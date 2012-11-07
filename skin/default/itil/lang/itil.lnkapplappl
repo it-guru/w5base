@@ -41,3 +41,6 @@
 'invalid characters in to service name'=>{de=>'ungültige Zeichen im nach Servicename'},
 'invalid notation of the from URL'=>{de=>'ungültige Notation der von URL'},
 'invalid notation of the to URL'=>{de=>'ungültige Notation der nach URL'},
+'Interface Monitoring'=>{de=>'Schnittstellenüberwachung'},
+'Interface Monitoring Tool'=>{de=>'Schnittstellenüberwachungs Tool'},
+'Interface Monitoring Interval'=>{de=>'Schnittstellenüberwachungs Interval'},

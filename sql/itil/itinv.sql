@@ -1142,3 +1142,6 @@ create table businessservice (
               REFERENCES appl (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table appl add applmgr bigint(20) default NULL, add applowner bigint(20) default NULL;
+alter table lnkapplappl add monitor varchar(20) default NULL;
+alter table lnkapplappl add monitortool varchar(20) default NULL;
+alter table lnkapplappl add monitorinterval varchar(20) default NULL;

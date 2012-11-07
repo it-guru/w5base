@@ -133,6 +133,78 @@ sub new
                 label         =>'to Servicename',
                 dataobjattr   =>'lnkapplappl.toservice'),
 
+      new kernel::Field::Select(
+                name          =>'monitor',
+                group         =>'comdetails',
+                label         =>'Interface Monitoring',
+                allowempty    =>1,
+                weblinkto     =>"none",
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'itil::lnkapplappl::monitor',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'itil::lnkapplappl::monitor',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['rawmonitor'=>'name'],
+                vjoindisp     =>'displaylabel',
+                htmleditwidth =>'200px'),
+
+      new kernel::Field::Interface(
+                name          =>'rawmonitor',
+                group         =>'comdetails',
+                label         =>'raw Interface Monitoring',
+                dataobjattr   =>'lnkapplappl.monitor'),
+
+      new kernel::Field::Select(
+                name          =>'monitortool',
+                group         =>'comdetails',
+                label         =>'Interface Monitoring Tool',
+                allowempty    =>1,
+                weblinkto     =>"none",
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'itil::appl::applbasemoni',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'itil::appl::applbasemoni',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['rawmonitortool'=>'name'],
+                vjoindisp     =>'displaylabel',
+                htmleditwidth =>'200px'),
+
+      new kernel::Field::Interface(
+                name          =>'rawmonitortool',
+                group         =>'comdetails',
+                label         =>'raw Interface Monitoring Tool',
+                dataobjattr   =>'lnkapplappl.monitortool'),
+
+      new kernel::Field::Select(
+                name          =>'monitorinterval',
+                group         =>'comdetails',
+                label         =>'Interface Monitoring Interval',
+                allowempty    =>1,
+                weblinkto     =>"none",
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'itil::lnkapplappl::monitorinterval',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'itil::lnkapplappl::monitorinterval',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['rawmonitorinterval'=>'name'],
+                vjoindisp     =>'displaylabel',
+                htmleditwidth =>'200px'),
+
+      new kernel::Field::Interface(
+                name          =>'rawmonitorinterval',
+                group         =>'comdetails',
+                label         =>'raw Interface Monitoring Interval',
+                dataobjattr   =>'lnkapplappl.monitorinterval'),
+
       new kernel::Field::Text(
                 name          =>'implapplversion',
                 group         =>'impl',
