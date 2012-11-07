@@ -222,6 +222,13 @@ sub new
                                 "'+GS++','GS'".
                                 ",'NONE')"),
 
+      new kernel::Field::Text(
+                name          =>'securityset',
+                label         =>'security set',
+                ignorecase    =>1,
+                group         =>'form',
+                dataobjattr   =>"amportfolio.securityset"),
+
       new kernel::Field::Float(
                 name          =>'systemcpucount',
                 label         =>'System CPU count',
@@ -735,7 +742,12 @@ sub getSqlFrom
       "amcomputer,amportfolio,ammodel,".
       "(select amcostcenter.* from amcostcenter ".
       " where amcostcenter.bdelete=0) amcostcenter, ".
-      "amportfolio assetportfolio, amtenant";
+      "amportfolio assetportfolio, ".
+#      "(select amitemlistval.* from amitemlistval,amitemizedlist ".
+#      " where amitemlistval.litemlistid=amitemlistval.litemlistid ".
+#      " and amitemizedlist.identifier='amPortfolioSecuritySet')  ".
+#      "securitysetval,".
+      "amtenant";
 
    return($from);
 }
@@ -753,6 +765,7 @@ sub initSqlWhere
       "and amportfolio.ltenantid=amtenant.ltenantid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
       "and ammodel.name='LOGICAL SYSTEM' ";
+#      "and amportfolio.securityset=securitysetval.litemlistvalid(+) ";
    return($where);
 }
 
