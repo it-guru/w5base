@@ -249,10 +249,10 @@ sub sendOverviewData
                      $month." ".$primrec->{fullname},
           emailtemplate =>'w5stat',
           emaillang     =>$lang,
-          emailcc       =>['hartmut.vogler@t-systems.com'],
           emailfrom     =>$emailto,
           emailtext     =>\@emailtext,
           emailto       =>$emailto,
+          emailfrom     =>'"'.$sitename.'"'." <>",
           additional    =>{
              htmldata=>$d,month=>$month, 
              directlink=>$joburl."/auth/base/menu/msel/Reporting?search_id=".
