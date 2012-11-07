@@ -631,11 +631,6 @@ sub LoadStatSet
       if (ref($primrec->{stats}) ne "HASH"){
          $primrec->{stats}={Datafield2Hash($primrec->{stats})};
       }
-      $self->ResetFilter();
-      $self->SecureSetFilter([{fullname=>\$primrec->{'fullname'},
-                               sgroup=>\$primrec->{'sgroup'}},
-                              {nameid=>\$primrec->{'nameid'},
-                               sgroup=>\$primrec->{'sgroup'}}]);
       my $dstrange=$primrec->{dstrange};
       my $lastrange=undef;
 
@@ -647,18 +642,33 @@ sub LoadStatSet
          }
          $lastrange=sprintf("%04d%02d",$Y,$M);
       }
+
+      my @fltlist=({fullname=>\$primrec->{'fullname'},
+                    sgroup=>\$primrec->{'sgroup'}},
+                   {nameid=>\$primrec->{'nameid'},
+                    sgroup=>\$primrec->{'sgroup'}});
+      my %srec;
       my $hist={area=>[]};
-      foreach my $srec ($self->getHashList(qw(ALL))){
-         if (ref($srec->{stats}) ne "HASH"){
-            $srec->{stats}={Datafield2Hash($srec->{stats})};
-         }
-         push(@{$hist->{area}},$srec);
-         if (defined($lastrange)){
-            if ($lastrange eq $srec->{dstrange}){
-               $hist->{lastdstrange}=$srec;
+      foreach my $flt (@fltlist){
+         $self->ResetFilter();
+         $self->SecureSetFilter($flt);
+         $self->SetCurrentOrder("NONE");
+         foreach my $srec ($self->getHashList(qw(ALL))){
+            if (!exists($srec{$srec->{id}})){
+               if (ref($srec->{stats}) ne "HASH"){
+                  $srec->{stats}={Datafield2Hash($srec->{stats})};
+               }
+               push(@{$hist->{area}},$srec);
+               if (defined($lastrange)){
+                  if ($lastrange eq $srec->{dstrange}){
+                     $hist->{lastdstrange}=$srec;
+                  }
+               }
+               $srec{$srec->{id}}++;
             }
          }
       }
+
       return($primrec,$hist);
 
    }
