@@ -197,6 +197,10 @@ sub getTimeRangeDrop
                                              $oldval eq "");
       if ($blk eq "shorthistory"){
          my @l=(
+                ''=>
+                $app->T("with undefined end"), 
+                '>now'=>
+                $app->T("in the future"), 
                 '>today-48h'=>
                 $app->T("future and last 48h"), 
                 '>now-3d'=>

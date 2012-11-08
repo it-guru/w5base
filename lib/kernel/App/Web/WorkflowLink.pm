@@ -196,6 +196,9 @@ sub WorkflowLinkResult
       if ($tt=~m/[\(\)]/){     # if a month or year is specified, the open
          $q{eventend}=$tt;     # entrys will not be displayed
       }
+      elsif ($tt eq ""){
+         $q{eventend}=[undef];
+      }
       else{
          $q{eventend}=[$tt,undef];
       }
