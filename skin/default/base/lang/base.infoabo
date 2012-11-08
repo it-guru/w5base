@@ -6,6 +6,8 @@
                        en=>'Relation'},
 'fieldgroup.newin'=>{de=>'InfoAbo Neuerfassung',
                        en=>'InfoAbo new'},
+'fieldgroup.comments'=>{de=>'Bemerkungen',
+                        en=>'Comments'},
 'Active'=>{de=>'Aktiv'},
 'User CI-State'=>{de=>'Kontakt CI-Status'},
 'User'=>{de=>'Kontakt',en=>'Contact'},

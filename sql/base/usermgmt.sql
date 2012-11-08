@@ -332,3 +332,4 @@ create table userblacklist (
 );
 alter table contact add admcomments longtext default NULL;
 alter table contact add ipacl longtext default NULL;
+alter table infoabo add comments longtext default NULL;

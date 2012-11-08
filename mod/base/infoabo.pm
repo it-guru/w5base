@@ -198,6 +198,12 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'contact.managedbygrp'),
 
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                group         =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'infoabo.comments'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -292,7 +298,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default relation source));
+   return(qw(header default relation comments source));
 }
 
 
@@ -539,6 +545,7 @@ sub Validate
    my @modelist=keys(%modelist);
 
    if (!in_array(\@modelist,$mode)){
+      msg(ERROR,"invalid rawmode=$mode - allowed=".join(",",@modelist));
       $self->LastMsg(ERROR,"invalid interal infomode");
       return(0);
    }
@@ -786,7 +793,7 @@ sub isViewValid
    if ($ENV{REMOTE_USER} eq "anonymous"){
       return("header","default");
    }
-   return("header","default","relation","history","source");
+   return("header","default","relation","history","comments","source");
 }
 
 sub isWriteValid
@@ -800,14 +807,14 @@ sub isWriteValid
    return("default","newin") if (ref($rec) eq "HASH" &&
                                  $self->getCurrentUserId() eq $userid);
    if ($self->isInfoAboAdmin() || $self->IsMemberOf("admin")){
-      return("default");
+      return("default","comments");
    }
 
    my %a=$self->getGroupsOf($self->getCurrentUserId(),
                             [qw(RContactAdmin)],'direct');
    my @idl=keys(%a);
    if (in_array([keys(%a)],$rec->{managedbyid})){
-      return("default");
+      return("default","comments");
    }
 
    return(undef);
