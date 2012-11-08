@@ -321,7 +321,7 @@ sub SecureSetFilter
    my @flt=@_;
   
    if (!$self->isDirectFilter(@flt)){
-      if (!$self->IsMemberOf($self->{admread},"RMember")){
+      if (!$self->isInfoAboAdmin("read")){
          my $userid=$self->getCurrentUserId();
          my @useridlist=($userid);
      
@@ -1103,7 +1103,15 @@ sub Welcome
 sub isInfoAboAdmin
 {
    my $self=shift;
+   my $mode=shift;
 
+   $mode="write" if (!defined($mode) || $mode eq "");
+   $mode="read" if ($mode ne "write");
+
+   if ($mode eq "read"){
+      my $bk=$self->IsMemberOf($self->{admread});
+      return($bk) if ($bk);
+   }
    return($self->IsMemberOf($self->{admwrite}));
 }
 

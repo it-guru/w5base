@@ -223,19 +223,10 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec) && $self->IsMemberOf("admin"));
    my $o=getModuleObject($self->Config,"base::infoabo");
-   return("ALL") if ($o->isInfoAboAdmin());
+   return("ALL") if ($o->isInfoAboAdmin("read"));
    return();
 }
 
-sub isWriteValid
-{
-   my $self=shift;
-   my $rec=shift;
-
-   my $o=getModuleObject($self->Config,"base::infoabo");
-   return("default") if ($o->isInfoAboAdmin());
-   return(undef);
-}
 
 
 sub isWriteValid
