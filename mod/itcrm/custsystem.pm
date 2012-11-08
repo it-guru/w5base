@@ -112,7 +112,8 @@ sub new
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['id'=>'systemid'],
                 nodetaillink  =>1,
-                vjoindisp     =>['appl','applcistatus','applcustomer']),
+                vjoindisp     =>['appl','applcistatus','applcustomer',
+                                 'applid']),
 
       new kernel::Field::SubList(
                 name          =>'software',
