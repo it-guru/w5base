@@ -128,6 +128,12 @@ sub NotifyChange
          my $emailto=[keys(%emailto)];
 
          return({exitcode=>0,msg=>'ok'}) if ($#{$emailto}==-1);
+
+         if (!($self->Config->Param("W5BaseOperationMode") eq "normal"||
+               $self->Config->Param("W5BaseOperationMode") eq "online")){
+            return({exitcode=>0,msg=>'Notify only in normal Online mode'});
+         }
+
          my $desc=$wfrec->{changedescription};
          $desc=~s/^AG\s+.*$//m;
          $desc=trim($desc);
