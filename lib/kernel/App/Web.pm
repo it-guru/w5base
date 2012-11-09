@@ -136,7 +136,7 @@ sub getValidWebFunctions
 {
    my ($self)=@_;
 
-   return(qw(Main));
+   return(qw(Main mobileMain));
 }
 
 
@@ -1279,6 +1279,18 @@ sub HttpHeader
    return($d);
 }
 
+sub mobileMain
+{
+   my $self=shift;
+   my $d="";
+
+   $d.=$self->HttpHeader("text/html");
+   $d.="this is mobile Main for $self";
+   $d.=$self->HtmlBottom(body=>1,form=>1);
+   print($d);
+   return;
+}
+
 sub noAccess
 {
    my $self=shift;
@@ -1396,6 +1408,7 @@ EOF
       }
    }
    $d.="<head>\n";
+   $d.="<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />";
    if (defined($param{'shorticon'})){
       my $shorticon=$param{'shorticon'};
       $d.="<link rel=\"shortcut icon\" ".

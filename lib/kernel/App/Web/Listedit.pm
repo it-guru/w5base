@@ -260,7 +260,7 @@ sub getValidWebFunctions
 {  
    my ($self)=@_;
    $self->doFrontendInitialize();
-   my @l=qw(NativMain Main MainWithNew addAttach 
+   my @l=qw(NativMain Main mobileMain MainWithNew addAttach 
             NativResult Result Upload UploadWelcome UploadFrame
             Welcome Empty Detail HtmlDetail HandleInfoAboSubscribe
             New Copy FormatSelect Bookmark startWorkflow
@@ -876,6 +876,66 @@ sub MainWithNew
    my ($self)=@_;
    return($self->Main(allowNewButton=>1));
 }
+
+sub mobileMain
+{
+   my $self=shift;
+   my $sitename=$self->Config->Param("SITENAME");
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['jquery.mobile-1.1.1.min.css'],
+                           js=>['jquery-1.7.1.min.js',
+                                'jquery.mobile.1.1.1.min.js'],
+                           title=>"Mobile - $sitename");
+
+   my $bak="<a data-role=\"button\" data-inline=\"true\" ".
+           "data-rel=\"back\" data-icon=\"arrow-u\" data-iconpos=\"left\">".
+           "Back".
+           "</a>";
+
+   my $mainp="<div data-role=\"page\" id=\"mainpage\">";
+   $mainp.="<div data-theme=\"a\" data-role=\"header\">";
+   $mainp.=$bak;
+   $mainp.="<h3>".$self->T($self->Self,$self->Self)."</h3>";
+   $mainp.="</div>";
+   $mainp.=<<EOF;
+<form action="" method="POST">
+     <div data-role="fieldcontain"  data-mini="true" >
+         <fieldset data-role="controlgroup">
+             <label for="textinput1">
+                 Name
+             </label>
+             <input name="" id="textinput1" placeholder="" value="" type="text" />
+         </fieldset>
+     </div>
+     <div data-role="fieldcontain" data-mini="true">
+         <fieldset data-role="controlgroup">
+             <label for="textinput2">
+                 Fullname
+             </label>
+             <input name="" id="textinput2" placeholder="" value="" type="text" />
+         </fieldset>
+     </div>
+     <div data-role="fieldcontain" data-mini="true">
+         <fieldset data-role="controlgroup">
+             <label for="textinput2">
+                 ApplicationID
+             </label>
+             <input name="" id="textinput2" placeholder="" value="" type="text" />
+         </fieldset>
+     </div>
+     <div align=right>
+     <input  data-mini="true" type="submit" data-inline="true" data-icon="search" data-iconpos="right" value="Submit" />
+     </div>
+ </form>
+
+EOF
+
+   $mainp.="</div>";
+   print($mainp."</body></html>");
+}
+
+
+
 
 sub Main
 {

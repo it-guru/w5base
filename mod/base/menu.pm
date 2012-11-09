@@ -214,7 +214,7 @@ sub getValidWebFunctions
 {
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(),
-          "root","menutop","menuframe","msel","TableVersionChecker",
+          "root","mobile","menutop","menuframe","msel","TableVersionChecker",
           "LoginFail","IllegalTokenAccess");
 }
 
@@ -657,6 +657,108 @@ EOF
    }
 }
 
+sub mobile
+{
+   my $self=shift;
+   my $sitename=$self->Config->Param("SITENAME");
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['jquery.mobile-1.1.1.min.css'],
+                           js=>['jquery-1.7.1.min.js',
+                                'jquery.mobile.1.1.1.min.js'],
+                           title=>"Mobile - $sitename");
+   my $ml=$self->_getMenuEntryFinalList(undef,"mobile");
+
+   my $mainp="<div data-role=\"page\" id=\"mainpage\">";
+   $mainp.="<div data-theme=\"a\" data-role=\"header\">";
+   $mainp.="<h3>$sitename</h3>";
+   $mainp.="</div>";
+
+   $mainp.="<ul data-role=\"listview\" data-divider-theme=\"b\" ".
+       "data-inset=\"true\">\n";
+#   $mainp.="<li data-role=\"list-divider\" role=\"heading\">";
+#   $mainp.="Main";
+#   $mainp.="</li>";
+   foreach my $mrec (sort({$a->{prio} <=> $b->{prio}} @$ml)){
+      next if ($mrec->{fullname} eq "MyW5Base");
+      next if ($mrec->{fullname} eq "Reporting");
+      next if ($mrec->{fullname} eq "Tools");
+      $mainp.="<li data-theme=\"c\">";
+      $mainp.="<a href=\"#page$mrec->{menuid}\" data-transition=\"flow\">";
+      $mainp.=$mrec->{label};
+      $mainp.="</a></li>\n";
+   } 
+   $mainp.="</ul>";
+   $mainp.="</div>\n";
+
+   print $mainp;
+   foreach my $mrec (@$ml){
+      $self->_mobileShowSubMenu("mainpage",$sitename,$mrec);
+   }
+   print("</body></html>");
+}
+
+sub _mobileShowSubMenu
+{
+   my $self=shift;
+   my $parentid=shift;
+   my $sitename=shift;
+   my $ment=shift;
+   my $mt=$self->Cache->{Menu}->{Cache};
+
+   my $mainp="<div data-role=\"page\" id=\"page$ment->{menuid}\">";
+   $mainp.="<div data-theme=\"a\" data-role=\"header\">";
+
+   $mainp.="<a data-role=\"button\" data-inline=\"true\" ".
+           "href=\"#$parentid\" data-icon=\"arrow-u\" data-iconpos=\"left\">".
+           "Back".
+           "</a>";
+
+   $mainp.="<a data-role=\"button\" data-inline=\"true\" ".
+           "href=\"#mainpage\" data-icon=\"home\" data-iconpos=\"right\">".
+           "Home".
+           "</a>";
+
+   $mainp.="<h3>$sitename</h3>";
+   $mainp.="</div>";
+   $mainp.="<br>";
+
+   if ($ment->{target}=~m/::/){  # seems to be a data object
+      my $target=$ment->{target};
+      $target=~s/::/\//;
+      $target="../../$target/mobile".$ment->{func};
+      $mainp.="<a data-theme=\"b\" data-role=\"button\" href=\"$target\" ".
+              "data-icon=\"arrow-r\" data-ajax=\"false\" ".
+              "data-iconpos=\"right\">".  
+              $ment->{label}."</a>";
+      $mainp.="<hr>\n";
+      $mainp.="<ul data-role=\"listview\" data-divider-theme=\"b\" ".
+          "data-inset=\"true\">";
+   }
+   else{
+      $mainp.="<ul data-role=\"listview\" data-divider-theme=\"b\" ".
+          "data-inset=\"true\">";
+      $mainp.="<li data-role=\"list-divider\" role=\"heading\">".
+              $ment->{label}.
+              "</li>";
+   }
+print STDERR ("msel=%s\n",Dumper($ment)) if ($ment->{fullname} eq "itil.system");;
+
+  # printf STDERR ("fullname: %s\n",Dumper($ment));
+   foreach my $mrec (@{$ment->{tree}}){
+      $mainp.="<li data-theme=\"c\">";
+      $mainp.="<a href=\"#page$mrec->{menuid}\" data-transition=\"flow\">";
+      $mainp.=$mrec->{label};
+      $mainp.="</a></li>\n";
+   } 
+   $mainp.="</ul>";
+   $mainp.="</div>\n\n\n";
+   print($mainp);
+
+   foreach my $sment (@{$ment->{tree}}){
+      $self->_mobileShowSubMenu("page$ment->{menuid}",$sitename,$sment);
+   }
+}
+
 sub LoginFail
 {
    my $self=shift;
@@ -684,7 +786,6 @@ sub menuframe
    $fp=~s/\//./g;
    $fp=~s/"/./g;
    my $rootpath=Query->Param("RootPath");
-   my $mt=$self->Cache->{Menu}->{Cache};
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(target=>'msel',
@@ -692,7 +793,7 @@ sub menuframe
                              base=>'',
                             prefix=>$rootpath,
                            style=>['default.css','menu.css']);
-   my $m=$self->MenuTab($rootpath,$mt,$fp,'JavaScript:SwitchMenuVisible() target=_self');
+   my $m=$self->MenuTab($rootpath,$fp,'JavaScript:SwitchMenuVisible() target=_self');
    my $menuframe=$self->getParsedTemplate("tmpl/menutmpl",{
                                        static=>{menutab=>$m,
                                                 rootpath=>$rootpath}});
@@ -912,11 +1013,25 @@ sub MenuTab
 {
    my $self=shift;
    my $rootpath=shift;
-   my $mt=shift;
    my $active=shift;
    my $rootlink=shift;
    my $d="\n";
-   #$d="<xmp>".Dumper($mt)."</xmp>";
+   
+   $d.=kernel::MenuTree::BuildHtmlTree(
+                     tree=>$self->_getMenuEntryFinalList($active,"normal"),
+                     hrefclass=>'menulink',
+                     rootlink =>$rootlink,
+                     rootpath => $rootpath);
+   return($d);
+}
+
+sub _getMenuEntryFinalList
+{
+   my $self=shift;
+   my $active=shift;
+   my $mode=shift;
+   my $mt=$self->Cache->{Menu}->{Cache};
+
    my @mlist=();
    # Pass 1 Basis-Liste zusammenstellen
    foreach my $srcrec (values(%{$mt->{menuid}})){
@@ -930,16 +1045,11 @@ sub MenuTab
    foreach my $m (@mlist){
       next if ($m->{fullname}=~m/\$$/);
       if (grep(/^read$/,$self->getMenuAcl($ENV{REMOTE_USER},$m))){
-         $self->processSubs($mt,$m,$active);
+         $self->processSubs($mt,$m,$active,$mode);
          push(@modmlist,$m);
       }
    }
-   #printf STDERR ("l=%s\n",Dumper(\@modmlist));
-   $d.=kernel::MenuTree::BuildHtmlTree(tree     => \@modmlist,
-                     hrefclass=>'menulink',
-                     rootlink =>$rootlink,
-                     rootpath => $rootpath);
-   return($d);
+   return(\@modmlist);
 }
 
 sub processSubs
@@ -948,19 +1058,20 @@ sub processSubs
    my $mt=shift;
    my $m=shift;
    my $active=shift;
+   my $mode=shift;
    my $rootpath=Query->Param("RootPath");
 
 
    my @subs=();
    foreach my $mid (@{$m->{subid}}){
-      if (substr($active,0,length($m->{fullname})+1) eq $m->{fullname}.'.' ||
-          $active eq $m->{fullname}){
+      if ((substr($active,0,length($m->{fullname})+1) eq $m->{fullname}.'.' ||
+          $active eq $m->{fullname}) || $mode eq "mobile"){
          my %clone=%{$mt->{menuid}->{$mid}};
          if ($#{$clone{acls}}==-1 || 
              grep(/^read$/,$self->getCurrentAclModes($ENV{REMOTE_USER},
                                                      $clone{acls}))){
                   push(@subs,\%clone);
-            $self->processSubs($mt,\%clone,$active);
+            $self->processSubs($mt,\%clone,$active,$mode);
          }
       }
    }
