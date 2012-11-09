@@ -18,7 +18,7 @@ package base::lnkqrulemandator;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
+use Class::ISA;
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
@@ -205,7 +205,10 @@ sub Validate
       $self->LastMsg(ERROR,"dataobj not functional");
       return(undef);  
    }
+   my @dataobjparent=Class::ISA::self_and_super_path($dataobj);
+
    my $dataobjparent=$do->SelfAsParentObject();
+
    my $qr=getModuleObject($self->Config(),"base::qrule");
    my $found=0;
    foreach my $qrulerec (@{$qr->{'data'}}){
@@ -217,7 +220,7 @@ sub Validate
                $found++;
                last;
             }
-            if ($dataobjparent=~m/^$t$/){
+            if (in_array(\@dataobjparent,$t)){
                $found++;
                last;
             }
