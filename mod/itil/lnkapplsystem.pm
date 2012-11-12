@@ -28,6 +28,14 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=5;
    my $self=bless($type->SUPER::new(%param),$type);
+   my $sys=getModuleObject($self->Config,"itil::system");
+
+   my $vmifexp="if (".join(' or ',
+                map({"system.systemtype='$_'"} @{$sys->needVMHost()}));
+   if ($#{$sys->needVMHost()}==-1){
+      $vmifexp="if (0";
+   }
+
 
    
 
@@ -96,7 +104,7 @@ sub new
                 readonly      =>1,
                 group         =>'assetinfo',
                 label         =>'Asset-Name',
-                dataobjattr   =>"if (system.systemtype='vmware',vasset.name,asset.name)"),
+                dataobjattr   =>"$vmifexp,vasset.name,asset.name)"),
 
       new kernel::Field::TextDrop(
                 name          =>'assetlocation',
@@ -442,7 +450,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'assetid',
                 label         =>'AssetID W5BaseID',
-                dataobjattr   =>"if (system.systemtype='vmware',vsystem.asset,system.asset)"),
+                dataobjattr   =>"$vmifexp,vsystem.asset,system.asset)"),
 
       new kernel::Field::Link(
                 name          =>'customerid',
@@ -543,7 +551,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'assetid',
                 label         =>'AssetId',
-                dataobjattr   =>"if (system.systemtype='vmware',vsystem.asset,system.asset)"),
+                dataobjattr   =>"$vmifexp,vsystem.asset,system.asset)"),
                                                    
       new kernel::Field::Text(
                 name          =>'applid',

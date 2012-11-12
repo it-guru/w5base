@@ -36,11 +36,9 @@ sub new
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
 
-   $self->{needVMHost}=['vmware','vPartition'];
-   $self->{needVMHost}=[]; # removed temp. since data quality problems
    my $vmifexp="if (".join(' or ',
-                map({"system.systemtype='$_'"} @{$self->{needVMHost}}));
-   if ($#{$self->{needVMHost}}==-1){
+                map({"system.systemtype='$_'"} @{$self->needVMHost()}));
+   if ($#{$self->needVMHost()}==-1){
       $vmifexp="if (0";
    }
 
@@ -1313,6 +1311,15 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 }
 
 
+sub needVMHost
+{
+   my $self=shift;
+
+   return([]);
+   return(['vmware','vPartition']);
+}
+
+
 
 
 
@@ -1329,7 +1336,7 @@ sub isViewValid
               physys ipaddresses phonenumbers sec applications
               location source customer history
               attachments control systemclass interview);
-   if (defined($rec) && in_array($self->{needVMHost},$rec->{'systemtype'})){
+   if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       push(@all,"vhost");
    }
    if (defined($rec) && $rec->{'isclusternode'}){
@@ -1350,7 +1357,7 @@ sub isWriteValid
    my @databossedit=qw(default software admin logsys contacts misc opmode 
                        physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
-   if (defined($rec) && in_array($self->{needVMHost},$rec->{'systemtype'})){
+   if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       @databossedit=grep(!/^physys$/, @databossedit);
       push(@databossedit,"vhost");
    }
