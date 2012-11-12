@@ -43,10 +43,10 @@ sub new
                 dataobjattr   =>'lnkbprocessbusinessservice.id'),
                                                  
       new kernel::Field::TextDrop(
-                name          =>'bprocess',
+                name          =>'businessprocess',
                 htmlwidth     =>'250px',
                 label         =>'Business process',
-                vjointo       =>'itil::bprocess',
+                vjointo       =>'itil::businessprocess',
                 vjoinon       =>['bprocessid'=>'id'],
                 vjoindisp     =>'name',
                 dataobjattr   =>'businessprocess.name'),
@@ -174,7 +174,7 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'bprocessbprocessid',
-                label         =>'ApplicationID',
+                label         =>'BusinessprocessID',
                 group         =>'bprocessinfo',
                 dataobjattr   =>'businessprocess.id'),
 

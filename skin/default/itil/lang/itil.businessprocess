@@ -4,3 +4,4 @@
 'fieldgroup.systems'=>{de=>'Systems',en=>'Systems'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
 'Applications'=>{de=>'Anwendungen'},
+'Business process'=>{de=>'Geschäftsprozess'},

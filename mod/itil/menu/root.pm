@@ -506,6 +506,25 @@ sub Init
                       prio=>1000,
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("bsm",
+                      "tmpl/welcome",
+                      prio=>200);
+   
+   $self->RegisterObj("bsm.bp",
+                      "itil::businessprocess",
+                      func=>'MainWithNew',
+                      prio=>1000);
+   
+   $self->RegisterObj("bsm.bs",
+                      "itil::businessservice",
+                      func=>'MainWithNew',
+                      prio=>1000);
+   
+   $self->RegisterObj("bsm.ba",
+                      "itil::appl",
+                      func=>'MainWithNew',
+                      prio=>1000);
+   
    return($self);
 }
 

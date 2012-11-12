@@ -1,3 +1,5 @@
 'itil::lnkbprocessbservice'=>{de=>'Verknüpfung Geschäftsprozess - Service',
                               en=>'Link Businessprocess - Service'},
 'Application'=>{de=>'Anwendung'},
+'Business process'=>{de=>'Geschäftsprozess'},
+'Customer'=>{de=>'Kunde'},
