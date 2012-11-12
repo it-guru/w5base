@@ -64,6 +64,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 sqlorder      =>'desc',
+                searchable    =>0,
                 label         =>'Name',
                 dataobjattr   =>"$worktable.name"),
 
@@ -81,7 +82,6 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'application',
-                htmldetail    =>0,
                 readonly      =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -89,7 +89,7 @@ sub new
                    return(0);
                 },
                 uploadable    =>0,
-                label         =>'Application',
+                label         =>'primary provided by Application',
                 weblinkto     =>'itil::appl',
                 weblinkon     =>['parentid'=>'id'],
                 dataobjattr   =>'appl.name'),
@@ -161,6 +161,19 @@ sub new
                 group         =>'desc',
                 label         =>'Business Service Description',
                 dataobjattr   =>"$worktable.description"),
+
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                group         =>'contacts'),
+
+      new kernel::Field::SubList(
+                name          =>'businessprocesses',
+                label         =>'involved in Businessprocesses',
+                group         =>'businessprocesses',
+                vjointo       =>'itil::lnkbprocessbservice',
+                vjoinon       =>['id'=>'businessserviceid'],
+                vjoindisp     =>['businessprocess','customer']),
 
       new kernel::Field::Link(
                 name          =>'databossid',
@@ -236,7 +249,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default applinfo desc source));
+          qw(header default applinfo desc contacts businessprocesses source));
 }
 
 
@@ -319,7 +332,7 @@ sub isWriteValid
 
    return("default") if (!defined($rec));
    if ($self->isParentWriteable($rec->{applid})){
-      push(@l,"default");
+      push(@l,"default","contacts");
    }
    return(@l);
 }
