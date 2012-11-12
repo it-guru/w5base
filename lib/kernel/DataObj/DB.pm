@@ -104,6 +104,21 @@ sub getSqlFields
          ($container,$fieldname)=split(/\./,$fullfieldname);
       }
       my $field=$self->getField($fieldname);
+      if (defined($field->{vjoinon})){
+         my $fchk=$field;
+         my $loop=0;
+         while(defined($fchk->{vjoinon})){
+            $fchk=$self->getField($fchk->{vjoinon}->[0]);
+            $loop++;
+            last if (!defined($fchk) && $loop<10);
+            push(@view,$fchk->Name()) if (!in_array(\@view,$fchk->Name()));
+            if (defined($fchk->{container})){
+               if (!in_array(\@view,$fchk->{container})){
+                  push(@view,$fchk->{container});
+               }
+            }
+         } 
+      }
       if (defined($field->{depend})){
          if (ref($field->{depend}) ne "ARRAY"){
             $field->{depend}=[$field->{depend}];
