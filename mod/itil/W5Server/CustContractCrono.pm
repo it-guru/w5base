@@ -18,7 +18,7 @@ sub new
 sub process
 {
    my $self=shift;
-   my $CronoTime="21:00";
+   my $CronoTime="22:00";
    my ($h,$m)=$CronoTime=~m/^(\d+):(\d+)/;
 
 
@@ -80,6 +80,43 @@ sub doCrono
 
    my ($year,$month,$day,$hour,$min,$sec)=Time_to_Date("GMT",time());
    my $m=sprintf("%04d/%02d",$year,$month);
+   my $mk=sprintf("(%02d/%04d)",$month,$year);
+
+
+   my $wf=getModuleObject($self->Config,"base::workflow");
+
+   $wf->SetFilter({eventend=>"$mk",isdeleted=>0});
+   $wf->SetCurrentView(qw(class id affectedcontractid));
+   $wf->SetCurrentOrder(qw(NONE));
+   my %wfstat=();
+   my %wfstatkeys=();
+
+   my ($wfrec,$msg)=$wf->getFirst(unbuffered=>1);
+   if (defined($wfrec)){
+      do{
+         #msg(INFO,"wfid=".Dumper($wfrec->{affectedcontractid}));
+         my $contractid=$wfrec->{affectedcontractid};
+         $contractid=[$contractid] if (ref($contractid) ne "ARRAY");
+         foreach my $cid (@{$contractid}){
+            if ($wfrec->{class}=~m/::change$/){
+               $wfstat{$cid}->{TotalChangeWorkflowCount}++;
+            }
+            elsif ($wfrec->{class}=~m/::incident$/){
+               $wfstat{$cid}->{TotalIncidentWorkflowCount}++;
+            }
+            elsif ($wfrec->{class}=~m/::eventinfo$/){
+               $wfstat{$cid}->{TotalEventnotifyWorkflowCount}++;
+            }
+            foreach my $k (keys(%{$wfstat{$cid}})){
+               $wfstatkeys{$k}++;
+            }
+         }
+         my $d=Dumper($wfrec);
+         ($wfrec,$msg)=$wf->getNext();
+      } until(!defined($wfrec));
+   }
+
+
    my $out=getModuleObject($self->Config,"itil::custcontractcrono");
    my $in=getModuleObject($self->Config,"itil::custcontract");
    my $sys=getModuleObject($self->Config,"itil::lnkapplsystem");
@@ -127,6 +164,10 @@ sub doCrono
             $add{totalActiveInstances}=$swinstancecount;
             $add{activeDatabaseInstances}=$dbcount;
 
+            foreach my $k (keys(%wfstatkeys)){
+               $add{$k}=$wfstat{$rec->{id}}->{$k};
+            }
+
             my $reportkeyfilter={custcontractid=>\$rec->{id},month=>\$m};
             if (keys(%applid)<=0){
                $out->BulkDeleteRecord($reportkeyfilter); 
@@ -145,6 +186,9 @@ sub doCrono
          ($rec,$msg)=$in->getNext();
       } until(!defined($rec));
    }
+
+
+
 
    
 }
