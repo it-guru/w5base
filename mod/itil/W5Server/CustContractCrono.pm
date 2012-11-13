@@ -137,32 +137,34 @@ sub doCrono
                $appl{$appl->{appl}}++;
                $applid{$appl->{applid}}++;
             }
-            $sys->ResetFilter();
-            $sys->SetFilter({applid=>[keys(%applid)],
-                             systemcistatusid=>\'4'});
-            my $syscount=0;
-            my $logicalcpucount=0;
-            foreach my $sysrec ($sys->getHashList(qw(id logicalcpucount))){
-               $syscount++;
-               $logicalcpucount+=$sysrec->{logicalcpucount};
-            }
-            $add{activeLogicalSystemCount}=$syscount;
-            $add{activeLogicalCPUCount}=$logicalcpucount;
-
-            $swi->ResetFilter();
-            $swi->SetFilter({applid=>[keys(%applid)],
-                             cistatusid=>\'4'});
-            my $swinstancecount=0;
-            my $dbcount=0;
-            foreach my $irec ($swi->getHashList(qw(id swnature))){
-               $swinstancecount++;
-               if ($irec->{nature}=~
-                   m/(mysql|mssql|oracle db|informix|postgres)/i){
-                  $dbcount++;
+            if (keys(%applid)){
+               $sys->ResetFilter();
+               $sys->SetFilter({applid=>[keys(%applid)],
+                                systemcistatusid=>\'4'});
+               my $syscount=0;
+               my $logicalcpucount=0;
+               foreach my $sysrec ($sys->getHashList(qw(id logicalcpucount))){
+                  $syscount++;
+                  $logicalcpucount+=$sysrec->{logicalcpucount};
                }
+               $add{activeLogicalSystemCount}=$syscount;
+               $add{activeLogicalCPUCount}=$logicalcpucount;
+             
+               $swi->ResetFilter();
+               $swi->SetFilter({applid=>[keys(%applid)],
+                                cistatusid=>\'4'});
+               my $swinstancecount=0;
+               my $dbcount=0;
+               foreach my $irec ($swi->getHashList(qw(id swnature))){
+                  $swinstancecount++;
+                  if ($irec->{nature}=~
+                      m/(mysql|mssql|oracle db|informix|postgres)/i){
+                     $dbcount++;
+                  }
+               }
+               $add{totalActiveInstances}=$swinstancecount;
+               $add{activeDatabaseInstances}=$dbcount;
             }
-            $add{totalActiveInstances}=$swinstancecount;
-            $add{activeDatabaseInstances}=$dbcount;
 
             foreach my $k (keys(%wfstatkeys)){
                $add{$k}=$wfstat{$rec->{id}}->{$k};
