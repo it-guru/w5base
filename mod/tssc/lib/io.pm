@@ -292,7 +292,12 @@ sub mkChangeStoreRec
       $updateto=$oldrec[0]->{id};
       $oldclass=$oldrec[0]->{class};
    }
-   msg(DEBUG,"tasks=%s",Dumper($rec->{tasks}));
+   my $ServiceCenterTaskCount="?";
+   my $tasks=$rec->{tasks};
+
+   if (ref($tasks) eq "ARRAY"){
+      $ServiceCenterTaskCount=$#tasks+1;
+   }
 
    $wfrec{srcid}=$rec->{changenumber};
    $wfrec{name}=$rec->{name};
@@ -317,6 +322,7 @@ sub mkChangeStoreRec
   # }
    $wfrec{additional}={
       ServiceCenterChangeNumber=>$rec->{changenumber},
+      ServiceCenterTaskCount=>$ServiceCenterTaskCount,
       ServiceCenterState=>$rec->{status},
       ServiceCenterAssignedTo=>$rec->{assignedto},
       ServiceCenterRisk=>$rec->{risk},
