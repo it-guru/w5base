@@ -296,7 +296,7 @@ sub mkChangeStoreRec
    my $tasks=$rec->{tasks};
 
    if (ref($tasks) eq "ARRAY"){
-      $ServiceCenterTaskCount=$#tasks+1;
+      $ServiceCenterTaskCount=$#{$tasks}+1;
    }
 
    $wfrec{srcid}=$rec->{changenumber};
