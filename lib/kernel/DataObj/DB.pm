@@ -110,7 +110,7 @@ sub getSqlFields
          while(defined($fchk->{vjoinon})){
             $fchk=$self->getField($fchk->{vjoinon}->[0]);
             $loop++;
-            last if (!defined($fchk) && $loop<10);
+            last if (!defined($fchk) || $loop<10);
             push(@view,$fchk->Name()) if (!in_array(\@view,$fchk->Name()));
             if (defined($fchk->{container})){
                if (!in_array(\@view,$fchk->{container})){
