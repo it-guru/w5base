@@ -1252,6 +1252,29 @@ sub addComplexAbos
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass}]});
    }
+   elsif ($WfRec->{eventmode} eq "EVk.infraloc"){
+      my $locid=$WfRec->{affectedlocationid};
+      $locid=[$locid] if (ref($locid) ne "ARRAY");
+      my $loc=getModuleObject($self->Config,"base::location");
+      $loc->SetFilter({id=>$locid});
+      foreach my $rec ($loc->getHashList(qw(id grprelations))){
+         foreach my $relrec (@{$rec->{grprelations}}){
+            if (in_array([qw(RMbusinesrel1 RMbusinesrel2 RMbusinesrel3)],
+                $relrec->{relmode})){
+               $self->LoadGroups(\%allcustomer,"both",$relrec->{grpid});
+            }
+         }
+      }
+      if (keys(%allcustomer)){
+         push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                    nativeventstatclass=>[$WfRec->{eventstatclass},undef],
+                    affecteditemprio=>[$WfRec->{affecteditemprio},undef],
+                    affectedcustomerid=>[keys(%allcustomer)],
+                    affectedorgareaid=>[undef],
+                    });
+      }
+
+   }
    elsif ($WfRec->{eventmode} eq "EVk.bprocess"){
       my $bpid=$WfRec->{affectedbusinessprocessid};
       $bpid=[$bpid] if (ref($bpid) ne "ARRAY");
@@ -1279,10 +1302,11 @@ sub addComplexAbos
                  affectedorgareaid=>[undef],
                  });
    }
-
-   $complexabo->SetFilter(\@flt);
-   foreach my $rec ($complexabo->getHashList(qw(email))){
-      $emailto->{$rec->{email}}++;
+   if ($#flt!=-1){
+      $complexabo->SetFilter(\@flt);
+      foreach my $rec ($complexabo->getHashList(qw(email))){
+         $emailto->{$rec->{email}}++;
+      }
    }
 }
 
@@ -2458,7 +2482,6 @@ sub nativProcess
    my $step=shift;
    my $WfRec=shift;
    my $actions=shift;
-
 
    if ($action eq "NextStep"){
       $h->{closedate}=undef;
