@@ -295,10 +295,6 @@ sub getNotificationSubject
    my $s=$self->SUPER::getNotificationSubject($WfRec,$action,$sendcustinfocount,
                                               $subjectlabel,$failclass);
 
-   if ($WfRec->{affecteditemprio} eq "1" &&
-       $WfRec->{eventstatclass} eq "1"){
-      $s="MI:".$s;
-   }
    $s="LIM-Info: ".$s;
 
    return($s);
