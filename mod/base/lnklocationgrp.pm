@@ -58,7 +58,7 @@ sub new
 
       new kernel::Field::Group(
                 name          =>'grp',
-                label         =>'Oranisation',
+                label         =>'Organisation',
                 vjoinon       =>'grpid'),
 
       new kernel::Field::Link(
