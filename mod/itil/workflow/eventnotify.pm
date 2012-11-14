@@ -629,7 +629,7 @@ sub getDynamicFields
                 getPostibleValues=>sub{
                    my $self=shift;
                    my @d;
-                   foreach my $k ($self->getParent->getAllowedEventModes()){
+                   foreach my $k (getAllowedEventModes()){
                       push(@d,$k,$self->getParent->T($k,$self->{translation}));
                    }
                    return(@d);
@@ -651,7 +651,6 @@ sub getDynamicFields
 
 sub getAllowedEventModes
 {
-   my $self=shift;
    return('EVk.appl','EVk.net','EVk.bprocess','EVk.infraloc','EVk.free');
 }
 
@@ -1234,23 +1233,28 @@ sub addComplexAbos
                  affecteditemprio=>[$WfRec->{affecteditemprio},undef],
                  affectedcustomerid=>[keys(%allcustomer)],
                  affectedorgareaid=>[keys(%allorgarea)],
+                 eventmode=>[$WfRec->{eventmode},undef],
                  });
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass},undef],
                  affecteditemprio=>[$WfRec->{affecteditemprio},undef],
                  affectedcustomerid=>[keys(%allcustomer)],
                  affectedorgareaid=>[undef],
+                 eventmode=>[$WfRec->{eventmode},undef],
                  });
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass},undef],
                  affecteditemprio=>[$WfRec->{affecteditemprio},undef],
                  affectedcustomerid=>[undef],
                  affectedorgareaid=>[keys(%allorgarea)],
+                 eventmode=>[$WfRec->{eventmode},undef],
                  });
    }
    elsif ($WfRec->{eventmode} eq "EVk.net"){
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
-                 nativeventstatclass=>[$WfRec->{eventstatclass}]});
+                 nativeventstatclass=>[$WfRec->{eventstatclass}],
+                 eventmode=>[$WfRec->{eventmode},undef]
+                 });
    }
    elsif ($WfRec->{eventmode} eq "EVk.infraloc"){
       my $locid=$WfRec->{affectedlocationid};
@@ -1261,19 +1265,17 @@ sub addComplexAbos
          foreach my $relrec (@{$rec->{grprelations}}){
             if (in_array([qw(RMbusinesrel1 RMbusinesrel2 RMbusinesrel3)],
                 $relrec->{relmode})){
-               $self->LoadGroups(\%allcustomer,"both",$relrec->{grpid});
+               $self->LoadGroups(\%allcustomer,"up",$relrec->{grpid});
             }
          }
       }
-      if (keys(%allcustomer)){
-         push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
-                    nativeventstatclass=>[$WfRec->{eventstatclass},undef],
-                    affecteditemprio=>[$WfRec->{affecteditemprio},undef],
-                    affectedcustomerid=>[keys(%allcustomer)],
-                    affectedorgareaid=>[undef],
-                    });
-      }
-
+      push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                 nativeventstatclass=>[$WfRec->{eventstatclass},undef],
+                 affecteditemprio=>[$WfRec->{affecteditemprio},undef],
+                 affectedcustomerid=>[keys(%allcustomer),undef],
+                 affectedorgareaid=>[undef],
+                 eventmode=>[$WfRec->{eventmode},undef]
+                 });
    }
    elsif ($WfRec->{eventmode} eq "EVk.bprocess"){
       my $bpid=$WfRec->{affectedbusinessprocessid};
@@ -1291,6 +1293,7 @@ sub addComplexAbos
                     affecteditemprio=>[$WfRec->{affecteditemprio},undef],
                     affectedcustomerid=>[keys(%allcustomer)],
                     affectedorgareaid=>[undef],
+                    eventmode=>[$WfRec->{eventmode},undef]
                     });
       }
    }
@@ -1300,6 +1303,7 @@ sub addComplexAbos
                  affecteditemprio=>[$WfRec->{affecteditemprio},undef],
                  affectedcustomerid=>[undef],
                  affectedorgareaid=>[undef],
+                 eventmode=>[$WfRec->{eventmode},undef]
                  });
    }
    if ($#flt!=-1){

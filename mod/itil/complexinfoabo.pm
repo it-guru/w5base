@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::App::Web::Listedit;
 use kernel::DataObj::DB;
 use kernel::Field;
+use itil::workflow::eventnotify;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -38,7 +39,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                uivisible     =>0,
+#                uivisible     =>0,
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'itil_infoabo.id'),
@@ -93,6 +94,23 @@ sub new
                 label         =>'Mode',
                 value         =>['eventinfo'],
                 dataobjattr   =>'itil_infoabo.infoabomode'),
+
+      new kernel::Field::Select(
+                name          =>'eventmode',
+                translation   =>'itil::workflow::eventnotify',
+                allowempty    =>1,
+                useNullEmpty  =>1,
+                label         =>'Eventnotification Mode',
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my @d=("","");
+                   foreach my $k (
+                          itil::workflow::eventnotify::getAllowedEventModes()){
+                      push(@d,$k,$self->getParent->T($k,$self->{translation}));
+                   }
+                   return(@d);
+                },
+                dataobjattr   =>'itil_infoabo.eventmode'),
 
       new kernel::Field::Select(
                 name          =>'eventstatclass',

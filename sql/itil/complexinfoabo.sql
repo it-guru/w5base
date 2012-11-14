@@ -21,3 +21,4 @@ create table itil_infoabo (
   key(affectedorgarea),key(affectedcustomer)
 );
 set FOREIGN_KEY_CHECKS=1;
+alter table itil_infoabo add eventmode varchar(20) default NULL;
