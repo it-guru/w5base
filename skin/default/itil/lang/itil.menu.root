@@ -99,7 +99,7 @@
 'invoice.lnkapplinvoicestor.cum'=>{de=>'kumuliert',en=>'cumulated'},
 'invoice.lnkapplinvoicestor.new'=>{de=>'Neueingabe',en=>'New'},
 'itu'=>{de=>'IT-Universum',en=>'IT-Universe'},
-'bsm'=>{de=>'IT-Servicemanagement',en=>'IT-Servicemanagement'},
+'bsm'=>{de=>'Business Service Management',en=>'Business Service Management'},
 'bsm.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'bsm.bs'=>{de=>'Business Service',en=>'Business service'},
 'bsm.ba'=>{de=>'Geschäftsanwendung',en=>'Business application'},
