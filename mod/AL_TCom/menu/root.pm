@@ -360,6 +360,15 @@ sub Init
                       "itil::costcenter",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("AL_TCom.kern.costcenter.new",
+                      "itil::costcenter",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.kern.costcenter.contacts",
+                      "finance::lnkcostcentercontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.kern.hwmodel.new",
                       "itil::hwmodel",
                       func=>'New',

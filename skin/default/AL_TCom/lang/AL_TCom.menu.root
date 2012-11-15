@@ -71,6 +71,7 @@
 'AL_TCom.kern.servicesupport.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.costcenter'=>{de=>'Kostenstelle/CO',en=>'CostCenter/CO'},
 'AL_TCom.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.kern.costcenter.contacts'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'AL_TCom.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'AL_TCom.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.bp.lnkappl'=>{de=>'Verkn. Anw.',en=>'Link Appl.'},
