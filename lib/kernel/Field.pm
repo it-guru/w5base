@@ -420,7 +420,11 @@ sub Label
       $d=$label;
       my $tr=$self->{translation};
       $tr=$self->getParent->Self if (!defined($tr));
-      $d=$self->getParent->T($d,$tr);
+      my @tr=($tr);
+      if ($tr ne $self->getParent->Self){
+         unshift(@tr,$self->getParent->Self);
+      }
+      $d=$self->getParent->T($d,@tr);
    }
    else{
       $d="(".$self->Name().")";

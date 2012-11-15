@@ -29,6 +29,10 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->getField("application")->{weblinkto}="AL_TCom::appl";
+   $self->getField("srcapplication")->{vjointo}="AL_TCom::appl";
+
+
    return($self);
 }
 

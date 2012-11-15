@@ -47,6 +47,8 @@ sub new
                 container     =>'additional'),
       insertafter=>['applid'] 
    );
+   $self->getField("businessservices")->{vjointo}="AL_TCom::businessservice";
+
    return($self);
 }
 

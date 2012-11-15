@@ -17,7 +17,7 @@
 'AL_TCom.appl.lnkapplinteranswer'=>{de=>'Interview',en=>'Interview'},
 'AL_TCom.appl.adv'=>{de=>'NOR-Vorgaben',en=>'NOR-target'},
 'AL_TCom.appl.nor'=>{de=>'NOR-Nachweis',en=>'NOR-Verification'},
-'AL_TCom.appl.bs'=>{de=>'Business Service',en=>'Business Service'},
+'AL_TCom.appl.bs'=>{de=>'IT-Service',en=>'IT-Service'},
 'AL_TCom.appl.bs.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.itclust'=>{de=>'Cluster',en=>'Cluster'},
 'AL_TCom.itclust.new'=>{de=>'Neueingabe',en=>'New'},

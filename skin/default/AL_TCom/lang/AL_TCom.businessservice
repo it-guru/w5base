@@ -2,4 +2,5 @@
                           en=>'Telekom IT IT-Service'},
 'Business-Service Fullname'=>{de=>'vollqualifizierter IT-Service',
                               en=>'IT-Service Fullname'},
-
+'Business Service Description'=>{de=>'Beschreibung des IT-Service',
+                                 en=>'IT-Service Description'},

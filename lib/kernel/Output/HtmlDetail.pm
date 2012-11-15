@@ -481,6 +481,7 @@ EOF
          if (defined($grpentry) && defined($grpentry->{translation})){
             my $tr=$grpentry->{translation};
             $tr=[$tr] if (ref($tr) ne "ARRAY");
+            unshift(@$tr,$self->getParent->getParent->Self());
             $grouplabel=$self->getParent->getParent->T($grouplabel,@$tr);
          }
          else{

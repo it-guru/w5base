@@ -240,6 +240,15 @@ sub new
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['itclustsvc']),
 
+      new kernel::Field::SubList(
+                name          =>'businessservices',
+                label         =>'provided Businessservices',
+                readonly      =>1,
+                group         =>'businessservices',
+                vjointo       =>'itil::businessservice',
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['fullname']),
+
       new kernel::Field::Text(
                 name          =>'businessteambossid',
                 group         =>'technical',
@@ -923,7 +932,6 @@ sub new
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
-                vjoininhash   =>['mdate','targetid','target', 'roles','id'],
                 group         =>'contacts'),
 
       new kernel::Field::PhoneLnk(
@@ -1492,7 +1500,7 @@ sub isViewValid
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control custcontracts customer delmgmt
               finance interfaces licenses monisla qc
-              misc opmgmt phonenumbers services
+              misc opmgmt phonenumbers services businessservices
               soclustgroup socomments sodrgroup source swinstances systems
               technical workflowbasedata header inmchm interview efforts);
    if (!$rec->{sodefinition}){
@@ -1629,7 +1637,7 @@ sub getDetailBlockPriority
           qw(header default finance technical opmgmt delmgmt 
              customer custcontracts 
              contacts phonenumbers 
-             interfaces systems swinstances services monisla
+             interfaces systems swinstances services businessservices monisla
              misc attachments control 
              sodrgroup soclustgroup socomments accountnumbers licenses source));
 }
