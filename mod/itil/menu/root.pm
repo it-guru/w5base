@@ -508,6 +508,7 @@ sub Init
 
    $self->RegisterObj("bsm",
                       "tmpl/welcome",
+                      defaultacl=>['valid_user'],
                       prio=>200);
    
    $self->RegisterObj("bsm.bp",
