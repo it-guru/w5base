@@ -53,6 +53,16 @@ sub new
                 label         =>'Incient Assignmentgroup ID',
                 container     =>'additional'),
 
+      new kernel::Field::Htmlarea(
+                name          =>'applicationexpertgroup',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>['tsmid','opmid','applmgrid','contacts'],
+                group         =>'technical',
+                label         =>'Application Expert Group',
+                onRawValue    =>\&calcApplicationExpertGroup),
+
       new kernel::Field::TextDrop(
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
@@ -105,6 +115,105 @@ sub new
    $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
 
    return($self);
+}
+
+sub calcApplicationExpertGroup
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $appl=$self->getParent;
+
+   my $user=getModuleObject($self->getParent->Config,"base::user");
+   my @aeg=('applmgr'=>{userid=>[$rec->{applmgrid}],
+                        label=>$appl->getField("applmgr")->Label(),
+                        sublabel=>"(System Manager)"},
+            'tsm'    =>{userid=>[$rec->{tsmid}],
+                        label=>$appl->getField("tsm")->Label(),
+                        sublabel=>"(technisch Verantw. Applikation)"},
+            'opm'    =>{userid=>[$rec->{opmid}],
+                        label=>$appl->getField("opm")->Label(),
+                        sublabel=>"(Produktions Verantw. Applikation)"},
+            'dba'    =>{userid=>[],
+                        label=>$self->getParent->T("Database Admin"),
+                        sublabel=>"(Verantwortlicher Datenbank)"},
+            'developerboss' =>{userid=>[],
+                               label=>$self->getParent->T("Developer",
+                                                      'itil::ext::lnkcontact'),
+                               sublabel=>"(Verantwortlicher Entwicklung)"},
+            'projectmanager'=>{userid=>[],
+                               label=>$self->getParent->T("Projectmanager",
+                                                     'itil::ext::lnkcontact'),
+                               sublabel=>"(Verantwortlicher Projektierung)"},
+           );
+   my %a=@aeg;
+
+   foreach my $crec (@{$rec->{contacts}}){
+      if ($crec->{target} eq "base::user" &&
+          in_array($crec->{roles},"developerboss")){
+         if (!in_array($a{developerboss}->{userid},$crec->{targetid})){
+            push(@{$a{developerboss}->{userid}},$crec->{targetid});
+         }
+      }
+      if ($crec->{target} eq "base::user" &&
+          in_array($crec->{roles},"projectmanager")){
+         if (!in_array($a{projectmanager}->{userid},$crec->{targetid})){
+            push(@{$a{projectmanager}->{userid}},$crec->{targetid});
+         }
+      }
+   }
+   my $swi=getModuleObject($self->getParent->Config,"itil::swinstance");
+   $swi->SetFilter({cistatusid=>\'4',applid=>\$rec->{id},
+                    swnature=>["Oracle DB Server","MySQL","MSSQL","DB2"]});
+   foreach my $srec ($swi->getHashList(qw(admid))){
+      if (!in_array($a{dba}->{userid},$srec->{admid})){
+         push(@{$a{dba}->{userid}},$srec->{admid});
+      }
+   }
+
+
+   my @chkuid;
+   foreach my $r (values(%a)){
+      push(@chkuid,@{$r->{userid}});
+   }
+   $user->SetFilter({userid=>\@chkuid});
+   $user->SetCurrentView(qw(phonename email));
+   my $u=$user->getHashIndexed("userid");
+
+   my $d="<table>";
+   while(my $aegtag=shift(@aeg)){
+      my $arec=shift(@aeg);
+      $d.="<tr><td valign=top><div><b>".$arec->{label}.":</b></div>\n".
+          "<div>".$arec->{sublabel}."</div></td>\n";
+      my $c="";
+      @{$arec->{userid}}=grep(!/^\s*$/,@{$arec->{userid}});
+      if ($#{$arec->{userid}}!=-1){
+         foreach my $userid (@{$arec->{userid}}){
+            $c.="<br>--<br>\n" if ($c ne "");
+            my @phone=split(/\n/,
+                      quoteHtml($u->{userid}->{$userid}->{phonename}));
+            my $htmlphone;
+            for(my $l=0;$l<=$#phone;$l++){
+               my $f=$phone[$l];
+               if ($l==0){
+                  $f="<a href='mailto:".
+                     "$u->{userid}->{$userid}->{email}'>$f</a>";
+                  $f.="<div style='visiblity:hidden;display:none'>".
+                      $u->{userid}->{$userid}->{email}."</div>\n";
+               }
+               $f="<div>$f</div>\n";
+               $htmlphone.=$f;
+             }
+            $c.=$htmlphone;
+         }
+      }
+      else{
+         $c="?\n";
+      }
+      $d.="<td valign=top>".$c."</td></tr>\n";
+   }
+   $d.="</table>";
+   return($d);
 }
 
 sub calcWorkflowStart

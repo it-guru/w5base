@@ -73,78 +73,12 @@ sub QuickFindDetail
    my $id=shift;
    my $htmlresult="?";
 
-   my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+   my $appl=getModuleObject($self->getParent->Config,"TS::appl");
    $appl->SetFilter({id=>\$id});
-   my ($rec,$msg)=$appl->getOnlyFirst(qw(tsmid applmgrid contacts));
+   my ($rec,$msg)=$appl->getOnlyFirst(qw(applicationexpertgroup));
 
    if (defined($rec)){
-print STDERR Dumper($rec);
-      my $user=getModuleObject($self->getParent->Config,"base::user");
-      my @aeg=('applmgr'=>{userid=>[$rec->{applmgrid}],
-                           label=>$appl->getField("applmgr")->Label()},
-               'tsm'    =>{userid=>[$rec->{tsmid}],
-                           label=>$appl->getField("tsm")->Label()},
-               'dba'    =>{userid=>[],
-                           label=>$self->getParent->T("Database Admin")},
-               'developerboss' =>{userid=>[],
-                                  label=>$self->getParent->T("Developer")},
-               'projectmanager'=>{userid=>[],
-                                  label=>$self->getParent->T("Projectmanager")},
-              );
-      my %a=@aeg;
-
-      foreach my $crec (@{$rec->{contacts}}){
-         if ($crec->{target} eq "base::user" &&
-             in_array($crec->{roles},"developerboss")){
-            if (!in_array($a{developerboss}->{userid},$crec->{targetid})){
-               push(@{$a{developerboss}->{userid}},$crec->{targetid});
-            }
-         }
-         if ($crec->{target} eq "base::user" &&
-             in_array($crec->{roles},"projectmanager")){
-            if (!in_array($a{projectmanager}->{userid},$crec->{targetid})){
-               push(@{$a{projectmanager}->{userid}},$crec->{targetid});
-            }
-         }
-      }
-      my $swi=getModuleObject($self->getParent->Config,"itil::swinstance");
-      $swi->SetFilter({cistatusid=>\'4',applid=>\$rec->{id},
-                       swnature=>["Oracle DB Server","MySQL","MSSQL","DB2"]});
-      foreach my $srec ($swi->getHashList(qw(admid))){
-         if (!in_array($a{dba}->{userid},$srec->{admid})){
-            push(@{$a{dba}->{userid}},$srec->{admid});
-         }
-      }
-      
-
-      my @chkuid;
-      foreach my $r (values(%a)){
-         push(@chkuid,@{$r->{userid}});
-      }
-      $user->SetFilter({userid=>\@chkuid});
-      $user->SetCurrentView(qw(phonename email));
-      my $u=$user->getHashIndexed("userid");
-
-      my $d="<table>";
-      while(my $aegtag=shift(@aeg)){
-         my $arec=shift(@aeg);
-         $d.="<tr><td valign=top><b>".$arec->{label}.":</b></td>";
-         my $c="";
-         @{$arec->{userid}}=grep(!/^\s*$/,@{$arec->{userid}});
-         if ($#{$arec->{userid}}!=-1){
-            foreach my $userid (@{$arec->{userid}}){
-               $c.="<br>--<br>\n" if ($c ne "");
-               my $phone=quoteHtml($u->{userid}->{$userid}->{phonename});
-               $c.="<pre>".$phone."</pre>";
-            }
-         }
-         else{
-            $c="?";
-         }
-         $d.="<td valign=top>".$c."</td></tr>\n";
-      }
-      $d.="</table>";
-      $htmlresult=$d;
+      $htmlresult=$rec->{applicationexpertgroup};
    }
    return($htmlresult);
 }

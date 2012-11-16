@@ -118,8 +118,8 @@ sub FormatedResult
    if ($self->readonly($current) && 
        ref($self->{onRawValue}) eq "CODE" &&
        !($FormatAs=~m/^Html.*$/)){
-      $d=~s/\n//g;
-      $d=~s/<br>/\r\n/g;
+      #      $d=~s/\n//g; Zeilen Umbrüche werden für die applicationexpert grou
+      $d=~s/<br>/\r\n/g;  # gebraucht - sonst sieht der Download scheise aus
       $d=~s/<[a-zA-Z]+[^>]*>//g;
       $d=~s/<\/[a-zA-Z]+[^>]*>//g;
    }
