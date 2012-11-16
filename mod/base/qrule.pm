@@ -515,27 +515,54 @@ sub WinHandleQualityCheck
 </table>
 <script language="JavaScript">
 
+function showLoading()
+{
+   var r=document.getElementById("reslist");
+   if (r){
+      var t="<center><br><br>"+
+            "<img src='../../base/load/ajaxloader.gif'><br>"+
+            "Loading ...</center>";
+      if (r.innerHTML!=t){
+         r.innerHTML=t;
+      }
+   }
+   else{
+      alert("Element reslist not found");
+   }
+   var r=document.getElementById("summary");
+   if (r){
+      var t="- working -";
+      if (r.innerHTML!=t){
+         r.innerHTML=t;
+      }
+   }
+   else{
+      alert("Element summary not found");
+   }
+}
+
 function addToResult(ruleid)
 {
+   window.setTimeout(showLoading,1);
    var xmlhttp=getXMLHttpRequest();
    xmlhttp.open("POST",document.location.href,true);
    xmlhttp.onreadystatechange=function() {
-    if (xmlhttp.readyState<4){
-       var r=document.getElementById("reslist");
-       if (r){
-          var t="Checking ...";
-          if (r.innerHTML!=t){
-             r.innerHTML=t;
-          }
-       }
-       var r=document.getElementById("summary");
-       if (r){
-          var t="- working -";
-          if (r.innerHTML!=t){
-             r.innerHTML=t;
-          }
-       }
-    }
+//    if (xmlhttp.readyState<4){
+//       var r=document.getElementById("reslist");
+//       if (r){
+//          var t="Checking ...";
+//          if (r.innerHTML!=t){
+//             r.innerHTML=t;
+//          }
+//       }
+//       var r=document.getElementById("summary");
+//       if (r){
+//          var t="- working -";
+//          if (r.innerHTML!=t){
+//             r.innerHTML=t;
+//          }
+//       }
+//    }
     if (xmlhttp.readyState==4 && (xmlhttp.status==200 || xmlhttp.status==304)){
        var xmlobject = xmlhttp.responseXML;
        var r=document.getElementById("reslist");
