@@ -138,7 +138,7 @@ sub calcApplicationExpertGroup
                         label=>$self->getParent->T("Database Admin"),
                         sublabel=>"(Verantwortlicher Datenbank)"},
             'developerboss' =>{userid=>[],
-                               label=>$self->getParent->T("Developer",
+                               label=>$self->getParent->T("Chief Developer",
                                                       'itil::ext::lnkcontact'),
                                sublabel=>"(Verantwortlicher Entwicklung)"},
             'projectmanager'=>{userid=>[],
