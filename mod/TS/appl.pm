@@ -210,7 +210,7 @@ sub calcApplicationExpertGroup
          }
       }
       else{
-         $c="?\n";
+         $c="<b><font color=red>?</font></b>\n";
       }
       $d.="<td valign=top>".$c."</td></tr>\n";
    }
