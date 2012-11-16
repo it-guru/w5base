@@ -3,4 +3,5 @@
 'fieldgroup.sec'=>{de=>'Sicherheitsdaten',en=>'Security data'},
 'Fullname'=>{de=>'Vollständiger Name'},
 'marked as delete'=>{de=>'gelöscht markiert'},
-
+'Tenant'=>{de=>'Instanz-Mieter'},
+'Tenant ID'=>{de=>'Instanz-Mieter ID'},

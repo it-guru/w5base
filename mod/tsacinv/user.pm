@@ -28,7 +28,9 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=5;
    my $self=bless($type->SUPER::new(%param),$type);
+
    
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -79,6 +81,18 @@ sub new
                 label         =>'Name',
                 ignorecase    =>1,
                 dataobjattr   =>'amempldept.name'),
+
+      new kernel::Field::Text(
+                name          =>'tenant',
+                label         =>'Tenant',
+                group         =>'source',
+                dataobjattr   =>'amtenant.code'),
+
+      new kernel::Field::Interface(
+                name          =>'tenantid',
+                label         =>'Tenant ID',
+                group         =>'source',
+                dataobjattr   =>'amtenant.ltenantid'),
 
       new kernel::Field::Text(
                 name          =>'firstname',
@@ -191,14 +205,16 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amempldept";
+   my $from="amempldept,amtenant";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="amempldept.lempldeptid<>0";
+   my $where="amempldept.lempldeptid<>0 ".
+             "and amempldept.ltenantid=amtenant.ltenantid ";
+
    return($where);
 }
 
@@ -223,6 +239,9 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_deleted"))){
      Query->Param("search_deleted"=>$self->T("no"));
+   }
+   if (!defined(Query->Param("search_tenant"))){
+     Query->Param("search_tenant"=>"CS");
    }
 }
 

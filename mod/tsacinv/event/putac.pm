@@ -493,16 +493,20 @@ sub ApplicationModified
                            $acuser->ResetFilter();
                            $acuser->SetFilter([
                               {
-                                 loginname=>\$posix{$userent}
+                                 loginname=>\$posix{$userent},
+                                 tenant=>\'CS'
                               },
                               {
-                                 ldapid=>\$posix{$userent}
+                                 ldapid=>\$posix{$userent},
+                                 tenant=>\'CS'
                               },
                               {
-                                 idno=>\$posix{$userent}
+                                 idno=>\$posix{$userent},
+                                 tenant=>\'CS'
                               },
                               {
-                                 email=>\$rec->{email}
+                                 email=>\$rec->{email},
+                                 tenant=>\'CS'
                               }
                            ]);
                            my @l=$acuser->getHashList(qw(lempldeptid idno));
