@@ -1,0 +1,3 @@
+'itcrm::qrule::compareApplOwner'=>{de=>'Abgleich der ApplicationOwner Rolle mit dem Kundenportal',en=>'Sync or ApplicationOwner Role with customer portal'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'different values stored in Customer Portal'=>{de=>'im Kundenportal sind andere Informationen hinterlegt'},
