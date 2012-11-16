@@ -148,7 +148,9 @@ sub calcApplicationExpertGroup
            );
    my %a=@aeg;
 
-   foreach my $crec (@{$rec->{contacts}}){
+   my $contacts=$appl->getField("contacts")->RawValue($rec);
+
+   foreach my $crec (@{$contacts}){
       if ($crec->{target} eq "base::user" &&
           in_array($crec->{roles},"developerboss")){
          if (!in_array($a{developerboss}->{userid},$crec->{targetid})){
