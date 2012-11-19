@@ -31,6 +31,7 @@ sub new
    $self->{transprefix}="boolean." if (!defined($self->{transprefix}));
    $self->{master}="1"             if (!defined($self->{master}));
    $self->{default}="0"            if (!defined($self->{default}));
+   $self->{uploadable}="0"         if (!defined($self->{uploadable}));
    $self->{readonly}='1'           if (!defined($self->{htmleditwidth}));
    $self->{WSDLfieldType}="xsd:string" if (!defined($self->{WSDLfieldType}));
    $self=bless($type->SUPER::new(%{$self}),$type);
@@ -43,7 +44,7 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $mode=shift;
-   my $d=$self->RawValue($current);
+   my $d=$self->SUPER::RawValue($current);
 
    $d=[$d] if (ref($d) ne "ARRAY");
    @$d=grep(!/^$/,@$d);
@@ -74,6 +75,45 @@ sub FormatedDetail
    }
    my $res=join("; ",sort(keys(%out)));
    return($res);
+}
+
+sub RawValue
+{
+   my $self=shift;
+   my $current=shift;
+   my $d;
+
+   my $d=$self->SUPER::RawValue($current);
+
+   $d=[$d] if (ref($d) ne "ARRAY");
+   @$d=grep(!/^$/,@$d);
+   if ($#{$d}==-1){
+      $d=[$self->{default}];
+   }
+   my %out;
+   my %chk;
+   foreach my $v (@{$d}){
+      $chk{$v}++;
+   }
+   if (keys(%chk)==0){ 
+      return($self->{default});
+   }
+   if (keys(%chk)==1){
+      foreach my $v (@{$d}){
+         return($v);
+      }
+   }
+   else{
+      foreach my $v (@{$d}){
+         if ($v eq $self->{master}){
+            return($v);
+         }
+      }
+      foreach my $v (@{$d}){
+         return($v);
+      }
+   }
+
 }
 
 
