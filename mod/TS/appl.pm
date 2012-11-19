@@ -166,7 +166,8 @@ sub calcApplicationExpertGroup
    }
    my $swi=getModuleObject($self->getParent->Config,"itil::swinstance");
    $swi->SetFilter({cistatusid=>\'4',applid=>\$rec->{id},
-                    swnature=>["Oracle DB Server","MySQL","MSSQL","DB2"]});
+                    swnature=>["Oracle DB Server","MySQL","MSSQL","DB2",
+                               "Informix","PostgreSQL"]});
    foreach my $srec ($swi->getHashList(qw(admid))){
       if (!in_array($a{dba}->{userid},$srec->{admid})){
          push(@{$a{dba}->{userid}},$srec->{admid});
