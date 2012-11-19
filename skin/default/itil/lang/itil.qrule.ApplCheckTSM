@@ -1,0 +1,2 @@
+'itil::qrule::ApplCheckTSM'=>{de=>'Prüfung der Befüllung des Feldes TSM',en=>'check if TSM is documented'},
+'no Technical Solution Manager defined'=>{de=>'kein Technical Solution Manager eingetragen'},
