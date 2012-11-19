@@ -223,6 +223,12 @@ sub new
                                 ",'NONE')"),
 
       new kernel::Field::Text(
+                name          =>'altname',
+                label         =>'second name',
+                group         =>'form',
+                dataobjattr   =>"amcomputer.addsysname"),
+
+      new kernel::Field::Text(
                 name          =>'securityset',
                 label         =>'security set',
                 ignorecase    =>1,
@@ -797,7 +803,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default location form applications ipaddresses software 
-             orderedservices services assetdata assetfinanz 
+             orderedservices services assetdata assetfinanz saphier
              w5basedata source));
 }  
 
