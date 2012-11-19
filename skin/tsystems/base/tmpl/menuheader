@@ -44,7 +44,7 @@ W5Base/Darwin - Support: <a href="mailto:W5Base.Darwin@t-systems.com" style="col
 <div class="navItem"><a target=msel href="http://systemsnet.telekom.de/cms/tsi-d/de/news/templateId=renderInternalPage/id=1764.html" title="T-Systems Intranet">TS-Intranet</a>
 </div>
 
-<div class="navItem" style="width:60px"><a target=ESS target=_blank href="https://selfservice.portal.telekom.de/irj/portal?NavigationTarget=navurl://2a03bf51eb6329a689810479cf7c2f41" title="ESS - Employee Self Service">ESS</a>
+<div class="navItem" style="width:80px"><a target=myPortal target=_blank href="https://selfservice-ws.portal.telekom.de/irj/portal?NavigationTarget=navurl://2a03bf51eb6329a689810479cf7c2f41" title="myPortal - Arbeitszeit erfassen">myPortal</a>
 </div>
 
 <div class="navItem" style="width:60px"><a target=work target=_top href="https://mycsm.telekom.de/webportal/TSI-GmbH/index.ephtml?width=800" title="T-Systems myMDS">myMDS</a>
