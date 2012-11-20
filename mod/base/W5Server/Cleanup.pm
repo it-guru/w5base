@@ -178,6 +178,8 @@ sub CleanupWorkflows
                   $wfop->{DB}->do("update wfkey set wfstate='21',".
                                   "closedate='$closedate' ".
                                   "where id='$rec->{id}'");
+                  $wf->SendRemoteEvent("upd",$rec,{stateid=>21,
+                                                   closedate=>$closedate});
                   $wfop->StoreUpdateDelta({id=>$rec->{id},
                                            stateid=>$rec->{stateid}},
                                           {id=>$rec->{id},
