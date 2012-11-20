@@ -56,7 +56,8 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3 &&
+                       $rec->{cistatusid}!=5);
    my $wfrequest={};
    my @qmsg;
    my @dataissue;
@@ -66,9 +67,13 @@ sub qcheckRecord
                                            oldrec=>$rec)){
       if ($fobj->Type() eq "Group"){
          my $name=$fobj->Name();
+         next if ($fobj->{vjointo} ne "base::grp");
          my $localfield=$fobj->{vjoinon}->[0];
          my $lfobj=$dataobj->getField($localfield);
          my $ldata=$lfobj->RawValue($rec);
+         if ($ldata eq "-2"){
+            push(@qmsg,"not acceptable group reference anonymous in: ".$name);
+         }
          if ($ldata ne ""){
             my $joinobj=$fobj->vjoinobj();
             $joinobj->SetFilter({$fobj->{vjoinon}->[1]=>\$ldata});

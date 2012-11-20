@@ -112,14 +112,11 @@ sub new
 #                dataobjattr   =>'costcenter.ldelmgr2'),
 
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Group(
                 name          =>'delmgrteam',
                 group         =>'delmgmt',
-                htmlwidth     =>'300px',
                 label         =>'Service Delivery-Management Team',
-                vjointo       =>'base::grp',
-                vjoinon       =>['delmgrteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>'delmgrteamid'),
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr',

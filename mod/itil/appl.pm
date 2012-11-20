@@ -460,7 +460,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'applmgr2id',
                 group         =>'customer',
-                dataobjattr   =>'appl.applmgr'),
+                dataobjattr   =>'appl.applmgr2'),
 
       new kernel::Field::Text(
                 name          =>'itnormodel',
