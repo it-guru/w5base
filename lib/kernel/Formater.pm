@@ -223,6 +223,8 @@ sub getHtmlViewLine
    if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
       $ro=1;
    }
+   my $userid=$app->getCurrentUserId();
+   $ro=1 if ($userid<=0);   # anonymous access no view editor allowed
    if (defined($curview)){
       for(my $c=0;$c<=$#userviewlist;$c++){
          my $view=$userviewlist[$c];
