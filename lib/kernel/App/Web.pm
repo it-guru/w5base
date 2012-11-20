@@ -1185,13 +1185,15 @@ sub IsMemberOf
    $group="admin"       if (!defined($group));
    $group=[$group]      if (ref($group) ne "ARRAY");
 
-   if (grep(/^valid_user$/,@$group) ||
-       grep(/^-1$/,@$group)){
+   if ((grep(/^valid_user$/,@$group) ||
+        grep(/^-1$/,@$group)) &&
+       in_array($roles,'RMember')){
       return(1) if ($ENV{REMOTE_USER} ne "" &&
                     $ENV{REMOTE_USER} ne "anonymous");
    }
-   if (grep(/^anonymous$/,@$group) ||
-       grep(/^-2$/,@$group)){
+   if ((grep(/^anonymous$/,@$group) ||
+       grep(/^-2$/,@$group)) &&
+       in_array($roles,'RMember')){
       return(1) if ($ENV{REMOTE_USER} eq "" ||
                     $ENV{REMOTE_USER} eq "anonymous");
    }
