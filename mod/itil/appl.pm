@@ -448,6 +448,20 @@ sub new
                 group         =>'customer',
                 dataobjattr   =>'appl.applmgr'),
 
+      new kernel::Field::Contact(
+                name          =>'applmgr2',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                AllowEmpty    =>1,
+                group         =>'customer',
+                label         =>'Deputy Application Manager',
+                vjoinon       =>'applmgr2id'),
+
+      new kernel::Field::Link(
+                name          =>'applmgr2id',
+                group         =>'customer',
+                dataobjattr   =>'appl.applmgr'),
+
       new kernel::Field::Text(
                 name          =>'itnormodel',
                 group         =>'customer',

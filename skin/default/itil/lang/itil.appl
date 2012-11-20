@@ -51,6 +51,7 @@
 'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
 'Application Version'=>{de=>'Anwendungsversion'},
 'Maintenance Window'=>{de=>'Wartungsfenster'},
+'Deputy Application Manager'=>{de=>'Application Manager Vertreter'},
 'average user count'=>{de=>'mittlere Benutzeranzahl'},
 'named user count'=>{de=>'eingetragene Benutzeranzahl'},
 'allow developer request workflows'=>{de=>'Workflow "Anforderung an Anwendungsentwicklung" erlauben'},
