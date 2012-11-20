@@ -1149,7 +1149,8 @@ sub getCurrentUserId
    if (defined($UserCache->{tz})){
       $userid=$UserCache->{userid};
    }
-   return($userid);
+   $userid="-2" if (!defined($userid));  # Securiy Fix - for not logged in
+   return($userid);                      # -2 is also groupid of group anonymous
 }
 
 
