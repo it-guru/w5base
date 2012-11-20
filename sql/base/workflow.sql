@@ -240,3 +240,28 @@ set FOREIGN_KEY_CHECKS=0;
 alter table workprocess add FOREIGN KEY fk_workprocess_databoss (databoss)
           REFERENCES contact (userid) ON DELETE RESTRICT;
 set FOREIGN_KEY_CHECKS=1;
+create table wfscheduleddatachange (
+  id          bigint(20) NOT NULL,
+  dataobject      varchar(128) NOT NULL,
+  dataobjectid    varchar(128) NOT NULL,
+  dataobjectfield varchar(40)  NOT NULL,
+  newdata         longtext default NULL,
+  state           int(2)   default '0',
+  comments     longtext default NULL,
+  description  longtext default NULL,
+  pretext      longtext default NULL,
+  plannedexec  datetime default NULL,
+  admininfo    datetime default NULL,
+  databossinfo datetime default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),key(plannedexec),key(admininfo),key(databossinfo),
+  key(state,dataobject,dataobjectid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
