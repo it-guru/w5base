@@ -119,7 +119,18 @@ function onNew()
       e.style.height=(t.offsetHeight-30)+"px";
    }
 }
+function onResize()
+{
+   var t=document.getElementById("TabSelectorModeSelect");
+   if (t){
+      var e=document.getElementById("HtmlDetail");
+      e.style.height="10px";
+   }
+   window.setTimeout(onNew,1);
+
+}
 addEvent(window, "load",   onNew);
+addEvent(window, "resize",   onResize);
 
 EOF
    $d.="</script>\n\n";
