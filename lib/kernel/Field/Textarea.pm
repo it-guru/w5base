@@ -32,7 +32,7 @@ sub new
    $self->{_permitted}->{editarea}=1;
    $self->{htmlheight}=""    if (!defined($self->{htmlheight}));
    $self->{valign}="top"     if (!defined($self->{valign}));
-   $self->{cols}="80"        if (!defined($self->{cols}));
+   $self->{cols}="70"        if (!defined($self->{cols}));
    return($self);
 }
 
