@@ -141,6 +141,7 @@ sub ProcessLine
    my $idfield=$app->IdField();
    my $idfieldname=undef;
    my $id=undef;
+
    if (defined($idfield)){
       $idfieldname=$idfield->Name() if (defined($idfield));
       $id=$idfield->RawValue($rec);
