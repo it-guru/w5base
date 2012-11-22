@@ -581,12 +581,12 @@ sub autoFillAutogenField
          if ($fld->{group} eq "MDB"){
             next if (!in_array(lc($rec->{swnature}),
                                ["mysql","mssql","postgesql","db2",
-                                "oracle db server"]));
+                                "oracle db server","informix"]));
          }
          if ($fld->{group} eq "MMiddleWare"){
             next if (in_array(lc($rec->{swnature}),
                               ["mysql","mssql","postgesql","db2",
-                               "oracle db server"]));
+                               "oracle db server","informix"]));
          }
          $self->autoFillAddResultCache(
             [$fld->{group}."DeliveryGroupID",
