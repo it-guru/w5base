@@ -315,6 +315,11 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+
+   if (!defined($oldrec) && $newrec->{name}=~m/^\s*$/){
+      $self->LastMsg(ERROR,"invalid service name specified");
+      return(0);
+   }
    if (effVal($oldrec,$newrec,"name") eq "[ENTIRE]" ||
        effVal($oldrec,$newrec,"name") eq ""){
       $newrec->{name}=undef;
