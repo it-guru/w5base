@@ -88,6 +88,15 @@ sub new
                    return(1) if (defined($current));
                    return(0);
                 },
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(1) if (defined($current));
+                   return(0);
+                },
                 uploadable    =>0,
                 label         =>'primary provided by Application',
                 weblinkto     =>'itil::appl',
@@ -112,7 +121,7 @@ sub new
                    return(1) if (defined($current));
                    return(0);
                 },
-                uploadable    =>0,
+                uploadable    =>1,
                 label         =>'provided by application',
                 vjointo       =>'itil::appl',
                 vjoinon       =>['applid'=>'id'],
