@@ -471,6 +471,13 @@ sub mkChangeStoreRec
       my $g=trim($agrp);
       $approver{$g}=1 if ($g ne "");
    }
+   if (ref($rec->{approved}) eq "ARRAY"){
+      foreach my $a (@{$rec->{approved}}){
+         foreach my $agrp (split(/\s/,$a->{name})){
+            $approver{$agrp}=1 if ($agrp ne "");
+         }
+      }
+   }
    my $masterapprove="SDM.DTAG.FE.APPROVE";
    my $triggerapprove="SDM.DTAG.APPROVE";
    if (in_array([keys(%approver)],$masterapprove)){
