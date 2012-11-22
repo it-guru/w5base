@@ -346,7 +346,7 @@ sub isWriteValid
 
    return("default") if (!defined($rec));
    if ($self->isParentWriteable($rec->{applid})){
-      push(@l,"default","contacts");
+      push(@l,"default","contacts","desc");
    }
    return(@l);
 }
