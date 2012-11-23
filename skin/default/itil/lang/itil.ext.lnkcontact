@@ -18,6 +18,7 @@
 'Information contact'=>{de=>'Informationspartner'},
 'Event information contact'=>{de=>'Ereignis-Informationspartner'},
 'Projectmanager'=>{de=>'Projektmanager'},
+'Projectmanager Development'=>{de=>'Projektmanager Entwicklung'},
 'read contract'=>{de=>'lesen'},
 'write contract'=>{de=>'write'},
 'privacy read'=>{de=>'vertrauliches lesen'},
