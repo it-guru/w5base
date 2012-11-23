@@ -364,9 +364,9 @@ sub Validate
    if (exists($newrec->{name})){
       $newrec->{name}=$name;
    }
-   $name=~s/\./_/g;
+   $name=~s/[§\.]/_/g;
    if ($name eq "" || ($name=~m/[^-a-z0-9_]/i)){
-      $self->LastMsg(ERROR,"invalid instance name");
+      $self->LastMsg(ERROR,sprintf($self->T("invalid cluster name '%s'"),$name));
       return(0);
    }
 
