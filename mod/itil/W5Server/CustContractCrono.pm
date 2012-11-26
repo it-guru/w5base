@@ -104,6 +104,9 @@ sub doCrono
             elsif ($wfrec->{class}=~m/::incident$/){
                $wfstat{$cid}->{TotalIncidentWorkflowCount}++;
             }
+            elsif ($wfrec->{class}=~m/::problem$/){
+               $wfstat{$cid}->{TotalProblemWorkflowCount}++;
+            }
             elsif ($wfrec->{class}=~m/::eventnotify$/){
                $wfstat{$cid}->{TotalEventnotifyWorkflowCount}++;
             }
