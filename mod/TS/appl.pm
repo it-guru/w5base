@@ -30,23 +30,6 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Text(
-                name          =>'acapplname',
-                label         =>'official AssetManager Applicationname',
-                group         =>'source',
-                htmldetail    =>0,
-                searchable    =>0,
-                depend        =>['applid','name'],
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   if ($current->{name} ne "" &&
-                       $current->{applid} ne ""){
-                      return(uc($current->{name}." (".$current->{applid}.")"));
-                   }
-                   return(undef);
-                }),
-
       new kernel::Field::Link(
                 name          =>'acinmassignmentgroupid',
                 group         =>'control',
@@ -99,6 +82,55 @@ sub new
                 container     =>'additional'),
       insertafter=>['applid'] 
    );
+
+
+
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'acapplname',
+                label         =>'AM: official AssetManager Applicationname',
+                group         =>'external',
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>['applid','name'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $applid=$self->getParent->getField("applid")
+                              ->RawValue($current);
+                   if ($applid ne ""){
+                      my $a=getModuleObject($self->getParent->Config,
+                                            "tsacinv::appl");
+                      if (defined($a)){
+                         $a->SetFilter({applid=>\$applid});
+                         my ($arec,$msg)=$a->getOnlyFirst(qw(fullname));
+                         if (defined($arec)){
+                            return($arec->{fullname});
+                         }
+                      }
+                   }
+
+                   if ($current->{name} ne "" &&
+                       $current->{applid} ne ""){
+                      return(uc($current->{name}." (".$current->{applid}.")"));
+                   }
+                   return(undef);
+                }),
+      new kernel::Field::Text(
+                name          =>'amossprodplan',
+                label         =>'AM: Production Planning OSS',
+                group         =>'external',
+                htmldetail    =>0,
+                searchable    =>0,
+                vjointo       =>'tsacinv::costcenter',
+                vjoinon       =>['conumber'=>'name'],
+                vjoindisp     =>'productionplanningoss')
+   );
+
+
+
+
+
    $self->{workflowlink}->{workflowtyp}=[qw(AL_TCom::workflow::diary
                                             OSY::workflow::diary
                                             itil::workflow::devrequest
