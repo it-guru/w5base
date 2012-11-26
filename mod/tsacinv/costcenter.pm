@@ -130,6 +130,18 @@ sub new
                 vjoinon       =>['semid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::TextDrop(
+                name          =>'productionplanningoss',
+                label         =>'Production Planning OSS',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['productionplanningossid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'productionplanningossid',
+                group         =>'contact',
+                dataobjattr   =>'amcostcenter.lproductionplanningossid'),
+
      new kernel::Field::TextDrop(
                 name          =>'sememail',
                 group         =>'contact',
@@ -143,8 +155,6 @@ sub new
                 name          =>'semid',
                 group         =>'contact',
                 dataobjattr   =>'amcostcenter.lservicemanagerid'),
-
-
 
       new kernel::Field::SubList(
                 name          =>'applications',

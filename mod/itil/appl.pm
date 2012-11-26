@@ -1080,6 +1080,7 @@ sub new
                 dataobjattr   =>'appl.lastqcheck'),
       new kernel::Field::QualityResponseArea()
    );
+   $self->AddGroup("external",translation=>'itil::appl');
    $self->{history}=[qw(insert modify delete)];
    $self->{workflowlink}={ workflowkey=>[id=>'affectedapplicationid']
                          };
@@ -1513,7 +1514,7 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control custcontracts customer delmgmt
-              finance interfaces licenses monisla qc
+              finance interfaces licenses monisla qc external
               misc opmgmt phonenumbers services businessservices
               soclustgroup socomments sodrgroup source swinstances systems
               technical workflowbasedata header inmchm interview efforts);
@@ -1653,7 +1654,8 @@ sub getDetailBlockPriority
              contacts phonenumbers 
              interfaces systems swinstances services businessservices monisla
              misc attachments control 
-             sodrgroup soclustgroup socomments accountnumbers licenses source));
+             sodrgroup soclustgroup socomments accountnumbers licenses 
+             external source));
 }
 
 sub HandleInfoAboSubscribe

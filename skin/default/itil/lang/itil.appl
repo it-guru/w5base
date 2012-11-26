@@ -4,6 +4,7 @@
 'fieldgroup.interfaces'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'fieldgroup.licenses'=>{de=>'Lizenzen',en=>'Licenses'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'fieldgroup.external'=>{de=>'weiterführende Infomationen aus anderen IT-Systemen',en=>'further Informations from other IT-Systemen'},
 'fieldgroup.businessservices'=>{de=>'bereitgestellte Business services',en=>'provided business services'},
 'fieldgroup.monisla'=>{de=>'Service Monitoring und SLA Überwachung',en=>'Service Monitoring and SLA'},
 'fieldgroup.services'=>{de=>'Cluster Services',en=>'Cluster Services'},

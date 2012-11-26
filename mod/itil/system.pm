@@ -1029,6 +1029,7 @@ sub new
    $self->{use_distinct}=1;
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->AddGroup("control",translation=>'itil::system');
+   $self->AddGroup("external",translation=>'itil::system');
    $self->setDefaultView(qw(name location cistatus mdate));
    $self->setWorktable("system");
    return($self);

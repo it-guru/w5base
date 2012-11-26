@@ -1,4 +1,5 @@
 'TS::appl'=>{de=>'T-Systems Anwendung',
                   en=>'T-Systems Application'},
 'fieldgroup.inmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
-'official AssetManager Applicationname'=>{de=>'offizieller AssetManager Anwendungsname'},
+'AM: official AssetManager Applicationname'=>{de=>'AM: offizieller AssetManager Anwendungsname'},
+'AM: Production Planning OSS'=>{de=>'AM: Produktions-Plannung OSS'},

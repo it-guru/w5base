@@ -18,6 +18,7 @@
 'write'                  =>{de=>'schreiben'                                 },
 'create'                 =>{de=>'erstellen'                                 },
 'No.'                    =>{de=>'Nr.'                                       },
+'original object name'   =>{de=>'orginal Datenobjektname'                   },
 'Owner'                  =>{de=>'Eigentümer/Bearbeiter'                     },
 'Editor'                 =>{de=>'Bearbeiter'                                },
 'Creator'                =>{de=>'Ersteller'                                 },
