@@ -133,6 +133,7 @@ sub new
 
    $self->{workflowlink}->{workflowtyp}=[qw(AL_TCom::workflow::diary
                                             OSY::workflow::diary
+                                            itil::workflow::businesreq
                                             itil::workflow::devrequest
                                             AL_TCom::workflow::businesreq
                                             THOMEZMD::workflow::businesreq
