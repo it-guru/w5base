@@ -41,10 +41,31 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 searchable    =>0,
-                depend        =>['tsmid','opmid','applmgrid','contacts'],
+                depend        =>['baseaeg'],
                 group         =>'technical',
                 label         =>'Application Expert Group',
                 onRawValue    =>\&calcApplicationExpertGroup),
+
+      new kernel::Field::Container(
+                name          =>'baseaeg',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>['tsmid','opmid','applmgrid','contacts'],
+                group         =>'technical',
+                label         =>'base Application Expert Group',
+                onRawValue    =>\&calcBaseApplicationExpertGroup),
+
+      new kernel::Field::Container(
+                name          =>'technicalaeg',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                uivisible     =>1,
+                depend        =>['baseaeg'],
+                group         =>'technical',
+                label         =>'tec Application Expert Group',
+                onRawValue    =>\&calcTecApplicationExpertGroup),
 
       new kernel::Field::TextDrop(
                 name          =>'acinmassingmentgroup',
@@ -150,7 +171,38 @@ sub new
    return($self);
 }
 
-sub calcApplicationExpertGroup
+
+sub calcTecApplicationExpertGroup
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $appl=$self->getParent;
+   my $aeg=$self->getField("baseaeg")->RawValue($rec);
+
+   my %aeg;
+   foreach my $aegtag (sort({$aeg->{$a}->{sindex}<=>$aeg->{$b}->{sindex}}
+                       keys(%$aeg))){
+      foreach my $v (sort(keys(%{$aeg->{$aegtag}}))){
+         my $tt=$aegtag."_".$v;
+         next if ($v eq "sindex");
+         next if ($v eq "phonename");
+         $aeg{$tt}=[] if (!exists($aeg{$tt}));
+         if (ref($aeg->{$aegtag}->{$v}) eq "ARRAY"){
+            push(@{$aeg{$tt}},@{$aeg->{$aegtag}->{$v}});
+         }
+         else{
+            push(@{$aeg{$tt}},$aeg->{$aegtag}->{$v});
+         }
+      }
+   }
+
+
+
+   return(\%aeg);
+}
+
+sub calcBaseApplicationExpertGroup
 {
    my $self=shift;
    my $rec=shift;
@@ -158,42 +210,92 @@ sub calcApplicationExpertGroup
    my $appl=$self->getParent;
 
    my $user=getModuleObject($self->getParent->Config,"base::user");
-   my @aeg=('applmgr'=>{userid=>[$rec->{applmgrid}],
-                        label=>$appl->getField("applmgr")->Label(),
-                        sublabel=>"(System Manager)"},
-            'tsm'    =>{userid=>[$rec->{tsmid}],
-                        label=>$appl->getField("tsm")->Label(),
-                        sublabel=>"(technisch Verantw. Applikation)"},
-            'opm'    =>{userid=>[$rec->{opmid}],
-                        label=>$appl->getField("opm")->Label(),
-                        sublabel=>"(Produktions Verantw. Applikation)"},
-            'dba'    =>{userid=>[],
-                        label=>$self->getParent->T("Database Admin"),
-                        sublabel=>"(Verantwortlicher Datenbank)"},
-            'developerboss' =>{userid=>[],
-                               label=>$self->getParent->T("Chief Developer",
-                                                      'itil::ext::lnkcontact'),
-                               sublabel=>"(Verantwortlicher Entwicklung)"},
-            'projectmanager'=>{userid=>[],
-                               label=>$self->getParent->T("Projectmanager",
-                                                     'itil::ext::lnkcontact'),
-                               sublabel=>"(Verantwortlicher Projektierung)"},
+   my $index=0;
+   my @aeg=('applmgr'=>{
+                userid=>[$rec->{applmgrid}],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$appl->getField("applmgr")->Label(),
+                sublabel=>"(System Manager)"
+            },
+            'tsm'=>{
+                userid=>[$rec->{tsmid}],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$appl->getField("tsm")->Label(),
+                sublabel=>"(technisch Verantw. Applikation)"
+            },
+            'opm'=>{
+                userid=>[$rec->{opmid}],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$appl->getField("opm")->Label(),
+                sublabel=>"(Produktions Verantw. Applikation)"
+            },
+            'dba'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Database Admin"),
+                sublabel=>"(Verantwortlicher Datenbank)"
+            },
+            'developerboss'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Chief Developer",
+                                           'itil::ext::lnkcontact'),
+                sublabel=>"(Verantwortlicher Entwicklung)"
+            },
+            'projectmanager'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Projectmanager",
+                                           'itil::ext::lnkcontact'),
+                         sublabel=>"(Verantwortlicher Projektierung)"
+            },
+            'sdesign'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Solution Designer",
+                                           'itil::ext::lnkcontact'),
+            },
+            'pmdev'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Projectmanager Development",
+                                           'itil::ext::lnkcontact'),
+            },
+            'AEG'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                label=>"Application Expert Group",
+                sublabel=>"(AEG)"
+            },
            );
    my %a=@aeg;
 
    my $contacts=$appl->getField("contacts")->RawValue($rec);
 
    foreach my $crec (@{$contacts}){
-      if ($crec->{target} eq "base::user" &&
-          in_array($crec->{roles},"developerboss")){
-         if (!in_array($a{developerboss}->{userid},$crec->{targetid})){
-            push(@{$a{developerboss}->{userid}},$crec->{targetid});
-         }
-      }
-      if ($crec->{target} eq "base::user" &&
-          in_array($crec->{roles},"projectmanager")){
-         if (!in_array($a{projectmanager}->{userid},$crec->{targetid})){
-            push(@{$a{projectmanager}->{userid}},$crec->{targetid});
+      foreach my $k (qw(developerboss projectmanager sdesign pmdev)){
+         if ($crec->{target} eq "base::user" &&
+             in_array($crec->{roles},$k)){
+            if (!in_array($a{$k}->{userid},$crec->{targetid})){
+               push(@{$a{$k}->{userid}},$crec->{targetid});
+            }
          }
       }
    }
@@ -202,8 +304,18 @@ sub calcApplicationExpertGroup
                     swnature=>["Oracle DB Server","MySQL","MSSQL","DB2",
                                "Informix","PostgreSQL"]});
    foreach my $srec ($swi->getHashList(qw(admid))){
-      if (!in_array($a{dba}->{userid},$srec->{admid})){
-         push(@{$a{dba}->{userid}},$srec->{admid});
+      if ($srec->{admid} ne ""){
+         if (!in_array($a{dba}->{userid},$srec->{admid})){
+            push(@{$a{dba}->{userid}},$srec->{admid});
+         }
+      }
+   }
+   foreach my $k (keys(%a)){  # fillup AEG
+      next if ($k eq "AEG");
+      foreach my $userid (@{$a{$k}->{userid}}){
+         if (!in_array($a{AEG}->{userid},$userid)){
+            push(@{$a{AEG}->{userid}},$userid);
+         }
       }
    }
 
@@ -215,31 +327,53 @@ sub calcApplicationExpertGroup
    $user->SetFilter({userid=>\@chkuid});
    $user->SetCurrentView(qw(phonename email));
    my $u=$user->getHashIndexed("userid");
+   foreach my $k (keys(%a)){
+      foreach my $userid (@{$a{$k}->{userid}}){
+         push(@{$a{$k}->{email}},$u->{userid}->{$userid}->{email});
+      }
+      foreach my $userid (@{$a{$k}->{userid}}){
+         push(@{$a{$k}->{phonename}},
+              $u->{userid}->{$userid}->{phonename});
+      }
+   }
+
+   return(\%a);
+}
+
+sub calcApplicationExpertGroup
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $appl=$self->getParent;
+   my $aeg=$self->getField("baseaeg")->RawValue($rec);
 
    my $d="<table>";
-   while(my $aegtag=shift(@aeg)){
-      my $arec=shift(@aeg);
+   foreach my $aegtag (sort({$aeg->{$a}->{sindex}<=>$aeg->{$b}->{sindex}}
+                       keys(%$aeg))){
+      next if ($aegtag eq "AEG");
+      my $arec=$aeg->{$aegtag};
       $d.="<tr><td valign=top><div><b>".$arec->{label}.":</b></div>\n".
           "<div>".$arec->{sublabel}."</div></td>\n";
       my $c="";
       @{$arec->{userid}}=grep(!/^\s*$/,@{$arec->{userid}});
       if ($#{$arec->{userid}}!=-1){
-         foreach my $userid (@{$arec->{userid}}){
+         for(my $uno=0;$uno<=$#{$arec->{userid}};$uno++){
             $c.="<br>--<br>\n" if ($c ne "");
             my @phone=split(/\n/,
-                      quoteHtml($u->{userid}->{$userid}->{phonename}));
+                      quoteHtml($arec->{phonename}->[$uno]));
             my $htmlphone;
             for(my $l=0;$l<=$#phone;$l++){
                my $f=$phone[$l];
                if ($l==0){
                   $f="<a href='mailto:".
-                     "$u->{userid}->{$userid}->{email}'>$f</a>";
+                     $arec->{email}->[$uno]."'>$f</a>";
                   $f.="<div style='visiblity:hidden;display:none'>".
-                      $u->{userid}->{$userid}->{email}."</div>\n";
+                      $arec->{email}->[$uno]."</div>\n";
                }
                $f="<div>$f</div>\n";
                $htmlphone.=$f;
-             }
+            }
             $c.=$htmlphone;
          }
       }

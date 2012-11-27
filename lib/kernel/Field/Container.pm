@@ -68,30 +68,7 @@ sub FormatedDetail
    }
    if ($mode=~m/html/i){
       if (defined($d) && ref($d) eq "HASH" && keys(%{$d})>0){
-         my $r="<table class=containerframe>"; 
-         foreach my $k (sort(keys(%{$d}))){
-            $r.="<tr>"; 
-            my $descwidth="width=1%";
-            if (defined($self->{desccolwidth})){
-               $descwidth="width=$self->{desccolwidth}"; 
-            }
-            $r.="<td class=containerfname $descwidth valign=top>$k</td>"; 
-            my $dk=$d->{$k};
-            $dk=[$dk] if (ref($dk) ne "ARRAY");
-            my $dd=quoteHtml(join(", ",@{$dk}));
-            $dd="&nbsp;" if ($dd=~m/^\s*$/);
-            #$dd=~s/\n/<br>\n/g;
-            if ($dd=~m/\n/ || $dd=~m/\S{40}/){
-               $dd="<table ".
-                  "style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
-                   "<tr><td><div class=multilinetext ".
-                   "style=\"height:auto;border-style:none\">".
-                   "<pre class=multilinetext>$dd</pre></div></td></tr></table>";
-            }
-            $r.="<td class=containerfval valign=top>$dd</td>"; 
-            $r.="</tr>"; 
-         }
-         $r.="</table>"; 
+         my $r=$self->hash2table(0,$d);
          return($r);
       }
       return(undef);
@@ -101,6 +78,51 @@ sub FormatedDetail
    }
    return($d);
 }
+
+sub hash2table
+{
+   my $self=shift;
+   my $loopcount=shift;
+   my $d=shift;
+   return("...") if ($loopcount>3);
+
+   my $r="<table class=containerframe>"; 
+   foreach my $k (sort(keys(%{$d}))){
+      $r.="<tr>"; 
+      my $descwidth="width=1%";
+      if (defined($self->{desccolwidth})){
+         $descwidth="width=$self->{desccolwidth}"; 
+      }
+      $r.="<td class=containerfname $descwidth valign=top>$k</td>"; 
+      my $dk=$d->{$k};
+      if (ref($dk) eq "HASH"){
+         $r.="<td class=containerfval valign=top>".
+             $self->hash2table($loopcount+1,$dk).
+             "</td>"; 
+      }
+      else{
+         $dk=[$dk] if (ref($dk) ne "ARRAY");
+         my $dd=quoteHtml(join(", ",@{$dk}));
+         $dd="&nbsp;" if ($dd=~m/^\s*$/);
+         #$dd=~s/\n/<br>\n/g;
+         if ($dd=~m/\n/ || $dd=~m/\S{40}/){
+            $dd="<table ".
+               "style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
+                "<tr><td><div class=multilinetext ".
+                "style=\"height:auto;border-style:none\">".
+                "<pre class=multilinetext>$dd</pre></div></td></tr></table>";
+         }
+         $r.="<td class=containerfval valign=top>$dd</td>"; 
+      }
+      $r.="</tr>"; 
+   }
+   $r.="</table>"; 
+   return($r);
+}
+
+
+
+
 
 sub RawValue
 {
