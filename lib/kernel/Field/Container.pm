@@ -107,6 +107,7 @@ sub RawValue
    my $self=shift;
    my $current=shift;
 
+   return($self->SUPER::RawValue($current)) if (exists($self->{onRawValue}));
    if (exists($current->{"___raw_container___".$self->Name})){
       $current->{$self->Name}=$current->{"___raw_container___".$self->Name};
       delete($current->{"___raw_container___".$self->Name});
