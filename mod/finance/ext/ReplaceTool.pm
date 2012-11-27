@@ -59,6 +59,13 @@ sub getControlRecord
              target       =>'databoss',
              idfield      =>'databossid'
            },
+           delmgrteamcostcenter=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'finance::costcenter',
+             target       =>'delmgrteam',
+             idfield      =>'delmgrteamid',
+             targetlabel  =>'name'
+           },
            delmgrcostcenter=>{
              replaceoptype=>'base::user',
              dataobj      =>'finance::costcenter',
