@@ -919,7 +919,8 @@ EOF
    {
       my $currenturl="${rootpath}../../base/user/Main";
       my $openurl=Query->Param("OpenURL");
-      if ($openurl=~m/^(http|https|news|telnet):/){
+      if (($openurl=~m/^(http|https|news|telnet):/) ||
+          ($openurl=~m/^\.\.\//)){
          Query->Delete("OpenURL");
          $currenturl=$openurl;
       }
