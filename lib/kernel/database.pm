@@ -98,7 +98,6 @@ sub Connect
       }
       else{
          my $private_foo_cachekey=$dbname."-".$$.".".$BackendSessionName;
-printf STDERR ("fifi Session=%s\n",$private_foo_cachekey);
          $self->{'db'}=DBI->connect_cached(
             $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
                mysql_enable_utf8 => 0,
