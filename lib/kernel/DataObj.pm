@@ -94,6 +94,13 @@ sub Ping
    return(1);
 }
 
+sub BackendSessionName
+{
+   my $self=shift;
+   $self->{BackendSessionName}=$_[0] if ($_[0] ne "");
+   return($self->{BackendSessionName});
+}
+
 sub SetFilterForQualityCheck    # prepaire dataobject for automatic 
 {                               # quality check (nightly)
    my $self=shift;
@@ -1429,7 +1436,6 @@ sub ValidatedInsertRecordTransactionless
 {
    my $self=shift;
    my $newrec=shift;
-
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    if (!$self->preValidate(undef,$newrec)){
       if ($self->LastMsg()==0){
@@ -2406,6 +2412,17 @@ sub getField
       }
    }
    return(undef);
+}
+
+sub getFieldIfExists
+{
+   my $self=shift;
+   my $fullfieldname=shift;
+   my $deprec=shift;
+   my $f=$self->getField($fullfieldname,$deprec);
+   $f={} if (!defined($f)); # das muﬂ irgendwann mal in ein "univeral" objekt
+                            # ge‰ndert werden
+   return($f);
 }
 
 sub getFieldParam
