@@ -18,7 +18,6 @@ package kernel::Field::Creator;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Field::Owner;
 @ISA    = qw(kernel::Field::Owner);
