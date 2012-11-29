@@ -116,15 +116,17 @@ sub new
                 depend        =>'advid',
                 getPostibleValues=>sub{
                    $self=shift;
-                   my $o=getModuleObject($self->Config,"itil::appladv");
+                   my $app=$self->getParent();
+                   my $o=$app->ModuleObject("itil::appladv");
                    return($o->getAllPosibleApplModules());
                 },
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
+                   my $app=$self->getParent();
                    my $f=$self->getField("advid");
                    my $advid=$f->RawValue($current);
-                   my $o=getModuleObject($self->Config,"itil::appladv");
+                   my $o=$app->ModuleObject("itil::appladv");
                    $o->SetFilter({id=>\$advid});
                    my ($rec,$msg)=$o->getOnlyFirst(qw(modules));
                    if (defined($rec)){
@@ -147,7 +149,7 @@ sub new
                        !defined($current->{dstate}) ||
                        $current->{dstate}==10){
                       if ($current->{srcparentid} ne ""){
-                         my $o=getModuleObject($app->Config,"itil::appladv");
+                         my $o=$app->ModuleObject("itil::appladv");
                          $o->SetFilter({srcparentid=>\$current->{srcparentid},
                                         isactive=>'1 [EMPTY]'});
                          my ($rec,$msg)=$o->getOnlyFirst(qw(id
@@ -169,6 +171,17 @@ sub new
                 readonly      =>1,
                 searchable    =>0,
                 container     =>'additional'),
+
+      new kernel::Field::Date(
+                name          =>'advmdate',
+                label         =>'ADV Modificationdate',
+                readonly      =>'1',
+                searchable    =>0,
+                weblinkto     =>'NONE',
+                group         =>'source',
+                vjointo       =>'itil::appladv',
+                vjoinon       =>['advid'=>'id'],
+                vjoindisp     =>'mdate'),
    );
 
    my $adv=getModuleObject($self->Config,"itil::appladv");

@@ -407,7 +407,7 @@ sub preProcessReadedRecord
 
    if (!defined($rec->{id}) && $rec->{srcparentid} ne ""){
       my $o=$self->Clone;
-      $o->BackendSessionName($self->Self.".ins"); # prevent sesssion reuse
+      $o->BackendSessionName("preProcessReadedRecord"); # prevent sesssion reuse
                                                   # on sql cached_connect
       my ($id)=$o->ValidatedInsertRecord({parentid=>$rec->{srcparentid},
                                           isactive=>1});

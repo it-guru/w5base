@@ -48,7 +48,7 @@ sub NOR_Report
    my $self=shift;
    my %param=@_;
    my %flt;
-   msg(DEBUG,"param=%s",Dumper(\%param));
+
    if ($param{customer} ne ""){
       my $c=$param{customer};
       $flt{customer}="$param{customer} $param{customer}.*";
@@ -271,6 +271,23 @@ sub NOR_Report
                    my $current=shift;
                    return($current->{name});
                 }),
+      new kernel::Field::Text(
+                name          =>'advstate',
+                label         =>'Status der NOR-Vorgabe',
+                depend        =>['advdstateid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $s=$self->getParent->getField("advdstateid")
+                              ->RawValue($current);
+                   return("offen") if ($s<20);
+                   return("erfolgt") if ($s==20);
+                   return("archiviert");
+                }),
+      new kernel::Field::Contact(
+                name          =>'sem',
+                label         =>'Customer Business Manager',
+                vjoinon       =>'semid'),
    );
 
    $o->getField("customer")->{label}="GP Name";
@@ -315,6 +332,7 @@ sub NOR_Report
                            normodel
                            SUMMARYappliedNOR
                            isdelta applname
+                           advstate advmdate sem
                            )],
                 });
 
