@@ -89,6 +89,7 @@ sub new
                                  'JacORB',
                                  'JBoss',
                                  'LDAP-Server',
+                                 'Loadbalancer',
                                  'MuleSource',
                                  'MQSeries',
                                  'MSSQL',
