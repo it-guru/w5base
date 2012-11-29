@@ -114,6 +114,20 @@ sub qcheckRecord
       my @qmsg;
       my @dataissue;
 
+      if (lc($wiwrec->{isVSNFD}) eq "ja" ||
+          lc($wiwrec->{isVSNFD}) eq "1"  ||
+          lc($wiwrec->{isVSNFD}) eq "yes" ||
+          lc($wiwrec->{isVSNFD}) eq "true"){
+         if ($rec->{dateofvsnfd} eq ""){
+            $forcedupd->{dateofvsnfd}=NowStamp("en"); 
+         }
+      }
+      else{
+         if ($rec->{dateofvsnfd} ne ""){
+            $forcedupd->{dateofvsnfd}=undef;
+         }
+      }
+
       my @fieldlist=qw(office_phone office_street office_zipcode 
                        office_location office_mobile office_costcenter
                        office_accarea
@@ -155,6 +169,7 @@ sub qcheckRecord
             $errorlevel=3 if ($errorlevel<3);
          }
       }
+      
       if (keys(%$wfrequest)){
          my $msg="different values stored in WhoIsWho: ";
          push(@qmsg,$msg);

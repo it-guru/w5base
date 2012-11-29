@@ -94,13 +94,6 @@ sub Ping
    return(1);
 }
 
-sub BackendSessionName
-{
-   my $self=shift;
-   $self->{BackendSessionName}=$_[0] if ($_[0] ne "");
-   return($self->{BackendSessionName});
-}
-
 sub SetFilterForQualityCheck    # prepaire dataobject for automatic 
 {                               # quality check (nightly)
    my $self=shift;

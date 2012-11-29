@@ -470,7 +470,10 @@ sub new
                    my $self=shift;
                    my $current=shift;
                    my $app=$self->getParent();
-                   return(1) if ($app->IsMemberOf("admin"));
+                   my $UC=$self->getParent->Cache->{User}->{Cache};
+                   if ($UC->{$ENV{REMOTE_USER}}->{rec}->{dateofvsnfd} ne ""){
+                      return(1);
+                   }
                    return(0);
                 },
                 vjoinon       =>['itnormodelid'=>'id'],

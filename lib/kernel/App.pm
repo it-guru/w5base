@@ -42,6 +42,14 @@ sub DataObj
    return($_[0]->{DataObj});
 }
 
+sub BackendSessionName
+{
+   my $self=shift;
+   $self->{BackendSessionName}=$_[0] if ($_[0] ne "");
+   return($self->{BackendSessionName});
+}
+
+
 
 
 sub Module
@@ -373,7 +381,8 @@ sub _LoadUserInUserCache
          $o->SetCurrentView(qw(surname userid givenname posix groups tz lang
                                cistatusid secstate ipacl
                                dialermode dialerurl dialeripref
-                               email usersubst usertyp fullname));
+                               email usersubst usertyp 
+                               dateofvsnfd));
          if ($AccountOrUserID=~m/^\d+$/){
             $o->SetFilter({userid=>\$AccountOrUserID});
          }
