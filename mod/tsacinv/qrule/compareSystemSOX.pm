@@ -78,6 +78,7 @@ sub qcheckRecord
                     " - please check your order";
             push(@qmsg,$msg);
             push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
          }
       }
    }
