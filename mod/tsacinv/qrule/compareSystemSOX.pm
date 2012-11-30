@@ -74,9 +74,10 @@ sub qcheckRecord
       if (defined($parrec)){
          my $issox=$dataobj->getField("issox")->RawValue($rec);
          if ($issox!=$parrec->{soxrelevant}){
-            push(@qmsg,
-         "SOX relevance not matches the AM presets! - please check your order");
-
+            my $msg="SOX relevance not matches the AM presets!".
+                    " - please check your order"
+            push(@qmsg,$msg);
+            push(@dataissue,$msg);
          }
       }
    }
