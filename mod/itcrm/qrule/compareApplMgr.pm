@@ -74,7 +74,6 @@ sub qcheckRecord
       $par->SetFilter({id=>\$rec->{id}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(itmanager));
       return(undef,undef) if (!$par->Ping());
-print STDERR Dumper($parrec);
 
       $self->IfaceCompare($dataobj,
                           $rec,"applmgr",
