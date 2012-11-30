@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use itil::appl;
-@ISA=qw(itil::appl);
+use TS::appl;
+@ISA=qw(TS::appl);
 
 sub new
 {
