@@ -1,0 +1,3 @@
+'tsacinv::qrule::importApplINMparam'=>{de=>'Abgleich der Incident relevanten Parameter mit AssetManager',en=>'Sync of incident relevant parameters against AssetManager'},
+'different values stored in AssetManager'=>{de=>'In AssetManager sind andere Inhalte gespeichert'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
