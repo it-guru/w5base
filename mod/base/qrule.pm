@@ -159,6 +159,8 @@ sub isQruleApplicable
    my $rec=shift;
 
    my $dataobjparent=$do->SelfAsParentObject();
+   my @objlist=@$objlist;
+   push(@objlist,Class::ISA::self_and_super_path($objlist->[0]));
    if (defined($self->{qrule}->{$lnkrec->{qruleid}})){
       my $qrule=$self->{qrule}->{$lnkrec->{qruleid}};
       my $postargets=$qrule->getPosibleTargets();
@@ -166,11 +168,11 @@ sub isQruleApplicable
       my $found=0;
       if (ref($postargets) eq "ARRAY"){
          foreach my $target (@$postargets){
-            if (grep(/^$target$/,@$objlist)){
+            if (grep(/^$target$/,@objlist)){
                my $qdataobj=quotemeta($lnkrec->{dataobj});
                my $qdataobjparent=quotemeta($dataobjparent);
-               if (grep(/^$qdataobj$/,@$objlist) ||
-                   grep(/^$dataobjparent$/,@$objlist)){
+               if (grep(/^$qdataobj$/,@objlist) ||
+                   grep(/^$dataobjparent$/,@objlist)){
                   $found=1;
                   last;
                }
