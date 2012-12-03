@@ -293,10 +293,10 @@ sub initSqlWhere
       "amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
-      "and (ammodel.name='CLUSTER' ".
-      "or ammodel.name='Oracle RAC Cluster') ".
+      "and ammodel.name='CLUSTER' ".
       "and amportfolio.ltenantid=amtenant.ltenantid ".
-      "and amcomputer.clustertype='Cluster' ".
+      "and (amcomputer.clustertype='Cluster' ".
+      "or amcomputer.clustertype='Oracle RAC Cluster') ".
       "and amcomputer.status<>'out of operation'";
    return($where);
 }
