@@ -293,7 +293,8 @@ sub initSqlWhere
       "amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
-      "and ammodel.name='CLUSTER' ".
+      "and (ammodel.name='CLUSTER' ".
+      "or ammodel.name='Oracle RAC Cluster') ".
       "and amportfolio.ltenantid=amtenant.ltenantid ".
       "and amcomputer.clustertype='Cluster' ".
       "and amcomputer.status<>'out of operation'";
