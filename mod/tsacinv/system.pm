@@ -903,10 +903,9 @@ sub Import
       $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
       # check 4: load Supervisor ID in W5Base
       my $tswiw=getModuleObject($self->Config,"tswiw::user");
-      my $databossid=$tswiw->GetW5BaseUserID($importname);
-      if (!defined($databossid)){
-         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
-         return(undef);
+      my $admid=$tswiw->GetW5BaseUserID($importname);
+      if (!defined($admid)){
+         $self->LastMsg(WARN,"Can't import Supervisor as Admin");
       }
       # check 5: find id of mandator "extern"
       my $mand=getModuleObject($self->Config,"base::mandator");
@@ -932,10 +931,13 @@ sub Import
       # final: do the insert operation
       my $newrec={name=>$sysrec->{systemname},
                   systemid=>$sysrec->{systemid},
-                  admid=>$databossid,
                   allowifupdate=>1,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
+      if (defined($admid)){
+         $newrec->{admid}=$admid;
+      }
+
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){
