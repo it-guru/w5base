@@ -57,6 +57,19 @@ sub ProcessServiceCenterRecord
    if (defined($wfstorerec)){
       if (!defined($updateto) || $updateto eq ""){
          # create new
+         # create pre check POC for workflow 13397595390001
+         if ($wfstorerec->{name} eq ""){
+            msg(ERROR,"POC: ohne Namen würde ich ignorieren 13397595390001");
+         }
+         my $eventend=$wfstorerec->{eventend};
+         my $eventstart=$wfstorerec->{eventstart};
+         if ($eventend ne "" && $eventstart ne ""){
+            my $duration=CalcDateDuration($eventstart,$eventend);
+            if ($duration->{totalseconds}<0){
+               msg(ERROR,"POC: zeit nicht gut - würde ich ignorieren 13397595390001");
+            }
+         }
+         #
          msg(DEBUG,"PROCESS: try to create new workflow entry");
          if (my $id=$wf->Store(undef,$wfstorerec)){
             msg(DEBUG,"workflow id=%s created",$id);

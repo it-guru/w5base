@@ -33,13 +33,6 @@ sub new
    return($self);
 }
 
-sub Init
-{
-   my $self=shift;
-   $self->RegisterEvent("mkP800swi","mkP800swi");
-   return(1);
-}
-
 sub mkP800swi
 {
    my $self=shift;
@@ -47,6 +40,7 @@ sub mkP800swi
    my $wf=getModuleObject($self->Config,"base::workflow");
    my $sw=getModuleObject($self->Config,"itil::swinstance");
    my $ss=getModuleObject($self->Config,"itil::servicesupport");
+   my $appl=getModuleObject($self->Config,"itil::appl");
    my ($year,$month,$day, $hour,$min,$sec) = Today_and_Now("GMT");
    my $start=sprintf("%02d/%04d",$month,$year);
    $sw->ResetFilter();
@@ -59,15 +53,18 @@ sub mkP800swi
    my ($rec,$msg)=$sw->getFirst();
    if (defined($rec)){
       do{
+         my $arec;
+         $appl->ResetFilter();
+         $appl->SetFilter({id=>\$rec->{applid},cistatusid=>[3,4,5]});
+         ($arec)=$appl->getOnlyFirst(qw(id));
          my $ssrec;
-         printf("TEST1 %s\n", Dumper($rec));
          if ($rec->{servicesupportid} ne ""){
             $ss->ResetFilter();
             $ss->SetFilter({id=>\$rec->{servicesupportid},cistatusid=>'<=4'});
             ($ssrec)=$ss->getOnlyFirst(qw(flathourscost comments name fullname
                                           servicedescription));
          }
-         if (defined($ssrec) && $rec->{appl} ne ""){
+         if (defined($arec) && defined($ssrec) && $rec->{appl} ne ""){
             my $eventstart=$self->getParent->ExpandTimeExpression(
                                                            "$year-$month-15-1M");
             my $eventend=$self->getParent->ExpandTimeExpression(
