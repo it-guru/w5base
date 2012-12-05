@@ -772,6 +772,7 @@ sub nativProcess
 
    if ($action eq "SaveStep.wffinish" ||
        $action eq "wffinish"){
+      return(0) if (!$self->ValidActionCheck(0,$actions,"wffinish"));
       if ($self->StoreRecord($WfRec,{
                                 step=>'base::workflow::diary::wffinish',
                                 fwdtarget=>undef,
