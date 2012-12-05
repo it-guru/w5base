@@ -385,10 +385,8 @@ sub SetFilter
             $id{$rec->{id}}++;
          }
       }
-      my %finalq=(id=>[keys(%id)]);
-      if ($origstatequery ne ""){
-         $finalq{stateid}=$origstatequery;
-      }
+      my %finalq=%q;
+      my $finalq{id}=[keys(%id)];
       push(@q,\%finalq);
    }
    $dataobj->ResetFilter();
