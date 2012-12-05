@@ -1,6 +1,6 @@
 package W5Base::API;
 #  W5Base Framework
-#  Copyright (C) 2008  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2012  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -85,6 +85,8 @@ the specified $storefile.
  $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
  $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug,
                       \$exitcode,\$msgs);
+ $config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug,
+                      undef,undef,timeout=>10000);
 
 The createConfig() function validates the configuration, checks the communication to the desiered W5Base-SOAP-Server and returns a config object on success.
 If it fails, you can get a human readable error message if you specifed 
@@ -327,7 +329,7 @@ use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
 
-$VERSION = "0.8";
+$VERSION = "0.9";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -581,6 +583,7 @@ sub createConfig
    my $debug=shift;
    my $backexitcode=shift;
    my $backexitmsg=shift;
+   my %param=@_;
 
    $W5Base::User=$user;
    $W5Base::Pass=$pass;
@@ -599,7 +602,11 @@ sub createConfig
       msg(ERROR,$@);
       exit(128);
    }
-   my $SOAP=SOAP::Lite->uri($uri)->proxy($proxy)->xmlschema("2001");
+   my @proxyparam=($proxy);
+   if (defined($param{timeout})){
+      push(@proxyparam,"timeout",$param{timeout});
+   }
+   my $SOAP=SOAP::Lite->uri($uri)->proxy(@proxyparam)->xmlschema("2001");
 
 
 #   my @r=$SOAP->Ping({lang=>\$lang})->result;
