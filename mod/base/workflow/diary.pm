@@ -420,7 +420,7 @@ sub nativProcess
    }
    if ($action eq "SaveStep.wfclose" ||
        $action eq "wfclose"){
-      return(base::workflow::diary::prewfclose::nativeProcess($self,
+      return(base::workflow::diary::prewfclose::nativProcess($self,
              $action,$h,$WfRec,$actions));
    }
 
