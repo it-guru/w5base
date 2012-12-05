@@ -400,7 +400,8 @@ sub nativProcess
    my $WfRec=shift;
    my $actions=shift;
 
-   if ($action eq "SaveStep.addnote"){
+   if ($action eq "SaveStep.addnote" ||
+       $action eq "addnote"){
       my $note=$h->{note};
       my $effort=$h->{effort};
       if ($note=~m/^\s*$/){
@@ -417,6 +418,14 @@ sub nativProcess
       }
       return(0);
    }
+   if ($action eq "SaveStep.wfclose" ||
+       $action eq "wfclose"){
+      return($self->base::workflow::diary::prewfclose::nativeProcess(
+             $action,$h,$WfRec,$actions));
+   }
+
+
+
    return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
 }
 
@@ -639,6 +648,40 @@ sub Validate
 
    return(0);
 }
+
+
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "SaveStep.wfclose" ||
+       $action eq "wfclose"){
+      my %fwd;
+      %fwd=(fwdtarget=>"base::user",fwdtargetid=>$WfRec->{openuser});
+      my $note=$h->{note};
+      if (!($note=~m/^\s*$/) && $WfRec->{detaildescription}=~m/^\s*$/){
+         $fwd{detaildescription}=$note;
+      }
+      my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
+      if ($self->getParent->StoreRecord($WfRec,$newstep,{
+                                %fwd,
+                                step=>$newstep,
+                                eventend=>NowStamp("en"),
+                                stateid=>17})){
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wfclose",
+             {translation=>'base::workflow::diary'},$note)){
+            return(1);
+         }
+         return(0);
+      }
+   }
+}
+
 sub Process
 {
    my $self=shift;
@@ -649,27 +692,12 @@ sub Process
 
    if ($action eq "NextStep"){
       return(undef) if (!$self->ValidActionCheck(1,$actions,"wfclose"));
-      my %fwd;
-      %fwd=(fwdtarget=>"base::user",fwdtargetid=>$WfRec->{openuser});
       my $note=Query->Param("note");
-      if (!($note=~m/^\s*$/) && $WfRec->{detaildescription}=~m/^\s*$/){
-         $fwd{detaildescription}=$note;
-      }
-      my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
-      msg(INFO,"newstep=$newstep");
-      if ($self->getParent->StoreRecord($WfRec,$newstep,{
-                                %fwd,
-                                step=>$newstep,
-                                eventend=>NowStamp("en"),
-                                stateid=>17})){
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfclose",
-             {translation=>'base::workflow::diary'},$note)){
-            Query->Delete("WorkflowStep");
-            return(1);
-         }
-         return(0);
-      }
+      my $bk=$self->nativProcess("SaveStep.wfclose",{note=>$note},
+                                 $WfRec,$actions);
+      Query->Delete("WorkflowStep") if ($bk);
+      return($bk);
+
    }
    return($self->SUPER::Process($action,$WfRec));
 }
@@ -742,7 +770,8 @@ sub nativProcess
    my $WfRec=shift;
    my $actions=shift;
 
-   if ($action eq "SaveStep.wffinish"){
+   if ($action eq "SaveStep.wffinish" ||
+       $action eq "wffinish"){
       if ($self->StoreRecord($WfRec,{
                                 step=>'base::workflow::diary::wffinish',
                                 fwdtarget=>undef,
