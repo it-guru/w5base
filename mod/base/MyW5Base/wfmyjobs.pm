@@ -264,6 +264,9 @@ sub SetFilter
       if ($#ids!=-1){
          push(@q,{id=>\@ids,stateid=>$origstatequery});
       }
+      else{
+         push(@q,{id=>[-1]});
+      }
    }
    if ($dc ne "DEPONLY"){
       my %q1=%q;
