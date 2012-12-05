@@ -386,7 +386,8 @@ sub SetFilter
          }
       }
       my %finalq=%q;
-      my $finalq{id}=[keys(%id)];
+      $finalq{id}=[keys(%id)];
+      $finalq{stateid}=$origstatequery;
       push(@q,\%finalq);
    }
    $dataobj->ResetFilter();
