@@ -144,7 +144,7 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>\%class(label)\%:</td>
 <td class=finput width=50% >\%class(search)\%</td>
-<td class=fname width=10%>\%state(label)\%:</td>
+<td class=fname width=10%>\%stateid(label)\%:</td>
 <td class=finput width=30%>\%stateid(search)\%</td>
 </tr>
 <tr>
@@ -228,6 +228,8 @@ sub SetFilter
 
    my %q=%{$flt};
    $q{isdeleted}=\'0';
+   my $origstatequery=$q{stateid};
+   delete($q{stateid});
    my @q=();
    if ($dc eq "ADDDEP" || $dc eq "DEPONLY"){
       my %q1=%q;
@@ -256,7 +258,12 @@ sub SetFilter
          $q2{stateid}.=" AND " if ($q2{stateid} ne "");
          $q2{stateid}.="5";
       }
-      push(@q,\%q1,\%q2);
+      $dataobj->SetFilter([\%q1,\%q2]);
+      $dataobj->SetCurrentOrder(qw(NONE));
+      my @ids=$dataobj->getVal("id");
+      if ($#ids!=-1){
+         push(@q,{id=>\@ids,stateid=>$origstatequery});
+      }
    }
    if ($dc ne "DEPONLY"){
       my %q1=%q;
@@ -371,7 +378,11 @@ sub SetFilter
             $id{$rec->{id}}++;
          }
       }
-      push(@q,{id=>[keys(%id)]});
+      my %finalq=(id=>[keys(%id)]);
+      if ($origstatequery ne ""){
+         $finalq{stateid}=$origstatequery;
+      }
+      push(@q,\%finalq);
    }
    $dataobj->ResetFilter();
    $dataobj->SecureSetFilter(\@q);

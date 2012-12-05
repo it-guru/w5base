@@ -119,7 +119,7 @@ sub new
                                    
       new kernel::Field::Interface(
                 name          =>'stateid',         # for fast
-                label         =>'Worflow state ID',
+                label         =>'Workflow state ID',
                 selectfix     =>1,
                 dataobjattr   =>'wfhead.wfstate'), # querys
                                    
@@ -1056,6 +1056,43 @@ sub CleanupWorkspace
                       });
    }
 }
+
+
+sub TaskOpen
+{
+   my $self=shift;
+   my $srcsys=shift;
+   my $srcid=shift;
+   my $directlnktype=shift;
+   my $directlnkid=shift;
+   my $directlnkmode=shift;
+   my $fwdtarget=shift;
+   my $fwdtargetid=shift;
+   my $fwddebtarget=shift;
+   my $fwddebtargetid=shift;
+   my $subject=shift;
+   my $text=shift;
+
+}
+
+
+sub TaskCleanup
+{
+   my $self=shift;
+   my $srcsys=shift;
+   my $srcid=shift;
+   my $directlnktype=shift;
+   my $directlnkid=shift;
+   my $directlnkmode=shift;
+   my $cleanupstate=shift;
+   my $cleanupmsg=shift;
+   my $mdatefilter=shift;
+
+}
+
+
+
+
 
 sub getDynamicFields
 {
