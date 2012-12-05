@@ -258,6 +258,7 @@ sub SetFilter
          $q2{stateid}.=" AND " if ($q2{stateid} ne "");
          $q2{stateid}.="5";
       }
+      $dataobj->ResetFilter();
       $dataobj->SetFilter([\%q1,\%q2]);
       $dataobj->SetCurrentOrder(qw(NONE));
       my @ids=$dataobj->getVal("id");
@@ -297,6 +298,7 @@ sub SetFilter
          $q2{stateid}.="5";
       }
       my %id=();  # this hack prevents searches over two keys (this is bad)
+      $dataobj->ResetFilter();
       $dataobj->SetFilter([\%q1,\%q2]);
       my @l=$dataobj->getHashList(qw(id));
       map({$id{$_->{id}}=1} @l);
@@ -313,6 +315,7 @@ sub SetFilter
          $q3{stateid}.="<=6";
       }
 
+      $dataobj->ResetFilter();
       $dataobj->SetFilter([\%q3]);
       my @l=$dataobj->getHashList(qw(id));
       map({$id{$_->{id}}=1} @l);
@@ -363,6 +366,7 @@ sub SetFilter
       }
       else{
          # filter out records, witch are assigned to me personaly
+         $dataobj->ResetFilter();
          $dataobj->SetFilter({id=>[keys(%id)]});
          $dataobj->SetCurrentOrder(qw(NONE));
          %id=();
