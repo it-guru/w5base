@@ -459,16 +459,32 @@ sub new
       new kernel::Field::Date(
                 name          =>'sslbegin',
                 history       =>0,
-                readonly      =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   if ( ($rec->{'sslurl'}=~m/^\[.*\]$/)){
+                      return(0);
+                   }
+                   return(1);
+                },
                 group         =>'ssl',
+                depend        =>['sslurl'],
                 label         =>'SSL Certificate Begin',
                 dataobjattr   =>'swinstance.ssl_cert_begin'),
 
       new kernel::Field::Date(
                 name          =>'sslend',
                 history       =>0,
-                readonly      =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   if (($rec->{'sslurl'}=~m/^\[.*\]$/)){
+                      return(0);
+                   }
+                   return(1);
+                },
                 group         =>'ssl',
+                depend        =>['sslurl'],
                 label         =>'SSL Certificate End',
                 dataobjattr   =>'swinstance.ssl_cert_end'),
 
