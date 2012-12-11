@@ -268,6 +268,16 @@ sub new
                 readonly      =>1,
                 depend        =>['businessteambossid']),
 
+      new kernel::Field::Text(
+                name          =>'businessteambossemail',
+                searchable    =>0,
+                group         =>'technical',
+                label         =>'Business Team Boss EMail',
+                onRawValue    =>\&getTeamBossEMail,
+                htmldetail    =>0,
+                readonly      =>1,
+                depend        =>['businessteambossid']),
+
       new kernel::Field::TextDrop(
                 name          =>'tsmemail',
                 group         =>'technical',
@@ -1189,6 +1199,28 @@ sub getTeamBoss
    }
    return(\@teamboss);
 }
+
+sub getTeamBossEMail
+{
+   my $self=shift;
+   my $current=shift;
+   my $teambossfieldname=$self->{depend}->[0];
+   my $teambossfield=$self->getParent->getField($teambossfieldname);
+   my $teambossid=$teambossfield->RawValue($current);
+   my @teamboss;
+   if ($teambossid ne "" && ref($teambossid) eq "ARRAY" && $#{$teambossid}>-1){
+      my $user=getModuleObject($self->getParent->Config,"base::user");
+      $user->SetFilter({userid=>$teambossid});
+      foreach my $rec ($user->getHashList("email")){
+         if ($rec->{email} ne ""){
+            push(@teamboss,$rec->{email});
+         }
+      }
+   }
+   return(\@teamboss);
+}
+
+
 
 sub calculateLogicalCpuCount
 {
