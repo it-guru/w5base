@@ -31,7 +31,7 @@
 'list records of my organisational area'=>{de=>"Datensätze meines organisatorischen Bereiches"},
 'This operation clears all fields in the searchmask.\\n Click cancel, if you don\'t want to do this.'=>{de=>'Diese Funktion löscht den Inhalt aller Felder in der Suchmaske.\\nKlicken Sie auf Abbrechen, wenn Sie dies nicht möchten.'},
 'With this action, it is possible to lose data!'=>{de=>'Mit dieser Aktion könnten ungesicherte Eingaben verloren gehen!'},
-"access for user '\%s' to W5Base Framework rejected"=>{de=>"Zugriff für den Account '\%s' auf das W5Base Framework verwährt"},
+"access for user '\%s' to W5Base Framework rejected"=>{de=>"Zugriff für den Account '\%s' auf das W5Base Framework verwehrt"},
 'possible reasons are a locked account or an incorrect contact definition'=>{de=>'mögliche Gründe sind ein gesperrter Account oder eine ungültige Kontakt-Definition'},
 "please contact the admins if you think, this isn't purposed"=>{de=>'falls Sie der Meinung sind, dass dies nicht beabsichtig ist, kontaktieren Sie bitte die Admins'},
 'Colleague'=> {de=>'Kollege'},
