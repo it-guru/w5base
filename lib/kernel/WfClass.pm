@@ -130,6 +130,7 @@ sub isEffortReadAllowed
    my $WfRec=shift;
    my $app=$self->getParent();
 
+   return(1) if ($W5V2::OperationContext eq "W5Server");
    my $fo=$self->getField("mandatorid");
    my $mandatorid=$fo->RawValue($WfRec);
    $mandatorid=[$mandatorid] if (ref($mandatorid) ne "ARRAY");
