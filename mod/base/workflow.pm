@@ -1430,14 +1430,23 @@ sub preValidate
          my $UserCache=$self->Cache->{User}->{Cache};
          my $mycontactid=$self->getCurrentUserId();;
          my $mycontactname;
-         if (defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname})){
-            $mycontactname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
+         if ($W5V2::OperationContext ne "W5Server"){
+            if (defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname})){
+               $mycontactname=
+                  $UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
+            }
          }
-         if (defined($mycontactid)){
-            $newrec->{openuser}=$mycontactid;
+         if ($W5V2::OperationContext ne "W5Server" ||
+             !defined($newrec->{openuser})){
+            if (defined($mycontactid)){
+               $newrec->{openuser}=$mycontactid;
+            }
          }
-         if (defined($mycontactname)){
-            $newrec->{openusername}=$mycontactname;
+         if ($W5V2::OperationContext ne "W5Server" ||
+             !defined($newrec->{openusername})){
+            if (defined($mycontactname)){
+               $newrec->{openusername}=$mycontactname;
+            }
          }
       }
    }

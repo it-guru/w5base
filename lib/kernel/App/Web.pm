@@ -1142,6 +1142,7 @@ sub getCurrentUserId
 {
    my $self=shift;
    my $userid;
+   return(undef) if ($W5V2::OperationContext ne "W5Server");
    my $UserCache=$self->Cache->{User}->{Cache};
    if (defined($UserCache->{$ENV{REMOTE_USER}})){
       $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
