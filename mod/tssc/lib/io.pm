@@ -57,16 +57,15 @@ sub ProcessServiceCenterRecord
    if (defined($wfstorerec)){
       if (!defined($updateto) || $updateto eq ""){
          # create new
-         # create pre check POC for workflow 13397595390001
-         if ($wfstorerec->{name} eq ""){
-            msg(ERROR,"POC: ohne Namen würde ich ignorieren 13397595390001");
+         if ($wfstorerec->{name} eq ""){ # siehe WF:13397595390001
+            return;
          }
          my $eventend=$wfstorerec->{eventend};
          my $eventstart=$wfstorerec->{eventstart};
          if ($eventend ne "" && $eventstart ne ""){
             my $duration=CalcDateDuration($eventstart,$eventend);
-            if ($duration->{totalseconds}<0){
-               msg(ERROR,"POC: zeit nicht gut - würde ich ignorieren 13397595390001");
+            if ($duration->{totalseconds}<0){ # siehe WF:13397595390001
+               return;
             }
          }
          #
