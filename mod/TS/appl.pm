@@ -257,8 +257,7 @@ sub calcBaseApplicationExpertGroup
                 email=>[],
                 sindex=>$index++,
                 phonename=>[],
-                label=>$self->getParent->T("Projectmanager",
-                                           'itil::ext::lnkcontact'),
+                label=>$self->getParent->T("Projectmanager"),
                          sublabel=>"(Verantwortlicher Projektierung)"
             },
             'sdesign'=>{

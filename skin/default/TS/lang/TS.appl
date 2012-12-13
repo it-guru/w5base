@@ -3,3 +3,5 @@
 'fieldgroup.inmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
 'AM: official AssetManager Applicationname'=>{de=>'AM: offizieller AssetManager Anwendungsname'},
 'AM: Production Planning OSS'=>{de=>'AM: Produktions-Plannung OSS'},
+'Database Admin'=>{de=>'Datenbankadministrator'},
+'Projectmanager'=>{de=>'Project Manager IT-System'},
