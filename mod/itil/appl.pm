@@ -978,6 +978,16 @@ sub new
                 dataobjattr   =>"if (itcrmappl.name is null or ".
                                 "itcrmappl.name='',appl.name,itcrmappl.name)"),
 
+      new kernel::Field::Text(
+                name          =>'customerapplicationid',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'customer',
+                label         =>'ID of application by customer',
+                dataobjattr   =>"if (itcrmappl.custapplid is null or ".
+                                "itcrmappl.custapplid='',appl.applid,".
+                                "itcrmappl.custapplid)"),
+
       new kernel::Field::SubList(
                 name          =>'oncallphones',
                 searchable    =>0,
