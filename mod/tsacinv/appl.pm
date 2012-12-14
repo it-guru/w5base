@@ -94,7 +94,7 @@ sub new
                 name          =>'customerprio',
                 label         =>'Priority',
                 dataobjattr   =>'amtsicustappl.priority'),
-                                    
+
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
@@ -104,7 +104,18 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'lcustomerid',
-                dataobjattr   =>'amtsicustappl.lcustomerlinkid'),
+                dataobjattr   =>'amcostcenter.lcustomerlinkid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'secunit',
+                label         =>'SecurityUnit',
+                vjointo       =>'tsacinv::customer',
+                vjoinon       =>['lsecunitid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'lsecunitid',
+                dataobjattr   =>'amtsicustappl.lsecurityunitid'),
                                     
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',

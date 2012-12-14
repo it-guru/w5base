@@ -15,6 +15,7 @@
 'Description'=>{de=>'Beschreibung'},
 'Org-Unit'=>{de=>'Organisationseinheit'},
 'is locked'=>{de=>'gesperrt'},
+'Customer'=>{de=>'Kunde'},
 'SAP costcenter hierarchy'=>{de=>'SAP Hierarchie'},
 'SAP hierarchy 0'=>{de=>'SAP Hierarchie Ebene 0'},
 'SAP hierarchy 1'=>{de=>'SAP Hierarchie Ebene 1'},

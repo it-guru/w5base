@@ -134,6 +134,7 @@ sub new
                 name          =>'productionplanningoss',
                 label         =>'Production Planning OSS',
                 vjointo       =>'tsacinv::group',
+                group         =>'contact',
                 vjoinon       =>['productionplanningossid'=>'lgroupid'],
                 vjoindisp     =>'name'),
 
@@ -141,6 +142,19 @@ sub new
                 name          =>'productionplanningossid',
                 group         =>'contact',
                 dataobjattr   =>'amcostcenter.lproductionplanningossid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'customer',
+                label         =>'Customer',
+                group         =>'contact',
+                vjointo       =>'tsacinv::customer',
+                vjoinon       =>['lcustomerid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'lcustomerid',
+                group         =>'contact',
+                dataobjattr   =>'amcostcenter.lcustomerlinkid'),
 
      new kernel::Field::TextDrop(
                 name          =>'sememail',
