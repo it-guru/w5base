@@ -33,7 +33,7 @@ create table history (
     dataobjectid varchar(128) NOT NULL,
     operation    varchar(10)  NOT NULL,
     oldstate     blob,
-    newstate     blob,comments blob,
+    newstate     blob,comments blob, origdataobject varchar(128)default NULL,
     uivisible    int(2)   NOT NULL default '1',
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',
