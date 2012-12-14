@@ -113,7 +113,7 @@ sub doQualityCheck
       if (!($dataobj->SetFilterForQualityCheck(@view))){
          return({exitcode=>0,msg=>'ok'});
       }
-      $dataobj->Limit($loopmax,0,0);
+      $dataobj->Limit($loopmax+1,0,0);
       my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
       $c=0;
       if (defined($rec)){
@@ -157,10 +157,11 @@ sub doQualityCheck
       }
       if (!defined($rec)){
          msg(DEBUG,"rec not defined - end of loop check");
-         last;
+         return({exitcode=>0,msg=>'ok'});
       }
       sleep(1);
    }until(0);
+
 
 
    return({exitcode=>0,msg=>'ok'});
