@@ -103,7 +103,7 @@ sub doQualityCheck
    my $time=time();
    my $total=0;
    my $c=0;
-   my $loopmax=10;
+   my $loopmax=20;
    my $firstid;
    do{
       $dataobj->ResetFilter();
@@ -153,7 +153,7 @@ sub doQualityCheck
                $firstid=$curid;
             }
             ($rec,$msg)=$dataobj->getNext();
-         }until(!defined($rec) ||  $c>=$loopmax-1);
+         }until(!defined($rec) ||  $c>=$loopmax);
       }
       if (!defined($rec)){
          msg(DEBUG,"rec not defined - end of loop check");
