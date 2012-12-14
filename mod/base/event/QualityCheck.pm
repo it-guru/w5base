@@ -153,7 +153,7 @@ sub doQualityCheck
                $firstid=$curid;
             }
             ($rec,$msg)=$dataobj->getNext();
-         }until(!defined($rec) || $c<$loopmax);
+         }until(!defined($rec) ||  $c>=$loopmax-1);
       }
       if (!defined($rec)){
          msg(DEBUG,"rec not defined - end of loop check");
