@@ -329,6 +329,13 @@ sub new
                 label         =>'technical release string from instance',
                 dataobjattr   =>'swinstance.techrelstring'),
 
+      new kernel::Field::Textarea(
+                name          =>'techproductstring',
+                group         =>'softwareinst',
+                htmldetail    =>0,
+                label         =>'technical product string from instance',
+                dataobjattr   =>'swinstance.techprodstring'),
+
   #    new kernel::Field::SubList(
   #              name          =>'systems',
   #              label         =>'Systems',
