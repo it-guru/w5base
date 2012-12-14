@@ -30,8 +30,6 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
    
-   my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"tswiw"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
 
    $self->setBase("o=Organisation,o=WiW");
    $self->AddFields(
@@ -121,6 +119,19 @@ sub new
    $self->setDefaultView(qw(touid name users));
    return($self);
 }
+
+sub Initialize
+{
+   my $self=shift;
+
+   my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"tswiw"));
+   return(@result) if (defined($result[0]) eq "InitERROR");
+
+   return(1) if (defined($self->{tswiw}));
+   return(0);
+}
+
+
 
 sub SetFilterForQualityCheck
 {  

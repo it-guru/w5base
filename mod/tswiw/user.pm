@@ -30,9 +30,6 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
    
-   my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"tswiw"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
-
    $self->setBase("o=People,o=WiW");
    $self->AddFields(
       new kernel::Field::Linenumber(name     =>'linenumber',
@@ -174,11 +171,69 @@ sub new
                                    label      =>'is VS-NfD instructed',
                                    dataobjattr=>'tVsNfd'),
 
+      new kernel::Field::Text(     name       =>'country',
+                                   group      =>'status',
+                                   label      =>'Country',
+                                   dataobjattr=>'C'),
+
+      new kernel::Field::Text(     name       =>'office_address',
+                                   group      =>'status',
+                                   label      =>'postalAddress',
+                                   dataobjattr=>'postalAddress'),
+
+      new kernel::Field::Text(     name       =>'office_organisation',
+                                   group      =>'status',
+                                   label      =>'Organisation',
+                                   dataobjattr=>'o'),
+
+      new kernel::Field::Text(     name       =>'office_orgunit',
+                                   group      =>'status',
+                                   label      =>'Orgunit',
+                                   dataobjattr=>'ou'),
+
+      new kernel::Field::Text(     name       =>'sex',
+                                   group      =>'status',
+                                   label      =>'Sex',
+                                   dataobjattr=>'tSex'),
+
+      new kernel::Field::Text(     name       =>'physicalDeliveryOfficeName',
+                                   group      =>'status',
+                                   label      =>'physicalDeliveryOfficeName',
+                                   dataobjattr=>'physicalDeliveryOfficeName'),
+
+      new kernel::Field::Text(     name       =>'lang',
+                                   group      =>'status',
+                                   label      =>'preferrredLanguage',
+                                   dataobjattr=>'preferrredLanguage'),
+
+      new kernel::Field::Text(     name       =>'x121Address',
+                                   group      =>'status',
+                                   label      =>'x121Address',
+                                   dataobjattr=>'x121Address'),
+
+      new kernel::Field::Text(     name       =>'photoURL',
+                                   group      =>'status',
+                                   label      =>'photoURL',
+                                   dataobjattr=>'tPhotoURL'),
+
 
    );
    $self->setDefaultView(qw(id uid surname givenname email));
    return($self);
 }
+
+sub Initialize
+{
+   my $self=shift;
+
+   my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"tswiw"));
+   return(@result) if (defined($result[0]) eq "InitERROR");
+
+   return(1) if (defined($self->{tswiw}));
+   return(0);
+}
+
+
 
 sub getValidWebFunctions
 {
