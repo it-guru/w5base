@@ -63,12 +63,17 @@ sub NotifyINetwork
    my ($WfRec)=$wf->getOnlyFirst(qw(involvedcustomer));
    my $involvedcustomer=$WfRec->{involvedcustomer};
    $involvedcustomer=[$involvedcustomer] if (ref($involvedcustomer) ne "ARRAY");
-   if (!grep(/^DTAG\.T-Home.*/,@$involvedcustomer) &&
-       !grep(/^DTAG\.TDG.*/,@$involvedcustomer) &&
+   if (!grep(/^DTAG\..*$/,@$involvedcustomer) &&
        !grep(/^DTAG$/,@$involvedcustomer)){
       return({exitcode=>0,
               msg=>'no trigger needed'});
    }
+#   if (!grep(/^DTAG\.T-Home.*/,@$involvedcustomer) &&
+#       !grep(/^DTAG\.TDG.*/,@$involvedcustomer) &&
+#       !grep(/^DTAG$/,@$involvedcustomer)){
+#      return({exitcode=>0,
+#              msg=>'no trigger needed'});
+#   }
 
    if ($WfRec->{class}=~m/.*::change$/){
       my $SCType=$WfRec->{additional}->{ServiceCenterType};
