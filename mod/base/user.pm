@@ -170,7 +170,7 @@ sub new
                 transprefix   =>'SAL.',
                 group         =>'name',
                 default       =>'',
-                htmleditwidth =>'50px',
+                htmleditwidth =>'90px',
                 value         =>["","f","m"],
                 dataobjattr   =>'contact.salutation'),
 
