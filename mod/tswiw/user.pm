@@ -196,20 +196,15 @@ sub new
                                    label      =>'Sex',
                                    dataobjattr=>'tSex'),
 
-      new kernel::Field::Text(     name       =>'physicalDeliveryOfficeName',
-                                   group      =>'status',
-                                   label      =>'physicalDeliveryOfficeName',
-                                   dataobjattr=>'physicalDeliveryOfficeName'),
-
       new kernel::Field::Text(     name       =>'lang',
                                    group      =>'status',
                                    label      =>'preferrredLanguage',
-                                   dataobjattr=>'preferrredLanguage'),
+                                   dataobjattr=>'preferredLanguage'),
 
-      new kernel::Field::Text(     name       =>'x121Address',
+      new kernel::Field::Text(     name       =>'winlogon',
                                    group      =>'status',
-                                   label      =>'x121Address',
-                                   dataobjattr=>'x121Address'),
+                                   label      =>'Window Domain Logon',
+                                   dataobjattr=>'tADlogin'),
 
       new kernel::Field::Text(     name       =>'photoURL',
                                    group      =>'status',

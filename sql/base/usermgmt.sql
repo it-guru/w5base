@@ -334,3 +334,6 @@ alter table contact add admcomments longtext default NULL;
 alter table contact add ipacl longtext default NULL;
 alter table infoabo add comments longtext default NULL;
 alter table infoabo add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table contact add office_orgname  varchar(128) default NULL;
+alter table contact add salutation char(2) default NULL;
+alter table contact add country char(4) default NULL;

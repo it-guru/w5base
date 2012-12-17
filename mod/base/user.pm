@@ -163,6 +163,17 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'contact.userid'),
                                   
+      new kernel::Field::Select(
+                name          =>'salutation',
+                label         =>'Salutation',
+                searchable    =>0,
+                transprefix   =>'SAL.',
+                group         =>'name',
+                default       =>'',
+                htmleditwidth =>'50px',
+                value         =>["","f","m"],
+                dataobjattr   =>'contact.salutation'),
+
       new kernel::Field::Text(
                 name          =>'givenname',
                 readonly      =>sub{
@@ -206,6 +217,32 @@ sub new
                 transprefix   =>'SECSTATE.',
                 group         =>'userro',
                 dataobjattr   =>'contact.secstate'),
+
+      new kernel::Field::Email(
+                name          =>'email',
+                label         =>'E-Mail',
+                prepRawValue   =>
+                   sub{
+                      my $self=shift;
+                      my $d=shift;
+                      my $current=shift;
+                      my $secstate=$self->getParent->getCurrentSecState();
+                      if ($secstate<2){
+                         my $userid=$self->getParent->getCurrentUserId();
+                         if (!defined($userid) ||
+                              $current->{userid}!=$userid){
+                            sub replEmail
+                            {
+                               my $e=$_[0];
+                               $e=~s/[a-z]/?/g;
+                               return("$e");
+                            } 
+                            $d=~s/(.*\@.*)/replEmail($1)/e; 
+                         }
+                      }
+                      return($d);
+                   },
+                dataobjattr   =>'contact.email'),
 
       new kernel::Field::Text(
                 name          =>'ipacl',
@@ -284,6 +321,12 @@ sub new
                 dataobjattr   =>'contact.office_phone'),
 
       new kernel::Field::Text(
+                name          =>'office_organisation',
+                group         =>'office',
+                label         =>'Organisation',
+                dataobjattr   =>'contact.office_orgname'),
+
+      new kernel::Field::Text(
                 name          =>'office_street',
                 group         =>'office',
                 label         =>'Street',
@@ -318,6 +361,16 @@ sub new
                 group         =>'office',
                 label         =>'electronical FAX-Number',
                 dataobjattr   =>'contact.office_elecfacsimile'),
+
+      new kernel::Field::Select(
+                name          =>'country',
+                htmleditwidth =>'50px',
+                group         =>'office',
+                label         =>'Country',
+                vjointo       =>'base::isocountry',
+                vjoinon       =>['country'=>'token'],
+                vjoindisp     =>'token',
+                dataobjattr   =>'contact.country'),
 
       new kernel::Field::Number(
                 name          =>'office_persnum',
@@ -552,32 +605,6 @@ sub new
                 uploadable    =>0,
                 label         =>'PC Phone Dialer URL',
                 dataobjattr   =>'contact.dialerurl'),
-
-      new kernel::Field::Email(
-                name          =>'email',
-                label         =>'E-Mail',
-                prepRawValue   =>
-                   sub{
-                      my $self=shift;
-                      my $d=shift;
-                      my $current=shift;
-                      my $secstate=$self->getParent->getCurrentSecState();
-                      if ($secstate<2){
-                         my $userid=$self->getParent->getCurrentUserId();
-                         if (!defined($userid) ||
-                              $current->{userid}!=$userid){
-                            sub replEmail
-                            {
-                               my $e=$_[0];
-                               $e=~s/[a-z]/?/g;
-                               return("$e");
-                            } 
-                            $d=~s/(.*\@.*)/replEmail($1)/e; 
-                         }
-                      }
-                      return($d);
-                   },
-                dataobjattr   =>'contact.email'),
 
       new kernel::Field::Select(
                 name          =>'winsize',
