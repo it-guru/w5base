@@ -128,9 +128,21 @@ sub qcheckRecord
          }
       }
 
+      if (lc($wiwrec->{sex}) eq "w" ||
+          lc($wiwrec->{sex}) eq "f"){
+         if ($rec->{salutation} ne "f"){
+            $forcedupd->{salutation}="f";
+         }
+      }
+      if (lc($wiwrec->{sex}) eq "m"){
+         if ($rec->{salutation} ne "m"){
+            $forcedupd->{salutation}="m";
+         }
+      }
+
       my @fieldlist=qw(office_phone office_street office_zipcode 
                        office_location office_mobile office_costcenter
-                       office_accarea
+                       office_accarea office_organisation country
                        office_facsimile);
       if ($rec->{usertyp} ne "function" &&
           $rec->{usertyp} ne "service"){
