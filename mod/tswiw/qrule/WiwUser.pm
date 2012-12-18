@@ -139,6 +139,9 @@ sub qcheckRecord
             $forcedupd->{salutation}="m";
          }
       }
+      if ($wiwrec->{country} eq ""){
+         $wiwrec->{country}=undef;
+      }
 
       my @fieldlist=qw(office_phone office_street office_zipcode 
                        office_location office_mobile office_costcenter
