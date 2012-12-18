@@ -45,7 +45,7 @@ sub DESTROY
 {
    my $self=shift;
    if (defined($self->{ldap}) && $self->{ldap}->can("unbind")){
-      msg(DEBUG,"unbind");
+      msg(DEBUG,"unbind - $self - $self->{ldapname}");
       $self->{ldap}->unbind();
    }
 }
