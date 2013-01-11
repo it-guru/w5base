@@ -750,7 +750,11 @@ sub FullView
          "title=\"".$self->T("use this link to reference this ".
          "record (f.e. in mail)")."\"><div id=WindowTitle>".
          $rec->{name}."</div></a></div>");
-   print("<div class=fullview>".$rec->{data}."</div>");
+   my $fo=$self->getField("data",$rec);
+   my $d=$fo->FormatedResult($rec,"HtmlDetail");
+   $d=ExpandW5BaseDataLinks($self,"HtmlDetail",$d);
+
+   print("<div class=fullview>".$d."</div>");
 
    print("<div class=authorline>");
 
