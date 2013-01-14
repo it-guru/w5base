@@ -943,6 +943,9 @@ sub findSimilarContacts            # check for similar contacts to reduce
       push(@flt,{surname=>\$current->{surname},
                  givenname=>\$current->{givenname}});
    }
+   if ($current->{office_phone} ne ""){
+      push(@flt,{office_phone=>\$current->{office_phone}});
+   }
    if ($#flt!=-1){
       $user->SetFilter(\@flt);
       foreach my $rec ($user->getHashList(qw(fullname))){
