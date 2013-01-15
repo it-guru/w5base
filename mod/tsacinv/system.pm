@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use tsacinv::lib::tools;
+use tsacinv::costcenter;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB tsacinv::lib::tools);
 
 sub new
@@ -123,15 +124,7 @@ sub new
                 label         =>'SAP costcenter hierarchy',
                 group         =>'saphier',
                 ignorecase    =>1,
-                dataobjattr   =>"amcostcenter.hier0id||'.'||".
-                                "amcostcenter.hier1id||'.'||".
-                                "amcostcenter.hier2id||'.'||".
-                                "amcostcenter.hier3id||'.'||".
-                                "amcostcenter.hier4id||'.'||".
-                                "amcostcenter.hier5id||'.'||".
-                                "amcostcenter.hier7id||'.'||".
-                                "amcostcenter.hier8id||'.'||".
-                                "amcostcenter.hier9id"),
+                dataobjattr   =>tsacinv::costcenter::getSAPhierSQL()),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',

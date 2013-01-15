@@ -11,6 +11,7 @@
 'fieldgroup.systemdata'=>{de=>'Systemdaten',en=>'Systemdata'},
 'Cost allocation active'=>{de=>'interne Leistungsverrechung aktiv'},
 'System CPU count'=>{de=>'CPU Anzahl'},
+'SAP costcenter hierarchy'=>{de=>'SAP Hierarchie'},
 'invoice relevant cpu count'=>{de=>'abrechnungsrelevante CPU Anzahl'},
 'System CPU speed'=>{de=>'CPU Taktfrequenz'},
 'Tenant'=>{de=>'Instanz-Mieter'},

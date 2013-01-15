@@ -31,12 +31,6 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
   
-   my $saphierfield; 
-   for(my $c=0;$c<=9;$c++){
-      $saphierfield.="||'.'||" if ($saphierfield ne "");
-      my $fld="amcostcenter.hier${c}id";
-      $saphierfield.="decode($fld,'','-',$fld)";
-   }
    $self->AddFields(
       new kernel::Field::Linenumber(
                 name       =>'linenumber',
@@ -197,7 +191,7 @@ sub new
                 label         =>'SAP costcenter hierarchy',
                 group         =>'saphier',
                 ignorecase    =>1,
-                dataobjattr   =>$saphierfield),
+                dataobjattr   =>tsacinv::costcenter::getSAPhierSQL()),
 
       new kernel::Field::Text(
                 name          =>'saphier0id',
@@ -316,6 +310,19 @@ sub new
    );
    $self->setDefaultView(qw(linenumber id name code description));
    return($self);
+}
+
+sub getSAPhierSQL
+{
+   my $tab=shift;
+   $tab="amcostcenter" if ($tab eq "");
+   my $saphierfield;
+   for(my $c=0;$c<=9;$c++){
+      $saphierfield.="||'.'||" if ($saphierfield ne "");
+      my $fld="amcostcenter.hier${c}id";
+      $saphierfield.="decode($fld,'','-',$fld)";
+   }
+   return($saphierfield);
 }
 
 sub initSearchQuery
