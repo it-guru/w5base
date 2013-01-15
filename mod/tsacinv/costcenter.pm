@@ -30,7 +30,13 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-   
+  
+   my $saphierfield; 
+   for(my $c=0;$c<=9;$c++){
+      $saphierfield.="||'.'||" if ($saphierfield ne "");
+      my $fld="amcostcenter.hier${c}id";
+      $saphierfield.="decode($fld,'','-',$fld)";
+   }
    $self->AddFields(
       new kernel::Field::Linenumber(
                 name       =>'linenumber',
@@ -191,21 +197,14 @@ sub new
                 label         =>'SAP costcenter hierarchy',
                 group         =>'saphier',
                 ignorecase    =>1,
-                dataobjattr   =>"amcostcenter.hier0id||'.'||".
-                                "amcostcenter.hier1id||'.'||".
-                                "amcostcenter.hier2id||'.'||".
-                                "amcostcenter.hier3id||'.'||".
-                                "amcostcenter.hier4id||'.'||".
-                                "amcostcenter.hier5id||'.'||".
-                                "amcostcenter.hier7id||'.'||".
-                                "amcostcenter.hier8id||'.'||".
-                                "amcostcenter.hier9id"),
+                dataobjattr   =>$saphierfield),
 
       new kernel::Field::Text(
                 name          =>'saphier0id',
                 label         =>'SAP hierarchy 0',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier0id'),
 
@@ -214,6 +213,7 @@ sub new
                 label         =>'SAP hierarchy 1',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier1id'),
 
@@ -222,6 +222,7 @@ sub new
                 label         =>'SAP hierarchy 2',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier2id'),
 
@@ -230,6 +231,7 @@ sub new
                 label         =>'SAP hierarchy 3',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier3id'),
 
@@ -238,6 +240,7 @@ sub new
                 label         =>'SAP hierarchy 4',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier4id'),
 
@@ -246,6 +249,7 @@ sub new
                 label         =>'SAP hierarchy 5',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier5id'),
 
@@ -254,6 +258,7 @@ sub new
                 label         =>'SAP hierarchy 6',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier6id'),
 
@@ -262,6 +267,7 @@ sub new
                 label         =>'SAP hierarchy 7',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier7id'),
 
@@ -270,6 +276,7 @@ sub new
                 label         =>'SAP hierarchy 8',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier8id'),
 
@@ -278,6 +285,7 @@ sub new
                 label         =>'SAP hierarchy 9',
                 group         =>'saphier',
                 ignorecase    =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'amcostcenter.hier9id'),
 
