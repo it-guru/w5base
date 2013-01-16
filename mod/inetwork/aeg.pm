@@ -55,6 +55,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'sdbapplname',
                 group         =>'sdb',
+                weblinkto     =>'tbestsupport::sdbappl',
+                weblinkon     =>['sdbid'=>'id'],
                 label         =>'Applicationname',
                 dataobjattr   =>'A_1545'),
 

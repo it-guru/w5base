@@ -298,6 +298,33 @@ sub calcBaseApplicationExpertGroup
          }
       }
    }
+
+   #######################################################################
+   # 
+   # tempoary add I-Network informations
+   # 
+   my $inaeg=getModuleObject($self->Config,"inetwork::aeg");
+   my $tswiw=getModuleObject($self->Config,"tswiw::user");
+   if (defined($inaeg)){
+      $inaeg->SetFilter({w5baseid=>\$rec->{id}});
+      foreach my $inrec ($inaeg->getHashList(qw(smemail pmeemail))){
+          if ($inrec->{smemail} ne ""){
+             my $smuserid=$tswiw->GetW5BaseUserID($inrec->{smemail});
+             if ($smuserid ne ""){
+                push(@{$a{applmgr}->{userid}},$smuserid);
+             }
+          }
+          if ($inrec->{pmeemail} ne ""){
+             my $pmeuserid=$tswiw->GetW5BaseUserID($inrec->{pmeemail});
+             if ($pmeuserid ne ""){
+                push(@{$a{developerboss}->{userid}},$pmeuserid);
+             }
+          }
+
+      }
+   }
+   #######################################################################
+
    my $swi=getModuleObject($self->getParent->Config,"itil::swinstance");
    $swi->SetFilter({cistatusid=>\'4',applid=>\$rec->{id},
                     swnature=>["Oracle DB Server","MySQL","MSSQL","DB2",
@@ -321,6 +348,7 @@ sub calcBaseApplicationExpertGroup
 
    my @chkuid;
    foreach my $r (values(%a)){
+      @{$r->{userid}}=grep(!/^\s*$/,@{$r->{userid}});
       push(@chkuid,@{$r->{userid}});
    }
    $user->SetFilter({userid=>\@chkuid});
@@ -355,7 +383,6 @@ sub calcApplicationExpertGroup
       $d.="<tr><td valign=top><div><b>".$arec->{label}.":</b></div>\n".
           "<div>".$arec->{sublabel}."</div></td>\n";
       my $c="";
-      @{$arec->{userid}}=grep(!/^\s*$/,@{$arec->{userid}});
       if ($#{$arec->{userid}}!=-1){
          for(my $uno=0;$uno<=$#{$arec->{userid}};$uno++){
             $c.="<br>--<br>\n" if ($c ne "");
