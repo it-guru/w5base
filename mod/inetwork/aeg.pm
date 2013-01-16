@@ -91,6 +91,12 @@ sub new
                 dataobjattr   =>'lower(A_1552)'),
 
       new kernel::Field::Email(
+                name          =>'sdemail',
+                group         =>'sdb',
+                label         =>'Solution Designer',
+                dataobjattr   =>'lower(A_4631)'),
+
+      new kernel::Field::Email(
                 name          =>'pmeemail',
                 label         =>'Project Manager Development',
                 dataobjattr   =>'lower(A_2981)'),

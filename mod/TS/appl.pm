@@ -307,7 +307,8 @@ sub calcBaseApplicationExpertGroup
    my $tswiw=getModuleObject($self->Config,"tswiw::user");
    if (defined($inaeg)){
       $inaeg->SetFilter({w5baseid=>\$rec->{id}});
-      foreach my $inrec ($inaeg->getHashList(qw(smemail pmeemail))){
+      foreach my $inrec ($inaeg->getHashList(qw(smemail pmeemail
+                                                sdemail))){
           if ($inrec->{smemail} ne ""){
              my $smuserid=$tswiw->GetW5BaseUserID($inrec->{smemail});
              if ($smuserid ne ""){
@@ -320,7 +321,12 @@ sub calcBaseApplicationExpertGroup
                 push(@{$a{developerboss}->{userid}},$pmeuserid);
              }
           }
-
+          if ($inrec->{sdemail} ne ""){
+             my $sduserid=$tswiw->GetW5BaseUserID($inrec->{sdemail});
+             if ($sduserid ne ""){
+                push(@{$a{sdesign}->{userid}},$sduserid);
+             }
+          }
       }
    }
    #######################################################################
