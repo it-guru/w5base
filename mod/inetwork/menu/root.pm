@@ -42,6 +42,10 @@ sub Init
                       "inetwork::orderchk",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.inetwork.aeg",
+                      "inetwork::aeg",
+                      defaultacl=>['valid_user']);
+   
    return($self);
 }
 
