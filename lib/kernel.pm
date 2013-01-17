@@ -81,7 +81,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &globalContext &NowStamp &CalcDateDuration
              &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array
              &hash2xml &effVal &effChanged 
-             &Debug &UTF8toLatin1
+             &Debug &UTF8toLatin1 &Html2Latin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
              &Dumper 
@@ -90,7 +90,8 @@ use Unicode::String qw(utf8 latin1 utf16);
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend &orgRoles &extractLangEntry
-             &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16);
+             &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16
+             &Stacktrace);
 
 sub utf8{return(&Unicode::String::utf8);}
 sub utf16{return(&Unicode::String::utf16);}
@@ -198,6 +199,30 @@ sub quoteSOAP
    return($d);
 }
 
+
+sub Html2Latin1
+{
+   my $d=shift;
+
+   $d=~s/<br>/\r\n/g;
+   $d=~s/<[a-zA-Z]+[^>]*>//g;
+   $d=~s/<\/[a-zA-Z]+[^>]*>//g;
+   $d=~s/&amp;/&/g;
+   $d=~s/&lt;/</g;
+   $d=~s/&gt;/>/g;
+   $d=~s/&Auml;/\xC4/g;
+   $d=~s/&Ouml;/\xD6/g;
+   $d=~s/&Uuml;/\xDC/g;
+   $d=~s/&auml;/\xE4/g;
+   $d=~s/&ouml;/\xF6/g;
+   $d=~s/&uuml;/\xFC/g;
+   $d=~s/&szlig;/\xDF/g;
+   $d=~s/&quot;/"/g;
+   $d=~s/&#x0027;/'/g;
+   $d=~s/&nbsp;/ /g;
+
+   return($d);
+}
 
 sub quoteHtml
 {
@@ -821,6 +846,21 @@ sub mkMailInlineAttachment
    $data=~s#\[attachment\((\d+)\)\]#_mkMailInlineAttachment($1,$baseurl)#ge;
    return($data);
 }
+
+sub Stacktrace {
+  my ( $path, $line, $subr );
+  my $max_depth = 30;
+  my $i = 1;
+
+  print STDERR ("--- Begin stack trace ---\n");
+  while ( (my @call_details = (caller($i++))) && ($i<$max_depth) ) {
+    print STDERR ("$i $call_details[1]($call_details[2]) ".
+                  "in $call_details[3]\n");
+  }
+  print STDERR ("--- End stack trace ---\n");
+  die();
+}
+
 
 
 
