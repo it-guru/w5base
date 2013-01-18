@@ -109,6 +109,19 @@ sub qcheckRecord
             return(0,{qmsg=>['user not found']});
          }
       }
+      else{
+         my $uidlist=$wiwrec->{uid};
+         $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
+         my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
+         my $posix=$posix[0];
+         if ($posix ne ""){
+            my $user=getModuleObject($self->getParent->Config(),
+                                      "base::user");
+            $user->ValidatedUpdateRecord($rec,
+                     {posix=>$posix},
+                     {userid=>\$rec->{userid}}); # try to use found posix
+         }
+      }
       my $forcedupd={};
       my $wfrequest={};
       my @qmsg;

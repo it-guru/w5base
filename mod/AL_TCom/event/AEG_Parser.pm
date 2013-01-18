@@ -47,6 +47,8 @@ sub AEG_Parser
    $self->{wiw}=getModuleObject($self->Config,"tswiw::user");
    return({exitcode=>1,msg=>"ERROR in tswiw::user"}) if (!defined($self->{wiw}));
 
+   $self->{applid}={};
+
    my $exitcode=$self->ProcessExcelExpand("/tmp/AEG.xls");
 
    return({exitcode=>$exitcode});
@@ -62,14 +64,16 @@ sub ProcessLineData
    my $row=shift;
    my $data=shift;
   
-   if ($row>0 && $row<1000){
-      if ($data->[0] ne ""){
-         my $custappl=$data->[0];
-         my $iaeg=$self->{iaeg};
-         $iaeg->SetFilter({name=>\$custappl});
-         my ($irec,$msg)=$iaeg->getOnlyFirst(qw(w5baseid smemail));
-         if (defined($irec) && $irec->{w5baseid}){
-            $data->[1]=$irec->{w5baseid};
+   if ($row>=0){
+      if ($data->[1]=~m/^\s*$/){
+         if ($data->[0] ne ""){
+            my $custappl=$data->[0];
+            my $iaeg=$self->{iaeg};
+            $iaeg->SetFilter({name=>\$custappl});
+            my ($irec,$msg)=$iaeg->getOnlyFirst(qw(w5baseid smemail));
+            if (defined($irec) && $irec->{w5baseid}){
+               $data->[1]=$irec->{w5baseid};
+            }
          }
       }
       if (!$data->[1]=~m/^\s*$/){
@@ -159,9 +163,40 @@ sub ProcessLineData
          if ($data->[$idcol]=~m/^\s*$/){
             $data->[$idcol]="???";
          }
-  
+         else{
+            my $uid=$self->{wiw}->GetW5BaseUserID($data->[$idcol]);
+            if ($uid ne ""){
+               $self->{user}->ResetFilter();
+               $self->{user}->SetFilter({userid=>\$uid});
+               my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(posix email));
+               if ($urec->{posix} ne ""){
+                  $data->[$idcol]=$urec->{posix};
+               }
+               else{
+                  $data->[$idcol]=$urec->{email};
+               }
+            }
+         }
       }
-      return();
+      my @ids=split(/[,;\s]+/,$data->[1]);
+      @ids=grep(!/^\s*$/,@ids);
+      if ($#ids==-1 && $data->[0] ne ""){
+         die("missing mapping for  $data->[0]");
+      }
+      else{
+         foreach my $applid (@ids){
+            if (exists($self->{applid}->{$applid})){
+               die("doublicate mapping for $applid");
+            }
+            $self->{applid}->{$applid}++;
+            $self->{appl}->ResetFilter();
+            $self->{appl}->SetFilter({id=>\$applid,cistatusid=>\'4'});
+            my ($arec,$msg)=$self->{appl}->getOnlyFirst(qw(id name));
+            if (!defined($arec)){
+               die("invalid applid $applid found");
+            }
+         }
+      }
    }
 
 }
@@ -219,6 +254,7 @@ sub ProcessExcelExpand
    }
    printf("INFO:  saving '%s'\n","$outfile");
    $oExcel->SaveAs($oBook,$outfile);
+   return(0);
 }
 
 
