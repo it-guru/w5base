@@ -139,14 +139,14 @@ sub ProcessLineData
                   $self->{wiw}->SetFilter({office_mobile=>join(" ",@v)});
                   my @l=$self->{wiw}->getHashList(qw(email));
                   if ($#==0){
-                     $data->[$idcol]=$l[0]->{email};
+                     $data->[$idcol]=lc($l[0]->{email});
                   }
                   next if (!($data->[$idcol]=~m/^\s*$/));
                   $self->{wiw}->ResetFilter();
                   $self->{wiw}->SetFilter({office_phone=>join(" ",@v)});
                   my @l=$self->{wiw}->getHashList(qw(email));
                   if ($#==0){
-                     $data->[$idcol]=$l[0]->{email};
+                     $data->[$idcol]=lc($l[0]->{email});
                   }
                }
             }
@@ -194,8 +194,8 @@ sub ProcessExcelExpand
       printf ("INFO:  opening $inpfile\n");
    }
    my $oExcel;
-   eval('use Spreadsheet::ParseExcel::SaveParser;'.
-        'use Spreadsheet::ParseExcel::Workbook;'.
+   eval('use Spreadsheet::ParseExcel;'.
+        'use Spreadsheet::ParseExcel::SaveParser;'.
         '$oExcel=new Spreadsheet::ParseExcel::SaveParser;');
    if ($@ ne "" || !defined($oExcel)){
       msg(ERROR,"%s",$@);
