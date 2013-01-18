@@ -314,17 +314,26 @@ sub calcBaseApplicationExpertGroup
              if ($smuserid ne ""){
                 push(@{$a{applmgr}->{userid}},$smuserid);
              }
+             else{
+                msg(ERROR,"unable to resolv $inrec->{smemail} from I-Network");
+             }
           }
           if ($inrec->{pmeemail} ne ""){
              my $pmeuserid=$tswiw->GetW5BaseUserID($inrec->{pmeemail});
              if ($pmeuserid ne ""){
-                push(@{$a{developerboss}->{userid}},$pmeuserid);
+                push(@{$a{pmdev}->{userid}},$pmeuserid);
+             }
+             else{
+                msg(ERROR,"unable to resolv $inrec->{pmeemail} from I-Network");
              }
           }
           if ($inrec->{sdemail} ne ""){
              my $sduserid=$tswiw->GetW5BaseUserID($inrec->{sdemail});
              if ($sduserid ne ""){
                 push(@{$a{sdesign}->{userid}},$sduserid);
+             }
+             else{
+                msg(ERROR,"unable to resolv $inrec->{sdemail} from I-Network");
              }
           }
       }
@@ -400,7 +409,7 @@ sub calcApplicationExpertGroup
                if ($l==0){
                   $f="<a href='mailto:".
                      $arec->{email}->[$uno]."'>$f</a>";
-                  $f.="<div style='visiblity:hidden;display:none'>".
+                  $f.="<div style='visiblity:hidden;display:none'>\n".
                       $arec->{email}->[$uno]."</div>\n";
                }
                $f="<div>$f</div>\n";
