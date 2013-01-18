@@ -195,6 +195,7 @@ sub ProcessExcelExpand
    }
    my $oExcel;
    eval('use Spreadsheet::ParseExcel::SaveParser;'.
+        'use Spreadsheet::ParseExcel::Workbook;'.
         '$oExcel=new Spreadsheet::ParseExcel::SaveParser;');
    if ($@ ne "" || !defined($oExcel)){
       msg(ERROR,"%s",$@);
