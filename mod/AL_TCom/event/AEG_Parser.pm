@@ -34,11 +34,15 @@ sub new
 sub AEG_Parser
 {
    my $self=shift;
+   my $name=shift;
+   if (!($name=~m/\.xls$/) || ! -f $name){
+      return({exitcode=>1,msg=>msg(ERROR,"invalid filename '$name'")});
+   }
 
    $self->{iaeg}=getModuleObject($self->Config,"inetwork::aeg");
    return({exitcode=>1,msg=>"ERROR in acsys"}) if (!defined($self->{iaeg}));
 
-   $self->{appl}=getModuleObject($self->Config,"itil::appl");
+   $self->{appl}=getModuleObject($self->Config,"TS::appl");
    return({exitcode=>1,msg=>"ERROR in appl"}) if (!defined($self->{appl}));
 
    $self->{user}=getModuleObject($self->Config,"base::user");
@@ -48,6 +52,7 @@ sub AEG_Parser
    return({exitcode=>1,msg=>"ERROR in tswiw::user"}) if (!defined($self->{wiw}));
 
    $self->{applid}={};
+
 
    my $exitcode=$self->ProcessExcelExpand("/tmp/AEG.xls");
 
@@ -64,7 +69,8 @@ sub ProcessLineData
    my $row=shift;
    my $data=shift;
   
-   if ($row>=0){
+   if ($row<10){
+      my @targetappl;
       if ($data->[1]=~m/^\s*$/){
          if ($data->[0] ne ""){
             my $custappl=$data->[0];
@@ -81,7 +87,8 @@ sub ProcessLineData
          $self->{appl}->ResetFilter();
          $self->{appl}->SetFilter({id=>$id,cistatusid=>'4'});
          my @dboss;
-         foreach my $arec ($self->{appl}->getHashList("databoss")){
+         my @targetappl=$self->{appl}->getHashList(qw(name id databoss));
+         foreach my $arec (@targetappl){
             push(@dboss,$arec->{databoss}) if ($arec->{databoss} ne "");
          }
          $data->[2]=join("; ",@dboss);
@@ -142,14 +149,14 @@ sub ProcessLineData
                   $self->{wiw}->ResetFilter();
                   $self->{wiw}->SetFilter({office_mobile=>join(" ",@v)});
                   my @l=$self->{wiw}->getHashList(qw(email));
-                  if ($#==0){
+                  if ($#l==0){
                      $data->[$idcol]=lc($l[0]->{email});
                   }
                   next if (!($data->[$idcol]=~m/^\s*$/));
                   $self->{wiw}->ResetFilter();
                   $self->{wiw}->SetFilter({office_phone=>join(" ",@v)});
                   my @l=$self->{wiw}->getHashList(qw(email));
-                  if ($#==0){
+                  if ($#l==0){
                      $data->[$idcol]=lc($l[0]->{email});
                   }
                }
@@ -189,6 +196,7 @@ sub ProcessLineData
          die("missing mapping for  $data->[0]");
       }
       else{
+         @targetappl=();
          foreach my $applid (@ids){
             if (exists($self->{applid}->{$applid})){
                die("doublicate mapping for $applid");
@@ -196,14 +204,311 @@ sub ProcessLineData
             $self->{applid}->{$applid}++;
             $self->{appl}->ResetFilter();
             $self->{appl}->SetFilter({id=>\$applid,cistatusid=>\'4'});
-            my ($arec,$msg)=$self->{appl}->getOnlyFirst(qw(id name));
+            my ($arec,$msg)=$self->{appl}->getOnlyFirst(qw(id name 
+                                                           applmgrid
+                                                           applmgr
+                                                           contacts 
+                                                           technicalaeg
+                                                           databossid));
             if (!defined($arec)){
                die("invalid applid $applid found");
             }
+            else{
+               push(@targetappl,$arec);
+            }
          }
       }
-   }
+      # OK, now processint @targetappl
 
+      foreach my $arec (@targetappl){
+         my $infomail;
+         msg(INFO,"Processing Appl: $arec->{name}");
+         my $aeg=$arec->{technicalaeg};
+         #
+         # Application Manager Check
+         #
+         my $uid=$self->{wiw}->GetW5BaseUserID($data->[6]);
+         if ($uid ne ""){
+            $self->{user}->ResetFilter();
+            $self->{user}->SetFilter({userid=>\$uid});
+            my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(fullname ));
+            if ($arec->{applmgrid} eq ""){  # kein ApplicationManager
+               msg(INFO," - kein Application Manager erfasst");
+               if ($self->{appl}->ValidatedUpdateRecord($arec,
+                      {applmgrid=>$uid},{id=>\$arec->{id}})){
+                  
+                  $infomail.="Der Application Manager wurde ".
+                             "auf '$urec->{fullname}' gesetzt. ".
+                             "Da diese Änderung über eine zentrale ".
+                             "Einspielung erfolgt ist, prüfen Sie bitte ob ".
+                             "diese Zuordnung plausiebel ist. Falls dies ".
+                             "nicht der Fall ist, klären Sie bitte wer der ".
+                             "korrekte Application Manager ist und tragen ".
+                             "dies entsprechend ein.\n\n";
+               }
+            }
+            if ($arec->{applmgrid} ne $uid){
+               $infomail.="Laut zentral erarbeiteter AEG Liste ist der ".
+                          "Application Manager für '$arec->{name}' nicht ".
+                          "'$arec->{applmgr}', sondern '$urec->{fullname}'.".
+                          "Bitte prüfen Sie, ob dies plausiebel ist und ".
+                          "passen Sie dann mit hoher Dringlichkeit die ".
+                          "Configdaten entsprechend an!\n\n";
+            }
+         }
+         #
+         # Technical Solution Manager Check
+         #
+         my $uid=$self->{wiw}->GetW5BaseUserID($data->[11]);
+         if ($uid ne ""){
+            $self->{user}->ResetFilter();
+            $self->{user}->SetFilter({userid=>\$uid});
+            my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(fullname ));
+            if ($arec->{tsmid} eq ""){  # kein TSM
+               msg(INFO," - kein TSM erfasst");
+               if ($self->{appl}->ValidatedUpdateRecord($arec,
+                      {tsmid=>$uid},{id=>\$arec->{id}})){
+                  
+                  $infomail.="Der <b>TSM</b> (Technical Solution Manager) ".
+                             "wurde auf '$urec->{fullname}' gesetzt. ".
+                             "Da diese Änderung über eine zentrale ".
+                             "Einspielung erfolgt ist, prüfen Sie bitte ob ".
+                             "diese Zuordnung plausiebel ist. Falls dies ".
+                             "nicht der Fall ist, klären Sie bitte wer der ".
+                             "korrekte TSM ist und tragen ".
+                             "dies entsprechend ein.\n\n";
+               }
+            }
+            if ($arec->{tsmid} ne $uid){
+               $infomail.="Laut zentral erarbeiteter AEG Liste ist der ".
+                          "<b>TSM</b> (Technical Solution Manager) ".
+                          " für '$arec->{name}' nicht ".
+                          "'$arec->{applmgr}', sondern '$urec->{fullname}'.".
+                          "Bitte prüfen Sie, ob dies plausiebel ist und ".
+                          "passen Sie dann mit hoher Dringlichkeit die ".
+                          "Configdaten entsprechend an!\n\n";
+            }
+         }
+         #
+         # Database Administrator Check
+         #
+         if ($#{$aeg->{dba_userid}}==-1){
+            msg(INFO,"no DBAs found");
+            $infomail.="Es konnte kein <b>DBA</b> (Datenbank Administrator) ".
+                       "in W5Base/Darwin identifiziert werden. ".
+                       "Bitte setzen Sie sich dringend mit ".
+                       "der zuständigen Datenbankbetreuung in Verbindung ".
+                       "und weisen Sie diese darauf hin, das alle ".
+                       "Datenbank-Instanzen für $arec->{name} als ".
+                       "Software-Instanzen korrekt zu erfassen sind! Im ".
+                       "speziellen muß der Instanz-Administrator bei diesen ".
+                       "Datenbank-Instanzen korrekt erfasst sein.\n\n";
+         }
+         else{
+            my $uid=$self->{wiw}->GetW5BaseUserID($data->[16]);
+            if ($uid ne ""){
+               $self->{user}->ResetFilter();
+               $self->{user}->SetFilter({userid=>\$uid});
+               my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(fullname ));
+               if (!in_array($aeg->{dba_userid},$uid)){
+                  $infomail.="Laut zentraler AEG Erfassung, sollte ".
+                             "'$urec->{fullname}' der <b>DBA</b> ".
+                             "für '$arec->{name}' ".
+                             "sein. Offensichtlich wurde dieser aber ".
+                             "in W5Base/Darwin nicht korrekt erfasst. ".
+                             "Bitte setzten Sie sich mit '$urec->{fullname}' ".
+                             "in Verbindung, damit dieser alle relevanten ".
+                             "Datenbank-Instanzen für '$arec->{name}' ".
+                             "korrekt als Software-Instanzen in W5Base/Darwin ".
+                             "erfasst! Im Speziellen ist der Eintrag des ".
+                             "richtigen Instanz-Administrator von Nöten.\n\n";
+               }
+            }
+         }
+         #
+         # Operations Manager Check
+         #
+         my $uid=$self->{wiw}->GetW5BaseUserID($data->[21]);
+         if ($uid ne ""){
+            $self->{user}->ResetFilter();
+            $self->{user}->SetFilter({userid=>\$uid});
+            my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(fullname ));
+            if ($arec->{opmid} eq ""){  # kein OPM
+               msg(INFO," - kein OPM erfasst");
+               if ($self->{appl}->ValidatedUpdateRecord($arec,
+                      {opmid=>$uid},{id=>\$arec->{id}})){
+                  
+                  $infomail.="Der <b>OPM</b> (Operations Manager) wurde ".
+                             "auf '$urec->{fullname}' gesetzt. ".
+                             "Da diese Änderung über eine zentrale ".
+                             "Einspielung erfolgt ist, prüfen Sie bitte ob ".
+                             "diese Zuordnung plausiebel ist. Falls dies ".
+                             "nicht der Fall ist, klären Sie bitte wer der ".
+                             "korrekte OPM ist und tragen ".
+                             "dies entsprechend ein.\n\n";
+               }
+            }
+            if ($arec->{opmid} ne $uid){
+               $infomail.="Laut zentral erarbeiteter AEG Liste ist der ".
+                          "<b>OPM</b> (Operations Manager) ".
+                          " für '$arec->{name}' nicht ".
+                          "'$arec->{applmgr}', sondern '$urec->{fullname}'.".
+                          "Bitte prüfen Sie, ob dies plausiebel ist und ".
+                          "passen Sie dann mit hoher Dringlichkeit die ".
+                          "Configdaten entsprechend an!\n\n";
+            }
+         }
+         #
+         # Projektmanager Entwicklung Check (contact role pmdev)
+         #
+         my $cinfomail;
+         my $uid=$self->{wiw}->GetW5BaseUserID($data->[26]);
+         if ($uid ne ""){
+            $self->{user}->ResetFilter();
+            $self->{user}->SetFilter({userid=>\$uid});
+            my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(fullname ));
+            my $lnkrec;
+            foreach my $cn (@{$arec->{contacts}}){
+                if ($cn->{target} eq "base::user" &&
+                    $cn->{targetid} eq $uid){
+                   $lnkrec=$cn->{id};
+                }
+            }
+            if (!defined($lnkrec)){
+               my $o=getModuleObject($self->Config,"base::lnkcontact");
+               my $lnkid=$o->ValidatedInsertRecord({target=>'base::user',
+                                                    targetid=>$uid,
+                                                    refid=>$arec->{id},
+                                                    parentobj=>'itil::appl'});
+               $cinfomail.="Es wurde der Kontakt ".
+                           "'$urec->{fullname}' zur ".
+                           "Anwendung hinzugefügt.";
+               $lnkrec=$lnkid;
+            }
+            if ($lnkrec ne ""){
+               my $o=getModuleObject($self->Config,"base::lnkcontact");
+               $o->SetFilter({id=>\$lnkrec});
+               my ($lrec,$msg)=$o->getOnlyFirst(qw(ALL));
+               $lnkrec=$lrec;
+               if (defined($lnkrec->{roles})){
+                  $lnkrec->{roles}=[$lnkrec->{roles}] if (ref($lnkrec->{roles})
+                                                          ne "ARRAY");
+               }
+               else{
+                  $lnkrec->{roles}=[];
+               }
+               my @l=(@{$lnkrec->{roles}});
+               $lnkrec->{roles}=\@l;
+            }
+            if (defined($lnkrec)){
+               my $roles=$lnkrec->{roles};
+               if (!in_array($roles,"pmdev")){
+                  my $o=getModuleObject($self->Config,"base::lnkcontact");
+                  my @newroles=@$roles;
+                  push(@newroles,"pmdev");
+                  $o->ValidatedUpdateRecord($lnkrec,{roles=>\@newroles},
+                                            {id=>\$lnkrec->{id}});
+                  $cinfomail.="Für den Kontakt '$urec->{fullname}' ".
+                              "wurde die Rolle 'Projektmanager Entwicklung' ".
+                              "vergeben.\n\n";
+               }
+            }
+         }
+
+         #
+         # Projektmanager IT-System (contact role projectmanager)
+         #
+         my $uid=$self->{wiw}->GetW5BaseUserID($data->[31]);
+         if ($uid ne ""){
+            $self->{user}->ResetFilter();
+            $self->{user}->SetFilter({userid=>\$uid});
+            my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(fullname ));
+            my $lnkrec;
+            foreach my $cn (@{$arec->{contacts}}){
+                if ($cn->{target} eq "base::user" &&
+                    $cn->{targetid} eq $uid){
+                   $lnkrec=$cn->{id};
+                }
+            }
+            if (!defined($lnkrec)){
+               my $o=getModuleObject($self->Config,"base::lnkcontact");
+               my $lnkid=$o->ValidatedInsertRecord({target=>'base::user',
+                                                    targetid=>$uid,
+                                                    refid=>$arec->{id},
+                                                    parentobj=>'itil::appl'});
+               $cinfomail.="Es wurde der Kontakt ".
+                           "'$urec->{fullname}' zur ".
+                           "Anwendung hinzugefügt.";
+               $lnkrec=$lnkid;
+            }
+            if ($lnkrec ne ""){
+               my $o=getModuleObject($self->Config,"base::lnkcontact");
+               $o->SetFilter({id=>\$lnkrec});
+               my ($lrec,$msg)=$o->getOnlyFirst(qw(ALL));
+               $lnkrec=$lrec;
+               if (defined($lnkrec->{roles})){
+                  $lnkrec->{roles}=[$lnkrec->{roles}] if (ref($lnkrec->{roles})
+                                                          ne "ARRAY");
+               }
+               else{
+                  $lnkrec->{roles}=[];
+               }
+            }
+            if (defined($lnkrec)){
+               my $roles=$lnkrec->{roles};
+               if (!in_array($roles,"projectmanager")){
+                  my $o=getModuleObject($self->Config,"base::lnkcontact");
+                  my @newroles=@$roles;
+                  push(@newroles,"projectmanager");
+                  $o->ValidatedUpdateRecord($lnkrec,{roles=>\@newroles},
+                                            {id=>\$lnkrec->{id}});
+                  $cinfomail.="Für den Kontakt '$urec->{fullname}' ".
+                              "wurde die Rolle 'Projektmanager' ".
+                              "vergeben.\n\n";
+               }
+            }
+         }
+         ####################################################################
+         if ($cinfomail ne ""){
+            $infomail.="An den Kontakten der Anwendung '$arec->{name}' ".
+                       "wurden aufgrund der zentral ermittelten AEG Liste ".
+                       "Anpassungen vorgenommen. $cinfomail".
+                       "Bitte überprüfen Sie diese Anpassungen in den ".
+                       "Kontakten auf Plausibilität. Bei etwaigen Fehlern ".
+                       "korrigieren Sie diese bitte zeitnah!\n\n";
+         }
+         if ($infomail ne ""){
+            $infomail.="\nSollten Sie bei diesen zentral initieren ".
+                       "Anpassungen Fehler erkannt und korrigiert haben, so ".
+                       "kommunizieren Sie diese bitte auch an ".
+                       "Hr. Lange/Hr. Ehlschleger.\n".
+                       "Auch bei Fragen zu diesen einmailigen zentralen ".
+                       "Einspielungsprozess, wenden Sie sich bitte an ".
+                       "Hr. Lange bzw. Hr. Ehlschleger.\n\n".
+                       "<b>Achtung:</b> Dies ist eine einmalige ".
+                       "Einspielung, d.h. für die weitere Pflege der ".
+                       "u.U. korrigieren Daten sind SIE als ".
+                       "Datenverantwortlicher gemäß des normalen ".
+                       "Config-Pflegeprozesses verantwortlich!";
+            $infomail="Sehr geehrter Datenverantwortlicher,\n\n".
+                      "für die AEG (Application Expert Group) wurde ".
+                      "zentral eine Ermittlung der notwendigen Kontaktdaten ".
+                      "durchgeführt. Auf Basis dieser Ermitlung ".
+                      "(Ansprechpartner sind Hr. Lange bzw. Hr. Ehlschleger) ".
+                      "wurde erkannt, das die Config-Daten der von Ihnen ".
+                      "Datenverantworteten Anwendung '$arec->{name}' ".
+                      "aktualisiert werden mußten.\n\n".$infomail;
+            my $act=getModuleObject($self->Config,"base::workflowaction");
+            $act->Notify('','Application Expert Group - Anpassungen '.
+                         $arec->{name},$infomail,
+                         emailfrom=>'"AEG Import-Testlauf" <>',
+                         emailto=>['11634953080001','11634955470001','12762475160001'],
+                         adminbcc=>1,
+                        );
+
+         }
+      } 
+   }
 }
 
 
