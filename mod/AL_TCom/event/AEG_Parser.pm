@@ -125,7 +125,7 @@ sub ProcessLineData
                   $self->{user}->ResetFilter();
                   $self->{user}->SetFilter({allphones=>join(" ",@v)});
                   my @l=$self->{user}->getHashList(qw(posix email));
-                  if ($#==0){
+                  if ($#l==0){
                      if ($l[0]->{posix} ne ""){
                         $data->[$idcol]=$l[0]->{posix};
                      }
@@ -164,17 +164,22 @@ sub ProcessLineData
             $data->[$idcol]="???";
          }
          else{
-            my $uid=$self->{wiw}->GetW5BaseUserID($data->[$idcol]);
-            if ($uid ne ""){
-               $self->{user}->ResetFilter();
-               $self->{user}->SetFilter({userid=>\$uid});
-               my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(posix email));
-               if ($urec->{posix} ne ""){
-                  $data->[$idcol]=$urec->{posix};
+            if ($data->[$idcol] ne "INVALID"){
+               my $uid=$self->{wiw}->GetW5BaseUserID($data->[$idcol]);
+               if ($uid ne ""){
+                  $self->{user}->ResetFilter();
+                  $self->{user}->SetFilter({userid=>\$uid});
+                  my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(posix email));
+                  if ($urec->{posix} ne ""){
+                     $data->[$idcol]=$urec->{posix};
+                  }
+                  else{
+                     $data->[$idcol]=$urec->{email};
+                  }
                }
-               else{
-                  $data->[$idcol]=$urec->{email};
-               }
+            }
+            else{
+               $data->[$idcol]="???";
             }
          }
       }
