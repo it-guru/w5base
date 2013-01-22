@@ -207,6 +207,10 @@ sub ProcessLineData
             my ($arec,$msg)=$self->{appl}->getOnlyFirst(qw(id name 
                                                            applmgrid
                                                            applmgr
+                                                           tsmid
+                                                           tsm
+                                                           opmid
+                                                           opm
                                                            contacts 
                                                            technicalaeg
                                                            databossid));
@@ -302,7 +306,7 @@ sub ProcessLineData
                $infomail.="Laut zentral erarbeiteter AEG Liste ist der ".
                           "<b>TSM</b> (Technical Solution Manager) ".
                           " für '$arec->{name}' nicht ".
-                          "'$arec->{applmgr}', sondern ".
+                          "'$arec->{tsm}', sondern ".
                           "<b>'$urec->{fullname}'</b>. ".
                           "Bitte prüfen Sie, ob dies plausiebel ist und ".
                           "passen Sie dann mit hoher Dringlichkeit die ".
@@ -372,7 +376,7 @@ sub ProcessLineData
                $infomail.="Laut zentral erarbeiteter AEG Liste ist der ".
                           "<b>OPM</b> (Operations Manager) ".
                           " für '$arec->{name}' nicht ".
-                          "'$arec->{applmgr}', sondern ".
+                          "'$arec->{opm}', sondern ".
                           "<b>'$urec->{fullname}'</b>. ".
                           "Bitte prüfen Sie, ob dies plausiebel ist und ".
                           "passen Sie dann mit hoher Dringlichkeit die ".
