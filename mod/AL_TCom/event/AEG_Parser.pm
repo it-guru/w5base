@@ -69,7 +69,7 @@ sub ProcessLineData
    my $row=shift;
    my $data=shift;
   
-   if ($row<200){
+   if ($row<20){
       my @targetappl;
       if ($data->[1]=~m/^\s*$/){
          if ($data->[0] ne ""){
