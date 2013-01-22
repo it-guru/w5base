@@ -69,7 +69,7 @@ sub ProcessLineData
    my $row=shift;
    my $data=shift;
   
-   if ($row<20){
+   if ($row<200){
       my @targetappl;
       if ($data->[1]=~m/^\s*$/){
          if ($data->[0] ne ""){
@@ -255,8 +255,8 @@ sub ProcessLineData
                if ($self->{appl}->ValidatedUpdateRecord($arec,
                       {applmgrid=>$uid},{id=>\$arec->{id}})){
                   
-                  $infomail.="Der Application Manager wurde ".
-                             "auf '$urec->{fullname}' gesetzt. ".
+                  $infomail.="Der <b>Application Manager</b> wurde ".
+                             "auf <b>'$urec->{fullname}'</b> gesetzt. ".
                              "Da diese Änderung über eine zentrale ".
                              "Einspielung erfolgt ist, prüfen Sie bitte ob ".
                              "diese Zuordnung plausiebel ist. Falls dies ".
@@ -267,8 +267,9 @@ sub ProcessLineData
             }
             if ($arec->{applmgrid} ne $uid){
                $infomail.="Laut zentral erarbeiteter AEG Liste ist der ".
-                          "Application Manager für '$arec->{name}' nicht ".
-                          "'$arec->{applmgr}', sondern '$urec->{fullname}'.".
+                          "<b>Application Manager</b> für '$arec->{name}' ".
+                          "nicht '$arec->{applmgr}', sondern ".
+                          "<b>'$urec->{fullname}'</b>. ".
                           "Bitte prüfen Sie, ob dies plausiebel ist und ".
                           "passen Sie dann mit hoher Dringlichkeit die ".
                           "Configdaten entsprechend an!\n\n";
@@ -302,7 +303,7 @@ sub ProcessLineData
                           "<b>TSM</b> (Technical Solution Manager) ".
                           " für '$arec->{name}' nicht ".
                           "'$arec->{applmgr}', sondern ".
-                          "<b>'$urec->{fullname}'</b>.".
+                          "<b>'$urec->{fullname}'</b>. ".
                           "Bitte prüfen Sie, ob dies plausiebel ist und ".
                           "passen Sie dann mit hoher Dringlichkeit die ".
                           "Configdaten entsprechend an!\n\n";
@@ -372,7 +373,7 @@ sub ProcessLineData
                           "<b>OPM</b> (Operations Manager) ".
                           " für '$arec->{name}' nicht ".
                           "'$arec->{applmgr}', sondern ".
-                          "<b>'$urec->{fullname}'</b>.".
+                          "<b>'$urec->{fullname}'</b>. ".
                           "Bitte prüfen Sie, ob dies plausiebel ist und ".
                           "passen Sie dann mit hoher Dringlichkeit die ".
                           "Configdaten entsprechend an!\n\n";
@@ -514,7 +515,7 @@ sub ProcessLineData
                        "Datenverantwortlicher gemäß des normalen ".
                        "Config-Pflegeprozesses verantwortlich!";
             $infomail="Sehr geehrter Datenverantwortlicher,\n\n".
-                      "für die AEG (Application Expert Group) wurde ".
+                      "für die <b>AEG (Application Expert Group)</b> wurde ".
                       "zentral eine Ermittlung der notwendigen Kontaktdaten ".
                       "durchgeführt. Auf Basis dieser Ermitlung ".
                       "(<b>Ansprechpartner sind Hr. Lange bzw. ".
