@@ -263,7 +263,7 @@ sub ProcessLineData
                              "auf <b>'$urec->{fullname}'</b> gesetzt. ".
                              "Da diese Änderung über eine zentrale ".
                              "Einspielung erfolgt ist, prüfen Sie bitte ob ".
-                             "diese Zuordnung plausiebel ist. Falls dies ".
+                             "diese Zuordnung plausibel ist. Falls dies ".
                              "nicht der Fall ist, klären Sie bitte wer der ".
                              "korrekte Application Manager ist und tragen ".
                              "dies entsprechend ein.\n\n";
@@ -407,7 +407,7 @@ sub ProcessLineData
                                                     parentobj=>'itil::appl'});
                $cinfomail.="Es wurde der Kontakt ".
                            "'$urec->{fullname}' zur ".
-                           "Anwendung hinzugefügt.";
+                           "Anwendung hinzugefügt. ";
                $lnkrec=$lnkid;
             }
             if ($lnkrec ne ""){
@@ -464,7 +464,7 @@ sub ProcessLineData
                                                     parentobj=>'itil::appl'});
                $cinfomail.="Es wurde der Kontakt ".
                            "'$urec->{fullname}' zur ".
-                           "Anwendung hinzugefügt.";
+                           "Anwendung hinzugefügt. ";
                $lnkrec=$lnkid;
             }
             if ($lnkrec ne ""){
@@ -506,11 +506,11 @@ sub ProcessLineData
                        "korrigieren Sie diese bitte zeitnah!\n\n";
          }
          if ($infomail ne ""){
-            $infomail.="\nSollten Sie bei diesen zentral initieren ".
+            $infomail.="\nSollten Sie bei diesen zentral initiierten ".
                        "Anpassungen Fehler erkannt und korrigiert haben, so ".
                        "kommunizieren Sie diese bitte auch an ".
                        "Hr. Lange/Hr. Ehlschleger.\n".
-                       "Auch bei Fragen zu diesen einmailigen zentralen ".
+                       "Bei Fragen zu diesem einmaligen zentralen ".
                        "Einspielungsprozess, wenden Sie sich bitte an ".
                        "Hr. Lange bzw. Hr. Ehlschleger.\n\n".
                        "<b>Achtung:</b> Dies ist eine einmalige ".
@@ -521,12 +521,12 @@ sub ProcessLineData
             $infomail="Sehr geehrter Datenverantwortlicher,\n\n".
                       "für die <b>AEG (Application Expert Group)</b> wurde ".
                       "zentral eine Ermittlung der notwendigen Kontaktdaten ".
-                      "durchgeführt. Auf Basis dieser Ermitlung ".
+                      "durchgeführt. Auf Basis dieser Ermittlung ".
                       "(<b>Ansprechpartner sind Hr. Lange bzw. ".
                       "Hr. Ehlschleger</b>) ".
-                      "wurde erkannt, das die Config-Daten der von Ihnen ".
-                      "Datenverantworteten Anwendung '$arec->{name}' ".
-                      "aktualisiert werden mußten.\n\n".$infomail;
+                      "wurde erkannt, dass die Config-Daten der von Ihnen ".
+                      "datenverantworteten Anwendung '$arec->{name}' ".
+                      "aktualisiert werden mussten.\n\n".$infomail;
             my $act=getModuleObject($self->Config,"base::workflowaction");
 
             $act->Notify('','Application Expert Group - Anpassungen '.
