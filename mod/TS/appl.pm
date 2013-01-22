@@ -395,10 +395,10 @@ sub calcApplicationExpertGroup
                        keys(%$aeg))){
       next if ($aegtag eq "AEG");
       my $arec=$aeg->{$aegtag};
-      $d.="<tr><td valign=top><div><b>".$arec->{label}.":</b></div>\n".
-          "<div>".$arec->{sublabel}."</div></td>\n";
       my $c="";
       if ($#{$arec->{userid}}!=-1){
+         $d.="<tr><td valign=top><div><b>".$arec->{label}.":</b></div>\n".
+             "<div>".$arec->{sublabel}."</div></td>\n";
          for(my $uno=0;$uno<=$#{$arec->{userid}};$uno++){
             $c.="<br>--<br>\n" if ($c ne "");
             my @phone=split(/\n/,
@@ -417,11 +417,8 @@ sub calcApplicationExpertGroup
             }
             $c.=$htmlphone;
          }
+         $d.="<td valign=top>".$c."</td></tr>\n";
       }
-      else{
-         $c="<b><font color=red>?</font></b>\n";
-      }
-      $d.="<td valign=top>".$c."</td></tr>\n";
    }
    $d.="</table>";
    return($d);
