@@ -114,7 +114,7 @@ sub qcheckRecord
          $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
          my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
          my $posix=$posix[0];
-         if ($posix ne ""){
+         if ($posix ne "" && $rec->{cistatusid}==4){
             my $user=getModuleObject($self->getParent->Config(),
                                       "base::user");
             $user->ValidatedUpdateRecord($rec,
