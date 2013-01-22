@@ -3,6 +3,7 @@
 'Fullname'=>{ de=>'vollqualifizierter Name'},
 'Street'=>{ de=>'Strasse'},
 'Location'=>{ de=>'Ort'},
+'Country'=>{ de=>'Land'},
 'ZIP-Code'=>{ de=>'PLZ'},
 'electronical FAX-Number'=>{ de=>'elektronisches FAX'},
 'FAX-Number'=>{ de=>'FAX'},
