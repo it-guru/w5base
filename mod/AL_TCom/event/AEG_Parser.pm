@@ -531,7 +531,7 @@ sub ProcessLineData
 
             $act->Notify('','Application Expert Group - Anpassungen '.
                          $arec->{name},$infomail,
-                         emailfrom=>'"AEG Import-Testlauf" <>',
+                         emailfrom=>'"AEG Import" <>',
                          emailto=>[$arec->{databossid}],
                          emailcc=>[keys(%emailcc)],
                          adminbcc=>1,
