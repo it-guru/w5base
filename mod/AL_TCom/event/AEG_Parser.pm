@@ -69,7 +69,7 @@ sub ProcessLineData
    my $row=shift;
    my $data=shift;
   
-   if ($row<10){
+   if ($row<20){
       my @targetappl;
       if ($data->[1]=~m/^\s*$/){
          if ($data->[0] ne ""){
@@ -222,7 +222,25 @@ sub ProcessLineData
 
       foreach my $arec (@targetappl){
          my $infomail;
+         my %emailcc=('11920906020009'=>1,'13033697790001'=>1,
+                      '11634955470001'=>1,'12762475160001'=>1);
          msg(INFO,"Processing Appl: $arec->{name}");
+         foreach my $cn (@{$arec->{contacts}}){
+             my $roles=$cn->{roles};
+             $roles=[$roles] if (ref($roles) ne "ARRAY");
+             if (in_array($roles,"write")){
+                if ($cn->{target} eq "base::user"){
+                   $emailcc{$cn->{targetid}}++;
+                }
+                if ($cn->{target} eq "base::grp"){
+                   my @l=$self->{appl}->getMembersOf($cn->{targetid},
+                                                     'RMember','direct');
+                   foreach my $uid (@l){
+                      $emailcc{$uid}++;
+                   }
+                }
+             }
+         }
          my $aeg=$arec->{technicalaeg};
          #
          # Application Manager Check
@@ -270,7 +288,7 @@ sub ProcessLineData
                       {tsmid=>$uid},{id=>\$arec->{id}})){
                   
                   $infomail.="Der <b>TSM</b> (Technical Solution Manager) ".
-                             "wurde auf '$urec->{fullname}' gesetzt. ".
+                             "wurde auf <b>'$urec->{fullname}'</b> gesetzt. ".
                              "Da diese Änderung über eine zentrale ".
                              "Einspielung erfolgt ist, prüfen Sie bitte ob ".
                              "diese Zuordnung plausiebel ist. Falls dies ".
@@ -283,7 +301,8 @@ sub ProcessLineData
                $infomail.="Laut zentral erarbeiteter AEG Liste ist der ".
                           "<b>TSM</b> (Technical Solution Manager) ".
                           " für '$arec->{name}' nicht ".
-                          "'$arec->{applmgr}', sondern '$urec->{fullname}'.".
+                          "'$arec->{applmgr}', sondern ".
+                          "<b>'$urec->{fullname}'</b>.".
                           "Bitte prüfen Sie, ob dies plausiebel ist und ".
                           "passen Sie dann mit hoher Dringlichkeit die ".
                           "Configdaten entsprechend an!\n\n";
@@ -299,7 +318,7 @@ sub ProcessLineData
                        "Bitte setzen Sie sich dringend mit ".
                        "der zuständigen Datenbankbetreuung in Verbindung ".
                        "und weisen Sie diese darauf hin, das alle ".
-                       "Datenbank-Instanzen für $arec->{name} als ".
+                       "Datenbank-Instanzen für '$arec->{name}' als ".
                        "Software-Instanzen korrekt zu erfassen sind! Im ".
                        "speziellen muß der Instanz-Administrator bei diesen ".
                        "Datenbank-Instanzen korrekt erfasst sein.\n\n";
@@ -312,7 +331,7 @@ sub ProcessLineData
                my ($urec,$msg)=$self->{user}->getOnlyFirst(qw(fullname ));
                if (!in_array($aeg->{dba_userid},$uid)){
                   $infomail.="Laut zentraler AEG Erfassung, sollte ".
-                             "'$urec->{fullname}' der <b>DBA</b> ".
+                             "<b>'$urec->{fullname}'</b> der <b>DBA</b> ".
                              "für '$arec->{name}' ".
                              "sein. Offensichtlich wurde dieser aber ".
                              "in W5Base/Darwin nicht korrekt erfasst. ".
@@ -339,7 +358,7 @@ sub ProcessLineData
                       {opmid=>$uid},{id=>\$arec->{id}})){
                   
                   $infomail.="Der <b>OPM</b> (Operations Manager) wurde ".
-                             "auf '$urec->{fullname}' gesetzt. ".
+                             "auf <b>'$urec->{fullname}'</b> gesetzt. ".
                              "Da diese Änderung über eine zentrale ".
                              "Einspielung erfolgt ist, prüfen Sie bitte ob ".
                              "diese Zuordnung plausiebel ist. Falls dies ".
@@ -352,7 +371,8 @@ sub ProcessLineData
                $infomail.="Laut zentral erarbeiteter AEG Liste ist der ".
                           "<b>OPM</b> (Operations Manager) ".
                           " für '$arec->{name}' nicht ".
-                          "'$arec->{applmgr}', sondern '$urec->{fullname}'.".
+                          "'$arec->{applmgr}', sondern ".
+                          "<b>'$urec->{fullname}'</b>.".
                           "Bitte prüfen Sie, ob dies plausiebel ist und ".
                           "passen Sie dann mit hoher Dringlichkeit die ".
                           "Configdaten entsprechend an!\n\n";
@@ -408,8 +428,9 @@ sub ProcessLineData
                   push(@newroles,"pmdev");
                   $o->ValidatedUpdateRecord($lnkrec,{roles=>\@newroles},
                                             {id=>\$lnkrec->{id}});
-                  $cinfomail.="Für den Kontakt '$urec->{fullname}' ".
-                              "wurde die Rolle 'Projektmanager Entwicklung' ".
+                  $cinfomail.="Für den Kontakt <b>'$urec->{fullname}'</b> ".
+                              "wurde die Rolle ".
+                              "<b>'Projektmanager Entwicklung'</b> ".
                               "vergeben.\n\n";
                }
             }
@@ -453,6 +474,8 @@ sub ProcessLineData
                else{
                   $lnkrec->{roles}=[];
                }
+               my @l=(@{$lnkrec->{roles}});
+               $lnkrec->{roles}=\@l;
             }
             if (defined($lnkrec)){
                my $roles=$lnkrec->{roles};
@@ -462,8 +485,8 @@ sub ProcessLineData
                   push(@newroles,"projectmanager");
                   $o->ValidatedUpdateRecord($lnkrec,{roles=>\@newroles},
                                             {id=>\$lnkrec->{id}});
-                  $cinfomail.="Für den Kontakt '$urec->{fullname}' ".
-                              "wurde die Rolle 'Projektmanager' ".
+                  $cinfomail.="Für den Kontakt <b>'$urec->{fullname}'</b> ".
+                              "wurde die Rolle <b>'Projektmanager'</b> ".
                               "vergeben.\n\n";
                }
             }
@@ -494,15 +517,18 @@ sub ProcessLineData
                       "für die AEG (Application Expert Group) wurde ".
                       "zentral eine Ermittlung der notwendigen Kontaktdaten ".
                       "durchgeführt. Auf Basis dieser Ermitlung ".
-                      "(Ansprechpartner sind Hr. Lange bzw. Hr. Ehlschleger) ".
+                      "(<b>Ansprechpartner sind Hr. Lange bzw. ".
+                      "Hr. Ehlschleger</b>) ".
                       "wurde erkannt, das die Config-Daten der von Ihnen ".
                       "Datenverantworteten Anwendung '$arec->{name}' ".
                       "aktualisiert werden mußten.\n\n".$infomail;
             my $act=getModuleObject($self->Config,"base::workflowaction");
+
             $act->Notify('','Application Expert Group - Anpassungen '.
                          $arec->{name},$infomail,
                          emailfrom=>'"AEG Import-Testlauf" <>',
-                         emailto=>['11634953080001','11634955470001','12762475160001'],
+                         emailto=>[$arec->{databossid}],
+                         emailcc=>[keys(%emailcc)],
                          adminbcc=>1,
                         );
 
