@@ -87,7 +87,7 @@ CREATE TABLE contact (
   modifyuser bigint(20) NOT NULL default '0',
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
-  email varchar(128),managedbygrp bigint(20) default '1',
+  email varchar(128),managedby bigint(20) default '1',
   options text NOT NULL,comments blob,
   timezone varchar(40) NOT NULL default 'CET',
   lang varchar(10),usertyp varchar(10) default 'user',

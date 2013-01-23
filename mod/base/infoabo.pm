@@ -196,7 +196,7 @@ sub new
                 htmldetail    =>0,
                 uploadable    =>0,
                 readonly      =>1,
-                dataobjattr   =>'contact.managedbygrp'),
+                dataobjattr   =>'contact.managedby'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -265,6 +265,11 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>'infoabo.realeditor'),
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'infoabo.lastqcheck'),
    );
    $self->setDefaultView(qw(parentobj targetname mode user active));
    $self->setWorktable("infoabo");
@@ -544,10 +549,12 @@ sub Validate
 
    my @modelist=keys(%modelist);
 
-   if (!in_array(\@modelist,$mode)){
-      msg(ERROR,"invalid rawmode=$mode - allowed=".join(",",@modelist));
-      $self->LastMsg(ERROR,"invalid interal infomode");
-      return(0);
+   if ($self->isDataInputFromUserFrontend()){
+      if (!in_array(\@modelist,$mode)){
+         msg(ERROR,"invalid rawmode=$mode - allowed=".join(",",@modelist));
+         $self->LastMsg(ERROR,"invalid interal infomode");
+         return(0);
+      }
    }
 
    my $curuserid=$self->getCurrentUserId();
@@ -595,7 +602,8 @@ sub FinishWrite
    my $userid=$self->getCurrentUserId();
    my $requserid=effVal($oldrec,$newrec,"userid");
    if ($userid ne $requserid &&
-       !($self->IsMemberOf("admin"))){
+       !($self->IsMemberOf("admin")) &&
+       $W5V2::OperationContext ne "QualityCheck"){
       my $ia=getModuleObject($self->Config,"base::infoabo");
       my $id=effVal($oldrec,$newrec,"id");
       $ia->SetFilter({id=>\$id});

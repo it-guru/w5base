@@ -736,7 +736,7 @@ sub new
                 name          =>'managedbyid',
                 group         =>'default',   # to allow write on create
                 selectfix     =>1,
-                dataobjattr   =>'contact.managedbygrp'),
+                dataobjattr   =>'contact.managedby'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
