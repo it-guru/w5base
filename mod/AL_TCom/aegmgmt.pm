@@ -166,6 +166,7 @@ sub new
       new kernel::Field::Htmlarea(
                 name          =>'applicationexpertgroup',
                 readonly      =>1,
+                group         =>'aeg',
                 searchable    =>0,
                 label         =>'Application Expert Group',
                 onRawValue    =>sub{
@@ -302,7 +303,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default meetings processcheck checklist source));
+   return(qw(header default aeg meetings processcheck checklist source));
 }
 
 
