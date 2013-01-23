@@ -2,6 +2,8 @@
                      en=>'Telekom IT: AEG Management'},
 'fieldgroup.meetings'=>{de=>'zyklische Meetings',
                         en=>'meetings'},
+'fieldgroup.aeg'=>{de=>'Application ExpertGroup',
+                        en=>'Application ExpertGroup'},
 'fieldgroup.checklist'=>{de=>'Check-Listen AG spezifisch',
                         en=>'check lists'},
 'fieldgroup.processcheck'=>{de=>'AG Prozessüberprüfung',
