@@ -126,6 +126,10 @@ sub Init
                       "itil::lnkapplsystem",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.appl.aegmgmt",
+                      "AL_TCom::aegmgmt",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.appl.lnksystem.new",
                       "itil::lnkapplsystem",
                       func=>'New',
@@ -430,6 +434,11 @@ sub Init
 
    $self->RegisterObj("AL_TCom.proc.softmgmt.analyse",
                       "itil::softwaresetanalyse",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.proc.applpriochange",
+                      "AL_TCom::applpriochange",
+                      func=>'MainWithNew',
                       defaultacl=>['admin']);
 
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
