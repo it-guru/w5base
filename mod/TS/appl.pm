@@ -406,7 +406,7 @@ sub calcApplicationExpertGroup
          $d.="<tr><td valign=top><div><b>".$arec->{label}.":</b></div>\n".
              "<div>".$arec->{sublabel}."</div></td>\n";
          for(my $uno=0;$uno<=$#{$arec->{userid}};$uno++){
-            $c.="<br>--<br>\n" if ($c ne "");
+            $c.="\n--<br>\n" if ($c ne "");
             my @phone=split(/\n/,
                       quoteHtml($arec->{phonename}->[$uno]));
             my $htmlphone;
