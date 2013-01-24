@@ -312,7 +312,9 @@ sub calcBaseApplicationExpertGroup
           if ($inrec->{smemail} ne ""){
              my $smuserid=$tswiw->GetW5BaseUserID($inrec->{smemail});
              if ($smuserid ne ""){
-                push(@{$a{applmgr}->{userid}},$smuserid);
+                if (!in_array($a{applmgr}->{userid},$smuserid)){
+                   push(@{$a{applmgr}->{userid}},$smuserid);
+                }
              }
              else{
                 msg(ERROR,"unable to resolv $inrec->{smemail} from I-Network");
@@ -321,7 +323,9 @@ sub calcBaseApplicationExpertGroup
           if ($inrec->{pmeemail} ne ""){
              my $pmeuserid=$tswiw->GetW5BaseUserID($inrec->{pmeemail});
              if ($pmeuserid ne ""){
-                push(@{$a{pmdev}->{userid}},$pmeuserid);
+                if (!in_array($a{pmdev}->{userid},$pmeuserid)){
+                   push(@{$a{pmdev}->{userid}},$pmeuserid);
+                }
              }
              else{
                 msg(ERROR,"unable to resolv $inrec->{pmeemail} from I-Network");
@@ -330,7 +334,9 @@ sub calcBaseApplicationExpertGroup
           if ($inrec->{sdemail} ne ""){
              my $sduserid=$tswiw->GetW5BaseUserID($inrec->{sdemail});
              if ($sduserid ne ""){
-                push(@{$a{sdesign}->{userid}},$sduserid);
+                if (!in_array($a{sdesign}->{userid},$sduserid)){
+                   push(@{$a{sdesign}->{userid}},$sduserid);
+                }
              }
              else{
                 msg(ERROR,"unable to resolv $inrec->{sdemail} from I-Network");
