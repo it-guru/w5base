@@ -42,6 +42,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
+                uivisible     =>0,
                 label         =>'W5BaseID',
                 dataobjattr   =>"$worktable.id"),
                                                   
@@ -208,9 +209,12 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>"$worktable.realeditor"),
 
-
-
-
+      new kernel::Field::Text(
+                name          =>'w5bid',
+                sqlorder      =>'desc',
+                uivisible     =>0,
+                label         =>'W5BaseID',
+                dataobjattr   =>"appl.id"),
    );
    $self->setDefaultView(qw(name applcistatus managed aegsolution));
    return($self);

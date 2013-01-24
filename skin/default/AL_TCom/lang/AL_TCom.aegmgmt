@@ -10,6 +10,7 @@
                         en=>'AG Process check'},
 'is managed AEG'=>{de=>'zentral koordinierte AEG'},
 'Application'=>{de=>'Anwendung'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
 'Application CI-State'=>{de=>'Anwendungs CI-Status'},
 'meeting interval'=>{de=>'zyklisches Meeting Interval'},
 'meetings startet at'=>{de=>'zyklisches Meetings beginnend ab'},
