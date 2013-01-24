@@ -212,7 +212,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'w5bid',
                 sqlorder      =>'desc',
-                uivisible     =>0,
                 label         =>'W5BaseID',
                 dataobjattr   =>"appl.id"),
    );
