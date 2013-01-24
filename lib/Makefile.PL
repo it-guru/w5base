@@ -7,7 +7,8 @@ WriteMakefile(
     'VERSION_FROM' => 'W5Base/API.pm', # finds $VERSION
     'MAN1PODS'     =>{'W5Base/API.pm'=>'blib/man1/W5Base::API.1'},
     'PMLIBDIRS'    =>['./W5Base/'],
-    'PM'     => {'W5Kernel.pm' => '$(INST_LIBDIR)/W5Kernel.pm',
+    'PM'     => {'W5Base/API.pm' =>'$(INST_LIBDIR)/W5Base/API.pm',
+                 'W5Kernel.pm' => '$(INST_LIBDIR)/W5Kernel.pm',
                  'W5FastConfig.pm' => '$(INST_LIBDIR)/W5FastConfig.pm'},
     'PREREQ_PM' => { 
          XML::DOM   => undef,
