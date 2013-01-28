@@ -7,13 +7,14 @@ use strict;
 use kernel;
 use kernel::config;
 use Getopt::Long;
-use vars qw($opt_v $opt_h $opt_c $opt_n $configname);
+use vars qw($opt_v $opt_h $opt_s $opt_c $opt_n $configname);
 
 $0="W5ServerClient ".join(" ",@ARGV);
 
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
                         'noconnecterror'=>\$opt_n,
+                        'showconfig'=>\$opt_s,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
 
@@ -22,6 +23,10 @@ if ($opt_v){
 }
 else{
    $W5V2::Debug=0;
+}
+if (defined($opt_h)){
+   help();
+   exit(1);
 }
 
 if ($opt_c eq ""){
@@ -37,6 +42,11 @@ if (!$configcheck->readconfig("$FindBin::Bin/..",$configname)){
    msg(ERROR,"can't read configfile '%s'",$configname);
    exit(1);
 }
+if (defined($opt_s)){
+   showConfig($configcheck);
+   exit(1);
+}
+
 {
    my $port=$configcheck->Param("W5SERVERPORT");
    $port=4711 if ($port eq "");
@@ -85,3 +95,39 @@ if (defined($res->{exitcode}) && $res->{exitcode}!=0){
    exit($res->{exitcode});
 }
 exit(0);
+
+sub help
+{
+   printf STDERR ("Usage: W5ServerClient [-d] -c {config} [-v]\n");
+   printf STDERR ("\n");
+   printf STDERR (" -c sets the name of the config (default:w5server.conf)\n");
+   printf STDERR (" -v activates verbose mode\n");
+   printf STDERR (" -d starts client in debug mode\n");
+   printf STDERR (" -noconnecterror -n no connect errors\n");
+   printf STDERR (" -showconfig -s     shows current config variables (-c)\n");
+   printf STDERR ("\n");
+}
+
+sub showConfig
+{
+   my $config=shift;
+
+   sub quote{
+      $_[0]=~s/"/\"/g;
+      $_[0]=~s/\$/\\\$/g;
+      $_[0];
+   }
+
+   foreach my $v (sort($config->varlist())){
+      my $val=$config->Param($v);
+      if (ref($val) eq "HASH"){
+         foreach my $sv (keys(%$val)){
+            printf("%s=\"%s\"\n",$v."[$sv]",quote($val->{$sv}));
+         }
+      }
+      else{
+         printf("%s=\"%s\"\n",$v,quote($val));
+      }
+   }
+}
+
