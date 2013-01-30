@@ -329,7 +329,7 @@ use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
 
-$VERSION = "0.9";
+$VERSION = "0.11";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -385,6 +385,10 @@ sub XGetOptions
    $param->{store}=\$store if (!defined($param->{store}));
    my $if;
    $param->{'initfile=s'}=\$if if (!defined($param->{'initfile=s'}));
+   $param->{'initfile=s'}=\$if if (defined($param->{'initfile=s'}) &&
+                                   ref($param->{'initfile=s'}) eq "SCALAR" && 
+                                   defined(${$param->{'initfile=s'}}) &&
+                                   ${$param->{'initfile=s'}} eq "");
 
    if (!($optresult=GetOptions(%$param))){
       if (defined($help)){
@@ -405,7 +409,7 @@ sub XGetOptions
 
    $storefile=XGetFQStoreFilename($storefile);
 
-   if (defined(${$param->{help}})){
+   if (defined(${$param->{help}}) && (${$param->{help}})){
       &$help();
       exit(0);
    }
@@ -466,7 +470,7 @@ sub XGetOptions
          my $ot=$param->{$p};
          $ot=$$ot if (ref($ot) eq "SCALAR");
          $ot=join(", ",@{$ot}) if (ref($ot) eq "ARRAY");
-         msg(INFO,sprintf("%8s = '%s'",$pname,$ot));
+         msg(INFO,sprintf("%8s = '%s'",$pname,defined($ot) ? $ot : "[undef]"));
       }
       msg(INFO,"-----------------");
    }
