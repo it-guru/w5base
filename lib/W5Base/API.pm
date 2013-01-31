@@ -329,7 +329,7 @@ use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
 
-$VERSION = "0.11";
+$VERSION = "0.12";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -396,7 +396,7 @@ sub XGetOptions
       }
       exit(1);
    }
-   if (${$param->{'initfile=s'}} ne ""){
+   if (defined(${$param->{'initfile=s'}}) && ${$param->{'initfile=s'}} ne ""){
       if (! (-r ${$param->{'initfile=s'}})){
          printf STDERR ("ERROR: can't read initfile '%s'\n",
                         ${$param->{'initfile=s'}});
@@ -512,9 +512,9 @@ sub XLoadStoreFile
 {
    my $storefile=shift;
    my $param=shift;
+   my %forceload=();
 
    if (open(F,"<".$storefile)){
-      
       while(my $l=<F>){
          $l=~s/\s*$//;
          if (my ($var,$val)=$l=~m/^(\S+)\t(.*)$/){
@@ -527,7 +527,8 @@ sub XLoadStoreFile
                      }
                   }
                   if (ref($param->{$var}) eq "ARRAY" &&
-                      $#{$param->{$var}}==-1){
+                      ($#{$param->{$var}}==-1 || $forceload{$var})){
+                     $forceload{$var}++;
                      push(@{$param->{$var}},unpack("u*",$val));
                   }
                }
@@ -549,16 +550,19 @@ sub XSaveStoreFile
          next if ($p=~m/^verbose.*/);
          next if ($p=~m/^help$/);
          next if ($p=~m/^store$/);
-         if (ref($param->{$p}) eq "SCALAR"){
+         if (ref($param->{$p}) eq "SCALAR" &&
+             defined(${$param->{$p}})){
             my $pstring=pack("u*",${$param->{$p}});
             $pstring=~s/\n//g;
             printf F ("%s\t%s\n",$p,$pstring);
          }
          if (ref($param->{$p}) eq "ARRAY"){
             foreach my $val (@{$param->{$p}}){
-               my $pstring=pack("u*",$val);
-               $pstring=~s/\n//g;
-               printf F ("%s\t%s\n",$p,$pstring);
+               if (defined($val)){
+                  my $pstring=pack("u*",$val);
+                  $pstring=~s/\n//g;
+                  printf F ("%s\t%s\n",$p,$pstring);
+               }
             }
          }
       }
