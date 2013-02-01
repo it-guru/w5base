@@ -85,12 +85,12 @@ sub Init
                       $app->SetFilter({id=>$wfrec->{affectedapplicationid}});
                       my ($arec,$msg)=$app->getOnlyFirst(qw(id conumber));
                       if (defined($arec)){
-                         $personaltag="CO:".$arec->{conumber};
+                         $personaltag="CostNode:".$arec->{conumber};
                       }
                    }
                    elsif (exists($wfrec->{involvedcostcenter}) && 
                        $wfrec->{involvedcostcenter} ne ""){
-                      $personaltag="CO:".$wfrec->{involvedcostcenter};
+                      $personaltag="CostNode:".$wfrec->{involvedcostcenter};
                    }
                  #  elsif (exists($wfrec->{affectedproject}) && 
                  #      $wfrec->{affectedproject} ne ""){
