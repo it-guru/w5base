@@ -76,7 +76,7 @@ sub Init
                    my $personaltag;
 
                    if ($wfrec->{class} eq "base::workflow::adminrequest"){
-                      $personaltag="W5BaseAdminRequest";
+                      $personaltag="AdminRequest";
                    }
                    elsif (exists($wfrec->{affectedapplicationid}) && 
                        $wfrec->{affectedapplicationid} ne ""){
