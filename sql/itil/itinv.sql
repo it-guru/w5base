@@ -1147,3 +1147,54 @@ alter table lnkapplappl add monitortool varchar(20) default NULL;
 alter table lnkapplappl add monitorinterval varchar(20) default NULL;
 alter table appl add applmgr2 bigint(20) default NULL;
 alter table swinstance add techprodstring longtext default NULL;
+create table systemmonipoint (
+  id         bigint(20) NOT NULL,
+  system     bigint(20) NOT NULL,
+  name        varchar(20)  NOT NULL,
+  description longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  srcsys      varchar(100) default 'w5base',
+  srcid       varchar(20) default NULL,
+  srcload     datetime    default NULL,
+  PRIMARY KEY  (id),UNIQUE KEY `nameing` (name,system),
+  FOREIGN KEY fk_system (system)
+              REFERENCES system (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table lnkbscomp (
+  id           bigint(20) NOT NULL,
+  businessservice  bigint(20) NOT NULL,
+  sortkey      bigint(20)  default NULL,
+  objtype      varchar(40) default NULL,
+  obj1id       bigint(20)  default NULL,
+  obj2id       bigint(20)  default NULL,
+  obj3id       bigint(20)  default NULL,
+  obj4id       bigint(20)  default NULL,
+  importance   int(2)      default 1,
+  #
+  #
+  comments     longtext    default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(20) default NULL, 
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  KEY obj1 (objtype,obj1id),
+  KEY obj2 (objtype,obj2id),
+  KEY obj3 (objtype,obj3id),
+  KEY obj4 (objtype,obj4id),
+  KEY businessservice (businessservice),               
+  UNIQUE KEY `sortkey` (sortkey),
+  UNIQUE KEY `srcsys` (srcsys,srcid),
+  FOREIGN KEY fk_businessservice (businessservice)
+              REFERENCES businessservice (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

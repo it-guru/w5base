@@ -80,6 +80,14 @@ sub new
                 label         =>'ApplicationID',
                 dataobjattr   =>"$worktable.appl"),
 
+      new kernel::Field::Databoss(),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                selectfix     =>1,
+                label         =>'Databoss ID',
+                dataobjattr   =>"appl.databoss"),
+                                                  
       new kernel::Field::Text(
                 name          =>'application',
                 readonly      =>sub{
@@ -171,6 +179,16 @@ sub new
                 label         =>'Business Service Description',
                 dataobjattr   =>"$worktable.description"),
 
+      new kernel::Field::SubList(
+                name          =>'servicecomp',
+                label         =>'service components',
+                group         =>'servicecomp',
+                subeditmsk    =>'subedit.businessservice',
+                vjointo       =>'itil::lnkbscomp',
+                allowcleanup  =>1,
+                vjoinon       =>['id'=>'businessserviceid'],
+                vjoindisp     =>['name','namealt1','namealt2',"comments"]),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -250,6 +268,8 @@ sub new
                 dataobjattr   =>'lnkcontact.croles'),
 
    );
+   $self->{history}=[qw(insert modify delete)];
+
    $self->setDefaultView(qw(fullname application));
    return($self);
 }
@@ -258,7 +278,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default applinfo desc contacts businessprocesses source));
+          qw(header default applinfo desc  servicecomp
+             contacts businessprocesses source));
 }
 
 
@@ -275,6 +296,8 @@ sub preProcessReadedRecord
       my $o=$self->Clone();
       my $oldcontext=$W5V2::OperationContext;
       $W5V2::OperationContext="QualityCheck";
+      $o->BackendSessionName("preProcessReadedRecord"); # prevent sesssion reuse
+                                                  # on sql cached_connect
       my ($id)=$o->ValidatedInsertRecord({applid=>$rec->{parentid}});
       $W5V2::OperationContext=$oldcontext;
       $rec->{id}=$id;
@@ -346,7 +369,7 @@ sub isWriteValid
 
    return("default") if (!defined($rec));
    if ($self->isParentWriteable($rec->{applid})){
-      push(@l,"default","contacts","desc");
+      push(@l,"default","contacts","desc","servicecomp");
    }
    return(@l);
 }

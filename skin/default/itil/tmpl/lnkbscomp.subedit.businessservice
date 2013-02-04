@@ -1,0 +1,21 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%objtype(label)%:</td>
+         <td class=finput width=40%>%objtype(sublistedit)%</td>
+         <td class=fname width=10%>%name(label)%:</td>
+         <td class=finput width=40%>%name(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%namealt1(label)%:</td>
+         <td class=finput width=40%>%namealt1(sublistedit)%</td>
+         <td class=fname width=10%>%namealt2(label)%:</td>
+         <td class=finput width=40%>%namealt2(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%comments(label)%:</td>
+         <td class=finput colspan=3>%comments(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

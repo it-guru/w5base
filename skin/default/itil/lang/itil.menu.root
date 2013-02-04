@@ -45,6 +45,7 @@
 'itil.system.lnksystemcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itil.system.lnksysteminteranswer'=>{de=>'Interview',en=>'Interview'},
 'itil.system.signedfilesystem'=>{de=>'signierte Datei',en=>'signed file'},
+'itil.system.monipoint'=>{de=>'Monitoring-Punkt',en=>'Monitoring-Point'},
 'itil.asset'=>{de=>'Hardware',en=>'Hardware'},
 'itil.asset.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.asset.core'=>{de=>'phys. Core',en=>'phys. Core'},

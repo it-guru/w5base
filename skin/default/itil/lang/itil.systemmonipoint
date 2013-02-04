@@ -1,0 +1,7 @@
+'itil::systemmonipoint'=>{de=>'log. System - Monitoring Punkt',
+                          en=>'log. System - Monitoring Punkt'},
+'fullqualified monitoring point'=>{de=>'vollqualifizierter Monitoring Punkt'},
+'fieldgroup.system'=>{de=>'Sytem Informationen',en=>'System Informations'},
+'Monitoring Point'=>{de=>'Monitoring Punkt'},
+'invalid monitoring service name'=>{de=>'ungültiger Monitoring-Punkt Name'},
+

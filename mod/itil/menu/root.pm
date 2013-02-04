@@ -240,6 +240,11 @@ sub Init
                       "itil::signedfilesystem",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itil.system.monipoint",
+                      "itil::systemmonipoint",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itil.asset",
                       "itil::asset",
                       defaultacl=>['valid_user']);
