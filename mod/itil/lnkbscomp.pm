@@ -72,7 +72,7 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'name',
                 htmlwidth     =>'200',
-                htmleditwidth =>'400',
+                htmleditwidth =>'200',
                 selectivetyp  =>1,
                 dst           =>$dst,
                 vjoineditbase =>$vjoineditbase,
@@ -88,7 +88,7 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'namealt1',
                 htmlwidth     =>'200',
-                htmleditwidth =>'400',
+                htmleditwidth =>'200',
                 selectivetyp  =>1,
                 dst           =>$dst,
                 vjoineditbase =>$vjoineditbase,
@@ -104,7 +104,7 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'namealt2',
                 htmlwidth     =>'200',
-                htmleditwidth =>'400',
+                htmleditwidth =>'200',
                 selectivetyp  =>1,
                 dst           =>$dst,
                 vjoineditbase =>$vjoineditbase,

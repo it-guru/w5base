@@ -183,7 +183,7 @@ sub preProcessReadedRecord
       my $o=$self->Clone();
       $o->BackendSessionName("preProcessReadedRecord"); # prevent sesssion reuse
                                                   # on sql cached_connect
-      my ($id)=$o->ValidatedInsertRecord({systemid=>$rec->{parentid},
+      my ($id)=$o->InsertRecord({systemid=>$rec->{parentid},
                                           name=>'con'});
       $rec->{id}=$id;
       $rec->{name}='con';

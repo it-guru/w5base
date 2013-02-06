@@ -41,6 +41,7 @@
 'AL_TCom.system.software.matrix'=>{de=>'Matrix',en=>'Matrix'},
 'AL_TCom.system.lnksysteminteranswer'=>{de=>'Interview',en=>'Interview'},
 'AL_TCom.system.signedfile'=>{de=>'signierte Datei',en=>'signed file'},
+'AL_TCom.system.monipoint'=>{de=>'Monitoring-Punkt',en=>'Monitoring-Point'},
 'AL_TCom.asset'=>{de=>'Hardware',en=>'Hardware'},
 'AL_TCom.asset.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.asset.lnkassetcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},

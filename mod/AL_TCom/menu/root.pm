@@ -247,6 +247,11 @@ sub Init
                       "AL_TCom::signedfilesystem",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.monipoint",
+                      "itil::systemmonipoint",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.asset",
                       "AL_TCom::asset",
                       defaultacl=>['valid_user']);

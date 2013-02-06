@@ -80,7 +80,8 @@ sub new
                 label         =>'ApplicationID',
                 dataobjattr   =>"$worktable.appl"),
 
-      new kernel::Field::Databoss(),
+      new kernel::Field::Databoss(
+                readonly      =>1),
 
       new kernel::Field::Link(
                 name          =>'databossid',
