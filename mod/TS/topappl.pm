@@ -65,17 +65,6 @@ sub new
                 onRawValue    =>\&calcClearTSM),
 
       new kernel::Field::Text(
-                name          =>'wbvclearname',
-                readonly      =>1,
-                depend        =>'contacts',
-                group         =>'topagaddinfos',
-                htmlwidth     =>'200px',
-                htmlnowrap    =>1,
-                vjoinconcat   =>"\n\n",
-                label         =>'IT-Manager (WBV/Application Manager)',
-                onRawValue    =>\&calcClearWBV),
-
-      new kernel::Field::Text(
                 name          =>'businessteamtlclearname',
                 readonly      =>1,
                 depend        =>'businessteambossid',
@@ -114,7 +103,7 @@ sub new
                             businessdepart
                             businessteam 
                             systemlocations systemosclass
-                            tsmclearname wbvclearname 
+                            tsmclearname  
                             businessteamtlclearname 
                             oncallphones databoss));
 
@@ -140,43 +129,6 @@ sub calcClearTSM
    return([sort(keys(%u))]);
 }
 
-sub calcClearWBV
-{
-   my $self=shift;
-   my $current=shift;
-   my $id=$current->{id};
-   my $app=$self->getParent();
-
-   my $contacts=$app->getField("contacts")->RawValue($current);
-   my @wbv;
-   if (ref($contacts) eq "ARRAY"){
-      foreach my $crec (@{$contacts}){
-         my $role=$crec->{roles};
-         $role=[$role] if (ref($role) ne "ARRAY");
-         if (grep(/^wbv$/,@$role) && $crec->{target} eq "base::user"){
-            push(@wbv,$crec->{targetid});
-         }
-      }
-   }
-   my $custappl=$app->getPersistentModuleObject("itcrm::custappl");
-   $custappl->SetFilter({id=>\$id});
-   my ($custrec,$msg)=$custappl->getOnlyFirst(qw(itmanagerid));
-   if (defined($custrec) && $custrec->{itmanagerid} ne ""){
-      push(@wbv,$custrec->{itmanagerid} );
-   }
-
-   if ($#wbv!=-1){
-      my $u=$app->getPersistentModuleObject("base::user");
-      $u->SetFilter({userid=>\@wbv});
-      my %u=();
-      foreach my $urec ($u->getHashList(qw(phonename))){
-         $u{$urec->{phonename}}++;
-      }
-      return([sort(keys(%u))]);
-   }
-   
-   return(undef);
-}
 
 sub calcCustApplName
 {
