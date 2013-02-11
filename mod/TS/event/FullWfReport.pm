@@ -152,7 +152,7 @@ sub recPreProcess
    @{$recordview}=@newrecview;
 
 
-   printf("process %s\n",$rec->{srcid});
+   printf("process %s (%s)\n",$rec->{srcid},$rec->{eventend});
 
    my %teams;
    foreach my $applid (@{$applid}){
@@ -177,10 +177,6 @@ sub recPreProcess
       }
    }
    $rec->{bteam}=join(", ",sort(keys(%teams)));
-
-   print Dumper($rec);
-
- 
 
    return(1);
 
