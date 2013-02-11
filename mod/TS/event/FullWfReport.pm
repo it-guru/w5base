@@ -88,7 +88,7 @@ sub FullWfReport
    for(my $m=1;$m<=12;$m++){
       my $month=sprintf("%02d",$m);
       push(@control,{
-         DataObj=>'base::workflow',
+         DataObj=>$wf,
          sheet=>'Incident ('.$month.'/'.$param{year}.')',
          filter=>{eventend=>'('.$month.'/'.$param{year}.')',
                   isdeleted=>\'0',
@@ -103,6 +103,7 @@ sub FullWfReport
                    additional.ServiceCenterPriority 
                    additional.ServiceCenterHomeAssignment
                    additional.ServiceCenterInvolvedAssignment
+                   affectedapplicationid)]},
                    affectedapplicationid)]},
       );
       push(@control,{
