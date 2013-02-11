@@ -50,35 +50,23 @@ sub FullWfReport
       my ($year,$month)=$self->Today_and_Now("GMT");
       $param{year}=$year;
    }
-   $param{filename}="/tmp/x.xls";
+   if ($param{filename} eq ""){
+      $param{filename}="/tmp/FullWorkflowReport$param{year}.xls";
+   }
+   msg(INFO,"loading appl cache ...");
+   my $appl=getModuleObject($self->Config,"itil::appl");
+   $appl->SetCurrentView(qw(id businessteamid));
 
-   print Dumper(\%param);
+   $self->{appl}=$appl->getHashIndexed(qw(id businessteamid));
+   msg(INFO,"... appl cache done");
 
+   msg(INFO,"loading grp cache ...");
+   my $grp=getModuleObject($self->Config,"base::grp");
+   $grp->SetCurrentView(qw(grpid fullname));
 
+   $self->{grp}=$grp->getHashIndexed(qw(grpid fullname));
+   msg(INFO,"... grp cache done");
 
-#   exit(0);
-#   my @keys=qw(name id conumber customer);
-#   my $appl=getModuleObject($self->Config,"itil::appl");
-#   $appl->SetFilter(\%flt);
-#   $appl->SetCurrentView(@keys);
-#   my $eventend=">now";
-#   if ($param{year} ne ""){
-#      $eventend="($param{year})";
-#   }
-#   if ($param{eventend} ne ""){
-#      $eventend="$param{eventend}";
-#   }
-#   my $t=$appl->getHashIndexed(@keys);
-#   if ($param{'filename'} eq ""){
-#      my $names=join("_",keys(%{$t->{name}}));
-#      $names=substr($names,0,40)."___" if (length($names)>40);
-#      my $tstr=$eventend;
-#      $tstr=~s/</less_/gi;
-#      $tstr=~s/>/more_/gi;
-#      $tstr=~s/[^a-z0-9]/_/gi;
-#      $names=~s/[^a-z0-9]/_/gi;
-#      $param{'filename'}="/tmp/FullIT-Report_${names}_${tstr}.xls";
-#   }
    msg(INFO,"start Report to $param{'filename'}");
    my $t0=time();
  
@@ -86,102 +74,116 @@ sub FullWfReport
    my $out=new kernel::XLSReport($self,$param{'filename'});
    $out->initWorkbook();
 
-   $flt{'cistatusid'}='4';
+   my $wf=getModuleObject($self->Config,"base::workflow");
+
+   $wf->AddFields(
+      new kernel::Field::Text(
+                name          =>'bteam',
+                label         =>'aktuelles Betriebsteam',
+                htmldetail    =>0)
+   );
 
    my @control=();
 
-   for(my $m=1;$m<=3;$m++){
+   for(my $m=1;$m<=12;$m++){
       my $month=sprintf("%02d",$m);
       push(@control,{
          DataObj=>'base::workflow',
-         sheet=>'Incident-Problem ('.$month.'/'.$param{year}.')',
+         sheet=>'Incident ('.$month.'/'.$param{year}.')',
          filter=>{eventend=>'('.$month.'/'.$param{year}.')',
-                  isdeleted=>'0',
-                  class=>['AL_TCom::workflow::incident',
-                          'AL_TCom::workflow::problem']},
+                  isdeleted=>\'0',
+                  #name=>'Reboot*',
+                  class=>['AL_TCom::workflow::incident']
+         },
+         lang=>'de',
+         recPreProcess=>\&recPreProcess,
          order=>'NONE',
-         view=>[qw(srcid affectedapplication name srcid eventstart eventend
+         view=>[qw(srcid affectedapplication bteam 
+                   name srcid eventstart eventend
                    additional.ServiceCenterPriority 
-                   additional.ServiceCenterReason 
-                   additional.ServiceCenterDowntimeStart 
-                   additional.ServiceCenterDowntimeEnd 
-                   wffields.incidentdescription)]},
+                   additional.ServiceCenterHomeAssignment
+                   additional.ServiceCenterInvolvedAssignment
+                   affectedapplicationid)]},
+      );
+      push(@control,{
+         DataObj=>$wf,
+         sheet=>'Problem ('.$month.'/'.$param{year}.')',
+         filter=>{eventend=>'('.$month.'/'.$param{year}.')',
+                  isdeleted=>\'0',
+                  #name=>'SIUX*',
+                  class=>['AL_TCom::workflow::problem']
+         },
+         lang=>'de',
+         recPreProcess=>\&recPreProcess,
+         order=>'NONE',
+         view=>[qw(srcid affectedapplication bteam
+                   name srcid eventstart eventend
+                   additional.ServiceCenterPriority 
+                   additional.ServiceCenterHomeAssignment
+                   additional.ServiceCenterReason
+                   additional.ServiceCenterAssignedTo
+                   additional.ServiceCenterTriggeredBy
+                   affectedapplicationid)]},
       );
    }
 
-
-
-#              {DataObj=>'itil::appl',
-#                 filter=>\%flt,
-#                 view=>[qw(name mandator id applid conumber customer
-#                           criticality customerprio)]},
-#
-#                {DataObj=>'itil::system',
-#                 filter=>{cistatusid=>'4',applications=>[keys(%{$t->{name}})]},
-#                 view=>[qw(name systemid applicationnames asset 
-#                           memory cpucount osrelease)]},
-#
-#                {DataObj=>'itil::asset',
-#                 filter=>{cistatusid=>'4',applications=>[keys(%{$t->{name}})]},
-#                 view=>[qw(name systemids 
-#                           hwmodel serialno memory cpucount 
-#                           applicationnames)]},
-#
-#                {DataObj=>'base::workflow',
-#                 sheet=>'Change',
-#                 filter=>{eventend=>$eventend,
-#                          isdeleted=>'0',
-#                          class=>'AL_TCom::workflow::change',
-#                          affectedapplicationid=>[keys(%{$t->{id}})]},
-#                 order=>'NONE',
-#                 view=>[qw(name id srcid eventstart eventend 
-#                           additional.ServiceCenterReason 
-#                           additional.ServiceCenterImpact 
-#                           additional.ServiceCenterRisk 
-#                           additional.ServiceCenterType 
-#                           additional.ServiceCenterUrgency 
-#                           additional.ServiceCenterPriority 
-#                           additional.ServiceCenterCloseCode
-#                           additional.ServiceCenterState 
-#                           additional.ServiceCenterCategory  
-#                           wffields.changedescription)]},
-#
-#
-#               {DataObj=>'base::workflow',
-#                sheet=>'BTB',
-#                filter=>{eventend=>$eventend,
-#                         isdeleted=>'0',
-#                         class=>'AL_TCom::workflow::diary',
-#                         affectedapplicationid=>[keys(%{$t->{id}})]},
-#                order=>'NONE',
-#                view=>[qw(name id eventstart eventend
-#                          detaildescription)]},
-#
-#               {DataObj=>'base::workflow',
-#                sheet=>'Ereignismeldung',
-#                filter=>{eventend=>$eventend,
-#                         isdeleted=>'0',
-#                         class=>'AL_TCom::workflow::eventnotify',
-#                         affectedapplicationid=>[keys(%{$t->{id}})]},
-#                order=>'NONE',
-#                view=>[qw(name id wffields.eventstatclass 
-#                          eventstart eventend
-#                          wffields.eventdesciption)]},
-#               );
-#
    $out->Process(@control);
    my $trep=time()-$t0;
    msg(INFO,"end Report to $param{'filename'} ($trep sec)");
 
-
-
-#   $self->{workbook}=$self->XLSopenWorkbook();
-#   if (!($self->{workbook}=$self->XLSopenWorkbook())){
-#      return({exitcode=>1,msg=>'fail to create tempoary workbook'});
-#   }
-
-
    return({exitcode=>0,msg=>'OK'});
+}
+
+
+sub recPreProcess
+{
+   my ($self,$DataObj,$rec,$recordview,$reproccount)=@_;
+   my $applid=$rec->{affectedapplicationid};
+   $applid=[$applid] if (ref($applid) ne "ARRAY");
+
+   ########################################################################
+   # modify record view
+   my @newrecview;
+   foreach my $fld (@$recordview){
+      my $name=$fld->Name;
+      next if ($name eq "affectedapplicationid");
+      push(@newrecview,$fld);
+   }
+   @{$recordview}=@newrecview;
+
+
+   printf("process %s\n",$rec->{srcid});
+
+   my %teams;
+   foreach my $applid (@{$applid}){
+      my ($teamid);
+      if (!exists($self->{appl}->{id}->{$applid})){
+         $teams{'MissingCurrentApplicationData'}++;
+      }
+      elsif (!defined($self->{appl}->{id}->{$applid}->{businessteamid}) ||
+             $self->{appl}->{id}->{$applid}->{businessteamid} eq ""){
+         $teams{'MissingApplicationBusinessTeam'}++;
+      }
+      else{
+         $teamid=$self->{appl}->{id}->{$applid}->{businessteamid};
+      }
+      if (defined($teamid)){
+         if (!exists($self->{grp}->{grpid}->{$teamid})){
+            $teams{'MissingBusinessTeamGroupInformation'}++;
+         }
+         else{
+            $teams{$self->{grp}->{grpid}->{$teamid}->{fullname}}++; 
+         }
+      }
+   }
+   $rec->{bteam}=join(", ",sort(keys(%teams)));
+
+   print Dumper($rec);
+
+ 
+
+   return(1);
+
 }
 
 
