@@ -104,7 +104,6 @@ sub FullWfReport
                    additional.ServiceCenterHomeAssignment
                    additional.ServiceCenterInvolvedAssignment
                    affectedapplicationid)]},
-                   affectedapplicationid)]},
       );
       push(@control,{
          DataObj=>$wf,
