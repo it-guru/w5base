@@ -261,19 +261,24 @@ sub Validate
          $self->LastMsg(ERROR,"to must be behind from");
          return(undef);
       }
-      if (effChanged($oldrec,$newrec,"lnkto")){
-         my $d=CalcDateDuration(NowStamp("en"),$to);
-         if ($d->{totaldays}<14){
-            $self->LastMsg(ERROR,"to must be at least 14 days in the future");
-            return(undef);
+      if (!$self->IsMemberOf("admin")){
+         if (effChanged($oldrec,$newrec,"lnkto")){
+            my $d=CalcDateDuration(NowStamp("en"),$to);
+            if ($d->{totaldays}<14){
+               $self->LastMsg(ERROR,"to must be at least 14 days ".
+                                    "in the future");
+               return(undef);
+            }
          }
       }
    }
-   if (effChanged($oldrec,$newrec,"lnkfrom")){
-      my $d=CalcDateDuration(NowStamp("en"),$from);
-      if ($d->{totaldays}<14){
-         $self->LastMsg(ERROR,"from must be at least 14 days in the future");
-         return(undef);
+   if (!$self->IsMemberOf("admin")){
+      if (effChanged($oldrec,$newrec,"lnkfrom")){
+         my $d=CalcDateDuration(NowStamp("en"),$from);
+         if ($d->{totaldays}<14){
+            $self->LastMsg(ERROR,"from must be at least 14 days in the future");
+            return(undef);
+         }
       }
    }
    if (effChanged($oldrec,$newrec,"mgmtitemgroupid")){
