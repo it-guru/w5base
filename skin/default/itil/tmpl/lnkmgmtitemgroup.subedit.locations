@@ -1,0 +1,21 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%location(label)%:</td>
+         <td class=finput colspan=3>%location(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%lnkfrom(label)%:</td>
+         <td class=finput colspan=3>%lnkfrom(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%lnkto(label)%:</td>
+         <td class=finput colspan=3>%lnkto(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%comments(label)%:</td>
+         <td class=finput colspan=3>%comments(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

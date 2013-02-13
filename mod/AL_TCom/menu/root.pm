@@ -423,7 +423,21 @@ sub Init
                       "TS::interview",
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.kern.mgmtitemgroup",
+                      "itil::mgmtitemgroup",
+                      defaultacl=>['valid_user']);
    
+   $self->RegisterObj("AL_TCom.kern.mgmtitemgroup.new",
+                      "itil::mgmtitemgroup",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.kern.mgmtitemgroup.lnkcigroup",
+                      "itil::lnkmgmtitemgroup",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.proc",
                       "tmpl/welcome",
                       prio=>20000);

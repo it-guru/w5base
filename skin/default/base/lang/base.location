@@ -29,3 +29,4 @@
 'organisations location prio'=>{de=>'Organisations Standort Prio'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'Location prio'=>{de=>'Standort Prio',en=>'Location prio'},
+'central managed CI groups'=>{de=>'zentral geführte CI Gruppen'},

@@ -430,6 +430,21 @@ sub new
                 htmleditwidth =>'100px',
                 dataobjattr   =>'appl.criticality'),
 
+      new kernel::Field::Text(
+                name          =>'mgmtitemgroup',
+                group         =>'customer',
+                label         =>'central managed CI groups',
+                vjointo       =>'itil::lnkmgmtitemgroup',
+                searchable    =>1,
+                htmldetail    =>1,
+                readonly      =>1,
+                vjoinbase     =>{'lnkfrom'=>'<now',
+                                 'lnkto'=>'>now OR [EMPTY]',
+                                 'mgmtitemgroupcistatusid'=>\'4'},
+                weblinkto     =>'NONE',
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>'mgmtitemgroup'),
+
       new kernel::Field::Contact(
                 name          =>'applowner',
                 vjoineditbase =>{'cistatusid'=>[3,4,5],

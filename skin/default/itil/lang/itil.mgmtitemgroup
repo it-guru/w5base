@@ -1,0 +1,9 @@
+'itil::mgmtitemgroup'=>{de=>'zentral geführte CI Gruppe',
+                        en=>'central managed CI group'},
+'fieldgroup.comments'=>{de=>'Bemerkungen und Verantwortung',
+                        en=>'comments and responsiblity'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'fieldgroup.applications'=>{de=>'zugeordnete Anwendungen',en=>'related applications'},
+'fieldgroup.locations'=>{de=>'zugeordnete Standorte',en=>'related locations'},
+'invalid name specified'=>{de=>'unzulässiger Name angegeben'},
+

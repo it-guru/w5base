@@ -43,6 +43,7 @@
 'Customer Contracts'=>{de=>'Kundenverträge'},
 'Contacts'=>{de=>'Kontakte'},
 'Customer'=>{de=>'Kunde'},
+'central managed CI groups'=>{de=>'zentral geführte CI Gruppen'},
 'Business Team'=>{de=>'Betriebsteam'},
 'Business Department'=>{de=>'Betriebsfachbereich'},
 'Customers Application Prioritiy'=>{de=>'Priorität der Anwendung'},

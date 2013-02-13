@@ -351,6 +351,20 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.kern.mgmtitemgroup",
+                      "itil::mgmtitemgroup",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.kern.mgmtitemgroup.new",
+                      "itil::mgmtitemgroup",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.kern.mgmtitemgroup.lnkmgmtitemgroup",
+                      "itil::lnkmgmtitemgroup",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.kern.software",
                       "itil::software",
                       defaultacl=>['valid_user']);

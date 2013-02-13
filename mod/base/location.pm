@@ -353,6 +353,24 @@ sub new
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'location.lastqcheck'),
    );
+   if (getModuleObject($self->Config,"itil::mgmtitemgroup")){
+      $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'mgmtitemgroup',
+                label         =>'central managed CI groups',
+                vjointo       =>'itil::lnkmgmtitemgroup',
+                searchable    =>1,
+                htmldetail    =>1,
+                readonly      =>1,
+                vjoinbase     =>{'lnkfrom'=>'<now',
+                                 'lnkto'=>'>now OR [EMPTY]',
+                                 'mgmtitemgroupcistatusid'=>\'4'},
+                weblinkto     =>'NONE',
+                vjoinon       =>['id'=>'locationid'],
+                vjoindisp     =>'mgmtitemgroup'),
+         insertafter=>['prio']
+      );
+   }
    $self->{CI_Handling}={uniquename=>"name",
                          uniquesize=>255};
    $self->setDefaultView(qw(location address1 name cistatus));
