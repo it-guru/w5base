@@ -95,12 +95,12 @@ sub new
        #         dataobjattr   =>'cm3rm1.location_code'),
 
       new kernel::Field::Text(
-                name          =>'softwareid',
+                name          =>'project',
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
                 htmldetail    =>0,
-                label         =>'SoftwareID (deprecated)',
-                dataobjattr   =>'cm3rm1.program_name'),
+                label         =>'Project',
+                dataobjattr   =>'cm3rm1.project'),
 
       new kernel::Field::Text(
                 name          =>'deviceid',
@@ -109,6 +109,14 @@ sub new
                 htmldetail    =>0,
                 label         =>'DeviceID (deprecated)',
                 dataobjattr   =>'cm3rm1.logical_name'),
+
+      new kernel::Field::Text(
+                name          =>'softwareid',
+                htmlwidth     =>'100px',
+                ignorecase    =>1,
+                htmldetail    =>0,
+                label         =>'SoftwareID (deprecated)',
+                dataobjattr   =>'cm3rm1.program_name'),
 
       new kernel::Field::SubList(
                 name          =>'software',

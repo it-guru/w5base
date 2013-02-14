@@ -20,6 +20,7 @@
 'Risk'=>{de=>'Risiko (Risk)'},
 'Priority'=>{de=>'Priorität (Priority)'},
 'Location'=>{de=>'Standort (Location)'},
+'Project'=>{de=>'Projekt (Project)'},
 'Category'=>{de=>'Kathegorie (Category)'},
 'Fallback'=>{de=>'Anulierungsverfahren (Fallback)'},
 'Urgency'=>{de=>'Dringlichkeit (Urgency)'},
