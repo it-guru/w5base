@@ -35,10 +35,10 @@ li{
    vertical-align: top;
    padding: 0px;
 }
-a:link     { color: #E20074; }
-a:visited  { color: #E20074; }
-a:hover    { color: #E20074; }
-a:active   { color: #E20074; }
+a:link     { color: black; }
+a:visited  { color: black; }
+a:hover    { color: black; }
+a:active   { color: black; }
 a:link.userlink     { color: #E20074;font-size: 10px; }
 a:visited.userlink  { color: #E20074;font-size: 10px; }
 a:hover.userlink    { color: #E20074;font-size: 10px; }
