@@ -58,7 +58,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   return($self->SUPER::isViewValid($rec),"applications");
 }
 
 sub FinishWrite
@@ -90,7 +90,8 @@ sub ValidateDelete
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default delmgmt applications contacts control misc source));
+   return(qw(header default itsem delmgmt applications contacts control 
+             misc source));
 }  
 
 
