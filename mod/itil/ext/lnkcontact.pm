@@ -168,6 +168,16 @@ sub getPosibleRoles
                                                      $self->Self),
             );
    }
+   if ($parentobj=~m/^.+::mgmtitemgroup$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::mgmtitemgroup$/)){
+      return("read"            =>$self->getParent->T("read",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
+            );
+   }
    return();
 }
 

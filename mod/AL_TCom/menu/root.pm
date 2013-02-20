@@ -424,20 +424,6 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("AL_TCom.kern.mgmtitemgroup",
-                      "itil::mgmtitemgroup",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("AL_TCom.kern.mgmtitemgroup.new",
-                      "itil::mgmtitemgroup",
-                      func=>'New',
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("AL_TCom.kern.mgmtitemgroup.lnkcigroup",
-                      "itil::lnkmgmtitemgroup",
-                      func=>'MainWithNew',
-                      defaultacl=>['valid_user']);
-
    $self->RegisterObj("AL_TCom.proc",
                       "tmpl/welcome",
                       prio=>20000);
@@ -459,6 +445,20 @@ sub Init
                       "AL_TCom::applpriochange",
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.proc.mgmtitemgroup",
+                      "itil::mgmtitemgroup",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("AL_TCom.proc.mgmtitemgroup.new",
+                      "itil::mgmtitemgroup",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.proc.mgmtitemgroup.lnkcigroup",
+                      "itil::lnkmgmtitemgroup",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
                       "base::workflow",

@@ -83,40 +83,17 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'costcenter.databoss'),
 
-#      new kernel::Field::TextDrop(
-#                name          =>'ldelmgr',
-#                group         =>'delmgmt',
-#                label         =>'lead Delivery Manager',
-#                AllowEmpty    =>1,
-#                vjointo       =>'base::user',
-#                vjoinon       =>['ldelmgrid'=>'userid'],
-#                vjoindisp     =>'fullname'),
-#
-#      new kernel::Field::Link(
-#                name          =>'ldelmgrid',
-#                group         =>'delmgmt',
-#                dataobjattr   =>'costcenter.ldelmgr'),
-#
-#      new kernel::Field::TextDrop(
-#                name          =>'ldelmgr2',
-#                group         =>'delmgmt',
-#                label         =>'lead Deputy Delivery Manager',
-#                AllowEmpty    =>1,
-#                vjointo       =>'base::user',
-#                vjoinon       =>['ldelmgr2id'=>'userid'],
-#                vjoindisp     =>'fullname'),
-#
-#      new kernel::Field::Link(
-#                name          =>'ldelmgr2id',
-#                group         =>'delmgmt',
-#                dataobjattr   =>'costcenter.ldelmgr2'),
-
-
       new kernel::Field::Group(
                 name          =>'delmgrteam',
                 group         =>'delmgmt',
+                AllowEmpty    =>1,
                 label         =>'Service Delivery-Management Team',
                 vjoinon       =>'delmgrteamid'),
+
+      new kernel::Field::Link(
+                name          =>'delmgrteamid',
+                group         =>'delmgmt',
+                dataobjattr   =>'costcenter.delmgrteam'),
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
@@ -132,25 +109,36 @@ sub new
                 group         =>'delmgmt',
                 dataobjattr   =>'costcenter.delmgr'),
 
-      new kernel::Field::TextDrop(
-                name          =>'delmgr2',
-                group         =>'delmgmt',
+
+
+      new kernel::Field::Group(
+                name          =>'itsemteam',
+                group         =>'itsem',
                 AllowEmpty    =>1,
-                label         =>'Deputy Service Delivery Manager',
+                label         =>'IT Servicemanagement Team',
+                vjoinon       =>'itsemteamid'),
+
+      new kernel::Field::Link(
+                name          =>'itsemteamid',
+                group         =>'itsem',
+                dataobjattr   =>'costcenter.itsemteam'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itsem',
+                group         =>'itsem',
+                label         =>'IT Servicemanager',
+                AllowEmpty    =>1,
                 vjointo       =>'base::user',
-                vjoinon       =>['delmgr2id'=>'userid'],
+                vjoinon       =>['itsemid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
-                name          =>'delmgr2id',
-                group         =>'delmgmt',
-                dataobjattr   =>'costcenter.delmgr2'),
+                name          =>'itsemid',
+                group         =>'itsem',
+                dataobjattr   =>'costcenter.itsem'),
 
 
-      new kernel::Field::Link(
-                name          =>'delmgrteamid',
-                group         =>'delmgmt',
-                dataobjattr   =>'costcenter.delmgrteam'),
+
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
@@ -171,6 +159,34 @@ sub new
                 htmleditwidth =>'30%',
                 label         =>'costcenter is direct useable by workflows',
                 dataobjattr   =>'costcenter.is_directwfuse'),
+
+      new kernel::Field::TextDrop(
+                name          =>'delmgr2',
+                group         =>'delmgmt',
+                AllowEmpty    =>1,
+                label         =>'Deputy Service Delivery Manager',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgr2id'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'delmgr2id',
+                group         =>'delmgmt',
+                dataobjattr   =>'costcenter.delmgr2'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itsem2',
+                group         =>'itsem',
+                AllowEmpty    =>1,
+                label         =>'Deputy IT Servicemanager',
+                vjointo       =>'base::user',
+                vjoinon       =>['itsem2id'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itsem2id',
+                group         =>'itsem',
+                dataobjattr   =>'costcenter.itsem2'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -242,9 +258,30 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default delmgmt contacts control misc source));
+   return(qw(header default itsem delmgmt contacts control misc source));
 }
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;   # if $rec is undefined, general access to app is checked
+   my %param=@_;
+
+   return("header","default") if (!defined($rec));
+
+   my ($itsem,$delmgr)=managerState($rec);
+   my @all=qw(header default itsem delmgmt contacts control misc source);
+
+   if ($itsem>0){
+      @all=grep(!/^delmgmt$/,@all);
+   } 
+   if ($delmgr>0){
+      @all=grep(!/^itsem$/,@all);
+   }
+
+   return(@all);
+}
+
 
 
 
@@ -291,6 +328,22 @@ sub ValidateCONumber
 }
 
 
+sub managerState
+{
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $itsem=0;
+   my $delmgr=0;
+
+   foreach my $v (qw(delmgrid delmgr2id delmgrteamid)){
+      $delmgr++ if (effVal($oldrec,$newrec,$v) ne "");
+   }
+   foreach my $v (qw(itsemid itsem2id itsemteamid)){
+      $itsem++ if (effVal($oldrec,$newrec,$v) ne "");
+   }
+   return($itsem,$delmgr);
+}
 
 
 sub Validate
@@ -299,6 +352,12 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   my ($itsem,$delmgr)=managerState($oldrec,$newrec);
+   if ($itsem>0 && $delmgr){
+      $self->LastMsg(ERROR,"IT Servicemanagement an delivery management ".
+                           "can not exist concurrently");
+      return(0);
+   }
 
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       if (!defined($oldrec) && !defined($newrec->{databossid})){
@@ -307,8 +366,8 @@ sub Validate
       }
       my $databossid=effVal($oldrec,$newrec,"databossid");
       if (!defined($databossid) || $databossid eq ""){
-         $self->LastMsg(ERROR,"no write access - ".
-                              "you have to define databoss at first");
+      $self->LastMsg(ERROR,"no write access - ".
+                           "you have to define databoss at first");
          return(undef);
       }
    }
@@ -361,7 +420,7 @@ sub isWriteValid
       return("default");
    }
 
-   my @databossedit=("default","delmgmt","contacts","control");
+   my @databossedit=("default","delmgmt","itsem","contacts","control");
    return(@databossedit) if (defined($rec) && $self->IsMemberOf("admin"));
    return(@databossedit) if (defined($rec) && $rec->{databossid}==$userid);
 

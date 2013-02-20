@@ -58,3 +58,6 @@ set FOREIGN_KEY_CHECKS=0;
 alter table costcenter add FOREIGN KEY fk_costcenter_databoss (databoss)
           REFERENCES contact (userid) ON DELETE RESTRICT;
 set FOREIGN_KEY_CHECKS=1;
+alter table costcenter add itsem   bigint(20)  default NULL;
+alter table costcenter add itsem2  bigint(20)  default NULL;
+alter table costcenter add itsemteam  bigint(20)  default NULL;

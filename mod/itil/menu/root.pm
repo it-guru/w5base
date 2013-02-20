@@ -351,20 +351,6 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itil.kern.mgmtitemgroup",
-                      "itil::mgmtitemgroup",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("itil.kern.mgmtitemgroup.new",
-                      "itil::mgmtitemgroup",
-                      func=>'New',
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itil.kern.mgmtitemgroup.lnkmgmtitemgroup",
-                      "itil::lnkmgmtitemgroup",
-                      func=>'MainWithNew',
-                      defaultacl=>['valid_user']);
-
    $self->RegisterObj("itil.kern.software",
                       "itil::software",
                       defaultacl=>['valid_user']);
@@ -471,6 +457,20 @@ sub Init
    $self->RegisterObj("itil.proc.softmgmt.analyse",
                       "itil::softwaresetanalyse",
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("itil.proc.mgmtitemgroup",
+                      "itil::mgmtitemgroup",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.proc.mgmtitemgroup.new",
+                      "itil::mgmtitemgroup",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.proc.mgmtitemgroup.lnkmgmtitemgroup",
+                      "itil::lnkmgmtitemgroup",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("invoice.lnkapplinvoicestor",
                       "itil::lnkapplinvoicestor",

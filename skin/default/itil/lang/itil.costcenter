@@ -1,4 +1,5 @@
-'itil::costcenter'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
+'itil::costcenter'=>{de=>'Kostenknoten',en=>'costnode'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'Applications'=>{de=>'Anwendungen'},
 'delete only posible, if there are no application relations'=>{de=>'löschen ist nur mögliche, wenn keine Anwendungsverknüpfungen vorhanden sind'},
+'Deputy IT Servicemanager'=>{de=>'IT Servicemanager Vertreter'},
