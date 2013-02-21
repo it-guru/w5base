@@ -165,6 +165,31 @@ sub qcheckRecord
          push(@fieldlist,"givenname","surname");
       }
 
+      my $typeclass=undef;
+      if ($wiwrec->{office_state} eq "Employee" ||
+          $wiwrec->{office_state} eq "Manager" ||
+          $wiwrec->{office_state} eq "Freelancer" ||
+          $wiwrec->{office_state} eq "DTAG User"){
+         $typeclass="user";
+      }
+      else{
+         $typeclass="function";
+      }
+      my $typeclassmismatch=0;
+
+      if ($rec->{usertyp} eq "user" || $rec->{usertyp} eq "extern"){
+         $typeclassmismatch++ if ($typeclass ne "user");
+      }
+      if ($rec->{usertyp} eq "function"){
+         $typeclassmismatch++ if ($typeclass ne "function" &&
+                                  $typeclass ne "service");
+      }
+      if ($typeclassmismatch){
+         $wiw->Log(ERROR,"basedata",
+                   "Contact type '$rec->{usertyp}' for ".
+                   "'$rec->{fullname}' did not ".
+                   "match WIW state '$wiwrec->{office_state}'");
+      }
 
       foreach my $fld (@fieldlist){
           my $wiwdata={$fld=>$wiwrec->{$fld}};
