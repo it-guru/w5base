@@ -1,8 +1,8 @@
 'tswiw::qrule::WiwUserOrgstruct'=>{de=>'Aktualitätsprüfung der Orgstrukturzuordnung',en=>'refresh of orgstructure relations'},
 'WhoIsWho to W5Base/Darwin automatic organisation relation administration:'=>{de=>'WhoIsWho - W5Base/Darwin automatische Organisationseinheitenzuorndung:'},
 
-'MAILTEXT.UPDATE'=>{de=>'Ihre Rollenzuorndung zur Gruppe <b>%s</b> wurde automatisch aktualisiert. W5Base/Darwin liest diese Informationen automatisch über WhoIsWho aus dem Personalsystem. Die Details zu Ihrer aktuellen Zuorndung können Sie über den unten aufgeführten Link abfragen.',en=>'Your role relation to the group <b>%s</b> has been changed. Details to your new role relation can be viewed by the link below.'},
-'MAILTEXT.NEW'=>{de=>'Sie wurden neu der Gruppe <b>%s</b> zugeordnet. W5Base/Darwin liest diese Informationen automatisch über WhoIsWho aus dem Personalsystem. Die Details zu Ihrer aktuellen Zuorndung können Sie über den unten aufgeführten Link abfragen.',en=>'You are new assinged to group <b>%s</b>. Details to your new role relation can be viewed by the link below'},
+'MAILTEXT.UPDATE'=>{de=>'Ihre Rollenzuorndung zur Gruppe <b>%s</b> wurde automatisch aktualisiert. W5Base/Darwin liest diese Informationen automatisch über WhoIsWho aus dem Personalsystem. Die Details zu Ihrer aktuellen Zuordnung können Sie über den unten aufgeführten Link abfragen.',en=>'Your role relation to the group <b>%s</b> has been changed. Details to your new role relation can be viewed by the link below.'},
+'MAILTEXT.NEW'=>{de=>'Sie wurden neu der Gruppe <b>%s</b> zugeordnet. W5Base/Darwin liest diese Informationen automatisch über WhoIsWho aus dem Personalsystem. Die Details zu Ihrer aktuellen Zuordnung können Sie über den unten aufgeführten Link abfragen.',en=>'You are new assinged to group <b>%s</b>. Details to your new role relation can be viewed by the link below'},
 'new org relation to'=>{de=>'Neue Organisationszuorndung zu'},
 'role update to'=>{de=>'Rollenaktualisierung innerhalb von'},
 'added roles'=>{de=>'hinzugefügte Rollen'},
