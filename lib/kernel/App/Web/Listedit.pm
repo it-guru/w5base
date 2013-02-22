@@ -262,7 +262,7 @@ sub getValidWebFunctions
    $self->doFrontendInitialize();
    my @l=qw(NativMain Main mobileMain MainWithNew addAttach 
             NativResult Result Upload UploadWelcome UploadFrame
-            Welcome Empty Detail HtmlDetail HandleInfoAboSubscribe
+            Welcome Empty Detail Visual HtmlDetail HandleInfoAboSubscribe
             New Copy FormatSelect Bookmark startWorkflow
             DeleteRec InitWorkflow AsyncSubListView 
             EditProcessor ViewProcessor HandleQualityCheck
@@ -1357,6 +1357,25 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
 }
 
 
+sub Visual
+{
+   my $self=shift;
+   my %param=@_;
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   if ($self->SecureSetFilter(\%flt)){
+      my $output=new kernel::Output($self);
+      $self->SetCurrentView(qw(ALL));
+      print $self->HttpHeader("text/html");
+      print("No Visual View avalable");
+   }
+   else{
+      print($self->noAccess());
+      return(undef);
+   }
+
+}
 
 sub HtmlDetail
 {
@@ -1797,7 +1816,13 @@ sub HandleQualityCheck
       $self->SetCurrentOrder("NONE");
       my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
       $qc->setParent($self);
-      print($qc->WinHandleQualityCheck($self->getQualityCheckCompat($rec),$rec));
+      if (defined($rec)){
+         print($qc->WinHandleQualityCheck($self->getQualityCheckCompat($rec),
+                                          $rec));
+      }
+      else{
+         print($qc->WinHandleQualityCheck([],undef));
+      }
    }
    else{
       print($self->noAccess());

@@ -41,8 +41,9 @@ sub CISearchResult
 
    my @l;
    if (grep(/^ci$/,@$stag) &&
-       grep(/^$tag$/,qw(group team gruppe bereich grp))){
-      my $flt=[{name=>"$searchtext",cistatusid=>"<=5"}];
+       (!defined($tag) || grep(/^$tag$/,qw(group team gruppe bereich grp)))){
+      my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
+               {fullname=>"$searchtext",cistatusid=>"<=5"}];
       my $dataobj=getModuleObject($self->getParent->Config,"base::grp");
       $dataobj->SetFilter($flt);
       foreach my $rec ($dataobj->getHashList(qw(fullname))){
@@ -64,7 +65,7 @@ sub QuickFindDetail
 
    my $dataobj=getModuleObject($self->getParent->Config,"base::grp");
    $dataobj->SetFilter({grpid=>\$id});
-   my @fl=qw(description);
+   my @fl=qw(name description);
    my ($rec,$msg)=$dataobj->getOnlyFirst(@fl);
 
    $dataobj->ResetFilter();
@@ -84,8 +85,6 @@ sub QuickFindDetail
             my $name=$dataobj->getField($v)->Label();
             my $data=$dataobj->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
                                          $v,"formated");
-            $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
-                         "<td valign=top>$data</td></tr>";
             $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
                          "<td valign=top>$data</td></tr>";
          }

@@ -108,10 +108,7 @@ sub addVisualLink
    $param{AllowClose}=1;
    my $detailx=$dataobj->DetailX();
    my $detaily=$dataobj->DetailY();
-   my $target="../../".$dataobj->Self()."/Detail";
-   if ($dataobj->Self() eq "base::workflow"){
-      $target="../../".$dataobj->Self()."/Process";
-   }
+   my $target="../../".$dataobj->Self()."/Visual";
    $target=~s/::/\//g;
    my $qstr=kernel::cgi::Hash2QueryString(%param);
 
@@ -122,7 +119,7 @@ sub addVisualLink
 
    $d.="<img align=right border=0 ".
        "src=\"../../../public/base/load/visual_small.gif\">";
-   $d="<div style=\"float:right;margin:2px\"><a class=sublink href=JavaScript:$onclick>".
+   $d="<div style=\"float:right;margin:2px\"><a class=sublink href=\"$target?$qstr\">".
       $d."</a></div>";
 
    return($d);

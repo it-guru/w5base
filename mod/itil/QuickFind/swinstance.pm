@@ -41,7 +41,7 @@ sub CISearchResult
 
    my @l;
    if (grep(/^ci$/,@$stag)){
-      my $flt=[{fullname=>"*$searchtext*"}];
+      my $flt=[{fullname=>"*$searchtext*",cistatusid=>"<5"}];
       my $dataobj=getModuleObject($self->getParent->Config,"itil::swinstance");
       $dataobj->SetFilter($flt);
       my $limit=10;
@@ -81,7 +81,7 @@ sub QuickFindDetail
    my @fl=qw(fullname databoss appl adm adm2 swteam);
    my ($rec,$msg)=$dataobj->getOnlyFirst(@fl);
    $dataobj->ResetFilter();
-   $dataobj->SecureSetFilter([{id=>\$id}]);
+   $dataobj->SecureSetFilter([{id=>\$id,cistatusid=>"<5"}]);
    my ($secrec,$msg)=$dataobj->getOnlyFirst(qw(id));
 
    if (defined($rec)){
