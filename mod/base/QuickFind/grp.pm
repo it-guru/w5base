@@ -75,6 +75,7 @@ sub QuickFindDetail
       $htmlresult="";
       if (defined($secrec)){
          $htmlresult.=$self->addDirectLink($dataobj,search_grpid=>$id);
+         $htmlresult.=$self->addVisualLink($dataobj,search_grpid=>$id);
       }
       $htmlresult.="<table>";
       my @l=@fl;
@@ -83,6 +84,8 @@ sub QuickFindDetail
             my $name=$dataobj->getField($v)->Label();
             my $data=$dataobj->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
                                          $v,"formated");
+            $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
+                         "<td valign=top>$data</td></tr>";
             $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
                          "<td valign=top>$data</td></tr>";
          }

@@ -67,6 +67,7 @@ sub addPhoneNumbers
    return($d);
 
 }
+
 sub addDirectLink
 {
    my $self=shift;
@@ -91,7 +92,37 @@ sub addDirectLink
 
    $d.="<img align=right border=0 ".
        "src=\"../../../public/base/load/directlink.gif\">";
-   $d="<div style=\"margin:2px\"><a class=sublink href=JavaScript:$onclick>".
+   $d="<div style=\"float:right;margin:2px\"><a class=sublink href=JavaScript:$onclick>".
+      $d."</a></div>";
+
+   return($d);
+}
+
+sub addVisualLink
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my %param=@_;
+   my $d="";
+
+   $param{AllowClose}=1;
+   my $detailx=$dataobj->DetailX();
+   my $detaily=$dataobj->DetailY();
+   my $target="../../".$dataobj->Self()."/Detail";
+   if ($dataobj->Self() eq "base::workflow"){
+      $target="../../".$dataobj->Self()."/Process";
+   }
+   $target=~s/::/\//g;
+   my $qstr=kernel::cgi::Hash2QueryString(%param);
+
+   my $onclick="openwin(\"$target?$qstr\",\"_blank\",".
+               "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+               "resizable=yes,scrollbars=no\")";
+
+
+   $d.="<img align=right border=0 ".
+       "src=\"../../../public/base/load/visual_small.gif\">";
+   $d="<div style=\"float:right;margin:2px\"><a class=sublink href=JavaScript:$onclick>".
       $d."</a></div>";
 
    return($d);
