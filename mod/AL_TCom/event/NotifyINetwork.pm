@@ -47,12 +47,14 @@ sub NotifyINetwork
    my $self=shift;
    my %param=@_;
 
-   delete($ENV{HTTP_PROXY});
-   delete($ENV{HTTPS_PROXY});
 
-   delete($ENV{http_proxy});
-   delete($ENV{https_proxy});
+   ###############################
+   delete($ENV{HTTP_PROXY});     #  ensure that NO Proxy enviroment is set
+   delete($ENV{HTTPS_PROXY});    #
 
+   delete($ENV{http_proxy});     #
+   delete($ENV{https_proxy});    #
+   ###############################
 
    my $wsuser=$self->Config->Param("WEBSERVICEUSER");
    my $wspass=$self->Config->Param("WEBSERVICEPASS");
@@ -75,12 +77,6 @@ sub NotifyINetwork
       return({exitcode=>0,
               msg=>'no trigger needed'});
    }
-#   if (!grep(/^DTAG\.T-Home.*/,@$involvedcustomer) &&
-#       !grep(/^DTAG\.TDG.*/,@$involvedcustomer) &&
-#       !grep(/^DTAG$/,@$involvedcustomer)){
-#      return({exitcode=>0,
-#              msg=>'no trigger needed'});
-#   }
 
    if ($WfRec->{class}=~m/.*::change$/){
       my $SCType=$WfRec->{additional}->{ServiceCenterType};
