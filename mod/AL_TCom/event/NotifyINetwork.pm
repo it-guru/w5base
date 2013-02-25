@@ -47,6 +47,13 @@ sub NotifyINetwork
    my $self=shift;
    my %param=@_;
 
+   delete($ENV{HTTP_PROXY});
+   delete($ENV{HTTPS_PROXY});
+
+   delete($ENV{http_proxy});
+   delete($ENV{https_proxy});
+
+
    my $wsuser=$self->Config->Param("WEBSERVICEUSER");
    my $wspass=$self->Config->Param("WEBSERVICEPASS");
    my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
