@@ -6,4 +6,6 @@
 'fieldgroup.applications'=>{de=>'zugeordnete Anwendungen',en=>'related applications'},
 'fieldgroup.locations'=>{de=>'zugeordnete Standorte',en=>'related locations'},
 'invalid name specified'=>{de=>'unzulässiger Name angegeben'},
+'you are not authorized to set other persons as databoss'=>{
+          de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},
 
