@@ -52,6 +52,16 @@ sub ImportINetworkContacts
    $self->{custmgmttool}='I-Network';
    $self->{custselection}='DTAG.TDG DTAG.TDG.* DTAG.T-Home.* DTAG.T-Home';
 
+   ###############################
+   delete($ENV{HTTP_PROXY});     #  ensure that NO Proxy enviroment is set
+   delete($ENV{HTTPS_PROXY});    #
+
+   delete($ENV{http_proxy});     #
+   delete($ENV{https_proxy});    #
+   ###############################
+
+
+
    my $wsuser=$self->Config->Param("WEBSERVICEUSER");
    my $wspass=$self->Config->Param("WEBSERVICEPASS");
    my $wsproxy=$self->Config->Param("WEBSERVICEPROXY");
