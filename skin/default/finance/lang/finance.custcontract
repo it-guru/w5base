@@ -1,6 +1,6 @@
 'finance::custcontract'=>{de=>'Kundenvertrag',en=>'Customer Contract'},
 'fieldgroup.default'=>{de=>'Kundenvertrag-Daten',en=>'Customer Contract-Informations'},
-'fieldgroup.sem'=>{de=>'Finanzielle Verantwortung',en=>'Service Management'},
+'fieldgroup.sem'=>{de=>'Kundenbetreuung/Vertragsgestaltung',en=>'Customer contact / Contract management'},
 'fieldgroup.modules'=>{de=>'vertragsweit gültige Standard Module',en=>'active standard modules'},
 'fieldgroup.misc'=>{de=>'Sonstiges',en=>'Misc'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},

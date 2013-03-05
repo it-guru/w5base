@@ -36,6 +36,9 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
+   my $haveitsemexp="costcenter.itsem is not null ".
+                    "or costcenter.itsemteam is not null ".
+                    "or costcenter.itsem2 is not null";
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -118,10 +121,11 @@ sub new
                 label         =>'CBM Team',
                 vjoinon       =>'responseteamid'),
 
-      new kernel::Field::Link(
+      new itil::appl::Link(
                 name          =>'responseteamid',
-                dataobjattr   =>'appl.responseteam'),
-
+                wrdataobjattr =>'appl.responseteam',
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsemteam,appl.responseteam)"),
 
       new kernel::Field::Contact(
                 name          =>'sem',
@@ -153,9 +157,11 @@ sub new
                 vjoinon       =>['sem2id'=>'userid'],
                 vjoindisp     =>'email'),
 
-      new kernel::Field::Link(
+      new itil::appl::Link(
                 name          =>'semid',
-                dataobjattr   =>'appl.sem'),
+                wrdataobjattr =>'appl.sem',
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem,appl.sem)"),
 
       new kernel::Field::Group(
                 name          =>'businessteam',
@@ -336,16 +342,59 @@ sub new
                 group         =>'opmgmt',
                 dataobjattr   =>'appl.opm'),
 
-      new kernel::Field::Import( $self,
-                vjointo       =>'itil::costcenter',
-                vjoinon       =>['conumber'=>'name'],
-                dontrename    =>1,
-                uploadable    =>0,
+
+      new kernel::Field::TextDrop(
+                name          =>'delmgr',
                 group         =>'delmgmt',
-                fields        =>[qw(delmgr   delmgr2
-                                    delmgrid delmgr2id
-                                    delmgrteam
-                                    delmgrteamid)]),
+                readonly      =>1,
+                label         =>'Service Delivery Manager',
+                translation   =>'finance::costcenter',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgrid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'delmgr2',
+                group         =>'delmgmt',
+                readonly      =>1,
+                label         =>'Deputy Service Delivery Manager',
+                translation   =>'finance::costcenter',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgr2id'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Group(
+                name          =>'delmgrteam',
+                group         =>'delmgmt',
+                readonly      =>1,
+                translation   =>'finance::costcenter',
+                label         =>'Service Delivery-Management Team',
+                vjoinon       =>'delmgrteamid'),
+
+
+      new kernel::Field::Link(
+                name          =>'delmgrteamid',
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsemteam,costcenter.delmgrteam)"),
+
+      new kernel::Field::Link(
+                name          =>'delmgrid',
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem,costcenter.delmgr)"),
+
+      new kernel::Field::Link(
+                name          =>'delmgr2id',
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem2,costcenter.delmgr2)"),
+
+      new kernel::Field::Link(
+                name          =>'haveitsem',
+                readonly      =>1,
+                selectfix     =>1,
+                dataobjattr   =>"if ($haveitsemexp,1,0)"),
 
       new kernel::Field::Group(
                 name          =>'customer',
@@ -367,9 +416,11 @@ sub new
                 label         =>'Deputy Customer Business Manager',
                 vjoinon       =>'sem2id'),
 
-      new kernel::Field::Link(
+      new itil::appl::Link(
                 name          =>'sem2id',
-                dataobjattr   =>'appl.sem2'),
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem2,appl.sem2)",
+                wrdataobjattr =>'appl.sem2'),
 
 
       new kernel::Field::Contact(
@@ -654,7 +705,6 @@ sub new
                 depend        =>['id'],
                 onRawValue    =>\&calculateRelPhysCpuCount),
 
-# Change: ITIL Anfrage/Anforderung an die Anwendungsentwicklung ID:13466586280001, 07.09.2012
       new kernel::Field::Select(
                name          =>'opmode',
                 #group         =>'misc',
@@ -909,7 +959,8 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'soslaclustduration',
-                label         =>'SLA maximum cluster service take over duration',
+                label         =>'SLA maximum cluster service '.
+                                'take over duration',
                 group         =>'soclustgroup',
                 searchable    =>0,
                 unit          =>'min',
@@ -917,7 +968,8 @@ sub new
 
       new kernel::Field::WorkflowLink(
                 name          =>'solastclusttestwf',
-                label         =>'last Cluster-Service switch test (CHM-WorkflowID)',
+                label         =>'last Cluster-Service switch '.
+                                'test (CHM-WorkflowID)',
                 AllowEmpty    =>1,
                 group         =>'soclustgroup',
                 vjoinon       =>'solastclusttestwfid'),
@@ -1107,8 +1159,6 @@ sub new
                 uploadable    =>0,
                 group         =>'workflowbasedata',
                 onRawValue    =>\&getWfEventNotifyTargets),
- 
-
       new kernel::Field::Interview(),
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
@@ -1180,8 +1230,19 @@ sub InterviewPartners
 }
 
 
-
-
+# 
+#  Sub: getTeamBossID
+#
+#  Calculates the userid of the business team boss.
+#
+#  Parameters:
+#
+#     rec        - current record
+#
+#  Returns:
+#
+#     array refernce - the list of  userids of team bosses.
+#
 sub getTeamBossID
 {
    my $self=shift;
@@ -1418,7 +1479,8 @@ sub getSqlFrom
             "and $worktable.id=lnkcontact.refid ".
             "left outer join appladv on (appl.id=appladv.appl and ".
             "appladv.isactive=1) ".
-            "left outer join itcrmappl on appl.id=itcrmappl.id";
+            "left outer join itcrmappl on appl.id=itcrmappl.id ".
+            "left outer join costcenter on appl.conumber=costcenter.name";
 
    return($from);
 }
@@ -1600,6 +1662,9 @@ sub isWriteValid
       return(@databossedit);
    }
    else{
+      if ($rec->{haveitsem}){
+         @databossedit=grep(!/^finance$/,@databossedit);
+      }
       if ($self->IsMemberOf("admin")){
          return(@databossedit);
       }
@@ -1844,6 +1909,35 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    }
    return($htmlresult);
 
+}
+
+
+#############################################################################
+
+package itil::appl::Link;
+
+use strict;
+use vars qw(@ISA);
+@ISA    = qw(kernel::Field::Link);
+
+
+sub new
+{
+   my $type=shift;
+   my $self={@_};
+   $self=bless($type->SUPER::new(%$self),$type);
+   return($self);
+}
+
+sub getBackendName     # returns the name/function to place in select
+{
+   my $self=shift;
+   my $mode=shift;
+   my $db=shift;
+
+   return($self->{wrdataobjattr}) if ($mode eq "update" || $mode eq "insert");
+
+   return($self->SUPER::getBackendName($mode,$db));
 }
 
 

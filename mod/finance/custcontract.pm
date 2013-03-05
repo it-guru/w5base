@@ -32,6 +32,10 @@ sub new
    $param{MainSearchFieldLines}=4;
 
    my $self=bless($type->SUPER::new(%param),$type);
+   my $haveitsemexp="costcenter.itsem is not null ".
+                    "or costcenter.itsemteam is not null ".
+                    "or costcenter.itsem2 is not null";
+
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -148,10 +152,13 @@ sub new
                 label         =>'CBM Team',
                 vjoinon       =>'responseteamid'),
 
-      new kernel::Field::Link(
+      new finance::custcontract::Link(
                 name          =>'responseteamid',
                 group         =>'sem',
-                dataobjattr   =>'custcontract.responseteam'),
+                wrdataobjattr =>'custcontract.responseteam',
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsemteam,".
+                                "custcontract.responseteam)"),
 
       new kernel::Field::TextDrop(
                 name          =>'sem',
@@ -161,10 +168,18 @@ sub new
                 vjoinon       =>['semid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new finance::custcontract::Link(
                 name          =>'semid',
                 group         =>'sem',
-                dataobjattr   =>'custcontract.sem'),
+                wrdataobjattr =>'custcontract.sem',
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem,custcontract.sem)"),
+
+      new kernel::Field::Link(
+                name          =>'haveitsem',
+                readonly      =>1,
+                selectfix     =>1,
+                dataobjattr   =>"if ($haveitsemexp,1,0)"),
 
       new kernel::Field::TextDrop(
                 name          =>'sem2',
@@ -174,20 +189,65 @@ sub new
                 vjoinon       =>['sem2id'=>'userid'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new finance::custcontract::Link(
                 name          =>'sem2id',
                 group         =>'sem',
-                dataobjattr   =>'custcontract.sem2'),
+                wrdataobjattr =>'custcontract.sem2',
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem2,custcontract.sem2)"),
 
-      new kernel::Field::Import( $self,
-                vjointo       =>'itil::costcenter',
-                vjoinon       =>['conumber'=>'name'],
-                dontrename    =>1,
+      new kernel::Field::TextDrop(
+                name          =>'delmgr',
                 group         =>'delmgmt',
-                fields        =>[qw(delmgr   delmgr2
-                                    delmgrid delmgr2id
-                                    delmgrteam
-                                    delmgrteamid)]),
+                readonly      =>1,
+                label         =>'Service Delivery Manager',
+                translation   =>'finance::costcenter',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgrid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'delmgr2',
+                group         =>'delmgmt',
+                readonly      =>1,
+                label         =>'Deputy Service Delivery Manager',
+                translation   =>'finance::costcenter',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgr2id'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Group(
+                name          =>'delmgrteam',
+                group         =>'delmgmt',
+                readonly      =>1,
+                translation   =>'finance::costcenter',
+                label         =>'Service Delivery-Management Team',
+                vjoinon       =>'delmgrteamid'),
+
+
+      new kernel::Field::Link(
+                name          =>'delmgrteamid',
+                readonly      =>1,
+                dataobjattr   =>"if (costcenter.delmgrteam is null,".
+                                "costcenter.itsemteam,costcenter.delmgrteam)"),
+
+      new kernel::Field::Link(
+                name          =>'delmgrid',
+                readonly      =>1,
+                dataobjattr   =>"if (costcenter.delmgr is null,".
+                                "costcenter.itsem,costcenter.delmgr)"),
+
+      new kernel::Field::Link(
+                name          =>'delmgr2id',
+                readonly      =>1,
+                dataobjattr   =>"if (costcenter.delmgr2 is null,".
+                                "costcenter.itsem2,costcenter.delmgr2)"),
+
+
+
+
+
+
 
       new kernel::Field::SubList(
                 name          =>'modules',
@@ -340,7 +400,10 @@ sub getSqlFrom
    my ($worktable,$workdb)=$self->getWorktable();
    my $from="$worktable left outer join lnkcontact ".
             "on lnkcontact.parentobj in ('finance::custcontract') ".
-            "and $worktable.id=lnkcontact.refid";
+            "and $worktable.id=lnkcontact.refid ".
+            "left outer join costcenter ".
+            "on custcontract.conumber=costcenter.name";
+
 
    return($from);
 }
@@ -501,6 +564,9 @@ sub isWriteValid
       return(@databossedit);
    }
    else{
+      if ($rec->{haveitsem}){
+         @databossedit=grep(!/^sem$/,@databossedit);
+      }
       if ($rec->{databossid}==$userid){
          return(@databossedit);
       }
@@ -543,6 +609,38 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("finance::custcontract");
 }
+
+#######################################################################
+
+package finance::custcontract::Link;
+
+use strict;
+use vars qw(@ISA);
+@ISA    = qw(kernel::Field::Link);
+
+
+sub new
+{
+   my $type=shift;
+   my $self={@_};
+   $self=bless($type->SUPER::new(%$self),$type);
+   return($self);
+}
+
+sub getBackendName     # returns the name/function to place in select
+{
+   my $self=shift;
+   my $mode=shift;
+   my $db=shift;
+
+   return($self->{wrdataobjattr}) if ($mode eq "update" || $mode eq "insert");
+
+   return($self->SUPER::getBackendName($mode,$db));
+}
+
+
+
+
 
 
 

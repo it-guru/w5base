@@ -33,6 +33,9 @@ sub new
    my ($worktable,$workdb)=$self->getWorktable();
    $self->{doclabel}="DOC-" if (!defined($self->{doclabel}));
    my $doclabel=$self->{doclabel};
+   my $haveitsemexp="costcenter.itsem is not null ".
+                    "or costcenter.itsemteam is not null ".
+                    "or costcenter.itsem2 is not null";
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -129,12 +132,16 @@ sub new
       new kernel::Field::Link(
                 name          =>'semid',
                 group         =>'sem',
-                dataobjattr   =>'appl.sem'),
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem,appl.sem)"),
 
       new kernel::Field::Link(
                 name          =>'sem2id',
                 group         =>'sem',
-                dataobjattr   =>'appl.sem2'),
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem2,appl.sem2)"),
 
       new kernel::Field::Link(
                 name          =>'tsmid',
@@ -164,15 +171,32 @@ sub new
                 label         =>'CO-Number',
                 dataobjattr   =>'appl.conumber'),
 
-      new kernel::Field::Import( $self,
-                vjointo       =>'itil::costcenter',
-                vjoinon       =>['conumber'=>'name'],
-                dontrename    =>1,
+      new kernel::Field::TextDrop(
+                name          =>'delmgr',
                 readonly      =>1,
-                uploadable    =>0,
-                htmldetail    =>0,
-                fields        =>[qw(delmgrid delmgr delmgr2id
-                                    delmgrteamid)]),
+                label         =>'Service Delivery Manager',
+                translation   =>'finance::costcenter',
+                vjointo       =>'base::user',
+                vjoinon       =>['delmgrid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'delmgrteamid',
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsemteam,costcenter.delmgrteam)"),
+
+      new kernel::Field::Link(
+                name          =>'delmgrid',
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem,costcenter.delmgr)"),
+
+      new kernel::Field::Link(
+                name          =>'delmgr2id',
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem2,costcenter.delmgr2)"),
 
       new kernel::Field::Group(
                 name          =>'responseteam',
@@ -184,7 +208,9 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'responseteamid',
-                dataobjattr   =>'appl.responseteam'),
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsemteam,appl.responseteam)"),
 
       new kernel::Field::TextDrop(
                 name          =>'customer',
@@ -488,7 +514,8 @@ sub getSqlFrom
           "on appl.id=$worktable.appl ".
           "left outer join lnkcontact ".
           "on lnkcontact.parentobj in ('itil::appl') ".
-          "and appl.id=lnkcontact.refid ";
+          "and appl.id=lnkcontact.refid ".
+          "left outer join costcenter on appl.conumber=costcenter.name";
 
    return($from);
 }

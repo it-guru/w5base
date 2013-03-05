@@ -30,7 +30,6 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
 
-
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
@@ -109,8 +108,6 @@ sub new
                 group         =>'delmgmt',
                 dataobjattr   =>'costcenter.delmgr'),
 
-
-
       new kernel::Field::Group(
                 name          =>'itsemteam',
                 group         =>'itsem',
@@ -136,8 +133,6 @@ sub new
                 name          =>'itsemid',
                 group         =>'itsem',
                 dataobjattr   =>'costcenter.itsem'),
-
-
 
 
       new kernel::Field::ContactLnk(
