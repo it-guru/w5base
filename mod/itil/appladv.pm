@@ -30,6 +30,10 @@ sub new
    $param{Worktable}='appladv';
    $param{doclabel}='-ADV';
    my $self=bless($type->SUPER::new(%param),$type);
+   my $haveitsemexp="costcenter.itsem is not null ".
+                    "or costcenter.itsemteam is not null ".
+                    "or costcenter.itsem2 is not null";
+
 
    my $ic=$self->getField("isactive");
    $ic->{label}="active ADV";
@@ -46,14 +50,17 @@ sub new
    $self->AddFields(
       new kernel::Field::Link(
                 name          =>'databossid',
-                dataobjattr   =>"appl.sem"),
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem,appl.sem)"),
                 insertafter=>'mandator'
-        
    );
    $self->AddFields(
       new kernel::Field::Link(
                 name          =>'sem2id',
-                dataobjattr   =>"appl.sem2"),
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem2,appl.sem2)"),
                 insertafter=>'databossid'
         
    );

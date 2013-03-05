@@ -116,9 +116,94 @@ sub new
                 dataobjattr   =>'appl.applid'),
 
       new kernel::Field::Group(
+                name          =>'itsemteam',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(1);
+                   }
+                   return(0);
+                },
+                group         =>'itsem',
+                readonly      =>1,
+                label         =>'IT Servicemanagement Team',
+                translation   =>'finance::costcenter',
+                vjoinon       =>'itsemteamid'),
+
+      new kernel::Field::Link(
+                name          =>'itsemteamid',
+                group         =>'itsem',
+                dataobjattr   =>'costcenter.itsemteam'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itsem',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(1);
+                   }
+                   return(0);
+                },
+                group         =>'itsem',
+                label         =>'IT Servicemanager',
+                translation   =>'finance::costcenter',
+                readonly      =>1,
+                vjointo       =>'base::user',
+                vjoinon       =>['itsemid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itsemid',
+                group         =>'itsem',
+                dataobjattr   =>'costcenter.itsem'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itsem2',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(1);
+                   }
+                   return(0);
+                },
+                group         =>'itsem',
+                readonly      =>1,
+                translation   =>'finance::costcenter',
+                label         =>'Deputy IT Servicemanager',
+                vjointo       =>'base::user',
+                vjoinon       =>['itsem2id'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itsem2id',
+                group         =>'itsem',
+                dataobjattr   =>'costcenter.itsem2'),
+
+
+
+      new kernel::Field::Group(
                 name          =>'responseteam',
                 group         =>'finance',
                 label         =>'CBM Team',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(0);
+                   }
+                   return(1);
+                },
                 vjoinon       =>'responseteamid'),
 
       new itil::appl::Link(
@@ -132,6 +217,16 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 group         =>'finance',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(0);
+                   }
+                   return(1);
+                },
                 label         =>'Customer Business Manager',
                 vjoinon       =>'semid'),
 
@@ -413,6 +508,16 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 group         =>'finance',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(0);
+                   }
+                   return(1);
+                },
                 label         =>'Deputy Customer Business Manager',
                 vjoinon       =>'sem2id'),
 
@@ -1636,7 +1741,7 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control custcontracts customer delmgmt
-              finance interfaces licenses monisla qc external
+              finance interfaces licenses monisla qc external itsem
               misc opmgmt phonenumbers services businessservices
               soclustgroup socomments sodrgroup source swinstances systems
               technical workflowbasedata header inmchm interview efforts);
@@ -1774,7 +1879,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default finance technical opmgmt delmgmt 
+          qw(header default itsem finance technical opmgmt delmgmt 
              customer custcontracts 
              contacts phonenumbers 
              interfaces systems swinstances services businessservices monisla

@@ -14,3 +14,5 @@
 'no write access - you have to define databoss at first'=>{de=>'kein Schreibzugriff - es muß erst ein Datenverantwortlicher definiert werden'},
 'you are not authorized to set other persons as databoss'=>{de=>'Sie sind nicht berechtig, andere Personen als Datenverantwortlichen zu bennen'},
 'IT Servicemanagement an delivery management can not exist concurrently'=>{de=>'IT Servicemanagement und Delivery Management können nicht gleichzeit existieren'},
+'Deputy IT Servicemanager'=>{de=>'IT Servicemanager Vertreter'},
+

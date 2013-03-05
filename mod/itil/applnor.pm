@@ -36,6 +36,10 @@ sub new
       return(0);
    };
    my $self=bless($type->SUPER::new(%param),$type);
+   my $haveitsemexp="costcenter.itsem is not null ".
+                    "or costcenter.itsemteam is not null ".
+                    "or costcenter.itsem2 is not null";
+
 
    my $ic=$self->getField("isactive");
    $ic->{label}="active NOR certificate";
@@ -45,9 +49,9 @@ sub new
       new kernel::Field::Link(
                 name          =>'databossid',
                 label         =>'Delivery Manager',
-                vjointo       =>'finance::costcenter',
-                vjoinon       =>['conumber'=>'name'],
-                vjoindisp     =>'delmgrid'),
+                readonly      =>1,
+                dataobjattr   =>"if ($haveitsemexp,".
+                                "costcenter.itsem,costcenter.delmgr)"),
    );
 
    $self->AddFields(
