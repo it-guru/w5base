@@ -444,6 +444,16 @@ sub new
                 readonly      =>1,
                 label         =>'Service Delivery Manager',
                 translation   =>'finance::costcenter',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(0);
+                   }
+                   return(1);
+                },
                 vjointo       =>'base::user',
                 vjoinon       =>['delmgrid'=>'userid'],
                 vjoindisp     =>'fullname'),
@@ -454,6 +464,16 @@ sub new
                 readonly      =>1,
                 label         =>'Deputy Service Delivery Manager',
                 translation   =>'finance::costcenter',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(0);
+                   }
+                   return(1);
+                },
                 vjointo       =>'base::user',
                 vjoinon       =>['delmgr2id'=>'userid'],
                 vjoindisp     =>'fullname'),
@@ -463,6 +483,16 @@ sub new
                 group         =>'delmgmt',
                 readonly      =>1,
                 translation   =>'finance::costcenter',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      return(0);
+                   }
+                   return(1);
+                },
                 label         =>'Service Delivery-Management Team',
                 vjoinon       =>'delmgrteamid'),
 
