@@ -285,7 +285,11 @@ sub isWriteValid
       return("default","comments","applications","locations","contacts");
    }
 
+   my @databossgrp=("comments","contacts","applications","locations");
 
+   if ($rec->{cistatusid}<3){
+      push(@databossgrp,"default");
+   }
 
    if ($rec->{databossid}==$userid){
       $databossedit++;
@@ -310,7 +314,7 @@ sub isWriteValid
          }
       }
    }
-   return("comments","contacts","applications","locations") if ($databossedit);
+   return(@databossgrp) if ($databossedit);
 
    return(undef);
 }
