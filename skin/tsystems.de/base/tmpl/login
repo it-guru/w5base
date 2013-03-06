@@ -1,0 +1,34 @@
+<table border=0 height=100% width=100%>
+<tr>
+<td valign=top align=center>
+<br>
+<br>
+<hr width=80%>
+<p>
+<div style="padding:10px;width:400px;border-style:solid;border-color:darkgreen;border-width:4px;text-align:left">
+Sie sind derzeit nicht angemeldet! Diverse Funktionen in dieser WEB-Anwendung
+sind nur möglich, wenn Sie sich Authentifiziert/Angemeldet haben.<br>
+Die Anmeldung ins W5Base Framework erfolgt mit Ihrem "normalen" WindowsNT 
+Domain Account oder der WhoIsWho Kennung. Wenn Sie z.B. Ihren Account 
+Mueller.Hans in der SUED3 Domain haben geben Sie <b>sued3/</b>mueller.hans (oder 
+z.B. <b>wiw/</b>hmueller für die WhoIsWho Anmeldung) als Anmeldename ein. <br>
+Falls Ihr Arbeitsplatz bereits auf Windows7 umgestellt ist, sollten Sie sich
+auch mit Ihrem EMEA1 Account (also z.B. <b>emea1/a???????</b> ) anmelden können.<br>
+Achten Sie darauf, dass der Anmeldename (Account) kleingeschrieben werden muß.<br>
+Bitte beachten Sie, dass Sonderzeichen (äöüß) und Leerzeichen im Passwort zu Problemen führen können.
+</div>
+<hr width=80%>
+Um fortzufahren klicken Sie bitte auf Login.<br>
+<p><b>
+<script language="JavaScript">
+function dologin()
+{
+   parent.parent.parent.document.location.href="../../../auth/base/menu/root";
+}
+</script>
+<br>
+<input type=button style="font-size:18px;padding:5px;width:200px" value=" Login " onclick="dologin();">
+<br>
+</td>
+</tr>
+</table>
