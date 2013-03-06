@@ -1,2 +1,3 @@
 use w5base;
-#alter table appl   add cabrelevant  int(1) default '0';
+#
+alter table appl add ictoid varchar(20), add key(ictoid), add ictono varchar(20),add key(ictono);

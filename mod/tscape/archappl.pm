@@ -48,8 +48,9 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 searchable    =>0,
+                sqlorder      =>'NONE',
                 label         =>'fullname',
-                dataobjattr   =>"ICTO_Nummer+' '+Name"),
+                dataobjattr   =>"ICTO_Nummer+' - '+Name"),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -93,8 +94,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_cistatus"))){
-     Query->Param("search_status"=>
-                  "!Retired");
+     Query->Param("search_status"=>"!Retired");
    }
 }
 

@@ -93,6 +93,33 @@ sub new
                 vjointo       =>'tssc::group',
                 vjoinon       =>['scapprgroupid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'icto',
+                label         =>'ICTO Objectname',
+                group         =>'architect',
+                async         =>'1',
+                vjointo       =>'tscape::archappl',
+                vjoinon       =>['ictoid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
+                name          =>'ictono',
+                htmldetail    =>0,
+                uploadable    =>0,
+                group         =>'architect',
+                label         =>'ICTO Number',
+                dataobjattr   =>'appl.ictono'),
+
+      new kernel::Field::Text(
+                name          =>'ictoid',
+                htmldetail    =>0,
+                uploadable    =>0,
+                searchable    =>0,
+                group         =>'architect',
+                label         =>'ICTO ID',
+                dataobjattr   =>'appl.ictoid'),
+
    );
  
    $self->AddFields(
@@ -484,6 +511,36 @@ sub getDetailBlockPriority
    return(@l);
 
 }  
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orgrec=shift;
+
+   if (effChanged($oldrec,$newrec,"ictoid")){
+      my $ictoid=effVal($oldrec,$newrec,"ictoid");
+      my $o=getModuleObject($self->Config,"tscape::archappl");
+      if (!defined($o)){
+         $self->LastMsg(ERROR,"unable to connect capeTS");
+         return(undef);
+      }
+      $o->SetFilter({id=>\$ictoid});
+      my ($archrec,$msg)=$o->getOnlyFirst(qw(archapplid));
+      if (!defined($archrec)){
+         $self->LastMsg(ERROR,"unable to identify archictecture record");
+         return(undef);
+      }
+      $newrec->{ictono}=$archrec->{archapplid};
+   }
+   print STDERR Dumper($newrec);
+
+   return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
+}
+
+
 
 
 

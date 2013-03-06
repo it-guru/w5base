@@ -1772,7 +1772,7 @@ sub isViewValid
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control custcontracts customer delmgmt
               finance interfaces licenses monisla qc external itsem
-              misc opmgmt phonenumbers services businessservices
+              misc opmgmt phonenumbers services businessservices architect
               soclustgroup socomments sodrgroup source swinstances systems
               technical workflowbasedata header inmchm interview efforts);
    if (!$rec->{sodefinition}){
@@ -1791,7 +1791,7 @@ sub isWriteValid
 
    my @databossedit=qw(default interfaces finance opmgmt technical contacts misc
                        systems attachments accountnumbers interview
-                       customer control phonenumbers monisla
+                       customer control phonenumbers monisla architect
                        sodrgroup soclustgroup socomments);
    if (!defined($rec)){
       return(@databossedit);
@@ -1910,7 +1910,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default itsem finance technical opmgmt delmgmt 
-             customer custcontracts 
+             architect customer custcontracts 
              contacts phonenumbers 
              interfaces systems swinstances services businessservices monisla
              misc attachments control 
