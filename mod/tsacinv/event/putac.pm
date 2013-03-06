@@ -247,7 +247,7 @@ sub ApplicationModified
    my $acappl=getModuleObject($self->Config,"tsacinv::appl");
    my $applappl=getModuleObject($self->Config,"itil::lnkapplappl");
    my $applsys=getModuleObject($self->Config,"itil::lnkapplsystem");
-   my $swinstance=getModuleObject($self->Config,"itil::swinstance");
+   my $swinstance=getModuleObject($self->Config,"TS::swinstance");
    my $acgrp=getModuleObject($self->Config,"tsacinv::group");
    my $app=getModuleObject($self->Config,"AL_TCom::appl");
    my $user=getModuleObject($self->Config,"base::user");
@@ -776,6 +776,10 @@ sub ApplicationModified
                      else{
                         $assignment="CSS.AO.DTAG";
                      }
+                     my $iassignment=$irec->{acinmassingmentgroup};
+                     if ($iassignment eq ""){
+                        $iassignment="[NULL]";
+                     }
                      #
                      # Info von Florian Sahlmann vom 11.06.2008:
                      # SAP-Instance:    M079345
@@ -801,6 +805,7 @@ sub ApplicationModified
                                 Model=>$model,
                                 Remarks=>$irec->{comments},
                                 Assignment=>$assignment,
+                                IncidentAG=>$iassignment,
                                 CostCenter=>$rec->{conumber},
                                 Security_Unit=>"TS.DE",
                                 CustomerLink=>"TS.DE",

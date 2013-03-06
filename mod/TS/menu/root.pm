@@ -122,6 +122,11 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.system.monipoint",
+                      "itil::systemmonipoint",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.system.systemnfsnas",
                       "itil::systemnfsnas",
                       defaultacl=>['valid_user']);

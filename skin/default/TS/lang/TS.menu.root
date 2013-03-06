@@ -20,6 +20,7 @@
 'itts.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
 'itts.system.ipaddress.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.system.dnsalias'=>{de=>'DNS-Alias',en=>'DNS-Alias'},
+'itts.system.monipoint'=>{de=>'Monitoring-Punkt',en=>'Monitoring-Point'},
 'itts.system.systemnfsnas'=>{de=>'NFS/NAS Freigabe',en=>'NFS/NAS Export'},
 'itts.system.systemnfsnas.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.system.systemnfsnas.clients'=>{de=>'System-Clients',en=>'System-Clients'},

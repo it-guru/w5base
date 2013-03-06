@@ -30,6 +30,21 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'acinmassignmentgroupid',
+                group         =>'control',
+                label         =>'Incient Assignmentgroup ID',
+                container     =>'additional'),
+
+      new kernel::Field::TextDrop(
+                name          =>'acinmassingmentgroup',
+                label         =>'Incident Assignmentgroup',
+                group         =>'inmchm',
+                async         =>'1',
+                searchable    =>0,
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['acinmassignmentgroupid'=>'lgroupid'],
+                vjoindisp     =>'name'),
 
       new kernel::Field::Link(
                 name          =>'scapprgroupid',
@@ -49,32 +64,9 @@ sub new
                 vjoindisp     =>'name'),
    );
  
-#   $self->{workflowlink}->{workflowtyp}=[qw(AL_TCom::workflow::diary
-#                                            OSY::workflow::diary
-#                                            itil::workflow::devrequest
-#                                            AL_TCom::workflow::businesreq
-#                                            THOMEZMD::workflow::businesreq
-#                                            base::workflow::DataIssue
-#                                            base::workflow::mailsend
-#                                            AL_TCom::workflow::change
-#                                            AL_TCom::workflow::problem
-#                                            AL_TCom::workflow::eventnotify
-#                                            AL_TCom::workflow::P800
-#                                            AL_TCom::workflow::P800special
-#                                            AL_TCom::workflow::incident)];
-#   $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
-
    return($self);
 }
 
-#sub getSpecPaths
-#{
-#   my $self=shift;
-#   my $rec=shift;
-#   my @l=$self->SUPER::getSpecPaths($rec);
-#   push(@l,"TS/spec/TS.swinstance");
-#   return(@l);
-#}
 
 
 sub isWriteValid
