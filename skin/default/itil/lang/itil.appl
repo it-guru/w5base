@@ -31,7 +31,7 @@
 'fieldgroup.finance'=>{de=>'Kundenbetreuung/Vertragsgestaltung',en=>'Customer contact / Contract management'},
 'fieldgroup.opmode'=>{de=>'Betriebsparameter',en=>'Operationalparameters'},
 'fieldgroup.technical'=>{de=>'Technische Verantwortung',en=>'technical'},
-'fieldgroup.delmgmt'=>{de=>'Anwendungs Delivery-Management',en=>'Application Delivery-Management'},
+'fieldgroup.delmgmt'=>{de=>'Service Delivery Management',en=>'Service Delivery Management'},
 'fieldgroup.customer'=>{de=>'Kunde/Auftraggeber',en=>'Customer'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'fieldgroup.accountnumbers'=>{de=>'Account Nummern',en=>'Account numbers'},

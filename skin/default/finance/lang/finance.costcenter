@@ -1,7 +1,7 @@
 'finance::costcenter'=>{de=>'Kostenknoten',
                         en=>'Costnode'},
 'fieldgroup.default'=>{de=>'Kostenknotendaten',en=>'Costnode data'},
-'fieldgroup.delmgmt'=>{de=>'Anwendungs Delivery-Management',en=>'Application Delivery-Management'},
+'fieldgroup.delmgmt'=>{de=>'Service Delivery Management',en=>'Service Delivery Management'},
 'fieldgroup.itsem'=>{de=>'IT-Servicemanagement',en=>'IT-Servicemanagement'},
 'CO-Number'=>{de=>'CO-/PSP-/Kostenstellennr.'},
 'Accounting Area'=>{de=>'Buchungskreis'},
