@@ -1,0 +1,6 @@
+'tscape::archappl'=>{de=>'architekturelle Anwendung',
+                     en=>'architecturel application'},
+'ICTO-Number'=>{de=>'ICTO-Nummer'},
+'description'=>{de=>'Beschreibung'},
+'Shortname'=>{de=>'Kurzbezeichnung'},
+'fullname'=>{de=>'vollqualifizierte Bezeichnung'},
