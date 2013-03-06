@@ -50,7 +50,7 @@ sub new
                 searchable    =>0,
                 sqlorder      =>'NONE',
                 label         =>'fullname',
-                dataobjattr   =>"ICTO_Nummer+' - '+Name"),
+                dataobjattr   =>"ICTO_Nummer+': '+Name"),
 
       new kernel::Field::Text(
                 name          =>'name',
