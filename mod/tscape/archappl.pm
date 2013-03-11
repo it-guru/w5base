@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=2 if (!exists($param{MainSearchFieldLines}));
+   $param{MainSearchFieldLines}=3 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
