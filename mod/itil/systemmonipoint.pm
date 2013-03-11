@@ -171,25 +171,26 @@ sub initSearchQuery
 
 
 
-
-
-
-sub preProcessReadedRecord
-{
-   my $self=shift;
-   my $rec=shift;
-
-   if (!defined($rec->{id}) && $rec->{parentid} ne ""){
-      my $o=$self->Clone();
-      $o->BackendSessionName("preProcessReadedRecord"); # prevent sesssion reuse
-                                                  # on sql cached_connect
-      my ($id)=$o->InsertRecord({systemid=>$rec->{parentid},
-                                          name=>'con'});
-      $rec->{id}=$id;
-      $rec->{name}='con';
-   }
-   return(undef);
-}
+#
+# do not create default monitoring points, because there are systems to,
+# which have NO monitoring
+#
+#sub preProcessReadedRecord
+#{
+#   my $self=shift;
+#   my $rec=shift;
+#
+#   if (!defined($rec->{id}) && $rec->{parentid} ne ""){
+#      my $o=$self->Clone();
+#      $o->BackendSessionName("preProcessReadedRecord"); # prevent sesssion reuse
+#                                                  # on sql cached_connect
+#      my ($id)=$o->InsertRecord({systemid=>$rec->{parentid},
+#                                          name=>'con'});
+#      $rec->{id}=$id;
+#      $rec->{name}='con';
+#   }
+#   return(undef);
+#}
 
 
 
