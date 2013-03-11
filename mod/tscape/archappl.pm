@@ -101,8 +101,8 @@ sub Initialize
 sub initSearchQuery
 {
    my $self=shift;
-   if (!defined(Query->Param("search_cistatus"))){
-     Query->Param("search_status"=>"!Retired");
+   if (!defined(Query->Param("search_status"))){
+     Query->Param("search_status"=>"\"!Retired\"");
    }
 }
 
