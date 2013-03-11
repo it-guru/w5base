@@ -82,7 +82,7 @@ sub new
    );
    $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(archapplid name  status));
+   $self->setDefaultView(qw(archapplid name  shortname status w5appl));
    $self->setWorktable("V_DARWIN_EXPORT");
    return($self);
 }
