@@ -62,6 +62,14 @@ sub new
                 label         =>'Shortname',
                 dataobjattr   =>'Kurzbezeichnung'),
 
+      new kernel::Field::SubList(
+                name          =>'w5appl',
+                label         =>'W5Base Application',
+                group         =>'appl',
+                vjointo       =>'TS::appl',
+                vjoinon       =>['id'=>'ictoid'],
+                vjoindisp     =>['name','cistatus']),
+
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
