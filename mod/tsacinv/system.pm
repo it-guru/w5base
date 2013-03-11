@@ -129,7 +129,6 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'supervisor',
                 label         =>'Supervisor',
-                searchable    =>0,
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['supervid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
