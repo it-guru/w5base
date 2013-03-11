@@ -42,7 +42,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'archapplid',
-                label         =>'ICTO-Number',
+                label         =>'ICTO-ID',
                 dataobjattr   =>'ICTO_Nummer'),
 
       new kernel::Field::Text(

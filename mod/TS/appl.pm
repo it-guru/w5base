@@ -108,7 +108,7 @@ sub new
                 htmldetail    =>0,
                 uploadable    =>0,
                 group         =>'architect',
-                label         =>'ICTO Number',
+                label         =>'ICTO-ID',
                 dataobjattr   =>'appl.ictono'),
 
       new kernel::Field::Text(
@@ -117,7 +117,7 @@ sub new
                 uploadable    =>0,
                 searchable    =>0,
                 group         =>'architect',
-                label         =>'ICTO ID',
+                label         =>'ICTO internal ID',
                 dataobjattr   =>'appl.ictoid'),
 
    );
