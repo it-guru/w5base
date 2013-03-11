@@ -127,6 +127,19 @@ sub new
                 dataobjattr   =>tsacinv::costcenter::getSAPhierSQL()),
 
       new kernel::Field::TextDrop(
+                name          =>'supervisor',
+                label         =>'Supervisor',
+                searchable    =>0,
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['supervid'=>'lempldeptid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'supervid',
+                label         =>'Supervisor ID',
+                dataobjattr   =>'amportfolio.lsupervid'),
+
+      new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
                 label         =>'Assignment Group',
                 vjointo       =>'tsacinv::group',
