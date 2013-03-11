@@ -1,6 +1,8 @@
 'tscape::archappl'=>{de=>'ICTO architekturelle Anwendung',
                      en=>'ICTO architecturel application'},
-'ICTO-Number'=>{de=>'ICTO-Nummer'},
 'description'=>{de=>'Beschreibung'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
 'fullname'=>{de=>'ICTO Objektbezeichnung',en=>'ICTO Objectname'},
+'fieldgroup.appl'=>{de=>'W5Base Anwendungszuordnung',
+                    en=>'W5Base Applicationrelation'},
+
