@@ -67,6 +67,10 @@ sub Init
                       "tsacinv::itclust",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("ac.shstorage",
+                      "tsacinv::sharedstorage",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("ac.asset",
                       "tsacinv::asset",
                       defaultacl=>['admin']);

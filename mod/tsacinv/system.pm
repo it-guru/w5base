@@ -123,6 +123,7 @@ sub new
                 name          =>'saphier',
                 label         =>'SAP costcenter hierarchy',
                 group         =>'saphier',
+                htmldetail    =>0,
                 ignorecase    =>1,
                 dataobjattr   =>tsacinv::costcenter::getSAPhierSQL()),
 
@@ -467,6 +468,14 @@ sub new
                 vjoinon       =>['lportfolioitemid'=>'lparentid'],
                 vjoindisp     =>[qw(id name version quantity)]),
 
+      new kernel::Field::SubList(
+                name          =>'usedsharedstorage',
+                label         =>'used shared storage',
+                group         =>'usedsharedstorage',
+                vjointo       =>'tsacinv::sharedstoragemnt',
+                vjoinon       =>['lcomputerid'=>'lcomputerid'],
+                vjoindisp     =>[qw(storagename name)]),
+
       new kernel::Field::Dynamic(
                 name          =>'dynservices',
                 searchable    =>0,
@@ -809,6 +818,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default location form applications ipaddresses software 
+             usedsharedstorage
              orderedservices services assetdata assetfinanz saphier
              w5basedata source));
 }  

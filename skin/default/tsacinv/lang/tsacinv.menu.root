@@ -9,6 +9,7 @@
 'ac.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
 'ac.system.swinstall'=>{de=>'Software-Inst.',en=>'Software-Inst.'},
 'ac.license'=>{de=>'Lizenz',en=>'License'},
+'ac.shstorage'=>{de=>'shared Storage',en=>'shared Storage'},
 'ac.krn'=>{de=>'Stammdaten',en=>'Kerneldata'},
 'ac.krn.mandator'=>{de=>'Mandanten',en=>'Mandator'},
 'ac.krn.model'=>{de=>'Model',en=>'Model'},

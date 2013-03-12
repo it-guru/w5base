@@ -4,6 +4,7 @@
 'fieldgroup.services'=>{de=>'gelieferte Leistungsarten', en=>'delivered Services'},
 'fieldgroup.orderedservices'=>{de=>'bestellte Leistungsarten', en=>'ordered Services'},
 'fieldgroup.saphier'=>{de=>'SAP Hierarchie', en=>'SAP hierarchie'},
+'fieldgroup.usedsharedstorage'=>{de=>'verwendeter Shared-Storage', en=>'verwendeter Shared-Storage'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen', en=>'IP-Addresses'},
 'fieldgroup.software'=>{de=>'Software', en=>'Software'},
 'fieldgroup.applications'=>{de=>'Anwendungen', en=>'Applications'},

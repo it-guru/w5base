@@ -310,6 +310,15 @@ sub new
                 vjoininhash   =>['child','systemweblink','systemid','comments',
                                  'srcsys','srcid']),
 
+      new kernel::Field::Text(
+                name          =>'usedsharedstoragesys',
+                group         =>'usedsharedstorage',
+                label         =>'used Shared-Storage Servers',
+                vjointo       =>'tsacinv::lnksharedstorage',
+                weblinkto     =>'NONE',
+                vjoinon       =>['applid'=>'applid'],
+                vjoindisp     =>'storagename'),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
@@ -640,7 +649,7 @@ sub Import
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default interfaces systems 
+   return(qw(header default interfaces systems usedsharedstorage
              control
              w5basedata source));
 }

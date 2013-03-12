@@ -3,6 +3,7 @@
 'fieldgroup.default'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
 'fieldgroup.interfaces'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'fieldgroup.usedsharedstorage'=>{de=>'verwendeter Shared-Storage', en=>'verwendeter Shared-Storage'},
 'CFM Assignment Group'=>{de=>'CFM Assignment Group'},
 'INM Assignment Group'=>{de=>'INM Assignment Group'},
 'CO-Number'=>{de=>'CO-Nummer/Kostenstelle'},
@@ -24,3 +25,4 @@
 'Application Maintenence Window'=>{de=>'Wartungsfenster'},
 'Account-Number'=>{de=>'Account-Nummer'},
 'ApplicationID not found in AssetManager'=>{de=>'ApplicationID konnte in AssetManager nicht gefunden werden'},
+'used Shared-Storage Servers'=>{de=>'verwendete Shared-Storage Server'},

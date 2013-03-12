@@ -1,0 +1,6 @@
+'tsacinv::sharedstoragemnt'=>{de=>'AssetManager shared Storage Mountpoint',
+                              en=>'AssetManager shared Storage Mountpoint'},
+'fieldgroup.system'=>{de=>'verwendet durch System',en=>'used by System'},
+'fieldgroup.storage'=>{de=>'Shared-Storage System',en=>'Shared-Storage System'},
+'Mountpoint'=>{de=>'vollqualifizierter Mountpoint'},
+'Path'=>{de=>'Pfad'},

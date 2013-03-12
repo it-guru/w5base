@@ -50,7 +50,7 @@ sub initSearchQuery
 {  
    my $self=shift;
    if (!defined(Query->Param("search_schemaname"))){
-      Query->Param("search_schemaname"=>'CP9168_AC01_TEST');
+      Query->Param("search_schemaname"=>'AM2107');
    }
 }
 
