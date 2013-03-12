@@ -38,11 +38,7 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itu.tscape.arch",
-                      "tmpl/welcome",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("itu.tscape.arch.archappl",
+   $self->RegisterObj("itu.tscape.archappl",
                       "tscape::archappl",
                       defaultacl=>['valid_user']);
    return($self);

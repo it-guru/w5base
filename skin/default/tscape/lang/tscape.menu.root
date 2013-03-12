@@ -1,3 +1,2 @@
 'itu.tscape'=>{de=>'CapeTS',en=>'CapeTS'},
-'itu.tscape.arch'=>{de=>'Architektur',en=>'Architectur'},
-'itu.tscape.arch.archappl'=>{de=>'Anwendung',en=>'Application'},
+'itu.tscape.archappl'=>{de=>'ICT-Objekt',en=>'ICT-Object'},
