@@ -93,7 +93,7 @@ sub ExpandContacts
    my $data=shift;
    my $resbuf=shift;
 
-   my $req=$data->{sendBaseData};
+   my $req=trim($data->{sendBaseData});
    my @req=split(/[;]+\s*/,$req);
    if (!($req=~m/^\s*$/) && $#req!=-1){
       my @sreq=sort(@req);
