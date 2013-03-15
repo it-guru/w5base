@@ -1143,6 +1143,7 @@ sub getCurrentUserId
    my $self=shift;
    my $userid;
    return(undef) if ($W5V2::OperationContext eq "W5Server");
+   return(undef) if ($W5V2::OperationContext eq "QualityCheck");
    my $UserCache=$self->Cache->{User}->{Cache};
    if (defined($UserCache->{$ENV{REMOTE_USER}})){
       $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
@@ -1408,7 +1409,8 @@ EOF
          if (!($jsname=~m/^(http|https):/)){
             $jsname="$param{prefix}$param{base}../../../public/base/load/$js";
          }
-         $d.="<script language=JavaScript src=\"$jsname\"></script>\n";
+         $d.="<script language=\"JavaScript\"  ".
+             "type=\"text/javascript\" src=\"$jsname\"></script>\n";
       }
    }
    $d.="<head>\n";
@@ -1431,7 +1433,7 @@ EOF
       $d.=$param{'title'};
       $d.="</title>\n";
    }
-   $d.="\n<script language=\"JavaScript\">\n";
+   $d.="\n<script language=\"JavaScript\" type=\"text/javascript\">\n";
    $d.="function DataLoseWarn(){\n";
    $d.="return(confirm(\"".
         $self->T("With this action, it is possible to lose data!").
@@ -1657,7 +1659,7 @@ sub findtemplvar
       my $qs=kernel::cgi::Hash2QueryString(%param);
 
       my $onclick="javascript:openwin('$url?$qs','_help',".
-                  "'height=570,width=620,toolbar=no,status=no,".
+                  "'height=570,width=680,toolbar=no,status=no,".
                   "resizable=yes,scrollbars=auto')";
       return("<span class=sublink onclick=$onclick ".
              "title=\"globalHelp\" alt=\"globalHelp\">".

@@ -26,6 +26,7 @@ use kernel::Field;
 use kernel::CIStatusTools;
 use kernel::MandatorDataACL;
 use finance::costcenter;
+use kernel::Scene;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink kernel::CIStatusTools
         kernel::MandatorDataACL);
@@ -930,6 +931,20 @@ sub new
                 htmleditwidth =>'30%',
                 label         =>'Application is mangaged by rules of SOX',
                 dataobjattr   =>'appl.is_soxcontroll'),
+
+      new kernel::Field::Text(
+                name          =>'mon1url',
+                group         =>'control',
+                htmldetail    =>0,
+                label         =>'Monitoring URL1',
+                dataobjattr   =>'appl.mon1url'),
+
+      new kernel::Field::Text(
+                name          =>'mon2url',
+                group         =>'control',
+                htmldetail    =>0,
+                label         =>'Monitoring URL2',
+                dataobjattr   =>'appl.mon2url'),
 
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
@@ -1937,67 +1952,100 @@ sub HandleInfoAboSubscribe
 }
 
 
-sub getHtmlDetailPages
-{
-   my $self=shift;
-   my ($p,$rec)=@_;
+#sub getHtmlDetailPages
+#{
+#   my $self=shift;
+#   my ($p,$rec)=@_;
+#
+#   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
+#   if (defined($rec)){
+#      push(@l,"OPInfo"=>$self->T("OperatorInfo"));
+#   }
+#   return(@l);
+#}
 
-   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
-   if (defined($rec)){
-      push(@l,"OPInfo"=>$self->T("OperatorInfo"));
-   }
-   return(@l);
-}
 
-
-sub getHtmlDetailPageContent
-{
-   my $self=shift;
-   my ($p,$rec)=@_;
-
-   my $page;
-   my $idname=$self->IdField->Name();
-   my $idval=$rec->{$idname};
-
-   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "OPInfo");
-
-   if ($p eq "OPInfo"){
-      Query->Param("$idname"=>$idval);
-      $idval="NONE" if ($idval eq "");
-
-      my $q=new kernel::cgi({});
-      $q->Param("$idname"=>$idval);
-      my $urlparam=$q->QueryString();
-      $page.="<iframe class=HtmlDetailPage name=HtmlDetailPage ".
-            "src=\"OPInfo?$urlparam\"></iframe>";
-   }
-   $page.=$self->HtmlPersistentVariables($idname);
-   return($page);
-}
+#sub getHtmlDetailPageContent
+#{
+#   my $self=shift;
+#   my ($p,$rec)=@_;
+#
+#   my $page;
+#   my $idname=$self->IdField->Name();
+#   my $idval=$rec->{$idname};
+#
+#   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "OPInfo");
+#
+#   if ($p eq "OPInfo"){
+#      Query->Param("$idname"=>$idval);
+#      $idval="NONE" if ($idval eq "");
+#
+#      my $q=new kernel::cgi({});
+#      $q->Param("$idname"=>$idval);
+#      my $urlparam=$q->QueryString();
+#      $page.="<iframe class=HtmlDetailPage name=HtmlDetailPage ".
+#            "src=\"OPInfo?$urlparam\"></iframe>";
+#   }
+#   $page.=$self->HtmlPersistentVariables($idname);
+#   return($page);
+#}
 
 sub getValidWebFunctions
 {
    my $self=shift;
 
-   return($self->SUPER::getValidWebFunctions(@_),"OPInfo");
+   return($self->SUPER::getValidWebFunctions(@_),"Scene");
 }
 
 
-sub OPInfo
+
+sub SceneHeader
 {
    my $self=shift;
+   my @js;
+   foreach my $l (qw(lib/raphael.js lib/jquery-1.8.1.min.js 
+                     lib/jquery-ui-1.8.23.custom.min.js 
+                     lib/jquery.layout.js lib/jquery.autoresize.js 
+                     lib/jquery-touch_punch.js lib/jquery.contextmenu.js 
+                     lib/rgbcolor.js lib/canvg.js lib/Class.js 
+                     lib/json2.js src/draw2d.js)){
+      push(@js,"../../../../../static/draw2d/".$l);
+
+   }
+
+}
+
+
+sub Scene
+{
+   my $self=shift;
+
    print $self->HttpHeader();
-   print $self->HtmlHeader(
-                           title=>"OP Info comming sone!",
-                           js=>['toolbox.js'],
-                           style=>['default.css',
-                                'work.css',
-                                'Output.HtmlDetail.css',
-                                'kernel.App.Web.css']);
+   print $self->HtmlHeader(title=>"Scene",
+      style=>['../../../../../static/draw2d/css/contextmenu.css',
+             ]);
 
-   print ("This is IT!");
+   #######################################################################
+   my $path;
+   if (defined(Query->Param("FunctionPath"))){
+      $path=Query->Param("FunctionPath");
+   }
+   $path=~s/\///;
+   my ($id,$scene)=split(/\//,$path);
+   my $dataobj=$self->Self();
+   #######################################################################
 
 
+   my $s=new kernel::Scene("gfx_holder");
+   print $s->htmlBootstrap();
+   print $s->htmlContainer();
+
+   $s->addShape("defid","draw2d.shape.node.Start",50,50);
+   $s->addShape("defid","draw2d.shape.node.End",150,150);
+   $s->addShape("defid","draw2d.shape.basic.Rectangle",250,150);
+
+   print $s->renderedScene();
+   print $self->HtmlBottom(body=>1);
 }
 
 sub HtmlPublicDetail   # for display record in QuickFinder or with no access

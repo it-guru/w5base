@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <title>'Draw2D touch' Examples</title>
+      <link type="text/css" rel="stylesheet" href="./css/contextmenu.css" />
+<!--
+	<SCRIPT src="./draw2d/lib/shifty.js"></SCRIPT>
+-->
+	<SCRIPT src="./lib/raphael.js"></SCRIPT>
+	<SCRIPT src="./lib/jquery-1.8.1.min.js"></SCRIPT>
+	<SCRIPT src="./lib/jquery-ui-1.8.23.custom.min.js"></SCRIPT>
+	<SCRIPT src="./lib/jquery.layout.js"></SCRIPT>
+	<SCRIPT src="./lib/jquery.autoresize.js"></SCRIPT>
+	<SCRIPT src="./lib/jquery-touch_punch.js"></SCRIPT>
+	<SCRIPT src="./lib/jquery.contextmenu.js"></SCRIPT>
+	<SCRIPT src="./lib/rgbcolor.js"></SCRIPT>
+	<SCRIPT src="./lib/canvg.js"></SCRIPT>
+	<SCRIPT src="./lib/Class.js"></SCRIPT>
+	<SCRIPT src="./lib/json2.js"></SCRIPT>
+	<SCRIPT src='./src/draw2d.js'></SCRIPT>
+
+
+
+  </head>
+  <body style="overflow:scroll">
+<!--
+  <div id="gfx_holder" 
+       style="width:655px; 
+             border-style:solid;border-color:black;
+             height:928px;
+             -webkit-tap-highlight-color: rgba(0,0,0,0); "></div>
+-->
+<center>
+  <div id="gfx_holder" 
+       style="width:928px; 
+             border-style:solid;border-color:black;
+             height:645px;
+             -webkit-tap-highlight-color: rgba(0,0,0,0); "></div>
+</center>
+
+ <pre id="out">
+
+ </pre>
+  
+ <script type="text/javascript">
+
+
+var MyConnection= draw2d.Connection.extend({
+    
+    init:function()
+    {
+      this._super();
+    },
+    
+    /**
+     * @method
+     * called by the framework if the figure should show the contextmenu.</br>
+     * The strategy to show the context menu depends on the plattform. Either loooong press or
+     * right click with the mouse.
+     * 
+     * @param {Number} x the x-coordinate to show the menu
+     * @param {Number} y the y-coordinate to show the menu
+     * @since 1.1.0
+     */
+    onContextMenu:function(x,y){
+        $.contextMenu({
+            selector: 'body', 
+            events:
+            {  
+                hide:function(){ $.contextMenu( 'destroy' ); }
+            },
+            callback: $.proxy(function(key, options) 
+            {
+               switch(key){
+               case "red":
+                   this.setColor("ff0000");
+                   break;
+               case "green":
+                   this.setColor("00ff00");
+                   break;
+               case "blue":
+                   this.setColor("0000ff");
+                   break;
+               case "delete":
+                   // without undo/redo support
+              //     this.getCanvas().removeFigure(this);
+                   
+                   // with undo/redo support
+                   var cmd = new draw2d.command.CommandDelete(this);
+                   this.getCanvas().getCommandStack().execute(cmd);
+               default:
+                   break;
+               }
+            
+            },this),
+            x:x,
+            y:y,
+            items: 
+            {
+                "red":    {name: "Red", icon: "edit"},
+                "green":  {name: "Green", icon: "cut"},
+                "blue":   {name: "Blue", icon: "copy"},
+                "sep1":   "---------",
+                "delete": {name: "Delete", icon: "delete"},
+            }
+        });
+   }
+    
+});
+
+var MyApp= draw2d.shape.basic.Image.extend({
+    
+    init:function(id,label)
+    {
+      this._super("https://darwin.telekom.de/darwin/public/tsacinv/load/appl.jpg?HTTP_ACCEPT_LANGUAGE=de3Bq2Cen-GB3D0.6%2Cen-US3D0.4",40,40);
+      this.addFigure(new draw2d.shape.basic.Label(label), 
+                     new draw2d.layout.locator.BottomLocator(this));
+      this.setId(id);
+    },
+    
+    /**
+     * @method
+     * called by the framework if the figure should show the contextmenu.</br>
+     * The strategy to show the context menu depends on the plattform. Either loooong press or
+     * right click with the mouse.
+     * 
+     * @param {Number} x the x-coordinate to show the menu
+     * @param {Number} y the y-coordinate to show the menu
+     * @since 1.1.0
+     */
+    onContextMenu:function(x,y){
+        $.contextMenu({
+            selector: 'body', 
+            events:
+            {  
+                hide:function(){ $.contextMenu( 'destroy' ); }
+            },
+            callback: $.proxy(function(key, options) 
+            {
+               switch(key){
+               case "show":
+                   this.setColor("ff0000");
+                   break;
+               case "hide":
+                   this.setColor("00ff00");
+                   break;
+               case "delete":
+                   // without undo/redo support
+              //     this.getCanvas().removeFigure(this);
+                   
+                   // with undo/redo support
+                   var cmd = new draw2d.command.CommandDelete(this);
+                   this.getCanvas().getCommandStack().execute(cmd);
+               default:
+                   break;
+               }
+            
+            },this),
+            x:x,
+            y:y,
+            items: 
+            {
+                "show":    {name: "Show"},
+                "hide":  {name: "Hide"},
+                "sep1":   "---------",
+                "delete": {name: "Delete", icon: "delete"},
+            }
+        });
+   }
+    
+});
+
+
+$(window).load(function () {
+
+   var canvas = null;
+   canvas = new draw2d.Canvas("gfx_holder");
+
+   // create and add two nodes which contains Ports (In and OUT)
+   //
+   var start = new draw2d.shape.node.Start();
+   var end   = new draw2d.shape.node.End();
+   var app   = new MyApp("w5b","W5Base/Darwin");
+
+   start.setDimension(80,30);
+   start.setDeleteable(false);
+   var p=new draw2d.HybridPort("hans");
+
+   start.addPort(p,draw2d.layout.locator.TopLocator);
+
+   // ...add it to the canvas 
+   canvas.addFigure( start, 50,50);
+   canvas.addFigure( end, 230,80);
+   canvas.addFigure( app, 100,100);
+
+
+   // Create a Connection and connect the Start and End node
+   //
+   var c = new MyConnection();
+
+   // Set the endpoint decorations for the connection
+   //
+  // c.setSourceDecorator(new draw2d.decoration.connection.BarDecorator());
+   c.setTargetDecorator(new draw2d.decoration.connection.ArrowDecorator());   
+   // Connect the endpoints with the start and end port
+   //
+   c.setSource(start.getOutputPort(0));
+   c.setTarget(end.getInputPort(0));
+
+   // and finally add the connection to the canvas
+   canvas.addFigure(c);
+
+    var msg = new draw2d.shape.note.PostIt("Use the context menu of the connection\nto change the color or delete the connection.");
+    canvas.addFigure(msg, 20,220);
+
+   var writer = new draw2d.io.json.Writer();
+   var json = writer.marshal(canvas);
+   $('#out').text(JSON.stringify(json,null,2));
+});
+
+    $("body").scrollTop(0)
+             .scrollLeft(0);
+
+  </script>
+
+  </body>
+  </html>
+  
+  
