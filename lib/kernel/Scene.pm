@@ -102,13 +102,11 @@ sub htmlContainer
    my $xmax=$self->{xmax};
    my $ymax=$self->{ymax};
    my $d=<<EOF;
-<center>
   <div id="gfx_holder" 
        style="width:${xmax}px; 
              border-style:solid;border-color:black;
              border-width:1px;
              height:${ymax}px;"></div>
-</center>
 EOF
    return($d);
 }
