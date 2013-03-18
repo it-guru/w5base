@@ -1198,3 +1198,23 @@ create table lnkbscomp (
   FOREIGN KEY fk_businessservice (businessservice)
               REFERENCES businessservice (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table systemmonipoint 
+ add mon1url varchar(128),add mon1date datetime,add mon1mode varchar(10),
+ add mon2url varchar(128),add mon2date datetime,add mon2mode varchar(10),
+ add mon3url varchar(128),add mon3date datetime,add mon3mode varchar(10);
+alter table system 
+ add mon1url varchar(128),add mon1date datetime,add mon1mode varchar(10),
+ add mon2url varchar(128),add mon2date datetime,add mon2mode varchar(10),
+ add mon3url varchar(128),add mon3date datetime,add mon3mode varchar(10);
+alter table appl 
+ add mon1url varchar(128),add mon1date datetime,add mon1mode varchar(10),
+ add mon2url varchar(128),add mon2date datetime,add mon2mode varchar(10),
+ add mon3url varchar(128),add mon3date datetime,add mon3mode varchar(10);
+alter table businessservice 
+ add mon1url varchar(128),add mon1date datetime,add mon1mode varchar(10),
+ add mon2url varchar(128),add mon2date datetime,add mon2mode varchar(10),
+ add mon3url varchar(128),add mon3date datetime,add mon3mode varchar(10);
+alter table businessprocess 
+ add mon1url varchar(128),add mon1date datetime,add mon1mode varchar(10),
+ add mon2url varchar(128),add mon2date datetime,add mon2mode varchar(10),
+ add mon3url varchar(128),add mon3date datetime,add mon3mode varchar(10);
