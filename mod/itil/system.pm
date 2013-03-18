@@ -697,7 +697,7 @@ sub new
                 name          =>'isapprovtest',
                 group         =>'opmode',
                 htmlhalfwidth =>1,
-                label         =>'Approval Testsystem',
+                label         =>'Approval/Integration System',
                 dataobjattr   =>'system.is_approvtest'),
 
       new kernel::Field::Boolean(
@@ -914,6 +914,20 @@ sub new
                 group         =>'control',
                 label         =>'JobServer Proxy Command',
                 dataobjattr   =>'system.ccproxy'),
+
+      new kernel::Field::Text(
+                name          =>'mon1url',
+                group         =>'control',
+                htmldetail    =>0,
+                label         =>'Monitoring URL1',
+                dataobjattr   =>'system.mon1url'),
+
+      new kernel::Field::Text(
+                name          =>'mon2url',
+                group         =>'control',
+                htmldetail    =>0,
+                label         =>'Monitoring URL2',
+                dataobjattr   =>'system.mon2url'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
