@@ -39,7 +39,7 @@
 'Productionsystem'=>{de=>'Produktionssystem'},
 'Developmentsystem'=>{de=>'Entwicklungssystem'},
 'Educationsystem'=>{de=>'Schulungssystem'},
-'Approval Testsystem'=>{de=>'Abnahmesystem'},
+'Approval/Integration System'=>{de=>'Abnahme-/Integrationssystem'},
 'Referencesystem'=>{de=>'Referenzsystem'},
 'Infrastructursystem'=>{de=>'Infrastruktursystem'},
 'Databaseserver'=>{de=>'Datenbankserver'},
