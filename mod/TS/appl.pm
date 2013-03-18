@@ -99,6 +99,7 @@ sub new
                 label         =>'ICTO Objectname',
                 group         =>'architect',
                 async         =>'1',
+                AllowEmpty    =>1,
                 vjointo       =>'tscape::archappl',
                 vjoinon       =>['ictoid'=>'id'],
                 vjoindisp     =>'fullname'),
