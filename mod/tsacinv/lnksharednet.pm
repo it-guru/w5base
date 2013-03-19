@@ -128,6 +128,7 @@ sub getSqlFrom
             "amportfolio systemportfolio,".
             "amcomputer,".
             "amportfolio netportfolio,".
+            "amcomputer  netcomputer,".
             "amportfolio netparentportfolio,".
             "ammodel     netparentmodel,".
             "amnature    netparentnature,".
@@ -149,6 +150,8 @@ sub initSqlWhere
       "and netparentmodel.lnatureid=netparentnature.lnatureid ".
       "and amtsirelportfappl.lportfolioid=systemportfolio.lportfolioitemid ".
       "and amtsirelportfappl.bdelete='0' ".
+      "and netcomputer.litemid=netportfolio.lportfolioitemid ".
+      "and netcomputer.status<>'out of operation' ".
       "and netparentnature.name in ('SWITCH') ".
       "and amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid ";
    return($where);
