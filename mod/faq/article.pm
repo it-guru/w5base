@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use HTML::TagFilter;
+use HTML::Parser;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 
