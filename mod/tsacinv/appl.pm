@@ -658,7 +658,7 @@ sub Import
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default interfaces systems usedsharedstorage
+   return(qw(header default interfaces systems usedsharedcomp
              control
              w5basedata source));
 }
