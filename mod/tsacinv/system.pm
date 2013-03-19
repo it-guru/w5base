@@ -482,6 +482,7 @@ sub new
                 label         =>'direct connected Shared-Network Components',
                 vjointo       =>'tsacinv::lnksharednet',
                 weblinkto     =>'NONE',
+                htmldetail    =>0,
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>'netname'),
 
@@ -828,7 +829,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default location form applications ipaddresses software 
-             usedsharedstorage
+             usedsharedcomp
              orderedservices services assetdata assetfinanz saphier
              w5basedata source));
 }  
