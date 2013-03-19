@@ -312,12 +312,21 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'usedsharedstoragesys',
-                group         =>'usedsharedstorage',
-                label         =>'used Shared-Storage Servers',
+                group         =>'usedsharedcomp',
+                label         =>'direct connected Shared-Storage Servers',
                 vjointo       =>'tsacinv::lnksharedstorage',
                 weblinkto     =>'NONE',
                 vjoinon       =>['applid'=>'applid'],
                 vjoindisp     =>'storagename'),
+
+      new kernel::Field::Text(
+                name          =>'usedsharednetcomp',
+                group         =>'usedsharedcomp',
+                label         =>'direct connected Shared-Network Components',
+                vjointo       =>'tsacinv::lnksharednet',
+                weblinkto     =>'NONE',
+                vjoinon       =>['applid'=>'applid'],
+                vjoindisp     =>'netname'),
 
       new kernel::Field::Date(
                 name          =>'cdate',

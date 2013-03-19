@@ -570,7 +570,6 @@ EOF
                next;
             }
          }
-      #   next if (!($fo->searchable()) && $type ne "Id");
          $defaultsearch=$fieldname if ($fo->defsearch);
          my $work=\$searchframe;
          $work=\$extframe if ($c>=$mainlines*2);
@@ -586,7 +585,16 @@ EOF
             $c2="95%";
             $cs="3";
          }
-         $$work.="<td class=fname width=$c1>\%$fieldname(searchlabel)\%:</td>";
+         my $label=$fo->Label();
+         my $t0="";
+         my $t1="";
+         if (length($label)>=30){
+            $t0="<a title=\"".quoteHtml($label)."\">";
+            $t1="</a>";
+         }
+ 
+         $$work.="<td class=fname width=$c1>".
+                 "${t0}\%$fieldname(searchlabel)\%${t1}:</td>";
          $$work.="<td class=finput width=$c2 colspan=$cs>".
                  "\%$fieldname(search)\%</td>";
          if ($fo->mainsearch()){
@@ -599,7 +607,8 @@ EOF
       }
       $searchframe.="</tr>" if (!($searchframe=~m/<\/tr>$/));
 
-      $d.=$self->arrangeSearchData($searchframe,$extframe,$defaultsearch,%param);
+      $d.=$self->arrangeSearchData($searchframe,$extframe,
+                                   $defaultsearch,%param);
       $self->ParseTemplateVars(\$d);
    }
    return($d);

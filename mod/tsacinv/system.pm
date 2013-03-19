@@ -470,11 +470,21 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'usedsharedstorage',
-                label         =>'used shared storage',
-                group         =>'usedsharedstorage',
+                label         =>'direct connected Shared-Storage Servers',
+                group         =>'usedsharedcomp',
                 vjointo       =>'tsacinv::sharedstoragemnt',
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>[qw(storagename name)]),
+
+      new kernel::Field::Text(
+                name          =>'usedsharednetcomp',
+                group         =>'usedsharedcomp',
+                label         =>'direct connected Shared-Network Components',
+                vjointo       =>'tsacinv::lnksharednet',
+                weblinkto     =>'NONE',
+                vjoinon       =>['lcomputerid'=>'lcomputerid'],
+                vjoindisp     =>'netname'),
+
 
       new kernel::Field::Dynamic(
                 name          =>'dynservices',

@@ -4,7 +4,7 @@
 'fieldgroup.services'=>{de=>'gelieferte Leistungsarten', en=>'delivered Services'},
 'fieldgroup.orderedservices'=>{de=>'bestellte Leistungsarten', en=>'ordered Services'},
 'fieldgroup.saphier'=>{de=>'SAP Hierarchie', en=>'SAP hierarchie'},
-'fieldgroup.usedsharedstorage'=>{de=>'verwendeter Shared-Storage', en=>'verwendeter Shared-Storage'},
+'fieldgroup.usedsharedcomp'=>{de=>'verwendete Shared-Componenten', en=>'verwendete Shared-Komponenten'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen', en=>'IP-Addresses'},
 'fieldgroup.software'=>{de=>'Software', en=>'Software'},
 'fieldgroup.applications'=>{de=>'Anwendungen', en=>'Applications'},
@@ -50,3 +50,6 @@
 'security flag'=>{de=>'Sicherheits-Flag'},
 'merged description of application usage'=>{de=>'Zusammengeführte Anwendungsverwendung'},
 'security set'=>{de=>'Security Set'},
+'direct connected Shared-Storage Servers'=>{de=>'direkt verbundene Shared-Storage Server'},
+'direct connected Shared-Network Components'=>{de=>'direkt verbundene Shared-Netzwerk Komponenten'},
+
