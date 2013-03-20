@@ -88,9 +88,9 @@ Graph.prototype.addGraphListener = function(obj)
 
 Graph.prototype.notify = function()
 {
-	this.eventListeners.forEach(function(obj){
-		obj.graphChanged();
-	});
+//	this.eventListeners.forEach(function(obj){
+//		obj.graphChanged();
+//	});
 };
 
 // -----------
