@@ -603,7 +603,7 @@ sub new
                    if ($mode=~m/html/i){
                       return("<a href=javascript:$onclick>$img</a>");
                    }
-                   return("-only a web useable link-");
+                   return("-");
                 }),
 
       new kernel::Field::DynWebIcon(
@@ -634,7 +634,7 @@ sub new
                    if ($mode=~m/html/i){
                       return("<a href=javascript:$onclick>$img</a>");
                    }
-                   return("-only a web useable link-");
+                   return("-");
                 }),
 
    );

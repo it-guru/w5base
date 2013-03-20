@@ -196,10 +196,20 @@ sub getLineSubListData
       foreach my $rec ($self->vjoinobj->getHashList(@view)){
          $d.="\n" if ($d ne "" && $#view>0); # if there is only one field, it
          foreach my $field (@view){          # isn't need to use linefeeds
-            $d.="; " if ($d ne "" && !($d=~m/\n$/));
-            my $da=$rec->{$field};
-            $da=~s/[\n\r;]/ /g;
-            $d.=$da;
+            my $fo=$self->vjoinobj->getField($field);
+            if (defined($fo)){
+               $d.=";" if ($d ne "" && !($d=~m/\n$/));
+               my $da=$fo->FormatedDetail($rec,"Csv01");
+              # my $da=$rec->{$field};
+               if (ref($da) eq "ARRAY"){
+                  $da=join(", ",@$da);
+               }
+               if (ref($da) eq "HASH"){
+                  $da=join(", ",map({$_."=".$da->{$_}} sort(keys(%$da))));
+               }
+               $da=~s/[\n\r;]/ /g;
+               $d.=$da;
+            }
          }
       }
       return($d);

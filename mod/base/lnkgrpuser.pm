@@ -355,7 +355,7 @@ sub new
  
                       return($d);
                    }
-                   return("-only a web useable link-");
+                   return("-");
                 }),
 
       new kernel::Field::DynWebIcon(
@@ -411,7 +411,7 @@ sub new
  
                       return($d);
                    }
-                   return("-only a web useable link-");
+                   return("-");
                 }),
 
    );
