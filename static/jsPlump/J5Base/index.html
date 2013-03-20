@@ -1,0 +1,110 @@
+<html>
+<head>
+
+<script type='text/javascript'    
+   src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
+</script>
+
+<link rel="stylesheet" href="../../../auth/base/load/jquery.ui.css"></link>
+
+<script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+
+<script language="JavaScript" src="../../../auth/base/load/jquery.ui.js">
+</script>
+
+
+<script  language="JavaScript" type="text/javascript" src="jsplump.js"></script>
+</head>
+
+
+<body>
+<center>
+<div id="mainframe" style="width:480px;height:500px;border-style:solid;border-color:black;border-width:1px;text-align:left">
+
+<div id='g8nzb' class="window" style="position:relative;left:70;top:150;width:100px;text-align:center;height:auto;border-style:solid;border-color:black;border-width:1px" id="container0">
+      <div >G8NZB</div>
+</div>
+
+
+<div id='g8nyb' class="window" style="position:relative;left:250;top:300;text-align:center;width:100px;height:auto;border-style:solid;border-color:black;border-width:1px" id="container1">
+      <div>G8NYB</div>
+</div>
+
+<div id='g8nsb' class="window" style="position:relative;left:150;top:200;text-align:center;width:100px;height:auto;border-style:solid;border-color:black;border-width:1px" id="container1">
+      <div>G8NSB</div>
+</div>
+
+</div>
+</center>
+
+
+<script language="JavaScript">
+
+jsPlumb.ready(function(){
+ //  jsPlumb.setRenderMode(jsPlumb.SVG);
+   document.onselectstart = function () { return false; };
+   jsPlumb.importDefaults({
+       ConnectorZIndex:5,
+       Connector: "Straight",
+       HoverClass:"connector-hover",
+       DragOptions : { cursor: "pointer", zIndex:2000 },
+       PaintStyle:{ lineWidth:2, strokeStyle:'rgba(0, 0, 200, 0.5)' }
+   });
+//   e0 = jsPlumb.addEndpoint("g8nzb"),
+
+//jsPlumb.connect({ 
+//   source:e0, 
+//   target:e1,
+//   paintStyle:{ lineWidth:1, strokeStyle:'rgba(0, 0, 200, 0.5)' },
+//   anchors:["RightMiddle", "TopCenter"],
+//   endpoint:[ "Blank" ]
+//});
+
+
+jsPlumb.connect({
+   source:'g8nyb',
+   target:'g8nzb',
+   anchors:["BottomCenter", "TopCenter"],
+   endpoint:[ "Blank" ]
+});
+
+
+jsPlumb.connect({
+   source:'g8nyb',
+   target:'g8nsb',
+   anchors:["BottomCenter", "TopCenter"],
+   endpoint:[ "Blank" ],
+   overlays:[ 
+      ["Arrow",{ width:7,length:8,location:1 } ]
+   ]
+});
+
+
+
+   jsPlumb.draggable($(".window"));
+$(".window").mouseover(function() {
+    $(this).css('cursor', 'pointer');
+});
+
+console.log($('#mainframe'));
+
+
+
+   window.setTimeout(function(){
+      $('#g8nyb').css({top:50});
+      $('#g8nyb').animate({
+          left: '+=100'
+       }, 500,function(){ 
+          jsPlumb.repaintEverything()
+       });
+      jsPlumb.repaintEverything();
+   },1000);
+
+});
+
+</script>
+
+
+</body>
+</html>
