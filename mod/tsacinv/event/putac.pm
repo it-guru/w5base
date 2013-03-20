@@ -546,6 +546,12 @@ sub ApplicationModified
                      $criticality="none";
                   }
                }
+               ########################################################
+               my $applref="[NULL]";
+               if ($rec->{ictono} ne ""){
+                  $applref="CapeTS: ".$rec->{ictono};
+               }
+               ########################################################
                my $issoxappl=$rec->{issoxappl};
                $issoxappl="YES" if ($rec->{issoxappl});
                $issoxappl="NO" if (!($rec->{issoxappl}));
@@ -592,7 +598,8 @@ sub ApplicationModified
                                    Deputy_Del_manager=>$idno{opm2},
                                    bDelete=>'0',
                                    Name=>$rec->{name},
-                                   Appl_Group=>$rec->{applgroup}
+                                   Appl_Group=>$rec->{applgroup},
+                                   Appl_Ref=>$applref
                                 }
                             };
                #
@@ -776,10 +783,12 @@ sub ApplicationModified
                      else{
                         $assignment="CSS.AO.DTAG";
                      }
+                     ########################################################
                      my $iassignment=$irec->{acinmassingmentgroup};
                      if ($iassignment eq ""){
                         $iassignment="[NULL]";
                      }
+                     ########################################################
                      #
                      # Info von Florian Sahlmann vom 11.06.2008:
                      # SAP-Instance:    M079345
