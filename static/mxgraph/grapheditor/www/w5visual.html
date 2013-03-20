@@ -13,15 +13,14 @@
 	
 		// URLs for save and export
 		var EXPORT_URL = '/export';
-		var SAVE_URL = '/save';
-		var OPEN_URL = 'http://blackhost.localnet/w5base/static/mxgraph/grapheditor/www/sam.xml';
+		var SAVE_URL = '/w5base/auth/base/w5visual/save';
+		var OPEN_URL = '/w5base/auth/base/w5visual/open/44233';
 		var RESOURCES_PATH = 'resources';
 		var RESOURCE_BASE = RESOURCES_PATH + '/grapheditor';
 		var STENCIL_PATH = 'stencils';
 		var IMAGE_PATH = 'images';
 		var STYLE_PATH = 'styles';
 		var CSS_PATH = 'styles';
-		var OPEN_FORM = 'open.html';
 	
 		// Specifies connection mode for touch devices (at least one should be true)
 		var tapAndHoldStartsConnection = true;
@@ -61,7 +60,7 @@
 		// files (the special bundle and the default bundle) is disabled to
 		// save a GET request. This requires that all resources be present in
 		// each properties file since only one file is loaded.
-		mxLoadResources = false;
+		mxLoadResources = true;
 		mxBasePath = '../../src';
 		mxLanguage = urlParams['lang'];
 		mxLanguages = ['de'];
@@ -105,8 +104,22 @@
 						this.actions.get('save').setEnabled(enabled);
 						this.actions.get('saveAs').setEnabled(false);
 						this.actions.get('export').setEnabled(false);
+                  this.editor.setGraphXml(req.getDocumentElement());
 					}));
 				}
+			};
+			EditorUi.prototype.save = function(name)
+			{
+            var xml = mxUtils.getXml(this.editor.getGraphXml());
+            xml = encodeURIComponent(xml);
+            new mxXmlRequest(SAVE_URL, 
+                             'filename='+name+'&xml='+xml,'POST').send(
+                function (o){
+                },
+                function (o){
+                   alert('ned ok');
+                }
+            );
 			};
 		})();
 	

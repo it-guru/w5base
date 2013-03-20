@@ -39,6 +39,7 @@
 
 <script language="JavaScript">
 
+
 jsPlumb.ready(function(){
  //  jsPlumb.setRenderMode(jsPlumb.SVG);
    document.onselectstart = function () { return false; };
@@ -92,9 +93,15 @@ console && console.log($('#mainframe'));
    window.setTimeout(function(){
       $('#g8nyb').css({top:50});
       $('#g8nyb').animate({
-          left: '+=100'
-       }, 500,function(){ 
-          jsPlumb.repaintEverything()
+          left: '+=100',
+       },{
+          step:function(){
+             jsPlumb.repaint("g8nyb");
+          },
+          complete:function(){ 
+             jsPlumb.repaint("g8nyb");
+             //jsPlumb.repaintEverything()
+          }
        });
       jsPlumb.repaintEverything();
    },1000);
