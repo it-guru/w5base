@@ -378,18 +378,19 @@ sub _LoadUserInUserCache
    }
    my $UserCache=$self->Cache->{User}->{Cache};
    if ($o){
-         $o->SetCurrentView(qw(surname userid givenname posix groups tz lang
-                               cistatusid secstate ipacl
-                               dialermode dialerurl dialeripref
-                               email usersubst usertyp 
-                               dateofvsnfd));
          if ($AccountOrUserID=~m/^\d+$/){
             $o->SetFilter({userid=>\$AccountOrUserID});
          }
          else{
             $o->SetFilter({'accounts'=>[$AccountOrUserID]});
          }
-         my ($rec,$msg)=$o->getFirst();
+         my ($rec,$msg)=$o->getOnlyFirst(qw(surname 
+                               fullname
+                               userid givenname posix groups tz lang
+                               cistatusid secstate ipacl
+                               dialermode dialerurl dialeripref
+                               email usersubst usertyp 
+                               dateofvsnfd));
          if (defined($rec)){
             if ($rec->{ipacl} ne ""){
                $rec->{ipacl}=[split(/[;,]\s*/,$rec->{ipacl})];
@@ -1394,7 +1395,8 @@ sub ExpandTimeExpression
       $found=0;
       if (($n)=$val=~m/^([\+-]\d+)h/){
          $val=~s/^([\+-]\d+)h//;
-         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,$Y,$M,$D,$h,$m,$s,0,0,0,$n,0,0);
+         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,
+                                              $Y,$M,$D,$h,$m,$s,0,0,0,$n,0,0);
          $found=1;
       }
       elsif (($n)=$val=~m/^([\+-]\d+)M/){
@@ -1407,19 +1409,28 @@ sub ExpandTimeExpression
          ($Y,$M,$D)=Add_Delta_YM($dsttimezone,$Y,$M,$D,$n,0);
          $found=1;
       }
-      elsif (($n)=$val=~m/^([\+-]\d+)m/){
+      elsif (($n)=$val=~m/^([\+-]\d+)m/){   # for months
          $val=~s/^([\+-]\d+)m//;
-         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,$Y,$M,$D,$h,$m,$s,0,0,0,0,$n,0);
+         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,
+                                              $Y,$M,$D,$h,$m,$s,0,0,0,0,$n,0);
          $found=1;
       }
-      elsif (($n)=$val=~m/^([\+-]\d+)d/){
+      elsif (($n)=$val=~m/^([\+-]\d+)w/){    # for weeks
+         $val=~s/^([\+-]\d+)w//;
+         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,
+                                              $Y,$M,$D,$h,$m,$s,0,0,7*$n,0,0,0);
+         $found=1;
+      }
+      elsif (($n)=$val=~m/^([\+-]\d+)d/){    # for days
          $val=~s/^([\+-]\d+)d//;
-         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,$Y,$M,$D,$h,$m,$s,0,0,$n,0,0,0);
+         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,
+                                              $Y,$M,$D,$h,$m,$s,0,0,$n,0,0,0);
          $found=1;
       }
       elsif (($n)=$val=~m/^([\+-]\d+)s/){
          $val=~s/^([\+-]\d+)s//;
-         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,$Y,$M,$D,$h,$m,$s,0,0,0,0,0,$n);
+         ($Y,$M,$D,$h,$m,$s)=Add_Delta_YMDHMS($dsttimezone,
+                                              $Y,$M,$D,$h,$m,$s,0,0,0,0,0,$n);
          $found=1;
       }
       elsif ($val=~m/^\s*$/){
