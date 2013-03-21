@@ -536,8 +536,6 @@ sub Validate
       }
       $newrec->{ictono}=$archrec->{archapplid};
    }
-   print STDERR Dumper($newrec);
-
    return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
 }
 
