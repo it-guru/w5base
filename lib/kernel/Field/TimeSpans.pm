@@ -42,10 +42,11 @@ sub Validate
    return({}) if (!exists($newrec->{$name}));
 
    my $newval=$newrec->{$name};
-   if (!ref($newval) && ($newval=~m/^0\(.*1\(.*2\(.*3\(.*4\(.*5\(.*6\(.*\)$/)){
+   if (!ref($newval) && 
+       ($newval=~m/^0\(.*1\(.*2\(.*3\(.*4\(.*5\(.*6\(.*7\(.*\)$/)){
       my @deparse=();
       while(my ($t,$v)=$newval=~m/^\+{0,1}(\d)\(([^\)]*?)\)/){
-         if ($t>=0 && $t<=6){
+         if ($t>=0 && $t<=7){
             $deparse[$t]=$v;
          }
          $newval=~s/^\+{0,1}\d\([^\)]*?\)//;
@@ -141,7 +142,7 @@ sub FormatedDetail
       $tab.="<td align=right>24h</td>";
       $tab.="</tr></table></td>";
       $tab.="<td>&nbsp;</td></tr>";
-      my @days=qw(sun mon tue wed thu fri sat);
+      my @days=qw(sun mon tue wed thu fri sat HOL);
       my @blocks=split(/\+/,$d);
       my @fval;
       foreach my $blk (@blocks){
@@ -152,6 +153,9 @@ sub FormatedDetail
       
       for(my $dayno=0;$dayno<=$#days;$dayno++){
          my $day=$self->getParent->T($days[$dayno],$self->Self());
+         if ($dayno!=7){
+            $day="<b>$day</b>";
+         }
          $tab.="<tr><td width=1%>$day</td><td with=200>";
          if ($mode ne "edit"){
             my @blks=();
