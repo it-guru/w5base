@@ -1,8 +1,0 @@
-'timetool'=>{de=>'Zeitmanagement',en=>'Timemanagement'},
-'timetool.timeplan'=>{de=>'Zeitplan',en=>'Timeplan'},
-'timetool.timeplan.new'=>{de=>'Neueingabe',en=>'New'},
-'timetool.tplan'=>{de=>'Kalender',en=>'Calender'},
-'timetool.tspan'=>{de=>'Zeiteintrag',en=>'Timeentry'},
-'timetool.tplan.workgroup'=>{de=>'Arbeitsgruppe',en=>'Workgroup'},
-'timetool.tplan.workgroup.new'=>{de=>'Neueingabe',en=>'New'},
-'timetool.tspan.new'=>{de=>'Neueintrag',en=>'New'},

@@ -1,5 +1,0 @@
-'timetool::tspan'=>{de=>'Zeiteintrag',en=>'Timeentry'},
-'fieldgroup.moduledata'=>{de=>'Modul Daten',en=>'Module data'},
-'From'=>{de=>'von'},
-'To'=>{de=>'bis'},
-'Entry Type'=>{de=>'Eintrag Typ'},

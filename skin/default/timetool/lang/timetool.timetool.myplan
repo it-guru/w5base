@@ -1,7 +1,0 @@
-'00vacation'=>{en=>'Vacation',de=>'Urlaub'},
-'10timeclear'=>{en=>'Gleitzeit',de=>'Gleitzeitausgleich'},
-'20businesstrip'=>{en=>'Business Trip',de=>'Dienstreise'},
-'30illness'=>{en=>'illness',de=>'Krank'},
-'40education'=>{en=>'education',de=>'Fortbildung'},
-'50svacation'=>{en=>'special Vacation',de=>'Sonderurlaub'},
-"entry violates ruleset \%s"=>{de=>"Eintrag verletzt Regel '\%s'"},
