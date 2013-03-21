@@ -723,22 +723,26 @@ sub getAdditionalMainButtons
    return($d);
 }
 
-sub getPosibleActions
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $app=$self->getParent;
-   my $userid=$self->getParent->getCurrentUserId();
-   my @l;
-
-   if ($WfRec->{stateid}==17){
-      if ($self->IsIncidentManager($WfRec) || 
-          $self->getParent->IsMemberOf(["admin","admin.workflow"])){
-         push(@l,"rootcausei");
-      }
-   }
-   return(@l,$self->SUPER::getPosibleActions($WfRec));
-}
+#
+# entfernt, da ab 01.04.13 keine Root-Cause Analysen mehr versandt werden
+# sollen (HV)
+#
+#sub getPosibleActions
+#{
+#   my $self=shift;
+#   my $WfRec=shift;
+#   my $app=$self->getParent;
+#   my $userid=$self->getParent->getCurrentUserId();
+#   my @l;
+#
+#   if ($WfRec->{stateid}==17){
+#      if ($self->IsIncidentManager($WfRec) || 
+#          $self->getParent->IsMemberOf(["admin","admin.workflow"])){
+#         push(@l,"rootcausei");
+#      }
+#   }
+#   return(@l,$self->SUPER::getPosibleActions($WfRec));
+#}
 
 sub AdditionalMainProcess
 {
