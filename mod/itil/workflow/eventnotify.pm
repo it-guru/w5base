@@ -325,6 +325,25 @@ sub getDynamicFields
                 searchable    =>0,
                 label         =>'Affected Item Prio'),
 
+      new kernel::Field::Text(
+                name          =>'affecteditemgroup',
+                container     =>'headref',
+                group         =>'eventnotifyshort',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       exists($param{current}->{affecteditemgroup})){
+                      my $o=$self->getParent->getField("affecteditemgroup");
+                      my $d=$param{current}->{affecteditemgroup};
+                      return(1) if ($d ne "");
+                   }
+                   return(0);
+                },
+                searchable    =>0,
+                label         =>'Affected Item Groups'),
+
       new kernel::Field::Select(
                 name          =>'affectedregion',
                 translation   =>'itil::workflow::eventnotify',
@@ -2547,8 +2566,17 @@ sub nativProcess
             my $l=getModuleObject($self->getParent->getParent->Config,
                                      "base::location");
             $l->SetFilter({id=>$h->{affectedlocationid},cistatusid=>"<=4"});
+            my %affecteditemgroup;
             foreach my $lrec ($l->getHashList(qw(prio cistatus id name
+                                                 mgmtitemgroup
                                                  grprelations))){
+               if (ref($lrec->{mgmtitemgroup}) eq "ARRAY"){
+                  map({$affecteditemgroup{$_}++;} @{$lrec->{mgmtitemgroup}});
+               }
+               else{
+                  $affecteditemgroup{$lrec->{mgmtitemgroup}}++;
+               }
+               
                $affectedlocationid{$lrec->{id}}++; 
                $affectedlocation{$lrec->{name}}++; 
                my ($prio)=$lrec->{prio};
@@ -2562,6 +2590,7 @@ sub nativProcess
                   }
                }
             }
+            $h->{affecteditemgroup}=[sort(keys(%affecteditemgroup))];
             if (defined($affecteditemprio)){
                $h->{affecteditemprio}=$affecteditemprio;
             }
@@ -2590,10 +2619,19 @@ sub nativProcess
          my ($arec,$msg)=$appl->getOnlyFirst(qw(name customer customerid 
                                                 mandator mandatorid conumber
                                                 responseteam businessteam
+                                                mgmtitemgroup
                                                 eventlang customerprio
                                                 custcontracts id));
          if (defined($arec)){
+            my %affecteditemgroup;
+            if (ref($arec->{mgmtitemgroup}) eq "ARRAY"){
+               map({$affecteditemgroup{$_}++;} @{$arec->{mgmtitemgroup}});
+            }
+            else{
+               $affecteditemgroup{$arec->{mgmtitemgroup}}++;
+            }
             $app=$arec->{name};
+            $h->{affecteditemgroup}=[sort(keys(%affecteditemgroup))];
             $h->{affectedapplicationid}=[$arec->{id}];   
             $h->{affectedapplication}=[$arec->{name}];   
             $h->{mandatorid}=[$arec->{mandatorid}];   
@@ -2620,6 +2658,7 @@ sub nativProcess
                delete($h->{affectedcontract});
                delete($h->{affectedcontractid});
             }
+            print STDERR Dumper($arec);
             if ($arec->{customer} ne ""){
                $h->{affectedcustomer}=[$arec->{customer}];
                $h->{affectedcustomerid}=[$arec->{customerid}];

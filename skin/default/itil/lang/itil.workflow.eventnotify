@@ -102,6 +102,7 @@
 'static mail subject'=>{de=>'statischer Benachrichtigungs-Betreff'},
 'static additional notify distribution list'=>{de=>'statische (zusätzliche) Verteilerliste'},
 'Affected Item Prio'=>{de=>'Prio des betroffenen Elementes'},
+'Affected Item Groups'=>{de=>'betroffene CI-Gruppen'},
 'SALUTATION02.open'=>{
  'de'=>"Sehr geehrte Damen und Herren,\n\n".
        "im Folgenden erhalten Sie den aktuellen Stand zum Ereignis\n".
