@@ -528,13 +528,18 @@ sub Validate
          $self->LastMsg(ERROR,"unable to connect capeTS");
          return(undef);
       }
-      $o->SetFilter({id=>\$ictoid});
-      my ($archrec,$msg)=$o->getOnlyFirst(qw(archapplid));
-      if (!defined($archrec)){
-         $self->LastMsg(ERROR,"unable to identify archictecture record");
-         return(undef);
+      if ($ictoid ne ""){
+         $o->SetFilter({id=>\$ictoid});
+         my ($archrec,$msg)=$o->getOnlyFirst(qw(archapplid));
+         if (!defined($archrec)){
+            $self->LastMsg(ERROR,"unable to identify archictecture record");
+            return(undef);
+         }
+         $newrec->{ictono}=$archrec->{archapplid};
       }
-      $newrec->{ictono}=$archrec->{archapplid};
+      else{
+         $newrec->{ictono}=undef;
+      }
    }
    return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
 }
