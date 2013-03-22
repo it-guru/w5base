@@ -62,6 +62,11 @@ sub new
                 label         =>'Shortname',
                 dataobjattr   =>'Kurzbezeichnung'),
 
+      new kernel::Field::Text(
+                name          =>'organisation',
+                label         =>'Organisation',
+                dataobjattr   =>'Organisation'),
+
       new kernel::Field::SubList(
                 name          =>'w5appl',
                 label         =>'W5Base Application',
