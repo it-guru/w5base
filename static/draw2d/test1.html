@@ -24,22 +24,12 @@
 
   </head>
   <body style="overflow:scroll">
-<!--
-  <div id="gfx_holder" 
-       style="width:655px; 
-             border-style:solid;border-color:black;
-             height:928px;
-             -webkit-tap-highlight-color: rgba(0,0,0,0); "></div>
--->
   <div id="gfx_holder" 
        style="width:928px; 
              border-style:solid;border-color:black;
              height:640px;
              -webkit-tap-highlight-color: rgba(0,0,0,0); "></div>
 
- <pre id="out">
-
- </pre>
   
  <script type="text/javascript">
 
@@ -212,9 +202,9 @@ $(window).load(function () {
     var msg = new draw2d.shape.note.PostIt("Use the context menu of the connection\nto change the color or delete the connection.");
     canvas.addFigure(msg, 20,220);
 
-   var writer = new draw2d.io.json.Writer();
-   var json = writer.marshal(canvas);
-   $('#out').text(JSON.stringify(json,null,2));
+  // var writer = new draw2d.io.json.Writer();
+  // var json = writer.marshal(canvas);
+  // $('#out').text(JSON.stringify(json,null,2));
 });
 
     $("body").scrollTop(0)
