@@ -1366,10 +1366,12 @@ sub HtmlHeader
   my $altlang="en";
   $altlang="de" if ($lang eq "en");
 
+  my $langtag="lang=\"$lang\" altlang=\"$altlang\"";
+
 
   $d.=<<EOF;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<html $langtag>
 <script language="JavaScript">
 var CURLANG="$lang";
 var ALTLANG="$altlang";
