@@ -398,13 +398,6 @@ sub new
                 dataobjattr   =>'swinstance.custcostalloc'),
       
       new kernel::Field::Boolean(
-                name          =>'autogendiary',
-                label         =>'automatic generation of diaries',
-                group         =>'control',
-                dataobjattr   =>'swinstance.autogendiary'),
-
-
-      new kernel::Field::Boolean(
                 name          =>'runonclusts',
                 selectfix     =>1,
                 label         =>'run on Cluster Service',
