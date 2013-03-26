@@ -198,9 +198,7 @@ sub ProcessLine
        "onMouseOut=\"this.className='$lineclass'\">\n";
    $d.="<td><a class=lineselect href=\"$dest\" ".
        "target=_blank onfocus='window.status=\"open record\";' ".
-       "><img height=100% width=2 ".
-       "src=\"../../../public/base/load/empty.gif\">".
-       "</a></td>";
+       ">&nbsp;</a></td>";
    my @l=();
    for(my $c=0;$c<=$#view;$c++){
       my $nowrap="";
