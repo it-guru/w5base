@@ -992,7 +992,7 @@ EOF
    my $BookmarkName=Query->Param("BookmarkName");
    my $ForceOrder=Query->Param("ForceOrder");
    print(<<EOF);
-<tr><td><iframe class=result id=result 
+<tr><td><iframe class=result id=result tabindex="-1"
                 name="Result" src="$welcomeurl"></iframe></td></tr>
 </table>
 <input type=hidden name=UseLimit value="10">
