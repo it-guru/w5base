@@ -100,6 +100,9 @@ sub ProcessHead
 
    $d.="<tr><td class=mainblock>";
    $d.="<table class=datatable width=100%>\n<tr class=headline>";
+   $d.="<th class=headfield style=\"padding:0;margin:0\">".
+       "<div style=\"padding:0;margin:0;width:3px\">".
+       "</div></th>";
    if ($#view!=-1){
       foreach my $field (@view){
          my $name=$field->Name();
@@ -149,9 +152,9 @@ sub ProcessLine
    $id=$id->[0] if (ref($id) eq "ARRAY");
    my $ResultLineClickHandler=$app->{ResultLineClickHandler};
    $ResultLineClickHandler="ById" if (!exists($app->{ResultLineClickHandler}));
+   my $dest;
    if (grep(/^$ResultLineClickHandler$/,$app->getValidWebFunctions())){
       if ($idfield){
-         my $dest;
          if ($id ne ""){
             if ($ResultLineClickHandler eq "ById"){
                $dest="ById/".$id;
@@ -193,6 +196,11 @@ sub ProcessLine
    $d.="<tr class=$lineclass ".
        "onMouseOver=\"this.className='linehighlight'\" ".
        "onMouseOut=\"this.className='$lineclass'\">\n";
+   $d.="<td><a class=lineselect href=\"$dest\" ".
+       "target=_blank onfocus='window.status=\"open record\";' ".
+       "><img height=100% width=2 ".
+       "src=\"../../../public/base/load/empty.gif\">".
+       "</a></td>";
    my @l=();
    for(my $c=0;$c<=$#view;$c++){
       my $nowrap="";

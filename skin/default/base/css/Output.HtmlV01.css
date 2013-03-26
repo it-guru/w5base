@@ -110,7 +110,7 @@ table.datatable{
    border-top-style:none;
    empty-cells:show;
 }
-span.viewselect{
+a.viewselect{
    cursor:pointer;
 }
 td.headline{
@@ -165,11 +165,39 @@ table.subtable td.hl {
 
 
 
+a:link.viewselect,a:visited.viewselect,a:active.viewselect    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#000000;
+          }
+
+a:focus.viewselect{
+   border-color:red;
+   border-width:1px;
+   border-style:solid;
+}
+
 a:link.pageswitch,a:visited.pageswitch,a:active.pageswitch    {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#16305e;
           }
+
+a:link.lineselect,a:visited.lineselect,a:active.lineselect    {
+            font-size:8px;
+            display: block;
+            height:100%;
+            width:100%;
+            text-decoration:none;
+          }
+a:focus.lineselect {
+            font-size:8px;
+            display: inline-block;
+            height:100%;
+            background-color:red;
+          }
+
+
 
 @media print{
    div.pagingline{

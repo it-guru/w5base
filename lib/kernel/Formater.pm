@@ -236,7 +236,7 @@ sub getHtmlViewLine
              "<table border=0 width=100% cellpadding=0 cellspacing=0><tr>".
              "<td align=left>";
          if (!($view=~m/^\*/) && !$ro){
-            $d.="<a title=\"".
+            $d.="<a class=viewtabedit title=\"".
                 $self->getParent->getParent->T(
                 "modify view or create new views").
                 "\" href=JavaScript:EditView(\"$view\")>".
@@ -247,11 +247,11 @@ sub getHtmlViewLine
                 "width=18 height=18>";
          }
          $d.="</td><td align=center>".
-             "<span class=viewselect ".
-             "OnClick=ChangeView(\"$view\",\"$dest\")>$view</span></td>";
+             "<a class=viewselect ".
+             "href=JavaScript:ChangeView(\"$view\",\"$dest\")>$view</a></td>";
          if ($allowfurther){
             $d.="<td align=right>".
-                "<a title=\"".
+                "<a class=viewtaboutput title=\"".
                 $self->getParent->getParent->T("use further functions or ".
                                                "select output format").
                 "\" href=JavaScript:FormatSelect(\"$view\",\"$dest\")>".
