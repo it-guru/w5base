@@ -48,6 +48,8 @@ sub getHttpHeader
    $d.="<link rel=stylesheet ".
        "href=\"../../base/load/Output.HtmlDetail.css\"></link>\n";
    $d.="<link rel=stylesheet ".
+       "href=\"../../base/load/Output.HtmlViewLine.css\"></link>\n";
+   $d.="<link rel=stylesheet ".
        "href=\"../../base/load/Output.HtmlViewEditor.css\"></link>\n";
    $d.="<link rel=stylesheet ".
        "href=\"../../base/load/MkTree.css\"></link>\n";

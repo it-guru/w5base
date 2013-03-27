@@ -51,6 +51,7 @@ sub getStyle
    my $app=$self->getParent->getParent();
    my $d="";
    $d.=$app->getTemplate("css/default.css","base");
+   $d.=$app->getTemplate("css/Output.HtmlViewLine.css","base");
    $d.=$app->getTemplate("css/Output.HtmlFormatSelector.css","base");
    return($d);
 }

@@ -1,0 +1,15 @@
+
+a:link.viewselect,a:visited.viewselect,a:active.viewselect    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#000000;
+          }
+
+a:focus.viewselect{
+   border-color:red;
+   border-width:1px;
+   border-style:solid;
+}
+
+
+
