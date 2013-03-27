@@ -748,7 +748,8 @@ sub SystemPartOfCorrection
    if (defined($val) && $val==0){             # recalculate "SystemPartOf" if
       my $lassetid=$current->{lassetid};      # value is 0 and not the complete
       if ($lassetid ne ""){                   # asset is distributed to systems
-         $sys->SetFilter({lassetid=>\$lassetid});
+         $sys->SetFilter({lassetid=>\$lassetid,
+                          status=>"\"!out of operation\""});
          my @l=$sys->getHashList(qw(partofassetdec));
          my $nullsys=0;
          my $sumok=0;

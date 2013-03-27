@@ -52,7 +52,8 @@
 'wfstate.7'=>{de=>'7-bestätigt',        en=>'7-confirmed'}, 
 'wfstate.8'=>{de=>'8-init',             en=>'8-init'},     
 'wfstate.9'=>{de=>'9-wiedereröffnet',   en=>'9-reopend'},
-'wfstate.10'=>{de=>'10-abgewiesen',     en=>'10-refused'},   #>15 = geschlossen
+'wfstate.10'=>{de=>'10-abgewiesen',     en=>'10-refused'},
+'wfstate.11'=>{de=>'11-nachgefragt'     en=>'11-inquired'},  #>15 = geschlossen
 'wfstate.16'=>{de=>'16-gelöst',         en=>'16-resolved'},
 'wfstate.17'=>{de=>'17-geschlossen',    en=>'17-closed'},
 'wfstate.18'=>{de=>'18-reflektion',     en=>'18-reflection'},  #>20 = beendet
