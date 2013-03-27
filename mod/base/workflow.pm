@@ -144,6 +144,44 @@ sub new
                                   effort comments creator
                                   intiatornotify)]),
                                    
+      new kernel::Field::Textarea(
+                name          =>'lateststate',
+                searchable    =>0,
+                label         =>'latest state',
+                group         =>'flow',
+                htmldetail    =>0,
+                depend        =>['shortactionlog'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+
+                   my $fobj=$self->getParent->getField("shortactionlog");
+                   my $d=$fobj->RawValue($current);
+                   my $state;
+                   if (defined($d) && ref($d) eq "ARRAY"){
+                      foreach my $arec (reverse(@{$d})){
+                         if ($arec->{comments} ne ""){
+                            $state=$arec->{comments};
+                            my $owner=$arec->{owner};
+                            if ($owner ne ""){
+                               my $user=getModuleObject(
+                                        $self->getParent->Config,"base::user"); 
+                               $user->SetFilter({userid=>\$owner});
+                               my ($actu,$msg)=$user->getOnlyFirst("purename");
+                               if (defined($actu)){
+                                  $owner=$actu->{purename};
+                               }
+                            }
+                            $state.="\n... by $owner" if ($owner ne "");
+                            last;
+                         }
+                      }
+                   }
+                   return($state) if (defined($state));;
+                   return($self->getParent->T("no action log entry"));
+                }),
+
+                                   
       new base::workflow::WorkflowRelation(
                 name          =>'relations',
                 searchable    =>0,

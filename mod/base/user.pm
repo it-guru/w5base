@@ -114,6 +114,25 @@ sub new
                    return($d);
                 }),
 
+      new kernel::Field::Text(
+                name          =>'purename',
+                htmlwidth     =>'280',
+                group         =>'name',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
+                depend        =>['surname','givenname'],
+                label         =>'pure name',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $secstate=$self->getParent->getCurrentSecState();
+                   my $d=$current->{surname};
+                   $d.=", " if ($d ne "" && $current->{givenname} ne "");
+                   $d.=$current->{givenname} if ($current->{givenname} ne "");
+                   return($d);
+                }),
+
 
       new kernel::Field::Select(
                 name          =>'usertyp',
