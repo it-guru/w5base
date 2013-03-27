@@ -37,6 +37,7 @@ foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
                        XML::Parser IO::Stringy MIME::Tools 
                        Crypt::DES Digest::MD5
                        Spreadsheet::WriteExcel::Big
+                       Spreadsheet::ParseExcel
                        Spreadsheet::ParseExcel::SaveParser
                        Net::Server XML::Smart IPC::Smart Data::Dumper RPC::Smart)){
    printf("INFO:  check module %-33s        ... ","'$module'");
