@@ -114,13 +114,24 @@ sub qcheckRecord
          $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
          my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
          my $posix=$posix[0];
-         if ($posix ne "" && $rec->{cistatusid}==4){
+         if ($posix ne "" && $rec->{cistatusid}==4 &&
+             $wiwrec->{office_state} ne "DTAG User"){
             my $user=getModuleObject($self->getParent->Config(),
                                       "base::user");
             $user->ValidatedUpdateRecord($rec,
                      {posix=>$posix},
                      {userid=>\$rec->{userid}}); # try to use found posix
          }
+      }
+      if ($wiwrec->{office_state} eq "DTAG User"){
+         if ($rec->{posix} ne ""){
+            $dataobj->Log(ERROR,"basedata",
+                   "Contact '%s'\nseems to have an invalid posix entry. ".
+                   "The\nWIW Status 'DTAG User' is not a real contact!".
+                   "\n-",
+                   $rec->{fullname});
+         }
+         return($errorlevel,undef);
       }
       my $forcedupd={};
       my $wfrequest={};

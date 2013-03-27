@@ -70,7 +70,6 @@ sub qcheckRecord
                                          groups posix cistatusid lastlogon
                                          fullname));
    if (defined($urec)){ # found correct urec record for user
-     # print STDERR Dumper($urec);
       if (defined($urec) && $urec->{email} ne "" &&
           $urec->{email} ne 'null@null.com' &&
           $urec->{usertyp} eq "user"){     # it seems to be a correct email
@@ -127,7 +126,7 @@ sub qcheckRecord
             }
             return($errorlevel,undef);
          }
-        # print STDERR Dumper($wiwrec);
+         print STDERR Dumper($wiwrec);
 
 
          my $wiwid=$wiwrec->{id};
@@ -141,6 +140,16 @@ sub qcheckRecord
 
          my $wrs=$wiwrec->{office_wrs};
          my $wiwstate=$wiwrec->{office_state};
+
+         if ($wiwstate eq "DTAG User"){
+            $wiwusr->Log(ERROR,"basedata",
+                "Contact '%s'\nseems to be a WebEx/SCP only user. ".
+                "Please check this and then clear the posix entry.".
+                "\n-",
+                $urec->{fullname});
+            return($errorlevel,undef);
+         }
+
          my $level1role="RFreelancer";
          if ($wiwstate eq "Intern" ||
              $wiwstate eq "Manager" ||
