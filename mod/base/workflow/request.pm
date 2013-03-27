@@ -31,6 +31,16 @@ sub new
 
    $self->AddFrontendFields(
       new kernel::Field::TextDrop(
+                name          =>'inquiryrequest',
+                label         =>'Inquiry to',
+                htmldetail    =>0,
+                group         =>'init',
+                vjointo       =>'base::user',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['inquiryrequestid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
                 name          =>'approverrequest',
                 label         =>'Approve requested by',
                 htmldetail    =>0,
@@ -57,6 +67,10 @@ sub new
                
                    return(@l); 
                 }),
+
+      new kernel::Field::Link (
+                name          =>'inquiryrequestid',
+                container     =>'headref'),
 
       new kernel::Field::Link (
                 name          =>'approverrequestid',
@@ -446,6 +460,20 @@ sub getPosibleActions
       if ($stateid<17){
          push(@l,"wfstartnew");   # neuen Workflow ableiten
          push(@l,"wfdefer");      # workflow zurückstellen
+      }
+   }
+   if ($iscurrent){
+      if ($stateid<17){
+         push(@l,"wfinquiry");    # Nachfrage stellen hinzufügen
+      }
+   }
+   if ($stateid==11){
+      if (!$iscurrent && $isworkspace){
+         push(@l,"wfaddsnote");  # the answer to an inquiry request
+         @l=grep(!/^nop$/,@l);   # remove nop entry
+      }
+      if ($iscurrent){
+        push(@l,"wfaddnote");
       }
    }
    if (($stateid==2 || $stateid==7 || $stateid==10 || $stateid==5) &&
@@ -1029,6 +1057,9 @@ sub generateWorkspacePages
    }
    if ($WfRec->{stateid}==1){
       $defop="wfactivate";
+   }
+   if ($WfRec->{stateid}==11){
+      $defop="wfaddsnote";
    }
    if ($WfRec->{stateid}==16){
       $defop="wfaddnote";

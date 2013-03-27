@@ -527,6 +527,11 @@ sub NotifyForward
            'An approve for Workflow %s has been requested to you').".",
            $workflowname);
       }
+      elsif ($param{mode} eq "INQUIRY:"){
+         $comments.="\n\n".sprintf($self->T(
+           'Please use the add note aktion in the workflow, to answer this inquiry').".",
+           $workflowname);
+      }
    }
    my $baseurl;
    if ($ENV{SCRIPT_URI} ne ""){

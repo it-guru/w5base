@@ -1,6 +1,7 @@
 'nop'=>{de=>'[ aktuell sind keine Aktionen durch Sie notwendig ]',en=>'[ there are no actions requiered by you at now ]'},
 'wfreject'=>{de=>'Anforderung ablehnen und zurück an Anforderer senden',en=>'reject request and send back to requestor'},
 'wfreject'=>{de=>'Anforderung ablehnen und zurück an Anforderer senden',en=>'reject request and send back to requestor'},
+'wfinquiry'=>{de=>'Rückfrage/Nachfrage erstellen',en=>'create inquiry mail'},
 'wfaddnote'=>{de=>'Bearbeitungshinweis oder Notiz hinzufügen',en=>'add note'},
 'wfaddsnote'=>{de=>'Bearbeitungshinweis oder Notiz hinzufügen',en=>'add note'},
 'wfacceptp'=>{de=>'Anforderung annehmen, abschließend bearbeiten und zurück an Anforderer',en=>'accept request, edit and finaly back to the requestor'},

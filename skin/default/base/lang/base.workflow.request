@@ -1,6 +1,7 @@
 'base::workflow::request'=>{de=>'Allgemeine Anforderung',en=>'generell request'},
 'base::workflow::request::tip'=>{de=>'Allgemeine Anforderungen unterliegen keinen speziellen Regeln. Sie können damit Anforderungen an beliebige Gruppen oder User schicken. Es sollte vorab geklärt werden, ob die Zielpersonen diesen Workflow auch bearbeiten/akzeptieren.',en=>'generell request'},
 'wfaddnote'=>{de=>'Notiz',en=>'Note'},
+'wfinquiry'=>{de=>'Nachfrage',en=>'Inquiry'},
 'wfaddsnote'=>{de=>'Notiz',en=>'Note'},
 'wfaccept'=>{de=>'Angenommen',en=>'Accepted'},
 'wfbreak'=>{de=>'Abgebrochen',en=>'Breaked'},
@@ -30,3 +31,4 @@
 'transform'=>{de=>'Umwandlung'},
 'Your request has been processed. For further informations use the attached link'=>{de=>'Ihre Anforderung wurde bearbeitet. Für weitere Informationen nutzen Sie bitte den beigefügten Link.'},
 'original request text'=>{de=>'Orginal Anforderungstext'},
+'Inquiry to'=>{de=>'Nachfrage bei'},

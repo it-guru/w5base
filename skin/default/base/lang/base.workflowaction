@@ -11,6 +11,7 @@
 'APROK:'=>{de=>'GENOK:'},
 'TAKEOVER:'=>{de=>'Übernahme:'},
 'FOLLOWUP:'=>{de=>'Nachtrag:'},
+'INQUIRY:'=>{de=>'Nachfrage:'},
 'APRREJ:'=>{de=>'GENABG:'},
 'DEFER:'=>{de=>'Zurückgestellt:'},
 'LABEL:unmark as deleted:'=>{de=>'Löschung entfernt',en=>'unmark as deleted'},
@@ -21,6 +22,7 @@
 'LABEL:FW:'=>{de=>'Weiterleitung',en=>'Forward'},
 'LABEL:TAKEOVER:'=>{de=>'Übernahme - der Workflow wurde Ihnen entzogen',en=>'Take over - the workflow has been revoked from you'},
 'LABEL:FOLLOWUP:'=>{de=>'Nachtrag',en=>'Followup'},
+'LABEL:INQUIRY:'=>{de=>'Nachfrage/Rückfrage',en=>'Inquiry'},
 'LABEL:APRREQ:'=>{de=>'Genehmigungsanforderung',en=>'Approve request'},
 'LABEL:INFO:'=>{de=>'Workflow Status Information',en=>'Workflow state information'},
 'The Workflow %s has been forwared to you without comments'=>{

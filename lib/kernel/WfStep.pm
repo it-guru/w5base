@@ -181,6 +181,15 @@ sub PostProcess
          #printf STDERR ("fifi no SaveStep.wffollowup message - user is sender\n");
       }
    }
+   if ($action eq "SaveStep.wfinquiry"){
+      $aobj->NotifyForward($WfRec->{id},
+                           $param{fwdtarget},
+                           $param{fwdtargetid},
+                           $param{fwdtargetname},
+                           $param{note},
+                           mode=>'INQUIRY:',
+                           sendercc=>1);
+   }
    if ($action eq "SaveStep.wfdefer"){
       my $userid=$WfRec->{initiatorid};
       if ($userid eq ""){
@@ -344,6 +353,72 @@ sub nativProcess
       }
       return(0);
    }
+   elsif ($op eq "wfinquiry"){
+      my $action=$op;
+      my $note=Query->Param("note");
+      $note=trim($note);
+   
+      my $inquiryrequest="inquiryrequest"; 
+      my $fobj=$self->getParent->getField($inquiryrequest);
+     # my $f=defined($newrec->{$inquiryrequest}) ?
+     #       $newrec->{$inquiryrequest} :
+     #       Query->Param("Formated_$inquiryrequest");
+      my $f=Query->Param("Formated_$inquiryrequest");
+
+      my $new1;
+      if ($new1=$fobj->Validate($WfRec,{$inquiryrequest=>$f})){
+         if (!defined($new1->{"${inquiryrequest}id"}) ||
+             $new1->{"${inquiryrequest}id"}==0){
+            if ($self->LastMsg()==0){
+               $self->LastMsg(ERROR,"invalid inquiry target");
+            }
+            return(0);
+         }
+      }
+      else{
+         return(0);
+      }
+      if ($self->getParent->getParent->getCurrentUserId()==
+          $new1->{"${inquiryrequest}id"}){
+         $self->LastMsg(ERROR,"you could'nt inquiry by your self");
+         return(0);
+      }
+      if ($note=~m/^\s*$/ ||
+          length($note)<10){
+         $self->LastMsg(ERROR,"you need to specified a descriptive note");
+         return(0);
+      }
+
+      my $inquiryrequestname=Query->Param("Formated_inquiryrequest");
+      my $info="\@:".$inquiryrequestname;
+      $info.="\n".$note;
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfinquiry",
+          {translation=>'base::workflow::request',
+           additional=>{
+                         approvereqtarget=>'base::user',
+                         approvereqtargetid=>$new1->{"${inquiryrequest}id"}
+                       }},$info,undef)){
+         my $openuserid=$WfRec->{openuser};
+         if ($self->getParent->getParent->AddToWorkspace($WfRec->{id},
+                            "base::user",$new1->{"${inquiryrequest}id"})){
+            if ($self->StoreRecord($WfRec,{stateid=>11})){
+               Query->Delete("OP");
+               #
+               # Mail versenden - Genehmigungsanforderung
+               #
+               $self->PostProcess("SaveStep.".$op,$WfRec,$actions,
+                              note=>$note,
+                              fwdtarget=>'base::user',
+                              fwdtargetid=>$new1->{"${inquiryrequest}id"},
+                              fwdtargetname=>$inquiryrequestname);
+               return(1);
+            }
+         }
+      }
+      return(0);
+   }
+
    elsif ($op eq "wfaddnote" || $op eq "wfaddsnote"){
       my $note=$h->{note};
       if ($note=~m/^\s*$/  || length($note)<10){
@@ -352,10 +427,18 @@ sub nativProcess
       }
       $note=trim($note);
       my $oprec={};
+      my $inquiryreset=0;
       if (grep(/^iscurrent$/,@{$actions})){ # state "in bearbeitung" darf
          $oprec->{stateid}=4;               # nur gesetzt werden, wenn
          $oprec->{postponeduntil}=undef;    # wf aktuell an mich zugewiesen
       }                                     # u. Rückstellung wird entfernt.
+      else{
+         if ($WfRec->{stateid}==11){
+            $oprec->{stateid}=2;
+            $inquiryreset=1;
+            $oprec->{postponeduntil}=undef;
+         }
+      }
       my $effort=$h->{effort};
       my $intiatornotify=$h->{intiatornotify};
       $intiatornotify=1 if ($intiatornotify ne "" &&
@@ -373,6 +456,9 @@ sub nativProcess
                $self->sendMail($WfRec,emailtext=>$note,
                                       emailto=>$urec->{email}); 
             }
+         }
+         if ($inquiryreset){
+            $self->sendMail($WfRec,emailtext=>$note); 
          }
          $self->StoreRecord($WfRec,$oprec);
          $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
@@ -610,6 +696,44 @@ sub sendMail
    else{
       $m{emailto}=trim($param{emailto});
    }
+   if ($param{emailto} eq ""){
+      my $fwdtarget=$WfRec->{fwdtarget};
+      my $fwdtargetid=$WfRec->{fwdtargetid};
+      my @to;
+      if ($fwdtarget eq "base::user"){
+         my $u=getModuleObject($self->Config,"base::user");
+         $u->SetFilter(userid=>\$fwdtargetid);
+         my ($rec,$msg)=$u->getOnlyFirst(qw(email));
+         if (defined($rec)){
+            push(@to,$rec->{email});
+         }
+      }
+      if ($fwdtarget eq "base::grp"){
+         my $grp=$self->{grp};
+         if (!defined($grp)){
+            $grp=getModuleObject($self->Config,"base::grp");
+            $self->{grp}=$grp;
+         }
+         $grp->ResetFilter();
+         if ($fwdtargetid ne ""){
+            $grp->SetFilter(grpid=>\$fwdtargetid);
+         }
+         my @acl=$grp->getHashList(qw(grpid users));
+         my %u=();
+         #msg(INFO,"d=%s",Dumper(\@acl));
+         foreach my $grprec (@acl){
+         #msg(INFO,"d=%s %s",ref($grprec->{users}),Dumper($grprec));
+            if (defined($grprec->{users}) && ref($grprec->{users}) eq "ARRAY"){
+               foreach my $usr (@{$grprec->{users}}){
+                  $u{$usr->{email}}=1;
+               }
+            }
+         }
+         @to=[keys(%u)];
+      }
+      $m{emailto}=\@to;
+   }
+
    if ($ENV{SCRIPT_URI} ne ""){
       my $baseurl=$ENV{SCRIPT_URI};
       $baseurl=~s#/(auth|public)/.*$##;
@@ -925,6 +1049,21 @@ sub generateWorkspacePages
                 "</option>\n";
       $$divset.="<div id=OPwfaddnote class=\"$class\">".
                 $self->getDefaultNoteDiv($WfRec,$actions).
+                "</div>";
+   }
+   if (grep(/^wfinquiry$/,@$actions)){
+      $$selopt.="<option value=\"wfinquiry\">".
+                $self->getParent->T("wfinquiry",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfinquiry class=\"$class\">".
+                "<table width=100% border=0 cellspacing=0 cellpadding=0>".
+                "<tr><td width=1% nowrap>&nbsp;%inquiryrequest(label)% ".
+                ":&nbsp;</td>".
+                "<td>\%inquiryrequest(detail)\%".
+                "</td></tr>".
+                "</table>".
+                $self->getDefaultNoteDiv($WfRec,$actions,mode=>'inquiry',
+                                                         height=>80).
                 "</div>";
    }
    if (grep(/^wfaddsnote$/,@$actions)){
