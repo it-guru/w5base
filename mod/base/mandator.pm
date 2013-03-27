@@ -72,7 +72,7 @@ sub new
                 },
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'grpid',
                 dataobjattr   =>'mandator.grpid'),
 
