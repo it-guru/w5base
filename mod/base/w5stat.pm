@@ -51,7 +51,8 @@ sub new
       new kernel::Field::Select(
                 name          =>'sgroup',
                 label         =>'Statistic Group',
-                value         =>['Group','Application','Location','User',
+                value         =>['Mandator','Group',
+                                 'Application','Location','User',
                                  'Contract'],
                 dataobjattr   =>'w5stat.statgroup'),
 

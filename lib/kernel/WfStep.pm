@@ -597,6 +597,18 @@ sub Process
          my $postponeduntil=Query->Param("Formated_postponeduntil");
          $oprec->{postponeduntil}=$app->ExpandTimeExpression($postponeduntil);
          if ($oprec->{postponeduntil} ne ""){
+            my $from=$WfRec->{eventstart};
+            my $d=CalcDateDuration($from,$oprec->{postponeduntil});
+            if ($d->{totaldays}>300){
+               $self->LastMsg(ERROR,"defer not allowed! ".
+                 "- Target date is more then 300 days after start of workflow");
+               return(undef);
+            }
+            my $d=CalcDateDuration(NowStamp("en"),$oprec->{postponeduntil});
+            if ($d->{totalminutes}<720){
+               $self->LastMsg(ERROR,"target date must be behind now");
+               return(undef);
+            }
             if ($app->Action->StoreRecord($WfRec->{id},"wfdefer",
                 {translation=>'base::workflow::request'},$note)){
                $self->StoreRecord($WfRec,$oprec);
@@ -604,6 +616,7 @@ sub Process
                $self->PostProcess($action.".".$op,$WfRec,$actions,
                                   note=>$note);
                Query->Delete("note");
+               Query->Delete("OP");
                return(1);
             }
          }
@@ -1255,25 +1268,61 @@ sub getDefaultNoteDiv
    }
    if ($mode eq "defer"){
       my $app=$self->getParent->getParent;
+      #######################################################################
+      # Build a select box with free editable entry (other)
+      #
+      my $eid="e".time().int(rand(1000));
+      my $oldval=Query->Param("Formated_postponeduntil");
+      $oldval="now+7d" if ($oldval eq "" || $oldval eq "now+?d");
       my @t=(
              'now+7d'  =>$app->T("one week"),
              'now+14d' =>$app->T("two weeks"),
              'now+28d' =>$app->T("one month"),
              'now+60d' =>$app->T("two months"),
              'now+90d' =>$app->T("three months"),
-             'now+180d'=>$app->T("half a year"));
+             'now+180d'=>$app->T("half a year"),
+             'now+?d'  =>$app->T("other"));
       $d.="<tr><td width=1% nowrap>".
           $app->T("postponed until").
           ":&nbsp;</td>".
-          "<td><select name=Formated_postponeduntil style=\"width:180px\">";
-      my $oldval=Query->Param("Formated_postponeduntil");
+          "<td>";
+      my $s="";
+      $s.="<script language=\"JavaScript\" type=\"text/javascript\">";
+      $s.="function OnChange$eid(dropDown){";
+      $s.="var selectedValue = dropDown.options[dropDown.selectedIndex].value;";
+      $s.="document.getElementById(\"text$eid\").value=selectedValue;";
+      $s.="if (selectedValue=='now+?d'){";
+      $s.=" document.getElementById(\"text$eid\").type='text';";
+      $s.=" dropDown.style.display='none';";
+      $s.=" dropDown.style.visibility='hidden';";
+      $s.="}";
+      $s.="}";
+      $s.="</script>";
+      $s.="<select onChange=\"OnChange$eid(this);\" style=\"width:200px\">";
+      my $foundentry=0;
       while(defined(my $min=shift(@t))){
          my $l=shift(@t);
-         $d.="<option value=\"$min\"";
-         $d.=" selected" if ($min eq $oldval);
-         $d.=">$l</option>";
+         $s.="<option value=\"$min\"";
+         if ($min eq $oldval){
+            $s.=" selected";
+            $foundentry++;
+         }
+         $s.=">$l</option>";
       }
-      $d.="</select></td>";
+      $s.="</select>";
+      my $textboxtype="text";
+      if ($foundentry){
+         $textboxtype="hidden";
+         $d.=$s;
+      }
+
+      $oldval=quoteHtml($oldval);
+      $d.="<input id=\"text$eid\" ".
+          "type=\"$textboxtype\" value=\"$oldval\" ".
+          "style=\"width:200px\" ".
+          "name=\"Formated_postponeduntil\">";
+      #######################################################################
+      $d.="</td>";
       $d.="</tr>";
    }
    $d.="</table>";

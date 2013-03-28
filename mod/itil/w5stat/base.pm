@@ -422,20 +422,41 @@ sub processRecord
          $self->getParent->storeStatVar("Group",[$rec->{businessteam},
                                                  $rec->{responseteam}],{},
                                         "ITIL.Application.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Application.Count",1);
       }
       if ($rec->{cistatusid}<=5){
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "ITIL.Total.Application.Count",1);
+
+      }
+      if ($rec->{dataissuestate} ne "OK"){
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "base.DataIssue.open",1);
       }
    }
    if ($module eq "itil::system"){
       if ($rec->{cistatusid}==4){
          $self->getParent->storeStatVar("Group",[$rec->{adminteam}],{},
                                         "ITIL.System.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.System.Count",1);
       }
       if ($rec->{cistatusid}<=5){
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "ITIL.Total.System.Count",1);
+      }
+      if ($rec->{dataissuestate} ne "OK"){
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "base.DataIssue.open",1);
       }
    }
    if ($module eq "itil::swinstance"){
