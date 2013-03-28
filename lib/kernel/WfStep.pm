@@ -1292,9 +1292,10 @@ sub getDefaultNoteDiv
       $s.="var selectedValue = dropDown.options[dropDown.selectedIndex].value;";
       $s.="document.getElementById(\"text$eid\").value=selectedValue;";
       $s.="if (selectedValue=='now+?d'){";
-      $s.=" document.getElementById(\"text$eid\").type='text';";
+      $s.=" document.getElementById(\"text$eid\").style.visibility='visible';";
       $s.=" dropDown.style.display='none';";
       $s.=" dropDown.style.visibility='hidden';";
+      $s.=" dropDown.style.width='0px';";
       $s.="}";
       $s.="}";
       $s.="</script>";
@@ -1310,16 +1311,16 @@ sub getDefaultNoteDiv
          $s.=">$l</option>";
       }
       $s.="</select>";
-      my $textboxtype="text";
+      my $textboxtype="visibility:visible";
       if ($foundentry){
-         $textboxtype="hidden";
+         $textboxtype="visibility:hidden";
          $d.=$s;
       }
 
       $oldval=quoteHtml($oldval);
       $d.="<input id=\"text$eid\" ".
-          "type=\"$textboxtype\" value=\"$oldval\" ".
-          "style=\"width:200px\" ".
+          "type=\"text\" value=\"$oldval\" ".
+          "style=\"width:200px;$textboxtype\" ".
           "name=\"Formated_postponeduntil\">";
       #######################################################################
       $d.="</td>";
