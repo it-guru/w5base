@@ -1,4 +1,4 @@
-'faq'=>{de=>'Wissensmanagement',en=>'Knowleged-Management'},
+'faq'=>{de=>'Wissensmanagement',en=>'Knowledge-Management'},
 'faq.article'=>{de=>'FAQ-Artikel',en=>'FAQ-Article'},
 'faq.article.new'=>{de=>'Neueingabe',en=>'New'},
 'faq.article.acl'=>{de=>'Zugriffssteuerung',en=>'Accesscontrol'},
