@@ -191,28 +191,22 @@ sub new
                 dataobjattr   =>'swinstance.servicesupport'),
 
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'adm',
                 label         =>'Instance Administrator',
                 group         =>'adm',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['admid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['admid'=>'userid']),
 
       new kernel::Field::Link(
                 name          =>'admid',
                 group         =>'adm',
                 dataobjattr   =>'swinstance.adm'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'adm2',
                 label         =>'Deputy Instance Administrator',
                 group         =>'adm',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['adm2id'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['adm2id'=>'userid']),
 
       new kernel::Field::Link(
                 name          =>'adm2id',
