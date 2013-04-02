@@ -28,6 +28,7 @@
 'Approve requested by'=>{de=>'Genehmigung angefordert bei'},
 'Alternate approve requested by'=>{de=>'Genehmigung alternativ angefordert bei'},
 'forward to'=>{de=>'Weiterleitung an'},
+'is default forward'=>{de=>'Standard Anforderungseingang'},
 'transform'=>{de=>'Umwandlung'},
 'Your request has been processed. For further informations use the attached link'=>{de=>'Ihre Anforderung wurde bearbeitet. Für weitere Informationen nutzen Sie bitte den beigefügten Link.'},
 'original request text'=>{de=>'Orginal Anforderungstext'},

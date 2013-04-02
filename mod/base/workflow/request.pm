@@ -182,6 +182,12 @@ sub getDynamicFields
                 readonly      =>1,
                 container     =>'headref'),
 
+      new kernel::Field::Boolean( 
+                name        =>'isdefaultforward',
+                label       =>'is default forward',
+                htmldetail    =>0,
+                container   =>'headref'),
+
 
     ));
 }
@@ -725,6 +731,7 @@ sub nativProcess
       }
       $h->{stateid}=1;
       $h->{step}=$self->getNextStep();
+      $h->{isdefaultforward}=0;
       if (!$h->{noautoassign}){
          $h->{stateid}=2;
          if ($target ne ""){
@@ -738,6 +745,7 @@ sub nativProcess
             $h->{fwddebtarget}=$fwddebtarget;
             $h->{fwddebtargetid}=$fwddebtargetid;
          }
+         $h->{isdefaultforward}=1;
       }
       $h->{eventend}=undef;
       $h->{closedate}=undef;

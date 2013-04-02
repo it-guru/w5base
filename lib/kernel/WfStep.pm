@@ -533,6 +533,10 @@ sub Process
          my $fobj=$self->getParent->getField("fwdtargetname");
          my $h=$self->getWriteRequestHash("web");
          my $newrec;
+         if (!defined($h->{isdefaultforward}) &&
+             defined($self->getParent->getField("isdefaultforward"))){
+            $h->{isdefaultforward}=0;
+         }
          if ($newrec=$fobj->Validate($WfRec,$h)){
             if (!defined($newrec->{fwdtarget}) ||
                 !defined($newrec->{fwdtargetid} ||
