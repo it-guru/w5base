@@ -126,7 +126,6 @@ sub qcheckRecord
             }
             return($errorlevel,undef);
          }
-         print STDERR Dumper($wiwrec);
 
 
          my $wiwid=$wiwrec->{id};
@@ -474,7 +473,6 @@ sub createGrp
                comments=>"Description from WhoIsWho: ".$wiwrec->{name});
    $newgrp{name}=~s/&/_u_/g;
    $newgrp{parentid}=$parentid if (defined($parentid));
-   msg(DEBUG,"Write=%s",Dumper(\%newgrp));
    my $back=$grp->ValidatedInsertRecord(\%newgrp);
    msg(DEBUG,"ValidatedInsertRecord returned=$back");
 
