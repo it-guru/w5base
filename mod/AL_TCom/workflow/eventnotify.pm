@@ -151,13 +151,29 @@ sub getDynamicFields
                 onRawValue    =>\&calcKPIs),
 
       new kernel::Field::Text(
+                name          =>'solutionline',
+                xlswidth      =>'40',
+                htmldetail    =>0,
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'Solution Line',
+                delend        =>['mandator'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $m=$self->getParent->getField("mandator")->RawValue($current);
+                   $m=[$m] if (ref($m) ne "ARRAY");
+                   my @l=grep(/Telekom.*Solution/,@$m);
+                   return(\@l);
+                }),
+
+      new kernel::Field::Text(
                 name          =>'eventchmticket',
                 xlswidth      =>'15',
                 translation   =>'AL_TCom::workflow::eventnotify',
                 group         =>'eventnotifyinternal',
                 label         =>'event initiating change number',
                 container     =>'headref'),
-
 
       new kernel::Field::Textarea(
                 name          =>'eventscproblemcause',
@@ -168,6 +184,7 @@ sub getDynamicFields
                 htmldetail    =>\&isSCproblemSet,
                 depend        =>['eventprmticket'],
                 label         =>'SC Problem cause'),
+
       new kernel::Field::Textarea(
                 name          =>'eventscproblemsolution',
                 translation   =>'AL_TCom::workflow::eventnotify',

@@ -141,14 +141,25 @@ sub Result
          sheet=>$s,
          DataObj=>'base::workflow',
          filter=>{id=>$sheet{$s}},
-         view=>[qw(name 
-                   wffields.eventstartofevent
+         view=>[qw(
                    wffields.eventendofevent
+                   wffields.affectedlocation wffields.affectedapplication
+                   name 
+                   wffields.eventstartofevent
                    wffields.qceventendofevent
 
+                   wffields.solutionline
+
+                   wffields.eventstatclass
+                   wffields.affectedregion
+                   wffields.eventstatrespo
+                   wffields.eventstatreason
+
                    wffields.affecteditemprio
-                   prio
+
                    eventduration
+                   eventdurationhour
+
                    wffields.eventkpifirstinfo
                    wffields.eventchmticket
                    wffields.eventprmticket

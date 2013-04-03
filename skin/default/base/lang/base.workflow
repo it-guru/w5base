@@ -27,6 +27,7 @@
 'Event-Start day'=>{de=>'Ereignis Beginn Tag'},
 'Event-End day'=>{de=>'Ereignis Ende Tag'},
 'Event-Duration Minutes'=>{de=>'Ereignis Dauer in Minuten'},
+'Event-Duration Hours'=>{de=>'Ereignis Dauer in Stunden'},
 'Event-Duration'=>{de=>'Ereignis Dauer'},
 'sum documented efforts'=>{de=>'Summe dokumentierter Aufwände (intern)'},
 'marked as delete'=>{de=>'gelöscht markiert'},

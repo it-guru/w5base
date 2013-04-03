@@ -483,7 +483,16 @@ sub new
                 visual        =>'minutes',
                 label         =>'Event-Duration Minutes',
                 depend        =>['eventstart','eventend']),
-                                   
+
+      new kernel::Field::Duration(
+                name          =>'eventdurationhour',
+                htmlwidth     =>'100px',
+                htmldetail    =>'0',
+                group         =>'state',
+                visual        =>'hours',
+                label         =>'Event-Duration Hours',
+                depend        =>['eventstart','eventend']),
+
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'state',

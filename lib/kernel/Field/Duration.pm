@@ -77,11 +77,14 @@ sub FormatedDetail
          if ($self->{visual} eq "auto"){
             return($prefix.$duration->{string});
          }
+         elsif ($self->{visual} eq "hours"){
+            return($prefix.sprintf("%.2f",($duration->{totalminutes}/60.0)));
+         }
          elsif ($self->{visual} eq "minutes"){
-            return($prefix.sprintf("%.4f",$duration->{totalminutes}));
+            return($prefix.sprintf("%d",int($duration->{totalminutes})));
          }
          elsif ($self->{visual} eq "seconds"){
-            return($prefix.sprintf("%.4f",$duration->{totalseconds}));
+            return($prefix.sprintf("%d",int($duration->{totalseconds})));
          }
       }
       return($duration->{totalminutes});

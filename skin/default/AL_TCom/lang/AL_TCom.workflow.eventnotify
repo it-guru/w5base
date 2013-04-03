@@ -36,3 +36,4 @@
 'SC Problem cause'=>{de=>'Ermittelte Ursache'},
 'SC Problem soultion'=>{de=>'Umzusetzende Maßnahmen'},
 'result of root cause analysis'=>{de=>'Ergebnis der Ursachenanalyse'},
+'Solution Line'=>{de=>'Solution Säule'},
