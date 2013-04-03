@@ -34,8 +34,12 @@ sub new
    my $self=bless({@_},$type);
    $self->{out}=new kernel::Output::XlsV01();
    $self->setParent($parent);
-   if ($filename ne ""){
+   $self->{filename}=$filename;
+   if ($filename ne "" && $filename ne ">&STDOUT"){
       $self->setFilename($filename);
+   }
+   else{
+      $self->setFilename("/tmp/out.xls");
    }
 
    return($self);
@@ -175,6 +179,11 @@ sub Process
       }
    }
    $out->closeWorkbook();
+   if ($self->{filename} eq ">&STDOUT"){
+      print STDOUT ($out->DownloadHeader().
+                    $out->getHttpHeader());
+      $out->Finish();
+   }
    if (ref($self->{FinalFilename}) eq "ARRAY"){
       my $filename=$self->{TempFilename};
       foreach my $FinalFilename (@{$self->{FinalFilename}}){

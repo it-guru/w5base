@@ -147,8 +147,9 @@ sub Run
          }
          $filename=[$filename];
       }
-      #msg(INFO,"load=$func");
-
+      if ($content eq ""){
+         $content="text/html";
+      }
      
       print $self->HttpHeader($content,%param);
       foreach my $file (@$filename){

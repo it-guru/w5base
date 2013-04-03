@@ -146,9 +146,17 @@ sub Main
          $o->ParseTemplateVars(\$templ);
       }
       printf("<tr><td valign=top height=1%%>%s</td></tr>",$templ);
-      my $if="<iframe src=\"../../base/load/loading\" ".
-             "name=Result style=\"width:100%;height:100%\">".
+      my $if;
+      if ($curquery->can("Welcome")){
+         $if="<iframe src=\"Welcome?MyW5BaseSUBMOD=$oldval\" ".
+             "name=Result id=Result style=\"width:100%;height:100%\">".
              "</iframe>";
+      }
+      else{
+         $if="<iframe src=\"../../base/load/loading\" ".
+             "name=Result id=Result style=\"width:100%;height:100%\">".
+             "</iframe>";
+      }
       printf("<tr><td>%s</td></tr>",$if);
    }
    else{
@@ -219,6 +227,10 @@ function DoSearch()
 
 function SelectionChanged()
 {
+   var o=document.getElementById('Result');
+   if (o){  // reset content of a posible existing Result iframe
+      o.src="about:blank";
+   }
    document.forms[0].target="_self";
    document.forms[0].action="Main";
    document.forms[0].submit();
@@ -236,6 +248,15 @@ EOF
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
+
+sub Welcome
+{
+   my $self=shift;
+   my $oldval=Query->Param($self->{'PlugableSelektor'});
+   if (defined($oldval) && exists($self->{SubDataObj}->{$oldval})){
+      return($self->{SubDataObj}->{$oldval}->Welcome());
+   }
+}
 
 sub Result
 {

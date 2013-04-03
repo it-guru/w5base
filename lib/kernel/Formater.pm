@@ -96,7 +96,12 @@ sub DownloadHeader
    my $self=shift;
    my $d="";
    $d.="Content-Name: ".$self->getDownloadFilename()."\n";
-   if ($self->getParent->{download}){
+
+   my $download=1;
+   if (ref($self->getParent())){
+      $download=$self->getParent->{download};
+   }
+   if ($download){
       $d.="Content-Disposition: attachment; filename=".
           $self->getDownloadFilename()."\n";
    }
@@ -110,7 +115,10 @@ sub DownloadHeader
 sub getDownloadFilename
 {
    my $self=shift;
-   my $file=lc($self->getParent->getParent()->Self());
+   my $file="report";
+   if (ref($self->getParent()) && ref($self->getParent->getParent())){
+      $file=lc($self->getParent->getParent()->Self());
+   }
    $file=~s/::/_/g;
 
    return($file);

@@ -57,7 +57,7 @@ sub Module
    my $self=shift;
    return($self->{OrigModule}) if (exists($self->{OrigModule}));
    my $s=$self->Self();
-   my ($module,$app)=$s=~m/^(.*)::(.*)$/;
+   my ($module,$app)=$s=~m/^(.*?)::(.*)$/;
    return($module);
 }
 
@@ -65,7 +65,8 @@ sub App
 {
    my $self=shift;
    my $s=$self->Self();
-   my ($module,$app)=$s=~m/^(.*)::(.*)$/;
+   my ($module,$app)=$s=~m/^(.*?)::(.*)$/;
+   $app=~s/::/./g;
    return($app);
 }
 

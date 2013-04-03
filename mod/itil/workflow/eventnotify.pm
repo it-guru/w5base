@@ -544,6 +544,21 @@ sub getDynamicFields
                 label         =>'Internal comments',
                 container     =>'headref'),
 
+      new kernel::Field::Boolean(
+                name          =>'netdurationsolved4h',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                label         =>'net event duration less then 4h',
+                container     =>'headref'),
+
+      new kernel::Field::Boolean(
+                name          =>'rcfound10wt',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifyinternal',
+                default       =>'1',
+                label         =>'Root-Cause found in less then 10wt',
+                container     =>'headref'),
+
       new kernel::Field::Select(
                 name          =>'eventstatnature',
                 translation   =>'itil::workflow::eventnotify',

@@ -140,6 +140,24 @@ sub sendResultFromLastMsg
 
 }
 
+sub Welcome
+{
+   my $self=shift;
+   print $self->getParent->HttpHeader("text/html");
+   print $self->getParent->HtmlHeader(style=>['default.css','mainwork.css'],
+                           body=>1,form=>1);
+   my $module=$self->Module();
+   my $appname=$self->App();
+   my $tmpl="tmpl/$appname.welcome";
+   my @detaillist=$self->getParent->getSkinFile("$module/".$tmpl);
+   if ($#detaillist!=-1){
+      print $self->getParent->getParsedTemplate($tmpl,{skinbase=>$module});
+   }
+   print $self->getParent->HtmlBottom(body=>1,form=>1);
+   return(0);
+}
+
+
 
 
 
@@ -233,6 +251,19 @@ sub getTimeRangeDrop
             $d.=" selected" if ($exp eq $oldval);
             $d.=">$nam</option>";
             $k{$exp}=$nam;
+         }
+      }
+      if ($blk eq "year"){
+         my $histl=5;
+         $histl=3 if (grep(/^shorthist$/,@modes));
+         $histl=10 if (grep(/^longhist$/,@modes));
+         my $sY=$year;
+         for(my $c=0;$c<=$histl;$c++){
+            my $eY=$sY-$c;
+            my $exp="($eY)";
+            $d.="<option value=\"".$exp."\"";
+            $d.=" selected" if ($c==0);
+            $d.=">$eY</option>\n";
          }
       }
       if ($blk eq "month" || $blk eq "monthyear" || $blk eq "fixmonth"){
