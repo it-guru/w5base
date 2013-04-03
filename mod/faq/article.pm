@@ -380,7 +380,7 @@ sub Validate
       $tf->allow_tags({
                        strong=>{},
                        sup=>{}, sub=>{},
-                       ol=>{}, ul=>{}, li=>{},
+                       ol=>{type=>['any'=>[]]}, ul=>{}, li=>{},
                        h1=>{style=>[any=>[]]}, 
                        h2=>{style=>[any=>[]]}, 
                        h3=>{style=>[any=>[]]}, 
