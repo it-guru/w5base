@@ -2481,11 +2481,12 @@ sub RawValue
    my $key=shift;
    my $current=shift;
    my $field=shift;
+   my $mode=shift;
    if (!defined($field)){
       #msg(ERROR,"access to unknown field '$key' in $self");
       return(undef);
    }
-   return($field->RawValue($current));
+   return($field->RawValue($current,$mode));
 }
 
 sub getSubList

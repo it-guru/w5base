@@ -1019,6 +1019,7 @@ sub FETCH
 {
    my $self=shift;
    my $key=shift;
+   my $mode=shift;
 
    return($self->{Rec}->{$key}) if (exists($self->{Rec}->{$key}));
    my $p=$self->getParent();
@@ -1030,7 +1031,7 @@ sub FETCH
       else{
          $fobj=$self->{View}->{$key};
       }
-      return($p->RawValue($key,$self->{Rec},$fobj));
+      return($p->RawValue($key,$self->{Rec},$fobj,$mode));
    }
    return("- unknown parent for '$key' - DataObj isn't valid at now -");
 }

@@ -137,9 +137,9 @@ sub FormatedDetail
       if (defined(@fromquery)){
          $d=\@fromquery;
       }
-      if (($#{$d}==-1 && defined($self->default))||
+      if (($#{$d}==-1 && defined($self->{default}))||
           ($#{$d}==0 && !defined($d->[0]))){
-         $d=[$self->default];
+         $d=[$self->default($current)];
       }
       my $width="100%";
       $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth}));

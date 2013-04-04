@@ -377,7 +377,6 @@ sub vjoinContext
       $context.=join(",",@{$self->{vjoinon}});
    }
    if (defined($self->{vjoinbase})){
-#printf STDERR ("fifi vjoinbase=%s on %s\n",$self->{vjoinbase},$self->Name());
       my @l;
       @l=@{$self->{vjoinbase}} if (ref($self->{vjoinbase}) eq "ARRAY");
       @l=%{$self->{vjoinbase}} if (ref($self->{vjoinbase}) eq "HASH");
@@ -731,14 +730,24 @@ sub RawValue
 {
    my $self=shift;
    my $current=shift;
+   my $mode=shift;    # ATTENTION! - This is not always set! (at now 03/2013)
    my $d;
 
+   my $tcurrent=tied(%$current);
+   if (defined($tcurrent)){
+      $current->{$self->{name}}=$tcurrent->FETCH($self->{name},$mode);
+      if ((!defined($current->{$self->{name}}) ||
+           $current->{$self->{name}} eq "") && exists($self->{default})){
+         $d=$self->default($current,$mode);
+      }
+   }
+
    if (exists($current->{$self->Name()}) &&
-       !(!defined($current->{$self->Name()}) && $self->{noUndefRawCaching})){
-      $d=$current->{$self->Name()};
+       !(!defined($current->{$self->{name}}) && $self->{noUndefRawCaching})){
+      $d=$current->{$self->{name}};
    }
    elsif (defined($self->{onRawValue}) && ref($self->{onRawValue}) eq "CODE"){
-      $current->{$self->Name()}=&{$self->{onRawValue}}($self,$current);
+      $current->{$self->Name()}=&{$self->{onRawValue}}($self,$current,$mode);
       $d=$current->{$self->Name()};
    }
    elsif (defined($self->{vjointo}) && 
@@ -793,6 +802,10 @@ sub RawValue
             }
          }
       }
+      my @fltlst=(\%flt);
+      if (ref($self->{vjoinonfine}) eq "CODE"){  # this allows dynamic joins
+         @fltlst=&{$self->{vjoinonfinish}}($self,\%flt,$current);
+      }
       my $joinkey=join(";",map({ my $k=$flt{$_};
                                  $k=$$k if (ref($k) eq "SCALAR");
                                  $k=join(";",@$k) if (ref($k) eq "ARRAY");
@@ -802,7 +815,7 @@ sub RawValue
       delete($self->{VJOINKEY});
       delete($self->{VJOINCONTEXT});
       if (keys(%flt)>0){
-         if ($joinval){ 
+         if ($#fltlst!=-1 && $joinval){ 
             if (!exists($c->{$joinkey})){
                $self->vjoinobj->ResetFilter();
                if (defined($self->{vjoinbase})){
@@ -817,7 +830,7 @@ sub RawValue
                      $self->vjoinobj->SetNamedFilter("BASE",@{$base});
                   }
                }
-               $self->vjoinobj->SetFilter(\%flt);
+               $self->vjoinobj->SetFilter(@fltlst);
                $c->{$joinkey}=[$self->vjoinobj->getHashList(@view)];
                if ($#{$c->{$joinkey}}==-1){
                   if (!$self->vjoinobj->Ping()){
@@ -896,8 +909,10 @@ sub RawValue
    if (ref($self->{prepRawValue}) eq "CODE"){
       $d=&{$self->{prepRawValue}}($self,$d,$current);
    }
-   $d=$self->{default} if (exists($self->{default}) && (!defined($d) ||
-                           $d eq ""));
+   # attention - default values are NOT cached in record - multi calles posible!
+   if (exists($self->{default}) && (!defined($d) || $d eq "")){
+      $d=$self->default($current,$mode); #allow code pointers for default values
+   }
    return($d);
 }
 
@@ -953,8 +968,6 @@ sub FinishWrite
    my $oldrec=shift;
    my $newrec=shift;
 
-   #printf STDERR ("fifi default FinishWrite handler for field %s\n",
-   #               $self->{name});
    if (defined($self->{onFinishWrite}) && 
        ref($self->{onFinishWrite}) eq "CODE"){   
       return(&{$self->{onFinishWrite}}($self,$oldrec,$newrec));

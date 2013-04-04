@@ -51,7 +51,7 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $mode=shift;
-   my $d=$self->RawValue($current);
+   my $d=$self->RawValue($current,$mode);
    my $name=$self->Name();
    if ($mode eq "HtmlSubList" || $mode eq "HtmlV01" || 
        $mode eq "HtmlDetail" || $mode eq "HtmlChart"){

@@ -583,11 +583,12 @@ sub FETCH
 {
    my $self=shift;
    my $key=shift;
+   my $mode=shift;
 
    return($self->{Rec}->{$key}) if (exists($self->{Rec}->{$key}));
    my $field=$self->getParent->getField($key);
    return(undef) if (!defined($field));
-   return($field->RawValue($self->{Rec}));
+   return($field->RawValue($self->{Rec},$mode));
 }
 
 

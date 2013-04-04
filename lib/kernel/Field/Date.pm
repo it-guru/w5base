@@ -43,7 +43,7 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $mode=shift;
-   my $d=$self->RawValue($current);
+   my $d=$self->RawValue($current,$mode);
    my $delta;
    my $dayoffset;
    my $timeonly;
