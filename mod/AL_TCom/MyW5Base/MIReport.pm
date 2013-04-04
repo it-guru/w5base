@@ -68,8 +68,13 @@ sub getQueryTemplate
 <table class=searchframe>
 <tr>
 <td class=fname width=10%>Year:</td><td class=finput>$tt</td>
-<td class=fname width=20%>&nbsp;</td>
-<td class=finput width=30% nowrap>&nbsp;</td>
+<td class=fname width=20%>Only Prio 1 events:</td>
+<td class=finput width=30% nowrap>
+<select name=search_onlyprio1>
+<option selected value="1">Yes</option>
+<option value="0">No - show all</option>
+</select>
+</td>
 </tr>
 <tr>
 <td colspan=4 align=right>
@@ -98,7 +103,14 @@ sub doAutoSearch
 sub Result
 {
    my $self=shift;
-   my $year=Query->Param("search_year");
+   my $wf=getModuleObject($self->Config,"base::workflow");
+   my %flt=$wf->getSearchHash();
+   print STDERR Dumper(\%flt);
+
+
+
+   my $year=$flt{year};
+   my $onlyprio1=$flt{onlyprio1};
    my $tz=$self->getParent->UserTimezone();
    my ($y,$m,$d)=Today_and_Now($tz);
 
@@ -118,7 +130,6 @@ sub Result
    }
    msg(INFO,"processing MI-Report for '$year'");
 
-   my $wf=getModuleObject($self->Config,"base::workflow");
    my $mi=getModuleObject($self->Config,"itil::lnkmgmtitemgroup");
    $wf->SetFilter({eventend=>$year,
                    class=>['AL_TCom::workflow::eventnotify',
@@ -127,10 +138,12 @@ sub Result
 
    my %sheet=();
    foreach my $wfrec ($wf->getHashList(qw(wffields.eventmode 
+                                  wffields.eventstatclass
                                   wffields.affecteditemgroup id))){
       my $top=$wfrec->{affecteditemgroup};
       $top="NONE" if (!defined($top) || $top eq "");
       $top=[split(/\s*;\s*/,$top)] if (ref($top) ne "ARRAY");
+      next if ($onlyprio1 && $wfrec->{eventstatclass} ne "1");
       foreach my $t (@$top){
          push(@{$sheet{$t}},$wfrec->{id});
       }
@@ -159,11 +172,21 @@ sub Result
 
                    eventduration
                    eventdurationhour
+                   wffields.eventnetduration
+                   wffields.eventnetdurationsolved4h
+                   wffields.eventrcfound10wt
 
                    wffields.eventkpifirstinfo
+
                    wffields.eventchmticket
+
                    wffields.eventprmticket
+                   wffields.eventscprmstatus
+                   wffields.eventscprmsolutiontype
+                   wffields.eventscprmclosetype
+
                    wffields.eventinmticket
+                   wffields.eventscproblemstatus
 
                    wffields.affecteditemgroup 
                    detaildescription createdate 

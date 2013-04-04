@@ -194,6 +194,106 @@ sub getDynamicFields
                 htmldetail    =>\&isSCproblemSet,
                 onRawValue    =>\&loadDataFromSC,
                 label         =>'SC Problem soultion'),
+
+      new kernel::Field::Number(
+                name          =>'eventnetduration',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                label         =>'net event duration',
+                unit          =>'h',
+                precision     =>2,
+                container     =>'headref',
+                depend        =>['eventstart','eventend'],
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   if ($mode ne "edit"){
+                      my $s=$current->{eventstart};
+                      my $e=$current->{eventend};
+                      if ($s ne "" && $e ne ""){
+                         my $d=CalcDateDuration($s,$e);
+                         if (defined($d)){
+                            return($d->{totalminutes}/60);
+                         }
+                      }
+                   }
+                   return("");
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'eventnetdurationsolved4h',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                readonly      =>1,
+                label         =>'net event duration less then 4h',
+                depend        =>['eventstart','eventend','eventnetduration'],
+                onRawValue    =>sub{
+                    my $self=shift;
+                    my $current=shift;
+                    my $p=$self->getParent;
+                    my $fo=$p->getField("eventnetduration",$current);
+                    my $v=$fo->RawValue($current);
+                    return($v<4.0 ? 1 : 0) if (defined($v));
+                    return(undef);
+                }),
+
+      new kernel::Field::Boolean(
+                name          =>'eventrcfound10wt',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                AllowEmpty    =>1,
+                label         =>'Root-Cause found in less then 10wt',
+                container     =>'headref'),
+
+      new kernel::Field::Text(
+                name          =>'eventscprmstatus',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                vjointo       =>'tssc::prm',
+                vjoinon       =>['eventprmticket'=>'problemnumber'],
+                weblinkto     =>'NONE',
+                vjoindisp     =>'status',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'SC Problem status'),
+
+      new kernel::Field::Text(
+                name          =>'eventscprmsolutiontype',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                vjointo       =>'tssc::prm',
+                vjoinon       =>['eventprmticket'=>'problemnumber'],
+                weblinkto     =>'NONE',
+                vjoindisp     =>'solutiontype',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'SC Problem Solution Type'),
+
+      new kernel::Field::Text(
+                name          =>'eventscprmclosetype',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                vjointo       =>'tssc::prm',
+                vjoinon       =>['eventprmticket'=>'problemnumber'],
+                weblinkto     =>'NONE',
+                vjoindisp     =>'closetype',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'SC Problem Close Type'),
+
+      new kernel::Field::Text(
+                name          =>'eventscproblemstatus',
+                translation   =>'AL_TCom::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                vjointo       =>'tssc::inm',
+                vjoinon       =>['eventinmticket'=>'incidentnumber'],
+                weblinkto     =>'NONE',
+                vjoindisp     =>'status',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'SC Incident status'),
+
       ));
 
 }
@@ -208,6 +308,16 @@ sub isSCproblemSet
    my %param=@_;
    my $current=$param{current};
    return(1) if ($current->{eventprmticket} ne "");
+   return(0);
+}
+
+sub isSCincidentSet
+{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   my $current=$param{current};
+   return(1) if ($current->{eventinmticket} ne "");
    return(0);
 }
 

@@ -7,6 +7,8 @@
                                    en=>'Internal Informations'},
 'fieldgroup.eventnotifystat'=>{de=>'Statistische Einstufung',
                                    en=>'Statistical clasification'},
+'fieldgroup.eventnotifypost'=>{de=>'KPI und SLA Nachbetrachtung',
+                                   en=>'KPI and SLA Postreflection'},
 'fieldgroup.eventnotifyshort'=>{de=>'Ereigniskurzinformation',
                                    en=>'Eventshortnotification'},
 'Event is in SLA online time'=>{de=>'Ereignis liegt innerhalb der SLA Onlinezeit'},

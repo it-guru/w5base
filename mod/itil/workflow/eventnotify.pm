@@ -43,6 +43,8 @@ sub Init
 {  
    my $self=shift;
 
+   $self->AddGroup("eventnotifypost",
+                   translation=>'itil::workflow::eventnotify');
    $self->AddGroup("eventnotifystat",
                    translation=>'itil::workflow::eventnotify');
    $self->AddGroup("eventnotifyinternal",
@@ -488,7 +490,7 @@ sub getDynamicFields
       new kernel::Field::Boolean(
                 name          =>'eventsla',
                 translation   =>'itil::workflow::eventnotify',
-                group         =>'eventnotifyinternal',
+                group         =>'eventnotifypost',
                 default       =>'0',
                 label         =>'Event is in SLA online time',
                 container     =>'headref'),
@@ -496,7 +498,7 @@ sub getDynamicFields
       new kernel::Field::Boolean(
                 name          =>'eventignoreforkpi',
                 translation   =>'itil::workflow::eventnotify',
-                group         =>'eventnotifyinternal',
+                group         =>'eventnotifypost',
                 default       =>'0',
                 label         =>'ignore Event while KPI calculation',
                 container     =>'headref'),
@@ -542,21 +544,6 @@ sub getDynamicFields
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifyinternal',
                 label         =>'Internal comments',
-                container     =>'headref'),
-
-      new kernel::Field::Boolean(
-                name          =>'netdurationsolved4h',
-                translation   =>'itil::workflow::eventnotify',
-                group         =>'eventnotifyinternal',
-                label         =>'net event duration less then 4h',
-                container     =>'headref'),
-
-      new kernel::Field::Boolean(
-                name          =>'rcfound10wt',
-                translation   =>'itil::workflow::eventnotify',
-                group         =>'eventnotifyinternal',
-                default       =>'1',
-                label         =>'Root-Cause found in less then 10wt',
                 container     =>'headref'),
 
       new kernel::Field::Select(
@@ -890,6 +877,9 @@ sub isViewValid
    my $userid=$self->getParent->getCurrentUserId();
    my @grps=qw(state header eventnotifystat eventnotify 
                eventnotifyshort eventnotifystatic);
+   if ($rec->{eventend} ne ""){
+      push(@grps,"eventnotifypost");
+   }
    my $fo=$self->getField("wffields.eventlang",$rec);
    if (defined($fo)){
       my $lang=$fo->RawValue($rec);
@@ -934,6 +924,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 {  
    my $self=shift;
    return("eventnotifyshort","eventnotify","alteventnotify","eventnotifystat",
+          "eventnotifypost",
           "eventnotifyinternal","eventnotifystatic",
           "flow","affected","relations","state");
 }
@@ -945,6 +936,7 @@ sub isWriteValid
    my $WfRec=shift;
    return(1) if (!defined($WfRec));
    my @grplist=("eventnotify","alteventnotify","eventnotifystat",
+             "eventnotifypost",
              "eventnotifyinternal","relations");
    if ($WfRec->{eventmode} ne "EVk.free"){ # in freetext, static parameters
       push(@grplist,"eventnotifystatic");  # are not editable!

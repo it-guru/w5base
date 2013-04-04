@@ -37,3 +37,6 @@
 'SC Problem soultion'=>{de=>'Umzusetzende Maßnahmen'},
 'result of root cause analysis'=>{de=>'Ergebnis der Ursachenanalyse'},
 'Solution Line'=>{de=>'Solution Säule'},
+'net event duration'=>{de=>'Netto Ereignisdauer'},
+'net event duration less then 4h'=>{de=>'Netto Ereignisdauer <4h'},
+'Root-Cause found in less then 10wt'=>{de=>'RC in weniger als 10AT gefunden'},
