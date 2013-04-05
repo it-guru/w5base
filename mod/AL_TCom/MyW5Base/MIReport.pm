@@ -132,8 +132,7 @@ sub Result
 
    my $mi=getModuleObject($self->Config,"itil::lnkmgmtitemgroup");
    $wf->SetFilter({eventend=>$year,
-                   class=>['AL_TCom::workflow::eventnotify',
-                           'itil::workflow::eventnotify'],
+                   class=>\'AL_TCom::workflow::eventnotify',
                    isdeleted=>\'0'});
 
    my %sheet=();
