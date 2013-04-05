@@ -246,7 +246,7 @@ sub getHtmlViewLine
          $overflowselektor.="}";
          $overflowselektor.="</script>";
          $overflowselektor.="<select onchange=\"onOverflowSelect(this);\" ".
-                            "style=\"width:100%\">";
+                            "style=\"width:100%;padding:0;margin:0\" name=x id=y>";
          for(my $c=$maxdirect-1;$c<=$#userviewlist;$c++){
             my $view=$userviewlist[$c];
             $overflowselektor.="<option ";
