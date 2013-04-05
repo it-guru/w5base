@@ -238,7 +238,7 @@ sub getHtmlViewLine
       my $overflowselektor;
       my $overflowseleked;
       if ($#userviewlist>$maxdirect-1){
-         $overflowselektor="<script type=\"text/javascript\" ".
+         $overflowselektor="<form><script type=\"text/javascript\" ".
                            "language=\"JavaScript\">";
          $overflowselektor.="function onOverflowSelect(o){";
          $overflowselektor.=" var v=o.options[o.selectedIndex].value;";
@@ -256,7 +256,7 @@ sub getHtmlViewLine
             }
             $overflowselektor.="value=\"$view\">$view</option>";
          }
-         $overflowselektor.="</select>";
+         $overflowselektor.="</select></form>";
       }
       for(my $c=0;$c<=$#userviewlist;$c++){
          next if ($c>$maxdirect-1);
