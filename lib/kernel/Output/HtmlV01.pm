@@ -100,10 +100,10 @@ sub ProcessHead
 
    $d.="<tr><td class=mainblock>";
    $d.="<table class=datatable width=100%>\n<tr class=headline>";
-   $d.="<th class=headfield style=\"padding:0;margin:0\">".
-       "<div style=\"padding:0;margin:0;width:3px\">".
-       "</div></th>";
    if ($#view!=-1){
+      $d.="<th class=headfield style=\"padding:0;margin:0\">".
+          "<div style=\"padding:0;margin:0;width:3px\">".
+          "</div></th>";
       foreach my $field (@view){
          my $name=$field->Name();
          my $displayname=$name;
@@ -196,9 +196,11 @@ sub ProcessLine
    $d.="<tr class=$lineclass ".
        "onMouseOver=\"this.className='linehighlight'\" ".
        "onMouseOut=\"this.className='$lineclass'\">\n";
-   $d.="<td><a class=lineselect href=\"$dest\" ".
-       "target=_blank onfocus='window.status=\"open record\";' ".
-       ">&nbsp;</a></td>";
+   if ($#view!=-1){
+      $d.="<td><a class=lineselect href=\"$dest\" ".
+          "target=_blank onfocus='window.status=\"open record\";' ".
+          ">&nbsp;</a></td>";
+   }
    my @l=();
    for(my $c=0;$c<=$#view;$c++){
       my $nowrap="";

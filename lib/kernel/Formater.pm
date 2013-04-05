@@ -223,6 +223,7 @@ sub getHtmlViewLine
    my $app=$self->getParent->getParent;
    my $curview=$app->getCurrentViewName();
    my $allowfurther=$app->allowFurtherOutput();
+   my $maxdirect=4;
 
 
    $d.="<tr><td height=1% class=mainblock>\n";
@@ -234,35 +235,73 @@ sub getHtmlViewLine
    my $userid=$app->getCurrentUserId();
    $ro=1 if ($userid<=0);   # anonymous access no view editor allowed
    if (defined($curview)){
+      my $overflowselektor;
+      my $overflowseleked;
+      if ($#userviewlist>$maxdirect-1){
+         $overflowselektor="<script type=\"text/javascript\" ".
+                           "language=\"JavaScript\">";
+         $overflowselektor.="function onOverflowSelect(o){";
+         $overflowselektor.=" var v=o.options[o.selectedIndex].value;";
+         $overflowselektor.=" ChangeView(v,\"$dest\");";
+         $overflowselektor.="}";
+         $overflowselektor.="</script>";
+         $overflowselektor.="<select onchange=\"onOverflowSelect(this);\" ".
+                            "style=\"width:100%\">";
+         for(my $c=$maxdirect-1;$c<=$#userviewlist;$c++){
+            my $view=$userviewlist[$c];
+            $overflowselektor.="<option ";
+            if ($view eq $curview){
+               $overflowselektor.="selected ";
+               $overflowseleked=$view;
+            }
+            $overflowselektor.="value=\"$view\">$view</option>";
+         }
+         $overflowselektor.="</select>";
+      }
       for(my $c=0;$c<=$#userviewlist;$c++){
+         next if ($c>$maxdirect-1);
          my $view=$userviewlist[$c];
+         my $cClickTarget=$view;
+         if ($overflowseleked){
+            $cClickTarget=$overflowseleked;
+         }
          my $state="inactive";
-         $state="active" if ($view eq $curview);
+         $state="active" if ($view eq $curview ||
+                             ($c==$maxdirect-1 &&
+                              $#userviewlist>$maxdirect-1 && 
+                              $overflowseleked));
          $d.="<td class=viewtab_spacer>&nbsp;</td>\n";
+         my $w="";
+         $w="style=\"width:155px\"" if ($c==$maxdirect-1 && 
+                                        $#userviewlist>$maxdirect-1);
          $d.="<td class=viewtab_$state nowrap>".
-             "<div class=viewtab_$state>".
+             "<div class=viewtab_$state $w>".
              "<table border=0 width=100% cellpadding=0 cellspacing=0><tr>".
              "<td align=left>";
          if (!($view=~m/^\*/) && !$ro){
             $d.="<a class=viewtabedit title=\"".
                 $self->getParent->getParent->T(
                 "modify view or create new views").
-                "\" href=JavaScript:EditView(\"$view\")>".
+                "\" href=JavaScript:EditView(\"$cClickTarget\")>".
                 "<img border=0 src=\"../../base/load/edit_mini.gif\"></a>";
          }
          else{
             $d.="<img border=0 src=\"../../base/load/empty.gif\" ".
                 "width=18 height=18>";
          }
-         $d.="</td><td align=center>".
-             "<a class=viewselect ".
-             "href=JavaScript:ChangeView(\"$view\",\"$dest\")>$view</a></td>";
+         my $selektor="<a class=viewselect ".
+             "href=JavaScript:ChangeView(\"$view\",\"$dest\")>$view</a>";
+         if ($c==$maxdirect-1 &&
+             $#userviewlist>$maxdirect-1){
+            $selektor=$overflowselektor;
+         }
+         $d.="</td><td align=center>".$selektor."</td>";
          if ($allowfurther){
             $d.="<td align=right>".
                 "<a class=viewtaboutput title=\"".
                 $self->getParent->getParent->T("use further functions or ".
                                                "select output format").
-                "\" href=JavaScript:FormatSelect(\"$view\",\"$dest\")>".
+                "\" href=JavaScript:FormatSelect(\"$cClickTarget\",\"$dest\")>".
                 "<img border=0 src=\"../../base/load/functions.gif\"></a>".
                 "</td>";
          }
