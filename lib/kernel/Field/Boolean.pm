@@ -30,12 +30,18 @@ sub new
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{value}=[0,1]            if (!defined($self->{value}));
    $self->{transprefix}="boolean." if (!defined($self->{transprefix}));
-   $self->{default}="0"            if (!defined($self->{default}));
+   $self->{allowempty}=0           if (!defined($self->{allowempty}));
+   if (!defined($self->{default})){
+      $self->{default}=$self->{allowempty} ? "": "0";
+   }
    $self->{htmleditwidth}="60px"   if (!defined($self->{htmleditwidth}));
    $self->{WSDLfieldType}="xsd:boolean" if (!defined($self->{WSDLfieldType}));
    if ($self->{markempty}){
       $self->{default}=undef;
    }
+  # if ($self->{allowempty} && !grep(/^$/,@{$self->{value}})){
+  #    unshift(@{$self->{value}},"");
+  # }
    return($self);
 }
 
