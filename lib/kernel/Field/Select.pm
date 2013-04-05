@@ -123,7 +123,7 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $mode=shift;
-   my $d=$self->RawValue($current);
+   my $d=$self->RawValue($current,$mode);
    my $name=$self->Name();
    $d=[$d] if (ref($d) ne "ARRAY");
    my $readonly=$self->readonly($current);
@@ -139,7 +139,7 @@ sub FormatedDetail
       }
       if (($#{$d}==-1 && defined($self->{default}))||
           ($#{$d}==0 && !defined($d->[0]))){
-         $d=[$self->default($current)];
+         $d=[$self->default($current,$mode)];
       }
       my $width="100%";
       $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth}));
