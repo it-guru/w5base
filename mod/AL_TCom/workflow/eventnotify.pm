@@ -202,6 +202,7 @@ sub getDynamicFields
                 label         =>'net event duration',
                 unit          =>'h',
                 precision     =>2,
+                history       =>0,  # history not working on autocalc fields
                 container     =>'headref',
                 depend        =>['eventstart','eventend'],
                 default       =>sub{
@@ -214,7 +215,7 @@ sub getDynamicFields
                       if ($s ne "" && $e ne ""){
                          my $d=CalcDateDuration($s,$e);
                          if (defined($d)){
-                            return($d->{totalminutes}/60);
+                            return(int($d->{totalminutes}/60*100)/100);
                          }
                       }
                    }
@@ -238,11 +239,36 @@ sub getDynamicFields
                     return(undef);
                 }),
 
+      new kernel::Field::Date(
+                name          =>'eventrcfoundat',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                label         =>'Root-Cause found at',
+                container     =>'headref'),
+
       new kernel::Field::Boolean(
                 name          =>'eventrcfound10wt',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifypost',
-                AllowEmpty    =>1,
+                depend        =>['eventend','eventrcfoundat'],
+                allowempty    =>1,
+                history       =>0,  # history not working on autocalc fields
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   if ($mode ne "edit" &&
+                       $current->{eventend} ne "" &&
+                       $current->{eventrcfoundat} ne ""){
+                      my $d=CalcDateDuration($current->{eventend},
+                                             $current->{eventrcfoundat});
+                      if ($d->{totaldays}<10.0){
+                         return(1);
+                      }
+                      return(0);
+                   }
+                   return(undef);
+                },
                 label         =>'Root-Cause found in less then 10wt',
                 container     =>'headref'),
 
@@ -644,6 +670,33 @@ sub activateMailSend
       return(1);
    }
    return(0);
+}
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orig=shift;
+
+   my $ee=effVal($oldrec,$newrec,"eventend");
+   if ($ee eq "" && effVal($oldrec,$newrec,"eventrcfoundat") ne ""){
+      $newrec->{eventrcfoundat}=undef;
+   }
+   if ($newrec->{eventrcfoundat} ne ""){
+      if ($ee eq ""){
+         $self->LastMsg(ERROR,"specification of rc found date not allowed");
+         return(0);
+      }
+      else{
+         my $d=CalcDateDuration($ee,$newrec->{eventrcfoundat});
+         if ($d->{totalminutes}<0){
+            $self->LastMsg(ERROR,"rc found date must be behind eventend");
+            return(0);
+         }
+      }
+   }
+   return($self->SUPER::Validate($oldrec,$newrec,$orig));
 }
 
 sub ValidateCreate

@@ -174,6 +174,7 @@ sub Result
                    eventdurationhour
                    wffields.eventnetduration
                    wffields.eventnetdurationsolved4h
+                   wffields.eventrcfoundat
                    wffields.eventrcfound10wt
 
                    wffields.eventkpifirstinfo
@@ -187,6 +188,9 @@ sub Result
 
                    wffields.eventinmticket
                    wffields.eventscproblemstatus
+
+                   wffields.eventconsequenceof 
+                   wffields.eventisconsequence
 
                    wffields.affecteditemgroup 
                    detaildescription createdate 

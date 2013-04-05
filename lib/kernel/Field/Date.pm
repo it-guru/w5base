@@ -248,7 +248,8 @@ sub FormatedDetail
                }
             }
             my $deltastr=join(" ",@blks);
-            $d.=" &nbsp; ( $deltastr )";
+            $d.=" &nbsp; ".
+                "<span style=\"white-space:nowrap;\">( $deltastr )</span>";
          }
       }
       if ($mode=~m/^XlsV\d+$/){

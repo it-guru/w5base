@@ -495,6 +495,45 @@ sub getDynamicFields
                 label         =>'Event is in SLA online time',
                 container     =>'headref'),
 
+
+      new kernel::Field::Text(
+                name          =>'eventconsequenceof',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                label         =>'consequence of events',
+                htmldetail    =>0,
+                depend        =>['id'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $p=$self->getParent();
+                   my $o=getModuleObject($p->Config,"base::workflowrelation");
+                   $o->SetFilter({srcwfid=>\$current->{id},
+                                  'name'=>\'consequenceof'});
+                   my @l=$o->getVal(qw(dstwf));
+                   return(\@l);
+                }),
+
+
+      new kernel::Field::Boolean(
+                name          =>'eventisconsequence',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifypost',
+                htmldetail    =>0,
+                depend        =>['eventconsequenceof'],
+                label         =>'event is consequence of other events',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $p=$self->getParent();
+                   my $fo=$p->getField("eventconsequenceof");
+                   my $v=$fo->RawValue($current);
+                   if (ref($v) eq "ARRAY" && $#{$v}!=-1){
+                      return(1);
+                   }
+                   return(0);
+                }),
+
       new kernel::Field::Boolean(
                 name          =>'eventignoreforkpi',
                 translation   =>'itil::workflow::eventnotify',
