@@ -223,7 +223,7 @@ sub getHtmlViewLine
    my $app=$self->getParent->getParent;
    my $curview=$app->getCurrentViewName();
    my $allowfurther=$app->allowFurtherOutput();
-   my $maxdirect=4;
+   my $maxdirect=6;
 
 
    $d.="<tr><td height=1% class=mainblock>\n";
@@ -246,7 +246,7 @@ sub getHtmlViewLine
          $overflowselektor.="}";
          $overflowselektor.="</script>";
          $overflowselektor.="<select onchange=\"onOverflowSelect(this);\" ".
-                       "style=\"width:100%;padding:0;margin:0;font-size:5\">";
+                            "style=\"padding:0px;margin:0px;font-size:10px\">";
          for(my $c=$maxdirect-1;$c<=$#userviewlist;$c++){
             my $view=$userviewlist[$c];
             $overflowselektor.="<option ";
