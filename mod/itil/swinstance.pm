@@ -98,6 +98,7 @@ sub new
                                  'Oracle ASM',
                                  'Oracle DB Server',
                                  'Oracle Appl Server',
+                                 'Oracle TimesTen DB',
                                  'PostgeSQL',
                                  'SAP/R2',
                                  'SAP/R3',
