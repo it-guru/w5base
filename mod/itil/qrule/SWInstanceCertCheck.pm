@@ -218,7 +218,13 @@ sub checkSSL
 
    msg(INFO,"Step2: try to connect to %s:%s",$host,$port);
    my $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
+                                   SSL_version=>'SSLv3',
                                    SSL_session_cache_size=>0);
+   if (!defined($sock)){
+      $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
+                                   SSL_version=>'SSLv2',
+                                   SSL_session_cache_size=>0);
+   }
 
    if (!defined($sock)){  # try to build connection over proxy
       my $proxy=$self->getParent->Config->Param("HTTPS_PROXY");
