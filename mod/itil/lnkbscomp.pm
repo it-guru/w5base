@@ -194,6 +194,10 @@ sub Validate
       $self->LastMsg(ERROR,"no access");
       return(0);
    }
+   if (effVal($oldrec,$newrec,"obj1id") eq ""){
+      $self->LastMsg(ERROR,"no primary element specified");
+      return(0);
+   }
 
    return(1);
 }
