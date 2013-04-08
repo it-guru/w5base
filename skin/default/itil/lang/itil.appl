@@ -145,4 +145,5 @@
 'nameing of application by customer'=>{de=>'Bezeichnung der Anwendung beim Kunden/Auftraggeber'},
 'Business Team Boss EMail'=>{de=>'Betriebsteamleiter E-Mail'},
 'ID of application by customer'=>{de=>'ID der Anwendung beim Kunden/Auftraggeber'},
+'provided Businessservices'=>{de=>'bereitgestellte Business-Services'},
 

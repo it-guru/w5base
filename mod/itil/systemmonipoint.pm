@@ -202,7 +202,7 @@ sub getSqlFrom
    my ($worktable,$workdb)=$self->getWorktable();
    my $from="";
 
-   $from.="system  left outer join $worktable on system.id=$worktable.system ";
+   $from.="$worktable  left outer join system on system.id=$worktable.system ";
 
    return($from);
 }

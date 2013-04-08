@@ -29,14 +29,16 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
   
    my $dst           =[
-                       'itil::appl'=>'name',
-                       'itil::system' =>'name',
                        'itil::systemmonipoint' =>'fullname',
+                       'itil::system' =>'name',
+                       'itil::appl'=>'name'
                       ];
 
-   my $vjoineditbase =[{'cistatusid'=>"<5"},
+   my $vjoineditbase =[
+                       {'systemcistatusid'=>'<5'},
                        {'cistatusid'=>"<5"},
-                       {'systemcistatusid'=>'<5'}];
+                       {'cistatusid'=>"<5"}
+                      ];
 
    $self->AddFields(
       new kernel::Field::Id(

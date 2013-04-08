@@ -348,7 +348,7 @@ sub new
                 readonly      =>1,
                 group         =>'businessservices',
                 vjointo       =>'itil::businessservice',
-                vjoinon       =>['id'=>'applid'],
+                vjoinon       =>['id'=>'servicecompapplid'],
                 vjoindisp     =>['fullname']),
 
       new kernel::Field::Text(

@@ -184,11 +184,29 @@ sub new
                 name          =>'servicecomp',
                 label         =>'service components',
                 group         =>'servicecomp',
+                searchable    =>0,
                 subeditmsk    =>'subedit.businessservice',
                 vjointo       =>'itil::lnkbscomp',
                 allowcleanup  =>1,
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>['name','namealt1','namealt2',"comments"]),
+
+      new kernel::Field::SubList(
+                name          =>'servicecompappl',
+                label         =>'full related application components',
+                htmldetail    =>0,
+                group         =>'servicecomp',
+                vjointo       =>'itil::lnkbsappl',
+                vjoinon       =>['id'=>'businessserviceid'],
+                vjoindisp     =>['appl']),
+
+      new kernel::Field::Link(
+                name          =>'servicecompapplid',
+                label         =>'full related application components ids',
+                group         =>'servicecomp',
+                vjointo       =>'itil::lnkbsappl',
+                vjoinon       =>['id'=>'businessserviceid'],
+                vjoindisp     =>['applid']),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
