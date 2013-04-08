@@ -884,6 +884,7 @@ sub new
                 group         =>'control',
                 htmleditwidth =>'30%',
                 label         =>'Application switch-over behaviour defined',
+                selectfix     =>1,
                 dataobjattr   =>'appl.sodefinition'),
 
       new kernel::Field::Boolean(
