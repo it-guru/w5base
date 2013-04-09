@@ -18,7 +18,6 @@ package base::event::cleanup;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 @ISA=qw(kernel::Event);
@@ -330,7 +329,14 @@ sub NotifyUser
                $notiy{emailto}=$urec->{email};
             }
             else{ # hier könnte man die Support Adresse einfügen
-               # nop on banalprotect
+               $notiy{emailto}=[];
+               $user->ResetFilter();
+               $user->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
+               foreach my $sup ($user->getHashList(qw(email))){
+                  if ($sup->{email} ne ""){
+                     push(@{$notiy{emailto}},$sup->{email});
+                  }
+               }
             }
             $notiy{emailcc}=[keys(%admins)];
             $notiy{name}=$self->T("relation expired").": ".$group;

@@ -488,11 +488,12 @@ sub NotifyNewTeamRelation
    my $op=shift;
    my $roles=shift;
    my $Config=$self->getParent->Config();
+   my $TargetPureName;
    msg(INFO,"NotifyNewTeamRelation: userid=$userid grpid=$grpid op=$op");
 
    my $user=getModuleObject($Config,"base::user");
    $user->SetFilter({userid=>\$userid,cistatusid=>"<6"});
-   my ($urec)=$user->getOnlyFirst(qw(email lastlang banalprotect));
+   my ($urec)=$user->getOnlyFirst(qw(email lastlang purename banalprotect));
 
    my $grp=getModuleObject($Config,"base::grp");
    $grp->SetFilter({grpid=>\$grpid,cistatusid=>"<6"});
@@ -500,6 +501,7 @@ sub NotifyNewTeamRelation
    msg(INFO,"--------------");
 
    if (defined($urec) && defined($grec)){
+      $TargetPureName=" ($urec->{purename})";
       if ($urec->{lastlang} ne ""){
          $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
       }
@@ -520,15 +522,19 @@ sub NotifyNewTeamRelation
                if (!$urec->{banalprotect}){
                   push(@emailcc,$urec->{email}) if ($urec->{email} ne "");
                }
-               else{ # hier könnte man die Support Adresse einfügen
-                  # nop on banalprotect
+               else{ # hier fügt Mann nun die Support Adresse einfügen
+                  $user->ResetFilter();
+                  $user->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
+                  foreach my $sup ($user->getHashList(qw(email))){
+                     push(@emailcc,$sup->{email}) if ($sup->{email} ne "");
+                  }
                }
             }
          }
       }
-     
+      # Admins hinzufügen  
       my $grpuser=getModuleObject($Config,"base::lnkgrpuser");
-      $grpuser->SetFilter({grpid=>\'1'});
+      $grpuser->SetFilter({grpid=>\'1'});   
       foreach my $lnkrec ($grpuser->getHashList(qw(userid roles))){
          if (ref($lnkrec->{roles}) eq "ARRAY"){
             if (grep(/^(RMember)$/,@{$lnkrec->{roles}})){
@@ -537,8 +543,12 @@ sub NotifyNewTeamRelation
                if (!$urec->{banalprotect}){
                   push(@emailbcc,$urec->{email}) if ($urec->{email} ne "");
                }
-               else{ # hier könnte man die Support Adresse einfügen
-                  # nop on banalprotect
+               else{ # hier fügt Mann nun die Support Adresse einfügen
+                  $user->ResetFilter();
+                  $user->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
+                  foreach my $sup ($user->getHashList(qw(email))){
+                     push(@emailbcc,$sup->{email}) if ($sup->{email} ne "");
+                  }
                }
             }
          }
@@ -552,7 +562,12 @@ sub NotifyNewTeamRelation
          $adr{emailto}=$urec->{email};
       }
       else{ # hier könnte man die Support Adresse einfügen
-         # nop on banalprotect
+         $user->ResetFilter();
+         $user->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
+         $adr{emailto}=[];
+         foreach my $sup ($user->getHashList(qw(email))){
+            push(@{$adr{emailto}},$sup->{email}) if ($sup->{email} ne "");
+         }
       }
 
       my $subject;
@@ -565,12 +580,14 @@ sub NotifyNewTeamRelation
       if ($op eq "Rnew"){
          $subject="$sitename: ".
                   $self->T("new org relation to")." ".$grec->{fullname}; 
-         $mailtext=sprintf($self->T("MAILTEXT.NEW"),$grec->{fullname});
+         $mailtext=sprintf($self->T("MAILTEXT.NEW"),$TargetPureName,
+                                                    $grec->{fullname});
       }
       else{
          $subject="$sitename: ".
                   $self->T("role update to")." ".$grec->{fullname}; 
-         $mailtext=sprintf($self->T("MAILTEXT.UPDATE"),$grec->{fullname});
+         $mailtext=sprintf($self->T("MAILTEXT.UPDATE"),$TargetPureName,
+                                                       $grec->{fullname});
       }
       my $baseurl=$Config->Param("EventJobBaseUrl");
       $baseurl.="/" if (!($baseurl=~m/\/$/));
