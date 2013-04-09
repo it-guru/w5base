@@ -1640,6 +1640,28 @@ sub findtemplvar
       $d.="&nbsp;</div>" if ($param[0] ne "RAW");
       return($d);
    }
+   elsif ($var eq "SUPPORTINFO"){
+      my $u=getModuleObject($self->Config,"base::user");
+      my $d="";
+      if (defined($u)){
+         $u->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
+         my ($urec)=$u->getOnlyFirst(qw(email office_phone));
+         if (defined($urec)){
+            if ($urec->{email} ne ""){
+               $d.="Support: <a href=\"mailto:$urec->{email}\" ".
+                   "class=supportinfo>$urec->{email}</a>";
+            }
+            $d.="&nbsp;&nbsp;" if ($d ne "");
+            if ($urec->{office_phone} ne ""){
+               $d.="1st Level Support Phone: <a  class=supportinfo ".
+                   "href=\"callto:$urec->{office_phone}\">".
+                   "$urec->{office_phone}</a>";
+            }
+            $d.="&nbsp;&nbsp;" if ($d ne "");
+         }
+      }
+      return($d);
+   }
    elsif ($var eq "GLOBALHELP"){
       my $tags=$param[0];
       my $searchtext=$param[1];

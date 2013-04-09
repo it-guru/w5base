@@ -45,6 +45,13 @@ a:visited
   color:#a4336d;
 }
 
+a.supportinfo,
+a.supportinfo:link,
+a.supportinfo:visited,
+a.supportinfo:hover
+{
+   color:white;
+}
 a.glossaryLink,
 a.glossaryLink:link,
 a.glossaryLink:visited,
