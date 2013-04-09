@@ -662,6 +662,18 @@ sub new
                 dataobjattr   =>'contact.allowifupdate'),
 
       new kernel::Field::Boolean(
+                name          =>'isw5support',
+                group         =>'control',
+                label         =>'use contact as central W5Base support',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(0) if ($self->getParent->IsMemberOf("admin"));
+                   return(1);
+                },
+                dataobjattr   =>'contact.isw5support'),
+
+      new kernel::Field::Boolean(
                 name          =>'banalprotect',
                 group         =>'control',
                 label         =>'protection against banal informations',

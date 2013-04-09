@@ -36,6 +36,7 @@
 'Timezone'=>{ de=>'Zeitzone'},
 'Language'=>{ de=>'Sprache'},
 'protection against banal informations'=>{de=>'Schutz vor banalen, operativen Information'},
+'use contact as central W5Base support'=>{de=>'Kontakt als zentrales W5Base Support-Postfach verwenden'},
 'large'=>{ de=>'groß'},
 'Last-Lang'=>{ de=>'letztmalig verwendete Sprache'},
 'Last-Logon'=>{ de=>'letzte Anmeldung'},
