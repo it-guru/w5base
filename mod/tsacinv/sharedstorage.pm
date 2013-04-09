@@ -43,6 +43,12 @@ sub new
                 dataobjattr   =>'assetportfolio.assettag'),
 
       new kernel::Field::Text(
+                name          =>'nature',
+                htmldetail    =>0,
+                label         =>'Nature',
+                dataobjattr   =>"amnature.name"),
+
+      new kernel::Field::Text(
                 name          =>'fullname',
                 htmldetail    =>0,
                 searchable    =>0,
@@ -210,7 +216,8 @@ sub getDetailBlockPriority
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amtsiprovsto,amtenant,amportfolio assetportfolio,amlocation";
+   my $from="amtsiprovsto,amtenant,amportfolio assetportfolio,".
+            "ammodel,amnature,amlocation";
    return($from);
 }
 
@@ -219,6 +226,10 @@ sub initSqlWhere
    my $self=shift;
    my $where="amtsiprovsto.lassetid=assetportfolio.lastid ".
              "and amtsiprovsto.bdelete='0' ".
+             "and assetportfolio.lmodelid=ammodel.lmodelid ".
+             "and ammodel.lnatureid=amnature.lnatureid(+) ".
+             "and amnature.name IN ('DISKSUBSYSTEM',".
+             "'DISKSUBSYSTEM_COMP','NAS-FILER') ".
              "and assetportfolio.ltenantid=amtenant.ltenantid ".
              "and assetportfolio.llocaid=amlocation.llocaid(+) ";
    return($where);
