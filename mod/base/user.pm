@@ -52,34 +52,27 @@ sub new
                 name          =>'fullname',
                 htmlwidth     =>'280',
                 group         =>'name',
-                readonly =>
-                   sub{
-                      my $self=shift;
-                      return(1);
-                    #  return(1) if (!$self->getParent->IsMemberOf("admin"));
-                    #  return(0);
-                   },
-                prepRawValue   =>
-                   sub{
-                      my $self=shift;
-                      my $d=shift;
-                      my $current=shift;
-                      my $secstate=$self->getParent->getCurrentSecState();
-                      if ($secstate<2){
-                         my $userid=$self->getParent->getCurrentUserId();
-                         if (!defined($userid) ||
-                              $current->{userid}!=$userid){
-                            sub ureplEmail
-                            {
-                               my $e=$_[0];
-                               $e=~s/[a-z]/?/g;
-                               return("($e)");
-                            } 
-                            $d=~s/\((.*\@.*)\)/ureplEmail($1)/e; 
-                         }
+                readonly      =>1,
+                prepRawValue  =>sub{
+                   my $self=shift;
+                   my $d=shift;
+                   my $current=shift;
+                   my $secstate=$self->getParent->getCurrentSecState();
+                   if ($secstate<2){
+                      my $userid=$self->getParent->getCurrentUserId();
+                      if (!defined($userid) ||
+                           $current->{userid}!=$userid){
+                         sub ureplEmail
+                         {
+                            my $e=$_[0];
+                            $e=~s/[a-z]/?/g;
+                            return("($e)");
+                         } 
+                         $d=~s/\((.*\@.*)\)/ureplEmail($1)/e; 
                       }
-                      return($d);
-                   },
+                   }
+                   return($d);
+                },
                 vjoinon       =>'userid',
                 label         =>'Fullname',
                 dataobjattr   =>'contact.fullname'),
@@ -152,16 +145,15 @@ sub new
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
                 group         =>['name','default','admcomments'],
-                readonly      =>
-                   sub{
-                      my $self=shift;
-                      my $rec=shift;
-                      return(0) if ($self->getParent->IsMemberOf("admin"));
-                      return(1) if (defined($rec) && 
-                                    $rec->{cistatusid}>2 &&
-                                    !$self->getParent->IsMemberOf("admin"));
-                      return(0);
-                   },
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(0) if ($self->getParent->IsMemberOf("admin"));
+                   return(1) if (defined($rec) && 
+                                 $rec->{cistatusid}>2 &&
+                                 !$self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
                 vjoineditbase =>{id=>">0"},
@@ -668,6 +660,18 @@ sub new
                 group         =>'control',
                 label         =>'allow automatic updates by interfaces',
                 dataobjattr   =>'contact.allowifupdate'),
+
+      new kernel::Field::Boolean(
+                name          =>'banalprotect',
+                group         =>'control',
+                label         =>'protection against banal informations',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(0) if ($self->getParent->IsMemberOf("admin"));
+                   return(1);
+                },
+                dataobjattr   =>'contact.banalprotect'),
 
       new kernel::Field::Textarea(
                 name          =>'ssh1publickey',
