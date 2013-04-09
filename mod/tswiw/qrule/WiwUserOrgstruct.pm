@@ -492,7 +492,7 @@ sub NotifyNewTeamRelation
 
    my $user=getModuleObject($Config,"base::user");
    $user->SetFilter({userid=>\$userid,cistatusid=>"<6"});
-   my ($urec)=$user->getOnlyFirst(qw(email lastlang));
+   my ($urec)=$user->getOnlyFirst(qw(email lastlang banalprotect));
 
    my $grp=getModuleObject($Config,"base::grp");
    $grp->SetFilter({grpid=>\$grpid,cistatusid=>"<6"});
@@ -516,8 +516,13 @@ sub NotifyNewTeamRelation
          if (ref($lnkrec->{roles}) eq "ARRAY"){
             if (grep(/^(RBoss|RBoss2)$/,@{$lnkrec->{roles}})){
                $user->SetFilter({userid=>\$lnkrec->{userid}});
-               my ($urec)=$user->getOnlyFirst(qw(email));
-               push(@emailcc,$urec->{email}) if ($urec->{email} ne "");
+               my ($urec)=$user->getOnlyFirst(qw(email banalprotect));
+               if (!$urec->{banalprotect}){
+                  push(@emailcc,$urec->{email}) if ($urec->{email} ne "");
+               }
+               else{ # hier könnte man die Support Adresse einfügen
+                  # nop on banalprotect
+               }
             }
          }
       }
@@ -528,17 +533,27 @@ sub NotifyNewTeamRelation
          if (ref($lnkrec->{roles}) eq "ARRAY"){
             if (grep(/^(RMember)$/,@{$lnkrec->{roles}})){
                $user->SetFilter({userid=>\$lnkrec->{userid}});
-               my ($urec)=$user->getOnlyFirst(qw(email lang));
-               push(@emailbcc,$urec->{email}) if ($urec->{email} ne "");
+               my ($urec)=$user->getOnlyFirst(qw(email banalprotect));
+               if (!$urec->{banalprotect}){
+                  push(@emailbcc,$urec->{email}) if ($urec->{email} ne "");
+               }
+               else{ # hier könnte man die Support Adresse einfügen
+                  # nop on banalprotect
+               }
             }
          }
       }
      
 
-      my %adr=(emailto=>$urec->{email},
-               emailfrom=>'"WhoIsWho to W5BaseDarwin" <no_reply@w5base.net>',
+      my %adr=(emailfrom=>'"WhoIsWho to W5BaseDarwin" <no_reply@w5base.net>',
                emailcc=>\@emailcc,
                emailbcc=>\@emailbcc);
+      if (!$urec->{banalprotect}){
+         $adr{emailto}=$urec->{email};
+      }
+      else{ # hier könnte man die Support Adresse einfügen
+         # nop on banalprotect
+      }
 
       my $subject;
       my $mailtext;
