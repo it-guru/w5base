@@ -234,9 +234,12 @@ sub getAdmins
    if ($#userid!=-1){
       $user->SetFilter({userid=>\@userid,cistatusid=>\'4',
                         usertyp=>\'user'});
-      foreach my $urec ($user->getHashList(qw(fullname lastlang email))){
+      foreach my $urec ($user->getHashList(qw(fullname lastlang 
+                                              banalprotect
+                                              email))){
          push(@res,{fullname=>$urec->{fullname},
                     lastlang=>$urec->{lastlang},
+                    banalprotect=>$urec->{banalprotect},
                     email=>$urec->{email}});
       }
    }
@@ -257,6 +260,7 @@ sub NotifyAdmin
       my ($urec,$msg)=$user->getOnlyFirst(qw(fullname cistatusid email));
       if (defined($urec) && $urec->{cistatusid}==4){
          foreach my $arec ($self->getAdmins()){
+            next if ($arec->{banalprotect});
             if ($arec->{lastlang} ne ""){
                $ENV{HTTP_FORCE_LANGUAGE}=$arec->{lastlang};
             }
@@ -298,6 +302,7 @@ sub NotifyUser
    if ($lrec->{usertyp} eq "user"){   # the relation effects on an real user
       my %admins;
       foreach my $arec ($self->getAdmins()){
+         next if ($arec->{banalprotect});
          $admins{$arec->{email}}++;
       }
       if ($lrec->{email} ne "" && ref($lrec->{roles}) eq "ARRAY"){
@@ -307,7 +312,7 @@ sub NotifyUser
          my $group=$lrec->{group};
          $user->SetFilter({userid=>\$userid});
          my ($urec,$msg)=$user->getOnlyFirst(qw(fullname lastlang email
-                                                cistatusid));
+                                                cistatusid banalprotect));
          if (defined($urec) && $urec->{cistatusid}==4 && $lrec->{roles} ne ""){
             if ($urec->{lastlang} ne ""){
                $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
@@ -321,7 +326,12 @@ sub NotifyUser
             my $groupinfo=$baseurl."/auth/base/menu/msel/sysadm/userenv".
                           "?OpenURL=%23groups";
             my %notiy;
-            $notiy{emailto}=$urec->{email};
+            if (!$urec->{banalprotect}){
+               $notiy{emailto}=$urec->{email};
+            }
+            else{ # hier könnte man die Support Adresse einfügen
+               # nop on banalprotect
+            }
             $notiy{emailcc}=[keys(%admins)];
             $notiy{name}=$self->T("relation expired").": ".$group;
             my $sitename=$self->Config->Param("SITENAME");

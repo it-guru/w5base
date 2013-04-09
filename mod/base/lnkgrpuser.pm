@@ -332,6 +332,7 @@ sub new
                    else{
                       $img.="border=0 ";
                    }
+                   $msg=~s/<.*?>//g;
                    $img.="src=\"../../base/load/directlink.gif\" ";
                    if ($msg ne ""){
                       $img.=" title=\"$msg\"";
@@ -389,6 +390,7 @@ sub new
                    else{
                       $img.="border=0 ";
                    }
+                   $msg=~s/<.*?>//g;
                    $img.="src=\"../../base/load/directlink.gif\" ";
                    if ($msg ne ""){
                       $img.=" title=\"$msg\"";
