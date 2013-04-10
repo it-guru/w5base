@@ -78,7 +78,7 @@ sub new
                      jdbc ldap LDIF MAPI 
                      MFT MQSeries Netegrity NFS ODBC OSI openFT
                      papier pkix-cmp POP3 POP3S 
-                     rcp rfc RMI RPC rsh sftp sldap smtp snmp
+                     rcp rfc RMI RPC rsh sftp sldap smtp snmp SPML
                      ssh tuxedo TCP UC4 UCP/SMS utm X.31 XAPI xml
                      OTHER)],
                 default       =>'online',
