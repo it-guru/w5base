@@ -600,7 +600,7 @@ sub Sendmail
    }
 
    
-   return({exitcode=>0,processed=>\@processed});
+   return({exitcode=>0,processed=>($#processed+1)});
 }
 
 
