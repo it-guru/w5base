@@ -989,7 +989,6 @@ sub StartW5ServerProcess
          start(); 
          process(); 
       ');
-      \$self->NotifyAdmin("$server temporary DEBUG - server end","ServerGoesDown=\$srv->{ServerGoesDown}");
       \$self->NotifyAdmin("$server crash","\$@") if (\$@ ne "");
 EOF
    eval("\$srvsub=sub { $srvcode return({exitcode=>0}); }");
