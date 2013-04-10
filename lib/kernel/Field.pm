@@ -734,7 +734,8 @@ sub RawValue
    my $d;
 
    my $tcurrent=tied(%$current);
-   if (defined($tcurrent)){
+   if (defined($tcurrent) && $tcurrent->can("STORE") && 
+       $tcurrent->can("FETCH")){
       $current->{$self->{name}}=$tcurrent->FETCH($self->{name},$mode);
       if ((!defined($current->{$self->{name}}) ||
            $current->{$self->{name}} eq "") && exists($self->{default})){
