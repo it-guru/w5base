@@ -109,6 +109,9 @@ sub w5statsend
    my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
    my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
    $grp->SetFilter({cistatusid=>[3,4]});
+   my ($send,$notsend,$notneeded)=(0,0,0);
+   my $MinReportUserGroupCount=$self->Config->Param("MinReportUserGroupCount");
+   $MinReportUserGroupCount=int($MinReportUserGroupCount);
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*t-com.st"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*.ST.DB"});
    $grp->SetCurrentView(qw(grpid fullname));
@@ -161,51 +164,66 @@ sub w5statsend
                my ($primrec,$hist)=$w5stat->LoadStatSet(id=>$chkrec->{id});
                if (defined($primrec) &&
                    defined($w5stat->{w5stat}->{'base::w5stat::overview'})){
-                  msg(INFO,"primrec ok and stat processor found");
-                  my $obj=$w5stat->{w5stat}->{'base::w5stat::overview'};
-                  my %P=$obj->getPresenter();
-                  if (defined($P{'overview'}) &&
-                      defined($P{'overview'}->{opcode})){
-                     msg(INFO,"overview tag handler found");
-                     foreach my $emailto (@emailto){
-                        my $lang="";
-                        $user->ResetFilter();
-                        $user->SetFilter({email=>\$emailto});
-                        my ($urec,$msg)=$user->getOnlyFirst(qw(lastlang 
-                                                               lang));
-                        if (defined($urec)){
-                           if ($urec->{lastlang} ne ""){
-                              $lang=$urec->{lastlang};
-                           }
-                           if ($lang eq ""){
-                              $lang=$urec->{lang};
-                           }
-                           $lang eq "en" if ($lang eq "");
-
-           
-                           $ENV{HTTP_FORCE_LANGUAGE}=$lang;
-                           my ($d,$ovdata)=
-                                &{$P{overview}->{opcode}}($obj,
-                                                            $primrec,$hist);
-                           my $needsend=$forcesend;
-                           foreach my $ovrec (@$ovdata){
-                              if (defined($ovrec->[2]) && 
-                                  $ovrec->[2] eq "red"){
-                                 $needsend=1;last;
-                              }
-                           }
-                           msg(INFO,"target=$emailto lang=$lang ".
-                                    "needsend=$needsend");
-                           if ($needsend && 1){
-                              $self->sendOverviewData($emailto,$lang,
-                                                  $primrec,$hist,$d,$ovdata);
-                           }
-                           delete($ENV{HTTP_FORCE_LANGUAGE});
-                        }
-                     }
+                  my $ucnt=0;
+                  $ucnt=$primrec->{stats}->{User} if (ref($primrec) eq "HASH" &&
+                                              ref($primrec->{stats}) eq "HASH");
+                  $ucnt=$ucnt->[0] if (ref($ucnt) eq "ARRAY");
+                  $ucnt=int($ucnt);
+                  if ($ucnt<$MinReportUserGroupCount &&
+                      $primrec->{nameid}>=2){
+                     $notsend++;
                   }
                   else{
-                     msg(ERROR,"can not find w5stat overview handler");
+                     msg(INFO,"primrec ok and stat processor found");
+                     my $obj=$w5stat->{w5stat}->{'base::w5stat::overview'};
+                     my %P=$obj->getPresenter();
+                     if (defined($P{'overview'}) &&
+                         defined($P{'overview'}->{opcode})){
+                        msg(INFO,"overview tag handler found");
+                        foreach my $emailto (@emailto){
+                           my $lang="";
+                           $user->ResetFilter();
+                           $user->SetFilter({email=>\$emailto});
+                           my ($urec,$msg)=$user->getOnlyFirst(qw(lastlang 
+                                                                  lang));
+                           if (defined($urec)){
+                              if ($urec->{lastlang} ne ""){
+                                 $lang=$urec->{lastlang};
+                              }
+                              if ($lang eq ""){
+                                 $lang=$urec->{lang};
+                              }
+                              $lang eq "en" if ($lang eq "");
+
+              
+                              $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+                              my ($d,$ovdata)=
+                                   &{$P{overview}->{opcode}}($obj,
+                                                               $primrec,$hist);
+                              my $needsend=$forcesend;
+                              foreach my $ovrec (@$ovdata){
+                                 if (defined($ovrec->[2]) && 
+                                     $ovrec->[2] eq "red"){
+                                    $needsend=1;last;
+                                 }
+                              }
+                              msg(INFO,"target=$emailto lang=$lang ".
+                                       "needsend=$needsend");
+                              if ($needsend && 1){
+                                 $send++;
+                                 $self->sendOverviewData($emailto,$lang,
+                                                     $primrec,$hist,$d,$ovdata);
+                              }
+                              else{
+                                 $notneeded++;
+                              }
+                              delete($ENV{HTTP_FORCE_LANGUAGE});
+                           }
+                        }
+                     }
+                     else{
+                        msg(ERROR,"can not find w5stat overview handler");
+                     }
                   }
                }
             }
@@ -213,7 +231,9 @@ sub w5statsend
          ($rec,$msg)=$grp->getNext();
       }until(!defined($rec));
    }
-   return({exitcode=>0});
+   return({exitcode=>0,
+           msg=>"send=>$send,notsend=>$notsend,notneeded=>$notneeded ".
+                "MinReportUserGroupCount=$MinReportUserGroupCount"});
 }
 
 sub sendOverviewData

@@ -544,6 +544,8 @@ sub ShowEntry
    my $subtitle=$self->T($requesttag,$rmod);
    $subtitle="" if ($requesttag eq "ALL");
    $title.=" - ".$subtitle;
+   my $MinReportUserGroupCount=$self->Config->Param("MinReportUserGroupCount");
+   $MinReportUserGroupCount=int($MinReportUserGroupCount);
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','w5stat.css'],
                            js=>['toolbox.js','subModal.js'],
@@ -579,26 +581,39 @@ $subtitle
 <script type="text/javascript" 
         src="../../../static/open-flash-chart/js/swfobject.js"></script>
 EOF
-      if ($requesttag ne ""){
-         my @Presenter;
-         foreach my $obj (values(%{$self->{w5stat}})){
-            if ($obj->can("getPresenter")){
-               my %P=$obj->getPresenter();
-               foreach my $p (values(%P)){
-                  $p->{module}=$obj->Self();
-                  $p->{obj}=$obj;
+      my $ucnt;
+      $ucnt=$primrec->{stats}->{User} if (ref($primrec) eq "HASH" &&
+                                    ref($primrec->{stats}) eq "HASH");
+      $ucnt=$ucnt->[0] if (ref($ucnt) eq "ARRAY");
+      if (defined($ucnt) && $ucnt<$MinReportUserGroupCount &&
+          $primrec->{nameid}>=2 &&
+          !$self->IsMemberOf("admin")){
+         printf("<br><hr><b>");
+         printf($self->T("Access to this report is not granted, because the minimum count of analysed users of %d is not reached."),$MinReportUserGroupCount);
+         printf("</b><hr>");
+      }
+      else{
+         if ($requesttag ne ""){
+            my @Presenter;
+            foreach my $obj (values(%{$self->{w5stat}})){
+               if ($obj->can("getPresenter")){
+                  my %P=$obj->getPresenter();
+                  foreach my $p (values(%P)){
+                     $p->{module}=$obj->Self();
+                     $p->{obj}=$obj;
+                  }
+                  push(@Presenter,%P);
                }
-               push(@Presenter,%P);
             }
-         }
-         my %P=@Presenter;
+            my %P=@Presenter;
      
-         foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
-            if (defined($P{$p}->{opcode}) && 
-                ($rtag eq $p || $requesttag eq "ALL")){
-               my ($d,$ovdata)=
-                      &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
-               print($d);
+            foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
+               if (defined($P{$p}->{opcode}) && 
+                   ($rtag eq $p || $requesttag eq "ALL")){
+                  my ($d,$ovdata)=
+                         &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
+                  print($d);
+               }
             }
          }
       }
