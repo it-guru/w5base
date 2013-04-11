@@ -104,7 +104,8 @@ sub ProcessHead
       $d.="<th class=headfield style=\"padding:0;margin:0\">".
           "<div style=\"padding:0;margin:0;width:3px\">".
           "</div></th>";
-      foreach my $field (@view){
+      for(my $pos=0;$pos<=$#view;$pos++){
+         my $field=$view[$pos];
          my $name=$field->Name();
          my $displayname=$name;
          if (defined($field)){
