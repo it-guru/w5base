@@ -1073,6 +1073,7 @@ sub Bookmark
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','work.css'],
                            title=>$self->T("... add a bookmark"),
+                           onload=>'onLoad();',
                            body=>1,form=>1);
    my $autosearch=Query->Param("AutoSearch");
    my $replace=Query->Param("ReplaceBookmark");
@@ -1126,6 +1127,9 @@ sub Bookmark
    print(<<EOF);
 <script language="JavaScript">
 $closewin
+function onLoad(){
+   document.forms[0].elements['BookmarkName'].focus();
+}
 function showUrl()
 {
    var x;
@@ -1161,6 +1165,7 @@ EOF
                                              REPL=>$repl}});
    #printf("Bookmark Handler");
    print("<input type=hidden name=SAVE value=\"1\">");
+   Query->Delete("BookmarkName");
    print $self->HtmlPersistentVariables(qw(ALL));
    print $self->HtmlBottom(body=>1,form=>1);
    return(0);

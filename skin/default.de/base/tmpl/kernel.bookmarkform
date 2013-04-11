@@ -22,10 +22,24 @@ nicht mehr korrekt arbeiten.<br>
 </td>
 </tr>
 <tr>
-<td colspan=2 height=1% valign=top>Ersetzen, falls Bookmarkname bereits verwendet? %REPL%</td>
+<td colspan=2 height=1% valign=top>
+<table width=80% cellspacing=0 cellpadding=0 border=0>
+<tr>
+<td>Ersetzen, falls Bookmarkname bereits verwendet?</td>
+<td width=1%>%REPL%
+</td></tr>
+</table></td>
 </tr>
 <tr>
-<td colspan=2 height=1% valign=top>Möchten Sie  "AutoSearch" Option in der Bookmark? %AUTOS%</td>
+<td colspan=2 height=1% valign=top>
+<table width=80% cellspacing=0 cellpadding=0 border=0>
+<tr>
+<td>Möchten Sie  "AutoSearch" Option in der Bookmark?
+</td>
+<td width=1%>%AUTOS%</td>
+</tr>
+</table>
+</td>
 </tr>
 <tr>
 <td colspan=2 height=1% valign=top>%LASTMSG%</td>

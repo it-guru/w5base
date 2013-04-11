@@ -21,10 +21,25 @@ of bookbarks!<br>
 </td>
 </tr>
 <tr>
-<td colspan=2 height=1% valign=top>Replace if bookmark already exists? %REPL%</td>
+<td colspan=2 height=1% valign=top>
+<table width=100% cellspacing=0 cellpadding=0 border=0>
+<tr>
+<td>Replace if bookmark already exists?</td>
+<td width=1%>%REPL%</td>
+</tr></table>
+</td>
 </tr>
 <tr>
-<td colspan=2 height=1% valign=top>Do you wish "AutoSearch" option in bookmark? %AUTOS%</td>
+<td colspan=2 height=1% valign=top>
+<table width=100% cellspacing=0 cellpadding=0 border=0>
+<tr>
+<td>Do you wish "AutoSearch" option in bookmark?</td>
+<td width=1%>%AUTOS%</td>
+</tr>
+</table>
+
+
+</td>
 </tr>
 <tr>
 <td colspan=2 height=1% valign=top>%LASTMSG%</td>
