@@ -527,6 +527,37 @@ sub new
                 onRawValue    =>\&AddW5BaseData,
                 depend        =>'systemid'),
 
+      new kernel::Field::Text(
+                name          =>'acmdbcontract',
+                group         =>'acmdb',
+                selectfix     =>1,
+                label         =>'ACMDB contract',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(1) if ($param{current}->{$self->{name}} ne "");
+                   }
+                   return(0);
+                },
+                dataobjattr   =>'amcomputer.servicename'),
+
+      new kernel::Field::Text(
+                name          =>'acmdbcontractnumber',
+                group         =>'acmdb',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(1) if ($param{current}->{$self->{name}} ne "");
+                   }
+                   return(0);
+                },
+                label         =>'ACMDB contractnumber',
+                dataobjattr   =>'amcomputer.slanumber'),
+
       new kernel::Field::Date(
                 name          =>'instdate',
                 group         =>'source',
@@ -831,7 +862,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default location form applications ipaddresses software 
              usedsharedcomp
-             orderedservices services assetdata assetfinanz saphier
+             orderedservices services assetdata assetfinanz saphier acmdb
              w5basedata source));
 }  
 
