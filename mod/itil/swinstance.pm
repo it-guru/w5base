@@ -99,6 +99,7 @@ sub new
                                  'Oracle DB Server',
                                  'Oracle Appl Server',
                                  'Oracle TimesTen DB',
+                                 'Oracle Transparent Gateway',
                                  'PostgeSQL',
                                  'SAP/R2',
                                  'SAP/R3',
