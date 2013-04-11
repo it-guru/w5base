@@ -101,8 +101,10 @@ sub Process
       if ($self->crec('lang') ne ""){
          $ENV{HTTP_ACCEPT_LANGUAGE}=$self->crec('lang');
       }
-
-
+      $self->FullContextReset();
+      $self->Context->{Linenumber}=0;
+      $out->{fieldkeys}={};
+      $out->{fieldobjects}=[];
       my $DataObj;
       my $reqDataObj=$self->crec('DataObj');
       if (ref($reqDataObj)){
@@ -152,8 +154,6 @@ sub Process
                }
                my $fieldbase={};
                map({$fieldbase->{$_->Name()}=$_} @recordview);
-               $out->{fieldkeys}={};
-               $out->{fieldobjects}=[];
                foreach my $fo (@recordview){
                   my $name=$fo->Name();
                   if (!defined($out->{fieldkeys}->{$name})){
