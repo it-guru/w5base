@@ -270,7 +270,10 @@ sub NotifyAdmin
             my $directlink=$baseurl."/auth/base/lnkgrpuser/Detail?".
                            "search_lnkgrpuserid=$lrec->{lnkgrpuserid}";
             my %notiy;
-            $notiy{emailfrom}=$urec->{email};
+            my $fakeFrom=$urec->{fullname};
+            $fakeFrom=~s/"//g;
+            $fakeFrom="\"$fakeFrom\" <>";
+            $notiy{emailfrom}=$fakeFrom;
             $notiy{emailto}=$arec->{email};
             $notiy{name}=$self->T("admin info: relation expired").": ".$group;
             my $sitename=$self->Config->Param("SITENAME");

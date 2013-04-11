@@ -453,7 +453,10 @@ sub Validate
          $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
       }
       if (defined($UserCache->{userid})){
-         $newrec->{emailfrom}= $UserCache->{email};
+         my $fakeFrom=$UserCache->{fullname};
+         $fakeFrom=~s/"//g;
+         $fakeFrom="\"$fakeFrom\" <>";   # fake from to 
+         $newrec->{emailfrom}=$fakeFrom; # prevent "out of office" notices
       }
    }
    $newrec->{step}=$self->getNextStep();
