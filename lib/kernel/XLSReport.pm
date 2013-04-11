@@ -266,6 +266,9 @@ sub StdReportParamHandling
       $tstr=~s/_$//;
       $tstr=~s/^_//;
       my $dir="./";
+      if ($pref=~m/^webfs:.*/){
+         $dir="";
+      }
       if ($param{'filename'}=~m/\/$/){
          $dir=$param{'filename'};
       }
