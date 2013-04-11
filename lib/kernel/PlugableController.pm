@@ -148,7 +148,7 @@ sub Main
       printf("<tr><td valign=top height=1%%>%s</td></tr>",$templ);
       my $if;
       if ($curquery->can("Welcome")){
-         $if="<iframe src=\"Welcome?MyW5BaseSUBMOD=$oldval\" ".
+         $if="<iframe src=\"Welcome?".$self->{'PlugableSelektor'}."=$oldval\" ".
              "name=Result id=Result style=\"width:100%;height:100%\">".
              "</iframe>";
       }
