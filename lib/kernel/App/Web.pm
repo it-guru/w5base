@@ -1060,12 +1060,20 @@ sub HandleNewUser
                my $currenturl=$ENV{SCRIPT_URI};
                $currenturl=~
                   s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
+               my $fromemail=$em;
+               my $uobj=getModuleObject($self->Config,"base::user");
+               $uobj->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
+               my ($urec)=$uobj->getOnlyFirst(qw(email));
+               if (ref($urec) eq "HASH" && $urec->{email} ne ""){
+                  $fromemail=$urec->{email};
+               }
+
                if ($id=$wf->Store(undef,{
                       id       =>$id,
                       class    =>'base::workflow::mailsend',
                       step     =>'base::workflow::mailsend::dataload',
                       name     =>$subject,
-                      emailfrom=>$em,
+                      emailfrom=>$fromemail,
                       emailto  =>$em,
                       emailtext=>$self->getParsedTemplate(
                                    "tmpl/accountverificationmail",
