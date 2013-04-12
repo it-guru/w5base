@@ -45,11 +45,13 @@ sub NSO_Kundensys_Rep
    my %flt;
    my @userid=qw(-1);
    $ENV{LANG}="de";
-   $param{'defaultFilenamePrefix'}="webfs:/Reports/NSO_Kundensys/NSO_Kundensysteme";
+   $param{'defaultFilenamePrefix'}=
+         "webfs:/Reports/NSO_Kundensys/NSO_Kundensysteme";
    msg(INFO,"start Report to $param{'filename'}");
    my $t0=time();
  
    $flt{'status'}='"!out of operation"';
+   $flt{'systemid'}="S09338353 S09340929 S09505355 S09505253 S09505304 S09319025 S09311363 S09314308 S09317724 S09317925 S09317766 S09317982 S09317814 S09318030 S09317868 S09318081";
 
    %param=kernel::XLSReport::StdReportParamHandling($self,%param);
    my $out=new kernel::XLSReport($self,$param{'filename'});
@@ -57,8 +59,11 @@ sub NSO_Kundensys_Rep
    $out->initWorkbook();
 
    my @view=qw(systemname systemid status 
-               assetassetid tsacinv_locationfullname
-               dynservices applicationnames);
+               systemos
+               assetassetid assetmodelname tsacinv_locationfullname
+               acmdbcontract acmdbcontractnumber
+               applicationnames
+               dynservices);
 
 
    my @control;
