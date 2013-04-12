@@ -1,5 +1,6 @@
 'ac'=>{de=>'AssetManager',en=>'AssetManager'},
 'ac.asset.fixedasset'=>{de=>'Komponente',en=>'FixedAsset'},
+'ac.asset.contract'=>{de=>'Warungsvertr.',en=>'Maint.Contr.'},
 'ac.asset'=>{de=>'Hardware',en=>'Asset'},
 'ac.itclust'=>{de=>'Cluster',en=>'Cluster'},
 'ac.appl'=>{de=>'Anwendung',en=>'Application'},

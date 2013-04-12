@@ -79,6 +79,10 @@ sub Init
                       "tsacinv::fixedasset",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("ac.asset.contract",
+                      "tsacinv::contract",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("ac.license",
                       "tsacinv::license",
                       defaultacl=>['admin']);

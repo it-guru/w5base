@@ -204,6 +204,22 @@ sub new
                 depend        =>[qw(lassetid)],
                 onRawValue    =>\&CalcSystemsOnAsset),
 
+
+      new kernel::Field::TextDrop(
+                name          =>'maintlevel',
+                label         =>'Maintenance Level',
+                group         =>'maint',
+                vjointo       =>'tsacinv::contract',
+                vjoinon       =>['maintlevelid'=>'contractid'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'maintlevelid',
+                group         =>'maint',
+                label         =>'Maint LevelID',
+                dataobjattr   =>'amasset.lmaintlevelid'),
+
+
       new kernel::Field::Date(
                 name          =>'deprstart',
                 group         =>'finanz',
@@ -279,6 +295,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'maitcond',
+                group         =>'maint',
                 label         =>'Maintenance Codition',
                 dataobjattr   =>'amasset.maintcond'),
 
@@ -483,7 +500,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default location finanz components source));
+   return(qw(header default location maint finanz components source));
 }
 
 

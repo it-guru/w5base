@@ -340,7 +340,7 @@ sub new
                 fields        =>[qw(assetid serialno inventoryno modelname 
                                     powerinput cpucount cputype cpuspeed 
                                     corecount
-                                    systemsonasset maitcond)]),
+                                    systemsonasset maitcond maintlevel)]),
 
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::asset',
