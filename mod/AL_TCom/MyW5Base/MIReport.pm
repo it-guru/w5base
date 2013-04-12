@@ -61,18 +61,22 @@ sub getQueryTemplate
    my $tt=$self->kernel::MyW5Base::getTimeRangeDrop("search_year",
                                                     $self,
                                                     qw(year));
+   my $t0=$self->T("Only Prio 1 events");
+   my $t1=$self->T("Year");
+   my $t2=$self->T("Yes");
+   my $t3=$self->T("No - show all");
 
 
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe>
 <tr>
-<td class=fname width=10%>Year:</td><td class=finput>$tt</td>
-<td class=fname width=20%>Only Prio 1 events:</td>
+<td class=fname width=10%>$t1:</td><td class=finput>$tt</td>
+<td class=fname width=20%>$t0:</td>
 <td class=finput width=30% nowrap>
 <select name=search_onlyprio1>
-<option selected value="1">Yes</option>
-<option value="0">No - show all</option>
+<option selected value="1">$t2</option>
+<option value="0">$t3</option>
 </select>
 </td>
 </tr>
@@ -105,9 +109,6 @@ sub Result
    my $self=shift;
    my $wf=getModuleObject($self->Config,"base::workflow");
    my %flt=$wf->getSearchHash();
-   print STDERR Dumper(\%flt);
-
-
 
    my $year=$flt{year};
    my $onlyprio1=$flt{onlyprio1};
@@ -148,26 +149,107 @@ sub Result
       }
    }
    my @control;
+   my $wf=getModuleObject($self->Config,"base::workflow");
+   $wf->AddFields(
+      new kernel::Field::Text(
+                name          =>'YEAR',
+                label         =>'Jahr',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{eventstart} ne ""){
+                      my ($Y,$M,$D,$h,$m,$s)=
+                            $self->getParent->ExpandTimeExpression(
+                            $current->{eventstart},"stamp","GMT","CET");
+                      return(sprintf("%04d",$Y));
+                   }
+                   return("");
+                },
+                htmldetail    =>0),
+   );
+   $wf->AddFields(
+      new kernel::Field::Text(
+                name          =>'MONTH',
+                label         =>'Monat',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{eventstart} ne ""){
+                      my ($Y,$M,$D,$h,$m,$s)=
+                            $self->getParent->ExpandTimeExpression(
+                            $current->{eventstart},"stamp","GMT","CET");
+                      return(sprintf("%02d",$M));
+                   }
+                   return("");
+                },
+                htmldetail    =>0),
+   );
+   $wf->AddFields(
+      new kernel::Field::Text(
+                name          =>'CWEEK',
+                label         =>'KW',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{eventstart} ne ""){
+                      my ($Y,$M,$D)=$self->getParent->ExpandTimeExpression(
+                            $current->{eventstart},"stamp","GMT","CET");
+                      return(kernel::date::Week_of_Year($Y,$M,$D));
+                   }
+                   return("");
+                },
+                htmldetail    =>0),
+   );
+   $wf->AddFields(
+      new kernel::Field::Text(
+                name          =>'QUART',
+                label         =>'Quartal',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{eventstart} ne ""){
+                      my ($Y,$M,$D)=$self->getParent->ExpandTimeExpression(
+                            $current->{eventstart},"stamp","GMT","CET");
+                      return(1) if ($M>=1 && $M<=3);
+                      return(2) if ($M>=4 && $M<=6);
+                      return(3) if ($M>=7 && $M<=9);
+                      return(4) if ($M>=10 && $M<=12);
+                      return("?");
+                   }
+                   return("");
+                },
+                htmldetail    =>0),
+   );
+
+
    foreach my $s (sort(keys(%sheet))){
       push(@control,{
-         sheet=>$s,
-         DataObj=>'base::workflow',
+         sheet=>$s,DataObj=>$wf,
          filter=>{id=>$sheet{$s}},
          view=>[qw(
                    wffields.eventendofevent
-                   wffields.affectedlocation wffields.affectedapplication
+                   wffields.affectedlocation 
+                   wffields.affectedapplication
+                   wffields.affectedapplicationgroup
+                   wffields.affecteditemprio
                    name 
                    wffields.eventstartofevent
                    wffields.qceventendofevent
+                   YEAR
+                   MONTH
+                   CWEEK
+                   QUART
 
                    wffields.solutionline
+                   wffields.eventspecrespocustomer
+                   wffields.eventspecrespoitprov
 
                    wffields.eventstatclass
                    wffields.affectedregion
                    wffields.eventstatrespo
                    wffields.eventstatreason
+                   wffields.eventstattype
 
-                   wffields.affecteditemprio
 
                    eventduration
                    eventdurationhour
@@ -196,8 +278,12 @@ sub Result
                    mandator wffields.affectedcustomer id)]}
       );
    }
+   my ($Y,$M,$D,$h,$m,$s)=$self->getParent->ExpandTimeExpression("now","stamp",
+                                                                 "GMT","CET");
+   my $t=sprintf("_%04d%02d%02d%02d%02d%02d",$Y,$M,$D,$h,$m,$s);
 
-   my $out=new kernel::XLSReport($self,">&STDOUT");
+   my $out=new kernel::XLSReport($self,">&STDOUT",
+                                 FinalFilename=>'W5Base-MI-Report'.$t);
    $out->initWorkbook();
 
 

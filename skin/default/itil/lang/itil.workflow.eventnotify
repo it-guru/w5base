@@ -190,4 +190,4 @@
 "qc eventend can't be sooner as eventend"=>{de=>"Betriebsfreigabe kann nicht vor technisches Ereignisende sein"},
 'event is consequence of other events'=>{de=>'Ereignis ist Folgeeffekt eines anderen Ereignisses'},
 'consequence of events'=>{de=>'Ereignis ausgelöst durch'},
-
+'Affected applicationgroup'=>{de=>'betroffene Anwendungsgruppe'},

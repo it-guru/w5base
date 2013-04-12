@@ -21,25 +21,27 @@ use vars qw(@ISA);
 use strict;
 use kernel;
 use kernel::Universal;
-use File::Temp;
+use File::Temp qw(tempfile);
 use kernel::Output::XlsV01;
 
 @ISA=qw(kernel::Universal);
 
-sub new
+sub new              # filename AND FinalFilename can be specified at new!
 {
    my $type=shift;
    my $parent=shift;
    my $filename=shift;
    my $self=bless({@_},$type);
    $self->{out}=new kernel::Output::XlsV01();
+   $self->{out}->setParent($self);
    $self->setParent($parent);
    $self->{filename}=$filename;
    if ($filename ne "" && $filename ne ">&STDOUT"){
       $self->setFilename($filename);
    }
    else{
-      $self->setFilename("/tmp/out.xls");
+      my ($fh, $filename) = tempfile();
+      $self->setFilename($filename);
    }
 
    return($self);
@@ -49,6 +51,14 @@ sub Config
 {
    my $self=shift;
    return($self->getParent->Config());
+}
+
+sub getDownloadFilename   # this callback is needed for &STDOUT 
+{
+   my $self=shift;
+   return($self->{FinalFilename}) if ($self->{FinalFilename} ne "");
+
+   return(undef);
 }
 
 sub setFilename

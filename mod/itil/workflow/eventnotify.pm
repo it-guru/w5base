@@ -211,6 +211,26 @@ sub getDynamicFields
                 depend        =>['eventmode'],
                 label         =>'Affected Application ID'),
 
+      new kernel::Field::Text(
+                name          =>'affectedapplicationgroup',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifyshort',
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       exists($param{current}->{$self->{name}})){
+                      my $d=$param{current}->{$self->{name}};
+                      return(1) if ($d ne "");
+                   }
+                   return(0);
+                },
+                uivisible     =>\&calcVisibility,
+                label         =>'Affected applicationgroup',
+                container     =>'headref'),
+
+
       new kernel::Field::KeyText( 
                 name          =>'affectedlocation',
                 translation   =>'itil::workflow::base',
@@ -823,6 +843,7 @@ sub calcVisibility
       return(1) if ($name eq "affectedapplicationid");
       return(1) if ($name eq "affectedcustomer");
       return(1) if ($name eq "affectedcustomerid");
+      return(1) if ($name eq "affectedapplicationgroup");
    }
    if ($rec->{headref}->{eventmode}->[0] eq "EVk.net"){
       return(1) if ($name eq "affectednetwork");
@@ -2666,6 +2687,7 @@ sub nativProcess
                                                 mandator mandatorid conumber
                                                 responseteam businessteam
                                                 mgmtitemgroup
+                                                applgroup
                                                 eventlang customerprio
                                                 custcontracts id));
          if (defined($arec)){
@@ -2679,6 +2701,7 @@ sub nativProcess
             $app=$arec->{name};
             $h->{affecteditemgroup}=[sort(keys(%affecteditemgroup))];
             $h->{affectedapplicationid}=[$arec->{id}];   
+            $h->{affectedapplicationgroup}=[$arec->{applgroup}];   
             $h->{affectedapplication}=[$arec->{name}];   
             $h->{mandatorid}=[$arec->{mandatorid}];   
             $h->{mandator}=[$arec->{mandator}];   

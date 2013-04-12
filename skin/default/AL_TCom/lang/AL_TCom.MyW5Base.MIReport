@@ -1,3 +1,6 @@
 'AL_TCom::MyW5Base::MIReport'=>{de=>'IT-Workflow: ITIL Ereignismeldungen - Major-Incident Report',
                               en=>'IT-Workflow: ITIL Ereignismeldungen - Major-Incident Report'},
 'Year'=>{de=>'Jahr'},
+'Only Prio 1 events'=>{de=>'Nur Prio1 Ereignisse'},
+'Yes'=>{de=>'Ja'},
+'No - show all'=>{de=>'Nein - zeige ALLE'},

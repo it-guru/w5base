@@ -116,8 +116,15 @@ sub getDownloadFilename
 {
    my $self=shift;
    my $file="report";
-   if (ref($self->getParent()) && ref($self->getParent->getParent())){
-      $file=lc($self->getParent->getParent()->Self());
+   if (ref($self->getParent()) eq "kernel::XLSReport" &&
+       $self->getParent()->can("getDownloadFilename")){
+      my $f=$self->getParent()->getDownloadFilename();
+      $file=$f if ($f ne "");
+   }
+   else{
+      if (ref($self->getParent()) && ref($self->getParent->getParent())){
+         $file=lc($self->getParent->getParent()->Self());
+      }
    }
    $file=~s/::/_/g;
 
