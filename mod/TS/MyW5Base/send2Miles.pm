@@ -17,7 +17,7 @@ package TS::MyW5Base::send2Miles;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use strict;
-use vars qw(@ISA);
+use vars qw(@ISA $debug);
 use kernel;
 use kernel::MyW5Base;
 use kernel::printFlushed;
@@ -71,6 +71,7 @@ sub getQueryTemplate
 <input type=password style='width:100%' name=password>&nbsp;&nbsp;
 </td>
 </tr>
+
 <tr>
 <td class=fname width=10%>Monat:</td><td class=finput>$tt</td>
 <td class=fname width=20%>MilesPlus Enviroment:</td>
@@ -81,6 +82,24 @@ sub getQueryTemplate
 </select>
 </td>
 </tr>
+
+<tr>
+<td class=fname width=10%>divine the forecast:</td><td class=finput>
+<select name=forecast>
+<option value='1'>yes</option>
+<option value='0'>no</option>
+</select>
+</td>
+<td class=fname width=20%>Debugging:</td>
+<td class=finput width=30% nowrap>
+<select name=debug>
+<option value='1'>yes</option>
+<option value='0'>no</option>
+</select>
+</td>
+</tr>
+
+
 <tr>
 <td colspan=4 align=right>
 <input type=button 
@@ -134,6 +153,8 @@ sub Result
    my $pass=Query->Param("password");
    my $base=Query->Param("base");
    my $month=Query->Param("month");
+   $TS::MyW5Base::send2Miles::debug=Query->Param("debug");
+   my $forecast=Query->Param("forecast");
 
    if ($user eq ""){
       $user="pmitarb";
@@ -152,6 +173,8 @@ sub Result
       my $xpass=$pass;
       $xpass=~s/./x/g;
       $self->printFlushed("Password : ".$xpass);
+      $self->printFlushed("forecast : ".$forecast);
+      $self->printFlushed("DEBUG    : ".$debug);
       $self->{base}=$base;
       if (!($self->{base}=~m/\/$/)){
          $self->{base}.="/";
@@ -186,6 +209,11 @@ sub Result
             $self->setEntries(@$book);
         #    last;
          }
+         my $signOK=$self->signMonth($month);
+         $self->reportStatus($month);
+         if (!$signOK){
+            $self->printFlushed("WARN: sign of month was not OK!");
+         }
       }
       else{
          $self->printFlushed(msg(ERROR,"login to MilesPlus failed"));
@@ -193,8 +221,6 @@ sub Result
       $self->printFlushed(" ");
       $self->printFlushed("... transfer request finshed");
    }
-   $self->signMonth($month);
-   $self->reportStatus($month);
 
    $self->printFlushedFinish();
 }
@@ -242,12 +268,15 @@ sub signMonth
    #printf("as_string=%s\n",$request->as_string());
    my $response=$self->{ua}->request($request);
    my $res=$response->content;
-   if (($res=~m/Zeitbuchungen/) &&
+   if (!($res=~m/error:/i) &&
        !($res=~m/error/i)){
       $self->printFlushed("... sign of month report seems to be OK");
+      return(1);
    }
    else{
-      $self->printFlushed($response->content);
+      $self->printFlushed("ERROR: sign of month failed");
+      $self->printFlushed($response->content) if ($debug);
+      return(0);
    }
 }
 
@@ -647,7 +676,7 @@ sub doLogin
                          Content=>[%{$self->{CurrentForm}}]);
    my $response=$self->{ua}->request($request);
    if ($response->code ne "302"){   # 302 signals login OK
-      $self->printFlushed($response->content);
+      $self->printFlushed($response->content) if ($debug);
       $self->printFlushed(msg(ERROR,"fail to post loginurl $url code=%s\n",
                      $response->code));
       return(0);

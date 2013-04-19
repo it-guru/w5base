@@ -1,0 +1,6 @@
+'tssapp01::psp'=>{de=>'PSP Element',en=>'PSP Element'},
+'Description'=>{de=>'Beschreibung'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'Databoss WIW ID'=>{de=>'Datenverantwortlicher WIW ID'},
+'SAP hierarchy'=>{de=>'SAP Hierarchie'},
+'fieldgroup.saphier'=>{de=>'SAP Hierarchie',en=>'SAP hierarchy'},
