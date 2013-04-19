@@ -22,7 +22,6 @@ use kernel;
 use kernel::Event;
 use File::Temp;
 use File::Path qw(remove_tree);
-use Text::CSV_XS;
 @ISA=qw(kernel::Event);
 
 # mapping
@@ -80,6 +79,8 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
+   eval('   use Text::CSV_XS;');
 
    return($self);
 }
