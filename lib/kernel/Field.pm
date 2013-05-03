@@ -738,6 +738,8 @@ sub RawValue
        $tcurrent->can("FETCH") && 
        exists($self->{default})){  # hoffe das löst das Problem mit dem
                                    # default Wert nur in Detail (eventinfo.pm)
+                                   # möglicherweise wäre ein check auf
+                                   # ref($self->{default}) eq "CODE" besser?!
       $current->{$self->{name}}=$tcurrent->FETCH($self->{name},$mode);
       if ((!defined($current->{$self->{name}}) ||
            $current->{$self->{name}} eq "") && exists($self->{default})){
