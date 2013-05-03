@@ -59,6 +59,12 @@ sub NSO_Kundensys_Rep
 
    my @view=qw(systemname systemid status 
                systemos
+               assetmodelname
+               assetpowerinput
+               assetmmaint
+               assetmaintlevel
+               installdate
+               compdeprstart
                assetassetid assetmodelname tsacinv_locationfullname
                acmdbcontract acmdbcontractnumber
                applicationnames
