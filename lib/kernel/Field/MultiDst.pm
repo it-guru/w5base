@@ -96,19 +96,20 @@ sub RawValue
 {
    my $self=shift;
    my $current=shift;
+   my $mode=shift;
 
    $self->initialize() if (!$self->{isinitialized});
    if (defined($current)){
       my $dsttyp;
       my $dsttypobj=$self->getParent->getField($self->{dsttypfield});
       if (defined($dsttypobj)){
-         $dsttyp=$dsttypobj->RawValue($current);
+         $dsttyp=$dsttypobj->RawValue($current,$mode);
       }
       if (defined($dsttyp) && $dsttyp ne ""){
          my $targetidobj=$self->getParent->getField($self->{dstidfield});
          my $targetid;
          if (defined($targetidobj)){
-            $targetid=$targetidobj->RawValue($current);
+            $targetid=$targetidobj->RawValue($current,$mode);
          }
          if (defined($targetid) && $targetid ne ""){
             foreach my $dststruct (@{$self->{dstobj}}){

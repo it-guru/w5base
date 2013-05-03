@@ -735,7 +735,9 @@ sub RawValue
 
    my $tcurrent=tied(%$current);
    if (defined($tcurrent) && $tcurrent->can("STORE") && 
-       $tcurrent->can("FETCH")){
+       $tcurrent->can("FETCH") && 
+       exists($self->{default})){  # hoffe das löst das Problem mit dem
+                                   # default Wert nur in Detail (eventinfo.pm)
       $current->{$self->{name}}=$tcurrent->FETCH($self->{name},$mode);
       if ((!defined($current->{$self->{name}}) ||
            $current->{$self->{name}} eq "") && exists($self->{default})){

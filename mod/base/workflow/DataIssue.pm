@@ -120,7 +120,7 @@ sub getDynamicFields
                              htmldetail         =>0,
                              readonly           =>1,
                              translation        =>'base::workflow::DataIssue',
-                             label              =>'affected Dataelement instance',
+                             label           =>'affected Dataelement instance',
                              container          =>'additional'),
                    new kernel::Field::Link(  
                              name               =>'altaffectedobjectname',
