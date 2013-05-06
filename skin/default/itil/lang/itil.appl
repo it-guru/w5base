@@ -114,7 +114,6 @@
 'opmode.education'=>{de=>'Schulung',en=>'Education'},
 'opmode.approvtest'=>{de=>'Abnahme',en=>'Approvaltest'},
 'opmode.reference'=>{de=>'Referenz',en=>'Reference'},
-'opmode.license'=>{de=>'Lizenz',en=>'License'},
 'opmode.cbreakdown'=>{de=>'Katastrophenfall',en=>'Disaster recovery'},
 'direct linked Licenses'=>{de=>'direkt verknüpfte Lizenzen'},
 'default language for eventinformations'=>{de=>'Standard Spracheinstellung für den Workflow Ereignismeldung'},
