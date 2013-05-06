@@ -283,7 +283,6 @@ sub ApplicationModified
 
    my %w52ac=(0 =>'OTHER',
               5 =>'CUSTOMER RESPONSIBILITY',
-              10=>'APPLICATION LICENSE',
               20=>'TEST',
               25=>'DISASTER',
               30=>'TRAINING',
@@ -567,7 +566,6 @@ sub ApplicationModified
                   $ApplU=30 if ($rec->{opmode} eq "education");
                   $ApplU=25 if ($rec->{opmode} eq "cbreakdown");
                   $ApplU=20 if ($rec->{opmode} eq "test");
-                  $ApplU=5  if ($rec->{opmode} eq "license");
                }
                my $acstatus="IN OPERATION";
                if ($rec->{cistatusid}==3){
