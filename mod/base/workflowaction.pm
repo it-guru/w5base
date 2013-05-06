@@ -667,6 +667,15 @@ sub Notify
              #                           '<null\@network>';
              #  }
             }
+            elsif ($param{$target}->[$c]=~m/^W5SUPPORT$/){ # target central Sup
+               $user->ResetFilter();
+               $user->SetFilter({isw5support=>\'1',
+                                 cistatusid=>"<6"});
+               my ($urec)=$user->getOnlyFirst(qw(email));
+               if (defined($urec)){
+                  $param{$target}->[$c]=$urec->{email};
+               }
+            }
             elsif ($param{$target}->[$c]=~m/^[a-z0-9]{2,8}$/){ # target posixid
                $user->ResetFilter();
                $user->SetFilter({posix=>\$param{$target}->[$c],
