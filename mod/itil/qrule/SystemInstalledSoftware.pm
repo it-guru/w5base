@@ -66,17 +66,31 @@ sub qcheckRecord
 
    my %swneeded=();
    my %swifound=();
+   my %swiprod=();
    if (ref($rec->{swinstances}) eq "ARRAY"){
       foreach my $swi (@{$rec->{swinstances}}){
          if ($swi->{softwareinstname} eq ""){ # this is a instance with no
             $swneeded{$swi->{swnature}}++;    # assinged software installation
          }
+         if ($swi->{techproductstring} ne ""){
+            $swiprod{$swi->{techproductstring}}++;
+         }
       }
    }
+   my %checkedswiprod;
+   if (keys(%swiprod)){
+      my $sw=getModuleObject($dataobj->Config,"itil::software");
+      $sw->SetFilter({name=>[keys(%swiprod)]});
+      foreach my $s ($sw->getHashList(qw(name id))){
+         $checkedswiprod{$s->{name}}++;
+      }
+   }
+   print STDERR Dumper(\%swiprod);
 
    if (ref($rec->{software}) eq "ARRAY"){
       foreach my $swrec (@{$rec->{software}}){
          $swifound{$swrec->{software}}++;
+         delete($checkedswiprod{$swrec->{software}});
          if ($swrec->{softwarecistatusid}!=4 &&
              $swrec->{softwarecistatusid}!=5 &&
              $swrec->{softwarecistatusid}!=3){
@@ -85,7 +99,13 @@ sub qcheckRecord
             push(@msg,"an installed software is no longer valid: ".$n);
          }
       }
-      
+   }
+   if (keys(%checkedswiprod)){
+      foreach my $software (sort(keys(%checkedswiprod))){
+         push(@msg,
+              "missing software installation for related software instances: ".
+              $software);
+      }
    }
    my %chkmap=("Oracle DB Server"=>'^oracle.*database.*$',
                "Apache"=>'^.*apache.*(web|http).*$',

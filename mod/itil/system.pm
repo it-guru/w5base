@@ -255,7 +255,8 @@ sub new
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['fullname','swnature'],
-                vjoininhash   =>['fullname','swnature','softwareinstname']),
+                vjoininhash   =>['fullname','swnature',
+                                 'softwareinstname','techproductstring']),
 
       new kernel::Field::Text(
                 name          =>'shortdesc',
