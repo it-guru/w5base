@@ -1,2 +1,5 @@
 'Select method to use on selected data'=>{de=>'Wählen Sie bitte die Methode, die auf die Datenauswahl angewandt werden soll'},
-'DirectView'=>{de=>'Direkt Ansicht'}
+'DirectView'=>{de=>'Direkt Ansicht'},
+'create a direct access url for the current data'=>{de=>'Direktzugriffs-URL der aktuell selektierten Daten erzeugen'},
+'download the selected data as offline file'=>{de=>'Download der selektieren Daten als Offline-Datei'},
+'show the selected data in browser (if it is posible)'=>{de=>'zeige die selektieren Daten direkt im Browser (falls dies möglich ist)'},
