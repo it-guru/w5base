@@ -33,6 +33,16 @@ sub new
    return($self);
 }
 
+sub Init
+{
+   my $self=shift;
+
+
+   $self->RegisterEvent("loadINetworkApplMgr","loadINetworkApplMgr",timeout=>12000);
+   return(1);
+}
+
+
 sub loadINetworkApplMgr
 {
    my $self=shift;
