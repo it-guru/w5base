@@ -105,6 +105,7 @@ sub new
                                  'SAP/R3',
                                  'Subversion Repository',
                                  'SunONE',
+                                 'StreamServe',
                                  'Teradata',
                                  'Tomcat',
                                  'Visibroker',
