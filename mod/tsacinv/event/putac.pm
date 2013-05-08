@@ -1060,6 +1060,7 @@ sub TransferFile
       if (!$self->{DebugMode}){
          if (!$ftp->Put($filename,$jobfile)){
             msg(ERROR,"File $filename to $jobfile could not be transfered");
+            msg(ERROR,"File $filename results: ".$ftp->message);
          }
          unlink($filename);
       }
