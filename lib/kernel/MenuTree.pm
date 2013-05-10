@@ -89,7 +89,8 @@ sub _TreeLine
       for(my $c=1;$c<=$#{$indent};$c++){
          my $l=4;
          $l=1 if ($indent->[$c-1]>0);
-         $d.="<img border=0 src=\"${rootpath}../../base/load/menu_bar_$l.gif\">";
+         $d.="<img border=0 alt=\"+\" ".
+             "src=\"${rootpath}../../base/load/menu_bar_$l.gif\">";
       }
       my $imgname="menu_bar_${id}.gif";
       $d.="<img border=0 src=\"${rootpath}../../base/load/$imgname\">";

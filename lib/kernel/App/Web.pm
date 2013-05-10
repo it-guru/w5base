@@ -1694,9 +1694,9 @@ sub findtemplvar
       my $onclick="javascript:openwin('$url?$qs','_help',".
                   "'height=570,width=680,toolbar=no,status=no,".
                   "resizable=yes,scrollbars=auto')";
-      return("<span class=sublink onclick=$onclick ".
+      return("<span class=sublink onclick=\"$onclick\" ".
              "title=\"globalHelp\" alt=\"globalHelp\">".
-             "<img border=0 src=\"$icon\"></span>");
+             "<img border=0 alt=\"Help Icon\" src=\"$icon\"></span>");
    }
    elsif ($var eq "StdButtonBar"){
       my $d="<div class=buttonframe>";
