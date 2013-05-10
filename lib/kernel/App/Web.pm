@@ -1349,7 +1349,7 @@ sub HtmlGoto
    my %param=@_;
    print $self->HttpHeader("text/html");
    print <<EOF;
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML>
 <html>
 <head><title>... redirecting ...</title></head>
 <body onload=document.forms[0].submit()>
@@ -1378,7 +1378,7 @@ sub HtmlHeader
 
 
   $d.=<<EOF;
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML>
 <html $langtag>
 <script language="JavaScript">
 var CURLANG="$lang";
