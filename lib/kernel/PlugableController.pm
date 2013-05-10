@@ -123,15 +123,35 @@ sub Main
    my $UserCache=$self->Cache->{User}->{Cache};
    $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
    my %selectCache;
+   my $lastGroup;
    foreach my $label (sort(grep(/^\[/,keys(%l))),
                       sort(grep(!/^\[/,keys(%l)))){
+      my $curGroup="";
+      if (my ($g)=$label=~m/^(.*):/){
+         $curGroup=$g;
+      }
+      if ($curGroup ne $lastGroup){
+         if (defined($lastGroup)){
+            $s.="</optgroup>";
+         }
+         $s.="<optgroup label=\"$curGroup\">";
+         $lastGroup=$curGroup;
+      }
+      my $useLabel=$label;
+      if ($curGroup ne ""){
+         my $qm=quotemeta($curGroup);
+         $useLabel=~s/^$qm:\s*//;
+      }
       if (defined($l{$label}) &&
           $l{$label}->can("isSelectable") && 
           $l{$label}->isSelectable(user=>$UserCache,cache=>\%selectCache)){
          $s.="<option ";
          $s.="selected " if ($l{$label}->Self() eq $oldval);
-         $s.="value=\"".$l{$label}->Self()."\">$label</option>";
+         $s.="value=\"".$l{$label}->Self()."\">$useLabel</option>";
       }
+   }
+   if (defined($lastGroup)){
+      $s.="</optgroup>";
    }
    $s.="</select>";
    printf("<tr><td valign=top height=1%%>%s</td></tr>",$s);
