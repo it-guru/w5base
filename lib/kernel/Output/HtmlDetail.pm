@@ -92,7 +92,7 @@ sub ProcessHead
    $d.="<style>";
    $d.=$self->getStyle($fh,$rec,$msg,\@view,$view);
    $d.="</style>\n".$self->{fieldsPageHeader};
-   $d.="<script language=\"JavaScript\">\n";
+   $d.="<script type=\"text/javascript\" language=\"JavaScript\">\n";
    if ($scrolly!=0){
       $d.=<<EOF;
 function DetailInit()  // used from asyncron sub data to restore position in
@@ -680,7 +680,7 @@ sub ProcessBottom
    $d.="</div>";
 
    if ($#{$self->Context->{jsonchanged}}!=-1){
-      $d.="\n<script language=JavaScript>\n";
+      $d.="\n<script type=\"text/javascript\" language=JavaScript>\n";
       foreach my $f (@{$self->Context->{jsonchanged}}){
          $d.="if (typeof($f)!=\"undefined\"){\n   $f('init');\n}\n";
       }
@@ -707,7 +707,8 @@ sub getHttpFooter
    my $d="</form></div></body>";
    $d.="</html>";
    if ($scrolly!=0){
-      $d.="<script language=JavaScript>".                # IE Hack to restore
+      $d.="<script type=\"text/javascript\" language=JavaScript>".
+           # IE Hack to restore
           "window.document.body.scrollTop=$scrolly;".# Scroll Position
           "</script>";
    }

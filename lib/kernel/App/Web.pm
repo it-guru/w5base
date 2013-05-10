@@ -403,9 +403,13 @@ sub getAppTitleBar
 <table id=TitleBar width=100% height=15 border=0 cellspacing=0 cellpadding=0>
 $titlebar
 </table>
-<script language=JavaScript src="$prefix../../../public/base/load/toolbox.js">
+<script type="text/javascript" 
+        language=JavaScript 
+        src="$prefix../../../public/base/load/toolbox.js">
 </script>
-<script language=JavaScript src="$prefix../../../public/base/load/kernel.App.Web.js">
+<script type="text/javascript" 
+        language=JavaScript 
+        src="$prefix../../../public/base/load/kernel.App.Web.js">
 </script>
 <script language="JavaScript">
 function RestartApp(retVal,isbreak)
@@ -1135,7 +1139,7 @@ sub HandleNewUser
                                      skinbase=>'base'
                                       });
       }
-      print("\n<script language=\"JavaScript\">".
+      print("\n<script type=\"text/javascript\" language=\"JavaScript\">".
             "if (top.location != self.location){".
             "top.location=self.location.href;".
             "}</script>\n");
@@ -1381,7 +1385,7 @@ sub HtmlHeader
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html $langtag>
 <head>
-<script language="JavaScript">
+<script type="text/javascript" language="JavaScript">
 var CURLANG="$lang";
 var ALTLANG="$altlang";
 </script>
