@@ -192,7 +192,8 @@ sub ProcessLine
 <tr>
 <td width=1% valign=top>
 <a href=JavaScript:$frec->{function}("$frec->{name}") title="$t1">
-<img src="$frec->{icon}" border=0 style="margin-right:5px;"></a>
+<img alt="format icon $frec->{name}" 
+     src="$frec->{icon}" border=0 style="margin-right:5px;"></a>
 </td>
 <td valign=top>
 
@@ -209,13 +210,14 @@ EOF
        my $t2=$app->T("download the selected data as offline file").': '.
               $frec->{label};
        $d.=<<EOF;
-<a style='cursor:pointer' onclick='ShowUrl("$frec->{name}")' title="$t1"><img border=0 src="../../../public/base/load/anker.gif"></a>&nbsp;
-<a onclick='DirectDownload("$frec->{name}",\"DirectView\")' style='cursor:pointer' title="$t2"><img border=0 src="../../../public/base/load/download_mini.gif"></a>
+<a style='cursor:pointer' onclick='ShowUrl("$frec->{name}")' title="$t1"><img border=0 alt="anker" src="../../../public/base/load/anker.gif"></a>&nbsp;
+<a onclick='DirectDownload("$frec->{name}",\"DirectView\")' style='cursor:pointer' title="$t2"><img border=0 alt="download" src="../../../public/base/load/download_mini.gif"></a>
 EOF
     }
     else{
        $d.=<<EOF;
-<img border=0 src="../../../public/base/load/empty.gif" width=16 height=16>
+<img border=0 alt="spacer" src="../../../public/base/load/empty.gif" 
+     width=16 height=16>
 EOF
     }
     $d.=<<EOF
