@@ -1062,7 +1062,7 @@ sub FormatedSearch
    my $d="<table style=\"table-layout:fixed;width:100%\" ".
          "border=0 cellspacing=0 cellpadding=0>\n";
    $d.="<tr><td>". # for min width, add an empty image with 50px width
-       "<img width=50 border=0 height=1 ".
+       "<img width=50 border=0 height=1 alt=\"spacer\" ".
        "src=\"../../../public/base/load/empty.gif\">";
    if (exists($self->{selectsearch})){
       my $options=$self->{selectsearch};
@@ -1095,6 +1095,7 @@ sub FormatedSearch
       $d.="<td width=10 valign=top align=right>";
       $d.="<img style=\"cursor:pointer;cursor:hand;float:right;\" ".
           "onClick=\"FieldHelp_On_$name()\" align=right ".
+          "alt=\"Field-Help\" ".
           "src=\"../../../public/base/load/questionmark.gif\" ".
           "border=0>";
       $d.="</td>";
