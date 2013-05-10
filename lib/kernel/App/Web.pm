@@ -1380,6 +1380,7 @@ sub HtmlHeader
   $d.=<<EOF;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html $langtag>
+<head>
 <script language="JavaScript">
 var CURLANG="$lang";
 var ALTLANG="$altlang";
@@ -1423,7 +1424,6 @@ EOF
              "type=\"text/javascript\" src=\"$jsname\"></script>\n";
       }
    }
-   $d.="<head>\n";
    $d.="<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />";
    if (defined($param{'shorticon'})){
       my $shorticon=$param{'shorticon'};

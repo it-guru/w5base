@@ -50,6 +50,7 @@ sub getHttpHeader
    my $d="";
    $d.=$app->HttpHeader("text/html");
    $d.=$app->HtmlHeader();
+printf STDERR ("fifi d=%s\n",$d);
 
    return($d);
 }
