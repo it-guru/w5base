@@ -74,7 +74,7 @@ sub _TreeLine
       if (defined($control->{rootlink})){
          $d.="<a href=$control->{rootlink}>";
       }
-      $d.="<img border=0 ".
+      $d.="<img border=0 alt=\"root\" ".
           "src=\"${rootpath}../../base/load/$control->{rootimg}\">";
       if (defined($control->{rootlink})){
          $d.="</a>";
@@ -93,10 +93,13 @@ sub _TreeLine
              "src=\"${rootpath}../../base/load/menu_bar_$l.gif\">";
       }
       my $imgname="menu_bar_${id}.gif";
-      $d.="<img border=0 src=\"${rootpath}../../base/load/$imgname\">";
+      $d.="<img border=0 alt=\"+\" ".
+          "src=\"${rootpath}../../base/load/$imgname\">";
       $d.="</td><td valign=center>";
       my $hrefclass;
-      $hrefclass="class=$control->{hrefclass}" if (defined($control->{hrefclass}));
+      if (defined($control->{hrefclass})){
+         $hrefclass="class=$control->{hrefclass}";
+      }
       $d.=$ment->{labelprefix}  if (defined($ment->{labelprefix}));
       my $usehref="href=\"$href\"";
       $usehref="href=$href" if ($href=~m/^javascript:/i);
