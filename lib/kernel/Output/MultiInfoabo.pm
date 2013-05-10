@@ -143,7 +143,7 @@ sub MultiOperationHeader
    my $d="";
 
    my $oldval=Query->Param("mode");
-   $d.=sprintf("<table width=100%%>");
+   $d.=sprintf("<table width=\"100%%\">");
    $d.=sprintf("<tr><td>");
    $d.=sprintf("<select name=mode style=\"width:100%%\">");
    if ($oldval eq ""){

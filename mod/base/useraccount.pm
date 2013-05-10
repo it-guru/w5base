@@ -253,7 +253,7 @@ EOF
    }
 
    my $tmpl=<<EOF;
-<table width=100% height=100%>
+<table width="100%" height="100%">
 <tr>
 <td valign=center align=center>
 <table border=0 width=50% cellspacing=0 cellpadding=5>

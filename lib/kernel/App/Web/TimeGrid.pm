@@ -275,7 +275,7 @@ function SetBase(newBase)
    ${basefunc}(newBase);
 }
 </script>
-<table width=100% cellspacing=0 cellpadding=0 border=0>
+<table width="100%" cellspacing=0 cellpadding=0 border=0>
 <tr><td width=1% valign=center align=left>$prevlink</td>
 <td align=center>$str</td>
 <td width=1% valign=center align=right>$nextlink</td></tr></table>

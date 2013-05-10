@@ -471,7 +471,7 @@ sub Process
    my $template;
    my $workarea=<<EOF;
 
-<table id=WorkareaTable width=100% border=0 cellspacing=0 cellpadding=0>
+<table id=WorkareaTable width="100%" border=0 cellspacing=0 cellpadding=0>
 <tr><td valign=top>$workspace</td>
 <td width=1% valign=top>$addbuttons</td></tr>
 </table>
@@ -517,7 +517,7 @@ EOF
 <div class=WorkBorder>
 $LastMsg
 <div id=Process class=ProcessHandler>
-<table width=100% border=0 height=100% cellspacing=1 cellpadding=0>
+<table width="100%" border=0 height=100% cellspacing=1 cellpadding=0>
 <tr><td colspan=3><div class=WorkArea style="height:${workareah}px">$workarea</div></td></tr>
 <tr>
 <tr height=1%>
@@ -591,7 +591,7 @@ $tip
 </div></div></div><div id=subtip style="text-align:left;float:none;margin:0;padding:0">$subtip</div><div id=ProcessHandler style="border-top-style:outset;border-width:4px;visibility:hidden">
 <div class=WorkBorder>
 $LastMsg
-<div id=ProcessWindow class=ProcessHandler style="visibility:hidden"><table width=100% border=0 height=100% cellspacing=0 cellpadding=0><tr><td colspan=3 valign=top><div id=WorkArea class=WorkArea style="height:${workareah}">$workarea</div>&nbsp;</td></tr>
+<div id=ProcessWindow class=ProcessHandler style="visibility:hidden"><table width="100%" border=0 height="100%" cellspacing=0 cellpadding=0><tr><td colspan=3 valign=top><div id=WorkArea class=WorkArea style="height:${workareah}">$workarea</div>&nbsp;</td></tr>
 <tr>
 <tr height=1%>
 <td width=30% align=left nowrap valign=bottom>$prevbutton&nbsp;</td>

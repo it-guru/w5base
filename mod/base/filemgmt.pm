@@ -1083,7 +1083,7 @@ sub browser
          my $qparam="";
          $qparam="parentid=$target->{fid}" if (defined($target->{fid}));
          my $page="<table style=\"table-layout:fixed\" ".
-                  "width=100% height=100% border=0 ".
+                  "width=\"100%\" height=\"100%\" border=0 ".
                   "cellspacing=0 cellpadding=0>";
          $page.="<tr height=1%><td valign=top>$bar</td></tr>";
          my $fileicon="<div class=fileimage>".
@@ -1302,7 +1302,7 @@ sub WebUpload
       }
    }
    print $header;
-   print("<table width=100% style=\"table-layout:fixed\" ".
+   print("<table width=\"100%\" style=\"table-layout:fixed\" ".
          "height=100% border=0>");
    print("<tr height=1%><td width=50>Datei:</td>");
    print("<td><input size=40 type=file name=file></td></tr>");
@@ -1351,8 +1351,8 @@ sub WebCreateDir
    print $header;
    my $ct=$self->T("Create directory");
    my $d=<<EOF;
-<table width=100% style="table-layout:fixed" height=100% border=0>
-<tr height=1%><td width=120>Verzeichnisname:</td>
+<table width="100%" style="table-layout:fixed" height="100%" border=0>
+<tr height="1%"><td width=120>Verzeichnisname:</td>
 <td><input size=55 type=text name=name></td></tr>
 <tr><td colspan=2 valign=center align=center>
 <input type=submit name=do style="width:200px" value="$ct"></td></tr>

@@ -768,7 +768,7 @@ function doPrint()
 </script>
 EOF
 
-   print("<table width=100% height=100% border=0>");
+   print("<table width=\"100%\" height=\"100%\" border=0>");
 
    printf("<tr height=1%><td>");
    print $self->getAppTitleBar(prefix=>$rootpath,
@@ -840,7 +840,7 @@ EOF
 
 
    print("<tr height=1%><td>");
-   print("<table border=0 width=100% border=0><tr>\n");
+   print("<table border=0 width=\"100%\" border=0><tr>\n");
    if ($self->IsMemberOf("admin")){
       print("<td width=320>");
       print("<table width=320 border=0 cellspacing=0 cellpadding=0><tr><td>");
@@ -956,11 +956,12 @@ EOF
 
    printf("<tr><td valign=top>");
 
-   print("<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>");
+   print("<table width=\"100%\" height=\"100%\" ".
+         "border=0 cellspacing=0 cellpadding=0>");
    printf("<tr height=1%%>");
    printf("<td valign=top></td>");
    printf("<td valign=top>");
-   print("<table border=0 width=100% cellspacing=0 ".
+   print("<table border=0 width=\"100%\" cellspacing=0 ".
          "cellpadding=0 border=0><tr>\n");
    printf("<td>".
           "<span class=sublink>".
@@ -1078,7 +1079,7 @@ EOF
 
    printf("</td>");
    print("<td valign=top style=\"padding-right:5px\">".
-        "<iframe name=entry width=100% height=100% ".
+        "<iframe name=entry width=\"100%\" height=\"100%\" ".
         "src=\"../ShowEntry?id=$requestid&tag=$oldtag\">".
         "</iframe></td>");
    print ("</tr></table>");

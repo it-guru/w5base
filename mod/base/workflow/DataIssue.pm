@@ -386,7 +386,7 @@ sub generateWorkspace
    my $actions=shift;
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
 <td class=fname width=20%>%affectedobject(label)%:</td>
 <td class=finput>%affectedobject(detail)%</td>
@@ -545,7 +545,7 @@ use kernel::WfStep;
 #   my $templ;
 #   my $pa=$self->getParent->T("posible action");
 #   $templ=<<EOF;
-#<table width=100% height=148 border=0 cellspacing=0 cellpadding=0>
+#<table width="100%" height=148 border=0 cellspacing=0 cellpadding=0>
 #<tr height=1%><td width=1% nowrap>$pa &nbsp;</td>
 #<td><select id=OP name=OP style="width:100%">$selopt</select></td></tr>
 #<tr><td colspan=3 valign=top>$divset</td></tr>

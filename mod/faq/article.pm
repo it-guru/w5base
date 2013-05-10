@@ -801,7 +801,7 @@ sub FullView
       }
       if ($att ne ""){
          print("<div class=attachments>".
-               "<table width=100%>".$att."</table></div>");
+               "<table width=\"100%\">".$att."</table></div>");
       }
    }
    my $owner=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
@@ -811,7 +811,7 @@ sub FullView
 #   print("<div id=WindowSignature>$owner<br>$mdate</div>");
    if ($ENV{REMOTE_USER} ne "anonymous" && $further ne ""){
       print("<div class=further>".$self->T("further articles").":".
-            "<table width=100%>".$further."</table></div>");
+            "<table width=\"100%\">".$further."</table></div>");
    }
    print(<<EOF);
 <script type="text/javascript" src="../../../static/lytebox/lytebox.js"></script>

@@ -84,7 +84,7 @@ sub _TreeLine
    else{
       $d.="<div style=\"border-style:none;border-width:1px;".
             "padding:0;margin:0;vertical-align:middle\">";
-      $d.="<table width=100% border=0 cellspacing=0 cellpadding=0>";
+      $d.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
       $d.="<tr><td valign=center width=1% nowrap>";
       for(my $c=1;$c<=$#{$indent};$c++){
          my $l=4;

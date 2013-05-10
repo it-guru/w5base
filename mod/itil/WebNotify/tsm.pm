@@ -37,16 +37,16 @@ sub getQueryForm
    my $data=shift;
 
    my $bb;
-   $bb="<table width=100%  height=280 border=1>";
-   $bb.="<tr height=1%><td>".
+   $bb="<table width=\"100%\"  height=\"280\" border=1>";
+   $bb.="<tr height=\"1%\"><td>".
         $self->getParent->T("Please specify the applications").
         ":</td></tr>";
    $bb.="<tr height=1%><td><textarea rows=3 name=sendBaseDataAppl ".
         "style='width:100%'>".
         $data->{sendBaseDataAppl}."</textarea></td></tr>";
 
-   $bb.="<tr height=1%><td>".
-        "<table width=100%><tr><td width=1% nowrap><b>".
+   $bb.="<tr height=\"1%\"><td>".
+        "<table width=\"100%\"><tr><td width=1% nowrap><b>".
         $self->getParent->T("Message subject").":</b></td>";
    $bb.="<td>".
         "<input style='width:100%' type=text name=messageSubject ".

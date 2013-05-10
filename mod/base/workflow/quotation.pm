@@ -596,17 +596,17 @@ sub generateWorkspace
    my $actions=shift;
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
-<td class=fname width=20%>%name(label)%:</td>
+<td class=fname width="20%">%name(label)%:</td>
 <td class=finput>%name(detail)%</td>
 </tr>
 <tr>
-<td class=fname valign=top width=20%>%detaildescription(label)%:</td>
+<td class=fname valign=top width="20%">%detaildescription(label)%:</td>
 <td class=finput>%detaildescription(detail)%</td>
 </tr>
 <tr>
-<td class=fname valign=top width=20%>%fwdtargetname(label)%:</td>
+<td class=fname valign=top width="20%">%fwdtargetname(label)%:</td>
 <td class=finput>%fwdtargetname(detail)%</td>
 </tr>
 </table>
@@ -843,7 +843,7 @@ printf STDERR ("action=%s\n",Dumper($actions));
       $$selopt.="<option value=\"wfreprocess\">".
                 $self->getParent->T("wfreprocess",$tr).
                 "</option>\n";
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
          "</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>Weiterleiten an:&nbsp;</td>".
@@ -1497,7 +1497,7 @@ sub generateWorkspace
 
    if ($self->getParent->getParent->IsMemberOf("admin")){
       $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
 <td class=fname width=20%>%fwdtargetname(label)%:</td>
 <td class=finput>%fwdtargetname(detail)%</td>

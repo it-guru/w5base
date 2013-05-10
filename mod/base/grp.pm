@@ -466,8 +466,8 @@ sub getGrpDiv
    my $desc=$grec->{description}; 
    my $comm=$grec->{comments}; 
  
-   $d.="<table width=100%>".
-       "<tr><td width=1%><img class=groupicon src=\"$img\"></td>".
+   $d.="<table width=\"100%\">".
+       "<tr><td width=\"1%\"><img class=groupicon src=\"$img\"></td>".
        "<td valign=top align=left><u>$desc</u><br>$comm</td></tr></table>";
 
    

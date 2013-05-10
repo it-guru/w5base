@@ -99,7 +99,7 @@ sub ProcessHead
    }
 
    $d.="<tr><td class=mainblock>";
-   $d.="<table class=datatable width=100%>\n<tr class=headline>";
+   $d.="<table class=datatable width=\"100%\">\n<tr class=headline>";
    if ($#view!=-1){
       $d.="<th class=headfield style=\"padding:0;margin:0\">".
           "<div style=\"padding:0;margin:0;width:3px\">".

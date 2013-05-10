@@ -488,7 +488,7 @@ sub WinHandleQualityCheck
    my $DetailClose=$self->T("DetailClose","kernel::App::Web::Listedit");
    my $DetailPrint=$self->T("DetailPrint","kernel::App::Web::Listedit");
    $d.=<<EOF;
-<table width=100% height=100% border=0>
+<table width="100%" height="100%" border=0>
 <tr height=50><td>$handlermask</td></tr>
 <tr>
 <td valign=top>
@@ -498,7 +498,7 @@ sub WinHandleQualityCheck
 </tr>
 <tr height=20>
 <td>
-<table cellspacing=0 cellpadding=0 width=100%>
+<table cellspacing=0 cellpadding=0 width="100%">
 <tr><td>$msg</td><td align=right><div id=summary></div></td></tr>
 </table>
 </td>

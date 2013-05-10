@@ -118,7 +118,7 @@ sub ProcessHead
 
    if ($param->{ParentMode} ne "HtmlV01" &&
        $param->{ParentMode} ne "HtmlNative"){
-      $d.="<table width=100% style=\"table-layout:fixed\">".
+      $d.="<table width=\"100%\" style=\"table-layout:fixed\">".
           "<tr><td><div style=\"overflow:hidden\">\n";
    }
    my $activeateSort="addEvent(window,\"load\",InitTab$tableid);";
@@ -139,7 +139,7 @@ $activeateSort
 </script>
 EOF
    if ($param->{ParentMode} eq "HtmlNative"){
-      $d.="<table width=100%>\n";
+      $d.="<table width=\"100%\">\n";
    }
    else{
       $d.="<table class=maintable>\n";
@@ -149,10 +149,10 @@ EOF
    $d.="<tr><td class=mainblock>";
 
    if ($param->{ParentMode} eq "HtmlNative"){
-      $d.="<table $tableidstr border=1 width=100%>\n";
+      $d.="<table $tableidstr border=1 width=\"100%\">\n";
    }
    else{
-      $d.="<table $tableidstr class=subdatatable width=100%>\n";
+      $d.="<table $tableidstr class=subdatatable width=\"100%\">\n";
    }
 
    $d.="<thead><tr class=subheadline>";

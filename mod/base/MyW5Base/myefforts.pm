@@ -212,7 +212,7 @@ sub Result
    my $condition=$self->T("condition");
    my $cond=Date_to_String("de",@now);
    print(<<EOF);
-<table width=100% border=1 style="border-collapse:collapse">
+<table width="100%" border=1 style="border-collapse:collapse">
 <tr>
 <td width=45% nowrap>$l1</td><td align=right width=40><b>$mwteff</b></td>
 <td width=45% nowrap>$l2</td><td width=40 align=right>$wtcount&nbsp;</td></tr>

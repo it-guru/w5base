@@ -49,7 +49,7 @@ sub RightsOverview   # erster Versuch der Berechtigungsübersicht
            "token=$chk->{token}".
            "'";
       print("<div class=checkframe id=\"$chk->{token}\">");
-      print("<table width=100% cellspacing=0 cellpadding=0>");
+      print("<table width=\"100%\" cellspacing=0 cellpadding=0>");
       print("<tr><td>");
       printf("checking '%s' in '%s' ($chk->{module} [$chk->{k}])...<br>",
              $chk->{label},

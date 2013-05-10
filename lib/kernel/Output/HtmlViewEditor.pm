@@ -106,7 +106,7 @@ sub ProcessHead
    $d.=$self->getHtmlViewLine($fh,$dest);
 
    $d.="<tr><td class=mainblock>";
-   $d.="<table  class=datatable width=100% border=0>\n".
+   $d.="<table  class=datatable width=\"100%\" border=0>\n".
        "<tr class=headline>";
    $app->{userview}->ResetFilter();
    $app->{userview}->SetFilter({module=>\$module,
@@ -315,9 +315,10 @@ addEvent(window,"load",convertTrees);
 </script>
 EOF
    $d.="<div id=ViewEditor class=ViewEditor ><div id=ViewEditorMain class=ViewEditorMain>";
-   $d.="<table height=100% width=100% border=0 cellpadding=5>";
+   $d.="<table height=\"100%\" width=\"100%\" border=0 cellpadding=5>";
    $d.="<tr><td valign=top>";
-   $d.="<table border=0 cellspacing=0 cellpadding=0 width=100% height=100%>".
+   $d.="<table border=0 cellspacing=0 cellpadding=0 ".
+       "width=\"100%\" height=\"100%\">".
        "<tr height=1%>";
    $d.="<td width=25% nowrap align=left>".
        "<input type=text size=10 name=AddView>";
@@ -329,9 +330,10 @@ EOF
        "value=\"".
        $app->T("Drop View",$self->Self())."\">";
    $d.="</td></tr>";
-   $d.="<tr><td colspan=3><table width=100% border=1 height=100%>";
+   $d.="<tr><td colspan=3><table width=\"100%\" border=1 height=\"100%\">";
    $d.="<tr height=1%>";
-   $d.="<td width=50%><table width=100%  border=0><tr><td align=left valign=middle>".
+   $d.="<td width=50%><table width=\"100%\" ".
+       " border=0><tr><td align=left valign=middle>".
        $app->T("MSG004",$self->Self())."</td><td valign=middle align=right>".
        "<input title=\"".$app->T("filter fields in menu tree",$self->Self()).
        "\" size=8 onKeyup=\"ShSearch();\" ".

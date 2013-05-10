@@ -339,7 +339,7 @@ sub CryptoOut
                                                  $erec->{name}.' read',
                                            entryid=>$id});
          print("<div class=passxinfo>");
-         print("<table width=100% border=0>");
+         print("<table width=\"100%\" border=0>");
          my $comments=$erec->{comments};
          $comments=" ($comments)" if (!($comments=~m/^\s*$/));
          print("<tr><td nowrap width=1% valign=top>Systemname:</td>".
@@ -694,9 +694,9 @@ addEvent(window,"load",resizeDiv);
 addEvent(window,"resize",resizeDiv);
 
 </script>
-<table width=100% border=0>
+<table width="100%" border=0>
 <tr>
-<td width=1% nowrap>&nbsp;<b>PassX Connector: &nbsp;</b></td><td><input type=text name=filter value="$flt" size=10 style="width:100%"></td><td width=100><input type=submit name=go value="$search" style="width:100%"></td></tr></table>
+<td width=1% nowrap>&nbsp;<b>PassX Connector: &nbsp;</b></td><td><input type=text name=filter value="$flt" size=10 style="width:100%"></td><td width="100"><input type=submit name=go value="$search" style="width:100%"></td></tr></table>
 <div id=sl style="width:100%;height:3px;overflow:auto;border-width:1px;border-style:solid">
 EOF
    my $userid=$self->getCurrentUserId();
@@ -744,11 +744,11 @@ sub pstore
 <input type=hidden name=curpath>
 <link rel=stylesheet type="text/css" href="../../../public/passx/load/passx.css"></link>
 <link rel=stylesheet type="text/css" href="../../../public/base/load/menu.css"></link>
-<table width=100% height=100% 
+<table width="100%" height="100%" 
        cellspacing=0 cellpadding=5 border=0 style="table-layout:fixed">
 <tr>
 <td width=30% valign=bottom>
-<table width=100% border=0>
+<table width="100%" border=0>
 <tr>
 <td><b>$PasswordFolders:</b></td><td><input type=text name=filter value="$flt" size=10></td><td><input type=submit name=go value="$search"></td></tr></table>
 <div id=sl style="width:100%;height:220px;overflow:auto;border-width:1px;border-style:solid">
@@ -771,7 +771,7 @@ EOF
 </td>
 <td align=center>
 <div class=storewin>
-<table border=0 width=100%>
+<table border=0 width="100%">
 <tr>
 <td>
 <a href=JavaScript:openwin("../entry/New","_blank","height=$detaily,width=$detailx,toolbar=no,status=no,resizable=yes,scrollbars=auto")>
@@ -1146,8 +1146,8 @@ window.onload=function(){
 
 }
 </script>
-<table width=100% height=100% border=0>
-<tr height=1%><td width=10% nowrap>$PersonalPassword</td><td>
+<table width="100%" height="100%" border=0>
+<tr height="1%"><td width="10%" nowrap>$PersonalPassword</td><td>
 <input name=rsaphrase autocomplete="off" autofill="off" onkeydown="testForEnter();" onkeypress="inputkeyhandler();" type=password>
 <input id=activity disabled name=activity type=hidden value="">
 </td><td align=right>

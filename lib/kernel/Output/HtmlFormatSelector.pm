@@ -86,7 +86,7 @@ sub ProcessHead
    $d.=$self->getHtmlViewLine($fh,$dest);
 
    $d.="<tr><td class=mainblock>";
-   $d.="<table  class=datatable width=100%>\n".
+   $d.="<table  class=datatable width=\"100%\">\n".
        "<tr class=headline>";
    $d.="<th colspan=2 class=headfield height=1%>".
        $self->getParent->getParent->T("Select method to use on selected data").
@@ -188,7 +188,7 @@ sub ProcessLine
             border-style:solid;
             float:left;
             border-width:1px;">
-<table width=100% cellspacing=0 cellpadding=0 border=0>
+<table width="100%" cellspacing=0 cellpadding=0 border=0>
 <tr>
 <td width=1% valign=top>
 <a href=JavaScript:$frec->{function}("$frec->{name}") title="$t1">
@@ -196,7 +196,7 @@ sub ProcessLine
 </td>
 <td valign=top>
 
-<table width=100% border=0 cellspacing=0 cellpadding=0>
+<table width="100%" border=0 cellspacing=0 cellpadding=0>
 <tr>
 
 <td><b><u>$frec->{label}</u></b></td>

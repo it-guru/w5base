@@ -142,7 +142,7 @@ function startWorkflow()
    fr.src="startWorkflow?class="+cl+"&CurrentId="+id;
 }
 </script>
-<table width=100% border=0>
+<table width="100%" border=0>
 <tr><td width=1% nowrap>$changes:</td>
 <td width=280>$tt</td>
 <td width=1% nowrap>$label1:</td>
@@ -153,7 +153,7 @@ function startWorkflow()
 </td></tr>
 <tr><td width=1% nowrap>$wftype:</td>
 <td colspan=3>
-<table width=100% cellspacing=0 cellpadding=0>
+<table width="100%" cellspacing=0 cellpadding=0>
 <tr><td width=90%>$wt</td>
 <td width=1%><input type=button onclick="startWorkflow();" id=startbutton disabled value="=> start Workflow" class=button style="width:100px"></td>
 </tr></table>

@@ -160,7 +160,7 @@ sub ShowNewTopic
   print(<<EOF);
 <tr>
 <td colspan=3>
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
 <td align=left>$lastmsg</td>
 <td width=1% align=right>
@@ -274,7 +274,7 @@ sub ShowTopic
       print("<br>");
    }
    else{
-      print("<table width=100% cellspacing=0 cellpadding=0 border=0>");
+      print("<table width=\"100%\" cellspacing=0 cellpadding=0 border=0>");
       print("<tr><td align=right><div class=OnlyInBrowser>");
       print("<a class=FunctionLink href=JavaScript:DetailPrint()>".
             $self->T("DetailPrint","kernel::App::Web::Listedit")."</a> &bull;");
@@ -290,14 +290,14 @@ sub ShowTopic
    $Q="&AllowClose=1" if ($allowclose);
    if ($allowclose){
       printf("<tr><td colspan=3 class=topiclabel>".
-             "<table width=100%% cellspacing=0 cellpadding=0 border=0>".
+             "<table width=\"100%%\" cellspacing=0 cellpadding=0 border=0>".
              "<tr><td><b>".
              $self->T("Board","faq::forumboard").":</b> ".
              "$borec->{name}".
              "</td></tr></table></td></tr>");
    }
    printf("<tr><td colspan=3 class=topiclabel>".
-          "<table width=100%% cellspacing=0 cellpadding=0 border=0>".
+          "<table width=\"100%%\" cellspacing=0 cellpadding=0 border=0>".
           "<tr><td><b>".
           $self->T("Topic","faq::forumtopic").":</b> <a class=topiclink ".
           "href=\"./$torec->{id}$Q\">$torec->{name}</a>".
@@ -338,10 +338,10 @@ sub ShowTopic
 
       print <<EOF;
 <td valign=top width=200 class=authorlabel>$creator<br>$cdate<br>
-<table width=100%>
+<table width="100%">
 <tr><td><!-- Beitragscount des users --></td><td align=right><!-- profile link -->
 </td></tr></table></td><td width=70% valign=top>
-<table style="table-layout:fixed" width=100% cellspacing=0 cellpadding=0>
+<table style="table-layout:fixed" width="100%" cellspacing=0 cellpadding=0>
 <tr><td><pre class=wraped style="overflow:hidden">$comments</pre></td>
 <td width=25 valign=top>$linelabel</td></tr></table>
 </td></tr>
@@ -617,7 +617,7 @@ EOF
 
          }
          ####################################################################
-         $d.="<table width=100%>";
+         $d.="<table width=\"100%\">";
          $d.="<tr>";
          $d.="<td>$edt</td>"; 
          $d.="<td width=1%><input type=submit value=\"".
@@ -753,7 +753,7 @@ sub ShowBoard
    if ($boardheader ne ""){
       printf("<tr><td colspan=6 align=left valign=top>".
              "<iframe src=\"${rootpath}../forumboard/BoardHeader?id=%s\" ".
-             "width=100% height=80></iframe>".
+             "width=\"100%\" height=\"80\"></iframe>".
              "</td></tr>",$borec->{id});
    }
    printf("<tr><td colspan=6 align=right valign=top>%s</td></tr>",

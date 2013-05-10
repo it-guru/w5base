@@ -192,11 +192,11 @@ textarea{
 }
 </style>
 <form method=POST>
-<table width=100% height=100%>
-<tr height=1%><td width=1%>$fromlabel:</td><td>$srclang</td></tr>
+<table width="100%" height="100%">
+<tr height="1%"><td width=1%>$fromlabel:</td><td>$srclang</td></tr>
 <tr><td colspan=2><textarea name=src>$cursrc</textarea></td></tr>
-<tr height=1%><td colspan=2 align=center><input style="width:60%" type=submit value=" $translabel "></td></tr>
-<tr height=1%><td width=1%>$tolabel:</td><td>$dstlang</td></tr>
+<tr height="1%"><td colspan=2 align=center><input style="width:60%" type=submit value=" $translabel "></td></tr>
+<tr height="1%"><td width=1%>$tolabel:</td><td>$dstlang</td></tr>
 <tr><td colspan=2><textarea name=dst $dstdis>$curdst</textarea></td></tr>
 </table>
 </form>

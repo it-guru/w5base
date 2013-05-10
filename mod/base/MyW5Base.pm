@@ -61,11 +61,11 @@ sub getWelcomeQueryTemplate
    if ($#bm==-1){
       $d=<<EOF;
 <tr><td valign=top align=center><br><br>
-<table width=80% border=0>
+<table width="80%" border=0>
 <tr>
-<td align=center width=20%>$mywf</td><td align=center width=20%>&nbsp;</td>
-<td align=center width=20%>$myjobs</td><td align=center width=20%>&nbsp;</td>
-<td align=center width=20%>$newwf</td>
+<td align=center width="20%">$mywf</td><td align=center width="20%">&nbsp;</td>
+<td align=center width="20%">$myjobs</td><td align=center width="20%">&nbsp;</td>
+<td align=center width="20%">$newwf</td>
 </td>
 </tr>
 <tr>
@@ -83,7 +83,7 @@ EOF
       my $userbookmarktitle=$self->T("bookmarks");
       my $bmdiv="<div class=winframe>";
       $bmdiv.="<div class=winframehead>".
-              "<table width=100% cellspacing=0 cellpadding=0 border=0>".
+              "<table width=\"100%\" cellspacing=0 cellpadding=0 border=0>".
               "<tr><td valign=center>".
               "<a target=msel class=winframehead ".
               "href=\"../../base/menu/msel/sysadm.userenv.bookmarks\">".
@@ -121,18 +121,18 @@ EOF
       }
       $d=<<EOF;
 <tr><td valign=top align=center>
-<table width=100% border=0>
+<table width="100%" border=0>
 <td valign=top>$bmdiv
 $newstext
 </td>
-<td width=40% valign=top>
+<td width="40%" valign=top>
 <div class=winframe id=workflowlinks>
 
 <div class=winframehead>Workflow Links:</div>
-<table width=99%>
+<table width="99%">
 <tr>
-<td align=center width=50%>$mywf</td>
-<td align=center width=50%>$newwf</td>
+<td align=center width="50%">$mywf</td>
+<td align=center width="50%">$newwf</td>
 </td>
 </tr>
 <tr>
@@ -240,12 +240,12 @@ function doQuickFind()
 </form>
 <form name=QuickFind>
 <div class=winframehead>QuickFind:</div>
-<table width=100% border=1>
+<table width="100%" border=1>
 <tr>
 <td>
 <input style="width:100%" type=text value="" name=searchtext>
 </td>
-<td width=1%>
+<td width="1%">
 <input onclick="doQuickFind();" type=button value="$search">
 </td>
 </tr>
@@ -268,7 +268,7 @@ sub addNewsFrame
 
    $news="<div class=winframe style=\"margin-top:4px\" id=newsall>";
    $news.="<div class=winframehead>".
-           "<table width=100% cellspacing=0 cellpadding=0 border=0>".
+           "<table width=\"100%\" cellspacing=0 cellpadding=0 border=0>".
            "<tr><td valign=center>".
            "<a target=msel class=winframehead ".
            "href=\"../../base/menu/msel/faq.forum\">".
@@ -289,7 +289,7 @@ sub getNews
    if (defined($to)){
       $to->SecureSetFilter();
       $to->Limit(50);
-      $d.="<table width=100% border=0 cellspacing=0>";
+      $d.="<table width=\"100%\" border=0 cellspacing=0>";
       my $newsline=1;
       my $newscount=0;
       $to->SetCurrentOrder(qw(cdate));
@@ -349,7 +349,7 @@ sub Result
    if ($self->LastMsg()){
       @msglist=$self->LastMsg();
    }
-   print "<table width=100% cellpadding=20><tr><td>";
+   print "<table width=\"100%\" cellpadding=20><tr><td>";
    print "<div class=lastmsg style=\"width:100%\">".
           join("<br>\n",map({
                               if ($_=~m/^ERROR/){

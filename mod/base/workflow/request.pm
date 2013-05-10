@@ -665,7 +665,7 @@ sub generateWorkspace
    my $actions=shift;
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width=\"100%\">
 <tr>
 <td class=fname width=20%>%name(label)%:</td>
 <td class=finput>%name(detail)%</td>
@@ -957,7 +957,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wfreprocess",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
          unHtml($note)."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>Weiterleiten an:&nbsp;</td>".
@@ -1011,7 +1011,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wfapprovalreq",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
          $note."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>&nbsp;Genehmigungs ".
@@ -1026,7 +1026,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wfapprovok",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
          unHtml($note)."</textarea></td></tr>";
       $d.="<tr><td colspan=2>Ja, ich bin sicher, dass ich diese Anforderung ".
@@ -1039,7 +1039,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wfapprovreject",$tr).
                 "</option>\n";
       my $note=Query->Param("note");
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
          $note."</textarea></td></tr>";
       $d.="</table>";
@@ -1049,7 +1049,7 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfapprovalcan\">".
                 $self->getParent->T("wfapprovalcan",$tr).
                 "</option>\n";
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
          "</textarea></td></tr>";
       #$d.="<tr><td width=1% nowrap>&nbsp;Genehmigungs ".

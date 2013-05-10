@@ -690,8 +690,8 @@ sub generateWorkspace
       $info=$self->getParent->T("MSG001");
    }
    my $templ=<<EOF;
-<table width=100% height=110 cellspacing=0 cellpadding=0>
-<tr height=1%><td>Benachrichtigungstext:</td></tr>
+<table width="100%" height="110" cellspacing=0 cellpadding=0>
+<tr height="1%"><td>Benachrichtigungstext:</td></tr>
 <tr><td>
 <textarea name=PublishInfoMsg style="width:100%;height:100%">$info</textarea>
 </td>

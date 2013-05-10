@@ -1943,10 +1943,10 @@ sub generateWorkspace
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 $StoredWorkspace
 <tr>
-<td class=fname width=30%>%eventmode(label)%:</td>
+<td class=fname width="30%">%eventmode(label)%:</td>
 <td class=finput>%eventmode(detail)%</td>
 </tr>
 </table>
@@ -2031,7 +2031,7 @@ sub generateWorkspace
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 $StoredWorkspace
 <tr>
 <td class=fname width=20%>%mandator(label)%:</td>
@@ -2123,7 +2123,7 @@ sub generateWorkspace
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 $StoredWorkspace
 <tr>
 <td class=fname width=20%>%mandator(label)%:</td>
@@ -2211,7 +2211,7 @@ sub generateWorkspace
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 $StoredWorkspace
 <tr>
 <td class=fname width=20%>%affectedbusinessprocess(label)%:</td>
@@ -2288,7 +2288,7 @@ sub generateWorkspace
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 $StoredWorkspace
 <tr>
 <td class=fname width=20%>%affectedapplication(label)%:</td>
@@ -2373,7 +2373,7 @@ sub generateWorkspace
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 $StoredWorkspace
 <tr>
 <td class=fname width=20%>%mandator(label)%:</td>
@@ -2458,7 +2458,7 @@ sub generateWorkspace
    my $StoredWorkspace=$self->SUPER::generateStoredWorkspace($WfRec,@steplist);
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 $StoredWorkspace
 <tr>
 <td class=fname valign=top width=20%>%affectedroom(label)%:</td>
@@ -2535,7 +2535,7 @@ informiert.
 EOF
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 $StoredWorkspace
 <tr>
 <td class=fname valign=top width=20%>%eventstatnature(label)%:</td>
@@ -2944,7 +2944,7 @@ sub generateWorkspace
    Query->Param("Formated_eventstartofevent"=>'now');
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
 <td class=fname width=20%>%eventstartofevent(label)%:</td>
 <td class=finput>%eventstartofevent(detail)%</td>
@@ -3037,12 +3037,12 @@ sub generateWorkspace
    my $t6=$self->T("Close Workflow");
    my $t7=$self->T("Modify event timespan");
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100% height=110>
+<table border=0 cellspacing=0 cellpadding=0 width="100%" height="110">
 <tr><td align=center valign=top>
 <textarea name=note $Dnote 
           onkeydown=\"textareaKeyHandler(this,event);\" 
           style=\"width:100%;height:50\"></textarea>
-<table border=0 width=100% cellspacing=0 cellpadding=0>
+<table border=0 width="100%" cellspacing=0 cellpadding=0>
 <tr>
 <td align=center>
 <input type=submit name=addnote $Daddnote value="$t1" 
@@ -3059,7 +3059,7 @@ $addButtons
 </tr>
 <tr>
 <td>
-<table width=100% border=0>
+<table width="100%" border=0>
 <tr>
 <td align=center>
 <input type=submit $Dscust 
@@ -3219,7 +3219,7 @@ sub generateWorkspace
       $tend=Query->Param("terminend");
    }
 
-   my $d="<table width=100% border=0>";
+   my $d="<table width=\"100%\" border=0>";
    $d.="<tr>";
    $d.="<td width=1% valign=top>An:</td>";
    $d.="<td>".
@@ -3724,7 +3724,7 @@ bekannt, so wird der Workflow als "geschlossen" markiert.
 EOF
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
 <td class=fname valign=top width=20%>%eventstartofevent(label)%:</td>
 <td class=finput>%eventstart(detail)%</td>
@@ -3847,7 +3847,7 @@ keinerlei Nacharbeiten mehr möglich.
 EOF
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr><td colspan=2>
 <div class=Question>
 $t
@@ -3929,7 +3929,7 @@ sub generateWorkspace
    my ($Dreact);
    $Dreact="disabled"    if (!$self->ValidActionCheck(0,$actions,"reactivate"));
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100% height=50>
+<table border=0 cellspacing=0 cellpadding=0 width="100%" height=50>
 <tr><td width=50% align=center>
 <input type=submit $Dreact 
        class=workflowbutton name=reactivate value="reaktivieren">

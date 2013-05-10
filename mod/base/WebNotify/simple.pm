@@ -43,16 +43,16 @@ sub getQueryForm
    my $data=shift;
 
    my $bb;
-   $bb="<table width=100%  height=280 border=1>";
-   $bb.="<tr height=1%><td>".
+   $bb="<table width=\"100%\"  height=\"280\" border=1>";
+   $bb.="<tr height=\"1%\"><td>".
         $self->getParent->T("Please specify target contacts").
         ":</td></tr>";
-   $bb.="<tr height=1%><td><textarea rows=2 name=sendBaseData ".
+   $bb.="<tr height=\"1%\"><td><textarea rows=2 name=sendBaseData ".
         "style='width:100%'>".
         $data->{sendBaseData}."</textarea></td></tr>";
 
-   $bb.="<tr height=1%><td>".
-        "<table width=100%><tr><td width=1% nowrap><b>".
+   $bb.="<tr height=\"1%\"><td>".
+        "<table width=\"100%\"><tr><td width=\"1%\" nowrap><b>".
         $self->getParent->T("Message subject").":</b></td>";
    $bb.="<td>".
         "<input style='width:100%' type=text name=messageSubject ".

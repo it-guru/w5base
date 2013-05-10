@@ -818,13 +818,13 @@ sub generateWorkspace
    }
    my $templ;
    if ($divset eq ""){
-      return("<table width=100%><tr><td>&nbsp;</td></tr></table>");
+      return("<table width=\"100%\"><tr><td>&nbsp;</td></tr></table>");
    }
    my $pa=$self->getParent->T("posible action");
    my $tabheight=$wsheight-30;
    $tabheight=30 if ($tabheight<30);  # ensure, that tabheigh is not negativ
    $templ=<<EOF;
-<table width=100% height=$tabheight border=0 cellspacing=0 cellpadding=0>
+<table width="100%" height="$tabheight" border=0 cellspacing=0 cellpadding=0>
 <tr height=1%><td width=1% nowrap>&nbsp;$pa &nbsp;</td>
 <td><select id=OP name=OP style="width:100%">$selopt</select></td></tr>
 <tr><td colspan=3 valign=top>$divset</td></tr>
@@ -877,7 +877,7 @@ sub generateWorkspacePages
                 "</option>\n";
       my $note=Query->Param("note");
 
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
          quoteHtml($note)."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>".
@@ -906,7 +906,7 @@ sub generateWorkspacePages
       $$selopt.="<option value=\"wfschedule\">".
                 $self->getParent->T("wfschedule",$tr).
                 "</option>\n";
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=4><tr>".
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=4><tr>".
          "<td colspan=2><br>Automaticly scheduling will copy this worklow in a selectable interval. After copy process, the new workflow will be activated automaticly. The result of the operation will be mailed to the creator of this workflow. ATTENSION: This function is Test!!!".
          "<br><br></td></tr>";
       $d.="<tr><td width=1% nowrap>".
@@ -992,7 +992,7 @@ sub generateWorkspacePages
                       "\"height=400,width=600,toolbar=no,status=no,".
                       "resizable=yes,scrollbars=no\")");
       }
-      my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>";
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
       #if ($#m!=-1){
          my $param={}; 
          $param->{parent}="base::workflow";
@@ -1037,7 +1037,7 @@ sub generateWorkspacePages
 
       $d.="<tr>".
          "<td colspan=2>".
-      #   "<table width=100% cellspacing=0 cellpadding=0><tr>".
+      #   "<table width=\"100%\" cellspacing=0 cellpadding=0><tr>".
       #   "<td nowrap width=1%>".
       #   $self->getParent->T("to").": &nbsp;</td><td>".
       #   "<input type=text name=emailto style=\"width:100%\">".
@@ -1073,7 +1073,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wfinquiry",$tr).
                 "</option>\n";
       $$divset.="<div id=OPwfinquiry class=\"$class\">".
-                "<table width=100% border=0 cellspacing=0 cellpadding=0>".
+                "<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>".
                 "<tr><td width=1% nowrap>&nbsp;%inquiryrequest(label)% ".
                 ":&nbsp;</td>".
                 "<td>\%inquiryrequest(detail)\%".
@@ -1229,7 +1229,7 @@ sub getDefaultNoteDiv
    }
 
    my $note=Query->Param("note");
-   my $d="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>".
+   my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note ".
          "onkeydown=\"textareaKeyHandler(this,event);\" ".
          "style=\"width:100%;height:${noteheight}px\">".

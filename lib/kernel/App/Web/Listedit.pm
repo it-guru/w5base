@@ -1344,7 +1344,7 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    my $htmlresult="";
 
    if ($header){
-      $htmlresult.="<table width=100% style='margin:5px'>\n";
+      $htmlresult.="<table width=\"100%\" style='margin:5px'>\n";
     
       my $fo=$self->getRecordHeaderField();
     
@@ -1356,7 +1356,7 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
       }
    }
    else{
-      $htmlresult.="<table width=100%>\n";
+      $htmlresult.="<table width=\"100%\">\n";
    }
    $htmlresult.="<tr><td colspan=2 align=center>";
    $htmlresult.="ERROR: ".
@@ -1871,7 +1871,8 @@ sub UploadWelcome
                            body=>1,form=>1,
                            title=>'W5BaseV2-Upload');
 
-   printf("<table width=100% height=100%><tr><td valign=center align=center>".
+   printf("<table width=\"100%\" height=\"100%\">".
+          "<tr><td valign=center align=center>".
           "%s</td></tr></table>",
           $self->T("Please select file and start upload"));
 
@@ -1888,7 +1889,7 @@ sub Welcome
       my $recordimg=$self->getRecordImageUrl();
       my $welcome=$self->T("WELCOME",$self->Self);
       print(<<EOF);
-<table width=100% height=60%>
+<table width="100%" height="60%">
 <tr>
 <td align=center valign=center>
 <table border=0 cellspacing=5 cellpadding=5>
@@ -2343,12 +2344,13 @@ function ScrollDown()
 }
 </script>
 EOF
-   print("<center><table border=0 width=100% height=100% cellpadding=5>");
+   print("<center><table border=0 ".
+         "width=\"100%\" height=\"100%\" cellpadding=5>");
    print("<tr><td align=center valign=top>");
-   print("<table width=70% class=uploadframe border=0>");
+   print("<table width=\"70%\" class=uploadframe border=0>");
    print("<tr><td>");
-   print("<table width=100% cellspacing=0 cellpadding=0>");
-   print("<tr><td><table width=100% border=0 ".
+   print("<table width=\"100%\" cellspacing=0 cellpadding=0>");
+   print("<tr><td><table width=\"100%\" border=0 ".
          "cellspacing=0 cellpadding=0><tr><td valign=top>");
 
 
@@ -2386,7 +2388,7 @@ EOF
    print("</td>");
    if ($self->IsMemberOf("admin")){
       print("<td width=45% valign=bottom>"); ################################
-      print("<table width=100% cellspacing=0 cellpadding=0>");
+      print("<table width=\"100%\" cellspacing=0 cellpadding=0>");
       print("<tr><td>History note:<br>".
             "<textarea style=\"width:100%\" ".
             "name=HistoryComments wrap=off rows=3 cols=10></textarea>");
@@ -2397,11 +2399,11 @@ EOF
    print("</table></td>");
    print("</td></tr>");
    print("<tr><td>");
-   print("<table width=100%>");
+   print("<table width=\"100%\">");
    printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload File"));
    print("<tr><td align=center><input size=55 type=file name=file></td></tr>");
    print("<tr><td>");
-   print("<table width=100%>");
+   print("<table width=\"100%\">");
    printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Result"));
    print("<tr><td>");
    print("<iframe id=uploadresult src=\"UploadWelcome\" name=uploadresult ".
@@ -2545,7 +2547,7 @@ sub ListeditTabObjectSearch
                            submodal=>1,
                            body=>1,form=>1,
                            title=>'W5BaseV1-System');
-   print("<table class=HtmlWorkflowLink width=100% height=100% ".
+   print("<table class=HtmlWorkflowLink width=\"100%\" height=\"100%\" ".
          "border=0 cellspacing=0 cellpadding=0>");
    printf("<tr><td height=1%%>%s</td></tr>",$searchmask);
    my $welcomeurl="../../base/load/tmpl/empty";

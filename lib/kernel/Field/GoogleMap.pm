@@ -113,7 +113,7 @@ function load() {
   else{
     e = document.getElementById("googlemap$id");
     if (e){
-       e.innerHTML="<table width=100% height=100%><tr><td align=center valign=center>No access to http://maps.google.com/</td></tr></table>";
+       e.innerHTML="<table width='100%' height='100%'><tr><td align=center valign=center>No access to http://maps.google.com/</td></tr></table>";
     }
   }
 }

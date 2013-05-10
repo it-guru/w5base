@@ -56,7 +56,8 @@ body{
 }
 </style>
 EOF
-   print("<table width=100% height=100% border=0 cellspacing=10 cellpadding=0>");
+   print("<table width=\"100%\" height=\"100%\" border=0 ".
+         "cellspacing=10 cellpadding=0>");
    printf("<tr><td height=1%% valign=top>%s</td></tr>",$self->getAppTitleBar());
    print $self->getParsedTemplate("tmpl/XLSExpand",{});
    my @collabel=('A'..'Z');
@@ -90,8 +91,8 @@ EOF
            "<td width=1%><select disabled name=\"OUT:$outkey{$l}\">$o</td></tr>"; 
    }
    print(<<EOF);
-<table width=100% cellpadding=10><tr><td>
-  <table width=100% border=0>
+<table width="100%" cellpadding=10><tr><td>
+  <table width="100%" border=0>
   <tr>
   <td width=50% height=1%><b>Eingangskriterien:</b></td>
   <td width=50% height=1%><b>Auffüll Informationen:</b></td>
@@ -99,12 +100,12 @@ EOF
   <tr id=ref>
     <td width=50%>
       <div id=inlist style="height:100px;overflow:auto">
-      <table width=100% border=1 cellpadding=0 cellspacing=0>$il</table>
+      <table width="100%" border=1 cellpadding=0 cellspacing=0>$il</table>
       </div>
     </td>
     <td width=50%>
       <div id=outlist style="height:100px;overflow:auto">
-      <table width=100% border=1 cellpadding=0 cellspacing=0>$ol</table>
+      <table width="100%" border=1 cellpadding=0 cellspacing=0>$ol</table>
       </div>
     </td>
   </tr>
@@ -114,7 +115,7 @@ EOF
    print("</td>");
    print("<tr><td height=80px valign=top>");
    print(<<EOF);
-<table width=100% border=1 height=100%  cellpadding=0 cellspacing=0>
+<table width="100%" border=1 height=100%  cellpadding=0 cellspacing=0>
 <tr>
 <td width=40% valign=top >Eingabedatei:<br>
 <input type=file name=file size=30 style="width:100%"><br><br>

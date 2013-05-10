@@ -320,7 +320,7 @@ sub arrangeSearchData
    $d.="<input type=hidden name=search_customerprio value=\"NONE\">";
    # Anwendungen im Mandaten DSS sind laut Hr. Weidner keine Top-Anwendungen
    $d.="<input type=hidden name=search_mandator value=\"!DSS\">";
-   $d.="<table width=100%><tr><td align=center>";
+   $d.="<table width=\"100%\"><tr><td align=center>";
    foreach my $rec (@customer){
       $d.="<input style=\"margin-right:2px;margin-left:2px;width:120px\" ".
           "type=button ".

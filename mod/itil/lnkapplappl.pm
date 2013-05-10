@@ -478,13 +478,13 @@ sub InterfaceAgreement
       my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
       my $n="../../../public/itil/load/lnkapplappl.jpg?".$cgi->query_string();
 
-      print("<table width=100% border=0 cellspacing=0 cellpadding=0><tr>");
-      print("<td width=20% align=left><img class=logo src='$n'></td>");
+      print("<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>");
+      print("<td width=\"20%\" align=left><img class=logo src='$n'></td>");
       print("<td>");
       print ("<h1>Schnittstellenvereinbarungen zwischenden Anwendungen<br> ".
              $l[0]->{name}." und ".$l[1]->{name}."</h1>");
       print("</td>");
-      print("<td width=20% align=right>&nbsp;</td>");
+      print("<td width=\"20%\" align=right>&nbsp;</td>");
       print("</tr></table>");
       print("<div class=doc>");
       print("<div class=disclaimer>");

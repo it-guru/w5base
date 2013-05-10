@@ -9,7 +9,7 @@ This chart shows the open workflows per month. Reference day is always the last 
 
 
 <!-- -------------------------------------------------- -->
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td valign=top><br>
@@ -23,7 +23,7 @@ This chart shows, which have longer then 4 weeks no activity.
 </table>
 
 <!-- -------------------------------------------------- -->
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td valign=top><br>
@@ -37,7 +37,7 @@ This chart shows, which have longer then 8 weeks no activity.
 </table>
 
 <!-- -------------------------------------------------- -->
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td valign=top><br>

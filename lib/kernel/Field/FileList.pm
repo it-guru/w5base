@@ -195,16 +195,16 @@ EOF
       $isprivate=" checked ";
    }
    $d.="<div class=FileListModeWork>";
-   $d.="<table width=100% height=80 border=0>";
-   $d.="<tr height=1%>";
+   $d.="<table width=\"100%\" height=80 border=0>";
+   $d.="<tr height=\"1%\">";
    $d.="<td>".$self->getParent->T("File to upload",'kernel::FileList').":</td>";
    $d.="<td colspan=2><input type=file name=file size=40></td>";
    $d.="</tr><tr>".
-       "<tr><td width=1% nowrap>".
+       "<tr><td width=\"1%\" nowrap>".
        $self->getParent->T("comments",'kernel::FileList')."</td>".
        "<td colspan=2><input name=comments value=\"$comments\" ".
        "type=text style=\"width:100%\"></tr>".
-       "<tr><td width=1% nowrap>".
+       "<tr><td width=\"1%\" nowrap>".
        $self->getParent->T("handle file as private",'kernel::FileList')."</td>".
        "<td><input type=checkbox $isprivate name=isprivate></td>";
    $d.="<td valign=bottom>".
@@ -269,8 +269,8 @@ EOF
       return();
    }
    $d.="<div class=FileListModeWork>";
-   $d.="<table width=100% height=40 border=0>";
-   $d.="<tr height=1%>";
+   $d.="<table width=\"100%\" height=\"40\" border=\"0\">";
+   $d.="<tr height=\"1%\">";
    $d.="<td><input type=submit name=DO style=\"width:100%\" value=\"".
        $self->getParent->T("delete marked files",'kernel::FileList')."\"></td>";
    $d.="</tr><tr><td></td></tr>";

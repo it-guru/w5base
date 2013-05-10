@@ -1,7 +1,7 @@
 <center><br>
-<table width=100% border=1>
+<table width="100%" border=1>
 <tr><td align=left valign=top>
-<table width=100%>
+<table width="100%">
 <tr><td width=1% nowrap>
 Fullname filter:
 </td><td>
@@ -25,7 +25,7 @@ function process(){
 }
 
 function listGroups(res){
-   var d="<table width=100% border=1>";
+   var d="<table width='100%' border=1>";
    d+="<tr><th>Groupname</th>"+
       "<th width=1% valign=top><input id=allcheck type=checkbox></th>"+
       "<th width=250 nowrap>Operation state</th></tr>";

@@ -41,7 +41,7 @@ sub NavBar
    my $d=shift;
 
    $d.=<<EOF;
-<table width=100% border=0>
+<table width="100%" border=0>
 <tr>
 <td width=1%><div class=navigation><a href="JavaScript:prev()" title="prev"><img border=0 src="../../../public/base/load/button_prev.gif"></a></div></td>
 <td align=center valign=bottom><span class=headline>$self->{headline}</span>&nbsp; &nbsp;&nbsp;</td>

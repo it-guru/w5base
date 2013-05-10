@@ -431,7 +431,7 @@ sub generateWorkspace
    my $actions=shift;
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
 <td class=fname width=20%>%tasktyp(label)%:</td>
 <td class=finput>%tasktyp(detail)%</td>
@@ -715,8 +715,8 @@ sub generateWorkspacePages
       my $s1=$f1->FormatedDetail($WfRec,"edit");
       my $s2=$f2->FormatedDetail($WfRec,"edit");
       $$divset.="<div id=OPsetprioexecs class=\"$class\">".
-                "<table width=100% border=0 style=\"margin-top:10px\">".
-                "<tr><td width=20%>$l1:</td><td>$s1</td></tr>".
+                "<table width=\"100%\" border=0 style=\"margin-top:10px\">".
+                "<tr><td width=\"20%\">$l1:</td><td>$s1</td></tr>".
                 "<tr><td>$l2:</td><td>$s2</td></tr>".
                 "</table></div>";
    }
@@ -1112,7 +1112,7 @@ sub generateWorkspace
 
    if ($self->getParent->getParent->IsMemberOf("admin")){
       $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
 <td class=fname width=20%>%fwdtargetname(label)%:</td>
 <td class=finput>%fwdtargetname(detail)%</td>

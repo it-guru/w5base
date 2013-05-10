@@ -45,7 +45,8 @@ function ${name}Set(v)
 </script>
 EOF
    $d.="<div id=TabSelector$name class=TabSelector$name>";
-   $d.="<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>";
+   $d.="<table width=\"100%\" height=\"100%\" border=0 ".
+       "cellspacing=0 cellpadding=0>";
    my @ml;
    my %pages=@{$param{pages}};
    my @plist=@{$param{pages}};
@@ -76,7 +77,8 @@ EOF
    $ml.="<td class=${name}Fillup>&nbsp;</td>";
    $ml="<table id=$name class=${name} cellspacing=0 cellpadding=0 border=0>".
        "<tr>$ml</tr></table>";
-   my $ht="<table id=$name width=100% border=0 cellspacing=0 cellpadding=0>";
+   my $ht="<table id=$name width=\"100%\" border=0 ".
+          "cellspacing=0 cellpadding=0>";
    if (defined($param{topline})){
       $ht.=sprintf("<tr><td height=1%%>%s</td></tr>",$param{topline});
    }

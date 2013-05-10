@@ -48,7 +48,7 @@ sub getQueryForm
    my $data=shift;
 
    my $bb;
-   $bb="<table width=100% height=250 border=1>";
+   $bb="<table width=\"100%\" height=250 border=1>";
    $bb.="<tr height=1%><td>Notify based on:</td></tr>";
    $bb.="<tr height=1%><td><textarea rows=3 name=sendBaseData ".
         "style='width:100%'>".
@@ -88,7 +88,7 @@ function doSend(){
 }
 </script>
 <input type=hidden name=ForceLevel value="">
-<table width=100%><tr>
+<table width="100%"><tr>
 <td align=left>$lastmsg</td>
 <td align=right width=1%>
 <input type=button onclick='doSend();' value='senden'>
@@ -176,7 +176,7 @@ sub getDefaultOptionLine
 
    my $bb;
 
-   $bb.="\n<table width=100% border=1>\n";
+   $bb.="\n<table width=\"100%\" border=1>\n";
    $bb.="<tr>\n";
    $bb.="<td valign=top>".$self->getParent->T("INFOTEXT",$self->Self)."</td>";
 

@@ -155,7 +155,7 @@ body{
 }
 
 </style>
-<table border=0 cellspacing=0 cellpadding=0 height=100% width=100%>
+<table border=0 cellspacing=0 cellpadding=0 height=\"100%\" width=\"100%\">
 EOF
 
    printf("<tr><td colspan=2 height=1%% style=\"padding:1px\" ".
@@ -189,7 +189,7 @@ EOF
 </tr>
 <tr>
 <td colspan=3 align=right>
-<table width=100% cellspacing=0 cellpadding=0>
+<table width="100%" cellspacing=0 cellpadding=0>
 <tr>
 <td>Mit dem Ausfallsanalyse Werkzeug können die Auswirkungen eines Ausfalls einer Komponente des IT-Betriebes und die entsprechenden Kontakte analysiert werden.
 <td>

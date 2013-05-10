@@ -296,9 +296,9 @@ sub generateWorkspace
    $d.="</select>";
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width="100%">
 <tr>
-<td class=fname width=20%>%name(label)%:</td>
+<td class=fname width="20%">%name(label)%:</td>
 <td colspan=3 class=finput>%name(detail)%</td>
 </tr>
 <tr>
@@ -313,22 +313,22 @@ sub generateWorkspace
 <td colspan=4>
 
 <div id=app style="height:60px;padding:0px;margin:0px;margin-top:2px;;border-style:solid;border-width:0px;border-color:black">
-<table width=100% border=0>
+<table width="100%" border=0>
 <tr>
-<td class=fname width=20% nowrap>%affectedapplication(label)%:</td>
+<td class=fname width="20%" nowrap>%affectedapplication(label)%:</td>
 <td class=finput>%affectedapplication(detail)%</td>
 </tr>
 </table>
 </div>
 
 <div id=fwd style="height:60px;padding:0px;margin:0px;;margin-top:2px;border-style:solid;border-width:0px;border-color:black">
-<table width=100% border=0>
+<table width="100%" border=0>
 <tr>
-<td class=fname width=20% nowrap>%quotationfwdtargetname(label)%:</td>
+<td class=fname width="20%" nowrap>%quotationfwdtargetname(label)%:</td>
 <td class=finput>%quotationfwdtargetname(detail)%</td>
 </tr>
 <tr>
-<td class=fname width=20% nowrap>%quotationfwd2targetname(label)%:</td>
+<td class=fname width="20%" nowrap>%quotationfwd2targetname(label)%:</td>
 <td class=finput>%quotationfwd2targetname(detail)%</td>
 </tr>
 </table>

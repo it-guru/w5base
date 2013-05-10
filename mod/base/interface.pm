@@ -75,7 +75,7 @@ sub io
       print $self->HtmlHeader(style=>'default.css',
                               title=>"W5Interface");
       print("<form method=post target=proc enctype=\"multipart/form-data\">");
-      print("<table width=100%% height=100%%>".
+      print("<table width=\"100%%\" height=\"100%%\">".
             "<tr><td valign=top align=center style=\"padding-top:20px\">".
             "$ENV{SCRIPT_URI}<br><br>".
             "file:<input type=file size=30 name=file><br>".

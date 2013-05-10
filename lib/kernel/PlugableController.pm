@@ -105,10 +105,11 @@ sub Main
                            body=>1,form=>1);
    print $self->HtmlSubModalDiv();
    #print Query->Dumper();
-   print("<table width=100% height=100% border=0 cellspacing=0 cellpadding=0>");
-   printf("<tr><td height=1%% valign=top>%s</td></tr>",
+   print("<table width=\"100%\" height=\"100%\" border=0 ".
+         "cellspacing=0 cellpadding=0>");
+   printf("<tr><td height=\"1%%\" valign=top>%s</td></tr>",
           $self->getAppTitleBar(title=>$title));
-   print("<tr><td height=1% valign=top>");
+   print("<tr><td height=\"1%\" valign=top>");
    print("<div class=searchframe><table class=searchframe>");
    my $selectname=$self->{'PlugableSelektor'};
 
@@ -281,7 +282,7 @@ sub Result
    if ($self->LastMsg()){
       @msglist=$self->LastMsg();
    }
-   print "<table width=100% cellpadding=20><tr><td>";
+   print "<table width=\"100%\" cellpadding=20><tr><td>";
    print "<div class=lastmsg style=\"width:100%\">".
           join("<br>\n",map({
                               if ($_=~m/^ERROR/){

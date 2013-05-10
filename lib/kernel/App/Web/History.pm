@@ -76,7 +76,7 @@ EOF
    }
    $tt.="</select>";
    $d.=<<EOF;
-<table width=100% border=0>
+<table width="100%" border=0>
 <tr>
 <td width=1% nowrap>$changes:</td>
 <td>$tt</td>

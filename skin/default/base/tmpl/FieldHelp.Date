@@ -1,7 +1,7 @@
 The search field '<b>%label%</b>' is a type of date-time. So you
 can use the following expressions to specify the desired date:<br>
 <br>
-<table width=100%>
+<table width="100%">
 
 <tr>
 <td>12:30:00</td>

@@ -47,7 +47,8 @@ sub loading
 
    print $self->HtmlHeader(style=>'default.css',
                            title=>$t);
-   printf("<table width=100%% height=100%%><tr><td valign=center align=center>".
+   printf("<table width=\"100%%\" height=\"100%%\">".
+          "<tr><td valign=center align=center>".
          "Loading ...".
          "</td></tr></table>");
    print $self->HtmlBottom(body=>1,form=>1);

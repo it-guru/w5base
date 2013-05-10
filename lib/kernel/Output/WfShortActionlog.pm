@@ -98,11 +98,11 @@ sub ProcessHead
    #$d.=$app->getTemplate("toolbox.js");
    #$d.="</script>\n\n";
    if ($param->{ParentMode} ne "HtmlV01"){
-      $d.="<table width=100% style=\"table-layout:fixed\"><tr><td>".
+      $d.="<table width=\"100%\" style=\"table-layout:fixed\"><tr><td>".
           "<tr><td class=mainblock>".
           "<div style=\"overflow:hidden\">\n";
    }
-   $d.="<table class=subdatatable width=100%>\n<tr class=subheadline>";
+   $d.="<table class=subdatatable width=\"100%\">\n<tr class=subheadline>";
    my $col=0;
    foreach my $f (qw(cdate name)){
       next if (!exists($self->{fieldkeys}->{$f}));
@@ -188,7 +188,7 @@ sub ProcessLine
    $d.="</td>";
    $d.="<td class=subdatafield valign=top style=\"width:auto;cursor:auto\">";
    $d.="<div class=workflowmultilinetext>";
-   $d.="<table width=100% cellspacing=0 cellpadding=0>".
+   $d.="<table width=\"100%\" cellspacing=0 cellpadding=0>".
        "<tr><td align=left valign=top>";
    $d.="<u>";
    { # process action name field

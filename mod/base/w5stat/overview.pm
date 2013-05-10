@@ -106,7 +106,7 @@ sub displayOverview
       }
    }
    $d.="\n<div class=overview>";
-   $d.="<table width=100% height=70%>";
+   $d.="<table width=\"100%\" height=\"70%\">";
    my $class="unitdata";
    foreach my $rec (@ovdata){
       if ($#{$rec}!=0){

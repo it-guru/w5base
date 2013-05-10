@@ -132,13 +132,13 @@ sub FormatedDetail
 #   $d=join($vjoinconcat,@$d);
 #   $d.=" ".$self->{unit} if ($d ne "" && $mode eq "HtmlDetail");
    if ($mode eq "HtmlDetail" || $mode eq "edit"){
-      my $tab="<table border=1 width=100% height=100%>";
-      $tab.="<tr><td>&nbsp;</td><td width=200>";
-      $tab.="<table width=100% border=0 cellspacing=0 cellpadding=0><tr>";
-      $tab.="<td align=left width=10%>0h</td>";
-      $tab.="<td align=center width=25%>6h</td>";
-      $tab.="<td align=center width=25%>12h</td>";
-      $tab.="<td align=center width=25%>18h</td>";
+      my $tab="<table border=1 width=\"100%\" height=\"100%\">";
+      $tab.="<tr><td>&nbsp;</td><td width=\"200\">";
+      $tab.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>";
+      $tab.="<td align=left width=\"10%\">0h</td>";
+      $tab.="<td align=center width=\"25%\">6h</td>";
+      $tab.="<td align=center width=\"25%\">12h</td>";
+      $tab.="<td align=center width=\"25%\">18h</td>";
       $tab.="<td align=right>24h</td>";
       $tab.="</tr></table></td>";
       $tab.="<td>&nbsp;</td></tr>";
@@ -156,7 +156,7 @@ sub FormatedDetail
          if ($dayno!=7){
             $day="<b>$day</b>";
          }
-         $tab.="<tr><td width=1%>$day</td><td with=200>";
+         $tab.="<tr><td width=\"1%\">$day</td><td with=200>";
          if ($mode ne "edit"){
             my @blks=();
             foreach my $b (split(/,/,$fval[$dayno])){

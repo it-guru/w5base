@@ -296,11 +296,11 @@ EOF
 <a name="index"></a>
 <div style="height:4px;border-width:0;overflow:hidden">&nbsp;</div>
 <div id=detailtopline class=detailtopline>
-   <table width=100% cellspacing=0 cellpadding=0>
+   <table width="100%" cellspacing=0 cellpadding=0>
       <tr>
 <td rowspan=2 width=1%>$ByIdLinkStart$recordimg$ByIdLinkEnd</a></td>
       <td class=detailtopline>
-<table border=0 cellspacing=0 width=100% style="table-layout:fixed;overflow:hidden"><tr>
+<table border=0 cellspacing=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
 <td class=detailtopline align=left>$H
 <div style="display:none;visibility:hidden;" id=WindowTitle>$s: $headerval</div>
 </td></tr></table>
@@ -399,7 +399,8 @@ EOF
                if (defined($spec->{$name})){
                   $fieldspec="<div id=\"fieldspec_$name\" ".
                              "class=detailfieldspec>".
-                             "<table width=100% style=\"table-layout:fixed\">".
+                             "<table width=\"100%\" ".
+                             "style=\"table-layout:fixed\">".
                              "<tr><td><span class=detailfieldspec>".
                              $spec->{$name}."</span></td></tr></table></div>";
                   $fieldspecfunc="OnMouseOver=
@@ -459,9 +460,9 @@ EOF
                   $subblock.=<<EOF;
          <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>
          <td class=finput colspan=$datacolspan>
-<table border=0 cellspacing=0 cellpadding=0 width=100% style="table-layout:fixed;overflow:hidden"><tr>
+<table border=0 cellspacing=0 cellpadding=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
 <td>
-<div style="width=100%;overflow:hidden">
+<div style="width:100%;overflow:hidden">
                           \%$name(detail)\%</div>
 </td></tr></table>
 </td>
@@ -519,7 +520,7 @@ EOF
             $grouplabel=~s/#//g;
             $template{$group}.=<<EOF;
  <div class=detailheadline>
- <table width=100% cellspacing=0 cellpadding=0>
+ <table width="100%" cellspacing=0 cellpadding=0>
  <tr>
  <td class=detailheadline align=left>$grouplabel</td>
  <td class=detailheadline align=right>%DETAILGROUPFUNCTIONS($subfunctions)%</td>

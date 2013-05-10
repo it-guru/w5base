@@ -390,7 +390,7 @@ sub generateMenuTree
    my %padd;
    my $targetml=\@ml;
    if (defined($rec)){
-      $simplem.="<table width=100%>";
+      $simplem.="<table width=\"100%\">";
       my $line=1;
       do{
         if ($rec->{quickpath} ne "" || $mode ne "fvwm"){

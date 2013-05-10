@@ -1005,13 +1005,13 @@ sub getRecordHtmlDetailHeader
       $statedisplay=$fld->FormatedDetail($current,"HtmlDetail");
    }
    $H.=<<EOF;
-<table width=100% height=100% border=0>
-<tr><td align=left>
+<table width="100%" height="100%" border=0>
+<tr><td align="left">
 <p class=detailtoplineobj>$wfname:</p>
 </td>
-<td align=right width=1%><p class=detailtoplinename>$current->{id}</p>
+<td align=right width="1%"><p class=detailtoplinename>$current->{id}</p>
 </td></tr>
-<tr><td align=left valign=top>
+<tr><td align="left" valign="top">
 <p class=detailtoplinename>$name</p>
 $statedisplay
 </td>
@@ -1981,7 +1981,8 @@ function displayResult(res)
 function doSearch()
 {
    \$("#result").html("<br><br>"+
-                      "<table width=100% border=0><tr><td align=center>"+
+                      "<table width=\"100%\" border=0><tr>".
+                      "<td align=\"center\">"+
                       "<img src=\\"../../base/load/ajaxloader.gif\\">"+
                       "</td></tr></table>");
    var surname=\$("#surname").val();
@@ -2023,17 +2024,17 @@ setFocus("");
 
 </style>
 <table id=mainTab 
-       width=100% height=100% style="border-collapse:collapse" border=0>
+       width="100%" height="100%" style="border-collapse:collapse" border=0>
 <tr height=1%>
-<td valign=bottom align=center width=100 class=borderright>
+<td valign=bottom align=center width="100" class=borderright>
 <img src="../../base/load/addrbook_logo.gif" height=30>
 </td>
 <td valign=top>
-<table border=0 width=100% id=searchTab>
+<table border=0 width="100%" id=searchTab>
 <tr>
-<td width=1%>Nachname:</td><td nowrap width=30%><input size=6 style="width:100%" type=text id=surname value="">&nbsp;</td>
-<td width=1%>Vorname:</td><td nowrap width=30%><input size=6 style="width:100%" type=text id=givenname>&nbsp;</td>
-<td width=1%>Ort:</td><td nowrap width=30%><input size=6 style="width:100%" type=text id=location>&nbsp;</td>
+<td width=1%>Nachname:</td><td nowrap width="30%"><input size=6 style="width:100%" type=text id=surname value="">&nbsp;</td>
+<td width=1%>Vorname:</td><td nowrap width="30%"><input size=6 style="width:100%" type=text id=givenname>&nbsp;</td>
+<td width=1%>Ort:</td><td nowrap width="30%"><input size=6 style="width:100%" type=text id=location>&nbsp;</td>
 <td width=10><span style="cursor:pointer" onclick="doSearch();"><img src="../../base/load/search.gif" height=30></span></td>
 </tr>
 </table>
@@ -2197,7 +2198,7 @@ sub New                   # Workflow starten
    my $msg=$self->T("Please select the workflow to start:");
    my $start=$self->T("start workflow");
    print <<EOF;
-<table width=100% height=100% border=0>
+<table width="100%" height="100%" border=0>
 <tr height=1%><td valign=top>$appheader</td></tr>
 <tr height=1%><td valign=top>$msg</td></tr>
 <tr><td align=center valign=center>$selbox</td></tr>
@@ -2538,11 +2539,11 @@ EOF
    $t=~s/"//g;
    $c=~s/"//g;
    print('<table style="margin:5px;padding-right:10px" border=0 '.
-         'cellspacing=0 cellpadding=0 width=100% height=100%>');
+         'cellspacing=0 cellpadding=0 width="100%" height="100%">');
    #printf("<tr><td height=1%%>Mail related to</td></tr>");
    print <<EOF;
  <tr height=1%><td height=1%>
-  <table width=100%><tr>
+  <table width=\"100%\"><tr>
   <td width=50 valign=top>
   <table border=0 cellspacing=0 cellpadding=0><tr>
   <td><span class=sublink onclick=\"openAdressbook('to','$to');\">
@@ -2556,7 +2557,7 @@ EOF
   </tr></table>
  </td></tr>
  <tr height=1%><td height=1%>
-  <table width=100%><tr>
+  <table width=\"100%\"><tr>
   <td width=50 valign=top>
   <table border=0 cellspacing=0 cellpadding=0><tr>
   <td><span class=sublink onclick=\"openAdressbook('cc','CC');\">
@@ -2570,13 +2571,13 @@ EOF
   </tr></table>
  </td></tr>
  <tr height=1%><td height=1%>
-  <table width=100%><tr>
+  <table width=\"100%\"><tr>
   <td width=50>$subject:</td>
   <td><input name=subject value="$s" style="width:100%"></td>
   </tr></table>
  </td></tr>
  <tr height=1%><td height=1%>
-  <table width=100%><tr>
+  <table width=\"100%\"><tr>
   <td width=50>$attmsg:</td>
   <td><input name=file size=32 type=file></td>
   <td width=140 nowrap align=right><div style="vertical-align:middle"><label for="addref">$refmsg:</label>
@@ -3120,7 +3121,8 @@ sub ListRel
             if ($mode ne "mail"){
                if (!$headadd){
                   $d.="<div class=${mode}SubList>";
-                  $d.="<table width=100% border=0 cellspacing=0 cellpadding=0>";
+                  $d.="<table width=\"100%\" border=0 ".
+                      "cellspacing=0 cellpadding=0>";
                   $headadd=1;
                }
             }
@@ -3149,8 +3151,9 @@ sub ListRel
 
             my $rowspan=1;
             if ($mode ne "mail"){
-               $d.="<table width=100% border=0 cellspacing=0 cellpadding=0>";
-               $d.="<tr><td width=1% nowrap style=\"border-top:solid;".
+               $d.="<table width=\"100%\" border=0 ".
+                   "cellspacing=0 cellpadding=0>";
+               $d.="<tr><td width=\"1%\" nowrap style=\"border-top:solid;".
                    "border-width:1px;border-top-color:silver\">";
                if ($mode ne "edit"){
                   $d.="<a class=sublink href=javascript:openwin(\"".
@@ -3438,7 +3441,7 @@ EOF
    my $lableRelation=$self->getParent->T("Relation",$self->Self);
    $d.=<<EOF;
 <div class=EditFrame>
-<table width=100% cellpadding=1 cellspacing=1 height=40 border=0>
+<table width="100%" cellpadding=1 cellspacing=1 height=40 border=0>
 <tr height=1%>
 <td width=1%>WorkflowID:</td>
 <td><input type=text name=opid style="width:100%" value="$opid" size=20></td>

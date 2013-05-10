@@ -9,7 +9,7 @@ Diese Grafik zeigt die offenen Workflows pro Monat. Als Referenz wird in der His
 
 
 <!-- -------------------------------------------------- -->
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td valign=top><br>
@@ -23,7 +23,7 @@ In dieser Grafik werden die Workflows gezählt, die länger als 4 Wochen nicht bea
 </table>
 
 <!-- -------------------------------------------------- -->
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td valign=top><br>
@@ -37,7 +37,7 @@ In dieser Grafik werden die Workflows gezählt, die länger als 8 Wochen nicht bea
 </table>
 
 <!-- -------------------------------------------------- -->
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td valign=top><br>

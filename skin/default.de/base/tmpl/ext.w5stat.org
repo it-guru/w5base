@@ -1,4 +1,4 @@
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td valign=top><br>
@@ -15,7 +15,7 @@ sich auch in in der W5Base angemeldet haben.
 </tr>
 </table>
 
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td>
@@ -37,7 +37,7 @@ sich auch in in der W5Base angemeldet haben.
 </table>
 
 
-<table width=100%>
+<table width="100%">
 <tr>
 
 <td valign=top><br>

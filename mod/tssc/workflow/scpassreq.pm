@@ -167,7 +167,7 @@ sub generateWorkspace
 
 
    my $templ=<<EOF;
-<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<table border=0 cellspacing=0 cellpadding=0 width=\"100%\">
 <tr>
 <td class=fname width=20%>%targetsys(label)%:</td>
 <td class=finput>%targetsys(detail)%</td>
@@ -307,7 +307,7 @@ sub generateWorkspacePages
          $$selopt.="<option value=\"wftrans2devreq\">".
                    $self->getParent->T("wftrans2devreq",$tr).
                    "</option>\n";
-         my $d="<table width=100% border=0 cellspacing=0 cellpadding=0>".
+         my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>".
                "<tr>".
                "<td colspan=2>Umwandeln in einen Entwickler-Request ".
                "für folgende Anwendung</td>".

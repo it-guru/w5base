@@ -18,7 +18,7 @@ div.loginframe{
 }
 
 </style>
-<body><table width=100% height=100%><tr><td align=center valign=center>
+<body><table width="100%" height="100%"><tr><td align=center valign=center>
 <table border=0>
 <tr>
 <td width=250 height=140 align=left valign=top>

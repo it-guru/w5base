@@ -2,7 +2,7 @@
 DetailAddTitle("%name(formated)%");
 </script>
 <div class=detailtopline>
-   <table width=100% cellspacing=0 cellpadding=0><tr>
+   <table width="100%" cellspacing=0 cellpadding=0><tr>
       <td class=detailtopline align=left>IP: %addr(formated)%</td>
       <td class=detailtopline align=right>%DETAILFUNCTIONS%</td>
    </table>
@@ -10,7 +10,7 @@ DetailAddTitle("%name(formated)%");
 
 <div class=detailframe>
 <div class=detailheadline>
-<table width=100% cellspacing=0 cellpadding=0><tr>
+<table width="100%" cellspacing=0 cellpadding=0><tr>
 <td class=detailheadline align=left>%DETAILLABEL%</td>
 <td class=detailheadline align=right>%DETAILGROUPFUNCTIONS%</td>
 </table>
