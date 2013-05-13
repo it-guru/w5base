@@ -44,31 +44,31 @@ sub new
                 label         =>'Change No.',
                 htmlwidth     =>'20',
                 align         =>'left',
-                dataobjattr   =>'cm3rm1.numberprgn'),
+                dataobjattr   =>'cm3rm1_w5base.numberprgn'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Brief Description',
                 ignorecase    =>1,
-                dataobjattr   =>'cm3rm1.brief_description'),
+                dataobjattr   =>'cm3rm1_w5base.brief_description'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 timezone      =>'CET',
                 label         =>'Created',
-                dataobjattr   =>'cm3rm1.orig_date_entered'),
+                dataobjattr   =>'cm3rm1_w5base.orig_date_entered'),
 
       new kernel::Field::Date(
                 name          =>'plannedstart',
                 timezone      =>'CET',
                 label         =>'Planed Start',
-                dataobjattr   =>'cm3rm1.planned_start'),
+                dataobjattr   =>'cm3rm1_w5base.planned_start'),
 
       new kernel::Field::Date(
                 name          =>'plannedend',
                 timezone      =>'CET',
                 label         =>'Planed End',
-                dataobjattr   =>'cm3rm1.planned_end'),
+                dataobjattr   =>'cm3rm1_w5base.planned_end'),
 
       new kernel::Field::Duration(
                 name          =>'plannedduration',
@@ -79,20 +79,20 @@ sub new
                 name          =>'status',
                 label         =>'Status',
                 htmlwidth     =>20,
-                dataobjattr   =>'cm3rm1.status'),
+                dataobjattr   =>'cm3rm1_w5base.status'),
 
       new kernel::Field::Text(
                 name          =>'location',
                 label         =>'Location',
                 ignorecase    =>1,
-                dataobjattr   =>'cm3rm1.change_shortname'), # scheint nicht 
-       #         dataobjattr   =>'cm3rm1.location_code'), # scheint nicht 
+                dataobjattr   =>'cm3rm1_w5base.change_shortname'), # scheint nicht 
+       #         dataobjattr   =>'cm3rm1_w5base.location_code'), # scheint nicht 
 
       new kernel::Field::Link(
                 name          =>'rawlocation',
                 label         =>'raw Location',
-                dataobjattr   =>'cm3rm1.change_shortname'), # scheint nicht 
-       #         dataobjattr   =>'cm3rm1.location_code'),
+                dataobjattr   =>'cm3rm1_w5base.change_shortname'), # scheint nicht 
+       #         dataobjattr   =>'cm3rm1_w5base.location_code'),
 
       new kernel::Field::Text(
                 name          =>'project',
@@ -100,7 +100,7 @@ sub new
                 ignorecase    =>1,
                 htmldetail    =>0,
                 label         =>'Project',
-                dataobjattr   =>'cm3rm1.project'),
+                dataobjattr   =>'cm3rm1_w5base.project'),
 
       new kernel::Field::Text(
                 name          =>'deviceid',
@@ -108,7 +108,7 @@ sub new
                 ignorecase    =>1,
                 htmldetail    =>0,
                 label         =>'DeviceID (deprecated)',
-                dataobjattr   =>'cm3rm1.logical_name'),
+                dataobjattr   =>'cm3rm1_w5base.logical_name'),
 
       new kernel::Field::Text(
                 name          =>'softwareid',
@@ -116,7 +116,7 @@ sub new
                 ignorecase    =>1,
                 htmldetail    =>0,
                 label         =>'SoftwareID (deprecated)',
-                dataobjattr   =>'cm3rm1.program_name'),
+                dataobjattr   =>'cm3rm1_w5base.program_name'),
 
       new kernel::Field::SubList(
                 name          =>'software',
@@ -143,17 +143,17 @@ sub new
       #new kernel::Field::Text(
       #          name          =>'custapplication',
       #          label         =>'Customer Application',
-      #          dataobjattr   =>'cm3rm1.dsc_service'),
+      #          dataobjattr   =>'cm3rm1_w5base.dsc_service'),
 
       new kernel::Field::Text(
                 name          =>'modelid',
                 label         =>'Model ID',
-                dataobjattr   =>'cm3rm1.model_ref'),
+                dataobjattr   =>'cm3rm1_w5base.model_ref'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 label         =>'Extern Change ID',
-                dataobjattr   =>'cm3rm1.ex_number'),
+                dataobjattr   =>'cm3rm1_w5base.ex_number'),
 
       new kernel::Field::SubList(
                 name          =>'approvalsreq',
@@ -208,14 +208,62 @@ sub new
                    return(length($d));
                 }),
 
+#      new kernel::Field::Textarea(
+#                name          =>'fallback',
+#                label         =>'Fallback',
+#                searchable    =>0,
+#                vjointo       =>'tssc::chm_fallback',
+#                vjoinconcat   =>"\n",
+#                vjoinon       =>['changenumber'=>'changenumber'],
+#                vjoindisp     =>'fallback'),
+
       new kernel::Field::Textarea(
                 name          =>'fallback',
                 label         =>'Fallback',
                 searchable    =>0,
-                vjointo       =>'tssc::chm_fallback',
-                vjoinconcat   =>"\n",
-                vjoinon       =>['changenumber'=>'changenumber'],
-                vjoindisp     =>'fallback'),
+                dataobjattr   =>'cm3rm1_w5base.backout_method'),
+
+      new kernel::Field::Textarea(
+                name          =>'cause',
+                label         =>'Cause',
+                searchable    =>0,
+                dataobjattr   =>'cm3rm1_w5base.cause'),
+
+      new kernel::Field::Textarea(
+                name          =>'chmtarget',
+                label         =>'Target of Change',
+                searchable    =>0,
+                dataobjattr   =>'cm3rm1_w5base.target_of_change'),
+
+      new kernel::Field::Textarea(
+                name          =>'riskomission',
+                label         =>'Risk of omission',
+                searchable    =>0,
+                dataobjattr   =>'cm3rm1_w5base.risk_of_mission'),
+
+      new kernel::Field::Textarea(
+                name          =>'riskimplementation',
+                label         =>'Risk of implementation',
+                searchable    =>0,
+                dataobjattr   =>'cm3rm1_w5base.risk_of_implementation'),
+
+      new kernel::Field::Textarea(
+                name          =>'impactdesc',
+                label         =>'Impact description',
+                searchable    =>0,
+                dataobjattr   =>'cm3rm1_w5base.impact_description'),
+
+      new kernel::Field::Textarea(
+                name          =>'cause',
+                label         =>'Cause',
+                searchable    =>0,
+                dataobjattr   =>'cm3rm1_w5base.cause'),
+
+      new kernel::Field::Textarea(
+                name          =>'validation',
+                label         =>'Validation',
+                searchable    =>0,
+                dataobjattr   =>'cm3rm1_w5base.justification'),
 
       new kernel::Field::Textarea(
                 name          =>'resources',
@@ -228,68 +276,74 @@ sub new
                 group         =>'status',
                 group         =>'status',
                 label         =>'Pritority',
-                dataobjattr   =>'cm3rm1.priority'),
+                dataobjattr   =>'cm3rm1_w5base.priority'),
 
       new kernel::Field::Text(
                 name          =>'impact',
                 group         =>'status',
                 label         =>'Business Impact',
-                dataobjattr   =>'cm3rm1.impact'),
+                dataobjattr   =>'cm3rm1_w5base.impact'),
+
+      new kernel::Field::Text(
+                name          =>'requestedfrom',
+                group         =>'status',
+                label         =>'Requested from',
+                dataobjattr   =>'cm3rm1_w5base.misc3'),
 
       new kernel::Field::Text(
                 name          =>'urgency',
                 group         =>'status',
                 label         =>'Urgency',
-                dataobjattr   =>'cm3rm1.urgency'),
+                dataobjattr   =>'cm3rm1_w5base.urgency'),
 
       new kernel::Field::Text(
                 name          =>'reason',
                 group         =>'status',
                 label         =>'Reason',
-                dataobjattr   =>'cm3rm1.reason'),
+                dataobjattr   =>'cm3rm1_w5base.reason'),
 
       new kernel::Field::Text(
                 name          =>'category',
                 group         =>'status',
                 label         =>'Category',
-                dataobjattr   =>'cm3rm1.category'),
+                dataobjattr   =>'cm3rm1_w5base.category'),
 
       new kernel::Field::Text(
                 name          =>'risk',
                 group         =>'status',
                 label         =>'Risk',
-                dataobjattr   =>'cm3rm1.risk_assessment'),
+                dataobjattr   =>'cm3rm1_w5base.risk_assessment'),
 
       new kernel::Field::Text(
                 name          =>'type',
                 group         =>'status',
                 label         =>'Type',
-                dataobjattr   =>'cm3rm1.class_field'),
+                dataobjattr   =>'cm3rm1_w5base.class_field'),
 
       new kernel::Field::Text(
                 name          =>'approvalstatus',
                 group         =>'status',
                 label         =>'Approval Status',
-                dataobjattr   =>'cm3rm1.approval_status'),
+                dataobjattr   =>'cm3rm1_w5base.approval_status'),
 
       new kernel::Field::Text(
                 name          =>'currentstatus',
                 group         =>'status',
                 label         =>'Current Status',
-                dataobjattr   =>'cm3rm1.status'),
+                dataobjattr   =>'cm3rm1_w5base.status'),
 
       new kernel::Field::Text(
                 name          =>'approvalstatus',
                 group         =>'status',
                 label         =>'Approval Status',
-                dataobjattr   =>'cm3rm1.approval_status'),
+                dataobjattr   =>'cm3rm1_w5base.approval_status'),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
                 timezone      =>'CET',
                 label         =>'SysModTime',
-                dataobjattr   =>'cm3rm1.sysmodtime'),
+                dataobjattr   =>'cm3rm1_w5base.sysmodtime'),
 
       new kernel::Field::Date(
                 name          =>'createtime',
@@ -297,13 +351,13 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Create time',
-                dataobjattr   =>'cm3rm1.orig_date_entered'),
+                dataobjattr   =>'cm3rm1_w5base.orig_date_entered'),
 
       new kernel::Field::Text(
                 name          =>'closedby',
                 group         =>'close',
                 label         =>'Closed by',
-                dataobjattr   =>'cm3rm1.closed_by'),
+                dataobjattr   =>'cm3rm1_w5base.closed_by'),
 
       new kernel::Field::Date(
                 name          =>'closetime',
@@ -311,19 +365,19 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Closeing time',
-                dataobjattr   =>'cm3rm1.close_time'),
+                dataobjattr   =>'cm3rm1_w5base.close_time'),
 
       new kernel::Field::Text(
                 name          =>'closecode',
                 group         =>'close',
                 label         =>'Close Code',
-                dataobjattr   =>'cm3rm1.close_code_accept'),
+                dataobjattr   =>'cm3rm1_w5base.close_code_accept'),
 
       new kernel::Field::Text(
                 name          =>'resolvedby',
                 group         =>'close',
                 label         =>'Resolved by',
-                dataobjattr   =>'cm3rm1.resolved_by'),
+                dataobjattr   =>'cm3rm1_w5base.resolved_by'),
 
       new kernel::Field::Date(
                 name          =>'resolvetime',
@@ -331,7 +385,7 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Resolve time',
-                dataobjattr   =>'cm3rm1.resolve_time'),
+                dataobjattr   =>'cm3rm1_w5base.resolve_time'),
 
       new kernel::Field::Date(
                 name          =>'workstart',
@@ -339,7 +393,7 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Work Start',
-                dataobjattr   =>'cm3rm1.work_start'),
+                dataobjattr   =>'cm3rm1_w5base.work_start'),
 
       new kernel::Field::Date(
                 name          =>'workend',
@@ -347,14 +401,14 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Work End',
-                dataobjattr   =>'cm3rm1.work_end'),
+                dataobjattr   =>'cm3rm1_w5base.work_end'),
 
       new kernel::Field::Text(
                 name          =>'workduration',
                 depend        =>['status'],
                 group         =>'close',
                 label         =>'Work Duration',
-                dataobjattr   =>'cm3rm1.work_duration'),
+                dataobjattr   =>'cm3rm1_w5base.work_duration'),
 
       new kernel::Field::Import($self,
                 vjointo       =>'tssc::chm_closingcomments',
@@ -369,59 +423,59 @@ sub new
                 group         =>'contact',
                 ignorecase    =>1,
                 label         =>'Assign Area',
-                dataobjattr   =>'cm3rm1.assigned_area'),
+                dataobjattr   =>'cm3rm1_w5base.assigned_area'),
 
       new kernel::Field::Link(
                 name          =>'rawassignarea',
                 label         =>'raw Assign Area',
-                dataobjattr   =>'cm3rm1.assigned_area'),
+                dataobjattr   =>'cm3rm1_w5base.assigned_area'),
 
       new kernel::Field::Text(
                 name          =>'customer',
                 ignorecase    =>1,
                 group         =>'contact',
                 label         =>'Customer',
-                dataobjattr   =>'cm3rm1.misc4'),
+                dataobjattr   =>'cm3rm1_w5base.misc4'),
 
       new kernel::Field::Link(
                 name          =>'rawcustomer',
                 group         =>'contact',
                 label         =>'raw Customer',
-                dataobjattr   =>'cm3rm1.misc4'),
+                dataobjattr   =>'cm3rm1_w5base.misc4'),
 
       new kernel::Field::Text(
                 name          =>'requestedby',
                 group         =>'contact',
                 label         =>'Requested By',
-                dataobjattr   =>'cm3rm1.requested_by'),
+                dataobjattr   =>'cm3rm1_w5base.requested_by'),
 
       new kernel::Field::Text(
                 name          =>'assignedto',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Assigned To',
-                dataobjattr   =>'cm3rm1.assigned_to'),
+                dataobjattr   =>'cm3rm1_w5base.assigned_to'),
 
       new kernel::Field::Text(
                 name          =>'implementor',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Implementor',
-                dataobjattr   =>'cm3rm1.assign_firstname'),
+                dataobjattr   =>'cm3rm1_w5base.assign_firstname'),
 
       new kernel::Field::Text(
                 name          =>'coordinator',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Coordinator group',
-                dataobjattr   =>'cm3rm1.coordinator'),
+                dataobjattr   =>'cm3rm1_w5base.coordinator'),
 
       new kernel::Field::Text(
                 name          =>'coordinatorposix',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Change-Manager (Coordinator)',
-                dataobjattr   =>'cm3rm1.coord_firstname'),
+                dataobjattr   =>'cm3rm1_w5base.coord_firstname'),
 
       new kernel::Field::Text(
                 name          =>'coordinatorname',
@@ -429,7 +483,7 @@ sub new
                 htmldetail    =>0,
                 group         =>'contact',
                 label         =>'Change-Manager fullname',
-                dataobjattr   =>'cm3rm1.coord_shortname'),
+                dataobjattr   =>'cm3rm1_w5base.coord_shortname'),
 
       new kernel::Field::SubList(
                 name          =>'relations',
@@ -444,14 +498,14 @@ sub new
                 name          =>'editor',
                 group         =>'contact',
                 label         =>'Editor',
-                dataobjattr   =>'cm3rm1.sysmoduser'),
+                dataobjattr   =>'cm3rm1_w5base.sysmoduser'),
 
       new kernel::Field::Text(
                 name          =>'addgrp',
                 sqlorder      =>"none",
                 group         =>'contact',
                 label         =>'Additional Groups',
-                dataobjattr   =>'cm3rm1.additional_groups'),
+                dataobjattr   =>'cm3rm1_w5base.additional_groups'),
 
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
@@ -560,15 +614,15 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cm3rm1,cm3ra43";
+   my $from="cm3rm1_w5base,cm3ra43";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="(cm3rm1.lastprgn='t' or cm3rm1.lastprgn is null) and ".
-             "cm3rm1.numberprgn=cm3ra43.numberprgn(+)";
+   my $where="(cm3rm1_w5base.lastprgn='t' or cm3rm1_w5base.lastprgn is null) and ".
+             "cm3rm1_w5base.numberprgn=cm3ra43.numberprgn(+)";
    return($where);
 }
 
