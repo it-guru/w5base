@@ -138,6 +138,16 @@ sub getPosibleRoles
              "techcontact"     =>$self->getParent->T("Technical Contact",
                                                      $self->Self));
    }
+   if ($parentobj=~m/^.+::businessservice$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::businessservice$/)){
+      return("read"            =>$self->getParent->T("read",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
+            );
+   }
    if ($parentobj=~m/^.+::system$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&

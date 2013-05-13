@@ -57,7 +57,8 @@ sub new
                    return(0);
                 },
                 label         =>'Business-Service Fullname',
-                dataobjattr   =>"concat(appl.name,':',".
+                dataobjattr   =>"concat(if (applname is null,'',".
+                                "concat(applname,':')),".
                                 "if ($worktable.name is null,'[ENTIRE]',".
                                 "$worktable.name))"),
                                                   
@@ -72,7 +73,7 @@ sub new
                 name          =>'parentid',
                 selectfix     =>1,
                 label         =>'ParentID',
-                dataobjattr   =>"appl.id"),
+                dataobjattr   =>"applid"),
                                                   
       new kernel::Field::Link(
                 name          =>'applid',
@@ -81,13 +82,30 @@ sub new
                 dataobjattr   =>"$worktable.appl"),
 
       new kernel::Field::Databoss(
-                readonly      =>1),
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(1);
+                   }
+                   return(0);
+                },
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if ($current->{applid} ne "");
+                   return(0);
+                }),
 
       new kernel::Field::Link(
                 name          =>'databossid',
                 selectfix     =>1,
                 label         =>'Databoss ID',
-                dataobjattr   =>"appl.databoss"),
+                dataobjattr   =>"if ($worktable.appl is null,".
+                                "$worktable.databoss,".
+                                "appldataboss)",
+                dataobjattr   =>"$worktable.databoss"),
                                                   
       new kernel::Field::Text(
                 name          =>'application',
@@ -103,14 +121,15 @@ sub new
                    my %param=@_;
                    my $current=$param{current};
 
-                   return(1) if (defined($current));
+                   return(1) if (defined($current) &&
+                                 $current->{applid} ne "");
                    return(0);
                 },
                 uploadable    =>0,
                 label         =>'primary provided by Application',
                 weblinkto     =>'itil::appl',
                 weblinkon     =>['parentid'=>'id'],
-                dataobjattr   =>'appl.name'),
+                dataobjattr   =>'applname'),
 
       new kernel::Field::TextDrop(
                 name          =>'srcapplication',
@@ -136,20 +155,6 @@ sub new
                 vjoinon       =>['applid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Select(
-                name          =>'applcistatus',
-                htmldetail    =>0,
-                group         =>'applinfo',
-                label         =>'Application CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['applcistatusid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'applcistatusid',
-                label         =>'ApplCiStatusID',
-                dataobjattr   =>'appl.cistatus'),
-
       new kernel::Field::Contact(
                 name          =>'funcmgr',
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
@@ -172,7 +177,7 @@ sub new
                 name          =>'mandatorid',
                 group         =>'applinfo',
                 readonly      =>1,
-                dataobjattr   =>'appl.mandator'),
+                dataobjattr   =>'applmandator'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -211,6 +216,7 @@ sub new
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
+                vjoinbase     =>[{'parentobj'=>\'itil::businessservice'}],
                 group         =>'contacts'),
 
       new kernel::Field::SubList(
@@ -227,11 +233,11 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'businessteamid',
-                dataobjattr   =>'appl.businessteam'),
+                dataobjattr   =>'applbusinessteam'),
 
       new kernel::Field::Link(
                 name          =>'responseteamid',
-                dataobjattr   =>'appl.responseteam'),
+                dataobjattr   =>'applresponseteam'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -274,17 +280,17 @@ sub new
       new kernel::Field::Link(
                 name          =>'sectarget',
                 noselect      =>'1',
-                dataobjattr   =>'lnkcontact.target'),
+                dataobjattr   =>'lnkcontacttarget'),
 
       new kernel::Field::Link(
                 name          =>'sectargetid',
                 noselect      =>'1',
-                dataobjattr   =>'lnkcontact.targetid'),
+                dataobjattr   =>'lnkcontacttargetid'),
 
       new kernel::Field::Link(
                 name          =>'secroles',
                 noselect      =>'1',
-                dataobjattr   =>'lnkcontact.croles'),
+                dataobjattr   =>'lnkcontactcroles'),
 
    );
    $self->{history}=[qw(insert modify delete)];
@@ -324,15 +330,6 @@ sub preProcessReadedRecord
    return(undef);
 }
 
-sub initSearchQuery
-{
-   my $self=shift;
-   if (!defined(Query->Param("search_applcistatus"))){
-     Query->Param("search_applcistatus"=>
-                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
-   }
-}
-
 
 
 sub getSqlFrom
@@ -343,10 +340,34 @@ sub getSqlFrom
    my ($worktable,$workdb)=$self->getWorktable();
    my $from="";
 
-   $from.="appl left outer join businessservice ".
-          "on appl.id=businessservice.appl left outer join lnkcontact ".
-          "on lnkcontact.parentobj='itil::appl' ".
-          "and appl.id=lnkcontact.refid ";
+   $from.="((select appl.id applid,appl.name applname,".
+          "appl.databoss appldataboss,".
+          "appl.mandator applmandator,".
+          "appl.businessteam applbusinessteam,".
+          "appl.responseteam applresponseteam,".
+          "lnkcontact.target lnkcontacttarget,".
+          "lnkcontact.targetid lnkcontacttargetid,".
+          "lnkcontact.croles lnkcontactcroles,".
+          "businessservice.* ".
+          "from appl left outer join businessservice ".
+          "on appl.id=businessservice.appl ".
+          "left outer join lnkcontact ".
+          "on lnkcontact.parentobj='itil::appl' and ".
+          "appl.id=lnkcontact.refid ".
+          "where appl.cistatus<6) union ".
+          "(select null applid,null applname,".
+          "null appldataboss,".
+          "null applmandator,".
+          "null applbusinessteam,".
+          "null applresponseteam,".
+          "lnkcontact.target lnkcontacttarget,".
+          "lnkcontact.targetid lnkcontacttargetid,".
+          "lnkcontact.croles lnkcontactcroles,".
+          "businessservice.* ".
+          "from businessservice left outer join lnkcontact ".
+          "on lnkcontact.parentobj='itil::businessservice' ".
+          "and lnkcontact.refid=businessservice.id ".
+          "where businessservice.appl is null)) as businessservice";
 
    return($from);
 }
@@ -366,16 +387,40 @@ sub Validate
        effVal($oldrec,$newrec,"name") eq ""){
       $newrec->{name}=undef;
    }
+   if (effVal($oldrec,$newrec,"name")=~m/[:\]\[]/){
+      $self->LastMsg(ERROR,"invalid service name specified");
+      return(0);
+   }
    if (defined($newrec->{name}) && $newrec->{name} eq ""){
       $self->LastMsg(ERROR,"invalid service name specified");
       return(0);
    }
    my $applid=effVal($oldrec,$newrec,"applid");
 
-   if ($applid eq "" || !$self->isParentWriteable($applid)){
-      $self->LastMsg(ERROR,"no write access to specified application");
-      return(0);
+   if ($applid eq ""){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            $newrec->{databossid}=$userid;
+         }
+      }
+      if (defined($newrec->{databossid}) &&
+          $newrec->{databossid}!=$userid &&
+          $newrec->{databossid}!=$oldrec->{databossid}){
+         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                              "as databoss");
+         return(0);
+      }
    }
+   else{
+      if (!$self->isParentWriteable($applid)){
+         $self->LastMsg(ERROR,"no write access to specified application");
+         return(0);
+      }
+   }
+
+
 
    return(1);
 }
@@ -387,8 +432,46 @@ sub isWriteValid
    my @l;
 
    return("default") if (!defined($rec));
-   if ($self->isParentWriteable($rec->{applid})){
-      push(@l,"default","contacts","desc","servicecomp");
+   if ($rec->{applid} ne ""){
+      if ($self->isParentWriteable($rec->{applid})){
+         push(@l,"default","desc","servicecomp");
+      }
+   }
+   else{
+      my $wr=0;
+      my $userid=$self->getCurrentUserId();
+      if ($userid==$rec->{databossid}){
+         $wr++;
+      }
+      else{
+         if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+            my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                        ["RMember"],"both");
+            my @grpids=keys(%grps);
+            foreach my $contact (@{$rec->{contacts}}){
+               if ($contact->{target} eq "base::user" &&
+                   $contact->{targetid} ne $userid){
+                  next;
+               }
+               if ($contact->{target} eq "base::grp"){
+                  my $grpid=$contact->{targetid};
+                  next if (!grep(/^$grpid$/,@grpids));
+               }
+               my @roles=($contact->{roles});
+               if (ref($contact->{roles}) eq "ARRAY"){
+                  @roles=@{$contact->{roles}};
+               }
+               if (grep(/^write$/,@roles)){
+                  $wr++;
+                  last;
+               }
+            }
+         }
+      }
+      
+      if ($wr){
+         push(@l,"default","contacts","desc","servicecomp");
+      }
    }
    return(@l);
 }
@@ -398,7 +481,15 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   my @l=qw(header default);
+   if ($rec->{applid} ne ""){
+      push(@l,qw(desc servicecomp));
+   }
+   else{
+      push(@l,qw(contacts desc servicecomp));
+   }
+   push(@l,qw(businessprocesses source));
+   return(@l);
 }
 
 sub getRecordImageUrl

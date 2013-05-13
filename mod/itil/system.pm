@@ -579,7 +579,7 @@ sub new
                 parentobj     =>'itil::system',
                 group         =>'attachments'),
 
-      new itil::system::Asset::Interface(
+      new kernel::Field::Interface(
                 name          =>'assetid',
                 dataobjattr   =>"$vmifexp,vsystem.asset,system.asset)", 
                 wrdataobjattr =>"system.asset"),
@@ -1432,39 +1432,6 @@ sub getDetailBlockPriority
              swinstances ipaddresses
              contacts misc attachments control source));
 }
-
-
-
-#############################################################################
-
-package itil::system::Asset::Interface;
-
-use strict;
-use vars qw(@ISA);
-@ISA    = qw(kernel::Field::Interface);
-
-
-sub new
-{
-   my $type=shift;
-   my $self={@_};
-   $self=bless($type->SUPER::new(%$self),$type);
-   return($self);
-}
-
-sub getBackendName     # returns the name/function to place in select
-{
-   my $self=shift;
-   my $mode=shift;
-   my $db=shift;
-
-   return($self->{wrdataobjattr}) if ($mode eq "update" || $mode eq "insert");
-
-   return($self->SUPER::getBackendName($mode,$db));
-}
-
-
-
 
 
 

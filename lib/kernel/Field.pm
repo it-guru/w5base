@@ -633,6 +633,9 @@ sub getBackendName     # returns the name/function to place in select
    my $mode=shift;
    my $db=shift;
 
+   return($self->{wrdataobjattr}) if (defined($self->{wrdataobjattr}) &&
+                                      ($mode eq "update" || $mode eq "insert"));
+
    if ($mode eq "select" || $mode=~m/^where\..*/){
       if (!defined($self->{dataobjattr}) && defined($self->{container})){
          if ($mode eq "where.select"){

@@ -5,6 +5,8 @@
 'fieldgroup.businessprocesses'=>{de=>'beteilig in Geschäftsprozessen',en=>'involved in Business processes'},
 'involved in Businessprocesses'=>{de=>'beteilig in Geschäftsprozessen',en=>'involved in Business processes'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'you are not authorized to set other persons as databoss'=>{
+          de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},
 'Business-Service Fullname'=>{de=>'vollqualifizierter Business-Service'},
 'primary provided by Application'=>{de=>'prim. bereitgestellt durch Anwendung'},
 'provided by application'=>{de=>'zur Verfügung gestellt durch Anwendung'},
