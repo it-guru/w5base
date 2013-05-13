@@ -1652,16 +1652,16 @@ sub SecureSetFilter
       my @grpids=keys(%grps);
 
       my $userid=$self->getCurrentUserId();
-      push(@flt,[
+      my @addflt=(
                  {sectargetid=>\$userid,sectarget=>\'base::user',
                   secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
                             "*roles=?read?=roles*"},
                  {sectargetid=>\@grpids,sectarget=>\'base::grp',
                   secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
                             "*roles=?read?=roles*"}
-                ]);
+                );
       if ($ENV{REMOTE_USER} ne "anonymous"){
-         push(@flt,[
+         push(@addflt,
                     {mandatorid=>\@mandators},
                     {databossid=>\$userid},
                     {semid=>\$userid},       {sem2id=>\$userid},
@@ -1669,8 +1669,10 @@ sub SecureSetFilter
                     {opmid=>\$userid},       {opm2id=>\$userid},
                     {businessteamid=>\@grpids},
                     {responseteamid=>\@grpids}
-                   ]);
+                   );
       }
+      push(@flt,\@addflt);
+      
    }
    return($self->SetFilter(@flt));
 }
