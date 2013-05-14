@@ -82,6 +82,7 @@ sub new
                                  'Business Objects',
                                  'CICS',
                                  'DB2',
+                                 'DOKuStar',
                                  'HP-NSK Pathway',
                                  'IIS',
                                  'IMS',  # IBM Information Management System
