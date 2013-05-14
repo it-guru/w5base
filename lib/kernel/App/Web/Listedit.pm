@@ -1489,18 +1489,37 @@ sub Detail
 #         print "<script language=\"JavaScript\" ".
 #               "src=\"../../../public/base/load/jquery.js\"></script>\n";
 #      }
+      print(<<EOF);
+<script language="JavaScript" type="text/javascript">
+function setEditMode(m)
+{
+   this.SubFrameEditMode=m;
+}
+function TabChangeCheck()
+{
+if (this.SubFrameEditMode==1){return(DataLoseWarn());}
+return(true);
+}
+function setCookie(c_name,value,exdays)
+{
+   var exdate=new Date();
+   exdate.setDate(exdate.getDate() + exdays);
+   var c_value=escape(value) + 
+               ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+   document.cookie=c_name + "=" + c_value;
+}
 
-      print("<script language=\"JavaScript\">");
-      print("function setEditMode(m)");
-      print("{");
-      print("   this.SubFrameEditMode=m;");
-      print("}");
-      print("function TabChangeCheck()");
-      print("{");
-      print("if (this.SubFrameEditMode==1){return(DataLoseWarn());}");
-      print("return(true);");
-      print("}");
-      print("</script>");
+window.onresize = function (evt) {
+   var width = window.innerWidth || 
+      (window.document.documentElement.clientWidth || 
+       window.document.body.clientWidth);
+   var height = window.innerHeight || 
+      (window.document.documentElement.clientHeight || 
+       window.document.body.clientHeight);
+   setCookie("W5WINSIZE",width+";"+height,10000);
+}
+</script>
+EOF
       $p="StandardDetail" if ($p eq "");
 
       my $page=$self->getHtmlDetailPageContent($p,$rec);

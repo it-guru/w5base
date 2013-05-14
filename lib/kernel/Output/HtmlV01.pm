@@ -177,19 +177,13 @@ sub ProcessLine
             if (defined($UserCache->{$ENV{REMOTE_USER}})){
                $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
             }
-            my $winsize="";
+            my $winsize="normal";
             if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
                $winsize=$UserCache->{winsize};
             }
-            if ($winsize eq ""){
-               $lineonclick="openwin(\"$dest\",\"_blank\",".
-                   "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-                   "resizable=yes,scrollbars=auto\")";
-            }
-            else{
-               if ($dest ne ""){
-                  $lineonclick="custopenwin(\"$dest\",\"$winsize\",$detailx)";
-               }
+            if ($dest ne ""){
+               $lineonclick="custopenwin(\"$dest\",\"$winsize\",".
+                            "$detailx,$detaily)";
             }
          }
       }

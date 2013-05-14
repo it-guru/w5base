@@ -190,11 +190,17 @@ sub addWebLinkToFacility
          my $detailx=$self->getParent->DetailX();
          my $detaily=$self->getParent->DetailY();
          $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
-         my $onclick="openwin('$target?".
-                     "AllowClose=1&search_$targetid=$targetval',".
-                     "'_blank',".
-                     "'height=$detaily,width=$detailx,toolbar=no,status=no,".
-                     "resizable=yes,scrollbars=no');";
+         my $dest="$target?AllowClose=1&search_$targetid=$targetval";
+         my $UserCache=$self->getParent->Cache->{User}->{Cache};
+         if (defined($UserCache->{$ENV{REMOTE_USER}})){
+            $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+         }
+         my $winsize="normal";
+         if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+            $winsize=$UserCache->{winsize};
+         }
+         my $onclick="custopenwin('$dest','$winsize',".
+                     "$detailx,$detaily)";
          #$d="<a class=sublink href=JavaScript:$onclick>".$d."</a>";
          my $context;
          if (defined($param{contextMenu})){

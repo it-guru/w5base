@@ -622,9 +622,10 @@ sub new
                 uploadable    =>0,
                 label         =>'Window-Size',
                 htmleditwidth =>'50%',
-                htmldetail    =>0,           # die Sache ist noch nicht opti
                 group         =>'userparam',
-                value         =>['','normal','large'],
+                default       =>'normal',
+                value         =>['normal','auto','large','persi',
+                                 'f800','f1024'],
                 container     =>'options'),
 
       new kernel::Field::Textarea(

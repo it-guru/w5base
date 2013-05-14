@@ -186,6 +186,20 @@ sub ProcessLine
    my $idfieldname=$idfield->Name();
    my $id=$idfield->RawValue($rec);
    $id=$id->[0] if (ref($id) eq "ARRAY");
+
+
+   #######################################################################
+   my $UserCache=$self->getParent->getParent->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   }
+   my $winsize="normal";
+   if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+      $winsize=$UserCache->{winsize};
+   }
+   #######################################################################
+
+
    if (grep(/^Detail$/,$app->getValidWebFunctions())){
       if ($idfield){
          my $dest=$app->Self();
@@ -199,9 +213,9 @@ sub ProcessLine
             $dest=~s/"/ /g;
             my $detailx=$app->DetailX();
             my $detaily=$app->DetailY();
-            $lineonclick="openwin(\"$dest\",\"_blank\",".
-                "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-                "resizable=yes,scrollbars=no\")";
+
+            $lineonclick="custopenwin(\"$dest\",\"$winsize\",".
+                         "$detailx,$detaily)";
          }
          else{
            $lineonclick=undef;
@@ -272,11 +286,9 @@ sub ProcessLine
                   $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
                   my %q=('AllowClose'=>1,
                          "search_$targetid"=>$targetval);
-                  $fclick="openwin(\"$target?".
-                           kernel::cgi::Hash2QueryString(%q).
-                      "\","."\"_blank\",".
-                      "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-                      "resizable=yes,scrollbars=no\")";
+                  my $dest="$target?".kernel::cgi::Hash2QueryString(%q);
+                  $fclick="custopenwin(\"$dest\",\"$winsize\",".
+                               "$detailx,$detaily)";
                }
             }
          }

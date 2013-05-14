@@ -390,7 +390,7 @@ sub _LoadUserInUserCache
                                userid givenname posix groups tz lang
                                cistatusid secstate ipacl
                                dialermode dialerurl dialeripref
-                               email usersubst usertyp 
+                               email usersubst usertyp winsize
                                dateofvsnfd));
          if (defined($rec)){
             if ($rec->{ipacl} ne ""){
