@@ -1667,6 +1667,7 @@ sub SecureSetFilter
                     {semid=>\$userid},       {sem2id=>\$userid},
                     {tsmid=>\$userid},       {tsm2id=>\$userid},
                     {opmid=>\$userid},       {opm2id=>\$userid},
+                    {delmgrid=>\$userid},    {delmgr2id=>\$userid},
                     {businessteamid=>\@grpids},
                     {responseteamid=>\@grpids}
                    );
