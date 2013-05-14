@@ -758,7 +758,9 @@ sub FinishWrite
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   if ($newrec->{name} eq "forwardto" || $newrec->{name} eq "reactivate"){
+   if ($newrec->{name} eq "forwardto" || 
+       ($newrec->{name} eq "reactivate" &&
+        $self->Config->Param("W5BaseOperationMode") ne "test")){
       my %add=Datafield2Hash($newrec->{additional});
       my $fwdtarget=$add{ForwardTarget}->[0];
       my $fwdtargetid=$add{ForwardTargetId}->[0];
