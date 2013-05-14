@@ -85,7 +85,6 @@ sub qcheckRecord
          $checkedswiprod{$s->{name}}++;
       }
    }
-   print STDERR Dumper(\%swiprod);
 
    if (ref($rec->{software}) eq "ARRAY"){
       foreach my $swrec (@{$rec->{software}}){
