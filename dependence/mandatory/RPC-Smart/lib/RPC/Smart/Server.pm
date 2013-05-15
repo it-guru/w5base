@@ -253,7 +253,13 @@ sub ipcStore
 
    return(undef) if (!defined($self->{ipc}));
    return(undef) if (!ref($val));
-   $self->{ipc}->store(Dumper($val));
+   my $store=Dumper($val);
+   if (length($store)>=2048-32){
+      printf STDERR ('ERROR: ipcStore result from async job larger '.
+                     'then 2048 Bytes');
+      $store=Dumper({exitcode=>2048,msg=>'ERROR: ipcStore result to large'});
+   }
+   $self->{ipc}->store($store);
    return(1);
 }
 
