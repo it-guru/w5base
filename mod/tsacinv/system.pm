@@ -486,6 +486,15 @@ sub new
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>'netname'),
 
+      new kernel::Field::SubList(
+                name          =>'backups',
+                label         =>'ordered backup jobs',
+                group         =>'backups',
+                vjointo       =>'tsacinv::backup',
+                vjoinon       =>['lcomputerid'=>'lcomputerid'],
+                vjoindisp     =>[qw(backupid name bgroup isactive 
+                                    hexpectedquantity)]),
+
 
       new kernel::Field::Dynamic(
                 name          =>'dynservices',
@@ -862,7 +871,8 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default location form applications ipaddresses software 
              usedsharedcomp
-             orderedservices services assetdata assetfinanz saphier acmdb
+             orderedservices services backups 
+             assetdata assetfinanz saphier acmdb
              w5basedata source));
 }  
 

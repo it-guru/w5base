@@ -1,0 +1,5 @@
+'tsacinv::backup'=>{de=>'Backup-Jobs',en=>'Backup-Jobs'},
+'expectedquantity'=>{de=>'erwartetes Volumen'},
+'Active'=>{de=>'Aktiv'},
+'Group'=>{de=>'Gruppe'},
+'Name'=>{de=>'Service',en=>'Service'},

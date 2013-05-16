@@ -2,6 +2,7 @@
                     en=>'AssetManager log. System'},
 'fieldgroup.default'=>{de=>'allgemeine Systemdaten', en=>'common system data'},
 'fieldgroup.acmdb'=>{de=>'ACMDB', en=>'ACMDB'},
+'fieldgroup.backups'=>{de=>'beauftragte Backup-Jobs', en=>'ordered Backup-Jobs'},
 'ACMDB contract'=>{de=>'ACMDB Vertrag'},
 'ACMDB contractnumber'=>{de=>'ACMDB Vertragsnummer'},
 'fieldgroup.services'=>{de=>'gelieferte Leistungsarten', en=>'delivered Services'},
