@@ -216,13 +216,16 @@ sub checkSSL
    my $host=shift;
    my $port=shift;
 
-   msg(INFO,"Step2: try to connect to %s:%s",$host,$port);
+   msg(INFO,"Step2: try to connect to %s:%s SSLv3",$host,$port);
    my $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
                                    SSL_version=>'SSLv3',
+                                   Timeout=>10,
                                    SSL_session_cache_size=>0);
    if (!defined($sock)){
+      msg(INFO,"Step2.1: try to connect to %s:%s SSLv2",$host,$port);
       $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
                                    SSL_version=>'SSLv2',
+                                   Timeout=>10,
                                    SSL_session_cache_size=>0);
    }
 
@@ -231,14 +234,14 @@ sub checkSSL
       if ($proxy eq ""){
          $proxy=$self->getParent->Config->Param("HTTP_PROXY");
       }
-      msg(INFO,"Step2.1: try to connect over proxy %s",$proxy);
+      msg(INFO,"Step2.2: try to connect over proxy %s",$proxy);
       $sock=new Net::ProxySSLconnect(PeerAddr=>"$host:$port",
                                      SSL_session_cache_size=>0,
                                      Proxy=>$proxy);
    }
 
    
-   return("connect failed to $host:$port") if (!defined($sock));
+   return("SSL connect failed to $host:$port") if (!defined($sock));
    msg(INFO,"Step2: Connect done");
    msg(INFO,"Step3: try to load peer_certificate");
    my $cert = $sock->peer_certificate();
