@@ -230,7 +230,7 @@ sub getHtmlViewLine
    my $app=$self->getParent->getParent;
    my $curview=$app->getCurrentViewName();
    my $allowfurther=$app->allowFurtherOutput();
-   my $maxdirect=6;
+   my $maxdirect=20;
 
 
    $d.="<tr><td height=1% class=mainblock>\n";
