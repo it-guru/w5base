@@ -415,16 +415,8 @@ sub NotifyForward
 
    #printf STDERR ("fifi param=%s\n",Dumper(\%param));
    my $wf=getModuleObject($self->Config,"base::workflow");
-   my $from='no_reply@w5base.net';
+   my $from;
    my @to=();
-   my $UserCache=$self->Cache->{User}->{Cache};
-   if (defined($UserCache->{$ENV{REMOTE_USER}})){
-      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
-   }
-   if (defined($UserCache->{email}) &&
-       $UserCache->{email} ne ""){
-      $from=$UserCache->{email};
-   }
    msg(INFO,"forward: search in $fwdtarget id $fwdtargetid");
    if ($fwdtarget eq "base::user"){
       my $u=getModuleObject($self->Config,"base::user");
@@ -433,8 +425,19 @@ sub NotifyForward
       if (defined($rec)){
          push(@to,$rec->{email});
       }
+      # if target is a base::user, from address must be correct set, to
+      # get out of office notices. If target ist base::grp, fake from
+      # can be used
+      my $UserCache=$self->Cache->{User}->{Cache};
+      if (defined($UserCache->{$ENV{REMOTE_USER}})){
+         $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+      }
+      if (defined($UserCache->{email}) &&
+          $UserCache->{email} ne ""){
+         $from=$UserCache->{email};
+      }
    }
-   if ($fwdtarget eq "base::grp"){
+   elsif ($fwdtarget eq "base::grp"){
       my $grp=$self->{grp};
       if (!defined($grp)){
          $grp=getModuleObject($self->Config,"base::grp");
@@ -557,6 +560,9 @@ sub NotifyForward
 
    if ($param{emailfrom} ne ""){
       $adr{emailfrom}=$param{emailfrom};
+   }
+   if ($adr{emailfrom} eq ""){
+      delete($adr{emailfrom});
    }
    if ($param{sendercc} && $from ne 'no_reply@w5base.net'){
       $adr{emailcc}=[$from];
