@@ -475,6 +475,12 @@ sub validateSCDconform
    return(undef);
 }
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::applnor");
+}
+
+
 
 sub Validate
 {

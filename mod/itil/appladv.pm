@@ -258,6 +258,13 @@ sub new
    return($self);
 }
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::appladv");
+}
+
+
+
 sub addModuleMatrix
 {
    my $self=shift;

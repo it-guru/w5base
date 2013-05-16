@@ -309,7 +309,8 @@ sub new
    my $fo=$self->getField("isactive");
    delete($fo->{default});
    $self->{use_distinct}=1;
-   $self->setDefaultView(qw(fullname cistatus mandator dstate isactive editor mdate));
+   $self->setDefaultView(qw(fullname cistatus mandator dstate 
+                            isactive editor mdate));
    return($self);
 }
 
@@ -456,7 +457,12 @@ sub SecureSetFilter
 
    my $userid=$self->getCurrentUserId();
 
-   if (!$self->IsMemberOf("admin") && $userid ne "12085359600001"){
+   my $readgrp="w5base.".$self->SelfAsParentObject().".read";
+
+   $readgrp=~s/::/\./g;
+
+   if (!$self->IsMemberOf("admin") && 
+       !$self->IsMemberOf($readgrp)){
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
                               [qw(RCFManager RCFManager2)],"both");
       my @grpids=keys(%grps);
