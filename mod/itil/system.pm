@@ -256,7 +256,9 @@ sub new
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['fullname','swnature'],
                 vjoininhash   =>['fullname','swnature',
-                                 'softwareinstname','techproductstring']),
+                                 'softwareinstname',
+                                 'techproductstring',
+                                 'techrelstring']),
 
       new kernel::Field::Text(
                 name          =>'shortdesc',

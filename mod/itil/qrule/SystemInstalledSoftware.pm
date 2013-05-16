@@ -72,8 +72,12 @@ sub qcheckRecord
          if ($swi->{softwareinstname} eq ""){ # this is a instance with no
             $swneeded{$swi->{swnature}}++;    # assinged software installation
          }
-         if ($swi->{techproductstring} ne ""){
-            $swiprod{$swi->{techproductstring}}++;
+         if ($swi->{techproductstring} ne "" &&
+             ($swi->{techrelstring}=~m/[0-9.]+/)){
+            if (!defined($swiprod{$swi->{techproductstring}})){
+               $swiprod{$swi->{techproductstring}}={};
+            }
+            $swiprod{$swi->{techproductstring}}->{$swi->{techrelstring}}++;
          }
       }
    }
@@ -82,14 +86,21 @@ sub qcheckRecord
       my $sw=getModuleObject($dataobj->Config,"itil::software");
       $sw->SetFilter({name=>[keys(%swiprod)]});
       foreach my $s ($sw->getHashList(qw(name id))){
-         $checkedswiprod{$s->{name}}++;
+         if (ref($swiprod{$s->{name}}) eq "HASH"){
+            $checkedswiprod{$s->{name}}=$swiprod{$s->{name}};
+         }
       }
    }
 
    if (ref($rec->{software}) eq "ARRAY"){
       foreach my $swrec (@{$rec->{software}}){
          $swifound{$swrec->{software}}++;
-         delete($checkedswiprod{$swrec->{software}});
+         if (exists($checkedswiprod{$swrec->{software}})){
+            delete($checkedswiprod{$swrec->{software}}->{$swrec->{version}});
+            if (!keys(%{$checkedswiprod{$swrec->{software}}})){
+               delete($checkedswiprod{$swrec->{software}});
+            }
+         }
          if ($swrec->{softwarecistatusid}!=4 &&
              $swrec->{softwarecistatusid}!=5 &&
              $swrec->{softwarecistatusid}!=3){
@@ -101,9 +112,11 @@ sub qcheckRecord
    }
    if (keys(%checkedswiprod)){
       foreach my $software (sort(keys(%checkedswiprod))){
-         push(@msg,
-              "missing software installation for related software instances: ".
-              $software);
+         foreach my $version (sort(keys(%{$checkedswiprod{$software}}))){
+            push(@msg,
+                 "missing software installation for ".
+                 "related software instances: ".$software." - ".$version);
+         }
       }
    }
    my %chkmap=("Oracle DB Server"=>'^oracle.*database.*$',
