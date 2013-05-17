@@ -613,8 +613,8 @@ EOF
                     WindowMode       =>$self->{WindowMode},
                     currentfieldgroup=>$currentfieldgroup);
          $self->ParseTemplateVars(\$dtemp,\%param);
-         $d.="<a name=$fieldgroup></a>";
-         $d.="<a name=$id.$fieldgroup></a>";
+         $d.="\n\n<a name=\"$fieldgroup\"></a>";
+         $d.="\n<a name=\"I.$id.$fieldgroup\"></a>\n";
          if ($c>0 || $#detaillist==0){
             my @msglist;
             if ($fieldgroup eq $currentfieldgroup){

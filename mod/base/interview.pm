@@ -842,8 +842,8 @@ sub Question
                                    'kernel.App.Web.css',
                                    'kernel.App.Web.DetailPage.css']);
    printf("<div style=\"margin-left:5px\">");
-   printf("<h2>%s:</h2>",$self->T("Interview Question Details"));
-   printf("<h3 style=\"margin-top:20px\">%s</h3>",$rec->{name});
+   printf("<h1>%s:</h1>",$self->T("Interview Question Details"));
+   printf("<h2 style=\"margin-top:20px\">%s</h2>",$rec->{name});
 
    printf("<div style=\"border-width:1px;border-style:solid;".
           "border-color:silver;margin-top:20px;".

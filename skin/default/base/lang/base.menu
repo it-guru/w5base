@@ -7,3 +7,5 @@
 'Accesscontrol'=>{de=>'Zugriffssteuerung'},
 'Translation'=>{de=>'Übersetzungsbasis'},
 'fieldgroup.default'=>{de=>'Menu Informationen',en=>'Menu informations'},
+'data area'=>{de=>'Datenbereich'},
+'navigation area'=>{de=>'Navigationsbereich'},

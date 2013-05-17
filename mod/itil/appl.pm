@@ -2064,10 +2064,10 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    my $htmlresult="";
    if ($header){
       $htmlresult.="<table style='margin:5px'>\n";
-      $htmlresult.="<tr><td colspan=2 align=center><h2>";
+      $htmlresult.="<tr><td colspan=2 align=center><h1>";
       $htmlresult.=$self->findtemplvar({current=>$rec,mode=>"Html"},
                                       "name","formated");
-      $htmlresult.="</h2></td></tr>";
+      $htmlresult.="</h1></td></tr>";
    }
    else{
       $htmlresult.="<table>\n";

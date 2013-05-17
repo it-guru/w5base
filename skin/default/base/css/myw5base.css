@@ -9,14 +9,14 @@ a:link.news,a:visited.news,a:active.news{
             text-decoration:none;
             color:black;
 }
-a:link.h2,a:visited.h2,a:active.h2{
+a:link.h1,a:visited.h1,a:active.h1{
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:black;
             font-size:18px;
             color:#16305e;
 }
-h2{
+h1{
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:black;

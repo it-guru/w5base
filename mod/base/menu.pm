@@ -793,7 +793,8 @@ sub menuframe
                              base=>'',
                             prefix=>$rootpath,
                            style=>['default.css','menu.css']);
-   my $m=$self->MenuTab($rootpath,$fp,'JavaScript:SwitchMenuVisible() target=_self');
+   my $m=$self->MenuTab($rootpath,$fp,
+                        'JavaScript:SwitchMenuVisible() target=_self');
    my $menuframe=$self->getParsedTemplate("tmpl/menutmpl",{
                                        static=>{menutab=>$m,
                                                 rootpath=>$rootpath}});
@@ -914,8 +915,10 @@ else{
 EOF
    print ("<frameset id=mselframe cols=\"200,*\" ".
           "framespacing=0 marginwidth=0 frameborder=0 border=0>\n");
+   my $t2=$self->T("navigation area");
    print ("<frame marginwidth=0 marginheight=0 scrolling=auto ".
-          "name=menuframe src=\"${rootpath}menuframe$fpfine\"></frame>\n");
+          "name=menuframe title=\"$t2\" ".
+          "src=\"${rootpath}menuframe$fpfine\"></frame>\n");
    {
       my $currenturl="${rootpath}../../base/user/Main";
       my $openurl=Query->Param("OpenURL");
@@ -965,8 +968,9 @@ EOF
       $currenturl.="&".kernel::cgi::Hash2QueryString(         
          originalMenuSelection=>$originalMenuSelection 
       );
+      my $t1=$self->T("data area");
       print ("<frame marginwidth=0 class=work marginheight=0 scrolling=auto ".
-             "name=work src=\"$currenturl\"></frame>\n");
+             "name=work title=\"$t1\" src=\"$currenturl\"></frame>\n");
    }
    print("</frameset>");
 }

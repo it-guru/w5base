@@ -2709,7 +2709,7 @@ sub makeHtmlIndexRecord
    my $group=shift;
    my $label=shift;
    return({label=>$label,
-           href=>"#$id.$group",
+           href=>"#I.$id.$group",
            group=>"$group",
           });
 }

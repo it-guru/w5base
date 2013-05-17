@@ -190,8 +190,8 @@ sub Result
 
    print("<center><table width=500>");
    printf("<tr><td align=center>".
-          "<a class=h2 href=\"Result?MyW5BaseSUBMOD=base::MyW5Base::myefforts\">".
-          "<h2>%s<br>\n%s</h2></a></td></tr>",
+          "<a class=h1 href=\"Result?MyW5BaseSUBMOD=base::MyW5Base::myefforts\">".
+          "<h1>%s<br>\n%s</h1></a></td></tr>",
           $self->T("Effort statistics of the last 14 days of"),
           $usrrec->{fullname});
    print("<tr><td>");
