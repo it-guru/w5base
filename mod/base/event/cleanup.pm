@@ -115,6 +115,7 @@ sub AutoFinishWorkflows
    $CleanupWorkflow="<now-84d" if ($CleanupWorkflow eq "");
 
 
+   my $c=0;
    foreach my $stateid (qw(16 17 10)){
       $wf->SetFilter({stateid=>\$stateid,
                       class=>$class,
@@ -137,6 +138,7 @@ sub AutoFinishWorkflows
                 
                   $wfop->UpdateRecord({stateid=>21,closedate=>$closedate},
                                       {id=>\$rec->{id}});
+                  $c++;
                   $wfop->StoreUpdateDelta({id=>$rec->{id},
                                          stateid=>$rec->{stateid}},
                                         {id=>$rec->{id},
@@ -147,7 +149,7 @@ sub AutoFinishWorkflows
          } until(!defined($rec));
       }
    }
-
+   return({exitcode=>0,msg=>"$c workflows finished"});
 
 }
 
