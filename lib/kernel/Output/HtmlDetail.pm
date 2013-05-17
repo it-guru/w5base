@@ -239,8 +239,8 @@ EOF
          $H=$self->getParent->getParent->getRecordHtmlDetailHeader($rec);
       }
       else{ 
-         $H="<p class=detailtoplineobj>$s:</p>".
-            "<p class=detailtoplinename>$headerval</p>";
+         $H="<h1 class=detailtoplineobj>$s:</h1>".
+            "<h2 class=detailtoplinename>$headerval</h2>";
          $recordimg=$self->getParent->getParent->getRecordImageUrl($rec);
          $subheader=$self->getParent->getParent->getRecordSubHeader($rec);
       }
@@ -522,7 +522,9 @@ EOF
  <div class=detailheadline>
  <table width="100%" cellspacing=0 cellpadding=0>
  <tr>
- <td class=detailheadline align=left>$grouplabel</td>
+ <td class=detailheadline align=left>
+ <h3 class="grouplabel">$grouplabel</h3>
+ </td>
  <td class=detailheadline align=right>%DETAILGROUPFUNCTIONS($subfunctions)%</td>
  </tr>
  </table>

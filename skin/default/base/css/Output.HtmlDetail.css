@@ -66,34 +66,30 @@ td.detailtopline{
    text-align:left;
    padding-top:5px;
 }
-h1{
-   font-weight:bold;
-   font-size:20px;
-   margin-bottom:4px;
-   margin-top:10px;
-}
-h2{
-   font-weight:bold;
-   font-size:17px;
-   padding:0px;
-   margin:0px;
-   margin-bottom:4px;
-   margin-top:10px;
-}
-h3{
-   font-weight:bold;
-   font-size:15px;
-   padding:0px;
-   margin:0px;
-   margin-bottom:4px;
-   margin-top:10px;
-}
-p.detailtoplineobj{
+h1.detailtoplineobj{
    color:white;
    font-weight:bold;
+   font-size:11px;
+   margin-bottom:0px;
+   margin-top:0px;
 }
-p.detailtoplinename{
+h2.detailtoplinename{
+   font-size:12px;
+   padding:0px;
+   font-weight:lighter;
+   margin:0px;
+   margin-bottom:0px;
+   margin-top:0px;
    color:white;
+}
+h3.grouplabel{
+   font-weight:bold;
+   font-size:12px;
+   padding:0px;
+   margin:0px;
+   margin-bottom:0px;
+   margin-top:0px;
+   color:black;
 }
 
 div.detailfieldspec{
