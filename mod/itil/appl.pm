@@ -52,6 +52,8 @@ sub new
                 searchable    =>0,
                 label         =>'W5BaseID',
                 dataobjattr   =>'appl.id'),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'name',

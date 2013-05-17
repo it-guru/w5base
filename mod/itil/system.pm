@@ -54,6 +54,8 @@ sub new
                 searchable    =>0,
                 label         =>'W5BaseID',
                 dataobjattr   =>'system.id'),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'name',

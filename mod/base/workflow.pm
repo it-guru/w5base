@@ -56,6 +56,8 @@ sub new
                 size          =>'10',
                 readonly      =>1,
                 dataobjattr   =>'wfhead.wfheadid'),
+
+      new kernel::Field::RecordUrl(),
                                   
       new kernel::Field::Text(
                 name          =>'name',

@@ -173,6 +173,8 @@ sub new
                 group         =>'userid',
                 readonly      =>1,
                 dataobjattr   =>'contact.userid'),
+
+      new kernel::Field::RecordUrl(),
                                   
       new kernel::Field::Select(
                 name          =>'salutation',

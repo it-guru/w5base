@@ -58,3 +58,4 @@
 'Interview state'       =>{de=>'Interview Status'},
 'DataIssue state'       =>{de=>'DataIssue Status'},
 'Additionalinformations'=>{de=>'Zusatzinformationen'},
+'URL of record'=>{de=>'URL des Datensatzes'},

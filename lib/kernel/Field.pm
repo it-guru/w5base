@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field::Id;
+use kernel::Field::RecordUrl;
 use kernel::Field::Vector;
 use kernel::Field::Text;
 use kernel::Field::FlexBox;
