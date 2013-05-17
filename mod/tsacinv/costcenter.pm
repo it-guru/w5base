@@ -156,6 +156,15 @@ sub new
                 group         =>'contact',
                 dataobjattr   =>'amcostcenter.lcustomerlinkid'),
 
+      new kernel::Field::SubList(
+                name          =>'deliverypartner',
+                label         =>'Deliverypartner',
+                group         =>'contact',
+                vjointo       =>'tsacinv::dlvpartner',
+                vjoinon       =>['name'=>'name'],
+                vjoindisp     =>[qw(deliverymanagement delmgr  
+                                  description)]),
+
      new kernel::Field::TextDrop(
                 name          =>'sememail',
                 group         =>'contact',

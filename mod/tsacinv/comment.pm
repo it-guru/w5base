@@ -63,7 +63,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cm3ra4";
+   my $from="amcomment";
    return($from);
 }
 

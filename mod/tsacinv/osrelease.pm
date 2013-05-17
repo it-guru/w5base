@@ -1,4 +1,4 @@
-package tsacinv::osrelease;
+package tsacinv::dlvpartner;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #

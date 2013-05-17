@@ -136,6 +136,10 @@ sub Init
                       "tsacinv::costcenter",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("ac.krn.costcenter.dlvpartner",
+                      "tsacinv::dlvpartner",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("ac.krn.customer",
                       "tsacinv::customer",
                       defaultacl=>['valid_user']);

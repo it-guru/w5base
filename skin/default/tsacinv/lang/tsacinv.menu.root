@@ -17,6 +17,7 @@
 'ac.krn.service'=>{de=>'Leistungen',en=>'Services'},
 'ac.krn.location'=>{de=>'Standort',en=>'Location'},
 'ac.krn.costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
+'ac.krn.costcenter.dlvpartner'=>{de=>'DeliveryPartner',en=>'DeliveryPartner'},
 'ac.krn.customer'=>{de=>'Kunden',en=>'Customer'},
 'ac.krn.osrelease'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'ac.krn.osrelease.lnkw5b'=>{de=>'W5B Mapping',en=>'W5B Mapping'},
