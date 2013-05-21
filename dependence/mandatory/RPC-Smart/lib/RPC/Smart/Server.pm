@@ -186,7 +186,7 @@ sub async
       return({result=>'no task space left',exitcode=>1});
    }
    my $taskenv={start=>time(),timeout=>$param{timeout},
-                ipc=>new IPC::Smart(-nolocking=>1,-size=>2048)};
+                ipc=>new IPC::Smart(-nolocking=>1,-size=>8192)};
   # printf STDERR ("MyServerFunc param=%s\n",Dumper(\@param));
    my $pid=fork();
    if ($pid==0){
@@ -254,9 +254,9 @@ sub ipcStore
    return(undef) if (!defined($self->{ipc}));
    return(undef) if (!ref($val));
    my $store=Dumper($val);
-   if (length($store)>=2048-32){
+   if (length($store)>=8192-128){
       printf STDERR ('ERROR: ipcStore result from async job larger '.
-                     'then 2048 Bytes');
+                     'then 8192 Bytes');
       $store=Dumper({exitcode=>2048,msg=>'ERROR: ipcStore result to large'});
    }
    $self->{ipc}->store($store);
