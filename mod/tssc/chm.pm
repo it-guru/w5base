@@ -85,8 +85,13 @@ sub new
                 name          =>'location',
                 label         =>'Location',
                 ignorecase    =>1,
-                dataobjattr   =>'cm3rm1_w5base.change_shortname'), # scheint nicht 
-       #         dataobjattr   =>'cm3rm1_w5base.location_code'), # scheint nicht 
+                dataobjattr   =>'cm3rm1_w5base.change_shortname'), 
+
+      new kernel::Field::Text(
+                name          =>'project',
+                label         =>'Project',
+                ignorecase    =>1,
+                dataobjattr   =>'cm3rm1.project'), 
 
       new kernel::Field::Link(
                 name          =>'rawlocation',
@@ -524,7 +529,7 @@ sub initSearchQuery
    my $nowlabel=$self->T("now","kernel::App");
 
    if (!defined(Query->Param("search_plannedend"))){
-     Query->Param("search_plannedend"=>">$nowlabel-2d AND <$nowlabel+1M");
+     Query->Param("search_plannedend"=>">$nowlabel-1d AND <$nowlabel+14d");
    }
 }
 
@@ -614,15 +619,16 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cm3rm1_w5base,cm3ra43";
+   my $from="cm3rm1_w5base,cm3rm1,cm3ra43";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="(cm3rm1_w5base.lastprgn='t' or cm3rm1_w5base.lastprgn is null) and ".
-             "cm3rm1_w5base.numberprgn=cm3ra43.numberprgn(+)";
+   my $where="cm3rm1_w5base.numberprgn=cm3rm1.numberprgn and ".
+             "(cm3rm1_w5base.lastprgn='t' or cm3rm1_w5base.lastprgn is null) ".
+             "and cm3rm1_w5base.numberprgn=cm3ra43.numberprgn(+)";
    return($where);
 }
 

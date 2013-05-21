@@ -52,3 +52,4 @@
 'Risk of implementation'=>{de=>'Risiko der Implementation (Risk of implementation)'},
 'Impact description'=>{de=>'Auswirkungsbeschreibung (Impact description)'},
 'Validation'=>{de=>'Prüfung (Validation)'},
+'Project'=>{de=>'Projekt'},
