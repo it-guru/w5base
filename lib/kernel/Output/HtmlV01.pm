@@ -192,7 +192,7 @@ sub ProcessLine
        "onMouseOver=\"this.className='linehighlight'\" ".
        "onMouseOut=\"this.className='$lineclass'\">\n";
    if ($#view!=-1){
-      $d.="<td><a class=lineselect href=\"$dest\" ".
+      $d.="<td width=1><a class=lineselect href=\"$dest\" ".
           "target=_blank onfocus='window.status=\"open record\";' ".
           ">&nbsp;</a></td>";
    }
@@ -251,9 +251,9 @@ sub ProcessLine
       if (defined($field->{align})){
          $align=" align=$field->{align}";
       }
-      if (defined($field->{htmlwidth})){
-         $style.="width:$field->{htmlwidth};";
-      }
+      if (defined($field->{htmlwidth}) && $c!=$#view){ # at last field, width
+         $style.="width:$field->{htmlwidth};";         # should be calc by 
+      }                                                # browser
       else{
          $style.="width:auto;";
       }
