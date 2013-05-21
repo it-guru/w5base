@@ -1009,16 +1009,16 @@ sub getRecordHtmlDetailHeader
    $H.=<<EOF;
 <table width="100%" height="100%" border=0>
 <tr><td align="left">
-<p class=detailtoplineobj>$wfname:</p>
+<h1 class=detailtoplineobj>$wfname:</h1>
 </td>
 <td align=right width="1%"><p class=detailtoplinename>$current->{id}</p>
 </td></tr>
 <tr><td align="left" valign="top">
-<p class=detailtoplinename>$name</p>
+<h2 class=detailtoplinename>$name</h2>
 $statedisplay
 </td>
 <td colspan=2 align=left valign=top nowrap>
-<p class=detailtoplinename>$statename: $state</p>
+<h2 class=detailtoplinename>$statename: $state</h2>
 </td>
 </tr>
 </table>

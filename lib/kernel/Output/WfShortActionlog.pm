@@ -209,6 +209,14 @@ sub ProcessLine
       }
    }
    $d.="</u>";
+
+   if ($rec->{intiatornotify}){
+      my $t0=$app->T("intiator notify send","kernel::Output::WfShortActionlog");
+
+      $d.="&nbsp;&nbsp;<img border=0 alt=\"initiator notification send\" ".
+          "title=\"$t0\" ".
+          "src=\"../../base/load/wfnotify.gif\">";
+   }
    $d.="</td><td align=right valign=top>";
    { # process owner name field
       my $fieldname="owner";
