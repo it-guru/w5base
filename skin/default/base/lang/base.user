@@ -25,6 +25,7 @@
 'Mobile-Phonenumber'=>{ de=>'Handy-Nummer'},
 'privat Mobile-Phonenumber'=>{ de=>'priv. Handy-Nummer'},
 'Accounts'=>{ de=>'Kennungen'},
+'E-Mail adresses'=>{ de=>'E-Mail-Adressen'},
 'all nativ phone numbers'=>{ de=>'alle generischen Telefonnummern'},
 'Admin Comments'=>{ de=>'Bemerkungen nur für Admins'},
 'Groups'=>{ de=>'Gruppen'},
