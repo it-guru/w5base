@@ -169,7 +169,7 @@ sub isWriteValid
    else{
       if ($self->IsMemberOf($rec->{mandatorid},
                             ["RCHManager","RCHManager2",
-                             "RCFManager","RCFManager2"],"up")){
+                             "RCFManager","RCFManager2"],"down")){
          return("default","mainusetimes");
       }
       if ($self->IsMemberOf($rec->{chmgrteamid},
