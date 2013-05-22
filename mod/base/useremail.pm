@@ -83,8 +83,7 @@ sub new
                 name          =>'userid',
                 label         =>'UserID',
                 wrdataobjattr =>'contact.pcontact',
-                dataobjattr   =>"if (contact.usertyp='altemail',".
-                                "contact.pcontact,contact.userid)"),
+                dataobjattr   =>"contact.pcontact"),
                                   
       new kernel::Field::Text(
                 name          =>'emailtyp',
@@ -179,6 +178,44 @@ sub allowFurtherOutput
    return(0) if ($self->getCurrentSecState()<4);
    return(1);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+
+   my ($worktable,$workdb)=$self->getWorktable();
+
+   my $precision0="";
+   my $precision1="";
+   if ($mode eq "select"){
+      foreach my $filter (@filter){
+         if (ref($filter) eq "HASH" && defined($filter->{userid})){
+            if (!ref($filter->{userid})){
+               $precision0.="and pcontact='$filter->{userid}' ";
+               $precision1.="and userid='$filter->{userid}' ";
+            }
+         }
+      }
+   }
+
+   my $from="(".
+            "select  email, cistatus, userid,pcontact, usertyp,".
+            "        fullname, createdate, modifydate, createuser, modifyuser,".
+            "        editor, realeditor ".
+            "from contact as a where usertyp='altemail' ".$precision0.
+            " union ".
+            "select  email, cistatus, userid,userid pcontact, usertyp,".
+            "        fullname, createdate, modifydate, createuser, modifyuser,".
+            "        editor, realeditor ".
+            "from contact as b where usertyp<>'altemail' ".$precision1.
+            ") as contact";
+
+   return($from);
+}
+
+
 
 sub initSearchQuery
 {
