@@ -57,8 +57,11 @@ sub NSO_Kundensys_Rep
    
    $out->initWorkbook();
 
-   my @view=qw(systemname systemid status 
+   my @view=qw(systemname 
+               systemid 
+               status 
                systemos
+               srcid
                assetmodelname
                assetpowerinput
                assetmmaint
