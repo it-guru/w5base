@@ -528,6 +528,8 @@ sub Process
       }
       elsif ($op eq "wfforward" || $op eq "wfreprocess"){ #default forwarding
          my $note=Query->Param("note");
+         my ($target,$fwdtarget,$fwdtargetid,$fwddebtarget, 
+             $fwddebtargetid,@wsref,$fwdtargetname);
          $note=trim($note);
 
          my $fobj=$self->getParent->getField("fwdtargetname");
@@ -537,46 +539,96 @@ sub Process
              defined($self->getParent->getField("isdefaultforward"))){
             $h->{isdefaultforward}=0;
          }
-         if ($newrec=$fobj->Validate($WfRec,$h)){
-            if (!defined($newrec->{fwdtarget}) ||
-                !defined($newrec->{fwdtargetid} ||
-                $newrec->{fwdtargetid}==0)){
-               if ($self->LastMsg()==0){
-                  $self->LastMsg(ERROR,"invalid forwarding target");
-               }
-               return(0);
-            }
-            if ($newrec->{fwdtarget} eq "base::user"){
-               # check against distribution contacts
-               my $user=getModuleObject($self->Config,"base::user");
-               $user->SetFilter({userid=>\$newrec->{fwdtargetid}});
-               my ($urec,$msg)=$user->getOnlyFirst(qw(usertyp));
-               if (!defined($urec) || 
-                   ($urec->{usertyp} ne "user" &&
-                    $urec->{usertyp} ne "service")){
-                  $self->LastMsg(ERROR,"selected forward user is not allowed");
-                  return(0);
-               }
+         if ($self->getParent->can("getDefaultContractor") &&
+             lc($h->{fwdtargetname}) eq "\@default"){
+            ($target,$fwdtarget,$fwdtargetid,$fwddebtarget,
+                $fwddebtargetid,@wsref)=
+                $self->getParent->getDefaultContractor($WfRec,$actions,$action);
+            if ($fwdtarget ne "" && $fwdtargetid ne ""){
+               $newrec->{fwdtarget}=$fwdtarget;
+               $newrec->{fwdtargetid}=$fwdtargetid;
+               $fwdtargetname=$target;
             }
          }
          else{
-            return(0);
+            if ($newrec=$fobj->Validate($WfRec,$h)){
+               if (!defined($newrec->{fwdtarget}) ||
+                   !defined($newrec->{fwdtargetid} ||
+                   $newrec->{fwdtargetid}==0)){
+                  if ($self->LastMsg()==0){
+                     $self->LastMsg(ERROR,"invalid forwarding target");
+                  }
+                  return(0);
+               }
+               if ($newrec->{fwdtarget} eq "base::user"){
+                  # check against distribution contacts
+                  my $user=getModuleObject($self->Config,"base::user");
+                  $user->SetFilter({userid=>\$newrec->{fwdtargetid}});
+                  my ($urec,$msg)=$user->getOnlyFirst(qw(usertyp));
+                  if (!defined($urec) || 
+                      ($urec->{usertyp} ne "user" &&
+                       $urec->{usertyp} ne "service")){
+                     $self->LastMsg(ERROR,
+                                    "selected forward user is not allowed");
+                     return(0);
+                  }
+               }
+            }
+            else{
+               return(0);
+            }
+            if ($newrec=$fobj->Validate($WfRec,$h)){
+               if (!defined($newrec->{fwdtarget}) ||
+                   !defined($newrec->{fwdtargetid} ||
+                   $newrec->{fwdtargetid}==0)){
+                  if ($self->LastMsg()==0){
+                     $self->LastMsg(ERROR,"invalid forwarding target");
+                  }
+                  return(0);
+               }
+               if ($newrec->{fwdtarget} eq "base::user"){
+                  # check against distribution contacts
+                  my $user=getModuleObject($self->Config,"base::user");
+                  $user->SetFilter({userid=>\$newrec->{fwdtargetid}});
+                  my ($urec,$msg)=$user->getOnlyFirst(qw(usertyp));
+                  if (!defined($urec) || 
+                      ($urec->{usertyp} ne "user" &&
+                       $urec->{usertyp} ne "service")){
+                     $self->LastMsg(ERROR,"selected forward user is not allowed");
+                     return(0);
+                  }
+               }
+            }
+            else{
+               return(0);
+            }
+            $fwdtargetname=Query->Param("Formated_fwdtargetname");
          }
-         my $fwdtargetname=Query->Param("Formated_fwdtargetname");
 
          if ($self->StoreRecord($WfRec,{stateid=>2,
                                         eventend=>undef,
                                         closedate=>undef,
                                         fwdtarget=>$newrec->{fwdtarget},
                                         fwdtargetid=>$newrec->{fwdtargetid},
-                                        fwddebtarget=>undef,
-                                        fwddebtargetid=>undef })){
+                                        fwddebtarget=>$fwddebtarget,
+                                        fwddebtargetid=>$fwddebtargetid })){
             if ($self->getParent->getParent->Action->StoreRecord(
                 $WfRec->{id},"wfforward",
                 {translation=>'base::workflow::request'},$fwdtargetname."\n".
                                                          $note,undef)){
                my $openuserid=$WfRec->{openuser};
                $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+
+               my $id=$WfRec->{id};
+               if ($#wsref!=-1){
+                  while(my $target=shift(@wsref)){
+                     my $targetid=shift(@wsref);
+                     last if ($targetid eq "" || $target eq "");
+                     $self->getParent->getParent->AddToWorkspace($id,
+                                                          $target,$targetid);
+                  }
+               }
+
                $self->PostProcess($action.".".$op,$WfRec,$actions,
                                   note=>$note,
                                   fwdtarget=>$newrec->{fwdtarget},
