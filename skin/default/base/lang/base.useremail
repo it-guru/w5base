@@ -1,0 +1,6 @@
+'base::useremail'=>{de=>'Kontakt E-Mail',en=>'contact email address'},
+'Type'=>{de=>'Typ'},
+'Contact'=>{de=>'Kontakt'},
+'Surname'=>{de=>'Nachname'},
+'Givenname'=>{de=>'Vorname'},
+

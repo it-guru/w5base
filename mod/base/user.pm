@@ -321,6 +321,17 @@ sub new
                 vjoindisp     =>['account','cdate'],
                 vjoininhash   =>['account','userid']),
 
+      new kernel::Field::SubList(
+                name          =>'emails',
+                label         =>'E-Mail adresses',
+                readonly      =>1,
+                group         =>'userro',
+                vjointo       =>'base::useremail',
+                vjoinbase     =>{'cistatusid'=>'4'},
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>['email','cistatus','emailtyp'],
+                vjoininhash   =>['id','email','cistatusid','emailtyp']),
+
       new kernel::Field::Phonenumber(
                 name          =>'office_mobile',
                 group         =>'office',
@@ -907,6 +918,14 @@ sub new
    $self->LoadSubObjs("user");
    $self->setDefaultView(qw(fullname cistatus usertyp));
    return($self);
+}
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;  # prevent list of contact entries of type=altemail
+   my $where="contact.usertyp in ('extern','service','user','function')";
+   return($where);
 }
 
 

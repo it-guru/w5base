@@ -117,7 +117,7 @@ CREATE TABLE contact (
   KEY givenname (givenname),key(cistatus),
   KEY office_location (office_location),
   KEY private_location (private_location)
-);
+)  ENGINE=INNODB;
 CREATE TABLE useraccount (
   account varchar(40) NOT NULL default '',
   userid bigint(20),password varchar(128),
@@ -338,3 +338,4 @@ alter table contact add office_orgname  varchar(128) default NULL;
 alter table contact add salutation char(2) default NULL;
 alter table contact add country char(4) default NULL;
 alter table contact add banalprotect int(1) default '0',add isw5support int(1) default'0',add key(isw5support);
+alter table contact add pcontact bigint(20) default NULL, add FOREIGN KEY fk_pcontact (pcontact) REFERENCES contact (userid) ON DELETE CASCADE;
