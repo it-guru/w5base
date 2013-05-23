@@ -167,7 +167,30 @@ sub new
                 name          =>'funcmgrid',
                 label         =>'functional mgr id',
                 dataobjattr   =>"$worktable.funcmgr"),
-                                                  
+
+      new kernel::Field::Text(
+                name          =>'mgmtitemgroup',
+                label         =>'central managed CI groups',
+                vjointo       =>'itil::lnkmgmtitemgroup',
+                searchable    =>1,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(0) if (defined($current));
+                   return(1);
+                },
+                htmldetail    =>1,
+                readonly      =>1,
+                vjoinbase     =>{'lnkfrom'=>'<now',
+                                 'lnkto'=>'>now OR [EMPTY]',
+                                 'mgmtitemgroupcistatusid'=>\'4'},
+                weblinkto     =>'NONE',
+                vjoinon       =>['id'=>'businessserviceid'],
+                vjoindisp     =>'mgmtitemgroup'),
+
       new kernel::Field::Mandator( 
                 readonly      =>1,
                 htmldetail    =>0,

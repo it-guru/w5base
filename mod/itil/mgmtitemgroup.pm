@@ -98,6 +98,19 @@ sub new
                 vjoindisp     =>['location','lnkfrom','lnkto']),
 
 
+      new kernel::Field::SubList(
+                name          =>'businessservices',
+                label         =>'businessservices',
+                group         =>'businessservices',
+                subeditmsk    =>'subedit.businessservices',
+                forwardSearch =>1,
+                vjointo       =>'itil::lnkmgmtitemgroup',
+                vjoinbase     =>[{lnkto=>">now-24h OR [EMPTY]",
+                                  businessserviceid=>"![EMPTY]"}],
+                vjoinon       =>['id'=>'mgmtitemgroupid'],
+                vjoindisp     =>['businessservice','lnkfrom','lnkto']),
+
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -212,7 +225,8 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default comments applications locations contacts source));
+   return(qw(header default comments applications businessservices 
+             locations contacts source));
 }
 
 
@@ -279,13 +293,16 @@ sub isWriteValid
 
    my $databossedit=0;
    if ($self->IsMemberOf($self->{CI_Handling}->{activator})){
-      return("default","comments","applications","locations","contacts");
+      return("default","comments","applications","businessservices","locations",
+             "contacts");
    }
    if ($self->IsMemberOf("admin")){
-      return("default","comments","applications","locations","contacts");
+      return("default","comments","applications","businessservices","locations",
+             "contacts");
    }
 
-   my @databossgrp=("comments","contacts","applications","locations");
+   my @databossgrp=("comments","contacts","applications","locations",
+                    "businessservices");
 
    if ($rec->{cistatusid}<3){
       push(@databossgrp,"default");

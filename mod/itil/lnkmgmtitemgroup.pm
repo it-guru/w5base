@@ -116,6 +116,19 @@ sub new
                 label         =>'Location ID',
                 dataobjattr   =>'lnkmgmtitemgroup.location'),
 
+      new kernel::Field::TextDrop(
+                 name          =>'businessservice',
+                 htmlwidth     =>'150px',
+                 label         =>'Businessservice',
+                 vjointo       =>'itil::businessservice',
+                 vjoinon       =>['businessserviceid'=>'id'],
+                 vjoindisp     =>'name'),
+
+      new kernel::Field::Interface(
+                name          =>'businessserviceid',
+                label         =>'Businessservice ID',
+                dataobjattr   =>'lnkmgmtitemgroup.businessservice'),
+
       new kernel::Field::Text(
                 name          =>'comments',
                 searchable    =>0,
@@ -237,7 +250,7 @@ sub Validate
    my $origrec=shift;
 
    my $lnkcount=0;
-   foreach my $idfield (qw(applid locationid)){
+   foreach my $idfield (qw(applid locationid businessserviceid)){
       $lnkcount++ if (effVal($oldrec,$newrec,$idfield) ne "");
    }
    if ($lnkcount==0){

@@ -4,6 +4,7 @@
                         en=>'comments and responsiblity'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'fieldgroup.applications'=>{de=>'zugeordnete Anwendungen',en=>'related applications'},
+'fieldgroup.businessservices'=>{de=>'zugeordnete Businessservices',en=>'related Businessservices'},
 'fieldgroup.locations'=>{de=>'zugeordnete Standorte',en=>'related locations'},
 'invalid name specified'=>{de=>'unzulässiger Name angegeben'},
 'you are not authorized to set other persons as databoss'=>{
