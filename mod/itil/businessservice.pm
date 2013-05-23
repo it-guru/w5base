@@ -481,7 +481,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   my @l=qw(header default);
+   my @l=qw(header default history);
    if ($rec->{applid} ne ""){
       push(@l,qw(desc servicecomp));
    }

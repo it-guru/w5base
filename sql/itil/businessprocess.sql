@@ -2,7 +2,7 @@ use w5base;
 create table lnkbprocessappl (
   id           bigint(20) NOT NULL,
   bprocess     bigint(20) NOT NULL,
-  appl         bigint(20) NOT NULL,
+  appl         bigint(20),
   relevance    int(2)     NOT NULL,
   comments     longtext    default NULL,
   additional   longtext    default NULL,
