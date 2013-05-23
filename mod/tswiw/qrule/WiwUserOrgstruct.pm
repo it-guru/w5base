@@ -604,7 +604,6 @@ sub NotifyNewTeamRelation
       $mailtext.="\n\nDirectLink:\n".$url;
       my $label=$self->T("WhoIsWho to W5Base/Darwin automatic ".
                          "organisation relation administration:");
-printf STDERR ("fifi lang=$ENV{HTTP_FORCE_LANGUAGE}\n");
       my $supportnote=$user->getParsedTemplate(
                         "tmpl/mailsend.supportnote",{
                            static=>{
