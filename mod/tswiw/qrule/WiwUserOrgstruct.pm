@@ -604,6 +604,15 @@ sub NotifyNewTeamRelation
       $mailtext.="\n\nDirectLink:\n".$url;
       my $label=$self->T("WhoIsWho to W5Base/Darwin automatic ".
                          "organisation relation administration:");
+printf STDERR ("fifi lang=$ENV{HTTP_FORCE_LANGUAGE}\n");
+      my $supportnote=$user->getParsedTemplate(
+                        "tmpl/mailsend.supportnote",{
+                           static=>{
+                           }
+                        });
+      if ($supportnote ne ""){
+         $mailtext.=$supportnote;
+      }
      
       if (my $id=$wf->Store(undef,{
               class    =>'base::workflow::mailsend',

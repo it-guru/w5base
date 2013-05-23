@@ -1656,21 +1656,37 @@ sub findtemplvar
    elsif ($var eq "SUPPORTINFO"){
       my $u=getModuleObject($self->Config,"base::user");
       my $d="";
+      my $mode="html";
+      $mode="html" if (in_array(\@param,"html"));
+      $mode="text" if (in_array(\@param,"text"));
       if (defined($u)){
          $u->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
          my ($urec)=$u->getOnlyFirst(qw(email office_phone));
          if (defined($urec)){
             if ($urec->{email} ne ""){
-               $d.="Support: <a href=\"mailto:$urec->{email}\" ".
-                   "class=supportinfo>$urec->{email}</a>";
+               if ($mode eq "html"){
+                  $d.="Support: <a href=\"mailto:$urec->{email}\" ".
+                      "class=supportinfo>$urec->{email}</a>";
+               }
+               if ($mode eq "text"){
+                  $d.="Mail: $urec->{email} ";
+               }
             }
-            $d.="&nbsp;&nbsp;" if ($d ne "");
+            $d.="&nbsp;&nbsp;" if ($d ne "" && $mode eq "html");
+            $d.="  " if ($d ne "" && $mode eq "text");
             if ($urec->{office_phone} ne ""){
-               $d.="1st Level Support Phone: <a  class=supportinfo ".
-                   "href=\"callto:$urec->{office_phone}\">".
-                   "$urec->{office_phone}</a>";
+               if ($mode eq "html"){
+                  $d.="1st Level Support Phone: <a  class=supportinfo ".
+                      "href=\"callto:$urec->{office_phone}\">".
+                      "$urec->{office_phone}</a>";
+               }
+               if ($mode eq "text"){
+                  $d.="Phone: ".
+                      "$urec->{office_phone}";
+               }
             }
-            $d.="&nbsp;&nbsp;" if ($d ne "");
+            $d.="&nbsp;&nbsp;" if ($d ne "" && $mode eq "html");
+            $d.="  " if ($d ne "" && $mode eq "text");
          }
       }
       return($d);
