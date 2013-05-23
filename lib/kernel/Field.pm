@@ -818,7 +818,7 @@ sub RawValue
          }
       }
       my @fltlst=(\%flt);
-      if (ref($self->{vjoinonfine}) eq "CODE"){  # this allows dynamic joins
+      if (ref($self->{vjoinonfinish}) eq "CODE"){  # this allows dynamic joins
          @fltlst=&{$self->{vjoinonfinish}}($self,\%flt,$current);
       }
       my $joinkey=join(";",map({ my $k=$flt{$_};
