@@ -49,3 +49,4 @@ alter table lnkbprocessbusinessservice add businessservice bigint(20) NOT NULL;
 set FOREIGN_KEY_CHECKS=0;
 alter table lnkbprocessbusinessservice add FOREIGN KEY fk_bs (businessservice) REFERENCES businessservice (id) ON DELETE CASCADE;
 set FOREIGN_KEY_CHECKS=1;
+alter table businessservice add bprocess  bigint(20);
