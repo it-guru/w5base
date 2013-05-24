@@ -5,6 +5,8 @@
 'AL_TCom.custcontract.crono'=>{de=>'Vertrags-Chronologie',en=>'Contruct-Chronology'},
 'AL_TCom.appl'=>{de=>'Anwendung',en=>'Application'},
 'AL_TCom.appl.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.appl.lnkapplurl'=>{de=>'Kommunikations URL',en=>'Communication URL'},
+'AL_TCom.appl.lnkapplurl.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},
 'AL_TCom.appl.lnkapplappl'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'AL_TCom.appl.lnkapplappl.new'=>{de=>'Neueingabe',en=>'New'},

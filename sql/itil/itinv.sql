@@ -1218,3 +1218,25 @@ alter table businessprocess
  add mon1url varchar(128),add mon1date datetime,add mon1mode varchar(10),
  add mon2url varchar(128),add mon2date datetime,add mon2mode varchar(10),
  add mon3url varchar(128),add mon3date datetime,add mon3mode varchar(10);
+create table accessurl (
+  id          bigint(20) NOT NULL,
+  appl        bigint(20) NOT NULL,
+  fullname    varchar(512) NOT NULL,
+  network     bigint(20) NOT NULL,
+  is_userfrontend int(1) default '0',scheme   varchar(20) not null,
+  is_interface    int(1) default '0',hostname varchar(128),  
+  is_internal     int(1) default '0',ipport   int(10),      
+  comments    longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  srcsys      varchar(100) default 'w5base',
+  srcid       varchar(20) default NULL,
+  srcload     datetime    default NULL,
+  PRIMARY KEY  (id), KEY (appl),
+  UNIQUE KEY fullname (fullname,network),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=INNODB;

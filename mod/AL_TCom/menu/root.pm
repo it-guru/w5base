@@ -102,6 +102,17 @@ sub Init
    $self->RegisterObj("AL_TCom.appl.new",
                       "AL_TCom::appl",
                       func=>'New',
+                      prio=>1,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.appl.lnkapplurl",
+                      "itil::lnkapplurl",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.appl.lnkapplurl.new",
+                      "itil::lnkapplurl",
+                      prio=>1,
+                      func=>'New',
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.appl.lnkapplappl",

@@ -75,8 +75,19 @@ sub Init
    
    $self->RegisterObj("itil.appl.new",
                       "itil::appl",
+                      prio=>1,
                       func=>'New',
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("itil.appl.lnkapplurl",
+                      "itil::lnkapplurl",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.appl.lnkapplurl.new",
+                      "itil::lnkapplurl",
+                      prio=>1,
+                      func=>'New',
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("itil.appl.lnkapplappl",
                       "itil::lnkapplappl",
