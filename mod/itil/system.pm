@@ -1484,9 +1484,20 @@ sub getHtmlDetailPageContent
       $page.=<<EOF;
 <script language="JavaScript" type="text/javascript">
 addEvent(window,"load",function(){
-   var f=document.getElementById("DISP01");
-   f.src="$perfurl";
+   setIFrameUrl();
 });
+addEvent(window,"resize",function(){
+   setIFrameUrl();
+});
+
+function setIFrameUrl(){
+   var f=document.getElementById("DISP01");
+   var w=window.innerWidth-10;
+   if (w<590){
+      w=590;
+   }
+   f.src="$perfurl&width="+w;
+}
 
 </script>
 EOF
