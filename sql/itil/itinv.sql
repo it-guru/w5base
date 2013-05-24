@@ -1240,3 +1240,7 @@ create table accessurl (
   UNIQUE KEY fullname (fullname,network),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
+alter table system 
+ add perf1url varchar(128),add perf1date datetime,add perf1mode varchar(10),
+ add perf2url varchar(128),add perf2date datetime,add perf2mode varchar(10),
+ add perf3url varchar(128),add perf3date datetime,add perf3mode varchar(10);

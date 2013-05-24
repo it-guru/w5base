@@ -935,6 +935,28 @@ sub new
                 dataobjattr   =>'system.mon2url'),
 
       new kernel::Field::Text(
+                name          =>'perf1url',
+                group         =>'control',
+                htmldetail    =>0,
+                label         =>'Performance URL1',
+                dataobjattr   =>'system.perf1url'),
+
+      new kernel::Field::Text(
+                name          =>'perf1date',
+                group         =>'control',
+                htmldetail    =>0,
+                history       =>0,
+                label         =>'Performance Date1',
+                dataobjattr   =>'system.perf1date'),
+
+      new kernel::Field::Text(
+                name          =>'perf2url',
+                group         =>'control',
+                htmldetail    =>0,
+                label         =>'Performance URL2',
+                dataobjattr   =>'system.perf2url'),
+
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
@@ -1423,6 +1445,59 @@ sub isWriteValid
    }
    return(undef);
 }
+
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
+   if (defined($rec)){
+      if ($rec->{perf1url} ne "" ||
+          $rec->{perf2url} ne "" ||
+          $rec->{perf3url} ne ""){
+         push(@l,"PerfDat"=>$self->T("Performance"));
+      }
+   }
+   return(@l);
+}
+
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "PerfDat");
+
+   if ($p eq "PerfDat"){
+      my $perfurl;
+      $perfurl=$rec->{perf3url} if ($rec->{perf3url} ne "");
+      $perfurl=$rec->{perf2url} if ($rec->{perf2url} ne "");
+      $perfurl=$rec->{perf1url} if ($rec->{perf1url} ne "");
+
+      $page.=<<EOF;
+<script language="JavaScript" type="text/javascript">
+addEvent(window,"load",function(){
+   var f=document.getElementById("DISP01");
+   f.src="$perfurl";
+});
+
+</script>
+EOF
+
+      $page.="<iframe class=HtmlDetailPage name=HtmlDetailPage id=DISP01 ".
+            "src=\"Empty\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
 
 
 
