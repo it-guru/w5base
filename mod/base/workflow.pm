@@ -1900,7 +1900,9 @@ sub Adressbook
 
 
    print <<EOF;
-<script language="JavaScript">
+
+
+<script language="JavaScript" type="text/javascript">
 
 var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
 // non jsonp call should be implemented in future
@@ -1988,9 +1990,9 @@ function displayResult(res)
 function doSearch()
 {
    \$("#result").html("<br><br>"+
-                      "<table width=\"100%\" border=0><tr>".
-                      "<td align=\"center\">"+
-                      "<img src=\\"../../base/load/ajaxloader.gif\\">"+
+                      "<table width=100% border=0><tr>"+
+                      "<td align=center>"+
+                      "<img src='../../base/load/ajaxloader.gif'>"+
                       "</td></tr></table>");
    var surname=\$("#surname").val();
    var givenname=\$("#givenname").val();
