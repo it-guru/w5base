@@ -43,6 +43,9 @@ sub GetKeyCriterion
              'TS::appl::scapprgroup'=>{
                          label=>'IT-Inventar: Change Approvergroup',
                             in=>[qw(itil::appl::id)]},
+             'TS::appl::ictono'=>{
+                         label=>'IT-Inventar: Applikation: ICTO-ID',
+                            in=>[qw(itil::appl::id)]},
               }
          };
    return($d);
@@ -80,6 +83,17 @@ sub ProcessLine
       foreach my $rec ($appl->getHashList("scapprgroup")){
          if ($rec->{"scapprgroup"} ne ""){
              $out->{'TS::appl::scapprgroup'}->{$rec->{"scapprgroup"}}++;
+         } 
+      }
+   }
+   if (defined($in->{'itil::appl::id'}) && 
+       exists($out->{'TS::appl::ictono'})){
+      my $appl=$self->getParent->getPersistentModuleObject('TS::appl');
+      my $id=[keys(%{$in->{'itil::appl::id'}})];
+      $appl->SetFilter({id=>$id});
+      foreach my $rec ($appl->getHashList("ictono")){
+         if ($rec->{"ictono"} ne ""){
+             $out->{'TS::appl::ictono'}->{$rec->{"ictono"}}++;
          } 
       }
    }
