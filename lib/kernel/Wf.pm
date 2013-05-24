@@ -157,7 +157,7 @@ sub FormatSubHeader
    if ($wfrec->{initialsite} ne "" && $wfrec->{initialsite} ne "JobServer"){
       my $lang="";
       if ($wfrec->{initiallang} ne ""){
-         $lang="?HTTP_ACCEPT_LANGUAGE=$wfrec->{initiallang}";
+         $lang="/$wfrec->{initiallang}";
       }
       my $imgtitle="current state of workflow";
       my $linktitle="direct link to orkflow";

@@ -1619,7 +1619,6 @@ sub Validate
          $self->{SubDataObj}->{$class}->recalcResponsiblegrp($oldrec,$newrec);
       }
    }
-#printf STDERR ("fifi Validate %s\n",Dumper($newrec->{kh}));
    #######################################################################
    return($bk);
 }
@@ -1816,7 +1815,15 @@ sub ShowState
       $ENV{HTTP_ACCEPT_LANGUAGE}=Query->Param("HTTP_ACCEPT_LANGUAGE");
    }
    my $wfstate=0;
-   my ($wfheadid)=$func=~m/(\d+)$/;
+   my $wfheadid;
+   if (my ($i,$l)=$func=~m/(\d+)\/(.+.+)$/){
+      $wfheadid=$i;
+      $ENV{HTTP_ACCEPT_LANGUAGE}=$l;
+   }
+   elsif (my ($i)=$func=~m/(\d+)$/){
+      $wfheadid=$i;
+   }
+
    $wfheadid=~s/^0+//;
    if ($wfheadid ne ""){
       $self->ResetFilter();
@@ -1827,9 +1834,6 @@ sub ShowState
    my $filename=$self->getSkinFile("base/img/wfstate$wfstate.gif");
    my %param;
 
-  # msg(INFO,"base::worflow ShowState ".
-  #          "func=$func id=$wfheadid wfstate=$wfstate filename=$filename");
-
    print $self->HttpHeader("image/gif",%param);
    if (open(MYF,"<$filename")){
       binmode MYF;
@@ -1839,6 +1843,7 @@ sub ShowState
       }
       close(MYF);
    }
+   delete($ENV{HTTP_ACCEPT_LANGUAGE});
 }
 
 sub getSelectableModules
