@@ -1494,7 +1494,7 @@ function setIFrameUrl(){
    var f=document.getElementById("DISP01");
    var w=window.innerWidth-20;
    if (!w){
-      w=window.outerWidth-30;
+      w=document.body.clientWidth-25;
    }
    if (w<580){
       w=580;
