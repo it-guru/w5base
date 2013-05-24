@@ -1492,9 +1492,9 @@ addEvent(window,"resize",function(){
 
 function setIFrameUrl(){
    var f=document.getElementById("DISP01");
-   var w=window.innerWidth-10;
-   if (w<590){
-      w=590;
+   var w=window.innerWidth-20;
+   if (w<580){
+      w=580;
    }
    f.src="$perfurl&width="+w;
 }
