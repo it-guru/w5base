@@ -58,8 +58,8 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    if (!defined($rec->{responseteam}) || $rec->{responseteam} eq ""){
-      return(3,{qmsg=>['no responseteam/IT-Servicemanagment team defined'],
-                dataissue=>['no responseteam/IT-Servicemanagment team defined']});
+      return(3,{qmsg=>['no responseteam/IT-Servicemanagement team defined'],
+                dataissue=>['no responseteam/IT-Servicemanagement team defined']});
    }
    return(0,undef);
 

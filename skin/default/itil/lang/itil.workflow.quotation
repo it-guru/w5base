@@ -1,6 +1,6 @@
 'itil::workflow::quotation'=>{de=>'ITIL Angebotsanfrage IT-Dienstleistung',
-                              en=>'ITIL IT-Service quotation'},
-'itil::workflow::quotation::tip'=>{de=>'Die Angebotsanfrage dient dazu, für bestimmte IT-Anforderungen rein eine Machbarkeits bzw. Kostenabschätzung einzuholen. Aus dieser Angebotsanfrage kann dann u.U. zu einem späteren Zeitpunkt ein Auftrag erstellt werden.',en=>'Quotation for IT-Services'},
+                              en=>'ITIL IT Service quotation'},
+'itil::workflow::quotation::tip'=>{de=>'Die Angebotsanfrage dient dazu, für bestimmte IT-Anforderungen rein eine Machbarkeits bzw. Kostenabschätzung einzuholen. Aus dieser Angebotsanfrage kann dann u.U. zu einem späteren Zeitpunkt ein Auftrag erstellt werden.',en=>'Quotation for Business-Services'},
 'RUserGroup'=>{de=>'Angebotsanfrage direkt an eine Person oder Gruppe'},
 'RAppl.developer'=>{de=>'Angebotsanfrage an die Entwickler einer Anwendung'},
 'RAppl.businessteam'=>{
