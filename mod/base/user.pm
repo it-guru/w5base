@@ -637,7 +637,7 @@ sub new
                 htmleditwidth =>'50%',
                 group         =>'userparam',
                 default       =>'normal',
-                value         =>['normal','auto','large','persi',
+                value         =>['normal','large','persi',
                                  'f800','f1024'],
                 container     =>'options'),
 
