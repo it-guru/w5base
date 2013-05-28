@@ -36,6 +36,10 @@ sub GetKeyCriterion
 {
    my $self=shift;
    my $d={
+       in=>{
+               'TS::appl::ictono'         =>{label=>'Application ICTO-ID',
+                                             out=>['itil::appl::id']},
+           },
        out=>{
              'TS::appl::acapplname'=>{
                          label=>'IT-Inventar: AssetManager Applicationname',
@@ -58,6 +62,23 @@ sub ProcessLine
    my $in=shift;
    my $out=shift;
    my $loopcount=shift;
+
+
+   if (defined($in->{'TS::appl::ictono'})){
+      my $appl=$self->getParent->getPersistentModuleObject('TS::appl');
+      if (ref($in->{'TS::appl::ictono'}) eq "HASH"){
+         $appl->SetFilter({ictono=>[keys(%{$in->{'TS::appl::ictono'}})],
+                           cistatusid=>'4'});
+      }
+      else{
+         $appl->SetFilter({ictono=>\$in->{'TS::appl::ictono'},cistatusid=>'4'});
+      }
+      foreach my $applrec ($appl->getHashList(qw(id name))){
+         $in->{'itil::appl::id'}->{$applrec->{id}}++;
+         $in->{'itil::appl::name'}->{$applrec->{name}}++;
+      }
+      return(0); # input has been enriched
+   }
 
  
    # output
