@@ -588,18 +588,24 @@ sub SecureSetFilter
                                RAuditor RMonitor)],"both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
-      push(@flt,[
-                 {mandatorid=>\@mandators},
-                 {databossid=>$userid},
-                 {guardianid=>$userid},       {guardian2id=>$userid},
-                 {guardianteamid=>\@grpids},
+
+      my @addflt=(
                  {sectargetid=>\$userid,sectarget=>\'base::user',
                   secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
                             "*roles=?read?=roles*"},
                  {sectargetid=>\@grpids,sectarget=>\'base::grp',
                   secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
                             "*roles=?read?=roles*"}
-                ]);
+                );
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         push(@addflt,
+                    {mandatorid=>\@mandators},
+                    {databossid=>\$userid},
+                    {guardianid=>$userid},       {guardian2id=>$userid},
+                    {guardianteamid=>\@grpids}
+                   );
+      }
+      push(@flt,\@addflt);
    }
    return($self->SetFilter(@flt));
 }
