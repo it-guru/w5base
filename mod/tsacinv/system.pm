@@ -492,7 +492,7 @@ sub new
                 group         =>'backups',
                 vjointo       =>'tsacinv::backup',
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
-                vjoindisp     =>[qw(backupid name bgroup isactive 
+                vjoindisp     =>[qw(backupid name stype bgroup tfrom tto isactive 
                                     hexpectedquantity)]),
 
 

@@ -47,6 +47,25 @@ sub new
                 label         =>'BackupID',
                 dataobjattr   =>'amtsibackup.code'),
 
+
+      new kernel::Field::Select(
+                name          =>'stype',
+                htmldetail    =>0,
+                label         =>'Typ',
+                transprefix   =>'SBACKTYP.', 
+                dataobjattr   =>'amtsibackup.setype'),
+
+      new kernel::Field::Select(
+                name          =>'type',
+                label         =>'Type',
+                transprefix   =>'BACKTYP.', 
+                dataobjattr   =>'amtsibackup.setype'),
+
+      new kernel::Field::Interface(
+                name          =>'typeid',
+                label         =>'TypeID',
+                dataobjattr   =>'amtsibackup.setype'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
@@ -62,6 +81,38 @@ sub new
                 label         =>'expectedquantity',
                 dataobjattr   =>"concat(amtsibackup.expectedquantity,".
                                 "concat(' ',amtsibackup.quantityunit))"),
+
+      new kernel::Field::Text(
+                name          =>'tfrom',
+                group         =>'timeframe',
+                label         =>'from',
+                dataobjattr   =>'amtsibackup.savetimeframefrom'),
+
+      new kernel::Field::Text(
+                name          =>'tto',
+                group         =>'timeframe',
+                label         =>'to',
+                dataobjattr   =>'amtsibackup.savetimeframeto'),
+
+
+      new kernel::Field::Text(
+                name          =>'dbtype',
+                group         =>'dbbackup',
+                label         =>'DBType',
+                dataobjattr   =>'amtsibackup.dbtype'),
+
+      new kernel::Field::Text(
+                name          =>'policy',
+                group         =>'dbbackup',
+                label         =>'Policy',
+                dataobjattr   =>'amtsibackup.policy'),
+
+      new kernel::Field::Text(
+                name          =>'dbinstance',
+                group         =>'dbbackup',
+                label         =>'Instance',
+                dataobjattr   =>'amtsibackup.dbinstance'),
+
 
       new kernel::Field::Boolean(
                 name          =>'isactive',
@@ -101,6 +152,11 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from="amtsibackup";
+ #           "(select amitemlistval.value,".
+ #           "amitemlistval.litemlistvalid from amitemizedlist,amitemlistval ".
+ #           "where amitemizedlist.litemlistid=amitemlistval.litemlistid and ".
+ #           "amitemizedlist.identifier='TSI_amTsiBackup_DBType') dbtypelist";
+
 
    return($from);
 }
@@ -108,7 +164,9 @@ sub getSqlFrom
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="amtsibackup.bdelete=0 ";
+   my $where=
+             #"amtsibackup.dbtype=dbtypelist.litemlistvalid and ".
+             "amtsibackup.bdelete=0 ";
    return($where);
 }
 
@@ -116,7 +174,12 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   my @all=qw(default header source);
+
+   push(@all,"dbbackup") if ($rec->{typeid} eq "1");
+   push(@all,"timeframe") if ( ($rec->{tfrom} ne "NA" && $rec->{tfrom} ne "") 
+                              || ($rec->{tto} ne "NA" && $rec->{tto} ne ""));
+   return(@all);
 }
 
 sub isWriteValid
