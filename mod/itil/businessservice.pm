@@ -126,7 +126,7 @@ sub new
                    return(0);
                 },
                 uploadable    =>0,
-                label         =>'primary provided by Application',
+                label         =>'primarily provided by application',
                 weblinkto     =>'itil::appl',
                 weblinkon     =>['parentid'=>'id'],
                 dataobjattr   =>'applname'),
