@@ -1121,7 +1121,7 @@ create table assetphyscpu (
 create table businessservice (
   id          bigint(20)  NOT NULL,
   name        varchar(128) default NULL,
-  appl        bigint(20) NOT NULL,
+  appl        bigint(20),
   cistatus    int(2)      NOT NULL, funcmgr bigint(20) default NULL,
   description longtext     default NULL,
   comments    longtext     default NULL,
