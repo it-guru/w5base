@@ -50,3 +50,4 @@ set FOREIGN_KEY_CHECKS=0;
 alter table lnkbprocessbusinessservice add FOREIGN KEY fk_bs (businessservice) REFERENCES businessservice (id) ON DELETE CASCADE;
 set FOREIGN_KEY_CHECKS=1;
 alter table businessservice add databoss  bigint(20);
+alter table businessservice add mandator  bigint(20);

@@ -40,6 +40,15 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(1) if (defined($current));
+                   return(0);
+                },
                 label         =>'W5BaseID',
                 dataobjattr   =>"$worktable.id"),
                                                   
@@ -105,7 +114,7 @@ sub new
                 dataobjattr   =>"if ($worktable.appl is null,".
                                 "$worktable.databoss,".
                                 "appldataboss)",
-                dataobjattr   =>"$worktable.databoss"),
+                wrdataobjattr  =>"$worktable.databoss"),
                                                   
       new kernel::Field::Text(
                 name          =>'application',
@@ -168,6 +177,32 @@ sub new
                 label         =>'functional mgr id',
                 dataobjattr   =>"$worktable.funcmgr"),
 
+      new kernel::Field::Mandator( 
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if ($current->{applid} ne "");
+                   return(0);
+                },
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(1) if (defined($current));
+                   return(0);
+                }),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                selectfix     =>1,
+                label         =>'Databoss ID',
+                dataobjattr   =>"if ($worktable.appl is null,".
+                                "$worktable.mandator,".
+                                "applmandator)",
+                wrdataobjattr  =>"$worktable.mandator"),
+                                                  
       new kernel::Field::Text(
                 name          =>'mgmtitemgroup',
                 label         =>'central managed CI groups',
@@ -179,10 +214,9 @@ sub new
                    my %param=@_;
                    my $current=$param{current};
 
-                   return(0) if (defined($current));
-                   return(1);
+                   return(1) if (defined($current));
+                   return(0);
                 },
-                htmldetail    =>1,
                 readonly      =>1,
                 vjoinbase     =>{'lnkfrom'=>'<now',
                                  'lnkto'=>'>now OR [EMPTY]',
@@ -190,17 +224,6 @@ sub new
                 weblinkto     =>'NONE',
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>'mgmtitemgroup'),
-
-      new kernel::Field::Mandator( 
-                readonly      =>1,
-                htmldetail    =>0,
-                group         =>'applinfo'),
-
-      new kernel::Field::Interface(
-                name          =>'mandatorid',
-                group         =>'applinfo',
-                readonly      =>1,
-                dataobjattr   =>'applmandator'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -249,10 +272,6 @@ sub new
                 vjointo       =>'itil::lnkbprocessbservice',
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>['businessprocess','customer']),
-
-      new kernel::Field::Link(
-                name          =>'databossid',
-                dataobjattr   =>'appl.databoss'),
 
       new kernel::Field::Link(
                 name          =>'businessteamid',
@@ -395,6 +414,23 @@ sub getSqlFrom
    return($from);
 }
 
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $org=shift;
+
+   if (!defined($oldrec)){
+      if (effVal($oldrec,$newrec,"mandatorid") eq ""){
+         my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write");
+         $newrec->{mandatorid}=$mandators[0] if ($mandators[0] ne "");
+      }
+   }
+
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$org));
+}
+
 sub Validate
 {
    my $self=shift;
@@ -435,6 +471,11 @@ sub Validate
                               "as databoss");
          return(0);
       }
+      if (effVal($oldrec,$newrec,"mandatorid") eq ""){
+         print STDERR Dumper($newrec);
+         my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write");
+         print STDERR (Dumper(\@mandators));
+      }
    }
    else{
       if (!$self->isParentWriteable($applid)){
@@ -442,6 +483,8 @@ sub Validate
          return(0);
       }
    }
+ 
+
 
 
 
