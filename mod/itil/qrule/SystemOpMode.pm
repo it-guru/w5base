@@ -59,7 +59,7 @@ sub qcheckRecord
       push(@qmsg,"no system classification defined");
    }
    if ($#qmsg!=-1){
-       return(3,{qmsg=>\@qmsg});
+       return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
    }
    return(0,undef);
 
