@@ -4,9 +4,9 @@ Willkommen,<br>
 Sie haben sich mit dem Account '%account%' das erste mal auf diesem
 Datenbanksystem angemeldet bzw. Ihre eingegebene E-Mail-Adresse
 wurde von Ihnen noch nicht bestätigt.<br>
-Diese Awendung benötigt ihre korrekte E-Mail Adresse. Bitte geben
+Diese Anwendung benötigt ihre korrekte E-Mail Adresse. Bitte geben
 Sie diese in dem unten stehenden Feld ein.<br>
-Sobald Sie auf Speichern klicken, wir Ihnen eine E-Mail zugesandt.
+Sobald Sie auf Speichern klicken, wird Ihnen eine E-Mail zugesandt.
 In dieser Mail finden Sie dann einen Link, mit dem Sie die E-Mail-Adresse
 bestätigen können. Danach ist Ihr User-Account einsatzbereit.
 EOF
@@ -27,13 +27,13 @@ EOF
            en=>'save email address'},
 'MSG101'=>{de=><<EOF,
 <b>... warten auf Bestätigung</b><br><br>
-Ihre Mail-Addresse '%email%' wurde erfolgreich gespreichert. Geichzeitig wurde
+Ihre Mail-Addresse '%email%' wurde erfolgreich gespeichert. Geichzeitig wurde
 Ihnen eine E-Mail zugestellt, in der Sie aufgefordert werden, die
 eingegebene E-Mail Adresse zu bestätigen.<br>
 Ihr Account ist einsatzbereit, sobald Sie diese Bestätigung durchgeführt
 haben.<br>
 <br>
-Sollten Sie irtümlich die falsche E-Mail-Adresse eingegeben haben, so
+Sollten Sie irrtümlich die falsche E-Mail-Adresse eingegeben haben, so
 haben Sie über die Funktion "Korrektur der E-Mail Adresse" die Möglichkeit,
 Ihre Eingabe entsprechend zu korrigieren.
 EOF

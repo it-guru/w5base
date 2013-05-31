@@ -8,7 +8,7 @@ No modul specification
 'customerprio'=>{de=>'
 Die Kundenprioriät definiert, mit welcher Priorität der Kunde die
 Anwendung einstuft, d.h. durch diesen Wert wird die Wichtigkeit der 
-Awendung für den Kunden beschrieben.
+Anwendung für den Kunden beschrieben.
 ',en=>'
 This is the customer priority. This meens, the priority of the
 application for the customer.

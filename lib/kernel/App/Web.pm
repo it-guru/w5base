@@ -955,10 +955,42 @@ sub HandleNewUser
          my $code=Query->Param("code");
          if ($code==$uarec->{requestemailwf}){
             my $user=getModuleObject($self->Config,"base::user");
-            $user->SetFilter({email=>$uarec->{requestemail}});
+            my $useremail=getModuleObject($self->Config,"base::useremail");
+            my $uerec;
+            $user->SetFilter({emails=>$uarec->{requestemail}});
             $user->SetCurrentView(qw(ALL));
             my ($urec,$msg)=$user->getFirst();
+            if (!defined($urec)){  # now check, if email is in useremail set
+               $useremail->SetFilter({email=>$uarec->{requestemail}});
+               $useremail->SetCurrentView(qw(ALL));
+               ($uerec,$msg)=$useremail->getFirst();
+               if (defined($uerec)){
+                  if ($uerec->{userid} eq ""){
+                     $useremail->ValidatedDeleteRecord($uerec);
+                     $uerec=undef;
+                  }
+                  $user->ResetFilter();
+                  $user->SetFilter({userid=>\$uerec->{userid}});
+                  $user->SetCurrentView(qw(ALL));
+                  ($urec,$msg)=$user->getFirst();
+               }
+            }
             if (defined($urec)){
+               if (defined($uerec) && $uerec->{cistatusid}>4){ #marked addresses
+                  print $self->HttpHeader("text/html");
+                  print $self->HtmlHeader(style=>['default.css','work.css'],
+                                       body=>1,form=>1,action=>$ENV{SCRIPT_URI},
+                                       refresh=>5,
+                                       title=>'W5Base - account verification');
+                  print $self->getParsedTemplate("tmpl/accountverificationdeny",
+                        { static=>{ 
+                               email=>$uarec->{requestemail},
+                               account=>$ENV{REMOTE_USER}},
+                         translation=>'base::accountverification',
+                         skinbase=>'base'
+                        });
+                  return(0);
+               }
                $ua->ValidatedUpdateRecord($uarec,{userid=>$urec->{userid},
                                                   requestemailwf=>undef},
                                    {account=>$ENV{REMOTE_USER}});
@@ -974,6 +1006,10 @@ sub HandleNewUser
                
                $user->ValidatedUpdateRecord($urec,$updrec,
                                    {userid=>\$urec->{userid}});
+               if (defined($uerec)){
+                  $useremail->ValidatedUpdateRecord($uerec,{cistatusid=>4},
+                                   {id=>\$uerec->{id}});
+               }
             }
             else{
                my $userid=undef;

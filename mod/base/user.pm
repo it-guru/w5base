@@ -233,7 +233,7 @@ sub new
 
       new kernel::Field::Email(
                 name          =>'email',
-                label         =>'E-Mail',
+                label         =>'primary E-Mail',
                 prepRawValue   =>
                    sub{
                       my $self=shift;
@@ -327,8 +327,8 @@ sub new
                 readonly      =>1,
                 group         =>'userro',
                 vjointo       =>'base::useremail',
-                vjoinbase     =>{'cistatusid'=>'4'},
-                vjoinon       =>['userid'=>'userid'],
+                vjoinbase     =>{'cistatusid'=>'<=4'}, # this is neassary for
+                vjoinon       =>['userid'=>'userid'],  # intial logon process!
                 vjoindisp     =>['email','cistatus','emailtyp'],
                 vjoininhash   =>['id','email','cistatusid','emailtyp']),
 

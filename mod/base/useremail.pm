@@ -122,7 +122,26 @@ sub new
                 vjointo       =>'base::user',
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>'givenname'),
-                                  
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'contact.srcsys'),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'contact.srcid'),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                history       =>0,
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'contact.srcload'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -190,11 +209,29 @@ sub getSqlFrom
    my $precision0="";
    my $precision1="";
    if ($mode eq "select"){
+      my ($worktable,$workdb)=$self->getWorktable();
+      $workdb=$self->{DB} if (!defined($workdb));
       foreach my $filter (@filter){
          if (ref($filter) eq "HASH" && defined($filter->{userid})){
             if (!ref($filter->{userid})){
                $precision0.="and pcontact='$filter->{userid}' ";
                $precision1.="and userid='$filter->{userid}' ";
+            }
+         }
+         if (ref($filter) eq "HASH" && defined($filter->{email})){
+     
+            if (!ref($filter->{email}) &&
+                !($filter->{email}=~m/[\*\?\s]/)){
+               my $e="email=".$workdb->quotemeta(lc($filter->{email}))." ";
+               $precision0.="and $e ";
+               $precision1.="and $e ";
+            }
+            if (ref($filter->{email}) eq "ARRAY"){
+               if ($#{$filter->{email}}==0){
+                  my $e="email=".$workdb->quotemeta(lc($filter->{email}))." ";
+                  $precision0.="and $e ";
+                  $precision1.="and $e ";
+               }
             }
          }
       }
@@ -203,12 +240,12 @@ sub getSqlFrom
    my $from="(".
             "select  email, cistatus, userid,pcontact, usertyp,".
             "        fullname, createdate, modifydate, createuser, modifyuser,".
-            "        editor, realeditor ".
+            "        editor, realeditor,srcsys,srcload,srcid ".
             "from contact as a where usertyp='altemail' ".$precision0.
             " union ".
             "select  email, cistatus, userid,userid pcontact, usertyp,".
             "        fullname, createdate, modifydate, createuser, modifyuser,".
-            "        editor, realeditor ".
+            "        editor, realeditor,srcsys,srcload,srcid ".
             "from contact as b where usertyp<>'altemail' ".$precision1.
             ") as contact";
 
