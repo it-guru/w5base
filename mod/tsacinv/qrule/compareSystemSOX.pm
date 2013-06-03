@@ -71,8 +71,8 @@ sub qcheckRecord
       $par->SetFilter({systemid=>\$rec->{systemid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
-      if (defined($parrec)){
-         my $issox=$dataobj->getField("issox")->RawValue($rec);
+      if (defined($parrec) && !$parrec->{soxrelevant}){ # only if no SOX is
+         my $issox=$dataobj->getField("issox")->RawValue($rec); # set in AM
          if ($issox!=$parrec->{soxrelevant}){
             my $msg="SOX relevance not matches the AM presets!".
                     " - please check your order";
