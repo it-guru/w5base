@@ -1345,7 +1345,7 @@ sub isViewValid
    elsif ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf(["admin","support"])){
          @gl=qw(header name default nativcontact comments 
-                   control userid userro qc);
+                   control userid userro qc history);
       }
       else{
          @gl=qw(header name default nativcontact comments userid userro qc);
