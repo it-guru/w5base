@@ -109,7 +109,7 @@ sub RefreshSAPP01
    $SIG{INT} = sub { eval('remove_tree($tempdir);exit(1);') if (-d $tempdir);};
    msg(DEBUG,"Starting Refresh on $tempdir");
    my $res=`echo 'lcd \"$tempdir\"\nget *' | 
-            sftp -p -b - \"$sftpsource\" 2>&1`;
+            sftp -b - \"$sftpsource\" 2>&1`;
    if ($?!=0){
       $loaderror=$res;
    }
