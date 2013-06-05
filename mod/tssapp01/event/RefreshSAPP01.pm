@@ -226,15 +226,16 @@ sub processFile
             my ($oldrec)=$if->getOnlyFirst(qw(name id));
             # validate against postible existing record
             if (exists($k{$wrrec->{'name'}})){
-               print Dumper($wrrec);
+               print STDERR Dumper($wrrec);
                exit(1);
             }
-               print Dumper($wrrec);
+            #   print Dumper($wrrec);
             $k{$wrrec->{'name'}}++;
            
             # take remote record 
             $if->ValidatedInsertOrUpdateRecord($wrrec,
-                                               {'name'=>\$wrrec->{'name'}});
+                                               {'name'=>\$wrrec->{'name'},
+                                                'srcsys'=>\$srcsys});
             #print Dumper($wrrec);
          }
       } 

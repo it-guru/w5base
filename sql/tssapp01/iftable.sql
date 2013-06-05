@@ -28,6 +28,6 @@ create table interface_tssapp01_01 (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
-  UNIQUE KEY `name` (name),
+  UNIQUE KEY `name` (name,srcsys),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 )  ENGINE=MyISAM DEFAULT CHARSET=latin1;
