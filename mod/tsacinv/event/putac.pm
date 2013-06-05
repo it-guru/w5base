@@ -1060,7 +1060,11 @@ sub TransferFile
       if (!$self->{DebugMode}){
          if (!$ftp->Put($filename,$jobfile)){
             msg(ERROR,"File $filename to $jobfile could not be transfered");
-            msg(ERROR,"File $filename results: ".$ftp->message);
+            msg(ERROR,"FTP transfer failed at ".NowStamp("en")." GMT");
+            msg(ERROR,"trying to detect ftp error message ...");
+            eval('msg(ERROR,$ftp->message());');
+            msg(ERROR,"eval error=$@");
+            msg(ERROR,"... detecting error message done.");
          }
          unlink($filename);
       }
