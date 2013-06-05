@@ -27,8 +27,20 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
    return($self);
 }
+
+sub Init
+{   
+   my $self=shift; 
+    
+   $self->AddGroup("devreqstat",
+                   translation=>'itil::workflow::devrequest');
+
+   return(1);
+}
+
 
 sub IsModuleSelectable
 {
@@ -118,7 +130,133 @@ sub getDynamicFields
                                   keyhandler =>'kh',
                                   container  =>'headref',
                                   label      =>'Affected Application ID'),
+
+      new kernel::Field::Boolean(
+                name          =>'devreqdetailstat',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'init',
+                default       =>'0',
+                label         =>'detailed classification/priorisation process',
+                container     =>'headref'),
+
+      new kernel::Field::Boolean(
+                name          =>'devreqdetailstatbugfix',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'0',
+                label         =>'request is verificable a bug fix',
+                container     =>'headref'),
+
+      new kernel::Field::Boolean(
+                name          =>'devreqdetailstatmgmtesc',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'0',
+                label         =>
+                    'there is a management statement to prior this request',
+                container     =>'headref'),
+
+      new kernel::Field::Boolean(
+                name          =>'devreqdetailstatdependent',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'0',
+                readonly      =>1,
+                label         =>
+                    'there are dependencies to other, open requests',
+                container     =>'headref'),
+
+      new kernel::Field::Boolean(
+                name          =>'devreqdetailstatnewfunc',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'0',
+                label         =>
+                 'request is in primary purpose window of affected application',
+                container     =>'headref'),
+
+     new kernel::Field::Select(
+                name          =>'devreqdetailstatbenefit',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'MIDDLE',
+                value         =>['LOW','MIDDLE','ESSENTIEL'],
+                label         =>
+                    'benefit for the affected business process',
+                container     =>'headref'),
+
+      new kernel::Field::Boolean(
+                name          =>'devreqdetailstatprocboss',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'0',
+                label         =>
+                 'processmanager of business process has approved',
+                container     =>'headref'),
+
+      new kernel::Field::Select(
+                name          =>'devreqdetailstatrisk',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'NORMAL',
+                value         =>['LOW','NORMAL','HIGH'],
+                label         =>
+                    'risk of implementation for affected application',
+                container     =>'headref'),
+
+      new kernel::Field::Text(
+                name          =>'devreqdetailstateffortclass',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'D (>20h)',
+                readonly      =>1,
+                label         =>'implementation effort class',
+                container     =>'headref'),
+
+      new kernel::Field::Boolean(
+                name          =>'devreqdetailstatappmgmtveto',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'devreqstat',
+                default       =>'0',
+                label         =>
+                 'veto from application management of affected application',
+                container     =>'headref'),
+
+
+
+
+
     ),$self->SUPER::getDynamicFields(%param));
+}
+
+sub getDetailBlockPriority            # posibility to change the block order
+{
+   return("init","devreqstat","flow");
+}
+
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @l=$self->SUPER::isWriteValid($rec);
+   push(@l,"devreqstat") if (in_array(\@l,"init"));
+
+   return(@l);
+}
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @l=$self->SUPER::isViewValid($rec);
+
+   if ($rec->{devreqdetailstat}){
+      push(@l,"devreqstat");
+   }
+   return(@l);
 }
 
 sub isWorkflowManager

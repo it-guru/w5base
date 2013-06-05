@@ -878,10 +878,10 @@ sub ValidateUserCache
       }
       elsif ($UserCache->{$ENV{REMOTE_USER}}->{state} ne $res->{state} ||
              !defined($UserCache->{$ENV{REMOTE_USER}}->{state})){
-         msg(INFO,"cache for $ENV{REMOTE_USER} is invalid - ".
-                  "cleared state='%s' rpcstate='%s'",
-                  $UserCache->{$ENV{REMOTE_USER}}->{state},
-                  $res->{state});
+         #msg(INFO,"cache for $ENV{REMOTE_USER} is invalid - ".
+         #         "cleared state='%s' rpcstate='%s'",
+         #         $UserCache->{$ENV{REMOTE_USER}}->{state},
+         #         $res->{state});
          delete($UserCache->{$ENV{REMOTE_USER}});
       }
       if (defined($UserCache->{$ENV{REMOTE_USER}})){

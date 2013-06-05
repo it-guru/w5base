@@ -46,16 +46,38 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fieldname',
+                searchable    =>0,
+                depend        =>['dataobject','dataobjectid'],
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   if ($current->{dataobject} ne ""){
-                      my $o=getModuleObject($self->getParent->Config,
-                                            $current->{dataobject});
-                      if (defined($o)){
-                         my $f=$o->getField($current->{name},$current);
-                         if (defined($f)){
-                            return($f->Label());
+                   my $o=getModuleObject($self->getParent->Config,
+                                         $current->{dataobject});
+                   if (defined($o)){
+                      my $f=$o->getField($current->{name});
+                      if (defined($f)){
+                         return($f->Label());
+                      }
+                      else{
+                         if ($current->{dataobject} ne "" &&
+                             $current->{dataobjectid} ne ""){
+                            my $idfield=$o->IdField();
+                            if (defined($idfield)){
+                               $o->SetFilter({$idfield->Name()=>
+                                              \$current->{dataobjectid}});
+                               my ($rec)=$o->getOnlyFirst(qw(ALL));
+                               if (defined($rec)){
+                                  my $f=$o->getField($current->{name},$rec);
+                                  if (!defined($f) &&
+                                    $current->{dataobject} eq "base::workflow"){
+                                     $f=$o->getField("wffields.".
+                                                     $current->{name},$rec);
+                                  }
+                                  if (defined($f)){
+                                     return($f->Label());
+                                  }
+                               }
+                            }
                          }
                       }
                    }
