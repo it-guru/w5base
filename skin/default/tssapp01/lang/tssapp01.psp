@@ -4,3 +4,4 @@
 'Databoss WIW ID'=>{de=>'Datenverantwortlicher WIW ID'},
 'SAP hierarchy'=>{de=>'SAP Hierarchie'},
 'fieldgroup.saphier'=>{de=>'SAP Hierarchie',en=>'SAP hierarchy'},
+'is deleted'=>{de=>'gelöscht markiert'},
