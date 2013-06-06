@@ -25,7 +25,7 @@ create table interface_tssapp01_01 (
   createdate   datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
   srcsys       varchar(100) default 'w5base',
-  srcid        varchar(20) default NULL,
+  srcid        varchar(30) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY `name` (name,srcsys),
