@@ -57,7 +57,7 @@ sub ProcessServiceCenterRecord
    if (defined($wfstorerec)){
       if (!defined($updateto) || $updateto eq ""){
          # create new
-         if ($wfstorerec->{name} eq ""){ # siehe WF:13397595390001
+         if ($wfstorerec->{name}=~m/^\s*$/){ # siehe WF:13397595390001
             return;
          }
          my $eventend=$wfstorerec->{eventend};
