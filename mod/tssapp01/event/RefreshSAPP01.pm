@@ -85,6 +85,16 @@ sub new
    return($self);
 }
 
+sub Init
+{
+   my $self=shift;
+
+
+   $self->RegisterEvent("RefreshSAPP01","RefreshSAPP01",timeout=>14400);
+   return(1);
+}
+
+
 sub RefreshSAPP01
 {
    my $self=shift;
@@ -218,7 +228,7 @@ sub processFile
              ($wrrec->{name}=~m/\s/)){
             msg(ERROR,"RefreshSAPP01: ".
                       "invalid record without or invalid ".
-                      "WBS-Number at line $line");
+                      "WBS-Number '".$wrrec->{name}."' at line $line");
          }
          else{
             $if->ResetFilter();
