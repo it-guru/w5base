@@ -90,7 +90,7 @@ sub MultiOperationHeader
    my @fieldlist=$app->getFieldObjsByView([qw(ALL)],
                                            opmode=>'MultiEdit');
    my @oktypes=qw(TextDrop Databoss Mandator Contact Group Number 
-                  Text Select Boolean);
+                  Text Select Boolean Date);
    foreach my $fo (@fieldlist){
       my $t=$fo->Type();
       if (in_array(\@oktypes,$t)){

@@ -141,6 +141,52 @@ EOF
 }
 
 
+sub  calcViewMatrix
+{
+   my ($self,$rec,$vMatrix,$fieldbase,$fieldlist,$viewgroups)=@_;
+
+   for(my $c=0;$c<=$#{$fieldlist};$c++){
+      my $name=$fieldlist->[$c]->Name();
+      $fieldbase->{$name}=$fieldlist->[$c];
+
+      $vMatrix->{uivisibleof}->[$c]=
+         $fieldlist->[$c]->UiVisible("HtmlDetail",current=>$rec);
+ 
+      $vMatrix->{htmldetailof}->[$c]=
+         $fieldlist->[$c]->htmldetail("HtmlDetail",current=>$rec);
+      next if (!($vMatrix->{uivisibleof}->[$c]));
+      next if (!($vMatrix->{htmldetailof}->[$c]));
+       
+      my @fieldgrouplist=($fieldlist->[$c]->{group});
+      if (ref($fieldlist->[$c]->{group}) eq "ARRAY"){
+         @fieldgrouplist=@{$fieldlist->[$c]->{group}};
+      }
+      $vMatrix->{fieldgrouplist}->[$c]=\@fieldgrouplist;
+      next if (!in_array($viewgroups,"ALL") &&
+               !in_array($viewgroups,$vMatrix->{fieldgrouplist}->[$c]));
+              
+      $fieldlist->[$c]->extendFieldHeader($self->{WindowMode},$rec,
+                                          \$self->{fieldHeaders}->{$name});
+      $fieldlist->[$c]->extendPageHeader($self->{WindowMode},$rec,
+                                          \$self->{fieldsPageHeader});
+
+      my $grouplabel=$fieldlist->[$c]->grouplabel($rec);
+      $vMatrix->{fieldhalfwidth}->{$name}=$fieldlist->[$c]->htmlhalfwidth();
+      foreach my $fieldgroup (@fieldgrouplist){
+         if (!grep(/^$fieldgroup$/,@{$vMatrix->{grouplist}})){
+            push(@{$vMatrix->{grouplist}},$fieldgroup);
+            $vMatrix->{grouplabel}->{$fieldgroup}=0;
+         }
+         $vMatrix->{grouplabel}->{$fieldgroup}=1 if ($grouplabel);
+         if ($vMatrix->{fieldhalfwidth}->{$name}){
+            $vMatrix->{grouphavehalfwidth}->{$fieldgroup}++;
+         }
+      }
+   }
+}
+
+
+
 sub ProcessLine
 {
    my ($self,$fh,$viewgroups,$rec,$recordview,$fieldbase,$lineno,$msg)=@_;
@@ -330,57 +376,32 @@ addEvent(window, "load", setTitle);
 $sfocus
 </script>
 EOF
-      my @grouplist;
+
       my @fieldlist=@$recordview;
-      my @uivisibleof=();
-      my %grouphavehalfwidth; 
-      my %fieldhalfwidth; 
+      my $vMatrix={
+         grouplist=>[],         # the list of groups, needs to be displayed
+         grouplabel=>{},        # the group labels
+         grouphavehalfwidth=>{},# the group have min. 1 halfwidth entry
+         uivisibleof=>[],       # field is uivisible
+         htmldetailof=>[],      # field ist in htmldetail
+         fieldhalfwidth=>{},    # field have half width entry
+         fieldgrouplist=>[]     # resolved groups of a field
+      };
+                      
+      $self->calcViewMatrix($rec,$vMatrix,$fieldbase,\@fieldlist,$viewgroups);
 
-      for(my $c=0;$c<=$#fieldlist;$c++){
-         my $name=$fieldlist[$c]->Name();
-         $fieldbase->{$name}=$fieldlist[$c];
-         $uivisibleof[$c]=$fieldlist[$c]->UiVisible("HtmlDetail",current=>$rec);
-         next if (!($uivisibleof[$c]));
-         next if (!($fieldlist[$c]->htmldetail("HtmlDetail",current=>$rec)));
-          
-         $fieldlist[$c]->extendFieldHeader($self->{WindowMode},$rec,
-                                           \$self->{fieldHeaders}->{$name});
-         $fieldlist[$c]->extendPageHeader($self->{WindowMode},$rec,
-                                          \$self->{fieldsPageHeader});
-
-         my @fieldgrouplist=($fieldlist[$c]->{group});
-         if (ref($fieldlist[$c]->{group}) eq "ARRAY"){
-            @fieldgrouplist=@{$fieldlist[$c]->{group}};
-         }
-         my $grouplabel=$fieldlist[$c]->grouplabel($rec);
-         $fieldhalfwidth{$name}=$fieldlist[$c]->htmlhalfwidth();
-         foreach my $fieldgroup (@fieldgrouplist){
-            if (!grep(/^$fieldgroup$/,@grouplist)){
-               push(@grouplist,$fieldgroup);
-               $grouplabel{$fieldgroup}=0;
-            }
-            $grouplabel{$fieldgroup}=1 if ($grouplabel);
-            if ($fieldhalfwidth{$name}){
-               $grouphavehalfwidth{$fieldgroup}++;
-            }
-         }
-      }
       my $spec=$self->getParent->getParent->LoadSpec($rec);
-      foreach my $group (@grouplist){
+      foreach my $group (@{$vMatrix->{grouplist}}){
          my $subfunctions="topedit,editend";
          my $subblock="";
          my $grpentry=$app->getGroup($group,current=>$rec);
          my $col=0;
          for(my $c=0;$c<=$#fieldlist;$c++){
             my $name=$fieldlist[$c]->Name();
-            next if (!($uivisibleof[$c]));
-            next if (!($fieldlist[$c]->htmldetail("HtmlDetail",current=>$rec)));
+            next if (!($vMatrix->{uivisibleof}->[$c]));
+            next if (!($vMatrix->{htmldetailof}->[$c]));
 
-            my @fieldgrouplist=($fieldlist[$c]->{group});
-            if (ref($fieldlist[$c]->{group}) eq "ARRAY"){
-               @fieldgrouplist=@{$fieldlist[$c]->{group}};
-            }
-            if (grep(/^$group$/,@fieldgrouplist)){
+            if (in_array($vMatrix->{fieldgrouplist}->[$c],$group)){
                if ($fieldlist[$c]->Type() eq "WebLink"){ # WebLink special
                   push(@indexdataaddon,{                 # handling
                      href=>$fieldlist[$c]->RawValue($rec),
@@ -413,13 +434,13 @@ EOF
                      push(@{$self->Context->{jsonchanged}},$n);
                   }
                }
-               my $halfwidth=$fieldhalfwidth{$name};
+               my $halfwidth=$vMatrix->{fieldhalfwidth}->{$name};
                $subblock.="<tr class=fline>" if ($col==0);
                if ($fieldlist[$c]->Type() eq "Textarea" ||
                    $fieldlist[$c]->Type() eq "Container" ||
                    $fieldlist[$c]->Type() eq "Htmlarea"){
                   my $datacolspan=2;
-                  $datacolspan=4 if ($grouphavehalfwidth{$group});
+                  $datacolspan=4 if ($vMatrix->{grouphavehalfwidth}->{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
 <td class=fname$valign colspan=$datacolspan><span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}<br>$fieldspec \%$name(detail)\%</td>
@@ -427,7 +448,7 @@ EOF
                }
                elsif ($fieldlist[$c]->Type() eq "TimeSpans"){
                   my $datacolspan=1;
-                  $datacolspan=4 if ($grouphavehalfwidth{$group});
+                  $datacolspan=4 if ($vMatrix->{grouphavehalfwidth}->{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
 <td class=fname$valign colspan=$datacolspan>$self->{'fieldHeaders'}->{$name}\%$name(detail)\%</td>
@@ -435,7 +456,7 @@ EOF
                }
                elsif ($fieldlist[$c]->can("EditProcessor")){
                   my $datacolspan=2;
-                  $datacolspan=4 if ($grouphavehalfwidth{$group});
+                  $datacolspan=4 if ($vMatrix->{grouphavehalfwidth}->{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
 <td class=fname$valign colspan=$datacolspan $fieldspecfunc>$self->{'fieldHeaders'}->{$name}$fieldspec\%$name(detail)\%</td>
@@ -446,7 +467,7 @@ EOF
                       $fieldlist[$c]->Type() eq "OSMap" ||
                       $fieldlist[$c]->Type() eq "GoogleMap"){
                   my $datacolspan=2;
-                  $datacolspan=4 if ($grouphavehalfwidth{$group});
+                  $datacolspan=4 if ($vMatrix->{grouphavehalfwidth}->{$group});
                   $datacolspan=2 if ($halfwidth);
                   $subblock.=<<EOF;
 <td class=finput$valign colspan=$datacolspan>$self->{'fieldHeaders'}->{$name}\%$name(detail)\%</td>
@@ -455,7 +476,7 @@ EOF
                }
                else{
                   my $datacolspan=1;
-                  $datacolspan=3 if ($grouphavehalfwidth{$group});
+                  $datacolspan=3 if ($vMatrix->{grouphavehalfwidth}->{$group});
                   $datacolspan=1 if ($halfwidth);
                   $subblock.=<<EOF;
          <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>
@@ -515,7 +536,7 @@ EOF
          $template{$group}.=<<EOF;
 <div class=detailframe>
 EOF
-         if ($grouplabel{$group}){
+         if ($vMatrix->{grouplabel}->{$group}){
             $grouplabel{$group}=$grouplabel;
             $grouplabel=~s/#//g;
             $template{$group}.=<<EOF;
@@ -603,36 +624,33 @@ EOF
    foreach my $template (@blocks){
       my $dtemp=$template{$template};
       my $fieldgroup=$template;
-      if (grep(/^ALL$/,@{$viewgroups}) || 
-          grep(/^$fieldgroup$/,@{$viewgroups})){
-         my %param=(id               =>$id,
-                    current          =>$rec,
-                    currentid        =>$currentid,
-                    fieldbase        =>$fieldbase,
-                    fieldgroup       =>$fieldgroup,
-                    editgroups       =>$editgroups,
-                    viewgroups       =>$viewgroups,
-                    WindowMode       =>$self->{WindowMode},
-                    currentfieldgroup=>$currentfieldgroup);
-         $self->ParseTemplateVars(\$dtemp,\%param);
-         $d.="\n\n<a name=\"$fieldgroup\"></a>";
-         $d.="\n<a name=\"I.$id.$fieldgroup\"></a>\n";
-         if ($c>0 || $#detaillist==0){
-            my @msglist;
-            if ($fieldgroup eq $currentfieldgroup){
-               @msglist=$self->getParent->getParent->LastMsg();
-            }
-            $d.="<div class=lastmsg>".
-                join("<br>\n",map({
-                                    if ($_=~m/^ERROR/){
-                                       $_="<font style=\"color:red;\">".$_.
-                                          "</font>";
-                                    }
-                                    $_;
-                                  } @msglist))."</div>";
+      my %param=(id               =>$id,
+                 current          =>$rec,
+                 currentid        =>$currentid,
+                 fieldbase        =>$fieldbase,
+                 fieldgroup       =>$fieldgroup,
+                 editgroups       =>$editgroups,
+                 viewgroups       =>$viewgroups,
+                 WindowMode       =>$self->{WindowMode},
+                 currentfieldgroup=>$currentfieldgroup);
+      $self->ParseTemplateVars(\$dtemp,\%param);
+      $d.="\n\n<a name=\"$fieldgroup\"></a>";
+      $d.="\n<a name=\"I.$id.$fieldgroup\"></a>\n";
+      if ($c>0 || $#detaillist==0){
+         my @msglist;
+         if ($fieldgroup eq $currentfieldgroup){
+            @msglist=$self->getParent->getParent->LastMsg();
          }
-         $d.=$dtemp;
+         $d.="<div class=lastmsg>".
+             join("<br>\n",map({
+                                 if ($_=~m/^ERROR/){
+                                    $_="<font style=\"color:red;\">".$_.
+                                       "</font>";
+                                 }
+                                 $_;
+                               } @msglist))."</div>";
       }
+      $d.=$dtemp;
       $c++;
    }
    $self->Context->{LINE}+=1;

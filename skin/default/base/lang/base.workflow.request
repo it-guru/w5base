@@ -19,7 +19,7 @@
 'initinfo'=>{de=>'Initiator Info versandt',en=>'initiator info send'},
 'wfcallback'=>{de=>'Zurückgerufen',en=>'Calledback'},
 'fieldgroup.init'=>{de=>'Anforderungszuordnung',en=>'Initiator infos'},
-'Initiated by'=>{de=>'Initiert/angefordert durch'},
+'Initiated by'=>{de=>'Initiiert/angefordert durch'},
 'Initiatorgroup'=>{de=>'Initiierende Gruppe'},
 'Comments of implementor'=>{de=>'Bemerkungen und Notizen des Auftragnehmers'},
 'implemented to'=>{de=>'voraussichtlich realisiert bis'},
