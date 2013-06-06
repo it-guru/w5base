@@ -141,7 +141,7 @@ sub RefreshSAPP01
    if (!defined($loaderror)){
       foreach my $file (@procfiles){
          msg(DEBUG,"cleanup '$file'");
-         my $res=`echo 'rm \"$file\"' | sftp -p -b - \"$sftpsource\" 2>&1`;
+         my $res=`echo 'rm \"$file\"' | sftp -b - \"$sftpsource\" 2>&1`;
          if ($?!=0){
             $loaderror.=$res;
          }
@@ -153,7 +153,7 @@ sub RefreshSAPP01
       return({exitcode=>1,msg=>'ERROR:'.$loaderror});
    }
 
-   return({exitcode=>0,msg=>'ok'});
+   return({exitcode=>0,msg=>'ok '.($#procfiles+1)." processed"});
 }
 
 sub processFile
