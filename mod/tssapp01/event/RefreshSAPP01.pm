@@ -198,7 +198,7 @@ sub processFile
       'NOR-solution model'     =>'normodel',
       'NOR-n'                  =>'norn');
    
-   if (open(my $fh,"<:encoding(utf8)",$file)){
+   if (open(my $fh,"<:encoding(Latin1)",$file)){
       $csv->column_names ($csv->getline($fh)); # use first line as fieldnames
       my $line=0;
       while(my $rec=$csv->getline_hr ($fh)){
