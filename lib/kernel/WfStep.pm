@@ -162,7 +162,18 @@ sub PostProcess
    my %param=@_;
    my $aobj=$self->getParent->getParent->Action();
 
-   if ($action eq "SaveStep.wffollowup"){
+   if ($action eq "SaveStep.wfw5event"){
+      my %newparam=(mode=>'EVENT:',
+                    workflowname=>$WfRec->{name},
+                    addtarget=>$param{addtarget},
+                    addcctarget=>$param{addcctarget});
+      $aobj->NotifyForward($WfRec->{id},
+                           $param{fwdtarget},
+                           $param{fwdtargetid},
+                           $param{fwdtargetname},
+                           $param{note},%newparam);
+   }
+   elsif ($action eq "SaveStep.wffollowup"){
       my %newparam=(mode=>'FOLLOWUP:',
                     workflowname=>$WfRec->{name},
                     addtarget=>$param{addtarget},
@@ -231,7 +242,26 @@ sub nativProcess
    my $userid=$self->getParent->getParent->getCurrentUserId();
 
 
-   if ($op eq "wffollowup"){
+   if ($op eq "wfw5event"){
+      my $note=$h->{note};
+      $note=trim($note);
+      my %param=(note=>$note,
+                 addtarget=>[],
+                 addcctarget=>[],
+                 additional=>{},
+                 fwdtarget=>$WfRec->{fwdtarget},
+                 fwdtargetid=>$WfRec->{fwdtargetid});
+
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfw5event",
+          {translation=>'base::workflow::request',
+           additional=>$param{additional}},$param{note})){
+         $self->PostProcess("SaveStep.".$op,$WfRec,$actions,%param);
+         return(1);
+      }
+      return(0);
+   }
+   elsif ($op eq "wffollowup"){
       my $note=$h->{note};
       if ($note=~m/^\s*$/  || length($note)<10){
          $self->LastMsg(ERROR,"empty or to short notes are not allowed");

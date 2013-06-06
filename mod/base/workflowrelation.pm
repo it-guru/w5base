@@ -276,6 +276,10 @@ sub Validate
       $self->LastMsg(ERROR,"invalid dstwfid '%s' specified",$dstwfid);
       return(0);
    }
+   if ($dstwfid eq $srcwfid){
+      $self->LastMsg(ERROR,"relation loops are not good");
+      return(0);
+   }
    return(1);
 }
 

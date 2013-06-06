@@ -190,13 +190,7 @@ sub new
                 label         =>'Relations',
                 group         =>'relations',
                 allowcleanup  =>1,
-                htmldetail    =>\&isOptionalFieldVisible,
-               # vjointo       =>'base::workflowaction',
-               # vjoinon       =>['id'=>'wfheadid'],
-               # vjoindisp     =>[qw(cdate id name actionref
-               #                   translation owner additional
-               #                   effort comments)]
-                ),
+                htmldetail    =>\&isOptionalFieldVisible),
                                    
       new kernel::Field::Boolean(
                 name          =>'isdeleted',
@@ -1405,6 +1399,20 @@ sub isDeleteValid
    return($self->{SubDataObj}->{$rec->{class}}->isDeleteValid($rec));
 }
 
+sub handleDependenceChange
+{
+   my $self=shift;
+   my $rec=shift;
+   my $dependwfheadid=shift;
+   my $dependmode=shift;
+   my $dependoldstateid=shift;
+   my $dependnewstateid=shift;
+   return(undef) if (!defined($rec) || 
+                 !defined($self->{SubDataObj}->{$rec->{class}}));
+   return($self->{SubDataObj}->{$rec->{class}}->handleDependenceChange($rec,
+          $dependwfheadid,$dependmode,$dependoldstateid,$dependnewstateid));
+}
+
 sub DataIssueCompleteWriteRequest
 {
    my $self=shift;
@@ -1654,6 +1662,42 @@ sub FinishWrite
    if ($stateid>=20 && $oldrec->{stateid}<20){
       $self->CleanupWorkspace($oldrec->{id});
    }
+   if (defined($oldrec) 
+     #  && $oldrec->{stateid}<15 && $stateid>15
+       ){
+      my $wfheadid=effVal($oldrec,$newrec,"id");
+      if (ref($oldrec->{relations}) eq "ARRAY"){
+         foreach my $relrec (@{$oldrec->{relations}}){
+            my $notifywfheadid;
+            my $notifymode;
+            if ($relrec->{dstwfid} eq $wfheadid &&
+                $relrec->{srcwfid} ne $wfheadid &&
+                $relrec->{name} eq "dependson"){
+               $notifywfheadid=$relrec->{srcwfid};
+               $notifymode=$relrec->{name};
+            }
+            if ($relrec->{srcwfid} eq $wfheadid &&
+                $relrec->{dstwfid} ne $wfheadid &&
+                $relrec->{name} eq "isdependencyfrom"){
+               $notifywfheadid=$relrec->{dstwfid};
+               $notifymode=$relrec->{name};
+            }
+            my $newstateid=exists($newrec->{stateid}) ? 
+                           $newrec->{stateid}: $stateid;
+       
+            if (defined($notifywfheadid)){
+               $self->ResetFilter();
+               $self->SetFilter({id=>\$notifywfheadid});
+               my ($WfRec,$msg)=$self->getOnlyFirst(qw(ALL));
+               if (defined($WfRec)){
+                  $self->handleDependenceChange($WfRec,$wfheadid,$notifymode,
+                                                $oldrec->{stateid},$newstateid);
+               }
+            }
+         }
+      }
+   }
+
    ######################################################################
 
    return($self->SUPER::FinishWrite($oldrec,$newrec));

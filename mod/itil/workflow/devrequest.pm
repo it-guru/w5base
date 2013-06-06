@@ -50,6 +50,15 @@ sub IsModuleSelectable
    return(1);
 }
 
+sub getPosibleRelations
+{
+   my $self=shift;
+   my $WfRec=shift;
+   return("itil::workflow::devrequest"=>'dependson',
+          "itil::workflow::devrequest"=>'info');
+}
+
+
 sub getPosibleWorkflowDerivations
 {
    my $self=shift;
@@ -242,6 +251,7 @@ sub isWriteValid
 
    my @l=$self->SUPER::isWriteValid($rec);
    push(@l,"devreqstat") if (in_array(\@l,"init"));
+   push(@l,"relations") if (in_array(\@l,"init"));
 
    return(@l);
 }

@@ -18,6 +18,7 @@
 'LABEL:mark as deleted:'=>{de=>'gelöscht markiert',en=>'mark as deleted'},
 'LABEL:APRREJ:'=>{de=>'Genehmigung abgelehnt',en=>'Approved rejected'},
 'LABEL:APROK:'=>{de=>'Genehmigt',en=>'Approved'},
+'LABEL:EVENT:'=>{de=>'Prozessbenachrichtigung',en=>'Prozessinformation'},
 'LABEL:DEFER:'=>{de=>'Ihr Workflow wurde zurückgestellt',en=>'Your workflow has been defered'},
 'LABEL:FW:'=>{de=>'Weiterleitung',en=>'Forward'},
 'LABEL:TAKEOVER:'=>{de=>'Übernahme - der Workflow wurde Ihnen entzogen',en=>'Take over - the workflow has been revoked from you'},

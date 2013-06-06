@@ -73,6 +73,32 @@ sub getPosibleActions
    return();
 }
 
+sub handleDependenceChange
+{
+   my $self=shift;
+   my $rec=shift;
+   my $dependwfheadid=shift;
+   my $dependmode=shift;
+   my $dependoldstateid=shift;
+   my $dependnewstateid=shift;
+
+   if ($dependoldstateid<=15 && $dependnewstateid>15){
+      my $stepobj=$self->getStepObject($self->getParent->Config,$rec->{step});
+      if (!defined($stepobj)){
+         return(undef);
+      }
+      if ($stepobj->can("nativProcess")){
+         $stepobj->nativProcess("wfw5event",{
+            note=>"The depend workflow ... \n".
+                  $dependwfheadid.
+                  "\n... has reached the ".
+                  "end of inwork phase."
+
+         },$rec,['wfw5event']);
+      }
+   }
+}
+
 
 sub  recalcResponsiblegrp
 {

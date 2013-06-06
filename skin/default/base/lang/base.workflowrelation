@@ -3,3 +3,4 @@
 'fieldgroup.dst'=>{de=>'nach Workflow (destination)',en=>'Destination'},
 'fieldgroup.comments'=>{de=>'Bemerkungen',en=>'Comments'},
 "invalid relation '\%s' specified"=>{de=>"ungültiger Verweistyp '\%s' verwendet"},
+'relation loops are not good'=>{de=>'Relationsschleifen sind keine gute Idee'},
