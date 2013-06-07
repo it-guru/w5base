@@ -1,4 +1,4 @@
-package tssapp01::event::RefreshSAPP01;
+package tssapp01::event::RefreshSAPpsp;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -90,14 +90,15 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("RefreshSAPP01","RefreshSAPP01",timeout=>14400);
+   $self->RegisterEvent("RefreshSAPpsp","RefreshSAPpsp",timeout=>14400);
    return(1);
 }
 
 
-sub RefreshSAPP01
+sub RefreshSAPpsp
 {
    my $self=shift;
+   my @filter=@_;
    my $loaderror;
    my @loadfiles;
    my @procfiles;
@@ -132,7 +133,7 @@ sub RefreshSAPP01
          @loadfiles=grep({ -f "$tempdir/$_" &&
                            !($_=~m/^\./) } readdir($dh));
          if ($#loadfiles==-1){
-            $loaderror="error - no fields transfered from '$sftpsource'";
+            $loaderror="error - no files transfered from '$sftpsource'";
          }
       }
       else{
@@ -142,19 +143,25 @@ sub RefreshSAPP01
    #######################################################################
    # after this, all useable files are in @loadfiles
    foreach my $file (@loadfiles){
+      my $label=$file;
+      $label=~s/_.*//;
+      my $type;
+      $type="psp" if ($file=~m/_order_hier_/);
+      next if (!defined($type));
+      next if (!($file=~m/\.csv$/i));
+      next if ($#filter!=-1 && !in_array(\@filter,$label));
+
       if ($self->processFile(File::Spec->catfile($tempdir,$file),$file)){
          push(@procfiles,$file);
       }
    }
 
    # cleanup FTP Server
-   if (!defined($loaderror)){
-      foreach my $file (@procfiles){
-         msg(DEBUG,"cleanup '$file'");
-         my $res=`echo 'rm \"$file\"' | sftp -b - \"$sftpsource\" 2>&1`;
-         if ($?!=0){
-            $loaderror.=$res;
-         }
+   foreach my $file (@procfiles){
+      msg(DEBUG,"cleanup '$file'");
+      my $res=`echo 'rm \"$file\"' | sftp -b - \"$sftpsource\" 2>&1`;
+      if ($?!=0){
+         $loaderror.=$res;
       }
    }
    
@@ -162,6 +169,7 @@ sub RefreshSAPP01
    if (defined($loaderror)){
       return({exitcode=>1,msg=>'ERROR:'.$loaderror});
    }
+   print STDERR Dumper(\%ENV);
 
    return({exitcode=>0,msg=>'ok '.($#procfiles+1)." processed"});
 }
@@ -183,7 +191,6 @@ sub processFile
    });
    my %k;
    my $srcsys=$label;
-   $srcsys=~s/_.*//;
 
    my %m=(
       'WBS-Number'             =>'name',
