@@ -61,3 +61,4 @@ set FOREIGN_KEY_CHECKS=1;
 alter table costcenter add itsem   bigint(20)  default NULL;
 alter table costcenter add itsem2  bigint(20)  default NULL;
 alter table costcenter add itsemteam  bigint(20)  default NULL;
+alter table costcenter add lastqcheck datetime default NULL,add key(lastqcheck);

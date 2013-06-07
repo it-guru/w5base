@@ -69,6 +69,7 @@ sub qcheckRecord
    foreach my $fieldname ($dataobj->getFieldList(current=>$rec)){
       my $fobj=$dataobj->getField($fieldname);
       my $t=$fobj->Type();
+      next if ($fobj->{readonly} eq "1");
       if (defined($fobj) && $fobj->Type()=~m/^($chkfieldtypes)$/){
          push(@fobjlst,$fobj);
       }

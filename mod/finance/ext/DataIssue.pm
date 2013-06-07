@@ -40,6 +40,11 @@ sub getControlRecord
              target    =>'name',
              targetid  =>'id'
            },
+           {
+             dataobj   =>'finance::costcenter',
+             target    =>'name',
+             targetid  =>'id'
+           },
          ];
 
 
@@ -96,7 +101,28 @@ sub DataIssueCompleteWriteRequest
          }
       }
    }
-   #printf STDERR ("itil:DataIssueCompleteWriteRequest=%s\n",Dumper($newrec));
+   if ($affectedobject=~m/::costcenter$/){
+      if ($newrec->{affectedobject}=~m/::costcenter$/){
+         # create link to config Management
+         $newrec->{directlnktype}=$newrec->{affectedobject};
+         $newrec->{directlnkid}=$newrec->{affectedobjectid};
+         $newrec->{directlnkmode}="DataIssue";
+      }
+      my $obj=getModuleObject($self->getParent->Config,$affectedobject);
+      my $affectedobjectid=effVal($oldrec,$newrec,"directlnkid");
+      $obj->SetFilter(id=>\$affectedobjectid);
+      my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid));
+      if (defined($confrec)){
+         if ($confrec->{databossid} ne ""){
+            $newrec->{fwdtarget}="base::user";
+            $newrec->{fwdtargetid}=$confrec->{databossid};
+         }
+         else{
+            $newrec->{fwdtarget}="base::grp";
+            $newrec->{fwdtargetid}="1";
+         }
+      }
+   }
    return(1);
 }
 

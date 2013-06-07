@@ -238,8 +238,14 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>'costcenter.realeditor'),
-   
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'costcenter.lastqcheck'),
+      new kernel::Field::QualityResponseArea()
    );
    $self->{history}=[qw(modify delete)];
    $self->{CI_Handling}={uniquename=>"name",

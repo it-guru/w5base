@@ -151,8 +151,11 @@ sub RefreshSAPpsp
       next if (!($file=~m/\.csv$/i));
       next if ($#filter!=-1 && !in_array(\@filter,$label));
 
-      if ($self->processFile(File::Spec->catfile($tempdir,$file),$file)){
+      if ($self->processFile(File::Spec->catfile($tempdir,$file),$label)){
          push(@procfiles,$file);
+         # ToDo: Bulk Delete old records
+
+
       }
    }
 
