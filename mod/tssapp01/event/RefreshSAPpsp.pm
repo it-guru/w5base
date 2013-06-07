@@ -172,7 +172,6 @@ sub RefreshSAPpsp
    if (defined($loaderror)){
       return({exitcode=>1,msg=>'ERROR:'.$loaderror});
    }
-   print STDERR Dumper(\%ENV);
 
    return({exitcode=>0,msg=>'ok '.($#procfiles+1)." processed"});
 }
