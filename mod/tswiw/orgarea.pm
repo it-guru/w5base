@@ -217,7 +217,7 @@ sub doParentFix
 {
    my $self=shift;
 
-   print $self->HttpHeader("text/html");
+   print $self->HttpHeader("text/html",charset=>'utf-8');
    my $grpid=$self->Query->Param("grpid");
    if ($grpid eq ""){
       print("ERROR: no grpid sumited");
@@ -266,7 +266,7 @@ sub doParentFix
          if (!$self->LastMsg()){
             $self->LastMsg(ERROR,"can not create new parent group");
          }
-         print(join("<hr>",grep(/ERROR/,$self->LastMsg())));
+         print(latin1(join("<hr>",grep(/ERROR/,$self->LastMsg())))->utf8());
          return();
       }
    }
