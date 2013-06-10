@@ -314,16 +314,19 @@ sub ValidateCONumber
    my $newrec=shift;
 
 
-   my $conummer=uc(effVal($oldrec,$newrec,$fieldname));
-   if ($conummer=~m/^\s*$/ || 
-       (!($conummer=~m/^[0-9]+$/) &&
-        !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
-        !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
-      return(0);
-   }
-   $conummer=~s/^0+//g;
-   if (defined($newrec)){
-      $newrec->{$fieldname}=$conummer;
+   if (!defined($oldrec) || exists($newrec->{$fieldname})){
+      my $conummer=uc(effVal($oldrec,$newrec,$fieldname));
+      if ($conummer=~m/^\s*$/ || 
+          (!($conummer=~m/^[0-9]+$/) &&
+           !($conummer=~m/^\S+\[\d+\]$/) &&   # for deleted entries
+           !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
+           !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
+         return(0);
+      }
+      $conummer=~s/^0+//g;
+      if (defined($newrec)){
+         $newrec->{$fieldname}=$conummer;
+      }
    }
    return(1);
 }
