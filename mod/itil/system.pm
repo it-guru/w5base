@@ -270,6 +270,7 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'adm',
+                AllowEmpty    =>1,
                 group         =>'admin',
                 label         =>'Administrator',
                 vjoinon       =>['admid'=>'userid']),

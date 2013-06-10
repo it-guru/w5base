@@ -352,6 +352,7 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'guardian',
+                AllowEmpty    =>1,
                 group         =>'guardian',
                 label         =>'Guardian',
                 vjoinon       =>['guardianid'=>'userid']),
@@ -362,6 +363,7 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'guardian2',
+                AllowEmpty    =>1,
                 group         =>'guardian',
                 label         =>'Deputy Guardian',
                 vjoinon       =>['guardian2id'=>'userid']),
