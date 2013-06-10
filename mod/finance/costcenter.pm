@@ -271,7 +271,8 @@ sub isViewValid
    return("header","default") if (!defined($rec));
 
    my ($itsem,$delmgr)=managerState($rec);
-   my @all=qw(header default itsem delmgmt contacts control misc source);
+   my @all=qw(header default itsem delmgmt contacts control misc source
+              history);
 
    if ($itsem>0){
       @all=grep(!/^delmgmt$/,@all);
