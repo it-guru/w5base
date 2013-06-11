@@ -1,6 +1,7 @@
 'faq::forum'=>{de=>'FAQ Wissens-Forum',en=>'FAQ Knowledge Forum'},
 'new topic'=>{de=>'neues Thema'},
 'answer'=>{de=>'Antwort'},
+'Search'=>{de=>'Suchen'},
 'send'=>{de=>'absenden'},
 'add'=>{de=>'hinzufügen'},
 'remove user from list'=>{de=>'Möchten Sie den User wirklich aus der Liste entfernen'},

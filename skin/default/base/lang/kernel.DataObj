@@ -35,3 +35,8 @@ EOF
 "invalid attribute '\%s' used"=>{de=>"ungültiges Feld '\%s' verwendet"},
 "multiple definition of same attribute"=>{de=>"Mehrfachdefinition des gleichen Feldes"},
 "write request to field '\%s' rejected"=>{de=>"Schreibzugriff auf das Feld '\%s' ist nicht zulässig"},
+'next page'=>{de=>'vorwärts'},
+'previous page'=>{de=>'zurück'},
+'Total: %d records'=>{de=>'Gesamtanzahl: %d Datens&auml;tze',
+                      en=>'Total: %d records'},
+

@@ -1,4 +1,0 @@
-'next page'=>{de=>'vorwärts'},
-'previous page'=>{de=>'zurück'},
-'Total: %d records'=>{de=>'Gesamtanzahl: %d Datens&auml;tze',
-                      en=>'Total: %d records'},

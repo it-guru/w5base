@@ -665,6 +665,17 @@ sub getShowBoardDetailFunctions
    my $id=shift;
    my $d="";
    my $label=$self->T("subscribers");
+
+
+   my $oldsearch=Query->Param("search");
+   my $qoldsearch=quoteHtml($oldsearch);
+   $d.="<div>".
+       $self->T("Search").": ".
+       "<input type=text name=search ".
+       "onchange=\"document.forms[0].elements['UseLimitStart'].value='0';\" ".
+       "value=\"".$qoldsearch."\">".
+       " &bull; ";
+
    $d.=<<EOF;
 <a href=\"javascript:DetailHandleShowSubscribers()\" class=detailfunctions>$label</a> &bull; 
 <script language="JavaScript">
@@ -704,8 +715,8 @@ function DetailHandleDirectInfoAboUnSubscribe()
    document.forms[0].submit();
 }
 </script>
+   </div>
 EOF
-
    return($d);
    # todo = direct subscript on one click
    if (1){
@@ -743,10 +754,50 @@ sub ShowBoard
                                       "<a class=toplink ".
                                       "href=\"./$id\">$borec->{name}</a>");
    my $to=$self->getPersistentModuleObject("faq::forumtopic");
-   $to->SetFilter({forumboard=>\$id});
+
+
+   # calculate search filter
+   my $s=Query->Param("search");
+   my @fl;
+   my %flt=(forumboard=>\$id);
+   if ($s ne ""){
+      if (!($s=~m/[\*\?\s]/)){
+         $s="*$s*";
+      }
+      $flt{name}=$s;
+      my $fe=$self->getPersistentModuleObject("faq::forumentry");
+      $fe->SetFilter({comments=>$s});
+      my @forumtopic=$fe->getVal("forumtopic");
+      if ($#forumtopic!=-1){
+         push(@fl,{forumboard=>\$id,id=>\@forumtopic});
+      }
+   }
+   push(@fl,\%flt);
+
+
+   # calculate pagelimit
+   my $pagelimit=10;
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   }
+   if (defined($UserCache->{pagelimit}) && $UserCache->{pagelimit} ne ""){
+      $pagelimit=$UserCache->{pagelimit};
+   }
+
+   my $uselimitstart=int(Query->Param("UseLimitStart"));
+   $uselimitstart=0 if ($uselimitstart eq "");
+   print("<input type=hidden name=UseLimitStart value=\"$uselimitstart\">");
+
+   my $uselimit=Query->Param("UseLimit");
+   $uselimit=$pagelimit if ($uselimit eq "");
+   print("<input type=hidden name=UseLimit value=\"$uselimit\">");
+
+   $to->SetFilter(\@fl);
    $to->SetCurrentOrder(qw(cdate));
    my $boardheader=$borec->{boardheader};
    my $class="class=boardgroup valign=top";
+
    print("<br><center>".
          "<div id=mainarea style=\"overflow:auto\">".
          "<table $self->{maintabparam}>");
@@ -769,33 +820,46 @@ sub ShowBoard
          $self->T("last answer")."</th></tr>");
    print("<tr class=boardspacer><td colspan=6></td></tr>");
    my $l=1;
+   my $line=0;
 
-   foreach my $rec ($to->getHashList(qw(lastentrymdate cdate name creatorshort 
+   $to->SetCurrentView(qw(lastentrymdate cdate name creatorshort 
                                         entrycount viewcount lastworkershort
                                         forcetopicicon
-                                        topicicon))){
-      print("<tr class=l$l>");
-      my $iconobj=$to->getField("topicicon");
-      my $icon=$iconobj->FormatedDetail($rec,"HtmlDetail");
-      $icon=~s/..\/faq\/load/$rootpath\/..\/load/;
-      print("<td width=15 align=center>$icon</td>");
-      my $name=$rec->{name};
-      $name=~s/</&lt;/g;
-      $name=~s/>/&gt;/g;
-      $name="<b>$name</b>" if ($rec->{entrycount}==0);
-      $name="<font color=darkred>$name</font>" if ($rec->{forcetopicicon}==2);
-      print("<td width=200><a class=listlink href=\"../Topic/$rec->{id}\">".
-            "$name</a></td>");
-      print("<td width=1% style=\"padding-left:2px;padding-right:2px\">".
-            "$rec->{creatorshort}</td>");
-      print("<td align=center>$rec->{entrycount}</td>");
-      print("<td align=center>$rec->{viewcount}</td>");
-      print("<td width=120>$rec->{lastworkershort}</td>");
-      print("</tr>");
-      $l++;
-      $l=1 if ($l>2);
+                                        topicicon));
+   $to->Limit($uselimit,$uselimitstart,1) if ($uselimit>0);
+   my ($rec,$msg)=$to->getFirst();
+   if (defined($rec)){
+      do{
+         print("<tr class=l$l>");
+         my $iconobj=$to->getField("topicicon");
+         my $icon=$iconobj->FormatedDetail($rec,"HtmlDetail");
+         $icon=~s/..\/faq\/load/$rootpath\/..\/load/;
+         print("<td width=15 align=center>$icon</td>");
+         my $name=$rec->{name};
+         $name=~s/</&lt;/g;
+         $name=~s/>/&gt;/g;
+         $name="<b>$name</b>" if ($rec->{entrycount}==0);
+         $name="<font color=darkred>$name</font>" if ($rec->{forcetopicicon}==2);
+         print("<td width=200><a class=listlink href=\"../Topic/$rec->{id}\">".
+               "$name</a></td>");
+         print("<td width=1% style=\"padding-left:2px;padding-right:2px\">".
+               "$rec->{creatorshort}</td>");
+         print("<td align=center>$rec->{entrycount}</td>");
+         print("<td align=center>$rec->{viewcount}</td>");
+         print("<td width=120>$rec->{lastworkershort}</td>");
+         print("</tr>");
+         $l++;
+         $line++;
+         $l=1 if ($l>2);
+         ($rec,$msg)=$to->getNext();
+      }until(!defined($rec));
    }
+   my $limitreached=$msg eq "Limit reached" ? 1 : 0;
+   my $rows=$to->Rows();
+   my $pagecontrol=$to->getHtmlPagingLine("FORM",$uselimit,
+                               $line,$rows,$limitreached,$uselimitstart);
    my $disnew="disabled";
+
 
    my @acl=$bo->getCurrentAclModes($ENV{REMOTE_USER},$borec->{acls});
    if ($self->IsMemberOf("admin") ||
@@ -808,7 +872,10 @@ sub ShowBoard
                                         board=>$id});
    my $newtopic=$self->T("new topic");
    print(<<EOF);
-</table></div>
+</table>
+$pagecontrol
+
+</div>
 <table $self->{maintabparam}>
 <tr><td colspan=6 class=boardgroup>&nbsp;</td></tr>
 <tr><td colspan=6 align=right>

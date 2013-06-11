@@ -286,105 +286,6 @@ sub ProcessLine
    return($d);
 }
 
-sub getPagingLine
-{
-   my $self=shift;
-   my $app=$self->getParent->getParent;
-   my $pagelimit=shift;
-   my $currentpage=shift;
-   my $totalpages=shift;
-   my $currentlimit=shift;
-   my $records=shift;
-   my $d="<div class=pagingline>";
-   my $nextpagestart=$pagelimit*($currentpage+1);
-   $nextpagestart=$totalpages*$pagelimit if ($nextpagestart>$totalpages*$pagelimit);
-   my $prevpagestart=($currentpage-1)*$pagelimit;
-   $prevpagestart=0 if ($prevpagestart<0);
-   
-
-   my $nexttext="&nbsp;";
-   if ($currentpage<$totalpages-1 && $currentlimit>0){
-      $nexttext="<a class=pageswitch ".
-                "href=JavaScript:setLimitStart($nextpagestart)>".
-                $app->T("next page")."</a>";
-   }
-   my $prevtext="&nbsp;";
-   if ($currentpage>0 && $currentlimit>0){
-      $prevtext="<a class=pageswitch ".
-                "href=JavaScript:setLimitStart($prevpagestart)>".
-                $app->T("previous page")."</a>";
-   }
-   my $recordstext="<b>".sprintf($app->T("Total: %d records"),$records)."</b>";
-   if (($records<500 || $app->IsMemberOf("admin")) && 
-       $app->allowHtmlFullList() &&
-       $currentlimit>0 && $records>$currentlimit){
-      $recordstext="<a class=pageswitch ".
-                   "href=Javascript:showall()>$recordstext</a>";
-   }
-   my $maxpages=14;
-   $maxpages=$totalpages-1 if ($maxpages>$totalpages-1);
-   my @pages=();
-   my $disppagestart=$currentpage-($maxpages/2);
-   $disppagestart=1 if ($disppagestart<1);
-   if ($disppagestart>$totalpages-$maxpages-1){
-      $disppagestart=$totalpages-$maxpages;
-   }
-   for(my $c=0;$c<=$maxpages;$c++){
-      $pages[$c]=$disppagestart+$c;
-   }
-
-   $pages[0]=1 if ($pages[0]!=1);
-   $pages[$maxpages]=$totalpages if ($totalpages>$pages[$maxpages]);
-
-   my $pagelist="";
-   if ($totalpages>1 && $currentlimit>0){
-      $pagelist.="<table border=0><tr>";
-      for(my $p=0;$p<=$#pages;$p++){
-         $pagelist.="<td>...</td>" if ($p==1 && $pages[$p]-1!=$pages[$p-1]);
-         my $disppagesstr=$pages[$p];
-         if ($currentpage+1==$pages[$p]){
-            $disppagesstr="<u><b>$pages[$p]</b></u>";
-         }
-         my $ps=($pages[$p]-1)*$pagelimit;
-         $disppagesstr="<a class=pageswitch ".
-                       "href=JavaScript:setLimitStart($ps)>".
-                       "$disppagesstr</a>";
-         $pagelist.="<td width=20 align=center>$disppagesstr</td>";
-         $pagelist.="<td>...</td>" if ($p==$#pages-1 && 
-                                       $pages[$p]+1!=$pages[$#pages]);
-      }
-      $pagelist.="</tr></table>";
-   }
-   
-   $d.="<center><table width=600 border=0><tr>";
-   $d.="<tr>";
-   $d.="<td width=90 align=center>$prevtext</td>";
-   $d.="<td align=center>$recordstext</td>";
-   $d.="<td width=90 align=center>$nexttext</td></tr>";
-   $d.="</tr>";
-   $d.="<tr>";
-   $d.="<td></td>";
-   $d.="<td align=center>$pagelist</td>";
-   $d.="<td></td></tr>";
-   $d.="</tr>";
-   $d.="</table></center></div>";
-   $d.=<<EOF;
-<script language="JavaScript">
-function setLimitStart(n)
-{
-   parent.document.forms[0].elements['UseLimitStart'].value=n;
-   parent.document.forms[0].submit();
-}
-function showall()
-{
-   parent.document.forms[0].elements['UseLimit'].value="0";
-   parent.document.forms[0].elements['UseLimitStart'].value="0";
-   parent.DoRemoteSearch(undefined,undefined,undefined,undefined,1);
-}
-</script>
-EOF
-   return($d);
-}
 sub ProcessBottom
 {
    my ($self,$fh,$rec,$msg)=@_;
@@ -438,23 +339,8 @@ EOF
    my $limitstart=$self->getParent->getParent->{_LimitStart};
    my $currentlimit=$self->getParent->getParent->{_Limit};
    my $r=$self->getParent->getParent->Rows();
-   if (defined($r) && $pagelimit>0){
-      my $totalpages=0;
-      if ($pagelimit>0){
-         $totalpages=$r/$pagelimit;
-      }
-      $totalpages=int($totalpages)+1 if (int($totalpages)!=$totalpages);
-      my $currentpage=0;
-      if ($pagelimit>0){
-         $currentpage=int($limitstart/$pagelimit);
-      }
-
-      $d.="<hr>" if ($limitreached || ($currentlimit>0 && $r>$currentlimit));
-      $d.=$self->getPagingLine($pagelimit,$currentpage,$totalpages,
-                               $currentlimit,$r);
-   }
-
-
+   $d.=$app->getHtmlPagingLine("SUBFRAME",$pagelimit,
+                               $currentlimit,$r,$limitreached,$limitstart);
    return($d);
 }
 

@@ -86,5 +86,11 @@ a:link.FunctionLink,a:visited.FunctionLink,a:active.FunctionLink    {
           }
 
 
+a:link.pageswitch,a:visited.pageswitch,a:active.pageswitch    {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+
 
 
