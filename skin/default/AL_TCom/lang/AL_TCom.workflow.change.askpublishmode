@@ -1,12 +1,17 @@
 'MSG001'=>{de=>'Sehr geehrte Damen und Herren,
 
 hiermit informieren wir Sie über den beigefügten Change. 
-Sie erhalten diese Information als Service-Manager der Anwendung, als TSM der Anwendung sowie als TSM/TSM-Vetreter einer Schnittstellenanwendung.
-Als TSM der Anwendung müssen Sie den Change im Servicecenter unter der Changenummer approven und evt. confirmen.
+Sie erhalten diese Information in Ihrer Funktion als CBM oder TSM der betroffenen Anwendung sowie als TSM/TSM-Vetreter einer Schnittstellenanwendung.
+Bitte prüfen Sie evtl. todos in ServiceCenter für diesen Change (approve, confirm, etc.).
 
 (Bitte beachten Sie, dass der beigefügte Direkt-Link die Information aus ServiceCenter mit 10-15min Verzögerung wiedergibt!)
 ',
-en=>'Dear Sirs,
+en=>'Dear Sir or Madam,
 
-we want to inform you about the attached change.'},
+herewith we inform you about the change below.
+You get this Information in your role as CBM or TSM of the affected application as well as TSM/TSM-Deputy of an Interface application.
+Please check possible todos in ServiceCenter for this change.
+
+(Please note, that the attached direct-link shows the informations from ServiceCenter with a delay from 10-15min!)
+'},
 'Telekom IT Change notification'=>{de=>'Telekom IT Benachrichtungsmodus'},
