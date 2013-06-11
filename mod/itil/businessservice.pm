@@ -531,6 +531,13 @@ sub isWriteValid
                }
             }
          }
+         if (!$wr){
+	    if ($rec->{mandatorid}!=0 &&
+	       $self->IsMemberOf($rec->{mandatorid},
+                                 ["RCFManager","RCFManager2"],"down")){
+               $wr++;
+	    }
+	 }
       }
       
       if ($wr){
