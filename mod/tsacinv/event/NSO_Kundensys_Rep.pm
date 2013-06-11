@@ -68,7 +68,9 @@ sub NSO_Kundensys_Rep
                assetmaintlevel
                installdate
                compdeprstart
-               assetassetid assetmodelname tsacinv_locationfullname
+               assetassetid 
+               assetserialno
+               assetmodelname tsacinv_locationfullname
                acmdbcontract acmdbcontractnumber
                applicationnames
                dynservices);
