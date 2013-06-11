@@ -139,11 +139,13 @@ sub Result
    my %sheet=();
    foreach my $wfrec ($wf->getHashList(qw(wffields.eventmode 
                                   wffields.eventstatclass
+                                  wffields.eventignoreforkpi
                                   wffields.affecteditemgroup id))){
       my $top=$wfrec->{affecteditemgroup};
       $top="NONE" if (!defined($top) || $top eq "");
       $top=[split(/\s*;\s*/,$top)] if (ref($top) ne "ARRAY");
       next if ($onlyprio1 && $wfrec->{eventstatclass} ne "1");
+      next if ($wfrec->{eventignoreforkpi} eq "1"); 
       foreach my $t (@$top){
          push(@{$sheet{$t}},$wfrec->{id});
       }
