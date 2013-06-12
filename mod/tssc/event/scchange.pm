@@ -59,7 +59,7 @@ sub scchange
                            requestedby editor softwareid software deviceid
                            createtime type resources closecode approved addgrp
                            impact priority reason urgency category risk
-                           closecode resolvetime
+                           closecode resolvetime project
                            coordinator coordinatorposix coordinatorname tasks));
    $chm->SetCurrentOrder("sysmodtime");
    msg(DEBUG,"view is set");

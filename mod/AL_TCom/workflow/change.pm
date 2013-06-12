@@ -244,7 +244,16 @@ sub isWriteValid
    return() if ($rec->{stateid}==21);
    return() if (!($rec->{step}=~m/::postreflection$/));
    if ($self->isPostReflector($rec)){
-      push(@edit,"tcomcod","affected");
+      my $project=$rec->{affectedproject};
+      $project=$project->[0] if (ref($project) eq "ARRAY");
+      my $scproject=$rec->{additional}->{ServiceCenterProject};
+      $scproject=$scproject->[0] if (ref($scproject) eq "ARRAY");
+      if ($scproject ne "" && $scproject eq $project){
+         push(@edit,"tcomcod");
+      }
+      else{
+         push(@edit,"tcomcod","affected");
+      }
    }
 
    return(@edit);  # ALL means all groups - else return list of fieldgroups

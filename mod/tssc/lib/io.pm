@@ -341,6 +341,7 @@ sub mkChangeStoreRec
       ServiceCenterCategory=>$rec->{category},
       ServiceCenterUrgency=>$rec->{urgency},
       ServiceCenterReason=>$rec->{reason},
+      ServiceCenterProject=>$rec->{project},
       ServiceCenterType=>$rec->{type},
       ServiceCenterPriority=>$rec->{priority},
       ServiceCenterImpact=>$rec->{impact},
@@ -517,6 +518,24 @@ sub mkChangeStoreRec
        $costcenter,$customername,$responseteam,$businessteam,
        $truecustomerprio)=
                $self->extractAffectedApplication($rec);
+
+   if (ref($aids) eq "ARRAY" && $#{$aids}!=-1){
+      if ($rec->{project} ne "" && !($rec->{project}=~m/\s/) &&
+          length($rec->{project})>=3){
+         my $pr=getModuleObject($self->Config(),"base::projectroom");
+         $pr->SetFilter({name=>\$rec->{project},
+                         cistatusid=>[2,3,4]});
+         my ($prrec,$msg)=$pr->getOnlyFirst(qw(id name));
+         if (defined($prrec)){
+            $wfrec{affectedproject}=$prrec->{name};
+            $wfrec{affectedprojectid}=$prrec->{id};
+         }
+      }
+      else{
+         $wfrec{affectedproject}=undef;
+         $wfrec{affectedprojectid}=undef;
+      }
+   }
 
    $wfrec{affectedsystemid}=$systemid;
    $wfrec{affectedsystem}=$system;
