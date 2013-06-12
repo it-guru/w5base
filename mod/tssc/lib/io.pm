@@ -526,7 +526,7 @@ sub mkChangeStoreRec
          $pr->SetFilter({name=>\$rec->{project},
                          cistatusid=>[2,3,4]});
          my ($prrec,$msg)=$pr->getOnlyFirst(qw(id name));
-         if (defined($prrec)){
+         if (defined($prrec) && $prrec->{name} ne ""){
             $wfrec{affectedproject}=$prrec->{name};
             $wfrec{affectedprojectid}=$prrec->{id};
          }
