@@ -123,6 +123,7 @@ sub new
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
+                sqlorder      =>'NONE', 
                 dataobjattr   =>"'i-network'"),
 
       new kernel::Field::Date(
