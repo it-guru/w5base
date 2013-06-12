@@ -530,10 +530,14 @@ sub mkChangeStoreRec
             $wfrec{affectedproject}=$prrec->{name};
             $wfrec{affectedprojectid}=$prrec->{id};
          }
+         else{
+            $wfrec{affectedproject}=[];
+            $wfrec{affectedprojectid}=[];
+         }
       }
       else{
-         $wfrec{affectedproject}=undef;
-         $wfrec{affectedprojectid}=undef;
+         $wfrec{affectedproject}=[];
+         $wfrec{affectedprojectid}=[];
       }
    }
 
