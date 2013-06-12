@@ -298,9 +298,6 @@ sub isWorkflowManager
                          "RMember","direct")){
                         return(1);
                      }
-
- 
-                     return(1);
                   }
                }
             }
