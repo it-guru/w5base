@@ -445,9 +445,9 @@ sub getPosibleActions
       push(@l,"wfmailsend"); # add a mailsend note for current worker
    }
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
-       $stateid<3 && $stateid>1){
+       (($stateid<3 && $stateid>1)||($stateid==5))){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
-      if (!$iscurrent){
+      if ((!$iscurrent) && $stateid!=5){
          push(@l,"wfcallback");# workflow zurueckholen(durch Anforderer o admin)
       }
    }
