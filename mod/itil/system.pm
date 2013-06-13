@@ -1251,6 +1251,12 @@ sub Validate
          $newrec->{itclustid}=undef;
       }
    }
+   if (!effVal($oldrec,$newrec,"isclusternode")){
+      if (exists($newrec->{itclustid})){
+         $newrec->{itclust}=undef;
+         $newrec->{itclustid}=undef;
+      }
+   }
 
    if (exists($newrec->{conumber}) && $newrec->{conumber} ne ""){
       if (!$self->finance::costcenter::ValidateCONumber("conumber",

@@ -118,6 +118,9 @@ sub qcheckRecord
                           $forcedupd,$wfrequest,
                           \@qmsg,\@dataissue,\$errorlevel,
                           mode=>'leftouterlink');
+      if (!$forcedupd->{isclusternode}){  # only take cluster relation if
+         delete($forcedupd->{itclust});   # system is realy a cluster node
+      }
       if (keys(%$forcedupd)){
        #  printf STDERR ("found DataIssue cluster on system $rec->{name}\n");
          if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,

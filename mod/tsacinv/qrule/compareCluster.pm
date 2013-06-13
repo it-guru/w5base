@@ -160,6 +160,8 @@ sub qcheckRecord
                   #
                   # this can be in the future maybe a seperate function
                   #
+                  @opList=grep({$_->{OP} ne "update"} @opList);
+                  
                   if ($#opList!=-1){
                      push(@qmsg,"cluster services needs correction");
                      foreach my $oprec (@opList){
@@ -171,10 +173,10 @@ sub qcheckRecord
                            push(@qmsg,"insert needed for: ".
                                       $oprec->{OPLABEL});
                         }
-                        elsif ($oprec->{OP} eq "update"){
-                           push(@qmsg,"update needed for: ".
-                                      $oprec->{OPLABEL});
-                        }
+                     #   elsif ($oprec->{OP} eq "update"){     # update only
+                     #      push(@qmsg,"update needed for: ".  # in 
+                     #                 $oprec->{OPLABEL});     # allowifupdate
+                     #   }                                     # mode needed
                      }
                      push(@dataissue,"cluster service list inconsistent to ".
                                      "AssetManager");
