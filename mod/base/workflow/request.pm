@@ -445,12 +445,25 @@ sub getPosibleActions
       push(@l,"wfmailsend"); # add a mailsend note for current worker
    }
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
-       (($stateid<3 && $stateid>1)||($stateid==5))){
+       $stateid<3 && $stateid>1){
       push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer o admin)
-      if ((!$iscurrent) && $stateid!=5){
+      if ((!$iscurrent)){
          push(@l,"wfcallback");# workflow zurueckholen(durch Anforderer o admin)
       }
    }
+   if ($userid==$creator && $stateid==5 ){
+      if ($WfRec->{postponeduntil} ne ""){
+         my $duration=CalcDateDuration(NowStamp("en"),
+                                       $WfRec->{postponeduntil});
+         if (defined($duration) && 
+             $duration->{totaldays}>21){
+            push(@l,"wfbreak");   # workflow abbrechen      (durch Anforderer 
+                                  # wenn Workflow für länger als 
+         }                        # 3 Wochen zurückgest.
+      }
+   }
+
+
    if ($stateid==2 && $lastworker==$userid){
       if (!$iscurrent){
          push(@l,"wfcallback"); # if last editor has an mismatched forward done
