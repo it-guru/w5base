@@ -1,0 +1,4 @@
+'itu.ciam'=>{de=>'CIAM',en=>'CIAM'},
+'itu.ciam.user'=>{de=>'Person',en=>'Person'},
+'itu.ciam.orgarea'=>{de=>'Organisationseinheit',en=>'Org-Unit'},
+'itu.ciam.costcenter'=>{de=>'Kostenknoten',en=>'CostCente'},
