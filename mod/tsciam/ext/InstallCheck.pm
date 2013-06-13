@@ -1,4 +1,4 @@
-package tswiw::ext::InstallCheck;
+package tsciam::ext::InstallCheck;
 #  W5Base Framework
 #  Copyright (C) 2011  Hartmut Vogler (it@guru.de)
 #
