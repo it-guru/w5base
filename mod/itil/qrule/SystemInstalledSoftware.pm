@@ -94,11 +94,17 @@ sub qcheckRecord
 
    if (ref($rec->{software}) eq "ARRAY"){
       foreach my $swrec (@{$rec->{software}}){
-         $swifound{$swrec->{software}}++;
-         if (exists($checkedswiprod{$swrec->{software}})){
-            delete($checkedswiprod{$swrec->{software}}->{$swrec->{version}});
-            if (!keys(%{$checkedswiprod{$swrec->{software}}})){
-               delete($checkedswiprod{$swrec->{software}});
+         my @swname=($swrec->{software});
+         if ($swrec->{software}=~m/^oracle_database.*/i){
+            push(@swname,"Oracle_Database_Enterprise_Edition");
+         }
+         foreach my $swname (@swname){
+            $swifound{$swname}++;
+            if (exists($checkedswiprod{$swname})){
+               delete($checkedswiprod{$swname}->{$swrec->{version}});
+               if (!keys(%{$checkedswiprod{$swname}})){
+                  delete($checkedswiprod{$swname});
+               }
             }
          }
          if ($swrec->{softwarecistatusid}!=4 &&
