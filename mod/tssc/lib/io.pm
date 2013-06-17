@@ -75,7 +75,7 @@ sub ProcessServiceCenterRecord
             $self->CreateOrUpdateRelations($id,$relations);
          }
          else{
-            msg(ERROR,"failed to create workflow");
+            msg(ERROR,"failed to create workflow :".$wfstorerec->{srcid});
          }
       }
       else{
