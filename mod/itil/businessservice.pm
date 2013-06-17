@@ -538,6 +538,11 @@ sub isWriteValid
                     $wr++;
             }
          }
+         if (!$wr){
+            if ($self->IsMemberOf("admin")){
+               $wr++;
+            }
+         }
       }
       
       if ($wr){
