@@ -55,11 +55,11 @@ sub ProcessServiceCenterRecord
       ($wfstorerec,$updateto)=$self->mkIncidentStoreRec($rec,$wf,$selfname,$obj);
    }
    if (defined($wfstorerec)){
+      # create new
+      if ($wfstorerec->{name}=~m/^\s*$/){ # siehe WF:13397595390001
+         return;
+      }
       if (!defined($updateto) || $updateto eq ""){
-         # create new
-         if ($wfstorerec->{name}=~m/^\s*$/){ # siehe WF:13397595390001
-            return;
-         }
          my $eventend=$wfstorerec->{eventend};
          my $eventstart=$wfstorerec->{eventstart};
          if ($eventend ne "" && $eventstart ne ""){
