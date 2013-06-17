@@ -72,12 +72,16 @@ sub qcheckRecord
          if ($swi->{softwareinstname} eq ""){ # this is a instance with no
             $swneeded{$swi->{swnature}}++;    # assinged software installation
          }
-         if ($swi->{techproductstring} ne "" &&
-             ($swi->{techrelstring}=~m/[0-9.]+/)){
+         if ($swi->{techproductstring} ne ""){
             if (!defined($swiprod{$swi->{techproductstring}})){
                $swiprod{$swi->{techproductstring}}={};
             }
-            $swiprod{$swi->{techproductstring}}->{$swi->{techrelstring}}++;
+            if ($swi->{techrelstring}=~m/[0-9.]+/){
+               $swiprod{$swi->{techproductstring}}->{$swi->{techrelstring}}++;
+            }
+            else{
+               $swiprod{$swi->{techproductstring}}->{'ANY'}++;
+            }
          }
       }
    }
@@ -102,6 +106,7 @@ sub qcheckRecord
             $swifound{$swname}++;
             if (exists($checkedswiprod{$swname})){
                delete($checkedswiprod{$swname}->{$swrec->{version}});
+               delete($checkedswiprod{$swname}->{'ANY'});
                if (!keys(%{$checkedswiprod{$swname}})){
                   delete($checkedswiprod{$swname});
                }
@@ -119,9 +124,16 @@ sub qcheckRecord
    if (keys(%checkedswiprod)){
       foreach my $software (sort(keys(%checkedswiprod))){
          foreach my $version (sort(keys(%{$checkedswiprod{$software}}))){
-            push(@msg,
-                 "missing software installation for ".
-                 "related software instances: ".$software." - ".$version);
+            if ($version eq "ANY"){
+               push(@msg,
+                    "missing software installation for ".
+                    "related software instances: ".$software);
+            }
+            else{
+               push(@msg,
+                    "missing software installation for ".
+                    "related software instances: ".$software." - ".$version);
+            }
          }
       }
    }
