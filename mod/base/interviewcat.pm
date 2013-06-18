@@ -36,6 +36,7 @@ sub new
                 name          =>'id',
                 label         =>'W5BaseID',
                 size          =>'10',
+                group         =>'id',
                 dataobjattr   =>'interviewcat.id'),
                                   
       new kernel::Field::TextDrop(
@@ -47,7 +48,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Name',
+                label         =>'Category-Tag',
                 size          =>'20',
                 dataobjattr   =>'interviewcat.name'),
 
@@ -59,7 +60,44 @@ sub new
                 dataobjattr   =>'interviewcat.fullname'),
 
       new kernel::Field::Textarea(
+                name          =>'name_label',
+                group         =>'details',
+                label         =>'Label',
+                dataobjattr   =>'interviewcat.frontlabel'),
+
+      new kernel::Field::Group(
+                name          =>'mgrgroup',
+                AllowEmpty    =>1,
+                label         =>'Manager group',
+                vjoinon       =>'mgrgroupid'),
+
+      new kernel::Field::Text(
+                name          =>'fulllabel',
+                readonly      =>1,
+                label         =>'full Label',
+                weblinkto     =>'NONE',
+                vjointo       =>'base::interviewcatTree',
+                vjoinon       =>['id'=>'startid'],
+                sortvalue     =>'NONE',
+                vjoinconcat   =>'.',
+                vjoindisp     =>'label'),
+
+      new kernel::Field::SubList(
+                name          =>'cattree',
+                readonly      =>1,
+                label         =>'categorie tree',
+                vjointo       =>'base::interviewcatTree',
+                vjoinon       =>['id'=>'startid'],
+                vjoindisp     =>['label','mgrgroup'],
+                vjoininhash   =>['label','mgrgroupid']),
+
+      new kernel::Field::Link(
+                name          =>'mgrgroupid',
+                dataobjattr   =>'interviewcat.mgrgroup'),
+
+      new kernel::Field::Textarea(
                 name          =>'comments',
+                group         =>'details',
                 label         =>'Comments',
                 dataobjattr   =>'interviewcat.comments'),
 
@@ -145,8 +183,15 @@ sub Validate
    if (defined($newrec->{name}) || !defined($oldrec)){
       trim(\$newrec->{name});
       if ($newrec->{name} eq "" ||
-           !($newrec->{name}=~m/^[a-zäöüß0-9_-\s]+$/i)){
-         $self->LastMsg(ERROR,"invalid groupname '%s' specified",
+           !($newrec->{name}=~m/^[a-z0-9_-]+$/i)){
+         $self->LastMsg(ERROR,"invalid category tag '%s' specified",
+                        $newrec->{name});
+         return(undef);
+      }
+   }
+   if (defined($newrec->{name_label})){
+      if ($newrec->{name_label}=~m/\./){
+         $self->LastMsg(ERROR,"invalid char 'dot' in label",
                         $newrec->{name});
          return(undef);
       }
@@ -177,7 +222,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    if (defined($rec)){
-      return(qw(header default id history questions));
+      return(qw(header default details id history questions));
    }
    return(qw(header default));
 }
@@ -187,7 +232,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default questions id));
+   return(qw(header default details questions id));
 }
 
 
@@ -197,16 +242,16 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
-   return(qw(default)) if ($self->IsMemberOf("admin"));
+   return(qw(default details)) if ($self->IsMemberOf("admin"));
    if (!defined($rec)){
       my $o=getModuleObject($self->Config,"base::interview");
       $o->SetFilter({contactid=>\$userid});
       my ($rec,$msg)=$o->getOnlyFirst(qw(id));
       if (defined($rec)){
-         return("default");
+         return("default details");
       }
    }
-   return(qw(default)) if ($rec->{creator} == $userid);
+   return(qw(default details)) if ($rec->{creator} == $userid);
 
    return(undef);
 }

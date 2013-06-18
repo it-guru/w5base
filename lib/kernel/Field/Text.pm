@@ -82,6 +82,9 @@ sub FormatedDetail
          if (lc($self->{sortvalue}) eq "asc"){
             $d=join($vjoinconcat,sort(@$d));
          }
+         elsif (lc($self->{sortvalue}) eq "none"){
+            $d=join($vjoinconcat,@$d);
+         }
          else{
             $d=join($vjoinconcat,reverse(sort(@$d)));
          }

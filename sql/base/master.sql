@@ -783,3 +783,6 @@ insert into w5seq (id) value (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(
 (4071),(4072),(4073),(4074),(4075),(4076),(4077),(4078),(4079),(4080),(4081),
 (4082),(4083),(4084),(4085),(4086),(4087),(4088),(4089),(4090),(4091),(4092),
 (4093),(4094),(4095);
+alter table interviewcat add mgrgroup bigint(20) default NULL;
+alter table interviewcat add frontlabel blob;
+alter table interview add frontlabel blob;

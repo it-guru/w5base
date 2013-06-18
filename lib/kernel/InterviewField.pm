@@ -28,9 +28,15 @@ sub getTotalActiveQuestions
    my $idname=shift;
    my $id=shift;
    my $answered=shift;
+   my %contextCache;
+   my $lang=$self->getParent->Lang();
    my $p=getModuleObject($self->getParent->Config,$parentobj);
    $p->SetFilter({$idname=>\$id});
    my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
+
+   #my $ic=getModuleObject($self->getParent->Config,"base::interviewcat");
+   #$ic->SetCurrentView(qw(id fulllabel));
+   #my $icat=$ic->getHashIndexed(qw(id));  # cache categorie labels
 
    my $i=getModuleObject($self->getParent->Config,"base::interview");
    $i->SetFilter({parentobj=>\$parentobj,
@@ -38,7 +44,7 @@ sub getTotalActiveQuestions
    my $pwrite=$i->checkParentWrite($p,$rec);
    my @viewlist=$i->getParentViewgroups($p,$rec);
    my @l;
-   foreach my $irec ($i->getHashList(qw(queryblock questclust 
+   foreach my $irec ($i->getHashList(qw(queryblock questclust interviewcattree
                                         qtag id name qname prio
                                         boundpviewgroup addquestdata
                                         interviewcatid contactid contact2id
@@ -53,7 +59,8 @@ sub getTotalActiveQuestions
          }
       }
       if ($restok){
-         my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec);
+         my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec,\%contextCache);
+
          my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs)=
             $i->getHtmlEditElements($write,$irec,
                          $answered->{interviewid}->{$irec->{id}},$p,$rec);
@@ -75,6 +82,7 @@ sub getTotalActiveQuestions
          if ($irec->{name} eq ""){
             $irec->{name}="no question text";
          }
+         $irec->{questclust}=extractLangEntry($irec->{questclust},$lang,80,0);
          push(@l,$irec);
       }
    }

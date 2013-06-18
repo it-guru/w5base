@@ -433,7 +433,14 @@ EOF
     
       my @blklist;
       my @blkid;
-    
+   
+      my %queryblocklabel; 
+
+    #  my $ic=getModuleObject($self->Config,"base::interviewcat");
+    #  $ic->SetCurrentView(qw(id fulllabel));
+    #  my $icat=$ic->getHashIndexed(qw(id));  # cache categorie labels
+
+
       foreach my $qrec (@{$state->{TotalActiveQuestions}}){
          if ($imode eq "open"){
             if (exists($state->{AnsweredQuestions}->
@@ -445,6 +452,12 @@ EOF
          }
          if ($lastqblock ne $qrec->{queryblock}){
             push(@blklist,$qrec->{queryblock});
+            $queryblocklabel{$qrec->{queryblock}}=$qrec->{queryblocklabel};
+         #       $icat->{id}->{$qrec->{interviewcatid}}->{fulllabel};
+         #   if (ref($queryblocklabel{$qrec->{queryblock}}) eq "ARRAY"){
+         #      $queryblocklabel{$qrec->{queryblock}}=
+         #         join(".",@{$queryblocklabel{$qrec->{queryblock}}});
+         #   }
             push(@blkid,$qrec->{interviewcatid});
          }
          $lastqblock=$qrec->{queryblock};
@@ -453,7 +466,8 @@ EOF
      # push(@blklist,"open");
       $lastqblock=undef;
       for(my $c=0;$c<=$#blklist;$c++){
-         my $blk=$blklist[$c];
+         #my $blk=$blklist[$c];
+         my $blk=$queryblocklabel{$blklist[$c]};
          my $blkid=$blkid[$c];
          $d.="\n</div>\n" if ($lastqblock ne "");
          $d.="<div class=InterviewQuestBlockFancyHead>$blk - $label</div>";

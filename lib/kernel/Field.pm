@@ -855,11 +855,16 @@ sub RawValue
                Dumper($c->{$joinkey}); # ensure that all subs are resolved
             }
             my %u=();
+            my @rawlist=();
             my $disp=$self->{vjoindisp};
             $disp=$disp->[0] if (ref($disp) eq "ARRAY");
+            my $dispobjvjoinconcat=", ";
             map({
                    my %current=%{$_};
                    my $dispobj=$self->vjoinobj->getField($disp,\%current);
+                   if (defined($dispobj->{vjoinconcat})){
+                      $dispobjvjoinconcat=$dispobj->{vjoinconcat};
+                   }
                    if (!defined($dispobj)){
                       die("fail to find $disp in $self");
                    }
@@ -868,8 +873,11 @@ sub RawValue
                     $bk="[ERROR: information temporarily unavailable]";
                    }
                    else{
-                      $bk=join(", ",@$bk) if (ref($bk) eq "ARRAY");
+                      if (ref($bk) eq "ARRAY"){
+                         $bk=join($dispobjvjoinconcat,@$bk);
+                      }
                    }
+                   push(@rawlist,$bk);
                    $u{$bk}=1;
                 } @{$c->{$joinkey}});
             if (keys(%u)>0){
@@ -887,7 +895,12 @@ sub RawValue
 #            }
 #            else{
                if (keys(%u)>1){
-                  $current->{$self->Name()}=[sort(keys(%u))];
+                  if (lc($self->{sortvalue}) eq "none"){
+                     $current->{$self->Name()}=[@rawlist];
+                  }
+                  else{
+                     $current->{$self->Name()}=[sort(keys(%u))];
+                  }
                }
                else{
                   if (keys(%u)==1){

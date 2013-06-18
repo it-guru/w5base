@@ -183,8 +183,8 @@ sub ProcessLine
    my $lineclass="subline".$self->{lineclass};
    my $lineonclick;
    my $idfield=$app->IdField();
-   my $idfieldname=$idfield->Name();
-   my $id=$idfield->RawValue($rec);
+   my $idfieldname=ref($idfield) ? $idfield->Name():undef;
+   my $id=ref($idfield) ? $idfield->RawValue($rec):undef;
    $id=$id->[0] if (ref($id) eq "ARRAY");
 
 

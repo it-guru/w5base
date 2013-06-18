@@ -55,16 +55,34 @@ sub new
                 vjoinon       =>['interviewcatid'=>'id'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Text(
+                name          =>'interviewcatlabel',
+                label         =>'categorie label',
+                searchable    =>0,
+                vjointo       =>'base::interviewcat',
+                vjoinon       =>['interviewcatid'=>'id'],
+                vjoindisp     =>'fulllabel'),
+
+
       new kernel::Field::Interface(
                 name          =>'interviewcatid',
                 label         =>'Interview categorie id',
                 dataobjattr   =>'interview.interviewcat'),
 
+      new kernel::Field::SubList(
+                name          =>'interviewcattree',
+                readonly      =>1,
+                label         =>'categorie tree',
+                vjointo       =>'base::interviewcatTree',
+                vjoinon       =>['interviewcatid'=>'startid'],
+                vjoindisp     =>['label','mgrgroup'],
+                vjoininhash   =>['label','mgrgroupid']),
+
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'540px',
                 label         =>'Question',
-                depend        =>['name_de','name_en'],
+                depend        =>['name_label','name_de','name_en'],
                 searchable    =>0,
                 readonly      =>1,
                 onRawValue    =>\&getQuestionText),
@@ -80,6 +98,11 @@ sub new
                 htmlwidth     =>'540px',
                 label         =>'Question (de)',
                 dataobjattr   =>'interview.name_de'),
+
+      new kernel::Field::Textarea(
+                name          =>'name_label',
+                label         =>'Label',
+                dataobjattr   =>'interview.frontlabel'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -208,7 +231,7 @@ sub new
                 label         =>'Question categorie',
                 dataobjattr   =>'interviewcat.fullname'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Textarea(
                 name          =>'questclust',
                 label         =>'Questiongroup',
                 dataobjattr   =>'interview.questclust'),
@@ -397,6 +420,10 @@ sub getQuestionText
    my $self=shift;
    my $current=shift;
    my $lang=$self->getParent->Lang();
+
+   if ($current->{'name_label'} ne ""){
+      return(extractLangEntry($current->{'name_label'},$lang,80,0));
+   }
    if ($lang eq "de" && $current->{'name_de'} ne ""){
       return($current->{'name_de'});
    }
@@ -664,12 +691,31 @@ sub checkAnserWrite
    my $pobj=shift;
    my $prec=shift;
 
+
    my $userid=$self->getCurrentUserId();
-   #printf STDERR ("fifi w=%s\n",Dumper($irec));
+
+   my @t=$irec->{interviewcattree};
+   if (ref($irec->{interviewcattree}) eq "ARRAY"){
+      @t=@{$irec->{interviewcattree}};
+   }
+   my @mgrgroup=();
+   $irec->{queryblocklabel}=join(".", map({
+       push(@mgrgroup,$_->{mgrgroupid}) if ($_->{mgrgroupid} ne "");
+       $_->{label}
+   } @t)); # nicht schoen! - Aber aus Performance gründen notwendig!
+
+   return($parentrw) if ($parentrw);
+
    if ($irec->{contactid}==$userid ||
        $irec->{contact2id}==$userid){  # allow always the contact to answer
       return(1);
    }
+
+   if ($self->IsMemberOf(\@mgrgroup)){
+      return(1);
+   }
+
+
 
 
    return($parentrw);

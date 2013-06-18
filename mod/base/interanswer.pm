@@ -428,6 +428,7 @@ sub getAnswerWriteState
    my $qid=shift;
    my $parentid=shift;
    my $parentobj=shift;
+   my $contextCache=shift;
 
    $i->ResetFilter();
    my $idfield=$i->IdField();
@@ -460,7 +461,6 @@ sub getAnswerWriteState
 
    $p->SetFilter({$idname=>\$parentid});
    my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
-
    my $pwrite=$i->checkParentWrite($p,$rec);
    return($i->checkAnserWrite($pwrite,$irec,$p,$rec),$irec,$oldrec,$rec);
 }

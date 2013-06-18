@@ -362,6 +362,7 @@ sub getSqlSelect
    my $order=$self->getSqlOrder("select",@filter);
    my $limitnum=$self->{_Limit};
    my @cmd;
+   return(undef) if ($#from==-1 || $from[0] eq "");
    foreach my $from (@from){
       my $cmd="select ".$distinct.join(",",@fields)." from $from";
       $cmd.=" where ".$where if ($where ne "");
