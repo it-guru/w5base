@@ -500,7 +500,9 @@ sub isWriteValid
       my @chkgroups;
       push(@chkgroups,$rec->{mandatorid}) if ($rec->{mandatorid} ne "");
       if ($#chkgroups!=-1){
-         if ($self->IsMemberOf(\@chkgroups,["RDataAdmin"],"down")){
+         if ($self->IsMemberOf(\@chkgroups,["RDataAdmin",
+                                            "RCFManager",
+                                            "RCFManager2"],"down")){
             return(@databossedit);
          }
       }

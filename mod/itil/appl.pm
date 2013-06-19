@@ -1851,17 +1851,21 @@ sub isWriteValid
          }
       }
       if ($rec->{mandatorid}!=0 && 
-         $self->IsMemberOf($rec->{mandatorid},["RCFManager","RCFManager2"],
+         $self->IsMemberOf($rec->{mandatorid},["RDataAdmin",
+                                               "RCFManager",
+                                               "RCFManager2"],
                            "down")){
          return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
       if ($rec->{businessteamid}!=0 && 
-         $self->IsMemberOf($rec->{businessteamid},["RCFManager","RCFManager2"],
+         $self->IsMemberOf($rec->{businessteamid},["RCFManager",
+                                                   "RCFManager2"],
                            "down")){
          return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
       if ($rec->{responseteamid}!=0 && 
-         $self->IsMemberOf($rec->{responseteamid},["RCFManager","RCFManager2"],
+         $self->IsMemberOf($rec->{responseteamid},["RCFManager",
+                                                   "RCFManager2"],
                            "down")){
          return($self->expandByDataACL($rec->{mandatorid},@databossedit));
       }
