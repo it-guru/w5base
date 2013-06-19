@@ -2,7 +2,7 @@
 'Fullname'=>{de=>'vollständiger Name'},
 'Category-Tag'=>{de=>'Kurzname'},
 'full Label'=>{de=>'vollständige Beschriftung'},
-'Label'=>{de=>'Kurzbeschriftung'},
+'Label (multilang)'=>{de=>'Kurzbeschriftung (multilang)'},
 'Parentgroup'=>{de=>'Eltern-Kategorie'},
 'fieldgroup.id'=>{de=>'Identifikation',en=>'Identification'},
 'fieldgroup.details'=>{de=>'Details',en=>'Details'},

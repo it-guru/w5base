@@ -72,6 +72,8 @@ sub new
       new kernel::Field::SubList(
                 name          =>'interviewcattree',
                 readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
                 label         =>'categorie tree',
                 vjointo       =>'base::interviewcatTree',
                 vjoinon       =>['interviewcatid'=>'startid'],
@@ -89,19 +91,23 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name_en',
+                searchable    =>0,
                 htmlwidth     =>'540px',
                 label         =>'Question (en-default)',
                 dataobjattr   =>'interview.name'),
 
       new kernel::Field::Text(
                 name          =>'name_de',
+                searchable    =>0,
                 htmlwidth     =>'540px',
                 label         =>'Question (de)',
                 dataobjattr   =>'interview.name_de'),
 
       new kernel::Field::Textarea(
                 name          =>'name_label',
-                label         =>'Label',
+                label         =>'Label (multilang)',
+                htmlheight    =>40,
+                searchable    =>0,
                 dataobjattr   =>'interview.frontlabel'),
 
       new kernel::Field::Select(
@@ -233,6 +239,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'questclust',
+                htmlheight    =>40,
                 label         =>'Questiongroup',
                 dataobjattr   =>'interview.questclust'),
 
@@ -294,6 +301,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
+                htmlheight    =>200,
                 dataobjattr   =>'interview.comments'),
 
       new kernel::Field::Textarea(
@@ -895,7 +903,8 @@ sub Question
    printf("<div style=\"border-width:1px;border-style:solid;".
           "border-color:silver;margin-top:20px;".
           "padding-bottom:10px;margin-right:10px\">");
-   my $c=FancyLinks(quoteHtml(extractLangEntry($rec->{comments},$lang)));
+   my $c=FancyLinks(quoteHtml(
+                    extractLangEntry($rec->{comments},$lang,undef,1)));
    $c=~s/\n/<br>\n/g;
    printf("<div style=\"margin:5px;margin-top:5px\">".
           "<b>%s:</b><br>%s</div>",$self->T("explanation"),$c);

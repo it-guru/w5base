@@ -4,7 +4,7 @@
 'Question (en-default)'=>{de=>'Frage (en-default)'},
 'fieldgroup.tech'=>{de=>'W5Base Verknüpfung',en=>'W5Base Relation'},
 'Questiongroup'=>{de=>'Fragegruppe'},
-'Label'=>{de=>'Beschriftung der Frage'},
+'Label (multilang)'=>{de=>'Beschriftung der Frage (multilang)'},
 'Manager group'=>{de=>'Manager Gruppe'},
 'parent Ojbect'=>{de=>'Elternobjekt'},
 'unique query tag'=>{de=>'eindeutiges QTag'},

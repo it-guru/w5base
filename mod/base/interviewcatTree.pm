@@ -69,8 +69,9 @@ sub new
                      my $lang=$self->getParent->Lang();
 
                      if ($current->{'name_label'} ne ""){
-                        return(extractLangEntry($current->{'name_label'},
-                               $lang,80,0));
+                        my $l=extractLangEntry($current->{'name_label'},
+                               $lang,80,0);
+                        return($l) if (!($l=~m/^\s*$/));
                      }
                      if ($current->{'name'} ne ""){
                         return($current->{'name'});

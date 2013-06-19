@@ -1372,13 +1372,22 @@ sub InterviewPartners
 
 
    return(''=>$self->T("Databoss"),
-          'INTERVSystemTechContact'=>'SystemTechContact',
-          'INTERVInfraClimaContact'=>'InfraClimaContact',
-          'INTERVInfraPowerContact'=>'InfraPowerContact',
-          'INTERVInfraIPNetContact'=>'InfraIPNetContact',
-          'INTERVInfrastrucContact'=>'InfrastrucContact') if (!defined($rec));
-   return(''=>[$rec->{'databossid'}]) if (exists($rec->{'databossid'}));
-   return(''=>[]);
+          'INTERVApplicationMgr'   =>'ApplicationManager',
+          'INTERVSystemTechContact'=>'TechnicalContact') if (!defined($rec));
+   my %g=();
+   $g{''}=[$rec->{'databossid'}] if (exists($rec->{'databossid'}) &&
+                                     $rec->{'databossid'} ne "");
+   my @amgr=();
+   push(@amgr,$rec->{applmgrid}) if ($rec->{applmgrid} ne "");
+   push(@amgr,$rec->{applmgr2id}) if ($rec->{applmgr2id} ne "");
+   $g{'INTERVApplicationMgr'}=\@amgr if ($#amgr!=-1);
+
+   my @tsm=();
+   push(@tsm,$rec->{tsmid}) if ($rec->{tsmid} ne "");
+   push(@tsm,$rec->{tsm2id}) if ($rec->{tsm2id} ne "");
+   $g{'INTERVSystemTechContact'}=\@tsm if ($#tsm!=-1);
+
+   return(%g);
 }
 
 

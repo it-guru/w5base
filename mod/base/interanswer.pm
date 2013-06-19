@@ -462,7 +462,20 @@ sub getAnswerWriteState
    $p->SetFilter({$idname=>\$parentid});
    my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
    my $pwrite=$i->checkParentWrite($p,$rec);
-   return($i->checkAnserWrite($pwrite,$irec,$p,$rec),$irec,$oldrec,$rec);
+   my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec);
+
+   my %boundpviewgroupAcl=$p->InterviewPartners($rec);
+
+   if (!$write){
+      my $userid=$self->getCurrentUserId();
+      my $tag=$irec->{boundpcontact}."";
+      if (exists($boundpviewgroupAcl{$tag}) &&
+          in_array($boundpviewgroupAcl{$tag},$userid)){
+         $write++;
+      }
+   }
+
+   return($write,$irec,$oldrec,$rec);
 }
 
 sub Store

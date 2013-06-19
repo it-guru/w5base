@@ -74,6 +74,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fulllabel',
                 readonly      =>1,
+                searchable    =>0,
                 label         =>'full Label',
                 weblinkto     =>'NONE',
                 vjointo       =>'base::interviewcatTree',
@@ -85,6 +86,8 @@ sub new
       new kernel::Field::SubList(
                 name          =>'cattree',
                 readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
                 label         =>'categorie tree',
                 vjointo       =>'base::interviewcatTree',
                 vjoinon       =>['id'=>'startid'],
@@ -243,16 +246,16 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
    return(qw(default details)) if ($self->IsMemberOf("admin"));
-   if (!defined($rec)){
-      my $o=getModuleObject($self->Config,"base::interview");
-      $o->SetFilter({contactid=>\$userid});
-      my ($rec,$msg)=$o->getOnlyFirst(qw(id));
-      if (defined($rec)){
-         return("default details");
+
+   my @l=($rec->{cattree});
+   @l=@{$rec->{cattree}} if (ref($rec->{cattree}) eq "ARRAY");
+   foreach my $catent (@l){
+      if ($catent->{mgrgroupid} ne ""){
+         if ($self->IsMemberOf($catent->{mgrgroupid})){
+            return("details");
+         }
       }
    }
-   return(qw(default details)) if ($rec->{creator} == $userid);
-
    return(undef);
 }
 

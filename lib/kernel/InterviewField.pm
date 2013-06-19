@@ -30,6 +30,7 @@ sub getTotalActiveQuestions
    my $answered=shift;
    my %contextCache;
    my $lang=$self->getParent->Lang();
+   my $userid=$self->getParent->getCurrentUserId();
    my $p=getModuleObject($self->getParent->Config,$parentobj);
    $p->SetFilter({$idname=>\$id});
    my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
@@ -43,11 +44,14 @@ sub getTotalActiveQuestions
                   cistatusid=>[3,4]});
    my $pwrite=$i->checkParentWrite($p,$rec);
    my @viewlist=$i->getParentViewgroups($p,$rec);
+   my %boundpviewgroupAcl=$p->InterviewPartners($rec);
+   
    my @l;
    foreach my $irec ($i->getHashList(qw(queryblock questclust interviewcattree
                                         qtag id name qname prio
                                         boundpviewgroup addquestdata
                                         interviewcatid contactid contact2id
+                                        boundpcontact
                                         questtyp restriction))){
       my $restok=1;
       if ($irec->{restriction} ne ""){
@@ -60,6 +64,13 @@ sub getTotalActiveQuestions
       }
       if ($restok){
          my $write=$i->checkAnserWrite($pwrite,$irec,$p,$rec,\%contextCache);
+         if (!$write){
+            my $tag=$irec->{boundpcontact}."";
+            if (exists($boundpviewgroupAcl{$tag}) &&
+                in_array($boundpviewgroupAcl{$tag},$userid)){
+               $write++;
+            }
+         }
 
          my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs)=
             $i->getHtmlEditElements($write,$irec,
