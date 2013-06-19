@@ -4,8 +4,8 @@
 <table width=200>
 <tr height=100>
 <td>
-<img src="../../base/load/notfound.jpg" alt="no records matching your query"
-                                    title="no records matching your query">
+<img src="../../base/load/notfound.jpg" alt="keine Datensätze gefunden"
+                                        title="keine Datensätze gefunden">
 </td>
 </tr>
 </table>
