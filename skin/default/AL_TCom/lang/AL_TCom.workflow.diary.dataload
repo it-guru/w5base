@@ -1,2 +1,2 @@
-'invalid or inactive costcenter used in application configuration'=>{de=>'ungültige oder inaktive CO-Nummer/Kostenstelle in Anwendungs-Konfiguration'},
+'invalid or inactive costcenter used in application configuration'=>{de=>'ungültiges oder inaktives Kontierungsobjekt in Anwendungs-Konfiguration'},
 'no valid application specified'=>{de=>'keine gültige Anwendung angegeben'},

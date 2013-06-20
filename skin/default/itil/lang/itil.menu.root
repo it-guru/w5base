@@ -86,7 +86,7 @@
 'itil.kern.hwmodel.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.servicesupport'=>{de=>'Service&amp;Support',en=>'Service&amp;Support'},
 'itil.kern.servicesupport.new'=>{de=>'Neueingabe',en=>'New'},
-'itil.kern.costcenter'=>{de=>'Kostenknoten',en=>'Cost-Node'},
+'itil.kern.costcenter'=>{de=>'Kontierungsobjekt',en=>'Costcenter'},
 'itil.kern.costcenter.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.itnormodel'=>{de=>'Betriebsmodel',en=>'NOR-Solutionmodel'},
 'itil.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},

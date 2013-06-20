@@ -184,7 +184,14 @@ sub getLineSubListData
       my $srcval=$srcfield->RawValue($current);
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
-      $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
+
+      my %flt=($self->{vjoinon}->[1]=>$srcval);
+      my @fltlst=(\%flt);
+      if (ref($self->{vjoinonfinish}) eq "CODE"){  # this allows dynamic joins
+         @fltlst=&{$self->{vjoinonfinish}}($self,%flt,$current);
+      }
+
+      $self->vjoinobj->SetFilter(@fltlst);
       my @view=@{$self->{vjoindisp}};
       if (defined($self->{'vjoindisp'.$mode})){
          if (!ref($self->{'vjoindisp'.$mode}) eq "ARRAY"){
@@ -243,7 +250,13 @@ sub getSubListData
          }
          $self->vjoinobj->SetNamedFilter("BASE",@{$base});
       }
-      $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
+      my %flt=($self->{vjoinon}->[1]=>$srcval);
+      my @fltlst=(\%flt);
+      if (ref($self->{vjoinonfinish}) eq "CODE"){  # this allows dynamic joins
+         @fltlst=&{$self->{vjoinonfinish}}($self,\%flt,$current);
+      }
+
+      $self->vjoinobj->SetFilter(@fltlst);
 
       my @view=@{$self->{vjoindisp}};
       if (defined($self->{'vjoindisp'.$mode})){

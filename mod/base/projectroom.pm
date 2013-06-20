@@ -119,7 +119,7 @@ sub new
                 name          =>'conumber',
                 htmlwidth     =>'100px',
                 group         =>'commercial',
-                label         =>'CO-Number',
+                label         =>'Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'projectroom.conumber'),

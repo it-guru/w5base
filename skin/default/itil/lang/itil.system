@@ -59,7 +59,7 @@
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Admin Team Boss'=>{de=>'Teamleiter des Adminteams'},
 'Asset-Name'=>{de=>'Asset-Name/AssetID',en=>'Asset-Name/AssetID'},
-'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
+'Costcenter'=>{de=>'Kontierungsobjekt'},
 'availabel for further use'=>{de=>'verfügbar für den Wiedereinsatz'},
 'OS-Class'=>{de=>'Betriebssystemklasse'},
 'there are still linked active ipaddresses on this system'=>{de=>'diesem System sind noch aktive IP-Adressen zugeordnet'},

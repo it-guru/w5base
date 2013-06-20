@@ -47,7 +47,8 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Name',
+                nowrap        =>1,
+                label         =>'PSP Name',
                 dataobjattr   =>'interface_tssapp01_01.name'),
 
       new kernel::Field::Text(

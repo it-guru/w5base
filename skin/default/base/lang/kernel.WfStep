@@ -28,7 +28,7 @@
 'wftakeover'=>{de=>'Übernahme',en=>'Take over'},
 'wfinquiry'=>{de=>'Nachfrage',en=>'Inquiry'},
 'TakeOverMailMsg'=>{en=>'This workflow has been revoked from you. For further informations feel free to contact me',de=>'Dieser Workflow wurde Ihnen entzogen. Falls Sie weitere Informationen dazu benötigen, kontaktieren Sie mich bitte.'},
-'NOTE: no costcenter allocation posible!'=>{de=>'NOTIZ: keine Zuordnung zu Kostenstelle/CO-Nummer möglich!'},
+'NOTE: no costcenter allocation posible!'=>{de=>'NOTIZ: keine Zuordnung zu Kontierungsobjekt möglich!'},
 'The workflow started by you, has been defered with no comments.'=>{de=>'Der Workflow wurde ohne Komentare zurückgestellt.'},
 'invalid forwarding target'=>{de=>'ungültiges Weiterleitungsziel'},
 'target date must be behind now'=>{de=>'Zielzeitpunkt muß in der Zukunft liegen'},

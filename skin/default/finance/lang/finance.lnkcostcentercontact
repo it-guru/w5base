@@ -1,2 +1,2 @@
-'finance::lnkcostcentercontact'=>{de=>'Kostenknoten Kontaktverknüpfung',en=>'Costcenter Contactrelation'},
-'CO-Number'=>{de=>'Kostenknoten'},
+'finance::lnkcostcentercontact'=>{de=>'Kontierungsobjekt Kontaktverknüpfung',en=>'Costcenter Contactrelation'},
+'CO-Number'=>{de=>'Kontierungsobjekt'},

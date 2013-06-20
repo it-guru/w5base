@@ -33,7 +33,7 @@
 'Producer Service&Support Class'=>{de=>'Hersteller Service&Support Class'},
 'Keywords'=>{de=>'Schlüsselworte'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
-'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
+'Costcenter'=>{de=>'Kontierungsobjekt'},
 'availabel for further use'=>{de=>'verfügbar für den Wiedereinsatz'},
 'delete only posible, if there are no system relations'=>{de=>'Das Löschen des Datensatzes ist nur zulässig, wenn keine Systeme zugeordnet sind'},
 'Systems'=>{de=>'Systeme'},

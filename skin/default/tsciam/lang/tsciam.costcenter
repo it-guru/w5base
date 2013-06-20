@@ -1,1 +1,1 @@
-'tsciam::costcenter'=>{de=>'CIAM Kostenknoten',en=>'CIAM CostCenter'},
+'tsciam::costcenter'=>{de=>'CIAM Kostenstelle',en=>'CIAM CostCenter'},

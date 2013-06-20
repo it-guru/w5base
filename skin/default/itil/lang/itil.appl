@@ -51,7 +51,8 @@
 'you are not authorized to set other persons as databoss'=>{
           de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},
 'Application ID'=>{de=>'Anwendungs-ID'},
-'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
+'Costcenter'=>{de=>'Kontierungsobjekt'},
+'Costcenter-Number'=>{de=>'Kontierungsobjekt-Nummer'},
 'Application Version'=>{de=>'Anwendungsversion'},
 'Maintenance Window'=>{de=>'Wartungsfenster'},
 'Deputy Application Manager'=>{de=>'Application Manager Vertreter'},

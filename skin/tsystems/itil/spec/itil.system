@@ -1,6 +1,6 @@
 #######################################################################
 'conumber'=>{de=>'
-Die Eingabe einer gültigen CO-Nummer ist zwingend, wenn der Datensatz
+Die Eingabe eines gültigen Kontierungsobjektes ist zwingend, wenn der Datensatz
 nach AssetManager übertragen werden soll!
 ',en=>'
 The definition of a valid co-number is needed, if this record

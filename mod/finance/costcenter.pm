@@ -35,20 +35,42 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 searchable    =>0,
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'costcenter.id'),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
-                htmlwidth     =>'120px',
-                label         =>'CO-Number',
+                htmlwidth     =>'200px',
+                htmleditwidth =>'200px',
+                label         =>'Costcenter',
                 dataobjattr   =>'costcenter.name'),
 
       new kernel::Field::Text(
+                name          =>'conodenumber',
+                htmlwidth     =>'150px',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'Costcenter-Number',
+                dataobjattr   =>"if(instr(costcenter.name,'-'),".
+                        "substr(costcenter.name,instr(costcenter.name,'-')+1),".
+                        "costcenter.name)"),
+
+      new kernel::Field::Text(
                 name          =>'accarea',
-                htmlwidth     =>'120px',
+                htmlwidth     =>'130px',
+                htmleditwidth =>'130px',
                 label         =>'Accounting Area',
                 dataobjattr   =>'costcenter.accarea'),
+
+      new kernel::Field::Select(
+                name          =>'costcentertype',
+                label         =>'Costcenter type',
+                transprefix   =>'CC.',
+                htmleditwidth =>'150px',
+                value         =>[qw(costcenter costnode pspelement)],
+                dataobjattr   =>'costcenter.costcentertype'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -67,7 +89,16 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 htmlwidth     =>'220px',
-                label         =>'CO-Shortdescription',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>1,
+                label         =>'Costcenter label',
+                dataobjattr   =>"if (costcenter.fullname<>'',concat(costcenter.name,': ',costcenter.fullname),costcenter.name)"),
+
+      new kernel::Field::Text(
+                name          =>'shortdesc',
+                htmlwidth     =>'220px',
+                label         =>'Shortdescription',
                 dataobjattr   =>'costcenter.fullname'),
 
       new kernel::Field::TextDrop(
@@ -321,6 +352,7 @@ sub ValidateCONumber
           (!($conummer=~m/^[0-9]+$/) &&
            !($conummer=~m/^\S+\[\d+\]$/) &&   # for deleted entries
            !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
+           !($conummer=~m/^[A-Z]-[A-Z,0-9]{10}$/) &&
            !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
          return(0);
       }

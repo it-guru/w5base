@@ -67,7 +67,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'conumber',
                 htmlwidth     =>'100px',
-                label         =>'CO-Number',
+                label         =>'Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'custcontract.conumber'),

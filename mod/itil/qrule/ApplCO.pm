@@ -4,9 +4,9 @@ package itil::qrule::ApplCO;
 
 =head3 PURPOSE
 
-Checks if there is an "installed/active" CO-Nummer is selected in
+Checks if there is an "installed/active" Costcenter is selected in
 every application with an CI-Status "installed/active" or "available".
-If there is no valid CO-Number defined, an error will be procceded.
+If there is no valid Costcenter defined, an error will be procceded.
 
 =head3 IMPORTS
 
@@ -60,15 +60,15 @@ sub qcheckRecord
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    my $coobj=getModuleObject($self->getParent->Config,"itil::costcenter");
    if (!($coobj->ValidateCONumber("conumber",$rec,undef))){
-      return(3,{qmsg=>['no valid conumber'],
-                dataissue=>['no valid conumber']});
+      return(3,{qmsg=>['no valid costcenter'],
+                dataissue=>['no valid costcenter']});
    }
    else{
       $coobj->SetFilter({cistatusid=>4,name=>\$rec->{conumber}});
       my ($rec,$msg)=$coobj->getOnlyFirst(qw(id));
       if (!defined($rec)){
-         return(3,{qmsg=>['conumber is not installed/active'],
-                   dataissue=>['conumber is not installed/active']});
+         return(3,{qmsg=>['costcenter is not installed/active'],
+                   dataissue=>['costcenter is not installed/active']});
       }
    }
    return(0,undef);

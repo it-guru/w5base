@@ -76,7 +76,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'applconumber',
-                label         =>'CO-Number of application',
+                label         =>'Costcenter of application',
                 size          =>'15',
                 group         =>'appldata',
                 htmldetail    =>0,
@@ -88,7 +88,7 @@ sub new
                 name          =>'applcodescription',
                 group         =>'appldata',
                 htmldetail    =>0,
-                label         =>'CO-Number desc of application',
+                label         =>'Costcenter desc of application',
                 dataobjattr   =>'amcostcenter.field1'),
 
       new kernel::Field::Text(
@@ -155,7 +155,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'sysconumber',
-                label         =>'CO-Number of system',
+                label         =>'Costcenter of system',
                 size          =>'15',
                 group         =>'sysdata',
                 htmldetail    =>0,
@@ -167,7 +167,7 @@ sub new
                 name          =>'syscodescription',
                 group         =>'sysdata',
                 htmldetail    =>0,
-                label         =>'CO-Number desc of system',
+                label         =>'Costcenter desc of system',
                 dataobjattr   =>'sysamcostcenter.field1'),
 
       new kernel::Field::TextDrop(

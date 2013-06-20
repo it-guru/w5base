@@ -2,7 +2,7 @@
 'Contract Number'=>{de=>'Vertragsnummer'},
 'Order Ticket Name'=>{de=>'Bezeichnung'},
 'Order Ticket Number'=>{de=>'Bestellscheinnummer'},
-'CO-Number'=>{de=>'CO-/Kostenstellennummer'},
+'CO-Number'=>{de=>'Kontierungsobjekt'},
 'Duration Start'=>{de=>'Laufzeitbegin'},
 'Duration End'=>{de=>'Laufzeitende'},
 

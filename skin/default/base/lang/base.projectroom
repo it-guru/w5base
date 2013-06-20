@@ -19,7 +19,7 @@ Klammer über mehrere Config-Items angesehen werden.
 'deputy Project boss'=>{de=>'Projektleiter Vertreter'},
 'Project boss'=>{de=>'Projektleiter'},
 'Relations'=>{de=>'Verknüpfungen'},
-'CO-Number'=>{de=>'Kostenstelle/CO-Nummer',en=>'CostCenter/CO-Number'},
+'Costcenter'=>{de=>'Kontierungsobjekt'},
 'restrictive task management'=>{de=>'restriktive Aufgabenverwaltung'},
 'Projectroom start'=>{de=>'Projektraum Start-Zeitpunkt'},
 'Projectroom end'=>{de=>'Projektraum Ende-Zeitpunkt'},

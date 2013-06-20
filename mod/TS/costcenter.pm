@@ -1,0 +1,101 @@
+package TS::costcenter;
+#  W5Base Framework
+#  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::Field;
+use finance::costcenter;
+@ISA=qw(finance::costcenter);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFields(
+      new kernel::Field::SubList(
+                name          =>'sapentries',
+                group         =>'saprelation',
+                label         =>'TS SAP P01 Entries',
+                vjointo       =>'tssapp01::psp',
+                vjoinon       =>['name'=>'name'],
+                vjoinonfinish =>sub{
+                   my $self=shift;
+                   my $flt=shift;
+                   my $current=shift;
+                   my $f=$flt->{name};
+                   $f=~s/\[.*\]$//;
+                   if ($f=~m/\S-[a-z0-9]+/){
+                      $flt->{name}=join(" ",map({'"'.$_.'"'}
+                                  $f,
+                                  $f."-*"));
+                   }
+                   elsif ($f=~m/[a-z0-9]+/){
+                      $flt->{name}=join(" ",map({'"'.$_.'"'}
+                                  "?-".$f,
+                                  "?-".$f."-*",
+                                  $f));
+                   }
+                   print STDERR Dumper($flt);
+                   return($flt);
+                },
+                vjoindisp     =>['name','status','description']),
+      insertafter=>'itsemid'
+   );
+   $self->AddGroup("saprelation",translation=>'TS::costcenter');
+
+   return($self);
+}
+
+
+sub isViewValid
+{
+   my $self=shift;
+   my @l=$self->SUPER::isViewValid(@_);
+   if (grep(/^(default|ALL)$/,@l)){
+      push(@l,"saprelation");
+   }
+   return(@l);
+}
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my @l=$self->SUPER::getDetailBlockPriority(@_);
+   my $inserti=$#l;
+   for(my $c=0;$c<=$#l;$c++){
+      $inserti=$c+1 if ($l[$c] eq "control");
+   }
+   splice(@l,$inserti,$#l-$inserti,("saprelation",@l[$inserti..($#l+-1)]));
+   return(@l);
+
+}
+
+
+
+
+
+
+
+
+
+
+1;

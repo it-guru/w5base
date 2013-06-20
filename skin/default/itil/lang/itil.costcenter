@@ -1,4 +1,4 @@
-'itil::costcenter'=>{de=>'Kostenknoten',en=>'costnode'},
+'itil::costcenter'=>{de=>'Kontierungsobjekt',en=>'costcenter'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'Applications'=>{de=>'Anwendungen'},
 'delete only posible, if there are no application relations'=>{de=>'löschen ist nur mögliche, wenn keine Anwendungsverknüpfungen vorhanden sind'},

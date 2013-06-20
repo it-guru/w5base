@@ -40,7 +40,7 @@
 'autoexpansion.36'=>{de=>'3 Jahre',en=>'3 Years'},
 'Cancel Period'=>{de=>'Kündigungsfrist'},
 'Auto Expansion'=>{de=>'automatische Verlängerung'},
-'CO-Number'=>{de=>'CO-Nummer'},
+'Costcenter'=>{de=>'Kontierungsobjekt'},
 "invalid contract number '\%s' specified"=>{de=>"ungültige Vertragsnummer '\%s'"},
 'no duration start defined'=>{de=>'kein Laufzeitbegin definiert'},
 'active modules'=>{de=>'aktive Module'},

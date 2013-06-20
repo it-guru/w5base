@@ -1,3 +1,3 @@
-'itil::qrule::ApplCO'=>{de=>'Prüfung der CO-Nummer',en=>'Check the CO-Number'},
-'no valid conumber'=>{de=>'keine gültige CO-Nummer'},
-'conumber is not installed/active'=>{de=>'CO-Nummer ist nicht installiert/aktiv'},
+'itil::qrule::ApplCO'=>{de=>'Prüfung des Kontierungsobjektes',en=>'Check the Costcenter'},
+'no valid costcenter'=>{de=>'keine gültiges Kontierungsobjekt'},
+'costcenter is not installed/active'=>{de=>'Kontierungsobjekt ist nicht installiert/aktiv'},

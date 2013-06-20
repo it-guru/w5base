@@ -566,7 +566,7 @@ sub new
                 name          =>'conumber',
                 group         =>'misc',
                 htmlwidth     =>'100px',
-                label         =>'CO-Number',
+                label         =>'Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'system.conumber'),

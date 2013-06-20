@@ -4,7 +4,7 @@
 'Location'=>{de=>'Ort'},
 'Country'=>{de=>'Land'},
 'Office'=>{de=>'Organisationseinheit'},
-'CostCenter'=>{de=>'Kostenknoten'},
+'CostCenter'=>{de=>'Kostenstelle'},
 'Fullname'=>{de=>'vollständiger Name'},
 'Accounting Area'=>{de=>'Buchungskreis'},
 'Room'=>{de=>'Zimmer'},

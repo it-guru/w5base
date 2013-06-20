@@ -106,10 +106,21 @@ sub new
                 name          =>'conumber',
                 htmleditwidth =>'150px',
                 htmlwidth     =>'100px',
-                label         =>'CO-Number',
+                label         =>'Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'appl.conumber'),
+
+      new kernel::Field::Text(
+                name          =>'conodenumber',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'Costcenter-Number',
+                vjointo       =>'itil::costcenter',
+                vjoinon       =>['conumber'=>'name'],
+                vjoindisp     =>'conodenumber'),
+
 
       new kernel::Field::Text(
                 name          =>'applid',

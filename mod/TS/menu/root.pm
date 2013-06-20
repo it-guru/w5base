@@ -263,7 +263,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.kern.costcenter",
-                      "itil::costcenter",
+                      "TS::costcenter",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.kern.costcenter.new",

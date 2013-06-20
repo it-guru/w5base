@@ -134,7 +134,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'applconumber',
                 htmlwidth     =>'100px',
-                label         =>'Application CO-Number',
+                label         =>'Application Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['applconumber'=>'name'],
                 readonly      =>'1',

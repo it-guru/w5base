@@ -24,7 +24,7 @@
 'Automationsname/IP-Address'=>{de=>'Automationsname/IP-Adresse'},
 'Instance ID'=>{de=>'Instanz ID'},
 'Customer cost allocation'=>{de=>'Instanz wird dem Endkunden verrechnet'},
-'Application CO-Number'=>{de=>'Anwendungs-CO/Kostenstelle'},
+'Application Costcenter'=>{de=>'Anwendungs-Kontierungsobjekt'},
 'invalid instance name'=>{de=>'ungültiger Instanz-Name'},
 'Service&Support Class'=>{de=>'Service&Support Klasse'},
 'Service&Support Class - SAP Service name'=>{de=>'Service&Support Klasse - SAP Leistungsart'},

@@ -4,7 +4,7 @@
 'Contract Name'=>{de=>'Vertragsbezeichnung'},
 'Order Ticket Typ'=>{de=>'Bestellscheintyp'},
 'Order Tickets'=>{de=>'Bestellscheine'},
-'CO-Number'=>{de=>'CO-/Kostenstellennummer'},
+'CO-Number'=>{de=>'Kontierungsobjekt',en=>'Costcenter'},
 'Account-Number'=>{de=>'Account-Nummer'},
 'Duration Start'=>{de=>'Laufzeitbegin'},
 'Duration End'=>{de=>'Laufzeitende'},
