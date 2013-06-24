@@ -209,8 +209,9 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'interface_tssapp01_01.modifydate'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Boolean(
                 name          =>'isdeleted',
+                uivisible     =>0,
                 label         =>'is deleted',
                 dataobjattr   =>'interface_tssapp01_01.isdeleted'),
 
