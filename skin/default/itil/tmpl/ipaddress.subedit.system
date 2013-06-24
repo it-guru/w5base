@@ -2,13 +2,17 @@
    <table class=editframe>
       <tr>
          <td class=fname width=10%>%name(label)%:</td>
-         <td class=finput width=40%>%name(sublistedit)%</td>
+         <td class=finput>%name(sublistedit)%</td>
+      </tr>
+      <tr>
          <td class=fname width=10%>%network(label)%:</td>
-         <td class=finput width=40%>%network(sublistedit)%</td>
+         <td class=finput>%network(sublistedit)%</td>
       </tr>
       <tr>
          <td class=fname>%dnsname(label)%:</td>
          <td class=finput>%dnsname(sublistedit)%</td>
+      </tr>
+      <tr>
          <td class=fname>%type(label)%:</td>
          <td class=finput>%type(sublistedit)%</td>
       </tr>

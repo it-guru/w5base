@@ -50,7 +50,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                htmleditwidth =>'40%',
+                htmleditwidth =>'60%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
@@ -88,6 +88,20 @@ sub new
                 label         =>'Binary IP-Adress',
                 group         =>'relatedto',
                 dataobjattr   =>'ipaddress.binnamekey'),
+                                                  
+      new kernel::Field::Boolean(
+                name          =>'is_primary',
+                label         =>'is primary',
+                htmldetail    =>1,
+                group         =>'further',
+                dataobjattr   =>'ipaddress.is_primary'),
+                                                  
+      new kernel::Field::Boolean(
+                name          =>'is_notdeleted',
+                label         =>'is notdeleted',
+                htmldetail    =>1,
+                group         =>'further',
+                dataobjattr   =>'ipaddress.is_notdeleted'),
                                                   
       new kernel::Field::TextDrop(
                 name          =>'itclustsvc',
@@ -260,6 +274,7 @@ sub new
                 group         =>'dnsaliases',
                 vjointo       =>'itil::dnsalias',
                 vjoinon       =>['dnsname'=>'dnsname'],
+                vjoinbase     =>{'cistatusid'=>"<=5"},
                 vjoindisp     =>['fullname']),
 
       new kernel::Field::Link(
@@ -286,6 +301,22 @@ sub new
                 value         =>[qw(0 1 2 3 4 5 8 9 6 7)],
                 dataobjattr   =>'ipaddress.addresstyp'),
 
+      new kernel::Field::Boolean(
+                name          =>'is_monitoring',
+                label         =>'use this ip for system monitoring',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(0) if ($param{current}->{itclustsvcid} ne "");
+                   }
+                   return(1);
+                },
+                depend        =>['itclustsvcid'],
+                group         =>'default',
+                dataobjattr   =>'ipaddress.is_monitoring'),
+                                                  
       new kernel::Field::Text(
                 name          =>'ifname',
                 htmlwidth     =>'130px',
@@ -465,6 +496,30 @@ sub Validate
    if (!defined($cistatusid) || $cistatusid==0){
       $newrec->{cistatusid}=4;
    }
+
+
+   #
+   # Generierung der Typ Flags (Eindeutigkeitssicherung)
+   #
+   my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
+   my $is_primary=effVal($oldrec,$newrec,"is_primary");
+   my $is_notdeleted=effVal($oldrec,$newrec,"is_notdeleted");
+   my $type=effVal($oldrec,$newrec,"type");
+   if ($type eq "0" && $is_primary ne "1"){
+      $newrec->{is_primary}=1;
+   }
+   if ($type ne "0" && $is_primary ne ""){
+      $newrec->{is_primary}=undef;
+   }
+   if ($cistatusid<=5 && $is_notdeleted ne "1"){
+      $newrec->{is_notdeleted}=1;
+   }
+   if ($cistatusid>5 && $is_notdeleted ne ""){
+      $newrec->{is_notdeleted}=undef;
+   }
+   ##################################################################
+
+
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
    my $binnamekey="";

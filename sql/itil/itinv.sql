@@ -1244,3 +1244,6 @@ alter table system
  add perf1url varchar(128),add perf1date datetime,add perf1mode varchar(10),
  add perf2url varchar(128),add perf2date datetime,add perf2mode varchar(10),
  add perf3url varchar(128),add perf3date datetime,add perf3mode varchar(10);
+alter table ipaddress add is_notdeleted int(1) default '1', add is_primary int(1) default null;
+update ipaddress set is_notdeleted=null where cistatus>=6;
+alter table ipaddress add is_monitoring int(1) default null, add unique moncheck(is_notdeleted,is_monitoring,system), add unique primcheck(is_notdeleted,is_primary,system);
