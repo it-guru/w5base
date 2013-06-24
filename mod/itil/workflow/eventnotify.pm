@@ -976,6 +976,10 @@ sub isViewValid
    if ($rec->{eventmode} eq "EVk.free"){
       @grps=grep(!/^(relations|affected)$/,@grps);
    }
+   else{
+      push(@grps,"affected"); # needs to be always visible (itstatus! anonym)
+   }
+
 
    return(@grps);
 }
