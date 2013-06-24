@@ -517,6 +517,10 @@ sub Validate
    if ($cistatusid>5 && $is_notdeleted ne ""){
       $newrec->{is_notdeleted}=undef;
    }
+   my $is_monitoring=effVal($oldrec,$newrec,"is_monitoring");
+   if ($is_monitoring ne "1" && $is_monitoring ne ""){
+      $newrec->{is_monitoring}=undef;
+   }
    ##################################################################
 
 
