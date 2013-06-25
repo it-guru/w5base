@@ -253,7 +253,7 @@ sub getSubListData
       my %flt=($self->{vjoinon}->[1]=>$srcval);
       my @fltlst=(\%flt);
       if (ref($self->{vjoinonfinish}) eq "CODE"){  # this allows dynamic joins
-         @fltlst=&{$self->{vjoinonfinish}}($self,\%flt,$current);
+         @fltlst=&{$self->{vjoinonfinish}}($self,\%flt,$current,$mode);
       }
 
       $self->vjoinobj->SetFilter(@fltlst);

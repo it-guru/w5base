@@ -334,19 +334,35 @@ sub new
                 label         =>'technical product string from instance',
                 dataobjattr   =>'swinstance.techprodstring'),
 
-  #    new kernel::Field::SubList(
-  #              name          =>'systems',
-  #              label         =>'Systems',
-  #              group         =>'systems',
-  #              allowcleanup  =>1,
-  #              subeditmsk    =>'subedit.swinstance',
-  #              vjointo       =>'itil::lnkswinstancesystem',
-  #              vjoinbase     =>[{systemcistatusid=>"<=5"}],
-  #              vjoinon       =>['id'=>'swinstanceid'],
-  #              vjoindisp     =>['system','systemsystemid','systemcistatus',
-  #                               'shortdesc'],
-  #              vjoininhash   =>['system','systemsystemid','systemcistatus',
-  #                               'systemid']),
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Instance-Relations',
+                group         =>'relations',
+                subeditmsk    =>'subedit.swinstance',
+                vjointo       =>'itil::lnkswinstanceswinstance',
+                vjoineditbase =>{'cistatusid'=>"<=5"},
+                vjoinon       =>['id'=>'fromswi'],
+#                vjoinonfinish =>sub{
+#                   my $self=shift;
+#                   my $flt=shift;
+#                   my $param=shift;
+#                   my $mode=shift;
+#                   my @flt=($flt);
+#                   push(@flt,{toswi=>$flt->{fromswi}});
+#
+#                   return(\@flt);
+#                },
+                vjoindisp     =>['toswinstance','conmode']),
+
+      new kernel::Field::Text(
+                name          =>'referedat',
+                label         =>'refered by',
+                group         =>'relations',
+                readonly      =>1,
+                vjointo       =>'itil::lnkswinstanceswinstance',
+                vjoineditbase =>{'cistatusid'=>"<=5"},
+                vjoinon       =>['id'=>'toswi'],
+                vjoindisp     =>['fromswinstance']),
 
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
@@ -920,6 +936,7 @@ sub isViewValid
 
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc env history control
+              relations
               softwareinst contacts attachments source swinstanceparam);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
@@ -941,7 +958,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default adm systems contacts ssl env misc 
-                       softwareinst
+                       softwareinst relations
                        attachments cluster control sec);
    if (!defined($rec)){
       return(@databossedit);
@@ -992,7 +1009,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default adm sec env misc cluster 
              systems softwareinst contacts swinstanceparam ssl 
-             control attachments source));
+             control attachments relations source));
 }
 
 

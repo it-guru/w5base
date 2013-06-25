@@ -1,0 +1,5 @@
+'itil::lnkswinstanceswinstance'=>{de=>'Software-Instanz Relation',en=>'Software-Instance relation'},
+'RELDEPEND'=>{de=>'"Ziel-Instanz" ist notwendig um aktuelle "Instanz" auszuführen'},
+'target Instance'=>{de=>'Ziel Instanz'},
+'Instance'=>{de=>'Instanz'},
+'no write access'=>{de=>'kein Schreibzugriff auf die Instanz'},

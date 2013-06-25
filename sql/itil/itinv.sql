@@ -1247,3 +1247,25 @@ alter table system
 alter table ipaddress add is_notdeleted int(1) default '1', add is_primary int(1) default null;
 update ipaddress set is_notdeleted=null where cistatus>=6;
 alter table ipaddress add is_monitoring int(1) default null, add unique MonitoringUniqueCheck(is_notdeleted,is_monitoring,system), add unique PrimaryUniqueCheck(is_notdeleted,is_primary,system);
+create table lnkswinstanceswinstance (
+  id bigint(20) NOT NULL,
+  fromswi bigint(20) NOT NULL,
+  toswi bigint(20) NOT NULL,
+  conmode varchar(10) default NULL,
+  comments longtext,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys varchar(100) default 'w5base',
+  srcid varchar(20) default NULL,
+  srcload datetime default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY srcsys (srcsys,srcid),
+  KEY toswi (toswi),unique(conmode,toswi,fromswi),
+  KEY fromswi (fromswi),
+  FOREIGN KEY fk_swi1 (toswi) REFERENCES swinstance (id) ON DELETE RESTRICT,
+  FOREIGN KEY fk_swi2 (fromswi) REFERENCES swinstance (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
