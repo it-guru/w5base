@@ -56,7 +56,9 @@ sub ProcessServiceCenterRecord
    }
    if (defined($wfstorerec)){
       # create new
-      if ($wfstorerec->{name}=~m/^\s*$/){ # siehe WF:13397595390001
+      my $chkname=$wfstorerec->{name};
+      $chkname=trim(rmNonLatin1($wfstorerec->{name}));
+      if ($chkname eq ""){ # siehe WF:13397595390001
          return;
       }
       if (!defined($updateto) || $updateto eq ""){
