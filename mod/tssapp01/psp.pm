@@ -262,6 +262,9 @@ sub Validate
    my $newrec=shift;
 
    $newrec->{etype}='PSP';
+   if (exists($newrec->{isdeleted}) && $newrec->{isdeleted} eq ""){
+      $newrec->{isdeleted}="0";
+   }
 
    return(1);
 }
