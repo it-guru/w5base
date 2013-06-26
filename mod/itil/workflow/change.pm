@@ -210,8 +210,10 @@ sub getNotifyDestinations
    }
    if ($mode eq "all"){
       my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
-      my $aaflt=[{fromapplid=>$applid},
-                 {toapplid=>$applid}];
+      my $aaflt=[{fromapplid=>$applid,
+                  cistatusid=>[4]},
+                 {toapplid=>$applid,
+                  cistatusid=>[4]}];
       $aa->SetFilter($aaflt);
       foreach my $aarec ($aa->getHashList(qw(fromapplid toapplid contype
                                            toapplcistatus))){

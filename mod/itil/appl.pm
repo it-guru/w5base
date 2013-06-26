@@ -777,7 +777,7 @@ sub new
                 forwardSearch =>1,
                 subeditmsk    =>'subedit.appl',
                 vjointo       =>'itil::lnkapplappl',
-                vjoinbase     =>[{toapplcistatus=>"<=5"}],
+                vjoinbase     =>[{toapplcistatus=>"<=5",cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'fromapplid'],
                 vjoindisp     =>['toappl','contype','conproto','conmode'],
                 vjoininhash   =>['toappl','contype','conproto','conmode',

@@ -5,6 +5,10 @@
          <td class=finput colspan=3>%toappl(sublistedit)%</td>
       </tr>
       <tr>
+         <td class=fname width=10%>%cistatus(label)%:</td>
+         <td class=finput colspan=3>%cistatus(sublistedit)%</td>
+      </tr>
+      <tr>
          <td class=fname width=10%>%contype(label)%:</td>
          <td class=finput colspan=3>%contype(sublistedit)%</td>
       </tr>

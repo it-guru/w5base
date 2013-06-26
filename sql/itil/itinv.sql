@@ -1269,3 +1269,4 @@ create table lnkswinstanceswinstance (
   FOREIGN KEY fk_swi1 (toswi) REFERENCES swinstance (id) ON DELETE RESTRICT,
   FOREIGN KEY fk_swi2 (fromswi) REFERENCES swinstance (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table lnkapplappl add cistatus int(2) default '4', add exch_personal_data int(2) default '0',add agreements longtext default NULL;

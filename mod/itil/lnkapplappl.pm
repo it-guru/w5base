@@ -52,6 +52,22 @@ sub new
                 vjoindisp     =>'name'),
 
       new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'Interface-State',
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoineditbase =>{id=>[3,4,5,6]},
+                default       =>'4',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'lnkapplappl.cistatus'),
+
+      new kernel::Field::Select(
                 name          =>'contype',
                 label         =>'Interfacetype',
                 htmlwidth     =>'250px',
@@ -94,6 +110,13 @@ sub new
                 label         =>'Interface description',
                 dataobjattr   =>'lnkapplappl.description'),
 
+      new kernel::Field::Htmlarea(
+                name          =>'htmlagreements',
+                searchable    =>0,
+                group         =>'agreement',
+                label         =>'Agreements',
+                dataobjattr   =>'lnkapplappl.agreements'),
+
       new kernel::Field::SubList(
                 name          =>'interfacescomp',
                 label         =>'Interface components',
@@ -135,7 +158,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'monitor',
-                group         =>'comdetails',
+                group         =>'classi',
                 label         =>'Interface Monitoring',
                 allowempty    =>1,
                 weblinkto     =>"none",
@@ -153,13 +176,13 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'rawmonitor',
-                group         =>'comdetails',
+                group         =>'classi',
                 label         =>'raw Interface Monitoring',
                 dataobjattr   =>'lnkapplappl.monitor'),
 
       new kernel::Field::Select(
                 name          =>'monitortool',
-                group         =>'comdetails',
+                group         =>'classi',
                 label         =>'Interface Monitoring Tool',
                 allowempty    =>1,
                 weblinkto     =>"none",
@@ -177,13 +200,13 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'rawmonitortool',
-                group         =>'comdetails',
+                group         =>'classi',
                 label         =>'raw Interface Monitoring Tool',
                 dataobjattr   =>'lnkapplappl.monitortool'),
 
       new kernel::Field::Select(
                 name          =>'monitorinterval',
-                group         =>'comdetails',
+                group         =>'classi',
                 label         =>'Interface Monitoring Interval',
                 allowempty    =>1,
                 weblinkto     =>"none",
@@ -201,9 +224,21 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'rawmonitorinterval',
-                group         =>'comdetails',
+                group         =>'classi',
                 label         =>'raw Interface Monitoring Interval',
                 dataobjattr   =>'lnkapplappl.monitorinterval'),
+
+
+      new kernel::Field::Select(
+                name          =>'persrelated',
+                group         =>'classi',
+                label         =>'transfer of person related informations',
+                default       =>'0',
+                transprefix   =>'PERS.',
+                value         =>[0,1,2],
+                htmleditwidth =>'200px',
+                dataobjattr   =>'lnkapplappl.exch_personal_data'),
+
 
       new kernel::Field::Text(
                 name          =>'implapplversion',
@@ -298,10 +333,21 @@ sub new
 
    );
    $self->{history}=[qw(insert modify delete)];
-   $self->setDefaultView(qw(id fromappl toappl cdate editor));
+   $self->setDefaultView(qw(fromappl toappl cistatus cdate editor));
    $self->setWorktable("lnkapplappl");
    return($self);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 
 sub getSqlFrom
@@ -368,8 +414,17 @@ sub Validate
       $self->LastMsg(ERROR,"invalid notation of the to URL");
       return(0);
    }
-
-
+   if (!defined($oldrec) && !exists($newrec->{htmldescription})){
+      $newrec->{htmldescription}=
+         "<ul><li>Technical Realisation</li></ul>".
+         "(nothing documented)<br><br>\n".
+         "<ul><li>Transfer Volumes</li></ul>".
+         "(nothing documented)<br><br>\n".
+         "<ul><li>Delivery Times/Delivery Intervals</li></ul>".
+         "(nothing documented)<br><br>\n".
+         "<ul><li>Detailed Description of Monitoring</li></ul>".
+         "(nothing documented)<br><br>\n";
+   }
 
    if (exists($newrec->{toapplid}) && 
        (!defined($oldrec) || $oldrec->{toapplid}!=$toapplid)){
@@ -398,7 +453,8 @@ sub Validate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default desc comdetails impl interfacescomp source));
+   return(qw(header default desc comdetails impl interfacescomp 
+             agreement classi source));
 }
 
 
@@ -423,7 +479,8 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
    my $applid=effVal($oldrec,$newrec,"fromapplid");
-   my @editgroup=("default","interfacescomp","desc","comdetails","impl");
+   my @editgroup=("default","interfacescomp","desc","agreement",
+                  "comdetails","impl","classi");
 
    return(@editgroup) if (!defined($oldrec) && !defined($newrec));
    return(@editgroup) if ($self->IsMemberOf("admin"));
@@ -463,7 +520,7 @@ sub InterfaceAgreement
    print("<div class=lnkdocument>");
    my $id=Query->Param("id");
    $self->ResetFilter();
-   $self->SetFilter({id=>\$id});
+   $self->SetFilter({id=>\$id,cistatusid=>"<=5"});
    my ($masterrec,$msg)=$self->getOnlyFirst(qw(fromapplid toapplid));
    if (defined($masterrec)){
       my $appl=getModuleObject($self->Config,"itil::appl");
@@ -502,9 +559,11 @@ sub InterfaceAgreement
       $l[1]->{targetname}=$l[0]->{name};
       $self->ResetFilter();
       $self->SetFilter([{fromapplid=>\$l[0]->{id},
-                         toapplid=>\$l[0]->{targetid}},
+                         toapplid=>\$l[0]->{targetid},
+                         cistatusid=>"<=5"},
                         {fromapplid=>\$l[1]->{id},
-                         toapplid=>\$l[1]->{targetid}}]);
+                         toapplid=>\$l[1]->{targetid},
+                         cistatusid=>"<=5"}]);
       my @iflist=$self->getHashList(qw(cdate mdate 
                                        fromapplid toapplid contype 
                                        conmode conproto
