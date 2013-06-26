@@ -84,7 +84,7 @@ sub getDefaultContractor
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
-   return('admin');
+   return('admin','base::grp','1');
 }
 
 sub getPosibleActions
