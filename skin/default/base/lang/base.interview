@@ -48,3 +48,4 @@
 'answer contact from parent'=>{de=>'Beantwortungskontakt aus Elternobjekt'},
 'additional quest data'=>{de=>'zusätzlich Frage-Daten'},
 'invalid question specified'=>{de=>'ungültiger Frage-Text'},
+'no write access to requested categorie'=>{de=>'kein Schreibzugriff auf die angegebene Kategorie'},

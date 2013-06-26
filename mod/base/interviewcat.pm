@@ -78,7 +78,7 @@ sub new
                 label         =>'full Label',
                 weblinkto     =>'NONE',
                 vjointo       =>'base::interviewcatTree',
-                vjoinon       =>['id'=>'startid'],
+                vjoinon       =>['id'=>'start_up_id'],
                 sortvalue     =>'NONE',
                 vjoinconcat   =>'.',
                 vjoindisp     =>'label'),
@@ -90,7 +90,7 @@ sub new
                 searchable    =>0,
                 label         =>'categorie tree',
                 vjointo       =>'base::interviewcatTree',
-                vjoinon       =>['id'=>'startid'],
+                vjoinon       =>['id'=>'start_up_id'],
                 vjoindisp     =>['label','mgrgroup'],
                 vjoininhash   =>['label','mgrgroupid']),
 

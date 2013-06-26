@@ -76,7 +76,7 @@ sub new
                 searchable    =>0,
                 label         =>'categorie tree',
                 vjointo       =>'base::interviewcatTree',
-                vjoinon       =>['interviewcatid'=>'startid'],
+                vjoinon       =>['interviewcatid'=>'start_up_id'],
                 vjoindisp     =>['label','mgrgroup'],
                 vjoininhash   =>['label','mgrgroupid']),
 
@@ -461,12 +461,28 @@ sub SecureSetFilter
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                               [orgRoles(),qw(RCFManager RCFManager2)],"both");
+                               [qw(RMember RCFManager RCFManager2)],"both");
       my @grpids=keys(%grps);
+      my @catid;
+      {
+         my $cat=$self->getPersistentModuleObject("base::interviewcat");
+         $cat->SetFilter({mgrgroupid=>\@grpids});
+         my @cattop=$cat->getVal("fullname");
+         if ($#cattop!=-1){
+            $cat->ResetFilter();
+            $cat->SetFilter({fullname=>
+                             join(" ",map({'"'.$_.'" "'.$_.'.*"'} @cattop))});
+            @catid=$cat->getVal("id");
+         }
+      }
+
       my $userid=$self->getCurrentUserId();
-      push(@flt,[
-                 {contactid=>\$userid},       {contact2id=>\$userid}
-                ]);
+      my @secflt=({contactid=>\$userid},
+                  {contact2id=>\$userid});
+      if ($#catid!=-1){
+         push(@secflt,{interviewcatid=>\@catid});
+      }
+      push(@flt,\@secflt);
    }
    return($self->SetFilter(@flt));
 }
@@ -497,7 +513,7 @@ sub isCopyValid
 {
    my $self=shift;
    my $rec=shift;  # if $rec is not defined, insert is validated
-   if ($self->isWriteValid()){
+   if ($self->isWriteValid($rec)){
       return(1);
    }
    return(0);
@@ -559,6 +575,19 @@ sub Validate
       $self->LastMsg(ERROR,"parentobj not prepaired for interview handling"); 
       return(undef);
    }
+
+  # my $interviewcatid=effVal($oldrec,$newrec,"interviewcatid");
+  # if (effChanged($oldrec,$newrec,"interviewcatid")){
+  #    my $iwr=0;
+  #    my $icat=getModuleObject($self->Config,"base::interviewcat");
+  #    $icat->SetFilter({id=>\$icat});
+  #    
+  #    if (!$iwr){
+  #       $self->LastMsg(ERROR,"no write access to requested categorie"); 
+  #       return(undef);
+  #    }
+  # }
+   
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"qtag"));
    return(1);
@@ -648,14 +677,13 @@ sub isWriteValid
          return("default","tech");
       }
      
-      return(undef);
+      return();
    }
 
 
-   return("default","tech") if ($rec->{contactid}==$userid ||
-                                $rec->{contact2id}==$userid ||
-                                $self->IsMemberOf("admin"));
-   return(undef);
+   return("default","tech") if ($rec->{owner} eq $userid ||
+                                $self->checkAnserWrite(0,$rec,undef,undef));
+   return();
 }
 
 sub FinishWrite

@@ -43,8 +43,12 @@ sub new
                 dataobjattr   =>'interviewcat.id'),
 
       new kernel::Field::Text(
-                name          =>'startid',
-                label         =>'StartID'),
+                name          =>'start_up_id',
+                label         =>'Start_upsearch_ID'),
+
+      new kernel::Field::Text(
+                name          =>'start_down_id',
+                label         =>'Start_downsearch_ID'),
 
       new kernel::Field::Text(
                 name          =>'level',
@@ -108,11 +112,12 @@ sub getSqlFrom
    my @filter=@_;
 
    if ($mode eq "select" && $#filter==0 && ref($filter[0]) eq "HASH" &&
-       keys(%{$filter[0]})==1 && exists($filter[0]->{startid}) &&
-       (($filter[0]->{startid}=~m/^\d+$/) || ref($filter[0]->{startid}))){
-      my $startid=$filter[0]->{startid};
-      $startid=$startid->[0] if (ref($startid) eq "ARRAY");
-      $startid=$$startid     if (ref($startid) eq "SCALAR");
+       keys(%{$filter[0]})==1 && exists($filter[0]->{start_up_id}) &&
+       (($filter[0]->{start_up_id}=~m/^\d+$/) || 
+         ref($filter[0]->{start_up_id}))){
+      my $start_up_id=$filter[0]->{start_up_id};
+      $start_up_id=$start_up_id->[0] if (ref($start_up_id) eq "ARRAY");
+      $start_up_id=$$start_up_id     if (ref($start_up_id) eq "SCALAR");
       my $from=<<EOF;
 
 (SELECT    
@@ -121,7 +126,7 @@ sub getSqlFrom
                                     FROM interviewcat WHERE id = \@id),
                   NULL) AS parentID
         FROM interviewcat, 
-             (SELECT \@id := '$startid', \@entryLevel:=0) AS vars
+             (SELECT \@id := '$start_up_id', \@entryLevel:=0) AS vars
         WHERE
             \@id IS NOT NULL
     ) AS dat JOIN interviewcat ON dat.id = interviewcat.id

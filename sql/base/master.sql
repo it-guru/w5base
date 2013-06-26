@@ -269,9 +269,9 @@ CREATE TABLE interviewcat (
    modifydate datetime NOT NULL default '0000-00-00 00:00:00',
    editor varchar(100) NOT NULL default '',
    realeditor varchar(100) NOT NULL default '',
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id),FOREIGN KEY (parentid) REFERENCES interviewcat (id) ON DELETE RESTRICT,
   UNIQUE KEY fullname (fullname),key name (name),key parentid (parentid)
-);
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table interview add cistatus int(2) NOT NULL;
 alter table interviewcat add createuser bigint(20) NOT NULL default '0';
 alter table interview add effectonmttr int(1) NOT NULL default '0';

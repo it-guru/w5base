@@ -398,8 +398,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL") if ($self->IsMemberOf("admin"));
-   return();
+   #return("ALL") if ($self->IsMemberOf("admin"));
+   return("ALL");
 }
 
 sub isWriteValid
@@ -552,7 +552,17 @@ sub SecureSetFilter
       if ($#user==-1){
          push(@user,-99);
       }
-      push(@flt,[ {owner=>\@user}]);   # only answers from me or my team
+      my @secflt=({owner=>\@user});    # only answers from me or my team
+      @secflt=();
+
+      my $i=getModuleObject($self->Config,"base::interview");
+      $i->SecureSetFilter({});  # all categories i can see
+      my @iid=$i->getVal("id");
+      if ($#iid!=-1){
+         push(@secflt,{interviewid=>\@iid});
+      }
+
+      push(@flt,\@secflt);
    }
    return($self->SetFilter(@flt));
 }
