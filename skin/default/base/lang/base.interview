@@ -33,6 +33,7 @@
 'QT.percent'=>{de=>'Prozent (10% Schritte)',en=>'percent (10% steps)'},
 'QT.percenta'=>{de=>'Prozent (Antwort ausreichend)',en=>'percent (answer sufficient)'},
 'QT.text'=>{de=>'Freitext',en=>'free text'},
+'QT.select'=>{de=>'Select-Box',en=>'Select-Box'},
 'Contact'=>{de=>'Ansprechpartner'},
 'Deputy Contact'=>{de=>'Ansprechpartner Vertreter'},
 'restriction'=>{de=>'Einschränkung'},

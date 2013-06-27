@@ -270,7 +270,7 @@ sub new
                 value         =>['percent','percenta',
                                  'percent4','text',
                                  'boolean','booleana',
-                                 'date'],
+                                 'date','select'],
                 label         =>'Question Typ',
                 dataobjattr   =>'interview.questtyp'),
 
@@ -682,7 +682,8 @@ sub isWriteValid
 
 
    return("default","tech") if ($rec->{owner} eq $userid ||
-                                $self->checkAnserWrite(0,$rec,undef,undef));
+                                $self->checkAnserWrite(0,$rec,undef,undef) ||
+                                $self->IsMemberOf("admin"));
    return();
 }
 
@@ -810,6 +811,23 @@ sub getHtmlEditElements
       $sel.="<option ";
       $sel.="selected " if ($a!=1 && $a ne "");
       $sel.="value=\"0\">".$self->T("no")."</option>";
+
+      $sel.="</select>";
+      my $p="<table class=Panswer><tr><td align=center>$sel</td></tr></table>";
+      $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
+   }
+   elsif ($irec->{questtyp} eq "select"){
+      my $a="";
+      $a=$answer->{answer} if (defined($answer));
+      my $sel="<select name=answer $opmode style=\"width:80px\">";
+      
+      $sel.="<option ";
+      $sel.="value=\"\"></option>";
+      foreach my $opt (split(/\|/,$irec->{addquestdata})){
+         $sel.="<option ";
+         $sel.="selected " if ($a eq $opt);
+         $sel.="value=\"$opt\">$opt</option>";
+      }
 
       $sel.="</select>";
       my $p="<table class=Panswer><tr><td align=center>$sel</td></tr></table>";
