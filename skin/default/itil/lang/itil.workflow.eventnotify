@@ -191,3 +191,4 @@
 'event is consequence of other events'=>{de=>'Ereignis ist Folgeeffekt eines anderen Ereignisses'},
 'consequence of events'=>{de=>'Ereignis ausgelöst durch'},
 'Affected applicationgroup'=>{de=>'betroffene Anwendungsgruppe'},
+'reporting groupname'=>{de=>'Reporting Gruppenname'},

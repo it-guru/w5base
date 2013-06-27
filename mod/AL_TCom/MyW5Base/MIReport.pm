@@ -230,9 +230,12 @@ sub Result
          filter=>{id=>$sheet{$s}},
          view=>[qw(
                    wffields.eventendofevent
+                   wffields.eventstatreportgroup
+
                    wffields.affectedlocation 
                    wffields.affectedapplication
-                   wffields.affectedapplicationgroup
+                   wffields.affectednetwork
+
                    wffields.affecteditemprio
                    name 
                    wffields.eventstartofevent

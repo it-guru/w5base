@@ -337,6 +337,7 @@ sub new
                 label         =>'all related E-Mail adresses',
                 readonly      =>1,
                 htmldetail    =>0,
+                searchable    =>0,
                 group         =>'userro',
                 vjointo       =>'base::useremail',
                 vjoinon       =>['userid'=>'userid'],  

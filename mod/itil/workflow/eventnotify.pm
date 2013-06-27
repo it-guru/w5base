@@ -702,6 +702,13 @@ sub getDynamicFields
                                  '5'],
                 container     =>'headref'),
 
+      new kernel::Field::Text(
+                name          =>'eventstatreportgroup',
+                translation   =>'itil::workflow::eventnotify',
+                group         =>'eventnotifystat',
+                label         =>'reporting groupname',
+                container     =>'headref'),
+
       new kernel::Field::Select(
                 name          =>'eventmode',
                 translation   =>'itil::workflow::eventnotify',
@@ -1917,7 +1924,6 @@ package itil::workflow::eventnotify::askmode;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -2185,7 +2191,6 @@ package itil::workflow::eventnotify::askbprocess;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -2343,7 +2348,6 @@ package itil::workflow::eventnotify::askloc;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -2428,7 +2432,6 @@ package itil::workflow::eventnotify::askroom;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateStoredWorkspace
@@ -2640,7 +2643,8 @@ sub nativProcess
             my %affecteditemgroup;
             foreach my $lrec ($l->getHashList(qw(prio cistatus id name
                                                  mgmtitemgroup
-                                                 grprelations))){
+                                                 grprelations
+                                                 location address1))){
                if (ref($lrec->{mgmtitemgroup}) eq "ARRAY"){
                   map({$affecteditemgroup{$_}++;} @{$lrec->{mgmtitemgroup}});
                }
@@ -2660,6 +2664,12 @@ sub nativProcess
                      $affectedcustomerid{$rel->{grpid}}++;
                   }
                }
+               $h->{eventstatreportgroup}=$lrec->{location}.' '.
+                                          $lrec->{address1};   
+               if ($h->{eventstatreportgroup} eq ""){
+                  $lrec->{name};
+               }
+               $h->{eventstatreportgroup}=~s/\s/_/g;
             }
             $h->{affecteditemgroup}=[sort(keys(%affecteditemgroup))];
             if (defined($affecteditemprio)){
@@ -2706,6 +2716,11 @@ sub nativProcess
             $h->{affecteditemgroup}=[sort(keys(%affecteditemgroup))];
             $h->{affectedapplicationid}=[$arec->{id}];   
             $h->{affectedapplicationgroup}=[$arec->{applgroup}];   
+            $h->{eventstatreportgroup}=$arec->{applgroup};   
+            if ($h->{eventstatreportgroup} eq ""){
+               $h->{eventstatreportgroup}=$arec->{name};
+            }
+            $h->{eventstatreportgroup}=~s/\s/_/g;
             $h->{affectedapplication}=[$arec->{name}];   
             $h->{mandatorid}=[$arec->{mandatorid}];   
             $h->{mandator}=[$arec->{mandator}];   
@@ -2731,7 +2746,6 @@ sub nativProcess
                delete($h->{affectedcontract});
                delete($h->{affectedcontractid});
             }
-            print STDERR Dumper($arec);
             if ($arec->{customer} ne ""){
                $h->{affectedcustomer}=[$arec->{customer}];
                $h->{affectedcustomerid}=[$arec->{customerid}];
@@ -2753,6 +2767,8 @@ sub nativProcess
                                         $self->getParent->Self);
          $h->{name}=$self->getParent->T("Network-notification:").
                     " ".$self->T($region,"itil::workflow::eventnotify");
+         $h->{eventstatreportgroup}="Network";
+         $h->{eventstatreportgroup}=~s/\s/_/g;
          if (!$self->getParent->ValidateCreate($h)){
             return(0);
          }
@@ -2792,6 +2808,8 @@ sub nativProcess
                delete($h->{affectedcustomer});
                delete($h->{affectedcustomerid});
             }
+            $h->{eventstatreportgroup}=$prec->{fullname};
+            $h->{eventstatreportgroup}=~s/\s/_/g;
          }
          else{
             $self->getParent->LastMsg(ERROR,
@@ -2807,6 +2825,8 @@ sub nativProcess
                $h->{eventstatclass}=4;
             }
          }
+         $h->{eventstatreportgroup}="FREE";
+         $h->{eventstatreportgroup}=~s/\s/_/g;
       }
       else{
          $self->getParent->LastMsg(ERROR,"invalid eventmode '$h->{eventmode}'");
@@ -3015,7 +3035,6 @@ package itil::workflow::eventnotify::main;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 sub generateWorkspace
@@ -3346,13 +3365,6 @@ sub Process
          $self->LastMsg(ERROR,"no termin text"); 
          return(undef);
       }
-
-#printf STDERR ("fifi emailto=%s\n",Dumper(\$emailto));
-#printf STDERR ("fifi emailtext=%s\n",Dumper(\$emailtext));
-#printf STDERR ("fifi rawterminstart=%s\n",Dumper(\$rawterminstart));
-#printf STDERR ("fifi rawterminend=%s\n",Dumper(\$rawterminend));
-#printf STDERR ("fifi tstart=%s\n",Dumper(\$tstart));
-#printf STDERR ("fifi tend=%s\n",Dumper(\$tend));
 
       my $wf=getModuleObject($self->Config,"base::workflow");
       my %notiy;
