@@ -233,6 +233,7 @@ sub processFile
          $wrrec->{srcsys}=$srcsys;
          $wrrec->{srcid}=$wrrec->{name};
          $wrrec->{srcload}=NowStamp("en");
+         $wrrec->{isdeleted}="0" if ($wrrec->{isdeleted} eq "");
          if (($wrrec->{name}=~m/^\s*$/) ||
              ($wrrec->{name}=~m/\s/)){
             msg(ERROR,"RefreshSAPP01: ".
@@ -240,9 +241,9 @@ sub processFile
                       "WBS-Number '".$wrrec->{name}."' at line $line");
          }
          else{
-            $if->ResetFilter();
-            $if->SetFilter({'name'=>\$wrrec->{'name'}});
-            my ($oldrec)=$if->getOnlyFirst(qw(name id));
+         #   $if->ResetFilter();
+         #   $if->SetFilter({'name'=>\$wrrec->{'name'}});
+         #   my ($oldrec)=$if->getOnlyFirst(qw(name id));
             # validate against postible existing record
             if (exists($k{$wrrec->{'name'}})){
                print STDERR Dumper($wrrec);
