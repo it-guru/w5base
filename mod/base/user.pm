@@ -332,6 +332,17 @@ sub new
                 vjoindisp     =>['email','cistatus','emailtyp'],
                 vjoininhash   =>['id','email','cistatusid','emailtyp']),
 
+      new kernel::Field::SubList(
+                name          =>'allemails',
+                label         =>'all related E-Mail adresses',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'userro',
+                vjointo       =>'base::useremail',
+                vjoinon       =>['userid'=>'userid'],  
+                vjoindisp     =>['email','cistatus','emailtyp'],
+                vjoininhash   =>['id','email','cistatusid','emailtyp']),
+
       new kernel::Field::Phonenumber(
                 name          =>'office_mobile',
                 group         =>'office',

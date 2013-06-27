@@ -27,6 +27,7 @@
 'Accounts'=>{ de=>'Kennungen'},
 'primary E-Mail'=>{ de=>'primäre E-Mail'},
 'E-Mail adresses'=>{ de=>'E-Mail-Adressen'},
+'all related E-Mail adresses'=>{ de=>'alle verknüpften E-Mail-Adressen'},
 'all nativ phone numbers'=>{ de=>'alle generischen Telefonnummern'},
 'Admin Comments'=>{ de=>'Bemerkungen nur für Admins'},
 'Groups'=>{ de=>'Gruppen'},

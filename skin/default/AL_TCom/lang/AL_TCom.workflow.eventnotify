@@ -38,7 +38,7 @@
 'result of root cause analysis'=>{de=>'Ergebnis der Ursachenanalyse'},
 'Solution Line'=>{de=>'Solution Säule'},
 'net event duration'=>{de=>'Netto Ereignisdauer'},
-'net event duration less then 4h'=>{de=>'Netto Ereignisdauer <4h'},
+'net event duration less or equal then 4h'=>{de=>'Netto Ereignisdauer <=4h'},
 'Root-Cause found in less then 10wt'=>{de=>'RC in weniger als 10AT gefunden'},
 'Root-Cause found at'=>{de=>'RC gefunden am'},
 'rc found date must be behind eventend'=>{de=>'RC gefunden Datum muß nach dem Ereignisende liegen'},

@@ -147,16 +147,19 @@ sub finishWriteRequestHash
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $changed=0;
    my $p=$self->getParent;
 
-   my %oldcopy;
-   %oldcopy=%{$self->RawValue($oldrec)} if (defined($oldrec));
-   my $oldhash=\%oldcopy; 
+   my $oldhash;
+   my $changed=0;
    foreach my $fo ($p->getFieldObjsByView([$p->getCurrentView()],
                                           current=>$newrec,oldrec=>$oldrec)){
-      if (defined($fo->{container}) && $fo->{container} eq $self->Name()){
+      if (exists($fo->{container}) && $fo->{container} eq $self->Name()){
          if (exists($newrec->{$fo->Name()})){
+            if (!defined($oldhash)){ # read oldhash value only if a entry
+               my %oldcopy;          # of the container is specified in newrec
+               %oldcopy=%{$self->RawValue($oldrec)} if (defined($oldrec));
+               $oldhash=\%oldcopy; 
+            }
             $oldhash->{$fo->Name()}=$newrec->{$fo->Name()};
             delete($newrec->{$fo->Name()});
             $changed=1;

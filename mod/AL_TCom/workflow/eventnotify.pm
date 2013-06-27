@@ -227,7 +227,7 @@ sub getDynamicFields
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifypost',
                 readonly      =>1,
-                label         =>'net event duration less then 4h',
+                label         =>'net event duration less or equal then 4h',
                 depend        =>['eventstart','eventend','eventnetduration'],
                 onRawValue    =>sub{
                     my $self=shift;
@@ -235,7 +235,7 @@ sub getDynamicFields
                     my $p=$self->getParent;
                     my $fo=$p->getField("eventnetduration",$current);
                     my $v=$fo->RawValue($current);
-                    return($v<4.0 ? 1 : 0) if (defined($v));
+                    return($v<=4.0 ? 1 : 0) if (defined($v));
                     return(undef);
                 }),
 
