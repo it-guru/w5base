@@ -173,6 +173,22 @@ function qhelp(id)
           "resizable=yes,scrollbars=auto");
 }
 
+function expandall(){
+   var c=0;
+   \$(".InterviewQuestBlockHead").each(function(){
+      var o=this;
+      setTimeout(function(){
+         switchQueryBlockOn(o);
+      },c);
+      c=c+800;    // wait some time
+   });
+}
+function collapseall(){
+   \$(".InterviewQuestBlockHead").each(function(){
+      switchQueryBlockOff(this);
+   });
+}
+
 function switchExt(id)
 {
    var e=document.getElementById("EXT"+id);
@@ -185,63 +201,93 @@ function switchExt(id)
       e.style.visibility="hidden";
    }
 }
-function switchQueryBlock(o,id,imode)
+function switchQueryBlockOn(o)
 {
+   var id=\$(o).attr("blkid");
+   var imode=\$(o).attr("imode");
    var e=document.getElementById("BLK"+id);
-   if (e.style.display=="none" || e.style.display==""){
-      e.innerHTML='<center><img src="../../base/load/ajaxloader.gif"></center>';
-      e.style.display="block";
-      e.style.visibility="visible";
-      var o=document.getElementById("BLKON"+id);
-      o.style.display="block";
-      o.style.visibility="visible";
-      var o=document.getElementById("BLKOFF"+id);
-      o.style.display="none";
-      o.style.visibility="hidden";
+   var Q=document.getElementById("QST"+id);
 
-      var xmlhttp=getXMLHttpRequest();
-      var path='HtmlInterviewLink';
-      xmlhttp.open("POST",path);
-      xmlhttp.onreadystatechange=function() {
-       if (xmlhttp.readyState==4 && 
-           (xmlhttp.status==200 || xmlhttp.status==304)){
-          var xmlobject = xmlhttp.responseXML;
-          var result=xmlobject.getElementsByTagName("q");
-          var d="";
-          for (var i = 0; i < result.length; ++i){
-              var childNode=result[i].childNodes[0];
+   if (id>0){
+      Q.innerHTML='<center><img src="../../base/load/ajaxloader.gif">'+
+                  '</center>';
+   }
+   e.style.display="block";
+   e.style.visibility="visible";
+   var o=document.getElementById("BLKON"+id);
+   o.style.display="block";
+   o.style.visibility="visible";
+   var o=document.getElementById("BLKOFF"+id);
+   o.style.display="none";
+   o.style.visibility="hidden";
+   if (id==0){
+      return;
+   }
+   var xmlhttp=getXMLHttpRequest();
+   var path='HtmlInterviewLink';
+   xmlhttp.open("POST",path);
+   xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState==4 && 
+        (xmlhttp.status==200 || xmlhttp.status==304)){
+       var xmlobject = xmlhttp.responseXML;
+       var result=xmlobject.getElementsByTagName("q");
+       var d="";
+       for (var i = 0; i < result.length; ++i){
+           var childNode=result[i].childNodes[0];
+           if (childNode){
+              d+=childNode.nodeValue;
+           }
+       }
+       if (d!=""){
+          Q.innerHTML=d;
+          var jso=xmlobject.getElementsByTagName("js");
+          for (var i = 0; i < jso.length; ++i){
+              var childNode=jso[i].childNodes[0];
               if (childNode){
-                 d+=childNode.nodeValue;
+                 eval(childNode.nodeValue);
               }
           }
-          if (d!=""){
-             e.innerHTML=d;
-             var jso=xmlobject.getElementsByTagName("js");
-             for (var i = 0; i < jso.length; ++i){
-                 var childNode=jso[i].childNodes[0];
-                 if (childNode){
-                    eval(childNode.nodeValue);
-                 }
-             }
-          }
-          else{
-             e.innerHTML="Nix meh drin!";
-          }
        }
-      }
-      var q="$idname=$id&interviewcatid="+id+"&IMODE="+imode;
-      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-      var r=xmlhttp.send(q);
+       else{
+          Q.innerHTML="<br>";
+       }
+    }
+   }
+   var q="$idname=$id&interviewcatid="+id+"&IMODE="+imode;
+   xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+   var r=xmlhttp.send(q);
+}
+
+function switchQueryBlockOff(o)
+{
+   var id=\$(o).attr("blkid");
+   var imode=\$(o).attr("imode");
+   var e=document.getElementById("BLK"+id);
+   var Q=document.getElementById("QST"+id);
+
+   e.style.display="none";
+   e.style.visibility="hidden";
+   var o=document.getElementById("BLKOFF"+id);
+   o.style.display="block";
+   o.style.visibility="visible";
+   var o=document.getElementById("BLKON"+id);
+   o.style.display="none";
+   o.style.visibility="hidden";
+
+}
+
+
+function switchQueryBlock(o)
+{
+   var id=\$(o).attr("blkid");
+   var imode=\$(o).attr("imode");
+   var e=document.getElementById("BLK"+id);
+   var Q=document.getElementById("QST"+id);
+   if (e.style.display=="none" || e.style.display==""){
+      switchQueryBlockOn(o);
    }
    else{
-      e.style.display="none";
-      e.style.visibility="hidden";
-      var o=document.getElementById("BLKOFF"+id);
-      o.style.display="block";
-      o.style.visibility="visible";
-      var o=document.getElementById("BLKON"+id);
-      o.style.display="none";
-      o.style.visibility="hidden";
+      switchQueryBlockOff(o);
    }
 }
 function loadForm(id,xmlobject)
@@ -337,6 +383,12 @@ EOF
        "<td width=10 nowrap>".
        "<img style=\"cursor:pointer\" onclick=\"document.forms[0].submit();\" ".
        "src=\"../../../public/base/load/reload.gif\"></td>".
+       "<td width=10 nowrap>".
+       "<img style=\"cursor:pointer\" onclick=\"expandall();\" ".
+       "src=\"../../../public/base/load/expandall.gif\"></td>".
+       "<td width=10 nowrap>".
+       "<img style=\"cursor:pointer\" onclick=\"collapseall();\" ".
+       "src=\"../../../public/base/load/collapseall.gif\"></td>".
        "</tr></table>";
    $d.="</div>";
    $d.=sprintf("<input type=hidden name=$idname value=\"%s\">",$id);
@@ -463,16 +515,58 @@ EOF
          $lastqblock=$qrec->{queryblock};
       }
       $d.="</div>" if ($lastqblock ne "");
-     # push(@blklist,"open");
-      $lastqblock=undef;
+      my @openlevel;
+      my $vsequence=0;
       for(my $c=0;$c<=$#blklist;$c++){
          #my $blk=$blklist[$c];
          my $blk=$queryblocklabel{$blklist[$c]};
          my $blkid=$blkid[$c];
-         $d.="\n</div>\n" if ($lastqblock ne "");
-         $d.="<div class=InterviewQuestBlockFancyHead>$blk - $label</div>";
-         $d.="\n<div ".
-             "onclick=\"switchQueryBlock(this,'${blkid}','${imode}');\" ".
+         my @curlevel=split(/\./,$blk);
+         switchToLevel(\$d,\@openlevel,\@curlevel,\$vsequence,$blkid,$imode);
+      }
+      switchToLevel(\$d,\@openlevel,[],\$vsequence);
+    
+      $d.="</div></div>";
+   }
+   return($d);
+}
+
+sub switchToLevel
+{
+   my $d=shift;
+   my $from=shift;
+   my $to=shift;
+   my $vsequence=shift;
+   my $last_blkid=shift;
+   my $imode=shift;
+
+   my $blk=join(".",@{$to});
+
+   my $complevel=$#{$to}<$#{$from} ? $#{$from} : $#{$to};
+   my $eqlevel=0;
+
+   for(my $i=0;$i<=$complevel;$i++){
+      if (!defined($to->[$i]) ||
+          !defined($from->[$i]) ||
+          $from->[$i] ne $to->[$i]){
+         $eqlevel=$i;
+         last;
+      }
+   }
+   $eqlevel=0 if ($eqlevel<0);
+   for(my $i=$#{$from};$i>=$eqlevel;$i--){
+       $$d.="</div>";
+   }
+   if ($#{$to}>=$eqlevel){
+      for(my $i=$eqlevel;$i<=$#{$to};$i++){
+         $blk=$to->[$i];
+         my $blkid=$last_blkid;
+         if ($i!=$#{$to}){
+            $blkid="VIRTUAL".$$vsequence;
+            $$vsequence++;
+         }
+         $$d.="\n<div blkid=\"${blkid}\" imode=\"${imode}\" ".
+             "onclick=\"switchQueryBlock(this);\" ".
              "class=InterviewQuestBlockHead>".
              "\n<div id=BLKON${blkid} class=OnOfSwitch ".
              "style=\"visible:hidden;display:none\">".
@@ -481,14 +575,12 @@ EOF
              "style=\"visible:visible;display:block\">".
              "<img border=0 src=\"../../../public/base/load/plus.gif\"></div>".
              "<div style=\"float:none\">$blk</div></div>";
-         $d.="\n<div id=BLK${blkid} name=\"$blk\" class=InterviewQuestBlock>";
-         $lastqblock=$blk;
+         $$d.="\n<div id=BLK${blkid} name=\"$blk\" class=InterviewQuestBlock>";
+         $$d.="\n<div id=QST${blkid} ".
+              "style=\"border-style-left:solid;border-color:black\" ><br></div>";
       }
-      $d.="</div>" if ($lastqblock ne "");
-    
-      $d.="</div></div>";
    }
-   return($d);
+   @{$from}=(@{$to});
 }
 
 
