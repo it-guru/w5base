@@ -58,6 +58,8 @@
 'AL_TCom.swinstance.param'=>{de=>'Life Parameter',en=>'Life Parameter'},
 'AL_TCom.swinstance.lnkswinstance'=>{de=>'Relation',en=>'Relation'},
 'AL_TCom.swinstance.lnkswinstance.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.swinstance.rule'=>{de=>'Config-Regel',en=>'Config-Rule'},
+'AL_TCom.swinstance.rule.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern'=>{de=>'Stammdaten',en=>'Basedata'},
 'AL_TCom.kern.network'=>{de=>'Netzbereich',en=>'Networkarea'},
 'AL_TCom.kern.network.new'=>{de=>'Neueingabe',en=>'New'},

@@ -13,6 +13,7 @@
 'fieldgroup.ssl'=>{de=>'SSL Prüfsystem',en=>'SSL Verification'},
 'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
 'fieldgroup.env'=>{en=>'enviroment documentation',de=>'Umgebungsbeschreibung'},
+'fieldgroup.swinstancerules'=>{en=>'Config rules',de=>'Konfigurationsregeln'},
 'fieldgroup.swinstanceparam'=>{en=>'Life Parameters',de=>'Life Parameter'},
 'fieldgroup.softwareinst'=>{en=>'related Software-Installation',de=>'zugeordnete Software-Installation'},
 'fieldgroup.systems'=>{en=>'running on logical System',de=>'Ausführung auf logischem System'},

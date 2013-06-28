@@ -65,6 +65,8 @@
 'itil.swinstance.param'=>{de=>'Life Parameter',en=>'Life Parameter'},
 'itil.swinstance.lnkswinstance'=>{de=>'Relation',en=>'Relation'},
 'itil.swinstance.lnkswinstance.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.swinstance.rule'=>{de=>'Config-Regel',en=>'Config-Rule'},
+'itil.swinstance.rule.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern'=>{de=>'Stammdaten',en=>'Basedata'},
 'itil.kern.network'=>{de=>'Netzwerk Bereich',en=>'Networkarea'},
 'itil.kern.network.new'=>{de=>'Neueingabe',en=>'New'},

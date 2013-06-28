@@ -61,6 +61,7 @@
 'allow developer request workflows'=>{de=>'Workflow "Anforderung an Anwendungsentwicklung" erlauben'},
 'allow business request workflows'=>{de=>'Workflow "Anforderung an den Anwendungsbetrieb" erlauben'},
 'Application has no system components'=>{de=>'Anwendung hat keine System Komponenten'},
+'Application is not architecture relevant'=>{de=>'Anwendung ist nicht IT-Architektur relevant'},
 'Application has no interfaces'=>{de=>'Anwendung hat keine Schnittstellen'},
 'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien (USA) zu betreuen'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},

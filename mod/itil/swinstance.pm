@@ -549,6 +549,17 @@ sub new
 #                subeditmsk    =>'subedit'),
 
       new kernel::Field::SubList(
+                name          =>'configrules',
+                searchable    =>0,
+                htmleditwidth =>'80%',
+                label         =>'Config Rules',
+                group         =>'swinstancerules',
+                vjoinbase     =>{'cistatusid'=>'<=5'},
+                vjointo       =>'itil::swinstancerule',
+                vjoinon       =>['id'=>'swinstanceid'],
+                vjoindisp     =>['fullname','cistatus']),
+
+      new kernel::Field::SubList(
                 name          =>'lnkswinstanceparam',
                 searchable    =>0,
                 htmleditwidth =>'80%',
@@ -936,7 +947,7 @@ sub isViewValid
 
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc env history control
-              relations
+              relations swinstancerules
               softwareinst contacts attachments source swinstanceparam);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
@@ -958,7 +969,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default adm systems contacts ssl env misc 
-                       softwareinst relations
+                       softwareinst relations swinstancerules
                        attachments cluster control sec);
    if (!defined($rec)){
       return(@databossedit);
@@ -1009,7 +1020,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default adm sec env misc cluster 
              systems softwareinst contacts swinstanceparam ssl 
-             control attachments relations source));
+             control swinstancerules attachments relations source));
 }
 
 

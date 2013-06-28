@@ -914,6 +914,13 @@ sub new
                 dataobjattr   =>'appl.is_applwithnoiface'),
 
       new kernel::Field::Boolean(
+                name          =>'isnotarchrelevant',
+                group         =>'control',
+                htmleditwidth =>'30%',
+                label         =>'Application is not architecture relevant',
+                dataobjattr   =>'appl.isnotarchrelevant'),
+
+      new kernel::Field::Boolean(
                 name          =>'allowdevrequest',
                 group         =>'control',
                 searchable    =>0,

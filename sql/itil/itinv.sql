@@ -1063,17 +1063,17 @@ create table swinstancerule (
   id         bigint(20) NOT NULL,
   swinstance bigint(20) NOT NULL,
   ruletype   char(10)   NOT NULL,
-  appl       bigint(20) default NULL,
-  system     bigint(20) default NULL,
+  refid      bigint(20) default NULL,
+  parentobj  varchar(30) default NULL,parentname varchar(80) default NULL,
   cistatus   int(2)      NOT NULL,
   complexity   int(2)   default '5',isprivate int(2) default '0',
-  rulelabel    varchar(40) default '',
+  rulelabel    varchar(128) default '',
   varname      longtext default NULL,
   vargroup     longtext default NULL,
   varval       longtext default NULL,
-  srcport      longtext default NULL,
-  dsthost      longtext default NULL,
-  dstport      longtext default NULL,
+  srcaddr      longtext default NULL,srcport      longtext default NULL,
+  dstaddr      longtext default NULL,dstport      longtext default NULL,
+  policy       char(20) default 'ALLOW',
   conumber     varchar(40) default NULL,
   comments     longtext default NULL,
   additional   longtext default NULL,
@@ -1087,12 +1087,12 @@ create table swinstancerule (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
-  FOREIGN KEY fk_swinstance (swinstance)
+  FOREIGN KEY fk_pswinstance (swinstance)
               REFERENCES swinstance (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_appl (appl)
-              REFERENCES appl (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_system (system)
-              REFERENCES system (id) ON DELETE CASCADE,
+  key(parentobj,refid),
+  key(rulelabel),
+  key(ruletype),
+  key(swinstance),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=0;
@@ -1270,3 +1270,4 @@ create table lnkswinstanceswinstance (
   FOREIGN KEY fk_swi2 (fromswi) REFERENCES swinstance (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table lnkapplappl add cistatus int(2) default '4', add exch_personal_data int(2) default '0',add agreements longtext default NULL;
+alter table appl add isnotarchrelevant int(1) default '0';

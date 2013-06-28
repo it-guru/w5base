@@ -332,6 +332,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itil.swinstance.rule",
+                      "itil::swinstancerule",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.swinstance.rule.new",
+                      "itil::swinstancerule",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itil.kern",
                       "tmpl/welcome");
    

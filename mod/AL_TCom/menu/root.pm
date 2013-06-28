@@ -324,6 +324,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.swinstance.rule",
+                      "itil::swinstancerule",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("AL_TCom.swinstance.rule.new",
+                      "itil::swinstancerule",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.kern",
                       "tmpl/welcome");

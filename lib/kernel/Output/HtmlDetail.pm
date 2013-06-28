@@ -173,7 +173,9 @@ sub  calcViewMatrix
       my $grouplabel=$fieldlist->[$c]->grouplabel($rec);
       $vMatrix->{fieldhalfwidth}->{$name}=$fieldlist->[$c]->htmlhalfwidth();
       foreach my $fieldgroup (@fieldgrouplist){
-         if (!grep(/^$fieldgroup$/,@{$vMatrix->{grouplist}})){
+         if ((in_array($viewgroups,$fieldgroup) ||
+              in_array($viewgroups,"ALL") ) && 
+             (!grep(/^$fieldgroup$/,@{$vMatrix->{grouplist}}))){
             push(@{$vMatrix->{grouplist}},$fieldgroup);
             $vMatrix->{grouplabel}->{$fieldgroup}=0;
          }
