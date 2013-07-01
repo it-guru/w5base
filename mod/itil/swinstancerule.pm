@@ -40,7 +40,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'LinkID',
+                label         =>'RuleID',
                 searchable    =>0,
                 group         =>'source',
                 dataobjattr   =>'swinstancerule.id'),
@@ -141,14 +141,14 @@ sub new
                 name          =>'toaddr',
                 group         =>'ipfw',
                 label         =>'to IP-Address',
-                dataobjattr   =>'swinstancerule.srcaddr'),
+                dataobjattr   =>'swinstancerule.dstaddr'),
 
       new kernel::Field::Text(
                 name          =>'toport',
                 group         =>'ipfw',
                 htmleditwidth =>'80px',
                 label         =>'to IP-Port',
-                dataobjattr   =>'swinstancerule.srcport'),
+                dataobjattr   =>'swinstancerule.dstport'),
 
       new kernel::Field::Text(
                 name          =>'clifromaddr',
@@ -219,11 +219,13 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'refid',
+                selectfix     =>1,
                 group         =>'link',
                 dataobjattr   =>'swinstancerule.refid'),
 
       new kernel::Field::Link(
                 name          =>'parentobj',
+                selectfix     =>1,
                 group         =>'link',
                 dataobjattr   =>'swinstancerule.parentobj'),
 
@@ -256,6 +258,81 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>'swinstancerule.realeditor'),
+
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                selectfix     =>1,
+                dataobjattr   =>'swinstance.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'swteamid',
+                selectfix     =>1,
+                dataobjattr   =>'swinstance.swteam'),
+
+      new kernel::Field::Link(
+                name          =>'admid',
+                selectfix     =>1,
+                dataobjattr   =>'swinstance.adm'),
+
+      new kernel::Field::Link(
+                name          =>'adm2id',
+                selectfix     =>1,
+                dataobjattr   =>'swinstance.adm2'),
+
+      new kernel::Field::Link(
+                name          =>'appl_databoss',
+                selectfix     =>1,
+                dataobjattr   =>'appl.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'appl_tsmid',
+                selectfix     =>1,
+                dataobjattr   =>'appl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'appl_tsm2id',
+                selectfix     =>1,
+                dataobjattr   =>'appl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'appl_opmid',
+                selectfix     =>1,
+                dataobjattr   =>'appl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'appl_opm2id',
+                selectfix     =>1,
+                dataobjattr   =>'appl.opm2'),
+
+      new kernel::Field::Link(
+                name          =>'system_databoss',
+                selectfix     =>1,
+                dataobjattr   =>'system.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'system_admid',
+                selectfix     =>1,
+                dataobjattr   =>'system.adm'),
+
+      new kernel::Field::Link(
+                name          =>'system_adm2id',
+                selectfix     =>1,
+                dataobjattr   =>'system.adm2'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -300,6 +377,71 @@ EOF
 }
 
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable";
+
+   $from.=" left outer join swinstance on ".
+          " swinstancerule.swinstance=swinstance.id ".
+          " left outer join lnkcontact ".
+          "on lnkcontact.parentobj='itil::swinstance' ".
+          "and swinstance.id=lnkcontact.refid ".
+          "left outer join appl on ".
+          "$worktable.parentobj='itil::appl' and $worktable.refid=appl.id ".
+          "left outer join system on ".
+          "$worktable.parentobj='itil::system' and $worktable.refid=system.id ";
+
+   return($from);
+}
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf([qw(admin w5base.itil.swinstance.read 
+                              w5base.itil.read)],
+                          "RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+            [orgRoles(),qw(RMember RCFManager RCFManager2 
+                           RAuditor RMonitor)],"both");
+      my @grpids=keys(%grps);
+      my $userid=$self->getCurrentUserId();
+      my @addflt=(
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"}
+                );
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         push(@addflt,
+                    {databossid=>\$userid},
+                    {admid=>$userid},       {adm2id=>$userid},
+                    {swteamid=>\@grpids},
+                    {appl_databoss=>\$userid},
+                    {appl_tsmid=>$userid},       {appl_tsm2id=>$userid},
+                    {appl_opmid=>$userid},       {appl_opm2id=>$userid},
+                    {system_databoss=>\$userid},
+                    {system_admid=>$userid},       {system_adm2id=>$userid},
+                   );
+      }
+      push(@flt,\@addflt);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+
+
+
 
 sub Validate
 {
@@ -308,6 +450,7 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   my $userid=$self->getCurrentUserId();
    my $ruletype=effVal($oldrec,$newrec,"ruletype");
    my $fullname;
    if ($ruletype eq "FWAPP"){
@@ -364,18 +507,129 @@ sub Validate
        $swinstanceid,"swinstancerules")){
       $writeok++;
    }
-   if (!$writeok){
-      if ((!defined($oldrec) && $newrec->{cistatusid}==2) ||
-          (defined($oldrec) && $oldrec->{cistatusid}==2 &&
-           $newrec->{cistatusid}==2)){
-         # validate access to request a new rule (bound component access)
-         if ($ruletype eq "FWSYS"){ 
-            # check write access to logical system
-            my $sysid=effVal($oldrec,$newrec,"refid");
+
+
+   my @addrchk;
+   my @portchk;
+   if ($ruletype=~m/^FW/){ 
+      @addrchk=qw(toaddr fromaddr);
+      @portchk=qw(toport fromport);
+   }
+   if ($ruletype=~m/^IPCLIACL$/){ 
+      @addrchk=qw(clifromaddr);
+      @portchk=qw(clitoport);
+   }
+   foreach my $n (@portchk){
+      if (exists($newrec->{$n})){
+         if ($newrec->{$n} ne "any"){
+            my @l=split(/\s*,\s*/,$newrec->{$n});
+            foreach my $chk (@l){
+               if (my ($v1,$v2)=$chk=~m/^(\d+)-(\d+)$/){
+                  if ($v1>=$v2 || 
+                      $v1<=0 || $v1>65535 ||
+                      $v2<=0 || $v2>65535){
+                     $self->LastMsg(ERROR,"invalid port range '%s'",$chk);
+                     return(0);
+                  }
+               }
+               elsif ($chk=~m/^\d+$/){
+                  if (!($chk>=1 && $chk<=65535)){
+                     $self->LastMsg(ERROR,"invalid port '%s'",$chk);
+                     return(0);
+                  }
+               }
+               else{
+                  $self->LastMsg(ERROR,"invalid port '%s'",$chk."($n)");
+                  return(0);
+               }
+            }
          }
-         elsif ($ruletype eq "FWAPP"){ 
-            # check write access to logical system
-            my $appid=effVal($oldrec,$newrec,"refid");
+      }
+   }
+   foreach my $n (@addrchk){
+      if (exists($newrec->{$n})){
+         if ($newrec->{$n} ne "any"){
+            my $chk=$newrec->{$n};
+            my ($o1,$o2,$o3,$o4,$net)=
+               $chk=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/;
+            if ($o1 eq "" || $o1>255 || 
+                $o2 eq "" || $o2>255 ||
+                $o3 eq "" || $o3>255 ||
+                $o4 eq "" || $o4>255 ||
+                $net  eq "" || $net>32 ||
+                (!defined($oldrec) && effVal($oldrec,$newrec,$n) eq "")){
+               $self->LastMsg(ERROR,"invalid address '%s'",$chk);
+               return(0);
+            }
+         }
+      }
+   }
+   if ($ruletype eq "FWSYS"){ 
+      # check write access to logical system
+      my $sysid=effVal($oldrec,$newrec,"refid");
+      if ($sysid ne ""){
+         my $o=getModuleObject($self->Config,"itil::system");
+         $o->SetFilter({id=>\$sysid});
+         my ($srec,$msg)=$o->getOnlyFirst(qw(name databossid 
+                                             admid adm2id));
+         if (defined($srec)){
+            if (!defined($oldrec) ||
+                $srec->{name} ne $oldrec->{parentname}){
+               $newrec->{parentname}=$srec->{name};
+            }
+            
+            if (((!defined($oldrec) || $oldrec->{cistatusid}==2) &&
+                 effVal($oldrec,$newrec,"cistatusid")==2) &&
+                ( $srec->{databossid}==$userid ||
+                  $srec->{admid}==$userid ||
+                  $srec->{adm2id}==$userid )){
+               $writeok++
+            }
+         }
+      }
+   }
+   elsif ($ruletype eq "FWAPP"){ 
+      # check write access to logical system
+      my $appid=effVal($oldrec,$newrec,"refid");
+      if ($appid ne ""){
+         my $o=getModuleObject($self->Config,"itil::appl");
+         $o->SetFilter({id=>\$appid});
+         my ($arec,$msg)=$o->getOnlyFirst(qw(name databossid tsmid
+                                             tsm2id opmid opm2id));
+         if (defined($arec)){
+            if (!defined($oldrec) ||
+                $arec->{name} ne $oldrec->{parentname}){
+               $newrec->{parentname}=$arec->{name};
+            }
+            if (((!defined($oldrec) || $oldrec->{cistatusid}==2) &&
+                 (effVal($oldrec,$newrec,"cistatusid")==2)) &&
+                ($arec->{databossid}==$userid ||
+                 $arec->{tsmid}==$userid ||
+                 $arec->{tsm2id}==$userid ||
+                 $arec->{opmid}==$userid ||
+                 $arec->{opm2id}==$userid)){
+               $writeok++
+            }
+         }
+      }
+   }
+   if (!$writeok){
+      my $oldswiid=defined($oldrec) ? 
+                   $oldrec->{swinstanceid}:$newrec->{swinstanceid};
+      my $newswiid=effVal($oldrec,$newrec,"swinstanceid");
+
+      if ($oldswiid eq $newswiid){
+         if ($self->itil::lib::Listedit::isWriteOnSwinstanceValid(
+             $newswiid,"default")){
+            $writeok++;
+         }
+      }
+      else{
+         if ($self->itil::lib::Listedit::isWriteOnSwinstanceValid(
+             $newswiid,"default") &&
+             $self->itil::lib::Listedit::isWriteOnSwinstanceValid(
+             $oldswiid,"default")){
+            $writeok++;
          }
       }
    }
@@ -417,6 +671,13 @@ sub isViewValid
    push(@l,"free")               if ($ruletype eq "FREE"   && defined($rec));
    push(@l,"ipcliacl")           if ($ruletype eq "IPCLIACL" && defined($rec));
    push(@l,"source") if (defined($rec));
+
+   if (defined($rec)){
+      if ($self->itil::lib::Listedit::isWriteOnSwinstanceValid(
+          $rec->{swinstanceid},"default")){
+         push(@l,"history");
+      }
+   }
    return(@l);
 }
 
@@ -431,11 +692,20 @@ sub isWriteValid
    }
    else{
       if ($rec->{cistatusid}==2){  # check access by bound item
+         my $userid=$self->getCurrentUserId();
+         foreach my $name (qw(appl_databoss appl_tsmid appl_tsm2id
+                              appl_opmid appl_opm2id 
+                              system_databoss system_admid system_adm2id)){
+            if ($userid==$rec->{$name}){
+               $rw++;
+               last;
+            }
+         }
       }
       if (!$rw){
          my $swid=$rec->{swinstanceid};
          if ($self->itil::lib::Listedit::isWriteOnSwinstanceValid(
-             $swid,"swinstancerules")){
+             $swid,"default")){
             $rw++;
          }
       }

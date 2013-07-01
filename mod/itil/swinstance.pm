@@ -733,7 +733,8 @@ sub SecureSetFilter
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-            [orgRoles(),qw(RMember RCFManager RCFManager2 RAuditor RMonitor)],"both");
+            [orgRoles(),qw(RMember RCFManager RCFManager2 
+                           RAuditor RMonitor)],"both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       my @addflt=(
@@ -969,7 +970,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default adm systems contacts ssl env misc 
-                       softwareinst relations swinstancerules
+                       softwareinst relations
                        attachments cluster control sec);
    if (!defined($rec)){
       return(@databossedit);

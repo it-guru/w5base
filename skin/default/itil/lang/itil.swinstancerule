@@ -33,4 +33,4 @@
 'from IP-Port'=>{de=>'von (source) IP-Port'},
 'to IP-Address'=>{de=>'nach (destination) IP-Adresse'},
 'to IP-Port'=>{de=>'nach (destination) IP-Port'},
-
+'no necessary write access'=>{de=>'keine Ausreichende Berechtigung vorhanden'},
