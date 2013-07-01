@@ -734,6 +734,154 @@ sub initSearchQuery
 }
 
 
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $userid=$self->getCurrentUserId();
+   my $ruletype=effVal($oldrec,$newrec,"ruletype");
+   my $swinstanceid=effVal($oldrec,$newrec,"swinstanceid");
+   my $notify;
+
+
+
+   my ($arefrec,$srefrec,$swirec);
+   if ($ruletype eq "FWAPP"){
+      my $o=getModuleObject($self->Config,"itil::appl");
+      my $refid=effVal($oldrec,$newrec,"refid");
+      $o->SetFilter({id=>\$refid});
+      ($arefrec)=$o->getOnlyFirst(qw(name tsmid tsm2id opmid opm2id 
+                                            databossid));
+   }
+   if ($ruletype eq "FWSYS"){
+      my $o=getModuleObject($self->Config,"itil::system");
+      my $refid=effVal($oldrec,$newrec,"refid");
+      $o->SetFilter({id=>\$refid});
+      ($srefrec)=$o->getOnlyFirst(qw(name admid adm2id databossid));
+   }
+   if ((defined($arefrec) || defined($srefrec)) && $swinstanceid ne ""){
+      my $o=getModuleObject($self->Config,"itil::swinstance");
+      $o->SetFilter({id=>\$swinstanceid});
+      ($swirec)=$o->getOnlyFirst(qw(name admid adm2id databossid));
+   }
+printf STDERR ("fifi 01\n");
+   return(1) if ((!defined($srefrec) && !defined($arefrec)) || 
+                  !defined($swirec));
+printf STDERR ("fifi 02 oldrec=$oldrec\n");
+
+
+   if ((!defined($oldrec) || $oldrec->{cistatusid}!=2) &&
+       effVal($oldrec,$newrec,"cistatusid")==2){
+      # Notify Instanz Admin 
+      # CC Instanz Admin2
+      # From current user
+      # bcc current user
+      # Subject: new request entry
+      my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      $wfa->Notify("INFO",
+            "rule activation request",
+            "User has been requested \na new rule (Mail Notification Beta)",
+            emailfrom=>[$userid],
+            emailto=>[$swirec->{admid}],
+            emailcc=>[$swirec->{adm2id}],
+            emailbcc=>[$userid]);
+   }
+
+   if (defined($oldrec) &&
+       $oldrec->{cistatusid}!=4 &&
+       effVal($oldrec,$newrec,"cistatusid")==4){
+      # Notify TSM/Admin
+      # CC TSM2 OPM OPM2 Admin2
+      # From current user
+      # Subject: activation of entry 
+printf STDERR ("fifi 06\n");
+      my $emailto=[];
+      my $emailcc=[];
+      push(@$emailto,$arefrec->{tsmid})  if ($arefrec->{tsmid} ne "");
+      push(@$emailcc,$arefrec->{opmid})  if ($arefrec->{opmid} ne "");
+      push(@$emailcc,$arefrec->{opm2id}) if ($arefrec->{opm2id} ne "");
+      push(@$emailcc,$arefrec->{tsm2id}) if ($arefrec->{tsm2id} ne "");
+      push(@$emailto,$srefrec->{admid})  if ($srefrec->{admid} ne "");
+      push(@$emailcc,$srefrec->{adm2id}) if ($srefrec->{adm2id} ne "");
+      my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      $wfa->Notify("INFO",
+            "activation of rule entry",
+            "Admin has activate the rule request\n (Mail notification is Beta)",
+            emailfrom=>[$userid],
+            emailto=>$emailto,
+            emailcc=>$emailcc,
+            emailbcc=>[$userid]);
+   }
+   if (defined($oldrec) &&
+       $oldrec->{cistatusid}==4 &&
+       effVal($oldrec,$newrec,"cistatusid")>4){
+      # Notify Creator
+      # CC TSM Admin TSM2 OPM OPM2 Admin2
+      # From current user
+      # Subject: deactivation of entry 
+      my $emailto=[];
+      my $emailcc=[];
+      push(@$emailto,$arefrec->{tsmid})  if ($arefrec->{tsmid} ne "");
+      push(@$emailcc,$srefrec->{admid})  if ($srefrec->{admid} ne "");
+      push(@$emailcc,$arefrec->{opmid})  if ($arefrec->{opmid} ne "");
+      push(@$emailcc,$arefrec->{opm2id}) if ($arefrec->{opm2id} ne "");
+      push(@$emailcc,$arefrec->{tsm2id}) if ($arefrec->{tsm2id} ne "");
+      push(@$emailcc,$srefrec->{adm2id}) if ($srefrec->{adm2id} ne "");
+      my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      $wfa->Notify("INFO",
+            "deactivation of rule entry",
+            "Admin of instance has been activated your rule request",
+            emailfrom=>[$userid],
+            emailto=>$emailto,
+            emailcc=>$emailcc,
+            emailbcc=>[$userid]);
+   }
+   if (defined($oldrec) &&
+       $oldrec->{cistatusid}<4 &&
+       effVal($oldrec,$newrec,"cistatusid")>4 &&
+       $oldrec->{owner}!=$userid){
+      # Notify TSM/Admin
+      # CC TSM2 OPM OPM2 Admin2
+      # From current user
+      # Subject: reject entry 
+
+      my $emailto=[];
+      my $emailcc=[];
+      my $creatorid=effVal($oldrec,$newrec,"creator");
+      push(@$emailto,$creatorid)         if ($creatorid ne "");
+      push(@$emailcc,$arefrec->{tsmid})  if ($arefrec->{tsmid} ne "");
+      push(@$emailcc,$srefrec->{admid})  if ($srefrec->{admid} ne "");
+      push(@$emailcc,$arefrec->{opmid})  if ($arefrec->{opmid} ne "");
+      push(@$emailcc,$arefrec->{opm2id}) if ($arefrec->{opm2id} ne "");
+      push(@$emailcc,$arefrec->{tsm2id}) if ($arefrec->{tsm2id} ne "");
+      push(@$emailcc,$srefrec->{adm2id}) if ($srefrec->{adm2id} ne "");
+      my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      $wfa->Notify("INFO",
+            "reject entry",
+            "Admin of instance has been reject your rule request ".
+            "(Email notification is Beta)",
+            emailfrom=>[$userid],
+            emailto=>$emailto,
+            emailcc=>$emailcc,
+            emailbcc=>[$userid]);
+   }
+   return(1);
+}
+
+
+sub isCopyValid
+{
+   my $self=shift;
+
+   return(1);
+}
+
+
+
+
+
 
 
 
