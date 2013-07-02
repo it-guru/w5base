@@ -34,3 +34,52 @@
 'to IP-Address'=>{de=>'nach (destination) IP-Adresse'},
 'to IP-Port'=>{de=>'nach (destination) IP-Port'},
 'no necessary write access'=>{de=>'keine Ausreichende Berechtigung vorhanden'},
+'software instance rule activation request'=>{de=>'Software-Instanz Regel Anforderung'},
+'MSG001'=>{de=>'Sehr geehrter Instanz-Admin,
+
+es liegt eine neue Anforderung für eine neue Config-Regel für
+die Instanz "%s" vor.
+
+Bitte führen Sie alle notwendigen Schritte zur Bearbeitung dieser 
+Anforderung durch.',
+en=>'Dear Instanz admin,
+
+we want to inform you about a new request for a config-rule
+to the instance "%s". 
+
+Please do all neassary steps to handle this request.'},
+
+'activation of software instance rule entry'=>{de=>'Aktivierung der Software-Instanz Regel'},
+'MSG002'=>{de=>'Sehr geehrter Anforder,
+
+die von Ihnen angeforderte Software-Instanz Config-Regel 
+"%s" wurde 
+durch einem der Instanz-Admins aktiviert.',
+en=>'Dear Requestor,
+
+the config-rule "%s" requested 
+by you has been activated by one of the instanz admins.'},
+'deactivation of software instance rule entry'=>{de=>'Deaktivierung einer Software-Instanz Regel'},
+'MSG003'=>{de=>'Sehr geehrter TSM/Admin,
+
+die unten aufgeführte Software-Instanz-Regel für ein von Ihnen verantwortetes Config-Items wurde durch einen der Instanz-Admins <b>deaktiviert</b>.
+
+Für nähre Informationen kontaktieren Sie bitte direkt den Instanz-Admin.',
+en=>'Dear Requestor,
+
+the below linked config-rule 
+requested has been deactivated. For further informaitons
+please contact the instanz-admin.'},
+'reject of rule request entry'=>{de=>'Ablehnung der Software-Instanz Regel'},
+'MSG004'=>{de=>'Sehr geehrter Anforder,
+
+die von Ihnen angeforderte Software-Instanz Config-Regel 
+"%s" 
+wurde <b>abgelehnt</b>! Für nähere Informationen
+kontaktieren Sie bitte direkt den Instanz-Admin.',
+en=>'Dear Requestor,
+
+the config-rule "%s" 
+requested has been <b>rejected</b>. For further informaitons
+please contact the instanz-admin.'},
+

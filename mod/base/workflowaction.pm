@@ -631,6 +631,36 @@ sub Notify
    else{
       $name=$subject;
    }
+
+   if (defined($param{dataobj}) &&
+       defined($param{dataobjid})){
+      my $dataobj=$param{dataobj};
+      $dataobj=~s/::/\//g;
+      my $dataobjid=$param{dataobjid};
+      my $baseurl;
+      if ($ENV{SCRIPT_URI} ne ""){
+         $baseurl=$ENV{SCRIPT_URI};
+         $baseurl=~s/\/auth\/.*$//;
+         my $url=$baseurl;
+         $url.="/auth/$dataobj/ById/".$dataobjid;
+         $text.="\n\n\n";
+         $text.=$url;
+         $text.="\n\n";
+      }
+      else{
+         my $baseurl=$self->Config->Param("EventJobBaseUrl");
+         $baseurl.="/" if (!($baseurl=~m/\/$/));
+         my $url=$baseurl;
+         $url.="/auth/$dataobj/ById/".$dataobjid;
+         $text.="\n\n\n";
+         $text.=$url;
+         $text.="\n\n";
+      }
+   }
+
+
+
+
    my %mailset=(class    =>'base::workflow::mailsend',
                 step     =>'base::workflow::mailsend::dataload',
                 name     =>$name,

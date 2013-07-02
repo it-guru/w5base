@@ -747,32 +747,30 @@ sub FinishWrite
 
 
 
-   my ($arefrec,$srefrec,$swirec);
+   my ($applrefrec,$sysrefrec,$swirec);
    if ($ruletype eq "FWAPP"){
       my $o=getModuleObject($self->Config,"itil::appl");
       my $refid=effVal($oldrec,$newrec,"refid");
       $o->SetFilter({id=>\$refid});
-      ($arefrec)=$o->getOnlyFirst(qw(name tsmid tsm2id opmid opm2id 
+      ($applrefrec)=$o->getOnlyFirst(qw(name tsmid tsm2id opmid opm2id 
                                             databossid));
    }
    if ($ruletype eq "FWSYS"){
       my $o=getModuleObject($self->Config,"itil::system");
       my $refid=effVal($oldrec,$newrec,"refid");
       $o->SetFilter({id=>\$refid});
-      ($srefrec)=$o->getOnlyFirst(qw(name admid adm2id databossid));
+      ($sysrefrec)=$o->getOnlyFirst(qw(name admid adm2id databossid));
    }
-   if ((defined($arefrec) || defined($srefrec)) && $swinstanceid ne ""){
+   if ((defined($applrefrec) || defined($sysrefrec)) && $swinstanceid ne ""){
       my $o=getModuleObject($self->Config,"itil::swinstance");
       $o->SetFilter({id=>\$swinstanceid});
-      ($swirec)=$o->getOnlyFirst(qw(name admid adm2id databossid));
+      ($swirec)=$o->getOnlyFirst(qw(fullname name admid adm2id databossid));
    }
-printf STDERR ("fifi 01\n");
-   return(1) if ((!defined($srefrec) && !defined($arefrec)) || 
+   return(1) if ((!defined($sysrefrec) && !defined($applrefrec)) || 
                   !defined($swirec));
-printf STDERR ("fifi 02 oldrec=$oldrec\n");
 
 
-   if ((!defined($oldrec) || $oldrec->{cistatusid}!=2) &&
+   if ((!defined($oldrec)) &&
        effVal($oldrec,$newrec,"cistatusid")==2){
       # Notify Instanz Admin 
       # CC Instanz Admin2
@@ -780,13 +778,28 @@ printf STDERR ("fifi 02 oldrec=$oldrec\n");
       # bcc current user
       # Subject: new request entry
       my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      my $emailto;
+      my $emailcc=[];
+      if ($swirec->{admid} ne ""){
+         $emailto=$swirec->{admid};
+         push(@$emailcc,$swirec->{adm2id})  if ($swirec->{adm2id} ne "");
+      }
+      else{
+         if ($swirec->{adm2id} ne ""){
+            $emailto=$swirec->{adm2id};
+         }
+      }
+      $ENV{HTTP_FORCE_LANGUAGE}=$self->getLangFromEmailto($emailto);
       $wfa->Notify("INFO",
-            "rule activation request",
-            "User has been requested \na new rule (Mail Notification Beta)",
+            $self->T("software instance rule activation request"),
+            sprintf($self->T("MSG001"),$swirec->{fullname}),
             emailfrom=>[$userid],
             emailto=>[$swirec->{admid}],
             emailcc=>[$swirec->{adm2id}],
-            emailbcc=>[$userid]);
+            emailbcc=>[$userid],
+            dataobj=>$self->Self,
+            dataobjid=>effVal($oldrec,$newrec,"id"));
+      delete($ENV{HTTP_FORCE_LANGUAGE});
    }
 
    if (defined($oldrec) &&
@@ -796,23 +809,26 @@ printf STDERR ("fifi 02 oldrec=$oldrec\n");
       # CC TSM2 OPM OPM2 Admin2
       # From current user
       # Subject: activation of entry 
-printf STDERR ("fifi 06\n");
-      my $emailto=[];
+      my $emailto;
       my $emailcc=[];
-      push(@$emailto,$arefrec->{tsmid})  if ($arefrec->{tsmid} ne "");
-      push(@$emailcc,$arefrec->{opmid})  if ($arefrec->{opmid} ne "");
-      push(@$emailcc,$arefrec->{opm2id}) if ($arefrec->{opm2id} ne "");
-      push(@$emailcc,$arefrec->{tsm2id}) if ($arefrec->{tsm2id} ne "");
-      push(@$emailto,$srefrec->{admid})  if ($srefrec->{admid} ne "");
-      push(@$emailcc,$srefrec->{adm2id}) if ($srefrec->{adm2id} ne "");
+      $emailto=$sysrefrec->{admid}          if ($sysrefrec->{admid} ne "");
+      $emailto=$applrefrec->{tsmid}         if ($applrefrec->{tsmid} ne "");
+      push(@$emailcc,$applrefrec->{opmid})  if ($applrefrec->{opmid} ne "");
+      push(@$emailcc,$applrefrec->{opm2id}) if ($applrefrec->{opm2id} ne "");
+      push(@$emailcc,$applrefrec->{tsm2id}) if ($applrefrec->{tsm2id} ne "");
+      push(@$emailcc,$sysrefrec->{adm2id})  if ($sysrefrec->{adm2id} ne "");
       my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      $ENV{HTTP_FORCE_LANGUAGE}=$self->getLangFromEmailto($emailto);
       $wfa->Notify("INFO",
-            "activation of rule entry",
-            "Admin has activate the rule request\n (Mail notification is Beta)",
+            $self->T("activation of software instance rule entry"),
+            sprintf($self->T("MSG002"),effVal($oldrec,$newrec,"fullname")),
             emailfrom=>[$userid],
             emailto=>$emailto,
             emailcc=>$emailcc,
-            emailbcc=>[$userid]);
+            emailbcc=>[$userid],
+            dataobj=>$self->Self,
+            dataobjid=>effVal($oldrec,$newrec,"id"));
+      delete($ENV{HTTP_FORCE_LANGUAGE});
    }
    if (defined($oldrec) &&
        $oldrec->{cistatusid}==4 &&
@@ -821,54 +837,86 @@ printf STDERR ("fifi 06\n");
       # CC TSM Admin TSM2 OPM OPM2 Admin2
       # From current user
       # Subject: deactivation of entry 
-      my $emailto=[];
+      my $emailto;
       my $emailcc=[];
-      push(@$emailto,$arefrec->{tsmid})  if ($arefrec->{tsmid} ne "");
-      push(@$emailcc,$srefrec->{admid})  if ($srefrec->{admid} ne "");
-      push(@$emailcc,$arefrec->{opmid})  if ($arefrec->{opmid} ne "");
-      push(@$emailcc,$arefrec->{opm2id}) if ($arefrec->{opm2id} ne "");
-      push(@$emailcc,$arefrec->{tsm2id}) if ($arefrec->{tsm2id} ne "");
-      push(@$emailcc,$srefrec->{adm2id}) if ($srefrec->{adm2id} ne "");
+      $emailto=$applrefrec->{tsmid}         if ($applrefrec->{tsmid} ne "");
+      push(@$emailcc,$sysrefrec->{admid})   if ($sysrefrec->{admid} ne "");
+      push(@$emailcc,$applrefrec->{opmid})  if ($applrefrec->{opmid} ne "");
+      push(@$emailcc,$applrefrec->{opm2id}) if ($applrefrec->{opm2id} ne "");
+      push(@$emailcc,$applrefrec->{tsm2id}) if ($applrefrec->{tsm2id} ne "");
+      push(@$emailcc,$sysrefrec->{adm2id})  if ($sysrefrec->{adm2id} ne "");
       my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      $ENV{HTTP_FORCE_LANGUAGE}=$self->getLangFromEmailto($emailto);
       $wfa->Notify("INFO",
-            "deactivation of rule entry",
-            "Admin of instance has been activated your rule request",
+            $self->T("deactivation of software instance rule entry"),
+            $self->T("MSG003"),
             emailfrom=>[$userid],
             emailto=>$emailto,
             emailcc=>$emailcc,
-            emailbcc=>[$userid]);
+            emailbcc=>[$userid],
+            dataobj=>$self->Self,
+            dataobjid=>effVal($oldrec,$newrec,"id"));
+      delete($ENV{HTTP_FORCE_LANGUAGE});
    }
    if (defined($oldrec) &&
        $oldrec->{cistatusid}<4 &&
-       effVal($oldrec,$newrec,"cistatusid")>4 &&
-       $oldrec->{owner}!=$userid){
+       effVal($oldrec,$newrec,"cistatusid")>4){
       # Notify TSM/Admin
       # CC TSM2 OPM OPM2 Admin2
       # From current user
       # Subject: reject entry 
 
-      my $emailto=[];
+      my $emailto;
       my $emailcc=[];
       my $creatorid=effVal($oldrec,$newrec,"creator");
-      push(@$emailto,$creatorid)         if ($creatorid ne "");
-      push(@$emailcc,$arefrec->{tsmid})  if ($arefrec->{tsmid} ne "");
-      push(@$emailcc,$srefrec->{admid})  if ($srefrec->{admid} ne "");
-      push(@$emailcc,$arefrec->{opmid})  if ($arefrec->{opmid} ne "");
-      push(@$emailcc,$arefrec->{opm2id}) if ($arefrec->{opm2id} ne "");
-      push(@$emailcc,$arefrec->{tsm2id}) if ($arefrec->{tsm2id} ne "");
-      push(@$emailcc,$srefrec->{adm2id}) if ($srefrec->{adm2id} ne "");
+      $emailto=$creatorid                   if ($creatorid ne "");
+      push(@$emailcc,$applrefrec->{tsmid})  if ($applrefrec->{tsmid} ne "");
+      push(@$emailcc,$sysrefrec->{admid})   if ($sysrefrec->{admid} ne "");
+      push(@$emailcc,$applrefrec->{opmid})  if ($applrefrec->{opmid} ne "");
+      push(@$emailcc,$applrefrec->{opm2id}) if ($applrefrec->{opm2id} ne "");
+      push(@$emailcc,$applrefrec->{tsm2id}) if ($applrefrec->{tsm2id} ne "");
+      push(@$emailcc,$sysrefrec->{adm2id})  if ($sysrefrec->{adm2id} ne "");
       my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      $ENV{HTTP_FORCE_LANGUAGE}=$self->getLangFromEmailto($emailto);
       $wfa->Notify("INFO",
-            "reject entry",
-            "Admin of instance has been reject your rule request ".
-            "(Email notification is Beta)",
+            $self->T("reject of rule request entry"),
+            sprintf($self->T("MSG004"),effVal($oldrec,$newrec,"fullname")),
             emailfrom=>[$userid],
             emailto=>$emailto,
             emailcc=>$emailcc,
-            emailbcc=>[$userid]);
+            emailbcc=>[$userid],
+            dataobj=>$self->Self,
+            dataobjid=>effVal($oldrec,$newrec,"id"));
+      delete($ENV{HTTP_FORCE_LANGUAGE});
    }
    return(1);
 }
+
+sub getLangFromEmailto
+{
+   my $self=shift;
+   my $userid=shift;
+
+   if ($userid ne ""){
+      my $u=getModuleObject($self->Config,"base::user");
+      $u->SetFilter({userid=>\$userid});
+      my ($urec)=$u->getOnlyFirst(qw(lastlang lang));
+      if (defined($urec)){
+         if ($urec->{lastlang} ne ""){
+            return($urec->{lastlang});
+         }
+         if ($urec->{lang} ne ""){
+            return($urec->{lang});
+         }
+      }
+   }
+   return("en");
+}
+
+
+
+
+
 
 
 sub isCopyValid
