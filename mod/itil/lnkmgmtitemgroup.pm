@@ -275,8 +275,25 @@ sub Validate
       $newrec->{lnkfrom}=$self->ExpandTimeExpression("now+28d");
    }
 
+
+   my $timelimit=14;
+   my $mgmtitemgroupid=effVal($oldrec,$newrec,"mgmtitemgroupid");
+
+   my $o=getModuleObject($self->Config,"itil::mgmtitemgroup");
+   $o->SetFilter({id=>\$mgmtitemgroupid});
+   my ($grec)=$o->getOnlyFirst(qw(grouptype));
+   if (!defined($grec)){
+      $self->LastMsg(ERROR,"invalid mgmtitemgroup id");
+      return(undef);
+   }
+   if ($grec->{grouptype} eq "RLABEL"){
+      $timelimit=0;
+   }
+
    my $from=effVal($oldrec,$newrec,"lnkfrom");
    my $to=effVal($oldrec,$newrec,"lnkto");
+
+   
 
    if ($to ne ""){
       my $d=CalcDateDuration($from,$to);
@@ -287,8 +304,8 @@ sub Validate
       if (!$self->IsMemberOf("admin")){
          if (effChanged($oldrec,$newrec,"lnkto")){
             my $d=CalcDateDuration(NowStamp("en"),$to);
-            if ($d->{totaldays}<14){
-               $self->LastMsg(ERROR,"to must be at least 14 days ".
+            if ($d->{totaldays}<$timelimit){
+               $self->LastMsg(ERROR,"to must be at least $timelimit days ".
                                     "in the future");
                return(undef);
             }
@@ -298,8 +315,8 @@ sub Validate
    if (!$self->IsMemberOf("admin")){
       if (effChanged($oldrec,$newrec,"lnkfrom")){
          my $d=CalcDateDuration(NowStamp("en"),$from);
-         if ($d->{totaldays}<14){
-            $self->LastMsg(ERROR,"from must be at least 14 days in the future");
+         if ($d->{totaldays}<$timelimit){
+            $self->LastMsg(ERROR,"from must be at least $timelimit days in the future");
             return(undef);
          }
       }
