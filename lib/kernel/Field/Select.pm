@@ -134,7 +134,7 @@ sub FormatedDetail
          $d=$current->{$self->{vjoinon}->[0]};
       }
       $d=[$d] if (ref($d) ne "ARRAY");
-      if (defined(@fromquery)){
+      if ($#fromquery!=-1){  # defined ist not allowed
          $d=\@fromquery;
       }
       if (($#{$d}==-1 && defined($self->{default}))||

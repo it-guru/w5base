@@ -224,10 +224,11 @@ sub InitRequest
    $W5V2::Query=$p{'cgi'};
    $W5V2::Context={};
    $W5V2::W5Server=undef;
-   if (!defined(%W5V2::Translation)){
-      #printf STDERR ("reset translation\n");
-      %W5V2::Translation=();
-   }
+   # maybee this is not needed
+   #if (!defined(%W5V2::Translation)){
+   #   #printf STDERR ("reset translation\n");
+   #   %W5V2::Translation=();
+   #}
    if (!defined($W5V2::Translation{"$self"})){
       #printf STDERR ("reset clear translation for $self\n");
       $W5V2::Translation{"$self"}={self=>$self,tab=>{}};
