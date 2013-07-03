@@ -220,6 +220,31 @@ sub new
                 readonly      =>1,
                 vjoinbase     =>{'lnkfrom'=>'<now',
                                  'lnkto'=>'>now OR [EMPTY]',
+                                 'grouptype'=>\'PCONTROL',
+                                 'mgmtitemgroupcistatusid'=>\'4'},
+                weblinkto     =>'NONE',
+                vjoinon       =>['id'=>'businessserviceid'],
+                vjoindisp     =>'mgmtitemgroup'),
+
+      new kernel::Field::Text(
+                name          =>'reportinglabel',
+                label         =>'Reporting Label',
+                vjointo       =>'itil::lnkmgmtitemgroup',
+                searchable    =>0,
+                htmldetail    =>0,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+
+                   return(1) if (defined($current));
+                   return(0);
+                },
+                readonly      =>1,
+                vjoinbase     =>{'lnkfrom'=>'<now',
+                                 'lnkto'=>'>now OR [EMPTY]',
+                                 'grouptype'=>\'RLABEL',
                                  'mgmtitemgroupcistatusid'=>\'4'},
                 weblinkto     =>'NONE',
                 vjoinon       =>['id'=>'businessserviceid'],

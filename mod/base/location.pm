@@ -364,12 +364,32 @@ sub new
                 readonly      =>1,
                 vjoinbase     =>{'lnkfrom'=>'<now',
                                  'lnkto'=>'>now OR [EMPTY]',
+                                 'grouptype'=>\'PCONTROL',
                                  'mgmtitemgroupcistatusid'=>\'4'},
                 weblinkto     =>'NONE',
                 vjoinon       =>['id'=>'locationid'],
                 vjoindisp     =>'mgmtitemgroup'),
          insertafter=>['prio']
       );
+      $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'reportinglabel',
+                label         =>'Reporting Label',
+                vjointo       =>'itil::lnkmgmtitemgroup',
+                searchable    =>0,
+                htmldetail    =>0,
+                readonly      =>1,
+                vjoinbase     =>{'lnkfrom'=>'<now',
+                                 'lnkto'=>'>now OR [EMPTY]',
+                                 'grouptype'=>\'RLABEL',
+                                 'mgmtitemgroupcistatusid'=>\'4'},
+                weblinkto     =>'NONE',
+                vjoinon       =>['id'=>'locationid'],
+                vjoindisp     =>'mgmtitemgroup'),
+         insertafter=>['prio']
+      );
+
+
    }
    $self->{CI_Handling}={uniquename=>"name",
                          uniquesize=>255};

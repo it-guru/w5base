@@ -703,10 +703,10 @@ sub getDynamicFields
                 container     =>'headref'),
 
       new kernel::Field::Text(
-                name          =>'eventstatreportgroup',
+                name          =>'eventstatreportinglabel',
                 translation   =>'itil::workflow::eventnotify',
                 group         =>'eventnotifystat',
-                label         =>'reporting groupname',
+                label         =>'Reporting Label ',
                 container     =>'headref'),
 
       new kernel::Field::Select(
@@ -2643,6 +2643,7 @@ sub nativProcess
             my %affecteditemgroup;
             foreach my $lrec ($l->getHashList(qw(prio cistatus id name
                                                  mgmtitemgroup
+                                                 reportinglabel
                                                  grprelations
                                                  location address1))){
                if (ref($lrec->{mgmtitemgroup}) eq "ARRAY"){
@@ -2664,12 +2665,15 @@ sub nativProcess
                      $affectedcustomerid{$rel->{grpid}}++;
                   }
                }
-               $h->{eventstatreportgroup}=$lrec->{location}.' '.
+               $h->{eventstatreportinglabel}=$lrec->{location}.' '.
                                           $lrec->{address1};   
-               if ($h->{eventstatreportgroup} eq ""){
+               if ($lrec->{reportinglabel} ne ""){
+                  $h->{eventstatreportinglabel}=$lrec->{reportinglabel};
+               }
+               if ($h->{eventstatreportinglabel} eq ""){
                   $lrec->{name};
                }
-               $h->{eventstatreportgroup}=~s/\s/_/g;
+               $h->{eventstatreportinglabel}=~s/\s/_/g;
             }
             $h->{affecteditemgroup}=[sort(keys(%affecteditemgroup))];
             if (defined($affecteditemprio)){
@@ -2701,7 +2705,7 @@ sub nativProcess
                                                 mandator mandatorid conumber
                                                 responseteam businessteam
                                                 mgmtitemgroup
-                                                applgroup
+                                                applgroup reportinglabel
                                                 eventlang customerprio
                                                 custcontracts id));
          if (defined($arec)){
@@ -2716,11 +2720,14 @@ sub nativProcess
             $h->{affecteditemgroup}=[sort(keys(%affecteditemgroup))];
             $h->{affectedapplicationid}=[$arec->{id}];   
             $h->{affectedapplicationgroup}=[$arec->{applgroup}];   
-            $h->{eventstatreportgroup}=$arec->{applgroup};   
-            if ($h->{eventstatreportgroup} eq ""){
-               $h->{eventstatreportgroup}=$arec->{name};
+            $h->{eventstatreportinglabel}=$arec->{applgroup};   
+            if ($h->{eventstatreportinglabel} eq ""){
+               $h->{eventstatreportinglabel}=$arec->{name};
             }
-            $h->{eventstatreportgroup}=~s/\s/_/g;
+            if ($arec->{reportinglabel} ne ""){
+               $h->{eventstatreportinglabel}=$arec->{reportinglabel};
+            }
+            $h->{eventstatreportinglabel}=~s/\s/_/g;
             $h->{affectedapplication}=[$arec->{name}];   
             $h->{mandatorid}=[$arec->{mandatorid}];   
             $h->{mandator}=[$arec->{mandator}];   
@@ -2767,8 +2774,8 @@ sub nativProcess
                                         $self->getParent->Self);
          $h->{name}=$self->getParent->T("Network-notification:").
                     " ".$self->T($region,"itil::workflow::eventnotify");
-         $h->{eventstatreportgroup}="Network";
-         $h->{eventstatreportgroup}=~s/\s/_/g;
+         $h->{eventstatreportinglabel}="Network";
+         $h->{eventstatreportinglabel}=~s/\s/_/g;
          if (!$self->getParent->ValidateCreate($h)){
             return(0);
          }
@@ -2789,6 +2796,7 @@ sub nativProcess
          $bp->SetFilter({cistatusid=>"<5",id=>$h->{affectedbusinessprocessid}});
          my ($prec,$msg)=$bp->getOnlyFirst(qw(name customer customerid 
                                               mandator mandatorid fullname
+                                              reportinglabel
                                               eventlang customerprio
                                               custcontracts id));
          if (defined($prec)){
@@ -2808,8 +2816,11 @@ sub nativProcess
                delete($h->{affectedcustomer});
                delete($h->{affectedcustomerid});
             }
-            $h->{eventstatreportgroup}=$prec->{fullname};
-            $h->{eventstatreportgroup}=~s/\s/_/g;
+            $h->{eventstatreportinglabel}=$prec->{fullname};
+            if ($prec->{reportinglabel} ne ""){
+               $h->{eventstatreportinglabel}=$prec->{reportinglabel};
+            }
+            $h->{eventstatreportinglabel}=~s/\s/_/g;
          }
          else{
             $self->getParent->LastMsg(ERROR,
@@ -2825,8 +2836,8 @@ sub nativProcess
                $h->{eventstatclass}=4;
             }
          }
-         $h->{eventstatreportgroup}="FREE";
-         $h->{eventstatreportgroup}=~s/\s/_/g;
+         $h->{eventstatreportinglabel}="FREE";
+         $h->{eventstatreportinglabel}=~s/\s/_/g;
       }
       else{
          $self->getParent->LastMsg(ERROR,"invalid eventmode '$h->{eventmode}'");

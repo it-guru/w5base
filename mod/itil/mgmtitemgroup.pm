@@ -61,7 +61,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'grouptype',
-                htmleditwidth =>'40%',
+                htmleditwidth =>'80%',
                 label         =>'Group-type',
                 value         =>['PCONTROL','RLABEL'],
                 dataobjattr   =>'mgmtitemgroup.grouptype'),
@@ -200,7 +200,7 @@ sub new
 
    );
    $self->{history}=[qw(insert modify delete)];
-   $self->setDefaultView(qw(name cistatus cdate mdate));
+   $self->setDefaultView(qw(name cistatus grouptype cdate mdate));
    $self->setWorktable("mgmtitemgroup");
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.mgmtitemgroup"],

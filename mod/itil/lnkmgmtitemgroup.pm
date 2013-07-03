@@ -75,6 +75,13 @@ sub new
                 htmldetail    =>0,
                 dataobjattr   =>'mgmtitemgroup.cistatus'),
 
+      new kernel::Field::Interface(
+                name          =>'grouptype',
+                label         =>'Group type',
+                readonly      =>1,
+                htmldetail    =>0,
+                dataobjattr   =>'mgmtitemgroup.grouptype'),
+
       new kernel::Field::Link(
                 name          =>'mgmtitemgroupid',
                 label         =>'managed item group ID',
@@ -95,6 +102,7 @@ sub new
                  htmlwidth     =>'150px',
                  label         =>'Application',
                  vjointo       =>'itil::appl',
+                 vjoineditbase =>{'cistatusid'=>"<=5"},
                  vjoinon       =>['applid'=>'id'],
                  vjoindisp     =>'name'),
 
@@ -108,6 +116,7 @@ sub new
                  htmlwidth     =>'150px',
                  label         =>'Location',
                  vjointo       =>'base::location',
+                 vjoineditbase =>{'cistatusid'=>"<=5"},
                  vjoinon       =>['locationid'=>'id'],
                  vjoindisp     =>'name'),
 
@@ -121,6 +130,7 @@ sub new
                  htmlwidth     =>'150px',
                  label         =>'Businessservice',
                  vjointo       =>'itil::businessservice',
+                 vjoineditbase =>{'cistatusid'=>"<=5"},
                  vjoinon       =>['businessserviceid'=>'id'],
                  vjoindisp     =>'name'),
 
