@@ -501,18 +501,6 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("invoice.lnkapplinvoicestor",
-                      "itil::lnkapplinvoicestor",
-                      defaultacl=>['admin']);
-
-   $self->RegisterObj("invoice.lnkapplinvoicestor.new",
-                      "itil::lnkapplinvoicestor",
-                      func=>'New',
-                      defaultacl=>['admin']);
-
-   $self->RegisterObj("invoice.lnkapplinvoicestor.cum",
-                      "itil::lnkapplinvoicestorcum");
-
    $self->RegisterObj('itil::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',
