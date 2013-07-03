@@ -3,6 +3,7 @@
 'fieldgroup.comments'=>{de=>'Bemerkungen und Verantwortung',
                         en=>'comments and responsiblity'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'Group-type'=>{de=>'Gruppen-Typ'},
 'fieldgroup.applications'=>{de=>'zugeordnete Anwendungen',en=>'related applications'},
 'fieldgroup.businessservices'=>{de=>'zugeordnete Businessservices',en=>'related Businessservices'},
 'fieldgroup.locations'=>{de=>'zugeordnete Standorte',en=>'related locations'},
@@ -10,3 +11,5 @@
 'you are not authorized to set other persons as databoss'=>{
           de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},
 
+'PCONTROL'=>{de=>'Prozesssteuerung und CI-Gruppierung',en=>'processcontrol and CI-grouping'},
+'RLABEL'=>{de=>'Reporing Label',en=>'Reporing Label'},

@@ -59,6 +59,13 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'mgmtitemgroup.cistatus'),
 
+      new kernel::Field::Select(
+                name          =>'grouptype',
+                htmleditwidth =>'40%',
+                label         =>'Group-type',
+                value         =>['PCONTROL','RLABEL'],
+                dataobjattr   =>'mgmtitemgroup.grouptype'),
+
       new kernel::Field::Databoss(
                 group         =>'comments'),
 

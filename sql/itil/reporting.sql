@@ -75,3 +75,4 @@ create table lnkmgmtitemgroup(
               REFERENCES location (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
+alter table mgmtitemgroup add grouptype char(20) default NULL;
