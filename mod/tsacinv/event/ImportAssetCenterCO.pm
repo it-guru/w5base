@@ -72,7 +72,7 @@ sub ImportAssetManagerCO
      $w5co->SetFilter({name=>\$rec->{name}});
      my ($w5rec,$msg)=$w5co->getOnlyFirst(qw(ALL));
      my $newrec={cistatusid=>4,
-                 fullname=>$rec->{description},
+                 shortdesc=>$rec->{description},
                  comments=>"authority at AssetManager",
                  srcload=>NowStamp(),
                  name=>$rec->{name}};
