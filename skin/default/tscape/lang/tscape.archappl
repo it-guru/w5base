@@ -6,3 +6,5 @@
 'fieldgroup.appl'=>{de=>'W5Base Anwendungszuordnung',
                     en=>'W5Base Applicationrelation'},
 
+'all reference Costcenters'=>{de=>'alle referenzierten Kontierungsobjekte'},
+

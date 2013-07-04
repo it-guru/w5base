@@ -71,9 +71,36 @@ sub new
                 name          =>'w5appl',
                 label         =>'W5Base Application',
                 group         =>'appl',
-                vjointo       =>'TS::appl',
+                vjointo       =>'TS::appl',          
                 vjoinon       =>['id'=>'ictoid'],
+                vjoinbase     =>{'cistatusid'=>"<=5"},
                 vjoindisp     =>['name','cistatus']),
+
+      new kernel::Field::Text(
+                name          =>'allconumbers',
+                label         =>'all reference Costcenters',
+                group         =>'appl',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
+                depend        =>['archapplid'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my %co;
+                   if ($current->{archapplid} ne ""){
+                      my $a=getModuleObject($self->getParent->Config,
+                                            "TS::appl");
+                      $a->SetFilter({ictono=>[$current->{archapplid}],
+                                     cistatusid=>"<=5"});
+                      foreach my $arec ($a->getHashList(qw(allconumbers))){
+                         my $l=$arec->{allconumbers};
+                         $l=[$l] if (ref($l) ne "ARRAY");
+                         map({$co{$_}++} @$l);
+                      }
+                   }
+                   return([sort(keys(%co))]);
+                }),
 
       new kernel::Field::Text(
                 name          =>'status',

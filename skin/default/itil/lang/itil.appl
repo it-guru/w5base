@@ -52,6 +52,7 @@
           de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},
 'Application ID'=>{de=>'Anwendungs-ID'},
 'Costcenter'=>{de=>'Kontierungsobjekt'},
+'all reference Costcenters'=>{de=>'alle referenzierten Kontierungsobjekte'},
 'Costcenter-Number'=>{de=>'Kontierungsobjekt-Nummer'},
 'Application Version'=>{de=>'Anwendungsversion'},
 'Maintenance Window'=>{de=>'Wartungsfenster'},

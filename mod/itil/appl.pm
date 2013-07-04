@@ -121,6 +121,37 @@ sub new
                 vjoinon       =>['conumber'=>'name'],
                 vjoindisp     =>'conodenumber'),
 
+      new kernel::Field::Text(
+                name          =>'allconumbers',
+                label         =>'all reference Costcenters',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
+                depend        =>['conumber','systems'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my %co;
+                   $co{$current->{conumber}}++;
+                   my $fo=$self->getParent->getField("systems");
+                   my $sl=$fo->RawValue($current);
+                   $sl=[] if (ref($sl) ne "ARRAY");
+                   my $s=getModuleObject($self->getParent->Config,
+                                         "itil::system");
+                   
+                   my $fl={id=>[map({$_->{systemid}} @{$sl})]};
+                   $s->SetFilter($fl);
+                   foreach my $srec ($s->getHashList(qw(conumber))){
+                      $co{$srec->{conumber}}++ if ($srec->{conumber} ne "");
+                   }
+                   return([sort(keys(%co))]);
+                }),
+       
+                
+
+
+                
+
 
       new kernel::Field::Text(
                 name          =>'applid',
