@@ -35,7 +35,9 @@ sub ExtendStags
 {
    my $self=shift;
    my $stags=shift;
-   push(@$stags,"citsscchm","T-Systems ServiceCenter Change");
+   if ($ENV{REMOTE_USER} ne "anonymous"){
+      push(@$stags,"citsscchm","T-Systems ServiceCenter Change");
+   }
 }
 
 sub CISearchResult

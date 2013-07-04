@@ -35,7 +35,9 @@ sub ExtendStags
 {
    my $self=shift;
    my $stags=shift;
-   push(@$stags,"citsciamuser","DTAG CIAM Person");
+   if ($ENV{REMOTE_USER} ne "anonymous"){
+      push(@$stags,"citsciamuser","DTAG CIAM Person");
+   }
 }
 
 sub CISearchResult

@@ -35,7 +35,9 @@ sub ExtendStags
 {
    my $self=shift;
    my $stags=shift;
-   push(@$stags,"ciaeg","TelekomIT Application Expert Group");
+   if ($ENV{REMOTE_USER} ne "anonymous"){
+      push(@$stags,"ciaeg","TelekomIT Application Expert Group");
+   }
 }
 
 sub CISearchResult

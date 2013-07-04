@@ -35,7 +35,9 @@ sub ExtendStags
 {
    my $self=shift;
    my $stags=shift;
-   push(@$stags,"citswiwuser","T-Systems WhoIsWho Person (slow)");
+   if ($ENV{REMOTE_USER} ne "anonymous"){
+      push(@$stags,"citswiwuser","T-Systems WhoIsWho Person (slow)");
+   }
 }
 
 sub CISearchResult
