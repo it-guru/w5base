@@ -482,7 +482,7 @@ sub getPosibleActions
       }
    }
    if ($iscurrent){
-      if ($stateid<17){
+      if ($stateid<16 && $userid!=$creator){
          push(@l,"wfinquiry");    # Nachfrage stellen hinzufügen
       }
    }
@@ -584,6 +584,9 @@ sub getPosibleActions
             else{                        # aber nur max 5mal und nicht laenger
                push(@l,"wfactivate");    # als 14 Tage nach Faktura Referenz
             }                            # Zeitpunkt
+         }
+         else{
+            push(@l,"wfnoreprocess");# keine Nachbesserung 
          }
       }
       push(@l,"wffine");     # Workflow erfolgreich beenden   (durch Anforderer)
@@ -1249,15 +1252,19 @@ sub nativProcess
       if (!defined($fwdtargetid)){
          return(0);
       }
+      my $wrec={stateid=>2,
+                fwdtarget=>$fwdtarget,
+                fwdtargetid=>$fwdtargetid,
+                fwddebtarget=>$fwddebtarget,
+                fwddebtargetid=>$fwddebtargetid,
+                eventstart=>NowStamp("en"),
+                eventend=>undef,
+                closedate=>undef};
+      if ($op eq "wfreprocess"){     # muss zurueck gesetzt werden! - Da dann 
+         $wrec->{invoicedate}=undef; # noch nicht abrechenbar
+      }
    
-      if ($self->StoreRecord($WfRec,{stateid=>2,
-                                    fwdtarget=>$fwdtarget,
-                                    fwdtargetid=>$fwdtargetid,
-                                    fwddebtarget=>$fwddebtarget,
-                                    fwddebtargetid=>$fwddebtargetid,
-                                    eventstart=>NowStamp("en"),
-                                    eventend=>undef,
-                                    closedate=>undef})){
+      if ($self->StoreRecord($WfRec,$wrec)){
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfactivate",
              {translation=>'base::workflow::request'},$h->{note},undef)){
