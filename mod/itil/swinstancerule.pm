@@ -712,7 +712,7 @@ sub isWriteValid
 
    }
 
-   return(qw(default ipfw link appl system varval ipcliacl free)) if ($rw);
+   return(qw(default ipfw appl system varval ipcliacl free)) if ($rw);
    return(undef);
 }
 
