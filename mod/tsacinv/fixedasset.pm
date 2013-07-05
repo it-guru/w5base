@@ -99,7 +99,7 @@ sub new
                 vjoinon       =>['assetid'=>'assetassetid'],
                 group         =>'systemdata',
                 vjoinconcat   =>', ',
-                fields        =>['systemid','systemname','conumber']),
+                fields        =>['systemid','systemname']),
 
       new kernel::Field::Link(
                 name          =>'lassetid',
