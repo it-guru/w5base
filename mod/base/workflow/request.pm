@@ -567,7 +567,7 @@ sub getPosibleActions
                   my $duration=CalcDateDuration($WfRec->{invoicedate},
                                                 NowStamp("en"));
                   if (defined($duration) && 
-                      $duration->{totaldays}>14){
+                      $duration->{totaldays}>28){
                      $reprook=0;
                   }
                }
