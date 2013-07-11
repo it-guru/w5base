@@ -1062,7 +1062,8 @@ sub TransferFile
             msg(ERROR,"File $filename to $jobfile could not be transfered");
             msg(ERROR,"FTP transfer failed at ".NowStamp("en")." GMT");
             msg(ERROR,"trying to detect ftp error message ...");
-            eval('msg(ERROR,$ftp->message());');
+            #eval('msg(ERROR,$ftp->message());');
+            eval('msg(ERROR,Dumper($ftp));');
             msg(ERROR,"eval error=$@");
             msg(ERROR,"... detecting error message done.");
          }
