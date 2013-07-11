@@ -270,7 +270,7 @@ sub qcheckRecord
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');
          if (defined($parrec->{conumber}) && 
-             !($parrec->{conumber}=~m/^\d+$/)){
+             !($parrec->{conumber}=~m/^\S{6,20}$/)){
             $parrec->{conumber}=undef;
          }
          $self->IfaceCompare($dataobj,
