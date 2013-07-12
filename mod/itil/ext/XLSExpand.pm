@@ -50,6 +50,12 @@ sub GetKeyCriterion
           out=>{'itil::appl::name'          =>{
                     label=>'IT-Inventar: Application'
                },
+                'itil::appl::mandator'      =>{
+                    label=>'IT-Inventar: Application: Mandant'
+               },
+                'itil::appl::applmgr'      =>{
+                    label=>'IT-Inventar: Application: Application Manager'
+               },
                 'itil::appl::sememail'      =>{
                     label=>'IT-Inventar: Application: CBM E-Mail'
                },
@@ -253,7 +259,9 @@ sub ProcessLine
  
    # output
    foreach my $appsekvar (qw(sem tsm tsm2 tsm2email name
-                             sememail tsmemail businessteam businessteamboss applid
+                             sememail tsmemail businessteam 
+                             businessteamboss applid
+                             mandator applmgr
                              customerprio criticality customer)){
       if (defined($in->{'itil::appl::id'}) && 
           exists($out->{'itil::appl::'.$appsekvar})){
