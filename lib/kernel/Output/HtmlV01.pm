@@ -88,9 +88,9 @@ sub ProcessHead
    $d.="<form method=POST><style>";
    $d.=$self->getStyle($fh);
    $d.="</style>\n\n";
-   $d.="<script language=JavaScript ".
+   $d.="<script language=JavaScript type=\"text/javascript\" ".
          "src=\"../../../public/base/load/toolbox.js\"></script>\n";
-   $d.="<script language=JavaScript ".
+   $d.="<script language=JavaScript type=\"text/javascript\" ".
          "src=\"../../../public/base/load/OutputHtml.js\"></script>\n";
    $d.=$self->{fieldsPageHeader};
    $d.="<table class=maintable>\n";
@@ -99,7 +99,44 @@ sub ProcessHead
    }
 
    $d.="<tr><td class=mainblock>";
-   $d.="<table class=datatable width=\"100%\">\n<tr class=headline>";
+
+   my $limit=$app->Limit();
+   my $rows=$self->getParent->getParent->Rows();
+   if ($limit==0 || $limit>$rows){   # add web-browser table sort function
+      my @sortnames;
+      foreach my $fieldname (@view){
+         my $field=$app->getField($fieldname);
+         if (defined($field) && $field->Type() eq "Number"){
+            push(@sortnames,"Number");
+         }
+         else{
+            push(@sortnames,"String");
+         }
+      }
+      my $sortline=join(",",map({'"'.$_.'"'} "None",@sortnames));
+      $d.="<script language=JavaScript type=\"text/javascript\" ".
+            "src=\"../../../public/base/load/sortabletable.js\"></script>\n";
+      $d.="<script language=JavaScript>\n";
+      $d.="var SortTableResultTable;\n";
+      $d.="addEvent(window,\"load\",InitTabResultTable);\n";
+      $d.="function InitTabResultTable(){\n";
+      $d.="SortTableResultTable=new SortableTable(".
+          "document.getElementById(\"ResultTable\"), [$sortline]);\n";
+      $d.="SortTableResultTable.onsort=function (){\n";
+      $d.=" var rows = SortTableResultTable.tBody.rows\n";
+      $d.=" var l = rows.length;\n";
+      $d.=" console.log(rows);\n";
+      $d.=" for (var i = 0; i < l; i++) { \n".
+          "   SortableTableremoveClassName(rows[i]); \n".
+          "   SortableTableaddClassName(rows[i], \n".
+          "        i % 2 ? \"subline2\":\"subline1\"); } };\n"; 
+      $d.="SortTableResultTable.sort(1,false);\n";
+      $d.="}\n";
+      $d.="</script>\n";
+   }
+
+   $d.="<table class=datatable id=ResultTable width=\"100%\">\n".
+       "<thead><tr class=headline>";
    if ($#view!=-1){
       $d.="<th class=headfield style=\"padding:0;margin:0\">".
           "<div style=\"padding:0;margin:0;width:3px\">".
@@ -125,7 +162,7 @@ sub ProcessHead
    else{
       $d.="<th class=headfield>No-Fields</th>";
    }
-   $d.="</tr>\n";
+   $d.="</tr></thead><tbody>\n";
    return($d);
 }
 sub ProcessLine
@@ -307,7 +344,7 @@ sub ProcessBottom
    }
 
    $d.="</td></tr>\n\n\n";
-   $d.="</table>\n";
+   $d.="<tbody></table>\n";
    if ($self->{SubListEdit}==1){
       $d.=<<EOF;
 <script language=JavaScript>
