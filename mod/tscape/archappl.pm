@@ -74,7 +74,7 @@ sub new
                 vjointo       =>'TS::appl',          
                 vjoinon       =>['id'=>'ictoid'],
                 vjoinbase     =>{'cistatusid'=>"<=5"},
-                vjoindisp     =>['name','cistatus']),
+                vjoindisp     =>['name','opmode','cistatus']),
 
       new kernel::Field::Text(
                 name          =>'allconumbers',
