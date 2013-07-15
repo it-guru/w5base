@@ -131,7 +131,6 @@ sub Result
    }
    msg(INFO,"processing MI-Report for '$year'");
 
-   my $mi=getModuleObject($self->Config,"itil::lnkmgmtitemgroup");
    $wf->SetFilter({eventend=>$year,
                    class=>\'AL_TCom::workflow::eventnotify',
                    isdeleted=>\'0'});
@@ -224,63 +223,53 @@ sub Result
    );
 
 
+
    foreach my $s (sort(keys(%sheet))){
       push(@control,{
          sheet=>$s,DataObj=>$wf,
          filter=>{id=>$sheet{$s}},
          view=>[qw(
-                   wffields.eventendofevent
-                   wffields.eventstatreportlabel
-
-                   wffields.affectedlocation 
-                   wffields.affectedapplication
-                   wffields.affectednetwork
-
-                   wffields.affecteditemprio
-                   name 
-                   wffields.eventstartofevent
-                   wffields.qceventendofevent
-                   YEAR
-                   MONTH
-                   CWEEK
-                   QUART
-
+                   mandator
                    wffields.solutionline
-                   wffields.eventspecrespocustomer
-                   wffields.eventspecrespoitprov
-
+                   wffields.affectedapplication wffields.affectedlocation
+                   wffields.eventstatreportinglabel
                    wffields.eventstatclass
-                   wffields.affectedregion
-                   wffields.eventstatrespo
-                   wffields.eventstatreason
-                   wffields.eventstattype
-
-
+                   wffields.eventstartofevent
+                   wffields.eventendofevent
                    eventduration
                    eventdurationhour
                    wffields.eventnetduration
-                   wffields.eventnetdurationsolved4h
-                   wffields.eventrcfoundat
-                   wffields.eventrcfound10wt
-
                    wffields.eventkpifirstinfo
-
+                   wffields.eventnetdurationsolved4h
                    wffields.eventchmticket
-
+                   detaildescription
+                   wffields.eventstatreason 
+                   wffields.eventstatrespo 
+                   id 
+                   YEAR 
+                   QUART 
+                   MONTH
+                   CWEEK
+                   wffields.eventinmticket
+                   wffields.eventscproblemstatus 
                    wffields.eventprmticket
-                   wffields.eventscprmstatus
+                   wffields.eventscprmstatus 
                    wffields.eventscprmsolutiontype
                    wffields.eventscprmclosetype
-
-                   wffields.eventinmticket
-                   wffields.eventscproblemstatus
-
-                   wffields.eventconsequenceof 
+                   wffields.eventspecrespocustomer wffields.eventspecrespoitprov
+                   wffields.eventrcfound10wt
                    wffields.eventisconsequence
-
-                   wffields.affecteditemgroup 
-                   detaildescription createdate 
-                   mandator wffields.affectedcustomer id)]}
+                   wffields.eventconsequenceof
+                   wffields.affecteditemprio
+                   name
+                   wffields.qceventendofevent
+                   wffields.affectedregion
+                   wffields.eventstattype
+                   wffields.eventrcfoundat
+                   wffields.affecteditemgroup
+                   createdate
+                   wffields.affectedcustomer
+                   wffields.affecteditemgroup )]}
       );
    }
    my ($Y,$M,$D,$h,$m,$s)=$self->getParent->ExpandTimeExpression("now","stamp",
