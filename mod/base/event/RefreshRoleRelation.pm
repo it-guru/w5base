@@ -16,6 +16,22 @@ package base::event::RefreshRoleRelation;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+
+#
+# Der Job ermöglicht es, verfallende Gruppenrelationen anhand von Rollenangaben
+# automatisch verlängern zu lassen.
+#
+# 1. Parameter ist die Gruppe die analysiert werden soll
+# 2. Parameter ist die Rollen-Liste die auf andere Relationen der Gruppen
+#    Mitglieder hin überprüft werden soll.
+# 3. Parameter ist der Request mit dem die Sache angefordert wurde
+#
+# Alle Relationen zu den aufgeführten Gruppen die in den nächsten <80 Tagen
+# verfallen würden, werden dann automatisch um 200 Tage verlängert.
+#
+
+
+
 use strict;
 use vars qw(@ISA);
 use kernel;
