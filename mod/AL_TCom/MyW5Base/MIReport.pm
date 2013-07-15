@@ -268,8 +268,7 @@ sub Result
                    wffields.eventrcfoundat
                    wffields.affecteditemgroup
                    createdate
-                   wffields.affectedcustomer
-                   wffields.affecteditemgroup )]}
+                   wffields.affectedcustomer)]}
       );
    }
    my ($Y,$M,$D,$h,$m,$s)=$self->getParent->ExpandTimeExpression("now","stamp",
