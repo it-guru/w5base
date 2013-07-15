@@ -85,7 +85,7 @@ my $event=shift(@ARGV);
 $event=~s/\.pm$//;
 msg(DEBUG,"ProcessEvent '%s'",$event);
 my @bk=$EventController->ProcessEvent($event,{param=>[@ARGV]});
-if (!defined(@bk)){
+if ($#bk==-1){
    msg(ERROR,"Event '%s' not known",$event);
    exit(1);
 }
