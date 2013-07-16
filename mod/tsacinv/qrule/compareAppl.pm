@@ -88,11 +88,40 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
-         if (!($parrec->{conumber}=~m/^\d+$/) &&          # classic co
-             !($parrec->{conumber}=~m/^[A-Z]-\d+-\d+$/)){ # PSP
-            # filter to remove invalid co-numbers without error message
-            delete($parrec->{conumber});
+         #
+         # Filter for conumbers, which are allowed to use in darwin
+         #
+         if (defined($parrec->{conumber})){
+            if ($parrec->{conumber} eq ""){
+               $parrec->{conumber}=undef;
+            }
+            if (defined($parrec->{conumber})){
+               #
+               # hier muß der Check gegen die SAP P01 rein für die 
+               # Umrechnung auf PSP Elemente
+               #
+
+               ###############################################################
+               my $co=getModuleObject($self->getParent->Config,
+                                      "finance::costcenter");
+               if (defined($co)){
+                  if (!($co->ValidateCONumber(
+                        $dataobj->SelfAsParentObject,"conumber", $parrec,
+                        {conumber=>$parrec->{conumber}}))){ # simulierter newrec
+                     $parrec->{conumber}=undef;
+                  }
+               }
+               else{
+                  $parrec->{conumber}=undef;
+               }
+            }
          }
+
+
+
+
+
+
          $self->IfaceCompare($dataobj,
                              $rec,"conumber",
                              $parrec,"conumber",

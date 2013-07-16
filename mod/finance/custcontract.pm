@@ -496,8 +496,8 @@ sub Validate
       }
    }
    if (exists($newrec->{conumber}) && $newrec->{conumber} ne ""){
-      if (!$self->finance::costcenter::ValidateCONumber("conumber",
-          $oldrec,$newrec)){
+      if (!$self->finance::costcenter::ValidateCONumber(
+          $self->SelfAsParentObject,"conumber", $oldrec,$newrec)){
          $self->LastMsg(ERROR,
              $self->T("invalid number format '\%s' specified",
                       "finance::costcenter"),$newrec->{conumber});

@@ -59,7 +59,7 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    my $coobj=getModuleObject($self->getParent->Config,"itil::costcenter");
-   if (!($coobj->ValidateCONumber("conumber",$rec,undef))){
+   if (!($coobj->ValidateCONumber($dataobj->Self,"conumber",$rec,undef))){
       return(3,{qmsg=>['no valid costcenter'],
                 dataissue=>['no valid costcenter']});
    }

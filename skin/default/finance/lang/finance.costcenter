@@ -14,7 +14,7 @@
 'Accounting Area'=>{de=>'Buchungskreis'},
 'Contacts'=>{de=>'Kontakte'},
 'Shortdescription'=>{de=>'Kurzbezeichnung'},
-"invalid number format '\%s' specified"=>{de=>"ungültige Kostenknoten Format '\%s' eingegeben"},
+"invalid number format '\%s' specified"=>{de=>"ungültige Kontierungsobjekt Format '\%s' eingegeben"},
 'Deputy Service Delivery Manager'=>{de=>'Service Delivery Manager Vertreter'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'costcenter is direct useable by workflows'=>{de=>'Kontierungsobjekt darf direkt von Workflows verwendet werden'},

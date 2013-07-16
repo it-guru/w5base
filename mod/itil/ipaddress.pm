@@ -505,6 +505,10 @@ sub Validate
    my $is_primary=effVal($oldrec,$newrec,"is_primary");
    my $is_notdeleted=effVal($oldrec,$newrec,"is_notdeleted");
    my $type=effVal($oldrec,$newrec,"type");
+   if ($type eq ""){  # if no type is specified - use secondary
+      $newrec->{type}=1;
+      $type=1;
+   }
    if ($type eq "0" && $is_primary ne "1"){
       $newrec->{is_primary}=1;
    }

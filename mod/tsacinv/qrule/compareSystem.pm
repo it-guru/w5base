@@ -269,10 +269,40 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');
-         if (defined($parrec->{conumber}) && 
-             !($parrec->{conumber}=~m/^\S{6,20}$/)){
-            $parrec->{conumber}=undef;
+
+
+         #
+         # Filter for conumbers, which are allowed to use in darwin
+         #
+         if (defined($parrec->{conumber})){
+            if ($parrec->{conumber} eq ""){
+               $parrec->{conumber}=undef;
+            }
+            if (defined($parrec->{conumber})){
+               #
+               # hier muß der Check gegen die SAP P01 rein für die 
+               # Umrechnung auf PSP Elemente
+               #
+
+               ###############################################################
+               my $co=getModuleObject($self->getParent->Config,
+                                      "finance::costcenter");
+               if (defined($co)){
+                  if (!($co->ValidateCONumber(
+                        $dataobj->SelfAsParentObject,"conumber", $parrec,
+                        {conumber=>$parrec->{conumber}}))){ # simulierter newrec
+                     $parrec->{conumber}=undef;
+                  }
+               }
+               else{
+                  $parrec->{conumber}=undef;
+               }
+            }
          }
+
+
+
+
          $self->IfaceCompare($dataobj,
                              $rec,"conumber",
                              $parrec,"conumber",
