@@ -326,7 +326,7 @@ sub ProcessFile
    # Pass 2: Process Lines
    #
    for(my $iSheet=$oBook->{'SheetCount'}-1;$iSheet>=0;$iSheet--){
-      my $oWkS=$oBook->worksheet($iSheet);
+      my $oWkS=$oBook->{'Worksheet'}[$iSheet];
       next if (!defined($oWkS));
       my $maxrow;
       my %globalrec=();
@@ -401,7 +401,8 @@ sub ProcessFile
          }
       }
       my $oldstyle=1;
-      if ($Spreadsheet::ParseExcel::VERSION eq "0.57" ){
+      if ($Spreadsheet::ParseExcel::VERSION eq "0.57" ||
+          $Spreadsheet::ParseExcel::VERSION eq "0.59"){
           
          $oldstyle=0;
       }
