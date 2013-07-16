@@ -1316,7 +1316,8 @@ sub HttpHeader
       $disp.="; " if ($disp ne "");
       $disp.="filename=\"$f\"";
       $d.="Content-Name: $f\n";
-   }
+      $d.="Content-Disposition: $disp\n";   # seems to be needed for chrome
+   }                                        # in attachment mode
    else{
       if ($disp ne "inline"){
          $d.="Content-Disposition: $disp\n";
