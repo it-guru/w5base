@@ -247,7 +247,7 @@ sub Validate
    my $newrec=shift;
 
    if (!defined($oldrec) || defined($newrec->{name})){
-      if ($newrec->{name}=~m/^\s*$/ || !($newrec->{name}=~m/^[a-z0-9-]+$/i)){
+      if ($newrec->{name}=~m/^\s*$/ || !($newrec->{name}=~m/^[a-z0-9-()_]+$/i)){
          $self->LastMsg(ERROR,"invalid name specified");
          return(0);
       }
