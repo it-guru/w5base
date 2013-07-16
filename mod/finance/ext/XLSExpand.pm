@@ -39,9 +39,9 @@ sub GetKeyCriterion
    my $d={in=>{'finance::costcenter::name'=>{label=>'Kostenknoten'},
               },
           out=>{
-                'finance::costcenter::name'     =>{label=>'Finanz/CRM: Kostenknoten: CO-Nummber/PSP'},
-                'finance::costcenter::fullname' =>{label=>'Finanz/CRM: Kostenknoten: Bezeichnung'},
-                'finance::costcenter::delmgr'   =>{label=>'Finanz/CRM: Kostenknoten: SDM'}
+                'finance::costcenter::name'     =>{label=>'Finanz/CRM: Kontierungsobjekt: CO-Nummber/PSP'},
+                'finance::costcenter::fullname' =>{label=>'Finanz/CRM: Kontierungsobjekt: Bezeichnung'},
+                'finance::costcenter::delmgr'   =>{label=>'Finanz/CRM: Kontierungsobjekt: SDM'}
                },
          };
    return($d);
@@ -55,18 +55,23 @@ sub ProcessLine
    my $out=shift;
    my $loopcount=shift;
 
-   if (defined($in->{'finance::costcenter::name'})){
+   if (defined($in->{'finance::costcenter::name'}) &&
+       !defined($in->{'finance::costcenter::id'})){
       my $o=$self->getParent->getPersistentModuleObject('finance::costcenter');
       if (ref($in->{'finance::costcenter::name'}) eq "HASH"){
          $o->SetFilter({name=>[keys(%{$in->{'finance::costcenter::name'}})],
-                           cistatusid=>'4'});
+                        cistatusid=>'4'});
       }
       else{
-         $o->SetFilter({name=>\$in->{'finance::costcenter::name'},cistatusid=>'4'});
+         $o->SetFilter({name=>\$in->{'finance::costcenter::name'},
+                        cistatusid=>'4'});
       }
+      my $c=0;
       foreach my $orec ($o->getHashList(qw(id name fullname))){
          $in->{'finance::costcenter::id'}->{$orec->{id}}++;
+         $c++;
       }
+      return(0) if ($c); # input data has been enriched
    }
  
    # output
