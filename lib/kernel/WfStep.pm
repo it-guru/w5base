@@ -1182,54 +1182,57 @@ sub generateWorkspacePages
                 "</div>";
    }
    if (grep(/^wfstartnew$/,@$actions)){
-      $$selopt.="<option value=\"wfstartnew\">".
-                $self->getParent->T("wfstartnew",$tr).
-                "</option>\n";
       my @l=$self->getParent->getPosibleWorkflowDerivations($WfRec,$actions);
-      my $d="<div id='wfstartnewContainer' unselectable=\"on\" ".
-            "style=\"height:90px;border-style:solid;".
-            "-moz-user-select:none;khtml-user-select: none;".
-            "border-color:gray;border-width:1px;overflow:auto;".
-            "padding:5px\">";
-      $d.="<script language=JavaScript>";
-      $d.="function markDerivateWorkflowLine(o){";
-      $d.="  var blk=document.getElementById('wfstartnewContainer');";
-      $d.="  for(var count=0;count<blk.childNodes.length; count++){";
-      $d.="     if (blk.childNodes[count].tagName=='DIV' && ";
-      $d.="         blk.childNodes[count].className=='DerivateWorkflowActiv'){";
-      $d.="        blk.childNodes[count].className='DerivateWorkflowInActiv';";
-      $d.="     }";
-      $d.="  }";
-      $d.="  var v=document.getElementById('doDerivateWorkflow');";
-      $d.="  v.value=o.id;";
-      $d.="  o.className='DerivateWorkflowActiv'";
-      $d.="}";
-      $d.="</script>";
-      foreach my $derivRec (@l){
-         $d.="<div id=\"$derivRec->{name}\" ".
-             "class=DerivateWorkflowInActiv ".
-             "style=\"cursor:pointer\"  ".
-             "onclick=\"markDerivateWorkflowLine(this);\" ".
-             "ondblclick=\"markDerivateWorkflowLine(this);".
-             "derivateWorkflow();\">";
-         if (!defined($derivRec->{icon})){
-            $derivRec->{icon}='../../base/load/MyW5Base-NewWf.jpg';
+      if ($#l>-1){
+         $$selopt.="<option value=\"wfstartnew\">".
+                   $self->getParent->T("wfstartnew",$tr).
+                   "</option>\n";
+         my $d="<div id='wfstartnewContainer' unselectable=\"on\" ".
+               "style=\"height:90px;border-style:solid;".
+               "-moz-user-select:none;khtml-user-select: none;".
+               "border-color:gray;border-width:1px;overflow:auto;".
+               "padding:5px\">";
+         $d.="<script language=JavaScript>";
+         $d.="function markDerivateWorkflowLine(o){";
+         $d.=" var blk=document.getElementById('wfstartnewContainer');";
+         $d.=" for(var count=0;count<blk.childNodes.length; count++){";
+         $d.="   if (blk.childNodes[count].tagName=='DIV' && ";
+         $d.="      blk.childNodes[count].className=='DerivateWorkflowActiv'){";
+         $d.="     blk.childNodes[count].className='DerivateWorkflowInActiv';";
+         $d.="   }";
+         $d.=" }";
+         $d.=" var v=document.getElementById('doDerivateWorkflow');";
+         $d.=" v.value=o.id;";
+         $d.=" o.className='DerivateWorkflowActiv'";
+         $d.="}";
+         $d.="</script>";
+         foreach my $derivRec (@l){
+            $d.="<div id=\"$derivRec->{name}\" ".
+                "class=DerivateWorkflowInActiv ".
+                "style=\"cursor:pointer\"  ".
+                "onclick=\"markDerivateWorkflowLine(this);\" ".
+                "ondblclick=\"markDerivateWorkflowLine(this);".
+                "derivateWorkflow();\">";
+            if (!defined($derivRec->{icon})){
+               $derivRec->{icon}='../../base/load/MyW5Base-NewWf.jpg';
+            }
+            my $i="<img border=0 style=\"padding:2px\" ".
+                  "src=\"$derivRec->{icon}\" width=30 height=30>";
+            $d.="<div style=\"float:left;width:34px;height:34px\">$i</div>".
+                "<div style=\"float:left;height:34px;".
+                "padding-top:5px;padding-left:5px;cursor:pointer\">".
+                $derivRec->{label}."</div>";
+            $d.="<div style='clear:both'></div>";
+            $d.="</div>";
          }
-         my $i="<img border=0 style=\"padding:2px\" ".
-               "src=\"$derivRec->{icon}\" width=30 height=30>";
-         $d.="<div style=\"float:left;width:34px;height:34px\">$i</div>".
-             "<div style=\"float:left;height:34px;".
-             "padding-top:5px;padding-left:5px;cursor:pointer\">".
-             $derivRec->{label}."</div>";
-         $d.="<div style='clear:both'></div>";
-         $d.="</div>";
+         $d.="\n<input type=hidden ".
+             "id=doDerivateWorkflow name=doDerivateWorkflow>";
+         $d.="\n</div>\n";
+         $$divset.="<div id=OPwfstartnew class=\"$class\">".
+                   "<div style=\"padding:5px\">".$d.
+                   "</div>".
+                   "</div>";
       }
-      $d.="\n<input type=hidden id=doDerivateWorkflow name=doDerivateWorkflow>";
-      $d.="\n</div>\n";
-      $$divset.="<div id=OPwfstartnew class=\"$class\">".
-                "<div style=\"padding:5px\">".$d.
-                "</div>".
-                "</div>";
    }
 
 }
