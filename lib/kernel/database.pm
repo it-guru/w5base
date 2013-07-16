@@ -94,7 +94,7 @@ sub Connect
             $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
                          private_foo_cachekey=>$self.time().".".
                          $BackendSessionName});
-         msg(INFO,"use NOT cached datbase connection on ODBC");
+         #msg(INFO,"use NOT cached datbase connection on ODBC");
       }
       else{
          my $private_foo_cachekey=$dbname."-".$$.".".$BackendSessionName;
