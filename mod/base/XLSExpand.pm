@@ -401,8 +401,8 @@ sub ProcessFile
          }
       }
       my $oldstyle=1;
-      if ($Spreadsheet::ParseExcel::VERSION eq "0.57" ||
-          $Spreadsheet::ParseExcel::VERSION eq "0.59"){
+      if ($Spreadsheet::ParseExcel::VERSION eq "0.57" ){
+          
          $oldstyle=0;
       }
 
