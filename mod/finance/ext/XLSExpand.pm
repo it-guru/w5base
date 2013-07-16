@@ -41,7 +41,8 @@ sub GetKeyCriterion
           out=>{
                 'finance::costcenter::name'     =>{label=>'Finanz/CRM: Kontierungsobjekt: CO-Nummber/PSP'},
                 'finance::costcenter::fullname' =>{label=>'Finanz/CRM: Kontierungsobjekt: Bezeichnung'},
-                'finance::costcenter::delmgr'   =>{label=>'Finanz/CRM: Kontierungsobjekt: SDM'}
+                'finance::costcenter::delmgr'   =>{label=>'Finanz/CRM: Kontierungsobjekt: SDM'},
+                'finance::costcenter::itsem'   =>{label=>'Finanz/CRM: Kontierungsobjekt: IT-SeM'}
                },
          };
    return($d);
@@ -75,7 +76,7 @@ sub ProcessLine
    }
  
    # output
-   foreach my $appsekvar (qw(name delmgr fullname)){
+   foreach my $appsekvar (qw(name delmgr itsem fullname)){
       if (exists($out->{'finance::costcenter::'.$appsekvar})){
          if (!defined($in->{'finance::costcenter::id'}) &&
              defined($out->{'finance::costcenter::name'})){
