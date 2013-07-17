@@ -243,7 +243,7 @@ sub Result
                    wffields.eventnetdurationsolved4h
                    wffields.eventchmticket
                    detaildescription
-                   wffields.eventstatreason 
+                   wffields.eventstatreasonFrontendText 
                    wffields.eventstatrespo 
                    id 
                    YEAR 
