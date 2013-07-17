@@ -164,7 +164,7 @@ sub RefreshSAPpsp
    # cleanup FTP Server
    foreach my $file (@procfiles){
       msg(DEBUG,"cleanup '$file'");
-      my $res=`echo 'mv \"$file\" \"$file.processed\"' |\
+      my $res=`echo 'rename \"$file\" \"$file.processed\"' |\
                sftp -b - \"$sftpsource\" 2>&1`;
       if ($?!=0){
          $loaderror.=$res;
@@ -247,7 +247,7 @@ sub RefreshSAPcostcenter
    # cleanup FTP Server
    foreach my $file (@procfiles){
       msg(DEBUG,"cleanup '$file'");
-      my $res=`echo 'mv \"$file\" \"$file.processed\"' |\
+      my $res=`echo 'rename \"$file\" \"$file.processed\"' |\
                sftp -b - \"$sftpsource\" 2>&1`;
       if ($?!=0){
          $loaderror.=$res;
