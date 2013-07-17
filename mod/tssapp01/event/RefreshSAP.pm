@@ -162,7 +162,8 @@ sub RefreshSAPpsp
    # cleanup FTP Server
    foreach my $file (@procfiles){
       msg(DEBUG,"cleanup '$file'");
-      my $res=`echo 'rm \"$file\"' | sftp -b - \"$sftpsource\" 2>&1`;
+      my $res=`echo 'mv \"$file\" \"$file.processed\"' |\
+               sftp -b - \"$sftpsource\" 2>&1`;
       if ($?!=0){
          $loaderror.=$res;
       }
@@ -175,6 +176,8 @@ sub RefreshSAPpsp
 
    return({exitcode=>0,msg=>'ok '.($#procfiles+1)." processed"});
 }
+
+
 
 sub processFile
 {
