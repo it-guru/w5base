@@ -102,6 +102,7 @@
 'itil.proc.ChangeManagement'=>{de=>'Change Management',en=>'Change Management'},
 'itil.proc.softmgmt'=>{de=>'Software Management',en=>'Software Management'},
 'itil.proc.softmgmt.analyse'=>{de=>'Analyse',en=>'Analyse'},
+'itil.proc.softmgmt.software'=>{de=>'Software Regel',en=>'Software Rule'},
 'itil.proc.mgmtitemgroup'=>{de=>'geführte CI Gruppe',en=>'managed CI group'},
 'itil.proc.mgmtitemgroup.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.proc.mgmtitemgroup.lnkmgmtitemgroup'=>{de=>'Zuordnungen',en=>'Relations'},

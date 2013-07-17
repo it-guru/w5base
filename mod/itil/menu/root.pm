@@ -487,6 +487,10 @@ sub Init
                       "itil::softwaresetanalyse",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itil.proc.softmgmt.software",
+                      "itil::lnksoftwaresoftwareset",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itil.proc.mgmtitemgroup",
                       "itil::mgmtitemgroup",
                       defaultacl=>['valid_user']);

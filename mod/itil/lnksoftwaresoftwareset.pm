@@ -153,7 +153,7 @@ sub new
                 dataobjattr   =>'lnksoftwaresoftwareset.realeditor')
 
    );
-   $self->setDefaultView(qw(appl name cdate));
+   $self->setDefaultView(qw(fullname version comparator mdate));
    $self->setWorktable("lnksoftwaresoftwareset");
    return($self);
 }
