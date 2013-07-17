@@ -1,4 +1,4 @@
-package tssapp01::psp;
+package tssapp01::costcenter;
 #  W5Base Framework
 #  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
 #
@@ -39,77 +39,44 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
-                dataobjattr   =>'interface_tssapp01_01.id'),
+                dataobjattr   =>'interface_tssapp01_02.id'),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
                 nowrap        =>1,
                 label         =>'PSP Name',
-                dataobjattr   =>'interface_tssapp01_01.name'),
-
-      new kernel::Field::Text(
-                name          =>'status',
-                label         =>'Status',
-                dataobjattr   =>'interface_tssapp01_01.status'),
+                dataobjattr   =>'interface_tssapp01_02.name'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
-                dataobjattr   =>'interface_tssapp01_01.description'),
+                dataobjattr   =>'interface_tssapp01_02.description'),
 
       new kernel::Field::Link(
                 name          =>'etype',
                 label         =>'Type',
-                dataobjattr   =>'interface_tssapp01_01.etype'),
+                dataobjattr   =>'interface_tssapp01_02.etype'),
 
       new kernel::Field::TextDrop(
-                name          =>'databoss',
+                name          =>'responsible',
                 group         =>'contacts',
-                label         =>'Databoss EMail',
+                label         =>'responsible EMail',
                 vjointo       =>'tswiw::user',
-                vjoinon       =>['databosswiw'=>'uid'],
+                vjoinon       =>['responsiblewiw'=>'uid'],
                 vjoindisp     =>'email'),
 
       new kernel::Field::Text(
-                name          =>'databosswiw',
+                name          =>'responsiblewiw',
                 group         =>'contacts',
-                label         =>'Databoss WIW ID',
-                dataobjattr   =>'interface_tssapp01_01.databosswiw'),
-
-      new kernel::Field::TextDrop(
-                name          =>'sm',
-                group         =>'contacts',
-                vjointo       =>'tswiw::user',
-                label         =>'Service Manager EMail',
-                vjoinon       =>['smwiw'=>'uid'],
-                vjoindisp     =>'email'),
-
-      new kernel::Field::Text(
-                name          =>'smwiw',
-                group         =>'contacts',
-                label         =>'Service Manager WIW ID',
-                dataobjattr   =>'interface_tssapp01_01.smwiw'),
-
-      new kernel::Field::TextDrop(
-                name          =>'dm',
-                group         =>'contacts',
-                label         =>'Delivery Manager EMail',
-                vjointo       =>'tswiw::user',
-                vjoinon       =>['dmwiw'=>'uid'],
-                vjoindisp     =>'email'),
-
-      new kernel::Field::Text(
-                name          =>'dmwiw',
-                group         =>'contacts',
-                label         =>'Delivery Manager WIW ID',
-                dataobjattr   =>'interface_tssapp01_01.dmwiw'),
+                label         =>'responsible WIW ID',
+                dataobjattr   =>'interface_tssapp01_02.responsiblewiw'),
 
       new kernel::Field::Text(
                 name          =>'saphier',
                 label         =>'SAP hierarchy',
                 group         =>'saphier',
                 ignorecase    =>1,
-                dataobjattr   =>tssapp01::psp::getSAPhierSQL()),
+                dataobjattr   =>tssapp01::costcenter::getSAPhierSQL()),
 
       new kernel::Field::Text(
                 name          =>'saphier1',
@@ -117,7 +84,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier1'),
+                dataobjattr   =>'interface_tssapp01_02.saphier1'),
 
       new kernel::Field::Text(
                 name          =>'saphier2',
@@ -125,7 +92,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier2'),
+                dataobjattr   =>'interface_tssapp01_02.saphier2'),
 
       new kernel::Field::Text(
                 name          =>'saphier3',
@@ -133,7 +100,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier3'),
+                dataobjattr   =>'interface_tssapp01_02.saphier3'),
 
       new kernel::Field::Text(
                 name          =>'saphier1',
@@ -141,7 +108,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier4'),
+                dataobjattr   =>'interface_tssapp01_02.saphier4'),
 
       new kernel::Field::Text(
                 name          =>'saphier5',
@@ -149,7 +116,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier5'),
+                dataobjattr   =>'interface_tssapp01_02.saphier5'),
 
       new kernel::Field::Text(
                 name          =>'saphier6',
@@ -157,7 +124,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier6'),
+                dataobjattr   =>'interface_tssapp01_02.saphier6'),
 
       new kernel::Field::Text(
                 name          =>'saphier7',
@@ -165,7 +132,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier7'),
+                dataobjattr   =>'interface_tssapp01_02.saphier7'),
 
       new kernel::Field::Text(
                 name          =>'saphier8',
@@ -173,7 +140,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier8'),
+                dataobjattr   =>'interface_tssapp01_02.saphier8'),
 
       new kernel::Field::Text(
                 name          =>'saphier9',
@@ -181,7 +148,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier9'),
+                dataobjattr   =>'interface_tssapp01_02.saphier9'),
 
       new kernel::Field::Text(
                 name          =>'saphier10',
@@ -189,49 +156,43 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier10'),
+                dataobjattr   =>'interface_tssapp01_02.saphier10'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Creation-Date',
-                dataobjattr   =>'interface_tssapp01_01.createdate'),
+                dataobjattr   =>'interface_tssapp01_02.createdate'),
                                                   
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
-                dataobjattr   =>'interface_tssapp01_01.modifydate'),
-
-      new kernel::Field::Boolean(
-                name          =>'isdeleted',
-                uivisible     =>0,
-                label         =>'is deleted',
-                dataobjattr   =>'interface_tssapp01_01.isdeleted'),
+                dataobjattr   =>'interface_tssapp01_02.modifydate'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'interface_tssapp01_01.srcsys'),
+                dataobjattr   =>'interface_tssapp01_02.srcsys'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'interface_tssapp01_01.srcid'),
+                dataobjattr   =>'interface_tssapp01_02.srcid'),
 
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'interface_tssapp01_01.srcload'),
+                dataobjattr   =>'interface_tssapp01_02.srcload'),
 
    );
    $self->setDefaultView(qw(name description cdate mdate));
-   $self->setWorktable("interface_tssapp01_01");
+   $self->setWorktable("interface_tssapp01_02");
    $self->{history}=[qw(insert modify delete)];
    return($self);
 }
@@ -239,7 +200,7 @@ sub new
 sub getSAPhierSQL
 {
    my $tab=shift;
-   $tab="interface_tssapp01_01" if ($tab eq "");
+   $tab="interface_tssapp01_02" if ($tab eq "");
    my $saphierfield;
    for(my $c=1;$c<=10;$c++){
       $saphierfield.=",'.'," if ($saphierfield ne "");
@@ -257,10 +218,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   $newrec->{etype}='PSP';
-   if (exists($newrec->{isdeleted}) && $newrec->{isdeleted} eq ""){
-      $newrec->{isdeleted}="0";
-   }
+  # $newrec->{etype}='PSP';
 
    return(1);
 }

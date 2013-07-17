@@ -1,2 +1,3 @@
 'itu.tssapp01'=>{de=>'SAP P01',en=>'SAP P01'},
 'itu.tssapp01.PSP'=>{de=>'PSP Element',en=>'PSP Element'},
+'itu.tssapp01.costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},

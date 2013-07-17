@@ -1,4 +1,4 @@
-package tssapp01::event::RefreshSAPpsp;
+package tssapp01::event::RefreshSAP;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -91,6 +91,8 @@ sub Init
 
 
    $self->RegisterEvent("RefreshSAPpsp","RefreshSAPpsp",timeout=>14400);
+   $self->RegisterEvent("RefreshSAPcostcenter",
+                        "RefreshSAPcostcenter",timeout=>14400);
    return(1);
 }
 
@@ -151,11 +153,94 @@ sub RefreshSAPpsp
       next if (!($file=~m/\.csv$/i));
       next if ($#filter!=-1 && !in_array(\@filter,$label));
 
-      if ($self->processFile(File::Spec->catfile($tempdir,$file),$label)){
+      if ($self->processFile(File::Spec->catfile($tempdir,$file),$label,$type)){
          push(@procfiles,$file);
          # ToDo: Bulk Delete old records
 
 
+      }
+   }
+
+   # cleanup FTP Server
+   foreach my $file (@procfiles){
+      msg(DEBUG,"cleanup '$file'");
+      my $res=`echo 'mv \"$file\" \"$file.processed\"' |\
+               sftp -b - \"$sftpsource\" 2>&1`;
+      if ($?!=0){
+         $loaderror.=$res;
+      }
+   }
+   
+
+   if (defined($loaderror)){
+      return({exitcode=>1,msg=>'ERROR:'.$loaderror});
+   }
+
+   return({exitcode=>0,msg=>'ok '.($#procfiles+1)." processed"});
+}
+
+
+sub RefreshSAPcostcenter
+{
+   my $self=shift;
+   my @filter=@_;
+   my $loaderror;
+   my @loadfiles;
+   my @procfiles;
+
+   my $sftpsource=$self->Config->Param("DATAOBJCONNECT");
+   $sftpsource=$sftpsource->{'RefreshSAPP01'} if (ref($sftpsource) eq "HASH");
+
+   if ($sftpsource eq ""){
+      my $msg="Event RefreshSAPP01 not processable without SFTP Connect\n".
+              "Parameter in DATAOBJCONNECT[RefreshSAPP01] Config";
+      msg(ERROR,$msg);
+      return({exitcode=>1,msg=>$msg});
+
+   }
+
+   #######################################################################
+   # transfer files from SFTP Server
+   my $tempdir=File::Temp::tempdir(CLEANUP=>1);
+   $SIG{INT} = sub { eval('remove_tree($tempdir);exit(1);') if (-d $tempdir);};
+   msg(DEBUG,"Starting Refresh on $tempdir");
+   my $res=`echo 'lcd \"$tempdir\"\nget *' | 
+            sftp -b - \"$sftpsource\" 2>&1`;
+   if ($?!=0){
+      $loaderror=$res;
+   }
+   #######################################################################
+   # after this, all fields in $tempdir
+
+   if (!defined($loaderror)){
+      my $dh;
+      if (opendir($dh,$tempdir)){
+         @loadfiles=grep({ -f "$tempdir/$_" &&
+                           !($_=~m/^\./) } readdir($dh));
+         if ($#loadfiles==-1){
+            $loaderror="error - no files transfered from '$sftpsource'";
+         }
+      }
+      else{
+         $loaderror="fail to open dir '$tempdir': $?";
+      }
+   }
+   #######################################################################
+   # after this, all useable files are in @loadfiles
+   foreach my $file (@loadfiles){
+      my $label=$file;
+      $label=~s/_.*//;
+      my $type;
+      $type="costcenter" if ($file=~m/_kostl_h_/);
+      next if (!defined($type));
+      next if (!($file=~m/\.csv$/i));
+      next if ($#filter!=-1 && !in_array(\@filter,$label));
+
+      if ($self->processFile(File::Spec->catfile($tempdir,$file),$label,$type)){
+         push(@procfiles,$file);
+         # ToDo: Bulk Delete old records
+
+         last;
       }
    }
 
@@ -184,8 +269,58 @@ sub processFile
    my $self=shift;
    my $file=shift;
    my $label=shift;
+   my $type=shift;
 
-   my $if=getModuleObject($self->Config,"tssapp01::psp");
+   my $obj; # target object
+   my %m;   # mapping
+   if ($type eq "psp"){
+      $obj="tssapp01::psp";
+      %m=(
+          'WBS-Number'             =>'name',
+          'description'            =>'description',
+          'delete'                 =>'isdeleted',
+          'status'                 =>'status',
+          'supervisor_wiw'         =>'databosswiw',
+          'customer'               =>'sapcustomer',
+          'service manager'        =>'smwiw',
+          'delivery manager'       =>'delmwiw',
+          'hierarchy TSI ID'       =>'saphier1',
+          'hierarchy ESS/BSS ID'   =>'saphier2',
+          'hierarchy ITO/SSM ID'   =>'saphier3',
+          'hierarchy BB-1'         =>'saphier4',
+          'business center ID'     =>'saphier5',
+          'customer center ID'     =>'saphier6',
+          'customer team ID'       =>'saphier7',
+          'customer office ID'     =>'saphier8',
+          'hierarchy 9 ID'         =>'saphier9',
+          'hierarchy 10 ID'        =>'saphier10',
+          'parent Co-Number'       =>'pconumber',
+          'NOR-solution model'     =>'normodel',
+          'NOR-n'                  =>'norn'
+      );
+   }
+   if ($type eq "costcenter"){
+      $obj="tssapp01::costcenter";
+      %m=(
+          'cost center'            =>'name',
+          'description'            =>'description',
+          'company code'           =>'accarea',
+          'cost center type'       =>'etype',
+          'supervisor'             =>'responsiblewiw',
+          'hierarchy TSI ID'       =>'saphier1',
+          'hierarchy ESS/BSS ID'   =>'saphier2',
+          'hierarchy ITO/SSM ID'   =>'saphier3',
+          'hierarchy SL/IL ID'     =>'saphier4',
+          'business center ID'     =>'saphier5',
+          'customer center ID'     =>'saphier6',
+          'customer team ID'       =>'saphier7',
+          'customer office ID'     =>'saphier8',
+          'hierarchy 9 ID'         =>'saphier9',
+          'hierarchy 10 ID'        =>'saphier10'
+      );
+   }
+   
+   my $if=getModuleObject($self->Config,$obj);
 
    msg(DEBUG,"process '$file'");
    my $csv=Text::CSV_XS->new({
@@ -197,29 +332,6 @@ sub processFile
    my %k;
    my $srcsys=$label;
 
-   my %m=(
-      'WBS-Number'             =>'name',
-      'description'            =>'description',
-      'delete'                 =>'isdeleted',
-      'status'                 =>'status',
-      'supervisor_wiw'         =>'databosswiw',
-      'customer'               =>'sapcustomer',
-      'service manager'        =>'smwiw',
-      'delivery manager'       =>'delmwiw',
-      'hierarchy TSI ID'       =>'saphier1',
-      'hierarchy ESS/BSS ID'   =>'saphier2',
-      'hierarchy ITO/SSM ID'   =>'saphier3',
-      'hierarchy BB-1'         =>'saphier4',
-      'business center ID'     =>'saphier5',
-      'customer center ID'     =>'saphier6',
-      'customer team ID'       =>'saphier7',
-      'customer office ID'     =>'saphier8',
-      'hierarchy 9 ID'         =>'saphier9',
-      'hierarchy 10 ID'        =>'saphier10',
-      'parent Co-Number'       =>'pconumber',
-      'NOR-solution model'     =>'normodel',
-      'NOR-n'                  =>'norn');
-   
    if (open(my $fh,"<:encoding(Latin1)",$file)){
       $csv->column_names ($csv->getline($fh)); # use first line as fieldnames
       my $line=0;

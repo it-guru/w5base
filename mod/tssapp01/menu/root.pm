@@ -42,6 +42,10 @@ sub Init
                       "tssapp01::psp",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.tssapp01.costcenter",
+                      "tssapp01::costcenter",
+                      defaultacl=>['valid_user']);
+   
    return($self);
 }
 
