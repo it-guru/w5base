@@ -162,8 +162,8 @@ sub ProcessLine
                my ($corec,$msg)=$o->getOnlyFirst(qw(id));
                if (defined($corec)){
                   $in->{'finance::costcenter::id'}->{$corec->{id}}++;
+                  return(0); # input data has been enritched
                }
-               return(0); # input data has been enritched
             }
          }
          if (grep(/^itil::system::.*$/,keys(%{$out}))){
