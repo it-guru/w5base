@@ -44,8 +44,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 nowrap        =>1,
-                label         =>'PSP Name',
+                label         =>'CostCenter',
                 dataobjattr   =>'interface_tssapp01_02.name'),
+
+      new kernel::Field::Text(
+                name          =>'accarea',
+                label         =>'Accounting Area',
+                dataobjattr   =>'interface_tssapp01_02.accarea'),
 
       new kernel::Field::Text(
                 name          =>'description',

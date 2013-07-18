@@ -1,4 +1,6 @@
-'tssapp01::psp'=>{de=>'Kostenstelle',en=>'CostCenter'},
+'tssapp01::costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
+'CostCenter'=>{de=>'Kostenstelle'},
 'Description'=>{de=>'Beschreibung'},
 'SAP hierarchy'=>{de=>'SAP Hierarchie'},
 'fieldgroup.saphier'=>{de=>'SAP Hierarchie',en=>'SAP hierarchy'},
+'Accounting Area'=>{de=>'Buchungskreis'},

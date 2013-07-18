@@ -93,7 +93,9 @@ sub new
                 searchable    =>0,
                 readonly      =>1,
                 label         =>'Costcenter label',
-                dataobjattr   =>"if (costcenter.fullname<>'',concat(costcenter.name,': ',costcenter.fullname),costcenter.name)"),
+                dataobjattr   =>"if (costcenter.fullname<>'',".
+                                "concat(costcenter.name,': ',".
+                                "costcenter.fullname),costcenter.name)"),
 
       new kernel::Field::Text(
                 name          =>'shortdesc',
@@ -301,6 +303,7 @@ sub isViewValid
 
    return("header","default") if (!defined($rec));
 
+
    my ($itsem,$delmgr)=managerState($rec);
    my @all=qw(header default itsem delmgmt contacts control misc source
               history qc);
@@ -341,26 +344,48 @@ sub SecureValidate
 sub ValidateCONumber
 {
    my $self=shift;
+   my $dataobj=shift;  # call for which dataobject
    my $fieldname=shift;
    my $oldrec=shift;
    my $newrec=shift;
 
 
-   if (!defined($oldrec) || exists($newrec->{$fieldname})){
-      my $conummer=uc(effVal($oldrec,$newrec,$fieldname));
-      if ($conummer=~m/^\s*$/ || 
-          (!($conummer=~m/^[0-9]+$/) &&
-           !($conummer=~m/^\S+\[\d+\]$/) &&   # for deleted entries
-           !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
-           !($conummer=~m/^[A-Z]-[A-Z,0-9]{10}$/) &&
-           !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
-         return(0);
+   if (!exists($self->{costcenter})){
+      $self->LoadSubObjs("ext/costcenter","costcenter");
+   }
+   my $n=0;
+   foreach my $obj (values(%{$self->{costcenter}})){
+      if ($obj->ValidateCONumber($dataobj,$fieldname,$oldrec,$newrec)){
+         return(1);
       }
-      $conummer=~s/^0+//g;
-      if (defined($newrec)){
-         $newrec->{$fieldname}=$conummer;
+      $n++;
+   }
+   if ($n==0){ # if there are no modules, only real nubers are allowed
+      msg(INFO,"no module found - using default format for costcenters");
+      my $conumber=effVal($oldrec,$newrec,$fieldname);
+      if ($conumber=~m/^\d+$/){
+         return(1);
       }
    }
+   return(0);
+
+
+
+#   if (!defined($oldrec) || exists($newrec->{$fieldname})){
+#      my $conummer=uc(effVal($oldrec,$newrec,$fieldname));
+#      if ($conummer=~m/^\s*$/ || 
+#          (!($conummer=~m/^[0-9]+$/) &&
+#           !($conummer=~m/^\S+\[\d+\]$/) &&   # for deleted entries
+#           !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
+#           !($conummer=~m/^[A-Z]-[A-Z,0-9]{10}$/) &&
+#           !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
+#         return(0);
+#      }
+#      $conummer=~s/^0+//g;
+#      if (defined($newrec)){
+#         $newrec->{$fieldname}=$conummer;
+#      }
+#   }
    return(1);
 }
 
@@ -408,8 +433,8 @@ sub Validate
          return(undef);
       }
    }
-   if (!$self->finance::costcenter::ValidateCONumber("name",
-       $oldrec,$newrec)){
+   if (!$self->finance::costcenter::ValidateCONumber(
+        $self->SelfAsParentObject,"name",$oldrec,$newrec)){
       $self->LastMsg(ERROR,
           $self->T("invalid number format '\%s' specified",
                    "finance::costcenter"),$newrec->{name});

@@ -48,6 +48,11 @@ sub new
                 dataobjattr   =>'interface_tssapp01_01.name'),
 
       new kernel::Field::Text(
+                name          =>'accarea',
+                label         =>'Accounting Area',
+                dataobjattr   =>'interface_tssapp01_01.accarea'),
+
+      new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 dataobjattr   =>'interface_tssapp01_01.status'),
