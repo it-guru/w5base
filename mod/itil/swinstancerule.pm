@@ -551,7 +551,7 @@ sub Validate
          if ($newrec->{$n} ne "any"){
             my $chk=$newrec->{$n};
             my ($o1,$o2,$o3,$o4,$net)=
-               $chk=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/;
+               $chk=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
             if ($o1 eq "" || $o1>255 || 
                 $o2 eq "" || $o2>255 ||
                 $o3 eq "" || $o3>255 ||
