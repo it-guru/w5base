@@ -95,7 +95,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'cistatusid',
-                group         =>'link',
+                group         =>'default',
                 label         =>'Rule-StateID',
                 dataobjattr   =>'swinstancerule.cistatus'),
 
