@@ -74,7 +74,19 @@ sub isSelectable
    if (ref($u->{groups}) eq "ARRAY"){  
       foreach my $grprec (@{$u->{groups}}){ 
          if (ref($grprec->{roles}) eq "ARRAY"){
-            return(1) if (grep(/^(RINManager|RCHManager|RPRManager|RAuditor|RMonitor)$/,
+            return(1) if (in_array($grprec->{roles}, 
+                          [qw(
+                              RINManager 
+                              RINManager2 
+                              RINOperator
+                              RCHManager 
+                              RCHManager2 
+                              RCHOperator
+                              RPRManager 
+                              RPRManager2 
+                              RPROperator
+                              RAuditor 
+                              RMonitor)],
                           @{$grprec->{roles}}));
          }
       }
