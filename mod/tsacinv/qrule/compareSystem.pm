@@ -350,6 +350,7 @@ sub qcheckRecord
                                      DATA=>{
                                         name      =>$newrec->{ipaddress},
                                         cistatusid=>4,
+                                        type      =>'1', # use sek. entry
                                         networkid =>$networkid,
                                         comments  =>$newrec->{description},
                                         systemid  =>$p{refid}
