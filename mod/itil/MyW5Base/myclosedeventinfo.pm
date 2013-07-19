@@ -93,7 +93,7 @@ sub Result
    if ($dc eq "TEAM"){
       my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
                            ["REmployee","RBoss","RFreelancer","RApprentice",
-                            "RINManager","RQManager"],"down");
+                            "RINManager","RINOperator","RQManager"],"down");
       @grpids=keys(%grp);
       @grpids=(qw(-1)) if ($#grpids==-1);
       my (%q1,%q2,%q3);
