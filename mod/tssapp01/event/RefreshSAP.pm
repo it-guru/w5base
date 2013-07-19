@@ -90,16 +90,17 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("RefreshSAPpsp","RefreshSAPpsp",timeout=>14400);
-   $self->RegisterEvent("RefreshSAPcostcenter",
-                        "RefreshSAPcostcenter",timeout=>14400);
+   $self->RegisterEvent("RefreshSAP",
+                        "RefreshSAP",timeout=>14400);
    return(1);
 }
 
 
-sub RefreshSAPpsp
+
+sub RefreshSAP
 {
    my $self=shift;
+   my $reqType=shift;
    my @filter=@_;
    my $loaderror;
    my @loadfiles;
@@ -116,12 +117,18 @@ sub RefreshSAPpsp
 
    }
 
+   if ($reqType eq ""){
+      my $msg="no type (costcenter or psp) specified";
+      msg(ERROR,$msg);
+      return({exitcode=>1,msg=>$msg});
+   }
+
    #######################################################################
    # transfer files from SFTP Server
    my $tempdir=File::Temp::tempdir(CLEANUP=>1);
    $SIG{INT} = sub { eval('remove_tree($tempdir);exit(1);') if (-d $tempdir);};
    msg(DEBUG,"Starting Refresh on $tempdir");
-   my $res=`echo 'lcd \"$tempdir\"\nget *' | 
+   my $res=`echo 'lcd \"$tempdir\"\nget *.csv' | 
             sftp -b - \"$sftpsource\" 2>&1`;
    if ($?!=0){
       $loaderror=$res;
@@ -148,97 +155,24 @@ sub RefreshSAPpsp
       my $label=$file;
       $label=~s/_.*//;
       my $type;
-      $type="psp" if ($file=~m/_order_hier_/);
+      if ($reqType eq "costcenter"){
+         $type="costcenter" if ($file=~m/_kostl_h_/);
+      }
+      if ($reqType eq "psp"){
+         $type="psp" if ($file=~m/_order_hier_/);
+      }
       next if (!defined($type));
       next if (!($file=~m/\.csv$/i));
-      next if ($#filter!=-1 && !in_array(\@filter,$label));
-
-      if ($self->processFile(File::Spec->catfile($tempdir,$file),$label,$type)){
-         push(@procfiles,$file);
-         # ToDo: Bulk Delete old records
-
-
-      }
-   }
-
-   # cleanup FTP Server
-   foreach my $file (@procfiles){
-      msg(DEBUG,"cleanup '$file'");
-      my $res=`echo 'rename \"$file\" \"$file.processed\"' |\
-               sftp -b - \"$sftpsource\" 2>&1`;
-      if ($?!=0){
-         $loaderror.=$res;
-      }
-   }
-   
-
-   if (defined($loaderror)){
-      return({exitcode=>1,msg=>'ERROR:'.$loaderror});
-   }
-
-   return({exitcode=>0,msg=>'ok '.($#procfiles+1)." processed"});
-}
-
-
-sub RefreshSAPcostcenter
-{
-   my $self=shift;
-   my @filter=@_;
-   my $loaderror;
-   my @loadfiles;
-   my @procfiles;
-
-   my $sftpsource=$self->Config->Param("DATAOBJCONNECT");
-   $sftpsource=$sftpsource->{'RefreshSAPP01'} if (ref($sftpsource) eq "HASH");
-
-   if ($sftpsource eq ""){
-      my $msg="Event RefreshSAPP01 not processable without SFTP Connect\n".
-              "Parameter in DATAOBJCONNECT[RefreshSAPP01] Config";
-      msg(ERROR,$msg);
-      return({exitcode=>1,msg=>$msg});
-
-   }
-
-   #######################################################################
-   # transfer files from SFTP Server
-   my $tempdir=File::Temp::tempdir(CLEANUP=>1);
-   $SIG{INT} = sub { eval('remove_tree($tempdir);exit(1);') if (-d $tempdir);};
-   msg(DEBUG,"Starting Refresh on $tempdir");
-   my $res=`echo 'lcd \"$tempdir\"\nget *' | 
-            sftp -b - \"$sftpsource\" 2>&1`;
-   if ($?!=0){
-      $loaderror=$res;
-   }
-   #######################################################################
-   # after this, all fields in $tempdir
-
-   if (!defined($loaderror)){
-      my $dh;
-      if (opendir($dh,$tempdir)){
-         @loadfiles=grep({ -f "$tempdir/$_" &&
-                           !($_=~m/^\./) } readdir($dh));
-         if ($#loadfiles==-1){
-            $loaderror="error - no files transfered from '$sftpsource'";
+      if ($#filter !=-1){
+         my $found=0;
+         foreach my $prefix (@filter){
+            my $qprefix=quotemeta($prefix);
+            $found++ if ($file=~m/^$qprefix/);
          }
+         next if (!$found);
       }
-      else{
-         $loaderror="fail to open dir '$tempdir': $?";
-      }
-   }
-   #######################################################################
-   # after this, all useable files are in @loadfiles
-   foreach my $file (@loadfiles){
-      my $label=$file;
-      $label=~s/_.*//;
-      my $type;
-      $type="costcenter" if ($file=~m/_kostl_h_/);
-      next if (!defined($type));
-      next if (!($file=~m/\.csv$/i));
-      next if ($#filter!=-1 && !in_array(\@filter,$label));
-
       if ($self->processFile(File::Spec->catfile($tempdir,$file),$label,$type)){
          push(@procfiles,$file);
-         # ToDo: Bulk Delete old records
 
          last;
       }
@@ -259,7 +193,7 @@ sub RefreshSAPcostcenter
       return({exitcode=>1,msg=>'ERROR:'.$loaderror});
    }
 
-   return({exitcode=>0,msg=>'ok '.($#procfiles+1)." processed"});
+   return({exitcode=>0,msg=>'ok '.($#procfiles+1)." files processed"});
 }
 
 
@@ -273,11 +207,13 @@ sub processFile
 
    my $obj; # target object
    my %m;   # mapping
+   my $start=NowStamp("en");
    if ($type eq "psp"){
       $obj="tssapp01::psp";
       %m=(
           'WBS-Number'             =>'name',
           'description'            =>'description',
+          'company code'           =>'accarea',
           'delete'                 =>'isdeleted',
           'status'                 =>'status',
           'supervisor_wiw'         =>'databosswiw',
@@ -371,12 +307,16 @@ sub processFile
             $if->ValidatedInsertOrUpdateRecord($wrrec,
                                                {'name'=>\$wrrec->{'name'},
                                                 'srcsys'=>\$srcsys});
+            #exit() if ($wrrec->{'name'} eq "E-900328595O-1000IT");
             #print Dumper($wrrec);
          }
       } 
       $csv->eof or $csv->error_diag ();
       #printf STDERR ("fifi $line processed\n");
    }
+   # ToDo: Bulk Delete old records
+   $if->BulkDeleteRecord({'srcload'=>"<$start",
+                          'srcsys'=>$srcsys});
 
    return(1); 
 }
