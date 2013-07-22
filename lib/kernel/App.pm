@@ -806,6 +806,9 @@ sub Log
    if ($W5V2::OperationContext eq "W5Server"){
       $facility="w5server_".$facility;
    }
+   elsif ($W5V2::OperationContext eq "W5Replicate"){
+      $facility="w5replicate_".$facility;
+   }
    my $Cache=$self->Cache;
    if (!exists($Cache->{LogCache})){
       $Cache->{LogCache}={}; 
