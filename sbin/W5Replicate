@@ -230,6 +230,8 @@ sub getOracleDBIConnectionHandle
    my $dst=DBI->connect($dbconnect,$dbuser,$dbpass,{
           AutoCommit=>0,
           FetchHashKeyName=>'NAME_lc',});
+   $dst->{'LongTruncOk'} = 1;
+   $dst->{'LongReadLen'} = 128000;
    if (!defined($dst)){
       msg(ERROR,$DBI::errstr);
       exit(100);
@@ -603,7 +605,8 @@ sub objectReplicationPhase2
          }
       }
    }
-   while($ReplicationStart+$MaximumReplicationTime-10>time() &&
+   my %idseen=();
+   SPLOOP: while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
       my $curSyncTime=time()-$ReplicationStart;
 
@@ -618,6 +621,8 @@ sub objectReplicationPhase2
       }
       foreach my $rec (@buffer){
          my $id=$rec->{$ctrl->{idname}};
+         last SPLOOP if (exists($idseen{$id}));  # end if an ID is already seen
+         $idseen{$id}++;
          $dbi->doCmd("update \"$ctrl->{name}\" set w5repllasttry=sysdate ".
                      "where $ctrl->{idname}=?",$id);
          $obj->ResetFilter();
@@ -646,7 +651,8 @@ sub objectReplicationPhase2
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
                                                 {
-                                                   enddate=>NowStamp("en")
+                                                 enddate=>NowStamp("en"),
+                                                 effentries=>int(keys(%idseen))
                                                 },
                                                 {id=>\$rstatid});
 }
