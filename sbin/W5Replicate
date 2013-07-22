@@ -65,7 +65,7 @@ if ($ENV{REMOTE_USER} eq ""){
    }
    $ENV{REAL_REMOTE_USER}="system/W5Replicate";
 }
-$W5V2::OperationContext="W5Server";
+$W5V2::OperationContext="W5Replicate";
 
 
 
@@ -73,7 +73,7 @@ $W5V2::OperationContext="W5Server";
 # handling option to set commandline specfied config-name
 #
 if ($opt_c eq ""){
-   $opt_c="replicate";
+   $opt_c="w5replicate";
 }
 $configname=$opt_c;
 
