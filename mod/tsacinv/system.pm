@@ -637,8 +637,10 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amcomputer.ORA_ROWSCN'),
-
+                dataobjattr   =>'amcomputer.dtlastmodif'),
+             #   dataobjattr   =>'amcomputer.ORA_ROWSCN'), # funktioniert
+                                                           # nach AM Update
+                                                           # nicht mehr
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
