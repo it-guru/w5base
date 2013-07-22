@@ -104,19 +104,15 @@ sub ProcessHead
    my $rows=$self->getParent->getParent->Rows();
    if ($limit==0 || $limit>$rows){   # add web-browser table sort function
       my @sortnames;
-      foreach my $fieldname (@view){
-         my $field=$app->getField($fieldname);
+      foreach my $field (@view){
+         my $fieldname=$field->Name();
          if (defined($field)){
-            if ($field->Name() eq "linenumber"){
-               push(@sortnames,"None");
+            if ($field->Type() eq "Number" ||
+                $field->Type() eq "Linenumber"){
+               push(@sortnames,"Number");
             }
             else{
-               if ($field->Type() eq "Number"){
-                  push(@sortnames,"Number");
-               }
-               else{
-                  push(@sortnames,"String");
-               }
+               push(@sortnames,"String");
             }
          }
       }
