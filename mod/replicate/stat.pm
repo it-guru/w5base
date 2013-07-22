@@ -45,9 +45,9 @@ sub new
                 dataobjattr   =>'replicatestat.id'),
                                                   
       new kernel::Field::Text(
-                name          =>'name',
-                label         =>'Dataobject name',
-                dataobjattr   =>'replicatestat.replobj'),
+                name          =>'objectid',
+                label         =>'Dataobject ID',
+                dataobjattr   =>'replicatestat.replobject'),
 
       new kernel::Field::Text(
                 name          =>'phase',
