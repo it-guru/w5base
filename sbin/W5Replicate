@@ -456,6 +456,11 @@ sub objectReplicationPhase1
                                                    objectid=>$rorec->{id},
                                                    startdate=>NowStamp("en")
                                                 });
+   if (!defined($rstatid)){
+      $dbi->rollback();
+      $dbi->disconnect();
+      die("can not create State-Record for phase 1 on $ctrl->{'name'}");
+   }
    my $oldreplkey;
    while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
@@ -572,6 +577,11 @@ sub objectReplicationPhase2
                                                    startdate=>NowStamp("en")
                                                 });
 
+   if (!defined($rstatid)){
+      $dbi->rollback();
+      $dbi->disconnect();
+      die("can not create State-Record for phase 2 on $ctrl->{'name'}");
+   }
 
    my $cmd="select count(*) n ".
            "from \"$ctrl->{name}\" ";
@@ -668,6 +678,12 @@ sub objectReplicationPhase3
                                                    startdate=>NowStamp("en")
                                                 });
 
+
+ #  if (!defined($rstatid)){
+ #     $dbi->rollback();
+ #     $dbi->disconnect();
+ #     die("can not create State-Record for phase 3 on $ctrl->{'name'}");
+ #  }
 
    my $cmd="delete from \"$ctrl->{name}\" ".
            "where w5repllastsucc<sysdate-7 and w5replfailcnt>2";
