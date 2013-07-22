@@ -637,11 +637,8 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>
-                   "to_date(amcomputer.dtlastmodif,'YYYY-MM-DD HH24:MI:SS')"),
-             #   dataobjattr   =>'amcomputer.ORA_ROWSCN'), # funktioniert
-                                                           # nach AM Update
-                                                           # nicht mehr
+                dataobjattr   =>'amcomputer.ORA_ROWSCN'),
+
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
