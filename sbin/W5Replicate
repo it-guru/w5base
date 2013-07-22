@@ -708,6 +708,7 @@ sub objectReplicationPhase3
 
 sub createSlot
 {
+   my $self=shift;
    my $tasklabel=shift;
    my $nice=shift;
    my $ctrl=shift;
@@ -716,6 +717,15 @@ sub createSlot
    my $pid=fork();
    if ($pid==0){
       POSIX::nice($nice);
+      {   # reset eviroment
+         $W5V2::W5Server=undef;
+         my %ClientParam;
+         $ClientParam{'PeerAddr'}=$self->Config->Param("W5SERVERHOST");
+         $ClientParam{'PeerPort'}=$self->Config->Param("W5SERVERPORT");
+         $W5V2::W5Server=new RPC::Smart::Client(%ClientParam);
+         $W5V2::W5Server->Connect();
+         $self->Cache->{W5Server}=$W5V2::W5Server;
+      }
       exit(&$function());
    }
 
@@ -753,7 +763,7 @@ while(my $nextjob=shift(@joblist)){
          if ($replControl->{'valid'} && $replControl->{'requested'}){
             if ($nextjob->{'phase'}==1){
                $currentStartPhase=1;
-               $slot[$slotno]=createSlot("Phase1",1,$replControl,sub{
+               $slot[$slotno]=createSlot($self,"Phase1",1,$replControl,sub{
                   objectReplicationPhase1($config,$phaselimit,$replControl);
                });
             }
@@ -767,13 +777,13 @@ while(my $nextjob=shift(@joblist)){
                   }
                }
                $currentStartPhase=2;
-               $slot[$slotno]=createSlot("Phase2",10,$replControl,sub{
+               $slot[$slotno]=createSlot($self,"Phase2",10,$replControl,sub{
                   objectReplicationPhase2($config,$phaselimit,$replControl);
                });
             }
             elsif ($nextjob->{'phase'}==3){  # cleanup
                $currentStartPhase=3;
-               $slot[$slotno]=createSlot("Phase3",2,$replControl,sub{
+               $slot[$slotno]=createSlot($self,"Phase3",2,$replControl,sub{
                   objectReplicationPhase3($config,10,$replControl);
                });
             }
@@ -927,6 +937,12 @@ sub preprocessRecord
                                     $col->{$fieldname}->{'size'});
          }
       }
+      if (scalar($rec{$fieldname}) =~ m/^Container=HASH/) {
+         $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
+      }
+      if (ref($rec{$fieldname}) eq "ARRAY"){
+         $rec{$fieldname}=join("; ",@{$rec{$fieldname}});
+      }
    }
    return(\%rec);
 }
@@ -974,12 +990,7 @@ sub InsertOrUpdate
       my $isChanged=$self->isChanged($ctrl,$curlist[0],$rec);
       my (@v,@values);
       foreach my $fieldname (@view){
-         if (scalar($rec->{$fieldname}) =~ m/^Container=HASH/) {
-            push(@values,$self->Hash2DataField($rec->{$fieldname}));
-         }
-         else {
-            push(@values,$rec->{$fieldname});
-         }
+         push(@values,$rec->{$fieldname});
          if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
             push(@v,"$fieldname=to_date(?,'YYYY-MM-DD HH24:MI:SS')");
          }
@@ -1001,12 +1012,7 @@ sub InsertOrUpdate
       my @values;
       my @place;
       foreach my $fieldname (@view) {
-         if (scalar($rec->{$fieldname}) =~ m/^Container=HASH/) {
-            push(@values,$self->Hash2DataField($rec->{$fieldname}));
-         }
-         else {
-            push(@values,$rec->{$fieldname});
-         }
+         push(@values,$rec->{$fieldname});
          if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
             push(@place,"to_date(?,'YYYY-MM-DD HH24:MI:SS')");
          }
