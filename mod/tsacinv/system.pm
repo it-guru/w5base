@@ -637,7 +637,7 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amcomputer.ORA_ROWSCN'),
+                dataobjattr   =>'amcomputer.dtlastmodif'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
