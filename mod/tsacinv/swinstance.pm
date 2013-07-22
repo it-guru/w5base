@@ -42,7 +42,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Instance fullname',
-                searchable    =>1,
+                searchable    =>0,
                 uppersearch   =>1,
                 htmldetail    =>0,
                 htmlwidth     =>'100px',
