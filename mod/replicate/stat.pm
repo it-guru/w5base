@@ -39,7 +39,6 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                uivisible     =>0,
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'replicatestat.id'),
@@ -82,7 +81,7 @@ sub new
                 dataobjattr   =>'replicatestat.enddate'),
                                                   
    );
-   $self->setDefaultView(qw(linenumber startdate  object phase enddate'));
+   $self->setDefaultView(qw(linenumber startdate  object phase enddate));
    $self->setWorktable("replicatestat");
    return($self);
 }
