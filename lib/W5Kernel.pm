@@ -27,7 +27,8 @@ sub msg
    foreach my $linemsg (split(/\n/,$msg)){
       $d.=sprintf("%-6s %s\n",$type.":",$linemsg);
    }
-   if ($W5V2::OperationContext eq "W5Server" && $type eq "INFO"){
+   if (($W5V2::OperationContext eq "W5Server" ||
+        $W5V2::OperationContext eq "W5Replicate") && $type eq "INFO"){
       if ($W5V2::Debug==0){
          print $d;
       }
