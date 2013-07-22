@@ -637,7 +637,8 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amcomputer.dtlastmodif'),
+                dataobjattr   =>
+                   "to_date(amcomputer.dtlastmodif,'YYYY-MM-DD HH24:MI:SS')"),
              #   dataobjattr   =>'amcomputer.ORA_ROWSCN'), # funktioniert
                                                            # nach AM Update
                                                            # nicht mehr
