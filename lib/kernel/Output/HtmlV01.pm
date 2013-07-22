@@ -106,11 +106,18 @@ sub ProcessHead
       my @sortnames;
       foreach my $fieldname (@view){
          my $field=$app->getField($fieldname);
-         if (defined($field) && $field->Type() eq "Number"){
-            push(@sortnames,"Number");
-         }
-         else{
-            push(@sortnames,"String");
+         if (defined($field)){
+            if ($field->Name() eq "linenumber"){
+               push(@sortnames,"None");
+            }
+            else{
+               if ($field->Type() eq "Number"){
+                  push(@sortnames,"Number");
+               }
+               else{
+                  push(@sortnames,"String");
+               }
+            }
          }
       }
       my $sortline=join(",",map({'"'.$_.'"'} "None",@sortnames));
@@ -125,12 +132,12 @@ sub ProcessHead
       $d.="SortTableResultTable.onsort=function (){\n";
       $d.=" var rows = SortTableResultTable.tBody.rows\n";
       $d.=" var l = rows.length;\n";
-      $d.=" console.log(rows);\n";
+    #  $d.=" console.log(rows);\n";
       $d.=" for (var i = 0; i < l; i++) { \n".
           "   SortableTableremoveClassName(rows[i]); \n".
           "   SortableTableaddClassName(rows[i], \n".
           "        i % 2 ? \"subline2\":\"subline1\"); } };\n"; 
-      $d.="SortTableResultTable.sort(1,false);\n";
+    #  $d.="SortTableResultTable.sort(1,false);\n";
       $d.="}\n";
       $d.="</script>\n";
    }
