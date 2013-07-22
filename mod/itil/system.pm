@@ -1014,6 +1014,18 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'system.realeditor'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"system.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(system.id,35,'0')"),
+
       new kernel::Field::SubList(
                 name          =>'customer',
                 htmldetail    =>0,
