@@ -658,7 +658,7 @@ sub InsertRecord
    if (!defined($newdata->{$idfield})){
       if ($idobj->autogen==1){
          my $res=$self->W5ServerCall("rpcGetUniqueId");
-         my $retry=15;
+         my $retry=30;
          while(!defined($res=$self->W5ServerCall("rpcGetUniqueId"))){
             sleep(1);
             last if ($retry--<=0);
