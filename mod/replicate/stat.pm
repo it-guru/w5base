@@ -44,6 +44,13 @@ sub new
                 label         =>'W5BaseID',
                 dataobjattr   =>'replicatestat.id'),
                                                   
+      new kernel::Field::TextDrop(
+                name          =>'object',
+                label         =>'Dataobject',
+                vjointo       =>'replicate::obj',
+                vjoinon       =>['objectid'=>'id'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::Text(
                 name          =>'objectid',
                 label         =>'Dataobject ID',
@@ -75,8 +82,7 @@ sub new
                 dataobjattr   =>'replicatestat.enddate'),
                                                   
    );
-   $self->setDefaultView(qw(linenumber partner name allow_phase1 
-                            allow_phase2 allow_phase3 cdate));
+   $self->setDefaultView(qw(linenumber startdate  object phase enddate'));
    $self->setWorktable("replicatestat");
    return($self);
 }
