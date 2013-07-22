@@ -92,6 +92,18 @@ sub new
                 vjoininhash   =>['mdate','targetid','target','roles'],
                 group         =>'contacts'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"network.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(network.id,35,'0')"),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
