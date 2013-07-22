@@ -1209,6 +1209,7 @@ sub getCurrentSecState
 {
    my $self=shift;
    return(4) if ($W5V2::OperationContext eq "W5Server" ||
+                 $W5V2::OperationContext eq "W5Replicate" ||
                  $W5V2::OperationContext eq "Kernel"); # return max sec level
    my $secstate=1;
    my $UserCache=$self->Cache->{User}->{Cache};
