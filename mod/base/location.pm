@@ -273,6 +273,19 @@ sub new
                 label         =>'Reference Code3',
                 dataobjattr   =>'location.refcode3'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"location.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(location.id,35,'0')"),
+
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
