@@ -6,4 +6,5 @@
 'fieldgroup.saphier'=>{de=>'SAP Hierarchie',en=>'SAP hierarchy'},
 'is deleted'=>{de=>'gelöscht markiert'},
 'Accounting Area'=>{de=>'Buchungskreis'},
+'Bussinessprocess mark'=>{de=>'Geschäftsprozesskenner'},
 

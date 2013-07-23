@@ -67,6 +67,11 @@ sub new
                 label         =>'Type',
                 dataobjattr   =>'interface_tssapp01_01.etype'),
 
+      new kernel::Field::Text(
+                name          =>'bpmark',
+                label         =>'Bussinessprocess mark',
+                dataobjattr   =>'interface_tssapp01_01.bpmark'),
+
       new kernel::Field::TextDrop(
                 name          =>'databoss',
                 group         =>'contacts',
