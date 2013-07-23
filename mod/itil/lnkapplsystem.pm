@@ -238,7 +238,19 @@ sub new
                 group         =>'source',
                 label         =>'Last-Load',
                 dataobjattr   =>'qlnkapplsystem.srcload'),
-                                                   
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"qlnkapplsystem.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(qlnkapplsystem.id,35,'0')"),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',

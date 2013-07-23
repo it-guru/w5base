@@ -328,6 +328,18 @@ sub new
                 vjoinon       =>['applid'=>'applid'],
                 vjoindisp     =>'netname'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>'amtsicustappl.dtlastmodif'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(amtsicustappl.code,35,'0')"),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
