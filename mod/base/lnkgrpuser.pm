@@ -268,6 +268,18 @@ sub new
                 label         =>'Last-Load',
                 dataobjattr   =>'lnkgrpuser.srcload'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"lnkgrpuser.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(lnkgrpuser.lnkgrpuserid,35,'0')"),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 label         =>'Creation-Date',
