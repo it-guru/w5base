@@ -1306,6 +1306,18 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'appl.srcload'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"appl.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(appl.id,35,'0')"),
+
       new kernel::Field::SubList(
                 name          =>'accountnumbers',
                 label         =>'Account numbers',
