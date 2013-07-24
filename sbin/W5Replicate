@@ -212,6 +212,19 @@ sub filterMatch
 }
 
 
+sub getOracleDBIschemaInfo
+{
+   my $dbi=shift;
+   my $schema=shift;
+
+   my $sth=$dbi->table_info(undef,$schema,'%');
+   my $found=0;
+   my @l=$sth->getHashList();
+
+   return(@l);
+}
+
+
 
 #
 # Connect to replication target oracle DB via DBI
@@ -246,7 +259,10 @@ sub getReplicateObjectRec
 {
    my $Config=shift;
    my $rprec=shift;
-   my $objectname=shift;
+   my $ctrl=shift;
+   my $dbi=shift;
+   my $schema=shift;
+   my $objectname=$ctrl->{'name'};
 
    my $ro=getModuleObject($Config,"replicate::obj");
    if (!defined($ro)){
@@ -269,6 +285,49 @@ sub getReplicateObjectRec
    if (!defined($rorec)){
       die("ERROR: can not load object record");
    }
+
+   # ensure that control table for state informations exists in
+   # oracle replication schema
+
+
+   my $found=0;
+   foreach my $tab (getOracleDBIschemaInfo($dbi,$schema)){
+      if ($tab->{table_type} eq "TABLE" && 
+          $tab->{'table_name'} eq "_".$objectname){
+         $found++;
+      }
+   }
+   if (!$found){
+      # create control table for requested object
+      msg(INFO,"create new control table for $ctrl->{name}");
+      my $idname=$ctrl->{'idname'};
+      my $refidtype=$ctrl->{'col'}->{lc($idname)}->{type}."(".
+                    $ctrl->{'col'}->{lc($idname)}->{size}.")";
+      $dbi->doCmd("CREATE table \"_$ctrl->{name}\" (".
+                  "refid $refidtype,".
+                  "W5REPLKEY            CHAR(70) not null,".
+                  "W5REPLKEYPRI         CHAR(35) not null,".
+                  "W5REPLKEYSEC         CHAR(35) not null,".
+                  "W5REPLLASTSUCC       DATE not null,".
+                  "W5REPLLASTTRY        DATE not null,".
+                  "W5REPLMDATE          DATE not null,".
+                  "W5REPLCDATE          DATE not null,".
+                  "W5REPLFAILCNT        NUMBER(22,0) default 0 not null,".
+                  "constraint \"_$ctrl->{name}_pk\" PRIMARY KEY (refid), ".
+                  "constraint \"_$ctrl->{name}_fk\" FOREIGN KEY (refid) ".
+                  "  references \"$ctrl->{name}\" ($idname) ".
+                  "  ON DELETE CASCADE".
+                  ")\n");
+      $dbi->doCmd("CREATE index \"_$ctrl->{name}_si1\" ".
+                  "on \"_$ctrl->{name}\" (W5REPLKEYPRI)");
+      $dbi->doCmd("CREATE index \"_$ctrl->{name}_si2\" ".
+                  "on \"_$ctrl->{name}\" (W5REPLLASTSUCC)");
+      $dbi->doCmd("CREATE index \"_$ctrl->{name}_si3\" ".
+                  "on \"_$ctrl->{name}\" (W5REPLFAILCNT)");
+
+      $dbi->commit();
+   }
+
    return($rorec);
 }
 
@@ -298,9 +357,9 @@ sub getReplicatePartnerRec
    if (!defined($rprec)){
       die("ERROR: can not load partner record");
    }
+
    return($rprec);
 }
-
 
 #
 # scans replication target by requested objects and attributes
@@ -320,9 +379,11 @@ sub getRequestedReplicationObjects
    # loading table list from oracle schema and check tables with :: in it
    # tables with a two douplepoints will be used as sync objects
    #
-   my $sth=$dbi->table_info(undef,$schema,'%');
-   foreach my $tab ($sth->getHashList()){
-      if ($tab->{'table_name'}=~m/::/){ # objects are recognizable by :: 
+   foreach my $tab (getOracleDBIschemaInfo($dbi,$schema)){
+      if ($tab->{table_type} eq "TABLE" && # sync only on real tables (no 
+                                           # temp views for data representation)
+          $tab->{'table_name'}=~m/::/   &&
+          !($tab->{'table_name'}=~m/^_/)){ # objects are recognizable by :: 
          my %ctrl=('name'=>$tab->{'table_name'},
                    'prio'=>'0',
                    'valid'=>'0',
@@ -336,7 +397,7 @@ sub getRequestedReplicationObjects
    # w5base. If the fieldname begins with w5, it will be ignored in view.
    #
    foreach my $ctrl (@replicationOjects){
-      my $replkey_found=0;
+#      my $replkey_found=0;
       $ctrl->{'view'}=[];
       $ctrl->{'columns'}=[];
       $ctrl->{'col'}={};
@@ -352,42 +413,42 @@ sub getRequestedReplicationObjects
          if (!(lc($col->{'column_name'})=~m/^w5/)){
             push(@{$ctrl->{'view'}},lc($col->{'column_name'}));
          }
-         if (lc($col->{'column_name'}) eq "w5replkey"){
-            $replkey_found++;
-         }
       }
 
       #
       # validating object names against the connected w5base system
       #
-      if ($replkey_found){
-         my $obj=getModuleObject($Config,$ctrl->{'name'});
-         if (defined($obj)){
-            my $idobj=$obj->IdField();
-            if (defined($idobj)){
-               my $idname=$idobj->Name();
-               $ctrl->{'idname'}=$idname;
-               if (exists($ctrl->{'col'}->{lc($idname)})){ # check on id col
-                  $ctrl->{'valid'}=1;
-                  $ctrl->{'replkeyfields'}=['replkeypri','replkeysec'];
-               }
+      my $obj=getModuleObject($Config,$ctrl->{'name'});
+      if (defined($obj)){
+         my $idobj=$obj->IdField();
+         if (defined($idobj)){
+            my $idname=$idobj->Name();
+            $ctrl->{'idname'}=$idname;
+            if (exists($ctrl->{'col'}->{lc($idname)})){ # check on id col
+               $ctrl->{'valid'}=1;
+               $ctrl->{'replkeyfields'}=['replkeypri','replkeysec'];
             }
-            my $syncobj=$obj->getField("replkeypri");
-            if (!defined($syncobj)){
+            else{
+               $ctrl->{'valid'}=0;
+               msg(ERROR,"id column '$idname' not exists in oracle ".
+                         "replication table  '$ctrl->{'name'}'");
+            }
+         }
+         my $syncobj=$obj->getField("replkeypri");
+         if (!defined($idobj)){  # id is mandatory for sync
+            msg(ERROR,"replication on object '$ctrl->{'name'}' ".
+                      "not posible - missing id field");
+            $ctrl->{'valid'}=0;
+         }
+         else{
+            if (!defined($syncobj)){  # a synckey must be defined in w5base!
                msg(ERROR,"remote object '$ctrl->{'name'}' ".
                          "is not replication compatible");
                $ctrl->{'valid'}=0;
             }
          }
       }
-      else{
-         msg(ERROR,"missing essential target fields in ora ".
-                   "object '$ctrl->{'name'}'");
-         $ctrl->{'valid'}=0;
-      }
    }
-   $dbi->commit();
-   $dbi->disconnect();
 
    if ($#ObjectFilter!=-1){
       my @objflt;
@@ -396,7 +457,8 @@ sub getRequestedReplicationObjects
              =~m/^(!{0,1}[a-z0-9*_]+::[a-z0-9*_]+)(\[.*\]){0,1}$/i){
             my %f=(obj=>$obj);
             if (defined($id)){
-               $f{'id'}=$id;
+               my $idname='id';
+               $f{$idname}=\$id;
             }
             push(@objflt,\%f);
          }
@@ -418,6 +480,14 @@ sub getRequestedReplicationObjects
          }
       }
    }
+   my $rprec=getReplicatePartnerRec($Config,$partner);
+   foreach my $ctrl (@replicationOjects){  # ensure, that all replication obj
+      if ($ctrl->{'requested'} && $ctrl->{'valid'}){ # records are exists
+         my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
+      }
+   }
+   $dbi->commit();
+   $dbi->disconnect();
 
 
 
@@ -450,7 +520,7 @@ sub objectReplicationPhase1
    }
 
    my $rprec=getReplicatePartnerRec($Config,$partner);
-   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl->{'name'});
+   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
 
    my $rstatobj=getModuleObject($Config,"replicate::stat");
    my $rstatid=$rstatobj->ValidatedInsertRecord({
@@ -468,7 +538,7 @@ sub objectReplicationPhase1
          $start+$phaselimit>time()){
       my $syncstart;
       my $replkeysec;
-      my $cmd="select max(w5replkey) sstart from \"$ctrl->{name}\"";
+      my $cmd="select max(w5replkey) sstart from \"_$ctrl->{name}\"";
       foreach my $rec ($dbi->getHashList($cmd)){
          $syncstart=$rec->{'sstart'};
       }
@@ -477,24 +547,30 @@ sub objectReplicationPhase1
       if (defined($syncstart)){ # restart sync process at 
                                 # last known position
          my $cmd="select w5replkeypri p,w5replkeysec s ".
-                 "from \"$ctrl->{name}\" ".
+                 "from \"_$ctrl->{name}\" ".
                  "where w5replkey=?";
          my $replkey;
          foreach my $rec ($dbi->getHashList($cmd,$syncstart)){
             $replkey=trim($rec->{'p'});
             $replkeysec=trim($rec->{'s'});
          }
+
          if (defined($replkey)){
             if ($replkey ne $oldreplkey){  # do small steps
-               $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\""});
+               $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
+                                $ctrl->{idname}=>'![EMPTY]'});
                $obj->Limit($smallpack,0,0);
             }
             else{
-               $obj->SetFilter({'replkeypri'=>\$replkey});
+               $obj->SetFilter({'replkeypri'=>\$replkey,
+                               $ctrl->{idname}=>'![EMPTY]'});
                my $n=$obj->CountRecords();
                $obj->ResetFilter();
-               $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\""});
-               if ($n>$smallpack-1){
+               $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
+                                $ctrl->{idname}=>'![EMPTY]'});
+               if ($n>$smallpack-1){  # if multiple records have the same
+                                      # replkeypri - all must be synced in
+                                      # one "smallpack"
                   msg(WARN,"found $n records with the same replkey '%s'",
                       $replkey);
                   $obj->Limit($n+$smallpack,0,0);
@@ -505,7 +581,6 @@ sub objectReplicationPhase1
             }
          }
       }
-#msg(WARN,"pack %d",time());
       my @syncfields=@{$ctrl->{'replkeyfields'}};
       $obj->SetCurrentView(@syncfields,@{$ctrl->{'view'}});
       $obj->SetCurrentOrder(@syncfields);
@@ -528,6 +603,7 @@ sub objectReplicationPhase1
                }
                $processed++;
                $dbi->commit();
+               msg(INFO,"InsertOrUpdate commited - processed=$processed");
             }
             ($srcrec,$msg)=$obj->getNext();
          } until(!defined($srcrec));
@@ -570,7 +646,7 @@ sub objectReplicationPhase2
    }
 
    my $rprec=getReplicatePartnerRec($Config,$partner);
-   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl->{'name'});
+   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
 
    my $rstatobj=getModuleObject($Config,"replicate::stat");
    my $rstatid=$rstatobj->ValidatedInsertRecord({
@@ -586,7 +662,7 @@ sub objectReplicationPhase2
    }
 
    my $cmd="select count(*) n ".
-           "from \"$ctrl->{name}\" ";
+           "from \"_$ctrl->{name}\" ";
    my $n=0;
    my $basewhere="";
    my $rec=$dbi->getHash($cmd);
@@ -597,11 +673,13 @@ sub objectReplicationPhase2
          $n=int($n/14);
          my $cmd="select (m1.max-m2.min)/4+m2.min avg ".
                  "from ".
-                 "(select max(w5repllasttry) max from \"$ctrl->{name}\") m1,".
-                 "(select min(w5repllasttry) min from \"$ctrl->{name}\") m2";
+                 "(select max(w5repllasttry) max from \"_$ctrl->{name}\") m1,".
+                 "(select min(w5repllasttry) min from \"_$ctrl->{name}\") m2";
          if (my $drec=$dbi->getHash($cmd)){
-            $basewhere="where w5repllasttry<'$drec->{avg}' ".
-                       "and w5repllasttry<SYSDATE-(1/24) and ROWNUM<$n ";
+            $basewhere=
+                  "where \"_$ctrl->{name}\".w5repllasttry<'$drec->{avg}' ".
+                  "and \"_$ctrl->{name}\".w5repllasttry<SYSDATE-(1/24) ".
+                  "and ROWNUM<$n ";
          }
       }
    }
@@ -611,9 +689,12 @@ sub objectReplicationPhase2
       my $curSyncTime=time()-$ReplicationStart;
 
       my $cmd="select * from ".
-              "(select $ctrl->{idname} from \"$ctrl->{name}\" ".$basewhere.
-              "order by w5repllasttry) ".
-              "where rownum<$smallpack";
+              "(select $ctrl->{idname} from \"$ctrl->{name}\" ".
+              " left outer join \"_$ctrl->{name}\" ".
+              " on \"$ctrl->{name}\".$ctrl->{idname}=\"_$ctrl->{name}\".refid ".
+              $basewhere.
+              "order by \"_$ctrl->{name}\".w5repllasttry NULLS FIRST) ".
+              "where ROWNUM<$smallpack";
       msg(INFO,"oracmd=$cmd");
       my @buffer=$dbi->getHashList($cmd);
       if ($#buffer==-1){
@@ -623,8 +704,8 @@ sub objectReplicationPhase2
          my $id=$rec->{$ctrl->{idname}};
          last SPLOOP if (exists($idseen{$id}));  # end if an ID is already seen
          $idseen{$id}++;
-         $dbi->doCmd("update \"$ctrl->{name}\" set w5repllasttry=sysdate ".
-                     "where $ctrl->{idname}=?",$id);
+         $dbi->doCmd("update \"_$ctrl->{name}\" set w5repllasttry=sysdate ".
+                     "where refid=?",$id);
          $obj->ResetFilter();
          $obj->SetFilter({$ctrl->{idname}=>\$id});
          my ($rrec,$msg)=$obj->getOnlyFirst(@{$ctrl->{'replkeyfields'}},
@@ -639,9 +720,9 @@ sub objectReplicationPhase2
             }
          }
          else{
-            $dbi->doCmd("update \"$ctrl->{name}\" ".
+            $dbi->doCmd("update \"_$ctrl->{name}\" ".
                         "set w5replfailcnt=w5replfailcnt+1 ".
-                        "where $ctrl->{idname}=?",$id);
+                        "where refid=?",$id);
          }
       }
       $dbi->commit();
@@ -671,11 +752,11 @@ sub objectReplicationPhase3
    my $ctrl=shift;
    my $start=time();
    msg(INFO,"============================================");
-   msg(INFO,"start: phase 3 replication for $ctrl->{name} - refresh");
+   msg(INFO,"start: phase 3 replication for $ctrl->{name} - cleanup");
    my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
 
    my $rprec=getReplicatePartnerRec($Config,$partner);
-   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl->{'name'});
+   my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
 
    my $rstatobj=getModuleObject($Config,"replicate::stat");
    my $rstatid=$rstatobj->ValidatedInsertRecord({
@@ -692,7 +773,10 @@ sub objectReplicationPhase3
  #  }
 
    my $cmd="delete from \"$ctrl->{name}\" ".
-           "where w5repllastsucc<sysdate-7 and w5replfailcnt>2";
+           "where \"$ctrl->{name}\".$ctrl->{idname} in ".
+           "(select refid from \"_$ctrl->{name}\" where ".
+           "\"_$ctrl->{name}\".w5repllastsucc<sysdate-7 and ".
+           "\"_$ctrl->{name}\".w5replfailcnt>2)";
    msg(INFO,"oracmd=$cmd");
    $dbi->doCmd($cmd);
    $dbi->commit();
@@ -743,13 +827,18 @@ sub createSlot
 
 my @ReplicationObjects=getRequestedReplicationObjects($config);
 
+
 my @joblist;
 
 foreach my $replControl (@ReplicationObjects){
    if ($replControl->{'valid'} && $replControl->{'requested'}){
-      unshift(@joblist,{phase=>1,replControl=>$replControl});
+      if (!exists($replControl->{'filter'})){
+         unshift(@joblist,{phase=>1,replControl=>$replControl});
+      }
       push(@joblist,{phase=>2,replControl=>$replControl});
-      push(@joblist,{phase=>3,replControl=>$replControl});
+      if (!exists($replControl->{'filter'})){
+         push(@joblist,{phase=>3,replControl=>$replControl});
+      }
    }
 }
 
@@ -931,17 +1020,19 @@ sub preprocessRecord
       delete($rec{$k});
    }
    foreach my $fieldname (keys(%rec)){
-      if ($col->{$fieldname}->{'type'} =~ m/^[char|varchar]/i) {
-         if (length($rec{$fieldname})>$col->{$fieldname}->{'size'}){
-            $rec{$fieldname}=substr($rec{$fieldname},0,
-                                    $col->{$fieldname}->{'size'});
-         }
-      }
       if (scalar($rec{$fieldname}) =~ m/^Container=HASH/) {
          $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
       }
       if (ref($rec{$fieldname}) eq "ARRAY"){
          $rec{$fieldname}=join("; ",@{$rec{$fieldname}});
+      }
+      # strip all field values to the max. length in the replication
+      # schema. This prevent oracle SQL Errors
+      if ($col->{$fieldname}->{'type'} =~ m/^[char|varchar]/i) {
+         if (length($rec{$fieldname})>$col->{$fieldname}->{'size'}){
+            $rec{$fieldname}=substr($rec{$fieldname},0,
+                                    $col->{$fieldname}->{'size'});
+         }
       }
    }
    return(\%rec);
@@ -979,6 +1070,7 @@ sub InsertOrUpdate
    my $dbtable=$ctrl->{'name'};
    my $idname=$ctrl->{'idname'};
    my $col=$ctrl->{'col'};
+   my ($bk,@w5v,@w5p,@w5b);
 
    my $rec=$self->preprocessRecord($ctrl,$reqrec,$col);
 
@@ -990,58 +1082,109 @@ sub InsertOrUpdate
       my $isChanged=$self->isChanged($ctrl,$curlist[0],$rec);
       my (@v,@values);
       foreach my $fieldname (@view){
-         push(@values,$rec->{$fieldname});
-         if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
-            push(@v,"$fieldname=to_date(?,'YYYY-MM-DD HH24:MI:SS')");
+         if ($fieldname=~m/^w5repl.*/i){
+            push(@w5v,$fieldname);
+            push(@w5p,"?");
+            push(@w5b,$rec->{$fieldname});
+            delete($rec->{$fieldname});
          }
-         else {
-            push(@v,"$fieldname=?");
+         else{
+            push(@values,$rec->{$fieldname});
+            if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
+               push(@v,"$fieldname=to_date(?,'YYYY-MM-DD HH24:MI:SS')");
+            }
+            else {
+               push(@v,"$fieldname=?");
+            }
          }
       }
-      push(@v,"w5repllastsucc=sysdate");
-      push(@v,"w5replfailcnt=0");
       if ($isChanged){
-         push(@v,"w5replmdate=sysdate");
+         push(@w5v,"w5replmdate");
+         push(@w5p,"sysdate");
       }
       my $v=join(",",@v);
       my $updcmd="update \"$dbtable\" set $v where $idname=?";
       msg(INFO,"upd: $updcmd");
-      return($self->doCmd($updcmd,@values,$idval));
+      $bk=$self->doCmd($updcmd,@values,$idval);
    }
    elsif ($#curlist==-1){ # do an insert
       my @values;
       my @place;
+      my @insview;
       foreach my $fieldname (@view) {
-         push(@values,$rec->{$fieldname});
-         if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
-            push(@place,"to_date(?,'YYYY-MM-DD HH24:MI:SS')");
+         if ($fieldname=~m/^w5repl.*/i){
+            push(@w5v,$fieldname);
+            push(@w5p,"?");
+            push(@w5b,$rec->{$fieldname});
+            delete($rec->{$fieldname});
          }
-         else {
-            push(@place,"?");
+         else{
+            push(@insview,$fieldname);
+            push(@values,$rec->{$fieldname});
+            if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
+               push(@place,"to_date(?,'YYYY-MM-DD HH24:MI:SS')");
+            }
+            else {
+               push(@place,"?");
+            }
          }
       }
       #my @values=map({$rec->{$_}} @view);
       #my @place=map({'?'} @view);
-      if (exists($ctrl->{'col'}->{'w5replmdate'})){
-         push(@view,'w5replmdate');
-         push(@place,'sysdate');
-      }
-      if (exists($ctrl->{'col'}->{'w5replcdate'})){
-         push(@view,'w5replcdate');
-         push(@place,'sysdate');
-      }
+     # if (exists($ctrl->{'col'}->{'w5replmdate'})){
+     #    push(@w5v,'w5replmdate');
+     #    push(@w5p,'sysdate');
+     # }
+     # if (exists($ctrl->{'col'}->{'w5replcdate'})){
+     #    push(@w5v,'w5replcdate');
+     #    push(@w5p,'sysdate');
+     # }
       
       my $inscmd="insert into \"$dbtable\" ".
-        "(".join(",",@view,"w5repllastsucc","w5repllasttry").") ".
-        "values(".join(",",@place,'sysdate','sysdate').")";
+        "(".join(",",@insview).") values(".join(",",@place).")";
       msg(INFO,"ins: $inscmd");
-      return($self->doCmd($inscmd,@values));
+      $bk=$self->doCmd($inscmd,@values);
    }
    else{
       msg(ERROR,"ganz scheisse!");
       exit(-12356);
    }
-   return(undef);
+   if ($bk){  # now store the current state of object in state table _
+      push(@w5v,'w5repllastsucc');
+      push(@w5p,'sysdate');
+      push(@w5v,'w5repllasttry');
+      push(@w5p,'sysdate');
+      push(@w5v,"w5replfailcnt");
+      push(@w5p,"0");
+      my $cmd="select refid from \"_$dbtable\" where refid=?";
+      my @curlist=$self->getHashList($cmd,$idval);
+      if ($#curlist==0){     # do an update
+         my @v;
+         for(my $c=0;$c<=$#w5v;$c++){
+            push(@v,$w5v[$c]."=".$w5p[$c]);
+         }
+         my $updcmd="update \"_$dbtable\" set ".
+                    join(",",@v)." where refid=?";
+         $bk=$self->doCmd($updcmd,@w5b,$idval);
+      }
+      else{
+         if (!in_array(\@w5v,"w5replmdate")){
+            push(@w5v,'w5replmdate');
+            push(@w5p,'sysdate');
+         }
+         push(@w5v,'w5replcdate');
+         push(@w5p,'sysdate');
+         push(@w5v,'refid');
+         push(@w5p,'?');
+         push(@w5b,$idval);
+         my $inscmd="insert into \"_$dbtable\" ".
+           "(".join(",",@w5v).") ".
+           "values(".join(",",@w5p).")";
+         msg(INFO,"w5ins: $inscmd :",join(",",@w5b));
+         $bk=$self->doCmd($inscmd,@w5b);
+      }
+   }
+   return($bk);
 }
 
 
