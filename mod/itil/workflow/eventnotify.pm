@@ -2875,7 +2875,7 @@ sub nativProcess
             $self->getParent->getParent->Action->NotifyForward(
                $newid,undef,undef,undef,
                $self->getParent->T("A new event information has ".
-                  "been registered by a non incident manager. Please ".
+                  "been registered by a non incident manager/operator. Please ".
                   "ensure that all neassasary actions be done, to handle ".
                   "this workflow correctly!"),
                addtarget=>\@inm,sendercc=>1,mode=>'INFO:');
