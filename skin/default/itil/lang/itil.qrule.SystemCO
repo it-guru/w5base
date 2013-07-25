@@ -1,0 +1,3 @@
+'itil::qrule::SystemCO'=>{de=>'Prüfung des Kontierungsobjektes',en=>'Check the Costcenter'},
+'no valid costcenter'=>{de=>'keine gültiges Kontierungsobjekt'},
+'costcenter object is empty or record not installed/active'=>{de=>'Kontierungsobjekt leer oder Objekt-Datensatz ist nicht installiert/aktiv'},
