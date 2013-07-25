@@ -121,6 +121,14 @@ if ($MaximumReplicationTime<20){
 }
 msg(DEBUG,"use MaximumReplicationTime=$MaximumReplicationTime seconds");
 
+$SIG{ALRM}=sub{ 
+   die("ERROR: hard programm termination by ".
+       "MaximumReplicationTime=$MaximumReplicationTime") 
+};
+alarm($MaximumReplicationTime+10);
+
+
+
 
 
 
@@ -243,12 +251,13 @@ sub getOracleDBIConnectionHandle
    my $dst=DBI->connect($dbconnect,$dbuser,$dbpass,{
           AutoCommit=>0,
           FetchHashKeyName=>'NAME_lc',});
-   $dst->{'LongTruncOk'} = 1;
-   $dst->{'LongReadLen'} = 128000;
    if (!defined($dst)){
       msg(ERROR,$DBI::errstr);
+      sleep(20);
       exit(100);
    }
+   $dst->{'LongTruncOk'} = 1;
+   $dst->{'LongReadLen'} = 128000;
    $dst->doCmd("alter session set NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'");
    msg(INFO,"connect to replication target '$dbconnect' successfull");
    return($dst,uc($dbuser),lc($dbuser).'@'.lc($dbconnect));
