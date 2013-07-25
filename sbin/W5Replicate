@@ -225,9 +225,14 @@ sub getOracleDBIschemaInfo
    my $dbi=shift;
    my $schema=shift;
 
+   return(@{$W5REPL::schemaInfoCache}) if (defined($W5REPL::schemaInfoCache));
+
+   msg(INFO,"load schemaInfoCache in process $$");
    my $sth=$dbi->table_info(undef,$schema,'%');
    my $found=0;
    my @l=$sth->getHashList();
+
+   $W5REPL::schemaInfoCache=\@l;
 
    return(@l);
 }
@@ -852,6 +857,18 @@ foreach my $replControl (@ReplicationObjects){
 }
 
 my @slot;
+$SIG{INT}=sub{  # shutdown handling if CTRL+C is pressed on main process
+   for(my $slotno=0;$slotno<$maxslots;$slotno++){
+      if (defined($slot[$slotno])){
+         my $s=$slot[$slotno];
+         if (kill(0,$s->{pid})){
+            printf STDERR ("INFO: shutdown slot $slotno with PID $s->{pid}\n");
+            kill(3,$s->{pid});
+         }
+      }
+   }
+   die("ERROR: hard programm termination by signal INT");
+};
 my $phaselimit=int($MaximumReplicationTime/2*3)-15;
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
@@ -1224,6 +1241,18 @@ sub doCmd
 {
    my $self=shift;
    my $cmd=shift;
+
+   if (
+       ($cmd=~m/^\s*create\s+table\s/i) ||
+       ($cmd=~m/^\s*create\s+index\s/i) ||
+       ($cmd=~m/^\s*alter\s+table\s/i)
+      ){
+      msg(INFO,"reset schemaInfoCache in process $$ for cmd='$cmd'");
+      $W5REPL::schemaInfoCache=undef;  # clear schema cache
+   }
+
+
+
    $self->{effectedRows}=undef;
    if (my $sth=$self->prepare($cmd)){
       my $bk=$sth->execute(@_);
