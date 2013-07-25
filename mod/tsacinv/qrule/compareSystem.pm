@@ -34,7 +34,7 @@ be imported.
 #######################################################################
 
 #  Functions:
-#  * at cistatus "installed/active":
+#  * at cistatus "installed/active" and "availabel":
 #    - check if systemid is valid in tsacinv::system
 #    - check if assetid is valid in tsacinv::asset 
 #
@@ -89,7 +89,8 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(0,undef) if ($rec->{cistatusid}!=4);
+   return(0,undef) if ($rec->{cistatusid}!=4 &&
+                       $rec->{cistatusid}!=3);
    return(0,undef) if ($rec->{systemid} eq $rec->{id});
    if ($rec->{systemid} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
