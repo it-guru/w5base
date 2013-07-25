@@ -637,20 +637,13 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amcomputer.dtlastmodif'),
+                dataobjattr   =>'amportfolio.dtlastmodif'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(amportfolio.assettag,35,'0')"),
-
-#      new kernel::Field::Date(                # does not exists on amPortfolio
-#                name          =>'srcload',
-#                timezone      =>'CET',
-#                group         =>'source',
-#                label         =>'Source-Load',
-#                dataobjattr   =>'amportfolio.dtimport'),
+                dataobjattr   =>"lpad(amportfolio.assettag,35,'0')")
 
    );
    $self->setDefaultView(qw(systemname status tsacinv_locationfullname 
