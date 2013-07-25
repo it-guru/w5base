@@ -1,8 +1,0 @@
-'tsqmdb::orderticket'=>{de=>'QMDB Bestellschein',en=>'QMDB Order Ticket'},
-'Contract Number'=>{de=>'Vertragsnummer'},
-'Order Ticket Name'=>{de=>'Bezeichnung'},
-'Order Ticket Number'=>{de=>'Bestellscheinnummer'},
-'CO-Number'=>{de=>'Kontierungsobjekt'},
-'Duration Start'=>{de=>'Laufzeitbegin'},
-'Duration End'=>{de=>'Laufzeitende'},
-

@@ -1,5 +1,0 @@
-'itu.qmdb'=>{de=>'QMDB SSM',en=>'QMDB SSM'},
-'itu.qmdb.custcontract'=>{de=>'Kundenvertrag',en=>'CustomerContract'},
-'itu.qmdb.custcontract.orderticket'=>{de=>'Bestellschein',en=>'Order Ticket'},
-'itu.qmdb.krn'=>{de=>'Stammdaten',en=>'Kernel'},
-'itu.qmdb.krn.dictonary'=>{de=>'DBDictonary',en=>'DBDictonary'},
