@@ -27,7 +27,7 @@
 'System OS'=>{de=>'Betriebssystem'},
 'Usage'=>{de=>'Verwendung'},
 'Type'=>{de=>'Systemart'},
-'System Part of Asset'=>{de=>'Sytemanteil an der Hardware'},
+'System Part of Asset'=>{de=>'Systemanteil an der Hardware'},
 'CO-Number'=>{de=>'Kostenstelle/CO-Nummer'},
 'Applications'=>{de=>'Anwendungen'},
 'ApplicationIDs'=>{de=>'Anwendungs IDs'},
