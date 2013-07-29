@@ -488,7 +488,19 @@ sub new
                 group         =>'source',
                 label         =>'Owner',
                 dataobjattr   =>'lnksoftwaresystem.modifyuser'),
-                                   
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"lnksoftwaresystem.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(lnksoftwaresystem.id,35,'0')"),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
