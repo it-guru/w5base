@@ -28,6 +28,7 @@
 'Usage'=>{de=>'Verwendung'},
 'Type'=>{de=>'Systemart'},
 'System Part of Asset'=>{de=>'Systemanteil an der Hardware'},
+'System Part of Asset (native from AssetManager)'=>{de=>'Systemanteil an der Hardware (nativ aus AssetManager)'},
 'CO-Number'=>{de=>'Kostenstelle/CO-Nummer'},
 'Applications'=>{de=>'Anwendungen'},
 'ApplicationIDs'=>{de=>'Anwendungs IDs'},

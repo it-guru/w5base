@@ -298,9 +298,16 @@ sub new
                 name          =>'partofasset',
                 label         =>'System Part of Asset',
                 unit          =>'%',
-                depend        =>['lassetid'],
+                depend        =>['lassetid','status'],
                 prepRawValue  =>\&SystemPartOfCorrection,
                 dataobjattr   =>'amcomputer.psystempartofasset'),
+
+      new kernel::Field::Float(
+                name          =>'nativepartofasset',
+                label      =>'System Part of Asset (native from AssetManager)',
+                htmldetail    =>0,
+                unit          =>'%',
+                dataobjattr   =>'amcomputer.psystempartofasset*100'),
 
 #      new kernel::Field::Text(
 #                name          =>'costallocactive',
@@ -775,6 +782,9 @@ sub SystemPartOfCorrection
    if (!defined($context->{SystemPartOfobj})){
       $context->{SystemPartOfobj}=getModuleObject($self->getParent->Config,
                                                   "tsacinv::system");
+   }
+   if (lc($current->{status}) eq "out of operation"){
+      return(0);
    }
    my $sys=$context->{SystemPartOfobj};
 
