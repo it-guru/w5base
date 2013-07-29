@@ -21,3 +21,4 @@ create table AL_TCom_appl_aegmgmt (
   FOREIGN KEY fk_appl (id)
               REFERENCES appl (id) ON DELETE CASCADE
 );
+alter table AL_TCom_appl_aegmgmt add leadprmmgr bigint(20);

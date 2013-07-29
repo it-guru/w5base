@@ -304,6 +304,13 @@ sub calcBaseApplicationExpertGroup
                 label=>$self->getParent->T("Projectmanager Development",
                                            'itil::ext::lnkcontact'),
             },
+            'leadprmmgr'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>"Lead Problem Manager"
+            },
             'AEG'=>{
                 userid=>[],
                 email=>[],
@@ -385,6 +392,18 @@ sub calcBaseApplicationExpertGroup
          }
       }
    }
+
+   #  add Lead Problem Manager from AEG Management based on 
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/13741398140002
+   my $aegm=getModuleObject($self->getParent->Config,"AL_TCom::aegmgmt");
+   if (defined($aegm)){
+      $aegm->SetFilter({id=>\$rec->{id}});
+      my ($mgmtrec,$msg)=$aegm->getOnlyFirst(qw(leadprmmgrid));
+      if (defined($mgmtrec) && $mgmtrec->{leadprmmgrid} ne ""){
+         push(@{$a{leadprmmgr}->{userid}},$mgmtrec->{leadprmmgrid});
+      }
+   }
+
    foreach my $k (keys(%a)){  # fillup AEG
       next if ($k eq "AEG");
       foreach my $userid (@{$a{$k}->{userid}}){

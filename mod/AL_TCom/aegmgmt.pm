@@ -104,6 +104,19 @@ sub new
                 label         =>'Solution',
                 dataobjattr   =>"$worktable.aegsolution"),
 
+      new kernel::Field::Contact(
+                name          =>'leadprmmgr',
+                AllowEmpty    =>1,
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                group         =>'addcontacts',
+                label         =>'Lead Problem Manager',
+                vjoinon       =>'leadprmmgrid'),
+
+      new kernel::Field::Link(
+                name          =>'leadprmmgrid',
+                group         =>'addcontacts',
+                dataobjattr   =>"$worktable.leadprmmgr"),
 
       new kernel::Field::Select(
                 name          =>'meetinginterval',
@@ -297,7 +310,8 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    my @l=$self->SUPER::isWriteValid($rec);
-   return("default","meetings","processcheck","checklist") if (in_array(\@l,"ALL"));
+   return("default","meetings","processcheck","addcontacts",
+          "checklist") if (in_array(\@l,"ALL"));
    return(undef);
 }
 
@@ -306,7 +320,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default aeg meetings processcheck checklist source));
+   return(qw(header default aeg addcontacts 
+             meetings processcheck checklist source));
 }
 
 

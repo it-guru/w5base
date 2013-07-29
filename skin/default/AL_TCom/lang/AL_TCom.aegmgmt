@@ -4,6 +4,8 @@
                         en=>'meetings'},
 'fieldgroup.aeg'=>{de=>'Application ExpertGroup',
                         en=>'Application ExpertGroup'},
+'fieldgroup.addcontacts'=>{de=>'zusätzliche AEG Kontakte',
+                           en=>'additional AEG contacts'},
 'fieldgroup.checklist'=>{de=>'Check-Listen AG spezifisch',
                         en=>'check lists'},
 'fieldgroup.processcheck'=>{de=>'AG Prozessüberprüfung',
