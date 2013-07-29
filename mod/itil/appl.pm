@@ -1024,30 +1024,6 @@ sub new
                 vjoindisp     =>'name'),
 
       new kernel::Field::Select(
-                name          =>'applbasemoniname',
-                group         =>'monisla',
-                label         =>'Application base monitoring',
-                allowempty    =>1,
-                weblinkto     =>"none",
-                vjointo       =>'base::itemizedlist',
-                vjoinbase     =>{
-                   selectlabel=>\'itil::appl::applbasemoni',
-                },
-                vjoineditbase =>{
-                   selectlabel=>\'itil::appl::applbasemoni',
-                   cistatusid=>\'4'
-                },
-                vjoinon       =>['applbasemoni'=>'name'],
-                vjoindisp     =>'displaylabel',
-                htmleditwidth =>'200px'),
-
-      new kernel::Field::Link(
-                name          =>'applbasemoni',
-                group         =>'monisla',
-                label         =>'Application base monitoring',
-                dataobjattr   =>'appl.applbasemoni'),
-
-      new kernel::Field::Select(
                 name          =>'slacontroltoolname',
                 group         =>'monisla',
                 label         =>'SLA control tool type',
@@ -1092,6 +1068,55 @@ sub new
                                  'year'],
                 htmleditwidth =>'100px',
                 dataobjattr   =>'appl.slacontrbase'),
+
+      new kernel::Field::Select(
+                name          =>'applbasemoniname',
+                group         =>'monisla',
+                label         =>'Application base monitoring',
+                allowempty    =>1,
+                weblinkto     =>"none",
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'itil::appl::applbasemoni',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'itil::appl::applbasemoni',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['applbasemoni'=>'name'],
+                vjoindisp     =>'displaylabel',
+                htmleditwidth =>'200px'),
+
+      new kernel::Field::Link(
+                name          =>'applbasemoni',
+                group         =>'monisla',
+                label         =>'Application base monitoring',
+                dataobjattr   =>'appl.applbasemoni'),
+
+
+      new kernel::Field::Select(
+                name          =>'applbasemonistatus',
+                group         =>'monisla',
+                label         =>'Application base monitoring status',
+                transprefix   =>'monistatus.',
+                value         =>['',
+                                 'NOMONI',
+                                 'MONISIMPLE',
+                                 'MONIAUTOIN'],
+                htmleditwidth =>'280px',
+                dataobjattr   =>'appl.applbasemonistatus'),
+
+      new kernel::Field::Group(
+                name          =>'applbasemoniteam',
+                group         =>'monisla',
+                label         =>'Application base monitoring resonsible Team',
+                vjoinon       =>'applbasemoniteamid'),
+
+      new kernel::Field::Link(
+                name          =>'applbasemoniteamid',
+                group         =>'monisla',
+                label         =>'Application base monitoring resonsible TeamID',
+                dataobjattr   =>'appl.applbasemoniteam'),
 
       new kernel::Field::Text(
                 name          =>'kwords',

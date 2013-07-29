@@ -1271,3 +1271,4 @@ create table lnkswinstanceswinstance (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table lnkapplappl add cistatus int(2) default '4', add exch_personal_data int(2) default '0',add agreements longtext default NULL;
 alter table appl add isnotarchrelevant int(1) default '0';
+alter table appl add applbasemoniteam bigint(20), add applbasemonistatus char(15);

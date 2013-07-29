@@ -90,6 +90,7 @@
 'no monitoring'=>{de=>'keine Überwachung'},
 'SLA control tool type'=>{de=>'SLA Überwachungstool'},
 'Application base monitoring'=>{de=>'Anwendungs Basismonitoring'},
+'Application base monitoring resonsible Team'=>{de=>'Anwendungs Basismonitoring verantw. Team'},
 '[none]'=>{de=>'[kein Eintrag]',en=>'[no entry]'},
 'SLA availibility guaranted by contract'=>{de=>'SLA vertraglich garantierte Verfügbarkeit'},
 'SLA availibility calculation base'=>{de=>'SLA Verfügbarkeit Berechnungsbasis'},
@@ -148,4 +149,10 @@
 'Business Team Boss EMail'=>{de=>'Betriebsteamleiter E-Mail'},
 'ID of application by customer'=>{de=>'ID der Anwendung beim Kunden/Auftraggeber'},
 'provided Businessservices'=>{de=>'bereitgestellte Business-Services'},
+'Application base monitoring status'=>{de=>'Anwendungs Basismonitoring Status'},
+'monistatus.'=>{de=>'[nicht definiert]',en=>'[not defined]'},
+'monistatus.NOMONI'=>{de=>'keine Überwachung/Monitoring',en=>'no monitoring'},
+'monistatus.MONISIMPLE'=>{de=>'Überwachung OHNE Autoticket',en=>'monitoring with NO autoticket'},
+'monistatus.MONIAUTOIN'=>{de=>'Überwachung mit Autoticket',en=>'monitoring with autoticket'},
+
 
