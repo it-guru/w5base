@@ -522,7 +522,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
                 AllowEmpty    =>1,
-                group         =>'misc',
+                group         =>'monisla',
                 label         =>'Service&Support Class',
                 vjointo       =>'itil::servicesupport',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -532,6 +532,31 @@ sub new
       new kernel::Field::Link(
                 name          =>'servicesupportid',
                 dataobjattr   =>'system.servicesupport'),
+
+      new kernel::Field::Select(
+                name          =>'monistatus',
+                group         =>'monisla',
+                label         =>'monitoring status',
+                transprefix   =>'monistatus.',
+                value         =>['',
+                                 'NOMONI',
+                                 'MONISIMPLE',
+                                 'MONIAUTOIN'],
+                htmleditwidth =>'280px',
+                dataobjattr   =>'system.monistatus'),
+
+      new kernel::Field::Group(
+                name          =>'moniteam',
+                group         =>'monisla',
+                label         =>'monitoring resonsible Team',
+                vjoinon       =>'moniteamid'),
+
+      new kernel::Field::Link(
+                name          =>'moniteamid',
+                group         =>'monisla',
+                label         =>'monitoring resonsible TeamID',
+                dataobjattr   =>'system.moniteam'),
+
 
       new kernel::Field::JoinUniqMerge(
                 name          =>'issox',
@@ -1400,7 +1425,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @all=qw(header default swinstances 
-              software admin logsys contacts misc opmode 
+              software admin logsys contacts monisla misc opmode 
               physys ipaddresses phonenumbers sec applications
               location source customer history
               attachments control systemclass interview);
@@ -1422,7 +1447,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default software admin logsys contacts misc opmode 
+   my @databossedit=qw(default software admin logsys contacts monisla misc opmode 
                        physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
@@ -1430,7 +1455,7 @@ sub isWriteValid
       push(@databossedit,"vhost");
    }
    if (!defined($rec)){
-      return("default","physys","admin","misc","cluster",
+      return("default","physys","admin","monisla","misc","cluster",
              "opmode","control","systemclass","sec");
    }
    else{
@@ -1549,7 +1574,7 @@ sub getDetailBlockPriority
              vhost physys systemclass cluster
              opmode sec applications customer software 
              swinstances ipaddresses
-             contacts misc attachments control source));
+             contacts monisla misc attachments control source));
 }
 
 

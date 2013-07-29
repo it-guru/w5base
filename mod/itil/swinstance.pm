@@ -190,11 +190,6 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'swinstance.cistatus'),
 
-      new kernel::Field::Link(
-                name          =>'servicesupportid',
-                dataobjattr   =>'swinstance.servicesupport'),
-
-
       new kernel::Field::Contact(
                 name          =>'adm',
                 label         =>'Instance Administrator',
@@ -367,22 +362,54 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
                 label         =>'Service&Support Class',
-                group         =>'misc',
+                group         =>'monisla',
                 vjointo       =>'itil::servicesupport',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['servicesupportid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Link(
+                name          =>'servicesupportid',
+                group         =>'monisla',
+                dataobjattr   =>'swinstance.servicesupport'),
+
       new kernel::Field::TextDrop(
                 name          =>'servicesupportsapservicename',
                 label         =>'Service&Support Class - SAP Service name',
-                group         =>'misc',
+                group         =>'monisla',
                 htmldetail    =>0,
                 readonly      =>1,
                 vjointo       =>'itil::servicesupport',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['servicesupportid'=>'id'],
                 vjoindisp     =>'sapservicename'),
+
+
+      new kernel::Field::Select(
+                name          =>'monistatus',
+                group         =>'monisla',
+                label         =>'monitoring status',
+                transprefix   =>'monistatus.',
+                value         =>['',
+                                 'NOMONI',
+                                 'MONISIMPLE',
+                                 'MONIAUTOIN'],
+                htmleditwidth =>'280px',
+                dataobjattr   =>'swinstance.monistatus'),
+
+      new kernel::Field::Group(
+                name          =>'moniteam',
+                group         =>'monisla',
+                label         =>'monitoring resonsible Team',
+                vjoinon       =>'moniteamid'),
+
+      new kernel::Field::Link(
+                name          =>'moniteamid',
+                group         =>'monisla',
+                label         =>'monitoring resonsible TeamID',
+                dataobjattr   =>'swinstance.moniteam'),
+
+
 
       new kernel::Field::Boolean(
                 name          =>'issox',
@@ -959,7 +986,7 @@ sub isViewValid
    my $rec=shift;
 
    return("header","default") if (!defined($rec));
-   my @all=qw(header default adm sec ssl misc env history control
+   my @all=qw(header default adm sec ssl misc monisla env history control
               relations swinstancerules
               softwareinst contacts attachments source swinstanceparam);
    if (defined($rec) && $rec->{'runonclusts'}){
@@ -981,7 +1008,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default adm systems contacts ssl env misc 
+   my @databossedit=qw(default adm systems contacts ssl env monisla misc 
                        softwareinst relations
                        attachments cluster control sec);
    if (!defined($rec)){
@@ -1031,7 +1058,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default adm sec env misc cluster 
+   return(qw(header default adm sec env monisla misc cluster 
              systems softwareinst contacts swinstanceparam ssl 
              control swinstancerules attachments relations source));
 }
