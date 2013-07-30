@@ -185,4 +185,31 @@ create or replace view ":TSI_HCO:interview" as
 create synonym TSI_HCO.w5base_interview for W5BASE.":TSI_HCO:interview";
 
 
+# Bei der Replikation können nur Objekte Repliziert werden, die
+# IDs besitzen. Für die Relationstable "itil::lnkapplsystem" muss
+# man also eine View hinzufügen:
+
+create or replace view "_ACT_itil::lnkapplsystem" as
+select "itil::appl".id applid,
+       "itil::appl".name applname,
+       "itil::system".id systemid,
+       "itil::system".name systemname
+from   "itil::appl","itil::lnkapplsystem","itil::system" 
+where "itil::appl".id="itil::lnkapplsystem".applid 
+   and "itil::lnkapplsystem".systemid="itil::system".id
+   and "itil::appl".cistatusid=4
+   and "itil::system".cistatusid=4
+   /* In dieser View werden alle relevanten, installiert/aktiv
+      markierten Anwendungs-System Relationen vorgehalten. 
+      In einem zweiten Schritt werden hier auch die Cluster Relationen
+      zu finden sein. */
+;
+
+# Alle "zwischen" Views zur Darstellung von Datenzuständen müssen mit _
+# beginnen. Dies stellt sicher, dass keine Namens-Kolistionen zu W5Base Objekten
+# entstehene können (Module fangen in W5Base NIE mit _ an)
+
+# Der alte Text einer View ist mit ...
+# select text from user_views
+# ... wieder abrufbar (incl. comments in der o.g. Schreibweise)
 
