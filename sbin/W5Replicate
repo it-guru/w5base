@@ -685,7 +685,7 @@ sub objectReplicationPhase2
    if (my $rec=$dbi->getHash($cmd)){
       $n=$rec->{'n'};
       if ($n>100){
-         $n=int($n/14);
+         $n=int($n/7);
          my $cmd="select (m1.max-m2.min)/4+m2.min avg ".
                  "from ".
                  "(select max(w5repllasttry) max from \"_$ctrl->{name}\") m1,".
@@ -693,8 +693,8 @@ sub objectReplicationPhase2
          if (my $drec=$dbi->getHash($cmd)){
             $basewhere=
                   "where \"_$ctrl->{name}\".w5repllasttry<'$drec->{avg}' ".
-                  "and \"_$ctrl->{name}\".w5repllasttry<SYSDATE-(1/24) ".
-                  "and ROWNUM<$n ";
+                  "and \"_$ctrl->{name}\".w5repllasttry<SYSDATE-(1/24*3) ".
+                  "and ROWNUM<$n ";                    # max refresh every 3h
          }
       }
    }
@@ -742,8 +742,6 @@ sub objectReplicationPhase2
       }
       $dbi->commit();
    }
-   $dbi->commit();
-   $dbi->disconnect();
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
                                                 {
@@ -751,6 +749,8 @@ sub objectReplicationPhase2
                                                  effentries=>int(keys(%idseen))
                                                 },
                                                 {id=>\$rstatid});
+   $dbi->commit();
+   $dbi->disconnect();
 }
 
 
