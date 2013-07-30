@@ -182,6 +182,12 @@ sub new
                 dataobjattr   =>'costcenter.comments'),
 
       new kernel::Field::Boolean(
+                name          =>'allowifupdate',
+                group         =>'control',
+                label         =>'allow automatic updates by interfaces',
+                dataobjattr   =>'costcenter.allowifupdate'),
+
+      new kernel::Field::Boolean(
                 name          =>'isdirectwfuse',
                 group         =>'control',
                 htmleditwidth =>'30%',
