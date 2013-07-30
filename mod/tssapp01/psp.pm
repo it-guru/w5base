@@ -300,6 +300,26 @@ sub isWriteValid
 }
 
 
+sub CO2PSP_Translator
+{
+   my $self=shift;
+   my $co=shift;
+   my $mode=shift;   
+
+   $mode="top" if (!defined($mode));
+
+   return() if (!($co=~m/^\S{10}$/));
+
+   foreach my $pref ("E-","R-","Q-"){   # X- not supported at now
+      $self->ResetFilter();
+      $self->SetFilter({name=>$pref.$co});
+      my ($saprec,$msg)=$self->getOnlyFirst(qw(name));
+      return($saprec->{name}) if (defined($saprec));
+   }
+   return();
+}
+
+
 
 
 

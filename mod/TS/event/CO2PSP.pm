@@ -39,10 +39,10 @@ sub new
 sub CO2PSP
 {
    my $self=shift;
-   my $filename=shift;
+   my $list=shift;
 
    $ENV{REMOTE_USER}="service/CO2PSP_Migration";
-   my $exitcode=$self->ProcessMigration();
+   my $exitcode=$self->ProcessMigration($list);
 
    return({exitcode=>$exitcode});
 }
@@ -166,6 +166,7 @@ sub ProcessLineData
 sub ProcessMigration
 {
    my $self=shift;
+   my $list=shift;
    $self->{costcenter}=getModuleObject($self->Config,"finance::costcenter");
    $self->{custcontract}=getModuleObject($self->Config,"finance::custcontract");
    $self->{appl}=getModuleObject($self->Config,"itil::appl");
@@ -175,13 +176,15 @@ sub ProcessMigration
 
    my %coMig;
 
+   my $cofilter="*";
+   $cofilter=[split(/[,;]+/,$list)] if ($list ne "");
+
    foreach my $o ($self->{appl},$self->{system},$self->{asset},
                   $self->{custcontract}){
       $o->ResetFilter();
-      $o->SetFilter({cistatusid=>"<=5"});
+      $o->SetFilter({cistatusid=>"<=5",conumber=>$cofilter});
       my $n=0;
       foreach my $arec ($o->getHashList(qw(conumber))){
-         last if ($n>10);
          if ($arec->{conumber}=~m/^\S+$/){
             if (!exists($coMig{$arec->{conumber}})){
                $coMig{$arec->{conumber}}=undef;
@@ -212,19 +215,16 @@ sub ProcessMigration
          push(@mis,$co);
       }
    }
-   print Dumper(\%coMig);
+   #print Dumper(\%coMig);
 
    foreach my $oldcostcenter (sort(keys(%coMig))){
       $self->ProcessLineData($oldcostcenter,
                              $coMig{$oldcostcenter});
    }
 
-   printf("Miss: %s\n",join(", ",@mis));
+   printf STDERR ("Miss: %s\n",join(", ",@mis));
   
-   
-
-   
-#   $self->ProcessLineData($oExcel,$oBook,$oWkS,$iSheet,$row,\@data);
+   return(0); 
 }
 
 

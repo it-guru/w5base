@@ -284,6 +284,12 @@ sub qcheckRecord
                # hier muß der Check gegen die SAP P01 rein für die 
                # Umrechnung auf PSP Elemente
                #
+               if ($parrec->{conumber}=~m/^\S{10}$/){
+                  my $sappsp=getModuleObject($self->getParent->Config,
+                                             "tssapp01::psp");
+                  my $psp=$sappsp->CO2PSP_Translator($parrec->{conumber});
+                  $parrec->{conumber}=$psp if (defined($psp));
+               }
 
                ###############################################################
                my $co=getModuleObject($self->getParent->Config,

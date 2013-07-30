@@ -100,6 +100,12 @@ sub qcheckRecord
                # hier muß der Check gegen die SAP P01 rein für die 
                # Umrechnung auf PSP Elemente
                #
+               if ($parrec->{conumber}=~m/^\S{10}$/){
+                  my $sappsp=getModuleObject($self->getParent->Config,
+                                             "tssapp01::psp");
+                  my $psp=$sappsp->CO2PSP_Translator($parrec->{conumber});
+                  $parrec->{conumber}=$psp if (defined($psp));
+               }
 
                ###############################################################
                my $co=getModuleObject($self->getParent->Config,
@@ -119,21 +125,24 @@ sub qcheckRecord
 
 
 
-
-
-
          $self->IfaceCompare($dataobj,
                              $rec,"conumber",
                              $parrec,"conumber",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                             $forcedupd,$wfrequest,\@qmsg,
+                             \@dataissue,\$errorlevel,
                              mode=>'native');
+print STDERR Dumper($forcedupd);
+print STDERR Dumper(\@qmsg);
+print STDERR Dumper(\@dataissue);
+print STDERR Dumper($wfrequest);
          if ($parrec->{sememail} ne ""){
             my $semid=$tswiw->GetW5BaseUserID($parrec->{sememail});
             if (defined($semid)){
                $self->IfaceCompare($dataobj,
                                    $rec,"semid",
                                    {semid=>$semid},"semid",
-                                   $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
+                                   $forcedupd,$wfrequest,\@qmsg,
+                                   \@dataissue,\$errorlevel,
                                    mode=>'native');
             }
             else{
