@@ -253,6 +253,157 @@ sub isWriteValid
 }
 
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),qw(ImportCostCenter));
+}
+
+
+sub ImportCostCenter
+{
+   my $self=shift;
+
+   my $importname=Query->Param("importname");
+   if (Query->Param("DOIT")){
+      if ($self->Import({importname=>$importname})){
+         Query->Delete("importname");
+         $self->LastMsg(OK,"costcenter has been successfuly imported");
+      }
+      Query->Delete("DOIT");
+   }
+
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importname},
+                           body=>1,form=>1,
+                           title=>"CostCenter Import");
+   print $self->getParsedTemplate("tmpl/minitool.costcenter.import",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub Import
+{
+   my $self=shift;
+   my $param=shift;
+
+   my $import=$param->{importname};
+   $import=trim($import);
+   $import=~s/[\*\?]//g;  # prevent wildcards
+   if ($import eq ""){
+      $self->LastMsg(ERROR,"please specify a valid costcenter or PSP");
+      return();
+   }
+   my @import=split(/[,;\s]+/,$import);
+   if ($#import>3){
+      $self->LastMsg(ERROR,"to many import elements specified");
+      return();
+   }
+   my $co=getModuleObject($self->Config,"TS::costcenter");
+
+   my $allok=1;
+   foreach my $chk (@import){
+      $chk=limitlen($chk,15,1);
+      if (!$co->ValidateCONumber($self->Self,
+           "conumber",undef,{conumber=>$chk})){
+         $self->LastMsg(ERROR,
+            "the element '%s' seems not to be acceptable for this database",
+            $chk);
+         $allok=0;
+      }
+   }
+   return() if (!$allok);
+
+   my @irec;
+   my $allok=1;
+   my $sappsp=getModuleObject($self->Config,"tssapp01::psp");
+   my $sapcos=getModuleObject($self->Config,"tssapp01::costcenter");
+   foreach my $chk (@import){
+      next if ($chk eq "");
+      $co->ResetFilter();
+      $co->SetFilter({name=>$chk});
+      my ($oldrec)=$co->getOnlyFirst(qw(id));
+      if (defined($oldrec)){
+         $self->LastMsg(WARN,"'%s' already exists - ignoring it",$chk);
+      }
+      else{
+         $sappsp->ResetFilter();
+         $sappsp->SetFilter({name=>$chk});
+         my ($saprec)=$sappsp->getOnlyFirst(qw(ALL));
+         if (defined($saprec)){
+            my $newrec={name=>$saprec->{name},
+                        costcentertype=>'pspelement',
+                        cistatusid=>4,
+                        srcsys=>$sappsp->Self,
+                        srcid=>$saprec->{id}};
+            if ($saprec->{accarea} ne ""){
+               $newrec->{accarea}=$saprec->{accarea};
+            }
+            if ($saprec->{description} ne ""){
+               $newrec->{shortdesc}=$saprec->{description};
+            }
+            my $userid=$self->getCurrentUserId();
+            $newrec->{databossid}=$userid;
+            $newrec->{allowifupdate}=1;
+            push(@irec,$newrec);
+         } 
+         else{
+            $sapcos->ResetFilter();
+            my $altchk=sprintf("%d %010d",$chk,$chk);
+            $sapcos->SetFilter({name=>$altchk});
+            my ($saprec)=$sapcos->getOnlyFirst(qw(ALL));
+            if (defined($saprec)){
+               my $newrec={name=>$saprec->{name},
+                           costcentertype=>'costcenter',
+                           cistatusid=>4,
+                           srcsys=>$sapcos->Self,
+                           srcid=>$saprec->{id}};
+               if ($saprec->{accarea} ne ""){
+                  $newrec->{accarea}=$saprec->{accarea};
+               }
+               if ($saprec->{description} ne ""){
+                  $newrec->{shortdesc}=$saprec->{description};
+               }
+               my $userid=$self->getCurrentUserId();
+               $newrec->{databossid}=$userid;
+               $newrec->{allowifupdate}=1;
+               push(@irec,$newrec);
+            }
+            else{
+               $self->LastMsg(ERROR,"can not find '%s' in SAP P01",$chk);
+               $allok=0;
+            }
+         }
+      }
+   }
+   return() if (!$allok);
+
+   my @iid;
+   foreach my $irec (@irec){
+      my $identifyby=$co->ValidatedInsertRecord($irec);
+      if (defined($identifyby) && $identifyby!=0){
+         $co->ResetFilter();
+         $co->SetFilter({'id'=>\$identifyby});
+         my ($rec,$msg)=$co->getOnlyFirst(qw(ALL));
+         if (defined($rec)){
+            my $qc=getModuleObject($self->Config,"base::qrule");
+            $qc->setParent($co);
+            $qc->nativQualityCheck($co->getQualityCheckCompat($rec),$rec);
+         }
+         push(@iid,$identifyby);
+         $self->LastMsg(INFO,"costcenter '%s' successfuly imported",
+                             $irec->{name});
+      }
+   }
+   return(@iid);
+}
+
+
+
+
+
 
 
 

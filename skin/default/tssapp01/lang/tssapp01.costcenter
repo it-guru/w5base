@@ -4,3 +4,7 @@
 'SAP hierarchy'=>{de=>'SAP Hierarchie'},
 'fieldgroup.saphier'=>{de=>'SAP Hierarchie',en=>'SAP hierarchy'},
 'Accounting Area'=>{de=>'Buchungskreis'},
+"'%s' already exists - ignoring it"=>{de=>"'%s' existiert bereits - Eintrag wird ignoriert"},
+"the element '%s' seems not to be acceptable for this database"=>{de=>"Das Element '%s' scheint für diese Datenbank nicht zulässig"},
+"costcenter '%s' successfuly imported"=>{de=>"Kontierungsobjekt '0000010200' erfolgreich importiert"},
+"costcenter has been successfuly imported"=>{de=>"Kontierungsobjekt import erfolgreich"},
