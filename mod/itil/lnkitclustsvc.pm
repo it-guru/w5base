@@ -193,6 +193,18 @@ sub new
                 group         =>'source',
                 label         =>'Last-Load',
                 dataobjattr   =>'qlnkitclustsvc.srcload'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"qlnkitclustsvc.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(qlnkitclustsvc.id,35,'0')"),
                                                    
       new kernel::Field::CDate(
                 name          =>'cdate',

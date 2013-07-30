@@ -86,64 +86,84 @@ sub ModuleObjectInfo
    }
    printf("</table>");
    printf("<br><br><hr>");
-   printf("</center><b>Oracle-Replication-Schema:</b><br>");
-   printf("<pre>");
-   printf("create table \"%s\" (\n",$self->Self);
-   my $form=" %-20s %s,\n";
-   foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
-      my $typ=$fo->Type();
-      my $name=$fo->Name();
-      if ($typ ne "SubList" && $typ ne "Linenumber" &&
-          $name ne "replkeypri" && $name ne "replkeysec"){
-         if ($name eq "id"){
-            printf($form,$fo->Name,"Number(22,0) not null");
-         }
-         elsif ($typ eq "Date" || $typ eq "CDate" || $typ eq "MDate"){
-            printf($form,$fo->Name,"DATE");
-         }
-         elsif ($typ eq "Boolean"){
-            printf($form,$fo->Name,"Number(1,0)");
-         }
-         elsif ($typ eq "TextDrop"){
-            printf($form,$fo->Name,"VARCHAR2(128)");
-         }
-         else{
-            printf($form,$fo->Name,"VARCHAR2(40)");
+   if ($self->IsMemberOf(["admin","support"])){
+      printf("</center><b>Oracle-Replication-Schema:</b><br>");
+
+      printf("<pre>");
+      printf("create table \"%s\" (\n",$self->Self);
+      my $form=" %-20s %s,\n";
+      foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
+         my $typ=$fo->Type();
+         my $name=$fo->Name();
+         next if (in_array([qw(lastqcheck secroles sectargetid sectarget
+                               lastqcheck dataissuestate qcresonsearea
+                               attachments additional contacts)],$name));
+         if ($typ ne "SubList" && $typ ne "Linenumber" &&
+             $name ne "replkeypri" && $name ne "replkeysec"){
+            if ($name eq "id"){
+               printf($form,$fo->Name,"Number(*,0) not null");
+            }
+            elsif ($name eq "cistatusid"){
+               printf($form,$fo->Name,"Number(2,0)");
+            }
+            elsif (in_array([qw(mandatorid databossid)],$name)){
+               printf($form,$fo->Name,"Number(*,0)");
+            }
+            elsif ($typ eq "Date" || $typ eq "CDate" || $typ eq "MDate"){
+               printf($form,$fo->Name,"DATE");
+            }
+            elsif ($typ eq "Boolean"){
+               printf($form,$fo->Name,"Number(1,0)");
+            }
+            elsif ($typ eq "TextDrop" || $typ eq "Contact" || 
+                   $typ eq "Databoss"){
+               printf($form,$fo->Name,"VARCHAR2(128)");
+            }
+            elsif ($typ eq "Group"){
+               printf($form,$fo->Name,"VARCHAR2(256)");
+            }
+            else{
+               my $len=40;
+               $len=80   if ($name eq "srcsys");
+               $len=80   if ($name eq "name");
+               $len=20   if ($name eq "cistatus");
+               $len=128  if ($name eq "fullname");
+               $len=4000 if ($name eq "comments");
+               printf($form,$fo->Name,"VARCHAR2($len)");
+            }
          }
       }
-   }
-   my @w5repladd=('W5REPLKEY'     =>'CHAR(70) not null',
-                  'W5REPLKEYPRI'  =>'CHAR(35) not null',
-                  'W5REPLKEYSEC'  =>'CHAR(35) not null',
-                  'W5REPLLASTSUCC'=>'DATE not null',
-                  'W5REPLLASTTRY' =>'DATE not null',
-                  'W5REPLMDATE'   =>'DATE not null',
-                  'W5REPLCDATE'   =>'DATE not null',
-                  'W5REPLFAILCNT' =>'NUMBER(22,0) default 0 not null');
-   while(my $k=shift(@w5repladd)){
-       my $v=shift(@w5repladd);
-       printf($form,$k,$v);
-   }
-   my $idname="?";
-   if (my $idobj=$self->IdField()){
-      $idname=$idobj->Name();
-   }
-   printf(" constraint \"%s_pk\" primary key (%s)\n",$self->Self,$idname);
+   #   # this is not longer nessesary, because this state tables are
+   #   # automaticly create by W5Replication tool
+   #   my @w5repladd=('W5REPLKEY'     =>'CHAR(70) not null',
+   #                  'W5REPLKEYPRI'  =>'CHAR(35) not null',
+   #                  'W5REPLKEYSEC'  =>'CHAR(35) not null',
+   #                  'W5REPLLASTSUCC'=>'DATE not null',
+   #                  'W5REPLLASTTRY' =>'DATE not null',
+   #                  'W5REPLMDATE'   =>'DATE not null',
+   #                  'W5REPLCDATE'   =>'DATE not null',
+   #                  'W5REPLFAILCNT' =>'NUMBER(22,0) default 0 not null');
+   #   while(my $k=shift(@w5repladd)){
+   #       my $v=shift(@w5repladd);
+   #       printf($form,$k,$v);
+   #   }
+      my $idname="?";
+      if (my $idobj=$self->IdField()){
+         $idname=$idobj->Name();
+      }
+      printf(" constraint \"%s_pk\" primary key (%s)\n",$self->Self,$idname);
 
-   printf(");\n");
-   printf("CREATE INDEX \"%s_si1\"\n       ON \"%s\"(W5REPLKEY);\n",
-          $self->Self,$self->Self);       
-   printf("CREATE INDEX \"%s_si2\"\n       ON \"%s\"(W5REPLLASTSUCC);\n",
-          $self->Self,$self->Self);       
-   if ($self->getField("name")){          
-      printf("CREATE INDEX \"%s_di1\"\n       ON \"%s\"(NAME);\n",
-             $self->Self,$self->Self);    
-   }                                      
-   if ($self->getField("fullname")){      
-      printf("CREATE INDEX \"%s_di2\"\n       ON \"%s\"(FULLNAME);\n",
-             $self->Self,$self->Self);
+      printf(");\n");
+      if ($self->getField("name")){          
+         printf("CREATE INDEX \"%s_di1\"\n       ON \"%s\"(NAME);\n",
+                $self->Self,$self->Self);    
+      }                                      
+      if ($self->getField("fullname")){      
+         printf("CREATE INDEX \"%s_di2\"\n       ON \"%s\"(FULLNAME);\n",
+                $self->Self,$self->Self);
+      }
+      printf("</pre>");
    }
-   printf("</pre>");
 
 
 
