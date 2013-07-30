@@ -31,9 +31,9 @@ sub new
 
    $self->AddFields(
       new kernel::Field::SubList(
-                name          =>'sapentries',
+                name          =>'sappspentries',
                 group         =>'saprelation',
-                label         =>'TS SAP P01 Entries',
+                label         =>'TS SAP P01 PSP Entries',
                 vjointo       =>'tssapp01::psp',
                 vjoinon       =>['name'=>'name'],
                 vjoinonfinish =>sub{
@@ -57,6 +57,28 @@ sub new
                    return($flt);
                 },
                 vjoindisp     =>['name','status','description']),
+      insertafter=>'itsemid'
+   );
+   $self->AddFields(
+      new kernel::Field::SubList(
+                name          =>'sapcoentries',
+                group         =>'saprelation',
+                label         =>'TS SAP P01 CostCenter Entries',
+                vjointo       =>'tssapp01::costcenter',
+                vjoinon       =>['name'=>'name'],
+                vjoinonfinish =>sub{
+                   my $self=shift;
+                   my $flt=shift;
+                   my $current=shift;
+                   my $f=$flt->{name};
+                   $f=~s/\[.*\]$//;
+                   if ($f=~m/\d+/){
+                      $flt->{name}=sprintf("%d %010d",$f,$f);
+                   }
+                   print STDERR Dumper($flt);
+                   return($flt);
+                },
+                vjoindisp     =>['name','description']),
       insertafter=>'itsemid'
    );
    $self->AddGroup("saprelation",translation=>'TS::costcenter');
