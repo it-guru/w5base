@@ -585,8 +585,9 @@ sub objectReplicationPhase1
                if ($n>$smallpack-1){  # if multiple records have the same
                                       # replkeypri - all must be synced in
                                       # one "smallpack"
-                  msg(WARN,"found $n records with the same replkey '%s'",
-                      $replkey);
+                  msg(WARN,"found $n records with the same replkey ".
+                           "'%s' in '%s'",
+                      $replkey,$ctrl->{name});
                   $obj->Limit($n+$smallpack,0,0);
                }
                else{
