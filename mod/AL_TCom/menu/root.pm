@@ -395,11 +395,11 @@ sub Init
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("AL_TCom.kern.costcenter",
-                      "itil::costcenter",
+                      "TS::costcenter",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("AL_TCom.kern.costcenter.new",
-                      "itil::costcenter",
+                      "TS::costcenter",
                       func=>'New',
                       defaultacl=>['valid_user']);
 
