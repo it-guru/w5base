@@ -310,6 +310,8 @@ sub CO2PSP_Translator
 
    return() if (!($co=~m/^\S{10}$/));
 
+   # aus Performance gründen wird das über eine Schleife (nicht über
+   # eine ODER Suche) durchgeführt!
    foreach my $pref ("E-","R-","Q-"){   # X- not supported at now
       $self->ResetFilter();
       $self->SetFilter({name=>$pref.$co});
