@@ -47,17 +47,6 @@ sub new
                 dataobjattr   =>'costcenter.name'),
 
       new kernel::Field::Text(
-                name          =>'conodenumber',
-                htmlwidth     =>'150px',
-                readonly      =>1,
-                htmldetail    =>0,
-                searchable    =>0,
-                label         =>'Costcenter-Number',
-                dataobjattr   =>"if(instr(costcenter.name,'-'),".
-                        "substr(costcenter.name,instr(costcenter.name,'-')+1),".
-                        "costcenter.name)"),
-
-      new kernel::Field::Text(
                 name          =>'accarea',
                 htmlwidth     =>'130px',
                 htmleditwidth =>'130px',
@@ -180,6 +169,16 @@ sub new
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'costcenter.comments'),
+
+      new kernel::Field::Text(
+                name          =>'conodenumber',
+                htmlwidth     =>'150px',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Costcenter-Number',
+                dataobjattr   =>"if(instr(costcenter.name,'-'),".
+                     "substr(costcenter.name,instr(costcenter.name,'-')+1,10),".
+                     "costcenter.name)"),
 
       new kernel::Field::Boolean(
                 name          =>'allowifupdate',

@@ -133,7 +133,7 @@ sub mkAcFtpRecAsset
                     Security_Unit=>"TS.DE",
                     bDelete=>'0',
                     Location=>'/DE-BAMBERG-GUTENBERGSTR-13/',
-                    Sender_CostCenter=>$rec->{conumber},
+                    Sender_CostCenter=>$rec->{conodenumber},
                     AssignmentGroup=>$assignment,
                     IncidentAG=>$assignment,
                }
@@ -578,7 +578,7 @@ sub ApplicationModified
                                    Priority=>$rec->{customerprio},
                                    EventID=>$CurrentEventId,
                                    AssignmentGroup=>$assignment,
-                                   CO_CC=>$rec->{conumber},
+                                   CO_CC=>$rec->{conodenumber},
                                    Description=>$rec->{description},
                                    CustBusinessDesc=>$rec->{description},
                                    Remarks=>$rec->{comments},
@@ -813,7 +813,7 @@ sub ApplicationModified
                                 Remarks=>$irec->{comments},
                                 Assignment=>$assignment,
                                 IncidentAG=>$iassignment,
-                                CostCenter=>$rec->{conumber},
+                                CostCenter=>$rec->{conodenumber},
                                 Security_Unit=>"TS.DE",
                                 CustomerLink=>"TS.DE",
                                 bDelete=>'0'
