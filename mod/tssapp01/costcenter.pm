@@ -391,10 +391,11 @@ sub Import
             my $qc=getModuleObject($self->Config,"base::qrule");
             $qc->setParent($co);
             $qc->nativQualityCheck($co->getQualityCheckCompat($rec),$rec);
+            push(@iid,$identifyby);
+
+            $self->LastMsg(INFO,"costcenter '%s' successfuly imported",
+                                $rec->{name});
          }
-         push(@iid,$identifyby);
-         $self->LastMsg(INFO,"costcenter '%s' successfuly imported",
-                             $irec->{name});
       }
    }
    return(@iid);

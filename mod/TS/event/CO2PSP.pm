@@ -136,8 +136,9 @@ sub ProcessLineData
                       "eine Ereweiterung der bekannten CO-Nummern da und ".
                       "haben i.d.R. die\nNotation \"A-9999999999\" ".
                       "(PSP Top Element) .\n\n".
-                      "Diese Umstellung wird nun auch im Config-Management ".
-                      "(SACM - Service Asset and Configuration Management) ".
+                      "Diese Umstellung wird nun auch in W5Base/Darwin ".
+                      "(SACM - ".
+                      "Service Asset and Configuration Management Prozess) ".
                       "dargestellt. ".
                       "Im konkreten Fall wurde das Kontierungsobjekt '<b>".
                       $data->[0]."</b>' auf '<b>".$data->[1].
