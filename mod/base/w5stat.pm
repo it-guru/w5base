@@ -768,7 +768,8 @@ function doPrint()
 </script>
 EOF
 
-   print("<table width=\"100%\" height=\"100%\" border=0>");
+   print("<table width=\"100%\" height=\"100%\" ".
+         "cellspacing=0 cellpadding=0 border=0>");
 
    printf("<tr height=1%><td>");
    print $self->getAppTitleBar(prefix=>$rootpath,
