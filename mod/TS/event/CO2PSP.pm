@@ -133,8 +133,8 @@ sub ProcessLineData
                       "auf SAP Seite wurde Mitte letzten Jahres die ".
                       "Kontierung auf CO-Nummer durch eine Kontierung ".
                       "auf PSP Elemente umgestellt. PSP Elemente stellen ".
-                      "eine Ereweiterung der bekannten CO-Nummern da und ".
-                      "haben i.d.R. die\nNotation \"A-9999999999\" ".
+                      "eine Erweiterung der bekannten CO-Nummern da und ".
+                      "haben i.d.R. die\nNotation \"A-0000000000\" ".
                       "(PSP Top Element) .\n\n".
                       "Diese Umstellung wird nun auch in W5Base/Darwin ".
                       "(SACM - ".
