@@ -77,7 +77,8 @@ sub ProcessLineData
    else{
       foreach my $rec (@colist){
          my $comments=$rec->{comments};
-         $comments=~s/\s*authority at AssetManager\s*//g;
+         $comments=~s/\s*authority at AssetManager\s*//ig;
+         $comments=~s/\s*authority at AssetCenter\s*//ig;
          if ($self->{$o}->ValidatedUpdateRecord($rec,
                            {
                             name=>$data->[1],
