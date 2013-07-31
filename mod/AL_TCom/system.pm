@@ -29,6 +29,10 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   # BETA - diese Funktion ist noch im Aufbau!
+   $self->AddVJoinReferenceRewrite("itil::appl"=>"AL_TCom::appl");
+
+
 
    return($self);
 }

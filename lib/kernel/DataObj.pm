@@ -2090,6 +2090,7 @@ sub InitFields
 {
    my $self=shift;
    my @finelist;
+   $self->{'_vjoinRewrite'}={} if (!exists($self->{'_vjoinRewrite'}));
    foreach my $obj (@_){
       next if (!defined($obj));
       my $name=$obj->Name;
@@ -2206,6 +2207,23 @@ sub AddGroup                 # parameter fields und translation
       }
    }
    return(1);
+}
+
+sub AddVJoinReferenceRewrite
+{
+   my $self=shift;
+   my %addtab=@_;
+
+   $self->{'_vjoinRewrite'}={} if (!exists($self->{'_vjoinRewrite'}));
+
+   foreach my $k (keys(%addtab)){
+      $self->{'_vjoinRewrite'}->{$k}=$addtab{$k};
+   }
+   #
+   #  ToDo - hier müßten alle Felder auf vjointo reference hin
+   #         überprüft und korrigiert werden
+   #
+   return(%{$self->{'_vjoinRewrite'}});
 }
 
 sub getGroup

@@ -360,13 +360,29 @@ sub vjoinobj
    my $self=shift;
    return(undef) if (!exists($self->{vjointo}));
    my $jointo=$self->{vjointo};
+   my $vjoinRewrite={};
+   my $p=$self->getParent;
+   if (defined($p) && exists($p->{_vjoinRewrite})){
+      $vjoinRewrite=$p->{_vjoinRewrite};
+   }
+   if (defined($vjoinRewrite->{$jointo})){
+      $jointo=$vjoinRewrite->{$jointo};
+   }
    my $joinparam=$self->{vjoinparam};
    ($jointo,$joinparam)=&{$jointo}($self) if (ref($jointo) eq "CODE");
    $self->{joincache}={} if (!defined($self->{joincache}));
 
    if (!defined($self->{joincache}->{$jointo})){
       #msg(INFO,"create of '%s'",$jointo);
+      #msg(INFO,"create of '%s' in $self %s",$jointo,$self->{_vjoinRewrite});
       my $o=getModuleObject($self->getParent->Config,$jointo,$joinparam);
+      foreach my $fobj ($o->getFieldObjsByView(["ALL"])){
+         if (defined($fobj->{vjointo})){
+            if (defined($vjoinRewrite->{$fobj->{vjointo}})){
+               $fobj->{vjointo}=$vjoinRewrite->{$fobj->{vjointo}};
+            }
+         }
+      }
       #msg(INFO,"o=$o");
       $self->{joincache}->{$jointo}=$o;
       $self->{joincache}->{$jointo}->setParent($self->getParent);
@@ -957,18 +973,22 @@ sub resolvContainerEntryFromCurrent
       $container=$parentofparent->getField($self->{container});
    }
    my $containerdata=$container->RawValue($current);
-   if (wantarray()){
-      if (ref($containerdata->{$self->Name}) eq "ARRAY"){
-         return(@{$containerdata->{$self->Name}});
-      }
-      return($containerdata->{$self->Name});
+   my $centryname=$self->Name;
+   if (defined($self->{containergroup})){
+      $centryname=$self->{containergroup}.".".$centryname;
    }
-   if (ref($containerdata->{$self->Name}) eq "ARRAY" &&
-       $#{$containerdata->{$self->Name}}<=0){
-      $d=$containerdata->{$self->Name}->[0];
+   if (wantarray()){
+      if (ref($containerdata->{$centryname}) eq "ARRAY"){
+         return(@{$containerdata->{$centryname}});
+      }
+      return($containerdata->{$centryname});
+   }
+   if (ref($containerdata->{$centryname}) eq "ARRAY" &&
+       $#{$containerdata->{$centryname}}<=0){
+      $d=$containerdata->{$centryname}->[0];
    }
    else{
-      $d=$containerdata->{$self->Name};
+      $d=$containerdata->{$centryname};
    }
    return($d);
 }
