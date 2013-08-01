@@ -53,12 +53,12 @@ sub Validate
 
    $self->FieldCache->{LastDrop}=undef;
 
-   if ($self->{'SoftValidate'}){
-      if ((!defined($fromquery) || $fromquery eq $oldrec->{$name}) &&
-          $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
-         return({});                              # (problem EDITBASE!)
-      }
-   }
+#   if ($self->{'SoftValidate'}){
+#      if ((!defined($fromquery) || $fromquery eq $oldrec->{$name}) &&
+#          $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
+#         return({});                              # (problem EDITBASE!)
+#      }
+#   }
 
    my $vjoinobj=$self->vjoinobj->Clone();
 
