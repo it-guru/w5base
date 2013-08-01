@@ -109,7 +109,8 @@ sub Validate
    if ($#{$keylist}<0 && ((defined($fromquery) && $fromquery ne "") ||
                           (defined($newrec->{$name}) && 
                            $newrec->{$name} ne $oldrec->{$name}))){
-      if ($newrec->{$name} eq "" && $self->{AllowEmpty}){
+      if ($newrec->{$name} eq "" && 
+          ($self->{AllowEmpty} || $self->IsMemberOf("admin"))){
          if (defined($self->{altnamestore})){
             return({$self->{vjoinon}->[0]=>undef,
                     $self->{altnamestore}=>undef});
