@@ -30,6 +30,7 @@ sub new
    $param{label}='Databoss'      if (!defined($param{label}));
    $param{vjoinon}='databossid'  if (!defined($param{vjoinon}));
    $param{AllowEmpty}='0'        if (!defined($param{AllowEmpty}));
+   $param{SoftValidate}='1'      if (!defined($param{SoftValidate}));
 
    my $self=bless($type->SUPER::new(%param),$type);
    return($self);

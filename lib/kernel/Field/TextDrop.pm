@@ -53,6 +53,13 @@ sub Validate
 
    $self->FieldCache->{LastDrop}=undef;
 
+   if ($self->{'SoftValidate'}){
+      if ((!defined($fromquery) || $fromquery eq $oldrec->{$name}) &&
+          $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
+         return({});                              # (problem EDITBASE!)
+      }
+   }
+
    my $vjoinobj=$self->vjoinobj->Clone();
 
    if (defined($self->{vjoinbase})){
@@ -99,18 +106,10 @@ sub Validate
                                       $self->Label,$newval);
       return(undef);
    }
-   if ($self->{'SoftValidate'}){
-      if ((!defined($fromquery) || $fromquery eq $oldrec->{$name}) &&
-          $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
-         return({});                              # (problem EDITBASE!)
-      }
-   }
-
    if ($#{$keylist}<0 && ((defined($fromquery) && $fromquery ne "") ||
                           (defined($newrec->{$name}) && 
                            $newrec->{$name} ne $oldrec->{$name}))){
-      if ($newrec->{$name} eq "" && 
-          ($self->{AllowEmpty} || $self->IsMemberOf("admin"))){
+      if ($newrec->{$name} eq "" && $self->{AllowEmpty}){
          if (defined($self->{altnamestore})){
             return({$self->{vjoinon}->[0]=>undef,
                     $self->{altnamestore}=>undef});
