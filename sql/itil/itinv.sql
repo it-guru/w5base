@@ -169,7 +169,7 @@ create table platform (
 );
 create table osrelease (
   id         bigint(20) NOT NULL,
-  name       varchar(40) NOT NULL,
+  name       varchar(45) NOT NULL,
   cistatus   int(2)      NOT NULL,
     mandator       bigint(20)  default NULL,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
