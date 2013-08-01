@@ -92,13 +92,7 @@ sub new
                 label         =>'Shortdescription',
                 dataobjattr   =>'costcenter.fullname'),
 
-      new kernel::Field::TextDrop(
-                name          =>'databoss',
-                label         =>'Databoss',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['databossid'=>'userid'],
-                vjoindisp     =>'fullname'),
+      new kernel::Field::Databoss(),
 
       new kernel::Field::Link(
                 name          =>'databossid',
