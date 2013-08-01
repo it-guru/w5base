@@ -52,13 +52,14 @@ sub Validate
    my $filter={$disp=>'"'.trim($newval).'"'};
 
    $self->FieldCache->{LastDrop}=undef;
+   my $fromquery=trim(Query->Param("Formated_$name"));
 
-#   if ($self->{'SoftValidate'}){
-#      if ((!defined($fromquery) || $fromquery eq $oldrec->{$name}) &&
-#          $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
-#         return({});                              # (problem EDITBASE!)
-#      }
-#   }
+   if ($self->{'SoftValidate'}){
+      if ((!defined($fromquery) || $fromquery eq $oldrec->{$name}) &&
+          $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
+         return({});                              # (problem EDITBASE!)
+      }
+   }
 
    my $vjoinobj=$self->vjoinobj->Clone();
 
@@ -74,7 +75,6 @@ sub Validate
    }
    $vjoinobj->SetFilter($filter);
    my %param=(AllowEmpty=>$self->AllowEmpty);
-   my $fromquery=trim(Query->Param("Formated_$name"));
    if (defined($fromquery)){
       $param{Add}=[{key=>$fromquery,val=>$fromquery},
                    {key=>"",val=>""}];
