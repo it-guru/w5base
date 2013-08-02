@@ -89,7 +89,19 @@ sub new
                 precision     =>'2',
                 label         =>'averaged latency',
                 dataobjattr   =>'replicateobject.latency'),
-                                                  
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"replicateobject.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(replicateobject.id,35,'0')"),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',

@@ -112,7 +112,17 @@ sub new
                 label         =>'AccountNoID',
                 dataobjattr   =>'amnetworkcard.laccountnoid'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>'amnetworkcard.dtlastmodif'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(amnetworkcard.lnetworkcardid,35,'0')")
    );
    $self->setDefaultView(qw(linenumber systemid 
                             systemname ipaddress status description));
