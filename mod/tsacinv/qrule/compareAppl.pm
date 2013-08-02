@@ -131,10 +131,6 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,\@qmsg,
                              \@dataissue,\$errorlevel,
                              mode=>'native');
-print STDERR Dumper($forcedupd);
-print STDERR Dumper(\@qmsg);
-print STDERR Dumper(\@dataissue);
-print STDERR Dumper($wfrequest);
          if ($parrec->{sememail} ne ""){
             my $semid=$tswiw->GetW5BaseUserID($parrec->{sememail});
             if (defined($semid)){
