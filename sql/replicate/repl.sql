@@ -21,7 +21,7 @@ CREATE TABLE replicateobject (
   allow_phase1       int(1)    default '1',
   allow_phase2       int(1)    default '1',
   allow_phase3       int(1)    default '1',
-  entrycount         bigint(20) default '0',
+  entrycount         bigint(20) default '0', latency decimal(8,2),
   comments    longtext  default NULL,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',

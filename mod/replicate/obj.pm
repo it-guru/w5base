@@ -76,6 +76,20 @@ sub new
                 label         =>'allow phase 3 (cleanup)',
                 dataobjattr   =>'replicateobject.allow_phase3'),
 
+      new kernel::Field::Number(
+                name          =>'entrycount',
+                group         =>'stat',
+                label         =>'replicated entries',
+                dataobjattr   =>'replicateobject.entrycount'),
+                                                  
+      new kernel::Field::Number(
+                name          =>'avglatency',
+                group         =>'stat',
+                unit          =>'h',
+                precistion    =>'2',
+                label         =>'averaged latency',
+                dataobjattr   =>'replicateobject.latency'),
+                                                  
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -135,6 +149,13 @@ sub Validate
    $newrec->{'name'}=$name;
    return(1);
 }
+
+sub getDetailBlockPriority                # posibility to change the block order
+{
+   my $self=shift;
+   return(qw(header default stat source));
+}
+
 
 
 sub isViewValid

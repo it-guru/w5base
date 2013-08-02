@@ -1,5 +1,8 @@
 'replicate::obj'=>{de=>'Replikations-Datenobjekt',en=>'Replication Dataobject'},
+'fieldgroup.stat'=>{de=>'Statistiken',en=>'Statistics'},
 'Dataobject name'=>{de=>'Datenobjekt-Name'},
 'allow phase 1 (modified)'=>{de=>'erlaube Phase1 (Änderungen)'},
 'allow phase 2 (refresh)'=>{de=>'erlaube Phase2 (Aktualisierungen)'},
 'allow phase 3 (cleanup)'=>{de=>'erlaube Phase3 (Bereinigen)'},
+'averaged latency'=>{de=>'mittlere Latenz'},
+'replicated entries'=>{de=>'replizierte Datensätze'},
