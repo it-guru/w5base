@@ -86,7 +86,7 @@ sub new
                 name          =>'avglatency',
                 group         =>'stat',
                 unit          =>'h',
-                precistion    =>'2',
+                precision     =>'2',
                 label         =>'averaged latency',
                 dataobjattr   =>'replicateobject.latency'),
                                                   
