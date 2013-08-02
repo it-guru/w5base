@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use finance::costcenter;
-@ISA=qw(finance::costcenter);
+use itil::costcenter;
+@ISA=qw(itil::costcenter);
 
 sub new
 {

@@ -3409,7 +3409,13 @@ sub FilterPart2SQLexp
          if (($val eq "[LEER]" || $val eq "[EMPTY]") && 
               ($sqlparam{wildcards} || $sqlparam{datatype} eq "DATE")){
             $exp.=" ".$conjunction." " if ($exp ne "");
-            $exp.="($sqlfieldname is NULL or $sqlfieldname='')";
+            if (defined($sqlparam{sqldbh}) &&
+                lc($sqlparam{sqldbh}->DriverName()) eq "oracle"){
+               $exp.="($sqlfieldname is NULL)"; # in oracle is ''=NULL and
+            }                                   # a compare on '' produces a
+            else{                               # wrong result
+               $exp.="($sqlfieldname is NULL or $sqlfieldname='')";
+            }
             next;
          }
          my $compop=" like ";
