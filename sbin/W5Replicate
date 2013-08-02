@@ -850,7 +850,7 @@ sub objectReplicationPhase3
    msg(INFO,"oracmd=$cmd");
    $dbi->doCmd($cmd);
    msg(INFO,"end:   phase 3 replication for $ctrl->{name}");
-   storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,2);
+   storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,3);
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
                                                 {
                                                    enddate=>NowStamp("en")
