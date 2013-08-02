@@ -270,6 +270,7 @@ sub getOracleDBIConnectionHandle
    $dst->{'LongTruncOk'} = 1;
    $dst->{'LongReadLen'} = 128000;
    $dst->doCmd("alter session set NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'");
+   $dst->doCmd("alter session set NLS_NUMERIC_CHARACTERS='. '");
    msg(INFO,"connect to replication target '$dbconnect' successfull");
    return($dst,uc($dbuser),lc($dbuser).'@'.lc($dbconnect));
 }
@@ -652,6 +653,7 @@ sub objectReplicationPhase1
            "from \"_$ctrl->{name}\" ";
    if (my $rec=$dbi->getHash($cmd)){
       $l=$rec->{l};
+      $l=~s/,/./g;
       $n=$rec->{n};
       my $ro=getModuleObject($Config,"replicate::obj");
       if (!defined($ro)){
@@ -1163,7 +1165,7 @@ sub InsertOrUpdate
          }
          else{
             push(@values,$rec->{$fieldname});
-            if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
+            if ($col->{$fieldname}->{type} =~ m/^(timestamp|date)/i) {
                push(@v,"$fieldname=to_date(?,'YYYY-MM-DD HH24:MI:SS')");
             }
             else {
