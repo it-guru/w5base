@@ -28,10 +28,12 @@ use Getopt::Long;
 use kernel::cgi;
 use DBI;
 use POSIX;
-use vars qw($opt_v $opt_h $opt_c $opt_t $opt_s $opt_q $opt_l $configname);
+use vars qw($opt_v $opt_h $opt_c $opt_t $opt_p 
+            $opt_s $opt_q $opt_l $configname);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'smallpack=i'=>\$opt_s,
                         'tasks=i'=>\$opt_t,
+                        'phase=s'=>\$opt_p,
                         'quietmode'=>\$opt_q,
                         'limittime=i'=>\$opt_l,
                         'debug'=>\$opt_v,
@@ -76,6 +78,10 @@ if ($opt_c eq ""){
    $opt_c="w5replicate";
 }
 $configname=$opt_c;
+
+$opt_p="1,2,3" if ($opt_p eq "");
+my @requested_phase=split(/[,; ]+/,$opt_p);
+@requested_phase=grep(/^[1-3]$/,@requested_phase);
 
 #
 # small pack of records, witch be passed in one operation (commit)
@@ -572,16 +578,19 @@ sub objectReplicationPhase1
          if (defined($replkey)){
             if ($replkey ne $oldreplkey){  # do small steps
                $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
-                                $ctrl->{idname}=>'![EMPTY]'});
+                       #         $ctrl->{idname}=>'![EMPTY]'
+                                });
                $obj->Limit($smallpack,0,0);
             }
             else{
                $obj->SetFilter({'replkeypri'=>\$replkey,
-                               $ctrl->{idname}=>'![EMPTY]'});
+                       #        $ctrl->{idname}=>'![EMPTY]'
+                               });
                my $n=$obj->CountRecords();
                $obj->ResetFilter();
                $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
-                                $ctrl->{idname}=>'![EMPTY]'});
+                       #         $ctrl->{idname}=>'![EMPTY]'
+                               });
                if ($n>$smallpack-1){  # if multiple records have the same
                                       # replkeypri - all must be synced in
                                       # one "smallpack"
@@ -601,11 +610,15 @@ sub objectReplicationPhase1
       $obj->SetCurrentOrder(@syncfields);
 
       my ($srcrec,$msg)=$obj->getFirst(buffer=>0);
+      my $candidates=0;
       my $processed=0;
       if (defined($srcrec)){
          do{
             $oldreplkey=$srcrec->{'replkeypri'};
-            if (defined($replkeysec) && $srcrec->{'replkeysec'} ge $replkeysec){
+            if (defined($replkeysec) && 
+                $srcrec->{'replkeysec'} ge $replkeysec &&
+                $srcrec->{$ctrl->{'idname'}} ne ""){
+               $candidates++;
                $replkeysec=undef;
             }
             if (!defined($replkeysec)){   # seek to synkey1 position in stream
@@ -623,20 +636,40 @@ sub objectReplicationPhase1
             ($srcrec,$msg)=$obj->getNext();
          } until(!defined($srcrec));
       }
-      if ($processed<2){
+      if ($processed<2 && $candidates<2){
          last;
       }
    }
 
-
-   $dbi->commit();
-   $dbi->disconnect();
    msg(INFO,"end:   phase 1 replication for $ctrl->{name}");
+
+   #######################################################################
+   # This needs to be a storeReplicateObjectStat method in the future and
+   # needs to be called on end of every phase
+   my $n=0;
+   my $l=undef;
+   my $cmd="select count(*) n,(max(w5repllasttry)-min(w5repllasttry))*24 l ".
+           "from \"_$ctrl->{name}\" ";
+   if (my $rec=$dbi->getHash($cmd)){
+      $l=$rec->{l};
+      $n=$rec->{n};
+      my $ro=getModuleObject($Config,"replicate::obj");
+      if (!defined($ro)){
+         die("ERROR: can not access replicate::obj for $ctrl->{name}");
+      }
+      $ro->ValidatedUpdateRecord($rorec,{entrycount=>$n,avglatency=>$l},
+                                 {id=>\$rorec->{id}});
+   }
+   #######################################################################
+
+
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
                                                 {
                                                    enddate=>NowStamp("en")
                                                 },
                                                 {id=>\$rstatid});
+   $dbi->commit();
+   $dbi->disconnect();
 }
 
 
@@ -680,7 +713,6 @@ sub objectReplicationPhase2
            "from \"_$ctrl->{name}\" ";
    my $n=0;
    my $basewhere="";
-   my $rec=$dbi->getHash($cmd);
 
    if (my $rec=$dbi->getHash($cmd)){
       $n=$rec->{'n'};
@@ -735,9 +767,16 @@ sub objectReplicationPhase2
             }
          }
          else{
-            $dbi->doCmd("update \"_$ctrl->{name}\" ".
-                        "set w5replfailcnt=w5replfailcnt+1 ".
-                        "where refid=?",$id);
+            if ($obj->Ping()){
+               $dbi->doCmd("update \"_$ctrl->{name}\" ".
+                           "set w5replfailcnt=w5replfailcnt+1 ".
+                           "where refid=?",$id);
+            }
+            else{
+               msg(ERROR,"connection to object $ctrl->{name} lost - ".
+                         "hard break of phase 2");
+               exit(1);
+            }
          }
       }
       $dbi->commit();
@@ -790,8 +829,9 @@ sub objectReplicationPhase3
    my $cmd="delete from \"$ctrl->{name}\" ".
            "where \"$ctrl->{name}\".$ctrl->{idname} in ".
            "(select refid from \"_$ctrl->{name}\" where ".
-           "\"_$ctrl->{name}\".w5repllastsucc<sysdate-7 and ".
-           "\"_$ctrl->{name}\".w5replfailcnt>2)";
+           "( \"_$ctrl->{name}\".w5repllastsucc<sysdate-7 and ".
+           "  \"_$ctrl->{name}\".w5replfailcnt>1) or ".
+           "\"_$ctrl->{name}\".w5replfailcnt>10)";
    msg(INFO,"oracmd=$cmd");
    $dbi->doCmd($cmd);
    $dbi->commit();
@@ -847,12 +887,18 @@ my @joblist;
 
 foreach my $replControl (@ReplicationObjects){
    if ($replControl->{'valid'} && $replControl->{'requested'}){
-      if (!exists($replControl->{'filter'})){
-         unshift(@joblist,{phase=>1,replControl=>$replControl});
+      if (in_array(\@requested_phase),"1"){
+         if (!exists($replControl->{'filter'})){
+            unshift(@joblist,{phase=>1,replControl=>$replControl});
+         }
       }
-      push(@joblist,{phase=>2,replControl=>$replControl});
-      if (!exists($replControl->{'filter'})){
-         push(@joblist,{phase=>3,replControl=>$replControl});
+      if (in_array(\@requested_phase),"2"){
+         push(@joblist,{phase=>2,replControl=>$replControl});
+      }
+      if (in_array(\@requested_phase),"3"){
+         if (!exists($replControl->{'filter'})){
+            push(@joblist,{phase=>3,replControl=>$replControl});
+         }
       }
    }
 }
