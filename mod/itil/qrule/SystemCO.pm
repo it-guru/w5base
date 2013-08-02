@@ -59,18 +59,19 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    my $coobj=getModuleObject($self->getParent->Config,"itil::costcenter");
-   if (!($coobj->ValidateCONumber($dataobj->Self,"conumber",$rec,undef))){
+   if ($rec->{conumber} eq "" ||
+       !($coobj->ValidateCONumber($dataobj->Self,"conumber",$rec,undef))){
       return(3,{qmsg=>['no valid costcenter'],
                 dataissue=>['no valid costcenter']});
    }
-   else{
-      $coobj->SetFilter({cistatusid=>4,name=>\$rec->{conumber}});
-      my ($rec,$msg)=$coobj->getOnlyFirst(qw(id));
-      if (!defined($rec)){
-         return(3,{qmsg=>['costcenter object is empty or record not installed/active'],
-            dataissue=>['costcenter object is empty or record not installed/active']});
-      }
-   }
+#   else{
+#      $coobj->SetFilter({cistatusid=>4,name=>\$rec->{conumber}});
+#      my ($rec,$msg)=$coobj->getOnlyFirst(qw(id));
+#      if (!defined($rec)){
+#         return(3,{qmsg=>['costcenter object is empty or record not installed/active'],
+#            dataissue=>['costcenter object is empty or record not installed/active']});
+#      }
+#   }
    return(0,undef);
 
 }
