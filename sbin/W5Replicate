@@ -276,6 +276,36 @@ sub getOracleDBIConnectionHandle
 }
 
 
+sub storeReplicateObjectStat
+{
+   my $Config=shift;
+   my $dbi=shift;
+   my $ctrl=shift;
+   my $rorec=shift;
+   my $phase=shift;
+
+   my $n=0;
+   my $l=undef;
+   my $cmd="select count(*) n,(max(w5repllasttry)-min(w5repllasttry))*24 l ".
+           "from \"_$ctrl->{name}\" ";
+   if (my $rec=$dbi->getHash($cmd)){
+      $l=$rec->{l};
+      $l=~s/,/./g;
+      $n=$rec->{n};
+      my $ro=getModuleObject($Config,"replicate::obj");
+      if (!defined($ro)){
+         die("ERROR: can not access replicate::obj for $ctrl->{name}");
+      }
+      my $now=NowStamp("en");
+      $ro->ValidatedUpdateRecord($rorec,{
+                                    entrycount=>$n,
+                                    "last_phase$phase"=>$now,
+                                    avglatency=>$l
+                                 },
+                                 {id=>\$rorec->{id}});
+   }
+}
+
 sub getReplicateObjectRec
 {
    my $Config=shift;
@@ -644,26 +674,7 @@ sub objectReplicationPhase1
 
    msg(INFO,"end:   phase 1 replication for $ctrl->{name}");
 
-   #######################################################################
-   # This needs to be a storeReplicateObjectStat method in the future and
-   # needs to be called on end of every phase
-   my $n=0;
-   my $l=undef;
-   my $cmd="select count(*) n,(max(w5repllasttry)-min(w5repllasttry))*24 l ".
-           "from \"_$ctrl->{name}\" ";
-   if (my $rec=$dbi->getHash($cmd)){
-      $l=$rec->{l};
-      $l=~s/,/./g;
-      $n=$rec->{n};
-      my $ro=getModuleObject($Config,"replicate::obj");
-      if (!defined($ro)){
-         die("ERROR: can not access replicate::obj for $ctrl->{name}");
-      }
-      $ro->ValidatedUpdateRecord($rorec,{entrycount=>$n,avglatency=>$l},
-                                 {id=>\$rorec->{id}});
-   }
-   #######################################################################
-
+   storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,1);
 
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
                                                 {
@@ -673,6 +684,7 @@ sub objectReplicationPhase1
    $dbi->commit();
    $dbi->disconnect();
 }
+
 
 
 
@@ -784,6 +796,7 @@ sub objectReplicationPhase2
       $dbi->commit();
    }
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
+   storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,2);
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
                                                 {
                                                  enddate=>NowStamp("en"),
@@ -836,14 +849,15 @@ sub objectReplicationPhase3
            "\"_$ctrl->{name}\".w5replfailcnt>10)";
    msg(INFO,"oracmd=$cmd");
    $dbi->doCmd($cmd);
-   $dbi->commit();
-   $dbi->disconnect();
    msg(INFO,"end:   phase 3 replication for $ctrl->{name}");
+   storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,2);
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
                                                 {
                                                    enddate=>NowStamp("en")
                                                 },
                                                 {id=>\$rstatid});
+   $dbi->commit();
+   $dbi->disconnect();
 }
 
 
