@@ -6,3 +6,6 @@
 'allow phase 3 (cleanup)'=>{de=>'erlaube Phase3 (Bereinigen)'},
 'averaged latency'=>{de=>'mittlere Latenz'},
 'replicated entries'=>{de=>'replizierte Datensätze'},
+'last phase 1 finish'=>{de=>'letzte erfolgreiche Phase 1'},
+'last phase 2 finish'=>{de=>'letzte erfolgreiche Phase 2'},
+'last phase 3 finish'=>{de=>'letzte erfolgreiche Phase 3'},

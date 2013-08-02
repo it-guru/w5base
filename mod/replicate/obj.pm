@@ -90,6 +90,24 @@ sub new
                 label         =>'averaged latency',
                 dataobjattr   =>'replicateobject.latency'),
 
+      new kernel::Field::Date(
+                name          =>'last_phase1',
+                group         =>'stat',
+                label         =>'last phase 1 finish',
+                dataobjattr   =>'replicateobject.last_phase1'),
+                                                  
+      new kernel::Field::Date(
+                name          =>'last_phase2',
+                group         =>'stat',
+                label         =>'last phase 2 finish',
+                dataobjattr   =>'replicateobject.last_phase2'),
+                                                  
+      new kernel::Field::Date(
+                name          =>'last_phase3',
+                group         =>'stat',
+                label         =>'last phase 3 finish',
+                dataobjattr   =>'replicateobject.last_phase3'),
+                                                  
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
