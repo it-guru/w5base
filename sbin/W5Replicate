@@ -299,7 +299,7 @@ sub storeReplicateObjectStat
       $ro->ValidatedUpdateRecord($rorec,{
          "entrycount"=>$n,
          "last_phase$phase"=>$now,
-         "avglatency"=>$l
+         "maxlatency"=>$l
       }, {id=>\$rorec->{id}});
    }
 }
