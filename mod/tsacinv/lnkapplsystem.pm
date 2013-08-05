@@ -318,6 +318,12 @@ sub new
                 label         =>'lchildid',
                 dataobjattr   =>'amtsirelportfappl.lportfolioid'),
 
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amtsirelportfappl.dtlastmodif'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 ignorecase    =>1,
