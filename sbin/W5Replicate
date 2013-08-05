@@ -26,6 +26,7 @@ use kernel::config;
 use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
+use List::Util 'shuffle';
 use DBI;
 use POSIX;
 use vars qw($opt_v $opt_h $opt_c $opt_t $opt_p 
@@ -132,9 +133,6 @@ $SIG{ALRM}=sub{
        "MaximumReplicationTime=$MaximumReplicationTime") 
 };
 alarm($MaximumReplicationTime+10);
-
-
-
 
 
 
@@ -260,8 +258,9 @@ sub getOracleDBIConnectionHandle
       exit(255);
    }
    my $dst=DBI->connect($dbconnect,$dbuser,$dbpass,{
-          AutoCommit=>0,
-          FetchHashKeyName=>'NAME_lc',});
+      AutoCommit=>0,
+      FetchHashKeyName=>'NAME_lc'
+   });
    if (!defined($dst)){
       msg(ERROR,$DBI::errstr);
       sleep(20);
@@ -298,11 +297,10 @@ sub storeReplicateObjectStat
       }
       my $now=NowStamp("en");
       $ro->ValidatedUpdateRecord($rorec,{
-                                    entrycount=>$n,
-                                    "last_phase$phase"=>$now,
-                                    avglatency=>$l
-                                 },
-                                 {id=>\$rorec->{id}});
+         "entrycount"=>$n,
+         "last_phase$phase"=>$now,
+         "avglatency"=>$l
+      }, {id=>\$rorec->{id}});
    }
 }
 
@@ -339,7 +337,6 @@ sub getReplicateObjectRec
 
    # ensure that control table for state informations exists in
    # oracle replication schema
-
 
    my $found=0;
    foreach my $tab (getOracleDBIschemaInfo($dbi,$schema)){
@@ -435,10 +432,12 @@ sub getRequestedReplicationObjects
                                            # temp views for data representation)
           $tab->{'table_name'}=~m/::/   &&
           !($tab->{'table_name'}=~m/^_/)){ # objects are recognizable by :: 
-         my %ctrl=('name'=>$tab->{'table_name'},
-                   'prio'=>'0',
-                   'valid'=>'0',
-                   'requested'=>'1');
+         my %ctrl=(
+            'name'=>$tab->{'table_name'},
+            'prio'=>'0',
+            'valid'=>'0',
+            'requested'=>'1'
+         );
          push(@replicationOjects,\%ctrl);
       }
    }
@@ -535,6 +534,8 @@ sub getRequestedReplicationObjects
    foreach my $ctrl (@replicationOjects){  # ensure, that all replication obj
       if ($ctrl->{'requested'} && $ctrl->{'valid'}){ # records are exists
          my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
+         $ctrl->{'entrycount'}=$rorec->{'entrycount'};
+         $ctrl->{'entrycount'}=0 if (!defined($ctrl->{'entrycount'}));
       }
    }
    $dbi->commit();
@@ -575,10 +576,10 @@ sub objectReplicationPhase1
 
    my $rstatobj=getModuleObject($Config,"replicate::stat");
    my $rstatid=$rstatobj->ValidatedInsertRecord({
-                                                   phase=>1,
-                                                   objectid=>$rorec->{id},
-                                                   startdate=>NowStamp("en")
-                                                });
+      phase=>1,
+      objectid=>$rorec->{id},
+      startdate=>NowStamp("en")
+   });
    if (!defined($rstatid)){
       $dbi->rollback();
       $dbi->disconnect();
@@ -676,11 +677,10 @@ sub objectReplicationPhase1
 
    storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,1);
 
-   my $rstatid=$rstatobj->ValidatedUpdateRecord({},
-                                                {
-                                                   enddate=>NowStamp("en")
-                                                },
-                                                {id=>\$rstatid});
+   my $rstatid=$rstatobj->ValidatedUpdateRecord({},{
+      enddate=>NowStamp("en")
+   },{id=>\$rstatid});
+
    $dbi->commit();
    $dbi->disconnect();
 }
@@ -829,10 +829,10 @@ sub objectReplicationPhase3
 
    my $rstatobj=getModuleObject($Config,"replicate::stat");
    my $rstatid=$rstatobj->ValidatedInsertRecord({
-                                                   phase=>3,
-                                                   objectid=>$rorec->{id},
-                                                   startdate=>NowStamp("en")
-                                                });
+      phase=>3,
+      objectid=>$rorec->{id},
+      startdate=>NowStamp("en")
+   });
 
 
  #  if (!defined($rstatid)){
@@ -851,11 +851,9 @@ sub objectReplicationPhase3
    $dbi->doCmd($cmd);
    msg(INFO,"end:   phase 3 replication for $ctrl->{name}");
    storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,3);
-   my $rstatid=$rstatobj->ValidatedUpdateRecord({},
-                                                {
-                                                   enddate=>NowStamp("en")
-                                                },
-                                                {id=>\$rstatid});
+   my $rstatid=$rstatobj->ValidatedUpdateRecord({},{
+       enddate=>NowStamp("en")
+   }, {id=>\$rstatid});
    $dbi->commit();
    $dbi->disconnect();
 }
@@ -884,10 +882,12 @@ sub createSlot
       exit(&$function());
    }
 
-   return({pid=>$pid,
-           label=>$tasklabel,
-           name=>$ctrl->{'name'},
-           start=>time()});
+   return({
+      pid=>$pid,
+      label=>$tasklabel,
+      name=>$ctrl->{'name'},
+      start=>time()
+   });
 }
 
 
@@ -900,6 +900,8 @@ my @ReplicationObjects=getRequestedReplicationObjects($config);
 
 
 my @joblist;
+my $phase2entries=0;
+my $totalRefreshEntries=0;
 
 foreach my $replControl (@ReplicationObjects){
    if ($replControl->{'valid'} && $replControl->{'requested'}){
@@ -909,6 +911,8 @@ foreach my $replControl (@ReplicationObjects){
          }
       }
       if (in_array(\@requested_phase),"2"){
+         $phase2entries++;
+         $totalRefreshEntries+=$replControl->{'entrycount'};
          push(@joblist,{phase=>2,replControl=>$replControl});
       }
       if (in_array(\@requested_phase),"3"){
@@ -918,6 +922,7 @@ foreach my $replControl (@ReplicationObjects){
       }
    }
 }
+@joblist=shuffle(@joblist);
 
 my @slot;
 $SIG{INT}=sub{  # shutdown handling if CTRL+C is pressed on main process
@@ -932,35 +937,40 @@ $SIG{INT}=sub{  # shutdown handling if CTRL+C is pressed on main process
    }
    die("ERROR: hard programm termination by signal INT");
 };
-my $phaselimit=int($MaximumReplicationTime/2*3)-15;
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
+      # das muß noch besser werden - phaselimit calc!
+      my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*$maxslots-15;
       if (!defined($slot[$slotno])){
          my $replControl=$nextjob->{'replControl'};
          if ($replControl->{'valid'} && $replControl->{'requested'}){
             if ($nextjob->{'phase'}==1){
                $currentStartPhase=1;
+               printf STDERR ("start phase1 ($phaselimit) for $replControl->{'name'}\n");
                $slot[$slotno]=createSlot($self,"Phase1",1,$replControl,sub{
                   objectReplicationPhase1($config,$phaselimit,$replControl);
                });
             }
             elsif ($nextjob->{'phase'}==2){ 
-               if ($currentStartPhase<2){ # change phase limit on sw lev2
-                  $phaselimit=$MaximumReplicationTime-
-                              (time()-$ReplicationStart);
-                  if ($#joblist!=-1){
-                     $phaselimit=int($phaselimit/($#joblist+1))-5;
-                     $phaselimit=10 if ($phaselimit<10);
-                  }
-               }
+               $phase2entries=1 if ($phase2entries<=0);
+               my $restTime=$MaximumReplicationTime-20-
+                            (time()-$ReplicationStart);
+               my $entrycount=$replControl->{'entrycount'};
+               $entrycount=1 if ($entrycount==0);
+               my $phaselimit=$restTime/($phase2entries/$maxslots)/
+                              $totalRefreshEntries*$maxslots*$entrycount;
+               $phaselimit=10 if ($phaselimit<10);
+               $phaselimit=int($phaselimit);
                $currentStartPhase=2;
+               printf STDERR ("start phase2 ($phaselimit) for $replControl->{'name'}\n");
                $slot[$slotno]=createSlot($self,"Phase2",10,$replControl,sub{
                   objectReplicationPhase2($config,$phaselimit,$replControl);
                });
             }
             elsif ($nextjob->{'phase'}==3){  # cleanup
                $currentStartPhase=3;
+               printf STDERR ("start phase3 (10) for $replControl->{'name'}\n");
                $slot[$slotno]=createSlot($self,"Phase3",2,$replControl,sub{
                   objectReplicationPhase3($config,10,$replControl);
                });
