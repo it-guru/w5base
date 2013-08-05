@@ -344,6 +344,18 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'amtsirelportfappl.dtimport'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>'amtsirelportfappl.dtlastmodif'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(amtsirelportfappl.lrelportfapplid,35,'0')")
+
    );
    $self->setDefaultView(qw(id parent applid child systemid systemola));
    return($self);
