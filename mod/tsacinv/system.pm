@@ -431,6 +431,15 @@ sub new
                 vjoindisp     =>[qw(name type ammount unit)],
                 vjoininhash   =>['name','type','ammount']),
 
+
+      new kernel::Field::Boolean(
+                name          =>'tbsm_ordered',
+                group         =>'orderedservices',
+                htmldetail    =>0,
+                label         =>'is TBSM ordered',
+                dataobjattr   =>"decode(tbsm.ordered,'XMBSM',1,0)"),
+
+
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
                 label         =>'IP-Adresses',
@@ -819,6 +828,13 @@ sub getSqlFrom
       "(select amcostcenter.* from amcostcenter ".
       " where amcostcenter.bdelete=0) amcostcenter, ".
       "amportfolio assetportfolio, ".
+      "(select distinct ".
+      "        amtsiservicetype.identifier ordered,amtsiservice.lportfolioid ".
+      " from amtsiservice,amtsiservicetype ".
+      " where amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
+      "       and amtsiservicetype.identifier='XMBSM'".
+      "       and amtsiservice.bdelete=0".
+      ") tbsm,".
 #      "(select amitemlistval.* from amitemlistval,amitemizedlist ".
 #      " where amitemlistval.litemlistid=amitemlistval.litemlistid ".
 #      " and amitemizedlist.identifier='amPortfolioSecuritySet')  ".
@@ -840,6 +856,7 @@ sub initSqlWhere
       "and amportfolio.lmodelid=ammodel.lmodelid ".
       "and amportfolio.ltenantid=amtenant.ltenantid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
+      "and amportfolio.lportfolioitemid=tbsm.lportfolioid(+) ".
       "and ammodel.name='LOGICAL SYSTEM' ";
 #      "and amportfolio.securityset=securitysetval.litemlistvalid(+) ";
    return($where);

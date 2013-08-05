@@ -27,3 +27,4 @@
 'ApplicationID not found in AssetManager'=>{de=>'ApplicationID konnte in AssetManager nicht gefunden werden'},
 'direct connected Shared-Storage Servers'=>{de=>'direkt verbundene Shared-Storage Server'},
 'direct connected Shared-Network Components'=>{de=>'direkt verbundene Shared-Netzwerk Komponenten'},
+'is TBSM on one of systems ordered'=>{de=>'TBSM wurde für eines der Systeme beauftragt'},

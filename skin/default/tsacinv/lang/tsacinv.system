@@ -27,6 +27,7 @@
 'System OS'=>{de=>'Betriebssystem'},
 'Usage'=>{de=>'Verwendung'},
 'Type'=>{de=>'Systemart'},
+'is TBSM ordered'=>{de=>'TBSM (Business Service Monitoring) wurde beauftragt'},
 'System Part of Asset'=>{de=>'Systemanteil an der Hardware'},
 'System Part of Asset (native from AssetManager)'=>{de=>'Systemanteil an der Hardware (nativ aus AssetManager)'},
 'CO-Number'=>{de=>'Kostenstelle/CO-Nummer'},

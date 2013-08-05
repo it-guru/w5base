@@ -310,6 +310,13 @@ sub new
                 vjoininhash   =>['child','systemweblink','systemid','comments',
                                  'srcsys','srcid']),
 
+      new kernel::Field::Boolean(
+                name          =>'tbsm_ordered',
+                group         =>'systems',
+                htmldetail    =>0,
+                label         =>'is TBSM on one of systems ordered',
+                dataobjattr   =>"decode(tbsm.ordered,'XMBSM',1,0)"),
+
       new kernel::Field::Text(
                 name          =>'usedsharedstoragesys',
                 group         =>'usedsharedcomp',
@@ -426,6 +433,20 @@ sub getSqlFrom
       "amtsicustappl, ".
       "(select amcostcenter.* from amcostcenter ".
       " where amcostcenter.bdelete=0) amcostcenter,amemplgroup assigrp,".
+      "(select distinct ".
+      "      amtsiservicetype.identifier ordered,amtsicustappl.ltsicustapplid ".
+      " from amtsiservice,amtsiservicetype,amtsirelportfappl,amtsicustappl,".
+      "      amportfolio ".
+      " where amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
+      "     and amtsiservicetype.identifier='XMBSM' ".
+      "     and amtsiservice.bdelete=0 ".
+      "     and amtsirelportfappl.bdelete=0 ".
+      "     and amtsiservice.lportfolioid=amtsirelportfappl.lportfolioid ".
+      "     and amtsirelportfappl.bactive=1 ".
+      "     and amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid ".
+      "     and amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid ".
+      "     and amportfolio.bdelete=0 ".
+      ") tbsm,".
       "amcomment amtsimaint,amcomment businessdesc,".
       "amtenant";
 
@@ -441,7 +462,8 @@ sub initSqlWhere
       "and amtsicustappl.ltenantid=amtenant.ltenantid ".
       "and amtsicustappl.lcostcenterid=amcostcenter.lcostid(+) ".
       "and amtsicustappl.lcustbusinessdescid=businessdesc.lcommentid(+) ".
-      "and amtsicustappl.lassignmentid=assigrp.lgroupid(+) ";
+      "and amtsicustappl.lassignmentid=assigrp.lgroupid(+) ".
+      "and amtsicustappl.ltsicustapplid=tbsm.ltsicustapplid(+) ";
    return($where);
 }
 
