@@ -83,11 +83,11 @@ sub new
                 dataobjattr   =>'replicateobject.entrycount'),
                                                   
       new kernel::Field::Number(
-                name          =>'avglatency',
+                name          =>'maxlatency',
                 group         =>'stat',
                 unit          =>'h',
                 precision     =>'2',
-                label         =>'averaged latency',
+                label         =>'max latency',
                 dataobjattr   =>'replicateobject.latency'),
 
       new kernel::Field::Date(

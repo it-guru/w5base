@@ -4,7 +4,7 @@
 'allow phase 1 (modified)'=>{de=>'erlaube Phase1 (Änderungen)'},
 'allow phase 2 (refresh)'=>{de=>'erlaube Phase2 (Aktualisierungen)'},
 'allow phase 3 (cleanup)'=>{de=>'erlaube Phase3 (Bereinigen)'},
-'averaged latency'=>{de=>'mittlere Latenz'},
+'max latency'=>{de=>'max Latenz'},
 'replicated entries'=>{de=>'replizierte Datensätze'},
 'last phase 1 finish'=>{de=>'letzte erfolgreiche Phase 1'},
 'last phase 2 finish'=>{de=>'letzte erfolgreiche Phase 2'},
