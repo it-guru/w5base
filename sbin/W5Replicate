@@ -27,6 +27,7 @@ use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
 use List::Util 'shuffle';
+use Time::HiRes qw(usleep);
 use DBI;
 use POSIX;
 use vars qw($opt_v $opt_h $opt_c $opt_t $opt_p 
@@ -610,18 +611,18 @@ sub objectReplicationPhase1
          if (defined($replkey)){
             if ($replkey ne $oldreplkey){  # do small steps
                $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
-                       #         $ctrl->{idname}=>'![EMPTY]'
+                                $ctrl->{idname}=>'![EMPTY]'
                                 });
                $obj->Limit($smallpack,0,0);
             }
             else{
                $obj->SetFilter({'replkeypri'=>\$replkey,
-                       #        $ctrl->{idname}=>'![EMPTY]'
+                               $ctrl->{idname}=>'![EMPTY]'
                                });
                my $n=$obj->CountRecords();
                $obj->ResetFilter();
                $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
-                       #         $ctrl->{idname}=>'![EMPTY]'
+                                $ctrl->{idname}=>'![EMPTY]'
                                });
                if ($n>$smallpack-1){  # if multiple records have the same
                                       # replkeypri - all must be synced in
@@ -716,6 +717,8 @@ sub objectReplicationPhase2
                                                    objectid=>$rorec->{id},
                                                    startdate=>NowStamp("en")
                                                 });
+   my $phase2start=Time::HiRes::time();
+   my $phase2recCnt=1;
 
    if (!defined($rstatid)){
       $dbi->rollback();
@@ -730,8 +733,9 @@ sub objectReplicationPhase2
 
    if (my $rec=$dbi->getHash($cmd)){
       $n=$rec->{'n'};
-      if ($n>100){
+      if ($n>1){
          $n=int($n/7);
+         $n=2 if ($n<2);
          my $cmd="select (m1.max-m2.min)/4+m2.min avg ".
                  "from ".
                  "(select max(w5repllasttry) max from \"_$ctrl->{name}\") m1,".
@@ -739,7 +743,7 @@ sub objectReplicationPhase2
          if (my $drec=$dbi->getHash($cmd)){
             $basewhere=
                   "where \"_$ctrl->{name}\".w5repllasttry<'$drec->{avg}' ".
-                  "and \"_$ctrl->{name}\".w5repllasttry<SYSDATE-(1/24*3) ".
+                  "and \"_$ctrl->{name}\".w5repllasttry<SYSDATE-(1/24*6) ".
                   "and ROWNUM<$n ";                    # max refresh every 3h
          }
       }
@@ -779,6 +783,7 @@ sub objectReplicationPhase2
                $dbi->disconnect();
                return;
             }
+            $phase2recCnt++;
          }
          else{
             if ($obj->Ping()){
@@ -795,6 +800,8 @@ sub objectReplicationPhase2
       }
       $dbi->commit();
    }
+   printf STDERR ("avg rec access in $ctrl->{name} cnt=$phase2recCnt = %.3lf ms\n",
+                  ((Time::HiRes::time()-$phase2start)*1000)/$phase2recCnt);
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
    storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,2);
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
@@ -942,6 +949,9 @@ while(my $nextjob=shift(@joblist)){
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
       # das muß noch besser werden - phaselimit calc!
       my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*$maxslots-15;
+      if ($phaselimit>($MaximumReplicationTime/3*2)){
+         $phaselimit=$MaximumReplicationTime/3*2;
+      }
       if (!defined($slot[$slotno])){
          my $replControl=$nextjob->{'replControl'};
          if ($replControl->{'valid'} && $replControl->{'requested'}){
@@ -960,7 +970,7 @@ while(my $nextjob=shift(@joblist)){
                $entrycount=1 if ($entrycount==0);
                my $phaselimit=$restTime/($phase2entries/$maxslots)/
                               $totalRefreshEntries*$maxslots*$entrycount;
-               $phaselimit=10 if ($phaselimit<10);
+               $phaselimit=5 if ($phaselimit<5);
                $phaselimit=int($phaselimit);
                $currentStartPhase=2;
                printf STDERR ("start phase2 ($phaselimit) for $replControl->{'name'}\n");
@@ -1005,13 +1015,16 @@ while(my $nextjob=shift(@joblist)){
           ($#joblist==-1 && $runnging==0)){
          last;
       }
-      sleep(1);
+      usleep(200000); # sleep 0,2 sec (i hope)
       msg(INFO,"freeslotcount=$freeslotcount joblist=$#joblist ".
                "run=$runnging max=$maxslots");
    }
    msg(INFO,"next job request from joblist=$#joblist");
 }
 msg(INFO,"OK, done");
+printf STDERR ("replication duration=%d max=%d\n",time()-$ReplicationStart,
+               $MaximumReplicationTime);
+               
 exit(0);
 
 #==================================================================
