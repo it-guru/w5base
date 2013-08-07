@@ -800,7 +800,7 @@ sub objectReplicationPhase2
       }
       $dbi->commit();
    }
-   printf STDERR ("avg rec access in $ctrl->{name} cnt=$phase2recCnt = %.3lf ms\n",
+   printf STDERR ("avg rec access in $ctrl->{name} (phaselimit=$phaselimit;cnt=$phase2recCnt) = %.3lf ms\n",
                   ((Time::HiRes::time()-$phase2start)*1000)/$phase2recCnt);
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
    storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,2);
@@ -957,30 +957,35 @@ while(my $nextjob=shift(@joblist)){
          if ($replControl->{'valid'} && $replControl->{'requested'}){
             if ($nextjob->{'phase'}==1){
                $currentStartPhase=1;
-               printf STDERR ("start phase1 ($phaselimit) for $replControl->{'name'}\n");
+               #printf STDERR ("start phase1 ($phaselimit) for $replControl->{'name'}\n");
                $slot[$slotno]=createSlot($self,"Phase1",1,$replControl,sub{
                   objectReplicationPhase1($config,$phaselimit,$replControl);
                });
             }
             elsif ($nextjob->{'phase'}==2){ 
+               my $avgrecaccesstime=0.05;
                $phase2entries=1 if ($phase2entries<=0);
                my $restTime=$MaximumReplicationTime-20-
                             (time()-$ReplicationStart);
                my $entrycount=$replControl->{'entrycount'};
                $entrycount=1 if ($entrycount==0);
-               my $phaselimit=$restTime/($phase2entries/$maxslots)/
-                              $totalRefreshEntries*$maxslots*$entrycount;
-               $phaselimit=5 if ($phaselimit<5);
+               my $phaselimit=($restTime/$phase2entries/
+                              ($totalRefreshEntries*$avgrecaccesstime))*
+                              $maxslots*$entrycount;
+               $phaselimit=20 if ($phaselimit<20);
+               if ($phaselimit>$MaximumReplicationTime/3){
+                  $phaselimit=$MaximumReplicationTime/3;
+               }
                $phaselimit=int($phaselimit);
                $currentStartPhase=2;
-               printf STDERR ("start phase2 ($phaselimit) for $replControl->{'name'}\n");
+               #printf STDERR ("start phase2 ($phaselimit) for $replControl->{'name'}\n");
                $slot[$slotno]=createSlot($self,"Phase2",10,$replControl,sub{
                   objectReplicationPhase2($config,$phaselimit,$replControl);
                });
             }
             elsif ($nextjob->{'phase'}==3){  # cleanup
                $currentStartPhase=3;
-               printf STDERR ("start phase3 (10) for $replControl->{'name'}\n");
+               #printf STDERR ("start phase3 (10) for $replControl->{'name'}\n");
                $slot[$slotno]=createSlot($self,"Phase3",2,$replControl,sub{
                   objectReplicationPhase3($config,10,$replControl);
                });
@@ -1089,8 +1094,7 @@ sub getHash
 }
 
 package DBI::db;
-use W5Kernel;
-use Data::Dumper;
+use kernel;
 
 sub getHashList
 {
@@ -1136,14 +1140,25 @@ sub preprocessRecord
          $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
       }
       if (ref($rec{$fieldname}) eq "ARRAY"){
-         $rec{$fieldname}=join("; ",@{$rec{$fieldname}});
+         if ($#{$rec{$fieldname}}>=0 &&
+             ref($rec{$fieldname}->[0]) ne "HASH"){
+            $rec{$fieldname}=join("; ",@{$rec{$fieldname}});
+         }
+         else{
+            $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
+         }
+      }
+      if (ref($rec{$fieldname}) eq "HASH"){
+         $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
       }
       # strip all field values to the max. length in the replication
       # schema. This prevent oracle SQL Errors
-      if ($col->{$fieldname}->{'type'} =~ m/^[char|varchar]/i) {
-         if (length($rec{$fieldname})>$col->{$fieldname}->{'size'}){
-            $rec{$fieldname}=substr($rec{$fieldname},0,
-                                    $col->{$fieldname}->{'size'});
+      if (exists($col->{$fieldname})){
+         if ($col->{$fieldname}->{'type'} =~ m/^[char|varchar]/i) {
+            if (length($rec{$fieldname})>$col->{$fieldname}->{'size'}){
+               $rec{$fieldname}=substr($rec{$fieldname},0,
+                                       $col->{$fieldname}->{'size'});
+            }
          }
       }
    }
@@ -1186,7 +1201,11 @@ sub InsertOrUpdate
 
    my $rec=$self->preprocessRecord($ctrl,$reqrec,$col);
 
-   my $cmd="select * from \"$dbtable\" where $idname=?";
+   my @selfield;
+   foreach my $fieldname (sort(keys(%{$col}))){
+      push(@selfield,$fieldname);
+   }
+   my $cmd="select ".join(",",@selfield)." from \"$dbtable\" where $idname=?";
    my $idval=$rec->{$idname};
    my @curlist=$self->getHashList($cmd,$idval);
    my @view=keys(%$rec);
@@ -1306,13 +1325,19 @@ sub Hash2DataField
    my $self=shift;
    my $container=shift;
    my $element;
-   if (exists($container->{'item'}) && 
+   if (ref($container) eq "ARRAY"){
+     return(utf8(hash2xml({entry=>$container}))->latin1());
+   }
+   elsif (exists($container->{'item'}) && 
        scalar($container->{'item'}) =~ m/^ARRAY/) {
       foreach my $item (@{$container->{'item'}}) {
          $element.=$item->{'name'}.
                    "='".$item->{'value'}."'=".
                    $item->{'name'}."\n";
       }
+   }
+   else{
+     return("<struct>".utf8(hash2xml($container))->latin1()."</struct>");
    }
    return($element);
 }
