@@ -32,3 +32,4 @@
 'Field type'=>{de=>'Feldtyp'},
 'Searchable'=>{de=>'Suchbar'},
 'Short information summary for config-item from inaccessable mandator'=>{de=>'Kurzzusammenfassung des Config-Items aus nicht freigeschaltenem (lesen) Mandaten'},
+"record id '%s' invalid - no existing record with this id"=>{de=>"Datensatz ID '%s' ungültig - kein vorhandener Datensatz mit dieser ID"}

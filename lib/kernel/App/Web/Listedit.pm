@@ -2110,6 +2110,13 @@ sub ProcessUploadRecord
                               "and use this as oldrec");
             }
          }
+         else{
+            ${$param{countfail}}++ if (ref($param{countfail}) eq "SCALAR");
+            printf(msg(ERROR,$self->T("record id '%s' invalid - ".
+                                      "no existing record with this id")),
+                   $rec->{$idname});
+            return(1);
+         }
       }
       delete($rec->{$idname}); # id field isn't valid in Write-Request!
    }
