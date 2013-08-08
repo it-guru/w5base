@@ -801,7 +801,6 @@ sub objectReplicationPhase2
       }
       $dbi->commit();
    }
-                  ((Time::HiRes::time()-$phase2start)*1000)/$phase2recCnt);
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
    my $avgrecaccess;
    if ($phase2recCnt>0){
