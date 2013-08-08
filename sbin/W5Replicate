@@ -1334,7 +1334,7 @@ sub Hash2DataField
    my $container=shift;
    my $element;
    if (ref($container) eq "ARRAY"){
-     return(utf8(hash2xml({entry=>$container}))->latin1());
+     return(utf8(hash2xml({'struct'=>{'entry'=>$container}}))->latin1());
    }
    elsif (exists($container->{'item'}) && 
        scalar($container->{'item'}) =~ m/^ARRAY/) {
@@ -1345,7 +1345,8 @@ sub Hash2DataField
       }
    }
    else{
-     return("<struct>".utf8(hash2xml($container))->latin1()."</struct>");
+     return("<struct><entry>".
+            utf8(hash2xml($container))->latin1()."</entry></struct>");
    }
    return($element);
 }
