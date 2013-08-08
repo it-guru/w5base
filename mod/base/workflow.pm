@@ -545,6 +545,18 @@ sub new
                 label         =>'Initial-Client',
                 dataobjattr   =>'wfhead.initialclient'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"wfhead.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(wfhead.wfheadid,35,'0')"),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',

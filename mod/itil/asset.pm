@@ -427,6 +427,18 @@ sub new
                 },
                 dataobjattr   =>'asset.additional'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"asset.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(asset.id,35,'0')"),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',

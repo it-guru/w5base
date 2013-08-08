@@ -326,7 +326,20 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tsacinv::fixedasset',
                 vjoinon       =>['lassetassetid'=>'lassetid'],
-                vjoindisp     =>['description','deprstart','deprend','deprbase']),
+                vjoindisp     =>['description','deprstart','deprend',
+                                 'deprbase']),
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"assetportfolio.dtlastmodif"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(assetportfolio.assettag,35,'0')"),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
