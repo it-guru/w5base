@@ -77,6 +77,17 @@ sub new
                 dataobjattr   =>'replicateobject.allow_phase3'),
 
       new kernel::Field::Number(
+                name          =>'minrefreshlatency',
+                unit          =>'h',
+                label         =>'minimal refresh latency',
+                dataobjattr   =>'replicateobject.minrefreshlatency'),
+
+      new kernel::Field::Textarea(
+                name          =>'qfilter',
+                label         =>'replication filter',
+                dataobjattr   =>'replicateobject.qfilter'),
+
+      new kernel::Field::Number(
                 name          =>'entrycount',
                 group         =>'stat',
                 label         =>'replicated entries',
@@ -88,6 +99,14 @@ sub new
                 unit          =>'h',
                 precision     =>'2',
                 label         =>'max latency',
+                dataobjattr   =>'replicateobject.latency'),
+
+      new kernel::Field::Number(
+                name          =>'avgrecaccess',
+                group         =>'stat',
+                unit          =>'ms',
+                precision     =>'2',
+                label         =>'averaged record access time',
                 dataobjattr   =>'replicateobject.latency'),
 
       new kernel::Field::Date(

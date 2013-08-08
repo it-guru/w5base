@@ -49,3 +49,4 @@ alter table replicatestat  add FOREIGN KEY fk_replicatestat (replobject)
 alter table replicateobject  add FOREIGN KEY fk_replicateobject (replpartner)
           REFERENCES replicatepartner (id) ON DELETE CASCADE;
 set FOREIGN_KEY_CHECKS=1;
+alter table replicateobject add qfilter longtext  default NULL, add minrefreshlatency int(4) default '6', add avgrecaccess decimal(8,2);

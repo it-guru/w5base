@@ -9,3 +9,6 @@
 'last phase 1 finish'=>{de=>'letzte erfolgreiche Phase 1'},
 'last phase 2 finish'=>{de=>'letzte erfolgreiche Phase 2'},
 'last phase 3 finish'=>{de=>'letzte erfolgreiche Phase 3'},
+'minimal refresh latency'=>{de=>'minimale Phase2 Latenz'},
+'replication filter'=>{de=>'Replikations Filter-Ausdruck'},
+'averanged record access time'=>{de=>'mitllere Datensatz Zugriffszeit'},
