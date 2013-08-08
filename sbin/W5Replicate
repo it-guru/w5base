@@ -283,6 +283,7 @@ sub storeReplicateObjectStat
    my $ctrl=shift;
    my $rorec=shift;
    my $phase=shift;
+   my $avgrecaccess=shift;
 
    my $n=0;
    my $l=undef;
@@ -735,7 +736,7 @@ sub objectReplicationPhase2
       $n=$rec->{'n'};
       if ($n>1){
          $n=int($n/7);
-         $n=2 if ($n<2);
+         $n=1 if ($n<1);
          my $cmd="select (m1.max-m2.min)/4+m2.min avg ".
                  "from ".
                  "(select max(w5repllasttry) max from \"_$ctrl->{name}\") m1,".
@@ -800,10 +801,18 @@ sub objectReplicationPhase2
       }
       $dbi->commit();
    }
-   printf STDERR ("avg rec access in $ctrl->{name} (phaselimit=$phaselimit;cnt=$phase2recCnt) = %.3lf ms\n",
                   ((Time::HiRes::time()-$phase2start)*1000)/$phase2recCnt);
    msg(INFO,"end:   phase 2 replication for $ctrl->{name}");
-   storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,2);
+   my $avgrecaccess;
+   if ($phase2recCnt>0){
+      $avgrecaccess=((Time::HiRes::time()-$phase2start)*1000)/$phase2recCnt;
+      printf STDERR ("avg rec access in $ctrl->{name} ".
+                     "(phaselimit=$phaselimit;cnt=$phase2recCnt) = %.3lf ms\n",
+                     $avgrecaccess);
+   }
+
+
+   storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,2,$avgrecaccess);
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},
                                                 {
                                                  enddate=>NowStamp("en"),
