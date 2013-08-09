@@ -102,9 +102,12 @@ sub InterviewSubForm
                 $qrec->{name}."</span></div>".
                 "</td><td width=50 nowrap valign=top>".
                 "<div id=relevant$qrec->{id}>$qrec->{HTMLrelevant}</div></td>".
-                "<td width=180 nowrap valign=top>".
+                "<td width=180 nowrap valign=middle>".
                 "<div class=InterviewQuestAnswer ".
                 "id=answer$qrec->{id}>$qrec->{HTMLanswer}</div></td>".
+                "<td width=1% align=center valign=top>".
+                "<div id=verify$qrec->{id}>$qrec->{HTMLverify}</div>".
+                "</td>".
                 "<td width=1% align=center valign=top>".
                 "<div class=qhelp onclick=qhelp($qrec->{id})><img border=0 ".
                 "src=\"../../../public/base/load/questionmark.gif\">".
@@ -171,6 +174,14 @@ function qhelp(id)
    openwin("../../base/interview/Detail?ModeSelectCurrentMode=Question&id="+id,"_blank",
           "height=400,width=600,toolbar=no,status=no,"+
           "resizable=yes,scrollbars=auto");
+}
+
+function qverify(qid)
+{
+   var parentid=document.getElementById("parentid").value;
+   var parentobj=document.getElementById("parentobj").value;
+
+   doStoreValue(qid,parentobj,parentid,"lastverify","1");
 }
 
 function expandall(){
@@ -292,7 +303,7 @@ function switchQueryBlock(o)
 }
 function loadForm(id,xmlobject)
 {
-   var v=new Array('answer','comments','relevant','js');
+   var v=new Array('answer','comments','relevant','verify','js');
    var js="";
 
    for (var i = 0; i < v.length; ++i){
@@ -320,6 +331,13 @@ function submitChange(o)
    qid=qid.substring(1,qid.length); // F am Anfang abscheinden
    var parentid=document.getElementById("parentid").value;
    var parentobj=document.getElementById("parentobj").value;
+
+   doStoreValue(qid,parentobj,parentid,vname,vval);
+}
+
+
+function doStoreValue(qid,parentobj,parentid,vname,vval)
+{
 
    var xmlhttp=getXMLHttpRequest();
    var path='../../base/interanswer/Store';

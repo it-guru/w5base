@@ -11,6 +11,7 @@
 'unique query tag'=>{de=>'eindeutiges QTag'},
 'Questiongroup'=>{de=>'Fragegruppe'},
 'Interview categorie'=>{de=>'Interview Kategorie'},
+'last verify of anser'=>{de=>'letzte Bestätigung der Antwort'},
 
 
 

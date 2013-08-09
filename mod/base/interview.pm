@@ -194,6 +194,7 @@ sub new
                 group         =>'tech',
                 htmleditwidth =>'250px',
                 allownative   =>1, 
+                uploadable    =>0,
                 allowempty    =>1, 
                 searchable    =>0, 
                 getPostibleValues=>sub{
@@ -245,11 +246,20 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'prio',
-                value         =>['', qw(1 2 3 4 5 6 7 8 9 10)],   # 1-10 are need to answer
+                value         =>['', qw(1 2 3 4 5 6 7 8 9 10)],
                 transprefix   =>'QPRIO.',
                 htmleditwidth =>'130px',
                 label         =>'Question prio',
                 dataobjattr   =>'interview.prio'),
+
+      new kernel::Field::Select(
+                name          =>'necessverifyinterv',
+                default       =>'180',
+                value         =>['90','180','365','1095'],
+                transprefix   =>'AVI.',
+                htmleditwidth =>'130px',
+                label         =>'necessary answer verify interval',
+                dataobjattr   =>'interview.necessverifyinterv'),
 
       new kernel::Field::Number(
                 name          =>'weighting',
@@ -788,13 +798,39 @@ sub getHtmlEditElements
                   $self->T("no")."</option>";
    }
    $HTMLrelevant.="</select>";
-   $HTMLcomments="<table cellspacing=0 cellpadding=0><tr><td></td><td nowrap class=InterviewSubMenu>Frage an Fragen-Ansprechpartner</td><td nowrap class=InterviewSubMenu>&nbsp;&bull;&nbsp;</td><td nowrap class=InterviewSubMenu>Frage weitergeben</td></tr></table>";
+   $HTMLcomments="<table cellspacing=0 cellpadding=0>".
+                 "<tr><td></td><td nowrap class=InterviewSubMenu>".
+                 "Frage an Fragen-Ansprechpartner</td>".
+                 "<td nowrap class=InterviewSubMenu>&nbsp;&bull;&nbsp;</td>".
+                 "<td nowrap class=InterviewSubMenu>Frage weitergeben</td>".
+                 "</tr></table>";
    $HTMLcomments="";
    my $txt="";
    $txt=quoteHtml($answer->{comments}) if (defined($answer));
    $HTMLcomments.="<textarea name=comments $opmode ".
                   "rows=5 style=\"width:100%\">".$txt."</textarea>";
    $HTMLanswer=" - ? - ";
+   my $HTMLVerifyButton="<div class=qverify>&nbsp;</div>";
+   if ($write){
+      if (defined($answer)){
+         my $needverify=1;
+         if ($answer->{lastverify} ne ""){
+            my $d=CalcDateDuration($answer->{lastverify},NowStamp("en"));
+            if (!($d->{totaldays}>$irec->{necessverifyinterv})){
+               $needverify=0;
+            }
+         }
+         if ($needverify){
+            $HTMLVerifyButton=
+                "<div class=qverify style=\"cursor:hand\" ".
+                "onclick=qverify($irec->{id}) >".
+                "<img border=0 width=80% height=80% ".
+                "title='set verified' alt='set verified' ".
+                "src=\"../../../public/base/load/ok.gif\">".
+                "</div>";
+         }
+      }
+   }
    if ($irec->{questtyp} eq "boolean" ||
        $irec->{questtyp} eq "booleana"){
       my $a="";
@@ -813,7 +849,8 @@ sub getHtmlEditElements
       $sel.="value=\"0\">".$self->T("no")."</option>";
 
       $sel.="</select>";
-      my $p="<table class=Panswer><tr><td align=center>$sel</td></tr></table>";
+      my $p="<table class=Panswer><tr><td align=center>$sel</td>".
+            "</tr></table>";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
    elsif ($irec->{questtyp} eq "select"){
@@ -830,7 +867,8 @@ sub getHtmlEditElements
       }
 
       $sel.="</select>";
-      my $p="<table class=Panswer><tr><td align=center>$sel</td></tr></table>";
+      my $p="<table class=Panswer><tr><td align=center>$sel</td>".
+            "</tr></table>";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
    elsif ($irec->{questtyp} eq "percent"  ||
@@ -869,7 +907,8 @@ sub getHtmlEditElements
       }
       $sel.="</select>";
       $p="<table cellspacing=0 cellpadding=0 ".
-         "class=Panswer border=0><tr><td>$sel</td>$p</tr></table>";
+         "class=Panswer border=0><tr><td>$sel</td>$p".
+          "</tr></table>";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
    elsif ($irec->{questtyp} eq "text"){
@@ -905,7 +944,7 @@ sub getHtmlEditElements
       $HTMLanswer="&nbsp;";
    }
 
-   return($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs);
+   return($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLVerifyButton,$HTMLjs);
 }
 
 

@@ -786,3 +786,5 @@ insert into w5seq (id) value (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(
 alter table interviewcat add mgrgroup bigint(20) default NULL;
 alter table interviewcat add frontlabel blob;
 alter table interview add frontlabel blob;
+alter table interview add necessverifyinterv int(4) default '180';
+alter table interanswer add lastverify datetime, add key(lastverify);

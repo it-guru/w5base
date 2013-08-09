@@ -162,6 +162,12 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'interanswer.modifydate'),
 
+      new kernel::Field::Date(
+                name          =>'lastverify',
+                group         =>'source',
+                label         =>'last verify of anser',
+                dataobjattr   =>'interanswer.lastverify'),
+
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
@@ -367,6 +373,10 @@ sub Validate
    if (!defined($oldrec) && !defined($newrec->{archiv})){
       $newrec->{archiv}="";
    }
+   if (!defined($oldrec) ||
+       !exists($newrec->{lastverify})){
+      $newrec->{lastverify}=NowStamp("en");
+   }
 #   my $name=trim(effVal($oldrec,$newrec,"name"));
 #   if ($name=~m/^\s*$/i){
 #      $self->LastMsg(ERROR,"invalid question specified"); 
@@ -489,13 +499,17 @@ sub Store
    $vval=UTF8toLatin1($vval);
 
    my $i=getModuleObject($self->Config,"base::interview");
-#   printf STDERR ("\n\nAjaxStore: qid=$qid parentid=$parentid ".
-#                  "parentobj=$parentobj vname=$vname\nval=$vval\n\n");
+   #printf STDERR ("\n\nAjaxStore: qid=$qid parentid=$parentid ".
+   #               "parentobj=$parentobj vname=$vname\nval=$vval\n\n");
 
    my ($write,$irec,$oldrec)=$self->getAnswerWriteState($i,$qid,
                                                         $parentid,$parentobj);
-   if ($vname eq "comments" || $vname eq "answer" || $vname eq "relevant"){
+   if ($vname eq "comments" || $vname eq "answer" || 
+       $vname eq "relevant" || $vname eq "lastverify"){
       if ($write){
+         if ($vname eq "lastverify"){
+            $vval=NowStamp("en");
+         }
          my %d=($vname=>$vval);
          if ($vname eq "relevant" && $vval==0){
             $d{'answer'}="";
@@ -515,13 +529,15 @@ sub Store
    $self->SetFilter({interviewid=>\$qid,
                      parentobj=>\$parentobj,
                      parentid=>\$parentid});
-   my ($newrec,$msg)=$self->getOnlyFirst(qw(answer comments relevant));
+   my ($newrec,$msg)=$self->getOnlyFirst(qw(answer comments lastverify 
+                                            relevant));
 
-   my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs)=
+   my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLVerifyButton,$HTMLjs)=
          $i->getHtmlEditElements($write,$irec,$newrec);
 
    $newrec->{HTMLanswer}=$HTMLanswer;
    $newrec->{HTMLrelevant}=$HTMLrelevant;
+   $newrec->{HTMLverify}=$HTMLVerifyButton;
    $newrec->{HTMLcomments}=$HTMLcomments;
    $newrec->{HTMLjs}=$HTMLjs;
    

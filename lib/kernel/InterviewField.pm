@@ -51,7 +51,7 @@ sub getTotalActiveQuestions
                                         qtag id name qname prio
                                         boundpviewgroup addquestdata
                                         interviewcatid contactid contact2id
-                                        boundpcontact
+                                        boundpcontact necessverifyinterv
                                         questtyp restriction))){
       my $restok=1;
       if ($irec->{restriction} ne ""){
@@ -72,10 +72,11 @@ sub getTotalActiveQuestions
             }
          }
 
-         my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLjs)=
+         my ($HTMLanswer,$HTMLrelevant,$HTMLcomments,$HTMLVerifyButton,$HTMLjs)=
             $i->getHtmlEditElements($write,$irec,
                          $answered->{interviewid}->{$irec->{id}},$p,$rec);
          $irec->{'HTMLanswer'}=$HTMLanswer;
+         $irec->{'HTMLverify'}=$HTMLVerifyButton;
          $irec->{'HTMLrelevant'}=$HTMLrelevant;
          $irec->{'HTMLcomments'}=$HTMLcomments;
          $irec->{'HTMLjs'}=$HTMLjs;
@@ -85,6 +86,7 @@ sub getTotalActiveQuestions
             if (!grep(/^($q|ALL)$/,@viewlist)){
                $irec->{'AnswerViewable'}=0;
                $irec->{'HTMLanswer'}="-";
+               $irec->{'HTMLverify'}="-";
                $irec->{'HTMLrelevant'}="-";
                $irec->{'HTMLcomments'}="-";
                $irec->{'HTMLjs'}="";
@@ -111,7 +113,8 @@ sub getAnsweredQuestions
    my $i=getModuleObject($self->getParent->Config,"base::interanswer");
    $i->SetFilter({parentobj=>\$parentobj,
                   parentid=>\$id});
-   $i->SetCurrentView(qw(interviewid answer relevant archiv comments));
+   $i->SetCurrentView(qw(interviewid answer relevant archiv comments
+                         lastverify));
 
    my $ial=$i->getHashIndexed(qw(interviewid));
 
