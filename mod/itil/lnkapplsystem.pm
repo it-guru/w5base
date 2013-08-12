@@ -762,6 +762,11 @@ sub getSqlFrom
                $datasourcerest1.=" and lnkapplsystem.id='$f->{id}->[0]'";
                $datasourcerest2.=" and 1=0";
             }
+            if (exists($f->{id}) && ref($f->{id}) eq "SCALAR" &&
+                ${$f->{id}}=~m/^\d+$/){
+               $datasourcerest1.=" and lnkapplsystem.id='${$f->{id}}'";
+               $datasourcerest2.=" and 1=0";
+            }
             if (exists($f->{systemid}) && $f->{systemid}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.system='$f->{systemid}'";
                $datasourcerest2.=" and system.id='$f->{systemid}'";
