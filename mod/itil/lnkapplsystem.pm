@@ -719,7 +719,6 @@ sub getSqlFrom
    my $datasourcerest2="system.cistatus<=5 and itclust.cistatus<=5";
    if ($mode eq "select"){
       foreach my $f (@filter){
-print STDERR Dumper($f);
          if (ref($f) eq "HASH"){
             if (exists($f->{assetid}) && $f->{assetid}=~m/^\d+$/){
                $f->{assetid}=[$f->{assetid}];
