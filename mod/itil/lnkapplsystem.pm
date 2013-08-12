@@ -719,6 +719,7 @@ sub getSqlFrom
    my $datasourcerest2="system.cistatus<=5 and itclust.cistatus<=5";
    if ($mode eq "select"){
       foreach my $f (@filter){
+print STDERR Dumper($f);
          if (ref($f) eq "HASH"){
             if (exists($f->{assetid}) && $f->{assetid}=~m/^\d+$/){
                $f->{assetid}=[$f->{assetid}];
@@ -752,6 +753,15 @@ sub getSqlFrom
                              join(",",map({"'".$_."'"} @{$f->{applid}})).")";
                $datasourcerest2.=" and lnkitclustsvcappl.appl in (".
                              join(",",map({"'".$_."'"} @{$f->{applid}})).")";
+            }
+            if (exists($f->{id}) && $f->{id}=~m/^\d+$/){
+               $datasourcerest1.=" and lnkapplsystem.id='$f->{id}'";
+               $datasourcerest2.=" and 1=0";
+            }
+            if (exists($f->{id}) && ref($f->{id}) eq "ARRAY" &&
+                $#{$f->{id}}==0 && $f->{id}->[0]=~m/^\d+$/){
+               $datasourcerest1.=" and lnkapplsystem.id='$f->{id}->[0]'";
+               $datasourcerest2.=" and 1=0";
             }
             if (exists($f->{systemid}) && $f->{systemid}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.system='$f->{systemid}'";
