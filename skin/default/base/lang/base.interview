@@ -56,3 +56,4 @@
 'invalid question specified'=>{de=>'ungültiger Frage-Text'},
 'no write access to requested categorie'=>{de=>'kein Schreibzugriff auf die angegebene Kategorie'},
 'necessary answer verify interval'=>{de=>'notwendigs Antwortinterval'},
+'click to set answer as verified'=>{de=>'klicken um Antwort als aktuell zu markieren'},

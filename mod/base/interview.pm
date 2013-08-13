@@ -809,23 +809,27 @@ sub getHtmlEditElements
    $HTMLcomments.="<textarea name=comments $opmode ".
                   "rows=5 style=\"width:100%\">".$txt."</textarea>";
    $HTMLanswer=" - ? - ";
-   my $HTMLVerifyButton="<div class=qverify>&nbsp;</div>";
+   my $HTMLVerifyButton=
+                "<div class=qverify>".
+                "<img border=0 ".
+                "src=\"../../../public/base/load/confirm_space.gif\">".
+                "</div>";
    if ($write){
       if (defined($answer)){
-         my $needverify=1;
+         $irec->{needverify}=1;
          if ($answer->{lastverify} ne ""){
             my $d=CalcDateDuration($answer->{lastverify},NowStamp("en"));
             if (!($d->{totaldays}>$irec->{necessverifyinterv})){
-               $needverify=0;
+               $irec->{needverify}=0;
             }
          }
-         if ($needverify){
+         if ($irec->{needverify}){
+            my $msg=$self->T("click to set answer as verified");
             $HTMLVerifyButton=
                 "<div class=qverify style=\"cursor:hand\" ".
                 "onclick=qverify($irec->{id}) >".
-                "<img border=0 width=80% height=80% ".
-                "title='set verified' alt='set verified' ".
-                "src=\"../../../public/base/load/ok.gif\">".
+                "<img border=0 title='$msg' alt='$msg' ".
+                "src=\"../../../public/base/load/confirm_entry.gif\">".
                 "</div>";
          }
       }
