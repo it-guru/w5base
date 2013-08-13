@@ -1,4 +1,5 @@
 'current questions'=>{de=>'aktueller Fragenkatalog'},
 'not answered questions'=>{de=>'unbeantwortete Fragen'},
+'outdated answers'=>{de=>'veraltete Beantwortungen'},
 'analyses'=>{de=>'Analysen'},
 

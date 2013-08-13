@@ -22,8 +22,6 @@ div.InterviewQuestBlockHead{
    vertical-align:center;
 }
 div.InterviewQuestBlock{
-   display:none;
-   visibility:hidden;
    margin:4px;
    margin-bottom:0px;
    margin-top:1px;
