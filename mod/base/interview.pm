@@ -107,7 +107,6 @@ sub new
                 name          =>'name_label',
                 label         =>'Label (multilang)',
                 htmlheight    =>40,
-                searchable    =>0,
                 dataobjattr   =>'interview.frontlabel'),
 
       new kernel::Field::Select(
