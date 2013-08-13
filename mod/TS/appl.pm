@@ -140,6 +140,7 @@ sub new
                 label         =>'AM: official AssetManager Applicationname',
                 group         =>'external',
                 htmldetail    =>0,
+                readonly      =>1,
                 searchable    =>0,
                 depend        =>['applid','name'],
                 onRawValue    =>sub{
@@ -169,6 +170,7 @@ sub new
                 name          =>'amossprodplan',
                 label         =>'AM: Production Planning OSS',
                 group         =>'external',
+                readonly      =>1,
                 htmldetail    =>0,
                 searchable    =>0,
                 vjointo       =>'tsacinv::costcenter',
