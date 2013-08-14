@@ -8,6 +8,9 @@ Checks if there is an "installed/active" Costcenter is selected in
 every application with an CI-Status "installed/active" or "available".
 If there is no valid Costcenter defined, an error will be procceded.
 
+If the logical system is a workstation, the Costcenter is not
+needed.
+
 =head3 IMPORTS
 
 NONE
@@ -58,6 +61,7 @@ sub qcheckRecord
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   return(0,undef) if ($rec->{isworkstation});
    my $coobj=getModuleObject($self->getParent->Config,"itil::costcenter");
    if ($rec->{conumber} eq "" ||
        !($coobj->ValidateCONumber($dataobj->Self,"conumber",$rec,undef))){
