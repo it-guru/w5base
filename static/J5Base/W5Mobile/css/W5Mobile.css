@@ -1,0 +1,15 @@
+@media only screen and (min-width: 640px) {
+  .ui-page {
+    width: 640px !important;
+    margin: 0 auto !important;
+    position: relative !important;
+  }
+  .ui-footer {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  BODY {
+    background-color: #ccc !important;
+  }
+}
+
