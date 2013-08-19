@@ -265,3 +265,29 @@ create table wfscheduleddatachange (
   PRIMARY KEY  (id),key(plannedexec),key(admininfo),key(databossinfo),
   key(state,dataobject,dataobjectid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE reportjob (
+  id          bigint(20) NOT NULL,
+  reportname  varchar(20)  NOT NULL,
+  reporttype  varchar(20)  NOT NULL,
+  cistatus    int(2) NOT NULL,
+  dataobj     varchar(80) NOT NULL,
+  flt         text default NULL,
+  repfields   text default NULL,
+  targetuser  bigint(20) default NULL,
+  targetfile  varchar(255) default NULL,
+  deltabuffer text default NULL,
+  usetimezone varchar(20) NOT NULL,
+  uselang     varchar(20) NOT NULL, 
+  comments     longtext default NULL,
+  lastrun      datetime,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(10) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY (id), key(reportname),key(lastrun)
+);

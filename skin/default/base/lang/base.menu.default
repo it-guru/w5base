@@ -70,6 +70,7 @@
 'sysadm.qmgmt.qrule.lnkmandator.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.filesig'=>{de=>'Transfersignatur',en=>'Transfersig'},
 'sysadm.filesig.signedfile'=>{de=>'signierte Datei',en=>'signed file'},
+'sysadm.reportjob'=>{de=>'Report Job',en=>'Report Job'},
 'Tools.filemgmt'=>{de=>'Dateiverwaltung',en=>'Filemanagement'},
 'Tools.filemgmt.acl'=>{de=>'Dateirechte',en=>'Filerights'},
 'Tools.teamtools'=>{de=>'Team-Tools',en=>'Team-Tools'},

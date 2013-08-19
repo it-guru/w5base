@@ -239,6 +239,11 @@ sub Init
                       "base::signedfile",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.reportjob",
+                      "base::reportjob",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("Tools",
                       "tmpl/welcome",
                       prio=>10,
