@@ -1,3 +1,4 @@
+use w5base;
 create table artcatalog (
   id         bigint(20)  NOT NULL,
   name       varchar(40) NOT NULL, 
@@ -27,6 +28,7 @@ create table artcategory (
   id           bigint(20)  NOT NULL,
   artcatalog   bigint(20)  NOT NULL, 
   partcategory bigint(20), 
+  chkpartcategory bigint(20) NOT NULL,
   posno          int(7)      NOT NULL,
   frontlabel     longtext, 
   sublabel       longtext, 
@@ -49,7 +51,7 @@ create table artcategory (
           REFERENCES artcategory (id) ON DELETE CASCADE,
   FOREIGN KEY articlecatalog (artcatalog)
           REFERENCES artcatalog (id) ON DELETE RESTRICT,
-  UNIQUE KEY `positionnumber` (artcatalog,posno),
+  UNIQUE KEY `positionnumber` (artcatalog,posno,chkpartcategory),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table artproduct (

@@ -1,0 +1,11 @@
+'article::category'=>{de=>'Kategorie',en=>'Categorie'},
+'Catalog'=>{de=>'Katalog'},
+'Category'=>{de=>'Kategorie'},
+'Category label'=>{de=>'Kategorie Beschriftung'},
+'Position Number'=>{de=>'Positionsnummer'},
+'parent Category'=>{de=>'Elternkategorie'},
+'Outline Number'=>{de=>'Gliederungsnummer'},
+'full Category'=>{de=>'gegliederte Kategorie'},
+'fieldgroup.products'=>{de=>'Produkte',en=>'Products'},
+'fieldgroup.subcategories'=>{de=>'Unter-Kategorien',en=>'Subcategories'},
+

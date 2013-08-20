@@ -19,7 +19,6 @@ package kernel::Field::Textarea;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field);
 
 
@@ -190,6 +189,7 @@ sub getBackendName
    my $self=shift;
    my $mode=shift;
    my $db=shift;
+
    return(undef) if ($mode eq "order");
    return(undef) if (!defined($self->{dataobjattr}));
    return($self->{dataobjattr});

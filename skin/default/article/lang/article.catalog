@@ -1,0 +1,4 @@
+'article::catalog'=>{de=>'Katalog',en=>'Catalog'},
+'Catalog label'=>{de=>'Katalog Beschriftung'},
+'Catalog'=>{de=>'Katalog'},
+'fieldgroup.categories'=>{de=>'Kategorien',en=>'Categories'},
