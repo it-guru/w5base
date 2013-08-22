@@ -208,8 +208,22 @@ sub getSqlOrder
       if ($#o==-1 || ($#o==0 && $o[0] eq "")){
          foreach my $field (@view){
             my $orderstring=$field->getBackendName("order",$self->{DB});
-            next if (!defined($orderstring));
-            push(@order,$orderstring);
+            if (!defined($orderstring)){
+               if (defined($field->{vjoinon}) && 
+                   ref($field->{vjoinon}) eq "ARRAY"){
+                  my $jfld=$self->getField($field->{vjoinon}->[0]);
+                  if (defined($jfld)){
+                     my $orderstring=$jfld->getBackendName("order",
+                                      $self->{DB});
+                     if (defined($orderstring)){
+                        push(@order,$orderstring);
+                     }
+                  }
+               }
+            }
+            else{
+               push(@order,$orderstring);
+            }
          }
          return(join(", ",@order));
       }
