@@ -31,9 +31,9 @@ sub new
    if (exists($self->{vjoinon}) && ref($self->{vjoinon}) ne "ARRAY"){
       $self->{vjoinon}=[$self->{vjoinon}=>'grpid'];
    }
-   $self->{name}='mandator'                 if (!defined($self->{name}));
-   $self->{label}='Mandator'                if (!defined($self->{label}));
-   $self->{htmleditwidth}='250px'             if (!defined($self->{htmleditwidth}));
+   $self->{name}='mandator'             if (!defined($self->{name}));
+   $self->{label}='Mandator'            if (!defined($self->{label}));
+   $self->{htmleditwidth}='250px'       if (!defined($self->{htmleditwidth}));
    $self->{htmlwidth}='80px'                if (!defined($self->{htmlwidth}));
    $self->{vjointo}='base::mandator'        if (!defined($self->{vjointo}));
    $self->{vjoinon}=['mandatorid'=>'grpid'] if (!defined($self->{vjoinon}));
@@ -60,8 +60,32 @@ sub getPostibleValues
       }
       my @res=();
       if ($self->getParent->IsMemberOf("admin")){
-         push(@mandators,keys(%{$MandatorCache->{grpid}}));
+         foreach my $grpid (keys(%{$MandatorCache->{grpid}})){
+            if (!in_array(\@mandators,$grpid)){
+               push(@mandators,$grpid);
+            }
+         }
       }
+
+      #######################################################################
+      # sort algorithmus to order the nearest (organisational) mandators 
+      # on top of the  list
+      my %groups=$self->getParent->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],
+                               'up');
+      @mandators=sort({ 
+          my $dista=999;
+          my $distb=999;
+          if (exists($groups{$a}) &&
+              exists($groups{$a}->{distance})){
+             $dista=$groups{$a}->{distance};
+          }
+          if (exists($groups{$b}) &&
+              exists($groups{$b}->{distance})){
+             $distb=$groups{$b}->{distance};
+          }
+          $dista<=>$distb;
+      } @mandators);
+      #######################################################################
       foreach my $mandator (@mandators){
          if (defined($MandatorCache->{grpid}->{$mandator}) &&
              $MandatorCache->{grpid}->{$mandator}->{cistatusid}==4){

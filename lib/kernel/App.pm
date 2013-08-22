@@ -238,11 +238,9 @@ sub getMandatorsOf
    if (defined($UserCache->{userid})){
       $userid=$UserCache->{userid};
    }
-   my %groups=$self->getGroupsOf($AccountOrUserID,
-                                 [qw(REmployee 
-                                     RBoss RBoss2 
-                                     RMember RCFManager RCFManager2)],
-                                 'both');
+   my %groups=$self->getGroupsOf($AccountOrUserID,[orgRoles(),
+                               qw(RCFManager RCFManager2)],
+                               'both');
    my @grps=keys(%groups);
    my %m=();
   # my %m=map({($_=>1);}@grps);
@@ -331,6 +329,10 @@ sub LoadGroups
    my $self=shift;
    my $allgrp=shift;
    my $direction=shift;
+   my $distance=0;
+   if (ref($_[0]) eq "SCALAR"){
+      $distance=${shift()};
+   }
    my @grpids=@_;
    my $GroupCache=$self->Cache->{Group}->{Cache};
    if (!defined($GroupCache)){
@@ -349,6 +351,7 @@ sub LoadGroups
          $allgrp->{$grp}={         # is requested - a force load is needed!
                fullname=>$fullname,
                grpid=>$grp,
+               distance=>$distance,
                direction=>$direction
          };
          if ($direction eq "down" || $direction eq "both"){
@@ -361,8 +364,10 @@ sub LoadGroups
          }
       }
    }
-   $self->LoadGroups($allgrp,"down",@down) if ($#down!=-1);
-   $self->LoadGroups($allgrp,"up",@up) if ($#up!=-1);
+   my $nextdistance=$distance+1;
+   $self->LoadGroups($allgrp,"down",\$nextdistance,@down) if ($#down!=-1);
+   $nextdistance=$distance+1;
+   $self->LoadGroups($allgrp,"up",\$nextdistance,@up) if ($#up!=-1);
 }
 
 sub _LoadUserInUserCache
@@ -491,6 +496,7 @@ sub getGroupsOf
          $allgrp{-1}={name=>'valid_user',
                       fullname=>'valid_user',
                       grpid=>-1,
+                      distance=>0,
                       roles=>['RMember']
                      };
       }
@@ -498,6 +504,7 @@ sub getGroupsOf
          $allgrp{-2}={name=>'anonymous',
                       fullname=>'anonymous',
                       grpid=>-2,
+                      distance=>0,
                       roles=>['RMember']
                      };
       }
@@ -506,6 +513,7 @@ sub getGroupsOf
          $allgrp{1}={name=>'admin',
                      fullname=>'admin',
                      grpid=>1,
+                     distance=>0,
                      roles=>['RMember']
                     };
       }
