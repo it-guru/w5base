@@ -537,6 +537,9 @@ sub getRequestedReplicationObjects
       if ($ctrl->{'requested'} && $ctrl->{'valid'}){ # records are exists
          my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
          $ctrl->{'entrycount'}=$rorec->{'entrycount'};
+         $ctrl->{'allow_phase1'}=$rorec->{'allow_phase1'};
+         $ctrl->{'allow_phase2'}=$rorec->{'allow_phase2'};
+         $ctrl->{'allow_phase3'}=$rorec->{'allow_phase3'};
          $ctrl->{'entrycount'}=0 if (!defined($ctrl->{'entrycount'}));
       }
    }
@@ -558,6 +561,7 @@ sub objectReplicationPhase1
    my $phaselimit=shift;
    my $ctrl=shift;
    my $start=time();
+   my $p1smallpack=$smallpack;
 
 
 
@@ -587,6 +591,7 @@ sub objectReplicationPhase1
       $dbi->disconnect();
       die("can not create State-Record for phase 1 on $ctrl->{'name'}");
    }
+   $p1smallpack=$p1smallpack*5 if ($ctrl->{name} eq "base::workflow");
    my $oldreplkey;
    while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
@@ -597,7 +602,7 @@ sub objectReplicationPhase1
          $syncstart=$rec->{'sstart'};
       }
       $obj->ResetFilter();
-      $obj->Limit($smallpack,0,0);
+      $obj->Limit($p1smallpack,0,0);
       if (defined($syncstart)){ # restart sync process at 
                                 # last known position
          my $cmd="select w5replkeypri p,w5replkeysec s ".
@@ -614,7 +619,7 @@ sub objectReplicationPhase1
                $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
                                 $ctrl->{idname}=>'![EMPTY]'
                                 });
-               $obj->Limit($smallpack,0,0);
+               $obj->Limit($p1smallpack,0,0);
             }
             else{
                $obj->SetFilter({'replkeypri'=>\$replkey,
@@ -625,16 +630,16 @@ sub objectReplicationPhase1
                $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
                                 $ctrl->{idname}=>'![EMPTY]'
                                });
-               if ($n>$smallpack-1){  # if multiple records have the same
-                                      # replkeypri - all must be synced in
-                                      # one "smallpack"
+               if ($n>$p1smallpack-1){  # if multiple records have the same
+                                        # replkeypri - all must be synced in
+                                        # one "smallpack"
                   msg(WARN,"found $n records with the same replkey ".
                            "'%s' in '%s'",
                       $replkey,$ctrl->{name});
-                  $obj->Limit($n+$smallpack,0,0);
+                  $obj->Limit($n+$p1smallpack,0,0);
                }
                else{
-                  $obj->Limit($smallpack,0,0);
+                  $obj->Limit($p1smallpack,0,0);
                }
             }
          }
@@ -731,6 +736,11 @@ sub objectReplicationPhase2
            "from \"_$ctrl->{name}\" ";
    my $n=0;
    my $basewhere="";
+   my $minrefreshlatency=6;
+   if ($rorec->{minrefreshlatency} ne "" &&
+       int($rorec->{minrefreshlatency})>0){
+      $minrefreshlatency=int($rorec->{minrefreshlatency});
+   }
 
    if (my $rec=$dbi->getHash($cmd)){
       $n=$rec->{'n'};
@@ -744,8 +754,9 @@ sub objectReplicationPhase2
          if (my $drec=$dbi->getHash($cmd)){
             $basewhere=
                   "where \"_$ctrl->{name}\".w5repllasttry<'$drec->{avg}' ".
-                  "and \"_$ctrl->{name}\".w5repllasttry<SYSDATE-(1/24*6) ".
-                  "and ROWNUM<$n ";                    # max refresh every 3h
+                  "and \"_$ctrl->{name}\".w5repllasttry<".
+                       "SYSDATE-(1/24*$minrefreshlatency) ".
+                  "and ROWNUM<=$n ";   # max refresh every $minrefreshlatency h
          }
       }
    }
@@ -859,9 +870,10 @@ sub objectReplicationPhase3
    my $cmd="delete from \"$ctrl->{name}\" ".
            "where \"$ctrl->{name}\".$ctrl->{idname} in ".
            "(select refid from \"_$ctrl->{name}\" where ".
-           "( \"_$ctrl->{name}\".w5repllastsucc<sysdate-7 and ".
+           "( \"_$ctrl->{name}\".w5repllastsucc<sysdate-14 and ".
            "  \"_$ctrl->{name}\".w5replfailcnt>1) or ".
-           "\"_$ctrl->{name}\".w5replfailcnt>10)";
+           "( \"_$ctrl->{name}\".w5repllastsucc<sysdate-8 and ".
+           "  \"_$ctrl->{name}\".w5replfailcnt>8))";
    msg(INFO,"oracmd=$cmd");
    $dbi->doCmd($cmd);
    msg(INFO,"end:   phase 3 replication for $ctrl->{name}");
@@ -916,23 +928,29 @@ my @ReplicationObjects=getRequestedReplicationObjects($config);
 
 my @joblist;
 my $phase2entries=0;
-my $totalRefreshEntries=0;
+my $totalRefreshEntries=1;
 
 foreach my $replControl (@ReplicationObjects){
    if ($replControl->{'valid'} && $replControl->{'requested'}){
       if (in_array(\@requested_phase),"1"){
          if (!exists($replControl->{'filter'})){
-            unshift(@joblist,{phase=>1,replControl=>$replControl});
+            if ($replControl->{'allow_phase1'}){
+               unshift(@joblist,{phase=>1,replControl=>$replControl});
+            }
          }
       }
       if (in_array(\@requested_phase),"2"){
-         $phase2entries++;
-         $totalRefreshEntries+=$replControl->{'entrycount'};
-         push(@joblist,{phase=>2,replControl=>$replControl});
+         if ($replControl->{'allow_phase2'}){
+            $phase2entries++;
+            $totalRefreshEntries+=$replControl->{'entrycount'};
+            push(@joblist,{phase=>2,replControl=>$replControl});
+         }
       }
       if (in_array(\@requested_phase),"3"){
-         if (!exists($replControl->{'filter'})){
-            push(@joblist,{phase=>3,replControl=>$replControl});
+         if ($replControl->{'allow_phase3'}){
+            if (!exists($replControl->{'filter'})){
+               push(@joblist,{phase=>3,replControl=>$replControl});
+            }
          }
       }
    }
@@ -1209,14 +1227,22 @@ sub InsertOrUpdate
 
    my $rec=$self->preprocessRecord($ctrl,$reqrec,$col);
 
-   my @selfield;
-   foreach my $fieldname (sort(keys(%{$col}))){
-      push(@selfield,$fieldname);
-   }
-   my $cmd="select ".join(",",@selfield)." from \"$dbtable\" where $idname=?";
+   my $cmd="select * from \"$dbtable\" where $idname=?";
    my $idval=$rec->{$idname};
+   msg(INFO,"query ($idval): $cmd");
    my @curlist=$self->getHashList($cmd,$idval);
-   my @view=keys(%$rec);
+
+   # hier muß die view noch sortiert werden, da wenn die LOB Felder nicht
+   # am Ende des Statements stehen, ein ORA-24816 auftaucht.
+   my @view=sort({
+      my $pa="100";
+      my $pb="100";
+      my @lobs=qw(CLOB LOB BLOB);
+      $pa=900 if (in_array(\@lobs,$col->{$a}->{type}));
+      $pb=900 if (in_array(\@lobs,$col->{$b}->{type}));
+      $pa.$a cmp $pb.$b;
+   } keys(%$rec));
+
    if ($#curlist==0){     # do an update
       my $isChanged=$self->isChanged($ctrl,$curlist[0],$rec);
       my (@v,@values);
@@ -1243,7 +1269,8 @@ sub InsertOrUpdate
       }
       my $v=join(",",@v);
       my $updcmd="update \"$dbtable\" set $v where $idname=?";
-      msg(INFO,"upd: $updcmd");
+      msg(INFO,"upd ($idval): $updcmd (",
+               join(",",map({"'".$_."'"} @values,$idval)).")");
       $bk=$self->doCmd($updcmd,@values,$idval);
    }
    elsif ($#curlist==-1){ # do an insert
@@ -1281,7 +1308,7 @@ sub InsertOrUpdate
       
       my $inscmd="insert into \"$dbtable\" ".
         "(".join(",",@insview).") values(".join(",",@place).")";
-      msg(INFO,"ins: $inscmd");
+      msg(INFO,"ins ($idval): $inscmd");
       $bk=$self->doCmd($inscmd,@values);
    }
    else{
