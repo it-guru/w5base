@@ -79,6 +79,12 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'artcatalog.cistatus'),
 
+      new kernel::Field::Mandator(),
+
+      new kernel::Field::Interface(
+                name          =>'mandatorid',
+                dataobjattr   =>'artcatalog.mandator'),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',

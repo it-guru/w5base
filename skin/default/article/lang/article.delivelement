@@ -1,0 +1,6 @@
+'article::delivelement'=>{de=>'Produktelement',en=>'Productelement'},
+'Productelement'=>{de=>'Produktemement'},
+'Description'=>{de=>'Beschreibung'},
+'Provider'=>{de=>'Anbieter'},
+'fieldgroup.mgmt'=>{de=>'Management',en=>'Management'},
+

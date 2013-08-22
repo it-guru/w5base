@@ -39,23 +39,46 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'Report JobID',
+                label         =>'W5BaseID',
+                group         =>'source',
                 sqlorder      =>'none',
                 dataobjattr   =>'artdelivelement.id'),
 
+      new kernel::Field::Text(
+                name          =>'fullname',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Productelement',
+                dataobjattr   =>'concat(artdelivprovider.name,": "'.
+                                ',artdelivelement.frontlabel)'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Name',
+                dataobjattr   =>'artdelivelement.frontlabel'),
+
       new kernel::Field::Select(
-                name          =>'cistatus',
-                htmleditwidth =>'40%',
-                label         =>'CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['cistatusid'=>'id'],
-                vjoineditbase =>{id=>">0"},
+                name          =>'provider',
+                label         =>'Provider',
+                vjointo       =>'article::delivprovider',
+                vjoinon       =>['providerid'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
-                name          =>'cistatusid',
-                label         =>'CI-StateID',
-                dataobjattr   =>'artdelivelement.cistatus'),
+                name          =>'providerid',
+                label         =>'ProviderID',
+                dataobjattr   =>'artdelivelement.artdelivprovider'),
+
+      new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'artdelivelement.description'),
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                group         =>'mgmt',
+                label         =>'Comments',
+                dataobjattr   =>'artdelivelement.comments'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
@@ -110,7 +133,7 @@ sub new
 
                                   
    );
-   $self->setDefaultView(qw(targetfile name cdate));
+   $self->setDefaultView(qw(fullname name cdate));
    $self->setWorktable("artdelivelement");
    return($self);
 }
@@ -120,9 +143,18 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","source");
+   return("header","default","mgmt","source");
 }
 
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="artdelivelement ".
+            "left outer join artdelivprovider  ".
+            "on artdelivelement.artdelivprovider=artdelivprovider.id ";
+   return($from);
+}
 
 
 sub Validate
@@ -133,8 +165,8 @@ sub Validate
    my $origrec=shift;
 
    my $name=effVal($oldrec,$newrec,"name");
-   if ($name eq "" || $name=~m/\s/){
-      $self->LastMsg(ERROR,"invalid report name '\%s' specified",
+   if ($name eq ""){
+      $self->LastMsg(ERROR,"invalid name '\%s' specified",
                      $name);
       return(undef);
    }
@@ -157,7 +189,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL") if ($self->IsMemberOf(["admin"]));
+   return("default","mgmt") if ($self->IsMemberOf(["admin"]));
    return(undef);
 }
 

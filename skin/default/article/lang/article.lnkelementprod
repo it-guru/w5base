@@ -1,0 +1,3 @@
+'article::lnkelementprod'=>{de=>'Produkt-Elementverknüpfung',en=>'Product-Element Relation'},
+'Product'=>{de=>'Produkt'},
+'Productelement'=>{de=>'Produktelement'},

@@ -56,9 +56,11 @@ create table artcategory (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table artproduct (
   id           bigint(20)  NOT NULL,
-  artcategory  bigint(20), 
-  posno        int(7),
-  variantof    bigint(20),
+  artcategory1 bigint(20) NOT NULL,
+  artcategory2 bigint(20),artcategory3 bigint(20),
+  posno1       int(7),     
+  posno2       int(7),    posno3       int(7),
+  pclass       char(20) default 'simple',variantof    bigint(20),
   variant      varchar(40) default 'standard',
   frontlabel   longtext, 
   pstatus      int(2)      NOT NULL,
@@ -88,9 +90,11 @@ create table artproduct (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  FOREIGN KEY articlecategory (artcategory)
+  FOREIGN KEY articlecategory (artcategory1)
           REFERENCES artcategory (id) ON DELETE CASCADE,
-  UNIQUE KEY `positionnumber` (artcategory,posno),
+  UNIQUE KEY `positionnumber1` (artcategory1,posno1),
+  UNIQUE KEY `positionnumber2` (artcategory2,posno2),
+  UNIQUE KEY `positionnumber3` (artcategory3,posno3),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table artdelivprovider (
@@ -154,5 +158,26 @@ create table lnkartelementprod (
           REFERENCES artdelivelement (id) ON DELETE CASCADE,
   FOREIGN KEY product (artproduct)
           REFERENCES artproduct (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table lnkartprodprod (
+  id         bigint(20)  NOT NULL,
+  partproduct      bigint(20)  NOT NULL,
+  artproduct       bigint(20)  NOT NULL,
+  comments    longtext,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),           
+  FOREIGN KEY pproduct (partproduct)
+          REFERENCES  artproduct (id) ON DELETE CASCADE,
+  FOREIGN KEY product (artproduct)
+          REFERENCES  artproduct (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

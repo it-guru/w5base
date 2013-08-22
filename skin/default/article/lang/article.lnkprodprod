@@ -1,0 +1,3 @@
+'article::lnkprodprod'=>{de=>'Unterproduktverknüpfung',en=>'Subproductrelation'},
+'Product'=>{de=>'Produkt'},
+'parent Bundle'=>{de=>'Bundle'},

@@ -146,7 +146,7 @@ sub new
                 label         =>'Products',
                 group         =>'products',
                 vjointo       =>'article::product',
-                vjoinon       =>['id'=>'categoryid'],
+                vjoinon       =>['id'=>'category1id'],
                 vjoindisp     =>['fullname']),
 
       new kernel::Field::SubList(

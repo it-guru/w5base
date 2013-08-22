@@ -39,9 +39,15 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'Report JobID',
+                label         =>'W5BaseID',
+                group         =>'source',
                 sqlorder      =>'none',
                 dataobjattr   =>'artdelivprovider.id'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Name',
+                dataobjattr   =>'artdelivprovider.name'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -56,6 +62,17 @@ sub new
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
                 dataobjattr   =>'artdelivprovider.cistatus'),
+
+      new kernel::Field::Mandator(),
+
+      new kernel::Field::Interface(
+                name          =>'mandatorid',
+                dataobjattr   =>'artdelivprovider.mandator'),
+
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                group         =>'contacts'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
@@ -120,7 +137,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","source");
+   return("header","default","contacts","source");
 }
 
 
@@ -133,8 +150,8 @@ sub Validate
    my $origrec=shift;
 
    my $name=effVal($oldrec,$newrec,"name");
-   if ($name eq "" || $name=~m/\s/){
-      $self->LastMsg(ERROR,"invalid report name '\%s' specified",
+   if ($name eq ""){
+      $self->LastMsg(ERROR,"invalid name '\%s' specified",
                      $name);
       return(undef);
    }
