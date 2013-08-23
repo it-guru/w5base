@@ -61,7 +61,7 @@ create table artproduct (
   posno1       int(7),     
   posno2       int(7),    posno3       int(7),
   pclass       char(20) default 'simple',variantof    bigint(20),
-  variant      varchar(40) default 'standard',
+  variant      varchar(40) default 'standard',variantdesc longtext,
   frontlabel   longtext, 
   pstatus      int(2)      NOT NULL,
   productmgr   bigint(20)  NOT NULL, 

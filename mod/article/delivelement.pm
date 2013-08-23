@@ -133,6 +133,7 @@ sub new
 
                                   
    );
+   $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(fullname name cdate));
    $self->setWorktable("artdelivelement");
    return($self);

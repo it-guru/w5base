@@ -210,6 +210,7 @@ sub new
 
                                   
    );
+   $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(catalog fullname name cdate));
    $self->setWorktable("artcategory");
    return($self);

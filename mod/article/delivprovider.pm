@@ -127,6 +127,7 @@ sub new
 
                                   
    );
+   $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(targetfile name cdate));
    $self->setWorktable("artdelivprovider");
    return($self);

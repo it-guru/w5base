@@ -80,13 +80,49 @@ sub new
                 value         =>['simple','bundle'],
                 dataobjattr   =>'artproduct.pclass'),
 
-      new kernel::Field::Select(
+      new kernel::Field::Text(
                 name          =>'pvariant',
                 label         =>'Product variant',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(1);
+                   }
+                   return(0);
+                },
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if (defined($current) && 
+                                 $current->{pvariant} eq "standard");
+                   return(0);
+                },
                 selectfix     =>1,
-                htmleditwidth =>'100px',
-                value         =>['standard','high','medium','low'],
                 dataobjattr   =>'artproduct.variant'),
+
+      new kernel::Field::TextDrop(
+                name          =>'variantof',
+                label         =>'variant of',
+                depend        =>['variantofid'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(1) if ($param{current}->{variantofid} ne "");
+                   }
+                   return(0);
+                },
+                vjointo       =>'article::product',
+                vjoinon       =>['variantofid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Interface(
+                name          =>'variantofid',
+                label         =>'VariantOf-Id',
+                dataobjattr   =>'artproduct.variantof'),
 
       new kernel::Field::Select(
                 name          =>'category1',
@@ -104,6 +140,15 @@ sub new
                 name          =>'posno1',
                 label         =>'Position Number',
                 width         =>'1%',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(0) if ($param{current}->{variantofid} ne "");
+                   }
+                   return(1);
+                },
                 searchable    =>0,
                 htmleditwidth =>'40px',
                 precision     =>0,
@@ -113,6 +158,12 @@ sub new
                 name          =>'description',
                 label         =>'Description',
                 dataobjattr   =>'artproduct.description'),
+
+      new kernel::Field::Textarea(
+                name          =>'variantdescription',
+                group         =>'variantspecials',
+                label         =>'variant specials',
+                dataobjattr   =>'artproduct.variantdesc'),
 
       new kernel::Field::Contact(
                 name          =>'productmgr',
@@ -192,6 +243,14 @@ sub new
                 value         =>['PERMONTH','PERYEAR'],
                 group         =>'cost',
                 dataobjattr   =>'artproduct.billinterval'),
+        
+      new kernel::Field::Link(
+                name          =>'subparentid',
+                label         =>'id for all sub elements/products',
+                readonly      =>1,
+                dataobjattr   =>'if (artproduct.variantof is null,'.
+                                'artproduct.id,artproduct.variantof)'),
+
 
       new kernel::Field::SubList(
                 name          =>'directproductelements',
@@ -207,7 +266,7 @@ sub new
                 },
                 group         =>'productelements',
                 vjointo       =>'article::lnkelementprod',
-                vjoinon       =>['id'=>'productid'],
+                vjoinon       =>['subparentid'=>'productid'],
                 vjoindisp     =>['delivelement']),
 
       new kernel::Field::SubList(
@@ -224,7 +283,7 @@ sub new
                 },
                 group         =>'productelements',
                 vjointo       =>'article::lnkelement',
-                vjoinon       =>['id'=>'productid'],
+                vjoinon       =>['subparentid'=>'productid'],
                 vjoindisp     =>['delivelement']),
 
       new kernel::Field::SubList(
@@ -232,8 +291,16 @@ sub new
                 label         =>'Subproducts',
                 group         =>'subproducts',
                 vjointo       =>'article::lnkprodprod',
-                vjoinon       =>['id'=>'pproductid'],
+                vjoinon       =>['subparentid'=>'pproductid'],
                 vjoindisp     =>['product']),
+
+      new kernel::Field::SubList(
+                name          =>'variants',
+                label         =>'Variants',
+                group         =>'variants',
+                vjointo       =>'article::product',
+                vjoinon       =>['id'=>'variantofid'],
+                vjoindisp     =>['fullname']),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -294,6 +361,7 @@ sub new
 
                                   
    );
+   $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(category1  
                             fullname description cdate));
    $self->setWorktable("artproduct");
@@ -305,7 +373,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","cost","mgmt","subproducts",
+   return("header","default","variantspecials",
+          "cost","mgmt","variants","subproducts",
           "productelements","source");
 }
 
@@ -316,6 +385,36 @@ sub isCopyValid
    return(0) if (!defined($rec));
    return(1);
 }
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+   if (!$bak){
+      my $id=effVal($oldrec,$newrec,"id");
+    #  my $p=getModuleObject($self->Config,"article::product");
+      my $p=$self;
+      $self->ResetFilter();
+      $p->SetFilter({variantofid=>\$id});
+      my @l=$p->getHashList(qw(ALL));
+      if ($#l!=-1){
+         $p->ResetFilter();
+         foreach my $subrec (@l){
+            my $id=$subrec->{id};
+            $p->ValidatedUpdateRecordTransactionless(
+                   $subrec,{mdate=>NowStamp("en")},{id=>\$id});
+         }
+         $p->RoolbackTransaction();
+      }
+   }
+   return($bak);
+}
+
+
+
 
 
 
@@ -334,6 +433,41 @@ sub Validate
                      $name);
       return(undef);
    }
+   if (!defined($oldrec) && $newrec->{pvariant} eq ""){
+      $newrec->{pvariant}="standard";
+   }
+   my $variantofid=effVal($oldrec,$newrec,"variantofid");
+   if ($variantofid ne ""){
+      if (effVal($oldrec,$newrec,"pvariant") eq "standard"){
+         $self->LastMsg(ERROR,"variant standard is not allowed if ".
+                              "product is a variant of an other ones");
+         return(undef);
+      }
+      my $p=getModuleObject($self->Config,"article::product");
+      $p->SetFilter({id=>\$variantofid});
+      my ($prec,$msg)=$p->getOnlyFirst(qw(ALL));
+      # Werte die immer vom "Parent" übernommen werden
+      foreach my $pfld (qw(category1id frontlabel pclass description)){
+         if (!defined($oldrec) ||
+             $oldrec->{$pfld} ne $prec->{$pfld}){
+            $newrec->{$pfld}=$prec->{$pfld};
+         }
+      }
+      if (!defined($oldrec)){
+         # Werte die nur Initial vom Parent übernommen werden
+         foreach my $pfld (qw(productmgrid)){
+            if (!defined($oldrec) ||
+                $oldrec->{$pfld} ne $prec->{$pfld}){
+               $newrec->{$pfld}=$prec->{$pfld};
+            }
+         }
+      }
+   }
+   else{
+      if (defined($oldrec->{variantofid})){
+         $newrec->{variantofid}=undef;
+      }
+   }
    return(1);
 }
 
@@ -344,7 +478,13 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("default","mgmt") if (!defined($rec));
-   my @l=("header","default","mgmt","productelements","source");
+   my @l=("header","default","history","mgmt","cost","productelements","source");
+   if ($rec->{pvariant} eq "standard"){
+      push(@l,"variants");
+   }
+   else{
+      push(@l,"variantspecials");
+   }
    push(@l,"subproducts") if ($rec->{pclass} eq "bundle");
    return(@l);
 }
@@ -357,7 +497,18 @@ sub isWriteValid
 
    my @wrgroups=qw(default mgmt);
 
+   if (defined($rec) && $rec->{variantofid}){
+      @wrgroups=grep(!/^default$/,@wrgroups);
+   }
+
    push(@wrgroups,"cost") if (defined($rec));
+
+   if (defined($rec) && $rec->{pvariant} eq "standard"){
+      push(@wrgroups,"variants");
+   }
+   else{
+      push(@wrgroups,"variantspecials");
+   }
 
    return(@wrgroups) if ($self->IsMemberOf(["admin"]));
    return(undef);
@@ -387,6 +538,8 @@ sub getBackendName
    my $db=shift;
 
    if (($mode=~m/^where/) || $mode eq "select"){
+      my $id=$self->getParent->getField("id");
+      my $id_attr=$id->getBackendName($mode,$db);
       my $name=$self->getParent->getField("name");
       my $name_attr=$name->getBackendName($mode,$db);
       my $pclass=$self->getParent->getField("pclass");
@@ -394,7 +547,9 @@ sub getBackendName
       my $pvariant=$self->getParent->getField("pvariant");
       my $pvariant_attr=$pvariant->getBackendName($mode,$db);
 
-      my $f="concat($pclass_attr,\" - \",$name_attr,\": \",$pvariant_attr)";
+      my $f="concat(trim(cast($id_attr as char(20))),\": \"".
+            ",$pclass_attr,\" - \",".
+            "$name_attr,\": \",$pvariant_attr)";
 
       return($f);
    }
