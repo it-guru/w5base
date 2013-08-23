@@ -63,6 +63,39 @@ sub Rows
     }
     return(undef);
 }
+# Seems not to work with current DBI Version
+#
+#sub StartTransaction
+#{
+#   my ($self,$operation,$oldrec,$newrec)=@_;
+#   if (defined($self->{DB})){
+#      $self->{DB}->begin_work;
+#   }
+#
+#   return(1);
+#}
+#
+#sub RoolbackTransaction
+#{
+#   my ($self,$operation,$oldrec,$newrec)=@_;
+#   if (defined($self->{DB})){
+#      $self->{DB}->rollback;
+#   }
+#
+#   return(1);
+#}
+#
+#sub FinishTransaction
+#{
+#   my ($self,$operation,$oldrec,$newrec)=@_;
+#   if (defined($self->{DB})){
+#      $self->{DB}->commit;
+#   }
+#
+#   return(1);
+#}
+
+
 
 
 sub getSqlFields
