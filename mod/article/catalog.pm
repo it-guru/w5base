@@ -85,6 +85,12 @@ sub new
                 name          =>'mandatorid',
                 dataobjattr   =>'artcatalog.mandator'),
 
+      new kernel::Field::Databoss(),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'artcatalog.databoss'),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -156,6 +162,14 @@ sub new
    $self->setWorktable("artcatalog");
    return($self);
 }
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/article/load/catalog.jpg?".$cgi->query_string());
+}
+
 
 sub getDetailBlockPriority
 {

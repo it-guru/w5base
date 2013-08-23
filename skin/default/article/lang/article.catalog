@@ -2,3 +2,4 @@
 'Catalog label'=>{de=>'Katalog Beschriftung'},
 'Catalog'=>{de=>'Katalog'},
 'fieldgroup.categories'=>{de=>'Kategorien',en=>'Categories'},
+'Databoss'=>{de=>'Datenverantwortlicher'},

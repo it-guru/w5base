@@ -216,6 +216,15 @@ sub new
    return($self);
 }
 
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/article/load/category.jpg?".$cgi->query_string());
+}
+
+
+
 sub getDetailBlockPriority
 {
    my $self=shift;

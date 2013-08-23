@@ -1,4 +1,4 @@
-'article'=>{de=>'Bestellkatalogmangement',en=>'Order-Catalogmanagement'},
+'article'=>{de=>'Katalogmangement',en=>'Catalogmanagement'},
 'article.catalog'=>{de=>'Katalog',en=>'Catalog'},
 'article.catalog.new'=>{de=>'Neueingabe',en=>'New'},
 'article.catalog.category'=>{de=>'Kategorie',en=>'Categroie'},

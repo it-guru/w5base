@@ -1,0 +1,7 @@
+'read elements'=>{de=>'Elemente lesen'},
+'write elements'=>{de=>'Elemente schreiben'},
+'admin provider'=>{de=>'Anbieter administrieren'},
+'read catalog'=>{de=>'Katalog lesen'},
+'admin catalog'=>{de=>'Katalog administrieren'},
+'order from catalog'=>{de=>'von Katalog bestellen'},
+'write catalog'=>{de=>'Katalog schreiben'},
