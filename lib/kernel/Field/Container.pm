@@ -160,7 +160,11 @@ sub finishWriteRequestHash
                %oldcopy=%{$self->RawValue($oldrec)} if (defined($oldrec));
                $oldhash=\%oldcopy; 
             }
-            $oldhash->{$fo->Name()}=$newrec->{$fo->Name()};
+            my $centryname=$fo->Name();
+            if (defined($fo->{containergroup})){
+               $centryname=$fo->{containergroup}.".".$centryname;
+            }
+            $oldhash->{$centryname}=$newrec->{$fo->Name()};
             delete($newrec->{$fo->Name()});
             $changed=1;
          }

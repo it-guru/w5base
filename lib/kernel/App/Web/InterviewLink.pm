@@ -51,7 +51,7 @@ sub HtmlInterviewLink
          print $self->HtmlBottom(body=>1);
       }
       else{
-         $self->InterviewSubForm($rec,$interviewcatid,$imode);
+         $self->InterviewSubForm("xml",$rec,$interviewcatid,$imode);
       }
    }
 }
@@ -59,6 +59,7 @@ sub HtmlInterviewLink
 sub InterviewSubForm
 {
    my $self=shift;
+   my $format=shift;
    my $rec=shift;
    my $interviewcatid=shift;
    my $imode=shift;
@@ -74,6 +75,11 @@ sub InterviewSubForm
                     {interviewid}->{$qrec->{id}}) &&
              $state->{AnsweredQuestions}->
                    {interviewid}->{$qrec->{id}}->{answer} ne ""){
+            next;
+         }
+      }
+      if ($imode eq "outdated"){
+         if (!exists($qrec->{needverify}) || !$qrec->{needverify}){
             next;
          }
       }
@@ -126,16 +132,22 @@ sub InterviewSubForm
          }
       }
    }
-   print $self->HttpHeader("text/xml");
-   if ($HTMLjs ne ""){
-      $HTMLjs="function Init$interviewcatid(){$HTMLjs} Init$interviewcatid(0)";
+   if ($format eq "xml"){
+      print $self->HttpHeader("text/xml");
+      if ($HTMLjs ne ""){
+         $HTMLjs="function Init$interviewcatid(){$HTMLjs} ".
+                 "Init$interviewcatid(0)";
+      }
+      else{
+         $HTMLjs="function Init$interviewcatid(){}";
+      }
+      my $res=hash2xml({document=>{result=>'ok',q=>\@q,js=>$HTMLjs,
+                                   exitcode=>0}},{header=>1});
+      print $res;
    }
    else{
-      $HTMLjs="function Init$interviewcatid(){}";
+      return(join("",@q));
    }
-   my $res=hash2xml({document=>{result=>'ok',q=>\@q,js=>$HTMLjs,
-                                exitcode=>0}},{header=>1});
-   print $res;
 }
 
 
@@ -376,6 +388,7 @@ function setA(formid,val)
 EOF
    my @sl=('current'=>$self->T("current questions"),
            'open'=>$self->T("not answered questions"),
+           'outdated'=>$self->T("outdated answers"),
            'analyses'=>$self->T("analyses"));
    my $s="<select name=IMODE onchange=\"document.forms['control'].submit();\" ".
          "style=\"width:200px\">";
@@ -523,11 +536,6 @@ EOF
          if ($lastqblock ne $qrec->{queryblock}){
             push(@blklist,$qrec->{queryblock});
             $queryblocklabel{$qrec->{queryblock}}=$qrec->{queryblocklabel};
-         #       $icat->{id}->{$qrec->{interviewcatid}}->{fulllabel};
-         #   if (ref($queryblocklabel{$qrec->{queryblock}}) eq "ARRAY"){
-         #      $queryblocklabel{$qrec->{queryblock}}=
-         #         join(".",@{$queryblocklabel{$qrec->{queryblock}}});
-         #   }
             push(@blkid,$qrec->{interviewcatid});
          }
          $lastqblock=$qrec->{queryblock};
@@ -540,9 +548,10 @@ EOF
          my $blk=$queryblocklabel{$blklist[$c]};
          my $blkid=$blkid[$c];
          my @curlevel=split(/\./,$blk);
-         switchToLevel(\$d,\@openlevel,\@curlevel,\$vsequence,$blkid,$imode);
+         $self->switchToLevel(\$d,$rec,\@openlevel,\@curlevel,
+                              \$vsequence,$blkid,$imode);
       }
-      switchToLevel(\$d,\@openlevel,[],\$vsequence);
+      $self->switchToLevel(\$d,$rec,\@openlevel,[],\$vsequence);
     
       $d.="</div></div>";
    }
@@ -551,7 +560,9 @@ EOF
 
 sub switchToLevel
 {
+   my $self=shift;
    my $d=shift;
+   my $rec=shift;
    my $from=shift;
    my $to=shift;
    my $vsequence=shift;
@@ -575,6 +586,14 @@ sub switchToLevel
    for(my $i=$#{$from};$i>=$eqlevel;$i--){
        $$d.="</div>";
    }
+   my $plusstyle ="visible:visible;display:block";
+   my $minusstyle="visible:hidden;display:none";
+   my $blkstyle="visible:hidden;display:none";
+   if ($imode eq "outdated"){
+      $minusstyle="visible:visible;display:block";
+      $plusstyle="visible:hidden;display:none";
+      $blkstyle="visible:visible;display:block";
+   }
    if ($#{$to}>=$eqlevel){
       for(my $i=$eqlevel;$i<=$#{$to};$i++){
          $blk=$to->[$i];
@@ -583,19 +602,32 @@ sub switchToLevel
             $blkid="VIRTUAL".$$vsequence;
             $$vsequence++;
          }
-         $$d.="\n<div blkid=\"${blkid}\" imode=\"${imode}\" ".
-             "onclick=\"switchQueryBlock(this);\" ".
-             "class=InterviewQuestBlockHead>".
-             "\n<div id=BLKON${blkid} class=OnOfSwitch ".
-             "style=\"visible:hidden;display:none\">".
-             "<img border=0 src=\"../../../public/base/load/minus.gif\"></div>".
-             "<div id=BLKOFF${blkid} class=OnOfSwitch ".
-             "style=\"visible:visible;display:block\">".
-             "<img border=0 src=\"../../../public/base/load/plus.gif\"></div>".
-             "<div style=\"float:none\">$blk</div></div>";
-         $$d.="\n<div id=BLK${blkid} name=\"$blk\" class=InterviewQuestBlock>";
-         $$d.="\n<div id=QST${blkid} ".
-              "style=\"border-style-left:solid;border-color:black\" ><br></div>";
+         my $blkvalue="<br>"; 
+         if ($imode eq "outdated"){
+            $blkvalue=$self->InterviewSubForm("html",$rec,$blkid,$imode);
+         }
+         if ($blkvalue ne ""){
+            $$d.="\n<div blkid=\"${blkid}\" imode=\"${imode}\" ".
+                "onclick=\"switchQueryBlock(this);\" ".
+                "class=InterviewQuestBlockHead>".
+                "\n<div id=BLKON${blkid} class=OnOfSwitch ".
+                "style=\"$minusstyle\">".
+                "<img border=0 src=\"../../../public/base/load/minus.gif\">".
+                "</div>".
+                "<div id=BLKOFF${blkid} class=OnOfSwitch ".
+                "style=\"$plusstyle\">".
+                "<img border=0 src=\"../../../public/base/load/plus.gif\">".
+                "</div>".
+                "<div style=\"float:none\">$blk</div></div>";
+            $$d.="\n<div id=BLK${blkid} name=\"$blk\" ".
+                 "class=InterviewQuestBlock style=\"$blkstyle\">";
+            $$d.="\n<div id=QST${blkid} ".
+                 "style=\"border-style-left:solid;border-color:black\" >".
+                 "$blkvalue</div>";
+         }
+         else{
+            $$d.="<div>"; # create a dummy div for structure consistence
+         }
       }
    }
    @{$from}=(@{$to});
