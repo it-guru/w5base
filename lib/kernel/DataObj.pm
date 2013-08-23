@@ -440,6 +440,10 @@ sub getHtmlDetailPageContent
       $idval="NONE" if ($idval eq "");
 
       my $q=new kernel::cgi({});
+      my $IMODE=Query->Param("IMODE");
+      if ($IMODE ne ""){
+         $q->Param('IMODE'=>$IMODE);
+      }
       $q->Param("$idname"=>$idval);
       my $urlparam=$q->QueryString();
 
