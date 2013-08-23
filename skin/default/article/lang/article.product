@@ -6,6 +6,8 @@
 'Description'=>{de=>'Beschreibung'},
 'fieldgroup.cost'=>{de=>'Kosten',en=>'Cost'},
 'fieldgroup.mgmt'=>{de=>'Produkt-Management',en=>'Product-Management'},
+'fieldgroup.mgmtlogosmall'=>{de=>'Produkt-Management - Logo 1',en=>'Product-Management - Logo 1'},
+'fieldgroup.mgmtlogolarge'=>{de=>'Produkt-Management - Logo 2',en=>'Product-Management - Logo 2'},
 'fieldgroup.variants'=>{de=>'Produkt-Varianten',en=>'Product-Variants'},
 'fieldgroup.productelements'=>{de=>'Produktelemente',en=>'Product-Elements'},
 'fieldgroup.subproducts'=>{de=>'Unterprodukte',en=>'Subproducts'},

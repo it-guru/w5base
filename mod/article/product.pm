@@ -191,6 +191,22 @@ sub new
                 group         =>'mgmt',
                 dataobjattr   =>'artproduct.orderable_to'),
 
+      new kernel::Field::File(
+                name          =>'logo_small',
+                label         =>'logo_small',
+                searchable    =>0,
+                group         =>'mgmtlogosmall',
+                uploadable    =>0,
+                dataobjattr   =>'artproduct.logo_small'),
+
+      new kernel::Field::File(
+                name          =>'logo_large',
+                label         =>'logo_large',
+                searchable    =>0,
+                group         =>'mgmtlogolarge',
+                uploadable    =>0,
+                dataobjattr   =>'artproduct.logo_large'),
+
       new kernel::Field::Number(
                 name          =>'costonce',
                 label         =>'cost once',
@@ -385,7 +401,8 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","variantspecials",
-          "cost","mgmt","variants","subproducts",
+          "cost","mgmt","mgmtlogosmall","mgmtlogolarge",
+          "variants","subproducts",
           "productelements","source");
 }
 
@@ -438,6 +455,54 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+
+   if (exists($newrec->{logo_small})){
+      if ($newrec->{logo_small} ne ""){
+         no strict;
+         my $f=$newrec->{logo_small};
+         seek($f,0,SEEK_SET);
+         my $pic;
+         my $buffer;
+         my $size=0;
+         while (my $bytesread=read($f,$buffer,1024)) {
+            $pic.=$buffer;
+            $size+=$bytesread;
+            if ($size>100240){
+               $self->LastMsg(ERROR,"picure to large");
+               return(0);
+            }
+         }
+         $newrec->{logo_small}=$pic;
+      }
+      else{
+         $newrec->{logo_small}=undef;
+      }
+   }
+
+   if (exists($newrec->{logo_large})){
+      if ($newrec->{logo_large} ne ""){
+         no strict;
+         my $f=$newrec->{logo_large};
+         seek($f,0,SEEK_SET);
+         my $pic;
+         my $buffer;
+         my $size=0;
+         while (my $bytesread=read($f,$buffer,1024)) {
+            $pic.=$buffer;
+            $size+=$bytesread;
+            if ($size>100240){
+               $self->LastMsg(ERROR,"picure to large");
+               return(0);
+            }
+         }
+         $newrec->{logo_large}=$pic;
+      }
+      else{
+         $newrec->{logo_large}=undef;
+      }
+   }
+
+
    my $name=effVal($oldrec,$newrec,"frontlabel");
    if ($name=~m/^\s$/){
       $self->LastMsg(ERROR,"invalid name '\%s' specified",
@@ -489,7 +554,9 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("default","mgmt") if (!defined($rec));
-   my @l=("header","default","history","mgmt","cost","productelements","source");
+   my @l=("header","default","history","mgmt",
+          "mgmtlogosmall","mgmtlogolarge",
+          "cost","productelements","source");
    if ($rec->{pvariant} eq "standard"){
       push(@l,"variants");
    }
@@ -506,7 +573,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgroups=qw(default mgmt);
+   my @wrgroups=qw(default mgmt mgmtlogosmall mgmtlogolarge);
 
    if (defined($rec) && $rec->{variantofid}){
       @wrgroups=grep(!/^default$/,@wrgroups);
