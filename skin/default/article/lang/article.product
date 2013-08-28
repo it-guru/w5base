@@ -17,6 +17,7 @@
 'variant of'=>{de=>'variante von'},
 'Product class'=>{de=>'Produktklasse'},
 'Product variant'=>{de=>'Produktvariante'},
+'Catalog'=>{de=>'Katalog'},
 'Position Number'=>{de=>'Positionsnummer'},
 'orderable from'=>{de=>'bestellbar von'},
 'orderable to'=>{de=>'bestellbar bis'},
@@ -31,4 +32,6 @@
 'product unit'=>{de=>'Produktionseinheit'},
 'bill interval'=>{de=>'Rechnungsinterval'},
 'variant standard is not allowed if product is a variant of an other ones'=>{de=>'Variante "standard" ist nicht erlaubt, wenn das Product eine Variante ist'},
+'no nesassary write access to category'=>{de=>'kein ausreichender Schreibzugriff auf Kategorie'},
+'missing categories'=>{de=>'fehlende Kategorie'},
 

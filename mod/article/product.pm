@@ -124,6 +124,16 @@ sub new
                 label         =>'VariantOf-Id',
                 dataobjattr   =>'artproduct.variantof'),
 
+      new kernel::Field::TextDrop(
+                name          =>'catalog',
+                label         =>'Catalog',
+                readonly      =>1,
+                vjointo       =>'article::catalog',
+                vjoinon       =>['catalogid'=>'id'],
+                vjoineditbase =>{cistatusid=>"<=5"},
+                vjoindisp     =>'fullname'),
+
+
       new kernel::Field::Select(
                 name          =>'category1',
                 label         =>'Category',
@@ -374,7 +384,34 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'artproduct.realeditor'),
 
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
 
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                noselect      =>'1',
+                dataobjattr   =>'artcatalog.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'artcatalog.mandator'),
+                                  
+      new kernel::Field::Link(
+                name          =>'catalogid',
+                dataobjattr   =>'artcatalog.id')
                                   
    );
    $self->{history}=[qw(insert modify delete)];
@@ -382,6 +419,40 @@ sub new
                             fullname description cdate));
    $self->setWorktable("artproduct");
    return($self);
+}
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf([qw(admin w5base.article.admin)],"RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                          [orgRoles(),qw(RMember RODManager RODManager2 
+                                         RODOperator
+                                         RAuditor RMonitor)],"both");
+      my @grpids=keys(%grps);
+
+      my $userid=$self->getCurrentUserId();
+      my @addflt=(
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?admin?=roles* ".
+                            "*roles=?read?=roles* *roles=?order?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?admin?=roles* ".
+                            "*roles=?read?=roles* *roles=?order?=roles*"}
+                );
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         push(@addflt,
+            {mandatorid=>\@mandators},
+            {databossid=>\$userid}
+         );
+      }
+      push(@flt,\@addflt);
+   }
+   return($self->SetFilter(@flt));
 }
 
 
@@ -394,6 +465,20 @@ sub getRecordImageUrl
 }
 
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="artproduct ".
+      "left outer join artcategory on artproduct.artcategory1=artcategory.id ".
+      "left outer join artcatalog on artcategory.artcatalog=artcatalog.id ".
+      "left outer join lnkcontact on lnkcontact.parentobj='article::catalog' ".
+      "and artcategory.id=lnkcontact.refid";
+   return($from);
+}
+
+
+
+
 
 sub getDetailBlockPriority
 {
@@ -401,9 +486,10 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","variantspecials",
-          "cost","mgmt","mgmtlogosmall","mgmtlogolarge",
-          "variants","subproducts",
-          "productelements","source");
+          "cost","mgmt","variants",
+          "subproducts",
+          "productelements",
+          "mgmtlogosmall","mgmtlogolarge","source");
 }
 
 sub isCopyValid
@@ -456,7 +542,53 @@ sub Validate
    my $origrec=shift;
 
 
-   if (exists($newrec->{logo_small})){
+   my %checkcategories;
+   if (!defined($oldrec)){
+      if (!defined($newrec->{productmgrid}) ||
+          $newrec->{productmgrid} eq ""){
+         my $userid=$self->getCurrentUserId();
+         $newrec->{productmgrid}=$userid;
+      }
+      if ($newrec->{category1id} eq ""){
+         $self->LastMsg(ERROR,"missing primary category");
+         return(0);
+      }
+      else{
+         $checkcategories{$newrec->{category1id}}++;
+      }
+   }
+   my $category1id=effVal($oldrec,$newrec,"category1id");
+   $checkcategories{$category1id}++ if ($category1id ne "");
+
+   my $cat=getModuleObject($self->Config,"article::category");
+   my $c=getModuleObject($self->Config,"article::catalog");
+   my @checkcategories=keys(%checkcategories);
+   if ($#checkcategories==-1){
+      $self->LastMsg(ERROR,"missing categories");
+      return(0);
+   }
+   my $wrok=$#checkcategories;
+   foreach my $categoryid (@checkcategories){
+      $cat->ResetFilter();
+      $cat->SetFilter({id=>\$categoryid});
+      my $catalogid=$cat->getVal("catalogid");
+      if ($catalogid ne ""){
+         if (!$c->isCatalogWriteValid($catalogid)){
+            $wrok--;
+         }
+      }
+   }
+   if ($wrok!=0){
+      $self->LastMsg(ERROR,"no nesassary write access to category");
+      return(0);
+   }
+
+
+
+
+
+
+   if (exists($newrec->{logo_small})){   # laden des small Logos
       if ($newrec->{logo_small} ne ""){
          no strict;
          my $f=$newrec->{logo_small};
@@ -479,7 +611,7 @@ sub Validate
       }
    }
 
-   if (exists($newrec->{logo_large})){
+   if (exists($newrec->{logo_large})){   # laden des small Logos
       if ($newrec->{logo_large} ne ""){
          no strict;
          my $f=$newrec->{logo_large};
@@ -588,7 +720,19 @@ sub isWriteValid
       push(@wrgroups,"variantspecials");
    }
 
-   return(@wrgroups) if ($self->IsMemberOf(["admin"]));
+   return(@wrgroups) if (!defined($rec));
+
+   my $catalogid=$rec->{catalogid};
+   if ($catalogid ne ""){
+      my $c=getModuleObject($self->Config,"article::catalog");
+      if ($c->isCatalogWriteValid($catalogid)){
+         return(@wrgroups);
+      }
+   }
+
+
+
+
    return(undef);
 }
 

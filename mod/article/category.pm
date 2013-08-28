@@ -100,6 +100,22 @@ sub new
                 allowempty    =>1,
                 vjointo       =>'article::category',
                 vjoinon       =>['pcategoryid'=>'id'],
+                vjoineditbase =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $flt={id=>undef};
+                   my $i=Query->Param("Formated_catalog");
+                   if ($i ne ""){
+                      $flt={catalogid=>\$i};
+                   }
+                   else{
+                      my $i=$current->{catalogid};
+                      if ($i ne ""){
+                         $flt={catalogid=>\$i,id=>"!".$current->{id}};
+                      }
+                   }
+                   return($flt);
+                },
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
@@ -207,14 +223,38 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'artcategory.realeditor'),
 
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
 
-                                  
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                noselect      =>'1',
+                dataobjattr   =>'artcatalog.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'artcatalog.mandator'),
+
    );
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(catalog fullname name cdate));
    $self->setWorktable("artcategory");
    return($self);
 }
+
 
 sub getRecordImageUrl
 {
@@ -223,6 +263,39 @@ sub getRecordImageUrl
    return("../../../public/article/load/category.jpg?".$cgi->query_string());
 }
 
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf([qw(admin w5base.article.admin)],"RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                          [orgRoles(),qw(RMember RODManager RODManager2 
+                                         RODOperator
+                                         RAuditor RMonitor)],"both");
+      my @grpids=keys(%grps);
+
+      my $userid=$self->getCurrentUserId();
+      my @addflt=(
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?admin?=roles* ".
+                            "*roles=?read?=roles* *roles=?order?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?admin?=roles* ".
+                            "*roles=?read?=roles* *roles=?order?=roles*"}
+                );
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         push(@addflt,
+            {mandatorid=>\@mandators},
+            {databossid=>\$userid}
+         );
+      }
+      push(@flt,\@addflt);
+   }
+   return($self->SetFilter(@flt));
+}
 
 
 sub getDetailBlockPriority
@@ -245,31 +318,34 @@ sub isCopyValid
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="artcategory ".
-            "left outer join artcategory as p1 ".
-            "on artcategory.partcategory=p1.id ".
-            "left outer join artcategory as p2 ".
-            "on p1.partcategory=p2.id ".
-            "left outer join artcategory as p3 ".
-            "on p2.partcategory=p3.id ".
-            "left outer join artcategory as p4 ".
-            "on p3.partcategory=p4.id ".
-            "left outer join artcategory as p5 ".
-            "on p4.partcategory=p5.id ".
-            "left outer join artcatalog  ".
-            "on artcategory.artcatalog=artcatalog.id ";
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+
+   my $from="$worktable ".
+      "left outer join artcategory as p1 on artcategory.partcategory=p1.id ".
+      "left outer join artcategory as p2 on p1.partcategory=p2.id ".
+      "left outer join artcategory as p3 on p2.partcategory=p3.id ".
+      "left outer join artcategory as p4 on p3.partcategory=p4.id ".
+      "left outer join artcategory as p5 on p4.partcategory=p5.id ".
+      "left outer join artcatalog on artcategory.artcatalog=artcatalog.id ".
+      "left outer join lnkcontact on lnkcontact.parentobj='article::catalog' ".
+      "and artcategory.id=lnkcontact.refid";
    return($from);
 }
+
 
 sub initSqlOrder
 {
    my $self=shift;
-   return("artcategory.artcatalog,p4.posno,p3.posno,".
-          "p2.posno,p1.posno,".
-          "artcategory.posno");
+   return("artcategory.artcatalog,".
+          'if (isnull(p4.posno),if (isnull(p3.posno),if (isnull(p2.posno),'.
+          'if (isnull(p1.posno),artcategory.posno,p1.posno),p2.posno),p3.posno),p4.posno),'.
+          'if (isnull(p2.posno),if (isnull(p1.posno),0,artcategory.posno),p1.posno),'.
+          'if (isnull(p3.posno),if (isnull(p2.posno),0,artcategory.posno),p2.posno),'.
+          'if (isnull(p4.posno),if (isnull(p3.posno),0,artcategory.posno),p3.posno)');
 }
-
-
 
 
 
@@ -295,6 +371,22 @@ sub Validate
          $newrec->{chkpcategoryid}=$newrec->{pcategoryid};
       }
    }
+   if (defined($oldrec)){ # check write on old category
+      my $cid=$oldrec->{catalogid};
+      my $c=getModuleObject($self->Config,"article::catalog");
+      if (!$c->isCatalogWriteValid($cid)){
+         $self->LastMsg(ERROR,"you have no right to modify this category");
+         return(0);
+      }
+   }
+   if (defined($newrec)){ # check on modifikation of a record
+      my $cid=effVal($oldrec,$newrec,"catalogid");
+      my $c=getModuleObject($self->Config,"article::catalog");
+      if ($cid eq "" || !$c->isCatalogWriteValid($cid)){
+         $self->LastMsg(ERROR,"you have no right to write in given catalog");
+         return(0);
+      }
+   }
    
    return(1);
 }
@@ -306,7 +398,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL") if ($self->IsMemberOf(["admin"]));
+   return("ALL");
    return(undef);
 }
 
@@ -315,7 +407,14 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if ($self->IsMemberOf(["admin"]));
+   return("default") if (!defined($rec));
+
+   my $cid=$rec->{catalogid};
+   my $c=getModuleObject($self->Config,"article::catalog");
+   if ($c->isCatalogWriteValid($cid)){
+      return("default");
+   }
+   
    return(undef);
 }
 

@@ -3,4 +3,5 @@
 'Description'=>{de=>'Beschreibung'},
 'Provider'=>{de=>'Anbieter'},
 'fieldgroup.mgmt'=>{de=>'Management',en=>'Management'},
+'you have no right to write in given provider'=>{de=>'kein Schreibzugriff auf angebenene Anbieter'},
 

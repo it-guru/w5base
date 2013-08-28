@@ -130,8 +130,28 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'artdelivelement.realeditor'),
 
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
 
-                                  
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
+      new kernel::Field::Interface(
+                name          =>'mandatorid',
+                dataobjattr   =>'artdelivprovider.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'artdelivprovider.databoss'),
    );
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(fullname name cdate));
@@ -159,11 +179,55 @@ sub getDetailBlockPriority
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="artdelivelement ".
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+
+   my $from="$worktable ".
             "left outer join artdelivprovider  ".
-            "on artdelivelement.artdelivprovider=artdelivprovider.id ";
+            "on artdelivelement.artdelivprovider=artdelivprovider.id ".
+            "left outer join lnkcontact on lnkcontact.parentobj='article::delivprovider' ".
+            "and artdelivprovider.id=lnkcontact.refid";
    return($from);
 }
+
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf([qw(admin w5base.article.admin)],"RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                          [orgRoles(),qw(RMember RODManager RODManager2 
+                                         RODOperator
+                                         RAuditor RMonitor)],"both");
+      my @grpids=keys(%grps);
+
+      my $userid=$self->getCurrentUserId();
+      my @addflt=(
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?admin?=roles* ".
+                            "*roles=?read?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?admin?=roles* ".
+                            "*roles=?read?=roles*"}
+                );
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         push(@addflt,
+            {mandatorid=>\@mandators},
+            {databossid=>\$userid}
+         );
+      }
+      push(@flt,\@addflt);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
 
 
 sub Validate
@@ -172,6 +236,24 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $origrec=shift;
+
+
+   if (defined($oldrec)){ # check write on old category
+      my $cid=$oldrec->{providerid};
+      my $c=getModuleObject($self->Config,"article::delivprovider");
+      if (!$c->isProviderWriteValid($cid)){
+         $self->LastMsg(ERROR,"you have no right to modify this element");
+         return(0);
+      }
+   }
+   if (defined($newrec)){ # check on modifikation of a record
+      my $cid=effVal($oldrec,$newrec,"providerid");
+      my $c=getModuleObject($self->Config,"article::delivprovider");
+      if ($cid eq "" || !$c->isProviderWriteValid($cid)){
+         $self->LastMsg(ERROR,"you have no right to write in given provider");
+         return(0);
+      }
+   }
 
    my $name=effVal($oldrec,$newrec,"name");
    if ($name eq ""){
@@ -189,7 +271,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL") if ($self->IsMemberOf(["admin"]));
+   return("ALL");
    return(undef);
 }
 
@@ -198,7 +280,16 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","mgmt") if ($self->IsMemberOf(["admin"]));
+   return("default","mgmt") if (!defined($rec));
+
+   my $cid=$rec->{providerid};
+   my $c=getModuleObject($self->Config,"article::delivprovider");
+   if ($c->isProviderWriteValid($cid)){
+      return("default","mgmt");
+   }
+
+   return(undef);
+
    return(undef);
 }
 

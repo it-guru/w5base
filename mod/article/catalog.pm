@@ -21,8 +21,9 @@ use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
+use kernel::MandatorDataACL;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+@ISA=qw(kernel::App::Web::Listedit kernel::MandatorDataACL kernel::DataObj::DB);
 
 sub new
 {
@@ -154,8 +155,20 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'artcatalog.realeditor'),
 
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
 
-                                  
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
    );
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(fullname name cdate));
@@ -180,6 +193,57 @@ sub getDetailBlockPriority
 }
 
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf([qw(admin w5base.article.admin)],"RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                          [orgRoles(),qw(RMember RODManager RODManager2 
+                                         RODOperator
+                                         RAuditor RMonitor)],"both");
+      my @grpids=keys(%grps);
+
+      my $userid=$self->getCurrentUserId();
+      my @addflt=(
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?admin?=roles* ".
+                            "*roles=?read?=roles* *roles=?order?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?admin?=roles* ".
+                            "*roles=?read?=roles* *roles=?order?=roles*"}
+                );
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         push(@addflt,
+            {mandatorid=>\@mandators},
+            {databossid=>\$userid}
+         );
+      }
+      push(@flt,\@addflt);
+
+   }
+   return($self->SetFilter(@flt));
+}
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable left outer join lnkcontact ".
+            "on lnkcontact.parentobj='$selfasparent' ".
+            "and $worktable.id=lnkcontact.refid";
+
+   return($from);
+}
+
+
+
+
 
 sub Validate
 {
@@ -188,13 +252,48 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            my $userid=$self->getCurrentUserId();
+            $newrec->{databossid}=$userid;
+         }
+      }
+      if (defined($newrec->{databossid}) &&
+          $newrec->{databossid}!=$userid &&
+          $newrec->{databossid}!=$oldrec->{databossid}){
+         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                              "as databoss");
+         return(0);
+      }
+   }
+
    my $name=effVal($oldrec,$newrec,"frontlabel");
    if ($name eq ""){
-      $self->LastMsg(ERROR,"invalid label '\%s' specified",
-                     $name);
+      $self->LastMsg(ERROR,"invalid label '\%s' specified",$name);
       return(undef);
    }
+
+
    return(1);
+}
+
+
+sub isCatalogWriteValid
+{
+   my $self=shift;
+   my $id=shift;
+
+   $self->ResetFilter();
+   $self->SetFilter({id=>\$id});
+   my ($crec,$msg)=$self->getOnlyFirst(qw(ALL));
+   if (defined($crec)){
+      my @l=$self->isWriteValid($crec);
+      return(1) if (in_array(\@l,[qw(ALL default)]));
+   }
+   return();
 }
 
 
@@ -204,8 +303,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL") if ($self->IsMemberOf(["admin"]));
-   return(undef);
+   return("ALL");
 }
 
 
@@ -213,9 +311,48 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   my $userid=$self->getCurrentUserId();
    my @admedit=qw(default contacts);
-   return(@admedit) if ($self->IsMemberOf(["admin"]));
-   return(undef);
+   my $write=0;
+
+   if (!defined($rec)){
+      $write++;
+   }
+   else{
+      if (!$write &&
+          $self->IsMemberOf(["admin"])){
+         $write++;
+      }
+      if (!$write &&
+          $rec->{databossid} eq $userid){
+         $write++;
+      }
+      if (!$write &&
+          defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+         my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                     ["RMember"],"both");
+         my @grpids=keys(%grps);
+         foreach my $contact (@{$rec->{contacts}}){
+            if ($contact->{target} eq "base::user" &&
+                $contact->{targetid} ne $userid){
+               next;
+            }
+            if ($contact->{target} eq "base::grp"){
+               my $grpid=$contact->{targetid};
+               next if (!grep(/^$grpid$/,@grpids));
+            }
+            my @roles=($contact->{roles});
+            @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+            if (grep(/^write$/,@roles)){
+               $write++;
+            }
+         }
+      }
+   }
+   if ($write){
+      return($self->expandByDataACL($rec->{mandatorid},@admedit));
+   }
+   return();
 }
 
 

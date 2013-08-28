@@ -8,4 +8,6 @@
 'full Category'=>{de=>'gegliederte Kategorie'},
 'fieldgroup.products'=>{de=>'Produkte',en=>'Products'},
 'fieldgroup.subcategories'=>{de=>'Unter-Kategorien',en=>'Subcategories'},
+'you have no right to write in given catalog'=>{de=>'Sie haben kein Recht, in den angegebenen Katalog zu schreiben'},
+
 

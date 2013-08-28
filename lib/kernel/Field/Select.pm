@@ -118,6 +118,19 @@ sub getPostibleValues
    return();
 }
 
+sub copyFrom
+{
+   my $self=shift;
+   my $oldrec=shift;
+   if (ref($self->{vjoinon}) eq "ARRAY"){
+      my $onfield=$self->{vjoinon}->[0];
+      my $onfld=$self->getParent->getField($onfield);
+      return($onfld->RawValue($oldrec));
+   }
+   return($self->RawValue($oldrec));
+}
+
+
 sub FormatedDetail
 {
    my $self=shift;
