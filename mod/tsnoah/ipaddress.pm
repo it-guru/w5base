@@ -36,12 +36,42 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 label         =>'ID',
-                dataobjattr   =>"ip_id"),
+                dataobjattr   =>"ipaddress.ip_id"),
+
+      new kernel::Field::Text(
+                name          =>'ifname',
+                label         =>'Interface Name',
+                htmlwidth     =>'200',
+                nowrap        =>1,
+                dataobjattr   =>'interface.interface_name'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'IP-Address',
-                dataobjattr   =>'ip_adresse'),
+                dataobjattr   =>'ipaddress.ip_adresse'),
+
+      new kernel::Field::Boolean(
+                name          =>'isprimary',
+                label         =>'is primary',
+                dataobjattr   =>"decode(interface.primary_interface,".
+                                "'ja',1,'nein',0)"),
+
+      new kernel::Field::TextDrop(
+                name          =>'subnet',
+                label         =>'Subnet',
+                vjointo       =>'tsnoah::ipnet',
+                vjoinon       =>['subnetid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'subnetid',
+                label         =>'SubNetID',
+                dataobjattr   =>'interface.subnetz_id'),
+
+      new kernel::Field::Link(
+                name          =>'regionid',
+                label         =>'RegionID',
+                dataobjattr   =>'interface.region_id'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
@@ -49,20 +79,20 @@ sub new
                 vjointo       =>'tsnoah::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name',
-                uppersearch   =>1),
+                uppersearch   =>1,
+                dataobjattr   =>'device.devicename'),
 
       new kernel::Field::Link(
                 name          =>'systemid',
-                dataobjattr   =>'device_id'),
+                dataobjattr   =>'ipaddress.device_id'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'timestamp'),
+                dataobjattr   =>'ipaddress.timestamp'),
 
    );
-   $self->setWorktable("TSIIMP.darwin_ip");
    $self->setDefaultView(qw(name systemname mdate));
    return($self);
 }
@@ -78,6 +108,20 @@ sub Initialize
    return(0);
 }
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="tsiimp.DARWIN_IP ipaddress ".
+         "join tsiimp.DARWIN_INTERFACE interface ".
+         "on ipaddress.interfacezuordnung_id=interface.interfacezuordnung_id ".
+         "left outer join tsiimp.DARWIN_DEVICE device ".
+         "on interface.device_id=device.device_id";
+
+   return($from);
+}
+
+
+
 
 sub getDetailBlockPriority
 {
@@ -92,23 +136,9 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/ipaddress.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/ip_adress.jpg?".$cgi->query_string());
 }
          
-
-sub isViewValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return("ALL");
-}
-
-sub isWriteValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(undef);
-}
 
 
 1;

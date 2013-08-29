@@ -1,4 +1,4 @@
-package tsnoah::system;
+package tsnoah::vlan;
 #  W5Base Framework
 #  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
 #
@@ -34,38 +34,39 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
-                sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'ID',
-                dataobjattr   =>"device_id"),
+                dataobjattr   =>"vlan.vlan_id"),
+
+      new kernel::Field::Text(
+                name          =>'vlanid',
+                label         =>'VLAN-ID',
+                dataobjattr   =>"vlan.vlan_id"),
 
       new kernel::Field::Text(
                 name          =>'name',
-                ignorecase    =>1, 
-                label         =>'Systemname',
-                dataobjattr   =>'devicename'),
+                label         =>'VLAN label',
+                dataobjattr   =>'vlan.vlan_name'),
 
       new kernel::Field::Text(
-                name          =>'typ',
-                label         =>'Typ',
-                dataobjattr   =>'upper(devicetyp)'),
+                name          =>'contactemail',
+                label         =>'Contact email',
+                dataobjattr   =>'vlan.ansprechpartner'),
 
-      new kernel::Field::Text(
-                name          =>'sid',
-                label         =>'ServiceID/SystemID',
-                dataobjattr   =>'service_id'),
-
-      new kernel::Field::Text(
-                name          =>'techconcept',
-                label         =>'technical concept number',
-                dataobjattr   =>'fachkonzept'),
+      new kernel::Field::TextDrop(
+                name          =>'contact',
+                label         =>'Contact',
+                vjointo       =>'base::user',
+                vjoinon       =>['contactemail'=>'email'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::SubList(
-                name          =>'ipaddresses',
-                group         =>'ipaddresses',
-                label         =>'IP-Adresses',
-                vjointo       =>'tsnoah::ipaddress',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name','ifname','isprimary']),
+                name          =>'ipnets',
+                group         =>'ipnets',
+                label         =>'IP-Networks',
+                vjointo       =>'tsnoah::ipnet',
+                vjoinon       =>['id'=>'vlanid'],
+                vjoindisp     =>['name','fullname']),
 
       new kernel::Field::Date(
                 name          =>'mdate',
@@ -74,7 +75,7 @@ sub new
                 dataobjattr   =>'timestamp'),
 
    );
-   $self->setDefaultView(qw(name systemid techconcept));
+   $self->setDefaultView(qw(name vlanid mdate));
    return($self);
 }
 
@@ -89,13 +90,14 @@ sub Initialize
    return(0);
 }
 
-sub getSqlFrom   # hier muß dann noch die DARWIN_INTERFACE Tabelle mit eingebunden werden!
+sub getSqlFrom
 {
    my $self=shift;
-   my $from="tsiimp.DARWIN_DEVICE system";
+   my $from="tsiimp.DARWIN_VLAN vlan ";
 
    return($from);
 }
+
 
 
 
@@ -104,16 +106,16 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","ipaddresses","source");
+   return("header","default","ipnets","source");
 }
 
 
-sub getRecordImageUrl
-{
-   my $self=shift;
-   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
-}
+#sub getRecordImageUrl
+#{
+#   my $self=shift;
+#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+#   return("../../../public/itil/load/ip_network.jpg?".$cgi->query_string());
+#}
          
 
 

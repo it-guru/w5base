@@ -1,0 +1,5 @@
+'tsnoah::system'=>{de=>'NOAH: logisches System',en=>'NOAH: logical System'},
+'technical concept number'=>{de=>'Fachkonzeptnummer'},
+'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'IP-Adresses'=>{de=>'IP-Adressen'},
+

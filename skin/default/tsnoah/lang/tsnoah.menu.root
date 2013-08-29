@@ -1,0 +1,6 @@
+'itu.noah'=>{de=>'NOAH',en=>'NOAH'},
+'itu.noah.region'=>{de=>'Region',en=>'Region'},
+'itu.noah.system'=>{de=>'System',en=>'System'},
+'itu.noah.ipnet'=>{de=>'IP-Netzwerk',en=>'IP-Net'},
+'itu.noah.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
+'itu.noah.vlan'=>{de=>'VLAN',en=>'VLAN'},

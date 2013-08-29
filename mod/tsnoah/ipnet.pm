@@ -1,4 +1,4 @@
-package tsnoah::system;
+package tsnoah::ipnet;
 #  W5Base Framework
 #  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
 #
@@ -34,47 +34,56 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
-                sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'ID',
-                dataobjattr   =>"device_id"),
+                dataobjattr   =>"ipnet.subnetz_id"),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Subnet label',
+                dataobjattr   =>'ipnet.subnetzname'),
 
       new kernel::Field::Text(
                 name          =>'name',
-                ignorecase    =>1, 
-                label         =>'Systemname',
-                dataobjattr   =>'devicename'),
+                label         =>'Subnet',
+                dataobjattr   =>'ipnet.subnetz_von'),
 
       new kernel::Field::Text(
-                name          =>'typ',
-                label         =>'Typ',
-                dataobjattr   =>'upper(devicetyp)'),
+                name          =>'subnetmask',
+                label         =>'Subnet mask',
+                dataobjattr   =>'ipnet.subnetz_maske'),
 
-      new kernel::Field::Text(
-                name          =>'sid',
-                label         =>'ServiceID/SystemID',
-                dataobjattr   =>'service_id'),
-
-      new kernel::Field::Text(
-                name          =>'techconcept',
-                label         =>'technical concept number',
-                dataobjattr   =>'fachkonzept'),
+      new kernel::Field::Link(
+                name          =>'vlanid',
+                label         =>'VLAN-ID',
+                dataobjattr   =>'ipnet.vlan_id'),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
                 group         =>'ipaddresses',
                 label         =>'IP-Adresses',
+                htmldetail    =>0,
                 vjointo       =>'tsnoah::ipaddress',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name','ifname','isprimary']),
+                vjoinon       =>['id'=>'subnetid'],
+                vjoindisp     =>['name','systemname']),
+
+      new kernel::Field::TextDrop(
+                name          =>'systems',
+                group         =>'systems',
+                label         =>'Systems',
+                weblinkto     =>'NONE',
+                vjointo       =>'tsnoah::ipaddress',
+                vjoinon       =>['id'=>'subnetid'],
+                vjoindisp     =>'systemname'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'timestamp'),
+                dataobjattr   =>'ipnet.timestamp'),
 
    );
-   $self->setDefaultView(qw(name systemid techconcept));
+   $self->setDefaultView(qw(fullname name subnetmask mdate));
    return($self);
 }
 
@@ -89,13 +98,14 @@ sub Initialize
    return(0);
 }
 
-sub getSqlFrom   # hier muß dann noch die DARWIN_INTERFACE Tabelle mit eingebunden werden!
+sub getSqlFrom
 {
    my $self=shift;
-   my $from="tsiimp.DARWIN_DEVICE system";
+   my $from="tsiimp.DARWIN_SUBNETZ ipnet";
 
    return($from);
 }
+
 
 
 
@@ -104,7 +114,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","ipaddresses","source");
+   return("header","default","ipaddresses","systems","source");
 }
 
 
@@ -112,7 +122,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/ip_network.jpg?".$cgi->query_string());
 }
          
 

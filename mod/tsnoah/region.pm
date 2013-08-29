@@ -1,4 +1,4 @@
-package tsnoah::system;
+package tsnoah::region;
 #  W5Base Framework
 #  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
 #
@@ -34,38 +34,29 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
-                sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'ID',
-                dataobjattr   =>"device_id"),
+                dataobjattr   =>"region.region_id"),
 
       new kernel::Field::Text(
                 name          =>'name',
-                ignorecase    =>1, 
-                label         =>'Systemname',
-                dataobjattr   =>'devicename'),
+                label         =>'Region',
+                dataobjattr   =>"region.region_abkuerzung"),
 
       new kernel::Field::Text(
-                name          =>'typ',
-                label         =>'Typ',
-                dataobjattr   =>'upper(devicetyp)'),
+                name          =>'fullname',
+                label         =>'Region label',
+                dataobjattr   =>'region.region'),
 
       new kernel::Field::Text(
-                name          =>'sid',
-                label         =>'ServiceID/SystemID',
-                dataobjattr   =>'service_id'),
+                name          =>'division',
+                label         =>'Divison',
+                dataobjattr   =>'region.division'),
 
       new kernel::Field::Text(
-                name          =>'techconcept',
-                label         =>'technical concept number',
-                dataobjattr   =>'fachkonzept'),
-
-      new kernel::Field::SubList(
-                name          =>'ipaddresses',
-                group         =>'ipaddresses',
-                label         =>'IP-Adresses',
-                vjointo       =>'tsnoah::ipaddress',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name','ifname','isprimary']),
+                name          =>'dnsdomain',
+                label         =>'DNS-Domain',
+                dataobjattr   =>'region.dnsdomain'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
@@ -74,7 +65,7 @@ sub new
                 dataobjattr   =>'timestamp'),
 
    );
-   $self->setDefaultView(qw(name systemid techconcept));
+   $self->setDefaultView(qw(fullname dnsdomain mdate));
    return($self);
 }
 
@@ -89,13 +80,14 @@ sub Initialize
    return(0);
 }
 
-sub getSqlFrom   # hier muß dann noch die DARWIN_INTERFACE Tabelle mit eingebunden werden!
+sub getSqlFrom
 {
    my $self=shift;
-   my $from="tsiimp.DARWIN_DEVICE system";
+   my $from="tsiimp.DARWIN_REGION region ";
 
    return($from);
 }
+
 
 
 
@@ -104,16 +96,16 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","ipaddresses","source");
+   return("header","default","ipnets","source");
 }
 
 
-sub getRecordImageUrl
-{
-   my $self=shift;
-   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
-}
+#sub getRecordImageUrl
+#{
+#   my $self=shift;
+#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+#   return("../../../public/itil/load/ip_network.jpg?".$cgi->query_string());
+#}
          
 
 

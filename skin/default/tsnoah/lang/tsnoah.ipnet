@@ -1,0 +1,7 @@
+'tsnoah::ipnet'=>{de=>'IP-Subnet',en=>'IP-Subnet'},
+'Subnet label'=>{de=>'Subnet Bezeichnung'},
+'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'IP-Addresses'=>{de=>'IP-Adressen'},
+'Systems'=>{de=>'Systeme'},
+

@@ -1,0 +1,6 @@
+'tsnoah::vlan'=>{de=>'NOAH: VLAN',en=>'NOAH: VLAN'},
+'fieldgroup.ipnets'=>{de=>'IP-Netzwerke',en=>'IP-Networks'},
+'IP-Networks'=>{de=>'IP-Netzwerke'},
+'VLAN label'=>{de=>'VLAN Bezeichnung'},
+'Contact email'=>{de=>'Kontakt E-Mail'},
+'Contact'=>{de=>'Kontaktperson'},
