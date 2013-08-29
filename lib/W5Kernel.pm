@@ -24,8 +24,10 @@ sub msg
    $msg=sprintf($msg,@_);
    return("") if ($type eq "DEBUG" && $W5V2::Debug==0);
    my $d;
+   my $u="";
+   $u=" <$ENV{REMOTE_USER}>" if ($ENV{REMOTE_USER} ne "");
    foreach my $linemsg (split(/\n/,$msg)){
-      $d.=sprintf("%-6s %s\n",$type.":",$linemsg);
+      $d.=sprintf("%-6s %s%s\n",$type.":",$linemsg,$u);
    }
    if (($W5V2::OperationContext eq "W5Server" ||
         $W5V2::OperationContext eq "W5Replicate") && $type eq "INFO"){
