@@ -41,10 +41,12 @@ sub RegisterObj
    my $p=$c->{MenuAccessObject};
    my $user=$c->{UserObject};
    my $grp=$c->{GroupObject};
+
    if (!defined($p)){
       $p=getModuleObject($self->Config,"base::menu");
       $c->{MenuAccessObject}=$p;
    }
+   return(undef) if (!$p->IsMemberOf("admin"));
    if (!defined($user)){
       $user=getModuleObject($self->Config,"base::user");
       $c->{UserObject}=$user;
@@ -105,12 +107,16 @@ sub RegisterObj
                $grp->SetFilter({fullname=>\$acl});
                my ($chkrec,$msg)=$grp->getOnlyFirst(qw(fullname));
                $found=1 if (defined($chkrec));
+printf STDERR ("fifi 01: $param{defaultacl}\n");
                if (!$found){
                   $user->SetFilter({fullname=>\$acl});
                   my ($chkrec,$msg)=$user->getOnlyFirst(qw(fullname));
                   $found=1 if (defined($chkrec));
+printf STDERR ("fifi 02: $param{defaultacl}\n");
                }
+printf STDERR ("fifi 03: $found\n");
                if ($found){
+printf STDERR ("fifi 04: %s\n",Dumper(\%rec));
                   $dfield->vjoinobj->ValidatedInsertRecord(\%rec);
                }
             }
