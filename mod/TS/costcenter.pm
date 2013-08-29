@@ -53,7 +53,6 @@ sub new
                                   "?-".$f."-*",
                                   $f));
                    }
-                   print STDERR Dumper($flt);
                    return($flt);
                 },
                 vjoindisp     =>['name','status','description']),
