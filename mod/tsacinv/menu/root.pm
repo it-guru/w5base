@@ -184,6 +184,18 @@ sub Init
                       prio=>20000,
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("ac.ad",
+                      "tmpl/welcome",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("ac.ad.system",
+                      "tsacinv::autodiscsystem",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("ac.ad.system.ipaddress",
+                      "tsacinv::autodiscipaddress",
+                      defaultacl=>['valid_user']);
+   
    return(1);
 }
 

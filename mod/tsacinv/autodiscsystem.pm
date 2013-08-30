@@ -1,0 +1,155 @@
+package tsacinv::autodiscsystem;
+#  W5Base Framework
+#  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::App::Web;
+use kernel::DataObj::DB;
+use kernel::Field;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   $param{MainSearchFieldLines}=4;
+   my $self=bless($type->SUPER::new(%param),$type);
+
+   
+   $self->AddFields(
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
+
+      new kernel::Field::Id(
+                name          =>'id',
+                group         =>'source',
+                label         =>'DiscoveryID',
+                dataobjattr   =>'amtsiautodiscovery.lautodiscoveryid'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                ignorecase    =>1,
+                label         =>'Systemname',
+                dataobjattr   =>'amtsiautodiscovery.name'),
+
+      new kernel::Field::Text(
+                name          =>'systemid',
+                label         =>'SystemID',
+                dataobjattr   =>'amtsiautodiscovery.assettag'),
+
+      new kernel::Field::Text(
+                name          =>'model',
+                label         =>'Model',
+                dataobjattr   =>'amtsiautodiscovery.model'),
+
+      new kernel::Field::Text(
+                name          =>'osrelease',
+                label         =>'OS-Relases',
+                dataobjattr   =>'amtsiautodiscovery.os'),
+
+      new kernel::Field::Text(
+                name          =>'memory',
+                label         =>'Memory',
+                unit          =>'MB',
+                dataobjattr   =>'amtsiautodiscovery.lmemorymb'),
+
+      new kernel::Field::Text(
+                name          =>'cpucount',
+                label         =>'CPU-Count',
+                dataobjattr   =>'amtsiautodiscovery.itotalnumberofcores'),
+
+      new kernel::Field::Text(
+                name          =>'serialno',
+                label         =>'Serialnumber',
+                dataobjattr   =>'amtsiautodiscovery.name'),
+
+      new kernel::Field::SubList(
+                name          =>'ipadresses',
+                label         =>'IP-Addresses',
+                vjointo       =>'tsacinv::autodiscipaddress',
+                vjoinon       =>['id'=>'systemautodiscid'],
+                vjoindisp     =>['name','physicaladdress'],
+                vjoinbase     =>{scandate=>">now-7d"}),
+
+      new kernel::Field::Date(
+                name          =>'scandate',
+                group         =>'source',
+                label         =>'Scandate',
+                dataobjattr   =>'amtsiautodiscovery.dtscandate'),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'amtsiautodiscovery.source'),
+
+
+   );
+   $self->{use_distinct}=0;
+
+   $self->setDefaultView(qw(name systemid model scandate));
+   return($self);
+}
+
+
+sub Initialize
+{
+   my $self=shift;
+
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
+   return(@result) if (defined($result[0]) eq "InitERROR");
+   return(1) if (defined($self->{DB}));
+   return(0);
+}
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_scandate"))){
+     Query->Param("search_scandate"=>">now-7d");
+   }
+}
+
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="amtsiautodiscovery";
+
+   return($from);
+}
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="";
+   return($where);
+}
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return( qw(header default ipadresses source));
+}  
+
+
+1;

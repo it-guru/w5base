@@ -33,3 +33,6 @@
 'AL_TCom.system.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
 'AL_TCom.itclust.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
 'AL_TCom.appl.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
+'ac.ad'=>{de=>'AutoDiscovery',en=>'AutoDiscovery'},
+'ac.ad.system'=>{de=>'System',en=>'System'},
+'ac.ad.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
