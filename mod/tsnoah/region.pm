@@ -58,6 +58,14 @@ sub new
                 label         =>'DNS-Domain',
                 dataobjattr   =>'region.dnsdomain'),
 
+      new kernel::Field::SubList(
+                name          =>'ipnets',
+                group         =>'ipnets',
+                label         =>'IP-Networks',
+                vjointo       =>'tsnoah::ipnet',
+                vjoinon       =>['id'=>'regionid'],
+                vjoindisp     =>['name','fullname']),
+
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',

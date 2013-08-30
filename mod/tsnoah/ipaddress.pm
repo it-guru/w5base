@@ -68,11 +68,6 @@ sub new
                 label         =>'SubNetID',
                 dataobjattr   =>'interface.subnetz_id'),
 
-      new kernel::Field::Link(
-                name          =>'regionid',
-                label         =>'RegionID',
-                dataobjattr   =>'interface.region_id'),
-
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',

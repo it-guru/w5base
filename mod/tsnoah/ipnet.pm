@@ -58,6 +58,11 @@ sub new
                 label         =>'VLAN-ID',
                 dataobjattr   =>'ipnet.vlan_id'),
 
+      new kernel::Field::Link(
+                name          =>'regionid',
+                label         =>'RegionID',
+                dataobjattr   =>'ipnet.region_id'),
+
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
                 group         =>'ipaddresses',
