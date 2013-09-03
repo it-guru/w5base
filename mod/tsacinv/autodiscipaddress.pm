@@ -45,7 +45,6 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
-                ignorecase    =>1,
                 label         =>'IP-Address',
                 dataobjattr   =>'amtsiautodiscinterfaces.ipaddress'),
 

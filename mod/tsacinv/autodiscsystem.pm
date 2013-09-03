@@ -81,7 +81,7 @@ sub new
                 dataobjattr   =>'amtsiautodiscovery.name'),
 
       new kernel::Field::SubList(
-                name          =>'ipadresses',
+                name          =>'ipaddresses',
                 label         =>'IP-Addresses',
                 vjointo       =>'tsacinv::autodiscipaddress',
                 vjoinon       =>['id'=>'systemautodiscid'],

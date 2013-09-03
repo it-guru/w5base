@@ -143,7 +143,7 @@ sub new
                 vjoindisp     =>['name','systemid',
                                  'cistatus',
                                  'shortdesc'],
-                vjoininhash   =>['system','systemsystemid','systemcistatus',
+                vjoininhash   =>['name','systemsystemid','systemcistatus',
                                  'systemid']),
 
       new kernel::Field::Boolean(
