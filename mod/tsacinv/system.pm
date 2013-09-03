@@ -446,7 +446,8 @@ sub new
                 group         =>'ipaddresses',
                 vjointo       =>'tsacinv::ipaddress',
                 vjoinon       =>['systemid'=>'systemid'],
-                vjoindisp     =>[qw(ipaddress description)]),
+                vjoindisp     =>[qw(ipaddress description)],
+                vjoininhash   =>[qw(ipaddress description dnsname)]),
 
       new kernel::Field::SubList(
                 name          =>'applications',

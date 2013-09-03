@@ -233,8 +233,10 @@ sub doIPanalyse
             $a{$node}->{acsystemname}=$acrec->{systemname};
             map({$a{$node}->{ip}->{$_->{ipaddress}}={}}
                 @{$acrec->{ipaddresses}});
-            map({$a{$node}->{acIP}->{$_->{ipaddress}}={}}
-                @{$acrec->{ipaddresses}});
+            map({$a{$node}->{acIP}->{$_->{ipaddress}}={
+                   desc=>$_->{description},
+                   dnsname=>$_->{dnsname}
+                 }} @{$acrec->{ipaddresses}});
          }
       }
       #####################################
@@ -268,9 +270,23 @@ sub doIPanalyse
 
    # check if all found ip adresses are exists in autodisc data
    foreach my $ip (keys(%{$a->{$systemname}->{acIP}})){
+      if ($a->{$systemname}->{acIP}->{$ip}->{dnsname} ne "" &&
+          !($a->{$systemname}->{acIP}->{$ip}->{dnsname}=~m/\..*\./)){
+         push(@{$a->{systemname}->{msg}},
+            {class=>'am.valueissue',
+             level=>1,
+             label=>"The field 'dns name' of IP-Address '$ip' ".
+                    "on system '$systemname' ($systemid) in AssetManager ".
+                    "contains no valid dns name"
+             });
+
+      }
       if (!exists($a->{$systemname}->{acautoIP}->{$ip})){
          my $ok=0;
-         if ($a->{$systemname}->{isclusternode}){
+         if ($a->{$systemname}->{acIP}->{$ip}->{desc}=~m/\b(RSB|Console)\b/){  
+            $ok=1;       # RSB can not be detected by autodiscovery
+         }                         
+         if (!$ok && $a->{$systemname}->{isclusternode}){
             if (exists($a->{SHARED}->{ip}->{$ip})){
                $ok++;  # alles Super - $ip ist eine ClusterPacket Adresse
             }
@@ -289,7 +305,7 @@ sub doIPanalyse
                $clusttext=" or any other node in the cluster"; 
             }
             push(@{$a->{systemname}->{msg}},
-               {class=>'ac.ipoverhead',
+               {class=>'am.ipoverhead',
                 level=>2,
                 label=>"The IP-Address '$ip' found in AssetManager, ".
                        "can not be detected (autodiscovery) on the ".
@@ -298,8 +314,22 @@ sub doIPanalyse
          }
       }
       if (exists($a->{$systemname}->{noahIP}->{$ip})){
-         my $noahname=$a->{$systemname}->{noahIP}->{$ip}->{name};
-         if (lc($noahname) ne lc($systemname)){
+         my $noahname=lc($a->{$systemname}->{noahIP}->{$ip}->{name});
+         my $noahnameok=0;
+         if ($noahname eq lc($systemname)){
+            $noahnameok=1;
+         }
+         if (!$noahnameok && $a->{$systemname}->{isclusternode}){
+            # check if the name in noah is for an other system in cluster
+            foreach my $node (map({$_->{name}} 
+                                  @{$a->{$systemname}->{nodes}})){
+               if (lc($node) eq $noahname){
+                  $noahnameok=1;
+               }
+            }
+         }
+         
+         if (!$noahnameok){
             push(@{$a->{systemname}->{msg}},
                {class=>'noah.issue',
                 level=>3,
@@ -312,6 +342,12 @@ sub doIPanalyse
       }
    }
    foreach my $ip (keys(%{$a->{$systemname}->{acautoIP}})){
+      if ($ip=~m/^fe80:0000:0000:0000:/){  # ignore Link-Local-Adressen IPv6
+         next;
+      }
+      if ($ip=~m/^127\..*$/){  # loopback Netz IPv4 127.0.0.0/8
+         next;
+      }
       if (!exists($a->{$systemname}->{acIP}->{$ip})){
          my $ok=0;
          if ($a->{$systemname}->{isclusternode}){
@@ -333,7 +369,7 @@ sub doIPanalyse
                $clusttext=" or any other node in the cluster"; 
             }
             push(@{$a->{systemname}->{msg}},
-               {class=>'ac.missip',
+               {class=>'am.missip',
                 level=>3,
                 label=>"The IP-Address '$ip' found by AutoDiscovery ".
                        "on '$systemname' ($systemid) is not documented ".
@@ -343,10 +379,8 @@ sub doIPanalyse
       }
    }
 
-   #print STDERR Dumper(\%a);
+#   print STDERR Dumper(\%a);
    return(\%a);
-
-
 }
 
 
