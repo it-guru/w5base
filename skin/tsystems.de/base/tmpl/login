@@ -7,8 +7,9 @@
 <p>
 <div style="padding:10px;width:80%;border-style:solid;border-color:#E20074;border-width:4px;text-align:left">
 <center>
-<h1>W5Base/Darwin Login</h1>
+<input type=button style="font-size:18px;padding:5px;width:250px" value=" W5Base/Darwin Login " onclick="dologin();">
 </center>
+
 
 <!--
 Die Anmeldung ins W5Base Framework erfolgt mit Ihrem "normalen" WindowsNT 
@@ -26,12 +27,12 @@ Hier können Sie sich mit Ihrer ...
 <li>Ihrem WindowsNT-Domänen-Account</li>
 <li>Oder falls bereits auf Windows 7 migriert mit Ihrem EMEA1-Account</li>
 </ul>
-... in die Anwendung W5Base/Darwin einloggen.<br>
+... in die Anwendung W5Base/Darwin einloggen. Verwenden Sie dazu dann Ihr Passwort aus dem betreffendem (Authentifikations-) System.<br>
 <br>
 
-Falls Sie noch nicht für Nutzung von W5Base/Darwin registriert sind, melden Sie sich einfach wie eben beschrieben an,
+Falls Sie noch nicht für die Nutzung von W5Base/Darwin registriert sind, melden Sie sich wie eben beschrieben an.
 Sie erhalten danach eine Registrierungs-Email mit der Sie Ihre Kennung oder Ihren Account bestätigen 
-und sich damit für die Nutzung registrieren. Dies ist nur einmal notwendig.<br>
+und sich damit für die Nutzung registrieren. <br>
 <br>
 Beispiel Account Mueller.Hans, Domäne sued3:<br>
 Windows NT: sued3/mueller.hans<br>
@@ -41,13 +42,13 @@ EMEA1 Account: emea1/a???????<br>
 
 
 
-Achten Sie darauf, dass der Anmeldename (Account) kleingeschrieben werden muß.  Bitte beachten Sie, dass Sonderzeichen (äöüß) und Leerzeichen im Passwort zu Problemen führen können.<br>
+Achten Sie bitte darauf, dass der Anmeldename (Account) kleingeschrieben werden muß.  Bitte beachten Sie, dass Sonderzeichen (äöüß) und Leerzeichen im Passwort zu Problemen führen können.<br>
 <br>
 Verschiedene Funktionen und Bereiche von Darwin stehen Ihnen auch ohne Anmeldung zur Verfügung.<br>
 
 </div>
 <hr width=80%>
-Um fortzufahren klicken Sie bitte auf Login.<br>
+Um fortzufahren klicken Sie bitte auf <b>"W5Base/Darwin Login"</b>.<br>
 <p><b>
 <script language="JavaScript">
 function dologin()
@@ -56,7 +57,6 @@ function dologin()
 }
 </script>
 <br>
-<input type=button style="font-size:18px;padding:5px;width:200px" value=" Login " onclick="dologin();">
 <br>
 </td>
 </tr>
