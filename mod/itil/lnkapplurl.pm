@@ -61,6 +61,7 @@ sub new
                                                    
       new kernel::Field::Select(
                 name          =>'applcistatus',
+                readonly      =>1,
                 group         =>'applinfo',
                 label         =>'Application CI-State',
                 vjointo       =>'base::cistatus',
@@ -108,18 +109,21 @@ sub new
       new kernel::Field::Text(
                 name          =>'scheme',
                 group         =>'urlinfo',
+                readonly      =>1,
                 label         =>'Scheme',
                 dataobjattr   =>'accessurl.scheme'),
                                                    
       new kernel::Field::Text(
                 name          =>'hostname',
                 group         =>'urlinfo',
+                readonly      =>1,
                 label         =>'Hostname',
                 dataobjattr   =>'accessurl.hostname'),
                                                    
       new kernel::Field::Number(
                 name          =>'ipport',
                 group         =>'urlinfo',
+                readonly      =>1,
                 label         =>'IP-Port',
                 dataobjattr   =>'accessurl.ipport'),
                                                    
