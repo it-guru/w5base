@@ -214,6 +214,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
+                readonly      =>1,
                 group         =>'applinfo',
                 translation   =>'itil::appl',
                 vjointo       =>'base::grp',
@@ -224,6 +225,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'applcustomerprio',
                 label         =>'Customers Application Prioritiy',
+                readonly      =>1,
                 translation   =>'itil::appl',
                 group         =>'applinfo',
                 dataobjattr   =>'appl.customerprio'),
