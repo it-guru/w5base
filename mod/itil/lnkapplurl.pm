@@ -208,6 +208,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'applapplid',
                 label         =>'ApplicationID',
+                readonly      =>1,
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
 
