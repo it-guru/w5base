@@ -209,6 +209,7 @@ sub new
                 name          =>'applapplid',
                 label         =>'ApplicationID',
                 readonly      =>1,
+                uploadable    =>0,
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
 
