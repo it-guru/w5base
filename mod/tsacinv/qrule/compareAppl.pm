@@ -73,6 +73,7 @@ sub qcheckRecord
    my $errorlevel=0;
 
    return(0,undef) if ($rec->{cistatusid}!=4 &&
+                       $rec->{cistatusid}!=4 &&
                        $rec->{cistatusid}!=5); # ist notwendig, damit CIs
                                                # auch wieder aktiviert
                                                # werden.
@@ -316,10 +317,11 @@ sub qcheckRecord
       }
    }
    else{
-      if ($rec->{mandator} ne "Extern"){
-         push(@qmsg,'no applicationid specified');
-         $errorlevel=3 if ($errorlevel<3);
-      }
+     # makes no sense, becaus this is often not suggestible by the databoss
+     # if ($rec->{mandator} ne "Extern"){
+     #    push(@qmsg,'no applicationid specified');
+     #    $errorlevel=3 if ($errorlevel<3);
+     # }
    }
 
 

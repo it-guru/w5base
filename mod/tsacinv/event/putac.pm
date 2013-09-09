@@ -254,7 +254,7 @@ sub ApplicationModified
    my $mand=getModuleObject($self->Config,"tsacinv::mandator");
    my $mandconfig;
    my $acuser=getModuleObject($self->Config,"tsacinv::user");
-   my %filter=(cistatusid=>['3','4']);
+   my %filter=(cistatusid=>['3','4','5']);
    $self->{DebugMode}=0;
    if ($#appid!=-1){
       if (grep(/^debug$/i,@appid)){
@@ -570,6 +570,9 @@ sub ApplicationModified
                my $acstatus="IN OPERATION";
                if ($rec->{cistatusid}==3){
                   $acstatus="PROJECT";
+               }
+               if ($rec->{cistatusid}==5){
+                  $acstatus="OUT OF OPERATION";
                }
                my $acftprec={
                                 Appl=>{
