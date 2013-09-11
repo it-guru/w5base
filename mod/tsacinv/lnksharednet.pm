@@ -97,6 +97,12 @@ sub new
       new kernel::Field::Text(
                 name          =>'netnature',
                 label         =>'Network-Component Nature',
+                dataobjattr   =>'netparentnature.name'),
+
+
+      new kernel::Field::Text(
+                name          =>'netnature',
+                label         =>'Network-Component Nature',
                 size          =>'20',
                 ignorecase    =>1,
                 dataobjattr   =>'netparentnature.name'),
@@ -152,7 +158,8 @@ sub initSqlWhere
       "and amtsirelportfappl.bdelete='0' ".
       "and netcomputer.litemid=netportfolio.lportfolioitemid ".
       "and netcomputer.status<>'out of operation' ".
-      "and netparentnature.name in ('SWITCH') ".
+      "and netparentnature.name in ".
+      "('SWITCH','FIREWALL-BOX','FC-SWITCH','ROUTER') ".
       "and amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid ";
    return($where);
 }

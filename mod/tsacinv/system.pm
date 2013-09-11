@@ -206,6 +206,18 @@ sub new
                 group         =>'form',
                 dataobjattr   =>'amcomputer.computertype'),
 
+      new kernel::Field::Text(
+                name          =>'model',
+                label         =>'Model',
+                group         =>'form',
+                dataobjattr   =>'ammodel.name'),
+
+      new kernel::Field::Text(
+                name          =>'nature',
+                label         =>'Nature',
+                group         =>'form',
+                dataobjattr   =>'amnature.name'),
+
       new kernel::Field::Boolean(
                 name          =>'soxrelevant',
                 label         =>'SOX relevant',
@@ -825,7 +837,7 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from=
-      "amcomputer,amportfolio,ammodel,".
+      "amcomputer,amportfolio,ammodel,amnature,".
       "(select amcostcenter.* from amcostcenter ".
       " where amcostcenter.bdelete=0) amcostcenter, ".
       "amportfolio assetportfolio, ".
@@ -855,6 +867,7 @@ sub initSqlWhere
       "and amportfolio.lparentid=assetportfolio.lportfolioitemid(+) ".
       "and amportfolio.lportfolioitemid=amcomputer.litemid ".
       "and amportfolio.lmodelid=ammodel.lmodelid ".
+      "and ammodel.lnatureid=amnature.lnatureid ".
       "and amportfolio.ltenantid=amtenant.ltenantid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
       "and amportfolio.lportfolioitemid=tbsm.lportfolioid(+) ".
