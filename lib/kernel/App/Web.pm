@@ -1750,12 +1750,13 @@ sub findtemplvar
       }
       my $qs=kernel::cgi::Hash2QueryString(%param);
 
-      my $onclick="javascript:openwin('$url?$qs','_help',".
+      my $onclick="openwin('$url?$qs','_help',".
                   "'height=570,width=680,toolbar=no,status=no,".
-                  "resizable=yes,scrollbars=auto')";
-      return("<span class=sublink onclick=\"$onclick\" ".
+                  "resizable=yes,scrollbars=auto');return(false);";
+      return("<a href=\"http://find.telekom.de\" ".
+             "class=sublink onclick=\"$onclick\" ".
              "title=\"globalHelp\" alt=\"globalHelp\">".
-             "<img border=0 alt=\"Help Icon\" src=\"$icon\"></span>");
+             "<img border=0 alt=\"Help Icon\" src=\"$icon\"></a>");
    }
    elsif ($var eq "StdButtonBar"){
       my $d="<div class=buttonframe>";

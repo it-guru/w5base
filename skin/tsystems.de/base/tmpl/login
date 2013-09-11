@@ -20,31 +20,41 @@ Falls Ihr Arbeitsplatz bereits auf Windows7 umgestellt ist, sollten Sie sich
 auch mit Ihrem EMEA1 Account (also z.B. <b>emea1/a???????</b> ) anmelden können.<br>
 <br>
 -->
+<img align=right style="position:relative;top:-40px;right:-10px;align:right" src="../../../public/base/load/logo_200x78.jpg">
 
-Hier können Sie sich mit Ihrer ...
+In der Anwendung W5Base/Darwin können Sie sich mit Ihrer ...
 <ul>
-<li>WhoIsWho-Kennung,</li>
-<li>Ihrem WindowsNT-Domänen-Account</li>
-<li>Oder falls bereits auf Windows 7 migriert mit Ihrem EMEA1-Account</li>
+<li>... WhoIsWho-Kennung,</li>
+<li>... WindowsNT-Domain-Account</li>
+<li>... oder falls bereits auf Windows 7 migriert mit Ihrem EMEA1-Account (NT-Domain EMEA1)</li>
 </ul>
-... in die Anwendung W5Base/Darwin einloggen. Verwenden Sie dazu dann Ihr Passwort aus dem betreffendem (Authentifikations-) System.<br>
-<br>
+... anmelden. Verwenden Sie dazu dann Ihr Passwort aus dem betreffendem (Authentifikations-) System.<br>
+<div style="clear:both;height:5px"></div>
 
 Falls Sie noch nicht für die Nutzung von W5Base/Darwin registriert sind, melden Sie sich wie eben beschrieben an.
 Sie erhalten danach eine Registrierungs-Email mit der Sie Ihre Kennung oder Ihren Account bestätigen 
 und sich damit für die Nutzung registrieren. <br>
-<br>
-Beispiel Account Mueller.Hans, Domäne sued3:<br>
-Windows NT: sued3/mueller.hans<br>
-WhoIsWho: . wiw/hmueller<br>
-EMEA1 Account: emea1/a???????<br>
-<br>
+<div style="clear:both;height:10px"></div>
+<b>Beispiel:</b> &nbsp;Account Mueller.Hans, Domäne sued3:<br>
+<div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
+Windows NT: sued3/mueller.hans
+</div>
+
+<div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
+WhoIsWho: wiw/hmueller
+</div>
+
+<div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
+EMEA1 Account: emea1/a???????
+</div>
+
+<div style="clear:both;height:5px"></div>
 
 
-
+Verschiedene Funktionen und Bereiche von Darwin stehen Ihnen allerdings auch ohne Anmeldung zur Verfügung. 
 Achten Sie bitte darauf, dass der Anmeldename (Account) kleingeschrieben werden muß.  Bitte beachten Sie, dass Sonderzeichen (äöüß) und Leerzeichen im Passwort zu Problemen führen können.<br>
-<br>
-Verschiedene Funktionen und Bereiche von Darwin stehen Ihnen auch ohne Anmeldung zur Verfügung.<br>
+<div style="clear:both;height:10px"></div>
+Nutzen Sie auch <a href="http://find.telekom.de" target=_blank>http://find.telekom.de</a> mit vereinfachter Darstellung. Einfache Nutzung durch Reduktion auf das wesentliche. Verwendung auf dem PC, Smartphone oder auch für Menschen mit Einschränkungen.
 
 </div>
 <hr width=80%>
