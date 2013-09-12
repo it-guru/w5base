@@ -2142,6 +2142,9 @@ sub ProcessUploadRecord
             print msg(INFO,"update record with id $id");
          }
          ${$param{countok}}++ if (ref($param{countok}) eq "SCALAR");
+         if ($param{infomail}){
+            $self->SendUploadInfoMail2Databoss(\%param,$oldrec,$newrec,$id);
+         }
       }
       else{
          if ($self->LastMsg()){
@@ -2174,10 +2177,61 @@ sub ProcessUploadRecord
             }
             ${$param{countok}}++ if (ref($param{countok}) eq "SCALAR");
          }
+         if ($param{infomail}){
+            $self->SendUploadInfoMail2Databoss(\%param,undef,$newrec,$newid);
+         }
       }
    }
    $self->LastMsg("");
    return(1);
+}
+
+
+sub SendUploadInfoMail2Databoss
+{
+   my $self=shift;
+   my $param=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $id=shift;
+   my $infomailtext=$param->{infomailtext};
+   return() if ($infomailtext=~m/^\s*$/);
+
+   $self->ResetFilter();
+   my $idname=$self->IdField()->Name();
+   $self->SetFilter({$idname=>\$id});
+   my ($current)=$self->getOnlyFirst(qw(ALL));
+
+   my $cilabel=$self->getRecordHeader($current);
+   my $lang=$self->Lang();
+   my $userid=$self->getCurrentUserId();
+   my $databossname=$self->T("Databoss");
+
+   my $databossid=$current->{databossid};
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$databossid});
+   my ($databossrec)=$user->getOnlyFirst(qw(purename lastlang));
+   if (defined($databossrec)){
+      $lang=$databossrec->{lastlang} if ($databossrec->{lastlang} ne "");
+      $databossname=$databossrec->{purename};
+   }
+
+   my $itext=extractLangEntry($infomailtext,$lang,8192,1);
+   $self->ParseTemplateVars(\$itext,{current=>$current,
+                                     static=>{
+                                        CILABEL=>$cilabel,
+                                        DATABOSSNAME=>$databossname
+                                     }});
+
+   print msg(INFO,"sending infomail to $databossid ($lang)");
+   my $wfa=$self->getPersistentModuleObject("InfoMailSender",
+                                            "base::workflowaction");
+   $wfa->Notify("INFO","zentralized data upload to ".$cilabel,$itext,
+                dataobj=>$self->Self(),
+                dataobjid=>$id,
+                emailfrom=>$userid,
+                emailto=>$databossid,
+                emailbcc=>$userid);
 }
 
 
@@ -2190,6 +2244,12 @@ sub Upload
    if (!$self->isUploadValid()){
       print($self->noAccess()); 
       return(undef); 
+   }
+   my $infomail=0;
+   my $infomailtext;
+   if (Query->Param("INFOMAIL") ne ""){
+      $infomail=1;
+      $infomailtext=Query->Param("INFOMAILTEXT");
    }
    my $file=Query->Param("file");
    my $HistoryComments=Query->Param("HistoryComments");
@@ -2260,9 +2320,11 @@ sub Upload
                                       if ($fldchk &&
                                           $self->prepUploadRecord($prec)){
                                          $self->ProcessUploadRecord($prec,
-                                                    debug=>$debug,
-                                                    countok=>\$countok,
-                                                    countfail=>\$countfail);
+                                                  debug=>$debug,
+                                                  countok=>\$countok,
+                                                  countfail=>\$countfail,
+                                                  infomail=>$infomail,
+                                                  infomailtext=>$infomailtext);
                                       }
                                       else{
                                          $countfail++;
@@ -2308,6 +2370,12 @@ sub UploadFrame
 {
    my $self=shift;
    my %param=@_;
+   my $infomailmode=0;
+
+   my $databossidfld=$self->getField("databossid");
+   if (defined($databossidfld)){
+      $infomailmode=1;
+   }
 
    if (!$self->isUploadValid()){
       print($self->noAccess()); 
@@ -2437,20 +2505,28 @@ EOF
    print("</table></td>");
    print("</td></tr>");
    print("<tr><td>");
+   print("<hr>");
 
 
    print("<table border=0 width=\"100%\">");
-   printf("<tr><td width=100 nowrap><b><u>%s:</u></b></td>",$self->T("Upload File"));
+   printf("<tr><td width=100 nowrap><b><u>%s:</u></b></td>",
+          $self->T("Upload File"));
    print("<td align=left><input size=55 type=file name=file></td></tr>");
    print("</tr></table><hr>");
 
-   printf("<div id=info style=\"visibility:hidden;display:none\">");
-   print("<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>");
-   print("<tr><td><u><b>Info mail to databoss:</b></ul></td></tr><td>".
-         "<textarea style=\"width:100%\" ".
-         "name=INFOMAILTEXT wrap=off rows=3 cols=10></textarea>");
-   print("</td><tr></table>");
-   printf("</div>");
+   if ($infomailmode){
+      my $infomailtemplate=$self->getTemplate("tmpl/uploadinfomail","base");
+
+      printf("<div id=info style=\"visibility:hidden;display:none\">");
+      print("<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>");
+      print("<tr><td><u><b>".$self->T("Info mail to databoss").
+            ":</b></ul></td></tr><td>".
+            "<textarea style=\"width:100%\" ".
+            "name=INFOMAILTEXT wrap=off rows=3 cols=10>".$infomailtemplate.
+            "</textarea>");
+      print("</td><tr></table>");
+      printf("</div>");
+   }
 
 
    printf("<table border=0 width=100%>");
@@ -2465,8 +2541,14 @@ EOF
 
    print("<td width=25% align=center>");
    print("<input type=checkbox class=checkbox name=DEBUG>Debug");
-   print("&nbsp;&nbsp;");
-   print("<input type=checkbox class=checkbox name=INFOMAIL onclick=\"document.getElementById('info').style.visibility=(this.checked)?'visible':'hidden';document.getElementById('info').style.display=(this.checked)?'block':'none';\">InfoMail");
+   if ($infomailmode){
+      print("&nbsp;&nbsp;");
+      print("<input type=checkbox class=checkbox name=INFOMAIL ".
+            "onclick=\"document.getElementById('info').style.visibility=".
+                        "(this.checked)?'visible':'hidden';".
+                     "document.getElementById('info').style.display=".
+                        "(this.checked)?'block':'none';\">InfoMail");
+   }
    print("</td>");
 
    print("</tr></table><hr>");

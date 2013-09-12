@@ -1,0 +1,22 @@
+Dear %DATABOSSNAME%,
+
+i have correct some attributes in the 
+Config-Item "%CILABEL%".  This correction did not 
+release you from your data responsibility! Please 
+ensure, that all informations will 
+be managed in the future, too.
+
+Kind regards
+
+
+[de:]
+Sehr geehrte(r) %DATABOSSNAME%,
+
+ich habe durch einen zentralen Upload das 
+Config-Item "%CILABEL%" korrigiert. Diese Korrektur 
+enbindet Sie nicht von Ihrer Datenverantwortung für 
+dieses Feld. Stellen Sie bitte sicher, dass auch in 
+Zukunft diese Information immer korrekt geführt wird.
+
+Mit freundlichem Gruss
+
