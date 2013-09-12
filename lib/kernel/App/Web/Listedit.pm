@@ -2397,12 +2397,12 @@ EOF
    print("<tr><td align=center valign=top>");
    print("<table width=\"70%\" class=uploadframe border=0>");
    print("<tr><td>");
-   print("<table  border=1 width=\"100%\" cellspacing=0 cellpadding=0>");
-   print("<tr><td><table border=1 width=\"100%\" border=0 ".
+   print("<table  border=0 width=\"100%\" cellspacing=0 cellpadding=0>");
+   print("<tr><td><table border=0 width=\"100%\" border=0 ".
          "cellspacing=0 cellpadding=0><tr><td valign=top width=1%>");
 
 
-   printf("<table border=1><tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Templates"));
+   printf("<table border=0><tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Templates"));
    print("<tr><td align=center>");
    my @formats=(icon_xls=>'XlsV01',
                 icon_xml=>'XMLV01');
@@ -2426,7 +2426,7 @@ EOF
    print("</td>");
    if ($self->IsMemberOf("admin")){
       print("<td valign=bottom>"); ################################
-      print("<table border=1 width=\"100%\" cellspacing=0 cellpadding=0>");
+      print("<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>");
       print("<tr><td><u><b>History note:</b></ul></td></tr><td>".
             "<textarea style=\"width:100%\" ".
             "name=HistoryComments wrap=off rows=3 cols=10></textarea>");
@@ -2439,13 +2439,13 @@ EOF
    print("<tr><td>");
 
 
-   print("<table border=1 width=\"100%\">");
+   print("<table border=0 width=\"100%\">");
    printf("<tr><td width=100 nowrap><b><u>%s:</u></b></td>",$self->T("Upload File"));
-   print("<td align=left><input size=85 type=file name=file></td></tr>");
-   print("</tr></table>");
+   print("<td align=left><input size=55 type=file name=file></td></tr>");
+   print("</tr></table><hr>");
 
    printf("<div id=info style=\"visibility:hidden;display:none\">");
-   print("<table border=1 width=\"100%\" cellspacing=0 cellpadding=0>");
+   print("<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>");
    print("<tr><td><u><b>Info mail to databoss:</b></ul></td></tr><td>".
          "<textarea style=\"width:100%\" ".
          "name=INFOMAILTEXT wrap=off rows=3 cols=10></textarea>");
@@ -2453,9 +2453,9 @@ EOF
    printf("</div>");
 
 
-   printf("<table border=1 width=100%>");
+   printf("<table border=0 width=100%>");
    print("<tr>");
-   print("<td width=25% align=center></td>");
+   print("<td width=25% align=center>&nbsp;</td>");
 
 
    print("<td align=center>");
@@ -2469,9 +2469,9 @@ EOF
    print("<input type=checkbox class=checkbox name=INFOMAIL onclick=\"document.getElementById('info').style.visibility=(this.checked)?'visible':'hidden';document.getElementById('info').style.display=(this.checked)?'block':'none';\">InfoMail");
    print("</td>");
 
-   print("</tr></table>");
+   print("</tr></table><hr>");
 
-   print("<table border=1 width=\"100%\">");
+   print("<table border=0 width=\"100%\">");
    printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Result"));
    print("<tr><td>");
    print("<iframe onload=\"isLoaded(self);\" ".
