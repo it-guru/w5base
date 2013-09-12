@@ -2354,6 +2354,12 @@ function SetButtonState(flag)
       }
    }
 }
+function isLoaded()
+{
+   isloading=0;
+   window.setTimeout('SetButtonState(false);',500);
+}
+
 function PreventDoublePost()
 {
    var d=window.document;
@@ -2370,10 +2376,6 @@ function ScrollDown()
 { 
    frames['uploadresult'].document.
          getElementsByTagName("pre")[0].style.fontSize="11px";
-   if (frames['uploadresult'].document.body.innerHTML.search("end upload")!=-1){
-      isloading=0;
-      window.setTimeout('SetButtonState(false);',1500);
-   }
    if (oldscroll==frames['uploadresult'].document.body.scrollTop){
       var o=frames['uploadresult'].document.body.scrollTop;
       frames['uploadresult'].scrollBy(0,5);
@@ -2395,12 +2397,12 @@ EOF
    print("<tr><td align=center valign=top>");
    print("<table width=\"70%\" class=uploadframe border=0>");
    print("<tr><td>");
-   print("<table width=\"100%\" cellspacing=0 cellpadding=0>");
-   print("<tr><td><table width=\"100%\" border=0 ".
-         "cellspacing=0 cellpadding=0><tr><td valign=top>");
+   print("<table  border=1 width=\"100%\" cellspacing=0 cellpadding=0>");
+   print("<tr><td><table border=1 width=\"100%\" border=0 ".
+         "cellspacing=0 cellpadding=0><tr><td valign=top width=1%>");
 
 
-   printf("<table><tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Templates"));
+   printf("<table border=1><tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Templates"));
    print("<tr><td align=center>");
    my @formats=(icon_xls=>'XlsV01',
                 icon_xml=>'XMLV01');
@@ -2418,24 +2420,14 @@ EOF
       $w=50;
    }
 
-   print("</td><td width=$w% valign=bottom>"); ##############################
+#   print("</td><td width=$w% valign=bottom>"); ##############################
 
-   printf("<table><tr><td><br></td></tr>");
-   print("<tr><td align=center>");
-   print("<input type=checkbox class=checkbox name=DEBUG>Debug");
-   print("</td><tr>");
-   print("<tr><td align=center>");
-   printf("<input class=uploadbutton type=submit value=\"%s\" ".
-         "></td></tr>",$self->T("start upload"));
-   print("</td></tr>");
-
-   print("</table>");
 
    print("</td>");
    if ($self->IsMemberOf("admin")){
-      print("<td width=45% valign=bottom>"); ################################
-      print("<table width=\"100%\" cellspacing=0 cellpadding=0>");
-      print("<tr><td>History note:<br>".
+      print("<td valign=bottom>"); ################################
+      print("<table border=1 width=\"100%\" cellspacing=0 cellpadding=0>");
+      print("<tr><td><u><b>History note:</b></ul></td></tr><td>".
             "<textarea style=\"width:100%\" ".
             "name=HistoryComments wrap=off rows=3 cols=10></textarea>");
       print("</td><tr></table>");
@@ -2445,19 +2437,52 @@ EOF
    print("</table></td>");
    print("</td></tr>");
    print("<tr><td>");
-   print("<table width=\"100%\">");
-   printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload File"));
-   print("<tr><td align=center><input size=55 type=file name=file></td></tr>");
-   print("<tr><td>");
-   print("<table width=\"100%\">");
+
+
+   print("<table border=1 width=\"100%\">");
+   printf("<tr><td width=100 nowrap><b><u>%s:</u></b></td>",$self->T("Upload File"));
+   print("<td align=left><input size=85 type=file name=file></td></tr>");
+   print("</tr></table>");
+
+   printf("<div id=info style=\"visibility:hidden;display:none\">");
+   print("<table border=1 width=\"100%\" cellspacing=0 cellpadding=0>");
+   print("<tr><td><u><b>Info mail to databoss:</b></ul></td></tr><td>".
+         "<textarea style=\"width:100%\" ".
+         "name=INFOMAILTEXT wrap=off rows=3 cols=10></textarea>");
+   print("</td><tr></table>");
+   printf("</div>");
+
+
+   printf("<table border=1 width=100%>");
+   print("<tr>");
+   print("<td width=25% align=center></td>");
+
+
+   print("<td align=center>");
+   printf("<input class=uploadbutton style=\"width:250px\" ".
+          "type=submit value=\"%s\" ".
+         "></td>",$self->T("start upload"));
+
+   print("<td width=25% align=center>");
+   print("<input type=checkbox class=checkbox name=DEBUG>Debug");
+   print("&nbsp;&nbsp;");
+   print("<input type=checkbox class=checkbox name=INFOMAIL onclick=\"document.getElementById('info').style.visibility=(this.checked)?'visible':'hidden';document.getElementById('info').style.display=(this.checked)?'block':'none';\">InfoMail");
+   print("</td>");
+
+   print("</tr></table>");
+
+   print("<table border=1 width=\"100%\">");
    printf("<tr><td><b><u>%s:</u></b></td></tr>",$self->T("Upload Result"));
    print("<tr><td>");
-   print("<iframe id=uploadresult src=\"UploadWelcome\" name=uploadresult ".
+   print("<iframe onload=\"isLoaded(self);\" ".
+         "id=uploadresult src=\"UploadWelcome\" name=uploadresult ".
          "style=\"width:100%\"></iframe>");
    print("</td></tr>");
-   print("</table></td>");
-   print("</td></tr>");
    print("</table>");
+ #  print("</td></tr>");
+ #  print("</table>");
+
+
    print("</td></tr>");
    print("</table></center>");
    print $self->HtmlBottom(body=>1,form=>1);
