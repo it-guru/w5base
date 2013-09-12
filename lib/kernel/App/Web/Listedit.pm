@@ -2132,6 +2132,10 @@ sub ProcessUploadRecord
       return(1);
    }
    if (defined($oldrec)){
+      my %origrec;
+      foreach my $k (keys(%$newrec)){
+         $origrec{$k}=$oldrec->{$k};
+      }
       if ($self->SecureValidatedUpdateRecord($oldrec,$newrec,$flt)){
          if ($self->LastMsg()){
             print join("\n",$self->LastMsg());
@@ -2143,7 +2147,7 @@ sub ProcessUploadRecord
          }
          ${$param{countok}}++ if (ref($param{countok}) eq "SCALAR");
          if ($param{infomail}){
-            $self->SendUploadInfoMail2Databoss(\%param,$oldrec,$newrec,$id);
+            $self->SendUploadInfoMail2Databoss(\%param,\%origrec,$newrec,$id);
          }
       }
       else{
@@ -2204,34 +2208,69 @@ sub SendUploadInfoMail2Databoss
 
    my $cilabel=$self->getRecordHeader($current);
    my $lang=$self->Lang();
+   $ENV{HTTP_FORCE_LANGUAGE}=$lang;
    my $userid=$self->getCurrentUserId();
-   my $databossname=$self->T("Databoss");
+   my $databossname=
+      $self->T("Databoss",[$self->Self,$self->SelfAsParentObject]);
+   my $salutation="";
+
 
    my $databossid=$current->{databossid};
    my $user=getModuleObject($self->Config,"base::user");
    $user->SetFilter({userid=>\$databossid});
-   my ($databossrec)=$user->getOnlyFirst(qw(purename lastlang));
+   my ($databossrec)=$user->getOnlyFirst(qw(purename lastlang salutation));
    if (defined($databossrec)){
       $lang=$databossrec->{lastlang} if ($databossrec->{lastlang} ne "");
       $databossname=$databossrec->{purename};
+      my $fld=$user->getField("salutation");
+      if ($databossrec->{salutation} ne ""){
+         $salutation.=$fld->FormatedResult($databossrec,"HtmlMail")." ";
+      }
    }
-
-   my $itext=extractLangEntry($infomailtext,$lang,8192,1);
-   $self->ParseTemplateVars(\$itext,{current=>$current,
-                                     static=>{
-                                        CILABEL=>$cilabel,
-                                        DATABOSSNAME=>$databossname
-                                     }});
-
-   print msg(INFO,"sending infomail to $databossid ($lang)");
-   my $wfa=$self->getPersistentModuleObject("InfoMailSender",
-                                            "base::workflowaction");
-   $wfa->Notify("INFO","zentralized data upload to ".$cilabel,$itext,
-                dataobj=>$self->Self(),
-                dataobjid=>$id,
-                emailfrom=>$userid,
-                emailto=>$databossid,
-                emailbcc=>$userid);
+   my $deltalog="";
+   foreach my $k (sort(keys(%{$newrec}))){
+      if (!defined($oldrec) ||
+           $current->{$k} ne $oldrec->{$k}){
+         my $fld=$self->getField($k,$current);
+         my $oldval="";
+         $oldval=$oldrec->{$k} if (defined($oldrec));
+         my $newval=$fld->FormatedResult($current,"Csv01");
+         $oldval=limitlen($oldval,15,1);
+         $newval=limitlen($newval,15,1);
+         my $label=$fld->Label();
+         $label=limitlen($label,20,1);
+         
+         if (!($oldval eq "" && $newval eq "")){    
+            $deltalog.="<b>$label:</b>\n ".
+                       "&bull; \"".$oldval."\" -&gt; \"".$newval."\"\n\n"; 
+         }
+      }
+   }
+   if ($deltalog ne ""){
+      my $itext=extractLangEntry($infomailtext,$lang,8192,1);
+      $self->ParseTemplateVars(\$itext,{current=>$current,
+                                        static=>{
+                                           SALUTATION=>$salutation,
+                                           CILABEL=>$cilabel,
+                                           DELTALOG=>$deltalog,
+                                           DATABOSSNAME=>$databossname
+                                        }});
+      
+      print msg(INFO,"sending infomail to $databossname ($lang)");
+      my $wfa=$self->getPersistentModuleObject("InfoMailSender",
+                                               "base::workflowaction");
+      $wfa->Notify("INFO",$self->T("centralized data upload to").
+                          " ".$cilabel,$itext,
+                   dataobj=>$self->Self(),
+                   dataobjid=>$id,
+                   emailfrom=>$userid,
+                   emailto=>$databossid,
+                   emailbcc=>$userid);
+   }
+   else{
+      print msg(INFO,"sending NO infomail - no changes detected");
+   }
+   delete($ENV{HTTP_FORCE_LANGUAGE});
 }
 
 
@@ -2522,7 +2561,7 @@ EOF
       print("<tr><td><u><b>".$self->T("Info mail to databoss").
             ":</b></ul></td></tr><td>".
             "<textarea style=\"width:100%\" ".
-            "name=INFOMAILTEXT wrap=off rows=3 cols=10>".$infomailtemplate.
+            "name=INFOMAILTEXT  rows=5 cols=10>".$infomailtemplate.
             "</textarea>");
       print("</td><tr></table>");
       printf("</div>");
