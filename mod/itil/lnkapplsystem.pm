@@ -650,7 +650,7 @@ sub new
                 }),
 
    );
-   $self->setDefaultView(qw(appl system systemsystemid fraction cdate));
+   $self->setDefaultView(qw(appl system systemsystemid fraction ));
    $self->setWorktable("lnkapplsystem");
    return($self);
 }
