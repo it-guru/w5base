@@ -650,7 +650,7 @@ sub new
                 }),
 
    );
-   $self->setDefaultView(qw(appl system systemsystemid fraction ));
+   $self->setDefaultView(qw(appl system systemsystemid fraction cdate));
    $self->setWorktable("lnkapplsystem");
    return($self);
 }
@@ -817,7 +817,7 @@ sub getSqlFrom
                "lnkitclustsvc.itsvcname) comments, ".
         "null additional, ".
         "100.0 fraction, ".
-        "lnkitclustsvcappl.createdate, ".
+        "min(lnkitclustsvcappl.createdate) createdate, ".
         "lnkitclustsvcappl.modifydate, ".
         "lnkitclustsvcappl.createuser, ".
         "lnkitclustsvcappl.modifyuser, ".
@@ -831,7 +831,8 @@ sub getSqlFrom
         "join lnkitclustsvc on lnkitclustsvc.id=lnkitclustsvcappl.itclustsvc ".
         "join itclust on itclust.id=lnkitclustsvc.itclust ".
         "join system on lnkitclustsvc.itclust=system.clusterid ".
-        $datasourcerest2;
+        $datasourcerest2." ".
+        "group by system.id";
 
    my $from="($datasource) qlnkapplsystem left outer join appl ".
             "on qlnkapplsystem.appl=appl.id ".
