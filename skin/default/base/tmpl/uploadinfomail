@@ -1,16 +1,23 @@
-Dear  %SALUTATION%%DATABOSSNAME%,
+Dear %SALUTATION%%DATABOSSNAME%,
 
-i have correct some attributes in the Config-Item "<b>%CILABEL%</b>".  This correction did not release you from your data responsibility! Please ensure, that all informations will be managed in the future, too.
+I have changed some attributes in the config-item "<b>%CILABEL%</b>". Some information about the change may be found in the history/change log of the config-item.
+
+This correction did not release you from your data responsibility!
+
+Please check the changes and please ensure, that all information and changes will be managed, controlled and supervised by you in the future, too.
 
 %DELTALOG%
 
 Kind regards
 
-
 [de:]
 Sehr geehrte(r) %SALUTATION%%DATABOSSNAME%,
 
-ich habe durch einen zentralen Upload das Config-Item "<b>%CILABEL%</b>" korrigiert. Diese Korrektur entbindet Sie nicht von Ihrer Datenverantwortung für dieses Feld. Stellen Sie bitte sicher, dass auch in Zukunft diese Information immer korrekt geführt wird.
+ich habe einige Attribute des Config-Items "<b>%CILABEL%</b>" korrigiert. Informationen über diese Änderungen können aus Verlauf-Log des Config-Items nachgelesen werden.
+
+Diese Änderung durch mich entbindet Sie nicht von Ihrer Datenverantwortung!
+
+Bitte prüfen Sie die Änderungen und stellen Sie sicher, dass zukünftig diese Daten auch weiterhin durch Sie gepflegt werden.
 
 %DELTALOG%
 
