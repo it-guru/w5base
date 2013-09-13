@@ -2208,10 +2208,8 @@ sub SendUploadInfoMail2Databoss
 
    my $cilabel=$self->getRecordHeader($current);
    my $lang=$self->Lang();
-   $ENV{HTTP_FORCE_LANGUAGE}=$lang;
    my $userid=$self->getCurrentUserId();
-   my $databossname=
-      $self->T("Databoss",[$self->Self,$self->SelfAsParentObject]);
+   my $databossname;
    my $salutation="";
 
 
@@ -2221,11 +2219,15 @@ sub SendUploadInfoMail2Databoss
    my ($databossrec)=$user->getOnlyFirst(qw(purename lastlang salutation));
    if (defined($databossrec)){
       $lang=$databossrec->{lastlang} if ($databossrec->{lastlang} ne "");
+      $ENV{HTTP_FORCE_LANGUAGE}=$lang;
       $databossname=$databossrec->{purename};
       my $fld=$user->getField("salutation");
       if ($databossrec->{salutation} ne ""){
          $salutation.=$fld->FormatedResult($databossrec,"HtmlMail")." ";
       }
+   }
+   if ($databossname eq ""){
+      $databossname=$self->T("Databoss");
    }
    my $deltalog="";
    foreach my $k (sort(keys(%{$newrec}))){
