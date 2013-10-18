@@ -203,7 +203,7 @@ sub new
                 vjoinon       =>['itsemid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'itsemid',
                 group         =>'itsem',
                 dataobjattr   =>'costcenter.itsem'),
@@ -228,7 +228,7 @@ sub new
                 vjoinon       =>['itsem2id'=>'userid'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'itsem2id',
                 group         =>'itsem',
                 dataobjattr   =>'costcenter.itsem2'),
@@ -716,7 +716,7 @@ sub new
                 label         =>'Application Manager',
                 vjoinon       =>'applmgrid'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'applmgrid',
                 group         =>'customer',
                 dataobjattr   =>'appl.applmgr'),
@@ -730,7 +730,7 @@ sub new
                 label         =>'Deputy Application Manager',
                 vjoinon       =>'applmgr2id'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'applmgr2id',
                 group         =>'customer',
                 dataobjattr   =>'appl.applmgr2'),
@@ -2190,9 +2190,20 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    else{
       $htmlresult.="<table>\n";
    }
-   my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2 databoss businessteam);
+   my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2 databoss businessteam systemnames);
    foreach my $v (@l){
-      if ($rec->{$v} ne ""){
+      if ($v eq "systemnames"){
+         my $name=$self->getField($v)->Label();
+         my $data;
+         if (ref($rec->{$v}) eq "ARRAY"){
+            $data=join("; ",sort(map({$_->{system}} @{$rec->{$v}})));
+            if ($data ne ""){
+               $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
+                            "<td valign=top>$data</td></tr>\n";
+            }
+         }
+      }
+      elsif ($rec->{$v} ne ""){
          my $name=$self->getField($v)->Label();
          my $data=$self->findtemplvar({current=>$rec,mode=>"Html"},
                                       $v,"formated");
