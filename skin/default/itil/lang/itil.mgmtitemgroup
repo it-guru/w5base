@@ -12,4 +12,4 @@
           de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},
 
 'PCONTROL'=>{de=>'Prozesssteuerung und CI-Gruppierung',en=>'processcontrol and CI-grouping'},
-'RLABEL'=>{de=>'Reporing Label',en=>'Reporing Label'},
+'RLABEL'=>{de=>'Reporting Label',en=>'Reporting Label'},
