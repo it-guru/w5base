@@ -248,14 +248,17 @@ sub getSqlOrder
                   if (defined($jfld)){
                      my $orderstring=$jfld->getBackendName("order",
                                       $self->{DB});
-                     if (defined($orderstring)){
+                     if (defined($orderstring) &&
+                         !in_array(\@order,$orderstring)){
                         push(@order,$orderstring);
                      }
                   }
                }
             }
             else{
-               push(@order,$orderstring);
+               if (!in_array(\@order,$orderstring)){
+                  push(@order,$orderstring);
+               }
             }
          }
          return(join(", ",@order));
@@ -268,7 +271,9 @@ sub getSqlOrder
             next if (!defined($field));
             my $orderstring=$field->getBackendName("order",$self->{DB},$ofield);
             next if (!defined($orderstring));
-            push(@order,$orderstring);
+            if (!in_array(\@order,$orderstring)){
+               push(@order,$orderstring);
+            }
          }
          return(join(", ",@order));
       }
