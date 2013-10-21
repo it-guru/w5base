@@ -541,6 +541,41 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   if (!defined($oldrec) && $newrec->{pvariant} eq ""){
+      $newrec->{pvariant}="standard";
+   }
+   my $variantofid=effVal($oldrec,$newrec,"variantofid");
+   if ($variantofid ne ""){
+      if (effVal($oldrec,$newrec,"pvariant") eq "standard"){
+         $self->LastMsg(ERROR,"variant standard is not allowed if ".
+                              "product is a variant of an other ones");
+         return(undef);
+      }
+      my $p=getModuleObject($self->Config,"article::product");
+      $p->SetFilter({id=>\$variantofid});
+      my ($prec,$msg)=$p->getOnlyFirst(qw(ALL));
+      # Werte die immer vom "Parent" übernommen werden
+      foreach my $pfld (qw(category1id frontlabel pclass description)){
+         if (!defined($oldrec) ||
+             $oldrec->{$pfld} ne $prec->{$pfld}){
+            $newrec->{$pfld}=$prec->{$pfld};
+         }
+      }
+      if (!defined($oldrec)){
+         # Werte die nur Initial vom Parent übernommen werden
+         foreach my $pfld (qw(productmgrid)){
+            if (!defined($oldrec) ||
+                $oldrec->{$pfld} ne $prec->{$pfld}){
+               $newrec->{$pfld}=$prec->{$pfld};
+            }
+         }
+      }
+   }
+   else{
+      if (defined($oldrec->{variantofid})){
+         $newrec->{variantofid}=undef;
+      }
+   }
 
    my %checkcategories;
    if (!defined($oldrec)){
@@ -640,41 +675,6 @@ sub Validate
       $self->LastMsg(ERROR,"invalid name '\%s' specified",
                      $name);
       return(undef);
-   }
-   if (!defined($oldrec) && $newrec->{pvariant} eq ""){
-      $newrec->{pvariant}="standard";
-   }
-   my $variantofid=effVal($oldrec,$newrec,"variantofid");
-   if ($variantofid ne ""){
-      if (effVal($oldrec,$newrec,"pvariant") eq "standard"){
-         $self->LastMsg(ERROR,"variant standard is not allowed if ".
-                              "product is a variant of an other ones");
-         return(undef);
-      }
-      my $p=getModuleObject($self->Config,"article::product");
-      $p->SetFilter({id=>\$variantofid});
-      my ($prec,$msg)=$p->getOnlyFirst(qw(ALL));
-      # Werte die immer vom "Parent" übernommen werden
-      foreach my $pfld (qw(category1id frontlabel pclass description)){
-         if (!defined($oldrec) ||
-             $oldrec->{$pfld} ne $prec->{$pfld}){
-            $newrec->{$pfld}=$prec->{$pfld};
-         }
-      }
-      if (!defined($oldrec)){
-         # Werte die nur Initial vom Parent übernommen werden
-         foreach my $pfld (qw(productmgrid)){
-            if (!defined($oldrec) ||
-                $oldrec->{$pfld} ne $prec->{$pfld}){
-               $newrec->{$pfld}=$prec->{$pfld};
-            }
-         }
-      }
-   }
-   else{
-      if (defined($oldrec->{variantofid})){
-         $newrec->{variantofid}=undef;
-      }
    }
    return(1);
 }
