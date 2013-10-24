@@ -289,8 +289,6 @@ sub isWriteValid
    }
 
    return(undef);
-
-   return(undef);
 }
 
 

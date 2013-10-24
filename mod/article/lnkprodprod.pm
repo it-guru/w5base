@@ -193,9 +193,8 @@ sub isWriteValid
    my $newrec=shift;
 
 
-   return("default") if ($self->IsMemberOf("admin"));
+   return("default");
 
-   return(undef);
 }
 
 

@@ -121,6 +121,8 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
 
+   return("default");
+
    return(undef);
 }
 
