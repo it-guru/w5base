@@ -278,6 +278,7 @@ sub Validate
    }
    if ($dstwfid eq $srcwfid){
       $self->LastMsg(ERROR,"relation loops are not good");
+      msg(ERROR,"loop reqeust on $srcwfid");
       return(0);
    }
    return(1);
