@@ -131,10 +131,9 @@ sub new
       new kernel::Field::Text(
                 name          =>'outlineno',
                 label         =>'Outline Number',
-                searchable    =>0,
                 htmldetail    =>0,
                 readonly      =>1,
-                dataobjattr   =>'cast(if (p1.id is null,artcategory.posno,'.
+                dataobjattr   =>'cast(if (p5.id is not null,"[LevelDepthError]",if (p1.id is null,artcategory.posno,'.
                                 'if(p2.id is null,concat(p1.posno,".",'.
                                 'artcategory.posno),if(p3.id is null,'.
                                 'concat(p2.posno,".",p1.posno,".",'.
@@ -142,7 +141,15 @@ sub new
                                 'concat(p3.posno,".",p2.posno,".",p1.posno,"."'.
                                 ',artcategory.posno),concat(p4.posno,".",'.
                                 'p3.posno,".",p2.posno,".",p1.posno,".",'.
-                                'artcategory.posno))))) as char(20))'),
+                                'artcategory.posno)))))) as char(20))'),
+
+#      new kernel::Field::Text(
+#                name          =>'outlineno2',
+#                label         =>'Outline Number2',
+#                htmldetail    =>0,
+#                readonly      =>1,
+#          dataobjattr   =>"concat(".
+#          ")"),
 
       new kernel::Field::Number(
                 name          =>'posno',
@@ -340,11 +347,12 @@ sub initSqlOrder
 {
    my $self=shift;
    return("artcategory.artcatalog,".
-          'if (isnull(p4.posno),if (isnull(p3.posno),if (isnull(p2.posno),'.
-          'if (isnull(p1.posno),artcategory.posno,p1.posno),p2.posno),p3.posno),p4.posno),'.
-          'if (isnull(p2.posno),if (isnull(p1.posno),0,artcategory.posno),p1.posno),'.
-          'if (isnull(p3.posno),if (isnull(p2.posno),0,artcategory.posno),p2.posno),'.
-          'if (isnull(p4.posno),if (isnull(p3.posno),0,artcategory.posno),p3.posno)');
+          "if (p5.id is not null,0,1)",
+          "if (isnull(p4.posno),if (isnull(p3.posno),if (isnull(p2.posno),if (isnull(p1.posno),if (isnull(artcategory.posno),0,artcategory.posno),p1.posno),p2.posno),p3.posno),p4.posno),".
+          "if (isnull(p4.posno),if (isnull(p3.posno),if (isnull(p2.posno),if (isnull(p1.posno),0,artcategory.posno),p1.posno),p2.posno),p3.posno),".
+          "if (isnull(p4.posno),if (isnull(p3.posno),if (isnull(p2.posno),if (isnull(p1.posno),0,0),artcategory.posno),p1.posno),p2.posno),".
+          "if (isnull(p4.posno),if (isnull(p3.posno),if (isnull(p2.posno),if (isnull(p1.posno),0,0),0),artcategory.posno),p1.posno),".
+          "if (isnull(p4.posno),if (isnull(p3.posno),if (isnull(p2.posno),if (isnull(p1.posno),0,0),0),0),artcategory.posno)");
 }
 
 
