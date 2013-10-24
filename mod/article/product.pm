@@ -277,7 +277,6 @@ sub new
                 dataobjattr   =>'if (artproduct.variantof is null,'.
                                 'artproduct.id,artproduct.variantof)'),
 
-
       new kernel::Field::SubList(
                 name          =>'directproductelements',
                 label         =>'direct Productelements',
@@ -705,6 +704,8 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
+   return("default") if (!defined($rec));
+
    my @wrgroups=qw(default mgmt mgmtlogosmall mgmtlogolarge);
 
    if (defined($rec) && $rec->{variantofid}){
@@ -719,6 +720,9 @@ sub isWriteValid
    else{
       push(@wrgroups,"variantspecials");
    }
+   push(@wrgroups,"subproducts") if ($rec->{pclass} eq "bundle" &&
+                                     $rec->{pvariant} eq "standard");
+   push(@wrgroups,"productelements") if ($rec->{pclass} eq "simple");
 
    return(@wrgroups) if (!defined($rec));
 
