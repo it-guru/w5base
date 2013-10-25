@@ -25,7 +25,6 @@ sub msg
    return("") if ($type eq "DEBUG" && $W5V2::Debug==0);
    my $d;
    my $u="";
-   $u=" ($ENV{REMOTE_USER})" if ($ENV{REMOTE_USER} ne "");
    foreach my $linemsg (split(/\n/,$msg)){
       $d.=sprintf("%-6s %s%s\n",$type.":",$linemsg,$u);
    }
@@ -35,11 +34,19 @@ sub msg
          print $d;
       }
       else{
-         print STDERR $d;
+         my $dout=$d;
+         if ($ENV{REMOTE_USER} ne ""){
+            $dout=~s/\n/ ($ENV{REMOTE_USER})\n/g;
+         }
+         print STDERR $dout;
       }
    }
    else{
-      print STDERR $d;
+      my $dout=$d;
+      if ($ENV{REMOTE_USER} ne ""){
+         $dout=~s/\n/ ($ENV{REMOTE_USER})\n/g;
+      }
+      print STDERR $dout;
    }
    return($d);
 }

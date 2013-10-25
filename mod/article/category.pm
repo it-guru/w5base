@@ -379,6 +379,10 @@ sub Validate
          $newrec->{chkpcategoryid}=$newrec->{pcategoryid};
       }
    }
+   if (effVal($oldrec,$newrec,"posno") eq "0"){
+      $self->LastMsg(ERROR,"position number 0 is not allowed");
+      return(0);
+   }
    if (defined($oldrec)){ # check write on old category
       my $cid=$oldrec->{catalogid};
       my $c=getModuleObject($self->Config,"article::catalog");

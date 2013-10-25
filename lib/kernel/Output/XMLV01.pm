@@ -96,7 +96,8 @@ sub ProcessLine
    foreach my $fo (@view){
       my $name=$fo->Name();
       my $v=$fo->UiVisible("XML",current=>$rec);
-      next if (!$v && ($fo->Type() ne "Interface"));
+      next if (!$v && ($fo->Type() ne "Interface" && 
+                       $fo->Type() ne "XMLInterface"));
       if (!defined($self->{fieldkeys}->{$name})){
          push(@{$self->{fieldobjects}},$fo);
          $self->{fieldkeys}->{$name}=$#{$self->{fieldobjects}};

@@ -52,6 +52,38 @@ sub new
    return($self);
 }
 
+sub ItemSummary
+{
+   my $self=shift;
+   my $current=shift;
+   my $summary=shift;
+
+   # alle beantworteten Interview-Fragen
+   my $o=getModuleObject($self->Config,"itil::lnkapplinteranswer");
+   $o->SetFilter({parentid=>\$current->{id}});
+   my @l=$o->getHashList(qw(name answer));
+   Dumper(\@l);
+   $summary->{interviewansers}=\@l;
+   return(0) if (!$o->Ping());
+
+
+   # alle aktiven Interview-Fragen
+   my $o=getModuleObject($self->Config,"itil::appl");
+   $o->SetFilter({id=>\$current->{id}});
+   my ($rec,$msg)=$o->getOnlyFirst(qw(interviewst));
+   my @q;
+   foreach my $q (@{$rec->{interviewst}->{TotalActiveQuestions}}){
+     push(@q,{name=>$q->{name},prio=>$q->{prio}});
+   }
+   $summary->{interviewstate}={TotalActiveQuestions=>\@q};
+   return(0) if (!$o->Ping());
+
+
+   return($self->SUPER::ItemSummary($current,$summary));
+}
+
+
+
 
 
 1;

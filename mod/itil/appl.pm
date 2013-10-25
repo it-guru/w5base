@@ -1406,6 +1406,25 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::XMLInterface(
+                name          =>'itemsummary',
+                label         =>'total Config-Item Summary',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $parrent=$self->getParent();
+                   my $summary={};
+                   my $bk=0;
+                   if ($parrent->can("ItemSummary")){
+                      $bk=$parrent->ItemSummary($current,$summary);
+                   }
+                   if ($bk){
+                      $summary->{xmlstate}="valid";
+                      return(hash2xml({xmlroot=>$summary})); 
+                   }
+                   return(hash2xml({xmlroot=>{xmlstate=>"invalid"}}));
+                }),
+
       new kernel::Field::Email(
                 name          =>'wfdataeventnotifytargets',
                 label         =>'WF:event notification customer info targets',
@@ -1433,6 +1452,22 @@ sub new
    $self->setWorktable("appl");
    return($self);
 }
+
+
+sub ItemSummary
+{
+   my $self=shift;
+   my $current=shift;
+   my $summary=shift;
+
+   my $o=getModuleObject($self->Config,$self->Self);
+   $o->SetFilter({id=>\$current->{id}});
+   my ($rec,$msg)=$o->getOnlyFirst("systems");
+   Dumper($rec);
+   $summary->{systems}=$rec->{systems};
+   return(1) if ($o->Ping());
+}
+
 
 sub initSearchQuery
 {

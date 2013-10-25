@@ -332,7 +332,8 @@ sub hash2xml {
         }
         else{
            my $d=$request->{$k};
-           if (!($d=~m#^<subrecord>#m)){  # prevent double quoting
+           if (!($d=~m#^<subrecord>#m) &&
+               !($d=~m#^<xmlroot>#m)){  # prevent double quoting
               $d=XmlQuote($d);
            }
            else{

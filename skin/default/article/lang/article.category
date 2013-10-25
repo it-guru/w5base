@@ -9,5 +9,6 @@
 'fieldgroup.products'=>{de=>'Produkte',en=>'Products'},
 'fieldgroup.subcategories'=>{de=>'Unter-Kategorien',en=>'Subcategories'},
 'you have no right to write in given catalog'=>{de=>'Sie haben kein Recht, in den angegebenen Katalog zu schreiben'},
+'position number 0 is not allowed'=>{de=>'Positionsnummer 0 ist nicht erlaubt'},
 
 

@@ -826,7 +826,8 @@ sub getHashList
                         }
                      }
                      else{
-                        $v=latin1($v)->utf8() if (defined($v));
+                        $v=latin1($v)->utf8() if (defined($v) &&
+                                                 $fobj->Type ne "XMLInterface");
                      }
                      if (defined($v)){
                         $cprec{$k}=SOAP::Data->type($wsdl)->value($v);

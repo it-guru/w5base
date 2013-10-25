@@ -37,6 +37,7 @@ use kernel::Field::Email;
 use kernel::Field::Link;
 use kernel::Field::DynWebIcon;
 use kernel::Field::Interface;
+use kernel::Field::XMLInterface;
 use kernel::Field::Linenumber;
 use kernel::Field::TextDrop;
 use kernel::Field::MultiDst;

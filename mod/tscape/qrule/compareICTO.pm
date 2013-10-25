@@ -72,7 +72,7 @@ sub qcheckRecord
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){
-         my $msg="the given ICTO-ID not exists in CapeTS anymore";
+         my $msg="the given ICTO-ID does not exist anymore in CapeTS";
          push(@qmsg,$msg);
          push(@dataissue,$msg);
          $errorlevel=3 if ($errorlevel<3);

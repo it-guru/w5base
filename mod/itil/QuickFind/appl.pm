@@ -76,6 +76,7 @@ sub QuickFindDetail
    $appl->SetFilter({id=>\$id});
    my ($rec,$msg)=$appl->getOnlyFirst(qw(delmgr delmgr2 conumber cistatus 
                                          sem sem2 tsm tsm2 databoss 
+                                         systemnames
                                          customerprio phonenumbers
                                          description businessteam));
    $appl->ResetFilter();
