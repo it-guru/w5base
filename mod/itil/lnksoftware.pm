@@ -934,7 +934,13 @@ sub calcSoftwareState
       $FilterSet->{Analyse}->{totalstate}="OK";
       $FilterSet->{Analyse}->{totalmsg}=[];
       my $ssoftware=$FilterSet->{Analyse}->{ssoftware}->{softwareid};
-      foreach my $swrec (@{$FilterSet->{Set}->{data}->{software}}){
+
+      my @ruleset=@{$FilterSet->{Set}->{data}->{software}};
+
+      @ruleset=sort({$a->{comparator}<=>$b->{comparator}} @ruleset);
+
+
+      foreach my $swrec (@ruleset){
          foreach my $swi (values(%{$FilterSet->{Analyse}->{ssoftware}->{id}})){
             if ($swrec->{softwareid} eq  $swi->{softwareid}){
                $FilterSet->{Analyse}->{relevantSoftwareInst}++;
@@ -966,7 +972,27 @@ sub calcSoftwareState
                        "releasekey error");
                }
                else{
-                  if ($swrec->{comparator} eq "2"){
+                  if ($swrec->{comparator} eq "3"){
+                     if ($swrec->{releasekey} gt $swi->{releasekey}){
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- soon update $swi->{software} on ".
+                                 "system $swi->{system} ".
+                                 "from $swi->{version} to  $swrec->{version}");
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^WARN/)
+                            &&  # ERROR have a higher priority
+                            !($FilterSet->{Analyse}->{totalstate}=~m/^FAIL$/)
+                            &&
+                            !($FilterSet->{Analyse}->{totalstate}
+                              =~m/^FAIL and not OK$/)){
+                           $FilterSet->{Analyse}->{totalstate}="WARN".$failpost;
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} needs soon >=$swrec->{version}");
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "2"){
                      if ($swrec->{releasekey} ne $swi->{releasekey} ||
                          $swrec->{version} ne $swi->{version}){
                         if ($failpost ne " but OK"){
@@ -975,7 +1001,7 @@ sub calcSoftwareState
                                  " of $swi->{software} is allowed on  ".
                                  " system $swi->{system} ");
                         }
-                        if ($FilterSet->{Analyse}->{totalstate} ne "FAIL"){
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
@@ -990,7 +1016,7 @@ sub calcSoftwareState
                                "- remove disallowed version $swi->{software} ".
                                " $swi->{version} from  system $swi->{system} ");
                         }
-                        if ($FilterSet->{Analyse}->{totalstate} ne "FAIL"){
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
@@ -1005,7 +1031,7 @@ sub calcSoftwareState
                                  "system $swi->{system} ".
                                  "from $swi->{version} to  $swrec->{version}");
                         }
-                        if ($FilterSet->{Analyse}->{totalstate} ne "FAIL"){
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
@@ -1056,10 +1082,31 @@ sub calcSoftwareState
                push(@d,"<font color=red>"."WARN: ".$m."</font>");
             }
          }
-         my $m=sprintf("found <b>%d</b> relevant software installations for check",
+         my $m=sprintf("found <b>%d</b>".
+                       " relevant software installations for check",
                        $FilterSet->{Analyse}->{relevantSoftwareInst});
          push(@d,"INFO: ".$m);
       }
+   }
+   my $finestate="green";
+   if ($FilterSet->{Analyse}->{totalstate}=~m/^WARN/){
+      $finestate="yellow";
+   }
+   elsif ($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/){
+      $finestate="red";
+   }
+   push(@d,"<b>STATE:</b> <font color=$finestate>".$finestate."</font>");
+   
+   if ($self->Name eq "rawsoftwareanalysestate"){
+      Dumper($FilterSet->{Analyse});
+      return({xmlroot=>{
+         totalstate=>$FilterSet->{Analyse}->{totalstate},
+         finestate=>$finestate,
+         totalmsg=>$FilterSet->{Analyse}->{totalmsg},
+         systems=>$FilterSet->{Analyse}->{systems},
+         software=>$FilterSet->{Analyse}->{softwareid},
+         relevantSoftwareInst=>$FilterSet->{Analyse}->{relevantSoftwareInst}
+      }});
    }
    if ($self->Name eq "softwareanalysestate"){
       return("<div style='width:300px'>".join("<br>",@d)."</div>");

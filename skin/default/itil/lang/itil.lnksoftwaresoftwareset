@@ -2,5 +2,6 @@
 'comp.0'=>{de=>'>= größer oder gleich » grün',en=>'greater or equal » green'},
 'comp.1'=>{de=>'!= nicht zugelassen » rot',en=>'not allowed » red'},
 'comp.2'=>{de=>'= exakt gleich zugelassen » grün',en=>'exakt equal allowed » green'},
+'comp.3'=>{de=>'< kleiner » gelb',en=>'smaller » yellow'},
 'Comparator'=>{de=>'Vergleichsoperator'},
 'no version specified'=>{de=>'keine Version angeben'},

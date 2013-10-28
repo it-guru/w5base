@@ -1420,9 +1420,9 @@ sub new
                    }
                    if ($bk){
                       $summary->{xmlstate}="valid";
-                      return(hash2xml({xmlroot=>$summary})); 
+                      return({xmlroot=>$summary}); 
                    }
-                   return(hash2xml({xmlroot=>{xmlstate=>"invalid"}}));
+                   return({xmlroot=>{xmlstate=>"invalid"}});
                 }),
 
       new kernel::Field::Email(

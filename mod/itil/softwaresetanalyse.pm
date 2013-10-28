@@ -32,6 +32,15 @@ sub new
    $self->{ResultLineClickHandler}="NONE";
 
    $self->AddFields(
+	  new kernel::Field::XMLInterface(
+                name          =>'rawsoftwareanalysestate',
+                readonly      =>1,
+                searchable    =>0,
+                htmlwidth     =>'400px',
+                group         =>'softsetvalidation',
+                htmlnowrap    =>1,
+                label         =>'Software analyse raw state',
+                onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
 	  new kernel::Field::Htmlarea(
                 name          =>'softwareanalysestate',
                 readonly      =>1,

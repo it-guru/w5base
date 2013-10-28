@@ -24,6 +24,7 @@ package kernel::Field::XMLInterface;
 
 use strict;
 use vars qw(@ISA);
+use kernel;
 @ISA    = qw(kernel::Field);
 
 
@@ -47,6 +48,93 @@ sub new
    $self=bless($type->SUPER::new(%$self),$type);
    return($self);
 }
+
+sub FormatedDetail
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $d=$self->RawValue($current);
+   if (!exists($d->{xmlroot})){
+      $d={xmlroot=>{xmlstate=>'incorrect'}};
+   }
+   if (!exists($d->{xmlroot}->{xmlstate})){
+      $d->{xmlroot}->{xmlstate}="unknown";
+   }
+   my $name=$self->Name();
+   if ($mode eq "SOAP"){
+      my $xml;
+      return(quoteSOAP(hash2xml($d)));
+   }
+   if ($mode=~m/html/i){ # charset handling ist noch nicht optimal! - Eigentlich
+      if (defined($d) && ref($d) eq "HASH" && keys(%{$d})>0){ # muss da noch
+         my $r="<pre>".quoteHtml(hash2xml($d))."</pre>"; # eine latin1 Sonder-
+         return($r);  # behandlung rein!
+      }
+      return(undef);
+   }
+   if ($mode=~m/edit/i){
+      return(undef);
+   }
+   return($d);
+}
+
+
+sub hash2table
+{
+   my $self=shift;
+   my $xpath=shift;
+   my $loopcount=shift;
+   my $d=shift;
+   return("...") if ($loopcount>2);
+
+
+   my $r="<table class=containerframe>" if ($loopcount==0);
+   foreach my $k (sort(keys(%{$d}))){
+      my $descwidth="width=1%";
+      if (defined($self->{desccolwidth})){
+         $descwidth="width=$self->{desccolwidth}";
+      }
+      my $dk=$d->{$k};
+      if (ref($dk) eq "HASH"){
+         $r.=$self->hash2table([@$xpath,$k],$loopcount+1,$dk);
+      }
+      else{
+         my $label=join(".",@$xpath,$k);
+         $r.="<td class=containerfname $descwidth valign=top>$label</td>";
+         $dk=[$dk] if (ref($dk) ne "ARRAY");
+         my $s1="";
+         my $s2="";
+         foreach my $subarray (@$dk){
+            if (ref($subarray)){
+               $s1.=$self->hash2table([@$xpath,$k],$loopcount+1,$subarray);
+            }
+            else{
+               my $dd=$subarray;
+               my $dd=quoteHtml(join(", ",@{$dk}));
+               $dd="&nbsp;" if ($dd=~m/^\s*$/);
+               #$dd=~s/\n/<br>\n/g;
+               $s2.="<tr>";
+               if ($dd=~m/\n/ || $dd=~m/\S{40}/){
+                  $dd="<table ".
+                  "style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
+                  "<tr><td><div class=multilinetext ".
+                  "style=\"min-width:100px;height:auto;border-style:none\">".
+                  "<pre class=multilinetext>$dd</pre></div></td></tr></table>";
+               }
+               $s2.="<td class=containerfval valign=top>$dd</td>";
+               $s2.="</tr>";
+            }
+         }
+         $r.=$s2.$s1;
+      }
+   }
+   $r.="</table>" if ($loopcount==0);
+   return($r);
+}
+
+
+
 
 
 1;
