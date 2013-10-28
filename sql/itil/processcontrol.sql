@@ -38,6 +38,25 @@ create table lnksoftwaresoftwareset (
   srcsys       varchar(100) default 'w5base',
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
-  PRIMARY KEY  (id), KEY software (software),key(releasekey),
+  PRIMARY KEY  (id), KEY software (software),key(releasekey),key(softwareset),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);
+create table lnkosreleasesoftwareset (
+  id           bigint(20) NOT NULL,
+  softwareset  bigint(20) NOT NULL,
+  osrelease    bigint(20) NOT NULL,
+  comparator   char(1)  default '0', 
+  comments     longtext    default NULL,
+  additional   longtext    default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id), KEY software (osrelease),key(softwareset),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );

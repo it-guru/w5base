@@ -1,0 +1,4 @@
+'itil::lnkosreleasesoftwareset'=>{de=>'Betriebssystem-Set Eintrag',en=>'OSRelease-Set Entry'},
+'comp.0'=>{de=>'== gleich » rot',en=>'== equal » red'},
+'comp.1'=>{de=>'== gleich » gelb',en=>'== equal » yellow'},
+'Comparator'=>{de=>'Vergleichsoperator'},

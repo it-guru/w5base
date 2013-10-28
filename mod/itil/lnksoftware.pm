@@ -873,7 +873,7 @@ sub calcSoftwareState
       my $ss=getModuleObject($self->getParent->Config,
                              "itil::softwareset");
       $ss->SecureSetFilter({cistatusid=>4,name=>\$FilterSet->{softwareset}});
-      my ($rec)=$ss->getOnlyFirst("name","software");
+      my ($rec)=$ss->getOnlyFirst("name","software","osrelease");
       if (!defined($rec)){
          return("INVALID SOFTSET SELECTED");
       }
@@ -897,18 +897,78 @@ sub calcSoftwareState
       foreach my $swrec (@{$FilterSet->{Set}->{data}->{software}}){
          $swid{$swrec->{softwareid}}++;
       }
+      # check softwareset against installations
+      $FilterSet->{Analyse}->{relevantSoftwareInst}=0;
+      $FilterSet->{Analyse}->{todo}=[];
+      $FilterSet->{Analyse}->{totalstate}="OK";
+      $FilterSet->{Analyse}->{dstate}={};
+      $FilterSet->{Analyse}->{totalmsg}=[];
       $FilterSet->{Analyse}->{softwareid}=[keys(%swid)];
+
+
       if ($#applid!=-1){ # load systems
          my $lnk=getModuleObject($self->getParent->Config,
                                 "itil::lnkapplsystem");
          $lnk->SetFilter({applid=>\@applid,
                           systemcistatusid=>[3,4]}); 
-         $FilterSet->{Analyse}->{systems}=[$lnk->getVal("systemid")];
+         $FilterSet->{Analyse}->{systems}=[];
+         $FilterSet->{Analyse}->{systemids}={};
+         foreach my $lnkrec ($lnk->getHashList(qw(systemid osreleaseid
+                                                  system))){
+            my $sid=$lnkrec->{systemid};
+            if (!exists($FilterSet->{Analyse}->{systemids}->{$sid})){
+               my $srec={
+                  name=>$lnkrec->{system},
+                  systemid=>$lnkrec->{systemid},
+                  osrelease=>$lnkrec->{osrelease},
+                  osreleaseid=>$lnkrec->{osreleaseid}
+               };
+               $FilterSet->{Analyse}->{systemids}->{$sid}=$srec;
+               push(@{$FilterSet->{Analyse}->{systems}},
+                    $FilterSet->{Analyse}->{systemids}->{$sid});
+               my @ruleset=@{$FilterSet->{Set}->{data}->{osrelease}};
+               @ruleset=sort({$a->{comparator}<=>$b->{comparator}} @ruleset);
+               my $dstate="OK";
+               foreach my $osrec (@ruleset){
+                  if ($srec->{osreleaseid} eq  $osrec->{osreleaseid}){
+                     if ($osrec->{comparator} eq "0"){
+                        $dstate="FAIL";
+                        push(@{$FilterSet->{Analyse}->{todo}},
+                              "- update OS '$srec->{osrelease}' ".
+                              "on $srec->{name}");
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL";
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                            "$srec->{name} OS '$srec->{osrelease}' ".
+                            "is marked as not allowed");
+                     }
+                     if ($osrec->{comparator} eq "1"){
+                        $dstate="WARN";
+                        push(@{$FilterSet->{Analyse}->{todo}},
+                              "- OS '$srec->{osrelease}' ".
+                              "on $srec->{name} needs soon a update");
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="WARN";
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                            "$srec->{name} OS '$srec->{osrelease}' ".
+                            "is soon not allowed");
+                     }
+                  }
+               }
+               $FilterSet->{Analyse}->{dstate}->{system}->{$lnkrec->{system}}={
+                  state=>$dstate,
+               };
+            }
+         }
       }
       my $lnk=getModuleObject($self->getParent->Config,
                              "itil::lnksoftwaresystem");
       if ($#applid!=-1){# load system installed software
-         $lnk->SetFilter({systemid=>$FilterSet->{Analyse}->{systems}});
+         $lnk->SetFilter({
+           systemid=>[keys(%{$FilterSet->{Analyse}->{systemids}})]
+         });
       }
       else{
          $lnk->SetFilter({id=>\$current->{id}});
@@ -928,11 +988,6 @@ sub calcSoftwareState
               $sw->getHashList(qw(id lnksoftwaresystemid fullname))];
       }
 
-      # check softwareset against installations
-      $FilterSet->{Analyse}->{relevantSoftwareInst}=0;
-      $FilterSet->{Analyse}->{todo}=[];
-      $FilterSet->{Analyse}->{totalstate}="OK";
-      $FilterSet->{Analyse}->{totalmsg}=[];
       my $ssoftware=$FilterSet->{Analyse}->{ssoftware}->{softwareid};
 
       my @ruleset=@{$FilterSet->{Set}->{data}->{software}};
@@ -1054,7 +1109,7 @@ sub calcSoftwareState
    if ($#applid!=-1){
       { # system count
          my $m=sprintf("analysed system count: %d",
-                         $#{$FilterSet->{Analyse}->{systems}}+1);
+                         int(keys(%{$FilterSet->{Analyse}->{systemids}})));
          if ($#{$FilterSet->{Analyse}->{systems}}==-1){
             push(@d,"<font color=red>"."WARN: ".$m."</font>");
          }
@@ -1063,7 +1118,7 @@ sub calcSoftwareState
          }
       }
       # softwareinstallation count
-      if ($#{$FilterSet->{Analyse}->{systems}}!=-1){
+      if (int(keys(%{$FilterSet->{Analyse}->{systemids}}))!=0){
          my $m=sprintf("analysed software installations count: %d",
                         keys(%{$FilterSet->{Analyse}->{ssoftware}->{id}})+0);
          if (keys(%{$FilterSet->{Analyse}->{ssoftware}->{id}})==0){
@@ -1101,6 +1156,7 @@ sub calcSoftwareState
       Dumper($FilterSet->{Analyse});
       return({xmlroot=>{
          totalstate=>$FilterSet->{Analyse}->{totalstate},
+         dstate=>$FilterSet->{Analyse}->{dstate},
          finestate=>$finestate,
          totalmsg=>$FilterSet->{Analyse}->{totalmsg},
          systems=>$FilterSet->{Analyse}->{systems},

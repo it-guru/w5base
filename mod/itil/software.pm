@@ -150,6 +150,24 @@ sub new
                 }),
 
       new kernel::Field::Boolean(
+                name          =>'is_dbs',
+                group         =>'class',
+                label         =>'is DBS (Databasesystem) software',
+                dataobjattr   =>'software.is_dbs'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_mw',
+                group         =>'class',
+                label         =>'is MW (Middleware) software',
+                dataobjattr   =>'software.is_mw'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_dms',
+                group         =>'class',
+                label         =>'is DMS (Documentmanagement) software',
+                dataobjattr   =>'software.is_dms'),
+
+      new kernel::Field::Boolean(
                 name          =>'releasesam1',
                 readonly      =>1,
                 htmldetail    =>0,
@@ -590,7 +608,7 @@ sub initSearchQuery
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default options doccontrol phonenumbers source));
+   return(qw(header default options doccontrol class phonenumbers source));
 }
 
 
@@ -614,7 +632,7 @@ sub isWriteValid
 
    my $userid=$self->getCurrentUserId();
    my @l;
-   push(@l,"default","doccontrol","phonenumbers") if (!defined($rec) ||
+   push(@l,"default","doccontrol","phonenumbers","class") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
    if (defined($rec) && $rec->{pclass} eq "MAIN"){

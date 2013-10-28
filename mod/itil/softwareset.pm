@@ -95,6 +95,16 @@ sub new
                 vjoininhash   =>['softwareid','version',
                                  'releasekey','comparator']),
 
+      new kernel::Field::SubList(
+                name          =>'osrelease',
+                label         =>'OS-Release presets',
+                group         =>'osrelease',
+                subeditmsk    =>'subedit.osrelease',
+                vjointo       =>'itil::lnkosreleasesoftwareset',
+                vjoinon       =>['id'=>'softwaresetid'],
+                vjoindisp     =>['fullname',"comparator"],
+                vjoininhash   =>['osreleaseid','comparator']),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',
@@ -209,7 +219,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default software contacts misc control
+   return(qw(header default software osrelease contacts misc control
              attachments source));
 }
 
@@ -335,18 +345,9 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-
-   return("ALL")  if ($self->IsMemberOf("admin"));
-   return(undef);
-}
-
-sub isWriteValid
-{
-   my $self=shift;
-   my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default software contacts misc);
+   my @databossedit=qw(default software osrelease contacts misc);
    if (!defined($rec)){
       return(@databossedit);
    }

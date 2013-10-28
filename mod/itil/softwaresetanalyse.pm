@@ -39,7 +39,7 @@ sub new
                 htmlwidth     =>'400px',
                 group         =>'softsetvalidation',
                 htmlnowrap    =>1,
-                label         =>'Software analyse raw state',
+                label         =>'SoftwareSet analysed raw state',
                 onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
 	  new kernel::Field::Htmlarea(
                 name          =>'softwareanalysestate',
@@ -48,7 +48,7 @@ sub new
                 htmlwidth     =>'400px',
                 group         =>'softsetvalidation',
                 htmlnowrap    =>1,
-                label         =>'Software analyse state',
+                label         =>'SoftwareSet analysed state',
                 onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
 	  new kernel::Field::Htmlarea(
                 name          =>'softwareanalysetodo',
@@ -57,7 +57,7 @@ sub new
                 group         =>'softsetvalidation',
                 htmlwidth     =>'500px',
                 htmlnowrap    =>1,
-                label         =>'Software analyse todo',
+                label         =>'SoftwareSet analysed todo',
                 onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
    );
    $self->AddFields(

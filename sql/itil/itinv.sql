@@ -1274,3 +1274,4 @@ alter table appl add isnotarchrelevant int(1) default '0';
 alter table appl add applbasemoniteam bigint(20), add applbasemonistatus char(15);
 alter table swinstance add moniteam bigint(20), add monistatus char(15);
 alter table system add moniteam bigint(20), add monistatus char(15);
+alter table software add is_dms int(1) default '0', add is_dbs int(1) default '0', add is_mw int(1) default '0';
