@@ -5,7 +5,17 @@
 <script src="js/jquery.js"></script>
 <script src="js/jquery.mobile.js"></script>
 <script src="js/W5Mobile.js"></script>
+<script src="../../public/base/load/J5Base.js"></script>
 </head>
+<script>
+$(document).ready(function (){
+   if (ENV.auth){
+
+   }
+   else{
+   }
+});
+</script>
 <body>
 
 <div data-role="header">
@@ -18,9 +28,7 @@
    mobile devices like Android, iPhone or other systems like that.
    </p>
    <form>
-       <input type="submit" value="Logon">
-       <br>
-       <hr>
+       <div id="logonarea"></div>
        <input type="submit" value="public tool A">
        <input type="submit" value="public tool B">
        <input type="submit" value="public tool C">

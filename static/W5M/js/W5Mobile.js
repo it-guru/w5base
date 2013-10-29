@@ -1,7 +1,10 @@
 var ENV=getConfigNameFromURL(document.URL);
-loadScript(ENV.rootpath+"public/base/load/J5Base.js"); //ensure J5Base is loaded
+$(document).ready(function (){
 
-console.log(ENV);
+   ENV.W5Base=createConfig({ useUTF8:true, mode:'public',transfer:'JSON' });
+   console.log(ENV);
+});
+
 
 
 
@@ -48,7 +51,7 @@ function getConfigNameFromURL(url){
    path.shift();
    path.pop();
    var rpath=path.reverse();
-   var config=rpath[3];
+   var config=rpath[2];
 
    var urlObj = {
       protocol:a.protocol,
@@ -58,7 +61,7 @@ function getConfigNameFromURL(url){
       hash:a.hash,
       pathname:a.pathname,
       configname:config,
-      rootpath:"../../../"+config+"/",
+      rootpath:"../../"+config+"/",
       path:path,
       search:a.search,
       parameters:params

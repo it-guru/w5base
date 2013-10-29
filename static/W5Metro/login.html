@@ -1,0 +1,35 @@
+<html>
+   <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/Droptiles.css?v=14">
+
+
+<body>
+<center>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Try to logon W5Base API Interface ...
+</body>
+<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+
+<script type="text/javascript">
+    // Bootstrap initialization
+    $(document).ready(function () {
+       window.parent.W5Base=window.parent.createConfig({ useUTF8:true, mode:'auth',
+                                    baseUrl:'../../', 
+                                    transfer:'JSON' });
+       var i=window.parent.W5Base.ContextInfo();
+       console.log(window.parent.Dumper(i));
+
+      window.setTimeout(function(){
+         window.parent.ui.closeApp();
+      },1000);
+
+    });
+</script>
+
+
+</html>
