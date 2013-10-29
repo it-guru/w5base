@@ -228,6 +228,14 @@ sub new
                 label         =>'Deprecation Start',
                 timezone      =>'CET'),
 
+      new kernel::Field::Number(
+                name          =>'age',
+                group         =>'finanz',
+                depend        =>'assetid',
+                onRawValue    =>\&CalcDep,
+                label         =>'Age',
+                unit          =>'days'),
+
       new kernel::Field::Date(
                 name          =>'deprend',
                 group         =>'finanz',
@@ -417,6 +425,7 @@ sub CalcDepr
    my $deprstart;
    my $residualvalue;
    my $deprbase;
+   my $age;
    if ($assetid ne ""){
       $ac->ResetFilter();
       $ac->SetFilter({assetid=>\$assetid});
@@ -447,9 +456,19 @@ sub CalcDepr
    $compdeprend=$deprend     if (!defined($compdeprend));
    $compdeprstart=$deprstart if (!defined($compdeprstart));
 
+   if ($deprstart ne ""){
+      my $d=CalcDateDuration($deprstart,NowStamp("en"));
+      if (defined($d)){
+         $age=int($d->{totaldays});
+      }
+   }
+
+   
+
    return({compdeprend=>$compdeprend,compdeprstart=>$compdeprstart,
            deprend=>$deprend,deprstart=>$deprstart,
            deprbase=>$deprbase,
+           age=>$age,
            residualvalue=>$residualvalue});
 
 

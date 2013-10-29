@@ -58,6 +58,10 @@ sub ItemSummary
    my $current=shift;
    my $summary=shift;
 
+   my $bk=$self->SUPER::ItemSummary($current,$summary);
+
+   return($bk) if (!$bk);
+
    # alle beantworteten Interview-Fragen
    my $o=getModuleObject($self->Config,"itil::lnkapplinteranswer");
    $o->SetFilter({parentid=>\$current->{id}});
@@ -78,8 +82,52 @@ sub ItemSummary
    $summary->{interviewstate}={TotalActiveQuestions=>\@q};
    return(0) if (!$o->Ping());
 
+   my $o=getModuleObject($self->Config,"itil::softwareset");
+   $o->SetFilter({name=>'"AO Engineering CIT Roadmap*"',
+                  cistatusid=>\'4'});
+   my @roadmapname=$o->getHashList(qw(id name));
 
-   return($self->SUPER::ItemSummary($current,$summary));
+   my @rm;
+   
+   foreach my $rm (@roadmapname){
+      my $o=getModuleObject($self->Config,"itil::softwaresetanalyse");
+      $o->SetFilter({id=>\$current->{id},
+                     softwareset=>$rm->{name}});
+      my ($rec,$msg)=$o->getOnlyFirst(qw(rawsoftwareanalysestate));
+      push(@rm,{name=>$rm->{name},
+                softwaresetid=>$rm->{id},
+                result=>$rec->{rawsoftwareanalysestate}->{xmlroot}});
+   }
+   return(0) if (!$o->Ping());
+   $summary->{roadmap}=\@rm;
+
+   my %systemids; # nachladen der Abschreibungsdaten aus AssetManager
+   my %assetids;
+   foreach my $sys (@{$summary->{systems}}){
+      $systemids{$sys->{systemsystemid}}=$sys if ($sys->{systemsystemid} ne "");
+   }
+   if (keys(%systemids)){
+      my $o=getModuleObject($self->Config,"tsacinv::system");
+      $o->SetFilter({systemid=>[keys(%systemids)]});
+      foreach my $acrec ($o->getHashList(qw(systemid assetassetid))){
+         $systemids{$acrec->{systemid}}->{assetid}=$acrec->{assetassetid};
+         $assetids{$acrec->{assetassetid}}={name=>$acrec->{assetassetid}};
+      }
+      return(0) if (!$o->Ping());
+      my $o=getModuleObject($self->Config,"tsacinv::asset");
+      $o->SetFilter({assetid=>[keys(%assetids)]});
+      foreach my $acrec ($o->getHashList(qw(assetid deprstart age))){
+         $assetids{$acrec->{assetid}}->{amdeprstart}=$acrec->{deprstart};
+         $assetids{$acrec->{assetid}}->{amage}=$acrec->{age};
+      }
+      return(0) if (!$o->Ping());
+      $summary->{assets}->{asset}=[values(%assetids)];
+   }
+
+
+
+
+   return(1);
 }
 
 

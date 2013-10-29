@@ -11,6 +11,7 @@
 'Systems on Asset'=>{de=>'log. Systeme auf dem Assets' },
 'Asset Serialnumber'=>{de=>'Asset Seriennummer' },
 'Tenant'=>{de=>'Instanz-Mieter'},
+'Age'=>{de=>'Alter'},
 'Tenant ID'=>{de=>'Instanz-Mieter ID'},
 'Asset Inventoryno'=>{de=>'Asset Inventarnummer' },
 'Asset CPU speed'=>{de=>'Asset CPU Taktfrequenz' },
