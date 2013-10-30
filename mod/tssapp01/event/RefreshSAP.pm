@@ -288,6 +288,8 @@ sub processFile
          $wrrec->{isdeleted}="0" if ($wrrec->{isdeleted} eq "");
          next if ($wrrec->{name} eq "9900591950 1000SI"); # wrong entries
          next if ($wrrec->{name} eq "9900591950 8109SI");
+         next if ($wrrec->{name} eq "9900592970 1000SI");
+         next if ($wrrec->{name} eq "9900592970 8109SI");
          if (($wrrec->{name}=~m/^\s*$/) ||
              ($wrrec->{name}=~m/\s/)){
             msg(ERROR,"RefreshSAPP01: ".
