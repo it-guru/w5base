@@ -702,6 +702,63 @@ sub deleteRecord
 
 
 
+sub getRelatedWorkflows
+{
+   my $self=$W5Base::SOAP;
+   my $uri=shift;
+   my $param=shift;
+   $param={} if (!ref($param));
+   $self->_SOAPaction2param($self->{SOAP}->action(),$param);
+   my $objectname=$param->{dataobject};
+   my $filter=$param->{filter};
+   my $id=$param->{IdentifiedBy};
+   my $timerange=$param->{timerange};
+   my $class=$param->{class};
+   my $fulltext=$param->{fulltext};
+
+   $self->Log(INFO,"soap",
+        "getRelatedWorkflows: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
+   $self->Log(INFO,"soap",
+              "[$objectname] ($id)");
+   $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
+   if (!($objectname=~m/^.+::.+$/)){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject name']}));
+   }
+   my $o=getModuleObject($self->Config,$objectname);
+   if (!defined($o)){
+      return(interface::SOAP::kernel::Finish({exitcode=>128,
+             lastmsg=>['invalid dataobject specified']}));
+   }
+   $o->setParent($self);
+   $o->Init();
+
+   if (defined($id) || $id eq "" || ($id=~m/\*/)){
+      my %param;
+      $param{class}=$class if ($class ne "");
+      $param{fulltext}=$class if ($fulltext ne "");
+      $param{timerange}=$timerange if ($timerange ne "");
+      my @l=$o->getRelatedWorkflows($id,\%param);
+      printf STDERR ("fifi l=%s\n",Dumper(\@l));
+      my $v=SOAP::Data->type("curns:ArrayOfStringItems")->value(
+                [map({SOAP::Data->type("xsd:string")->value($_);} @l)]
+            );
+
+      return(interface::SOAP::kernel::Finish({exitcode=>0,
+                                              id=>$v})); 
+      return(interface::SOAP::kernel::Finish({exitcode=>20,
+             lastmsg=>[
+                msg(ERROR,'no unique idenitifier in dataobject found')]})); 
+   }
+   else{
+      return(interface::SOAP::kernel::Finish({exitcode=>12,
+             lastmsg=>["no getRelatedWorkflows IdentifiedBy specified"]})); 
+   }
+   return(interface::SOAP::kernel::Finish({exitcode=>-1}));
+}
+
+
+
 sub findRecord
 {
    return(getHashList(@_));

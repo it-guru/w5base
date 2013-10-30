@@ -826,8 +826,6 @@ sub getHashList
 }
 
 
-
-
 #
 # Write methods
 #
@@ -882,6 +880,32 @@ sub deleteRecord
       if ($self->{exitcode}==0){
          delete($self->{lastmsg});
          return($result->{IdentifiedBy});
+      }
+      $self->{lastmsg}=$result->{lastmsg};
+   }
+   return(undef); 
+}
+
+
+sub getRelatedWorkflows
+{
+   my $self=shift;
+   my $dataobjectid=shift;
+   my $param=shift;
+   my $SOAPresult=$self->SOAP->getRelatedWorkflows({dataobject=>$self->Name,
+                                             lang=>$self->Config->{lang},
+                                             IdentifiedBy=>$dataobjectid,
+                                             timerange=>$param->{timerange},
+                                             fulltext=>$param->{fulltext},
+                                             class=>$param->{class}});
+   my $result=$self->_analyseSOAPresult($SOAPresult);
+   if (defined($result)){
+      $self->{exitcode}=$result->{exitcode};
+      if ($self->{exitcode}==0){
+         delete($self->{lastmsg});
+         return() if (ref($result->{id}) ne "ArrayOfStringItems");
+         return() if (ref($result->{id}->[0]) ne "string");
+         return(@{$result->{id}->[0]});
       }
       $self->{lastmsg}=$result->{lastmsg};
    }

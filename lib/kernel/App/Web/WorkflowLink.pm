@@ -164,6 +164,8 @@ EOF
    return($d);
 }
 
+
+
 sub WorkflowLinkResult
 {
    my $self=shift;
@@ -174,162 +176,19 @@ sub WorkflowLinkResult
    if (!$h->{IsFrontendInitialized}){
       $h->{IsFrontendInitialized}=$h->FrontendInitialize();
    }
-   if (Query->Param("MultiActOperation") eq ':doPROCESS:'){
-      my $q=Query->MultiVars();
-      my @idl;
-      foreach my $k (keys(%$q)){
-         if (my ($id)=$k=~m/^ACT:(\d+)$/){
-            if ($q->{$k} eq "1" || $q->{$k} eq "on"){
-               push(@idl,$id);
-            }
-         }
-      }
-      if ($#idl!=-1){
-         $h->ResetFilter();
-         $h->SecureSetFilter({id=>\@idl});
-         return($h->Result(ExternalFilter=>1));
-      }
-   }
-   if ($h->validateSearchQuery()){
-      my %q=$h->getSearchHash();
-      my $tt=Query->Param("Search_ListTime");
-      if ($tt=~m/[\(\)]/){     # if a month or year is specified, the open
-         $q{eventend}=$tt;     # entrys will not be displayed
-      }
-      elsif ($tt eq ""){
-         $q{eventend}=[undef];
-      }
-      else{
-         $q{eventend}=[$tt,undef];
-      }
-      #Query->Delete("Search_ListTime");  # a test - to allo search time in
-      my $class=Query->Param("class");    # bookmark entries
-      if ($class ne "*" && $class ne ""){
-         $q{class}=[$class];
-      }
-      if ($class eq "*" && defined($self->{workflowlink}->{workflowtyp})){
-         $q{class}=$self->{workflowlink}->{workflowtyp};
-      }
-      my %qorg=%q;
 
-      my $dataobject=$self->Self;
-      my $dataobjectid=Query->Param("CurrentId");
-      my $idobj=$self->IdField();
-      my $idname=$idobj->Name();
-      if (ref($self->{workflowlink}->{workflowkey}) eq "ARRAY" &&
-          $self->{workflowlink}->{workflowkey}->[0] eq $idname){
-         $q{$self->{workflowlink}->{workflowkey}->[1]}=\$dataobjectid;
-       #  $q{affectedapplication}="ASS_ADSL-NI(P)";
-      }
-      else{
-         if (ref($self->{workflowlink}->{workflowkey}) eq "CODE"){
-            &{$self->{workflowlink}->{workflowkey}}($self,\%q,$dataobjectid);
-         }
-         else{
-            $q{id}="none";
-         }
-      }
+   my $tt=Query->Param("Search_ListTime");
+   my $class=Query->Param("class");    
+   my $currentid=Query->Param("CurrentId");
+   my $fulltext=Query->Param("fulltext");
+   
+   my $ids=$self->getRelatedWorkflows($currentid,
+             {timerange=>$tt,class=>$class,fulltext=>$fulltext});
 
-
-      my $fulltext=Query->Param("fulltext");
-
-      my %qmax=%q;
-      $h->ResetFilter();
-      $h->SetFilter(\%qmax);
-      $h->Limit(1502);
-      $h->SetCurrentOrder("id");
-      my @l=$h->getHashList("id");
-      my %idl=();
-      map({$idl{$_->{id}}=1} @l);
-      if (keys(%idl)>1500){
-         print $self->noAccess(msg(ERROR,$self->T("selection to ".
-                               "unspecified for search",
-                               "kernel::App::Web::WorkflowLink")));
-         return();
-      }
-      if ($q{class} eq "" || $q{class}=~m/::(DataIssue|mailsend)$/ ||
-          (ref($q{class}) eq "ARRAY" && 
-           grep(/::(DataIssue|mailsend)$/,@{$q{class}}))){
-         my $fo=$h->getField("directlnktype");
-         if (defined($fo)){
-            my $mode="*";
-            if ($q{class} eq ""){
-               $mode=['DataIssue','W5BaseMail'];
-            }
-            if ($q{class}=~m/::(DataIssue)$/ ||
-                (ref($q{class}) eq "ARRAY" && 
-                 grep(/::(DataIssue)$/,@{$q{class}}))){
-               push(@$mode,'DataIssue') if (ref($mode) eq "ARRAY");
-            }
-            if ($q{class}=~m/::(mailsend)$/ ||
-                (ref($q{class}) eq "ARRAY" && 
-                 grep(/::(mailsend)$/,@{$q{class}}))){
-               push(@$mode,'W5BaseMail') if (ref($mode) eq "ARRAY");
-            }
-           
-            my %qadd=%qorg; # now add the DataIssue Workflows to 
-                            # DataSelection idl
-            $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
-            $qadd{directlnkid}=\$dataobjectid;
-            $qadd{directlnkmode}=$mode;
-            $qadd{isdeleted}=\'0';
-            $h->ResetFilter();
-            $h->SetFilter(\%qadd);
-            $h->Limit(1502);
-            $h->SetCurrentOrder("id");
-            my @l=$h->getHashList("id");
-            map({$idl{$_->{id}}=1} @l);
-         }
-      }
-      if (keys(%idl)>1500){
-         print $self->noAccess(msg(ERROR,$self->T("selection to ".
-                               "unspecified for search",
-                               "kernel::App::Web::WorkflowLink")));
-         return();
-      }
-      %q=(id=>[keys(%idl)],isdeleted=>\'0');
-
-
-      if (!$fulltext=~m/^\s*$/){
-         if (keys(%idl)!=0){
-            my %ftname=%q;
-            $ftname{name}="*$fulltext*";
-            $ftname{id}=[keys(%idl)];
-            my %ftdesc=%q;
-            $ftdesc{detaildescription}="*$fulltext*";
-            $ftdesc{id}=[keys(%idl)];
-            $h->ResetFilter();
-            $h->SetFilter([\%ftdesc,\%ftname]);
-            $h->SetCurrentOrder("id");
-            my %idl1=();
-            my %idl2=();
-            my %idl3=();
-            my @l=$h->getHashList("id");
-            map({$idl1{$_->{id}}=1} @l);
-
-            { # and now the note search
-               $h->{Action}->ResetFilter(); 
-               $h->{Action}->SetFilter({comments=>"*$fulltext*",
-                                        wfheadid=>[keys(%idl)]}); 
-               $h->SetCurrentOrder("wfheadid");
-               my @l=$h->{Action}->getHashList("wfheadid");
-               $h->{Action}->ResetFilter(); 
-               map({$idl2{$_->{wfheadid}}=1} @l);
-            }
-            map({$idl3{$_}=1} keys(%idl2));
-            map({$idl3{$_}=1} keys(%idl1));
-            %q=(id=>[keys(%idl3)],isdeleted=>\'0');
-         }
-         else{
-            %q=(id=>[-1]);
-         }
-      }
-      $h->ResetFilter();
-      $h->SecureSetFilter(\%q);
-      $h->setDefaultView(qw(linenumber eventstart eventend state name));
-      return($h->Result(ExternalFilter=>1));
-   }
-   return("");
+   $h->ResetFilter();
+   $h->SecureSetFilter({id=>$ids,isdeleted=>0});
+   $h->setDefaultView(qw(linenumber eventstart eventend state name));
+   return($h->Result(ExternalFilter=>1));
 }
 
 sub startWorkflow

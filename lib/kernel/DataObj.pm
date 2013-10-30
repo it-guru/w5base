@@ -579,6 +579,169 @@ sub getVal
    return(@l);
 }
 
+
+sub getRelatedWorkflows
+{
+   my $self=shift;
+   my $dataobj=$self->Self;    # dataobject 
+   my $dataobjectid=shift;     # id of record to find related workflows
+   my $param=shift;
+   my $q={};
+
+   my $idobj=$self->IdField();
+
+   my $idname;
+   if (defined($idobj)){
+      $idname=$idobj->Name();
+   }
+print STDERR ("fifi server=%s\n",Dumper($param));
+
+   my $h=$self->getPersistentModuleObject("getRelatedWorkflows",
+                                          "base::workflow");
+   $h->setParent(undef); # reset parent link
+   if (!$h->{IsFrontendInitialized}){
+      $h->{IsFrontendInitialized}=$h->FrontendInitialize();
+   }
+
+   my $tt=$param->{'timerange'};
+
+   if ($tt=~m/[\(\)]/){     # if a month or year is specified, the open
+      $q->{eventend}=$tt;     # entrys will not be displayed
+   }
+   elsif ($tt eq ""){
+      $q->{eventend}=[undef];
+   }
+   else{
+      $q->{eventend}=[$tt,undef];
+   }
+
+   my $class=$param->{class};
+
+   if ($class ne "*" && $class ne ""){
+      $q->{class}=[$class];
+   }
+   if (ref($self->{workflowlink})){
+      if ($class eq "*" && defined($self->{workflowlink}->{workflowtyp})){
+         $q->{class}=$self->{workflowlink}->{workflowtyp};
+      }
+   }
+   my %qorg=%$q;
+
+   if (ref($self->{workflowlink})){
+      if (ref($self->{workflowlink}->{workflowkey}) eq "ARRAY" &&
+          $self->{workflowlink}->{workflowkey}->[0] eq $idname){
+         $q->{$self->{workflowlink}->{workflowkey}->[1]}=\$dataobjectid;
+       #  $q{affectedapplication}="ASS_ADSL-NI(P)";
+      }
+      else{
+         if (ref($self->{workflowlink}->{workflowkey}) eq "CODE"){
+            &{$self->{workflowlink}->{workflowkey}}($self,$q,$dataobjectid);
+         }
+         else{
+            $q->{id}="none";
+         }
+      }
+   }
+
+
+   my %qmax=%$q;
+   $h->ResetFilter();
+   $h->SetFilter(\%qmax);
+   $h->Limit(1502);
+   $h->SetCurrentOrder("id");
+   my @l=$h->getHashList("id");
+   my %idl=();
+   map({$idl{$_->{id}}=1} @l);
+   if (keys(%idl)>1500){
+      $self->LastMsg(ERROR,$self->T("selection to ".
+                                    "unspecified for search",
+                                    "kernel::App::Web::WorkflowLink"));
+      return(undef);
+   }
+   if ($q->{class} eq "" || $q->{class}=~m/::(DataIssue|mailsend)$/ ||
+       (ref($q->{class}) eq "ARRAY" && 
+        grep(/::(DataIssue|mailsend)$/,@{$q->{class}}))){
+      my $fo=$h->getField("directlnktype");
+      if (defined($fo)){
+         my $mode="*";
+         if ($q->{class} eq ""){
+            $mode=['DataIssue','W5BaseMail'];
+         }
+         if ($q->{class}=~m/::(DataIssue)$/ ||
+             (ref($q->{class}) eq "ARRAY" && 
+              grep(/::(DataIssue)$/,@{$q->{class}}))){
+            push(@$mode,'DataIssue') if (ref($mode) eq "ARRAY");
+         }
+         if ($q->{class}=~m/::(mailsend)$/ ||
+             (ref($q->{class}) eq "ARRAY" && 
+              grep(/::(mailsend)$/,@{$q->{class}}))){
+            push(@$mode,'W5BaseMail') if (ref($mode) eq "ARRAY");
+         }
+        
+         my %qadd=%qorg; # now add the DataIssue Workflows to 
+                         # DataSelection idl
+         $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
+         $qadd{directlnkid}=\$dataobjectid;
+         $qadd{directlnkmode}=$mode;
+         $qadd{isdeleted}=\'0';
+         $h->ResetFilter();
+         $h->SetFilter(\%qadd);
+         $h->Limit(1502);
+         $h->SetCurrentOrder("id");
+         my @l=$h->getHashList("id");
+         map({$idl{$_->{id}}=1} @l);
+      }
+   }
+   if (keys(%idl)>1500){
+      $self->LastMsg(ERROR,$self->T("selection to ".
+                                    "unspecified for search",
+                                    "kernel::App::Web::WorkflowLink"));
+      return(undef);
+   }
+   my %q=(id=>[keys(%idl)],isdeleted=>\'0');
+
+   my $fulltext=$param->{'fulltext'};
+
+   if (!$fulltext=~m/^\s*$/){
+      if (keys(%idl)!=0){
+         my %ftname=%$q;
+         $ftname{name}="*$fulltext*";
+         $ftname{id}=[keys(%idl)];
+         my %ftdesc=%q;
+         $ftdesc{detaildescription}="*$fulltext*";
+         $ftdesc{id}=[keys(%idl)];
+         $h->ResetFilter();
+         $h->SetFilter([\%ftdesc,\%ftname]);
+         $h->SetCurrentOrder("id");
+         my %idl1=();
+         my %idl2=();
+         my %idl3=();
+         my @l=$h->getHashList("id");
+         map({$idl1{$_->{id}}=1} @l);
+
+         { # and now the note search
+            $h->{Action}->ResetFilter(); 
+            $h->{Action}->SetFilter({comments=>"*$fulltext*",
+                                     wfheadid=>[keys(%idl)]}); 
+            $h->SetCurrentOrder("wfheadid");
+            my @l=$h->{Action}->getHashList("wfheadid");
+            $h->{Action}->ResetFilter(); 
+            map({$idl2{$_->{wfheadid}}=1} @l);
+         }
+         map({$idl3{$_}=1} keys(%idl2));
+         map({$idl3{$_}=1} keys(%idl1));
+         return([keys(%idl3)]);
+      }
+      else{
+         return([]);
+      }
+   }
+   return([keys(%idl)]);
+}
+
+
+
+
 sub getWriteRequestHash
 {
    my $self=shift;
