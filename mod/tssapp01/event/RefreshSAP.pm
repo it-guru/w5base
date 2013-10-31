@@ -290,6 +290,10 @@ sub processFile
          next if ($wrrec->{name} eq "9900591950 8109SI");
          next if ($wrrec->{name} eq "9900592970 1000SI");
          next if ($wrrec->{name} eq "9900592970 8109SI");
+         next if ($wrrec->{name} eq "9910014071 1000SI");
+         next if ($wrrec->{name} eq "9910014071 8109SI");
+
+
          if (($wrrec->{name}=~m/^\s*$/) ||
              ($wrrec->{name}=~m/\s/)){
             msg(ERROR,"RefreshSAPP01: ".
