@@ -352,6 +352,20 @@ sub NotifyUser
             $tmpl.="\n<br>".$self->T("list your current group relations").
                    ":<br>".$groupinfo;
             $tmpl.="\n<br>DirectLink:<br>".$directlink;
+           
+
+            my $supportnote=$user->getParsedTemplate(
+                              "tmpl/mailsend.supportnote",{
+                                 static=>{
+                                 }
+                              });
+            if ($supportnote ne ""){
+               $tmpl.="\n<br>\n";
+               $tmpl.=$supportnote;
+            }
+
+
+
             $notiy{emailtext}=$tmpl;
             $notiy{class}='base::workflow::mailsend';
             $notiy{step}='base::workflow::mailsend::dataload';

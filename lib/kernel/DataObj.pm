@@ -594,8 +594,6 @@ sub getRelatedWorkflows
    if (defined($idobj)){
       $idname=$idobj->Name();
    }
-print STDERR ("fifi server=%s\n",Dumper($param));
-
    my $h=$self->getPersistentModuleObject("getRelatedWorkflows",
                                           "base::workflow");
    $h->setParent(undef); # reset parent link
