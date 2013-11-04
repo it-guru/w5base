@@ -587,6 +587,8 @@ sub getRelatedWorkflows
    my $dataobjectid=shift;     # id of record to find related workflows
    my $param=shift;
    my $q={};
+   my @internalWfView=qw(id isdeleted eventend stateid eventstart 
+                         srcid srcsys name class fwdtarget fwdtargetid);
 
    my $idobj=$self->IdField();
 
@@ -647,9 +649,8 @@ sub getRelatedWorkflows
    $h->SetFilter(\%qmax);
    $h->Limit(1502);
    $h->SetCurrentOrder("id");
-   my @l=$h->getHashList("id");
    my %idl=();
-   map({$idl{$_->{id}}=1} @l);
+   map({$idl{$_->{id}}=$_} $h->getHashList(@internalWfView));
    if (keys(%idl)>1500){
       $self->LastMsg(ERROR,$self->T("selection to ".
                                     "unspecified for search",
@@ -686,8 +687,7 @@ sub getRelatedWorkflows
          $h->SetFilter(\%qadd);
          $h->Limit(1502);
          $h->SetCurrentOrder("id");
-         my @l=$h->getHashList("id");
-         map({$idl{$_->{id}}=1} @l);
+         map({$idl{$_->{id}}=$_} $h->getHashList(@internalWfView));
       }
    }
    if (keys(%idl)>1500){
@@ -702,7 +702,7 @@ sub getRelatedWorkflows
 
    if (!$fulltext=~m/^\s*$/){
       if (keys(%idl)!=0){
-         my %ftname=%$q;
+         my %ftname=%q;
          $ftname{name}="*$fulltext*";
          $ftname{id}=[keys(%idl)];
          my %ftdesc=%q;
@@ -715,7 +715,7 @@ sub getRelatedWorkflows
          my %idl2=();
          my %idl3=();
          my @l=$h->getHashList("id");
-         map({$idl1{$_->{id}}=1} @l);
+         map({$idl1{$_->{id}}=$idl{$_->{id}}} @l);
 
          { # and now the note search
             $h->{Action}->ResetFilter(); 
@@ -726,15 +726,15 @@ sub getRelatedWorkflows
             $h->{Action}->ResetFilter(); 
             map({$idl2{$_->{wfheadid}}=1} @l);
          }
-         map({$idl3{$_}=1} keys(%idl2));
-         map({$idl3{$_}=1} keys(%idl1));
-         return([keys(%idl3)]);
+         map({$idl3{$_}=$idl{$_}} keys(%idl2));
+         map({$idl3{$_}=$idl{$_}} keys(%idl1));
+         return(\%idl3);
       }
       else{
-         return([]);
+         return({});
       }
    }
-   return([keys(%idl)]);
+   return(\%idl);
 }
 
 
