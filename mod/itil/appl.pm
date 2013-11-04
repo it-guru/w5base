@@ -1465,7 +1465,14 @@ sub ItemSummary
    my ($rec,$msg)=$o->getOnlyFirst("systems");
    Dumper($rec);
    $summary->{systems}=$rec->{systems};
-   return(1) if ($o->Ping());
+   return(0) if (!$o->Ping());
+
+   my $ids=$self->getRelatedWorkflows($current->{id},
+             {timerange=>">01.10.2013"});
+   $summary->{workflow}=[values(%$ids)];
+   return(0) if (!$self->Ping());
+
+   return(1);
 }
 
 

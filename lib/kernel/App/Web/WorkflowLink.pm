@@ -184,11 +184,12 @@ sub WorkflowLinkResult
    
    my $ids=$self->getRelatedWorkflows($currentid,
              {timerange=>$tt,class=>$class,fulltext=>$fulltext});
-
-   $h->ResetFilter();
-   $h->SecureSetFilter({id=>$ids,isdeleted=>0});
-   $h->setDefaultView(qw(linenumber eventstart eventend state name));
-   return($h->Result(ExternalFilter=>1));
+   if (defined($ids)){
+      $h->ResetFilter();
+      $h->SecureSetFilter({id=>[keys(%{$ids})],isdeleted=>0});
+      $h->setDefaultView(qw(linenumber eventstart eventend state name));
+      return($h->Result(ExternalFilter=>1));
+   }
 }
 
 sub startWorkflow

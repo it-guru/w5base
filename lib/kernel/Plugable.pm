@@ -317,20 +317,26 @@ sub getTimeRangeDrop
    if (grep(/^relativemonth$/,@modes)){
       $d.="<option value=\"nextmonth\"";
       $d.=" selected" if ($oldval eq "nextmonth");
-      $d.=">".$self->getParent->T("nextmonth")."</option>";
+      $d.=">".$app->T("nextmonth")."</option>";
       $k{nextmonth}="nextmonth";
    }
    if (grep(/^relativemonth$/,@modes)){
       $d.="<option value=\"currentmonth\"";
       $d.=" selected" if ($oldval eq "currentmonth");
-      $d.=">".$self->getParent->T("currentmonth")."</option>";
+      $d.=">".$app->T("currentmonth")."</option>";
       $k{currentmonth}="currentmonth";
+   }
+   if (grep(/^relativemonth$/,@modes)){
+      $d.="<option value=\"curandlastmonth\"";
+      $d.=" selected" if ($oldval eq "curandlastmonth");
+      $d.=">".$app->T("curandlastmonth")."</option>";
+      $k{currentmonth}="curandlastmonth";
    }
    if (grep(/^lastmonth$/,@modes) ||
        grep(/^relativemonth$/,@modes)){
       $d.="<option value=\"lastmonth\"";
       $d.=" selected" if ($oldval eq "lastmonth");
-      $d.=">".$self->getParent->T("lastmonth")."</option>";
+      $d.=">".$app->T("lastmonth")."</option>";
       $k{lastmonth}="lastmonth";
    }
    $d.="</select>\n"; 
