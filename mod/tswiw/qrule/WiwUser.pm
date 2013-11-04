@@ -93,6 +93,9 @@ sub qcheckRecord
                   $user->SetFilter({email=>\$newemail});
                   my ($alturec,$msg)=$user->getOnlyFirst(qw(ALL));
                   if (defined($alturec)){
+                     printf STDERR ("WiwUser: ".
+                                    "address change failed - ".
+                                    "problem not automatic repairable.\n");
                      return(0,
                         {qmsg=>['unrepairable email address change detected']});
                   }
