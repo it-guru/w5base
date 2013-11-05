@@ -62,7 +62,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'frontlabel',
-                label         =>'Product label',
+                label         =>'Product designation',
                 htmlheight    =>50,
                 dataobjattr   =>'artproduct.frontlabel'),
 
@@ -146,6 +146,19 @@ sub new
                 label         =>'CategoryID',
                 dataobjattr   =>'artproduct.artcategory1'),
 
+      new kernel::Field::Select(
+                name          =>'category2',
+                label         =>'alt Category',
+                allowempty    =>1,
+                vjointo       =>'article::category',
+                vjoinon       =>['category2id'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'category2id',
+                label         =>'alt CategoryID',
+                dataobjattr   =>'artproduct.artcategory2'),
+
       new kernel::Field::Number(
                 name          =>'posno1',
                 label         =>'Position Number',
@@ -166,6 +179,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'description',
+                group         =>'desc',
                 label         =>'Description',
                 dataobjattr   =>'artproduct.description'),
 
@@ -174,6 +188,36 @@ sub new
                 group         =>'variantspecials',
                 label         =>'variant specials',
                 dataobjattr   =>'artproduct.variantdesc'),
+
+      new kernel::Field::Textarea(
+                name          =>'custoblig',
+                group         =>'custoblig',
+                label         =>'Customer obligations',
+                dataobjattr   =>'artproduct.custoblig'),
+
+      new kernel::Field::Textarea(
+                name          =>'premises',
+                group         =>'custoblig',
+                label         =>'Premises',
+                dataobjattr   =>'artproduct.premises'),
+
+      new kernel::Field::Textarea(
+                name          =>'rest',
+                group         =>'custoblig',
+                label         =>'Restrictions',
+                dataobjattr   =>'artproduct.rest'),
+
+      new kernel::Field::Textarea(
+                name          =>'exclusions',
+                group         =>'custoblig',
+                label         =>'Exclusions',
+                dataobjattr   =>'artproduct.exclusions'),
+
+      new kernel::Field::Textarea(
+                name          =>'pod',
+                group         =>'pod',
+                label         =>'Point of delivery',
+                dataobjattr   =>'artproduct.pod'),
 
       new kernel::Field::Contact(
                 name          =>'productmgr',
@@ -265,7 +309,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'billinterval',
-                label         =>'bill interval',
+                label         =>'Invoicing frequency',
                 value         =>['PERMONTH','PERYEAR'],
                 group         =>'cost',
                 dataobjattr   =>'artproduct.billinterval'),
@@ -276,40 +320,6 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'if (artproduct.variantof is null,'.
                                 'artproduct.id,artproduct.variantof)'),
-
-      new kernel::Field::SubList(
-                name          =>'directproductelements',
-                label         =>'direct Productelements',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   if (defined($param{current})){
-                      return(1) if ($param{current}->{pclass} eq "simple");
-                   }
-                   return(0);
-                },
-                group         =>'productelements',
-                vjointo       =>'article::lnkelementprod',
-                vjoinon       =>['subparentid'=>'productid'],
-                vjoindisp     =>['delivelement']),
-
-      new kernel::Field::SubList(
-                name          =>'allproductelements',
-                label         =>'all Productelements',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   if (defined($param{current})){
-                      return(1) if ($param{current}->{pclass} eq "bundle");
-                   }
-                   return(0);
-                },
-                group         =>'productelements',
-                vjointo       =>'article::lnkelement',
-                vjoinon       =>['subparentid'=>'productid'],
-                vjoindisp     =>['delivelement']),
 
       new kernel::Field::SubList(
                 name          =>'subproducts',
@@ -484,10 +494,9 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","variantspecials",
-          "cost","mgmt","variants",
+   return("header","default","desc","variantspecials",
+          "custoblig","pod","cost","mgmt","variants",
           "subproducts",
-          "productelements",
           "mgmtlogosmall","mgmtlogolarge","source");
 }
 
@@ -508,7 +517,6 @@ sub FinishWrite
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
    if (!$bak){
       my $id=effVal($oldrec,$newrec,"id");
-    #  my $p=getModuleObject($self->Config,"article::product");
       my $p=$self;
       $self->ResetFilter();
       $p->SetFilter({variantofid=>\$id});
@@ -520,7 +528,6 @@ sub FinishWrite
             $p->ValidatedUpdateRecordTransactionless(
                    $subrec,{mdate=>NowStamp("en")},{id=>\$id});
          }
-         $p->RoolbackTransaction();
       }
    }
    return($bak);
@@ -684,10 +691,10 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","mgmt") if (!defined($rec));
-   my @l=("header","default","history","mgmt",
+   return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
+   my @l=("header","default","history","mgmt","desc","custoblig","pod",
           "mgmtlogosmall","mgmtlogolarge",
-          "cost","productelements","source");
+          "cost","source");
    if ($rec->{pvariant} eq "standard"){
       push(@l,"variants");
    }
@@ -704,12 +711,12 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   return("default") if (!defined($rec));
+   return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
 
-   my @wrgroups=qw(default mgmt mgmtlogosmall mgmtlogolarge);
+   my @wrgroups=qw(default desc custoblig pod mgmt mgmtlogosmall mgmtlogolarge);
 
    if (defined($rec) && $rec->{variantofid}){
-      @wrgroups=grep(!/^default$/,@wrgroups);
+      @wrgroups=grep(!/^(default|desc|custoblig|pod)$/,@wrgroups);
    }
 
    push(@wrgroups,"cost") if (defined($rec));
@@ -722,7 +729,6 @@ sub isWriteValid
    }
    push(@wrgroups,"subproducts") if ($rec->{pclass} eq "bundle" &&
                                      $rec->{pvariant} eq "standard");
-   push(@wrgroups,"productelements") if ($rec->{pclass} eq "simple");
 
    return(@wrgroups) if (!defined($rec));
 

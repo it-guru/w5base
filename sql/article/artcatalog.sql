@@ -119,10 +119,10 @@ create table artdelivprovider (
   key name(name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-create table artdelivelement (
+create table artprodvariantoption (
   id         bigint(20)  NOT NULL,
-  artdelivprovider  bigint(20)  NOT NULL,
-  frontlabel        longtext, 
+  artproduct bigint(20)  NOT NULL,
+  optionclass  char(10), 
   description longtext,
   comments    longtext,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
@@ -135,8 +135,8 @@ create table artdelivelement (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  FOREIGN KEY deliverypartner (artdelivprovider)
-          REFERENCES artdelivprovider (id) ON DELETE RESTRICT,
+  FOREIGN KEY artproduct (artproduct)
+          REFERENCES artproduct (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnkartelementprod (
@@ -181,3 +181,4 @@ create table lnkartprodprod (
           REFERENCES  artproduct (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table artproduct add custoblig longtext, add premises longtext, add rest longtext, add exclusions longtext, add pod longtext;
