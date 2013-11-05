@@ -738,17 +738,15 @@ sub getRelatedWorkflows
       $param{class}=$class if ($class ne "");
       $param{fulltext}=$class if ($fulltext ne "");
       $param{timerange}=$timerange if ($timerange ne "");
-      my @l=$o->getRelatedWorkflows($id,\%param);
-      printf STDERR ("fifi l=%s\n",Dumper(\@l));
-      my $v=SOAP::Data->type("curns:ArrayOfStringItems")->value(
-                [map({SOAP::Data->type("xsd:string")->value($_);} @l)]
-            );
-
-      return(interface::SOAP::kernel::Finish({exitcode=>0,
-                                              id=>$v})); 
+      my $l=$o->getRelatedWorkflows($id,\%param);
+      if (ref($l)){
+         my $v=[values(%$l)];
+       #  my $v=SOAP::Data->type("curns:ArrayOfStringItems")->value(
+       #       [map({SOAP::Data->type("xsd:string")->value($_);} values(%$l))]);
+         return(interface::SOAP::kernel::Finish({exitcode=>0,workflows=>$v})); 
+      }
       return(interface::SOAP::kernel::Finish({exitcode=>20,
-             lastmsg=>[
-                msg(ERROR,'no unique idenitifier in dataobject found')]})); 
+             lastmsg=>[msg(ERROR,'query error')]})); 
    }
    else{
       return(interface::SOAP::kernel::Finish({exitcode=>12,

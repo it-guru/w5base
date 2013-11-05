@@ -43,7 +43,7 @@ else{
 # do search
 #
 my @res=$appl->getRelatedWorkflows(5275,{timerange=>'(2013)'});
-printf STDERR ("list=%s\n",join(":",@res));
+printf STDERR ("list=%s\n",Dumper(\@res));
 $appl->dieOnERROR();
 exit(0);
 

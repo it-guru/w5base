@@ -903,9 +903,7 @@ sub getRelatedWorkflows
       $self->{exitcode}=$result->{exitcode};
       if ($self->{exitcode}==0){
          delete($self->{lastmsg});
-         return() if (ref($result->{id}) ne "ArrayOfStringItems");
-         return() if (ref($result->{id}->[0]) ne "string");
-         return(@{$result->{id}->[0]});
+         return(@{$result->{workflows}});
       }
       $self->{lastmsg}=$result->{lastmsg};
    }
