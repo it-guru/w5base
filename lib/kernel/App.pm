@@ -377,6 +377,7 @@ sub _LoadUserInUserCache
    my $res=shift;              # result of rpcCacheQuery in Web Context
 
    return(0) if ($AccountOrUserID eq "");
+   return(0) if ($AccountOrUserID eq "anonymous");
    my $o=$self->Cache->{User}->{DataObj};
    if (!defined($o)){     # DataObj also filled in App/Web.pm !
       $o=$self->ModuleObject("base::user");
