@@ -66,14 +66,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("article.product.lnkelement",
-                      "article::lnkelementprod",
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("article.product.lnkelement.new",
-                      "article::lnkelementprod",
-                      func=>'New',
-                      defaultacl=>['valid_user']);
+#   $self->RegisterObj("article.product.lnkelement",
+#                      "article::lnkelementprod",
+#                      defaultacl=>['valid_user']);
+#
+#   $self->RegisterObj("article.product.lnkelement.new",
+#                      "article::lnkelementprod",
+#                      func=>'New',
+#                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("article.product.subproduct",
                       "article::lnkprodprod",
@@ -93,14 +93,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("article.delivprovider.element",
-                      "article::delivelement",
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("article.delivprovider.element.new",
-                      "article::delivelement",
-                      func=>'New',
-                      defaultacl=>['valid_user']);
+#   $self->RegisterObj("article.delivprovider.element",
+#                      "article::delivelement",
+#                      defaultacl=>['valid_user']);
+#
+#   $self->RegisterObj("article.delivprovider.element.new",
+#                      "article::delivelement",
+#                      func=>'New',
+#                      defaultacl=>['valid_user']);
 
    return($self);
 }
