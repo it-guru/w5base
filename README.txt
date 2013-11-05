@@ -255,7 +255,7 @@ min number of cores               : 1
    #
    su - $W5BASEDEVUSER
    cd $W5BASEINSTDIR/..
-   svn co https://w5base.svn.sourceforge.net/svnroot/w5base/HEAD w5base
+   svn co https://svn.code.sf.net/p/w5base/code/HEAD w5base
  
  
  Step6: add special packages from w5base repository
