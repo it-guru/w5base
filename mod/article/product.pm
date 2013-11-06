@@ -146,19 +146,6 @@ sub new
                 label         =>'CategoryID',
                 dataobjattr   =>'artproduct.artcategory1'),
 
-      new kernel::Field::Select(
-                name          =>'category2',
-                label         =>'alt Category',
-                allowempty    =>1,
-                vjointo       =>'article::category',
-                vjoinon       =>['category2id'=>'id'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'category2id',
-                label         =>'alt CategoryID',
-                dataobjattr   =>'artproduct.artcategory2'),
-
       new kernel::Field::Number(
                 name          =>'posno1',
                 label         =>'Position Number',
@@ -176,6 +163,19 @@ sub new
                 htmleditwidth =>'40px',
                 precision     =>0,
                 dataobjattr   =>'artproduct.posno1'),
+
+      new kernel::Field::Select(
+                name          =>'category2',
+                label         =>'alt Category',
+                allowempty    =>1,
+                vjointo       =>'article::category',
+                vjoinon       =>['category2id'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'category2id',
+                label         =>'alt CategoryID',
+                dataobjattr   =>'artproduct.artcategory2'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -233,6 +233,19 @@ sub new
                 group         =>'mgmt',
                 dataobjattr   =>'artproduct.productmgr'),
 
+      new kernel::Field::TextDrop(
+                name          =>'delivprovider',
+                label         =>'Provider',
+                group         =>'mgmt',
+                vjointo       =>'article::delivprovider',
+                vjoinon       =>['delivproviderid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'delivproviderid',
+                group         =>'mgmt',
+                dataobjattr   =>'artproduct.delivprovider'),
+
       new kernel::Field::Date(
                 name          =>'orderable_from',
                 group         =>'mgmt',
@@ -260,6 +273,88 @@ sub new
                 group         =>'mgmtlogolarge',
                 uploadable    =>0,
                 dataobjattr   =>'artproduct.logo_large'),
+
+
+
+      new kernel::Field::Textarea(
+                name          =>'pricerulesmodals',
+                group         =>'price',
+                label         =>'Commercial Rules/Modalities',
+                dataobjattr   =>'artproduct.price_rulesmodals'),
+
+      new kernel::Field::Number(
+                name          =>'priceonce',
+                label         =>'price once',
+                precision     =>2,
+                width         =>'50',
+                group         =>'price',
+                dataobjattr   =>'artproduct.price_once'),
+
+      new kernel::Field::Number(
+                name          =>'priceday',
+                label         =>'price day',
+                precision     =>2,
+                width         =>'50',
+                group         =>'price',
+                dataobjattr   =>'artproduct.price_day'),
+
+      new kernel::Field::Number(
+                name          =>'pricemonth',
+                label         =>'price month',
+                precision     =>2,
+                width         =>'50',
+                group         =>'price',
+                dataobjattr   =>'artproduct.price_month'),
+
+      new kernel::Field::Number(
+                name          =>'priceyear',
+                precision     =>2,
+                width         =>'50',
+                label         =>'price year',
+                group         =>'price',
+                dataobjattr   =>'artproduct.price_year'),
+
+      new kernel::Field::Number(
+                name          =>'priceperuse',
+                label         =>'price peruse',
+                precision     =>2,
+                width         =>'50',
+                group         =>'price',
+                dataobjattr   =>'artproduct.price_peruse'),
+
+      new kernel::Field::Text(
+                name          =>'pricecurrency',
+                label         =>'currency',
+                group         =>'price',
+                dataobjattr   =>'artproduct.price_currency'),
+
+      new kernel::Field::Text(
+                name          =>'priceprodunit',
+                label         =>'unit of quantity',
+                group         =>'price',
+                dataobjattr   =>'artproduct.price_produnit'),
+
+      new kernel::Field::Select(
+                name          =>'pricebillinterval',
+                label         =>'Invoicing frequency',
+                value         =>['PERMONTH','PERYEAR'],
+                group         =>'price',
+                dataobjattr   =>'artproduct.price_billinterval'),
+
+      new kernel::Field::Textarea(
+                name          =>'pricestepping',
+                group         =>'price',
+                label         =>'Step pricing',
+                dataobjattr   =>'artproduct.price_stepping'),
+
+
+      new kernel::Field::Textarea(
+                name          =>'pricerulesmodals',
+                group         =>'price',
+                label         =>'Commercial Rules/Modalities',
+                dataobjattr   =>'artproduct.price_rulesmodals'),
+
+
 
       new kernel::Field::Number(
                 name          =>'costonce',
@@ -302,17 +397,31 @@ sub new
                 dataobjattr   =>'artproduct.cost_peruse'),
 
       new kernel::Field::Text(
-                name          =>'produnit',
-                label         =>'product unit',
+                name          =>'costcurrency',
+                label         =>'currency',
                 group         =>'cost',
-                dataobjattr   =>'artproduct.produnit'),
+                dataobjattr   =>'artproduct.cost_currency'),
+
+      new kernel::Field::Text(
+                name          =>'costprodunit',
+                label         =>'unit of quantity',
+                group         =>'cost',
+                dataobjattr   =>'artproduct.cost_produnit'),
 
       new kernel::Field::Select(
-                name          =>'billinterval',
+                name          =>'costbillinterval',
                 label         =>'Invoicing frequency',
                 value         =>['PERMONTH','PERYEAR'],
                 group         =>'cost',
-                dataobjattr   =>'artproduct.billinterval'),
+                dataobjattr   =>'artproduct.cost_billinterval'),
+
+      new kernel::Field::Textarea(
+                name          =>'coststepping',
+                group         =>'cost',
+                label         =>'Step pricing',
+                dataobjattr   =>'artproduct.cost_stepping'),
+
+
         
       new kernel::Field::Link(
                 name          =>'subparentid',
@@ -495,7 +604,7 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","desc","variantspecials",
-          "custoblig","pod","cost","mgmt","variants",
+          "custoblig","pod","price","cost","mgmt","variants",
           "subproducts",
           "mgmtlogosmall","mgmtlogolarge","source");
 }
@@ -694,7 +803,7 @@ sub isViewValid
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
    my @l=("header","default","history","mgmt","desc","custoblig","pod",
           "mgmtlogosmall","mgmtlogolarge",
-          "cost","source");
+          "cost","price","source");
    if ($rec->{pvariant} eq "standard"){
       push(@l,"variants");
    }
@@ -719,7 +828,7 @@ sub isWriteValid
       @wrgroups=grep(!/^(default|desc|custoblig|pod)$/,@wrgroups);
    }
 
-   push(@wrgroups,"cost") if (defined($rec));
+   push(@wrgroups,"cost","price") if (defined($rec));
 
    if (defined($rec) && $rec->{pvariant} eq "standard"){
       push(@wrgroups,"variants");

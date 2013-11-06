@@ -133,7 +133,9 @@ sub new
                 label         =>'Outline Number',
                 htmldetail    =>0,
                 readonly      =>1,
-                dataobjattr   =>'cast(if (p5.id is not null,"[LevelDepthError]",if (p1.id is null,artcategory.posno,'.
+                dataobjattr   =>'cast(if (p5.id is not null,'.
+                                '"[LevelDepthError]",'.
+                                'if (p1.id is null,artcategory.posno,'.
                                 'if(p2.id is null,concat(p1.posno,".",'.
                                 'artcategory.posno),if(p3.id is null,'.
                                 'concat(p2.posno,".",p1.posno,".",'.
@@ -163,6 +165,11 @@ sub new
                 label         =>'Category label',
                 htmlheight    =>50,
                 dataobjattr   =>'artcategory.frontlabel'),
+
+      new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'category description',
+                dataobjattr   =>'artcategory.description'),
 
       new kernel::Field::SubList(
                 name          =>'products',
