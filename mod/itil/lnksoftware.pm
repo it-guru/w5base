@@ -283,6 +283,16 @@ sub new
                 group         =>'softwaredetails',
                 dataobjattr   =>'software.producer'),
 
+      new kernel::Field::Interface(
+                name          =>'is_dbs',
+                group         =>'softwaredetails',
+                dataobjattr   =>'software.is_dbs'),
+
+      new kernel::Field::Interface(
+                name          =>'is_mw',
+                group         =>'softwaredetails',
+                dataobjattr   =>'software.is_mw'),
+
       new kernel::Field::Select(
                 name          =>'softwarecistatus',
                 group         =>'softwaredetails',
@@ -905,6 +915,14 @@ sub calcSoftwareState
       $FilterSet->{Analyse}->{totalmsg}=[];
       $FilterSet->{Analyse}->{softwareid}=[keys(%swid)];
 
+      my $resdstate=$FilterSet->{Analyse}->{dstate};
+      foreach my $g (qw(OS MW DB)){
+         $resdstate->{group}->{$g}={
+            count=>0,
+            fail=>0,
+            warn=>0,
+         };
+      }
 
       if ($#applid!=-1){ # load systems
          my $lnk=getModuleObject($self->getParent->Config,
@@ -929,6 +947,7 @@ sub calcSoftwareState
                my @ruleset=@{$FilterSet->{Set}->{data}->{osrelease}};
                @ruleset=sort({$a->{comparator}<=>$b->{comparator}} @ruleset);
                my $dstate="OK";
+               $resdstate->{group}->{OS}->{count}++;
                foreach my $osrec (@ruleset){
                   if ($srec->{osreleaseid} eq  $osrec->{osreleaseid}){
                      if ($osrec->{comparator} eq "0"){
@@ -942,6 +961,7 @@ sub calcSoftwareState
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                             "$srec->{name} OS '$srec->{osrelease}' ".
                             "is marked as not allowed");
+                        $resdstate->{group}->{OS}->{fail}++;
                      }
                      if ($osrec->{comparator} eq "1"){
                         $dstate="WARN";
@@ -954,10 +974,11 @@ sub calcSoftwareState
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                             "$srec->{name} OS '$srec->{osrelease}' ".
                             "is soon not allowed");
+                        $resdstate->{group}->{OS}->{warn}++;
                      }
                   }
                }
-               $FilterSet->{Analyse}->{dstate}->{system}->{$lnkrec->{system}}={
+               $resdstate->{system}->{$lnkrec->{system}}={
                   state=>$dstate,
                };
             }
@@ -974,7 +995,7 @@ sub calcSoftwareState
          $lnk->SetFilter({id=>\$current->{id}});
       }
       $lnk->SetCurrentView(qw(systemid system software denyupd denyupdvalidto
-                              releasekey version softwareid));
+                              releasekey version softwareid is_dbs is_mw));
       $FilterSet->{Analyse}->{ssoftware}=
              $lnk->getHashIndexed(qw(id systemid softwareid));
 
@@ -995,8 +1016,14 @@ sub calcSoftwareState
       @ruleset=sort({$a->{comparator}<=>$b->{comparator}} @ruleset);
 
 
-      foreach my $swrec (@ruleset){
-         foreach my $swi (values(%{$FilterSet->{Analyse}->{ssoftware}->{id}})){
+      foreach my $swi (values(%{$FilterSet->{Analyse}->{ssoftware}->{id}})){
+         if ($swi->{is_mw}){
+            $resdstate->{group}->{MW}->{count}++;
+         }
+         if ($swi->{is_dbs}){
+            $resdstate->{group}->{DB}->{count}++;
+         }
+         foreach my $swrec (@ruleset){
             if ($swrec->{softwareid} eq  $swi->{softwareid}){
                $FilterSet->{Analyse}->{relevantSoftwareInst}++;
                if ($swi->{version}=~m/^\s*$/){
@@ -1034,6 +1061,12 @@ sub calcSoftwareState
                                  "- soon update $swi->{software} on ".
                                  "system $swi->{system} ".
                                  "from $swi->{version} to  $swrec->{version}");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{warn}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{warn}++;
+                           }
                         }
                         if (!($FilterSet->{Analyse}->{totalstate}=~m/^WARN/)
                             &&  # ERROR have a higher priority
@@ -1055,6 +1088,12 @@ sub calcSoftwareState
                                  "- only version $swi->{version} ".
                                  " of $swi->{software} is allowed on  ".
                                  " system $swi->{system} ");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{fail}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{fail}++;
+                           }
                         }
                         if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
@@ -1070,6 +1109,12 @@ sub calcSoftwareState
                            push(@{$FilterSet->{Analyse}->{todo}},
                                "- remove disallowed version $swi->{software} ".
                                " $swi->{version} from  system $swi->{system} ");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{fail}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{fail}++;
+                           }
                         }
                         if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
@@ -1085,6 +1130,12 @@ sub calcSoftwareState
                                  "- update $swi->{software} on ".
                                  "system $swi->{system} ".
                                  "from $swi->{version} to  $swrec->{version}");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{fail}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{fail}++;
+                           }
                         }
                         if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
@@ -1099,8 +1150,8 @@ sub calcSoftwareState
          }
       }
 
- 
       
+ 
    }
  #  printf STDERR ("id=$current->{id} d=%s\n",Dumper($FilterSet->{Set}->{data}));
  #  printf STDERR ("sw=%s\n",Dumper($FilterSet->{Analyse}->{ssoftware}));
@@ -1150,6 +1201,14 @@ sub calcSoftwareState
    elsif ($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/){
       $finestate="red";
    }
+   my @resdstate;
+   foreach my $g (sort(keys(%{$FilterSet->{Analyse}->{dstate}->{group}}))){
+       push(@resdstate,"$g(".
+              $FilterSet->{Analyse}->{dstate}->{group}->{$g}->{count}."/".
+              $FilterSet->{Analyse}->{dstate}->{group}->{$g}->{warn}."/".
+              $FilterSet->{Analyse}->{dstate}->{group}->{$g}->{fail}.")");
+   }
+   push(@d,"INFO:  grouped state ".join(" ",@resdstate));
    push(@d,"<b>STATE:</b> <font color=$finestate>".$finestate."</font>");
    
    if ($self->Name eq "rawsoftwareanalysestate"){
