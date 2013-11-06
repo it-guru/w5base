@@ -66,6 +66,11 @@ sub new
                 htmlheight    =>50,
                 dataobjattr   =>'artcatalog.frontlabel'),
 
+      new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Catalog description',
+                dataobjattr   =>'artcatalog.description'),
+
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',

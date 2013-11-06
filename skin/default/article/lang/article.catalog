@@ -1,5 +1,6 @@
 'article::catalog'=>{de=>'Katalog',en=>'Catalog'},
 'Catalog label'=>{de=>'Katalog Beschriftung'},
+'Catalog description'=>{de=>'Katalog Beschreibung'},
 'Catalog'=>{de=>'Katalog'},
 'fieldgroup.categories'=>{de=>'Kategorien',en=>'Categories'},
 'Databoss'=>{de=>'Datenverantwortlicher'},

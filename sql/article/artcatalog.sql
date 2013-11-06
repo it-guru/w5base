@@ -131,10 +131,10 @@ create table artdelivprovider (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table artprodvariantoption (
   id         bigint(20)  NOT NULL,
-  artproduct bigint(20)  NOT NULL,
-  optionclass  char(10), 
-  description longtext,
-  comments    longtext,
+  artproduct bigint(20)  NOT NULL,variantof bigint(20) not null,
+  optionclass  char(10), name varchar(40),
+  description longtext,  raci_customer varchar(4), raci_supplier varchar(4),
+  comments    longtext,  checkfrequency longtext,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',

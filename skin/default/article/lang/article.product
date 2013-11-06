@@ -52,4 +52,6 @@
 'Commercial Rules/Modalities'=>{de=>'Kommerzielle Regelungen/Modalitäten'},
 'Step pricing'=>{de=>'Korridorregelungen'},
 'Provider'=>{de=>'Anbieter'},
+'PERMONTH'=>{de=>'monatlich'},
+'PERYEAR'=>{de=>'jährlich'},
 
