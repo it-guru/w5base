@@ -832,7 +832,7 @@ sub getSqlFrom
         "join itclust on itclust.id=lnkitclustsvc.itclust ".
         "join system on lnkitclustsvc.itclust=system.clusterid ".
         $datasourcerest2." ".
-        "group by system.id";
+        "group by system.id,lnkitclustsvcappl.appl";
 
    my $from="($datasource) qlnkapplsystem left outer join appl ".
             "on qlnkapplsystem.appl=appl.id ".
