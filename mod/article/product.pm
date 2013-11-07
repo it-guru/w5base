@@ -180,6 +180,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'description',
                 group         =>'desc',
+                htmlheight    =>350,
                 label         =>'Description',
                 dataobjattr   =>'artproduct.description'),
 
@@ -603,8 +604,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","desc","variantspecials",
-          "custoblig","pod","price","cost","mgmt","variants",
+   return("header","default","desc","variants","variantspecials",
+          "custoblig","pod","price","cost","mgmt",
           "subproducts",
           "mgmtlogosmall","mgmtlogolarge","source");
 }

@@ -12,7 +12,7 @@
 'fieldgroup.mgmtlogolarge'=>{de=>'Produkt-Management - Logo 2',en=>'Product-Management - Logo 2'},
 'fieldgroup.custoblig'=>{de=>'Mitwirkungsleistungen, Voraussetzungen und Ausschlüsse',en=>'Customer obligations, premises and exclusions'},
 'fieldgroup.pod'=>{de=>'Leistungsübergabepunkt',en=>'Point of delivery'},
-'fieldgroup.desc'=>{de=>'Productbeschreibung',en=>'Product description'},
+'fieldgroup.desc'=>{de=>'Produktbeschreibung',en=>'Product description'},
 'fieldgroup.variants'=>{de=>'Produktvarianten',en=>'Product variants'},
 'fieldgroup.subproducts'=>{de=>'Unterprodukte',en=>'Subproducts'},
 'fieldgroup.variantspecials'=>{de=>'Varianten-Besonderheiten',en=>'variant specials'},
