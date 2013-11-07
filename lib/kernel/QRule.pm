@@ -371,6 +371,32 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
          }
       }
    }
+   elsif ($param{mode} eq "date"){      
+      if (exists($comprec->{$compfieldname})){
+         if (defined($comprec->{$compfieldname})){
+            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
+            my $t1=$origrec->{$origfieldname};
+            my $t2=$comprec->{$compfieldname};
+            if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
+               $takeremote++;
+            }
+         }
+      }
+   }
+   elsif ($param{mode} eq "day"){      
+      if (exists($comprec->{$compfieldname})){
+         if (defined($comprec->{$compfieldname})){
+            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
+            my $t1=$origrec->{$origfieldname};
+            my $t2=$comprec->{$compfieldname};
+            $t1=~s/^(\d{4}-\d{2}-\d{2}).*/\1/;
+            $t2=~s/^(\d{4}-\d{2}-\d{2}).*/\1/;
+            if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
+               $takeremote++;
+            }
+         }
+      }
+   }
    elsif ($param{mode} eq "integer"){  # like amounth of memory
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&

@@ -2,6 +2,7 @@
 'fieldgroup.default'=>{de=>'Asset-Verwaltungs-Daten',en=>'Asset-Administration-Informations'},
 'fieldgroup.physasset'=>{de=>'Hardwaredaten',en=>'Assetdata'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
+'fieldgroup.financeco'=>{de=>'Kontierung und Finanzen',en=>'finance informations'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'fieldgroup.location'=>{de=>'Standort',en=>'Location'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
@@ -44,3 +45,7 @@
 'mangaged by rules of SOX'=>{de=>'Betreuung nach SOX (USA) Regeln'},
 'SOX state'=>{de=>'SOX (USA) status'},
 'invalid name specified'=>{de=>'ungültiger Asset Name / AssetID'},
+'Deprecation Start'=>{de=>'Abschreibungsbegin'},
+'Deprecation End'=>{de=>'Abschreibungsende'},
+"deprend can not be sooner as deprstart"=>{de=>"Abschreibungsende kann nicht vor Abschreibungsbegin liegen"},
+

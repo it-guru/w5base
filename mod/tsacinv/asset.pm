@@ -232,6 +232,7 @@ sub new
                 name          =>'age',
                 group         =>'finanz',
                 depend        =>'assetid',
+                htmldetail    =>0,
                 onRawValue    =>\&CalcDep,
                 label         =>'Age',
                 unit          =>'days'),

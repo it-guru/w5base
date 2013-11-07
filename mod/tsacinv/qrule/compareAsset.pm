@@ -127,6 +127,20 @@ sub qcheckRecord
                        mode=>'integer');
 
          $self->IfComp($dataobj,
+                       $rec,"deprstart",
+                       $parrec,"deprstart",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'day');
+
+         $self->IfComp($dataobj,
+                       $rec,"deprend",
+                       $parrec,"deprend",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'day');
+
+         $self->IfComp($dataobj,
                        $rec,"corecount",
                        $parrec,"corecount",
                        $autocorrect,$forcedupd,$wfrequest,

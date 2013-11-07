@@ -317,11 +317,25 @@ sub new
       new kernel::Field::Text(
                 name          =>'conumber',
                 htmlwidth     =>'100px',
-                group         =>'misc',
+                group         =>'financeco',
                 label         =>'Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'asset.conumber'),
+
+      new kernel::Field::Date(
+                name          =>'deprstart',
+                group         =>'financeco',
+                dayonly       =>1,
+                label         =>'Deprecation Start',
+                dataobjattr   =>'asset.deprstart'),
+
+      new kernel::Field::Date(
+                name          =>'deprend',
+                group         =>'financeco',
+                dayonly       =>1,
+                label         =>'Deprecation End',
+                dataobjattr   =>'asset.deprend'),
 
       new kernel::Field::Text(
                 name          =>'kwords',
@@ -685,6 +699,20 @@ sub Validate
       }
    }
 
+   my $deprend=effVal($oldrec,$newrec,"deprend");
+   my $deprstart=effVal($oldrec,$newrec,"deprstart");
+   if ($deprend ne "" && $deprstart ne ""){
+      my $duration=CalcDateDuration($deprstart,$deprend);
+      if ($duration->{totalseconds}<0){
+         $self->LastMsg(ERROR,"deprend can not be sooner as deprstart");
+         my $srcid=effVal($oldrec,$newrec,"srcid");
+         msg(ERROR,"totalseconds=$duration->{totalseconds} ".
+                   "start=$deprstart end=$deprend srcid=$srcid");
+         return(0);
+      }
+   }
+
+
 
    ########################################################################
    # standard security handling
@@ -742,7 +770,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default guardian physasset contacts control location 
-                       phonenumbers misc attachments sec);
+                       phonenumbers misc attachments sec financeco);
    if (!defined($rec)){
       return("default","control");
    }
@@ -790,7 +818,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default guardian phonenumbers location 
-             physasset sec contacts misc systems 
+             physasset sec financeco contacts misc systems 
              applications attachments control source));
 }
 
