@@ -581,7 +581,7 @@ sub isViewValid
    if ($rec->{dstate}>10){
       return(qw(header default source));
    }
-   return("header","default","qc");
+   return("header","default","qc","source");
 }
 
 sub isDeleteValid
