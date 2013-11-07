@@ -69,6 +69,43 @@ sub getDescription
    return($html);
 }
 
+sub getHints
+{
+   my $self=shift;
+   my $instdir=$self->getParent->Config->Param("INSTDIR");
+   my $selfname=$self->Self();
+   my $h;
+   $selfname=~s/::/\//g;
+   my $filename=$instdir."/mod/${selfname}.pm";
+   if (open(F,"<$filename")){
+      my $inhints=0;
+      while(my $l=<F>){
+         $l=~s/\s*$//;
+         if ($l=~m/HINTS/){
+            $inhints=1;
+            next;
+         }
+         if ($inhints && $l=~m/^=(cut|head|pod)/){
+            $inhints=0;
+            last;
+         }
+         if ($inhints){
+            $l="\n".$l if ($l=~m/^\[..:\]$/);
+            if ($l eq ""){
+               $l.="\n";
+            }
+            else{
+               $l.=" ";
+            }
+            $h.=$l;
+         }
+      }
+      close(F);
+
+   }
+   return($h);
+}
+
 sub qcheckRecord
 {
    my $self=shift;

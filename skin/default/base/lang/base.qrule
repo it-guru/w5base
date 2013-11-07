@@ -3,3 +3,9 @@
 'messy'=>{de=>'unschön'},
 'posible Target'=>{de=>'mögliche Datenobjekte'},
 'full QRule Name'=>{de=>'vollqualifizierter Name'},
+'Description'=>{de=>'Beschreibung'},
+'Hints'=>{de=>'Hinweise zur Problembeseitigung'},
+'Rule Infos'=>{de=>'Regelinformationen'},
+'hints available'=>{de=>'Hinweise zur Problembeseitigung vorhanden'},
+'open infos to quality rule'=>{de=>'Infos zur QualityRule öffnen'},
+

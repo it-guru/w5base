@@ -77,6 +77,17 @@ sub new
                 }),
 
       new kernel::Field::Textarea(
+                name          =>'hints',
+                label         =>'Hints',
+                searchable    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   return($self->getParent->{qrule}->{$id}->getHints());
+                }),
+
+      new kernel::Field::Textarea(
                 name          =>'code',
                 label         =>'Programmcode',
                 searchable    =>0,
@@ -285,10 +296,15 @@ sub nativQualityCheck
          $resulttext="warn"      if ($qresult==2);
          $resulttext="undefined" if (!defined($qresult));
          my $qrulelongname=$qrule->getName();
-         my $res={ rulelabel=>"$qrulelongname",
-                   ruleid=>$qrule->Self,
-                   result=>$self->T($resulttext),
-                   exitcode=>$qresult};
+         my $hints=$qrule->getHints();
+         my $havehints=$hints eq "" ? 0 : 1;
+         my $res={ 
+            rulelabel=>"$qrulelongname",
+            ruleid=>$qrule->Self,
+            havehints=>$havehints,
+            result=>$self->T($resulttext),
+            exitcode=>$qresult
+         };
          if (defined($control->{qmsg})){
             $res->{qmsg}=$control->{qmsg};
             if (ref($res->{qmsg}) eq "ARRAY"){
@@ -487,6 +503,8 @@ sub WinHandleQualityCheck
    my $msg=$self->findtemplvar({},"LASTMSG"); 
    my $DetailClose=$self->T("DetailClose","kernel::App::Web::Listedit");
    my $DetailPrint=$self->T("DetailPrint","kernel::App::Web::Listedit");
+   my $qruleinfo=$self->T("open infos to quality rule");
+   my $hintsav=$self->T("hints available");
    $d.=<<EOF;
 <table width="100%" height="100%" border=0>
 <tr height=50><td>$handlermask</td></tr>
@@ -595,6 +613,10 @@ function addToResult(ruleid)
              var resultChildNode=result.childNodes[0];
              var resulttext=resultChildNode.nodeValue;
 
+             var havehints=ruleres.getElementsByTagName("havehints")[0];
+             var havehintsChildNode=havehints.childNodes[0];
+             var havehintstext=havehintsChildNode.nodeValue;
+
              var exitcode=ruleres.getElementsByTagName("exitcode")[0];
              var exitcodetext="?";
              var color="";
@@ -616,7 +638,15 @@ function addToResult(ruleid)
                    warn++;
                 }
              }
-             r.innerHTML+="<a class=rulelink href=javascript:openwin('../../base/qrule/Detail?id="+ruleidtext+"','_blank','height=480,width=640,toolbar=no,status=no,resizeable=yes,scrollbars=no')>"+labeltext+"</a>"+": "+color+resulttext+"</font><br>";
+             var atitle="$qruleinfo";
+             var tabselect="";
+             if (havehintstext=="1"){
+                labeltext+=" <img alt='hints available' height=10 width=10 "+
+                           "src='../../base/load/info.gif'>";
+                atitle+=" - $hintsav";
+                tabselect="ModeSelectCurrentMode=FView&";
+             }
+             r.innerHTML+="<a title='"+atitle+"' class=rulelink href=javascript:openwin('../../base/qrule/Detail?"+tabselect+"id="+ruleidtext+"','_blank','height=480,width=640,toolbar=no,status=no,resizeable=yes,scrollbars=no')>"+labeltext+"</a>"+": "+color+resulttext+"</font><br>";
 
              var qmsg=ruleres.getElementsByTagName("qmsg");
 
@@ -690,6 +720,127 @@ EOF
 
    return($d);
 }
+
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   if (defined($rec)){
+      if ($rec->{hints} ne ""){
+         if ($ENV{REMOTE_USER} ne "anonymous"){
+            return($self->SUPER::getHtmlDetailPages($p,$rec),
+                   "FView"=>$self->T("Rule Infos"));
+         }
+         return("FView"=>$self->T("Rule Infos"));
+      }
+   }
+   return($self->SUPER::getHtmlDetailPages($p,$rec));
+}
+
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "FView");
+   $self->HandleLastView("HtmlDetail",$rec) if ($p eq "StandardDetail");
+
+   if ($p eq "FView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page="<link rel=\"stylesheet\" ".
+            "href=\"../../../static/lytebox/lytebox.css\" ".
+            "type=\"text/css\" media=\"screen\" />";
+
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"FullView?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   return($self->SUPER::getValidWebFunctions(@_),"FullView");
+}
+
+
+sub FullView
+{
+   my $self=shift;
+   my $lang=$self->Lang();
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(body=>1,
+                           js=>'toolbox.js',
+                           style=>['default.css',
+                                   'kernel.App.Web.css',
+                                   'kernel.App.Web.DetailPage.css']);
+   printf("<div style=\"margin-left:5px\">");
+   printf("<h1>%s:</h1>",$self->T("Quality Rule"));
+   printf("<h2 style=\"margin-top:20px\">%s</h2>",$rec->{name});
+
+   printf("<div style=\"border-width:1px;border-style:solid;".
+          "border-color:silver;margin-top:20px;".
+          "padding-bottom:10px;margin-right:10px\">");
+
+printf STDERR ("fifi 01: lan=$lang\n");
+printf STDERR ("fifi 02: hints=%s\n",$rec->{hints});
+
+
+   my $c=FancyLinks(quoteHtml(
+                    extractLangEntry($rec->{hints},$lang,undef,1)));
+   $c=~s/\n/<br>\n/g;
+   printf("<div style=\"margin:5px;margin-top:5px\">".
+          "<b>%s:</b><br>%s</div>",$self->T("Hints"),$c);
+
+
+   my $contact=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                   "contact","formated");
+   if ($rec->{contact} ne ""){
+      printf("<div style=\"margin:5px;margin-top:20px\">".
+             "<b>%s:</b><br>%s</div>",
+             $self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                 "contact","label"),$contact);
+   }
+
+   my $contact2=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                   "contact2","formated");
+   if ($rec->{contact2} ne ""){
+      printf("<div style=\"margin:5px;margin-top:20px\">".
+             "<b>%s:</b><br>%s</div>",
+             $self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                 "contact2","label"),$contact2);
+   }
+   print("</div>");
+
+
+   print $self->HtmlBottom(body=>1);
+
+
+}
+
+
+
 
    
 

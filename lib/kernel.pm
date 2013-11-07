@@ -120,7 +120,7 @@ sub extractLangEntry       # extracts a specific lang entry from a multiline
    my $curlang="";
    my %ltxt;
    foreach my $line (split('\r{0,1}\n',$labeldata)){
-      if (my ($newlang)=$line=~m/^\s*\[([a-z]{1,3}):\]$/){
+      if (my ($newlang)=$line=~m/^\s*\[([a-z]{1,3}):\]\s*$/){
          $curlang=$newlang;
       }
       else{

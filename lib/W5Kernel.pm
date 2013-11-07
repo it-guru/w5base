@@ -130,7 +130,7 @@ sub extractLanguageBlock
    }
    foreach my $blk (split(/(\[[a-z]{1,3}:\]\s*\n)/,$d)){
       $blk=trim($blk);
-      if (my ($newlang)=$blk=~m/^\[([a-z]+):\]$/){
+      if (my ($newlang)=$blk=~m/^\[([a-z]+):\]\s*$/){
          $curlang=$newlang;
       } 
       else{

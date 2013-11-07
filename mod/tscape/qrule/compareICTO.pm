@@ -12,6 +12,33 @@ is marked as "Retired" (if the application is in CI-status 3 or 4)
 
 - name of cluster
 
+=head3 HINTS
+
+no english hints available
+
+[de:]
+
+Jede Anwendung benötigt eine ICTO-ID. Diese wird von der IT-Architektur
+über das Tool CapeTS vergeben. Der Application-Manager einer Anwendung
+sollte die betreffende ICTO-ID seiner Anwendung kennen.
+
+Sollte die ICTO-ID nicht bekannt sein, so kann diese über Hr. Krohn ...
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/13627534400001
+
+... erfragt werden. Sollte es Probleme bei der Ermittlung der ICTO-ID
+geben, so können Sie Hr. Striepecke ...
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/13401048580000
+
+... kontatieren.
+
+Sollte sicher sein, dass eine Anwendung nicht durch die IT-Architektur
+erfasst wird (dies kann z.B. bei Test oder Entwicklungsumgebungen
+der Fall sein), so muß in den Config-Daten der Anwendung das
+Feld "Anwendung ist nicht IT-Architektur relevant" = "Ja" gesetzt
+werden.
+
 =cut
 #######################################################################
 #
@@ -66,6 +93,26 @@ sub qcheckRecord
    my $errorlevel=0;
 
    return(0,undef) if (!($rec->{cistatusid}==3 || $rec->{cistatusid}==4));
+
+   
+   if ($rec->{isnotarchrelevant}){
+      if ($rec->{ictono} ne ""){
+         my $msg="found ICTO-ID on an non architecture relevant application";
+         push(@qmsg,$msg);
+         push(@dataissue,$msg);
+         $errorlevel=3 if ($errorlevel<3);
+      }
+   }
+   else{
+      if ($rec->{ictono} eq ""){
+         my $msg="missing ICTO-ID";
+         push(@qmsg,$msg);
+         push(@dataissue,$msg);
+         $errorlevel=3 if ($errorlevel<3);
+      }
+   }
+
+
    if ($rec->{ictono} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
       $par->SetFilter({archapplid=>\$rec->{ictono}});
@@ -86,6 +133,8 @@ sub qcheckRecord
          }
       }
    }
+
+   # isnotarchrelevant
 
    return($self->HandleWfRequest($dataobj,$rec,
                                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
