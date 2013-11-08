@@ -13,18 +13,17 @@
 
 <img align=right style="position:relative;top:-40px;right:-10px;align:right" src="../../../public/base/load/logo_200x78.jpg">
 
-To the W5Base/Darwin application you can logon with your ...
+To log on to W5Base/Darwin you can use your ...
 <ul>
 <li>... WhoIsWho-Account,</li>
 <li>... WindowsNT-Domain-Account</li>
 <li>... or if you have a Windows 7 system, with your EMEA1-Account (NT-Domain EMEA1)</li>
 </ul>
-At logon process use your password from the concerned (authentification-) system.<br>
+Please use your password from the authentification system accordingly.
+<br>
 <div style="clear:both;height:5px"></div>
 
-If you not alread a registered user in W5Base/Darwin, please logon in the descripted kind.
-After your first logon, you will get a registration E-Mail and after the confirm your account
-will be activated.<br>
+If you are not already a registered user for W5Base/Darwin, please log on in the way just shown above. After your first logon, you will receive a registration email with confirmation instructions and your account will be activated after the confirmation.  <br>
 <div style="clear:both;height:10px"></div>
 <b>Example:</b> &nbsp;Account Mueller.Hans, Domäne sued3:<br>
 <div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
@@ -41,9 +40,8 @@ EMEA1 Account: emea1/a???????
 
 <div style="clear:both;height:5px"></div>
 
-
-Some functiions or areas in W5Base/Darwin will be also available without a logon.
-Please write your logon account always in lower case. Don't use space characters in your password.<br>
+Some functionalities and data areas in W5Base/Darwin will be also accessible without logging on. Please use only lower case letters for account name when loggin on and please don't use space characters in your password.
+<br>
 <div style="clear:both;height:10px"></div>
 At <a href="http://find.telekom.de" target=_blank>http://find.telekom.de</a> you can use a simpler frontend with reduced barriers.
 
