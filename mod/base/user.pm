@@ -219,7 +219,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'posix',
                 label         =>'POSIX-Identifier',
-                group         =>'userro',
+                group         =>'userid',
                 dataobjattr   =>'contact.posix_identifier'),
 
       new kernel::Field::Select(
