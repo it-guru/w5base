@@ -559,6 +559,12 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'artproduct.comments'),
 
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                label         =>'Attachments',
+                parentobj     =>'article::product',
+                group         =>'attachments'),
+
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
@@ -713,7 +719,7 @@ sub getDetailBlockPriority
    return("header","default","desc","variants","variantspecials",
           "custoblig","pod","price","cost","mgmt",
           "subproducts",
-          "mgmtlogosmall","mgmtlogolarge","source");
+          "mgmtlogosmall","mgmtlogolarge","attachments","source");
 }
 
 sub isCopyValid
@@ -923,7 +929,7 @@ sub isViewValid
    my $rec=shift;
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
    my @l=("header","default","history","mgmt","desc","custoblig","pod",
-          "mgmtlogosmall","mgmtlogolarge",
+          "mgmtlogosmall","mgmtlogolarge","attachments",
           "cost","price","source");
    if ($rec->{pvariant} eq "standard"){
       push(@l,"variants");
@@ -943,7 +949,8 @@ sub isWriteValid
 
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
 
-   my @wrgroups=qw(default desc custoblig pod mgmt mgmtlogosmall mgmtlogolarge);
+   my @wrgroups=qw(default desc custoblig pod mgmt mgmtlogosmall 
+                   mgmtlogolarge attachments);
 
    if (defined($rec) && $rec->{variantofid}){
       @wrgroups=grep(!/^(default|desc|custoblig|pod)$/,@wrgroups);
