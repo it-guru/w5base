@@ -222,6 +222,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.location.currency",
+                      "base::isocurrency",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("sysadm.location.currency.new",
+                      "base::isocurrency",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.location.googlekeys",
                       "base::googlekeys",
                       defaultacl=>['admin']);

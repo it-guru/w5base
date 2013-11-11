@@ -32,6 +32,8 @@
 'sysadm.location.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.location.country'=>{de=>'Land',en=>'Country'},
 'sysadm.location.country.new'=>{de=>'Neueingabe',en=>'New'},
+'sysadm.location.currency'=>{de=>'Währung',en=>'Currency'},
+'sysadm.location.currency.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.location.googlekeys'=>{de=>'GoogleMaps',en=>'GoogleMaps'},
 'sysadm.location.googlekeys.new'=>{de=>'Neu',en=>'New'},
 'sysadm.location.lnklocationcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
