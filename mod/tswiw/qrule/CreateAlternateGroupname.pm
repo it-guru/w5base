@@ -113,7 +113,15 @@ sub qcheckRecord
    my %trtab=(
       'SDM.TC' =>'DTAG.TSI.S.DTAG',
       'CS.TC'  =>'DTAG.TSI.Prod.CS.Telco',
-      'TI'     =>'DTAG.TSI.TI',
+      'TI.CSO' =>'DTAG.TSI.TI.E-CSO',
+      'TI.TSO' =>'DTAG.TSI.TI.E-TSO',
+      'TI.MCS' =>'DTAG.TSI.TI.E-MCS',
+      'TI.GSO' =>'DTAG.TSI.TI.E-GSO',
+      'TI.ESO' =>'DTAG.TSI.TI.E-ESO',
+      'TI.TSI' =>'DTAG.TSI.TI.E-TSI',
+      'TI.ITS' =>'DTAG.TSI.TI.E-ITS',
+      'TI.ITG' =>'DTAG.TSI.TI.E-ITG',
+      'TI.ART' =>'DTAG.TSI.TI.E-ART',
       'PSS'    =>'DTAG.TSI.Prod.GBOP.PSS',
       'INT.CSS'=>'DTAG.TSI.INT.SK.CSS.CSS_Applicat'
    );

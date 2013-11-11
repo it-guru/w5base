@@ -70,6 +70,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
+                vjoineditbase =>{deleted=>\'0'},
                 group         =>'inmchm',
                 async         =>'1',
                 searchable    =>0,

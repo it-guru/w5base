@@ -12,6 +12,35 @@ If there is no valid assignmentgroup defined, an error will be procceded.
 
 NONE
 
+=head3 HINTS
+
+no english hints avalilable
+
+[de:]
+
+Die Incident-Assignmengroup ist zwingend, wenn der Datensatz nach
+AssetManager exportiert werden soll/muß. Falls die Assignmengroup
+über ServiceCenter angelegt wurde, ist es wichtig das diese dort
+für den Export nach AssetManager markiert wurde. 
+Ansonsten kann die Gruppe nicht ausgewählt werden - obwohl diese
+u.U. in ServiceCenter angezeigt wird.
+Ansprechpartner für Assignmentgroups im allgemeinen sind in der
+TelekomIT ...
+
+Hr. Christmann
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/12023707570001
+
+bzw.
+
+Hr. Beez
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/11634954900005
+
+... Diese beiden Kollegen können entsprechende Aufträge zur Erstellung
+bzw. veränderung von Assignmentgroups einstellen.
+
+
 =cut
 #######################################################################
 #  W5Base Framework
@@ -69,6 +98,19 @@ sub qcheckRecord
            'there is no incident assignmentgroup defined');
       push(@{$desc->{dataissue}},
            'there is no incident assignmentgroup defined');
+   }
+   else{
+      my $o=getModuleObject($self->getParent->Config,"tsacinv::group");
+      $o->SetFilter({lgroupid=>\$rec->{acinmassignmentgroupid}});
+      my ($grec)=$o->getOnlyFirst(qw(id deleted));
+      if ($o->Ping()){
+         if (!defined($grec) || $grec->{deleted}){
+            my $m="refered incident assignmentgroup is deleted";
+            push(@{$desc->{qmsg}},$m);
+            push(@{$desc->{dataissue}},$m);
+            $exitcode=3 if ($exitcode<3);
+         }
+      }
    }
    return($exitcode,$desc);
 }
