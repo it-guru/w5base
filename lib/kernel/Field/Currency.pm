@@ -19,7 +19,7 @@ package kernel::Field::Currency;
 use strict;
 use vars qw(@ISA);
 use kernel;
-@ISA    = qw(kernel::Field);
+@ISA    = qw(kernel::Field::Number);
 
 
 sub new
@@ -28,6 +28,7 @@ sub new
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{align}='right' if (!defined($self->{align}));
    $self->{unit}='Euro'   if (!defined($self->{unit}));
+   $self->{precision}=2 if (!defined($self->{precision}));
    $self->{_permitted}->{precision}=1;
    return($self);
 }
@@ -38,8 +39,9 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $mode=shift;
+   return($self->SUPER::FormatedDetail($current,$mode)) if ($mode eq "edit");
    my $d=$self->RawValue($current);
-   $self->{precision}=2 if (!defined($self->{precision}));
+
 
    if ($mode eq "HtmlDetail"          || $mode=~m/^[>]{0,1}HtmlV01$/ ||
        $mode eq "HtmlSubList" ||

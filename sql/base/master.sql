@@ -788,3 +788,17 @@ alter table interviewcat add frontlabel blob;
 alter table interview add frontlabel blob;
 alter table interview add necessverifyinterv int(4) default '180';
 alter table interanswer add lastverify datetime, add key(lastverify);
+create table isocurrency (
+  id          bigint(20)   NOT NULL,
+  cistatus    int(2)       default '4',
+  token       char(3)      NOT NULL,subunit varchar(80),
+  fullname    varchar(40)  NOT NULL,name varchar(38) NOT NULL,
+  comments    longtext     default NULL,numerictoken int(2),
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  PRIMARY KEY (id),unique(token),unique(fullname)
+);

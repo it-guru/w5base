@@ -1,0 +1,6 @@
+'base::isocurrency'=>{de=>'ISO Währung',en=>'ISO Currency'},
+'ISO-Token'=>{de=>'ISO-Code'},
+'Currencyname'=>{de=>'Währungsbezeichnung'},
+'full currency name'=>{de=>'vollst. Währungsbezeichnung'},
+'Subunit'=>{de=>'Untereinheit'},
+'numeric code'=>{de=>'Numerischer Code'},
