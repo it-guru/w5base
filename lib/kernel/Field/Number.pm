@@ -113,6 +113,12 @@ sub Unformat
       my $d=$formated;
       my $precision=$self->precision;
       $precision=0 if (!defined($precision));
+      if ($d=~m/\.\d+,/){  # german notation with . as thausend sep
+         $d=~s/\.//g;
+      }
+      if ($d=~m/,\d+\./){  # english notation with , as thausend sep
+         $d=~s/,//g;
+      }
       if (!($d=~s/(-?)(\d+)[,\.]{0,1}([0-9]{0,$precision})[0-9]*$/$1$2\.$3/)){
          $self->getParent->LastMsg(ERROR,
              sprintf(

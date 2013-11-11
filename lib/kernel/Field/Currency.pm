@@ -57,7 +57,7 @@ sub FormatedDetail
             };
          }
          if ($mode eq "HtmlDetail" && $self->{unit} ne ""){
-            $d.=" ".$self->{unit};
+            $d.=" ".$self->unit($mode,$current);
          }
       }
    }

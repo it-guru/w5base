@@ -40,6 +40,7 @@
 'cost peruse'=>{de=>'verbrauchsabhängige Kosten'},
 'unit of quantity'=>{de=>'Mengeneinheit'},
 'currency'=>{de=>'Währung'},
+'currency label'=>{de=>'Währungsbezeichnung'},
 'Invoicing frequency'=>{de=>'Abrechnungsfrequenz'},
 'variant standard is not allowed if product is a variant of an other ones'=>{de=>'Variante "standard" ist nicht erlaubt, wenn das Product eine Variante ist'},
 'no nesassary write access to category'=>{de=>'kein ausreichender Schreibzugriff auf Kategorie'},
@@ -54,4 +55,5 @@
 'Provider'=>{de=>'Anbieter'},
 'PERMONTH'=>{de=>'monatlich'},
 'PERYEAR'=>{de=>'jährlich'},
+'orderable to can not be sooner as orderable from'=>{de=>"'bestellbar bis' darf nicht vor 'bestellbar von' liegen"},
 

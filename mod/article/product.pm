@@ -283,48 +283,108 @@ sub new
                 label         =>'Commercial Rules/Modalities',
                 dataobjattr   =>'artproduct.price_rulesmodals'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'priceonce',
                 label         =>'price once',
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{pricecurrency} ne ""){
+                      return($current->{pricecurrency});
+                   }
+                   return();
+                },
                 precision     =>2,
                 width         =>'50',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_once'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'priceday',
                 label         =>'price day',
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{pricecurrency} ne ""){
+                      return($current->{pricecurrency});
+                   }
+                   return();
+                },
                 precision     =>2,
                 width         =>'50',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_day'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'pricemonth',
                 label         =>'price month',
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{pricecurrency} ne ""){
+                      return($current->{pricecurrency});
+                   }
+                   return();
+                },
                 precision     =>2,
                 width         =>'50',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_month'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'priceyear',
                 precision     =>2,
                 width         =>'50',
                 label         =>'price year',
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{pricecurrency} ne ""){
+                      return($current->{pricecurrency});
+                   }
+                   return();
+                },
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_year'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'priceperuse',
                 label         =>'price peruse',
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{pricecurrency} ne ""){
+                      return($current->{pricecurrency});
+                   }
+                   return();
+                },
                 precision     =>2,
                 width         =>'50',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_peruse'),
 
+      new kernel::Field::Select(
+                name          =>'pricecurrencysel',
+                label         =>'currency label',
+                vjointo       =>'base::isocurrency',
+                vjoinon       =>['pricecurrency'=>'token'],
+                vjoindisp     =>'fullname',
+                group         =>'price'),
+
       new kernel::Field::Text(
                 name          =>'pricecurrency',
+                htmldetail    =>0,
+                default       =>'EUR',
                 label         =>'currency',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_currency'),
@@ -357,48 +417,94 @@ sub new
 
 
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'costonce',
                 label         =>'cost once',
-                precision     =>2,
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{costcurrency} ne ""){
+                      return($current->{costcurrency});
+                   }
+                   return();
+                },
                 width         =>'50',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_once'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'costday',
                 label         =>'cost day',
-                precision     =>2,
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{costcurrency} ne ""){
+                      return($current->{costcurrency});
+                   }
+                   return();
+                },
                 width         =>'50',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_day'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'costmonth',
                 label         =>'cost month',
-                precision     =>2,
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{costcurrency} ne ""){
+                      return($current->{costcurrency});
+                   }
+                   return();
+                },
                 width         =>'50',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_month'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'costyear',
-                precision     =>2,
+                depend        =>['pricecurrency'],
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{costcurrency} ne ""){
+                      return($current->{costcurrency});
+                   }
+                   return();
+                },
                 width         =>'50',
                 label         =>'cost year',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_year'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Currency(
                 name          =>'costperuse',
                 label         =>'cost peruse',
-                precision     =>2,
+                unit          =>'',
                 width         =>'50',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_peruse'),
 
+      new kernel::Field::Select(
+                name          =>'costcurrencysel',
+                label         =>'currency label',
+                vjointo       =>'base::isocurrency',
+                vjoinon       =>['costcurrency'=>'token'],
+                vjoindisp     =>'fullname',
+                group         =>'cost'),
+
       new kernel::Field::Text(
                 name          =>'costcurrency',
+                htmldetail    =>0,
+                default       =>'EUR',
                 label         =>'currency',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_currency'),
@@ -690,6 +796,20 @@ sub Validate
    else{
       if (defined($oldrec->{variantofid})){
          $newrec->{variantofid}=undef;
+      }
+   }
+
+   my $orderable_to=effVal($oldrec,$newrec,"orderable_to");
+   my $orderable_from=effVal($oldrec,$newrec,"orderable_from");
+   if ($orderable_to ne "" && $orderable_from ne ""){
+      my $duration=CalcDateDuration($orderable_from,$orderable_to);
+      if ($duration->{totalseconds}<0){
+         $self->LastMsg(ERROR,
+                        "orderable to can not be sooner as orderable from");
+         my $srcid=effVal($oldrec,$newrec,"srcid");
+         msg(ERROR,"totalseconds=$duration->{totalseconds} ".
+                   "start=$orderable_from end=$orderable_to srcid=$srcid");
+         return(0);
       }
    }
 
