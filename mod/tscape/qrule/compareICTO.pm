@@ -14,30 +14,58 @@ is marked as "Retired" (if the application is in CI-status 3 or 4)
 
 =head3 HINTS
 
-no english hints available
+Every application needs an ICTO-Id. This Id must be provided by 
+IT architecture by means of the tool CapeTS.
+
+The application manager should know the ICTO-Ids of his applications. 
+
+In the case that you cannot determine the ICTO-Id  
+please contact Mr. Krohn ...
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/13627534400001  .
+
+In case of problems determining the ICTO-Id please 
+contact  Mr. Striepecke ...
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/13401048580000  .
+
+If you are sure that an application is not relevant for architecture 
+and is not configured in CapeTS (i.e. pure technical applications 
+that provide technical access to networks) , then there is the 
+possibility - in the configuration data of the application - 
+to set the flag  " Application is not architecture relevant:" to  "yes".
+
+The rule which lead to this issue won't be executed on 
+this application anymore. 
 
 [de:]
 
-Jede Anwendung benötigt eine ICTO-ID. Diese wird von der IT-Architektur
-über das Tool CapeTS vergeben. Der Application-Manager einer Anwendung
-sollte die betreffende ICTO-ID seiner Anwendung kennen.
+Jede Anwendung benötigt eine ICTO-ID. Diese wird von der 
+IT-Architektur über das Tool CapeTS vergeben. 
+Der Application-Manager einer Anwendung sollte die 
+betreffende ICTO-ID seiner Anwendung kennen.
 
-Sollte die ICTO-ID nicht bekannt sein, so kann diese über Hr. Krohn ...
+Sollte die ICTO-ID nicht bekannt sein, so kann 
+diese über Hr. Krohn ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/13627534400001
 
-... erfragt werden. Sollte es Probleme bei der Ermittlung der ICTO-ID
-geben, so können Sie Hr. Striepecke ...
+... erfragt werden. Sollte es Probleme bei der Ermittlung 
+der ICTO-ID geben, so können Sie Hr. Striepecke ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/13401048580000
 
-... kontatieren.
+... kontaktieren.
 
-Sollte sicher sein, dass eine Anwendung nicht durch die IT-Architektur
-erfasst wird (dies kann z.B. bei Test oder Entwicklungsumgebungen
-der Fall sein), so muß in den Config-Daten der Anwendung das
-Feld "Anwendung ist nicht IT-Architektur relevant" = "Ja" gesetzt
-werden.
+Sollte sicher sein, dass eine Anwendung nicht durch die 
+IT-Architektur erfasst wird (z.B. ein rein technische Anwendung 
+die technischen Zugang zu Netzwerken ermöglicht), so muß in 
+den Config-Daten der Anwendung das Feld "Anwendung ist 
+nicht IT-Architektur relevant" = "Ja" gesetzt werden.
+
+Die Regel, die zu diesem Data-Issue führte, wird dann auf 
+die Anwendung nicht mehr angewendet.
+
 
 =cut
 #######################################################################
