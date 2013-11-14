@@ -1,0 +1,10 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10% valign=top>%slaquality(label)%:</td>
+         <td class=finput valign=top>%slaquality(sublistedit)%</td>
+         <td class=finput>%description(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%
