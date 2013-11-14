@@ -740,10 +740,10 @@ sub InsertRecord
    my %raw=$self->QuoteHashData("insert",$workdb,oldrec=>undef,
                                 current=>$newdata);
    my $cmd;
-   if ($self->{UseSqlReplace}==1){
-
-   }
-   else{
+   #   if ($self->{UseSqlReplace}==1){  # bisher kein alternatives Verhalten
+   #                                    # im SQL Replace modus !!!
+   #   }                                # Kann ansonsten probleme im Arikel
+   {                                    # Katalog geben
       my @flist=keys(%raw);
       $cmd="insert into $worktable (".
            join(",",@flist).") ".

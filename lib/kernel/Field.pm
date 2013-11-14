@@ -657,8 +657,14 @@ sub getBackendName     # returns the name/function to place in select
    my $mode=shift;
    my $db=shift;
 
-   return($self->{wrdataobjattr}) if (defined($self->{wrdataobjattr}) &&
-                                      ($mode eq "update" || $mode eq "insert"));
+   if (defined($self->{wrdataobjattr}) &&
+       ($mode eq "update" || 
+        $mode eq "where.update" ||   # Die where.* modes sind notwendig, damit
+        $mode eq "where.insert" ||   # im SQL Replace modus auch berechnete
+        $mode eq "where.delete" ||   # ID Felder korrekt verarbeitet werden
+        $mode eq "insert")){
+      return($self->{wrdataobjattr});
+   }
 
    if ($mode eq "select" || $mode=~m/^where\..*/){
       if (!defined($self->{dataobjattr}) && defined($self->{container})){

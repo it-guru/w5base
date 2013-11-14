@@ -13,6 +13,7 @@
 'fieldgroup.custoblig'=>{de=>'Mitwirkungsleistungen, Voraussetzungen und Ausschlüsse',en=>'Customer obligations, premises and exclusions'},
 'fieldgroup.pod'=>{de=>'Leistungsübergabepunkt',en=>'Point of delivery'},
 'fieldgroup.desc'=>{de=>'Produktbeschreibung',en=>'Product description'},
+'fieldgroup.slaqualities'=>{de=>'SLA/Qualitäten',en=>'SLA/Qualities'},
 'fieldgroup.variants'=>{de=>'Produktvarianten',en=>'Product variants'},
 'fieldgroup.subproducts'=>{de=>'Unterprodukte',en=>'Subproducts'},
 'fieldgroup.variantspecials'=>{de=>'Varianten-Besonderheiten',en=>'variant specials'},

@@ -1,0 +1,4 @@
+'article::productoptkpi'=>{de=>'SLA/Quality',en=>'SLA/Quality'},
+'Description'=>{de=>'Beschreibung'},
+'SLA Quality'=>{de=>'SLA Qualität'},
+

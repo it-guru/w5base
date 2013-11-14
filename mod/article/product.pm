@@ -111,7 +111,10 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    if (defined($param{current})){
-                      return(1) if ($param{current}->{variantofid} ne "");
+                      if ($param{current}->{variantofid} ne 
+                          $param{current}->{id}){
+                         return(1);
+                      }
                    }
                    return(0);
                 },
@@ -155,7 +158,10 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    if (defined($param{current})){
-                      return(0) if ($param{current}->{variantofid} ne "");
+                      if ($param{current}->{variantofid} ne 
+                          $param{current}->{id}){
+                         return(0);
+                      }
                    }
                    return(1);
                 },
@@ -553,6 +559,14 @@ sub new
                 vjoinon       =>['id'=>'variantofid'],
                 vjoindisp     =>['fullname']),
 
+      new kernel::Field::SubList(
+                name          =>'slaqualities',
+                label         =>'SLA/Qualities',
+                group         =>'slaqualities',
+                vjointo       =>'article::productoptkpi',
+                vjoinon       =>['id'=>'productid'],
+                vjoindisp     =>['slaquality','description']),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'mgmt',
@@ -718,7 +732,7 @@ sub getDetailBlockPriority
    my %param=@_;
    return("header","default","desc","variants","variantspecials",
           "custoblig","pod","price","cost","mgmt",
-          "subproducts",
+          "subproducts","slaqualities",
           "mgmtlogosmall","mgmtlogolarge","attachments","source");
 }
 
@@ -802,6 +816,28 @@ sub Validate
    else{
       if (defined($oldrec->{variantofid})){
          $newrec->{variantofid}=undef;
+      }
+      my $posno1=effVal($oldrec,$newrec,"posno1");
+      my $oldposno1=$posno1;
+      if ($posno1 eq ""){
+         my $category1id=effVal($oldrec,$newrec,"category1id");
+         my $o=getModuleObject($self->Config,"article::product");
+         $o->SetFilter({category1id=>\$category1id});
+         my @pl;
+         foreach my $r ($o->getHashList(qw(posno1))){
+            my $no=$r->{posno1};
+            $no=0 if ($no<=0);
+            $pl[$no]++;
+         } 
+         for(my $c=1;$c<=$#pl;$c++){
+            if ($pl[$c]==0){
+               $posno1=$c;
+               last;
+            }
+         }
+      }
+      if ($oldposno1 ne $posno1){
+         $newrec->{posno1}=$posno1;
       }
    }
 
@@ -929,7 +965,7 @@ sub isViewValid
    my $rec=shift;
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
    my @l=("header","default","history","mgmt","desc","custoblig","pod",
-          "mgmtlogosmall","mgmtlogolarge","attachments",
+          "mgmtlogosmall","mgmtlogolarge","attachments","slaqualities",
           "cost","price","source");
    if ($rec->{pvariant} eq "standard"){
       push(@l,"variants");
@@ -950,7 +986,7 @@ sub isWriteValid
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
 
    my @wrgroups=qw(default desc custoblig pod mgmt mgmtlogosmall 
-                   mgmtlogolarge attachments);
+                   mgmtlogolarge attachments slaqualities);
 
    if (defined($rec) && $rec->{variantofid}){
       @wrgroups=grep(!/^(default|desc|custoblig|pod)$/,@wrgroups);

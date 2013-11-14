@@ -129,12 +129,12 @@ create table artdelivprovider (
   key name(name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-create table artprodvariantoption (
+create table artprodopttoken (
   id         bigint(20)  NOT NULL,
-  artproduct bigint(20)  NOT NULL,variantof bigint(20) not null,
+  artproduct bigint(20)  NOT NULL,
   optionclass  char(10), name varchar(40),
-  description longtext,  raci_customer varchar(4), raci_supplier varchar(4),
-  comments    longtext,  checkfrequency longtext,
+  description longtext,  
+  comments    longtext, 
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',
@@ -189,5 +189,25 @@ create table lnkartprodprod (
           REFERENCES  artproduct (id) ON DELETE CASCADE,
   FOREIGN KEY product (artproduct)
           REFERENCES  artproduct (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table artprodoptkpi (
+  id         varchar(40)  NOT NULL,
+  artproduct bigint(20)  NOT NULL,partproduct bigint(20)  NOT NULL,
+  token      varchar(40) NOT NULL,
+  description longtext,  
+  comments    longtext, 
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),unique(artproduct,token),key(partproduct),
+  FOREIGN KEY artproduct (artproduct)
+          REFERENCES artproduct (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
