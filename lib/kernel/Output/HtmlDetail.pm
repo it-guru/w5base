@@ -370,7 +370,6 @@ function setTitle()
          event.dataTransfer.setData('Text', "$dragname");
       });
    }
-
    return(true);
 }
 addEvent(window, "load", setTitle);
@@ -623,6 +622,10 @@ EOF
 
 
    $self->{WindowMode}="HtmlDetailEdit" if ($currentfieldgroup ne "");
+   my $latelastmsg=0;
+   if ($currentfieldgroup eq "" && $self->getParent->getParent->LastMsg()){
+      $latelastmsg++;
+   }
    foreach my $template (@blocks){
       my $dtemp=$template{$template};
       my $fieldgroup=$template;
@@ -640,17 +643,19 @@ EOF
       $d.="\n<a name=\"I.$id.$fieldgroup\"></a>\n";
       if ($c>0 || $#detaillist==0){
          my @msglist;
-         if ($fieldgroup eq $currentfieldgroup){
+         if ($fieldgroup eq $currentfieldgroup || 
+             ($fieldgroup eq "default" && $latelastmsg)){
             @msglist=$self->getParent->getParent->LastMsg();
          }
-         $d.="<div class=lastmsg>".
-             join("<br>\n",map({
-                                 if ($_=~m/^ERROR/){
-                                    $_="<font style=\"color:red;\">".$_.
-                                       "</font>";
-                                 }
-                                 $_;
-                               } @msglist))."</div>";
+         $d.="<div class=lastmsg>".join("<br>\n",map({
+           if ($_=~m/^ERROR/){
+              $_="<font style=\"color:red;\">".$_."</font>";
+           }
+           if ($_=~m/^WARN/){
+              $_="<font style=\"color:brown;\">".$_."</font>";
+           }
+           $_;
+         } @msglist))."</div>";
       }
       $d.=$dtemp;
       $c++;
@@ -658,6 +663,11 @@ EOF
    $self->Context->{LINE}+=1;
    return($d);
 }
+
+
+
+
+
 sub ProcessBottom
 {
    my ($self,$fh,$rec,$msg)=@_;

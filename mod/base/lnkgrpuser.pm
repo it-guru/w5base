@@ -83,10 +83,10 @@ sub new
             $newval=[$newval] if (ref($newval) ne "ARRAY");
             
             foreach my $new (@{$newval}){
-               push(@addlist,$new) if (!grep(/^$new$/,@{$oldval}));
+               push(@addlist,$new) if (!in_array($oldval,$new));
             }
             foreach my $old (@{$oldval}){
-               push(@dellist,$old) if (!grep(/^$old$/,@{$newval}));
+               push(@dellist,$old) if (!in_array($newval,$old));
             }
             my $grpid=effVal($oldrec,$newrec,"grpid");
             if ($grpid eq ""){
@@ -99,8 +99,9 @@ sub new
                                   RBoss RBoss2 RTimeManager));
                   my $removed=0;
                   foreach my $modlist ((\@addlist,\@dellist)){
-                     foreach my $rolechk (@$modlist){
-                        if (!grep(/^$rolechk$/,@allowed)){
+                     my @rolechk=@$modlist;
+                     foreach my $rolechk (@rolechk){
+                        if (!in_array(\@allowed,$rolechk)){
                            @$modlist=grep(!/^$rolechk$/,@$modlist);
                            $removed++;
                         }
