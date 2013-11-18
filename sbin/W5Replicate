@@ -958,7 +958,8 @@ foreach my $replControl (@ReplicationObjects){
 @joblist=shuffle(@joblist);
 
 my @slot;
-$SIG{INT}=sub{  # shutdown handling if CTRL+C is pressed on main process
+sub shutdown{  # shutdown handling if CTRL+C is pressed on main process
+   print
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
       if (defined($slot[$slotno])){
          my $s=$slot[$slotno];
@@ -970,6 +971,8 @@ $SIG{INT}=sub{  # shutdown handling if CTRL+C is pressed on main process
    }
    die("ERROR: hard programm termination by signal INT");
 };
+
+$SIG{INT}=\&shutdown;
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
