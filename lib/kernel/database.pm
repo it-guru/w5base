@@ -218,8 +218,12 @@ sub execute
    delete($attr->{unbuffered});
    
    if ($self->{db}){
+       if (ref($self->{'db'}) eq "HASH"){
+          printf STDERR ("$self->{'db'} contains HASH - this is bad!\n");
+          print STDERR Dumper($self->{'db'});
+          die(); 
+       }
        $self->{sth}=$self->{'db'}->prepare($statement,$attr);
-       #printf STDERR ("fifi $c->{$self->{dataobjattr}}->{sth}\n");
        if (!($self->{sth})){
           return(undef,$DBI::errstr);
        }
@@ -270,6 +274,7 @@ sub getArrayList
 sub DriverName
 {
    my $self=shift;
+   return() if (!defined($self->{db}));
    return($self->{db}->{Driver}->{Name});
 }
 
