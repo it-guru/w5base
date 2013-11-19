@@ -27,11 +27,16 @@ use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
 use List::Util 'shuffle';
-use Time::HiRes qw(usleep);
+use Time::HiRes qw(usleep sleep);
 use DBI;
 use POSIX;
 use vars qw($opt_v $opt_h $opt_c $opt_t $opt_p 
             $opt_s $opt_q $opt_l $configname);
+$|=1;
+my $startProcessPPID=getppid(); # there is need to check ppid at at start 
+                                # against current, because IO::Multiplex and
+                                # DBD::Oracle modifies SIGPIPE Handler!
+
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'smallpack=i'=>\$opt_s,
                         'tasks=i'=>\$opt_t,
@@ -46,6 +51,7 @@ my @ObjectFilter=@ARGV;
 if ($opt_q){
    open STDOUT, '>>/dev/null' or die "Can't write to /dev/null: $!";
 }
+
 
 my $ReplicationStart=time();
 if ($opt_h){
@@ -72,7 +78,6 @@ if ($ENV{REMOTE_USER} eq ""){
 $W5V2::OperationContext="W5Replicate";
 
 
-
 #
 # handling option to set commandline specfied config-name
 #
@@ -97,6 +102,7 @@ if ($opt_s ne ""){
       Help();exit(255);
    }
 }
+
 
 #
 # handling limitation of parallel tasks
@@ -135,6 +141,26 @@ $SIG{ALRM}=sub{
 };
 alarm($MaximumReplicationTime+10);
 
+my @slot;
+sub doShutdown{  # doShutdown handling if CTRL+C is pressed on main process
+   printf STDERR ("doShutdown started...\n");
+   for(my $slotno=0;$slotno<$maxslots;$slotno++){
+      if (defined($slot[$slotno])){
+         my $s=$slot[$slotno];
+         if (kill(0,$s->{pid})){
+            printf STDERR ("INFO: doShutdown slot $slotno with PID $s->{pid}\n");
+            kill(3,$s->{pid});
+         }
+      }
+   }
+   die("ERROR: hard programm termination by signal INT");
+   exit();
+}
+
+$SIG{CHLD}='DEFAULT';  # signal, falls ein tocherprozess terminiert
+$SIG{HUP}=\&doShutdown;
+$SIG{INT}=\&doShutdown;
+$SIG{KILL}=\&doShutdown;
 
 
 my %ClientParam=();
@@ -260,7 +286,8 @@ sub getOracleDBIConnectionHandle
    }
    my $dst=DBI->connect($dbconnect,$dbuser,$dbpass,{
       AutoCommit=>0,
-      FetchHashKeyName=>'NAME_lc'
+      FetchHashKeyName=>'NAME_lc',
+      ora_action=>'W5Replication'
    });
    if (!defined($dst)){
       msg(ERROR,$DBI::errstr);
@@ -420,10 +447,22 @@ sub getRequestedReplicationObjects
    my @replicationOjects;
    my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
 
+   # check if other W5Replication Action are already in process in
+   # current schema - This needs read access to V$SESSION !
+
+   my @buffer=$dbi->getHashList(
+      "select * from V\$SESSION where ".
+      "USERNAME=sys_context('USERENV', 'SESSION_USER') and ".
+      "ACTION=sys_context('USERENV', 'ACTION') and ".
+      "SID<>sys_context('USERENV', 'SID')");
+   if ($#buffer!=-1){
+      $dbi->disconnect();
+      msg(ERROR,"other sessions in current schema are already active");
+      doShutdown();
+      exit(101);
+   }
+
    my $rprec=getReplicatePartnerRec($Config,$partner);
-
-
-
 
    #
    # loading table list from oracle schema and check tables with :: in it
@@ -896,6 +935,9 @@ sub createSlot
 
    my $pid=fork();
    if ($pid==0){
+      $SIG{HUP}=sub{die("by HUP in $$")};
+      $SIG{INT}=sub{die("by INT in $$")};
+      $SIG{KILL}=sub{die("by KILL in $$")};
       POSIX::nice($nice);
       {   # reset eviroment
          $W5V2::W5Server=undef;
@@ -923,7 +965,9 @@ sub createSlot
 #==================================================================
 #                       MAIN         
 
+doShutdown() if ($startProcessPPID ne getppid());
 my @ReplicationObjects=getRequestedReplicationObjects($config);
+doShutdown() if ($startProcessPPID ne getppid());
 
 
 my @joblist;
@@ -931,6 +975,7 @@ my $phase2entries=0;
 my $totalRefreshEntries=1;
 
 foreach my $replControl (@ReplicationObjects){
+   doShutdown() if ($startProcessPPID ne getppid());
    if ($replControl->{'valid'} && $replControl->{'requested'}){
       if (in_array(\@requested_phase),"1"){
          if (!exists($replControl->{'filter'})){
@@ -957,25 +1002,10 @@ foreach my $replControl (@ReplicationObjects){
 }
 @joblist=shuffle(@joblist);
 
-my @slot;
-sub shutdown{  # shutdown handling if CTRL+C is pressed on main process
-   print
-   for(my $slotno=0;$slotno<$maxslots;$slotno++){
-      if (defined($slot[$slotno])){
-         my $s=$slot[$slotno];
-         if (kill(0,$s->{pid})){
-            printf STDERR ("INFO: shutdown slot $slotno with PID $s->{pid}\n");
-            kill(3,$s->{pid});
-         }
-      }
-   }
-   die("ERROR: hard programm termination by signal INT");
-};
-
-$SIG{INT}=\&shutdown;
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
+      doShutdown() if ($startProcessPPID ne getppid());
       # das muß noch besser werden - phaselimit calc!
       my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*$maxslots-15;
       if ($phaselimit>($MaximumReplicationTime/3*2)){
