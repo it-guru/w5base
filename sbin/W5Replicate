@@ -855,9 +855,9 @@ sub objectReplicationPhase2
    my $avgrecaccess;
    if ($phase2recCnt>0){
       $avgrecaccess=((Time::HiRes::time()-$phase2start)*1000)/$phase2recCnt;
-      printf STDERR ("avg rec access in $ctrl->{name} ".
-                     "(phaselimit=$phaselimit;cnt=$phase2recCnt) = %.3lf ms\n",
-                     $avgrecaccess);
+     # printf STDERR ("avg rec access in $ctrl->{name} ".
+     #                "(phaselimit=$phaselimit;cnt=$phase2recCnt) = %.3lf ms\n",
+     #                $avgrecaccess);
    }
 
 
