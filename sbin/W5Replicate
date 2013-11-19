@@ -1086,8 +1086,8 @@ while(my $nextjob=shift(@joblist)){
    msg(INFO,"next job request from joblist=$#joblist");
 }
 msg(INFO,"OK, done");
-printf STDERR ("replication duration=%d max=%d\n",time()-$ReplicationStart,
-               $MaximumReplicationTime);
+#printf STDERR ("replication duration=%d max=%d\n",time()-$ReplicationStart,
+#               $MaximumReplicationTime);
                
 exit(0);
 
