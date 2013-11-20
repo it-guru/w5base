@@ -74,13 +74,13 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itts.appl.prio",
-                      "TS::topappl",
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itts.appl.prio.groups",
-                      "TS::topapplgroups",
-                      defaultacl=>['valid_user']);
+#   $self->RegisterObj("itts.appl.prio",
+#                      "TS::topappl",
+#                      defaultacl=>['valid_user']);
+#
+#   $self->RegisterObj("itts.appl.prio.groups",
+#                      "TS::topapplgroups",
+#                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.appl.lnksystem",
                       "itil::lnkapplsystem",
