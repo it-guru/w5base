@@ -227,7 +227,7 @@ sub nativProcessInitiate
    if ($stepobj->can("nativProcess")){
       my $d=Dumper($h);
       $d=~s/^.*?=\s*//;
-      msg(INFO,"*nativProcess on $self\n action='$action'\nstep='$step'\n ".
+      msg(DEBUG,"*nativProcess on $self\n action='$action'\nstep='$step'\n ".
                "dataload=%s",$d);
       my @actions=$self->getPosibleActions($WfRec);
       return($stepobj->nativProcess($action,$h,$WfRec,\@actions));
