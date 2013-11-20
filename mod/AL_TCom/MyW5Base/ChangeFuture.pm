@@ -150,7 +150,6 @@ sub Result
          }
       }
       else{
-         printf STDERR ("fifi %s\n",Dumper($rec->{affectedapplicationid}));
          push(@idl,$rec->{id});
       }
    }
