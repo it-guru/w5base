@@ -1,0 +1,5 @@
+'base::reportjob'=>{de=>'Report Job',en=>'Report Job'},
+'valuechange'=>{de=>'Änderung der Liste',en=>'change of list'},
+'Data valid to'=>{de=>'Daten gültig bis'},
+'fieldgroup.data'=>{de=>'Reportingdaten',en=>'Report-Data'},
+'Data'=>{de=>'Reportingdaten',en=>'Report-Data'},

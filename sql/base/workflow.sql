@@ -286,8 +286,8 @@ CREATE TABLE reportjob (
   modifyuser   bigint(20) default NULL,
   editor       varchar(100) NOT NULL default '',
   realeditor   varchar(100) NOT NULL default '',
-  srcsys       varchar(10) default 'w5base',
-  srcid        varchar(20) default NULL,
+  srcsys       varchar(80) default 'w5base',
+  srcid        varchar(80) default NULL,
   srcload      datetime    default NULL,
-  PRIMARY KEY (id), key(reportname),key(lastrun)
+  PRIMARY KEY (id), key(reportname),key(lastrun),UNIQUE KEY `srcsys` (srcsys,srcid)
 );

@@ -87,6 +87,9 @@ sub Connect
       $self->{'db'}=DBI->connect($self->{dbconnect},
                                  $self->{dbuser},
                                  $self->{dbpass},{mysql_enable_utf8 => 0});
+      if ($self->{'db'}->{private_inW5Transaction}){
+         $self->{'db'}->{AutoCommit}=0;
+      }
    }
    else{
       if ($self->{dbconnect}=~m/^dbi:odbc:/i){  # cached funktioniert nicht
@@ -95,6 +98,9 @@ sub Connect
                          private_foo_cachekey=>$self.time().".".
                          $BackendSessionName});
          #msg(INFO,"use NOT cached datbase connection on ODBC");
+         if ($self->{'db'}->{private_inW5Transaction} ne ""){
+            $self->{'db'}->{AutoCommit}=0;
+         }
       }
       else{
          my $private_foo_cachekey=$dbname."-".$$.".".$BackendSessionName;
@@ -104,6 +110,9 @@ sub Connect
                AutoCommit=>1,
                private_foo_cachekey=>$private_foo_cachekey
             });
+         if ($self->{'db'}->{private_inW5Transaction} ne ""){
+            $self->{'db'}->{AutoCommit}=0;
+         }
       }
    }
    $self->{parentlabel}=$self->getParent->Self()."-".$dbname;
@@ -193,6 +202,56 @@ sub checksoftlimit
       if (my ($n)=$$cmd=~m/\s+limit\s+(\d+)/){
          $self->{softlimit}=$n;
          $$cmd=~s/\s+limit\s+(\d+)//;
+      }
+   }
+}
+
+
+sub begin_work 
+{
+   my $self=shift;
+
+   if ($self->{db}){
+      if ($self->{db}->{AutoCommit}){
+         $self->{W5Transaction}=$self->getParent()."-".time();
+         $self->{db}->begin_work();
+         # The private_inW5Transaction handling is neassesary, because 
+         # Apache::DBI (or connect_cached) resets AutoCommit flag on
+         # a reuse of the handle
+         $self->{db}->{private_inW5Transaction}=$self->{W5Transaction};
+         msg(INFO,"begin_work($self->{W5Transaction}) done in ");
+      }
+   }
+}
+
+sub commit 
+{
+   my $self=shift;
+
+   if ($self->{db}){
+      if ($self->{db}->{private_inW5Transaction} eq $self->{W5Transaction}){
+         $self->{db}->commit();
+         msg(INFO,"commit($self->{W5Transaction}) done in ");
+         $self->{db}->{private_inW5Transaction}=undef;
+      }
+      else{
+         msg(INFO,"skip commit(".$self->getParent->Self.")");
+      }
+   }
+}
+
+sub rollback 
+{
+   my $self=shift;
+
+   if ($self->{db}){
+      if ($self->{db}->{private_inW5Transaction} eq $self->{W5Transaction}){
+         $self->{db}->rollback();
+         msg(INFO,"rollback($self->{W5Transaction}) done in ");
+         $self->{db}->{private_inW5Transaction}=undef;
+      }
+      else{
+         msg(INFO,"skip rollback(".$self->getParent->Self.")");
       }
    }
 }

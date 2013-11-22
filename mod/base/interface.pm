@@ -777,9 +777,11 @@ sub getHashList
    $filter={} if ($filter eq "");
 
    $view=[split(/\s*[,;]\s*/,$view)] if (ref($view) ne "ARRAY");
+   my $q=Dumper($filter);
+   $q=~s/\$VAR1/query/;
    $self->Log(INFO,"soap",
               "findRecord: [$objectname] (%s)\n%s",
-              join(",",@$view),Dumper($filter));
+              join(",",@$view),$q);
 
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
    if (!($objectname=~m/^.+::.+$/)){

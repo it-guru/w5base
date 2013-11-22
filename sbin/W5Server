@@ -964,6 +964,7 @@ sub StartW5ServerProcess
    my $srvsub;
    my $srvcode=<<EOF;
       \$0="W5Sserver-".\$server;
+      my \$orgpid=\$\$;
       sub start{
           \$srv->start();
       }
@@ -983,13 +984,22 @@ sub StartW5ServerProcess
       \$SIG{USR1}=sub{
          \$srv->{ServerGoesDown}=1;
       };
-      msg(DEBUG,"srvobj=\$srv");
       eval('
          \$self->W5ServerConnect();
          start(); 
          process(); 
       ');
-      \$self->NotifyAdmin("$server crash","\$@") if (\$@ ne "");
+      if (\$\$ eq \$orgpid){ # error an we are in original server
+         if (\$@ ne ""){ # error an we are in original server
+            \$self->NotifyAdmin("$server crash pid=\$\$ \$0","\$@");
+         }
+      }
+      else{
+         if (\$@ ne ""){ 
+            print STDERR \$@;
+            exit(1);
+         }
+      }
 EOF
    eval("\$srvsub=sub { $srvcode return({exitcode=>0}); }");
 

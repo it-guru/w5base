@@ -84,7 +84,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &Debug &UTF8toLatin1 &Html2Latin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
-             &Dumper 
+             &Dumper &CSV2Hash
              &FancyLinks &ExpandW5BaseDataLinks &mkInlineAttachment 
              &FormatJsDialCall
              &mkMailInlineAttachment &haveSpecialChar
@@ -104,6 +104,40 @@ sub LangTable
 sub Dumper
 {
    return(Data::Dumper::Dumper(@_));
+}
+
+sub CSV2Hash
+{
+   my $t=shift;
+   my @orgkey=@_;
+
+   my @t=split("\n",$t);
+   my @fld=split(/;/,shift(@t));
+
+   if ($#orgkey==-1){
+      @t=map({
+         my @l=split(/;/,$_);
+         my %r;
+         for(my $c=0;$c<=$#l;$c++){
+            $r{$fld[$c]}=$l[$c];     
+         }
+         \%r;
+      } @t);
+      return(\@t);
+   }
+   my %t;
+   while(my $l=shift(@t)){
+      my @k=@orgkey;
+      my @l=split(/;/,$l);
+      my %r;
+      for(my $c=0;$c<=$#l;$c++){
+         $r{$fld[$c]}=$l[$c];     
+      }
+      foreach my $k (@k){
+         $t{$k}->{$r{$k}}=\%r; 
+      }
+   }
+   return(\%t);
 }
 
 

@@ -50,6 +50,17 @@ sub AddDatabase
       return("InitERROR",msg(ERROR,"can't connect to database '%s'",$db));
    }
    $self->{$db}=$obj;
+   my $W5BaseTransactionSave=$self->Config->Param("W5BaseTransactionSave");
+   if (lc($W5BaseTransactionSave) eq "yes" ||
+       lc($W5BaseTransactionSave) eq "on" ||
+       lc($W5BaseTransactionSave) eq "true" ||
+       $W5BaseTransactionSave eq "1"){
+      $W5BaseTransactionSave=1;
+   }
+   else{
+     $W5BaseTransactionSave=0;
+   }
+   $self->{W5BaseTransactionSave}=$W5BaseTransactionSave;
    return($dbh);
 }  
 
@@ -65,35 +76,52 @@ sub Rows
 }
 # Seems not to work with current DBI Version
 #
-#sub StartTransaction
-#{
-#   my ($self,$operation,$oldrec,$newrec)=@_;
-#   if (defined($self->{DB})){
-#      $self->{DB}->begin_work;
-#   }
+# Das Problem ist, dass sich Apache::DBI zwar die private_* Attribute
+# für einen Datenbank-Handle "merkt" und somit eine Datenbank-Sitzung
+# ganz klar als "inTranskation" markierbar verhält - Das Problem ist
+# aber, dass Apache DBI einen Aktiven dbh mit einem rollback initialisiert,
+# wenn erkannt wird, dass AutoCommit=0 ist.
+# das Problem ist also die Methode Apache::DBI::reset_startup_state, die
+# einen rollback nur dann durchführen dürfte, wenn keine Acitive
+# W5Transaktion vorliegt - für das Problem hab ich bisher keine Lösung (HV)
 #
-#   return(1);
-#}
+# Die folgenden 3 Funktionen müßten aktiviert werden und im Apache::DBI
+# ein Patch eingebaut werden, der erkennt, ob einen offene Objekt-Transkation
+# (private_inW5Transaction) vorliegt. Dann könnte man Transkationssicherung
+# (vermutlich) ohne Site-Effekte aktvieren.
 #
-#sub RoolbackTransaction
-#{
-#   my ($self,$operation,$oldrec,$newrec)=@_;
-#   if (defined($self->{DB})){
-#      $self->{DB}->rollback;
-#   }
+# Die Funktionalität der Transationssicherung sollte derzeit noch
+# abgeschalten bleiben W5BaseTransactionSave=no
 #
-#   return(1);
-#}
-#
-#sub FinishTransaction
-#{
-#   my ($self,$operation,$oldrec,$newrec)=@_;
-#   if (defined($self->{DB})){
-#      $self->{DB}->commit;
-#   }
-#
-#   return(1);
-#}
+sub StartTransaction
+{
+   my ($self,$operation,$oldrec,$newrec)=@_;
+   if (defined($self->{DB}) && $self->{W5BaseTransactionSave}){
+      $self->{DB}->begin_work;
+   }
+
+   return(1);
+}
+
+sub RoolbackTransaction
+{
+   my ($self,$operation,$oldrec,$newrec)=@_;
+   if (defined($self->{DB}) && $self->{W5BaseTransactionSave}){
+      $self->{DB}->rollback;
+   }
+
+   return(1);
+}
+
+sub FinishTransaction
+{
+   my ($self,$operation,$oldrec,$newrec)=@_;
+   if (defined($self->{DB}) && $self->{W5BaseTransactionSave}){
+      $self->{DB}->commit;
+   }
+
+   return(1);
+}
 
 
 
@@ -884,7 +912,6 @@ sub getFirst
       my $p=$self->Self();
       my $msg=sprintf("%s:time=%0.4fsec;mod=$p",NowStamp(),$t);
       $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
-     # msg(INFO,"sqlcmd=%s (%s) limitstart=$self->{_LimitStart}",$sqlcmd[0],$msg);
       $self->Log(INFO,"sqlread",$sqlcmd[0]." ($msg)");
       if ($self->{_LimitStart}>1){
          for(my $c=0;$c<$self->{_LimitStart};$c++){
