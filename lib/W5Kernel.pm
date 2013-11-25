@@ -196,14 +196,15 @@ sub in_array
 {
    my ($arr,$search_for) = @_;
    $arr=[$arr] if (ref($arr) ne "ARRAY");
-   my %items = map {$_ => 1} @$arr; # create a hash out of the array values
+   my %items;
+   map({$items{$_}++} @$arr); # create a hash out of the array values
    if (ref($search_for) eq "ARRAY"){
       foreach my $search_for_loop (@$search_for){
          return(1) if (exists($items{$search_for_loop}));
       }
       return(0);
    }
-   return (exists($items{$search_for}))?1:0;
+   return(exists($items{$search_for})?1:0);
 }
 
 
