@@ -253,8 +253,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL") if ($self->IsMemberOf(["admin"]));
-   return(undef);
+   return("ALL"); # u.U. muß hier noch ein Handler rein, der nur bestimmte
+                  # Reports an bestimmte Personen lesbar macht.
 }
 
 
