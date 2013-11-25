@@ -630,6 +630,7 @@ sub objectReplicationPhase1
       $dbi->disconnect();
       die("can not create State-Record for phase 1 on $ctrl->{'name'}");
    }
+
    $p1smallpack=$p1smallpack*5 if ($ctrl->{name} eq "base::workflow");
    my $oldreplkey;
    while($ReplicationStart+$MaximumReplicationTime-10>time() &&
@@ -691,6 +692,8 @@ sub objectReplicationPhase1
       my $candidates=0;
       my $processed=0;
       if (defined($srcrec)){
+         $dbi->doCmd("lock table \"$ctrl->{name}\" IN EXCLUSIVE MODE");
+         $dbi->doCmd("lock table \"_$ctrl->{name}\" IN EXCLUSIVE MODE");
          do{
             $oldreplkey=$srcrec->{'replkeypri'};
             if (defined($replkeysec) && 
@@ -708,11 +711,11 @@ sub objectReplicationPhase1
                   return;
                }
                $processed++;
-               $dbi->commit();
                msg(INFO,"InsertOrUpdate commited - processed=$processed");
             }
             ($srcrec,$msg)=$obj->getNext();
          } until(!defined($srcrec));
+         $dbi->commit();
       }
       if ($processed<2 && $candidates<2){
          last;
@@ -804,6 +807,8 @@ sub objectReplicationPhase2
          $start+$phaselimit>time()){
       my $curSyncTime=time()-$ReplicationStart;
 
+      $dbi->doCmd("lock table \"$ctrl->{name}\" IN EXCLUSIVE MODE");
+      $dbi->doCmd("lock table \"_$ctrl->{name}\" IN EXCLUSIVE MODE");
       my $cmd="select * from ".
               "(select $ctrl->{idname} from \"$ctrl->{name}\" ".
               " left outer join \"_$ctrl->{name}\" ".
@@ -906,6 +911,8 @@ sub objectReplicationPhase3
  #     die("can not create State-Record for phase 3 on $ctrl->{'name'}");
  #  }
 
+   $dbi->doCmd("lock table \"$ctrl->{name}\" IN EXCLUSIVE MODE");
+   $dbi->doCmd("lock table \"_$ctrl->{name}\" IN EXCLUSIVE MODE");
    my $cmd="delete from \"$ctrl->{name}\" ".
            "where \"$ctrl->{name}\".$ctrl->{idname} in ".
            "(select refid from \"_$ctrl->{name}\" where ".
@@ -1005,7 +1012,6 @@ foreach my $replControl (@ReplicationObjects){
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
-      doShutdown() if ($startProcessPPID ne getppid());
       # das muß noch besser werden - phaselimit calc!
       my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*$maxslots-15;
       if ($phaselimit>($MaximumReplicationTime/3*2)){
@@ -1054,6 +1060,7 @@ while(my $nextjob=shift(@joblist)){
       }
    }
    while(1){
+      doShutdown() if ($startProcessPPID ne getppid());
       my $freeslotcount=0;
       my $runnging=0;
       for(my $slotno=0;$slotno<$maxslots;$slotno++){
