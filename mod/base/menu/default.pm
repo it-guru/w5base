@@ -250,8 +250,8 @@ sub Init
 
    $self->RegisterObj("sysadm.reportjob",
                       "base::reportjob",
-                      func=>'MainWithNew',
-                      defaultacl=>['admin']);
+                      func=>'Main',
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("Tools",
                       "tmpl/welcome",
