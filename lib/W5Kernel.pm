@@ -31,7 +31,7 @@ sub msg
    if (($W5V2::OperationContext eq "W5Server" ||
         $W5V2::OperationContext eq "W5Replicate") && $type eq "INFO"){
       if ($W5V2::Debug==0){
-         print $d;
+        # print $d;  # ich denke, dass ist nicht gut (HV 11/2013)
       }
       else{
          my $dout=$d;
