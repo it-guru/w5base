@@ -296,9 +296,9 @@ sub processFile
 
          if (($wrrec->{name}=~m/^\s*$/) ||
              ($wrrec->{name}=~m/\s/)){
-            msg(ERROR,"RefreshSAPP01: ".
-                      "invalid record without or invalid ".
-                      "WBS-Number '".$wrrec->{name}."' at line $line");
+            #msg(ERROR,"RefreshSAPP01: ".
+            #          "invalid record without or invalid ".
+            #          "WBS-Number '".$wrrec->{name}."' at line $line");
          }
          else{
          #   $if->ResetFilter();
