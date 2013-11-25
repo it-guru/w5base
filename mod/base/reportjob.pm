@@ -42,13 +42,9 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'Report JobID',
+                group         =>'source',
                 sqlorder      =>'none',
                 dataobjattr   =>'reportjob.id'),
-
-#      new kernel::Field::Text(
-#                name          =>'targetfile',
-#                label         =>'WebFS target file/URL/Mail',
-#                dataobjattr   =>'reportjob.targetfile'),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -64,21 +60,34 @@ sub new
                 vjoineditbase =>{id=>">0"},
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Textarea(
+                name          =>'textdata',
+                group         =>'data',
+                label         =>'Data',
+                dataobjattr   =>'reportjob.comments'),
+
+      new kernel::Field::Date(
+                name          =>'validto',
+                group         =>'data',
+                label         =>'Data valid to',
+                dataobjattr   =>'reportjob.validto'),
+
+      new kernel::Field::XMLInterface(
+                name          =>'deltabuffer',
+                label         =>'XML Data',
+                dataobjattr   =>'reportjob.deltabuffer'),
+
+
       new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
                 dataobjattr   =>'reportjob.cistatus'),
 
-      new kernel::Field::Select(
-                name          =>'tz',
-                label         =>'Timezone',
-                value         =>['CET','GMT',DateTime::TimeZone::all_names()],
-                dataobjattr   =>'reportjob.usetimezone'),
-
-      new kernel::Field::Textarea(
-                name          =>'repfields',
-                label         =>'Report Fieldnames',
-                dataobjattr   =>'reportjob.repfields'),
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'reportjob.srcsys'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
@@ -135,6 +144,7 @@ sub new
    );
    $self->setDefaultView(qw(targetfile name cdate));
    $self->setWorktable("reportjob");
+   $self->LoadSubObjs("Reporter","Reporter");
    return($self);
 }
 
@@ -143,7 +153,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","wffieldsfilter","source");
+   return("header","default","data","wffieldsfilter","source");
 }
 
 
@@ -156,13 +166,85 @@ sub Validate
    my $origrec=shift;
 
    my $name=effVal($oldrec,$newrec,"name");
-   if ($name eq "" || $name=~m/\s/){
+   if ($name eq "" || $name=~m/^\s$/){
       $self->LastMsg(ERROR,"invalid report name '\%s' specified",
                      $name);
       return(undef);
    }
+   if (!defined($oldrec)){
+      $newrec->{cistatusid}=4 if (!exists($newrec->{cistatusid}));
+      if (!exists($newrec->{validto})){
+         $newrec->{validto}=$self->ExpandTimeExpression("now+7d"); 
+      }
+   }
    return(1);
 }
+
+
+sub HandleInfoAboSubscribe
+{
+   my $self=shift;
+   my $id=Query->Param("CurrentIdToEdit");
+   my $ia=$self->getPersistentModuleObject("base::infoabo");
+   if ($id ne ""){
+      $self->ResetFilter();
+      $self->SetFilter({id=>\$id});
+      my ($rec,$msg)=$self->getOnlyFirst(qw(name));
+      print($ia->WinHandleInfoAboSubscribe({},
+                      $self->SelfAsParentObject(),$id,$rec->{name},
+                      "base::staticinfoabo",undef,undef));
+   }
+   else{
+      print($self->noAccess());
+   }
+}
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+
+   if (defined($oldrec)){
+      if (effChanged($oldrec,$newrec,"textdata")){ 
+         my $name=effVal($oldrec,$newrec,"name");
+         my $id=effVal($oldrec,$newrec,"id");
+         my $emailto={};
+         my $ia=getModuleObject($self->Config,"base::infoabo");
+         my $user=getModuleObject($self->Config,"base::user");
+         $ia->LoadTargets($emailto,'*::reportjob',\'valuechange',$id);
+         my $wa=getModuleObject($self->Config,"base::workflowaction");
+         my %msg;
+         foreach my $k (keys(%$emailto)){
+            my $lang="en";
+            $user->ResetFilter();
+            $user->SetFilter({allemail=>\$k});
+            my ($urec)=$user->getOnlyFirst(qw(lastlang));
+            if (defined($urec) && $urec->{lastlang} ne ""){
+               $lang=$urec->{lastlang};
+            }
+            $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+            my $reporter=effVal($oldrec,$newrec,"srcsys");
+            if (!exists($msg{$lang})){
+               $msg{$lang}=
+                  $self->{Reporter}->{$reporter}->onChange($oldrec,$newrec);
+            }
+            my $msg=$msg{$lang};
+            if ($msg ne ""){
+               $wa->Notify("INFO","ReportChanged: ".$name,$msg,emailto=>$k);
+            }
+            delete($ENV{HTTP_FORCE_LANGUAGE});
+         }
+      }
+   }
+   return($bak);
+}
+
+
+
+
 
 
 
@@ -180,8 +262,15 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL") if ($self->IsMemberOf(["admin"]));
-   return(undef);
+   return(undef);  # only jobs are allowed to write to this table
+}
+
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(1) if ($self->IsMemberOf("admin"));
+   return(0);
 }
 
 
