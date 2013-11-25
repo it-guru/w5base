@@ -137,9 +137,9 @@ sub addTask
    $param->{maxstderr}=128 if (!exists($param->{maxstderr}));
    $param->{maxstdout}=128 if (!exists($param->{maxstdout}));
    if ($#{$self->{task}}<100){  # max 100 task in queue
-      push($self->{task},{name=>$name,stdout=>[],stderr=>[],
-                          param=>$param,
-                          requesttime=>time()});
+      push(@{$self->{task}},{name=>$name,stdout=>[],stderr=>[],
+                             param=>$param,
+                             requesttime=>time()});
       return(1);
    }
    return(0);
