@@ -108,7 +108,7 @@ sub Finish
 
 
    if (ref($self->{fieldlist}) eq "ARRAY"){
-      unshift($task->{stdout},join(";",@{$self->{fieldlist}}));
+      unshift(@{$task->{stdout}},join(";",@{$self->{fieldlist}}));
    }
    my $o=$reporter->{reportjob};
    $o->SetFilter({srcsys=>\$self->Self,srcid=>\'1'});
