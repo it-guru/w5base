@@ -684,6 +684,7 @@ sub objectReplicationPhase1
             }
          }
       }
+      #$obj->SetFilter({assetid=>"LT-59204*"});
       my @syncfields=@{$ctrl->{'replkeyfields'}};
       $obj->SetCurrentView(@syncfields,@{$ctrl->{'view'}});
       $obj->SetCurrentOrder(@syncfields);
@@ -981,24 +982,25 @@ my @joblist;
 my $phase2entries=0;
 my $totalRefreshEntries=1;
 
+
 foreach my $replControl (@ReplicationObjects){
    doShutdown() if ($startProcessPPID ne getppid());
    if ($replControl->{'valid'} && $replControl->{'requested'}){
-      if (in_array(\@requested_phase),"1"){
+      if (in_array(\@requested_phase,"1")){
          if (!exists($replControl->{'filter'})){
             if ($replControl->{'allow_phase1'}){
                unshift(@joblist,{phase=>1,replControl=>$replControl});
             }
          }
       }
-      if (in_array(\@requested_phase),"2"){
+      if (in_array(\@requested_phase,"2")){
          if ($replControl->{'allow_phase2'}){
             $phase2entries++;
             $totalRefreshEntries+=$replControl->{'entrycount'};
             push(@joblist,{phase=>2,replControl=>$replControl});
          }
       }
-      if (in_array(\@requested_phase),"3"){
+      if (in_array(\@requested_phase,"3")){
          if ($replControl->{'allow_phase3'}){
             if (!exists($replControl->{'filter'})){
                push(@joblist,{phase=>3,replControl=>$replControl});
@@ -1007,6 +1009,7 @@ foreach my $replControl (@ReplicationObjects){
       }
    }
 }
+#print STDERR Dumper(\@joblist);sleep(1);
 @joblist=shuffle(@joblist);
 
 my $currentStartPhase;
@@ -1242,7 +1245,9 @@ sub isChanged
    my $changecount=0;
    foreach my $k (keys(%$newrec)){
       if (!($k=~m/^w5repl.*$/i)){
-         if (trim($newrec->{$k}) ne trim($oldrec->{$k})){
+         my $new=$newrec->{$k};
+         my $old=$oldrec->{$k};
+         if (trim($new) ne trim($old)){
             $changecount++;
             msg(INFO,sprintf("%s: old='%s' new='%s'",$k,$oldrec->{$k},
                                                         $newrec->{$k}));
@@ -1309,7 +1314,7 @@ sub InsertOrUpdate
       }
       my $v=join(",",@v);
       my $updcmd="update \"$dbtable\" set $v where $idname=?";
-      msg(INFO,"upd ($idval): $updcmd (",
+      msg(INFO,"upd ($idval): $updcmd (".
                join(",",map({"'".$_."'"} @values,$idval)).")");
       $bk=$self->doCmd($updcmd,@values,$idval);
    }
