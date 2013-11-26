@@ -1,4 +1,4 @@
-package article::productoptkpi;
+package article::productoptmodal;
 #  W5Base Framework
 #  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
 #
@@ -45,10 +45,10 @@ sub new
                 group         =>'source',
                 searchable    =>0,
                 readonly      =>1,
-                wrdataobjattr =>'artprodoptkpi.id',
-                dataobjattr   =>"if (artprodoptkpi.id is null,".
+                wrdataobjattr =>'artprodoptmodal.id',
+                dataobjattr   =>"if (artprodoptmodal.id is null,".
                                 "concat(artproduct.id,'-',".
-                                "artprodopttoken.token),artprodoptkpi.id)"),
+                                "artprodopttoken.token),artprodoptmodal.id)"),
                                                  
       new kernel::Field::TextDrop(
                 name          =>'product',
@@ -78,7 +78,7 @@ sub new
                 name          =>'productid',
                 readonly      =>1,
                 label         =>'Delivery-ProductID',
-                wrdataobjattr =>'artprodoptkpi.artproduct',
+                wrdataobjattr =>'artprodoptmodal.artproduct',
                 dataobjattr   =>"artproduct.id"),
 
       new kernel::Field::Link(
@@ -94,10 +94,10 @@ sub new
                 dataobjattr   =>'artproduct.variant'),
 
       new kernel::Field::Select(
-                name          =>'slaquality',
-                label         =>'SLA Quality',
+                name          =>'modality',
+                label         =>'Modality',
                 weblinkto     =>"none",
-                vjointo       =>'article::kernkpi',
+                vjointo       =>'article::kernmodal',
                 vjoineditbase =>{
                    cistatusid=>\'4'
                 },
@@ -109,67 +109,67 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'token',
-                label         =>'SLA Quality token',
+                label         =>'Modal token',
                 dataobjattr   =>'artprodopttoken.token'),
 
 
       new kernel::Field::Interface(
-                name          =>'kpiartproduct',
+                name          =>'modalartproduct',
                 searchable    =>0,
                 label         =>'KPI token',
-                dataobjattr   =>'artprodoptkpi.artproduct'),
+                dataobjattr   =>'artprodoptmodal.artproduct'),
 
       new kernel::Field::Interface(
-                name          =>'kpipartproduct',
+                name          =>'modalpartproduct',
                 searchable    =>0,
                 label         =>'KPI pareent',
-                dataobjattr   =>'artprodoptkpi.partproduct'),
+                dataobjattr   =>'artprodoptmodal.partproduct'),
 
       new kernel::Field::Interface(
-                name          =>'kpitoken',
+                name          =>'modaltoken',
                 searchable    =>0,
                 label         =>'KPI token',
-                dataobjattr   =>'artprodoptkpi.token'),
+                dataobjattr   =>'artprodoptmodal.token'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
                 searchable    =>0,
                 label         =>'Description',
-                dataobjattr   =>'artprodoptkpi.description'),
+                dataobjattr   =>'artprodoptmodal.description'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
                 label         =>'Comments',
-                dataobjattr   =>'artprodoptkpi.comments'),
+                dataobjattr   =>'artprodoptmodal.comments'),
 
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
                 label         =>'Owner',
-                dataobjattr   =>'artprodoptkpi.modifyuser'),
+                dataobjattr   =>'artprodoptmodal.modifyuser'),
                                    
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'artprodoptkpi.modifydate'),
+                dataobjattr   =>'artprodoptmodal.modifydate'),
                                                    
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
                 label         =>'Editor',
-                dataobjattr   =>'artprodoptkpi.editor'),
+                dataobjattr   =>'artprodoptmodal.editor'),
                                                   
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 label         =>'RealEditor',
-                dataobjattr   =>'artprodoptkpi.realeditor'),
+                dataobjattr   =>'artprodoptmodal.realeditor'),
 
    );
    $self->setDefaultView(qw(product delivelement cdate));
-   $self->setWorktable("artprodoptkpi");
+   $self->setWorktable("artprodoptmodal");
    return($self);
 }
 
@@ -186,12 +186,12 @@ sub getSqlFrom
    my $self=shift;
    my $from="artproduct join ".
             "(select distinct partproduct,token ".
-            " from artprodoptkpi) artprodopttoken ".
+            " from artprodoptmodal) artprodopttoken ".
             "on (artproduct.variantof=artprodopttoken.partproduct or ".
             "    artproduct.id=artprodopttoken.partproduct) ".
-            "left outer join artprodoptkpi on ".
-            "artprodoptkpi.token=artprodopttoken.token and ".
-            "artproduct.id=artprodoptkpi.artproduct";
+            "left outer join artprodoptmodal on ".
+            "artprodoptmodal.token=artprodopttoken.token and ".
+            "artproduct.id=artprodoptmodal.artproduct";
    return($from);
 }
 
@@ -227,9 +227,9 @@ sub Validate
       my ($prec,$msg)=$o->getOnlyFirst(qw(subparentid));
       if (defined($prec)){
          delete($newrec->{productid});
-         $newrec->{kpipartproduct}=$prec->{subparentid};
-         $newrec->{kpiartproduct}=$productid;
-         $newrec->{kpitoken}=$token;
+         $newrec->{modalpartproduct}=$prec->{subparentid};
+         $newrec->{modalartproduct}=$productid;
+         $newrec->{modaltoken}=$token;
          $newrec->{id}=$productid."-".$token;
       }
    }
@@ -240,7 +240,7 @@ sub Validate
          $self->LastMsg(ERROR,"token change not supported");
          return(0);
       }
-      if (effVal($oldrec,$newrec,"kpitoken") eq ""){
+      if (effVal($oldrec,$newrec,"modaltoken") eq ""){
          $newrec->{productid}=$productid;
          $newrec->{token}=$token;
          my $o=getModuleObject($self->Config,"article::product");
@@ -248,9 +248,9 @@ sub Validate
          my ($prec,$msg)=$o->getOnlyFirst(qw(subparentid));
          if (defined($prec)){
             delete($newrec->{productid});
-            $newrec->{kpipartproduct}=$prec->{subparentid};
-            $newrec->{kpiartproduct}=$productid;
-            $newrec->{kpitoken}=$token;
+            $newrec->{modalpartproduct}=$prec->{subparentid};
+            $newrec->{modalartproduct}=$productid;
+            $newrec->{modaltoken}=$token;
             $newrec->{id}=$productid."-".$token;
          }
       }

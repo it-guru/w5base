@@ -567,6 +567,14 @@ sub new
                 vjoinon       =>['id'=>'productid'],
                 vjoindisp     =>['slaquality','description']),
 
+      new kernel::Field::SubList(
+                name          =>'modalities',
+                label         =>'Modalities',
+                group         =>'modalities',
+                vjointo       =>'article::productoptmodal',
+                vjoinon       =>['id'=>'productid'],
+                vjoindisp     =>['modality','description']),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'mgmt',
@@ -731,7 +739,7 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","desc","variants","variantspecials",
-          "custoblig","pod","price","cost","mgmt",
+          "custoblig","pod","price","modalities","cost","mgmt",
           "subproducts","slaqualities",
           "mgmtlogosmall","mgmtlogolarge","attachments","source");
 }
@@ -797,7 +805,8 @@ sub Validate
       $p->SetFilter({id=>\$variantofid});
       my ($prec,$msg)=$p->getOnlyFirst(qw(ALL));
       # Werte die immer vom "Parent" übernommen werden
-      foreach my $pfld (qw(category1id frontlabel pclass description)){
+      foreach my $pfld (qw(category1id frontlabel pclass description
+                           custoblig premises rest exclusions pod)){
          if (!defined($oldrec) ||
              $oldrec->{$pfld} ne $prec->{$pfld}){
             $newrec->{$pfld}=$prec->{$pfld};
@@ -966,6 +975,7 @@ sub isViewValid
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
    my @l=("header","default","history","mgmt","desc","custoblig","pod",
           "mgmtlogosmall","mgmtlogolarge","attachments","slaqualities",
+          "modalities",
           "cost","price","source");
    if ($rec->{pvariant} eq "standard"){
       push(@l,"variants");
@@ -986,7 +996,8 @@ sub isWriteValid
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
 
    my @wrgroups=qw(default desc custoblig pod mgmt mgmtlogosmall 
-                   mgmtlogolarge attachments slaqualities);
+                   mgmtlogolarge attachments slaqualities
+                   modalities);
 
    if (defined($rec) && $rec->{variantofid}){
       @wrgroups=grep(!/^(default|desc|custoblig|pod)$/,@wrgroups);

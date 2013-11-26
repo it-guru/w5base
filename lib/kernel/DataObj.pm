@@ -99,6 +99,19 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
    my $self=shift;
    my @view=@_;                 # predefinition for request view
    my @flt;
+
+   # eine alternative wäre es, in einem qualityState objekt die letzte
+   # geprüfte ID (mit Zeitstempel) zu speichern. Die IDs müsten aufsteigend
+   # sortiert werden. 
+
+   if (!defined($self->getField("lastqcheck"))){
+      # hole die letzte geprüfte ID aus dem StateSpeicher, prüfe
+      # ob Datensätze > dieser ID existieren, (wenn nein, dann reset state
+      # und kein Filter - wenn ja, dann setzte diesen Filter)
+    #  $flt[0]->{systemid}=">S06705023";
+
+   }
+
    if (my $cistatusid=$self->getField("cistatusid")){
      # $flt[0]->{cistatusid}=[3,4,5];  # muss wieder geändert werden!!!
       $flt[0]->{cistatusid}=[1,2,3,4,5];
@@ -977,8 +990,7 @@ sub isViewValid
    my %param=@_;  
 
    if (exists($self->{useMenuFullnameAsACL})){
-      my $func="Main";
-      #$func="New" if (!defined($rec));
+      my $func=["Main","MainWithNew"];
       my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
                         $self->{useMenuFullnameAsACL},
                         func=>$func);
@@ -1001,8 +1013,8 @@ sub isWriteValid
    my $rec=shift;  # if $rec is not defined, insert is validated
 
    if (exists($self->{useMenuFullnameAsACL})){
-      my $func="Main";
-      $func="New" if (!defined($rec));
+      my $func=["Main","MainWithNew"];
+      $func=["MainWithNew","New"] if (!defined($rec));
       my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
                         $self->{useMenuFullnameAsACL},
                         func=>$func);

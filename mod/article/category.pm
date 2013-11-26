@@ -438,6 +438,24 @@ sub isWriteValid
 }
 
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($#{$rec->{subcategories}}!=-1){
+      return(0);
+   }
+   
+   if ($#{$rec->{products}}!=-1){
+      return(0);
+   }
+   
+   return(1);
+}
+
+
+
 package article::category::Field::Text;
 use strict;
 use vars qw(@ISA);

@@ -93,6 +93,20 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("article.kern",
+                      "tmpl/welcome",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("article.kern.kpi",
+                      "article::kernkpi",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("article.kern.modal",
+                      "article::kernmodal",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
 #   $self->RegisterObj("article.delivprovider.element",
 #                      "article::delivelement",
 #                      defaultacl=>['valid_user']);

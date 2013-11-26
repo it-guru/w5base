@@ -13,3 +13,6 @@
 'article.delivprovider.new'=>{de=>'Neueingabe',en=>'New'},
 'article.delivprovider.element'=>{de=>'Produktelement',en=>'Productelement'},
 'article.delivprovider.element.new'=>{de=>'Neueingabe',en=>'New'},
+'article.kern'=>{de=>'Stammdaten',en=>'Kernel'},
+'article.kern.kpi'=>{de=>'KPI/Qualitäten',en=>'KPI/Qualities'},
+'article.kern.modal'=>{de=>'Modalitäten',en=>'Modals'},
