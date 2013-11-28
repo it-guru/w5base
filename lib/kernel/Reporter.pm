@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Plugable;
+use kernel::date;
 @ISA=qw(kernel::Plugable);
 
 sub new
@@ -51,16 +52,60 @@ sub taskCreator          # creates new Prozess requests
    my $Reporter=shift;
 
    if (!defined($self->{lastrun})){
-      $reporter->addTask($self->Self,{maxstdout=>1024,maxstderr=>1024});
       my $o=$Reporter->{reportjob};
-      $o->SetFilter({srcsys=>[$self->Self],srcid=>[$self->Self]});
-      my ($reportrec)=$o->getOnlyFirst(qw(ALL));
-      $self->{lastrun}=NowStamp("en");
+      $o->SetFilter({srcsys=>\$self->Self,srcid=>\'1'});
+      my ($reportrec)=$o->getOnlyFirst(qw(srcload));
+      if (defined($reportrec) && $reportrec->{srcload} ne ""){
+         $self->{lastrun}=$reportrec->{srcload};
+      }
+      else{
+         $self->{lastrun}="1999-01-01 00:00:00";
+      }
    }
+   my ($definterval,$deftimes)=$self->getDefaultIntervalMinutes();
+   my ($nY,$nM,$nD,$nh,$nm,$ns)=Today_and_Now("en");
+   $definterval=int($definterval);
+   $definterval=1 if ($definterval<=0);
+   if (ref($deftimes) eq "ARRAY"){
+      if ($definterval<5){
+         $definterval=5;
+      }
+   }
+   else{
+      $deftimes=[];
+   }
+   @$deftimes=sort({ $a<=>$b } 
+                  map({ my $s=$_;
+                    if (my ($h,$m)=$_=~m/(\d+):(\d+)/){
+                       $s=$h+(1.0/60.0*$m);
+                    }
+                    $s;
+                  } @$deftimes));
+
    my $d=CalcDateDuration($self->{lastrun},NowStamp("en"));
-   if ($d->{totalminutes}>$self->getDefaultIntervalMinutes()){
-      $reporter->addTask($self->Self,{maxstdout=>1024,maxstderr=>1024});
-      $self->{lastrun}=NowStamp("en");
+   if ($d->{totalminutes}>$definterval){
+      my $startTask=0;
+      $startTask++ if ($#{$deftimes}==-1);
+      for(my $t=0;$t<$#{$deftimes};$t++){
+         my $twinlow=$deftimes->[$t];
+         my $twinheight=($twinlow+(1/60)*4);
+         my $nowfloat=$nh+(1/60*$nm);
+         if ($twinlow<=$nowfloat){
+            if ($twinheight>$nowfloat){
+               if (!defined($deftimes->[$t+1]) || 
+                   $deftimes->[$t+1]>$nowfloat){
+                  $startTask++;
+               }
+            }
+         }
+         if ($twinlow>$nowfloat){ # weitere checks machen dann ohnehin
+            last;                   # keine Sinn mehr
+         }
+      }
+      if ($startTask){
+         $reporter->addTask($self->Self,{maxstdout=>1024,maxstderr=>1024});
+         $self->{lastrun}=NowStamp("en");
+      }
    }
 }
 
@@ -107,6 +152,9 @@ sub Finish
    my $reporter=shift;
 
 
+   if (!$#{$task->{stderr}}!=-1){
+      printf STDERR ("fifi Finish: %s\n",Dumper($task->{stderr}));
+   }
    if (ref($self->{fieldlist}) eq "ARRAY"){
       unshift(@{$task->{stdout}},join(";",@{$self->{fieldlist}}));
    }
@@ -116,7 +164,7 @@ sub Finish
 
    my $d=join("\n",@{$task->{stdout}});
 
-   my $interval=$self->getDefaultIntervalMinutes();
+   my ($interval)=$self->getDefaultIntervalMinutes();
    my $validto=60*24;
    $validto=60*24*7 if ($interval>60*12);
    if ($validto<$interval){

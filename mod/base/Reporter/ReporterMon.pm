@@ -1,4 +1,4 @@
-package AL_TCom::Reporter::prio1location;
+package base::Reporter::ReporterMon;
 #  W5Base Framework
 #  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
 #
@@ -27,35 +27,28 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->{fieldlist}=[qw(name id prio)];
-   $self->{name}="DTAG Locations Prio1";
+   $self->{fieldlist}=[qw(name id validto srcsys)];
+   $self->{name}="Reporing-Server - Monitor";
    return($self);
 }
-
 
 sub getDefaultIntervalMinutes
 {
    my $self=shift;
 
-   return(1); #(24*60)
+   return(60*2,['07:00','13:15','16:00']);    
 }
-
 
 sub Process             # will be run as a spereate Process (PID)
 {
    my $self=shift;
 
-   my $appl=getModuleObject($self->Config,"base::location");
-   $appl->SetFilter({cistatusid=>\'4',grprelations=>"DTAG DTAG.*"});
+   my $o=getModuleObject($self->Config,"base::reportjob");
+   $o->SetFilter({cistatusid=>\'4', validto=>">now"});
    my $d;
-   foreach my $arec ($appl->getHashList(@{$self->{fieldlist}})){
-      next if ($arec->{prio} ne "1");
-      $d.=sprintf("%s;%d;%d\n",
-                  $arec->{name},
-                  $arec->{id},
-                  $arec->{prio});
+   foreach my $rec ($o->getHashList(@{$self->{fieldlist}})){
+      printf("%s;%d;%d;%s\n",$rec->{name},$rec->{id});
    }
-   print $d;
    return(1);
 }
 
@@ -70,18 +63,11 @@ sub onChange
    my $msg="";
    my $old=CSV2Hash($oldrec->{textdata},"id");
    my $new=CSV2Hash($newrec->{textdata},"id");
-   foreach my $id (keys(%{$old->{id}})){
-      if (!exists($new->{id}->{$id})){
-         my $m=$self->T('- "%s" (W5BaseID:%s) has leave the list');
-         $msg.=sprintf($m."\n",$old->{id}->{$id}->{name},$id);
-         $msg.="  ".join(",",
-             map({$_=$old->{id}->{$id}->{$_}} keys(%{$old->{id}->{$id}})));
-      }
-   }
    foreach my $id (keys(%{$new->{id}})){
       if (!exists($old->{id}->{$id})){
-         my $m=$self->T('+ "%s" (W5BaseID:%s) has been added the list');
-         $msg.=sprintf($m."\n",$new->{id}->{$id}->{name},$id);
+         my $m=$self->T('+ "%s" (%s) report job has invalid data');
+         $msg.=sprintf($m."\n",$new->{id}->{$id}->{name},
+                               $new->{id}->{$id}->{srcsys});
       }
    }
    if ($msg ne ""){
@@ -92,9 +78,6 @@ sub onChange
 
    return($msg);
 }
-
-
-
 
 
 

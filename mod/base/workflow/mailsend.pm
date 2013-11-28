@@ -473,17 +473,36 @@ sub Validate
    return(1);
 }
 
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep" || $action eq "Store"){
+      if (my $id=$self->StoreRecord($WfRec,$h)){
+         $h->{id}=$id;
+         return(1);
+      }
+      return(0);
+   }
+
+
+   return(undef);
+}
+
 sub Process
 {
    my $self=shift;
    my $action=shift;
    my $WfRec=shift;
+   my $actions=shift;
 
    if ($action eq "NextStep"){
       my $h=$self->getWriteRequestHash("web");
-      if (!$self->StoreRecord($WfRec,$h)){
-         return(0);
-      }
+      return($self->nativProcess($action,$h,$WfRec,$actions));
    }
    if ($action eq "BreakWorkflow"){
       if (!$self->StoreRecord($WfRec,{
@@ -516,6 +535,26 @@ sub generateWorkspace
 </tr></table></div>
 EOF
    return($templ);
+}
+
+sub nativProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "Send"){
+      if (my $id=$self->StoreRecord($WfRec,
+             {step=>'base::workflow::mailsend::waitforspool'})){
+         return(1);
+      }
+      return(0);
+   }
+
+
+   return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
 }
 
 sub Process

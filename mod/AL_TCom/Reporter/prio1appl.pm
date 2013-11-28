@@ -28,7 +28,7 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{fieldlist}=[qw(name id customerprio customer)];
-   $self->{name}="Application Prio1";
+   $self->{name}="DTAG Application Prio1";
    return($self);
 }
 
@@ -36,7 +36,7 @@ sub getDefaultIntervalMinutes
 {
    my $self=shift;
 
-   return(1); #(24*60)
+   return(60,['12:00','13:30','15:00','15:30']);    
 }
 
 sub Process             # will be run as a spereate Process (PID)

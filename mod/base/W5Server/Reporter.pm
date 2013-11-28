@@ -52,13 +52,17 @@ sub Reporter
    my @slot=(undef,undef,undef,undef,undef);
    $self->{task}=[];
    my %cons=();
+   my $last_taskCreator=0;
    $self->{console}=\%cons;
    my %Reporter=(start=>time(),reportjob=>$reportjob,tasklist=>$self->{task});
    while (1) {  #Infinite loop
        my ($newsock)=IO::Select->select($readable_handles,undef,undef,1);
        $Reporter{loopcount}++;
        $Reporter{consolen}=keys(%cons);
-       $self->taskCreator(\%Reporter);         # creates new tasks if needed
+       if ($last_taskCreator<time()-30){  # call taskCreator every half minute
+          $self->taskCreator(\%Reporter);     
+          $last_taskCreator=time();
+       }
        $self->slotHandler(\%Reporter,\@slot);  # executes tasks if is space 
        foreach my $sock (@$newsock) {      # in slots
            if ($sock == $main_socket) {
@@ -137,6 +141,7 @@ sub addTask
    $param->{maxstderr}=128 if (!exists($param->{maxstderr}));
    $param->{maxstdout}=128 if (!exists($param->{maxstdout}));
    if ($#{$self->{task}}<100){  # max 100 task in queue
+      $self->broadcast("receive a new task request for $name");
       push(@{$self->{task}},{name=>$name,stdout=>[],stderr=>[],
                              param=>$param,
                              requesttime=>time()});
@@ -212,8 +217,8 @@ sub slotHandler
             $slot->[$c]->{task}->{waitpidresult}=$sysexitcode; 
             $slot->[$c]->{task}->{exitcode}=$sig; 
             my $module=$slot->[$c]->{task}->{name};
+            $self->broadcast("Finish ".$module." slot $c at PID $pid");
             $reporter->{reportjob}->{Reporter}->{$module}->Finish($slot->[$c]->{task},$reporter);
-            $self->broadcast("cleanup slot $c");
             $slot->[$c]=undef;
          }
          else{
