@@ -457,8 +457,8 @@ sub Validate
    my $newrec=shift;
 
 
-#printf STDERR ("fifi Validate:oldrec=%s\n",Dumper($oldrec));
-#printf STDERR ("fifi Validate:newrec=%s\n",Dumper($newrec));
+   #printf STDERR ("fifi Validate:oldrec=%s\n",Dumper($oldrec));
+   #printf STDERR ("fifi Validate:newrec=%s\n",Dumper($newrec));
    if (!defined($oldrec)){
       trim($newrec) if (defined($newrec));
       my $name=$newrec->{"scname"};
@@ -560,7 +560,7 @@ sub UpdateRecord   # fake write request to SC
       $op{'sla.relevant'}="No";
       $op{'sla.relevant'}="Yes" if ($newrec->{'scslarelevant'});
       
-      msg(INFO,"ReopenApplicationIncident=%s",Dumper(\%op));
+      #msg(INFO,"ReopenApplicationIncident=%s",Dumper(\%op));
       $sc->IncidentResolve(%op);
       $msg=$sc->LastMessage();
       $fail=0 if ($msg=~m/resolved/i);
@@ -580,7 +580,7 @@ sub UpdateRecord   # fake write request to SC
    }
    elsif ($op eq "ReopenApplicationIncident"){
       my %op;
-      msg(INFO,"ReopenApplicationIncident=%s",Dumper($newrec));
+      #msg(INFO,"ReopenApplicationIncident=%s",Dumper($newrec));
       $sc->IncidentReopen($newrec->{'scdescription'},
                           {assignment=>$newrec->{'scassignment'}});
       $msg=$sc->LastMessage();
