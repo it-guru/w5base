@@ -813,7 +813,10 @@ sub getMenuAcl
       my $found=0;
       foreach my $m (values(%{$menucache->{menuid}})){
          next if ($m->{target} ne $target); 
-         next if (defined($param{func}) && $m->{func} ne $param{func}); 
+         next if (defined($param{func}) && 
+                  ((!ref($param{func}) && $m->{func} ne $param{func}) ||
+                   (ref($param{func}) eq "ARRAY" &&
+                    !in_array($param{func},$m->{func})))); 
          next if (defined($param{param}) && $m->{param} ne $param{param}); 
          $found=1;
          if (ref($m->{acls}) eq "ARRAY" && $#{$m->{acls}}==-1){
