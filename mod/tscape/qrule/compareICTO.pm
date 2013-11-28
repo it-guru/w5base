@@ -35,6 +35,20 @@ that provide technical access to networks) , then there is the
 possibility - in the configuration data of the application - 
 to set the flag  " Application is not architecture relevant:" to  "yes".
 
+So there are two possibilities of providing correct data 
+concerning the architecture relevance of an application:
+
+1. Either the application is architecture relevant, then 
+the attribute  Application is not architecture 
+relevant: has to be set to no and a valid ICTO-Id has to 
+be entered.
+
+2. Or the application is not architecture relevant, then 
+the attribute  Application is not architecture relevant: has 
+to be set to yes and you are not allowed to enter an 
+ICTO-Id, i.e. you must delete the actual ICTO-Id, if one 
+is has been given already.
+
 The rule which lead to this issue won't be executed on 
 this application anymore. 
 
@@ -62,6 +76,20 @@ IT-Architektur erfasst wird (z.B. ein rein technische Anwendung
 die technischen Zugang zu Netzwerken ermöglicht), so muß in 
 den Config-Daten der Anwendung das Feld "Anwendung ist 
 nicht IT-Architektur relevant" = "Ja" gesetzt werden.
+
+Es gibt also zwei Möglichkeiten für die korrekte Angabe der 
+Architektur-Relevanz einer Applikation:
+
+1. Entweder ist die Anwenduung IT-Architektur-relevant, 
+dann muss das Attribut  Anwendung ist nicht IT-Architektur 
+relevant: auf nein gesetzt werden und es muss eine 
+gültige ICTO-Id angegeben werden.
+
+2. Oder die Anwendung ist nicht IT-Architektur-relevant, 
+dann muss das Attribut  Anwendung ist nicht IT-Architektur 
+relevant: auf "ja" gesetzt werden und es darf keine 
+ICTO-Id angegeben werden.
+
 
 Die Regel, die zu diesem Data-Issue führte, wird dann auf 
 die Anwendung nicht mehr angewendet.
