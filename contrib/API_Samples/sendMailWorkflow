@@ -43,7 +43,7 @@ my $WfRec={ class=>'base::workflow::mailsend',
             action=>'Store',
             emailtext=>"Hallo User,\n\dies ist ein Testtext\n".
                        "bei Fragen : http://www.google.de",
-            emailto=>'hartmut.vogler@t-systems.com'
+            emailto=>'hgler@t-stems.com'
           };
 
 #######################################################################
