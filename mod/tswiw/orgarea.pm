@@ -373,7 +373,7 @@ sub Import
                         srcload=>NowStamp(),
                         comments=>"Description from WhoIsWho: ".
                                   $wiwrec->{name});
-            msg(DEBUG,"Write=%s",Dumper(\%newgrp));
+            #msg(DEBUG,"Write=%s",Dumper(\%newgrp));
             if (my $back=$grp->ValidatedInsertRecord(\%newgrp)){
                $ok++;    
                msg(DEBUG,"ValidatedInsertRecord returned=$back");
