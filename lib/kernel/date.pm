@@ -43,6 +43,10 @@ sub _tzset
    my $oldtz=$ENV{TZ};
    $ENV{TZ}=$newtz;                   # compatible for none Env::C Enviroments
    eval('Env::C::setenv("TZ",$newtz,1);');  # needed for mod_perl2
+   if ($@){
+      die("ERROR: perl module Env::C not installed - ".
+          "this causes maybee problems!");
+   }
    POSIX::tzset();   
    return($oldtz);
 }

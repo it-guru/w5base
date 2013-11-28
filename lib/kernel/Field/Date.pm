@@ -384,7 +384,7 @@ sub Unformat
    my $self=shift;
    my $formated=shift;
    my $rec=shift;
-   #printf STDERR ("fifi unformat of %s = %s\n",$self->Name(),Dumper($formated));
+
    if (defined($formated)){
       $formated=[$formated] if (ref($formated) ne "ARRAY");
       return(undef) if (!defined($formated->[0]));

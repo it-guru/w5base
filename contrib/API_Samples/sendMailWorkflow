@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+use lib qw(/opt/w5base2/lib /opt/w5base/lib);
+use strict;                   
+use W5Base::API;
+use Data::Dumper;
+
+my $DefaultBase="https://w5base.net/w5base/auth/";
+my ($help,$verbose,$loginuser,$loginpass,$quiet,$base,$lang);
+my %P=("help"=>\$help,"base=s"=>\$base,"lang=s"=>\$lang,
+       "webuser=s"=>\$loginuser,"webpass=s"=> \$loginpass,
+       "verbose+"=>\$verbose);
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,".W5Base.Interface");
+
+#######################################################################
+# create connection config
+#
+my $apidebug=$verbose>=3 ? 1 : 0;
+my $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug);
+if (!defined($Config)){
+   msg(ERROR,"base url or username/password is not valid");exit(1);
+}
+else{
+   msg(DEBUG,"create of config ok");
+}
+msg(DEBUG,"verbose=$verbose");
+
+
+#######################################################################
+# load ModuleObject
+#
+my $objectname="base::workflow";
+my $wf=getModuleObject($Config,$objectname);
+if (!defined($wf)){
+   msg(ERROR,"can't load object $objectname");exit(2);
+}
+else{
+   msg(DEBUG,"create of ModuleObject $wf ok");
+}
+
+my $WfRec={ class=>'base::workflow::mailsend',
+            name=>'Hallo Welt',
+            step=>'base::workflow::mailsend::dataload',
+            action=>'Store',
+            emailtext=>"Hallo User,\n\dies ist ein Testtext\n".
+                       "bei Fragen : http://www.google.de",
+            emailto=>'hartmut.vogler@t-systems.com'
+          };
+
+#######################################################################
+#
+msg(INFO,"create mail Workflow");
+if (my $id=$wf->storeRecord($WfRec)){
+   msg(INFO,"create mailsend Workflow at id=$id");
+   if ($wf->storeRecord({action=>'Send'},$id)){
+      msg(INFO,"send done Workflow at id=$id");
+   }
+   exit(0);
+}
+else{
+   $wf->dieOnERROR();
+}
+exit(1);
+
+#######################################################################
+sub Help
+{
+   print(<<EOF);
+$RealScript [options] FullnameFilter
+
+   --verbose display more details of operation process
+   --quiet   only errors would be displayed
+   --base    base url of filemgmt (default: $DefaultBase)
+
+   --webuser username
+   --webpass password
+   --store   stores the parameters (not help,verbose and store)
+   --help    show this help
+
+EOF
+}
+#######################################################################
+exit(255);

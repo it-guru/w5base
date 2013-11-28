@@ -586,11 +586,13 @@ sub Sendmail
             close(F);
             push(@processed,$rec->{id});
             if (open(D,">/tmp/mail.dump.tmp")){
+               my $finerec={state=>21,
+                            eventend=>NowStamp("en"),
+                            closedate=>NowStamp("en"),
+                            step=>'base::workflow::mailsend::finish'};
                print D $mail;
-               $wf->Store($rec,{state=>21,
-                                eventend=>NowStamp("en"),
-                                closedate=>NowStamp("en"),
-                                step=>'base::workflow::mailsend::finish'});
+               print D "\n----\n".Dumper($finerec);
+               $wf->Store($rec,$finerec);
                close(D);
             }
          }
