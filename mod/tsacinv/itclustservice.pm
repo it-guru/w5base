@@ -353,7 +353,7 @@ sub Import
          $self->LastMsg(ERROR,"ClusterID has no Assignment Group");
          return(undef);
       }
-      printf STDERR Dumper($sysrec);
+      #printf STDERR Dumper($sysrec);
       # check 2: Assingment Group active
       my $acgroup=getModuleObject($self->Config,"tsacinv::group");
       $acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
