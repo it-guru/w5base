@@ -210,6 +210,10 @@ sub qcheckRecord
           if (ref($wiwdata->{$fld}) eq "ARRAY"){
              $wiwdata->{$fld}=$wiwdata->{$fld}->[0];
           }
+          if ($fld eq "office_phone" &&
+              ($wiwdata->{$fld}=~m/dummyvalue$/)){
+             $wiwdata->{$fld}=undef;
+          }
           $wiwdata->{$fld}=~s/^\s*unknown\s*$//i;
           if ($fld eq "country"){
              if ($wiwdata->{country} eq ""){
