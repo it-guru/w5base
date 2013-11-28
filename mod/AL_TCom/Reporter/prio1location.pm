@@ -32,12 +32,11 @@ sub new
    return($self);
 }
 
-
 sub getDefaultIntervalMinutes
 {
    my $self=shift;
 
-   return(300); #(24*60)
+   return(60,['6:00','20:30']);    
 }
 
 
