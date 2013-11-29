@@ -59,10 +59,6 @@ sub Reporter
        my ($newsock)=IO::Select->select($readable_handles,undef,undef,1);
        $Reporter{loopcount}++;
        $Reporter{consolen}=keys(%cons);
-       if ($last_taskCreator<time()-30){  # call taskCreator every half minute
-          $self->taskCreator(\%Reporter);     
-          $last_taskCreator=time();
-       }
        $self->slotHandler(\%Reporter,\@slot);  # executes tasks if is space 
        foreach my $sock (@$newsock) {      # in slots
            if ($sock == $main_socket) {
@@ -83,6 +79,11 @@ sub Reporter
                }
            }
        }   
+       if ($last_taskCreator==0 ||
+           $last_taskCreator<time()-30){  # call taskCreator every half minute
+          $self->taskCreator(\%Reporter);     
+          $last_taskCreator=time();
+       }
    }
    #######################################################################
 }
@@ -206,24 +207,33 @@ sub slotHandler
    $reporter->{runningJobs}=0;
    $reporter->{maxSlots}=$#{$slot}+1;
    $reporter->{usedSlots}=0;
+   $SIG{CHLD}='DEFAULT';
    for(my $c=0;$c<=$#{$slot};$c++){
       if (defined($slot->[$c])){
          $reporter->{usedSlots}++;
          $self->handleSlotIO($reporter,$slot->[$c]);
-         $SIG{CHLD}='DEFAULT';
          my $pid=$slot->[$c]->{pid};
          if ((my $sysexitcode=waitpid($pid,WNOHANG))>0){
-            my $sig=$sysexitcode&8;
+            my $sig=$?>>8;
             $slot->[$c]->{task}->{waitpidresult}=$sysexitcode; 
             $slot->[$c]->{task}->{exitcode}=$sig; 
             my $module=$slot->[$c]->{task}->{name};
-            $self->broadcast("Finish ".$module." slot $c at PID $pid");
-            $reporter->{reportjob}->{Reporter}->{$module}->Finish($slot->[$c]->{task},$reporter);
+            $self->broadcast("Finish ".$module." slot $c at PID $pid($sig)");
+            my $reportermodules=$reporter->{reportjob}->{Reporter};
+            $reportermodules->{$module}->Finish($slot->[$c]->{task},$reporter);
             $slot->[$c]=undef;
          }
          else{
             if (kill(0,$pid)){
                $reporter->{runningJobs}++;
+            }
+            else{
+               my $module=$slot->[$c]->{task}->{name};
+               $self->broadcast("seltsam $pid scheint tot zu sein");
+               my $reportermodules=$reporter->{reportjob}->{Reporter};
+               $reportermodules->{$module}->Finish($slot->[$c]->{task},
+                                                   $reporter);
+               $slot->[$c]=undef;
             }
          }
          
@@ -251,18 +261,24 @@ sub slotHandler
 
                open(STDERR, ">&".fileno($newSTDERR));
                open(STDOUT, ">&".fileno($newSTDOUT));
-               for(my $c=3;$c<254;$c++){  # ensure, that all 
-                  POSIX::close($c);       # filehandles are closed
+               for(my $cc=3;$cc<254;$cc++){  # ensure, that all 
+                  POSIX::close($cc);       # filehandles are closed
                }
                $0.="(".$task->{name}.")";
-               $reporter->{reportjob}->{Reporter}->{$task->{name}}->Process();
+               my $reportermodules=$reporter->{reportjob}->{Reporter};
+               my $bk=$reportermodules->{$task->{name}}->Process();
+               if (defined($bk) && $bk>0){
+                  printf STDERR ("existcode:$bk\n");
+                  exit($bk);
+               }
                exit(0);
             }
             else{
+               $self->broadcast("starting job $task->{name} at ".
+                                "slot $c on pid $pid");
                $slot->[$c]->{pid}=$pid;
                $reporter->{jobcount}++
             }
-            $self->broadcast("starting job $task->{name} at slot $c on pid $pid");
          }
       }
    }
@@ -276,7 +292,7 @@ sub broadcast
 
    foreach my $cons (values(%{$self->{console}})){
       my $h=$cons->{handle};
-      printf $h ("broadcast: %s\n",$msg);
+      printf $h ("%s: %s\n",NowStamp("en"),$msg);
    }
 }
 

@@ -77,6 +77,11 @@ sub new
                 label         =>'XML Data',
                 dataobjattr   =>'reportjob.deltabuffer'),
 
+      new kernel::Field::Textarea(
+                name          =>'errbuffer',
+                group         =>'error',
+                label         =>'ERRORs',
+                dataobjattr   =>'reportjob.errbuffer'),
 
       new kernel::Field::Link(
                 name          =>'cistatusid',
@@ -86,6 +91,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
+                selectfix     =>1,
                 label         =>'Source-System',
                 dataobjattr   =>'reportjob.srcsys'),
 
@@ -153,7 +159,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","data","wffieldsfilter","source");
+   return("header","default","data","error","wffieldsfilter","source");
 }
 
 
@@ -253,9 +259,29 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL"); # u.U. muß hier noch ein Handler rein, der nur bestimmte
-                  # Reports an bestimmte Personen lesbar macht.
+
+   my $viewok=1;
+   if ($rec->{srcsys} ne "" &&
+       exists($self->{Reporter}->{$rec->{srcsys}})){
+      $viewok=$self->{Reporter}->{$rec->{srcsys}}->isViewValid($self,$rec);
+   }
+   return() if (!$viewok);
+
+   if ($rec->{errbuffer} ne ""){
+      return("header","default","data","error","source");
+   }
+   return("header","default","data","source");
 }
+
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/reportjob.jpg?".$cgi->query_string());
+}
+
+
 
 
 sub isWriteValid

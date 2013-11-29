@@ -267,7 +267,7 @@ create table wfscheduleddatachange (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE reportjob (
   id          bigint(20) NOT NULL,
-  reportname  varchar(20)  NOT NULL,
+  reportname  varchar(80)  NOT NULL,
   reporttype  varchar(20)  NOT NULL,
   cistatus    int(2) NOT NULL,
   dataobj     varchar(80) NOT NULL,
@@ -275,7 +275,7 @@ CREATE TABLE reportjob (
   repfields   text default NULL,
   targetuser  bigint(20) default NULL,
   targetfile  varchar(255) default NULL,
-  deltabuffer text default NULL,
+  deltabuffer text default NULL,errbuffer text default null,
   usetimezone varchar(20) NOT NULL,
   uselang     varchar(20) NOT NULL, 
   comments     longtext default NULL,

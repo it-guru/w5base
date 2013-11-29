@@ -117,6 +117,15 @@ sub Process             # will be run as a spereate Process (PID)
 }
 
 
+sub isViewValid
+{
+   my $reporter=shift;
+   my $self=shift;
+   my $rec=shift;
+   return(1);
+}
+
+
 sub stdout              # will be called on stdout line output
 {
    my $self=shift;
@@ -136,10 +145,11 @@ sub stderr             # will be called on stderr line output
    my $line=shift;
    my $task=shift;
    my $reporter=shift;
-   #printf STDERR ("%s(ERR):%s\n",$self->Self,$line);
-   push(@{$task->{stderr}},$line);
-   if ($#{$task->{stderr}}>$task->{param}->{maxstderr}){
-      shift(@{$task->{stderr}});
+   if (!($line=~m/^INFO:/)){
+      push(@{$task->{stderr}},$line);
+      if ($#{$task->{stderr}}>$task->{param}->{maxstderr}){
+         shift(@{$task->{stderr}});
+      }
    }
 }
 
@@ -152,9 +162,6 @@ sub Finish
    my $reporter=shift;
 
 
-   if (!$#{$task->{stderr}}!=-1){
-      printf STDERR ("fifi Finish: %s\n",Dumper($task->{stderr}));
-   }
    if (ref($self->{fieldlist}) eq "ARRAY"){
       unshift(@{$task->{stdout}},join(";",@{$self->{fieldlist}}));
    }
@@ -178,6 +185,12 @@ sub Finish
        textdata=>$d, name=>$name, validto=>$validto,
        srcsys=>$self->Self,srcid=>'1',srcload =>NowStamp("en")
    };
+   if ($#{$task->{stderr}}!=-1){
+      $newrec->{errbuffer}=join("\n",@{$task->{stderr}});
+   }
+   else{
+      $newrec->{errbuffer}=undef;
+   }
    
    
    if (defined($reportrec) && $d eq $reportrec->{textdata}){

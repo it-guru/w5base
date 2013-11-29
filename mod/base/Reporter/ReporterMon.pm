@@ -32,12 +32,31 @@ sub new
    return($self);
 }
 
+#sub getDefaultIntervalMinutes
+#{
+#   my $self=shift;
+#
+#   return(60*2,['07:00','13:15','16:00']);    
+#}
+
 sub getDefaultIntervalMinutes
 {
    my $self=shift;
 
-   return(60*2,['07:00','13:15','16:00']);    
+   return(1);
 }
+
+
+sub isViewValid
+{
+   my $reporter=shift;
+   my $self=shift;
+   my $rec=shift;
+   return(0) if (!$self->IsMemberOf("admin"));
+   return(1);
+}
+
+
 
 sub Process             # will be run as a spereate Process (PID)
 {
@@ -49,7 +68,8 @@ sub Process             # will be run as a spereate Process (PID)
    foreach my $rec ($o->getHashList(@{$self->{fieldlist}})){
       printf("%s;%d;%d;%s\n",$rec->{name},$rec->{id});
    }
-   return(1);
+   printf STDERR ("fifi 01\n");
+   return(13);
 }
 
 

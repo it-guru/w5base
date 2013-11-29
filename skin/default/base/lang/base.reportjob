@@ -2,4 +2,5 @@
 'valuechange'=>{de=>'Änderung der Liste',en=>'change of list'},
 'Data valid to'=>{de=>'Daten gültig bis'},
 'fieldgroup.data'=>{de=>'Reportingdaten',en=>'Report-Data'},
+'fieldgroup.error'=>{de=>'ERROR-Ausgaben',en=>'ERROR-Output'},
 'Data'=>{de=>'Reportingdaten',en=>'Report-Data'},
