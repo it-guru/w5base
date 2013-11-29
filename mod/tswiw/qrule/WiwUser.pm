@@ -182,6 +182,7 @@ sub qcheckRecord
       my $typeclass=undef;
       if ($wiwrec->{office_state} eq "Employee" ||
           $wiwrec->{office_state} eq "Manager" ||
+          $wiwrec->{office_state} eq "Employee-1st-Day" ||  # vor Eintrittsdat.
           $wiwrec->{office_state} eq "Freelancer" ||
           $wiwrec->{office_state} eq "DTAG User"){
          $typeclass="user";
