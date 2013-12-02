@@ -57,6 +57,7 @@ sub Connect
    $p{dbuser}=$self->getParent->Config->Param('DATAOBJUSER');
    $p{dbpass}=$self->getParent->Config->Param('DATAOBJPASS');
    $p{dbschema}=$self->getParent->Config->Param('DATAOBJBASE');
+   local $SIG{INT}; # try fix signal INT problem DBD::Oracle
 
    if (my $parent=$self->getParent()){
       # check if DATAOBJCONNECT is "overwrited" defined for current object
