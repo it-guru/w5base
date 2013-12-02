@@ -102,13 +102,28 @@ sub processConsoleCommand
    elsif ($command eq "uptime"){
       printf $client ("uptime: %d\n",$reporter->{start});
    }
-   elsif ($command eq "exit"){
-      close($client);
+   elsif ((my $module)=$command=~m/^run\s+(\S+)$/){
+      if (exists($reportjob->{Reporter}->{$module})){
+         $self->addTask($module);
+         printf $client ("OK\n"); 
+      }
+      else{
+         printf $client ("ERROR: Invalid module name '%s'\n",$module); 
+      }
    }
+   #elsif ($command eq "exit"){
+   #   close($client);
+   #}
    elsif ($command eq "status"){
       my %d=%$reporter;
       delete($d{reportjob});
-      printf $client ("status: %s\n",Dumper(\%d));
+      my $d=Dumper(\%d);
+      $d=~s/^.*?{/{/;
+      printf $client ("status: %s\n",$d);
+      printf $client ("Loaded modules:\n");
+      foreach my $module (sort(keys(%{$reportjob->{Reporter}}))){
+         printf $client ("- %s\n",$module);
+      }
    }
    elsif ($command eq "shutdown"){
       $self->Shutdown();
