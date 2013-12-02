@@ -39,7 +39,7 @@ sub Init                  # at this method, the registration must be done
    my $pack=ref($self);
    $pack=~s/^.*:://;
    if ($self->can($pack)){
-      msg(INFO,"auto RegisterEvent '$pack'");
+      msg(DEBUG,"auto RegisterEvent '$pack'");
       $self->RegisterEvent($pack,ref($self)."::".$pack);
    }
    return(1);
