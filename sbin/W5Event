@@ -10,14 +10,14 @@ use kernel::config;
 use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
-use vars qw($opt_v $opt_h $opt_c $configname);
+use vars qw($opt_v $opt_d $opt_h $opt_c $configname);
 $0="W5Event ".join(" ",@ARGV);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
-                        'debug'=>\$opt_v,
+                        'debug'=>\$opt_d,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
 
-if ($opt_v){
+if ($opt_d){
    $W5V2::Debug=1;
 }
 else{

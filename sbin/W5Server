@@ -1003,7 +1003,7 @@ sub StartW5ServerProcess
 EOF
    eval("\$srvsub=sub { $srvcode return({exitcode=>0}); }");
 
-   my $sched=$self->async($srvsub);
+   my $sched=$self->async($srvsub,name=>$server);
    $self->{W5ServerProcess}->{$server}=$sched;
 }
 
@@ -1039,15 +1039,18 @@ sub sendSignalToAllRunningProcesses
    my $signal=shift;
    my $n=0;
 
-   foreach my $server (keys(%{$self->{W5Server}})){  # sending INT to current
-      my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID}; # spare w5servers
-      msg(DEBUG,"send Signal($signal) from %s to %s at %s",
-                getpid(),$server,$pid);
-      if (kill($signal,$pid)){
-         $n++;
-      }
-   }
-   sleep(1);
+#  Das ist nicht mehr notwendig, da die W5Serverprozesse Teil des TaskHashes
+#  sind.
+#
+#   foreach my $server (keys(%{$self->{W5Server}})){  # sending INT to current
+#      my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID}; # spare w5servers
+#      msg(DEBUG,"send Signal($signal) from %s to %s at %s",
+#                getpid(),$server,$pid);
+#      if (kill($signal,$pid)){
+#         $n++;
+#      }
+#   }
+#   sleep(1);
    foreach my $pid ($self->runningTasks()){
       msg(DEBUG,"send Signal($signal) to event at pid %s",$pid);
       if (kill($signal,$pid)){
