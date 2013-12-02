@@ -61,8 +61,7 @@ sub Process             # will be run as a spereate Process (PID)
    foreach my $rec ($o->getHashList(@{$self->{fieldlist}})){
       printf("%s;%d;%d;%s\n",$rec->{name},$rec->{id});
    }
-   printf STDERR ("fifi 01\n");
-   return(13);
+   return(0);
 }
 
 
