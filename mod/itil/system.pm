@@ -117,6 +117,7 @@ sub new
                 label         =>'Applicationnames',
                 group         =>'applications',
                 htmldetail    =>0,
+                readonly      =>1,
                 searchable    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
@@ -128,6 +129,7 @@ sub new
                 label         =>'Technical Solution Manager E-Mails',
                 group         =>'applications',
                 htmldetail    =>0,
+                readonly      =>1,
                 searchable    =>0,
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
@@ -152,6 +154,7 @@ sub new
                 group         =>'customer',
                 depend        =>['applications'],
                 searchable    =>0,
+                readonly      =>1,
                 htmldetail    =>0,
                 onRawValue    =>sub{
                    my $self=shift;
@@ -207,6 +210,7 @@ sub new
                 group         =>'customer',
                 depend        =>['applications'],
                 searchable    =>0,
+                readonly      =>1,
                 htmldetail    =>0,
                 onRawValue    =>sub{
                    my $self=shift;

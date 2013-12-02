@@ -2533,15 +2533,19 @@ EOF
 
 
    print("</td>");
-   if ($self->IsMemberOf("admin")){
-      print("<td valign=bottom>"); ################################
-      print("<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>");
-      print("<tr><td><u><b>History note:</b></ul></td></tr><td>".
-            "<textarea style=\"width:100%\" ".
-            "name=HistoryComments wrap=off rows=3 cols=10></textarea>");
-      print("</td><tr></table>");
-      print("</td>");
-   }
+   #if ($self->IsMemberOf("admin")){  # laut Carina sind die HistoryComments
+                                 # für alle sinnvoll
+   # siehe: 
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/13817467940005
+                                   
+   print("<td valign=bottom>"); ################################
+   print("<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>");
+   print("<tr><td><u><b>History note:</b></ul></td></tr><td>".
+         "<textarea style=\"width:100%\" ".
+         "name=HistoryComments wrap=off rows=3 cols=10></textarea>");
+   print("</td><tr></table>");
+   print("</td>");
+   #}
    print("</tr>");
    print("</table></td>");
    print("</td></tr>");
