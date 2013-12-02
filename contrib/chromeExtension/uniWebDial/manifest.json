@@ -1,6 +1,7 @@
 {
   "name" : "universal WebDial",
   "version" : "0.2.0",
+  "manifest_version": 2,
   "description" : "universal extension to use softphone (webdialer)",
   "background_page" : "background.html",
   "options_page": "options.html",
