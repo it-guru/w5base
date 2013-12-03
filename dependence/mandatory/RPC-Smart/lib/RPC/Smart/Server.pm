@@ -135,7 +135,9 @@ sub mux_input
          #printf STDERR ("fifi d=%s\n",$$d);
          if ($self->validateXML($$d)){ 
             my  $XML;
-            eval {$XML=new XML::Smart($$d);};
+            eval {
+                $XML=new XML::Smart($$d);
+            };
             my $result=$@;
             if ($result eq ""){
                my $resXML=new XML::Smart();
@@ -148,7 +150,9 @@ sub mux_input
                      $self->callMethod($mux,$io,$callXML,$resXML);
                   }
                }
-               print $resXML->data;
+               #my $data=$resXML->data;
+               #$data=~s/^1//;;  # mystery bug seems to came from XML::Smart
+               print(scalar($resXML->data));
             }
             else{
                $XML=new XML::Smart();
@@ -187,7 +191,10 @@ sub async
    }
    my $taskenv={start=>time(),timeout=>$param{timeout},
                 ipc=>new IPC::Smart(-nolocking=>1,-size=>8192)};
-  # printf STDERR ("MyServerFunc param=%s\n",Dumper(\@param));
+   foreach my $k (keys(%param)){
+      next if (exists($taskenv->{$k}));
+      $taskenv->{$k}=$param{$k};
+   }
    my $pid=fork();
    if ($pid==0){
       {  # cleanup paren multiplex server
@@ -305,7 +312,6 @@ sub callMethod
    else{
       $result="ERROR: unknown method '$method'";
    }
-   #printf STDERR ("callMethod:$method res=$result\n");
    if ($result eq ""){
       if (defined($fres) && ref($fres) eq "HASH"){
          push(@{$resXML->{root}},{call=>{exitcode=>0,%{$fres}}}) ;
