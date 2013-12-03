@@ -55,7 +55,7 @@ sub Process             # will be run as a spereate Process (PID)
                   $arec->{prio});
    }
    print $d;
-   return(1);
+   return(0);
 }
 
 
