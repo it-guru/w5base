@@ -1,1 +1,4 @@
 'article::delivprovider'=>{de=>'Anbieder',en=>'Provider'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'Groupname'=>{de=>'Gruppenname'},
+

@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -56,6 +57,7 @@ sub new
                 name          =>'name',
                 label         =>'Productname',
                 htmldetail    =>0,
+                searchable    =>0,
                 readonly      =>1,
                 multilang     =>1,
                 dataobjattr   =>'artproduct.frontlabel'),
@@ -244,6 +246,7 @@ sub new
                 name          =>'delivprovider',
                 label         =>'Provider',
                 group         =>'mgmt',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjointo       =>'article::delivprovider',
                 vjoinon       =>['delivproviderid'=>'id'],
                 vjoindisp     =>'name'),
@@ -252,6 +255,22 @@ sub new
                 name          =>'delivproviderid',
                 group         =>'mgmt',
                 dataobjattr   =>'artproduct.delivprovider'),
+
+      new kernel::Field::TextDrop(
+                name          =>'delivprovidergroup',
+                label         =>'Provider groupname',
+                group         =>'mgmt',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'base::grp',
+                vjoinon       =>['delivprovidergrpid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Interface(
+                name          =>'delivprovidergrpid',
+                group         =>'mgmt',
+                readonly      =>1,
+                dataobjattr   =>'artdelivprovider.grpid'),
 
       new kernel::Field::Date(
                 name          =>'orderable_from',
@@ -708,6 +727,13 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
 
 
 sub getRecordImageUrl
@@ -724,6 +750,8 @@ sub getSqlFrom
    my $from="artproduct ".
       "left outer join artcategory on artproduct.artcategory1=artcategory.id ".
       "left outer join artcatalog on artcategory.artcatalog=artcatalog.id ".
+      "left outer join artdelivprovider on ".
+      "artproduct.delivprovider=artdelivprovider.id ".
       "left outer join lnkcontact on lnkcontact.parentobj='article::catalog' ".
       "and artcategory.id=lnkcontact.refid";
    return($from);

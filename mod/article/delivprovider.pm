@@ -22,8 +22,9 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use kernel::CIStatusTools;
 use kernel::MandatorDataACL;
-@ISA=qw(kernel::App::Web::Listedit  kernel::MandatorDataACL kernel::DataObj::DB);
+@ISA=qw(kernel::App::Web::Listedit  kernel::MandatorDataACL kernel::DataObj::DB  kernel::CIStatusTools);
 
 sub new
 {
@@ -75,6 +76,17 @@ sub new
       new kernel::Field::Link(
                 name          =>'databossid',
                 dataobjattr   =>'artdelivprovider.databoss'),
+
+      new kernel::Field::TextDrop(
+                name          =>'groupname',
+                label         =>'Groupname',
+                vjointo       =>'base::grp',
+                vjoinon       =>['grpid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Interface(
+                name          =>'grpid',
+                dataobjattr   =>'artdelivprovider.grpid'),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
@@ -232,6 +244,7 @@ sub Validate
                      $name);
       return(undef);
    }
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);
 }
 
@@ -244,6 +257,27 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    return("ALL");
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+   $self->NotifyOnCIStatusChange($oldrec,$newrec);
+   return($bak);
+}
+
 
 sub getSqlFrom
 {

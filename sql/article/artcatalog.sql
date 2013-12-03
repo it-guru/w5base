@@ -114,7 +114,7 @@ create table artdelivprovider (
   mandator   bigint(20)  NOT NULL,
   databoss   bigint(20)  NOT NULL,
   cistatus   int(2)      NOT NULL,
-  description longtext,
+  description longtext, grpid bigint(20) not null,
   comments    longtext,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
@@ -126,7 +126,7 @@ create table artdelivprovider (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  key name(name),
+  unique(name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table artprodopttoken (
