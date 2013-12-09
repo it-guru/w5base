@@ -70,7 +70,7 @@ sub onChange
    my $new=CSV2Hash($newrec->{textdata},"id");
    foreach my $id (keys(%{$old->{id}})){
       if (!exists($new->{id}->{$id})){
-         my $m=$self->T('- "%s" (W5BaseID:%s) has leave the list');
+         my $m=$self->T('- "%s" (W5BaseID:%s) has left the list');
          $msg.=sprintf($m."\n",$old->{id}->{$id}->{name},$id);
          #$msg.="  ".join(",",
          #    map({$_=$old->{id}->{$id}->{$_}} keys(%{$old->{id}->{$id}})));
@@ -78,7 +78,7 @@ sub onChange
    }
    foreach my $id (keys(%{$new->{id}})){
       if (!exists($old->{id}->{$id})){
-         my $m=$self->T('+ "%s" (W5BaseID:%s) has been added the list');
+         my $m=$self->T('+ "%s" (W5BaseID:%s) has been added to the list');
          $msg.=sprintf($m."\n",$new->{id}->{$id}->{name},$id);
       }
       else{
