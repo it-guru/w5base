@@ -217,8 +217,8 @@ sub Validate
 
    if (!defined($oldrec)){
       my $token=effVal($oldrec,$newrec,"token");
-      if (!($token=~m/^[a-zA-Z0-9]+$/)){
-         $self->LastMsg(ERROR,"invalid token in base::itemizedlist");
+      if (!($token=~m/^[a-zA-Z0-9_]+$/)){
+         $self->LastMsg(ERROR,"invalid token in itemizedlist");
          return(0);
       }
       my $productid=effVal($oldrec,$newrec,"productid");
