@@ -46,8 +46,12 @@ sub rpcCallSerialEvent
    if ($self->{EventController}->isEvent($event)){
       my $timeout=$self->{EventController}->getMaxEventTimeout($event);
       return($self->async(sub {
+         my $tasks=$self->getTasksHash();  # this should be done in RPC::Server,
+         $tasks={};                        # but at this position, i didnt need
          $0="W5Server '$event'";
          $self->initAsyncEnv($event,{param=>[@p]},'any');
+         $SIG{USR1}='DEFAULT';
+         $SIG{USR2}='DEFAULT';
          $SIG{CHLD}='DEFAULT';
          $SIG{ALRM}='DEFAULT';
          $self->{EventController}->setParent($self);
@@ -963,6 +967,9 @@ sub StartW5ServerProcess
    my $srv=$self->{W5Server}->{$server};
    my $srvsub;
    my $srvcode=<<EOF;
+      my \$tasks=\$self->getTasksHash();  # this should be done in RPC::Server,
+      \$tasks={};                         # but at this position, i didnt need
+                                          # a module update
       \$0="W5Sserver-".\$server;
       my \$orgpid=\$\$;
       sub start{
