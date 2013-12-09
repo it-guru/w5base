@@ -409,6 +409,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'pricecurrency',
                 htmldetail    =>0,
+                uploadable    =>0,
                 default       =>'EUR',
                 label         =>'currency',
                 group         =>'price',
@@ -462,7 +463,7 @@ sub new
       new kernel::Field::Currency(
                 name          =>'costday',
                 label         =>'cost day',
-                depend        =>['pricecurrency'],
+                depend        =>['costcurrency'],
                 unit          =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -479,7 +480,7 @@ sub new
       new kernel::Field::Currency(
                 name          =>'costmonth',
                 label         =>'cost month',
-                depend        =>['pricecurrency'],
+                depend        =>['costcurrency'],
                 unit          =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -495,7 +496,7 @@ sub new
 
       new kernel::Field::Currency(
                 name          =>'costyear',
-                depend        =>['pricecurrency'],
+                depend        =>['costcurrency'],
                 unit          =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -520,7 +521,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'costcurrencysel',
-                label         =>'currency label',
+                label         =>'currency label (cost)',
                 vjointo       =>'base::isocurrency',
                 vjoinon       =>['costcurrency'=>'token'],
                 vjoindisp     =>'fullname',
@@ -529,8 +530,9 @@ sub new
       new kernel::Field::Text(
                 name          =>'costcurrency',
                 htmldetail    =>0,
+                uploadable    =>0,
                 default       =>'EUR',
-                label         =>'currency',
+                label         =>'currency (cost)',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_currency'),
 
