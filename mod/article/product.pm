@@ -272,6 +272,23 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'artdelivprovider.grpid'),
 
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                group         =>'mgmt',
+                default       =>'4',
+                vjoineditbase =>{id=>[qw(1 4 5 6)]},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                group         =>'mgmt',
+                label         =>'CI-StateID',
+                dataobjattr   =>'artproduct.pstatus'),
+
       new kernel::Field::Date(
                 name          =>'orderable_from',
                 group         =>'mgmt',
@@ -728,6 +745,17 @@ sub SecureSetFilter
    }
    return($self->SetFilter(@flt));
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 sub isQualityCheckValid
 {

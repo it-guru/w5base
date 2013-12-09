@@ -63,7 +63,7 @@ create table artproduct (
   pclass       char(20) default 'simple',variantof    bigint(20),
   variant      varchar(40) default 'standard',variantdesc longtext,
   frontlabel   longtext, 
-  pstatus      int(2)      NOT NULL,
+  pstatus      int(2) NOT NULL,
   productmgr   bigint(20)  NOT NULL, delivprovider bigint(20)  NOT NULL,
   orderable_from datetime default NULL,
   orderable_to   datetime default NULL,

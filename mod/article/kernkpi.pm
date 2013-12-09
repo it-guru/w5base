@@ -198,6 +198,16 @@ sub initSearchQuery
    }
 }
 
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;

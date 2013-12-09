@@ -205,6 +205,16 @@ sub getDetailBlockPriority                # posibility to change the block order
 }
 
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
+
 sub Validate
 {
    my $self=shift;
