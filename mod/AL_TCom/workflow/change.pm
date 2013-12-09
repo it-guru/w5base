@@ -78,6 +78,42 @@ sub addSRCLinkToFacility
 }
 
 
+sub getFollowupTargetUserids
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $param=shift;
+   $self->SUPER::getFollowupTargetUserids($WfRec,$param);
+
+   if (defined($WfRec->{affectedapplicationid}) &&
+       ref($WfRec->{affectedapplicationid}) eq "ARRAY"){
+      if ($param->{note}=~m/\[timb\.\S+\]/){
+         my $usrgrp=getModuleObject($self->Config,"base::lnkgrpuserrole");
+         my $chm=getModuleObject($self->Config,"itil::chmmgmt");
+         $chm->SetFilter({id=>$WfRec->{affectedapplicationid}});
+         foreach my $chmrec ($chm->getHashList(qw(chmgrteamid chmgrfmbid))){
+            if ($chmrec->{chmgrfmbid} ne ""){
+               push(@{$param->{addcctarget}},$chmrec->{chmgrfmbid});
+            }
+            elsif ($chmrec->{chmgrteamid} ne ""){
+               $usrgrp->ResetFilter();
+               $usrgrp->SetFilter({grpid=>\$chmrec->{chmgrteamid},
+                                   cistatusid=>[4,5],
+                                   grpcistatusid=>[4],
+                                   nativrole=>[orgRoles()]});
+               foreach my $lnkrec ($usrgrp->getHashList(qw(userid))){
+                  msg(INFO,"add userid '$lnkrec->{userid}'");
+                  push(@{$param->{addcctarget}},$lnkrec->{userid});
+               }
+            }
+         }
+         push(@{$param->{addcctarget}});
+      }
+   }
+}
+
+
+
 
 
 
