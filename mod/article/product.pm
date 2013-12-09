@@ -807,6 +807,9 @@ sub isCopyValid
    my $self=shift;
    my $rec=shift;
    return(0) if (!defined($rec));
+   if ($rec->{variantofid} ne ""){
+      return(0);
+   }
    return(1);
 }
 
