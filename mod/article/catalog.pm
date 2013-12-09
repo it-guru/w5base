@@ -110,6 +110,12 @@ sub new
                 vjoinon       =>['id'=>'catalogid'],
                 vjoindisp     =>['fullname']),
 
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                label         =>'Attachments',
+                parentobj     =>'article::catalog',
+                group         =>'attachments'),
+
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
@@ -194,7 +200,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","categories","contacts","source");
+   return("header","default","categories","contacts","attachments","source");
 }
 
 
@@ -317,7 +323,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
-   my @admedit=qw(default contacts);
+   my @admedit=qw(default contacts attachments);
    my $write=0;
 
    if (!defined($rec)){

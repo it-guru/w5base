@@ -187,6 +187,12 @@ sub new
                 vjoinon       =>['id'=>'pcategoryid'],
                 vjoindisp     =>['fullname']),
 
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                label         =>'Attachments',
+                parentobj     =>'article::category',
+                group         =>'attachments'),
+
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
@@ -317,7 +323,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","subcategories","products","source");
+   return("header","default","subcategories","products","attachments","source");
 }
 
 sub isCopyValid
@@ -431,7 +437,7 @@ sub isWriteValid
    my $cid=$rec->{catalogid};
    my $c=getModuleObject($self->Config,"article::catalog");
    if ($c->isCatalogWriteValid($cid)){
-      return("default");
+      return("default","attachments");
    }
    
    return(undef);
