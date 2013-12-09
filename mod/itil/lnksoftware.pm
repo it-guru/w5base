@@ -283,16 +283,6 @@ sub new
                 group         =>'softwaredetails',
                 dataobjattr   =>'software.producer'),
 
-      new kernel::Field::Interface(
-                name          =>'is_dbs',
-                group         =>'softwaredetails',
-                dataobjattr   =>'software.is_dbs'),
-
-      new kernel::Field::Interface(
-                name          =>'is_mw',
-                group         =>'softwaredetails',
-                dataobjattr   =>'software.is_mw'),
-
       new kernel::Field::Select(
                 name          =>'softwarecistatus',
                 group         =>'softwaredetails',
@@ -317,6 +307,22 @@ sub new
                 readonly      =>1,
                 group         =>'softwaredetails',
                 dataobjattr   =>'software.productclass'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_dbs',
+                label         =>'is DBS (Databasesystem) software',
+                htmldetail    =>1,
+                readonly      =>1,
+                group         =>'softwaredetails',
+                dataobjattr   =>'software.is_dbs'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_mw',
+                label         =>'is MW (Middleware) software',
+                htmldetail    =>1,
+                readonly      =>1,
+                group         =>'softwaredetails',
+                dataobjattr   =>'software.is_mw'),
 
       new kernel::Field::Select(
                 name          =>'rightsmgmt',

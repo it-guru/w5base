@@ -52,3 +52,7 @@
 'installed Options'=>{de=>'installierte Optionen'},
 'Optionlist'=>{de=>'Optionsliste'},
 'change of software product not allowed if there are options'=>{de=>'Ändern der Software ist nicht erlaubt wenn Optionen vorhanden sind'},
+'is DBS (Databasesystem) software'=>{de=>'ist DBS (Datenbanksystem) Software'},
+'is DMS (Documentmanagement) software'=>{de=>'ist DMS (Dokumentenmanagement) Software'},
+'is MW (Middleware) software'=>{de=>'ist MW (Middleware) Software'},
+
