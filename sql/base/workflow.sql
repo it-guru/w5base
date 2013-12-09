@@ -275,7 +275,7 @@ CREATE TABLE reportjob (
   repfields   text default NULL,
   targetuser  bigint(20) default NULL,
   targetfile  varchar(255) default NULL,
-  deltabuffer text default NULL,errbuffer text default null,
+  deltabuffer longtext default NULL,errbuffer longtext default null,
   usetimezone varchar(20) NOT NULL, errcode int(3) default null,
   uselang     varchar(20) NOT NULL, 
   comments     longtext default NULL,
