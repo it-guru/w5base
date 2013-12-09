@@ -61,7 +61,6 @@ sub new
                 name          =>'product',
                 htmlwidth     =>'250px',
                 label         =>'Product',
-                vjoineditbase =>{pclass=>\'simple'},
                 vjointo       =>'article::product',
                 vjoinon       =>['productid'=>'id'],
                 vjoindisp     =>'fullname'),
