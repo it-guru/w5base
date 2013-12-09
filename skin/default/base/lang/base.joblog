@@ -1,3 +1,4 @@
 'base::joblog'=>{de=>'W5Base Job-Log',en=>'W5Base Job-Log'},
 'fieldgroup.default'=>{de=>'Job Statusinformationen',en=>'Job informations'},
+'fieldgroup.result'=>{de=>'Ergebnisse',en=>'results'},
 'Duration'=>{de=>'Dauer'},

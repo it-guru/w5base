@@ -72,8 +72,8 @@ sub onChange
       if (!exists($new->{id}->{$id})){
          my $m=$self->T('- "%s" (W5BaseID:%s) has leave the list');
          $msg.=sprintf($m."\n",$old->{id}->{$id}->{name},$id);
-         $msg.="  ".join(",",
-             map({$_=$old->{id}->{$id}->{$_}} keys(%{$old->{id}->{$id}})));
+         #$msg.="  ".join(",",
+         #    map({$_=$old->{id}->{$id}->{$_}} keys(%{$old->{id}->{$id}})));
       }
    }
    foreach my $id (keys(%{$new->{id}})){

@@ -103,7 +103,7 @@ sub taskCreator          # creates new Prozess requests
          }
       }
       if ($startTask){
-         $reporter->addTask($self->Self,{maxstdout=>1024,maxstderr=>1024});
+         $reporter->addTask($self->Self,{maxstdout=>undef,maxstderr=>1024});
          $self->{lastrun}=NowStamp("en");
       }
    }
@@ -133,8 +133,10 @@ sub stdout              # will be called on stdout line output
    my $task=shift;
    my $reporter=shift;
    push(@{$task->{stdout}},$line);
-   if ($#{$task->{stdout}}>$task->{param}->{maxstdout}){
-      shift(@{$task->{stdout}});
+   if (defined($task->{param}->{maxstdout})){
+      if ($#{$task->{stdout}}>$task->{param}->{maxstdout}){
+         shift(@{$task->{stdout}});
+      }
    }
    #printf STDERR ("%s(OUT):%s\n",$self->Self,$line);
 }
@@ -147,8 +149,10 @@ sub stderr             # will be called on stderr line output
    my $reporter=shift;
    if (!($line=~m/^INFO:/)){
       push(@{$task->{stderr}},$line);
-      if ($#{$task->{stderr}}>$task->{param}->{maxstderr}){
-         shift(@{$task->{stderr}});
+      if (defined($task->{param}->{maxstderr})){
+         if ($#{$task->{stderr}}>$task->{param}->{maxstderr}){
+            shift(@{$task->{stderr}});
+         }
       }
    }
 }
