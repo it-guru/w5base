@@ -61,4 +61,5 @@
 'PERMONTH'=>{de=>'monatlich'},
 'PERYEAR'=>{de=>'jährlich'},
 'orderable to can not be sooner as orderable from'=>{de=>"'bestellbar bis' darf nicht vor 'bestellbar von' liegen"},
+'invalid characters in variant name'=>{de=>'ungültige Zeichen im Variantennamen'},
 

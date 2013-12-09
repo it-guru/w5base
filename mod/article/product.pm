@@ -855,6 +855,12 @@ sub Validate
    if (!defined($oldrec) && $newrec->{pvariant} eq ""){
       $newrec->{pvariant}="standard";
    }
+   my $pvariant=effVal($oldrec,$newrec,"pvariant");
+   if ($pvariant ne "" &&
+       !($pvariant=~m/^[A-Z0-9_]+$/i)){
+      $self->LastMsg(ERROR,"invalid characters in variant name");
+      return(undef);
+   }
    my $variantofid=effVal($oldrec,$newrec,"variantofid");
    if ($variantofid ne ""){
       if (effVal($oldrec,$newrec,"pvariant") eq "standard"){

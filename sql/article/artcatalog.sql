@@ -99,7 +99,7 @@ create table artproduct (
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id),unique vname (variantof,variant),
   FOREIGN KEY articlecategory (artcategory1)
           REFERENCES artcategory (id) ON DELETE CASCADE,
   UNIQUE KEY `positionnumber1` (artcategory1,posno1),
