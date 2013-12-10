@@ -864,7 +864,6 @@ sub LoadTargets
          }
          if (defined($desthash->{lc($rec->{email})}) &&
              ref($desthash->{lc($rec->{email})}) ne "ARRAY"){
-            Stacktrace();
             $desthash->{lc($rec->{email})}=[];
          }
          if (!defined($desthash->{lc($rec->{email})}) ||
