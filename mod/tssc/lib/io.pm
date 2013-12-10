@@ -493,17 +493,17 @@ sub mkChangeStoreRec
          }
       }
    }
-   my $masterapprove="SDM.DTAG.FE.APPROVE";
-   my $triggerapprove="SDM.DTAG.APPROVE";
+   my $masterapprove=["SDM.DTAG.FE.APPROVE","TI.TSI.INT.CHM.FE.CA"];
+   my $triggerapprove=["SDM.DTAG.APPROVE","TI.TSI.INT.CHM.CA"];
    if (in_array([keys(%approver)],$masterapprove)){
-      msg(DEBUG,"AlApproveCompletly4INetwork $masterapprove handling");
+      msg(DEBUG,"AlApproveCompletly4INetwork masterapprove handling");
       my $AlApproveCompletly=0;
       my $ChmApproved=0;
       if (ref($rec->{approved}) eq "ARRAY"){
          foreach my $a (@{$rec->{approved}}){
             foreach my $agrp (split(/\s/,$a->{name})){
-               $AlApproveCompletly=1 if ($agrp eq $masterapprove);
-               $ChmApproved=1 if ($agrp eq $triggerapprove);
+               $AlApproveCompletly=1 if (in_array($masterapprove,$agrp));
+               $ChmApproved=1 if (in_array($triggerapprove,$agrp));
             }
          }
       }
