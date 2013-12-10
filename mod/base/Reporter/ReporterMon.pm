@@ -49,6 +49,16 @@ sub isViewValid
    return(1);
 }
 
+#sub stderr             # for debugging 
+#{
+#   my $self=shift;
+#   my $line=shift;
+#   my $task=shift;
+#   my $reporter=shift;
+#   push(@{$task->{stderr}},$line);
+#}
+
+
 
 
 sub Process             # will be run as a spereate Process (PID)
@@ -56,10 +66,10 @@ sub Process             # will be run as a spereate Process (PID)
    my $self=shift;
 
    my $o=getModuleObject($self->Config,"base::reportjob");
-   $o->SetFilter({cistatusid=>\'4', validto=>">now"});
+   $o->SetFilter({cistatusid=>\'4', validto=>"<now"});
    my $d;
    foreach my $rec ($o->getHashList(@{$self->{fieldlist}})){
-      printf("%s;%d;%d;%s\n",$rec->{name},$rec->{id});
+      print(join(";",map({$rec->{$_}} @{$self->{fieldlist}}))."\n");
    }
    return(0);
 }
