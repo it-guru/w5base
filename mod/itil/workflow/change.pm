@@ -210,9 +210,7 @@ sub getNotifyDestinations
    }
    if ($mode eq "all"){
       my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
-      my $aaflt=[{fromapplid=>$applid,
-                  cistatusid=>[4]},
-                 {toapplid=>$applid,
+      my $aaflt=[{toapplid=>$applid,
                   cistatusid=>[4]}];
       $aa->SetFilter($aaflt);
       foreach my $aarec ($aa->getHashList(qw(fromapplid toapplid contype
@@ -220,12 +218,8 @@ sub getNotifyDestinations
          next if ($aarec->{contype}==4 ||
                   $aarec->{contype}==5 ||
                   $aarec->{contype}==3 );   # uncritical  communications
-         if (grep(/^$aarec->{fromapplid}$/,@$applid)){ # von mir eingetragen
-            next if ($aarec->{toapplcistatus}>4);      # not active filter
-            push(@ifid,$aarec->{toapplid});
-         }
-         else{                                         # von anderen eingetragen
-            push(@ifid,$aarec->{fromapplid});
+         if (!in_array($applid,$aarec->{fromapplid})){ # von der anderen
+            push(@ifid,$aarec->{fromapplid});           # seite eingetragen
          }
       }
    }
