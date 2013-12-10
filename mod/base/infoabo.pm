@@ -862,13 +862,14 @@ sub LoadTargets
          if (!defined($desthash->{lc($rec->{email})})){
             $desthash->{lc($rec->{email})}=[];
          }
+         if (defined($desthash->{lc($rec->{email})}) &&
+             ref($desthash->{lc($rec->{email})}) ne "ARRAY"){
+            Stacktrace();
+            $desthash->{lc($rec->{email})}=[];
+         }
          if (!defined($desthash->{lc($rec->{email})}) ||
               ref($desthash->{lc($rec->{email})}) eq "ARRAY"){
             push(@{$desthash->{lc($rec->{email})}},$rec->{id});
-         }
-         if (defined($desthash->{lc($rec->{email})}) &&
-             ref($desthash->{lc($rec->{email})}) ne "ARRAY"){
-            msg(ERROR,"seltsam: ".Dumper($desthash));
          }
          $c++;
       }
