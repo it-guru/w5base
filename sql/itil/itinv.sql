@@ -1275,3 +1275,26 @@ alter table appl add applbasemoniteam bigint(20), add applbasemonistatus char(15
 alter table swinstance add moniteam bigint(20), add monistatus char(15);
 alter table system add moniteam bigint(20), add monistatus char(15);
 alter table software add is_dms int(1) default '0', add is_dbs int(1) default '0', add is_mw int(1) default '0';
+create table applgrp (
+  id         bigint(20) NOT NULL,
+  name       varchar(40) NOT NULL,
+  fullname   varchar(128) default NULL,
+  cistatus   int(2)      NOT NULL,
+  applgrpid  varchar(20) default NULL,
+  databoss   bigint(20)  default NULL,
+  mandator   bigint(20)  default NULL,
+  description longtext   default NULL,
+  additional  longtext   default NULL,
+  comments    longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,allowifupdate int(2) default 0,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,lastqcheck datetime default NULL,
+  PRIMARY KEY  (id), UNIQUE KEY applgrpid (applgrpid),key(lastqcheck),
+  UNIQUE KEY name (name),KEY(mandator), UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=INNODB;

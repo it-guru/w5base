@@ -1,0 +1,6 @@
+'itil::applgrp'=>{de=>'Anwendungsgruppe',en=>'Applicationgroup'},
+'Fullname of Applicationgroup'=>{de=>'Langname der Anwendungsgruppe'},
+'Applicationgroupname'=>{de=>'Anwendungsgruppenname'},
+'Applicationgroup ID'=>{de=>'Anwendungsgruppen ID'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+"invalid applicationgroupname '%s'"=>{de=>"ungültiger Anwendungsgruppenname '%s'"},

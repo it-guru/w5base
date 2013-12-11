@@ -1,0 +1,4 @@
+'AL_TCom::applgrp'=>{de=>'Telekom IT Anwendungsgruppe',en=>'Telekom IT Applicationgroup'},
+'Applicationgroup ID'=>{de=>'Anwendungsgruppen ID (ICTO-ID)'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+"invalid applicationgroupname '%s'"=>{de=>"ungültiger Anwendungsgruppenname '%s'"},

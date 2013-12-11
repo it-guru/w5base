@@ -3,6 +3,8 @@
 'AL_TCom.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.custcontract.lnkappl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
 'AL_TCom.custcontract.crono'=>{de=>'Vertrags-Chronologie',en=>'Contruct-Chronology'},
+'AL_TCom.applgrp'=>{de=>'Anwendungsgruppe',en=>'Applicationgroup'},
+'AL_TCom.applgrp.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl'=>{de=>'Anwendung',en=>'Application'},
 'AL_TCom.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkapplurl'=>{de=>'Kommunikations URL',en=>'Communication URL'},

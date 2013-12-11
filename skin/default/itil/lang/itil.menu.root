@@ -4,6 +4,8 @@
 'itil.custcontract.crono'=>{de=>'Vertrags-Chronologie',en=>'Contruct-Chronology'},
 'itil.custcontract.lnkappl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
 'itil.custcontract.lnkappl.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.applgrp'=>{de=>'Anwendungsgruppe',en=>'Applicationgroup'},
+'itil.applgrp.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl'=>{de=>'Anwendung',en=>'Application'},
 'itil.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},
