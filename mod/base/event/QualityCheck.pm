@@ -54,24 +54,31 @@ sub QualityCheck
    my %dataobjtocheck=$self->LoadQualitCheckActivationLinks();
    #msg(INFO,Dumper(\%dataobjtocheck));
    if ($dataobj eq ""){
+      my $n=keys(%dataobjtocheck);
+      my $doSleep=($self->{qualitycheckduration}+600-10)/$n;
+      $doSleep=10 if ($doSleep<10);
+      $doSleep=300 if ($doSleep>300);
       foreach my $dataobj (sort(keys(%dataobjtocheck))){
-            msg(INFO,"calling QualityCheck for '$dataobj'");
-            my $bk=$self->W5ServerCall("rpcCallEvent","QualityCheck",$dataobj);
-            if (!defined($bk->{AsyncID})){
-               msg(ERROR,"can't call QualityCheck for ".
-                         "dataobj '$dataobj' Event");
-            }
+         msg(INFO,"calling QualityCheck for '$dataobj'");
+         my $bk=$self->W5ServerCall("rpcCallEvent","QualityCheck",$dataobj);
+         if (!defined($bk->{AsyncID})){
+            msg(ERROR,"can't call QualityCheck for ".
+                      "dataobj '$dataobj' Event");
+         }
+         sleep($doSleep);
       }
    }
    else{
       my $obj=getModuleObject($self->Config,$dataobj);
       if (defined($obj)){
          my $basefilter;
-         if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}})) &&
-             $dataobj ne "base::workflow"){
-            msg(INFO,"set (basefilter) mandatorid filter='%s'",
-                     join(",",keys(%{$dataobjtocheck{$dataobj}})));
-            $basefilter={mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]};
+         if ($obj->getField("mandatorid")){
+            if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}})) &&
+                $dataobj ne "base::workflow"){
+               msg(INFO,"set (basefilter) mandatorid filter='%s'",
+                        join(",",keys(%{$dataobjtocheck{$dataobj}})));
+               $basefilter={mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]};
+            }
          }
          return($self->doQualityCheck($basefilter,$obj));
       }
@@ -91,26 +98,43 @@ sub doQualityCheck
  
    msg(INFO,"doQualityCheck in Object $dataobj");
 
+   my $stateparam={
+      checkProcess=>undef,
+      firstid=>undef,
+      idname=>undef,
+      directlnktype=>[$dataobj->Self,$dataobj->SelfAsParentObject()],
+   };
    my @view=("qcok");
-   if (my $lastqcheck=$dataobj->getField("lastqcheck")){
-      unshift(@view,"lastqcheck");
-   }
    my $idfieldobj=$dataobj->IdField();
-   if (defined($idfieldobj)){
-      push(@view,$idfieldobj->Name());
+   $stateparam->{idname}=$idfieldobj->Name();
+   if (my $lastqcheck=$dataobj->getField("lastqcheck")){
+      $stateparam->{checkProcess}="lastqcheckBased";
+      unshift(@view,"lastqcheck");
+      if (defined($idfieldobj)){
+         push(@view,$idfieldobj->Name());
+      }
+   }
+   else{
+      $stateparam->{checkProcess}="idBased";
+      if (defined($idfieldobj)){
+         unshift(@view,$stateparam->{idname});
+      }
+   }
+   if ($stateparam->{checkProcess} eq "idBased"){
+      $self->loadQualityCheckContext($stateparam);
    }
    my $qualitycheckduration=$self->{qualitycheckduration};
    my $time=time();
    my $total=0;
    my $c=0;
-   my $loopmax=20;
-   my $firstid;
+   my $loopmax=50;
+   #my $loopmax=2;
    do{
       $dataobj->ResetFilter();
       if (defined($basefilter)){
          $dataobj->SetNamedFilter("MANDATORID",$basefilter);
       }
-      if (!($dataobj->SetFilterForQualityCheck(@view))){
+      if (!($dataobj->SetFilterForQualityCheck($stateparam,@view))){
          return({exitcode=>0,msg=>'ok'});
       }
       $dataobj->Limit($loopmax+1,0,0);
@@ -119,6 +143,22 @@ sub doQualityCheck
       if (defined($rec)){
          do{
             msg(DEBUG,"check record start");
+            my $curid=$idfieldobj->RawValue($rec);
+            if ($stateparam->{checkProcess} eq "idBased"){
+               if ($curid eq ""){
+                  die("id based QualityCheck process not supported if id=''");
+               }
+               if (defined($stateparam->{lastid}) &&
+                   $stateparam->{lastid} ne ""){
+                  # now store the check context and cleanup DataIssue workflows
+                  # with id >$stateparam->{lastid} and <$curid
+                  $self->storeQualityCheckContextWithWorkflowCleanup(
+                      $stateparam,$curid
+                  );
+
+               }
+            }
+
             my $qcokobj=$dataobj->getField("qcok");
             if (defined($qcokobj)){
                my $qcok=$qcokobj->RawValue($rec); 
@@ -129,16 +169,14 @@ sub doQualityCheck
             }
             $total++;
             $c++;
-            my $curidname=$idfieldobj->Name();
-            my $curid=$idfieldobj->RawValue($rec);
             if ($self->LastMsg()>0){
                msg(ERROR,"error messages while check of ".
-                         $curidname."='".$curid."' in ".
+                         $stateparam->{idname}."='".$curid."' in ".
                          $dataobj->Self());
                $self->LastMsg("");
             }
             msg(DEBUG,"check record end");
-            if ( $curid eq $firstid){ 
+            if ( $curid eq $stateparam->{firstid}){ 
                return({exitcode=>0,
                        msg=>'ok '.$total.' records checked = all'});
             }
@@ -149,9 +187,11 @@ sub doQualityCheck
                        msg=>'ok '.$total.' records checked = partial'});
                last;
             }
-            if (!defined($firstid)){
-               $firstid=$curid;
+            if (!defined($stateparam->{firstid})){
+               $stateparam->{firstid}=$curid;
             }
+            $stateparam->{lastid}=$curid;
+            $stateparam->{lasttime}=NowStamp("en");
             ($rec,$msg)=$dataobj->getNext();
          }until(!defined($rec) ||  $c>=$loopmax);
       }
@@ -162,10 +202,48 @@ sub doQualityCheck
       sleep(1);
    }until(0);
 
-
-
    return({exitcode=>0,msg=>'ok'});
 }
+
+sub loadQualityCheckContext
+{
+   my $self=shift;
+   my $stateparam=shift;
+
+
+}
+
+sub storeQualityCheckContextWithWorkflowCleanup
+{
+   my $self=shift;
+   my $stateparam=shift;
+   my $curid=shift;    # cleanup >$lastid - <$curid
+   my $lasttime=$stateparam->{lasttime}; 
+   my $directlnktype=$stateparam->{directlnktype};
+   my $lastid=$stateparam->{lastid};   # this id must be stored
+
+
+   # Abschlieﬂen aller DataIssue Workflows, deren lastload <$lasttime ist
+   # und deren dataobjid >$lastid and <$curid ist.
+   my $wf=getModuleObject($self->Config,"base::workflow");
+
+   my $cleanupfilter={stateid=>"<20",class=>\"base::workflow::DataIssue",
+                   srcload=>"<\"$lasttime GMT\"",
+                   directlnktype=>$directlnktype,
+                   directlnkid=>">\"$lastid\" AND <\"$curid\""};
+   $wf->SetFilter($cleanupfilter);
+   $wf->SetCurrentView(qw(ALL));
+   $wf->ForeachFilteredRecord(sub{
+                      $wf->Store($_,{stateid=>'21',
+                                     fwddebtarget=>undef,
+                                     fwddebtargetid=>undef,
+                                     fwdtarget=>undef,
+                                     fwdtarget=>undef});
+                   });
+   ########################################################################
+}
+
+
 
 
 sub LoadQualitCheckActivationLinks
