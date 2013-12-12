@@ -1062,7 +1062,7 @@ sub TransferFile
       msg(INFO,"Processing  file: '%s'",$filename);
       if (!$self->{DebugMode}){
          my $transferOK=0;
-         if (!$ftp->Put($filename,$jobfile)){
+         if (!defined($ftp->Put($filename,$jobfile))){
             msg(ERROR,"File $filename to $jobfile could not be transfered:".
                       " $?, $!");
             msg(ERROR,"FTP transfer failed at ".NowStamp("en")." GMT");
