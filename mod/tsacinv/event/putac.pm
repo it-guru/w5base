@@ -1061,16 +1061,20 @@ sub TransferFile
       msg(INFO,"Processing  job : '%s'",$jobfile);
       msg(INFO,"Processing  file: '%s'",$filename);
       if (!$self->{DebugMode}){
+         my $transferOK=0;
          if (!$ftp->Put($filename,$jobfile)){
-            msg(ERROR,"File $filename to $jobfile could not be transfered");
+            msg(ERROR,"File $filename to $jobfile could not be transfered:".
+                      " $?, $!");
             msg(ERROR,"FTP transfer failed at ".NowStamp("en")." GMT");
             msg(ERROR,"trying to detect ftp error message ...");
-            eval('msg(ERROR,$ftp->message());');
-            #eval('msg(ERROR,Dumper($ftp));');
-            msg(ERROR,"eval error=$@");
+            my $s=$ftp->size($jobfile);
+            msg(ERROR,"size on remote site is $s");
             msg(ERROR,"... detecting error message done.");
          }
          else{
+            $transferOK++;
+         }
+         if ($transferOK){
             unlink($filename);
          }
       }
