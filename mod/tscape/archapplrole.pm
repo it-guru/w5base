@@ -95,8 +95,7 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where="Mail not like '% %' and ".
-             "Mail not like '%\@unknown-telekom.%' and ".
-             "Role<>'Application Manager'";
+             "Mail not like '%\@unknown-telekom.%' ";
    return($where);
 }
 
