@@ -1,0 +1,11 @@
+'itil::lnkapplgrpappl'=>{de=>'Verknüpfung Anwendungsgruppe-Anwendung',en=>'Relation Applicationgroup-Application'},
+'fieldgroup.relation'=>{de=>'Relationsdaten',en=>'Relationdata'},
+'Application'=>{de=>'Anwendung'},
+'Application CI-State'=>{de=>'Anwendungs CI-Status'},
+'Application Version'=>{de=>'Anwendungs Version'},
+'Applicationgroup CI-State'=>{de=>'Anwendungsgruppe CI-Status'},
+'Applicationgroup'=>{de=>'Anwendungsgruppe'},
+'planed activation'=>{de=>'geplante Aktivierung'},
+'planed retirement'=>{de=>'geplante Außerbetriebname'},
+'application already belongs to an other applicationgroup'=>{de=>'Anwendung gehört bereits zu einer anderen Anwendungsgruppe'},
+

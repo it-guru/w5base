@@ -6,6 +6,8 @@
 'itil.custcontract.lnkappl.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.applgrp'=>{de=>'Anwendungsgruppe',en=>'Applicationgroup'},
 'itil.applgrp.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.applgrp.appl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
+'itil.applgrp.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl'=>{de=>'Anwendung',en=>'Application'},
 'itil.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},

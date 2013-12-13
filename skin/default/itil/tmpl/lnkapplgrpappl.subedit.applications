@@ -1,0 +1,21 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%appl(label)%:</td>
+         <td class=finput width=40%>%appl(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%applversion(label)%:</td>
+         <td class=finput width=40%>%applversion(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%planed_activation(label)%:</td>
+         <td class=finput width=40%>%planed_activation(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%planed_retirement(label)%:</td>
+         <td class=finput width=40%>%planed_retirement(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

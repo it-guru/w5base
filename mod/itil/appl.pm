@@ -662,6 +662,21 @@ sub new
                 dataobjattr   =>'appl.criticality'),
 
       new kernel::Field::Text(
+                name          =>'applgrp',
+                label         =>'Applicationgroup (BETA!)',
+                readonly      =>'1',
+                group         =>'customer',
+                weblinkto     =>'itil::applgrp',
+                weblinkon     =>['applgrpid'=>'id'],
+                dataobjattr   =>'applgrp.name'),
+
+      new kernel::Field::Interface(
+                name          =>'applgrpid',
+                readonly      =>'1',
+                group         =>'customer',
+                dataobjattr   =>'lnkapplgrpappl.applgrp'),
+
+      new kernel::Field::Text(
                 name          =>'mgmtitemgroup',
                 group         =>'customer',
                 label         =>'central managed CI groups',
@@ -1786,7 +1801,13 @@ sub getSqlFrom
             "left outer join appladv on (appl.id=appladv.appl and ".
             "appladv.isactive=1) ".
             "left outer join itcrmappl on appl.id=itcrmappl.id ".
-            "left outer join costcenter on appl.conumber=costcenter.name";
+            "left outer join costcenter on appl.conumber=costcenter.name ".
+            "left outer join lnkapplgrpappl on lnkapplgrpappl.appl=".
+            "(select s.appl from lnkapplgrpappl s".
+            " where appl.id=s.appl ".
+            " order by s.id ".
+            " limit 1) ".
+            "left outer join applgrp on lnkapplgrpappl.applgrp=applgrp.id";
 
    return($from);
 }

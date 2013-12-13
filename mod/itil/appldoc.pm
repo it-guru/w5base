@@ -315,21 +315,11 @@ sub new
 }
 
 
-#sub SetFilterForQualityCheck    # prepaire dataobject for automatic
-#{                               # quality check (nightly)
-#   my $self=shift;
-#   my @view=@_;                 # predefinition for request view
-#
-#   $self->ResetFilter();
-#   $self->SetFilter([{isactive=>"1 [EMPTY]"},
-#                     {mdate=>">now-14d"}]);
-#   $self->SetCurrentView(qw(qcok));
-#   return(1);
-#}
 
 sub SetFilterForQualityCheck    # prepaire dataobject for automatic
 {                               # quality check (nightly)
    my $self=shift;
+   my $stateparam=shift;
    my @view=@_;                 # predefinition for request view
    my @flt;
    if (my $cistatusid=$self->getField("isactive")){

@@ -76,6 +76,17 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'applgrp.cistatus'),
 
+      new kernel::Field::SubList(  
+                name       =>'applications',
+                label      =>'Applications',
+                group      =>'applications',
+                subeditmsk =>'subedit.applications',
+                vjointo    =>'itil::lnkapplgrpappl',
+                vjoinon    =>['id'=>'applgrpid'],
+                vjoindisp  =>['appl','applversion','applcistatus'],
+                vjoinbase  =>[{applcistatusid=>'<=5'}],
+                vjoininhash=>['applid','applcistatusid','appl']),
+
       new kernel::Field::Mandator(),
 
       new kernel::Field::Link(
@@ -240,7 +251,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default services systems contacts misc control
+   return(qw(header default applications contacts misc control
              attachments source));
 }
 
@@ -325,7 +336,7 @@ sub Validate
    if (exists($newrec->{applgrpid}) && $applgrpid eq ""){
       $newrec->{applgrpid}=undef;
    }
-   $name=~s/[^a-z0-9]/_/gi;
+   $name=~s/[^a-z0-9:]/_/gi;
    if (exists($newrec->{name})){
       $newrec->{name}=$name;
    }
@@ -405,7 +416,9 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default services contacts misc attachments control);
+   my @databossedit=qw(default services contacts 
+                       applications
+                       misc attachments control);
    if (!defined($rec)){
       return(@databossedit);
    }

@@ -147,6 +147,23 @@ sub isWriteOnSwinstanceValid
 }
 
 
+sub isWriteOnApplgrpValid
+{
+   my $self=shift;
+   my $applgrpid=shift;
+   my $group=shift;
+
+   my $applgrp=$self->getPersistentModuleObject("itil::applgrp");
+   $applgrp->SetFilter({id=>\$applgrpid});
+   my ($arec,$msg)=$applgrp->getOnlyFirst(qw(ALL));
+   my @g=$applgrp->isWriteValid($arec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
+
 sub isWriteOnSoftwaresetValid
 {
    my $self=shift;

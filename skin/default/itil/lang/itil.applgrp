@@ -1,4 +1,5 @@
 'itil::applgrp'=>{de=>'Anwendungsgruppe',en=>'Applicationgroup'},
+'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'Fullname of Applicationgroup'=>{de=>'Langname der Anwendungsgruppe'},
 'Applicationgroupname'=>{de=>'Anwendungsgruppenname'},
 'Applicationgroup ID'=>{de=>'Anwendungsgruppen ID'},

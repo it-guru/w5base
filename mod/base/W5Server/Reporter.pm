@@ -105,6 +105,7 @@ sub processConsoleCommand
    elsif ((my $module)=$command=~m/^run\s+(\S+)$/){
       if (exists($reportjob->{Reporter}->{$module})){
          $self->addTask($module);
+         $reportjob->{Reporter}->{$module}->{lastrun}=NowStamp("en");
          printf $client ("OK\n"); 
       }
       else{

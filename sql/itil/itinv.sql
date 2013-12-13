@@ -1298,3 +1298,26 @@ create table applgrp (
   PRIMARY KEY  (id), UNIQUE KEY applgrpid (applgrpid),key(lastqcheck),
   UNIQUE KEY name (name),KEY(mandator), UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
+create table lnkapplgrpappl (
+  id         bigint(20) NOT NULL,
+  applgrp    bigint(20) NOT NULL,
+  appl       bigint(20) NOT NULL, applversion varchar(20),
+  retirement        datetime,
+  planed_activation datetime,     planed_retirement datetime,
+  description longtext   default NULL,
+  additional  longtext   default NULL,
+  comments    longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id), UNIQUE KEY rel (applgrp,appl,applversion),
+  UNIQUE KEY `srcsys` (srcsys,srcid),
+  FOREIGN KEY (appl) REFERENCES appl (id) ON DELETE CASCADE,
+  FOREIGN KEY (applgrp) REFERENCES applgrp (id) ON DELETE CASCADE
+) ENGINE=INNODB;
