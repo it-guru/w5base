@@ -63,6 +63,11 @@ sub new
                 dataobjattr   =>'Kurzbezeichnung'),
 
       new kernel::Field::Text(
+                name          =>'status',
+                label         =>'Status',
+                dataobjattr   =>'Status'),
+
+      new kernel::Field::Text(
                 name          =>'organisation',
                 label         =>'Organisation',
                 dataobjattr   =>'Organisation'),
@@ -75,6 +80,22 @@ sub new
                 vjoinon       =>['id'=>'ictoid'],
                 vjoinbase     =>{'cistatusid'=>"<=5"},
                 vjoindisp     =>['name','opmode','cistatus']),
+
+      new kernel::Field::SubList(
+                name          =>'applvers',
+                label         =>'Applicationversions',
+                group         =>'applvers',
+                vjointo       =>'tscape::applver',          
+                vjoinon       =>['archapplid'=>'ictoid'],
+                vjoindisp     =>['fullname','status','planed_activation']),
+
+      new kernel::Field::SubList(
+                name          =>'roles',
+                label         =>'Roles',
+                group         =>'roles',
+                vjointo       =>'tscape::archapplrole',          
+                vjoinon       =>['archapplid'=>'ictoid'],
+                vjoindisp     =>['role','email']),
 
       new kernel::Field::Text(
                 name          =>'allconumbers',
@@ -101,11 +122,6 @@ sub new
                    }
                    return([sort(keys(%co))]);
                 }),
-
-      new kernel::Field::Text(
-                name          =>'status',
-                label         =>'Status',
-                dataobjattr   =>'Status'),
 
       new kernel::Field::Textarea(       
                 name          =>'description',
@@ -138,6 +154,16 @@ sub initSearchQuery
    }
 }
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="V_DARWIN_EXPORT";
+
+   return($from);
+}
+
+
+
 
 
 sub getDetailBlockPriority
@@ -145,7 +171,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default");
+   return("header","default","applvers","roles");
 }
 
 

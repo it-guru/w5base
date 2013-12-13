@@ -3,8 +3,11 @@
 'description'=>{de=>'Beschreibung'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
 'fullname'=>{de=>'ICTO Objektbezeichnung',en=>'ICTO Objectname'},
+'fieldgroup.roles'=>{de=>'Rollen',en=>'Roles'},
 'fieldgroup.appl'=>{de=>'W5Base Anwendungszuordnung',
                     en=>'W5Base Applicationrelation'},
+'fieldgroup.applvers'=>{de=>'Anwendungsversionen',
+                    en=>'Applicationversions'},
 
 'all reference Costcenters'=>{de=>'alle referenzierten Kontierungsobjekte'},
 

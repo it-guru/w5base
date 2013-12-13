@@ -41,6 +41,14 @@ sub Init
    $self->RegisterObj("itu.tscape.archappl",
                       "tscape::archappl",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tscape.archappl.role",
+                      "tscape::archapplrole",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.tscape.applver",
+                      "tscape::applver",
+                      defaultacl=>['valid_user']);
    return($self);
 }
 
