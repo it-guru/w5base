@@ -383,6 +383,11 @@ sub Validate
                      $name);
       return(undef);
    }
+   my $catalogid=effVal($oldrec,$newrec,"catalogid");
+   if ($catalogid eq "" || $catalogid==0){
+      $self->LastMsg(ERROR,"none or invalid catalog specified");
+      return(undef);
+   }
    if (exists($newrec->{pcategoryid})){
       if ($newrec->{pcategoryid} eq ""){
          $newrec->{pcategoryid}=undef;
@@ -391,6 +396,27 @@ sub Validate
       else{
          $newrec->{chkpcategoryid}=$newrec->{pcategoryid};
       }
+   }
+   if (exists($newrec->{posno}) && ($newrec->{posno}=~m/^\s*$/)){
+      my $cl=$self->Clone();
+      my $pcategoryid=effVal($oldrec,$newrec,"pcategoryid");
+      my $myid=effVal($oldrec,$newrec,"id");
+      if (defined($pcategoryid)){
+         $cl->SetFilter({pcategoryid=>\$pcategoryid});
+      }
+      else{
+         my $catalogid=effVal($oldrec,$newrec,"catalogid");
+         $cl->SetFilter({catalogid=>\$catalogid,
+                         pcategoryid=>\$pcategoryid});
+      }
+      my %i;
+      foreach my $rec ($cl->getHashList(qw(id posno pcategoryid))){
+         next if ($rec->{id} eq $myid);
+         $i{$rec->{posno}}=$rec->{id};
+      }
+      my $nextfree=0;
+      while(defined($i{++$nextfree})){}
+      $newrec->{posno}=$nextfree;
    }
    if (effVal($oldrec,$newrec,"posno") eq "0"){
       $self->LastMsg(ERROR,"position number 0 is not allowed");
