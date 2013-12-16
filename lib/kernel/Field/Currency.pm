@@ -29,7 +29,6 @@ sub new
    $self->{align}='right' if (!defined($self->{align}));
    $self->{unit}='Euro'   if (!defined($self->{unit}));
    $self->{precision}=2 if (!defined($self->{precision}));
-   $self->{_permitted}->{precision}=1;
    return($self);
 }
 
@@ -49,6 +48,13 @@ sub FormatedDetail
       if (defined($d)){
          my $format=sprintf("%%.%df",$self->{precision});
          $d=sprintf($format,$d);
+         if (defined($self->{minprecision})){
+            my $n=int($self->{minprecision});
+printf STDERR ("fifi 01: $d\n");
+            $d=~s/^(.*\.\d{$n}[^0]*).*$/$1/e;
+            #$d=~s/^(.*\.{$n}\d[^0]*).*$/$1/e;
+printf STDERR ("fifi 02: $d\n");
+         }
          $d=~s/\./,/g;
          if ($mode eq "HtmlDetail"          || $mode=~m/^[>]{0,1}HtmlV01$/ ||
              $mode=~m/^[>]{0,1}AscV01$/ ){

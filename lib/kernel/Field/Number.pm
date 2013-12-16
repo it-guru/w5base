@@ -29,6 +29,10 @@ sub new
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{editrange}=1;
    $self->{_permitted}->{precision}=1;
+   $self->{_permitted}->{minprecision}=1; # kann definiert werden, wenn 
+                                          # nullen am Ende auf die minimale
+                                          # anzahl von stellen entfernt werden
+                                          # sollen (nur in der HTML Oberfläche)
    $self->{_permitted}->{decimaldot}=1;
    $self->{decimaldot}="," if (!defined($self->{decimaldot}));
 

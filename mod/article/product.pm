@@ -128,8 +128,7 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    if (defined($param{current})){
-                      if ($param{current}->{variantofid} ne 
-                          $param{current}->{id}){
+                      if (defined($param{current}->{variantofid})){
                          return(1);
                       }
                    }
@@ -202,6 +201,18 @@ sub new
                 label         =>'alt CategoryID',
                 dataobjattr   =>'artproduct.artcategory2'),
 
+      new kernel::Field::TextDrop(
+                name          =>'delivprovider',
+                label         =>'Provider',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjointo       =>'article::delivprovider',
+                vjoinon       =>['delivproviderid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'delivproviderid',
+                dataobjattr   =>'artproduct.delivprovider'),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 group         =>'desc',
@@ -260,23 +271,8 @@ sub new
                 dataobjattr   =>'artproduct.productmgr'),
 
       new kernel::Field::TextDrop(
-                name          =>'delivprovider',
-                label         =>'Provider',
-                group         =>'mgmt',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjointo       =>'article::delivprovider',
-                vjoinon       =>['delivproviderid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'delivproviderid',
-                group         =>'mgmt',
-                dataobjattr   =>'artproduct.delivprovider'),
-
-      new kernel::Field::TextDrop(
                 name          =>'delivprovidergroup',
                 label         =>'Provider groupname',
-                group         =>'mgmt',
                 readonly      =>1,
                 htmldetail    =>0,
                 vjointo       =>'base::grp',
@@ -480,6 +476,8 @@ sub new
       new kernel::Field::Currency(
                 name          =>'costonce',
                 label         =>'cost once',
+                precision     =>3,
+                minprecision  =>2,
                 depend        =>['pricecurrency'],
                 unit          =>sub{
                    my $self=shift;
@@ -497,6 +495,8 @@ sub new
       new kernel::Field::Currency(
                 name          =>'costday',
                 label         =>'cost day',
+                precision     =>3,
+                minprecision  =>2,
                 depend        =>['costcurrency'],
                 unit          =>sub{
                    my $self=shift;
@@ -514,6 +514,8 @@ sub new
       new kernel::Field::Currency(
                 name          =>'costmonth',
                 label         =>'cost month',
+                precision     =>3,
+                minprecision  =>2,
                 depend        =>['costcurrency'],
                 unit          =>sub{
                    my $self=shift;
@@ -542,13 +544,27 @@ sub new
                 },
                 width         =>'50',
                 label         =>'cost year',
+                precision     =>3,
+                minprecision  =>2,
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_year'),
 
       new kernel::Field::Currency(
                 name          =>'costperuse',
                 label         =>'cost peruse',
+                depend        =>['costcurrency'],
+                precision     =>3,
+                minprecision  =>2,
                 unit          =>'',
+                unit          =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current=shift;
+                   if ($current->{costcurrency} ne ""){
+                      return($current->{costcurrency});
+                   }
+                   return();
+                },
                 width         =>'50',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_peruse'),
@@ -572,7 +588,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'costprodunit',
-                label         =>'unit of quantity',
+                label         =>'unit of quantity (cost)',
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_produnit'),
 
@@ -827,6 +843,9 @@ sub isCopyValid
    if ($rec->{variantofid} ne ""){
       return(0);
    }
+   if ($rec->{pclass} ne "bundle"){
+      return(0);
+   }
    return(1);
 }
 
@@ -873,12 +892,6 @@ sub Validate
       $newrec->{pvariant}="standard";
    }
 
-   my $delivproviderid=effVal($oldrec,$newrec,"delivproviderid");
-   if ($delivproviderid eq "" || $delivproviderid==0){
-      $self->LastMsg(ERROR,"no provider specified");
-      return(undef);
-   }
-
    my $productmgrid=effVal($oldrec,$newrec,"productmgrid");
    if ($productmgrid eq "" || $productmgrid==0){
       my $userid=$self->getCurrentUserId();
@@ -906,6 +919,7 @@ sub Validate
       my ($prec,$msg)=$p->getOnlyFirst(qw(ALL));
       # Werte die immer vom "Parent" übernommen werden
       foreach my $pfld (qw(category1id frontlabel pclass description
+                           delivproviderid pdetaillevel
                            custoblig premises rest exclusions pod)){
          if (!defined($oldrec) ||
              $oldrec->{$pfld} ne $prec->{$pfld}){
@@ -939,6 +953,12 @@ sub Validate
          while(defined($i{++$nextfree})){}
          $newrec->{posno1}=$nextfree;
       }
+   }
+
+   my $delivproviderid=effVal($oldrec,$newrec,"delivproviderid");
+   if ($delivproviderid eq "" || $delivproviderid==0){
+      $self->LastMsg(ERROR,"no provider specified");
+      return(undef);
    }
 
    my $orderable_to=effVal($oldrec,$newrec,"orderable_to");

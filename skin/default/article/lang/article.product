@@ -42,6 +42,7 @@
 'cost year'=>{de=>'jährliche Kosten'},
 'cost peruse'=>{de=>'verbrauchsabhängige Kosten'},
 'unit of quantity'=>{de=>'Mengeneinheit'},
+'unit of quantity (cost)'=>{de=>'Mengeneinheit (Kosten)'},
 'currency'=>{de=>'Währung'},
 'currency (cost)'=>{de=>'Währung (Kosten)'},
 'currency label'=>{de=>'Währungsbezeichnung'},
