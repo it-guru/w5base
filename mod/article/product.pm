@@ -82,6 +82,21 @@ sub new
                 value         =>['simple','bundle'],
                 dataobjattr   =>'artproduct.pclass'),
 
+      new kernel::Field::Select(
+                name          =>'pdetaillevel',
+                label         =>'Product detail level',
+                selectfix     =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if (defined($current));
+                   return(0);
+                },
+                htmleditwidth =>'100px',
+                value         =>['max'],
+                selectfix     =>1,
+                dataobjattr   =>'artproduct.detaillevel'),
+
       new kernel::Field::Text(
                 name          =>'pvariant',
                 label         =>'Product variant',
@@ -160,9 +175,11 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    if (defined($param{current})){
-                      if ($param{current}->{variantofid} ne 
-                          $param{current}->{id}){
-                         return(0);
+                      if (defined($param{current}->{variantofid})){
+                         if ($param{current}->{variantofid} ne 
+                             $param{current}->{id}){
+                            return(0);
+                         }
                       }
                    }
                    return(1);
@@ -855,6 +872,22 @@ sub Validate
    if (!defined($oldrec) && $newrec->{pvariant} eq ""){
       $newrec->{pvariant}="standard";
    }
+
+   my $delivproviderid=effVal($oldrec,$newrec,"delivproviderid");
+   if ($delivproviderid eq "" || $delivproviderid==0){
+      $self->LastMsg(ERROR,"no provider specified");
+      return(undef);
+   }
+
+   my $productmgrid=effVal($oldrec,$newrec,"productmgrid");
+   if ($productmgrid eq "" || $productmgrid==0){
+      my $userid=$self->getCurrentUserId();
+      $newrec->{productmgrid}=$userid;
+   }
+
+
+
+
    my $pvariant=effVal($oldrec,$newrec,"pvariant");
    if ($pvariant ne "" &&
        !($pvariant=~m/^[A-Z0-9_]+$/i)){
@@ -894,26 +927,17 @@ sub Validate
          $newrec->{variantofid}=undef;
       }
       my $posno1=effVal($oldrec,$newrec,"posno1");
-      my $oldposno1=$posno1;
       if ($posno1 eq ""){
          my $category1id=effVal($oldrec,$newrec,"category1id");
          my $o=getModuleObject($self->Config,"article::product");
          $o->SetFilter({category1id=>\$category1id});
-         my @pl;
-         foreach my $r ($o->getHashList(qw(posno1))){
-            my $no=$r->{posno1};
-            $no=0 if ($no<=0);
-            $pl[$no]++;
+         my %i;
+         foreach my $rec ($o->getHashList(qw(id posno1))){
+            $i{$rec->{posno1}}=$rec->{id};
          } 
-         for(my $c=1;$c<=$#pl;$c++){
-            if ($pl[$c]==0){
-               $posno1=$c;
-               last;
-            }
-         }
-      }
-      if ($oldposno1 ne $posno1){
-         $newrec->{posno1}=$posno1;
+         my $nextfree=0;
+         while(defined($i{++$nextfree})){}
+         $newrec->{posno1}=$nextfree;
       }
    }
 

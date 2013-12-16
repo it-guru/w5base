@@ -23,6 +23,7 @@
 'variant of'=>{de=>'variante von'},
 'Product class'=>{de=>'Produktklasse'},
 'Product variant'=>{de=>'Produktvariante'},
+'Product detail level'=>{de=>'Produktdetailierung'},
 'Catalog'=>{de=>'Katalog'},
 'Position Number'=>{de=>'Positionsnummer'},
 'orderable from'=>{de=>'bestellbar von'},
@@ -62,4 +63,5 @@
 'PERYEAR'=>{de=>'jährlich'},
 'orderable to can not be sooner as orderable from'=>{de=>"'bestellbar bis' darf nicht vor 'bestellbar von' liegen"},
 'invalid characters in variant name'=>{de=>'ungültige Zeichen im Variantennamen'},
+'no provider specified'=>{de=>'kein Anbieter angegeben'},
 

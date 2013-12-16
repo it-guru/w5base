@@ -56,7 +56,7 @@ create table artcategory (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table artproduct (
   id           bigint(20)  NOT NULL,
-  artcategory1 bigint(20) NOT NULL,
+  artcategory1 bigint(20) NOT NULL,detaillevel varchar(20) default 'max',
   artcategory2 bigint(20),artcategory3 bigint(20),
   posno1       int(7),     
   posno2       int(7),    posno3       int(7),
