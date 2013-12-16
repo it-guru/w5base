@@ -170,8 +170,12 @@ sub FormatedResult
    
    if ($FormatAs eq "HtmlV01"){
       if (!$self->{AllowHtmlInput}){
-         $d=~s/</&lt;/g;
-         $d=~s/>/&gt;/g;
+         $d=quoteHtml($d);
+        # $d=~s/</&lt;/g;
+        # $d=~s/>/&gt;/g;
+      }
+      else{
+         $d=quoteHtml($d);
       }
       $d=~s/\n/<br>\n/g;
    }
