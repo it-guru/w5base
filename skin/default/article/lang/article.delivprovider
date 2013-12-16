@@ -1,4 +1,4 @@
-'article::delivprovider'=>{de=>'Anbieder',en=>'Provider'},
+'article::delivprovider'=>{de=>'Anbieter',en=>'Provider'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Groupname'=>{de=>'Gruppenname'},
 
