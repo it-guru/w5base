@@ -131,6 +131,7 @@ sub getSqlFields
    my $self=shift;
    my @view=$self->getCurrentView();
    my @flist=();
+   my $drivername=defined($self->{DB}) ? $self->{DB}->DriverName():undef;
    my $distinct;
    if ($view[0] eq "DISTINCT"){
       $distinct="distinct";
@@ -206,7 +207,9 @@ sub getSqlFields
          $fieldname="___raw_container___".$field->Name();
       }
       if (defined($selectfield)){
-         push(@flist,"$selectfield $fieldname");
+         # ToDo: u.U. muss $drivername noch berücksichtig werden, beim
+         #       einfügen von " as "
+         push(@flist,"$selectfield as $fieldname");
       }
       #
       # dependencies solution on vjoins
@@ -441,6 +444,7 @@ sub getSqlSelect
    my $group=$self->getSqlGroup("select",@filter);
    my $order=$self->getSqlOrder("select",@filter);
    my $limitnum=$self->{_Limit};
+   my $drivername=defined($self->{DB}) ? $self->{DB}->DriverName():undef;
    my @cmd;
    return(undef) if ($#from==-1 || $from[0] eq "");
    foreach my $from (@from){
@@ -453,12 +457,10 @@ sub getSqlSelect
       #
       if ($limitnum>0 && !$self->{_UseSoftLimit}){
 
-         if (defined($self->{DB}->{db}) &&
-             lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+         if ($drivername eq "mysql"){
             $cmd.=" limit $limitnum";
          }
-         if (defined($self->{DB}->{db}) &&
-             lc($self->{DB}->{db}->{Driver}->{Name}) eq "oracle"){
+         if ($drivername eq "oracle"){
             $cmd="select * from ($cmd) where ROWNUM<=$limitnum";
          }
       }
@@ -472,8 +474,7 @@ sub getSqlSelect
    }
    if ($#cmd>0){
       map({$_="(".$_.")"} @cmd);
-      if (defined($self->{DB}->{db}) &&
-          lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+      if ($drivername eq "mysql"){
          my $cmd=join(" union ",@cmd);
          $cmd.=" limit $limitnum" if ($limitnum>0 && !$self->{_UseSoftLimit});
          return($cmd);
@@ -1029,15 +1030,13 @@ sub setWorktable
 {
    my $self=shift;
    $self->{Worktable}=$_[0];
-   delete($self->{WorkDB});
-   $self->{WorkDB}=$_[1] if (defined($self->{WorkDB}));
-   return($self->{Worktable},$self->{WorkDB});
+   return($self->{Worktable},$self->{DB});
 }
 
 sub getWorktable
 {
    my $self=shift;
-   return($self->{Worktable},$self->{WorkDB});
+   return($self->{Worktable},$self->{DB});
 }
 
 

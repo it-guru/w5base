@@ -199,7 +199,7 @@ sub checksoftlimit
    my $cmd=shift;
    delete($self->{softlimit});
 
-   if ($self->DriverName() eq "ODBC"){
+   if ($self->DriverName() eq "odbc"){
       if (my ($n)=$$cmd=~m/\s+limit\s+(\d+)/){
          $self->{softlimit}=$n;
          $$cmd=~s/\s+limit\s+(\d+)//;
@@ -335,7 +335,15 @@ sub DriverName
 {
    my $self=shift;
    return() if (!defined($self->{db}));
-   return($self->{db}->{Driver}->{Name});
+   my $driver=$self->{db}->{Driver};
+   if (defined($driver)){
+      my $name=lc($driver->{Name});
+      if ($name eq "odbc"){
+         # maybee special addons f.e. as .mssql extensions
+      }
+      return($name);
+   }
+   return();
 }
 
 sub Ping
@@ -357,13 +365,6 @@ sub quotemeta
    my $str=shift;
    utf8::downgrade($str,1);
    return($self->{db}->quote($str));
-}
-
-sub DriverName
-{
-   my $self=shift;
-
-   return(lc($self->{db}->{Driver}->{Name}));
 }
 
 sub dbname
