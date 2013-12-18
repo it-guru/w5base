@@ -33,19 +33,20 @@ sub new
 
    
    $self->AddFields(
-      new kernel::Field::Linenumber(
-                name          =>'linenumber',
-                label         =>'No.'),
-
       new kernel::Field::Id(
-                name          =>'id',
+                name          =>'systemdiscoveryid',
                 group         =>'source',
                 label         =>'DiscoveryID',
                 dataobjattr   =>'amtsiautodiscovery.lautodiscoveryid'),
 
       new kernel::Field::Text(
-                name          =>'name',
+                name          =>'systemname',
                 ignorecase    =>1,
+                label         =>'Systemname',
+                dataobjattr   =>'amtsiautodiscovery.name'),
+
+      new kernel::Field::Link(
+                name          =>'fullname',
                 label         =>'Systemname',
                 dataobjattr   =>'amtsiautodiscovery.name'),
 
@@ -71,22 +72,54 @@ sub new
                 dataobjattr   =>'amtsiautodiscovery.lmemorymb'),
 
       new kernel::Field::Text(
+                name          =>'physcpucount',
+                label         =>'phys CPU-Count',
+                dataobjattr   =>'amtsiautodiscovery.lcpucount'),
+
+      new kernel::Field::Text(
+                name          =>'cputype',
+                label         =>'CPU-Type',
+                dataobjattr   =>'amtsiautodiscovery.cputype'),
+
+      new kernel::Field::Text(
+                name          =>'cpuspeed',
+                label         =>'CPU-Speed',
+                unit          =>'MHz',
+                dataobjattr   =>'amtsiautodiscovery.lcpuspeedmhz'),
+
+      new kernel::Field::Text(
+                name          =>'independcpucount',
+                label         =>'indipendent CPU-Count',
+                dataobjattr   =>'amtsiautodiscovery.itotalnumberofcores'),
+
+      new kernel::Field::Text(
                 name          =>'cpucount',
                 label         =>'CPU-Count',
-                dataobjattr   =>'amtsiautodiscovery.itotalnumberofcores'),
+                dataobjattr   =>'amtsiautodiscovery.itotalnumberofcores*'.
+                                'amtsiautodiscovery.smt'),
 
       new kernel::Field::Text(
                 name          =>'serialno',
                 label         =>'Serialnumber',
-                dataobjattr   =>'amtsiautodiscovery.name'),
+                dataobjattr   =>'amtsiautodiscovery.serialno'),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
                 label         =>'IP-Addresses',
+                group         =>'ipaddresses',
                 vjointo       =>'tsacinv::autodiscipaddress',
-                vjoinon       =>['id'=>'systemautodiscid'],
-                vjoindisp     =>['name','physicaladdress'],
+                vjoinon       =>['systemdiscoveryid'=>'systemautodiscid'],
+                vjoindisp     =>['address','physicaladdress'],
                 vjoinbase     =>{scandate=>">now-7d"}),
+
+      new kernel::Field::SubList(
+                name          =>'softwareinstallations',
+                label         =>'Software Installations',
+                group         =>'softwareinstallations',
+                vjointo       =>'tsacinv::autodiscsoftware',
+                vjoinon       =>['systemdiscoveryid'=>'systemautodiscid'],
+                vjoindisp     =>['software','version','producer'],
+                vjoinbase     =>{scandate=>">now-14d"}),
 
       new kernel::Field::Date(
                 name          =>'scandate',
@@ -148,7 +181,7 @@ sub initSqlWhere
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default ipadresses source));
+   return( qw(header default ipaddresses softwareinstallations source));
 }  
 
 

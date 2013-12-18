@@ -1,4 +1,4 @@
-package tsacinv::autodiscipaddress;
+package tsacinv::autodiscsoftware;
 #  W5Base Framework
 #  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
 #
@@ -41,18 +41,23 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'DiscoveryID',
-                dataobjattr   =>'amtsiautodiscinterfaces.linterfaceid'),
+                dataobjattr   =>'amtsiautodiscsw.ladswid'),
 
       new kernel::Field::Text(
-                name          =>'address',
-                label         =>'IP-Address',
-                htmlwidth     =>'200px',
-                dataobjattr   =>'amtsiautodiscinterfaces.ipaddress'),
+                name          =>'software',
+                label         =>'Software',
+                htmlwidth     =>'350px',
+                dataobjattr   =>'amtsiautodiscsw.productname'),
 
       new kernel::Field::Text(
-                name          =>'physicaladdress',
-                label         =>'physical Address',
-                dataobjattr   =>'amtsiautodiscinterfaces.physicaladdress'),
+                name          =>'producer',
+                label         =>'Producer',
+                dataobjattr   =>'amtsiautodiscsw.manufacturer'),
+
+      new kernel::Field::Text(
+                name          =>'version',
+                label         =>'Version',
+                dataobjattr   =>'amtsiautodiscsw.version'),
 
       new kernel::Field::TextDrop(
                 name          =>'systemname',
@@ -64,19 +69,19 @@ sub new
       new kernel::Field::Link(
                 name          =>'systemautodiscid',
                 label         =>'SystemID',
-                dataobjattr   =>'amtsiautodiscinterfaces.lsystemautodiscid'),
+                dataobjattr   =>'amtsiautodiscsw.lautodiscsystemid'),
 
       new kernel::Field::Date(
                 name          =>'scandate',
                 group         =>'source',
                 label         =>'Scandate',
-                dataobjattr   =>'amtsiautodiscinterfaces.dtscan'),
+                dataobjattr   =>'amtsiautodiscsw.dtscan'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amtsiautodiscinterfaces.source'),
+                dataobjattr   =>'amtsiautodiscsw.source'),
 
 
    );
@@ -110,7 +115,7 @@ sub initSearchQuery
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amtsiautodiscinterfaces";
+   my $from="amtsiautodiscsw";
 
    return($from);
 }
