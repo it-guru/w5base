@@ -133,6 +133,24 @@ sub hash2table
    return($r);
 }
 
+sub RawValue
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;    # ATTENTION! - This is not always set! (at now 03/2013)
+
+   my $d=$self->SUPER::RawValue($current,$mode);
+
+   if (defined($d) && ref($d) ne "HASH"){
+      if (!($d=~m/^<xmlroot>/)){
+         $d="<xmlroot>".$d."</xmlroot>";
+      }
+      $d=xml2hash($d);
+   }
+   return($d);
+}
+
+
 
 
 
