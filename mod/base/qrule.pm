@@ -231,6 +231,8 @@ sub nativQualityCheck
 
    my $parentTransformationCount=0;
 
+   $parent->preQualityCheckRecord($rec);
+
    if ($parent->Self() ne "base::workflow"){
       foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
          my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
@@ -802,10 +804,6 @@ sub FullView
    printf("<div style=\"border-width:1px;border-style:solid;".
           "border-color:silver;margin-top:20px;".
           "padding-bottom:10px;margin-right:10px\">");
-
-printf STDERR ("fifi 01: lan=$lang\n");
-printf STDERR ("fifi 02: hints=%s\n",$rec->{hints});
-
 
    my $c=FancyLinks(quoteHtml(
                     extractLangEntry($rec->{hints},$lang,undef,1)));

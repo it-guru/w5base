@@ -97,6 +97,7 @@ sub Ping
 sub SetFilterForQualityCheck    # prepaire dataobject for automatic 
 {                               # quality check (nightly)
    my $self=shift;
+   my $stateparam=shift;
    my @view=@_;                 # predefinition for request view
    my @flt;
 
@@ -104,12 +105,10 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
    # geprüfte ID (mit Zeitstempel) zu speichern. Die IDs müsten aufsteigend
    # sortiert werden. 
 
-   if (!defined($self->getField("lastqcheck"))){
-      # hole die letzte geprüfte ID aus dem StateSpeicher, prüfe
-      # ob Datensätze > dieser ID existieren, (wenn nein, dann reset state
-      # und kein Filter - wenn ja, dann setzte diesen Filter)
-    #  $flt[0]->{systemid}=">S06705023";
-
+   if ($stateparam->{checkProcess} eq "idBased"){
+      if (exists($stateparam->{lastid})){
+         $flt[0]->{$stateparam->{idname}}=">\"$stateparam->{lastid}\"";
+      }
    }
 
    if (my $cistatusid=$self->getField("cistatusid")){
@@ -122,6 +121,15 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
    }
    $self->SetFilter(\@flt);
    $self->SetCurrentView(@view);
+   return(1);
+}
+
+sub preQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+
    return(1);
 }
 
