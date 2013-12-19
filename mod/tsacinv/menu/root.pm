@@ -196,6 +196,10 @@ sub Init
                       "tsacinv::autodiscipaddress",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("ac.ad.system.softwareinst",
+                      "tsacinv::autodiscsoftware",
+                      defaultacl=>['valid_user']);
+   
    return(1);
 }
 
