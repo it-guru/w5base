@@ -186,7 +186,7 @@ sub Finish
    my $name=$self->{name};
    $name=$self->Self if ($name eq "");
    my $newrec={
-       textdata=>$d, name=>$name, validto=>$validto,
+       textdata=>$d, name=>$name,
        srcsys=>$self->Self,srcid=>'1',srcload =>NowStamp("en")
    };
    if ($#{$task->{stderr}}!=-1){
@@ -194,6 +194,9 @@ sub Finish
    }
    else{
       $newrec->{errbuffer}=undef;
+   }
+   if ($newrec->{errbuffer} ne ""){   # set new validto only if no errors
+      $newrec->{validto}=$validto;    # are ocured
    }
    
    

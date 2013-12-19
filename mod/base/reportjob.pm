@@ -214,7 +214,8 @@ sub FinishWrite
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
 
    if (defined($oldrec)){
-      if (effChanged($oldrec,$newrec,"textdata")){ 
+      if (effChanged($oldrec,$newrec,"textdata") &&
+          effVal($oldrec,$newrec,"errbuffer") ne ""){ 
          my $name=effVal($oldrec,$newrec,"name");
          my $id=effVal($oldrec,$newrec,"id");
          my $emailto={};
