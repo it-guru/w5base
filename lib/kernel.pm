@@ -69,6 +69,7 @@ package kernel;
 use strict;
 use vars qw(@EXPORT @ISA);
 use Data::Dumper;
+use XML::Parser;
 use W5Kernel;
 use kernel::date;
 use Scalar::Util qw(weaken);
@@ -80,7 +81,7 @@ use Unicode::String qw(utf8 latin1 utf16);
 @EXPORT = qw(&Query &LangTable &extractLanguageBlock 
              &globalContext &NowStamp &CalcDateDuration
              &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array
-             &hash2xml &effVal &effChanged 
+             &hash2xml &xml2hash &effVal &effChanged 
              &Debug &UTF8toLatin1 &Html2Latin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
@@ -98,7 +99,7 @@ sub utf16{return(&Unicode::String::utf16);}
 sub latin1{return(&Unicode::String::latin1);}
 sub LangTable
 {
-  return("en","de");
+   return("en","de");
 }
 
 sub Dumper
@@ -116,13 +117,13 @@ sub CSV2Hash
 
    if ($#orgkey==-1){
       @t=map({
-         my @l=split(/;/,$_);
-         my %r;
-         for(my $c=0;$c<=$#l;$c++){
+            my @l=split(/;/,$_);
+            my %r;
+            for(my $c=0;$c<=$#l;$c++){
             $r{$fld[$c]}=$l[$c];     
-         }
-         \%r;
-      } @t);
+            }
+            \%r;
+            } @t);
       return(\@t);
    }
    my %t;
@@ -144,14 +145,14 @@ sub CSV2Hash
 sub extractLangEntry       # extracts a specific lang entry from a multiline
 {                          # textarea field like :
    my $labeldata=shift;    #
-   my $lang=shift;         # hello
-   my $maxlen=shift;       # [de:]
-   my $multiline=shift;    # Hallo
+      my $lang=shift;         # hello
+      my $maxlen=shift;       # [de:]
+      my $multiline=shift;    # Hallo
 
-   $multiline=0 if (!defined($multiline)); # >1 means max lines 0 = join all
-   $maxlen=0    if (!defined($maxlen));    # 0 means no limits
+      $multiline=0 if (!defined($multiline)); # >1 means max lines 0 = join all
+      $maxlen=0    if (!defined($maxlen));    # 0 means no limits
 
-   my $curlang="";
+      my $curlang="";
    my %ltxt;
    foreach my $line (split('\r{0,1}\n',$labeldata)){
       if (my ($newlang)=$line=~m/^\s*\[([a-z]{1,3}):\]\s*$/){
@@ -176,7 +177,7 @@ sub extractLangEntry       # extracts a specific lang entry from a multiline
    else{
       $d="";
    }
-  
+
    return(trim($d));
 }
 
@@ -204,9 +205,9 @@ sub FormatJsDialCall
       $dialerurl=~s/\%phonenumber\%/$phone/g;
 
       my $open="openwin('$dialerurl',".
-               "'_blank',".
-               "'height=360,width=580,toolbar=no,status=no,".
-               "resizable=yes,scrollbars=no')";
+         "'_blank',".
+         "'height=360,width=580,toolbar=no,status=no,".
+         "resizable=yes,scrollbars=no')";
       my $cmd="$open;";
       return($cmd);
    }
@@ -301,12 +302,12 @@ sub quoteWap
 }
 
 sub quoteQueryString {
-  my $toencode = shift;
-  return undef unless defined($toencode);
-  # force bytes while preserving backward compatibility -- dankogai
-  $toencode = pack("C*", unpack("C*", $toencode));
-  $toencode=~s/([^a-zA-Z0-9_.-])/uc sprintf("%%%02x",ord($1))/eg;
-  return $toencode;
+   my $toencode = shift;
+   return undef unless defined($toencode);
+# force bytes while preserving backward compatibility -- dankogai
+   $toencode = pack("C*", unpack("C*", $toencode));
+   $toencode=~s/([^a-zA-Z0-9_.-])/uc sprintf("%%%02x",ord($1))/eg;
+   return $toencode;
 }
 
 sub orgRoles
@@ -324,6 +325,79 @@ sub XmlQuote
    $org=~s/>/&gt;/g;
    utf8::encode($org);
    return($org);
+}
+
+sub xml2hash {
+   my $d=shift;
+   my $h={};
+
+   my $p=new XML::Parser();
+
+   my $hbuf;
+   my $hbuflevel;
+
+   my $CurrentTag;
+   my $CurrentRoot;
+   my $currentTarget; 
+   
+
+   $p->setHandlers(Start=>sub{
+                      my ($p,$tag,%attr)=@_;
+                      my @c=$p->context();
+                      my $chk=$h;
+                      foreach my $c (@c){
+                         if (!exists($chk->{$c})){
+                            $chk->{$c}={};
+                         }
+                         if (ref($chk) eq "HASH"){
+                            $chk=$chk->{$c};
+                         }
+                         if (ref($chk) eq "ARRAY"){
+                            $chk=$chk->[$#{$chk}];
+                         }
+                      }
+                      if (ref($chk->{$tag}) eq "HASH"){
+                         my %old=%{$chk->{$tag}};
+                         my @sublist=(\%old);
+                         $chk->{$tag}=\@sublist;
+                         $currentTarget=\$chk->{$tag};
+                      }
+                      if (ref($chk->{$tag}) eq "ARRAY"){
+                         my $newchk={};
+                         push(@{$chk->{$tag}},$newchk);
+                         $chk=$newchk;
+                         $currentTarget=undef;
+                      }
+                      elsif (!exists($chk->{$tag})){
+                         $chk->{$tag}={};
+                         $currentTarget=\$chk->{$tag};
+                      }
+                   },
+                   End=>sub{
+                      my ($p,$tag,%attr)=@_;
+                      my @c=$p->context();
+                      $currentTarget=undef;
+                    #  $buffer=undef;
+                   },
+                   Char=>sub {
+                      my ($p,$s)=@_;
+                      my @c=$p->context();
+                      my $trimeds=trim($s);
+                      if (defined($currentTarget) && $trimeds ne ""){
+                         if (!ref($$currentTarget)){
+                            $$currentTarget.=$s;
+                         }
+                         else{
+                            $$currentTarget=$s;
+                         }
+                      }
+                   });
+
+   eval("\$p->parse(\$d);");
+   if ($@ ne ""){
+      return(undef);
+   }
+   return($h);
 }
 
 sub hash2xml {
