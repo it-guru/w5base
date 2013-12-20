@@ -72,6 +72,20 @@ sub new
                 label         =>'Organisation',
                 dataobjattr   =>'Organisation'),
 
+      new kernel::Field::Contact(
+                name          =>'applmgr',
+                label         =>'Application Manager',
+                vjoinon       =>['applmgremail'=>'allemails']),
+
+      new kernel::Field::Text(
+                name          =>'applmgremail',
+                label         =>'Application Manager E-Mail',
+                dataobjattr   =>
+                  "(select TOP 1 lower(Mail) from V_DARWIN_EXPORT_AEG ".
+                  "where V_DARWIN_EXPORT_AEG.ICTO_Nummer=".
+                         "V_DARWIN_EXPORT.ICTO_Nummer ".
+                  "order by V_DARWIN_EXPORT_AEG.Mail)"),
+
       new kernel::Field::SubList(
                 name          =>'w5appl',
                 label         =>'W5Base Application',
@@ -157,7 +171,11 @@ sub initSearchQuery
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="V_DARWIN_EXPORT";
+   my ($worktable,$workdb)=$self->getWorktable();
+
+   my $from=$worktable;
+
+   my $driver=$workdb->DriverName();
 
    return($from);
 }
