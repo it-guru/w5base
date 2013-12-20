@@ -269,3 +269,26 @@ create table artprodoptmodal (
           REFERENCES artkernmodal (name) ON DELETE RESTRICT,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table artprodoptresponse (
+  id         varchar(40)  NOT NULL,
+  partproduct bigint(20)  NOT NULL,
+  name       varchar(80) NOT NULL,
+  raci_contactor varchar(4),
+  raci_orderer   varchar(4),
+  frequency      varchar(20),
+  description longtext,  
+  comments    longtext, 
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),
+  FOREIGN KEY artproduct (partproduct)
+          REFERENCES artproduct (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -1,0 +1,21 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%name(label)%:</td>
+         <td class=finput>%name(sublistedit)%</td>
+         <td class=fname width=10%>%frequency(label)%:</td>
+         <td class=finput width=200>%frequency(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10% valign=top>%description(label)%:</td>
+         <td class=finput colspan=3>%description(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%raci_supplier(label)%:</td>
+         <td class=finput>%raci_supplier(sublistedit)%</td>
+         <td class=fname width=10%>%raci_customer(label)%:</td>
+         <td class=finput width=200>%raci_customer(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

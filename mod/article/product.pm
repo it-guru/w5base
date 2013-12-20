@@ -623,6 +623,14 @@ sub new
                 vjoindisp     =>['product']),
 
       new kernel::Field::SubList(
+                name          =>'response',
+                label         =>'Responsibility-Matrix',
+                group         =>'response',
+                vjointo       =>'article::productoptresponse',
+                vjoinon       =>['subparentid'=>'parentproductid'],
+                vjoindisp     =>['name','description','response','frequency']),
+
+      new kernel::Field::SubList(
                 name          =>'variants',
                 label         =>'Variants',
                 group         =>'variants',
@@ -829,7 +837,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","desc","variants","variantspecials",
+   return("header","default","desc","response","variants","variantspecials",
           "custoblig","pod","price","modalities","cost","mgmt",
           "subproducts","slaqualities",
           "mgmtlogosmall","mgmtlogolarge","attachments","source");
@@ -1086,7 +1094,7 @@ sub isViewValid
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
    my @l=("header","default","history","mgmt","desc","custoblig","pod",
           "mgmtlogosmall","mgmtlogolarge","attachments","slaqualities",
-          "modalities",
+          "modalities","response",
           "cost","price","source");
    if ($rec->{pvariant} eq "standard"){
       push(@l,"variants");
@@ -1107,11 +1115,11 @@ sub isWriteValid
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
 
    my @wrgroups=qw(default desc custoblig pod mgmt mgmtlogosmall 
-                   mgmtlogolarge attachments slaqualities
+                   mgmtlogolarge attachments slaqualities response
                    modalities);
 
    if (defined($rec) && $rec->{variantofid}){
-      @wrgroups=grep(!/^(default|desc|custoblig|pod)$/,@wrgroups);
+      @wrgroups=grep(!/^(default|desc|custoblig|pod|response)$/,@wrgroups);
    }
 
    push(@wrgroups,"cost","price") if (defined($rec));
