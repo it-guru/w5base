@@ -849,14 +849,14 @@ sub ApplicationModified
    print $onlinefh ("</XMLInterface>\n");
    close($onlinefh);
 
-   $self->TransferFile($fh{instance},$filename{instance},
-                       $ftp,"instance");
    $self->TransferFile($fh{appl_contact_rel},$filename{appl_contact_rel},
                        $ftp,"appl_contact_rel");
    $self->TransferFile($fh{ci_appl_rel},$filename{ci_appl_rel},
                        $ftp,"ci_appl_rel");
    $self->TransferFile($fh{appl_appl_rel},$filename{appl_appl_rel},
                        $ftp,"appl_appl_rel");
+   $self->TransferFile($fh{instance},$filename{instance},
+                       $ftp,"instance");
    my $back=$self->TransferFile($fh{appl},$filename{appl},$ftp,"appl");
 
 # temp deakiv, da div. Schnittstellenprobleme noch nicht geklärt sind.
@@ -1067,8 +1067,9 @@ sub TransferFile
                       " $?, $!");
             msg(ERROR,"FTP transfer failed at ".NowStamp("en")." GMT");
             msg(ERROR,"trying to detect ftp error message ...");
-            my $s=$ftp->size($jobfile);
-            msg(ERROR,"size on remote site is $s");
+            my $s;
+            eval('$s=$ftp->size($jobfile);');
+            msg(ERROR,"size on remote site is $s ($@)");
             msg(ERROR,"... detecting error message done.");
          }
          else{
