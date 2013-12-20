@@ -195,7 +195,8 @@ sub Finish
    else{
       $newrec->{errbuffer}=undef;
    }
-   if ($newrec->{errbuffer} ne ""){   # set new validto only if no errors
+   if (!defined($newrec->{errbuffer}) ||
+       $newrec->{errbuffer} eq ""){   # set new validto only if no errors
       $newrec->{validto}=$validto;    # are ocured
    }
    

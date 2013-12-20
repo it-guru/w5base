@@ -608,6 +608,8 @@ sub initAsyncEnv
    pipe(REDIRSTDERR,NEWSTDERR);
    my $pid=fork();
    if ($pid==0){
+      my $tasks=$self->getTasksHash();  # this should be done in RPC::Server,
+      $tasks={};                        # but at this position, i didnt need
       $SIG{INT}='IGNORE';
       $SIG{HUP}='DEFAULT';
       $0.=" MONITOR";
