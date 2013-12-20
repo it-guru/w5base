@@ -50,10 +50,8 @@ sub FormatedDetail
          $d=sprintf($format,$d);
          if (defined($self->{minprecision})){
             my $n=int($self->{minprecision});
-printf STDERR ("fifi 01: $d\n");
             $d=~s/^(.*\.\d{$n}[^0]*).*$/$1/e;
             #$d=~s/^(.*\.{$n}\d[^0]*).*$/$1/e;
-printf STDERR ("fifi 02: $d\n");
          }
          $d=~s/\./,/g;
          if ($mode eq "HtmlDetail"          || $mode=~m/^[>]{0,1}HtmlV01$/ ||
