@@ -72,6 +72,11 @@ sub new
                 label         =>'Bussinessprocess mark',
                 dataobjattr   =>'interface_tssapp01_01.bpmark'),
 
+      new kernel::Field::Text(
+                name          =>'ictono',
+                label         =>'ICTO-ID',
+                dataobjattr   =>'interface_tssapp01_01.ictono'),
+
       new kernel::Field::TextDrop(
                 name          =>'databoss',
                 group         =>'contacts',

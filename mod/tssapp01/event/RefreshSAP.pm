@@ -71,6 +71,8 @@ use File::Path qw(remove_tree);
 #strategic partner name  = not mapped
 #NOR-solution model      = normodel     = NOR Solution Model     = varchar(5)
 #NOR-n                   = norn         = NOR Exclude            = varchar(30)
+#Business_Prozess_Info   = bpmark       = Bussiness Process      = varchar(20)
+#ICTO-Nummer             = ictono       = ICTO-ID                = varchar(20)
 
 
 
@@ -217,6 +219,7 @@ sub processFile
           'delete'                        =>'isdeleted',
           'status'                        =>'status',
           'Business_Prozess_Information'  =>'bpmark',
+          'ICTO-Nummer'                   =>'ictono',
           'supervisor_wiw'                =>'databosswiw',
           'customer'                      =>'sapcustomer',
           'service manager'               =>'smwiw',

@@ -58,3 +58,4 @@ create table interface_tssapp01_02 (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 )  ENGINE=MyISAM DEFAULT CHARSET=latin1;
 alter table interface_tssapp01_01 add bpmark varchar(20);
+alter table interface_tssapp01_01 add ictono varchar(20);
