@@ -746,6 +746,7 @@ sub new
       new kernel::Field::File(
                 name          =>'picture',
                 label         =>'picture',
+                content       =>'image/jpg',
                 searchable    =>0,
                 uploadable    =>0,
                 group         =>'picture',
