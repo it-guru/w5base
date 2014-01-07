@@ -198,6 +198,50 @@ sub isWriteOnBProcessValid
 }
 
 
+sub preQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+   # load Autodiscovery Data from all configured engines
+
+   my $p=$self->SelfAsParentObject();
+   if ($p eq "itil::system" || $p eq "itil::swinstance"){
+      my $add=$self->getPersistentModuleObject("itil::autodiscdata");
+      my $ade=$self->getPersistentModuleObject("itil::autodiscengine");
+      $ade->SetFilter({localdataobj=>\$p});
+      foreach my $engine ($ade->getHashList(qw(ALL))){
+         my $rk;
+         $rk="systemid"     if ($p eq "itil::system");
+         $rk="swinstanceid" if ($p eq "itil::swinstance");
+         $add->SetFilter({$rk=>\$rec->{id},engine=>\$engine->{name}});
+         my ($oldadrec)=$add->getOnlyFirst(qw(ALL));
+         my $ado=$self->getPersistentModuleObject($engine->{addataobj});
+         if (defined($ado)){
+            $ado->SetFilter({$engine->{adkey}=>\$rec->{$engine->{localkey}}});
+            my ($adrec)=$ado->getOnlyFirst(qw(ALL));
+            if ($ado->Ping()){
+               my $adxml=hash2xml($adrec);
+               if (!defined($oldadrec)){
+                  $add->ValidatedInsertRecord({engine=>$engine->{name},
+                                               $rk=>$rec->{id},
+                                               data=>$adxml});
+               }
+               else{
+                  $add->ValidatedUpdateRecord($oldadrec,
+                                              {data=>$adxml},
+                                              {engine=>\$engine->{name},
+                                               $rk=>\$rec->{id}});
+               }
+            }
+         }
+      }
+   }
+   return(1);
+}
+
+
+
 
 
 
