@@ -323,6 +323,7 @@ sub new
       new kernel::Field::File(
                 name          =>'logo_small',
                 label         =>'logo_small',
+                content       =>'image/jpg',
                 searchable    =>0,
                 group         =>'mgmtlogosmall',
                 uploadable    =>0,
@@ -331,6 +332,7 @@ sub new
       new kernel::Field::File(
                 name          =>'logo_large',
                 label         =>'logo_large',
+                content       =>'image/jpg',
                 searchable    =>0,
                 group         =>'mgmtlogolarge',
                 uploadable    =>0,

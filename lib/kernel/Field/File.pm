@@ -28,25 +28,26 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{sqlorder}="none";   
-   return($self);
-}
-
-sub RawValue
-{
-   my $self=shift;
-   my $current=shift;
-   if (defined($self->{onDownloadUrl}) &&
-          ref($self->{onDownloadUrl}) eq "CODE"){
-      my $path=$ENV{SCRIPT_URI};
-      $path=~s/\/(auth|public)\/.*/\/$1\//;
-      my $parent=$self->getParent->Self;
-      $parent=~s/::/\//g;
-      my $url=$path.$parent."/".&{$self->{onDownloadUrl}}($self,$current);
-      return($url);
+   if (!exists($self->{onDownloadUrl})){
+      $self->{onDownloadUrl}=sub{
+         my $self=shift;
+         my $current=shift;
+         my $parent=$self->getParent();
+         my $idField=$parent->IdField();
+         my $id;
+         if (defined($idField)){
+            $id=$idField->RawValue($current);
+         }
+         if ($id ne ""){
+            return("ViewProcessor/Raw/".$self->{name}."/".$id);
+         }
+         return(undef);
+      };
    }
-  
-   return("< FileEntry >");
-
+   if (!defined($self->{content})){
+      $self->{content}="application/octet-stream";
+   }
+   return($self);
 }
 
 
@@ -57,18 +58,30 @@ sub FormatedDetail
    my $mode=shift;
    my $d=$self->RawValue($current);
    my $name=$self->Name();
+
+   my $url;
+   if (defined($self->{onDownloadUrl}) &&
+       ref($self->{onDownloadUrl}) eq "CODE"){
+      $url=&{$self->{onDownloadUrl}}($self,$current);
+   }
    if ($mode eq "HtmlDetail"){
-      my $url;
-      if (defined($self->{onDownloadUrl}) &&
-          ref($self->{onDownloadUrl}) eq "CODE"){
-         $url=&{$self->{onDownloadUrl}}($self,$current);
+      if ($d ne ""){
+         if (defined($url)){
+            return("&lt; <a class=filelink target=_blank ".
+                   "href=\"$url\">FileEntry</a> &gt;");
+         }
       }
-      return("<a class=filelink href=\"$url\">$d</a>") if (defined($url));
+      else{
+         return("&lt; noFile &gt;");
+      }
    }
    if (($mode eq "edit" || $mode eq "workflow") && !defined($self->{vjointo})){
       return("<input type=file name=$name size=45>");
    }
-   return($d);
+   if ($d ne ""){
+      return($url);
+   }
+   return("<noFile>");
 }
 
 sub Uploadable
@@ -77,6 +90,45 @@ sub Uploadable
 
    return(0);
 }
+
+
+sub ViewProcessor
+{
+   my $self=shift;
+   my $mode=shift;
+   my $refid=shift;
+   if ($mode eq "Raw" && $refid ne ""){
+      my $response={document=>{}};
+
+      my $obj=$self->getParent();
+      my $idfield=$obj->IdField();
+      my $d="";
+      if (defined($idfield)){
+         $obj->ResetFilter();
+         $obj->SecureSetFilter({$idfield->Name()=>\$refid});
+         $obj->SetCurrentOrder("NONE");
+         my ($rec,$msg)=$obj->getOnlyFirst(qw(ALL));
+         if (defined($rec)){
+            if ($obj->Ping()){
+               my $fo=$obj->getField($self->Name(),$rec);
+               $d=$fo->RawValue($rec);
+            }
+         }
+      }
+      my $ext=".bin";
+      if (my ($f1,$f2)=$self->{content}=~m/^(.*)\/(.*)$/){
+         if ($f1 eq "image"){
+            $ext=".$f2";
+         }
+      }
+      print $self->getParent->HttpHeader($self->{content},
+              filename=>$self->{name}.$ext);
+      print $d;
+      return;
+   }
+   return;
+}
+
 
 
 
