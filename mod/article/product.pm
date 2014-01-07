@@ -256,6 +256,12 @@ sub new
                 label         =>'Point of delivery',
                 dataobjattr   =>'artproduct.pod'),
 
+      new kernel::Field::Textarea(
+                name          =>'specialarr',
+                group         =>'specialarr',
+                label         =>'Specific agreements',
+                dataobjattr   =>'artproduct.specialarr'),
+
       new kernel::Field::Contact(
                 name          =>'productmgr',
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
@@ -351,7 +357,8 @@ sub new
                    }
                    return();
                 },
-                precision     =>2,
+                precision     =>4,
+                minprecision  =>2,
                 width         =>'50',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_once'),
@@ -369,7 +376,8 @@ sub new
                    }
                    return();
                 },
-                precision     =>2,
+                precision     =>4,
+                minprecision  =>2,
                 width         =>'50',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_day'),
@@ -387,15 +395,17 @@ sub new
                    }
                    return();
                 },
-                precision     =>2,
+                precision     =>4,
+                minprecision  =>2,
                 width         =>'50',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_month'),
 
       new kernel::Field::Currency(
                 name          =>'priceyear',
-                precision     =>2,
                 width         =>'50',
+                precision     =>4,
+                minprecision  =>2,
                 label         =>'price year',
                 depend        =>['pricecurrency'],
                 unit          =>sub{
@@ -423,7 +433,8 @@ sub new
                    }
                    return();
                 },
-                precision     =>2,
+                precision     =>4,
+                minprecision  =>2,
                 width         =>'50',
                 group         =>'price',
                 dataobjattr   =>'artproduct.price_peruse'),
@@ -476,7 +487,7 @@ sub new
       new kernel::Field::Currency(
                 name          =>'costonce',
                 label         =>'cost once',
-                precision     =>3,
+                precision     =>4,
                 minprecision  =>2,
                 depend        =>['pricecurrency'],
                 unit          =>sub{
@@ -495,7 +506,7 @@ sub new
       new kernel::Field::Currency(
                 name          =>'costday',
                 label         =>'cost day',
-                precision     =>3,
+                precision     =>4,
                 minprecision  =>2,
                 depend        =>['costcurrency'],
                 unit          =>sub{
@@ -514,7 +525,7 @@ sub new
       new kernel::Field::Currency(
                 name          =>'costmonth',
                 label         =>'cost month',
-                precision     =>3,
+                precision     =>4,
                 minprecision  =>2,
                 depend        =>['costcurrency'],
                 unit          =>sub{
@@ -544,7 +555,7 @@ sub new
                 },
                 width         =>'50',
                 label         =>'cost year',
-                precision     =>3,
+                precision     =>4,
                 minprecision  =>2,
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_year'),
@@ -553,7 +564,7 @@ sub new
                 name          =>'costperuse',
                 label         =>'cost peruse',
                 depend        =>['costcurrency'],
-                precision     =>3,
+                precision     =>4,
                 minprecision  =>2,
                 unit          =>'',
                 unit          =>sub{
@@ -594,7 +605,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'costbillinterval',
-                label         =>'Invoicing frequency',
+                label         =>'Invoicing frequency (cost)',
                 value         =>['PERMONTH','PERYEAR'],
                 group         =>'cost',
                 dataobjattr   =>'artproduct.cost_billinterval'),
@@ -602,11 +613,9 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'coststepping',
                 group         =>'cost',
-                label         =>'Step pricing',
+                label         =>'Step pricing (cost)',
                 dataobjattr   =>'artproduct.cost_stepping'),
 
-
-        
       new kernel::Field::Link(
                 name          =>'subparentid',
                 label         =>'id for all sub elements/products',
@@ -838,7 +847,7 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","desc","response","variants","variantspecials",
-          "custoblig","pod","price","modalities","cost","mgmt",
+          "custoblig","pod","price","modalities","cost","specialarr","mgmt",
           "subproducts","slaqualities",
           "mgmtlogosmall","mgmtlogolarge","attachments","source");
 }
@@ -927,7 +936,7 @@ sub Validate
       my ($prec,$msg)=$p->getOnlyFirst(qw(ALL));
       # Werte die immer vom "Parent" übernommen werden
       foreach my $pfld (qw(category1id frontlabel pclass description
-                           delivproviderid pdetaillevel
+                           delivproviderid pdetaillevel specialarr
                            custoblig premises rest exclusions pod)){
          if (!defined($oldrec) ||
              $oldrec->{$pfld} ne $prec->{$pfld}){
@@ -1094,7 +1103,7 @@ sub isViewValid
    return("default","desc","custoblig","pod","mgmt") if (!defined($rec));
    my @l=("header","default","history","mgmt","desc","custoblig","pod",
           "mgmtlogosmall","mgmtlogolarge","attachments","slaqualities",
-          "modalities","response",
+          "modalities","response","specialarr",
           "cost","price","source");
    if ($rec->{pvariant} eq "standard"){
       push(@l,"variants");
@@ -1116,10 +1125,10 @@ sub isWriteValid
 
    my @wrgroups=qw(default desc custoblig pod mgmt mgmtlogosmall 
                    mgmtlogolarge attachments slaqualities response
-                   modalities);
+                   modalities specialarr);
 
    if (defined($rec) && $rec->{variantofid}){
-      @wrgroups=grep(!/^(default|desc|custoblig|pod|response)$/,@wrgroups);
+      @wrgroups=grep(!/^(default|desc|custoblig|specialarr|pod|response)$/,@wrgroups);
    }
 
    push(@wrgroups,"cost","price") if (defined($rec));
