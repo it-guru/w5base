@@ -490,6 +490,10 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.proc.mgmtitemgroup.lnkcontact",
+                      "itil::lnkmgmtitemgroupcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
                       "base::workflow",
                       func=>'New',

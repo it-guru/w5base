@@ -532,6 +532,10 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.proc.mgmtitemgroup.lnkcontact",
+                      "itil::lnkmgmtitemgroupcontact",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj('itil::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',
