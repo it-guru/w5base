@@ -25,6 +25,7 @@ use kernel::App::Web::InterviewLink;
 use kernel::Field;
 use kernel::CIStatusTools;
 use finance::costcenter;
+use itil::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink
         kernel::CIStatusTools);
@@ -1580,6 +1581,17 @@ sub getDetailBlockPriority
              swinstances ipaddresses
              contacts monisla misc attachments control source));
 }
+
+sub preQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return($self->itil::lib::Listedit::preQualityCheckRecord($rec));
+}
+
+
+
 
 
 
