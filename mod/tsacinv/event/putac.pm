@@ -180,17 +180,6 @@ sub AssetModified
       $filter{name}=\@assetname;
    }
    my (%fh,%filename);
-   my $ftp=new kernel::FTP($self,"tsacftp");
-   if (defined($ftp)){
-      if (!($ftp->Connect())){
-         return({exitcode=>1,msg=>msg(ERROR,"can't connect to ftp server ".
-                "- login fails")});
-      }
-      $self->{ftp}=$ftp;
-   }
-   else{
-      return({exitcode=>1,msg=>msg(ERROR,"can't create ftp object")});
-   }
 
    $self->{jobstart}=NowStamp();
    ($fh{asset},       $filename{asset}               )=$self->InitTransfer();
@@ -231,10 +220,8 @@ sub AssetModified
       } until(!defined($rec));
    }
    msg(INFO,"count status: acnew=$acnew acnewback=$acnewback");
-   $self->TransferFile($fh{asset},$filename{asset},
-                       $ftp,"asset");
-   $self->TransferFile($fh{system},$filename{system},
-                       $ftp,"logsys");
+   $self->TransferFile($fh{asset},$filename{asset},"asset");
+   $self->TransferFile($fh{system},$filename{system},"logsys");
 }
 
 
@@ -297,23 +284,11 @@ sub ApplicationModified
   #                         description businessteam));
 
    my (%fh,%filename);
-   my $ftp=new kernel::FTP($self,"tsacftp");
-   if (defined($ftp)){
-      if (!($ftp->Connect())){
-         return({exitcode=>1,msg=>msg(ERROR,"can't connect to ftp server ".
-                "- login fails")});
-      }
-      $self->{ftp}=$ftp;
-   }
-   else{
-      return({exitcode=>1,msg=>msg(ERROR,"can't create ftp object")});
-   }
    ($fh{appl},         $filename{appl}               )=$self->InitTransfer();
    ($fh{appl_appl_rel},$filename{appl_appl_rel}      )=$self->InitTransfer();
    ($fh{ci_appl_rel},  $filename{ci_appl_rel}        )=$self->InitTransfer();
    ($fh{appl_contact_rel},$filename{appl_contact_rel})=$self->InitTransfer();
    ($fh{instance},     $filename{instance}           )=$self->InitTransfer();
-   return($ftp) if (ref($ftp) eq "HASH" || !defined($ftp)); # on errors
 
 
    my $exclmand;
@@ -850,14 +825,14 @@ sub ApplicationModified
    close($onlinefh);
 
    $self->TransferFile($fh{appl_contact_rel},$filename{appl_contact_rel},
-                       $ftp,"appl_contact_rel");
+                       "appl_contact_rel");
    $self->TransferFile($fh{ci_appl_rel},$filename{ci_appl_rel},
-                       $ftp,"ci_appl_rel");
+                       "ci_appl_rel");
    $self->TransferFile($fh{appl_appl_rel},$filename{appl_appl_rel},
-                       $ftp,"appl_appl_rel");
+                       "appl_appl_rel");
    $self->TransferFile($fh{instance},$filename{instance},
-                       $ftp,"instance");
-   my $back=$self->TransferFile($fh{appl},$filename{appl},$ftp,"appl");
+                       "instance");
+   my $back=$self->TransferFile($fh{appl},$filename{appl},"appl");
 
 # temp deakiv, da div. Schnittstellenprobleme noch nicht geklärt sind.
 #   $self->sendFileToAssetManagerOnlineInterface($onlinefilename,$elements);
@@ -1043,11 +1018,15 @@ sub TransferFile
    my $self=shift;
    my $fh=shift;
    my $filename=shift;
-   my $ftp=shift;
    my $object=shift;
 
    print $fh ("</XMLInterface>\n");
    close($fh);
+
+   my $ftp=new kernel::FTP($self,"tsacftp");
+   if (!defined($ftp)){
+      return({exitcode=>1,msg=>msg(ERROR,"can't create ftp object")});
+   }
 
    if (open(FI,"<$filename") && open(FO,">/tmp/last.putac.$object.xml")){
       printf FO ("%s",join("",<FI>));
@@ -1055,7 +1034,7 @@ sub TransferFile
       close(FI);
    }
    if ($ftp->Connect()){
-      msg(INFO,"Connect to FTP Server OK");
+      msg(INFO,"Connect to FTP Server OK '$ftp'");
       my $jobname="w5base.".$self->{jobstart}.".xml";
       my $jobfile="$object/$jobname";
       msg(INFO,"Processing  job : '%s'",$jobfile);
@@ -1107,19 +1086,7 @@ sub SWInstallModified
    $lnk->SetFilter(\%filter);
    #$lnk->Limit(100);
    $lnk->SetCurrentView(qw(id w5systemid software version licencecount));
-   my $ftp=new kernel::FTP($self,"tsacftp");
-   if (defined($ftp)){
-      if (!($ftp->Connect())){
-         return({exitcode=>1,msg=>msg(ERROR,"can't connect to ftp server ".
-                "- login fails")});
-      }
-      $self->{ftp}=$ftp;
-   }
-   else{
-      return({exitcode=>1,msg=>msg(ERROR,"can't create ftp object")});
-   }
    my ($fh,$filename)=$self->InitTransfer();
-   return($ftp) if (ref($ftp) eq "HASH" || !defined($ftp)); # on errors
 
    my ($rec,$msg)=$lnk->getFirst();
    if (defined($rec)){
@@ -1149,7 +1116,7 @@ sub SWInstallModified
          ($rec,$msg)=$lnk->getNext();
       } until(!defined($rec));
    }
-   return($self->TransferFile($fh,$filename,$ftp,"swinstall"));
+   return($self->TransferFile($fh,$filename,"swinstall"));
 
 
 }
