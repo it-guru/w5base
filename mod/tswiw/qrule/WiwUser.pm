@@ -61,6 +61,9 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+   my $checksession=shift;
+   my $autocorrect=$checksession->{autocorrect};
+
    my $errorlevel=0;
 
    if ($rec->{email} ne "" && $rec->{cistatusid}<=5){

@@ -202,8 +202,11 @@ sub preQualityCheckRecord
 {
    my $self=shift;
    my $rec=shift;
+   my @param=@_;
 
    # load Autodiscovery Data from all configured engines
+
+   my %AutoDiscovery=();
 
    my $p=$self->SelfAsParentObject();
    if ($p eq "itil::system" || $p eq "itil::swinstance"){
@@ -218,25 +221,38 @@ sub preQualityCheckRecord
          my ($oldadrec)=$add->getOnlyFirst(qw(ALL));
          my $ado=$self->getPersistentModuleObject($engine->{addataobj});
          if (defined($ado)){
+            my $adfield=$add->getField("data");
             $ado->SetFilter({$engine->{adkey}=>\$rec->{$engine->{localkey}}});
             my ($adrec)=$ado->getOnlyFirst(qw(ALL));
-            if ($ado->Ping()){
-               my $adxml=hash2xml($adrec);
-               if (!defined($oldadrec)){
-                  $add->ValidatedInsertRecord({engine=>$engine->{name},
-                                               $rk=>$rec->{id},
-                                               data=>$adxml});
+            if (defined($adrec)){
+               if ($ado->Ping()){
+                  $adrec->{xmlstate}="OK";
+                  my $adxml=hash2xml({xmlroot=>$adrec});
+                  if (!defined($oldadrec)){
+                     $add->ValidatedInsertRecord({engine=>$engine->{name},
+                                                  $rk=>$rec->{id},
+                                                  data=>$adxml});
+                  }
+                  else{
+                     $add->ValidatedUpdateRecord($oldadrec,
+                                                 {data=>$adxml},
+                                                 {engine=>\$engine->{name},
+                                                  $rk=>\$rec->{id}});
+                  }
+                  $AutoDiscovery{$engine}={
+                     data=>$adfield->RawValue({data=>$adxml})
+                  };
                }
-               else{
-                  $add->ValidatedUpdateRecord($oldadrec,
-                                              {data=>$adxml},
-                                              {engine=>\$engine->{name},
-                                               $rk=>\$rec->{id}});
-               }
+            }
+            if (defined($oldadrec) && !exists($AutoDiscovery{$engine})){
+               $AutoDiscovery{$engine}={
+                  data=>$adfield->RawValue($oldadrec)
+               };
             }
          }
       }
    }
+   $param[0]->{AutoDiscovery}=\%AutoDiscovery;
    return(1);
 }
 

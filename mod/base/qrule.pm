@@ -230,8 +230,7 @@ sub nativQualityCheck
    my %qruledone;
 
    my $parentTransformationCount=0;
-
-   $parent->preQualityCheckRecord($rec);
+   $parent->preQualityCheckRecord($rec,@param);
 
    if ($parent->Self() ne "base::workflow"){
       foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
@@ -268,6 +267,8 @@ sub nativQualityCheck
    }
 
 
+   $param[0]->{autocorrect}=0 if (!exists($param[0]->{autocorrect}));;
+   $param[0]->{ruleno}=0 if (!exists($param[0]->{ruleno}));;
    foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
       my $qrulename=$lnkrec->{qruleid};
       next if ($qruledone{$qrulename});
@@ -277,7 +278,8 @@ sub nativQualityCheck
          my $oldcontext=$W5V2::OperationContext;
          $W5V2::OperationContext="QualityCheck";
          my $acorrect=0;  # vorgesehen für auto correct modeA
-         my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,$acorrect);
+         $param[0]->{ruleno}++;
+         my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,@param);
          $W5V2::OperationContext=$oldcontext;
          if (defined($control) && defined($control->{dataissue})){
             my $dataissuemsg=$control->{dataissue};
@@ -477,7 +479,8 @@ sub WinHandleQualityCheck
       print $self->HttpHeader("text/xml");
       my $res=hash2xml({},{header=>1});
       print $res."<document>";
-      my $checkresult=$self->nativQualityCheck($objlist,$rec);
+      my %checksession=(checkstart=>time(),checkmode=>'web');
+      my $checkresult=$self->nativQualityCheck($objlist,$rec,\%checksession);
       #print STDERR Dumper($checkresult);
       foreach my $ruleres (@{$checkresult->{rule}}){
          my $res=hash2xml({rule=>$ruleres},{});

@@ -43,7 +43,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'engine',
                 htmleditwidth =>'80px',
-                label         =>'Name',
+                label         =>'Engine',
                 readonly      =>sub{
                    my $self=shift;
                    my $rec=shift;
@@ -66,7 +66,7 @@ sub new
                 label         =>'Target Type',
                 readonly      =>1,
                 dataobjattr   =>
-                   "if (system.name is null,'SYSTEM','INSTANCE')"),
+                   "if (system.name is null,'INSTANCE','SYSTEM')"),
 
       new kernel::Field::Interface(
                 name          =>'systemid',
@@ -120,6 +120,14 @@ sub new
    return($self);
 }
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 sub getSqlFrom
 {
@@ -138,7 +146,7 @@ sub isCopyValid
 {
    my $self=shift;
 
-   return(1);
+   return(0);
 }
 
 sub getDetailBlockPriority
@@ -152,7 +160,6 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","autoimport") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 

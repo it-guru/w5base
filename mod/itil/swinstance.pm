@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
+use itil::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
@@ -1062,6 +1063,16 @@ sub getDetailBlockPriority
              systems softwareinst contacts swinstanceparam ssl 
              control swinstancerules attachments relations source));
 }
+
+sub preQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return($self->itil::lib::Listedit::preQualityCheckRecord($rec));
+}
+
+
 
 
 

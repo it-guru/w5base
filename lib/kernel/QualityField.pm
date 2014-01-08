@@ -40,7 +40,8 @@ sub loadQualityCheckResult
          my $qc=getModuleObject($parent->Config,"base::qrule");
          $qc->setParent($parent);
          my $compat=$parent->getQualityCheckCompat($chkrec);
-         $result=$qc->nativQualityCheck($compat,$chkrec);
+         my %checksession=(checkstart=>time(),checkmode=>'field');
+         $result=$qc->nativQualityCheck($compat,$chkrec,\%checksession);
          #printf STDERR ("nativQualityCheck=%s\n",Dumper($result));
       }
       $context->{QualityResult}->{$id}=$result;

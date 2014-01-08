@@ -1585,9 +1585,8 @@ sub getDetailBlockPriority
 sub preQualityCheckRecord
 {
    my $self=shift;
-   my $rec=shift;
 
-   return($self->itil::lib::Listedit::preQualityCheckRecord($rec));
+   return($self->itil::lib::Listedit::preQualityCheckRecord(@_));
 }
 
 

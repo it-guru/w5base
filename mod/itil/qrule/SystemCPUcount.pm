@@ -56,7 +56,10 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+   my $checksession=shift;
+   my $autocorrect=$checksession->{autocorrect};
 
+   #print STDERR Dumper($checksession);
 
    # sampe AutoDiscovery data access
    my $parent=$self->getParent();
