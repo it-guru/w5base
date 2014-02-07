@@ -56,7 +56,7 @@ sub Connect
       $self->{$v}=$p{$v}->{$name};
    }
    $self->{base}=$p{base}->{$name};
-   my %param=();
+   my %param=(Passive=>1);
    #$param{Debug}=1 if ($W5V2::Debug==1);
    $self->{ftp}=Net::FTP->new($self->{serv},%param);
    if (defined($self->{ftp})){
