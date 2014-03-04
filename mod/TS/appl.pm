@@ -314,6 +314,13 @@ sub calcBaseApplicationExpertGroup
                 phonename=>[],
                 label=>"Lead Problem Manager"
             },
+            'leadinmmgr'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>"Lead Incident Manager"
+            },
             'AEG'=>{
                 userid=>[],
                 email=>[],
@@ -401,9 +408,12 @@ sub calcBaseApplicationExpertGroup
    my $aegm=getModuleObject($self->getParent->Config,"AL_TCom::aegmgmt");
    if (defined($aegm)){
       $aegm->SetFilter({id=>\$rec->{id}});
-      my ($mgmtrec,$msg)=$aegm->getOnlyFirst(qw(leadprmmgrid));
+      my ($mgmtrec,$msg)=$aegm->getOnlyFirst(qw(leadprmmgrid leadinmmgrid));
       if (defined($mgmtrec) && $mgmtrec->{leadprmmgrid} ne ""){
          push(@{$a{leadprmmgr}->{userid}},$mgmtrec->{leadprmmgrid});
+      }
+      if (defined($mgmtrec) && $mgmtrec->{leadinmmgrid} ne ""){
+         push(@{$a{leadinmmgr}->{userid}},$mgmtrec->{leadinmmgrid});
       }
    }
 

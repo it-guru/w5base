@@ -50,9 +50,9 @@ sub CISearchResult
 
    my @l;
    if (grep(/^ciaeg$/,@$stag)){
-      my $flt=[{name=>"*$searchtext*", cistatusid=>"<=5"},
+      my $flt=[{name=>"*$searchtext*", cistatusid=>"<=5",managed=>1},
               ];
-      my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+      my $appl=getModuleObject($self->getParent->Config,"AL_TCom::aegmgmt");
       $appl->SetFilter($flt);
       foreach my $rec ($appl->getHashList(qw(name customer))){
          my $dispname=$rec->{name};
@@ -75,7 +75,7 @@ sub QuickFindDetail
    my $id=shift;
    my $htmlresult="?";
 
-   my $appl=getModuleObject($self->getParent->Config,"TS::appl");
+   my $appl=getModuleObject($self->getParent->Config,"AL_TCom::appl");
    $appl->SetFilter({id=>\$id});
    my ($rec,$msg)=$appl->getOnlyFirst(qw(applicationexpertgroup));
 

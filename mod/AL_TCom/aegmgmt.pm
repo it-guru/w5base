@@ -69,7 +69,7 @@ sub new
                 label         =>'Application CI-State',
                 vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
-                vjoinon       =>['applcistatusid'=>'id'],
+                vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::Boolean(
@@ -88,8 +88,8 @@ sub new
 
 
                                                   
-      new kernel::Field::Link(
-                name          =>'applcistatusid',
+      new kernel::Field::Interface(
+                name          =>'cistatusid',
                 readonly      =>1,
                 uploadable    =>0,
                 label         =>'Application CI-StateID',
@@ -114,6 +114,21 @@ sub new
 
 
       new kernel::Field::Contact(
+                name          =>'leadinmmgr',
+                AllowEmpty    =>1,
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                group         =>'addcontacts',
+                label         =>'Lead Incident Manager',
+                vjoinon       =>'leadinmmgrid'),
+
+      new kernel::Field::Link(
+                name          =>'leadinmmgrid',
+                label         =>'Lead Incident Manager ID',
+                group         =>'addcontacts',
+                dataobjattr   =>"$worktable.leadinmmgr"),
+
+      new kernel::Field::Contact(
                 name          =>'leadprmmgr',
                 AllowEmpty    =>1,
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
@@ -124,6 +139,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'leadprmmgrid',
+                label         =>'Lead Problem Manager ID',
                 group         =>'addcontacts',
                 dataobjattr   =>"$worktable.leadprmmgr"),
 
@@ -209,6 +225,18 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
                 dataobjattr   =>"$worktable.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"$worktable.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(appl.id,35,'0')"),
 
       new kernel::Field::Owner(
                 name          =>'owner',
