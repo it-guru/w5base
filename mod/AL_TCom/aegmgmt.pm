@@ -95,14 +95,23 @@ sub new
                 label         =>'Application CI-StateID',
                 dataobjattr   =>'appl.cistatus'),
 
-      new kernel::Field::Select(
+#      new kernel::Field::Select(
+#                name          =>'aegsolution',
+#                value         =>['Customer Solutions',
+#                                 'Market & Corporate Solutions',
+#                                 'Technologiy Solutions',
+#                                 'EU Solutions'],
+#                label         =>'Solution',
+#                dataobjattr   =>"$worktable.aegsolution"),
+
+      new kernel::Field::Text(
                 name          =>'aegsolution',
-                value         =>['Customer Solutions',
-                                 'Market & Corporate Solutions',
-                                 'Technologiy Solutions',
-                                 'EU Solutions'],
                 label         =>'Solution',
-                dataobjattr   =>"$worktable.aegsolution"),
+                readonly      =>1,
+                dataobjattr   =>"if (mandator.name regexp 'TelekomIT.*',".
+                                "replace(mandator.name,'TelekomIT ',''),".
+                                "'NONE')"),
+
 
       new kernel::Field::Contact(
                 name          =>'leadprmmgr',
@@ -118,65 +127,65 @@ sub new
                 group         =>'addcontacts',
                 dataobjattr   =>"$worktable.leadprmmgr"),
 
-      new kernel::Field::Select(
-                name          =>'meetinginterval',
-                group         =>'meetings',
-                value         =>['none',
-                                 'weekly',
-                                 'monthly'],
-                label         =>'meeting interval',
-                dataobjattr   =>"$worktable.meetinginterval"),
-                                                  
-      new kernel::Field::Date(
-                name          =>'meetingstart',
-                group         =>'meetings',
-                label         =>'meetings startet at',
-                dataobjattr   =>"$worktable.meetingstart"),
-                                                  
-      new kernel::Field::Textarea(
-                name          =>'meetingcomments',
-                group         =>'meetings',
-                label         =>'meetings - comments',
-                dataobjattr   =>"$worktable.meetingcomments"),
-                                                  
-
-      new kernel::Field::Boolean(
-                name          =>'processcheckdone',
-                group         =>'processcheck',
-                label         =>'process check done',
-                dataobjattr   =>"$worktable.processcheckdone"),
-                                                  
-      new kernel::Field::Date(
-                name          =>'processcheckuntil',
-                group         =>'processcheck',
-                label         =>'process check finished at',
-                dataobjattr   =>"$worktable.processcheckuntil"),
-                                                  
-      new kernel::Field::Textarea(
-                name          =>'processcheckcomments',
-                group         =>'processcheck',
-                label         =>'process check - comments',
-                dataobjattr   =>"$worktable.processcheckcomments"),
-                                                  
-
-      new kernel::Field::Boolean(
-                name          =>'checklistdone',
-                group         =>'checklist',
-                label         =>'checklists created',
-                dataobjattr   =>"$worktable.checklistdone"),
-                                                  
-      new kernel::Field::Date(
-                name          =>'checklistuntil',
-                group         =>'checklist',
-                label         =>'checklist createfinished at',
-                dataobjattr   =>"$worktable.checklistuntil"),
-                                                  
-      new kernel::Field::Textarea(
-                name          =>'checklistcomments',
-                group         =>'checklist',
-                label         =>'checklist - comments',
-                dataobjattr   =>"$worktable.checklistcomments"),
-
+#      new kernel::Field::Select(
+#                name          =>'meetinginterval',
+#                group         =>'meetings',
+#                value         =>['none',
+#                                 'weekly',
+#                                 'monthly'],
+#                label         =>'meeting interval',
+#                dataobjattr   =>"$worktable.meetinginterval"),
+#                                                  
+#      new kernel::Field::Date(
+#                name          =>'meetingstart',
+#                group         =>'meetings',
+#                label         =>'meetings startet at',
+#                dataobjattr   =>"$worktable.meetingstart"),
+#                                                  
+#      new kernel::Field::Textarea(
+#                name          =>'meetingcomments',
+#                group         =>'meetings',
+#                label         =>'meetings - comments',
+#                dataobjattr   =>"$worktable.meetingcomments"),
+#                                                  
+#
+#      new kernel::Field::Boolean(
+#                name          =>'processcheckdone',
+#                group         =>'processcheck',
+#                label         =>'process check done',
+#                dataobjattr   =>"$worktable.processcheckdone"),
+#                                                  
+#      new kernel::Field::Date(
+#                name          =>'processcheckuntil',
+#                group         =>'processcheck',
+#                label         =>'process check finished at',
+#                dataobjattr   =>"$worktable.processcheckuntil"),
+#                                                  
+#      new kernel::Field::Textarea(
+#                name          =>'processcheckcomments',
+#                group         =>'processcheck',
+#                label         =>'process check - comments',
+#                dataobjattr   =>"$worktable.processcheckcomments"),
+#                                                  
+#
+#      new kernel::Field::Boolean(
+#                name          =>'checklistdone',
+#                group         =>'checklist',
+#                label         =>'checklists created',
+#                dataobjattr   =>"$worktable.checklistdone"),
+#                                                  
+#      new kernel::Field::Date(
+#                name          =>'checklistuntil',
+#                group         =>'checklist',
+#                label         =>'checklist createfinished at',
+#                dataobjattr   =>"$worktable.checklistuntil"),
+#                                                  
+#      new kernel::Field::Textarea(
+#                name          =>'checklistcomments',
+#                group         =>'checklist',
+#                label         =>'checklist - comments',
+#                dataobjattr   =>"$worktable.checklistcomments"),
+#
       new kernel::Field::Htmlarea(
                 name          =>'applicationexpertgroup',
                 readonly      =>1,
@@ -225,6 +234,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'w5bid',
                 sqlorder      =>'desc',
+                readonly      =>1,
                 label         =>'W5BaseID',
                 dataobjattr   =>"appl.id"),
    );
@@ -273,7 +283,8 @@ sub getSqlFrom
    my ($worktable,$workdb)=$self->getWorktable();
    my $from="";
 
-   $from.="appl left outer join $worktable on appl.id=$worktable.id";
+   $from.="appl left outer join $worktable on appl.id=$worktable.id ".
+          "left outer join mandator on appl.mandator=mandator.grpid";
 
    return($from);
 }
