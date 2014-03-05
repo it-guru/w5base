@@ -226,13 +226,13 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>"$worktable.modifydate"),
 
-      new kernel::Field::Interface(
+      new kernel::Field::Text(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
                 dataobjattr   =>"$worktable.modifydate"),
 
-      new kernel::Field::Interface(
+      new kernel::Field::Text(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
@@ -297,6 +297,7 @@ sub preProcessReadedRecord
       $o->BackendSessionName("preProcessReadedRecord");
       my ($id)=$o->ValidatedInsertRecord({id=>$rec->{parentid}});
       $rec->{id}=$id;
+      $rec->{replkeypri}=NowStamp("en"); # needed for replication!
    }
    return(undef);
 }
