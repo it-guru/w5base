@@ -297,7 +297,7 @@ sub preProcessReadedRecord
       $o->BackendSessionName("preProcessReadedRecord");
       my ($id)=$o->ValidatedInsertRecord({id=>$rec->{parentid}});
       $rec->{id}=$id;
-      $rec->{replkeypri}=NowStamp("en"); # needed for replication!
+      $rec->{replkeypri}="1970-01-01 00:00:00";
    }
    return(undef);
 }
