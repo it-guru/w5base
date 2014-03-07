@@ -466,8 +466,8 @@ sub getFirst
    my $p=$self->Self();
    my $msg=sprintf("time=%0.4fsec;mod=$p",$t);
    $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
-   msg(INFO,"LDAP Time of=%s attrs=%s base=\"%s\" ($msg)",
-            $ldapfilter,join(",",@attr),$base);
+   #msg(INFO,"LDAP Time of=%s attrs=%s base=\"%s\" ($msg)",
+   #         $ldapfilter,join(",",@attr),$base);
    if ($sth){
       if ($self->{_LimitStart}>0){
          for(my $c=0;$c<$self->{_LimitStart}-1;$c++){

@@ -88,8 +88,10 @@ sub Connect
       $self->{'db'}=DBI->connect($self->{dbconnect},
                                  $self->{dbuser},
                                  $self->{dbpass},{mysql_enable_utf8 => 0});
-      if ($self->{'db'}->{private_inW5Transaction}){
-         $self->{'db'}->{AutoCommit}=0;
+      if (defined($self->{'db'})){
+         if ($self->{'db'}->{private_inW5Transaction}){
+            $self->{'db'}->{AutoCommit}=0;
+         }
       }
    }
    else{
@@ -99,8 +101,10 @@ sub Connect
                          private_foo_cachekey=>$self.time().".".
                          $BackendSessionName});
          #msg(INFO,"use NOT cached datbase connection on ODBC");
-         if ($self->{'db'}->{private_inW5Transaction} ne ""){
-            $self->{'db'}->{AutoCommit}=0;
+         if (defined($self->{'db'})){
+            if ($self->{'db'}->{private_inW5Transaction} ne ""){
+               $self->{'db'}->{AutoCommit}=0;
+            }
          }
       }
       else{
@@ -111,14 +115,16 @@ sub Connect
                AutoCommit=>1,
                private_foo_cachekey=>$private_foo_cachekey
             });
-         if ($self->{'db'}->{private_inW5Transaction} ne ""){
-            $self->{'db'}->{AutoCommit}=0;
+         if (defined($self->{'db'})){
+            if ($self->{'db'}->{private_inW5Transaction} ne ""){
+               $self->{'db'}->{AutoCommit}=0;
+            }
          }
       }
    }
    $self->{parentlabel}=$self->getParent->Self()."-".$dbname;
 
-   if (!$self->{'db'}){
+   if (!defined($self->{'db'})){
       if ($self->{dbconnect}=~m/oracle/i){
          if ($ENV{ORACLE_HOME} ne ""){
             msg(ERROR,"env ORACLE_HOME='$ENV{ORACLE_HOME}'");
@@ -155,6 +161,7 @@ sub Connect
          #msg(INFO,"schema on $dbname set: $schemacmd; for $parent");
       }
    }
+   return(undef) if (!defined($self->{'db'}));
    #
    #  setting the DBI parameters for the created
    #  child session
@@ -364,6 +371,9 @@ sub quotemeta
    my $self=shift;
    my $str=shift;
    utf8::downgrade($str,1);
+   #Stacktrace() if (ref($self->{db}) ne "CODE");
+   print STDERR Dumper($self->{db}) if (ref($self->{db}) eq "HASH");
+   Stacktrace() if (ref($self->{db}) eq "HASH");
    return($self->{db}->quote($str));
 }
 
