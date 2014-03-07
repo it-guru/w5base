@@ -133,25 +133,28 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,\@qmsg,
                              \@dataissue,\$errorlevel,
                              mode=>'native');
-         if ($parrec->{sememail} ne ""){
-            my $semid=$tswiw->GetW5BaseUserID($parrec->{sememail});
-            if (defined($semid)){
-               $self->IfaceCompare($dataobj,
-                                   $rec,"semid",
-                                   {semid=>$semid},"semid",
-                                   $forcedupd,$wfrequest,\@qmsg,
-                                   \@dataissue,\$errorlevel,
-                                   mode=>'native');
-            }
-            else{
-               $tswiw->Log(ERROR,"basedata",
-                         "CBM '$parrec->{sememail}' ".
-                         "for application '".$rec->{name}."' ".
-                         "can not be located in W5Base and WhoIsWho ".
-                         "while import(qrule) of application ".
-                         "from AssetManager\n-");
+         if (!$rec->{haveitsem}){
+            if ($parrec->{sememail} ne ""){
+               my $semid=$tswiw->GetW5BaseUserID($parrec->{sememail});
+               if (defined($semid)){
+                  $self->IfaceCompare($dataobj,
+                                      $rec,"semid",
+                                      {semid=>$semid},"semid",
+                                      $forcedupd,$wfrequest,\@qmsg,
+                                      \@dataissue,\$errorlevel,
+                                      mode=>'native');
+               }
+               else{
+                  $tswiw->Log(ERROR,"basedata",
+                            "CBM '$parrec->{sememail}' ".
+                            "for application '".$rec->{name}."' ".
+                            "can not be located in W5Base and WhoIsWho ".
+                            "while import(qrule) of application ".
+                            "from AssetManager\n-");
+               }
             }
          }
+
          if ($parrec->{tsmemail} ne ""){
             my $tsmid=$tswiw->GetW5BaseUserID($parrec->{tsmemail});
             if (defined($tsmid)){
@@ -328,7 +331,7 @@ sub qcheckRecord
 
 
    if (keys(%$forcedupd)>0){
-      msg(INFO,sprintf("forceupd=%s\n",Dumper($forcedupd)));
+      #msg(INFO,sprintf("forceupd=%s\n",Dumper($forcedupd)));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
          push(@qmsg,"all desired fields has been updated: ".
                     join(", ",keys(%$forcedupd)));
