@@ -138,7 +138,6 @@ sub qcheckRecord
       $errorlevel=3 if ($errorlevel<3);
    }
 
-
    return($self->HandleWfRequest($dataobj,$rec,
                                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
 }
