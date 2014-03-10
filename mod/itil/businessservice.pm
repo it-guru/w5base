@@ -66,7 +66,9 @@ sub new
                    return(0);
                 },
                 label         =>'Business-Service Fullname',
-                dataobjattr   =>"concat(if (applname is null,'',".
+                dataobjattr   =>"concat(".
+                                "if (nature='','',concat(nature,':')),".
+                                "if (applname is null,'',".
                                 "concat(applname,':')),".
                                 "if ($worktable.name is null,'[ENTIRE]',".
                                 "$worktable.name))"),
@@ -77,6 +79,14 @@ sub new
                 searchable    =>0,
                 label         =>'Name',
                 dataobjattr   =>"$worktable.name"),
+
+      new kernel::Field::Select(
+                name          =>'nature',
+                sqlorder      =>'desc',
+                label         =>'Nature',
+                transprefix   =>'nat.',
+                value         =>['','ITS','ENS','TSA'],
+                dataobjattr   =>"$worktable.nature"),
 
       new kernel::Field::Link(
                 name          =>'parentid',

@@ -31,13 +31,15 @@ sub new
    my $dst           =[
                        'itil::systemmonipoint' =>'fullname',
                        'itil::system' =>'name',
-                       'itil::appl'=>'name'
+                       'itil::appl'=>'name',
+                       'itil::businessservice'=>'fullname'
                       ];
 
    my $vjoineditbase =[
                        {'systemcistatusid'=>'<5'},
                        {'cistatusid'=>"<5"},
-                       {'cistatusid'=>"<5"}
+                       {'cistatusid'=>"<5"},
+                       {}
                       ];
 
    $self->AddFields(
