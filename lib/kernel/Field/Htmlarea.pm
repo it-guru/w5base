@@ -71,8 +71,9 @@ tinyMCE.init({
      	mode : "exact",
         elements : "Formated_$name",
         theme : "modern",
-        plugins: "link code nonbreaking image textcolor contextmenu lists",
+        plugins: "autoresize link code nonbreaking image textcolor contextmenu lists",
         nonbreaking_force_tab: true,
+        autoresize_max_height: 500,
         target_list: [
             {title: 'New page', value: '_blank'}
         ],
