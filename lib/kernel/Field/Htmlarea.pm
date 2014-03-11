@@ -62,7 +62,7 @@ sub FormatedDetail
      # $d.="</td></tr></table>";
       $d=<<EOF.$d;
 <script language=JavaScript 
-        src="../../../static/tinymce/jscripts/tiny_mce/tiny_mce.js">
+        src="../../../static/tinymce/jscripts/tiny_mce/tinymce.min.js">
 </script>
 <script language=JavaScript>
 function initTinyMCE_$name()
@@ -70,26 +70,20 @@ function initTinyMCE_$name()
 tinyMCE.init({
 	mode : "exact",
         elements : "Formated_$name",
-        theme : "advanced",
+        theme : "modern",
+        plugins: "link code nonbreaking image textcolor contextmenu lists",
+        nonbreaking_force_tab: true,
+        target_list: [
+            {title: 'New page', value: '_blank'}
+        ],
+        menubar : false,
         theme_advanced_layout_manager : "SimpleLayout",
-        plugins: "clearbr",
-        theme_advanced_buttons1 : "separator,"+
-                                  "bold,italic,underline,strikethrough,"+
-                                  "forecolor,backcolor,"+
-                                  "separator,link,unlink,"+
-                                  "separator,hr,sub,sup,separator,"+
-                                  "indent,outdent,separator,bullist,numlist,"+
-                                  "separator",
-        theme_advanced_buttons2 : "separator,justifyleft,justifycenter,"+
-                                  "justifyright,"+
-                                  "justifyfull,formatselect,fontsizeselect,"+
-                                  "removeformat,cleanup,"+
-                                  "separator,image,separator,"+
-                                  "code,clearbr,separator",
-        theme_advanced_buttons3 : "",
+        toolbar : "undo redo | styleselect forecolor backcolor | "+
+                  "bold italic underline bulllist | "+
+                  "link image hr anchor insertdatetime | nonbreaking code",
+        contextmenu: "link image bold italic",
         language : "$lang",
-        theme_advanced_toolbar_align : "center",
-        theme_advanced_toolbar_location : "top",
+        statusbar : false,
         strict_loading_mode : true,
         auto_reset_designmode : true,
         theme_advanced_blockformats : "p,h1,h2,h3,pre,xmp",
