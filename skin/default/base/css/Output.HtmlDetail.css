@@ -161,9 +161,13 @@ div.issuestate{
    height:40px;
 }
 
-div.mceExternalToolbar{
-   right:15px;
+
+div.mce-toolbar div.mce-container-body {
+    text-align: center;
 }
+
+.defaultSkin span.mceIcon, .defaultSkin img.mceIcon {display:block; width:18px; height:18px}
+.defaultSkin .mceButton {display:block; border:1px solid #F0F0EE; width: 18px; height:18px; margin-right:1px}
 
 
 div.multilinehtml{

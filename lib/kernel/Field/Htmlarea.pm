@@ -77,6 +77,7 @@ tinyMCE.init({
             {title: 'New page', value: '_blank'}
         ],
         menubar : false,
+        skin: "light",
         theme_advanced_layout_manager : "SimpleLayout",
         toolbar : "undo redo | styleselect forecolor backcolor | "+
                   "bold italic underline bulllist | "+
