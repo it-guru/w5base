@@ -79,16 +79,15 @@ tinyMCE.init({
         menubar : false,
         mode : "textareas",
         skin: "light",
-        theme_advanced_layout_manager : "SimpleLayout",
         toolbar : "undo redo | styleselect forecolor backcolor | "+
                   "bold italic underline bulllist | "+
                   "link image hr anchor insertdatetime | nonbreaking code",
         contextmenu: "link image bold italic",
         language : "$lang",
         statusbar : false,
-        strict_loading_mode : true,
-        auto_reset_designmode : true,
-        theme_advanced_blockformats : "p,h1,h2,h3,pre,xmp",
+       // strict_loading_mode : true,
+       // auto_reset_designmode : true,
+       // theme_advanced_blockformats : "p,h1,h2,h3,pre,xmp",
         content_css : "../../../public/base/load/default.css,"+
                       "../../../public/base/load/work.css"
 });
