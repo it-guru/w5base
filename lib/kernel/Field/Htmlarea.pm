@@ -57,7 +57,7 @@ sub FormatedDetail
      # $d.="<table border=0 style=\"width:100%;table-layout:fixed;".
      #     "padding:0;border-width:0;margin:0\">".
      #     "<tr><td></div>";
-      $d.="<textarea id=Formated_$name name=Formated_$name class=multilinehtml></textarea>";
+      $d.="<table border=0 style=\"width:100%;table-layout:fixed;padding:0;border-width:0;margin:0\"><tr><td><textarea id=Formated_$name name=Formated_$name class=multilinehtml></textarea></td></tr></table>";
       $d.="<textarea id=Data_$name style=\"visible:hidden;display:none\">$orgd</textarea>";
      # $d.="</td></tr></table>";
       $d=<<EOF.$d;
@@ -68,7 +68,7 @@ sub FormatedDetail
 function initTinyMCE_$name()
 {
 tinyMCE.init({
-	mode : "exact",
+     	mode : "exact",
         elements : "Formated_$name",
         theme : "modern",
         plugins: "autoresize link code nonbreaking image textcolor contextmenu lists",
@@ -77,9 +77,8 @@ tinyMCE.init({
             {title: 'New page', value: '_blank'}
         ],
         menubar : false,
-        mode : "textareas",
         skin: "light",
-        toolbar : "undo redo | styleselect forecolor backcolor | "+
+        toolbar : "undo | styleselect forecolor backcolor | "+
                   "bold italic underline bulllist | "+
                   "link image hr anchor insertdatetime | nonbreaking code",
         contextmenu: "link image bold italic",
