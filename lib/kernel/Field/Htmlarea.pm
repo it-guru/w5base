@@ -71,12 +71,13 @@ tinyMCE.init({
 	mode : "exact",
         elements : "Formated_$name",
         theme : "modern",
-        plugins: "link code nonbreaking image textcolor contextmenu lists",
+        plugins: "autoresize link code nonbreaking image textcolor contextmenu lists",
         nonbreaking_force_tab: true,
         target_list: [
             {title: 'New page', value: '_blank'}
         ],
         menubar : false,
+        mode : "textareas",
         skin: "light",
         theme_advanced_layout_manager : "SimpleLayout",
         toolbar : "undo redo | styleselect forecolor backcolor | "+
