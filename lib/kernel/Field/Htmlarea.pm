@@ -78,6 +78,7 @@ tinyMCE.init({
         ],
         menubar : false,
         skin: "light",
+        height: "300",
         toolbar : "undo | styleselect forecolor backcolor | "+
                   "bold italic underline bulllist | "+
                   "link image hr anchor insertdatetime | nonbreaking code",
