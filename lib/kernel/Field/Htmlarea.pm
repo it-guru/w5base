@@ -71,14 +71,13 @@ tinyMCE.init({
      	mode : "exact",
         elements : "Formated_$name",
         theme : "modern",
-        plugins: "autoresize link code nonbreaking image textcolor contextmenu lists",
+        plugins: "link code nonbreaking image textcolor contextmenu lists",
         nonbreaking_force_tab: true,
         target_list: [
             {title: 'New page', value: '_blank'}
         ],
         menubar : false,
         skin: "light",
-        height: "300",
         toolbar : "undo | styleselect forecolor backcolor | "+
                   "bold italic underline bulllist | "+
                   "link image hr anchor insertdatetime | nonbreaking code",
