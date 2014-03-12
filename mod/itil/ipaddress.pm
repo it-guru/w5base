@@ -93,6 +93,7 @@ sub new
                 name          =>'is_primary',
                 label         =>'is primary',
                 htmldetail    =>1,
+                searchable    =>0,
                 group         =>'further',
                 dataobjattr   =>'ipaddress.is_primary'),
                                                   
@@ -100,6 +101,7 @@ sub new
                 name          =>'is_notdeleted',
                 label         =>'is notdeleted',
                 htmldetail    =>1,
+                searchable    =>0,
                 group         =>'further',
                 dataobjattr   =>'ipaddress.is_notdeleted'),
                                                   
