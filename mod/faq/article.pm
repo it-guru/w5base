@@ -394,6 +394,7 @@ sub Validate
                        h4=>{},
                        h5=>{},
                        pre=>{},
+                       code=>{},
                        em=>{},
                        img=>{src=>['any'=>[]],border=>['any'=>[]],
                              align=>['any'=>[]],
