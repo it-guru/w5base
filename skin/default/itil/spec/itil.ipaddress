@@ -1,0 +1,21 @@
+'type'=>{de=>'
+Der Typ gibt Auskunft über die Verwendung
+der IP-Adresse. Der Typ "primär" ist 
+einzutragen, wenn der Hauptanteil der
+Kommunikation über diese IP erfolgen
+soll (UserLAN). Bei Cluster-Packeten
+ist die Hauptadresse eines Packages
+aps "primär" zu kennzeichnen (auch wenn
+diese dann als sekundär-Adresse auf
+einem logischen Interface eines 
+Systems "erscheint").
+',en=>'
+The Typ of an IP informs about the
+usage of the ip. The primary ip is
+the ip, thru the most of the traffic
+is transfered.
+In cluster packages the main
+clusterpackage adress has to be 
+marked as primary.
+'},
+

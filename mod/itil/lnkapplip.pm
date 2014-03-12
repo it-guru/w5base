@@ -101,6 +101,15 @@ sub getSqlFrom
    select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
       from lnkitclustsvcappl,ipaddress 
       where lnkitclustsvcappl.itclustsvc=ipaddress.lnkitclustsvc
+   union
+   select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
+      from lnkitclustsvcappl,lnkitclustsvc,itclust,system,ipaddress 
+      where lnkitclustsvcappl.itclustsvc=lnkitclustsvc.id and
+            lnkitclustsvc.itclust=itclust.id and 
+            system.clusterid=itclust.id and
+            ipaddress.system=system.id and
+            system.cistatus<=4 and
+            itclust.cistatus<=4 
 ) as ai,appl,ipaddress 
 
 EOF

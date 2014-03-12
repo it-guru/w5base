@@ -15,6 +15,7 @@
 'Interface name'=>{de=>'Interface-Bezeichnung'},
 'Network'=>{de=>'Netzwerk (Routingarea)',en=>'Network (Routingarea)'},
 'Short Comments'=>{de=>'Kurzbemerkungen'},
+'classification'=>{de=>'Klassifizierung'},
 'iptyp.0'=>{de=>'primär',en=>'primary'},
 'iptyp.1'=>{de=>'sekundär',en=>'secondary'},
 'iptyp.2'=>{de=>'Cluster-Paket',en=>'Cluster-Package'},

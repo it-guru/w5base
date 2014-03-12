@@ -228,6 +228,7 @@ sub new
                    my $self=shift;
                    my $mode=shift;
                    my %param=@_;
+                   return(1) if (!exists($param{current}));
                    my $current=$param{current};
 
                    return(0) if ($current->{systemid} eq "");
@@ -237,6 +238,32 @@ sub new
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
                 vjoinon       =>['furthersystemid'=>'systemid'],
                 vjoindisp     =>['tsmemail']),
+
+      new kernel::Field::Text(
+                name          =>'class',
+                label         =>'classification',
+                group         =>'further',
+                readonly      =>1,
+                htmldetail    =>0,
+                dataobjattr   =>'(select '.
+                   'concat_ws(",",'.
+                   'if (system.is_applserver=1,"\'APPL\'",NULL),'.
+                   'if (system.id is null and lnkitclustsvc is not null,'.
+                       '"\'CLUSTERPACKAGE\'",NULL),'.
+                   'if (system.is_webserver=1,"\'WEBSRV\'",NULL), '.
+                   'if (system.is_mailserver=1,"\'MAILSRV\'",NULL), '.
+                   'if (system.is_router=1,"\'ROUTER\'",NULL), '.
+                   'if (system.is_netswitch=1,"\'NETSWITCH\'",NULL), '.
+                   'if (system.is_nas=1,"\'NAS\'",NULL), '.
+                   'if (system.is_terminalsrv=1,"\'TS\'",NULL), '.
+                   'if (system.is_loadbalacer=1,"\'LOADBALANCER\'",NULL), '.
+                   'if (system.is_clusternode=1,"\'CLUSTERNODE\'",NULL), '.
+                   'if (system.is_databasesrv=1,"\'DB\'",NULL)) '.
+                   ' from ipaddress as ip '.
+                   'left outer join system on system.id=ip.system '.
+                   'left outer join lnkitclustsvc on '.
+                         'lnkitclustsvc.id=ip.lnkitclustsvc '.
+                   'where ip.id=ipaddress.id limit 1)'),
 
       new kernel::Field::Text(
                 name          =>'tsm2email',
