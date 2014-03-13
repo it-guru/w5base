@@ -8,6 +8,7 @@
 'Quality Check last date'=>{de=>'Zeitpunkt der letzten Qualitätsprüfung'    },
 'Comments'               =>{de=>'Bemerkungen'                               },
 'User-Account'           =>{de=>'Benutzerkennung'                           },
+'Datacare Assistent'     =>{de=>'Datenpflege-Assistent'                     },
 'cancel'                 =>{de=>'abbrechen'                                 },
 'yes'                    =>{de=>'ja'                                        },
 'no'                     =>{de=>'nein'                                      },

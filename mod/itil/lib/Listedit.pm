@@ -220,35 +220,63 @@ sub preQualityCheckRecord
          $add->SetFilter({$rk=>\$rec->{id},engine=>\$engine->{name}});
          my ($oldadrec)=$add->getOnlyFirst(qw(ALL));
          my $ado=$self->getPersistentModuleObject($engine->{addataobj});
-         if (defined($ado)){
-            my $adfield=$add->getField("data");
-            $ado->SetFilter({$engine->{adkey}=>\$rec->{$engine->{localkey}}});
-            my ($adrec)=$ado->getOnlyFirst(qw(ALL));
-            if (defined($adrec)){
-               if ($ado->Ping()){
-                  $adrec->{xmlstate}="OK";
-                  my $adxml=hash2xml({xmlroot=>$adrec});
-                  if (!defined($oldadrec)){
-                     $add->ValidatedInsertRecord({engine=>$engine->{name},
-                                                  $rk=>$rec->{id},
-                                                  data=>$adxml});
+         if (!exists($rec->{$engine->{localkey}})){
+            # autodisc key data does not exists in local object
+            msg(ERROR,"preQualityCheckRecord failed for $p ".
+                      "local key $engine->{localkey} does not exists");
+            next;
+         }
+         if (defined($ado)){  # check if autodisc object name is OK
+            my $adokey=$ado->getField($engine->{adkey});
+            if (defined($adokey)){ # check if autodisc key is OK
+               my $adfield=$add->getField("data");
+               $ado->SetFilter({
+                  $engine->{adkey}=>\$rec->{$engine->{localkey}}
+               });
+               my ($adrec)=$ado->getOnlyFirst(qw(ALL));
+               if (defined($adrec)){
+                  if ($ado->Ping()){
+                     $adrec->{xmlstate}="OK";
+                     my $adxml=hash2xml({xmlroot=>$adrec});
+                     if (!defined($oldadrec)){
+                        $add->ValidatedInsertRecord({engine=>$engine->{name},
+                                                     $rk=>$rec->{id},
+                                                     data=>$adxml});
+                     }
+                     else{
+                        my $upd={data=>$adxml};
+                        my $chk=$adfield->RawValue($oldadrec);
+                        if (trim($upd->{data}) eq trim($chk)){  # wird verm.
+                           delete($upd->{data});    # sein, da XML im Aufbau
+                           $upd->{mdate}=$oldadrec->{mdate}; # dynamisch ist
+                        }
+                        $add->ValidatedUpdateRecord($oldadrec,$upd,{
+                           engine=>\$engine->{name},
+                           $rk=>\$rec->{id}
+                        });
+                     }
+                     $AutoDiscovery{$engine->{name}}={
+                        data=>$adfield->RawValue({data=>$adxml})
+                     };
                   }
-                  else{
-                     $add->ValidatedUpdateRecord($oldadrec,
-                                                 {data=>$adxml},
-                                                 {engine=>\$engine->{name},
-                                                  $rk=>\$rec->{id}});
-                  }
-                  $AutoDiscovery{$engine}={
-                     data=>$adfield->RawValue({data=>$adxml})
+               }
+               if (defined($oldadrec) && 
+                   !exists($AutoDiscovery{$engine->{name}})){
+                  $AutoDiscovery{$engine->{name}}={
+                     data=>$adfield->RawValue($oldadrec)
                   };
                }
             }
-            if (defined($oldadrec) && !exists($AutoDiscovery{$engine})){
-               $AutoDiscovery{$engine}={
-                  data=>$adfield->RawValue($oldadrec)
-               };
+            else{
+               msg(ERROR,"preQualityCheckRecord failed for $p ".
+                         "while access AutoDisc($engine->{name}) key ".
+                          $engine->{adkey});
             }
+         }
+         else{
+            msg(ERROR,"preQualityCheckRecord failed for $p ".
+                      "while load AutoDisc($engine->{name}) object ".
+                       $engine->{addataobj});
          }
       }
    }

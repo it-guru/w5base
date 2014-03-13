@@ -271,6 +271,7 @@ sub ProcessLine
             }
             $fclick=undef if ($field->can("getSubListData"));
             $fclick=undef if ($field->Type() eq "IssueState");
+            $fclick=undef if ($field->Type() eq "DatacareAssistent");
            
             if ($self->{SubListEdit}==1){
                $fclick="SubListEdit('$id')";

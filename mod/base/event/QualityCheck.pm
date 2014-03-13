@@ -102,6 +102,7 @@ sub doQualityCheck
       checkProcess=>undef,
       firstid=>undef,
       idname=>undef,
+      SelfAsParentObject=>$dataobj->SelfAsParentObject(),
       directlnktype=>[$dataobj->Self,$dataobj->SelfAsParentObject()],
    };
    my @view=("qcok");
@@ -194,6 +195,9 @@ sub doQualityCheck
             $stateparam->{lasttime}=NowStamp("en");
             ($rec,$msg)=$dataobj->getNext();
          }until(!defined($rec) ||  $c>=$loopmax);
+
+         # store loop state
+
       }
       if (!defined($rec)){
          msg(DEBUG,"rec not defined - end of loop check");
@@ -210,7 +214,19 @@ sub loadQualityCheckContext
    my $self=shift;
    my $stateparam=shift;
 
-
+   my $joblog=$self->getPersistentModuleObject("base::joblog");
+   $joblog->SetFilter({exitmsg=>'IDPOINT:*',
+                       event=>[$self->Self],
+                       name=>[$stateparam->{'SelfAsParentObject'}],
+                       mdate=>'>now-7d'});
+   my @l=$joblog->getHashList(qw(mdate exitmsg));
+   if ($#l>-1){
+      my ($lastid)=$l[0]->{exitmsg}=~m/^IDPOINT:(.*)$/;
+      if ($lastid ne ""){
+         $stateparam->{lastid}=$lastid;
+         $stateparam->{lasttime}=$l[0]->{mdate};
+      }
+   }
 }
 
 sub storeQualityCheckContextWithWorkflowCleanup
@@ -241,6 +257,25 @@ sub storeQualityCheckContextWithWorkflowCleanup
                                      fwdtarget=>undef});
                    });
    ########################################################################
+   my $joblog=$self->getPersistentModuleObject("base::joblog");
+   if (defined($stateparam->{joblogentry})){
+      $joblog->ValidatedUpdateRecord({},{
+         exitmsg=>'IDPOINT:'.$lastid
+      },{id=>[$stateparam->{joblogentry}]});
+   }
+   else{
+      my $id=$joblog->ValidatedInsertRecord({
+         event=>$self->Self,
+         name=>$stateparam->{'SelfAsParentObject'},
+         exitcode=>0,
+         pid=>$$,
+         exitstate=>'ok',
+         exitmsg=>'IDPOINT:'.$lastid
+      });
+      if (defined($id)){
+         $stateparam->{joblogentry}=$id;
+      }
+   }
 }
 
 

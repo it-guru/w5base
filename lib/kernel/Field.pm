@@ -80,6 +80,7 @@ use kernel::Field::Fulltext;
 use kernel::Field::Interview;
 use kernel::Field::InterviewState;
 use kernel::Field::WorkflowLink;
+use kernel::Field::DatacareAssistent;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal);
 
