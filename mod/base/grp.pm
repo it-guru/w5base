@@ -392,8 +392,27 @@ sub getValidWebFunctions
    my $self=shift;
 
    return($self->SUPER::getValidWebFunctions(@_),"TeamView","TreeCreate",
-         "RightsOverview","RightsOverviewLoader");
+         "RightsOverview","RightsOverviewLoader","view");
 }
+
+sub view
+{
+   my ($self)=@_;
+   my $idfield=$self->IdField();
+   my $idname=$idfield->Name();
+   my $val="undefined";
+   if (defined(Query->Param("FunctionPath"))){
+      $val=Query->Param("FunctionPath");
+   }
+   $val=~s/^\///;
+   $val="UNDEF" if ($val eq "");
+   $self->HtmlGoto("../Detail",post=>{
+      $idname=>$val,
+      ModeSelectCurrentMode=>'TView'
+   });
+   return();
+}
+
 
 sub SelfAsParentObject    # this method is needed because existing derevations
 {
@@ -467,7 +486,9 @@ sub getGrpDiv
    my $comm=$grec->{comments}; 
  
    $d.="<table width=\"100%\">".
-       "<tr><td width=\"1%\"><img class=groupicon src=\"$img\"></td>".
+       "<tr><td width=\"1%\">".
+       "<a onclick=\"return(false);\" href=\"view/$grec->{grpid}\">".
+       "<img class=groupicon src=\"$img\"></a></td>".
        "<td valign=top align=left><u>$desc</u><br>$comm</td></tr></table>";
 
    
@@ -493,7 +514,7 @@ sub getUserDiv
    $name.=$urec->{givenname};
    $name=$urec->{email} if ($name=~m/^\s*$/);
    
-   $d.=$name."</div>";
+   $d.="<p>".$name."</p></div>";
    return($d);
 }
 
@@ -540,9 +561,11 @@ sub TeamView   # erster Versuch der Teamview
       }
       my $group=$self->getGrpDiv($rec);
       my $cleardiv="<div style=\"clear:both\"></div>";
-      print "<div class=topframe>$rec->{fullname}$cleardiv</div>";
-      print "<div class=groupframe>$group$boss$cleardiv</div>";
-      print "<div class=userframe>$employee$cleardiv</div>";
+      print "<div class=topframe>".
+            "<a onclick=\"return(false);\" href=\"view/$rec->{grpid}\">".
+            "$rec->{fullname}</a><div>$cleardiv";
+      print "<div class=groupframe>$group$boss</div>$cleardiv";
+      print "<div class=userframe>$employee</div>$cleardiv";
    }
    print $self->HtmlBottom(body=>1,form=>1);
 }
