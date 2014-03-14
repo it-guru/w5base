@@ -100,7 +100,7 @@ addEvent(window, "load",initTinyMCE_$name);
 </script>
 EOF
    }
-   return($d);
+   return($self->SUPER::FormatedDetail($current,$FormatAs));
 }
 
 sub FormatedResult
@@ -115,7 +115,7 @@ sub FormatedResult
        !($FormatAs=~m/^Html.*$/)){
       $d=Html2Latin1($d);
    }
-   return($d);
+   return($self->SUPER::FormatedResult($current,$FormatAs));
 }
 
 
