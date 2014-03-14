@@ -45,6 +45,7 @@ sub FormatedDetail
          "style=\"width:100%;table-layout:fixed;padding:0;".
                  "border-width:0;margin:0\">".
          "<tr><td><div class=multilinehtml>$d</div></td></tr></table>";
+      return($d);
    }
    if ($FormatAs eq "edit" || $FormatAs eq "workflow"){
       my $fromquery=Query->Param("Formated_$name");
@@ -99,6 +100,7 @@ addEvent(window, "load",initTinyMCE_$name);
 
 </script>
 EOF
+      return($d);
    }
    return($self->SUPER::FormatedDetail($current,$FormatAs));
 }
