@@ -168,20 +168,6 @@ sub initSearchQuery
    }
 }
 
-sub getSqlFrom
-{
-   my $self=shift;
-   my ($worktable,$workdb)=$self->getWorktable();
-
-   my $from=$worktable;
-
-   my $driver=$workdb->DriverName();
-
-   return($from);
-}
-
-
-
 
 
 sub getDetailBlockPriority
