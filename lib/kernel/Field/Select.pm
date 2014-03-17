@@ -426,6 +426,15 @@ sub FormatedResult
       $res=~s/>/&gt;/g;
       $res=~s/\n/<br>\n/g;
    }
+   if ($FormatAs eq "SOAP"){
+      if (!ref($res)){
+         $res=quoteSOAP($res);
+      }
+      elsif (ref($d) eq "ARRAY"){
+         $res=[map({quoteSOAP($_)} @{$res})];
+      }
+   }
+
 
    return($res);
 }
