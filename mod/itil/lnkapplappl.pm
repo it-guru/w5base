@@ -77,6 +77,11 @@ sub new
                 htmleditwidth =>'350px',
                 dataobjattr   =>'lnkapplappl.contype'),
 
+      new kernel::Field::Interface(
+                name          =>'rawcontype',
+                label         =>'raw Interfacetype',
+                dataobjattr   =>'lnkapplappl.contype'),
+
       new kernel::Field::Select(
                 name          =>'conmode',
                 label         =>'Interfacemode',
