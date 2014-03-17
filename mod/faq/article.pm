@@ -753,7 +753,7 @@ sub FullView
          "record (f.e. in mail)")."\"><div id=WindowTitle>".
          $rec->{name}."</div></a></div>");
    my $fo=$self->getField("data",$rec);
-   my $d=$fo->FormatedResult($rec,"HtmlDetail");
+   my $d=$fo->FormatedResult($rec,"HtmlV01"); # get HTML Code without scrollbar
    $d=ExpandW5BaseDataLinks($self,"HtmlDetail",$d);
 
    print("<div class=fullview>".$d."</div>");
