@@ -178,6 +178,12 @@ sub Init
                       prio=>20000,
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itts.appl.acimport",
+                      "tsacinv::appl",
+                      func=>'ImportAppl',
+                      prio=>20000,
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("AL_TCom.itclust.acimport",
                       "tsacinv::itclust",
                       func=>'ImportCluster',

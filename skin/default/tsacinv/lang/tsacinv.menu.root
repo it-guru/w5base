@@ -30,6 +30,7 @@
 'ac.quality'=>{de=>'Qualitätsanalysen',en=>'Quality-Analysys'},
 'ac.quality.appl'=>{de=>'Anwendung',en=>'Application'},
 'itts.system.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
+'itts.appl.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
 'AL_TCom.system.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
 'AL_TCom.itclust.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
 'AL_TCom.appl.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
