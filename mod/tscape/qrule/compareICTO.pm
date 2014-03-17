@@ -141,7 +141,10 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
    my $checksession=shift;
-   my $autocorrect=$checksession->{autocorrect};
+   my $autocorrect=0;
+   if (ref($checksession) eq "HASH"){
+      $autocorrect=$checksession->{autocorrect};
+   }
 
    my $wfrequest={};
    my $forcedupd={};
