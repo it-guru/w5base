@@ -257,7 +257,7 @@ sub storeQualityCheckContextWithWorkflowCleanup
                                      fwdtarget=>undef});
                    });
    ########################################################################
-   my $joblog=$self->getPersistentModuleObject("base::joblog");
+   my $joblog=$self->getPersistentModuleObject("IdPointStore","base::joblog");
    if (defined($stateparam->{joblogentry})){
       $joblog->ValidatedUpdateRecord({},{
          exitmsg=>'IDPOINT:'.$lastid
