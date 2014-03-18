@@ -52,6 +52,12 @@ sub Init
                       func=>"ImportCostCenter",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itts.kern.costcenter.SAP_Import",
+                      "tssapp01::costcenter",
+                      prio=>1,
+                      func=>"ImportCostCenter",
+                      defaultacl=>['valid_user']);
+   
    return($self);
 }
 
