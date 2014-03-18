@@ -51,4 +51,4 @@ alter table lnkbprocessbusinessservice add FOREIGN KEY fk_bs (businessservice) R
 set FOREIGN_KEY_CHECKS=1;
 alter table businessservice add databoss  bigint(20);
 alter table businessservice add mandator  bigint(20);
-alter table businessservice add nature  char(3) default '';
+alter table businessservice add nature  char(3) default '', add unique fullname(nature,name);
