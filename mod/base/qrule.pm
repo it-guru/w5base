@@ -175,18 +175,17 @@ sub isQruleApplicable
    if (defined($self->{qrule}->{$lnkrec->{qruleid}})){
       my $qrule=$self->{qrule}->{$lnkrec->{qruleid}};
       my $postargets=$qrule->getPosibleTargets();
+      return() if (!defined($postargets)); 
       $postargets=[$postargets] if (ref($postargets) ne "ARRAY");
       my $found=0;
-      if (ref($postargets) eq "ARRAY"){
-         foreach my $target (@$postargets){
-            if (grep(/^$target$/,@objlist)){
-               my $qdataobj=quotemeta($lnkrec->{dataobj});
-               my $qdataobjparent=quotemeta($dataobjparent);
-               if (grep(/^$qdataobj$/,@objlist) ||
-                   grep(/^$dataobjparent$/,@objlist)){
-                  $found=1;
-                  last;
-               }
+      foreach my $target (@$postargets){
+         if (grep(/^$target$/,@objlist)){
+            my $qdataobj=quotemeta($lnkrec->{dataobj});
+            my $qdataobjparent=quotemeta($dataobjparent);
+            if (grep(/^$qdataobj$/,@objlist) ||
+                grep(/^$dataobjparent$/,@objlist)){
+               $found=1;
+               last;
             }
          }
       }
@@ -196,22 +195,134 @@ sub isQruleApplicable
       }
       return($qrule) if ($found);
    }
-   return;
+   return();
+}
+
+sub calcParentAndObjlist
+{
+   my $self=shift;
+   my $parent=shift;
+   my $objlist=shift;
+   my $mandator=shift;
+   my $rec=shift;
+   my $potentialRuleList=shift;
+   my $orgParentName=$parent->Self();
+
+   my $cache=$self->Cache();
+   my $cachekey=$parent->Self."-".join(",",@$mandator);
+   $cache->{QualityRuleCompat}={} if (!exists($cache->{QualityRuleCompat}));
+   $cache=$cache->{QualityRuleCompat};
+
+   my $parentTransformationCount=0;
+   if ($parent->Self() ne "base::workflow"){
+      if (!exists($cache->{$orgParentName})){
+         foreach my $lnkrec (@$potentialRuleList){
+            my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
+            if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
+               if ($parent->Self() ne $do->Self()){
+                  if ($parentTransformationCount==0){
+                     # rec muß neu gelesen werden!
+                     $do->ResetFilter();
+                     my $idobj=$do->IdField();
+                     if (defined($idobj)){
+                        my $idname=$do->IdField()->Name();
+                        $do->SetFilter({$idname=>\$rec->{$idname}});
+                        ($rec)=$do->getOnlyFirst(qw(ALL)); 
+                        if (!defined($rec)){
+                           msg(ERROR,"parent transformation error ".
+                                     "while reread rec");
+                           return;
+                        }
+                        $objlist=$do->getQualityCheckCompat($rec); 
+                        msg(INFO,"qrule parent transformation ".
+                                 "from %s to %s done",
+                                 $parent->Self(),$do->Self());
+                        $parent=$do;
+                     }
+                     else{
+                        msg(ERROR,"qrule.pm can not detect ".
+                                  "idfield in ".$do->Self());
+                     }
+                  }
+                  else{
+                     msg(ERROR,"mulitple parent transformation detected");
+                  }
+               }
+            }
+         }
+         $cache->{$orgParentName}={parent=>$parent->Self,objlist=>$objlist};
+      }
+      else{
+         $parent=getModuleObject($self->Config,
+                                 $cache->{$orgParentName}->{parent});
+         $objlist=$cache->{$orgParentName}->{objlist};
+      }
+   }
+   return($parent,$objlist);
+
+}
+
+
+sub calcFinalQruleList
+{
+   my $self=shift;
+   my $parent=shift;
+   my $objlist=shift;
+   my $rec=shift;
+   my $mandator=[];
+
+   my @qrulelist=();
+
+   #
+   # Berechnung der möglichen QualityRules anhand des Mandaten
+   #
+   $mandator=$rec->{mandatorid} if (exists($rec->{mandatorid}));
+   $mandator=[$mandator] if (ref($mandator) ne "ARRAY");
+   push(@$mandator,0);  # for rules on any mandator
+   @$mandator=sort(@$mandator);
+   $objlist=[$objlist] if (ref($objlist) ne "ARRAY");
+   my $lnkr=getModuleObject($self->Config,"base::lnkqrulemandator");
+   if ($self->getParent->Self() eq "base::workflow"){
+      $lnkr->SetFilter({mandatorid=>$mandator,dataobj=>\$rec->{class}});
+   }
+   else{
+      $lnkr->SetFilter({mandatorid=>$mandator});
+   }
+   #######################################################################
+
+   my @potentialRuleList=$lnkr->getHashList(qw(mdate qruleid dataobj));
+
+   #######################################################################
+   # Notwendige Parent-Transformation prüfen
+   # Hier kommt es wohlmöglich zu einer Änderung des zu verwendenden Parent,
+   # da der Mandant u.U. mit einer Ableitung des aktuellen Objektes laut
+   # QualityRule zu prüfen ist. Auch die objlist kann sich dabei verändern.
+   ($parent,$objlist)=$self->calcParentAndObjlist($parent,$objlist,
+                                                  $mandator,$rec,
+                                                  \@potentialRuleList);
+   my %qruledone;
+   foreach my $lnkrec (@potentialRuleList){
+      my $qrulename=$lnkrec->{qruleid};
+      next if ($qruledone{$qrulename}); # doppelte behandlung verhindern
+      my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
+      if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
+         $qruledone{$qrulename}++;
+         push(@qrulelist,$qrulename);
+      }
+   }
+   return($parent,$objlist,\@qrulelist);
 }
 
 
 
 
-sub nativQualityCheck
+sub nativDatacareAssistant
 {
    my $self=shift;
    my $objlist=shift;
    my $rec=shift;
    my @param=@_;
    my $parent=$self->getParent->Clone;
-   my $result;
-   my %alldataissuemsg;
-   my %dataupdate;
    my $mandator=[];
    my $checkStart=NowStamp("en");
 
@@ -228,10 +339,11 @@ sub nativQualityCheck
       $lnkr->SetFilter({mandatorid=>$mandator});
    }
    my %qruledone;
-
    my $parentTransformationCount=0;
-   $parent->preQualityCheckRecord($rec,@param);
 
+   #######################################################################
+   # from nativeQualityCheck
+   #######################################################################
    if ($parent->Self() ne "base::workflow"){
       foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
          my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
@@ -265,75 +377,117 @@ sub nativQualityCheck
          }
       }
    }
-
+   #######################################################################
 
    $param[0]->{autocorrect}=0 if (!exists($param[0]->{autocorrect}));;
+
    $param[0]->{ruleno}=0 if (!exists($param[0]->{ruleno}));;
    foreach my $lnkrec ($lnkr->getHashList(qw(mdate qruleid dataobj))){
       my $qrulename=$lnkrec->{qruleid};
       next if ($qruledone{$qrulename});
       my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
-      if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
+      my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec);
+      if (defined($qrule) && $qrule->can("datacareRecord")){
          $qruledone{$qrulename}++;
-         my $oldcontext=$W5V2::OperationContext;
-         $W5V2::OperationContext="QualityCheck";
-         my $acorrect=0;  # vorgesehen für auto correct modeA
          $param[0]->{ruleno}++;
-         my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,@param);
-         $W5V2::OperationContext=$oldcontext;
-         if (defined($control) && defined($control->{dataissue})){
-            my $dataissuemsg=$control->{dataissue};
-            $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
-            if ($#{$dataissuemsg}!=-1){
-               my $qrulename=$qrule->Self();
-               if (!defined($alldataissuemsg{$qrulename})){
-                  $alldataissuemsg{$qrulename}=[];
-               }
-               push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
+         my ($qresult,$control)=$qrule->datacareRecord($parent,$rec,@param);
+      }
+   }
+
+   printf STDERR ("fifi 02  %d\n",time());
+
+   return({fifi=>'xx'});
+}
+
+
+
+sub nativQualityCheck
+{
+   my $self=shift;
+   my $objlist=shift;
+   my $rec=shift;
+   my @param=@_;
+   my $parent=$self->getParent->Clone;
+   my $result;
+   my %alldataissuemsg;
+   my %dataupdate;
+   my $checkStart=NowStamp("en");
+
+   $param[0]->{autocorrect}=0 if (!exists($param[0]->{autocorrect}));;
+   $param[0]->{ruleno}=0 if (!exists($param[0]->{ruleno}));;
+
+
+
+   my ($parent,$objlist,$finalQruleList)=
+       $self->calcFinalQruleList($parent,$objlist,$rec);
+
+   #######################################################################
+   # Generelle Operationen im parent durchführen, die IMMER vor dem 
+   # QualityCheck durchgeführt werden müssen (z.B. laden von AutoDiscovery
+   # Daten)
+   $parent->preQualityCheckRecord($rec,@param);
+
+
+   foreach my $qrulename (@$finalQruleList){
+      my $qrule=$self->{qrule}->{$qrulename};
+      my $oldcontext=$W5V2::OperationContext;
+      $W5V2::OperationContext="QualityCheck";
+      my $acorrect=0;  # vorgesehen für auto correct modeA
+      $param[0]->{ruleno}++;
+      my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,@param);
+      $W5V2::OperationContext=$oldcontext;
+      if (defined($control) && defined($control->{dataissue})){
+         my $dataissuemsg=$control->{dataissue};
+         $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
+         if ($#{$dataissuemsg}!=-1){
+            my $qrulename=$qrule->Self();
+            if (!defined($alldataissuemsg{$qrulename})){
+               $alldataissuemsg{$qrulename}=[];
             }
+            push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
          }
-         if (defined($control) && defined($control->{dataupdate})){
-         }
-         my $resulttext="OK";
-         $resulttext="fail"      if ($qresult!=0);
-         $resulttext="messy"     if ($qresult==1);
-         $resulttext="warn"      if ($qresult==2);
-         $resulttext="undefined" if (!defined($qresult));
-         my $qrulelongname=$qrule->getName();
-         my $hints=$qrule->getHints();
-         my $havehints=$hints eq "" ? 0 : 1;
-         my $res={ 
-            rulelabel=>"$qrulelongname",
-            ruleid=>$qrule->Self,
-            havehints=>$havehints,
-            result=>$self->T($resulttext),
-            exitcode=>$qresult
-         };
-         if (defined($control->{qmsg})){
-            $res->{qmsg}=$control->{qmsg};
-            if (ref($res->{qmsg}) eq "ARRAY"){
-               for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
-                  if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s+(.*)$/){
-                     $res->{qmsg}->[$c]=$self->T($pr,
-                                                  $qrulename).": ".$po;
-                  }
-                  else{
-                     $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
-                                                  $qrulename);
-                  }
-               }
-            }
-            else{
-               if (my ($pr,$po)=$res->{qmsg}=~m/^(.*)\s*:\s+(.*)$/){
-                  $res->{qmsg}=$self->T($pr,$qrulename).": ".$po;
+      }
+      if (defined($control) && defined($control->{dataupdate})){
+      }
+      my $resulttext="OK";
+      $resulttext="fail"      if ($qresult!=0);
+      $resulttext="messy"     if ($qresult==1);
+      $resulttext="warn"      if ($qresult==2);
+      $resulttext="undefined" if (!defined($qresult));
+      my $qrulelongname=$qrule->getName();
+      my $hints=$qrule->getHints();
+      my $havehints=$hints eq "" ? 0 : 1;
+      my $res={ 
+         rulelabel=>"$qrulelongname",
+         ruleid=>$qrule->Self,
+         havehints=>$havehints,
+         result=>$self->T($resulttext),
+         exitcode=>$qresult
+      };
+      if (defined($control->{qmsg})){
+         $res->{qmsg}=$control->{qmsg};
+         if (ref($res->{qmsg}) eq "ARRAY"){
+            for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
+               if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s+(.*)$/){
+                  $res->{qmsg}->[$c]=$self->T($pr,
+                                               $qrulename).": ".$po;
                }
                else{
-                  $res->{qmsg}=$self->T($res->{qmsg},$qrulename);
+                  $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
+                                               $qrulename);
                }
             }
          }
-         push(@{$result->{rule}},$res);
+         else{
+            if (my ($pr,$po)=$res->{qmsg}=~m/^(.*)\s*:\s+(.*)$/){
+               $res->{qmsg}=$self->T($pr,$qrulename).": ".$po;
+            }
+            else{
+               $res->{qmsg}=$self->T($res->{qmsg},$qrulename);
+            }
+         }
       }
+      push(@{$result->{rule}},$res);
    }
    if ($parent->Self() ne "base::workflow"){ # only DataIssues for nonworkflows!
       my $wf=getModuleObject($parent->Config,"base::workflow");
