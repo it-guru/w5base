@@ -859,7 +859,7 @@ sub preProcessDBmsg
    my $self=shift;
    my $msg=shift;
 
-   if (my ($fld,$key)=$msg=~m/^Duplicate entry '(.+)' for key (\d+)\s*$/){
+   if (my ($fld,$key)=$msg=~m/^Duplicate entry '(.+)' for key (\S+)\s*$/){
       return(sprintf($self->T("Duplicate entry '%s'"),$fld));
    }
    
