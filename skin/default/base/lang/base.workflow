@@ -4,6 +4,7 @@
 'Tip'=>{de=>'Tipp'},
 'no Tip for'=>{de=>'Kein Tipp für'},
 'Adressbook'=>{de=>'Adressbuch'},
+'urgency index'=>{de=>'Dringlichkeitsindex'},
 'Adressbooks'=>{de=>'Adressbücher'},
 'Workflow nature'=>{de=>'Workflow Art'},
 'Workflow-Class'=>{de=>'Workflow Klasse'},

@@ -99,6 +99,18 @@ sub new
                 label         =>'PrioID',
                 dataobjattr   =>'wfhead.prio'),
                                    
+      new kernel::Field::Number(
+                name          =>'urcencyindex',
+                htmldetail    =>0,
+                label         =>'urgency index',
+                htmlwidth     =>'10px',
+                unit          =>'1-1000 calculated',
+                sqlorder      =>'desc',
+                dataobjattr   =>'1001-if ('.
+                '(datediff(curdate(),wfhead.eventstart)/30)*(10*wfhead.prio)'.
+                '>1000,1000,'.
+                '(datediff(curdate(),wfhead.eventstart)/30)*(10*wfhead.prio))'),
+                                   
       new base::workflow::Field::state(
                 name          =>'state',
                 htmldetail    =>0,

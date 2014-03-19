@@ -93,6 +93,46 @@ sub getPosibleWorkflowDerivations
    return(@l);
 }
 
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orgrec=shift;
+
+   if (effChanged($oldrec,$newrec,"implementationeffort")){
+      my $v=$newrec->{implementationeffort};
+      $v=1   if ($v eq "<2");
+      $v=7   if ($v eq "<8");
+      $v=19  if ($v eq "<20");
+      if (my ($max)=$v=~m/^\d+-(\d+)$/){
+         $v=$max;
+      }
+      if (my ($num)=$v=~m/^\D+(\d+).*$/){
+         $v=$num;
+      }
+      if ($v<2){
+         $newrec->{devreqdetailstateffortclass}="A (<2h)";
+      }
+      elsif($v<8){
+         $newrec->{devreqdetailstateffortclass}="B (<8h)";
+      }
+      elsif($v<20){
+         $newrec->{devreqdetailstateffortclass}="C (<20h)";
+      }
+      else{
+         $newrec->{devreqdetailstateffortclass}="D (>20h)";
+      }
+   }
+   return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
+}
+
+
+
+
+
+
 sub getDynamicFields
 {
    my $self=shift;
