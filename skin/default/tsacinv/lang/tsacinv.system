@@ -25,6 +25,7 @@
 'second name'=>{de=>'zweiter/alternativer Systemname'},
 'System Memory'=>{de=>'Arbeitsspeicher'},
 'System OS'=>{de=>'Betriebssystem'},
+'System OS patchlevel'=>{de=>'Betriebssystem Patchlevel'},
 'Usage'=>{de=>'Verwendung'},
 'Type'=>{de=>'Systemart'},
 'is TBSM ordered'=>{de=>'TBSM (Business Service Monitoring) wurde beauftragt'},

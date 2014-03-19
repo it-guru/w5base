@@ -306,6 +306,20 @@ sub new
                 label         =>'System OS',
                 dataobjattr   =>'trim(amcomputer.operatingsystem)'),
 
+      new kernel::Field::Text(
+                name          =>'systemospatchlevel',
+                label         =>'System OS patchlevel',
+                htmldetail    =>0,
+                dataobjattr   =>"trim(amcomputer.osbuildnumber)||".
+                                "decode(amcomputer.osbuildnumber,'',".
+                                "'',decode(amcomputer.osbuildversion,'','','/'))||".
+                                'trim(amcomputer.osbuildversion)'),
+
+      new kernel::Field::Text(
+                name          =>'systemos',
+                label         =>'System OS',
+                dataobjattr   =>'trim(amcomputer.operatingsystem)'),
+
       new kernel::Field::Float(
                 name          =>'partofasset',
                 label         =>'System Part of Asset',
@@ -661,6 +675,11 @@ sub new
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'amportfolio.externalid'),
+
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
  
       new kernel::Field::Interface(
                 name          =>'replkeypri',
@@ -987,7 +1006,7 @@ sub Import
          $self->LastMsg(ERROR,"SystemID has no Assignment Group");
          return(undef);
       }
-      printf STDERR Dumper($sysrec);
+      #printf STDERR Dumper($sysrec);
       # check 2: Assingment Group active
       my $acgroup=getModuleObject($self->Config,"tsacinv::group");
       $acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
