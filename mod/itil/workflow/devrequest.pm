@@ -66,38 +66,29 @@ sub getPosibleWorkflowDerivations
    my $actions=shift;
    my @l;
 
+   if ($WfRec->{stateid}<16){
+      push(@l,
+         {label=>$self->T('Initiate quotation request to developer'),
+          actor=>sub{
+             my $self=shift;
+             my $WfRec=shift;
 
-   push(@l,
-     # {label=>'Beisp an Entwickler starten',
-     #  actor=>sub{
-     #     my $self=shift;
-     #     my $WfRec=shift;
-#
-#          print $self->HttpHeader("text/plain");
-#          print("OK self handelt");
-#          return(1);
-#       },
-#       name=>'sami'
-#      },
-      {label=>$self->T('Initiate quotation request to developer'),
-       actor=>sub{
-          my $self=shift;
-          my $WfRec=shift;
-
-          return({
-             targeturl=>'New',
-             targetparam=>{
-               Formated_name=>$WfRec->{name},
-               Formated_quotationdetaildescription=>$WfRec->{detaildescription},
-               Formated_reqnature=>'RAppl.developer',
-               Formated_affectedapplication=>$WfRec->{affectedapplication},
-               WorkflowClass=>'itil::workflow::quotation'
-             }
-          });
-       },
-       name=>'invoicerequest'
-      }
-      );
+             return({
+                targeturl=>'New',
+                targetparam=>{
+                  Formated_name=>$WfRec->{name},
+                  Formated_quotationdetaildescription=>
+                                 $WfRec->{detaildescription},
+                  Formated_reqnature=>'RAppl.developer',
+                  Formated_affectedapplication=>$WfRec->{affectedapplication},
+                  WorkflowClass=>'itil::workflow::quotation'
+                }
+             });
+          },
+          name=>'invoicerequest'
+         }
+         );
+   }
 
    return(@l);
 }
