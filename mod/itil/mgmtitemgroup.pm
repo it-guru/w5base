@@ -196,7 +196,14 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>'mgmtitemgroup.realeditor'),
-   
+
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'mgmtitemgroup.lastqcheck'),
+      new kernel::Field::QualityResponseArea()
 
    );
    $self->{history}=[qw(insert modify delete)];

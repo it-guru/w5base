@@ -76,3 +76,4 @@ create table lnkmgmtitemgroup(
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
 alter table mgmtitemgroup add grouptype char(20) default NULL;
+alter table mgmtitemgroup add lastqcheck datetime default NULL,add key(lastqcheck);
