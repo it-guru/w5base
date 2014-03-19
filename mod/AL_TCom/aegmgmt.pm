@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{Worktable}="AL_TCom_appl_aegmgmt";
    $self->{useMenuFullnameAsACL}=$self->Self;
@@ -105,13 +106,24 @@ sub new
 #                dataobjattr   =>"$worktable.aegsolution"),
 
       new kernel::Field::Text(
+                name          =>'ictoid',
+                label         =>'ICTO-ID',
+                readonly      =>1,
+                dataobjattr   =>"appl.ictono"),
+
+      new kernel::Field::Import($self,
+                vjointo       =>'itil::appl',
+                vjoinon       =>['id'=>'id'],
+                group         =>"default",
+                fields        =>['mgmtitemgroup']),
+
+      new kernel::Field::Text(
                 name          =>'aegsolution',
                 label         =>'Solution',
                 readonly      =>1,
                 dataobjattr   =>"if (mandator.name regexp 'TelekomIT.*',".
                                 "replace(mandator.name,'TelekomIT ',''),".
                                 "'NONE')"),
-
 
       new kernel::Field::Contact(
                 name          =>'leadinmmgr',
@@ -226,13 +238,13 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>"$worktable.modifydate"),
 
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
                 dataobjattr   =>"$worktable.modifydate"),
 
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
