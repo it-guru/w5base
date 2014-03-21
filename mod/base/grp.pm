@@ -183,6 +183,12 @@ sub new
                 group         =>'grptype',
                 dataobjattr   =>'is_orggroup'),
 
+      new kernel::Field::Htmlarea(
+                name          =>'grppresentation',
+                label         =>'Team-View Presentation',
+                group         =>'teamview',
+                dataobjattr   =>'grp.grppresentation'),
+
       new kernel::Field::FileList(
                 name          =>'attachments',
                 parentobj     =>'base::grp',
@@ -565,6 +571,10 @@ sub TeamView   # erster Versuch der Teamview
             "<a onclick=\"return(false);\" href=\"view/$rec->{grpid}\">".
             "$rec->{fullname}</a><div>$cleardiv";
       print "<div class=groupframe>$group$boss</div>$cleardiv";
+      if ($rec->{grppresentation} ne ""){
+         printf("<div class=grppresentation>%s</div>",
+               $rec->{grppresentation});
+      }
       print "<div class=userframe>$employee</div>$cleardiv";
    }
    print $self->HtmlBottom(body=>1,form=>1);
@@ -608,7 +618,7 @@ sub isWriteValid
 
    return(qw(default)) if (!defined($rec) && $self->IsMemberOf("admin"));
    return(undef) if ($rec->{grpid}<=0);
-   return(qw(default users phonenumbers 
+   return(qw(default users phonenumbers teamview
              misc grptype attachments)) if ($self->IsMemberOf("admin"));
    if (defined($rec)){
       my $grpid=$rec->{grpid};
@@ -616,7 +626,7 @@ sub isWriteValid
          return(qw(users phonenumbers misc attachments));
       }
       if ($self->IsMemberOf([$grpid],["RBoss","RBoss2"],"direct")){
-         return(qw(phonenumbers misc grptype attachments));
+         return(qw(phonenumbers misc grptype teamview attachments));
       }
    }
    return(undef);
@@ -686,7 +696,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
    return(qw(header default users subunits phonenumbers grptype additional
-                misc attachments));
+                misc teamview attachments));
 }
 
 

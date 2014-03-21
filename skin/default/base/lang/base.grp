@@ -7,6 +7,7 @@
 'group has references in contact links!'=>{ de=>'Die Gruppe hat Refrenzen Kontaktverknüpfungen!'},
 'fieldgroup.00.ro'             =>{ de=>'Gruppenidentifikation',en=>'Group-Indentify'},
 'fieldgroup.users'             =>{ de=>'Gruppenmitglieder',en=>'Group-Members'},
+'fieldgroup.teamview'          =>{ de=>'TeamView-Präsentation',en=>'TeamView Presentation'},
 'fieldgroup.additional'        =>{ de=>'Zusatzparameter',en=>'additional Parameters'},
 'fieldgroup.default'           =>{ de=>'Gruppendaten',en=>'Group-Informations'},
 'fieldgroup.source'            =>{ de=>'Datenquelle',en=>'Data-Source'},

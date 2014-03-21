@@ -340,3 +340,4 @@ alter table contact add country char(4) default NULL;
 alter table contact add banalprotect int(1) default '0',add isw5support int(1) default'0',add key(isw5support);
 alter table contact add pcontact bigint(20) default NULL, add FOREIGN KEY fk_pcontact (pcontact) REFERENCES contact (userid) ON DELETE CASCADE;
 alter table contact add srcsys varchar(100) default 'w5base', add srcid varchar(100) default NULL,add srcload datetime default NULL, add UNIQUE KEY `srcsys` (srcsys,srcid);
+alter table grp  add grppresentation longtext default NULL;

@@ -47,9 +47,17 @@ div.topframe{
    border-style:none;
 }
 div.groupframe{
+   padding-top:5px;
    margin:20px;
    border-style:none;
    display:inline-block;
+   border-width:2px;
+}
+div.grppresentation{
+   color:black;  
+   margin:20px;
+   border-color:gray;
+   border-top-style:solid;
    border-width:2px;
 }
 div.userframe{
