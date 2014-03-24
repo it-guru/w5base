@@ -714,14 +714,14 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'ssh1publickey',
                 label         =>'SSH1 Public Key',
-                group         =>'control',
+                group         =>'userid',
                 htmldetail    =>0,
                 dataobjattr   =>'contact.ssh1publickey'),
 
       new kernel::Field::Textarea(
                 name          =>'ssh2publickey',
                 label         =>'SSH2 Public Key',
-                group         =>'control',
+                group         =>'userid',
                 htmldetail    =>0,
                 dataobjattr   =>'contact.ssh2publickey'),
 
