@@ -189,6 +189,9 @@ sub rows
     my $self=shift;
 
     if (defined($self->{sth})){
+       if (defined($self->{fixrowcount})){ # for DB2 or schrott like that
+          return($self->{fixrowcount});
+       }
        return($self->{sth}->rows());
     }
     return(undef);
@@ -289,6 +292,18 @@ sub execute
           printf STDERR ("$self->{'db'} contains HASH - this is bad!\n");
           print STDERR Dumper($self->{'db'});
           die(); 
+       }
+       delete($self->{fixrowcount});
+       if (($self->DriverName() eq "db2"    # result of DB2 rows is not correct
+            && $statement=~m/^select/i)){
+          my $cnt=$self->{'db'}->prepare("select count(*) from ($statement)",
+                                         $attr);
+          if ($cnt->execute(@bind_values)){
+             my $h=$cnt->fetchrow_arrayref();
+             if (ref($h) eq "ARRAY"){
+                $self->{fixrowcount}=$h->[0]; 
+             }
+          }
        }
        $self->{sth}=$self->{'db'}->prepare($statement,$attr);
        if (!($self->{sth})){
