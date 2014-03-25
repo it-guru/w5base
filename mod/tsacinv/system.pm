@@ -65,7 +65,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'amcomputer.status'),
+                dataobjattr   =>'lower(amcomputer.status)'),
 
       new kernel::Field::Text(
                 name          =>'tenant',

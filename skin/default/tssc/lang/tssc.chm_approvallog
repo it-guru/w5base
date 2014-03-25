@@ -1,0 +1,5 @@
+'tssc::chm_approvallog'=>{de=>'Approval Log',en=>'Approval Log'},
+'Timestamp'=>{de=>'Zeitstempel'},
+'Group'=>{de=>'Gruppe'},
+'Action'=>{de=>'Aktion'},
+'Statement'=>{de=>'Begründung'},

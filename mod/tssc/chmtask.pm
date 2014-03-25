@@ -48,6 +48,7 @@ sub new
                 label         =>'Task No.',
                 searchable    =>1,
                 align         =>'left',
+                htmlwidth     =>'200px',
                 dataobjattr   =>'cm3tm1.numberprgn'),
 
       new kernel::Field::Text(
@@ -63,12 +64,12 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'cm3tm1.status'),
 
-      new kernel::Field::Text(
-                name          =>'approvalstatus',
-                label         =>'approval status',
-                group         =>'status',
-                ignorecase    =>1,
-                dataobjattr   =>'cm3tm1.approval_status'),
+#      new kernel::Field::Text(
+#                name          =>'approvalstatus',
+#                label         =>'approval status',
+#                group         =>'status',
+#                ignorecase    =>1,
+#                dataobjattr   =>'cm3tm1.approval_status'),
 
       new kernel::Field::Date(
                 name          =>'plannedstart',
@@ -85,7 +86,7 @@ sub new
       new kernel::Field::Boolean(          # the field ci_down does not exists
                 name          =>'cidown',  # in scadm schema - but in scadm1.
                 timezone      =>'CET',     # => soo i build a hack to allow 
-                label         =>'CI-Offline (PSO)',  # the access on this field
+                label         =>'PSO-Flag',     # the access on this field
                 dataobjattr   =>"decode(downtab.ci_down,'t','1','0')"),
 
 #      new kernel::Field::Date(
@@ -132,11 +133,18 @@ sub new
                 dataobjattr   =>'cm3tm1.down_end'),
 
       new kernel::Field::Text(
-                name          =>'assingedto',
+                name          =>'assignedto',
                 label         =>'Assigned to',
                 group         =>'contact',
                 ignorecase    =>1,
                 dataobjattr   =>'cm3tm1.assigned_to'),
+
+      new kernel::Field::Text(
+                name          =>'implementer',
+                label         =>'Implementer',
+                group         =>'contact',
+                ignorecase    =>1,
+                dataobjattr   =>'cm3tm1.assign_firstname'),
 
       new kernel::Field::Text(
                 name          =>'editor',
@@ -159,9 +167,8 @@ sub new
                 dataobjattr   =>'cm3tm1.orig_date_entered'),
 
    );
+
    $self->{use_distinct}=0;
-
-
    $self->setDefaultView(qw(linenumber changenumber name));
    return($self);
 }
@@ -175,7 +182,6 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
-
 
 sub getSqlFrom
 {
@@ -192,8 +198,10 @@ sub initSqlWhere
    return($where);
 }
 
-
-
+sub isQualityCheckValid
+{
+   return(0);
+}
 
 sub isViewValid
 {

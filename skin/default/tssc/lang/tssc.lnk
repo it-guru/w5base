@@ -5,3 +5,5 @@
 'fieldgroup.dst'=>{de=>'Destination',en=>'Destination'},
 'Description'=>{de=>'Beschreibung'},
 'relation type'=>{de=>'Verknüpfungstyp'},
+'Valid'=>{de=>'Gültig'},
+'Priority'=>{de=>'Priorität'},

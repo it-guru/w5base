@@ -41,7 +41,7 @@ sub FormatedDetail
    my $current=shift;
    my $mode=shift;
    my $name=$self->Name();
-   my $d=$self->RawValue($current);
+   my $d=$self->RawValue($current,$mode);
    my $j="\n--\n";
    if (exists($self->{vjoinconcat})){
       $j=$self->{vjoinconcat};
@@ -161,14 +161,14 @@ sub FormatedResult
    my $self=shift;
    my $current=shift;
    my $FormatAs=shift;
-   my $d=$self->RawValue($current);
+   my $d=$self->RawValue($current,$FormatAs);
    my $j="\n--\n";
    if (exists($self->{vjoinconcat})){
       $j=$self->{vjoinconcat};
    }
    $d=join($j,@{$d}) if (ref($d) eq "ARRAY");
-   
-   if ($FormatAs eq "HtmlV01"){
+
+   if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlSubList"){
       if (!$self->{AllowHtmlInput}){
          $d=quoteHtml($d);
         # $d=~s/</&lt;/g;

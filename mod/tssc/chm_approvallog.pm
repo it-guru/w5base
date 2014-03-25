@@ -1,4 +1,4 @@
-package tssc::chm_approvereq;
+package tssc::chm_approvallog;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -34,32 +34,33 @@ sub new
       new kernel::Field::Linenumber(name       =>'linenumber',
                                     label      =>'No.'),
 
-      new kernel::Field::Id(        name       =>'changenumber',
+      new kernel::Field::Text(      name       =>'changenumber',
                                     label      =>'Change No.',
                                     align      =>'left',
-                                    dataobjattr=>'cm3ra14.numberprgn'),
+                                    dataobjattr=>'approvallogm1.unique_key'),
+
+      new kernel::Field::Date(      name       =>'timestamp',
+                                    label      =>'Timestamp',
+                                    htmlwidth  =>'200px',
+                                    dataobjattr=>'approvallogm1.sysmodtime'),
 
       new kernel::Field::Text(      name       =>'name',
                                     ignorecase =>1,
-                                    label      =>'Pending',
-                                    htmldetail =>0,
-                                    dataobjattr=>'cm3ra14.current_pending_groups'),
-
-      new kernel::Field::Text(      name       =>'groupname',
-                                    label      =>'Pending',
+                                    label      =>'Group',
                                     htmlwidth  =>'200px',
-                                    vjointo    =>'tssc::group',
-                                    vjoinon    =>['name'=>'name'],
-                                    vjoindisp  =>['name']),
+                                    dataobjattr=>'approvallogm1.groupprgn'),
 
-      new kernel::Field::Text(      name       =>'groupmailbox',
-                                    label      =>'Group Email Address',
-                                    vjointo    =>'tssc::group',
-                                    vjoinon    =>['name'=>'name'],
-                                    vjoindisp  =>['groupmailbox']),
+      new kernel::Field::Text(      name       =>'action',
+                                    ignorecase =>1,
+                                    label      =>'Action',
+                                    dataobjattr=>'approvallogm1.action'),
+
+      new kernel::Field::Textarea(  name       =>'statement',
+                                    label      =>'Statement',
+                                    dataobjattr=>'approvallogm1.comments'),
    );
 
-   $self->setDefaultView(qw(linenumber groupname groupmailbox));
+   $self->setDefaultView(qw(linenumber name action timestamp));
    $self->{use_distinct}=0;
 
    return($self);
@@ -79,7 +80,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cm3ra14";
+   my $from="approvallogm1";
    return($from);
 }
 

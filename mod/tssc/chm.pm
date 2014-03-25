@@ -76,22 +76,10 @@ sub new
                 depend        =>[qw(plannedstart plannedend)]),
 
       new kernel::Field::Text(
-                name          =>'status',
-                label         =>'Status',
-                htmlwidth     =>20,
-                dataobjattr   =>'cm3rm1_w5base.status'),
-
-      new kernel::Field::Text(
                 name          =>'location',
                 label         =>'Location',
                 ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.change_shortname'), 
-
-      new kernel::Field::Text(
-                name          =>'project',
-                label         =>'Project',
-                ignorecase    =>1,
-                dataobjattr   =>'cm3rm1.project'), 
 
       new kernel::Field::Link(
                 name          =>'rawlocation',
@@ -100,11 +88,15 @@ sub new
        #         dataobjattr   =>'cm3rm1_w5base.location_code'),
 
       new kernel::Field::Text(
+                name          =>'srcid',
+                label         =>'Extern Change ID',
+                dataobjattr   =>'cm3rm1_w5base.ex_number'),
+
+      new kernel::Field::Text(
                 name          =>'project',
+                label         =>'Project',
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
-                htmldetail    =>0,
-                label         =>'Project',
                 dataobjattr   =>'cm3rm1_w5base.project'),
 
       new kernel::Field::Text(
@@ -112,6 +104,7 @@ sub new
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'DeviceID (deprecated)',
                 dataobjattr   =>'cm3rm1_w5base.logical_name'),
 
@@ -120,6 +113,7 @@ sub new
                 htmlwidth     =>'100px',
                 ignorecase    =>1,
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'SoftwareID (deprecated)',
                 dataobjattr   =>'cm3rm1_w5base.program_name'),
 
@@ -129,6 +123,7 @@ sub new
                 group         =>'software',
                 htmlwidth     =>'300px',
                 htmldetail    =>0,
+                searchable    =>0,
                 vjointo       =>'tssc::chm_software',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
@@ -140,6 +135,7 @@ sub new
                 htmlwidth     =>'300px',
                 nodetaillink  =>1,
                 htmldetail    =>0,
+                searchable    =>0,
                 vjointo       =>'tssc::chm_device',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
@@ -155,23 +151,28 @@ sub new
                 label         =>'Model ID',
                 dataobjattr   =>'cm3rm1_w5base.model_ref'),
 
-      new kernel::Field::Text(
-                name          =>'srcid',
-                label         =>'Extern Change ID',
-                dataobjattr   =>'cm3rm1_w5base.ex_number'),
-
       new kernel::Field::SubList(
                 name          =>'approvalsreq',
                 label         =>'Approvals Required',
-                htmlwidth     =>'200px',
                 group         =>'approvals',
+                forwardSearch =>1,
                 vjointo       =>'tssc::chm_approvereq',
                 vjoinon       =>['changenumber'=>'changenumber'],
-                vjoindisp     =>[qw(name)]),
+                vjoindisp     =>[qw(groupname groupmailbox)]),
 
       new kernel::Field::SubList(
-                name          =>'approved',
-                label         =>'Approved Groups',
+                name          =>'approvallog',
+                label         =>'Approval Log',
+                group         =>'approvals',
+                forwardSearch =>1,
+                vjointo       =>'tssc::chm_approvallog',
+                vjoinon       =>['changenumber'=>'changenumber'],
+                vjoindisp     =>[qw(timestamp name action)]),
+
+      new kernel::Field::SubList(
+                name          =>'approved',   # wird noch für das NotifyInetwork
+                label         =>'Approved Groups',  # verfahren gebraucht
+                htmldetail    =>0,
                 htmlwidth     =>'200px',
                 group         =>'approvals',
                 vjointo       =>'tssc::chm_approvedgrp',
@@ -181,14 +182,16 @@ sub new
       new kernel::Field::SubList(
                 name          =>'tasks',
                 label         =>'Tasks',
-                htmlwidth     =>'200px',
+                htmlwidth     =>'300px',
                 group         =>'tasks',
+                forwardSearch =>1,
                 vjointo       =>'tssc::chmtask',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoininhash   =>['plannedstart','plannedend',
                                  'tasknumber','name','cidown',
-                                 'status','relations'],
-                vjoindisp     =>[qw(tasknumber name)]),
+                                 'status','relations','implementer'],
+                vjoindisp     =>[qw(plannedstart plannedend tasknumber status
+                                    cidown name implementer)]),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -236,7 +239,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'chmtarget',
-                label         =>'Target of Change',
+                label         =>'Target of change',
                 searchable    =>0,
                 dataobjattr   =>'cm3rm1_w5base.target_of_change'),
 
@@ -271,17 +274,36 @@ sub new
                 dataobjattr   =>'cm3rm1_w5base.justification'),
 
       new kernel::Field::Textarea(
+                name          =>'serviceinfo',
+                label         =>'Service Info',
+                searchable    =>0,
+                dataobjattr   =>'cm3rm1_w5base.service_info_comments'),
+
+      new kernel::Field::Textarea(
                 name          =>'resources',
                 label         =>'Resources',
+                htmldetail    =>0,
                 searchable    =>0,
                 dataobjattr   =>'cm3ra43.resources'),
 
       new kernel::Field::Text(
                 name          =>'priority',
-                group         =>'status',
+                htmldetail    =>0,
                 group         =>'status',
                 label         =>'Pritority',
                 dataobjattr   =>'cm3rm1_w5base.priority'),
+
+      new kernel::Field::Text(
+                name          =>'status',
+                group         =>'status',
+                label         =>'Current Status',
+                dataobjattr   =>'cm3rm1_w5base.status'),
+
+      new kernel::Field::Text(
+                name          =>'approvalstatus',
+                group         =>'status',
+                label         =>'Approval Status',
+                dataobjattr   =>'cm3rm1_w5base.approval_status'),
 
       new kernel::Field::Text(
                 name          =>'impact',
@@ -304,12 +326,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'reason',
                 group         =>'status',
+                htmldetail    =>0,
                 label         =>'Reason',
                 dataobjattr   =>'cm3rm1_w5base.reason'),
-
+             
       new kernel::Field::Text(
                 name          =>'category',
                 group         =>'status',
+                htmldetail    =>0,
                 label         =>'Category',
                 dataobjattr   =>'cm3rm1_w5base.category'),
 
@@ -323,25 +347,58 @@ sub new
                 name          =>'type',
                 group         =>'status',
                 label         =>'Type',
+                htmldetail    =>0,
                 dataobjattr   =>'cm3rm1_w5base.class_field'),
 
       new kernel::Field::Text(
-                name          =>'approvalstatus',
+                name          =>'typecalc',
                 group         =>'status',
-                label         =>'Approval Status',
-                dataobjattr   =>'cm3rm1_w5base.approval_status'),
+                label         =>'Type calculated',
+                htmldetail    =>0,
+                dataobjattr   =>'cm3rm1_w5base.dsc_change_type_calculated'),
 
       new kernel::Field::Text(
-                name          =>'currentstatus',
+                name          =>'types',
                 group         =>'status',
-                label         =>'Current Status',
-                dataobjattr   =>'cm3rm1_w5base.status'),
+                label         =>'Type',
+                depend        =>[qw(type typecalc)],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return "$current->{type} (calc. $current->{typecalc})";
+                }),
 
       new kernel::Field::Text(
-                name          =>'approvalstatus',
+                name          =>'criticality',
                 group         =>'status',
-                label         =>'Approval Status',
-                dataobjattr   =>'cm3rm1_w5base.approval_status'),
+                label         =>'Criticality',
+                htmldetail    =>0,
+                dataobjattr   =>'cm3rm1_w5base.criticality'),
+
+      new kernel::Field::Text(
+                name          =>'criticalitycalc',
+                group         =>'status',
+                label         =>'Criticality calculated',
+                htmldetail    =>0,
+                dataobjattr   =>'cm3rm1_w5base.criticality_total'),
+
+      new kernel::Field::Text(
+                name          =>'criticalities',
+                group         =>'status',
+                label         =>'Criticality',
+                depend        =>[qw(criticality criticalitycalc)],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return "$current->{criticality}".
+                          " (calc. $current->{criticalitycalc})";
+                }),
+
+      new kernel::Field::Text(
+                name          =>'complexity',
+                group         =>'status',
+                label         =>'Complexity',
+                dataobjattr   =>'cm3rm1_w5base.complexity'),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
@@ -426,6 +483,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'assignarea',
                 group         =>'contact',
+                htmldetail    =>0,
                 ignorecase    =>1,
                 label         =>'Assign Area',
                 dataobjattr   =>'cm3rm1_w5base.assigned_area'),
@@ -433,6 +491,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'rawassignarea',
                 label         =>'raw Assign Area',
+                htmldetail    =>0,
                 dataobjattr   =>'cm3rm1_w5base.assigned_area'),
 
       new kernel::Field::Text(
@@ -451,6 +510,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'requestedby',
                 group         =>'contact',
+                htmldetail    =>0,
                 label         =>'Requested By',
                 dataobjattr   =>'cm3rm1_w5base.requested_by'),
 
@@ -465,21 +525,21 @@ sub new
                 name          =>'implementor',
                 uppersearch   =>1,
                 group         =>'contact',
-                label         =>'Implementor',
+                label         =>'Coordinator',
                 dataobjattr   =>'cm3rm1_w5base.assign_firstname'),
 
       new kernel::Field::Text(
                 name          =>'coordinator',
                 uppersearch   =>1,
                 group         =>'contact',
-                label         =>'Coordinator group',
+                label         =>'Changemanager group',
                 dataobjattr   =>'cm3rm1_w5base.coordinator'),
 
       new kernel::Field::Text(
                 name          =>'coordinatorposix',
                 uppersearch   =>1,
                 group         =>'contact',
-                label         =>'Change-Manager (Coordinator)',
+                label         =>'Changemanager',
                 dataobjattr   =>'cm3rm1_w5base.coord_firstname'),
 
       new kernel::Field::Text(
@@ -490,14 +550,37 @@ sub new
                 label         =>'Change-Manager fullname',
                 dataobjattr   =>'cm3rm1_w5base.coord_shortname'),
 
-      new kernel::Field::SubList(
+       new kernel::Field::SubList(
                 name          =>'relations',
                 label         =>'Relations',
+                uivisible     =>0,
                 group         =>'relations',
                 vjointo       =>'tssc::lnk',
                 vjoinon       =>['changenumber'=>'src'],
                 vjoininhash   =>['dst','dstobj','primary'],
                 vjoindisp     =>[qw(dst dstname primary)]),
+
+
+      new kernel::Field::SubList(
+                name          =>'configitems',
+                label         =>'Configuration Items',
+                group         =>'configitems',
+                forwardSearch =>1,
+                vjointo       =>'tssc::lnkci',
+                vjoinon       =>['changenumber'=>'src'],
+                vjoindisp     =>[qw(dstmodel dstname dstcriticality civalid
+                                    dststatus 
+                                    furtherciinfo)]),
+                              #      opmode mandator
+
+      new kernel::Field::SubList(
+                name          =>'tickets',
+                label         =>'Related Tickets',
+                group         =>'tickets',
+                forwardSearch =>1,
+                vjointo       =>'tssc::lnkticket',
+                vjoinon       =>['changenumber'=>'src'],
+                vjoindisp     =>[qw(dstid priority status)]),
 
       new kernel::Field::Text(
                 name          =>'editor',
@@ -505,10 +588,11 @@ sub new
                 label         =>'Editor',
                 dataobjattr   =>'cm3rm1_w5base.sysmoduser'),
 
-      new kernel::Field::Text(
-                name          =>'addgrp',
+      new kernel::Field::Text(  # notwendig, solange noch das NotifyINetwork
+                name          =>'addgrp', # verfahren verwendet wird.
                 sqlorder      =>"none",
                 group         =>'contact',
+                htmldetail    =>0,
                 label         =>'Additional Groups',
                 dataobjattr   =>'cm3rm1_w5base.additional_groups'),
 
@@ -550,6 +634,7 @@ sub Initialize
 sub SetFilterForQualityCheck
 {
    my $self=shift;
+   my $stateparam=shift;
    my @view=@_;
    return(undef);
 }
@@ -606,7 +691,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(status relations approvals tasks contact));
+          qw(status configitems tickets relations approvals tasks contact));
 }
 
 sub getRecordImageUrl
@@ -632,6 +717,31 @@ sub initSqlWhere
    return($where);
 }
 
+sub SetFilter
+{
+   my $self=shift;
+
+   my $flt=$_[0];
+
+   if (ref($flt) eq "HASH" && exists($flt->{changenumber}) &&
+       !ref($flt->{changenumber})) {
+
+      my @chnrs;
+      foreach my $chnr (split /[\s,;]+/,$flt->{changenumber}) {
+         if (my ($pref,$chnum)=$chnr=~m/^([><]{0,1})(\d{1,8})$/) {
+            $chnr=$pref.'CHM'.'0'x(8-length($chnum)).$chnum;       
+         }
+         push @chnrs,$chnr;
+      }
+
+      $_[0]->{changenumber}=join(' ',@chnrs);
+   }
+
+   return($self->SUPER::SetFilter(@_));
+}
+
+
+
 sub isViewValid
 {
    my $self=shift;
@@ -641,7 +751,7 @@ sub isViewValid
       $st=$rec->{status};
    }
    if ($st ne "closed" && $st ne "rejected" && $st ne "resolved"){
-      return(qw(contact default relations 
+      return(qw(contact default tickets configitems relations qc
                 status header software device tasks approvals));
    }
    return("ALL");
@@ -659,8 +769,11 @@ sub getHtmlDetailPages
    my $self=shift;
    my ($p,$rec)=@_;
 
-   return($self->SUPER::getHtmlDetailPages($p,$rec),
-          "VisualView"=>$self->T("Visual-View"));
+   return($self->SUPER::getHtmlDetailPages($p,$rec));
+   # VisualView ausgeblendet; muss angepasst werden
+   #
+   #return($self->SUPER::getHtmlDetailPages($p,$rec),
+   #       "VisualView"=>$self->T("Visual-View"));
 }
 
 sub getHtmlDetailPageContent

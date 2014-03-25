@@ -285,6 +285,7 @@ sub new
 sub SetFilterForQualityCheck
 {
    my $self=shift;
+   my $stateparam=shift;
    my @view=@_;
    return(undef);
 }
