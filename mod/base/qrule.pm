@@ -465,27 +465,7 @@ sub nativQualityCheck
          exitcode=>$qresult
       };
       if (defined($control->{qmsg})){
-         $res->{qmsg}=$control->{qmsg};
-         if (ref($res->{qmsg}) eq "ARRAY"){
-            for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
-               if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s+(.*)$/){
-                  $res->{qmsg}->[$c]=$self->T($pr,
-                                               $qrulename).": ".$po;
-               }
-               else{
-                  $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
-                                               $qrulename);
-               }
-            }
-         }
-         else{
-            if (my ($pr,$po)=$res->{qmsg}=~m/^(.*)\s*:\s+(.*)$/){
-               $res->{qmsg}=$self->T($pr,$qrulename).": ".$po;
-            }
-            else{
-               $res->{qmsg}=$self->T($res->{qmsg},$qrulename);
-            }
-         }
+         $self->translate_qmsg($control,$res,$qrulename);
       }
       push(@{$result->{rule}},$res);
    }
@@ -618,6 +598,37 @@ sub nativQualityCheck
 
 }
 
+sub translate_qmsg
+{
+   my $self=shift;
+   my $control=shift;
+   my $res=shift;
+   my $qrulename=shift;
+ 
+
+   $res->{qmsg}=$control->{qmsg};
+   if (ref($res->{qmsg}) eq "ARRAY"){
+      for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
+         if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s+(.*)$/){
+            $res->{qmsg}->[$c]=$self->T($pr,
+                                         $qrulename).": ".$po;
+         }
+         else{
+            $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
+                                         $qrulename);
+         }
+      }
+   }
+   else{
+      if (my ($pr,$po)=$res->{qmsg}=~m/^(.*)\s*:\s+(.*)$/){
+         $res->{qmsg}=$self->T($pr,$qrulename).": ".$po;
+      }
+      else{
+         $res->{qmsg}=$self->T($res->{qmsg},$qrulename);
+      }
+   }
+   return($res);
+}
 
 sub WinHandleQualityCheck
 {

@@ -1011,18 +1011,22 @@ EOF
    }
    my $BookmarkName=Query->Param("BookmarkName");
    my $ForceOrder=Query->Param("ForceOrder");
-   print(<<EOF);
-<tr><td><iframe class=result id=result 
-                name="Result" src="$welcomeurl"></iframe></td></tr>
-</table>
-<input type=hidden name=UseLimit value="10">
-<input type=hidden name=UseLimitStart value="0">
-<input type=hidden name=FormatAs value="HtmlV01">
-<input type=hidden name=BookmarkName value="$BookmarkName">
-<input type=hidden name=CurrentView value="$CurrentView">
-<input type=hidden name=ForceOrder value="$ForceOrder">
-EOF
-   print $self->HtmlBottom(body=>1,form=>1);
+
+   my $iframe="<iframe class=result id=result ".
+              "name=\"Result\" src=\"$welcomeurl\"></iframe>";
+   print("<tr><td>$iframe</td></tr></table>");
+
+   my $persistentVari=
+      "<input type=\"hidden\" name=\"UseLimit\" value=\"10\">".
+      "<input type=\"hidden\" name=\"UseLimitStart\" value=\"0\">".
+      "<input type=\"hidden\" name=\"FormatAs\" value=\"HtmlV01\">".
+      "<input type=\"hidden\" name=\"BookmarkName\" value=\"$BookmarkName\">".
+      "<input type=\"hidden\" name=\"CurrentView\" value=\"$CurrentView\">".
+      "<input type=\"hidden\" name=\"ForceOrder\" value=\"$ForceOrder\">".
+      "<input type=\"hidden\" name=\"DataObj\" value=\"".$self->Self().\">";
+
+   print($persistentVari);
+   print($self->HtmlBottom(body=>1,form=>1));
 }
 
 

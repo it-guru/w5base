@@ -120,13 +120,22 @@ sub qcheckRecord
    }
 
    if (keys(%$forcedupd)){
-      if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
-         push(@qmsg,"all desired fields has been updated: ".
-                    join(", ",keys(%$forcedupd)));
+      if ($checksession->{checkmode} eq "test"){
+         push(@qmsg,"prevent forceupdates due checkmode=test");
+         foreach my $k (sort(keys(%$forcedupd))){
+            push(@qmsg," $k=$forcedupd->{$k}");
+         }
       }
       else{
-         push(@qmsg,$self->getParent->LastMsg());
-         $errorlevel=3 if ($errorlevel<3);
+         if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
+                                             {id=>\$rec->{id}})){
+            push(@qmsg,"all desired fields has been updated: ".
+                       join(", ",keys(%$forcedupd)));
+         }
+         else{
+            push(@qmsg,$self->getParent->LastMsg());
+            $errorlevel=3 if ($errorlevel<3);
+         }
       }
    }
 
