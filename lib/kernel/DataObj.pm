@@ -129,7 +129,6 @@ sub preQualityCheckRecord
    my $self=shift;
    my $rec=shift;
 
-
    return(1);
 }
 
@@ -3691,7 +3690,8 @@ sub FilterPart2SQLexp
                }
             }
          }
-         if (lc($sqlparam{sqldbh}->DriverName()) eq "oracle" &&
+         if ((lc($sqlparam{sqldbh}->DriverName()) eq "oracle" ||
+              $sqlparam{sqldbh}->DriverName() eq "db2") &&
              $sqlparam{ignorecase}==1){
             if ($val ne "NULL"){
                $sqlfieldname="lower($sqlfieldname)";
