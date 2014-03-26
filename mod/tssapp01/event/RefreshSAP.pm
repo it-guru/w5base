@@ -309,8 +309,9 @@ sub processFile
          #   my ($oldrec)=$if->getOnlyFirst(qw(name id));
             # validate against postible existing record
             if (exists($k{$wrrec->{'name'}})){
-               print STDERR Dumper($wrrec);
-               exit(1);
+               printf STDERR ("ERROR: dublicate entry '%s' - ignoring it\n",
+                              $wrrec->{'name'});
+               next;
             }
             #   print Dumper($wrrec);
             $k{$wrrec->{'name'}}++;
