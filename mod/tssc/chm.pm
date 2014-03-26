@@ -361,6 +361,7 @@ sub new
                 name          =>'types',
                 group         =>'status',
                 label         =>'Type',
+                searchable    =>0,
                 depend        =>[qw(type typecalc)],
                 onRawValue    =>sub{
                    my $self=shift;
@@ -386,6 +387,7 @@ sub new
                 name          =>'criticalities',
                 group         =>'status',
                 label         =>'Criticality',
+                searchable    =>0,
                 depend        =>[qw(criticality criticalitycalc)],
                 onRawValue    =>sub{
                    my $self=shift;

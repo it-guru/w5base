@@ -39,7 +39,7 @@
 'fieldgroup.misc'        =>{de=>'Sonstiges',         en=>'Miscellaneous'},
 'fieldgroup.acl'         =>{de=>'Zugriffssteuerung', en=>'Accesscontrol'},
 'fieldgroup.interview'   =>{de=>'Interview',         en=>'Interview'},
-'fieldgroup.qc'          =>{de=>'QualitiyCheck',     en=>'QualitiyCheck'},
+'fieldgroup.qc'          =>{de=>'QualityCheck',      en=>'QualityCheck'},
 'fieldgroup.control'     =>{de=>'Steuerungs-/Automationsdaten',
                             en=>'Control-/Authomationinformations'},
 
