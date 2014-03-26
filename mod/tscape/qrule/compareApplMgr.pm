@@ -14,22 +14,22 @@ a BusinessApplication.
 
 =head3 HINTS
 
-Jede Anwendung benötigt eine ICTO-ID. Diese wird von der 
-IT-Architektur über das Tool CapeTS vergeben. 
-Der Application-Manager einer Anwendung sollte die 
-betreffende ICTO-ID seiner Anwendung kennen.
+Der ApplicationManager der für eine Anwendung verantwortlich
+ist, wird durch das zugehörige ICTO-Objekt aus CapeTS vorgeben.
 
-Sollte die ICTO-ID nicht bekannt sein, so kann 
-diese über Hr. Krohn ...
+Diese QualityRule stellt sicher, dass in W5Base/Darwin der
+gleiche ApplicationManager eingetragen ist.
+
+Sollte der falsche ApplicationManager durch diese Regel gemeldet
+werden, so kann dies an einem Fehleintrag in CapeTS oder einer
+falschen ICTO Nummer beim Anwendungseintrag in W5Base/Darwin
+liegen.
+
+IT-Architektur über das Tool CapeTS vergeben. 
+
+Ansprechpartner für CapeTS ist Hr. Krohn ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/13627534400001
-
-... erfragt werden. Sollte es Probleme bei der Ermittlung 
-der ICTO-ID geben, so können Sie Hr. Striepecke ...
-
-https://darwin.telekom.de/darwin/auth/base/user/ById/13401048580000
-
-... kontaktieren.
 
 
 =cut
