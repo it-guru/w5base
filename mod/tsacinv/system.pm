@@ -309,11 +309,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemospatchlevel',
                 label         =>'System OS patchlevel',
-                htmldetail    =>0,
-                dataobjattr   =>"trim(amcomputer.osbuildnumber)||".
-                                "decode(amcomputer.osbuildnumber,'',".
-                                "'',decode(amcomputer.osbuildversion,'','','/'))||".
-                                'trim(amcomputer.osbuildversion)'),
+                dataobjattr   =>"amcomputer.osservicelevel"),
 
       new kernel::Field::Text(
                 name          =>'systemos',
