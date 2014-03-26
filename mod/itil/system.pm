@@ -1105,7 +1105,7 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'system.lastqcheck'),
-      new kernel::Field::DatacareAssistant()
+   # new kernel::Field::DatacareAssistant()
 
    );
    $self->{workflowlink}={ workflowkey=>[id=>'affectedsystemid']
