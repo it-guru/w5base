@@ -1105,7 +1105,7 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'system.lastqcheck'),
-      new kernel::Field::DatacareAssistent()
+      new kernel::Field::DatacareAssistant()
 
    );
    $self->{workflowlink}={ workflowkey=>[id=>'affectedsystemid']
@@ -1296,7 +1296,7 @@ sub Validate
    }
    if (!effVal($oldrec,$newrec,"isclusternode")){
       if (exists($newrec->{itclustid})){
-         $newrec->{itclust}=undef;
+         delete($newrec->{itclust}); # ensure, not itclust is specified
          $newrec->{itclustid}=undef;
       }
    }
