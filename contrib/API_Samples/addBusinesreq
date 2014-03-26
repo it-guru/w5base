@@ -59,13 +59,12 @@ msg(INFO,"Workflow id=$id");
                                           step class))){
       printf("WfRec=%s\n",Dumper($WfRec));
    }
-   exit(0);
 
    my $id=$wf->storeRecord({action=>'wfaccept'},$id);
    $wf->dieOnERROR();
    msg(INFO,"accept done");
    my $id=$wf->storeRecord({note=>'Hallo',effort=>123,
-                            action=>'wffineproc'},$id);
+                            action=>'wffine'},$id);
    $wf->dieOnERROR();
    msg(INFO,"fineproc done");
    $wf->SetFilter({id=>[$id]});

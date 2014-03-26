@@ -114,13 +114,6 @@ sub checksoftlimit
    my $self=shift;
    my $cmd=shift;
    delete($self->{softlimit});
-
-   if ($self->getDriverName() eq "ODBC"){
-      if (my ($n)=$$cmd=~m/\s+limit\s+(\d+)/){
-         $self->{softlimit}=$n;
-         $$cmd=~s/\s+limit\s+(\d+)//;
-      }
-   }
 }
 
 

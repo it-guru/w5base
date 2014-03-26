@@ -572,7 +572,8 @@ sub QuoteHashData
              && $fobj->Type() ne "KeyText" 
              && $fobj->Type() ne "KeyHandler" &&
                 $fobj->Type() ne "File"){
-            msg(ERROR,"can't QuoteHashData field '$field' in $self - ".
+            msg(ERROR,"can not quote '".$newdata->{$field}.
+                      "' for field '".$field."' in ".$self->Self." $self - ".
                       "no dataobjattr");
          }
       }

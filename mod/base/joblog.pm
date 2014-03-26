@@ -55,6 +55,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'exitcode',
+                group         =>'result',
                 htmlwidth     =>'1%',
                 label         =>'Exitcode',
                 dataobjattr   =>'joblog.exitcode'),
@@ -62,12 +63,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'exitstate',
                 htmlwidth     =>'1%',
+                group         =>'result',
                 label         =>'Exitstate',
                 dataobjattr   =>'joblog.exitstate'),
 
       new kernel::Field::Text(
                 name          =>'exitmsg',
-                htmlwidth     =>'1%',
+                group         =>'result',
+                htmlwidth     =>'200px',
                 label         =>'Exit message',
                 dataobjattr   =>'joblog.msg'),
 
@@ -93,16 +96,19 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcsys',
                 label         =>'Source-System',
+                htmldetail    =>0,
                 dataobjattr   =>'joblog.srcsys'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 label         =>'Source-Id',
+                htmldetail    =>0,
                 dataobjattr   =>'joblog.srcid'),
 
       new kernel::Field::Date(
                 name          =>'srcload',
                 label         =>'Last-Load',
+                htmldetail    =>0,
                 dataobjattr   =>'joblog.srcload'),
 
 
@@ -117,6 +123,23 @@ sub new
                             duration cdate mdate));
    $self->setWorktable("joblog");
    return($self);
+}
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","result","source");
+}
+
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
 }
 
 

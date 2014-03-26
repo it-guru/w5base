@@ -123,7 +123,6 @@ sub qcheckRecord
    }
 
    if (keys(%$forcedupd)>0){
-      msg(INFO,sprintf("forceupd=%s\n",Dumper($forcedupd)));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
          push(@qmsg,"all desired fields has been updated: ".
                     join(", ",keys(%$forcedupd)));
