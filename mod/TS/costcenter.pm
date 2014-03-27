@@ -74,7 +74,6 @@ sub new
                    if ($f=~m/\d+/){
                       $flt->{name}=sprintf("%d %010d",$f,$f);
                    }
-                   print STDERR Dumper($flt);
                    return($flt);
                 },
                 vjoindisp     =>['name','description']),
