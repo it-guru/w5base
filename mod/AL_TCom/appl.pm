@@ -37,6 +37,104 @@ sub new
                 searchable    =>0,
                 label         =>'allow to send for (Herbeiruf)',
                 container     =>'additional'),
+
+      new kernel::Field::Select(
+                name          =>'drclass',
+                group         =>'monisla',
+                label         =>'Disaster Recovery Class (requested)',
+                transprefix   =>'DR.',
+                value         =>['',
+                                 '0',
+                                 '1',
+                                 '2',
+                                 '3',
+                                 '4',
+                                 '5',
+                                 '6',
+                                 '7',
+                                ],
+                htmleditwidth =>'280px',
+                dataobjattr   =>'appl.disasterrecclass'),
+
+      new kernel::Field::Select(
+                name          =>'rtolevel',
+                group         =>'monisla',
+                label         =>'RTO Recovery Time Objective (current)',
+                transprefix   =>'RTO.',
+                value         =>['',
+                                 '0',
+                                 '1',
+                                 '2',
+                                 '3',
+                                 '4'],
+                dataobjattr   =>'appl.rtolevel'),
+
+      new kernel::Field::Select(
+                name          =>'rpolevel',
+                group         =>'monisla',
+                label         =>'RPO Recovery Point Objective (current)',
+                transprefix   =>'RPO.',
+                value         =>['',
+                                 '0',
+                                 '1',
+                                 '2',
+                                 '3',
+                                 '4',
+                                 '5'],
+                dataobjattr   =>'appl.rpolevel'),
+
+      new kernel::Field::Text(
+                name          =>'drc',
+                group         =>'monisla',
+                label         =>'DR Class',
+                htmldetail    =>0,
+                dataobjattr   =>'appl.disasterrecclass'),
+
+      new kernel::Field::Text(
+                name          =>'rto',
+                group         =>'monisla',
+                label         =>'RTO',
+                htmldetail    =>0,
+                dataobjattr   =>'appl.rtolevel'),
+
+      new kernel::Field::Text(
+                name          =>'rpo',
+                group         =>'monisla',
+                label         =>'RPO',
+                htmldetail    =>0,
+                dataobjattr   =>'appl.rpolevel'),
+
+      new kernel::Field::Boolean(
+                name          =>'drcok',
+                group         =>'monisla',
+                label         =>'DR Class - OK',
+                htmldetail    =>0,
+                dataobjattr   =>
+                  "if (appl.disasterrecclass=7, ".
+                  "   if (appl.rpolevel<=2 && appl.rpolevel>0 && ".
+                  "       appl.rtolevel<=1 && appl.rtolevel>0,1,0),".
+                  "if (appl.disasterrecclass=6, ".
+                  "   if (appl.rpolevel<=2 && appl.rpolevel>0 && ".
+                  "       appl.rtolevel<=1 && appl.rtolevel>0,1,0),".
+                  "if (appl.disasterrecclass=5, ".
+                  "   if (appl.rpolevel<=2 && appl.rpolevel>0 && ".
+                  "       appl.rtolevel<=1 && appl.rtolevel>0,1,0),".
+                  "if (appl.disasterrecclass=4, ".
+                  "   if (appl.rpolevel<=2 && appl.rpolevel>0 && ".
+                  "       appl.rtolevel<=1 && appl.rtolevel>0,1,0),".
+                  "if (appl.disasterrecclass=3, ".
+                  "   if (appl.rpolevel<=3 && appl.rpolevel>0 && ".
+                  "       appl.rtolevel<=3 && appl.rtolevel>0,1,0),".
+                  "if (appl.disasterrecclass=2, ".
+                  "   if (appl.rpolevel<=3 && appl.rpolevel>0 && ".
+                  "       appl.rtolevel<=4 && appl.rtolevel>0,1,0),".
+                  "if (appl.disasterrecclass=1, ".
+                  "   if (appl.rpolevel<=3 && appl.rpolevel>0 && ".
+                  "       appl.rtolevel<=4 && appl.rtolevel>0,1,0),".
+                  "if (appl.disasterrecclass=0, ".
+                  "   if (appl.rpolevel>=0 && ".
+                  "       appl.rtolevel>=0,1,0),".
+                  "NULL))))))))"),
    );
  
    $self->AddFields(

@@ -1321,3 +1321,6 @@ create table lnkapplgrpappl (
   FOREIGN KEY (appl) REFERENCES appl (id) ON DELETE CASCADE,
   FOREIGN KEY (applgrp) REFERENCES applgrp (id) ON DELETE CASCADE
 ) ENGINE=INNODB;
+alter table appl add disasterrecclass varchar(20) default NULL;
+alter table appl add rtolevel varchar(20) default NULL;
+alter table appl add rpolevel varchar(20) default NULL;
