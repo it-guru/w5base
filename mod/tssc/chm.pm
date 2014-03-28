@@ -598,15 +598,26 @@ sub new
                 label         =>'Additional Groups',
                 dataobjattr   =>'cm3rm1_w5base.additional_groups'),
 
-      new kernel::Field::QualityText(),
-      new kernel::Field::QualityState(),
-      new kernel::Field::QualityOk()
+      new kernel::Field::QualityOk(
+                uivisible     =>\&showQualityFields),
+
+      new kernel::Field::QualityText(
+                uivisible     =>\&showQualityFields),
    );
 
    $self->setDefaultView(qw(linenumber changenumber 
                             plannedstart plannedend 
                             status name));
+
    return($self);
+}
+
+sub showQualityFields {
+   my $self=shift;
+   my %grps=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                 ['RCHManager','RCHManager2']);
+   return(1) if (keys(%grps));
+   return(0);
 }
 
 sub initSearchQuery

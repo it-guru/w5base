@@ -294,7 +294,7 @@ sub qcheckRecord
       $exitcode=3;
    }
    # changemanager userid
-   if ($rec->{type} ne 'standard' && $rec->{managerposix}=~m/^\s*$/){
+   if ($rec->{type} ne 'standard' && $rec->{coordinatorposix}=~m/^\s*$/){
       push(@qmsg,"changemanager missing");
       $exitcode=3;
    }
