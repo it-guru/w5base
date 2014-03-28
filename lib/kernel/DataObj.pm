@@ -3660,7 +3660,8 @@ sub FilterPart2SQLexp
          }
          my $setescape="";
          if (defined($sqlparam{sqldbh}) &&
-             lc($sqlparam{sqldbh}->DriverName()) eq "oracle" &&
+             ($sqlparam{sqldbh}->DriverName() eq "oracle" ||
+              $sqlparam{sqldbh}->DriverName() eq "db2") &&
              $compop eq " like "){
             $setescape=" ESCAPE '\\' ";
          }

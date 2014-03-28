@@ -1,4 +1,4 @@
-package tsacinv::DBDataDiconary;
+package TAD4D::DBDataDiconary;
 #  W5Base Framework
 #  Copyright (C) 2008  Hartmut Vogler (it@guru.de)
 #
@@ -27,7 +27,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{DictionaryMode}="Oracle";
+   $param{DictionaryMode}="DB2";
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
 
@@ -38,9 +38,9 @@ sub Initialize
 {
    my $self=shift;
 
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tad4d"));
    return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->{use_distinct}=1;
+ #  $self->{use_distinct}=1;
 
    return(1) if (defined($self->{DB}));
    return(0);
@@ -50,7 +50,7 @@ sub initSearchQuery
 {  
    my $self=shift;
    if (!defined(Query->Param("search_schemaname"))){
-      Query->Param("search_schemaname"=>'AM2107');
+      Query->Param("search_schemaname"=>'ADM');
    }
 }
 

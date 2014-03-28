@@ -1,3 +1,6 @@
 'TAD4D::system'=>{de=>'TAD4D: System',en=>'TAD4D: System'},
 'fieldgroup.software'=>{de=>'Software',en=>'Software'},
+'fieldgroup.agent'=>{de=>'TAD4D Agent',en=>'TAD4D Agent'},
+'Serialnumber'=>{de=>'Seriennummer'},
+'IP-Address'=>{de=>'IP-Adresse'},
 

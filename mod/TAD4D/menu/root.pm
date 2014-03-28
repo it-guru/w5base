@@ -49,6 +49,11 @@ sub Init
    $self->RegisterObj("itu.tad4d.system.nsoftware",
                       "TAD4D::nativesoftware",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tad4d.dictonary",
+                      "TAD4D::DBDataDiconary",
+                      defaultacl=>['admin']);
+
    return($self);
 }
 

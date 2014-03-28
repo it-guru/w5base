@@ -86,7 +86,10 @@ sub getSqlFrom
 {
    my $self=shift;
    my $wt=$self->{Worktable};
-   my $from=<<EOF;
+   my $from="tablefields";
+
+   if ($self->{DictionaryMode} eq "Oracle"){
+      $from=<<EOF;
 (select distinct t.owner schemaname,
        lower(t.owner||'.'||t.table_name||'.'||t.column_name) fieldname,
        t.data_type,
@@ -99,6 +102,25 @@ where t.table_name=i.table_name(+)
       and t.owner=i.table_owner(+) 
       and t.column_name=i.column_name(+)) f
 EOF
+   }
+
+   if ($self->{DictionaryMode} eq "DB2"){
+      $from=<<EOF;
+(select trim(tabschema)||'.'||trim(tabname)||'.'||colname fieldname,
+        typename data_type,
+        length   data_length,
+        (select '1' from syscat.indexes
+         where syscat.indexes.tabschema=syscat.columns.tabschema and
+               syscat.indexes.tabname=syscat.columns.tabname and
+               syscat.indexes.colnames like '\%+'||syscat.columns.colname||'\%'
+         fetch first 1 rows only) isindexed,
+        trim(tabschema) owner
+ from syscat.columns) f
+EOF
+   }
+
+
+
    return($from);
 }
 

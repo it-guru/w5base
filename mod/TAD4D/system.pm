@@ -72,6 +72,24 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'adm.computer.computer_model'),
 
+      new kernel::Field::Text(
+                name          =>'serialno',
+                label         =>'Serialnumber',
+                dataobjattr   =>'adm.computer.sys_ser_num'),
+
+      new kernel::Field::Text(
+                name          =>'agentversion',
+                group         =>'agent',
+                label         =>'Version',
+                dataobjattr   =>'adm.agent.version'),
+
+      new kernel::Field::Text(
+                name          =>'agentip',
+                group         =>'agent',
+                label         =>'IP-Address',
+                dataobjattr   =>'adm.agent.ip_address'),
+
+
       new kernel::Field::SubList(
                 name          =>'software',
                 label         =>'Software',
@@ -204,7 +222,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default software 
+   return(qw(header default agent software 
              source));
 }  
 

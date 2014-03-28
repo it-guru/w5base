@@ -27,7 +27,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{DiconaryMode}="Oracle";
+   $param{DictionaryMode}="Oracle";
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
 
