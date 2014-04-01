@@ -779,17 +779,20 @@ EOF
 
    my %histid;
    my @ol;
-   my ($Y,$M,$dstrange);
+   my ($Y,$M,$dstrange,$altdstrange);
    if (defined($primrec)){
       push(@ol,$primrec->{id},$primrec->{fullname});
       $dstrange=$primrec->{dstrange};
       ($Y,$M)=$dstrange=~m/^(\d{4})(\d{2})$/;
    }
    else{
-      my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
+      my ($year,$mon,$day) = Today_and_Now("GMT");
+      my ($altyear,$altmon)= Add_Delta_YMD("GMT",$year,$mon,$day,0,-1,0);
+      
       $Y=$year;
       $M=$mon;
       $dstrange=sprintf("%04d%02d",$year,$mon);
+      $altdstrange=sprintf("%04d%02d",$altyear,$altmon);
    }
    my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
    my $userid=$self->getCurrentUserId();
@@ -810,10 +813,6 @@ EOF
    my @grps=$grp->getHashList("fullname","grpid");
                     
 
-
-
-
-
    my @grpnames;
    my @grpids;
    foreach my $r (@grps){
@@ -828,9 +827,20 @@ EOF
                            {dstrange=>\$dstrange,sgroup=>\'Group',
                             nameid=>\@grpids},
                           ]);
+   my @statnamelst=$self->getHashList(qw(fullname id));
 
-   foreach my $r (sort({$a->{fullname} cmp $b->{fullname}}
-                            $self->getHashList(qw(fullname id)))){
+   if ($#statnamelst==-1){   # seems to be the first day in month
+      $self->ResetFilter();
+      $self->SecureSetFilter([
+                              {dstrange=>\$altdstrange,sgroup=>\'Group',
+                               fullname=>\@grpnames},
+                              {dstrange=>\$altdstrange,sgroup=>\'Group',
+                               nameid=>\@grpids},
+                             ]);
+      @statnamelst=$self->getHashList(qw(fullname id));
+   }
+
+   foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
       push(@ol,$r->{id},$r->{fullname});
    }
    if (!defined($primrec) && $#ol!=-1){
