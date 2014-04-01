@@ -41,6 +41,8 @@ sub new
                 name          =>'id',
                 label         =>'Qrule activation LinkID',
                 dataobjattr   =>'lnkqrulemandator.lnkqrulemandatorid'),
+ 
+      new kernel::Field::RecordUrl(),
 
       new kernel::Field::Mandator(allowany=>1),
 
