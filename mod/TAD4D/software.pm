@@ -53,6 +53,13 @@ sub new
                 label         =>'Software',
                 htmlwidth     =>380,
                 ignorecase    =>1,
+                dataobjattr   =>'adm.component.name'),
+
+      new kernel::Field::Text(
+                name          =>'softwareproduct',
+                label         =>'Software Product',
+                htmlwidth     =>380,
+                ignorecase    =>1,
                 dataobjattr   =>'adm.swproduct.name'),
 
       new kernel::Field::Text(
@@ -121,7 +128,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="adm.prod_inv,adm.agent,adm.swproduct";
+   my $from="adm.prod_inv,adm.agent,adm.swproduct,adm.component";
    return($from);
 }
 
@@ -129,7 +136,8 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where="adm.prod_inv.agent_id=adm.agent.id and ".
-             "adm.prod_inv.product_id=adm.swproduct.id";
+             "adm.prod_inv.product_id=adm.swproduct.id and ".
+             "adm.prod_inv.component_id=adm.component.id";
    return($where);
 }
 

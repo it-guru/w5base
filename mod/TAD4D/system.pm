@@ -89,6 +89,11 @@ sub new
                 label         =>'IP-Address',
                 dataobjattr   =>'adm.agent.ip_address'),
 
+      new kernel::Field::Text(
+                name          =>'hostname',
+                group         =>'agent',
+                label         =>'Hostname',
+                dataobjattr   =>'adm.agent.hostname'),
 
       new kernel::Field::SubList(
                 name          =>'software',
