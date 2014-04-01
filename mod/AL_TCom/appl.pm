@@ -146,6 +146,10 @@ sub new
       insertafter=>['applid'] 
    );
    $self->getField("businessservices")->{vjointo}="AL_TCom::businessservice";
+   my $applmgr2=$self->getField("applmgr2");
+   if (defined($applmgr2)){
+      $applmgr2->{uivisible}=0;
+   }
 
    return($self);
 }
