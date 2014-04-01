@@ -376,6 +376,15 @@ sub autoFillAutogenField
          elsif (($r=~m/.*\.CZ$/) || ($r=~m/^[^\.]+\.[^\.]+\.CZ\.*/)){
             push(@country,"CZ");
          }
+         elsif (($r=~m/^[^\.]+\.[^\.]+\.INT\.SK\.*/)){
+            push(@country,"SK");
+         }
+         elsif (($r=~m/^[^\.]+\.[^\.]+\.INT\.HU\.*/)){
+            push(@country,"HU");
+         }
+         elsif (($r=~m/^[^\.]+\.[^\.]+\.INT\.CZ\.*/)){
+            push(@country,"CZ");
+         }
          elsif (($r=~m/^[^\.]+\.[^\.]+\.INT\.*/)){
             push(@country,"II");
          }
