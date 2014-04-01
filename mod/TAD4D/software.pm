@@ -36,6 +36,12 @@ sub new
                 name          =>'linenumber',
                 label         =>'No.'),
 
+      new kernel::Field::Id(
+                name          =>'id',
+                label         =>'Id',
+                group         =>'source',
+                dataobjattr   =>'adm.prod_inv.id'),
+
       new kernel::Field::Text(
                 name          =>'hostname',
                 label         =>'Hostname',
@@ -55,10 +61,36 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'adm.swproduct.version'),
 
+      new kernel::Field::Boolean(
+                name          =>'isremote',
+                label         =>'Remote',
+                dataobjattr   =>'adm.prod_inv.is_remote'),
+
+      new kernel::Field::Text(
+                name          =>'scope',
+                label         =>'Scope',
+                ignorecase    =>1,
+                dataobjattr   =>'adm.prod_inv.scope'),
+
+      new kernel::Field::Date(
+                name          =>'starttime',
+                label         =>'Start-Time',
+                dataobjattr   =>"decode(adm.prod_inv.start_time,".
+                                "'9999-12-31 00:00:00.000000',".
+                                "NULL,adm.prod_inv.start_time)"),
+
+      new kernel::Field::Text(
+                name          =>'endtime',
+                label         =>'End-Time',
+                dataobjattr   =>"decode(adm.prod_inv.end_time,".
+                                "'9999-12-31 00:00:00.000000',".
+                                "NULL,adm.prod_inv.end_time)"),
+
       new kernel::Field::Text(
                 name          =>'agentid',
                 label         =>'Agent ID',
                 ignorecase    =>1,
+                group         =>'source',
                 dataobjattr   =>'adm.agent.id'),
 
    );
@@ -78,27 +110,26 @@ sub Initialize
 }
 
 
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
-#}
-         
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/software.jpg?".$cgi->query_string());
+}
 
 
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="adm.soft_inv_data,adm.agent,adm.swproduct";
+   my $from="adm.prod_inv,adm.agent,adm.swproduct";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="adm.soft_inv_data.agent_id=adm.agent.id and ".
-             "adm.soft_inv_data.swprod_id=adm.swproduct.id";
+   my $where="adm.prod_inv.agent_id=adm.agent.id and ".
+             "adm.prod_inv.product_id=adm.swproduct.id";
    return($where);
 }
 

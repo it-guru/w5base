@@ -97,7 +97,7 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'TAD4D::software',
                 vjoinon       =>['agentid'=>'agentid'],
-                vjoindisp     =>['software','version']),
+                vjoindisp     =>['software','version','isremote']),
 
       new kernel::Field::SubList(
                 name          =>'nativesoftware',
