@@ -480,6 +480,14 @@ sub Init
                       "itil::mgmtitemgroup",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("AL_TCom.proc.licman",
+                      "tmpl/welcome",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("AL_TCom.proc.licman.amtelitsys",
+                      "AL_TCom::amtelitsys",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("AL_TCom.proc.mgmtitemgroup.new",
                       "itil::mgmtitemgroup",
                       func=>'New',
