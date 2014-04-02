@@ -49,7 +49,7 @@ sub analyseApplMgr
    my $wiwuser=getModuleObject($self->Config,"tswiw::user");
    my $cape=getModuleObject($self->Config,"tscape::archappl");
 
-   $cape->SetCurrentView(qw(fullname archapplid applmgremail));
+   $cape->SetCurrentView(qw(fullname archapplid applmgremail organisation));
    $cape->SetFilter({status=>"!Retired"});
    #$cape->Limit(50);
 
@@ -75,8 +75,10 @@ sub analyseApplMgr
                ($wiwurec)=$wiwuser->getOnlyFirst(qw(office_orgunit)); 
             }
             if (!defined($wiwurec)){
-               $msg{"Application Manager $rec->{applmgremail} ".
-                    "for $rec->{archapplid} not found in WhoIsWho"}++;
+               if ($rec->{organisation}=~m/ T-TI /){
+                  $msg{"Application Manager $rec->{applmgremail} ".
+                       "for $rec->{archapplid} not found in WhoIsWho"}++;
+               }
             }
             else{
                if ($wiwurec->{office_orgunit}=~m/^E-/){
@@ -87,6 +89,7 @@ sub analyseApplMgr
                                                   $rec->{fullname},
                                                   $rec->{archapplid},
                                                   $rec->{applmgremail},
+                                                  $rec->{organisation},
                                                   $wiwurec);
                }
             }
@@ -111,6 +114,7 @@ sub validateTelITApplication
    my $fullname=shift;
    my $ictoid=shift;
    my $applmgremail=shift;
+   my $organisation=shift;
    my $wiwurec=shift;
 
    my ($solution)=$wiwurec->{office_orgunit}=~m/^(\S-\S\S\S).*$/;
@@ -136,16 +140,18 @@ sub validateTelITApplication
    msg(INFO,"         * Appl-Count: ".($#arec+1));
 
    if ($#arec==-1){
-      $msg->{"No Applications for ICTO-Object $ictoid from ".
-             "ApplicationManager $applmgremail in '$mrec->{name}'".
-             ";$applmgremail;$solution"}++;
+      if ($organisation=~m/ T-IT /){
+         $msg->{"No Applications for ICTO-Object $ictoid from ".
+                "ApplicationManager $applmgremail in '$mrec->{name}'".
+                ";$ictoid;$applmgremail;$solution"}++;
+      }
    }
    else{
       foreach my $arec (@arec){
          if ($arec->{mandatorid} ne $mrec->{grpid}){
             $msg->{"Mandator of Application $arec->{name} ($arec->{mandator}) ".
                    "did not match Solution of ApplicationManager".
-                   ";$applmgremail;$solution"}++;
+                   ";$ictoid;$applmgremail;$solution"}++;
 
          }
       }
