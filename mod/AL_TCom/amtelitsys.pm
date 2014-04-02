@@ -86,7 +86,7 @@ sub SetFilter
    foreach my $flt (@flt){
       if (ref($flt) eq "HASH"){
          $flt->{saphier}="9TS_ES.9DTIT 9TS_ES.9DTIT.*";
-         $flt->{status}=\"in operation";
+         $flt->{status}='"in operation" "hibernate"';
          $flt->{tenant}=['CS'];
       }
    }
