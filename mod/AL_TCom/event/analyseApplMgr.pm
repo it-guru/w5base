@@ -99,6 +99,7 @@ sub analyseApplMgr
          printf F ("- %s\n\n",$msg);
 
       }
+   }
    close(F);
    return({exitcode=>0});
 }
