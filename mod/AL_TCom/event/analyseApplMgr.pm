@@ -77,7 +77,8 @@ sub analyseApplMgr
             if (!defined($wiwurec)){
                if ($rec->{organisation}=~m/ T-TI /){
                   $msg{"Application Manager $rec->{applmgremail} ".
-                       "for $rec->{archapplid} not found in WhoIsWho"}++;
+                       "for $rec->{archapplid} not found in WhoIsWho".
+                       ";$rec->{archapplid}"}++;
                }
             }
             else{
@@ -99,7 +100,7 @@ sub analyseApplMgr
    }
    if (open(F,">analyseApplMgr.csv")){
       foreach my $msg (sort(keys(%msg))){
-         printf F ("- %s\n\n",$msg);
+         printf F ("- %s\n",$msg);
 
       }
    }
