@@ -9,4 +9,4 @@
 'fieldgroup.services'=>{de=>'Cluster Services',
                         en=>'Cluster Services'},
 'Systems'=>{de=>'Systeme'},
-'cluster has been successfuly imported'=>{de=>'Cluster wurder erfolgreich importiert'},
+'cluster has been successfuly imported'=>{de=>'Cluster wurde erfolgreich importiert'},
