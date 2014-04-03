@@ -168,7 +168,12 @@ sub Connect
    #
    $self->{'db'}->{'FetchHashKeyName'}="NAME_lc";
    $self->{'db'}->{'LongTruncOk'} = 1;
-   $self->{'db'}->{'LongReadLen'} = 128000;
+   if (uc($self->DriverName()) eq "ODBC"){   # problem with MSSQL freetds.
+      $self->{'db'}->{'LongReadLen'} = 8192;
+   }
+   else{
+      $self->{'db'}->{'LongReadLen'} = 128000;
+   }
 
    return($self->{'db'});
 }
