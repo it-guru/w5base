@@ -119,36 +119,10 @@ sub qcheckRecord
       return(0,undef);
    }
 
-   if (keys(%$forcedupd)){
-      if ($checksession->{checkmode} eq "test"){
-         push(@qmsg,"prevent forceupdates due checkmode=test");
-         foreach my $k (sort(keys(%$forcedupd))){
-            push(@qmsg," $k=$forcedupd->{$k}");
-         }
-      }
-      else{
-         if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
-                                             {id=>\$rec->{id}})){
-            push(@qmsg,"all desired fields has been updated: ".
-                       join(", ",keys(%$forcedupd)));
-         }
-         else{
-            push(@qmsg,$self->getParent->LastMsg());
-            $errorlevel=3 if ($errorlevel<3);
-         }
-      }
-   }
-
-
-   if (keys(%$wfrequest)){
-      my $msg="different values stored in CapeTS: ";
-      push(@qmsg,$msg);
-      push(@dataissue,$msg);
-      $errorlevel=3 if ($errorlevel<3);
-   }
-
-   return($self->HandleWfRequest($dataobj,$rec,
-                                 \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
+   return($self->HandleQRuleResults("CapeTS",
+          $dataobj,$rec,$checksession,
+          \@qmsg,\@dataissue,\$errorlevel,$wfrequest,$forcedupd
+   ));
 }
 
 

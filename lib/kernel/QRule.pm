@@ -485,6 +485,86 @@ sub HandleWfRequest
    return($$errorlevel,undef);
 }
 
+sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
+{                         # - muß aber noch sauber getestet werden.  Sie soll
+   my $self=shift;        # automatische Updates und Benachrichtigungen bündeln
+   my $partnerlabel=shift;# erstes Beispiel ist unter ...
+   my $dataobj=shift;     # mod/tscape/qrule/compareApplMgr.pm
+   my $rec=shift;         # implementiert. 
+   my $checksession=shift;
+   my $qmsg=shift;
+   my $dataissue=shift;
+   my $errorlevel=shift;
+   my $wfrequest=shift;
+   my $forcedupd=shift;
+
+
+   if (keys(%$forcedupd)){
+      if ($checksession->{checkmode} eq "test"){
+         push(@$qmsg,"prevent forceupdates due checkmode=test");
+         foreach my $k (sort(keys(%$forcedupd))){
+            push(@$qmsg," $k=$forcedupd->{$k}");
+         }
+      }
+      else{
+         my $idfield=$dataobj->IdField();
+         if (defined($idfield)){
+            my $idname=$idfield->Name();
+            my %notifycontrol=(
+               mode=>'QualityCheck'
+            );
+            if ($dataobj->NotifiedValidatedUpdateRecord(
+                   \%notifycontrol,
+                   $rec,$forcedupd,
+                   {$idname=>\$rec->{$idname}})){
+               push(@$qmsg,"all desired fields has been updated: ".
+                          join(", ",keys(%$forcedupd)));
+            }
+            else{
+               push(@$qmsg,$self->getParent->LastMsg());
+               $$errorlevel=3 if ($$errorlevel<3);
+            }
+         }
+         else{
+            push(@$qmsg,"ERROR: unable to identify id field");
+         }
+      }
+   }
+
+   if (keys(%$wfrequest)){
+      my $msg="different values stored in"." ".$partnerlabel.": ";
+      push(@$qmsg,$msg);
+      push(@$dataissue,$msg);
+      $$errorlevel=3 if ($$errorlevel<3);
+   }
+
+
+   foreach my $name (sort(keys(%$wfrequest))){
+      my $fo=$dataobj->getField($name);
+      if (defined($fo)){
+         my $label=$fo->rawLabel();
+         push(@$dataissue,"[W5TRANSLATIONBASE=$fo->{translation}]");
+         my $msg="$label: '$wfrequest->{$name}'";
+         push(@$dataissue,$msg);
+
+         my $label=$fo->Label();
+         my $msg="$label: '$wfrequest->{$name}'";
+         push(@$qmsg,$msg);
+      }
+   }
+   #printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
+   if ($#{$qmsg}!=-1 || $$errorlevel>0){
+      my $r={qmsg=>$qmsg,dataissue=>$dataissue};
+      $r->{dataupdate}=$wfrequest;
+      return($$errorlevel,$r);
+   }
+   return($$errorlevel,undef);
+}
+
+
+
+
+
 sub getPersistentModuleObject
 {
    my $self=shift;

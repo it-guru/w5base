@@ -1681,6 +1681,121 @@ sub SecureValidatedUpdateRecord
    return(undef);
 }
 
+sub NotifiedValidatedUpdateRecord
+{
+   my $self=shift;
+   my $notifycontrol=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my @filter=@_;
+
+   return(undef) if (ref($notifycontrol) ne "HASH");
+
+   my %oldval=%{$oldrec};
+
+   my $bk;
+   if ($self->StartTransaction("update",$oldrec,$newrec)){
+      $bk=$self->ValidatedUpdateRecordTransactionless($oldrec,$newrec,@filter);
+   }
+   else{
+      $self->LastMsg(ERROR,"can not start update transaction");
+   }
+   if ($self->LastMsg()){
+      $self->RoolbackTransaction("update",$oldrec,$newrec);
+   }
+   $self->FinishTransaction("update",$oldrec,$newrec);
+
+   if ($bk){ # now create a notification mail
+      if (!defined($notifycontrol->{wf})){
+         $notifycontrol->{wfact}=getModuleObject($self->Config,"base::workflowaction");
+      }
+      my $idfield=$self->IdField();
+      my $databossfld=$self->getField("databossid");
+      my $namefld=$self->getField("fullname");
+      if (!defined($namefld)){
+         $namefld=$self->getField("name");
+      }
+      my $contactsfld=$self->getField("contacts");
+
+      my $subject=$self->T("Automatic data update",'kernel::QRule');
+      if (defined($namefld)){
+         my $name=$namefld->FormatedDetail($oldrec,"AscV01");
+         $subject.=" : ".$name;
+      }
+
+      my %notifyparam=(
+         adminbcc=>1,
+         lang=>'en',
+      );
+      if (defined($idfield)){
+         my $id=$idfield->RawValue($oldrec);
+         if ($id ne ""){
+            $notifyparam{dataobj}=$self->Self;
+            $notifyparam{dataobjid}=$id;
+         }
+      }
+      if (defined($databossfld)){
+         my $databossid=$databossfld->RawValue($oldrec);
+         if ($databossid ne ""){
+            my $user=getModuleObject($self->Config,"base::user");
+            $user->SetFilter({userid=>\$databossid});
+            my ($urec)=$user->getOnlyFirst(qw(email lastlang lang)); 
+            if (defined($urec)){
+               if ($urec->{lastlang} ne ""){
+                  $notifyparam{lang}=$urec->{lastlang};
+               }
+               else{
+                  if ($urec->{lang} ne ""){
+                     $notifyparam{lang}=$urec->{lang};
+                  }
+               }
+               if ($urec->{email} ne ""){
+                  $notifyparam{emailto}=$urec->{email};
+               }
+            }
+         }
+      }
+      my $lastlang;
+      if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
+         $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+      }
+      $ENV{HTTP_FORCE_LANGUAGE}=$notifyparam{lang};
+      my $text=$self->T("Dear databoss",'kernel::QRule');
+      $text.=",\n\n";
+      $text.=$self->T("there was done an update on a record which is managed ".
+                      "by you based on",'kernel::QRule');
+      $text.=" ".$notifycontrol->{mode}.".\n\n";
+
+      foreach my $k (keys(%$newrec)){
+         my $kfld=$self->getField($k);
+         if (defined($kfld)){
+            $text.="<b>".$kfld->Label()."</b>";
+            $text.=":\n";
+            $text.="old value:\n";
+            $text.=$kfld->FormatedDetail(\%oldval,"HtmlV01");
+            $text.="\n";                                  
+            $text.="new value:\n";                        
+            $text.=$kfld->FormatedDetail($newrec,"HtmlV01");;
+         }
+      }
+
+
+      $text.="\n\n".
+             $self->T("This update did not delivers you of your data responsibility!",
+                      'kernel::QRule');
+
+      $notifycontrol->{wfact}->Notify("INFO",$subject,$text,%notifyparam);
+      if (defined($lastlang)){
+         $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+      }
+      else{
+         delete($ENV{HTTP_FORCE_LANGUAGE});
+      }
+   }
+
+   return($bk);
+}
+
 sub ValidatedUpdateRecord
 {
    my $self=shift;
