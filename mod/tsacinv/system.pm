@@ -752,7 +752,7 @@ sub AddServices
    }
    if (defined($param{current})){
       my $systemid=$param{current}->{systemid};
-      $c->{db}->SetFilter({systemid=>\$systemid});
+      $c->{db}->SetFilter({systemid=>\$systemid,isdelivered=>\'1'});
       my @l=$c->{db}->getHashList(qw(name ammount));
       my %sumrec=();
       foreach my $rec (@l){
