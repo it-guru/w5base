@@ -24,17 +24,20 @@ registered in KOMPAS.
 '},
 
 'drclass'=>{de=>'
-Das Disaster-Recovery Level, das vom Kunden für diese
-Anwendung gefordert wird. Eine Beschreibung, wie die
-einzelnen Level definiert sind und der Zusammenhang
-zu RTO und RPO ist unter ...<br>
+Disaster Recovery Class, welche für diese 
+Anwendung implementiert ist.
+
+Die Definition und der Zusammenhang der 
+einzelnen Level ist unter dem ...<br>
 <a href="https://darwin.telekom.de/darwin/auth/faq/article/ById/13959099930001"
  target="_blank">FAQ13959099930001</a><br>
 ... beschrieben.
 ',en=>'
-The Disaster-Recovery Level, requested by the customer
-A documentation about the definitions of the dr level
-and the relations to RTO and RPO can be found at
+Disaster Recovery class, which is implemented 
+for this application. 
+
+The definition and relationship of each level 
+is described under the ...
 <a href="https://darwin.telekom.de/darwin/auth/faq/article/ById/13959099930001"
  target="_blank">FAQ13959099930001</a><br>
 '},
