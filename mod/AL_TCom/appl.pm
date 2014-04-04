@@ -96,9 +96,16 @@ sub new
                 name          =>'rto',
                 group         =>'monisla',
                 label         =>'RTO',
-                depend        =>['drc'],
                 htmldetail    =>0,
-                dataobjattr   =>'appl.rtolevel'),
+                dataobjattr   =>'if (appl.disasterrecclass=0,0,'.
+                                'if (appl.disasterrecclass=1,4,'.
+                                'if (appl.disasterrecclass=2,4,'.
+                                'if (appl.disasterrecclass=3,3,'.
+                                'if (appl.disasterrecclass=4,1,'.
+                                'if (appl.disasterrecclass=5,1,'.
+                                'if (appl.disasterrecclass=6,1,'.
+                                'if (appl.disasterrecclass=7,1,'.
+                                'NULL))))))))'),
 
       new kernel::Field::Text(
                 name          =>'rpo',
@@ -106,7 +113,15 @@ sub new
                 label         =>'RPO',
                 depend        =>['drc'],
                 htmldetail    =>0,
-                dataobjattr   =>'appl.rpolevel'),
+                dataobjattr   =>'if (appl.disasterrecclass=0,0,'.
+                                'if (appl.disasterrecclass=1,3,'.
+                                'if (appl.disasterrecclass=2,3,'.
+                                'if (appl.disasterrecclass=3,3,'.
+                                'if (appl.disasterrecclass=4,2,'.
+                                'if (appl.disasterrecclass=5,2,'.
+                                'if (appl.disasterrecclass=6,2,'.
+                                'if (appl.disasterrecclass=7,2,'.
+                                'NULL))))))))'),
    );
  
    $self->AddFields(
