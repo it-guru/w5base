@@ -83,7 +83,8 @@ sub new
                 dataobjattr   =>
                   "(select TOP 1 lower(Mail) from V_DARWIN_EXPORT_AEG ".
                   "where V_DARWIN_EXPORT_AEG.ICTO_Nummer=".
-                         "V_DARWIN_EXPORT.ICTO_Nummer ".
+                         "V_DARWIN_EXPORT.ICTO_Nummer and ".
+                         "V_DARWIN_EXPORT_AEG.Role='Application Manager' ".
                   "order by V_DARWIN_EXPORT_AEG.Mail)"),
 
       new kernel::Field::SubList(
