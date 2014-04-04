@@ -63,6 +63,13 @@ sub getControlRecord
              idfield      =>'semid',
              targetlabel  =>'name'
            },
+           applmgr=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::appl',
+             target       =>'applmgr',
+             idfield      =>'applmgrid',
+             targetlabel  =>'name'
+           },
            guardianteam=>{
              replaceoptype=>'base::grp',
              dataobj      =>'itil::asset',
