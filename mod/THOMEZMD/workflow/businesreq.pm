@@ -62,7 +62,7 @@ sub getDynamicFields
         "175084-0011; Einspielen von Releaseänderungen (Major Releases)",
         "175084-0012; Einspielen von Versionen",
         "175084-0013; Fallback für Releasewechsel oder Migrationen",
-        "175084-0014; Desaster-Recovery Test",
+        "175084-0014; Disaster-Recovery Test",
         "175084-0015; Deinstallation von Applikationen",
         "175084-0016; Ausführen von Batches/Scripten",
         "175084-0017; Ausführen von Daueraufträge",
