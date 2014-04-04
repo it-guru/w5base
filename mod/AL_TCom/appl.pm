@@ -41,7 +41,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'drclass',
                 group         =>'monisla',
-                label         =>'Disaster Recovery Class (requested)',
+                label         =>'Disaster Recovery Class',
                 transprefix   =>'DR.',
                 value         =>['',
                                  '0',
