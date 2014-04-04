@@ -1089,11 +1089,41 @@ sub Validate
    if (!defined($oldrec)){
       $newrec->{secstate}=$self->Config->Param("DefaultUserSecState");
    }
+
    my $usertyp=effVal($oldrec,$newrec,"usertyp");
-   $newrec->{surname}="FMB" if ($usertyp eq "function");
-   if ($usertyp eq "service"){
-      $newrec->{givenname}="";
+   # field resets based on usertype
+   if ($usertyp eq "function"){
+      if (effVal($oldrec,$newrec,"surname") ne "FMB"){
+         $newrec->{surname}="FMB";
+      }
    }
+   if ($usertyp eq "service"){
+      if (effVal($oldrec,$newrec,"givenname") ne ""){
+         $newrec->{givenname}="";
+      }
+   }
+   if ($usertyp eq "function" || $usertyp eq "service"){
+      foreach my $v (qw(office_mobile
+                        private_street
+                        private_zipcode
+                        private_location
+                        private_facsimile
+                        private_elecfacsimile
+                        private_mobile
+                        private_phone
+                        office_room
+                        office_location
+                        office_street
+                        office_zipcode
+                        office_organisation
+                        country)){
+         if (effVal($oldrec,$newrec,$v) ne ""){
+            $newrec->{$v}="";
+         }
+      }
+   }
+
+
    if ($usertyp ne "service" &&
        effVal($oldrec,$newrec,"surname") eq "" &&
        effVal($oldrec,$newrec,"givenname") eq ""){
