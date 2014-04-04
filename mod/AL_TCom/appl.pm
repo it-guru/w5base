@@ -137,7 +137,7 @@ sub new
 #                  "   if (appl.rpolevel>=0 && ".
 #                  "       appl.rtolevel>=0,1,0),".
 #                  "NULL))))))))"),
-#   );
+   );
  
    $self->AddFields(
       new kernel::Field::Text(
