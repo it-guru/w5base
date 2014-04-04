@@ -2,4 +2,5 @@
 'Component'=>{de=>'Komponente'},
 'Redundance 1'=>{de=>'Redundanz 1'},
 'Redundance 2'=>{de=>'Redundanz 2'},
+'Comments and Redundance'=>{de=>'Bemerkungen und Redundanzen'},
 'no primary element specified'=>{de=>'keine primäre Komponente angegeben'},

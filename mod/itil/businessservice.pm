@@ -275,7 +275,8 @@ sub new
                 vjointo       =>'itil::lnkbscomp',
                 allowcleanup  =>1,
                 vjoinon       =>['id'=>'businessserviceid'],
-                vjoindisp     =>['name','namealt1','namealt2',"comments"]),
+                vjoindisp     =>['lnkpos','name',"xcomments"]),
+                # namealt1 namealt2
 
       new kernel::Field::SubList(
                 name          =>'servicecompappl',

@@ -2,9 +2,12 @@
    <table class=editframe>
       <tr>
          <td class=fname width=10%>%objtype(label)%:</td>
-         <td class=finput width=40%>%objtype(sublistedit)%</td>
+         <td class=finput colspan=2>%objtype(sublistedit)%</td>
+         <td class=fname nowrap>%lnkpos(sublistedit)%</td>
+      </tr>
+      <tr>
          <td class=fname width=10%>%name(label)%:</td>
-         <td class=finput width=40%>%name(sublistedit)%</td>
+         <td class=finput colspan=3>%name(sublistedit)%</td>
       </tr>
       <tr>
          <td class=fname width=10%>%namealt1(label)%:</td>

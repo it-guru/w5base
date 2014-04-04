@@ -53,6 +53,13 @@ sub new
                 label         =>'Businessservice ID',
                 dataobjattr   =>'lnkbscomp.businessservice'),
 
+      new kernel::Field::Text(
+                name          =>'lnkpos',
+                label         =>'Pos',
+                htmlwidth     =>'50',
+                htmleditwidth =>'30px',
+                dataobjattr   =>'lnkbscomp.lnkpos'),
+
       new kernel::Field::Link(
                 name          =>'sortkey',
                 label         =>'SortKey',
@@ -126,6 +133,26 @@ sub new
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'lnkbscomp.comments'),
+
+      new kernel::Field::Textarea(
+                name          =>'xcomments',
+                label         =>'Comments and Redundance',
+                depend        =>['comments','namealt1','namealt2'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $f1=$self->getParent->getField("namealt1");
+                   my $f2=$self->getParent->getField("namealt2");
+                   my $v1=$f1->RawValue($current);
+                   my $v2=$f2->RawValue($current);
+                   my $c;
+                   $c.="|$v1" if ($v1 ne "");
+                   $c.="\n" if ($c ne "");
+                   $c.="|$v2" if ($v2 ne "");
+                   $c.="\n---\n" if ($c ne "");
+                   $c.=$current->{comments};
+                   return($c);
+                }), 
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -202,6 +229,22 @@ sub Validate
       $self->LastMsg(ERROR,"no primary element specified");
       return(0);
    }
+   if (exists($newrec->{lnkpos})){
+      if ($newrec->{lnkpos} ne ""){
+         if ($newrec->{lnkpos}<1){
+            $newrec->{lnkpos}=1;
+         }
+         if ($newrec->{lnkpos}>99){
+            $newrec->{lnkpos}=99;
+         }
+         $newrec->{lnkpos}=sprintf("%02d",$newrec->{lnkpos});
+      }
+      else{
+         $newrec->{lnkpos}=undef;  # allow multiple lines without lnkpos
+      }
+   }
+
+
 
    return(1);
 }
