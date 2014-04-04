@@ -41,8 +41,8 @@
                      en=>'Installation of major updates'},
 'fallback'=>        {de=>'Fallback für Releasewechsel oder Migrationen',
                      en=>'Fallback of release change of migration'},
-'desrecoverytest'=> {de=>'Desaster-Recovery Test',
-                     en=>'Desaster-Recovery Test'},
+'desrecoverytest'=> {de=>'Disaster-Recovery Test',
+                     en=>'Disaster-Recovery Test'},
 'uninstall'=>       {de=>'Deinstallation von Applikationen',
                      en=>'Uninstall application'},
 

@@ -1169,7 +1169,7 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'soslanumdrtests',
-                label         =>'SLA number Desaster-Recovery tests per year',
+                label         =>'SLA number Disaster-Recovery tests per year',
                 group         =>'sodrgroup',
                 htmleditwidth =>'120',
                 searchable    =>0,
@@ -1177,7 +1177,7 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'sosladrduration',
-                label         =>'SLA planned Desaster-Recovery duration',
+                label         =>'SLA planned Disaster-Recovery duration',
                 group         =>'sodrgroup',
                 unit          =>'min',
                 searchable    =>0,
@@ -1186,20 +1186,20 @@ sub new
       new kernel::Field::WorkflowLink(
                 name          =>'olastdrtestwf',
                 AllowEmpty    =>1,
-                label         =>'last Desaster-Recovery test (CHM-WorkflowID)',
+                label         =>'last Disaster-Recovery test (CHM-WorkflowID)',
                 group         =>'sodrgroup',
                 vjoinon       =>'olastdrtestwfid'),
 
       new kernel::Field::Link(
                 name          =>'olastdrtestwfid',
-                label         =>'last Desaster-Recovery test (CHM-WorkflowID)',
+                label         =>'last Disaster-Recovery test (CHM-WorkflowID)',
                 group         =>'sodrgroup',
                 searchable    =>0,
                 dataobjattr   =>'appl.solastdrtestwf'),
 
       new kernel::Field::Date(
                 name          =>'solastdrdate',
-                label         =>'last Desaster-Recovery test (WorkflowEnd)',
+                label         =>'last Disaster-Recovery test (WorkflowEnd)',
                 readonly      =>1,
                 dayonly       =>1,
                 group         =>'sodrgroup',
@@ -1210,7 +1210,7 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'temp_solastdrdate',
-                label         =>'last Desaster-Recovery test date (temp)',
+                label         =>'last Disaster-Recovery test date (temp)',
                 group         =>'sodrgroup',
                 searchable    =>0,
                 dayonly       =>1,
@@ -1971,9 +1971,9 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control custcontracts customer delmgmt
-              finance interfaces licenses monisla qc external itsem
+              finance interfaces licenses monisla sodrgroup qc external itsem
               misc opmgmt phonenumbers services businessservices architect
-              soclustgroup socomments sodrgroup source swinstances systems
+              soclustgroup socomments source swinstances systems
               technical workflowbasedata header inmchm interview efforts);
    if (!$rec->{sodefinition}){
       @all=grep(!/^(socomments|soclustgroup|sodrgroup)$/,@all);
@@ -2116,9 +2116,10 @@ sub getDetailBlockPriority
           qw(header default itsem finance technical opmgmt delmgmt 
              architect customer custcontracts 
              contacts phonenumbers 
-             interfaces systems swinstances services businessservices monisla
+             interfaces systems swinstances services businessservices 
+             monisla sodrgroup
              misc attachments control 
-             sodrgroup soclustgroup socomments accountnumbers licenses 
+             soclustgroup socomments accountnumbers licenses 
              external source));
 }
 
