@@ -1175,7 +1175,7 @@ create table lnkbscomp (
   obj3id       bigint(20)  default NULL,
   obj4id       bigint(20)  default NULL,
   importance   int(2)      default 1,
-  #
+  lnkpos       char(2)     default NULL,
   #
   comments     longtext    default NULL,
   createdate   datetime NOT NULL default '0000-00-00 00:00:00',
@@ -1187,7 +1187,7 @@ create table lnkbscomp (
   srcsys       varchar(100) default 'w5base',
   srcid        varchar(20) default NULL, 
   srcload      datetime    default NULL,
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id),UNIQUE KEY lnkpos(lnkpos,businessservice),
   KEY obj1 (objtype,obj1id),
   KEY obj2 (objtype,obj2id),
   KEY obj3 (objtype,obj3id),
