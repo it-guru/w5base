@@ -86,9 +86,12 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(0,undef) if (!($rec->{cistatusid}==3 || $rec->{cistatusid}==4));
+   return(0,undef) if (!($rec->{cistatusid}==3 || 
+                         $rec->{cistatusid}==4));
 
-   
+   return(0,undef) if ($rec->{opmode} ne "prod"); # ApplicationManager sind
+                                                  # nur für die Prod Umgebungen
+                                                  # definiert.
    if ($rec->{ictono} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
       $par->SetFilter({archapplid=>\$rec->{ictono}});
