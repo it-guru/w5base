@@ -392,8 +392,11 @@ sub new
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return "$current->{criticality}".
-                          " (calc. $current->{criticalitycalc})";
+                   my $txt=$current->{criticality};
+                   if ($current->{criticalitycalc}=~m/\S*/){
+                      $txt.=" (calc. $current->{criticalitycalc})";
+                   }
+                   return $txt;
                 }),
 
       new kernel::Field::Text(
