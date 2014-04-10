@@ -1115,13 +1115,13 @@ sub Validate
                         office_location
                         office_street
                         office_zipcode
-                        office_organisation
                         country)){
          if (effVal($oldrec,$newrec,$v) ne ""){
             $newrec->{$v}="";
          }
       }
    }
+
 
 
    if ($usertyp ne "service" &&
@@ -1271,8 +1271,7 @@ sub Validate
       $newrec->{allowifupdate}=1;
    }
    #######################################################################
-   if ($usertyp eq "service"){
-      my $email=effVal($oldrec,$newrec,"email");
+   if ($usertyp eq "service" && defined($newrec->{fullname})){
       $newrec->{fullname}="service: ".$newrec->{fullname};
    }
    my $fullname=effVal($oldrec,$newrec,"fullname");
