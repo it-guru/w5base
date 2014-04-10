@@ -52,6 +52,15 @@ sub getPosibleRoles
        $self->getParent->getParent->Self()=~m/^AL_TCom::custcontract$/)){
       return("vk"=>$self->getParent->T("T-Com:VK Vertragskoordinator",$self->Self));
    }
+   if ($parentobj=~m/^.+::businessservice$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::businessservice$/)){
+      return(
+             "requestor"       =>$self->getParent->T("Requestor",
+                                                     $self->Self));
+   }
+
    return();
 }
 
@@ -80,6 +89,19 @@ sub Validate
          }
       }
    }
+
+   if (defined($newrec->{roles}) && $parentobj=~m/::businessservice$/){
+      my $roles=$newrec->{roles};
+      $roles=[$roles] if (ref($roles) ne "ARRAY");
+      if (grep(/^requestor$/,@$roles) ){
+         if ($app->isRoleMultiUsed({
+               requestor     =>$self->getParent->T("Requestor")
+               },$roles,$oldrec,$newrec,$parentobj,$refid)){
+            return(0);
+         }
+      }
+   }
+
 
    return(1);
 }

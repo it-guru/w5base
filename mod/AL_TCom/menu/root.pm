@@ -168,8 +168,16 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.appl.bs.new",
-                      "itil::businessservice",
+                      "AL_TCom::businessservice",
                       func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.appl.bs.lnkcontact",
+                      "itil::lnkbscontact",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.appl.bs.its",
+                      "AL_TCom::businessserviceITS",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.itclust",
