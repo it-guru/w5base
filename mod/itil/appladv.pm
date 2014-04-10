@@ -168,6 +168,7 @@ sub new
                 label         =>'customer NOR Model definiton wish',
                 group         =>'nordef',
                 allowempty    =>1,
+                depend        =>['normodelbycustomerid'],
                 vjointo       =>'itil::itnormodel',
                 vjoinon       =>['normodelbycustomerid'=>'id'],
                 vjoindisp     =>'name',
@@ -257,12 +258,6 @@ sub new
 
    return($self);
 }
-
-sub SelfAsParentObject    # this method is needed because existing derevations
-{
-   return("itil::appladv");
-}
-
 
 
 sub addModuleMatrix
@@ -451,6 +446,7 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("itil::appladv");
 }
+
 
 
 
