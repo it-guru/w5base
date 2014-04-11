@@ -1,3 +1,4 @@
 'from'=>{de=>'von'},
 'to'=>{de=>'nach'},
 'translate'=>{de=>'übersetzen'},
+'ATTENTION: The translation will done bei Google-Translation Services! Do not use this module for internal Informations!'=>{de=>'ACHTUNG: Die Übersetzung wird durch die Google-Translation-Services realisiert! Verwenden Sie die Funktion NICHT für interne oder geheime Informationen!'}
