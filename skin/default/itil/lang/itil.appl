@@ -154,5 +154,7 @@
 'monistatus.NOMONI'=>{de=>'keine Überwachung/Monitoring',en=>'no monitoring'},
 'monistatus.MONISIMPLE'=>{de=>'Überwachung OHNE Autoticket',en=>'monitoring with NO autoticket'},
 'monistatus.MONIAUTOIN'=>{de=>'Überwachung mit Autoticket',en=>'monitoring with autoticket'},
+'Interface application ci-status change'=>{de=>'Schnittstellenanwendung - CI-Status Änderung'},
+'a interface application (%s) of an application which is managed by you, has change the ci status to %s .Please check the currentness of the interface definitions in %s !'=>{de=>'bei einer Schnittstellenanwendung (%s) einer von Ihnen geführten Anwendungen wurde der CI-Status auf %s geändert. Bitte überprüfen Sie die Schnittstellendefinition von %s auf deren Aktualität und Vollständigkeit!'},
 
 

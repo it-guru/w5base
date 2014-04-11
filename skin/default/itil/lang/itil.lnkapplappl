@@ -55,3 +55,5 @@
 'PERS.0'=>{de=>'[unklar/nicht definiert]',en=>'[unknown]'},
 'PERS.1'=>{de=>'Nein',en=>'No'},
 'PERS.2'=>{de=>'Ja',en=>'Yes'},
+'from Application CI-State'=>{de=>'von Anwendung CI-Status'},
+'to Application CI-State'=>{de=>'nach Anwendung CI-Status'},

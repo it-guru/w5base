@@ -219,6 +219,9 @@ sub preQualityCheckRecord
          $rk="swinstanceid" if ($p eq "itil::swinstance");
          $add->SetFilter({$rk=>\$rec->{id},engine=>\$engine->{name}});
          my ($oldadrec)=$add->getOnlyFirst(qw(ALL));
+         # check age of oldadrec - if newer then 24h - use old one
+            # todo
+
          my $ado=$self->getPersistentModuleObject($engine->{addataobj});
          if (!exists($rec->{$engine->{localkey}})){
             # autodisc key data does not exists in local object

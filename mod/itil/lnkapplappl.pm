@@ -26,6 +26,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    
 
@@ -121,6 +122,37 @@ sub new
                 group         =>'agreement',
                 label         =>'Agreements',
                 dataobjattr   =>'lnkapplappl.agreements'),
+
+      new kernel::Field::Select(
+                name          =>'fromapplicationcistatus',
+                label         =>'from Application CI-State',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['fromapplcistatus'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'fromapplcistatus',
+                label         =>'from Appl CI-Status',
+                dataobjattr   =>'fromappl.cistatus'),
+
+      new kernel::Field::Select(
+                name          =>'toapplicationcistatus',
+                label         =>'to Application CI-State',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjoineditbase =>{id=>">0"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['toapplcistatus'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'toapplcistatus',
+                label         =>'to Appl CI-Status',
+                dataobjattr   =>'toappl.cistatus'),
+
 
       new kernel::Field::SubList(
                 name          =>'interfacescomp',
@@ -338,16 +370,6 @@ sub new
                 label         =>'to ApplID',
                 dataobjattr   =>'lnkapplappl.toappl'),
 
-      new kernel::Field::Link(
-                name          =>'toapplcistatus',
-                label         =>'to Appl CI-Status',
-                dataobjattr   =>'toappl.cistatus'),
-
-      new kernel::Field::Link(
-                name          =>'fromapplcistatus',
-                label         =>'from Appl CI-Status',
-                dataobjattr   =>'fromappl.cistatus'),
-
    );
    $self->{history}=[qw(insert modify delete)];
    $self->setDefaultView(qw(fromappl toappl cistatus cdate editor));
@@ -360,6 +382,14 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_cistatus"))){
      Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+   if (!defined(Query->Param("search_fromapplicationcistatus"))){
+     Query->Param("search_fromapplicationcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+   if (!defined(Query->Param("search_toapplicationcistatus"))){
+     Query->Param("search_toapplicationcistatus"=>
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
 }
