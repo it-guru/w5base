@@ -362,11 +362,15 @@ sub getPostibleRoleValues
    my $app=$self->getParent();
    my @opt;
    my $parentobj;
+
    if (defined($current)){
       $parentobj=$current->{parentobj};
    }
    else{
       $parentobj=$newrec->{parentobj};
+      if ($parentobj eq ""){
+         $parentobj=Query->Param("parentobj");  # bei Neueingabe über SubList
+      }
    }
    foreach my $obj (values(%{$app->{lnkcontact}})){
       push(@opt,$obj->getPosibleRoles($self,$parentobj,$current,$newrec));

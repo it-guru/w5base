@@ -143,7 +143,8 @@ sub FormatedDetail
    if (($mode eq "workflow" || $mode eq "edit" ) 
        && !($readonly)){
       my @fromquery=Query->Param("Formated_$name");
-      if (defined($self->{vjointo}) && defined($self->{vjoinon})){
+      if (defined($current) &&
+          defined($self->{vjointo}) && defined($self->{vjoinon})){
          $d=$current->{$self->{vjoinon}->[0]};
       }
       $d=[$d] if (ref($d) ne "ARRAY");
@@ -169,6 +170,7 @@ sub FormatedDetail
       }
       $s.=" class=\"finput\" style=\"width:$width\">";
       my @options=$self->getPostibleValues($current,undef,"edit");
+printf STDERR ("fifi current=$current options=%s\n",join(",",@options));
       while($#options!=-1){
          my $key=shift(@options);
          my $val=shift(@options);
