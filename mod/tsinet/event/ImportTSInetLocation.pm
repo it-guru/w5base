@@ -85,8 +85,8 @@ sub ImportTSInetLocation
             }
             if ($#{$rec->{w5locid}}==-1){
                push(@problems," - no w5bloc for ".
-                              "streetser $rec->{streetser} ".
-                              "($rec->{location};$rec->{address1})");
+                  "streetser $rec->{streetser} ".
+                  "($rec->{prio};$rec->{location};$rec->{address1})");
             }
             else{
                foreach my $w5id (@{$rec->{w5locid}}){
