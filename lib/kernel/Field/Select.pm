@@ -170,7 +170,6 @@ sub FormatedDetail
       }
       $s.=" class=\"finput\" style=\"width:$width\">";
       my @options=$self->getPostibleValues($current,undef,"edit");
-printf STDERR ("fifi current=$current options=%s\n",join(",",@options));
       while($#options!=-1){
          my $key=shift(@options);
          my $val=shift(@options);
