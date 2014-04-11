@@ -66,12 +66,15 @@ sub new
                    return(0);
                 },
                 label         =>'Business-Service Fullname',
-                dataobjattr   =>"concat(".
-                                "if (nature='','',concat(nature,':')),".
-                                "if (applname is null,'',".
-                                "concat(applname,':')),".
-                                "if ($worktable.name is null,'[ENTIRE]',".
-                                "$worktable.name))"),
+                dataobjattr   =>
+                   "concat(".
+                   "if (nature='','',concat(nature,".
+                   "if (shortname='',':',concat(shortname,':')))),".
+                   "if (applname is null,'',".
+                   "concat(applname,if (shortname='',':',".
+                   "concat(':',shortname,':')))),".
+                   "if ($worktable.name is null,'[ENTIRE]',".
+                   "$worktable.name))"),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
@@ -80,12 +83,20 @@ sub new
                 label         =>'Name',
                 dataobjattr   =>"$worktable.name"),
 
+      new kernel::Field::Text(
+                name          =>'shortname',
+                sqlorder      =>'desc',
+                searchable    =>0,
+                htmleditwidth =>'50px',
+                label         =>'Short name',
+                dataobjattr   =>"$worktable.shortname"),
+
       new kernel::Field::Select(
                 name          =>'nature',
                 sqlorder      =>'desc',
                 label         =>'Nature',
                 transprefix   =>'nat.',
-                value         =>['','ITS','ENS','TSA'],
+                value         =>['','IT-S','ES','TR'],
                 dataobjattr   =>"$worktable.nature"),
 
       new kernel::Field::Link(
@@ -276,7 +287,6 @@ sub new
                 allowcleanup  =>1,
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>['lnkpos','name',"xcomments"]),
-                # namealt1 namealt2
 
       new kernel::Field::SubList(
                 name          =>'servicecompappl',
@@ -386,6 +396,12 @@ sub getDetailBlockPriority
 }
 
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::businessservice");
+}
+
+
 
 
 
@@ -478,6 +494,11 @@ sub Validate
        && ($newrec->{name}=~m/^\s*$/)){
       $self->LastMsg(ERROR,"invalid service name specified");
       return(0);
+   }
+   if (exists($newrec->{shortname})){
+      my $sn=$newrec->{shortname};
+      $sn=~s/[^0-9,a-z,-]//gi;
+      $newrec->{shortname}=$sn;
    }
 
    if (effVal($oldrec,$newrec,"name") eq "[ENTIRE]" ||
