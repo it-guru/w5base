@@ -154,6 +154,7 @@ sub new
                 name          =>'viewlastbywriter',
                 label         =>'View last by author',
                 frontreadonly =>1,
+                uploadable    =>0,
                 group         =>'sig',
                 dataobjattr   =>'faq.viewlastbywriter'),
 
@@ -249,6 +250,7 @@ sub new
                 name          =>'rawdata',
                 searchable    =>1,
                 htmldetail    =>0,
+                uploadable    =>0,
                 label         =>'raw data',
                 dataobjattr   =>'faq.data'),
 
