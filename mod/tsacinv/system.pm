@@ -102,6 +102,12 @@ sub new
                 group         =>"location",
                 fields        =>[qw(room place)]),
 
+      new kernel::Field::Text(
+                name          =>'customerlink',
+                label         =>'Customer (link)',
+                htmldetail    =>0,
+                dataobjattr   =>'amcostcenter.customerlink'),
+
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenterID',
@@ -853,7 +859,10 @@ sub getSqlFrom
    my $self=shift;
    my $from=
       "amcomputer,amportfolio,ammodel,amnature,".
-      "(select amcostcenter.* from amcostcenter ".
+      "(select amcostcenter.*,amtsiaccsecunit.identifier as customerlink ".
+      " from amcostcenter left outer ".
+      " join amtsiaccsecunit on ".
+      "amcostcenter.lcustomerlinkid=amtsiaccsecunit.lunitid ".
       " where amcostcenter.bdelete=0) amcostcenter, ".
       "amportfolio assetportfolio, ".
       "(select distinct ".
