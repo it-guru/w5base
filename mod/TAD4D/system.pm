@@ -29,6 +29,7 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->{use_distinct}=0;
 
    
    $self->AddFields(
@@ -102,6 +103,7 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'TAD4D::software',
                 vjoinon       =>['agentid'=>'agentid'],
+                vjoinbase     =>{endtime=>\undef},
                 vjoindisp     =>['software','version','isremote']),
 
       new kernel::Field::SubList(

@@ -28,8 +28,9 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
-
+   $self->{use_distinct}=0;
    
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -86,7 +87,7 @@ sub new
                                 "'9999-12-31 00:00:00.000000',".
                                 "NULL,adm.prod_inv.start_time)"),
 
-      new kernel::Field::Text(
+      new kernel::Field::Date(
                 name          =>'endtime',
                 label         =>'End-Time',
                 dataobjattr   =>"decode(adm.prod_inv.end_time,".
@@ -96,7 +97,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'agentid',
                 label         =>'Agent ID',
-                ignorecase    =>1,
                 group         =>'source',
                 dataobjattr   =>'adm.agent.id'),
 
@@ -131,6 +131,15 @@ sub getSqlFrom
    my $from="adm.prod_inv,adm.agent,adm.swproduct,adm.component";
    return($from);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_endtime"=>'[EMPTY]');
+   }
+}
+
 
 sub initSqlWhere
 {

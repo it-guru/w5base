@@ -3741,8 +3741,9 @@ sub FilterPart2SQLexp
          if (($val eq "[LEER]" || $val eq "[EMPTY]") && 
               ($sqlparam{wildcards} || $sqlparam{datatype} eq "DATE")){
             $exp.=" ".$conjunction." " if ($exp ne "");
+            my $sqldriver=$sqlparam{sqldbh}->DriverName();
             if (defined($sqlparam{sqldbh}) &&
-                lc($sqlparam{sqldbh}->DriverName()) eq "oracle"){
+                ($sqldriver eq "oracle" || $sqldriver eq "db2")){
                $exp.="($sqlfieldname is NULL)"; # in oracle is ''=NULL and
             }                                   # a compare on '' produces a
             else{                               # wrong result
