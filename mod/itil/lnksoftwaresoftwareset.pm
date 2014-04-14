@@ -67,6 +67,13 @@ sub new
                 dataobjattr   =>'lnksoftwaresoftwareset.version'),
 
       new kernel::Field::Text(
+                name          =>'startwith',
+                htmlwidth     =>'60px',
+                htmleditwidth =>'60px',
+                label         =>'only if Start with',
+                dataobjattr   =>'lnksoftwaresoftwareset.startwith'),
+
+      new kernel::Field::Text(
                 name          =>'releasekey',
                 readonly      =>1,
                 group         =>'releaseinfos',
@@ -79,7 +86,7 @@ sub new
                 htmleditwidth =>'220px',
                 label         =>'Comparator',
                 transprefix   =>'comp.',
-                value         =>['0', '1', '2','3'],
+                value         =>['0', '10','11', '2','3'],
                 dataobjattr   =>'lnksoftwaresoftwareset.comparator'),
 
       new kernel::Field::Link(
@@ -174,6 +181,13 @@ sub getDetailBlockPriority
           qw(default liccontractinfo source));
 }
 
+
+sub initSqlOrder
+{
+   my $self=shift;
+   return("lnksoftwaresoftwareset.software,".
+          "lnksoftwaresoftwareset.comparator desc");
+}
 
 
 

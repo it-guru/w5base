@@ -92,7 +92,7 @@ sub new
                 vjointo       =>'itil::lnksoftwaresoftwareset',
                 vjoinon       =>['id'=>'softwaresetid'],
                 vjoindisp     =>['fullname',"comparator",'version'],
-                vjoininhash   =>['softwareid','version',
+                vjoininhash   =>['softwareid','version','startwith',
                                  'releasekey','comparator']),
 
       new kernel::Field::SubList(

@@ -7,8 +7,12 @@
       <tr>
          <td class=fname width=5%>%version(label)%:</td>
          <td class=finput width=100>%version(sublistedit)%</td>
+         <td class=fname width=5%>%startwith(label)%:</td>
+         <td class=finput width=100>%startwith(sublistedit)%</td>
+      </tr>
+      <tr>
          <td class=fname width=5%>%comparator(label)%:</td>
-         <td class=finput width=120>%comparator(sublistedit)%</td>
+         <td class=finput colspan=3>%comparator(sublistedit)%</td>
       </tr>
    </table>
 </div>

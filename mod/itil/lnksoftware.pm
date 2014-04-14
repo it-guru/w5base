@@ -1019,7 +1019,7 @@ sub calcSoftwareState
 
       my @ruleset=@{$FilterSet->{Set}->{data}->{software}};
 
-      @ruleset=sort({$a->{comparator}<=>$b->{comparator}} @ruleset);
+      @ruleset=sort({$b->{comparator}<=>$a->{comparator}} @ruleset);
 
 
       foreach my $swi (values(%{$FilterSet->{Analyse}->{ssoftware}->{id}})){
@@ -1029,13 +1029,19 @@ sub calcSoftwareState
          if ($swi->{is_dbs}){
             $resdstate->{group}->{DB}->{count}++;
          }
-         foreach my $swrec (@ruleset){
+         RULESET: foreach my $swrec (@ruleset){
             if ($swrec->{softwareid} eq  $swi->{softwareid}){
                $FilterSet->{Analyse}->{relevantSoftwareInst}++;
                if ($swi->{version}=~m/^\s*$/){
                   push(@{$FilterSet->{Analyse}->{todo}},
                         "- no version specified in software installaton ".
                         "of $swrec->{softwareid} on system $swi->{systemid}");
+               }
+               if ($swrec->{startwith} ne ""){
+                  my $qstartwith=quotemeta($swrec->{startwith});
+                  if (!($swi->{version}=~m/^$qstartwith/i)){
+                     next RULESET;
+                  }
                }
                my $failpost="";
                if ($swi->{denyupd}>0){
@@ -1074,16 +1080,17 @@ sub calcSoftwareState
                               $resdstate->{group}->{DB}->{warn}++;
                            }
                         }
-                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^WARN/)
-                            &&  # ERROR have a higher priority
-                            !($FilterSet->{Analyse}->{totalstate}=~m/^FAIL$/)
-                            &&
-                            !($FilterSet->{Analyse}->{totalstate}
-                              =~m/^FAIL and not OK$/)){
+                  #      if (!($FilterSet->{Analyse}->{totalstate}=~m/^WARN/)
+                  #          &&  # ERROR have a higher priority
+                  #          !($FilterSet->{Analyse}->{totalstate}=~m/^FAIL$/)
+                  #          &&
+                  #          !($FilterSet->{Analyse}->{totalstate}
+                  #            =~m/^FAIL and not OK$/)){
                            $FilterSet->{Analyse}->{totalstate}="WARN".$failpost;
-                        }
+                  #      }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                              "$swi->{software} needs soon >=$swrec->{version}");
+                        last RULESET;
                      }
                   }
                   elsif ($swrec->{comparator} eq "2"){
@@ -1106,9 +1113,16 @@ sub calcSoftwareState
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                              "$swi->{software} needs $swrec->{version}");
+                        last RULESET;
                      }
                   }
-                  elsif ($swrec->{comparator} eq "1"){
+                  elsif ($swrec->{comparator} eq "12"){
+                     if ($swrec->{releasekey} eq $swi->{releasekey} ||
+                         $swrec->{version} eq $swi->{version}){
+                        last RULESET;
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "10"){
                      if ($swrec->{releasekey} eq $swi->{releasekey} ||
                          $swrec->{version} eq $swi->{version}){
                         if ($failpost ne " but OK"){
@@ -1127,6 +1141,28 @@ sub calcSoftwareState
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                              "$swi->{software} disallowed $swrec->{version}");
+                        last RULESET;
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "11"){
+                     if ($swrec->{releasekey} gt $swi->{releasekey}){
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                               "- remove disallowed version $swi->{software} ".
+                               " $swi->{version} from  system $swi->{system} ");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{fail}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{fail}++;
+                           }
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} disallowed $swrec->{version}");
+                        last RULESET;
                      }
                   }
                   elsif ($swrec->{comparator} eq "0"){
@@ -1148,6 +1184,7 @@ sub calcSoftwareState
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                              "$swi->{software} needs >=$swrec->{version}");
+                        last RULESET;
                      }
                   }
                }
