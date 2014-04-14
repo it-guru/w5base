@@ -61,6 +61,8 @@ sub NSO_Kundensys_Rep
                systemid 
                status 
                systemos
+               assignmentgroup
+               virtualization
                srcid
                assetmodelname
                assetpowerinput
