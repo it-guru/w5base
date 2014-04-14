@@ -67,7 +67,6 @@ sub new
                 name          =>'softwareproduct',
                 label         =>'Software Product',
                 htmlwidth     =>380,
-                searchable    =>0,
                 ignorecase    =>1,
                 dataobjattr   =>'adm.swproduct.name'),
 
@@ -76,11 +75,6 @@ sub new
                 label         =>'Version',
                 ignorecase    =>1,
                 dataobjattr   =>'adm.swproduct.version'),
-
-      new kernel::Field::Boolean(
-                name          =>'isremote',
-                label         =>'Remote',
-                dataobjattr   =>'adm.prod_inv.is_remote'),
 
       new kernel::Field::Text(
                 name          =>'scope',
@@ -101,6 +95,11 @@ sub new
                 dataobjattr   =>"decode(adm.prod_inv.end_time,".
                                 "'9999-12-31 00:00:00.000000',".
                                 "NULL,adm.prod_inv.end_time)"),
+
+      new kernel::Field::Boolean(
+                name          =>'isremote',
+                label         =>'Remote',
+                dataobjattr   =>'adm.prod_inv.is_remote'),
 
       new kernel::Field::Text(
                 name          =>'agentid',
