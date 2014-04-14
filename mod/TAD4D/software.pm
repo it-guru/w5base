@@ -50,6 +50,13 @@ sub new
                 dataobjattr   =>'adm.agent.hostname'),
 
       new kernel::Field::Text(
+                name          =>'vendor',
+                label         =>'Vendor',
+                htmlwidth     =>180,
+                ignorecase    =>1,
+                dataobjattr   =>'adm.vendor.name'),
+
+      new kernel::Field::Text(
                 name          =>'software',
                 label         =>'Software',
                 htmlwidth     =>380,
@@ -60,6 +67,7 @@ sub new
                 name          =>'softwareproduct',
                 label         =>'Software Product',
                 htmlwidth     =>380,
+                searchable    =>0,
                 ignorecase    =>1,
                 dataobjattr   =>'adm.swproduct.name'),
 
@@ -101,7 +109,7 @@ sub new
                 dataobjattr   =>'adm.agent.id'),
 
    );
-   $self->setDefaultView(qw(hostname software version));
+   $self->setDefaultView(qw(hostname vendor software version));
    return($self);
 }
 
@@ -128,7 +136,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="adm.prod_inv,adm.agent,adm.swproduct,adm.component";
+   my $from="adm.prod_inv,adm.agent,adm.swproduct,adm.component,adm.vendor";
    return($from);
 }
 
@@ -146,6 +154,7 @@ sub initSqlWhere
    my $self=shift;
    my $where="adm.prod_inv.agent_id=adm.agent.id and ".
              "adm.prod_inv.product_id=adm.swproduct.id and ".
+             "adm.swproduct.vendor_id=adm.vendor.id and ".
              "adm.prod_inv.component_id=adm.component.id";
    return($where);
 }
