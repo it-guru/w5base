@@ -29,3 +29,4 @@
 'SAP hierarchy 9'=>{de=>'SAP Hierarchie Ebene 9'},
 'untrimmed CostCenter-No.'=>{de=>'ungekürtze Kostenstelle/CO/PSP'},
 'Production Planning OSS'=>{de=>'Produktionsplannung OSS'},
+'used by active systems'=>{de=>'verwendet durch logische Systeme'},

@@ -80,6 +80,17 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'amcostcenter.orgunit'),
 
+      new kernel::Field::Boolean(
+                name          =>'usedbyactivesystems',
+                label         =>'used by logical systems',
+                htmldetail    =>0,
+                dataobjattr   =>
+                   "(select decode(count(*),0,0,1) ".
+                   "from amportfolio p1,amcomputer c1 ".
+                   " where p1.lportfolioitemid=c1.litemid and ".
+                   " p1.lcostid=amcostcenter.lcostid and ".
+                   " lower(c1.status)!='out of operation')"),
+
       new kernel::Field::Text(
                 name          =>'ictonr',
                 label         =>'ICTO-No',
@@ -192,6 +203,7 @@ sub new
                 label         =>'Systems',
                 group         =>'systems',
                 vjointo       =>'tsacinv::system',
+                vjoinbase     =>{status=>"\"!out of operation\""},
                 vjoinon       =>['name'=>'conumber'],
                 vjoindisp     =>[qw(fullname)]),
 
