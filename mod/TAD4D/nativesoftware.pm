@@ -63,8 +63,17 @@ sub new
       new kernel::Field::Text(
                 name          =>'agentid',
                 label         =>'Agent ID',
+                group         =>'source',
                 ignorecase    =>1,
                 dataobjattr   =>'adm.agent.id'),
+
+      new kernel::Field::Date(
+                name          =>'scandate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Scan-Date',
+                dataobjattr   =>'adm.agent.scan_time'),
+
 
    );
    $self->setDefaultView(qw(hostname software version));

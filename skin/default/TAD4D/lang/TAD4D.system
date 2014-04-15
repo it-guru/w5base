@@ -3,4 +3,5 @@
 'fieldgroup.agent'=>{de=>'TAD4D Agent',en=>'TAD4D Agent'},
 'Serialnumber'=>{de=>'Seriennummer'},
 'IP-Address'=>{de=>'IP-Adresse'},
+'Scan-Date'=>{de=>'Scan-Datum'},
 

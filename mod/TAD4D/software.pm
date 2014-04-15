@@ -107,6 +107,13 @@ sub new
                 group         =>'source',
                 dataobjattr   =>'adm.agent.id'),
 
+      new kernel::Field::Date(
+                name          =>'scandate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Scan-Date',
+                dataobjattr   =>'adm.agent.scan_time'),
+
    );
    $self->setDefaultView(qw(hostname vendor software version));
    return($self);

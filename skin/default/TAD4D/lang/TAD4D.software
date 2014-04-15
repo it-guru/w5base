@@ -1,3 +1,5 @@
 'TAD4D::software'=>{de=>'TAD4D Softwareinstallation',en=>'TAD4D Software installation'},
 'Vendor'=>{de=>'Hersteller'},
+'Scan-Date'=>{de=>'Scan-Datum'},
+
 

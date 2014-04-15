@@ -141,9 +141,16 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'adm.computer.update_time'),
 
+      new kernel::Field::Date(
+                name          =>'scandate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Scan-Date',
+                dataobjattr   =>'adm.agent.scan_time'),
+
    );
    $self->setWorktable("adm.computer");
-   $self->setDefaultView(qw(systemname osrelease hwmodel));
+   $self->setDefaultView(qw(systemname osrelease hwmodel scandate));
    return($self);
 }
 
