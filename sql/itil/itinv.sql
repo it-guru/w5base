@@ -1324,3 +1324,5 @@ create table lnkapplgrpappl (
 alter table appl add disasterrecclass varchar(20) default NULL;
 alter table appl add rtolevel varchar(20) default NULL;
 alter table appl add rpolevel varchar(20) default NULL;
+alter table asset add denyupd int(1) default '0',add denyupdvalidto datetime default NULL,add denyupdcomments longtext default NULL,add refreshinfo1 datetime default NULL, add refreshinfo2 datetime default NULL, add refreshinfo3 datetime default NULL;
+alter table system add denyupd int(1) default '0',add denyupdvalidto datetime default NULL,add denyupdcomments longtext default NULL;

@@ -24,6 +24,7 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
 use finance::costcenter;
+use itil::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
@@ -336,6 +337,58 @@ sub new
                 dayonly       =>1,
                 label         =>'Deprecation End',
                 dataobjattr   =>'asset.deprend'),
+
+
+     new kernel::Field::Select(
+                name          =>'denyupd',
+                group         =>'upd',
+                label         =>'it is posible to refresh hardware',
+                value         =>[0,10,20,30,99],
+                transprefix   =>'DENUPD.',
+                dataobjattr   =>'asset.denyupd'),
+
+     new kernel::Field::Textarea(
+                name          =>'denyupdcomments',
+                group         =>'upd',
+                label         =>'comments to Update/Refresh posibilities',
+                dataobjattr   =>'asset.denyupdcomments'),
+
+     new kernel::Field::Date(
+                name          =>'denyupdvalidto',
+                group         =>'upd',
+                htmldetail    =>sub{
+                                   my $self=shift;
+                                   my $mode=shift;
+                                   my %param=@_;
+                                   if (defined($param{current})){
+                                      my $d=$param{current}->{$self->{name}};
+                                      return(1) if ($d ne "");
+                                   }
+                                   return(0);
+                                },
+                label         =>'Upgrade/Refresh reject valid to',
+                dataobjattr   =>'asset.denyupdvalidto'),
+
+     new kernel::Field::Date(
+                name          =>'refreshinfo1',
+                group         =>'upd',
+                htmldetail    =>0,
+                label         =>'Refresh notification 1',
+                dataobjattr   =>'asset.refreshinfo1'),
+
+     new kernel::Field::Date(
+                name          =>'refreshinfo2',
+                group         =>'upd',
+                htmldetail    =>0,
+                label         =>'Refresh notification 2',
+                dataobjattr   =>'asset.refreshinfo2'),
+
+     new kernel::Field::Date(
+                name          =>'refreshinfo3',
+                group         =>'upd',
+                htmldetail    =>0,
+                label         =>'Refresh notification 3',
+                dataobjattr   =>'asset.refreshinfo3'),
 
       new kernel::Field::Text(
                 name          =>'kwords',
@@ -736,6 +789,11 @@ sub Validate
    }
    ########################################################################
 
+   if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
+      return(0);
+   }
+
+
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
 
    return(1);
@@ -759,7 +817,14 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+
+   my @all=qw(default guardian physasset contacts control location 
+              systems source qc applications
+              phonenumbers misc attachments sec financeco history);
+   if ($rec->{deprstart} ne ""){
+      push(@all,"upd");
+   }
+   return(@all);
 }
 
 
@@ -770,7 +835,8 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default guardian physasset contacts control location 
-                       phonenumbers misc attachments sec financeco);
+                       phonenumbers misc attachments sec financeco
+                       upd);
    if (!defined($rec)){
       return("default","control");
    }
@@ -818,7 +884,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default guardian phonenumbers location 
-             physasset sec financeco contacts misc systems 
+             physasset sec financeco upd contacts misc systems 
              applications attachments control source));
 }
 

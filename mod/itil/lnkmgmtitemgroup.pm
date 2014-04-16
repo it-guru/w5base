@@ -139,6 +139,14 @@ sub new
                 label         =>'Businessservice ID',
                 dataobjattr   =>'lnkmgmtitemgroup.businessservice'),
 
+      new kernel::Field::Import($self,
+                vjointo       =>'itil::mgmtitemgroup',
+                vjoinon       =>['mgmtitemgroupid'=>'id'],
+                group         =>"hans",
+                fields        =>['grouptype']),
+
+
+
       new kernel::Field::Text(
                 name          =>'comments',
                 searchable    =>0,
@@ -243,8 +251,8 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {  
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default  source));
+   return(
+          qw( default  hans source header));
 }
 
 

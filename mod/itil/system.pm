@@ -607,6 +607,39 @@ sub new
                 label         =>'Keywords',
                 dataobjattr   =>'system.kwords'),
 
+     new kernel::Field::Select(
+                name          =>'denyupd',
+                group         =>'upd',
+                label         =>'it is posible to update/upgrade OS',
+                value         =>[0,10,20,30,99],
+                transprefix   =>'DENUPD.',
+                dataobjattr   =>'system.denyupd'),
+
+     new kernel::Field::Textarea(
+                name          =>'denyupdcomments',
+                group         =>'upd',
+                label         =>'comments to Update/Upgrade posibilities',
+                dataobjattr   =>'system.denyupdcomments'),
+
+     new kernel::Field::Date(
+                name          =>'denyupdvalidto',
+                group         =>'upd',
+                htmldetail    =>sub{
+                                   my $self=shift;
+                                   my $mode=shift;
+                                   my %param=@_;
+                                   if (defined($param{current})){
+                                      my $d=$param{current}->{$self->{name}};
+                                      return(1) if ($d ne "");
+                                   }
+                                   return(0);
+                                },
+                label         =>'Update/Upgrade reject valid to',
+                dataobjattr   =>'system.denyupdvalidto'),
+
+
+
+
       new kernel::Field::FileList(
                 name          =>'attachments',
                 label         =>'Attachments',
@@ -1347,6 +1380,10 @@ sub Validate
       }
    }
 
+   if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
+      return(0);
+   }
+
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);
@@ -1433,7 +1470,7 @@ sub isViewValid
    my @all=qw(header default swinstances 
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses phonenumbers sec applications
-              location source customer history
+              location source customer history upd
               attachments control systemclass interview);
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       push(@all,"vhost");
@@ -1453,7 +1490,8 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default software admin logsys contacts monisla misc opmode 
+   my @databossedit=qw(default software admin logsys contacts 
+                       monisla misc opmode upd
                        physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
@@ -1580,7 +1618,8 @@ sub getDetailBlockPriority
              vhost physys systemclass cluster
              opmode sec applications customer software 
              swinstances ipaddresses
-             contacts monisla misc attachments control source));
+             contacts monisla misc upd 
+             attachments control source));
 }
 
 sub preQualityCheckRecord

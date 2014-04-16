@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use itil::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -835,19 +836,8 @@ sub Validate
    if (exists($newrec->{quantity}) && ! defined($newrec->{quantity})){
       delete($newrec->{quantity});
    }
-
-   if (exists($newrec->{denyupd})){
-      if ($newrec->{denyupd}>0){
-         if (exists($newrec->{denyupdvalidto})){
-            # prüfen ob länger als 365 Tage in der Zukunft!
-         }
-         if (effVal($oldrec,$newrec,"denyupdvalidto") eq ""){
-            $newrec->{denyupdvalidto}=$self->ExpandTimeExpression("now+365d");
-         }
-      }
-      else{
-         $newrec->{denyupdvalidto}=undef;
-      }
+   if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
+      return(0);
    } 
 
    return(1);

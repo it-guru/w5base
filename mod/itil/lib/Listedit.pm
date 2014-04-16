@@ -288,6 +288,36 @@ sub preQualityCheckRecord
 }
 
 
+sub updateDenyHandling
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (exists($newrec->{denyupd})){
+      if ($newrec->{denyupd}>0){
+         if (exists($newrec->{denyupdvalidto}) &&
+             $newrec->{denyupdvalidto} ne ""){
+            # prüfen ob länger als 36 Monate in der Zukunft!
+            my $d=CalcDateDuration(NowStamp("en"),$newrec->{denyupdvalidto});
+            if ($d->{days}>1095){
+               $self->LastMsg(ERROR,
+                    "deny reject valid to can only be 3 years in the future");
+               return(0);
+            }
+         }
+         if (effVal($oldrec,$newrec,"denyupdvalidto") eq ""){
+            $newrec->{denyupdvalidto}=$self->ExpandTimeExpression("now+365d");
+         }
+      }
+      else{
+         $newrec->{denyupdvalidto}=undef;
+      }
+   }
+   return(1);
+}
+
+
 
 
 
