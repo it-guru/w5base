@@ -221,7 +221,7 @@ sub mkProblemStoreRec
    };
    if (($rec->{priority}=~m/^\d+$/) &&
        $rec->{priority}>0 && $rec->{priority}<10){
-      $wfrec{prio}=$rec->{priority};
+      $wfrec{prio}=int($rec->{priority});
    }
 
    $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{createtime},
@@ -1008,7 +1008,7 @@ sub mkIncidentStoreRec
    };
    if (($rec->{priority}=~m/^\d+$/) &&
        $rec->{priority}>0 && $rec->{priority}<10){
-      $wfrec{prio}=$rec->{priority};
+      $wfrec{prio}=int($rec->{priority});
    }
    if (!($rec->{deviceid}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceCenterDeviceID}=$rec->{deviceid};
