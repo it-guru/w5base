@@ -44,6 +44,19 @@ sub Init
    $self->AddGroup("itilincident",translation=>'itil::workflow::incident');
 }
 
+sub isOptionalFieldVisible
+{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   my $name=$param{field}->Name();
+
+   return(1) if ($name eq "prio");
+   return(1) if ($name eq "name");
+   return($self->SUPER::isOptionalFieldVisible($mode,%param));
+}
+
+
 sub getDynamicFields
 {
    my $self=shift;
@@ -108,7 +121,7 @@ sub isViewValid
 
 sub getDetailBlockPriority                # posibility to mod the block order
 {
-   return("header","itilincident","affected","state","relations","source");
+   return("header","default","itilincident","affected","state","relations","source");
 }
 
 

@@ -607,7 +607,7 @@ sub getRelatedWorkflows
    my $dataobjectid=shift;     # id of record to find related workflows
    my $param=shift;
    my $q={};
-   my @internalWfView=qw(id isdeleted eventend stateid eventstart 
+   my @internalWfView=qw(id isdeleted eventend stateid eventstart prio
                          srcid srcsys name class fwdtarget fwdtargetid);
 
    my $idobj=$self->IdField();

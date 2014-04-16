@@ -219,6 +219,11 @@ sub mkProblemStoreRec
       ServiceCenterSoftwareID=>$rec->{softwareid},
       ServiceCenterCreator=>$rec->{creator},
    };
+   if (($rec->{priority}=~m/^\d+$/) &&
+       $rec->{priority}>0 && $rec->{priority}<10){
+      $wfrec{prio}=$rec->{priority};
+   }
+
    $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{createtime},
                                                  "en","CET");
    $wfrec{eventend}=$app->ExpandTimeExpression($rec->{closetime},
@@ -1001,6 +1006,10 @@ sub mkIncidentStoreRec
       ServiceCenterDowntimeStart=>$rec->{downtimestart},
       ServiceCenterDowntimeEnd=>$rec->{downtimeend},
    };
+   if (($rec->{priority}=~m/^\d+$/) &&
+       $rec->{priority}>0 && $rec->{priority}<10){
+      $wfrec{prio}=$rec->{priority};
+   }
    if (!($rec->{deviceid}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceCenterDeviceID}=$rec->{deviceid};
    }

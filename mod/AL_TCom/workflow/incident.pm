@@ -136,6 +136,8 @@ EOF
    ));
 }
 
+
+
 sub isWriteValid
 {
    my $self=shift;
@@ -157,7 +159,7 @@ sub isWriteValid
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return("header","itilincident","flow","affected","tcomcod","state","relations","source");
+   return("header","default","itilincident","flow","affected","tcomcod","state","relations","source");
 }
 
 
