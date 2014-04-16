@@ -88,6 +88,8 @@ sub isOptionalFieldVisible
    return(1) if ($name eq "name");
    return(1) if ($name eq "shortactionlog");
    return(1) if ($name eq "detaildescription");
+   return(1) if ($name eq "prio");
+
    return(0);
 }  
 
