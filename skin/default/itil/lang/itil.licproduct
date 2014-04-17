@@ -1,0 +1,4 @@
+'itil::licproduct'=>{de=>'Lizenz Produkt',en=>'License product'},
+'Producer'=>{de=>'Hersteller'},
+'Product family'=>{de=>'Produktfamilie'},
+'Licensemetric'=>{de=>'Lizenzmetrik'},

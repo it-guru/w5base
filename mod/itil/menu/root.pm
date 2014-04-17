@@ -411,6 +411,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.kern.licproduct",
+                      "itil::licproduct",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.kern.licproduct.new",
+                      "itil::licproduct",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.kern.producer",
                       "itil::producer",
                       defaultacl=>['valid_user']);

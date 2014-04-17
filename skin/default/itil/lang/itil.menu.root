@@ -81,6 +81,8 @@
 'itil.kern.osrelease.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.software'=>{de=>'Software',en=>'Software'},
 'itil.kern.software.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.kern.licproduct'=>{de=>'Lizenzprodukt',en=>'Lizenceproduct'},
+'itil.kern.licproduct.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.platform'=>{de=>'Plattform',en=>'Platform'},
 'itil.kern.platform.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.producer'=>{de=>'Hersteller',en=>'Producer'},

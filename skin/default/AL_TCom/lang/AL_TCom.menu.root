@@ -73,6 +73,8 @@
 'AL_TCom.proc.mgmtitemgroup.lnkcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'AL_TCom.kern.software'=>{de=>'Software',en=>'Software'},
 'AL_TCom.kern.software.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.kern.licproduct'=>{de=>'Lizenzprodukt',en=>'Lizenceproduct'},
+'AL_TCom.kern.licproduct.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.platform'=>{de=>'Plattform',en=>'Platform'},
 'AL_TCom.kern.platform.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.producer'=>{de=>'Hersteller',en=>'Producer'},
