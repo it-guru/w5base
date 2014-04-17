@@ -1326,3 +1326,26 @@ alter table appl add rtolevel varchar(20) default NULL;
 alter table appl add rpolevel varchar(20) default NULL;
 alter table asset add denyupd int(1) default '0',add denyupdvalidto datetime default NULL,add denyupdcomments longtext default NULL,add refreshinfo1 datetime default NULL, add refreshinfo2 datetime default NULL, add refreshinfo3 datetime default NULL;
 alter table system add denyupd int(1) default '0',add denyupdvalidto datetime default NULL,add denyupdcomments longtext default NULL;
+create table licproduct (
+  id          bigint(20)  NOT NULL,
+  name        varchar(128) NOT NULL,
+  pgroup      varchar(128) default NULL,
+  cistatus    int(2)      NOT NULL,
+    lmetric varchar(40) default 'UNKNOWN',
+    producer       bigint(20)  default NULL, 
+    mandator       bigint(20)  default NULL,
+  comments    longtext     default NULL,
+  additional  longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  srcsys      varchar(100) default 'w5base',
+  srcid       varchar(20) default NULL,
+  srcload     datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY name (name),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);
