@@ -895,7 +895,6 @@ sub calcSoftwareState
    else{
       $cachekey=$current->{id};
    }
-
    if ($FilterSet->{Analyse}->{id} ne $cachekey){
       $FilterSet->{Analyse}={id=>$cachekey};
       # load interessting softwareids from softwareset
@@ -928,12 +927,16 @@ sub calcSoftwareState
          $FilterSet->{Analyse}->{systems}=[];
          $FilterSet->{Analyse}->{systemids}={};
          foreach my $lnkrec ($lnk->getHashList(qw(systemid osreleaseid
-                                                  system))){
+                                                  system 
+                                                  systemdenyupd
+                                                  systemdenyupdvalidto))){
             my $sid=$lnkrec->{systemid};
             if (!exists($FilterSet->{Analyse}->{systemids}->{$sid})){
                my $srec={
                   name=>$lnkrec->{system},
                   systemid=>$lnkrec->{systemid},
+                  denyupd=>$lnkrec->{systemdenyupd},
+                  denyupdvalidto=>$lnkrec->{systemdenyupdvalidto},
                   osrelease=>$lnkrec->{osrelease},
                   osreleaseid=>$lnkrec->{osreleaseid}
                };
@@ -942,35 +945,56 @@ sub calcSoftwareState
                     $FilterSet->{Analyse}->{systemids}->{$sid});
                my @ruleset=@{$FilterSet->{Set}->{data}->{osrelease}};
                @ruleset=sort({$a->{comparator}<=>$b->{comparator}} @ruleset);
+
+               my $failpost="";
+               if ($srec->{denyupd}>0){
+                  $failpost=" but OK";
+                  if ($srec->{denyupdvalidto} ne ""){
+                      my $d=CalcDateDuration(
+                                        NowStamp("en"),$srec->{denyupdvalidto});
+                      if ($d->{totalminutes}<0){
+                         $failpost=" and not OK";
+                      }
+                  }
+               }
+
                my $dstate="OK";
                $resdstate->{group}->{OS}->{count}++;
                foreach my $osrec (@ruleset){
                   if ($srec->{osreleaseid} eq  $osrec->{osreleaseid}){
                      if ($osrec->{comparator} eq "0"){
                         $dstate="FAIL";
-                        push(@{$FilterSet->{Analyse}->{todo}},
-                              "- update OS '$srec->{osrelease}' ".
-                              "on $srec->{name}");
-                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
-                           $FilterSet->{Analyse}->{totalstate}="FAIL";
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- update OS '$srec->{osrelease}' ".
+                                 "on $srec->{name}");
+                           if (!($FilterSet->{Analyse}->{totalstate}
+                                =~m/^FAIL/)){
+                              $FilterSet->{Analyse}->{totalstate}=
+                                 "FAIL".$failpost;
+                           }
+                           push(@{$FilterSet->{Analyse}->{totalmsg}},
+                               "$srec->{name} OS '$srec->{osrelease}' ".
+                               "is marked as not allowed");
+                           $resdstate->{group}->{OS}->{fail}++;
                         }
-                        push(@{$FilterSet->{Analyse}->{totalmsg}},
-                            "$srec->{name} OS '$srec->{osrelease}' ".
-                            "is marked as not allowed");
-                        $resdstate->{group}->{OS}->{fail}++;
                      }
                      if ($osrec->{comparator} eq "1"){
                         $dstate="WARN";
-                        push(@{$FilterSet->{Analyse}->{todo}},
-                              "- OS '$srec->{osrelease}' ".
-                              "on $srec->{name} needs soon a update");
-                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
-                           $FilterSet->{Analyse}->{totalstate}="WARN";
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- OS '$srec->{osrelease}' ".
+                                 "on $srec->{name} needs soon a update");
+                           if (!($FilterSet->{Analyse}->{totalstate}
+                               =~m/^FAIL/)){
+                              $FilterSet->{Analyse}->{totalstate}=
+                                 "WARN".$failpost;
+                           }
+                           push(@{$FilterSet->{Analyse}->{totalmsg}},
+                               "$srec->{name} OS '$srec->{osrelease}' ".
+                               "is soon not allowed");
+                           $resdstate->{group}->{OS}->{warn}++;
                         }
-                        push(@{$FilterSet->{Analyse}->{totalmsg}},
-                            "$srec->{name} OS '$srec->{osrelease}' ".
-                            "is soon not allowed");
-                        $resdstate->{group}->{OS}->{warn}++;
                      }
                   }
                }
@@ -980,6 +1004,7 @@ sub calcSoftwareState
             }
          }
       }
+      #print STDERR Dumper($FilterSet->{Analyse});
       my $lnk=getModuleObject($self->getParent->Config,
                              "itil::lnksoftwaresystem");
       if ($#applid!=-1){# load system installed software
@@ -1070,14 +1095,9 @@ sub calcSoftwareState
                               $resdstate->{group}->{DB}->{warn}++;
                            }
                         }
-                  #      if (!($FilterSet->{Analyse}->{totalstate}=~m/^WARN/)
-                  #          &&  # ERROR have a higher priority
-                  #          !($FilterSet->{Analyse}->{totalstate}=~m/^FAIL$/)
-                  #          &&
-                  #          !($FilterSet->{Analyse}->{totalstate}
-                  #            =~m/^FAIL and not OK$/)){
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
                            $FilterSet->{Analyse}->{totalstate}="WARN".$failpost;
-                  #      }
+                        }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
                              "$swi->{software} needs soon >=$swrec->{version}");
                         last RULESET;
@@ -1179,15 +1199,9 @@ sub calcSoftwareState
                   }
                }
             }
-            #printf STDERR ("check $swrec->{softwareid} $swrec->{releasekey} against $swi->{softwareid} $swi->{releasekey}\n");
          }
       }
-
-      
- 
    }
- #  printf STDERR ("id=$current->{id} d=%s\n",Dumper($FilterSet->{Set}->{data}));
- #  printf STDERR ("sw=%s\n",Dumper($FilterSet->{Analyse}->{ssoftware}));
 
    my @d;
    if ($#applid!=-1){
@@ -1228,10 +1242,10 @@ sub calcSoftwareState
       }
    }
    my $finestate="green";
-   if ($FilterSet->{Analyse}->{totalstate}=~m/^WARN/){
+   if ($FilterSet->{Analyse}->{totalstate} eq "WARN"){
       $finestate="yellow";
    }
-   elsif ($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/){
+   elsif ($FilterSet->{Analyse}->{totalstate} eq "FAIL"){
       $finestate="red";
    }
    my @resdstate;
@@ -1241,6 +1255,8 @@ sub calcSoftwareState
               $FilterSet->{Analyse}->{dstate}->{group}->{$g}->{warn}."/".
               $FilterSet->{Analyse}->{dstate}->{group}->{$g}->{fail}.")");
    }
+   push(@d,"INFO:  total state ".$FilterSet->{Analyse}->{totalstate});
+   push(@d,"INFO:  grouped state format (count/warn/fail)");
    push(@d,"INFO:  grouped state ".join(" ",@resdstate));
    push(@d,"<b>STATE:</b> <font color=$finestate>".$finestate."</font>");
    

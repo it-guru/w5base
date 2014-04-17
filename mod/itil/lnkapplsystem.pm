@@ -172,6 +172,21 @@ sub new
                 label         =>'OSReleaseID',
                 dataobjattr   =>'system.osrelease'),
 
+      new kernel::Field::Link(
+                name          =>'systemdenyupd',
+                label         =>'System denyupd',
+                dataobjattr   =>'system.denyupd'),
+
+      new kernel::Field::Link(
+                name          =>'systemdenyupdvalidto',
+                label         =>'System denyupdvalidto',
+                dataobjattr   =>'system.denyupdvalidto'),
+
+      new kernel::Field::Link(
+                name          =>'osreleaseid',
+                label         =>'OSReleaseID',
+                dataobjattr   =>'system.osrelease'),
+
       new kernel::Field::Boolean(
                 name          =>'isprod',
                 readonly      =>1,
