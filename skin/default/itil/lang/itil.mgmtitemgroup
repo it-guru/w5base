@@ -13,3 +13,4 @@
 
 'PCONTROL'=>{de=>'Prozesssteuerung und CI-Gruppierung',en=>'processcontrol and CI-grouping'},
 'RLABEL'=>{de=>'Reporting Label',en=>'Reporting Label'},
+'fieldgroup.groupdetails'=>{de=>'Gruppendetails',en=>'Groupdetails'},

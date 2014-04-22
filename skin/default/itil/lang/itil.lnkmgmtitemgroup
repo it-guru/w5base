@@ -1,5 +1,5 @@
 'itil::lnkmgmtitemgroup'=>{de=>'CI Gruppen Zuordnung',
-                           CI=>'CI group relation'},
+                           en=>'CI group relation'},
 'managed item group'=>{de=>'geführte CI Gruppe'},
 'managed group CI-State'=>{de=>'CI-Status der Gruppe'},
 'relation from'=>{de=>'Zuordnung von'},

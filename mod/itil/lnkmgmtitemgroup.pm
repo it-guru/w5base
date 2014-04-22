@@ -142,10 +142,8 @@ sub new
       new kernel::Field::Import($self,
                 vjointo       =>'itil::mgmtitemgroup',
                 vjoinon       =>['mgmtitemgroupid'=>'id'],
-                group         =>"hans",
+                group         =>"groupdetails",
                 fields        =>['grouptype']),
-
-
 
       new kernel::Field::Text(
                 name          =>'comments',
@@ -251,8 +249,7 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {  
    my $self=shift;
-   return(
-          qw( default  hans source header));
+   return(qw(header default groupdetails source));
 }
 
 
