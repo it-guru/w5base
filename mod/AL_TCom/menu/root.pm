@@ -520,10 +520,6 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itservices",
-                      "AL_TCom::its",
-                      defaultacl=>['admin']);
-   
-   $self->RegisterObj("itservices",
                       "AL_TCom::itschain",
                       defaultacl=>['admin']);
    
