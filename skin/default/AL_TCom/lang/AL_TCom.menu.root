@@ -102,3 +102,8 @@
 'AL_TCom.proc.applpriochange'=>{de=>'Prio Anpassung',en=>'Prio Change'},
 'AL_TCom.proc.softmgmt.analyse'=>{de=>'Analyse',en=>'Analyse'},
 'Reporting.amore'=>{de=>'@more',en=>'@more'},
+'itservices'=>{de=>'IT-Services',en=>'IT-Services'},
+'itservices.its'=>{de=>'IT-Service',en=>'IT-Service'},
+'itservices.ens'=>{de=>'Enabling Service',en=>'Enabling Service'},
+'itservices.ta'=>{de=>'Transaction',en=>'Transaction'},
+'itservices.new'=>{de=>'Neueingabe',en=>'New'},

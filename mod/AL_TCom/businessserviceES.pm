@@ -1,4 +1,4 @@
-package AL_TCom::businessserviceITS;
+package AL_TCom::businessserviceES;
 #  W5Base Framework
 #  Copyright (C) 2012  Hartmut Vogler (it@guru.de)
 #
@@ -38,7 +38,7 @@ sub new
 sub SetFilter
 {
    my $self=shift;
-   $self->SetNamedFilter("NATURE",{nature=>\'IT-S'});
+   $self->SetNamedFilter("NATURE",{nature=>\'ES'});
 
    return($self->SUPER::SetFilter(@_));
 }

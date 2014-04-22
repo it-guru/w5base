@@ -54,6 +54,13 @@ sub new
                 dataobjattr   =>'lnkbscomp.businessservice'),
 
       new kernel::Field::Text(
+                name          =>'uppername',
+                label         =>'upper Businessservice name',
+                vjointo       =>'itil::businessservice',
+                vjoinon       =>['businessserviceid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
                 name          =>'lnkpos',
                 label         =>'Pos',
                 htmlwidth     =>'50',

@@ -57,8 +57,10 @@ sub getPosibleRoles
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::businessservice$/)){
       return(
-             "requestor"       =>$self->getParent->T("Requestor",
-                                                     $self->Self));
+         "requestor"=>$self->getParent->T("requestor",$self->Self),
+         "procmgr"  =>$self->getParent->T("process designer",$self->Self),
+         "slmgr"    =>$self->getParent->T("service level manager",$self->Self),
+         "evmgr"    =>$self->getParent->T("event manager",$self->Self));
    }
 
    return();
@@ -95,7 +97,9 @@ sub Validate
       $roles=[$roles] if (ref($roles) ne "ARRAY");
       if (grep(/^requestor$/,@$roles) ){
          if ($app->isRoleMultiUsed({
-               requestor     =>$self->getParent->T("Requestor")
+               procmgr     =>$self->getParent->T("process designer"),
+               slmgr       =>$self->getParent->T("service level manager"),
+               requestor     =>$self->getParent->T("requestor")
                },$roles,$oldrec,$newrec,$parentobj,$refid)){
             return(0);
          }

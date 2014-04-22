@@ -107,6 +107,19 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'businessprocess.databoss'),
 
+      new kernel::Field::TextDrop(
+                name          =>'pbusinessprocess',
+                label         =>'parent business process',
+                vjointo       =>'crm::businessprocess',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['pbusinessprocessid'=>'id'],
+                AllowEmpty    =>1,
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'pbusinessprocessid',
+                dataobjattr   =>'businessprocess.pbusinessprocess'),
+
       new kernel::Field::Contact(
                 name          =>'processowner',
                 group         =>'procdesc',

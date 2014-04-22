@@ -519,6 +519,35 @@ sub Init
                       "itil::lnkmgmtitemgroupcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itservices",
+                      "AL_TCom::its",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itservices",
+                      "AL_TCom::itschain",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itservices.its",
+                      "AL_TCom::businessserviceITS",
+                      prio=>100,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itservices.ens",
+                      "AL_TCom::businessserviceES",
+                      prio=>150,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itservices.ta",
+                      "AL_TCom::businessserviceTA",
+                      prio=>200,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itservices.new",
+                      "itil::businessservice",
+                      prio=>1000,
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
                       "base::workflow",
                       func=>'New',

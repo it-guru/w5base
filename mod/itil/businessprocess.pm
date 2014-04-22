@@ -39,7 +39,6 @@ sub new
                 vjointo       =>'itil::lnkbprocessbservice',
                 vjoinon       =>['id'=>'bprocessid'],
                 vjoindisp     =>['businessservice'],
-                vjoinbase     =>[{applcistatusid=>'<=5'}],
                 vjoininhash   =>['businessservice','applid',
                                  'applcistatusid','appl']),
       new kernel::Field::SubList(

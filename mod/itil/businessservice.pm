@@ -96,7 +96,7 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'Nature',
                 transprefix   =>'nat.',
-                value         =>['','IT-S','ES','TR'],
+                value         =>['','IT-S','ES','TA'],
                 dataobjattr   =>"$worktable.nature"),
 
       new kernel::Field::Link(
@@ -278,6 +278,16 @@ sub new
                 dataobjattr   =>"$worktable.description"),
 
       new kernel::Field::SubList(
+                name          =>'upperservice',
+                label         =>'upper service',
+                group         =>'uservicecomp',
+                searchable    =>0,
+                vjointo       =>'itil::lnkbscomp',
+                allowcleanup  =>1,
+                vjoinon       =>['id'=>'obj1id'],
+                vjoindisp     =>['uppername']),
+
+      new kernel::Field::SubList(
                 name          =>'servicecomp',
                 label         =>'service components',
                 group         =>'servicecomp',
@@ -391,7 +401,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default applinfo desc  servicecomp
+          qw(header default applinfo desc  uservicecomp servicecomp
              contacts businessprocesses source));
 }
 
@@ -434,34 +444,57 @@ sub getSqlFrom
    my ($worktable,$workdb)=$self->getWorktable();
    my $from="";
 
-   $from.="((select appl.id applid,appl.name applname,".
-          "appl.databoss appldataboss,".
-          "appl.mandator applmandator,".
-          "appl.businessteam applbusinessteam,".
-          "appl.responseteam applresponseteam,".
-          "lnkcontact.target lnkcontacttarget,".
-          "lnkcontact.targetid lnkcontacttargetid,".
-          "lnkcontact.croles lnkcontactcroles,".
-          "businessservice.* ".
-          "from appl left outer join businessservice ".
-          "on appl.id=businessservice.appl ".
-          "left outer join lnkcontact ".
-          "on lnkcontact.parentobj='itil::appl' and ".
-          "appl.id=lnkcontact.refid ".
-          "where appl.cistatus<6) union ".
-          "(select null applid,null applname,".
-          "null appldataboss,".
-          "null applmandator,".
-          "null applbusinessteam,".
-          "null applresponseteam,".
-          "lnkcontact.target lnkcontacttarget,".
-          "lnkcontact.targetid lnkcontacttargetid,".
-          "lnkcontact.croles lnkcontactcroles,".
-          "businessservice.* ".
-          "from businessservice left outer join lnkcontact ".
-          "on lnkcontact.parentobj='itil::businessservice' ".
-          "and lnkcontact.refid=businessservice.id ".
-          "where businessservice.appl is null)) as businessservice";
+   my $basefields="appl.id applid,appl.name applname,".
+                  "appl.databoss appldataboss,".
+                  "appl.mandator applmandator,".
+                  "appl.businessteam applbusinessteam,".
+                  "appl.responseteam applresponseteam,".
+                  "lnkcontact.target lnkcontacttarget,".
+                  "lnkcontact.targetid lnkcontacttargetid,".
+                  "lnkcontact.croles lnkcontactcroles,".
+                  "businessservice.*";
+
+   if (ref($flt[0]) eq "HASH" &&
+       ref($flt[0]->{id})){
+      my $id;
+      if (ref($flt[0]->{id}) eq "ARRAY"){
+         $id=join(",",@{$flt[0]->{id}});
+      }
+      if (ref($flt[0]->{id}) eq "SCALAR"){
+         $id=${$flt[0]->{id}};
+      }
+ 
+      $from.="(select $basefields from businessservice ".
+             "left outer join lnkcontact ".
+             "on lnkcontact.parentobj='itil::businessservice' ".
+             "and lnkcontact.refid=businessservice.id ".
+             "left outer join appl ".
+             "on appl.id=businessservice.appl ".
+             "where businessservice.id in ($id) ".
+             ") as businessservice ";
+   }
+   else{
+      $from.="((select $basefields ".
+             "from appl left outer join businessservice ".
+             "on appl.id=businessservice.appl ".
+             "left outer join lnkcontact ".
+             "on lnkcontact.parentobj='itil::appl' and ".
+             "appl.id=lnkcontact.refid ".
+             "where appl.cistatus<6) union ".
+             "(select null applid,null applname,".
+             "null appldataboss,".
+             "null applmandator,".
+             "null applbusinessteam,".
+             "null applresponseteam,".
+             "lnkcontact.target lnkcontacttarget,".
+             "lnkcontact.targetid lnkcontacttargetid,".
+             "lnkcontact.croles lnkcontactcroles,".
+             "businessservice.* ".
+             "from businessservice left outer join lnkcontact ".
+             "on lnkcontact.parentobj='itil::businessservice' ".
+             "and lnkcontact.refid=businessservice.id ".
+             "where businessservice.appl is null)) as businessservice";
+   }
 
    return($from);
 }
@@ -616,10 +649,10 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    my @l=qw(header default history);
    if ($rec->{applid} ne ""){
-      push(@l,qw(desc servicecomp));
+      push(@l,qw(desc uservicecomp servicecomp));
    }
    else{
-      push(@l,qw(contacts desc servicecomp));
+      push(@l,qw(contacts desc uservicecomp servicecomp));
    }
    push(@l,qw(businessprocesses source));
    return(@l);

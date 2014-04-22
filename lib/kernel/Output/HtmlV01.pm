@@ -263,7 +263,7 @@ sub ProcessLine
             #   $data=$data->latin1();
             #}
             if (ref($field->{onClick}) eq "CODE"){
-               my $fc=&{$field->{onClick}}($self,$app);
+               my $fc=&{$field->{onClick}}($field,$self,$app,$rec);
                $fclick=$fc if ($fc ne "");
             }
             if (exists($field->{weblink})){

@@ -3,7 +3,7 @@ create table businessprocess (
   id          bigint(20)  NOT NULL,
   fullname        varchar(128) NOT NULL,name varchar(40) not null,
   cistatus    int(2)      NOT NULL,
-    mandator    bigint(20)  default NULL,
+    mandator    bigint(20)  default NULL,pbusinessprocess bigint(20),
     databoss    bigint(20)  default NULL,
     customer    bigint(20)  default NULL,
     importance  int(2)      NOT NULL,
