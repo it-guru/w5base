@@ -86,7 +86,7 @@ sub new
                 htmleditwidth =>'220px',
                 label         =>'Comparator',
                 transprefix   =>'comp.',
-                value         =>['0', '10','11', '2','3'],
+                value         =>['1','3','10','11','12'],
                 dataobjattr   =>'lnksoftwaresoftwareset.comparator'),
 
       new kernel::Field::Link(
