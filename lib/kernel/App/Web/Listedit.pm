@@ -310,7 +310,16 @@ sub ById
    }
    $val=~s/^\///;
    $val="UNDEF" if ($val eq "");
-   $self->HtmlGoto("../Detail",post=>{$idname=>$val});
+   my %param;
+   my $target="../Detail";
+   if (my ($id,$anker)=$val=~m/^(.*)\/fieldgroup.(.+)$/){
+      $target="../../Detail";
+      $val=$id;
+      $param{OpenURL}="#fieldgroup_".$anker;
+   }
+   
+   $param{$idname}=$val;
+   $self->HtmlGoto($target,post=>\%param);
    return();
 }
 
@@ -1503,11 +1512,11 @@ sub Detail
       if (defined($idobj) && defined($rec)){
          $parentid=$idobj->RawValue($rec);
       }
-      print $self->HtmlSubModalDiv();
-      print "<script language=\"JavaScript\" ".
-            "src=\"../../../public/base/load/toolbox.js\"></script>".
+      print($self->HtmlSubModalDiv());
+      print("<script language=\"JavaScript\" ".
+            "src=\"../../../public/base/load/toolbox.js\"></script>\n".
             "<script language=\"JavaScript\" ".
-            "src=\"../../../public/base/load/subModal.js\"></script>\n";
+            "src=\"../../../public/base/load/subModal.js\"></script>\n");
 #      my $UserJavaScript=$self->getUserJavaScriptDiv($self->Self,$parentid);
 #      if ($UserJavaScript ne ""){
 #         print "<script language=\"JavaScript\" ".
@@ -1555,12 +1564,15 @@ EOF
                  page        =>$page,
                  actionbox   =>'<div id=IssueState>&nbsp;</div>'
                 );
+
+
       if (($#{$param{pages}})/2<4){  # if there less then 5 pages, expand them
          $param{tabwidth}="20%"; # as mutch as it looks good
       }
-      print TabSelectorTool("ModeSelect",%param);
-      print "<script language=\"JavaScript\">".$self->getDetailFunctionsCode($rec).
-             "</script>";
+      print(TabSelectorTool("ModeSelect",%param));
+      print("<script language=\"JavaScript\">".
+            $self->getDetailFunctionsCode($rec).
+             "</script>");
 
     #  print($UserJavaScript);
       print $self->HtmlBottom(body=>1,form=>1);
