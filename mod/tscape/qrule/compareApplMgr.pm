@@ -89,10 +89,7 @@ sub qcheckRecord
    return(0,undef) if (!($rec->{cistatusid}==3 || 
                          $rec->{cistatusid}==4));
 
-   return(0,undef) if ($rec->{opmode} ne "prod"); # ApplicationManager sind
-                                                  # nur für die Prod Umgebungen
-                                                  # definiert.
-   if ($rec->{ictono} ne ""){
+   if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
       $par->SetFilter({archapplid=>\$rec->{ictono}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
@@ -118,14 +115,44 @@ sub qcheckRecord
          }
       }
    }
-   else{
-      return(0,undef);
-   }
+   my @result=$self->HandleQRuleResults("CapeTS",
+                 $dataobj,$rec,$checksession,
+                 \@qmsg,\@dataissue,\$errorlevel,$wfrequest,$forcedupd);
 
-   return($self->HandleQRuleResults("CapeTS",
-          $dataobj,$rec,$checksession,
-          \@qmsg,\@dataissue,\$errorlevel,$wfrequest,$forcedupd
-   ));
+   #
+   # Kontakte sollen nun doch nicht automatisch angepasst werden
+   #
+#   my $foundent;
+#   my @resetent;
+#   foreach my $cent (@{$rec->{contacts}}){
+#      if ($cent->{target} eq "base::user"){
+#         if ($cent->{targetname} eq $rec->{applmgr}){
+#            $foundent=$cent;
+#         }
+#         elsif ($cent->{srcsys} eq $self->Self()){
+#            push(@resetent,$cent);
+#         }
+#      }
+#   }
+#
+#   foreach my $cent (@resetent){    #clear invalid applmgr entries from self
+#      printf STDERR ("Clear:%s\n",Dumper($cent));
+#   }
+#   if (defined($foundent)){
+#      my $roles=$foundent->{roles};
+#      $roles=[$roles] if (ref($roles) ne "ARRAY");
+#      if (!in_array($roles,"write")){   # update nur wenn nicht bereits write
+#         printf STDERR ("Update:%s\n",Dumper($foundent));
+#      }
+#   }
+#   else{  # add applicationmanager as contact (write) if he is not already
+#      if ($rec->{databoss} ne $rec->{applmgr}){  # the databoss
+#         printf STDERR ("Add Contact:%s\n",$rec->{applmgr});
+#      }
+#   }
+
+
+   return(@result);
 }
 
 
