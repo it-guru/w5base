@@ -521,7 +521,7 @@ sub Init
 
    $self->RegisterObj("itservices",
                       "AL_TCom::itschain",
-                      defaultacl=>['admin']);
+                      defaultacl=>['valid_user']);  # muß noch admin  werden!
    
    $self->RegisterObj("itservices.its",
                       "AL_TCom::businessserviceITS",
