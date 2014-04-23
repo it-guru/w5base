@@ -43,10 +43,46 @@ sub new
    );
    $self->AddGroup("contactpersons",translation=>'AL_TCom::businessservice');
 
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'sdbid',
+                searchable    =>0,
+                group         =>'desc',
+                label         =>'SDB-ID',
+                container     =>'additional'),
+      insertafter=>['description']
+   );
+
+
+
 
 
    return($self);
 }
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orgrec=shift;
+
+   if (exists($newrec->{sdbid})){
+      if ($newrec->{sdbid} ne ""){
+         $newrec->{srcsys}="SDB";
+         $newrec->{srcid}=$newrec->{sdbid};
+         $newrec->{srcload}=NowStamp("en");
+      }
+      else{
+         $newrec->{srcsys}="w5base";
+         $newrec->{srcid}=undef;
+         $newrec->{srcload}=undef;
+      }
+   }
+   return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
+
+}
+
 
 
 sub getDetailBlockPriority

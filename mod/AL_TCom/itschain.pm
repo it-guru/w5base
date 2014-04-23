@@ -48,6 +48,12 @@ sub new
                 weblinkon     =>['its_id']),
 
       new kernel::Field::Text(
+                name          =>'es_pos',
+                readonly      =>1,
+                label         =>'Enabling-Service Pos.',
+                dataobjattr   =>"lnkes.lnkpos"),
+
+      new kernel::Field::Text(
                 name          =>'es_name',
                 readonly      =>1,
                 label         =>'Enabling-Service Name',
@@ -56,6 +62,12 @@ sub new
                 onClick       =>\&multiDestLinkHandler,
                 weblinkto     =>'AL_TCom::businessserviceES',
                 weblinkon     =>['es_id']),
+
+      new kernel::Field::Text(
+                name          =>'ta_pos',
+                readonly      =>1,
+                label         =>'Transaction Pos.',
+                dataobjattr   =>"lnkta.lnkpos"),
 
       new kernel::Field::Text(
                 name          =>'ta_name',
@@ -105,7 +117,9 @@ sub new
    );
    $self->setDefaultView(qw(linenumber
                             its_name 
+                            es_pos
                             es_name 
+                            ta_pos
                             ta_name 
                             appl_name));
    return($self);
@@ -171,23 +185,36 @@ sub getSqlFrom
    my $from="";
 
    my @view=$self->getCurrentView();
-   print STDERR Dumper(\@view);
+
+   my @f;
+   foreach my $flt (@flt){
+      if (ref($flt) eq "HASH"){
+         if (grep(/^(es_)/,keys(%$flt))){
+            push(@f,"es");
+         }
+         if (grep(/^(ta_)/,keys(%$flt))){
+            push(@f,"ta");
+         }
+         if (grep(/^(appl_)/,keys(%$flt))){
+            push(@f,"appl");
+         }
+      }
+   }
 
    $from.="businessservice as its ";
-
-   if (grep(/^(es_|ta_|appl_)/,@view)){
+   if (grep(/^(es_|ta_|appl_)/,@view) || in_array(\@f,["es","ta","appl"])){
       $from.="left outer join lnkbscomp as lnkits ".
              "  on its.id=lnkits.businessservice ".
              "     and lnkits.objtype='itil::businessservice' ".
              "left outer join businessservice as es ".
-             "  on lnkits.obj1id=es.id ";
-      if (grep(/^(ta_|appl_)/,@view)){
+             "  on lnkits.obj1id=es.id and es.nature='ES' ";
+      if (grep(/^(ta_|appl_)/,@view) || in_array(\@f,["ta","appl"])){
          $from.="left outer join lnkbscomp as lnkes ".
                 "  on es.id=lnkes.businessservice ".
                 "     and lnkes.objtype='itil::businessservice' ".
                 "left outer join businessservice as ta ".
-                "  on lnkes.obj1id=ta.id ";
-         if (grep(/^(appl_)/,@view)){
+                "  on lnkes.obj1id=ta.id and ta.nature='TA' ";
+         if (grep(/^(appl_)/,@view) || in_array(\@f,["appl"])){
             $from.="left outer join lnkbscomp as lnkta ".
                    "  on ta.id=lnkta.businessservice ".
                    "     and lnkes.objtype='itil::businessservice' ".

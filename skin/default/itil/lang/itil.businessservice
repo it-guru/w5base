@@ -32,4 +32,4 @@ Anwendung zur Verfügung stellen kann.',en=>'Welcome'},
 'nat.TA'=>{de=>'Transaktion (TA)',en=>'Transaction (TA)'},
 'Nature'=>{de=>'Ausprägung'},
 'Short name'=>{de=>'Kurzbezeichnung'},
-
+'invalid version string'=>{de=>'ungültiger Versionsstring'},

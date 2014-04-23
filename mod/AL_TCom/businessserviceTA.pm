@@ -30,7 +30,6 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->getField("nature")->{searchable}=0;
-
    return($self);
 }
 
@@ -42,7 +41,6 @@ sub SetFilter
 
    return($self->SUPER::SetFilter(@_));
 }
-
 
 
 

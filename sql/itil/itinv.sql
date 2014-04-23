@@ -1123,7 +1123,7 @@ create table businessservice (
   name        varchar(128) default NULL,
   appl        bigint(20),
   cistatus    int(2)      NOT NULL, funcmgr bigint(20) default NULL,
-  description longtext     default NULL,
+  description longtext     default NULL,version varchar(20),
   comments    longtext     default NULL,
   additional  longtext     default NULL,
   createdate  datetime NOT NULL default '0000-00-00 00:00:00',

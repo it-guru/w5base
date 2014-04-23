@@ -271,11 +271,35 @@ sub new
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>'mgmtitemgroup'),
 
+      new kernel::Field::Text(
+                name          =>'version',
+                group         =>'desc',
+                label         =>'Version',
+                htmleditwidth =>'80px',
+                dataobjattr   =>"$worktable.version"),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 group         =>'desc',
                 label         =>'Business Service Description',
                 dataobjattr   =>"$worktable.description"),
+
+
+     new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                htmldetail    =>0,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $rec=$param{current};
+                   if (!defined($rec->{$self->Name()})){
+                      return(0);
+                   }
+                   return(1);
+                },
+                dataobjattr   =>$worktable.'.additional'),
 
       new kernel::Field::SubList(
                 name          =>'upperservice',
@@ -336,6 +360,25 @@ sub new
       new kernel::Field::Link(
                 name          =>'responseteamid',
                 dataobjattr   =>'applresponseteam'),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>$worktable.'.srcsys'),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>$worktable.'.srcid'),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                history       =>0,
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>$worktable.'.srcload'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -521,6 +564,14 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
+
+   if (exists($newrec->{version}) && $newrec->{version} ne ""){
+      if (!($newrec->{version}=~m/^\d{1,2}(\.\d{1,2}){0,4}$/)){
+         $self->LastMsg(ERROR,"invalid version string");
+         return(0);
+      }
+   }
 
 
    if (!defined($oldrec) && defined($newrec->{name})
