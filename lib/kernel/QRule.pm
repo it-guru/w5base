@@ -519,6 +519,9 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
                    {$idname=>\$rec->{$idname}})){
                push(@$qmsg,"all desired fields has been updated: ".
                           join(", ",keys(%$forcedupd)));
+               foreach my $k (keys(%$forcedupd)){
+                  $rec->{$k}=$forcedupd->{$k};
+               }
             }
             else{
                push(@$qmsg,$self->getParent->LastMsg());
