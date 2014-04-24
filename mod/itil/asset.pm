@@ -342,6 +342,7 @@ sub new
      new kernel::Field::Select(
                 name          =>'denyupd',
                 group         =>'upd',
+                depend        =>['deprstart'],
                 label         =>'it is posible to refresh hardware',
                 value         =>[0,10,20,30,99],
                 transprefix   =>'DENUPD.',
@@ -350,12 +351,14 @@ sub new
      new kernel::Field::Textarea(
                 name          =>'denyupdcomments',
                 group         =>'upd',
+                depend        =>['deprstart'],
                 label         =>'comments to Update/Refresh posibilities',
                 dataobjattr   =>'asset.denyupdcomments'),
 
      new kernel::Field::Date(
                 name          =>'denyupdvalidto',
                 group         =>'upd',
+                depend        =>['deprstart'],
                 htmldetail    =>sub{
                                    my $self=shift;
                                    my $mode=shift;
