@@ -77,7 +77,7 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'grouptype',
-                label         =>'Group type',
+                label         =>'Raw Grouptype',
                 readonly      =>1,
                 htmldetail    =>0,
                 dataobjattr   =>'mgmtitemgroup.grouptype'),
