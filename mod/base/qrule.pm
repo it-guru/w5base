@@ -204,9 +204,11 @@ sub calcParentAndObjlist
    my $parent=shift;
    my $objlist=shift;
    my $mandator=shift;
-   my $rec=shift;
+   my $calledRec=shift;
    my $potentialRuleList=shift;
    my $orgParentName=$parent->Self();
+
+   my $rec=$calledRec;
 
    my $cache=$self->Cache();
    my $cachekey=$parent->Self."-".join(",",@$mandator);
@@ -232,6 +234,9 @@ sub calcParentAndObjlist
                            msg(ERROR,"parent transformation error ".
                                      "while reread rec");
                            return;
+                        }
+                        else{
+                           %$calledRec=%$rec;
                         }
                         $objlist=$do->getQualityCheckCompat($rec); 
                         msg(INFO,"qrule parent transformation ".
