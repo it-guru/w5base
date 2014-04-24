@@ -108,10 +108,10 @@ sub new
                 sqlorder      =>'desc',
                 dataobjattr   =>'1001-if ('.
                 '(datediff(curdate(),wfhead.eventstart)/30)*'.
-                '(10*(10-wfhead.prio))'.
+                '(10*wfhead.prio)'.
                 '>1000,1000,'.
                 '(datediff(curdate(),wfhead.eventstart)/30)*'.
-                '(10*(10-wfhead.prio)))'),
+                '(10*wfhead.prio))'),
                                    
       new base::workflow::Field::state(
                 name          =>'state',
