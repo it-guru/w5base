@@ -106,12 +106,12 @@ sub new
                 htmlwidth     =>'10px',
                 unit          =>'1-1000 calculated',
                 sqlorder      =>'desc',
-                dataobjattr   =>'1001-if ('.
+                dataobjattr   =>'if ('.
                 '(datediff(curdate(),wfhead.eventstart)/30)*'.
-                '(10*wfhead.prio)'.
+                '(10*(10-wfhead.prio))'.
                 '>1000,1000,'.
                 '(datediff(curdate(),wfhead.eventstart)/30)*'.
-                '(10*wfhead.prio))'),
+                '(10*(10-wfhead.prio)))'),
                                    
       new base::workflow::Field::state(
                 name          =>'state',
