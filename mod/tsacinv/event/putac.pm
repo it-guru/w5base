@@ -234,6 +234,7 @@ sub ApplicationModified
    my $acappl=getModuleObject($self->Config,"tsacinv::appl");
    my $applappl=getModuleObject($self->Config,"itil::lnkapplappl");
    my $applsys=getModuleObject($self->Config,"itil::lnkapplsystem");
+   my $acapplsys=getModuleObject($self->Config,"tsacinv::lnkapplsystem");
    my $swinstance=getModuleObject($self->Config,"TS::swinstance");
    my $acgrp=getModuleObject($self->Config,"tsacinv::group");
    my $app=getModuleObject($self->Config,"AL_TCom::appl");
@@ -333,7 +334,23 @@ sub ApplicationModified
                                               isapprovtest isdevel isprod
                                               shortdesc systemid
                                               srcsys srcid));
+               my @alreadyManuellRelated;
+               if ($rec->{applid} ne ""){
+                  $acapplsys->ResetFilter();
+                  $acapplsys->SetFilter({applid=>\$rec->{applid}});
+                  $acapplsys->SetCurrentView(qw(applid systemid srcsys srcid));
+                  foreach my $r ($acapplsys->getHashList(qw(
+                                  applid systemid srcsys srcid))){
+                     if (!in_array(\@alreadyManuellRelated,$r->{systemid})){
+                        if ($r->{srcsys} ne "W5Base"){
+                           push(@alreadyManuellRelated,$r->{systemid});
+                        }
+                     }
+                  }
+               }
                foreach my $lnk (@l){
+                  next if (in_array(\@alreadyManuellRelated,
+                                    $lnk->{systemsystemid}));
                   my $SysU=0;
                   $SysU=20 if ($SysU<20 && $lnk->{istest}); 
                   $SysU=30 if ($SysU<30 && $lnk->{iseducation}); 
@@ -343,28 +360,38 @@ sub ApplicationModified
                   $SysU=70 if ($SysU<70 && $lnk->{isprod}); 
                   $ApplU=$SysU if ($ApplU<$SysU);
                   next if ($lnk->{systemsystemid}=~m/^\s*$/);
+                  # Die AM-SAPLNK werden von der XML Schnittstelle nur
+                  # "virtuell" erzeugt - sie dürfen also NICHT als normale
+                  # Relationen übertragen werden.
                   next if ($lnk->{srcsys} eq "AM-SAPLNK");
-                  next if ($lnk->{srcsys} eq "AM");
+                  if ($rec->{allowifupdate}){
+                     # Wenn automatische Updates bei der Anwendung zugelassen
+                     # sind, dann dürfen Relationen, die automatisch aus AM
+                     # kamen, NICHT nach AM zurück geschrieben werden, da ja
+                     # dann AssetManager das führende System für die Relationen
+                     # ist.
+                     next if ($lnk->{srcsys} eq "AM");
+                  }
                   $CurrentEventId="Add System '$lnk->{system}' to $CurrentAppl";
                   my $externalid=$lnk->{id};
                   if ($externalid eq ""){
                      $externalid="C-".$rec->{id}."-".$lnk->{systemid};
                   }
                   my $acftprec={
-                                   CI_APPL_REL=>{
-                                      EventID=>$CurrentEventId,
-                                      ExternalSystem=>'W5Base',
-                                      ExternalID=>$externalid,
-                                      Appl_ExternalSystem=>'W5Base',
-                                      Appl_ExternalID=>$rec->{id},
-                                      Port_ExternalSystem=>'W5Base',
-                                      Port_ExternalID=>$lnk->{systemid},
-                                      Security_Unit=>"TS.DE",
-                                      Description=>$lnk->{shortdesc},
-                                      bDelete=>'0',
-                                      bActive=>'1',
-                                   }
-                               };
+                      CI_APPL_REL=>{
+                         EventID=>$CurrentEventId,
+                         ExternalSystem=>'W5Base',
+                         ExternalID=>$externalid,
+                         Appl_ExternalSystem=>'W5Base',
+                         Appl_ExternalID=>$rec->{id},
+                         Port_ExternalSystem=>'W5Base',
+                         Port_ExternalID=>$lnk->{systemid},
+                         Security_Unit=>"TS.DE",
+                         Description=>$lnk->{shortdesc},
+                         bDelete=>'0',
+                         bActive=>'1',
+                      }
+                  };
                   if ($rec->{applid} ne ""){
                      $acftprec->{CI_APPL_REL}->{Application}=uc($rec->{applid});
                   }    
