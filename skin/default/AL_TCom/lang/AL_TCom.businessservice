@@ -4,7 +4,7 @@
                               en=>'Business-Service Fullname'},
 'Business Service Description'=>{de=>'Beschreibung des Business-Service',
                                  en=>'Business-Service Description'},
-'fieldgroup.contactpersons'=>{de=>'Kontaktpersonen',en=>'Contact persons'},
+'fieldgroup.contactpersons'=>{de=>'Ansprechpartner',en=>'Contact persons'},
 'requestor'=>{de=>'Anforderer'},
 'responsible service level manager'=>{de=>'zuständiger Service Level Manager'},
 'responsible IT-Service owner'=>{de=>'zuständiger IT-Service Owner'},
