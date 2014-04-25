@@ -101,6 +101,24 @@ sub new
                 label         =>'Remote',
                 dataobjattr   =>'adm.prod_inv.is_remote'),
 
+      new kernel::Field::Boolean(
+                name          =>'ispvu',
+                label         =>'is PVU (Processor Value Unit) posible',
+                group         =>'productinfo',
+                dataobjattr   =>'adm.swproduct.is_pvu'),
+
+      new kernel::Field::Boolean(
+                name          =>'isrvu',
+                label         =>'is RVU (Processor Value Unit) posible',
+                group         =>'productinfo',
+                dataobjattr   =>'adm.swproduct.is_rvu'),
+
+      new kernel::Field::Boolean(
+                name          =>'issubcap',
+                label         =>'is SubCapacity posible',
+                group         =>'productinfo',
+                dataobjattr   =>'adm.swproduct.is_sub_cap'),
+
       new kernel::Field::Text(
                 name          =>'agentid',
                 label         =>'Agent ID',
@@ -194,7 +212,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default software 
+   return(qw(header default software productinfo
              source));
 }  
 
