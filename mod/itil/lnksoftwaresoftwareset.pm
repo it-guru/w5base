@@ -54,11 +54,22 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'fullname',
                 htmlwidth     =>'250px',
+                uploadable    =>0,
                 htmldetail    =>0,
                 label         =>'Software fullname',
                 vjointo       =>'itil::software',
                 vjoinon       =>['softwareid'=>'id'],
                 vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'softwareset',
+                htmlwidth     =>'250px',
+                htmldetail    =>0,
+                label         =>'Software Set',
+                group         =>'softwareset',
+                vjointo       =>'itil::softwareset',
+                vjoinon       =>['softwaresetid'=>'id'],
+                vjoindisp     =>'name'),
 
       new kernel::Field::Text(
                 name          =>'version',
@@ -76,6 +87,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'releasekey',
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'releaseinfos',
                 label         =>'Releasekey',
                 dataobjattr   =>'lnksoftwaresoftwareset.releasekey'),
@@ -160,7 +172,7 @@ sub new
                 dataobjattr   =>'lnksoftwaresoftwareset.realeditor')
 
    );
-   $self->setDefaultView(qw(fullname version comparator mdate));
+   $self->setDefaultView(qw(fullname version startwith comparator mdate));
    $self->setWorktable("lnksoftwaresoftwareset");
    return($self);
 }
@@ -244,9 +256,9 @@ sub isWriteValid
    my $newrec=shift;
    my $softwaresetid=effVal($oldrec,$newrec,"softwaresetid");
 
-   return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default") if ($self->IsMemberOf("admin"));
-   return("default") if ($self->isWriteOnSoftwaresetValid($softwaresetid,"software"));
+   return("default","softwareset") if (!defined($oldrec) && !defined($newrec));
+   return("default","softwareset") if ($self->IsMemberOf("admin"));
+   return("default","softwareset") if ($self->isWriteOnSoftwaresetValid($softwaresetid,"software"));
    return(undef);
 }
 
