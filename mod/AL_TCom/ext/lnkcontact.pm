@@ -55,7 +55,8 @@ sub getPosibleRoles
    if ($parentobj=~m/^.+::businessservice$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
-       $self->getParent->getParent->Self()=~m/^.+::businessservice$/)){
+       $self->getParent->getParent->SelfAsParentObject() eq 
+          "itil::businessservice")){
       return(
          "requestor"=>$self->getParent->T("requestor",$self->Self),
          "procmgr"  =>$self->getParent->T("process designer",$self->Self),
