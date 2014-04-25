@@ -547,7 +547,15 @@ sub new
                 depend        =>[qw(systemid)],
                 group         =>'services',
                 label         =>'Services Columns',
-                fields        =>\&AddServices),
+                fields        =>\&AddDeliveredServices),
+
+      new kernel::Field::Dynamic(
+                name          =>'dynorderedservices',
+                searchable    =>0,
+                depend        =>[qw(systemid)],
+                group         =>'orderedservices',
+                label         =>'ordered Services Columns',
+                fields        =>\&AddOrderedServices),
 
       new kernel::Field::Text(
                 name          =>'w5base_appl',
@@ -747,7 +755,7 @@ sub AddW5BaseData
    
 }
 
-sub AddServices
+sub AddDeliveredServices
 {
    my $self=shift;
    my %param=@_;
@@ -766,7 +774,41 @@ sub AddServices
       }
       foreach my $ola (keys(%sumrec)){
          push(@dyn,$self->getParent->InitFields(
-              new kernel::Field::Float(   name       =>'ola'.$ola,
+              new kernel::Field::Float(   name       =>'delola'.$ola,
+                                          label      =>$ola,
+                                          group      =>'services',
+                                          htmldetail =>0,
+                                          onRawValue =>sub {
+                                                          return($sumrec{$ola});
+                                                       },
+                                          dataobjattr=>'amcomputer.name'
+                                      )
+             ));
+      }
+   }
+   return(@dyn);
+}
+
+sub AddOrderedServices
+{
+   my $self=shift;
+   my %param=@_;
+   my @dyn=();
+   my $c=$self->Context();
+   if (!defined($c->{db})){
+      $c->{db}=getModuleObject($self->getParent->Config,"tsacinv::service");
+   }
+   if (defined($param{current})){
+      my $systemid=$param{current}->{systemid};
+      $c->{db}->SetFilter({systemid=>\$systemid,isdelivered=>\'0'});
+      my @l=$c->{db}->getHashList(qw(name ammount));
+      my %sumrec=();
+      foreach my $rec (@l){
+         $sumrec{$rec->{name}}+=$rec->{ammount};
+      }
+      foreach my $ola (keys(%sumrec)){
+         push(@dyn,$self->getParent->InitFields(
+              new kernel::Field::Float(   name       =>'ordola'.$ola,
                                           label      =>$ola,
                                           group      =>'services',
                                           htmldetail =>0,

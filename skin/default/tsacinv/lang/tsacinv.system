@@ -40,6 +40,7 @@
 'installation date'=>{de=>'Installationsdatum'},
 'system installation date'=>{de=>'Installationsdatum des logischen Systems'},
 'Services Columns'=>{de=>'Leistungsarten in Spalten'},
+'ordered Services Columns'=>{de=>'bestellte Leistungsarten in Spalten'},
 'W5Base Application'=>{de=>'W5Base Anwendung'},
 'W5Base Businessteam'=>{de=>'W5Base Betriebsteam'},
 'delivered Services'=>{de=>'gelieferte Leistungsarten'},
