@@ -141,7 +141,8 @@ sub getPosibleRoles
    if ($parentobj=~m/^.+::businessservice$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
-       $self->getParent->getParent->Self()=~m/^.+::businessservice$/)){
+       $self->getParent->getParent->SelfAsParentObject() 
+        eq "itil::businessservice")){
       return("read"            =>$self->getParent->T("read",
                                                      $self->Self),
              "write"           =>$self->getParent->T("write",
