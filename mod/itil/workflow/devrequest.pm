@@ -125,12 +125,72 @@ sub Validate
          $newrec->{devreqdetailstateffortclass}="D (>20h)";
       }
    }
+
+
+   if (effChanged($oldrec,$newrec,"devreqdetailstat") &&
+           effVal($oldrec,$newrec,"devreqdetailstat") eq '0') {
+      # switched detailstat from yes to no
+      # to be defined what to do
+      #
+   } elsif (effVal($oldrec,$newrec,"devreqdetailstat") eq '1') {
+      
+      my @detailstatfields=("devreqdetailstatbugfix",
+                            "devreqdetailstatmgmtesc",
+                            "devreqdetailstatdependent",
+                            "devreqdetailstatnewfunc",
+                            "devreqdetailstatbenefit",
+                            "devreqdetailstatprocboss",
+                            "devreqdetailstatrisk",
+                            "devreqdetailstateffortclass",
+                            "devreqdetailstatappmgmtveto",
+      );
+
+      my $calcPrio;
+
+      foreach my $statfield (@detailstatfields) {
+         if (effChanged($oldrec,$newrec,$statfield)) {
+            $calcPrio=1;
+            last;
+         }
+      }
+
+      if ($calcPrio) {
+         my $newPrio; 
+         my %stat;
+
+         foreach my $statfield (@detailstatfields) {
+            $stat{$statfield}=effVal($oldrec,$newrec,$statfield);
+         }
+
+         my $faktor=1;
+         $faktor*=6   if ($stat{devreqdetailstatbugfix}    == 1);
+         $faktor*=7   if ($stat{devreqdetailstatmgmtesc}   == 1);
+         $faktor*=0   if ($stat{devreqdetailstatdependent} == 1);
+         $faktor*=0   if ($stat{devreqdetailstatnewfunc}   == 0);
+         $faktor*=2   if ($stat{devreqdetailstatbenefit} eq 'MIDDLE');
+         $faktor*=5   if ($stat{devreqdetailstatbenefit} eq 'ESSENTIEL');
+         $faktor*=0   if ($stat{devreqdetailstatprocboss}  == 0);
+         $faktor*=0.5 if ($stat{devreqdetailstatrisk} eq 'NORMAL');
+         $faktor*=0.2 if ($stat{devreqdetailstatrisk} eq 'HIGH');
+         $faktor*=3   if ($stat{devreqdetailstateffortclass} eq 'A (<2h)');
+         $faktor*=2   if ($stat{devreqdetailstateffortclass} eq 'B (<8h)');
+         $faktor*=1   if ($stat{devreqdetailstateffortclass} eq 'C (<20h)');
+         $faktor*=0.5 if ($stat{devreqdetailstateffortclass} eq 'D (>20h)');
+         $faktor*=0   if ($stat{devreqdetailstatappmgmtveto} == 1);
+
+         $newPrio=int(6-(6/630)*$faktor)+2;
+         
+         $newPrio=2 if ($newPrio<2);
+         $newPrio=8 if ($newPrio>8);
+
+         if ($newPrio ne $oldrec->{prio}) {
+            $newrec->{prio}=$newPrio;
+         }
+      }
+   }
+      
    return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
 }
-
-
-
-
 
 
 sub getDynamicFields
@@ -261,10 +321,6 @@ sub getDynamicFields
                 label         =>
                  'veto from application management of affected application',
                 container     =>'headref'),
-
-
-
-
 
     ),$self->SUPER::getDynamicFields(%param));
 }
