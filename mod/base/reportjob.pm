@@ -183,6 +183,9 @@ sub Validate
          $newrec->{validto}=$self->ExpandTimeExpression("now+7d"); 
       }
    }
+   if (exists($newrec->{errbuffer}) && $newrec->{errbuffer} ne ""){
+      delete($newrec->{textbuffer});
+   }
    return(1);
 }
 
@@ -213,9 +216,14 @@ sub FinishWrite
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
 
+print STDERR ("fifi 01\n");
    if (defined($oldrec)){
+print STDERR ("fifi 02\n");
+print STDERR ("fifi 02 old=$oldrec->{textdata}\n");
+print STDERR ("fifi 02 new=$newrec->{textdata}\n");
       if (effChanged($oldrec,$newrec,"textdata") &&
-          effVal($oldrec,$newrec,"errbuffer") ne ""){ 
+          effVal($oldrec,$newrec,"errbuffer") eq ""){ 
+print STDERR ("fifi 03\n");
          my $name=effVal($oldrec,$newrec,"name");
          my $id=effVal($oldrec,$newrec,"id");
          my $emailto={};
@@ -225,6 +233,7 @@ sub FinishWrite
          my $wa=getModuleObject($self->Config,"base::workflowaction");
          my %msg;
          foreach my $k (keys(%$emailto)){
+print STDERR ("fifi 04 k=$k\n");
             my $lang="en";
             $user->ResetFilter();
             $user->SetFilter({allemail=>\$k});

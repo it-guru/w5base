@@ -56,6 +56,10 @@ sub Reporter
    $self->{console}=\%cons;
    my %Reporter=(start=>time(),reportjob=>$reportjob,tasklist=>$self->{task});
    while (1) {  #Infinite loop
+       if (!$Reporter{reportjob}->Ping()){
+          sleep(120); # etwas warten - dann sollte die DB wieder da sein
+          die("lost connection to database - Restart needed");
+       }
        my ($newsock)=IO::Select->select($readable_handles,undef,undef,1);
        $Reporter{loopcount}++;
        $Reporter{consolen}=keys(%cons);
