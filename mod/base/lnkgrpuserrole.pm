@@ -108,7 +108,6 @@ sub new
                                  'RPRManager2',                # ITIL role
                                  'RODManager',                 # ITIL role
                                  'RODManager2',                # ITIL role
-                                 'RITSoDManager',              # IT role
                                  'RITDemandMgr',               # IT role
                                  'RINOperator',                # ITIL role
                                  'RCHOperator',                # ITIL role

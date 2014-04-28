@@ -36,8 +36,6 @@
                    en=>'W5Base Contact-Administrator'},
 'W5BaseSupport'=>{ de=>'W5Base Support', en=>'W5Base Support'},
 'RTimeManager'=>{ de=>'Zeit-Manager', en=>'Time-Manager'},
-'RITSoDManager'=>{ de=>'IT StorageOnDemand Manager', 
-                   en=>'IT StorageOnDemand Manager'},
 'RITDemandMgr'=>{ de=>'IT Tool Demand Manager', 
                   en=>'IT Tool Demand Manager'},
 'base::lnkgrpuserrole'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
