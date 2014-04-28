@@ -169,6 +169,10 @@ sub FormatedResult
    $d=join($j,@{$d}) if (ref($d) eq "ARRAY");
 
    if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlSubList"){
+      if (!ref($d)){
+         my $lang=$self->getParent->Lang();
+         $d=extractLangEntry($d,$lang);
+      }
       if (!$self->{AllowHtmlInput}){
          $d=quoteHtml($d);
         # $d=~s/</&lt;/g;
