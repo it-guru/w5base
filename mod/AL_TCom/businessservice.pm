@@ -35,6 +35,23 @@ sub new
 
    $self->AddFields(
       new kernel::Field::Contact(
+                name          =>'requestor',
+                group         =>'contactpersons',
+                label         =>'Requestor',
+                readonly      =>1,
+                vjoinon       =>'requestorid'),
+      new kernel::Field::Link(
+                name          =>'requestorid',
+                group         =>'contactpersons',
+                label         =>'Requestor',
+                readonly      =>1,
+                dataobjattr   =>"(select targetid from lnkcontact where ".
+                   " lnkcontact.refid=businessservice.id and ".
+                   " lnkcontact.target='base::user' and ".
+                   " lnkcontact.parentobj='itil::businessservice' and ".
+                   " croles like '%roles=\\'requestor\\'=roles%'".
+                   " limit 1)"),
+      new kernel::Field::Contact(
                 name          =>'itsowner',
                 group         =>'contactpersons',
                 label         =>'IT-Service Owner',

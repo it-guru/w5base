@@ -928,8 +928,8 @@ sub new
                                  'test',
                                  'devel',
                                  'education',
-                                'approvtest',
-                                'reference',
+                                 'approvtest',
+                                 'reference',
                                  'cbreakdown'],  # see also opmode at system
                 htmleditwidth =>'200px',
                dataobjattr   =>'appl.opmode'),

@@ -11,3 +11,4 @@
 'responsible event manager'=>{de=>'zuständiger Event Manager'},
 'responsible process designer'=>{de=>'zuständiger Prozessdesigner'},
 'IT-Service owner'=>{de=>'IT-Service Owner'},
+'Requestor'=>{de=>'Anforderer'},
