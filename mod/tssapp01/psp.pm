@@ -70,6 +70,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'bpmark',
                 label         =>'Bussinessprocess mark',
+                weblinkto     =>'tssapp01::gpk',
+                weblinkon     =>['bpmark'=>'name'],
                 dataobjattr   =>'interface_tssapp01_01.bpmark'),
 
       new kernel::Field::Text(
