@@ -59,3 +59,21 @@ create table interface_tssapp01_02 (
 )  ENGINE=MyISAM DEFAULT CHARSET=latin1;
 alter table interface_tssapp01_01 add bpmark varchar(20);
 alter table interface_tssapp01_01 add ictono varchar(20);
+create table interface_tssapp01_gpk (
+  id           bigint(20)  NOT NULL,
+  name         varchar(10) NOT NULL,
+  description  longtext    default NULL,
+  phase        varchar(20) NOT NULL,
+  response     varchar(40) NOT NULL,
+  allocation   varchar(40) default NULL,
+  comments     longtext    default NULL,
+  perftype     varchar(20) NOT NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(30) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY `name` (name,srcsys),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+)  ENGINE=MyISAM DEFAULT CHARSET=latin1;
