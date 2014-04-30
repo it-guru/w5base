@@ -3,4 +3,4 @@
 'Target-Name'=>{de=>'Bezugsziel'},
 'ACL-Mode'=>{de=>'Zugriffsmodus'},
 "no '\%s' specified"=>{de=>"kein '\%s' angegeben"},
-'insufficient access to parent object'=>{de=>'keine Ausreichenden Rechte auf das Elternobject'},
+'insufficient access to parent object'=>{de=>'keine ausreichenden Rechte auf das Elternobject'},

@@ -480,8 +480,22 @@ sub checkacl
       my @fid=($rec->{fid});
       my $workrec=$rec;
       $context->{$workrec->{fid}}=$workrec;
+      my $foundro=0;
+      my $foundrw=0;
+      my $foundad=0;
       while(defined($workrec)){
-         last if (!$workrec->{inheritrights});
+         if (!$workrec->{inheritrights}){
+            if (exists($workrec->{admin})){
+               $foundad=$workrec->{admin};
+            }
+            if (exists($workrec->{read})){
+               $foundro=$workrec->{read};
+            }
+            if (exists($workrec->{write})){
+               $foundrw=$workrec->{write};
+            }
+            last;
+         }
          if (defined($workrec->{parentid})){
             my $parentid=$workrec->{parentid};
             if (!defined($context->{$parentid})){
@@ -499,9 +513,6 @@ sub checkacl
             last;
          }
       }
-      my $foundro=0;
-      my $foundrw=0;
-      my $foundad=0;
       my $isadmin=$self->IsMemberOf("admin");
       foreach my $fid (@fid){
          if (!defined($context->{$fid}->{$mode})){
@@ -576,12 +587,25 @@ sub checkacl
                   }
                }
             }
-            $context->{$fid}={'read'=>$foundro,'write'=>$foundrw,
-                              'admin'=>$foundad};
+            my $inheritrights=$context->{$fid}->{inheritrights};
+            my $parentid=$context->{$fid}->{parentid};
+            $context->{$fid}={    # verkürzen des Cache eintrages auf die
+               'read'=>$foundro,  # "essenz".
+               'write'=>$foundrw,
+               'inheritrights'=>$inheritrights,
+               'parentid'=>$parentid,
+               'admin'=>$foundad
+            };
          }
-         return(1) if ($context->{$fid}->{$mode});
+         else{  # init rights from upper level
+            $foundro=$context->{$fid}->{read};
+            $foundrw=$context->{$fid}->{write};
+            $foundad=$context->{$fid}->{admin};
+         }
       } 
+      
    }
+   
    return($context->{$rec->{fid}}->{$mode});
 
 }
