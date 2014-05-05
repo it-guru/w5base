@@ -187,6 +187,51 @@ sub Result
    );
    $wf->AddFields(
       new kernel::Field::Text(
+                name          =>'EVENTSTATRESPO',
+                label         =>'Verantwortung (TelIT Definition)',
+                depend        =>[qw(eventstatrespo eventspecrespocustomer 
+                                    eventspecrespoitprov)],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $p=$self->getParent;
+                   my $f1obj=$p->getField("wffields.eventstatrespo",
+                                          $current);
+                   my $f2obj=$p->getField("wffields.eventspecrespocustomer",
+                                          $current);
+                   my $f3obj=$p->getField("wffields.eventspecrespoitprov",
+                                          $current);
+                   if (defined($f1obj) && defined($f2obj) && defined($f3obj)){
+                      my $f1=$f1obj->RawValue($current);
+                      my $f2=$f2obj->RawValue($current);
+                      my $f3=$f3obj->RawValue($current);
+                      if ($f1 eq "EVre.customer" &&
+                          $f2=~m/^DTAG.TDG\.{0,1}/){
+                         return("Customer");
+                      }
+                      if ($f1 eq "EVre.itprov" &&
+                          $f3=~m/^DTAG.TSI.TI\.{0,1}/){
+                         return("Telekom IT");
+                      }
+                      elsif ($f1 eq "EVre.itprov" &&
+                          $f3=~m/^DTAG.TSI.Prod\.{0,1}/){
+                         return("Delivery");
+                      }
+                      elsif ($f1 eq "EVre.itprov" &&
+                          $f3=~m/^DTAG.TSI$/){
+                         return("Telekom IT/Delivery");
+                      }
+                      elsif ($f1 eq "EVre.itprov" &&
+                          $f3=~m/^DTAG.TSI\.{0,1}/){
+                         return("T-Systems");
+                      }
+                   }
+                   return("invalid");
+                },
+                htmldetail    =>0),
+   );
+   $wf->AddFields(
+      new kernel::Field::Text(
                 name          =>'CWEEK',
                 label         =>'KW',
                 onRawValue    =>sub{
@@ -257,6 +302,7 @@ sub Result
                    wffields.eventscprmsolutiontype
                    wffields.eventscprmclosetype
                    wffields.eventspecrespocustomer wffields.eventspecrespoitprov
+                   EVENTSTATRESPO
                    wffields.eventrcfound10wt
                    wffields.eventisconsequence
                    wffields.eventconsequenceof
