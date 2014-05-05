@@ -1,6 +1,6 @@
 package AL_TCom::event::checkCostcenterCompl;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -134,9 +134,10 @@ sub checkCostcenterCompl
    foreach my $t (keys(%target)){
       my %param=(
       #            adminbcc=>1,
+      #            emailbcc=>[qw(11634953080001)],
                   emailbcc=>[qw(11634953080001)],
-                  emailcc=>[qw(11634955470001 
-                               12762475160001)]
+      #            emailcc=>[qw(11634955470001 
+      #                         12762475160001)]
       );
       if ($t ne "UNKNOWN"){
 #         $param{emailto}=$t;
