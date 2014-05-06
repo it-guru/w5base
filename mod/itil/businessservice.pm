@@ -66,12 +66,11 @@ sub new
                    return(0);
                 },
                 label         =>'Business-Service Fullname',
-                dataobjattr   =>
-                   "concat(".
-                   "if (nature='','',concat(nature,".
-                   "if (shortname='',':',concat(shortname,':')))),".
+                dataobjattr   => "concat(".
+                   "if (nature is null or nature='','',concat(nature,".
+                   "if (shortname is null or shortname='',':',concat(shortname,':')))),".
                    "if (applname is null,'',".
-                   "concat(applname,if (shortname='',':',".
+                   "concat(applname,if (shortname is null or shortname='',':',".
                    "concat(':',shortname,':')))),".
                    "if ($worktable.name is null,'[ENTIRE]',".
                    "$worktable.name))"),
@@ -271,18 +270,18 @@ sub new
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>'mgmtitemgroup'),
 
+      new kernel::Field::Textarea(
+                name          =>'description',
+                group         =>'desc',
+                label         =>'Business Service Description',
+                dataobjattr   =>"$worktable.description"),
+
       new kernel::Field::Text(
                 name          =>'version',
                 group         =>'desc',
                 label         =>'Version',
                 htmleditwidth =>'80px',
                 dataobjattr   =>"$worktable.version"),
-
-      new kernel::Field::Textarea(
-                name          =>'description',
-                group         =>'desc',
-                label         =>'Business Service Description',
-                dataobjattr   =>"$worktable.description"),
 
 
      new kernel::Field::Container(
