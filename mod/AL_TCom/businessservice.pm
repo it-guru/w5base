@@ -57,6 +57,57 @@ sub new
                 label         =>'IT-Service Owner',
                 readonly      =>1,
                 vjoinon       =>'funcmgrid'),
+      new kernel::Field::Contact(
+                name          =>'procmgr',
+                group         =>'contactpersons',
+                label         =>'process designer',
+                readonly      =>1,
+                vjoinon       =>'procmgrid'),
+      new kernel::Field::Link(
+                name          =>'procmgrid',
+                group         =>'contactpersons',
+                label         =>'process designer id',
+                readonly      =>1,
+                dataobjattr   =>"(select targetid from lnkcontact where ".
+                   " lnkcontact.refid=businessservice.id and ".
+                   " lnkcontact.target='base::user' and ".
+                   " lnkcontact.parentobj='itil::businessservice' and ".
+                   " croles like '%roles=\\'procmgr\\'=roles%'".
+                   " limit 1)"),
+      new kernel::Field::Contact(
+                name          =>'slmgr',
+                group         =>'contactpersons',
+                label         =>'service level manager',
+                readonly      =>1,
+                vjoinon       =>'slmgrid'),
+      new kernel::Field::Link(
+                name          =>'slmgrid',
+                group         =>'contactpersons',
+                label         =>'service level manager id',
+                readonly      =>1,
+                dataobjattr   =>"(select targetid from lnkcontact where ".
+                   " lnkcontact.refid=businessservice.id and ".
+                   " lnkcontact.target='base::user' and ".
+                   " lnkcontact.parentobj='itil::businessservice' and ".
+                   " croles like '%roles=\\'slmgr\\'=roles%'".
+                   " limit 1)"),
+      new kernel::Field::Contact(
+                name          =>'evmgr',
+                group         =>'contactpersons',
+                label         =>'event manager',
+                readonly      =>1,
+                vjoinon       =>'evmgrid'),
+      new kernel::Field::Link(
+                name          =>'evmgrid',
+                group         =>'contactpersons',
+                label         =>'event manager id',
+                readonly      =>1,
+                dataobjattr   =>"(select targetid from lnkcontact where ".
+                   " lnkcontact.refid=businessservice.id and ".
+                   " lnkcontact.target='base::user' and ".
+                   " lnkcontact.parentobj='itil::businessservice' and ".
+                   " croles like '%roles=\\'evmgr\\'=roles%'".
+                   " limit 1)"),
    );
    $self->AddGroup("contactpersons",translation=>'AL_TCom::businessservice');
 
