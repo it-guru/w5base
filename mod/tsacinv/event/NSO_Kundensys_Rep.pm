@@ -75,7 +75,7 @@ sub NSO_Kundensys_Rep
                assetmodelname tsacinv_locationfullname
                acmdbcontract acmdbcontractnumber
                applicationnames
-               dynservices);
+               dynorderedservices);
 
 
    my @control;
