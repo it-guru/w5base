@@ -306,12 +306,21 @@ sub updateDenyHandling
                return(0);
             }
          }
-         if (effVal($oldrec,$newrec,"denyupdvalidto") eq ""){
-            $newrec->{denyupdvalidto}=$self->ExpandTimeExpression("now+365d");
+         if (effVal($oldrec,$newrec,"denyupdvalidto") eq ""){ # default=1.5Jahre
+            $newrec->{denyupdvalidto}=$self->ExpandTimeExpression("now+550d");
          }
       }
       else{
          $newrec->{denyupdvalidto}=undef;
+      }
+   }
+   if ($self->SelfAsParentObject() eq "itil::asset"){
+      if (effChanged($oldrec,$newrec,"denyupdvalidto") ||
+          effChanged($oldrec,$newrec,"denyupd") ||
+          effChanged($oldrec,$newrec,"deprstart")){
+         $newrec->{refreshinfo1}=undef;
+         $newrec->{refreshinfo2}=undef;
+         $newrec->{refreshinfo3}=undef;
       }
    }
    return(1);

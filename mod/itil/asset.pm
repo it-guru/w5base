@@ -375,21 +375,21 @@ sub new
      new kernel::Field::Date(
                 name          =>'refreshinfo1',
                 group         =>'upd',
-                htmldetail    =>0,
+                uivisible     =>0,
                 label         =>'Refresh notification 1',
                 dataobjattr   =>'asset.refreshinfo1'),
 
      new kernel::Field::Date(
                 name          =>'refreshinfo2',
                 group         =>'upd',
-                htmldetail    =>0,
+                uivisible     =>0,
                 label         =>'Refresh notification 2',
                 dataobjattr   =>'asset.refreshinfo2'),
 
      new kernel::Field::Date(
                 name          =>'refreshinfo3',
                 group         =>'upd',
-                htmldetail    =>0,
+                uivisible     =>0,
                 label         =>'Refresh notification 3',
                 dataobjattr   =>'asset.refreshinfo3'),
 

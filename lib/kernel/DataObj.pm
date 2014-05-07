@@ -1726,6 +1726,20 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
             }
          }
       }
+      my $contacts=$oldrec->{contacts};
+      if (ref($contacts) eq "ARRAY"){
+         if (!exists($notifyparam{emailcc})){
+            $notifyparam{emailcc}=[];
+         }
+         if (!ref($notifyparam{emailcc}) eq "ARRAY"){
+            $notifyparam{emailcc}=[$notifyparam{emailcc}];
+         }
+         foreach my $crec (@$contacts){
+            if ($crec->{target} eq "base::user"){
+               push(@{$notifyparam{emailcc}},$crec->{targetid});
+            }
+         }
+      }
    }
    my $lastlang;
    if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
@@ -1735,16 +1749,18 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
 
    my ($subject,$text)=&{$gentext}($self,\%notifyparam);
 
-   if (!defined($notifycontrol->{wf})){
-      $notifycontrol->{wfact}=getModuleObject($self->Config,
-                                              "base::workflowaction");
-   }
-   $notifycontrol->{wfact}->Notify("INFO",$subject,$text,%notifyparam);
-   if (defined($lastlang)){
-      $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
-   }
-   else{
-      delete($ENV{HTTP_FORCE_LANGUAGE});
+   if (defined($subject) && defined($text)){
+      if (!defined($notifycontrol->{wf})){
+         $notifycontrol->{wfact}=getModuleObject($self->Config,
+                                                 "base::workflowaction");
+      }
+      $notifycontrol->{wfact}->Notify("INFO",$subject,$text,%notifyparam);
+      if (defined($lastlang)){
+         $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+      }
+      else{
+         delete($ENV{HTTP_FORCE_LANGUAGE});
+      }
    }
 }
 
@@ -1798,20 +1814,22 @@ sub NotifiedValidatedUpdateRecord
          $text.=$self->T("there was done an update on a record ".
                          "which is managed ".
                          "by you based on",'kernel::QRule');
-         $text.=" ".$notifycontrol->{mode}.".\n\n";
-        
+         $text.=" ".$notifycontrol->{mode}.".\n";
+       
+         my $fldtext=""; 
          foreach my $k (keys(%$newrec)){
             my $kfld=$self->getField($k);
-            if (defined($kfld)){
-               $text.="<b>".$kfld->Label()."</b>";
-               $text.=":\n";
-               $text.="old value:\n";
-               $text.=$kfld->FormatedDetail(\%oldval,"HtmlV01");
-               $text.="\n";                                  
-               $text.="new value:\n";                        
-               $text.=$kfld->FormatedDetail($newrec,"HtmlV01");;
+            if (defined($kfld) && $kfld->uivisible()){
+               $fldtext.="\n<b>".$kfld->Label()."</b>";
+               $fldtext.=":\n";
+               $fldtext.="old value:\n";
+               $fldtext.=$kfld->FormatedDetail(\%oldval,"HtmlV01");
+               $fldtext.="\n";                                  
+               $fldtext.="new value:\n";                        
+               $fldtext.=$kfld->FormatedDetail($newrec,"HtmlV01");;
             }
          }
+         return(undef) if ($fldtext eq "");
         
          $text.="\n\n".
                $self->T("This update did not delivers you of your ".
