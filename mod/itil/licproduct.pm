@@ -61,16 +61,9 @@ sub new
                 dataobjattr   =>'licproduct.pgroup'),
 
       new kernel::Field::Text(
-                name          =>'dummy1',
-                htmldetail    =>'0',
+                name          =>'metric',
                 label         =>'Lizenzmetrik',
-                container     =>'additional'),
-
-      new kernel::Field::Text(
-                name          =>'dummy0',
-                htmldetail    =>'0',
-                label         =>'Akt. Version',
-                container     =>'additional'),
+                dataobjattr   =>'licproduct.lmetric'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -97,6 +90,11 @@ sub new
       new kernel::Field::Link(
                 name          =>'producerid',
                 dataobjattr   =>'licproduct.producer'),
+
+      new kernel::Field::Text(
+                name          =>'itemno',
+                label         =>'Item/Order-No.',
+                dataobjattr   =>'licproduct.itemno'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',

@@ -2,3 +2,4 @@
 'Producer'=>{de=>'Hersteller'},
 'Product family'=>{de=>'Produktfamilie'},
 'Licensemetric'=>{de=>'Lizenzmetrik'},
+'Item/Order-No.'=>{de=>'Artikel-/Bestellnummer'},

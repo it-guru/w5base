@@ -51,7 +51,7 @@
 'AL_TCom.asset.lnkassetcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'AL_TCom.asset.core'=>{de=>'phys. Core',en=>'phys. Core'},
 'AL_TCom.asset.cpu'=>{de=>'phys. CPU',en=>'phys. CPU'},
-'AL_TCom.liccontract'=>{de=>'Lizenzvertrag',en=>'License Contract'},
+'AL_TCom.liccontract'=>{de=>'Lizenzierung',en=>'Licensing'},
 'AL_TCom.liccontract.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.swinstance'=>{de=>'Software-Instanz',en=>'Software-Instance'},
 'AL_TCom.swinstance.new'=>{de=>'Neueingabe',en=>'New'},

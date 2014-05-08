@@ -275,7 +275,7 @@ create table ipaddress (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table liccontract (
   id          bigint(20)  NOT NULL,
-  name        varchar(40) NOT NULL,
+  name        varchar(300) NOT NULL,
   cistatus    int(2)      NOT NULL,
     software       bigint(20)  default NULL,
     sem            bigint(20)  default NULL,
@@ -1328,10 +1328,10 @@ alter table asset add denyupd int(1) default '0',add denyupdvalidto datetime def
 alter table system add denyupd int(1) default '0',add denyupdvalidto datetime default NULL,add denyupdcomments longtext default NULL;
 create table licproduct (
   id          bigint(20)  NOT NULL,
-  name        varchar(128) NOT NULL,
+  name        varchar(255) NOT NULL,
   pgroup      varchar(128) default NULL,
   cistatus    int(2)      NOT NULL,
-    lmetric varchar(40) default 'UNKNOWN',
+    lmetric varchar(40) default 'UNKNOWN', itemno varchar(40),
     producer       bigint(20)  default NULL, 
     mandator       bigint(20)  default NULL,
   comments    longtext     default NULL,
@@ -1349,3 +1349,5 @@ create table licproduct (
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 );
+alter table liccontract add licproduct bigint(20) default null;
+alter table liccontract add fullname varchar(512) not null;
