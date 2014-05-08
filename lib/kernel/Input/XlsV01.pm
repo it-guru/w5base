@@ -39,7 +39,10 @@ sub SetInput
       my ($fh,$filename)=tempfile();
       my $size;
       my $blk=1024;
-      my $max=1024000;
+      my $max=2048000;
+      if ($self->getParent->getParent->IsMemberOf("admin")){
+         $max=$max*10;
+      }
       my ($w,$r);
       while($r=sysread($file,$buffer,$blk)){
          my $w=syswrite($fh,$buffer,$r);
