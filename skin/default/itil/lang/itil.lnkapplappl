@@ -11,8 +11,8 @@
 'fieldgroup.classi'=>{en=>'Classification of interface',
                     de=>'Klassifizierung der Schnittstelle'},
 'fieldgroup.interfacescomp'=>{
-    de=>'spezielle Schnittstellen Komponenten/Einzelheiten',
-    en=>'individual Interface components'},
+    de=>'spezielle Schnittstellen Komponenten/Einzelheiten und Kontakte',
+    en=>'individual Interface components and contacts'},
 'Interface components'=>{de=>'Schnittstellen Komponenten'},
 'from Application'=>{de=>'von Anwendung'},
 'to Application'=>{de=>'nach Anwendung'},
