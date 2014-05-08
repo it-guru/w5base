@@ -100,7 +100,6 @@ sub new
                                  'MySQL',
                                  'Nginx',
                                  'OpenLDAP',
-                                 'Oracle',
                                  'Oracle ASM',
                                  'Oracle DB Server',
                                  'Oracle Appl Server',
