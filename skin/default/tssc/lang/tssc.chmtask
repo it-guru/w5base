@@ -10,7 +10,7 @@
 'SysModTime'=>{de=>'letzte Bearbeitung'},
 'Create time'=>{de=>'Erstellungszeitpunkt'},
 'Description'=>{de=>'Task Beschreibung'},
-'Work Start'=>{de=>'Arbeitsbegin'},
+'Work Start'=>{de=>'Arbeitsbeginn'},
 'Work End'=>{de=>'Arbeitsende'},
 'Planed Start'=>{de=>'geplanter Beginn'},
 'Planed End'=>{de=>'geplantes Ende'},
