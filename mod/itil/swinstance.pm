@@ -104,6 +104,7 @@ sub new
                                  'Oracle DB Server',
                                  'Oracle Appl Server',
                                  'Oracle TimesTen DB',
+                                 'Oracle SOA-Suite',
                                  'Oracle Transparent Gateway',
                                  'PHP-fpm',
                                  'PostgeSQL',
