@@ -1,0 +1,7 @@
+'tshpsa::lnkswi'=>{de=>'HP-SA discovered Software-Installation',
+                   en=>'HP-SA discovered Software-Installation'},
+'fieldgroup.rel'=>{de=>'Zuordnung',en=>'Relation'},
+'class'=>{de=>'Software-Klasse'},
+'version'=>{de=>'Version'},
+'path'=>{de=>'Installationspfad'},
+'iname'=>{de=>'Instanz-Name'},

@@ -1,3 +1,7 @@
 'tshpsa::system'=>{de=>'HP-SA logisches System',
                    en=>'HP-SA logical system'},
+'fieldgroup.sysgrps'=>{de=>'Systemgruppen',
+                       en=>'System groups'},
+'fieldgroup.swis'=>{de=>'Software-Installationen',
+                    en=>'Software-Installations'},
 

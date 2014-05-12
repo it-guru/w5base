@@ -1,4 +1,4 @@
-package tshpsa::system;
+package tshpsa::sysgrp;
 #  W5Base Framework
 #  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
 #
@@ -40,36 +40,8 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Hostname',
-                dataobjattr   =>'hostname'),
-
-      new kernel::Field::Text(
-                name          =>'systemid',
-                label         =>'SystemID',
-                dataobjattr   =>'systemid'),
-
-      new kernel::Field::Text(
-                name          =>'primaryip',
-                label         =>'primary IP',
-                dataobjattr   =>'pip'),
-
-      new kernel::Field::SubList(
-                name          =>'sysgrps',
-                label         =>'Groups',
-                group         =>'sysgrps',
-                vjointo       =>'tshpsa::lnksystemsysgrp',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>[qw(sysgrpname sysgrpid)]),
-
-      new kernel::Field::SubList(
-                name          =>'swis',
-                label         =>'Software-Installations',
-                group         =>'swis',
-                vjointo       =>'tshpsa::lnkswi',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>[qw(class version iname)]),
-
-
+                label         =>'Name',
+                dataobjattr   =>'group_name'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
@@ -77,7 +49,7 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'curdate')
    );
-   $self->setDefaultView(qw(name systemid primaryip mdate));
+   $self->setDefaultView(qw(name mdate));
    return($self);
 }
 
@@ -96,29 +68,19 @@ sub getSqlFrom
    my $self=shift;
    my $from=<<EOF;
 
-(select system.item_id,
-       ddim.curdate,
-       lower(system.host_name) hostname,
-       lower(system.display_name) name,
-       system.primary_ip pip,
-       attr_systemid.ATTRIBUTE_SHORT_VALUE systemid
+(
 
+select grp.item_id,
+       ddim.curdate,
+       grp.group_name
 from (select CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL curdate 
       from CMDB_DATA.DATE_DIMENSION 
-      where CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL 
-            between SYSDATE-1 AND SYSDATE)  ddim
-     join CMDB_DATA.SAS_SERVERS system
-          on ddim.curdate between system.begin_date and system.end_date
-     join SAS_SERVER_CUST_ATTRIBUTES attr_systemid
-          on ddim.curdate 
-             between attr_systemid.begin_date and attr_systemid.end_date
-             and system.item_id=attr_systemid.item_id
-             and attr_systemid.ATTRIBUTE_NAME='ITM_Service_ID'
-     join SAS_SERVERS_BASE base
-          on system.item_id=base.item_id
-     join SAS_SERVER_AGENT agent
-          on system.item_id=agent.item_id
-) locicalsystem
+      where CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL between SYSDATE-1 AND SYSDATE)  ddim
+      join SAS_SERVER_GROUPS grp 
+          on ddim.curdate between grp.begin_date and grp.end_date
+ 
+)
+
 EOF
 
    return($from);
@@ -130,7 +92,15 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","swis","sysgrps","source");
+   return("header","default","w5baselocation");
+}
+
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/grp.jpg?".$cgi->query_string());
 }
 
 sub isQualityCheckValid
@@ -141,14 +111,6 @@ sub isQualityCheckValid
 }
 
 
-
-
-sub getRecordImageUrl
-{
-   my $self=shift;
-   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
-}
          
 
 sub isViewValid
