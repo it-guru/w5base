@@ -502,7 +502,7 @@ sub Validate
    my $unitcount=effVal($oldrec,$newrec,"unitcount");
 
    if (effVal($oldrec,$newrec,"licproductid") eq ""){
-      $fullname=$fullname." (unlimited License)";
+      $fullname=$fullname." (unspecified License)";
    }
    elsif ($units ne "" || $unitcount ne ""){
       my $u=$units;
@@ -512,7 +512,7 @@ sub Validate
       $fullname=$fullname." ($u $l License)";
    }
    else{
-      $fullname=$fullname." (unspecified License)";
+      $fullname=$fullname." (unlimited License)";
    }
    if (effVal($oldrec,$newrec,"cistatusid") eq "6"){
       $fullname.=" [deleted]";
