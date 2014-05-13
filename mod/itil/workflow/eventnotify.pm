@@ -1311,7 +1311,8 @@ sub addComplexAbos
       my $appl=getModuleObject($self->Config,"itil::appl");
       $appl->SetFilter({id=>$applid});
       foreach my $rec ($appl->getHashList(qw(customerid responseteamid
-                                             businessteamid delmgrteamid))){
+                                             businessteamid delmgrteamid
+                                             mandatorid))){
          if ($rec->{customerid} ne ""){
             $self->LoadGroups(\%allcustomer,"up",$rec->{customerid});
          }
@@ -1321,8 +1322,11 @@ sub addComplexAbos
          if ($rec->{businessteamid} ne ""){
             $self->LoadGroups(\%allorgarea,"up",$rec->{businessteamid});
          }
-         if ($rec->{businessteamid} ne ""){
+         if ($rec->{delmgrteamid} ne ""){
             $self->LoadGroups(\%allorgarea,"up",$rec->{delmgrteamid});
+         }
+         if ($rec->{mandatorid} ne ""){
+            $self->LoadGroups(\%allorgarea,"up",$rec->{mandatorid});
          }
       }
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
@@ -1358,13 +1362,22 @@ sub addComplexAbos
       $locid=[$locid] if (ref($locid) ne "ARRAY");
       my $loc=getModuleObject($self->Config,"base::location");
       $loc->SetFilter({id=>$locid});
-      foreach my $rec ($loc->getHashList(qw(id grprelations))){
+      foreach my $rec ($loc->getHashList(qw(id grprelations
+                                            mandatorid))){
          foreach my $relrec (@{$rec->{grprelations}}){
             if (in_array([qw(RMbusinesrel1 RMbusinesrel2 RMbusinesrel3)],
                 $relrec->{relmode})){
                $self->LoadGroups(\%allcustomer,"up",$relrec->{grpid});
             }
          }
+         if ($rec->{mandatorid} ne ""){
+            $self->LoadGroups(\%allorgarea,"up",$rec->{mandatorid});
+         }
+      }
+      my $wfmandatorid=$WfRec->{mandatorid};
+      $wfmandatorid=[$wfmandatorid] if (ref($wfmandatorid) ne "ARRAY");
+      foreach my $mandatorid (@$wfmandatorid){
+         $self->LoadGroups(\%allorgarea,"up",$mandatorid);
       }
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass},undef],
@@ -1372,6 +1385,13 @@ sub addComplexAbos
                  affectedcustomerid=>[keys(%allcustomer),undef],
                  affectedorgareaid=>[undef],
                  eventmode=>[$WfRec->{eventmode},undef]
+                 });
+      push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
+                 nativeventstatclass=>[$WfRec->{eventstatclass},undef],
+                 affecteditemprio=>[$WfRec->{affecteditemprio},undef],
+                 affectedcustomerid=>[undef],
+                 affectedorgareaid=>[keys(%allorgarea)],
+                 eventmode=>[$WfRec->{eventmode},undef],
                  });
    }
    elsif ($WfRec->{eventmode} eq "EVk.bprocess"){
