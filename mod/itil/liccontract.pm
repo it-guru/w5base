@@ -105,7 +105,7 @@ sub new
                 vjointo       =>'itil::licproduct',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['licproductid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
                 name          =>'licproductid',
@@ -486,7 +486,7 @@ sub Validate
    my $newrec=shift;
 
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-        (($newrec->{name}=~m/[^A-Z,:0-9. _\[\]()]/i) ||
+        (($newrec->{name}=~m/[^A-Z,-:0-9. _\[\]()]/i) ||
          length(trim($newrec->{name}))<3)){
       $self->LastMsg(ERROR,"invalid licensing name specified");
       return(0);

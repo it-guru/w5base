@@ -105,17 +105,17 @@ sub new
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
-                uivisible     =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $rec=$param{current};
-                   my $d=$rec->{$self->Name()};
-                   if (ref($d) eq "HASH" && keys(%$d)){
-                      return(1);
-                   }
-                   return(0);
-                },
+                #uivisible     =>sub{
+                #   my $self=shift;
+                #   my $mode=shift;
+                #   my %param=@_;
+                #   my $rec=$param{current};
+                #   my $d=$rec->{$self->Name()};
+                #   if (ref($d) eq "HASH" && keys(%$d)){
+                #      return(1);
+                #   }
+                #   return(0);
+                #},
                 dataobjattr   =>'licproduct.additional'),
 
       new kernel::Field::Text(
@@ -315,9 +315,11 @@ sub isWriteValid
 
    my $userid=$self->getCurrentUserId();
    my @l;
-   push(@l,"default","source","doccontrol","phonenumbers","class") if (!defined($rec) ||
-                         ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
-                         $self->IsMemberOf($self->{CI_Handling}->{activator}));
+   push(@l,"default") if (!defined($rec));
+   if ($self->IsMemberOf("admin")){
+      push(@l,"default");
+   }
+
    return(@l);
 }
 
@@ -338,7 +340,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
 
-   my @l="header","default","source","attachments","history";
+   my @l=("header","default","source","attachments","history");
   
    return(@l);
 }
