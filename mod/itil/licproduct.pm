@@ -37,6 +37,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'licproduct.id'),
                                                   
@@ -188,7 +189,7 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(name id cistatus mdate cdate));
+   $self->setDefaultView(qw(name metric cistatus mdate cdate));
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.licproduct"],
                          uniquesize=>120};
@@ -249,7 +250,7 @@ sub Validate
    my $newrec=shift;
 
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-       $newrec->{name}=~m/^\s*$/){
+       ($newrec->{name}=~m/^\s*$/ || length(trim($newrec->{name}))<3)){
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
    }
@@ -317,9 +318,6 @@ sub isWriteValid
    push(@l,"default","source","doccontrol","phonenumbers","class") if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
-   if (defined($rec) && $rec->{pclass} eq "MAIN"){
-      push(@l,"options");
-   }
    return(@l);
 }
 
@@ -339,10 +337,10 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   if ($rec->{pclass} ne "MAIN"){
-      return("header","default","source","doccontrol","history");
-   }
-   return("ALL");
+
+   my @l="header","default","source","attachments","history";
+  
+   return(@l);
 }
 
 sub isCopyValid

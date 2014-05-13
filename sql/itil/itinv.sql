@@ -1351,3 +1351,4 @@ create table licproduct (
 );
 alter table liccontract add licproduct bigint(20) default null;
 alter table liccontract add fullname varchar(512) not null;
+alter table lnksoftwaresystem add licsubof bigint(20) default null;

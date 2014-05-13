@@ -180,7 +180,7 @@ sub new
                 label         =>'License contract',
                 vjointo       =>'itil::liccontract',
                 vjoinon       =>['liccontractid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Number(
                 name          =>'quantity',
@@ -190,6 +190,40 @@ sub new
                 label         =>'Quantity',
                 dataobjattr   =>'lnksoftwaresystem.quantity'),
 
+      new kernel::Field::Select(
+                name          =>'licsubof',
+                label         =>'is sub licensed product of',
+                group         =>'lic',
+                jsonchanged   =>\&getOnChangedScript,
+                jsoninit      =>\&getOnChangedScript,
+                allowempty    =>1,
+                vjointo       =>'itil::lnksoftware',
+                vjoinbase     =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @flt;
+                   my $sys=$current->{systemid};
+                   if ($sys ne ""){
+                      push(@flt,{systemid=>\$sys});
+                   }
+                   return(\@flt);
+                },
+                vjoinon       =>['licsubofid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'licsubofid',
+                group         =>'lic',
+                dataobjattr   =>'lnksoftwaresystem.licsubof'),
+
+      new kernel::Field::Text(
+                name          =>'licproduct',
+                group         =>'lic',
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'License product',
+                dataobjattr   =>'licproduct.name'),
+                                                 
       new kernel::Field::Number(
                 name          =>'licrelevantcpucount',
                 group         =>'lic',
@@ -569,6 +603,37 @@ sub new
 }
 
 
+sub getOnChangedScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var l=document.forms[0].elements['Formated_liccontract'];
+var q=document.forms[0].elements['Formated_quantity'];
+var s=document.forms[0].elements['Formated_licsubof'];
+
+if (s && q && l){
+   var v=s.options[s.selectedIndex].value;
+   if (v!="" && v!="[none]"){
+      l.value="";
+      q.value="0";
+      l.disabled=true;
+      q.disabled=true;
+   }
+   else{
+      l.disabled=false;
+      q.disabled=false;
+   }
+}
+
+EOF
+   return($d);
+}
+
+
+
 sub calcLicMetrics   # licrelevantopmode licrelevantosrelease 
 {                    # licrelevantcpucount
    my $self=shift;
@@ -679,7 +744,9 @@ sub getSqlFrom
             "left outer join system ".
             "on lnksoftwaresystem.system=system.id ".
             "left outer join liccontract ".
-            "on lnksoftwaresystem.liccontract=liccontract.id ";
+            "on lnksoftwaresystem.liccontract=liccontract.id ".
+            "left outer join licproduct ".
+            "on liccontract.licproduct=licproduct.id ";
 
    return($from);
 }
@@ -714,7 +781,7 @@ sub calcRightsMgmtState
       if ($current->{cicistatusid}==4){
          if ($current->{liccontractcistatusid}!=4){
             push(@msg,"ERROR: ". 
-                 $self->getParent->T("license contract is installed/active"));
+                 $self->getParent->T("licensing contract is not active"));
          }
       }
    }
@@ -756,6 +823,30 @@ sub Validate
             $self->LastMsg(ERROR,"change of software product not allowed ".
                                  "if there are options");
             return(undef);
+         }
+      }
+   }
+   if (effVal($oldrec,$newrec,"licsubofid") ne ""){
+      if (effVal($oldrec,$newrec,"liccontractid") ne ""){
+         $newrec->{liccontractid}=undef;
+      }
+      if (effVal($oldrec,$newrec,"quantity")!=0){
+         $newrec->{quantity}=0;
+      }
+   }
+   if (effChanged($oldrec,$newrec,"liccontractid")){
+      my $licid=effVal($oldrec,$newrec,"liccontractid");
+      my $quantity=effVal($oldrec,$newrec,"quantity");
+      if ($quantity<=0){
+         $quantity=1;
+      }
+      my $o=getModuleObject($self->Config,"itil::liccontract");
+      $o->SetFilter({id=>\$licid});
+      my ($licrec)=$o->getOnlyFirst(qw(ALL));
+      if ($licrec->{units} ne ""){
+         if ($licrec->{licfree}-$quantity<0){
+            $self->LastMsg(ERROR,"not enouth free units in license");
+            return(0);
          }
       }
    }
@@ -824,8 +915,18 @@ sub Validate
                msg(INFO,"alternate create of installation OK");
             }
             else{
-               if (!defined($oldrec) ||
-                   !($self->isInstanceRelationWriteable($oldrec->{id}))){
+               #if (defined($oldrec)){
+               #   my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
+               #   my @lim=$self->getMembersOf($mandatorid, 
+               #                               [qw(RLIOperator)],'up');
+               #   if ($#lim==-1){
+               #      $self->LastMsg(ERROR,"system is not writeable for you");
+               #      return(undef);
+               #   }
+               #}
+               if ((!defined($oldrec) ||
+                    !($self->isInstanceRelationWriteable($oldrec->{id}))) &&
+                   !$self->isLicManager(effVal($oldrec,$newrec,"mandatorid"))){
                   $self->LastMsg(ERROR,"system is not writeable for you");
                   return(undef);
                }
@@ -842,6 +943,21 @@ sub Validate
 
    return(1);
 }
+
+sub isLicManager
+{
+   my $self=shift;
+   my $mandatorid=shift;
+
+   if ($mandatorid ne ""){
+      my @lim=$self->getMembersOf($mandatorid, [qw(RLIOperator)],'up');
+      if ($#lim!=-1){
+         return(1);
+      }
+   }
+   return(0);
+}
+
 
 sub VersionKeyGenerator
 {
@@ -1332,6 +1448,8 @@ sub isWriteValid
          }
       }
    }
+   my $mandatorid=$rec->{mandatorid};
+   return("lic") if ($self->isLicManager($mandatorid));
    return(undef);
 }
 
@@ -1400,7 +1518,6 @@ sub checkAlternateInstCreateRights
                                                        # trust checking - this
                                                        # is not the final 
                                                        # process!
-
    $newrec->{alternateCreateRight}="1";  # store information about alternate
                                          # process for FinishWrite
 

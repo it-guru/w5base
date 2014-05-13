@@ -113,6 +113,7 @@ sub new
                                  'RCHOperator',                # ITIL role
                                  'RCFOperator',                # ITIL role
                                  'RPROperator',                # ITIL role
+                                 'RLIOperator',                # ITIL role
                                  'RAdmin',                     # W5Base role
                                  'RDataAdmin',                 # W5Base role
                                  'RContactAdmin',              # W5Base role

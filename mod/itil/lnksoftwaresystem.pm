@@ -209,7 +209,9 @@ sub getSqlFrom
             "left outer join liccontract ".
             "on lnksoftwaresystem.liccontract=liccontract.id ".
             "left outer join asset ".
-            "on system.asset=asset.id";
+            "on system.asset=asset.id ".
+            "left outer join licproduct ".
+            "on liccontract.licproduct=licproduct.id ";
    return($from);
 }
 

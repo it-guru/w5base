@@ -28,6 +28,7 @@
 'RPROperator'=>{ de=>'Problem-Operator',en=>'Problem-Operator'},
 'RCFOperator'=>{ de=>'Config-Operator', en=>'Config-Operator'},
 'RODOperator'=>{ de=>'Order-Operator', en=>'Order-Operator'},
+'RLIOperator'=>{ de=>'Lizenz-Operator', en=>'License-Operator'},
 'RControlling'=>{ de=>'Controlling', en=>'Controlling'},
 'RBackoffice'=>{ de=>'Backoffice', en=>'Backoffice'},
 'RAuditor'=>{ de=>'Auditor', en=>'Auditor'},

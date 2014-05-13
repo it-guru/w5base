@@ -55,4 +55,7 @@
 'is DBS (Databasesystem) software'=>{de=>'ist DBS (Datenbanksystem) Software'},
 'is DMS (Documentmanagement) software'=>{de=>'ist DMS (Dokumentenmanagement) Software'},
 'is MW (Middleware) software'=>{de=>'ist MW (Middleware) Software'},
+'licensing contract is not active'=>{de=>'Lizenzierung ist nicht aktiv'},
+'not enouth free units in license'=>{de=>'nicht genügend freie Einheiten in der Lizenz'},
+'is sub licensed product of'=>{de=>'ist Unterproduktlizenz von'},
 

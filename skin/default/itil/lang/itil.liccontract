@@ -1,5 +1,4 @@
-'itil::liccontract'=>{de=>'Lizenzvertrag',en=>'License contract'},
-'fieldgroup.default'=>{de=>'Lizenzvertrag-Daten',en=>'License contract-Informations'},
+'itil::liccontract'=>{de=>'Lizenzierung',en=>'Licensing'},
 'fieldgroup.finance'=>{de=>'Finanzielle Verantwortung',en=>'finanze'},
 'fieldgroup.source'=>{de=>'Datenquelle',en=>'Datasource'},
 'fieldgroup.licdesc'=>{de=>'Lizenzbeschreibung',en=>'License description'},
@@ -19,4 +18,21 @@
 'Duration start'=>{de=>'Lizenzlaufzeitbeginn'},
 'Duration end'=>{de=>'Lizenzlaufzeitende'},
 'License free count'=>{de=>'aktuell verfügbare Einheiten'},
-'invalid license name specified'=>{de=>'ungültiger Lizenzname eingegeben'},
+'invalid licensing name specified'=>{de=>'ungültiger Lizenzierungsbezeichnung eingegeben'},
+'Name'=>{de=>'Lizenzierungsbezeichnung',
+         en=>'Licensing-label'},
+'License product'=>{de=>'Lizenzprodukt'},
+'License load'=>{de=>'Lizenzauslastung'},
+'units'=>{de=>'Anzahl Einheiten'},
+'price per unit'=>{de=>'Preis pro Einheit'},
+'Order ref'=>{de=>'Auftragsnummer'},
+'Order date'=>{de=>'Auftragsdatum'},
+'fieldgroup.order'=>{de=>'Beschaffung',en=>'Order'},
+'only admins can create product less entries'=>{de=>'Nur Admins können Einträge ohne Produkt erzeugen'},
+'only admins can create entries with no unit binding'=>{de=>'Nur Admins können Einträge ohne Einheitenbindung erzeugen'},
+'WELCOME'=>{de=>'Es gibt 3 verschiedene Grundformen der Lizenzierung.<br>
+a) Normale Einträge mit n-Einheiten und einem Lizenzierungsprodukt. Diese können von jedem "normlen" User erzeugt werden.<br>
+b) Einträge ohne Lizenzierungsprodukt - diese sind für "offene" Lizenzen vorgesehen und können nur von Admins erzeugt werden.<br>
+c) Einträge mit Lizenzprodukt und 0 Einheiten. Diese sind als "dummy" Eintäge anzusehen und dienen rein der Definition des betreffenden Lizenzproduktes. Auch diese können nur von Admins erzeugt werden.<br>
+'},
+

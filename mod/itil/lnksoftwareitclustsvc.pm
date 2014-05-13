@@ -75,11 +75,37 @@ sub new
                 vjoinon       =>['itclustcistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Text(
+                name          =>'itclust',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'link',
+                label         =>'Cluster',
+                dataobjattr   =>'itclust.name'),
+
+      new kernel::Field::Select(
+                name          =>'itclustcistatus',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'link',
+                label         =>'Cluster CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['itclustcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+                                                   
       new kernel::Field::Link(
                 name          =>'itclustcistatusid',
                 label         =>'Cluster CI-StatusID',
                 dataobjattr   =>'itclust.cistatus'),
                                                    
+      new kernel::Field::Text(
+                name          =>'itclustsvc',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'link',
+                label         =>'Cluster Service',
+                dataobjattr   =>'lnkitclustsvc.name'),
+
       new kernel::Field::Link(
                 name          =>'softwareid',
                 label         =>'SoftwareID',
@@ -127,7 +153,10 @@ sub getSqlFrom
             "left outer join system ".   # dummy relation, to corrct sql
             "on '-99'=system.id ".       # handling of fullname
             "left outer join liccontract ".
-            "on lnksoftwaresystem.liccontract=liccontract.id";
+            "on lnksoftwaresystem.liccontract=liccontract.id ".
+            "left outer join licproduct ".
+            "on liccontract.licproduct=licproduct.id ";
+
    return($from);
 }
 

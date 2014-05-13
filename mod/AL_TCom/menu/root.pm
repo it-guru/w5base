@@ -302,6 +302,21 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.liccontract.sys",
+                      "itil::lnklicsystem",
+                      func=>'Main',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.liccontract.appl",
+                      "itil::lnklicappl",
+                      func=>'Main',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.liccontract.appl.new",
+                      "itil::lnklicappl",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.swinstance",
                       "TS::swinstance",
                       defaultacl=>['valid_user']);

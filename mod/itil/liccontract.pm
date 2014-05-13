@@ -40,9 +40,16 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'liccontract.id'),
                                                   
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Fullname',
+                uivisible     =>0,
+                dataobjattr   =>'liccontract.fullname'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
@@ -68,18 +75,43 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'liccontract.cistatus'),
 
+#      new kernel::Field::TextDrop(
+#                name          =>'software',
+#                label         =>'Software',
+#                vjointo       =>'itil::software',
+#                vjoineditbase =>{'cistatusid'=>[3,4]},
+#                vjoinon       =>['softwareid'=>'id'],
+#                vjoindisp     =>'name'),
+#
+#      new kernel::Field::Link(
+#                name          =>'softwareid',
+#                label         =>'SoftwareID',
+#                dataobjattr   =>'liccontract.software'),
+
       new kernel::Field::TextDrop(
-                name          =>'software',
-                label         =>'Software',
-                vjointo       =>'itil::software',
+                name          =>'licproduct',
+                label         =>'License product',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      if ($param{current}->{licproductid} eq ""){
+                         return(0);
+                      }
+                   }
+                   return(1);
+                },
+                vjointo       =>'itil::licproduct',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['softwareid'=>'id'],
+                vjoinon       =>['licproductid'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
-                name          =>'softwareid',
-                label         =>'SoftwareID',
-                dataobjattr   =>'liccontract.software'),
+                name          =>'licproductid',
+                selectfix     =>1,
+                label         =>'License product ID',
+                dataobjattr   =>'liccontract.licproduct'),
 
       new kernel::Field::Databoss(),
 
@@ -87,46 +119,46 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'liccontract.databoss'),
 
-      new kernel::Field::TextDrop(
-                name          =>'responseteam',
-                htmlwidth     =>'300px',
-                group         =>'finance',
-                label         =>'CBM Team',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['responseteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'responseteamid',
-                dataobjattr   =>'liccontract.responseteam'),
-
-
-      new kernel::Field::TextDrop(
-                name          =>'sem',
-                group         =>'finance',
-                label         =>'Customer Business Manager',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['semid'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'semid',
-                dataobjattr   =>'liccontract.sem'),
-
-      new kernel::Field::TextDrop(
-                name          =>'sem2',
-                group         =>'finance',
-                label         =>'Deputy Customer Business Manager',
-                vjointo       =>'base::user',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['sem2id'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'sem2id',
-                dataobjattr   =>'liccontract.sem2'),
+#      new kernel::Field::TextDrop(
+#                name          =>'responseteam',
+#                htmlwidth     =>'300px',
+#                group         =>'finance',
+#                label         =>'CBM Team',
+#                vjointo       =>'base::grp',
+#                vjoineditbase =>{'cistatusid'=>[3,4]},
+#                vjoinon       =>['responseteamid'=>'grpid'],
+#                vjoindisp     =>'fullname'),
+#
+#      new kernel::Field::Link(
+#                name          =>'responseteamid',
+#                dataobjattr   =>'liccontract.responseteam'),
+#
+#
+#      new kernel::Field::TextDrop(
+#                name          =>'sem',
+#                group         =>'finance',
+#                label         =>'Customer Business Manager',
+#                vjointo       =>'base::user',
+#                vjoineditbase =>{'cistatusid'=>[3,4]},
+#                vjoinon       =>['semid'=>'userid'],
+#                vjoindisp     =>'fullname'),
+#
+#      new kernel::Field::Link(
+#                name          =>'semid',
+#                dataobjattr   =>'liccontract.sem'),
+#
+#      new kernel::Field::TextDrop(
+#                name          =>'sem2',
+#                group         =>'finance',
+#                label         =>'Deputy Customer Business Manager',
+#                vjointo       =>'base::user',
+#                vjoineditbase =>{'cistatusid'=>[3,4]},
+#                vjoinon       =>['sem2id'=>'userid'],
+#                vjoindisp     =>'fullname'),
+#
+#      new kernel::Field::Link(
+#                name          =>'sem2id',
+#                dataobjattr   =>'liccontract.sem2'),
 
 
       new kernel::Field::ContactLnk(
@@ -140,28 +172,19 @@ sub new
       new kernel::Field::Number(
                 name          =>'unitcount',
                 group         =>'licdesc',
+                readonly      =>1,
                 htmleditwidth =>'100',
                 label         =>'unit count',
                 dataobjattr   =>'liccontract.unitcount'),
 
-      new kernel::Field::Select(
+      new kernel::Field::TextDrop(
                 name          =>'unittype',
                 group         =>'licdesc',
-                default       =>'',
-                htmleditwidth =>'250',
                 label         =>'unit type',
-                transprefix   =>'UT.',
-                value         =>[
-                                 'logicalSystem',
-                                 'logicalCPU',
-                                 'physicalCPU',
-                                 'concurrentUser',
-                                 'namedUser',
-                                 'project',
-                                 '',        
-                                 ],
-                dataobjattr   =>'liccontract.unittype'),,
-
+                vjointo       =>'itil::licproduct',
+                vjoinon       =>['licproductid'=>'id'],
+                vjoindisp     =>'metric',
+                readonly      =>1),
 
       new kernel::Field::Date(
                 name          =>'durationstart',
@@ -213,6 +236,13 @@ sub new
                                  $n+=$r->{quantity};
                               } 
                            }
+                           my $fo=$self->getParent->getField("licuseitclust"); 
+                           my $d=$fo->RawValue($current);
+                           if (ref($d) eq "ARRAY"){
+                              foreach my $r (@$d){
+                                 $n+=$r->{quantity};
+                              } 
+                           }
 
                            return($n);
                         },
@@ -223,17 +253,49 @@ sub new
                 name          =>'licfree',
                 group         =>'licuse',
                 label         =>'License free count',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      if ($param{current}->{units} eq ""){
+                         return(0);
+                      }
+                   }
+                   return(1);
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fo=$self->getParent->getField("licuse"); 
+                   my $d=$fo->RawValue($current);
+                   my $fo=$self->getParent->getField("unitcount");
+                   my $max=$fo->RawValue($current);
+                   if (defined($max) && $max>0){
+                      return($max-$d);
+                   }
+                   return(undef);
+                },
+                depend        =>['licuse','unitcount']),
+
+      new kernel::Field::Percent(
+                name          =>'licload',
+                group         =>'licuse',
+                label         =>'License load',
                 onRawValue    =>sub{
                            my $self=shift;
                            my $current=shift;
-                           my $fo=$self->getParent->getField("licuse"); 
-                           my $d=$fo->RawValue($current);
-                           my $fo=$self->getParent->getField("unitcount");
-                           my $max=$fo->RawValue($current);
-                           if (defined($max) && $max>0){
-                              return($max-$d);
+                           if ($current->{units} ne ""){
+                              my $fo=$self->getParent->getField("licuse"); 
+                              my $d=$fo->RawValue($current);
+                              my $fo=$self->getParent->getField("unitcount");
+                              my $max=$fo->RawValue($current);
+                              if ($max>0){
+                                 return($d/100*$max);
+                              }
+                              return(100);
                            }
-                           return(undef);
+                           return(0);
                         },
                 depend        =>['licuse','unitcount']
                 ),
@@ -260,6 +322,44 @@ sub new
                 vjoindisp     =>['appl','applcistatus','quantity'],
                 vjoininhash   =>['appl','applcistatus','quantity']),
 
+      new kernel::Field::SubList(
+                name          =>'licuseitclust',
+                label         =>'License use by (cluster service)',
+                group         =>'licuse',
+                htmldetail    =>0,
+                vjointo       =>'itil::lnklicitclustsvc',
+                vjoinon       =>['id'=>'liccontractid'],
+                vjoinbase     =>[{itclustcistatusid=>"<=5"}],
+                vjoindisp     =>['itclustsvc','itclustcistatus','quantity'],
+                vjoininhash   =>['itclustsvc','itclustcistatus','quantity']),
+
+      new kernel::Field::Text(
+                name          =>'orderref',
+                group         =>'order',
+                label         =>'Order ref',
+                dataobjattr   =>'liccontract.orderref'),
+
+      new kernel::Field::Date(
+                name          =>'orderdate',
+                dayonly       =>1,
+                group         =>'order',
+                label         =>'Order date',
+                dataobjattr   =>'liccontract.orderdate'),
+
+      new kernel::Field::Number(
+                name          =>'units',
+                group         =>'order',
+                selectfix     =>1,
+                label         =>'units',
+                dataobjattr   =>'liccontract.unitcount'),
+
+      new kernel::Field::Currency(
+                name          =>'extprice',
+                group         =>'order',
+                label         =>'price per unit',
+                dataobjattr   =>'liccontract.extprice'),
+
+
       new kernel::Field::FileList(
                 name          =>'attachments',
                 parentobj     =>'itil::liccontract',
@@ -269,16 +369,6 @@ sub new
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
-                uivisible     =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $rec=$param{current};
-                   if (!defined($rec->{$self->Name()})){
-                      return(0);
-                   }
-                   return(1);
-                },
                 dataobjattr   =>'liccontract.additional'),
 
       new kernel::Field::Text(
@@ -396,14 +486,59 @@ sub Validate
    my $newrec=shift;
 
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-       (($newrec->{name}=~m/^\s*$/) || 
-        (haveSpecialChar($newrec->{name})))){
-      $self->LastMsg(ERROR,"invalid license name specified");
+        (($newrec->{name}=~m/[^A-Z,:0-9. _\[\]()]/i) ||
+         length(trim($newrec->{name}))<3)){
+      $self->LastMsg(ERROR,"invalid licensing name specified");
       return(0);
    }
    if (defined($newrec->{cistatusid}) && $newrec->{cistatusid}>4){
       # validate if subdatastructures have a cistauts <=4 
       # if true, the new cistatus isn't alowed
+   }
+
+   my $fullname=effVal($oldrec,$newrec,"name");
+   $fullname=~s/\[\d+\]$//;
+   my $units=effVal($oldrec,$newrec,"units");
+   my $unitcount=effVal($oldrec,$newrec,"unitcount");
+
+   if (effVal($oldrec,$newrec,"licproductid") eq ""){
+      $fullname=$fullname." (unlimited License)";
+   }
+   elsif ($units ne "" || $unitcount ne ""){
+      my $u=$units;
+      $u=$unitcount if ($u eq "");
+      my $l="unit";
+      $l="units" if ($u>1);
+      $fullname=$fullname." ($u $l License)";
+   }
+   else{
+      $fullname=$fullname." (unspecified License)";
+   }
+   if (effVal($oldrec,$newrec,"cistatusid") eq "6"){
+      $fullname.=" [deleted]";
+   }
+
+   if (effVal($oldrec,$newrec,"fullname") ne $fullname){
+      $newrec->{fullname}=$fullname;
+   }
+
+
+   if (!defined($oldrec)){
+      my $licproductid=effVal($oldrec,$newrec,"licproductid");
+      if ($licproductid eq ""){
+         if (!$self->IsMemberOf("admin")){
+            $self->LastMsg(ERROR,"only admins can create product less entries");
+            return(undef);
+         }
+      }
+   }
+   my $units=effVal($oldrec,$newrec,"units");
+   my $unitcount=effVal($oldrec,$newrec,"unitcount");
+   if ($units eq "" || $units<=0 || (defined($oldrec) && $unitcount<=0)){
+      if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+         $self->LastMsg(ERROR,"only admins can create entries with no unit binding");
+         return(undef);
+      }
    }
 
    ########################################################################
@@ -457,17 +592,23 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
+   return("header","default","order") if (!defined($rec));
 
-   my @grplist=qw(header default finance licdesc licuse 
+   my @grplist=qw(header default licuse 
                  contacts misc attachments source);
    my @l=$self->isWriteValid($rec);
-   if (grep(/^privacy_lickeys$/,@l)){
-      push(@grplist,"privacy_lickeys");
+   if ($rec->{licproductid} ne ""){
+      push(@grplist,"order");
    }
-   else{
-      my @acl=$self->getCurrentAclModes($ENV{REMOTE_USER},$rec->{contacts});
-      push(@grplist,"privacy_lickeys") if (grep(/^privread$/,@acl));
+   if ($rec->{units} ne ""){
+      push(@grplist,"licdesc","finance");
+      if (grep(/^privacy_lickeys$/,@l)){
+         push(@grplist,"privacy_lickeys");
+      }
+      else{
+         my @acl=$self->getCurrentAclModes($ENV{REMOTE_USER},$rec->{contacts});
+         push(@grplist,"privacy_lickeys") if (grep(/^privread$/,@acl));
+      }
    }
    return(@grplist);
 }
@@ -475,7 +616,7 @@ sub isViewValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default finance licdesc licuse privacy_lickeys 
+   return( qw(header default finance licdesc licuse order privacy_lickeys 
              contacts misc attachments));
 }
 
@@ -488,10 +629,10 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default finance privacy_lickeys 
+   my @databossedit=qw(default finance privacy_lickeys order
                        contacts licdesc attachments);
    if (!defined($rec)){
-      return("default");
+      return("default","order");
    }
    else{
       if ($rec->{databossid}==$userid){
@@ -521,6 +662,8 @@ sub isWriteValid
    }
    return(undef);
 }
+
+
 
 
 1;
