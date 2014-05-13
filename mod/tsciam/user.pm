@@ -179,10 +179,10 @@ sub new
                                    label      =>'tOuCID',
                                    dataobjattr=>'tOuCID'),
 
-      new kernel::Field::Boolean(  name       =>'isVSNFD',
-                                   group      =>'status',
-                                   label      =>'is VS-NfD instructed',
-                                   dataobjattr=>'tVsNfd'),
+      #new kernel::Field::Boolean(  name       =>'isVSNFD',
+      #                             group      =>'status',
+      #                             label      =>'is VS-NfD instructed',
+      #                             dataobjattr=>'tVsNfd'),
 
       new kernel::Field::Text(     name       =>'country',
                                    group      =>'status',
@@ -219,10 +219,10 @@ sub new
                                    label      =>'Window Domain Logon',
                                    dataobjattr=>'tADlogin'),
 
-      new kernel::Field::Text(     name       =>'photoURL',
-                                   group      =>'status',
-                                   label      =>'photoURL',
-                                   dataobjattr=>'tPhotoURL'),
+      #new kernel::Field::Text(     name       =>'photoURL',
+      #                             group      =>'status',
+      #                             label      =>'photoURL',
+      #                             dataobjattr=>'tPhotoURL'),
 
 
    );
