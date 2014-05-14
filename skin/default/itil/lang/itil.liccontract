@@ -11,7 +11,7 @@
 'UT.project'=>{de=>'einem Projekt',en=>'one project'},
 'UT.concurrentUser'=>{de=>'einem gleichzeiten Benutzer',en=>'one concurrent user'},
 'UT.namedUser'=>{de=>'einem named User',en=>'one named user'},
-'unit type'=>{de=>'eine Einheit entspricht'},
+'unit type (license metric)'=>{de=>'eine Einheit entspricht (Lizenz Metric)'},
 'unit count'=>{de=>'Anzahl insgesammt verfügbare Einheiten'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'License use count'=>{de=>'aktuell genutzte Einheiten'},

@@ -88,7 +88,7 @@ sub FormatedDetail
    if (($mode eq "edit" || $mode eq "workflow") && 
        !defined($self->{vjointo})){
       my $readonly=0;
-      if ($self->{readonly}==1){
+      if ($self->readonly($current)){
          $readonly=1;
       }
       if (defined($d) && $d ne ""){

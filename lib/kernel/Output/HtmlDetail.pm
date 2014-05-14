@@ -578,7 +578,9 @@ EOF
       my $setno=0;
       my $indexcols=2; 
       for(my $c=0;$c<=$#indexdata;$c++){
-         if (length($indexdata[$c]->{label})>40){
+         my $chklabel=$indexdata[$c]->{label};
+         $chklabel=~s/\<.*?\>//g; # remove html sequences from check
+         if (length($chklabel)>40){
             $indexcols=1;last;
          }
       }

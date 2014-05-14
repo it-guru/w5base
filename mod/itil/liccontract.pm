@@ -172,7 +172,15 @@ sub new
       new kernel::Field::Number(
                 name          =>'unitcount',
                 group         =>'licdesc',
-                readonly      =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+print STDERR Dumper($current);
+                   if ($current->{licproductid} ne ""){
+                      return(1);
+                   }
+                   return(0);
+                },
                 htmleditwidth =>'100',
                 label         =>'unit count',
                 dataobjattr   =>'liccontract.unitcount'),
@@ -180,7 +188,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'unittype',
                 group         =>'licdesc',
-                label         =>'unit type',
+                label         =>'unit type (license metric)',
                 vjointo       =>'itil::licproduct',
                 vjoinon       =>['licproductid'=>'id'],
                 vjoindisp     =>'metric',
@@ -291,7 +299,7 @@ sub new
                               my $fo=$self->getParent->getField("unitcount");
                               my $max=$fo->RawValue($current);
                               if ($max>0){
-                                 return($d/100*$max);
+                                 return($d*100/$max);
                               }
                               return(100);
                            }
