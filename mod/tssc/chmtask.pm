@@ -74,13 +74,13 @@ sub new
       new kernel::Field::Date(
                 name          =>'plannedstart',
                 timezone      =>'CET',
-                label         =>'Planed Start',
+                label         =>'Planned Start',
                 dataobjattr   =>'cm3tm1.planned_start'),
 
       new kernel::Field::Date(
                 name          =>'plannedend',
                 timezone      =>'CET',
-                label         =>'Planed End',
+                label         =>'Planned End',
                 dataobjattr   =>'cm3tm1.planned_end'),
 
       new kernel::Field::Boolean(          # the field ci_down does not exists
