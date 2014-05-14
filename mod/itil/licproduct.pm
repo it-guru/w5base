@@ -191,7 +191,7 @@ sub new
    );
    $self->setDefaultView(qw(name metric cistatus mdate cdate));
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.licproduct"],
+                         activator=>["admin","w5base.itil.licproduct"],
                          uniquesize=>120};
    $self->{history}=[qw(insert modify delete)];
 
@@ -307,31 +307,18 @@ sub FinishDelete
    return(1);
 }
 
-
 sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   my @l;
-   push(@l,"default") if (!defined($rec));
-   if ($self->IsMemberOf("admin")){
-      push(@l,"default");
-   }
-
-   return(@l);
+   return("default") if (!defined($rec) ||
+                         ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
+                         $self->IsMemberOf($self->{CI_Handling}->{activator}));
+   return(undef);
 }
 
-sub isDeleteValid
-{
-   my $self=shift;
-   my $rec=shift;
-
-   my @l=$self->isWriteValid($rec);
-   return(1) if (in_array(\@l,"default"));
-   return(0);
-}
 
 
 sub isViewValid

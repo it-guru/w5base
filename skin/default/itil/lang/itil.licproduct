@@ -3,3 +3,4 @@
 'Product family'=>{de=>'Produktfamilie'},
 'Licensemetric'=>{de=>'Lizenzmetrik'},
 'Item/Order-No.'=>{de=>'Artikel-/Bestellnummer'},
+'invalid producer specified'=>{de=>'ungültiger Hersteller angegeben'},
