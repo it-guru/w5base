@@ -20,10 +20,10 @@ no english hints avalilable
 
 Die Refresh QualityRule ist darauf ausgerichtet, dass ein 
 Hardware-Asset max. 60 Monate im Einsatz sein darf. Die Berechnung
-erfolgt auf Basis des Abschreibungsbegins.
+erfolgt auf Basis des Abschreibungsbeginns.
 Somit gilt:
 
- DeadLine = Abschreibungsbegin + 60 Monate
+ DeadLine = Abschreibungsbeginn + 60 Monate
 
  RefreshData = DeadLine oder denyupdvalidto falls denyupdvalidto gültig ist.
 
@@ -91,7 +91,7 @@ sub qcheckRecord
    my $denyupd=$rec->{denyupd}; 
    my $denyupdvalidto=$rec->{denyupdvalidto}; 
    my $now=NowStamp("en");
-   if ($deprstart ne ""){  # nur wenn Abschreibungsbegin eingetragen!
+   if ($deprstart ne ""){  # nur wenn Abschreibungsbeginn eingetragen!
       my $deadline=$self->getParent->ExpandTimeExpression($deprstart."+60M");
       my $refreshdate=$deadline;
       my $to_deadline=CalcDateDuration($now,$deadline,"GMT");
@@ -111,93 +111,98 @@ sub qcheckRecord
 
       my $to_refresh=CalcDateDuration($now,$refreshdate,"GMT");
 
-
       if ($rec->{refreshinfo3} eq ""  &&      # info 3 level Ende-10 Monate
           defined($to_refresh) && $to_refresh->{days}<300){
          my $newrec={refreshinfo3=>NowStamp("en")};
          $newrec->{refreshinfo1}=NowStamp("en") if ($rec->{refreshinfo1} eq "");
          $newrec->{refreshinfo2}=NowStamp("en") if ($rec->{refreshinfo2} eq "");
-         $notifyparam{emailcc}=[$self->getApplmgrUserIds($rec)];
-         $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
-            \%notifyparam, $notifycontrol,
-            sub{
-               my $self=shift;
+         $self->finalizeNotifyParam($rec,\%notifyparam,"refreshinfo3");
+         if ($dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}})){
+            $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
+               \%notifyparam, $notifycontrol,
+               sub{
+                  my $self=shift;
 
-               my $lang=$dataobj->Lang();
-               my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
-                                                             $lang."day");
-               my $subject=sprintf($self->T(
-                           "Hardware %s needs to be refreshed in %d months"),
-                           $rec->{name},10);
-               my $text=$dataobj->getParsedTemplate(
-                            "tmpl/itil.qrule.HardwareRefresh",
-                            {
-                               skinbase=>'itil',
-                               static=>{
-                                  NAME=>$rec->{name},
-                                  REFRESH=>$refreshstr,
-                               }
-                            });
-               return($subject,$text);
-            });
+                  my $lang=$dataobj->Lang();
+                  my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
+                                                                $lang."day");
+                  my $subject=sprintf($self->T(
+                              "Hardware %s needs to be refreshed in %d months"),
+                              $rec->{name},10);
+                  my $text=$dataobj->getParsedTemplate(
+                               "tmpl/itil.qrule.HardwareRefresh",
+                               {
+                                  skinbase=>'itil',
+                                  static=>{
+                                     NAME=>$rec->{name},
+                                     REFRESH=>$refreshstr,
+                                  }
+                               });
+                  return($subject,$text);
+               });
+          }
       }
       elsif ($rec->{refreshinfo2} eq "" &&    # info 2 level Ende-18 Monate
           defined($to_refresh) && $to_refresh->{days}<540){
          my $newrec={refreshinfo2=>NowStamp("en")};
          $newrec->{refreshinfo1}=NowStamp("en") if ($rec->{refreshinfo1} eq "");
-         $notifyparam{emailcc}=[$self->getApplmgrUserIds($rec)];
-         $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
-            \%notifyparam,
-            $notifycontrol,
-            sub{
-               my $self=shift;
+         $self->finalizeNotifyParam($rec,\%notifyparam,"refreshinfo2");
+         if ($dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}})){
+            $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
+               \%notifyparam,
+               $notifycontrol,
+               sub{
+                  my $self=shift;
 
-               my $lang=$dataobj->Lang();
-               my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
-                                                             $lang."day");
-               my $subject=sprintf($self->T(
-                           "Hardware %s needs to be refreshed in %d months"),
-                           $rec->{name},18);
-               my $text=$dataobj->getParsedTemplate(
-                            "tmpl/itil.qrule.HardwareRefresh",
-                            {
-                               skinbase=>'itil',
-                               static=>{
-                                  NAME=>$rec->{name},
-                                  REFRESH=>$refreshstr,
-                               }
-                            });
-               return($subject,$text);
-            });
+                  my $lang=$dataobj->Lang();
+                  my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
+                                                                $lang."day");
+                  my $subject=sprintf($self->T(
+                              "Hardware %s needs to be refreshed in %d months"),
+                              $rec->{name},18);
+                  my $text=$dataobj->getParsedTemplate(
+                               "tmpl/itil.qrule.HardwareRefresh",
+                               {
+                                  skinbase=>'itil',
+                                  static=>{
+                                     NAME=>$rec->{name},
+                                     REFRESH=>$refreshstr,
+                                  }
+                               });
+                  return($subject,$text);
+               });
+         }
 
       }
       elsif ($rec->{refreshinfo1} eq "" &&    # info 1 level Ende-24 Monate
           defined($to_deadline) && $to_deadline->{days}<730){
          my $newrec={refreshinfo1=>NowStamp("en")};
-         $notifyparam{emailcc}=[$self->getApplmgrUserIds($rec)];
-         $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
-            \%notifyparam,
-            $notifycontrol,
-            sub{
-               my $self=shift;
+         $self->finalizeNotifyParam($rec,\%notifyparam,"refreshinfo1");
+         if ($dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}})){
+            $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
+               \%notifyparam,
+               $notifycontrol,
+               sub{
+                  my $self=shift;
 
-               my $lang=$dataobj->Lang();
-               my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
-                                                             $lang."day");
-               my $subject=sprintf($self->T(
-                           "Hardware %s needs to be refreshed in %d months"),
-                           $rec->{name},24);
-               my $text=$dataobj->getParsedTemplate(
-                            "tmpl/itil.qrule.HardwareRefresh",
-                            {
-                               skinbase=>'itil',
-                               static=>{
-                                  NAME=>$rec->{name},
-                                  REFRESH=>$refreshstr,
-                               }
-                            });
-               return($subject,$text);
-            });
+                  my $lang=$dataobj->Lang();
+                  my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
+                                                                $lang."day");
+                  my $subject=sprintf($self->T(
+                              "Hardware %s needs to be refreshed in %d months"),
+                              $rec->{name},24);
+                  my $text=$dataobj->getParsedTemplate(
+                               "tmpl/itil.qrule.HardwareRefresh",
+                               {
+                                  skinbase=>'itil',
+                                  static=>{
+                                     NAME=>$rec->{name},
+                                     REFRESH=>$refreshstr,
+                                  }
+                               });
+                  return($subject,$text);
+               });
+         }
       }
 
       if (defined($to_refresh) && $to_refresh->{days}<180){
@@ -213,6 +218,17 @@ sub qcheckRecord
                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest,$forcedupd);
    return(@result);
 }
+
+sub finalizeNotifyParam
+{
+   my $self=shift;
+   my $rec=shift;
+   my $notifyparam=shift;
+   my $mode=shift;
+
+   $notifyparam->{emailcc}=[$self->getApplmgrUserIds($rec)];
+}
+
 
 
 sub getApplmgrUserIds
