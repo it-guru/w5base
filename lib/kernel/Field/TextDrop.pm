@@ -50,6 +50,9 @@ sub Validate
 
    $disp=$disp->[0] if (ref($disp) eq "ARRAY");
    my $filter={$disp=>'"'.trim($newval).'"'};
+   if (trim($newval) eq ""){
+      $filter={$disp=>\''};
+   }
 
    $self->FieldCache->{LastDrop}=undef;
    my $fromquery=trim(Query->Param("Formated_$name"));
@@ -124,8 +127,15 @@ sub Validate
    if (defined($comprec) && ref($comprec) eq "HASH"){
       $comprec->{$name}=$vallist->[0];
    }
-   my $result={$self->{vjoinon}->[0]=>
-           $vjoinobj->getVal($vjoinobj->IdField->Name(),$filter)};
+   my @r=$vjoinobj->getVal($vjoinobj->IdField->Name(),$filter);
+   if ($#r>0){
+      $self->getParent->LastMsg(ERROR,"software problem - ".
+                                      "not unique select result - contact ".
+                                      "developer!");
+      return(undef);
+   }
+   
+   my $result={$self->{vjoinon}->[0]=>$r[0]};
    if (defined($self->{altnamestore})){
       $result->{$self->{altnamestore}}=$vallist->[0];      
    }
