@@ -139,7 +139,7 @@ sub FinishWrite
    my $insertcmd="insert into $keytab (".join(",",@insvar).") values ";
    foreach my $k (keys(%{$newval})){
       $insdata{name}=$k;
-      push(@cleanuprest,"(id='$id' and name='$k')");
+
       my %data;
       if (ref($newval->{$k}) eq "ARRAY"){
          foreach my $data (@{$newval->{$k}}){
@@ -151,11 +151,18 @@ sub FinishWrite
             $data{lc($newval->{$k})}=$newval->{$k};
          }
       }
-      foreach my $data (keys(%data)){
-         $insdata{fval}=$data{$data};
-         my $cmd="(".join(",",map({$self->{db}->quotemeta($insdata{$_})}
-                                  @insvar)).")";
-         push(@insertvalue,$cmd);
+      my $newk=lc(join("|",sort(values(%data))));
+      my $oldk=$oldrec->{$k};
+      $oldk=join("|",sort(@{$oldk})) if (ref($oldk) eq "ARRAY");
+      $oldk=lc($oldk);
+      if ($oldk ne $newk){
+         push(@cleanuprest,"(id='$id' and name='$k')");
+         foreach my $data (keys(%data)){
+            $insdata{fval}=$data{$data};
+            my $cmd="(".join(",",map({$self->{db}->quotemeta($insdata{$_})}
+                                     @insvar)).")";
+            push(@insertvalue,$cmd);
+         }
       }
    }
    if ($#cleanuprest!=-1){
