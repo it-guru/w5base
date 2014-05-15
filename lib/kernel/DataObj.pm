@@ -1711,7 +1711,7 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
       if ($databossid ne ""){
          my $user=getModuleObject($self->Config,"base::user");
          $user->SetFilter({userid=>\$databossid});
-         my ($urec)=$user->getOnlyFirst(qw(email lastlang lang)); 
+         my ($urec)=$user->getOnlyFirst(qw(userid lastlang lang)); 
          if (defined($urec)){
             if ($urec->{lastlang} ne ""){
                $notifyparam{lang}=$urec->{lastlang};
@@ -1721,8 +1721,16 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
                   $notifyparam{lang}=$urec->{lang};
                }
             }
-            if ($urec->{email} ne ""){
-               $notifyparam{emailto}=$urec->{email};
+            if ($urec->{userid} ne ""){
+               if (defined($notifyparam{emailto})){
+                  if (ref($notifyparam{emailto}) ne "ARRAY"){
+                     $notifyparam{emailto}=[$notifyparam{emailto}];
+                  }
+               }
+               else{
+                  $notifyparam{emailto}=[];
+               }
+               unshift(@{$notifyparam{emailto}},$urec->{userid});
             }
          }
       }
@@ -1736,7 +1744,11 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
          }
          foreach my $crec (@$contacts){
             if ($crec->{target} eq "base::user"){
-               push(@{$notifyparam{emailcc}},$crec->{targetid});
+               my $roles=$crec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if (in_array($roles,"write")){
+                  push(@{$notifyparam{emailcc}},$crec->{targetid});
+               }
             }
          }
       }
