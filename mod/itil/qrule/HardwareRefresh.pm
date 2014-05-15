@@ -70,6 +70,16 @@ sub getPosibleTargets
    return(["itil::asset"]);
 }
 
+sub isHardwareRefreshCheckNeeded
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(0) if ($rec->{cistatusid}<=2 || $rec->{cistatusid}>=5);
+   return(1);
+}
+
+
 sub qcheckRecord
 {
    my $self=shift;
@@ -84,8 +94,9 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-
-   return(0,undef) if ($rec->{cistatusid}<=2 || $rec->{cistatusid}>=5);
+   if (!$self->isHardwareRefreshCheckNeeded($rec)){
+      return(0,undef);
+   }
 
    my $deprstart=$rec->{deprstart}; 
    my $denyupd=$rec->{denyupd}; 

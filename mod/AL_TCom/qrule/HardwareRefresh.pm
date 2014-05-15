@@ -66,6 +66,30 @@ sub new
    return($self);
 }
 
+sub isHardwareRefreshCheckNeeded
+{
+   my $self=shift;
+   my $rec=shift;
+
+
+   return(0) if ($rec->{cistatusid}<=2 || $rec->{cistatusid}>=5);
+
+   my $o=getModuleObject($self->getParent->Config,"tsacinv::system");
+
+   my $name=$rec->{name};
+
+   $o->SetFilter({assetassetid=>\$name,
+                  systemolaclass=>\'10',
+                  status=>'"!out of operation"'});
+   my @l=$o->getVal("systemid");
+ 
+   return(0) if ($#l==-1);
+
+   return(1);
+}
+
+
+
 sub finalizeNotifyParam
 {
    my $self=shift;
