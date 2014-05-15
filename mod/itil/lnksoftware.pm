@@ -840,13 +840,15 @@ sub Validate
       if ($quantity<=0){
          $quantity=1;
       }
-      my $o=getModuleObject($self->Config,"itil::liccontract");
-      $o->SetFilter({id=>\$licid});
-      my ($licrec)=$o->getOnlyFirst(qw(ALL));
-      if ($licrec->{units} ne ""){
-         if ($licrec->{licfree}-$quantity<0){
-            $self->LastMsg(ERROR,"not enouth free units in license");
-            return(0);
+      if ($licid ne ""){
+         my $o=getModuleObject($self->Config,"itil::liccontract");
+         $o->SetFilter({id=>\$licid});
+         my ($licrec)=$o->getOnlyFirst(qw(ALL));
+         if ($licrec->{units} ne ""){
+            if ($licrec->{licfree}-$quantity<0){
+               $self->LastMsg(ERROR,"not enouth free units in license");
+               return(0);
+            }
          }
       }
    }
