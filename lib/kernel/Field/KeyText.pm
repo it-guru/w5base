@@ -98,6 +98,8 @@ sub preProcessFilter
          }
          my $subcmd="$cmd where $where";
          #msg(INFO,"key searchcmd or=%s",$subcmd);
+         $self->getParent->Log(INFO,"sqlread",$subcmd.
+                               " (KeyText subcmd OR)");
          foreach my $rec ($db->getHashList($subcmd)){
             $res{$rec->{id}}++;
          }
@@ -110,6 +112,8 @@ sub preProcessFilter
             $op="=" if (($sword=~m/^\d+$/));
             my $subcmd="$cmd where fval $op '$sword' and name='$name'";
             msg(INFO,"key searchcmd and=%s",$subcmd);
+            $self->getParent->Log(INFO,"sqlread",$subcmd.
+                                  " (KeyText subcmd AND)");
             foreach my $rec ($db->getHashList($subcmd)){
                $res{$rec->{id}}++;
             }
@@ -117,7 +121,8 @@ sub preProcessFilter
       }
       my @residlist=();
       foreach my $id (keys(%res)){
-         if ($res{$id}==$#words+1 || lc($self->{conjunction}) eq "or"){
+         # >= search needed for wildcard AND searches!
+         if ($res{$id}>=$#words+1 || lc($self->{conjunction}) eq "or"){
             push(@residlist,$id);
          }
       }
@@ -134,6 +139,7 @@ sub preProcessFilter
             }
          }
       }
+print STDERR "f2:".Dumper(\@residlist);
       $self->getParent->SetNamedFilter("KeyFilter:".$self->{name},
                                        {$idfield=>\@residlist});
       delete($hflt->{$self->{name}});
