@@ -139,7 +139,6 @@ sub preProcessFilter
             }
          }
       }
-print STDERR "f2:".Dumper(\@residlist);
       $self->getParent->SetNamedFilter("KeyFilter:".$self->{name},
                                        {$idfield=>\@residlist});
       delete($hflt->{$self->{name}});
