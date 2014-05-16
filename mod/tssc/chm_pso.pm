@@ -112,13 +112,18 @@ sub SetFilter
    return($self->SUPER::SetFilter(@_));
 }
 
+sub isQualityCheckValid
+{
+   return(undef);
+}
+
 sub initSearchQuery
 {
    my $self=shift;
    my $nowlabel=$self->T("today","kernel::App");
 
    if (!defined(Query->Param("search_plannedstart"))){
-     Query->Param("search_plannedstart"=>">$nowlabel AND <$nowlabel+3d");
+     Query->Param("search_plannedstart"=>">$nowlabel AND <$nowlabel+5d");
    }
 }
 
