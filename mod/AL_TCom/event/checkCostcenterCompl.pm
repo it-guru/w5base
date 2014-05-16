@@ -47,7 +47,7 @@ sub checkCostcenterCompl
                            saphier=>"9TS_ES.9DTIT 9TS_ES.9DTIT.*",
    #                        name=>"100003444O 100003468O 900472579O 80140070 900509483O E100008037",
                            islocked=>\'0'});
-   $costcenter->SetCurrentView(qw(name));
+   $costcenter->SetCurrentView(qw(name saphier));
    my $cc=$costcenter->getHashIndexed("name");
    my @list=keys(%{$cc->{name}});
 
@@ -93,7 +93,6 @@ sub checkCostcenterCompl
          $sapcost->ResetFilter();
          $sapcost->SetFilter({name=>"$co"});
          ($saprec)=$sapcost->getOnlyFirst(qw(ALL));
-         print Dumper($saprec);
          if (defined($saprec) && $saprec->{responsible} ne ""){
             $msg{$co}->{contact}=lc($saprec->{responsible});
          }
@@ -120,6 +119,14 @@ sub checkCostcenterCompl
          }
       }
    }
+   if (open(F,">/tmp/checkCostcenterCompl.missing.csv")){
+      foreach my $co (sort(keys(%msg))){
+         printf F ("%s;%s\r\n",$co,$msg{$co}->{contact});
+      }
+      close(F);
+   }
+
+ 
    my %target;
    foreach my $co (keys(%msg)){
       my $t=$msg{$co}->{contact};
@@ -135,7 +142,7 @@ sub checkCostcenterCompl
       my %param=(
       #            adminbcc=>1,
       #            emailbcc=>[qw(11634953080001)],
-                  emailbcc=>[qw(11634953080001)],
+      #            emailbcc=>[qw(11634953080001)],
       #            emailcc=>[qw(11634955470001 
       #                         12762475160001)]
       );
@@ -151,6 +158,9 @@ sub checkCostcenterCompl
           "Zur Verwaltung der Kontierungsobjekte verwenden Sie bitte den ".
           "Link\n".
           "https://darwin.telekom.de/darwin/auth/base/menu/msel/AL_TCom/kern/costcenter\n".
+          "Beziehen sich die Kontierungsobjekte auf die Bereiche TSS ".
+          "oder DSS, so besprechen Sie die weitere Vorgehensweie bitte ".
+          "mit Fr. Gräb Anja (Bamberg). ".
           "Bei Unklarheiten bei der Vorgehensweise zum erzeugen bzw. ".
           "bearbeiten von Kontierungsobjekten, kontaktieren Sie bitte ".
           "die Config-Manager im CC dieser Mail.";
