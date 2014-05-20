@@ -180,6 +180,7 @@ sub getFinalLdapFilter
               $sub="(|$sub)";
             }
          }
+         $sub="(|".$sub.")" if ($sub ne "");
          return($sub);
       }
       if ($#list==-1){
@@ -202,14 +203,22 @@ sub getFinalLdapFilter
          }
          my $orlist=MakeLikeList($sqlfield,$fieldobject,@orlist);
          my $norlist=MakeLikeList($sqlfield,$fieldobject,@norlist);
-         #msg(INFO,"orlist =$orlist");
-         #msg(INFO,"norlist=$norlist");
+         $norlist="(!".$norlist.")" if ($norlist ne "");
+         msg(INFO,"orlist =$orlist");
+         msg(INFO,"norlist=$norlist");
          if ($orlist ne "" || $norlist ne ""){ 
             my $notempty=0;
             $notempty=1 if ($$where ne "");
             $$where="(& ".$$where if ($notempty);
             $$where.=$orlist  if ($orlist ne "");
             $$where.="  )" if ($notempty);
+
+            my $notempty=0;
+            $notempty=1 if ($$where ne "");
+            $$where="(& ".$$where if ($notempty);
+            $$where.=$norlist  if ($norlist ne "");
+            $$where.="  )" if ($notempty);
+
          }
       }
       elsif($param->{onlyextprocessing}){
@@ -282,11 +291,11 @@ sub getFinalLdapFilter
             }
          }
          # printf STDERR ("SUBDUMP:$subwhere\n");
-         $where="(|".$where.$subwhere.")" if ($subwhere ne "");
+         $where="(&".$where.$subwhere.")" if ($subwhere ne "");
      
       }
    } 
-   #printf STDERR ("DUMP:$where\n");
+   printf STDERR ("DUMP:$where\n");
    return($where);
 }
 

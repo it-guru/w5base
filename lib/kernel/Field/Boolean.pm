@@ -29,6 +29,9 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{value}=[0,1]            if (!defined($self->{value}));
+   # Boolean unterstützt auch andere Werte für 0,1 wenn diese
+   # bei der initialisierung als value mitgegeben werden. Erstes
+   # value=false, zweites value=true (zumindest ist es so geplant)
    $self->{transprefix}="boolean." if (!defined($self->{transprefix}));
    $self->{allowempty}=0           if (!defined($self->{allowempty}));
    if (!defined($self->{default})){
