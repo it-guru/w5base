@@ -295,7 +295,7 @@ sub getFinalLdapFilter
      
       }
    } 
-   printf STDERR ("DUMP:$where\n");
+   #printf STDERR ("DUMP:$where\n");
    return($where);
 }
 
