@@ -28,19 +28,30 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
+
    
-   $self->setBase("o=DTAG");
+   $self->setBase("ou=Person,o=DTAG");
    $self->AddFields(
       new kernel::Field::Linenumber(name     =>'linenumber',
-                                    label      =>'No.'),
+                                    label    =>'No.'),
 
-      new kernel::Field::Id(       name       =>'id',
+      new kernel::Field::Link(     name       =>'tcid',
                                    label      =>'PersonalID',
                                    size       =>'10',
                                    htmlwidth  =>'130',
                                    align      =>'left',
                                    dataobjattr=>'tCID'),
+
+      new kernel::Field::Id(       name       =>'twrid',
+                                   label      =>'WorkRelationID',
+                                   size       =>'10',
+                                   htmlwidth  =>'130',
+                                   align      =>'left',
+                                   group      =>'status',
+                                   sortvalue  =>'asc',
+                                   dataobjattr=>'tWrID'),
 
       new kernel::Field::Text(     name       =>'uid',
                                    label      =>'UserID',
@@ -57,6 +68,15 @@ sub new
                                    align      =>'left',
                                    sortvalue  =>'asc',
                                    dataobjattr=>'twiw-uid'),
+
+      # nicht immer gefüllt
+      #new kernel::Field::Text(     name       =>'adid',
+      #                             label      =>'AD Loginname',
+      #                             size       =>'10',
+      #                             htmlwidth  =>'130',
+      #                             align      =>'left',
+      #                             sortvalue  =>'asc',
+      #                             dataobjattr=>'tADsAMAccountName'),
 
       new kernel::Field::Text(     name       =>'fullname',
                                    label      =>'Fullname',
@@ -87,6 +107,16 @@ sub new
                                    size       =>'10',
                                    dataobjattr=>'givenname'),
 
+      new kernel::Field::Boolean(  name       =>'active',
+                                   value      =>['false','true'],
+                                   label      =>'Aktiv',
+                                   dataobjattr=>'tisActive'),
+
+      new kernel::Field::Boolean(  name       =>'primary',
+                                   value      =>['false','true'],
+                                   label      =>'Primary',
+                                   dataobjattr=>'tisPrimary'),
+
       new kernel::Field::Email(    name       =>'email',
                                    label      =>'E-Mail',
                                    size       =>'10',
@@ -110,8 +140,8 @@ sub new
       new kernel::Field::TextDrop( name       =>'office',
                                    label      =>'Office',
                                    group      =>'office',
-                                   vjointo    =>'tswiw::orgarea',
-                                   vjoinon    =>['touid'=>'touid'],
+                                   vjointo    =>'tsciam::orgarea',
+                                   vjoinon    =>['toucid'=>'toucid'],
                                    vjoindisp  =>'name'),
 
       new kernel::Field::Text(     name       =>'office_state',
@@ -119,15 +149,15 @@ sub new
                                    label      =>'Status',
                                    dataobjattr=>'organizationalstatus'),
 
-      new kernel::Field::Text(     name       =>'office_wrs',
-                                   group      =>'office',
-                                   label      =>'Workrelationship',
-                                   dataobjattr=>'tTypeOfWorkrelationship'),
+      #new kernel::Field::Text(     name       =>'office_wrs',
+      #                             group      =>'office',
+      #                             label      =>'Workrelationship',
+      #                             dataobjattr=>'tTypeOfWorkrelationship'),
 
-      new kernel::Field::Text(     name       =>'office_persnum',
-                                   group      =>'office',
-                                   label      =>'Personal-Number',
-                                   dataobjattr=>'employeeNumber'),
+      #new kernel::Field::Text(     name       =>'office_persnum',
+      #                             group      =>'office',
+      #                             label      =>'Personal-Number',
+      #                             dataobjattr=>'employeeNumber'),
 
       new kernel::Field::Text(     name       =>'office_costcenter',
                                    group      =>'office',
@@ -174,7 +204,7 @@ sub new
                                    label      =>'Location',
                                    dataobjattr=>'l'),
 
-      new kernel::Field::Text(     name       =>'touid',
+      new kernel::Field::Text(     name       =>'toucid',
                                    group      =>'office',
                                    label      =>'tOuCID',
                                    dataobjattr=>'tOuCID'),
@@ -189,20 +219,20 @@ sub new
                                    label      =>'Country',
                                    dataobjattr=>'C'),
 
-      new kernel::Field::Text(     name       =>'office_address',
-                                   group      =>'status',
-                                   label      =>'postalAddress',
-                                   dataobjattr=>'postalAddress'),
+      #new kernel::Field::Text(     name       =>'office_address',
+      #                             group      =>'status',
+      #                             label      =>'postalAddress',
+      #                             dataobjattr=>'postalAddress'),
 
-      new kernel::Field::Text(     name       =>'office_organisation',
-                                   group      =>'status',
-                                   label      =>'Organisation',
-                                   dataobjattr=>'o'),
+      #new kernel::Field::Text(     name       =>'office_organisation',
+      #                             group      =>'status',
+      #                             label      =>'Organisation',
+      #                             dataobjattr=>'o'),
 
-      new kernel::Field::Text(     name       =>'office_orgunit',
-                                   group      =>'status',
-                                   label      =>'Orgunit',
-                                   dataobjattr=>'ou'),
+      #new kernel::Field::Text(     name       =>'office_orgunit',
+      #                             group      =>'status',
+      #                             label      =>'Orgunit',
+      #                             dataobjattr=>'ou'),
 
       new kernel::Field::Text(     name       =>'sex',
                                    group      =>'status',
@@ -214,10 +244,10 @@ sub new
                                    label      =>'preferrredLanguage',
                                    dataobjattr=>'preferredLanguage'),
 
-      new kernel::Field::Text(     name       =>'winlogon',
-                                   group      =>'status',
-                                   label      =>'Window Domain Logon',
-                                   dataobjattr=>'tADlogin'),
+      #new kernel::Field::Text(     name       =>'winlogon',
+      #                             group      =>'status',
+      #                             label      =>'Window Domain Logon',
+      #                             dataobjattr=>'tADlogin'),
 
       #new kernel::Field::Text(     name       =>'photoURL',
       #                             group      =>'status',
@@ -226,7 +256,7 @@ sub new
 
 
    );
-   $self->setDefaultView(qw(id uid surname givenname email));
+   $self->setDefaultView(qw(id wrid uid surname givenname email));
    return($self);
 }
 
@@ -240,6 +270,15 @@ sub Initialize
    return(1) if (defined($self->{tswiw}));
    return(0);
 }
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 
 
@@ -257,6 +296,20 @@ sub isViewValid
    my $rec=shift;
    return("ALL");
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_active"))){
+     Query->Param("search_active"=>"\"".$self->T("boolean.true")."\"");
+   }
+   if (!defined(Query->Param("search_primary"))){
+     Query->Param("search_primary"=>"\"".$self->T("boolean.true")."\"");
+   }
+}
+
+
+
 
 sub isWriteValid
 {

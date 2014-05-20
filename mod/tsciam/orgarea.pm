@@ -49,17 +49,69 @@ sub new
                                    size       =>'10',
                                    dataobjattr=>'tOuSD'),
 
+      new kernel::Field::TextDrop( name       =>'bossfullname',
+                                   label      =>'Boss',
+                                   vjointo    =>'tsciam::user',
+                                   depend     =>['toumgr'],
+                                   vjoinon    =>['toumgr'=>'tcid'],
+                                   vjoindisp  =>'fullname'),
+
+#      new kernel::Field::TextDrop( name       =>'boss',
+#                                   label      =>'Boss (tOuMgr)',
+#                                   vjointo    =>'tsciam::user',
+#                                   depend     =>['toumgr'],
+#                                   vjoinon    =>['toumgr'=>'tcid'],
+#                                   vjoindisp  =>'id'),
+
+      new kernel::Field::TextDrop( name       =>'bosssurname',
+                                   label      =>'Boss (surname)',
+                                   htmldetail =>0,
+                                   searchable =>0,
+                                   vjointo    =>'tsciam::user',
+                                   depend     =>['toumgr'],
+                                   vjoinon    =>['toumgr'=>'tcid'],
+                                   vjoindisp  =>'surname'),
+
+      new kernel::Field::TextDrop( name       =>'bossgivenname',
+                                   label      =>'Boss (givenname)',
+                                   htmldetail =>0,
+                                   searchable =>0,
+                                   depend     =>['toumgr'],
+                                   vjointo    =>'tsciam::user',
+                                   vjoinon    =>['toumgr'=>'tcid'],
+                                   vjoindisp  =>'givenname'),
+
+      new kernel::Field::TextDrop( name       =>'bossemail',
+                                   label      =>'Boss (email)',
+                                   htmldetail =>0,
+                                   searchable =>0,
+                                   depend     =>['toumgr'],
+                                   vjointo    =>'tsciam::user',
+                                   vjoinon    =>['toumgr'=>'tcid'],
+                                   vjoindisp  =>'email'),
+
+
+
+      new kernel::Field::SubList(  name       =>'users',
+                                   label      =>'Users',
+                                   group      =>'userro',
+                                   vjointo    =>'tsciam::user',
+                                   vjoinon    =>['toucid'=>'toucid'],
+                                   vjoinbase  =>{primary=>'true',
+                                                 active=>'true'},
+                                   vjoindisp  =>['fullname']),
+
       new kernel::Field::TextDrop( name       =>'parent',
                                    label      =>'Parentgroup (tOuSuperior)',
                                    vjointo    =>'tsciam::orgarea',
                                    vjoinon    =>['parentid'=>'toucid'],
                                    vjoindisp  =>'name'),
 
-      new kernel::Field::Text(     name       =>'parentid',
+      new kernel::Field::Interface(name       =>'parentid',
                                    label      =>'ParentID (tOuSuperior)',
                                    dataobjattr=>'tOuSuperior'),
 
-      new kernel::Field::Text(     name       =>'toumgr',
+      new kernel::Field::Interface(name       =>'toumgr',
                                    dataobjattr=>'tOuMgr'),
 
       new kernel::Field::QualityText(),
@@ -80,6 +132,16 @@ sub Initialize
    return(1) if (defined($self->{tswiw}));
    return(0);
 }
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 
 
