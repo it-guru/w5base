@@ -1,6 +1,6 @@
-package tsciam::ext::Adressbook;
+package tsciam::ActiveUser;
 #  W5Base Framework
-#  Copyright (C) 2010  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,25 +18,32 @@ package tsciam::ext::Adressbook;
 #
 use strict;
 use vars qw(@ISA);
-use kernel;
-use kernel::Universal;
-@ISA=qw(kernel::Universal);
-
+use tsciam::user;
+@ISA=qw(tsciam::user);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
-   my $self=bless({%param},$type);
+   my $self=bless($type->SUPER::new(%param),$type);
+   $self->getField("active")->{searchable}=0;
+   $self->getField("primary")->{searchable}=0;
    return($self);
 }
 
-sub getAdressbooks
+sub SetFilter
 {
    my $self=shift;
-   return("CIAM"=>'tsciam::ActiveUser');  # Adapter to get only active elements
-}
 
+   my $flt=$_[0];
+
+   if (ref($flt) eq "HASH"){
+      $_[0]->{active}="true";
+      $_[0]->{primary}="true";
+   }
+
+   return($self->SUPER::SetFilter(@_));
+}
 
 
 
