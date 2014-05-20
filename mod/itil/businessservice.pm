@@ -66,14 +66,7 @@ sub new
                    return(0);
                 },
                 label         =>'Business-Service Fullname',
-                dataobjattr   => "concat(".
-                   "if (nature is null or nature='','',concat(nature,".
-                   "if (shortname is null or shortname='',':',concat(shortname,':')))),".
-                   "if (applname is null,'',".
-                   "concat(applname,if (shortname is null or shortname='',':',".
-                   "concat(':',shortname,':')))),".
-                   "if ($worktable.name is null,'[ENTIRE]',".
-                   "$worktable.name))"),
+                dataobjattr   =>getBSfullnameSQL($worktable,"applname")),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
@@ -437,6 +430,26 @@ sub new
 
    $self->setDefaultView(qw(fullname application));
    return($self);
+}
+
+sub getBSfullnameSQL
+{
+   my $worktable=shift;
+   my $applname=shift;
+
+   my $d="concat(".
+         "if ($worktable.nature is null ".
+         "or $worktable.nature='','',concat($worktable.nature,".
+         "if ($worktable.shortname is null or ".
+         "$worktable.shortname='',':',concat($worktable.shortname,':')))),".
+         "if ($applname is null,'',".
+         "concat($applname,if ($worktable.shortname is null or ".
+         "$worktable.shortname='',':',".
+         "concat(':',$worktable.shortname,':')))),".
+         "if ($worktable.name is null,'[ENTIRE]',".
+         "$worktable.name))";
+
+   return($d);
 }
 
 sub getDetailBlockPriority

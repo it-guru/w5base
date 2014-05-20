@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use itil::businessservice;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -40,40 +41,52 @@ sub new
       new kernel::Field::Text(
                 name          =>'its_name',
                 readonly      =>1,
-                label         =>'IT-Service Name',
-                dataobjattr   =>"its.name",
+                label         =>'IT-Service',
+                dataobjattr   =>
+                   itil::businessservice::getBSfullnameSQL("its","NULL"),
                 depend        =>['its_id'],
                 onClick       =>\&multiDestLinkHandler,
                 weblinkto     =>'AL_TCom::businessserviceITS',
                 weblinkon     =>['its_id']),
 
-      new kernel::Field::Text(
-                name          =>'es_pos',
-                readonly      =>1,
-                label         =>'Enabling-Service Pos.',
-                dataobjattr   =>"lnkes.lnkpos"),
+      #new kernel::Field::Text(
+      #          name          =>'es_pos',
+      #          readonly      =>1,
+      #          htmldetail    =>0,
+      #          selectfix     =>1,
+      #          label         =>'Enabling-Service Pos.',
+      #          dataobjattr   =>"lnkes.lnkpos"),
 
       new kernel::Field::Text(
                 name          =>'es_name',
                 readonly      =>1,
-                label         =>'Enabling-Service Name',
-                dataobjattr   =>"es.name",
+                label         =>'IT-Enabling Service',
+                dataobjattr   =>
+                   "concat(lnkits.lnkpos,' - ',".
+                   itil::businessservice::getBSfullnameSQL("es","NULL").
+                   ")",
                 depend        =>['es_id'],
                 onClick       =>\&multiDestLinkHandler,
                 weblinkto     =>'AL_TCom::businessserviceES',
                 weblinkon     =>['es_id']),
 
-      new kernel::Field::Text(
-                name          =>'ta_pos',
-                readonly      =>1,
-                label         =>'Transaction Pos.',
-                dataobjattr   =>"lnkta.lnkpos"),
+      #new kernel::Field::Text(
+      #          name          =>'ta_pos',
+      #          readonly      =>1,
+      #          htmldetail    =>0,
+      #          selectfix     =>1,
+      #          searchable    =>0,
+      #          label         =>'Transaction Pos.',
+      #          dataobjattr   =>"lnkta.lnkpos"),
 
       new kernel::Field::Text(
                 name          =>'ta_name',
                 readonly      =>1,
-                label         =>'Transaction Name',
-                dataobjattr   =>"ta.name",
+                label         =>'IT-Service Transaction',
+                dataobjattr   =>
+                   "concat(lnkes.lnkpos,' - ',".
+                   itil::businessservice::getBSfullnameSQL("ta","NULL").
+                   ")",
                 depend        =>['ta_id'],
                 onClick       =>\&multiDestLinkHandler,
                 weblinkto     =>'AL_TCom::businessserviceTA',
@@ -83,7 +96,7 @@ sub new
                 name          =>'appl_name',
                 readonly      =>1,
                 label         =>'Application Name',
-                dataobjattr   =>"appl.name",
+                dataobjattr   =>"concat(lnkta.lnkpos,' - ',appl.name)",
                 depend        =>['appl_id'],
                 onClick       =>\&multiDestLinkHandler,
                 weblinkto     =>'AL_TCom::appl',
@@ -117,9 +130,7 @@ sub new
    );
    $self->setDefaultView(qw(linenumber
                             its_name 
-                            es_pos
                             es_name 
-                            ta_pos
                             ta_name 
                             appl_name));
    return($self);
