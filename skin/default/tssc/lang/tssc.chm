@@ -4,6 +4,7 @@
 'fieldgroup.default'=>{de=>'Change-Daten',en=>'Change-Data'},
 'fieldgroup.approvals'=>{de=>'Zustimmungen (Approvals)',en=>'Approvals'},
 'fieldgroup.tasks'=>{de=>'Tasks',en=>'Tasks'},
+'fieldgroup.downtimesum'=>{de=>'PSO-Übersicht',en=>'PSO summary'},
 'fieldgroup.software'=>{de=>'betroffene Software/Anwendungen (deprecated)',en=>'affected Software/Applications (deprecated)'},
 'fieldgroup.configitems'=>{de=>'Configuration Items',en=>'Configuration Items'},
 'fieldgroup.tickets'=>{de=>'Tickets (Relations)',en=>'Tickets (Relations'},
@@ -59,3 +60,4 @@
 'Approval Status'=>{de=>'Approval Status'},
 'Usage'=>{de=>'Betriebsart'},
 'Criticality'=>{de=>'Kritikalität'},
+'Downtime summary'=>{de=>'PSO-Übersicht'},

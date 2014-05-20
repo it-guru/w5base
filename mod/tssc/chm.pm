@@ -286,6 +286,29 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'cm3ra43.resources'),
 
+      new kernel::Field::JoinUniqMerge(
+                name          =>'pso',
+                label         =>'PSO',
+                group         =>'downtimesum',
+                searchable    =>0,
+                htmldetail    =>0,
+                vjointo       =>'tssc::chmtask',
+                vjoinon       =>['changenumber'=>'changenumber'],
+                vjoindisp     =>'cidown'),
+
+      new kernel::Field::SubList(
+                name          =>'downtimesum',
+                label         =>'Downtime summary',
+                group         =>'downtimesum',
+                depend        =>'pso',
+                htmldetail    =>1,
+                searchable    =>0,
+                forwardSearch =>1,
+                vjointo       =>'tssc::chm_pso',
+                vjoinon       =>['changenumber'=>'changenumber'],
+                vjoinbase     =>[{plannedstart=>''}],
+                vjoindisp     =>[qw(plannedstart plannedend applname)]),
+
       new kernel::Field::Text(
                 name          =>'priority',
                 htmldetail    =>0,
@@ -707,7 +730,8 @@ sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(status configitems tickets relations approvals tasks contact));
+          qw(status configitems tickets relations approvals
+             tasks downtimesum contact));
 }
 
 sub getRecordImageUrl
@@ -768,7 +792,7 @@ sub isViewValid
    }
    if ($st ne "closed" && $st ne "rejected" && $st ne "resolved"){
       return(qw(contact default tickets configitems relations qc
-                status header software device tasks approvals));
+                status header software device tasks approvals downtimesum));
    }
    return("ALL");
 }

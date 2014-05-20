@@ -31,7 +31,7 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
-
+$self->{pso}=1;
    $self->AddFields(
       new kernel::Field::Linenumber(
                name           =>'linenumber',
