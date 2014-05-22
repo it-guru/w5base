@@ -204,8 +204,8 @@ sub getFinalLdapFilter
          my $orlist=MakeLikeList($sqlfield,$fieldobject,@orlist);
          my $norlist=MakeLikeList($sqlfield,$fieldobject,@norlist);
          $norlist="(!".$norlist.")" if ($norlist ne "");
-         msg(INFO,"orlist =$orlist");
-         msg(INFO,"norlist=$norlist");
+         #msg(INFO,"orlist =$orlist");
+         #msg(INFO,"norlist=$norlist");
          if ($orlist ne "" || $norlist ne ""){ 
             my $notempty=0;
             $notempty=1 if ($$where ne "");
@@ -247,6 +247,7 @@ sub getFinalLdapFilter
       #msg(INFO,"getSqlWhere: interpret %s",Dumper($filter));
       my @subflt=$filter;
       @subflt=@$filter if (ref($filter) eq "ARRAY");
+      my $l0where="";
       foreach my $filter (@subflt){
          my $subwhere="";
          foreach my $field (keys(%{$filter})){
@@ -291,9 +292,10 @@ sub getFinalLdapFilter
             }
          }
          # printf STDERR ("SUBDUMP:$subwhere\n");
-         $where="(&".$where.$subwhere.")" if ($subwhere ne "");
+         $l0where="(|".$l0where.$subwhere.")" if ($subwhere ne "");
      
       }
+      $where="(&".$where.$l0where.")" if ($l0where ne "");
    } 
    #printf STDERR ("DUMP:$where\n");
    return($where);
