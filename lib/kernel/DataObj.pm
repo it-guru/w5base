@@ -3758,6 +3758,7 @@ sub FilterPart2SQLexp
             @workfilter=();
          }
       }
+      my $sqlfieldnameislowered=0;
       for(my $fltpos=0;$fltpos<=$#workfilter;$fltpos++){
          my $val=$workfilter[$fltpos];
          if ($val eq "AND" && $sqlparam{logicalop} && $fltpos>0){
@@ -3873,7 +3874,10 @@ sub FilterPart2SQLexp
               $sqlparam{sqldbh}->DriverName() eq "db2") &&
              $sqlparam{ignorecase}==1){
             if ($val ne "NULL"){
-               $sqlfieldname="lower($sqlfieldname)";
+               if (!$sqlfieldnameislowered){
+                  $sqlfieldnameislowered++;
+                  $sqlfieldname="lower($sqlfieldname)";
+               }
                $val="lower($val)";
             }
          }
