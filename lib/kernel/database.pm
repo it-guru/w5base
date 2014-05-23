@@ -303,10 +303,12 @@ sub execute
             && $statement=~m/^select/i)){
           my $cnt=$self->{'db'}->prepare("select count(*) from ($statement)",
                                          $attr);
-          if ($cnt->execute(@bind_values)){
-             my $h=$cnt->fetchrow_arrayref();
-             if (ref($h) eq "ARRAY"){
-                $self->{fixrowcount}=$h->[0]; 
+          if (defined($cnt)){  # check if there is a memory problem in statement
+             if ($cnt->execute(@bind_values)){
+                my $h=$cnt->fetchrow_arrayref();
+                if (ref($h) eq "ARRAY"){
+                   $self->{fixrowcount}=$h->[0]; 
+                }
              }
           }
        }
