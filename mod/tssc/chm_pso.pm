@@ -35,51 +35,54 @@ $self->{pso}=1;
    $self->AddFields(
       new kernel::Field::Linenumber(
                name           =>'linenumber',
-               label          =>'No.',
-      ),
+               label          =>'No.'),
 
       new kernel::Field::Date(
                name           =>'plannedstart',
                timezone       =>'CET',
                label          =>'Planned Start',
                translation    =>'tssc::chmtask',
-               dataobjattr    =>'cm3tm1.planned_start',
-      ),
+               dataobjattr    =>'cm3tm1.planned_start'),
 
       new kernel::Field::Date(
                name           =>'plannedend',
                timezone       =>'CET',
                label          =>'Planned End',
                translation    =>'tssc::chmtask',
-               dataobjattr    =>'cm3tm1.planned_end',
-      ),
+               dataobjattr    =>'cm3tm1.planned_end'),
 
       new kernel::Field::Text(
                name           =>'tasknumber',
                label          =>'Task No.',
                translation    =>'tssc::chmtask',
-               dataobjattr    =>'cm3tm1.numberprgn',
-      ),
+               dataobjattr    =>'cm3tm1.numberprgn'),
 
       new kernel::Field::Text(
                name           =>'changenumber',
                label          =>'Change No.',
                translation    =>'tssc::chmtask',
-               dataobjattr    =>'cm3tm1.parent_change',
-      ),
+               dataobjattr    =>'cm3tm1.parent_change'),
 
       new kernel::Field::Text(
                name           =>'appl',
                label          =>'Application',
-               dataobjattr    =>'screlationm1.depend',
-      ),
+               dataobjattr    =>'screlationm1.depend'),
+
+      new kernel::Field::Text(
+               name           =>'appl',
+               label          =>'Application',
+               dataobjattr    =>'screlationm1.depend'),
+
+      new kernel::Field::Boolean(
+               name           =>'isdown',
+               label          =>'is Down',
+               dataobjattr    =>"'1'"),
 
       new kernel::Field::Text(
                name           =>'applname',
                label          =>'Application name',
                searchable     =>0,
-               dataobjattr    =>'devicem1.system_name',
-      ),
+               dataobjattr    =>'devicem1.system_name'),
 
    );
 

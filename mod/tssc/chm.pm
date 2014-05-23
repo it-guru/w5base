@@ -288,13 +288,14 @@ sub new
 
       new kernel::Field::JoinUniqMerge(
                 name          =>'pso',
-                label         =>'PSO',
+                label         =>'PSO in next 4 weeks',
                 group         =>'downtimesum',
-                searchable    =>0,
+                searchable    =>1,
                 htmldetail    =>0,
-                vjointo       =>'tssc::chmtask',
+                vjoinbase     =>['plannedstart'=>">now AND <now+28d"],
+                vjointo       =>'tssc::chm_pso',
                 vjoinon       =>['changenumber'=>'changenumber'],
-                vjoindisp     =>'cidown'),
+                vjoindisp     =>'isdown'),
 
       new kernel::Field::SubList(
                 name          =>'downtimesum',
