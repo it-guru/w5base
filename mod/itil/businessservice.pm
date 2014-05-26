@@ -263,6 +263,7 @@ sub new
                 name          =>'reportinglabel',
                 label         =>'Reporting Label',
                 vjointo       =>'itil::lnkmgmtitemgroup',
+                group         =>'reporting',
                 searchable    =>0,
                 htmldetail    =>0,
                 htmldetail    =>sub{
@@ -288,6 +289,18 @@ sub new
                 group         =>'desc',
                 label         =>'Business Service Description',
                 dataobjattr   =>"$worktable.description"),
+
+      new kernel::Field::Date(
+                name          =>'validfrom',
+                group         =>'desc',
+                label         =>'Duration Start',
+                dataobjattr   =>"$worktable.validfrom"),
+
+      new kernel::Field::Date(
+                name          =>'validto',
+                group         =>'desc',
+                label         =>'Duration End',
+                dataobjattr   =>"$worktable.validto"),
 
       new kernel::Field::Text(
                 name          =>'version',
@@ -483,7 +496,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default applinfo desc  uservicecomp servicecomp
-             contacts businessprocesses attachments source));
+             contacts businessprocesses reporting attachments source));
 }
 
 
@@ -612,6 +625,17 @@ sub Validate
       }
    }
 
+   my $validto=effVal($oldrec,$newrec,"validto");
+   my $validfrom=effVal($oldrec,$newrec,"validfrom");
+   if ($validto ne "" && $validfrom ne ""){
+      my $duration=CalcDateDuration($validfrom,$validto);
+      if ($duration->{totalseconds}<0){
+         $self->LastMsg(ERROR,"validto can't be sooner as validfrom");
+         return(0);
+      }
+   }
+
+
 
    if (!defined($oldrec) && defined($newrec->{name})
        && ($newrec->{name}=~m/^\s*$/)){
@@ -726,7 +750,8 @@ sub isWriteValid
       }
       
       if ($wr){
-         push(@l,"default","contacts","desc","servicecomp","attachments");
+         push(@l,"default","contacts","desc","servicecomp",
+                 "attachments","reporting");
       }
    }
    return(@l);
@@ -742,7 +767,8 @@ sub isViewValid
       push(@l,qw(desc uservicecomp servicecomp));
    }
    else{
-      push(@l,qw(contacts desc uservicecomp servicecomp attachments));
+      push(@l,qw(contacts desc uservicecomp servicecomp 
+                 attachments reporting));
    }
    push(@l,qw(businessprocesses source));
    return(@l);

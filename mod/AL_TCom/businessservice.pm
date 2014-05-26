@@ -118,14 +118,12 @@ sub new
                 name          =>'sdbid',
                 searchable    =>0,
                 group         =>'desc',
+                htmleditwidth =>'150',
                 label         =>'SDB-ID',
                 container     =>'additional'),
       insertafter=>['description']
    );
-
-
-
-
+   $self->setDefaultView(qw(fullname cistatus));
 
    return($self);
 }
