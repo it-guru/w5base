@@ -176,10 +176,6 @@ sub Init
                       "itil::lnkbscontact",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("AL_TCom.appl.bs.its",
-                      "AL_TCom::businessserviceITS",
-                      defaultacl=>['valid_user']);
-
    $self->RegisterObj("AL_TCom.itclust",
                       "AL_TCom::itclust",
                       defaultacl=>['valid_user']);

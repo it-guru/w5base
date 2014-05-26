@@ -106,6 +106,7 @@ sub new
                 name          =>'nature',
                 sqlorder      =>'desc',
                 label         =>'Nature',
+                htmleditwidth =>'40%',
                 transprefix   =>'nat.',
                 value         =>['','IT-S','ES','TA'],
                 dataobjattr   =>"$worktable.nature"),

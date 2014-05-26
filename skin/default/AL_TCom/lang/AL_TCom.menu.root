@@ -23,7 +23,6 @@
 'AL_TCom.appl.bs'=>{de=>'Business-Service',en=>'Business-Service'},
 'AL_TCom.appl.bs.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.bs.lnkcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
-'AL_TCom.appl.bs.its'=>{de=>'IT-Service',en=>'IT-Service'},
 'AL_TCom.itclust'=>{de=>'Cluster',en=>'Cluster'},
 'AL_TCom.itclust.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.itclust.lnkitclustsvc'=>{de=>'Service',en=>'Service'},
