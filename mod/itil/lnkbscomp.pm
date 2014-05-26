@@ -39,7 +39,7 @@ sub new
                        {'systemcistatusid'=>'<5'},
                        {'cistatusid'=>"<5"},
                        {'cistatusid'=>"<5"},
-                       {}
+                       {'cistatusid'=>"<5"}
                       ];
 
    $self->AddFields(

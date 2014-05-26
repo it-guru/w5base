@@ -558,7 +558,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itservices.new",
-                      "itil::businessservice",
+                      "AL_TCom::businessservice",
                       prio=>1000,
                       func=>'New',
                       defaultacl=>['valid_user']);

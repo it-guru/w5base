@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{Worktable}="businessservice";
    my ($worktable,$workdb)=$self->getWorktable();
@@ -82,6 +83,24 @@ sub new
                 htmleditwidth =>'50px',
                 label         =>'Short name',
                 dataobjattr   =>"$worktable.shortname"),
+
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                vjoineditbase =>{id=>">0"},
+                default       =>4,
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>"if ($worktable.cistatus is null,".
+                                "4,$worktable.cistatus)", # hack for autogen
+                wrdataobjattr =>"$worktable.cistatus"),   # (entire) services
 
       new kernel::Field::Select(
                 name          =>'nature',
@@ -353,6 +372,12 @@ sub new
                 name          =>'responseteamid',
                 dataobjattr   =>'applresponseteam'),
 
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                label         =>'Attachments',
+                parentobj     =>'itil::businessservice',
+                group         =>'attachments'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -428,7 +453,7 @@ sub new
    );
    $self->{history}=[qw(insert modify delete)];
 
-   $self->setDefaultView(qw(fullname application));
+   $self->setDefaultView(qw(fullname cistatus application));
    return($self);
 }
 
@@ -457,7 +482,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default applinfo desc  uservicecomp servicecomp
-             contacts businessprocesses source));
+             contacts businessprocesses attachments source));
 }
 
 
@@ -485,6 +510,7 @@ sub preProcessReadedRecord
       my ($id)=$o->ValidatedInsertRecord({applid=>$rec->{parentid}});
       $W5V2::OperationContext=$oldcontext;
       $rec->{id}=$id;
+      $rec->{cistatusid}='4';
    }
    return(undef);
 }
@@ -699,7 +725,7 @@ sub isWriteValid
       }
       
       if ($wr){
-         push(@l,"default","contacts","desc","servicecomp");
+         push(@l,"default","contacts","desc","servicecomp","attachments");
       }
    }
    return(@l);
@@ -715,7 +741,7 @@ sub isViewValid
       push(@l,qw(desc uservicecomp servicecomp));
    }
    else{
-      push(@l,qw(contacts desc uservicecomp servicecomp));
+      push(@l,qw(contacts desc uservicecomp servicecomp attachments));
    }
    push(@l,qw(businessprocesses source));
    return(@l);
@@ -783,6 +809,19 @@ sub SecureSetFilter
    }
    return($self->SetFilter(@flt));
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
+
 
 
 

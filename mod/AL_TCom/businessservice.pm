@@ -32,6 +32,8 @@ sub new
 
    $self->getField("application")->{weblinkto}="AL_TCom::appl";
    $self->getField("srcapplication")->{vjointo}="AL_TCom::appl";
+   my $naturelist=$self->getField("nature")->{value};
+   @$naturelist=grep(!/^$/,@$naturelist);
 
    $self->AddFields(
       new kernel::Field::Contact(
