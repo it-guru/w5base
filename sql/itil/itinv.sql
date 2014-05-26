@@ -1122,7 +1122,7 @@ create table businessservice (
   id          bigint(20)  NOT NULL,
   name        varchar(128) default NULL,
   appl        bigint(20),
-  cistatus    int(2)      NOT NULL, funcmgr bigint(20) default NULL,
+  cistatus    int(2)      default '4', funcmgr bigint(20) default NULL,
   description longtext     default NULL,version varchar(20),
   comments    longtext     default NULL,
   additional  longtext     default NULL,
@@ -1352,3 +1352,22 @@ create table licproduct (
 alter table liccontract add licproduct bigint(20) default null;
 alter table liccontract add fullname varchar(512) not null;
 alter table lnksoftwaresystem add licsubof bigint(20) default null;
+create table lnkapplconumber (
+  id          bigint(20)  NOT NULL,
+  name        varchar(40) NOT NULL,
+  appl        bigint(20)  NOT NULL,
+  comments    longtext     default NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser  bigint(20) NOT NULL default '0',
+  modifyuser  bigint(20) NOT NULL default '0',
+  editor      varchar(100) NOT NULL default '',
+  realeditor  varchar(100) NOT NULL default '',
+  srcsys      varchar(100) default 'w5base',
+  srcid       varchar(20) default NULL,
+  srcload     datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY name (appl,name),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+);
+alter table businessservice add validfrom datetime default NULL, add validto datetime default NULL, add customer bigint(20)  default NULL, add repocycle varchar(20) default NULL;
