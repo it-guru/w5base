@@ -31,7 +31,6 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
-$self->{pso}=1;
    $self->AddFields(
       new kernel::Field::Linenumber(
                name           =>'linenumber',
@@ -72,11 +71,6 @@ $self->{pso}=1;
                name           =>'appl',
                label          =>'Application',
                dataobjattr    =>'screlationm1.depend'),
-
-      new kernel::Field::Boolean(
-               name           =>'isdown',
-               label          =>'is Down',
-               dataobjattr    =>"'1'"),
 
       new kernel::Field::Text(
                name           =>'applname',
