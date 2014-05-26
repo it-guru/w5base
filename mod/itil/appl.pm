@@ -1961,73 +1961,73 @@ sub FinishWrite
    $self->NotifyAddOrRemoveObject($oldrec,$newrec,"name",
                                   "STEVapplchanged",100000003);
 
-   if (defined($oldrec) && defined($newrec) &&
-       exists($newrec->{cistatusid}) &&
-       $oldrec->{cistatusid}!=$newrec->{cistatusid}){ # notify Interface appls
-
-      my $id=effVal($oldrec,$newrec,"id");
-      my $lnkappl=getModuleObject($self->Config,"itil::lnkapplappl");
-      $lnkappl->SetFilter({toapplid=>\$id,
-                           cistatusid=>"<5",
-                           fromapplcistatus=>"<6"});
-      my @l=$lnkappl->getHashList(qw(fromapplid));
-      my %a;
-      my %u;
-      foreach my $lnkrec (@l){
-         $a{$lnkrec->{fromapplid}}++;
-      }
-      my $appl=$self->Clone();
-      $appl->SetFilter({id=>[keys(%a)]});
-      foreach my $arec ($appl->getHashList(qw(name databossid contacts id))){
-         $a{$arec->{id}}=$arec;
-         $u{$arec->{databossid}}={} if ($arec->{databossid} ne "");
-         if ($oldrec->{cistatusid}==4 && $newrec->{cistatusid}==5){
-            # notify zeitweise/inaktiv
-            $a{$arec->{id}}->{mode}="inaktive";
-         }
-         if ($oldrec->{cistatusid}<5 && $newrec->{cistatusid}==6){
-            # notify gelöscht
-            $a{$arec->{id}}->{mode}="deleted";
-         }
-         if ($oldrec->{cistatusid}>4 && $newrec->{cistatusid}==4){
-            # notify reaktivierung
-            $a{$arec->{id}}->{mode}="reactive";
-         }
-      }
-      my $user=getModuleObject($self->Config,"base::user");
-      $user->SetFilter({userid=>[keys(%u)]});
-      foreach my $urec ($user->getHashList(qw(lang lastlang 
-                                              cistatusid userid))){
-         $u{$urec->{userid}}=$urec;
-      }
-      my $notifycontrol={};
-
-      foreach my $apprec (values(%a)){
-         my %notifyparam=(
-            adminbcc=>1,
-            emailfrom=>undef,
-            lang=>'en',
-         );
-         $self->NotifyWriteAuthorizedContacts($apprec,undef,
-                                              \%notifyparam,$notifycontrol,sub {
-            my $self=shift;
-            my $notifyparam=shift;
-
-            my $subject=$self->T("Interface application ci-status change");
-            my $text=$self->T("Dear databoss",'kernel::QRule');
-            $text.=",\n\n";
-            $text.=sprintf(
-                   $self->T('a interface application (%s) of an application '.
-                            'which is managed '.
-                            'by you, has change the ci status to %s .'.
-                            'Please check the currentness of the '.
-                            'interface definitions in %s !'),
-                   $oldrec->{name},$apprec->{mode},$apprec->{name});
-            return($subject,$text);
-
-         });
-      }
-   }
+#   if (defined($oldrec) && defined($newrec) &&
+#       exists($newrec->{cistatusid}) &&
+#       $oldrec->{cistatusid}!=$newrec->{cistatusid}){ # notify Interface appls
+#
+#      my $id=effVal($oldrec,$newrec,"id");
+#      my $lnkappl=getModuleObject($self->Config,"itil::lnkapplappl");
+#      $lnkappl->SetFilter({toapplid=>\$id,
+#                           cistatusid=>"<5",
+#                           fromapplcistatus=>"<6"});
+#      my @l=$lnkappl->getHashList(qw(fromapplid));
+#      my %a;
+#      my %u;
+#      foreach my $lnkrec (@l){
+#         $a{$lnkrec->{fromapplid}}++;
+#      }
+#      my $appl=$self->Clone();
+#      $appl->SetFilter({id=>[keys(%a)]});
+#      foreach my $arec ($appl->getHashList(qw(name databossid contacts id))){
+#         $a{$arec->{id}}=$arec;
+#         $u{$arec->{databossid}}={} if ($arec->{databossid} ne "");
+#         if ($oldrec->{cistatusid}==4 && $newrec->{cistatusid}==5){
+#            # notify zeitweise/inaktiv
+#            $a{$arec->{id}}->{mode}="inaktive";
+#         }
+#         if ($oldrec->{cistatusid}<5 && $newrec->{cistatusid}==6){
+#            # notify gelöscht
+#            $a{$arec->{id}}->{mode}="deleted";
+#         }
+#         if ($oldrec->{cistatusid}>4 && $newrec->{cistatusid}==4){
+#            # notify reaktivierung
+#            $a{$arec->{id}}->{mode}="reactive";
+#         }
+#      }
+#      my $user=getModuleObject($self->Config,"base::user");
+#      $user->SetFilter({userid=>[keys(%u)]});
+#      foreach my $urec ($user->getHashList(qw(lang lastlang 
+#                                              cistatusid userid))){
+#         $u{$urec->{userid}}=$urec;
+#      }
+#      my $notifycontrol={};
+#
+#      foreach my $apprec (values(%a)){
+#         my %notifyparam=(
+#            adminbcc=>1,
+#            emailfrom=>undef,
+#            lang=>'en',
+#         );
+#         $self->NotifyWriteAuthorizedContacts($apprec,undef,
+#                                              \%notifyparam,$notifycontrol,sub {
+#            my $self=shift;
+#            my $notifyparam=shift;
+#
+#            my $subject=$self->T("Interface application ci-status change");
+#            my $text=$self->T("Dear databoss",'kernel::QRule');
+#            $text.=",\n\n";
+#            $text.=sprintf(
+#                   $self->T('a interface application (%s) of an application '.
+#                            'which is managed '.
+#                            'by you, has change the ci status to %s .'.
+#                            'Please check the currentness of the '.
+#                            'interface definitions in %s !'),
+#                   $oldrec->{name},$apprec->{mode},$apprec->{name});
+#            return($subject,$text);
+#
+#         });
+#      }
+#   }
    return($bak);
 }
 
