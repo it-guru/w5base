@@ -151,6 +151,10 @@ sub  calcViewMatrix
 
       $vMatrix->{uivisibleof}->[$c]=
          $fieldlist->[$c]->UiVisible("HtmlDetail",current=>$rec);
+
+
+      # fifi fast solution:
+      $vMatrix->{uivisibleof}->[$c]=1 if ($fieldlist->[$c]->Type() eq "MatrixHeader");
  
       $vMatrix->{htmldetailof}->[$c]=
          $fieldlist->[$c]->htmldetail("HtmlDetail",current=>$rec);
@@ -397,6 +401,8 @@ EOF
          my $subblock="";
          my $grpentry=$app->getGroup($group,current=>$rec);
          my $col=0;
+         my $MaxMatrixCol=0;
+         my $CurMatrixCol=0; 
          for(my $c=0;$c<=$#fieldlist;$c++){
             my $name=$fieldlist[$c]->Name();
             next if (!($vMatrix->{uivisibleof}->[$c]));
@@ -475,11 +481,43 @@ EOF
 EOF
 
                }
+               elsif ($fieldlist[$c]->Type() eq "MatrixHeader"){
+                  my $label=$fieldlist[$c]->Label();
+                  $MaxMatrixCol=$#{$label};
+                  $subblock.=join("\n",
+                                map({
+                                   "<td class=finput$valign colspan=1 ".
+                                   "align=center><b>".
+                                   $_.
+                                   "</b></td>";
+                                } @$label));
+               }
                else{
+                  my $align=$fieldlist[$c]->align("Detail");
+                  $align="left" if ($align eq "");
                   my $datacolspan=1;
                   $datacolspan=3 if ($vMatrix->{grouphavehalfwidth}->{$group});
                   $datacolspan=1 if ($halfwidth);
-                  $subblock.=<<EOF;
+                  if ($MaxMatrixCol){
+                     if ($CurMatrixCol==0){
+                        $subblock.="<td class=fname$valign style=\"width:20%;\">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>";
+                     }
+                     $subblock.=<<EOF;
+<td class=finput colspan=$datacolspan>
+<table border=0 cellspacing=0 cellpadding=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
+<td>
+<div style="text-align:$align;width:100%;overflow:hidden">
+                          \%$name(detail)\%</div>
+</td></tr></table>
+</td>
+EOF
+                     $CurMatrixCol++;
+                     if ($CurMatrixCol>=$MaxMatrixCol){
+                        $CurMatrixCol=0;
+                     }
+                  }
+                  else{
+                     $subblock.=<<EOF;
          <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>
          <td class=finput colspan=$datacolspan>
 <table border=0 cellspacing=0 cellpadding=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
@@ -489,20 +527,23 @@ EOF
 </td></tr></table>
 </td>
 EOF
+                  }
                }
                if ($fieldlist[$c]->Type() ne "WebLink"){
                   $col++;
-                  if ($halfwidth){
-                     if ($col>=2){
-                        $col=0;
-                     } 
+                  if ($CurMatrixCol==0){
+                     if ($halfwidth){
+                        if ($col>=2){
+                           $col=0;
+                        } 
+                     }
+                     else{
+                        if ($col>=1){
+                           $col=0;
+                        } 
+                     }
+                     $subblock.="</tr>" if ($col==0);
                   }
-                  else{
-                     if ($col>=1){
-                        $col=0;
-                     } 
-                  }
-                  $subblock.="</tr>" if ($col==0);
                }
             }
          }

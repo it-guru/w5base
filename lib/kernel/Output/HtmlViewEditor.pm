@@ -405,9 +405,13 @@ sub getViewFieldSelect
       else{
          my $fobj=$app->getField($field);
          if ($fobj){
+            my $label=$fobj->Label();
+            my $ext="";
+            $fobj->extendFieldHeader("ViewEditor",undef,\$ext);
+            $label.=$ext if ($ext ne "");
             $d.="<option value=\"$field\"";
            # $d.=" selected" if (grep(/^$field$/,@oldval));
-            $d.=">".$fobj->Label()."</option>";
+            $d.=">".$label."</option>";
          }
       }
    }
@@ -474,13 +478,17 @@ sub getFullFieldTreeSelect
       $c++;
       foreach my $fobj (@checkedobjs){
          my $field=$fobj->Name();
+         my $label=$fobj->Label();
+         my $ext="";
+         $fobj->extendFieldHeader("ViewEditor",undef,\$ext);
+         $label.=$ext if ($ext ne "");
          $d.="<ul id=tree_$c>";
          $c++;
          $d.="<li xvalue=\'$field\' downpoint=1 id=treediv_$c ".
              "onClick=\"DoFieldonClick(this);\" ".
              "onMouseDown=\"return(false)\" ".
              "onSelectStart=\"return(false)\" ".
-             ">".$fobj->Label()."</li>";
+             ">".$label."</li>";
          $d.="</ul>";
       }
       $d.="</li>";

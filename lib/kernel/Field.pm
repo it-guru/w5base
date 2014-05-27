@@ -80,6 +80,7 @@ use kernel::Field::Fulltext;
 use kernel::Field::Interview;
 use kernel::Field::InterviewState;
 use kernel::Field::WorkflowLink;
+use kernel::Field::MatrixHeader;
 use kernel::Field::DatacareAssistant;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal);
@@ -117,6 +118,7 @@ sub new
    $self->{_permitted}->{frontreadonly}=1;   # Nur zum lesen
    $self->{_permitted}->{grouplabel}=1; # 1 wenn in HTML Detail Grouplabel soll
    $self->{_permitted}->{dlabelpref}=1; # Beschriftungs prefix in HtmlDetail
+   $self->{_permitted}->{extLabelPostfix}=1; # Label Ext on all expect Detail
    $self->{searchable}=1 if (!defined($self->{searchable}));
    $self->{selectable}=1 if (!defined($self->{selectable}));
    $self->{htmldetail}=1 if (!defined($self->{htmldetail}));
@@ -290,7 +292,7 @@ sub extendFieldHeader
    my $current=shift;
    my $curFieldHeadRef=shift;
    if (exists($self->{extLabelPostfix}) && $mode ne "Detail"){
-      $$curFieldHeadRef=$self->{extLabelPostfix};
+      $$curFieldHeadRef=$self->extLabelPostfix($mode,$current);
    }
 #   $$curFieldHeadRef.="x";
 }
@@ -441,14 +443,23 @@ sub Label
    my $label=$self->{label};
    my $d;
    if ($label ne ""){
-      $d=$label;
       my $tr=$self->{translation};
       $tr=$self->getParent->Self if (!defined($tr));
       my @tr=($tr);
       if ($tr ne $self->getParent->Self){
          unshift(@tr,$self->getParent->Self);
       }
-      $d=$self->getParent->T($d,@tr);
+      if (ref($label) eq "ARRAY"){
+         my @d=@$label;
+         for(my $c=0;$c<=$#d;$c++){
+            $d[$c]=$self->getParent->T($d[$c],@tr);
+         }
+         return(\@d);
+      }
+      else{
+         $d=$label;
+         $d=$self->getParent->T($d,@tr);
+      }
    }
    else{
       $d="(".$self->Name().")";

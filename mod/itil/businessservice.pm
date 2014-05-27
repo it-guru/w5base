@@ -386,6 +386,177 @@ sub new
                 name          =>'responseteamid',
                 dataobjattr   =>'applresponseteam'),
 
+
+
+      new kernel::Field::MatrixHeader(
+                name          =>'slamatrix',
+                group         =>'sla',
+                label         =>[undef,'requested','implemented','current']),
+
+      new kernel::Field::Duration(
+                name          =>'requ_mtbf',
+                group         =>'sla',
+                visual        =>'hh:mm',
+                label         =>'MTBF',
+                align         =>'right',
+                searchable    =>0,
+                extLabelPostfix=>\&extLabelPostfixRequested,
+                dataobjattr   =>$worktable.'.requ_mtbf'),
+
+      new kernel::Field::Duration(
+                name          =>'impl_mtbf',
+                group         =>'sla',
+                visual        =>'hh:mm',
+                searchable    =>0,
+                label         =>'MTBF',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixImplemented,
+                dataobjattr   =>$worktable.'.impl_mtbf'),
+
+      new kernel::Field::Duration(
+                name          =>'curr_mtbf',
+                group         =>'sla',
+                visual        =>'hh:mm',
+                searchable    =>0,
+                label         =>'MTBF',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixCurrent,
+                dataobjattr   =>$worktable.'.curr_mtbf'),
+
+
+      new kernel::Field::Duration(
+                name          =>'requ_ttr',
+                group         =>'sla',
+                visual        =>'hh:mm',
+                searchable    =>0,
+                label         =>'TTR',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixRequested,
+                dataobjattr   =>$worktable.'.requ_ttr'),
+
+      new kernel::Field::Duration(
+                name          =>'impl_ttr',
+                group         =>'sla',
+                visual        =>'hh:mm',
+                searchable    =>0,
+                label         =>'TTR',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixImplemented,
+                dataobjattr   =>$worktable.'.impl_ttr'),
+
+      new kernel::Field::Duration(
+                name          =>'curr_ttr',
+                group         =>'sla',
+                visual        =>'hh:mm',
+                searchable    =>0,
+                label         =>'TTR',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixCurrent,
+                dataobjattr   =>$worktable.'.curr_ttr'),
+
+      new kernel::Field::MatrixHeader(
+                name          =>'monimatrix',
+                group         =>'moni',
+                label         =>[undef,'requested','implemented','current',
+                                 'threshold crit','threshold warn']),
+
+      new kernel::Field::Percent(
+                name          =>'requ_avail_p',
+                precision     =>2,
+                group         =>'moni',
+                searchable    =>0,
+                label         =>'avalability in %',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixRequested,
+                dataobjattr   =>$worktable.'.requ_avail_p'),
+
+      new kernel::Field::Percent(
+                name          =>'impl_avail_p',
+                precision     =>2,
+                group         =>'moni',
+                searchable    =>0,
+                label         =>'avalability in %',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixImplemented,
+                dataobjattr   =>$worktable.'.impl_avail_p'),
+
+      new kernel::Field::Percent(
+                name          =>'curr_avail_p',
+                precision     =>2,
+                group         =>'moni',
+                searchable    =>0,
+                label         =>'avalability in %',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixCurrent,
+                dataobjattr   =>$worktable.'.curr_avail_p'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_warn_avail',
+                group         =>'moni',
+                precision     =>2, 
+                default       =>'0.97',
+                label         =>'avalability',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>$worktable.'.th_warn_avail'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_crit_avail',
+                group         =>'moni',
+                precision     =>2, 
+                default       =>'0.92',
+                label         =>'avalability',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>$worktable.'.th_crit_avail'),
+
+      new kernel::Field::Number(
+                name          =>'requ_respti',
+                group         =>'moni',
+                label         =>'responsetime in ms',
+                align         =>'right',
+                searchable    =>0,
+                extLabelPostfix=>\&extLabelPostfixRequested,
+                dataobjattr   =>$worktable.'.requ_respti'),
+
+      new kernel::Field::Number(
+                name          =>'impl_respti',
+                group         =>'moni',
+                searchable    =>0,
+                label         =>'responsetime in ms',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixImplemented,
+                dataobjattr   =>$worktable.'.impl_respti'),
+
+      new kernel::Field::Number(
+                name          =>'curr_respti',
+                group         =>'moni',
+                label         =>'responsetime in ms',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixCurrent,
+                dataobjattr   =>$worktable.'.curr_respti'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_warn_respti',
+                group         =>'moni',
+                default       =>'0.97',
+                precision     =>2, 
+                label         =>'responsetime',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>$worktable.'.th_warn_respti'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_crit_respti',
+                group         =>'moni',
+                default       =>'0.92',
+                precision     =>2, 
+                label         =>'responsetime',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>$worktable.'.th_crit_respti'),
+
+
       new kernel::Field::FileList(
                 name          =>'attachments',
                 label         =>'Attachments',
@@ -471,6 +642,39 @@ sub new
    return($self);
 }
 
+sub extLabelPostfixRequested
+{
+   my $self=shift;
+   return(" - ".$self->getParent->T("requested"));
+}
+
+sub extLabelPostfixImplemented
+{
+   my $self=shift;
+   return(" - ".$self->getParent->T("implemented"));
+}
+
+sub extLabelPostfixCurrent
+{
+   my $self=shift;
+   return(" - ".$self->getParent->T("current"));
+}
+
+sub extLabelPostfixTHCrit
+{
+   my $self=shift;
+   return(" - ".$self->getParent->T("threshold crit"));
+}
+
+sub extLabelPostfixTHWarn
+{
+   my $self=shift;
+   return(" - ".$self->getParent->T("threshold warn"));
+}
+
+
+
+
 sub getBSfullnameSQL
 {
    my $worktable=shift;
@@ -496,7 +700,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default applinfo desc  uservicecomp servicecomp
-             contacts businessprocesses reporting attachments source));
+             contacts businessprocesses reporting sla moni attachments source));
 }
 
 
@@ -750,7 +954,7 @@ sub isWriteValid
       }
       
       if ($wr){
-         push(@l,"default","contacts","desc","servicecomp",
+         push(@l,"default","contacts","desc","servicecomp","sla","moni",
                  "attachments","reporting");
       }
    }
@@ -768,7 +972,7 @@ sub isViewValid
    }
    else{
       push(@l,qw(contacts desc uservicecomp servicecomp 
-                 attachments reporting));
+                 attachments reporting sla moni));
    }
    push(@l,qw(businessprocesses source));
    return(@l);
