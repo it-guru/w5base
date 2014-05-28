@@ -29,6 +29,9 @@ Somit gilt:
 
 Ein DataIssue wird erzeugt, wenn RefreshData - 6 Monate erreicht ist.
 
+Weitere Infos bzw. Ansprechpartner finden Sie unter ...
+https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
+
 
 
 =cut
