@@ -75,9 +75,11 @@ tinyMCE.init({
         plugins: "autoresize link code nonbreaking image textcolor contextmenu lists",
         nonbreaking_force_tab: true,
         autoresize_max_height: 400,
-        target_list: [
-            {title: 'New page', value: '_blank'}
-        ],
+        target_list: false,
+//        target_list: [
+//        //    {title: 'None', value: ''},
+//            {title: 'New page', value: '_blank'}
+//        ],
         menubar : false,
         skin: "light",
         toolbar : "undo | styleselect forecolor backcolor | "+
