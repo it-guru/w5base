@@ -389,7 +389,7 @@ sub Validate
                        h4=>{style=>[any=>[]]}, 
                        h5=>{style=>[any=>[]]},
                        xmp=>{},
-                       div=>{},
+                       div=>{style=>[any=>[]]},
                        h1=>{},
                        h2=>{},
                        h3=>{},
