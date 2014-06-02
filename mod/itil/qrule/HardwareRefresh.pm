@@ -118,7 +118,12 @@ sub qcheckRecord
          }
       }
       my %notifyparam=(emailfrom=>"\"Hardware Refresh Notification\" <>");
-      my $notifycontrol={};
+      my $tmpl=$self->Self;
+      $tmpl=~s/::/./g;
+      my $skinbase=$self->Self;
+      $skinbase=~s/::.*//g;
+      my $notifycontrol={useTemplate=>"tmpl/$tmpl",
+                         useSkinBase=>$skinbase};
 
       my $to_refresh=CalcDateDuration($now,$refreshdate,"GMT");
 
@@ -133,6 +138,8 @@ sub qcheckRecord
                \%notifyparam, $notifycontrol,
                sub{
                   my $self=shift;
+                  my $notifyparam=shift;
+                  my $notifycontrol=shift;
 
                   my $lang=$dataobj->Lang();
                   my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
@@ -141,9 +148,9 @@ sub qcheckRecord
                               "Hardware %s needs to be refreshed in %d months"),
                               $rec->{name},10);
                   my $text=$dataobj->getParsedTemplate(
-                               "tmpl/itil.qrule.HardwareRefresh",
+                               $notifycontrol->{useTemplate},
                                {
-                                  skinbase=>'itil',
+                                  skinbase=>$notifycontrol->{useSkinBase},
                                   static=>{
                                      NAME=>$rec->{name},
                                      REFRESH=>$refreshstr,
@@ -164,6 +171,8 @@ sub qcheckRecord
                $notifycontrol,
                sub{
                   my $self=shift;
+                  my $notifyparam=shift;
+                  my $notifycontrol=shift;
 
                   my $lang=$dataobj->Lang();
                   my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
@@ -172,9 +181,9 @@ sub qcheckRecord
                               "Hardware %s needs to be refreshed in %d months"),
                               $rec->{name},18);
                   my $text=$dataobj->getParsedTemplate(
-                               "tmpl/itil.qrule.HardwareRefresh",
+                               $notifycontrol->{useTemplate},
                                {
-                                  skinbase=>'itil',
+                                  skinbase=>$notifycontrol->{useSkinBase},
                                   static=>{
                                      NAME=>$rec->{name},
                                      REFRESH=>$refreshstr,
@@ -195,6 +204,8 @@ sub qcheckRecord
                $notifycontrol,
                sub{
                   my $self=shift;
+                  my $notifyparam=shift;
+                  my $notifycontrol=shift;
 
                   my $lang=$dataobj->Lang();
                   my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
@@ -203,9 +214,9 @@ sub qcheckRecord
                               "Hardware %s needs to be refreshed in %d months"),
                               $rec->{name},24);
                   my $text=$dataobj->getParsedTemplate(
-                               "tmpl/itil.qrule.HardwareRefresh",
+                               $notifycontrol->{useTemplate},
                                {
-                                  skinbase=>'itil',
+                                  skinbase=>$notifycontrol->{useSkinBase},
                                   static=>{
                                      NAME=>$rec->{name},
                                      REFRESH=>$refreshstr,
@@ -248,7 +259,6 @@ sub getApplmgrUserIds
    my $rec=shift;
 
    # calculate application managers
-   print STDERR Dumper($rec->{applications});
    my @applid;
    my @applmgrid;
    foreach my $arec (@{$rec->{applications}}){

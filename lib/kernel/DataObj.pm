@@ -1759,7 +1759,7 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
    }
    $ENV{HTTP_FORCE_LANGUAGE}=$notifyparam{lang};
 
-   my ($subject,$text)=&{$gentext}($self,\%notifyparam);
+   my ($subject,$text)=&{$gentext}($self,\%notifyparam,$notifycontrol);
 
    if (defined($subject) && defined($text)){
       if (!defined($notifycontrol->{wf})){
