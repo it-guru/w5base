@@ -1,0 +1,32 @@
+<table align="center" width="650px">
+<tr><td>
+<h4 style="margin-top:20px;">Ziel</h4>
+Der IT-ServiceKatalog fasst für alle IT-ServiceObjekte der IT-Services die relevanten Daten zur fachlichen und organisatorische Beschreibung, sowie die mit dem Business-Partner vereinbarten Kennzahlen zusammen.<br />
+In weiteren Ausbaustufen wird angestrebt, auch die Kosten für Betrieb und Ausfall darstellen und auswerten zu können.
+
+<h4 style="margin-top:20px";>Aufgaben</h4>
+ <ul style="padding-left:30px;">
+  <li>Abbildung aller geplanten und in Betrieb befindlichen IT-Services</li>
+  <li>Abbildung aller zu einem IT-Service gehörenden IT-ServiceObjekte</li>
+  <li>Darstellung aller zu den IT-ServiceObjekten gehörigen IT-ServiceParameter</li>
+  <li>Darstellung aller über die Baumstruktur des IT-ServiceModells miteinander verknüpften Hierarchieebenen</li>
+  <li>Bereitstellung strukturierter Informationen über unterschiedliche Kontexteinsprünge</li>
+  <li>Bereitstellung unterschiedlicher Reports in druck- und exportfähigen Formaten</li>
+ </ul>
+</td></tr>
+<tr>
+<td align="center" valign="top">
+<input type=button onclick="openFAQ('http://find.telekom.de/faq%23itservice')"
+       style='width:250px;padding:5px;margin:10px;background:silver;'
+       value="weiterführende Informationen">
+</td>
+</tr>
+</table>
+
+<script langauge="JavaScript">
+function openFAQ(url){
+   popup=window.open(url,"FAQ",'height=500,width=800,toolbar=no,status=no,resizable=yes,scrollbars=auto');
+   popup.focus();
+}
+</script>
+
