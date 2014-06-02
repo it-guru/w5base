@@ -170,17 +170,15 @@ sub getFinalLdapFilter
       {
          my $sqlfield=shift;
          my $fo=shift;
-         my $sub="";
+         my @sub=();
          foreach my $subval (@_){
             my @vallist=$fo->prepareToSearch($subval);
             foreach my $val (@vallist){
-               $sub.="($sqlfield=$val)";
-            }
-            if ($#vallist>0){
-              $sub="(|$sub)";
+               push(@sub,"($sqlfield=$val)");
             }
          }
-         $sub="(|".$sub.")" if ($sub ne "");
+         my $sub=join("",@sub);
+         $sub="(|".$sub.")" if ($#sub>0);
          return($sub);
       }
       if ($#list==-1){
@@ -204,8 +202,8 @@ sub getFinalLdapFilter
          my $orlist=MakeLikeList($sqlfield,$fieldobject,@orlist);
          my $norlist=MakeLikeList($sqlfield,$fieldobject,@norlist);
          $norlist="(!".$norlist.")" if ($norlist ne "");
-         #msg(INFO,"orlist =$orlist");
-         #msg(INFO,"norlist=$norlist");
+         msg(INFO,"orlist  ($sqlfield)=$orlist");
+         msg(INFO,"norlist ($sqlfield)=$norlist");
          if ($orlist ne "" || $norlist ne ""){ 
             my $notempty=0;
             $notempty=1 if ($$where ne "");
@@ -236,18 +234,23 @@ sub getFinalLdapFilter
          my $fname=$fieldobject->Name();
          foreach my $q (@list){
             $q=$q;
+            my $notempty=0;
+            $notempty=1 if ($$where ne "");
+            $$where="(& ".$$where if ($notempty);
             $$where.="($sqlfield=$q)";
+            $$where.="  )" if ($notempty);
          }
       }
       #msg(INFO,"AddOrList=$$where");
    }
 
+   my @l1where=();
    foreach my $filter (@filter){
-      #msg(INFO,"getSqlWhere: interpret $filter in object $self");
-      #msg(INFO,"getSqlWhere: interpret %s",Dumper($filter));
+      msg(INFO,"getSqlWhere: interpret $filter in object $self");
+     # msg(INFO,"getSqlWhere: interpret %s",Dumper($filter));
       my @subflt=$filter;
       @subflt=@$filter if (ref($filter) eq "ARRAY");
-      my $l0where="";
+      my @l0where=();
       foreach my $filter (@subflt){
          my $subwhere="";
          foreach my $field (keys(%{$filter})){
@@ -291,13 +294,14 @@ sub getFinalLdapFilter
                }
             }
          }
-         # printf STDERR ("SUBDUMP:$subwhere\n");
-         $l0where="(|".$l0where.$subwhere.")" if ($subwhere ne "");
-     
+         printf STDERR ("SUBDUMP:$subwhere\n");
+        # $l0where="(|".$l0where.$subwhere.")" if ($subwhere ne "");
+         push(@l0where,$subwhere) if ($subwhere ne "");
       }
-      $where="(&".$where.$l0where.")" if ($l0where ne "");
+      push(@l1where,"(|".$where.join("",@l0where).")") if ($#l0where!=-1);
    } 
-   #printf STDERR ("DUMP:$where\n");
+   $where="(&".join("",@l1where).")";
+   printf STDERR ("DUMP:$where\n");
    return($where);
 }
 
