@@ -294,14 +294,14 @@ sub getFinalLdapFilter
                }
             }
          }
-         printf STDERR ("SUBDUMP:$subwhere\n");
+         #printf STDERR ("SUBDUMP:$subwhere\n");
         # $l0where="(|".$l0where.$subwhere.")" if ($subwhere ne "");
          push(@l0where,$subwhere) if ($subwhere ne "");
       }
       push(@l1where,"(|".$where.join("",@l0where).")") if ($#l0where!=-1);
    } 
    $where="(&".join("",@l1where).")";
-   printf STDERR ("DUMP:$where\n");
+   #printf STDERR ("DUMP:$where\n");
    return($where);
 }
 
