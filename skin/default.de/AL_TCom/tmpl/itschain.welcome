@@ -16,17 +16,18 @@ In weiteren Ausbaustufen wird angestrebt, auch die Kosten für Betrieb und Ausfal
 </td></tr>
 <tr>
 <td align="center" valign="top">
-<input type=button onclick="openFAQ('http://find.telekom.de/faq%23itservice')"
+<input type=button onclick="openFAQ(this);"
        style='width:250px;padding:5px;margin:10px;background:silver;'
        value="weiterführende Informationen">
 </td>
 </tr>
 </table>
 
-<script langauge="JavaScript">
-function openFAQ(url){
-   popup=window.open(url,"FAQ",'height=500,width=800,toolbar=no,status=no,resizable=yes,scrollbars=auto');
-   popup.focus();
+<script language="JavaScript" type="text/javascript"
+        src="../../../public/base/load/toolbox.js"></script>
+<script language="JavaScript">
+function openFAQ(){
+   openwin('http://find.telekom.de/faq%23itservice','_blank','height=500,width=600,toolbar=no,status=no,resizable=yes,scrollbars=auto');
 }
 </script>
 
