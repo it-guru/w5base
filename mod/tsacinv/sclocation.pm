@@ -1,6 +1,6 @@
-package tsacinv::customer;
+package tsacinv::sclocation;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -39,57 +39,39 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'UnitID',
-                dataobjattr   =>'amtsiaccsecunit.lunitid'),
+                label         =>'SCLocationID',
+                dataobjattr   =>'amtsisclocations.ltsisclocationsid'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 uppersearch   =>1,
-                dataobjattr   =>'amtsiaccsecunit.identifier'),
+                dataobjattr   =>'amtsisclocations.sclocationname'),
 
       new kernel::Field::Text(      
-                name          =>'fullname',
+                name          =>'company',
                 ignorecase    =>1,
-                label         =>'Description',
-                dataobjattr   =>'amtsiaccsecunit.description'),
-
-      new kernel::Field::TextDrop(
-                name          =>'delmgr',
-                searchable    =>0,
-                label         =>'Delivery Manager',
-                vjointo       =>'tsacinv::user',
-                vjoinon       =>['delmgrid'=>'lempldeptid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'delmgrid',
-                dataobjattr   =>'amtsiaccsecunit.ldeliverymanagerid'),
+                label         =>'Company',
+                dataobjattr   =>'amtsisclocations.companytxt'),
 
       new kernel::Field::Text(
-                name          =>'code',
-                label         =>'Code',
-                dataobjattr   =>'amtsiaccsecunit.code'),
+                name          =>'subcompany',
+                ignorecase    =>1,
+                label         =>'SubCompany',
+                dataobjattr   =>'amtsisclocations.subcompany'),
 
-      new kernel::Field::TextDrop(
-                name          =>'defaultsclocation',
-                label         =>'Default SC Location',
-                vjoinon       =>['defaultsclocationid'=>'id'],
-                vjointo       =>'tsacinv::sclocation',
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'defaultsclocationid',
-                label         =>'defaultsclocationid',
-                dataobjattr   =>'amtsiaccsecunit.ldefaultsclocationid'),
+      new kernel::Field::Text(
+                name          =>'sclocationid',
+                label         =>'SC-LocationID',
+                dataobjattr   =>'amtsisclocations.sclocationid'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 timezone      =>'CET',
                 label         =>'Modification date',
-                dataobjattr   =>'amtsiaccsecunit.dtlastmodif'),
+                dataobjattr   =>'amtsisclocations.dtlastmodif'),
    );
-   $self->setDefaultView(qw(linenumber id name fullname));
+   $self->setDefaultView(qw(linenumber name company subcompany sclocationid));
    return($self);
 }
 
@@ -99,17 +81,17 @@ sub Initialize
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("amtsiaccsecunit");
+   $self->setWorktable("amtsisclocations");
    return(1) if (defined($self->{DB}));
    return(0);
 }
 
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amtsiaccsecunit.lunitid<>0 ";
-   return($where);
-}
+#sub initSqlWhere
+#{
+#   my $self=shift;
+#   my $where="amtsiaccsecunit.lunitid<>0 ";
+#   return($where);
+#}
 
 
          

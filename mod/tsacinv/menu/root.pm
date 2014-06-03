@@ -132,6 +132,10 @@ sub Init
                       "tsacinv::location",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("ac.krn.sclocation",
+                      "tsacinv::sclocation",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("ac.krn.costcenter",
                       "tsacinv::costcenter",
                       defaultacl=>['valid_user']);
