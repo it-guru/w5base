@@ -266,6 +266,7 @@ sub ApplicationModified
       }
       $filter{mandatorid}=\@mandid;
    }
+   open(AMTODO,">/tmp/amsctodo.txt");
 
 
 
@@ -576,6 +577,18 @@ sub ApplicationModified
                if ($rec->{cistatusid}==5){
                   $acstatus="OUT OF OPERATION";
                }
+
+               # ---
+               # anhand der conumber checken, ob im SAP WIB gesetzt ist
+               # ---
+               # prüfen ob in assetmanager der customerlink notwendige
+               # customerlink existiert
+               # ---
+               # prüfen ob in assetmanager beim kontierungsobjekt der
+               # passende customerlink eingetragen ist.
+               # ---
+               $self->validateCostCenter4AssetManager($rec);
+
                my $acftprec={
                                 Appl=>{
                                    Security_Unit=>"TS.DE",
@@ -860,11 +873,135 @@ sub ApplicationModified
    $self->TransferFile($fh{instance},$filename{instance},
                        "instance");
    my $back=$self->TransferFile($fh{appl},$filename{appl},"appl");
+   close(AMTODO);
 
 # temp deakiv, da div. Schnittstellenprobleme noch nicht geklärt sind.
 #   $self->sendFileToAssetManagerOnlineInterface($onlinefilename,$elements);
    return($back);
 }
+
+
+sub validateCostCenter4AssetManager
+{
+   my $self=shift;
+   my $rec=shift;
+   my $conumber=$rec->{conumber};
+   my $conodenumber=$rec->{conodenumber};
+   my $customer=$rec->{customer};
+   my $amsctodo=$self->{amsctodocache};
+
+   my $psp=$self->getPersistentModuleObject("tssapp01::psp");
+
+   $psp->SetFilter({name=>\$conumber});
+   my ($psprec,$msg)=$psp->getOnlyFirst(qw(bpmark status));
+
+   if (defined($psprec) && $psprec->{bpmark} eq "WIB"){
+      # CustomerLink/SC Location Handling only for WIP PSP Elements
+      my $scloc=$self->getPersistentModuleObject("tsacinv::sclocation");
+      $scloc->SetFilter({name=>\$customer});
+      my ($sclocrec,$msg)=$scloc->getOnlyFirst(qw(id name sclocationid));
+      if (!defined($sclocrec)){
+         my $msgtoken="MISSSCLOC:$customer";
+         if (!exists($amsctodo->{$msgtoken})){
+            $amsctodo->{$msgtoken}++;
+            printf AMTODO (
+               "Message: %s to ServiceCenter-Operating\n\n".
+                   "The ServiceCenter Location '$customer' is\n".
+                   "missing. Please create a new SC Location\n".
+                   "with the following parameters:\n\n".
+                   " Name:          $customer\n".
+                   " SC-LocationID: 3863.****.****\n".
+                   " Company:       DEUTSCHE TELEKOM\n".
+                   " SubCompany:    $customer\n".
+               "\n%s\n\n",$msgtoken,"-" x 70);
+         }
+         
+         
+      }
+      else{
+         my $amcust=$self->getPersistentModuleObject("tsacinv::customer");
+         $amcust->SetFilter({name=>\$customer});
+         my ($amcustrec,$msg)=$amcust->getOnlyFirst(qw(name 
+                                                       defaultsclocationid
+                                                       defaultsclocation));
+         if (defined($amcustrec)){
+            if ($amcustrec->{defaultsclocationid} ne $sclocrec->{id}){
+
+               my $msgtoken="WRONGSCLOC:$customer";
+               if (!exists($amsctodo->{$msgtoken})){
+                  $amsctodo->{$msgtoken}++;
+                  printf AMTODO (
+                     "Message: %s to AssetManager-Operating\n\n".
+                         "The Customer entry '$customer' in AssetManager\n".
+                         "have a wrong DefaultSCLocation. Please change\n".
+                         "the DefaultSCLocation for '$customer' at\n".
+                         "'Customers and Security Units' from ...\n".
+                         "  '$amcustrec->{defaultsclocation}'\n".
+                         "... to ...\n".
+                         "  '$customer'\n".
+                     "\n%s\n\n",$msgtoken,"-" x 70);
+               }
+            }
+            else{
+               # now check the customerlink in costcenter AM
+               my $amco=$self->getPersistentModuleObject("tsacinv::costcenter");
+               $amco->SetFilter({name=>\$conodenumber});
+               my ($amcorec,$msg)=$amco->getOnlyFirst(qw(name customer));
+               if (!defined($amcorec)){
+                  my $msgtoken="MISSCO:$conodenumber";
+                  if (!exists($amsctodo->{$msgtoken})){
+                     $amsctodo->{$msgtoken}++;
+                     printf AMTODO (
+                        "Message: %s to AssetManager-Operating\n\n".
+                           "The costcenter entry for '$conodenumber' in AssetManager\n".
+                            "is missing.\n".
+                        "\n%s\n\n",$msgtoken,"-" x 70);
+                  }
+               }
+               else{
+                  if ($amcorec->{customer} ne $customer){
+                     my $msgtoken="WRONGCUSTLNK:$customer";
+                     if (!exists($amsctodo->{$msgtoken})){
+                        $amsctodo->{$msgtoken}++;
+                        printf AMTODO (
+                           "Message: %s to SchmidtBirgit\n\n".
+                               "The CustomerLink at costcenter '$conodenumber'\n".
+                               "in AssetManager is wrong.\n".
+                               "Please change the CustomerLink for '$conodenumber' at\n".
+                               "'Cost Centers' from ...\n".
+                               "  '$amcorec->{customer}'\n".
+                               "... to ...\n".
+                               "  '$customer'\n".
+                           "\n%s\n\n",$msgtoken,"-" x 70);
+                     }
+                  }
+               }
+            }
+         }
+         else{
+            my $msgtoken="MISSCUST:$customer";
+            if (!exists($amsctodo->{$msgtoken})){
+               $amsctodo->{$msgtoken}++;
+               printf AMTODO (
+                  "Message: %s to AssetManager-Operating\n\n".
+                     "The Customer entry '$customer' in AssetManager\n".
+                     "is missing. Please create a new Entry\n".
+                     "in 'Customers and Security Units' with\n".
+                     "with the following parameters:\n\n".
+                     " Unit Identifier:   $customer\n".
+                     " Identifier:        $customer\n".
+                     " Description:       $customer\n".
+                     " Type:              Customer\n".
+                     " DefaultSCLocation: $customer\n".
+                  "\n%s\n\n",$msgtoken,"-" x 70);
+            }
+         }
+      }
+   }
+}
+
+
+
 
 sub sendFileToAssetManagerOnlineInterface
 {
