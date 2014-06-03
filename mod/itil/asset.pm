@@ -344,7 +344,7 @@ sub new
                 group         =>'upd',
                 depend        =>['deprstart'],
                 label         =>'it is posible to refresh hardware',
-                value         =>[0,10,20,30,99],
+                value         =>[0,5,10,20,30,99],
                 transprefix   =>'DENUPD.',
                 dataobjattr   =>'asset.denyupd'),
 

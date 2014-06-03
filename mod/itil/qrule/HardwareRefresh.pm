@@ -27,7 +27,7 @@ Somit gilt:
 
  RefreshData = DeadLine oder denyupdvalidto falls denyupdvalidto gültig ist.
 
-Ein DataIssue wird erzeugt, wenn RefreshData - 6 Monate erreicht ist.
+Ein DataIssue wird erzeugt, wenn RefreshData überschritten wird.
 
 
 
@@ -129,6 +129,8 @@ sub qcheckRecord
 
       if ($rec->{refreshinfo3} eq ""  &&      # info 3 level Ende-10 Monate
           defined($to_refresh) && $to_refresh->{days}<300){
+         my $late="" if ($to_deadline->{days}<300-30);
+         $late="less then" if ($to_deadline->{days}<300-30);
          my $newrec={refreshinfo3=>NowStamp("en")};
          $newrec->{refreshinfo1}=NowStamp("en") if ($rec->{refreshinfo1} eq "");
          $newrec->{refreshinfo2}=NowStamp("en") if ($rec->{refreshinfo2} eq "");
@@ -144,9 +146,13 @@ sub qcheckRecord
                   my $lang=$dataobj->Lang();
                   my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
                                                                 $lang."day");
+                  my $m="24";
+                  if ($late ne ""){
+                     $m=$self->T($late)." ".$m;
+                  }
                   my $subject=sprintf($self->T(
-                              "Hardware %s needs to be refreshed in %d months"),
-                              $rec->{name},10);
+                              "Hardware %s needs to be refreshed in %s months"),
+                              $rec->{name},$m);
                   my $text=$dataobj->getParsedTemplate(
                                $notifycontrol->{useTemplate},
                                {
@@ -162,6 +168,8 @@ sub qcheckRecord
       }
       elsif ($rec->{refreshinfo2} eq "" &&    # info 2 level Ende-18 Monate
           defined($to_refresh) && $to_refresh->{days}<540){
+         my $late="" if ($to_deadline->{days}<540-30);
+         $late="less then" if ($to_deadline->{days}<540-30);
          my $newrec={refreshinfo2=>NowStamp("en")};
          $newrec->{refreshinfo1}=NowStamp("en") if ($rec->{refreshinfo1} eq "");
          $self->finalizeNotifyParam($rec,\%notifyparam,"refreshinfo2");
@@ -177,9 +185,13 @@ sub qcheckRecord
                   my $lang=$dataobj->Lang();
                   my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
                                                                 $lang."day");
+                  my $m="18";
+                  if ($late ne ""){
+                     $m=$self->T($late)." ".$m;
+                  }
                   my $subject=sprintf($self->T(
-                              "Hardware %s needs to be refreshed in %d months"),
-                              $rec->{name},18);
+                              "Hardware %s needs to be refreshed in %s months"),
+                              $rec->{name},$m);
                   my $text=$dataobj->getParsedTemplate(
                                $notifycontrol->{useTemplate},
                                {
@@ -196,6 +208,8 @@ sub qcheckRecord
       }
       elsif ($rec->{refreshinfo1} eq "" &&    # info 1 level Ende-24 Monate
           defined($to_deadline) && $to_deadline->{days}<730){
+         my $late="" if ($to_deadline->{days}<730-30);
+         $late="less then" if ($to_deadline->{days}<730-30);
          my $newrec={refreshinfo1=>NowStamp("en")};
          $self->finalizeNotifyParam($rec,\%notifyparam,"refreshinfo1");
          if ($dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}})){
@@ -210,9 +224,13 @@ sub qcheckRecord
                   my $lang=$dataobj->Lang();
                   my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
                                                                 $lang."day");
+                  my $m="24";
+                  if ($late ne ""){
+                     $m=$self->T($late)." ".$m;
+                  }
                   my $subject=sprintf($self->T(
-                              "Hardware %s needs to be refreshed in %d months"),
-                              $rec->{name},24);
+                              "Hardware %s needs to be refreshed in %s months"),
+                              $rec->{name},$m);
                   my $text=$dataobj->getParsedTemplate(
                                $notifycontrol->{useTemplate},
                                {
@@ -228,7 +246,6 @@ sub qcheckRecord
       }
 
       if (defined($to_refresh) && $to_refresh->{days}<-30){
-         # Nur noch 6 Monate - jetzt DataIssue erzeugen!
          my $msg="hardware is out of date - refresh is necessary";
          push(@dataissue,$msg);
          push(@qmsg,$msg);
