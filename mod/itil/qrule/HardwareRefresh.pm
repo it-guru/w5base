@@ -227,7 +227,7 @@ sub qcheckRecord
          }
       }
 
-      if (defined($to_refresh) && $to_refresh->{days}<180){
+      if (defined($to_refresh) && $to_refresh->{days}>30){
          # Nur noch 6 Monate - jetzt DataIssue erzeugen!
          my $msg="hardware is out of date - refresh is necessary";
          push(@dataissue,$msg);
