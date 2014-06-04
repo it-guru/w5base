@@ -70,3 +70,9 @@ verantwortet weiterhin die Steuerung
 und das Monitoring der Leistungserbringung.
 ',en=>'
 '},
+'conumber'=>{de=>'
+Kontierungsobjekt für die Verbuchung
+von betrieblichen Aufwänden (anwendungsnahe
+Leistungen), z.B. Zeitaufwände des Betriebsteams
+',en=>'
+'},
