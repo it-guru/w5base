@@ -391,13 +391,14 @@ sub new
       new kernel::Field::MatrixHeader(
                 name          =>'slamatrix',
                 group         =>'sla',
-                label         =>[undef,'requested','implemented','current']),
+                label         =>[undef,'requested','implemented','current',
+                                 'threshold warn','threshold crit']),
 
       new kernel::Field::Duration(
                 name          =>'requ_mtbf',
                 group         =>'sla',
                 visual        =>'hh:mm',
-                label         =>'MTBF',
+                label         =>'MTBF in h',
                 align         =>'right',
                 searchable    =>0,
                 extLabelPostfix=>\&extLabelPostfixRequested,
@@ -408,7 +409,7 @@ sub new
                 group         =>'sla',
                 visual        =>'hh:mm',
                 searchable    =>0,
-                label         =>'MTBF',
+                label         =>'MTBF in h',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixImplemented,
                 dataobjattr   =>$worktable.'.impl_mtbf'),
@@ -418,18 +419,51 @@ sub new
                 group         =>'sla',
                 visual        =>'hh:mm',
                 searchable    =>0,
-                label         =>'MTBF',
+                label         =>'MTBF in h',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixCurrent,
                 dataobjattr   =>$worktable.'.curr_mtbf'),
 
+      new kernel::Field::Number(
+                name          =>'threshold_warn_mtbf',
+                group         =>'sla',
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   return(undef) if ($mode eq "edit");
+                   return('0.92')
+                },
+                precision     =>2, 
+                label         =>'MTBF',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>$worktable.'.th_warn_mtbf'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_crit_mtbf',
+                group         =>'sla',
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   return(undef) if ($mode eq "edit");
+                   return('0.97')
+                },
+                precision     =>2, 
+                label         =>'MTBF',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>$worktable.'.th_crit_mtbf'),
 
       new kernel::Field::Duration(
                 name          =>'requ_ttr',
                 group         =>'sla',
                 visual        =>'hh:mm',
                 searchable    =>0,
-                label         =>'TTR',
+                label         =>'TTR in h',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixRequested,
                 dataobjattr   =>$worktable.'.requ_ttr'),
@@ -439,7 +473,7 @@ sub new
                 group         =>'sla',
                 visual        =>'hh:mm',
                 searchable    =>0,
-                label         =>'TTR',
+                label         =>'TTR in h',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixImplemented,
                 dataobjattr   =>$worktable.'.impl_ttr'),
@@ -449,16 +483,50 @@ sub new
                 group         =>'sla',
                 visual        =>'hh:mm',
                 searchable    =>0,
-                label         =>'TTR',
+                label         =>'TTR in h',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixCurrent,
                 dataobjattr   =>$worktable.'.curr_ttr'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_warn_ttr',
+                group         =>'sla',
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   return(undef) if ($mode eq "edit");
+                   return('0.92')
+                },
+                precision     =>2, 
+                label         =>'TTR',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>$worktable.'.th_warn_ttr'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_crit_ttr',
+                group         =>'sla',
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   return(undef) if ($mode eq "edit");
+                   return('0.97')
+                },
+                precision     =>2, 
+                label         =>'TTR',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>$worktable.'.th_crit_ttr'),
 
       new kernel::Field::MatrixHeader(
                 name          =>'monimatrix',
                 group         =>'moni',
                 label         =>[undef,'requested','implemented','current',
-                                 'threshold crit','threshold warn']),
+                                 'threshold warn','threshold crit']),
 
       new kernel::Field::Percent(
                 name          =>'requ_avail_p',
@@ -494,7 +562,14 @@ sub new
                 name          =>'threshold_warn_avail',
                 group         =>'moni',
                 precision     =>2, 
-                default       =>'0.97',
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   return(undef) if ($mode eq "edit");
+                   return('0.92')
+                },
                 label         =>'avalability',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
@@ -504,7 +579,14 @@ sub new
                 name          =>'threshold_crit_avail',
                 group         =>'moni',
                 precision     =>2, 
-                default       =>'0.92',
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   return(undef) if ($mode eq "edit");
+                   return('0.97')
+                },
                 label         =>'avalability',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
@@ -539,7 +621,14 @@ sub new
       new kernel::Field::Number(
                 name          =>'threshold_warn_respti',
                 group         =>'moni',
-                default       =>'0.97',
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   return(undef) if ($mode eq "edit");
+                   return('0.97')
+                },
                 precision     =>2, 
                 label         =>'responsetime',
                 align         =>'right',
@@ -549,7 +638,14 @@ sub new
       new kernel::Field::Number(
                 name          =>'threshold_crit_respti',
                 group         =>'moni',
-                default       =>'0.92',
+                default       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   return(undef) if ($mode eq "edit");
+                   return('0.92')
+                },
                 precision     =>2, 
                 label         =>'responsetime',
                 align         =>'right',
@@ -641,6 +737,7 @@ sub new
    $self->setDefaultView(qw(fullname cistatus application));
    return($self);
 }
+
 
 sub extLabelPostfixRequested
 {
