@@ -101,7 +101,6 @@
 'AL_TCom.proc.softmgmt'=>{de=>'Software Management',en=>'Software Management'},
 'AL_TCom.proc.licman'=>{de=>'Lizenz Management',en=>'License Management'},
 'AL_TCom.proc.licman.amtelitsys'=>{de=>'AM TelIT Sys',en=>'AM TelIT Sys'},
-'AL_TCom.proc.applpriochange'=>{de=>'Prio Anpassung',en=>'Prio Change'},
 'AL_TCom.proc.softmgmt.analyse'=>{de=>'Analyse',en=>'Analyse'},
 'AL_TCom.proc.softmgmt.software'=>{de=>'Verkn. Software',en=>'Software Rel.'},
 'Reporting.amore'=>{de=>'@more',en=>'@more'},

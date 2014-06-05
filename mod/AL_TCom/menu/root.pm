@@ -503,11 +503,6 @@ sub Init
                       "itil::lnksoftwaresoftwareset",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("AL_TCom.proc.applpriochange",
-                      "AL_TCom::applpriochange",
-                      func=>'MainWithNew',
-                      defaultacl=>['admin']);
-
    $self->RegisterObj("AL_TCom.proc.mgmtitemgroup",
                       "itil::mgmtitemgroup",
                       defaultacl=>['valid_user']);
