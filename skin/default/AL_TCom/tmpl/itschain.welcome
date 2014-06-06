@@ -1,5 +1,12 @@
-<table align="center" width="650px">
-<tr><td>
+<table align="center" width="650px" cellspacing="10" style="margin-top:20px;">
+
+<tr>
+<th colspan="2">IT-Service Katalog Management</th>
+</tr>
+
+<tr>
+<td><img src="../load/itservice.png"></td>
+<td>
 <h4 style="margin-top:20px;">Target</h4>
 The IT-Service catalogue summarizes for all IT-service-objects of IT-services the relevant data for technical and organizational description and with the business partner agreed code numbers for all IT-service-objects of IT-services.<br />
 In further stages the aim is also to represent the costs of operation and failure. 
@@ -13,9 +20,11 @@ In further stages the aim is also to represent the costs of operation and failur
   <li>Provide structured information on different context levels</li>
   <li>Provision of different reports in print and exportable formats</li>
  </ul>
-</td></tr>
+</td>
+</tr>
+
 <tr>
-<td align="center" valign="top">
+<td colspan="2" align="center" valign="top">
 <input type=button onclick="openFAQ(this);"
        style='width:250px;padding:5px;margin:10px;background:silver;'
        value="further Informations">
