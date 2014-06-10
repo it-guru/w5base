@@ -55,6 +55,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 label         =>'Modification-Date',
+                timezone      =>'CET',
                 dataobjattr   =>'screlationm1.sysmodtime'),
 
       new kernel::Field::Interface(
