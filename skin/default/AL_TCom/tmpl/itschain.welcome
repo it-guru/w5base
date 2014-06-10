@@ -1,11 +1,11 @@
 <table align="center" width="650px" cellspacing="10" style="margin-top:20px;">
 
 <tr>
-<th colspan="2">IT-Service Katalog Management</th>
+<td rowspan="2" width="240px"><img src="../load/itservice.png"></td>
+<td><h2>IT-Service Katalog Management</h2></td>
 </tr>
 
 <tr>
-<td><img src="../load/itservice.png"></td>
 <td>
 <h4 style="margin-top:20px;">Target</h4>
 The IT-Service catalogue summarizes for all IT-service-objects of IT-services the relevant data for technical and organizational description and with the business partner agreed code numbers for all IT-service-objects of IT-services.<br />

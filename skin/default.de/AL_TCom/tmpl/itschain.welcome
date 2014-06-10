@@ -1,11 +1,12 @@
 <table align="center" width="650px" cellspacing="10" style="margin-top:20px;">
 
+
 <tr>
-<th colspan="2">IT-Service Katalog Management</th>
+<td rowspan="2" width="240px"><img src="../load/itservice.png"></td>
+<td><h2>IT-Service Katalog Management</h2></td>
 </tr>
 
 <tr>
-<td><img src="../load/itservice.png"></td>
 <td>
 <h4>Ziel</h4>
 Der IT-ServiceKatalog fasst für alle IT-ServiceObjekte der IT-Services die relevanten Daten zur fachlichen und organisatorische Beschreibung, sowie die mit dem Business-Partner vereinbarten Kennzahlen zusammen.<br />
