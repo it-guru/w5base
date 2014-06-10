@@ -41,6 +41,7 @@ sub new
 
       new kernel::Field::Date(      name       =>'timestamp',
                                     label      =>'Timestamp',
+                                    timezone   =>'CET',
                                     htmlwidth  =>'200px',
                                     dataobjattr=>'approvallogm1.sysmodtime'),
 
