@@ -36,8 +36,12 @@ sub Init
 
    $self->RegisterObj("itu.dina",
                       "tmpl/welcome",
-                      defaultacl=>['admin']);
+                      defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.dina.oralicense",
+                      "tsdina::oralicense",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.dina.dictionary",
                       "tsdina::DBDataDiconary",
                       defaultacl=>['admin']);
