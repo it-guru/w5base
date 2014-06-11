@@ -278,6 +278,11 @@ sub isWriteValid
    return(undef);
 }
 
+sub isUploadValid
+{
+   return(undef);
+}
+
 sub getDetailBlockPriority
 {
    my $self=shift;
