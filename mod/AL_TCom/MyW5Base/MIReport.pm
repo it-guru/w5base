@@ -225,6 +225,11 @@ sub Result
                           $f3=~m/^DTAG.TSI\.{0,1}/){
                          return("T-Systems");
                       }
+                      if ($f1 eq "EVre.both" &&
+                          $f2=~m/^DTAG.TDG\.{0,1}/ &&
+                          $f3=~m/^DTAG.TSI.TI\.{0,1}/){
+                         return("Customer/Telekom IT");
+                      }
                    }
                    return("invalid");
                 },
