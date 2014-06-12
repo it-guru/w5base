@@ -34,15 +34,19 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("itu.dina",
+   $self->RegisterObj("itu.tsdina",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itu.dina.oralicense",
+   $self->RegisterObj("itu.tsdina.oralicense",
                       "tsdina::oralicense",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.dina.dictionary",
+#   $self->RegisterObj("itu.tsdina.system",
+#                      "tsdina::system",
+#                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsdina.dictionary",
                       "tsdina::DBDataDiconary",
                       defaultacl=>['admin']);
 

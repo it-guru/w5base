@@ -40,6 +40,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'instanceid',
                 label         =>'Instance ID',
+                htmldetail    =>0,
                 dataobjattr   =>'dina_inst_id'),
 
       new kernel::Field::Text(
