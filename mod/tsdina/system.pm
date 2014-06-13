@@ -1,4 +1,4 @@
-package tsdina::oralicense;
+package tsdina::system;
 #  W5Base Framework
 #  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
 #
@@ -37,97 +37,89 @@ sub new
                 htmlwidth     =>'1%',
                 label         =>'No.'),
 
-      new kernel::Field::Id(
-                name          =>'instanceid',
-                label         =>'Instance ID',
-                htmldetail    =>0,
-                dataobjattr   =>'dina_inst_id'),
-
-      new kernel::Field::Text(
-                name          =>'edition',
-                label         =>'Edition',
-                dataobjattr   =>'edition'),
-
-      new kernel::Field::Text(
-                name          =>'version',
-                label         =>'Version',
-                dataobjattr   =>'version'),
-
-      new kernel::Field::Text(
-                name          =>'dbname',
-                label         =>'DB Name',
-                dataobjattr   =>'db_name'),
-
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Instance Name',
-                dataobjattr   =>'instance_name'),
-
-      new kernel::Field::Date(
-                name          =>'monitordate',
-                label         =>'Monitor Date',
-                dataobjattr   =>'monitor_date'),
-
-      new kernel::Field::Text(
-                name          =>'systemname',
-                group         =>'system',
                 label         =>'Systemname',
-                dataobjattr   =>'host_name'),
+                dataobjattr   =>'servername'),
+
+      new kernel::Field::Id(
+                name          =>'id',
+                label         =>'SystemID',
+                dataobjattr   =>"systemid"),
 
       new kernel::Field::Text(
-                name          =>'systemid',
-                group         =>'system',
-                label         =>'SystemID',
-                dataobjattr   =>'systemid',
-                weblinkto     =>'tsdina::system',
-                weblinkon     =>['systemid'=>'id'],
-      ),
+                name          =>'w5baseid',
+                label         =>'W5BaseID',
+                weblinkto     =>'itil::system',
+                weblinkon     =>['w5baseid'=>'id'],
+                dataobjattr   =>'w5baseid'),
+
+      new kernel::Field::Text(
+                name          =>'hostid',
+                label         =>'HostID',
+                htmldetail    =>0,
+                dataobjattr   =>'host_id'),
 
       new kernel::Field::Text(
                 name          =>'platform',
-                group         =>'system',
-                htmldetail    =>0,
                 label         =>'Platform',
-                dataobjattr   =>'platform_name'),
-
-      new kernel::Field::Number(
-                name          =>'physicalcores',
-                group         =>'system',
-                htmldetail    =>0,
-                label         =>'Physical Cores',
-                dataobjattr   =>'numberphysicalcores'),
+                vjointo       =>'tsdina::oralicense',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['platform'],
+                weblinkto     =>'NONE',
+      ),
 
       new kernel::Field::Number(
                 name          =>'onlinevirtcpu',
-                group         =>'system',
-                htmldetail    =>0,
                 label         =>'Online Virtual CPUs',
-                dataobjattr   =>'online_virtual_cpus'),
+                vjointo       =>'tsdina::oralicense',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['onlinevirtcpu'],
+                weblinkto     =>'NONE',
+      ),
 
       new kernel::Field::Text(
                 name          =>'lpartype',
                 group         =>'lpar',
-                htmldetail    =>0,
                 label         =>'LPAR Type',
-                dataobjattr   =>'lpar_type'),
+                vjointo       =>'tsdina::oralicense',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['lpartype'],
+                weblinkto     =>'NONE',
+      ),
 
       new kernel::Field::Text(
                 name          =>'lparmode',
                 group         =>'lpar',
-                htmldetail    =>0,
                 label         =>'LPAR Mode',
-                dataobjattr   =>'lpar_mode'),
+                vjointo       =>'tsdina::oralicense',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['lparmode'],
+                weblinkto     =>'NONE',
+      ),
 
-      new kernel::Field::Number(
+      new kernel::Field::Text(
                 name          =>'lparsharedpoolid',
                 group         =>'lpar',
-                htmldetail    =>0,
                 label         =>'LPAR Shared Pool ID',
-                dataobjattr   =>'lpar_shared_pool_id'),
+                vjointo       =>'tsdina::oralicense',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['lparsharedpoolid'],
+                weblinkto     =>'NONE',
+      ),
+
+      new kernel::Field::SubList(
+                name          =>'oralicense',
+                label         =>'Oracle license info',
+                group         =>'oralicenseinfo',
+                vjointo       =>'tsdina::oralicense',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>[qw(dbname name version)],
+                forwardSearch =>1,
+      ),
 
    );
-   $self->setDefaultView(qw(dbname name monitordate));
-
+   $self->setDefaultView(qw(name id platform));
    return($self);
 }
 
@@ -144,7 +136,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="darwin_ora_license_info_vw";
+   my $from="dina_darwin_map_vw";
    return($from);
 }
 
@@ -154,7 +146,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","system");
+   return("header","default");
 }
 
 sub isQualityCheckValid
@@ -168,7 +160,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/licproduct.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 }
 
 sub isViewValid
@@ -182,6 +174,8 @@ sub isUploadValid
 {
    return(0);
 }
+
+
 
 
 1;

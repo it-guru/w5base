@@ -38,13 +38,13 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.tsdina.system",
+                      "tsdina::system",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.tsdina.oralicense",
                       "tsdina::oralicense",
                       defaultacl=>['valid_user']);
-
-#   $self->RegisterObj("itu.tsdina.system",
-#                      "tsdina::system",
-#                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("itu.tsdina.dictionary",
                       "tsdina::DBDataDiconary",

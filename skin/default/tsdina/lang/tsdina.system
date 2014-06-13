@@ -1,0 +1,6 @@
+'tsdina::system'=>{de=>'DINA System',en=>'DINA System'},
+'fieldgroup.oralicenseinfo'=>{de=>'Oracle Lizenz Information',
+                              en=>'Oracle license information'},
+'fieldgroup.lpar'=>{de=>'LPAR Information',en=>'LPAR information'},
+'Platform'=>{de=>'Plattform'},
+'Oracle license info'=>{de=>'Oracle Lizenz Info'},
