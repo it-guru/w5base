@@ -30,28 +30,42 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'acassignmentgroupid',
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'lassignmentid'),
+
       new kernel::Field::TextDrop(
                 name          =>'acassingmentgroup',
                 label         =>'AssetManager Assignmentgroup',
                 group         =>'admin',
                 weblinkto     =>'tsacinv::group',
-                weblinkon     =>['acassingmentgroup'=>'name'],
+                weblinkon     =>['acassignmentgroupid'=>'lgroupid'],
                 searchable    =>0,
                 readonly      =>1,
                 async         =>'1',
+                depend        =>['acassignmentgroupid'],
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'assignmentgroup'),
+
+      new kernel::Field::Link(
+                name          =>'aciassignmentgroupid',
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'lincidentagid'),
 
       new kernel::Field::TextDrop(
                 name          =>'aciassignmentgroup',
                 label         =>'AM Incident-Assignmentgroup',
                 group         =>'admin',
                 weblinkto     =>'tsacinv::group',
-                weblinkon     =>['aciassignmentgroup'=>'name'],
+                weblinkon     =>['aciassignmentgroupid'=>'lgroupid'],
                 searchable    =>0,
                 readonly      =>1,
                 async         =>'1',
+                depend        =>['aciassignmentgroupid'],
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'iassignmentgroup'),
