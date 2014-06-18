@@ -69,15 +69,6 @@ sub new
                 weblinkto     =>'NONE',
       ),
 
-      new kernel::Field::Number(
-                name          =>'onlinevirtcpu',
-                label         =>'Online Virtual CPUs',
-                vjointo       =>'tsdina::oralicense',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['onlinevirtcpu'],
-                weblinkto     =>'NONE',
-      ),
-
       new kernel::Field::Text(
                 name          =>'lpartype',
                 group         =>'lpar',
@@ -105,6 +96,16 @@ sub new
                 vjointo       =>'tsdina::oralicense',
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['lparsharedpoolid'],
+                weblinkto     =>'NONE',
+      ),
+
+      new kernel::Field::Number(
+                name          =>'onlinevirtcpu',
+                group         =>'lpar',
+                label         =>'Online Virtual CPUs',
+                vjointo       =>'tsdina::oralicense',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['onlinevirtcpu'],
                 weblinkto     =>'NONE',
       ),
 
@@ -147,13 +148,6 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default");
-}
-
-sub isQualityCheckValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(0);
 }
 
 sub getRecordImageUrl

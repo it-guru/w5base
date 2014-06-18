@@ -80,8 +80,7 @@ sub new
                 label         =>'SystemID',
                 dataobjattr   =>'systemid',
                 weblinkto     =>'tsdina::system',
-                weblinkon     =>['systemid'=>'id'],
-      ),
+                weblinkon     =>['systemid'=>'id']),
 
       new kernel::Field::Text(
                 name          =>'platform',
