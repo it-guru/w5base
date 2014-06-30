@@ -161,6 +161,12 @@ sub new
                 label         =>'AssetManager PortfolioID',
                 dataobjattr   =>'amtsiswinstance.lportfolioid'),
 
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amportfolio.dtlastmodif'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
