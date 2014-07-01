@@ -1,3 +1,3 @@
 'finance::w5stat::base::custcontract'=>{de=>'Config Management (CFM);Kundenverträge',en=>'Config Management (CFM);Customer contracts'},
 'count of customer contracts'=>{de=>'Anzahl Kundenverträge'},
-'Count of Customer Contract Config-Items'=>{de=>'Anzahl Kundenvetrags Config-Items'},
+'Count of Customer Contract Config-Items'=>{de=>'Anzahl Kundenvertrags Config-Items'},
