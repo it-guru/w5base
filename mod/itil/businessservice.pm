@@ -930,6 +930,13 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   my $autogenmode=0;
+
+   if (!defined($oldrec) && keys(%$newrec)==1 && defined($newrec->{applid})){
+      $autogenmode++;
+   }
+
+
 
    if (exists($newrec->{version}) && $newrec->{version} ne ""){
       if (!($newrec->{version}=~m/^\d{1,2}(\.\d{1,2}){0,4}$/)){
@@ -993,9 +1000,11 @@ sub Validate
       }
    }
    else{
-      if (!$self->isParentWriteable($applid)){
-         $self->LastMsg(ERROR,"no write access to specified application");
-         return(0);
+      if (!$autogenmode){
+         if (!$self->isParentWriteable($applid)){
+            $self->LastMsg(ERROR,"no write access to specified application");
+            return(0);
+         }
       }
    }
  
