@@ -122,6 +122,32 @@ sub new
                 label         =>'ICTO internal ID',
                 dataobjattr   =>'appl.ictoid'),
 
+      new kernel::Field::Select(
+                name          =>'controlcenter',
+                group         =>'monisla',
+                label         =>'responsible ControlCenter',
+                allowempty    =>1,
+                vjointo       =>'base::grp',
+                vjoinbase     =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @posiblegroups=(12797577180002,12788074530009);
+                   if ($current->{businessteamid} ne ""){
+                      push(@posiblegroups,$current->{businessteamid});
+                   }
+                   return({grpid=>\@posiblegroups,cistatusid=>'4'});
+                },
+                vjoinon       =>['controlcenterid'=>'grpid'],
+                depend        =>['businessteamid'],
+                vjoindisp     =>'fullname',
+                htmleditwidth =>'280px'),
+
+      new kernel::Field::Link(
+                name          =>'controlcenterid',
+                group         =>'control',
+                label         =>'ControlCenter ID',
+                dataobjattr   =>'appl.controlcenter'),
+
    );
  
    $self->AddFields(

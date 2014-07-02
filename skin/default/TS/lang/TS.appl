@@ -8,3 +8,4 @@
 'Projectmanager'=>{de=>'Project Manager IT-System'},
 'ICTO Objectname'=>{de=>'ICTO Objektbezeichnung'},
 'unable to identify archictecture record'=>{de=>'Fehler bei der Identifikation des Architektur Datensatzes'},
+'responsible ControlCenter'=>{de=>'verantwortliches ControlCenter'},

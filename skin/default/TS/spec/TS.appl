@@ -13,4 +13,13 @@ bei Changes für diese Anwendung mindestens
 verwendet werden soll. Dies ist in
 der Regel die Approvergroup des betreffenden
 Betriebsteams.
+'},
+'controlcenter'=>{de=>'
+Geben Sie die Bezeichnung des Teams ein, 
+das für die Bearbeitung der Events im 
+First Level Support zuständig ist. In der
+Regel ist dass das Application Control 
+Center. Wenn die Events von einem 
+Betriebsteam bearbeitet werden, tragen 
+sie diese Team-Bezeichnung ein.
 '}
