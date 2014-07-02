@@ -377,6 +377,7 @@ sub Validate
    if (exists($newrec->{data})){
       my $tf=new HTML::TagFilter(strip_comments => 1,
                                  verbose=>1,
+                                 skip_mailto_entification=>1,
                                  log_rejects => 1);  
       $tf->clear_rules();
       $tf->allow_tags({
