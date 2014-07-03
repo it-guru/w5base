@@ -838,7 +838,7 @@ sub preProcessReadedRecord
       $W5V2::OperationContext=$oldcontext;
       $rec->{id}=$id;
       $rec->{cistatusid}='4';
-      $rec->{replkeypri}="1970-01-01 00:00:00"
+      $rec->{replkeypri}="1970-01-01 00:00:00";
       $rec->{replkeysec}=$id;
    }
    return(undef);
