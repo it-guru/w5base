@@ -838,6 +838,8 @@ sub preProcessReadedRecord
       $W5V2::OperationContext=$oldcontext;
       $rec->{id}=$id;
       $rec->{cistatusid}='4';
+      $rec->{replkeypri}=NowStamp("en");
+      $rec->{replkeysec}=$id;
    }
    return(undef);
 }
@@ -932,7 +934,11 @@ sub Validate
 
    my $autogenmode=0;
 
-   if (!defined($oldrec) && keys(%$newrec)==1 && defined($newrec->{applid})){
+   if (!defined($oldrec) && 
+       ( (keys(%$newrec)==1 && defined($newrec->{applid})) ||
+         $W5V2::OperationContext eq "W5Server" ||
+         $W5V2::OperationContext eq "W5Replicate" ||
+         $W5V2::OperationContext eq "QualityCheck")){
       $autogenmode++;
    }
 
