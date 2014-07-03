@@ -120,7 +120,9 @@ sub getPersistentModuleObject    # kann u.U. demnächst durch die App.pm ersetzt
       my $m=getModuleObject($config,$module);
       $self->{$label}=$m
    }
-   $self->{$label}->ResetFilter();
+   if (defined($self->{$label}) && $self->{$label}->can("ResetFilter")){
+      $self->{$label}->ResetFilter();
+   }
    return($self->{$label});
 }
 

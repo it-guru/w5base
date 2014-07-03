@@ -687,6 +687,7 @@ sub Notify
 
    }
    my $user=getModuleObject($self->Config,"base::user");
+   my $grp=getModuleObject($self->Config,"base::grp");
    foreach my $target (qw(emailfrom emailto emailcc emailbcc)){
       if (exists($param{$target})){
          for(my $c=0;$c<=$#{$param{$target}};$c++){
@@ -702,6 +703,21 @@ sub Notify
              #     $param{$target}->[$c]='"invalid ref($param{$target}->[$c])" '.
              #                           '<null\@network>';
              #  }
+            }
+            elsif (my ($group)=
+                      $param{$target}->[$c]=~m/^groupmembers:(\S+)$/){ # w5group
+               $grp->ResetFilter();
+               $grp->SetFilter({fullname=>\$group,
+                                 cistatusid=>"<6"});
+               my ($grec)=$grp->getOnlyFirst(qw(users));
+               if (defined($grp)){
+                  $param{$target}->[$c]=undef;
+                  foreach my $u (@{$grec->{users}}){
+                     if (!in_array($param{$target},$u->{email})){
+                        push(@{$param{$target}},$u->{email});
+                     }
+                  }
+               }
             }
             elsif ($param{$target}->[$c]=~m/^W5SUPPORT$/){ # target central Sup
                $user->ResetFilter();

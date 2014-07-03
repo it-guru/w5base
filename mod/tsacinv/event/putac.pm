@@ -890,7 +890,11 @@ sub validateCostCenter4AssetManager
    my $customer=$rec->{customer};
    my $amsctodo=$self->{amsctodocache};
 
+   # oberste SCLocation der Deutschen Telekom (OS Mandant) in SM9 ist
+   # nach aktuellem Stand (05/2014) die SCLocationID 3863.0000.0000
+
    my $psp=$self->getPersistentModuleObject("tssapp01::psp");
+   my $start=$self->getPersistentModuleObject("base::start");
 
    $psp->SetFilter({name=>\$conumber});
    my ($psprec,$msg)=$psp->getOnlyFirst(qw(bpmark status));
@@ -901,19 +905,24 @@ sub validateCostCenter4AssetManager
       $scloc->SetFilter({name=>\$customer});
       my ($sclocrec,$msg)=$scloc->getOnlyFirst(qw(id name sclocationid));
       if (!defined($sclocrec)){
-         my $msgtoken="MISSSCLOC:$customer";
+         my $msgtoken="MISS_SCLOC:$customer";
          if (!exists($amsctodo->{$msgtoken})){
             $amsctodo->{$msgtoken}++;
-            printf AMTODO (
-               "Message: %s to ServiceCenter-Operating\n\n".
-                   "The ServiceCenter Location '$customer' is\n".
-                   "missing. Please create a new SC Location\n".
-                   "with the following parameters:\n\n".
-                   " Name:          $customer\n".
-                   " SC-LocationID: 3863.****.****\n".
-                   " Company:       DEUTSCHE TELEKOM\n".
-                   " SubCompany:    $customer\n".
-               "\n%s\n\n",$msgtoken,"-" x 70);
+            my $msgtext=sprintf("The ServiceCenter Location '$customer' is ".
+                                "missing. Please create a new SC Location ".
+                                "with the following parameters:\n\n".
+                                " Name:          $customer\n".
+                                " SC-LocationID: 3863.****.****\n".
+                                " Company:       DEUTSCHE TELEKOM\n".
+                                " SubCompany:    $customer\n");
+            $start->ToDoRequest(
+               undef,"SC-Location:$customer",
+               $msgtoken,$msgtext,
+               [
+                  '11634953080001'  # vogler
+               ]
+            );
+            printf AMTODO ($msgtext);
          }
          
          
@@ -930,16 +939,23 @@ sub validateCostCenter4AssetManager
                my $msgtoken="WRONGSCLOC:$customer";
                if (!exists($amsctodo->{$msgtoken})){
                   $amsctodo->{$msgtoken}++;
-                  printf AMTODO (
-                     "Message: %s to AssetManager-Operating\n\n".
-                         "The Customer entry '$customer' in AssetManager\n".
-                         "have a wrong DefaultSCLocation. Please change\n".
-                         "the DefaultSCLocation for '$customer' at\n".
-                         "'Customers and Security Units' from ...\n".
-                         "  '$amcustrec->{defaultsclocation}'\n".
-                         "... to ...\n".
-                         "  '$customer'\n".
-                     "\n%s\n\n",$msgtoken,"-" x 70);
+                  my $msgtext=sprintf(
+                     "The Customer entry '$customer' in AssetManager\n".
+                     "has a wrong DefaultSCLocation. Please change\n".
+                     "the DefaultSCLocation for '$customer' at\n".
+                     "'Customers and Security Units' from ...\n".
+                     "  '$amcustrec->{defaultsclocation}'\n".
+                     "... to ...\n".
+                     "  '$customer'\n"
+                  );
+                  $start->ToDoRequest(
+                     undef,"AM-Customer:$customer",
+                     $msgtoken,$msgtext,
+                     [
+                        '11634953080001'  # vogler
+                     ]
+                  );
+                  printf AMTODO ($msgtext);
                }
             }
             else{
@@ -951,11 +967,18 @@ sub validateCostCenter4AssetManager
                   my $msgtoken="MISSCO:$conodenumber";
                   if (!exists($amsctodo->{$msgtoken})){
                      $amsctodo->{$msgtoken}++;
-                     printf AMTODO (
-                        "Message: %s to AssetManager-Operating\n\n".
-                           "The costcenter entry for '$conodenumber' in AssetManager\n".
-                            "is missing.\n".
-                        "\n%s\n\n",$msgtoken,"-" x 70);
+                     my $msgtext=sprintf(
+                        "The costcenter entry for '$conodenumber' ".
+                        "in AssetManager is missing.\n"
+                     );
+                     $start->ToDoRequest(
+                        undef,"AM-CO:$conodenumber",
+                        $msgtoken,$msgtext,
+                        [
+                           '11634953080001'  # vogler
+                        ]
+                     );
+                     printf AMTODO ($msgtext);
                   }
                }
                else{
@@ -963,16 +986,24 @@ sub validateCostCenter4AssetManager
                      my $msgtoken="WRONGCUSTLNK:$customer";
                      if (!exists($amsctodo->{$msgtoken})){
                         $amsctodo->{$msgtoken}++;
-                        printf AMTODO (
-                           "Message: %s to SchmidtBirgit\n\n".
-                               "The CustomerLink at costcenter '$conodenumber'\n".
-                               "in AssetManager is wrong.\n".
-                               "Please change the CustomerLink for '$conodenumber' at\n".
-                               "'Cost Centers' from ...\n".
-                               "  '$amcorec->{customer}'\n".
-                               "... to ...\n".
-                               "  '$customer'\n".
-                           "\n%s\n\n",$msgtoken,"-" x 70);
+                        my $msgtext=sprintf(
+                           "The CustomerLink at costcenter '$conodenumber' ".
+                           "in AssetManager is wrong. ".
+                           "Please change the CustomerLink ".
+                           "for '$conodenumber' at ".
+                           "'Cost Centers' from ...\n".
+                           "  '$amcorec->{customer}'\n".
+                           "... to ...\n".
+                           "  '$customer'\n"
+                        );
+                        $start->ToDoRequest(
+                           undef,"AM-Customer:$customer",
+                           $msgtoken,$msgtext,
+                           [
+                              '11634953080001'  # vogler
+                           ]
+                        );
+                        printf AMTODO ($msgtext);
                      }
                   }
                }
@@ -982,8 +1013,7 @@ sub validateCostCenter4AssetManager
             my $msgtoken="MISSCUST:$customer";
             if (!exists($amsctodo->{$msgtoken})){
                $amsctodo->{$msgtoken}++;
-               printf AMTODO (
-                  "Message: %s to AssetManager-Operating\n\n".
+               my $msgtext=sprintf(
                      "The Customer entry '$customer' in AssetManager\n".
                      "is missing. Please create a new Entry\n".
                      "in 'Customers and Security Units' with\n".
@@ -992,8 +1022,16 @@ sub validateCostCenter4AssetManager
                      " Identifier:        $customer\n".
                      " Description:       $customer\n".
                      " Type:              Customer\n".
-                     " DefaultSCLocation: $customer\n".
-                  "\n%s\n\n",$msgtoken,"-" x 70);
+                     " DefaultSCLocation: $customer\n"
+               );
+               $start->ToDoRequest(
+                  undef,"AM-Customer:$customer",
+                  $msgtoken,$msgtext,
+                  [
+                     '11634953080001'  # vogler
+                  ]
+               );
+               printf AMTODO ($msgtext);
             }
          }
       }

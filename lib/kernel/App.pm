@@ -89,7 +89,9 @@ sub getPersistentModuleObject
       $self->{$label}=$m
    }
    if (defined($self->{$label})){
-      $self->{$label}->ResetFilter();
+      if ($self->{$label}->can("ResetFilter")){
+         $self->{$label}->ResetFilter();
+      }
    }
    return($self->{$label});
 }

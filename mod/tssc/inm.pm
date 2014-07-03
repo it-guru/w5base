@@ -52,6 +52,11 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'problemm1.brief_description'),
 
+      new kernel::Field::Link(
+                name          =>'rawname',
+                label         =>'Brief Description',
+                dataobjattr   =>'problemm1.brief_description'),
+
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',

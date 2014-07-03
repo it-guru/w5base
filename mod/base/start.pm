@@ -101,6 +101,42 @@ EOF
 }
 
 
+sub ToDoRequest
+{
+   my $self=shift;
+   my $class=shift;     # handler (or undef if base::workflow::todo)
+   my $id=shift;        # unique in class or undef
+   my $subject=shift;
+   my $text=shift;
+   my $target=shift;    # array
+
+   my @param=($class,$id,$subject,$text,$target);
+
+   if (!exists($self->{todohandler})){
+      $self->LoadSubObjs("todohandler","todohandler");
+   }
+   foreach my $k (keys(%{$self->{todohandler}})){
+      if ($self->{todohandler}->{$k}->can("preHandle")){
+         $self->{todohandler}->{$k}->preHandle(\@param);
+      }
+   }
+   my $processed=0; 
+   
+   foreach my $k (keys(%{$self->{todohandler}})){
+      if ($self->{todohandler}->{$k}->can("Handle")){
+         if ($self->{todohandler}->{$k}->Handle(@param)){
+            $processed++;
+            last;
+         }
+      }
+   }
+   if (!$processed){
+      msg(WARN,"not processed todo '$subject'");
+   }
+   return($processed);
+}
+
+
 
 
 
