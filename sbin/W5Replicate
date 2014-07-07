@@ -30,7 +30,7 @@ use List::Util 'shuffle';
 use Time::HiRes qw(usleep sleep);
 use DBI;
 use POSIX;
-use vars qw($opt_v $opt_h $opt_c $opt_t $opt_p 
+use vars qw($opt_v $opt_h $opt_c $opt_t $opt_p $opt_f
             $opt_s $opt_q $opt_l $configname);
 $|=1;
 my $startProcessPPID=getppid(); # there is need to check ppid at at start 
@@ -42,6 +42,7 @@ exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'tasks=i'=>\$opt_t,
                         'phase=s'=>\$opt_p,
                         'quietmode'=>\$opt_q,
+                        'force'=>\$opt_f,          # process if other sessions
                         'limittime=i'=>\$opt_l,
                         'debug'=>\$opt_v,
                         'help'=>\$opt_h,
@@ -456,10 +457,12 @@ sub getRequestedReplicationObjects
       "ACTION=sys_context('USERENV', 'ACTION') and ".
       "SID<>sys_context('USERENV', 'SID')");
    if ($#buffer!=-1){
-      $dbi->disconnect();
-      msg(ERROR,"other sessions in current schema are already active");
-      doShutdown();
-      exit(101);
+      if (!$opt_f){
+         $dbi->disconnect();
+         msg(ERROR,"other sessions in current schema are already active");
+         doShutdown();
+         exit(101);
+      }
    }
 
    my $rprec=getReplicatePartnerRec($Config,$partner);
@@ -636,6 +639,7 @@ sub objectReplicationPhase1
    while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
       my $syncstart;
+      my $replkey;
       my $replkeysec;
       my $cmd="select max(w5replkey) sstart from \"_$ctrl->{name}\"";
       foreach my $rec ($dbi->getHashList($cmd)){
@@ -648,7 +652,6 @@ sub objectReplicationPhase1
          my $cmd="select w5replkeypri p,w5replkeysec s ".
                  "from \"_$ctrl->{name}\" ".
                  "where w5replkey=?";
-         my $replkey;
          foreach my $rec ($dbi->getHashList($cmd,$syncstart)){
             $replkey=trim($rec->{'p'});
             $replkeysec=trim($rec->{'s'});
@@ -697,11 +700,13 @@ sub objectReplicationPhase1
          $dbi->doCmd("lock table \"_$ctrl->{name}\" IN EXCLUSIVE MODE");
          do{
             $oldreplkey=$srcrec->{'replkeypri'};
-            if (defined($replkeysec) && 
-                $srcrec->{'replkeysec'} ge $replkeysec &&
-                $srcrec->{$ctrl->{'idname'}} ne ""){
+            if ((defined($replkey) && $srcrec->{'replkeypri'} gt $replkey) || 
+                (defined($replkeysec) && 
+                 $srcrec->{'replkeysec'} ge $replkeysec &&
+                 $srcrec->{$ctrl->{'idname'}} ne "")){
                $candidates++;
                $replkeysec=undef;
+               $replkey=undef;
             }
             if (!defined($replkeysec)){   # seek to synkey1 position in stream
                if (!$dbi->InsertOrUpdate($ctrl,$srcrec)){
@@ -718,10 +723,12 @@ sub objectReplicationPhase1
          } until(!defined($srcrec));
          $dbi->commit();
       }
+printf STDERR ("fifi processed=$processed candidates=$candidates\n");
       if ($processed<2 && $candidates<2){
          last;
       }
    }
+exit();
 
    msg(INFO,"end:   phase 1 replication for $ctrl->{name}");
 
