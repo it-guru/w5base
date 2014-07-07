@@ -723,7 +723,6 @@ sub objectReplicationPhase1
          } until(!defined($srcrec));
          $dbi->commit();
       }
-printf STDERR ("fifi processed=$processed candidates=$candidates\n");
       if ($processed<2 && $candidates<2){
          last;
       }
