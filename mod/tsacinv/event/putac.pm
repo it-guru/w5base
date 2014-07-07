@@ -888,6 +888,9 @@ sub validateCostCenter4AssetManager
    my $conumber=$rec->{conumber};
    my $conodenumber=$rec->{conodenumber};
    my $customer=$rec->{customer};
+   if (!exists($self->{amsctodocache})){
+      $self->{amsctodocache}={};
+   }
    my $amsctodo=$self->{amsctodocache};
 
    # oberste SCLocation der Deutschen Telekom (OS Mandant) in SM9 ist
