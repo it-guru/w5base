@@ -345,7 +345,9 @@ sub new
                 vjointo       =>'itil::lnkbscomp',
                 allowcleanup  =>1,
                 vjoinon       =>['id'=>'businessserviceid'],
-                vjoindisp     =>['lnkpos','name',"xcomments"]),
+                vjoindisp     =>['lnkpos','name',"xcomments"],
+                vjoininhash   =>['sortkey','lnkpos','id','objtype',
+                                 'obj1id','obj2id','obj3id','comments']),
 
       new kernel::Field::SubList(
                 name          =>'servicecompappl',
@@ -678,7 +680,7 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>$worktable.'.srcload'),
 
-      new kernel::Field::Interface(
+      new kernel::Field::Text(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
