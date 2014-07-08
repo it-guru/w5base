@@ -865,7 +865,7 @@ sub getHtmlEditElements
       $sel.="value=\"\"></option>";
       foreach my $opt (split(/\|/,$irec->{addquestdata})){
          $sel.="<option ";
-         $sel.="selected " if ($a eq $opt);
+         $sel.="selected " if (trim($a) eq trim($opt));
          $sel.="value=\"$opt\">$opt</option>";
       }
 
