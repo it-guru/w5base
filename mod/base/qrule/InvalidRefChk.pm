@@ -81,6 +81,7 @@ sub qcheckRecord
    foreach my $fobj (@fobjlst){
       my $label=$fobj->Label();
       my @checkids=();
+      next if (!$fobj->uivisible());
       if ($fobj->Type() ne "ContactLnk"){
          my $idfobj=$dataobj->getField($fobj->{vjoinon}->[0]);
          if (defined($idfobj)){
