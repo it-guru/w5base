@@ -160,6 +160,10 @@ sub qcheckRecord
                                   static=>{
                                      NAME=>$rec->{name},
                                      REFRESH=>$refreshstr,
+                                     SYSTEMS=>join(", ",
+                                       map({$_->{name}} @{$rec->{systems}})),
+                                     APPLICATIONS=>join(", ", 
+                                       @{$rec->{applicationnames}})
                                   }
                                });
                   return($subject,$text);
@@ -199,6 +203,10 @@ sub qcheckRecord
                                   static=>{
                                      NAME=>$rec->{name},
                                      REFRESH=>$refreshstr,
+                                     SYSTEMS=>join(", ",
+                                       map({$_->{name}} @{$rec->{systems}})),
+                                     APPLICATIONS=>join(", ", 
+                                       @{$rec->{applicationnames}})
                                   }
                                });
                   return($subject,$text);
@@ -238,6 +246,10 @@ sub qcheckRecord
                                   static=>{
                                      NAME=>$rec->{name},
                                      REFRESH=>$refreshstr,
+                                     SYSTEMS=>join(", ",
+                                       map({$_->{name}} @{$rec->{systems}})),
+                                     APPLICATIONS=>join(", ", 
+                                       @{$rec->{applicationnames}})
                                   }
                                });
                   return($subject,$text);

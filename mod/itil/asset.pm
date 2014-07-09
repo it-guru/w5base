@@ -344,7 +344,7 @@ sub new
                 group         =>'upd',
                 depend        =>['deprstart'],
                 label         =>'it is posible to refresh hardware',
-                value         =>[0,5,10,20,30,99],
+                value         =>[0,5,10,20,25,28,30,35,38,40,99],
                 transprefix   =>'DENUPD.',
                 dataobjattr   =>'asset.denyupd'),
 
@@ -385,6 +385,21 @@ sub new
                 uivisible     =>0,
                 label         =>'Refresh notification 2',
                 dataobjattr   =>'asset.refreshinfo2'),
+
+     new kernel::Field::Text(
+                name          =>'refreshstate',
+                group         =>'upd',
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'Hardware refresh state',
+                dataobjattr   =>
+                "if (asset.deprstart is not null,".
+                    "if (".
+                        "if (asset.denyupdvalidto>".
+                             "date_add(asset.deprstart,INTERVAL 60 MONTH),".
+                             "asset.denyupdvalidto,".
+                             "date_add(asset.deprstart,INTERVAL 60 MONTH)".
+                             ")<now(),'red','green'),'unknown')"),
 
      new kernel::Field::Date(
                 name          =>'refreshinfo3',

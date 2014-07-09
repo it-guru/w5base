@@ -77,6 +77,12 @@ sub isHardwareRefreshCheckNeeded
 
    return(0) if ($rec->{cistatusid}<=2 || $rec->{cistatusid}>=5);
 
+   my $deprstart=$rec->{deprstart};
+
+   return(0) if ($deprstart eq "");
+
+   return(0) if ($deprstart lt "2011-06-30 00:00:00");
+
    my $o=getModuleObject($self->getParent->Config,"tsacinv::system");
 
    my $name=$rec->{name};
@@ -101,6 +107,7 @@ sub finalizeNotifyParam
    my $mode=shift;
 
    $notifyparam->{emailto}=[$self->getApplmgrUserIds($rec)];
+   $notifyparam->{emailcc}=[12855121480002]; # Günther F. 
 }
 
 
