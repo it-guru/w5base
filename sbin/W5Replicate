@@ -727,7 +727,6 @@ sub objectReplicationPhase1
          last;
       }
    }
-exit();
 
    msg(INFO,"end:   phase 1 replication for $ctrl->{name}");
 
