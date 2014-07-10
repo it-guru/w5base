@@ -234,7 +234,8 @@ sub checkParentWriteAccess
    $pobj->SetFilter({$pobj->IdField->Name()=>\$refid});
    my @l=$pobj->getHashList(qw(ALL));
    if ($#l==-1){
-      return(1); # parent object id does not exists
+      $self->LastMsg(ERROR,"invalid refid specified '%s'",$refid);
+      return(0); # parent object id does not exists
    }
    if ($#l!=0){
       $self->LastMsg(ERROR,"invalid '%s' specified '%s'",

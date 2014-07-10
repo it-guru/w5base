@@ -5,3 +5,4 @@
 'no \'%s\' specified'=>{de=>'keine \'%s\' eingegeben'},
 'fieldgroup.default'=>{de=>'Rechteinformationen',
                        en=>'Accessinformations'},
+'FAQ Shortdescription'=>{de=>'FAQ Kurzbezeichnung'},

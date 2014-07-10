@@ -32,6 +32,23 @@ sub new
 
    $param{acltable}="faqacl";
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->getField("refid")->{label}="Article-No";
+   $self->getField("refid")->{translation}="faq::article";
+
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'article',
+                uploadable    =>0,
+                readonly      =>1,
+                vjoinon       =>['refid'=>'faqid'],
+                vjoindisp     =>'name',
+                vjointo       =>'faq::article',
+                label         =>'FAQ Shortdescription'),
+      insertafter=>['aclparentobj']
+   );
+
+
+
    return($self);
 }
 
