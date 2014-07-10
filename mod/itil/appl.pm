@@ -27,6 +27,7 @@ use kernel::CIStatusTools;
 use kernel::MandatorDataACL;
 use finance::costcenter;
 use kernel::Scene;
+use Data::Dumper;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink kernel::CIStatusTools
         kernel::MandatorDataACL);
@@ -2323,7 +2324,9 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    else{
       $htmlresult.="<table>\n";
    }
-   my @l=qw(sem sem2 delmgr delmgr2 tsm tsm2 databoss businessteam systemnames);
+   my @l=qw(applmgr 
+           sem sem2 delmgr delmgr2 tsm tsm2 databoss 
+           businessteam systemnames);
    foreach my $v (@l){
       if ($v eq "systemnames"){
          my $name=$self->getField($v)->Label();

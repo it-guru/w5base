@@ -75,6 +75,7 @@ sub QuickFindDetail
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
    $appl->SetFilter({id=>\$id});
    my ($rec,$msg)=$appl->getOnlyFirst(qw(delmgr delmgr2 conumber cistatus 
+                                         applmgr
                                          sem sem2 tsm tsm2 databoss 
                                          systemnames
                                          customerprio phonenumbers
