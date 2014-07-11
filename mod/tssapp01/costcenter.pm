@@ -177,6 +177,18 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'interface_tssapp01_02.modifydate'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"interface_tssapp01_02.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(interface_tssapp01_02.id,35,'0')"),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
