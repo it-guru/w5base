@@ -1515,11 +1515,14 @@ sub ValidatedInsertOrUpdateRecord
    $self->ForeachFilteredRecord(sub{
       my $rec=$_;
       my $changed=0;
+      my $restoremdate=1;
       foreach my $k (keys(%$newrec)){
          if ($k ne $idfname){
             if ($newrec->{$k} ne $rec->{$k}){
                $changed=1;
-               last;
+               if ($k ne "srcload"){
+                  $restoremdate=0;
+               }
             }
          }
          else{
@@ -1529,6 +1532,11 @@ sub ValidatedInsertOrUpdateRecord
          }
       }
       if ($changed){
+         if ($restoremdate){  # handling if only srcload has been changed
+            if (exists($rec->{mdate}) && $rec->{mdate} ne ""){
+               $newrec->{mdate}=$rec->{mdate};
+            }
+         }
          my $opobj=$self->Clone();
          $opobj->ValidatedUpdateRecord($rec,$newrec,
                                       {$idfname=>$rec->{$idfname}});
