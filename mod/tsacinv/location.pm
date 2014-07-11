@@ -212,7 +212,6 @@ sub findW5LocID
    foreach my $k (keys(%$newrec)){
       delete($newrec->{$k}) if (!defined($newrec->{$k}));
    }
-   #printf STDERR ("fifi newrec=%s\n",Dumper($newrec));
    my $d;
    my @locid=$loc->getIdByHashIOMapped($self->getParent->Self,$newrec,
                                        DEBUG=>\$d,
@@ -228,7 +227,9 @@ sub findW5LocID
    if ($#locid!=-1){
       return(\@locid);
    }
-   #return($d);
+   if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+      return($d);
+   }
    return(undef);
 }
 
