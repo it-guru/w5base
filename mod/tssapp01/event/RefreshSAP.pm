@@ -282,7 +282,7 @@ sub processFile
             my $target=$m{$k};
             $wrrec->{$target}=undef;
             if ($rec->{$k} ne "" && $rec->{$k} ne "nn"){
-               $wrrec->{$target}=$rec->{$k};
+               $wrrec->{$target}=trim($rec->{$k});
             }
          }
          $wrrec->{srcsys}=$srcsys;
@@ -295,7 +295,6 @@ sub processFile
          next if ($wrrec->{name} eq "9900592970 8109SI");
          next if ($wrrec->{name} eq "9910014071 1000SI");
          next if ($wrrec->{name} eq "9910014071 8109SI");
-
 
          if (($wrrec->{name}=~m/^\s*$/) ||
              ($wrrec->{name}=~m/\s/)){

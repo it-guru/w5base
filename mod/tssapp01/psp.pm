@@ -62,6 +62,11 @@ sub new
                 label         =>'Description',
                 dataobjattr   =>'interface_tssapp01_01.description'),
 
+      new kernel::Field::Text(
+                name          =>'sapcustomer',
+                label         =>'SAP Customer',
+                dataobjattr   =>'interface_tssapp01_01.sapcustomer'),
+
       new kernel::Field::Link(
                 name          =>'etype',
                 label         =>'Type',
@@ -153,7 +158,7 @@ sub new
                 dataobjattr   =>'interface_tssapp01_01.saphier3'),
 
       new kernel::Field::Text(
-                name          =>'saphier1',
+                name          =>'saphier4',
                 label         =>'SAP hierarchy 4',
                 group         =>'saphier',
                 searchable    =>0,
