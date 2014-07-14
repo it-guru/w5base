@@ -65,6 +65,14 @@ sub Validate
          return({$self->Name()=>"service/QualityCheck"});
       }
    }
+   if ($W5V2::OperationContext eq "Enrichment"){
+      if (defined($oldrec)){
+         return({});
+      }
+      else{
+         return({$self->Name()=>"service/QualityEnrichment"});
+      }
+   }
    $editor=$ENV{REMOTE_USER}    if ($editor eq "");
    $editor="system/".$ENV{USER} if ($editor eq "" && $ENV{USER} ne "");
    $editor="system/unknown"     if ($editor eq "");

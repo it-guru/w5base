@@ -1509,6 +1509,14 @@ sub preValidate
             $newrec->{openusername}="QualityCheck";
          }
       }
+      elsif ($W5V2::OperationContext eq "Enrichment"){
+         if (!defined($newrec->{openuser})){
+            $newrec->{openuser}=undef;
+         }
+         if (!defined($newrec->{openusername})){
+            $newrec->{openusername}="Enrichment";
+         }
+      }
       else{
          my $UserCache=$self->Cache->{User}->{Cache};
          my $mycontactid=$self->getCurrentUserId();;

@@ -27,7 +27,7 @@ create table autodiscdata (
   srcload     datetime    default NULL,
   editor      varchar(100) NOT NULL default '',
   realeditor  varchar(100) NOT NULL default '',
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id),unique(swinstance,engine),unique(system,engine),
   FOREIGN KEY fk_engine (engine)
               REFERENCES autodiscengine (name) ON DELETE CASCADE,
   FOREIGN KEY fk_swinstance (swinstance)

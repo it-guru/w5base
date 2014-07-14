@@ -107,6 +107,18 @@ sub Connect
             }
          }
       }
+      elsif ($self->{dbconnect}=~m/^dbi:db2:/i){# cached funktioniert nicht
+         $self->{'db'}=DBI->connect(            # mit DB2 verbindungen 
+            $self->{dbconnect},$self->{dbuser},$self->{dbpass},{  # fork probl.
+                         private_foo_cachekey=>$self.time().".".
+                         $BackendSessionName});
+         #msg(INFO,"use NOT cached datbase connection on ODBC");
+         if (defined($self->{'db'})){
+            if ($self->{'db'}->{private_inW5Transaction} ne ""){
+               $self->{'db'}->{AutoCommit}=0;
+            }
+         }
+      }
       else{
          my $private_foo_cachekey=$dbname."-".$$.".".$BackendSessionName;
          $self->{'db'}=DBI->connect_cached(

@@ -163,6 +163,14 @@ sub isWriteValid
    return(undef);
 }
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(1) if ($self->IsMemberOf("admin"));
+   return(undef);
+}
+
 
 
 

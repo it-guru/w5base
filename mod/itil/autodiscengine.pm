@@ -202,12 +202,9 @@ sub Validate
    my $newrec=shift;
 
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-       !($newrec->{name}=~m/^[A-Z0-9_]+$/)){
+       !($newrec->{name}=~m/^[A-Z0-9_]+$/i)){
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
-   }
-   if (exists($newrec->{name})){
-      $newrec->{name}=uc($newrec->{name});
    }
    if (exists($newrec->{localdataobj})){
       if ($newrec->{localdataobj} ne "itil::system" &&

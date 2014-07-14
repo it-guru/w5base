@@ -454,29 +454,32 @@ sub nativQualityCheck
 
 
    #
-   # Das Enrichment Verfahren sollte irgendwann mal den Methodenaufruf
+   # Das Enrichment Verfahren kann vorraussichtlich NICHT den
    # preQualityCheckRecord ersetzen.
+   # Enrichment wird asyncron ablaufen müssen und IMMER ohne User-Interaktion
+   # ablaufen, d.h. der User kann das Enrichment (stand 07/2014) 
+   # vorraussichtlich nicht selbst anstoßen.
    #
-   foreach my $qrulename (@$finalQruleList){
-      my $qrule=$self->{qrule}->{$qrulename};
-      my $oldcontext=$W5V2::OperationContext;
-      $W5V2::OperationContext="Enrichment";
-      my $dataModified=0;
-      $param[0]->{ruleno}++;
-      if ($qrule->can("enrichRecord")){
-        $dataModified=$qrule->enrichRecord($parent,$rec,@param);
-      }
-      $W5V2::OperationContext=$oldcontext;
-      if ($dataModified){ # reload rec is a ToDo
-         my $reloadedRec=$self->reloadRec($parent,$rec);
-         if (!defined($reloadedRec)){
-            msg(ERROR,"reloadRec error after enrichment");
-            return();
-         }
-         $rec=$reloadedRec;
-      }
-   }
-   $param[0]->{ruleno}=0;
+   # foreach my $qrulename (@$finalQruleList){
+   #    my $qrule=$self->{qrule}->{$qrulename};
+   #    my $oldcontext=$W5V2::OperationContext;
+   #    $W5V2::OperationContext="Enrichment";
+   #    my $dataModified=0;
+   #    $param[0]->{ruleno}++;
+   #    if ($qrule->can("enrichRecord")){
+   #      $dataModified=$qrule->enrichRecord($parent,$rec,@param);
+   #    }
+   #    $W5V2::OperationContext=$oldcontext;
+   #    if ($dataModified){ # reload rec is a ToDo
+   #       my $reloadedRec=$self->reloadRec($parent,$rec);
+   #       if (!defined($reloadedRec)){
+   #          msg(ERROR,"reloadRec error after enrichment");
+   #          return();
+   #       }
+   #       $rec=$reloadedRec;
+   #    }
+   #  }
+   #  $param[0]->{ruleno}=0;
 
    foreach my $qrulename (@$finalQruleList){
       my $qrule=$self->{qrule}->{$qrulename};
@@ -484,40 +487,42 @@ sub nativQualityCheck
       $W5V2::OperationContext="QualityCheck";
       my $acorrect=0;  # vorgesehen für auto correct modeA
       $param[0]->{ruleno}++;
-      my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,@param);
-      $W5V2::OperationContext=$oldcontext;
-      if (defined($control) && defined($control->{dataissue})){
-         my $dataissuemsg=$control->{dataissue};
-         $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
-         if ($#{$dataissuemsg}!=-1){
-            my $qrulename=$qrule->Self();
-            if (!defined($alldataissuemsg{$qrulename})){
-               $alldataissuemsg{$qrulename}=[];
+      if ($qrule->can("qcheckRecord")){
+         my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,@param);
+         $W5V2::OperationContext=$oldcontext;
+         if (defined($control) && defined($control->{dataissue})){
+            my $dataissuemsg=$control->{dataissue};
+            $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
+            if ($#{$dataissuemsg}!=-1){
+               my $qrulename=$qrule->Self();
+               if (!defined($alldataissuemsg{$qrulename})){
+                  $alldataissuemsg{$qrulename}=[];
+               }
+               push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
             }
-            push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
          }
+         if (defined($control) && defined($control->{dataupdate})){
+         }
+         my $resulttext="OK";
+         $resulttext="fail"      if ($qresult!=0);
+         $resulttext="messy"     if ($qresult==1);
+         $resulttext="warn"      if ($qresult==2);
+         $resulttext="undefined" if (!defined($qresult));
+         my $qrulelongname=$qrule->getName();
+         my $hints=$qrule->getHints();
+         my $havehints=$hints eq "" ? 0 : 1;
+         my $res={ 
+            rulelabel=>"$qrulelongname",
+            ruleid=>$qrule->Self,
+            havehints=>$havehints,
+            result=>$self->T($resulttext),
+            exitcode=>$qresult
+         };
+         if (defined($control->{qmsg})){
+            $self->translate_qmsg($control,$res,$qrulename);
+         }
+         push(@{$result->{rule}},$res);
       }
-      if (defined($control) && defined($control->{dataupdate})){
-      }
-      my $resulttext="OK";
-      $resulttext="fail"      if ($qresult!=0);
-      $resulttext="messy"     if ($qresult==1);
-      $resulttext="warn"      if ($qresult==2);
-      $resulttext="undefined" if (!defined($qresult));
-      my $qrulelongname=$qrule->getName();
-      my $hints=$qrule->getHints();
-      my $havehints=$hints eq "" ? 0 : 1;
-      my $res={ 
-         rulelabel=>"$qrulelongname",
-         ruleid=>$qrule->Self,
-         havehints=>$havehints,
-         result=>$self->T($resulttext),
-         exitcode=>$qresult
-      };
-      if (defined($control->{qmsg})){
-         $self->translate_qmsg($control,$res,$qrulename);
-      }
-      push(@{$result->{rule}},$res);
    }
    if ($parent->Self() ne "base::workflow"){ # only DataIssues for nonworkflows!
       my $wf=getModuleObject($parent->Config,"base::workflow");

@@ -78,6 +78,24 @@ sub new
                 vjoinon       =>['qruleid'=>'id'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                group         =>'default',
+                label         =>'Rule-State',
+                vjoineditbase =>{id=>[qw(4 5)]},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                group         =>'default',
+                label         =>'Rule-StateID',
+                dataobjattr   =>'lnkqrulemandator.cistatus'),
+
+
       new kernel::Field::Htmlarea(
                 name          =>'qruledesc',
                 label         =>'Quality Rule Description',
@@ -164,7 +182,7 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'lnkqrulemandator.realeditor'),
    );
-   $self->setDefaultView(qw(mandator qrule cdate dataobj));
+   $self->setDefaultView(qw(mandator qrule cistatus cdate dataobj));
    $self->setWorktable("lnkqrulemandator");
    return($self);
 }

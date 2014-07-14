@@ -198,94 +198,94 @@ sub isWriteOnBProcessValid
 }
 
 
-sub preQualityCheckRecord
-{
-   my $self=shift;
-   my $rec=shift;
-   my @param=@_;
-
-   # load Autodiscovery Data from all configured engines
-
-   my %AutoDiscovery=();
-
-   my $p=$self->SelfAsParentObject();
-   if ($p eq "itil::system" || $p eq "itil::swinstance"){
-      my $add=$self->getPersistentModuleObject("itil::autodiscdata");
-      my $ade=$self->getPersistentModuleObject("itil::autodiscengine");
-      $ade->SetFilter({localdataobj=>\$p});
-      foreach my $engine ($ade->getHashList(qw(ALL))){
-         my $rk;
-         $rk="systemid"     if ($p eq "itil::system");
-         $rk="swinstanceid" if ($p eq "itil::swinstance");
-         $add->SetFilter({$rk=>\$rec->{id},engine=>\$engine->{name}});
-         my ($oldadrec)=$add->getOnlyFirst(qw(ALL));
-         # check age of oldadrec - if newer then 24h - use old one
-            # todo
-
-         my $ado=$self->getPersistentModuleObject($engine->{addataobj});
-         if (!exists($rec->{$engine->{localkey}})){
-            # autodisc key data does not exists in local object
-            msg(ERROR,"preQualityCheckRecord failed for $p ".
-                      "local key $engine->{localkey} does not exists");
-            next;
-         }
-         if (defined($ado)){  # check if autodisc object name is OK
-            my $adokey=$ado->getField($engine->{adkey});
-            if (defined($adokey)){ # check if autodisc key is OK
-               my $adfield=$add->getField("data");
-               $ado->SetFilter({
-                  $engine->{adkey}=>\$rec->{$engine->{localkey}}
-               });
-               my ($adrec)=$ado->getOnlyFirst(qw(ALL));
-               if (defined($adrec)){
-                  if ($ado->Ping()){
-                     $adrec->{xmlstate}="OK";
-                     my $adxml=hash2xml({xmlroot=>$adrec});
-                     if (!defined($oldadrec)){
-                        $add->ValidatedInsertRecord({engine=>$engine->{name},
-                                                     $rk=>$rec->{id},
-                                                     data=>$adxml});
-                     }
-                     else{
-                        my $upd={data=>$adxml};
-                        my $chk=$adfield->RawValue($oldadrec);
-                        if (trim($upd->{data}) eq trim($chk)){  # wird verm.
-                           delete($upd->{data});    # sein, da XML im Aufbau
-                           $upd->{mdate}=$oldadrec->{mdate}; # dynamisch ist
-                        }
-                        $add->ValidatedUpdateRecord($oldadrec,$upd,{
-                           engine=>\$engine->{name},
-                           $rk=>\$rec->{id}
-                        });
-                     }
-                     $AutoDiscovery{$engine->{name}}={
-                        data=>$adfield->RawValue({data=>$adxml})
-                     };
-                  }
-               }
-               if (defined($oldadrec) && 
-                   !exists($AutoDiscovery{$engine->{name}})){
-                  $AutoDiscovery{$engine->{name}}={
-                     data=>$adfield->RawValue($oldadrec)
-                  };
-               }
-            }
-            else{
-               msg(ERROR,"preQualityCheckRecord failed for $p ".
-                         "while access AutoDisc($engine->{name}) key ".
-                          $engine->{adkey});
-            }
-         }
-         else{
-            msg(ERROR,"preQualityCheckRecord failed for $p ".
-                      "while load AutoDisc($engine->{name}) object ".
-                       $engine->{addataobj});
-         }
-      }
-   }
-   $param[0]->{AutoDiscovery}=\%AutoDiscovery;
-   return(1);
-}
+#sub preQualityCheckRecord
+#{
+#   my $self=shift;
+#   my $rec=shift;
+#   my @param=@_;
+#
+#   # load Autodiscovery Data from all configured engines
+#
+#   my %AutoDiscovery=();
+#
+#   my $p=$self->SelfAsParentObject();
+#   if ($p eq "itil::system" || $p eq "itil::swinstance"){
+#      my $add=$self->getPersistentModuleObject("itil::autodiscdata");
+#      my $ade=$self->getPersistentModuleObject("itil::autodiscengine");
+#      $ade->SetFilter({localdataobj=>\$p});
+#      foreach my $engine ($ade->getHashList(qw(ALL))){
+#         my $rk;
+#         $rk="systemid"     if ($p eq "itil::system");
+#         $rk="swinstanceid" if ($p eq "itil::swinstance");
+#         $add->SetFilter({$rk=>\$rec->{id},engine=>\$engine->{name}});
+#         my ($oldadrec)=$add->getOnlyFirst(qw(ALL));
+#         # check age of oldadrec - if newer then 24h - use old one
+#            # todo
+#
+#         my $ado=$self->getPersistentModuleObject($engine->{addataobj});
+#         if (!exists($rec->{$engine->{localkey}})){
+#            # autodisc key data does not exists in local object
+#            msg(ERROR,"preQualityCheckRecord failed for $p ".
+#                      "local key $engine->{localkey} does not exists");
+#            next;
+#         }
+#         if (defined($ado)){  # check if autodisc object name is OK
+#            my $adokey=$ado->getField($engine->{adkey});
+#            if (defined($adokey)){ # check if autodisc key is OK
+#               my $adfield=$add->getField("data");
+#               $ado->SetFilter({
+#                  $engine->{adkey}=>\$rec->{$engine->{localkey}}
+#               });
+#               my ($adrec)=$ado->getOnlyFirst(qw(ALL));
+#               if (defined($adrec)){
+#                  if ($ado->Ping()){
+#                     $adrec->{xmlstate}="OK";
+#                     my $adxml=hash2xml({xmlroot=>$adrec});
+#                     if (!defined($oldadrec)){
+#                        $add->ValidatedInsertRecord({engine=>$engine->{name},
+#                                                     $rk=>$rec->{id},
+#                                                     data=>$adxml});
+#                     }
+#                     else{
+#                        my $upd={data=>$adxml};
+#                        my $chk=$adfield->RawValue($oldadrec);
+#                        if (trim($upd->{data}) eq trim($chk)){  # wird verm.
+#                           delete($upd->{data});    # sein, da XML im Aufbau
+#                           $upd->{mdate}=$oldadrec->{mdate}; # dynamisch ist
+#                        }
+#                        $add->ValidatedUpdateRecord($oldadrec,$upd,{
+#                           engine=>\$engine->{name},
+#                           $rk=>\$rec->{id}
+#                        });
+#                     }
+#                     $AutoDiscovery{$engine->{name}}={
+#                        data=>$adfield->RawValue({data=>$adxml})
+#                     };
+#                  }
+#               }
+#               if (defined($oldadrec) && 
+#                   !exists($AutoDiscovery{$engine->{name}})){
+#                  $AutoDiscovery{$engine->{name}}={
+#                     data=>$adfield->RawValue($oldadrec)
+#                  };
+#               }
+#            }
+#            else{
+#               msg(ERROR,"preQualityCheckRecord failed for $p ".
+#                         "while access AutoDisc($engine->{name}) key ".
+#                          $engine->{adkey});
+#            }
+#         }
+#         else{
+#            msg(ERROR,"preQualityCheckRecord failed for $p ".
+#                      "while load AutoDisc($engine->{name}) object ".
+#                       $engine->{addataobj});
+#         }
+#      }
+#   }
+#   $param[0]->{AutoDiscovery}=\%AutoDiscovery;
+#   return(1);
+#}
 
 
 sub updateDenyHandling
