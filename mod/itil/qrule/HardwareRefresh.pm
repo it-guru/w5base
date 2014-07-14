@@ -153,6 +153,10 @@ sub qcheckRecord
                   my $subject=sprintf($self->T(
                               "Hardware %s needs to be refreshed in %s months"),
                               $rec->{name},$m);
+                  my $applications=$rec->{applicationnames};
+                  if (ref($applications) eq "ARRAY"){
+                     $applications=join(", ", @{$applications});
+                  }
                   my $text=$dataobj->getParsedTemplate(
                                $notifycontrol->{useTemplate},
                                {
@@ -162,8 +166,7 @@ sub qcheckRecord
                                      REFRESH=>$refreshstr,
                                      SYSTEMS=>join(", ",
                                        map({$_->{name}} @{$rec->{systems}})),
-                                     APPLICATIONS=>join(", ", 
-                                       @{$rec->{applicationnames}})
+                                     APPLICATIONS=>$applications
                                   }
                                });
                   return($subject,$text);
@@ -196,6 +199,10 @@ sub qcheckRecord
                   my $subject=sprintf($self->T(
                               "Hardware %s needs to be refreshed in %s months"),
                               $rec->{name},$m);
+                  my $applications=$rec->{applicationnames};
+                  if (ref($applications) eq "ARRAY"){
+                     $applications=join(", ", @{$applications});
+                  }
                   my $text=$dataobj->getParsedTemplate(
                                $notifycontrol->{useTemplate},
                                {
@@ -205,8 +212,7 @@ sub qcheckRecord
                                      REFRESH=>$refreshstr,
                                      SYSTEMS=>join(", ",
                                        map({$_->{name}} @{$rec->{systems}})),
-                                     APPLICATIONS=>join(", ", 
-                                       @{$rec->{applicationnames}})
+                                     APPLICATIONS=>$applications
                                   }
                                });
                   return($subject,$text);
@@ -239,6 +245,10 @@ sub qcheckRecord
                   my $subject=sprintf($self->T(
                               "Hardware %s needs to be refreshed in %s months"),
                               $rec->{name},$m);
+                  my $applications=$rec->{applicationnames};
+                  if (ref($applications) eq "ARRAY"){
+                     $applications=join(", ", @{$applications});
+                  }
                   my $text=$dataobj->getParsedTemplate(
                                $notifycontrol->{useTemplate},
                                {
@@ -248,8 +258,7 @@ sub qcheckRecord
                                      REFRESH=>$refreshstr,
                                      SYSTEMS=>join(", ",
                                        map({$_->{name}} @{$rec->{systems}})),
-                                     APPLICATIONS=>join(", ", 
-                                       @{$rec->{applicationnames}})
+                                     APPLICATIONS=>$applications
                                   }
                                });
                   return($subject,$text);
