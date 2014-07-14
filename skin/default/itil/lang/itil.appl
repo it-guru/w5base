@@ -7,7 +7,7 @@
 'fieldgroup.architect'=>{de=>'Architektur',en=>'Architecture'},
 'fieldgroup.external'=>{de=>'weiterführende Infomationen aus anderen IT-Systemen',en=>'further Informations from other IT-Systemen'},
 'fieldgroup.businessservices'=>{de=>'bereitgestellte Business services',en=>'provided business services'},
-'fieldgroup.monisla'=>{de=>'Service Monitoring und SLA/Überwachung',en=>'Service Monitoring and SLA'},
+'fieldgroup.monisla'=>{de=>'Monitoring und SLA/Überwachung',en=>'Monitoring and SLA'},
 'fieldgroup.services'=>{de=>'Cluster Services',en=>'Cluster Services'},
 'fieldgroup.opmgmt'=>{de=>'Operation Management',en=>'Operation Management'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
