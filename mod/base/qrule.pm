@@ -224,30 +224,20 @@ sub calcParentAndObjlist
                if ($parent->Self() ne $do->Self()){
                   if ($parentTransformationCount==0){
                      # rec muß neu gelesen werden!
-                     $do->ResetFilter();
-                     my $idobj=$do->IdField();
-                     if (defined($idobj)){
-                        my $idname=$do->IdField()->Name();
-                        $do->SetFilter({$idname=>\$rec->{$idname}});
-                        ($rec)=$do->getOnlyFirst(qw(ALL)); 
-                        if (!defined($rec)){
-                           msg(ERROR,"parent transformation error ".
-                                     "while reread rec");
-                           return;
-                        }
-                        else{
-                           %$calledRec=%$rec;
-                        }
-                        $objlist=$do->getQualityCheckCompat($rec); 
-                        msg(INFO,"qrule parent transformation ".
-                                 "from %s to %s done",
-                                 $parent->Self(),$do->Self());
-                        $parent=$do;
+                     my $reloadedRec=$self->reloadRec($do,$rec);
+
+                     if (!defined($reloadedRec)){
+                        msg(ERROR,"parent transformation error ".
+                                  "while reread rec");
+                        return();
                      }
-                     else{
-                        msg(ERROR,"qrule.pm can not detect ".
-                                  "idfield in ".$do->Self());
-                     }
+                     %$calledRec=%$reloadedRec;
+                     $rec=$reloadedRec;
+                     $objlist=$do->getQualityCheckCompat($rec); 
+                     msg(INFO,"qrule parent transformation ".
+                              "from %s to %s done",
+                              $parent->Self(),$do->Self());
+                     $parent=$do;
                   }
                   else{
                      msg(ERROR,"mulitple parent transformation detected");
@@ -265,6 +255,35 @@ sub calcParentAndObjlist
    }
    return($parent,$objlist);
 
+}
+
+
+sub reloadRec
+{
+   my $self=shift;
+   my $do=shift;
+   my $rec=shift;
+
+   $do->ResetFilter();
+   my $idobj=$do->IdField();
+   if (defined($idobj)){
+      my $idname=$do->IdField()->Name();
+      $do->SetFilter({$idname=>\$rec->{$idname}});
+      ($rec)=$do->getOnlyFirst(qw(ALL)); 
+      if (!defined($rec)){
+         msg(ERROR,"parent transformation error ".
+                   "while reread rec");
+         return();
+      }
+      else{
+         return($rec);
+      }
+   }
+   else{
+      msg(ERROR,"qrule.pm can not detect ".
+                "idfield in ".$do->Self());
+   }
+   return();
 }
 
 
@@ -288,10 +307,13 @@ sub calcFinalQruleList
    $objlist=[$objlist] if (ref($objlist) ne "ARRAY");
    my $lnkr=getModuleObject($self->Config,"base::lnkqrulemandator");
    if ($self->getParent->Self() eq "base::workflow"){
-      $lnkr->SetFilter({mandatorid=>$mandator,dataobj=>\$rec->{class}});
+      $lnkr->SetFilter({mandatorid=>$mandator,
+                        cistatusid=>\'4',
+                        dataobj=>\$rec->{class}});
    }
    else{
-      $lnkr->SetFilter({mandatorid=>$mandator});
+      $lnkr->SetFilter({mandatorid=>$mandator,
+                        cistatusid=>\'4'});
    }
    #######################################################################
 
@@ -399,7 +421,6 @@ sub nativDatacareAssistant
       }
    }
 
-   printf STDERR ("fifi 02  %d\n",time());
 
    return({fifi=>'xx'});
 }
@@ -422,7 +443,6 @@ sub nativQualityCheck
    $param[0]->{ruleno}=0 if (!exists($param[0]->{ruleno}));;
 
 
-
    my ($parent,$objlist,$finalQruleList)=
        $self->calcFinalQruleList($parent,$objlist,$rec);
 
@@ -432,6 +452,31 @@ sub nativQualityCheck
    # Daten)
    $parent->preQualityCheckRecord($rec,@param);
 
+
+   #
+   # Das Enrichment Verfahren sollte irgendwann mal den Methodenaufruf
+   # preQualityCheckRecord ersetzen.
+   #
+   foreach my $qrulename (@$finalQruleList){
+      my $qrule=$self->{qrule}->{$qrulename};
+      my $oldcontext=$W5V2::OperationContext;
+      $W5V2::OperationContext="Enrichment";
+      my $dataModified=0;
+      $param[0]->{ruleno}++;
+      if ($qrule->can("enrichRecord")){
+        $dataModified=$qrule->enrichRecord($parent,$rec,@param);
+      }
+      $W5V2::OperationContext=$oldcontext;
+      if ($dataModified){ # reload rec is a ToDo
+         my $reloadedRec=$self->reloadRec($parent,$rec);
+         if (!defined($reloadedRec)){
+            msg(ERROR,"reloadRec error after enrichment");
+            return();
+         }
+         $rec=$reloadedRec;
+      }
+   }
+   $param[0]->{ruleno}=0;
 
    foreach my $qrulename (@$finalQruleList){
       my $qrule=$self->{qrule}->{$qrulename};
