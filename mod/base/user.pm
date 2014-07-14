@@ -240,7 +240,9 @@ sub new
                       my $d=shift;
                       my $current=shift;
                       my $secstate=$self->getParent->getCurrentSecState();
-                      if ($secstate<2){
+                      if ($W5V2::OperationContext ne "QualityCheck" &&
+                          $W5V2::OperationContext ne "Enrichment" &&
+                          $secstate<2){
                          my $userid=$self->getParent->getCurrentUserId();
                          if (!defined($userid) ||
                               $current->{userid}!=$userid){
