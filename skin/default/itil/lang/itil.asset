@@ -64,7 +64,7 @@
               en=>'No - customer did not wish a newer version'},
 'DENUPD.35'=>{de=>'Nein - Hardwarerefresh ist bereits in die Wege geleitet',
               en=>'No - Hardwarerefresh is already on going'},
-'DENUPD.38'=>{de=>'Nein - Retierement der Applikation aktuell in Prüfung',
+'DENUPD.38'=>{de=>'Nein - Retirement der Applikation aktuell in Prüfung',
               en=>'No - retierement of the application in validation'},
 'DENUPD.40'=>{de=>'Nein - es gibt kein Budget',
               en=>'No - there is no budget'},
