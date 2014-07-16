@@ -38,6 +38,7 @@ sub new
                 size          =>'10',
                 group         =>'id',
                 dataobjattr   =>'interviewcat.id'),
+      new kernel::Field::RecordUrl(),
                                   
       new kernel::Field::TextDrop(
                 name          =>'parent',
