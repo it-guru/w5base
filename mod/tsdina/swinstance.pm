@@ -1,4 +1,4 @@
-package tsdina::oralicense;
+package tsdina::swinstance;
 #  W5Base Framework
 #  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
 #
@@ -167,7 +167,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/licproduct.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/swinstance.jpg?".$cgi->query_string());
 }
 
 sub isViewValid

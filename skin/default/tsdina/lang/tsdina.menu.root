@@ -1,5 +1,5 @@
 'itu.tsdina'=>{de=>'TS-DINA',en=>'TS-DINA'},
 'itu.tsdina.system'=>{de=>'System',en=>'System'},
-'itu.tsdina.oralicense'=>{de=>'Oracle Lizenz Info',en=>'Oracle License Info'},
+'itu.tsdina.swinstance'=>{de=>'Software-Instanz',en=>'Software-Instance'},
 'itu.tsdina.dictionary'=>{de=>'DBDictionary',en=>'DBDictionary'},
 

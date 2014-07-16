@@ -1,5 +1,5 @@
-'tsdina::oralicense'=>{de=>'Oracle Lizenz Information',
-                       en=>'Oracle License Information'},
+'tsdina::swinstance'=>{de=>'Software-Instanzen',
+                       en=>'Software-Instances'},
 'fieldgroup.lpar'=>{de=>'LPAR',en=>'LPAR'},
 'fieldgroup.system'=>{de=>'System',en=>'System'},
 'Instance Name'=>{de=>'Instanz Name'},
