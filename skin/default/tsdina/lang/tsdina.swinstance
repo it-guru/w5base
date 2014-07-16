@@ -1,5 +1,5 @@
-'tsdina::swinstance'=>{de=>'Software-Instanzen',
-                       en=>'Software-Instances'},
+'tsdina::swinstance'=>{de=>'DINA Software-Instanz',
+                       en=>'DINA Software Instance'},
 'fieldgroup.lpar'=>{de=>'LPAR',en=>'LPAR'},
 'fieldgroup.system'=>{de=>'System',en=>'System'},
 'Instance Name'=>{de=>'Instanz Name'},

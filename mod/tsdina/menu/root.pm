@@ -42,8 +42,8 @@ sub Init
                       "tsdina::system",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsdina.oralicense",
-                      "tsdina::oralicense",
+   $self->RegisterObj("itu.tsdina.swinstance",
+                      "tsdina::swinstance",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itu.tsdina.dictionary",

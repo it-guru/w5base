@@ -110,9 +110,9 @@ sub new
       ),
 
       new kernel::Field::SubList(
-                name          =>'swinstance',
-                label         =>'Software instance info',
-                group         =>'swinstanceinfo',
+                name          =>'swinstances',
+                label         =>'Software instances',
+                group         =>'swinstances',
                 vjointo       =>'tsdina::swinstance',
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>[qw(dbname name version)],
