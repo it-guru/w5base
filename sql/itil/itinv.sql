@@ -1374,3 +1374,7 @@ alter table businessservice add validfrom datetime default NULL, add validto dat
 alter table businessservice add requ_mtbf int(10) default NULL,add impl_mtbf int(10) default NULL,add curr_mtbf int(10) default NULL, add requ_ttr varchar(20) default NULL,add impl_ttr int(10) default NULL,add  curr_ttr int(10) default NULL, add requ_avail_p double(8,2) default NULL,add impl_avail_p double(8,2) default NULL,add  curr_avail_p double(8,2) default NULL, add requ_respti varchar(20) default NULL,add impl_respti int(10) default NULL,add  curr_respti int(10) default NULL,add th_warn_avail double(8,2) default NULL, add th_crit_avail double(8,2) default NULL, add th_warn_respti double(8,2) default NULL, add th_crit_respti double(8,2) default NULL;
 alter table businessservice add th_warn_mtbf double(8,2) default NULL, add th_crit_mtbf double(8,2) default NULL,add th_warn_ttr double(8,2) default NULL, add th_crit_ttr double(8,2) default NULL;
 alter table appl add controlcenter bigint(20);
+alter table system add lastqenrich datetime default NULL,add key(lastqenrich);
+alter table appl add lastqenrich datetime default NULL,add key(lastqenrich);
+alter table swinstance add lastqenrich datetime default NULL,add key(lastqenrich);
+alter table accessurl add lastip longtext, add lastqcheck datetime default NULL,add key(lastqcheck);
