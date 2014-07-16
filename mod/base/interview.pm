@@ -92,6 +92,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name_en',
                 searchable    =>0,
+                htmldetail    =>0,
                 htmlwidth     =>'540px',
                 label         =>'Question (en-default)',
                 dataobjattr   =>'interview.name'),
@@ -99,6 +100,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name_de',
                 searchable    =>0,
+                htmldetail    =>0,
                 htmlwidth     =>'540px',
                 label         =>'Question (de)',
                 dataobjattr   =>'interview.name_de'),
@@ -536,16 +538,16 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   my $name=trim(effVal($oldrec,$newrec,"name_de"));
-   if (length($name)<10 || ($name=~m/^\s*$/i)){
-      $self->LastMsg(ERROR,"invalid question specified"); 
-      return(undef);
-   }
-   my $name=trim(effVal($oldrec,$newrec,"name_en"));
-   if (length($name)<10 || ($name=~m/^\s*$/i)){
-      $self->LastMsg(ERROR,"invalid question specified"); 
-      return(undef);
-   }
+#   my $name=trim(effVal($oldrec,$newrec,"name_de"));
+#   if (length($name)<10 || ($name=~m/^\s*$/i)){
+#      $self->LastMsg(ERROR,"invalid question specified"); 
+#      return(undef);
+#   }
+#   my $name=trim(effVal($oldrec,$newrec,"name_en"));
+#   if (length($name)<10 || ($name=~m/^\s*$/i)){
+#      $self->LastMsg(ERROR,"invalid question specified"); 
+#      return(undef);
+#   }
    my $qtag=effVal($oldrec,$newrec,"qtag");
    if (($qtag=~m/\s/i) || length($qtag)<3){
       $self->LastMsg(ERROR,"invalid unique query tag specified"); 

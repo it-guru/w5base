@@ -156,6 +156,9 @@ sub compileExpression
          if ($e->{type} eq "CONST"){
             $cmd.="$e->{val}";
          }
+         if ($e->{type} eq "VALUE"){
+            $cmd.="$e->{val}";
+         }
          if ($e->{type} eq "FUNC"){
             $cmd.="$e->{val}";
          }
@@ -177,10 +180,10 @@ sub compileExpression
       }
       $cmd.=")};";
       $self->Code($cmd);
-      
+      #printf STDERR ("fifi cmd=$cmd\n"); 
      
       my $match=eval($cmd);
-      $self->errString($@) if ($self->errString() eq "");
+      $self->errString($@) if ($self->errString() eq "" && $@ ne "");
       return($match);
    }
    return(undef);
