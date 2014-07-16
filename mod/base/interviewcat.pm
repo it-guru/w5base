@@ -169,7 +169,8 @@ sub new
                 dataobjattr   =>'interviewcat.parentid'),
    );
    $self->{history}=[qw(insert modify delete)];
-   $self->{locktables}="interviewcat write, history write, iomap write";
+   $self->{locktables}="interviewcat write, history write, iomap write, ".
+                       "grp write";
    $self->setDefaultView(qw(fullname interviewcatid editor comments));
    $self->setWorktable("interviewcat");
    return($self);
@@ -183,6 +184,16 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   if (defined($newrec->{name})){
+      $newrec->{name}=~s/\s/_/g;
+      $newrec->{name}=~s/ü/ue/g;
+      $newrec->{name}=~s/ö/oe/g;
+      $newrec->{name}=~s/ä/ae/g;
+      $newrec->{name}=~s/ß/ss/g;
+      $newrec->{name}=~s/Ü/Ue/g;
+      $newrec->{name}=~s/Ö/Oe/g;
+      $newrec->{name}=~s/Ä/Ae/g;
+   }
    if (defined($newrec->{name}) || !defined($oldrec)){
       trim(\$newrec->{name});
       if ($newrec->{name} eq "" ||
