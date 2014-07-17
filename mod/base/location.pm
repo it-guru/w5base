@@ -670,14 +670,6 @@ sub Normalize
    if ($rec->{address1}=~m/^wolbeckerstr/i){
       $rec->{address1}=~s/^wolbeckerstr\S+/Wolbecker Stra\xDFe/i;
    }
-   if (($rec->{location}=~m/frankfurt/i) &&
-       ($rec->{address1}=~m/^Hahnstr.*43.*$/i) &&
-       !($rec->{address1}=~m/(old|alt)/i)){
-      $rec->{label}="T-Systems";
-      $rec->{address1}="Hahnstra\xDFe 43";
-      $rec->{location}="Frankfurt am Main";
-      $rec->{zipcode}="60528";
-   }
    if (($rec->{location}=~m/donauw/i) &&
        ($rec->{address1}=~m/^Reichs.*$/i) &&
        !($rec->{address1}=~m/(old|alt)/i)){
