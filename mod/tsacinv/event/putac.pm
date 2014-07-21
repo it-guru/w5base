@@ -83,6 +83,7 @@ sub getAcGroupByW5BaseGroup
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS\.IMS\.IM2$/CSS.SDM.PSS.CIAM/i;
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS\.IMS\.IM3$/CSS.SDM.PSS.CIAM/i;
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS/CSS.SDM.PSS/i;
+   $grpname=~s/^DTAG\.TSI\.TI\.E-([A-Z]+).*/TI.$1/i;
    if ($grpname ne ""){
       $acgrp->SetFilter({name=>$grpname}); 
       my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
@@ -533,7 +534,7 @@ sub ApplicationModified
                }
                if (!defined($assignment)){
                   $grpnotfound{$chkassignment}=1;
-                  $assignment="CSS.AO.DTAG" 
+                  $assignment="TI" 
                }
                my $criticality=$rec->{criticality};
                $criticality=~s/^CR//;
@@ -783,7 +784,6 @@ sub ApplicationModified
                   }
                   if ($systemid ne ""){
                      my $assignment=$irec->{swteam};
-                     $assignment=~s/^.*\.CSS\.AO\.DTAG/CSS.AO.DTAG/i;
                      if ($assignment ne ""){
                         $acgrp->ResetFilter(); 
                         $acgrp->SetFilter({name=>$assignment}); 
@@ -793,11 +793,11 @@ sub ApplicationModified
                         }
                         else{
                            $grpnotfound{$assignment}=1;
-                           $assignment="CSS.AO.DTAG";
+                           $assignment="TI";
                         }
                      }
                      else{
-                        $assignment="CSS.AO.DTAG";
+                        $assignment="TI";
                      }
                      ########################################################
                      my $iassignment=$irec->{acinmassingmentgroup};
@@ -1306,7 +1306,7 @@ sub SWInstallModified
                              Customer=>"TS.DE",
                              Status=>"installed/active",
                              EventID=>$jobname,
-                             AssignmentGroup=>"CSS.AO.DTAG",
+                             AssignmentGroup=>"TI",
                              SoftwareVersion=>$rec->{version},
                              SoftwareName=>$rec->{software},
                              LicenseUnits=>$rec->{licencecount},
