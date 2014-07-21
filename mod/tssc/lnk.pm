@@ -109,7 +109,16 @@ sub new
                 group         =>'dst',
                 label         =>'Destination-ID',
                 uppersearch   =>1,
-                dataobjattr   =>'screlationm1.depend'),
+                dataobjattr   =>
+                   "decode(substr(depend,1,8),'org=TSI|',".
+                   "reverse(".
+                      "substr(substr(reverse(".
+                         "dbms_lob.substr(screlationm1.descprgn,255,1)".
+                      "),2,20),1,".
+                   "instr(substr(reverse(".
+                      "dbms_lob.substr(screlationm1.descprgn,255,1)".
+                   "),2,20),'(')-1))  ".
+                   ",screlationm1.depend)"),
 
       new kernel::Field::Text(
                 name          =>'dstfilename',
@@ -134,7 +143,8 @@ sub new
                 name          =>'primary',
                 label         =>'Primary',
                 markempty     =>1,
-                dataobjattr   =>"decode(screlationm1.primary_ci,'true',1,'false',0,NULL)"),
+                dataobjattr   =>"decode(screlationm1.primary_ci,".
+                                "'true',1,'false',0,NULL)"),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
@@ -160,17 +170,20 @@ sub getObjDecode
 {
    my $varname=shift;
    return("decode($varname,".
-                  "'cm3r','tssc::chm',".
-                  "'problem','tssc::inm',".
-                  "'rootcause','tssc::prm',".
-                  "'device',".
-                   "decode(dstdev.model,'APPLICATION','tsacinv::appl',".
-                   "decode(dstdev.model,'LOGICAL SYSTEM','tsacinv::system',".
-                   "decode(substr(depend,0,4),'APPL','tsacinv::appl',".
-                   "decode(substr(depend,0,3),'GER','tsacinv::appl',".
-                   "decode(substr(depend,0,1),'A','tsacinv::asset',".
-                   "decode(substr(depend,0,1),'S','tsacinv::system',".
-                           "NULL)))))))");
+      "'cm3r','tssc::chm',".
+      "'problem','tssc::inm',".
+      "'rootcause','tssc::prm',".
+      "'device',".
+       "decode(dstdev.model,'APPLICATION','tsacinv::appl',".
+       "decode(dstdev.model,'LOGICAL SYSTEM','tsacinv::system',".
+       "decode(substr(depend,0,4),'APPL','tsacinv::appl',".
+       "decode(substr(depend,0,3),'GER','tsacinv::appl',".
+       "decode(substr(depend,0,1),'A','tsacinv::asset',".
+       "decode(substr(depend,0,1),'S','tsacinv::system',".
+         "decode(instr(depend,'|cit=amTsiCustAppl|'),0,".
+         "decode(instr(depend,'|cit=amPortfolio|'),0,NULL,".
+         "'tsacinv::system'),'tsacinv::appl')".
+       ")))))))");
 }
 
 
