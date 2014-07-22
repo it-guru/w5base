@@ -95,51 +95,14 @@ sub DataIssueCompleteWriteRequest
 
    my $affectedobject=effVal($oldrec,$newrec,"affectedobject");
 
-   if ($affectedobject=~m/^itil::mgmtitemgroup$/){
-      $newrec->{directlnktype}=effVal($oldrec,$newrec,"affectedobject");
-      $newrec->{directlnkid}=effVal($oldrec,$newrec,"affectedobjectid");
-      $newrec->{directlnkmode}="DataIssue";
-      my $obj=getModuleObject($self->getParent->Config,$affectedobject);
-      my $affectedobjectid=effVal($oldrec,$newrec,"directlnkid");
-      $obj->SetFilter(id=>\$affectedobjectid);
-      my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid mandatorid mandator));
-      if (defined($confrec)){
-         if ($confrec->{databossid} ne ""){
-            $newrec->{fwdtarget}="base::user";
-            $newrec->{fwdtargetid}=$confrec->{databossid};
-         }
-        # if ($confrec->{mandatorid} ne ""){
-        #    $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};
-        #    if (!defined($newrec->{fwdtargetid}) ||
-        #         $newrec->{fwdtargetid} eq ""){
-        #       # now search a Config-Manager
-        #       my @confmgr=$self->getParent->getMembersOf(
-        #                      $confrec->{mandatorid},
-        #                      ["RCFManager","RCFManager2"]);
-        #       my $cfmgr1=shift(@confmgr);
-        #       my $cfmgr2=shift(@confmgr);
-        #       if ($cfmgr1 ne ""){
-        #          $newrec->{fwdtarget}="base::user";
-        #          $newrec->{fwdtargetid}=$cfmgr1;
-        #       }
-        #       if ($cfmgr2 ne ""){
-        #          $newrec->{fwddebtarget}="base::user";
-        #          $newrec->{fwddebtargetid}=$cfmgr2;
-        #       }
-        #    }
-        # }
-        # if ($confrec->{mandator} ne ""){
-        #    $newrec->{kh}->{mandator}=$confrec->{mandator};
-        # }
-      }
-   }
-
    if (($affectedobject=~m/::appl$/)   ||
        ($affectedobject=~m/::custcontract$/) ||
        ($affectedobject=~m/::swinstance$/) ||
        ($affectedobject=~m/::itclust$/) ||
+       ($affectedobject=~m/::mgmtitemgroup$/) ||
        ($affectedobject=~m/::applnor$/) ||
        ($affectedobject=~m/::appladv$/) ||
+       ($affectedobject=~m/::lnkapplurl$/) ||
        ($affectedobject=~m/::asset$/) ||
        ($affectedobject=~m/::system$/)){
       if (defined($newrec->{affectedobject}) &&
@@ -155,8 +118,18 @@ sub DataIssueCompleteWriteRequest
       my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid mandatorid mandator));
       if (defined($confrec)){
          if ($confrec->{databossid} ne ""){
-            $newrec->{fwdtarget}="base::user";
-            $newrec->{fwdtargetid}=$confrec->{databossid};
+            my $u=getModuleObject($self->getParent->Config,"base::user");
+            $u->SetFilter({userid=>\$confrec->{databossid}});
+            my ($urec)=$u->getOnlyFirst(qw(cistatusid));
+            if (defined($urec) && 
+                $urec->{cistatusid}<5 && $urec->{cistatusid}>2){
+               $newrec->{fwdtarget}="base::user";
+               $newrec->{fwdtargetid}=$confrec->{databossid};
+            }
+            else{
+               $newrec->{fwdtarget}=undef;
+               $newrec->{fwdtargetid}=undef;
+            }
          }
          if ($confrec->{mandatorid} ne ""){
             $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};
@@ -165,7 +138,17 @@ sub DataIssueCompleteWriteRequest
                # now search a Config-Manager
                my @confmgr=$self->getParent->getMembersOf(
                               $confrec->{mandatorid},
-                              ["RCFManager","RCFManager2"]);
+                              ["RCFManager"]);
+               {  # add posible deputies
+                  my @confmgr2=$self->getParent->getMembersOf(
+                                 $confrec->{mandatorid},
+                                 ["RCFManager2"]);
+                  foreach my $uid (@confmgr2){
+                     if (!in_array(\@confmgr,$uid)){
+                        push(@confmgr,$uid);
+                     }
+                  }
+               }
                my $cfmgr1=shift(@confmgr);
                my $cfmgr2=shift(@confmgr);
                if ($cfmgr1 ne ""){
