@@ -111,6 +111,9 @@ sub qcheckRecord
    my $self=shift;
    my $rec=shift;
 
+
+   
+
    my $result=3;       # undef = rule not useable
                        #     1 = rule failed, but no big problem
                        #     2 = rule failed
@@ -119,6 +122,13 @@ sub qcheckRecord
                qmsg=>'this is a rule with no defined qcheckRecord method',
                dataissue=>'this could be an array of text to DataIssue Wf',
             };
+
+   if ($self->can("qenrichRecord")){
+      $result=0;
+      $desc={
+               qmsg=>'enrichment only rule'
+            };
+   }
 
 
    return($result,$desc);

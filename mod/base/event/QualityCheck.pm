@@ -51,7 +51,9 @@ sub QualityCheck
    my $self=shift;
    my $dataobj=shift;
    msg(DEBUG,"starting QualityCheck");
-   my %dataobjtocheck=$self->LoadQualitCheckActivationLinks();
+   my $lnkq=getModuleObject($self->Config,"base::lnkqrulemandator");
+
+   my %dataobjtocheck=$lnkq->LoadQualityActivationLinks();
    #msg(INFO,Dumper(\%dataobjtocheck));
    if ($dataobj eq ""){
       my $n=keys(%dataobjtocheck);
@@ -280,34 +282,5 @@ sub storeQualityCheckContextWithWorkflowCleanup
 
 
 
-
-sub LoadQualitCheckActivationLinks
-{
-   my $self=shift;
-
-   my $lnkq=getModuleObject($self->Config,"base::lnkqrulemandator");
-   my %dataobjtocheck;
-   $lnkq->ResetFilter();
-   $lnkq->SetCurrentView("dataobj","mandatorid");
-   my ($rec,$msg)=$lnkq->getFirst(unbuffered=>1);
-   if (defined($rec)){
-      do{
-         msg(INFO,"dataobject=$rec->{dataobj} ".
-                  "mandatorid=$rec->{mandatorid}");
-         if ($rec->{dataobj} ne ""){
-            my $mandatorid=$rec->{mandatorid};
-            $mandatorid=0 if (!defined($mandatorid));
-            if ($rec->{dataobj}=~m/::workflow::/){
-               $dataobjtocheck{'base::workflow'}->{$mandatorid}++;
-            }
-            else{
-               $dataobjtocheck{$rec->{dataobj}}->{$mandatorid}++;
-            }
-         }
-         ($rec,$msg)=$lnkq->getNext();
-      }until(!defined($rec));
-   }
-   return(%dataobjtocheck);
-}
 
 1;

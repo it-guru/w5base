@@ -49,7 +49,7 @@ sub EnrichmentCollector
                                 Listen    => 5 );
    my $readable_handles = new IO::Select();
    $readable_handles->add($main_socket);
-   my @slot=(undef,undef,undef,undef,undef);
+   my @slot=(undef,undef,undef,undef,undef,undef,undef);
    $self->{task}=[];
    my %cons=();
    my $last_taskCreator=0;
@@ -146,27 +146,119 @@ sub taskCreator
    my $self=shift;
    my $SrvStat=shift;
 
+   if (!defined($self->{toDoPipe})){
+      $self->{toDoPipe}=[];
+   }
+
+   my $todo=$self->{toDoPipe};
+
    $self->broadcast("call taskCreator");
-   my $todo=$self->{systems};
 
-   if ($#{$todo}==-1){
-      my $sys=getModuleObject($self->Config,"itil::system");
-      $sys->SetFilter({cistatusid=>[3,4]});
-      #$sys->Limit(200,0,0);
-      my @l=$sys->getVal(qw(id));
-      @{$self->{systems}}=@l;
+   if ($#{$todo}<50){
+      msg(DEBUG,"starting QualityCheck");
+      my $lnkq=getModuleObject($self->Config,"base::lnkqrulemandator");
+      my $qrule=getModuleObject($self->Config,"base::qrule");
+
+      my %dataobjtoenrich=$lnkq->LoadQualityActivationLinks();
+
+      ######################################################################
+      # Filter out QualityRules with no enrichment handler
+      foreach my $dataobj (sort(keys(%dataobjtoenrich))){
+         $self->broadcast("check candidat: $dataobj");
+         my @enrichRules=();
+         foreach my $mandatorid (keys(%{$dataobjtoenrich{$dataobj}})){
+            foreach my $qn (keys(%{$dataobjtoenrich{$dataobj}->{$mandatorid}})){
+               if (!($qrule->{qrule}->{$qn}->can("qenrichRecord"))){
+                  delete($dataobjtoenrich{$dataobj}->{$mandatorid}->{$qn});
+               }
+            }
+            if (!keys(%{$dataobjtoenrich{$dataobj}->{$mandatorid}})){
+               delete($dataobjtoenrich{$dataobj}->{$mandatorid});
+            }
+         }
+         if (!keys(%{$dataobjtoenrich{$dataobj}})){
+            delete($dataobjtoenrich{$dataobj});
+         }
+      }
+      ######################################################################
+
+      $self->broadcast("candidats are:".Dumper(\%dataobjtoenrich));
+
+      foreach my $dataobj (sort(keys(%dataobjtoenrich))){
+         foreach my $mandatorid (keys(%{$dataobjtoenrich{$dataobj}})){
+            my $o=getModuleObject($self->Config,$dataobj);
+            if (defined($o)){
+               my $idfield=$o->IdField();
+               if (defined($idfield)){
+                  my $idname=$idfield->Name();
+                  my $flt={lastqenrich=>['<now-24h',undef]};
+                  if ($mandatorid>0 && defined($o->getField("mandatorid"))){
+                     $flt->{mandatorid}=\$mandatorid;
+                  }
+                  if ($o->getField("cistatusid")){
+                     $flt->{cistatusid}=[3,4,5];
+                  }
+                  $o->SetFilter($flt);
+                  $o->SetCurrentView("lastqenrich","mdate",$idname);
+                  $o->Limit(50);
+                  my ($rec,$msg)=$o->getFirst(unbuffered=>1);
+                  if (defined($rec)){
+                     do{
+                        my $param={qrules=>[
+                                      keys(%{$dataobjtoenrich{$dataobj}->{$mandatorid}})
+                                   ],
+                                   idname=>$idname};
+                        push(@{$todo},{
+                           name=>$dataobj."::".$rec->{$idname},
+                           dataobj=>$dataobj,
+                           id=>$rec->{$idname},
+                           stdout=>[],stderr=>[],
+                           param=>$param,
+                           requesttime=>time()
+                        });
+                        ($rec,$msg)=$o->getNext();
+                     }until(!defined($rec));
+                  }
+               }
+            }
+         }
+      }
    }
+
+
+
    while($#{$self->{task}}<100 && $#{$todo}!=-1){
-      my $system=shift(@{$todo});
+      my $todorec=shift(@{$todo});
       my $param={};
-      push(@{$self->{task}},{name=>"itil::system::$system",
-                             dataobj=>"itil::system",
-                             id=>$system,
-                             stdout=>[],stderr=>[],
-                             param=>$param,
-                             requesttime=>time()});
-
+      push(@{$self->{task}},$todorec);
    }
+
+
+
+
+
+
+
+#   my $todo=$self->{systems};
+#
+#   if ($#{$todo}==-1){
+#      my $sys=getModuleObject($self->Config,"itil::system");
+#      $sys->SetFilter({cistatusid=>[3,4]});
+#      #$sys->Limit(200,0,0);
+#      my @l=$sys->getVal(qw(id));
+#      @{$self->{systems}}=@l;
+#   }
+#   while($#{$self->{task}}<100 && $#{$todo}!=-1){
+#      my $system=shift(@{$todo});
+#      my $param={};
+#      push(@{$self->{task}},{name=>"itil::system::$system",
+#                             dataobj=>"itil::system",
+#                             id=>$system,
+#                             stdout=>[],stderr=>[],
+#                             param=>$param,
+#                             requesttime=>time()});
+#
+#   }
 }
 
 #sub addTask
@@ -300,7 +392,9 @@ sub slotHandler
                   POSIX::close($cc);       # filehandles are closed
                }
                $0.="(".$task->{name}.")";
-               my $bk=$self->processEnrichment($task->{dataobj},$task->{id});
+               my $bk=$self->processEnrichment($task->{dataobj},
+                                               $task->{id},
+                                               $task->{param});
                if (defined($bk) && $bk>0){
                #   printf STDERR ("existcode:$bk\n");
                   exit($bk);
@@ -357,12 +451,45 @@ sub processEnrichment
    my $self=shift;
    my $dataobj=shift;
    my $id=shift;
+   my $param=shift;
 
+   my $idname=$param->{idname};
+   my $rec;
 
-
+   printf STDERR ("fifi $dataobj -> $id\n");
    my $obj=getModuleObject($self->Config,$dataobj);
-   $obj->SetFilter({id=>\$id});
-   my ($rec)=$obj->getOnlyFirst(qw(ALL));
+   if (defined($obj) && $idname ne ""){
+      $obj->SetFilter({$idname=>\$id});
+      my ($rec)=$obj->getOnlyFirst(qw(ALL));
+      my $qr=getModuleObject($self->Config,"base::qrule");
+
+      foreach my $qrulename (@{$param->{qrules}}){
+         my $qrule=$qr->{qrule}->{$qrulename};
+         my $oldcontext=$W5V2::OperationContext;
+         $W5V2::OperationContext="Enrichment";
+         my $dataModified=0;
+         if ($qrule->can("qenrichRecord")){
+           $dataModified=$qrule->qenrichRecord($obj,$rec,$param);
+         }
+         $W5V2::OperationContext=$oldcontext;
+         if ($dataModified){ # reload rec is a ToDo
+            my $reloadedRec=$qr->reloadRec($obj,$rec);
+            if (!defined($reloadedRec)){
+               msg(ERROR,"reloadRec error after enrichment");
+               return();
+            }
+            $rec=$reloadedRec;
+         }
+      }
+
+      $obj->ValidatedUpdateRecord($rec,{lastqenrich=>NowStamp("en"),
+                                        mdate=>$rec->{mdate}},
+                                  {$idname=>\$id});
+   }
+
+   return(0);
+
+
 
    my $add=getModuleObject($self->Config,"itil::autodiscdata");
    my $ade=getModuleObject($self->Config,"itil::autodiscengine");

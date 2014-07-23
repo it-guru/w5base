@@ -6,6 +6,7 @@
 'Attachments'            =>{de=>'Dateianlagen'                              },
 'Further Functions'      =>{de=>'weiterführende Funktionen'                 },
 'Quality Check last date'=>{de=>'Zeitpunkt der letzten Qualitätsprüfung'    },
+'Quality enrich last date'=>{de=>'Zeitpunkt der letzten Datenanreicherung'  },
 'Comments'               =>{de=>'Bemerkungen'                               },
 'User-Account'           =>{de=>'Benutzerkennung'                           },
 'Data care Assistant'    =>{de=>'Datenpflege-Assistent'                     },
@@ -41,7 +42,7 @@
 'fieldgroup.misc'        =>{de=>'Sonstiges',         en=>'Miscellaneous'},
 'fieldgroup.acl'         =>{de=>'Zugriffssteuerung', en=>'Accesscontrol'},
 'fieldgroup.interview'   =>{de=>'Interview',         en=>'Interview'},
-'fieldgroup.qc'          =>{de=>'QualityCheck',      en=>'QualityCheck'},
+'fieldgroup.qc'          =>{de=>'Qualitäts-Sicherung',en=>'Quality-System'},
 'fieldgroup.control'     =>{de=>'Steuerungs-/Automationsdaten',
                             en=>'Control-/Authomationinformations'},
 
@@ -62,3 +63,4 @@
 'DataIssue state'       =>{de=>'DataIssue Status'},
 'Additionalinformations'=>{de=>'Zusatzinformationen'},
 'URL of record'=>{de=>'URL des Datensatzes'},
+'enrichment only rule'=>{de=>'Datenanreicherungsregel'},

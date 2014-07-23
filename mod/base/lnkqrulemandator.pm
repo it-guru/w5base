@@ -279,5 +279,37 @@ sub getRecordImageUrl
 }
 
 
+sub LoadQualityActivationLinks
+{     
+   my $self=shift;
+
+   my %dataobjtocheck;
+   $self->ResetFilter();
+   $self->SetFilter({cistatusid=>\'4'});
+   $self->SetCurrentView("dataobj","mandatorid","qruleid");
+   my ($rec,$msg)=$self->getFirst(unbuffered=>1);
+   if (defined($rec)){
+      do{
+         msg(INFO,"dataobject=$rec->{dataobj} ".
+                  "mandatorid=$rec->{mandatorid}");
+         if ($rec->{dataobj} ne ""){
+            my $mandatorid=$rec->{mandatorid};
+            my $qruleid=$rec->{qruleid};
+            $mandatorid=0 if (!defined($mandatorid));
+            if ($rec->{dataobj}=~m/::workflow::/){
+               $dataobjtocheck{'base::workflow'}->{$mandatorid}->{$qruleid}++;
+            }
+            else{
+               $dataobjtocheck{$rec->{dataobj}}->{$mandatorid}->{$qruleid}++;
+            }
+         }
+         ($rec,$msg)=$self->getNext();
+      }until(!defined($rec));
+   }
+   return(%dataobjtocheck);
+}
+
+
+
 
 1;

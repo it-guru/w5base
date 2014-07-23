@@ -74,6 +74,7 @@ use kernel::Field::QualityText;
 use kernel::Field::QualityState;
 use kernel::Field::QualityOk;
 use kernel::Field::QualityLastDate;
+use kernel::Field::EnrichLastDate;
 use kernel::Field::QualityResponseArea;
 use kernel::Field::IssueState;
 use kernel::Field::Fulltext;
