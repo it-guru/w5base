@@ -5,6 +5,8 @@
 'fieldgroup.w5base' =>{de=>'zusätzliche Daten (W5Base)',
                        en=>'additional data (w5base)'},
 'relation name'     =>{de=>'Verknüpfungsname',en=>'Relation name'},
+'Destination name'  =>{de=>'Name',en=>'Name'},
+'Destination-ID'    =>{de=>'Asset-ID',en=>'Asset ID'},
 'Criticality'       =>{de=>'Kritikalität'},
 'Customer'          =>{de=>'Kunde'},
 'further ci informations'=>{de=>'weiterführende CI-Informationen'},

@@ -596,10 +596,8 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tssc::lnkci',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoindisp     =>[qw(dstmodel dstname dstcriticality civalid
-                                    dststatus 
-                                    furtherciinfo)]),
-                              #      opmode mandator
+                vjoindisp     =>[qw(dstname dst dstcriticality civalid
+                                    dststatus furtherciinfo)]),
 
       new kernel::Field::SubList(
                 name          =>'tickets',
@@ -608,7 +606,7 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tssc::lnkticket',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoindisp     =>[qw(dstid priority status)]),
+                vjoindisp     =>[qw(dst priority status)]),
 
       new kernel::Field::Text(
                 name          =>'editor',
