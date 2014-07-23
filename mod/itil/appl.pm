@@ -1457,7 +1457,9 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'appl.lastqcheck'),
-      new kernel::Field::QualityResponseArea()
+      new kernel::Field::QualityResponseArea(),
+      new kernel::Field::EnrichLastDate(
+                dataobjattr   =>'appl.lastqenrich')
    );
    $self->AddGroup("external",translation=>'itil::appl');
    $self->{history}=[qw(insert modify delete)];
@@ -2162,6 +2164,16 @@ sub ValidateDelete
       $refobj->SetFilter({'toapplid'=>\$id});
       $lock++ if ($refobj->CountRecords()>0);
    }
+   my $refobj=getModuleObject($self->Config,"itil::lnkbscomp");
+   if (defined($refobj)){
+      my $idname=$self->IdField->Name();
+      my $id=$rec->{$idname};
+      $refobj->SetFilter([{objtype=>\'itil::appl',obj1id=>\$id},
+                          {objtype=>\'itil::appl',obj2id=>\$id},
+                          {objtype=>\'itil::appl',obj3id=>\$id}]);
+      $lock++ if ($refobj->CountRecords()>0);
+   }
+
    if ($lock>0 ||
        $#{$rec->{systems}}!=-1 ||
        $#{$rec->{services}}!=-1 ||
@@ -2169,7 +2181,8 @@ sub ValidateDelete
        $#{$rec->{custcontracts}}!=-1){
       $self->LastMsg(ERROR,
           "delete only posible, if there are no system, ".
-          "software instance and contract relations");
+          "software instance, cluster service, interfaces, service components ".
+          "and contract relations");
       return(0);
    }
 
