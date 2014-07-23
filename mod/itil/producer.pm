@@ -129,6 +129,18 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'producer.modifydate'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"producer.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(producer.id,35,'0')"),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
