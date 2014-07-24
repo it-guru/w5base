@@ -146,6 +146,22 @@ sub new
                 vjoininhash   =>['name','systemsystemid','systemcistatus',
                                  'systemid']),
 
+      new kernel::Field::SubList(
+                name          =>'software',
+                label         =>'Software',
+                group         =>'software',
+                subeditmsk    =>'subedit.system',
+                readonly      =>1,
+                htmldetail    =>0,
+                forwardSearch =>1,
+                vjointo       =>'itil::lnksoftwareitclustsvc',
+                vjoinbase     =>[{softwarecistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'itclustid'],
+                vjoindisp     =>['software','version','quantity','comments'],
+                vjoininhash   =>['softwarecistatusid','liccontractcistatusid',
+                                 'liccontractid',
+                                 'software','version','quantity']),
+
       new kernel::Field::Boolean(
                 name          =>'allowifupdate',
                 group         =>'control',
@@ -289,7 +305,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default services systems contacts misc control
+   return(qw(header default services systems software contacts misc control
              attachments source));
 }
 

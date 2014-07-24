@@ -76,6 +76,14 @@ sub new
                 vjoindisp     =>'name'),
 
       new kernel::Field::Text(
+                name          =>'itclustid',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'link',
+                label         =>'ClusterID',
+                dataobjattr   =>'itclust.id'),
+
+      new kernel::Field::Text(
                 name          =>'itclust',
                 readonly      =>1,
                 htmldetail    =>0,
