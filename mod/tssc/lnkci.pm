@@ -29,10 +29,6 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Interface(
-                name          =>'description',
-                dataobjattr   =>'screlationm1.descprgn'),
-
       new kernel::Field::Text (
                 name          =>'dstcriticality',
                 group         =>'dst',
@@ -137,37 +133,9 @@ sub new
 
                    return($d);
                 }),
-                    
-#      new kernel::Field::Textarea(
-#                name          =>'probableapps',
-#                label         =>'probable W5Base application',
-#                depend        =>['dst','dstobj'],
-#                onRawValue    =>sub{
-#                    my $self   =shift;
-#                    my $current=shift;
-#                    my $mode=shift;
-#                    my $p=$self->getParent();
-#
-#                    my %d;
-#
-#                    my $dstobj=$p->getField("dstobj")->RawValue($current);
-#                    my $dst=$p->getField("dst")->RawValue($current);
-#
-#                    if ($dstobj eq "tsacinv::system" && $dst ne ""){
-#                       my $o=getModuleObject($self->Config,"itil::system");
-#                       $o->SetFilter({systemid=>\$dst});
-#                       my ($rec)=$o->getOnlyFirst(qw(applications));
-#                       if (ref($rec->{applications}) eq "ARRAY"){
-#                          foreach my $app (@{$rec->{applications}}){
-#                             $d{$app->{appl}}++;
-#                          }
-#                       }
-#                    }
-#                   return([sort(keys(%d))]);
-#                }),
    );
    
-   $self->setDefaultView(qw(linenumber dst dstname probableapps));
+   $self->setDefaultView(qw(linenumber dst dstname furtherciinfo));
    return($self);
 }
 
