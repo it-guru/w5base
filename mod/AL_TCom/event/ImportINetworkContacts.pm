@@ -260,13 +260,13 @@ sub getContactEntryId
    }
 
    my $user=getModuleObject($self->Config,"base::user");
-   $user->SetFilter({email=>$d->{'email'}});
+   $user->SetFilter({emails=>$d->{'email'}});
    my ($urec,$msg)=$user->getOnlyFirst(qw(userid));
    if (!defined($urec)){
       my $chk=$d->{'email'};
       $chk=~s/\@.*/\@*/;
       $user->ResetFilter();
-      $user->SetFilter({email=>$chk});
+      $user->SetFilter({emails=>$chk});
       my ($urec,$msg)=$user->getOnlyFirst(qw(userid));
       if (defined($urec)){
            $self->{problems}->{"100".lc($d->{'email'})}=
