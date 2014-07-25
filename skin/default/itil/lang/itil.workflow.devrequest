@@ -9,6 +9,7 @@
 'fieldgroup.default'=>{de=>'test'},
 'developer requests are disabled for the desired application'=>{de=>'Entwickleranforderungen sind für die ausgewählte Anwendung (im CFM) nicht zugelassen'},
 'Initiate quotation request to developer'=>{de=>'Angebotsanfrage beim Entwickler initiieren'},
+'Initiate request to businessteam'=>{de=>'Auftrag an den Anwendungsbetrieb initiieren'},
 'fieldgroup.devreqstat'=>{de=>'detaillierte Klassifizierung/Priorisierung',en=>'detailes classification/priorisition'},
 'veto from application management of affected application'=>{de=>'Veto des Application-Managements der betroffenen Anwendung liegt vor'},
 'implementation effort class'=>{de=>'Aufwandsklasse für die Implementation des Requests'},
@@ -22,3 +23,5 @@
 'processmanager of business process has approved'=>{de=>'Zustimmung des Geschäftsprozess-Managers liegt vor'},
 'dependson'=>{de=>'der Workflow "%s" muß vor diesem Workflow gelößt werden',en=>'the workflow "%s" must be solved bevor this workflow'},
 'REV.dependson'=>{de=>'nach diesem Workflow kann der Workflow "%s" bearbeitet werden',en=>'after the current workflow the workflow "%s" can be processed'},
+'derivation'=>{de=>'Abgeleiteter Workflow "%s"',en=>'derivated workflow "%s"'},
+'REV.derivation'=>{de=>'Abgeleitet von Workflow "%s"',en=>'derivated from workflow "%s"'},
