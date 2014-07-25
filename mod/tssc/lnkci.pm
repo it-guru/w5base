@@ -30,6 +30,17 @@ sub new
    
    $self->AddFields(
       new kernel::Field::Text (
+                name          =>'descname',
+                label         =>'Name',
+                depend        =>['description'],
+                htmlwidth     =>'200px',
+                onRawValue    =>sub {
+                    my $self   =shift;
+                    my $current=shift;
+                    return(split "\n",$current->{description})[4];
+                 }),
+
+      new kernel::Field::Text (
                 name          =>'dstcriticality',
                 group         =>'dst',
                 label         =>'Criticality',

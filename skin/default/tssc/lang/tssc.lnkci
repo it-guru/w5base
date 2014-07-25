@@ -10,5 +10,4 @@
 'Criticality'       =>{de=>'Kritikalität'},
 'Customer'          =>{de=>'Kunde'},
 'further ci informations'=>{de=>'weiterführende CI-Informationen'},
-'probable W5Base application'=>{de=>'vermutliche W5Base Anwendung'},
-
+'Destination-Model' =>{de=>'Typ',en=>'Type'},

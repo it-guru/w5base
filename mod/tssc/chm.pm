@@ -596,8 +596,8 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tssc::lnkci',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoindisp     =>[qw(dstname dst dstcriticality civalid
-                                    dststatus furtherciinfo)]),
+                vjoindisp     =>[qw(descname dstmodel dstcriticality
+                                    civalid dststatus furtherciinfo)]),
 
       new kernel::Field::SubList(
                 name          =>'tickets',
