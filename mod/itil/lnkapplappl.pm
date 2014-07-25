@@ -64,6 +64,13 @@ sub new
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'Interface fullname',
+                selectfix     =>1,
+                dataobjattr   =>"concat(fromappl.name,':',".
+                                "toappl.name,':',lnkapplappl.conprotocol)"),
+
+      new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
                 dataobjattr   =>'lnkapplappl.cistatus'),

@@ -128,10 +128,10 @@ sub ProcessLine
                                         $self->getParent->getParent->Self);
 
    if (my $f=$self->getParent->getParent->getField("fullname")){
-      $headerval=quoteHtml($f->RawValue($rec));
+      $headerval=$f->RawValue($rec);
    }
    elsif (my $f=$self->getParent->getParent->getField("name")){
-      $headerval=quoteHtml($f->RawValue($rec));
+      $headerval=$f->RawValue($rec);
    }
    else{
       $headerval='%objecttitle%';

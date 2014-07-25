@@ -112,14 +112,32 @@ sub FormatedResult
    my $self=shift;
    my $current=shift;
    my $FormatAs=shift;
+
    my $d=$self->RawValue($current);
    $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
-   if ($self->readonly($current) && 
-       ref($self->{onRawValue}) eq "CODE" &&
-       !($FormatAs=~m/^Html.*$/)){
-      $d=Html2Latin1($d);
+   if ($FormatAs eq "SOAP"){
+      if (!ref($d)){
+         $d=quoteSOAP($d);
+      }
+      elsif (ref($d) eq "ARRAY"){
+         $d=[map({quoteSOAP($_)} @{$d})];
+      }
    }
-   return($self->SUPER::FormatedResult($current,$FormatAs));
+   if ($FormatAs eq "DTPpdfv01"){
+      eval('use HTML::FormatText;use HTML::TreeBuilder 5 -weak;');
+      if ($@ eq ""){
+         my $f;
+         my $dTree;
+         eval('$f=HTML::FormatText->new(leftmargin=>0,rightmargin=>50);');
+         if (defined($f) && !ref($d) && $d ne ""){
+            eval('$dTree=HTML::TreeBuilder->new_from_content($d);');
+            if (defined($dTree)){
+               $d=$f->format($dTree);
+            }
+         }
+      }
+   }
+   return($d);
 }
 
 
