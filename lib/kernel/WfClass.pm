@@ -585,7 +585,8 @@ addEvent(window, "load",   ProcessInit);
 </script>
 EOF
       }
-      $template.=$app->HtmlPersistentVariables(qw(id isCopyFromId));
+      $template.=$app->HtmlPersistentVariables(qw(id isCopyFromId 
+                                                  isDerivateFrom));
    }
    else{
       my $workheight=$StepObj->getWorkHeight();
@@ -681,7 +682,9 @@ addEvent(window, "load",   ProcessInit);
 </script>
 EOF
       Query->Param("WorkflowClass"=>$class);
-      $template.=$app->HtmlPersistentVariables(qw(WorkflowClass isCopyFromId));
+      $template.=$app->HtmlPersistentVariables(qw(WorkflowClass 
+                                                  isDerivateFrom
+                                                  isCopyFromId));
    }
    my @l=Query->Param("WorkflowStep");
    if ($#l!=-1){

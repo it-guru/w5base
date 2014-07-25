@@ -625,7 +625,6 @@ sub getPosibleActions
       sprintf(" - creator              : %s\n",$creator).
       sprintf(" - lastworker           : %s\n",$lastworker).
       sprintf(" - actions              : %s\n",join(", ",@l)));
-      #printf STDERR (" - WfRec :\n%s\n",Dumper($WfRec));
    }
 
    return(@l);
@@ -800,6 +799,7 @@ sub nativProcess
          }
          return(0);
       }
+  
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
          if ($#wsref!=-1){
@@ -808,6 +808,18 @@ sub nativProcess
                last if ($targetid eq "" || $target eq "");
                $self->getParent->getParent->AddToWorkspace($id,
                                                            $target,$targetid);
+            }
+         }
+         my $isDerivateFrom=Query->Param("isDerivateFrom");
+         if ($isDerivateFrom ne ""){
+            if (my ($srctype,$srcid)=$isDerivateFrom=~m/^(.*)::(\d+)$/){
+               my $wr=getModuleObject($self->Config,"base::workflowrelation"); 
+               $wr->ValidatedInsertRecord({
+                  name=>"derivation",
+                  translation=>$srctype,
+                  srcwfid=>$srcid,
+                  dstwfid=>$id,
+               });
             }
          }
          $self->PostProcess($action,$h,$actions);
@@ -889,7 +901,6 @@ package base::workflow::request::main;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
-use Data::Dumper;
 @ISA=qw(kernel::WfStep);
 
 

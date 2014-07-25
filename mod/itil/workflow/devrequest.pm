@@ -86,6 +86,24 @@ sub getPosibleWorkflowDerivations
              });
           },
           name=>'invoicerequest'
+         },
+         {label=>$self->T('Initiate request to businessteam'),
+          actor=>sub{
+             my $self=shift;
+             my $WfRec=shift;
+
+             return({
+                targeturl=>'New',
+                targetparam=>{
+                  Formated_name=>$WfRec->{name},
+                  Formated_detaildescription=>
+                                 $WfRec->{detaildescription},
+                  Formated_affectedapplication=>$WfRec->{affectedapplication},
+                  WorkflowClass=>'itil::workflow::businesreq'
+                }
+             });
+          },
+          name=>'businesreq'
          }
          );
    }

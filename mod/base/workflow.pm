@@ -2167,7 +2167,7 @@ sub DerivateFrom # Workflow ableiten
                      print("<html>");
                      eval("use JSON;");
                      if ($@ eq ""){
-                        $bk->{'targetparam'}->{'DerivateFrom'}=
+                        $bk->{'targetparam'}->{'isDerivateFrom'}=
                              $wfrec->{'class'}."::".$wfrec->{'id'};
                         my $json;
                         eval('$json='.
@@ -2190,7 +2190,7 @@ sub DerivateFrom # Workflow ableiten
                         print("<form action='$bk->{targeturl}' method=POST>");
                         print("</form>");
                         print("derivation of new workflow from ".
-                              $bk->{'targetparam'}->{'DerivateFrom'}."<br>");
+                              $bk->{'targetparam'}->{'isDerivateFrom'}."<br>");
                         print("loading ...");
                         #print("<xmp>".$json."</xmp>");
                         print("</body>");
