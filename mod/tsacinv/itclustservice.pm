@@ -246,14 +246,6 @@ sub initSqlWhere
    return($where);
 }
 
-sub SecureSetFilter
-{
-   my $self=shift;
-   my @flt=@_;
-
-   return($self->addAltBCSetFilter(@flt));
-}
-
 
 sub isViewValid
 {
