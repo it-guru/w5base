@@ -182,7 +182,7 @@ sub ItemSummary
    my ($rec,$msg)=$o->getOnlyFirst(qw(interviewst));
    my @q;
    foreach my $q (@{$rec->{interviewst}->{TotalActiveQuestions}}){
-     push(@q,{name=>$q->{name},prio=>$q->{prio}});
+     push(@q,{name=>$q->{name},prio=>$q->{prio},id=>$q->{id}});
    }
    $summary->{interviewstate}={TotalActiveQuestions=>\@q};
    return(0) if (!$o->Ping());
