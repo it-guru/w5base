@@ -37,7 +37,7 @@ sub new
                 onRawValue    =>sub {
                     my $self   =shift;
                     my $current=shift;
-                    return(split "\n",$current->{description})[4];
+                    return(split("\n",$current->{description}))[4];
                  }),
 
       new kernel::Field::Text (
@@ -49,7 +49,7 @@ sub new
                 onRawValue    =>sub {
                     my $self   =shift;
                     my $current=shift;
-                    my $criticality=(split "\n",$current->{description})[0];
+                    my $criticality=(split("\n",$current->{description}))[0];
                     return lc $criticality;
                  }),
 
@@ -59,7 +59,8 @@ sub new
                 label         =>'Valid',
                 translation   =>'tssc::lnk',
                 htmlwidth     =>'50',
-                dataobjattr   =>"decode(screlationm1.valid_ci,'t',1,'f',0,NULL)"),
+                dataobjattr   =>"decode(".
+                                "screlationm1.valid_ci,'t',1,'f',0,NULL)"),
 
       new kernel::Field::Text (
                 name          =>'dststatus',
@@ -70,7 +71,7 @@ sub new
                 onRawValue    =>sub {
                     my $self   =shift;
                     my $current=shift;
-                    my $status = (split "\n",$current->{description})[2];
+                    my $status = (split("\n",$current->{description}))[2];
                     return lc $status;
                  }),
 
