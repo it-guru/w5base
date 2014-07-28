@@ -149,6 +149,18 @@ sub DataIssueCompleteWriteRequest
                      }
                   }
                }
+               if ($#confmgr==-1){
+                  my @cf1=$self->getParent->getMembersOf(
+                              $confrec->{mandatorid},
+                              ["RCFManager"],"up");
+                  if ($#cf1!=-1){
+                     push(@confmgr,$cf1[0]);
+                  }
+                  my @cf2=$self->getParent->getMembersOf(
+                              $confrec->{mandatorid},
+                              ["RCFManager2"],"up");
+                  push(@confmgr,@cf2);
+               }
                my $cfmgr1=shift(@confmgr);
                my $cfmgr2=shift(@confmgr);
                if ($cfmgr1 ne ""){
