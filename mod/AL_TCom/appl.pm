@@ -170,7 +170,7 @@ sub ItemSummary
    # alle beantworteten Interview-Fragen
    my $o=getModuleObject($self->Config,"itil::lnkapplinteranswer");
    $o->SetFilter({parentid=>\$current->{id}});
-   my @l=$o->getHashList(qw(name answer));
+   my @l=$o->getHashList(qw(id name relevant interviewid answer));
    Dumper(\@l);
    $summary->{interviewansers}=\@l;
    return(0) if (!$o->Ping());
