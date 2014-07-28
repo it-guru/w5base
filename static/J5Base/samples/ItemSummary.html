@@ -1,0 +1,92 @@
+<html>
+<head>
+<title>mini Progi - ItemSummary view</title>
+<script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+
+<script language="JavaScript" src="../../../auth/base/load/datadumper.js">
+</script>
+
+<script language="JavaScript">
+var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+
+console.log(W5Base.ContextInfo());
+
+function displayItemSummary(res)
+{
+   var d="";
+
+   $('#state').html("<font color=green>done</font>");
+
+   var d=Dumper;
+   d.setMaxIterations(10000);
+
+
+   $('#result').html("<pre>"+d(res)+"</pre>");
+}
+
+function loadItemSummary()
+{
+   $('#state').html("<font color=darkred>loading ItemSummary ...</font>");
+   var o=getModuleObject(W5Base,"AL_TCom::appl");
+
+   o.SetFilter({cistatusid:"4",id:$('#appl').val()});  
+   o.findRecord("name,id,itemsummary",displayItemSummary);
+}
+
+function addApplNames(res)
+{
+   for(c=0;c<res.length;c++){
+      $('#appl').append($('<option></option>').
+               val(res[c].id).html(res[c].name));
+   }
+   $('#state').html("<font color=darkgreen>Ready</font>");
+}
+
+function loadApplNames()
+{
+   $('#state').html("<font color=darkred>loading applications ...</font>");
+   var o=getModuleObject(W5Base,"itil::appl");
+   o.SetFilter({cistatusid:"4",name:"w*"});  
+   o.findRecord("name,id",addApplNames);
+}
+
+$(document).ready(function (){
+   $('#state').html("<font color=darkred>init ...</font>");
+   window.setTimeout(loadApplNames,1500);
+});
+
+
+</script>
+
+</head>
+<body>
+<!-- CONTROL -->
+<table border=0 width=100%>
+   <tr>
+      <td width=1% nowrap>Application:</td>
+      <td>
+         <select style="width:100%" onchange="loadItemSummary();" id=appl >
+         <option></option></select>
+      </td>
+      <td width=1% colspan=1 align=right>
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Status:</td>
+      <td><div id=state></div>
+      </td>
+      <td width=1% colspan=1 align=right>&nbsp;
+      </td>
+   </tr>
+</table>
+
+<!-- RESULT -->
+
+<div id=result>
+</div>
+
+
+</body>
+</html>
+
