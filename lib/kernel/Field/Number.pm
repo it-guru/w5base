@@ -176,7 +176,8 @@ sub getXLSformatname
 
    my $f=$self->SUPER::getXLSformatname;
 
-   if (defined($self->precision)) {
+   if ( defined($self->precision) &&
+       !defined($self->xlsnumformat)) {
       my $p="number.".$self->precision();
       $f=~s/^\w+?(\.|$)/$p$1/;
    }
