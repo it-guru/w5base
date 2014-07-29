@@ -173,7 +173,15 @@ sub getXLSformatname
 {
    my $self=shift;
    my $data=shift;
-   return("number.".$self->precision());
+
+   my $f=$self->SUPER::getXLSformatname;
+
+   if (defined($self->precision)) {
+      my $p="number.".$self->precision();
+      $f=~s/^\w+?(\.|$)/$p$1/;
+   }
+
+   return $f;
 }
 
 

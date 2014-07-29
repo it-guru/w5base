@@ -147,7 +147,6 @@ sub Format
    }
 
    my $name=$formatname;
- 
    my $usecolor;
    if (my ($col)=$name=~m/\.color=\"(#[0-9a-fA-F]+)\"/){
       $name=~s/\.color=\"(#[0-9a-fA-F]+)\"//g;
@@ -162,6 +161,10 @@ sub Format
    if (my ($col)=$name=~m/\.bcolor=\"(#[0-9a-fA-F]+)\"/){
       $name=~s/\.bcolor=\"(#[0-9a-fA-F]+)\"//g;
       $usebcolor=$self->getColorIndex($col);
+   }
+   my $numformat;
+   if (($numformat)=$name=~m/\.numformat=\"(.+)\"/){
+      $name=~s/\.numformat=\"(.+)\"//g;
    }
 
    my $format;
@@ -204,6 +207,9 @@ sub Format
       if (defined($usebcolor)){
          $format->set_border(1);
          $format->set_border_color($usebcolor);
+      }
+      if (defined($numformat)){
+         $format->set_num_format($numformat);
       }
       $self->{format}->{$formatname}=$format;
       return($self->{format}->{$formatname}); 
@@ -280,8 +286,15 @@ sub ProcessLine
       }
       else{
          $data="'".$data if ($data=~m/^=/);
-         $self->{'worksheet'}->write($lineno,$cellno,$data,
-                                     $self->Format($format));
+
+         my $numformat=$self->Format($format)->{_num_format};
+         if ($numformat eq '@'){
+            $self->{'worksheet'}->write_string($lineno,$cellno,$data,
+                                               $self->Format($format));
+         } else {
+            $self->{'worksheet'}->write($lineno,$cellno,$data,
+                                        $self->Format($format));
+         }
       }
    }
    return(undef);

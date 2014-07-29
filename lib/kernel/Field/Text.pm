@@ -27,6 +27,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{multilang}=0      if (!defined($self->{multilang}));
+   $self->{xlsnumformat}='@' if (!defined($self->{xlsnumformat}));
 
    return($self);
 }

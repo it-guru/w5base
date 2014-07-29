@@ -106,6 +106,7 @@ sub new
    $self->{_permitted}->{xlscolor}=1;   # Farbe der Spalte in XLS Ausgabe
    $self->{_permitted}->{xlsbgcolor}=1; # Hintergrund der Spalte in XLS Ausgabe
    $self->{_permitted}->{xlsbcolor}=1;  # Rahmen der Spalte in XLS Ausgabe
+   $self->{_permitted}->{xlsnumformat}=1;  # Zellenformat
    $self->{_permitted}->{uivisible}=1;  # Anzeige in der Detailsicht bzw. Listen
    $self->{_permitted}->{history}=1;    # Über das Feld braucht History
    $self->{_permitted}->{htmldetail}=1; # Anzeige in der Detailsicht
@@ -1235,6 +1236,7 @@ sub getXLSformatname
    my $xlscolor=$self->xlscolor;
    my $xlsbgcolor=$self->xlsbgcolor;
    my $xlsbcolor=$self->xlsbcolor;
+   my $xlsnumformat=$self->xlsnumformat;
    my $f="default";
    my $colset=0;
    if (defined($xlscolor)){
@@ -1250,8 +1252,9 @@ sub getXLSformatname
       }
       $f.=".bcolor=\"".$xlsbcolor."\"";
    }
-   
-
+   if (defined($xlsnumformat)){
+      $f.=".numformat=\"".$xlsnumformat."\"";
+   }
    return($f);
 }
 
