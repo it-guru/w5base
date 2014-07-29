@@ -46,7 +46,7 @@ sub new
                 label         =>'Automation Password',
                 container     =>'additional'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Textarea(
                 name          =>'hcconnectstring',
                 htmldetail    =>1,
                 uploadable    =>1,
