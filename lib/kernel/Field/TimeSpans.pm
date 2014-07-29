@@ -28,6 +28,7 @@ sub new
    my $type=shift;
    my $self={@_};
    $self->{valign}="top"     if (!defined($self->{valign}));
+   $self->{tspantype}=['']   if (!defined($self->{tspantype})); 
    my $self=bless($type->SUPER::new(%$self),$type);
    return($self);
 }
@@ -61,6 +62,15 @@ sub Validate
       my @times;
       my @chk;
       foreach my $t (split(/[,;]/,$newval->[$day])){
+         my $type="";
+         if (my ($mtype)=$t=~m/^([a-z])/i){
+            $t=~s/^([a-z])//i;
+            $type=uc($mtype);
+         }
+         if (!in_array($self->{tspantype},$type)){
+            $self->getParent->LastMsg(ERROR,"invalid tspan type");
+            return(undef);
+         }
          if ($t ne ""){
             my ($h1,$m1,$h2,$m2)=$t=~m/^(\d+):(\d+)-(\d+):(\d+)$/;
             if (!defined($h1) || !defined($m2)){
@@ -85,10 +95,17 @@ sub Validate
                }
             }
             push(@chk,[$h1*60+$m1,$h2*60+$m2]);
-            push(@times,sprintf("%02d:%02d-%02d:%02d",$h1,$m1,$h2,$m2));
+            push(@times,sprintf("%s%02d:%02d-%02d:%02d",
+                                uc($type),$h1,$m1,$h2,$m2));
          }
       }
-      $newval->[$day]=join(", ",sort(@times));
+      $newval->[$day]=join(", ",sort({
+         my $aa=$a;
+         my $bb=$b;
+         $aa=~s/^[a-z]//i;
+         $bb=~s/^[a-z]//i;
+         $aa<=>$bb;
+      } @times));
       $newstring.="+" if ($newstring ne "");
       $newstring.="$day($newval->[$day])";
    }
@@ -160,11 +177,11 @@ sub FormatedDetail
          if ($mode ne "edit"){
             my @blks=();
             foreach my $b (split(/,/,$fval[$dayno])){
-               if (my ($starth,$startm,$endh,$endm)=$b=~
-                       m/^\s*(\d+):(\d+)-(\d+):(\d+)\s*$/){
+               if (my ($type,$starth,$startm,$endh,$endm)=$b=~
+                       m/^\s*([a-z]{0,1})(\d+):(\d+)-(\d+):(\d+)\s*$/i){
                   my $sp=(($starth*60)+$startm)*100/1440;
                   my $ep=(($endh*60)+$endm)*100/1440;
-                  push(@blks,[$sp,$ep]);
+                  push(@blks,[$sp,$ep,undef,$type]);
                }
             }
             @blks=sort({$a->[0]<=>$b->[0]} @blks);
@@ -192,8 +209,19 @@ sub FormatedDetail
             my $seg=0;
             foreach my $blk (@blks){
                my $w=$blk->[1]-$blk->[0];
-               my $color="transparent";
-               $color="blue" if ($blk->[2] eq "on");
+
+               if (ref($self->{tspantypeproc}) eq "CODE"){
+                  &{$self->{tspantypeproc}}($self,$current,$mode,$blk);
+               }
+               else{
+                  if ($blk->[2] eq "on"){
+                     $blk->[4]="blue";
+                  }
+                  else{
+                     $blk->[4]="transparent";
+                  }
+               }
+               my $color=$blk->[4];
                $tab.="<div id=\"$name.$dayno.$seg\" style=\"background:$color;".
                      "width:$w\%;height:18px;float:left;".
                      "border-style:none;padding:0px;margin:0px\">";

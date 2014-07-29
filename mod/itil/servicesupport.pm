@@ -123,6 +123,18 @@ sub new
                 name          =>'support',
                 htmlwidth     =>'150px',
                 depend        =>['issupport'],
+                tspantype     =>['','R'],
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on"){
+                      $blk->[4]="blue";
+                      $blk->[4]="lightblue" if ($blk->[3] eq "R");
+                   }
+                },
                 group         =>'support',
                 label         =>'support',
                 container     =>'additional'),
@@ -137,6 +149,18 @@ sub new
                 name          =>'serivce',
                 htmlwidth     =>'150px',
                 depend        =>['isservice'],
+                tspantype     =>['','R'],
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on"){
+                      $blk->[4]="blue";
+                      $blk->[4]="lightblue" if ($blk->[3] eq "R");
+                   }
+                },
                 group         =>'service',
                 label         =>'service',
                 container     =>'additional'),
