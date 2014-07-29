@@ -45,6 +45,14 @@ sub new
                 group         =>'hcautom',
                 label         =>'Automation Password',
                 container     =>'additional'),
+
+      new kernel::Field::Text(
+                name          =>'hcconnectstring',
+                htmldetail    =>1,
+                uploadable    =>1,
+                group         =>'hcautom',
+                label         =>'HealthChecker ConnectString',
+                container     =>'additional'),
    );
 
    $self->AddGroup("hcautom",translation=>'tshc::swinstance');
