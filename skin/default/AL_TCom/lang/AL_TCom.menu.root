@@ -105,6 +105,8 @@
 'AL_TCom.proc.softmgmt.software'=>{de=>'Verkn. Software',en=>'Software Rel.'},
 'Reporting.amore'=>{de=>'@more',en=>'@more'},
 'itservices'=>{de=>'IT-Services Telekom IT',en=>'IT-Services Telekom IT'},
+'itservices.bps'=>{de=>'Geschäftsprozess',en=>'Businessprocess'},
+'itservices.bps.new'=>{de=>'Neueingabe',en=>'New'},
 'itservices.its'=>{de=>'IT-Service',en=>'IT-Service'},
 'itservices.ens'=>{de=>'IT-Enabling Service',en=>'IT-Enabling Service'},
 'itservices.ta'=>{de=>'IT-Service Transaction',en=>'IT-Service Transaction'},

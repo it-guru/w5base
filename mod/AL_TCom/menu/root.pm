@@ -533,6 +533,17 @@ sub Init
                       "AL_TCom::itschain",
                       defaultacl=>['valid_user']);  # muß noch admin  werden!
    
+   $self->RegisterObj("itservices.bps",
+                      "itil::businessprocess",
+                      prio=>50,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itservices.bps.new",
+                      "itil::businessprocess",
+                      func=>'New',
+                      prio=>50,
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itservices.its",
                       "AL_TCom::businessserviceITS",
                       prio=>100,
