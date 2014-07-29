@@ -301,7 +301,7 @@ sub GetW5BaseUserID
    }
    my $flt={posix=>\$importname};
    if ($importname=~m/\@/){
-      $flt={email=>\$importname};
+      $flt={emails=>\$importname};
    }
    my $user=getModuleObject($self->Config,"base::user");
    $user->SetFilter($flt);
