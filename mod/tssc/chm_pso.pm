@@ -29,7 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -57,15 +57,22 @@ sub new
                dataobjattr    =>'cm3tm1.numberprgn'),
 
       new kernel::Field::Text(
+               name           =>'taskstatus',
+               label          =>'Task Status',
+               dataobjattr    =>'cm3tm1.status'),
+
+      new kernel::Field::Text(
                name           =>'changenumber',
                label          =>'Change No.',
                translation    =>'tssc::chmtask',
                dataobjattr    =>'cm3tm1.parent_change'),
 
       new kernel::Field::Text(
-               name           =>'appl',
-               label          =>'Application',
-               dataobjattr    =>'screlationm1.depend'),
+               name           =>'changestatus',
+               label          =>'Change Status',
+               vjointo        =>'tssc::chm',
+               vjoinon        =>['changenumber'=>'changenumber'],
+               vjoindisp      =>[qw(status)]),
 
       new kernel::Field::Text(
                name           =>'appl',
@@ -77,6 +84,15 @@ sub new
                label          =>'Application name',
                searchable     =>0,
                dataobjattr    =>'devicem1.system_name'),
+
+      new kernel::Field::Select(
+               name           =>'opmode',
+               label          =>'operation mode',
+               translation    =>'itil::appl',
+               transprefix    =>'opmode.',
+               vjointo        =>'itil::appl',
+               vjoinon        =>['appl'=>'applid'],
+               vjoindisp      =>[qw(opmode)]),
 
    );
 
@@ -110,6 +126,11 @@ sub SetFilter
 }
 
 sub isQualityCheckValid
+{
+   return(undef);
+}
+
+sub isUploadValid
 {
    return(undef);
 }

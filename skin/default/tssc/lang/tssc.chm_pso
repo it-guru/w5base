@@ -6,3 +6,6 @@
    {
     de=>'Limit für die Anzahl der Anwendungen überschritten (max. 100)'
    },
+'operation mode'=>{de=>'vorwiegende Betriebsart (W5Base)',
+                   en=>'primary operation mode (W5Base)'},
+'opmode.unknown'=>{de=>'unbekannt',en=>'unknown'},
