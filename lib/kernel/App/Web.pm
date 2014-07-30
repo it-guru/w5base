@@ -1586,6 +1586,7 @@ sub HtmlSubModalDiv
                  onclick="hidePopWin(true,true);" />
          </div>
       </div>
+      <div id=popupData style="visible:hidden;display:none"></div>
       <iframe src="$param{prefix}../../../public/base/msg/loading" 
               style="background-color:transparent;width:100%" 
               scrolling="auto" 

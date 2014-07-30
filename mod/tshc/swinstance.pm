@@ -38,7 +38,7 @@ sub new
                 label         =>'Automation Username',
                 container     =>'additional'),
 
-      new kernel::Field::Text(
+      new kernel::Field::CryptText(
                 name          =>'autompassword',
                 htmldetail    =>1,
                 uploadable    =>1,

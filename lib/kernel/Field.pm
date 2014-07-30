@@ -83,6 +83,7 @@ use kernel::Field::InterviewState;
 use kernel::Field::WorkflowLink;
 use kernel::Field::MatrixHeader;
 use kernel::Field::DatacareAssistant;
+use kernel::Field::CryptText;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal);
 
