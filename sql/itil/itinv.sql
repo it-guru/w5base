@@ -1377,4 +1377,16 @@ alter table appl add controlcenter bigint(20);
 alter table system add lastqenrich datetime default NULL,add key(lastqenrich);
 alter table appl add lastqenrich datetime default NULL,add key(lastqenrich);
 alter table swinstance add lastqenrich datetime default NULL,add key(lastqenrich);
-alter table accessurl add lastip longtext, add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table accessurl add lastip longtext, add lastqcheck datetime default NULL,add key(lastqcheck),add lastqenrich datetime default NULL,add key(lastqenrich);
+create table accessurllastip (
+  id          bigint(20)  NOT NULL,
+  accessurl   bigint(20)  NOT NULL,
+  name        varchar(40) NOT NULL,
+  createdate  datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
+  srcload     datetime    default NULL,
+  PRIMARY KEY  (id),
+  KEY name (name),
+  FOREIGN KEY accessurl (accessurl)
+              REFERENCES accessurl (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

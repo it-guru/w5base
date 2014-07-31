@@ -46,6 +46,13 @@ sub new
                                                  
       new kernel::Field::Text(
                 name          =>'fullname',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'URL fullname',
+                dataobjattr   =>"concat(appl.name,': ',accessurl.fullname)"),
+
+      new kernel::Field::Text(
+                name          =>'name',
                 label         =>'URL',
                 dataobjattr   =>'accessurl.fullname'),
 
@@ -119,7 +126,15 @@ sub new
                 readonly      =>1,
                 label         =>'Hostname',
                 dataobjattr   =>'accessurl.hostname'),
-                                                   
+
+      new kernel::Field::SubList(
+                name          =>'lastipaddresses',
+                label         =>'last known IP-Adresses',
+                group         =>'lastipaddresses',
+                vjointo       =>'itil::lnkapplurlip',
+                vjoinon       =>['id'=>'lnkapplurlid'],
+                vjoindisp     =>['name','srcload']),
+
       new kernel::Field::Number(
                 name          =>'ipport',
                 group         =>'urlinfo',
@@ -247,12 +262,16 @@ sub new
                 label         =>'ApplID',
                 dataobjattr   =>'accessurl.appl'),
                                                    
-      new kernel::Field::Link(
-                name          =>'mandatorid',
-                label         =>'MandatorID',
-                dataobjattr   =>'appl.mandator'),
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'accessurl.lastqcheck'),
+      new kernel::Field::QualityResponseArea(),
+
    );
-   $self->setDefaultView(qw(fullname network appl applcistatus cdate));
+   $self->setDefaultView(qw(name network appl applcistatus cdate));
    $self->setWorktable("accessurl");
    return($self);
 }
@@ -264,6 +283,17 @@ sub getSqlFrom
             "on accessurl.appl=appl.id";
    return($from);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_applcistatus"))){
+     Query->Param("search_applcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
 
 
 
@@ -296,7 +326,7 @@ sub Validate
    my $origrec=shift;
 
 
-   my $name=effVal($oldrec,$newrec,"fullname");
+   my $name=effVal($oldrec,$newrec,"name");
    $name=~s/^([A-Z,a-z]+)/lc($1)/ex;
    if (($name=~m/\s/) || ($name=~m/^\s*$/)){
       $self->LastMsg(ERROR,"invalid URL specified");
@@ -350,8 +380,8 @@ sub Validate
 
    }
 
-   if (effVal($oldrec,$newrec,"fullname") ne $name){
-      $newrec->{fullname}=$name;
+   if (effVal($oldrec,$newrec,"name") ne $name){
+      $newrec->{name}=$name;
    }
    if (effVal($oldrec,$newrec,"scheme") ne $scheme){
       $newrec->{scheme}=$scheme;
@@ -363,7 +393,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default class applinfo urlinfo source));
+          qw(header default class applinfo urlinfo lastipaddresses source));
 }
 
 
@@ -373,8 +403,18 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default","class") if (!defined($rec));
-   return("ALL");
+   return("header","default") if (!defined($rec));
+
+   my @l=qw(header default class applinfo urlinfo source history);
+
+   if ($#{$rec->{lastipaddresses}}!=-1){
+      push(@l,"lastipaddresses");
+   }
+
+   if ($self->IsMemberOf("admin")){
+      push(@l,"qc");
+   }
+   return(@l);
 }
 
 sub isWriteValid
@@ -385,6 +425,7 @@ sub isWriteValid
    my $applid=defined($rec) ? $rec->{applid} : undef;
 
    my $wrok=$self->isWriteToApplValid($applid);
+
    return("default","class") if ($wrok);
    return(undef);
 }

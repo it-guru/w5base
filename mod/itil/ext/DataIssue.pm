@@ -80,6 +80,11 @@ sub getControlRecord
              target    =>'name',
              targetid  =>'id'
            },
+           {
+             dataobj   =>'itil::lnkapplurl',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
          ];
 
 

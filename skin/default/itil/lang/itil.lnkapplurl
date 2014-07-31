@@ -5,6 +5,7 @@
 'Network'=>{de=>'Netzbereich'},
 'fieldgroup.class'=>{de=>'URL-Klassifikation',en=>'URL-Classification'},
 'fieldgroup.applinfo'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
+'fieldgroup.lastipaddresses'=>{de=>'letzte bekannte IP-Adressen',en=>'last known IP addresses'},
 'fieldgroup.urlinfo'=>{de=>'URL-Daten',en=>'URL-Data'},
 'Accessed by endusers (Application Frontend)'=>{de=>'Zugriff durch End-User (Anwendungs-Frontend)'},
 'Accessed by interface applications'=>{de=>'Zugriff durch Schnittstellenanwendungen'},
@@ -14,3 +15,5 @@
 'no valid application specifed'=>{de=>'keine gültige Anwendung angegeben'},
 'no classification specified'=>{de=>'keine Klassifikation der URL durchgeführt'},
 'no write access to requested application'=>{de=>'kein Schreibzugriff auf die ausgewählte Anwendung'},
+'last known IP-Adresses'=>{de=>'letzte bekannte IP Adressen'},
+'URL fullname'=>{de=>'URL Bezeichner'},
