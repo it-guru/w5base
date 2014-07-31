@@ -1851,7 +1851,7 @@ sub NotifiedValidatedUpdateRecord
          }
          return(undef) if ($fldtext eq "");
         
-         $text.="\n\n".
+         $text.="\n".$fldtext."\n\n\n".
                $self->T("This update did not delivers you of your ".
                         "data responsibility!",'kernel::QRule');
          return($subject,$text);
