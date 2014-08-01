@@ -74,4 +74,4 @@
 'it is posible to refresh hardware'=>{de=>'Hardware kann erneuert/refreshed werden'},
 'Upgrade/Refresh reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
 'Hardware refresh state'=>{de=>'Hardware-Refresh Status'},
-'planned Upgrade/Refresh date'=>{de=>'geplannter Hardware Refresh Zeitpunkt'},
+'planned Upgrade/Refresh date'=>{de=>'geplanter Hardware Refresh Zeitpunkt'},
