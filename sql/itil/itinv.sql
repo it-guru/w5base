@@ -1390,3 +1390,4 @@ create table accessurllastip (
   FOREIGN KEY accessurl (accessurl)
               REFERENCES accessurl (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table asset add refreshpland datetime default NULL;

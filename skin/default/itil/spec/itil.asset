@@ -10,4 +10,11 @@ words. This can be used, to do a
 simple grouping of systems by
 search function.
 '},
+'refreshpland'=>{de=>'
+Hier ist der geplannte Refresh-Termin
+zu erfassen, so bald dieser definiert
+wurde.',en=>'
+At this field, you have to store
+the date of planned hardware 
+refresh - if this is defined'},
 

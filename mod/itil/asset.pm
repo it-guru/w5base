@@ -343,10 +343,31 @@ sub new
                 name          =>'denyupd',
                 group         =>'upd',
                 depend        =>['deprstart'],
+                jsonchanged   =>\&getOnChangedScript,
+                jsoninit      =>\&getOnChangedScript,
                 label         =>'it is posible to refresh hardware',
                 value         =>[0,5,10,20,25,28,30,35,38,40,99],
                 transprefix   =>'DENUPD.',
                 dataobjattr   =>'asset.denyupd'),
+
+     new kernel::Field::Date(
+                name          =>'refreshpland',
+                group         =>'upd',
+                dayonly       =>1,
+                depend        =>['denyupd'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{$self->{name}} ne ""){
+                      return(1);
+                   }
+                   return(1) if ($param{currentfieldgroup} eq $self->{group});
+                   return(0);
+                },
+                label         =>'planned Upgrade/Refresh date',
+                dataobjattr   =>'asset.refreshpland'),
 
      new kernel::Field::Textarea(
                 name          =>'denyupdcomments',
@@ -631,6 +652,32 @@ sub SelfAsParentObject    # this method is needed because existing derevations
    return("itil::asset");
 }
 
+sub getOnChangedScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var d=document.forms[0].elements['Formated_denyupd'];
+var r=document.forms[0].elements['Formated_refreshpland'];
+
+if (d && r){
+   var v=d.options[d.selectedIndex].value;
+   if (v!="" && v!="0"){
+      r.value="";
+      r.disabled=true;
+   }
+   else{
+      r.disabled=false;
+   }
+}
+
+EOF
+   return($d);
+}
+
+
 
 
 
@@ -806,6 +853,12 @@ sub Validate
       }
    }
    ########################################################################
+
+   if (effVal($oldrec,$newrec,"denyupd")!=0){
+      if (effVal($oldrec,$newrec,"refreshpland") ne ""){
+         $newrec->{refreshpland}=undef;
+      }
+   }
 
    if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
       return(0);
