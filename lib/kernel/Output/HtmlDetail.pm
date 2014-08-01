@@ -143,7 +143,8 @@ EOF
 
 sub  calcViewMatrix
 {
-   my ($self,$rec,$vMatrix,$fieldbase,$fieldlist,$viewgroups)=@_;
+   my ($self,$rec,$vMatrix,$fieldbase,$fieldlist,$viewgroups,
+       $currentfieldgroup)=@_;
 
    for(my $c=0;$c<=$#{$fieldlist};$c++){
       my $name=$fieldlist->[$c]->Name();
@@ -156,8 +157,9 @@ sub  calcViewMatrix
       # fifi fast solution:
       $vMatrix->{uivisibleof}->[$c]=1 if ($fieldlist->[$c]->Type() eq "MatrixHeader");
  
-      $vMatrix->{htmldetailof}->[$c]=
-         $fieldlist->[$c]->htmldetail("HtmlDetail",current=>$rec);
+      $vMatrix->{htmldetailof}->[$c]=$fieldlist->[$c]->htmldetail("HtmlDetail",
+            current=>$rec,
+            currentfieldgroup=>$currentfieldgroup);
       next if (!($vMatrix->{uivisibleof}->[$c]));
       next if (!($vMatrix->{htmldetailof}->[$c]));
        
@@ -393,7 +395,8 @@ EOF
          fieldgrouplist=>[]     # resolved groups of a field
       };
                       
-      $self->calcViewMatrix($rec,$vMatrix,$fieldbase,\@fieldlist,$viewgroups);
+      $self->calcViewMatrix($rec,$vMatrix,$fieldbase,\@fieldlist,$viewgroups,
+                            $currentfieldgroup);
 
       my $spec=$self->getParent->getParent->LoadSpec($rec);
       foreach my $group (@{$vMatrix->{grouplist}}){
