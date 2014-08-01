@@ -132,7 +132,7 @@ sub new
                    $blk->[4]="transparent";
                    if ($blk->[2] eq "on"){
                       $blk->[4]="blue";
-                      $blk->[4]="lightblue" if ($blk->[3] eq "R");
+                      $blk->[4]="yellow" if ($blk->[3] eq "R");
                    }
                 },
                 group         =>'support',
@@ -158,7 +158,7 @@ sub new
                    $blk->[4]="transparent";
                    if ($blk->[2] eq "on"){
                       $blk->[4]="blue";
-                      $blk->[4]="lightblue" if ($blk->[3] eq "R");
+                      $blk->[4]="yellow" if ($blk->[3] eq "R");
                    }
                 },
                 group         =>'service',
