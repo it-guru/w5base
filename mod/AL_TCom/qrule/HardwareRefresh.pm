@@ -81,8 +81,12 @@ sub isHardwareRefreshCheckNeeded
 
    return(0) if ($deprstart eq "");
 
+   # check against start date
    return(0) if ($deprstart lt "2011-06-30 00:00:00");
+   #######################################################################
 
+
+   # check against "CLASSIC" system type
    my $o=getModuleObject($self->getParent->Config,"tsacinv::system");
 
    my $name=$rec->{name};
@@ -93,6 +97,33 @@ sub isHardwareRefreshCheckNeeded
    my @l=$o->getVal("systemid");
  
    return(0) if ($#l==-1);
+   #######################################################################
+
+   # check against costcenter saphier of logical systems
+   my $o=getModuleObject($self->getParent->Config,"itil::system");
+   my $aid=$rec->{id};
+   $o->SetFilter({assetid=>\$aid,cistatusid=>[3,4]});
+   my @colist=$o->getVal(qw(conumber));
+   @colist=grep(!/^\s*$/,@colist);
+   my @saphier;
+   if ($#colist!=-1){
+      my $o=getModuleObject($self->getParent->Config,"TS::costcenter");
+      $o->SetFilter({name=>\@colist});
+      foreach my $corec ($o->getHashList(qw(sappspentries sapcoentries))){
+         foreach my $r (@{$corec->{sappspentries}},
+                        @{$corec->{sapcoentries}}){
+            if (!in_array(\@saphier,$r->{saphier})){
+               push(@saphier,$r->{saphier});
+            }
+         }
+      }
+   }
+   if (!(grep(/^9TS_ES\.9DTIT\./,@saphier) ||  # kann keine SAPHIER festgestellt
+        ($#saphier==-1))){    # werden oder liegt sie in der TelIT, dann checken
+      return(0);
+   }
+   #######################################################################
+
 
    return(1);
 }

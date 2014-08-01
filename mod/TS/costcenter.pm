@@ -55,7 +55,8 @@ sub new
                    }
                    return($flt);
                 },
-                vjoindisp     =>['name','status','description']),
+                vjoindisp     =>['name','status','description'],
+                vjoininhash   =>['name','status','description','saphier']),
       insertafter=>'itsemid'
    );
    $self->AddFields(
@@ -76,6 +77,7 @@ sub new
                    }
                    return($flt);
                 },
+                vjoininhash     =>['name','description','saphier'],
                 vjoindisp     =>['name','description']),
       insertafter=>'itsemid'
    );
