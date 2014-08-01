@@ -65,23 +65,32 @@ sub FormatedDetail
 </tr>
 
 <tr>
-<td>ClearText:</td>
+<td>Text:</td>
 <td><input style='width:100%' type=text id=_in2></td>
 </tr>
 
 <tr>
 <td colspan=2 align=center>
-<input type=button value=' Crypt ' onClick="var _in1=window.document.getElementById('_in1');var _in2=window.document.getElementById('_in2');hidePopWin(true,0,{_in1:_in1.value,_in2:_in2.value});">
+<input type=button value=' Crypt ' onClick="var _in1=window.document.getElementById('_in1');var _in2=window.document.getElementById('_in2');if (_in1.value=='' || _in2.value==''){alert('missing value');}else{hidePopWin(true,0,{_in1:_in1.value,_in2:_in2.value});}">
 </td>
 </tr>
 
 </table>
 </div>
+<script lang="JavaScript" type="text/javascript"
+   src="../../base/load/crypto_jsbn.js"></script>
+<script lang="JavaScript" type="text/javascript"
+   src="../../base/load/crypto_jsbn2.js"></script>
+<script lang="JavaScript" type="text/javascript"
+   src="../../base/load/crypt_xor.js"></script>
 
 <script lang="JavaScript" type="text/javascript">
 function endCrypt(data,isBreaked){
    var e=window.document.getElementById("$name");
-   e.value=data._in1;
+   var v=W5XOR_encrypt(data._in2,data._in1);
+   if (v!=""){
+      e.value="W5XOR:"+v;
+   }
 }
 addEvent(window, "load",function(){
    var e=window.document.getElementById("$name");
