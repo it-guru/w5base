@@ -175,7 +175,6 @@ sub new
                 readonly      =>sub{
                    my $self=shift;
                    my $current=shift;
-print STDERR Dumper($current);
                    if ($current->{licproductid} ne ""){
                       return(1);
                    }
