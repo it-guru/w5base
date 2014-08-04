@@ -893,6 +893,14 @@ sub Validate
          $newrec->{patchkey}=$patch;
          $newrec->{majorminorkey}=$rel;
       }
+      elsif (my ($rel)=$version=~m/^(\d+\.\d+)$/){
+         $newrec->{patchkey}="";
+         $newrec->{majorminorkey}=$rel;
+      }
+      elsif (my ($rel)=$version=~m/^(\d+)$/){
+         $newrec->{patchkey}="";
+         $newrec->{majorminorkey}=$rel;
+      }
       elsif (my ($rel)=$version=~m/^(\d+[\.\d+]{0,1})$/){
          $newrec->{patchkey}="";
          $newrec->{majorminorkey}=$rel;
