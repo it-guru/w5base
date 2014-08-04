@@ -346,7 +346,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'is_dbs',
                 label         =>'is DBS (Databasesystem) software',
-                htmldetail    =>1,
+                htmldetail    =>0,
                 readonly      =>1,
                 group         =>'softwaredetails',
                 dataobjattr   =>'software.is_dbs'),
@@ -354,7 +354,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'is_mw',
                 label         =>'is MW (Middleware) software',
-                htmldetail    =>1,
+                htmldetail    =>0,
                 readonly      =>1,
                 group         =>'softwaredetails',
                 dataobjattr   =>'software.is_mw'),
