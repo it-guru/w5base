@@ -50,7 +50,12 @@ sub SecureValidate
    my $newrec=shift;
    my $wrgroups=shift;
 
-   return(0) if (!$self->ProtectObject($oldrec,$newrec,$self->{adminsgroups}));
+   if (exists($self->{CI_Handling})){
+      if (!$self->ProtectObject($oldrec,$newrec,
+                                $self->{CI_Handling}->{activator})){
+         return(0);
+      }
+   }
    return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
