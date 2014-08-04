@@ -61,7 +61,7 @@ sub FormatedDetail
 
 <tr>
 <td>PassPhrase:</td>
-<td><input style='width:100%' type=text id=_in1></td>
+<td><input style='width:100%' type=password id=_in1></td>
 </tr>
 
 <tr>
@@ -71,7 +71,7 @@ sub FormatedDetail
 
 <tr>
 <td colspan=2 align=center>
-<input type=button value=' Crypt ' onClick="var _in1=window.document.getElementById('_in1');var _in2=window.document.getElementById('_in2');if (_in1.value=='' || _in2.value==''){alert('missing value');}else{hidePopWin(true,0,{_in1:_in1.value,_in2:_in2.value});}">
+<input type=button value=' W5XOR Crypt ' onClick="var _in1=window.document.getElementById('_in1');var _in2=window.document.getElementById('_in2');if (_in2.value!='' && _in1.value==''){alert('missing passphrase');}else{hidePopWin(true,0,{_in1:_in1.value,_in2:_in2.value});}">
 </td>
 </tr>
 
@@ -87,9 +87,14 @@ sub FormatedDetail
 <script lang="JavaScript" type="text/javascript">
 function endCrypt(data,isBreaked){
    var e=window.document.getElementById("$name");
-   var v=W5XOR_encrypt(data._in2,data._in1);
-   if (v!=""){
-      e.value="W5XOR:"+v;
+   if (data._in2=='' && data._in1==''){
+         e.value="";
+   }
+   else{
+      var v=W5XOR_encrypt(data._in2,data._in1);
+      if (v!=""){
+         e.value="W5XOR:"+v;
+      }
    }
 }
 addEvent(window, "load",function(){
