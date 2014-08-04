@@ -549,15 +549,24 @@ sub Init
                       prio=>100,
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itservices.its.contact",
+                      "itil::lnkbscontact");
+
    $self->RegisterObj("itservices.ens",
                       "AL_TCom::businessserviceES",
                       prio=>150,
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itservices.ens.contact",
+                      "itil::lnkbscontact");
+
    $self->RegisterObj("itservices.ta",
                       "AL_TCom::businessserviceTA",
                       prio=>200,
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itservices.ta.contact",
+                      "itil::lnkbscontact");
 
    $self->RegisterObj("itservices.new",
                       "AL_TCom::businessservice",

@@ -601,6 +601,9 @@ sub Init
                       func=>'MainWithNew',
                       prio=>1000);
    
+   $self->RegisterObj("bsm.bs.lnkbscontact",
+                      "itil::lnkbscontact");
+   
    $self->RegisterObj("bsm.ba",
                       "itil::appl",
                       func=>'MainWithNew',

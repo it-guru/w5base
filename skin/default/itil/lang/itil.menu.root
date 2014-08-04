@@ -119,4 +119,5 @@
 'bsm'=>{de=>'Business Services',en=>'Business Services'},
 'bsm.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'bsm.bs'=>{de=>'Business Service',en=>'Business service'},
+'bsm.bs.lnkbscontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'bsm.ba'=>{de=>'Geschäftsanwendung',en=>'Business application'},

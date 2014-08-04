@@ -41,6 +41,8 @@ sub new
                 label         =>'W5BaseID',
                 dataobjattr   =>'businessprocess.id'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Mandator(),
 
       new kernel::Field::Link(
@@ -114,11 +116,27 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['pbusinessprocessid'=>'id'],
                 AllowEmpty    =>1,
-                vjoindisp     =>'name'),
+                vjoindisp     =>'selector'),
 
       new kernel::Field::Link(
                 name          =>'pbusinessprocessid',
                 dataobjattr   =>'businessprocess.pbusinessprocess'),
+
+      new kernel::Field::Textarea(
+                name          =>'treeview',
+                label         =>'TreeView',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   my @d;
+                   $self->getParent->TreeLoad(\@d,"crm::businessprocess",$id);
+
+print STDERR Dumper(\@d);                   
+
+                   return(Dumper(\@d));
+                }),
+
 
       new kernel::Field::Contact(
                 name          =>'processowner',
@@ -302,6 +320,98 @@ sub new
 }
 
 
+sub TreeLoad
+{
+   my $self=shift;
+   my $d=shift;
+   my $dataobj=shift;
+   my $id=shift;
+   my $idx=shift;
+   my @l;
+
+   $idx={} if (!defined($idx));
+
+   # load direct records
+   my $o=$self->getPersistentModuleObject("TreeBproc".$dataobj,$dataobj);
+   my @ofields=qw(name id pbusinessprocessid urlofcurrentrec);
+
+   my $tent;
+   $o->SetFilter({id=>\$id,cistatusid=>'<=5'});
+   if (my ($r)=$o->getOnlyFirst(@ofields)){
+      $tent={
+         label=>$r->{name},
+         id=>$r->{id},
+         url=>$r->{urlofcurrentrec},
+         type=>$o->SelfAsParentObject(),
+         child=>[]
+      };
+      if ($r->{pbusinessprocessid} ne ""){
+         $tent->{pid}=$r->{pbusinessprocessid};
+      }
+      $idx->{$r->{id}}=$tent;
+      push(@l,$tent);
+   }
+
+
+   # load parent tree
+   while(exists($tent->{pid}) && $tent->{pid} ne ""){
+      $o->SetFilter({id=>\$tent->{pid},cistatusid=>'<=5'});
+      delete($tent->{pid});
+      $tent={};
+      if (my ($r)=$o->getOnlyFirst(@ofields)){
+         if (!exists($idx->{$r->{id}})){
+            $tent={
+               label=>$r->{name},
+               icon=>$o->getRecordImageUrl($r),
+               id=>$r->{id},
+               url=>$r->{urlofcurrentrec},
+               dataobj=>$o->SelfAsParentObject(),
+               child=>[@l]
+            };
+            
+            if ($r->{pbusinessprocessid} ne ""){
+               $tent->{pid}=$r->{pbusinessprocessid};
+            }
+            $idx->{$r->{id}}=$tent;
+            @l=($tent);
+         }
+      }
+   }
+
+   # load subs (level1)
+   $o->SetFilter({pbusinessprocessid=>\$id,cistatusid=>'<=5'});
+   my @subsl1;
+   foreach my $r ($o->getHashList(@ofields)){
+      $tent={
+         label=>$r->{name},
+         icon=>$o->getRecordImageUrl($r),
+         id=>$r->{id},
+         url=>$r->{urlofcurrentrec},
+         dataobj=>$o->SelfAsParentObject()
+      };
+      $idx->{$r->{id}}=$tent;
+      push(@subsl1,$tent);
+   }
+   $idx->{$id}->{child}=\@subsl1;
+
+
+#   if ($level eq "" || $level eq "up"){
+#      if ($l[0]->{pid} ne ""){
+#         my @newtop;
+#         printf STDERR ("fifi load $l[0]->{pid} for $l[0]->{label}\n");
+#         $self->TreeLoad(\@newtop,"crm::businessprocess",$l[0]->{pid},"up");
+#         printf STDERR ("fifi load new top $newtop[0]->{label}\n");
+#       #  if ($#newtop!=-1){
+#       #     $newtop[0]->{child}=[@l];
+#       #  }
+#         @l=(@newtop);
+#      }
+#   }
+
+   @{$d}=@l;
+}
+
+
 sub getWfEventNotifyTargets     # calculates the target email addresses
 {                               # for an customer information in
    my $self=shift;              # itil::workflow::eventnotify
@@ -455,7 +565,17 @@ sub getSqlFrom
             "on businessprocessacl.aclparentobj='$selfasparent' ".
             "and $worktable.id=businessprocessacl.refid ".
             "left outer join grp as customer on ".
-            "customer.grpid=businessprocess.customer";
+            "customer.grpid=businessprocess.customer ".
+            "left outer join businessprocess as p1 on ".
+            "businessprocess.pbusinessprocess=p1.id ".
+            "left outer join businessprocess as p2 on ".
+            "p1.pbusinessprocess=p2.id ".
+            "left outer join businessprocess as p3 on ".
+            "p2.pbusinessprocess=p3.id ".
+            "left outer join businessprocess as p4 on ".
+            "p3.pbusinessprocess=p4.id ".
+            "left outer join businessprocess as p5 on ".
+            "p4.pbusinessprocess=p5.id ";
 
    return($from);
 }  

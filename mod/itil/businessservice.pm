@@ -654,6 +654,49 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>$worktable.'.th_crit_respti'),
 
+      new kernel::Field::Number(
+                name          =>'reproacht',
+                group         =>'reporting',
+                label         =>'reproach-time',
+                unit          =>'days',
+                align         =>'right',
+                dataobjattr   =>$worktable.'.reproacht'),
+
+      new kernel::Field::Select(
+                name          =>'durationtoav',
+                group         =>'reporting',
+                label         =>'Duration to availability',
+                value         =>['','24:00'],
+                htmleditwidth =>'90px',
+                dataobjattr   =>$worktable.'.durationtoav'),
+
+      new kernel::Field::Select(
+                name          =>'repoperiod',
+                group         =>'reporting',
+                label         =>'Reporting-period',
+                value         =>['','24:00'],
+                htmleditwidth =>'90px',
+                dataobjattr   =>$worktable.'.repoperiod'),
+
+      new kernel::Field::Duration(
+                name          =>'mperiod',
+                group         =>'reporting',
+                label         =>'Measure-period',
+                visual        =>'hh:mm',
+                dataobjattr   =>$worktable.'.mperiod'),
+
+      new kernel::Field::Textarea(
+                name          =>'commentsrm',
+                group         =>'reporting',
+                label         =>'Remarks on measurement procedures and reporting',
+                dataobjattr   =>$worktable.'.commentsrm'),
+
+      new kernel::Field::Textarea(
+                name          =>'commentsperf',
+                group         =>'reporting',
+                label         =>'Performance-description',
+                dataobjattr   =>$worktable.'.commentsperf'),
+
 
       new kernel::Field::FileList(
                 name          =>'attachments',
