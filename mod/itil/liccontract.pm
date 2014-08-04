@@ -412,6 +412,18 @@ print STDERR Dumper($current);
                 label         =>'Modification-Date',
                 dataobjattr   =>'liccontract.modifydate'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"liccontract.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(liccontract.id,35,'0')"),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
