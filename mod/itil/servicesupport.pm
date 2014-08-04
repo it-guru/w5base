@@ -98,6 +98,11 @@ sub new
                 group         =>'responsibility',
                 dataobjattr   =>'servicesupport.databoss2'),
 
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                group         =>'contacts'),
+
       new kernel::Field::Select(
                 name          =>'tz',
                 group         =>'characteristic',
@@ -332,7 +337,7 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default responsibility characteristic 
+   return(qw(header default responsibility contacts characteristic 
              finance oncallservice support service 
              callcenter saprelation source));
 }
@@ -424,7 +429,28 @@ sub isWriteValid
                          $rec->{databoss2id} eq $userid)){
       $databoss++;
    }
-   push(@blklist,"default","characteristic",
+   elsif (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  ["RMember"],"both");
+      my @grpids=keys(%grps);
+      foreach my $contact (@{$rec->{contacts}}){
+         if ($contact->{target} eq "base::user" &&
+             $contact->{targetid} ne $userid){
+            next;
+         }
+         if ($contact->{target} eq "base::grp"){
+            my $grpid=$contact->{targetid};
+            next if (!grep(/^$grpid$/,@grpids));
+         }
+         my @roles=($contact->{roles});
+         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+         if (grep(/^write$/,@roles)){
+            $databoss++;
+         }
+      }
+   }
+
+   push(@blklist,"default","characteristic","contacts",
                  "responsibility") if ($self->IsMemberOf("admin")||$databoss);
    if (!defined($rec) || ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
        $self->IsMemberOf($self->{CI_Handling}->{activator})){
@@ -448,7 +474,8 @@ sub isViewValid
    my $rec=shift;
    my @param=@_;
    my @adds=();
-   return("header","default","responsibility","characteristic") if (!defined($rec));
+   return("header","default","responsibility",
+          "characteristic") if (!defined($rec));
    foreach my $grp (qw(service oncallservice support callcenter saprelation)){
       push(@adds,$grp) if ($rec->{"is".$grp});
    }
@@ -465,7 +492,7 @@ sub isViewValid
       }
    }
 
-   return("header","default","responsibility","characteristic",
+   return("header","default","responsibility","characteristic","contacts",
           "source","history",@adds);
 }
 

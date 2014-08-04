@@ -189,6 +189,15 @@ sub getPosibleRoles
                                                      $self->Self),
             );
    }
+   if ($parentobj=~m/^itil::servicesupport$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^itil::servicesupport$/)){
+      return(
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
+            );
+   }
    return();
 }
 
