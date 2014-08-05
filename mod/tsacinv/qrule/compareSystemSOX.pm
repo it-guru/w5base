@@ -71,6 +71,12 @@ sub qcheckRecord
       $par->SetFilter({systemid=>\$rec->{systemid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
+      if ($parrec->{assignmentgroup}="CS.DPS.DE.MSY" ||
+          ($parrec->{assignmentgroup}=~m/^CS\.DPS\.DE\.MSY\..*$/)){
+         # CS.DPS.DE.MSY Pflegt das SOX Flag in AM nicht
+         # siehe: https://darwin.telekom.de/darwin/auth/base/workflow/ById/14072395420001
+         return(0,undef);
+      }
       if (defined($parrec) && !$parrec->{soxrelevant}){ # only if no SOX is
          my $issox=$dataobj->getField("issox")->RawValue($rec); # set in AM
          if ($issox!=$parrec->{soxrelevant}){
