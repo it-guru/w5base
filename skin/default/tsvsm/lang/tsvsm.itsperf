@@ -1,0 +1,6 @@
+'tsvsm::itsperf'=>{de=>'IT-Service Messwerte',en=>'IT-Service Measurements'},
+'measure period'=>{de=>'Messzeitraum'},
+'availability'=>{de=>'Verfügbarkeit'},
+'performance'=>{de=>'Performanz'},
+'response time'=>{de=>'Antwortzeit'},
+'quality'=>{de=>'Qualität'},

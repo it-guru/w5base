@@ -110,8 +110,49 @@ sub new
                    " lnkcontact.parentobj='itil::businessservice' and ".
                    " croles like '%roles=\\'evmgr\\'=roles%'".
                    " limit 1)"),
+
+      new kernel::Field::Text(
+                name          =>'vsmname',
+                precision     =>2,
+                group         =>'VSMmeasurements',
+                label         =>'VSM HashTag',
+                vjointo       =>'tsvsm::itsperf',
+                vjoindisp     =>'name',
+                vjoinon       =>['sdbid'=>'id']),
+
+      new kernel::Field::Percent(
+                name          =>'vsmavail',
+                precision     =>2,
+                weblinkto     =>'NONE',
+                group         =>'VSMmeasurements',
+                label         =>'VSM availibility',
+                vjointo       =>'tsvsm::itsperf',
+                vjoindisp     =>'avail',
+                vjoinon       =>['sdbid'=>'id']),
+
+      new kernel::Field::Percent(
+                name          =>'vsmperf',
+                precision     =>2,
+                group         =>'VSMmeasurements',
+                weblinkto     =>'NONE',
+                label         =>'VSM performance',
+                vjointo       =>'tsvsm::itsperf',
+                vjoindisp     =>'perf',
+                vjoinon       =>['sdbid'=>'id']),
+
+      new kernel::Field::Percent(
+                name          =>'vsmquality',
+                group         =>'VSMmeasurements',
+                weblinkto     =>'NONE',
+                precision     =>2,
+                label         =>'VSM quality',
+                vjointo       =>'tsvsm::itsperf',
+                vjoindisp     =>'quality',
+                vjoinon       =>['sdbid'=>'id']),
+
    );
    $self->AddGroup("contactpersons",translation=>'AL_TCom::businessservice');
+   $self->AddGroup("VSMmeasurements",translation=>'AL_TCom::businessservice');
 
    $self->AddFields(
       new kernel::Field::Text(
@@ -162,6 +203,7 @@ sub getDetailBlockPriority
       $inserti=$c+1 if ($l[$c] eq "desc");
    }
    splice(@l,$inserti,$#l-$inserti,("contactpersons",@l[$inserti..($#l+-1)]));
+   splice(@l,$inserti,$#l-$inserti,("VSMmeasurements",@l[$inserti..($#l+-1)]));
    return(@l);
 
 }
@@ -175,6 +217,11 @@ sub isViewValid
 
    if (in_array(\@l,["desc","ALL"])){
       push(@l,"contactpersons");
+   }
+   if ($rec->{sdbid} ne ""){
+      if (in_array(\@l,["desc","ALL"])){
+         push(@l,"VSMmeasurements");
+      }
    }
 
    return(@l);

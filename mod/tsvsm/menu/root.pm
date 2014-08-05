@@ -1,6 +1,6 @@
-package AL_TCom::businessserviceITS;
+package tsvsm::menu::root;
 #  W5Base Framework
-#  Copyright (C) 2012  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,33 +19,31 @@ package AL_TCom::businessserviceITS;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Field;
-use AL_TCom::businessservice;
-@ISA=qw(AL_TCom::businessservice);
+use kernel::MenuRegistry;
+@ISA=qw(kernel::MenuRegistry);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-
-   $self->getField("nature")->{searchable}=0;
-
-
    return($self);
 }
 
-
-sub SetFilter
+sub Init
 {
    my $self=shift;
-   $self->SetNamedFilter("NATURE",{nature=>\'IT-S'});
 
-   return($self->SUPER::SetFilter(@_));
+   $self->RegisterObj("itu.tsvsm",
+                      "tmpl/welcome",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itu.tsvsm.itsperf",
+                      "tsvsm::itsperf",
+                      defaultacl=>['valid_user']);
+   
+   return($self);
 }
-
-
-
 
 
 
