@@ -60,12 +60,12 @@ sub FormatedDetail
 <table border=1 width=100%>
 
 <tr>
-<td>PassPhrase:</td>
+<td width="1\%">PassPhrase:</td>
 <td><input style='width:100%' type=password id=_in1></td>
 </tr>
 
 <tr>
-<td>Text:</td>
+<td width="1\%">Text:</td>
 <td><input style='width:100%' type=text id=_in2></td>
 </tr>
 
@@ -86,20 +86,23 @@ sub FormatedDetail
 
 <script lang="JavaScript" type="text/javascript">
 function endCrypt(data,isBreaked){
-   var e=window.document.getElementById("$name");
-   if (data._in2=='' && data._in1==''){
-         e.value="";
-   }
-   else{
-      var v=W5XOR_encrypt(data._in2,data._in1);
-      if (v!=""){
-         e.value="W5XOR:"+v;
+   if ((!isBreaked) && data){
+      var e=window.document.getElementById("$name");
+      if (data._in2=='' && data._in1==''){
+            e.value="";
+      }
+      else{
+         var v=W5XOR_encrypt(data._in2,data._in1);
+         if (v!=""){
+            e.value="W5XOR:"+v;
+         }
       }
    }
 }
 addEvent(window, "load",function(){
    var e=window.document.getElementById("$name");
    addEvent(e,"focus",function(){
+      
       parent.parent.showPopWin(function(){
          var e=window.document.getElementById("_CryptForm");
          return(e.innerHTML);
