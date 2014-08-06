@@ -102,7 +102,7 @@ sub new
                  htmlwidth     =>'150px',
                  label         =>'Application',
                  vjointo       =>'itil::appl',
-                 vjoineditbase =>{'cistatusid'=>"<=5"},
+                 vjoineditbase =>{'cistatusid'=>"4"},
                  vjoinon       =>['applid'=>'id'],
                  vjoindisp     =>'name'),
 
@@ -116,7 +116,7 @@ sub new
                  htmlwidth     =>'150px',
                  label         =>'Location',
                  vjointo       =>'base::location',
-                 vjoineditbase =>{'cistatusid'=>"<=5"},
+                 vjoineditbase =>{'cistatusid'=>"4"},
                  vjoinon       =>['locationid'=>'id'],
                  vjoindisp     =>'name'),
 
