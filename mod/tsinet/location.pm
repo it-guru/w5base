@@ -135,8 +135,6 @@ sub findW5LocID
    $newrec->{zipcode}=$zipcode;
    $newrec->{cistatusid}="4";
 
-   $loc->Normalize($newrec);
-
    foreach my $k (keys(%$newrec)){
       delete($newrec->{$k}) if (!defined($newrec->{$k}));
    }

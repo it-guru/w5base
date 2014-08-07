@@ -285,18 +285,13 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if (exists($newrec->{queryfrom})){
-      if ($newrec->{queryfrom} eq ""){
-         $newrec->{queryfrom}=undef;
-      }
-      else{
-         if (!($newrec->{queryfrom}=~m/^\S+::\S+$/) &&
-             $newrec->{queryfrom} ne "preWrite"){
-            $self->LastMsg(ERROR,"invalid value in 'queryfrom'");
-            return(0);
-         }
-      }
+   if (!($newrec->{queryfrom}=~m/^\S+::\S+$/) &&
+         $newrec->{queryfrom} ne "preWrite"     &&
+         $newrec->{queryfrom} ne 'any'){
+      $self->LastMsg(ERROR,"invalid value in 'queryfrom'");
+      return(0);
    }
+
    my $oldfullname=$oldrec->{fullname};
    my $fullname="";
    for(my $fno=1;$fno<=5;$fno++){

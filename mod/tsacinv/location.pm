@@ -207,8 +207,6 @@ sub findW5LocID
    return(undef) if ($newrec->{address1}=~m/^\s*$/);
    return(undef) if ($newrec->{location}=~m/^\s*$/);
 
-   $loc->Normalize($newrec);
-
    foreach my $k (keys(%$newrec)){
       delete($newrec->{$k}) if (!defined($newrec->{$k}));
    }

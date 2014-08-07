@@ -1419,7 +1419,7 @@ sub getIOMap
       my $iomap=$self->getPersistentModuleObject("IOMap","base::iomap");
       my $flt={dataobj=>[$self->Self]};
       if (defined($queryfrom)){
-         $flt->{queryfrom}=[$queryfrom,""];
+         $flt->{queryfrom}=[$queryfrom,"any"];
          $flt->{cistatusid}=[4];
       }
       if ($project){
