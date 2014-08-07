@@ -140,6 +140,21 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'interviewcat.modifydate'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                uivisible     =>0,
+                label         =>'primary sync key',
+                dataobjattr   =>"interviewcat.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                uivisible     =>0,
+                label         =>'secondary sync key',
+                dataobjattr   =>"interviewcat.id"),
+
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'id',
