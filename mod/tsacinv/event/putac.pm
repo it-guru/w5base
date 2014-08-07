@@ -774,6 +774,21 @@ sub ApplicationModified
                $swinstance->SetFilter({applid=>\$rec->{id},
                                        cistatusid=>['3','4']});
                foreach my $irec ($swinstance->getHashList(qw(ALL))){
+
+                  if ($irec->{swinstanceid} eq ""){
+                     my $acswi=getModuleObject($self->Config,
+                                               "tsacinv::swinstance");
+                     $acswi->SetFilter({srcsys=>\'W5Base',srcid=>\$irec->{id}});
+                     my ($acswirec,$msg)=$acswi->getOnlyFirst(qw(swinstanceid));
+                     if (defined($acswirec) && $acswirec->{swinstanceid} ne ""){
+                        my $swi=$swinstance->Clone();
+                        $swi->UpdateRecord({
+                           swinstanceid=>$acswirec->{swinstanceid}},
+                           {id=>\$irec->{id}}
+                        );
+                     }
+                  }
+
                   $CurrentEventId="Instance '$irec->{fullname}'";
                   my $systemid;
                   if ($irec->{system} ne ""){
@@ -831,6 +846,7 @@ sub ApplicationModified
                                 Remarks=>$irec->{comments},
                                 Assignment=>$assignment,
                                 IncidentAG=>$iassignment,
+                                SC_Location_Id=>'1000.0043.0089',
                                 CostCenter=>$rec->{conodenumber},
                                 Security_Unit=>"TS.DE",
                                 CustomerLink=>"TS.DE",
@@ -841,6 +857,46 @@ sub ApplicationModified
                      print $fh hash2xml($swi,{header=>0});
                      print $onlinefh hash2xml($swi,{header=>0});
                      $elements++;
+
+                     ##########################################################
+                     #
+                     # create relation to Application
+                     #
+                     $CurrentEventId="Add Instance '$irec->{fullname}' ".
+                                     "to $CurrentAppl";
+                     my $externalid=$irec->{id};
+                     if ($externalid eq ""){
+                        $externalid="I-".$rec->{id}."-".$irec->{id};
+                     }
+                     my $acftprec={
+                         CI_APPL_REL=>{
+                            EventID=>$CurrentEventId,
+                            ExternalSystem=>'W5Base',
+                            ExternalID=>$externalid,
+                            Appl_ExternalSystem=>'W5Base',
+                            Appl_ExternalID=>$rec->{id},
+                            Port_ExternalSystem=>'W5Base',
+                            Port_ExternalID=>$irec->{id},
+                            Security_Unit=>"TS.DE",
+                            bDelete=>'0',
+                            bActive=>'1',
+                         }
+                     };
+                     if ($rec->{applid} ne ""){
+                        $acftprec->{CI_APPL_REL}->{Application}=
+                            uc($rec->{applid});
+                     }
+                     if ($irec->{swinstanceid} ne ""){
+                        $acftprec->{CI_APPL_REL}->{Portfolio}=
+                               uc($irec->{swinstanceid});
+                     }
+
+                     $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$ApplU};
+                     my $fh=$fh{ci_appl_rel};
+                     print $fh hash2xml($acftprec,{header=>0});
+                     print $onlinefh hash2xml($acftprec,{header=>0});
+                     $elements++;
+                     ##########################################################
                   }
                }
             }
