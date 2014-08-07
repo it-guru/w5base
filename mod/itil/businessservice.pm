@@ -629,7 +629,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.97')
+                   return('0.92')
                 },
                 precision     =>2, 
                 label         =>'responsetime',
@@ -646,7 +646,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.92')
+                   return('0.97')
                 },
                 precision     =>2, 
                 label         =>'responsetime',
