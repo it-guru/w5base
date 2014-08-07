@@ -1358,6 +1358,8 @@ sub getIdByHashIOMapped
 
    $self->NormalizeByIOMap($queryfrom,\%flt,%param);
 
+   %{$q}=%flt; # return the mapped query structure to the calling process
+
    $$debug.="\nRequest after mappings:\n" if ($debug);
    foreach my $k (keys(%flt)){  # fix search (no like)
       my $v=$flt{$k};
