@@ -116,6 +116,7 @@ sub new
    $self->{_permitted}->{selectfix}=1;  # force to use this field alwasy in sql
    $self->{_permitted}->{default}=1;    # Default value on new records
    $self->{_permitted}->{unit}=1;       # Unit prefix in detail view
+   $self->{_permitted}->{background}=1; # Color of Background (if posible)
    $self->{_permitted}->{label}=1;      # Die Beschriftung des Felds
    $self->{_permitted}->{readonly}=1;   # Nur zum lesen
    $self->{_permitted}->{frontreadonly}=1;   # Nur zum lesen
@@ -1181,6 +1182,46 @@ EOF
    $d.="</td></tr></table>\n";
    return($d);
 }
+
+
+sub BackgroundColorHandling
+{
+   my $self=shift;
+   my $FormatAs=shift;
+   my $current=shift;
+   my $d=shift;
+
+   my $bg=$self->background($FormatAs,$current);
+   if ($bg ne ""){
+      if ($FormatAs eq "HtmlDetail"){
+         if ($bg eq "red" || $bg eq "green" ||
+             $bg eq "yellow" || $bg eq "grey" || $bg eq "blue"){
+            $d="<div ".
+               "style='background-image:".
+               "url(../../base/load/cellbg_$bg.jpg)'>".
+               $d.
+               "</div>";
+         }
+         else{
+            $d="<div ".
+               "style='background-color:$bg'>".
+               $d.
+               "</div>";
+         }
+      }
+      elsif ($FormatAs eq "HtmlV01"){  # background-color geht hier nicht
+         if ($bg eq "red" || $bg eq "green" ||
+             $bg eq "yellow" || $bg eq "grey" || $bg eq "blue"){
+            $d.="<img height=10 width=10 src='../../base/load/cellbg_$bg.jpg'>";
+         }
+      }
+   }
+   
+   return($d);
+}
+
+
+
 
 sub getFieldHelpUrl
 {

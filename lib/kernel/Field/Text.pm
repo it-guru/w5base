@@ -122,6 +122,9 @@ sub FormatedDetail
       }
    }
    $d.=" ".$self->{unit} if ($d ne "" && $FormatAs eq "HtmlDetail");
+   if (exists($self->{background})){
+      $d=$self->BackgroundColorHandling($FormatAs,$current,$d);
+   }
    return($d);
 }
 

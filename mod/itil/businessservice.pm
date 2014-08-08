@@ -437,6 +437,7 @@ sub new
                    return(undef) if ($mode eq "edit");
                    return('0.92')
                 },
+                background    =>\&calcBackgroundFlagColor,
                 precision     =>2, 
                 label         =>'MTBF',
                 align         =>'right',
@@ -454,6 +455,7 @@ sub new
                    return(undef) if ($mode eq "edit");
                    return('0.97')
                 },
+                background    =>\&calcBackgroundFlagColor,
                 precision     =>2, 
                 label         =>'MTBF',
                 align         =>'right',
@@ -501,6 +503,7 @@ sub new
                    return(undef) if ($mode eq "edit");
                    return('0.92')
                 },
+                background    =>\&calcBackgroundFlagColor,
                 precision     =>2, 
                 label         =>'TTR',
                 align         =>'right',
@@ -518,6 +521,7 @@ sub new
                    return(undef) if ($mode eq "edit");
                    return('0.97')
                 },
+                background    =>\&calcBackgroundFlagColor,
                 precision     =>2, 
                 label         =>'TTR',
                 align         =>'right',
@@ -572,6 +576,7 @@ sub new
                    return(undef) if ($mode eq "edit");
                    return('0.92')
                 },
+                background    =>\&calcBackgroundFlagColor,
                 label         =>'avalability',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
@@ -589,6 +594,7 @@ sub new
                    return(undef) if ($mode eq "edit");
                    return('0.97')
                 },
+                background    =>\&calcBackgroundFlagColor,
                 label         =>'avalability',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
@@ -631,6 +637,7 @@ sub new
                    return(undef) if ($mode eq "edit");
                    return('0.92')
                 },
+                background    =>\&calcBackgroundFlagColor,
                 precision     =>2, 
                 label         =>'responsetime',
                 align         =>'right',
@@ -648,6 +655,7 @@ sub new
                    return(undef) if ($mode eq "edit");
                    return('0.97')
                 },
+                background    =>\&calcBackgroundFlagColor,
                 precision     =>2, 
                 label         =>'responsetime',
                 align         =>'right',
@@ -795,6 +803,29 @@ sub new
    return($self);
 }
 
+sub calcBackgroundFlagColor
+{
+   my $self=shift;
+   my $FormatAs=shift;
+   my $current=shift;
+
+   my $def=$self->default($FormatAs);
+   my $cur=$current->{$self->Name()};
+
+   $cur=$def if ($cur eq "");
+
+   my $delta=abs($def-$cur);
+   if ($delta>0 && $def>0){
+      my $p=(100*$delta)/$def;
+      print STDERR ("delta=$delta p=$p\n");
+      if ($p>10){
+         return("red");
+      }elsif ($p>5){
+         return("yellow");
+      }
+   }
+   return("");
+}
 
 sub extLabelPostfixRequested
 {

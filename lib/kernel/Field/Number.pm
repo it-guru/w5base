@@ -81,6 +81,9 @@ sub FormatedDetail
                $d.=" ".$self->unit($mode,$d,$current);
             }
          }
+         if (exists($self->{background})){
+            $d=$self->BackgroundColorHandling($mode,$current,$d);
+         }
       }
 
       return($d);
@@ -104,6 +107,8 @@ sub FormatedDetail
    }
    return($d);
 }
+
+
 
 sub Unformat
 {
