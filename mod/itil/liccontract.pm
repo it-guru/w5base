@@ -504,6 +504,10 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (exists($newrec->{name})){
+      $newrec->{name}=~s/\$//g;
+   }
+
    if ((!defined($oldrec) || defined($newrec->{name})) &&
         (($newrec->{name}=~m/[^A-Z,\+\!&,-:0-9. _\[\]()]/i) ||
          length(trim($newrec->{name}))<3)){
