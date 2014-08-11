@@ -2,5 +2,7 @@
 'Clusterservice fullname'=>{de=>'vollständiger Service'},
 'Usage'=>{de=>'Verwendung'},
 'Description'=>{de=>'Beschreibung'},
+'fieldgroup.backups'=>{de=>'beauftragte Backup-Jobs',
+                       en=>'ordered Backup-Jobs'},
 'fieldgroup.applications'=>{de=>'Anwendungen',
                        en=>'Applications'},

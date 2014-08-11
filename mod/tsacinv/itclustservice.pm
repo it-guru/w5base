@@ -137,6 +137,20 @@ sub new
                 label         =>'AC-PortfolioID',
                 dataobjattr   =>'amcomputer.lparentid'),
 
+      new kernel::Field::Link(
+                name          =>'lcomputerid',
+                label         =>'ComputerID',
+                dataobjattr   =>'amcomputer.lcomputerid'),
+
+      new kernel::Field::SubList(
+                name          =>'backups',
+                label         =>'ordered backup jobs',
+                group         =>'backups',
+                vjointo       =>'tsacinv::backup',
+                vjoinon       =>['lcomputerid'=>'lcomputerid'],
+                vjoindisp     =>[qw(backupid name stype bgroup tfrom tto isactive
+                                    hexpectedquantity)]),
+
 #      new kernel::Field::SubList(
 #                name          =>'applications',
 #                label         =>'Applications',
@@ -265,7 +279,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default systems source));
+   return(qw(header default systems backups source));
 }  
 
 
