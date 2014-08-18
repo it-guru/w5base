@@ -728,6 +728,12 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>$worktable.'.th_crit_perf'),
 
+      new kernel::Field::Textarea(
+                name          =>'slacomments',
+                group         =>'monicomments',
+                label         =>'comments for alternate thresholds',
+                dataobjattr   =>$worktable.'.slacomments'),
+
       new kernel::Field::Number(
                 name          =>'reproacht',
                 group         =>'reporting',
@@ -950,7 +956,8 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default applinfo desc  uservicecomp servicecomp
-             contacts businessprocesses reporting sla moni attachments source));
+             contacts businessprocesses reporting sla moni monicomments 
+             attachments source));
 }
 
 
@@ -1220,6 +1227,7 @@ sub isWriteValid
       
       if ($wr){
          push(@l,"default","contacts","desc","servicecomp","sla","moni",
+                 "monicomments",
                  "attachments","reporting");
       }
    }
@@ -1237,7 +1245,7 @@ sub isViewValid
    }
    else{
       push(@l,qw(contacts desc uservicecomp servicecomp 
-                 attachments reporting sla moni));
+                 attachments reporting sla moni monicomments));
    }
    push(@l,qw(businessprocesses source));
    return(@l);
