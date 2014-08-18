@@ -125,6 +125,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'treeview',
                 label         =>'TreeView',
+                htmldetail    =>0,
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
