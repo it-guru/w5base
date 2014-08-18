@@ -662,6 +662,72 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>$worktable.'.th_crit_respti'),
 
+      new kernel::Field::Percent(
+                name          =>'requ_perf',
+                group         =>'moni',
+                label         =>'performance in %',
+                align         =>'right',
+                default       =>'95',
+                searchable    =>0,
+                extLabelPostfix=>\&extLabelPostfixRequested,
+                dataobjattr   =>$worktable.'.requ_perf'),
+
+      new kernel::Field::Percent(
+                name          =>'impl_perf',
+                group         =>'moni',
+                searchable    =>0,
+                label         =>'performance in %',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixImplemented,
+                dataobjattr   =>$worktable.'.impl_perf'),
+
+      new kernel::Field::Percent(
+                name          =>'curr_perf',
+                group         =>'moni',
+                default       =>'95',
+                label         =>'performance in %',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixCurrent,
+                dataobjattr   =>$worktable.'.curr_perf'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_warn_perf',
+                group         =>'moni',
+               # default       =>sub{
+               #    my $self=shift;
+               #    my $current=shift;
+               #    my $mode=shift;
+               #
+               #    return(undef) if ($mode eq "edit");
+               #    return('0.92')
+               # },
+                readonly      =>1,
+                background    =>\&calcBackgroundFlagColor,
+                precision     =>2, 
+                label         =>'performance',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>$worktable.'.th_warn_perf'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_crit_perf',
+                group         =>'moni',
+               # default       =>sub{
+               #    my $self=shift;
+               #    my $current=shift;
+               #    my $mode=shift;
+               #
+               #    return(undef) if ($mode eq "edit");
+               #    return('0.97')
+               # },
+                readonly      =>1,
+                background    =>\&calcBackgroundFlagColor,
+                precision     =>2, 
+                label         =>'performance',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>$worktable.'.th_crit_perf'),
+
       new kernel::Field::Number(
                 name          =>'reproacht',
                 group         =>'reporting',
@@ -817,7 +883,6 @@ sub calcBackgroundFlagColor
    my $delta=abs($def-$cur);
    if ($delta>0 && $def>0){
       my $p=(100*$delta)/$def;
-      print STDERR ("delta=$delta p=$p\n");
       if ($p>10){
          return("red");
       }elsif ($p>5){
