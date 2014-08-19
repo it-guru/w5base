@@ -438,6 +438,7 @@ sub new
                    return('0.92')
                 },
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 precision     =>2, 
                 label         =>'MTBF',
                 align         =>'right',
@@ -456,6 +457,7 @@ sub new
                    return('0.97')
                 },
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 precision     =>2, 
                 label         =>'MTBF',
                 align         =>'right',
@@ -504,6 +506,7 @@ sub new
                    return('0.92')
                 },
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 precision     =>2, 
                 label         =>'TTR',
                 align         =>'right',
@@ -522,6 +525,7 @@ sub new
                    return('0.97')
                 },
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 precision     =>2, 
                 label         =>'TTR',
                 align         =>'right',
@@ -577,6 +581,7 @@ sub new
                    return('0.92')
                 },
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 label         =>'avalability',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
@@ -595,6 +600,7 @@ sub new
                    return('0.97')
                 },
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 label         =>'avalability',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
@@ -639,6 +645,7 @@ sub new
                 },
                 background    =>\&calcBackgroundFlagColor,
                 precision     =>2, 
+                editrange     =>[0.01,5.0],
                 label         =>'responsetime',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
@@ -656,6 +663,7 @@ sub new
                    return('0.97')
                 },
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 precision     =>2, 
                 label         =>'responsetime',
                 align         =>'right',
@@ -703,6 +711,7 @@ sub new
                # },
                 readonly      =>1,
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 precision     =>2, 
                 label         =>'performance',
                 align         =>'right',
@@ -722,6 +731,7 @@ sub new
                # },
                 readonly      =>1,
                 background    =>\&calcBackgroundFlagColor,
+                editrange     =>[0.01,5.0],
                 precision     =>2, 
                 label         =>'performance',
                 align         =>'right',

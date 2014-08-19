@@ -160,7 +160,7 @@ sub Validate
             $self->getParent->LastMsg(ERROR,
                 sprintf(
                    $self->getParent->T(
-                     "value '%s' not in allowed editrange '%s-%s' for '%s'",
+                     "value '%s' not in allowed range '%s-%s' for '%s'",
                       $self->Self),$d,
                      $self->{editrange}->[0],$self->{editrange}->[1],
                      $self->Label()));
