@@ -81,6 +81,7 @@ sub ListFiles
    }
    $fo->SetFilter({parentobj=>$parentobj,
                    parentrefid=>$refid});
+   my $ownerfield=$fo->getField("owner");
    foreach my $rec ($fo->getHashList(qw(ALL))){
       if (defined($rec)){
          #next if ($mode eq "" && !$fo->isViewValid($rec));
@@ -95,8 +96,12 @@ sub ListFiles
             $clone{label}.="&nbsp;<a title=\"$privacy\">".
                          "<font color=red><b>!</b></font></a>";
          }
+         my $ownername=$ownerfield->FormatedDetail($rec,"HtmlV01");
          my $t=$self->getParent->ExpandTimeExpression($rec->{mdate},
-               $self->getParent->Lang())." GMT by $rec->{editor}";
+               $self->getParent->Lang())." GMT ".
+               $self->getParent->T("by","kernel::FileList").
+               " ".
+               $ownername;
 
          $clone{description}="$t";
          

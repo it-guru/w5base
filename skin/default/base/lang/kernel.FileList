@@ -9,3 +9,4 @@
 'delete marked files'=>{de=>'markierte Dateien löschen'},
 'handle file as private'=>{de=>'Datei vertraulich behandeln'},
 'comments'=>{de=>'Bemerkungen'},
+'by'=>{de=>'von'},

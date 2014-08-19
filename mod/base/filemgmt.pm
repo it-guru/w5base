@@ -232,44 +232,6 @@ sub getState
    return($state);
 }
 
-#sub getSqlFrom
-#{
-#   my $self=shift;
-#   my $from="filemgmt left outer join fileacl ".
-#            "on filemgmt.fid=fileacl.refid and ".
-#            "fileacl.aclparentobj='base::filemgmt'";
-#   return($from);
-#}
-#
-#
-#
-#sub SecureSetFilter
-#{
-#   my $self=shift;
-##   if (!$self->IsMemberOf("admin")){
-#      my $userid;
-#      my $UserCache=$self->Cache->{User}->{Cache};
-#      if (defined($UserCache->{$ENV{REMOTE_USER}})){
-#         $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
-#      }
-#      if (defined($UserCache->{tz})){
-#         $userid=$UserCache->{userid};
-#      }
-#      my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','both');
-#      return($self->SUPER::SecureSetFilter([{owner=>\$userid},
-#                                            {aclmode=>['write','read'],
-#                                             acltarget=>\'base::user',
-#                                             acltargetid=>[$userid]},
-#                                            {aclmode=>['write','read'],
-#                                             acltarget=>\'base::grp',
-#                                             acltargetid=>[keys(%groups)]},
-#                                            {acltargetid=>[undef]},
-#                                            ],@_));
-##   }
-#   return($self->SUPER::SecureSetFilter(@_));
-#}
-
-
 
 sub SecureSetFilter
 {
