@@ -2,6 +2,9 @@
                        en=>'DINA Software Instance'},
 'fieldgroup.lpar'=>{de=>'LPAR',en=>'LPAR'},
 'fieldgroup.system'=>{de=>'System',en=>'System'},
+'fieldgroup.oracle'=>{de=>'Oracle Information',en=>'Oracle information'},
+'fieldgroup.features'=>{de=>'Oracle Features',en=>'Oracle Features'},
+'fieldgroup.options'=>{de=>'Oracle Optionen',en=>'Oracle Options'},
 'Instance Name'=>{de=>'Instanz Name'},
 'Monitor Date'=>{de=>'Monitor Zeitpunkt'},
 

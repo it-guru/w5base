@@ -38,25 +38,16 @@ sub new
                 label         =>'No.'),
 
       new kernel::Field::Id(
-                name          =>'instanceid',
+                name          =>'dinainstanceid',
                 label         =>'Instance ID',
                 htmldetail    =>0,
                 dataobjattr   =>'dina_inst_id'),
 
-      new kernel::Field::Text(
-                name          =>'edition',
-                label         =>'Edition',
-                dataobjattr   =>'edition'),
-
-      new kernel::Field::Text(
-                name          =>'version',
-                label         =>'Version',
-                dataobjattr   =>'version'),
-
-      new kernel::Field::Text(
-                name          =>'dbname',
-                label         =>'DB Name',
-                dataobjattr   =>'db_name'),
+      new kernel::Field::Link(
+                name          =>'dinadbid',
+                label         =>'Dina DB ID',
+                htmldetail    =>0,
+                dataobjattr   =>'dina_db_id'),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -67,6 +58,42 @@ sub new
                 name          =>'monitordate',
                 label         =>'Monitor Date',
                 dataobjattr   =>'monitor_date'),
+
+      new kernel::Field::Text(
+                name          =>'dbname',
+                label         =>'DB Name',
+                group         =>'oracle',
+                dataobjattr   =>'db_name'),
+
+      new kernel::Field::Text(
+                name          =>'edition',
+                label         =>'Edition',
+                group         =>'oracle',
+                dataobjattr   =>'edition'),
+
+      new kernel::Field::Text(
+                name          =>'version',
+                label         =>'Version',
+                group         =>'oracle',
+                dataobjattr   =>'version'),
+
+      new kernel::Field::SubList(
+                name          =>'orafeatures',
+                label         =>'Features',
+                group         =>'features',
+                forwardSearch =>1,
+                vjointo       =>'tsdina::lnkorafeature',
+                vjoinon       =>['dinadbid'=>'dinadbid'],
+                vjoindisp     =>[qw(name usage)]),      
+
+      new kernel::Field::SubList(
+                name          =>'oraoptions',
+                label         =>'Options',
+                group         =>'options',
+                forwardSearch =>1,
+                vjointo       =>'tsdina::lnkoraoption',
+                vjoinon       =>['dinainstanceid'=>'dinainstanceid'],
+                vjoindisp     =>[qw(name installed)]),      
 
       new kernel::Field::Text(
                 name          =>'systemname',
@@ -125,7 +152,7 @@ sub new
                 dataobjattr   =>'lpar_shared_pool_id'),
 
    );
-   $self->setDefaultView(qw(dbname name monitordate));
+   $self->setDefaultView(qw(name monitordate));
 
    return($self);
 }
@@ -153,7 +180,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","system");
+   return("header","default","oracle","features","options","system");
 }
 
 sub isQualityCheckValid

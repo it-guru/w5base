@@ -115,7 +115,7 @@ sub new
                 group         =>'swinstances',
                 vjointo       =>'tsdina::swinstance',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>[qw(dbname name version)],
+                vjoindisp     =>[qw(name)],
                 forwardSearch =>1,
       ),
 
