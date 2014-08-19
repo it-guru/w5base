@@ -684,6 +684,7 @@ sub new
                 name          =>'impl_perf',
                 group         =>'moni',
                 searchable    =>0,
+                readonly      =>1,
                 label         =>'performance in %',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixImplemented,
