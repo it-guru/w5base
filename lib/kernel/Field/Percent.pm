@@ -51,7 +51,11 @@ sub FormatedDetail
       if (defined($fromquery)){
          $d=$fromquery;
       }
-      return("<input class=finput type=text name=Formated_$name value=\"$d\">");
+      my $readonly=0;
+      if ($self->readonly($current)){
+         $readonly=1;
+      }
+      return($self->getSimpleInputField($d,$readonly));
    }
 
    if ($mode=~m/^[>]{0,1}Html.*$/ ||
