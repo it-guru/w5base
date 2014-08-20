@@ -465,7 +465,7 @@ sub Label
          $d=$self->getParent->T($d,@tr);
       }
    }
-   else{
+   if ($label eq "" || $d eq ""){
       $d="(".$self->Name().")";
    }
    return($d);
