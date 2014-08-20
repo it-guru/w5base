@@ -226,9 +226,92 @@ sub new
                 searchable    =>0,
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::TextDrop(
+                name          =>'tsm2email',
+                htmldetail    =>0,
+                label         =>'Deputy Technical Contact E-Mail',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['tsm2id'=>'lempldeptid'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::TextDrop(
+                name          =>'tsm2ldapid',
+                htmldetail    =>0,
+                label         =>'Deputy Technical Contact LDAPID',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['tsm2id'=>'lempldeptid'],
+                vjoindisp     =>'ldapid'),
+
       new kernel::Field::Link(
                 name          =>'tsm2id',
                 dataobjattr   =>'amtsicustappl.ldeputytechnicalcontactid'),
+
+
+
+
+      new kernel::Field::TextDrop(
+                name          =>'opm',
+                label         =>'OPM Contact',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['opmid'=>'lempldeptid'],
+                searchable    =>0,
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'opmemail',
+                htmldetail    =>0,
+                label         =>'OPM Contact E-Mail',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['opmid'=>'lempldeptid'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::TextDrop(
+                name          =>'opmldapid',
+                htmldetail    =>0,
+                label         =>'OPM Contact LDAPID',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['opmid'=>'lempldeptid'],
+                vjoindisp     =>'ldapid'),
+
+      new kernel::Field::Link(
+                name          =>'opmid',
+                dataobjattr   =>'amtsicustappl.lleaddemid'),
+                                    
+      new kernel::Field::TextDrop(
+                name          =>'opm2',
+                label         =>'Deputy OPM Contact',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['opm2id'=>'lempldeptid'],
+                searchable    =>0,
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'opm2email',
+                htmldetail    =>0,
+                label         =>'Deputy OPM Contact E-Mail',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['opm2id'=>'lempldeptid'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::TextDrop(
+                name          =>'opm2ldapid',
+                htmldetail    =>0,
+                label         =>'Deputy OPM Contact LDAPID',
+                vjointo       =>'tsacinv::user',
+                vjoinon       =>['opm2id'=>'lempldeptid'],
+                vjoindisp     =>'ldapid'),
+
+      new kernel::Field::Link(
+                name          =>'opm2id',
+                dataobjattr   =>'amtsicustappl.ldeputydemid'),
+
+
+
+
+
+
+
+
                                     
       new kernel::Field::Link(
                 name          =>'lassignmentid',

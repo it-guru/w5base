@@ -174,6 +174,63 @@ sub qcheckRecord
                          "from AssetManager\n-");
             }
          }
+         if ($parrec->{tsm2email} ne ""){
+            my $tsmid=$tswiw->GetW5BaseUserID($parrec->{tsm2email});
+            if (defined($tsmid)){
+               $self->IfaceCompare($dataobj,
+                                   $rec,"tsm2id",
+                                   {tsmid=>$tsmid},"tsmid",
+                                   $forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'native');
+            }
+            else{
+               $tswiw->Log(ERROR,"basedata",
+                         "TSM2 '$parrec->{tsm2email}' ".
+                         "for application '".$rec->{name}."' ".
+                         "can not be located in W5Base and WhoIsWho ".
+                         "while import(qrule) of application ".
+                         "from AssetManager\n-");
+            }
+         }
+         if ($parrec->{opmemail} ne ""){
+            my $opmid=$tswiw->GetW5BaseUserID($parrec->{opmemail});
+            if (defined($opmid)){
+               $self->IfaceCompare($dataobj,
+                                   $rec,"opmid",
+                                   {opmid=>$opmid},"opmid",
+                                   $forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'native');
+            }
+            else{
+               $tswiw->Log(ERROR,"basedata",
+                         "OPM '$parrec->{opmemail}' ".
+                         "for application '".$rec->{name}."' ".
+                         "can not be located in W5Base and WhoIsWho ".
+                         "while import(qrule) of application ".
+                         "from AssetManager\n-");
+            }
+         }
+         if ($parrec->{opm2email} ne ""){
+            my $opmid=$tswiw->GetW5BaseUserID($parrec->{opm2email});
+            if (defined($opmid)){
+               $self->IfaceCompare($dataobj,
+                                   $rec,"opm2id",
+                                   {opmid=>$opmid},"opmid",
+                                   $forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'native');
+            }
+            else{
+               $tswiw->Log(ERROR,"basedata",
+                         "OPM2 '$parrec->{opm2email}' ".
+                         "for application '".$rec->{name}."' ".
+                         "can not be located in W5Base and WhoIsWho ".
+                         "while import(qrule) of application ".
+                         "from AssetManager\n-");
+            }
+         }
          $self->IfaceCompare($dataobj,
                              $rec,"applnumber",
                              $parrec,"ref",
