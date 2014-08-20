@@ -192,6 +192,15 @@ sub qcheckRecord
                              $forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'text');
+         if ($dataobj->getField("scapprgroup")){
+            $self->IfaceCompare($dataobj,
+                                $rec,"scapprgroup",
+                                $parrec,"capprovergroup",
+                                $forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'native',
+                                AllowEmpty=>0);
+         }
          if ($dataobj->Self eq "AL_TCom::appl"){  # only for AL DTAG
             $self->IfaceCompare($dataobj,
                                 $rec,"acinmassingmentgroup",
