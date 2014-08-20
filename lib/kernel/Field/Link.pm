@@ -36,10 +36,5 @@ sub new
    return($self);
 }
 
-sub Label
-{
-   return(" ");
-}
-
 
 1;
