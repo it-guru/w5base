@@ -55,6 +55,9 @@ sub Process             # will be run as a spereate Process (PID)
                   $arec->{customerprio},$arec->{customer});
    }
    print $d;
+   for(my $c=0;$c<2048;$c++){  # test ob sich dadurch die Buffer Probleme
+      print("\n");             # lösen lassen
+   }
    return(0);
 }
 
