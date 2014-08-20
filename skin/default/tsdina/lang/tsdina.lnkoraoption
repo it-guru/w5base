@@ -1,1 +1,4 @@
+'tsdina::lnkoraoption'=>{de=>'DINA Oracle Option',
+                         en=>'DINA Oracle Option'},
+'Instance'=>{de=>'Instanz'},
 'installed'=>{de=>'installiert'},

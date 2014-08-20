@@ -37,17 +37,45 @@ sub new
                 htmlwidth     =>'1%',
                 label         =>'No.'),
 
+      new kernel::Field::Id(
+                name          =>'lnkid',
+                label         =>'LinkID',
+                htmldetail    =>0,
+                searchable    =>0,
+                dataobjattr   =>'opt.ROWID'),
+
       new kernel::Field::Link(
                 name          =>'dinainstanceid',
                 label         =>'Instance ID',
                 htmldetail    =>0,
                 dataobjattr   =>'opt.dina_inst_id'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'name',
-                label         =>'Name',
+                label         =>'Link name',
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>['optionname','instance'],
+                onRawValue    =>sub{
+                   my $self   =shift;
+                   my $current=shift;
+                   my $lnkname=$current->{optionname}.' - '.
+                               $self->getParent->getVal('instancename');
+                   return($lnkname);
+                }),
+
+      new kernel::Field::Text(
+                name          =>'optionname',
+                label         =>'Option',
                 htmlwidth     =>'300px',
                 dataobjattr   =>'name.option_name'),
+
+      new kernel::Field::Text(
+                name          =>'instancename',
+                label         =>'Instance',
+                vjointo       =>'tsdina::swinstance',
+                vjoinon       =>['dinainstanceid'=>'dinainstanceid'],
+                vjoindisp     =>['name']),
 
       new kernel::Field::Boolean(
                 name          =>'installed',
@@ -84,6 +112,17 @@ sub initSqlWhere
    my $where="opt.optid=name.optid";
    return($where);
 }
+
+sub isQualityCheckValid
+{
+   return(0);
+}
+
+sub isUploadValid
+{
+   return(0);
+}
+
 
 
 1;

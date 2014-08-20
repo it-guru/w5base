@@ -82,18 +82,20 @@ sub new
                 label         =>'Features',
                 group         =>'features',
                 forwardSearch =>1,
+                searchable    =>0,
                 vjointo       =>'tsdina::lnkorafeature',
                 vjoinon       =>['dinadbid'=>'dinadbid'],
-                vjoindisp     =>[qw(name usage)]),      
+                vjoindisp     =>[qw(featurename usage)]),      
 
       new kernel::Field::SubList(
                 name          =>'oraoptions',
                 label         =>'Options',
                 group         =>'options',
                 forwardSearch =>1,
+                searchable    =>0,
                 vjointo       =>'tsdina::lnkoraoption',
                 vjoinon       =>['dinainstanceid'=>'dinainstanceid'],
-                vjoindisp     =>[qw(name installed)]),      
+                vjoindisp     =>[qw(optionname installed)]),      
 
       new kernel::Field::Text(
                 name          =>'systemname',
@@ -208,6 +210,7 @@ sub isUploadValid
 {
    return(0);
 }
+
 
 
 1;

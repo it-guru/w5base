@@ -46,6 +46,14 @@ sub Init
                       "tsdina::swinstance",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.tsdina.swinstance.orafeature",
+                      "tsdina::lnkorafeature",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsdina.swinstance.oraoption",
+                      "tsdina::lnkoraoption",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.tsdina.dictionary",
                       "tsdina::DBDataDiconary",
                       defaultacl=>['admin']);

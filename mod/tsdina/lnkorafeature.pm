@@ -37,25 +37,55 @@ sub new
                 htmlwidth     =>'1%',
                 label         =>'No.'),
 
+      new kernel::Field::Id(
+                name          =>'lnkid',
+                label         =>'LinkID',
+                htmldetail    =>0,
+                searchable    =>0,
+                dataobjattr   =>'features.ROWID'),
+
       new kernel::Field::Link(
                 name          =>'dinadbid',
                 label         =>'Dina DB ID',
                 htmldetail    =>0,
                 dataobjattr   =>'features.dina_db_id'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'name',
-                label         =>'Name',
+                label         =>'Link name',
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>['featurename','dbname'],
+                onRawValue    =>sub{
+                   my $self   =shift;
+                   my $current=shift;
+                   my $lnkname=$current->{featurename}.' - '.
+                               $self->getParent->getVal('dbname');
+                   return($lnkname);
+                }),
+
+      new kernel::Field::Text(
+                name          =>'featurename',
+                label         =>'Feature',
                 htmlwidth     =>'300px',
                 dataobjattr   =>'name.feature_name'),
 
       new kernel::Field::Text(
+                name          =>'dbname',
+                label         =>'DB Name',
+                vjointo       =>'tsdina::swinstance',
+                vjoinon       =>['dinadbid'=>'dinadbid'],
+                vjoindisp     =>['dbname']),
+
+      new kernel::Field::Text(
                 name          =>'usage',
                 label         =>'Usage',
-                dataobjattr   =>'features.usage_info'),
+                dataobjattr   =>"decode(features.usage_info,".
+                                   "'--','',".
+                                   "features.usage_info)"),
    );
 
-   $self->setDefaultView(qw(linenumber name usage));
+   $self->setDefaultView(qw(linenumber featurename dbname usage));
 
    return($self);
 }
@@ -84,6 +114,17 @@ sub initSqlWhere
    my $where="features.fid=name.fid";
    return($where);
 }
+
+sub isQualityCheckValid
+{
+   return(0);
+}
+
+sub isUploadValid
+{
+   return(0);
+}
+
 
 
 1;
