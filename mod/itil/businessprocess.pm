@@ -75,7 +75,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default procdesc applications businessservices acl misc source));
+   return(qw(header default procdesc applications 
+             businessservices acl misc source));
 }
 
 

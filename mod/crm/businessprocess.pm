@@ -191,6 +191,15 @@ print STDERR Dumper(\@d);
                 dataobjattr   =>'businessprocess.comments'),
 
       new kernel::Field::SubList(
+                name          =>'subproc',
+                label         =>'subproc',
+                readonly      =>1,
+                group         =>'subproc',
+                vjointo       =>'crm::businessprocess',
+                vjoinon       =>['id'=>'pbusinessprocessid'],
+                vjoindisp     =>['fullname']),
+
+      new kernel::Field::SubList(
                 name          =>'acls',
                 label         =>'Accesscontrol',
                 subeditmsk    =>'subedit.businessprocess',
@@ -646,8 +655,7 @@ sub isViewValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default procdesc acl misc source));
+   return(qw(header default subproc procdesc acl misc source));
 }
 
 sub SelfAsParentObject
