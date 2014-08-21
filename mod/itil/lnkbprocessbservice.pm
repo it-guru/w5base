@@ -53,7 +53,6 @@ sub new
                                                    
       new kernel::Field::TextDrop(
                 name          =>'businessservice',
-                htmlwidth     =>'100px',
                 label         =>'Businessservice',
                 vjointo       =>'itil::businessservice',
                 vjoinon       =>['businessserviceid'=>'id'],
