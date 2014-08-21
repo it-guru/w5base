@@ -41,7 +41,7 @@ sub new
                 name          =>'lnkid',
                 label         =>'LinkID',
                 htmldetail    =>0,
-                searchable    =>0,
+                uivisible     =>0,
                 dataobjattr   =>'opt.ROWID'),
 
       new kernel::Field::Link(
@@ -64,11 +64,23 @@ sub new
                    return($lnkname);
                 }),
 
+      new kernel::Field::Number(
+                name          =>'optionid',
+                label         =>'Option ID',
+                searchable    =>0,
+                dataobjattr   =>'opt.optid'),
+
       new kernel::Field::Text(
                 name          =>'optionname',
                 label         =>'Option',
-                htmlwidth     =>'300px',
+                ignorecase    =>1,
+                htmlwidth     =>'200px',
                 dataobjattr   =>'name.option_name'),
+
+      new kernel::Field::Boolean(
+                name          =>'installed',
+                label         =>'installed',
+                dataobjattr   =>'opt.installed'),
 
       new kernel::Field::Text(
                 name          =>'instancename',
@@ -77,13 +89,16 @@ sub new
                 vjoinon       =>['dinainstanceid'=>'dinainstanceid'],
                 vjoindisp     =>['name']),
 
-      new kernel::Field::Boolean(
-                name          =>'installed',
-                label         =>'installed',
-                dataobjattr   =>'opt.installed'),
+      new kernel::Field::Text(
+                name          =>'dbname',
+                label         =>'DB Name',
+                htmldetail    =>0,
+                vjointo       =>'tsdina::swinstance',
+                vjoinon       =>['dinainstanceid'=>'dinainstanceid'],
+                vjoindisp     =>['dbname']),
    );
 
-   $self->setDefaultView(qw(linenumber name installed));
+   $self->setDefaultView(qw(linenumber instancename optionname installed));
 
    return($self);
 }
@@ -109,7 +124,7 @@ sub getSqlFrom
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="opt.optid=name.optid";
+   my $where="opt.optid=name.optid(+)";
    return($where);
 }
 

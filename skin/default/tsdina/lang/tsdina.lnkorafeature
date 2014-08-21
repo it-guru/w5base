@@ -1,2 +1,5 @@
 'tsdina::lnkorafeature'=>{de=>'DINA Oracle Feature',
                           en=>'DINA Oracle Feature'},
+'Instance'=>{de=>'Instanz'},
+'Comments'=>{de=>'Bemerkungen'},
+'Feature used'=>{de=>'Feature genutzt'},

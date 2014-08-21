@@ -41,8 +41,9 @@ sub new
                 name          =>'lnkid',
                 label         =>'LinkID',
                 htmldetail    =>0,
-                searchable    =>0,
-                dataobjattr   =>'features.ROWID'),
+                uivisible     =>0,
+                dataobjattr   =>"concat(features.dina_db_id,".
+                                 "concat('-',features.fid))"),
 
       new kernel::Field::Link(
                 name          =>'dinadbid',
@@ -64,28 +65,54 @@ sub new
                    return($lnkname);
                 }),
 
+      new kernel::Field::Number(
+                name          =>'featureid',
+                label         =>'Feature ID',
+                searchable    =>0,
+                dataobjattr   =>'features.fid'),
+
       new kernel::Field::Text(
                 name          =>'featurename',
                 label         =>'Feature',
-                htmlwidth     =>'300px',
-                dataobjattr   =>'name.feature_name'),
+                ignorecase    =>1,
+                htmlwidth     =>'200px',
+                #dataobjattr   =>'name.feature_name'),
+                # fix, solange in oracle_db_features_vw der
+                # Datensatz für die fid 14 fehlt.
+                dataobjattr   =>"decode(features.fid,14,".
+                                       "'Exadata',".
+                                       "name.feature_name)"),
+
+      new kernel::Field::Boolean(
+                name          =>'used',
+                label         =>'Feature used',
+                htmldetail    =>0,
+                dataobjattr   =>"decode(features.usage_info,'--',0,1 )"),
 
       new kernel::Field::Text(
                 name          =>'dbname',
                 label         =>'DB Name',
+                weblinkto     =>'none',
                 vjointo       =>'tsdina::swinstance',
                 vjoinon       =>['dinadbid'=>'dinadbid'],
                 vjoindisp     =>['dbname']),
 
       new kernel::Field::Text(
-                name          =>'usage',
-                label         =>'Usage',
-                dataobjattr   =>"decode(features.usage_info,".
-                                   "'--','',".
-                                   "features.usage_info)"),
+                name          =>'instance',
+                label         =>'Instance',
+                htmldetail    =>0,
+                vjointo       =>'tsdina::swinstance',
+                vjoinon       =>['dinadbid'=>'dinadbid'],
+                vjoindisp     =>['name']),
+
+      new kernel::Field::Text(
+                name          =>'comments',
+                label         =>'Comments',
+                ignorecase    =>1,
+                dataobjattr   =>'features.usage_info'),
    );
 
-   $self->setDefaultView(qw(linenumber featurename dbname usage));
+   $self->setDefaultView(qw(linenumber featurename dbname comments));
 
    return($self);
 }
@@ -111,7 +138,7 @@ sub getSqlFrom
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="features.fid=name.fid";
+   my $where="features.fid=name.fid(+)";
    return($where);
 }
 

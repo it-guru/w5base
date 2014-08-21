@@ -52,6 +52,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Instance Name',
+                ignorecase    =>1,
                 dataobjattr   =>'instance_name'),
 
       new kernel::Field::Date(
@@ -62,12 +63,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'dbname',
                 label         =>'DB Name',
+                ignorecase    =>1,
                 group         =>'oracle',
                 dataobjattr   =>'db_name'),
 
       new kernel::Field::Text(
                 name          =>'edition',
                 label         =>'Edition',
+                ignorecase    =>1,
                 group         =>'oracle',
                 dataobjattr   =>'edition'),
 
@@ -85,7 +88,7 @@ sub new
                 searchable    =>0,
                 vjointo       =>'tsdina::lnkorafeature',
                 vjoinon       =>['dinadbid'=>'dinadbid'],
-                vjoindisp     =>[qw(featurename usage)]),      
+                vjoindisp     =>[qw(featurename comments)]),      
 
       new kernel::Field::SubList(
                 name          =>'oraoptions',
@@ -154,6 +157,7 @@ sub new
                 dataobjattr   =>'lpar_shared_pool_id'),
 
    );
+
    $self->setDefaultView(qw(name monitordate));
 
    return($self);
