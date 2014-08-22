@@ -88,7 +88,7 @@ sub new
                 searchable    =>0,
                 vjointo       =>'tsdina::lnkorafeature',
                 vjoinon       =>['dinadbid'=>'dinadbid'],
-                vjoindisp     =>[qw(featurename comments)]),      
+                vjoindisp     =>[qw(featurename usageinfo)]),      
 
       new kernel::Field::SubList(
                 name          =>'oraoptions',

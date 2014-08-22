@@ -106,13 +106,13 @@ sub new
                 vjoindisp     =>['name']),
 
       new kernel::Field::Text(
-                name          =>'comments',
-                label         =>'Comments',
+                name          =>'usageinfo',
+                label         =>'last usage info',
                 ignorecase    =>1,
                 dataobjattr   =>'features.usage_info'),
    );
 
-   $self->setDefaultView(qw(linenumber featurename dbname comments));
+   $self->setDefaultView(qw(linenumber featurename dbname usageinfo));
 
    return($self);
 }
