@@ -302,6 +302,15 @@ sub new
                 label         =>'Duration End',
                 dataobjattr   =>"$worktable.validto"),
 
+      new kernel::Field::Select(
+                name          =>'reviewperiod',
+                group         =>'desc',
+                label         =>'Review-period',
+                transprefix   =>'REVIEW.',
+                value         =>['','WEEK','MONTH','QUARTER','YEAR'],
+                htmleditwidth =>'150px',
+                dataobjattr   =>$worktable.'.reviewperiod'),
+
       new kernel::Field::Text(
                 name          =>'version',
                 group         =>'desc',
@@ -768,15 +777,6 @@ sub new
                 value         =>['','24:00'],
                 htmleditwidth =>'90px',
                 dataobjattr   =>$worktable.'.repoperiod'),
-
-      new kernel::Field::Select(
-                name          =>'reviewperiod',
-                group         =>'reporting',
-                label         =>'Review-period',
-                transprefix   =>'REVIEW.',
-                value         =>['','WEEK','MONTH','QUARTER','YEAR'],
-                htmleditwidth =>'150px',
-                dataobjattr   =>$worktable.'.reviewperiod'),
 
       new kernel::Field::Duration(
                 name          =>'mperiod',
