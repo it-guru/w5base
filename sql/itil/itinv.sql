@@ -1394,3 +1394,4 @@ alter table asset add refreshpland datetime default NULL;
 alter table businessservice add repoperiod varchar(20) default '', add durationtoav varchar(20) default '', add reproacht bigint(20) default NULL, add mperiod   bigint(20) default NULL, add commentsrm longtext  default NULL, add commentsperf longtext  default NULL;
 alter table businessservice add curr_perf int(10) default NULL, add requ_perf varchar(20) default NULL,add impl_perf int(10) default NULL,add th_warn_perf double(8,2) default NULL, add th_crit_perf double(8,2) default NULL;
 alter table businessservice add  slacomments longtext default NULL;
+alter table businessservice add  reviewperiod varchar(20) default NULL;
