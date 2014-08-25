@@ -1,0 +1,2 @@
+'itil::qrule::check_bs_subref'=>{de=>'Statusprüfung der detailierten Service-Komponenten',en=>'State-Check of detailed service components'},
+'invalid state in sub elemente'=>{de=>'ungültiger Status im Unterelement'},
