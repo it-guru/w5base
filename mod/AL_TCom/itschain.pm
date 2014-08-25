@@ -85,7 +85,7 @@ sub new
                 label         =>'IT-Service Transaction',
                 dataobjattr   =>
                    "concat(lnkes.lnkpos,' - ',".
-                   itil::businessservice::getBSfullnameSQL("tr","NULL").
+                   itil::businessservice::getBSfullnameSQL("ta","NULL").
                    ")",
                 depend        =>['ta_id'],
                 onClick       =>\&multiDestLinkHandler,
