@@ -318,6 +318,19 @@ sub new
                 htmleditwidth =>'80px',
                 dataobjattr   =>"$worktable.version"),
 
+      new kernel::Field::TextDrop(
+                name          =>'servicesupport',
+                label         =>'Service&Support Class',
+                group         =>'desc',
+                vjointo       =>'itil::servicesupport',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['servicesupportid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'servicesupportid',
+                group         =>'desc',
+                dataobjattr   =>"$worktable.servicesupport"),
 
      new kernel::Field::Container(
                 name          =>'additional',

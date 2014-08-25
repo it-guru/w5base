@@ -1395,3 +1395,4 @@ alter table businessservice add repoperiod varchar(20) default '', add durationt
 alter table businessservice add curr_perf int(10) default NULL, add requ_perf varchar(20) default NULL,add impl_perf int(10) default NULL,add th_warn_perf double(8,2) default NULL, add th_crit_perf double(8,2) default NULL;
 alter table businessservice add  slacomments longtext default NULL;
 alter table businessservice add  reviewperiod varchar(20) default NULL;
+alter table businessservice add  servicesupport bigint(20) default NULL;
