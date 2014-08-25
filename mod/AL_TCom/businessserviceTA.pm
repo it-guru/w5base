@@ -37,7 +37,7 @@ sub new
 sub SetFilter
 {
    my $self=shift;
-   $self->SetNamedFilter("NATURE",{nature=>\'TA'});
+   $self->SetNamedFilter("NATURE",{nature=>\'TR'});
 
    return($self->SUPER::SetFilter(@_));
 }

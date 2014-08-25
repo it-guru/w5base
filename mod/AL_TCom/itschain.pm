@@ -85,7 +85,7 @@ sub new
                 label         =>'IT-Service Transaction',
                 dataobjattr   =>
                    "concat(lnkes.lnkpos,' - ',".
-                   itil::businessservice::getBSfullnameSQL("ta","NULL").
+                   itil::businessservice::getBSfullnameSQL("tr","NULL").
                    ")",
                 depend        =>['ta_id'],
                 onClick       =>\&multiDestLinkHandler,
@@ -219,12 +219,12 @@ sub getSqlFrom
              "     and lnkits.objtype='itil::businessservice' ".
              "left outer join businessservice as es ".
              "  on lnkits.obj1id=es.id and es.nature='ES' ";
-      if (grep(/^(ta_|appl_)/,@view) || in_array(\@f,["ta","appl"])){
+      if (grep(/^(ta_|appl_)/,@view) || in_array(\@f,["tr","appl"])){
          $from.="left outer join lnkbscomp as lnkes ".
                 "  on es.id=lnkes.businessservice ".
                 "     and lnkes.objtype='itil::businessservice' ".
                 "left outer join businessservice as ta ".
-                "  on lnkes.obj1id=ta.id and ta.nature='TA' ";
+                "  on lnkes.obj1id=ta.id and ta.nature='TR' ";
          if (grep(/^(appl_)/,@view) || in_array(\@f,["appl"])){
             $from.="left outer join lnkbscomp as lnkta ".
                    "  on ta.id=lnkta.businessservice ".
