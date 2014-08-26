@@ -67,6 +67,11 @@ sub new
                 dataobjattr   =>'amtsibackup.setype'),
 
       new kernel::Field::Text(
+                name          =>'subtype',
+                label         =>'Subtype',
+                dataobjattr   =>'amtsibackup.subtype'),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 dataobjattr   =>'amtsibackup.backupservice'),

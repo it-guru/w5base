@@ -146,6 +146,7 @@ sub new
                 name          =>'backups',
                 label         =>'ordered backup jobs',
                 group         =>'backups',
+                forwardSearch =>1,
                 vjointo       =>'tsacinv::backup',
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>[qw(backupid name stype bgroup tfrom tto isactive
