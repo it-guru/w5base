@@ -47,7 +47,6 @@ sub new
                 label         =>'BackupID',
                 dataobjattr   =>'amtsibackup.code'),
 
-
       new kernel::Field::Select(
                 name          =>'stype',
                 htmldetail    =>0,
@@ -130,8 +129,8 @@ sub new
                 dataobjattr   =>'amtsibackup.lcomputerid'),
 
    );
-   $self->setDefaultView(qw(linenumber systemid 
-                            systemname ipaddress status description));
+   $self->setDefaultView(qw(linenumber backupid type
+                            subtype name bgroup));
    return($self);
 }
 
@@ -180,8 +179,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    my @all=qw(default header source);
-
-   push(@all,"dbbackup") if ($rec->{typeid} eq "1");
+   push(@all,"dbbackup") if ($rec->{type} eq "1");
    push(@all,"timeframe") if ( ($rec->{tfrom} ne "NA" && $rec->{tfrom} ne "") 
                               || ($rec->{tto} ne "NA" && $rec->{tto} ne ""));
    return(@all);

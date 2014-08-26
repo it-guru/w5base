@@ -149,7 +149,7 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tsacinv::backup',
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
-                vjoindisp     =>[qw(backupid name stype bgroup tfrom tto isactive
+                vjoindisp     =>[qw(backupid name bgroup tfrom tto isactive
                                     hexpectedquantity)]),
 
 #      new kernel::Field::SubList(
