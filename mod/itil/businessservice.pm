@@ -22,6 +22,9 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use DateTime;
+use DateTime::Span;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -258,6 +261,82 @@ sub new
                 weblinkto     =>'NONE',
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>'mgmtitemgroup'),
+
+
+      new kernel::Field::Textarea(
+                name          =>'treeservicesupportcheck',
+                label         =>'Tree Service & Support Check',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   my $st={};
+                   $self->getParent->LoadTreeSPCheck($st,
+                                    "itil::businessservice",$id);
+                   return(
+                      dumpSpanSet('k',$st->{tree}->{entry}->{CorelSS}->{supportK})
+                   );
+                }),
+
+      new kernel::Field::TimeSpans(
+                name          =>'supportTcheck',
+                label         =>'Support Check',
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on"){
+                      $blk->[4]="blue";
+                      $blk->[4]="green" if ($blk->[3] eq "K");
+                   }
+                   if ($blk->[2] eq "off"){
+                      $blk->[4]="red";
+                   }
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   my $st={};
+                   $self->getParent->LoadTreeSPCheck($st,
+                                    "itil::businessservice",$id);
+                   return(
+                      dumpSpanSet('K',$st->{tree}->{entry}->{CorelSS}->{supportK})
+                   );
+                }),
+
+
+      new kernel::Field::TimeSpans(
+                name          =>'supportTcheck2',
+                label         =>'Support Check2',
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on"){
+                      $blk->[4]="blue";
+                      $blk->[4]="lightgreen" if ($blk->[3] eq "k");
+                   }
+                   if ($blk->[2] eq "off"){
+                      $blk->[4]="red";
+                   }
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   my $st={};
+                   $self->getParent->LoadTreeSPCheck($st,
+                                    "itil::businessservice",$id);
+                   return(
+                      dumpSpanSet('k',$st->{tree}->{entry}->{CorelSS}->{supportKR})
+                   );
+                }),
+
 
       new kernel::Field::Text(
                 name          =>'reportinglabel',
@@ -931,6 +1010,277 @@ sub calcBackgroundFlagColor
    return("");
 }
 
+
+sub LoadTreeSPCheck
+{
+   my $self=shift;
+   my $st=shift;
+   my $dataobj=shift;
+   my $id=shift;
+   my $p=shift;
+
+   $st->{tree}={} if (!defined($st->{tree}));
+
+   $p=$st->{tree} if (!defined($p));
+   $p->{level}=0  if (!exists($p->{level}));
+
+   #######################################################################
+   # root record laden
+   #######################################################################
+
+   my $o=$self->getPersistentModuleObject("TreeBproc".$dataobj,$dataobj);
+
+   $o->SetFilter({id=>\$id});
+   my ($r)=$o->getOnlyFirst(qw(servicesupportid name));
+
+   my $entry="${dataobj}::${id}";
+   $st->{entry}->{$entry}={name=>$r->{name}};
+   if ($r->{servicesupportid} ne ""){
+      my $sspid=$r->{servicesupportid};
+      if (!exists($st->{servicesupport}->{$sspid})){
+         $st->{servicesupport}->{$sspid}={};
+      }
+      $st->{entry}->{$entry}->{servicesupport}=
+                $st->{servicesupport}->{$sspid};
+   }
+   $p->{entry}=$st->{entry}->{$entry};
+   #$p->{entry}=$entry;
+
+   #######################################################################
+   # subtree recursive load 
+   #######################################################################
+   foreach my $srec (@{$r->{servicecomp}}){
+       if ($srec->{objtype} eq "itil::businessservice" ||
+           $srec->{objtype} eq "itil::appl"){
+          $p->{child}=[] if (!defined($p->{child}));
+          my @crec={level=>$p->{level}+1};
+          push(@{$p->{child}},\@crec);
+          $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj1id},
+                                 $p->{child}->[$#{$p->{child}}]->[0]);
+          if ($srec->{obj2id} ne ""){
+             push(@crec,{level=>$p->{level}+1});
+             $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj2id},
+                                    $p->{child}->[$#{$p->{child}}]->[1]);
+          }
+          if ($srec->{obj3id} ne ""){
+             push(@crec,{level=>$p->{level}+1});
+             $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj3id},
+                                    $p->{child}->[$#{$p->{child}}]->[2]);
+          }
+       }
+   }
+   #######################################################################
+   # generate service support datastructure
+   #######################################################################
+   if ($p->{level}==0){ # load details of Service&Support Clases
+      my @sspid=keys(%{$st->{servicesupport}});
+      my $dataobj="itil::servicesupport"; 
+      my $o=$self->getPersistentModuleObject("TreeBproc".$dataobj,$dataobj);
+      $o->SetFilter({id=>\@sspid});
+      foreach my $srec ($o->getHashList(qw(serivce
+                                           support name))){
+         $st->{servicesupport}->{$srec->{id}}->{serivceestring}=
+              $srec->{serivce};
+         $st->{servicesupport}->{$srec->{id}}->{supportstring}=
+              $srec->{support};
+         $st->{servicesupport}->{$srec->{id}}->{name}=
+              $srec->{name};
+         foreach my $t (qw(serivce support)){
+            my @fval=();
+            foreach my $blk (split(/\+/,$srec->{$t})){
+               if (my ($n,$d)=$blk=~m/^(\d+)\((.*)\)$/){
+                  foreach my $seg (split(/,/,$d)){
+                     if (my ($label,$starth,$startm,$endh,$endm)=$seg=~
+                         m/^\s*([a-z]{0,1})(\d+):(\d+)-(\d+):(\d+)\s*$/i){
+                        $label="K" if ($label eq "");
+                        push(@{$fval[$n]},{
+                           label=>$label,
+                           starth=>int($starth),startm=>int($startm),
+                           endh=>int($endh),endm=>int($endm)
+                        });
+                     }
+                  }
+               }
+            }
+            $st->{servicesupport}->{$srec->{id}}->{"${t}struct"}=\@fval;
+         }
+      }
+      $self->ServiceTreeCorelation($st);
+   }
+}
+
+
+sub ServiceTreeCorelation
+{
+   my $self=shift;
+   my $st=shift;
+   my $p=shift;
+
+   $p=$st->{tree} if (!defined($p));
+
+   my @dsets=(
+      "serivceK",   # ServiceZeit Fragmente Kernzeit
+      "serivceR",   # ServiceZeit Fragmente Randzeit
+      "supportK",   # SupportZeit Fragmente Kernzeit
+      "supportR"    # SupportZeit Fragmente Randzeit
+   );
+   my @allsets=(
+      @dsets,       # alle direkt ermittelbaren Sets
+      "serivceKR",  # Kernzeit gefordert, aber Ranzeit ausreichend
+      "supportKR",  # Kernzeit gefordert, aber Ranzeit ausreichend
+   );
+   my %DirectSS;
+   map({$DirectSS{$_}=createSpanSet()} @dsets);
+   if (exists($p->{entry}->{servicesupport})){
+      $DirectSS{'serivceK'}=
+         createSpanSet('K','serivce',$p->{entry}->{servicesupport});
+      $DirectSS{'serivceR'}=
+         createSpanSet('R','serivce',$p->{entry}->{servicesupport});
+      $DirectSS{'supportK'}=
+         createSpanSet('K','support',$p->{entry}->{servicesupport});
+      $DirectSS{'supportR'}=
+         createSpanSet('R','support',$p->{entry}->{servicesupport});
+   }
+   $p->{entry}->{DirectSS}=\%DirectSS;
+
+   my %CorelSS;
+   map({$CorelSS{$_}=createSpanSet()} @allsets);
+
+   foreach my $set (@dsets){ # join DirectSS as base for CorelSS
+      $CorelSS{$set}=$CorelSS{$set}->union($DirectSS{$set});
+   }
+   $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportK});
+   $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportR});
+   $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceK});
+   $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceR});
+
+   if (exists($p->{child})){
+      foreach my $c (@{$p->{child}}){
+         my %cs;
+         map({$cs{$_}=createSpanSet()} @allsets);
+         # aller redundanzen müssen serive und Support Zeiten maessig
+         # Oder verknüpft werden
+         foreach my $altc (@$c){  # alternativen durchgehen und corelieren
+            if (!exists($altc->{CorelSS})){
+               $self->ServiceTreeCorelation($st,$altc);
+            }
+            foreach my $set (@dsets){
+               $cs{$set}=$cs{$set}->union($altc->{entry}->{CorelSS}->{$set});
+            }
+            $cs{supportKR}=
+              $cs{supportKR}->union($altc->{entry}->{CorelSS}->{supportKR});
+            $cs{serivceKR}=
+              $cs{serivceKR}->union($altc->{entry}->{CorelSS}->{serivceKR});
+         }
+         # jedes Child ergebnis per AND Operation an das CorelSS hinzufügen
+         foreach my $set (@dsets){
+            $CorelSS{$set}=$CorelSS{$set}->intersection($cs{$set});
+         }
+      }
+      # childs zur eigenen Corelation UND verknüpfen und speichern
+   }
+   $p->{entry}->{CorelSS}=\%CorelSS;
+}
+
+sub createSpanSet
+{
+   my $type=shift;       # K|R
+   my $block=shift;     
+   my $ssentry=shift;    # service support entry
+
+   my $spanset= DateTime::SpanSet->from_spans( spans => []);
+   return($spanset) if (!defined($type));
+
+   if (exists($ssentry->{$block."struct"})){
+      #print STDERR "X($block):\n";
+      my $e=$ssentry->{$block."struct"};
+      for(my $t=0;$t<=7;$t++){
+         foreach my $tspanrec (@{$e->[$t]}){
+            if ($type eq $tspanrec->{label} ||
+                ($type eq "K" && exists($tspanrec->{label}) &&
+                 $tspanrec->{label} eq "")){
+               my $needsubstract1=1;
+               my $starth=$tspanrec->{starth}; 
+               my $startm=$tspanrec->{startm}; 
+               my $endh=$tspanrec->{endh}; 
+               my $endm=$tspanrec->{endm}; 
+               if ($endh==24 && $endm==0){
+                  $needsubstract1=0;
+                  $endh=23;
+                  $endm=59;
+               }
+               my $start=new DateTime( year=>1999,
+                                       month=>1,
+                                       day=>$t+1,
+                                       hour=>$starth,
+                                       minute=>$startm);
+               my $end  =new DateTime( year=>1999,
+                                       month=>1,
+                                       day=>$t+1,
+                                       hour=>$endh,
+                                       minute=>$endm);
+               if ($needsubstract1){ # 24:00 -> 23:59 mapping
+                  $end->subtract_duration(
+                     new DateTime::Duration(
+                        minutes=>1
+                     )
+                  );
+               }
+               my $span=DateTime::Span->from_datetimes(
+                  start=>$start,
+                  end=>$end
+               );
+               $spanset=$spanset->union($span);
+            }
+         }
+      }
+   }
+   return($spanset);
+}
+
+sub dumpSpanSet
+{
+   my @p=@_;
+
+   my @week;
+   while(my $tt=shift(@p)){
+      my $s=shift(@p);
+      for(my $t=0;$t<=7;$t++){
+         my $t1=DateTime->new(year=>1999,month=>1,day=>$t+1,
+                              hour=>0,minute=>0,second=>0);
+         my $t2=DateTime->new(year=>1999,month=>1,day=>$t+1,
+                              hour=>23,minute=>59,second=>59);
+         my $dayspan=DateTime::Span->from_datetimes(start=>$t1,end=>$t2);
+         my $day=$s->intersection($dayspan);
+         my $i=$day->iterator();
+         my @day;
+         while (my $dt=$i->next()){
+            my $start=$dt->start();
+            my $end=$dt->end();
+            $end->add_duration(
+               new DateTime::Duration(
+                  minutes=>1
+               )
+            );
+            my $endh=$end->hour();
+            my $endm=$end->minute();
+            if ($endh==0 && $endm==0){
+               $endh=24;
+            }
+            push(@day,sprintf("%s%02d:%02d-%02d:%02d",$tt,
+                              $start->hour(),$start->minute(),
+                              $endh,$endm));
+         }
+         push(@week,sprintf("%d(%s)",$t,join(",",@day)));
+      }
+   }
+   return(join("+",@week));
+}
+
+
+
+
+
 sub extLabelPostfixRequested
 {
    my $self=shift;
@@ -1304,7 +1654,8 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/bussinessservice.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/bussinessservice.jpg?".
+          $cgi->query_string());
 }
 
 
@@ -1348,17 +1699,17 @@ sub SecureSetFilter
 
       my $userid=$self->getCurrentUserId();
       push(@flt,[
-                 {mandatorid=>\@mandators},
-                 {databossid=>\$userid},
-                 {businessteamid=>\@grpids},
-                 {responseteamid=>\@grpids},
-                 {sectargetid=>\$userid,sectarget=>\'base::user',
-                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-                            "*roles=?read?=roles*"},
-                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
-                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-                            "*roles=?read?=roles*"}
-                ]);
+         {mandatorid=>\@mandators},
+         {databossid=>\$userid},
+         {businessteamid=>\@grpids},
+         {responseteamid=>\@grpids},
+         {sectargetid=>\$userid,sectarget=>\'base::user',
+          secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                    "*roles=?read?=roles*"},
+         {sectargetid=>\@grpids,sectarget=>\'base::grp',
+          secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                    "*roles=?read?=roles*"}
+      ]);
    }
    return($self->SetFilter(@flt));
 }

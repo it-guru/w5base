@@ -81,7 +81,8 @@ sub Validate
             }
             if (($h1*60+$m1>=$h2*60+$m2) ||
                 ($h1<0) || ($h1>23) || ($m1<0) || ($m1>59) ||
-                ($h2<0) || ($h2>23) || ($m2<0) || ($m2>59)){
+                ((($h2<0) || ($h2>23) || ($m2<0) || ($m2>59)) &&
+                !($h2==24 && $m2==0))){
                my $msg=sprintf($app->T("range missmismatch '%s'"),$t);
                $self->getParent->LastMsg(ERROR,$msg);
                return(undef);
