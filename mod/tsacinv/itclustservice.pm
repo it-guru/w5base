@@ -149,8 +149,8 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tsacinv::backup',
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
-                vjoindisp     =>[qw(backupid name bgroup tfrom tto isactive
-                                    hexpectedquantity)]),
+                vjoindisp     =>[qw(backupid stype subtype name
+                                    dbinstance policy tfrom tto isactive)]),
 
 #      new kernel::Field::SubList(
 #                name          =>'applications',

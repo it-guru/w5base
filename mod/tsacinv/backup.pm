@@ -51,12 +51,14 @@ sub new
                 name          =>'stype',
                 htmldetail    =>0,
                 label         =>'Typ',
+                depend        =>['typeid','type'],
                 transprefix   =>'SBACKTYP.', 
                 dataobjattr   =>'amtsibackup.setype'),
 
       new kernel::Field::Select(
                 name          =>'type',
                 label         =>'Type',
+                depend        =>['typeid','stype'],
                 transprefix   =>'BACKTYP.', 
                 dataobjattr   =>'amtsibackup.setype'),
 
@@ -130,7 +132,7 @@ sub new
 
    );
    $self->setDefaultView(qw(linenumber backupid type
-                            subtype name bgroup));
+                            subtype name tfrom tto isactive));
    return($self);
 }
 
@@ -179,7 +181,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    my @all=qw(default header source);
-   push(@all,"dbbackup") if ($rec->{type} eq "1");
+   push(@all,"dbbackup") if ($rec->{typeid} eq "1");
    push(@all,"timeframe") if ( ($rec->{tfrom} ne "NA" && $rec->{tfrom} ne "") 
                               || ($rec->{tto} ne "NA" && $rec->{tto} ne ""));
    return(@all);
