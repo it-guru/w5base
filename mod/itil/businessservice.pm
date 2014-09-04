@@ -1105,7 +1105,6 @@ sub LoadTreeSPCheck
    my $p=shift;
 
    $st->{tree}={} if (!defined($st->{tree}));
-printf STDERR ("fifi treeload for $self->{name}\n");
 
    $p=$st->{tree} if (!defined($p));
    $p->{level}=0  if (!exists($p->{level}));
