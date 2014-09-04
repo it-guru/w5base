@@ -263,24 +263,12 @@ sub new
                 vjoindisp     =>'mgmtitemgroup'),
 
 
-      new kernel::Field::Textarea(
-                name          =>'treeservicesupportcheck',
-                label         =>'Tree Service & Support Check',
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $id=$current->{id};
-                   my $st={};
-                   $self->getParent->LoadTreeSPCheck($st,
-                                    "itil::businessservice",$id);
-                   return(
-                      dumpSpanSet('k',$st->{tree}->{entry}->{CorelSS}->{supportK})
-                   );
-                }),
-
       new kernel::Field::TimeSpans(
-                name          =>'supportTcheck',
-                label         =>'Support Check',
+                name          =>'supportReq',
+                label         =>'requested service times',
+                htmldetail    =>0,
+                tspantype     =>['R','K'],
+                tspanlegend   =>1,
                 tspantypeproc =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -289,7 +277,8 @@ sub new
                    $blk->[4]="transparent";
                    if ($blk->[2] eq "on"){
                       $blk->[4]="blue";
-                      $blk->[4]="green" if ($blk->[3] eq "K");
+                      $blk->[4]="blue" if ($blk->[3] eq "K");
+                      $blk->[4]="yellow" if ($blk->[3] eq "R");
                    }
                    if ($blk->[2] eq "off"){
                       $blk->[4]="red";
@@ -303,14 +292,63 @@ sub new
                    $self->getParent->LoadTreeSPCheck($st,
                                     "itil::businessservice",$id);
                    return(
-                      dumpSpanSet('K',$st->{tree}->{entry}->{CorelSS}->{supportK})
+                      dumpSpanSet(
+                         {},
+                         'K',$st->{tree}->{entry}->{DirectSS}->{supportK},
+                         'R',$st->{tree}->{entry}->{DirectSS}->{supportR})
                    );
                 }),
 
 
       new kernel::Field::TimeSpans(
-                name          =>'supportTcheck2',
-                label         =>'Support Check2',
+                name          =>'supportTreeCheck',
+                htmldetail    =>0,
+                label         =>'analyzed service times tree',
+                tspantype     =>{'k'=>'core replaced by border time',
+                                 ''=>'',
+                                 'r'=>'border replaced by core time',
+                                 'K'=>'continuous core time',
+                                 'R'=>'continuous border time'},
+                tspanlegend   =>1,
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on" || $blk->[2] eq "legend"){
+                      $blk->[4]="blue";
+                      $blk->[4]="lightblue" if ($blk->[3] eq "k");
+                      $blk->[4]="lightyellow" if ($blk->[3] eq "r");
+                      $blk->[4]="yellow" if ($blk->[3] eq "R");
+                   }
+                   if ($blk->[2] eq "off" || $blk->[3] eq ""){
+                      $blk->[4]="red";
+                   }
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   my $st={};
+                   $self->getParent->LoadTreeSPCheck($st,
+                                    "itil::businessservice",$id);
+                   return(
+                      dumpSpanSet({},
+                         'r'=>$st->{tree}->{entry}->{CorelSS}->{supportr},
+                         'k'=>$st->{tree}->{entry}->{CorelSS}->{supportk},
+                         'K'=>$st->{tree}->{entry}->{CorelSS}->{supportK},
+                         'R'=>$st->{tree}->{entry}->{CorelSS}->{supportR})
+                   );
+                }),
+
+
+      new kernel::Field::TimeSpans(
+                name          =>'serivceReq',
+                label         =>'requested service times',
+                htmldetail    =>0,
+                tspantype     =>['R','K'],
+                tspanlegend   =>1,
                 tspantypeproc =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -319,7 +357,8 @@ sub new
                    $blk->[4]="transparent";
                    if ($blk->[2] eq "on"){
                       $blk->[4]="blue";
-                      $blk->[4]="lightgreen" if ($blk->[3] eq "k");
+                      $blk->[4]="blue" if ($blk->[3] eq "K");
+                      $blk->[4]="yellow" if ($blk->[3] eq "R");
                    }
                    if ($blk->[2] eq "off"){
                       $blk->[4]="red";
@@ -333,7 +372,53 @@ sub new
                    $self->getParent->LoadTreeSPCheck($st,
                                     "itil::businessservice",$id);
                    return(
-                      dumpSpanSet('k',$st->{tree}->{entry}->{CorelSS}->{supportKR})
+                      dumpSpanSet(
+                         {},
+                         'K',$st->{tree}->{entry}->{DirectSS}->{serivceK},
+                         'R',$st->{tree}->{entry}->{DirectSS}->{serivceR})
+                   );
+                }),
+
+
+      new kernel::Field::TimeSpans(
+                name          =>'serivceTreeCheck',
+                htmldetail    =>0,
+                label         =>'analyzed service times tree',
+                tspantype     =>{'k'=>'core replaced by border time',
+                                 ''=>'',
+                                 'r'=>'border replaced by core time',
+                                 'K'=>'continuous core time',
+                                 'R'=>'continuous border time'},
+                tspanlegend   =>1,
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on" || $blk->[2] eq "legend"){
+                      $blk->[4]="blue";
+                      $blk->[4]="lightblue" if ($blk->[3] eq "k");
+                      $blk->[4]="lightyellow" if ($blk->[3] eq "r");
+                      $blk->[4]="yellow" if ($blk->[3] eq "R");
+                   }
+                   if ($blk->[2] eq "off" || $blk->[3] eq ""){
+                      $blk->[4]="red";
+                   }
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   my $st={};
+                   $self->getParent->LoadTreeSPCheck($st,
+                                    "itil::businessservice",$id);
+                   return(
+                      dumpSpanSet({},
+                         'r'=>$st->{tree}->{entry}->{CorelSS}->{serivcer},
+                         'k'=>$st->{tree}->{entry}->{CorelSS}->{serivcek},
+                         'K'=>$st->{tree}->{entry}->{CorelSS}->{serivceK},
+                         'R'=>$st->{tree}->{entry}->{CorelSS}->{serivceR})
                    );
                 }),
 
@@ -1020,6 +1105,7 @@ sub LoadTreeSPCheck
    my $p=shift;
 
    $st->{tree}={} if (!defined($st->{tree}));
+printf STDERR ("fifi treeload for $self->{name}\n");
 
    $p=$st->{tree} if (!defined($p));
    $p->{level}=0  if (!exists($p->{level}));
@@ -1126,8 +1212,10 @@ sub ServiceTreeCorelation
    );
    my @allsets=(
       @dsets,       # alle direkt ermittelbaren Sets
-      "serivceKR",  # Kernzeit gefordert, aber Ranzeit ausreichend
-      "supportKR",  # Kernzeit gefordert, aber Ranzeit ausreichend
+      "supportk",  # Kernzeit muß Randzeit ersetzen
+      "supportr",  # Randzeit muß Kernzeit ersetzen
+      "serivcek",  # Kernzeit muß Randzeit ersetzen
+      "serivcer",  # Randzeit muß Kernzeit ersetzen
    );
    my %DirectSS;
    map({$DirectSS{$_}=createSpanSet()} @dsets);
@@ -1146,13 +1234,15 @@ sub ServiceTreeCorelation
    my %CorelSS;
    map({$CorelSS{$_}=createSpanSet()} @allsets);
 
-   foreach my $set (@dsets){ # join DirectSS as base for CorelSS
-      $CorelSS{$set}=$CorelSS{$set}->union($DirectSS{$set});
+   foreach my $set (@dsets){ # negation
+      $CorelSS{$set}=$CorelSS{$set}->complement();
    }
-   $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportK});
-   $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportR});
-   $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceK});
-   $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceR});
+   
+
+  # $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportK});
+  # $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportR});
+  # $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceK});
+  # $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceR});
 
    if (exists($p->{child})){
       foreach my $c (@{$p->{child}}){
@@ -1166,19 +1256,40 @@ sub ServiceTreeCorelation
             }
             foreach my $set (@dsets){
                $cs{$set}=$cs{$set}->union($altc->{entry}->{CorelSS}->{$set});
+               $CorelSS{supportr}=$CorelSS{supportr}->union(
+                                      $altc->{entry}->{CorelSS}->{supportr});
+               $CorelSS{supportk}=$CorelSS{supportk}->union(
+                                      $altc->{entry}->{CorelSS}->{supportk});
+               $CorelSS{serivcer}=$CorelSS{serivcer}->union(
+                                      $altc->{entry}->{CorelSS}->{serivcer});
+               $CorelSS{serivcek}=$CorelSS{serivcek}->union(
+                                      $altc->{entry}->{CorelSS}->{serivcek});
             }
-            $cs{supportKR}=
-              $cs{supportKR}->union($altc->{entry}->{CorelSS}->{supportKR});
-            $cs{serivceKR}=
-              $cs{serivceKR}->union($altc->{entry}->{CorelSS}->{serivceKR});
          }
+         $CorelSS{supportr}=$CorelSS{supportr}->union($cs{supportK});
+         $CorelSS{supportk}=$CorelSS{supportk}->union($cs{supportR});
+         $CorelSS{serivcer}=$CorelSS{serivcer}->union($cs{serivceK});
+         $CorelSS{serivcek}=$CorelSS{serivcek}->union($cs{serivceR});
+
+
          # jedes Child ergebnis per AND Operation an das CorelSS hinzufügen
          foreach my $set (@dsets){
             $CorelSS{$set}=$CorelSS{$set}->intersection($cs{$set});
          }
       }
-      # childs zur eigenen Corelation UND verknüpfen und speichern
    }
+
+   $CorelSS{supportr}=$CorelSS{supportr}->intersection($DirectSS{supportR});
+   $CorelSS{supportk}=$CorelSS{supportk}->intersection($DirectSS{supportK});
+   $CorelSS{serivcer}=$CorelSS{serivcer}->intersection($DirectSS{serivceR});
+   $CorelSS{serivcek}=$CorelSS{serivcek}->intersection($DirectSS{serivceK});
+
+
+
+   foreach my $set (@dsets){ # join DirectSS as base for CorelSS
+      $CorelSS{$set}=$CorelSS{$set}->intersection($DirectSS{$set});
+   }
+
    $p->{entry}->{CorelSS}=\%CorelSS;
 }
 
@@ -1240,41 +1351,50 @@ sub createSpanSet
 
 sub dumpSpanSet
 {
+   my $param=shift;
    my @p=@_;
 
    my @week;
    while(my $tt=shift(@p)){
       my $s=shift(@p);
-      for(my $t=0;$t<=7;$t++){
-         my $t1=DateTime->new(year=>1999,month=>1,day=>$t+1,
-                              hour=>0,minute=>0,second=>0);
-         my $t2=DateTime->new(year=>1999,month=>1,day=>$t+1,
-                              hour=>23,minute=>59,second=>59);
-         my $dayspan=DateTime::Span->from_datetimes(start=>$t1,end=>$t2);
-         my $day=$s->intersection($dayspan);
-         my $i=$day->iterator();
-         my @day;
-         while (my $dt=$i->next()){
-            my $start=$dt->start();
-            my $end=$dt->end();
-            $end->add_duration(
-               new DateTime::Duration(
-                  minutes=>1
-               )
-            );
-            my $endh=$end->hour();
-            my $endm=$end->minute();
-            if ($endh==0 && $endm==0){
-               $endh=24;
+      if (defined($s)){
+         for(my $t=0;$t<=7;$t++){
+            $week[$t]=[] if (!defined($week[$t]));
+            my $t1=DateTime->new(year=>1999,month=>1,day=>$t+1,
+                                 hour=>0,minute=>0,second=>0);
+            my $t2=DateTime->new(year=>1999,month=>1,day=>$t+1,
+                                 hour=>23,minute=>59,second=>59);
+            my $dayspan=DateTime::Span->from_datetimes(start=>$t1,end=>$t2);
+            my $day=$s->intersection($dayspan);
+            my $i=$day->iterator();
+            my @day;
+            while (my $dt=$i->next()){
+               my $start=$dt->start();
+               my $end=$dt->end();
+               $end->add_duration(
+                  new DateTime::Duration(
+                     minutes=>1
+                  )
+               );
+               my $endh=$end->hour();
+               my $endm=$end->minute();
+               if ($endh==0 && $endm==0){
+                  $endh=24;
+               }
+               push(@{$week[$t]},sprintf("%s%02d:%02d-%02d:%02d",$tt,
+                                 $start->hour(),$start->minute(),
+                                 $endh,$endm));
             }
-            push(@day,sprintf("%s%02d:%02d-%02d:%02d",$tt,
-                              $start->hour(),$start->minute(),
-                              $endh,$endm));
          }
-         push(@week,sprintf("%d(%s)",$t,join(",",@day)));
       }
    }
-   return(join("+",@week));
+   my @st;
+   for(my $t=0;$t<=7;$t++){
+     my $w=$week[$t];
+     $w=[] if (!defined($w));
+     $st[$t]=$t."(".join(",",@$w).")";
+   }
+   return(join("+",@st));
 }
 
 
@@ -1722,6 +1842,133 @@ sub initSearchQuery
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
 }
+
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "TView"=>$self->T("Tree View"));
+}
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView");
+
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   if ($p eq "TView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page="<link rel=\"stylesheet\" ".
+            "href=\"../../../static/lytebox/lytebox.css\" ".
+            "type=\"text/css\" media=\"screen\" />";
+
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"TreeView?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   return($self->SUPER::getValidWebFunctions(@_),"TreeView");
+}
+
+sub TreeView   
+{
+   my $self=shift;
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           title=>"TeamView",
+                           js=>['toolbox.js'],
+                           style=>['default.css','work.css',
+                                   'kernel.App.Web.css',
+                                   'Output.HtmlDetail.css']);
+   if (defined($rec)){
+      printf("<div id=\"HtmlDetail\"><div style=\"padding:5px\">".
+             "<br><h2>%s :</h2><br>%s<br>",
+             $self->T("Businessservice tree analyse"),
+             $self->getField("fullname")->
+                FormatedDetail($rec,"HtmlV01"));
+
+      print("<table width=100%>");
+
+      printf("<tr><td>");
+      printf("<hr>");
+      printf("<h1>".$self->T("Support times")."</h1>");
+      printf("<h3>".$self->T("requested support times")."</h1> (%s)",
+             $self->getField("servicesupport")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("%s",
+             $self->getField("supportReq")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("</td></tr>");
+      
+
+      printf("<tr><td>");
+      printf("<h3>".$self->T("analyzed support times tree")."</h1>");
+      printf("%s",
+             $self->getField("supportTreeCheck")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("</td></tr>");
+      printf("</table>");
+
+
+      print("<table width=100%>");
+
+      printf("<tr><td>");
+      printf("<hr>");
+      printf("<h1>".$self->T("Service times")."</h1>");
+      printf("<h3>".$self->T("requested service times")."</h1> (%s)",
+             $self->getField("servicesupport")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("%s",
+             $self->getField("serivceReq")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("</td></tr>");
+      
+
+      printf("<tr><td>");
+      printf("<h3>".$self->T("analyzed service times tree")."</h1>");
+      printf("%s",
+             $self->getField("serivceTreeCheck")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("</td></tr>");
+      printf("</table>");
+
+
+      printf("</div></div>");
+
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
+
+}
+
+
+
 
 
 

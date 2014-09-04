@@ -30,6 +30,7 @@ sub new
    $self->{valign}="top"     if (!defined($self->{valign}));
    $self->{tspantype}=['']   if (!defined($self->{tspantype})); 
    my $self=bless($type->SUPER::new(%$self),$type);
+   $self->{_permitted}->{tspanlegend}=1;
    return($self);
 }
 
@@ -57,6 +58,14 @@ sub Validate
    }
    $newval=[$newval] if (ref($newval) ne "ARRAY");
    my $newstring="";
+   my $tspantype=$self->{tspantype};
+   my @tspantype;
+   if (ref($self->{tspantype}) eq "HASH"){
+      @tspantype=keys(%{$self->{tspantype}});
+   }
+   elsif (ref($self->{tspantype}) eq "ARRAY"){
+      @tspantype=@{$self->{tspantype}};
+   }
    for(my $day=0;$day<=$#{$newval};$day++){
       $newval->[$day]=~s/[\(\)\s\+]//g;
       my @times;
@@ -67,7 +76,7 @@ sub Validate
             $t=~s/^([a-z])//i;
             $type=uc($mtype);
          }
-         if (!in_array($self->{tspantype},$type)){
+         if (!in_array(\@tspantype,$type)){
             $self->getParent->LastMsg(ERROR,"invalid tspan type");
             return(undef);
          }
@@ -252,8 +261,55 @@ sub FormatedDetail
                "<td><input name=$name $dis type=text value=\"$val\" ".
                "style=\"width:100%\"></td></tr>";
       }
-      $tab.="</table><br>";
-      $d=$tab;
+      $tab.="</table>";
+      my $legend="";
+      my @tspantype;
+      if (ref($self->{tspantype}) eq "HASH"){
+         @tspantype=keys(%{$self->{tspantype}});
+      }
+      elsif (ref($self->{tspantype}) eq "ARRAY"){
+         @tspantype=@{$self->{tspantype}};
+      }
+      my $s="border-width:1px;border-style:solid;border-color:gray";
+      if ($self->tspanlegend($current,$mode) &&
+          ref($self->{tspantype}) eq "HASH"){
+         my $col=0;
+         $legend.="<div align=\"right\">";
+         $legend.="<table width=\"80%\" ".
+                  " style=\"$s;margin-top:4px\" ".
+                  ">";
+         for(my $t=0;$t<=$#tspantype;$t++){
+            next if ($self->{tspantype}->{$tspantype[$t]} eq "");
+            if ($col==0){
+               $legend.="<tr>"; 
+            }
+            my $blk=[undef,undef,"legend",$tspantype[$t]];
+            if (ref($self->{tspantypeproc}) eq "CODE"){
+               &{$self->{tspantypeproc}}($self,$current,$mode,$blk);
+            }
+            my $color=$blk->[4];
+            my $tspantypekey=$tspantype[$t];
+            $tspantypekey="&nbsp;" if ($tspantypekey eq "");
+            $legend.="<td width=\"10%\" style=\"$s;background-color:$color\" ".
+                     "align=\"center\" ";
+
+            $legend.=">".$tspantypekey."</td>"; 
+            $legend.="<td>".
+                     $self->getParent->T($self->{tspantype}->{$tspantype[$t]},
+                     $self->getParent->Self(),
+                     $self->getParent->SelfAsParentObject()).
+                     "</td>"; 
+            $col++; 
+            if ($col==2){
+               $col=0;
+               $legend.="</tr>"; 
+            }
+         }
+         $legend.="</tr>" if ($col!=0);
+         $legend.="</table>";
+         $legend.="</div>";
+      }
+      $d=$tab.$legend."<br>";
    }
    return($d);
 }

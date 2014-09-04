@@ -128,6 +128,7 @@ sub new
                 label         =>'VSM availibility',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'avail',
+                depend        =>['sdbid'],
                 vjoinon       =>['sdbid'=>'id']),
 
       new kernel::Field::Percent(
@@ -138,6 +139,7 @@ sub new
                 label         =>'VSM performance',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'perf',
+                depend        =>['sdbid'],
                 vjoinon       =>['sdbid'=>'id']),
 
       new kernel::Field::Percent(
@@ -148,6 +150,7 @@ sub new
                 label         =>'VSM quality',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'quality',
+                depend        =>['sdbid'],
                 vjoinon       =>['sdbid'=>'id']),
 
    );

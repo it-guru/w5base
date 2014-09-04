@@ -154,7 +154,9 @@ sub new
                 name          =>'serivce',
                 htmlwidth     =>'150px',
                 depend        =>['isservice'],
-                tspantype     =>['','R'],
+                tspantype     =>{''=>'core time',
+                                 'K'=>'core time',
+                                 'R'=>'border time'},
                 tspantypeproc =>sub{
                    my $self=shift;
                    my $current=shift;
