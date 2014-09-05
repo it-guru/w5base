@@ -5,3 +5,4 @@
 'version'=>{de=>'Version'},
 'path'=>{de=>'Installationspfad'},
 'iname'=>{de=>'Instanz-Name'},
+'Scandate'=>{de=>'Scan-Datum'},

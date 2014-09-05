@@ -82,6 +82,11 @@ sub new
                 label         =>'iname',
                 dataobjattr   =>'iname'),
 
+      new kernel::Field::Date(
+                name          =>'scandate',
+                label         =>'Scandate',
+                dataobjattr   =>'scandate'),
+
    );
    $self->setDefaultView(qw(systemname class version path iname));
    return($self);
@@ -108,7 +113,8 @@ select attr.item_id sysid,
        swi.swclass,
        swi.swvers,
        swi.swpath,
-       swi.iname
+       swi.iname,
+       swi.scandate
 
 from (select DATE_DIMENSION.FULL_DATE_LOCAL curdate 
       from DATE_DIMENSION 
@@ -127,11 +133,12 @@ from (select DATE_DIMENSION.FULL_DATE_LOCAL curdate
               ) ||
            '</f></r></x>' 
           )
-          columns swid    FOR ORDINALITY,
-                  swclass varchar2(40)  path 'f[1]',
-                  swvers  varchar2(40)  path 'f[2]',
-                  swpath  varchar2(512) path 'f[3]',
-                  iname   varchar2(40)  path 'f[4]'
+          columns swid      FOR ORDINALITY,
+                  swclass   varchar2(40)  path 'f[1]',
+                  swvers    varchar2(40)  path 'f[2]',
+                  swpath    varchar2(512) path 'f[3]',
+                  iname     varchar2(40)  path 'f[4]',
+                  scandate  varchar2(40)  path 'f[5]'
       ) swi
 ) lnkswi
 EOF
