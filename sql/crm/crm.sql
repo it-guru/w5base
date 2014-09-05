@@ -51,3 +51,4 @@ set FOREIGN_KEY_CHECKS=0;
 alter table businessprocess add FOREIGN KEY fk_businessprocess_databoss (databoss)
           REFERENCES contact (userid) ON DELETE RESTRICT;
 set FOREIGN_KEY_CHECKS=1;
+alter table businessprocess add nature varchar(20) default 'PROCESS';

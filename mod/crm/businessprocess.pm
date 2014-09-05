@@ -97,6 +97,17 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'businessprocess.cistatus'),
 
+      new kernel::Field::Select(
+                name          =>'nature',
+                sqlorder      =>'desc',
+                label         =>'Nature',
+                htmleditwidth =>'40%',
+                default       =>'PROCESS',
+                transprefix   =>'nat.',
+                value         =>['DOMAIN','PROCESS','PROCPART','BCASE',
+                                 'PROCPARTST','CUSTSEG'],
+                dataobjattr   =>"businessprocess.nature"),
+
       new kernel::Field::TextDrop(
                 name          =>'databoss',
                 label         =>'Databoss',
@@ -132,8 +143,6 @@ sub new
                    my $id=$current->{id};
                    my @d;
                    $self->getParent->TreeLoad(\@d,"crm::businessprocess",$id);
-
-print STDERR Dumper(\@d);                   
 
                    return(Dumper(\@d));
                 }),
@@ -197,7 +206,7 @@ print STDERR Dumper(\@d);
                 group         =>'subproc',
                 vjointo       =>'crm::businessprocess',
                 vjoinon       =>['id'=>'pbusinessprocessid'],
-                vjoindisp     =>['fullname']),
+                vjoindisp     =>['fullname','nature']),
 
       new kernel::Field::SubList(
                 name          =>'acls',

@@ -25,4 +25,12 @@
 'Customers Process Prioritiy'=>{de=>'Priorität des Geschäftsprozesses'},
 'fieldgroup.workflowbasedata'=>{de=>'Workflow Basis-Daten',en=>'Workflow Base-Data'},
 'WF:event notification customer info targets'=>{de=>'WF:Ereignismeldung Kundeninformations Zieladressen'},
+'Nature'=>{de=>'Ausprägung'},
+'nat.DOMAIN'=>{de=>'Prozessdomäne',en=>'Process domain'},
+'nat.PROCESS'=>{de=>'Prozess',en=>'Process'},
+'nat.PROCPART'=>{de=>'Teilprozess',en=>'Process part'},
+'nat.BCASE'=>{de=>'Geschäftsfall',en=>'Business case'},
+'nat.PROCPARTST'=>{de=>'Teilprozessschritt',en=>'Process part step'},
+'nat.CUSTSEG'=>{de=>'Kundensegment',en=>'Customer segment'},
+
 
