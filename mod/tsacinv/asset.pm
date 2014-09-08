@@ -171,6 +171,13 @@ sub new
                 dataobjattr   =>'decode(amasset.lcpunumber,0,NULL,'.
                                 'amasset.lcpunumber)'),
 
+      new kernel::Field::Number(
+                name          =>'cpumaxsup',
+                htmldetail    =>0,
+                label         =>'Asset max. CPU count supported',
+                dataobjattr   =>'decode(amasset.imaxnumberprocessors,0,NULL,'.
+                                'amasset.imaxnumberprocessors)'),
+
       new kernel::Field::Float(
                 name          =>'cpuspeed',
                 label         =>'Asset CPU speed',
@@ -349,6 +356,19 @@ sub new
                 group         =>'source',
                 label         =>'secondary sync key',
                 dataobjattr   =>"lpad(assetportfolio.assettag,35,'0')"),
+
+      new kernel::Field::Date(
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'Creation-Date',
+                dataobjattr   =>'assetportfolio.dtcreation'),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'assetportfolio.dtlastmodif'),
+
 
       new kernel::Field::Text(
                 name          =>'srcsys',

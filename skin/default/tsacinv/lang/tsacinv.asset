@@ -15,6 +15,7 @@
 'Tenant ID'=>{de=>'Instanz-Mieter ID'},
 'Asset Inventoryno'=>{de=>'Asset Inventarnummer' },
 'Asset CPU speed'=>{de=>'Asset CPU Taktfrequenz' },
+'Asset max. CPU count supported'=>{de=>'Asset max. CPU Anzahl suppored' },
 'Asset CPU count'=>{de=>'Asset CPU Anzahl' },
 'Asset CPU type'=>{de=>'Asset CPU Typ' },
 'Asset Core count'=>{de=>'Asset Core Anzahl' },
