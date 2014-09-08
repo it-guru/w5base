@@ -90,7 +90,6 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'name',
                 htmlwidth     =>'200',
-                htmleditwidth =>'200',
                 selectivetyp  =>1,
                 dst           =>$dst,
                 vjoineditbase =>$vjoineditbase,
