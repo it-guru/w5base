@@ -111,6 +111,21 @@ sub new
                 label         =>'SLA',
                 dataobjattr   =>'service_option'),
 
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                timezone      =>'CET',
+                label         =>'Modification-Date',
+                dataobjattr   =>"to_date(substr(tsupdate,0,14),".
+                                "'YYYYMMDDHH24MISS')"),
+
+      new kernel::Field::Text(
+                name          =>'mnote',
+                group         =>'source',
+                timezone      =>'CET',
+                label         =>'Modification-Note',
+                dataobjattr   =>"description")
+
    );
    $self->setDefaultView(qw(country zipcode location address1 prio 
                             customer w5location));
@@ -183,7 +198,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","w5baselocation");
+   return("header","default","w5baselocation","source");
 }
 
 

@@ -3,3 +3,4 @@
 'Valid to'=>{de=>'Gültig bis'},
 'Customer'=>{de=>'Kunde'},
 'fieldgroup.w5baselocation'=>{de=>'W5Base Standort',en=>'W5Base Location'},
+'Modification-Note'=>{de=>'Bearbeitungs-Notiz'},
