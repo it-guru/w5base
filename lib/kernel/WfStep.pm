@@ -789,7 +789,7 @@ sub sendMail
 
    $m{name}=trim($param{subject});
    $m{emailtext}=trim($param{emailtext});
-   if (ref($param{emailto}) ne "ARRAY"){
+   if (ref($param{emailto}) eq "ARRAY"){
       $m{emailto}=$param{emailto};
    }
    else{
@@ -819,16 +819,14 @@ sub sendMail
          }
          my @acl=$grp->getHashList(qw(grpid users));
          my %u=();
-         #msg(INFO,"d=%s",Dumper(\@acl));
          foreach my $grprec (@acl){
-         #msg(INFO,"d=%s %s",ref($grprec->{users}),Dumper($grprec));
             if (defined($grprec->{users}) && ref($grprec->{users}) eq "ARRAY"){
                foreach my $usr (@{$grprec->{users}}){
                   $u{$usr->{email}}=1;
                }
             }
          }
-         @to=[keys(%u)];
+         @to=keys(%u);
       }
       $m{emailto}=\@to;
    }
