@@ -128,6 +128,19 @@ sub new
 
 
    );
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'itscode',
+                readonly      =>1,
+                label         =>'IT-Service Code',
+                dataobjattr   =>
+                   "concat(its.nature,'_',its.shortname,'_',".
+                   "es.nature,es.shortname,'_',".
+                   "ta.nature,ta.shortname,' ',its.name".
+                   ")"),
+      insertafter=>['appl_name']
+   );
+
    $self->setDefaultView(qw(linenumber
                             its_name 
                             es_name 
@@ -213,13 +226,15 @@ sub getSqlFrom
    }
 
    $from.="businessservice as its ";
-   if (grep(/^(es_|ta_|appl_)/,@view) || in_array(\@f,["es","ta","appl"])){
+   if (grep(/^(es_|ta_|appl_|itscode)/,@view) || 
+       in_array(\@f,["es","ta","appl"])){
       $from.="left outer join lnkbscomp as lnkits ".
              "  on its.id=lnkits.businessservice ".
              "     and lnkits.objtype='itil::businessservice' ".
              "left outer join businessservice as es ".
              "  on lnkits.obj1id=es.id and es.nature='ES' ";
-      if (grep(/^(ta_|appl_)/,@view) || in_array(\@f,["tr","appl"])){
+      if (grep(/^(ta_|appl_|itscode)/,@view) || 
+          in_array(\@f,["tr","appl"])){
          $from.="left outer join lnkbscomp as lnkes ".
                 "  on es.id=lnkes.businessservice ".
                 "     and lnkes.objtype='itil::businessservice' ".
