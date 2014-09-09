@@ -1,0 +1,5 @@
+'base::qrule::checkInfoAboRef'=>{de=>'Prüfung und Bereinigung der Referenzen eines InfoAbos',en=>'Check an cleanup of references in an InfoAbo'},
+'set infoabo inactive due expiration'=>{de=>'setze InfoAbo inaktiv da Verfallsdatum überschritten'},
+'note target of invalid is invalid'=>{de=>'notiere Ziel als ungültig'},
+'remove invalid note of target'=>{de=>'entferne Notiz über ungültiges Ziel'},
+'remove infoabo due long invalidity'=>{de=>'entferne InfoAbo aufgrund langer Ungültgikeit'},

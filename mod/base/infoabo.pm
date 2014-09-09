@@ -101,6 +101,22 @@ sub new
                 getPostibleValues=>\&getPostibleModes,
                 dataobjattr   =>'infoabo.mode'),
 
+      new kernel::Field::Date(
+                name          =>'invalidsince',
+                group         =>'relation',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{$self->{name}} ne ""){
+                      return(1);
+                   }
+                   return(0);
+                },
+                label         =>'relation invalid since',
+                dataobjattr   =>'infoabo.invalidsince'),
+                                                 
       new kernel::Field::Link(
                 name          =>'usercistatusid',
                 group         =>'relation',
@@ -801,7 +817,7 @@ sub isViewValid
    if ($ENV{REMOTE_USER} eq "anonymous"){
       return("header","default");
    }
-   return("header","default","relation","history","comments","source");
+   return("header","default","relation","history","comments","source","qc");
 }
 
 sub isWriteValid

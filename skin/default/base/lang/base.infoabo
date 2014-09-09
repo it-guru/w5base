@@ -49,3 +49,4 @@
 'Expiration-Date'=>{de=>'Verfallsdatum'},
 'expires at'=>{de=>'verfällt am'},
 'expiration to long in the past'=>{de=>'Verfallsdatum liegt zu weit in der Vergangenheit'},
+'relation invalid since'=>{de=>'Zuordnung ungültig seit'},

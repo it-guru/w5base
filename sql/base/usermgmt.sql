@@ -333,7 +333,7 @@ create table userblacklist (
 alter table contact add admcomments longtext default NULL;
 alter table contact add ipacl longtext default NULL;
 alter table infoabo add comments longtext default NULL;
-alter table infoabo add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table infoabo add lastqcheck datetime default NULL,add key(lastqcheck),add invalidsince datetime default null;
 alter table contact add office_orgname  varchar(128) default NULL;
 alter table contact add salutation char(2) default NULL;
 alter table contact add country char(4) default NULL;
@@ -342,3 +342,25 @@ alter table contact add pcontact bigint(20) default NULL, add FOREIGN KEY fk_pco
 alter table contact add srcsys varchar(100) default 'w5base', add srcid varchar(100) default NULL,add srcload datetime default NULL, add UNIQUE KEY `srcsys` (srcsys,srcid);
 alter table grp  add grppresentation longtext default NULL;
 alter table lnkqrulemandator add cistatus int(2) default '4';
+create table useradvice (
+  id         bigint(20)   NOT NULL,
+  userid     bigint(20)   NOT NULL,
+  reldataobj       varchar(128) default NULL,
+  reldataobjid     varchar(128) default NULL,rellabel varchar(128) default NULL,
+  acknowledged     int(1) default '0',
+  advicetext       longtext NOT NULL,
+  comments         longtext default NULL,
+  srcsys      varchar(80) default NULL,
+  srcid       varchar(80) default NULL,
+  srcload     datetime    default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser bigint(20) NOT NULL default '0',
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  PRIMARY KEY  (id),
+  UNIQUE KEY `srcsys` (srcsys,srcid),
+  KEY datarel (reldataobj,reldataobjid,acknowledged),
+  KEY userrel (userid,acknowledged)
+);
