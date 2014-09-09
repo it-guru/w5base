@@ -267,6 +267,7 @@ sub new
                 name          =>'supportReq',
                 label         =>'requested service times',
                 htmldetail    =>0,
+                searchable    =>0,
                 tspantype     =>['R','K'],
                 tspanlegend   =>1,
                 tspantypeproc =>sub{
@@ -303,6 +304,7 @@ sub new
       new kernel::Field::TimeSpans(
                 name          =>'supportTreeCheck',
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'analyzed service times tree',
                 tspantype     =>{'k'=>'core replaced by border time',
                                  ''=>'',
@@ -347,6 +349,7 @@ sub new
                 name          =>'serivceReq',
                 label         =>'requested service times',
                 htmldetail    =>0,
+                searchable    =>0,
                 tspantype     =>['R','K'],
                 tspanlegend   =>1,
                 tspantypeproc =>sub{
@@ -383,6 +386,7 @@ sub new
       new kernel::Field::TimeSpans(
                 name          =>'serivceTreeCheck',
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'analyzed service times tree',
                 tspantype     =>{'k'=>'core replaced by border time',
                                  ''=>'',
@@ -1255,15 +1259,27 @@ sub ServiceTreeCorelation
             }
             foreach my $set (@dsets){
                $cs{$set}=$cs{$set}->union($altc->{entry}->{CorelSS}->{$set});
-               $CorelSS{supportr}=$CorelSS{supportr}->union(
-                                      $altc->{entry}->{CorelSS}->{supportr});
-               $CorelSS{supportk}=$CorelSS{supportk}->union(
-                                      $altc->{entry}->{CorelSS}->{supportk});
-               $CorelSS{serivcer}=$CorelSS{serivcer}->union(
-                                      $altc->{entry}->{CorelSS}->{serivcer});
-               $CorelSS{serivcek}=$CorelSS{serivcek}->union(
-                                      $altc->{entry}->{CorelSS}->{serivcek});
             }
+            $CorelSS{supportr}=$CorelSS{supportr}->union(
+                                   $altc->{entry}->{CorelSS}->{supportr});
+            $CorelSS{supportr}=$CorelSS{supportr}->union(
+                                   $altc->{entry}->{CorelSS}->{supportk});
+
+            $CorelSS{supportk}=$CorelSS{supportk}->union(
+                                   $altc->{entry}->{CorelSS}->{supportk});
+
+            $CorelSS{supportk}=$CorelSS{supportk}->union(
+                                   $altc->{entry}->{CorelSS}->{supportr});
+
+            $CorelSS{serivcer}=$CorelSS{serivcer}->union(
+                                   $altc->{entry}->{CorelSS}->{serivcer});
+            $CorelSS{serivcer}=$CorelSS{serivcer}->union(
+                                   $altc->{entry}->{CorelSS}->{serivcek});
+
+            $CorelSS{serivcek}=$CorelSS{serivcek}->union(
+                                   $altc->{entry}->{CorelSS}->{serivcek});
+            $CorelSS{serivcek}=$CorelSS{serivcek}->union(
+                                   $altc->{entry}->{CorelSS}->{serivcer});
          }
          $CorelSS{supportr}=$CorelSS{supportr}->union($cs{supportK});
          $CorelSS{supportk}=$CorelSS{supportk}->union($cs{supportR});
