@@ -43,9 +43,10 @@ sub getQueryTemplate
 {
    my $self=shift;
    my $timelabel=$self->getParent->T("Change end time");;
+
    my $timedrop=$self->getTimeRangeDrop("Search_TimeRange",
                                         $self->getParent,
-                                        qw(month));
+                                        qw(month year));
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe><tr>

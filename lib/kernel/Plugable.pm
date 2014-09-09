@@ -188,6 +188,10 @@ sub getTimeRangeDrop
                       !($oldval=~m/^currentmonth$/) &&
                       !($oldval=~m/^lastmonth$/)));
    $oldval=undef if (grep(/^month$/,@modes) && !($oldval=~m/AND/));
+   if (!defined($oldval) && in_array(\@modes,"month")){
+      $oldval=sprintf("(%02d/%04d)",$month,$year);
+   }
+printf STDERR ("fifi oldval=$oldval\n");
    foreach my $blk (@modes){
       if ($blk eq "nearfuture"){
          my @l=(
@@ -262,7 +266,7 @@ sub getTimeRangeDrop
             my $eY=$sY-$c;
             my $exp="($eY)";
             $d.="<option value=\"".$exp."\"";
-            $d.=" selected" if ($c==0);
+            $d.=" selected" if ($c==0 && !defined($oldval));
             $d.=">$eY</option>\n";
          }
       }
