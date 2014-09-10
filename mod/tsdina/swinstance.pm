@@ -156,6 +156,18 @@ sub new
                 label         =>'LPAR Shared Pool ID',
                 dataobjattr   =>'lpar_shared_pool_id'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>'monitor_date'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(dina_inst_id,35,'0')"),
+
    );
 
    $self->setDefaultView(qw(name monitordate));
