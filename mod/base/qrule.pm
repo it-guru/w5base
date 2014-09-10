@@ -18,6 +18,7 @@ package base::qrule;
 #
 use strict;
 use vars qw(@ISA);
+use Time::HiRes qw(gettimeofday);
 use kernel;
 use kernel::Field;
 use kernel::DataObj::Static;
@@ -208,7 +209,7 @@ sub calcParentAndObjlist
    my $potentialRuleList=shift;
    my $orgParentName=$parent->Self();
 
-   my $rec=$calledRec;
+   my $rec=$$calledRec;
 
    my $cache=$self->Cache();
    my $cachekey=$parent->Self."-".join(",",@$mandator);
@@ -219,19 +220,18 @@ sub calcParentAndObjlist
    if ($parent->Self() ne "base::workflow"){
       if (!exists($cache->{$orgParentName})){
          foreach my $lnkrec (@$potentialRuleList){
-            my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
+            my $do=$self->getPersistentModuleObject($lnkrec->{dataobj});
             if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
                if ($parent->Self() ne $do->Self()){
                   if ($parentTransformationCount==0){
                      # rec muß neu gelesen werden!
                      my $reloadedRec=$self->reloadRec($do,$rec);
-
                      if (!defined($reloadedRec)){
                         msg(ERROR,"parent transformation error ".
                                   "while reread rec");
                         return();
                      }
-                     %$calledRec=%$reloadedRec;
+                     ${$calledRec}=$reloadedRec; # return new rec to caller
                      $rec=$reloadedRec;
                      $objlist=$do->getQualityCheckCompat($rec); 
                      msg(INFO,"qrule parent transformation ".
@@ -300,7 +300,7 @@ sub calcFinalQruleList
    #
    # Berechnung der möglichen QualityRules anhand des Mandaten
    #
-   $mandator=$rec->{mandatorid} if (exists($rec->{mandatorid}));
+   $mandator=$$rec->{mandatorid} if (exists($$rec->{mandatorid}));
    $mandator=[$mandator] if (ref($mandator) ne "ARRAY");
    push(@$mandator,0);  # for rules on any mandator
    @$mandator=sort(@$mandator);
@@ -332,7 +332,7 @@ sub calcFinalQruleList
       my $qrulename=$lnkrec->{qruleid};
       next if ($qruledone{$qrulename}); # doppelte behandlung verhindern
       my $do=getModuleObject($self->Config,$lnkrec->{dataobj});
-      if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
+      if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$$rec)){
          $qruledone{$qrulename}++;
          push(@qrulelist,$qrulename);
       }
@@ -444,7 +444,7 @@ sub nativQualityCheck
 
 
    my ($parent,$objlist,$finalQruleList)=
-       $self->calcFinalQruleList($parent,$objlist,$rec);
+       $self->calcFinalQruleList($parent,$objlist,\$rec);
 
    #######################################################################
    # Generelle Operationen im parent durchführen, die IMMER vor dem 
@@ -482,6 +482,10 @@ sub nativQualityCheck
    #  $param[0]->{ruleno}=0;
 
    foreach my $qrulename (@$finalQruleList){
+      my $sseconds=Time::HiRes::time();
+      if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+         msg(INFO,"start rule $qrulename ...");
+      }
       my $qrule=$self->{qrule}->{$qrulename};
       my $oldcontext=$W5V2::OperationContext;
       $W5V2::OperationContext="QualityCheck";
@@ -522,6 +526,12 @@ sub nativQualityCheck
             $self->translate_qmsg($control,$res,$qrulename);
          }
          push(@{$result->{rule}},$res);
+      }
+      if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+         my $eseconds=Time::HiRes::time();
+         my $t=sprintf("%.3lf",$eseconds-$sseconds);
+         msg(INFO,"... end rule $qrulename (duration=$t sec)");
+         msg(INFO,"-------------------------------------------------\n");
       }
    }
    if ($parent->Self() ne "base::workflow"){ # only DataIssues for nonworkflows!
