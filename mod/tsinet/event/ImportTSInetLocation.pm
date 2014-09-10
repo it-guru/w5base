@@ -151,11 +151,11 @@ sub ImportTSInetLocation
    # cleanup contact links -> old style
    my $lnk=getModuleObject($self->Config,"base::lnkcontact");
    $lnk->ResetFilter();
-   $lnk->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start-2d\""});
+   $lnk->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start-4d\""});
    $lnk->DeleteAllFilteredRecords("ValidatedDeleteRecord");
 
    $rel->ResetFilter();
-   $rel->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start-2d\""});
+   $rel->SetFilter({srcsys=>\'TSINET',srcload=>"\"<$start-4d\""});
    $rel->DeleteAllFilteredRecords("ValidatedDeleteRecord");
 
 
