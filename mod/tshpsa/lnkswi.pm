@@ -82,7 +82,7 @@ sub new
                 label         =>'iname',
                 dataobjattr   =>'iname'),
 
-      new kernel::Field::Date(
+      new kernel::Field::Text(
                 name          =>'scandate',
                 label         =>'Scandate',
                 dataobjattr   =>'scandate'),
