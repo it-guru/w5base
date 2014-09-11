@@ -181,7 +181,9 @@ sub Sendmail
          # CC Handling
          $rec->{emailcc}=[$rec->{emailcc}] if (ref($rec->{emailcc}) ne "ARRAY");
          my @emailcc=@{$rec->{emailcc}};
-         if ($#mailallow!=-1 || $opmode eq "test"){
+         if ($#mailallow!=-1 || 
+             $opmode eq "test" ||
+             $opmode eq "dev"){
             @emailcc=map({my $m=$_;
                           my $qm=quotemeta($m);
                           if (!grep(/^$qm$/i,@mailallow)){
