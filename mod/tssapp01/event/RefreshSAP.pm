@@ -310,6 +310,8 @@ sub processFile
             if (exists($k{$wrrec->{'name'}})){
                # doublicate (known) entry
                next if ($wrrec->{'name'} eq "X-BCM98-1000");
+               next if ($wrrec->{'name'} eq "R-9910044497");
+               next if ($wrrec->{'name'} eq "R-9910044497-1000");
                ###############################################################
                printf STDERR ("ERROR: dublicate entry '%s' - ignoring it\n",
                               $wrrec->{'name'});
