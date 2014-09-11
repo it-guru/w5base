@@ -199,7 +199,9 @@ sub Sendmail
             $rec->{emailbcc}=[$rec->{emailbcc}];
          }
          my @emailbcc=@{$rec->{emailbcc}};
-         if ($#mailallow!=-1 || $opmode eq "test"){
+         if ($#mailallow!=-1 || 
+             $opmode eq "test" ||
+             $opmode eq "dev"){
             @emailbcc=map({my $m=$_;
                           my $qm=quotemeta($m);
                           if (!grep(/^$qm$/i,@mailallow)){
