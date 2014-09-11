@@ -699,6 +699,9 @@ sub Notify
                if (defined($urec)){
                   $param{$target}->[$c]=$urec->{email};
                }
+               else{
+                  $param{$target}->[$c]=undef;
+               }
              #  else{
              #     $param{$target}->[$c]='"invalid ref($param{$target}->[$c])" '.
              #                           '<null\@network>';
@@ -755,8 +758,9 @@ sub Notify
    }
    if (!exists($param{emailfrom})){
       $mailset{emailfrom}="\"W5Base-Notify\" <none\@null.com>";
-   }
-   else{
+      $mailset{emailfrom}="\"W5Base-Notify\" <>"; # is better, because no
+   }                                              # out of office notes goes
+   else{                                          # to the internet
       $mailset{emailfrom}=$param{emailfrom};
    }
 

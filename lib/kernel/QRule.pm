@@ -521,7 +521,8 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
          if (defined($idfield)){
             my $idname=$idfield->Name();
             my %notifycontrol=(
-               mode=>'QualityCheck'
+               mode=>'QualityCheck',
+               datasource=>$partnerlabel
             );
             if ($dataobj->NotifiedValidatedUpdateRecord(
                    \%notifycontrol,

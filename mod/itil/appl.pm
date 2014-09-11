@@ -99,10 +99,6 @@ sub new
                 vjoinon       =>['semid'=>'userid'],
                 vjoindisp     =>'email'),
 
-      new kernel::Field::Link(
-                name          =>'servicesupportid',
-                dataobjattr   =>'appl.servicesupport'),
-
       new kernel::Field::Text(
                 name          =>'conumber',
                 htmleditwidth =>'150px',
@@ -1038,6 +1034,11 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['servicesupportid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'servicesupportid',
+                dataobjattr   =>'appl.servicesupport'),
+
 
       new kernel::Field::Select(
                 name          =>'slacontroltoolname',

@@ -41,8 +41,10 @@ sub loadQualityCheckResult
          $qc->setParent($parent);
          my $compat=$parent->getQualityCheckCompat($chkrec);
          my %checksession=(checkstart=>time(),checkmode=>'field');
+         if ($obj->getField("allowifupdate") && $chkrec->{allowifupdate}==1){
+            $checksession{autocorrect}=1;
+         }
          $result=$qc->nativQualityCheck($compat,$chkrec,\%checksession);
-         #printf STDERR ("nativQualityCheck=%s\n",Dumper($result));
       }
       $context->{QualityResult}->{$id}=$result;
    }

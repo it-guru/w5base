@@ -1692,6 +1692,7 @@ sub SecureValidatedUpdateRecord
 }
 
 sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
+
 {                                   # with write role
    my $self=shift;
    my $oldrec=shift;
@@ -1770,6 +1771,35 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
    $ENV{HTTP_FORCE_LANGUAGE}=$notifyparam{lang};
 
    my ($subject,$text)=&{$gentext}($self,\%notifyparam,$notifycontrol);
+
+   if ($notifycontrol->{autosubject}){
+      $subject="" if (!defined($subject));
+      my $nsubject=$self->T("Automatic data update");
+      $nsubject.=" ".$subject if ($subject ne "");
+      if ($notifycontrol->{datasource} ne ""){  # automatische zusammenstellen
+         $nsubject.=" ".$self->T("based on datasource")." ". # der subject
+                    $notifycontrol->{datasource};            # zeile
+      }
+      $subject=$nsubject;
+   }
+   if (defined($text) && $notifycontrol->{autotext}){  # automatischen header
+      my $ntext=$self->T("Dear databoss",'kernel::QRule'); # und fooder an den
+      $ntext.=",\n\n";                                     # text anhängen
+      $ntext.=$self->T("there was done an update on a record ".
+                      "which is managed ".
+                      "by you based on",'kernel::QRule');
+      if ($notifycontrol->{datasource} ne ""){
+         $ntext.=" ".$self->T("the datasource")." ".
+                 $notifycontrol->{datasource};
+      }
+      $ntext.=" ".$notifycontrol->{mode}.".";
+      $ntext.="\n";
+      $ntext.="\n".$text."\n\n\n".
+               $self->T("This update did not delivers you of your ".
+                        "data responsibility!",'kernel::QRule');
+      $text=$ntext;
+   }
+
 
    if (defined($subject) && defined($text)){
       if (!defined($notifycontrol->{wf})){

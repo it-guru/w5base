@@ -278,6 +278,15 @@ sub getRecordImageUrl
    return("../../../public/base/load/lnkmandatorqmgmt.jpg?".$cgi->query_string());
 }
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
 
 sub LoadQualityActivationLinks
 {     
