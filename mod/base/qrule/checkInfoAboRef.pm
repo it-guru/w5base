@@ -79,8 +79,14 @@ sub qcheckRecord
       # static InfoAbos haben keine gültige Datensatz Referenz - man könnte
       # höchstens noch überprüfen, ob der InfoAboMode noch perl T eine
       # Übersetzung liefert - das sollte aber noch Zeit haben.
-      $valid=1; 
-
+      my $o=getModuleObject($self->getParent->Config,"base::user");
+      if (defined($o) && $rec->{userid} ne ""){
+         $o->SetFilter({userid=>\$rec->{userid},cistatusid=>"!6"});
+         my ($rec,$msg)=$o->getOnlyFirst("userid");
+         if (defined($rec)){
+            $valid=1;
+         }
+      }
    }elsif ($rec->{parentobj} ne ""){
       my $o=getModuleObject($self->getParent->Config,$rec->{parentobj});
       if (defined($o)){
