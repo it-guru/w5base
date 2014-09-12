@@ -529,7 +529,7 @@ sub nativQualityCheck
       }
       if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
          my $eseconds=Time::HiRes::time();
-         my $t=sprintf("%.3lf",$eseconds-$sseconds);
+         my $t=sprintf("%.3lf",$eseconds-$sseconds); 
          msg(INFO,"... end rule $qrulename (duration=$t sec)");
          msg(INFO,"-------------------------------------------------\n");
       }
@@ -710,6 +710,9 @@ sub WinHandleQualityCheck
       my $res=hash2xml({},{header=>1});
       print $res."<document>";
       my %checksession=(checkstart=>time(),checkmode=>'web');
+      if (exists($rec->{allowifupdate}) && $rec->{allowifupdate}==1){
+         $checksession{autocorrect}=1;
+      }
       my $checkresult=$self->nativQualityCheck($objlist,$rec,\%checksession);
       #print STDERR Dumper($checkresult);
       foreach my $ruleres (@{$checkresult->{rule}}){

@@ -44,6 +44,8 @@ sub getControlData
                                               name=>'STEVqreportbyorg'},
            'base::workflow'=>{id  =>'110000003',
                                               name=>'STEVwfstatsendWeek'},
+           'base::user' =>   {id  =>'110000004',
+                                              name=>'STEVborderchange'},
           ]);
 
 }

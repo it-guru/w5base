@@ -24,6 +24,7 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use DateTime;
 use DateTime::Span;
+use itil::lib::BorderChangeHandling;
 
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
@@ -1607,6 +1608,21 @@ sub SecureValidate
 
    return($self->SUPER::SecureValidate($oldrec,$newrec,$org));
 }
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+   $self->itil::lib::BorderChangeHandling::BorderChangeHandling(
+      $oldrec,
+      $newrec
+   );
+
+   return($bak);
+}
+
 
 sub Validate
 {

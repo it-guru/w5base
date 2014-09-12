@@ -1802,7 +1802,7 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
 
 
    if (defined($subject) && defined($text)){
-      if (!defined($notifycontrol->{wf})){
+      if (!defined($notifycontrol->{wfact})){
          $notifycontrol->{wfact}=getModuleObject($self->Config,
                                                  "base::workflowaction");
       }
