@@ -69,6 +69,10 @@ sub FormatedDetail
       if ($mode=~m/^Html/){
          $d=~s/\s/&nbsp;/g;
       }
+      if (exists($self->{background})){
+         $d=$self->BackgroundColorHandling($mode,$current,$d);
+      }
+
    }
 
    return($d);

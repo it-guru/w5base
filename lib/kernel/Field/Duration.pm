@@ -77,18 +77,23 @@ sub FormatedDetail
       if (my $duration=CalcDateDuration($d1,$d2,"GMT")){
          if ($mode eq "HtmlDetail" || $mode eq "HtmlV01" ||
              ($mode=~m/^XLS/i)){
+            my $d="";
             if ($self->{visual} eq "auto"){
-               return($prefix.$duration->{string});
+               $d=$prefix.$duration->{string};
             }
             elsif ($self->{visual} eq "hours"){
-               return($prefix.sprintf("%.2f",($duration->{totalminutes}/60.0)));
+               $d=$prefix.sprintf("%.2f",($duration->{totalminutes}/60.0));
             }
             elsif ($self->{visual} eq "minutes"){
-               return($prefix.sprintf("%d",int($duration->{totalminutes})));
+               $d=$prefix.sprintf("%d",int($duration->{totalminutes}));
             }
             elsif ($self->{visual} eq "seconds"){
-               return($prefix.sprintf("%d",int($duration->{totalseconds})));
+               $d=$prefix.sprintf("%d",int($duration->{totalseconds}));
             }
+            if (exists($self->{background})){
+               $d=$self->BackgroundColorHandling($mode,$current,$d);
+            }
+            return($d);
          }
          return($duration->{totalminutes});
       }
@@ -111,6 +116,14 @@ sub FormatedDetail
             $d=$fromquery;
          }
          return($self->getSimpleInputField($d,$readonly));
+      }
+      else{
+         if ($mode eq "HtmlSubList" || $mode eq "HtmlV01" ||
+             $mode eq "HtmlDetail" || $mode eq "HtmlChart"){
+            if (exists($self->{background})){
+               $d=$self->BackgroundColorHandling($mode,$current,$d);
+            }
+         }
       }
       return($d);
    }

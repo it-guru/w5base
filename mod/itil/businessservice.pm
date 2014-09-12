@@ -584,8 +584,13 @@ sub new
       new kernel::Field::MatrixHeader(
                 name          =>'slamatrix',
                 group         =>'sla',
-                label         =>[undef,'requested','implemented','current',
-                                 'threshold warn','threshold crit']),
+                label         =>[undef,'requested',
+                                 'implemented','current',
+                                 'threshold fact. warn',
+                                 'threshold warn',
+                                 'threshold fact. crit',
+                                 'threshold crit'
+                                 ]),
 
       new kernel::Field::Duration(
                 name          =>'requ_mtbf',
@@ -618,7 +623,7 @@ sub new
                 dataobjattr   =>$worktable.'.curr_mtbf'),
 
       new kernel::Field::Number(
-                name          =>'threshold_warn_mtbf',
+                name          =>'threshold_fact_warn_mtbf',
                 group         =>'sla',
                 default       =>sub{
                    my $self=shift;
@@ -636,8 +641,22 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
                 dataobjattr   =>$worktable.'.th_warn_mtbf'),
 
+      new kernel::Field::Duration(
+                name          =>'threshold_warn_mtbf',
+                group         =>'sla',
+                background    =>\&calcBackgroundFlagColor,
+                precision     =>2, 
+                visual        =>'hh:mm',
+                readonly      =>1,
+                label         =>'MTBF',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>"$worktable.impl_mtbf*".
+                                "if ($worktable.th_warn_mtbf is null,0.92,".
+                                "$worktable.th_warn_mtbf)"),
+
       new kernel::Field::Number(
-                name          =>'threshold_crit_mtbf',
+                name          =>'threshold_fact_crit_mtbf',
                 group         =>'sla',
                 default       =>sub{
                    my $self=shift;
@@ -649,11 +668,28 @@ sub new
                 },
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
-                precision     =>2, 
+                precision     =>2,
                 label         =>'MTBF',
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>$worktable.'.th_crit_mtbf'),
+
+
+
+      new kernel::Field::Duration(
+                name          =>'threshold_crit_mtbf',
+                group         =>'sla',
+                background    =>\&calcBackgroundFlagColor,
+                depend        =>['threshold_crit_mtbf'],
+                precision     =>2, 
+                readonly      =>1,
+                visual        =>'hh:mm',
+                label         =>'MTBF',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>"$worktable.impl_mtbf*".
+                                "if ($worktable.th_crit_mtbf is null,0.97,".
+                                "$worktable.th_crit_mtbf)"),
 
       new kernel::Field::Duration(
                 name          =>'requ_ttr',
@@ -686,7 +722,7 @@ sub new
                 dataobjattr   =>$worktable.'.curr_ttr'),
 
       new kernel::Field::Number(
-                name          =>'threshold_warn_ttr',
+                name          =>'threshold_fact_warn_ttr',
                 group         =>'sla',
                 default       =>sub{
                    my $self=shift;
@@ -704,8 +740,22 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
                 dataobjattr   =>$worktable.'.th_warn_ttr'),
 
+      new kernel::Field::Duration(
+                name          =>'threshold_warn_ttr',
+                group         =>'sla',
+                background    =>\&calcBackgroundFlagColor,
+                depend        =>['threshold_fact_warn_ttr'],
+                readonly      =>1,
+                visual        =>'hh:mm',
+                label         =>'TTR',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>"$worktable.impl_ttr*".
+                                "if ($worktable.th_warn_ttr is null,0.92,".
+                                "$worktable.th_warn_ttr)"),
+
       new kernel::Field::Number(
-                name          =>'threshold_crit_ttr',
+                name          =>'threshold_fact_crit_ttr',
                 group         =>'sla',
                 default       =>sub{
                    my $self=shift;
@@ -723,11 +773,28 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>$worktable.'.th_crit_ttr'),
 
+      new kernel::Field::Duration(
+                name          =>'threshold_crit_ttr',
+                group         =>'sla',
+                background    =>\&calcBackgroundFlagColor,
+                readonly      =>1,
+                visual        =>'hh:mm',
+                label         =>'TTR',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>"$worktable.impl_ttr*".
+                                "if ($worktable.th_crit_ttr is null,0.97,".
+                                "$worktable.th_crit_ttr)"),
+
       new kernel::Field::MatrixHeader(
                 name          =>'monimatrix',
                 group         =>'moni',
                 label         =>[undef,'requested','implemented','current',
-                                 'threshold warn','threshold crit']),
+                                 'threshold fact. warn',
+                                 'threshold warn',
+                                 'threshold fact. crit',
+                                 'threshold crit'
+                                ]),
 
       new kernel::Field::Percent(
                 name          =>'requ_avail_p',
@@ -760,7 +827,7 @@ sub new
                 dataobjattr   =>$worktable.'.curr_avail_p'),
 
       new kernel::Field::Number(
-                name          =>'threshold_warn_avail',
+                name          =>'threshold_fact_warn_avail',
                 group         =>'moni',
                 precision     =>2, 
                 default       =>sub{
@@ -778,8 +845,22 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
                 dataobjattr   =>$worktable.'.th_warn_avail'),
 
+      new kernel::Field::Percent(
+                name          =>'threshold_warn_avail',
+                group         =>'moni',
+                depend        =>['threshold_fact_warn_avail'],
+                precision     =>2, 
+                readonly      =>1,
+                background    =>\&calcBackgroundFlagColor,
+                label         =>'avalability',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>"$worktable.impl_avail_p*".
+                                "if ($worktable.th_warn_avail is null,0.92,".
+                                "$worktable.th_warn_avail)"),
+
       new kernel::Field::Number(
-                name          =>'threshold_crit_avail',
+                name          =>'threshold_fact_crit_avail',
                 group         =>'moni',
                 precision     =>2, 
                 default       =>sub{
@@ -796,6 +877,20 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>$worktable.'.th_crit_avail'),
+
+      new kernel::Field::Percent(
+                name          =>'threshold_crit_avail',
+                group         =>'moni',
+                precision     =>2, 
+                background    =>\&calcBackgroundFlagColor,
+                depend        =>['threshold_fact_crit_avail'],
+                readonly      =>1,
+                label         =>'avalability',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>"$worktable.impl_avail_p*".
+                                "if ($worktable.th_crit_avail is null,0.97,".
+                                "$worktable.th_crit_avail)"),
 
       new kernel::Field::Number(
                 name          =>'requ_respti',
@@ -824,7 +919,7 @@ sub new
                 dataobjattr   =>$worktable.'.curr_respti'),
 
       new kernel::Field::Number(
-                name          =>'threshold_warn_respti',
+                name          =>'threshold_fact_warn_respti',
                 group         =>'moni',
                 default       =>sub{
                    my $self=shift;
@@ -843,7 +938,21 @@ sub new
                 dataobjattr   =>$worktable.'.th_warn_respti'),
 
       new kernel::Field::Number(
-                name          =>'threshold_crit_respti',
+                name          =>'threshold_warn_respti',
+                group         =>'moni',
+                background    =>\&calcBackgroundFlagColor,
+                depend        =>['threshold_fact_warn_respti'],
+                unit          =>'ms',
+                readonly      =>1,
+                label         =>'responsetime',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>"$worktable.impl_respti*".
+                                "if ($worktable.th_warn_respti is null,0.92,".
+                                "$worktable.th_warn_respti)"),
+
+      new kernel::Field::Number(
+                name          =>'threshold_fact_crit_respti',
                 group         =>'moni',
                 default       =>sub{
                    my $self=shift;
@@ -860,6 +969,20 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>$worktable.'.th_crit_respti'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_crit_respti',
+                group         =>'moni',
+                background    =>\&calcBackgroundFlagColor,
+                label         =>'responsetime',
+                depend        =>['threshold_fact_crit_respti'],
+                unit          =>'ms',
+                readonly      =>1,
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>"$worktable.impl_respti*".
+                                "if ($worktable.th_crit_respti is null,0.97,".
+                                "$worktable.th_crit_respti)"),
 
       new kernel::Field::Percent(
                 name          =>'requ_perf',
@@ -891,16 +1014,8 @@ sub new
                 dataobjattr   =>$worktable.'.curr_perf'),
 
       new kernel::Field::Number(
-                name          =>'threshold_warn_perf',
+                name          =>'threshold_fact_warn_perf',
                 group         =>'moni',
-               # default       =>sub{
-               #    my $self=shift;
-               #    my $current=shift;
-               #    my $mode=shift;
-               #
-               #    return(undef) if ($mode eq "edit");
-               #    return('0.92')
-               # },
                 readonly      =>1,
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -911,16 +1026,20 @@ sub new
                 dataobjattr   =>$worktable.'.th_warn_perf'),
 
       new kernel::Field::Number(
-                name          =>'threshold_crit_perf',
+                name          =>'threshold_warn_perf',
                 group         =>'moni',
-               # default       =>sub{
-               #    my $self=shift;
-               #    my $current=shift;
-               #    my $mode=shift;
-               #
-               #    return(undef) if ($mode eq "edit");
-               #    return('0.97')
-               # },
+                readonly      =>1,
+                background    =>\&calcBackgroundFlagColor,
+                depend        =>['threshold_fact_warn_perf'],
+                precision     =>2, 
+                label         =>'performance',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                dataobjattr   =>"NULL"),
+
+      new kernel::Field::Number(
+                name          =>'threshold_fact_crit_perf',
+                group         =>'moni',
                 readonly      =>1,
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -929,6 +1048,18 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>$worktable.'.th_crit_perf'),
+
+      new kernel::Field::Number(
+                name          =>'threshold_crit_perf',
+                group         =>'moni',
+                readonly      =>1,
+                depend        =>['threshold_fact_crit_perf'],
+                background    =>\&calcBackgroundFlagColor,
+                precision     =>2, 
+                label         =>'performance',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                dataobjattr   =>"NULL"),
 
       new kernel::Field::Textarea(
                 name          =>'slacomments',
@@ -1083,8 +1214,15 @@ sub calcBackgroundFlagColor
    my $FormatAs=shift;
    my $current=shift;
 
-   my $def=$self->default($FormatAs);
-   my $cur=$current->{$self->Name()};
+   my $depname=$self->Name();
+   if (!($depname=~m/^threshold_fact_/)){
+      $depname=~s/^threshold_/threshold_fact_/;
+   }  
+   my $depfield=$self->getParent->getField($depname,$current);
+
+   my $def=$depfield->default($FormatAs);
+
+   my $cur=$depfield->RawValue($current);
 
    $cur=$def if ($cur eq "");
 
@@ -1438,13 +1576,13 @@ sub extLabelPostfixCurrent
 sub extLabelPostfixTHCrit
 {
    my $self=shift;
-   return(" - ".$self->getParent->T("threshold crit"));
+   return(" - ".$self->getParent->T("threshold fact. crit"));
 }
 
 sub extLabelPostfixTHWarn
 {
    my $self=shift;
-   return(" - ".$self->getParent->T("threshold warn"));
+   return(" - ".$self->getParent->T("threshold fact. warn"));
 }
 
 
