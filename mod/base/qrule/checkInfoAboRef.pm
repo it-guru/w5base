@@ -5,7 +5,9 @@ package base::qrule::checkInfoAboRef;
 =head3 PURPOSE
 
 This qulaity rule checks the CI-Status of the groups, references in
-businessteam, serviceteam and customer.
+businessteam, serviceteam and customer. It is technical not posible,
+to realize realtions to config-items per foreign keys - so the only
+posible solution is to check in cycle if the target exists still.
 
 =cut
 
@@ -73,7 +75,13 @@ sub qcheckRecord
       }
    } 
    my $valid=0;
-   if ($rec->{parentobj} ne ""){
+   if ($rec->{parentobj} eq "base::staticinfoabo"){
+      # static InfoAbos haben keine gültige Datensatz Referenz - man könnte
+      # höchstens noch überprüfen, ob der InfoAboMode noch perl T eine
+      # Übersetzung liefert - das sollte aber noch Zeit haben.
+      $valid=1; 
+
+   }elsif ($rec->{parentobj} ne ""){
       my $o=getModuleObject($self->getParent->Config,$rec->{parentobj});
       if (defined($o)){
          my $idfield=$o->IdField();
@@ -103,7 +111,8 @@ sub qcheckRecord
       $o->ValidatedUpdateRecord($rec,{invalidsince=>NowStamp("en")},
                                 {id=>\$rec->{id}});
       push(@qmsg,"note target of invalid is invalid");
-      printf STDERR ("DEBUG from QRule: ungültiges Ziel in InfoAbo $rec->{id}\n");
+      printf STDERR ("DEBUG from QRule: ungültiges Ziel in ".
+                     "InfoAbo $rec->{id}\n");
    }
    if ($valid && $rec->{invalidsince} ne ""){
       my $o=$dataobj->Clone();
@@ -115,13 +124,15 @@ sub qcheckRecord
    if ($rec->{invalidsince} ne ""){
       my $d=CalcDateDuration(NowStamp("en"),$rec->{invalidsince},"GMT");
       if ($d->{totalminutes}<-30320){
-         printf STDERR ("DEBUG from QRule: demnaechst Delete of InfoAbo $rec->{id}\n");
+         printf STDERR ("DEBUG from QRule: demnaechst Delete of ".
+                        "InfoAbo $rec->{id}\n");
       }
       if ($d->{totalminutes}<-40320){
          my $o=$dataobj->Clone();
          $o->ValidatedDeleteRecord($rec,{id=>\$rec->{id}});
          push(@qmsg,"remove infoabo due long invalidity");
-         printf STDERR ("DEBUG from QRule: Delete of InfoAbo $rec->{id}\n");
+         printf STDERR ("DEBUG from QRule: Delete of ".
+                        "InfoAbo $rec->{id}\n");
       }
 
    }
