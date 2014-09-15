@@ -884,8 +884,13 @@ sub RawValue
                      $self->vjoinobj->SetNamedFilter("BASE",@{$base});
                   }
                }
-               $self->vjoinobj->SetFilter(@fltlst);
-               $c->{$joinkey}=[$self->vjoinobj->getHashList(@view)];
+               if (defined($self->vjoinobj) && $self->vjoinobj->Ping()){
+                  $self->vjoinobj->SetFilter(@fltlst);
+                  $c->{$joinkey}=[$self->vjoinobj->getHashList(@view)];
+               }
+               else{
+                  return("[ERROR: information temporarily unavailable]");
+               }
                if ($#{$c->{$joinkey}}==-1){
                   if (!$self->vjoinobj->Ping()){
                     return("[ERROR: information temporarily unavailable]");

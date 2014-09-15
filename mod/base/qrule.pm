@@ -309,7 +309,7 @@ sub calcFinalQruleList
    if ($self->getParent->Self() eq "base::workflow"){
       $lnkr->SetFilter({mandatorid=>$mandator,
                         cistatusid=>\'4',
-                        dataobj=>\$rec->{class}});
+                        dataobj=>$$rec->{class}});
    }
    else{
       $lnkr->SetFilter({mandatorid=>$mandator,
@@ -706,6 +706,7 @@ sub WinHandleQualityCheck
    if (defined($mode) && $mode eq "process" && $CurrentIdToEdit ne ""){
       #printf STDERR ("fifi env=%s\n",Dumper(\%ENV));
       #printf STDERR ("fifi query=%s\n",Query->Dumper());
+      #printf STDERR ("fifi rec=%s\n",Dumper($rec));
       print $self->HttpHeader("text/xml");
       my $res=hash2xml({},{header=>1});
       print $res."<document>";
