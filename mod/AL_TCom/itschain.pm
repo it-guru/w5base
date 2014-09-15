@@ -62,7 +62,9 @@ sub new
                 readonly      =>1,
                 label         =>'IT-Enabling Service',
                 dataobjattr   =>
-                   "concat(lnkits.lnkpos,' - ',".
+                   "concat(".
+                   "if (lnkits.lnkpos is null,'?? - ',".
+                   "concat(lnkits.lnkpos,' - ')),".
                    itil::businessservice::getBSfullnameSQL("es","NULL").
                    ")",
                 depend        =>['es_id'],
@@ -84,7 +86,9 @@ sub new
                 readonly      =>1,
                 label         =>'IT-Service Transaction',
                 dataobjattr   =>
-                   "concat(lnkes.lnkpos,' - ',".
+                   "concat(".
+                   "if (lnkes.lnkpos is null,'?? - ',".
+                   "concat(lnkes.lnkpos,' - ')),".
                    itil::businessservice::getBSfullnameSQL("ta","NULL").
                    ")",
                 depend        =>['ta_id'],
@@ -96,7 +100,11 @@ sub new
                 name          =>'appl_name',
                 readonly      =>1,
                 label         =>'Application Name',
-                dataobjattr   =>"concat(lnkta.lnkpos,' - ',appl.name)",
+                dataobjattr   =>
+                   "concat(".
+                   "if (lnkta.lnkpos is null,'?? - ',".
+                   "concat(lnkta.lnkpos,' - ')),".
+                   "appl.name)",
                 depend        =>['appl_id'],
                 onClick       =>\&multiDestLinkHandler,
                 weblinkto     =>'AL_TCom::appl',
@@ -228,23 +236,23 @@ sub getSqlFrom
    $from.="businessservice as its ";
    if (grep(/^(es_|ta_|appl_|itscode)/,@view) || 
        in_array(\@f,["es","ta","appl"])){
-      $from.="left outer join lnkbscomp as lnkits ".
+      $from.="join lnkbscomp as lnkits ".
              "  on its.id=lnkits.businessservice ".
              "     and lnkits.objtype='itil::businessservice' ".
-             "left outer join businessservice as es ".
+             "join businessservice as es ".
              "  on lnkits.obj1id=es.id and es.nature='ES' ";
       if (grep(/^(ta_|appl_|itscode)/,@view) || 
           in_array(\@f,["tr","appl"])){
-         $from.="left outer join lnkbscomp as lnkes ".
+         $from.="join lnkbscomp as lnkes ".
                 "  on es.id=lnkes.businessservice ".
                 "     and lnkes.objtype='itil::businessservice' ".
-                "left outer join businessservice as ta ".
+                "join businessservice as ta ".
                 "  on lnkes.obj1id=ta.id and ta.nature='TR' ";
          if (grep(/^(appl_)/,@view) || in_array(\@f,["appl"])){
-            $from.="left outer join lnkbscomp as lnkta ".
+            $from.="join lnkbscomp as lnkta ".
                    "  on ta.id=lnkta.businessservice ".
                    "     and lnkes.objtype='itil::businessservice' ".
-                   "left outer join appl".
+                   "join appl".
                    "  on lnkta.obj1id=appl.id ";
          }
       }
