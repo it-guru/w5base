@@ -402,6 +402,8 @@ sub getReplicateObjectRec
                   "on \"_$ctrl->{name}\" (W5REPLLASTSUCC)");
       $dbi->doCmd("CREATE index \"_$ctrl->{name}_si3\" ".
                   "on \"_$ctrl->{name}\" (W5REPLFAILCNT)");
+      $dbi->doCmd("CREATE index \"_$ctrl->{name}_si4\" ".
+                  "on \"_$ctrl->{name}\" (W5REPLLASTTRY)");
 
       $dbi->commit();
    }
