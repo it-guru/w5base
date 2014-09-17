@@ -145,12 +145,12 @@ sub qcheckRecord
                                       mode=>'native');
                }
                else{
-                  $tswiw->Log(ERROR,"basedata",
-                            "CBM '$parrec->{sememail}' ".
-                            "for application '".$rec->{name}."' ".
-                            "can not be located in W5Base and WhoIsWho ".
-                            "while import(qrule) of application ".
-                            "from AssetManager\n-");
+              #    $tswiw->Log(ERROR,"basedata",
+              #              "CBM '$parrec->{sememail}' ".
+              #              "for application '".$rec->{name}."' ".
+              #              "can not be located in W5Base and WhoIsWho ".
+              #              "while import(qrule) of application ".
+              #              "from AssetManager\n-");
                }
             }
          }
@@ -166,12 +166,12 @@ sub qcheckRecord
                                    mode=>'native');
             }
             else{
-               $tswiw->Log(ERROR,"basedata",
-                         "TSM '$parrec->{tsmemail}' ".
-                         "for application '".$rec->{name}."' ".
-                         "can not be located in W5Base and WhoIsWho ".
-                         "while import(qrule) of application ".
-                         "from AssetManager\n-");
+             #  $tswiw->Log(ERROR,"basedata",
+             #            "TSM '$parrec->{tsmemail}' ".
+             #            "for application '".$rec->{name}."' ".
+             #            "can not be located in W5Base and WhoIsWho ".
+             #            "while import(qrule) of application ".
+             #            "from AssetManager\n-");
             }
          }
          if ($parrec->{tsm2email} ne ""){
@@ -185,12 +185,12 @@ sub qcheckRecord
                                    mode=>'native');
             }
             else{
-               $tswiw->Log(ERROR,"basedata",
-                         "TSM2 '$parrec->{tsm2email}' ".
-                         "for application '".$rec->{name}."' ".
-                         "can not be located in W5Base and WhoIsWho ".
-                         "while import(qrule) of application ".
-                         "from AssetManager\n-");
+             #  $tswiw->Log(ERROR,"basedata",
+             #            "TSM2 '$parrec->{tsm2email}' ".
+             #            "for application '".$rec->{name}."' ".
+             #            "can not be located in W5Base and WhoIsWho ".
+             #            "while import(qrule) of application ".
+             #            "from AssetManager\n-");
             }
          }
          if ($parrec->{opmemail} ne ""){
@@ -204,12 +204,12 @@ sub qcheckRecord
                                    mode=>'native');
             }
             else{
-               $tswiw->Log(ERROR,"basedata",
-                         "OPM '$parrec->{opmemail}' ".
-                         "for application '".$rec->{name}."' ".
-                         "can not be located in W5Base and WhoIsWho ".
-                         "while import(qrule) of application ".
-                         "from AssetManager\n-");
+             #  $tswiw->Log(ERROR,"basedata",
+             #            "OPM '$parrec->{opmemail}' ".
+             #            "for application '".$rec->{name}."' ".
+             #            "can not be located in W5Base and WhoIsWho ".
+             #            "while import(qrule) of application ".
+             #            "from AssetManager\n-");
             }
          }
          if ($parrec->{opm2email} ne ""){
@@ -223,12 +223,12 @@ sub qcheckRecord
                                    mode=>'native');
             }
             else{
-               $tswiw->Log(ERROR,"basedata",
-                         "OPM2 '$parrec->{opm2email}' ".
-                         "for application '".$rec->{name}."' ".
-                         "can not be located in W5Base and WhoIsWho ".
-                         "while import(qrule) of application ".
-                         "from AssetManager\n-");
+             #  $tswiw->Log(ERROR,"basedata",
+             #            "OPM2 '$parrec->{opm2email}' ".
+             #            "for application '".$rec->{name}."' ".
+             #            "can not be located in W5Base and WhoIsWho ".
+             #            "while import(qrule) of application ".
+             #            "from AssetManager\n-");
             }
          }
          $self->IfaceCompare($dataobj,
