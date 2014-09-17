@@ -334,7 +334,7 @@ sub new
    $self->{use_distinct}=1;
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.crm.businessprocess"],
-                         uniquesize=>40};
+                         uniquesize=>100};
    return($self);
 }
 
