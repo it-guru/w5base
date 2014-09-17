@@ -48,8 +48,9 @@ sub new
                 htmldetail    =>0,
                 searchable    =>0,
                 label         =>'Fullname',
-                dataobjattr   =>"concat(producer.name,
-                                 if(producer.name<>'','-',''),licproduct.name)"),
+                dataobjattr   =>"concat(producer.name,".
+                                "if(producer.name<>'','-',''),".
+                                "licproduct.name)"),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -341,6 +342,31 @@ sub isCopyValid
    return(1) if ($self->IsMemberOf("admin"));
    return(0);
 }
+
+
+sub prepUploadFilterRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   if ((!defined($newrec->{id}) || $newrec->{id} eq "")
+       && $newrec->{srcid} ne ""){
+      my $o=$self->Clone();
+      $o->SetFilter({srcid=>\$newrec->{srcid}});
+      my @l=$o->getHashList(qw(id));
+      if ($#l==0){
+         my $crec=$l[0];
+         $newrec->{id}=$crec->{id};
+         delete($newrec->{srcid});
+      }
+      elsif($#l>0){
+         $self->LastMsg(ERROR,"not unique srcid");
+      }
+   }
+   $self->SUPER::prepUploadFilterRecord($newrec);
+}
+
+
 
 
 
