@@ -76,12 +76,7 @@ sub new
                 label         =>'Feature',
                 ignorecase    =>1,
                 htmlwidth     =>'200px',
-                #dataobjattr   =>'name.feature_name'),
-                # fix, solange in oracle_db_features_vw der
-                # Datensatz für die fid 14 fehlt.
-                dataobjattr   =>"decode(features.fid,14,".
-                                       "'Exadata',".
-                                       "name.feature_name)"),
+                dataobjattr   =>'name.feature_name'),
 
       new kernel::Field::Boolean(
                 name          =>'used',

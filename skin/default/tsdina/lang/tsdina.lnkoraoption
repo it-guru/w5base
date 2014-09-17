@@ -1,4 +1,5 @@
 'tsdina::lnkoraoption'=>{de=>'DINA Oracle Option',
                          en=>'DINA Oracle Option'},
+'fieldgroup.instances'=>{de=>'Instanzen',en=>'Instances'},
 'Instance'=>{de=>'Instanz'},
 'installed'=>{de=>'installiert'},

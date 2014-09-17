@@ -85,9 +85,18 @@ sub new
       new kernel::Field::Text(
                 name          =>'instancename',
                 label         =>'Instance',
+                htmldetail    =>0,
                 vjointo       =>'tsdina::swinstance',
                 vjoinon       =>['dinainstanceid'=>'dinainstanceid'],
-                vjoindisp     =>['name']),
+                vjoindisp     =>['dinainstancename']),
+
+      new kernel::Field::SubList(
+                name          =>'instances',
+                label         =>'Instances',
+                group         =>'instances',
+                vjointo       =>'tsdina::swinstance',
+                vjoinon       =>['dinainstanceid'=>'dinainstanceid'],
+                vjoindisp     =>[qw(dinainstancename systemname)]),
 
       new kernel::Field::Text(
                 name          =>'dbname',

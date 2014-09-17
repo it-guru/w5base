@@ -38,10 +38,25 @@ sub new
                 label         =>'No.'),
 
       new kernel::Field::Id(
-                name          =>'dinainstanceid',
+                name          =>'instancid',
                 label         =>'Instance ID',
                 htmldetail    =>0,
+                uivisible     =>0,
+                dataobjattr   =>"concat(dina_inst_id,".
+                                 "concat('-',systemid))"),
+
+      new kernel::Field::Text(
+                name          =>'dinainstanceid',
+                label         =>'DINA Instance ID',
+                htmldetail    =>0,
                 dataobjattr   =>'dina_inst_id'),
+
+      new kernel::Field::Text(
+                name          =>'dinainstancename',
+                label         =>'Instance Name',
+                htmlwidth     =>'200px',
+                ignorecase    =>1,
+                dataobjattr   =>'instance_name'),
 
       new kernel::Field::Link(
                 name          =>'dinadbid',
@@ -49,11 +64,11 @@ sub new
                 htmldetail    =>0,
                 dataobjattr   =>'dina_db_id'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'name',
-                label         =>'Instance Name',
-                ignorecase    =>1,
-                dataobjattr   =>'instance_name'),
+                htmldetail    =>0,
+                dataobjattr   =>"concat(instance_name,".
+                                 "concat(' - ',host_name))"),
 
       new kernel::Field::Date(
                 name          =>'monitordate',
@@ -170,7 +185,7 @@ sub new
 
    );
 
-   $self->setDefaultView(qw(name monitordate));
+   $self->setDefaultView(qw(dinainstancename systemname monitordate));
 
    return($self);
 }
