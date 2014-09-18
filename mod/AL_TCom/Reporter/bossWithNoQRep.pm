@@ -58,7 +58,7 @@ sub Process             # will be run as a spereate Process (PID)
                   active=>0,
                   rawmode=>\'STEVqreportbyorg'});
    foreach my $arec ($o->getHashList(@{$self->{fieldlist}})){
-      print(join(";",map({$arec->{$_}} @{$self->{fieldlist}})."\n"));
+      print(join(";",map({$arec->{$_}} @{$self->{fieldlist}}))."\n");
    }
    return(0);
 }
