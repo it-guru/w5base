@@ -38,17 +38,10 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
-                searchable    =>1,
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'servicesupport.id'),
 
-      new kernel::Field::Mandator(),
-
-      new kernel::Field::Link(
-                name          =>'mandatorid',
-                selectfix     =>1,
-                dataobjattr   =>'servicesupport.mandator'),
-                                                  
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
@@ -59,6 +52,13 @@ sub new
                 label         =>'long description',
                 dataobjattr   =>'servicesupport.fullname'),
 
+      new kernel::Field::Mandator(),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                selectfix     =>1,
+                dataobjattr   =>'servicesupport.mandator'),
+                                                  
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
