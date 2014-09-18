@@ -106,6 +106,7 @@
 'Reporting.amore'=>{de=>'@more',en=>'@more'},
 'itservices'=>{de=>'IT-Services Telekom IT',en=>'IT-Services Telekom IT'},
 'itservices.bps'=>{de=>'Geschäftsprozess',en=>'Businessprocess'},
+'itservices.bps.acl'=>{de=>'Zugriffssteuerung',en=>'Access control'},
 'itservices.bps.new'=>{de=>'Neueingabe',en=>'New'},
 'itservices.its'=>{de=>'IT-Service',en=>'IT-Service'},
 'itservices.its.contact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},

@@ -18,7 +18,6 @@ package kernel::App::Web::AclControl;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
@@ -51,6 +50,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'refid',
+                frontreadonly =>1,
                 label         =>'ReferenceID',
                 dataobjattr   =>$acltable.'.refid'),
 
@@ -87,7 +87,7 @@ sub new
                 htmlwidth     =>'130',
                 label         =>'Posix',
                 readonly      =>1,
-                group         =>'userinfo',
+                htmldetail    =>0,
                 vjointo       =>'base::user',
                 vjoinon       =>['acltargetid'=>'userid'],
                 vjoindisp     =>'posix'),
