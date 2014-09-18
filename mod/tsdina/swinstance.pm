@@ -38,7 +38,7 @@ sub new
                 label         =>'No.'),
 
       new kernel::Field::Id(
-                name          =>'instancid',
+                name          =>'instanceid',
                 label         =>'Instance ID',
                 htmldetail    =>0,
                 uivisible     =>0,
