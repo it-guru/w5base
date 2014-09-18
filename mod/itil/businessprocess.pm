@@ -52,7 +52,9 @@ sub new
                 vjoinbase     =>[{applcistatusid=>'<=5'}],
                 vjoininhash   =>['applid','applcistatusid','appl']),
    );
+   $self->getField("pbusinessprocess")->{'vjointo'}='itil::businessprocess';
    $self->getField("pbusinessprocess")->{'weblinkto'}='itil::businessprocess';
+   $self->getField("subproc")->{'vjointo'}='itil::businessprocess';
 
    return($self);
 }
