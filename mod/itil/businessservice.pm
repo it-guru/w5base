@@ -306,7 +306,7 @@ sub new
                 name          =>'supportTreeCheck',
                 htmldetail    =>0,
                 searchable    =>0,
-                label         =>'analyzed service times tree',
+                label         =>'aggregated service times tree',
                 tspantype     =>{'k'=>'core replaced by border time',
                                  ''=>'',
                                  'r'=>'border replaced by core time',
@@ -388,7 +388,7 @@ sub new
                 name          =>'serivceTreeCheck',
                 htmldetail    =>0,
                 searchable    =>0,
-                label         =>'analyzed service times tree',
+                label         =>'aggregated service times tree',
                 tspantype     =>{'k'=>'core replaced by border time',
                                  ''=>'',
                                  'r'=>'border replaced by core time',
@@ -489,7 +489,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
-                label         =>'Service&Support Class',
+                label         =>'demanded Service&Support Class',
                 group         =>'desc',
                 vjointo       =>'itil::servicesupport',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -500,6 +500,20 @@ sub new
                 name          =>'servicesupportid',
                 group         =>'desc',
                 dataobjattr   =>"$worktable.servicesupport"),
+
+      new kernel::Field::TextDrop(
+                name          =>'implservicesupport',
+                label         =>'implemented Service&Support Class',
+                group         =>'desc',
+                vjointo       =>'itil::servicesupport',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['implservicesupportid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'implservicesupportid',
+                group         =>'desc',
+                dataobjattr   =>"$worktable.implservicesupport"),
 
      new kernel::Field::Container(
                 name          =>'additional',
@@ -2098,7 +2112,7 @@ sub TreeView
       
 
       printf("<tr><td>");
-      printf("<h3>".$self->T("analyzed support times tree")."</h1>");
+      printf("<h3>".$self->T("aggregated support times tree")."</h1>");
       printf("%s",
              $self->getField("supportTreeCheck")->
                 FormatedDetail($rec,"HtmlDetail"));
@@ -2121,7 +2135,7 @@ sub TreeView
       
 
       printf("<tr><td>");
-      printf("<h3>".$self->T("analyzed service times tree")."</h1>");
+      printf("<h3>".$self->T("aggregated service times tree")."</h1>");
       printf("%s",
              $self->getField("serivceTreeCheck")->
                 FormatedDetail($rec,"HtmlDetail"));

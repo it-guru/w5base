@@ -55,3 +55,4 @@ alter table businessservice add nature  char(5) default '', add unique fullname(
 alter table businessservice add contact1 bigint(20),add contact2 bigint(20),add contact3 bigint(20),add contact4 bigint(20),add contact5 bigint(20),add contact6 bigint(20),add contact7 bigint(20),add contact8 bigint(20),add contact9 bigint(20);
 alter table businessservice add shortname varchar(10);
 alter table businessservice drop key fullname, add unique fullname(nature,name,shortname);
+alter table businessservice add implservicesupport  bigint(20);
