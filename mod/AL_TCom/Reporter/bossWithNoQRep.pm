@@ -1,4 +1,4 @@
-package AL_TCom::Reporter::prio1appl;
+package AL_TCom::Reporter::bossWithNoQRep;
 #  W5Base Framework
 #  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
 #
@@ -28,8 +28,8 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->{fieldlist}=[qw(name id customerprio customer)];
-   $self->{name}="DTAG Application Prio1";
+   $self->{fieldlist}=[qw(userid user)];
+   $self->{name}="TelekomIT Leiter mit deaktiviertem QualityReport";
    return($self);
 }
 
@@ -44,16 +44,24 @@ sub Process             # will be run as a spereate Process (PID)
 {
    my $self=shift;
 
-   my $appl=getModuleObject($self->Config,"AL_TCom::appl");
-   $appl->SetFilter({cistatusid=>\'4',customerprio=>\'1',
-                     customer=>"DTAG DTAG.*"});
-   foreach my $arec ($appl->getHashList(@{$self->{fieldlist}})){
-      my $d=sprintf("%s;%d;%d;%s\n",
-                    $arec->{name},
-                    $arec->{id},
-                    $arec->{customerprio},$arec->{customer});
-      print($d);
+   my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
+
+   $lnk->SetFilter({group=>"dtag.tsi.ti dtag.tsi.ti.*",
+                    nativroles=>'RBoss'});
+   my %userid;
+   foreach my $lrec ($lnk->getHashList(qw(userid))){
+      $userid{$lrec->{userid}}++;
    }
+   
+   my $o=getModuleObject($self->Config,"base::infoabo");
+   $o->SetFilter({userid=>[keys(%userid)],
+                  active=>0,
+                  rawmode=>\'STEVqreportbyorg'});
+   my @l;
+   foreach my $arec ($o->getHashList(@{$self->{fieldlist}})){
+      push(@l,$arec->{user});
+   }
+   print(join("\n",sort(@l)));
    return(0);
 }
 
@@ -98,6 +106,21 @@ sub onChange
 
    return($msg);
 }
+
+sub isViewValid
+{
+   my $reporter=shift;
+   my $self=shift;
+   my $rec=shift;
+
+   return(1) if ($self->IsMemberOf("admin"));
+   return(1) if ($self->IsMemberOf("DTAG.TSI.TI",[qw(RCFManager RCFManager2)],
+                                   "up"));
+
+   return(0);
+}
+
+
 
 
 

@@ -17,7 +17,6 @@ package AL_TCom::Reporter::prio1location;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use strict;
-local $| = 1;
 use vars qw(@ISA);
 use kernel;
 use kernel::Reporter;
@@ -47,17 +46,13 @@ sub Process             # will be run as a spereate Process (PID)
 
    my $appl=getModuleObject($self->Config,"base::location");
    $appl->SetFilter({cistatusid=>\'4',grprelations=>"DTAG DTAG.*"});
-   my $d;
    foreach my $arec ($appl->getHashList(@{$self->{fieldlist}})){
       next if ($arec->{prio} ne "1");
-      $d.=sprintf("%s;%d;%d\n",
+      my $d=sprintf("%s;%d;%d\n",
                   $arec->{name},
                   $arec->{id},
                   $arec->{prio});
-   }
-   print $d;
-   for(my $c=0;$c<2048;$c++){  # test ob sich dadurch die Buffer Probleme
-      print("\n");             # lösen lassen
+      print $d;
    }
 
    return(0);

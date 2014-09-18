@@ -252,7 +252,12 @@ sub FinishWrite
    return($bak);
 }
 
-
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
 
 
 

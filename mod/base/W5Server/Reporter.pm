@@ -160,7 +160,6 @@ sub addTask
    my $param=shift;
 
    $param->{maxstderr}=128 if (!exists($param->{maxstderr}));
-   $param->{maxstdout}=128 if (!exists($param->{maxstdout}));
    if ($#{$self->{task}}<100){  # max 100 task in queue
       $self->broadcast("receive a new task request for $name");
       push(@{$self->{task}},{name=>$name,stdout=>[],stderr=>[],
@@ -188,25 +187,36 @@ sub handleSlotIO
    while(1){
       my $readedlines=0;
       my $s=new IO::Select();
-      $s->add($slot->{stdout});
-      $s->add($slot->{stderr});
+      $s->add($slot->{stdout}) if (defined($slot->{stdout}));
+      $s->add($slot->{stderr}) if (defined($slot->{stderr}));
       my @ready=$s->can_read(0);
-      for(my $c=0;$c<=$#ready;$c++){
-         my $fh=$ready[$c];
+      foreach my $fh (@ready){
          my $line=<$fh>;
-         if ($line){
+         #$self->broadcast("fifi - $? - handleSlotIO: (read on=$fh) err=$slot->{stderr} out=$slot->{stdout} line=$line");
+         if (!defined($line)){
+            if ($fh eq $slot->{stdout}){
+               $slot->{stdout}=undef;
+            }
+            if ($fh eq $slot->{stderr}){
+               $slot->{stderr}=undef;
+            }
+         }
+         else{
             $line=~s/\s*$//;
             my $taskname=$slot->{task}->{name};
             my $module=$reporter->{reportjob}->{Reporter}->{$taskname};
             if ($fh eq $slot->{stdout}){
                $module->stdout($line,$slot->{task},$reporter);
-               $readedlines++;
             }
-            if ($fh eq $slot->{stderr}){
+            elsif ($fh eq $slot->{stderr}){
                $module->stderr($line,$slot->{task},$reporter);
-               $readedlines++;
+            }
+            else{
+               $self->broadcast("fifi handleSlotIO: seltsamer fh=$fh");
+               last;
             }
          }
+         $readedlines++;
       }
       last if (!$readedlines);
    }
@@ -234,11 +244,18 @@ sub slotHandler
          $self->handleSlotIO($reporter,$slot->[$c]);
          my $pid=$slot->[$c]->{pid};
          if ((my $sysexitcode=waitpid($pid,WNOHANG))>0){
-            my $sig=$?>>8;
+            my $exitcode=$?>>8;
+            my $sig=$?&127;
+            if ($sig!=0){
+               push(@{$slot->[$c]->{task}->{stderr}},
+                    "terminated by Signal($sig)\n"); 
+               $exitcode=1;
+            }
             $slot->[$c]->{task}->{waitpidresult}=$sysexitcode; 
-            $slot->[$c]->{task}->{exitcode}=$sig; 
+            $slot->[$c]->{task}->{exitcode}=$exitcode; 
             my $module=$slot->[$c]->{task}->{name};
-            $self->broadcast("Finish ".$module." slot $c at PID $pid($sig)");
+            $self->broadcast("Finish ".$module." slot $c at ".
+                             "PID $pid(sig=$sig;exitcode=$exitcode)");
             my $reportermodules=$reporter->{reportjob}->{Reporter};
             $reportermodules->{$module}->Finish($slot->[$c]->{task},$reporter);
             $slot->[$c]=undef;
@@ -270,7 +287,6 @@ sub slotHandler
             $slot->[$c]->{stderr}=$rSTDERR;
             my $pid=fork();                   # fork the task 
             if ($pid==0){
-               $|=1;
                close(STDIN);
                $SIG{PIPE}='DEFAULT';
                $SIG{INT}='DEFAULT';
