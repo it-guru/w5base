@@ -57,11 +57,9 @@ sub Process             # will be run as a spereate Process (PID)
    $o->SetFilter({userid=>[keys(%userid)],
                   active=>0,
                   rawmode=>\'STEVqreportbyorg'});
-   my @l;
    foreach my $arec ($o->getHashList(@{$self->{fieldlist}})){
-      push(@l,$arec->{user});
+      print(join(";",map({$arec->{$_}} @{$self->{fieldlist}})."\n"));
    }
-   print(join("\n",sort(@l)));
    return(0);
 }
 
