@@ -18,14 +18,46 @@ package tscddwh::appl;
 #
 use strict;
 use vars qw(@ISA);
+use kernel;
 use AL_TCom::appl;
 @ISA=qw(AL_TCom::appl);
+
+# This Object is only for Replication of "itemsummary" to W5Warehouse
 
 sub new
 {
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->getField("mandator")->{searchable}=0;
+   $self->getField("cistatus")->{searchable}=0;
+   $self->getField("mdate")->{searchable}=0;
    return($self);
 }
+
+sub SetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if ($#flt!=0 || ref($flt[0]) ne "HASH"){
+      $self->LastMsg("ERROR","invalid Filter request on $self");
+      return(undef);
+   }
+
+   my %f1=(%{$flt[0]});
+   $f1{cistatusid}=['3','4','5'];
+   my %f2=(%{$flt[0]});
+   $f2{cistatusid}=['6'];
+#   $f2{mdate}=">now-28d";
+
+   my @flt=([\%f1,\%f2]);
+
+   print STDERR Dumper(\@flt);
+
+   return($self->SUPER::SetFilter(@flt));
+}
+
+
+
 1;
