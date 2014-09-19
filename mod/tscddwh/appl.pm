@@ -53,7 +53,7 @@ sub SetFilter
 
    my @flt=([\%f1,\%f2]);
 
-   print STDERR Dumper(\@flt);
+   #print STDERR Dumper(\@flt);
 
    return($self->SUPER::SetFilter(@flt));
 }
