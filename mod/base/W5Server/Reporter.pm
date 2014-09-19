@@ -241,9 +241,10 @@ sub slotHandler
    for(my $c=0;$c<=$#{$slot};$c++){
       if (defined($slot->[$c])){
          $reporter->{usedSlots}++;
-         $self->handleSlotIO($reporter,$slot->[$c]);
          my $pid=$slot->[$c]->{pid};
-         if ((my $sysexitcode=waitpid($pid,WNOHANG))>0){
+         my $sysexitcode=waitpid($pid,WNOHANG);
+         $self->handleSlotIO($reporter,$slot->[$c]);
+         if ($sysexitcode>0){
             my $exitcode=$?>>8;
             my $sig=$?&127;
             if ($sig!=0){
