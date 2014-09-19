@@ -245,8 +245,8 @@ sub slotHandler
          my $sysexitcode=waitpid($pid,WNOHANG);
          $self->handleSlotIO($reporter,$slot->[$c]);
          if ($sysexitcode>0){
-            my $exitcode=$?>>8;
-            my $sig=$?&127;
+            my $exitcode=$sysexitcode>>8;
+            my $sig=$sysexitcode&127;
             if ($sig!=0){
                push(@{$slot->[$c]->{task}->{stderr}},
                     "terminated by Signal($sig)\n"); 
