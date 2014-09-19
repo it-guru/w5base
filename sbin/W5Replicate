@@ -638,6 +638,7 @@ sub objectReplicationPhase1
 
    $p1smallpack=$p1smallpack*5 if ($ctrl->{name} eq "base::workflow");
    my $oldreplkey;
+   my $recinqueue=1;
    while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
       my $syncstart;
@@ -698,6 +699,7 @@ sub objectReplicationPhase1
       my $candidates=0;
       my $processed=0;
       if (defined($srcrec)){
+         $recinqueue=1;
          $dbi->doCmd("lock table \"$ctrl->{name}\" IN EXCLUSIVE MODE");
          $dbi->doCmd("lock table \"_$ctrl->{name}\" IN EXCLUSIVE MODE");
          do{
@@ -716,7 +718,7 @@ sub objectReplicationPhase1
                             "object '$ctrl->{'name'}'");
                   $dbi->rollback();
                   $dbi->disconnect();
-                  return;
+                  return(8);
                }
                $processed++;
                msg(INFO,"InsertOrUpdate commited - processed=$processed");
@@ -726,6 +728,7 @@ sub objectReplicationPhase1
          $dbi->commit();
       }
       if ($processed<2 && $candidates<2){
+         $recinqueue=0;
          last;
       }
    }
@@ -740,6 +743,9 @@ sub objectReplicationPhase1
 
    $dbi->commit();
    $dbi->disconnect();
+   return(127) if ($recinqueue);
+   msg(INFO,"end:   phase 1 all fine and nothing in queue");
+   return(0);
 }
 
 
@@ -769,10 +775,10 @@ sub objectReplicationPhase2
 
    my $rstatobj=getModuleObject($Config,"replicate::stat");
    my $rstatid=$rstatobj->ValidatedInsertRecord({
-                                                   phase=>2,
-                                                   objectid=>$rorec->{id},
-                                                   startdate=>NowStamp("en")
-                                                });
+      phase=>2,
+      objectid=>$rorec->{id},
+      startdate=>NowStamp("en")
+   });
    my $phase2start=Time::HiRes::time();
    my $phase2recCnt=1;
 
@@ -782,8 +788,7 @@ sub objectReplicationPhase2
       die("can not create State-Record for phase 2 on $ctrl->{'name'}");
    }
 
-   my $cmd="select count(*) n ".
-           "from \"_$ctrl->{name}\" ";
+   my $cmd="select count(*) n from \"_$ctrl->{name}\" ";
    my $n=0;
    my $basewhere="";
    my $minrefreshlatency=6;
@@ -883,6 +888,7 @@ sub objectReplicationPhase2
                                                 {id=>\$rstatid});
    $dbi->commit();
    $dbi->disconnect();
+   return(0);
 }
 
 
@@ -937,6 +943,7 @@ sub objectReplicationPhase3
    }, {id=>\$rstatid});
    $dbi->commit();
    $dbi->disconnect();
+   return(0);
 }
 
 
@@ -946,6 +953,7 @@ sub createSlot
    my $tasklabel=shift;
    my $nice=shift;
    my $ctrl=shift;
+   my $job=shift;
    my $function=shift;
 
    my $pid=fork();
@@ -965,10 +973,11 @@ sub createSlot
       }
       exit(&$function());
    }
-
+   $job->{state}="running";
    return({
       pid=>$pid,
       label=>$tasklabel,
+      job=>$job,
       name=>$ctrl->{'name'},
       start=>time()
    });
@@ -992,11 +1001,19 @@ my $totalRefreshEntries=1;
 
 foreach my $replControl (@ReplicationObjects){
    doShutdown() if ($startProcessPPID ne getppid());
+   my $p1jobrec;
+   my $p2jobrec;
+   my $p3jobrec;
    if ($replControl->{'valid'} && $replControl->{'requested'}){
       if (in_array(\@requested_phase,"1")){
          if (!exists($replControl->{'filter'})){
             if ($replControl->{'allow_phase1'}){
-               unshift(@joblist,{phase=>1,replControl=>$replControl});
+               $p1jobrec={
+                  phase=>1,
+                  state=>'wait',
+                  replControl=>$replControl
+               };
+               unshift(@joblist,$p1jobrec);
             }
          }
       }
@@ -1004,69 +1021,97 @@ foreach my $replControl (@ReplicationObjects){
          if ($replControl->{'allow_phase2'}){
             $phase2entries++;
             $totalRefreshEntries+=$replControl->{'entrycount'};
-            push(@joblist,{phase=>2,replControl=>$replControl});
+            $p2jobrec={
+               phase=>2,
+               state=>'wait',
+               replControl=>$replControl
+            };
+            if (defined($p1jobrec)){
+               $p2jobrec->{depend}=$p1jobrec;
+            }
+            push(@joblist,$p2jobrec);
          }
       }
       if (in_array(\@requested_phase,"3")){
          if ($replControl->{'allow_phase3'}){
             if (!exists($replControl->{'filter'})){
-               push(@joblist,{phase=>3,replControl=>$replControl});
+               $p3jobrec={
+                   phase=>3,
+                   state=>'wait',
+                   replControl=>$replControl
+               };
+               push(@joblist,$p3jobrec);
             }
          }
       }
    }
 }
-#print STDERR Dumper(\@joblist);sleep(1);
 @joblist=shuffle(@joblist);
+#print STDERR Dumper(\@joblist);sleep(1);
 
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
-   for(my $slotno=0;$slotno<$maxslots;$slotno++){
-      # das muß noch besser werden - phaselimit calc!
-      my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*$maxslots-15;
-      if ($phaselimit>($MaximumReplicationTime/3*2)){
-         $phaselimit=$MaximumReplicationTime/3*2;
+   if (exists($nextjob->{depend}) && $nextjob->{depend}->{state} ne "done"){
+      msg(INFO,"dependence wait for $nextjob on ".
+               "$nextjob->{depend}($nextjob->{depend}->{state})");
+      if ($nextjob->{depend}->{state} eq "wait" ||
+          $nextjob->{depend}->{state} eq "running"){
+         push(@joblist,$nextjob);
       }
-      if (!defined($slot[$slotno])){
-         my $replControl=$nextjob->{'replControl'};
-         if ($replControl->{'valid'} && $replControl->{'requested'}){
-            if ($nextjob->{'phase'}==1){
-               $currentStartPhase=1;
-               #printf STDERR ("start phase1 ($phaselimit) for $replControl->{'name'}\n");
-               $slot[$slotno]=createSlot($self,"Phase1",1,$replControl,sub{
-                  objectReplicationPhase1($config,$phaselimit,$replControl);
-               });
-            }
-            elsif ($nextjob->{'phase'}==2){ 
-               my $avgrecaccesstime=0.05;
-               $phase2entries=1 if ($phase2entries<=0);
-               my $restTime=$MaximumReplicationTime-20-
-                            (time()-$ReplicationStart);
-               my $entrycount=$replControl->{'entrycount'};
-               $entrycount=1 if ($entrycount==0);
-               my $phaselimit=($restTime/$phase2entries/
-                              ($totalRefreshEntries*$avgrecaccesstime))*
-                              $maxslots*$entrycount;
-               $phaselimit=20 if ($phaselimit<20);
-               if ($phaselimit>$MaximumReplicationTime/3){
-                  $phaselimit=$MaximumReplicationTime/3;
-               }
-               $phaselimit=int($phaselimit);
-               $currentStartPhase=2;
-               #printf STDERR ("start phase2 ($phaselimit) for $replControl->{'name'}\n");
-               $slot[$slotno]=createSlot($self,"Phase2",10,$replControl,sub{
-                  objectReplicationPhase2($config,$phaselimit,$replControl);
-               });
-            }
-            elsif ($nextjob->{'phase'}==3){  # cleanup
-               $currentStartPhase=3;
-               #printf STDERR ("start phase3 (10) for $replControl->{'name'}\n");
-               $slot[$slotno]=createSlot($self,"Phase3",2,$replControl,sub{
-                  objectReplicationPhase3($config,10,$replControl);
-               });
-            }
+      else{
+         msg(ERROR,"job $nextjob->{name} dependence ".
+                   "break $nextjob->{depend}->{state}");
+      }
+      sleep(1);
+   }
+   else{
+      for(my $slotno=0;$slotno<$maxslots;$slotno++){
+         # das muß noch besser werden - phaselimit calc!
+         my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*$maxslots-15;
+         if ($phaselimit>($MaximumReplicationTime/3*2)){
+            $phaselimit=$MaximumReplicationTime/3*2;
          }
-         last;
+         if (!defined($slot[$slotno])){
+            my $replControl=$nextjob->{'replControl'};
+            if ($replControl->{'valid'} && $replControl->{'requested'}){
+               if ($nextjob->{'phase'}==1){
+                  $currentStartPhase=1;
+                  #printf STDERR ("start phase1 ($phaselimit) for $replControl->{'name'}\n");
+                  $slot[$slotno]=createSlot($self,"Phase1",1,$replControl,$nextjob,sub{
+                     objectReplicationPhase1($config,$phaselimit,$replControl);
+                  });
+               }
+               elsif ($nextjob->{'phase'}==2){ 
+                  my $avgrecaccesstime=0.05;
+                  $phase2entries=1 if ($phase2entries<=0);
+                  my $restTime=$MaximumReplicationTime-20-
+                               (time()-$ReplicationStart);
+                  my $entrycount=$replControl->{'entrycount'};
+                  $entrycount=1 if ($entrycount==0);
+                  my $phaselimit=($restTime/$phase2entries/
+                                 ($totalRefreshEntries*$avgrecaccesstime))*
+                                 $maxslots*$entrycount;
+                  $phaselimit=20 if ($phaselimit<20);
+                  if ($phaselimit>$MaximumReplicationTime/3){
+                     $phaselimit=$MaximumReplicationTime/3;
+                  }
+                  $phaselimit=int($phaselimit);
+                  $currentStartPhase=2;
+                  #printf STDERR ("start phase2 ($phaselimit) for $replControl->{'name'}\n");
+                  $slot[$slotno]=createSlot($self,"Phase2",10,$replControl,$nextjob,sub{
+                     objectReplicationPhase2($config,$phaselimit,$replControl);
+                  });
+               }
+               elsif ($nextjob->{'phase'}==3){  # cleanup
+                  $currentStartPhase=3;
+                  #printf STDERR ("start phase3 (10) for $replControl->{'name'}\n");
+                  $slot[$slotno]=createSlot($self,"Phase3",2,$replControl,$nextjob,sub{
+                     objectReplicationPhase3($config,10,$replControl);
+                  });
+               }
+            }
+            last;
+         }
       }
    }
    while(1){
@@ -1079,9 +1124,24 @@ while(my $nextjob=shift(@joblist)){
             $runnging++;
             if (kill(0,$s->{pid})){
                if ((my $sysexitcode=waitpid($s->{pid},WNOHANG))>0){
-                  my $sig=$sysexitcode&8;
-                  $s->{'exitstate'}=$sig;
+                  $sysexitcode=$?;
+                  my $sig=$sysexitcode&127;
+                  my $exitcode=$sysexitcode>>8;
+                  $s->{'exitstate'}=$exitcode;
+                  if ($sig!=0){
+                     msg(ERROR,"recive signal $sig from replication task !!!");
+                     $s->{'exitstate'}=$sig;
+                  }
                   $s->{'end'}=time();
+                  if ($s->{'exitstate'}==127){
+                     $s->{job}->{state}="incomplete";
+                  }
+                  elsif ($s->{'exitstate'}==0){
+                     $s->{job}->{state}="done";
+                  }
+                  else{
+                     $s->{job}->{state}="fail($s->{exitstate})";
+                  }
                }
             }
             else{
