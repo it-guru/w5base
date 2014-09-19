@@ -538,6 +538,11 @@ sub Init
                       prio=>50,
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itservices.bps.acl",
+                      "crm::businessprocessacl",
+                      prio=>40,
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itservices.bps.new",
                       "itil::businessprocess",
                       func=>'New',
