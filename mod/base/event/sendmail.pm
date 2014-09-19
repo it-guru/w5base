@@ -314,6 +314,7 @@ sub Sendmail
                my $emailtext=$rec->{emailtext}->[$blk];
                if (!(($emailtext=~m/<a/) ||
                      ($emailtext=~m/<b>/) ||
+                     ($emailtext=~m/<center>/) ||
                      ($emailtext=~m/<\/b>/) ||
                      ($emailtext=~m/<\/ul>/) ||
                      ($emailtext=~m/<i>/) ||
