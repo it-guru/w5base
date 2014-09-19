@@ -117,8 +117,8 @@ sub qcheckRecord
       $o->ValidatedUpdateRecord($rec,{invalidsince=>NowStamp("en")},
                                 {id=>\$rec->{id}});
       push(@qmsg,"note target of invalid is invalid");
-      printf STDERR ("DEBUG from QRule: ungültiges Ziel in ".
-                     "InfoAbo $rec->{id}\n");
+      #printf STDERR ("DEBUG from QRule: ungültiges Ziel in ".
+      #               "InfoAbo $rec->{id}\n");
    }
    if ($valid && $rec->{invalidsince} ne ""){
       my $o=$dataobj->Clone();
