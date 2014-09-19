@@ -671,11 +671,13 @@ sub getRelatedWorkflows
    $h->SetCurrentOrder("id");
    my %idl=();
    map({$idl{$_->{id}}=$_} $h->getHashList(@internalWfView));
-   if (keys(%idl)>1500){
-      $self->LastMsg(ERROR,$self->T("selection to ".
-                                    "unspecified for search",
-                                    "kernel::App::Web::WorkflowLink"));
-      return(undef);
+   if ($W5V2::OperationContext eq "WebFrontend"){
+      if (keys(%idl)>1500){
+         $self->LastMsg(ERROR,$self->T("selection to ".
+                                       "unspecified for search",
+                                       "kernel::App::Web::WorkflowLink"));
+         return(undef);
+      }
    }
    if ($q->{class} eq "" || $q->{class}=~m/::(DataIssue|mailsend)$/ ||
        (ref($q->{class}) eq "ARRAY" && 
@@ -710,11 +712,13 @@ sub getRelatedWorkflows
          map({$idl{$_->{id}}=$_} $h->getHashList(@internalWfView));
       }
    }
-   if (keys(%idl)>1500){
-      $self->LastMsg(ERROR,$self->T("selection to ".
-                                    "unspecified for search",
-                                    "kernel::App::Web::WorkflowLink"));
-      return(undef);
+   if ($W5V2::OperationContext eq "WebFrontend"){
+      if (keys(%idl)>1500){
+         $self->LastMsg(ERROR,$self->T("selection to ".
+                                       "unspecified for search",
+                                       "kernel::App::Web::WorkflowLink"));
+         return(undef);
+      }
    }
    my %q=(id=>[keys(%idl)],isdeleted=>\'0');
 
