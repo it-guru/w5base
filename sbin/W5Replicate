@@ -1059,7 +1059,7 @@ while(my $nextjob=shift(@joblist)){
          push(@joblist,$nextjob);
       }
       else{
-         msg(ERROR,"job $nextjob->{name} dependence ".
+         msg(ERROR,"job $nextjob->{replControl}->{name} dependence ".
                    "break $nextjob->{depend}->{state}");
       }
       sleep(1);
