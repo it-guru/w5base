@@ -342,14 +342,14 @@ sub Validate
       $self->LastMsg(ERROR,"not suppored scheme specified");
       return(undef);
    }
-   if (in_array([qw(http ldap ldaps https file)],$scheme)){
+   if (in_array([qw(ftp http ldap ldaps https file)],$scheme)){
       my $host=URI->new($name)->host();
       if ($host eq ""){
          $self->LastMsg(ERROR,"can not identify host in URL");
          return(undef);
       }
-      if (effVal($oldrec,$newrec,"hostname") ne $host){
-         $newrec->{hostname}=$host;
+      if (effVal($oldrec,$newrec,"hostname") ne lc($host)){
+         $newrec->{hostname}=lc($host);
       }
       my $port=URI->new($name)->port();
       if (effVal($oldrec,$newrec,"ipport") ne $port){

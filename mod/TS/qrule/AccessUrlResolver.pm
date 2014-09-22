@@ -69,7 +69,11 @@ sub qcheckRecord
    my $desc={qmsg=>[],solvtip=>[]};
    my @ipl;
    my $host=$rec->{hostname};
-   if ($host=~m/^\d+\.\d+\.\d+\.\d+$/){ # url redirects already to an ip
+   if ($host eq ""){
+      my $msg="can not identify hostname in:".$rec->{fullname};
+      push(@{$desc->{qmsg}},$msg);
+      push(@{$desc->{dataissue}},$msg);
+   }elsif ($host=~m/^\d+\.\d+\.\d+\.\d+$/){ # url redirects already to an ip
       push(@ipl,$host);
    }
    else{
@@ -123,7 +127,8 @@ sub qcheckRecord
                }
             }
             else{
-               msg(ERROR,"$self query failed: ".$res->errorstring);
+               msg(ERROR,$self->Self()." query failed: ".$res->errorstring.
+                         " for ".$host);
                return(undef);
             }
          }
