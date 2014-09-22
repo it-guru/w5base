@@ -104,4 +104,15 @@ sub Initialize
    return(0);
 }
 
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_saphier"))){
+     Query->Param("search_saphier"=>
+                  "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
+   }
+}
+
+
 1;
