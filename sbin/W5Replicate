@@ -320,6 +320,7 @@ sub storeReplicateObjectStat
    if (my $rec=$dbi->getHash($cmd)){
       $l=$rec->{l};
       $l=~s/,/./g;
+      $l=sprintf("%.5lf",$l);
       $n=$rec->{n};
       my $ro=getModuleObject($Config,"replicate::obj");
       if (!defined($ro)){
@@ -842,8 +843,11 @@ sub objectReplicationPhase2
                      "where refid=?",$id);
          $obj->ResetFilter();
          $obj->SetFilter({$ctrl->{idname}=>\$id});
-         my ($rrec,$msg)=$obj->getOnlyFirst(@{$ctrl->{'replkeyfields'}},
-                                            @{$ctrl->{'view'}});
+         # replkeyfields kann ein Problem sein, da dadurch Phase1 durcheinander
+         # kommen kann
+         #my ($rrec,$msg)=$obj->getOnlyFirst(@{$ctrl->{'replkeyfields'}},
+         #                                   @{$ctrl->{'view'}});
+         my ($rrec,$msg)=$obj->getOnlyFirst(@{$ctrl->{'view'}});
          if (defined($rrec)){
             if (!$dbi->InsertOrUpdate($ctrl,$rrec)){
                msg(ERROR,"REPLICATION BREAK: fail to refresh in ".
@@ -1026,9 +1030,10 @@ foreach my $replControl (@ReplicationObjects){
                state=>'wait',
                replControl=>$replControl
             };
-            if (defined($p1jobrec)){
-               $p2jobrec->{depend}=$p1jobrec;
-            }
+            #if (defined($p1jobrec)){          # keine gute Idee, da dadurch
+            #   $p2jobrec->{depend}=$p1jobrec; # die Replikationsperformance
+            #}                                 # bei extrem großen Objekten
+            #                                  # scheisse wird
             push(@joblist,$p2jobrec);
          }
       }
@@ -1076,8 +1081,8 @@ while(my $nextjob=shift(@joblist)){
             if ($replControl->{'valid'} && $replControl->{'requested'}){
                if ($nextjob->{'phase'}==1){
                   $currentStartPhase=1;
-                  #printf STDERR ("start phase1 ($phaselimit) for $replControl->{'name'}\n");
-                  $slot[$slotno]=createSlot($self,"Phase1",1,$replControl,$nextjob,sub{
+                  $slot[$slotno]=createSlot($self,"Phase1",1,
+                                            $replControl,$nextjob,sub{
                      objectReplicationPhase1($config,$phaselimit,$replControl);
                   });
                }
@@ -1097,15 +1102,15 @@ while(my $nextjob=shift(@joblist)){
                   }
                   $phaselimit=int($phaselimit);
                   $currentStartPhase=2;
-                  #printf STDERR ("start phase2 ($phaselimit) for $replControl->{'name'}\n");
-                  $slot[$slotno]=createSlot($self,"Phase2",10,$replControl,$nextjob,sub{
+                  $slot[$slotno]=createSlot($self,"Phase2",10,
+                                            $replControl,$nextjob,sub{
                      objectReplicationPhase2($config,$phaselimit,$replControl);
                   });
                }
                elsif ($nextjob->{'phase'}==3){  # cleanup
                   $currentStartPhase=3;
-                  #printf STDERR ("start phase3 (10) for $replControl->{'name'}\n");
-                  $slot[$slotno]=createSlot($self,"Phase3",2,$replControl,$nextjob,sub{
+                  $slot[$slotno]=createSlot($self,"Phase3",2,
+                                            $replControl,$nextjob,sub{
                      objectReplicationPhase3($config,10,$replControl);
                   });
                }
@@ -1264,10 +1269,15 @@ sub preprocessRecord
    my ($ctrl,$reqrec,$col)=@_;
    my %rec=(%$reqrec);
 
-   $rec{'w5replkey'}=sprintf("%35s%35s",$rec{'replkeypri'},$rec{'replkeysec'});
-   $rec{'w5replkey'}=~s/ /0/g;
-   $rec{'w5replkeypri'}=$rec{'replkeypri'};
-   $rec{'w5replkeysec'}=$rec{'replkeysec'};
+   if (exists($rec{'replkeypri'}) && exists($rec{'replkeysec'})){
+      # in Phase2 no replkeypri and replkeysec will be updated! This is
+      # neassesary to ensure process in Phase1
+      $rec{'w5replkey'}=sprintf("%35s%35s",$rec{'replkeypri'},
+                                           $rec{'replkeysec'});
+      $rec{'w5replkey'}=~s/ /0/g;
+      $rec{'w5replkeypri'}=$rec{'replkeypri'};
+      $rec{'w5replkeysec'}=$rec{'replkeysec'};
+   }
    foreach my $k (@{$ctrl->{'replkeyfields'}}){
       delete($rec{$k});
    }
