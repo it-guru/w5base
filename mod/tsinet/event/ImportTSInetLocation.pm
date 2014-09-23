@@ -77,6 +77,7 @@ sub ImportTSInetLocation
          if ($locvalid){ 
             my $org=$rec->{customer};
             $org=~s/^DTAG\.TDE/DTAG.TDG/;
+            $org=~s/^DTAG\.TSG/DTAG.TDG.TSG/;
             $grp->ResetFilter();
             $grp->SetFilter({fullname=>\$org});
             my ($grprec,$msg)=$grp->getOnlyFirst(qw(id fullname name));
