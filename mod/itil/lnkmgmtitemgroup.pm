@@ -151,6 +151,28 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'lnkmgmtitemgroup.comments'),
 
+      new kernel::Field::Date(
+                name          =>'notify1on',
+                group         =>'notifications',
+                uivisible     =>sub{
+                   my $self=shift;
+                   return(1) if ($self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
+                label         =>'Notification 1 (on)',
+                dataobjattr   =>'lnkmgmtitemgroup.notify1on'),
+
+      new kernel::Field::Date(
+                name          =>'notify1off',
+                group         =>'notifications',
+                uivisible     =>sub{
+                   my $self=shift;
+                   return(1) if ($self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
+                label         =>'Notification 1 (off)',
+                dataobjattr   =>'lnkmgmtitemgroup.notify1off'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -249,7 +271,7 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {  
    my $self=shift;
-   return(qw(header default groupdetails source));
+   return(qw(header default groupdetails notifications source));
 }
 
 

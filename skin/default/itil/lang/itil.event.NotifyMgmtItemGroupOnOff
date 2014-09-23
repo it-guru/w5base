@@ -1,0 +1,7 @@
+'managed itemgroups notification'=>{
+       de=>'Benachrichtigung zu zentral geführten CI-Gruppen'},
+'databoss'=>{de=>'Datenverantwortliche(r)'},
+'application manager'=>{de=>'Application Manager(in)'},
+'application'=>{de=>'die Anwendung',en=>'the application'},
+'location'=>{de=>'der Standort',en=>'the location'},
+'businessservice'=>{de=>'der Business Service',en=>'the business service'},

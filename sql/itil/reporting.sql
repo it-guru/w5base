@@ -77,3 +77,5 @@ create table lnkmgmtitemgroup(
 set FOREIGN_KEY_CHECKS=1;
 alter table mgmtitemgroup add grouptype char(20) default NULL;
 alter table mgmtitemgroup add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table lnkmgmtitemgroup add notify1on datetime default NULL;
+alter table lnkmgmtitemgroup add notify1off datetime default NULL;

@@ -1,5 +1,6 @@
 'itil::lnkmgmtitemgroup'=>{de=>'CI Gruppen Zuordnung',
                            en=>'CI group relation'},
+'fieldgroup.notifications'=>{de=>'Benachrichtigungen',en=>'Notifications'},
 'managed item group'=>{de=>'geführte CI Gruppe'},
 'managed group CI-State'=>{de=>'CI-Status der Gruppe'},
 'relation from'=>{de=>'Zuordnung von'},
