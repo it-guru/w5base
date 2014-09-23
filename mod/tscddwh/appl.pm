@@ -35,26 +35,27 @@ sub new
    return($self);
 }
 
+
 sub SetFilter
 {
    my $self=shift;
    my @flt=@_;
 
-   if ($#flt!=0 || ref($flt[0]) ne "HASH"){
-      $self->LastMsg("ERROR","invalid Filter request on $self");
-      return(undef);
+   if ($W5V2::OperationContext eq "W5Replicate"){
+      if ($#flt!=0 || ref($flt[0]) ne "HASH"){
+         $self->LastMsg("ERROR","invalid Filter request on $self");
+         return(undef);
+      }
+
+      my %f1=(%{$flt[0]});
+      $f1{cistatusid}=['3','4','5'];
+
+      my %f2=(%{$flt[0]});
+      $f2{cistatusid}=['6'];
+      $f2{mdate}=">now-28d";
+
+      @flt=([\%f1,\%f2]);
    }
-
-   my %f1=(%{$flt[0]});
-   $f1{cistatusid}=['3','4','5'];
-   my %f2=(%{$flt[0]});
-   $f2{cistatusid}=['6'];
-#   $f2{mdate}=">now-28d";
-
-   my @flt=([\%f1,\%f2]);
-
-   #print STDERR Dumper(\@flt);
-
    return($self->SUPER::SetFilter(@flt));
 }
 
