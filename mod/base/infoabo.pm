@@ -115,6 +115,7 @@ sub new
                    return(0);
                 },
                 label         =>'relation invalid since',
+                uploadable    =>0,
                 dataobjattr   =>'infoabo.invalidsince'),
                                                  
       new kernel::Field::Link(
