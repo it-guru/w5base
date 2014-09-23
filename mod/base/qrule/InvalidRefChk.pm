@@ -70,6 +70,8 @@ sub qcheckRecord
       my $fobj=$dataobj->getField($fieldname);
       my $t=$fobj->Type();
       next if ($fobj->{readonly} eq "1");
+      my $htmldetail=$fobj->htmldetail("HtmlDetail",current=>$rec);
+      next if (!$htmldetail);
       if (defined($fobj) && $fobj->Type()=~m/^($chkfieldtypes)$/){
          push(@fobjlst,$fobj);
       }
@@ -92,8 +94,6 @@ sub qcheckRecord
             }
 
          }
-      #   printf STDERR ("vjointo=%s",$fobj->{vjointo});
-      #   printf STDERR ("vjoinon=%s",$fobj->{vjoinon}->[0]);
       }
       else{
          my $val=$fobj->RawValue($rec);
