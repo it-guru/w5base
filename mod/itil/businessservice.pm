@@ -515,6 +515,7 @@ sub new
                 label         =>'implemented service times',
                 group         =>'desc',
                 readonly      =>1,
+                htmldetail    =>0,
                 tspantypeproc =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -539,6 +540,7 @@ sub new
                 label         =>'implemented support times',
                 group         =>'desc',
                 readonly      =>1,
+                htmldetail    =>0,
                 tspantypeproc =>sub{
                    my $self=shift;
                    my $current=shift;
