@@ -515,6 +515,21 @@ sub new
                 label         =>'implemented service times',
                 group         =>'desc',
                 readonly      =>1,
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on"){
+                      $blk->[4]="blue";
+                      $blk->[4]="blue" if ($blk->[3] eq "k");
+                      $blk->[4]="yellow" if ($blk->[3] eq "r");
+                   }
+                   if ($blk->[2] eq "off"){
+                      $blk->[4]="red";
+                   }
+                },
                 vjointo       =>'itil::servicesupport',
                 vjoinon       =>['implservicesupportid'=>'id'],
                 vjoindisp     =>'serivce'),
@@ -524,6 +539,21 @@ sub new
                 label         =>'implemented support times',
                 group         =>'desc',
                 readonly      =>1,
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on"){
+                      $blk->[4]="blue";
+                      $blk->[4]="blue" if ($blk->[3] eq "k");
+                      $blk->[4]="yellow" if ($blk->[3] eq "r");
+                   }
+                   if ($blk->[2] eq "off"){
+                      $blk->[4]="red";
+                   }
+                },
                 vjointo       =>'itil::servicesupport',
                 vjoinon       =>['implservicesupportid'=>'id'],
                 vjoindisp     =>'support'),
