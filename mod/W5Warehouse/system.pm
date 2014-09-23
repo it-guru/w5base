@@ -86,6 +86,26 @@ sub new
                 label         =>'found in TAD4D Integ',
                 dataobjattr   =>'is_t4di'),
 
+      new kernel::Field::Text(
+                name          =>'amtype',
+                label         =>'AM Type',
+                dataobjattr   =>'amtype'),
+
+      new kernel::Field::Text(
+                name          =>'ammodel',
+                label         =>'AM Model',
+                dataobjattr   =>'ammodel'),
+
+      new kernel::Field::Text(
+                name          =>'amusage',
+                label         =>'AM Usage',
+                dataobjattr   =>'amusage'),
+
+      new kernel::Field::Text(
+                name          =>'amnature',
+                label         =>'AM Nature',
+                dataobjattr   =>'amnature'),
+
    );
    $self->setWorktable("system_universum");
    $self->setDefaultView(qw(systemname systemid is_w5 is_am is_t4dp is_t4di
