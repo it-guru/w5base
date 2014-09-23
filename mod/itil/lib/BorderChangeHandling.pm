@@ -44,9 +44,10 @@ sub BorderChangeHandling
          $watchchanged++ if (effChanged($oldrec,$newrec,$f));
       } 
       if ($watchchanged){
+         my $ia=getModuleObject($self->Config,"base::infoabo");
          my $wfa=getModuleObject($self->Config,"base::workflowaction");
          my $id=effVal($oldrec,$newrec,"id");
-         my %u=(emailto=>{},emailcc=>{},emailbcc=>{11634953080001=>1});
+         my %u=(emailto=>{},emailcc=>{},emailbcc=>{});
          my %border;
          if ($self->SelfAsParentObject() eq "itil::appl"){
             ####################################################################
@@ -124,8 +125,11 @@ sub BorderChangeHandling
                if ($arec->{databossid} ne ""){
                   $u{emailto}->{$arec->{databossid}}++;
                }
-               $border{'itil::appl'}->{$arec->{id}}=
-                  $arec->{name}
+               $border{'itil::appl'}->{$arec->{id}}=$arec->{name};
+               $ia->LoadTargets($u{emailcc},\'itil::appl',
+                                \'genborderchange',\$arec->{id},
+                                 undef,                  
+                                 load=>'userid');
             }
          }
          ##################################################################
@@ -138,9 +142,23 @@ sub BorderChangeHandling
                   $u{emailto}->{$lrec->{databossid}}++;
                }
                $border{'itil::businessservice'}->{$lrec->{id}}=
-                  $lrec->{fullname}
+                  $lrec->{fullname};
+               $ia->LoadTargets($u{emailcc},\'itil::businessservice',
+                                \'genborderchange',\$lrec->{id},
+                                 undef,                  
+                                 load=>'userid');
             }
          }
+         #################################################################
+         # infoabo handling
+         my @to=keys(%{$u{emailto}});
+         $u{emailto}={};
+         $ia->LoadTargets($u{emailto},'base::staticinfoabo',
+                          \'STEVborderchange','110000004',
+                           \@to,
+                           default=>1,
+                           load=>'userid');
+
          ####################################################################
          # calculation of notification languages and filter activ users
          my $user=getModuleObject($self->Config,"base::user");
@@ -157,8 +175,8 @@ sub BorderChangeHandling
            $lang="en"  if ($lang eq "");
            $ul{$lang}->{$urec->{userid}}++;
          }
-         $ul{en}->{11634953080001}++;
-         $ul{de}->{11634953080001}++;
+         #$ul{en}->{11634953080001}++;  # debug with uid=hvogler
+         #$ul{de}->{11634953080001}++;
          ####################################################################
          # create and send notifications
          my $lastlang;

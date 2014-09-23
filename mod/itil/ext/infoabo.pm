@@ -45,6 +45,7 @@ sub getControlData
                                 },
            'itil::appl'    =>   {target=>'name',
                                  mode  =>[
+                                     'genborderchange'=>'itil::appl',
                                      'changenotify'=>'itil::appl',
                                      'eventnotify'=>'itil::appl',
                                      'daily_modified_appldiary'=>'itil::appl',
@@ -61,12 +62,16 @@ sub getControlData
                                  mode  =>['eventnotify'=>'itil::appl'],
                                 },
            'crm::businessprocess'=>{target=>'selector',
-                                 mode  =>['eventnotify'=>'itil::appl'],
+                                 mode  =>['eventnotify'=>'itil::appl',
+                                          'genborderchange'=>'itil::appl'],
                                 },
            'itil::network'=>    {target=>'name',
                                  mode  =>['eventnotify'=>'itil::appl'],
-                                }
- 
+                                },
+           'itil::businessservice'=>{target=>'fullname',
+              mode  =>[
+                 'genborderchange'=>'itil::businessservice',
+              ]}
           });
 
 }

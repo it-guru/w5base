@@ -865,6 +865,9 @@ sub LoadTargets
    my $userlist=shift;
    my %param=@_;
 
+   my $load=$param{load};   # load userid or email address
+   $load="email" if ($load eq "" || !($load ne "email" || $load eq "userid"));
+
    my $c=0;
    if (!defined($userlist)){
       $self->ResetFilter();
@@ -872,19 +875,19 @@ sub LoadTargets
                         usercistatusid=>"<=5",
                         parent=>$parent,
                         active=>\'1'});
-      foreach my $rec ($self->getHashList(qw(email))){
+      foreach my $rec ($self->getHashList(qw(userid email))){
          next if ($rec->{email} eq ""); # ensure entries are filtered, if the
                                         # contact entry has been deleted
-         if (!defined($desthash->{lc($rec->{email})})){
-            $desthash->{lc($rec->{email})}=[];
+         if (!defined($desthash->{lc($rec->{$load})})){
+            $desthash->{lc($rec->{$load})}=[];
          }
-         if (defined($desthash->{lc($rec->{email})}) &&
-             ref($desthash->{lc($rec->{email})}) ne "ARRAY"){
-            $desthash->{lc($rec->{email})}=[];
+         if (defined($desthash->{lc($rec->{$load})}) &&
+             ref($desthash->{lc($rec->{$load})}) ne "ARRAY"){
+            $desthash->{lc($rec->{$load})}=[];
          }
-         if (!defined($desthash->{lc($rec->{email})}) ||
-              ref($desthash->{lc($rec->{email})}) eq "ARRAY"){
-            push(@{$desthash->{lc($rec->{email})}},$rec->{id});
+         if (!defined($desthash->{lc($rec->{$load})}) ||
+              ref($desthash->{lc($rec->{$load})}) eq "ARRAY"){
+            push(@{$desthash->{lc($rec->{$load})}},$rec->{id});
          }
          $c++;
       }
@@ -905,10 +908,10 @@ sub LoadTargets
          @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
          if ($rec->{email} ne ""){
             if ($rec->{active} && $rec->{usercistatusid}<=5){
-               if (!defined($desthash->{lc($rec->{email})})){
-                  $desthash->{lc($rec->{email})}=[];
+               if (!defined($desthash->{lc($rec->{$load})})){
+                  $desthash->{lc($rec->{$load})}=[];
                }
-               push(@{$desthash->{lc($rec->{email})}},$rec->{id});
+               push(@{$desthash->{lc($rec->{$load})}},$rec->{id});
                $c++;
             }
          }
@@ -939,11 +942,11 @@ sub LoadTargets
          $self->ResetFilter();
          $self->SetFilter({refid=>$refid,mode=>$mode,active=>\'1',
                            parent=>$parent,userid=>$userlist});
-         foreach my $rec ($self->getHashList(qw(email))){
-            if (!defined($desthash->{lc($rec->{email})})){
-               $desthash->{lc($rec->{email})}=[];
+         foreach my $rec ($self->getHashList(qw(userid email))){
+            if (!defined($desthash->{lc($rec->{$load})})){
+               $desthash->{lc($rec->{$load})}=[];
             }
-            push(@{$desthash->{lc($rec->{email})}},$rec->{id});
+            push(@{$desthash->{lc($rec->{$load})}},$rec->{id});
          }
       }
    }

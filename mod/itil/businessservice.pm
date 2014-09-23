@@ -1885,19 +1885,21 @@ sub Validate
    my $applid=effVal($oldrec,$newrec,"applid");
 
    if ($applid eq ""){
-      my $userid=$self->getCurrentUserId();
-      if (!defined($oldrec)){
-         if (!defined($newrec->{databossid}) ||
-             $newrec->{databossid}==0){
-            $newrec->{databossid}=$userid;
+      if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+         my $userid=$self->getCurrentUserId();
+         if (!defined($oldrec)){
+            if (!defined($newrec->{databossid}) ||
+                $newrec->{databossid}==0){
+               $newrec->{databossid}=$userid;
+            }
          }
-      }
-      if (defined($newrec->{databossid}) &&
-          $newrec->{databossid}!=$userid &&
-          $newrec->{databossid}!=$oldrec->{databossid}){
-         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
-                              "as databoss");
-         return(0);
+         if (defined($newrec->{databossid}) &&
+             $newrec->{databossid}!=$userid &&
+             $newrec->{databossid}!=$oldrec->{databossid}){
+            $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                                 "as databoss");
+            return(0);
+         }
       }
       if (effVal($oldrec,$newrec,"mandatorid") eq ""){
          print STDERR Dumper($newrec);
