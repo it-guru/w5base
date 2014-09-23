@@ -510,6 +510,24 @@ sub new
                 vjoinon       =>['implservicesupportid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::TimeSpans(
+                name          =>'implserivcetimes',
+                label         =>'implemented service times',
+                group         =>'desc',
+                readonly      =>1,
+                vjointo       =>'itil::servicesupport',
+                vjoinon       =>['implservicesupportid'=>'id'],
+                vjoindisp     =>'serivce'),
+
+      new kernel::Field::TimeSpans(
+                name          =>'implsupporttimes',
+                label         =>'implemented support times',
+                group         =>'desc',
+                readonly      =>1,
+                vjointo       =>'itil::servicesupport',
+                vjoinon       =>['implservicesupportid'=>'id'],
+                vjoindisp     =>'support'),
+
       new kernel::Field::Link(
                 name          =>'implservicesupportid',
                 group         =>'desc',
@@ -2112,6 +2130,16 @@ sub TreeView
       
 
       printf("<tr><td>");
+      printf("<h3>".$self->T("implemented support times")."</h1> (%s)",
+             $self->getField("implservicesupport")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("<br>%s",
+             $self->getField("implsupporttimes")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("</td></tr>");
+      
+
+      printf("<tr><td>");
       printf("<h3>".$self->T("aggregated support times tree")."</h1>");
       printf("%s",
              $self->getField("supportTreeCheck")->
@@ -2130,6 +2158,15 @@ sub TreeView
                 FormatedDetail($rec,"HtmlDetail"));
       printf("%s",
              $self->getField("serivceReq")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("</td></tr>");
+      
+      printf("<tr><td>");
+      printf("<h3>".$self->T("implemented service times")."</h1> (%s)",
+             $self->getField("implservicesupport")->
+                FormatedDetail($rec,"HtmlDetail"));
+      printf("<br>%s",
+             $self->getField("implserivcetimes")->
                 FormatedDetail($rec,"HtmlDetail"));
       printf("</td></tr>");
       
