@@ -206,7 +206,7 @@ CREATE TABLE lnkcontact (
 CREATE TABLE infoabo (
   id         bigint(20)  NOT NULL,
   userid     bigint(20)  NOT NULL,
-  parentobj  varchar(20) NOT NULL,
+  parentobj  varchar(40) NOT NULL,
   refid      bigint(20)  NOT NULL,
   cistatus   int(2)      NOT NULL,
   active     int(1) default '1',
