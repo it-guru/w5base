@@ -142,3 +142,4 @@
 'SAL.'=>{de=>'neutral',en=>'neutral'},
 'SAL.f'=>{de=>'Frau',en=>'Miss'},
 'SAL.m'=>{de=>'Herr',en=>'Mister'},
+'STEVborderchange'=>{de=>'Info bei Änderung tangierender Elemente über die Funktion oder Rolle',en=>'automatic border-change notification by function or role'},
