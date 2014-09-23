@@ -1,0 +1,2 @@
+'itil::qrule::check_bs_parentref'=>{de=>'Statusprüfung der übergeordneten Service-Komponenten',en=>'State-Check of parent service components'},
+'invalid state in parent elemente'=>{de=>'ungültiger Status im übergeordneten Element'},
