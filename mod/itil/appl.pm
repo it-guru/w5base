@@ -1448,6 +1448,7 @@ sub new
                 label         =>'WF:event notification customer info targets',
                 htmldetail    =>0,
                 searchable    =>0,
+                readonly      =>1,
                 uploadable    =>0,
                 group         =>'workflowbasedata',
                 onRawValue    =>\&getWfEventNotifyTargets),
