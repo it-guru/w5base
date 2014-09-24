@@ -108,12 +108,15 @@ sub new
                                  'RPRManager2',                # ITIL role
                                  'RODManager',                 # ITIL role
                                  'RODManager2',                # ITIL role
+                                 'RCAManager',                 # ITIL role
+                                 'RCAManager2',                # ITIL role
                                  'RITDemandMgr',               # IT role
                                  'RINOperator',                # ITIL role
                                  'RCHOperator',                # ITIL role
                                  'RCFOperator',                # ITIL role
                                  'RPROperator',                # ITIL role
                                  'RLIOperator',                # ITIL role
+                                 'RCAOperator',                # ITIL role
                                  'RAdmin',                     # W5Base role
                                  'RDataAdmin',                 # W5Base role
                                  'RContactAdmin',              # W5Base role
