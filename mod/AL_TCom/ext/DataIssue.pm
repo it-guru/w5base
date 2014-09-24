@@ -51,6 +51,26 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'AL_TCom::businessservice',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
+             dataobj   =>'AL_TCom::businessserviceITS',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
+             dataobj   =>'AL_TCom::businessserviceES',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
+             dataobj   =>'AL_TCom::businessserviceTA',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'AL_TCom::asset',
              target    =>'name',
              targetid  =>'id'

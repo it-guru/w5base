@@ -56,3 +56,4 @@ alter table businessservice add contact1 bigint(20),add contact2 bigint(20),add 
 alter table businessservice add shortname varchar(10);
 alter table businessservice drop key fullname, add unique fullname(nature,name,shortname);
 alter table businessservice add implservicesupport  bigint(20);
+alter table businessservice add lastqcheck datetime default NULL,add key(lastqcheck);

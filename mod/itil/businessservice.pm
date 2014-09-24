@@ -589,7 +589,10 @@ sub new
                 vjointo       =>'itil::lnkbscomp',
                 allowcleanup  =>1,
                 vjoinon       =>['id'=>'obj1id'],
-                vjoindisp     =>['uppername']),
+                vjoindisp     =>['uppername'],
+                vjoininhash   =>['sortkey','lnkpos','id','objtype',
+                                 'obj1id','obj2id','obj3id','comments',
+                                 'uppername','businessserviceid']),
 
       new kernel::Field::SubList(
                 name          =>'servicecomp',
@@ -1249,6 +1252,14 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>"$worktable.realeditor"),
+
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>"$worktable.lastqcheck"),
+      new kernel::Field::QualityResponseArea(),
 
       new kernel::Field::Link(
                 name          =>'sectarget',

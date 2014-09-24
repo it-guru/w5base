@@ -61,6 +61,11 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'itil::businessservice',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'itil::appladv',
              target    =>'fullname',
              targetid  =>'id'
@@ -105,6 +110,7 @@ sub DataIssueCompleteWriteRequest
        ($affectedobject=~m/::swinstance$/) ||
        ($affectedobject=~m/::itclust$/) ||
        ($affectedobject=~m/::mgmtitemgroup$/) ||
+       ($affectedobject=~m/::businessservice$/) ||
        ($affectedobject=~m/::applnor$/) ||
        ($affectedobject=~m/::appladv$/) ||
        ($affectedobject=~m/::lnkapplurl$/) ||
