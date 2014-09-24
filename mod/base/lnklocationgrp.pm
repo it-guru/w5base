@@ -44,6 +44,7 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'lnklocationgrp.id'),
 
+
       new kernel::Field::TextDrop(
                 name          =>'location',
                 label         =>'Location',
@@ -73,6 +74,24 @@ sub new
                 value         =>['RMbusinesrel1','RMbusinesrel2',
                                  'RMbusinesrel3'],
                 dataobjattr   =>'lnklocationgrp.relmode'),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                htmldetail    =>0,
+                label         =>'Fullname',
+                depend        =>['location','relmode','grp'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+
+                   my $l=$self->getParent->getField("location")->
+                         FormatedDetail($rec,"AscV01");
+                   my $r=$self->getParent->getField("relmode")->
+                         FormatedDetail($rec,"AscV01");
+                   my $g=$self->getParent->getField("grp")->
+                         FormatedDetail($rec,"AscV01");
+                   return("$l-$g-$r");
+                }),
 
       new kernel::Field::Text(
                 name          =>'comments',

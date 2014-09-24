@@ -35,6 +35,7 @@ sub getControlRecord
 {
    my $self=shift;
    my $d=[ 
+
            menuentry=>{
              replaceoptype=>'base::grp',
              dataobj      =>'base::menuacl',
@@ -58,6 +59,14 @@ sub getControlRecord
              idfield      =>'targetid',
              targetlabel  =>'fullname',
              baseflt      =>{target=>\'base::grp'}
+           },
+           locationgrp=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'base::lnklocationgrp',
+             target       =>'grp',
+             idfield      =>'grpid',
+             targetlabel  =>'fullname',
+             baseflt      =>{}
            },
            usercontact=>{
              replaceoptype=>'base::user',
