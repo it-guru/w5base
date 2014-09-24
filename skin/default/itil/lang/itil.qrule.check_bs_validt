@@ -1,0 +1,2 @@
+'itil::qrule::check_bs_validt'=>{de=>'Prüfung ob Businessservice außerhalb von Laufzeit installiert/aktiv',en=>'Check if businessservice is outside duration timespan in installed/atkvie state'},
+'businessservice outside duration start/end in state installed/active'=>{de=>'Businessservice außerhalb von Laufzeit Begin/Ende in installiert/aktiv CI-Status'},
