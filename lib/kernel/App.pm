@@ -304,15 +304,17 @@ sub getMembersOf
    my $self=shift;
    my $group=shift;
    my $roles=shift;
-   my $direction=shift;
+   my $direction=shift;  # posible = up down both (firstup)
    $direction="down" if (!defined($direction));
    $group=[$group]      if (ref($group) ne "ARRAY");
    $roles=["RMember"]   if (!defined($roles));
    my %allgrp;
    my %userids;
 
+   my $LoadGroups_direction=$direction;
+   $LoadGroups_direction="up" if ($direction eq "firstup");
    foreach my $directgrp (@$group){
-      $self->LoadGroups(\%allgrp,$direction,$directgrp);
+      $self->LoadGroups(\%allgrp,$LoadGroups_direction,$directgrp);
    }
    my $rolelink=$self->getPersistentModuleObject("getMembersOf",
                                                 "base::lnkgrpuserrole");
@@ -320,6 +322,24 @@ sub getMembersOf
    $rolelink->SetFilter({grpid=>\@grpids,role=>$roles,
                          expiration=>">now OR [LEER]",    #to handle expiration
                          cistatusid=>[3,4]});
+   if ($direction eq "firstup"){
+      my @uids;
+      $rolelink->SetCurrentView(qw(userid grpid));
+      my $d=$rolelink->getHashIndexed(qw(grpid));
+      foreach my $grprec (sort({
+                            $a->{distance} <=> $b->{distance}
+                         } values(%allgrp))){
+         if (exists($d->{grpid}->{$grprec->{grpid}})){
+            my $l=$d->{grpid}->{$grprec->{grpid}};
+            $l=[$l] if (ref($l) ne "ARRAY");
+            foreach my $lnkrec (@$l){
+               push(@uids,$lnkrec->{userid});
+            }
+            last;
+         }
+      }
+      return(@uids);
+   }
    map({$userids{$_->{userid}}++;} $rolelink->getHashList(qw(userid)));
 
    return(keys(%userids));
