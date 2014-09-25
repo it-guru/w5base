@@ -39,6 +39,7 @@ sub NotifyMgmtItemGroupOnOff
 
    my $lnkobj=getModuleObject($self->Config,"itil::lnkmgmtitemgroup");
    my $user  =getModuleObject($self->Config,"base::user");
+   my $msgcnt; # number of sent messages
 
    ## added to mgmtitemgroup
    $lnkobj->ResetFilter;
@@ -55,6 +56,7 @@ sub NotifyMgmtItemGroupOnOff
       if (defined($r)) {
          $lnkobj->UpdateRecord({notify1on=>NowStamp("en")},
                                {id=>$n->{id}});
+         $msgcnt++;
       }
    }
 
@@ -74,6 +76,7 @@ sub NotifyMgmtItemGroupOnOff
       if (defined($r)) {
          $lnkobj->UpdateRecord({notify1off=>NowStamp("en")},
                                {id=>$n->{id}});
+         $msgcnt++;
       }
    }
 
@@ -93,10 +96,11 @@ sub NotifyMgmtItemGroupOnOff
       if (defined($r)) {
          $lnkobj->UpdateRecord({notify1off=>NowStamp("en")},
                                {id=>$n->{id}});
+         $msgcnt++;
       }
    }
 
-   return({exitcode=>0});
+   return({exitcode=>0,exitmsg=>"$msgcnt notification(s) sent"});
 }
 
 
