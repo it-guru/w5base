@@ -496,6 +496,28 @@ sub CalcDepr
 }
 
 
+sub SetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if ($W5V2::OperationContext eq "W5Replicate"){
+      if ($#flt!=0 || ref($flt[0]) ne "HASH"){
+         $self->LastMsg("ERROR","invalid Filter request on $self");
+         return(undef);
+      }
+
+      my %f1=(%{$flt[0]});
+      $f1{status}='!"wasted"';
+
+      @flt=([\%f1]);
+   }
+   return($self->SUPER::SetFilter(@flt));
+}
+
+
+
+
 sub getSqlFrom
 {
    my $self=shift;
