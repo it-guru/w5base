@@ -189,6 +189,9 @@ sub WriteToStdout
                   }
                   syswrite($fh,$d);
                }
+               if ($app->can("FinishView")){
+                  $app->FinishView($rec);
+               }
             }
             else{
                $self->Context->{CurrentLimit}++; # fix to handel isViewValid

@@ -2122,6 +2122,13 @@ sub ValidatedDeleteRecordTransactionless
    return($bak);
 }
 
+sub FinishView    # called on finsh view of one record (f.e. to reset caches)
+{
+   my $self=shift;
+   my $rec=shift;
+
+}
+
 sub SendRemoteEvent
 {
    my $self=shift;

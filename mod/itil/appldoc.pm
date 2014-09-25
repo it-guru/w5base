@@ -356,6 +356,17 @@ sub handleRawValueAutogenField
    return("NONE"); 
 }
 
+sub FinishView    # called on finsh view of one record (f.e. to reset caches)
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $c=$self->Cache();
+
+   delete($c->{autoFillCache});
+}
+
+
 sub autoFillAddResultCache
 {
    my $self=shift;
