@@ -41,6 +41,14 @@ sub Init
    $self->RegisterObj("itu.W5Warehouse.system",
                       "W5Warehouse::system",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.W5Warehouse.krn",
+                      "tmpl/welcome",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itu.W5Warehouse.krn.views",
+                      "W5Warehouse::uview",
+                      defaultacl=>['admin']);
    
    return($self);
 }
