@@ -355,6 +355,16 @@ sub Validate
       }
    }
 
+   if (effChanged($oldrec,$newrec,"lnkfrom")) {
+      $newrec->{notify1on}=undef;
+   }   
+   if (effChanged($oldrec,$newrec,"lnkto")) {
+      if (!defined $newrec->{lnkto}) {
+         $newrec->{notify1off}='1970-01-01 00:00:00';
+      } else {
+         $newrec->{notify1off}=undef;
+      }
+   }   
 
    return(1);
 }

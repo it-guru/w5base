@@ -77,6 +77,25 @@ sub NotifyMgmtItemGroupOnOff
       }
    }
 
+   ## removed from mgmtitemgroup has been retracted
+   $lnkobj->ResetFilter;
+   $lnkobj->SetFilter({notify1off=>\'1970-00-00 00:00:00',
+                       grouptype =>\'PCONTROL',
+                       lnkto     =>'[EMPTY]'});
+
+   # collect all data needed for Notification
+   $notifyparams=undef;
+   $notifyparams=$self->getNotifyParam($lnkobj,$user);
+
+   # notify
+   foreach my $n (@$notifyparams) {
+      my $r=$self->notify($n,'roff');
+      if (defined($r)) {
+         $lnkobj->UpdateRecord({notify1off=>NowStamp("en")},
+                               {id=>$n->{id}});
+      }
+   }
+
    return({exitcode=>0});
 }
 
@@ -85,7 +104,7 @@ sub notify
 {
    my $self=shift;
    my $par=shift;
-   my $act=shift; # 'on' or 'off'
+   my $act=shift; # 'on', 'off' or 'roff' (lnkto deleted)
 
    $ENV{HTTP_FORCE_LANGUAGE}=$par->{lang} if $par->{lang} ne "";
       
