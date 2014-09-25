@@ -51,11 +51,25 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'view_name'),
 
+      new kernel::Field::Text(
+                name          =>'ifaceuser',
+                label         =>'Interface User',
+                ignorecase    =>1,
+                dataobjattr   =>"decode(regexp_replace(view_name,'_.*',''),".
+                                "NULL,'[ANY]',".
+                                "upper(regexp_replace(view_name,'_.*','')))"),
+
+      new kernel::Field::Text(
+                name          =>'ifacetable',
+                label         =>'Interface Table',
+                ignorecase    =>1,
+                dataobjattr   =>"regexp_replace(view_name,'^.*_','')"),
+
       new kernel::Field::Textarea(
                 name          =>'viewcommand',
                 label         =>'View Command',
-                searchable    =>0,
                 htmldetail    =>0,
+                searchable    =>0,
                 ignorecase    =>1,
                 dataobjattr   =>'text'),
 
@@ -63,18 +77,30 @@ sub new
                 name          =>'recreatecommand',
                 label         =>'Recreate Command',
                 htmlheight    =>'400px',
-                depend        =>['name','viewcommand'],
+                searchable    =>0,
+                depend        =>['name','viewcommand','ifaceuser','ifacetable'],
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return("create or replace view \"".$current->{name}."\"".
+                   my $n="create or replace view \"".$current->{name}."\"".
                           " as\n".
-                          $current->{viewcommand}.";\n\n");
+                          $current->{viewcommand}.";\n\n";
+                   $n.="grant select on \"$current->{name}\" to W5I;\n";
+                   if ($current->{ifaceuser} ne "" &&
+                       $current->{ifaceuser} ne "[ANY]"){
+                      $n.="grant select on \"$current->{name}\" to ".
+                          $current->{ifaceuser}.";\n".
+                          "create or replace synonym ".
+                          $current->{ifaceuser}.".".$current->{ifacetable}." ".
+                          "for \"$current->{name}\";\n".
+                          "\n\n";
+                   }
+                   return($n);
                 }),
 
    );
    $self->setWorktable("all_views");
-   $self->setDefaultView(qw(linenumber name));
+   $self->setDefaultView(qw(linenumber ifaceuser ifacetable name));
    return($self);
 }
 
@@ -97,16 +123,6 @@ sub initSqlWhere
 }
 
 
-
-
-sub initSearchQuery
-{
-   my $self=shift;
-   if (!defined(Query->Param("search_saphier"))){
-     Query->Param("search_saphier"=>
-                  "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
-   }
-}
 
 
 1;
