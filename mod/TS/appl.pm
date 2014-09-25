@@ -51,7 +51,8 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 searchable    =>0,
-                depend        =>['tsmid','opmid','applmgrid','contacts'],
+                depend        =>['tsmid','opmid','applmgrid','contacts',
+                                 'systems','businessteamid'],
                 group         =>'technical',
                 label         =>'base Application Expert Group',
                 onRawValue    =>\&calcBaseApplicationExpertGroup),
@@ -391,52 +392,6 @@ sub calcBaseApplicationExpertGroup
       }
    }
 
-   #######################################################################
-   # 
-   # tempoary add I-Network informations
-   # 
-   my $inaeg=getModuleObject($self->Config,"inetwork::aeg");
-   my $tswiw=getModuleObject($self->Config,"tswiw::user");
-   if (defined($inaeg)){
-      $inaeg->SetFilter({w5baseid=>\$rec->{id}});
-      foreach my $inrec ($inaeg->getHashList(qw(smemail pmeemail
-                                                sdemail))){
-          if ($inrec->{smemail} ne ""){
-             my $smuserid=$tswiw->GetW5BaseUserID($inrec->{smemail});
-             if ($smuserid ne ""){
-                if (!in_array($a{applmgr}->{userid},$smuserid)){
-                   push(@{$a{applmgr}->{userid}},$smuserid);
-                }
-             }
-             else{
-                msg(ERROR,"unable to resolv $inrec->{smemail} from I-Network");
-             }
-          }
-          if ($inrec->{pmeemail} ne ""){
-             my $pmeuserid=$tswiw->GetW5BaseUserID($inrec->{pmeemail});
-             if ($pmeuserid ne ""){
-                if (!in_array($a{pmdev}->{userid},$pmeuserid)){
-                   push(@{$a{pmdev}->{userid}},$pmeuserid);
-                }
-             }
-             else{
-                msg(ERROR,"unable to resolv $inrec->{pmeemail} from I-Network");
-             }
-          }
-          if ($inrec->{sdemail} ne ""){
-             my $sduserid=$tswiw->GetW5BaseUserID($inrec->{sdemail});
-             if ($sduserid ne ""){
-                if (!in_array($a{sdesign}->{userid},$sduserid)){
-                   push(@{$a{sdesign}->{userid}},$sduserid);
-                }
-             }
-             else{
-                msg(ERROR,"unable to resolv $inrec->{sdemail} from I-Network");
-             }
-          }
-      }
-   }
-   #######################################################################
 
    my $swi=getModuleObject($self->getParent->Config,"itil::swinstance");
    $swi->SetFilter({cistatusid=>\'4',applid=>\$rec->{id},
@@ -489,6 +444,34 @@ sub calcBaseApplicationExpertGroup
          }
       }
    }
+
+   # add IT-SeM
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14074110550001
+   my @sid=();
+   foreach my $sysrec (@{$appl->getField("systems")->RawValue($rec)}){
+      push(@sid,$sysrec->{systemid}); 
+   }
+   my $o=getModuleObject($self->getParent->Config,"itil::system");
+   $o->SetFilter({id=>\@sid});
+   my @co=$o->getVal("conumber");
+   my $o=getModuleObject($self->getParent->Config,"itil::costcenter");
+   $o->SetFilter({name=>\@co});
+   foreach my $corec ($o->getHashList(qw(itsemid))){
+      if ($corec->{itsemid} ne ""){
+         push(@{$a{itsem}->{userid}},$corec->{itsemid});
+      }
+   }
+
+   # add Capacitymanager
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14074110550001
+   if ($rec->{businessteamid} ne ""){
+      my @uids=$user->getMembersOf($rec->{businessteamid},
+                                   [qw(RCAOperator)],"firstup");
+      foreach my $uid (@uids){
+         push(@{$a{capmgr}->{userid}},$uid);
+      }
+   }
+   
 
    foreach my $k (keys(%a)){  # fillup AEG
       next if ($k eq "AEG");
