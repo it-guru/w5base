@@ -212,7 +212,6 @@ sub doIPanalyse
          $itclust->SetFilter({id=>\$rec->{itclustid}});
          my ($itclustrec)=$itclust->getOnlyFirst(qw(systems)); 
          if (defined($itclustrec)){
-            print STDERR Dumper($itclustrec);
             foreach my $s (@{$itclustrec->{systems}}){
                if (!in_array([map({$_->{systemid}} 
                                   @{$a{$systemname}->{nodes}})],

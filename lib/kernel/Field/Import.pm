@@ -62,6 +62,7 @@ sub new
             $fo{$fkey}=$param{$fkey};
          }
       }
+      delete($fo{vjoinbase});   # vjoinbase kann nicht importiert werden!
       if (defined($param{vjoinon})){   
          $fo{vjointo}=$param{vjointo};
          $fo{vjoinon}=$param{vjoinon};

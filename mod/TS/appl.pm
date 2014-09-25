@@ -333,6 +333,13 @@ sub calcBaseApplicationExpertGroup
                 label=>$self->getParent->T("Projectmanager Development",
                                            'itil::ext::lnkcontact'),
             },
+            'itsem'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>"IT-Servicemanager"
+            },
             'leadprmmgr'=>{
                 userid=>[],
                 email=>[],
@@ -346,6 +353,20 @@ sub calcBaseApplicationExpertGroup
                 sindex=>$index++,
                 phonename=>[],
                 label=>"Lead Incident Manager"
+            },
+            'chmmgr'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>"Change Manager"
+            },
+            'capmgr'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>"Capacity Manager"
             },
             'AEG'=>{
                 userid=>[],
@@ -431,15 +452,41 @@ sub calcBaseApplicationExpertGroup
 
    #  add Lead Problem Manager from AEG Management based on 
    # https://darwin.telekom.de/darwin/auth/base/workflow/ById/13741398140002
+   # modified by
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14074110550001
    my $aegm=getModuleObject($self->getParent->Config,"AL_TCom::aegmgmt");
    if (defined($aegm)){
       $aegm->SetFilter({id=>\$rec->{id}});
       my ($mgmtrec,$msg)=$aegm->getOnlyFirst(qw(leadprmmgrid leadinmmgrid));
-      if (defined($mgmtrec) && $mgmtrec->{leadprmmgrid} ne ""){
-         push(@{$a{leadprmmgr}->{userid}},$mgmtrec->{leadprmmgrid});
+      if (defined($mgmtrec)){
+         if ($mgmtrec->{leadprmmgrid} ne ""){
+            push(@{$a{leadprmmgr}->{userid}},$mgmtrec->{leadprmmgrid});
+         }
+         else{
+            push(@{$a{leadprmmgr}->{userid}},14111237770001);
+         }
+         if ($mgmtrec->{leadinmmgrid} ne ""){
+            push(@{$a{leadinmmgr}->{userid}},$mgmtrec->{leadinmmgrid});
+         }
+         else{
+            push(@{$a{leadinmmgr}->{userid}},13581667950003);
+         }
       }
-      if (defined($mgmtrec) && $mgmtrec->{leadinmmgrid} ne ""){
-         push(@{$a{leadinmmgr}->{userid}},$mgmtrec->{leadinmmgrid});
+   }
+
+   # add Changemanager
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14074110550001
+   my $chmm=getModuleObject($self->getParent->Config,"itil::chmmgmt");
+   if (defined($chmm)){
+      $chmm->SetFilter({id=>\$rec->{id}});
+      my ($chmrec,$msg)=$chmm->getOnlyFirst(qw(chmgrfmbid));
+      if (defined($chmrec)){
+         if ($chmrec->{chmgrfmbid} ne ""){
+            push(@{$a{chmmgr}->{userid}},$chmrec->{chmgrfmbid});
+         }
+         else{
+            push(@{$a{chmmgr}->{userid}},13721598690001);
+         }
       }
    }
 
