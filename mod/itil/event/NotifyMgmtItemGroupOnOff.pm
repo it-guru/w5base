@@ -39,7 +39,7 @@ sub NotifyMgmtItemGroupOnOff
 
    my $lnkobj=getModuleObject($self->Config,"itil::lnkmgmtitemgroup");
    my $user  =getModuleObject($self->Config,"base::user");
-   my $msgcnt; # number of sent messages
+   my $msgcnt=0; # number of sent messages
 
    ## added to mgmtitemgroup
    $lnkobj->ResetFilter;
@@ -100,7 +100,7 @@ sub NotifyMgmtItemGroupOnOff
       }
    }
 
-   return({exitcode=>0,exitmsg=>"$msgcnt notification(s) sent"});
+   return({exitcode=>0,msg=>"$msgcnt notification(s) sent"});
 }
 
 
