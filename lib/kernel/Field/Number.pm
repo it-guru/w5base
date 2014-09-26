@@ -146,6 +146,25 @@ sub Unformat
    return({});
 }
 
+
+sub prepUploadRecord   # prepair one record on upload
+{
+   my $self=shift;
+   my $newrec=shift;
+   my $oldrec=shift;
+   my $bk=$self->Unformat([$newrec->{$self->{name}}],$newrec);
+
+   if (defined($bk)){
+      if (exists($bk->{$self->{name}})){
+         $newrec->{$self->{name}}=$bk->{$self->{name}};
+      }
+   }
+   return(1);
+}
+
+
+
+
 sub Validate
 {
    my $self=shift;
@@ -156,8 +175,7 @@ sub Validate
    if (defined($newrec->{$self->Name()})){
       if (ref($self->{editrange}) eq "ARRAY"){
          my $d=$newrec->{$self->Name()};
-         if ($d ne "" &&
-             !($d>=$self->{editrange}->[0] && $d<=$self->{editrange}->[1])){
+         if (!($d>=$self->{editrange}->[0] && $d<=$self->{editrange}->[1])){
             $self->getParent->LastMsg(ERROR,
                 sprintf(
                    $self->getParent->T(

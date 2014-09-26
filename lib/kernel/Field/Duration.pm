@@ -161,7 +161,10 @@ sub Unformat
             $formated=($h*60*60)+($m*60);
          } 
          else{
-            $self->getParent->LastMsg(ERROR,"invalid format for duration");
+            $self->getParent->LastMsg(ERROR,
+                  sprintf($self->getParent->T(
+                          'invalid format for duration for "%s"'),
+                          $self->Label()));
             return(undef);
          }
       }
@@ -170,6 +173,23 @@ sub Unformat
    }
    return({});
 }
+
+sub prepUploadRecord   # prepair one record on upload
+{
+   my $self=shift;
+   my $newrec=shift;
+   my $oldrec=shift;
+   my $bk=$self->Unformat([$newrec->{$self->{name}}],$newrec);
+
+   if (defined($bk)){
+      if (exists($bk->{$self->{name}})){
+         $newrec->{$self->{name}}=$bk->{$self->{name}};
+      }
+   }
+   return(1);
+}
+
+
 
 
 
