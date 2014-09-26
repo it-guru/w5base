@@ -1,1 +1,1 @@
-'invalid format for duration'=>{de=>'ungültiges Format zur Zeitdauerangabe'},
+'invalid format for duration for "%s"'=>{de=>'ungültiges Format zur Zeitdauerangabe in "%s"'},
