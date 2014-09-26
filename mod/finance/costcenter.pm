@@ -136,7 +136,7 @@ sub new
                 group         =>'itsem',
                 dataobjattr   =>'costcenter.itsemteam'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'itsem',
                 group         =>'itsem',
                 label         =>'IT Servicemanager',
