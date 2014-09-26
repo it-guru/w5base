@@ -63,7 +63,7 @@ sub new
                 name          =>'ifacetable',
                 label         =>'Interface Table',
                 ignorecase    =>1,
-                dataobjattr   =>"regexp_replace(view_name,'^.*_','')"),
+                dataobjattr   =>"regexp_replace(view_name,'^.*?_','')"),
 
       new kernel::Field::Textarea(
                 name          =>'viewcommand',
