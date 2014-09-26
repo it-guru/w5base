@@ -186,6 +186,7 @@ sub new
       new kernel::Field::Htmlarea(
                 name          =>'grppresentation',
                 label         =>'Team-View Presentation',
+                searchable    =>0,
                 group         =>'teamview',
                 dataobjattr   =>'grp.grppresentation'),
 
