@@ -2353,6 +2353,11 @@ sub Upload
                                             my $label=$fieldname;
                                             if (defined($fobj)){
                                                $label=$fobj->Label();
+                                               my $fieldHeader="";
+                                               $fobj->extendFieldHeader(
+                                                   "Upload",{},\$fieldHeader,
+                                                   $self->Self);
+                                                   $label.=$fieldHeader;
                                             }
                                             if (!defined($fobj)){
                                                $self->LastMsg(ERROR,
@@ -2368,7 +2373,7 @@ sub Upload
                                                   'field "%s" is not '.
                                                   'allowed to be '.
                                                   'uploaded',
-                                                  $label);
+                                                  $label."($fieldname)");
                                                $fldchk=0;
                                                last;
                                             }

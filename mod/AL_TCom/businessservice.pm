@@ -114,6 +114,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'vsmname',
                 precision     =>2,
+                readonly      =>1,
                 group         =>'VSMmeasurements',
                 label         =>'VSM HashTag',
                 vjointo       =>'tsvsm::itsperf',
@@ -123,6 +124,7 @@ sub new
       new kernel::Field::Percent(
                 name          =>'vsmavail',
                 precision     =>2,
+                readonly      =>1,
                 weblinkto     =>'NONE',
                 group         =>'VSMmeasurements',
                 label         =>'VSM availibility',
@@ -134,6 +136,7 @@ sub new
       new kernel::Field::Percent(
                 name          =>'vsmperf',
                 precision     =>2,
+                readonly      =>1,
                 group         =>'VSMmeasurements',
                 weblinkto     =>'NONE',
                 label         =>'VSM performance',
@@ -145,6 +148,7 @@ sub new
       new kernel::Field::Percent(
                 name          =>'vsmquality',
                 group         =>'VSMmeasurements',
+                readonly      =>1,
                 weblinkto     =>'NONE',
                 precision     =>2,
                 label         =>'VSM quality',
@@ -230,20 +234,6 @@ sub isViewValid
    return(@l);
 }
 
-
-sub isWriteValid
-{
-   my $self=shift;
-   my $rec=shift;
-
-   my @l=$self->SUPER::isWriteValid($rec);
-
-   #if (in_array(\@l,["desc","ALL"])){
-   #   push(@l,"contactpersons");
-   #}
-
-   return(@l);
-}
 
 
 

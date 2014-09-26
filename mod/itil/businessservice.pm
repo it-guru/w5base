@@ -267,8 +267,10 @@ sub new
       new kernel::Field::TimeSpans(
                 name          =>'supportReq',
                 label         =>'requested service times',
-                htmldetail    =>0,
+                uploadable    =>0,
+                readonly      =>1,
                 searchable    =>0,
+                htmldetail    =>0,
                 tspantype     =>['R','K'],
                 tspanlegend   =>1,
                 tspantypeproc =>sub{
@@ -305,6 +307,8 @@ sub new
       new kernel::Field::TimeSpans(
                 name          =>'supportTreeCheck',
                 htmldetail    =>0,
+                uploadable    =>0,
+                readonly      =>1,
                 searchable    =>0,
                 label         =>'aggregated service times tree',
                 tspantype     =>{'k'=>'core replaced by border time',
@@ -350,6 +354,8 @@ sub new
                 name          =>'serivceReq',
                 label         =>'requested service times',
                 htmldetail    =>0,
+                uploadable    =>0,
+                readonly      =>1,
                 searchable    =>0,
                 tspantype     =>['R','K'],
                 tspanlegend   =>1,
@@ -387,6 +393,8 @@ sub new
       new kernel::Field::TimeSpans(
                 name          =>'serivceTreeCheck',
                 htmldetail    =>0,
+                uploadable    =>0,
+                readonly      =>1,
                 searchable    =>0,
                 label         =>'aggregated service times tree',
                 tspantype     =>{'k'=>'core replaced by border time',
@@ -433,6 +441,7 @@ sub new
                 label         =>'Reporting Label',
                 vjointo       =>'itil::lnkmgmtitemgroup',
                 group         =>'reporting',
+                uploadable    =>0,
                 searchable    =>0,
                 htmldetail    =>0,
                 htmldetail    =>sub{
@@ -705,7 +714,7 @@ sub new
                 precision     =>2, 
                 label         =>'MTBF',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
                 dataobjattr   =>$worktable.'.th_warn_mtbf'),
 
       new kernel::Field::Duration(
@@ -738,7 +747,7 @@ sub new
                 precision     =>2,
                 label         =>'MTBF',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
                 dataobjattr   =>$worktable.'.th_crit_mtbf'),
 
 
@@ -804,7 +813,7 @@ sub new
                 precision     =>2, 
                 label         =>'TTR',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
                 dataobjattr   =>$worktable.'.th_warn_ttr'),
 
       new kernel::Field::Duration(
@@ -837,7 +846,7 @@ sub new
                 precision     =>2, 
                 label         =>'TTR',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
                 dataobjattr   =>$worktable.'.th_crit_ttr'),
 
       new kernel::Field::Duration(
@@ -909,7 +918,7 @@ sub new
                 editrange     =>[0.01,5.0],
                 label         =>'avalability',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
                 dataobjattr   =>$worktable.'.th_warn_avail'),
 
       new kernel::Field::Percent(
@@ -942,7 +951,7 @@ sub new
                 editrange     =>[0.01,5.0],
                 label         =>'avalability',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
                 dataobjattr   =>$worktable.'.th_crit_avail'),
 
       new kernel::Field::Percent(
@@ -1001,7 +1010,7 @@ sub new
                 editrange     =>[0.01,5.0],
                 label         =>'responsetime',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
                 dataobjattr   =>$worktable.'.th_warn_respti'),
 
       new kernel::Field::Number(
@@ -1034,7 +1043,7 @@ sub new
                 precision     =>2, 
                 label         =>'responsetime',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
                 dataobjattr   =>$worktable.'.th_crit_respti'),
 
       new kernel::Field::Number(
@@ -1089,7 +1098,7 @@ sub new
                 precision     =>2, 
                 label         =>'performance',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
+                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
                 dataobjattr   =>$worktable.'.th_warn_perf'),
 
       new kernel::Field::Number(
@@ -1113,7 +1122,7 @@ sub new
                 precision     =>2, 
                 label         =>'performance',
                 align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
+                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
                 dataobjattr   =>$worktable.'.th_crit_perf'),
 
       new kernel::Field::Number(
@@ -1203,7 +1212,7 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>$worktable.'.srcload'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
@@ -1651,10 +1660,23 @@ sub extLabelPostfixCurrent
 sub extLabelPostfixTHCrit
 {
    my $self=shift;
-   return(" - ".$self->getParent->T("threshold fact. crit"));
+   return(" - ".$self->getParent->T("threshold crit"));
 }
 
 sub extLabelPostfixTHWarn
+{
+   my $self=shift;
+   return(" - ".$self->getParent->T("threshold warn"));
+}
+
+
+sub extLabelPostfixTHfactCrit
+{
+   my $self=shift;
+   return(" - ".$self->getParent->T("threshold fact. crit"));
+}
+
+sub extLabelPostfixTHfactWarn
 {
    my $self=shift;
    return(" - ".$self->getParent->T("threshold fact. warn"));
@@ -1940,7 +1962,8 @@ sub isWriteValid
    my $rec=shift;
    my @l;
 
-   return("default") if (!defined($rec));
+   return("default","sla","reporting","moni","desc",
+          "monicomments") if (!defined($rec));
    if ($rec->{applid} ne ""){
       if ($self->isParentWriteable($rec->{applid})){
          push(@l,"default","desc","servicecomp");

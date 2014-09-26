@@ -955,8 +955,20 @@ sub SecureValidate
                !grep(/^.*\.$wrfield$/,@$wrgroups) && 
                !$writeok &&
                !($fo->Type() eq "Id"))){
+             my $fieldname=$wrfield;
+             msg(INFO,"wrgroups=".join(",",@$wrgroups));
+             msg(INFO,"writeok=$writeok");
+             if (defined($fo)){
+                my $label=$fo->Label();
+                my $fieldHeader="";
+                $fo->extendFieldHeader(
+                    "Upload",{},\$fieldHeader,
+                    $self->Self);
+                $label.=$fieldHeader;
+                $fieldname.="(".$label.")";
+             }
              my $msg=sprintf($self->T("write request to field '\%s' rejected"),
-                             $wrfield);
+                             $fieldname);
              $self->LastMsg(ERROR,$msg);
              return(0);
           }

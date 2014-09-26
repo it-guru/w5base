@@ -156,7 +156,8 @@ sub Validate
    if (defined($newrec->{$self->Name()})){
       if (ref($self->{editrange}) eq "ARRAY"){
          my $d=$newrec->{$self->Name()};
-         if (!($d>=$self->{editrange}->[0] && $d<=$self->{editrange}->[1])){
+         if ($d ne "" &&
+             !($d>=$self->{editrange}->[0] && $d<=$self->{editrange}->[1])){
             $self->getParent->LastMsg(ERROR,
                 sprintf(
                    $self->getParent->T(
