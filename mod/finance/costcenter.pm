@@ -110,7 +110,7 @@ sub new
                 group         =>'delmgmt',
                 dataobjattr   =>'costcenter.delmgrteam'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'delmgr',
                 group         =>'delmgmt',
                 label         =>'Service Delivery Manager',
@@ -187,7 +187,7 @@ sub new
                 label         =>'costcenter is direct useable by workflows',
                 dataobjattr   =>'costcenter.is_directwfuse'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'delmgr2',
                 group         =>'delmgmt',
                 AllowEmpty    =>1,
@@ -201,7 +201,7 @@ sub new
                 group         =>'delmgmt',
                 dataobjattr   =>'costcenter.delmgr2'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Contact(
                 name          =>'itsem2',
                 group         =>'itsem',
                 AllowEmpty    =>1,
