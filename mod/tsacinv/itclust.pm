@@ -76,6 +76,12 @@ sub new
                 dataobjattr   =>'amportfolio.usage'),
 
       new kernel::Field::Text(
+                name          =>'clustertype',
+                label         =>'Clustertype',
+                uppersearch   =>1,
+                dataobjattr   =>'amcomputer.clustertype'),
+
+      new kernel::Field::Text(
                 name          =>'tenant',
                 label         =>'Tenant',
                 group         =>'source',
@@ -163,9 +169,18 @@ sub new
                 group         =>'services',
                 vjointo       =>'tsacinv::itclustservice',
                 vjoinon       =>['lclusterid'=>'lclusterid'],
-                vjoindisp     =>[qw(fullname description)],
+                vjoindisp     =>[qw(fullname type)],
                 vjoininhash   =>[qw(serviceid status name description)]),
 
+      new kernel::Field::SubList(
+                name          =>'notassignedbackups',
+                label         =>'not assignable backup jobs',
+                group         =>'notassignedbackups',
+                forwardSearch =>1,
+                vjointo       =>'tsacinv::backup',
+                vjoinon       =>['lclusterid'=>'lcomputerid'],
+                vjoindisp     =>[qw(backupid stype subtype name
+                                    dbinstance policy tfrom tto isactive)]),
 
       new kernel::Field::Link(
                 name          =>'lportfolioitemid',
@@ -306,7 +321,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   return('ALL');
 }
 
 sub isWriteValid
@@ -320,7 +335,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default services systems source));
+   return(qw(header default services systems notassignedbackups source));
 }  
 
 
