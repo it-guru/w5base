@@ -1,5 +1,6 @@
 'itil::lnkbscomp'=>{de=>'Service Komponente',en=>'Service Component'},
 'Component'=>{de=>'Komponente'},
+'Component type'=>{de=>'Komponententyp'},
 'Redundance 1'=>{de=>'Redundanz 1'},
 'Redundance 2'=>{de=>'Redundanz 2'},
 'Comments and Redundance'=>{de=>'Bemerkungen und Redundanzen'},
