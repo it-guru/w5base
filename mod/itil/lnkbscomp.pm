@@ -143,6 +143,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'xcomments',
                 label         =>'Comments and Redundance',
+                uploadable    =>0,
                 depend        =>['comments','namealt1','namealt2'],
                 onRawValue    =>sub{
                    my $self=shift;
@@ -202,7 +203,7 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'lnkbscomp.modifydate'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
@@ -227,7 +228,7 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'lnkbscomp.realeditor'),
    );
-   $self->setDefaultView(qw(id fromappl toappl cdate editor));
+   $self->setDefaultView(qw(id uppername pos name cdate editor));
    $self->setWorktable("lnkbscomp");
    return($self);
 }
