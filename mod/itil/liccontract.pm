@@ -509,7 +509,7 @@ sub Validate
    }
 
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-        (($newrec->{name}=~m/[^A-Z,\+\!&,-:0-9. _\[\]()]/i) ||
+        (($newrec->{name}=~m/[^A-Z,\+\!&,-:0-9. _\[\]()#]/i) ||
          length(trim($newrec->{name}))<3)){
       $self->LastMsg(ERROR,
                      "invalid licensing name '$newrec->{name}' specified");
