@@ -1289,7 +1289,9 @@ sub NormalizeByIOMap
                if ($mexp ne ""){
                   $check++;
                   my $cmd;
-                  my $fltval=$flt->{$fname};
+                  my $fltval="";
+                  next CHK if (!exists($flt->{$fname}));
+                  $fltval=$flt->{$fname};
 
                   if ($mexp=~m/^!/){
                      $mexp=~s/^!//;
