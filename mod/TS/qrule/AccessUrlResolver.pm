@@ -125,6 +125,17 @@ sub qcheckRecord
                   next unless($rr->type eq "A");
                   push(@ipl,$rr->address);
                }
+               if ($#ipl==-1){
+                  my $msg="can not find any ip for: ".$host;
+                  push(@{$desc->{qmsg}},$msg);
+                  push(@{$desc->{dataissue}},$msg);
+               }
+            }
+            elsif ($res->errorstring eq "NXDOMAIN" ||
+                   $res->errorstring eq "NOERROR"){
+               my $msg="can not resolv hostname: ".$host;
+               push(@{$desc->{qmsg}},$msg);
+               push(@{$desc->{dataissue}},$msg);
             }
             else{
                msg(ERROR,$self->Self()." query failed: ".$res->errorstring.
