@@ -119,57 +119,15 @@ sub new
                 name          =>'systemname',
                 group         =>'system',
                 label         =>'Systemname',
-                dataobjattr   =>'host_name'),
+                vjointo       =>'tsdina::system',
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>['name']),
 
       new kernel::Field::Text(
                 name          =>'systemid',
                 group         =>'system',
                 label         =>'SystemID',
-                dataobjattr   =>'systemid',
-                weblinkto     =>'tsdina::system',
-                weblinkon     =>['systemid'=>'id']),
-
-      new kernel::Field::Text(
-                name          =>'platform',
-                group         =>'system',
-                htmldetail    =>0,
-                label         =>'Platform',
-                dataobjattr   =>'platform_name'),
-
-      new kernel::Field::Number(
-                name          =>'physicalcores',
-                group         =>'system',
-                htmldetail    =>0,
-                label         =>'Physical Cores',
-                dataobjattr   =>'numberphysicalcores'),
-
-      new kernel::Field::Number(
-                name          =>'onlinevirtcpu',
-                group         =>'system',
-                htmldetail    =>0,
-                label         =>'Online Virtual CPUs',
-                dataobjattr   =>'online_virtual_cpus'),
-
-      new kernel::Field::Text(
-                name          =>'lpartype',
-                group         =>'lpar',
-                htmldetail    =>0,
-                label         =>'LPAR Type',
-                dataobjattr   =>'lpar_type'),
-
-      new kernel::Field::Text(
-                name          =>'lparmode',
-                group         =>'lpar',
-                htmldetail    =>0,
-                label         =>'LPAR Mode',
-                dataobjattr   =>'lpar_mode'),
-
-      new kernel::Field::Number(
-                name          =>'lparsharedpoolid',
-                group         =>'lpar',
-                htmldetail    =>0,
-                label         =>'LPAR Shared Pool ID',
-                dataobjattr   =>'lpar_shared_pool_id'),
+                dataobjattr   =>'systemid'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',

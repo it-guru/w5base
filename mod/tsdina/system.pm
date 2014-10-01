@@ -63,51 +63,76 @@ sub new
       new kernel::Field::Text(
                 name          =>'platform',
                 label         =>'Platform',
-                vjointo       =>'tsdina::swinstance',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['platform'],
-                weblinkto     =>'NONE',
-      ),
+                dataobjattr   =>'software_system'),
+
+      new kernel::Field::Text(
+                name          =>'t4dserverid',
+                label         =>'TAD4D ServerID',
+                dataobjattr   =>"CASE
+                                  WHEN HW_IMPLEMENTATION IS NOT NULL
+                                   AND VENDOR_SERIAL_NUMBER IS NOT NULL
+                                  THEN
+                                   'IBM'
+                                   || ' '
+                                   || SUBSTR (
+                                       SUBSTR (HW_IMPLEMENTATION,
+                                        INSTR (HW_IMPLEMENTATION,',')+1),1,
+                                        INSTR (
+                                         SUBSTR (HW_IMPLEMENTATION,
+                                          INSTR (HW_IMPLEMENTATION,',')+1),'-',
+                                          -1)
+                                        - 1)
+                                   || ' '
+                                   || VENDOR_SERIAL_NUMBER
+                                  ELSE NULL
+                                 END"),
+
+      new kernel::Field::Text(
+                name          =>'dinaagent',
+                label         =>'DINA Agent',
+                dataobjattr   =>'dina_agent_version'),
 
       new kernel::Field::Text(
                 name          =>'lpartype',
                 group         =>'lpar',
                 label         =>'LPAR Type',
-                vjointo       =>'tsdina::swinstance',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['lpartype'],
-                weblinkto     =>'NONE',
-      ),
+                dataobjattr   =>'lpar_type'),
 
       new kernel::Field::Text(
                 name          =>'lparmode',
                 group         =>'lpar',
                 label         =>'LPAR Mode',
-                vjointo       =>'tsdina::swinstance',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['lparmode'],
-                weblinkto     =>'NONE',
-      ),
+                dataobjattr   =>'lpar_mode'),
+
+     new kernel::Field::Text(
+                name          =>'ec',
+                group         =>'lpar',
+                label         =>'Entitled Capacity',
+                dataobjattr   =>'entitled_capacity'),
 
       new kernel::Field::Text(
-                name          =>'lparsharedpoolid',
+                name          =>'sharedpoolid',
                 group         =>'lpar',
-                label         =>'LPAR Shared Pool ID',
-                vjointo       =>'tsdina::swinstance',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['lparsharedpoolid'],
-                weblinkto     =>'NONE',
-      ),
+                label         =>'Shared Pool ID',
+                dataobjattr   =>'shared_pool_id'),
 
       new kernel::Field::Number(
                 name          =>'onlinevirtcpu',
                 group         =>'lpar',
                 label         =>'Online Virtual CPUs',
-                vjointo       =>'tsdina::swinstance',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['onlinevirtcpu'],
-                weblinkto     =>'NONE',
-      ),
+                dataobjattr   =>'online_virtual_cpus'),
+
+      new kernel::Field::Text(
+                name          =>'actphyscpusinsystem',
+                group         =>'lpar',
+                label         =>'Active physical CPUs in System',
+                dataobjattr   =>'active_physical_cpus_in_system'),
+
+      new kernel::Field::Text(
+                name          =>'actcpusinspool',
+                group         =>'lpar',
+                label         =>'Active CPUs in Pool',
+                dataobjattr   =>'active_cpus_in_pool'),
 
       new kernel::Field::SubList(
                 name          =>'swinstances',
@@ -115,7 +140,7 @@ sub new
                 group         =>'swinstances',
                 vjointo       =>'tsdina::swinstance',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>[qw(name)],
+                vjoindisp     =>[qw(dinainstancename)],
                 forwardSearch =>1,
       ),
 
@@ -137,7 +162,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dina_darwin_map_vw";
+   my $from="dina_asset_info_vw";
    return($from);
 }
 
@@ -147,7 +172,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default");
+   return("header","default","lpar","swinstances");
 }
 
 sub getRecordImageUrl
@@ -161,14 +186,16 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   my @view=qw(header default);
+   push (@view,'lpar') if (defined $rec->{lparmode});
+   push (@view,'swinstances');
+   return @view;
 }
 
 sub isUploadValid
 {
    return(0);
 }
-
 
 
 
