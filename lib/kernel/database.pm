@@ -93,6 +93,10 @@ sub Connect
             $self->{'db'}->{AutoCommit}=0;
          }
       }
+      if ($DBI::errstr ne ""){
+         msg(ERROR,"connect problem on ".
+                   "handle '$dbname' err='$DBI::errstr'");
+      }
    }
    else{
       if ($self->{dbconnect}=~m/^dbi:odbc:/i){  # cached funktioniert nicht
