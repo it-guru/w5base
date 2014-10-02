@@ -128,7 +128,8 @@ sub notify
       ciname       =>$par->{ciname},
       mgmtitemgroup=>$par->{mgmtitemgroup},
       lnkfrom      =>$par->{lnkfrom},
-      lnkto        =>$par->{lnkto}
+      lnkto        =>$par->{lnkto},
+      tz=>$par->{tz},
    });
    my %notify=(
                class        =>'base::workflow::mailsend',
@@ -183,6 +184,7 @@ sub getNotifyParam
 
       $mylnkrec{mgmtitemgroup}=$lnk->{mgmtitemgroup};
       $mylnkrec{id}=$lnk->{id};
+      $mylnkrec{role}='databoss';
 
       if (defined($lnk->{applid})) {
 
@@ -191,7 +193,6 @@ sub getNotifyParam
          my ($cid)=$ciobj->getOnlyFirst(qw(name databossid applmgrid));
          $mylnkrec{ciname}=$cid->{name};
          $mylnkrec{citype}='application';
-         $mylnkrec{role}  ='databoss';
          if (defined($cid->{applmgrid})) {
             $mailtoid =$cid->{applmgrid};
             @mailccids=($cid->{databossid});
@@ -228,23 +229,25 @@ sub getNotifyParam
       # mailto
       $user->ResetFilter;
       $user->SetFilter({userid=>\$mailtoid});
-      my ($u)=$user->getOnlyFirst(qw(email lastlang));
+      my ($u)=$user->getOnlyFirst(qw(email lastlang tz));
       my @to=($u->{email});
       $mylnkrec{mailto}=\@to;
       $mylnkrec{lang}  =$u->{lastlang};
-
+      $mylnkrec{tz}    =$u->{tz};
       # mailcc
       $user->ResetFilter;
       $user->SetFilter({userid=>\@mailccids});
       my @cc=map {$_->{email}} $user->getHashList('email');
       $mylnkrec{mailcc}=\@cc;
 
-      # lnkfrom, lnkto
-      my $format='enday';
-      $format='deday' if ($mylnkrec{lang} eq 'de');
-      my $lnkfrom=$lnkobj->ExpandTimeExpression($lnk->{lnkfrom},$format);
+      my $format=$mylnkrec{lang};
+      my $lnkfrom=$lnkobj->ExpandTimeExpression($lnk->{lnkfrom},$format,
+                                                undef,$mylnkrec{tz});
+      $lnkfrom.=" ($mylnkrec{tz})";
       $mylnkrec{lnkfrom}=$lnkfrom;
-      my $lnkto=$lnkobj->ExpandTimeExpression($lnk->{lnkto},$format);
+      my $lnkto=$lnkobj->ExpandTimeExpression($lnk->{lnkto},$format,
+                                              undef,$mylnkrec{tz});
+      $lnkto.=" ($mylnkrec{tz})";
       $mylnkrec{lnkto}=$lnkto;
 
       push(@notifyparam,\%mylnkrec);
