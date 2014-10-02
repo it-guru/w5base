@@ -50,7 +50,7 @@ sub new
                 vjointo       =>'base::interview',
                 vjoinon       =>['interviewid'=>'id'],
                 vjoindisp     =>'name',
-                depend        =>['name_de','name_en'],
+                depend        =>['name_label','name_de','name_en'],
                 searchable    =>0,
                 onRawValue    =>\&getQuestionText),
 
@@ -69,6 +69,13 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 dataobjattr   =>'interview.name_de'),
+
+      new kernel::Field::Textarea(
+                name          =>'name_label',
+                label         =>'Label (multilang)',
+                readonly      =>1,
+                htmldetail    =>0,
+                dataobjattr   =>'interview.frontlabel'),
 
       new kernel::Field::Boolean(
                 name          =>'relevant',
@@ -249,6 +256,10 @@ sub getQuestionText
    my $self=shift;
    my $current=shift;
    my $lang=$self->getParent->Lang();
+
+   if ($current->{'name_label'} ne ""){
+      return(extractLangEntry($current->{'name_label'},$lang,80,0));
+   }
    if ($lang eq "de" && $current->{'name_de'} ne ""){
       return($current->{'name_de'});
    }
