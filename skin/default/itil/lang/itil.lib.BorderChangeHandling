@@ -1,4 +1,4 @@
-'Dear user'=>{de=>'Sehr geehrter Nuter'},
+'Dear user'=>{de=>'Sehr geehrter Nutzer'},
 "there were attribute changes in the touching element '%s' related to your roles or interessts (infoabo) user:"=>{de=>"es wurden Attribute am tangierenden Element '%s' (bezugnehmend auf Ihre Rolle/Funktion oder durch abonnierte InfoAbos) vorgenommen:"},
 'This changes touches the following elements:'=>{de=>'Diese Änderungen tangieren die folgenden Elemente:'},
 'attribute change on touched element:'=>{de=>'Attributänderung an tangierendem Element:'},
