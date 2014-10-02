@@ -191,7 +191,6 @@ sub getTimeRangeDrop
    if (!defined($oldval) && in_array(\@modes,"month")){
       $oldval=sprintf("(%02d/%04d)",$month,$year);
    }
-printf STDERR ("fifi oldval=$oldval\n");
    foreach my $blk (@modes){
       if ($blk eq "nearfuture"){
          my @l=(
