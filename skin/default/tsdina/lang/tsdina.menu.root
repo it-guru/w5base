@@ -1,4 +1,4 @@
-'itu.tsdina'=>{de=>'TS-DINA',en=>'TS-DINA'},
+'itu.tsdina'=>{de=>'Dina',en=>'Dina'},
 'itu.tsdina.system'=>{de=>'System',en=>'System'},
 'itu.tsdina.swinstance'=>{de=>'Software-Instanz',en=>'Software-Instance'},
 'itu.tsdina.swinstance.orafeature'=>{de=>'Oracle Feature',en=>'Oracle Feature'},
