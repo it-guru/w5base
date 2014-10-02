@@ -119,6 +119,12 @@ sub new
                 group         =>'productinfo',
                 dataobjattr   =>'adm.swproduct.is_sub_cap'),
 
+      new kernel::Field::Boolean(
+                name          =>'isfreeofcharge',
+                label         =>'free of charge',
+                group         =>'productinfo',
+                dataobjattr   =>'adm.component.is_free_only'),
+
       new kernel::Field::Text(
                 name          =>'agentid',
                 label         =>'Agent ID',
