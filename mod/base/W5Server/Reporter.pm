@@ -270,6 +270,8 @@ sub slotHandler
             else{
                my $module=$slot->[$c]->{task}->{name};
                $self->broadcast("seltsam $pid scheint tot zu sein");
+               push(@{$slot->[$c]->{task}->{stderr}},"$pid seams died\n"); 
+               $slot->[$c]->{task}->{exitcode}=1; 
                my $reportermodules=$reporter->{reportjob}->{Reporter};
                $reportermodules->{$module}->Finish($slot->[$c]->{task},
                                                    $reporter);
