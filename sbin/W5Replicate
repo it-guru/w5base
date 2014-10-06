@@ -691,6 +691,9 @@ sub objectReplicationPhase1
             }
          }
       }
+      else{
+         $obj->SetFilter({}); # ensure that SetFilter is always be called
+      }                       # for "hard" object filters (like workflows)
       #$obj->SetFilter({assetid=>"LT-59204*"});
       my @syncfields=@{$ctrl->{'replkeyfields'}};
       $obj->SetCurrentView(@syncfields,@{$ctrl->{'view'}});
