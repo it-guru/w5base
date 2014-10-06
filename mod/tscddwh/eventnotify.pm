@@ -1,0 +1,65 @@
+package tscddwh::eventnotify;
+#  W5Base Framework
+#  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use base::workflow;
+@ISA=qw(base::workflow);
+
+# This Object is only for Replication of "itemsummary" to W5Warehouse
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+   $self->getField("state")->{searchable}=0;
+   $self->getField("stateid")->{searchable}=0;
+   $self->getField("mdate")->{searchable}=0;
+   $self->getField("state")->{searchable}=0;
+   return($self);
+}
+
+
+sub SetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if ($#flt!=0 || ref($flt[0]) ne "HASH"){
+      $self->LastMsg("ERROR","invalid Filter request on $self");
+      return(undef);
+   }
+
+   my %f1=(%{$flt[0]});
+   $f1{stateid}="21";
+   $f1{mdate}=">now-14d";
+   $f1{class}=\"AL_TCom::workflow::eventnotify";
+
+   my %f2=(%{$flt[0]});
+   $f2{stateid}="!21";
+   $f2{class}=\"AL_TCom::workflow::eventnotify";
+
+   @flt=([\%f1,\%f2]);
+   return($self->SUPER::SetFilter(@flt));
+}
+
+
+
+1;
