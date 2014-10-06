@@ -17,7 +17,6 @@ package AL_TCom::Reporter::prio1appl;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use strict;
-local $| = 1;
 use vars qw(@ISA);
 use kernel;
 use kernel::Reporter;
