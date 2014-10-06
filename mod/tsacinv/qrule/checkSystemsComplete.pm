@@ -114,14 +114,20 @@ sub qcheckRecord
    if (keys(%sollsystemid)){
       my $o=getModuleObject($self->getParent->Config,"itil::system");
       $o->SetFilter({
-         systemid=>[keys(%sollsystemid)],
-         conumber=>\$rec->{name}
+         systemid=>[keys(%sollsystemid)]
       });
       my @ist=$o->getHashList(qw(name systemid));
       my %istsystemid;
       foreach my $r (@ist){
          $istsystemid{$r->{systemid}}++ if ($r->{systemid} ne "");
       }
+      printf STDERR ("name=%s\n",$rec->{name});
+      printf STDERR ("sollsystemid=%s\n",Dumper(\%sollsystemid));
+      printf STDERR ("istsystemid=%s\n",Dumper(\%istsystemid));
+
+
+
+
       my @miss;
       foreach my $r (sort(keys(%sollsystemid))){
          if (!exists($istsystemid{$r})){
