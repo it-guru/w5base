@@ -22,7 +22,7 @@ use kernel;
 use base::workflow;
 @ISA=qw(base::workflow);
 
-# This Object is only for Replication of "itemsummary" to W5Warehouse
+# This Object is only for Replication of "openeventnotify" to W5Warehouse
 
 sub new
 {
@@ -32,7 +32,7 @@ sub new
    $self->getField("state")->{searchable}=0;
    $self->getField("stateid")->{searchable}=0;
    $self->getField("mdate")->{searchable}=0;
-   $self->getField("state")->{searchable}=0;
+   $self->getField("class")->{searchable}=0;
    return($self);
 }
 
@@ -50,13 +50,22 @@ sub SetFilter
    my %f1=(%{$flt[0]});
    $f1{stateid}="21";
    $f1{mdate}=">now-14d";
+   $f1{isdeleted}=\"0";
    $f1{class}=\"AL_TCom::workflow::eventnotify";
 
    my %f2=(%{$flt[0]});
    $f2{stateid}="!21";
+   $f2{isdeleted}=\"0";
    $f2{class}=\"AL_TCom::workflow::eventnotify";
 
-   @flt=([\%f1,\%f2]);
+   my %f3=(%{$flt[0]});
+   $f3{isdeleted}="1";
+   $f3{mdate}=">now-14d";
+   $f3{class}=\"AL_TCom::workflow::eventnotify";
+
+
+
+   @flt=([\%f1,\%f2,\%f3]);
    return($self->SUPER::SetFilter(@flt));
 }
 
