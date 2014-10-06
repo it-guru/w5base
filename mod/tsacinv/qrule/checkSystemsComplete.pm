@@ -94,7 +94,6 @@ sub qcheckRecord
 
    my $o=getModuleObject($self->getParent->Config,"tsacinv::system");
 
-   printf STDERR ("fifi 01 $self\n");
 
    my $co=$rec->{name};
    $co=~s/^[a-z]-//i;
@@ -107,7 +106,6 @@ sub qcheckRecord
    });
    my @soll=$o->getHashList(qw(systemname systemid));
 
-   print STDERR Dumper(\@soll);
    my %sollsystemid;
 
    foreach my $r (@soll){
