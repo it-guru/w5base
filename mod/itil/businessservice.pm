@@ -1941,7 +1941,7 @@ sub Validate
       }
    }
    else{
-      if (!$autogenmode){
+      if ($self->isDataInputFromUserFrontend() && !$autogenmode){
          if (!$self->isParentWriteable($applid)){
             $self->LastMsg(ERROR,"no write access to specified application");
             return(0);
