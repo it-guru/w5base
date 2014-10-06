@@ -121,9 +121,9 @@ sub qcheckRecord
       foreach my $r (@ist){
          $istsystemid{$r->{systemid}}++ if ($r->{systemid} ne "");
       }
-      printf STDERR ("name=%s\n",$rec->{name});
-      printf STDERR ("sollsystemid=%s\n",Dumper(\%sollsystemid));
-      printf STDERR ("istsystemid=%s\n",Dumper(\%istsystemid));
+      #printf STDERR ("name=%s\n",$rec->{name});
+      #printf STDERR ("sollsystemid=%s\n",Dumper(\%sollsystemid));
+      #printf STDERR ("istsystemid=%s\n",Dumper(\%istsystemid));
 
 
 
