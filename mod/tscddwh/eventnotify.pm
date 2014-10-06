@@ -63,11 +63,28 @@ sub SetFilter
    $f3{mdate}=">now-14d";
    $f3{class}=\"AL_TCom::workflow::eventnotify";
 
-
-
    @flt=([\%f1,\%f2,\%f3]);
    return($self->SUPER::SetFilter(@flt));
 }
+
+sub SetCurrentView  # hack to prevent needed wffields. prefix
+{
+   my $self=shift;
+   my @f=@_;
+
+   my @fl;
+   foreach my $f (@f){
+      if (!$self->getField($f)){ 
+         push(@fl,"wffields.".$f);
+      }
+      else{
+         push(@fl,$f);
+      }
+   }
+   return($self->SUPER::SetCurrentView(@fl));
+}
+
+
 
 
 
