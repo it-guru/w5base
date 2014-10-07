@@ -53,9 +53,15 @@ sub new
                 label         =>'Businessservice ID',
                 dataobjattr   =>'lnkbscomp.businessservice'),
 
-      new kernel::Field::Text(
+      new kernel::Field::TextDrop(
                 name          =>'uppername',
                 label         =>'upper Businessservice name',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if (defined($rec));
+                   return(0);
+                },
                 vjointo       =>'itil::businessservice',
                 vjoinon       =>['businessserviceid'=>'id'],
                 vjoindisp     =>'fullname'),
