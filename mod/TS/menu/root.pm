@@ -105,6 +105,16 @@ sub Init
                       "itil::lnkapplcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.appl.lnkapplurl",
+                      "itil::lnkapplurl",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.appl.lnkapplurl.new",
+                      "itil::lnkapplurl",
+                      prio=>1,
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.system",
                       "OSY::system",
                       defaultacl=>['valid_user']);
