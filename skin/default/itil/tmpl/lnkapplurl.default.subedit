@@ -1,0 +1,27 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%name(label)%:</td>
+         <td class=finput width=40%>%name(sublistedit)%</td>
+         <td class=fname width=10%>%network(label)%:</td>
+         <td class=finput width=40%>%network(sublistedit)%</td>
+      </tr>
+      <tr><td colspan=4>
+      <table border=0>
+      <tr>
+         <td class=fname>%is_userfrontend(label)%:</td>
+         <td class=finput>%is_userfrontend(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname>%is_interface(label)%:</td>
+         <td class=finput>%is_interface(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname>%is_interal(label)%:</td>
+         <td class=finput>%is_interal(sublistedit)%</td>
+      </tr>
+      </table>
+      </td></tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

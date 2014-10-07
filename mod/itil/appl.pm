@@ -392,6 +392,14 @@ sub new
                 vjoinon       =>['id'=>'servicecompapplid'],
                 vjoindisp     =>['fullname']),
 
+      new kernel::Field::SubList(
+                name          =>'applurl',
+                label         =>'Communication URLs',
+                group         =>'applurl',
+                vjointo       =>'itil::lnkapplurl',
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['name']),
+
       new kernel::Field::Text(
                 name          =>'businessteambossid',
                 group         =>'technical',
@@ -1983,7 +1991,7 @@ sub isViewValid
               attachments contacts control custcontracts customer delmgmt
               finance interfaces licenses monisla sodrgroup qc external itsem
               misc opmgmt phonenumbers services businessservices architect
-              soclustgroup socomments source swinstances systems
+              soclustgroup socomments source swinstances systems applurl
               technical workflowbasedata header inmchm interview efforts);
    if (!$rec->{sodefinition}){
       @all=grep(!/^(socomments|soclustgroup|sodrgroup)$/,@all);
@@ -2000,7 +2008,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default interfaces finance opmgmt technical contacts misc
-                       systems attachments accountnumbers interview
+                       systems applurl attachments accountnumbers interview
                        customer control phonenumbers monisla architect
                        sodrgroup soclustgroup socomments);
    if (!defined($rec)){
@@ -2137,7 +2145,7 @@ sub getDetailBlockPriority
           qw(header default itsem finance technical opmgmt delmgmt 
              architect customer custcontracts 
              contacts phonenumbers 
-             interfaces systems swinstances services businessservices 
+             interfaces systems swinstances services businessservices applurl
              monisla sodrgroup
              misc attachments control 
              soclustgroup socomments accountnumbers licenses 
