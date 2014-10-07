@@ -91,6 +91,13 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
+          # hack für die Spezialisten, die die AssetID in Kleinschrift
+          # erfasst haben.
+          if ($parrec->{assetid} ne $rec->{name}){
+             msg(INFO,"force rename of $rec->{name} to ".$parrec->{assetid});
+             $forcedupd->{name}=$parrec->{assetid};   
+          }
+          ################################################################
           my $acroom=$parrec->{room};
           my $acloc=$parrec->{tsacinv_locationfullname};
           if ($acroom=~m/^\d{1,2}\.\d{3}$/){
@@ -98,8 +105,6 @@ sub qcheckRecord
                 $acroom=$geb.$acroom;
              }
           }
-         # $acroom="C1.300" if ($acroom eq "1.300"); 
-#printf STDERR ("acroom=$acroom asset=%s\n",Dumper($parrec));
           $self->IfComp($dataobj,
                         $rec,"room",
                         {room=>$acroom},"room",
