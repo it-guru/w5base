@@ -1,0 +1,3 @@
+'itil::qrule::URLlist'=>{de=>'Prüfung auf erfasste Kommunikations URLs',
+                         en=>'Check on documentation of communication URLs'},
+'missing communication urls in application documentation'=>{de=>'fehlende Kommunikations URLs in Anwendungsdokumentation'},
