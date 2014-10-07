@@ -285,9 +285,10 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if (!($newrec->{queryfrom}=~m/^\S+::\S+$/) &&
-         $newrec->{queryfrom} ne "preWrite"     &&
-         $newrec->{queryfrom} ne 'any'){
+   my $queryfrom=effVal($oldrec,$newrec,"queryfrom");
+   if (!($queryfrom=~m/^\S+::\S+$/) &&
+         $queryfrom ne "preWrite"     &&
+         $queryfrom ne 'any'){
       $self->LastMsg(ERROR,"invalid value in 'queryfrom'");
       return(0);
    }
