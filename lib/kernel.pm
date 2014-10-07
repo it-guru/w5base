@@ -87,7 +87,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
              &Dumper &CSV2Hash
              &FancyLinks &ExpandW5BaseDataLinks &mkInlineAttachment 
-             &FormatJsDialCall &HashTreeExtract
+             &FormatJsDialCall &HashExtr
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
              &isDataInputFromUserFrontend &orgRoles &extractLangEntry
@@ -522,7 +522,7 @@ sub Hash2Datafield
    return($data);
 }
 
-sub HashTreeExtract
+sub HashExtr
 {
    my $h=shift;
    my $path=shift;
@@ -538,13 +538,12 @@ sub HashTreeExtract
    my @lpath=(@{$path});
 
    if (ref($h) eq "ARRAY"){
-      for(my $c=0;$c<$#{$h};$c++){
-         push(@l,HashTreeExtract($h->[$c],\@lpath,$regexp,$h->[$c]));
+      for(my $c=0;$c<=$#{$h};$c++){
+         push(@l,HashExtr($h->[$c],\@lpath,$regexp,$h->[$c]));
       }
    }
    if (ref($h) eq "HASH"){
       if ($#lpath==0){
-         #printf STDERR ("match $h->{$lpath[0]} against $regexp\n");
          if ($h->{$lpath[0]}=~m/$regexp/){
             if (ref($lastarraylevel)){
                push(@l,$lastarraylevel);
@@ -557,8 +556,7 @@ sub HashTreeExtract
       else{
          my $k=shift(@lpath);
          if (exists($h->{$k})){
-            printf STDERR ("fifi call for $k\n");
-            push(@l,HashTreeExtract($h->{$k},\@lpath,$regexp));
+            push(@l,HashExtr($h->{$k},\@lpath,$regexp));
          }
       }
    }

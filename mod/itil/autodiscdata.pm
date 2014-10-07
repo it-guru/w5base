@@ -87,6 +87,20 @@ sub new
                 label         =>'AutodiscoveryData',
                 dataobjattr   =>'autodiscdata.addata'),
 
+      new kernel::Field::Text(
+                name          =>'enginefullname',
+                label         =>'Engine fullname',
+                group         =>'source',
+                readonly      =>1,
+                dataobjattr   =>'autodiscengine.fullname'),
+
+      new kernel::Field::Text(
+                name          =>'enginedataobj',
+                label         =>'Engine DataObj',
+                group         =>'source',
+                readonly      =>1,
+                dataobjattr   =>'autodiscengine.addataobj'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -137,7 +151,9 @@ sub getSqlFrom
    my $from="$worktable left outer join system ".
             "on autodiscdata.system=system.id ".
             "left outer join swinstance ".
-            "on autodiscdata.swinstance=swinstance.id";
+            "on autodiscdata.swinstance=swinstance.id ".
+            "left outer join autodiscengine ".
+            "on autodiscdata.engine=autodiscengine.name";
    return($from);
 }
 
@@ -192,6 +208,140 @@ sub Validate
 
    return(1);
 }
+
+
+sub LoadAutoDiscDataSet
+{
+   my $self=shift;
+   my $targettyp=shift;
+   my $targetid=shift;
+
+   my $d={};
+
+   $self->ResetFilter();
+   if ($targettyp eq "SYSTEM"){
+      $self->SetFilter({systemid=>\$targetid,targettyp=>\$targettyp});
+      $self->SetCurrentView(qw(data engine enginefullname enginedataobj));
+      my ($rec,$msg)=$self->getFirst();
+      if (defined($rec)){
+         my $f=$self->getField("data");
+         do{
+            my $discrec={
+               enginefullname=>$rec->{enginefullname},
+               data=>$f->RawValue($rec)->{xmlroot}
+            }; 
+            $d->{type}->{$rec->{enginedataobj}}=$discrec;
+            $d->{engine}->{$rec->{engine}}=$discrec;
+            ($rec,$msg)=$self->getNext();
+         } until(!defined($rec));
+      }
+   }
+   return($d);
+}
+
+sub SoftwareAnalyseAutoDiscDataSet
+{
+   my $self=shift;
+   my $adrec=shift;
+   my $rec=shift;
+   my $enginedataobj=shift;
+   my $path=shift;
+   my $searchexpr=shift;
+   my $software=shift;
+   my $control=shift;
+   $software=[split(/\|/,$software)] if (ref($software) ne "ARRAY");
+
+   my $sourcepath="/type/".$enginedataobj."/data".$path;
+
+
+   my @needSW=@$software;
+   my $needSW="^(".join("|",@needSW).")\$";
+
+   my @mgmtSWdirect=HashExtr($rec->{software},"/software",qr/$needSW/);
+   my @mgmtSWidirect;
+   if ($rec->{isclusternode}){
+      my $itclustid=$rec->{itclustid};
+      if ($itclustid ne ""){
+         my $itclust=getModuleObject($self->Config,"itil::itclust");
+         $itclust->SetFilter({id=>\$itclustid});
+         my ($clustrec)=$itclust->getOnlyFirst(qw(software));
+         @mgmtSWidirect=HashExtr($clustrec->{software},"/software",qr/$needSW/);
+      }
+   }
+   if (my @discSW=HashExtr($adrec,$sourcepath,$searchexpr)){
+      $control->{resultMsg}=[] if (!defined($control->{resultMsg}));
+      my @resultMsg=();
+      my $enginefullname=$adrec->{type}->{$enginedataobj}->{enginefullname};
+      my %discVers;
+      map({$discVers{$_->{version}}++} @discSW);
+      my @discVers=sort(keys(%discVers));
+   
+   
+      if ($#mgmtSWdirect==-1 && $#mgmtSWidirect==-1){
+         push(@{$control->{resultMsg}},
+            sprintf("It seems, there are missing ".
+                    "Software Installation %s ".
+                    "in versions like %s based on ".
+                    "AutoDiscovery system %s\n",
+                    join(" or ",@needSW),
+                    join(" or ",@discVers),
+                    $enginefullname)
+         );
+      }
+      else{
+         my @missedVers;
+         foreach my $v (@discVers){
+            my $found=0;
+            my $qv=quotemeta($v);
+            foreach my $mrec (@mgmtSWdirect,@mgmtSWidirect){
+               if (($mrec->{version}=~m/^$qv\./) ||
+                   $mrec->{version} eq $v){  # nur Anfang vergleichen
+                  $found++;
+               }
+            }
+            push(@missedVers,$v) if (!$found);
+         }
+         if ($#missedVers!=-1){
+            push(@{$control->{resultMsg}},
+               sprintf("It seems, there are missing ".
+                       "Software Installation %s ".
+                       "in versions like %s based on ".
+                       "AutoDiscovery system %s\n",
+                       join(" or ",@needSW),
+                       join(" and ",@missedVers),
+                       $enginefullname)
+            );
+         }
+         my @oddInst;
+         foreach my $mrec (@mgmtSWdirect){
+            my $found=0;
+            foreach my $drec (@discSW){
+               my $qVers=quotemeta($drec->{version});
+               if (($mrec->{version}=~m/^$qVers\./) ||
+                   $drec->{version} eq $mrec->{version}){
+                  $found++;
+               }
+            }
+            if (!$found){
+               push(@oddInst,$mrec->{software}."-".$mrec->{version})
+            }
+         }
+         if ($#oddInst!=-1){
+            foreach my $oddInst (@oddInst){
+               push(@{$control->{resultMsg}},
+                  sprintf("The Software Installation %s ".
+                          "could not be autodetected by ".
+                          "AutoDiscovery system %s\n",
+                          $oddInst,$enginefullname)
+               );
+            }
+         }
+
+      }
+   }
+}
+
+
 
 
 

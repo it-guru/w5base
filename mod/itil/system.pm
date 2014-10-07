@@ -1138,6 +1138,8 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'system.lastqcheck'),
+      new kernel::Field::EnrichLastDate(
+                dataobjattr   =>'system.lastqenrich'),
    # new kernel::Field::DatacareAssistant()
 
    );

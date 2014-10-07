@@ -106,14 +106,19 @@ sub processConsoleCommand
    elsif ($command eq "uptime"){
       printf $client ("uptime: %d\n",$reporter->{start});
    }
-   elsif ((my $module)=$command=~m/^run\s+(\S+)$/){
-      if (exists($reportjob->{Reporter}->{$module})){
-         $self->addTask($module);
-         $reportjob->{Reporter}->{$module}->{lastrun}=NowStamp("en");
-         printf $client ("OK\n"); 
-      }
-      else{
-         printf $client ("ERROR: Invalid module name '%s'\n",$module); 
+   elsif (my ($dataobj,$id,$qrule)=$command=~m/^run\s+(\S+)\s+(\S+)\s+(\S+)$/){
+      my $o=getModuleObject($self->Config,$dataobj);
+      if (defined($o)){
+         my $todo=$self->{toDoPipe};
+         my @qrule=split(/,/,$qrule);
+         unshift(@{$todo},{
+            name=>$dataobj."::".$id,
+            dataobj=>$dataobj,
+            id=>$id,
+            stdout=>[],stderr=>[],
+            param=>{qrules=>\@qrule,idname=>$o->IdField->Name()},
+            requesttime=>time()
+         });
       }
    }
    #elsif ($command eq "exit"){
@@ -205,9 +210,8 @@ sub taskCreator
                   if (defined($rec)){
                      do{
                         my $param={qrules=>[
-                                      keys(%{$dataobjtoenrich{$dataobj}->{$mandatorid}})
-                                   ],
-                                   idname=>$idname};
+                           keys(%{$dataobjtoenrich{$dataobj}->{$mandatorid}})
+                        ], idname=>$idname};
                         push(@{$todo},{
                            name=>$dataobj."::".$rec->{$idname},
                            dataobj=>$dataobj,

@@ -694,6 +694,8 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'swinstance.lastqcheck'),
+      new kernel::Field::EnrichLastDate(
+                dataobjattr   =>'swinstance.lastqenrich'),
    );
    $self->{history}=[qw(insert modify delete)];
    $self->{use_distinct}=1;
