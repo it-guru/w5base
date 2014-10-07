@@ -9,4 +9,6 @@
 'wffine'=>{de=>'abgeschlossen',en=>'closed'},
 'wffinish'=>{de=>'beendet',en=>'finished'},
 'wfdireproc'=>{de=>'Nachbearbeitung angef.',en=>'reprocess request'},
+'Involved CostCenter'=>{de=>'beteiligte Kostenstelle'},
+'Involved Accounting Area'=>{de=>'beteiligter Buchungskreis'},
 

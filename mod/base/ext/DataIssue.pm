@@ -108,11 +108,14 @@ sub DataIssueCompleteWriteRequest
       my $obj=getModuleObject($self->getParent->Config,$affectedobject);
       my $affectedobjectid=effVal($oldrec,$newrec,"directlnkid");
       $obj->SetFilter(id=>\$affectedobjectid);
-      my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid mandatorid mandator));
+      my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid mandatorid mandator
+                                             office_costcenter office_accarea));
       if (defined($confrec)){
          if ($confrec->{databossid} ne ""){
             $newrec->{fwdtarget}="base::user";
             $newrec->{fwdtargetid}=$confrec->{databossid};
+            $newrec->{involvedcostcenter}=$confrec->{office_costcenter};
+            $newrec->{involvedaccarea}=$confrec->{office_accarea};
          }
          if ($confrec->{mandatorid} ne ""){
             $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};

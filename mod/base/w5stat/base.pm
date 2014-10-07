@@ -672,6 +672,22 @@ sub processRecord
             $age=$d->{totalminutes};
          }
          
+         if ($age>80640 && 
+             $rec->{stateid}!=5 && 
+             $rec->{class} eq "base::workflow::DataIssue"){ # 8 Wochen
+            my $acc=$rec->{involvedcostcenter};
+            if ($acc ne ""){
+               if ($rec->{involvedaccarea} ne ""){
+                  $acc.='@'.$rec->{involvedaccarea};
+               }
+               $acc=~s/\./_/g;
+               $self->getParent->storeStatVar("Costcenter",$acc,{},
+                                              "base.DataIssue.sleep56",1);
+               $self->getParent->storeStatVar("Costcenter",$acc,
+                                 {maxlevel=>1,method=>'concat'},
+                                 "base.DataIssue.sleep56.id",$rec->{id});
+            }
+         }
 
          foreach my $resp (@responsiblegrp){
             $self->getParent->storeStatVar("Group",$resp,{},

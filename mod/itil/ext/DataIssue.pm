@@ -131,13 +131,18 @@ sub DataIssueCompleteWriteRequest
          if ($confrec->{databossid} ne ""){
             my $u=getModuleObject($self->getParent->Config,"base::user");
             $u->SetFilter({userid=>\$confrec->{databossid}});
-            my ($urec)=$u->getOnlyFirst(qw(cistatusid));
+            my ($urec)=$u->getOnlyFirst(qw(cistatusid
+                                           office_costcenter office_accarea));
             if (defined($urec) && 
                 $urec->{cistatusid}<5 && $urec->{cistatusid}>2){
                $newrec->{fwdtarget}="base::user";
                $newrec->{fwdtargetid}=$confrec->{databossid};
+               $newrec->{involvedcostcenter}=$urec->{office_costcenter};
+               $newrec->{involvedaccarea}=$urec->{office_accarea};
             }
             else{
+               $newrec->{involvedcostcenter}=undef;
+               $newrec->{involvedaccarea}=undef;
                $newrec->{fwdtarget}=undef;
                $newrec->{fwdtargetid}=undef;
             }

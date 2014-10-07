@@ -152,6 +152,19 @@ sub getDynamicFields
                              translation        =>'base::workflow::DataIssue',
                              label              =>'DataIssue Operation Fields',
                              container          =>'additional'),
+                   new kernel::Field::Text(
+                             name               =>'involvedcostcenter',
+                             htmldetail         =>0,
+                             searchable         =>0,
+                             container          =>'headref',
+                             label              =>'Involved CostCenter'),
+                   new kernel::Field::Text(
+                             name               =>'involvedaccarea',
+                             htmldetail         =>0,
+                             searchable         =>0,
+                             container          =>'headref',
+                             label              =>'Involved Accounting Area'),
+
                  );
 #   if (defined($self->getParent->
 
