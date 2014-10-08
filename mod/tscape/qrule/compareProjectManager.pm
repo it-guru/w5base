@@ -14,7 +14,7 @@ a BusinessApplication.
 
 =head3 HINTS
 
-Der Project Manager IT-System soll federführend in CapeTS über
+Der Project Manager IT-Application soll federführend in CapeTS über
 das ICTO Objekt gepflegt werdeni (zumindest für die Produktionsanwendungen
 eines ICTO Obejktes).
 
@@ -100,7 +100,8 @@ sub qcheckRecord
          if (defined($parrec)){
             my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
             foreach my $r (@{$parrec->{roles}}){
-               if ($r->{role} eq "Project Manager IT-System" &&
+               if (($r->{role} eq "Project Manager IT-System" ||
+                    $r->{role} eq "Project Manager IT-Application") &&
                    $r->{email} ne ""){
                   my $pmid=$tswiw->GetW5BaseUserID($r->{email});
                   if ($pmid ne ""){

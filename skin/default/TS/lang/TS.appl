@@ -5,7 +5,7 @@
 'AM: official AssetManager Applicationname'=>{de=>'AM: offizieller AssetManager Anwendungsname'},
 'AM: Production Planning OSS'=>{de=>'AM: Produktions-Plannung OSS'},
 'Database Admin'=>{de=>'Datenbankadministrator'},
-'Projectmanager'=>{de=>'Project Manager IT-System'},
+'Projectmanager'=>{de=>'Project Manager IT-Application'},
 'ICTO Objectname'=>{de=>'ICTO Objektbezeichnung'},
 'unable to identify archictecture record'=>{de=>'Fehler bei der Identifikation des Architektur Datensatzes'},
 'responsible ControlCenter'=>{de=>'verantwortliches ControlCenter'},
