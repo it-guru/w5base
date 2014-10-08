@@ -127,7 +127,13 @@ from (select DATE_DIMENSION.FULL_DATE_LOCAL curdate
            '<x><r><f>' || 
               replace(
                   replace(
-                     rtrim(trim( attr.ATTRIBUTE_SHORT_VALUE ),chr(10)),chr(10),
+                     rtrim(trim( 
+                       case when length(attr.ATTRIBUTE_SHORT_VALUE)>2500 then
+                       substr(attr.ATTRIBUTE_SHORT_VALUE,0,2500) || '...'
+                       else
+                       attr.ATTRIBUTE_SHORT_VALUE
+                       end
+                     ),chr(10)),chr(10),
                      '</f></r><r><f>'
                   ),';','</f><f>'
               ) ||
