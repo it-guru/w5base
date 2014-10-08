@@ -93,11 +93,6 @@ sub mkp800
       @monthlist=(sprintf("%02d/%04d",$sM,$sY),
                   sprintf("%02d/%04d",$month,$year));
    }
-   my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
-   if (!defined($bflexxwf) || !$bflexxwf->Ping()){
-      msg(ERROR,"can not connect to b:flexx inteface database");
-      return({exicode=>1});
-   }
 
    my $startnow=$app->ExpandTimeExpression("now","en","GMT");
    msg(INFO,"start operation with time = $startnow");
@@ -158,7 +153,7 @@ sub mkp800
                    $rec->{class} eq "AL_TCom::workflow::businesreq"))){
                $self->processRec($start,\%p800,$rec);
                $self->processRecSpecial($start,\%p800special,$rec,
-                                        $xlsexp,$bflexxwf,$monthlist[1]);
+                                        $xlsexp,$monthlist[1]);
             }
          }
       }
@@ -333,7 +328,6 @@ sub mkp800
              $wf->ValidatedDeleteRecord($_);
          });
          $self->xlsFinish($xlsexp,$month);  # stores the xls export in webfs
-         $self->bflexxRawFinish($bflexxwf,$startnow,$starttime); 
       }
    }
    return({exitcode=>0});
@@ -345,7 +339,6 @@ sub processRec
    my $start=shift;
    my $p800=shift;
    my $rec=shift;
-   my $bflexxwf=shift;
 
 
    msg(DEBUG,"process %s srcid=%s",$rec->{id},$rec->{srcid});
@@ -407,7 +400,6 @@ sub processRecSpecial
    my $p800=shift;
    my $rec=shift;
    my $xlsexp=shift;
-   my $bflexxwf=shift;
    my $specialmon=shift;
 
    msg(DEBUG,"special process %s:%s end=%s",
@@ -455,112 +447,10 @@ sub processRecSpecial
                }
             }
          }
-         $self->bflexxRawExport($bflexxwf,$rec,$mon,$eY,$eM,$eD);
       }
    }
 }
 
-
-
-sub bflexxRawFinish
-{
-   my $self=shift;
-   my $bflexxwf=shift;
-   my $now=shift;
-   my $starttime=shift;
-
-   my $rec;
-   do{      # seltsamer cleanup - aber nur so funktionierts mit ODBC und MSSQL
-      $bflexxwf->ResetFilter(); 
-      $bflexxwf->SetFilter(srcload=>"\"<$now\"",eventend=>"\">$starttime\"");
-      ($rec)=$bflexxwf->getOnlyFirst(qw(ALL));
-      if (defined($rec)){
-         $bflexxwf->ValidatedDeleteRecord($rec);
-      }
-   }until(!defined($rec));
-}
-
-sub bflexxRawExport
-{
-   my $self=shift;
-   my $bflexxwf=shift;
-   my $rec=shift;
-   my $repmon=shift;
-   my ($wY,$wM,$wD)=@_;
-
-
-   my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
-   if (defined($bflexxwf)){
-      my $ag=$rec->{affectedapplication};
-      $ag=[$ag] if (!ref($ag) eq "ARRAY");
-      my $vert=$rec->{affectedcontract};
-      $vert=[$vert] if (!ref($vert) eq "ARRAY");
-
-      my $cause=$rec->{tcomcodcause};
-      $cause=join(", ",@$cause) if (ref($cause) eq "ARRAY");
-
-      my $comments=$rec->{tcomcodcomments};
-      $comments=join("\n",@$comments) if (ref($comments) eq "ARRAY");
-
-      my $extid=$rec->{tcomexternalid};
-      $extid=join("\n",@$extid) if (ref($extid) eq "ARRAY");
-      if ($extid eq ""){
-         $extid=$rec->{customerrefno};
-      }
-      $extid=join("\n",@$extid) if (ref($extid) eq "ARRAY");
-      if (!($extid=~m/W5B:/)){
-         if ($extid ne ""){
-            $extid="W5B:".$rec->{id}." ".$extid;
-         }
-         else{
-            $extid="W5B:".$rec->{id};
-         }
-      }
-
-      my $specialt=$rec->{headref}->{specialt};
-      $specialt=join(", ",@$specialt) if (ref($specialt) eq "ARRAY");
-
-      if (my ($m,$y)=$repmon=~m/^(\d+)\/(\d{4})/){
-         $repmon=sprintf("%04d%02d",$y,$m);
-      }
-      foreach my $vertno (@$vert){
-         if ($vertno ne ""){
-            my $newrec={name=>$rec->{name},
-                        eventend=>$rec->{eventend},
-                        w5baseid=>$rec->{id},
-                        class=>$rec->{class},
-                        tcomworktime=>$specialt,
-                        tcomcodcause=>$cause,
-                        tcomcodcomments=>$comments,
-                        tcomexternalid=>limitlen($extid,40,1),
-                        appl=>join(", ",@$ag),
-                        custcontract=>$vertno,
-                        srcload=>NowStamp("en"),
-                        srcid=>$rec->{srcid},
-                        month=>$repmon,
-                        srcsys=>$rec->{srcsys}};
-            my $bflexxwf=getModuleObject($self->Config,"tsbflexx::ifworkflow");
-            $bflexxwf->SetFilter({w5baseid=>\$newrec->{w5baseid},
-                                  custcontract=>\$vertno});
-            my ($oldrec,$msg)=$bflexxwf->getOnlyFirst(qw(ALL));
-
-
-            if (defined($oldrec)){
-               $bflexxwf->ValidatedUpdateRecord($oldrec,$newrec,
-                                                {w5baseid=>\$newrec->{w5baseid},
-                                                 custcontract=>\$vertno} );
-            }
-            else{
-               $bflexxwf->ValidatedInsertRecord($newrec);
-            }
-            # fifi
-            #$bflexxwf->ValidatedInsertOrUpdateRecord($newrec,
-            #            {w5baseid=>\$newrec->{w5baseid},
-            #             custcontract=>\$vertno});
-         }   
-      }   
-   }
-}
 
 
 sub xlsExport
