@@ -1007,7 +1007,9 @@ sub calcSoftwareState
       $ss->SecureSetFilter({cistatusid=>4,name=>\$FilterSet->{softwareset}});
       my ($rec)=$ss->getOnlyFirst("name","software","osrelease");
       if (!defined($rec)){
-         return("INVALID SOFTSET SELECTED");
+         my $setname;
+         $setname=" -".$FilterSet->{softwareset}."- ";
+         return("INVALID SOFTSET $setname SELECTED");
       }
       $FilterSet->{Set}->{data}=$rec;
       Dumper($FilterSet->{Set}->{data});
