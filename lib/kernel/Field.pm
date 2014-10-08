@@ -232,7 +232,9 @@ sub getSimpleInputField
    my $d;
 
    my $unit=$self->unit;
-   $unit="<td width=40>$unit</td>" if ($unit ne "");
+   if ($unit ne ""){
+      $unit="<td nowrap><span style=\"white-space: nowrap;\">$unit</span></td>";
+   }
    my $inputfield="<input type=\"text\" id=\"$name\" value=\"$value\" ".
                   "name=\"Formated_$name\" class=\"finput\">";
    if (ref($self->{getHtmlImputCode}) eq "CODE"){
@@ -247,6 +249,7 @@ sub getSimpleInputField
 EOF
    }
    else{
+      $unit="" if ($value eq "");
       $d=<<EOF;
 <table style="table-layout:fixed;width:100%" cellspacing=0 cellpadding=0>
 <tr><td><span class="readonlyinput">$value</span></td>$unit</tr></table>

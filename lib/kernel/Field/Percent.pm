@@ -55,7 +55,11 @@ sub FormatedDetail
       if ($self->readonly($current)){
          $readonly=1;
       }
-      return($self->getSimpleInputField($d,$readonly));
+      my $oldunit=$self->{unit};
+      $self->{unit}="%";
+      my $d=$self->getSimpleInputField($d,$readonly);
+      $self->{unit}=$oldunit;
+      return($d);
    }
 
    if ($mode=~m/^[>]{0,1}Html.*$/ ||

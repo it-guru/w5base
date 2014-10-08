@@ -660,8 +660,10 @@ sub new
       new kernel::Field::MatrixHeader(
                 name          =>'slamatrix',
                 group         =>'sla',
-                label         =>[undef,'requested',
-                                 'implemented','current',
+                label         =>[undef,
+                                 'requested',
+                                 'current',
+                                 'implemented',
                                  'threshold fact. warn',
                                  'threshold warn',
                                  'threshold fact. crit',
@@ -679,16 +681,6 @@ sub new
                 dataobjattr   =>$worktable.'.requ_mtbf'),
 
       new kernel::Field::Duration(
-                name          =>'impl_mtbf',
-                group         =>'sla',
-                visual        =>'hh:mm',
-                searchable    =>0,
-                label         =>'MTBF in h',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixImplemented,
-                dataobjattr   =>$worktable.'.impl_mtbf'),
-
-      new kernel::Field::Duration(
                 name          =>'curr_mtbf',
                 group         =>'sla',
                 visual        =>'hh:mm',
@@ -697,6 +689,16 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixCurrent,
                 dataobjattr   =>$worktable.'.curr_mtbf'),
+
+      new kernel::Field::Duration(
+                name          =>'impl_mtbf',
+                group         =>'sla',
+                visual        =>'hh:mm',
+                searchable    =>0,
+                label         =>'MTBF in h',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixImplemented,
+                dataobjattr   =>$worktable.'.impl_mtbf'),
 
       new kernel::Field::Number(
                 name          =>'threshold_fact_warn_mtbf',
@@ -778,16 +780,6 @@ sub new
                 dataobjattr   =>$worktable.'.requ_ttr'),
 
       new kernel::Field::Duration(
-                name          =>'impl_ttr',
-                group         =>'sla',
-                visual        =>'hh:mm',
-                searchable    =>0,
-                label         =>'TTR in h',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixImplemented,
-                dataobjattr   =>$worktable.'.impl_ttr'),
-
-      new kernel::Field::Duration(
                 name          =>'curr_ttr',
                 group         =>'sla',
                 visual        =>'hh:mm',
@@ -796,6 +788,16 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixCurrent,
                 dataobjattr   =>$worktable.'.curr_ttr'),
+
+      new kernel::Field::Duration(
+                name          =>'impl_ttr',
+                group         =>'sla',
+                visual        =>'hh:mm',
+                searchable    =>0,
+                label         =>'TTR in h',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixImplemented,
+                dataobjattr   =>$worktable.'.impl_ttr'),
 
       new kernel::Field::Number(
                 name          =>'threshold_fact_warn_ttr',
@@ -865,7 +867,10 @@ sub new
       new kernel::Field::MatrixHeader(
                 name          =>'monimatrix',
                 group         =>'moni',
-                label         =>[undef,'requested','implemented','current',
+                label         =>[undef,
+                                 'requested',
+                                 'current',
+                                 'implemented',
                                  'threshold fact. warn',
                                  'threshold warn',
                                  'threshold fact. crit',
@@ -883,16 +888,6 @@ sub new
                 dataobjattr   =>$worktable.'.requ_avail_p'),
 
       new kernel::Field::Percent(
-                name          =>'impl_avail_p',
-                precision     =>2,
-                group         =>'moni',
-                searchable    =>0,
-                label         =>'avalability in %',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixImplemented,
-                dataobjattr   =>$worktable.'.impl_avail_p'),
-
-      new kernel::Field::Percent(
                 name          =>'curr_avail_p',
                 precision     =>2,
                 group         =>'moni',
@@ -901,6 +896,16 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixCurrent,
                 dataobjattr   =>$worktable.'.curr_avail_p'),
+
+      new kernel::Field::Percent(
+                name          =>'impl_avail_p',
+                precision     =>2,
+                group         =>'moni',
+                searchable    =>0,
+                label         =>'avalability in %',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixImplemented,
+                dataobjattr   =>$worktable.'.impl_avail_p'),
 
       new kernel::Field::Number(
                 name          =>'threshold_fact_warn_avail',
@@ -978,6 +983,14 @@ sub new
                 dataobjattr   =>$worktable.'.requ_respti'),
 
       new kernel::Field::Number(
+                name          =>'curr_respti',
+                group         =>'moni',
+                label         =>'responsetime in ms',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixCurrent,
+                dataobjattr   =>$worktable.'.curr_respti'),
+
+      new kernel::Field::Number(
                 name          =>'impl_respti',
                 group         =>'moni',
                 searchable    =>0,
@@ -985,14 +998,6 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixImplemented,
                 dataobjattr   =>$worktable.'.impl_respti'),
-
-      new kernel::Field::Number(
-                name          =>'curr_respti',
-                group         =>'moni',
-                label         =>'responsetime in ms',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixCurrent,
-                dataobjattr   =>$worktable.'.curr_respti'),
 
       new kernel::Field::Number(
                 name          =>'threshold_fact_warn_respti',
@@ -1071,6 +1076,15 @@ sub new
                 dataobjattr   =>$worktable.'.requ_perf'),
 
       new kernel::Field::Percent(
+                name          =>'curr_perf',
+                group         =>'moni',
+                default       =>'95',
+                label         =>'performance in %',
+                align         =>'right',
+                extLabelPostfix=>\&extLabelPostfixCurrent,
+                dataobjattr   =>$worktable.'.curr_perf'),
+
+      new kernel::Field::Percent(
                 name          =>'impl_perf',
                 group         =>'moni',
                 searchable    =>0,
@@ -1079,15 +1093,6 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixImplemented,
                 dataobjattr   =>$worktable.'.impl_perf'),
-
-      new kernel::Field::Percent(
-                name          =>'curr_perf',
-                group         =>'moni',
-                default       =>'95',
-                label         =>'performance in %',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixCurrent,
-                dataobjattr   =>$worktable.'.curr_perf'),
 
       new kernel::Field::Number(
                 name          =>'threshold_fact_warn_perf',
