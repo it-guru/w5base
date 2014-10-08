@@ -709,7 +709,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.92')
+                   return('0.97')
                 },
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -730,7 +730,7 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
                 dataobjattr   =>"$worktable.impl_mtbf*".
-                                "if ($worktable.th_warn_mtbf is null,0.92,".
+                                "if ($worktable.th_warn_mtbf is null,0.97,".
                                 "$worktable.th_warn_mtbf)"),
 
       new kernel::Field::Number(
@@ -742,7 +742,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.97')
+                   return('0.92')
                 },
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -766,7 +766,7 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>"$worktable.impl_mtbf*".
-                                "if ($worktable.th_crit_mtbf is null,0.97,".
+                                "if ($worktable.th_crit_mtbf is null,0.92,".
                                 "$worktable.th_crit_mtbf)"),
 
       new kernel::Field::Duration(
@@ -808,7 +808,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.92')
+                   return('0.97')
                 },
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -829,7 +829,7 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
                 dataobjattr   =>"$worktable.impl_ttr*".
-                                "if ($worktable.th_warn_ttr is null,0.92,".
+                                "if ($worktable.th_warn_ttr is null,0.97,".
                                 "$worktable.th_warn_ttr)"),
 
       new kernel::Field::Number(
@@ -841,7 +841,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.97')
+                   return('0.92')
                 },
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -861,7 +861,7 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>"$worktable.impl_ttr*".
-                                "if ($worktable.th_crit_ttr is null,0.97,".
+                                "if ($worktable.th_crit_ttr is null,0.92,".
                                 "$worktable.th_crit_ttr)"),
 
       new kernel::Field::MatrixHeader(
@@ -1008,7 +1008,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.92')
+                   return('1.50')
                 },
                 background    =>\&calcBackgroundFlagColor,
                 precision     =>2, 
@@ -1029,7 +1029,7 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
                 dataobjattr   =>"$worktable.impl_respti*".
-                                "if ($worktable.th_warn_respti is null,0.92,".
+                                "if ($worktable.th_warn_respti is null,1.50,".
                                 "$worktable.th_warn_respti)"),
 
       new kernel::Field::Number(
@@ -1041,7 +1041,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.97')
+                   return('1.80')
                 },
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -1062,7 +1062,7 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>"$worktable.impl_respti*".
-                                "if ($worktable.th_crit_respti is null,0.97,".
+                                "if ($worktable.th_crit_respti is null,1.80,".
                                 "$worktable.th_crit_respti)"),
 
       new kernel::Field::Percent(
@@ -1315,13 +1315,58 @@ sub calcBackgroundFlagColor
 
    $cur=$def if ($cur eq "");
 
-   my $delta=abs($def-$cur);
-   if ($delta>0 && $def>0){
-      my $p=(100*$delta)/$def;
-      if ($p>10){
-         return("red");
-      }elsif ($p>5){
+   # korrektur der Färbungen (mittlerweilen sehr komplex) Requ:
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14127566190001
+
+   if ($depname eq "threshold_fact_warn_mtbf" ||
+       $depname eq "threshold_fact_warn_ttr"){
+      if ($cur>=0.92 && $cur<0.97){
          return("yellow");
+      }
+      elsif($cur<0.92){
+         return("red");
+      }
+      elsif($cur>1.00){
+         return("red");
+      }
+   }
+   elsif ($depname eq "threshold_fact_crit_mtbf" ||
+          $depname eq "threshold_fact_crit_ttr"){
+      if($cur<0.92){
+         return("red");
+      }
+      elsif($cur>1.00){
+         return("red");
+      }
+   }
+   elsif ($depname eq "threshold_fact_warn_respti"){
+      if ($cur>1.50 && $cur<=1.80){
+         return("yellow");
+      }
+      elsif($cur<1.00){
+         return("red");
+      }
+      elsif($cur>1.80){
+         return("red");
+      }
+   }
+   elsif ($depname eq "threshold_fact_crit_respti"){
+      if($cur<1.00){
+         return("red");
+      }
+      elsif($cur>1.80){
+         return("red");
+      }
+   }
+   else{
+      my $delta=abs($def-$cur);
+      if ($delta>0 && $def>0){
+         my $p=(100*$delta)/$def;
+         if ($p>10){
+            return("red");
+         }elsif ($p>5){
+            return("yellow");
+         }
       }
    }
    return("");
