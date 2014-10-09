@@ -68,14 +68,14 @@ sub qcheckRecord
       if ($duration->{totalminutes}<0){
          $valid=0;
       }
-      print STDERR "from:".Dumper($duration); 
+      #print STDERR "from:".Dumper($duration); 
    }
    if ($validto ne ""){
       my $duration=CalcDateDuration(NowStamp("en"),$validto);
       if ($duration->{totalminutes}<0){
          $valid=0;
       }
-      print STDERR "to:".Dumper($duration); 
+      #print STDERR "to:".Dumper($duration); 
    }
    if (!$valid){
       push(@msg,"businessservice outside duration start/end ".
