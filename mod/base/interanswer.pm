@@ -151,6 +151,8 @@ sub new
       new kernel::Field::Percent(
                 name          =>'answerlevel',
                 label         =>'Answer level',
+                htmldetail    =>0,
+                readonly      =>1,
                 dataobjattr   =>
                    'if (ADDDATE(interanswer.lastverify,'.
                        'interview.necessverifyinterv)<'.
