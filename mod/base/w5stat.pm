@@ -53,7 +53,7 @@ sub new
                 label         =>'Statistic Group',
                 value         =>['Mandator','Group',
                                  'Application','Location','User',
-                                 'Contract'],
+                                 'Contract','Costcenter'],
                 dataobjattr   =>'w5stat.statgroup'),
 
       new kernel::Field::Text(
