@@ -12,6 +12,7 @@
 'Questiongroup'=>{de=>'Fragegruppe'},
 'Interview categorie'=>{de=>'Interview Kategorie'},
 'last verify of anser'=>{de=>'letzte Bestätigung der Antwort'},
+'Answer level'=>{de=>'Antwort Erreichungsgrad'},
 
 
 

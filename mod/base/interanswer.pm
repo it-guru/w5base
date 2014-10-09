@@ -148,6 +148,30 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'interanswer.comments'),
 
+      new kernel::Field::Percent(
+                name          =>'answerlevel',
+                label         =>'Answer level',
+                dataobjattr   =>
+                   'if (ADDDATE(interanswer.lastverify,'.
+                       'interview.necessverifyinterv)<'.
+                       'now(),0, '.
+                   'if (interanswer.answer is null '.
+                   'or interanswer.answer="",0,'.
+                   'CASE interview.questtyp '.
+                   ' WHEN "percent"  THEN interanswer.answer '.
+                   ' WHEN "percent4" THEN interanswer.answer '.
+                   ' WHEN "percenta" THEN if (interanswer.answer<>"" and '.
+                                             'interanswer.answer>0,100,0) '.
+                   ' WHEN "text"     THEN if (interanswer.answer<>"",100,0) '.
+                   ' WHEN "date"     THEN if (interanswer.answer<>"",100,0) '.
+                   ' WHEN "select"   THEN if (interanswer.answer<>"",100,0) '.
+                   ' WHEN "boolean"  THEN if (interanswer.answer="1",100,0) '.
+                   ' WHEN "booleana" THEN if (interanswer.answer="0" or '.
+                                             'interanswer.answer="1",100,0) '.
+                   ' ELSE "0" '.
+                   'END'.
+                   '))'),
+
       new kernel::Field::Text(
                 name          =>'archiv',
                 group         =>'archiv',

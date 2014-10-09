@@ -267,7 +267,7 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 label         =>'weighting',
-                dataobjattr   =>'11-interview.prio'),
+                dataobjattr   =>'11-if (interview.prio is null,10,interview.prio)'),
 
       new kernel::Field::Interface(
                 name          =>'rawprio',
