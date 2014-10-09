@@ -289,23 +289,23 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   if (!$self->IsMemberOf("admin")){
+   if (!$self->IsMemberOf("admin") && 
+       $W5V2::OperationContext ne "W5Replicate"){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-          [orgRoles(),qw(RCFManager RCFManager2
-                         RAuditor RMonitor)],"both");
+          [orgRoles(),qw(RCFManager RCFManager2 RAuditor RMonitor)],"both");
       my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       push(@flt,[
-                 {mandatorid=>\@mandators},
-                 {databossid=>$userid},
-                 {sectargetid=>\$userid,sectarget=>\'base::user',
-                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-                            "*roles=?read?=roles*"},
-                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
-                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-                            "*roles=?read?=roles*"},
-                ]);
+         {mandatorid=>\@mandators},
+         {databossid=>$userid},
+         {sectargetid=>\$userid,sectarget=>\'base::user',
+          secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                    "*roles=?read?=roles*"},
+         {sectargetid=>\@grpids,sectarget=>\'base::grp',
+          secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                    "*roles=?read?=roles*"},
+      ]);
    }
    return($self->SetFilter(@flt));
 }
