@@ -171,7 +171,27 @@ sub new
                 container     =>'additional'),
       insertafter=>['description']
    );
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'contextlist',
+                readonly      =>1,
+                uivisible     =>0,
+                label         =>'Context-List',
+                vjointo       =>'AL_TCom::itscontext',
+                vjoinon       =>['id'=>'id'],
+             #   vjoinon       =>sub{
+             #      my $self=shift;
+             #      return(undef); 
+             #   },
+                vjoindisp     =>'scontextcode',
+                weblinkto     =>'NONE',
+                vjoinconcat  =>"\n"),
+      insertafter=>['fullname']
+   );
    $self->setDefaultView(qw(fullname cistatus));
+
+   $self->getField("application")->{uivisible}=0;
+   $self->getField("srcapplication")->{uivisible}=0;
 
    return($self);
 }
@@ -194,6 +214,12 @@ sub Validate
          $newrec->{srcid}=undef;
          $newrec->{srcload}=undef;
       }
+   }
+   my $nature=effVal($oldrec,$newrec,"nature");
+   if (effVal($oldrec,$newrec,"shortname") ne "" &&
+       ($nature eq "TR" || $nature eq "ES")){
+      $self->LastMsg(ERROR,"invalid shortname on ES or TR businessservices");
+      return(undef);
    }
    return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
 

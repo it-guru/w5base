@@ -2169,6 +2169,8 @@ sub getHtmlDetailPages
    my $self=shift;
    my ($p,$rec)=@_;
 
+   return($self->SUPER::getHtmlDetailPages($p,$rec)) if (!defined($rec));
+
    return($self->SUPER::getHtmlDetailPages($p,$rec),
           "TView"=>$self->T("Tree View"));
 }

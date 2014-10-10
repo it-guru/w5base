@@ -30,6 +30,8 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->getField("nature")->{searchable}=0;
+   $self->getField("contextlist")->{vjoinon}=['id'=>'itsid'];
+   $self->getField("contextlist")->{uivisible}=1;
 
 
    return($self);

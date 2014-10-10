@@ -1106,7 +1106,13 @@ sub FormatedDetailDereferncer
       }
       if (ref($d) eq "ARRAY"){
          if (exists($self->{vjoinconcat}) && $self->{vjoinconcat} ne ""){
+            if (($FormatAs=~m/^Html/) && ($self->{vjoinconcat}=~m/\n/)){
+               my $j=$self->{vjoinconcat};
+               $j=~s/\n/<br>\n/g;
+               return(join($j,@$d));
+            }
             return(join($self->{vjoinconcat},@$d));
+            
          }
          return(join("; ",@$d));
       }

@@ -98,6 +98,9 @@ sub FormatedDetail
       }
       my $vjoinconcat=$self->{vjoinconcat};
       $vjoinconcat="; " if (!defined($vjoinconcat));
+      if (($FormatAs=~m/^Html/) && ($vjoinconcat=~m/\n/)){
+         $vjoinconcat=~s/\n/<br>\n/g;
+      }
       if (defined($self->{sortvalue})){
          if (lc($self->{sortvalue}) eq "asc"){
             $d=join($vjoinconcat,sort(@$d));

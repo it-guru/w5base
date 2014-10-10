@@ -257,6 +257,7 @@ sub getSqlFrom
          }
       }
    }
+printf STDERR ("fifi from=%s\n",$from);
 
 
 
