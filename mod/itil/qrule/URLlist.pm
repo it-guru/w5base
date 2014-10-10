@@ -12,11 +12,11 @@ maybee no application URLs are registered.
 NONE
 
 =head3 HINTS
+If there are software-instances of type ... 
+Apache 
+... in CI-Status "installed/active" it is mandatory to enter 
+at least one communication URL.
 
-If there are software-instances of type ...
-Apache
-... in CI-Status "installed/active" there is need to have
-at least on communication URL.
 
 [de:]
 
