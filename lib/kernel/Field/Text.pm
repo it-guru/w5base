@@ -98,7 +98,8 @@ sub FormatedDetail
       }
       my $vjoinconcat=$self->{vjoinconcat};
       $vjoinconcat="; " if (!defined($vjoinconcat));
-      if (($FormatAs eq "HtmlDetail") && ($vjoinconcat=~m/\n/)){
+      if (($FormatAs eq "HtmlDetail" ||
+           $FormatAs eq "edit") && ($vjoinconcat=~m/\n/)){
          $vjoinconcat=~s/\n/<br>\n/g;
       }
       if (defined($self->{sortvalue})){
