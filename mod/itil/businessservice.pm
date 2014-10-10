@@ -1742,7 +1742,8 @@ sub getBSfullnameSQL
 
    my $d="concat(".
          "if ($worktable.nature is null ".
-         "or $worktable.nature='','',concat($worktable.nature,'_',".
+         "or $worktable.nature='','',concat($worktable.nature,".
+         "if ($worktable.shortname is null or $worktable.shortname='','','_'),".
          "if ($worktable.shortname is null or ".
          "$worktable.shortname='',':',concat($worktable.shortname,':')))),".
          "if ($applname is null,'',".
