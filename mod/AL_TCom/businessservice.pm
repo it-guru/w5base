@@ -188,6 +188,23 @@ sub new
                 vjoinconcat  =>"\n"),
       insertafter=>['fullname']
    );
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'contextaliases',
+                readonly      =>1,
+                uivisible     =>0,
+                label         =>'Context-Aliases',
+                vjointo       =>'AL_TCom::itscontext',
+                vjoinon       =>['id'=>'id'],
+             #   vjoinon       =>sub{
+             #      my $self=shift;
+             #      return(undef); 
+             #   },
+                vjoindisp     =>'scontextcode',
+                weblinkto     =>'NONE',
+                vjoinconcat  =>"\n"),
+      insertafter=>['fullname']
+   );
    $self->setDefaultView(qw(fullname cistatus));
 
    $self->getField("application")->{uivisible}=0;

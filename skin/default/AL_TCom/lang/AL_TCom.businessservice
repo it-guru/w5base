@@ -20,3 +20,4 @@
 'VSM quality'=>{de=>'VSM Qualität'},
 'VSM availibility'=>{de=>'VSM Verfügbarkeit'},
 'Context-List'=>{de=>'Kontextliste'},
+'Context-Aliases'=>{de=>'Kontextvarianten'},

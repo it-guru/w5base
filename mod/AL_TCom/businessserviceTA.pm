@@ -32,6 +32,10 @@ sub new
    $self->getField("nature")->{searchable}=0;
    $self->getField("contextlist")->{vjoinon}=['id'=>'taid'];
    $self->getField("contextlist")->{uivisible}=1;
+   $self->getField("contextaliases")->{vjoinon}=['id'=>'taid'];
+   $self->getField("contextaliases")->{uivisible}=1;
+
+
 
    return($self);
 }
