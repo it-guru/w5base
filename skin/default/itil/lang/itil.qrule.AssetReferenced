@@ -1,0 +1,2 @@
+'itil::qrule::AssetReferenced'=>{de=>'Überprüfung ob logische Systeme dem Asset zugeordnet sind',en=>'Check if there are logical systems related to asset'},
+'no logical systems referenced to this asset'=>{de=>'keine logischen Systeme mit Bezug auf diese Hardware vorhanden'},
