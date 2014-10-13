@@ -342,6 +342,11 @@ sub Validate
       $self->LastMsg(ERROR,"not suppored scheme specified");
       return(undef);
    }
+   if (my ($host)=$name=~m#^sftp://([^:/]+)#){  # sftp not supported by URI
+      if (effVal($oldrec,$newrec,"hostname") ne lc($host)){
+         $newrec->{hostname}=lc($host);
+      }
+   }
    if (in_array([qw(ftp http ldap ldaps https file)],$scheme)){
       my $host=URI->new($name)->host();
       if ($host eq ""){
@@ -354,6 +359,11 @@ sub Validate
       my $port=URI->new($name)->port();
       if (effVal($oldrec,$newrec,"ipport") ne $port){
          $newrec->{ipport}=$port;
+      }
+   }
+   if ($scheme eq "ssh"){
+      if (effVal($oldrec,$newrec,"ipport") ne "22"){
+         $newrec->{ipport}="22";
       }
    }
    my $applid=effVal($oldrec,$newrec,"applid");
