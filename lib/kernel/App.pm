@@ -912,6 +912,7 @@ sub Log
                   $logd.="\n";
                }
             }
+            $logd=~s/[^[:ascii:]]+/?/g;
             print $fout ($logd); # print atomic to make it better readable
             return(1);           # in the log for the admins
          }
