@@ -31,6 +31,8 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->{history}=[qw(insert modify delete)];
+
    
 
    $self->AddFields(
@@ -332,6 +334,9 @@ sub Validate
       $self->LastMsg(ERROR,"invalid URL specified");
       return(undef);
    }
+   if (URI->new($name)->path() eq "/"){
+      $name=~s#/\s*$##;
+   }
    my $scheme=URI->new($name)->scheme();
    if ($scheme eq ""){
       $self->LastMsg(ERROR,"URL syntax error or no scheme specified");
@@ -384,7 +389,7 @@ sub Validate
        &&
        (effVal($oldrec,$newrec,"is_userfrontend") eq "0" &&
         effVal($oldrec,$newrec,"is_interface") eq "0" &&
-        effVal($oldrec,$newrec,"is_interface") eq "0" )){
+        effVal($oldrec,$newrec,"is_internal") eq "0" )){
       $self->LastMsg(ERROR,"no classification specified");
       return(undef);
 
@@ -415,7 +420,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
 
-   my @l=qw(header default class applinfo urlinfo source history);
+   my @l=qw(header default history class applinfo urlinfo source history);
 
    if ($#{$rec->{lastipaddresses}}!=-1){
       push(@l,"lastipaddresses");
