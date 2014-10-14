@@ -125,6 +125,9 @@ sub Connect
       }
       else{
          my $private_foo_cachekey=$dbname."-".$$.".".$BackendSessionName;
+         if (my $p=$self->getParent()){
+            $private_foo_cachekey.="_".$p->Self();
+         }
          $self->{'db'}=DBI->connect_cached(
             $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
                mysql_enable_utf8 => 0,

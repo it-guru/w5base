@@ -112,6 +112,8 @@ sub ApplicationWorkflowXLSRep
 
    my $grpsol=getModuleObject($self->Config,"base::grp");
 
+
+
    $grpsol->AddFields(
       new kernel::Field::Number(
                 name          =>'NUMchm',
@@ -145,13 +147,16 @@ sub ApplicationWorkflowXLSRep
          DataObj=>$appl,
          recPreProcess=>\&recPreProcess,
          filter=>{cistatusid=>\'4',
-#                  name=>'W*',
+                  name=>'W*',
                   mandator=>"!Extern !Sec*"},
-         view=>['name','businessteamid','mandatorid',
+         view=>['name',
                 'mandator','ictono',
+                'applid',
+                'tsm','applmgr',
                 'customer','customerprio','criticality',
                 'NUMchm','NUMinm','NUMprm','NUMdi',
                 'acinmassingmentgroup',
+                'businessteamid',
                 'id'
          ]
       },
@@ -261,8 +266,6 @@ sub recPreProcess
          $self->{SOL}->{$rec->{mandatorid}}->{NUMdi}++;
       }
    }
-   $recordview=[grep(!/^businessteamid$/,@$recordview)];
-   $recordview=[grep(!/^mandatorid$/,@$recordview)];
    return(1);
 }
 

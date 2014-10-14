@@ -622,6 +622,10 @@ sub getRelatedWorkflows
    if (!$h->{IsFrontendInitialized}){
       $h->{IsFrontendInitialized}=$h->FrontendInitialize();
    }
+   if (!defined($param->{'limit'})){
+      $param->{'limit'}=1500;
+   }
+   my $limit=$param->{'limit'};
 
    my $tt=$param->{'timerange'};
 
@@ -667,12 +671,12 @@ sub getRelatedWorkflows
    my %qmax=%$q;
    $h->ResetFilter();
    $h->SetFilter(\%qmax);
-   $h->Limit(1502);
+   $h->Limit($limit+2);
    $h->SetCurrentOrder("id");
    my %idl=();
    map({$idl{$_->{id}}=$_} $h->getHashList(@internalWfView));
    if ($W5V2::OperationContext eq "WebFrontend"){
-      if (keys(%idl)>1500){
+      if (keys(%idl)>$limit){
          $self->LastMsg(ERROR,$self->T("selection to ".
                                        "unspecified for search",
                                        "kernel::App::Web::WorkflowLink"));
@@ -707,13 +711,13 @@ sub getRelatedWorkflows
          $qadd{isdeleted}=\'0';
          $h->ResetFilter();
          $h->SetFilter(\%qadd);
-         $h->Limit(1502);
+         $h->Limit($limit+2);
          $h->SetCurrentOrder("id");
          map({$idl{$_->{id}}=$_} $h->getHashList(@internalWfView));
       }
    }
    if ($W5V2::OperationContext eq "WebFrontend"){
-      if (keys(%idl)>1500){
+      if (keys(%idl)>$limit){
          $self->LastMsg(ERROR,$self->T("selection to ".
                                        "unspecified for search",
                                        "kernel::App::Web::WorkflowLink"));
