@@ -149,14 +149,17 @@ sub ApplicationWorkflowXLSRep
          filter=>{cistatusid=>\'4',
                   name=>'W*',
                   mandator=>"!Extern !Sec*"},
+         unbuffered=>0,  # unbuffered führt zu Problemen, wenn ein gefitertes
+                         # feld gleichzeitig in der Ausgabe view steht!
          view=>['name',
+                'cistatus',
+                'businessteam',
                 'mandator','ictono',
                 'applid',
                 'tsm','applmgr',
                 'customer','customerprio','criticality',
                 'NUMchm','NUMinm','NUMprm','NUMdi',
                 'acinmassingmentgroup',
-                'businessteamid',
                 'id'
          ]
       },
