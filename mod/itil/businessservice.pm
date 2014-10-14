@@ -664,10 +664,10 @@ sub new
                                  'requested',
                                  'current',
                                  'implemented',
-                                 'threshold fact. warn',
-                                 'threshold warn',
-                                 'threshold fact. crit',
-                                 'threshold crit'
+                         #        'threshold fact. warn',
+                         #        'threshold warn',
+                         #        'threshold fact. crit',
+                         #        'threshold crit'
                                  ]),
 
       new kernel::Field::Duration(
@@ -700,74 +700,74 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixImplemented,
                 dataobjattr   =>$worktable.'.impl_mtbf'),
 
-      new kernel::Field::Number(
-                name          =>'threshold_fact_warn_mtbf',
-                group         =>'sla',
-                default       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
+      #new kernel::Field::Number(
+      #          name          =>'threshold_fact_warn_mtbf',
+      #          group         =>'sla',
+      #          default       =>sub{
+      #             my $self=shift;
+      #             my $current=shift;
+      #             my $mode=shift;
+      #
+      #            return(undef) if ($mode eq "edit");
+      #            return('0.97')
+      #         },
+      #         background    =>\&calcBackgroundFlagColor,
+      #         editrange     =>[0.01,5.0],
+      #         precision     =>2, 
+      #         label         =>'MTBF',
+      #         align         =>'right',
+      #         extLabelPostfix=>\&extLabelPostfixTHfactWarn,
+      #         dataobjattr   =>$worktable.'.th_warn_mtbf'),
 
-                   return(undef) if ($mode eq "edit");
-                   return('0.97')
-                },
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                precision     =>2, 
-                label         =>'MTBF',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
-                dataobjattr   =>$worktable.'.th_warn_mtbf'),
+      #new kernel::Field::Duration(
+      #         name          =>'threshold_warn_mtbf',
+      #         group         =>'sla',
+      #         background    =>\&calcBackgroundFlagColor,
+      #         precision     =>2, 
+      #         visual        =>'hh:mm',
+      #         readonly      =>1,
+      #         label         =>'MTBF',
+      #         align         =>'right',
+      #         extLabelPostfix=>\&extLabelPostfixTHWarn,
+      #         dataobjattr   =>"$worktable.impl_mtbf*".
+      #                         "if ($worktable.th_warn_mtbf is null,0.97,".
+      #                         "$worktable.th_warn_mtbf)"),
 
-      new kernel::Field::Duration(
-                name          =>'threshold_warn_mtbf',
-                group         =>'sla',
-                background    =>\&calcBackgroundFlagColor,
-                precision     =>2, 
-                visual        =>'hh:mm',
-                readonly      =>1,
-                label         =>'MTBF',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
-                dataobjattr   =>"$worktable.impl_mtbf*".
-                                "if ($worktable.th_warn_mtbf is null,0.97,".
-                                "$worktable.th_warn_mtbf)"),
-
-      new kernel::Field::Number(
-                name          =>'threshold_fact_crit_mtbf',
-                group         =>'sla',
-                default       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-
-                   return(undef) if ($mode eq "edit");
-                   return('0.92')
-                },
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                precision     =>2,
-                label         =>'MTBF',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
-                dataobjattr   =>$worktable.'.th_crit_mtbf'),
+      #new kernel::Field::Number(
+      #         name          =>'threshold_fact_crit_mtbf',
+      #         group         =>'sla',
+      #         default       =>sub{
+      #            my $self=shift;
+      #            my $current=shift;
+      #            my $mode=shift;
+      #
+      #            return(undef) if ($mode eq "edit");
+      #            return('0.92')
+      #         },
+      #         background    =>\&calcBackgroundFlagColor,
+      #         editrange     =>[0.01,5.0],
+      #         precision     =>2,
+      #         label         =>'MTBF',
+      #         align         =>'right',
+      #         extLabelPostfix=>\&extLabelPostfixTHfactCrit,
+      #         dataobjattr   =>$worktable.'.th_crit_mtbf'),
 
 
 
-      new kernel::Field::Duration(
-                name          =>'threshold_crit_mtbf',
-                group         =>'sla',
-                background    =>\&calcBackgroundFlagColor,
-                depend        =>['threshold_crit_mtbf'],
-                precision     =>2, 
-                readonly      =>1,
-                visual        =>'hh:mm',
-                label         =>'MTBF',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
-                dataobjattr   =>"$worktable.impl_mtbf*".
-                                "if ($worktable.th_crit_mtbf is null,0.92,".
-                                "$worktable.th_crit_mtbf)"),
+      #new kernel::Field::Duration(
+      #         name          =>'threshold_crit_mtbf',
+      #         group         =>'sla',
+      #         background    =>\&calcBackgroundFlagColor,
+      #         depend        =>['threshold_crit_mtbf'],
+      #         precision     =>2, 
+      #         readonly      =>1,
+      #         visual        =>'hh:mm',
+      #         label         =>'MTBF',
+      #         align         =>'right',
+      #         extLabelPostfix=>\&extLabelPostfixTHCrit,
+      #         dataobjattr   =>"$worktable.impl_mtbf*".
+      #                         "if ($worktable.th_crit_mtbf is null,0.92,".
+      #                         "$worktable.th_crit_mtbf)"),
 
       new kernel::Field::Duration(
                 name          =>'requ_ttr',
@@ -799,70 +799,70 @@ sub new
                 extLabelPostfix=>\&extLabelPostfixImplemented,
                 dataobjattr   =>$worktable.'.impl_ttr'),
 
-      new kernel::Field::Number(
-                name          =>'threshold_fact_warn_ttr',
-                group         =>'sla',
-                default       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
+      #new kernel::Field::Number(
+      #         name          =>'threshold_fact_warn_ttr',
+      #         group         =>'sla',
+      #         default       =>sub{
+      #            my $self=shift;
+      #            my $current=shift;
+      #            my $mode=shift;
+      #
+      #            return(undef) if ($mode eq "edit");
+      #            return('0.97')
+      #         },
+      #         background    =>\&calcBackgroundFlagColor,
+      #         editrange     =>[0.01,5.0],
+      #         precision     =>2, 
+      #         label         =>'TTR',
+      #         align         =>'right',
+      #         extLabelPostfix=>\&extLabelPostfixTHfactWarn,
+      #         dataobjattr   =>$worktable.'.th_warn_ttr'),
 
-                   return(undef) if ($mode eq "edit");
-                   return('0.97')
-                },
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                precision     =>2, 
-                label         =>'TTR',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
-                dataobjattr   =>$worktable.'.th_warn_ttr'),
+      #new kernel::Field::Duration(
+      #         name          =>'threshold_warn_ttr',
+      #         group         =>'sla',
+      #         background    =>\&calcBackgroundFlagColor,
+      #         depend        =>['threshold_fact_warn_ttr'],
+      #         readonly      =>1,
+      #         visual        =>'hh:mm',
+      #         label         =>'TTR',
+      #         align         =>'right',
+      #         extLabelPostfix=>\&extLabelPostfixTHWarn,
+      #         dataobjattr   =>"$worktable.impl_ttr*".
+      #                         "if ($worktable.th_warn_ttr is null,0.97,".
+      #                         "$worktable.th_warn_ttr)"),
 
-      new kernel::Field::Duration(
-                name          =>'threshold_warn_ttr',
-                group         =>'sla',
-                background    =>\&calcBackgroundFlagColor,
-                depend        =>['threshold_fact_warn_ttr'],
-                readonly      =>1,
-                visual        =>'hh:mm',
-                label         =>'TTR',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
-                dataobjattr   =>"$worktable.impl_ttr*".
-                                "if ($worktable.th_warn_ttr is null,0.97,".
-                                "$worktable.th_warn_ttr)"),
+      #new kernel::Field::Number(
+      #         name          =>'threshold_fact_crit_ttr',
+      #         group         =>'sla',
+      #         default       =>sub{
+      #            my $self=shift;
+      #            my $current=shift;
+      #            my $mode=shift;
+      #
+      #            return(undef) if ($mode eq "edit");
+      #            return('0.92')
+      #         },
+      #         background    =>\&calcBackgroundFlagColor,
+      #         editrange     =>[0.01,5.0],
+      #         precision     =>2, 
+      #         label         =>'TTR',
+      #         align         =>'right',
+      #         extLabelPostfix=>\&extLabelPostfixTHfactCrit,
+      #         dataobjattr   =>$worktable.'.th_crit_ttr'),
 
-      new kernel::Field::Number(
-                name          =>'threshold_fact_crit_ttr',
-                group         =>'sla',
-                default       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-
-                   return(undef) if ($mode eq "edit");
-                   return('0.92')
-                },
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                precision     =>2, 
-                label         =>'TTR',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
-                dataobjattr   =>$worktable.'.th_crit_ttr'),
-
-      new kernel::Field::Duration(
-                name          =>'threshold_crit_ttr',
-                group         =>'sla',
-                background    =>\&calcBackgroundFlagColor,
-                readonly      =>1,
-                visual        =>'hh:mm',
-                label         =>'TTR',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
-                dataobjattr   =>"$worktable.impl_ttr*".
-                                "if ($worktable.th_crit_ttr is null,0.92,".
-                                "$worktable.th_crit_ttr)"),
+      #new kernel::Field::Duration(
+      #         name          =>'threshold_crit_ttr',
+      #         group         =>'sla',
+      #         background    =>\&calcBackgroundFlagColor,
+      #         readonly      =>1,
+      #         visual        =>'hh:mm',
+      #         label         =>'TTR',
+      #         align         =>'right',
+      #         extLabelPostfix=>\&extLabelPostfixTHCrit,
+      #         dataobjattr   =>"$worktable.impl_ttr*".
+      #                         "if ($worktable.th_crit_ttr is null,0.92,".
+      #                         "$worktable.th_crit_ttr)"),
 
       new kernel::Field::MatrixHeader(
                 name          =>'monimatrix',
