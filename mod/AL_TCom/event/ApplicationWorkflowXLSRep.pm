@@ -147,7 +147,7 @@ sub ApplicationWorkflowXLSRep
          DataObj=>$appl,
          recPreProcess=>\&recPreProcess,
          filter=>{cistatusid=>\'4',
-                  name=>'W*',
+             #     name=>'W*',
                   mandator=>"!Extern !Sec*"},
          unbuffered=>0,  # unbuffered führt zu Problemen, wenn ein gefitertes
                          # feld gleichzeitig in der Ausgabe view steht!
