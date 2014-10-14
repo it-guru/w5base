@@ -160,6 +160,7 @@ sub ApplicationWorkflowXLSRep
                 'customer','customerprio','criticality',
                 'NUMchm','NUMinm','NUMprm','NUMdi',
                 'acinmassingmentgroup',
+                'applgroup',
                 'id'
          ]
       },
