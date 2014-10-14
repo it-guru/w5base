@@ -112,7 +112,7 @@ sub NotifyINetwork
       }
    }
 
-   my $soap=SOAP::Lite->uri($inetwxmlns)->proxy($wsproxy)
+   my $soap=SOAP::Lite->uri($inetwxmlns)->proxy($wsproxy,timeout=>15)
                       ->on_action(sub{'"'.$inetwxmlns.$_[1].'"'});
    $soap->serializer->register_ns($inetwxmlns,'ns');
 
