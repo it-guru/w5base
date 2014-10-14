@@ -20,7 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field::Select;
-use Data::Dumper;
 @ISA    = qw(kernel::Field::Select);
 
 
