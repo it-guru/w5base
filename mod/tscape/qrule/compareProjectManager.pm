@@ -145,49 +145,6 @@ sub qcheckRecord
                      }
                   }
                }
-               else{
-                  if (in_array($roles,"projectmanager")){
-                     my @newroles=grep(!/^projectmanager$/,@{$roles});
-                     if ($#newroles==-1){
-                        if ($autocorrect){
-                           push(@notifymsg,sprintf(
-                                $self->T('removing projectmanager '.
-                                         'contact %s',$self->Self),
-                                $crec->{targetname}));
-                           #################################################
-                           $lnkcontact->ValidatedDeleteRecord($crec,{
-                              id=>$crec->{id}
-                           });
-
-                           #################################################
-                        }
-                        else{
-                           push(@dataissue,"no projectmanager role for: ".
-                                $crec->{targetname});
-                        }
-                     }
-                     else{
-                        if ($autocorrect){
-                           push(@notifymsg,sprintf(
-                                $self->T('removing projectmanager role '.
-                                         'from contact %s',$self->Self),
-                                $crec->{targetname}));
-                           #################################################
-                           $lnkcontact->ValidatedUpdateRecord(
-                                        {%$crec,
-                                         refid=>$rec->{id},
-                                         parentobj=>'itil::appl'},
-                                        {roles=>\@newroles},
-                                        {id=>\$crec->{id}});
-                           #################################################
-                        }
-                        else{
-                           push(@dataissue,"no projectmanager role for: ".
-                                $crec->{targetname});
-                        }
-                     }
-                  }
-               }
             }
             if (!$pmfound){
                my $user=getModuleObject($self->getParent->Config,"base::user");
@@ -217,6 +174,57 @@ sub qcheckRecord
                }
             }
          }
+         foreach my $crec (@{$rec->{contacts}}){
+            my $roles=$crec->{roles};
+            $roles=[$roles] if (ref($roles) ne "ARRAY");
+            if ($crec->{target} ne "base::user" ||
+                ($crec->{target} eq "base::user" &&
+                 !in_array(\@pm_soll,$crec->{targetid}))){
+               if (in_array($roles,"projectmanager")){
+                  my @newroles=grep(!/^projectmanager$/,@{$roles});
+                  if ($#newroles==-1){
+                     if ($autocorrect){
+                        push(@notifymsg,sprintf(
+                             $self->T('removing projectmanager '.
+                                      'contact %s',$self->Self),
+                             $crec->{targetname}));
+                        #################################################
+                        $lnkcontact->ValidatedDeleteRecord($crec,{
+                           id=>$crec->{id}
+                        });
+
+                        #################################################
+                     }
+                     else{
+                        push(@dataissue,"no projectmanager role for: ".
+                             $crec->{targetname});
+                     }
+                  }
+                  else{
+                     if ($autocorrect){
+                        push(@notifymsg,sprintf(
+                             $self->T('removing projectmanager role '.
+                                      'from contact %s',$self->Self),
+                             $crec->{targetname}));
+                        #################################################
+                        $lnkcontact->ValidatedUpdateRecord(
+                                     {%$crec,
+                                      refid=>$rec->{id},
+                                      parentobj=>'itil::appl'},
+                                     {roles=>\@newroles},
+                                     {id=>\$crec->{id}});
+                        #################################################
+                     }
+                     else{
+                        push(@dataissue,"no projectmanager role for: ".
+                             $crec->{targetname});
+                     }
+                  }
+               }
+            }
+         }
+
+
          if ($#notifymsg!=-1){
             @qmsg=@notifymsg;
             return($rec->{name},join("\n\n",map({"- ".$_} @notifymsg)));
@@ -230,7 +238,7 @@ sub qcheckRecord
       push(@qmsg,@dataissue);
    }
 
-   return($errorlevel,{qmsg=>\@qmsg});
+   return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue});
 }
 
 sub qenrichRecord
