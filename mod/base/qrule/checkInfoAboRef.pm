@@ -129,16 +129,16 @@ sub qcheckRecord
 
    if ($rec->{invalidsince} ne ""){
       my $d=CalcDateDuration(NowStamp("en"),$rec->{invalidsince},"GMT");
-      if ($d->{totalminutes}<-30320){
-         printf STDERR ("DEBUG from QRule: demnaechst Delete of ".
-                        "InfoAbo $rec->{id}\n");
-      }
+      #if ($d->{totalminutes}<-30320){
+      #   printf STDERR ("DEBUG from QRule: demnaechst Delete of ".
+      #                  "InfoAbo $rec->{id}\n");
+      #}
       if ($d->{totalminutes}<-40320){
          my $o=$dataobj->Clone();
          $o->ValidatedDeleteRecord($rec,{id=>\$rec->{id}});
          push(@qmsg,"remove infoabo due long invalidity");
-         printf STDERR ("DEBUG from QRule: Delete of ".
-                        "InfoAbo $rec->{id}\n");
+      #   printf STDERR ("DEBUG from QRule: Delete of ".
+      #                  "InfoAbo $rec->{id}\n");
       }
 
    }
