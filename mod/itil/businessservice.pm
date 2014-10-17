@@ -917,7 +917,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.92')
+                   return('0.97')
                 },
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -937,7 +937,7 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHWarn,
                 dataobjattr   =>"$worktable.impl_avail_p*".
-                                "if ($worktable.th_warn_avail is null,0.92,".
+                                "if ($worktable.th_warn_avail is null,0.97,".
                                 "$worktable.th_warn_avail)"),
 
       new kernel::Field::Number(
@@ -950,7 +950,7 @@ sub new
                    my $mode=shift;
 
                    return(undef) if ($mode eq "edit");
-                   return('0.97')
+                   return('0.92')
                 },
                 background    =>\&calcBackgroundFlagColor,
                 editrange     =>[0.01,5.0],
@@ -970,7 +970,7 @@ sub new
                 align         =>'right',
                 extLabelPostfix=>\&extLabelPostfixTHCrit,
                 dataobjattr   =>"$worktable.impl_avail_p*".
-                                "if ($worktable.th_crit_avail is null,0.97,".
+                                "if ($worktable.th_crit_avail is null,0.92,".
                                 "$worktable.th_crit_avail)"),
 
       new kernel::Field::Number(
@@ -1319,7 +1319,8 @@ sub calcBackgroundFlagColor
    # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14127566190001
 
    if ($depname eq "threshold_fact_warn_mtbf" ||
-       $depname eq "threshold_fact_warn_ttr"){
+       $depname eq "threshold_fact_warn_ttr"  ||
+       $depname eq "threshold_fact_warn_avail"){
       if ($cur>=0.92 && $cur<0.97){
          return("yellow");
       }
@@ -1331,7 +1332,8 @@ sub calcBackgroundFlagColor
       }
    }
    elsif ($depname eq "threshold_fact_crit_mtbf" ||
-          $depname eq "threshold_fact_crit_ttr"){
+          $depname eq "threshold_fact_crit_ttr"  ||
+          $depname eq "threshold_fact_crit_avail"){
       if($cur<0.92){
          return("red");
       }
