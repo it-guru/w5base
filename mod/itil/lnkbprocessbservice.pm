@@ -58,41 +58,6 @@ sub new
                 vjoinon       =>['businessserviceid'=>'id'],
                 vjoindisp     =>'fullname'),
                                                    
-      new kernel::Field::Select(
-                name          =>'applcistatus',
-                group         =>'applinfo',
-                label         =>'Application CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['applcistatusid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Text(
-                name          =>'applapplid',
-                label         =>'ApplicationID',
-                group         =>'applinfo',
-                dataobjattr   =>'appl.applid'),
-
-      new kernel::Field::Text(
-                name          =>'appl',
-                label         =>'Application',
-                htmldetail    =>0,
-                group         =>'applinfo',
-                dataobjattr   =>'appl.name'),
-
-      new kernel::Field::Boolean(
-                name          =>'autobpnotify',
-                group         =>'eventnotification',
-                label         =>
-                'automatic notification of businessprocess impact',
-                dataobjattr   =>'lnkbprocessbusinessservice.autobpnotify'),
-
-      new kernel::Field::Textarea(
-                name          =>'applfailinfo',
-                group         =>'eventnotification',
-                label         =>
-                'impact to businessproces on application impairment',
-                dataobjattr   =>'lnkbprocessbusinessservice.appfailinfo'),
-
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
@@ -159,19 +124,20 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
-                label         =>'ApplMandatorID',
+                label         =>'BusinessProcessMandatorID',
                 group         =>'bprocessinfo',
                 dataobjattr   =>'businessprocess.mandator'),
 
       new kernel::Field::Select(
                 name          =>'bprocesscistatus',
                 group         =>'bprocessinfo',
-                label         =>'Application CI-State',
+                label         =>'Business Process CI-State',
                 vjointo       =>'base::cistatus',
+                readonly      =>1,
                 vjoinon       =>['bprocesscistatusid'=>'id'],
                 vjoindisp     =>'name'),
                                                   
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'bprocessbprocessid',
                 label         =>'BusinessprocessID',
                 group         =>'bprocessinfo',
@@ -180,6 +146,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
+                readonly      =>1,
                 group         =>'bprocessinfo',
                 translation   =>'crm::businessprocess',
                 vjointo       =>'base::grp',
@@ -194,13 +161,10 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'customerid',
+                readonly      =>1,
                 label         =>'CustomerID',
                 dataobjattr   =>'businessprocess.customer'),
 
-      new kernel::Field::Link(
-                name          =>'applcistatusid',
-                label         =>'ApplCiStatusID',
-                dataobjattr   =>'appl.cistatus'),
                                                    
       new kernel::Field::Link(
                 name          =>'bprocessid',
@@ -213,16 +177,11 @@ sub new
                 dataobjattr   =>'lnkbprocessbusinessservice.businessservice'),
 
       new kernel::Field::Link(
-                name          =>'applid',
-                label         =>'ApplID',
-                dataobjattr   =>'appl.id'),
-
-      new kernel::Field::Link(
                 name          =>'mandatorid',
                 label         =>'MandatorID',
                 dataobjattr   =>'businessprocess.mandator'),
    );
-   $self->setDefaultView(qw(bprocess appl applapplid fraction cdate));
+   $self->setDefaultView(qw(businessprocess businessservice cdate));
    $self->setWorktable("lnkbprocessbusinessservice");
    return($self);
 }
@@ -233,9 +192,7 @@ sub getSqlFrom
    my $from="lnkbprocessbusinessservice left outer join businessprocess ".
             "on lnkbprocessbusinessservice.bprocess=businessprocess.id ".
             "left outer join businessservice ".
-            "on lnkbprocessbusinessservice.businessservice=businessservice.id ".
-            "left outer join appl ".
-            "on businessservice.appl=appl.id";
+            "on lnkbprocessbusinessservice.businessservice=businessservice.id ";
    return($from);
 }
 
@@ -312,7 +269,7 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
    my $bprocessid=effVal($oldrec,$newrec,"bprocessid");
-   my @rw=qw(default eventnotification);
+   my @rw=qw(default);
 
    return(@rw) if (!defined($oldrec) && !defined($newrec));
    return(@rw) if ($self->IsMemberOf("admin"));

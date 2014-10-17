@@ -2,4 +2,6 @@
                               en=>'Link Businessprocess - Service'},
 'Application'=>{de=>'Anwendung'},
 'Business process'=>{de=>'Geschäftsprozess'},
+'Businessservice'=>{de=>'Business Service'},
 'Customer'=>{de=>'Kunde'},
+'Business Process CI-State'=>{de=>'Geschäftsprozess CI-Status'},

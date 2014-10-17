@@ -42,6 +42,9 @@ sub Init
                       "crm::businessprocess",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("customerportal.bp.acl",
+                      "crm::businessprocessacl");
+
    $self->RegisterObj("customerportal.bp.new",
                       "crm::businessprocess",
                       func=>'New',
