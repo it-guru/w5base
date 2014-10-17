@@ -468,10 +468,6 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("AL_TCom.kern.bp.lnkappl",
-                      "itil::lnkbprocessappl",
-                      defaultacl=>['admin']);
-
    $self->RegisterObj("AL_TCom.kern.complexinfoabo",
                       "itil::complexinfoabo",
                       func=>'MainWithNew',
@@ -541,6 +537,11 @@ sub Init
    $self->RegisterObj("itservices.bps.acl",
                       "crm::businessprocessacl",
                       prio=>40,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itservices.bps.lnkbs",
+                      "itil::lnkbprocessbservice",
+                      prio=>45,
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itservices.bps.new",
