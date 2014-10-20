@@ -56,7 +56,7 @@ sub new
                 label         =>'Interface User',
                 ignorecase    =>1,
                 dataobjattr   =>"decode(regexp_replace(view_name,'_.*',''),".
-                                "NULL,'[ANY]',".
+                                "NULL,'[UNDEF]',".
                                 "upper(regexp_replace(view_name,'_.*','')))"),
 
       new kernel::Field::Text(
@@ -87,7 +87,7 @@ sub new
                           $current->{viewcommand}.";\n\n";
                    $n.="grant select on \"$current->{name}\" to W5I;\n";
                    if ($current->{ifaceuser} ne "" &&
-                       $current->{ifaceuser} ne "[ANY]"){
+                       $current->{ifaceuser} ne "[UNDEF]"){
                       $n.="grant select on \"$current->{name}\" to ".
                           $current->{ifaceuser}.";\n".
                           "create or replace synonym ".
@@ -98,6 +98,14 @@ sub new
                    return($n);
                 }),
 
+      new kernel::Field::Textarea(
+                name          =>'viewfields',
+                label         =>'View Fields',
+                ignorecase    =>1,
+                dataobjattr   =>"(select listagg(column_name,', ') ".
+                                "within group (order by column_name) ".
+                                "from all_tab_columns where ".
+                                "owner='W5REPO' and table_name=view_name) "),
    );
    $self->setWorktable("all_views");
    $self->setDefaultView(qw(linenumber ifaceuser ifacetable name));
