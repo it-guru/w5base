@@ -269,12 +269,9 @@ sub getSqlFrom
 
 sub SecureValidate
 {
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   return(1);
+   return(kernel::DataObj::SecureValidate(@_));
 }
+
 
 
 sub initSearchQuery
@@ -388,7 +385,6 @@ sub FinishWrite
    my $oldrec=shift;
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
-   $self->NotifyOnCIStatusChange($oldrec,$newrec);
    return($bak);
 }
 

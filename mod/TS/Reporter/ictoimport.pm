@@ -46,12 +46,71 @@ sub Process             # will be run as a spereate Process (PID)
    my $appl=getModuleObject($self->Config,"TS::appl");
    $appl->SetFilter({cistatusid=>\'4'});
    my $oldictono;
+   my %icto=();
+   my $start=NowStamp("en");
    foreach my $arec ($appl->getHashList(@{$self->{fieldlist}},"id")){
-      if ($arec->{ictono} ne $oldictono){
-         $self->logRecord($arec);
+      if ($arec->{ictono} ne ""){
+         my $i=lc($arec->{ictono});
+         $icto{$i}=[] if (!exists($icto{$i}));
+         push(@{$icto{$i}},$arec->{id});
+         $self->logRecord($arec) if ($oldictono ne $arec->{ictono});
       }
       $oldictono=$arec->{ictono};
    }
+   my $agrp=getModuleObject($self->Config,"itil::applgrp");
+   my $m=getModuleObject($self->Config,"base::mandator");
+   my $i=getModuleObject($self->Config,"tscape::archappl");
+   my $la=getModuleObject($self->Config,"itil::lnkapplgrpappl");
+
+   my $iname=$i->Self();
+   $i->SetFilter({archapplid=>[keys(%icto)]});
+   foreach my $irec ($i->getHashList(qw(archapplid fullname description
+                                        shortname))){
+      my $mandator="Telekom IT";
+      $m->ResetFilter();
+      $m->SetFilter({name=>\$mandator,cistatusid=>\'4'});
+      my ($mandatorid)=$m->getVal("grpid");
+      my $shortname=$irec->{shortname};
+      $shortname="NONAME ".$irec->{archapplid} if ($shortname eq "");
+      $shortname=~s/\s/_/g;
+
+      $agrp->ResetFilter();
+      $agrp->SetFilter({name=>$shortname,applgrpid=>"!".$irec->{archapplid}});
+      my ($agrpid)=$agrp->getVal("id");
+      if ($agrpid ne ""){  # make it unique
+         $shortname.="_".$irec->{archapplid};
+      }
+
+      my @idl=$agrp->ValidatedInsertOrUpdateRecord({
+            cistatusid=>'4',
+            name=>$shortname,
+            fullname=>$irec->{fullname},
+            applgrpid=>$irec->{archapplid},
+            comments=>$irec->{description},
+            mandatorid=>$mandatorid,
+            srcid=>$irec->{archapplid},
+            srcsys=>$iname,
+            srcload=>$start
+         },
+         {srcsys=>\$iname,srcid=>\$irec->{archapplid}}
+      );
+      if ($#idl==0){
+         foreach my $applid (@{$icto{lc($irec->{archapplid})}}){
+            my $lid=lc($irec->{archapplid})."-".$applid;
+            my @l=$la->ValidatedInsertOrUpdateRecord({
+                  applgrpid=>$idl[0],
+                  applid=>$applid,
+                  srcid=>$lid,
+                  srcsys=>$iname,
+                  srcload=>$start
+               },
+               {srcsys=>\$iname,srcid=>\$lid}
+            );
+         }
+      }
+   }
+   $agrp->BulkDeleteRecord({'srcload'=>"<\"$start\"",srcsys=>\$iname});
+   $la->BulkDeleteRecord({'srcload'=>"<\"$start\"",srcsys=>\$iname});
    return(0);
 }
 
