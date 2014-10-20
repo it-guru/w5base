@@ -203,9 +203,10 @@ sub BorderChangeHandling
             my $text=$self->T("Dear user","itil::lib::BorderChangeHandling");
             $text.=",\n\n";
             $text.=sprintf(
-                      $self->T("there were attribute changes in the touching ".
-                               "element '%s' related to your roles or ".
-                               "interessts (infoabo) user:",
+                      $self->T("there have been attribute ".
+                               "changes made on the tangent ".
+                               "element '%s' (related to your ".
+                               "roles/functions or infoabo subscriptions):",
                                "itil::lib::BorderChangeHandling"),
                    effVal($oldrec,$newrec,$nameattr));
                   
