@@ -85,8 +85,21 @@ sub qcheckRecord
       $par->SetFilter({applid=>\$rec->{applid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
+
+      if (!defined($parrec)){
+         # try to find parrec by srcsys and srcid
+         $par->ResetFilter();
+         $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+         ($parrec)=$par->getOnlyFirst(qw(ALL));
+         if (defined($parrec) && $rec->{applid} ne $parrec->{applid}){
+            $forcedupd->{applid}=$parrec->{applid};
+         }
+      }
+
       if (!defined($parrec)){
          push(@qmsg,'given applicationid not found as active in AssetManager');
+         push(@dataissue,
+              'given applicationid not found as active in AssetManager');
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
@@ -418,7 +431,7 @@ sub qcheckRecord
    #######################################################################
 
    if ($#qmsg!=-1 || $errorlevel>0){
-      return($errorlevel,{qmsg=>\@qmsg});
+      return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue});
    }
 
    return($errorlevel,undef);
