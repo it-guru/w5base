@@ -40,6 +40,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Systemname',
+                ignorecase    =>1,
                 dataobjattr   =>'servername'),
 
       new kernel::Field::Id(
@@ -69,7 +70,7 @@ sub new
                 name          =>'t4dserverid',
                 label         =>'TAD4D ServerID',
                 dataobjattr   =>"CASE
-                                  WHEN HW_IMPLEMENTATION IS NOT NULL
+                                  WHEN HW_IMPLEMENTATION LIKE '(IBM)%'
                                    AND VENDOR_SERIAL_NUMBER IS NOT NULL
                                   THEN
                                    'IBM'
