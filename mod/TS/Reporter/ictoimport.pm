@@ -65,7 +65,7 @@ sub Process             # will be run as a spereate Process (PID)
    my $iname=$i->Self();
    $i->SetFilter({archapplid=>[keys(%icto)]});
    foreach my $irec ($i->getHashList(qw(archapplid fullname description
-                                        shortname))){
+                                        shortname status))){
       my $mandator="Telekom IT";
       $m->ResetFilter();
       $m->SetFilter({name=>\$mandator,cistatusid=>\'4'});
@@ -81,8 +81,16 @@ sub Process             # will be run as a spereate Process (PID)
          $shortname.="_".$irec->{archapplid};
       }
 
+      my $cistatusid="4";
+      if ($irec->{status} eq "Plan"){
+         $cistatusid="3";
+      }
+      if ($irec->{status} eq "Retired"){
+         $cistatusid="6";
+      }
+
       my @idl=$agrp->ValidatedInsertOrUpdateRecord({
-            cistatusid=>'4',
+            cistatusid=>$cistatusid,
             name=>$shortname,
             fullname=>$irec->{fullname},
             applgrpid=>$irec->{archapplid},
