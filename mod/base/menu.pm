@@ -836,6 +836,19 @@ sub menutop
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
+sub mT
+{
+   my $self=shift;
+   my $tag=shift;
+   my $translation=shift;
+
+   my $trtext=$self->T($tag,$translation);
+   if ($trtext eq $tag && ($trtext=~m/\./)){
+      $trtext=~s/^.*\.//;
+   }
+   return($trtext);
+}
+
 sub msel
 {
    my $self=shift;
@@ -858,11 +871,7 @@ sub msel
          push(@msub,$subm);
          my $tag=join(".",@msub);
          if (defined($mt->{fullname}->{$tag})){
-            my $trtext=$self->T($tag,$mt->{fullname}->{$tag}->{translation});
-            if ($trtext eq $tag && $trtext=~m/\./){
-               $trtext=~s/^.*\.//;
-            }
-            push(@mname,$trtext);
+            push(@mname,$self->mT($tag,$mt->{fullname}->{$tag}->{translation}));
          }
       }
       $wintitle=join(".",@mname);
@@ -1083,7 +1092,7 @@ sub processSubs
    $m->{tree}=\@subs;
    delete($m->{tree}) if ($#{$m->{tree}}==-1);
    if ($m->{translation} ne ""){
-      $m->{label}=$self->T($m->{fullname},$m->{translation});
+      $m->{label}=$self->mT($m->{fullname},$m->{translation});
    }
    else{
       $m->{label}=$m->{fullname};
