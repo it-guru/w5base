@@ -11,7 +11,7 @@
 <hr>
 <div style="margin:10px">
 <b><font color=green>W5</font><font color=darkblue>Warehouse</font></b> ...<br><br>
-... is the reporting Datawarehouse system for W5Base/Darwin. In this area, many data are <u>not</u> mirrored in realtime, soo data latencies are normal and wanted.
+... ist das Reporting-Datawarehouse System für W5Base/Darwin. In diesem Datenbereich sind viele Informationen <u>nicht</u> in Echtzeit gespiegelt. Datenlatenzen sind somit normal und gewollt.
 </div>
 <hr>
 <br>
