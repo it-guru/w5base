@@ -61,6 +61,8 @@
 'Interview result'      =>{de=>'Interview Ergebnis'},
 'Interview state'       =>{de=>'Interview Status'},
 'DataIssue state'       =>{de=>'DataIssue Status'},
+'as of timestamp'       =>{de=>'als Abfrage vom Zeitpunkt'},
 'Additionalinformations'=>{de=>'Zusatzinformationen'},
 'URL of record'=>{de=>'URL des Datensatzes'},
 'enrichment only rule'=>{de=>'Datenanreicherungsregel'},
+

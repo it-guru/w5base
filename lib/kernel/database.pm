@@ -445,6 +445,9 @@ sub fetchrow
       return(undef,1);
    }
    $self->{'current'}=$self->{'sth'}->fetchrow_hashref();
+   if ($DBI::err){
+      return(undef,1);
+   }
    return($self->{'current'});
 }
 
