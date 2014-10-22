@@ -38,13 +38,14 @@ sub AddAllFieldsFromWorktable
 {
    my $self=shift;
 
+   my ($worktable,$workdb)=$self->getWorktable();
    my @l;
    push(@l,new kernel::Field::Linenumber(
                 name          =>'linenumber',
                 label         =>'No.'));
    
    my $dict=getModuleObject($self->Config,"W5Warehouse::ufield");
-   $dict->SetFilter({aliasowner=>\'W5I',alias=>\'APPSYSASS'});
+   $dict->SetFilter({aliasowner=>\'W5I',alias=>\$worktable});
    foreach my $fld ($dict->getHashList(qw(fieldname fieldtype))){
       my $name=lc($fld->{fieldname});
       if ($name=~m/\s/){
@@ -60,21 +61,21 @@ sub AddAllFieldsFromWorktable
                        searchable    =>1,
                        ignorecase    =>1,
                        label         =>$label,
-                       dataobjattr   =>$fld->{fieldname}));
+                       dataobjattr   =>"\"$fld->{fieldname}\""));
       }
       elsif ($fld->{fieldtype} eq "NUMBER"){
          push(@l,new kernel::Field::Number(
                        name          =>$name,
                        searchable    =>0,
                        label         =>$label,
-                       dataobjattr   =>$fld->{fieldname}));
+                       dataobjattr   =>"\"$fld->{fieldname}\""));
       }
       elsif ($fld->{fieldtype} eq "DATE"){
          push(@l,new kernel::Field::Date(
                        name          =>$name,
                        searchable    =>0,
                        label         =>$label,
-                       dataobjattr   =>$fld->{fieldname}));
+                       dataobjattr   =>"\"$fld->{fieldname}\""));
       }
       if ($#l==1){
          push(@l,new kernel::Field::Date(

@@ -50,6 +50,10 @@ sub Init
                       "W5Warehouse::AppSysAss",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.W5Warehouse.Rep.UserGroupRelation",
+                      "W5Warehouse::UserGroupRelation",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itu.W5Warehouse.krn",
                       "tmpl/welcome",
                       prio=>10000,

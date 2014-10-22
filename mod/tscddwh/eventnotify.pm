@@ -23,6 +23,7 @@ use base::workflow;
 @ISA=qw(base::workflow);
 
 # This Object is only for Replication of "openeventnotify" to W5Warehouse
+# which will be used by aMore and CD-DWH (as of date 09/2014)
 
 sub new
 {

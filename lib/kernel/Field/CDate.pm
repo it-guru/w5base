@@ -19,7 +19,6 @@ package kernel::Field::CDate;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field::Date);
 
 
