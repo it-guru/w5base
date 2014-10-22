@@ -137,7 +137,10 @@ sub getSqlFrom
             "left outer join liccontract ".
             "on lnksoftwaresystem.liccontract=liccontract.id ".
             "join lnksoftwaresystem as plnksoftware ".
-            "on lnksoftwaresystem.parent=plnksoftware.id";
+            "on lnksoftwaresystem.parent=plnksoftware.id ".
+            "left outer join licproduct ".
+            "on liccontract.licproduct=licproduct.id ";
+
 
    return($from);
 }
