@@ -709,7 +709,7 @@ sub BulkDeleteRecord
    #my $cmd="delete from ta_application_data where ta_application_data.id=13";
    msg(INFO,"delcmd=%s",$cmd);
    if ($workdb->do($cmd)){
-      msg(INFO,"delete seems to be ok");
+      $self->Log(INFO,"sqlwrite",$cmd);
       return(1);
    }
    $self->LastMsg(ERROR,$self->preProcessDBmsg($workdb->getErrorMsg()));
