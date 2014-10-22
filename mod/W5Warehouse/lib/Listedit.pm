@@ -73,7 +73,6 @@ sub AddAllFieldsFromWorktable
          push(@l,new kernel::Field::Date(
                        name          =>$name,
                        searchable    =>0,
-                       sqlorder      =>'NONE',
                        label         =>$label,
                        dataobjattr   =>$fld->{fieldname}));
       }
@@ -82,14 +81,15 @@ sub AddAllFieldsFromWorktable
                        name          =>'as_of_Timestamp',
                        searchable    =>1,
                        onPreProcessFilter=>sub{
-                          my $self=shift;
-                          my $hflt=shift;
-                          if (defined($hflt->{as_of_Timestamp})){
-                             $self->getParent->Context()->{as_of_Timestamp}=
-                                $hflt->{as_of_Timestamp};
-                             delete($hflt->{as_of_Timestamp});
-                          }
-                          return(0);
+                         my $self=shift;
+                         my $hflt=shift;
+                         delete($self->getParent->Context()->{as_of_Timestamp});
+                         if (defined($hflt->{as_of_Timestamp})){
+                            $self->getParent->Context()->{as_of_Timestamp}=
+                               $hflt->{as_of_Timestamp};
+                            delete($hflt->{as_of_Timestamp});
+                         }
+                         return(0);
                        },
                        sqlorder      =>'NONE',
                        label         =>"as of timestamp",
@@ -98,6 +98,29 @@ sub AddAllFieldsFromWorktable
    }
    $self->AddFields(@l);
 }
+
+sub Welcome 
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css'],
+                           body=>1,form=>1,
+                           title=>'W5Warehouse Archive access');
+
+   printf ("W5Warehouse ist ein Datawarehouse System! - Alle Daten ".
+           "stehen mit einer Zeitverzögerung von bis zu 24h bereit. ".
+           "Der angebbare Abfragezeitpunkt bezieht sich auf das ".
+           "vorhanden sein der Daten im W5Warhouse-System (also nicht ".
+           "auf den Zeitpunkt des Datenstandes des dem Warehouse ".
+           "zuliefernden Datenhaltungssystems.");
+           
+   
+
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
 
 
 
@@ -118,7 +141,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_as_of_Timestamp"))){
-     Query->Param("search_as_of_Timestamp"=>$self->T("now")."-1d");
+     Query->Param("search_as_of_Timestamp"=>$self->T("now"));
    }
 }
 
@@ -136,10 +159,13 @@ sub getSqlFrom
 
    if ($ts ne ""){
       my $t=$self->ExpandTimeExpression($ts,"en",undef,"GMT");
+      my $now=NowStamp("en");
       if (!defined($t)){
          return(undef);
       }
-      $append=" AS OF TIMESTAMP TO_TIMESTAMP('$t','YYYY-MM-DD HH24:MI:SS')";
+      if ($t ne $now){
+         $append=" AS OF TIMESTAMP TO_TIMESTAMP('$t','YYYY-MM-DD HH24:MI:SS')";
+      }
    }
    return($worktable.$append);
 }
