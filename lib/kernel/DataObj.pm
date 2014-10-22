@@ -1829,12 +1829,12 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
                                                  "base::workflowaction");
       }
       $notifycontrol->{wfact}->Notify("INFO",$subject,$text,%notifyparam);
-      if (defined($lastlang)){
-         $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
-      }
-      else{
-         delete($ENV{HTTP_FORCE_LANGUAGE});
-      }
+   }
+   if (defined($lastlang)){
+      $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+   }
+   else{
+      delete($ENV{HTTP_FORCE_LANGUAGE});
    }
 }
 
