@@ -150,7 +150,7 @@ sub Validate
 
 sub SelfAsParentObject    # this method is needed because existing derevations
 {
-   return("itil::chmmgr");
+   return("itil::chmmgmt");
 }
 
 
