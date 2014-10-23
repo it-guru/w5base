@@ -57,3 +57,9 @@
 'PERS.2'=>{de=>'Ja',en=>'Yes'},
 'from Application CI-State'=>{de=>'von Anwendung CI-Status'},
 'to Application CI-State'=>{de=>'nach Anwendung CI-Status'},
+'state'=>{
+   de=>'Alle Informationen in diesem Dokuement entsprechen dem Stand im ITIL-Configuration-Management vom ',
+   en=>'All informations in these document refer to state of ITIL-Configuration-Management from '},
+'disclaimer'=>{
+   de=>'Die Daten dürfen nur gebunden an den vereinbarten Zweck und innerhalb der definierten Applikation verarbeitet werden. Eine Weitergabe an andere Applikationen ist nur mit schriftlicher Zustimmung erlaubt. Die Partnerapplikation bestätigt, dass zum Zeitpunkt der Unterschrift und auch darüber hinaus jederzeit die Konzernvorgaben eingehalten werden und dass im speziellen die BR-Freigabe und das SDSK jederzeit aktuell und freigegeben vorliegt. Die Schnittstellenpartner behalten sich vor, diese Schnittstelle bei Nichteinhalten der Vereinbarungen oder bei gravierenden technischen Beeinträchtigungen abzuschalten.',
+   en=>'The usage of data is only allowed for the agreed purpose and to be processed within the defined application. The disclosure of data to other applications is only allowed with written permission. The partner application confirms that all corporate guidelines are met at the time of signature and in the future and that especially the Working-Council release and the Standardized Data Privacy & Security Concept (SDSK) are always available and up to date. The interface partners reserve the right to disconnect this interface in case of non-compliance to the agreements, or in case of major technical drawbacks.'},

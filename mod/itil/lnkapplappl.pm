@@ -799,12 +799,9 @@ sub InterfaceAgreement
       print("</ol>");
       print("</div>");
       print("<div class=disclaimer>");
-      printf("Alle Informationen dieses Dokumentes entsprechen dem Stand %s ".
-             "im ITIL-Configuration-Management.",NowStamp("en")); 
-      print("<br />");
-      print("Die Schnittstellenpartner behalten sich vor, ".
-            "diese Schnittstelle bei Nichteinhaltung ".
-            "der Vereinbarungen abzuschalten.");
+      print($self->T('state'),NowStamp("en"));
+      print("<br><br>");
+      print($self->T('disclaimer'));
       print("</div>");
       print("<div class=subscriber>");
       print("<table class=subscriber>");
