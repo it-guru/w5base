@@ -456,8 +456,8 @@ sub Validate
    }
    my $fromurl=effVal($oldrec,$newrec,"fromurl");
    if ($fromurl ne "" &&
-       !(($fromurl=~m/^[a-z]+:\/\/\S+?\/.*$/) &&
-         ($fromurl=~m/^[a-z]+:\/\/\S+\/\S+\@\S+\/.*$/))){
+       !($fromurl=~m/^[a-z]+:\/\/\S+\/.*$/) &&
+       !($fromurl=~m/^[a-z]+:\/\/\S+\/\S+\@\S+\/.*$/)){
       $self->LastMsg(ERROR,"invalid notation of the from URL");
       return(0);
    }
@@ -472,42 +472,45 @@ sub Validate
    if (!defined($oldrec)) {
       if (!exists($newrec->{htmlagreements})) {
          $newrec->{htmlagreements}=
-            "<ul><li>Ziel/Zweck der Schnittstelle - ".
-            "Purpose of the Interface</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Aufbau/Testphase - ".
-            "Setup/Testing Phase</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Regelverarbeitungen und Wartungen - ".
-            "Rule Processing and Maintenance</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Verhalten bei Datenfehlern (Ansp.) - ".
-            "Behaviour in case of Data Errors (Contact)</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Verhalten bei technischen Fehlern (Ansp.) - ".
-            "Behaviour in case of Technical Errors (Contact)</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Evtl. Regressanspruchsregelungen - ".
-            "Possible Regulations for Recourse Rights</li></ul>".
-            "(nothing documented)<br><br>\n";
+            "<ul>".
+            "<li><b>Ziel/Zweck der Schnittstelle - ".
+            "Purpose of the Interface</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Aufbau/Testphase - ".
+            "Setup/Testing Phase</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Regelverarbeitungen und Wartungen - ".
+            "Rule Processing and Maintenance</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Verhalten bei Datenfehlern (Ansp.) - ".
+            "Behaviour in case of Data Errors (Contact)</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Verhalten bei technischen Fehlern (Ansp.) - ".
+            "Behaviour in case of Technical Errors (Contact)</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Evtl. Regressanspruchsregelungen - ".
+            "Possible Regulations for Recourse Rights</b><br>".
+            "(nothing documented)</li>".
+            "</ul>";
       }
       if (!exists($newrec->{htmldescription})){
          $newrec->{htmldescription}=
-            "<ul><li>Technische Realisation (log. System, IP, usw.) - ".
-            "Technical Realisation (log. system, IP, etc.)</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Übertragungsvolumen/Datenmenge - ".
-            "Transfer Volumes</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Lieferzeiten/Lieferungs-Intervall - ".
-            "Delivery Times/Delivery Intervals</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Beschreibung des Monitorings - ".
-            "Detailed Description of Monitoring</li></ul>".
-            "(nothing documented)<br><br>\n".
-            "<ul><li>Inhalt/Felder - ".
-            "Content/Fields</li></ul>".
-            "(nothing documented)<br><br>\n";
+            "<ul>".
+            "<li><b>Technische Realisation (log. System, IP, usw.) - ".
+            "Technical Realisation (log. system, IP, etc.)</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Übertragungsvolumen/Datenmenge - ".
+            "Transfer Volumes</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Lieferzeiten/Lieferungs-Intervall - ".
+            "Delivery Times/Delivery Intervals</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Beschreibung des Monitorings - ".
+            "Detailed Description of Monitoring</b><br>".
+            "(nothing documented)</li>".
+            "<li><b>Inhalt/Felder - ".
+            "Content/Fields</b><br>".
+            "(nothing documented)</li>";
       }
    }
 
@@ -611,10 +614,10 @@ sub InterfaceAgreement
       my $appl=getModuleObject($self->Config,"itil::appl");
       $appl->ResetFilter();
       $appl->SetFilter({id=>\$masterrec->{fromapplid}});
-      my ($ag1,$msg)=$appl->getOnlyFirst(qw(name id tsm applmgr));
+      my ($ag1,$msg)=$appl->getOnlyFirst(qw(name id tsm applmgr description));
       $appl->ResetFilter();
       $appl->SetFilter({id=>\$masterrec->{toapplid}});
-      my ($ag2,$msg)=$appl->getOnlyFirst(qw(name id tsm applmgr));
+      my ($ag2,$msg)=$appl->getOnlyFirst(qw(name id tsm applmgr description));
       my @l=($ag1,$ag2);
       @l=sort({$a->{name} cmp $b->{cmp}} @l);
       my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
@@ -652,7 +655,7 @@ sub InterfaceAgreement
       my @iflist=$self->getHashList(qw(cdate mdate 
                                        fromapplid toapplid contype 
                                        conmode conproto
-                                       htmldescription comments
+                                       htmlagreements htmldescription comments
                                        fromurl fromservice
                                        tourl toservice
                                        monitor monitortool
@@ -686,113 +689,132 @@ sub InterfaceAgreement
 
       print("<ol type='I' class=appl>");
       foreach my $ctrl (@l){
-         printf("<li><b>Definition der Schnittstelle aus Sicht '%s'</b><br>",
+         print("<li>");
+         printf("<h1>Definition der Schnittstelle aus Sicht '%s'</h1>",
                  $ctrl->{name});
-         printf("<p class=applheader>".
-               "Fachlicher Ansprechpartner für die Anwendung '%1\$s' ".
-               "ist der Application Manager '%2\$s'. ".
-               "Technischer Ansprechpartner ist der ".
-               "Technical Solution Manager '%3\$s'. In den folgenden ".
-               "Absätzen wird die Sichtweise der Schnittstellen und die ".
-               "Rahmenbedinungen für dessen Funktion aus Sicht des ".
-               "Betreibers der Anwendung '%1\$s' beschrieben.".
-               "<br><br></p>",
-               $ctrl->{name},$ctrl->{applmgr},$ctrl->{tsm});
-         printf("<p>Die Verbindungen in Richtung '%s' im Einzelnen:</p>",
+
+         (my $desc=$ctrl->{description})=~s{\n}{<br>}g;
+         print("<div class=desc>");
+         printf("<h2>Anwendungsbeschreibung:</h1>%s",$desc);
+         print("<br><br>");
+         printf("<h2>Ansprechpartner:</h2>".
+                "Fachlicher Ansprechpartner für die Anwendung '%1\$s' ".
+                "ist der Application Manager '%2\$s'.<br> ".
+                "Technischer Ansprechpartner ist der ".
+                "Technical Solution Manager '%3\$s'.<br><br>".
+                "In den folgenden Absätzen wird die Sichtweise der ".
+                "Schnittstellen und die Rahmenbedinungen für dessen Funktion ".
+                "aus Sicht des Betreibers der Anwendung '%1\$s' beschrieben.",
+                $ctrl->{name},$ctrl->{applmgr},$ctrl->{tsm});
+         print("<br><br>");
+         printf("<h2>Die Verbindungen in Richtung '%s' im Einzelnen:</h2>",
                $ctrl->{targetname});
         # print "<xmp>".Dumper($ctrl)."</xmp>";
          if ($#{$ctrl->{interface}}!=-1){
             print("<ol class=lnkapplappl type='a'>");
             foreach my $ifrec (@{$ctrl->{interface}}){
-               printf("<li><b>%s-Kommunikation mittels <u>%s</u> zur ".
-                     "Anwendung '%s'</b><br>",
+               print("<li>");
+               printf("<h1>%s-Kommunikation mittels <u>%s</u> zur ".
+                     "Anwendung '%s'</h1>",
                      $ifrec->{conmode},$ifrec->{conproto},$ctrl->{targetname});
+               print("<div>");
                if ($ifrec->{comments} ne ""){
                   printf("<div class=comments>%s</div>",$ifrec->{comments});
                }
 
-               print("<ul>");
                if ($ifrec->{contype} ne ""){
                   my $type=$self->T("contype.$ifrec->{contype}",
                                     "itil::lnkapplappl");
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                          $self->getField("contype")->Label,
                          $type);
                }
                if ($ifrec->{fromurl} ne ""){
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                           $self->getField("fromurl")->Label,
                           $ifrec->{fromurl});
                }
                if ($ifrec->{fromservice} ne ""){
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                           $self->getField("fromservice")->Label,
                           $ifrec->{fromservice});
                }
                if ($ifrec->{tourl} ne ""){
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                           $self->getField("tourl")->Label,
                           $ifrec->{tourl});
                }
                if ($ifrec->{toservice} ne ""){
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                           $self->getField("toservice")->Label,
                           $ifrec->{toservice});
                }
                if ($ifrec->{monitor} ne ""){
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                           $self->getField("monitor")->Label,
                           $ifrec->{monitor});
                }
                if ($ifrec->{monitortool} ne ""){
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                           $self->getField("monitortool")->Label,
                           $ifrec->{monitortool});
                }
                if ($ifrec->{monitorinterval} ne ""){
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                           $self->getField("monitorinterval")->Label,
                           $ifrec->{monitorinterval});
                }
                if ($ifrec->{persrelated} ne ""){
                   my $prel=$self->T("PERS.$ifrec->{persrelated}",
                                     "itil::lnkapplappl");
-                  printf("<li>%s: %s</li>",
+                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
                           $self->getField("persrelated")->Label,
                           $prel);
                }
-               print("</ul>");
 
+               if ($ifrec->{htmlagreements} ne ""){
+                  my $label=$self->getField("htmlagreements")->Label;
+                  printf("<div class=htmldescription>".
+                         "<b>%s</b><br><br>%s</div><br>",
+                         $label,$ifrec->{htmlagreements});
+               }
                if ($ifrec->{htmldescription} ne ""){
-                  printf("<div class=htmldescription>%s</div>",
-                         $ifrec->{htmldescription});
+                  my $label=$self->getField("htmldescription")->Label;
+                  printf("<div class=htmldescription>".
+                         "<b>%s</b><br><br>%s</div><br>",
+                         $label,$ifrec->{htmldescription});
                }
                if (!($ifrec->{partnerok})){
                   print($noTargetDefTxt);
                }
+               print("</div></li>");
             }
             print("</ol>");
          }
          else{
-            print($noTargetDefTxt);
+            print("<br>",$noTargetDefTxt);
          }
-         print("</li>");
+         print("</div></li>");
       }
       print("</ol>");
       print("</div>");
       print("<div class=disclaimer>");
       printf("Alle Informationen dieses Dokumentes entsprechen dem Stand %s ".
              "im ITIL-Configuration-Management.",NowStamp("en")); 
+      print("<br />");
+      print("Die Schnittstellenpartner behalten sich vor, ".
+            "diese Schnittstelle bei Nichteinhaltung ".
+            "der Vereinbarungen abzuschalten.");
       print("</div>");
       print("<div class=subscriber>");
-      print("<table class=subscriber width=100%>");
-      print("<tr height=50>");
-      print("<td width=50%>&nbsp;</td>");
-      print("<td width=50%>&nbsp;</td>");
+      print("<table class=subscriber>");
+      print("<tr height=50px>");
+      print("<td>&nbsp;</td>");
+      print("<td>&nbsp;</td>");
       print("</tr>");
       print("<tr>");
-      printf("<td width=50% align=center>Datum, Unterschrift AM '%s'</td>",$l[0]->{name});
-      printf("<td width=50% align=center>Datum, Unterschrift AM '%s'</td>",$l[1]->{name});
+      printf("<td>Datum, Unterschrift AM '%s'</td>",$l[0]->{name});
+      printf("<td>Datum, Unterschrift AM '%s'</td>",$l[1]->{name});
       print("</tr>");
       print("</table>");
       print("</div>");
