@@ -60,5 +60,20 @@ sub SetFilter
 }
 
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($self->isDataInputFromUserFrontend()){
+      return(undef);
+   }
+
+   return($self->SUPER::isViewValid($rec));
+}
+
+
+
+
 
 1;

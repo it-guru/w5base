@@ -68,6 +68,19 @@ sub SetFilter
    return($self->SUPER::SetFilter(@flt));
 }
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($self->isDataInputFromUserFrontend()){
+      return(undef);
+   }
+
+   return($self->SUPER::isViewValid($rec));
+}
+
+
 sub SetCurrentView  # hack to prevent needed wffields. prefix
 {
    my $self=shift;
