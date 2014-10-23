@@ -333,11 +333,11 @@ sub getPosibleActions
    my $iscurrent=$self->isCurrentForward($WfRec);
 
    if ($stateid==2 || $stateid==4){
-      push(@l,"wfaddsnote");
+      push(@l,"wfaddlnote");
    }
    if ($iscurrent && ($stateid==5)){
       push(@l,"nop");
-      push(@l,"wfaddsnote");
+      push(@l,"wfaddlnote");
    }
    if ($iscurrent && ($stateid==2 || $stateid==4)){
       push(@l,"wfdefer");
@@ -666,7 +666,7 @@ sub Process
          $self->LastMsg(ERROR,"invalid disalloed action requested");
          return(0);
       }
-      if ($op eq "wfaddsnote"){
+      if ($op eq "wfaddlnote"){
          my $note=Query->Param("note");
          if ($note=~m/^\s*$/  || length($note)<10){
             $self->LastMsg(ERROR,"empty or to short notes are not allowed");
@@ -677,7 +677,7 @@ sub Process
          $oprec->{stateid}=4;
          my $effort=Query->Param("Formated_effort");
          if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfaddsnote",
+             $WfRec->{id},"wfaddlnote",
              {translation=>'base::workflow::request'},$note,$effort)){
             $self->StoreRecord($WfRec,$oprec);
             $self->PostProcess($action.".".$op,$WfRec,$actions);
@@ -864,7 +864,7 @@ sub generateWorkspacePages
    }
    $self->SUPER::generateWorkspacePages($WfRec,$actions,
                                                $divset,$selopt);
-   return("wfaddsnote");
+   return("wfaddlnote");
 }
 
 

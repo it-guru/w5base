@@ -3,6 +3,7 @@
 'wfaddnote'=>{de=>'Notiz',en=>'Note'},
 'wfinquiry'=>{de=>'Nachfrage',en=>'Inquiry'},
 'wfaddsnote'=>{de=>'Notiz',en=>'Note'},
+'wfaddlnote'=>{de=>'Notiz',en=>'Note'},
 'wfaccept'=>{de=>'Angenommen',en=>'Accepted'},
 'wfbreak'=>{de=>'Abgebrochen',en=>'Breaked'},
 'wffine'=>{de=>'Abgeschlossen',en=>'Finished'},

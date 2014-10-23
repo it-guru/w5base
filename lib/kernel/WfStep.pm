@@ -449,7 +449,7 @@ sub nativProcess
       return(0);
    }
 
-   elsif ($op eq "wfaddnote" || $op eq "wfaddsnote"){
+   elsif ($op eq "wfaddnote" || $op eq "wfaddsnote" || $op eq "wfaddlnote"){
       my $note=$h->{note};
       if ($note=~m/^\s*$/  || length($note)<10){
          $self->LastMsg(ERROR,"empty or to short notes are not allowed");
@@ -1171,6 +1171,14 @@ sub generateWorkspacePages
                 $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
                 "</div>";
    }
+   if (grep(/^wfaddlnote$/,@$actions)){
+      $$selopt.="<option value=\"wfaddlnote\">".
+                $self->getParent->T("wfaddlnote",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfaddlnote class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions,mode=>'local').
+                "</div>";
+   }
    if (grep(/^wfdefer$/,@$actions)){
       $$selopt.="<option value=\"wfdefer\">".
                 $self->getParent->T("wfdefer",$tr).
@@ -1315,8 +1323,13 @@ sub getDefaultNoteDiv
    my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note ".
          "onkeydown=\"textareaKeyHandler(this,event);\" ".
-         "style=\"width:100%;height:${noteheight}px\">".
+         "style=\"width:100%;resize:none;height:${noteheight}px\">".
          quoteHtml($note)."</textarea></td></tr>";
+   if ($mode eq "local"){
+      $d.="<tr><td valign=left style='padding:2px'>".
+          $self->getParent->getParent->T("LOCALNOTE","base::workflowaction").
+          "<td></tr>";
+   }
    if ($mode eq "addnote" || $mode eq "simple"){
       if ($mode eq "simple"){
          $d.="<tr><td width=1% nowrap valign=center>&nbsp;";
