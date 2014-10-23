@@ -319,7 +319,8 @@ sub getFollowupTargetUserids
                                    grpcistatusid=>[4],
                                    nativrole=>[orgRoles()]});
                foreach my $lnkrec ($usrgrp->getHashList(qw(userid))){
-                  msg(INFO,"add userid '$lnkrec->{userid}'");
+                  # message not needed in errorlog
+                  #msg(INFO,"add userid '$lnkrec->{userid}'");
                   push(@{$param->{addcctarget}},$lnkrec->{userid});
                }
             }
