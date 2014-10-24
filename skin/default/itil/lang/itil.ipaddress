@@ -41,4 +41,5 @@ Systembedingt wird bei Wildcard-Abfragen nur dann ein Ergebnis
 angezeigt, wenn innerhalb der ersten 40 gefundenen IP-Adressen
 min. 1 IP-Adresse vorhanden ist, bei der man auch das
 dazugehörige System/Cluster anzeigen darf.',en=>'By technical restrictions there will be only a result displayed, if there are on wildcard query at last one displayable ip in the list'},
+'relevant CI is alive'=>{de=>'relevantes Config-Item ist aktiv'},
 

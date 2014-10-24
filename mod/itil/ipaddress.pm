@@ -219,6 +219,27 @@ sub new
                 vjoinon       =>['id'=>'ipaddressid'],
                 vjoindisp     =>'customer'),
 
+      new kernel::Field::Boolean(
+                name          =>'ciactive',
+                label         =>'relevant CI is alive',
+                group         =>'further',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                dataobjattr   =>'(select '.
+                   'if (system.id is not null,if (system.cistatus<6,1,0),'.
+                   'if (lnkitclustsvc.id is not null,1,0)) '.
+                   ' from ipaddress as ip '.
+                   'left outer join system on system.id=ip.system '.
+                   'left outer join lnkitclustsvc on '.
+                         'lnkitclustsvc.id=ip.lnkitclustsvc '.
+                   'where ip.id=ipaddress.id limit 1)'),
+
       new kernel::Field::Text(
                 name          =>'tsmemail',
                 label         =>'Systems TSM E-Mail',

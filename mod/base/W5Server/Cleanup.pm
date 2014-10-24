@@ -40,7 +40,8 @@ sub process
          $self->{doForceCleanup}=0;
          if (!$ro){
             my $joblog=getModuleObject($self->getParent->Config,"base::joblog");
-            my %jobrec=(name=>"Cleanup.pm",event=>"Cleanup.pm W5Server",
+            my %jobrec=(name=>"base::W5Server::Cleanup.pm",
+                        event=>"Cleanup.pm W5Server",
                         pid=>$$);
             my $jobid;
             if ($joblog->Ping()){
