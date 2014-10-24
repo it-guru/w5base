@@ -164,7 +164,6 @@ sub Validate
       );
 
       my $calcPrio;
-
       foreach my $statfield (@detailstatfields) {
          if (effChanged($oldrec,$newrec,$statfield)) {
             $calcPrio=1;
@@ -172,7 +171,11 @@ sub Validate
          }
       }
 
-      if ($calcPrio) {
+      # Prio wird beim Speichern immer berechnet,
+      # auch wenn keine Klassifizierung geändert wurde.
+      # Zur Erleichterung, solange es noch alte Worflows
+      # ohne priocalculated gibt.
+      #if ($calcPrio) {
          my $newPrio; 
          my %stat;
 
@@ -196,14 +199,43 @@ sub Validate
          $faktor*=0.5 if ($stat{devreqdetailstateffortclass} eq 'D (>20h)');
          $faktor*=0   if ($stat{devreqdetailstatappmgmtveto} == 1);
 
-         $newPrio=int(6-(6/630)*$faktor)+2;
-         
-         $newPrio=2 if ($newPrio<2);
-         $newPrio=8 if ($newPrio>8);
+         #$newPrio=int(6-(6/630)*$faktor)+2;
+         #
+         #$newPrio=2 if ($newPrio<2);
+         #$newPrio=8 if ($newPrio>8);
 
-         if ($newPrio ne $oldrec->{prio}) {
+         if ($faktor<1) {
+            $newPrio=8;
+         } elsif ($faktor<3) {
+            $newPrio=7;
+         } elsif ($faktor<6) {
+            $newPrio=6;
+         } elsif ($faktor<12) {
+            $newPrio=5;
+         } elsif ($faktor<32) {
+            $newPrio=4;
+         } elsif ($faktor<=100) {
+            $newPrio=3;
+         } else {
+            $newPrio=2;
+         }
+            
+      #   if ($newPrio ne $oldrec->{prio}){
+      #      $newrec->{prio}=$newPrio;
+      #      $newrec->{priocalculated}=$newPrio;
+      #   }
+         if ($newPrio ne $oldrec->{priocalculated}) {
+            $newrec->{priocalculated}=$newPrio;
             $newrec->{prio}=$newPrio;
          }
+            
+      #}
+
+      # Update Prio always if a detailstatfield has changed
+      if ($calcPrio &&
+          effVal($oldrec,$newrec,"priocalculated") !=
+          effVal($oldrec,$newrec,"prio")) {
+         $newrec->{prio}=effVal($oldrec,$newrec,"priocalculated");
       }
    }
       
@@ -251,7 +283,6 @@ sub getDynamicFields
 
       new kernel::Field::Boolean(
                 name          =>'devreqdetailstat',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'init',
                 default       =>'0',
                 label         =>'detailed classification/priorisation process',
@@ -259,7 +290,6 @@ sub getDynamicFields
 
       new kernel::Field::Boolean(
                 name          =>'devreqdetailstatbugfix',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'0',
                 label         =>'request is verificable a bug fix',
@@ -267,7 +297,6 @@ sub getDynamicFields
 
       new kernel::Field::Boolean(
                 name          =>'devreqdetailstatmgmtesc',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'0',
                 label         =>
@@ -276,7 +305,6 @@ sub getDynamicFields
 
       new kernel::Field::Boolean(
                 name          =>'devreqdetailstatdependent',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'0',
                 readonly      =>1,
@@ -286,7 +314,6 @@ sub getDynamicFields
 
       new kernel::Field::Boolean(
                 name          =>'devreqdetailstatnewfunc',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'0',
                 label         =>
@@ -295,7 +322,6 @@ sub getDynamicFields
 
      new kernel::Field::Select(
                 name          =>'devreqdetailstatbenefit',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'MIDDLE',
                 value         =>['LOW','MIDDLE','ESSENTIEL'],
@@ -305,7 +331,6 @@ sub getDynamicFields
 
       new kernel::Field::Boolean(
                 name          =>'devreqdetailstatprocboss',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'0',
                 label         =>
@@ -314,7 +339,6 @@ sub getDynamicFields
 
       new kernel::Field::Select(
                 name          =>'devreqdetailstatrisk',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'NORMAL',
                 value         =>['LOW','NORMAL','HIGH'],
@@ -324,7 +348,6 @@ sub getDynamicFields
 
       new kernel::Field::Text(
                 name          =>'devreqdetailstateffortclass',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'D (>20h)',
                 readonly      =>1,
@@ -333,11 +356,26 @@ sub getDynamicFields
 
       new kernel::Field::Boolean(
                 name          =>'devreqdetailstatappmgmtveto',
-                translation   =>'itil::workflow::eventnotify',
                 group         =>'devreqstat',
                 default       =>'0',
                 label         =>
                  'veto from application management of affected application',
+                container     =>'headref'),
+
+      new kernel::Field::Number(
+                name          =>'priocalculated',
+                group         =>'devreqstat',
+                readonly      =>1,
+                htmldetail    =>sub {
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   my $v=$self->RawValue($current);
+                   return(0) if (!defined($v));
+                   return(1);
+                },
+                label         =>'Prio calculated',
                 container     =>'headref'),
 
     ),$self->SUPER::getDynamicFields(%param));
