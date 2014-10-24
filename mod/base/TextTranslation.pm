@@ -121,7 +121,7 @@ $html=new HTML::Parser();
       my $res=$response->content;
       if ($res ne ""){
          $res=UTF8toLatin1($res);
-         msg(INFO,"GoogleResponse=%s\n",$res);
+         #msg(INFO,"GoogleResponse=%s\n",$res);
          my $eenv=new Safe();
          my $res=$eenv->reval($res.";");
          if (ref($res) eq "ARRAY" &&
