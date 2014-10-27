@@ -708,10 +708,10 @@ sub InterfaceAgreement
                 "aus Sicht des Betreibers der Anwendung '%1\$s' beschrieben.",
                 $ctrl->{name},$ctrl->{applmgr},$ctrl->{tsm});
          print("<br><br>");
-         printf("<h2>Die Verbindungen in Richtung '%s' im Einzelnen:</h2>",
-               $ctrl->{targetname});
         # print "<xmp>".Dumper($ctrl)."</xmp>";
          if ($#{$ctrl->{interface}}!=-1){
+            printf("<h2>Die Verbindungen in Richtung '%s' im Einzelnen:</h2>",
+                   $ctrl->{targetname});
             print("<ol class=lnkapplappl type='a'>");
             foreach my $ifrec (@{$ctrl->{interface}}){
                print("<li>");
@@ -785,15 +785,12 @@ sub InterfaceAgreement
                          "<b>%s</b><br><br>%s</div><br>",
                          $label,$ifrec->{htmldescription});
                }
-               if (!($ifrec->{partnerok})){
-                  print($noTargetDefTxt);
-               }
                print("</div></li>");
             }
             print("</ol>");
          }
          else{
-            print("<br>",$noTargetDefTxt);
+            print($noTargetDefTxt);
          }
          print("</div></li>");
       }
