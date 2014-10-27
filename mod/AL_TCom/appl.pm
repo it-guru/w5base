@@ -137,7 +137,7 @@ sub new
                                 'if (appl.disasterrecclass=5,2,'.
                                 'if (appl.disasterrecclass=6,2,'.
                                 'if (appl.disasterrecclass=7,2,'.
-                                'NULL))))))))'),
+
    );
    #  removed based on 
    #  https://darwin.telekom.de/darwin/auth/base/workflow/ById/14135335110009
@@ -171,7 +171,8 @@ sub ItemSummary
    # alle beantworteten Interview-Fragen
    my $o=getModuleObject($self->Config,"itil::lnkapplinteranswer");
    $o->SetFilter({parentid=>\$current->{id}});
-   my @l=$o->getHashList(qw(id name relevant interviewid answer answerlevel));
+   my @l=$o->getHashList(qw(id name relevant interviewid answer answerlevel
+                            comments));
    Dumper(\@l);
    $summary->{interviewansers}=\@l;
    return(0) if (!$o->Ping());
