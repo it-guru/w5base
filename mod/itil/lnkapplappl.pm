@@ -102,12 +102,13 @@ sub new
                 name          =>'conproto',
                 label         =>'Interfaceprotocol',
                 value         =>[qw( unknown 
-                     BCV CAPI Corba DB-Connection DB-Link dce DCOM DSO 
+                     BCV CAPI CIFS Corba DB-Connection DB-Link dce DCOM DSO 
                      ftp html http https IMAP IMAPS IMAP4 
                      jdbc ldap ldaps LDIF MAPI 
                      MFT MQSeries Netegrity NFS ODBC OSI openFT
                      papier pkix-cmp POP3 POP3S 
-                     rcp rfc RMI RPC rsh sftp sldap smtp snmp SPML
+                     rcp rfc RMI RPC rsh sftp sldap SMB SMB-AuthOnly
+                     smtp snmp SPML
                      ssh tuxedo TCP UC4 UCP/SMS utm X.31 XAPI xml
                      OTHER)],
                 default       =>'online',
