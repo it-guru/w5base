@@ -48,6 +48,7 @@
 'Customer'=>{de=>'Kunde'},
 'central managed CI groups'=>{de=>'zentral geführte CI Gruppen'},
 'Business Team'=>{de=>'Betriebsteam'},
+'Applicationgroup'=>{de=>'Anwendungsgruppe'},
 'Business Department'=>{de=>'Betriebsfachbereich'},
 'Customers Application Prioritiy'=>{de=>'Priorität der Anwendung'},
 'you are not authorized to set other persons as databoss'=>{

@@ -668,7 +668,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'applgrp',
-                label         =>'Applicationgroup (BETA!)',
+                label         =>'Applicationgroup',
                 readonly      =>'1',
                 group         =>'customer',
                 weblinkto     =>'itil::applgrp',
@@ -938,10 +938,14 @@ sub new
                                  'cbreakdown'],  # see also opmode at system
                 htmleditwidth =>'200px',
                dataobjattr   =>'appl.opmode'),
-      new kernel::Field::Text(
-                name          =>'applgroup',
-                label         =>'Application Group',
-                dataobjattr   =>'appl.applgroup'),
+      #
+      # removed based on 
+      # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14135335110009
+      #
+      #new kernel::Field::Text(
+      #          name          =>'applgroup',
+      #          label         =>'Application Group',
+      #          dataobjattr   =>'appl.applgroup'),
 
       new kernel::Field::Textarea(
                 name          =>'description',

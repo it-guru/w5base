@@ -150,15 +150,18 @@ sub new
                 dataobjattr   =>'appl.controlcenter'),
 
    );
- 
-   $self->AddFields(
-      new kernel::Field::Text(
-                name          =>'applnumber',
-                searchable    =>0,
-                label         =>'Application number',
-                container     =>'additional'),
-      insertafter=>['applid'] 
-   );
+
+   # removed based on request
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14135335110009
+   # 
+   #$self->AddFields(
+   #   new kernel::Field::Text(
+   #             name          =>'applnumber',
+   #             searchable    =>0,
+   #             label         =>'Application number',
+   #             container     =>'additional'),
+   #   insertafter=>['applid'] 
+   #);
 
 
 

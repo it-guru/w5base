@@ -2725,7 +2725,7 @@ sub nativProcess
                                                 mandator mandatorid conumber
                                                 responseteam businessteam
                                                 mgmtitemgroup
-                                                applgroup reportinglabel
+                                                applgrp reportinglabel
                                                 eventlang customerprio
                                                 custcontracts id));
          if (defined($arec)){
@@ -2739,8 +2739,8 @@ sub nativProcess
             $app=$arec->{name};
             $h->{affecteditemgroup}=[sort(keys(%affecteditemgroup))];
             $h->{affectedapplicationid}=[$arec->{id}];   
-            $h->{affectedapplicationgroup}=[$arec->{applgroup}];   
-            $h->{eventstatreportinglabel}=$arec->{applgroup};   
+            $h->{affectedapplicationgroup}=[$arec->{applgrp}];   
+            $h->{eventstatreportinglabel}=$arec->{applgrp};   
             if ($h->{eventstatreportinglabel} eq ""){
                $h->{eventstatreportinglabel}=$arec->{name};
             }
