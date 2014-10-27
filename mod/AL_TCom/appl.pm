@@ -137,6 +137,7 @@ sub new
                                 'if (appl.disasterrecclass=5,2,'.
                                 'if (appl.disasterrecclass=6,2,'.
                                 'if (appl.disasterrecclass=7,2,'.
+                                'NULL))))))))'),
 
    );
    #  removed based on 
