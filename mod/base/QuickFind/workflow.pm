@@ -80,7 +80,7 @@ sub QuickFindDetail
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($dataobj,id=>$id);
+         $htmlresult.=$self->addDirectLink($dataobj,{id=>$id});
       }
       $htmlresult.="<table>";
       my @l=@fl;

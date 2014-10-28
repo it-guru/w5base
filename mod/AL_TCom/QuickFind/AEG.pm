@@ -77,10 +77,16 @@ sub QuickFindDetail
 
    my $appl=getModuleObject($self->getParent->Config,"AL_TCom::appl");
    $appl->SetFilter({id=>\$id});
-   my ($rec,$msg)=$appl->getOnlyFirst(qw(applicationexpertgroup));
+   my ($rec,$msg)=$appl->getOnlyFirst(qw(applicationexpertgroup
+                                         technicalaeg));
 
    if (defined($rec)){
       $htmlresult=$rec->{applicationexpertgroup};
+      if (ref($rec->{technicalaeg}) eq "HASH" &&
+          ref($rec->{technicalaeg}->{AEG_email}) eq "ARRAY"){
+         my $email=join(";",@{$rec->{technicalaeg}->{AEG_email}});
+         $htmlresult.=$self->addDirectLink("mailto:".$email);
+      }
    }
    return($htmlresult);
 }

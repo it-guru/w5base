@@ -72,28 +72,33 @@ sub addDirectLink
 {
    my $self=shift;
    my $dataobj=shift;
-   my %param=@_;
+   my $param=shift;
    my $d="";
 
-   $param{AllowClose}=1;
-   my $detailx=$dataobj->DetailX();
-   my $detaily=$dataobj->DetailY();
-   my $target="../../".$dataobj->Self()."/Detail";
-   if ($dataobj->Self() eq "base::workflow"){
-      $target="../../".$dataobj->Self()."/Process";
-   }
-   $target=~s/::/\//g;
-   my $qstr=kernel::cgi::Hash2QueryString(%param);
+   my $onclick=$dataobj;
+   if (ref($param) eq "HASH"){
+      my %param=%$param;
+      $param{AllowClose}=1;
+      my $detailx=$dataobj->DetailX();
+      my $detaily=$dataobj->DetailY();
+      my $target="../../".$dataobj->Self()."/Detail";
+      if ($dataobj->Self() eq "base::workflow"){
+         $target="../../".$dataobj->Self()."/Process";
+      }
+      $target=~s/::/\//g;
+      my $qstr=kernel::cgi::Hash2QueryString(%param);
 
-   my $onclick="openwin(\"$target?$qstr\",\"_blank\",".
-               "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-               "resizable=yes,scrollbars=no\")";
+      $onclick="JavaScript:openwin(\"$target?$qstr\",\"_blank\",".
+                  "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                  "resizable=yes,scrollbars=no\")";
+   }
 
 
    $d.="<img align=right border=0 ".
        "src=\"../../../public/base/load/directlink.gif\">";
-   $d="<div style=\"float:right;margin:2px\"><a class=sublink href=JavaScript:$onclick>".
+   $d="<div style=\"float:right;margin:2px\"><a class=sublink href=$onclick>".
       $d."</a></div>";
+ 
 
    return($d);
 }
@@ -102,19 +107,25 @@ sub addVisualLink
 {
    my $self=shift;
    my $dataobj=shift;
-   my %param=@_;
+   my $param=shift;
    my $d="";
 
-   $param{AllowClose}=1;
-   my $detailx=$dataobj->DetailX();
-   my $detaily=$dataobj->DetailY();
-   my $target="../../".$dataobj->Self()."/Visual";
-   $target=~s/::/\//g;
-   my $qstr=kernel::cgi::Hash2QueryString(%param);
-
-   my $onclick="openwin(\"$target?$qstr\",\"_blank\",".
-               "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-               "resizable=yes,scrollbars=no\")";
+   my $onclick;
+   my $target;
+   my $qstr;
+   if (ref($param) eq "HASH"){
+      my %param=%$param;
+      $param{AllowClose}=1;
+      my $detailx=$dataobj->DetailX();
+      my $detaily=$dataobj->DetailY();
+      $target="../../".$dataobj->Self()."/Visual";
+      $target=~s/::/\//g;
+      $qstr=kernel::cgi::Hash2QueryString(%param);
+     
+      $onclick="openwin(\"$target?$qstr\",\"_blank\",".
+                  "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
+                  "resizable=yes,scrollbars=no\")";
+   }
 
 
    $d.="<img align=right border=0 ".

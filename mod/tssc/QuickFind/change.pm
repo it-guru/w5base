@@ -98,7 +98,7 @@ sub QuickFindDetail
       if (defined($rec)){
          $htmlresult="";
          if (defined($secrec)){
-            $htmlresult.=$self->addDirectLink($wf,id=>$id);
+            $htmlresult.=$self->addDirectLink($wf,{id=>$id});
          }
          $htmlresult.="<table>\n";
          foreach my $v (@l){
@@ -126,7 +126,7 @@ sub QuickFindDetail
             $htmlresult="";
             if (defined($secrec)){
                $htmlresult.=$self->addDirectLink($tschm,
-                                                 search_changenumber=>$id);
+                                                 {search_changenumber=>$id});
             }
             $htmlresult.="<table>\n";
             foreach my $v (@l){

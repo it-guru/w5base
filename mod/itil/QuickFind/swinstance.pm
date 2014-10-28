@@ -40,7 +40,8 @@ sub CISearchResult
    my %param=@_;
 
    my @l;
-   if (grep(/^ci$/,@$stag)){
+   if (grep(/^ci$/,@$stag) &&
+       (!defined($tag) || grep(/^$tag$/,qw(instance)))){
       my $flt=[{fullname=>"*$searchtext*",cistatusid=>"<5"}];
       my $dataobj=getModuleObject($self->getParent->Config,"itil::swinstance");
       $dataobj->SetFilter($flt);
@@ -87,7 +88,7 @@ sub QuickFindDetail
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
+         $htmlresult.=$self->addDirectLink($dataobj,{search_id=>$id});
       }
       $htmlresult.="<table>";
       my @l=@fl;

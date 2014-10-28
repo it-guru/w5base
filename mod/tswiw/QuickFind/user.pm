@@ -95,7 +95,7 @@ sub QuickFindDetail
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($tswiwuser,search_id=>$id);
+         $htmlresult.=$self->addDirectLink($tswiwuser,{search_id=>$id});
       }
       $htmlresult.="<table>\n";
       foreach my $v (@l){

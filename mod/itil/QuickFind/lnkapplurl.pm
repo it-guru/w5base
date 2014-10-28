@@ -78,7 +78,7 @@ sub QuickFindDetail
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($dataobj,search_id=>$id);
+         $htmlresult.=$self->addDirectLink($dataobj,{search_id=>$id});
       }
       $htmlresult.="<table>";
       my @l=qw(network name appl);

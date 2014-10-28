@@ -93,7 +93,7 @@ sub QuickFindDetail
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($dataobj,search_userid=>$id);
+         $htmlresult.=$self->addDirectLink($dataobj,{search_userid=>$id});
       }
       $htmlresult.="<table>";
       my @l=@fl;

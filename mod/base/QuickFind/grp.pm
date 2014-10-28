@@ -75,8 +75,8 @@ sub QuickFindDetail
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($dataobj,search_grpid=>$id);
-         $htmlresult.=$self->addVisualLink($dataobj,search_grpid=>$id);
+         $htmlresult.=$self->addDirectLink($dataobj,{search_grpid=>$id});
+         $htmlresult.=$self->addVisualLink($dataobj,{search_grpid=>$id});
       }
       $htmlresult.="<table>";
       my @l=@fl;
