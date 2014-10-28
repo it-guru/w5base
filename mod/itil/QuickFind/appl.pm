@@ -87,7 +87,7 @@ sub QuickFindDetail
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($appl,search_id=>$id);
+         $htmlresult.=$self->addDirectLink($appl,{search_id=>$id});
       }
       $htmlresult.=$appl->HtmlPublicDetail($rec,0);
    }
