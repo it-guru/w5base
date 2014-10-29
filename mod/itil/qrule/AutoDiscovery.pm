@@ -59,10 +59,13 @@ sub qenrichRecord
    my $checksession=shift;
    my $dataobjname=$dataobj->SelfAsParentObject();
 
+   return(0) if ($rec->{cistatusid}==6);
+
    my $add=getModuleObject($dataobj->Config,"itil::autodiscdata");
    my $ade=getModuleObject($dataobj->Config,"itil::autodiscengine");
    if (defined($add) && defined($ade)){ # itil:: seems to be installed
-      $ade->SetFilter({localdataobj=>\$dataobjname});
+      $ade->SetFilter({localdataobj=>\$dataobjname,
+                       cistatusid=>\'4'});
       foreach my $engine ($ade->getHashList(qw(ALL))){
          my $rk;
          $rk="systemid"     if ($dataobjname eq "itil::system");
