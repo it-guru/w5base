@@ -232,6 +232,93 @@ sub ItemSummary
       $summary->{assets}->{asset}=[values(%assetids)];
    }
 
+   #######################################################################
+   # neuer Versuch für RiManOS
+
+   # das muß rein, wenn der Alte Rotz oben raus fliegt
+   #my $o=getModuleObject($self->Config,"itil::softwareset");
+   #$o->SetFilter({name=>'"AO Engineering CIT Roadmap*"',
+   #               cistatusid=>\'4'});
+   #my @roadmapname=$o->getHashList(qw(id name));
+   #
+   #my @rm;
+   ###########################
+   {
+      my $softwareset=0;
+      my @softstate;
+      my $l1=getModuleObject($self->Config,"itil::lnksoftwaresystem");
+      my $l2=getModuleObject($self->Config,"itil::lnksoftwareitclustsvc");
+      my @swview=qw(fullname denyupd denyupdcomments 
+                    softwareinstrelstate is_dbs is_mw);
+      foreach my $rm (@roadmapname){
+         $l1->ResetFilter();
+         $l1->SetFilter({applications    =>\$current->{name},
+                         softwareset     =>$rm->{name},
+                         systemcistatusid=>"!6"});
+         my @l1=$l1->getHashList(@swview);
+         $l2->ResetFilter();
+         $l2->SetFilter({applications    =>\$current->{name},
+                         softwareset     =>$rm->{name},
+                         itclustcistatus =>"!6"});
+         my @l2=$l2->getHashList(@swview);
+         push(@softstate,{
+            roadmap=>$rm->{name},
+            i=>[@l1,@l2]
+         });
+      }
+      return(0) if (!$l1->Ping());
+      return(0) if (!$l2->Ping());
+      Dumper(\@softstate);
+      $summary->{software}={record=>\@softstate};      # SET : software fertig
+   }
+   ###########################
+   {
+      my $o=getModuleObject($self->Config,"itil::asset");
+      $o->SetFilter({applications=>\$current->{name},
+                     cistatusid=>"!6"});
+      my @assets=$o->getHashList(qw(name denyupd denyupdcomments refreshpland
+                               assetrefreshstate));
+      return(0) if (!$o->Ping());
+      Dumper(\@assets);
+      $summary->{hardware}={record=>\@assets};         # SET : hardware fertig
+   }
+   ###########################
+   {
+      my $o=getModuleObject($self->Config,"itil::lnkapplinteranswer");
+      $o->SetFilter({parentid=>\$current->{id}});
+      $o->SetCurrentView(qw(id name relevant interviewid answer answerlevel
+                            comments));
+      my $ia=$o->getHashIndexed("interviewid");
+      return(0) if (!$o->Ping());
+      print STDERR Dumper($ia);
+      my $o=getModuleObject($self->Config,"itil::appl");
+      $o->SetFilter({id=>\$current->{id}});
+      my ($rec,$msg)=$o->getOnlyFirst(qw(interviewst));
+      my @q;
+      foreach my $q (@{$rec->{interviewst}->{TotalActiveQuestions}}){
+        my $h={
+           question=>$q->{name},
+           questionprio=>$q->{prio},
+           questionid=>$q->{id},
+           questionstate=>'FAIL'
+        };
+        if (exists($ia->{interviewid}->{$q->{id}})){
+           my $a=$ia->{interviewid}->{$q->{id}};
+           $h->{answer}=$a->{answer};
+           $h->{answerrelevant}=$a->{relevant};
+           $h->{answercomments}=$a->{comments};
+           $h->{answerlevel}=$a->{answerlevel};
+           if ($h->{answerlevel}>75){
+              $h->{questionstate}='OK';
+           }
+        }
+        push(@q,$h);
+      }
+      return(0) if (!$o->Ping());
+      $summary->{interview}={record=>\@q};
+   }
+   #######################################################################
+
 
 
 
