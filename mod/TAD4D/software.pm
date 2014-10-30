@@ -31,6 +31,8 @@ sub new
    $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{use_distinct}=0;
+   $self->{use_dirtyread}=1;
+
    
    $self->AddFields(
       new kernel::Field::Linenumber(

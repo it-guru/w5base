@@ -470,6 +470,9 @@ sub getSqlSelect
          msg(ERROR,"ilegal filter for '%s'\n%s",$cmd,Dumper(\@filter));
          return(undef);
       }
+      if ($drivername eq "db2"){
+         $cmd.=" with ur" if ($self->{use_dirtyread}==1);
+      }
       push(@cmd,$cmd);
    }
    if ($#cmd>0){

@@ -32,6 +32,7 @@ sub new
    $self=bless($self,$type);
    $self->{isInitalized}=0;
    $self->{use_distinct}=1 if (!exists($self->{use_distinct}));
+   $self->{use_dirtyread}=0 if (!exists($self->{use_dirtyread}));
    $self->{dontSendRemoteEvent}=1 if (!exists($self->{dontSendRemoteEvent}));
    
    return($self);
@@ -2159,7 +2160,13 @@ sub SendRemoteEvent
    foreach my $eh (values(%{$self->{ObjectEventHandler}})){
       $eh->HandleEvent($mode,$self->Self,$oldrec,$newrec);
    }
-   if (!$self->{dontSendRemoteEvent}){
+   my @updkeys;
+   if (defined($newrec)){
+      @updkeys=keys(%$newrec);
+      @updkeys=grep(!/^(lastqenrich|lastqcheck|mdate)$/,@updkeys);
+   }
+   
+   if ($#updkeys!=-1 && !$self->{dontSendRemoteEvent}){
       my $idobj=$self->IdField();
       my $userid=$self->getCurrentUserId();
       my ($id,$sub);

@@ -30,6 +30,9 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->{use_dirtyread}=1;
+
+
    
    $self->AddFields(
       new kernel::Field::Id(
