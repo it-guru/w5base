@@ -432,7 +432,9 @@ sub processRecord
                                         "ITIL.Total.Application.Count",1);
 
       }
-      if ($rec->{dataissuestate} ne "OK"){
+      if ($rec->{dataissuestate} ne "OK" &&
+          (ref($rec->{dataissuestate}) eq "HASH" &&
+           $rec->{dataissuestate}->{dataissuestate} ne "OK")){
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
@@ -452,7 +454,9 @@ sub processRecord
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "ITIL.Total.System.Count",1);
       }
-      if ($rec->{dataissuestate} ne "OK"){
+      if ($rec->{dataissuestate} ne "OK" &&
+          (ref($rec->{dataissuestate}) eq "HASH" &&
+           $rec->{dataissuestate}->{dataissuestate} ne "OK")){
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},

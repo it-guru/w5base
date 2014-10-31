@@ -26,6 +26,7 @@ use kernel::Field;
 use kernel::CIStatusTools;
 use finance::costcenter;
 use itil::lib::Listedit;
+use itil::lnksoftware;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink
         kernel::CIStatusTools);
@@ -637,8 +638,63 @@ sub new
                 label         =>'Update/Upgrade reject valid to',
                 dataobjattr   =>'system.denyupdvalidto'),
 
+     new kernel::Field::Htmlarea(
+                name          =>'osanalysestate',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
+                htmlwidth     =>'400px',
+                group         =>'upd',
+                htmlnowrap    =>1,
+                label         =>'System OS analysed state',
+                onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
+     new kernel::Field::Htmlarea(
+                name          =>'osanalysetodo',
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'upd',
+                htmlnowrap    =>1,
+                htmlwidth     =>'500px',
+                htmldetail    =>0,
+                htmlnowrap    =>1,
+                label         =>'System OS analysed todo',
+                onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
 
-
+     new kernel::Field::Text(
+                name          =>'softwareset',
+                readonly      =>1,
+                group         =>'upd',
+                selectsearch  =>sub{
+                   my $self=shift;
+                   my $ss=getModuleObject($self->getParent->Config,
+                                          "itil::softwareset");
+                   $ss->SecureSetFilter({cistatusid=>4});
+                   my @l=$ss->getVal("name");
+                   return(@l);
+                },
+                searchable    =>1,
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                htmldetail    =>0,
+                label         =>'validate against Software Set',
+                onPreProcessFilter=>sub{
+                   my $self=shift;
+                   my $hflt=shift;
+                   if (defined($hflt->{$self->{name}})){
+                      $self->getParent->Context->{FilterSet}=
+                          {$self->{name}=>[$hflt->{$self->{name}}]};
+                      delete( $hflt->{$self->{name}})
+                   }
+                   else{
+                      delete($self->getParent->Context->{FilterSet} );
+                   }
+                   return(0);
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $FilterSet=$self->getParent->Context->{FilterSet};
+                   return($FilterSet->{softwareset});
+                }),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
@@ -1288,6 +1344,9 @@ sub SecureSetFilter
    }
    return($self->SetFilter(@flt));
 }
+
+
+
 
 
 

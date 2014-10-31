@@ -49,7 +49,9 @@ sub getWorkflowRec
                    stateid=>"<17",
                    directlnkid=>\$refid,
                    directlnkmode=>\'DataIssue'});
-   my ($issuerec)=$wf->getOnlyFirst(qw(id eventstart name fwdtargetname));
+   my ($issuerec)=$wf->getOnlyFirst(qw(id eventstart name 
+                                       urlofcurrentrec
+                                       fwdtargetname));
    return($issuerec);
 }
 
@@ -184,7 +186,7 @@ sub FormatedDetail
    my $idfield=$self->getParent->IdField();
    if ($mode eq "HtmlDetail" || $mode eq "HtmlV01"){
       if (defined($idfield)){
-         my $id=$idfield->RawValue($current);
+         my $id=$idfield->RawValue($current,$mode);
          my $divid="ViewProcessor_$self->{name}_$id";
          my $XMLUrl="$ENV{SCRIPT_URI}";
          my $parent=$self->getParent->Self;
@@ -269,22 +271,57 @@ EOF
 sub RawValue
 {
    my $self=shift;
-   my $d=$self->SUPER::RawValue(@_);
+#   my $d=$self->SUPER::RawValue(@_);
    my $current=shift;
+   my $mode=shift;
+
+   my $msg="?";
+
    my $idfield=$self->getParent->IdField();
    if (defined($idfield)){
       my $refid=$idfield->RawValue($current);
       my $obj=$self->getParent()->SelfAsParentObject();
       my $issuerec=$self->getWorkflowRec($obj,$refid);
       if (defined($issuerec)){
-         return("DataIssue ".
-                $self->getParent->T("since","kernel::Field::IssueState")." ".
-                $issuerec->{eventstart}." GMT");
+         if ($mode ne ""){
+            $msg="DataIssue ".
+                 $self->getParent->T("since","kernel::Field::IssueState")." ".
+                 $issuerec->{eventstart}." GMT";
+         }
+         else{
+            $msg="FAIL";
+            # hier muß noch eine Bewertung rein 
+            # WARN = eventstart liegt weniger als 8 Wochen in der
+            # vergangenheit. Ansonsten FAIL
+            # sufix "but OK" wenn der Bearbeitungszeitpunkt kürzer als 8 Wochen 
+            # in der Vergangenheit und mdate min. 1h nach eventstart
+            $msg={
+               dataissuestate=>$msg,
+               id=>$issuerec->{id},
+               eventstart=>$issuerec->{eventstart},
+               dataissue=>$issuerec->{name},
+               dataobj=>$self->getParent->SelfAsParentObject(),
+               dataobjid=>$refid,
+               url=>$issuerec->{urlofcurrentrec}
+            };
+         }
       }
-      return("OK");
+      else{
+         if ($mode ne ""){
+            $msg="OK";
+         }
+         else{
+            $msg="OK";
+            $msg={
+               dataobj=>$self->getParent->SelfAsParentObject(),
+               dataobjid=>$refid,
+               dataissuestate=>$msg
+            };
+         }
+      }
    }
 
-   return("?");
+   return($msg);
 }
 
 

@@ -472,6 +472,15 @@ sub new
                 label         =>'validate against Software Set',
                 onPreProcessFilter=>sub{
                    my $self=shift;
+                   my $hflt=shift;
+                   if (defined($hflt->{$self->{name}})){
+                      $self->getParent->Context->{FilterSet}=
+                          {$self->{name}=>[$hflt->{$self->{name}}]};
+                      delete( $hflt->{$self->{name}})
+                   }
+                   else{
+                      delete($self->getParent->Context->{FilterSet} );
+                   }
                    return(0);
                 },
                 onRawValue    =>sub{
@@ -708,22 +717,6 @@ sub calcLicMetrics   # licrelevantopmode licrelevantosrelease
       return($cpucount) if ($self->{name} eq "licrelevantcpucount");
    }
    return(\@res);
-}
-
-
-sub SetFilter
-{
-   my $self=shift;
-
-   if (ref($_[0]) eq "HASH" && exists($_[0]->{softwareset})){
-      my $setname=$_[0]->{softwareset};
-      $setname=~s/^"(.*)"/$1/;
-      $self->Context->{FilterSet}={
-                                     softwareset=>$setname
-                                  };
-   }
-   return($self->SUPER::SetFilter(@_));
-
 }
 
 
@@ -1015,12 +1008,20 @@ sub calcSoftwareState
       Dumper($FilterSet->{Set}->{data});
    }
    my @applid;
+   my @analysegroups=qw(OS MW DB);
+   my @systemid;
    my $cachekey;
-   if ($self->getParent->SelfAsParentObject() eq "itil::appl"){
+   if ($self->getParent->SelfAsParentObject() eq "itil::system"){
+      @systemid=($current->{id});
+      $cachekey=join(",",sort(@systemid));
+      @analysegroups=qw(OS);
+   }
+   elsif ($self->getParent->SelfAsParentObject() eq "itil::appl"){
       @applid=($current->{id});
       $cachekey=join(",",sort(@applid));
    }
    else{
+      @analysegroups=qw(MW DB);
       $cachekey=$current->{id};
    }
    if ($FilterSet->{Analyse}->{id} ne $cachekey){
@@ -1039,7 +1040,7 @@ sub calcSoftwareState
       $FilterSet->{Analyse}->{softwareid}=[keys(%swid)];
 
       my $resdstate=$FilterSet->{Analyse}->{dstate};
-      foreach my $g (qw(OS MW DB)){
+      foreach my $g (@analysegroups){
          $resdstate->{group}->{$g}={
             count=>0,
             fail=>0,
@@ -1047,11 +1048,17 @@ sub calcSoftwareState
          };
       }
 
-      if ($#applid!=-1){ # load systems
+      if ($#applid!=-1 || $#systemid!=-1){ # load systems
          my $lnk=getModuleObject($self->getParent->Config,
                                 "itil::lnkapplsystem");
-         $lnk->SetFilter({applid=>\@applid,
-                          systemcistatusid=>[3,4]}); 
+         if ($#applid!=-1){
+            $lnk->SetFilter({applid=>\@applid,
+                             systemcistatusid=>[3,4]}); 
+         }
+         else{
+            $lnk->SetFilter({systemid=>\@systemid,
+                             applcistatusid=>[3,4]}); 
+         }
          $FilterSet->{Analyse}->{systems}=[];
          $FilterSet->{Analyse}->{systemids}={};
          foreach my $lnkrec ($lnk->getHashList(qw(systemid osreleaseid
@@ -1096,15 +1103,13 @@ sub calcSoftwareState
                            push(@{$FilterSet->{Analyse}->{todo}},
                                  "- update OS '$srec->{osrelease}' ".
                                  "on $srec->{name}");
-                           if (!($FilterSet->{Analyse}->{totalstate}
-                                =~m/^FAIL/)){
-                              $FilterSet->{Analyse}->{totalstate}=
-                                 "FAIL".$failpost;
-                           }
                            push(@{$FilterSet->{Analyse}->{totalmsg}},
                                "$srec->{name} OS '$srec->{osrelease}' ".
                                "is marked as not allowed");
                            $resdstate->{group}->{OS}->{fail}++;
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                      }
                      if ($osrec->{comparator} eq "1"){
@@ -1113,15 +1118,14 @@ sub calcSoftwareState
                            push(@{$FilterSet->{Analyse}->{todo}},
                                  "- OS '$srec->{osrelease}' ".
                                  "on $srec->{name} needs soon a update");
-                           if (!($FilterSet->{Analyse}->{totalstate}
-                               =~m/^FAIL/)){
-                              $FilterSet->{Analyse}->{totalstate}=
-                                 "WARN".$failpost;
-                           }
                            push(@{$FilterSet->{Analyse}->{totalmsg}},
                                "$srec->{name} OS '$srec->{osrelease}' ".
                                "is soon not allowed");
                            $resdstate->{group}->{OS}->{warn}++;
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}=
+                              "WARN".$failpost;
                         }
                      }
                   }
@@ -1403,11 +1407,13 @@ sub calcSoftwareState
    if ($self->Name eq "softwareanalysestate"){
       return("<div style='width:300px'>".join("<br>",@d)."</div>");
    }
-   if ($self->Name eq "softwareanalysetodo"){
+   if ($self->Name eq "softwareanalysetodo" ||
+       $self->Name eq "osanalysetodo"){
       return("<div style='width:500px'>".
              join("<br>",@{$FilterSet->{Analyse}->{todo}})."</div>");
    }
-   if ($self->Name eq "softwareinstrelstate"){
+   if ($self->Name eq "softwareinstrelstate" ||
+       $self->Name eq "osanalysestate"){
       return($FilterSet->{Analyse}->{totalstate});
    }
    if ($self->Name eq "softwareinstrelmsg"){

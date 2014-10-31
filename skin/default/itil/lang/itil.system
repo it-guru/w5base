@@ -92,5 +92,9 @@
 'Update/Upgrade reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
 'it is posible to update/upgrade OS'=>{de=>'Update/Upgrade des OS möglich'},
 'Upgrade/Refresh reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
+'validate against Software Set'=>{de=>'Prüfung gegen SoftwareSet'},
+'System OS analysed state'=>{de=>'Betriebssystemversions-Analysestatus'},
+'System OS analysed todo'=>{de=>'Betriebssystemversions-Analyse ToDo'},
+
 
 

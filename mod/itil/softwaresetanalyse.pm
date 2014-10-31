@@ -79,6 +79,15 @@ sub new
                 label         =>'validate against Software Set',     
                 onPreProcessFilter=>sub{
                    my $self=shift;
+                   my $hflt=shift;
+                   if (defined($hflt->{$self->{name}})){
+                      $self->getParent->Context->{FilterSet}=
+                          {$self->{name}=>[$hflt->{$self->{name}}]};
+                      delete( $hflt->{$self->{name}})
+                   }
+                   else{
+                      delete($self->getParent->Context->{FilterSet} );
+                   }
                    return(0);
                 },
                 onRawValue    =>sub{
@@ -95,27 +104,6 @@ sub new
                             tsm opm businessteam));
 
    return($self);
-}
-
-
-sub SetFilter
-{
-   my $self=shift;
-
-   if (ref($_[0]) ne "HASH" || !exists($_[0]->{softwareset})){ 
-      $self->LastMsg(ERROR,
-                     "invalid or undefined analyse softwareset in filter");
-      return(0);
-   }
-   if (ref($_[0]) eq "HASH" && exists($_[0]->{softwareset})){
-      my $setname=$_[0]->{softwareset};
-      $setname=~s/^"(.*)"/$1/;
-      $self->Context->{FilterSet}={
-                                     softwareset=>$setname
-                                  };
-   }
-   return($self->SUPER::SetFilter(@_));
-
 }
 
 
