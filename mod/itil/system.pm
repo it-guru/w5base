@@ -1368,19 +1368,6 @@ sub Validate
       }
    }
    ########################################################################
-   if ($oldrec->{cistatusid}!=6 &&
-       $newrec->{cistatusid}==6){
-      if (defined($oldrec->{ipaddresses}) && 
-          ref($oldrec->{ipaddresses}) eq "ARRAY"){
-         foreach my $iprec (@{$oldrec->{ipaddresses}}){
-            if ($iprec->{cistatusid}!=6){
-               $self->LastMsg(ERROR,
-                    "there are still linked active ipaddresses on this system");
-               return(undef);
-            }
-         }
-      }
-   }
 
    if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
       return(0);
