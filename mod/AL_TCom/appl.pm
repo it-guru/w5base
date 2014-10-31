@@ -290,7 +290,6 @@ sub ItemSummary
                             comments));
       my $ia=$o->getHashIndexed("interviewid");
       return(0) if (!$o->Ping());
-      print STDERR Dumper($ia);
       my $o=getModuleObject($self->Config,"itil::appl");
       $o->SetFilter({id=>\$current->{id}});
       my ($rec,$msg)=$o->getOnlyFirst(qw(interviewst));
