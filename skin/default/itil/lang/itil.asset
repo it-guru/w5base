@@ -73,5 +73,6 @@
 'comments to Update/Refresh posibilities'=>{de=>'Bemerkungen zu den Update/Refresh Möglichkeiten'},
 'it is posible to refresh hardware'=>{de=>'Hardware kann erneuert/refreshed werden'},
 'Upgrade/Refresh reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
+'Hardware refresh light'=>{de=>'Hardware-Refresh Ampel'},
 'Hardware refresh state'=>{de=>'Hardware-Refresh Status'},
 'planned Upgrade/Refresh date'=>{de=>'geplanter Hardware Refresh Zeitpunkt'},
