@@ -411,8 +411,8 @@ sub new
                 name          =>'refreshstate',
                 group         =>'upd',
                 htmldetail    =>0,
-                searchable    =>0,
-                label         =>'Hardware refresh state',
+                searchable    =>1,
+                label         =>'Hardware refresh light',
                 dataobjattr   =>
                 "if (asset.deprstart is not null,".
                     "if (".
@@ -421,6 +421,26 @@ sub new
                              "asset.denyupdvalidto,".
                              "date_add(asset.deprstart,INTERVAL 60 MONTH)".
                              ")<now(),'red','green'),'unknown')"),
+
+     new kernel::Field::Text(
+                name          =>'assetrefreshstate',
+                group         =>'upd',
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'Hardware refresh state',
+                depend        =>['deprstart','denyupdvalidto','refreshstate'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fo=$self->getParent->getField("refreshstate");
+                   my $f=$fo->RawValue($current);
+                   my $s="FAIL";
+                   if ($f eq "green"){
+                      $s="OK"
+                   }
+                   return($s);
+                }),
+                
 
      new kernel::Field::Date(
                 name          =>'refreshinfo3',
