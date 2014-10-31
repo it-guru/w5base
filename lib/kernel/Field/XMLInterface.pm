@@ -36,14 +36,21 @@ sub new
    $self->{htmldetail}=0 if (!defined($self->{htmldetail}));
    $self->{uivisible}=sub {
       my $self=shift;
-      if ($self->getParent->can("IsMemberOf")){
-         return(1) if ($self->getParent->IsMemberOf("admin"));
+      my $mode=shift;
+      if ($mode eq "ViewEditor"){
+         if ($self->getParent->can("IsMemberOf")){
+            return(1) if ($self->getParent->IsMemberOf("admin"));
+         }
+         if ($self->getParent->can("getParent") && 
+             defined($self->getParent->getParent())){
+            return(1) if ($self->getParent->getParent->IsMemberOf("admin"));
+         }
+         return(0);
       }
-      if ($self->getParent->can("getParent") && 
-          defined($self->getParent->getParent())){
-         return(1) if ($self->getParent->getParent->IsMemberOf("admin"));
+      if ($mode eq "HtmlDetail"){
+         return(0);
       }
-      return(0);
+      return(1);
    } if (!defined($self->{uivisible}));
    $self=bless($type->SUPER::new(%$self),$type);
    return($self);
