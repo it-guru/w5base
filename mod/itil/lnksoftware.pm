@@ -1303,7 +1303,8 @@ sub calcSoftwareState
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
-                             "$swi->{software} disallowed $swrec->{version}");
+                             "$swi->{software} disallowed ".
+                             "lower then $swrec->{version}");
                         last RULESET;
                      }
                   }
