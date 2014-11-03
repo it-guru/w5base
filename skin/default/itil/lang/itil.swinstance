@@ -63,3 +63,6 @@
 'monistatus.NOMONI'=>{de=>'keine Überwachung/Monitoring',en=>'no monitoring'},
 'monistatus.MONISIMPLE'=>{de=>'Überwachung OHNE Autoticket',en=>'monitoring with NO autoticket'},
 'monistatus.MONIAUTOIN'=>{de=>'Überwachung mit Autoticket',en=>'monitoring with autoticket'},
+'is DBS (Databasesystem) instance'=>{de=>'ist DBS (Datenbanksystem) Instanz'},
+'is DMS (Documentmanagement) instance'=>{de=>'ist DMS (Dokumentenmanagement) Instanz'},
+'is MW (Middleware) instance'=>{de=>'ist MW (Middleware) Instanz'},

@@ -161,6 +161,10 @@
 'a interface application (%s) of an application which is managed by you, has change the ci status to %s .Please check the currentness of the interface definitions in %s !'=>{de=>'bei einer Schnittstellenanwendung (%s) einer von Ihnen geführten Anwendungen wurde der CI-Status auf %s geändert. Bitte überprüfen Sie die Schnittstellendefinition von %s auf deren Aktualität und Vollständigkeit!'},
 'genborderchange'=>{de=>'Änderung von generischen Attributen tangierender Elemente',
                         en=>'Change of generic attributs on border elements'},
+'MW Instance count'=>{de=>'MW Instanz Anzahl'},
+'DBS Instance count'=>{de=>'DBS Instanz Anzahl'},
+'Instance count'=>{de=>'Instanz Anzahl'},
+'Interfaces count'=>{de=>'Schnittstellen Anzahl'},
 
 
 

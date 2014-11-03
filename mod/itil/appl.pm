@@ -373,7 +373,37 @@ sub new
                 vjointo       =>'itil::swinstance',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>['fullname','swnature']),
+                vjoindisp     =>['fullname','swnature','is_dbs','is_mw']),
+
+      new kernel::Field::Number(
+                name          =>'swinstancecount',
+                label         =>'Instance count',
+                group         =>'swinstances',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['swinstances'],
+                onRawValue    =>\&calculateInstanceCount),
+
+      new kernel::Field::Number(
+                name          =>'mwswinstancecount',
+                label         =>'MW Instance count',
+                group         =>'swinstances',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['swinstances'],
+                onRawValue    =>\&calculateInstanceCount),
+
+      new kernel::Field::Number(
+                name          =>'dbsswinstancecount',
+                label         =>'DBS Instance count',
+                group         =>'swinstances',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['swinstances'],
+                onRawValue    =>\&calculateInstanceCount),
 
       new kernel::Field::SubList(
                 name          =>'services',
@@ -850,6 +880,16 @@ sub new
                 vjoindisp     =>['toappl','contype','conproto','conmode'],
                 vjoininhash   =>['toappl','contype','conproto','conmode',
                                  'toapplid', 'comments']),
+
+      new kernel::Field::Number(
+                name          =>'interfacescount',
+                label         =>'Interfaces count',
+                group         =>'interfaces',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['interfaces'],
+                onRawValue    =>\&calculateInterfacesCount),
 
       new kernel::Field::SubList(
                 name          =>'systems',
@@ -1686,6 +1726,41 @@ sub calculateSysCount
    my $sysfld=$self->getParent->getField("systems");
    my $s=$sysfld->RawValue($current);
    return(0) if (!ref($s) eq "ARRAY");
+   return($#{$s}+1);
+}
+
+sub calculateInterfacesCount
+{
+   my $self=shift;
+   my $current=shift;
+   my $sysfld=$self->getParent->getField("interfaces");
+   my $s=$sysfld->RawValue($current);
+   return(0) if (!ref($s) eq "ARRAY");
+   return($#{$s}+1);
+}
+
+sub calculateInstanceCount
+{
+   my $self=shift;
+   my $current=shift;
+   my $sysfld=$self->getParent->getField("swinstances");
+   my $s=$sysfld->RawValue($current);
+   return(0) if (!ref($s) eq "ARRAY");
+   if ($self->{name} eq "mwswinstancecount"){
+      my $c=0;
+      foreach my $swrec (@{$s}){
+         $c++ if ($swrec->{is_mw});
+      }
+      return($c);
+   }
+   elsif ($self->{name} eq "dbsswinstancecount"){
+      my $c=0;
+      foreach my $swrec (@{$s}){
+         $c++ if ($swrec->{is_dbs});
+      }
+      return($c);
+
+   }
    return($#{$s}+1);
 }
 

@@ -307,6 +307,22 @@ sub new
                 group         =>'softwareinst',
                 dataobjattr   =>'software.name'),
 
+      new kernel::Field::Boolean(
+                name          =>'is_dbs',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'softwareinst',
+                label         =>'is DBS (Databasesystem) instance',
+                dataobjattr   =>'software.is_dbs'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_mw',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'softwareinst',
+                label         =>'is MW (Middleware) instance',
+                dataobjattr   =>'software.is_mw'),
+
       new kernel::Field::Text(
                 name          =>'softwareinstversion',
                 htmldetail    =>0,
