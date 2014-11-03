@@ -242,7 +242,9 @@ sub ItemSummary
    #my @roadmapname=$o->getHashList(qw(id name));
    #
    #my @rm;
+   my @dataissues;
    ###########################
+   my $rm=$rm[0];
    {
       my $softwareset=0;
       my @softstate;
@@ -250,22 +252,20 @@ sub ItemSummary
       my $l2=getModuleObject($self->Config,"itil::lnksoftwareitclustsvc");
       my @swview=qw(fullname denyupd denyupdcomments 
                     softwareinstrelstate is_dbs is_mw);
-      foreach my $rm (@roadmapname){
-         $l1->ResetFilter();
-         $l1->SetFilter({applications    =>\$current->{name},
-                         softwareset     =>$rm->{name},
-                         systemcistatusid=>"!6"});
-         my @l1=$l1->getHashList(@swview);
-         $l2->ResetFilter();
-         $l2->SetFilter({applications    =>\$current->{name},
-                         softwareset     =>$rm->{name},
-                         itclustcistatus =>"!6"});
-         my @l2=$l2->getHashList(@swview);
-         push(@softstate,{
-            roadmap=>$rm->{name},
-            i=>[@l1,@l2]
-         });
-      }
+      $l1->ResetFilter();
+      $l1->SetFilter({applications    =>\$current->{name},
+                      softwareset     =>$rm->{name},
+                      systemcistatusid=>"!6"});
+      my @l1=$l1->getHashList(@swview);
+      $l2->ResetFilter();
+      $l2->SetFilter({applications    =>\$current->{name},
+                      softwareset     =>$rm->{name},
+                      itclustcistatus =>"!6"});
+      my @l2=$l2->getHashList(@swview);
+      push(@softstate,{
+         roadmap=>$rm->{name},
+         i=>[@l1,@l2]
+      });
       return(0) if (!$l1->Ping());
       return(0) if (!$l2->Ping());
       Dumper(\@softstate);
@@ -273,14 +273,50 @@ sub ItemSummary
    }
    ###########################
    {
+      my $o=getModuleObject($self->Config,"itil::system");
+      $o->SetFilter({applications=>\$current->{name},
+                     softwareset     =>$rm->{name},
+                     cistatusid=>"!6"});
+      my @systems=$o->getHashList(qw(name denyupd denyupdcomments 
+                                     dataissuestate
+                                     osanalysestate));
+      return(0) if (!$o->Ping());
+      Dumper(\@systems);
+      for(my $c=0;$c<=$#systems;$c++){
+         push(@dataissues,$systems[$c]->{dataissuestate});
+         delete($systems[$c]->{dataissuestate});
+      }
+      $summary->{system}={record=>\@systems};         # SET : hardware fertig
+   }
+   ###########################
+   {
       my $o=getModuleObject($self->Config,"itil::asset");
       $o->SetFilter({applications=>\$current->{name},
                      cistatusid=>"!6"});
       my @assets=$o->getHashList(qw(name denyupd denyupdcomments refreshpland
-                               assetrefreshstate));
+                                    dataissuestate
+                                    assetrefreshstate));
       return(0) if (!$o->Ping());
       Dumper(\@assets);
+      for(my $c=0;$c<=$#assets;$c++){
+         push(@dataissues,$assets[$c]->{dataissuestate});
+         delete($assets[$c]->{dataissuestate});
+      }
       $summary->{hardware}={record=>\@assets};         # SET : hardware fertig
+   }
+   ###########################
+   {
+      my $o=getModuleObject($self->Config,"itil::swinstance");
+      $o->SetFilter({appl=>\$current->{name},
+                     cistatusid=>"!6"});
+      my @swinstances=$o->getHashList(qw(name dataissuestate));
+      return(0) if (!$o->Ping());
+      Dumper(\@swinstances);
+      for(my $c=0;$c<=$#swinstances;$c++){
+         push(@dataissues,$swinstances[$c]->{dataissuestate});
+         delete($swinstances[$c]->{dataissuestate});
+      }
+     # $summary->{sinstance}={record=>\@swinstnaces};  # SET : inst fertig
    }
    ###########################
    {
@@ -317,7 +353,13 @@ sub ItemSummary
       $summary->{interview}={record=>\@q};
    }
    #######################################################################
-
+   {
+      my $o=getModuleObject($self->Config,"itil::appl");
+      $o->SetFilter({id=>\$current->{id}});
+      my ($rec,$msg)=$o->getOnlyFirst(qw(dataissuestate));
+      push(@dataissues,$rec->{dataissuestate});
+      $summary->{dataquality}={record=>\@dataissues};
+   }
 
 
 
