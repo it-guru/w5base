@@ -67,7 +67,9 @@ sub qcheckRecord
    my $errorlevel=0;
 
 
-   return(0,undef) if ($rec->{cistatusid}==6);
+   return(0,undef) if ($rec->{cistatusid}==6 ||
+                       $rec->{cistatusid}==1 ||
+                       $rec->{cistatusid}==2);
 
    my $sysflt={asset=>$rec->{name},cistatusid=>\'4'};
    if ($rec->{cistatusid}!=4){
