@@ -43,27 +43,34 @@ sub new
                 label         =>'ID',
                 group         =>'source',
                 align         =>'left',
-                dataobjattr   =>"view_name"),
+                dataobjattr   =>"all_views.view_name"),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'View Name',
                 ignorecase    =>1,
-                dataobjattr   =>'view_name'),
+                dataobjattr   =>'all_views.view_name'),
+
+      new kernel::Field::Text(
+                name          =>'status',
+                label         =>'View Status',
+                ignorecase    =>1,
+                dataobjattr   =>'all_objects.status'),
 
       new kernel::Field::Text(
                 name          =>'ifaceuser',
                 label         =>'Interface User',
                 ignorecase    =>1,
-                dataobjattr   =>"decode(regexp_replace(view_name,'_.*',''),".
-                                "NULL,'[UNDEF]',".
-                                "upper(regexp_replace(view_name,'_.*','')))"),
+                dataobjattr   =>
+                      "decode(regexp_replace(all_views.view_name,'_.*',''),".
+                      "NULL,'[UNDEF]',".
+                      "upper(regexp_replace(all_views.view_name,'_.*','')))"),
 
       new kernel::Field::Text(
                 name          =>'ifacetable',
                 label         =>'Interface Table',
                 ignorecase    =>1,
-                dataobjattr   =>"regexp_replace(view_name,'^.*?_','')"),
+                dataobjattr   =>"regexp_replace(all_views.view_name,'^.*?_','')"),
 
       new kernel::Field::Textarea(
                 name          =>'viewcommand',
@@ -71,7 +78,7 @@ sub new
                 htmldetail    =>0,
                 searchable    =>0,
                 ignorecase    =>1,
-                dataobjattr   =>'text'),
+                dataobjattr   =>'all_views.text'),
 
       new kernel::Field::Textarea(
                 name          =>'recreatecommand',
@@ -102,13 +109,15 @@ sub new
                 name          =>'viewfields',
                 label         =>'View Fields',
                 ignorecase    =>1,
-                dataobjattr   =>"(select listagg(column_name,', ') ".
-                                "within group (order by column_name) ".
-                                "from all_tab_columns where ".
-                                "owner='W5REPO' and table_name=view_name) "),
+                dataobjattr   =>
+                      "(select listagg(column_name,', ') ".
+                      "within group (order by column_name) ".
+                      "from all_tab_columns where ".
+                      "all_tab_columns.owner='W5REPO' and ".
+                      "all_tab_columns.table_name=all_views.view_name) "),
    );
    $self->setWorktable("all_views");
-   $self->setDefaultView(qw(linenumber ifaceuser ifacetable name));
+   $self->setDefaultView(qw(linenumber ifaceuser ifacetable name status));
    return($self);
 }
 
@@ -126,9 +135,25 @@ sub Initialize
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="owner='W5REPO' ";
+   my $where="all_views.owner='W5REPO' ";
    return($where);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable ";
+
+   $from.="join all_objects on ($worktable.owner=all_objects.owner and ".
+          "$worktable.view_name=all_objects.object_name)";
+
+   return($from);
+}
+
+
 
 
 
