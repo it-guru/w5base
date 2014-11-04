@@ -91,7 +91,7 @@ sub InterviewSubForm
                    $qrec->{questclust}."</div>";
 
                $d.="\n<div class=InterviewQuestHead>".
-                   "<table border=1 class=InterviewQuestHead width=95%>".
+                   "<table border=0 class=InterviewQuestHead width=95%>".
                    "<tr><td class=InterviewQuestHead></td>".
                    "<td class=InterviewQuestHead width=55 align=center>".
                    "relevant</td>".
@@ -105,7 +105,7 @@ sub InterviewSubForm
                    "</tr></table></div>";
             }
             $d.="\n<div class=InterviewQuest><form name=\"F$qrec->{id}\">".
-                "<table border=1 class=InterviewQuest width=95% 
+                "<table border=0 class=InterviewQuest width=95% 
                   border=0 >".
                 "<tr><td><div onclick=switchExt($qrec->{id})>".
                 "<span class=InterviewQuestion>".
