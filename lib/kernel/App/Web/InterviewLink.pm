@@ -89,24 +89,28 @@ sub InterviewSubForm
                 $lastquestclust ne $qrec->{questclust}){
                $d.="<div class=\"InterviewQuestClust\">".
                    $qrec->{questclust}."</div>";
+
                $d.="\n<div class=InterviewQuestHead>".
                    "<table border=0 class=InterviewQuestHead width=95%>".
                    "<tr><td class=InterviewQuestHead></td>".
-                   "<td class=InterviewQuestHead width=50 align=center>".
+                   "<td class=InterviewQuestHead width=55 align=center>".
                    "relevant</td>".
                    "<td class=InterviewQuestHead width=180 ".
                    "align=center valign=top>".
                    $self->T("answer","base::interanswer").
-                   "</td><td width=1%>&nbsp;&nbsp;</td>".
+                   "</td><td width=1%><img border=0 ".
+                   "src=\"../../../public/base/load/confirm_space.gif\"></td>".
+                   "<td width=1%><img border=0 width=8 height=12 ".
+                   "src=\"../../../public/base/load/empty.gif\"></td>".
                    "</tr></table></div>";
             }
             $d.="\n<div class=InterviewQuest><form name=\"F$qrec->{id}\">".
-                "<table class=InterviewQuest width=95% 
+                "<table border=0 class=InterviewQuest width=95% 
                   border=0 >".
                 "<tr><td><div onclick=switchExt($qrec->{id})>".
                 "<span class=InterviewQuestion>".
                 $qrec->{name}."</span></div>".
-                "</td><td width=50 nowrap valign=top>".
+                "</td><td width=55 nowrap valign=top>".
                 "<div id=relevant$qrec->{id}>$qrec->{HTMLrelevant}</div></td>".
                 "<td width=180 nowrap valign=top>".
                 "<div class=InterviewQuestAnswer ".
@@ -119,7 +123,7 @@ sub InterviewSubForm
                 "src=\"../../../public/base/load/questionmark.gif\">".
                 "</div></td>".
                 "</tr>".
-                "<tr><td colspan=4>".
+                "<tr><td colspan=5>".
                 "<div id=EXT$qrec->{id} ".
                 "style=\"display:none;visibility:hidden\">".
                 "<div id=comments$qrec->{id}>$qrec->{HTMLcomments}</div>".
