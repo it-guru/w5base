@@ -103,8 +103,8 @@ sub RightsOverviewLoader
          my $targetlabel=$chk->{ctrlrec}->{targetlabel};
          $targetlabel="fullname" if ($targetlabel eq "");
          foreach my $rec ($obj->getHashList($targetlabel)){
-            if ($rec->{fullname} ne ""){
-               $d.="<li>$rec->{fullname}<br>";
+            if ($rec->{$targetlabel} ne ""){
+               $d.="<li>$rec->{$targetlabel}<br>";
             }
             elsif ($rec->{fullname} ne ""){
                $d.="<li>$rec->{fullname}<br>";

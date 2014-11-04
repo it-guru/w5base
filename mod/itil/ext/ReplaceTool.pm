@@ -154,6 +154,28 @@ sub getControlRecord
              idfield      =>'databoss2id',
              targetlabel  =>'fullname'
            },
+           businessservicedataboss=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::businessservice',
+             target       =>'databoss',
+             idfield      =>'databossid',
+             targetlabel  =>'fullname'
+           },
+           businessservicefuncmgr=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::businessservice',
+             target       =>'funcmgr',
+             idfield      =>'funcmgrid',
+             targetlabel  =>'fullname'
+           },
+           userbscontact=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::lnkbscontact',
+             target       =>'targetname',
+             idfield      =>'targetid',
+             targetlabel  =>'businessservice',
+             baseflt      =>{secparentobj=>\'itil::businessservice'}
+           }
          ];
    return($d);
 }

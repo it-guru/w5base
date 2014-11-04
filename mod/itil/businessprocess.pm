@@ -39,18 +39,7 @@ sub new
                 vjointo       =>'itil::lnkbprocessbservice',
                 vjoinon       =>['id'=>'bprocessid'],
                 vjoindisp     =>['businessservice'],
-                vjoininhash   =>['businessservice','applid',
-                                 'applcistatusid','appl']),
-      new kernel::Field::SubList(
-                name          =>'applications',
-                label         =>'Applications',
-                htmldetail    =>0,
-                group         =>'applications',
-                vjointo       =>'itil::lnkbprocessbservice',
-                vjoinon       =>['id'=>'bprocessid'],
-                vjoindisp     =>['appl'],
-                vjoinbase     =>[{applcistatusid=>'<=5'}],
-                vjoininhash   =>['applid','applcistatusid','appl']),
+                vjoininhash   =>['businessservice']),
    );
    $self->getField("pbusinessprocess")->{'vjointo'}='itil::businessprocess';
    $self->getField("pbusinessprocess")->{'weblinkto'}='itil::businessprocess';
