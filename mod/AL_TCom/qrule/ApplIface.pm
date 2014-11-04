@@ -1,4 +1,4 @@
-package itil::qrule::ApplIface;
+package AL_TCom::qrule::ApplIface;
 #######################################################################
 =pod
 
@@ -8,6 +8,8 @@ Every Application in in CI-Status "installed/active" or "available", needs
 at least 1 interface, if the flag "application has no intefaces" is not 
 true.
 Loop interfaces from the current to the current application are not allowed.
+In special case against the parent rule itil::qrule::ApplIface, in this
+rule Applications in the mgmtitemgroup SAP are always treated as OK.
 
 =head3 IMPORTS
 
@@ -16,7 +18,7 @@ NONE
 =cut
 #######################################################################
 #  W5Base Framework
-#  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -36,7 +38,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::QRule;
-@ISA=qw(kernel::QRule);
+use itil::qrule::ApplIface;
+@ISA=qw(itil::qrule::ApplIface);
 
 sub new
 {
@@ -47,11 +50,6 @@ sub new
    return($self);
 }
 
-sub getPosibleTargets
-{
-   return(["itil::appl"]);
-}
-
 sub qcheckRecord
 {
    my $self=shift;
@@ -60,32 +58,18 @@ sub qcheckRecord
    my $checksession=shift;
    my $autocorrect=$checksession->{autocorrect};
 
-   return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
-   if (!$rec->{isnoifaceappl}){
-      if (ref($rec->{interfaces}) ne "ARRAY" || $#{$rec->{interfaces}}==-1){
-         return(3,{qmsg=>['no interfaces defined'],
-                   dataissue=>['no interfaces defined']});
-      }
-      foreach my $ifrec (@{$rec->{interfaces}}){
-         if ($ifrec->{'comments'}=~m/(^|\s)DataLoopInOutTechSpec(\s|$)/) {
-            next;
-         }
-         if ($ifrec->{toapplid} eq $rec->{id}){
-            my @msg=("loop interfaces to the current ".
-                     "application are not allowed");
-            return(3,{qmsg=>\@msg,dataissue=>\@msg});
-         }
-      }
+   my $mgmtitemgroup=$rec->{mgmtitemgroup};
+   if (ref($mgmtitemgroup) ne "ARRAY"){
+      $mgmtitemgroup=[$mgmtitemgroup];
    }
-   else{
-      if (ref($rec->{interfaces}) eq "ARRAY" && $#{$rec->{interfaces}}!=-1){
-         return(3,{qmsg=>['superfluous interfaces'],
-                   dataissue=>['superfluous interfaces']});
-      }
-   }
-   return(0,undef);
-
+   if (in_array($mgmtitemgroup,"SAP")){
+      return(0,undef);
+   } 
+   return($self->SUPER::qcheckRecord($dataobj,$rec,$checksession));
 }
+
+
+
 
 
 
