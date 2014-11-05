@@ -649,6 +649,12 @@ sub new
                    return($out);
                 }),
 
+      new kernel::Field::Textarea(
+                name          =>'tcomments',
+                label         =>'technical comments',
+                searchable    =>'0',
+                dataobjattr   =>"unistr(amcomment.memcomment)"),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
@@ -923,7 +929,7 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from=
-      "amcomputer,amportfolio,ammodel,amnature,".
+      "amcomputer,amportfolio,ammodel,amnature,amcomment,".
       "(select amcostcenter.*,amtsiaccsecunit.identifier as customerlink ".
       " from amcostcenter left outer ".
       " join amtsiaccsecunit on ".
@@ -960,7 +966,8 @@ sub initSqlWhere
       "and amportfolio.ltenantid=amtenant.ltenantid ".
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
       "and amportfolio.lportfolioitemid=tbsm.lportfolioid(+) ".
-      "and ammodel.name='LOGICAL SYSTEM' ";
+      "and ammodel.name='LOGICAL SYSTEM' ".
+      "and amcomputer.lcommentid=amcomment.lcommentid(+) ";
 #      "and amportfolio.securityset=securitysetval.litemlistvalid(+) ";
    return($where);
 }

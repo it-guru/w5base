@@ -57,6 +57,7 @@
 'SYSCLASS.30'=>{de=>'APPCOM',en=>'APPCOM'},
 'security flag'=>{de=>'Sicherheits-Flag'},
 'merged description of application usage'=>{de=>'Zusammengeführte Anwendungsverwendung'},
+'technical comments'=>{de=>'Technische Bemerkungen'},
 'security set'=>{de=>'Security Set'},
 'direct connected Shared-Storage Servers'=>{de=>'direkt verbundene Shared-Storage Server'},
 'direct connected Shared-Network Components'=>{de=>'direkt verbundene Shared-Netzwerk Komponenten'},
