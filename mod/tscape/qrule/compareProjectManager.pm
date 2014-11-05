@@ -116,6 +116,17 @@ sub qcheckRecord
             $lnkcontact=getModuleObject($self->getParent->Config,
                                                  "base::lnkcontact");
          }
+         my $pmexists=0;
+         foreach my $crec (@{$rec->{contacts}}){
+            my $roles=$crec->{roles};
+            $roles=[$roles] if (ref($roles) ne "ARRAY");
+            if (in_array($roles,"projectmanager")){
+               $pmexists++;
+            }
+         }
+         if (!$pmexists){    # Wenn in Darwin kein Projektmanager erfasst, dann
+            $autocorrect=1;  # darf der PM direkt aus CapeTS übernommen werden.
+         }                   # request: 14151779290001
          foreach my $pmid (@pm_soll){
             my $pmfound=0;
             foreach my $crec (@{$rec->{contacts}}){
