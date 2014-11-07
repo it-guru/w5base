@@ -2,25 +2,46 @@
 <html>
 <head>
 <title>Marvin Data View Operation System</title>
+   <meta charset="ISO-8859-1">
+   <meta http-equiv="X-UA-Compatible" content="IE=8"/> 
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="stylesheet" href="../jqm/jquery.mobile.min.css" />
    <script src="../jq/jquery.min.js"></script>
-   <script src="../jqm/jquery.mobile.min.js"></script>
 
-   <link rel="stylesheet" href="../os.css" />
-   <script src="../os.js"></script>
+
+<script language="JavaScript" 
+   src="https://darwin.telekom.de/darwin/auth/base/load/J5Base.js">
+</script>
+<script language="JavaScript" 
+   src="https://darwin.telekom.de/darwin/public/base/load/datadumper.js">
+</script>
+
+<link rel="stylesheet" href="../os.css" />
+<script language="JavaScript"
+   src="../os.js">
+</script>
+<script language="JavaScript"
+   src="RiManOS.js">
+</script>
+   <script src="../jqm/jquery.mobile.min.js"></script>
 </head>
 <body>
 <div data-role="page">
    <div data-role="header" align="center">
-      <a href="../os.html" data-rel="back">Back</a>
-      <h1>RiManOS Welcome</h1>
+      <a  data-rel="back">zur&uuml;ck</a>
+      <a href="../os.html" data-rel="home">Home</a>
+      <h1>RiManOS</h1>
    </div>
    <div role="main" class="ui-content">
+      <div style="height:90px;vertical-align:bottom">
+      <span style="vertical-align:bottom">
+      <img height=80 width=80 src="compass.gif">
+      <b>Anwendungsgruppen:</b>
+      </span>
+      </div>
       <a href="#" class="ui-btn">Anchor</a>
       <button class="ui-btn">Button</button>
    </div>
-   <div data-role="footer" align="center">W5Base/Darwin Mobile Interface</div>
 </div>
 </body>
 </html>

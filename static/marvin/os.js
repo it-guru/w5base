@@ -1,10 +1,10 @@
 
 function setScreenBaseLayout(){
-   console.log("screen resize");
 
-  // setTimeout(function(){
       var screen=$.mobile.getScreenHeight();
 
+      $(".ui-content").height(1);
+      $(".ui-content").width(640);
       var header=$(".ui-header").hasClass("ui-header-fixed") ? 
                  $(".ui-header").outerHeight()-1 : 
                     $(".ui-header").outerHeight();
@@ -18,12 +18,12 @@ function setScreenBaseLayout(){
 
       content=screen-header-footer-contentCurrent;
       $(".ui-content").height(content);
-  // },1);
 }
 
 //$(document).on("pagecontainertransition",setScreenBaseLayout);
 //$(window).on("resize",setScreenBaseLayout);
 //$(window).on("load",setScreenBaseLayout);
+//$(window).on("pageshow",setScreenBaseLayout);
 //$(window).on("ready",setScreenBaseLayout);
 //$(window).on("orientationchange",setScreenBaseLayout)
 
