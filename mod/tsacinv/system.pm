@@ -649,11 +649,14 @@ sub new
                    return($out);
                 }),
 
-      new kernel::Field::Textarea(
-                name          =>'tcomments',
+      new kernel::Field::Textarea(                 # Attention: NCLOB field!
+                name          =>'tcomments',       # makes distinct not posible!
                 label         =>'technical comments',
                 searchable    =>'0',
-                dataobjattr   =>"unistr(amcomment.memcomment)"),
+                #dataobjattr   =>"unistr(amcomment.memcomment)"),
+                # unistr could not be used becouse invalid backslash sequenses
+                # in assetmanager
+                dataobjattr   =>"amcomment.memcomment"),
 
       new kernel::Field::Date(
                 name          =>'cdate',
@@ -711,6 +714,7 @@ sub new
                 dataobjattr   =>"lpad(amportfolio.assettag,35,'0')")
 
    );
+   $self->{use_distinct}=0;
    $self->setDefaultView(qw(systemname status tsacinv_locationfullname 
                             systemid assetassetid));
    return($self);
