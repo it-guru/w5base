@@ -2,6 +2,10 @@ $(document).ready(function (){
 //   window.setTimeout(loadMgmtItemGroups,1);
 //
   console.log("ready done");
+  $("#elements>.ui-button").onclick(function(){
+     alert("ok");
+
+  });
 
 $.mobile.loading( "show", {
   text: "foo",
