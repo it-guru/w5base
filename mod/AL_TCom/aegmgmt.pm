@@ -230,6 +230,15 @@ sub new
                    return($arec->{$self->Name});
                 }),
 
+      new kernel::Field::Link(
+                name          =>'technicalaeg',
+                readonly      =>1,
+                group         =>'aeg',
+                searchable    =>0,
+                vjointo       =>'TS::appl',
+                vjoinon       =>['id'=>'id'],
+                vjoindisp     =>'technicalaeg'),
+
       new kernel::Field::MDate(
                 name          =>'mdate',
                 readonly      =>1,
@@ -350,13 +359,19 @@ sub getRecordHtmlIndex
                                                   $grouplist,$grouplabel);
 
    my $email;
-   if (ref($rec->{technicalaeg}) eq "HASH" &&
-       ref($rec->{technicalaeg}->{AEG_email}) eq "ARRAY"){
-      my $email=join(";",@{$rec->{technicalaeg}->{AEG_email}});
+   my $o=getModuleObject($self->Config,"TS::appl");
+   $o->SetFilter({id=>\$rec->{id}});
+   my ($arec,$msg)=$o->getOnlyFirst(qw(technicalaeg));
+
+   my $technicalaeg=$arec->{technicalaeg};
+   if (ref($technicalaeg) eq "HASH" &&
+       ref($technicalaeg->{AEG_email}) eq "ARRAY"){
+      $email=join(";",@{$technicalaeg->{AEG_email}});
    }
+   
    if ($email ne ""){
       push(@indexlist,{label=>$self->T('AEG Distibutionlist'),
-              href=>"mailto:null\@null.com",
+              href=>"mailto:".$email,
               target=>"_self"
              });
    }
