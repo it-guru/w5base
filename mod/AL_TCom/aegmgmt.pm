@@ -338,6 +338,34 @@ sub getSqlFrom
 #   return($where);
 #}
 
+sub getRecordHtmlIndex
+{
+   my $self=shift;
+   my $rec=shift;
+   my $id=shift;
+   my $viewgroups=shift;
+   my $grouplist=shift;
+   my $grouplabel=shift;
+   my @indexlist=$self->SUPER::getRecordHtmlIndex($rec,$id,$viewgroups,
+                                                  $grouplist,$grouplabel);
+
+   my $email;
+   if (ref($rec->{technicalaeg}) eq "HASH" &&
+       ref($rec->{technicalaeg}->{AEG_email}) eq "ARRAY"){
+      my $email=join(";",@{$rec->{technicalaeg}->{AEG_email}});
+   }
+   if ($email ne ""){
+      push(@indexlist,{label=>$self->T('AEG Distibutionlist'),
+              href=>"mailto:null\@null.com",
+              target=>"_self"
+             });
+   }
+
+   return(@indexlist);
+}
+
+
+
 
 
 sub Validate
