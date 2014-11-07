@@ -27,3 +27,8 @@ function setScreenBaseLayout(){
 //$(window).on("ready",setScreenBaseLayout);
 //$(window).on("orientationchange",setScreenBaseLayout)
 
+
+function call(f)
+{
+   window.setTimeout(f,1);
+}
