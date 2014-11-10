@@ -97,8 +97,8 @@ sub qcheckRecord
                $flt->{cistatusid}="!6";
             }
             $o->SetFilter($flt);
-            my ($rec,$msg)=$o->getOnlyFirst($idfield->Name());
-            if (defined($rec)){
+            my ($datarec,$msg)=$o->getOnlyFirst($idfield->Name());
+            if (defined($datarec)){
                # now check the User
                my $o=getModuleObject($self->getParent->Config,"base::user");
                if (defined($o) && $rec->{userid} ne ""){
