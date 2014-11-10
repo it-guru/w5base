@@ -69,7 +69,8 @@ function show_mgmtitemgroup_scenario()
          id:rec.id,
          name:rec.name
       });
-      li.html("<a class='list-href' id='"+rec.id+"' href='#"+rec.id+"'>"+
+      li.html("<a class='list-href' rel='external' "+
+              "id='"+rec.id+"' href='#"+rec.id+"'>"+
               rec.name+
               "</a>");
       ul.append(li);
@@ -80,6 +81,7 @@ function show_mgmtitemgroup_scenario()
    $(".list-href").click(function(){
       $.mobile.loading('show');
        var grpid=$(this).attr("id");
+       app.orgPath=[grpid];
        load_appl_scenario(grpid,function(){
           show_appl_scenario(grpid);
        });
@@ -117,7 +119,7 @@ function show_appl_scenario()
          id:rec.id,
          name:rec.name
       });
-      li.html("<a class='list-href' id='"+rec.id+"' href='#"+
+      li.html("<a class='list-href' rel='external' id='"+rec.id+"' href='#"+
               app.orgPath.join("-")+"-"+rec.id+"'>"+rec.name+"</a>");
       ul.append(li);
    }
@@ -127,10 +129,78 @@ function show_appl_scenario()
    $(".list-href").click(function(){
       $.mobile.loading('show');
        var applid=$(this).attr("id");
+       app.orgPath=[app.mgmtitemgroup.id,applid];
        load_appldetail_scenario(applid,function(){
           show_appldetail_scenario(applid);
        });
    });
+   $.mobile.loading('hide');
+}
+
+function load_appldetailstat_scenario(nextCall)
+{
+   $.mobile.loading('show');
+   $("#Elements-Container").append(
+      "<h2 align=\"center\">RiManOS: Statistik</h2>"
+   );
+   $("#Elements-Container").append(
+      "<div id='stat'>building stats ...</div>"
+   );
+   loadList('AL_TCom::appl','name,itemsummary,description,id',function(res){
+      app.appldetail=res[0];
+      nextCall();
+   },{
+      id:app.appldetail.id
+   });
+}
+
+function show_appldetailstat_scenario(applid)
+{
+   console.log("app in show_appldetailstat_scenario",app);
+   $("#stat").html("done!");
+
+   //data generation for dataquality
+   var isum=app.appldetail.itemsummary.xmlroot;
+   console.log(isum.dataquality);
+   var dataquality={
+      ok:0,
+      fail:0,
+      total:0
+   };
+   for(c=0;c<isum.dataquality.record.length;c++){
+      dataquality.total+=1;
+      if (isum.dataquality.record[c].dataissuestate=="OK"){
+         dataquality.ok++;
+      }
+      else{
+         dataquality.fail++;
+      }
+   }
+   var dataquality_data=[
+      {
+         label:"DataIssue OK",
+         data:dataquality.ok,
+         color:"green"
+      },
+      {
+         label:"DataIssue fail",
+         data:dataquality.fail,
+         color:"red"
+      }
+   ];
+   console.log(dataquality);
+
+   //visualisation
+   $("#stat").html("<div id='dataquality' style='border-style:solid;border-color:gray;margin:5px;width:240px;height:100px' />");
+   var placeholder=$("#dataquality");
+   $.plot(placeholder,dataquality_data,{
+      series:{
+         pie:{
+            show:true
+         }
+      }
+   });
+
    $.mobile.loading('hide');
 }
 
@@ -146,12 +216,27 @@ function load_appldetail_scenario(applid,nextCall)
    });
 }
 
+
+
 function show_appldetail_scenario(applid)
 {
    var label="ApplList";
-   $("#Elements-Container").html("<pre>"+Dumper(app.appldetail)+"</pre>");
-   $.mobile.loading('hide');
-   
+   var description=app.appldetail.description;
+
+   description=description.replace(/\n/g,"<br>");
+
+   console.log("desc=",description);
+
+  
+
+   $("#Elements-Container").html("");
+   $("#Elements-Container").append("<h1>"+app.appldetail.name+"</h1>");
+   $("#Elements-Container").append("<p id=\"desc\"></p>");
+   $("#desc").html(description);
+
+   call(function(){
+       load_appldetailstat_scenario(show_appldetailstat_scenario);
+   });
 }
 
 
@@ -162,6 +247,7 @@ function runApp(){
    var appPath=target.split("-");
    app.orgPath=$.grep(appPath,function(a){return(a!="");});
    app.appPath=$.grep(appPath,function(a){return(a!="");});
+   console.log("orgPath=",app.orgPath);
    // appPath contains the current Hash
 
    $.mobile.loading('show');
