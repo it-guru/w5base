@@ -90,8 +90,6 @@ function show_mgmtitemgroup_scenario()
 //  Application List Scenario
 function load_appl_scenario(grpid,nextCall)
 {
-   console.log("load_appl_scenario for "+grpid);
-   console.log("app ",app);
    var groupname=app.mgmtitemgroup.id[String(grpid)].name;
    loadList('itil::appl','name,id',function(res){
       app.appl={rec:[],id:{}};
@@ -156,12 +154,10 @@ function load_appldetailstat_scenario(nextCall)
 
 function show_appldetailstat_scenario(applid)
 {
-   console.log("app in show_appldetailstat_scenario",app);
    $("#stat").html("done!");
 
    //data generation for dataquality
    var isum=app.appldetail.itemsummary.xmlroot;
-   console.log(isum.dataquality);
    var dataquality={
       ok:0,
       fail:0,
@@ -188,14 +184,14 @@ function show_appldetailstat_scenario(applid)
          color:"red"
       }
    ];
-   console.log(dataquality);
 
    //visualisation
-   $("#stat").html("<div id='dataquality' style='border-style:solid;border-color:gray;margin:5px;width:240px;height:100px' />");
+   $("#stat").html("<div id='dataquality' style='border-style:solid;border-color:gray;padding:5px;width:240px;height:100px' />");
    var placeholder=$("#dataquality");
    $.plot(placeholder,dataquality_data,{
       series:{
          pie:{
+            radius:0.8,
             show:true
          }
       }
@@ -225,7 +221,6 @@ function show_appldetail_scenario(applid)
 
    description=description.replace(/\n/g,"<br>");
 
-   console.log("desc=",description);
 
   
 
@@ -247,7 +242,6 @@ function runApp(){
    var appPath=target.split("-");
    app.orgPath=$.grep(appPath,function(a){return(a!="");});
    app.appPath=$.grep(appPath,function(a){return(a!="");});
-   console.log("orgPath=",app.orgPath);
    // appPath contains the current Hash
 
    $.mobile.loading('show');
