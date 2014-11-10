@@ -89,12 +89,11 @@ sub doCleanup
    my $j=getModuleObject($self->Config,"base::joblog");
    $j->BulkDeleteRecord({'mdate'=>$CleanupJobLog});
 
- # InfoAbo Cleanup is buggy (HV 10.11.2014)
- #  my $CleanupInfoAbo=$self->getParent->Config->Param("CleanupInfoAbo");
- #  $CleanupInfoAbo="<now-56d" if ($CleanupInfoAbo eq "");
- #  msg(DEBUG,"(%s) Processing doCleanup base::infoabo",$self->Self);
- #  my $ia=getModuleObject($self->Config,"base::infoabo");
- #  $ia->BulkDeleteRecord({'expiration'=>$CleanupInfoAbo});
+   my $CleanupInfoAbo=$self->getParent->Config->Param("CleanupInfoAbo");
+   $CleanupInfoAbo="<now-56d" if ($CleanupInfoAbo eq "");
+   msg(DEBUG,"(%s) Processing doCleanup base::infoabo",$self->Self);
+   my $ia=getModuleObject($self->Config,"base::infoabo");
+   $ia->BulkDeleteRecord({'expiration'=>$CleanupInfoAbo});
 
    my $CleanupUserLogon=$self->getParent->Config->Param("CleanupUserLogon");
    $CleanupUserLogon="<now-365d" if ($CleanupUserLogon eq "");
