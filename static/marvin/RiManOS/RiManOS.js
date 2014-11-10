@@ -1,4 +1,9 @@
-var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+var W5Base=createConfig({ 
+   useUTF8:false, 
+   mode:'auth',
+   transfer:'JSON',
+   baseURL:J5Base_baseUrl
+},J5Base_baseUrl);
 
 
 
@@ -156,8 +161,9 @@ function show_appldetailstat_scenario(applid)
 {
    $("#stat").html("done!");
 
-   //data generation for dataquality
    var isum=app.appldetail.itemsummary.xmlroot;
+   var d={};
+   //data generation for dataquality
    var dataquality={
       ok:0,
       fail:0,
@@ -172,30 +178,123 @@ function show_appldetailstat_scenario(applid)
          dataquality.fail++;
       }
    }
-   var dataquality_data=[
+   d.dataquality=[
       {
-         label:"DataIssue OK",
+         label:"Issue free = "+dataquality.ok,
          data:dataquality.ok,
          color:"green"
       },
       {
-         label:"DataIssue fail",
+         label:"DataIssue fail = "+dataquality.fail,
          data:dataquality.fail,
          color:"red"
       }
    ];
 
-   //visualisation
-   $("#stat").html("<div id='dataquality' style='border-style:solid;border-color:gray;padding:5px;width:240px;height:100px' />");
-   var placeholder=$("#dataquality");
-   $.plot(placeholder,dataquality_data,{
-      series:{
-         pie:{
-            radius:0.8,
-            show:true
-         }
+   var hardware={
+      ok:0,
+      fail:0,
+      total:0
+   };
+   for(c=0;c<isum.hardware.record.length;c++){
+      console.log(isum.hardware.record[c]);
+      hardware.total+=1;
+      if (isum.hardware.record[c].assetrefreshstate=="OK"){
+         hardware.ok++;
       }
-   });
+      else{
+         hardware.fail++;
+      }
+   }
+   d.hardware=[
+      {
+         label:"Hardware OK = "+hardware.ok,
+         data:hardware.ok,
+         color:"green"
+      },
+      {
+         label:"HardwareRefresh fail = "+hardware.fail,
+         data:hardware.fail,
+         color:"red"
+      }
+   ];
+
+
+   var system={
+      ok:0,
+      fail:0,
+      total:0
+   };
+   for(c=0;c<isum.system.record.length;c++){
+      console.log(isum.system.record[c]);
+      system.total+=1;
+      if (isum.system.record[c].osanalysestate=="OK"){
+         system.ok++;
+      }
+      else{
+         system.fail++;
+      }
+   }
+   d.system=[
+      {
+         label:"OperationSystem OK = "+system.ok,
+         data:system.ok,
+         color:"green"
+      },
+      {
+         label:"OperationSystem fail = "+system.fail,
+         data:system.fail,
+         color:"red"
+      }
+   ];
+
+
+   var software={
+      ok:0,
+      fail:0,
+      total:0
+   };
+   for(c=0;c<isum.software.record[0].i.length;c++){
+      software.total+=1;
+      if (isum.software.record[0].i[c].osanalysestate=="OK"){
+         software.ok++;
+      }
+      else{
+         software.fail++;
+      }
+   }
+   d.software=[
+      {
+         label:"Software OK = "+software.ok,
+         data:software.ok,
+         color:"green"
+      },
+      {
+         label:"Software fail = "+software.fail,
+         data:software.fail,
+         color:"red"
+      }
+   ];
+
+
+
+   //visualisation
+   $("#stat").html("");
+   for (var chartname in d){
+      $("#stat").append("<div id='"+chartname+"_' "+
+                        "style='border-style:solid;border-color:gray;width:300px;height:130px;margin:2px;float:left;' />");
+      $("#"+chartname+"_").append("<div align=center><p>"+chartname+"</p></div>");
+      $("#"+chartname+"_").append("<div id='"+chartname+"' style=\"margin-bottom:2px;height:80px\" />");
+      var placeholder=$("#"+chartname);
+      $.plot(placeholder,d[chartname],{
+         series:{
+            pie:{
+               radius:0.8,
+               show:true
+            }
+         }
+      });
+   }
 
    $.mobile.loading('hide');
 }
