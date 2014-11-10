@@ -30,5 +30,7 @@ function setScreenBaseLayout(){
 
 function call(f)
 {
-   window.setTimeout(f,1);
+   if (f){
+      window.setTimeout(f,1);
+   }
 }

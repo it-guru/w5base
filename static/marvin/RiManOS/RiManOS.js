@@ -165,7 +165,9 @@ function runApp(){
    // appPath contains the current Hash
 
    $.mobile.loading('show');
-   load_mgmtitemgroup_scenario();
+   load_mgmtitemgroup_scenario(function(){
+      show_mgmtitemgroup_scenario();
+   });
 }
 
 
