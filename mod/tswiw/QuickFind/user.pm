@@ -54,6 +54,11 @@ sub CISearchResult
       my $flt=[{surname=>"*$searchtext*"},
                {uid=>\$searchtext},
                {email=>\"*$searchtext*"}];
+      my @words=split(/[, ]+/,$searchtext);
+      if ($#words>0){
+         $flt={surname=>"$words[0]*",
+               givenname=>"$words[1]*"};
+      }
       my $wiwuser=getModuleObject($self->getParent->Config,"tswiw::user");
       $wiwuser->SetFilter($flt);
       foreach my $rec ($wiwuser->getHashList(qw(surname givenname email))){
@@ -86,7 +91,7 @@ sub QuickFindDetail
 
    my $tswiwuser=getModuleObject($self->getParent->Config,"tswiw::user");
    $tswiwuser->SetFilter({id=>\$id});
-   my @l=qw(surname givenname email office_phone office_mobile);
+   my @l=qw(surname givenname email office_phone office_mobile touid);
    my ($rec,$msg)=$tswiwuser->getOnlyFirst(@l);
    $tswiwuser->ResetFilter();
    $tswiwuser->SecureSetFilter([{id=>\$id}]);

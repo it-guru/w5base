@@ -11,7 +11,7 @@ die <b>WhoIsWhoID</b> spezifizieren.
 Wenn die Einheit identifizert werden kann, und die Einheit
 noch nicht existiert, dann wird dieser automatisch als "installiert/aktiv"
 erzeugt.</td></tr>
-<tr><td width=1% nowrap>Org-Area WhoIsWhoID:</td>
+<tr><td width=1% nowrap>Org-Area WhoIsWhoID (tOuID):</td>
 <td><input type=text class=finput name=importname value="%importname%"></td></tr>
 <tr>
 <td colspan=2 align=center><input name=DOIT type=submit value=" importieren "></td>

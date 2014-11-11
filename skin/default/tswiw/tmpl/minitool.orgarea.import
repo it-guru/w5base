@@ -10,7 +10,7 @@ database. The user you want to import can be specified
 by <b>WhoIsWhoID</b> of the required orgarea .<br>
 If the orgarea can be found, it will be automaticly create as
 installed/active group.</td></tr>
-<tr><td width=1% nowrap>Org-Area WhoIsWhoID:</td>
+<tr><td width=1% nowrap>Org-Area WhoIsWhoID (tOuID):</td>
 <td><input type=text class=finput name=importname value="%importname%"></td></tr>
 <tr>
 <td colspan=2 align=center><input name=DOIT type=submit value=" import "></td>
