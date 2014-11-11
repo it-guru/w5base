@@ -49,6 +49,13 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullname',
+                uivisible     =>0,
+                label         =>'fullname',
+                dataobjattr   =>"if (servicesupport.fullname<>'',".
+                                "servicesupport.fullname,servicesupport.name)"),
+
+      new kernel::Field::Text(
+                name          =>'description',
                 label         =>'long description',
                 dataobjattr   =>'servicesupport.fullname'),
 
