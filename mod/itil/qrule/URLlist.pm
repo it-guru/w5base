@@ -14,6 +14,7 @@ NONE
 =head3 HINTS
 If there are software-instances of type ... 
 Apache 
+SunOne
 ... in CI-Status "installed/active" it is mandatory to enter 
 at least one communication URL.
 
@@ -22,6 +23,7 @@ at least one communication URL.
 
 Wenn es bei einer Anwendung Software-Instanzen vom Type ...
 Apache
+SunOne
 ... im Status "installiert/aktiv" gibt, muß es auch min. eine
 Anwendungs-URL geben.
 
@@ -83,8 +85,9 @@ sub qcheckRecord
 
 
    my $urlswi=0;
+   my @needed=qw(Apache SunOne);
    foreach my $swi (@{$rec->{swinstances}}){
-      if ($swi->{swnature} eq "Apache"){
+      if (in_array(\@needed,$swi->{swnature})){
          $urlswi++;
       }
    }
