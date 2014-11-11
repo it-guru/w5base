@@ -487,6 +487,8 @@ sub processRecord
       my $countvar;
       $countvar="ITIL.Change.Finish.Count" if ($rec->{class}=~m/::change$/);
       $countvar="ITIL.Incident.Finish.Count" if ($rec->{class}=~m/::incident$/);
+      $countvar="ITIL.Problem.Finish.Count" if ($rec->{class}=~m/::problem$/);
+      $countvar="ITIL.Devrequest.Finish.Count" if ($rec->{class}=~m/::devrequest$/);
       my @affectedapplication=$rec->{affectedapplication};
       if (ref($rec->{affectedapplication}) eq "ARRAY"){
          @affectedapplication=@{$rec->{affectedapplication}};
@@ -529,11 +531,31 @@ sub processRecord
                                               $rec->{eventstart},
                                               $rec->{eventend});
             }
+            elsif ($rec->{class}=~m/::change$/){
+               $self->getParent->storeStatVar("Application",$appl,
+                                              {nosplit=>1,
+                                               method=>'tspan.union'},
+                                              "ITIL.Change",
+                                              $rec->{eventstart},
+                                              $rec->{eventend});
+            }
+            elsif ($rec->{class}=~m/::problem$/){
+               $self->getParent->storeStatVar("Application",$appl,
+                                              {nosplit=>1,
+                                               method=>'tspan.union'},
+                                              "ITIL.Problem",
+                                              $rec->{eventstart},
+                                              $rec->{eventend});
+            }
          }
          my $involvedresponseteam=$rec->{involvedresponseteam};
          my $involvedbusinessteam=$rec->{involvedbusinessteam};
-         $involvedresponseteam=[$involvedresponseteam] if (!ref($involvedresponseteam));
-         $involvedbusinessteam=[$involvedbusinessteam] if (!ref($involvedbusinessteam));
+         if (!ref($involvedresponseteam)){
+            $involvedresponseteam=[$involvedresponseteam];
+         }
+         if (!ref($involvedbusinessteam)){
+            $involvedbusinessteam=[$involvedbusinessteam];
+         }
          my @groups=();
          push(@groups,@$involvedresponseteam);
          push(@groups,@$involvedbusinessteam);
