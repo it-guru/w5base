@@ -55,5 +55,5 @@
 'extern2w5base'=>{de=>'Datentransfer vom externen System zur W5Base',en=>'Data transfer from the external system to W5Base'},
 'Sync state'=>{de=>'Syncronisationsstatus'},
 'creator posix'=>{de=>'Ersteller POSIX'},
-'LOCALNOTE'=>{de=>'Das Hinzufügen einer persönlichen Notiz führt zu keinerlei Abarbeitung order Lösung des Workflows! Es dient rein zur Hinterlegung von Notizen im Workflow-Verlauf durch den aktuellen Bearbeiter des Workflows.',en=>'The adding of personal notes will not lead to any processing or finishing of this workflow!. It is only for adding informational notes in the history of the workflow.'},
+'LOCALNOTE'=>{de=>'Das Hinzufügen einer persönlichen Notiz führt zu keinerlei Abarbeitung bzw. Lösung des Workflows! Dies dient rein zur Hinterlegung von Notizen im Workflow-Verlauf durch den aktuellen Bearbeiter.',en=>'The adding of personal notes will not lead to any processing or finishing of this workflow!. It is only for adding informational notes in the history of the workflow.'},
 
