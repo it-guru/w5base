@@ -12,7 +12,6 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->setWorktable("APPSYSASS");
-   $self->AddAllFieldsFromWorktable();
    $self->setDefaultView(qw(linenumber 
                             w5_app_name 
                             w5_sys_systemname 

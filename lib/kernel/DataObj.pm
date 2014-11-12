@@ -518,7 +518,7 @@ sub getHashIndexed
    my @key=@_;
    my $res={};
 
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   $self->doInitialize();
    @key=($self->{'fields'}->[0]) if ($#key==-1);
    my ($rec,$msg)=$self->getFirst();
    if (defined($rec)){
@@ -550,7 +550,8 @@ sub getHashList
    my $self=shift;
    my @view=@_;
    my @l=();
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+
+   $self->doInitialize();
    if ($#view!=-1){
       $self->SetCurrentView(@view);
    }
@@ -1019,6 +1020,9 @@ sub isViewValid
 
    if (exists($self->{useMenuFullnameAsACL})){
       my $func=["Main","MainWithNew"];
+      if ($self->{useMenuFullnameAsACL} eq "1"){
+         $self->{useMenuFullnameAsACL}=$self->Self();
+      }
       my $acl=$self->getMenuAcl($ENV{REMOTE_USER},
                         $self->{useMenuFullnameAsACL},
                         func=>$func);
@@ -1646,7 +1650,8 @@ sub ValidatedInsertRecordTransactionless
 {
    my $self=shift;
    my $newrec=shift;
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+
+   $self->doInitialize();
    if (!$self->preValidate(undef,$newrec)){
       if ($self->LastMsg()==0){
          $self->LastMsg(ERROR,"ValidatedInsertRecord: ".
@@ -1956,7 +1961,7 @@ sub ValidatedUpdateRecordTransactionless
    my $newrec=shift;
    my @filter=@_;
 
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   $self->doInitialize();
    my %comprec=%{$newrec};
    if (!$self->preValidate($oldrec,$newrec,\%comprec)){
       if ($self->LastMsg()==0){
@@ -2017,7 +2022,6 @@ sub ForeachFilteredRecord
    my $method=shift;
    my @paramarray=@_;
 
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    my ($rec,$msg)=$self->getFirst();
    if (defined($rec)){
       do{
@@ -2045,7 +2049,6 @@ sub DeleteAllFilteredRecords
    if (defined($idobj)){
       my $idname=$idobj->Name();
       $self->SetCurrentView(qw(ALL));
-      $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
       my ($rec,$msg)=$self->getFirst();
       if (defined($rec)){
          do{
@@ -2094,7 +2097,7 @@ sub SecureValidatedDeleteRecord
    my $self=shift;
    my $oldrec=shift;
    $self->isDataInputFromUserFrontend(1);
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   $self->doInitialize();
    if ($self->isDeleteValid($oldrec)){
       return($self->ValidatedDeleteRecord($oldrec));
    }
@@ -2130,7 +2133,7 @@ sub ValidatedDeleteRecordTransactionless
    my $self=shift;
    my $oldrec=shift;
 
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   $self->doInitialize();
    my $bak=undef;
    if ($self->ValidateDelete($oldrec)){
       $bak=$self->DeleteRecord($oldrec);
@@ -2202,7 +2205,7 @@ sub DeleteRecord
 {
    my $self=shift;
    my $oldrec=shift;
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   $self->doInitialize();
    msg(ERROR,"DeleteRecord not implemented in DataObj '$self'");
    return(0);
 }
@@ -2210,7 +2213,7 @@ sub BulkDeleteRecord    # this function should be only used, if the
 {                       # developer exactly knows the consequeses!!!
    my $self=shift;
    my @filter=@_;
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   $self->doInitialize();
    msg(ERROR,"BulkDeleteRecord not implemented in DataObj '$self'");
    return(0);
 }
@@ -2599,6 +2602,16 @@ sub AddFields
          $self->AddGroup($obj->{group},translation=>$obj->{translation});
       }
    }
+   return(1);
+}
+
+sub ResetFields
+{
+   my $self=shift;
+
+   $self->{'FieldOrder'}=[];
+   $self->{'Field'}={};
+   $self->{'Group'}={};
    return(1);
 }
 

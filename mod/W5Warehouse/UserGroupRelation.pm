@@ -12,7 +12,6 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->setWorktable("USERGROUPRELATION");
-   $self->AddAllFieldsFromWorktable();
    $self->setDefaultView(qw(linenumber 
                             kontaktname
                             gruppenname
