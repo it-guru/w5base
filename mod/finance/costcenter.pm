@@ -233,6 +233,18 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'costcenter.srcload'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"costcenter.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(costcenter.id,35,'0')"),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
