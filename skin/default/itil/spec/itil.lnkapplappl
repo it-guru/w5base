@@ -52,6 +52,7 @@ oracle://USER\@HOST:PORT/
 ldap://USER/PASWORD\@HOST/DN?ATTRIBUTES?SCOPE?FILTER?EXT
 http://USER:PASSWORD\@HOST/PATH
 https://USER:PASSWORD\@HOST/PATH
+sftp://USER\@HOST
 EOF
 en=><<EOF},
 You can specify the URL of the communication
@@ -65,6 +66,7 @@ oracle://USER\@HOST:PORT/
 ldap://USER/PASWORD\@HOST/DN?ATTRIBUTES?SCOPE?FILTER?EXT
 http://USER:PASSWORD\@HOST/PATH
 https://USER:PASSWORD\@HOST/PATH
+sftp://USER\@HOST
 EOF
 
 'tourl'=>{de=><<EOF,
