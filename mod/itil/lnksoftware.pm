@@ -43,6 +43,8 @@ sub new
                 label         =>'LinkID',
                 searchable    =>0,
                 dataobjattr   =>'lnksoftwaresystem.id'),
+ 
+      new kernel::Field::RecordUrl(),
 
       new kernel::Field::Text(
                 name          =>'fullname',

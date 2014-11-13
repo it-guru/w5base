@@ -85,6 +85,7 @@ sub RawValue
          }
       }
    }
+   $current->{$self->{name}}=$url;
    return($url); 
 }
 

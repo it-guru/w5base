@@ -251,7 +251,8 @@ sub ItemSummary
       my $l1=getModuleObject($self->Config,"itil::lnksoftwaresystem");
       my $l2=getModuleObject($self->Config,"itil::lnksoftwareitclustsvc");
       my @swview=qw(fullname denyupd denyupdcomments 
-                    softwareinstrelstate is_dbs is_mw);
+                    softwareinstrelstate is_dbs is_mw
+                    urlofcurrentrec);
       $l1->ResetFilter();
       $l1->SetFilter({applications    =>\$current->{name},
                       softwareset     =>$rm->{name},
@@ -279,14 +280,15 @@ sub ItemSummary
                      cistatusid=>"!6"});
       my @systems=$o->getHashList(qw(name denyupd denyupdcomments 
                                      dataissuestate
-                                     osanalysestate));
+                                     osanalysestate
+                                     urlofcurrentrec));
       return(0) if (!$o->Ping());
       Dumper(\@systems);
       for(my $c=0;$c<=$#systems;$c++){
          push(@dataissues,$systems[$c]->{dataissuestate});
          delete($systems[$c]->{dataissuestate});
       }
-      $summary->{system}={record=>\@systems};         # SET : hardware fertig
+      $summary->{system}={record=>\@systems};         # SET : system fertig
    }
    ###########################
    {
@@ -295,14 +297,15 @@ sub ItemSummary
                      cistatusid=>"!6"});
       my @assets=$o->getHashList(qw(name denyupd denyupdcomments refreshpland
                                     dataissuestate
-                                    assetrefreshstate));
+                                    assetrefreshstate
+                                    urlofcurrentrec));
       return(0) if (!$o->Ping());
-      Dumper(\@assets);
       for(my $c=0;$c<=$#assets;$c++){
          push(@dataissues,$assets[$c]->{dataissuestate});
          delete($assets[$c]->{dataissuestate});
       }
-      $summary->{hardware}={record=>\@assets};         # SET : hardware fertig
+      Dumper(\@assets);
+      $summary->{hardware}={record=>\@assets};   # SET : hardware fertig
    }
    ###########################
    {
@@ -360,6 +363,13 @@ sub ItemSummary
       push(@dataissues,$rec->{dataissuestate});
       $summary->{dataquality}={record=>\@dataissues};
    }
+
+   #foreach my $k (keys(%{$summary})){
+   #   if (!in_array([qw(dataquality urlofcurrentrec
+   #                     system hardware software interview)],$k)){
+   #      delete($summary->{$k});
+   #   }
+   #}
 
 
 

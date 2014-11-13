@@ -43,6 +43,8 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'swinstance.id'),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'fullname',

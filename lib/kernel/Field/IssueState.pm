@@ -302,7 +302,7 @@ sub RawValue
                dataissue=>$issuerec->{name},
                dataobj=>$self->getParent->SelfAsParentObject(),
                dataobjid=>$refid,
-               url=>$issuerec->{urlofcurrentrec}
+               urlofcurrentrec=>$issuerec->{urlofcurrentrec}
             };
          }
       }

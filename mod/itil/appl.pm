@@ -1535,9 +1535,10 @@ sub ItemSummary
 
    my $o=getModuleObject($self->Config,$self->Self);
    $o->SetFilter({id=>\$current->{id}});
-   my ($rec,$msg)=$o->getOnlyFirst("systems");
+   my ($rec,$msg)=$o->getOnlyFirst(qw(systems urlofcurrentrec));
    Dumper($rec);
    $summary->{systems}=$rec->{systems};
+   $summary->{urlofcurrentrec}=$rec->{urlofcurrentrec};
    return(0) if (!$o->Ping());
 
    my $ids=$self->getRelatedWorkflows($current->{id},
