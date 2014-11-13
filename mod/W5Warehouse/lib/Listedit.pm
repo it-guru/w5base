@@ -55,7 +55,7 @@ sub AddAllFieldsFromWorktable
       foreach my $fld ($dict->getHashList(qw(fieldname fieldtype))){
          my $name=lc($fld->{fieldname});
          if ($name=~m/\s/){
-            $name=~s/\s/_/g;
+            $name=~s/[\s\.-]/_/g;
          }
          my $label=$fld->{fieldname};
          if (!($label=~m/[ ,a-z]/)){
@@ -159,7 +159,18 @@ sub Welcome
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
+sub ModuleObjectInfo
+{
+   my $self=shift;
 
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'kernel.App.Web.ModuleObjectInfo.css'],
+                           js=>['toolbox.js'],
+                           title=>$self->T('Module Object Information'),
+                           form=>1);
+   print $self->HtmlBottom(form=>1);
+}
 
 
 

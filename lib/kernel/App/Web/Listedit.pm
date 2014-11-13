@@ -49,6 +49,7 @@ sub ModuleObjectInfo
                            js=>['toolbox.js'],
                            title=>$self->T('Module Object Information'),
                            form=>1);
+   $self->doInitialize();
    print("<table width=98%>");
    printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Frontend name"));
    printf("<td>%s</td></tr>",$self->T($self->Self,$self->Self));
