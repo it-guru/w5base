@@ -20,9 +20,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use itil::lib::Listedit;
-use URI;
-use URI::URL;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+#use URI;
+#use URI::URL;
+@ISA=qw(kernel::App::Web::Listedit itil::lib::Listedit kernel::DataObj::DB);
 
 
 sub new
@@ -329,48 +329,18 @@ sub Validate
 
 
    my $name=effVal($oldrec,$newrec,"name");
-   $name=~s/^([A-Z,a-z]+)/lc($1)/ex;
-   if (($name=~m/\s/) || ($name=~m/^\s*$/)){
-      $self->LastMsg(ERROR,"invalid URL specified");
-      return(undef);
+
+   my $uri=$self->URLValidate($name);
+   if ($uri->{error}) {
+      $self->LastMsg(ERROR,$uri->{error});
    }
-   if (URI->new($name)->path() eq "/"){
-      $name=~s#/\s*$##;
-   }
-   my $scheme=URI->new($name)->scheme();
-   if ($scheme eq ""){
-      $self->LastMsg(ERROR,"URL syntax error or no scheme specified");
-      return(undef);
-   }
-   my @sok=qw(http ldap ldaps https file mailto sftp ftp ssh rlogin);
-   if (!in_array(\@sok,$scheme)){
-      $self->LastMsg(ERROR,"not suppored scheme specified");
-      return(undef);
-   }
-   if (my ($host)=$name=~m#^sftp://([^:/]+)#){  # sftp not supported by URI
-      if (effVal($oldrec,$newrec,"hostname") ne lc($host)){
-         $newrec->{hostname}=lc($host);
+   if (effVal($oldrec,$newrec,"hostname") ne $uri->{host}){
+         $newrec->{hostname}=$uri->{host};
       }
+   if (effVal($oldrec,$newrec,"ipport") ne $uri->{port}){
+         $newrec->{ipport}=$uri->{port};
    }
-   if (in_array([qw(ftp http ldap ldaps https file)],$scheme)){
-      my $host=URI->new($name)->host();
-      if ($host eq ""){
-         $self->LastMsg(ERROR,"can not identify host in URL");
-         return(undef);
-      }
-      if (effVal($oldrec,$newrec,"hostname") ne lc($host)){
-         $newrec->{hostname}=lc($host);
-      }
-      my $port=URI->new($name)->port();
-      if (effVal($oldrec,$newrec,"ipport") ne $port){
-         $newrec->{ipport}=$port;
-      }
-   }
-   if ($scheme eq "ssh"){
-      if (effVal($oldrec,$newrec,"ipport") ne "22"){
-         $newrec->{ipport}="22";
-      }
-   }
+
    my $applid=effVal($oldrec,$newrec,"applid");
    if ($applid eq ""){
       $self->LastMsg(ERROR,"no valid application specifed");
@@ -398,8 +368,8 @@ sub Validate
    if (effVal($oldrec,$newrec,"name") ne $name){
       $newrec->{name}=$name;
    }
-   if (effVal($oldrec,$newrec,"scheme") ne $scheme){
-      $newrec->{scheme}=$scheme;
+   if (effVal($oldrec,$newrec,"scheme") ne $uri->{scheme}){
+      $newrec->{scheme}=$uri->{scheme};
    }
    return(1);
 }

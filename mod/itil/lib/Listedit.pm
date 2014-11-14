@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
+use URI;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
@@ -59,7 +60,66 @@ sub SecureValidate
    return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
+sub URLValidate
+{
+   my $self=shift;
+   my $name=shift;
 
+   my %uri;
+
+   $name=~s/^([A-Z,a-z]+)/lc($1)/ex;
+   if (($name=~m/\s/) || ($name=~m/^\s*$/)){
+      $uri{error}=("invalid URL specified");
+      return(\%uri);
+   }
+   if (URI->new($name)->path() eq "/"){
+      $name=~s{/\s*$}{};
+   }
+   
+   $uri{name}=$name;
+
+   $uri{scheme}=URI->new($name)->scheme();
+   if ($uri{scheme} eq ""){
+      $uri{error}=("URL syntax error or no scheme specified");
+      return(\%uri);
+   }
+
+   my @sok=qw(http ldap ldaps https file mailto sftp ftp ssh rlogin
+              oracle mysql informix scp);
+   if (!in_array(\@sok,$uri{scheme})){
+      $uri{error}=("not supported scheme specified");
+      return(\%uri);
+   }
+
+   if (in_array([qw(ftp http ldap ldaps https file)],$uri{scheme})){
+      $uri{host}=lc(URI->new($name)->host());
+      if ($uri{host} eq ""){
+         $uri{error}=("can not identify host in URL");
+         return(\%uri);
+      }
+      $uri{port}=URI->new($name)->port();
+
+   } else {
+      #my ($host,$port)=$name=~m/\@([^:\/]+)(?:\:(\d+))?/;
+      my $befhost=qr{\@}; # character before the host
+      $befhost=qr{://} if (index($name,'@')==-1);
+         
+      my ($host,$port)=$name=~m/$befhost([^:\/]+)(?:\:(\d+))?/;
+      if (in_array([qw(ssh sftp scp)],$uri{scheme})) {
+         $uri{host}=$host;
+         $uri{port}=$port if ($port);
+      }
+      if (!$uri{port}) {
+         $uri{port}=22 if ($uri{scheme} eq 'ssh');
+         $uri{port}=22 if ($uri{scheme} eq 'sftp');
+         $uri{port}=22 if ($uri{scheme} eq 'scp');
+      }
+   }
+print STDERR Dumper(\%uri);
+   
+
+   return(\%uri);
+}
 
 sub FinishWrite
 {

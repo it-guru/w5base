@@ -456,20 +456,20 @@ sub Validate
       return(0);
    }
    my $fromurl=effVal($oldrec,$newrec,"fromurl");
-   if ($fromurl ne "" &&
-       !($fromurl=~m/^[a-z]+:\/\/\S+\/.*$/) &&
-       !($fromurl=~m/^[a-z]+:\/\/\S+\/\S+\@\S+\/.*$/) &&
-       !($fromurl=~m/^[a-z]+:\/\/\S+\@\S+$/)){
-      $self->LastMsg(ERROR,"invalid notation of the from URL");
-      return(0);
+   if ($fromurl ne ""){
+      my $uri=$self->URLValidate($fromurl);
+      if ($uri->{error}) {
+         $self->LastMsg(ERROR,$uri->{error});
+         return(0);
+      }
    }
    my $tourl=effVal($oldrec,$newrec,"tourl");
-   if ($tourl ne "" &&
-       !($tourl=~m/^[a-z]+:\/\/\S+\/.*$/) &&
-       !($tourl=~m/^[a-z]+:\/\/\S+\/\S+\@\S+\/.*$/) &&
-       !($tourl=~m/^[a-z]+:\/\/\S+\@\S+$/)){
-      $self->LastMsg(ERROR,"invalid notation of the to URL");
-      return(0);
+   if ($tourl ne ""){
+      my $uri=$self->URLValidate($tourl);
+      if ($uri->{error}) {
+         $self->LastMsg(ERROR,$uri->{error});
+         return(0);
+      }
    }
 
    if (!defined($oldrec)) {
