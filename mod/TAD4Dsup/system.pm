@@ -43,10 +43,11 @@ create table "OF-A1_W5I_TAD4Dsup__system" (
 create or replace view "W5I_TAD4Dsup__system" as
 select "W5I_system_universum".systemname,
        "W5I_system_universum".systemid,
+       "W5I_system_universum".saphier,
        (case
           when "W5I_system_universum".is_t4di=1 and 
                "W5I_system_universum".is_t4dp=1 then 'Both'
-          when "W5I_system_universum".is_t4dp=1 then 'Produktion'
+          when "W5I_system_universum".is_t4dp=1 then 'Production'
           when "W5I_system_universum".is_t4di=1 then 'Integration'
           else 'None'
        end) cenv ,
@@ -56,7 +57,8 @@ select "W5I_system_universum".systemname,
        "OF-A1_W5I_TAD4Dsup__system".modifydate
 from "W5I_system_universum"
      left outer join "OF-A1_W5I_TAD4Dsup__system" 
-        on "W5I_system_universum".systemid="OF-A1_W5I_TAD4Dsup__system".systemid;
+        on "W5I_system_universum".systemid=
+           "OF-A1_W5I_TAD4Dsup__system".systemid;
 
 
 create or replace trigger "W5I_TAD4Dsup__system_trigger" 
@@ -128,10 +130,18 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'systemid'),
 
+      new kernel::Field::Text(
+                name          =>'saphier',
+                label         =>'SAP Hier',
+                uppersearch   =>1,
+                align         =>'left',
+                dataobjattr   =>'saphier'),
+
       new kernel::Field::Select(
                 name          =>'cenv',
                 label         =>'current Env',
                 readonly      =>1,
+                transprefix   =>'ENV.',
                 value         =>['Production','Integration','Both','None'],
                 dataobjattr   =>'cenv'),
 
@@ -147,6 +157,26 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'comments'),
 
+      new kernel::Field::Textarea(
+                name          =>'todo',
+                label         =>'ToDo',
+                dataobjattr   =>
+                   "(case".
+                   "   when cenv<>denv  then '* move system to '||denv||'\n'".
+                   "   else ''".
+                   "end) ||".
+                   "(case".
+                   "   when cenv='Both' then '* remove system ".
+                                             "from one enviroment\n'".
+                   "   else ''".
+                   "end) ||".
+                   "(case".
+                   "   when denv is null and saphier like '9TS_ES.9DTIT.%' ".
+                                         "then '* set destination ".
+                                               "enviroment\n'".
+                   "   else ''".
+                   "end)"),
+
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
@@ -161,7 +191,7 @@ sub new
                 dataobjattr   =>'modifyuser')
    );
    $self->setWorktable("TAD4Dsup__system");
-   $self->setDefaultView(qw(systemname systemid cenv denv));
+   $self->setDefaultView(qw(systemname systemid cenv denv todo));
    return($self);
 }
 
@@ -174,6 +204,16 @@ sub Initialize
    return(@result) if (defined($result[0]) eq "InitERROR");
    return(1) if (defined($self->{DB}));
    return(0);
+}
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_saphier"))){
+     Query->Param("search_saphier"=>
+                  "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
+   }
 }
 
 

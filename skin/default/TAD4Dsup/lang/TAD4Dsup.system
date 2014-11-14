@@ -6,3 +6,4 @@
 'ENV.Both'=>{de=>'beide'},
 'ENV.None'=>{de=>'keine'},
 'ENV.'=>{de=>'-',en=>'-'},
+'SAP Hier'=>{de=>'SAP Hierarchie'},
