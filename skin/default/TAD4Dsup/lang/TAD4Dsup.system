@@ -1,0 +1,8 @@
+'TAD4Dsup::system'=>{de=>'TAD4D Support Tool',en=>'TAD4D Support Tool'},
+'current Env'=>{de=>'aktuelle Umgebung'},
+'destination Env'=>{de=>'Zielumgebung'},
+'ENV.Production'=>{de=>'Produktion'},
+'ENV.Integration'=>{de=>'Integration'},
+'ENV.Both'=>{de=>'beide'},
+'ENV.None'=>{de=>'keine'},
+'ENV.'=>{de=>'-',en=>'-'},
