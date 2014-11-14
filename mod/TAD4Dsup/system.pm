@@ -134,6 +134,7 @@ sub new
                 name          =>'saphier',
                 label         =>'SAP Hier',
                 uppersearch   =>1,
+                readonly      =>1,
                 align         =>'left',
                 dataobjattr   =>'saphier'),
 
@@ -160,6 +161,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'todo',
                 label         =>'ToDo',
+                readonly      =>1,
                 dataobjattr   =>
                    "(case".
                    "   when cenv<>denv  then '* move system to '||denv||'\n'".
