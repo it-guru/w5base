@@ -941,7 +941,7 @@ sub new
                 group         =>'cluster',
                 label         =>'Cluster',
                 vjointo       =>'itil::itclust',
-                vjoineditbase =>{'cistatusid'=>[2,3,4]},
+                vjoineditbase =>{'cistatusid'=>[2,3,4,5]},
                 vjoinon       =>['itclustid'=>'id'],
                 vjoindisp     =>'fullname'),
 
