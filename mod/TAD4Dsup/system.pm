@@ -45,7 +45,7 @@ select "W5I_system_universum".systemname,
        "W5I_system_universum".systemid,
        (case
           when "W5I_system_universum".is_t4di=1 and 
-               "W5I_system_universum".is_t4di=1 then 'Both'
+               "W5I_system_universum".is_t4dp=1 then 'Both'
           when "W5I_system_universum".is_t4dp=1 then 'Produktion'
           when "W5I_system_universum".is_t4di=1 then 'Integration'
           else 'None'
