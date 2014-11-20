@@ -120,15 +120,17 @@ sub qcheckRecord
       #printf STDERR ("DEBUG from QRule: ungültiges Ziel in ".
       #               "InfoAbo $rec->{id}\n");
    }
-   if ($valid && $rec->{invalidsince} ne ""){
+   my $invalidsince=$rec->{invalidsince};
+   if ($valid && $invalidsince ne ""){
       my $o=$dataobj->Clone();
       $o->ValidatedUpdateRecord($rec,{invalidsince=>undef},
                                 {id=>\$rec->{id}});
       push(@qmsg,"remove invalid note of target");
+      $invalidsince=undef;
    }
 
-   if ($rec->{invalidsince} ne ""){
-      my $d=CalcDateDuration(NowStamp("en"),$rec->{invalidsince},"GMT");
+   if ($invalidsince ne ""){
+      my $d=CalcDateDuration(NowStamp("en"),$invalidsince,"GMT");
       #if ($d->{totalminutes}<-30320){
       #   printf STDERR ("DEBUG from QRule: demnaechst Delete of ".
       #                  "InfoAbo $rec->{id}\n");
