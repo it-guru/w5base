@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use Text::Wrap qw(wrap);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -101,6 +102,29 @@ sub new
                           $current->{ifaceuser}.".".$current->{ifacetable}." ".
                           "for \"$current->{name}\";\n".
                           "\n\n";
+                   }
+                   return($n);
+                }),
+
+      new kernel::Field::Textarea(
+                name          =>'objectdef',
+                label         =>'IO-Object Defintion',
+                htmlheight    =>'400px',
+                searchable    =>0,
+                depend        =>['ifaceuser','ifacetable','viewfields'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $n="NO IO-Object";
+                   if ($current->{ifaceuser} ne "" &&
+                       $current->{ifaceuser} ne "[UNDEF]"){
+                      $n="";
+                      my $label=$current->{ifaceuser}.".".
+                                $current->{ifacetable}.":";
+                      $label.="\n".("=" x length($label))."\n";
+                      $Text::Wrap::columns=50;
+                      $n.=$label.wrap('','',$current->{viewfields}); 
+                      $n.="\n".("-" x $Text::Wrap::columns)."\n";
                    }
                    return($n);
                 }),
