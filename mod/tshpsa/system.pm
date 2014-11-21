@@ -69,7 +69,15 @@ sub new
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>[qw(class version iname)]),
 
-
+      new kernel::Field::Text(
+                name          =>'w5appl',
+                label         =>'W5Base Applications',
+                group         =>'w5basedata',
+                searchable    =>0,
+                weblinkto     =>'none',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>['applicationnames']),
 
       new kernel::Field::Date(
                 name          =>'mdate',
@@ -130,7 +138,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","swis","sysgrps","source");
+   return("header","default","swis","sysgrps","w5basedata","source");
 }
 
 sub isQualityCheckValid
