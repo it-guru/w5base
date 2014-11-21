@@ -37,6 +37,15 @@ sub new
                                                    'taid'=>\undef};
    $self->getField("contextaliases")->{uivisible}=1;
 
+   $self->AddFields(
+      new kernel::Field::SubList(
+                name          =>'customers',
+                label         =>'Customers',
+                group         =>'customers',
+                vjointo       =>'AL_TCom::itscustomer',
+                vjoinon       =>['id'=>'its_id'],
+                vjoindisp     =>[qw(customer)]),
+   );
 
    return($self);
 }
@@ -51,8 +60,30 @@ sub SetFilter
 }
 
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my @l=$self->SUPER::getDetailBlockPriority(@_);
+   my $inserti=$#l;
+   for(my $c=0;$c<=$#l;$c++){
+      $inserti=$c+1 if ($l[$c] eq "desc");
+   }
+   splice(@l,$inserti,$#l-$inserti,("customers",@l[$inserti..($#l+-1)]));
+   return(@l);
+}
 
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @l=self->SUPER::isViewValid($rec);
+
+   push(@l,"customers");
+
+   return(@l);
+}
 
 
 1;
