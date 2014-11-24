@@ -90,7 +90,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcid',
                 label         =>'Extern Change ID',
-                dataobjattr   =>'cm3rm1_w5base.ex_number'),
+                dataobjattr   =>"decode(cm3rm1_w5base.ex_number,'null',NULL,".
+                                       "cm3rm1_w5base.ex_number)"),
 
       new kernel::Field::Text(
                 name          =>'project',
@@ -311,6 +312,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'priority',
+                searchable    =>0,
                 htmldetail    =>0,
                 group         =>'status',
                 label         =>'Pritority',
@@ -320,18 +322,21 @@ sub new
                 name          =>'status',
                 group         =>'status',
                 label         =>'Current Status',
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.status'),
 
       new kernel::Field::Text(
                 name          =>'approvalstatus',
                 group         =>'status',
                 label         =>'Approval Status',
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.approval_status'),
 
       new kernel::Field::Text(
                 name          =>'impact',
                 group         =>'status',
                 label         =>'Business Impact',
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.impact'),
 
       new kernel::Field::Text(
@@ -344,6 +349,7 @@ sub new
                 name          =>'urgency',
                 group         =>'status',
                 label         =>'Urgency',
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.urgency'),
 
       new kernel::Field::Text(
@@ -351,6 +357,7 @@ sub new
                 group         =>'status',
                 htmldetail    =>0,
                 label         =>'Reason',
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.reason'),
              
       new kernel::Field::Text(
@@ -358,12 +365,14 @@ sub new
                 group         =>'status',
                 htmldetail    =>0,
                 label         =>'Category',
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.category'),
 
       new kernel::Field::Text(
                 name          =>'risk',
                 group         =>'status',
                 label         =>'Risk',
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.risk_assessment'),
 
       new kernel::Field::Text(
@@ -371,6 +380,7 @@ sub new
                 group         =>'status',
                 label         =>'Type',
                 htmldetail    =>0,
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.class_field'),
 
       new kernel::Field::Text(
@@ -378,18 +388,20 @@ sub new
                 group         =>'status',
                 label         =>'Type calculated',
                 htmldetail    =>0,
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.dsc_change_type_calculated'),
 
       new kernel::Field::Text(
                 name          =>'types',
                 group         =>'status',
-                label         =>'Type',
+                label         =>'Change types',
                 searchable    =>0,
                 depend        =>[qw(type typecalc)],
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   return "$current->{type} (calc. $current->{typecalc})";
+                   my $type=$current->{type};
+                   return "$type (calc. $current->{typecalc})";
                 }),
 
       new kernel::Field::Text(
@@ -397,6 +409,7 @@ sub new
                 group         =>'status',
                 label         =>'Criticality',
                 htmldetail    =>0,
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.criticality'),
 
       new kernel::Field::Text(
@@ -404,12 +417,13 @@ sub new
                 group         =>'status',
                 label         =>'Criticality calculated',
                 htmldetail    =>0,
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.criticality_total'),
 
       new kernel::Field::Text(
                 name          =>'criticalities',
                 group         =>'status',
-                label         =>'Criticality',
+                label         =>'Criticalities',
                 searchable    =>0,
                 depend        =>[qw(criticality criticalitycalc)],
                 onRawValue    =>sub{
@@ -426,6 +440,7 @@ sub new
                 name          =>'complexity',
                 group         =>'status',
                 label         =>'Complexity',
+                ignorecase    =>1,
                 dataobjattr   =>'cm3rm1_w5base.complexity'),
 
       new kernel::Field::Date(
