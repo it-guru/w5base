@@ -333,6 +333,7 @@ sub Validate
    my $uri=$self->URLValidate($name);
    if ($uri->{error}) {
       $self->LastMsg(ERROR,$uri->{error});
+      return(undef);
    }
    if (effVal($oldrec,$newrec,"hostname") ne $uri->{host}){
          $newrec->{hostname}=$uri->{host};
