@@ -76,3 +76,17 @@ von betrieblichen Aufwänden (anwendungsnahe
 Leistungen), z.B. Zeitaufwände des Betriebsteams
 ',en=>'
 '},
+'namedusercount'=>{de=>'
+Die Anzahl der Benutzer bezieht sich auf DIREKTE Benutzer der Anwendung.
+Indirekte Nutzer (Schnittstellen) dürfen dabei nicht mit gezählt werden.
+',en=>'
+The user count refers to DIRECT users of the application.
+Indirect users (Interfaces) must not consider.
+'},
+'avgusercount'=>{de=>'
+Die Anzahl der Benutzer bezieht sich auf DIREKTE Benutzer der Anwendung.
+Indirekte Nutzer (Schnittstellen) dürfen dabei nicht mit gezählt werden.
+',en=>'
+The user count refers to DIRECT users of the application.
+Indirect users (Interfaces) must not consider.
+'},
