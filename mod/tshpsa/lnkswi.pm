@@ -73,6 +73,16 @@ sub new
                 vjoindisp     =>'systemid'),
 
       new kernel::Field::Text(
+                name          =>'w5appl',
+                label         =>'usable from applications',
+                group         =>'w5basedata',
+                searchable    =>0,
+                weblinkto     =>'none',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemsystemid'=>'systemid'],
+                vjoindisp     =>['applicationnames']),
+
+      new kernel::Field::Text(
                 name          =>'path',
                 label         =>'path',
                 dataobjattr   =>'swpath'),
@@ -160,7 +170,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","rel","source");
+   return("header","default","rel","w5basedata","source");
 }
 
 sub isQualityCheckValid
