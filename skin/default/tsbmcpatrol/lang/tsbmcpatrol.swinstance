@@ -1,0 +1,4 @@
+'tsbmcpatrol::swinstance'=>{de=>'BMC Patrol - Instanz Supportdaten',
+                            en=>'BMC Patrol - Instanz Supportdata'},
+'fieldgroup.bmcdata'=>{de=>'BMC Verbindungsparameter',
+                       en=>'BMC Connect parameter'},
