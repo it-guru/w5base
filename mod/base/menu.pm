@@ -942,8 +942,9 @@ EOF
             my $target;
             if (defined($m->{acls}) && ref($m->{acls}) eq "ARRAY" &&
                 ($#{$m->{acls}}==-1 ||
-                 grep(/^read$/,$self->getCurrentAclModes($ENV{REMOTE_USER},
-                                                     $m->{acls})))){
+                 grep(/^(read|write)$/,
+                      $self->getCurrentAclModes($ENV{REMOTE_USER},
+                      $m->{acls})))){
                $target=$self->targetUrl($m);
                #printf STDERR ("fifi read of $fp ok\n");
             }
@@ -1058,7 +1059,7 @@ sub _getMenuEntryFinalList
    my @modmlist=();
    foreach my $m (@mlist){
       next if ($m->{fullname}=~m/\$$/);
-      if (grep(/^read$/,$self->getMenuAcl($ENV{REMOTE_USER},$m))){
+      if (grep(/^(read|write)$/,$self->getMenuAcl($ENV{REMOTE_USER},$m))){
          $self->processSubs($mt,$m,$active,$mode);
          push(@modmlist,$m);
       }
@@ -1082,7 +1083,7 @@ sub processSubs
           $active eq $m->{fullname}) || $mode eq "mobile"){
          my %clone=%{$mt->{menuid}->{$mid}};
          if ($#{$clone{acls}}==-1 || 
-             grep(/^read$/,$self->getCurrentAclModes($ENV{REMOTE_USER},
+             grep(/^(read|write)$/,$self->getCurrentAclModes($ENV{REMOTE_USER},
                                                      $clone{acls}))){
                   push(@subs,\%clone);
             $self->processSubs($mt,\%clone,$active,$mode);
