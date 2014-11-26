@@ -2605,6 +2605,18 @@ sub AddFields
    return(1);
 }
 
+sub DelFields
+{
+   my $self=shift;
+   my @fobjlist=@_;
+
+   foreach my $fld (@fobjlist){
+      my $fldname=$fld;
+      delete($self->{'Field'}->{$fldname});
+      @{$self->{'FieldOrder'}}=grep(!/^$fldname$/,@{$self->{'FieldOrder'}});
+   }
+}
+
 sub ResetFields
 {
    my $self=shift;
