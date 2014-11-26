@@ -30,13 +30,13 @@ use kernel::Field;
 # Generierung der Support-Views in der pw5repo Kennung
 #
 
-create table "OF-A1_W5I_TAD4Dsup__system" (
+create table "W5I_TAD4Dsup__system_of" (
    systemid     varchar2(40) not null,
    denv         varchar2(20) not null,
    comments     varchar2(4000),
    modifyuser   number(*,0),
    modifydate   date,
-   constraint "OF-A1_W5I_TAD4Dsup__system_pk" primary key (systemid)
+   constraint "W5I_TAD4Dsup__system_of_pk" primary key (systemid)
 );
 
 
@@ -51,45 +51,20 @@ select "W5I_system_universum".systemname,
           when "W5I_system_universum".is_t4di=1 then 'Integration'
           else 'None'
        end) cenv ,
-       "OF-A1_W5I_TAD4Dsup__system".comments,
-       "OF-A1_W5I_TAD4Dsup__system".denv,
-       "OF-A1_W5I_TAD4Dsup__system".modifyuser,
-       "OF-A1_W5I_TAD4Dsup__system".modifydate
+       "W5I_TAD4Dsup__system_of".comments,
+       "W5I_TAD4Dsup__system_of".denv,
+       "W5I_TAD4Dsup__system_of".modifyuser,
+       "W5I_TAD4Dsup__system_of".modifydate
 from "W5I_system_universum"
-     left outer join "OF-A1_W5I_TAD4Dsup__system" 
+     left outer join "W5I_TAD4Dsup__system_of" 
         on "W5I_system_universum".systemid=
-           "OF-A1_W5I_TAD4Dsup__system".systemid;
+           "W5I_TAD4Dsup__system_of".systemid;
 
 
-create or replace trigger "W5I_TAD4Dsup__system_trigger" 
-  INSTEAD of UPDATE on "W5I_TAD4Dsup__system"
-  REFERENCING new AS n 
-              old AS o
-  FOR EACH ROW
-declare
-   rowcnt number;
-begin
-   SELECT COUNT(*) INTO rowcnt 
-      FROM "OF-A1_W5I_TAD4Dsup__system" 
-      WHERE systemid = :o.systemid;
-   IF rowcnt = 0  THEN
-     INSERT 
-        INTO "OF-A1_W5I_TAD4Dsup__system" 
-               (   systemid,   comments,   modifyuser,   modifydate,   denv) 
-        VALUES (:o.systemid,:n.comments,:n.modifyuser,:n.modifydate,:n.denv);
-   ELSE
-     UPDATE "OF-A1_W5I_TAD4Dsup__system" 
-        SET comments   = :n.comments,
-            modifyuser = :n.modifyuser,
-            modifydate = :n.modifydate,
-            denv       = :n.denv
-        WHERE systemid = :o.systemid;
-   END IF;
-end;
-
-
-grant select,update on "W5I_TAD4Dsup__system" to W5I;
+grant select on "W5I_TAD4Dsup__system" to W5I;
+grant update,insert on "W5I_TAD4Dsup__system_of" to W5I;
 create or replace synonym W5I.TAD4Dsup__system for "W5I_TAD4Dsup__system";
+create or replace synonym W5I.TAD4Dsup__system_of for "W5I_TAD4Dsup__system_of";
 
 
 =cut
@@ -113,7 +88,8 @@ sub new
                 label         =>'ID',
                 group         =>'source',
                 align         =>'left',
-                dataobjattr   =>"(systemid||'-'||systemname)"),
+                dataobjattr   =>"(systemid||'-'||systemname)",
+                wrdataobjattr =>"systemid"),
 
       new kernel::Field::Text(
                 name          =>'systemname',
@@ -129,6 +105,11 @@ sub new
                 ignorecase    =>1,
                 readonly      =>1,
                 dataobjattr   =>'systemid'),
+
+      new kernel::Field::Link(
+                name          =>'ofid',
+                label         =>'Overflow ID',
+                dataobjattr   =>'of_id'),
 
       new kernel::Field::Text(
                 name          =>'saphier',
@@ -192,10 +173,38 @@ sub new
                 label         =>'Owner',
                 dataobjattr   =>'modifyuser')
    );
-   $self->setWorktable("TAD4Dsup__system");
+   $self->setWorktable("TAD4Dsup__system_of");
    $self->setDefaultView(qw(systemname systemid cenv denv todo));
    return($self);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my $from="TAD4Dsup__system";
+
+   return($from);
+}
+
+sub ValidatedUpdateRecord
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my @filter=@_;
+
+   $filter[0]={id=>\$oldrec->{systemid}};
+   $newrec->{id}=$oldrec->{systemid};  # als Referenz in der Overflow die 
+   if (!defined($oldrec->{ofid})){     # SystemID verwenden
+      return($self->SUPER::ValidatedInsertRecord($newrec));
+   }
+   return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
+}
+
+
+
 
 
 sub Initialize
