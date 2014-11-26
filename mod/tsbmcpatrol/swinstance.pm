@@ -107,7 +107,7 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>"swinstance_bmcpatrol_of.modifydate"),
+                dataobjattr   =>"swinstance_bmcpatrol_of.of_modifydate"),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
