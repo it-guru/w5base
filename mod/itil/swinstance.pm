@@ -753,7 +753,7 @@ sub getSqlFrom
    my $self=shift;
    my $mode=shift;
    my @flt=@_;
-   my ($worktable,$workdb)=$self->getWorktable();
+   my $worktable="swinstance";
    my $from="$worktable";
 
    $from.=" left outer join lnkcontact ".
