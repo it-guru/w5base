@@ -32,3 +32,12 @@ function call(f)
 {
    window.setTimeout(f,10);
 }
+
+function Application(){
+   this.run=function(){
+       console.log("running Appl");
+       console.log($.t("Back"));
+
+   }
+   return(this);
+};

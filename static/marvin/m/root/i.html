@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Marvin Data View Operation System</title>
+<!--- START header --- fixed -->
+   <meta charset="ISO-8859-1">
+   <meta http-equiv="X-UA-Compatible" content="IE=8"/> 
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="../../js/jquery.mobile-1.4.5.css" />
+   <script src="../../js/jquery-1.7.1.js"></script>
+   <script src="../../js/jquery.mobile-1.4.5.js"></script>
+   <script src="../../js/i18next-1.7.4.js"></script>
+   <script src="../../etc/MarvinConfig.js"></script>
+   <script src="../../m/root/kernel.js"></script>
+
+   <link rel="stylesheet" href="i.css" />
+   <script src="i.js"></script>
+   <script src="../../m/root/run.js"></script>
+<!--- ENDE header --- fixed -->
+
+</head>
+<body>
+<div data-role="page" id="root">
+      <div data-role="header" align="center"><h1>Marvin V0.1</h1>
+      </div>
+      <div role="main" class="ui-content">
+         <a href="#debugtools" 
+            class="ui-btn">Debugging und Test-Tools</a>
+      </div>
+      <div role="main" class="ui-content">
+         <a href="#about" 
+            class="ui-btn" data-i18n='About'></a>
+      </div>
+</div>
+
+<div data-role="page" id="debugtools">
+
+   <div data-role="header">
+      <a  id='back-btn' href='#root' data-i18n='Back'></a>
+      <h1>Marvin Debug Tools</h1>
+   </div><!-- /header -->
+
+   <div data-role="content" data-theme="a">  
+      <p data-i18n='DebugWelcome'></p>
+         <a href="../rimanos/i.html" rel="external"
+            class="ui-btn">RiManOS Debugger</a>
+   </div><!-- /content -->
+</div><!-- /page two -->
+
+
+<div data-role="page" id="about">
+
+   <div data-role="header">
+      <a  id='back-btn' href='#root' data-i18n='Back'></a>
+      <h1>Marvin Technologie</h1>
+   </div><!-- /header -->
+   <div data-role="content" data-theme="a" i18n='de'><p>
+                Marvin setzt auf J5Base - einer JavaScript Erweiterung 
+                für den Zugriff auf W5Base Applikationen. Zusätzlich 
+                kommen die folgenden JavaScript Erweiterungen zum 
+                Einsatz:</p>
+                <ul>
+                <li>jQuery</li>
+                <li>jQuery-Mobile</li>
+                <li>i18next</li>
+                </ul>
+                <p>Das Haupt Interface erwartet keine Authentifikation
+                und kann somit keinerlei Unterscheidung über die Sichtbarkeit
+                von Menüpunkten machen (d.h. jeder sieht auf dieser
+                Ebene alles). Erst in den einzelnen Untermodulen werden
+                wird bei Bedarf eine Authentifikation angefordert. Von da
+                an können dann bestimmte Funktionen für einzelne Usergruppen
+                eingeschränkt sein.</p>
+                <p>
+                Alle Marvin Anwendungen sind von ihrer Kern-Struktur gleich
+                aufgebaut.<br>
+                marvin/TMPL<br>
+                i18n*.js, i.html, i.js, i.css<br>
+      </p>
+         <a href="../TMPL/i.html" rel="external"
+            class="ui-btn">Template</a>
+   </div>
+   <div data-role="content" data-theme="a" i18n='en'><p>
+                An explaination for Marvin Technologie is only available 
+                in german.
+     </p>
+   </div><!-- /content -->
+</div><!-- /page two -->
+
+
+</body>
+</html>
+

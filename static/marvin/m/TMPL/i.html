@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Marvin Data View Operation System</title>
+<!--- START header --- fixed -->
+   <meta charset="ISO-8859-1">
+   <meta http-equiv="X-UA-Compatible" content="IE=8"/> 
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="../../js/jquery.mobile-1.4.5.css" />
+   <script src="../../js/jquery-1.7.1.js"></script>
+   <script src="../../js/jquery.mobile-1.4.5.js"></script>
+   <script src="../../js/i18next-1.7.4.js"></script>
+   <script src="../../etc/MarvinConfig.js"></script>
+   <script src="../../m/root/kernel.js"></script>
+
+   <link rel="stylesheet" href="i.css" />
+   <script src="i.js"></script>
+   <script src="../../m/root/run.js"></script>
+<!--- ENDE header --- fixed -->
+
+</head>
+<body>
+<div data-role="page" id="root">
+      <div data-role="header" align="center">
+         <a class="homebutton ui-btn-right"
+            rel="external" data-rel="home">Marvin</a>
+         <h1 data-i18n='Application-Name'></h1>
+      </div>
+      <div role="main" class="ui-content">
+         <a href="#page1" 
+            class="ui-btn">Page1</a>
+         <a href="#page2" 
+            class="ui-btn">Page2</a>
+
+         <a href="#about" 
+            class="ui-btn" data-i18n='About'></a>
+      </div>
+</div>
+
+<div data-role="page" id="page1">
+   <div data-role="header">
+      <a  id='back-btn' href='#root' data-i18n='Back'></a>
+      <h1>Page 1</h1>
+      <a class="homebutton ui-btn-right"
+         rel="external" data-rel="home">Marvin</a>
+   </div><!-- /header -->
+   <div data-role="content" data-theme="a" i18n='de'><p>
+       Text1 Text Text
+   </p>
+   </div><!-- /content -->
+</div><!-- /page two -->
+
+
+<div data-role="page" id="page2">
+   <div data-role="header">
+      <a  id='back-btn' href='#root' data-i18n='Back'></a>
+      <h1>Page 2</h1>
+      <a class="homebutton ui-btn-right"
+         rel="external" data-rel="home">Marvin</a>
+   </div><!-- /header -->
+   <div data-role="content" data-theme="a" i18n='de'><p>
+       Text2 Text Text
+   </p>
+   </div><!-- /content -->
+</div><!-- /page two -->
+
+
+<div data-role="page" id="about">
+
+   <div data-role="header">
+      <a  id='back-btn' href='#root' data-i18n='Back'></a>
+      <h1>Marvin Technologie</h1>
+   </div><!-- /header -->
+   <div data-role="content" data-theme="a" i18n='de'><p>
+                Generelle Beschreibung für das Modul
+      </p>
+   </div>
+   <div data-role="content" data-theme="a" i18n='en'><p>
+                Generell explaination for the current Module
+     </p>
+   </div><!-- /content -->
+</div><!-- /page two -->
+
+
+</body>
+</html>
+
