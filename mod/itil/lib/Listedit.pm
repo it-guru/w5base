@@ -115,7 +115,6 @@ sub URLValidate
          $uri{port}=22 if ($uri{scheme} eq 'scp');
       }
    }
-print STDERR Dumper(\%uri);
    
 
    return(\%uri);
