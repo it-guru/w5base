@@ -6,9 +6,10 @@
    <meta charset="ISO-8859-1">
    <meta http-equiv="X-UA-Compatible" content="IE=8"/> 
    <meta name="viewport" content="width=device-width, initial-scale=1">
-   <link rel="stylesheet" href="jqm/jquery.mobile.min.css" />
-   <script src="jq/jquery.min.js"></script>
-   <script src="jqm/jquery.mobile.min.js"></script>
+   <link rel="stylesheet" href="js/jquery.mobile-1.4.5.css" />
+   <script src="js/jquery-1.7.1.js"></script>
+   <script src="js/jquery.mobile-1.4.5.js"></script>
+   <script src="js/i18next-1.7.4.js"></script>
 
    <link rel="stylesheet" href="os.css" />
    <script src="os.js"></script>
@@ -16,15 +17,30 @@
 
 </head>
 <body>
-<div data-role="page">
+<div data-role="page" id="root">
       <div data-role="header" align="center"><h1>Marvin Gate</h1>
       </div>
       <div role="main" class="ui-content">
-         <a href="./RiManOS/index.html" 
-            rel="external" class="ui-btn">RiManOS OnlineView</a>
-         <button class="ui-btn">Button</button>
+         <a href="#debugtools" 
+            class="ui-btn">Debugging und Test-Tools</a>
       </div>
 </div>
+
+<div data-role="page" id="debugtools">
+
+   <div data-role="header">
+      <a  id='back-btn' href='#root'>Back</a>
+      <h1>Marvin Debug Tools</h1>
+   </div><!-- /header -->
+
+   <div data-role="content" data-theme="a">  
+      <p>Mit den Marvin Debug-Tools ist es möglich, eine Reihe von individuellen Analysen und Abfragen auf W5Base/Darwin durchzuführen.</p>
+      <p><a href="#one" "reverse" data-role="button" data-theme="b">Back to page "one"</a></p>  
+      
+   </div><!-- /content -->
+</div><!-- /page two -->
+
+
 </body>
 </html>
 
