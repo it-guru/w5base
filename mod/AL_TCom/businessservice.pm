@@ -238,6 +238,10 @@ sub Validate
       $self->LastMsg(ERROR,"invalid shortname on ES or TR businessservices");
       return(undef);
    }
+   if ($nature eq ""){ # in AL_TCom mode, natures mandatory
+      $self->LastMsg(ERROR,"invalid nature specified");
+      return(undef);
+   }
    return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
 
 }

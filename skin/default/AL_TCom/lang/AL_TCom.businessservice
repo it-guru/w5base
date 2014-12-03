@@ -21,3 +21,4 @@
 'VSM availibility'=>{de=>'VSM Verfügbarkeit'},
 'Context-List'=>{de=>'Kontextliste'},
 'Context-Aliases'=>{de=>'Kontextvarianten'},
+'invalid nature specified'=>{de=>'ungültige Ausprägung angegeben'},
