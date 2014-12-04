@@ -1,7 +1,38 @@
+<script language="JavaScript">
+function refreshHintNotifier()
+{
+
+
+}
+function displayHints()
+{
+   showPopWin('../../base/usermask/Main',500,200,refreshHintNotifier);
+}
+</script>
 <body style='overflow:hidden'><table width=100% height=100% border=0 cellspacing=0 cellpadding=0>
 <tr height=1%><td><iframe style="padding:0px;margin:0px" frameborder=0 width=100% height=100 name=menutop src="%menutopurl%"></iframe></td></tr>
 
 <tr><td><iframe style="padding:0px;margin:0px" width=100%  frameborder=0 height=100% name=msel src="%mselurl%"></iframe></td></tr>
 </table>
+<div id='popupMask'></div>
+<div id='popupContainer'>
+<div id='popupInner'>
+  <div id="TitleBar" class="TitleBar">
+         <div id="popupTitle"></div>
+         <div id="popupControls">
+            <img src="%rootpath%/darwin/public/base/load/subModClose.gif" 
+                 onclick="hidePopWin(true,true);" />
+         </div>
+      </div>
+      <div id=popupData style="visible:hidden;display:none"></div>
+      <iframe src="%rootpath%/public/base/msg/loading" 
+              style="background-color:transparent;width:100%" 
+              scrolling="auto" 
+              frameborder="0" allowtransparency="true" 
+              class=popupFrame 
+              id="popupFrame" name="popupFrame" ></iframe>
+
+</div>
+</div>
 </body>
 

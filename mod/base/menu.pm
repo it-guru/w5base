@@ -633,7 +633,7 @@ EOF
       }
       print $self->HttpHeader("text/html");
       print $self->HtmlHeader(style=>['default.css'],
-                              js=>'toolbox.js',
+                              js=>['toolbox.js','subModal.js'],
                               shorticon=>'icon_w5base.ico',
                               title=>$sitename);
       my $qs=kernel::cgi::Hash2QueryString(Query->MultiVars());
