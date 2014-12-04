@@ -329,14 +329,6 @@ sub getDynamicFields
                     'benefit for the affected business process',
                 container     =>'headref'),
 
-#      new kernel::Field::Boolean(
-#                name          =>'devreqdetailstatprocboss',
-#                group         =>'devreqstat',
-#                default       =>'0',
-#                label         =>
-#                 'processmanager of business process has approved',
-#                container     =>'headref'),
-#
       new kernel::Field::Select(
                 name          =>'devreqdetailstatprocboss',
                 group         =>'devreqstat',
