@@ -333,8 +333,8 @@ sub getDynamicFields
                 name          =>'devreqdetailstatprocboss',
                 group         =>'devreqstat',
                 transprefix   =>'devreqdetailstatprocboss.',
-                default       =>'no',
-                value         =>['yes','no','needless'],
+                default       =>'0',
+                value         =>['1','0','needless'],
                 label         =>
                  'processmanager of business process has approved',
                 container     =>'headref'),
