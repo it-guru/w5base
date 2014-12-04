@@ -26,3 +26,6 @@
 'REV.dependson'=>{de=>'nach diesem Workflow kann der Workflow "%s" bearbeitet werden',en=>'after the current workflow the workflow "%s" can be processed'},
 'derivation'=>{de=>'Abgeleiteter Workflow "%s"',en=>'derivated workflow "%s"'},
 'REV.derivation'=>{de=>'Abgeleitet von Workflow "%s"',en=>'derivated from workflow "%s"'},
+'devreqdetailstatprocboss.yes'=>{de=>'ja'},
+'devreqdetailstatprocboss.no'=>{de=>'nein'},
+'devreqdetailstatprocboss.needless'=>{de=>'nicht erforderlich'},

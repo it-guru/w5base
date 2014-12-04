@@ -190,7 +190,7 @@ sub Validate
          $faktor*=0   if ($stat{devreqdetailstatnewfunc}   == 0);
          $faktor*=2   if ($stat{devreqdetailstatbenefit} eq 'MIDDLE');
          $faktor*=5   if ($stat{devreqdetailstatbenefit} eq 'ESSENTIEL');
-         $faktor*=0   if ($stat{devreqdetailstatprocboss}  == 0);
+         $faktor*=0   if ($stat{devreqdetailstatprocboss} eq 'no');
          $faktor*=0.5 if ($stat{devreqdetailstatrisk} eq 'NORMAL');
          $faktor*=0.2 if ($stat{devreqdetailstatrisk} eq 'HIGH');
          $faktor*=3   if ($stat{devreqdetailstateffortclass} eq 'A (<2h)');
@@ -329,10 +329,20 @@ sub getDynamicFields
                     'benefit for the affected business process',
                 container     =>'headref'),
 
-      new kernel::Field::Boolean(
+#      new kernel::Field::Boolean(
+#                name          =>'devreqdetailstatprocboss',
+#                group         =>'devreqstat',
+#                default       =>'0',
+#                label         =>
+#                 'processmanager of business process has approved',
+#                container     =>'headref'),
+#
+      new kernel::Field::Select(
                 name          =>'devreqdetailstatprocboss',
                 group         =>'devreqstat',
-                default       =>'0',
+                transprefix   =>'devreqdetailstatprocboss.',
+                default       =>'no',
+                value         =>['yes','no','needless'],
                 label         =>
                  'processmanager of business process has approved',
                 container     =>'headref'),
