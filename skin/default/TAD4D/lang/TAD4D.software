@@ -6,5 +6,6 @@
 'is RVU (Processor Value Unit) posible'=>{de=>'ist RVU (Processor Value Unit) möglich'},
 'is SubCapacity posible'=>{de=>'ist SubCapacity möglich'},
 'free of charge'=>{de=>'kostenlos'},
+'Scan/Mapping confidence'=>{de=>'Scan/Mapping Verlässlichkeit'},
 
 

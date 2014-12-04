@@ -103,6 +103,11 @@ sub new
                 label         =>'Remote',
                 dataobjattr   =>'adm.prod_inv.is_remote'),
 
+      new kernel::Field::Percent(
+                name          =>'confidencelevel',
+                label         =>'Scan/Mapping confidence',
+                dataobjattr   =>'adm.prod_inv.confidence_level'),
+
       new kernel::Field::Boolean(
                 name          =>'ispvu',
                 label         =>'is PVU (Processor Value Unit) posible',
@@ -141,7 +146,8 @@ sub new
                 dataobjattr   =>'adm.agent.scan_time'),
 
    );
-   $self->setDefaultView(qw(hostname vendor software version));
+   $self->setDefaultView(qw(hostname vendor software softwareproduct 
+                            version confidencelevel));
    return($self);
 }
 
