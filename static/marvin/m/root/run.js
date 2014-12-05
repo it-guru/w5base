@@ -29,7 +29,7 @@ i18n.init({
       }
       console.log("Marvin_Home:"+Marvin_Home);
       console.log("caller:"+document.referrer);
-      App.run();
+      window.setTimeout(function(){App.run();},1000);
    }
 );
 

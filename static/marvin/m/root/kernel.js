@@ -13,5 +13,15 @@ if (typeof console === "undefined" || typeof console.log === "undefined") {
   }
 }
 
+function loadScript(url) {
+    var script = document.createElement('script');
+    console.log("loadScript:"+url);
+    script.type = 'text/javascript';
+    script.src = url;
+    $("head").append(script);
+}
+loadScript(J5Base_baseUrl+"public/base/load/J5BaseMinimal.js");
+
+
 //////////////////////////////////////////////////////////////////////////
 
