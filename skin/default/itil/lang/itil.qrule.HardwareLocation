@@ -1,0 +1,2 @@
+'itil::qrule::HardwareLocation'=>{de=>'Prüfung ob Standort der Hardware dokumentiert ist',en=>'check if there is a location defined'},
+'invalid or no location specified'=>{de=>'kein oder ungültiger Standort angegeben'},
