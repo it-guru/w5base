@@ -1080,7 +1080,7 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $FormatAs=shift;
-   my $d=$self->RawValue($current);
+   my $d=$self->RawValue($current,$FormatAs);
    $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
    if ($FormatAs eq "SOAP"){
       if (!ref($d)){
