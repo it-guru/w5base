@@ -49,7 +49,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'amasset.status'),
+                dataobjattr   =>'lower(amasset.status)'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
