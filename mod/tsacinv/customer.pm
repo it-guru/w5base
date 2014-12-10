@@ -90,6 +90,7 @@ sub new
                 dataobjattr   =>'amtsiaccsecunit.dtlastmodif'),
    );
    $self->setDefaultView(qw(linenumber id name fullname));
+   $self->setWorktable("amtsiaccsecunit");
    return($self);
 }
 
@@ -99,7 +100,6 @@ sub Initialize
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("amtsiaccsecunit");
    return(1) if (defined($self->{DB}));
    return(0);
 }

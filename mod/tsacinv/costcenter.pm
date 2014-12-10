@@ -330,6 +330,7 @@ sub new
                 dataobjattr   =>'amcostcenter.dtlastmodif')
    );
    $self->setDefaultView(qw(linenumber id name code description));
+   $self->setWorktable("amcostcenter");
    return($self);
 }
 
@@ -368,7 +369,6 @@ sub Initialize
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("amcostcenter");
    return(1) if (defined($self->{DB}));
    return(0);
 }

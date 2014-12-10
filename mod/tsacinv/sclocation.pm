@@ -72,6 +72,7 @@ sub new
                 dataobjattr   =>'amtsisclocations.dtlastmodif'),
    );
    $self->setDefaultView(qw(linenumber name company subcompany sclocationid));
+   $self->setWorktable("amtsisclocations");
    return($self);
 }
 
@@ -81,7 +82,6 @@ sub Initialize
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("amtsisclocations");
    return(1) if (defined($self->{DB}));
    return(0);
 }
