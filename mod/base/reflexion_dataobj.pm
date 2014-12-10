@@ -22,6 +22,7 @@ use kernel;
 use kernel::Field;
 use kernel::DataObj::Static;
 use kernel::App::Web::Listedit;
+use Text::Wrap;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
 
 $VERSION="1.0";
@@ -52,6 +53,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'fullname',
+                searchable    =>1,
                 align         =>'left',
                 label         =>'fullqualified object'),
 
@@ -66,6 +68,44 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description'),
+
+      new kernel::Field::Textarea(
+                name          =>'sqlfrom',
+                label         =>'SQL From Base Defintion'),
+
+      new kernel::Field::Textarea(
+                name          =>'sqlfields',
+                label         =>'SQL Field Base Defintion'),
+
+      new kernel::Field::Textarea(
+                name          =>'objectdef',
+                label         =>'IO-Object Defintion',
+                htmlheight    =>'400px',
+                searchable    =>0,
+                depend        =>['fullname','modnamelabel',
+                                 'sqlfrom','sqlfields'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $n=$current->{fullname};
+                   $Text::Wrap::columns=60;
+                   if ($n ne $current->{modnamelabel}){
+                      $n.="\n(".$current->{modnamelabel}.")";
+                   }
+                   $n.="\n".("=" x $Text::Wrap::columns)."\n";
+                   my $h1="SQL Access to Tables:";
+                   $h1.="\n".("-" x length($h1))."\n";
+                   $h1.=$current->{sqlfrom}."\n";
+                   $h1=wrap('','',$h1);
+                   $n.=$h1."\n";
+                   my $h1="SQL Access to Fields:";
+                   $h1.="\n".("-" x length($h1))."\n";
+                   $h1.=$current->{sqlfields}."\n";
+                   $h1=wrap('','',$h1);
+                   $n.=$h1;
+                   $n.=("-" x $Text::Wrap::columns)."\n\n".chr(9)."\n";
+                   return($n);
+                }),
 
    );
    $self->{'data'}=\&getData;
@@ -101,6 +141,29 @@ sub getData
             if ($modname->can("VERSION")){
                $rec{version}=$modname->VERSION;
             }
+            if ($o->can("getSqlFrom")){
+               my $from=$o->getSqlFrom();
+               $rec{sqlfrom}=$from;
+               if ($o->can("AddDatabase")){
+                  my $From;
+                  my $inbracket=0;
+                  $from=~s/[\n\r]/ /g;
+                  $from=~s/ +/ /g;
+                  pos($from)=0;
+                  while ($from=~m{\G((.*?,)|(.*\(.+\))|([^,]+$))}cmg){
+                     my $sub=$1;
+                     if ($sub=~m/,\s*$/){
+                        $sub.="\n";
+                     }
+                     $sub=~s/^\s*//;
+                     $From.=$sub;
+                  }
+                  $rec{sqlfrom}=$From;
+               }
+            }
+            else{
+               $rec{sqlfrom}=undef;
+            }
             $rec{description}="\$${modname}::DESCRIPTION";
             $rec{description}=eval($rec{description});
             if ($rec{version} eq ""){
@@ -109,7 +172,24 @@ sub getData
             if ($rec{description} eq ""){
                $rec{description}="??? Beta Module ???";
             }
+            $rec{sqlfields}="";
+            my %f=();
+            if ($o->can("getFieldObjsByView")){
+               foreach my $fo ($o->getFieldObjsByView([qw(ALL)])){
+                  my $d=$fo->{dataobjattr};
+                  $d=~s/\n/ /g;
+                  $d=~s/ +/ /g;
+                  if ($d ne ""){
+                     $f{$d}++;
+                  }
+               }
+               $rec{sqlfields}=join(",\n",sort(keys(%f)));
+            }
+
             push(@data,\%rec);
+         }
+         else{
+            msg(ERROR,"fail to load reflexion dataobj: $modname");
          }
       }
       $c->{data}=\@data;
