@@ -13,6 +13,7 @@
    <script src="../../etc/MarvinConfig.js"></script>
    <script src="../../m/root/kernel.js"></script>
 
+   <link rel="stylesheet" href="../../m/root/i.css" />
    <link rel="stylesheet" href="i.css" />
    <script src="i.js"></script>
    <script src="../../m/root/run.js"></script>
@@ -27,7 +28,7 @@
          <h1 data-i18n='Application-Name'></h1>
       </div>
       <div role="main" class="ui-content">
-         <a href="#page1" 
+         <a href="#toplists" 
             class="ui-btn">Top-Listen</a>
          <a href="#appsearch" 
             class="ui-btn">Anwendungssuche</a>
@@ -37,22 +38,38 @@
       </div>
 </div>
 
-<div data-role="page" id="page1">
+
+
+<div data-role="page" id="toplists">
    <div data-role="header">
       <a  id='back-btn' href='#root' data-i18n='Back'></a>
-      <h1>Page 1</h1>
+      <h1>Top-Listen</h1>
       <a class="homebutton ui-btn-right"
          rel="external" data-rel="home">Marvin</a>
    </div><!-- /header -->
-   <div data-role="content" data-theme="a" i18n='de'><p>
-       Text1 Text Text
+   <div data-role="content" id='toplists-content' data-theme="a" i18n='de'><p>
    </p>
    </div>
 </div>
 
 
+
+<div data-role="page" id="toplist">
+   <div data-role="header">
+      <a  id='appdetail-back-btn' href='#toplists' data-i18n='Back'></a>
+      <h1 i18n='de'>RiManOS Interface - TopListe-itemsummary</h1>
+      <h1 i18n='en'>RiManOS Interface - TopList-itemsummary</h1>
+      <a class="homebutton ui-btn-right"
+         rel="external" data-rel="home">Marvin</a>
+   </div><!-- /header -->
+   <div data-role="content" id='toplist-content' data-theme="a" >
+   </div>
+</div>
+
+
+
 <div data-role="page" id="appsearch">
-   <form method=POST onsubmit='return(searchApplication(this));'>
+   <form method=POST onsubmit='return(App.searchApplication(this));'>
    <div data-role="header">
       <a  id='appsearch-back-btn' href='#root' data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - Anwendungssuche</h1>
@@ -68,7 +85,11 @@
    </div>
    <div class="ui-grid-b">
        <p i18n='de'>Bei der Suche können die bekannten W5Base/Darwin 
-                    Wildcards verwendet werden.</p>
+                    Wildcards verwendet werden. Normalerweise wird der
+                    RiManOS Prozess nur für Top-Anwendungen gelebt. Mit
+                    diesem Interface ist es aber möglich, die betreffenden
+                    Daten auch für alle anderen "installiert/aktiv" 
+                    markierten Anwendungen darzustellen.</p>
    </div>
    <input type='submit' class="ui-btn" value="Search" />
    </p>
