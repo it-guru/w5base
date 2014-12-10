@@ -35,7 +35,8 @@ i18n.init({
          }
       }
       if (!App.run){
-         App.run=function(){};
+         App.run=function(){
+         };
       }
 
 
@@ -51,19 +52,73 @@ i18n.init({
       }
       console.log("Marvin_Home:"+Marvin_Home);
       console.log("caller:"+document.referrer);
-      window.setTimeout(function(){App.run();},1000);
+
+
+      var hash = document.location.hash.replace(/^#/,'');
+      if (hash.match(/\?/)){
+         hash=hash.replace(/^.*\?/,'');
+         var callpath=hash.split(";");
+         App.CurrentPath=callpath;
+         App.CallPath=callpath;
+      }
+      else{
+         App.CurrentPath=[];
+         App.CallPath=[];
+      }
+      
+      App.callStack=function(finalcall){
+         var nextcall=App.CallPath.shift();
+         if (nextcall==undefined){
+            if (finalcall){
+               finalcall();
+            }
+         }
+         else{
+            var regex=/^(.*)\((.*)\)$/;
+            r=nextcall.match(regex);
+            console.log(r);
+            eval("App."+r[1]+"("+r[2]+");");
+         }
+         console.log("callstack:"+nextcall);
+       //  alert("callstack:"+nextcall);
+      };
+
+      console.log("hash="+hash);
+
+
+      window.setTimeout(function(){App.callStack(function(){App.run();});},100);
    }
 );
 
 
-$(document).on( "mobileinit", function() {
-   // ----------------------------------------------------
-   // configure Loading box
+
+$(document).bind("mobileinit", function(){
+   console.log("mobileinit");
+   console.log("address change to "+document.location.hash);
+
+});
+$(document).on("pageinit", function(){
+   console.log("pageinit");
+});
+
+
+
+$(document).ready(function () {
+//   if ($.browser.msie || $.browser.webkit) {  // IE only works correct with
+//       $("a").attr("data-ajax", "false");     // external references
+//       $("a").attr("rel", "external");
+//       var a = $("form");
+//       if (a != null) {
+//           $("form").first().attr("data-ajax", "false");
+//           $("form").first().attr("rel", "external");
+//       }
+//   }
    $.mobile.loader.prototype.options.text = "loading ...";
    $.mobile.loader.prototype.options.textVisible = true;
    $.mobile.loader.prototype.options.theme = "b";
    $.mobile.loader.prototype.options.html = "";
-   // ----------------------------------------------------
+   console.log("ready done");
+
 });
 
 

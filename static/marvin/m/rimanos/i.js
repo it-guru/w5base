@@ -1,18 +1,23 @@
 
 function Application(){
 
-   this.searchApplication=function(){
+   this.searchApplication=function(id){
       var listview="name,id";
       var detailview="name,description,id";
       var curview=listview;
       var o=this.W5Base().getModuleObject("itil::appl");
+
      
-      if (0){ // directer call
+      if (id){ // directer call
+         console.log("show direct id "+id);
          curview=detailview;
-         // url auswerten, welche ID geladen werden soll
+         o.SetFilter({id:id});
       }
       else{
          var search_name=$('#search_application_name').val();
+         if (search_name.length==0){
+            $.mobile.navigate("#appsearch");
+         }
          o.SetFilter({name:search_name, cistatusid:"!6"});
       }
       o.findRecord(curview,function(l){
@@ -22,14 +27,18 @@ function Application(){
          else if (l.length==1){
             if (curview!=detailview){
                o.SetFilter({id:l[0].id});  // detail Felder hinzuladen
-               o.findRecord(detailview,displayApplication);
+               o.findRecord(detailview,function(l){
+                  App.currentApplication=l[0];
+                  App.displayApplication(l);
+               });
             }
             else{  // direct anzeigen
-               displayApplication(l);
+               App.callStack(function(){App.displayApplication(l);});
             }
          }
          else{
             $.mobile.navigate("#applist");
+            $('#appdetail-back-btn').attr('href',"#applist"); // allow back list
             var label="Anwendungsliste";
             $("#applist-content").html("");
             var ul=$('<ul id="listview" data-role="listview" '+
@@ -45,21 +54,31 @@ function Application(){
             }
             $("#applist-content").append(ul);
             $('#applist').trigger("create");
+            $(".list-href").click(function(){
+               $.mobile.loading('show');
+               var id=$(this).attr("id");
+               App.A(id); 
+            });
+
          }
       });
       return(false);
    }
+   this.A=this.searchApplication;
+
+   this.displayApplicationURL=function(rec){
+      return("#appdetail?A("+rec.id+")");
+   }
 
    this.displayApplication=function(rec){
-      $.mobile.navigate("#appdetail");
+      $.mobile.navigate(App.displayApplicationURL(rec[0]));
       $("#appdetail-content").html("OK found "+rec[0].name);
    }
 
 
    this.searchApplicationListEntry=function(rec){
       var d="<a class='list-href' rel='external' id='"+rec.id+"' "+
-            "href='?A:"+rec.id+"#applist"+
-            "'>"+rec.name+"</a>";
+            "href='"+App.displayApplicationURL(rec)+"'>"+rec.name+"</a>";
       return(d);
    }
 
@@ -123,20 +142,25 @@ function Application(){
 
    this.searchTopListsEntry=function(rec){
       var d="<a class='list-href' rel='external' id='"+rec.id+"' "+
-            "href='?T:"+rec.id+"#toplist"+
+            "href='#toplist?T:"+rec.id+
             "'>"+rec.name+"</a>";
       return(d);
    }
 
-
-
-
-
    $('#toplists').live('pagebeforeshow',function(event, ui){
+      console.log("pagebeforeshow");
       $("#toplists-content").html("");
    });
 
+   $('#applist').live('pageshow',function(event, ui){  // falls applist gebooked
+      var search_name=$('#search_application_name').val();
+      if (search_name.length==0){
+         $.mobile.navigate("#appsearch");
+      }
+   });
+
    $('#toplists').live('pageshow',function(event, ui){
+       console.log("pageshow");
        App.searchTopLists();
    });
 

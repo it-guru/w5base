@@ -8,7 +8,6 @@
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="stylesheet" href="../../js/jquery.mobile-1.4.5.css" />
    <script src="../../js/jquery-1.7.1.js"></script>
-   <script src="../../js/jquery.mobile-1.4.5.js"></script>
    <script src="../../js/i18next-1.7.4.js"></script>
    <script src="../../etc/MarvinConfig.js"></script>
    <script src="../../m/root/kernel.js"></script>
@@ -17,11 +16,12 @@
    <link rel="stylesheet" href="i.css" />
    <script src="i.js"></script>
    <script src="../../m/root/run.js"></script>
+   <script src="../../js/jquery.mobile-1.4.5.js"></script>
 <!--- ENDE header --- fixed -->
 
 </head>
 <body>
-<div data-role="page" id="root">
+<div data-role="page" id="rootpage">
       <div data-role="header" align="center">
          <a class="homebutton ui-btn-right"
             rel="external" data-rel="home">Marvin</a>
@@ -42,7 +42,7 @@
 
 <div data-role="page" id="toplists">
    <div data-role="header">
-      <a  id='back-btn' href='#root' data-i18n='Back'></a>
+      <a  id='back-btn' href='#rootpage' data-i18n='Back'></a>
       <h1>Top-Listen</h1>
       <a class="homebutton ui-btn-right"
          rel="external" data-rel="home">Marvin</a>
@@ -56,7 +56,7 @@
 
 <div data-role="page" id="toplist">
    <div data-role="header">
-      <a  id='appdetail-back-btn' href='#toplists' data-i18n='Back'></a>
+      <a  id='toplist-back-btn' href='#toplists' data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - TopListe-itemsummary</h1>
       <h1 i18n='en'>RiManOS Interface - TopList-itemsummary</h1>
       <a class="homebutton ui-btn-right"
@@ -69,9 +69,9 @@
 
 
 <div data-role="page" id="appsearch">
-   <form method=POST onsubmit='return(App.searchApplication(this));'>
+   <form method=POST onsubmit='return(App.searchApplication());'>
    <div data-role="header">
-      <a  id='appsearch-back-btn' href='#root' data-i18n='Back'></a>
+      <a  id='appsearch-back-btn' href='#rootpage' data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - Anwendungssuche</h1>
       <h1 i18n='en'>RiManOS Interface - Application search</h1>
       <a class="homebutton ui-btn-right"
@@ -91,7 +91,8 @@
                     Daten auch für alle anderen "installiert/aktiv" 
                     markierten Anwendungen darzustellen.</p>
    </div>
-   <input type='submit' class="ui-btn" value="Search" />
+   <input type='button' class="ui-btn" onclick="App.searchApplication();" 
+          value="Search" />
    </p>
    </div>
    </form>
@@ -116,7 +117,7 @@
 
 <div data-role="page" id="appdetail">
    <div data-role="header">
-      <a  id='appdetail-back-btn' href='#applist' data-i18n='Back'></a>
+      <a  id='appdetail-back-btn' href='#appsearch' data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - Anwendungs-itemsummary</h1>
       <h1 i18n='en'>RiManOS Interface - Application-itemsummary</h1>
       <a class="homebutton ui-btn-right"
@@ -132,7 +133,7 @@
 <div data-role="page" id="about">
 
    <div data-role="header">
-      <a  id='back-btn' href='#root' data-i18n='Back'></a>
+      <a  id='back-btn' href='#rootpage' data-i18n='Back'></a>
       <h1>RiManOS Interface</h1>
    </div><!-- /header -->
    <div data-role="content" data-theme="a" i18n='de'><p>
