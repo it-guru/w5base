@@ -71,7 +71,7 @@ sub new
                 vjointo       =>'itil::software',
                 vjoinon       =>['id'=>'producerid'],
                 vjoindisp     =>['name','cistatus'],
-                vjoinbase     =>[{cistatusid=>\'4'}]),
+                vjoinbase     =>[{cistatusid=>'<6'}]),
 
       new kernel::Field::SubList(
                 name          =>'models',
@@ -80,7 +80,7 @@ sub new
                 vjointo       =>'itil::hwmodel',
                 vjoinon       =>['id'=>'producerid'],
                 vjoindisp     =>['name','cistatus'],
-                vjoinbase     =>[{cistatusid=>\'4'}]),
+                vjoinbase     =>[{cistatusid=>'<6'}]),
 
       new kernel::Field::Container(
                 name          =>'additional',
