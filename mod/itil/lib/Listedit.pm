@@ -100,7 +100,6 @@ sub URLValidate
       $uri{port}=URI->new($name)->port();
 
    } else {
-      #my ($host,$port)=$name=~m/\@([^:\/]+)(?:\:(\d+))?/;
       my $befhost=qr{\@}; # character before the host
       $befhost=qr{://} if (index($name,'@')==-1);
          
@@ -115,10 +114,75 @@ sub URLValidate
          $uri{port}=22 if ($uri{scheme} eq 'scp');
       }
    }
-   
+
+   if ($uri{host}) {
+      if ($uri{host}=~m/^\d+\.\d+\.\d+\.\d+$/ || # IPv4
+          $uri{host}=~m/[\[\]]/) { # IPv6
+         my $ipcheckresult;
+         if (!$self->IPValidate($uri{host},\$ipcheckresult)) {
+            $uri{error}=$ipcheckresult;
+            return(\%uri);
+         }
+      }
+      elsif ($uri{host}=~m/[^A-Za-z0-9.:\-\[\]]/ || # allowed characters
+          $uri{host}=~m/(^\.)|([.\-]$)/ || # must not start with .
+                                           # or end with . or -
+          !($uri{host}=~m/\.[a-z]{2,}$/i)) # TLD must have more than 1 character
+      { 
+         $uri{error}=("invalid hostname");
+         return(\%uri);
+      }
+
+   }
 
    return(\%uri);
 }
+
+sub IPValidate {
+   my $self=shift;
+   my $ip=shift;
+   my $msg=shift;
+   my $type;
+
+   if ($ip=~m/^\s*$/){
+      $$msg="invalid ip-address or empty specified";
+      return(undef);
+   }
+
+   if (my ($o1,$o2,$o3,$o4)=$ip=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/){
+      if (($o1<0 || $o1 >255 ||
+           $o2<0 || $o2 >255 ||
+           $o3<0 || $o3 >255 ||
+           $o4<0 || $o4 >255)||
+          ($o1==0 && $o2==0 && $o3==0 && $o4==0) ||
+          ($o1==255 && $o2==255 && $o3==255 && $o4==255)){
+         $$msg="invalid IPv4 address";
+         return(undef);
+      }
+      $type="IPv4";
+
+   } else {
+      $ip=~s/^\[(.*)\]$/$1/;
+      my @groups=split(/:/,$ip,-1);
+      
+      if (@groups!=8) {
+         $$msg="unknown ip-address format";
+         return(undef);
+      }
+
+      foreach my $g (@groups) {
+         if (!($g=~m/^[0-9a-f]{0,4}$/i)) {
+            $$msg="invalid IPv6 address";
+            return(undef);
+         }
+      }
+      $type="IPv6";
+   }
+
+   return($type);
+}
+
+
 
 sub FinishWrite
 {

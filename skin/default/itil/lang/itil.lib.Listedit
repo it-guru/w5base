@@ -1,1 +1,11 @@
 'deny reject valid to can only be 3 years in the future'=>{de=>'Ausschlußbedingung kann maximal 3 Jahre gültig sein'},
+'invalid URL specified'=>{de=>'ungültige URL angegeben'},
+'URL syntax error or no scheme specified'=>
+   {de=>'Syntax-Fehler in der URL oder kein Schema angegeben'},
+'not supported scheme specified'=>{de=>'kein unterstütztes Schema angegeben'},
+'can not identify host in URL'=>{de=>'Hostname kann nicht identifiziert werden'},
+'invalid hostname'=>{de=>'ungültiger Hostname'},
+'invalid ip-address or empty specified'=>{de=>'ungültige oder leere IP-Adresse'},
+'unknown ip-address format'=>{de=>'unbekanntes IP-Adressen Format'},
+'invalid IPv4 address'=>{de=>'ungültige IPv4 Adresse'},
+'invalid IPv6 address'=>{de=>'ungültige IPv6 Adresse'},

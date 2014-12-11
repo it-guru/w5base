@@ -23,7 +23,9 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
+use itil::lib::Listedit;
+@ISA=qw(kernel::App::Web::Listedit itil::lib::Listedit
+        kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
 {
@@ -586,56 +588,34 @@ sub Validate
    if ($cistatusid<=5){
       $name=~s/\[\d*\]$//;
    }
-   if ($name=~m/^\s*$/){
-      $self->LastMsg(ERROR,"invalid ip-address or empty specified");
-      return(0);
+
+   if ($name=~m/\./){
+      $name=~s/^[0]+([1-9])/$1/g;
+      $name=~s/\.[0]+([1-9])/.$1/g;
+   }
+   my $chkname=lc($name);
+   if ($cistatusid>5){
+      $chkname=~s/\[\d+\]$//;
+   }
+
+   my $errmsg;
+   my $type=$self->IPValidate($chkname,\$errmsg);
+   if ($type eq "IPv4"){
+      my ($o1,$o2,$o3,$o4)=$chkname=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
+      $ip6str="0000:0000:0000:0000:0000:ffff:".
+              unpack("H2",pack('C',$o1)).
+              unpack("H2",pack('C',$o2)).":".
+              unpack("H2",pack('C',$o3)).
+              unpack("H2",pack('C',$o4));
+   }
+   elsif ($type eq "IPv6"){
+       $ip6str=$chkname;
    }
    else{
-      $name=~s/\s//g;
-      if ($name=~m/\./){
-         $name=~s/^[0]+([1-9])/$1/g;
-         $name=~s/\.[0]+([1-9])/.$1/g;
-      }
-      my $chkname=lc($name);
-      if ($cistatusid>5){
-         $chkname=~s/\[\d+\]$//;
-      }
-      if (my ($o1,$o2,$o3,$o4)=$chkname=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/){
-         if (($o1<0 || $o1 >255 || 
-              $o2<0 || $o2 >255 ||
-              $o3<0 || $o3 >255 ||
-              $o4<0 || $o4 >255)||
-             ($o1==0 && $o2==0 && $o3==0 && $o4==0) ||
-             ($o1==255 && $o2==255 && $o3==255 && $o4==255)){
-            $self->LastMsg(ERROR,
-                   sprintf($self->T("invalid IPV4 address '\%s'"),$name));
-            return(0);
-         }
-         $ip6str="0000:0000:0000:0000:0000:ffff:".
-                 unpack("H2",pack('C',$o1)).
-                 unpack("H2",pack('C',$o2)).":".
-                 unpack("H2",pack('C',$o3)).
-                 unpack("H2",pack('C',$o4));
-      }
-      elsif (my ($o1,$o2,$o3,$o4,$o5,$o6,$o7,$o8)=$chkname
-                =~m/^([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4}):([0-9a-f]{4})$/){
-       #  if (($o1<0 || $o1 >255 || 
-       #       $o2<0 || $o2 >255 ||
-       #       $o3<0 || $o3 >255 ||
-       #       $o4<0 || $o4 >255)||
-       #      ($o1==0 && $o2==0 && $o3==0 && $o4==0) ||
-       #      ($o1==255 && $o2==255 && $o3==255 && $o4==255)){
-       #     $self->LastMsg(ERROR,
-       #            sprintf($self->T("invalid IPV4 address '\%s'"),$name));
-       #     return(0);
-       #  }
-          $ip6str=$chkname;
-      }
-      else{
-         $self->LastMsg(ERROR,"unknown ip-address format");
-         return(0);
-      }
-   } 
+      $self->LastMsg(ERROR,$self->T($errmsg,"itil::lib::Listedit"));
+      return(0);
+   }
+
    foreach my $okt (split(/:/,$ip6str)){
       $binnamekey.=unpack("B16",pack("H4",$okt));
    }
