@@ -92,7 +92,8 @@ sub new
                 vjoinbase     =>[{lnkto=>">now-24h OR [EMPTY]",
                                   applid=>"![EMPTY]"}],
                 vjoinon       =>['id'=>'mgmtitemgroupid'],
-                vjoindisp     =>['appl','lnkfrom','lnkto']),
+                vjoindisp     =>['appl','lnkfrom','lnkto'],
+                vjoinhash     =>['appl','lnkfrom','lnkto','applid']),
 
       new kernel::Field::SubList(
                 name          =>'locations',
@@ -104,7 +105,8 @@ sub new
                 vjoinbase     =>[{lnkto=>">now-24h OR [EMPTY]",
                                   locationid=>"![EMPTY]"}],
                 vjoinon       =>['id'=>'mgmtitemgroupid'],
-                vjoindisp     =>['location','lnkfrom','lnkto']),
+                vjoindisp     =>['location','lnkfrom','lnkto'],
+                vjoinhash     =>['location','lnkfrom','lnkto','locationid']),
 
 
       new kernel::Field::SubList(
