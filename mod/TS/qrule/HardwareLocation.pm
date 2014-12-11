@@ -14,14 +14,8 @@ NONE
 
 =head3 HINTS
 
-The allocation of the location is normaly from AssetManager
-imported automatically. So if no location be present,
-so this may be because in Asset Manager no location
-is detected.
-If the location is not however be taken to Darwin, so
-there may be a lack of mapping the location tables
-are. This must then assinged as a admin request 
-to the Darwin Administration.
+The assignment of the location is automatically imported from Asset Manager. If there is no location available, the reason can be that the location is not recorded in Asset Manager. In case an existing location is not imported into Darwin, it may be because of a missing mapping in the location-tables. This has to be reported to the Darwin administration via an admin-request.
+
 
 [de:]
 
@@ -31,7 +25,7 @@ so kann dies daran liegen, das in AssetManager kein Standort
 erfasst ist.
 Sollte der Standort dennoch nicht nach Darwin übernommen werden, so
 kann dies an einem fehlenden Mapping der Standort-Tabellen 
-liegen. Dies muß dann über einen Admin-Request an die Darwin
+liegen. Dies muss dann über einen Admin-Request an die Darwin
 Administration gemeldet werden.
 
 =cut
