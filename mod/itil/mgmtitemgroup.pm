@@ -93,7 +93,7 @@ sub new
                                   applid=>"![EMPTY]"}],
                 vjoinon       =>['id'=>'mgmtitemgroupid'],
                 vjoindisp     =>['appl','lnkfrom','lnkto'],
-                vjoinhash     =>['appl','lnkfrom','lnkto','applid']),
+                vjoininhash   =>['appl','lnkfrom','lnkto','applid']),
 
       new kernel::Field::SubList(
                 name          =>'locations',
@@ -106,7 +106,7 @@ sub new
                                   locationid=>"![EMPTY]"}],
                 vjoinon       =>['id'=>'mgmtitemgroupid'],
                 vjoindisp     =>['location','lnkfrom','lnkto'],
-                vjoinhash     =>['location','lnkfrom','lnkto','locationid']),
+                vjoininhash   =>['location','lnkfrom','lnkto','locationid']),
 
 
       new kernel::Field::SubList(
