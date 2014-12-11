@@ -259,6 +259,12 @@ sub getSubListData
       $self->vjoinobj->SetFilter(@fltlst);
 
       my @view=@{$self->{vjoindisp}};
+      if ($mode eq "JSON" || $mode eq "JSONP"){
+         if (defined($self->{vjoininhash}) &&
+             ref($self->{vjoininhash}) eq "ARRAY"){
+            @view=@{$self->{vjoininhash}};
+         }
+      }
       if (defined($self->{'vjoindisp'.$mode})){
          if (!ref($self->{'vjoindisp'.$mode}) eq "ARRAY"){
             $self->{'vjoindisp'.$mode}=[$self->{'vjoindisp'.$mode}];
