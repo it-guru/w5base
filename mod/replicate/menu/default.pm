@@ -47,6 +47,15 @@ sub Init
                       "replicate::stat",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("sysadm.repl.blacklist",
+                      "replicate::blacklist",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("sysadm.repl.blacklist.new",
+                      "replicate::blacklist",
+                      func=>'New',
+                      defaultacl=>['admin']);
+   
    return(1);
 }
 

@@ -50,3 +50,23 @@ alter table replicateobject  add FOREIGN KEY fk_replicateobject (replpartner)
           REFERENCES replicatepartner (id) ON DELETE CASCADE;
 set FOREIGN_KEY_CHECKS=1;
 alter table replicateobject add qfilter longtext  default NULL, add minrefreshlatency int(4) default '6', add avgrecaccess decimal(8,2);
+CREATE TABLE replicateblacklist (
+  id                   bigint(20),
+  replpartnerid        bigint(20) NOT NULL,
+  objtype              varchar(40) NOT NULL,
+  field                varchar(40) NOT NULL default '',
+  status               tinyint(2),
+  expiration           datetime,
+  comments             longtext default NULL,
+  createdate           datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate           datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser           bigint(20) default NULL,
+  modifyuser           bigint(20) default NULL,
+  editor               varchar(100) NOT NULL default '',
+  realeditor           varchar(100) NOT NULL default '',
+  PRIMARY KEY (id),
+  UNIQUE KEY (replpartnerid,objtype,field),
+  FOREIGN KEY (replpartnerid)
+    REFERENCES replicatepartner (id)
+    ON DELETE CASCADE
+) ENGINE=INNODB;
