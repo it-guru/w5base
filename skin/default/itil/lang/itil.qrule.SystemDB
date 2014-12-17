@@ -1,0 +1,5 @@
+'itil::qrule::SystemDB'=>
+   {de=>'Prüfung Systemklassifizierung Datenbankserver',
+    en=>'check systemclass databaseserver'},
+'inconsistent entries in databaseserver and software instances'=>
+   {de=>'widersprüchliche Angaben bei Datenbankserver und Software Instanzen'},
