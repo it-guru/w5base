@@ -66,6 +66,17 @@ $(document).bind("pagebeforecreate", function(){
          console.log("caller:"+document.referrer);
 
 
+         $('form').bind("keypress", function(e) {   // fix to handle IE8 
+           if (e.keyCode == 13) {                   // behavier on submit by
+                                                    // enter key
+             $(this).find("input[type=submit]").trigger("click");
+             e.preventDefault();
+             return false;
+           }
+         });
+
+
+
          var hash = document.location.hash.replace(/^#/,'');
          if (hash.match(/\?/)){
             hash=hash.replace(/^.*\?/,'');

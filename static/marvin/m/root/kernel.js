@@ -23,6 +23,8 @@ function loadScript(url) {
 loadScript(J5Base_baseUrl+"public/base/load/J5BaseMinimal.js");
 
 
+
+
 //////////////////////////////////////////////////////////////////////////
 
 // Form parsing
@@ -42,13 +44,13 @@ jQuery.fn.extend({
 // query coding 
 
 function queryenc(str) {
-    return("["+window.btoa(str)+"]");
+    return("["+Base64.encode(str)+"]");
 }
 
 function querydec(str) {
     str=str.replace(/^\[/,'');
     str=str.replace(/\]$/,'');
-    return(window.atob(str));
+    return(Base64.decode(str));
 }
 
 

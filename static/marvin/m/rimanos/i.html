@@ -10,6 +10,7 @@
    <script src="../../js/jquery-1.7.1.js"></script>
    <script src="../../js/i18next-1.7.4.js"></script>
    <script src="../../etc/MarvinConfig.js"></script>
+   <script src="../../m/root/base64.js"></script>
    <script src="../../m/root/kernel.js"></script>
 
    <link rel="stylesheet" href="../../m/root/i.css" />
@@ -116,7 +117,7 @@
 
 
 <div data-role="page" id="appl-search">
-   <form>
+   <form method=post action='#appl-search' onsubmit="return(false);">
    <div data-role="header">
       <a  href='#rootpage' data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - Anwendungssuche</h1>
