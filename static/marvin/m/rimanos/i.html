@@ -3,7 +3,7 @@
 <head>
 <title>Marvin Data View Operation System</title>
 <!--- START header --- fixed -->
-   <meta charset="ISO-8859-1">
+   <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=8"/> 
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="stylesheet" href="../../js/jquery.mobile-1.4.5.css" />
@@ -14,9 +14,9 @@
 
    <link rel="stylesheet" href="../../m/root/i.css" />
    <link rel="stylesheet" href="i.css" />
+   <script src="../../js/jquery.mobile-1.4.5.js"></script>
    <script src="i.js"></script>
    <script src="../../m/root/run.js"></script>
-   <script src="../../js/jquery.mobile-1.4.5.js"></script>
 <!--- ENDE header --- fixed -->
 
 </head>
@@ -28,13 +28,16 @@
          <h1 data-i18n='Application-Name'></h1>
       </div>
       <div role="main" class="ui-content">
-         <a href="#toplists" 
-            class="ui-btn">Top-Listen</a>
-         <a href="#appsearch" 
-            class="ui-btn">Anwendungssuche</a>
+         <input type='button' class="ui-btn"
+            onclick='App.Toplist.doSearch({});' 
+            data-i18n='[value]Top-Listen' />
+         <input type='button' class='ui-btn' 
+            onclick='App.Appl.openSearch();' 
+            data-i18n='[value]Applicationsearch' />
          <p>&nbsp;</p>
-         <a href="#about" 
-            class="ui-btn" data-i18n='About'></a>
+         <input type='button' class="ui-btn" 
+            onclick='$.mobile.navigate("#about");' 
+            data-i18n='[value]About' />
       </div>
 </div>
 
@@ -47,31 +50,75 @@
       <a class="homebutton ui-btn-right"
          rel="external" data-rel="home">Marvin</a>
    </div><!-- /header -->
-   <div data-role="content" id='toplists-content' data-theme="a" i18n='de'><p>
+   <div data-role="content" id='toplists-content' data-theme="a" ><p>
    </p>
    </div>
 </div>
 
 
 
-<div data-role="page" id="toplist">
+<div data-role="page" id="toplist-search-result">
    <div data-role="header">
-      <a  id='toplist-back-btn' href='#toplists' data-i18n='Back'></a>
+      <a  href='#rootpage' data-i18n='Back'></a>
+      <h1 i18n='de'>Top-Listen</h1>
+      <h1 i18n='en'>Top-Lists</h1>
+      <a class="homebutton ui-btn-right"
+         rel="external" data-rel="home">Marvin</a>
+   </div><!-- /header -->
+   <div data-role="content" id='toplist-search-result-content' data-theme="a" >
+   </div>
+</div>
+
+<div data-role="page" id="toplist-detail">
+   <div data-role="header">
+      <a  id='toplist-detail-back-btn' href='#toplist-search-result' 
+          data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - TopListe-itemsummary</h1>
       <h1 i18n='en'>RiManOS Interface - TopList-itemsummary</h1>
       <a class="homebutton ui-btn-right"
          rel="external" data-rel="home">Marvin</a>
    </div><!-- /header -->
-   <div data-role="content" id='toplist-content' data-theme="a" >
+   <div data-role="content" id='toplist-detail-content' data-theme="a" >
+   </div>
+</div>
+
+<div data-role="page" id="toplistappl-search">
+<!-- dummy to forward to toplist-search-result -->
+</div>
+
+<div data-role="page" id="toplistappl-search-result">
+   <div data-role="header">
+      <a  id='toplistappl-search-result-back-btn' href='#toplistappl-search' data-i18n='Back'></a>
+      <h1 i18n='de'>RiManOS Interface - Anwendungssuche</h1>
+      <h1 i18n='en'>RiManOS Interface - Application search</h1>
+      <a class="homebutton ui-btn-right"
+         rel="external" data-rel="home">Marvin</a>
+   </div><!-- /header -->
+   <div data-role="content" id='toplistappl-search-result-content' 
+        data-theme="a" >
+   </div>
+</div>
+
+<div data-role="page" id="toplistappl-detail">
+   <div data-role="header">
+      <a  id='toplistappl-detail-back-btn' href='#toplist-search-result' 
+          data-i18n='Back'></a>
+      <h1 i18n='de'>RiManOS Interface - TopListe-itemsummary</h1>
+      <h1 i18n='en'>RiManOS Interface - TopList-itemsummary</h1>
+      <a class="homebutton ui-btn-right"
+         rel="external" data-rel="home">Marvin</a>
+   </div><!-- /header -->
+   <div data-role="content" id='toplistappl-detail-content' data-theme="a" >
    </div>
 </div>
 
 
 
-<div data-role="page" id="appsearch">
-   <form method=POST onsubmit='return(App.searchApplication());'>
+
+<div data-role="page" id="appl-search">
+   <form>
    <div data-role="header">
-      <a  id='appsearch-back-btn' href='#rootpage' data-i18n='Back'></a>
+      <a  href='#rootpage' data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - Anwendungssuche</h1>
       <h1 i18n='en'>RiManOS Interface - Application search</h1>
       <a class="homebutton ui-btn-right"
@@ -81,17 +128,18 @@
    <div class="ui-field-contain">
      <label i18n='de' for="search_application_name">Anwendungsname:</label>
      <label i18n='en' for="search_application_name">Applicationname:</label>
-     <input type="text" id="search_application_name">
+     <input type="text" name='name' id="search_application_name">
    </div>
    <div class="ui-grid-b">
-       <p i18n='de'>Bei der Suche können die bekannten W5Base/Darwin 
+       <p i18n='de'>Bei der Suche kÃ¶nnen die bekannten W5Base/Darwin 
                     Wildcards verwendet werden. Normalerweise wird der
-                    RiManOS Prozess nur für Top-Anwendungen gelebt. Mit
-                    diesem Interface ist es aber möglich, die betreffenden
-                    Daten auch für alle anderen "installiert/aktiv" 
+                    RiManOS Prozess nur fÃ¼r Top-Anwendungen gelebt. Mit
+                    diesem Interface ist es aber mÃ¶glich, die betreffenden
+                    Daten auch fÃ¼r alle anderen "installiert/aktiv" 
                     markierten Anwendungen darzustellen.</p>
    </div>
-   <input type='button' class="ui-btn" onclick="App.searchApplication();" 
+   <input type='submit' class="ui-btn" 
+          onclick="return(App.Appl.handleSearchSubmit(this));" 
           value="Search" />
    </p>
    </div>
@@ -100,30 +148,30 @@
 
 
 
-<div data-role="page" id="applist">
+<div data-role="page" id="appl-search-result">
    <div data-role="header">
-      <a  id='applist-back-btn' href='#appsearch' data-i18n='Back'></a>
+      <a  id='appl-search-result-back-btn' href='#' data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - Anwendungssuche</h1>
       <h1 i18n='en'>RiManOS Interface - Application search</h1>
       <a class="homebutton ui-btn-right"
          rel="external" data-rel="home">Marvin</a>
    </div><!-- /header -->
-   <div data-role="content" id='applist-content' data-theme="a" >
+   <div data-role="content" id='appl-search-result-content' data-theme="a" >
    </div>
 </div>
 
 
 
 
-<div data-role="page" id="appdetail">
+<div data-role="page" id="appl-detail">
    <div data-role="header">
-      <a  id='appdetail-back-btn' href='#appsearch' data-i18n='Back'></a>
+      <a  id='appl-detail-back-btn' href='#' data-i18n='Back'></a>
       <h1 i18n='de'>RiManOS Interface - Anwendungs-itemsummary</h1>
       <h1 i18n='en'>RiManOS Interface - Application-itemsummary</h1>
       <a class="homebutton ui-btn-right"
          rel="external" data-rel="home">Marvin</a>
    </div><!-- /header -->
-   <div data-role="content" id='appdetail-content' data-theme="a" >
+   <div data-role="content" id='appl-detail-content' data-theme="a" >
    </div>
 </div>
 
@@ -137,10 +185,10 @@
       <h1>RiManOS Interface</h1>
    </div><!-- /header -->
    <div data-role="content" data-theme="a" i18n='de'><p>
-                Dieses Modul analysiert primär das Feld "itemsummary", auf
+                Dieses Modul analysiert primÃ¤r das Feld "itemsummary", auf
                 das die Auswertungen in CD-DWH aufsetzen.</p>
                 <p>
-                Die Auswertungen über CD-DWH sind mit Latenzen verbunden, was
+                Die Auswertungen Ã¼ber CD-DWH sind mit Latenzen verbunden, was
                 das Debugen sehr erschwert. Dieses Marvin Modul erlaubt
                 es, die Daten in Echtzeit abzufragen und eine Auswertung
                 dargestellt zu bekommen.</p>

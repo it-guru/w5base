@@ -1,181 +1,71 @@
 
-function Application(){
+// derevation for itil::appl
+var Appl=new Class(W5ModuleObject,{
+   Constructor:function(pApp,frontname){
+      this.SUPER('Constructor',pApp,frontname,"itil::appl");
+      this.listView=['name'];
+      this.detailView=['name','description','cdate','mdate','owner'];
+   },
+   setFilter:function(f){
+      f['cistatusid']=4;
+      return(this.SUPER('setFilter',f));
+   }
+});
 
-   this.searchApplication=function(id){
-      var listview="name,id";
-      var detailview="name,description,id";
-      var curview=listview;
-      var o=this.W5Base().getModuleObject("itil::appl");
-
-     
-      if (id){ // directer call
-         console.log("show direct id "+id);
-         curview=detailview;
-         o.SetFilter({id:id});
+var Toplist=new Class(W5ModuleObject,{
+   Constructor:function(pApp,frontname){
+      this.SUPER('Constructor',pApp,frontname,"itil::mgmtitemgroup");
+      this.listView=['name','applications'];
+      this.detailView=['name','applications','cdate','mdate'];
+   },
+   setFilter:function(f){
+      f['cistatusid']=4;
+      f['name']="top*";
+      return(this.SUPER('setFilter',f));
+   },
+   softFilterRecord:function(rec){
+      if (rec['applications'].length==0){
+         return(undefined);
       }
-      else{
-         var search_name=$('#search_application_name').val();
-         if (search_name.length==0){
-            $.mobile.navigate("#appsearch");
-         }
-         o.SetFilter({name:search_name, cistatusid:"!6"});
-      }
-      o.findRecord(curview,function(l){
-         if (l.length==0){
-            alert("not found");
-         }
-         else if (l.length==1){
-            if (curview!=detailview){
-               o.SetFilter({id:l[0].id});  // detail Felder hinzuladen
-               o.findRecord(detailview,function(l){
-                  App.currentApplication=l[0];
-                  App.displayApplication(l);
-               });
-            }
-            else{  // direct anzeigen
-               App.callStack(function(){App.displayApplication(l);});
-            }
-         }
-         else{
-            $.mobile.navigate("#applist");
-            $('#appdetail-back-btn').attr('href',"#applist"); // allow back list
-            var label="Anwendungsliste";
-            $("#applist-content").html("");
-            var ul=$('<ul id="listview" data-role="listview" '+
-                     'data-inset="true" style="height:100%"/>');
-            ul.append("<li data-role='list-divider'>"+label+"</li>");
-            for(c=0;c<l.length;c++){
-               var li=$('<li />').attr({
-                  id:l[c].id,
-                  name:l[c].name
-               });
-               li.html(App.searchApplicationListEntry(l[c]));
-               ul.append(li);
-            }
-            $("#applist-content").append(ul);
-            $('#applist').trigger("create");
-            $(".list-href").click(function(){
-               $.mobile.loading('show');
-               var id=$(this).attr("id");
-               App.A(id); 
-            });
-
-         }
-      });
-      return(false);
+      return(rec);
+   },
+   openDetailResult:function(rec){
+      var queryStack={mgmtitemgroup:rec.name,cistatusid:4};
+      console.log("set queryStack for App.ToplistAppl.queryStack",queryStack);
+      App.ToplistAppl.queryStack=queryStack;
+      App.ToplistAppl.doSearch(queryStack);
    }
-   this.A=this.searchApplication;
+});
 
-   this.displayApplicationURL=function(rec){
-      return("#appdetail?A("+rec.id+")");
+var ToplistAppl=new Class(W5ModuleObject,{
+   Constructor:function(pApp,frontname){
+      this.SUPER('Constructor',pApp,frontname,"itil::appl");
+      this.listView=['name'];
+      this.detailView=['name','cdate','mdate'];
+   },
+   queryStackHandler:function(hash,queryStack){
+       console.log("handling Stack hash='"+hash+"'",queryStack);
+       if (hash=="search"){
+          App.Toplist.doSearch({});
+          // Back Button muﬂ noch definiert werden!
+          return(true);
+       }
+       if (hash=="search-result"){
+          App.ToplistAppl.doSearch(queryStack);
+          // Back Button muﬂ noch definiert werden!
+          return(true);
+       }
+       if (hash=="detail"){
+          App.ToplistAppl.doSearch({id:queryStack.ID});
+          return(true);
+       }
+       return(false);
    }
-
-   this.displayApplication=function(rec){
-      $.mobile.navigate(App.displayApplicationURL(rec[0]));
-      $("#appdetail-content").html("OK found "+rec[0].name);
-   }
+});
 
 
-   this.searchApplicationListEntry=function(rec){
-      var d="<a class='list-href' rel='external' id='"+rec.id+"' "+
-            "href='"+App.displayApplicationURL(rec)+"'>"+rec.name+"</a>";
-      return(d);
-   }
-
-
-
-   this.searchTopLists=function(){
-      var listview="name,applications,id";
-      var detailview="name,description,id";
-      var curview=listview;
-      $.mobile.loading('show');
-      var o=this.W5Base().getModuleObject("itil::mgmtitemgroup");
-     
-      if (0){ // directer call
-         curview=detailview;
-         // url auswerten, welche ID geladen werden soll
-      }
-      else{
-         o.SetFilter({name:"top*", cistatusid:"4"});
-      }
-      o.findRecord(curview,function(l){
-         $.mobile.loading('hide');
-         if (l.length==0){
-            alert("not found");
-         }
-         else if (l.length==1){
-            if (curview!=detailview){
-               o.SetFilter({id:l[0].id});  // detail Felder hinzuladen
-               o.findRecord(detailview,App.displayTopList);
-            }
-            else{  // direct anzeigen
-               displayTopList(l);
-            }
-         }
-         else{
-            var label="Top-Listen:";
-            var ul=$('<ul id="listview" data-role="listview" '+
-                     'data-inset="true" style="height:100%"/>');
-            ul.append("<li data-role='list-divider'>"+label+"</li>");
-            for(c=0;c<l.length;c++){
-               if (l[c].applications.length){ 
-                  var li=$('<li />').attr({
-                     id:l[c].id,
-                     name:l[c].name
-                  });
-                  li.html(App.searchTopListsEntry(l[c]));
-                  ul.append(li);
-               }
-            }
-            $("#toplists-content").append(ul);
-            $('#toplists').trigger("create");
-         }
-      });
-      return(false);
-   }
-
-   this.displayTopList=function(rec){
-      $.mobile.navigate("#toplist");
-      $("#toplist-content").html("OK found "+rec[0].name);
-   }
-
-
-   this.searchTopListsEntry=function(rec){
-      var d="<a class='list-href' rel='external' id='"+rec.id+"' "+
-            "href='#toplist?T:"+rec.id+
-            "'>"+rec.name+"</a>";
-      return(d);
-   }
-
-   $('#toplists').live('pagebeforeshow',function(event, ui){
-      console.log("pagebeforeshow");
-      $("#toplists-content").html("");
-   });
-
-   $('#applist').live('pageshow',function(event, ui){  // falls applist gebooked
-      var search_name=$('#search_application_name').val();
-      if (search_name.length==0){
-         $.mobile.navigate("#appsearch");
-      }
-   });
-
-   $('#toplists').live('pageshow',function(event, ui){
-       console.log("pageshow");
-       App.searchTopLists();
-   });
-
-
-   $("input").keypress(function(event) {
-     //  if (event.which == 13) {
-     //     console.log("key 13 event");
-     //     $(this).closest('form').submit();
-     //     return(false);
-     //  }
-     //  return(false);
-   });
-   return(this);
-};
-
-
-
-
+var Application=function(){
+   this.Appl=new Appl(this,"appl");
+   this.Toplist=new Toplist(this,"toplist");
+   this.ToplistAppl=new ToplistAppl(this,"toplistappl");
+}
