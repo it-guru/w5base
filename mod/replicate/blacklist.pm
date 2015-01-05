@@ -143,7 +143,6 @@ sub Validate
    }
    my $replpartnerid=effVal($oldrec,$newrec,"replpartnerid");
 
-   my $object=getModuleObject($self->Config,"replicate::obj");
    my $chko=getModuleObject($self->Config,$objtype);
    if (!defined($chko)){
       $self->LastMsg(ERROR,"invalid Dataobject");
