@@ -42,14 +42,12 @@ sub isSelectable
 {
    my $self=shift;
 
-   return(1); # for testing!
-
    my $acl=$self->getParent->getMenuAcl($ENV{REMOTE_USER},
                           'AL_TCom::MyW5Base::MIReport$',
                           func=>'Main');
 
    if (defined($acl)){
-      return(1) if (grep(/^read$/,@$acl));
+      return(1) if (grep(/^(read|write)$/,@$acl));
    }
    return(0);
 }
@@ -61,10 +59,14 @@ sub getQueryTemplate
    my $tt=$self->kernel::MyW5Base::getTimeRangeDrop("search_year",
                                                     $self,
                                                     qw(year));
-   my $t0=$self->T("Only Prio 1 events");
+   my $t0=$self->T("event Prio");
    my $t1=$self->T("Year");
-   my $t2=$self->T("Yes");
-   my $t3=$self->T("No - show all");
+   my $t2=$self->T("Prio1");
+   my $t3=$self->T("Prio1+Prio2");
+   my $t4=$self->T("any");
+   my $ta=$self->T("ignore reporting flag");
+   my $t10=$self->T("no");
+   my $t11=$self->T("yes");
 
 
    my $d=<<EOF;
@@ -74,9 +76,21 @@ sub getQueryTemplate
 <td class=fname width=10%>$t1:</td><td class=finput>$tt</td>
 <td class=fname width=20%>$t0:</td>
 <td class=finput width=30% nowrap>
-<select name=search_onlyprio1>
+<select name=search_prioselect>
 <option selected value="1">$t2</option>
-<option value="0">$t3</option>
+<option value="2">$t3</option>
+<option value="0">$t4</option>
+</select>
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td class=fname width=10%>$ta:</td>
+<td class=finput width=30% nowrap>
+<select name=search_ignrepflag>
+<option selected value="0">$t10</option>
+<option value="1">$t11</option>
 </select>
 </td>
 </tr>
@@ -111,9 +125,12 @@ sub Result
    my %flt=$wf->getSearchHash();
 
    my $year=$flt{year};
-   my $onlyprio1=$flt{onlyprio1};
+   my $prioselect=$flt{prioselect};
+   my $ignrepflag=$flt{ignrepflag};
    my $tz=$self->getParent->UserTimezone();
    my ($y,$m,$d)=Today_and_Now($tz);
+
+   $ignrepflag=0 if (!defined($flt{ignrepflag}));
 
    # $year and $tz are initial parameters
 
@@ -143,8 +160,13 @@ sub Result
       my $top=$wfrec->{affecteditemgroup};
       $top="NONE" if (!defined($top) || $top eq "");
       $top=[split(/\s*;\s*/,$top)] if (ref($top) ne "ARRAY");
-      next if ($onlyprio1 && $wfrec->{eventstatclass} ne "1");
-      next if ($wfrec->{eventignoreforkpi} eq "1"); 
+      next if ($prioselect==1 && $wfrec->{eventstatclass} ne "1");
+      next if ($prioselect==2 && 
+               ($wfrec->{eventstatclass} ne "1" &&
+                $wfrec->{eventstatclass} ne "2"));
+      if ($flt{ignrepflag}==1){
+         next if ($wfrec->{eventignoreforkpi} eq "1"); 
+      }
       foreach my $t (@$top){
          push(@{$sheet{$t}},$wfrec->{id});
       }
