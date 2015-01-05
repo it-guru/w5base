@@ -20,6 +20,10 @@ function loadScript(url) {
     script.src = url;
     $("head").append(script);
 }
+
+function call(f){
+   window.setTimeout(f,10);
+}
 loadScript(J5Base_baseUrl+"public/base/load/J5BaseMinimal.js");
 
 
@@ -243,7 +247,8 @@ var W5ModuleObject=new Class({
          var id=This.queryStack.ID;
          if (ui.prevPage[0]==undefined){
             if (!$.isEmptyObject(This.queryStack)){
-               stackIsHandled=This.queryStackHandler("detail",queryStack,ui);
+               stackIsHandled=
+                  This.queryStackHandler("detail",This.queryStack,ui);
             }
             if (!stackIsHandled){
                var idname=This.getIdFieldName();
@@ -259,7 +264,7 @@ var W5ModuleObject=new Class({
    },
 
    queryStackLoader:function(hash,ui){
-      var qstring=hash;
+      var qstring=document.location.hash.replace(/^#/,'');
       var queryStack=$.extend({},this.queryStack);
       if (qstring.match(/\?/)){
          qstring=qstring.replace(/^.*\?/,'');
@@ -288,7 +293,8 @@ var W5ModuleObject=new Class({
           else{
              $(backButtonId).click(function(){
                 var target="#"+ui.prevPage[0].id+"?"+
-                  queryenc($.param($.extend(This.queryStack,{ID:queryStack.ID})));
+                  queryenc($.param($.extend(This.queryStack,
+                                            {ID:queryStack.ID})));
                 $.mobile.navigate(target);
              });
           }
@@ -298,7 +304,6 @@ var W5ModuleObject=new Class({
              var previousPage =$.mobile.activePage;
              var backButtonId='#'+This.frontname+"-search-result-back-btn";
              if (ui.prevPage[0]==undefined){
-                console.log("autonav",ui);
                 $.mobile.navigate("#"+This.frontname+"-search");
              }
              $(backButtonId).unbind('click');
@@ -311,6 +316,11 @@ var W5ModuleObject=new Class({
           else{
              if (ui.prevPage[0]==undefined){
                 This.doSearch({});
+             }
+             else{
+                var queryStack=$.extend({},This.queryStack);
+                delete queryStack.ID;
+                This.doSearch(queryStack);
              }
           }
        }
@@ -363,7 +373,7 @@ var W5ModuleObject=new Class({
       var This=this;
       $("."+this.frontname+"-detail-link").each(function(i){
          var id=$(this).attr("id");
-         var queryStack=$.extend(this.queryStack,{ID:id});
+         var queryStack=$.extend({},this.queryStack,{ID:id});
          var link='#'+This.frontname+"-detail?"+queryenc($.param(queryStack));
          $(this).attr("href",link);
       });
@@ -401,20 +411,18 @@ var W5ModuleObject=new Class({
       var contentid='#'+this.frontname+"-detail-content";
       $(contentid).html(d);
       $(contentid).trigger('create');
-      $(contentid+" :input:visible:first").focus();
-     // $('#'+this.frontname+"-detail-content textarea").on('click',function(){
-     //    $(this).autosize();
-     // });
+      window.setTimeout(function(){
+         $(contentid+" :input:visible:first").focus();
+      },1000);
       
       var target='#'+this.frontname+"-detail"+"?"+
-                 queryenc($.param($.extend(this.queryStack,{ID:rec[idname]})));
+              queryenc($.param($.extend({},this.queryStack,{ID:rec[idname]})));
       $.mobile.navigate(target);
    },
 
    formatDetail:function(rec){
       var d='';
       var view=this.getDetailView();
-      console.log("DetailView:",view);
       for(c=0;c<view.length;c++){
          name=view[c];
          d+="<fieldset data-role='fieldcontain'>";
