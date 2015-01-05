@@ -56,7 +56,6 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-printf STDERR Dumper($rec);
    return(0,undef) if ($rec->{cistatusid}==1 || $rec->{cistatusid}==6);
    if (($rec->{location}=~/^\s*$/) || ($rec->{location}=~/^.*\[\d+\]$/)){
       my $msg='invalid or no location specified';
