@@ -454,21 +454,35 @@ sub getRequestedReplicationObjects
    # check if other W5Replication Action are already in process in
    # current schema - This needs read access to V$SESSION !
 
-   my @buffer=$dbi->getHashList(
-      "select * from V\$SESSION where ".
-      "USERNAME=sys_context('USERENV', 'SESSION_USER') and ".
-      "ACTION=sys_context('USERENV', 'ACTION') and ".
-      "SID<>sys_context('USERENV', 'SID')");
-   if ($#buffer!=-1){
-      if (!$opt_f){
-         $dbi->disconnect();
-         msg(ERROR,"other sessions in current schema are already active");
-         doShutdown();
-         exit(101);
-      }
-   }
+#   my @buffer=$dbi->getHashList(
+#      "select * from V\$SESSION where ".
+#      "USERNAME=sys_context('USERENV', 'SESSION_USER') and ".
+#      "ACTION=sys_context('USERENV', 'ACTION') and ".
+#      "SID<>sys_context('USERENV', 'SID')");
+#   if ($#buffer!=-1){
+#      if (!$opt_f){
+#         $dbi->disconnect();
+#         msg(ERROR,"other sessions in current schema are already active");
+#         doShutdown();
+#         exit(101);
+#      }
+#   }
+
 
    my $rprec=getReplicatePartnerRec($Config,$partner);
+print STDERR Dumper($rprec);
+
+   # loading blacklist informations
+   my $blacklist=getModuleObject($Config,"replicate::blacklist");
+   $blacklist->SetFilter({
+      replpartnerid=>\$rprec->{id},
+      status=>\'1',
+      expiration=>[undef,">now"]
+   });
+   $blacklist->SetCurrentView(qw(objtype field));
+   my $bl=$blacklist->getHashIndexed("objtype");
+
+   print Dumper($bl);
 
    #
    # loading table list from oracle schema and check tables with :: in it
@@ -479,13 +493,28 @@ sub getRequestedReplicationObjects
                                            # temp views for data representation)
           $tab->{'table_name'}=~m/::/   &&
           !($tab->{'table_name'}=~m/^_/)){ # objects are recognizable by :: 
-         my %ctrl=(
-            'name'=>$tab->{'table_name'},
-            'prio'=>'0',
-            'valid'=>'0',
-            'requested'=>'1'
-         );
-         push(@replicationOjects,\%ctrl);
+         my $blocked=0;
+         my $blockedFields=[];
+         if (exists($bl->{objtype}->{$tab->{'table_name'}})){
+            my $l=$bl->{objtype}->{$tab->{'table_name'}};
+            $l=[$l] if (ref($l) ne "ARRAY");
+            $blockedFields=[map({uc($_->{field})} @$l)];
+            if (in_array($blockedFields,'')){
+               $blocked=1;
+               msg(WARN,"debug info: blocked by blacklist ".
+                        "$tab->{'table_name'}");
+            }
+         }
+         if (!$blocked){
+            my %ctrl=(
+               'name'=>$tab->{'table_name'},
+               'blockedFields'=>$blockedFields,
+               'prio'=>'0',
+               'valid'=>'0',
+               'requested'=>'1'
+            );
+            push(@replicationOjects,\%ctrl);
+         }
       }
    }
 
@@ -500,6 +529,11 @@ sub getRequestedReplicationObjects
       $ctrl->{'col'}={};
       my $sth=$dbi->column_info(undef,$schema,$ctrl->{'name'},'%');
       foreach my $col ($sth->getHashList()){
+         if (in_array($ctrl->{blockedFields},$col->{'column_name'})){
+            msg(WARN,"debug info: blocked by blacklist ".
+                      "$ctrl->{'name'} : $col->{'column_name'}");
+            next;
+         }
          $ctrl->{'col'}->{lc($col->{'column_name'})}={
                                'name'=>$col->{'column_name'},
                                'type'=>$col->{'type_name'},

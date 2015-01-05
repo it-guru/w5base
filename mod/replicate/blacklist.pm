@@ -142,14 +142,13 @@ sub Validate
       return(undef);
    }
    my $replpartnerid=effVal($oldrec,$newrec,"replpartnerid");
+
    my $object=getModuleObject($self->Config,"replicate::obj");
-   $object->SetFilter({partnerid=>\$replpartnerid,name=>\$objtype});
-   my ($d,$msg)=$object->getOnlyFirst('name');
-   if (!defined($d)) {
+   my $chko=getModuleObject($self->Config,$objtype);
+   if (!defined($chko)){
       $self->LastMsg(ERROR,"invalid Dataobject");
       return(undef);
    }
-   $newrec->{objtype}=$d->{name};
 
    # validate Datafield
    $newrec->{field}=lc($newrec->{field});
