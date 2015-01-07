@@ -4,8 +4,9 @@ package itil::qrule::URLlist;
 
 =head3 PURPOSE
 
-Check if there are software instances on an application and 
-maybee no application URLs are registered.
+Check if there are software instances on an application with CI-Status
+"available/in project", "installed/active" or "inactiv/stored"
+and no application URLs are registered.
 
 =head3 IMPORTS
 
@@ -15,8 +16,8 @@ NONE
 If there are software-instances of type ... 
 Apache 
 SunOne
-... in CI-Status "available/in project", "installed/active"
-or "inactiv/stored" it is mandatory to enter at least one communication URL.
+... in CI-Status "installed/active" it is mandatory to enter
+at least one communication URL.
 
 
 [de:]
@@ -24,8 +25,8 @@ or "inactiv/stored" it is mandatory to enter at least one communication URL.
 Wenn es bei einer Anwendung Software-Instanzen vom Type ...
 Apache
 SunOne
-... im Status "verfügbar/in Projektierung", "installiert/aktiv"
-oder "zeitweise inaktiv" gibt, muss es auch min. eine Anwendungs-URL geben.
+... im Status "installiert/aktiv" gibt,
+muss es auch min. eine Anwendungs-URL geben.
 
 
 
@@ -68,6 +69,14 @@ sub getPosibleTargets
    return(["itil::appl"]);
 }
 
+sub isURLlistCheckNeeded
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(0) if ($rec->{cistatusid}<3 || $rec->{cistatusid}>5);
+   return(1);
+}
 
 sub qcheckRecord
 {
@@ -83,6 +92,9 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
+   if (!$self->isURLlistCheckNeeded($rec)){
+      return(0,undef);
+   }
 
    my $urlswi=0;
    my @needed=qw(Apache SunOne);
@@ -91,8 +103,7 @@ sub qcheckRecord
          $urlswi++;
       }
    }
-   if ($urlswi>0 && $#{$rec->{applurl}}==-1 &&
-       $rec->{cistatusid}>2 && $rec->{cistatusid}<6){
+   if ($urlswi>0 && $#{$rec->{applurl}}==-1){
       $errorlevel=3;
       my $msg="missing communication urls in application documentation";
       push(@dataissue,$msg);
