@@ -45,6 +45,7 @@ sub new
                 label         =>'URL ID',
                 searchable    =>0,
                 dataobjattr   =>'accessurl.id'),
+      new kernel::Field::RecordUrl(),
                                                  
       new kernel::Field::Text(
                 name          =>'fullname',
