@@ -470,7 +470,6 @@ sub getRequestedReplicationObjects
 
 
    my $rprec=getReplicatePartnerRec($Config,$partner);
-print STDERR Dumper($rprec);
 
    # loading blacklist informations
    my $blacklist=getModuleObject($Config,"replicate::blacklist");
@@ -482,7 +481,6 @@ print STDERR Dumper($rprec);
    $blacklist->SetCurrentView(qw(objtype field));
    my $bl=$blacklist->getHashIndexed("objtype");
 
-   print Dumper($bl);
 
    #
    # loading table list from oracle schema and check tables with :: in it
