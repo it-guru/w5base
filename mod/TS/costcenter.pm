@@ -69,6 +69,9 @@ sub new
                 vjoinonfinish =>sub{
                    my $self=shift;
                    my $flt=shift;
+                   if (ref($flt) ne "HASH"){
+                      Stacktrace();
+                   }
                    my $current=shift;
                    my $f=$flt->{name};
                    $f=~s/\[.*\]$//;
