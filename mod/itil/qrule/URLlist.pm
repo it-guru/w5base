@@ -15,8 +15,8 @@ NONE
 If there are software-instances of type ... 
 Apache 
 SunOne
-... in CI-Status "installed/active" it is mandatory to enter 
-at least one communication URL.
+... in CI-Status "available/in project", "installed/active"
+or "inactiv/stored" it is mandatory to enter at least one communication URL.
 
 
 [de:]
@@ -24,8 +24,8 @@ at least one communication URL.
 Wenn es bei einer Anwendung Software-Instanzen vom Type ...
 Apache
 SunOne
-... im Status "installiert/aktiv" gibt, muß es auch min. eine
-Anwendungs-URL geben.
+... im Status "verfügbar/in Projektierung", "installiert/aktiv"
+oder "zeitweise inaktiv" gibt, muss es auch min. eine Anwendungs-URL geben.
 
 
 
@@ -91,7 +91,8 @@ sub qcheckRecord
          $urlswi++;
       }
    }
-   if ($urlswi>0 && $#{$rec->{applurl}}==-1){
+   if ($urlswi>0 && $#{$rec->{applurl}}==-1 &&
+       $rec->{cistatusid}>2 && $rec->{cistatusid}<6){
       $errorlevel=3;
       my $msg="missing communication urls in application documentation";
       push(@dataissue,$msg);
