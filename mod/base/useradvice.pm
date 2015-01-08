@@ -43,15 +43,26 @@ sub new
                 label         =>'W5BaseID',
                 dataobjattr   =>'useradvice.id'),
 
+      new kernel::Field::TextDrop(
+                name          =>'user',
+                label         =>'Target User',
+                vjointo       =>'base::user',
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
       new kernel::Field::Text(
                 name          =>'advicetext',
                 label         =>'advice text',
                 dataobjattr   =>'useradvice.advicetext'),
 
+      new kernel::Field::Link(
+                name          =>'userid',
+                label         =>'userid',
+                dataobjattr   =>'useradvice.userid'),
+
       new kernel::Field::Select(
                 name          =>'acknowledged',
-                group         =>'customer',
-                label         =>'acknowledg state',
+                label         =>'acknowledge state',
                 value         =>['0','1'],
                 transprefix   =>'ACK.',
                 dataobjattr   =>'useradvice.acknowledged'),
@@ -95,7 +106,7 @@ sub new
                 dataobjattr   =>'useradvice.realeditor'),
 
    );
-   $self->setDefaultView(qw(advicetext fullname cdate));
+   $self->setDefaultView(qw(advicetext acknowledged cdate));
    $self->setWorktable("useradvice");
    return($self);
 }
@@ -140,6 +151,59 @@ sub getDetailBlockPriority
 #   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
 #   return("../../../public/base/load/useradvice.jpg?".$cgi->query_string());
 #}
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+   return("currentAdviceList","countEntries",
+          $self->SUPER::getValidWebFunctions());
+}
+
+
+sub currentAdviceList
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           body=>1,form=>1,
+                           title=>$self->T("user advices"));
+
+   print("hi");
+
+
+   print $self->HtmlBottom(body=>1,form=>1);
+
+
+}
+
+sub countEntries
+{
+   my $self=shift;
+   print $self->HttpHeader("text/xml");
+
+   my $userid=$self->getCurrentUserId();
+
+   $self->SetFilter({acknowledged=>0,userid=>\$userid});
+   my $n=$self->CountRecords();
+
+   
+
+   printf("<root><openadvice>%d</openadvice></root>\n",$n);
+}
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+
+   return(0);
+
+}
+
+
+
+
 
 
 

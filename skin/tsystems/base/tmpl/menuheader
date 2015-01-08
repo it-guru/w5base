@@ -61,9 +61,24 @@ TSI-HELP: <a  style="color:white" href="callto:+498008744357">+49 800 8744357</a
 <div class="navItem"><a target=work href="http://youandme.telekom.de" title="YOU and ME">YOU and ME</a>
 </div>
 
-<div align=right>
+<div align=right style='float:right'>
 %GLOBALHELP()%
 </div>
+
+<!--  Advtisor -->
+<div style="align:right;float:right;margin-left:5px;cursor:hand">
+<span onclick="window.top.displayHints();return(false);">
+<div title='no open messages' id='adv0' style='display:none;width:22;height:21;font-size:11px;float:left;text-align:center;vertical-align:middle;background-image:url("../../base/load/advice0.gif")'>
+&nbsp;
+</div>
+
+<div id='adv1' style='display:none;width:22;height:21;font-size:11px;float:left;text-align:center;vertical-align:middle;background-image:url("../../base/load/advice1.gif")'>
+<span id='advcount' style='display:block;visibility:visible;margin-top:6px;font-weight:bold;color:black;'></span>
+</div>
+
+</span>
+</div>
+<!--   -------->
 
 </div>
 </div>

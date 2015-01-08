@@ -647,7 +647,7 @@ EOF
       $qs="?".$qs if ($qs ne "");
       my $mselurl="${rootpath}msel$menu$qs";
       my $d=$self->getParsedTemplate("tmpl/menutopframe",{static=>
-                                                {  rootpath=>$rootpath,
+                                                {  rootpath=>"../../..",
                                                    menutopurl=>$menutopurl,
                                                    mselurl=>$mselurl,
                                                 }});
