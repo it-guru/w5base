@@ -79,7 +79,7 @@ sub HandleCIStatusModification
    my $id=effVal($oldrec,$newrec,$idfield);
    my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
    if (!defined($id) && defined($newrec) && $newrec->{cistatusid}==6){
-      $self->LastMsg(ERROR,"can't idenfify target record id");
+      $self->LastMsg(ERROR,"can't idenfify target record id in ".$self->Self);
       return(0);
    }
    my $adduniq=0;
