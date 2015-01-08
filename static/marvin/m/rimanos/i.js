@@ -44,6 +44,9 @@ function itemsummary2html(rec,o){
       if (isum.hardware.record[c].assetrefreshstate=="OK"){
          hardware.ok++;
       }
+      else if (isum.hardware.record[c].assetrefreshstate.match(/but OK$/)){
+         hardware.commented++;
+      }
       else{
          hardware.fail++;
       }
@@ -53,6 +56,11 @@ function itemsummary2html(rec,o){
          label:"Hardware OK = "+hardware.ok,
          data:hardware.ok,
          color:"green"
+      },
+      {
+         label:"Hardware Commented = "+hardware.commented,
+         data:hardware.commented,
+         color:"blue"
       },
       {
          label:"HardwareRefresh fail = "+hardware.fail,
