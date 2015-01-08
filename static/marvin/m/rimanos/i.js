@@ -2,6 +2,10 @@ var ApplDetailView=['name','ictono'];
 
 function itemsummary2html(rec,o){
 
+   if (!rec || !rec.itemsummary){
+      console.log("itemsummary2html on invalid rec",rec);
+   }
+
 
    var isum=rec.itemsummary.xmlroot;
    var d={};
@@ -9,7 +13,9 @@ function itemsummary2html(rec,o){
    var dataquality={
       ok:0,
       fail:0,
-      total:0
+      total:0,
+      commented:0,
+      warn:0
    };
    for(c=0;c<isum.dataquality.record.length;c++){
       dataquality.total+=1;
@@ -36,6 +42,8 @@ function itemsummary2html(rec,o){
    var hardware={
       ok:0,
       fail:0,
+      commented:0,
+      warn:0,
       total:0
    };
    for(c=0;c<isum.hardware.record.length;c++){
@@ -43,6 +51,9 @@ function itemsummary2html(rec,o){
       hardware.total+=1;
       if (isum.hardware.record[c].assetrefreshstate=="OK"){
          hardware.ok++;
+      }
+      else if (isum.hardware.record[c].assetrefreshstate=="WARN")){
+         hardware.warn++;
       }
       else if (isum.hardware.record[c].assetrefreshstate.match(/but OK$/)){
          hardware.commented++;
@@ -61,6 +72,11 @@ function itemsummary2html(rec,o){
          label:"Hardware Commented = "+hardware.commented,
          data:hardware.commented,
          color:"blue"
+      },
+      {
+         label:"Hardware Warn = "+hardware.warn,
+         data:hardware.warn,
+         color:"yellow"
       },
       {
          label:"HardwareRefresh fail = "+hardware.fail,
