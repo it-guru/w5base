@@ -21,7 +21,10 @@ function loadScript(url) {
     $("head").append(script);
 }
 
-function call(f){
+function call(f,t){
+   if (!t){
+      t=10;
+   }
    window.setTimeout(f,10);
 }
 loadScript(J5Base_baseUrl+"public/base/load/J5BaseMinimal.js");
@@ -227,7 +230,6 @@ var W5ModuleObject=new Class({
          this.detailView=['fullname','name','cdate','mdate'];
       }
       this.currentView=undefined;
-      this.currentRecord=undefined;
       var This=this;
       $('#'+this.frontname+"-search").live('pageshow',function(e,ui){
          var hash = document.location.hash.replace(/^#/,'');
@@ -320,7 +322,10 @@ var W5ModuleObject=new Class({
              else{
                 var queryStack=$.extend({},This.queryStack);
                 delete queryStack.ID;
-                This.doSearch(queryStack);
+                var r=$("#"+This.frontname+"-search-result-content").html();
+                if (r.match(/^\s*$/)){   /// result content ist noch leer
+                   This.doSearch(queryStack);
+                }
              }
           }
        }
@@ -406,10 +411,13 @@ var W5ModuleObject=new Class({
 
    openDetailResult:function(rec){
       var idname=this.getIdFieldName();
+      console.log("call this.formatDetail",rec);
       $.mobile.loading('hide');
-      var d=this.formatDetail(rec);
       var contentid='#'+this.frontname+"-detail-content";
-      $(contentid).html(d);
+      var d=this.formatDetail(rec,$(contentid));
+      //if (d!=""){
+      //   $(contentid).html(d);
+      //}
       $(contentid).trigger('create');
       window.setTimeout(function(){
          $(contentid+" :input:visible:first").focus();
@@ -420,7 +428,7 @@ var W5ModuleObject=new Class({
       $.mobile.navigate(target);
    },
 
-   formatDetail:function(rec){
+   formatDetail:function(rec,jqo){
       var d='';
       var view=this.getDetailView();
       for(c=0;c<view.length;c++){
@@ -429,6 +437,9 @@ var W5ModuleObject=new Class({
          var ename=this.frontname+"-detail-content-"+name;
          d+="<label for='"+ename+"'>"+name+":</label>";
          var val=new String(rec[name]);
+         //if (val==undefined){
+         //   val="";
+         //}
          if (val.length>45 || val.match(/\n/)){
             d+="<textarea readonly name='"+ename+"'>"+val+"</textarea>";
          }
@@ -438,7 +449,8 @@ var W5ModuleObject=new Class({
          d+="</fieldset>";
       }
       d+='</table>';
-      return(d);
+      jqo.html(d);
+      return;
    },
 
    doSearch:function(filter){
@@ -446,6 +458,7 @@ var W5ModuleObject=new Class({
       this.setFilter(filter);
       var o=this.DataObj();
       this.currentView=this.getListView();
+      console.log("doSearch with View ",this.currentView);
       var useView=this.currentView.slice(0);
       if (useView.indexOf(this.getIdFieldName())==-1){
          useView.push(this.getIdFieldName());
@@ -471,24 +484,28 @@ var W5ModuleObject=new Class({
          alert("not found");
       }
       else if (l.length==1){
+         console.log("found 1 record with view "+this.currentView.join(","));
          if (this.currentView.join(",")!=this.getDetailView().join(",")){
             var idname=this.getIdFieldName();
             var flt={};
             flt[idname]=l[0][idname];
             this.setFilter(flt);
             var o=this.DataObj();
-            this.currentView=this.getDetailView();
-            var useView=this.currentView.slice(0);
+            //this.currentView=this.getDetailView();
+            var new_currentView=this.getDetailView();
+            var useView=new_currentView.slice(0);
             if (useView.indexOf(this.getIdFieldName())==-1){
                useView.push(this.getIdFieldName());
             }
             var This=this; // store this, because it is needed in callback
+            console.log("new search with view "+useView.join(","));
             o.findRecord(useView,function(l){
+                This.currentView=new_currentView;
                 This.handleSearchResult(l);
             });
          }
          else{
-            this.currentRecord=l[0];
+            console.log("call of openDetailResult with ",l[0]);
             this.openDetailResult(l[0]);
          }
       }

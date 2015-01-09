@@ -2,183 +2,185 @@ var ApplDetailView=['name','ictono'];
 
 function itemsummary2html(rec,o){
 
-   if (!rec || !rec.itemsummary){
-      console.log("itemsummary2html on invalid rec",rec);
-   }
-
-
    var isum=rec.itemsummary.xmlroot;
    var d={};
-   //data generation for dataquality
-   var dataquality={
-      ok:0,
-      fail:0,
-      total:0,
-      commented:0,
-      warn:0
-   };
-   for(c=0;c<isum.dataquality.record.length;c++){
-      dataquality.total+=1;
-      if (isum.dataquality.record[c].dataissuestate=="OK"){
-         dataquality.ok++;
-      }
-      else{
-         dataquality.fail++;
-      }
-   }
-   d.dataquality=[
-      {
-         label:"Issue free = "+dataquality.ok,
-         data:dataquality.ok,
-         color:"green"
-      },
-      {
-         label:"DataIssue fail = "+dataquality.fail,
-         data:dataquality.fail,
-         color:"red"
-      }
-   ];
 
-   var hardware={
-      ok:0,
-      fail:0,
-      commented:0,
-      warn:0,
-      total:0
-   };
-   for(c=0;c<isum.hardware.record.length;c++){
-      console.log(isum.hardware.record[c]);
-      hardware.total+=1;
-      if (isum.hardware.record[c].assetrefreshstate=="OK"){
-         hardware.ok++;
-      }
-      else if (isum.hardware.record[c].assetrefreshstate=="WARN")){
-         hardware.warn++;
-      }
-      else if (isum.hardware.record[c].assetrefreshstate.match(/but OK$/)){
-         hardware.commented++;
-      }
-      else{
-         hardware.fail++;
-      }
-   }
-   d.hardware=[
-      {
-         label:"Hardware OK = "+hardware.ok,
-         data:hardware.ok,
-         color:"green"
-      },
-      {
-         label:"Hardware Commented = "+hardware.commented,
-         data:hardware.commented,
-         color:"blue"
-      },
-      {
-         label:"Hardware Warn = "+hardware.warn,
-         data:hardware.warn,
-         color:"yellow"
-      },
-      {
-         label:"HardwareRefresh fail = "+hardware.fail,
-         data:hardware.fail,
-         color:"red"
-      }
-   ];
-
-
-   var system={
-      ok:0,
-      fail:0,
-      total:0
-   };
-   for(c=0;c<isum.system.record.length;c++){
-      console.log(isum.system.record[c]);
-      system.total+=1;
-      if (isum.system.record[c].osanalysestate=="OK"){
-         system.ok++;
-      }
-      else{
-         system.fail++;
-      }
-   }
-   d.system=[
-      {
-         label:"OperationSystem OK = "+system.ok,
-         data:system.ok,
-         color:"green"
-      },
-      {
-         label:"OperationSystem fail = "+system.fail,
-         data:system.fail,
-         color:"red"
-      }
-   ];
-
-
-   var software={
-      ok:0,
-      fail:0,
-      total:0
-   };
-   for(c=0;c<isum.software.record[0].i.length;c++){
-      software.total+=1;
-      if (isum.software.record[0].i[c].osanalysestate=="OK"){
-         software.ok++;
-      }
-      else{
-         software.fail++;
-      }
-   }
-   d.software=[
-      {
-         label:"Software OK = "+software.ok,
-         data:software.ok,
-         color:"green"
-      },
-      {
-         label:"Software fail = "+software.fail,
-         data:software.fail,
-         color:"red"
-      }
-   ];
-
-
-   o.html("");
-   for (var chartname in d){
-      var dataset=d[chartname];
-      o.append("<div id='"+chartname+"_' "+
-         "style='border-style:solid;border-color:gray;width:300px;height:130px;margin:2px;float:left' /></div>");
-      $('#'+chartname+'_').append("<div id='"+chartname+"' style=\"margin-bottom:2px;height:80px\" />");
-      var placeholder=$("#"+chartname);
-      $.plot(placeholder,dataset,{
-         series:{
-            pie:{
-               radius:0.8,
-               show:true
+   var baseTags=new Array('dataquality','hardware','system','software',
+                          'interview');
+   for(tpos=0;tpos<baseTags.length;tpos++){
+      var tag=baseTags[tpos];
+      d[tag]=new Object();
+      d[tag].cnt={
+         ok:0,
+         fail:0,
+         total:0,
+         commented:0,
+         warn:0
+      };
+      if (tag=='dataquality'){
+         d[tag].label="Datenqualit&auml;t";
+         for(c=0;c<isum[tag].record.length;c++){
+            d[tag].cnt.total+=1;
+            if (isum[tag].record[c].dataissuestate=="OK"){
+               d[tag].cnt.ok++;
+            }
+            else if (isum[tag].record[c].dataissuestate=="WARN"){
+               d[tag].cnt.warn++;
+            }
+            else if (isum[tag].record[c].dataissuestate.match(/but OK$/)){
+               d[tag].cnt.commented++;
+            }
+            else{
+               d[tag].cnt.fail++;
             }
          }
+      }
+      if (tag=='hardware'){
+         d[tag].label="Hardware-Refresh";
+         for(c=0;c<isum.hardware.record.length;c++){
+            d[tag].cnt.total+=1;
+            if (isum[tag].record[c].assetrefreshstate=="OK"){
+               d[tag].cnt.ok++;
+            }
+            else if (isum[tag].record[c].assetrefreshstate=="WARN"){
+               d[tag].cnt.warn++;
+            }
+            else if (isum[tag].record[c].assetrefreshstate.match(/but OK$/)){
+               d[tag].cnt.commented++;
+            }
+            else{
+               d[tag].cnt.fail++;
+            }
+         }
+      }
+      if (tag=='system'){
+         d[tag].label="Betriebssystemversion";
+         for(c=0;c<isum[tag].record.length;c++){
+            d[tag].cnt.total+=1;
+            if (isum[tag].record[c].osanalysestate=="OK"){
+               d[tag].cnt.ok++;
+            }
+            else if (isum[tag].record[c].osanalysestate=="WARN"){
+               d[tag].cnt.warn++;
+            }
+            else if (isum[tag].record[c].osanalysestate.match(/but OK$/)){
+               d[tag].cnt.commented++;
+            }
+            else{
+               d[tag].cnt.fail++;
+            }
+         }
+      }
+      if (tag=='software'){
+         d[tag].label="Software-Installationen";
+         for(c=0;c<isum[tag].record[0].i.length;c++){
+            d[tag].cnt.total+=1;
+            if (isum[tag].record[0].i[c].softwareinstrelstate=="OK"){
+               d[tag].cnt.ok++;
+            }
+            else if (isum[tag].record[0].i[c].softwareinstrelstate=="WARN"){
+               d[tag].cnt.warn++;
+            }
+            else if (isum[tag].record[0].i[c].
+                     softwareinstrelstate.match(/but OK$/)){
+               d[tag].cnt.commented++;
+            }
+            else{
+               d[tag].cnt.fail++;
+            }
+         }
+      }
+      if (tag=='interview'){
+         d[tag].label="Interview(HCO)";
+         for(c=0;c<isum[tag].record.length;c++){
+            d[tag].cnt.total+=1;
+            if (isum[tag].record[c].questionstate=="OK"){
+               d[tag].cnt.ok++;
+            }
+            else if (isum[tag].record[c].questionstate=="WARN"){
+               d[tag].cnt.warn++;
+            }
+            else if (isum[tag].record[c].
+                     questionstate.match(/but OK$/)){
+               d[tag].cnt.commented++;
+            }
+            else{
+               d[tag].cnt.fail++;
+            }
+         }
+      }
+      d[tag].plot=[
+         {
+            label:"OK:"+d[tag].cnt.ok,
+            data:d[tag].cnt.ok,
+            color:"green"
+         },
+         {
+            label:"Commented:"+d[tag].cnt.commented,
+            data:d[tag].cnt.commented,
+            color:"blue"
+         },
+         {
+            label:"Warn:"+d[tag].cnt.warn,
+            data:d[tag].cnt.warn,
+            color:"yellow"
+         },
+         {
+            label:"Fail:"+d[tag].cnt.fail,
+            data:d[tag].cnt.fail,
+            color:"red"
+         }
+      ];
+   }
+
+   var col=0;
+   for (var chartname in d){
+      var dataset=d[chartname].plot;
+      col=col+1;
+      o.append("<div id='"+chartname+"_border' "+
+         "style='border-style:solid;border-color:gray;"+
+         "width:300px;height:150px;margin:2px;float:left' />");
+
+      $('#'+chartname+'_border').append("<p align=center>"+
+                                        d[chartname].label+
+                                        "</p>");
+      $('#'+chartname+'_border').append("<div id='"+chartname+"_plot' "+
+         "style=\"margin-bottom:2px;height:80px;width:280px\" />");
+      var placeholder=$("#"+chartname+"_plot");
+      $.plot(placeholder,dataset,{
+              series:{
+                 pie:{
+                    radius:0.8,
+                    show:true
+                 }
+              }
       });
+      if (col==2){
+         o.append("<div style='clear:both' />");
+         col=0;
+      }
    }
 }
 
-function formatDetail(rec){
-   console.log("formatDetail on ",this);
-   var d=this.SUPER('formatDetail',rec);
-   d+="<hr><div id='summaryresult'></div>";
+function formatDetail(rec,jqo){
+   this.SUPER('formatDetail',rec,jqo);
    var o=this.DataObj();
-   var useView=['itemsummary','name','id'];
-   $.mobile.loading('show');
-   o.findRecord(useView,function(l){
-      if (l.length==0){
-         $('#summaryresult').html("record not found");
-      }
-      else{
-         itemsummary2html(l[0],$('#summaryresult'));
+   jqo.append("<hr><div id=summaryresult />");
+   call(function(){
+      var useView=['itemsummary','name','id'];
+      $.mobile.loading('show');
+      o.findRecord(useView,function(l){
+         if (l.length==0){
+            $('#summaryresult').html("record not found");
+         }
+         else{
+            itemsummary2html(l[0],$('#summaryresult'));
 
-      } 
-      $.mobile.loading('hide');
-   });
-   return(d);
+         } 
+         $.mobile.loading('hide');
+      });
+   },1000);
+   return;
 }
 
 // derevation for itil::appl
