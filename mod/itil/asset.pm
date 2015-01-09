@@ -413,19 +413,13 @@ sub new
                 htmldetail    =>0,
                 searchable    =>1,
                 label         =>'Hardware refresh light',
-                dataobjattr   =>
-                "if (asset.deprstart is not null,".
-                    "if (".
-                        "if (asset.denyupdvalidto>".
-                             "date_add(asset.deprstart,INTERVAL 60 MONTH),".
-                             "asset.denyupdvalidto,".
-                             "date_add(asset.deprstart,INTERVAL 60 MONTH)".
-                             ")<now(),'red','green'),'unknown')"),
+                dataobjattr   =>getSQLrefreshstateCommand()),
 
      new kernel::Field::Text(
                 name          =>'assetrefreshstate',
                 group         =>'upd',
                 htmldetail    =>0,
+                readonly      =>1,
                 searchable    =>0,
                 label         =>'Hardware refresh state',
                 depend        =>['deprstart','denyupdvalidto','refreshstate'],
@@ -434,9 +428,22 @@ sub new
                    my $current=shift;
                    my $fo=$self->getParent->getField("refreshstate");
                    my $f=$fo->RawValue($current);
+                   $f=~s/\s.*$//;
                    my $s="FAIL";
                    if ($f eq "green"){
                       $s="OK"
+                   }
+                   elsif ($f eq "yellow"){
+                      $s="WARN"
+                   }
+                   elsif ($f eq "lightgreen"){
+                      $s="WARN but OK"
+                   }
+                   elsif ($f eq "red"){
+                      $s="FAIL"
+                   }
+                   elsif ($f eq "blue"){
+                      $s="FAIL but OK"
                    }
                    return($s);
                 }),
@@ -658,6 +665,52 @@ sub new
    $self->setDefaultView(qw(name mandator cistatus mdate));
    $self->setWorktable("asset");
    return($self);
+}
+
+sub getSQLrefreshstateCommand
+{
+   my $shortterm="INTERVAL 36 MONTH";
+   my $longterm="INTERVAL 60 MONTH";
+   my $d=<<EOF;
+
+if (asset.deprstart is not null,
+   if (asset.refreshpland is not null and asset.refreshpland>sysdate(),
+      'green => refreshplaned is set',
+   /*ELSE no refresh planed is set*/
+      if (asset.denyupdvalidto is not null and asset.denyupd>0,
+         if (date_add(asset.denyupdvalidto,INTERVAL -1 MONTH)<sysdate(),
+            'yellow',
+         /*ELSE Begruendungsendezeitpunkt liegt ausreichend in der Zukunft*/
+            if (length(asset.denyupdcomments)>10,
+               'blue =>comment exists and is valid',
+            /*ELSE kein Begründungstext vorhanden*/
+               'red => 5 years and no comments'
+            )
+         ),
+      /*ELSE kein Begruendungsendezeitpunkt*/
+         if (date_add(asset.deprstart,${longterm})<sysdate(),
+            'red => 5 years',
+         /*ELSE*/
+            if (date_add(asset.deprstart,${shortterm})<sysdate(),
+               if (length(asset.denyupdcomments)>10,
+                  'lightgreen',
+               /*ELSE Bemerkung nicht vorhanden*/
+                  'yellow => 3 years and no comments'
+               ),
+            /*ELSE*/
+               'green'
+            )
+         )
+      )
+   ),
+/*ELSE Abschreibungsbegin nicht gesetzt*/
+   'yellow => no deprstart'
+)
+
+
+EOF
+
+   return($d);
 }
 
 
