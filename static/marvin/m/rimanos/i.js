@@ -134,6 +134,7 @@ function itemsummary2html(rec,o){
    }
 
    var col=0;
+   o.html("");
    for (var chartname in d){
       var dataset=d[chartname].plot;
       col=col+1;
