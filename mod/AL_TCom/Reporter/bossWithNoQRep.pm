@@ -72,27 +72,27 @@ sub onChange
    my $newrec=shift;
 
    my $msg="";
-   my $old=CSV2Hash($oldrec->{textdata},"id");
-   my $new=CSV2Hash($newrec->{textdata},"id");
-   foreach my $id (keys(%{$old->{id}})){
-      if (!exists($new->{id}->{$id})){
+   my $old=CSV2Hash($oldrec->{textdata},"userid");
+   my $new=CSV2Hash($newrec->{textdata},"userid");
+   foreach my $userid (keys(%{$old->{userid}})){
+      if (!exists($new->{userid}->{$userid})){
          my $m=$self->T('- "%s" (W5BaseID:%s) has left the list');
-         $msg.=sprintf($m."\n",$old->{id}->{$id}->{name},$id);
+         $msg.=sprintf($m."\n",$old->{userid}->{$userid}->{user},$userid);
          #$msg.="  ".join(",",
          #    map({$_=$old->{id}->{$id}->{$_}} keys(%{$old->{id}->{$id}})));
       }
    }
-   foreach my $id (keys(%{$new->{id}})){
-      if (!exists($old->{id}->{$id})){
+   foreach my $userid (keys(%{$new->{userid}})){
+      if (!exists($old->{userid}->{$userid})){
          my $m=$self->T('+ "%s" (W5BaseID:%s) has been added to the list');
-         $msg.=sprintf($m."\n",$new->{id}->{$id}->{name},$id);
+         $msg.=sprintf($m."\n",$new->{userid}->{$userid}->{user},$userid);
       }
       else{
-         if ($old->{id}->{$id}->{name} ne 
-             $new->{id}->{$id}->{name}){
+         if ($old->{userid}->{$userid}->{user} ne 
+             $new->{userid}->{$userid}->{user}){
             my $m=$self->T('<> "%s" (W5BaseID:%s) renamed to "%s"');
-            $msg.=sprintf($m."\n",$old->{id}->{$id}->{name},$id,
-                                  $new->{id}->{$id}->{name});
+            $msg.=sprintf($m."\n",$old->{userid}->{$userid}->{user},$userid,
+                                  $new->{userid}->{$userid}->{user});
          }
       }
    }
