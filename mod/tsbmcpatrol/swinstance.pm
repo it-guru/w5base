@@ -83,7 +83,7 @@ sub new
                 dataobjattr   =>'of_connectstr'),
 
       new kernel::Field::Textarea(
-                name          =>'ovcomments',
+                name          =>'ofcomments',
                 htmldetail    =>1,
                 uploadable    =>1,
                 group         =>'bmcdata',
