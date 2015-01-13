@@ -131,7 +131,7 @@ sub new
                 name          =>'denv',
                 label         =>'destination Env',
                 transprefix   =>'ENV.',
-                value         =>['Production','Integration',''],
+                value         =>['Production','Integration','None',''],
                 dataobjattr   =>'denv'),
 
       new kernel::Field::Textarea(
