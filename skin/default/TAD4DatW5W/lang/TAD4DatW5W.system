@@ -1,0 +1,8 @@
+'TAD4DatW5W::system'=>{de=>'TAD4DatW5W: System',en=>'TAD4DatW5W: System'},
+'fieldgroup.software'=>{de=>'Software',en=>'Software'},
+'fieldgroup.agent'=>{de=>'TAD4DatW5W Agent',en=>'TAD4DatW5W Agent'},
+'Serialnumber'=>{de=>'Seriennummer'},
+'IP-Address'=>{de=>'IP-Adresse'},
+'Scan-Date'=>{de=>'Scan-Datum'},
+'Enviroment'=>{de=>'Umgebung'},
+

@@ -1,0 +1,11 @@
+'TAD4DatW5W::software'=>{de=>'TAD4DatW5W Softwareinstallation',en=>'TAD4DatW5W Software installation'},
+'Vendor'=>{de=>'Hersteller'},
+'Scan-Date'=>{de=>'Scan-Datum'},
+'fieldgroup.productinfo'=>{de=>'Software Produkt Infos',en=>'Software Product infos'},
+'is PVU (Processor Value Unit) posible'=>{de=>'ist PVU (Processor Value Unit) möglich'},
+'is RVU (Processor Value Unit) posible'=>{de=>'ist RVU (Processor Value Unit) möglich'},
+'is SubCapacity posible'=>{de=>'ist SubCapacity möglich'},
+'free of charge'=>{de=>'kostenlos'},
+'Scan/Mapping confidence'=>{de=>'Scan/Mapping Verlässlichkeit'},
+
+
