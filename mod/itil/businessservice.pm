@@ -2084,6 +2084,9 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @l=qw(header default history);
+   if ($self->IsMemberOf("admin")){
+      push(@l,qw(qc));
+   }
    if ($rec->{applid} ne ""){
       push(@l,qw(desc uservicecomp servicecomp));
    }
