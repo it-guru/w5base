@@ -126,7 +126,7 @@ sub  recalcResponsiblegrp
          my %grpid;
          foreach my $grec (@{$usrrec->{groups}}){
             if (ref($grec->{roles}) eq "ARRAY"){
-               if (grep(/^(REmployee|RBoss|RBoss2)$/,@{$grec->{roles}})){
+               if (in_array($grec->{roles},[orgRoles])){
                   $grp{$grec->{group}}++;
                   $grpid{$grec->{grpid}}++;
                }
