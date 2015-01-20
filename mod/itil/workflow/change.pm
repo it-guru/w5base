@@ -211,7 +211,8 @@ sub getNotifyDestinations
    if ($mode eq "all"){
       my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
       my $aaflt=[{toapplid=>$applid,
-                  cistatusid=>[4]}];
+                  cistatusid=>[4],
+                  fromapplcistatus=>[3,4,5]}];
       $aa->SetFilter($aaflt);
       foreach my $aarec ($aa->getHashList(qw(fromapplid toapplid contype
                                            toapplcistatus))){
@@ -919,8 +920,6 @@ sub Process
              class    =>'base::workflow::mailsend',
              step     =>'base::workflow::mailsend::dataload',
              name     =>$subject,
-             skinbase       =>'base',
-             emailtemplate  =>'eventnotification',
              emailfrom      =>$emailfrom,
              emailto        =>\@emailto,
              emailcc        =>\@emailcc,

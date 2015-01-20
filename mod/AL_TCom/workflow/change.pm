@@ -344,17 +344,20 @@ sub getNotifyDestinations
    my @ccbyfunc;
    $appl->ResetFilter();
    $appl->SetFilter({id=>$applid});
-   my @fl=qw(semid sem2id tsmid tsm2id);
+   my @fl=qw(semid sem2id tsmid tsm2id applmgrid applmgr2id);
    my @ifid;
    foreach my $rec ($appl->getHashList(@fl)){
-      push(@tobyfunc,$rec->{tsmid})  if ($rec->{tsmid}>0);
-      push(@ccbyfunc,$rec->{tsm2id}) if ($rec->{tsm2id}>0);
-      push(@tobyfunc,$rec->{semid})  if ($rec->{semid}>0);
-      push(@ccbyfunc,$rec->{sem2id}) if ($rec->{sem2id}>0);
+      push(@tobyfunc,$rec->{tsmid})      if ($rec->{tsmid}>0);
+      push(@ccbyfunc,$rec->{tsm2id})     if ($rec->{tsm2id}>0);
+      push(@tobyfunc,$rec->{semid})      if ($rec->{semid}>0);
+      push(@ccbyfunc,$rec->{sem2id})     if ($rec->{sem2id}>0);
+      push(@tobyfunc,$rec->{applmgrid})  if ($rec->{applmgrid}>0);
+      push(@ccbyfunc,$rec->{applmgr2id}) if ($rec->{applmgr2id}>0);
    }
    my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
-   my $aaflt=[{fromapplid=>$applid},
-              {toapplid=>$applid}];
+   my $aaflt=[{toapplid=>$applid,
+               cistatusid=>[4],
+               fromapplcistatus=>[3,4,5]}];
    $aa->SetFilter($aaflt);
    foreach my $aarec ($aa->getHashList(qw(fromapplid toapplid contype
                                         toapplcistatus))){
@@ -415,7 +418,7 @@ sub getPosibleButtons
    my $self=shift;
    my $WfRec=shift;
    my %buttons=$self->SUPER::getPosibleButtons($WfRec);
-   $buttons{"PublishTComMode"}=$self->T('AL-TCom Change notification');
+   $buttons{"PublishTComMode"}=$self->T('TelekomIT Change notification');
    delete($buttons{BreakWorkflow});
    delete($buttons{NextStep});
    return(%buttons);

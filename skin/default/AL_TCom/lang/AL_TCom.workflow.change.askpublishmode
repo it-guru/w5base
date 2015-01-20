@@ -1,17 +1,14 @@
-'MSG001'=>{de=>'Sehr geehrte Damen und Herren,
-
+'MSG001'=>{
+de=>'Sehr geehrte Damen und Herren,
 hiermit informieren wir Sie über den beigefügten Change. 
-Sie erhalten diese Information in Ihrer Funktion als CBM oder TSM der betroffenen Anwendung sowie als TSM/TSM-Vetreter einer Schnittstellenanwendung.
-Bitte prüfen Sie evtl. todos in ServiceCenter für diesen Change (approve, confirm, etc.).
+Sie erhalten diese Information weil eine Applikation aus Ihrem Verantwortungsbereich als TSM, CBM/IT-SeM oder AM direkt oder über eine kritische Schnittstelle von diesem Change betroffen ist, oder Sie sich die Changebenachrichtigung für eine der direkt betroffenen Anwendungen abonniert haben. 
+Bitte stellen Sie eine zeitnahe Bearbeitung sicher, falls von Ihnen Tasks oder Approvals bearbeitet werden müssen.
+(Bitte beachten Sie, dass der beigefügte Direkt-Link die Information aus ServiceCenter mit einer Verzögerung von bis zu 15Min wiedergibt!)',
 
-(Bitte beachten Sie, dass der beigefügte Direkt-Link die Information aus ServiceCenter mit 10-15min Verzögerung wiedergibt!)
-',
-en=>'Dear Sir or Madam,
 
-herewith we inform you about the change below.
-You get this Information in your role as CBM or TSM of the affected application as well as TSM/TSM-Deputy of an Interface application.
-Please check possible todos in ServiceCenter for this change.
-
-(Please note, that the attached direct-link shows the informations from ServiceCenter with a delay from 10-15min!)
-'},
-'Telekom IT Change notification'=>{de=>'Telekom IT Benachrichtungsmodus'},
+en=>'Ladies and Gentlemen,
+you receive this information because one (or more) application(s) within your responsibility as TSM, CBM/IT-SeM or AM will be affected directly or via interface by the change below, or if you subscribed the Changenotification for one of the directly affected applications.
+In case you have approvals to give or tasks to perform please make sure to do it as soon as possible.
+(please allow for a 15 minute delay before using the attached link) '
+},
+'TelekomIT Change notification'=>{de=>'TelekomIT Benachrichtigungsmodus'},
