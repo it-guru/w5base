@@ -94,7 +94,7 @@ my @requested_phase=split(/[,; ]+/,$opt_p);
 #
 # small pack of records, witch be passed in one operation (commit)
 #
-my $smallpack=100;
+my $smallpack=50;
 if ($opt_s ne ""){
    if ($opt_s=~m/^\d+$/){
       $smallpack=$opt_s;
