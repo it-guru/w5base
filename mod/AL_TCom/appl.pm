@@ -346,8 +346,17 @@ sub ItemSummary
            $h->{answerrelevant}=$a->{relevant};
            $h->{answercomments}=$a->{comments};
            $h->{answerlevel}=$a->{answerlevel};
-           if ($h->{answerlevel}>75){
+           if ($h->{answerlevel}>99){
               $h->{questionstate}='OK';
+           }
+           elsif ($h->{answerlevel}>=50){
+              $h->{questionstate}='WARN';
+           }
+        }
+        if ($h->{questionstate} ne "OK" &&
+            $h->{questionstate} ne ""){
+           if (length($h->{answercomments})>10){
+              $h->{questionstate}.=" but OK"; 
            }
         }
         push(@q,$h);
