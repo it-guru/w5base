@@ -31,14 +31,13 @@ use Time::HiRes qw(usleep sleep);
 use DBI;
 use POSIX;
 use vars qw($opt_v $opt_h $opt_c $opt_t $opt_p $opt_f
-            $opt_s $opt_q $opt_l $configname);
+            $opt_q $opt_l $configname);
 $|=1;
 my $startProcessPPID=getppid(); # there is need to check ppid at at start 
                                 # against current, because IO::Multiplex and
                                 # DBD::Oracle modifies SIGPIPE Handler!
 
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
-                        'smallpack=i'=>\$opt_s,
                         'tasks=i'=>\$opt_t,
                         'phase=s'=>\$opt_p,
                         'quietmode'=>\$opt_q,
@@ -95,14 +94,6 @@ my @requested_phase=split(/[,; ]+/,$opt_p);
 # small pack of records, witch be passed in one operation (commit)
 #
 my $smallpack=50;
-if ($opt_s ne ""){
-   if ($opt_s=~m/^\d+$/){
-      $smallpack=$opt_s;
-   }
-   else{
-      Help();exit(255);
-   }
-}
 
 
 #
@@ -614,6 +605,7 @@ sub getRequestedReplicationObjects
       if ($ctrl->{'requested'} && $ctrl->{'valid'}){ # records are exists
          my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
          $ctrl->{'entrycount'}=$rorec->{'entrycount'};
+         $ctrl->{'commitblocksize'}=$rorec->{'commitblocksize'};
          $ctrl->{'allow_phase1'}=$rorec->{'allow_phase1'};
          $ctrl->{'allow_phase2'}=$rorec->{'allow_phase2'};
          $ctrl->{'allow_phase3'}=$rorec->{'allow_phase3'};
@@ -639,6 +631,10 @@ sub objectReplicationPhase1
    my $ctrl=shift;
    my $start=time();
    my $p1smallpack=$smallpack;
+
+   if ($ctrl->{commitblocksize}>0){
+      $p1smallpack=$ctrl->{commitblocksize};
+   }
 
 
 
@@ -797,6 +793,12 @@ sub objectReplicationPhase2
    my $phaselimit=shift;
    my $ctrl=shift;
    my $start=time();
+   my $p2smallpack=$smallpack;
+
+   if ($ctrl->{commitblocksize}>0){
+      $p2smallpack=$ctrl->{commitblocksize};
+   }
+
    msg(INFO,"============================================");
    msg(INFO,"start: phase 2 replication for $ctrl->{name} - refresh");
    my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
@@ -864,7 +866,7 @@ sub objectReplicationPhase2
               " on \"$ctrl->{name}\".$ctrl->{idname}=\"_$ctrl->{name}\".refid ".
               $basewhere.
               "order by \"_$ctrl->{name}\".w5repllasttry NULLS FIRST) ".
-              "where ROWNUM<$smallpack";
+              "where ROWNUM<$p2smallpack";
       msg(INFO,"oracmd=$cmd");
       my @buffer=$dbi->getHashList($cmd);
       if ($#buffer==-1){

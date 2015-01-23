@@ -70,3 +70,4 @@ CREATE TABLE replicateblacklist (
     REFERENCES replicatepartner (id)
     ON DELETE CASCADE
 ) ENGINE=INNODB;
+alter table replicateobject add commitblocksize tinyint(3) default '50';

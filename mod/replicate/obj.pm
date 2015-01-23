@@ -82,6 +82,13 @@ sub new
                 label         =>'minimal refresh latency',
                 dataobjattr   =>'replicateobject.minrefreshlatency'),
 
+      new kernel::Field::Select(
+                name          =>'commitblocksize',
+                label         =>'commit block size',
+                value         =>['25','50','75','100','125','150'],
+                default       =>'50',
+                dataobjattr   =>'replicateobject.commitblocksize'),
+
       new kernel::Field::Textarea(
                 name          =>'qfilter',
                 label         =>'replication filter',

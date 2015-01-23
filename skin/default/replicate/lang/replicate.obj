@@ -12,3 +12,4 @@
 'minimal refresh latency'=>{de=>'minimale Phase2 Latenz'},
 'replication filter'=>{de=>'Replikations Filter-Ausdruck'},
 'averanged record access time'=>{de=>'mitllere Datensatz Zugriffszeit'},
+'commit block size'=>{de=>'Commit-Block Größe'},
