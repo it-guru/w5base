@@ -9,7 +9,7 @@ Please verfiy your login informations. Further informations
 about the login procedure will be find on the login page.
 </td></tr>
 <tr>
-<td colspan=2 align=center><input type=button onclick="document.location.href='../../../public/base/menu/root';" value=" back to login page "></td>
+<td colspan=2 align=center><input type=button onclick="document.location.href='../../../../public/base/menu/root';" value=" back to login page "></td>
 </tr>
 </table>
 </div>
