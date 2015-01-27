@@ -83,7 +83,23 @@ sub new
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'curdate')
+                dataobjattr   =>'curdate'),
+
+      new kernel::Field::Textarea(
+                name          =>'rawscan',
+                group         =>'source',
+                label         =>'raw Scan-Data',
+                dataobjattr   =>"
+   (select ATTRIBUTE_SHORT_VALUE from SAS_SERVER_CUST_ATTRIBUTES 
+   where SAS_SERVER_CUST_ATTRIBUTES.item_id=locicalsystem.item_id 
+      and SAS_SERVER_CUST_ATTRIBUTES.ATTRIBUTE_NAME='TI.CSO_ao_mw_scanner'
+      and (select DATE_DIMENSION.FULL_DATE_LOCAL curdate 
+           from DATE_DIMENSION 
+           where DATE_DIMENSION.FULL_DATE_LOCAL between SYSDATE-1 AND SYSDATE) 
+        between SAS_SERVER_CUST_ATTRIBUTES.begin_date 
+           and SAS_SERVER_CUST_ATTRIBUTES.end_date
+      and ROWNUM<2)")
+
    );
    $self->setDefaultView(qw(name systemid primaryip mdate));
    return($self);
