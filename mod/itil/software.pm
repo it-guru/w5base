@@ -39,6 +39,8 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'software.id'),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'fullname',
