@@ -517,8 +517,18 @@ sub new
                 group         =>'source',
                 label         =>'RealEditor',
                 dataobjattr   =>'ipaddress.realeditor'),
-   
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"ipaddress.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(ipaddress.id,35,'0')")
    );
    $self->setDefaultView(qw(name system dnsname cistatus mdate));
    $self->setWorktable("ipaddress");

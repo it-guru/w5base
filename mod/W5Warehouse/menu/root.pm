@@ -50,6 +50,10 @@ sub Init
                       "W5Warehouse::AppSysAss",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.W5Warehouse.Rep.Systemhardening",
+                      "W5Warehouse::Systemhardening",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itu.W5Warehouse.Rep.IT_SeM",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
