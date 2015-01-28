@@ -616,7 +616,7 @@ sub new
                 htmleditwidth =>'80%',
                 label         =>'Life Parameters',
                 group         =>'swinstanceparam',
-                vjoinbase     =>{'islatest'=>'1'},
+                vjoinbase     =>{'islatest'=>'1',mdate=>'>now-56d'},
                 vjointo       =>'itil::lnkswinstanceparam',
                 vjoinon       =>['id'=>'swinstanceid'],
                 vjoindisp     =>['namegrp','name','val']),
