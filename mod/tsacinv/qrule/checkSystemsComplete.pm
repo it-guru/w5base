@@ -109,7 +109,9 @@ sub qcheckRecord
    my %sollsystemid;
 
    foreach my $r (@soll){
-      $sollsystemid{$r->{systemid}}=$r->{systemname} if ($r->{systemid} ne "");
+      if ($r->{systemid} ne ""){
+         $sollsystemid{uc($r->{systemid})}=$r->{systemname};
+      }
    }
    if (keys(%sollsystemid)){
       my $o=getModuleObject($self->getParent->Config,"itil::system");
@@ -119,14 +121,10 @@ sub qcheckRecord
       my @ist=$o->getHashList(qw(name systemid));
       my %istsystemid;
       foreach my $r (@ist){
-         $istsystemid{$r->{systemid}}++ if ($r->{systemid} ne "");
+         if ($r->{systemid} ne ""){
+            $istsystemid{uc($r->{systemid})}++;
+         }
       }
-      #printf STDERR ("name=%s\n",$rec->{name});
-      #printf STDERR ("sollsystemid=%s\n",Dumper(\%sollsystemid));
-      #printf STDERR ("istsystemid=%s\n",Dumper(\%istsystemid));
-
-
-
 
       my @miss;
       foreach my $r (sort(keys(%sollsystemid))){
