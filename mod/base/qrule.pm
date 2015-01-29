@@ -583,7 +583,7 @@ sub nativQualityCheck
          $W5V2::OperationContext="QualityCheck";
          #msg(INFO,"QualityRule Level5");
          if (!defined($WfRec)){
-            #msg(INFO,"QualtiyCheck: ".
+            #msg(INFO,"QualityCheck: ".
             #         "an old record does not exists - so i create a new one");
             my $newrec={name=>$name,
                         detaildescription=>$detaildescription,
@@ -604,7 +604,7 @@ sub nativQualityCheck
             $result->{wfheadid}=$bk;
          }
          else{
-            msg(INFO,"QualtiyCheck: ".
+            msg(INFO,"QualityCheck: ".
                      "an old record exists - so i update the record");
             my $newrec={name=>$name,
                         mdate=>$WfRec->{mdate},
