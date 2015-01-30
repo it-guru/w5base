@@ -1097,7 +1097,7 @@ sub WinHandleInfoAboSubscribe
 <td>
 <div style="height:100%;margin:0">
 <select size=5 name=infoabo onchange="document.forms[0].submit();" 
-        style="width:570px;height:100%;overflow:hidden">
+        style="width:570px;height:100%;overflow:auto">
 $optionlist</select>
 </div>
 </td>
