@@ -13,8 +13,11 @@ sub new
    
    $self->setWorktable("SYSTEMHARDENING");
    $self->setDefaultView(qw(linenumber 
+                            applicationid
                             anwendungsname 
-                            systemname ));
+                            icto_id
+                            systemname 
+                            ip_adresse));
    return($self);
 }
 
