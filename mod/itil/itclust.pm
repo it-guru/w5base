@@ -66,7 +66,7 @@ sub new
                                  'Sun-Cluster',
                                  'Veritas-Cluster',
                                  'Microsoft-Cluster',
-                                 'Oracle-RAC-Cluster',
+                                 'Oracle-Clusterware',
                                  'HP-Metrocluster',
                                  'MSSQL-Cluster',
                                  'Loadbalancer',
