@@ -54,9 +54,7 @@ sub AddAllFieldsFromWorktable
       $dict->SetFilter({aliasowner=>\'W5I',alias=>\$worktable});
       foreach my $fld ($dict->getHashList(qw(fieldname fieldtype))){
          my $name=lc($fld->{fieldname});
-         if ($name=~m/\s/){
-            $name=~s/[\s\.-]/_/g;
-         }
+         $name=~s/[\s\.-]/_/g;
          my $label=$fld->{fieldname};
          if (!($label=~m/[ ,a-z]/)){
             $label=~s/_/ /g; 
