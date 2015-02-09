@@ -44,8 +44,7 @@ sub getOptionalModules
    my $self=shift;
    # Digest/SHA1 for mysql server interface
 
-   return qw(SC::API
-             SC::Customer::TSystems
+   return qw(
              LWP::UserAgent
              SOAP::Lite
              MIME::Base64
