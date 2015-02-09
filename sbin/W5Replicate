@@ -1323,12 +1323,16 @@ sub preprocessRecord
          $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
       }
       if (ref($rec{$fieldname}) eq "ARRAY"){
-         if ($#{$rec{$fieldname}}>=0 &&
-             ref($rec{$fieldname}->[0]) ne "HASH"){
-            $rec{$fieldname}=join("; ",@{$rec{$fieldname}});
+         if ($#{$rec{$fieldname}}>=0){
+            if (ref($rec{$fieldname}->[0]) ne "HASH"){
+               $rec{$fieldname}=join("; ",@{$rec{$fieldname}});
+            }
+            else{
+               $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
+            }
          }
          else{
-            $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
+            $rec{$fieldname}=undef;
          }
       }
       if (ref($rec{$fieldname}) eq "HASH"){
