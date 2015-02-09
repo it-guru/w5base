@@ -1146,19 +1146,6 @@ sub new
                 dataobjattr   =>"lpad(system.id,35,'0')"),
 
       new kernel::Field::SubList(
-                name          =>'customer',
-                htmldetail    =>0,
-                readonly      =>1,
-                htmlwidth     =>'400px',
-                label         =>'Customer',
-                group         =>'applications',
-                subeditmsk    =>'subedit.appl',
-                vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{applcistatusid=>"<=4"}],
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['applcustomer','appl']),
-
-      new kernel::Field::SubList(
                 name          =>'customerprio',
                 htmldetail    =>0,
                 readonly      =>1,
