@@ -1210,6 +1210,12 @@ sub generateNotificationPreview
       $emailcc=join("; ",grep(!/^\s*$/,@{$param{cc}}));
    }
 
+   my $emailbcc="";
+ 
+   if (ref($param{bcc}) eq "ARRAY"){
+      $emailbcc=join("; ",grep(!/^\s*$/,@{$param{bcc}}));
+   }
+
    my $preview=$self->getParent->T("Preview");
    $preview.=":";
 #   if (defined($param{subject})){
@@ -1217,6 +1223,7 @@ sub generateNotificationPreview
 #   }
    my $tomsg=$self->getParent->T("To");
    my $ccmsg=$self->getParent->T("CC");
+   my $bccmsg=$self->getParent->T("BCC");
    my $subjectmsg=$self->getParent->T("Subject");
    my $sepstart="<table class=emailpreviewset border=1>";
    my $sepend="</table>";
@@ -1236,6 +1243,12 @@ EOF
 <tr>
 <td valign=top><b>$ccmsg:</b></td>
 <td>$emailcc</td>
+</tr>
+EOF
+   $templ.=<<EOF if ($emailbcc ne "");
+<tr>
+<td valign=top><b>$bccmsg:</b></td>
+<td>$emailbcc</td>
 </tr>
 EOF
    $templ.=<<EOF if ($param{subject});

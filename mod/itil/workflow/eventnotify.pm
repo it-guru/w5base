@@ -3492,7 +3492,7 @@ sub generateWorkspace
                                              subject=>$subject,
                                              emailsubheader=>\@emailsubheader,
                                              emailsubtitle=>\@emailsubtitle,
-                                             to=>\@email));
+                                             bcc=>\@email));
 }
 
 sub getPosibleButtons
@@ -3707,8 +3707,9 @@ sub Process
              emailtemplate  =>'eventnotification',
              skinbase       =>$self->getParent->getNotificationSkinbase($WfRec),
              emailfrom      =>$emailfrom,
-             emailto        =>\@emailto,
+             #emailto        =>\@emailto,
              emailcc        =>\@emailcc,
+             emailbcc       =>\@emailto,
              emaillang      =>$eventlang,
              emailprefix    =>\@emailprefix,
              emailpostfix   =>\@emailpostfix,
