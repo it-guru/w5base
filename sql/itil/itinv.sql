@@ -1396,3 +1396,5 @@ alter table businessservice add curr_perf int(10) default NULL, add requ_perf va
 alter table businessservice add  slacomments longtext default NULL;
 alter table businessservice add  reviewperiod varchar(20) default NULL;
 alter table businessservice add  servicesupport bigint(20) default NULL;
+alter table appl add mainusetime text default NULL;
+alter table appl add secusetime  text default NULL;

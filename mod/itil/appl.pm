@@ -1208,6 +1208,22 @@ sub new
                 dataobjattr   =>'appl.maintwindow'),
 
       new kernel::Field::Textarea(
+                name          =>'mainusetime',
+                group         =>'misc',
+                searchable    =>0, 
+                label         =>'Main use time',
+                htmlheight    =>40,
+                dataobjattr   =>'appl.mainusetime'),
+
+      new kernel::Field::Textarea(
+                name          =>'secusetime',
+                group         =>'misc',
+                searchable    =>0, 
+                label         =>'Secondary use time',
+                htmlheight    =>40,
+                dataobjattr   =>'appl.secusetime'),
+
+      new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',
                 label         =>'Comments',
