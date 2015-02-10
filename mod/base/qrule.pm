@@ -881,6 +881,7 @@ function addToResult(ruleid)
              var tabselect="";
              if (havehintstext=="1"){
                 labeltext+=" <img alt='hints available' height=10 width=10 "+
+                           "border=0 "+
                            "src='../../base/load/info.gif'>";
                 atitle+=" - $hintsav";
                 tabselect="ModeSelectCurrentMode=FView&";

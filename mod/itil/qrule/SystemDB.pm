@@ -13,6 +13,26 @@ produce an error.
 
 NONE
 
+=head3 HINTS
+
+If there is a system marked as databaseserver (in systemclassification)
+there is need to have at least one software instance linked to the 
+locical system (or cluster complex) with a software installation based
+on a database software.
+In reverse if "is database server" is set to false, it is not allowed
+to have database instances on the logical system.
+
+[de:]
+
+Wenn ein logisches System in der Systemklassifizierung als Datenbankserver
+markiert ist, dann muß min. eine Software-Instanz mit dem logischen
+System (oder Cluster Komplex) verbunden sein, die auf einer 
+Datenbanksoftware basiert.
+Umgekehrt ist muß darf falls ein System mit  "ist Datenbankserver"=nein
+markiert ist, auch keine Datenbank-Software-Instanz mit dem System
+verknüpft sein.
+
+
 =cut
 #######################################################################
 #  W5Base Framework
