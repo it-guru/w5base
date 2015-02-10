@@ -68,8 +68,9 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(0,undef) if ($rec->{cistatusid}!=4 && 
-                       $rec->{cistatusid}!=3);
+   return(0,undef) if ($rec->{cistatusid}!=3 && 
+                       $rec->{cistatusid}!=4 &&
+                       $rec->{cistatusid}!=5);
 
    my $cocobj=getModuleObject($self->getParent->Config,"tsacinv::costcenter");
    $cocobj->SetFilter({name=>$rec->{conodenumber}});
