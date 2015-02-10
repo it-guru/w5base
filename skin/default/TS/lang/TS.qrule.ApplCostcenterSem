@@ -1,0 +1,6 @@
+'TS::qrule::ApplCostcenterSem'=>{de=>'Prüfung Servicemanager in SAP P01',
+                                 en=>'check Servicemanager in SAP P01'},
+'MSG01'=>{de=>'Servicemanager im zugehörigen costcenter Datensatz '.
+              'in AssetManager fehlt',
+          en=>'servicemanager in related costcenter record '.
+              'in AssetManager missing'},
