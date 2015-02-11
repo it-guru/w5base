@@ -1,5 +1,6 @@
 'TAD4Dsup::system'=>{de=>'TAD4D Support Tool',en=>'TAD4D Support Tool'},
 'fieldgroup.tad4d'=>{de=>'TAD4D',en=>'TAD4D'},
+'fieldgroup.w5basedata'=>{de=>'W5Base Verknüpfung',en=>'W5Base relation'},
 'current Env'=>{de=>'aktuelle Umgebung'},
 'destination Env'=>{de=>'Zielumgebung'},
 'ENV.Production'=>{de=>'Produktion'},

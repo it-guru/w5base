@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tsacinv::system;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 =head1
@@ -206,6 +207,21 @@ sub new
                 label         =>'Computer Model',
                 dataobjattr   =>'computer_model'),
 
+      new kernel::Field::Text(
+                name          =>'w5base_appl',
+                group         =>'w5basedata',
+                searchable    =>0,
+                label         =>'W5Base Application',
+                onRawValue    =>\&tsacinv::system::AddW5BaseData,
+                depend        =>'systemid'),
+
+      new kernel::Field::Text(
+                name          =>'w5base_tsm',
+                searchable    =>0,
+                group         =>'w5basedata',
+                label         =>'W5Base TSM',
+                onRawValue    =>\&tsacinv::system::AddW5BaseData,
+                depend        =>'systemid'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
@@ -225,6 +241,9 @@ sub new
    return($self);
 }
 
+
+
+
 sub getSqlFrom
 {
    my $self=shift;
@@ -239,7 +258,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default tad4d source));
+          qw(header default tad4d w5basedata source));
 }
 
 
