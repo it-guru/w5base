@@ -160,6 +160,53 @@ sub new
                    "   else ''".
                    "end)"),
 
+      new kernel::Field::Text(
+                name          =>'agent_version',
+                group         =>'tad4d',
+                label         =>'Agent Version',
+                dataobjattr   =>'agent_version'),
+
+      new kernel::Field::Boolean(
+                name          =>'agent_active',
+                group         =>'tad4d',
+                label         =>'Agent Active',
+                dataobjattr   =>'agent_active'),
+
+      new kernel::Field::Text(
+                name          =>'agent_statusid',
+                group         =>'tad4d',
+                label         =>'Agent StatusID',
+                dataobjattr   =>'agent_status'),
+
+      new kernel::Field::Text(
+                name          =>'agent_status',
+                group         =>'tad4d',
+                label         =>'Agent Status',
+                dataobjattr   =>"decode(agent_status,".
+                                       "'0','OK',".
+                                       "'11264','failed?',".
+                                       "'512','missing capscan?',".
+                                       "'unknown')"),
+
+      new kernel::Field::Text(
+                name          =>'agent_osname',
+                group         =>'tad4d',
+                label         =>'Agent OS Name',
+                dataobjattr   =>'agent_osname'),
+
+      new kernel::Field::Text(
+                name          =>'agent_osversion',
+                group         =>'tad4d',
+                label         =>'Agent OS Version',
+                dataobjattr   =>'agent_osversion'),
+
+      new kernel::Field::Text(
+                name          =>'computer_model',
+                group         =>'tad4d',
+                label         =>'Computer Model',
+                dataobjattr   =>'computer_model'),
+
+
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
@@ -187,6 +234,14 @@ sub getSqlFrom
 
    return($from);
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(
+          qw(header default tad4d source));
+}
+
 
 sub ValidatedUpdateRecord
 {

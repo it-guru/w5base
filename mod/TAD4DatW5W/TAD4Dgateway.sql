@@ -51,6 +51,11 @@ select 'tad4dp-'||adm_agent.id                 agent_id,
        adm_agent.version                       agent_version,
        adm_agent.ip_address                    agent_ip_address,
        adm_agent.hostname                      agent_hostname,
+       adm_agent.status                        agent_status,
+       adm_agent.os_name                       agent_osname,
+       adm_agent.os_version                    agent_osversion,
+       adm_agent.active                        agent_active,
+
        to_date(substr(adm_agent.scan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_scan_time
    from adm.agent@tad4d adm_agent
@@ -62,6 +67,11 @@ select 'tad4di-'||adm_agent.id                 agent_id,
        adm_agent.version                       agent_version,
        adm_agent.ip_address                    agent_ip_address,
        adm_agent.hostname                      agent_hostname,
+       adm_agent.status                        agent_status,
+       adm_agent.os_name                       agent_osname,
+       adm_agent.os_version                    agent_osversion,
+       adm_agent.active                        agent_active,
+
        to_date(substr(adm_agent.scan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_scan_time
    from adm.agent@tad4di adm_agent;
