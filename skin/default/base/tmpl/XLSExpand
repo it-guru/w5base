@@ -3,7 +3,7 @@ Dieses Werkzeug ermöglicht es, Exceldateien um bestimmte verknüpfte
 Information zu erweitern. Zu diesem Zweck definieren Sie Spalten in der
 Eingabedatei, die die Schlüsselinformationen enthalten. Die Eingangsspalten sind
 ODER verknüpft und es werden nur CI-Status installed/activ gefiltert. Bei der Verarbeitung<br>
-werden dann die gewünschten "Auffüll Information" als zusätzliche Spalten
+werden dann die gewünschten "Auffüll Informationen" als zusätzliche Spalten
 in die Exceldatei angefügt.
 <tr><td valign=top id=ref>
 

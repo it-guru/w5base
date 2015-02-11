@@ -33,7 +33,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'acinmassignmentgroupid',
                 group         =>'control',
-                label         =>'Incient Assignmentgroup ID',
+                label         =>'Incident Assignmentgroup ID',
                 container     =>'additional'),
 
       new kernel::Field::Htmlarea(
@@ -82,18 +82,35 @@ sub new
       new kernel::Field::Link(
                 name          =>'scapprgroupid',
                 group         =>'control',
-                label         =>'Change Approvergroup ID',
+                label         =>'Change Approvergroup technical ID',
+                container     =>'additional'),
+
+      new kernel::Field::Link(
+                name          =>'scapprgroupid2',
+                group         =>'control',
+                label         =>'Change Approvergroup business ID',
                 container     =>'additional'),
 
       new kernel::Field::TextDrop(
                 name          =>'scapprgroup',
-                label         =>'Change Approvergroup',
+                label         =>'Change Approvergroup technical',
                 vjoineditbase =>{isapprover=>\'1'},
                 group         =>'inmchm',
                 async         =>'1',
                 searchable    =>0,
                 vjointo       =>'tssc::group',
                 vjoinon       =>['scapprgroupid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'scapprgroup2',
+                label         =>'Change Approvergroup business',
+                vjoineditbase =>{isapprover=>\'1'},
+                group         =>'inmchm',
+                async         =>'1',
+                searchable    =>0,
+                vjointo       =>'tssc::group',
+                vjoinon       =>['scapprgroupid2'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::TextDrop(

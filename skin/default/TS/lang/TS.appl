@@ -9,3 +9,5 @@
 'ICTO Objectname'=>{de=>'ICTO Objektbezeichnung'},
 'unable to identify archictecture record'=>{de=>'Fehler bei der Identifikation des Architektur Datensatzes'},
 'responsible ControlCenter'=>{de=>'verantwortliches ControlCenter'},
+'Change Approvergroup technical'=>{de=>'Change Approvergroup technisch'},
+'Change Approvergroup business'=>{de=>'Change Approvergroup fachlich'},

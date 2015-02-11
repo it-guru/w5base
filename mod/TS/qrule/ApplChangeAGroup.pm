@@ -75,9 +75,16 @@ sub qcheckRecord
    if ($rec->{scapprgroup}=~m/^\s*$/){
       $exitcode=3 if ($exitcode<3);
       push(@{$desc->{qmsg}},
-           'there is no change assignmentgroup defined');
+           'there is no technical change approvergroup defined');
       push(@{$desc->{dataissue}},
-           'there is no change assignmentgroup defined');
+           'there is no technical change approvergroup defined');
+   }
+   if ($rec->{scapprgroup2}=~m/^\s*$/){
+      $exitcode=3 if ($exitcode<3);
+      push(@{$desc->{qmsg}},
+           'there is no business change approvergroup defined');
+      push(@{$desc->{dataissue}},
+           'there is no business change approvergroup defined');
    }
    return($exitcode,$desc);
 }
