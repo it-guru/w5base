@@ -1,6 +1,7 @@
 'itil::businessservice'=>{de=>'Business-Service',en=>'Business-Service'},
 'fieldgroup.applinfo'=>{de=>'Applikationsdaten',en=>'Application informations'},
 'fieldgroup.desc'=>{de=>'Allgemeine Beschreibung',en=>'General Description'},
+'fieldgroup.grprelations'=>{de=>'Organnisationsverknüpfungen',en=>'Organisation relations'},
 'fieldgroup.reporting'=>{de=>'Reporting und Messverfahren',en=>'Reporting and measurement'},
 'fieldgroup.sla'=>{de=>'SLA/OLA Global',en=>'SLA/OLA Global'},
 'fieldgroup.moni'=>{de=>'SLA/OLA Service Design',en=>'SLA/OLA Service Design'},
