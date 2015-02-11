@@ -1398,3 +1398,24 @@ alter table businessservice add  reviewperiod varchar(20) default NULL;
 alter table businessservice add  servicesupport bigint(20) default NULL;
 alter table appl add mainusetime text default NULL;
 alter table appl add secusetime  text default NULL;
+create table lnkbusinessservicegrp (
+  id         bigint(20) NOT NULL,
+  businessservice    bigint(20) NOT NULL, 
+  grp                bigint(20) NOT NULL,
+  comments           longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(80) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id), UNIQUE KEY rel (businessservice,grp),
+  UNIQUE KEY `srcsys` (srcsys,srcid),
+  FOREIGN KEY (businessservice) 
+          REFERENCES businessservice(id) ON DELETE CASCADE,
+  FOREIGN KEY (grp) 
+          REFERENCES grp (grpid) ON DELETE CASCADE
+) ENGINE=INNODB;

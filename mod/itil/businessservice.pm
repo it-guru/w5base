@@ -647,6 +647,15 @@ sub new
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>['businessprocess','customer']),
 
+      new kernel::Field::SubList(
+                name          =>'grprelations',
+                label         =>'Organisation Relations',
+                group         =>'grprelations',
+                vjointo       =>'itil::lnkbusinessservicegrp',
+                vjoinon       =>['id'=>'businessserviceid'],
+                vjoindisp     =>['grp'],
+                vjoininhash   =>['grpid','grp','comments','id']),
+
       new kernel::Field::Link(
                 name          =>'businessteamid',
                 dataobjattr   =>'applbusinessteam'),
@@ -1766,7 +1775,8 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default applinfo desc  uservicecomp servicecomp
-             contacts businessprocesses reporting sla moni monicomments 
+             contacts businessprocesses grprelations
+             reporting sla moni monicomments 
              attachments source));
 }
 
@@ -2071,7 +2081,7 @@ sub isWriteValid
       
       if ($wr){
          push(@l,"default","contacts","desc","servicecomp","sla","moni",
-                 "monicomments",
+                 "monicomments","grprelations",
                  "attachments","reporting");
       }
    }
@@ -2082,6 +2092,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
+
    return("header","default") if (!defined($rec));
    my @l=qw(header default history);
    if ($self->IsMemberOf("admin")){
@@ -2091,7 +2102,7 @@ sub isViewValid
       push(@l,qw(desc uservicecomp servicecomp));
    }
    else{
-      push(@l,qw(contacts desc uservicecomp servicecomp 
+      push(@l,qw(contacts desc uservicecomp servicecomp grprelations
                  attachments reporting sla moni monicomments));
    }
    push(@l,qw(businessprocesses source));

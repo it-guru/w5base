@@ -1,6 +1,6 @@
-package base::lnklocationgrp;
+package itil::lnkbusinessservicegrp;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2015  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -42,20 +42,20 @@ sub new
                 name          =>'id',
                 label         =>'LinkID',
                 searchable    =>0,
-                dataobjattr   =>'lnklocationgrp.id'),
+                dataobjattr   =>'lnkbusinessservicegrp.id'),
 
 
       new kernel::Field::TextDrop(
-                name          =>'location',
-                label         =>'Location',
-                vjointo       =>'base::location',
+                name          =>'businessservice',
+                label         =>'Businesservice',
+                vjointo       =>'itil::businessservice',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['locationid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoinon       =>['businessserviceid'=>'id'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
-                name          =>'locationid',
-                dataobjattr   =>'lnklocationgrp.location'),
+                name          =>'businessserviceid',
+                dataobjattr   =>'lnkbusinessservicegrp.businessservice'),
 
       new kernel::Field::Group(
                 name          =>'grp',
@@ -66,102 +66,86 @@ sub new
                 name          =>'grpid',
                 readonly      =>1,
                 group         =>'rel',
-                dataobjattr   =>'lnklocationgrp.grp'),
-
-      new kernel::Field::Select(
-                name          =>'relmode',
-                label         =>'relation mode',
-                value         =>['RMbusinesrel1','RMbusinesrel2',
-                                 'RMbusinesrel3'],
-                dataobjattr   =>'lnklocationgrp.relmode'),
+                dataobjattr   =>'lnkbusinessservicegrp.grp'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                htmldetail    =>0,
+                uivisible     =>0,
                 label         =>'Fullname',
                 depend        =>['location','relmode','grp'],
                 onRawValue    =>sub{
                    my $self=shift;
                    my $rec=shift;
 
-                   my $l=$self->getParent->getField("location")->
-                         FormatedDetail($rec,"AscV01");
-                   my $r=$self->getParent->getField("relmode")->
+                   my $l=$self->getParent->getField("businessservice")->
                          FormatedDetail($rec,"AscV01");
                    my $g=$self->getParent->getField("grp")->
                          FormatedDetail($rec,"AscV01");
-                   return("$l-$g-$r");
+                   return("$l-$g");
                 }),
 
       new kernel::Field::Text(
                 name          =>'comments',
                 searchable    =>0,
                 label         =>'Comments',
-                dataobjattr   =>'lnklocationgrp.comments'),
-
-      new kernel::Field::Databoss(
-                group         =>'locinfos'),
-
-      new kernel::Field::Link(
-                name          =>'databossid',
-                dataobjattr   =>'location.databoss'),
+                dataobjattr   =>'lnkbusinessservicegrp.comments'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
                 label         =>'Creator',
-                dataobjattr   =>'lnklocationgrp.createuser'),
+                dataobjattr   =>'lnkbusinessservicegrp.createuser'),
                                    
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
                 label         =>'Owner',
-                dataobjattr   =>'lnklocationgrp.modifyuser'),
+                dataobjattr   =>'lnkbusinessservicegrp.modifyuser'),
                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'lnklocationgrp.srcsys'),
+                dataobjattr   =>'lnkbusinessservicegrp.srcsys'),
                                                    
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'lnklocationgrp.srcid'),
+                dataobjattr   =>'lnkbusinessservicegrp.srcid'),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
                 label         =>'Last-Load',
-                dataobjattr   =>'lnklocationgrp.srcload'),
+                dataobjattr   =>'lnkbusinessservicegrp.srcload'),
                                                    
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'lnklocationgrp.createdate'),
+                dataobjattr   =>'lnkbusinessservicegrp.createdate'),
                                                 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'lnklocationgrp.modifydate'),
+                dataobjattr   =>'lnkbusinessservicegrp.modifydate'),
                                                    
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
                 label         =>'Editor',
-                dataobjattr   =>'lnklocationgrp.editor'),
+                dataobjattr   =>'lnkbusinessservicegrp.editor'),
                                                   
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 label         =>'RealEditor',
-                dataobjattr   =>'lnklocationgrp.realeditor')
+                dataobjattr   =>'lnkbusinessservicegrp.realeditor')
    );
-   $self->setDefaultView(qw(location grp relmode cdate));
-   $self->setWorktable("lnklocationgrp");
+   $self->setDefaultView(qw(businessservice grp cdate));
+   $self->setWorktable("lnkbusinessservicegrp");
    return($self);
 }
 
@@ -169,14 +153,14 @@ sub new
 #{
 #   my $self=shift;
 #   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/lnklocationgrp.jpg?".$cgi->query_string());
+#   return("../../../public/itil/load/lnkbusinessservicegrp.jpg?".$cgi->query_string());
 #}
          
 
 sub getDetailBlockPriority
 {  
    my $self=shift;
-   return(qw(header default locinfos source));
+   return(qw(header default source));
 }
 
 
@@ -190,6 +174,7 @@ sub isQualityCheckValid
 
 
 
+
 sub Validate
 {
    my $self=shift;
@@ -197,38 +182,39 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+
    my $grpid=effVal($oldrec,$newrec,"grpid");
    if ($grpid eq ""){
       $self->LastMsg(ERROR,"no group selected with marked as oranisation");
       return(undef);
    }
-   my $locationid=effVal($oldrec,$newrec,"locationid");
-   if ($locationid eq ""){
-      $self->LastMsg(ERROR,"invalid location");
+   my $businessserviceid=effVal($oldrec,$newrec,"businessserviceid");
+   if ($businessserviceid eq ""){
+      $self->LastMsg(ERROR,"invalid businessservice");
       return(undef);
    }
-   if (!$self->isLocationWriteable($locationid)){
-         $self->LastMsg(ERROR,"no write access to requested location");
+   if (!$self->isBusinessserviceWriteable($businessserviceid)){
+         $self->LastMsg(ERROR,"no write access to requested businessservice");
          return(undef);
    }
    return(1);
 }
 
-sub isLocationWriteable
+sub isBusinessserviceWriteable
 {
    my $self=shift;
-   my $locationid=shift;
+   my $businessserviceid=shift;
 
-   my $loc=getModuleObject($self->Config,"base::location");
+   my $bs=getModuleObject($self->Config,"itil::businessservice");
 
-   $loc->SetFilter({id=>\$locationid});
-   my ($locrec,$msg)=$loc->getOnlyFirst(qw(ALL));
-   if (!defined($locrec)){
-      $self->LastMsg(ERROR,"locatioid does not exists");
+   $bs->SetFilter({id=>\$businessserviceid});
+   my ($bsrec,$msg)=$bs->getOnlyFirst(qw(ALL));
+   if (!defined($bsrec)){
+      $self->LastMsg(ERROR,"businessserviceid does not exists");
       return(undef);
    }
    if ($self->isDataInputFromUserFrontend()){
-      my @acl=$loc->isWriteValid($locrec);
+      my @acl=$bs->isWriteValid($bsrec);
       if (!in_array(\@acl,"grprelations")){
          return(undef);
       }
@@ -250,8 +236,8 @@ sub getSqlFrom
 {
    my $self=shift;
    my ($worktable,$workdb)=$self->getWorktable();
-   return("$worktable left outer join location ".
-          "on $worktable.location=location.id ");
+   return("$worktable left outer join businessservice ".
+          "on $worktable.businessservice=businessservice.id ");
 }
 
 
@@ -269,7 +255,7 @@ sub isWriteValid
    return("default") if (!$self->isDataInputFromUserFrontend() &&
                          !defined($oldrec));
    if (defined($oldrec)){
-      if (!$self->isLocationWriteable($oldrec->{locationid})){
+      if (!$self->isBusinessserviceWriteable($oldrec->{businessserviceid})){
          return(undef);
       }
    }

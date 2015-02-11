@@ -1,0 +1,4 @@
+'itil::lnkbusinessservicegrp'=>{de=>'Businessservice Org-Verknüpfung',
+                                en=>'Businessservice Org-Relation'},
+'no write access to requested businessservice'=>{de=>'kein Schreibzugriff auf angegebenen Businessservice'},
+'no group selected with marked as oranisation'=>{de=>'keine Gruppe mit Organisationsmarkierung ausgewählt'},

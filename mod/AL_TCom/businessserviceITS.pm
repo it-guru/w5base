@@ -39,8 +39,9 @@ sub new
 
    $self->AddFields(
       new kernel::Field::SubList(
-                name          =>'customers',
-                label         =>'Customers',
+                name          =>'applcustomers',
+                label         =>'Application Customers',
+                htmldetail    =>0,
                 group         =>'customers',
                 vjointo       =>'AL_TCom::itscustomer',
                 vjoinon       =>['id'=>'its_id'],
@@ -78,7 +79,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
 
-   my @l=self->SUPER::isViewValid($rec);
+   my @l=$self->SUPER::isViewValid($rec);
 
    push(@l,"customers");
 
