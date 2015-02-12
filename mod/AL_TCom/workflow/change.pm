@@ -373,14 +373,16 @@ sub getNotifyDestinations
       }
    }
 
-   my @fl=qw(tsmid tsm2id);
+   my @fl=qw(tsmid tsm2id applmgrid applmgr2id);
    if ($#ifid!=-1){
       $appl->ResetFilter();
       $appl->SetFilter({id=>\@ifid,cistatusid=>"<=4"});
       foreach my $rec ($appl->getHashList(@fl,"name")){
          $ifappl->{$rec->{name}}=1;
-         push(@tobyfunc,$rec->{tsmid})  if ($rec->{tsmid}>0);
-         push(@ccbyfunc,$rec->{tsm2id}) if ($rec->{tsm2id}>0);
+         push(@tobyfunc,$rec->{tsmid})      if ($rec->{tsmid}>0);
+         push(@ccbyfunc,$rec->{tsm2id})     if ($rec->{tsm2id}>0);
+         push(@tobyfunc,$rec->{applmgrid})  if ($rec->{applmgrid}>0);
+         push(@ccbyfunc,$rec->{applmgr2id}) if ($rec->{applmgr2id}>0);
       }
    }
    $ia->LoadTargets($emailto,'*::appl',\'changenotify',$applid);
