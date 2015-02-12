@@ -139,7 +139,8 @@ sub new
                 name          =>'denv',
                 label         =>'destination Env',
                 transprefix   =>'ENV.',
-                value         =>['Production','Integration','None',''],
+                value         =>['Production','Integration','Shared',
+                                 'None','NT',''],
                 dataobjattr   =>'denv'),
 
       new kernel::Field::Boolean(
@@ -164,7 +165,10 @@ sub new
                    "   else ''".
                    "end) ||".
                    "(case".
-                   "   when cenv<>denv  then '* move system to '||denv||'\n'".
+                   "   when cenv<>denv  ".
+                   "        AND denv<>'Shared' ".
+                   "        AND denv<>'NT' ".
+                   "        then '* move system to '||denv||'\n'".
                    "   else ''".
                    "end) ||".
                    "(case".
@@ -174,6 +178,8 @@ sub new
                    "end) ||".
                    "(case".
                    "   when computer_model is null ".
+                   "        AND denv<>'Shared' ".
+                   "        AND denv<>'NT' ".
                    "        AND computer_serialno is null then ".
                    "        '* hardware detection not posible\n'".
                    "   else ''".

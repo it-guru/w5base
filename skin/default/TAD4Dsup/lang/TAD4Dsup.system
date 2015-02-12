@@ -7,6 +7,8 @@
 'ENV.Integration'=>{de=>'Integration'},
 'ENV.Both'=>{de=>'beide'},
 'ENV.None'=>{de=>'keine'},
+'ENV.NT'=>{de=>'keine technisch realisierbar'},
+'ENV.Shared'=>{de=>'Shared'},
 'ENV.'=>{de=>'-',en=>'-'},
 'SAP Hier'=>{de=>'SAP Hierarchie'},
 'costelement'=>{de=>'Kontierungsobjekt'},
