@@ -187,6 +187,18 @@ sub new
                 label         =>'RealEditor',
                 dataobjattr   =>'itemizedlist.realeditor'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"itemizedlist.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(itemizedlist.id,35,'0')"),
+
    );
    $self->setDefaultView(qw(linenumber selectlabel displaylabel cistatus mdate));
    $self->setWorktable("itemizedlist");
