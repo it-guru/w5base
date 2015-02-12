@@ -51,14 +51,28 @@ select 'tad4dp-'||adm_agent.id                 agent_id,
        adm_agent.version                       agent_version,
        adm_agent.ip_address                    agent_ip_address,
        adm_agent.hostname                      agent_hostname,
-       adm_agent.status                        agent_status,
+       adm_agent.status                        agent_statusid,
+       decode(adm_agent.status,
+              '1','ok',
+              '2','initializing',
+              '3','not connecting',
+              '4','failed',
+              '5','unknown',
+              '6','incomplete',
+              '7','missing software scan',
+              '8','missing capacity scan',
+              '-?-')                           agent_status,
        adm_agent.os_name                       agent_osname,
        adm_agent.os_version                    agent_osversion,
        adm_agent.active                        agent_active,
 
        to_date(substr(adm_agent.scan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               agent_scan_time
-   from adm.agent@tad4d adm_agent
+                                               agent_scan_time,
+       to_date(substr(adm_agent.catalog_version,0,19),'YYYY-MM-DD-HH24.MI.SS')
+                                               agent_catalog_version,
+       to_date(substr(adm_agent.full_hwscan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
+                                               agent_full_hwscan_time
+   from custom.agent_v@tad4d adm_agent
 union all
 select 'tad4di-'||adm_agent.id                 agent_id,
        'tad4di-'||adm_agent.node_id            agent_node_id,
@@ -67,14 +81,28 @@ select 'tad4di-'||adm_agent.id                 agent_id,
        adm_agent.version                       agent_version,
        adm_agent.ip_address                    agent_ip_address,
        adm_agent.hostname                      agent_hostname,
-       adm_agent.status                        agent_status,
+       adm_agent.status                        agent_statusid,
+       decode(adm_agent.status,
+              '1','ok',
+              '2','initializing',
+              '3','not connecting',
+              '4','failed',
+              '5','unknown',
+              '6','incomplete',
+              '7','missing software scan',
+              '8','missing capacity scan',
+              '-?-')                           agent_status,
        adm_agent.os_name                       agent_osname,
        adm_agent.os_version                    agent_osversion,
        adm_agent.active                        agent_active,
 
        to_date(substr(adm_agent.scan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               agent_scan_time
-   from adm.agent@tad4di adm_agent;
+                                               agent_scan_time,
+       to_date(substr(adm_agent.catalog_version,0,19),'YYYY-MM-DD-HH24.MI.SS')
+                                               agent_catalog_version,
+       to_date(substr(adm_agent.full_hwscan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
+                                               agent_full_hwscan_time
+   from custom.agent_v@tad4di adm_agent;
 
 CREATE INDEX "TAD4D_adm_agent_id" 
    ON "mview_TAD4D_adm_agent"(agent_id) online;

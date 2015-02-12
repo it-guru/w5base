@@ -120,6 +120,13 @@ sub new
                 align         =>'left',
                 dataobjattr   =>'saphier'),
 
+      new kernel::Field::Text(
+                name          =>'costelement',
+                label         =>'costelement',
+                ignorecase    =>1,
+                readonly      =>1,
+                dataobjattr   =>'costelement'),
+
       new kernel::Field::Select(
                 name          =>'cenv',
                 label         =>'current Env',
@@ -135,6 +142,12 @@ sub new
                 value         =>['Production','Integration','None',''],
                 dataobjattr   =>'denv'),
 
+      new kernel::Field::Boolean(
+                name          =>'agent_active',
+                group         =>'tad4d',
+                label         =>'Agent Active',
+                dataobjattr   =>'agent_active'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
@@ -146,12 +159,23 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>
                    "(case".
+                   "   when systemid like 'TAD4D%MISS'  then ".
+                       "'* set systemid on system agent\n'".
+                   "   else ''".
+                   "end) ||".
+                   "(case".
                    "   when cenv<>denv  then '* move system to '||denv||'\n'".
                    "   else ''".
                    "end) ||".
                    "(case".
                    "   when cenv='Both' then '* remove system ".
                                              "from one enviroment\n'".
+                   "   else ''".
+                   "end) ||".
+                   "(case".
+                   "   when computer_model is null ".
+                   "        AND computer_serialno is null then ".
+                   "        '* hardware detection not posible\n'".
                    "   else ''".
                    "end) ||".
                    "(case".
@@ -168,26 +192,16 @@ sub new
                 dataobjattr   =>'agent_version'),
 
       new kernel::Field::Boolean(
-                name          =>'agent_active',
+                name          =>'agent_systemidunique',
                 group         =>'tad4d',
-                label         =>'Agent Active',
-                dataobjattr   =>'agent_active'),
-
-      new kernel::Field::Text(
-                name          =>'agent_statusid',
-                group         =>'tad4d',
-                label         =>'Agent StatusID',
-                dataobjattr   =>'agent_status'),
+                label         =>'Agent SystemID Unique',
+                dataobjattr   =>'agent_systemidunique'),
 
       new kernel::Field::Text(
                 name          =>'agent_status',
                 group         =>'tad4d',
                 label         =>'Agent Status',
-                dataobjattr   =>"decode(agent_status,".
-                                       "'0','OK',".
-                                       "'11264','failed?',".
-                                       "'512','missing capscan?',".
-                                       "'unknown')"),
+                dataobjattr   =>'agent_status'),
 
       new kernel::Field::Text(
                 name          =>'agent_osname',
@@ -201,11 +215,29 @@ sub new
                 label         =>'Agent OS Version',
                 dataobjattr   =>'agent_osversion'),
 
+      new kernel::Field::Date(
+                name          =>'agent_full_hwscan_time',
+                group         =>'tad4d',
+                label         =>'Hardware-Scan-Date',
+                dataobjattr   =>'agent_full_hwscan_time'),
+
+      new kernel::Field::Date(
+                name          =>'agent_scan_time',
+                group         =>'tad4d',
+                label         =>'Software-Scan-Date',
+                dataobjattr   =>'agent_scan_time'),
+
       new kernel::Field::Text(
                 name          =>'computer_model',
                 group         =>'tad4d',
                 label         =>'Computer Model',
                 dataobjattr   =>'computer_model'),
+
+      new kernel::Field::Text(
+                name          =>'computer_serialno',
+                group         =>'tad4d',
+                label         =>'Computer Serialno.',
+                dataobjattr   =>'computer_serialno'),
 
       new kernel::Field::Text(
                 name          =>'w5base_appl',
@@ -240,7 +272,6 @@ sub new
    $self->setDefaultView(qw(systemname systemid cenv denv todo));
    return($self);
 }
-
 
 
 
@@ -298,6 +329,10 @@ sub initSearchQuery
    if (!defined(Query->Param("search_saphier"))){
      Query->Param("search_saphier"=>
                   "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
+   }
+   if (!defined(Query->Param("search_agent_active"))){
+     Query->Param("search_agent_active"=>
+                  $self->T("yes"));
    }
 }
 
