@@ -89,6 +89,14 @@ sub qcheckRecord
    return(0,undef) if (!($rec->{cistatusid}==3 || 
                          $rec->{cistatusid}==4));
 
+   #  Durch den Request ...
+   #  https://darwin.telekom.de/darwin/auth/base/workflow/ById/14168384790001
+   #  ... wurde gefordert, das für die Übernahme des ApplicationManagers
+   #  aus CapeTS nicht das "normale" Verfahrent über 
+   #  "automatisch Updates zulassen" verwendet werden soll.
+   $autocorrect=1;
+   
+
    if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
       $par->SetFilter({archapplid=>\$rec->{ictono}});
