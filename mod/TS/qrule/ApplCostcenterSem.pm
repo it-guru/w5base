@@ -17,11 +17,28 @@ NONE
 
 [en:]
 
-Check servicemanager entry in SAP P01!
+The servicemanager of the related costcenter record in AssetManager is missing.
+
+This can result in "marking as delete" the application in AssetManager, involving
+that the application is no more selectable in the process supporting tools.
+
+The probably reason is a missing entry in SAP P01.
+
+Responsible to maintenance this record in SAP P01 is the databoss 
+from the costcenter of the application.
 
 [de:]
 
-Eintrag Servicemanager in SAP P01 prüfen!
+Der Servicemanager am zugehörigen costcenter Datensatz in AssetManager fehlt.
+
+Das kann dazu führen, dass die Anwendung in AssetManager als "deleted" markiert 
+wird, was z.B. zur Folge hat, dass sie in prozessunterstützenden Tools nicht 
+mehr als ConfigItem auswählbar ist.
+
+Wahrscheinliche Ursache ist ein fehlender Eintrag in SAP P01.
+
+Zuständig für die Pflege dieses Datensatzes in SAP P01 ist der
+Datenverantwortliche des Kontierungsobjektes der Anwendung.
 
 =cut
 #######################################################################
@@ -72,12 +89,15 @@ sub qcheckRecord
                        $rec->{cistatusid}!=4 &&
                        $rec->{cistatusid}!=5);
 
-   my $cocobj=getModuleObject($self->getParent->Config,"tsacinv::costcenter");
-   $cocobj->SetFilter({name=>$rec->{conodenumber}});
-
-   if (!$cocobj->getVal('sem')) {
+   my $amcoc=getModuleObject($self->getParent->Config,"tsacinv::costcenter");
+   $amcoc->SetFilter({name=>$rec->{conodenumber}});
+  
+   if ($amcoc->getVal('sem') eq '') {
+      my $itilcoc=getModuleObject($self->getParent->Config,"itil::costcenter");
+      $itilcoc->SetFilter({name=>$rec->{conumber}});
+      my $boss=$itilcoc->getVal('databoss');
       return(3,{qmsg     =>['MSG01'],
-                dataissue=>['MSG01']});
+                dataissue=>["MSG02: ".$itilcoc->getVal('databoss')]});
    }
 
    return(0,undef);

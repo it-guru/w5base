@@ -4,3 +4,13 @@
               'in AssetManager fehlt',
           en=>'servicemanager in related costcenter record '.
               'in AssetManager missing'},
+'MSG02'=>{de=>"Servicemanager im zugehörigen costcenter Datensatz ".
+              "in AssetManager fehlt.\n".
+              "Wahrscheinliche Ursache ist ein fehlender Eintrag in SAP P01.\n".
+              "Zuständig für die Pflege dieses Datensatzes in SAP P01 ist der ".
+              "Datenverantwortliche des Kontierungsobjektes",
+          en=>"servicemanager in related costcenter record ".
+              "in AssetManager missing.\n".
+              "The probably reason is a missing entry in SAP P01.\n".
+              "Responsible for maintenance of this record in SAP P01 ".
+              "is the databoss of the costcenter"},
