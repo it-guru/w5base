@@ -373,9 +373,11 @@ sub getBackendName
       $_=$db->DriverName();
       case: {   # did not works on tsinet Oracle database
          /^oracle$/i and do {
-            return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS') ".
-                   "NULLS FIRST"); # needed for QualityChecks
-
+            return("$self->{name} NULLS FIRST"); #needed for QualityCheck
+            # nulls first ist notwendig, damit die gleiche Sortierung wie
+            # in MySQL generiert wird. Das to_char ist in Oracle nicht
+            # notwendig beim Sortieren, da es ansonsten zu Namenskolisionen
+            # zu bereits definierten Aliase kommen kann.
          };
       }
    }

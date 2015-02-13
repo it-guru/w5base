@@ -18,7 +18,8 @@ select distinct sysmapped.*,
        "tsacinv::system".type   amtype,
        "tsacinv::system".nature amnature,
        "tsacinv::system".model  ammodel,
-       "tsacinv::system".usage  amusage
+       "tsacinv::system".usage  amusage,
+       sysmapped.systemid || '-' || sysmapped.systemname id
 from  (
    with
    w5sys as (select name                          systemname,
@@ -49,7 +50,7 @@ from  (
              from adm.computer@tad4di join adm.agent@tad4di
                   on adm.computer.computer_sys_id=adm.agent.id)
 
-      select sysbase.systemname,sysbase.systemid,
+      select substr(sysbase.systemname,0,255) systemname,sysbase.systemid,
              decode(w5sysbysysid.id,
                     NULL,decode(w5sysbyname.id,NULL,0,
                                 1),1) is_w5,
@@ -121,5 +122,21 @@ from  (
    left outer join "W5I_ACT_costelement" w5_costelement
         on "itil::system".conumber=w5_costelement.name
    left outer join "W5I_ACT_costelement" am_costelement
-        on "tsacinv::system".conumber=am_costelement.shortname
+        on "tsacinv::system".conumber=am_costelement.shortname;
+
+CREATE INDEX "mview_W5I_system_universum_i"
+   ON "mview_W5I_system_universum" (id) online;
+
+CREATE INDEX "mview_W5I_system_universum_i0"
+   ON "mview_W5I_system_universum" (systemid) online;
+
+CREATE INDEX "mview_W5I_system_universum_i1"
+   ON "mview_W5I_system_universum" (systemname) online;
+
+CREATE INDEX "mview_W5I_system_universum_i2"
+   ON "mview_W5I_system_universum" (saphier) online;
+
+create or replace view "W5I_system_universum" as
+select * from "mview_W5I_system_universum";
+
 

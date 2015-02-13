@@ -89,7 +89,7 @@ sub new
                 label         =>'ID',
                 group         =>'source',
                 align         =>'left',
-                dataobjattr   =>"(systemid||'-'||systemname)",
+                dataobjattr   =>"id",
                 wrdataobjattr =>"systemid"),
 
       new kernel::Field::Text(
@@ -146,6 +146,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'agent_active',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Agent Active',
                 dataobjattr   =>'agent_active'),
 
@@ -194,54 +195,63 @@ sub new
       new kernel::Field::Text(
                 name          =>'agent_version',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Agent Version',
                 dataobjattr   =>'agent_version'),
 
       new kernel::Field::Boolean(
                 name          =>'agent_systemidunique',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Agent SystemID Unique',
                 dataobjattr   =>'agent_systemidunique'),
 
       new kernel::Field::Text(
                 name          =>'agent_status',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Agent Status',
                 dataobjattr   =>'agent_status'),
 
       new kernel::Field::Text(
                 name          =>'agent_osname',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Agent OS Name',
                 dataobjattr   =>'agent_osname'),
 
       new kernel::Field::Text(
                 name          =>'agent_osversion',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Agent OS Version',
                 dataobjattr   =>'agent_osversion'),
 
       new kernel::Field::Date(
                 name          =>'agent_full_hwscan_time',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Hardware-Scan-Date',
                 dataobjattr   =>'agent_full_hwscan_time'),
 
       new kernel::Field::Date(
                 name          =>'agent_scan_time',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Software-Scan-Date',
                 dataobjattr   =>'agent_scan_time'),
 
       new kernel::Field::Text(
                 name          =>'computer_model',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Computer Model',
                 dataobjattr   =>'computer_model'),
 
       new kernel::Field::Text(
                 name          =>'computer_serialno',
                 group         =>'tad4d',
+                readonly      =>1,
                 label         =>'Computer Serialno.',
                 dataobjattr   =>'computer_serialno'),
 
@@ -249,6 +259,7 @@ sub new
                 name          =>'w5base_appl',
                 group         =>'w5basedata',
                 searchable    =>0,
+                readonly      =>1,
                 label         =>'W5Base Application',
                 onRawValue    =>\&tsacinv::system::AddW5BaseData,
                 depend        =>'systemid'),
@@ -256,6 +267,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'w5base_tsm',
                 searchable    =>0,
+                readonly      =>1,
                 group         =>'w5basedata',
                 label         =>'W5Base TSM',
                 onRawValue    =>\&tsacinv::system::AddW5BaseData,
@@ -336,6 +348,22 @@ sub initSearchQuery
      Query->Param("search_saphier"=>
                   "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
    }
+}
+
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @l=$self->SUPER::isViewValid($rec);
+
+   if (in_array(\@l,"ALL")){
+      if ($rec->{cenv} eq "Both"){
+         return(qw(header source default));
+      }
+   }
+   return(@l);
 }
 
 
