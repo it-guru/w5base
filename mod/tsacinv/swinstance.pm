@@ -51,6 +51,17 @@ sub new
                                 ",concat(amportfolio.assettag,')')))"),
 
       new kernel::Field::Text(
+                name          =>'scfullname',
+                label         =>'ServiceCenter Instance fullname',
+                searchable    =>0,
+                uppersearch   =>1,
+                htmldetail    =>0,
+                htmlwidth     =>'100px',
+                align         =>'left',
+                dataobjattr   =>"concat(amportfolio.name,concat(' ('".
+                                ",concat(amportfolio.code,')')))"),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Instance name',
                 uppersearch   =>1,
