@@ -228,14 +228,14 @@ sub new
                 dataobjattr   =>'agent_osversion'),
 
       new kernel::Field::Date(
-                name          =>'agent_full_hwscan_time',
+                name          =>'hwscan_time',
                 group         =>'tad4d',
                 readonly      =>1,
                 label         =>'Hardware-Scan-Date',
                 dataobjattr   =>'agent_full_hwscan_time'),
 
       new kernel::Field::Date(
-                name          =>'agent_scan_time',
+                name          =>'scan_time',
                 group         =>'tad4d',
                 readonly      =>1,
                 label         =>'Software-Scan-Date',
