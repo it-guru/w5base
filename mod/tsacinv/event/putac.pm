@@ -1287,7 +1287,7 @@ sub TransferFile
    print $fh ("</XMLInterface>\n");
    close($fh);
 
-   my $ftp=new kernel::FTP($self,"tsacftp");
+   my $ftp=new kernel::FileTransfer($self,"tsacftp");
    if (!defined($ftp)){
       return({exitcode=>1,msg=>msg(ERROR,"can't create ftp object")});
    }
@@ -1310,10 +1310,10 @@ sub TransferFile
                       " $?, $!");
             msg(ERROR,"FTP transfer failed at ".NowStamp("en")." GMT");
             msg(ERROR,"trying to detect ftp error message ...");
-            my $s;
-            eval('$s=$ftp->size($jobfile);');
-            msg(ERROR,"size on remote site is $s ($@)");
-            msg(ERROR,"... detecting error message done.");
+         #   my $s;
+         #   eval('$s=$ftp->size($jobfile);');
+         #   msg(ERROR,"size on remote site is $s ($@)");
+         #   msg(ERROR,"... detecting error message done.");
          }
          else{
             $transferOK++;
