@@ -71,6 +71,12 @@ sub new
                 label         =>'response time',
                 dataobjattr   =>'antwortzeit'),
 
+      new kernel::Field::Number(
+                name          =>'trend',
+                precision     =>0,
+                label         =>'Trend',
+                dataobjattr   =>'trend'),
+
    );
    $self->setWorktable("darwin");
 
