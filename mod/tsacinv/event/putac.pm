@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
-use kernel::FTP;
+use kernel::FileTransfer;
 
 use LWP::UserAgent;         # for AC XML Interface
 use HTTP::Request::Common;  #
