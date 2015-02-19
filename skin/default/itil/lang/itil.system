@@ -33,6 +33,7 @@
 'all Customers'=>{de=>'alle Kunden'},
 'Deputy Administrator'=>{de=>'Administrator Vertreter'},
 'Administrationteam'=>{de=>'Administrationsteam'},
+'Admin Team Boss EMail'=>{de=>'Adminteam Leiter EMail'},
 'Applications'=>{de=>'Anwendungen'},
 'Applicationnames'=>{de=>'Anwendungsnamen'},
 'Applicationnames line'=>{de=>'Anwendungsname (Zeile)'},

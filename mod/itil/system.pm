@@ -428,6 +428,15 @@ sub new
                 readonly      =>1,
                 depend        =>['adminteambossid']),
 
+      new kernel::Field::Text(
+                name          =>'adminteambossemail',
+                searchable    =>0,
+                group         =>'admin',
+                label         =>'Admin Team Boss EMail',
+                onRawValue    =>\&getTeamBossEMail,
+                htmldetail    =>0,
+                readonly      =>1,
+                depend        =>['adminteambossid']),
 
       new kernel::Field::Select(
                 name          =>'osrelease',
@@ -962,7 +971,7 @@ sub new
                 vjoindisp     =>['webaddresstyp','name','cistatus',
                                  'dnsname','shortcomments'],
                 vjoininhash   =>['id','name','addresstyp',
-                                 'cistatusid',
+                                 'cistatusid','networkid',
                                  'dnsname','comments']),
 
       new kernel::Field::SubList(
@@ -1219,6 +1228,28 @@ sub getTeamBossID
    }
    return(\@teambossid);
 }
+
+sub getTeamBossEMail
+{
+   my $self=shift;
+   my $current=shift;
+   my $teambossfieldname=$self->{depend}->[0];
+   my $teambossfield=$self->getParent->getField($teambossfieldname);
+   my $teambossid=$teambossfield->RawValue($current);
+   my @teamboss;
+   if ($teambossid ne "" && ref($teambossid) eq "ARRAY" && $#{$teambossid}>-1){
+      my $user=getModuleObject($self->getParent->Config,"base::user");
+      $user->SetFilter({userid=>$teambossid});
+      foreach my $rec ($user->getHashList("email")){
+         if ($rec->{email} ne ""){
+            push(@teamboss,$rec->{email});
+         }
+      }
+   }
+   return(\@teamboss);
+}
+
+
 
 sub calcPhyCpuCount   #calculates the relative physical cpucount
 {
