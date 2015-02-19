@@ -904,7 +904,7 @@ sub generateWorkspace
    my $tabheight=$wsheight-30;
    $tabheight=30 if ($tabheight<30);  # ensure, that tabheigh is not negativ
    $templ=<<EOF;
-<table width="100%" height="$tabheight" border=0 cellspacing=0 cellpadding=0>
+<table width="100%" height="$tabheight" border=0 cellspacing=0 cellpadding=1>
 <tr height=1%><td width=1% nowrap>&nbsp;$pa &nbsp;</td>
 <td><select id=OP name=OP style="width:100%">$selopt</select></td></tr>
 <tr><td colspan=3 valign=top>$divset</td></tr>
@@ -1153,7 +1153,7 @@ sub generateWorkspacePages
                 $self->getParent->T("wfinquiry",$tr).
                 "</option>\n";
       $$divset.="<div id=OPwfinquiry class=\"$class\">".
-                "<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>".
+                "<table width=\"100%\" border=0 cellspacing=0 cellpadding=1>".
                 "<tr><td width=1% nowrap>&nbsp;%inquiryrequest(label)% ".
                 ":&nbsp;</td>".
                 "<td>\%inquiryrequest(detail)\%".
