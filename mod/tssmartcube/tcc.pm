@@ -71,6 +71,7 @@ sub new
                 label         =>'Cluster Software',
                 ignorecase    =>1,
                 group         =>['ha'],
+                htmldetail    =>0,
                 depend        =>['ha_base_setup_color'],
                 background    =>\&getTCCbackground,
                 dataobjattr   =>'HA_BASE_SETUP'),
@@ -103,7 +104,7 @@ sub new
                 name          =>'os_name',
                 label         =>'Operationsystem',
                 ignorecase    =>1,
-                group         =>['default','os'],
+                group         =>['os'],
                 dataobjattr   =>'OS_NAME'),
 
       new kernel::Field::Text(
@@ -143,7 +144,7 @@ sub new
       # HW base-setups ######################################################
       new kernel::Field::Text(
                 name          =>'hw_base_setup',
-                label         =>'Hardware Base-Setup',
+                label         =>'Hardware Base-Setup ?',
                 depend        =>['hw_base_setup_color'],
                 background    =>\&getTCCbackground,
                 ignorecase    =>1,
@@ -179,6 +180,7 @@ sub new
                 name          =>'other_base_setups',
                 label         =>'Other Base-Setups',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 group         =>['other'],
                 dataobjattr   =>'OTHER_BASE_SETUPS'),
 
@@ -198,37 +200,39 @@ sub new
                 label         =>'Filesets for Roadmap',
                 group         =>['roadmap'],
                 depend        =>['filesets_color'],
-                background    =>\&getTCCbackground,
+#                background    =>\&getTCCbackground,
+                htmldetail    =>0,
                 ignorecase    =>1,
                 dataobjattr   =>'FILESETS_AVAILABLE'),
 
-      new kernel::Field::Text(
-                name          =>'filesets_check',
-                label         =>'Filesets for Roadmap: CheckID',
-                group         =>['roadmap'],
-                htmldetail    =>0,
-                ignorecase    =>1,
-                dataobjattr   =>'CHECK_FILESETS'),
-
-
-      new kernel::Field::Text(
-                name          =>'filesets_state',
-                label         =>'Filesets for Roadmap: State',
-                group         =>['roadmap'],
-                htmldetail    =>0,
-                dataobjattr   =>getTCCStateSQL('CHECK_FILESETS')),
-
-      new kernel::Field::Text(
-                name          =>'filesets_color',
-                label         =>'Filesets for Roadmap: Color',
-                group         =>['roadmap'],
-                htmldetail    =>0,
-                dataobjattr   =>getTCCColorSQL('CHECK_FILESETS')),
+#      new kernel::Field::Text(
+#                name          =>'filesets_check',
+#                label         =>'Filesets for Roadmap: CheckID',
+#                group         =>['roadmap'],
+#                htmldetail    =>0,
+#                ignorecase    =>1,
+#                dataobjattr   =>'CHECK_FILESETS'),
+#
+#
+#      new kernel::Field::Text(
+#                name          =>'filesets_state',
+#                label         =>'Filesets for Roadmap: State',
+#                group         =>['roadmap'],
+#                htmldetail    =>0,
+#                dataobjattr   =>getTCCStateSQL('CHECK_FILESETS')),
+#
+#      new kernel::Field::Text(
+#                name          =>'filesets_color',
+#                label         =>'Filesets for Roadmap: Color',
+#                group         =>['roadmap'],
+#                htmldetail    =>0,
+#                dataobjattr   =>getTCCColorSQL('CHECK_FILESETS')),
 
       new kernel::Field::Text(
                 name          =>'sv_versions',
                 label         =>'Software-Discovery Script Version',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 group         =>['roadmap'],
                 dataobjattr   =>'SV_VERSIONS'),
 
@@ -257,6 +261,7 @@ sub new
                 label         =>'Disk Settings',
                 group         =>'dsk',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'DISK_SETTINGS'),
 
       new kernel::Field::Text(
@@ -270,6 +275,7 @@ sub new
                 name          =>'multipath_access',
                 label         =>'Multipath Access',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 group         =>['dsk'],
                 dataobjattr   =>'DISK_MULTIPATH_ACCESS'),
 
@@ -285,6 +291,7 @@ sub new
                 label         =>'Fibrechannel Settings',
                 group         =>'dsk',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 dataobjattr   =>'FC_SETTINGS'),
 
       new kernel::Field::Text(
@@ -298,6 +305,7 @@ sub new
                 name          =>'vscsi',
                 label         =>'VSCSI Settings',
                 ignorecase    =>1,
+                htmldetail    =>0,
                 group         =>'dsk',
                 dataobjattr   =>'VSCSI_DISK_SETTINGS'),
 
@@ -313,6 +321,7 @@ sub new
                 label         =>'ISCSI Settings',
                 ignorecase    =>1,
                 group         =>'dsk',
+                htmldetail    =>0,
                 dataobjattr   =>'ISCSI_DISK_SETTINGS'),
 
       new kernel::Field::Text(
@@ -327,12 +336,14 @@ sub new
                 label         =>'Storage-Discovery Script-Version',
                 ignorecase    =>1,
                 group         =>'dsk',
+                htmldetail    =>0,
                 dataobjattr   =>'SV_STORAGE'),
 
       new kernel::Field::Text(
                 name          =>'storage_check',
                 label         =>'CHECK_STORAGE ?',
                 group         =>'dsk',
+                htmldetail    =>0,
                 dataobjattr   =>'CHECK_STORAGE'),
 
       new kernel::Field::Date(
@@ -340,6 +351,7 @@ sub new
                 label         =>'Storage-Data Import Date',
                 ignorecase    =>1,
                 group         =>'dsk',
+                htmldetail    =>0,
                 dataobjattr   =>'STORAGE_DATE'),
 
       #######################################################################
@@ -350,6 +362,7 @@ sub new
                 name          =>'mon',
                 label         =>'Monitoring Filter',
                 group         =>'mon',
+                htmldetail    =>0,
                 ignorecase    =>1,
                 dataobjattr   =>'MON_FILTER'),
 
@@ -363,17 +376,17 @@ sub new
 
       #######################################################################
 
-      new kernel::Field::Text(
-                name          =>'check_status',
-                label         =>'CHECK_STATUS ?',
-                ignorecase    =>1,
-                dataobjattr   =>'CHECK_STATUS'),
-
-      new kernel::Field::Text(
-                name          =>'check_release',
-                label         =>'CHECK_RELEASE ?',
-                ignorecase    =>1,
-                dataobjattr   =>'CHECK_RELEASE'),
+#      new kernel::Field::Text(
+#                name          =>'check_status',
+#                label         =>'CHECK_STATUS ?',
+#                ignorecase    =>1,
+#                dataobjattr   =>'CHECK_STATUS'),
+#
+#      new kernel::Field::Text(
+#                name          =>'check_release',
+#                label         =>'CHECK_RELEASE ?',
+#                ignorecase    =>1,
+#                dataobjattr   =>'CHECK_RELEASE'),
 
       #######################################################################
       new kernel::Field::Text(
