@@ -338,6 +338,13 @@ sub new
                 label         =>'Deprecation End',
                 dataobjattr   =>'asset.deprend'),
 
+      new kernel::Field::Number(
+                name          =>'age',
+                group         =>'financeco',
+                unit          =>'days',
+                readonly      =>1,
+                label         =>'Hardware age',
+                dataobjattr   =>'datediff(sysdate(),asset.deprstart)'),
 
      new kernel::Field::Select(
                 name          =>'denyupd',

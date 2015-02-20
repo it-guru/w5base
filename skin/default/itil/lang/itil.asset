@@ -76,3 +76,5 @@
 'Hardware refresh light'=>{de=>'Hardware-Refresh Ampel'},
 'Hardware refresh state'=>{de=>'Hardware-Refresh Status'},
 'planned Upgrade/Refresh date'=>{de=>'geplanter Hardware Refresh Zeitpunkt'},
+'days'=>{de=>'Tage'},
+'Hardware age'=>{de=>'Hardwarealter'},
