@@ -609,6 +609,9 @@ sub getPosibleActions
       my $mgr=$self->isWorkflowManager($WfRec); # Workflow Manager can
       if (!$iscurrent && $mgr){                 # always takeover an active
          push(@l,"nop","wfhardtake");           # workflow !!
+         if ($stateid<16){ # bei allen aktiven Workflow email zulassen
+            push(@l,"wfmailsend");   
+         }
       }
       if ($iscurrent && $mgr){                  # 
          push(@l,"wfforward");                  # manager can forward
