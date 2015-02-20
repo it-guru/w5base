@@ -972,7 +972,8 @@ sub new
                                  'dnsname','shortcomments'],
                 vjoininhash   =>['id','name','addresstyp',
                                  'cistatusid','networkid',
-                                 'dnsname','comments']),
+                                 'dnsname','comments',
+                                 'srcsys']),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresseslist',

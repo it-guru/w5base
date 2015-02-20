@@ -333,7 +333,8 @@ sub qcheckRecord
                           my $eq;
                           if ($a->{name} eq $b->{ipaddress}){
                              $eq=0;
-                             $eq=1 if ($a->{comments} eq $b->{description});
+                             $eq=1 if ($a->{comments} eq $b->{description} &&
+                                       $a->{srcsys} eq "AMCDS");
                           }
                           return($eq);
                        },
@@ -357,6 +358,7 @@ sub qcheckRecord
                                      DATA=>{
                                         name      =>$newrec->{ipaddress},
                                         cistatusid=>4,
+                                        srcsys    =>'AMCDS',
                                         type      =>'1', # use sek. entry
                                         networkid =>$networkid,
                                         comments  =>$newrec->{description},
@@ -365,6 +367,11 @@ sub qcheckRecord
                                      });
                           }
                           elsif ($mode eq "delete"){
+                             my $networkid=$oldrec->{networkid};
+                             if ($networkid ne $p{netarea}->{name}->
+                                               {'Insel-Netz/Kunden-LAN'}->{id}){
+                                return();
+                             }
                              return({OP=>$mode,
                                      MSG=>"delete ip $oldrec->{name} ".
                                           "from W5Base",
