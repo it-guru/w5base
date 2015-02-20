@@ -9,10 +9,19 @@ auswählbar.
 '},
 'scapprgroup'=>{de=>'
 Wählen Sie hier die Approvergroup, die
-bei Changes für diese Anwendung mindestens 
+bei Changes für diese Anwendung
+aus technischer Sicht mindestens 
 verwendet werden soll. Dies ist in
 der Regel die Approvergroup des betreffenden
 Betriebsteams.
+'},
+'scapprgroup2'=>{de=>'
+Wählen Sie hier die Approvergroup, die
+bei Changes für diese Anwendung 
+aus fachlicher Sicht mindestens 
+verwendet werden soll. Dies ist in
+der Regel die Approvergroup des betreffenden
+Application Managers.
 '},
 'controlcenter'=>{de=>'
 Geben Sie die Bezeichnung des Teams ein, 

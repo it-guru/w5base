@@ -5,8 +5,9 @@ package TS::qrule::ApplChangeAGroup;
 =head3 PURPOSE
 
 Checks if there is on a "installed/active" or "available" application
-a change assignmentgroup for assetcenter definied.
-If there is no valid assignmentgroup defined, an error will be procceded.
+a change approvergroup for technical side an one for business side is 
+defined. If there are no valid approvergroups defined, 
+an error will be proceeded.
 
 =head3 IMPORTS
 
@@ -71,7 +72,6 @@ sub qcheckRecord
    return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
                                 $rec->{cistatusid}!=3) ||
                                $rec->{opmode} eq "license");
-
    if ($rec->{scapprgroup}=~m/^\s*$/){
       $exitcode=3 if ($exitcode<3);
       push(@{$desc->{qmsg}},
