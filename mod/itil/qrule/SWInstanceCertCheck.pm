@@ -217,16 +217,30 @@ sub checkSSL
    my $port=shift;
 
    msg(INFO,"Step2: try to connect to %s:%s SSLv3",$host,$port);
+   Env::C::setenv("HTTPS_VERSION","3",1);
    my $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
-                                   SSL_version=>'SSLv3',
+                                   SSL_version=>'SSLv23',
                                    Timeout=>10,
                                    SSL_session_cache_size=>0);
+   #my $errstr=IO::Socket::SSL->errstr();
+   #msg(ERROR,"connet error: $errstr");
    if (!defined($sock)){
       msg(INFO,"Step2.1: try to connect to %s:%s SSLv2",$host,$port);
       $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
                                    SSL_version=>'SSLv2',
                                    Timeout=>10,
                                    SSL_session_cache_size=>0);
+     # my $errstr=IO::Socket::SSL->errstr();
+     # msg(ERROR,"connet error: $errstr");
+   }
+   if (!defined($sock)){
+      msg(INFO,"Step2.2: try to connect to %s:%s SSLv23",$host,$port);
+      $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
+                                   SSL_version=>'SSLv23',
+                                   Timeout=>10,
+                                   SSL_session_cache_size=>0);
+     # my $errstr=IO::Socket::SSL->errstr();
+     # msg(ERROR,"connet error: $errstr");
    }
 
    if (!defined($sock)){  # try to build connection over proxy
