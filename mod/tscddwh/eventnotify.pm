@@ -74,6 +74,9 @@ sub isViewValid
    my $rec=shift;
 
    if ($self->isDataInputFromUserFrontend()){
+      if ($self->IsMemberOf("admin")){
+         return("ALL");
+      }
       return(undef);
    }
 
