@@ -1,34 +1,46 @@
-'acinmassingmentgroup'=>{de=>'
-Geben Sie die Incident Assignmentgroup
-an, die im ServiceCenter bei Incidents
-für diese Anwendung verwendet werden soll.
-Die Assignmentgroup muß in ServiceCenter
-so angelegt sein, dass diese nach AssetManager
-übertragen wird. Nur dann ist sie hier
-auswählbar.
+'acinmassingmentgroup'=>{
+   de=>'
+Geben Sie die Incident Assignmentgroup an, die im ServiceCenter bei 
+Incidents für diese Anwendung verwendet werden soll.
+Die Assignmentgroup muss in ServiceCenter so angelegt sein, 
+dass diese nach AssetManager übertragen wird. 
+Nur dann ist sie hier auswählbar.
+', en=>'
+Enter the Incident Assignmentgroup which is used in Service Center for 
+Incident Tickets regarding this application. 
+The Assignmentgroup must be available in Service Center and the group 
+has to have been transferred to Asset Manager. 
+Only then is the group selectable.
 '},
-'scapprgroup'=>{de=>'
-Wählen Sie hier die Approvergroup, die
-bei Changes für diese Anwendung
-aus technischer Sicht mindestens 
-verwendet werden soll. Dies ist in
-der Regel die Approvergroup des betreffenden
-Betriebsteams.
+'scapprgroup'=>{
+   de=>'
+Wählen Sie hier die Approvergroup, die bei Changes für diese Anwendung 
+aus technischer Sicht verwendet werden muss. 
+Dies ist in der Regel die Approvergroup des betreffenden Betriebsteams.
+', en=>'
+Enter the Approvergroup which has to be used for Changes on this application 
+from the technical point of view. 
+Generally it is the Approvergroup of the respective Business Team.
 '},
-'scapprgroup2'=>{de=>'
-Wählen Sie hier die Approvergroup, die
-bei Changes für diese Anwendung 
-aus fachlicher Sicht mindestens 
-verwendet werden soll. Dies ist in
-der Regel die Approvergroup des betreffenden
-Application Managers.
+'scapprgroup2'=>{
+   de=>'
+Wählen Sie hier die Approvergroup, die bei Changes für diese Anwendung 
+aus fachlicher Sicht verwendet werden muss. 
+Dies ist in der Regel die Approvergroup des betreffenden Application Managers.
+', en=>'
+Enter the Approvergroup which should be used for Changes on this application 
+from the business point of view. 
+Generally it is the Approvergroup of the respective Application Manager.
 '},
-'controlcenter'=>{de=>'
-Geben Sie die Bezeichnung des Teams ein, 
-das für die Bearbeitung der Events im 
-First Level Support zuständig ist. In der
-Regel ist dass das Application Control 
-Center. Wenn die Events von einem 
-Betriebsteam bearbeitet werden, tragen 
-sie diese Team-Bezeichnung ein.
+'controlcenter'=>{
+   de=>'
+Geben Sie die Bezeichnung des Teams ein, das für die Bearbeitung der Events 
+im First Level Support zuständig ist. 
+In der Regel ist das das Application Control Center. 
+Wenn die Events von einem Betriebsteam bearbeitet werden, 
+tragen sie diese Team-Bezeichnung ein.
+', en=>'
+Enter the team, which is responsible for handling events in 
+first level support. Normally is this the application control center.
+If the events will be handled from an business team, enter this team.
 '}
