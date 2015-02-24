@@ -170,8 +170,16 @@ sub Put
       } 
       return(1);
    }
-   if ($self->{mode} eq "ftp"){
+   elsif ($self->{mode} eq "ftp"){
       return($self->{$self->{mode}}->put($local,$remote));
+   }
+   else{
+      $self->{errstr}="missing connect call or invalid protocol";
+      if ($self->{evalmode}){
+         return(undef);
+      }
+      msg(ERROR,$self->errstr());
+      return(undef);
    }
    return(undef);
 }
@@ -181,9 +189,28 @@ sub Get
    my $self=shift;
    my $remote=shift;
    my $local=shift;
-   if ($self->{mode} eq "ftp" ||
-       $self->{mode} eq "sftp"){
+   if ($self->{mode} eq "sftp"){
+      my $s=$self->{$self->{mode}}->get($remote,$local);
+      if (!defined($s)){
+         $self->{errstr}=$self->{$self->{mode}}->error;
+         if ($self->{evalmode}){
+            return(undef);
+         }
+         msg(ERROR,$self->errstr());
+         return(undef);
+      } 
+      return(1);
+   }
+   elsif ($self->{mode} eq "ftp"){
       return($self->{$self->{mode}}->get($remote,$local));
+   }
+   else{
+      $self->{errstr}="missing connect call or invalid protocol";
+      if ($self->{evalmode}){
+         return(undef);
+      }
+      msg(ERROR,$self->errstr());
+      return(undef);
    }
    return(undef);
 }
