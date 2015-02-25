@@ -77,7 +77,8 @@ sub Process             # will be run as a spereate Process (PID)
       $p->parsefile($filename);
    }
    else{
-      printf("ERROR: %s\n",$ftp->errstr());
+      printf STDERR ("ERROR: can not load xml file %s\n",$ftp->errstr());
+      return(1); 
    }
    unlink($filename);
 
