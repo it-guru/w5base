@@ -1,0 +1,5 @@
+'TS::qrule::CocCostcenterSem'=>{
+   de=>'Prüfung Servicemanager-Eintrag in SAP P01',
+   en=>'check Servicemanager entry in SAP P01'},
+'no service manager in SAP P01'=>{
+   de=>'kein Servicemanager in SAP P01 eingetragen'},

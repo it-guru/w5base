@@ -1,11 +1,12 @@
-package TS::qrule::ApplCostcenterSem;
+package TS::qrule::CocCostcenterSem;
 #######################################################################
 =pod
 
 =head3 PURPOSE
 
-Checks if the given costcenter is valid in AssetManager.
-If not, an error will be procceded.
+Checks if there is a Servicemanager defined in the costcenter record
+in AssetManager.
+If not and this record is related with application(s), an error will be procceded.
 
 =head3 IMPORTS
 
@@ -15,30 +16,23 @@ NONE
 
 [en:]
 
-The given costcenter has no servicemanager entry in AssetManager.
+The servicemanager of the related costcenter record in AssetManager is missing.
+The probably reason is a missing entry in SAP P01.
 
-This can result in "marking as delete" the application in AssetManager, involving
-that the application is no more selectable in the process supporting tools.
-
-Please check if the given costcenter is correct.
-If so, the entry in SAP P01 should be checked.
-
-Responsible to maintenance this record in SAP P01 is the databoss of the costcenter.
+This can result in "marking as delete" of applications in AssetManager, 
+which are using this costcenter, which is inolving that this applications 
+are no more selectable in the process supporting tools as configuration item.
 
 [de:]
 
-Das angegebene Kontierungsobjekt enthält keinen 
-Servicemanager-Eintrag in AssetManager.
+Der Servicemanager am zugehörigen costcenter Datensatz in AssetManager fehlt.
+Wahrscheinliche Ursache ist ein fehlender Eintrag in SAP P01.
 
-Das kann dazu führen, dass die Anwendung in AssetManager als "deleted" markiert 
-wird, was z.B. zur Folge hat, dass sie in prozessunterstützenden Tools nicht 
-mehr als ConfigItem auswählbar ist.
+Das kann dazu führen, dass Anwendungen, die dieses Kontierungsobjekt nutzen,
+in AssetManager als "deleted" markiert werden, was wiederum zur Folge hat,
+dass diese Anwendungen in prozessunterstützenden Tools nicht 
+mehr als ConfigItem auswählbar sind.
 
-Bitte prüfen, ob das Kontierungsobjekt korrekt angegeben wurde.
-Wenn ja, sollte der Eintrag in SAP P01 überprüft werden.
-
-Zuständig für die Pflege dieses Datensatzes in SAP P01 ist der
-Datenverantwortliche des Kontierungsobjektes.
 
 =cut
 #######################################################################
@@ -76,7 +70,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["itil::appl"]);
+   return(["itil::costcenter"]);
 }
 
 sub qcheckRecord
@@ -92,9 +86,10 @@ sub qcheckRecord
    my $amcoc=getModuleObject($self->getParent->Config,"tsacinv::costcenter");
    $amcoc->SetFilter({name=>$rec->{conodenumber}});
   
-   if ($amcoc->getVal('sem') eq '') {
-      return(3,{qmsg     =>['no servicemanager entry in AssetManager'],
-                dataissue=>['no servicemanager entry in AssetManager']});
+   if ($amcoc->getVal('sem') eq '' &&
+       $#{$rec->{applications}}>-1) {
+         return(3,{qmsg     =>["no service manager in SAP P01"],
+                   dataissue=>["no service manager in SAP P01"]});
    }
 
    return(0,undef);
