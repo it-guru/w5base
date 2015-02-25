@@ -1567,8 +1567,12 @@ sub ValidatedInsertOrUpdateRecord
             }
          }
          my $opobj=$self->Clone();
-         $opobj->ValidatedUpdateRecord($rec,$newrec,
-                                      {$idfname=>$rec->{$idfname}});
+         if (!($opobj->ValidatedUpdateRecord($rec,$newrec,
+               {$idfname=>$rec->{$idfname}}))){
+            msg(ERROR,"internal error on ValidatedInsertOrUpdateRecord %s ".
+                      "in $self",
+                Dumper(\@filter));
+         }
       }
       push(@idlist,$rec->{$idfname});
       $found++;

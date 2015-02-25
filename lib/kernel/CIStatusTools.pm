@@ -76,6 +76,15 @@ sub HandleCIStatusModification
    }
 
    my $idfield=$self->IdField->Name();
+
+   if (!defined($oldrec) && defined($newrec) && $newrec->{cistatusid}==6){
+      # special case to insert/create an "disposed of waste" record
+      # - solution is to create a "virtual" oldrec entry
+      my %n=%{$newrec};
+      $n{$idfield}="[NULL]";
+      $oldrec=\%n;
+   }
+
    my $id=effVal($oldrec,$newrec,$idfield);
    my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
    if (!defined($id) && defined($newrec) && $newrec->{cistatusid}==6){
