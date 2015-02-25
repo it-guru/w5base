@@ -4,7 +4,7 @@ package TS::qrule::ApplCostcenterSem;
 
 =head3 PURPOSE
 
-Checks if the given costcenter is valid in AssetManager.
+Checks if the given costcenter object is valid in AssetManager.
 If not, an error will be procceded.
 
 =head3 IMPORTS
@@ -17,28 +17,25 @@ NONE
 
 The given costcenter has no servicemanager entry in AssetManager.
 
-This can result in "marking as delete" the application in AssetManager, involving
-that the application is no more selectable in the process supporting tools.
+The result could be, that the application can no more transmitted to AssetManager and will there "marked as delete". In process supporting tools the application is then no more selectable as configuration item.
 
 Please check if the given costcenter is correct.
-If so, the entry in SAP P01 should be checked.
-
-Responsible to maintenance this record in SAP P01 is the databoss of the costcenter.
+For inquiries contact the databoss of the costcenter object.
 
 [de:]
 
 Das angegebene Kontierungsobjekt enthält keinen 
 Servicemanager-Eintrag in AssetManager.
 
-Das kann dazu führen, dass die Anwendung in AssetManager als "deleted" markiert 
-wird, was z.B. zur Folge hat, dass sie in prozessunterstützenden Tools nicht 
-mehr als ConfigItem auswählbar ist.
+Das kann dazu führen, dass die Anwendung nicht nach AssetManager 
+übertragen werden kann und deshalb dort als "deleted" markiert 
+wird. In prozessunterstützenden Tools ist die Anwendung dann nicht 
+mehr als ConfigItem auswählbar.
 
 Bitte prüfen, ob das Kontierungsobjekt korrekt angegeben wurde.
-Wenn ja, sollte der Eintrag in SAP P01 überprüft werden.
+Für Rückfragen wenden Sie sich bitte an den Datenverantwortlichen 
+des Kontierungsobjektes.
 
-Zuständig für die Pflege dieses Datensatzes in SAP P01 ist der
-Datenverantwortliche des Kontierungsobjektes.
 
 =cut
 #######################################################################
@@ -93,8 +90,10 @@ sub qcheckRecord
    $amcoc->SetFilter({name=>$rec->{conodenumber}});
   
    if ($amcoc->getVal('sem') eq '') {
-      return(3,{qmsg     =>['no servicemanager entry in AssetManager'],
-                dataissue=>['no servicemanager entry in AssetManager']});
+      return(3,{qmsg     =>['no servicemanager entry in the '.
+                            'costcenter object in AssetManager'],
+                dataissue=>['no servicemanager entry in the '.
+                            'costcenter object in AssetManager']});
    }
 
    return(0,undef);

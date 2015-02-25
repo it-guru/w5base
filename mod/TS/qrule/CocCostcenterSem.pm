@@ -19,19 +19,17 @@ NONE
 The servicemanager of the related costcenter record in AssetManager is missing.
 The probably reason is a missing entry in SAP P01.
 
-This can result in "marking as delete" of applications in AssetManager, 
-which are using this costcenter, which is inolving that this applications 
-are no more selectable in the process supporting tools as configuration item.
+The result could be, that the application can no more transmitted to AssetManager and will there "marked as delete". In process supporting tools the application is then no more selectable as configuration item.
 
 [de:]
 
 Der Servicemanager am zugehörigen costcenter Datensatz in AssetManager fehlt.
 Wahrscheinliche Ursache ist ein fehlender Eintrag in SAP P01.
 
-Das kann dazu führen, dass Anwendungen, die dieses Kontierungsobjekt nutzen,
-in AssetManager als "deleted" markiert werden, was wiederum zur Folge hat,
-dass diese Anwendungen in prozessunterstützenden Tools nicht 
-mehr als ConfigItem auswählbar sind.
+Das kann dazu führen, dass die Anwendung nicht nach AssetManager
+übertragen werden kann und deshalb dort als "deleted" markiert
+wird. In prozessunterstützenden Tools ist die Anwendung dann nicht
+mehr als ConfigItem auswählbar.
 
 
 =cut
@@ -88,8 +86,10 @@ sub qcheckRecord
   
    if ($amcoc->getVal('sem') eq '' &&
        $#{$rec->{applications}}>-1) {
-         return(3,{qmsg     =>["no service manager in SAP P01"],
-                   dataissue=>["no service manager in SAP P01"]});
+         return(3,{qmsg     =>['no service manager entry in the '.
+                               'costcenter object in SAP P01'],
+                   dataissue=>['no service manager entry in the '.
+                               'costcenter object in SAP P01']});
    }
 
    return(0,undef);
