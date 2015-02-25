@@ -1234,6 +1234,8 @@ sub generateNotificationPreview
 <tr><td align=left>
 &nbsp;<b>$preview</b>
 <table class=emailpreview>
+EOF
+   $templ.=<<EOF if ($email ne "");
 <tr>
 <td valign=top width=50><b>$tomsg:</b></td>
 <td>$email</td>
@@ -1241,19 +1243,19 @@ sub generateNotificationPreview
 EOF
    $templ.=<<EOF if ($emailcc ne "");
 <tr>
-<td valign=top><b>$ccmsg:</b></td>
+<td valign=top width=50><b>$ccmsg:</b></td>
 <td>$emailcc</td>
 </tr>
 EOF
    $templ.=<<EOF if ($emailbcc ne "");
 <tr>
-<td valign=top><b>$bccmsg:</b></td>
+<td valign=top width=50><b>$bccmsg:</b></td>
 <td>$emailbcc</td>
 </tr>
 EOF
    $templ.=<<EOF if ($param{subject});
 <tr>
-<td valign=top><b>$subjectmsg:</b></td>
+<td valign=top width=50><b>$subjectmsg:</b></td>
 <td>$param{subject}</td>
 </tr>
 EOF
