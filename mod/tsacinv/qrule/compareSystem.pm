@@ -214,13 +214,27 @@ sub qcheckRecord
          if ($parrec->{systemname} ne $rec->{name} &&
              ($parrec->{systemname}=~m/\s/)){
             $nameok=0;
-            push(@qmsg,'systemname with whitespace in AssetManager - '.
+            my $m='systemname with whitespace in AssetManager - '.
+                  'contact oss to fix this!';
+            push(@qmsg,$m);
+            push(@dataissue,$m);
+            $errorlevel=3 if ($errorlevel<3);
+         }
+         if ($parrec->{systemname}=~m/\.\S{1,3}$/){
+            $parrec->{systemname}=~s/\..*//;
+            my $m='systemname with DNS Domain in AssetManager - '.
+                  'contact oss to fix this!';
+            push(@qmsg,$m);
+            push(@dataissue,$m);
+            $errorlevel=3 if ($errorlevel<3);
+         }
+
+         if ($parrec->{systemname}=~m/^\s*$/){  # könnte notwendig werden!
+            $nameok=0;
+            push(@qmsg,'systemname from AssetManager not useable - '.
                        'contact oss to fix this!');
             $errorlevel=3 if ($errorlevel<3);
          }
-#         if ($parrec->{systemname}=~m/^\s*$/){  # könnte notwendig werden!
-#            $nameok=0;
-#         }
          if ($nameok){
             $dataobj->ResetFilter();
             $dataobj->SetFilter({name=>\$parrec->{systemname},
