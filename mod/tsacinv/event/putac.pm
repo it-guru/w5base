@@ -856,6 +856,11 @@ sub ApplicationModified
                                    bDelete=>'0'
                                  }
                                 };
+                        if ($irec->{databossid} eq "12072167880012"){
+                           $swi->{Instances}->{SC_Location_Id}=
+                                "4787.0000.0000";
+                        }
+
                         my $fh=$fh{instance};
                         print $fh hash2xml($swi,{header=>0});
                         print $onlinefh hash2xml($swi,{header=>0});
