@@ -96,6 +96,8 @@ EOF
                                                     $self,
                                                     qw(selectshorthistory
                                                        shorthistory monthyear
+                                                       lastweek
+                                                       last2weeks
                                                        longhistory));
    my $wfstart="";
    my $workflowstart=$self->{workflowlink}->{workflowstart};

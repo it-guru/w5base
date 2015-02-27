@@ -16,6 +16,8 @@
 'currentmonth'=>{de=>'aktueller Monat',en=>'current month'},
 'nextmonth'=>{de=>'nächster Monat',en=>'next month'},
 'lastmonth'=>{de=>'letzter Monat',en=>'last month'},
+'lastweek'=>{de=>'letzte Woche',en=>'last week'},
+'last2weeks'=>{de=>'letzte 2 Wochen',en=>'last two weeks'},
 'curandlastmonth'=>{de=>'aktueller und letzter Monat',en=>'current and last month'},
 'in the future'=>{de=>'in der Zukunft'},
 'with undefined end'=>{de=>'noch nicht definiert'},

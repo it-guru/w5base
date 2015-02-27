@@ -342,6 +342,18 @@ sub getTimeRangeDrop
       $d.=">".$app->T("lastmonth")."</option>";
       $k{lastmonth}="lastmonth";
    }
+   if (grep(/^lastweek$/,@modes)){
+      $d.="<option value=\"lastweek\"";
+      $d.=" selected" if ($oldval eq "lastweek");
+      $d.=">".$app->T("lastweek")."</option>";
+      $k{lastweek}="lastweek";
+   }
+   if (grep(/^last2weeks$/,@modes)){
+      $d.="<option value=\"last2weeks\"";
+      $d.=" selected" if ($oldval eq "last2weeks");
+      $d.=">".$app->T("last2weeks")."</option>";
+      $k{last2weeks}="last2weeks";
+   }
    $d.="</select>\n"; 
    if (wantarray()){
       return(%k);

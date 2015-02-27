@@ -1079,6 +1079,14 @@ sub PreParseTimeExpression
       $val="\">=$Y-$M-01 00:00:00\" AND \"<=$Y-$M-$max 23:59:59\"";
       $f=sprintf("%04d-%02d",$Y,$M);
    }
+   elsif ($val=~m/^lastweek$/gi){
+      $val=">=now-7d AND <=now";
+      $f=sprintf("lastweek");
+   }
+   elsif ($val=~m/^last2weeks$/gi){
+      $val=">=now-14d AND <=now";
+      $f=sprintf("last2weeks");
+   }
    elsif ($val=~m/^nextmonth$/gi){
       my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($tz); 
       ($Y,$M,$D)=Add_Delta_YM($tz,$Y,$M,$D,0,1);

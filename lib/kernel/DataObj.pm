@@ -631,7 +631,10 @@ sub getRelatedWorkflows
 
    my $tt=$param->{'timerange'};
 
-   if ($tt=~m/[\(\)]/){     # if a month or year is specified, the open
+   if ($tt=~m/[\(\)]/ ||
+       $tt eq "lastweek" ||
+       $tt eq "last2weeks"
+      ){     # if a month or year is specified, the open
       $q->{eventend}=$tt;     # entrys will not be displayed
    }
    elsif ($tt eq ""){
