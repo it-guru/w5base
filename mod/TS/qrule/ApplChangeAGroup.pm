@@ -71,22 +71,24 @@ sub qcheckRecord
    }
    return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
                                 $rec->{cistatusid}!=3) ||
-                               $rec->{customerprio}>2  ||
                                $rec->{opmode} eq "license");
-   if ($rec->{scapprgroup}=~m/^\s*$/){
+   if (trim($rec->{scapprgroup}) eq ""){
       $exitcode=3 if ($exitcode<3);
       push(@{$desc->{qmsg}},
            'there is no technical change approvergroup defined');
       push(@{$desc->{dataissue}},
            'there is no technical change approvergroup defined');
    }
-   if ($rec->{scapprgroup2}=~m/^\s*$/ &&
-       NowStamp=~m/^20150315/){ # erst ab 15.03.2015 aktiv
-      $exitcode=3 if ($exitcode<3);
-      push(@{$desc->{qmsg}},
-           'there is no business change approvergroup defined');
-      push(@{$desc->{dataissue}},
-           'there is no business change approvergroup defined');
+   if ($rec->{customerprio} eq "1" || $rec->{customerprio} eq "2"){
+      if (NowStamp() gt "20150315000000"){
+         if (trim($rec->{scapprgroup2}) eq ""){
+            $exitcode=3 if ($exitcode<3);
+            push(@{$desc->{qmsg}},
+                 'there is no business change approvergroup defined');
+            push(@{$desc->{dataissue}},
+                 'there is no business change approvergroup defined');
+         }
+      }
    }
    return($exitcode,$desc);
 }
