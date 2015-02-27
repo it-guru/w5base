@@ -5,4 +5,7 @@
 'application version'=>{de=>'Anwendungsversion'},
 'shortname'=>{de=>'Kurzname'},
 'fullname'=>{de=>'Anwendungsversion'},
+'Retirement Date'=>{de=>"Retirement Datum"},
+'Retirement Type'=>{de=>"Retirement Typ"},
+
 

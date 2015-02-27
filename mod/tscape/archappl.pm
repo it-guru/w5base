@@ -63,6 +63,17 @@ sub new
                 dataobjattr   =>'Kurzbezeichnung'),
 
       new kernel::Field::Text(
+                name          =>'retirement_type',
+                label         =>'Retirement Type',
+                dataobjattr   =>'Retirement_Type'),
+
+      new kernel::Field::Date(
+                name          =>'planned_retirement_date',
+                timezone      =>'CET',
+                label         =>'planned Retirement Date',
+                dataobjattr   =>'geplantes_Retirement_Datum'),
+
+      new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 dataobjattr   =>'Status'),

@@ -64,6 +64,18 @@ sub new
                 dataobjattr   =>'Status'),
 
       new kernel::Field::Text(
+                name          =>'retirement_type',
+                label         =>'Retirement Type',
+                dataobjattr   =>'Retirement_Type'),
+
+      new kernel::Field::Date(
+                name          =>'retirement_date',
+                label         =>'Retirement Date',
+                timezone      =>'CET',
+                dataobjattr   =>'Retirement_Date'),
+
+
+      new kernel::Field::Text(
                 name          =>'applversion',
                 label         =>'application version',
                 dataobjattr   =>'Version'),
