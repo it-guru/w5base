@@ -151,21 +151,52 @@ sub new
                    return(releaseSample($_[0],$_[1],""));
                 }),
 
+      new kernel::Field::Text(
+                name          =>'pclass',
+                selectfix     =>1,
+                group         =>'pclass',
+                label         =>'Product Class',
+                dataobjattr   =>'software.productclass'),
+                                                   
+      new kernel::Field::Interface(
+                name          =>'parentid',
+                group         =>['pclass','default'],
+                label         =>'parent product id',
+                dataobjattr   =>'software.parent'),
+                                                   
+      new kernel::Field::TextDrop(
+                name          =>'parentproduct',
+                group         =>'pclass',
+                label         =>'parent product',
+                AllowEmpty    =>1,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if (!defined($current));
+                   return(1) if ($current->{pclass} eq "OPTION");
+                   return(0);
+                },
+                vjointo       =>'itil::software',
+                vjoinon       =>['parentid'=>'id'],
+                vjoindisp     =>'fullname'),
+                                                   
       new kernel::Field::Boolean(
                 name          =>'is_dbs',
-                group         =>'class',
+                group         =>'pclass',
                 label         =>'is DBS (Databasesystem) software',
                 dataobjattr   =>'software.is_dbs'),
 
       new kernel::Field::Boolean(
                 name          =>'is_mw',
-                group         =>'class',
+                group         =>'pclass',
                 label         =>'is MW (Middleware) software',
                 dataobjattr   =>'software.is_mw'),
 
       new kernel::Field::Boolean(
                 name          =>'is_dms',
-                group         =>'class',
+                group         =>'pclass',
                 label         =>'is DMS (Documentmanagement) software',
                 dataobjattr   =>'software.is_dms'),
 
@@ -373,35 +404,6 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'software.srcload'),
 
-      new kernel::Field::Text(
-                name          =>'pclass',
-                htmldetail    =>0,
-                selectfix     =>1,
-                label         =>'Product Class',
-                dataobjattr   =>'software.productclass'),
-                                                   
-      new kernel::Field::Interface(
-                name          =>'parentid',
-                label         =>'parent product id',
-                dataobjattr   =>'software.parent'),
-                                                   
-      new kernel::Field::TextDrop(
-                name          =>'parentproduct',
-                group         =>'source',
-                label         =>'parent product',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-                   return(0) if (!defined($current));
-                   return(1) if ($current->{pclass} eq "OPTION");
-                   return(0);
-                },
-                vjointo       =>'itil::software',
-                vjoinon       =>['parentid'=>'id'],
-                vjoindisp     =>'fullname'),
-                                                   
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -557,6 +559,34 @@ sub Validate
    if (exists($newrec->{name})){
       $newrec->{name}=~s/\s+/_/g;
    }
+   if (exists($newrec->{pclass})){
+      if ($newrec->{pclass} ne "MAIN" &&
+          $newrec->{pclass} ne "OPTION"){
+         $self->LastMsg(ERROR,"invalid pclass spezified");
+         return(undef);
+      }
+   }
+   if (effVal($oldrec,$newrec,"pclass") ne "OPTION"){
+      if (effVal($oldrec,$newrec,"parentid") ne ""){
+         $newrec->{parentid}=undef;
+      }
+   }
+   if (effVal($oldrec,$newrec,"pclass") eq "OPTION"){
+      if (exists($newrec->{parentid}) && $newrec->{parentid} eq "" &&
+          $oldrec->{parentid} ne ""){
+         $self->LastMsg(ERROR,"on options, parent could not be deleted");
+         return(undef);
+      }
+      if (exists($newrec->{parentid}) && 
+          $oldrec->{parentid} ne "" &&
+          $newrec->{parentid} ne $oldrec->{parentid}){
+         $self->LastMsg(ERROR,"on options, parent could not be changed");
+         return(undef);
+      }
+   }
+
+
+
    if (!defined($oldrec) &&
         $newrec->{pclass} eq "OPTION" &&
         $newrec->{parentid} ne ""){
@@ -617,7 +647,7 @@ sub initSearchQuery
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default options doccontrol class phonenumbers source));
+   return(qw(header default options doccontrol pclass phonenumbers source));
 }
 
 
@@ -647,6 +677,9 @@ sub isWriteValid
    if (defined($rec) && $rec->{pclass} eq "MAIN"){
       push(@l,"options");
    }
+   if ($self->IsMemberOf("admin")){
+      push(@l,"pclass");
+   }
    return(@l);
 }
 
@@ -667,7 +700,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    if ($rec->{pclass} ne "MAIN"){
-      return("header","default","source","doccontrol","history");
+      return("header","default","source","doccontrol","pclass","history");
    }
    return("ALL");
 }
