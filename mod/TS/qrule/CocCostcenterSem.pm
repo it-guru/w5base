@@ -16,10 +16,10 @@ NONE
 
 [en:]
 
-The servicemanager of the related costcenter record in AssetManager is missing.
-The probably reason is a missing entry in SAP P01.
+The Service Manager of the related costcenter is missing in AssetManager. The probable reason is a missing entry in SAP P01.
 
-The result could be, that the application can no more transmitted to AssetManager and will there "marked as delete". In process supporting tools the application is then no more selectable as configuration item.
+As a result the application cannot be transmitted to Asset Manager and will therefore get the status "marked as delete". Afterwards the application is not selectable as configuration item in the tools supporting the process.
+
 
 [de:]
 

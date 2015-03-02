@@ -15,12 +15,12 @@ NONE
 
 [en:]
 
-The given costcenter has no servicemanager entry in AssetManager.
+The given costcenter has no Service Manager entry in AssetManager.
 
-The result could be, that the application can no more transmitted to AssetManager and will there "marked as delete". In process supporting tools the application is then no more selectable as configuration item.
+As a result the application cannot be transmitted to Asset Manager and will therefore get the status "marked as delete". Afterwards the application is not selectable as configuration item in the tools supporting the process.
 
-Please check if the given costcenter is correct.
-For inquiries contact the databoss of the costcenter object.
+Please check, if the costcenter is entered correctly. For inquiries contact the databoss of the affected costcenter.
+
 
 [de:]
 
