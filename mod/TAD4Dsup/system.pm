@@ -42,25 +42,136 @@ create table "W5I_TAD4Dsup__system_of" (
 
 
 create or replace view "W5I_TAD4Dsup__system" as
-select "W5I_system_universum".systemname,
+select "W5I_system_universum".id,
+       "W5I_system_universum".systemname,
        "W5I_system_universum".systemid,
        "W5I_system_universum".saphier,
+       "W5I_system_universum".amcostelement costelement,
        (case
-          when "W5I_system_universum".is_t4di=1 and 
+          when "W5I_system_universum".is_t4di=1 and
                "W5I_system_universum".is_t4dp=1 then 'Both'
           when "W5I_system_universum".is_t4dp=1 then 'Production'
           when "W5I_system_universum".is_t4di=1 then 'Integration'
           else 'None'
        end) cenv ,
+       
+       decode((select count(*)
+        from "mview_TAD4D_adm_agent"
+        where agent_custom_data1="W5I_system_universum".systemid
+              and agent_active=1
+       ),'1',1,'0','1',0) agent_systemidunique,
+
+       (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_status
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_status
+          else null
+       end) agent_status ,
+       
+       (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_version
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_version
+          else null
+       end) agent_version ,
+       
+       (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_osname
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_osname
+          else null
+       end) agent_osname ,
+
+       (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_osversion
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_osversion
+          else null
+       end) agent_osversion ,
+
+       (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_active
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_active
+          else null
+       end) agent_active ,
+
+       (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_full_hwscan_time
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_full_hwscan_time
+          else null
+       end) agent_full_hwscan_time ,
+
+       (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_scan_time
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_scan_time
+          else null
+       end) agent_scan_time ,
+
+       (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_computer.computer_model
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_computer.computer_model
+          else null
+       end) computer_model ,
+
+      (case
+          when "W5I_system_universum".is_t4di=0 and
+               "W5I_system_universum".is_t4dp=1 then tad4dp_computer.sys_ser_num
+          when "W5I_system_universum".is_t4di=1 and
+               "W5I_system_universum".is_t4dp=0 then tad4di_computer.sys_ser_num
+          else null
+       end) computer_serialno ,
+       "tsacinv::system".systemola     AM_systemola,
+       "tsacinv::system".status        AM_systemstatus,
+       "tsacinv::system".securitymodel AM_securitymodel,
+       "tsacinv::asset".modelname      AM_modelname,
+       "tsacinv::system".assetassetid  AM_assetid,
+       "tsacinv::asset".cputype        AM_assetcputype,
+       "tsacinv::asset".cpucount       AM_assetcpucount,
+       "tsacinv::asset".corecount      AM_assetcorecount,
+       "tsacinv::asset".systemsonasset AM_systemsonasset,
+       "tsacinv::asset".tsacinv_locationfullname AM_location,
+
+       "W5I_TAD4Dsup__system_of".systemid of_id,
        "W5I_TAD4Dsup__system_of".comments,
        "W5I_TAD4Dsup__system_of".denv,
        "W5I_TAD4Dsup__system_of".modifyuser,
        "W5I_TAD4Dsup__system_of".modifydate
 from "W5I_system_universum"
-     left outer join "W5I_TAD4Dsup__system_of" 
-        on "W5I_system_universum".systemid=
-           "W5I_TAD4Dsup__system_of".systemid;
 
+     left outer join "W5I_TAD4Dsup__system_of"
+        on "W5I_system_universum".systemid="W5I_TAD4Dsup__system_of".systemid
+        
+     left outer join "mview_TAD4D_adm_agent" tad4dp_agent
+        on "W5I_system_universum".t4dpcomputer_sys_id=tad4dp_agent.agent_id
+           and tad4dp_agent.agent_deleted_time is null
+        
+     left outer join "mview_TAD4D_adm_agent" tad4di_agent
+        on "W5I_system_universum".t4dicomputer_sys_id=tad4di_agent.agent_id
+           and tad4di_agent.agent_deleted_time is null
+        
+     left outer join "mview_TAD4D_adm_computer" tad4dp_computer
+        on tad4dp_agent.agent_id=tad4dp_computer.computer_sys_id
+        
+     left outer join "mview_TAD4D_adm_computer" tad4di_computer
+        on tad4di_agent.agent_id=tad4di_computer.computer_sys_id
+        
+     left outer join "tsacinv::system"
+        on "W5I_system_universum".systemid="tsacinv::system".systemid
+        
+     left outer join "tsacinv::asset"
+        on "tsacinv::system".assetassetid="tsacinv::asset".assetid;
 
 grant select on "W5I_TAD4Dsup__system" to W5I;
 grant update,insert on "W5I_TAD4Dsup__system_of" to W5I;
@@ -140,7 +251,7 @@ sub new
                 label         =>'destination Env',
                 transprefix   =>'ENV.',
                 value         =>['Production','Integration','Shared',
-                                 'None','NT',''],
+                                 'CHK','DEFERRED','CHK','OUT',''],
                 dataobjattr   =>'denv'),
 
       new kernel::Field::Boolean(
@@ -167,8 +278,10 @@ sub new
                    "end) ||".
                    "(case".
                    "   when cenv<>denv  ".
+                   "        AND denv<>'CHK' ".
+                   "        AND denv<>'DEFERRED' ".
+                   "        AND denv<>'OUT' ".
                    "        AND denv<>'Shared' ".
-                   "        AND denv<>'NT' ".
                    "        then '* move system to '||denv||'\n'".
                    "   else ''".
                    "end) ||".
@@ -179,8 +292,10 @@ sub new
                    "end) ||".
                    "(case".
                    "   when computer_model is null ".
+                   "        AND denv<>'CHK' ".
+                   "        AND denv<>'DEFERRED' ".
+                   "        AND denv<>'OUT' ".
                    "        AND denv<>'Shared' ".
-                   "        AND denv<>'NT' ".
                    "        AND computer_serialno is null then ".
                    "        '* hardware detection not posible\n'".
                    "   else ''".
@@ -256,6 +371,70 @@ sub new
                 dataobjattr   =>'computer_serialno'),
 
       new kernel::Field::Text(
+                name          =>'am_systemid',
+                group         =>'am',
+                label         =>'SystemID',
+                dataobjattr   =>'systemid'),
+
+      new kernel::Field::Text(
+                name          =>'am_systemola',
+                group         =>'am',
+                label         =>'SystemOLA',
+                dataobjattr   =>'am_systemola'),
+
+      new kernel::Field::Text(
+                name          =>'am_systemstatus',
+                group         =>'am',
+                label         =>'System Status',
+                dataobjattr   =>'am_systemstatus'),
+
+      new kernel::Field::Text(
+                name          =>'am_securitymodel',
+                group         =>'am',
+                translation   =>'tsacinv::system',
+                label         =>'security flag',
+                dataobjattr   =>'am_securitymodel'),
+
+      new kernel::Field::Text(
+                name          =>'am_assetid',
+                group         =>'am',
+                label         =>'AssetID',
+                dataobjattr   =>'am_assetid'),
+
+      new kernel::Field::Text(
+                name          =>'am_modelname',
+                group         =>'am',
+                label         =>'Model',
+                dataobjattr   =>'am_modelname'),
+
+      new kernel::Field::Text(
+                name          =>'am_location',
+                group         =>'am',
+                label         =>'AMLocation',
+                dataobjattr   =>'am_location'),
+
+      new kernel::Field::Number(
+                name          =>'am_cpucount',
+                group         =>'am',
+                translation   =>'tsacinv::asset',
+                label         =>'Asset CPU count',
+                dataobjattr   =>'am_assetcpucount'),
+
+      new kernel::Field::Number(
+                name          =>'am_corecount',
+                group         =>'am',
+                translation   =>'tsacinv::asset',
+                label         =>'Asset Core count',
+                dataobjattr   =>'am_assetcorecount'),
+
+      new kernel::Field::Number(
+                name          =>'am_systemsonasset',
+                group         =>'am',
+                translation   =>'tsacinv::asset',
+                label         =>'Systems on Asset',
+                dataobjattr   =>'am_systemsonasset'),
+
+      new kernel::Field::Text(
                 name          =>'w5base_appl',
                 group         =>'w5basedata',
                 searchable    =>0,
@@ -307,7 +486,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default tad4d w5basedata source));
+          qw(header default tad4d w5basedata am source));
 }
 
 

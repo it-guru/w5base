@@ -23,7 +23,7 @@ select distinct sysmapped.*,
 from  (
    with
    w5sys as (select name                          systemname,
-                    systemid                      systemid,
+                    upper(systemid)               systemid,
                     conumber                      conumber,
                     id                            id
              from "itil::system"
@@ -50,7 +50,8 @@ from  (
              from adm.computer@tad4di join adm.agent@tad4di
                   on adm.computer.computer_sys_id=adm.agent.id)
 
-      select substr(sysbase.systemname,0,255) systemname,sysbase.systemid,
+      select substr(sysbase.systemname,0,255) systemname,
+             upper(sysbase.systemid) systemid,
              decode(w5sysbysysid.id,
                     NULL,decode(w5sysbyname.id,NULL,0,
                                 1),1) is_w5,

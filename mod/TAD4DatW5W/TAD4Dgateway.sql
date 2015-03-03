@@ -71,7 +71,9 @@ select 'tad4dp-'||adm_agent.id                 agent_id,
        to_date(substr(adm_agent.catalog_version,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_catalog_version,
        to_date(substr(adm_agent.full_hwscan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               agent_full_hwscan_time
+                                               agent_full_hwscan_time,
+       to_date(substr(adm_agent.deleted_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
+                                               agent_deleted_time
    from custom.agent_v@tad4d adm_agent
 union all
 select 'tad4di-'||adm_agent.id                 agent_id,
@@ -101,7 +103,9 @@ select 'tad4di-'||adm_agent.id                 agent_id,
        to_date(substr(adm_agent.catalog_version,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_catalog_version,
        to_date(substr(adm_agent.full_hwscan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               agent_full_hwscan_time
+                                               agent_full_hwscan_time,
+       to_date(substr(adm_agent.deleted_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
+                                               agent_deleted_time
    from custom.agent_v@tad4di adm_agent;
 
 CREATE INDEX "TAD4D_adm_agent_id" 
