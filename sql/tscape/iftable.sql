@@ -3,7 +3,7 @@ create table interface_tscape_v_darwin_export(
     icto_nummer varchar(40) not null,
     internal_key varchar(40) not null,
     name varchar(255),
-    status varchar(20),
+    status varchar(20),retirement_type varchar(40),
     kurzbezeichnung varchar(255),
     beschreibung longtext,
     geplantes_retirement_datum datetime,
