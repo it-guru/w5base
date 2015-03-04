@@ -591,6 +591,24 @@ sub loadDataFromSC
 }
 
 
+sub getFixNotifyDestinations
+{
+   my $self=shift;
+   my $mode=shift;
+   my @fixemail=();
+
+   if ($mode eq "custinfo") {
+      my $inm=13581667950003; # FMB INM
+      my $uobj=getModuleObject($self->Config,"base::user");
+      $uobj->SetFilter({userid=>$inm});
+      my $inmemail=$uobj->getVal('email');
+      push(@fixemail,"to"=>$inmemail);
+   }
+
+   return(@fixemail);
+}
+
+
 sub getNotifyDestinations
 {
    my $self=shift;
@@ -632,6 +650,7 @@ sub getNotifyDestinations
                                    $applid);
       }
    }
+
    return($self->SUPER::getNotifyDestinations($mode,$WfRec,$emailto));
 }
 

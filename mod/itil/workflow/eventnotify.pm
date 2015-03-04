@@ -1432,6 +1432,20 @@ sub addComplexAbos
 }
 
 
+sub getFixNotifyDestinations
+{
+   my $self=shift;
+   my $mode=shift;
+   # examples for @fixemail:
+   #    push(@fixemail,"to"=>$emailaddress1)
+   #    push(@fixemail,"cc"=>$emailaddress1)
+   #    push(@fixemail,"bcc"=>$emailaddress1)
+   my @fixemail=();
+
+   return(@fixemail);
+}
+
+
 sub getNotifyDestinations
 {
    my $self=shift;
@@ -3458,7 +3472,10 @@ sub generateWorkspace
 {
    my $self=shift;
    my $WfRec=shift;
-   my @email=@{$self->Context->{CurrentTarget}};
+   my @emailto=();
+   my @emailcc=();
+   my @emailbcc=@{$self->Context->{CurrentTarget}};
+   my @emailfixed=$self->getParent->getFixNotifyDestinations("custinfo");
    my $emaillang=();
    my @emailprefix=();
    my @emailpostfix=();
@@ -3470,6 +3487,13 @@ sub generateWorkspace
    my $smstext=();
    my %additional=();
    my $subject;
+
+   while (my $t=shift(@emailfixed)) {
+      my $email=shift(@emailfixed);
+      push(@emailto,$email) if ($t eq 'to');
+      push(@emailcc,$email) if ($t eq 'cc');
+      push(@emailbcc,$email) if ($t eq 'bcc');
+   }
 
    my $id=$WfRec->{id};
    my $app=$self->getParent->getParent();
@@ -3492,7 +3516,9 @@ sub generateWorkspace
                                              subject=>$subject,
                                              emailsubheader=>\@emailsubheader,
                                              emailsubtitle=>\@emailsubtitle,
-                                             bcc=>\@email));
+                                             to=>\@emailto,
+                                             cc=>\@emailcc,
+                                             bcc=>\@emailbcc));
 }
 
 sub getPosibleButtons
@@ -3700,6 +3726,19 @@ sub Process
             }
          }
       }
+
+      # all regular recipients are to be addressed in 'bcc'
+      my @emailbcc=@emailto;
+      undef @emailto;
+
+      my @emailfixed=$self->getParent->getFixNotifyDestinations("custinfo");
+      while (my $t=shift(@emailfixed)) {
+         my $email=shift(@emailfixed);
+         push(@emailto,$email) if ($t eq 'to');
+         push(@emailcc,$email) if ($t eq 'cc');
+         push(@emailbcc,$email) if ($t eq 'bcc');
+      }
+
       my $newmailrec={
              class    =>'base::workflow::mailsend',
              step     =>'base::workflow::mailsend::dataload',
@@ -3707,9 +3746,9 @@ sub Process
              emailtemplate  =>'eventnotification',
              skinbase       =>$self->getParent->getNotificationSkinbase($WfRec),
              emailfrom      =>$emailfrom,
-             #emailto        =>\@emailto,
+             emailto        =>\@emailto,
              emailcc        =>\@emailcc,
-             emailbcc       =>\@emailto,
+             emailbcc       =>\@emailbcc,
              emaillang      =>$eventlang,
              emailprefix    =>\@emailprefix,
              emailpostfix   =>\@emailpostfix,
