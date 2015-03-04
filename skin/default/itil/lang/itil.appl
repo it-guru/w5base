@@ -61,7 +61,6 @@
 'Maintenance Window'=>{de=>'Wartungsfenster'},
 'Main use time'=>{de=>'Hauptnutzungszeit'},
 'Secondary use time'=>{de=>'Nebennutzungszeit'},
-'Deputy Application Manager'=>{de=>'Application Manager Vertreter'},
 'average user count'=>{de=>'mittlere Benutzeranzahl'},
 'named user count'=>{de=>'eingetragene Benutzeranzahl'},
 'allow developer request workflows'=>{de=>'Workflow "Anforderung an Anwendungsentwicklung" erlauben'},

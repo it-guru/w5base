@@ -344,7 +344,7 @@ sub getNotifyDestinations
    my @ccbyfunc;
    $appl->ResetFilter();
    $appl->SetFilter({id=>$applid});
-   my @fl=qw(semid sem2id tsmid tsm2id applmgrid applmgr2id);
+   my @fl=qw(semid sem2id tsmid tsm2id applmgrid);
    my @ifid;
    foreach my $rec ($appl->getHashList(@fl)){
       push(@tobyfunc,$rec->{tsmid})      if ($rec->{tsmid}>0);
@@ -352,7 +352,6 @@ sub getNotifyDestinations
       push(@tobyfunc,$rec->{semid})      if ($rec->{semid}>0);
       push(@ccbyfunc,$rec->{sem2id})     if ($rec->{sem2id}>0);
       push(@tobyfunc,$rec->{applmgrid})  if ($rec->{applmgrid}>0);
-      push(@ccbyfunc,$rec->{applmgr2id}) if ($rec->{applmgr2id}>0);
    }
    my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
    my $aaflt=[{toapplid=>$applid,
@@ -373,7 +372,7 @@ sub getNotifyDestinations
       }
    }
 
-   my @fl=qw(tsmid tsm2id applmgrid applmgr2id);
+   my @fl=qw(tsmid tsm2id applmgrid);
    if ($#ifid!=-1){
       $appl->ResetFilter();
       $appl->SetFilter({id=>\@ifid,cistatusid=>"<=4"});
@@ -382,7 +381,6 @@ sub getNotifyDestinations
          push(@tobyfunc,$rec->{tsmid})      if ($rec->{tsmid}>0);
          push(@ccbyfunc,$rec->{tsm2id})     if ($rec->{tsm2id}>0);
          push(@tobyfunc,$rec->{applmgrid})  if ($rec->{applmgrid}>0);
-         push(@ccbyfunc,$rec->{applmgr2id}) if ($rec->{applmgr2id}>0);
       }
    }
    $ia->LoadTargets($emailto,'*::appl',\'changenotify',$applid);

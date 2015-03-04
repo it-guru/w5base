@@ -771,20 +771,6 @@ sub new
                 group         =>'customer',
                 dataobjattr   =>'appl.applmgr'),
 
-      new kernel::Field::Contact(
-                name          =>'applmgr2',
-                vjoineditbase =>{'cistatusid'=>[3,4,5],
-                                 'usertyp'=>[qw(extern user)]},
-                AllowEmpty    =>1,
-                group         =>'customer',
-                label         =>'Deputy Application Manager',
-                vjoinon       =>'applmgr2id'),
-
-      new kernel::Field::Interface(
-                name          =>'applmgr2id',
-                group         =>'customer',
-                dataobjattr   =>'appl.applmgr2'),
-
       new kernel::Field::Text(
                 name          =>'itnormodel',
                 group         =>'customer',
@@ -1614,7 +1600,6 @@ sub InterviewPartners
                                      $rec->{'databossid'} ne "");
    my @amgr=();
    push(@amgr,$rec->{applmgrid}) if ($rec->{applmgrid} ne "");
-   push(@amgr,$rec->{applmgr2id}) if ($rec->{applmgr2id} ne "");
    $g{'INTERVApplicationMgr'}=\@amgr if ($#amgr!=-1);
 
    my @tsm=();
