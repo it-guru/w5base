@@ -15,17 +15,23 @@ NONE
 
 [en:]
 
-The given costcenter has no Service Manager entry in AssetManager.
+The given costcenter has no Service Manager entry in AssetManager 
+(It is transferred to AssetManager from SAP P01).
 
-As a result the application cannot be transmitted to Asset Manager and will therefore get the status "marked as delete". Afterwards the application is not selectable as configuration item in the tools supporting the process.
+As a result the application cannot be transmitted to AssetManager 
+and will therefore get the status "marked as delete". 
+Afterwards the application is not selectable as configuration item 
+in the tools supporting the process.
 
-Please check, if the costcenter is entered correctly. For inquiries contact the databoss of the affected costcenter.
+Please check, if the costcenter is entered correctly. 
+For inquiries contact the databoss of the affected costcenter. 
+This person has to have the entry added into SAP P01.
 
 
 [de:]
 
-Das angegebene Kontierungsobjekt enthält keinen 
-Servicemanager-Eintrag in AssetManager.
+Das angegebene Kontierungsobjekt enthält keinen Servicemanager-Eintrag 
+in AssetManager (Der Eintrag wird ursprünglich aus SAP P01 geliefert).
 
 Das kann dazu führen, dass die Anwendung nicht nach AssetManager 
 übertragen werden kann und deshalb dort als "deleted" markiert 
@@ -34,7 +40,7 @@ mehr als ConfigItem auswählbar.
 
 Bitte prüfen, ob das Kontierungsobjekt korrekt angegeben wurde.
 Für Rückfragen wenden Sie sich bitte an den Datenverantwortlichen 
-des Kontierungsobjektes.
+des Kontierungsobjektes. Dieser muss die Angabe in SAP P01 nachtragen lassen.
 
 
 =cut
