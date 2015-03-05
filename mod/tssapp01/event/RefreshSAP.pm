@@ -153,7 +153,7 @@ sub RefreshSAP
    }
    #######################################################################
    # after this, all useable files are in @loadfiles
-   foreach my $file (@loadfiles){
+   foreach my $file (sort(@loadfiles)){
       my $label=$file;
       $label=~s/_.*//;
       my $type;
@@ -175,8 +175,6 @@ sub RefreshSAP
       }
       if ($self->processFile(File::Spec->catfile($tempdir,$file),$label,$type)){
          push(@procfiles,$file);
-
-         last;
       }
    }
 
