@@ -165,6 +165,9 @@ sub ItemSummary
 
    return($bk) if (!$bk);
 
+   my $f=$self->getField("urlofcurrentrec",$current);
+   $summary->{urlofcurrentrec}=$f->RawValue($current);
+
    # alle beantworteten Interview-Fragen
    my $o=getModuleObject($self->Config,"itil::lnkapplinteranswer");
    $o->SetFilter({parentid=>\$current->{id}});
