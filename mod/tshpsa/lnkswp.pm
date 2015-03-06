@@ -178,7 +178,7 @@ select attr.item_id sysid,
        replace(utl_i18n.string_to_raw(data =>
            attr.item_id||'-'||swi.swclass||'-'||
            swi.swpath||'-'||swi.iname),' ','') id,
-       attr.item_id||' - 'swi.swclass||' - '||
+       attr.item_id||' - '||swi.swclass||' - '||
        swi.swpath||' - '||swi.iname fullname,
        ddim.curdate,
        swi.swclass,
