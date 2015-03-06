@@ -106,6 +106,7 @@ sub new
                 background    =>\&getTCCbackground,
                 ignorecase    =>1,
                 htmllabelwidth=>'250',
+                depend        =>['roadmap_color'],
                 group         =>['roadmap'],
                 dataobjattr   =>'OS_NAME'),
 
