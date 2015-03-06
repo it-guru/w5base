@@ -1,4 +1,4 @@
-package tshpsa::lnkswi;
+package tshpsa::lnkswp;
 #  W5Base Framework
 #  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
 #
@@ -36,6 +36,7 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'ItemID',
+                htmldetail    =>0,
                 dataobjattr   =>"id"),
 
       new kernel::Field::Link(
@@ -44,11 +45,39 @@ sub new
                 dataobjattr   =>'sysid'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                ignorecase    =>1,
+                nowrap        =>1,
+                htmlwidth     =>'120',
+                htmldetail    =>0,
+                label         =>'Process entry fullname',
+                dataobjattr   =>'fullname'),
+
+      new kernel::Field::Text(
+                name          =>'softwarename',
+                ignorecase    =>1,
+                nowrap        =>1,
+                searchable    =>0,
+                htmlwidth     =>'120',
+                label         =>'based on Software',
+                depend        =>['softwareid','software','class'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $soft=$self->getParent->getField("software");
+                   my $s=$soft->RawValue($current);
+                   if ($s ne ""){
+                      return($s);
+                   }
+                   return($current->{class});
+                }),
+
+      new kernel::Field::Text(
                 name          =>'class',
                 ignorecase    =>1,
                 nowrap        =>1,
                 htmlwidth     =>'120',
-                label         =>'class',
+                label         =>'Software-Key',
                 dataobjattr   =>'swclass'),
 
       new kernel::Field::Text(
@@ -83,19 +112,46 @@ sub new
                 vjoindisp     =>['applicationnames']),
 
       new kernel::Field::Text(
+                name          =>'softwareid',
+                label         =>'SoftwareID',
+                group         =>'w5basedata',
+                searchable    =>0,
+                depend        =>['class'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id;
+                   if ($current->{class} ne ""){
+                      my ($iid)=$current->{class}=~m/\[(\d+)\]$/;
+                      $id=$iid;
+                   }
+                   return($id);
+                }),
+
+      new kernel::Field::TextDrop(
+                name          =>'software',
+                htmlwidth     =>'200px',
+                label         =>'Software',
+                group         =>'w5basedata',
+                vjoineditbase =>{cistatusid=>[3,4]},
+                vjointo       =>'itil::software',
+                vjoinon       =>['softwareid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Text(
                 name          =>'path',
                 label         =>'path',
                 dataobjattr   =>'swpath'),
 
       new kernel::Field::Text(
-                name          =>'iname',
-                label         =>'iname',
+                name          =>'uname',
+                label         =>'ProcessUser',
                 dataobjattr   =>'iname'),
 
       new kernel::Field::Text(
                 name          =>'scandate',
                 label         =>'Scandate',
-                dataobjattr   =>'scandate'),
+                dataobjattr   =>'scandate')
 
    );
    $self->setDefaultView(qw(systemname class version path iname));
@@ -118,7 +174,11 @@ sub getSqlFrom
    my $from=<<EOF;
 (
 select attr.item_id sysid,
-       attr.item_id || '-' || swi.swid id,
+--       attr.item_id || '-' || swi.swid id,
+       replace(utl_i18n.string_to_raw(data =>
+           attr.item_id||'-'||swi.swclass||'-'||
+           swi.swpath||'-'||swi.iname),' ','') id,
+       attr.item_id||swi.swclass||'-'||swi.swpath||'-'||swi.iname fullname,
        ddim.curdate,
        swi.swclass,
        swi.swvers,

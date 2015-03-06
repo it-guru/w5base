@@ -62,12 +62,12 @@ sub new
                 vjoindisp     =>[qw(sysgrpname sysgrpid)]),
 
       new kernel::Field::SubList(
-                name          =>'swis',
-                label         =>'Software-Installations',
-                group         =>'swis',
-                vjointo       =>'tshpsa::lnkswi',
+                name          =>'swps',
+                label         =>'running Software-Processes',
+                group         =>'swps',
+                vjointo       =>'tshpsa::lnkswp',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>[qw(class version iname)]),
+                vjoindisp     =>[qw(softwarename version uname path)]),
 
       new kernel::Field::Text(
                 name          =>'w5appl',
@@ -88,6 +88,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'rawscan',
                 group         =>'source',
+                htmldetail    =>0,
                 label         =>'raw Scan-Data',
                 dataobjattr   =>"
    (select ATTRIBUTE_SHORT_VALUE from SAS_SERVER_CUST_ATTRIBUTES 
@@ -154,7 +155,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","swis","sysgrps","w5basedata","source");
+   return("header","default","swps","sysgrps","w5basedata","source");
 }
 
 sub isQualityCheckValid

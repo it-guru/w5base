@@ -42,8 +42,8 @@ sub Init
                       "tshpsa::system",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.hpsa.system.software",
-                      "tshpsa::lnkswi",
+   $self->RegisterObj("itu.hpsa.system.process",
+                      "tshpsa::lnkswp",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itu.hpsa.system.sysgrp",

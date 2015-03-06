@@ -2,9 +2,10 @@
                    en=>'HP-SA logical system'},
 'fieldgroup.sysgrps'=>{de=>'Systemgruppen',
                        en=>'System groups'},
-'fieldgroup.swis'=>{de=>'Software-Installationen',
-                    en=>'Software-Installations'},
+'fieldgroup.swps'=>{de=>'Software-Prozesse',
+                    en=>'Software-Processes'},
 'fieldgroup.w5basedata'=>{de=>'W5Base/Darwin Daten',
                           en=>'W5Base/Darwin Data'},
 'W5Base Applications'=>{de=>'W5Base Anwendungen'},
+'running Processes'=>{de=>'Software-Prozesses'},
 
