@@ -41,6 +41,7 @@ sub new
                 name          =>'fullname',
                 label         =>'Fullname',
                 uivisible     =>1,
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>"(SYSTEM_NAME||' ('||SYSTEM_ID||')')"),
 
