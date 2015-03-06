@@ -111,6 +111,7 @@ sub new
    $self->{_permitted}->{uivisible}=1;  # Anzeige in der Detailsicht bzw. Listen
    $self->{_permitted}->{history}=1;    # Über das Feld braucht History
    $self->{_permitted}->{htmldetail}=1; # Anzeige in der Detailsicht
+   $self->{_permitted}->{htmllabelwidth}=1; # min Breite der Label spalte
    $self->{_permitted}->{detailadd}=1;  # zusätzliche Daten bei HtmlDetail
    $self->{_permitted}->{translation}=1;# Übersetzungsbasis für Labels
    $self->{_permitted}->{selectfix}=1;  # force to use this field alwasy in sql
@@ -1211,14 +1212,17 @@ sub BackgroundColorHandling
          if ($bg eq "red" || $bg eq "green" ||
              $bg eq "yellow" || $bg eq "grey" || $bg eq "blue"){
             $d="<div ".
-               "style='background-image:".
+               "style='padding-top:2px;padding-bottom:2px;".
+               "padding-left:2px;background-image:".
                "url(../../base/load/cellbg_$bg.jpg)'>".
                $d.
                "</div>";
          }
          else{
             $d="<div ".
-               "style='background-color:$bg'>".
+               "style='padding-top:2px;padding-bottom:2px;".
+               "padding-left:2px;background-color:".
+               "$bg'>".
                $d.
                "</div>";
          }

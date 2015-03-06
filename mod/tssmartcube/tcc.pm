@@ -40,77 +40,106 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
-                uivisible     =>0,
-                dataobjattr   =>"(SYSTEM_ID||'-'||SYSTEM_NAME)"),
+                uivisible     =>1,
+                htmldetail    =>0,
+                dataobjattr   =>"(SYSTEM_NAME||' ('||SYSTEM_ID||')')"),
+
+      new kernel::Field::Text(
+                name          =>'systemname',
+                label         =>'Systemname',
+                htmllabelwidth=>'250',
+                ignorecase    =>1,
+                dataobjattr   =>'SYSTEM_NAME'),
 
       new kernel::Field::Id(
                 name          =>'systemid',
                 label         =>'SystemID',
                 group         =>'default',
+                htmllabelwidth=>'250',
                 searchable    =>1,
                 uppersearch   =>1,
                 dataobjattr   =>"SYSTEM_ID"),
 
       new kernel::Field::Text(
-                name          =>'systemname',
-                label         =>'Systemname',
+                name          =>'assetid',
+                label         =>'AssetID',
+                htmllabelwidth=>'250',
                 ignorecase    =>1,
-                dataobjattr   =>'SYSTEM_NAME'),
+                dataobjattr   =>'ASSET_ID'),
 
       new kernel::Field::Text(
                 name          =>'productline',
                 label         =>'Productline',
+                htmllabelwidth=>'150',
                 ignorecase    =>1,
                 dataobjattr   =>'PRODUCTLINE'),
 
-
-      #######################################################################
-      # Cluster Software ####################################################
-      new kernel::Field::Text(
-                name          =>'ha_base_setup',
-                label         =>'Cluster Software',
-                ignorecase    =>1,
-                group         =>['ha'],
+      new kernel::Field::Number(
+                name          =>'check_status',
+                label         =>'TCC total state: CheckID',
                 htmldetail    =>0,
-                depend        =>['ha_base_setup_color'],
+                dataobjattr   =>'CHECK_STATUS'),
+
+      new kernel::Field::Date(
+                name          =>'tcc_report_date',
+                searchable    =>0,
+                htmllabelwidth=>'250',
+                label         =>'Report-Date',
+                dataobjattr   =>'REPORT_DATE'),
+
+      new kernel::Field::Text(
+                name          =>'check_status_color',
+                htmllabelwidth=>'250',
+                depend        =>['check_status_color'],
                 background    =>\&getTCCbackground,
-                dataobjattr   =>'HA_BASE_SETUP'),
+                label         =>'TCC total state',
+                dataobjattr   =>getTCCColorSQL('CHECK_STATUS')),
 
-      new kernel::Field::Text(
-                name          =>'ha_base_setup_check',
-                group         =>['ha'],
-                htmldetail    =>0,
-                label         =>'Cluster Software: CheckID',
-                dataobjattr   =>'CHECK_HA'),
-
-      new kernel::Field::Text(
-                name          =>'ha_base_setup_state',
-                group         =>['ha'],
-                htmldetail    =>0,
-                label         =>'Cluster Software: State',
-                dataobjattr   =>getTCCStateSQL('CHECK_HA')),
-
-      new kernel::Field::Text(
-                name          =>'ha_base_setup_color',
-                group         =>['default','ha'],
-                htmldetail    =>0,
-                label         =>'Cluster Software: Color',
-                dataobjattr   =>getTCCColorSQL('CHECK_HA')),
-      #######################################################################
 
       #######################################################################
-      # Betriebssystem   ####################################################
+      # Roadmap Compliance ##################################################
+
       new kernel::Field::Text(
-                name          =>'os_name',
+                name          =>'roadmap',
                 label         =>'Operationsystem',
+                background    =>\&getTCCbackground,
                 ignorecase    =>1,
-                group         =>['os'],
+                htmllabelwidth=>'250',
+                group         =>['roadmap'],
                 dataobjattr   =>'OS_NAME'),
+
+      new kernel::Field::Text(
+                name          =>'roadmap_check',
+                label         =>'Roadmap Compliance: CheckID',
+                htmllabelwidth=>'250',
+                group         =>['roadmap'],
+                htmldetail    =>0,
+                dataobjattr   =>'CHECK_ROADMAP'),
+
+      new kernel::Field::Text(
+                name          =>'roadmap_state',
+                label         =>'Roadmap Compliance: State',
+                htmllabelwidth=>'250',
+                group         =>['roadmap'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCStateSQL('CHECK_ROADMAP')),
+
+      new kernel::Field::Text(
+                name          =>'roadmap_color',
+                label         =>'Roadmap Compliance: Color',
+                htmllabelwidth=>'250',
+                htmldetail    =>0,
+                group         =>['roadmap'],
+                dataobjattr   =>getTCCColorSQL('CHECK_ROADMAP')),
+
+      #######################################################################
+      # Release-/Patchmanagement Compliancy #################################
 
       new kernel::Field::Text(
                 name          =>'os_base_setup',
                 label         =>'OS Base-Setup',
-                group         =>['os'],
+                htmllabelwidth=>'250',
+                group         =>['patch'],
                 depend        =>['os_base_setup_color'],
                 background    =>\&getTCCbackground,
                 ignorecase    =>1,
@@ -119,179 +148,230 @@ sub new
       new kernel::Field::Text(
                 name          =>'os_base_setup_check',
                 label         =>'OS Base-Setup: CheckID',
-                group         =>['os'],
+                group         =>['patch'],
                 htmldetail    =>0,
                 dataobjattr   =>'CHECK_OS'),
 
       new kernel::Field::Text(
                 name          =>'os_base_setup_state',
                 label         =>'OS Base-Setup: State',
-                group         =>['os'],
+                group         =>['patch'],
                 htmldetail    =>0,
                 dataobjattr   =>getTCCStateSQL('CHECK_OS')),
 
       new kernel::Field::Text(
                 name          =>'os_base_setup_color',
                 label         =>'OS Base-Setup: Color',
-                group         =>['os'],
+                group         =>['patch'],
                 htmldetail    =>0,
                 dataobjattr   =>getTCCColorSQL('CHECK_OS')),
 
-      #######################################################################
+
+      new kernel::Field::Text(
+                name          =>'other_base_setups',
+                label         =>'Other Base-Setups',
+                ignorecase    =>1,
+                htmllabelwidth=>'250',
+                depend        =>['other_base_setups_color'],
+                background    =>\&getTCCbackground,
+                group         =>['patch'],
+                dataobjattr   =>'OTHER_BASE_SETUPS'),
+
+      new kernel::Field::Text(
+                name          =>'other_base_setups_check',
+                label         =>'Other Base-Setups: CheckID',
+                group         =>['patch'],
+                htmldetail    =>0,
+                dataobjattr   =>'CHECK_OTHER'),
+
+      new kernel::Field::Text(
+                name          =>'other_base_setups_state',
+                label         =>'Other Base-Setups: State',
+                group         =>['patch'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCStateSQL('CHECK_OTHER')),
+
+      new kernel::Field::Text(
+                name          =>'other_base_setups_color',
+                label         =>'Other Base-Setups: Color',
+                group         =>['patch'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCColorSQL('CHECK_OTHER')),
 
 
-      #######################################################################
-      # HW base-setups ######################################################
+      new kernel::Field::Text(
+                name          =>'ha_base_setup',
+                label         =>'Cluster Software',
+                ignorecase    =>1,
+                htmllabelwidth=>'250',
+                group         =>['patch'],
+                htmldetail    =>1,
+                depend        =>['ha_base_setup_color'],
+                background    =>\&getTCCbackground,
+                dataobjattr   =>'HA_BASE_SETUP'),
+
+      new kernel::Field::Text(
+                name          =>'ha_base_setup_check',
+                group         =>['patch'],
+                htmldetail    =>0,
+                label         =>'Cluster Software: CheckID',
+                dataobjattr   =>'CHECK_HA'),
+
+      new kernel::Field::Text(
+                name          =>'ha_base_setup_state',
+                group         =>['patch'],
+                htmldetail    =>0,
+                label         =>'Cluster Software: State',
+                dataobjattr   =>getTCCStateSQL('CHECK_HA')),
+
+      new kernel::Field::Text(
+                name          =>'ha_base_setup_color',
+                group         =>['patch'],
+                htmldetail    =>0,
+                label         =>'Cluster Software: Color',
+                dataobjattr   =>getTCCColorSQL('CHECK_HA')),
+
+
       new kernel::Field::Text(
                 name          =>'hw_base_setup',
-                label         =>'Hardware Base-Setup ?',
-                depend        =>['hw_base_setup_color'],
+                label         =>'Hardware Base-Setup',
+                depend        =>['patch'],
                 background    =>\&getTCCbackground,
+                htmllabelwidth=>'250',
                 ignorecase    =>1,
-                group         =>['hw'],
+                group         =>['patch'],
                 dataobjattr   =>'HW_BASE_SETUP'),
 
       new kernel::Field::Text(
                 name          =>'hw_base_setup_check',
                 label         =>'Hardware Base-Setup: CheckID',
-                group         =>['hw'],
+                group         =>['patch'],
                 htmldetail    =>0,
                 dataobjattr   =>'CHECK_HW'),
 
       new kernel::Field::Text(
                 name          =>'hw_base_setup_state',
                 label         =>'Hardware Base-Setup: State',
-                group         =>['hw'],
+                group         =>['patch'],
                 htmldetail    =>0,
                 dataobjattr   =>getTCCStateSQL('CHECK_HW')),
 
       new kernel::Field::Text(
                 name          =>'hw_base_setup_color',
                 label         =>'Hardware Base-Setup: Color',
-                group         =>['hw'],
+                group         =>['patch'],
                 htmldetail    =>0,
                 dataobjattr   =>getTCCColorSQL('CHECK_HW')),
-
-      #######################################################################
-
-      #######################################################################
-      # other base-setups ###################################################
-      new kernel::Field::Text(
-                name          =>'other_base_setups',
-                label         =>'Other Base-Setups',
-                ignorecase    =>1,
-                htmldetail    =>0,
-                group         =>['other'],
-                dataobjattr   =>'OTHER_BASE_SETUPS'),
-
-      new kernel::Field::Text(
-                name          =>'other_base_setups_check',
-                label         =>'Other Base-Setups: CheckID',
-                group         =>['other'],
-                htmldetail    =>0,
-                dataobjattr   =>'CHECK_OTHER'),
-
-      #######################################################################
-
-      #######################################################################
-      # Roadmap #############################################################
-      new kernel::Field::Text(
-                name          =>'filesets',
-                label         =>'Filesets for Roadmap',
-                group         =>['roadmap'],
-                depend        =>['filesets_color'],
-#                background    =>\&getTCCbackground,
-                htmldetail    =>0,
-                ignorecase    =>1,
-                dataobjattr   =>'FILESETS_AVAILABLE'),
-
-#      new kernel::Field::Text(
-#                name          =>'filesets_check',
-#                label         =>'Filesets for Roadmap: CheckID',
-#                group         =>['roadmap'],
-#                htmldetail    =>0,
-#                ignorecase    =>1,
-#                dataobjattr   =>'CHECK_FILESETS'),
-#
-#
-#      new kernel::Field::Text(
-#                name          =>'filesets_state',
-#                label         =>'Filesets for Roadmap: State',
-#                group         =>['roadmap'],
-#                htmldetail    =>0,
-#                dataobjattr   =>getTCCStateSQL('CHECK_FILESETS')),
-#
-#      new kernel::Field::Text(
-#                name          =>'filesets_color',
-#                label         =>'Filesets for Roadmap: Color',
-#                group         =>['roadmap'],
-#                htmldetail    =>0,
-#                dataobjattr   =>getTCCColorSQL('CHECK_FILESETS')),
 
       new kernel::Field::Text(
                 name          =>'sv_versions',
                 label         =>'Software-Discovery Script Version',
                 ignorecase    =>1,
-                htmldetail    =>0,
-                group         =>['roadmap'],
+                htmllabelwidth=>'250',
+                group         =>['patch'],
                 dataobjattr   =>'SV_VERSIONS'),
 
-
-      new kernel::Field::Text(
-                name          =>'os_name_check',
-                label         =>'Roadmap: CheckID',
-                group         =>['roadmap'],
-                htmldetail    =>0,
-                dataobjattr   =>'CHECK_ROADMAP'),
-
-
       new kernel::Field::Date(
-                name          =>'version_info_date',
+                name          =>'tcc_version_info_date',
                 label         =>'Software-Discovery: Importdate',
-                group         =>['roadmap'],
+                group         =>['patch'],
+                htmllabelwidth=>'250',
                 ignorecase    =>1,
                 dataobjattr   =>'VERSION_INFO_DATE'),
 
-      #######################################################################
-
-      #######################################################################
-      # Multipath ###########################################################
       new kernel::Field::Text(
-                name          =>'disk',
-                label         =>'Disk Settings',
-                group         =>'dsk',
+                name          =>'check_release',
+                label         =>'Release-/Patchmanagement Compliancy: CheckID',
+                group         =>['patch'],
+                htmllabelwidth=>'250',
                 ignorecase    =>1,
                 htmldetail    =>0,
+                dataobjattr   =>'CHECK_RELEASE'),
+
+      new kernel::Field::Text(
+                name          =>'check_release_state',
+                label         =>'Release-/Patchmanagement Compliancy: State',
+                group         =>['patch'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCStateSQL('CHECK_RELEASE')),
+
+      new kernel::Field::Text(
+                name          =>'check_release_color',
+                label         =>'Release-/Patchmanagement Compliancy',
+                htmllabelwidth=>'250',
+                background    =>\&getTCCbackground,
+                group         =>['patch'],
+                dataobjattr   =>getTCCColorSQL('CHECK_RELEASE')),
+
+
+
+      #######################################################################
+      # Storage Connectivity Compliancy #####################################
+
+      new kernel::Field::Text(
+                name          =>'multipath_access',
+                label         =>'SAN Multipath Access',
+                ignorecase    =>1,
+                htmllabelwidth=>'250',
+                group         =>['dsk'],
+                depend        =>['multipath_access_color'],
+                background    =>\&getTCCbackground,
+                dataobjattr   =>'DISK_MULTIPATH_ACCESS'),
+
+      new kernel::Field::Text(
+                name          =>'multipath_access_check',
+                label         =>'SAN Multipath Access: CheckID',
+                htmldetail    =>0,
+                group         =>['dsk'],
+                dataobjattr   =>'CHECK_MULTIPATH'),
+
+      new kernel::Field::Text(
+                name          =>'multipath_access_color',
+                label         =>'SAN Multipath Access: Color',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCColorSQL('CHECK_MULTIPATH')),
+
+      new kernel::Field::Text(
+                name          =>'disk',
+                label         =>'SAN Disk Settings',
+                group         =>'dsk',
+                depend        =>['disk_color'],
+                background    =>\&getTCCbackground,
+                htmllabelwidth=>'250',
+                ignorecase    =>1,
                 dataobjattr   =>'DISK_SETTINGS'),
 
       new kernel::Field::Text(
                 name          =>'disk_check',
-                label         =>'Disk Settings: CheckID',
+                label         =>'SAN Disk Settings: CheckID',
                 group         =>'dsk',
                 htmldetail    =>0,
                 dataobjattr   =>'CHECK_DISK'),
 
       new kernel::Field::Text(
-                name          =>'multipath_access',
-                label         =>'Multipath Access',
-                ignorecase    =>1,
-                htmldetail    =>0,
+                name          =>'disk_state',
+                label         =>'SAN Disk Settings: State',
                 group         =>['dsk'],
-                dataobjattr   =>'DISK_MULTIPATH_ACCESS'),
+                htmldetail    =>0,
+                dataobjattr   =>getTCCStateSQL('CHECK_DISK')),
 
       new kernel::Field::Text(
-                name          =>'multipath_access_check',
-                label         =>'Multipath Access: CheckID',
+                name          =>'disk_color',
+                label         =>'SAN Disk Settings: Color',
+                group         =>['dsk'],
                 htmldetail    =>0,
-                group         =>['mp'],
-                dataobjattr   =>'CHECK_MULTIPATH'),
+                dataobjattr   =>getTCCColorSQL('CHECK_DISK')),
+
 
       new kernel::Field::Text(
                 name          =>'fc_settings',
                 label         =>'Fibrechannel Settings',
+                depend        =>['fc_settings_color'],
+                htmllabelwidth=>'250',
+                background    =>\&getTCCbackground,
                 group         =>'dsk',
                 ignorecase    =>1,
-                htmldetail    =>0,
                 dataobjattr   =>'FC_SETTINGS'),
 
       new kernel::Field::Text(
@@ -302,10 +382,60 @@ sub new
                 dataobjattr   =>'CHECK_FC'),
 
       new kernel::Field::Text(
+                name          =>'fc_settings_state',
+                label         =>'SAN Filesets: State',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCStateSQL('CHECK_FC')),
+
+      new kernel::Field::Text(
+                name          =>'fc_settings_color',
+                label         =>'SAN Filesets: Color',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCColorSQL('CHECK_FC')),
+
+      new kernel::Field::Text(
+                name          =>'filesets',
+                label         =>'SAN Filesets',
+                group         =>['dsk'],
+                htmllabelwidth=>'250',
+                depend        =>['filesets_color'],
+                background    =>\&getTCCbackground,
+                ignorecase    =>1,
+                dataobjattr   =>'FILESETS_AVAILABLE'),
+
+      new kernel::Field::Text(
+                name          =>'filesets_check',
+                label         =>'SAN Filesets: CheckID',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                ignorecase    =>1,
+                dataobjattr   =>'CHECK_FILESETS'),
+
+
+      new kernel::Field::Text(
+                name          =>'filesets_state',
+                label         =>'SAN Filesets: State',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCStateSQL('CHECK_FILESETS')),
+
+      new kernel::Field::Text(
+                name          =>'filesets_color',
+                label         =>'SAN Filesets: Color',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCColorSQL('CHECK_FILESETS')),
+
+
+      new kernel::Field::Text(
                 name          =>'vscsi',
                 label         =>'VSCSI Settings',
                 ignorecase    =>1,
-                htmldetail    =>0,
+                htmllabelwidth=>'250',
+                depend        =>['vscsi_color'],
+                background    =>\&getTCCbackground,
                 group         =>'dsk',
                 dataobjattr   =>'VSCSI_DISK_SETTINGS'),
 
@@ -317,11 +447,28 @@ sub new
                 dataobjattr   =>'CHECK_VSCSI'),
 
       new kernel::Field::Text(
+                name          =>'vscsi_state',
+                label         =>'VSCSI Settings: State',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCStateSQL('CHECK_VSCSI')),
+
+      new kernel::Field::Text(
+                name          =>'vscsi_color',
+                label         =>'VSCSI Settings: Color',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCColorSQL('CHECK_VSCSI')),
+
+
+      new kernel::Field::Text(
                 name          =>'iscsi',
                 label         =>'ISCSI Settings',
                 ignorecase    =>1,
+                htmllabelwidth=>'250',
+                depend        =>['iscsi_color'],
+                background    =>\&getTCCbackground,
                 group         =>'dsk',
-                htmldetail    =>0,
                 dataobjattr   =>'ISCSI_DISK_SETTINGS'),
 
       new kernel::Field::Text(
@@ -332,91 +479,70 @@ sub new
                 dataobjattr   =>'CHECK_ISCSI'),
 
       new kernel::Field::Text(
+                name          =>'iscsi_state',
+                label         =>'VSCSI Settings: State',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCStateSQL('CHECK_VSCSI')),
+
+      new kernel::Field::Text(
+                name          =>'iscsi_color',
+                label         =>'VSCSI Settings: Color',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                dataobjattr   =>getTCCColorSQL('CHECK_VSCSI')),
+
+      new kernel::Field::Text(
                 name          =>'storage',
                 label         =>'Storage-Discovery Script-Version',
                 ignorecase    =>1,
-                group         =>'dsk',
                 htmldetail    =>0,
+                htmllabelwidth=>'250',
+                group         =>'dsk',
                 dataobjattr   =>'SV_STORAGE'),
+
+      new kernel::Field::Date(
+                name          =>'tcc_storage_date',
+                label         =>'Storage-Discovery Importdate',
+                group         =>['dsk'],
+                htmldetail    =>0,
+                htmllabelwidth=>'250',
+                dataobjattr   =>'STORAGE_DATE'),
 
       new kernel::Field::Text(
                 name          =>'storage_check',
-                label         =>'CHECK_STORAGE ?',
+                label         =>'Storage Connectivity Compliancy: CheckID',
                 group         =>'dsk',
                 htmldetail    =>0,
                 dataobjattr   =>'CHECK_STORAGE'),
 
-      new kernel::Field::Date(
-                name          =>'storage_date',
-                label         =>'Storage-Data Import Date',
-                ignorecase    =>1,
-                group         =>'dsk',
-                htmldetail    =>0,
-                dataobjattr   =>'STORAGE_DATE'),
-
-      #######################################################################
-
-      #######################################################################
-      # Monitoring ##########################################################
       new kernel::Field::Text(
-                name          =>'mon',
-                label         =>'Monitoring Filter',
-                group         =>'mon',
+                name          =>'iscsi_state',
+                label         =>'Storage Connectivity Compliancy: State',
+                group         =>['dsk'],
                 htmldetail    =>0,
-                ignorecase    =>1,
-                dataobjattr   =>'MON_FILTER'),
+                dataobjattr   =>getTCCStateSQL('CHECK_STORAGE')),
 
       new kernel::Field::Text(
-                name          =>'mon_check',
-                label         =>'Monitoring Filter: CheckID',
-                group         =>'mon',
-                ignorecase    =>1,
-                htmldetail    =>0,
-                dataobjattr   =>'CHECK_MON'),
+                name          =>'storage_color',
+                label         =>'Storage Connectivity Compliancy',
+                group         =>['dsk'],
+                htmllabelwidth=>'250',
+                background    =>\&getTCCbackground,
+                dataobjattr   =>getTCCColorSQL('CHECK_STORAGE')),
+
+
 
       #######################################################################
-
-#      new kernel::Field::Text(
-#                name          =>'check_status',
-#                label         =>'CHECK_STATUS ?',
-#                ignorecase    =>1,
-#                dataobjattr   =>'CHECK_STATUS'),
-#
-#      new kernel::Field::Text(
-#                name          =>'check_release',
-#                label         =>'CHECK_RELEASE ?',
-#                ignorecase    =>1,
-#                dataobjattr   =>'CHECK_RELEASE'),
 
       #######################################################################
       new kernel::Field::Text(
                 name          =>'srcsys',
                 label         =>'AutoDiscovery Sourcesystem',
                 searchable    =>0,
+                htmllabelwidth=>'250',
                 group         =>'source',
                 dataobjattr   =>'AD_SOURCE'),
-
-      new kernel::Field::Text(
-                name          =>'ad_filter',
-                label         =>'Autodiscovery Filter',
-                ignorecase    =>1,
-                htmldetail    =>0,
-                group         =>'source',
-                dataobjattr   =>'AD_FILTER'),
-
-      new kernel::Field::Text(
-                name          =>'check_ad',
-                label         =>'Autodiscovery: CheckID',
-                htmldetail    =>0,
-                group         =>'source',
-                dataobjattr   =>'CHECK_AD'),
-
-      new kernel::Field::Date(
-                name          =>'report_date',
-                searchable    =>0,
-                label         =>'Report-Date',
-                group         =>'source',
-                dataobjattr   =>'REPORT_DATE'),
 
    );
    $self->setWorktable("tcc_report");
@@ -507,7 +633,7 @@ sub isQualityCheckValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default os ha roadmap hw dsk mon other source));
+   return(qw(header default roadmap patch dsk ha  hw mon other source));
 }
 
 
@@ -518,7 +644,13 @@ sub getTCCbackground{
 
    my $name=$self->Name();
 
-   my $f=$self->getParent->getField($name."_color");
+   my $colorfield=$name;
+
+   if (!($self->Name()=~m/_color$/)){
+      $colorfield.="_color";
+   }
+
+   my $f=$self->getParent->getField($colorfield);
 
    my $col;
 
@@ -553,7 +685,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
+   return("../../../public/tssmartcube/load/bgtccicon.jpg?".$cgi->query_string());
 }
 
 

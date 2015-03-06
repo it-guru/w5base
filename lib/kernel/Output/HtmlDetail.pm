@@ -445,6 +445,11 @@ EOF
                   }
                }
                my $halfwidth=$vMatrix->{fieldhalfwidth}->{$name};
+               my $htmllabelwidth=$fieldlist[$c]->htmllabelwidth();
+               my $labelwidth="";
+               if (defined($htmllabelwidth)){
+                  $labelwidth=" width=\"$htmllabelwidth\" "; 
+               }
                $subblock.="<tr class=fline>" if ($col==0);
                if ($fieldlist[$c]->Type() eq "Textarea" ||
                    $fieldlist[$c]->Type() eq "Container" ||
@@ -502,9 +507,12 @@ EOF
                   my $datacolspan=1;
                   $datacolspan=3 if ($vMatrix->{grouphavehalfwidth}->{$group});
                   $datacolspan=1 if ($halfwidth);
+                  if ($labelwidth eq ""){
+                     $labelwidth="style=\"width:20%;\"";
+                  }
                   if ($MaxMatrixCol){
                      if ($CurMatrixCol==0){
-                        $subblock.="<td class=fname$valign style=\"width:20%;\">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>";
+                        $subblock.="<td class=fname$valign $labelwidth>$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>";
                      }
                      $subblock.=<<EOF;
 <td class=finput colspan=$datacolspan>
@@ -522,7 +530,7 @@ EOF
                   }
                   else{
                      $subblock.=<<EOF;
-         <td class=fname$valign style="width:20%;">$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>
+         <td class=fname$valign $labelwidth>$fieldspec<span $fieldspecfunc>$prefix\%$name(label)%:</span>$self->{'fieldHeaders'}->{$name}</td>
          <td class=finput colspan=$datacolspan>
 <table border=0 cellspacing=0 cellpadding=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
 <td>
