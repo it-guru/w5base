@@ -65,7 +65,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'responsible',
                 group         =>'contacts',
-                label         =>'responsible EMail',
+                label         =>'costcenter responsible EMail',
                 vjointo       =>'tswiw::user',
                 vjoinon       =>['responsiblewiw'=>'uid'],
                 vjoindisp     =>'email'),
@@ -73,7 +73,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'responsiblewiw',
                 group         =>'contacts',
-                label         =>'responsible WIW ID',
+                label         =>'costcenter responsible WIW ID',
                 dataobjattr   =>'interface_tssapp01_02.responsiblewiw'),
 
       new kernel::Field::Text(

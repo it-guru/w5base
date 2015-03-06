@@ -8,3 +8,5 @@
 "the element '%s' seems not to be acceptable for this database"=>{de=>"Das Element '%s' scheint für diese Datenbank nicht zulässig"},
 "costcenter '%s' successfuly imported"=>{de=>"Kontierungsobjekt '%s' erfolgreich importiert"},
 "costcenter has been successfuly imported"=>{de=>"Kontierungsobjekt import erfolgreich"},
+'costcenter responsible EMail'=>{de=>'Kostenstellenverantwortlicher EMail'},
+'costcenter responsible WIW ID'=>{de=>'Kostenstellenverantwortlicher WIW ID'},

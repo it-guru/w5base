@@ -87,7 +87,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'databoss',
                 group         =>'contacts',
-                label         =>'Databoss EMail',
+                label         =>'Projectmanager EMail',
                 vjointo       =>'tswiw::user',
                 vjoinon       =>['databosswiw'=>'uid'],
                 vjoindisp     =>'email'),
@@ -95,27 +95,27 @@ sub new
       new kernel::Field::Text(
                 name          =>'databosswiw',
                 group         =>'contacts',
-                label         =>'Databoss WIW ID',
+                label         =>'Projectmanager WIW ID',
                 dataobjattr   =>'interface_tssapp01_01.databosswiw'),
 
       new kernel::Field::TextDrop(
                 name          =>'sm',
                 group         =>'contacts',
                 vjointo       =>'tswiw::user',
-                label         =>'Service Manager EMail',
+                label         =>'CBM EMail',
                 vjoinon       =>['smwiw'=>'uid'],
                 vjoindisp     =>'email'),
 
       new kernel::Field::Text(
                 name          =>'smwiw',
                 group         =>'contacts',
-                label         =>'Service Manager WIW ID',
+                label         =>'CBM WIW ID',
                 dataobjattr   =>'interface_tssapp01_01.smwiw'),
 
       new kernel::Field::TextDrop(
                 name          =>'dm',
                 group         =>'contacts',
-                label         =>'Delivery Manager EMail',
+                label         =>'Deliverymanager EMail',
                 vjointo       =>'tswiw::user',
                 vjoinon       =>['dmwiw'=>'uid'],
                 vjoindisp     =>'email'),
@@ -123,7 +123,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'dmwiw',
                 group         =>'contacts',
-                label         =>'Delivery Manager WIW ID',
+                label         =>'Deliverymanager WIW ID',
                 dataobjattr   =>'interface_tssapp01_01.dmwiw'),
 
       new kernel::Field::Text(
