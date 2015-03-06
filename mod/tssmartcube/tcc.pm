@@ -547,7 +547,7 @@ sub new
 
    );
    $self->setWorktable("tcc_report");
-   $self->setDefaultView(qw(systemid systemname));
+   $self->setDefaultView(qw(systemid systemname roadmap_color check_status_color));
    return($self);
 }
 
