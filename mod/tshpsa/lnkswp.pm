@@ -132,6 +132,7 @@ sub new
                 name          =>'software',
                 htmlwidth     =>'200px',
                 label         =>'Software',
+                searchable    =>0,
                 group         =>'w5basedata',
                 vjoineditbase =>{cistatusid=>[3,4]},
                 vjointo       =>'itil::software',
