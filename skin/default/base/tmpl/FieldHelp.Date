@@ -1,62 +1,107 @@
-The search field '<b>%label%</b>' is a type of date-time. So you
-can use the following expressions to specify the desired date:<br>
+The search field '<b>%label%</b>' is a type of date-time. So you can use the following expressions to specify the desired date:<br>
 <br>
 <table width="100%">
 
 <tr>
-<td>12:30:00</td>
-<td>This will use the current date and add the specifed time</td>
+<td colspan=2>
+<b>Time expressions:</b>
+</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("now")>now</a></td>
-<td>this will be use the current date and current time</td>
+<td nowrap valign=top><b>12:30:00</b></td>
+<td>...this will use the current date and add the specifed time.</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("today")>today</a></td>
-<td>this will be use the current date and as time 00:00:00</td>
+<td nowrap valign=top><b>09.03.2015</b></td>
+<td>...this will use the time 00:00:00 at 2015-03-09. If you like to use another time, add this behind the date and one space. Because of the space, you have to enclose the expression within apostrophes (e.g.&nbsp;'09.03.2015&nbsp;13:32').</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("lastmonth")>lastmonth</a></td>
-<td>this specifies the range of all days in the last month</td>
+<td nowrap valign=top><b><a href=JavaScript:SendData("now")>now</a></b></td>
+<td>...this will use the current date and current time.</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("nextmonth")>nextmonth</a></td>
-<td>this specifies the range of all days in the next month</td>
+<td nowrap valign=top><b><a href=JavaScript:SendData("today")>today</a></b></td>
+<td>...this will use the current date and as time 00:00:00.</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("currentmonth")>currentmonth</a></td>
-<td>this specifies the range of all days in the current month</td>
+<td nowrap valign=top><b><a href=JavaScript:SendData("today+1d")>today+1d</a></b></td>
+<td>...this specifies tomorrow 00:00:00.</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("today+1d")>today+1d</a></td>
-<td>this specifies tomorrow 00:00:00</td>
+<td nowrap valign=top><b><a href=JavaScript:SendData("now-5h")>now-5h</a></b></td>
+<td>...this specifies timestamp 5 hours ago.</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("now-5h")>now-5h</a></td>
-<td>this specifies timestamp 5 hours ago</td>
+<td nowrap valign=top><b>09.03.2015-2Y</b></td>
+<td>...this specifies the time 00:00:00 at 2013-03-09.</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("(11/2008)")>(11/2008)</a></td>
-<td>this specifies any timestamp in the month 11 of the year 2008</td>
+<td colspan=2><br><br>
+<b>Time periods (not available at all time-fields):</b>
+</td>
+</tr>
+
+</tr>
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("lastmonth")>lastmonth</a></b></td>
+<td>...all records with timestamp within the last calendar month.</td>
 </tr>
 
 <tr>
-<td><a href=JavaScript:SendData("(2008CW11)")>(2008CW11)</a></td>
-<td>this specifies any timestamp in the calendar week 11 of the year 2008</td>
+<td nowrap valign=top><b><a href=JavaScript:SendData("nextmonth")>nextmonth</a><b></td>
+<td>...all records with timestamp within the next calendar month.</td>
 </tr>
 
 <tr>
-<td>...</td>
-<td>there are more expression, but they are'nt documented at now</td>
+<td nowrap valign=top><b><a href=JavaScript:SendData("currentmonth")>currentmonth</a></b></td>
+<td>...all records with timestamp within the current calendar month.</td>
 </tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("(11/2014)")>(11/2014)</a></b></td>
+<td>...all records within month 11 of year 2014.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><a href=JavaScript:SendData("(2014KW11)")>(2008KW11)</a></b></td>
+<td>...all records within calendar week 11 of year 2014. Per Definition a week always starts at monday 00:00:00.</td>
+</tr>
+
+<tr>
+<td valign=top colspan=2><br>
+<b>Complex expressions in timestamp fields:</b><br>
+You can use complex expressions with logical concatenations, which allows user-defined queries.<br>
+Expressions with spaces have to enclosed in apostrophes (e.g. '09.03.2015 12:30:00').
+<br><br>
+<u><b>Examples:</b></u><br><br>
+<b><a href='JavaScript:SendData("&#39;&gt;09.03.2015 13:00&#39; AND &#39;&lt;09.03.2015 15:00&#39;")'>&#39;&gt;09.03.2015 13:00&#39; AND &#39;&lt;09.03.2015 15:00&#39;</a></b><br>
+...all records within 2015-03-09 13:00 and 2015-03-09 15:00.<br><br> 
+<b><a href='JavaScript:SendData("&gt;now-1M AND &lt;now+1M")'>&gt;now-1M AND &lt;now+1M</a></b><br>
+...all records between "1 month ago" and "1 month in the future".<br>
+<br>
+<b><a href='JavaScript:SendData("&gt;jetzt")'>&gt;now</a></b><br>
+...all records in the future.<br>
+<br>
+</td>
+</tr>
+
+<tr>
+<td valign=top colspan=2><br><b>Abbreviations:</b></td>
+</tr>
+<tr><td><b>h</b></td><td>Hour</td></tr>
+<tr><td><b>d</b></td><td>Day</td></tr>
+<tr><td><b>w</b></td><td>Week</td></tr>
+<tr><td><b>M</b></td><td>Month</td></tr>
+<tr><td><b>Y</b></td><td>Year</td></tr>
+
 </table>
 <script language="JavaScript">
 function SendData(t)
