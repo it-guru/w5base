@@ -19,7 +19,7 @@ select distinct sysmapped.*,
        "tsacinv::system".nature amnature,
        "tsacinv::system".model  ammodel,
        "tsacinv::system".usage  amusage,
-       sysmapped.systemid || '-' || sysmapped.systemname id
+       replace(sysmapped.systemid || '-' || sysmapped.systemname,' ','_') id
 from  (
    with
    w5sys as (select name                          systemname,

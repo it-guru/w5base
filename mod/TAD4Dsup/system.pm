@@ -256,7 +256,7 @@ sub new
                 label         =>'destination Env',
                 transprefix   =>'ENV.',
                 value         =>['Production','Integration','Shared',
-                                 'CHK','DEFERRED','CHK','OUT',''],
+                                 'CHK','DEFERRED','REJECTED','OUT',''],
                 dataobjattr   =>'denv'),
 
       new kernel::Field::Boolean(
