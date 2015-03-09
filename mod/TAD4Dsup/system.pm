@@ -420,6 +420,13 @@ sub new
                 label         =>'Asset CPU count',
                 dataobjattr   =>'am_assetcpucount'),
 
+      new kernel::Field::Text(
+                name          =>'am_assetcputype',
+                group         =>'am',
+                translation   =>'tsacinv::asset',
+                label         =>'Asset CPU Typ',
+                dataobjattr   =>'am_assetcputype'),
+
       new kernel::Field::Number(
                 name          =>'am_corecount',
                 group         =>'am',
