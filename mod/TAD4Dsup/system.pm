@@ -133,6 +133,7 @@ select "W5I_system_universum".id,
           else null
        end) computer_serialno ,
        "tsacinv::system".systemola     AM_systemola,
+       "tsacinv::system".systemolaclass  AM_systemolaclass,
        "tsacinv::system".status        AM_systemstatus,
        "tsacinv::system".securitymodel AM_securitymodel,
        "tsacinv::asset".modelname      AM_modelname,
@@ -381,6 +382,12 @@ sub new
                 group         =>'am',
                 label         =>'SystemOLA',
                 dataobjattr   =>'am_systemola'),
+
+      new kernel::Field::Text(
+                name          =>'am_systemolaclass',
+                group         =>'am',
+                label         =>'SystemOLA Service Class',
+                dataobjattr   =>'am_systemolaclass'),
 
       new kernel::Field::Text(
                 name          =>'am_systemstatus',
