@@ -46,6 +46,11 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'itil::costcenter',
+             target    =>'name',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'itil::asset',
              target    =>'name',
              targetid  =>'id'
