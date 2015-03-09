@@ -93,7 +93,7 @@ sub Init
 
 
    $self->RegisterEvent("RefreshSAP",
-                        "RefreshSAP",timeout=>18000);
+                        "RefreshSAP",timeout=>19000);
    return(1);
 }
 
@@ -153,6 +153,7 @@ sub RefreshSAP
    }
    #######################################################################
    # after this, all useable files are in @loadfiles
+   my $reccnt=0;
    foreach my $file (sort(@loadfiles)){
       my $label=$file;
       $label=~s/_.*//;
@@ -173,7 +174,7 @@ sub RefreshSAP
          }
          next if (!$found);
       }
-      if ($self->processFile(File::Spec->catfile($tempdir,$file),$label,$type)){
+      if ($self->processFile(File::Spec->catfile($tempdir,$file),$label,$type,\$reccnt)){
          push(@procfiles,$file);
       }
    }
@@ -193,7 +194,7 @@ sub RefreshSAP
       return({exitcode=>1,msg=>'ERROR:'.$loaderror});
    }
 
-   return({exitcode=>0,msg=>'ok '.($#procfiles+1)." files processed"});
+   return({exitcode=>0,msg=>'ok '.($#procfiles+1)." files processed $reccnt records"});
 }
 
 
@@ -204,6 +205,7 @@ sub processFile
    my $file=shift;
    my $label=shift;
    my $type=shift;
+   my $reccnt=shift;
 
    my $obj; # target object
    my %m;   # mapping
@@ -270,6 +272,7 @@ sub processFile
    my %k;
    my $srcsys=$label;
 
+
    if (open(my $fh,"<:encoding(Latin1)",$file)){
       $csv->column_names ($csv->getline($fh)); # use first line as fieldnames
       my $line=0;
@@ -322,6 +325,7 @@ sub processFile
             $if->ValidatedInsertOrUpdateRecord($wrrec,
                                                {'name'=>\$wrrec->{'name'},
                                                 'srcsys'=>\$srcsys});
+            $$reccnt++;
             #exit() if ($wrrec->{'name'} eq "E-900328595O-1000IT");
             #print Dumper($wrrec);
          }
