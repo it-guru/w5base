@@ -545,6 +545,10 @@ sub initSearchQuery
      Query->Param("search_saphier"=>
                   "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
    }
+   if (!defined(Query->Param("search_denv"))){
+     Query->Param("search_denv"=>
+                  "\"!out of scope\"");
+   }
 }
 
 
