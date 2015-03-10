@@ -132,19 +132,55 @@ sub qcheckRecord
                        \@qmsg,\@dataissue,\$errorlevel,
                        mode=>'integer');
 
+         if ($parrec->{acqumode} eq "1"){
+            $parrec->{acqumode}="RENTAL";
+         }
+         elsif ($parrec->{acqumode} eq "2"){
+            $parrec->{acqumode}="LEASE";
+         }
+         elsif ($parrec->{acqumode} eq "3"){
+            $parrec->{acqumode}="LOAN";
+         }
+         elsif ($parrec->{acqumode} eq "4"){
+            $parrec->{acqumode}="PROVISION";
+         }
+         elsif ($parrec->{acqumode} eq "6"){
+            $parrec->{acqumode}="FREE";
+         }
+         else{
+            $parrec->{acqumode}="PURCASE";
+         }
          $self->IfComp($dataobj,
-                       $rec,"deprstart",
-                       $parrec,"deprstart",
+                       $rec,"acqumode",
+                       $parrec,"acqumode",
                        $autocorrect,$forcedupd,$wfrequest,
                        \@qmsg,\@dataissue,\$errorlevel,
-                       mode=>'day');
+                       mode=>'string');
+         if ($autocorrect || $parrec->{acqumode} eq $rec->{acqumode}){
+            if ($parrec->{acqumode} ne "PURCASE"){
+               $self->IfComp($dataobj,
+                             $rec,"startacqu",
+                             $parrec,"startacquisition",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'day');
+            }
+            else{
+               $self->IfComp($dataobj,
+                             $rec,"deprstart",
+                             $parrec,"deprstart",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'day');
 
-         $self->IfComp($dataobj,
-                       $rec,"deprend",
-                       $parrec,"deprend",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       \@qmsg,\@dataissue,\$errorlevel,
-                       mode=>'day');
+               $self->IfComp($dataobj,
+                             $rec,"deprend",
+                             $parrec,"deprend",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'day');
+            }
+         }
 
          $self->IfComp($dataobj,
                        $rec,"corecount",

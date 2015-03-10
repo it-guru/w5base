@@ -722,7 +722,7 @@ alter table system add is_avforfuse bool default '0', add key(is_avforfuse);
 alter table asset  add is_avforfuse bool default '0', add key(is_avforfuse);
 alter table appl   add eventlang  varchar(5) default NULL;
 update appl set eventlang='de';
-alter table appl   add chmgrteam    bigint(20) default NULL;
+#
 alter table system add is_infrastruct bool default '0', add key(is_infrastruct);
 alter table appl   add secstate  varchar(20) default NULL;
 alter table servicesupport add fullname varchar(128) default NULL;
@@ -1419,3 +1419,4 @@ create table lnkbusinessservicegrp (
   FOREIGN KEY (grp) 
           REFERENCES grp (grpid) ON DELETE CASCADE
 ) ENGINE=INNODB;
+alter table asset add acquStart datetime default NULL,add acquMode varchar(10) default 'PURCASE';

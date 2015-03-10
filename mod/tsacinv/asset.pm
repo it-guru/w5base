@@ -227,28 +227,70 @@ sub new
                 dataobjattr   =>'amasset.lmaintlevelid'),
 
 
-      new kernel::Field::Date(
-                name          =>'deprstart',
+      new kernel::Field::Select(
+                name          =>'acqumode',
+                label         =>'Acquisition Mode',
                 group         =>'finanz',
-                depend        =>'assetid',
-                onRawValue    =>\&CalcDep,
-                label         =>'Deprecation Start',
-                timezone      =>'CET'),
+                transprefix   =>'AQMODE.',
+                value         =>[0,1,2,3,4,6],
+                dataobjattr   =>'amasset.seAcquModeTsi'),
+
+      new kernel::Field::Date(
+                name          =>'startacquisition',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if ($current->{acqumode}==0);
+                   return(1);
+                },
+                group         =>'finanz',
+                depend        =>'acqumode',
+                label         =>'Acquisition Start',
+                timezone      =>'CET',
+                dataobjattr   =>'amasset.dstartacqu'),
 
       new kernel::Field::Number(
                 name          =>'age',
                 group         =>'finanz',
-                depend        =>'assetid',
+                depend        =>['assetid','acqumode','startacquisition'],
                 htmldetail    =>0,
+                searchable    =>0,
                 onRawValue    =>\&CalcDep,
                 label         =>'Age',
                 unit          =>'days'),
+
+       new kernel::Field::Date(
+                name          =>'deprstart',
+                group         =>'finanz',
+                searchable    =>0,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{acqumode}==0);
+                   return(0);
+                },
+                onRawValue    =>\&CalcDep,
+                label         =>'Deprecation Start',
+                timezone      =>'CET'),
+
 
       new kernel::Field::Date(
                 name          =>'deprend',
                 group         =>'finanz',
                 searchable    =>0,
-                depend        =>'assetid',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{acqumode}==0);
+                   return(0);
+                },
+                depend        =>['assetid','acqumode'],
                 onRawValue    =>\&CalcDep,
                 label         =>'Deprecation End',
                 timezone      =>'CET'),
@@ -256,7 +298,15 @@ sub new
       new kernel::Field::Date(
                 name          =>'compdeprstart',
                 group         =>'finanz',
-                depend        =>'assetid',
+                depend        =>['assetid','acqumode'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{acqumode}==0);
+                   return(0);
+                },
                 searchable    =>0,
                 onRawValue    =>\&CalcDep,
                 label         =>'Component Deprecation Start',
@@ -266,7 +316,15 @@ sub new
                 name          =>'compdeprend',
                 group         =>'finanz',
                 searchable    =>0,
-                depend        =>'assetid',
+                depend        =>['assetid','acqumode'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{acqumode}==0);
+                   return(0);
+                },
                 onRawValue    =>\&CalcDep,
                 label         =>'Component Deprecation End',
                 timezone      =>'CET'),
@@ -275,15 +333,31 @@ sub new
                 name          =>'deprbase',
                 group         =>'finanz',
                 searchable    =>0,
-                depend        =>'assetid',
+                depend        =>['assetid','acqumode'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{acqumode}==0);
+                   return(0);
+                },
                 onRawValue    =>\&CalcDep,
                 label         =>'deprication base'),
 
       new kernel::Field::Currency(
                 name          =>'residualvalue',
                 group         =>'finanz',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{acqumode}==0);
+                   return(0);
+                },
                 searchable    =>0,
-                depend        =>'assetid',
+                depend        =>['assetid','acqumode'],
                 onRawValue    =>\&CalcDep,
                 label         =>'residual value'),
 
@@ -291,6 +365,15 @@ sub new
                 name          =>'mdepr',
                 label         =>'Asset Depr./Month',
                 size          =>'20',
+                depend        =>['assetid','acqumode'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1) if ($current->{acqumode}==0);
+                   return(0);
+                },
                 group         =>'finanz',
                 dataobjattr   =>'amasset.mdeprcalc'),
 
@@ -447,50 +530,69 @@ sub CalcDepr
    my $residualvalue;
    my $deprbase;
    my $age;
-   if ($assetid ne ""){
-      $ac->ResetFilter();
-      $ac->SetFilter({assetid=>\$assetid});
-      my @fal=$ac->getHashList(qw(deprend deprstart deprbase residualvalue));
-      my $maxdeprbase=0; 
-      foreach my $fa (@fal){
-         $maxdeprbase=$fa->{deprbase} if ($fa->{deprbase}>$maxdeprbase);
-      }
-      foreach my $fa (@fal){
-         $residualvalue+=$fa->{residualvalue};
-         $deprbase+=$fa->{deprbase};
-         if ($maxdeprbase==$fa->{deprbase}){
-            $deprend=$fa->{deprend}         if (!defined($deprend));
-            $deprstart=$fa->{deprstart}     if (!defined($deprstart));
+   if ($current->{acqumode}==0){
+      if ($assetid ne ""){
+         $ac->ResetFilter();
+         $ac->SetFilter({assetid=>\$assetid});
+         my @fal=$ac->getHashList(qw(deprend deprstart deprbase residualvalue));
+         my $maxdeprbase=0; 
+         foreach my $fa (@fal){
+            $maxdeprbase=$fa->{deprbase} if ($fa->{deprbase}>$maxdeprbase);
          }
-         else{
-            $compdeprend=$fa->{deprend}     if (!defined($compdeprend));
-            $compdeprstart=$fa->{deprstart} if (!defined($compdeprstart));
-            if ($compdeprend lt $fa->{deprend}){
-               $compdeprend=$fa->{deprend};
+         foreach my $fa (@fal){
+            $residualvalue+=$fa->{residualvalue};
+            $deprbase+=$fa->{deprbase};
+            if ($maxdeprbase==$fa->{deprbase}){
+               $deprend=$fa->{deprend}         if (!defined($deprend));
+               $deprstart=$fa->{deprstart}     if (!defined($deprstart));
             }
-            if ($compdeprstart gt $fa->{deprstart}){
-               $compdeprstart=$fa->{deprstart};
+            else{
+               $compdeprend=$fa->{deprend}     if (!defined($compdeprend));
+               $compdeprstart=$fa->{deprstart} if (!defined($compdeprstart));
+               if ($compdeprend lt $fa->{deprend}){
+                  $compdeprend=$fa->{deprend};
+               }
+               if ($compdeprstart gt $fa->{deprstart}){
+                  $compdeprstart=$fa->{deprstart};
+               }
             }
          }
       }
-   }
-   $compdeprend=$deprend     if (!defined($compdeprend));
-   $compdeprstart=$deprstart if (!defined($compdeprstart));
+      $compdeprend=$deprend     if (!defined($compdeprend));
+      $compdeprstart=$deprstart if (!defined($compdeprstart));
 
-   if ($deprstart ne ""){
-      my $d=CalcDateDuration($deprstart,NowStamp("en"));
-      if (defined($d)){
-         $age=int($d->{totaldays});
+      if ($deprstart ne ""){
+         my $d=CalcDateDuration($deprstart,NowStamp("en"));
+         if (defined($d)){
+            $age=int($d->{totaldays});
+         }
       }
-   }
 
+      
+
+      return({compdeprend=>$compdeprend,compdeprstart=>$compdeprstart,
+              deprend=>$deprend,deprstart=>$deprstart,
+              deprbase=>$deprbase,
+              age=>$age,
+              residualvalue=>$residualvalue});
+   }
+   else{
+      my $startacquisition=$current->{startacquisition}; 
+      my $age;
+      if ($startacquisition ne ""){
+         my $d=CalcDateDuration($startacquisition,NowStamp("en"));
+         if (defined($d)){
+            $age=int($d->{totaldays});
+         }
+      }
+
+      return({compdeprend=>undef,compdeprstart=>undef,
+              deprend=>undef,deprstart=>undef,
+              deprbase=>undef,
+              age=>$age,
+              residualvalue=>undef});
+   }
    
-
-   return({compdeprend=>$compdeprend,compdeprstart=>$compdeprstart,
-           deprend=>$deprend,deprstart=>$deprstart,
-           deprbase=>$deprbase,
-           age=>$age,
-           residualvalue=>$residualvalue});
 
 
 }
@@ -523,7 +625,8 @@ sub getSqlFrom
    my $self=shift;
    my $from="amasset,amnature, amportfolio assetportfolio,ammodel, amlocation,".
             "(select amcostcenter.* from amcostcenter ".
-            " where amcostcenter.bdelete=0) amcostcenter, amtenant";
+            " where amcostcenter.bdelete=0) amcostcenter, amtenant ";
+
 
    return($from);
 }

@@ -102,7 +102,8 @@ sub DataIssueCompleteWriteRequest
       }
    }
    if ($affectedobject=~m/::costcenter$/){
-      if ($newrec->{affectedobject}=~m/::costcenter$/){
+      if (defined($newrec) &&
+          $newrec->{affectedobject}=~m/::costcenter$/){
          # create link to config Management
          $newrec->{directlnktype}=$newrec->{affectedobject};
          $newrec->{directlnkid}=$newrec->{affectedobjectid};

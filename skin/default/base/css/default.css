@@ -41,6 +41,11 @@ iframe.HtmlDetailPage{
       background: transparent;
       border: 0;
    }
+   input[disabled] {
+       color: gray;
+       background-color:silver;
+       background-image: none;
+   }
 
    p{
       margin-top: 0px;

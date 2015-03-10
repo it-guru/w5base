@@ -143,7 +143,32 @@ sub FormatedDetail
             }
             else{
                if (!$self->{dayonly} || $self->{dayonly}==2){
-                  if ($absdelta>2635200){
+                  if ($absdelta>31536000){
+                     my $years=int($absdelta/31536000);
+                     $absdelta=$absdelta-($years*31536000);
+                     # und noch die Tage killen
+                     {
+                        my $months=int($absdelta/2635200);
+                        $absdelta=$months*2635200;
+                     }
+                     if ($lang eq "de"){
+                        if ($years==1){
+                           push(@blks,"einem Jahr");
+                        }
+                        else{
+                           push(@blks,"$years Jahren");
+                        }
+                     }
+                     else{
+                        if ($years==1){
+                           push(@blks,"one year");
+                        }
+                        else{
+                           push(@blks,"$years years");
+                        }
+                     }
+                  }
+                  if ($absdelta>=2635200){
                      my $months=int($absdelta/2635200);
                      $absdelta=$absdelta-($months*2635200);
                      if ($lang eq "de"){

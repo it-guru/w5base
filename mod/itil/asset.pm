@@ -324,16 +324,77 @@ sub new
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'asset.conumber'),
 
+      new kernel::Field::Select(
+                name          =>'acqumode',
+                label         =>'Acquisition Mode',
+                jsonchanged   =>\&getOnChangedAcquScript,
+                jsoninit      =>\&getOnChangedAcquScript,
+                group         =>'financeco',
+                selectfix     =>1,
+                value         =>[qw(
+                                      PURCASE
+                                      RENTAL
+                                      LEASE
+                                      LOAN
+                                      PROVISION
+                                      FREE
+                                )],
+                dataobjattr   =>'asset.acquMode'),
+
       new kernel::Field::Date(
-                name          =>'deprstart',
+                name          =>'startacqu',
                 group         =>'financeco',
                 dayonly       =>1,
+                selectfix     =>1,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{'acqumode'} ne "PURCASE"){
+                      return(1);
+                   }
+                   return(1) if ($param{currentfieldgroup} eq $self->{group});
+                   return(0);
+                },
+                label         =>'Acquisition Start',
+                dataobjattr   =>'asset.acquStart'),
+
+      new kernel::Field::Date(
+                name          =>'deprstart',
+                depend        =>['acqumode'],
+                group         =>'financeco',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{'acqumode'} eq "PURCASE"){
+                      return(1);
+                   }
+                   return(1) if ($param{currentfieldgroup} eq $self->{group});
+                   return(0);
+                },
+                dayonly       =>1,
+                selectfix     =>1,
                 label         =>'Deprecation Start',
                 dataobjattr   =>'asset.deprstart'),
 
       new kernel::Field::Date(
                 name          =>'deprend',
+                depend        =>['acqumode'],
                 group         =>'financeco',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{'acqumode'} eq "PURCASE"){
+                      return(1);
+                   }
+                   return(1) if ($param{currentfieldgroup} eq $self->{group});
+                   return(0);
+                },
                 dayonly       =>1,
                 label         =>'Deprecation End',
                 dataobjattr   =>'asset.deprend'),
@@ -343,8 +404,11 @@ sub new
                 group         =>'financeco',
                 unit          =>'days',
                 readonly      =>1,
+                htmldetail    =>0,
                 label         =>'Hardware age',
-                dataobjattr   =>'datediff(sysdate(),asset.deprstart)'),
+                dataobjattr   =>"if (acqumode='PURCASE',".
+                                "datediff(sysdate(),asset.deprstart),".
+                                "datediff(sysdate(),asset.acquStart))"),
 
      new kernel::Field::Select(
                 name          =>'denyupd',
@@ -680,7 +744,7 @@ sub getSQLrefreshstateCommand
    my $longterm="INTERVAL 60 MONTH";
    my $d=<<EOF;
 
-if (asset.deprstart is not null,
+if (if (asset.acquMode='PURCASE',asset.deprstart,asset.acquStart) is not null,
    if (asset.refreshpland is not null and asset.refreshpland>sysdate(),
       'green => refreshplaned is set',
    /*ELSE no refresh planed is set*/
@@ -695,10 +759,12 @@ if (asset.deprstart is not null,
             )
          ),
       /*ELSE kein Begruendungsendezeitpunkt*/
-         if (date_add(asset.deprstart,${longterm})<sysdate(),
+         if (date_add(if (asset.acquMode='PURCASE',
+                        asset.deprstart,asset.acquStart),${longterm})<sysdate(),
             'red => 5 years',
          /*ELSE*/
-            if (date_add(asset.deprstart,${shortterm})<sysdate(),
+            if (date_add(if (asset.acquMode='PURCASE',
+                     asset.deprstart,asset.acquStart),${shortterm})<sysdate(),
                if (length(asset.denyupdcomments)>10,
                   'lightgreen',
                /*ELSE Bemerkung nicht vorhanden*/
@@ -710,8 +776,8 @@ if (asset.deprstart is not null,
          )
       )
    ),
-/*ELSE Abschreibungsbegin nicht gesetzt*/
-   'yellow => no deprstart'
+/*ELSE Start nicht gesetzt*/
+   'yellow => no start date'
 )
 
 
@@ -756,6 +822,41 @@ if (d && r){
 EOF
    return($d);
 }
+
+
+sub getOnChangedAcquScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var d=document.forms[0].elements['Formated_acqumode'];
+var s=document.forms[0].elements['Formated_startacqu'];
+var ds=document.forms[0].elements['Formated_deprstart'];
+var de=document.forms[0].elements['Formated_deprend'];
+
+if (d && s && ds && de){
+   var v=d.options[d.selectedIndex].value;
+   if (v=="PURCASE"){
+      s.value="";
+      s.disabled=true;
+      ds.disabled=false;
+      de.disabled=false;
+   }
+   else{
+      s.disabled=false;
+      ds.disabled=true;
+      ds.value="";
+      de.disabled=true;
+      de.value="";
+   }
+}
+
+EOF
+   return($d);
+}
+
 
 
 
@@ -896,6 +997,17 @@ sub Validate
          return(0);
       }
    }
+   if (effChanged($oldrec,$newrec,"acqumode")){
+      if ($newrec->{acqumode} ne "PURCASE"){
+         $newrec->{deprstart}=undef;
+         $newrec->{deprend}=undef;
+      }
+      else{
+         $newrec->{startacqu}=undef;
+      }
+   }
+
+
 
    my $deprend=effVal($oldrec,$newrec,"deprend");
    my $deprstart=effVal($oldrec,$newrec,"deprstart");
@@ -972,7 +1084,8 @@ sub isViewValid
    my @all=qw(default guardian physasset contacts control location 
               systems source qc applications
               phonenumbers misc attachments sec financeco history);
-   if ($rec->{deprstart} ne ""){
+   if (($rec->{acqumode} eq "PURCASE" && $rec->{deprstart} ne "") ||
+       ($rec->{acqumode} ne "PURCASE" && $rec->{startacqu} ne "")){
       push(@all,"upd");
    }
    return(@all);
