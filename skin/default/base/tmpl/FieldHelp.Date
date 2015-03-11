@@ -1,4 +1,4 @@
-The search field '<b>%label%</b>' is a type of date-time. So you can use the following expressions to specify the desired date:<br>
+The search field '<b>%label%</b>' date-time type of field. You can use the following expressions to specify the desired date:<br>
 <br>
 <table width="100%">
 
@@ -10,22 +10,22 @@ The search field '<b>%label%</b>' is a type of date-time. So you can use the fol
 
 <tr>
 <td nowrap valign=top><b>12:30:00</b></td>
-<td>...this will use the current date and add the specifed time.</td>
+<td>...this uses the exact date and the exact specifed time.</td>
 </tr>
 
 <tr>
 <td nowrap valign=top><b>09.03.2015</b></td>
-<td>...this will use the time 00:00:00 at 2015-03-09. If you like to use another time, add this behind the date and one space. Because of the space, you have to enclose the expression within apostrophes (e.g.&nbsp;'09.03.2015&nbsp;13:32').</td>
+<td>...this uses the time 00:00:00 at the specified date. In this case 2015-03-09. If you want to use another time, add it behind the date using one space. Because of the space, you have to enclose the expression within apostrophes (e.g.&nbsp;'09.03.2015&nbsp;13:32').</td>
 </tr>
 
 <tr>
 <td nowrap valign=top><b><a href=JavaScript:SendData("now")>now</a></b></td>
-<td>...this will use the current date and current time.</td>
+<td>...this uses the current date and current time.</td>
 </tr>
 
 <tr>
 <td nowrap valign=top><b><a href=JavaScript:SendData("today")>today</a></b></td>
-<td>...this will use the current date and as time 00:00:00.</td>
+<td>...this uses the current date and the time 00:00:00.</td>
 </tr>
 
 <tr>
@@ -40,12 +40,12 @@ The search field '<b>%label%</b>' is a type of date-time. So you can use the fol
 
 <tr>
 <td nowrap valign=top><b>09.03.2015-2Y</b></td>
-<td>...this specifies the time 00:00:00 at 2013-03-09.</td>
+<td>...this specifies the time 00:00:00 on 2013-03-09.</td>
 </tr>
 
 <tr>
 <td colspan=2><br><br>
-<b>Time periods (not available at all time-fields):</b>
+<b>Time periods (not available in all time-fields):</b>
 </td>
 </tr>
 
@@ -72,7 +72,7 @@ The search field '<b>%label%</b>' is a type of date-time. So you can use the fol
 
 <tr>
 <td nowrap valign=top><b><a href=JavaScript:SendData("(2014KW11)")>(2008KW11)</a></b></td>
-<td>...all records within calendar week 11 of year 2014. Per Definition a week always starts at monday 00:00:00.</td>
+<td>...all records within calendar week 11 of year 2014. Per Definition a week always starts on monday 00:00:00.</td>
 </tr>
 
 <tr>
@@ -83,7 +83,7 @@ Expressions with spaces have to enclosed in apostrophes (e.g. '09.03.2015 12:30:
 <br><br>
 <u><b>Examples:</b></u><br><br>
 <b><a href='JavaScript:SendData("&#39;&gt;09.03.2015 13:00&#39; AND &#39;&lt;09.03.2015 15:00&#39;")'>&#39;&gt;09.03.2015 13:00&#39; AND &#39;&lt;09.03.2015 15:00&#39;</a></b><br>
-...all records within 2015-03-09 13:00 and 2015-03-09 15:00.<br><br> 
+...all records between 2015-03-09 13:00 and 2015-03-09 15:00.<br><br> 
 <b><a href='JavaScript:SendData("&gt;now-1M AND &lt;now+1M")'>&gt;now-1M AND &lt;now+1M</a></b><br>
 ...all records between "1 month ago" and "1 month in the future".<br>
 <br>
