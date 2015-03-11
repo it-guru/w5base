@@ -170,7 +170,46 @@ sub getValidWebFunctions
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(),qw(ImportOrgarea 
                                                   doParentFix
+                                                  TreeView
                                                   ParentGroupFix));
+}
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "TView"=>$self->T("Tree View"));
+}
+
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView");
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+   if ($p eq "TView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page="<link rel=\"stylesheet\" ".
+            "href=\"../../../static/lytebox/lytebox.css\" ".
+            "type=\"text/css\" media=\"screen\" />";
+
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"TreeView?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
 }
 
 
@@ -401,5 +440,113 @@ sub Import
    $self->LastMsg(ERROR,"one or more operations failed");
    return(undef);
 }
+
+sub TreeView
+{
+   my $self=shift;
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           title=>"TreeView",
+                           js=>['toolbox.js'],
+                           style=>['default.css','work.css',
+                                   'kernel.App.Web.css',
+                                   'public/base/load/grpteamview.css']);
+   if (defined($rec)){
+      my @parents;
+      my @childs;
+      my $parent=$rec->{parentid};
+      while($parent ne ""){
+         $self->ResetFilter();
+         $self->SecureSetFilter({touid=>\$parent});
+         my ($rec,$msg)=$self->getOnlyFirst(qw(touid name parentid shortname
+                                               bosssurname bossgivenname));
+         if (defined($rec)){
+            unshift(@parents,$rec);
+            $parent=$rec->{parentid};
+         }
+         else{
+            $parent=undef;
+         }
+      }
+      $self->ResetFilter();
+      $self->SecureSetFilter({parentid=>\$rec->{touid}});
+      @childs=$self->getHashList(qw(touid name parentid shortname
+                                    bosssurname bossgivenname));
+
+
+      print("<div id=\"orgtree\" style=\"margin:5px\">");
+      print("Orgbaum:<br>");
+
+      printf("<div id=\"parents\" style=\"width:100%%;text-align:center\">");
+      my $level=0;
+      foreach my $prec (@parents){
+         displayOrg($prec,$level);
+         $level++;
+         print("<br>");
+      }
+      printf("</div>");
+
+      printf("<div id=\"current\" style=\"width:100%%;text-align:center;\">");
+   printf("<div style=\"width:1px;border-left:1px solid #aaa;margin-left:50%;height:20px\"></div>");
+      printf("<div style=\"padding-left:120px;padding-right:120px\">");
+      printf("<div style=\"border-style:solid;border-width:1px;display:inline-block;".
+          "border-color:black;height:80px;width:100%;\">");
+
+
+      printf("Current");
+      printf("</div>");
+      printf("</div>");
+      printf("</div>");
+
+      $level++;
+
+
+      printf("<div id=\"childs\" style=\"width:100%%;text-align:center\">");
+      foreach my $crec (@childs){
+         displayOrg($crec,$level);
+
+      }
+      printf("</div>");
+
+      printf("</div>"); # end of orgtree
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub displayOrg
+{
+   my $prec=shift;
+   my $level=shift;
+
+   printf("<div style=\"display: inline-block;".
+          "margin-left:5px;margin-right:5px;margin-top:0px\">");
+   if ($level!=0){
+      printf("<div style=\"width:1px;border-left:1px solid #aaa;margin-left:50%;height:20px\"></div>");
+   }
+   printf("<div style=\"border-style:solid;border-width:1px;display: inline-block;".
+          "border-color:black;width:280px;height:80px;\">");
+   print("<table border=1 height=100% width=100%>");
+   my $label=$prec->{name};
+   if ($prec->{shortname} ne ""){
+      $label.=" (".$prec->{shortname}.")";
+   }
+   printf("<tr height=1%%><td align=center><b>%s</b></td></tr>",$label);
+   my $boss=$prec->{bosssurname};
+   $boss.=", " if ($boss ne "" && $prec->{bossgivenname} ne "");
+   $boss.=$prec->{bossgivenname}; 
+   printf("<tr><td valign=top>%s<br>&nbsp;</td></tr>",$boss);
+   print("</table>");
+   
+   printf("</div>");
+   printf("</div>");
+}
+
 
 1;
