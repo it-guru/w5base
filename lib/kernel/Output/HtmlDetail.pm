@@ -49,6 +49,7 @@ sub getHttpHeader
                                 'Output.HtmlSubList.css',
                                 'kernel.filemgmt.css'],
                         title=>'Detail loading ...',
+                        body=>1,
                         onload=>'DetailInit()');
    return($d);
 }

@@ -1427,6 +1427,12 @@ sub HtmlHeader
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html $langtag>
 <head>
+EOF
+  if ($param{IEedge}){
+     $d.='<meta http-equiv="X-UA-Compatible" content="IE=edge">';
+  }
+
+  $d.=<<EOF;
 <script type="text/javascript" language="JavaScript">
 var CURLANG="$lang";
 var ALTLANG="$altlang";
@@ -1511,7 +1517,7 @@ EOF
       $d.=">";
    }
    $d.="</head>\n";
-   if ($param{body} || defined($param{onunload})){
+   if ($param{body} || defined($param{onunload}) || defined($param{onload})){
       $d.="<body";
       if (defined($param{onload})){
          $d.=" OnLoad=\"$param{onload}\"" if ($param{onload} ne "");

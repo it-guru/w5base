@@ -205,7 +205,8 @@ sub getHtmlDetailPageContent
             "type=\"text/css\" media=\"screen\" />";
 
       $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
-            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "padding:0;margin:0\" frameborder=\"0\" ".
+            "class=HtmlDetailPage name=HtmlDetailPage ".
             "src=\"TreeView?$urlparam\"></iframe>";
    }
    $page.=$self->HtmlPersistentVariables($idname);
@@ -455,9 +456,10 @@ sub TreeView
    print $self->HtmlHeader(
                            title=>"TreeView",
                            js=>['toolbox.js'],
+                           IEedge=>1,
+                           body=>1,
                            style=>['default.css','work.css',
-                                   'kernel.App.Web.css',
-                                   'public/base/load/grpteamview.css']);
+                                   'kernel.App.Web.css']);
    if (defined($rec)){
       my @parents;
       my @childs;
@@ -481,8 +483,7 @@ sub TreeView
                                     bosssurname bossgivenname));
 
 
-      print("<div id=\"orgtree\" style=\"margin:5px\">");
-      print("Orgbaum:<br>");
+      print("<div id=\"orgtree\" style=\"min-width:400px;margin:5px;margin-top:15px\">");
 
       printf("<div id=\"parents\" style=\"width:100%%;text-align:center\">");
       my $level=0;
@@ -494,8 +495,8 @@ sub TreeView
       printf("</div>");
 
       printf("<div id=\"current\" style=\"width:100%%;text-align:center;\">");
-   printf("<div style=\"width:1px;border-left:1px solid #aaa;margin-left:50%;height:20px\"></div>");
-      printf("<div style=\"padding-left:120px;padding-right:120px\">");
+   printf("<div style=\"width:1px;;border-left:1px solid #aaa;margin-left:50%;height:20px\"></div>");
+      printf("<div style=\"padding-left:40px;padding-right:40px\">");
       printf("<div style=\"border-style:solid;border-width:1px;display:inline-block;".
           "border-color:black;height:80px;width:100%;\">");
 
@@ -535,7 +536,7 @@ sub displayOrg
    print("<table border=1 height=100% width=100%>");
    my $label=$prec->{name};
    if ($prec->{shortname} ne ""){
-      $label.=" (".$prec->{shortname}.")";
+      $label.="<br>(".$prec->{shortname}.")";
    }
    printf("<tr height=1%%><td align=center><b>%s</b></td></tr>",$label);
    my $boss=$prec->{bosssurname};
