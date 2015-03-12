@@ -15,8 +15,9 @@ NONE
 
 [en:]
 
-The given costcenter has no Service Manager entry in AssetManager 
-(It is transferred to AssetManager from SAP P01).
+The given costcenter has no Service Manager entry in AssetManager. 
+It is transferred to AssetManager from SAP P01 and there named 
+as CBM (Customer Business Manager).
 
 As a result the application cannot be transmitted to AssetManager 
 and will therefore get the status "marked as delete". 
@@ -31,7 +32,8 @@ This person has to have the entry added into SAP P01.
 [de:]
 
 Das angegebene Kontierungsobjekt enthält keinen Servicemanager-Eintrag 
-in AssetManager (Der Eintrag wird ursprünglich aus SAP P01 geliefert).
+in AssetManager. Der Eintrag wird ursprünglich aus SAP P01 geliefert 
+und dort als CBM (Customer Business Manager) bezeichnet.
 
 Das kann dazu führen, dass die Anwendung nicht nach AssetManager 
 übertragen werden kann und deshalb dort als "deleted" markiert 
@@ -92,9 +94,13 @@ sub qcheckRecord
                        $rec->{cistatusid}!=4 &&
                        $rec->{cistatusid}!=5);
 
+   my $cocobj=getModuleObject($self->getParent->Config,"finance::costcenter");
+   $cocobj->SetFilter({name=>$rec->{conumber}});
+   my $coctype=$cocobj->getVal('costcentertype');
+   return(0,undef) if ($coctype ne "pspelement");
+
    my $amcoc=getModuleObject($self->getParent->Config,"tsacinv::costcenter");
    $amcoc->SetFilter({name=>$rec->{conodenumber}});
-  
    if ($amcoc->getVal('sem') eq '') {
       return(3,{qmsg     =>['no servicemanager entry in the '.
                             'costcenter object in AssetManager'],

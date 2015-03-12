@@ -4,8 +4,8 @@ package TS::qrule::CocCostcenterSem;
 
 =head3 PURPOSE
 
-Checks if there is a Servicemanager defined in the costcenter record
-in AssetManager.
+Checks if there is a Customer Business Manager defined in the costcenter object
+in SAP P01.
 If not and this record is related with application(s), an error will be procceded.
 
 =head3 IMPORTS
@@ -16,15 +16,14 @@ NONE
 
 [en:]
 
-The Service Manager of the related costcenter is missing in AssetManager. The probable reason is a missing entry in SAP P01.
+The Customer Business Manager of the related costcenter object is missing in SAP P01.
 
 As a result the application cannot be transmitted to Asset Manager and will therefore get the status "marked as delete". Afterwards the application is not selectable as configuration item in the tools supporting the process.
 
 
 [de:]
 
-Der Servicemanager am zugehörigen costcenter Datensatz in AssetManager fehlt.
-Wahrscheinliche Ursache ist ein fehlender Eintrag in SAP P01.
+Im zugehörigen Kontierungsobjekt in SAP P01 ist kein Customer Business Manager eingetragen.
 
 Das kann dazu führen, dass die Anwendung nicht nach AssetManager
 übertragen werden kann und deshalb dort als "deleted" markiert
@@ -77,19 +76,21 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(0,undef) if ($rec->{cistatusid}!=3 && 
-                       $rec->{cistatusid}!=4 &&
-                       $rec->{cistatusid}!=5);
+   return(0,undef) if (($rec->{cistatusid}!=3 && 
+                        $rec->{cistatusid}!=4 &&
+                        $rec->{cistatusid}!=5) ||
+                       $rec->{costcentertype} ne 'pspelement');
 
-   my $amcoc=getModuleObject($self->getParent->Config,"tsacinv::costcenter");
-   $amcoc->SetFilter({name=>$rec->{conodenumber}});
-  
-   if ($amcoc->getVal('sem') eq '' &&
+   my $sapobj=getModuleObject($self->getParent->Config,"tssapp01::psp");
+   $sapobj->SetFilter({name=>$rec->{name}});
+
+   my $smwiw=$sapobj->getVal('smwiw');
+   if ($smwiw eq '' &&
        $#{$rec->{applications}}>-1) {
-         return(3,{qmsg     =>['no service manager entry in the '.
-                               'costcenter object in SAP P01'],
-                   dataissue=>['no service manager entry in the '.
-                               'costcenter object in SAP P01']});
+         return(3,{qmsg     =>['no CBM (Customer Business Manager) '.
+                               'defined in the costcenter object in SAP P01'],
+                   dataissue=>['no CBM (Customer Business Manager) '.
+                               'defined in the costcenter object in SAP P01']});
    }
 
    return(0,undef);
