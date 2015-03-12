@@ -79,7 +79,7 @@ The search field '<b>%label%</b>' date-time type of field. You can use the follo
 <td valign=top colspan=2><br>
 <b>Complex expressions in timestamp fields:</b><br>
 You can use complex expressions with logical concatenations, which allows user-defined queries.<br>
-Expressions with spaces have to enclosed in apostrophes (e.g. '09.03.2015 12:30:00').
+Expressions with spaces have to be enclosed in apostrophes (e.g. '09.03.2015 12:30:00').
 <br><br>
 <u><b>Examples:</b></u><br><br>
 <b><a href='JavaScript:SendData("&#39;&gt;09.03.2015 13:00&#39; AND &#39;&lt;09.03.2015 15:00&#39;")'>&#39;&gt;09.03.2015 13:00&#39; AND &#39;&lt;09.03.2015 15:00&#39;</a></b><br>
