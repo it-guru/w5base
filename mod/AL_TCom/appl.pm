@@ -372,14 +372,20 @@ sub ItemSummary
       $summary->{dataquality}={record=>\@dataissues};
    }
 
-   #foreach my $k (keys(%{$summary})){
-   #   if (!in_array([qw(dataquality urlofcurrentrec
-   #                     system hardware software interview)],$k)){
-   #      delete($summary->{$k});
-   #   }
-   #}
-
-
+   #######################################################################
+   my %systemids; # nachladen TCC osroadmap Daten
+   foreach my $sys (@{$summary->{systems}}){
+      $systemids{$sys->{systemsystemid}}=$sys if ($sys->{systemsystemid} ne "");
+   }
+   if (keys(%systemids)){
+      my $o=getModuleObject($self->Config,"tssmartcube::tcc");
+      $o->SetFilter({systemid=>[keys(%systemids)]});
+      my @osroadmap=$o->getHashList(qw(systemid roadmap osroadmapstate 
+                                       urlofcurrentrec ));
+      return(0) if (!$o->Ping());
+      Dumper(\@osroadmap);
+      $summary->{osroadmap}={record=>\@osroadmap};
+   }
 
    return(1);
 }
