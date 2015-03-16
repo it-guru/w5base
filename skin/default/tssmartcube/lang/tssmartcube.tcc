@@ -1,6 +1,7 @@
 'tssmartcube::tcc'=>{de=>'TCC-System-Report',en=>'TCC-System-Report'},
 'fieldgroup.default'=>{de=>'Allgemeine System Informationen',
                        en=>'General System Informations'},
+'fieldgroup.upd'=>{de=>'OS Update/Refresh Möglichkeiten',en=>'OS Update/Refresh posibilities'},
 'fieldgroup.ha'=>{de=>'Cluster Software',en=>'Cluster Software'},
 'fieldgroup.os'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'fieldgroup.hw'=>{de=>'Hardware',en=>'Hardware'},
@@ -12,4 +13,8 @@
 'Productline'=>{de=>'Produktlinie'},
 'TCC total state'=>{de=>'TCC Gesammtstatus'},
 'Report-Date'=>{de=>'Report-Datum'},
+'comments to Update/Refresh posibilities'=>{de=>'Bemerkungen zu den Update/Refresh Möglichkeiten'},
+'it is posible to update/upgrade OS'=>{de=>'Update/Upgrade des OS möglich'},
+'Upgrade/Refresh reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
+'Update/Upgrade reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
 

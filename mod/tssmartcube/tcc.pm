@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use itil::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -61,6 +62,13 @@ sub new
                 uppersearch   =>1,
                 dataobjattr   =>"SYSTEM_ID"),
 
+      new kernel::Field::RecordUrl(),
+
+      new kernel::Field::Link(
+                name          =>'ofid',
+                label         =>'Overflow ID',
+                dataobjattr   =>'of_id'),
+
       new kernel::Field::Text(
                 name          =>'assetid',
                 label         =>'AssetID',
@@ -78,6 +86,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'check_status',
                 label         =>'TCC total state: CheckID',
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'CHECK_STATUS'),
 
@@ -133,6 +142,94 @@ sub new
                 htmldetail    =>0,
                 group         =>['roadmap'],
                 dataobjattr   =>getTCCColorSQL('CHECK_ROADMAP')),
+
+      #######################################################################
+
+      new kernel::Field::Select(
+                name          =>'denyup',
+                label         =>'it is posible to update/upgrade OS',
+                group         =>'upd',
+                vjointo       =>'itil::upddeny',
+                vjoinon       =>['denyupdid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'denyupdid',
+                group         =>'upd',
+                default       =>'0',
+                label         =>'UpdDenyID',
+                dataobjattr   =>'denyupd'),
+
+      new kernel::Field::Textarea(
+                name          =>'denyupdcomments',
+                group         =>'upd',
+                label         =>'comments to Update/Refresh posibilities',
+                dataobjattr   =>'denyupdcomments'),
+
+     new kernel::Field::Date(
+                name          =>'denyupdvalidto',
+                group         =>'upd',
+                htmldetail    =>sub{
+                                   my $self=shift;
+                                   my $mode=shift;
+                                   my %param=@_;
+                                   if (defined($param{current})){
+                                      my $d=$param{current}->{$self->{name}};
+                                      return(1) if ($d ne "");
+                                   }
+                                   return(0);
+                                },
+                label         =>'Update/Upgrade reject valid to',
+                dataobjattr   =>'ddenyupdvalidto'),
+
+      new kernel::Field::Text(
+                name          =>'osroadmapstate',
+                label         =>'OS Roadmap State',
+                group         =>'upd',
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>['roadmap_state','denyupdvalidto','denyupdid',
+                                 'denyupdcomments'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+
+
+                   my $st="OK";
+                   $st="WARN" if ($current->{roadmap_state} eq "warning");
+                   $st="FAIL" if ($current->{roadmap_state} eq "critical");
+
+                   my $failpost="";
+                   if ($current->{denyupdid}==0){
+                      return($st);
+                   }
+                   elsif ($current->{denyupdid}<100){
+                      # check if "but OK| but not OK"
+                      if ($st eq "WARN" || $st eq "FAIL"){
+                         if ($current->{denyupdvalidto} ne ""){
+                             my $d=CalcDateDuration(
+                                   NowStamp("en"),$current->{denyupdvalidto});
+                             if ($d->{totalminutes}<0){
+                                $failpost=" and not OK";
+                             }
+                             else{
+                                $failpost=" but OK";
+                             }
+                         }
+                         if (length($current->{denyupdcomments})<10 &&
+                             $failpost eq " but OK"){
+                            $failpost=" and not OK";
+                         }
+                      }
+                   }
+                   else{
+                      if ($st eq "WARN" || $st eq "FAIL"){
+                         $failpost=" and not OK";
+                      }
+                   }
+
+                   return($st.$failpost);
+                }),
 
       #######################################################################
       # Release-/Patchmanagement Compliancy #################################
@@ -546,11 +643,35 @@ sub new
                 group         =>'source',
                 dataobjattr   =>'AD_SOURCE'),
 
+      new kernel::Field::MDate(
+                name          =>'mdate', 
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'dmodifydate'),
+
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'Owner',
+                dataobjattr   =>'modifyuser')
    );
-   $self->setWorktable("tcc_report");
+   $self->setWorktable("smartcube_tcc_report_of");
    $self->setDefaultView(qw(systemid systemname roadmap check_status_color));
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my $from="smartcube_tcc_report";
+
+   return($from);
+}
+
 
 #SYSTEM_ID               = SystemID des logischen Systems (aus AssetManager)
 
@@ -631,14 +752,60 @@ sub isQualityCheckValid
 }
 
 
+sub ValidatedUpdateRecord
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my @filter=@_;
+
+   $filter[0]={systemid=>\$oldrec->{systemid}};
+   $newrec->{systemid}=$oldrec->{systemid};  # als Referenz in der Overflow die 
+   if (!defined($oldrec->{ofid})){     # SystemID verwenden
+      return($self->SUPER::ValidatedInsertRecord($newrec));
+   }
+   return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
+}
+
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;  # if $rec is not defined, insert is validated
+
+   return(undef) if (!defined($rec));
+   return(undef) if (!($rec->{systemid}=~m/^S.*\d+$/));
+
+   my $sys=getModuleObject($self->Config,"itil::system");
+   $sys->SetFilter({systemid=>\$rec->{systemid}});
+   my ($sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   my @l=$sys->isWriteValid($sysrec);
+
+   if (in_array(\@l,[qw(upd ALL)]) || $self->IsMemberOf("admin")){
+      return("upd");
+   }
+   return(undef);
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
+      return(0);
+   }
+   return(1);
+}
+
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default roadmap patch dsk ha  hw mon other source));
+   return(qw(header default roadmap upd patch dsk ha  hw mon other source));
 }
-
-
 
 
 sub getTCCbackground{
@@ -662,6 +829,7 @@ sub getTCCbackground{
 
    return($col);
 }
+
 
 sub Initialize
 {

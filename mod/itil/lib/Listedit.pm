@@ -422,8 +422,15 @@ sub updateDenyHandling
    my $oldrec=shift;
    my $newrec=shift;
 
+   my $denyupdid;
+   if (exists($newrec->{denyupdid})){
+      $denyupdid=$newrec->{denyupdid};
+   }
    if (exists($newrec->{denyupd})){
-      if ($newrec->{denyupd}>0){
+      $denyupdid=$newrec->{denyupd};
+   }
+   if (defined($denyupdid)){
+      if ($denyupdid>0){
          if (exists($newrec->{denyupdvalidto}) &&
              $newrec->{denyupdvalidto} ne ""){
             # prüfen ob länger als 36 Monate in der Zukunft!
