@@ -54,7 +54,7 @@ sub new
                                    dataobjattr=>'tWrID'),
 
       new kernel::Field::Text(     name       =>'uid',
-                                   label      =>'UserID',
+                                   label      =>'UserID (uid)',
                                    size       =>'10',
                                    htmlwidth  =>'130',
                                    align      =>'left',
