@@ -91,7 +91,15 @@ sub qcheckRecord
                $cl->SetFilter({clusterid=>\$amclust->{clusterid}});
                my ($w5clust,$msg)=$cl->getOnlyFirst(qw(id fullname cistatusid));
                if (defined($w5clust)){
-                  $parrec{itclust}=$w5clust->{'fullname'};
+                  if ($w5clust->{cistatusid}>5){
+                     push(@qmsg,"can not create needed cluster relation: ".
+                          $w5clust->{'fullname'});
+                     $errorlevel=3 if ($errorlevel<3);
+                     $parrec{itclust}=undef;
+                  }
+                  else{
+                     $parrec{itclust}=$w5clust->{'fullname'};
+                  }
                  # printf STDERR ("found\n");
                  # printf STDERR ("amclust=%s\n",Dumper($amclust));
                  # printf STDERR ("w5clust=%s\n",Dumper($w5clust));
