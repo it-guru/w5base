@@ -562,7 +562,7 @@ sub isViewValid
 
    if (in_array(\@l,"ALL")){
       if ($rec->{cenv} eq "Both"){
-         return(qw(header source default));
+         return(qw(header source am default));
       }
    }
    return(@l);
