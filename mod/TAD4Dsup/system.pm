@@ -247,6 +247,7 @@ sub new
                 name          =>'cenv',
                 label         =>'current Env',
                 readonly      =>1,
+                selectfix     =>1,
                 transprefix   =>'ENV.',
                 value         =>['Production','Integration','Both','None'],
                 dataobjattr   =>'cenv'),
