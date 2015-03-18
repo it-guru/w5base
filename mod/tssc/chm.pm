@@ -590,10 +590,10 @@ sub new
                 vjoininhash   =>['dst','dstobj','primary'],
                 vjoindisp     =>[qw(dst dstname primary)]),
 
-
       new kernel::Field::SubList(
                 name          =>'configitems',
                 label         =>'Configuration Items',
+                searchable    =>0,
                 group         =>'configitems',
                 forwardSearch =>1,
                 vjointo       =>'tssc::lnkci',
