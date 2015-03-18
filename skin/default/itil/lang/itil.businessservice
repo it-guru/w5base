@@ -2,6 +2,7 @@
 'fieldgroup.applinfo'=>{de=>'Applikationsdaten',en=>'Application informations'},
 'fieldgroup.desc'=>{de=>'Allgemeine Beschreibung',en=>'General Description'},
 'fieldgroup.grprelations'=>{de=>'Organisationsverknüpfungen',en=>'Organisation relations'},
+'Organisation Relations'=>{de=>'Organisationsverknüpfungen'},
 'fieldgroup.reporting'=>{de=>'Reporting und Messverfahren',en=>'Reporting and measurement'},
 'fieldgroup.sla'=>{de=>'SLA/OLA Global',en=>'SLA/OLA Global'},
 'fieldgroup.moni'=>{de=>'SLA/OLA Service Design',en=>'SLA/OLA Service Design'},
