@@ -295,7 +295,7 @@ sub ItemSummary
       $o->SetFilter({applications=>\$current->{name},
                      cistatusid=>"!6"});
       my @assets=$o->getHashList(qw(name denyupd denyupdcomments refreshpland
-                                    dataissuestate age
+                                    dataissuestate age acqumode 
                                     assetrefreshstate
                                     urlofcurrentrec));
       return(0) if (!$o->Ping());
