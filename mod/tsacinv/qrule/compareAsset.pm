@@ -148,7 +148,7 @@ sub qcheckRecord
             $parrec->{acqumode}="FREE";
          }
          else{
-            $parrec->{acqumode}="PURCASE";
+            $parrec->{acqumode}="PURCHASE";
          }
          $self->IfComp($dataobj,
                        $rec,"acqumode",
@@ -157,7 +157,7 @@ sub qcheckRecord
                        \@qmsg,\@dataissue,\$errorlevel,
                        mode=>'string');
          if ($autocorrect || $parrec->{acqumode} eq $rec->{acqumode}){
-            if ($parrec->{acqumode} ne "PURCASE"){
+            if ($parrec->{acqumode} ne "PURCHASE"){
                $self->IfComp($dataobj,
                              $rec,"startacqu",
                              $parrec,"startacquisition",

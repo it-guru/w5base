@@ -332,7 +332,7 @@ sub new
                 group         =>'financeco',
                 selectfix     =>1,
                 value         =>[qw(
-                                      PURCASE
+                                      PURCHASE
                                       RENTAL
                                       LEASE
                                       LOAN
@@ -351,7 +351,7 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    if (exists($param{current}) &&
-                       $param{current}->{'acqumode'} ne "PURCASE"){
+                       $param{current}->{'acqumode'} ne "PURCHASE"){
                       return(1);
                    }
                    return(1) if ($param{currentfieldgroup} eq $self->{group});
@@ -369,7 +369,7 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    if (exists($param{current}) &&
-                       $param{current}->{'acqumode'} eq "PURCASE"){
+                       $param{current}->{'acqumode'} eq "PURCHASE"){
                       return(1);
                    }
                    return(1) if ($param{currentfieldgroup} eq $self->{group});
@@ -389,7 +389,7 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    if (exists($param{current}) &&
-                       $param{current}->{'acqumode'} eq "PURCASE"){
+                       $param{current}->{'acqumode'} eq "PURCHASE"){
                       return(1);
                    }
                    return(1) if ($param{currentfieldgroup} eq $self->{group});
@@ -406,7 +406,7 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 label         =>'Hardware age',
-                dataobjattr   =>"if (acqumode='PURCASE',".
+                dataobjattr   =>"if (acqumode='PURCHASE',".
                                 "datediff(sysdate(),asset.deprstart),".
                                 "datediff(sysdate(),asset.acquStart))"),
 
@@ -744,7 +744,7 @@ sub getSQLrefreshstateCommand
    my $longterm="INTERVAL 60 MONTH";
    my $d=<<EOF;
 
-if (if (asset.acquMode='PURCASE',asset.deprstart,asset.acquStart) is not null,
+if (if (asset.acquMode='PURCHASE',asset.deprstart,asset.acquStart) is not null,
    if (asset.refreshpland is not null and asset.refreshpland>sysdate(),
       'green => refreshplaned is set',
    /*ELSE no refresh planed is set*/
@@ -759,11 +759,11 @@ if (if (asset.acquMode='PURCASE',asset.deprstart,asset.acquStart) is not null,
             )
          ),
       /*ELSE kein Begruendungsendezeitpunkt*/
-         if (date_add(if (asset.acquMode='PURCASE',
+         if (date_add(if (asset.acquMode='PURCHASE',
                         asset.deprstart,asset.acquStart),${longterm})<sysdate(),
             'red => 5 years',
          /*ELSE*/
-            if (date_add(if (asset.acquMode='PURCASE',
+            if (date_add(if (asset.acquMode='PURCHASE',
                      asset.deprstart,asset.acquStart),${shortterm})<sysdate(),
                if (length(asset.denyupdcomments)>10,
                   'lightgreen',
@@ -838,7 +838,7 @@ var de=document.forms[0].elements['Formated_deprend'];
 
 if (d && s && ds && de){
    var v=d.options[d.selectedIndex].value;
-   if (v=="PURCASE"){
+   if (v=="PURCHASE"){
       s.value="";
       s.disabled=true;
       ds.disabled=false;
@@ -998,7 +998,7 @@ sub Validate
       }
    }
    if (effChanged($oldrec,$newrec,"acqumode")){
-      if ($newrec->{acqumode} ne "PURCASE"){
+      if ($newrec->{acqumode} ne "PURCHASE"){
          $newrec->{deprstart}=undef;
          $newrec->{deprend}=undef;
       }
@@ -1084,8 +1084,8 @@ sub isViewValid
    my @all=qw(default guardian physasset contacts control location 
               systems source qc applications
               phonenumbers misc attachments sec financeco history);
-   if (($rec->{acqumode} eq "PURCASE" && $rec->{deprstart} ne "") ||
-       ($rec->{acqumode} ne "PURCASE" && $rec->{startacqu} ne "")){
+   if (($rec->{acqumode} eq "PURCHASE" && $rec->{deprstart} ne "") ||
+       ($rec->{acqumode} ne "PURCHASE" && $rec->{startacqu} ne "")){
       push(@all,"upd");
    }
    return(@all);

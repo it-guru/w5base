@@ -35,7 +35,7 @@
 'residual value'=>{de=>'Restbuchwert'},
 'deprication base'=>{de=>'Anschaffungswert'},
 'Components'=>{de=>'Komponenten'},
-'AQMODE.0'=>{de=>'gekauft',en=>'Purcase'},
+'AQMODE.0'=>{de=>'gekauft',en=>'Purchase'},
 'AQMODE.1'=>{de=>'gemietet',en=>'Rental'},
 'AQMODE.2'=>{de=>'geleast',en=>'Lease'},
 'AQMODE.3'=>{de=>'geliehen',en=>'Loan'},

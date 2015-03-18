@@ -78,7 +78,7 @@
 'planned Upgrade/Refresh date'=>{de=>'geplanter Hardware Refresh Zeitpunkt'},
 'days'=>{de=>'Tage'},
 'Hardware age'=>{de=>'Hardwarealter'},
-'PURCASE'=>{de=>'gekauft',en=>'Purcase'},
+'PURCHASE'=>{de=>'gekauft',en=>'Purchase'},
 'RENTAL'=>{de=>'gemietet',en=>'Rental'},
 'LEASE'=>{de=>'geleast',en=>'Lease'},
 'LOAN'=>{de=>'geliehen',en=>'Loan'},
