@@ -297,16 +297,6 @@ sub new
                    "   else ''".
                    "end) ||".
                    "(case".
-                   "   when computer_model is null ".
-                   "        AND denv<>'CHK' ".
-                   "        AND denv<>'DEFERRED' ".
-                   "        AND denv<>'OUT' ".
-                   "        AND denv<>'Shared' ".
-                   "        AND computer_serialno is null then ".
-                   "        '* hardware detection not posible\n'".
-                   "   else ''".
-                   "end) ||".
-                   "(case".
                    "   when denv is null and saphier like '9TS_ES.9DTIT.%' ".
                                          "then '* set destination ".
                                                "enviroment\n'".
