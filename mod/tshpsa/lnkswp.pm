@@ -22,6 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use itil::lib::Listedit;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -43,6 +45,13 @@ sub new
                 name          =>'systemid',
                 label         =>'system id',
                 dataobjattr   =>'sysid'),
+
+      new kernel::Field::RecordUrl(),
+
+      new kernel::Field::Link(
+                name          =>'ofid',
+                label         =>'Overflow ID',
+                dataobjattr   =>'of_id'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -97,6 +106,7 @@ sub new
                 name          =>'systemsystemid',
                 label         =>'SystemID',
                 group         =>'rel',
+                selectfix     =>1,
                 vjointo       =>'tshpsa::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'systemid'),
@@ -152,13 +162,78 @@ sub new
       new kernel::Field::Text(
                 name          =>'scandate',
                 label         =>'Scandate',
-                dataobjattr   =>'scandate')
+                dataobjattr   =>'scandate'),
+
+
+      new kernel::Field::Select(
+                name          =>'denyup',
+                label         =>'it is posible to update Software',
+                group         =>'upd',
+                vjointo       =>'itil::upddeny',
+                vjoinon       =>['denyupdid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'denyupdid',
+                group         =>'upd',
+                default       =>'0',
+                label         =>'UpdDenyID',
+                dataobjattr   =>'denyupd'),
+
+      new kernel::Field::Textarea(
+                name          =>'denyupdcomments',
+                group         =>'upd',
+                label         =>'comments to Update/Refresh posibilities',
+                dataobjattr   =>'denyupdcomments'),
+
+     new kernel::Field::Date(
+                name          =>'denyupdvalidto',
+                group         =>'upd',
+                htmldetail    =>sub{
+                                   my $self=shift;
+                                   my $mode=shift;
+                                   my %param=@_;
+                                   if (defined($param{current})){
+                                      my $d=$param{current}->{$self->{name}};
+                                      return(1) if ($d ne "");
+                                   }
+                                   return(0);
+                                },
+                label         =>'Update/Upgrade reject valid to',
+                dataobjattr   =>'ddenyupdvalidto'),
+
+      new kernel::Field::Text(
+                name          =>'swpstate',
+                label         =>'Software Process state State',
+                group         =>'upd',
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>['denyupdvalidto','denyupdid',
+                                 'denyupdcomments'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+
+                   return("OK");      # hier fehlt noch EINIGES!!!
+                })
 
    );
-   $self->setWorktable("HPSA_lnkswp");
+   $self->setWorktable("HPSA_lnkswp_of");
    $self->setDefaultView(qw(systemname class version path iname));
    return($self);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my $from="HPSA_lnkswp";
+
+   return($from);
+}
+
+
 
 sub Initialize
 {
@@ -170,12 +245,45 @@ sub Initialize
    return(0);
 }
 
+
+sub ValidatedUpdateRecord
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my @filter=@_;
+
+   $filter[0]={id=>\$oldrec->{id}};
+   $newrec->{id}=$oldrec->{id};  # als Referenz in der Overflow die 
+   if (!defined($oldrec->{ofid})){     # SystemID verwenden
+      return($self->SUPER::ValidatedInsertRecord($newrec));
+   }
+   return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
+      return(0);
+   }
+   return(1);
+}
+
+
+
+
+
 sub getDetailBlockPriority
 {
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","rel","w5basedata","source");
+   return("header","default","upd","rel","w5basedata","source");
 }
 
 sub isQualityCheckValid
@@ -183,6 +291,26 @@ sub isQualityCheckValid
    my $self=shift;
    my $rec=shift;
    return(0);
+}
+
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;  # if $rec is not defined, insert is validated
+
+   return(undef) if (!defined($rec));
+   return(undef) if (!($rec->{systemsystemid}=~m/^S.*\d+$/));
+
+   my $sys=getModuleObject($self->Config,"itil::system");
+   $sys->SetFilter({systemid=>\$rec->{systemsystemid}});
+   my ($sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   my @l=$sys->isWriteValid($sysrec);
+
+   if (in_array(\@l,[qw(upd ALL)]) || $self->IsMemberOf("admin")){
+      return("upd");
+   }
+   return(undef);
 }
 
 
@@ -201,13 +329,6 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("ALL");
-}
-
-sub isWriteValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(undef);
 }
 
 

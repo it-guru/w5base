@@ -11,3 +11,10 @@
 'usable from applications'=>{de=>'nutzbar von Anwendungen'},
 'based on Software'=>{de=>'basiernde Software'},
 'Process entry fullname'=>{de=>'voller Prozessname'},
+
+'fieldgroup.upd'=>{de=>'Software Update/Refresh Möglichkeiten',en=>'Software Update/Refresh posibilities'},
+'comments to Update/Refresh posibilities'=>{de=>'Bemerkungen zu den Update/Refresh Möglichkeiten'},
+'it is posible to update Software'=>{de=>'Update der Software möglich'},
+'Upgrade/Refresh reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
+'Update/Upgrade reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
+

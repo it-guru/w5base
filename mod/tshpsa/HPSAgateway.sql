@@ -6,6 +6,23 @@
    Views von W5Base/Darwin aus zugegriffen (tshpsa::*).
 */ 
 
+/** Overflow Tabel **/
+
+-- drop table "W5I_HPSA_lnkswp_of";
+create table "W5I_HPSA_lnkswp_of" (
+ id                   VARCHAR2(3000),
+ denyupd              NUMBER(*,0) default '0',
+ denyupdcomments      VARCHAR2(4000),
+ ddenyupdvalidto      DATE,
+ modifyuser           NUMBER(*,0),
+ dmodifydate          DATE,
+ constraint "W5I_HPSA_lnkswp_of_pk" primary key (id)
+);
+grant select,insert,update,delete on "W5I_HPSA_lnkswp_of" to W5I;
+create or replace synonym W5I.HPSA_lnkswp_of
+   for "W5I_HPSA_lnkswp_of";
+
+
 /*  ==== tshpsa::sysgrp ====== */
 
 -- drop materialized view "mview_HPSA_sysgrp";
@@ -98,7 +115,17 @@ CREATE INDEX "HPSA_lnkswp_swclass"
    ON "mview_HPSA_lnkswp"(lower(swclass)) online;
 
 create or replace view "W5I_HPSA_lnkswp" as
-select * from "mview_HPSA_lnkswp";
+select "mview_HPSA_lnkswp".*,
+       overflow.id      of_id,
+       overflow.denyupd,
+       overflow.denyupdcomments,
+       overflow.ddenyupdvalidto,
+       overflow.modifyuser,
+       overflow.dmodifydate
+from "mview_HPSA_lnkswp"
+     left outer join "W5I_HPSA_lnkswp_of" overflow
+        on "mview_HPSA_lnkswp".id=overflow.id;
+
 grant select on "W5I_HPSA_lnkswp" to "W5I";
 create or replace synonym W5I.HPSA_lnkswp 
    for "W5I_HPSA_lnkswp";
@@ -184,7 +211,6 @@ select * from "mview_HPSA_lnksystemsysgrp";
 grant select on "W5I_HPSA_lnksystemsysgrp" to "W5I";
 create or replace synonym W5I.HPSA_lnksystemsysgrp 
    for "W5I_HPSA_lnksystemsysgrp";
-
 
 
 
