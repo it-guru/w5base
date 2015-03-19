@@ -155,6 +155,7 @@ sub new
                 dataobjattr   =>'scandate')
 
    );
+   $self->setWorktable("HPSA_lnkswp");
    $self->setDefaultView(qw(systemname class version path iname));
    return($self);
 }
@@ -163,69 +164,11 @@ sub Initialize
 {
    my $self=shift;
 
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tshpsa"));
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
    return(@result) if (defined($result[0]) eq "InitERROR");
    return(1) if (defined($self->{DB}));
    return(0);
 }
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=<<EOF;
-(
-select attr.item_id sysid,
---       attr.item_id || '-' || swi.swid id,
-       replace(utl_i18n.string_to_raw(data =>
-           attr.item_id||'-'||swi.swclass||'-'||
-           swi.swpath||'-'||swi.iname),' ','') id,
-       attr.item_id||' - '||swi.swclass||' - '||
-       swi.swpath||' - '||swi.iname fullname,
-       ddim.curdate,
-       swi.swclass,
-       swi.swvers,
-       swi.swpath,
-       swi.iname,
-       swi.scandate
-
-from (select DATE_DIMENSION.FULL_DATE_LOCAL curdate 
-      from DATE_DIMENSION 
-      where DATE_DIMENSION.FULL_DATE_LOCAL between SYSDATE-1 AND SYSDATE)  ddim
-      join  SAS_SERVER_CUST_ATTRIBUTES attr
-          on ddim.curdate between attr.begin_date and attr.end_date
-             and attr.ATTRIBUTE_NAME='TI.CSO_ao_mw_scanner',
-      XMLTable ( '//x/r'
-          passing XMLType( 
-           '<x><r><f>' || 
-              replace(
-                  replace(
-                     rtrim(trim( 
-                       case when length(attr.ATTRIBUTE_SHORT_VALUE)>2500 then
-                       substr(attr.ATTRIBUTE_SHORT_VALUE,0,2500) || '...'
-                       else
-                       attr.ATTRIBUTE_SHORT_VALUE
-                       end
-                     ),chr(10)),chr(10),
-                     '</f></r><r><f>'
-                  ),';','</f><f>'
-              ) ||
-           '</f></r></x>' 
-          )
-          columns swid      FOR ORDINALITY,
-                  swclass   varchar2(40)  path 'f[1]',
-                  swvers    varchar2(40)  path 'f[2]',
-                  swpath    varchar2(512) path 'f[3]',
-                  iname     varchar2(40)  path 'f[4]',
-                  scandate  varchar2(40)  path 'f[5]'
-      ) swi
-) lnkswi
-EOF
-
-   return($from);
-}
-
-
-
 
 sub getDetailBlockPriority
 {

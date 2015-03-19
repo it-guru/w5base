@@ -41,6 +41,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
+                ignorecase    =>1,
                 dataobjattr   =>'group_name'),
 
       new kernel::Field::Date(
@@ -49,6 +50,7 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'curdate')
    );
+   $self->setWorktable("HPSA_sysgrp");
    $self->setDefaultView(qw(name mdate));
    return($self);
 }
@@ -57,33 +59,10 @@ sub Initialize
 {
    my $self=shift;
 
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tshpsa"));
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
    return(@result) if (defined($result[0]) eq "InitERROR");
    return(1) if (defined($self->{DB}));
    return(0);
-}
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=<<EOF;
-
-(
-
-select grp.item_id,
-       ddim.curdate,
-       grp.group_name
-from (select CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL curdate 
-      from CMDB_DATA.DATE_DIMENSION 
-      where CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL between SYSDATE-1 AND SYSDATE)  ddim
-      join SAS_SERVER_GROUPS grp 
-          on ddim.curdate between grp.begin_date and grp.end_date
- 
-)
-
-EOF
-
-   return($from);
 }
 
 

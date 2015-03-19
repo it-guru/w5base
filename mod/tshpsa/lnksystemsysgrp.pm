@@ -55,6 +55,7 @@ sub new
                 label         =>'systemid',
                 dataobjattr   =>'dstid'),
    );
+   $self->setWorktable("HPSA_lnksystemsysgrp");
    $self->setDefaultView(qw(srcid dstid mdate));
    return($self);
 }
@@ -63,44 +64,16 @@ sub Initialize
 {
    my $self=shift;
 
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tshpsa"));
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
    return(@result) if (defined($result[0]) eq "InitERROR");
    return(1) if (defined($self->{DB}));
    return(0);
 }
 
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=<<EOF;
-
-(
-
-select memb.item_id,
-       memb.item_source_id srcid,
-       memb.server_item_id dstid,
-       grp.group_name      srcname,
-       memb.latest_flag is_latest
-from (select DATE_DIMENSION.FULL_DATE_LOCAL curdate 
-      from DATE_DIMENSION 
-      where DATE_DIMENSION.FULL_DATE_LOCAL between SYSDATE-1 AND SYSDATE)  ddim
-      join SAS_SERVER_GROUP_MEMBERS memb 
-          on ddim.curdate between memb.begin_date and memb.end_date
-      join SAS_SERVER_GROUPS grp 
-          on ddim.curdate between grp.begin_date and grp.end_date
-             and memb.item_source_id=grp.item_id
-) lnksystemsysgrp
-
-EOF
-
-   return($from);
-}
-
-
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="lnksystemsysgrp.is_latest=1";
+   my $where="is_latest=1";
    return($where);
 }
 

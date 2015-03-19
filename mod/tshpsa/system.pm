@@ -40,6 +40,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
+                lowersearch   =>1,
                 label         =>'Hostname',
                 dataobjattr   =>'hostname'),
 
@@ -85,23 +86,14 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'curdate'),
 
-      new kernel::Field::Textarea(
-                name          =>'rawscan',
-                group         =>'source',
-                htmldetail    =>0,
-                label         =>'raw Scan-Data',
-                dataobjattr   =>"
-   (select ATTRIBUTE_SHORT_VALUE from SAS_SERVER_CUST_ATTRIBUTES 
-   where SAS_SERVER_CUST_ATTRIBUTES.item_id=locicalsystem.item_id 
-      and SAS_SERVER_CUST_ATTRIBUTES.ATTRIBUTE_NAME='TI.CSO_ao_mw_scanner'
-      and (select DATE_DIMENSION.FULL_DATE_LOCAL curdate 
-           from DATE_DIMENSION 
-           where DATE_DIMENSION.FULL_DATE_LOCAL between SYSDATE-1 AND SYSDATE) 
-        between SAS_SERVER_CUST_ATTRIBUTES.begin_date 
-           and SAS_SERVER_CUST_ATTRIBUTES.end_date
-      and ROWNUM<2)")
-
+#      new kernel::Field::Textarea(
+#                name          =>'rawscan',
+#                group         =>'source',
+#                htmldetail    =>0,
+#                label         =>'raw Scan-Data',
+#                dataobjattr   =>"rawscan")
    );
+   $self->setWorktable("HPSA_system");
    $self->setDefaultView(qw(name systemid primaryip mdate));
    return($self);
 }
@@ -110,43 +102,10 @@ sub Initialize
 {
    my $self=shift;
 
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tshpsa"));
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
    return(@result) if (defined($result[0]) eq "InitERROR");
    return(1) if (defined($self->{DB}));
    return(0);
-}
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=<<EOF;
-
-(select system.item_id,
-       ddim.curdate,
-       lower(system.host_name) hostname,
-       lower(system.display_name) name,
-       system.primary_ip pip,
-       attr_systemid.ATTRIBUTE_SHORT_VALUE systemid
-
-from (select CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL curdate 
-      from CMDB_DATA.DATE_DIMENSION 
-      where CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL 
-            between SYSDATE-1 AND SYSDATE)  ddim
-     join CMDB_DATA.SAS_SERVERS system
-          on ddim.curdate between system.begin_date and system.end_date
-     join SAS_SERVER_CUST_ATTRIBUTES attr_systemid
-          on ddim.curdate 
-             between attr_systemid.begin_date and attr_systemid.end_date
-             and system.item_id=attr_systemid.item_id
-             and attr_systemid.ATTRIBUTE_NAME='ITM_Service_ID'
-     join SAS_SERVERS_BASE base
-          on system.item_id=base.item_id
-     join SAS_SERVER_AGENT agent
-          on system.item_id=agent.item_id
-) locicalsystem
-EOF
-
-   return($from);
 }
 
 
