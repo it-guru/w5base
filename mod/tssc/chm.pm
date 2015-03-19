@@ -154,7 +154,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'approvalsreq',
-                label         =>'Approvals Required',
+                label         =>'Current Approvals',
                 group         =>'approvals',
                 forwardSearch =>1,
                 vjointo       =>'tssc::chm_approvereq',
@@ -165,6 +165,7 @@ sub new
                 name          =>'approvallog',
                 label         =>'Approval Log',
                 group         =>'approvals',
+                searchable    =>0,
                 forwardSearch =>1,
                 vjointo       =>'tssc::chm_approvallog',
                 vjoinon       =>['changenumber'=>'changenumber'],
@@ -176,6 +177,7 @@ sub new
                 htmldetail    =>0,
                 htmlwidth     =>'200px',
                 group         =>'approvals',
+                searchable    =>0,
                 vjointo       =>'tssc::chm_approvedgrp',
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoindisp     =>[qw(name)]),
@@ -577,7 +579,7 @@ sub new
                 uppersearch   =>1,
                 htmldetail    =>0,
                 group         =>'contact',
-                label         =>'Change-Manager fullname',
+                label         =>'Changemanager name',
                 dataobjattr   =>'cm3rm1_w5base.coord_shortname'),
 
        new kernel::Field::SubList(
@@ -606,6 +608,7 @@ sub new
                 label         =>'Related Tickets',
                 group         =>'tickets',
                 forwardSearch =>1,
+                searchable    =>0,
                 vjointo       =>'tssc::lnkticket',
                 vjoinon       =>['changenumber'=>'src'],
                 vjoindisp     =>[qw(dst priority status)]),
@@ -621,7 +624,7 @@ sub new
                 sqlorder      =>"none",
                 group         =>'contact',
                 htmldetail    =>0,
-                label         =>'Additional Groups',
+                label         =>'Approver Groups',
                 dataobjattr   =>'cm3rm1_w5base.additional_groups'),
 
       new kernel::Field::QualityOk(
