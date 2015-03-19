@@ -52,52 +52,29 @@ sub ApplAssessmentReport
 
    %param=kernel::XLSReport::StdReportParamHandling($self,%param);
 
-   #msg(INFO,"start Report to %s",join(", ",@{$param{'filename'}}));
-
    my $out=new kernel::XLSReport($self,$param{'filename'});
    $out->initWorkbook();
 
    my $appl=getModuleObject($self->Config,"AL_TCom::appl");
 
-#   $asset->AddFields(
-#      new kernel::Field::Date(
-#                name          =>'deprend',
-#                label         =>'Deprecation End',
-#                translation   =>'tsacinv::asset',
-#                vjointo       =>'tsacinv::asset',
-#                vjoinon       =>['name'=>'assetid'],
-#                vjoindisp     =>'deprend'),
-#      new kernel::Field::Text(
-#                name          =>'applco',
-#                label         =>'Anwendungs CO-Number',
-#                onRawValue    =>sub{
-#                   my $self=shift;
-#                   my $current=shift;
-#                   if ($current->{applicationnames} ne ""){
-#                      my $appl=$self->getParent->getPersistentModuleObject(
-#                                                 "itil::appl");
-#                      $appl->SetFilter({name=>\$current->{applicationnames}});
-#                      my ($WfRec)=$appl->getOnlyFirst(qw(conumber));
-#                     
-#                      return($WfRec->{conumber});
-#                   }
-#                   return(undef);
-#                }),
-#   );
- 
-   
-
    my @control=(
                 {DataObj=>$appl,
                  sheet=>'ApplAssessmentReport',
+                 unbuffered=>0,  
+                       # unbuffered führt zu Problemen, wenn ein gefitertes
+                       # feld gleichzeitig in der Ausgabe view steht!
+   #              recPreProcess=>\&recPreProcess,
                  filter=>{
-                          mandator=>'Telekom*',
+                          mandator=>'Telekom* Extern',
+                          opmode=>\'prod',
                           ictono=>'!""',
                           cistatusid=>'4'
                          },
                  order=>'name',
                  lang=>'de',
-                 view=>[qw(name cistatus ictono icto criticality 
+                 view=>[qw(name mandator 
+                           cistatus ictono icto criticality 
+                           itsem
                            servicesupport drclass rtolevel rpolevel drc )]
                 },
                );
@@ -107,6 +84,15 @@ sub ApplAssessmentReport
    msg(INFO,"end Report to $param{'filename'}");
 
    return({exitcode=>0,msg=>"OK"});
+}
+
+sub recPreProcess
+{
+   my ($self,$DataObj,$rec,$recordview,$reproccount)=@_;
+
+   print Dumper($rec);
+
+   return(0);
 }
 
 
