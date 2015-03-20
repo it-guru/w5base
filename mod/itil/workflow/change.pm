@@ -305,29 +305,32 @@ sub getFollowupTargetUserids
       foreach my $arec ($appl->getHashList(qw(tsmid))){
          push(@{$param->{addtarget}},$arec->{tsmid}) if ($arec->{tsmid} ne "");
       }
-      if ($param->{note}=~m/\[chm\.\S+\]/){
-         my $usrgrp=getModuleObject($self->Config,"base::lnkgrpuserrole"); 
-         my $chm=getModuleObject($self->Config,"itil::chmmgmt"); 
-         $chm->SetFilter({id=>$WfRec->{affectedapplicationid}});
-         foreach my $chmrec ($chm->getHashList(qw(chmgrteamid chmgrfmbid))){
-            if ($chmrec->{chmgrfmbid} ne ""){
-               push(@{$param->{addcctarget}},$chmrec->{chmgrfmbid});
-            }
-            elsif ($chmrec->{chmgrteamid} ne ""){
-               $usrgrp->ResetFilter();
-               $usrgrp->SetFilter({grpid=>\$chmrec->{chmgrteamid},
-                                   cistatusid=>[4,5],
-                                   grpcistatusid=>[4],
-                                   nativrole=>[orgRoles()]});
-               foreach my $lnkrec ($usrgrp->getHashList(qw(userid))){
-                  # message not needed in errorlog
-                  #msg(INFO,"add userid '$lnkrec->{userid}'");
-                  push(@{$param->{addcctarget}},$lnkrec->{userid});
-               }
-            }
-         }
-         push(@{$param->{addcctarget}});
-      }
+
+      # itil::chmmgmt chmgrteam no more used, see 14246971890003
+      #
+      #if ($param->{note}=~m/\[chm\.\S+\]/){
+      #   my $usrgrp=getModuleObject($self->Config,"base::lnkgrpuserrole"); 
+      #   my $chm=getModuleObject($self->Config,"itil::chmmgmt"); 
+      #   $chm->SetFilter({id=>$WfRec->{affectedapplicationid}});
+      #   foreach my $chmrec ($chm->getHashList(qw(chmgrteamid chmgrfmbid))){
+      #      if ($chmrec->{chmgrfmbid} ne ""){
+      #         push(@{$param->{addcctarget}},$chmrec->{chmgrfmbid});
+      #      }
+      #      elsif ($chmrec->{chmgrteamid} ne ""){
+      #         $usrgrp->ResetFilter();
+      #         $usrgrp->SetFilter({grpid=>\$chmrec->{chmgrteamid},
+      #                             cistatusid=>[4,5],
+      #                             grpcistatusid=>[4],
+      #                             nativrole=>[orgRoles()]});
+      #         foreach my $lnkrec ($usrgrp->getHashList(qw(userid))){
+      #            # message not needed in errorlog
+      #            #msg(INFO,"add userid '$lnkrec->{userid}'");
+      #            push(@{$param->{addcctarget}},$lnkrec->{userid});
+      #         }
+      #      }
+      #   }
+      #   push(@{$param->{addcctarget}});
+      #}
    }
 }
 
@@ -435,15 +438,18 @@ sub isChangeManager
    $mandator=[$mandator] if (!ref($mandator) eq "ARRAY");
    return(1) if ($self->getParent->IsMemberOf($mandator,"RCHManager","down"));
    return(1) if ($self->getParent->IsMemberOf("admin"));
-   my $aid=$WfRec->{affectedapplicationid};
-   $aid=[$aid] if (ref($aid) ne "ARRAY");
-   my $chmmgmt=getModuleObject($self->getParent->Config,"itil::chmmgmt");
-   $chmmgmt->SetFilter({id=>$aid});
-   foreach my $arec ($chmmgmt->getHashList(qw(chmgrteamid))){
-      if ($arec->{chmgrteamid} ne ""){
-         return(1) if ($self->getParent->IsMemberOf($arec->{chmgrteamid}));
-      }
-   }
+
+   # itil::chmmgmt chmgrteam no more used, see 14246971890003
+   #
+   #my $aid=$WfRec->{affectedapplicationid};
+   #$aid=[$aid] if (ref($aid) ne "ARRAY");
+   #my $chmmgmt=getModuleObject($self->getParent->Config,"itil::chmmgmt");
+   #$chmmgmt->SetFilter({id=>$aid});
+   #foreach my $arec ($chmmgmt->getHashList(qw(chmgrteamid))){
+   #   if ($arec->{chmgrteamid} ne ""){
+   #      return(1) if ($self->getParent->IsMemberOf($arec->{chmgrteamid}));
+   #   }
+   #}
    
 
    return(0);

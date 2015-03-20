@@ -4,4 +4,3 @@
 'fieldgroup.mainusetimes'=>{de=>'Hauptnutzungszeiten',en=>'Main use times'},
 'write rejected - please first set chmgmt team'=>{de=>'Schreibzugriff nicht zulässig - bitte erst Changemanager Team eintragen'},
 'Change Management Function Contact'=>{de=>'Changemanagement Funktionskontakt'},
-'main use times'=>{de=>'Hauptnutzungszeiten'},

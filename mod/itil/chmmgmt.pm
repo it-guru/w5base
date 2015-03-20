@@ -68,6 +68,7 @@ sub new
                 htmlwidth     =>'300px',
                 AllowEmpty    =>1,
                 label         =>'Change Management Team',
+                uivisible     =>0,
                 vjointo       =>'base::grp',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['chmgrteamid'=>'grpid'],
@@ -91,22 +92,8 @@ sub new
                                     delmgr delmgrid
                                     businessteam businessteamid
                                     customer customerid 
-                                    customerprio criticality)]),
+                                    customerprio criticality)]));
 
-      new kernel::Field::TimeSpans(
-                name          =>'mainusetimes',
-                htmlwidth     =>'150px',
-                depend        =>['isoncallservice'],
-                group         =>'mainusetimes',
-                label         =>'main use times',
-                container     =>'additional'),
-
-      new kernel::Field::Container(
-                name          =>'additional',
-                label         =>'Additionalinformations',
-                htmldetail    =>0,
-                dataobjattr   =>'appl.additionalchm')
-   );
    $self->AddGroup("appldata",translation=>'itil::chmmgmt');
    $self->{history}=[qw(insert modify delete)];
    $self->{use_distinct}=1;
@@ -164,20 +151,20 @@ sub isWriteValid
 
    return(undef) if (!defined($rec));
    if (!defined($rec->{chmgrteamid})){
-      return("default","mainusetimes");
+      return("default");
    }
    else{
       if ($self->IsMemberOf($rec->{mandatorid},
                             ["RCHManager","RCHManager2",
                              "RCFManager","RCFManager2"],"down")){
-         return("default","mainusetimes");
+         return("default");
       }
       if ($self->IsMemberOf($rec->{chmgrteamid},
                             ["RMember"],"up")){
-         return("default","mainusetimes");
+         return("default");
       }
       if ($self->IsMemberOf("admin")){
-         return(qw(default mainusetimes));
+         return("default");
       }
    }
    return(undef);
