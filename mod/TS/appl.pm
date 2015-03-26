@@ -52,7 +52,8 @@ sub new
                 htmldetail    =>0,
                 searchable    =>0,
                 depend        =>['tsmid','opmid','applmgrid','contacts',
-                                 'systems','businessteamid'],
+                                 'systems','businessteamid',
+                                 'mandator','mandatorid'],
                 group         =>'technical',
                 label         =>'base Application Expert Group',
                 onRawValue    =>\&calcBaseApplicationExpertGroup),
@@ -411,6 +412,16 @@ sub calcBaseApplicationExpertGroup
                push(@{$a{$k}->{userid}},$crec->{targetid});
             }
          }
+      }
+   }
+
+   # In der GDU SAP ist generell der TSM auch DBA laut Request ...
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14273593150005
+   # (auch wenns eigentlich ein Schmarren ist)
+   my $m=$appl->getField("mandator")->RawValue($rec);
+   if ($rec->{mandator} eq "GDU SAP"){
+      if ($rec->{tsmid} ne ""){
+         push(@{$a{dba}->{userid}},$rec->{tsmid});
       }
    }
 

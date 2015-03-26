@@ -115,6 +115,10 @@ sub FormatedResult
 
    my $d=$self->RawValue($current);
    $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
+   if (!($FormatAs=~m/Html/) && $self->{readonly} eq "1" &&
+        ref($self->{onRawValue}) eq "CODE"){ # rein berechnete HTML  Felder
+      $d=Html2Latin1($d);
+   }
    if ($FormatAs eq "SOAP"){
       if (!ref($d)){
          $d=quoteSOAP($d);
