@@ -417,8 +417,10 @@ sub calcBaseApplicationExpertGroup
 
    my $swi=getModuleObject($self->getParent->Config,"itil::swinstance");
    $swi->SetFilter({cistatusid=>\'4',applid=>\$rec->{id},
-                    swnature=>["Oracle DB Server","MySQL","MSSQL","DB2",
-                               "Informix","PostgreSQL"]});
+                 #   swnature=>["Oracle DB Server","MySQL","MSSQL","DB2",
+                 #              "Informix","PostgreSQL"]
+                    is_dbs=>1  # aus Workflow Request : 14273569140001
+                   });
    foreach my $srec ($swi->getHashList(qw(admid))){
       if ($srec->{admid} ne ""){
          if (!in_array($a{dba}->{userid},$srec->{admid})){
