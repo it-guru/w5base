@@ -651,14 +651,14 @@ sub calcSoftwareState
       else{
          $lnk->SetFilter({id=>\$current->{id}});
       }
-      $lnk->SetCurrentView(qw(systemid system software denyupd denyupdvalidto
-                              releasekey version softwareid is_dbs is_mw));
       my @fl=qw(id systemid softwareid);
       if ($lnk->can("getAnalyseSoftwareStateRecordsIndexed")){
          $FilterSet->{Analyse}->{ssoftware}=
             $lnk->getAnalyseSoftwareStateRecordsIndexed(@fl);
       }
       else{
+         $lnk->SetCurrentView(qw(systemid system software denyupd denyupdvalidto
+                                 releasekey version softwareid is_dbs is_mw));
          $FilterSet->{Analyse}->{ssoftware}=$lnk->getHashIndexed(@fl);
       }
 
