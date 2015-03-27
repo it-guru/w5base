@@ -244,7 +244,7 @@ sub ItemSummary
    my @dataissues;
    ###########################
    my $rm=$rm[0];
-   {
+   if (defined($rm)){
       my $softwareset=0;
       my @softstate;
       my $l1=getModuleObject($self->Config,"itil::lnksoftwaresystem");
@@ -386,6 +386,39 @@ sub ItemSummary
       Dumper(\@osroadmap);
       $summary->{osroadmap}={record=>\@osroadmap};
    }
+
+   #######################################################################
+   # HPSA muss unter hpsaswp rein!
+   my $rm=$rm[0];
+   if (defined($rm)){
+      my $softwareset=0;
+      my @softstate;
+
+      my %systemids; # nachladen HPSA Scandaten bassierend of SystemIDs
+      foreach my $sys (@{$summary->{systems}}){
+         if ($sys->{systemsystemid} ne ""){
+            $systemids{$sys->{systemsystemid}}=$sys;
+         }
+      }
+      if (keys(%systemids)){
+         my $l1=getModuleObject($self->Config,"hpsa::lnkswp");
+         my @swview=qw(fullname denyupd denyupdcomments 
+                       softwarerelstate is_dbs is_mw
+                       urlofcurrentrec);
+         $l1->ResetFilter();
+         $l1->SetFilter({systemid        =>[keys(%systemids)],
+                         softwareset     =>$rm->{name}});
+         my @l1=$l1->getHashList(@swview);
+         push(@softstate,{
+            roadmap=>$rm->{name},
+            i=>[@l1]
+         });
+         return(0) if (!$l1->Ping());
+         Dumper(\@softstate);
+         $summary->{hpsaswp}={record=>\@softstate};    # SET : hpsaswp fertig
+      }
+   }
+
 
    return(1);
 }
