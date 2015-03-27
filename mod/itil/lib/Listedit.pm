@@ -461,6 +461,490 @@ sub updateDenyHandling
    return(1);
 }
 
+sub Version2Key
+{
+   my $version=shift;
+
+   my @v=split(/\./,$version);
+   my @relkey=();
+   for(my $relpos=0;$relpos<5;$relpos++){
+      $v[$relpos]=~s/\D//g;
+      if ($v[$relpos]=~m/^\d+$/){
+         $relkey[$relpos]=sprintf("%04d",$v[$relpos]);
+      }
+      else{
+         $relkey[$relpos]="0000";
+      }
+   }
+   return(join("",@relkey));
+}
+
+
+sub calcSoftwareState
+{
+   my $self=shift;
+   my $current=shift;
+   my $analysedataobj=shift;
+
+   if (!defined($analysedataobj) || $analysedataobj eq ""){
+      $analysedataobj="itil::lnksoftwaresystem";
+   }
+
+   my $FilterSet=$self->getParent->Context->{FilterSet};
+   if ($FilterSet->{softwareset} eq ""){
+      return("NO SOFTSET SELECTED");
+   }
+   if ($FilterSet->{Set}->{name} ne $FilterSet->{softwareset} &&
+       $FilterSet->{softwareset} ne ""){
+      $FilterSet->{Set}={name=>$FilterSet->{softwareset}};
+      my $ss=getModuleObject($self->getParent->Config,
+                             "itil::softwareset");
+      my $setname=$FilterSet->{softwareset};
+      my $flt={cistatusid=>4,name=>$setname};
+      $ss->SecureSetFilter($flt);
+      my ($rec)=$ss->getOnlyFirst("name","software","osrelease");
+      if (!defined($rec)){
+         my $setname;
+         $setname=" -".$FilterSet->{softwareset}->[0]."- ";
+         return("INVALID SOFTSET $setname SELECTED");
+      }
+      #print STDERR Dumper($rec);
+      $FilterSet->{Set}->{data}=$rec;
+      Dumper($FilterSet->{Set}->{data});
+   }
+   my @applid;
+   my @analysegroups=qw(OS MW DB);
+   my @systemid;
+   my $cachekey;
+   if ($self->getParent->SelfAsParentObject() eq "itil::system"){
+      @systemid=($current->{id});
+      $cachekey=join(",",sort(@systemid));
+      @analysegroups=qw(OS);
+   }
+   elsif ($self->getParent->SelfAsParentObject() eq "itil::appl"){
+      @applid=($current->{id});
+      $cachekey=join(",",sort(@applid));
+   }
+   else{
+      @analysegroups=qw(MW DB);
+      $cachekey=$current->{id};
+   }
+   if ($FilterSet->{Analyse}->{id} ne $cachekey){
+      $FilterSet->{Analyse}={id=>$cachekey};
+      # load interessting softwareids from softwareset
+      my %swid;
+      foreach my $swrec (@{$FilterSet->{Set}->{data}->{software}}){
+         $swid{$swrec->{softwareid}}++;
+      }
+      # check softwareset against installations
+      $FilterSet->{Analyse}->{relevantSoftwareInst}=0;
+      $FilterSet->{Analyse}->{todo}=[];
+      $FilterSet->{Analyse}->{totalstate}="OK";
+      $FilterSet->{Analyse}->{dstate}={};
+      $FilterSet->{Analyse}->{totalmsg}=[];
+      $FilterSet->{Analyse}->{softwareid}=[keys(%swid)];
+
+      my $resdstate=$FilterSet->{Analyse}->{dstate};
+      foreach my $g (@analysegroups){
+         $resdstate->{group}->{$g}={
+            count=>0,
+            fail=>0,
+            warn=>0,
+         };
+      }
+
+      if ($#applid!=-1 || $#systemid!=-1){ # load systems
+         my $lnk=getModuleObject($self->getParent->Config,
+                                "itil::lnkapplsystem");
+         if ($#applid!=-1){
+            $lnk->SetFilter({applid=>\@applid,
+                             systemcistatusid=>[3,4]}); 
+         }
+         else{
+            $lnk->SetFilter({systemid=>\@systemid,
+                             applcistatusid=>[3,4]}); 
+         }
+         $FilterSet->{Analyse}->{systems}=[];
+         $FilterSet->{Analyse}->{systemids}={};
+         foreach my $lnkrec ($lnk->getHashList(qw(systemid osreleaseid
+                                                  system 
+                                                  systemdenyupd
+                                                  systemdenyupdvalidto))){
+            my $sid=$lnkrec->{systemid};
+            if (!exists($FilterSet->{Analyse}->{systemids}->{$sid})){
+               my $srec={
+                  name=>$lnkrec->{system},
+                  systemid=>$lnkrec->{systemid},
+                  denyupd=>$lnkrec->{systemdenyupd},
+                  denyupdvalidto=>$lnkrec->{systemdenyupdvalidto},
+                  osrelease=>$lnkrec->{osrelease},
+                  osreleaseid=>$lnkrec->{osreleaseid}
+               };
+               $FilterSet->{Analyse}->{systemids}->{$sid}=$srec;
+               push(@{$FilterSet->{Analyse}->{systems}},
+                    $FilterSet->{Analyse}->{systemids}->{$sid});
+               my @ruleset=@{$FilterSet->{Set}->{data}->{osrelease}};
+               @ruleset=sort({$a->{comparator}<=>$b->{comparator}} @ruleset);
+
+               my $failpost="";
+               if ($srec->{denyupd}>0){
+                  $failpost=" but OK";
+                  if ($srec->{denyupdvalidto} ne ""){
+                      my $d=CalcDateDuration(
+                                        NowStamp("en"),$srec->{denyupdvalidto});
+                      if ($d->{totalminutes}<0){
+                         $failpost=" and not OK";
+                      }
+                  }
+               }
+
+               my $dstate="OK";
+               $resdstate->{group}->{OS}->{count}++;
+               foreach my $osrec (@ruleset){
+                  if ($srec->{osreleaseid} eq  $osrec->{osreleaseid}){
+                     if ($osrec->{comparator} eq "0"){
+                        $dstate="FAIL";
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- update OS '$srec->{osrelease}' ".
+                                 "on $srec->{name}");
+                           push(@{$FilterSet->{Analyse}->{totalmsg}},
+                               "$srec->{name} OS '$srec->{osrelease}' ".
+                               "is marked as not allowed");
+                           $resdstate->{group}->{OS}->{fail}++;
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
+                     }
+                     if ($osrec->{comparator} eq "1"){
+                        $dstate="WARN";
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- OS '$srec->{osrelease}' ".
+                                 "on $srec->{name} needs soon a update");
+                           push(@{$FilterSet->{Analyse}->{totalmsg}},
+                               "$srec->{name} OS '$srec->{osrelease}' ".
+                               "is soon not allowed");
+                           $resdstate->{group}->{OS}->{warn}++;
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}=
+                              "WARN".$failpost;
+                        }
+                     }
+                  }
+               }
+               $resdstate->{system}->{$lnkrec->{system}}={
+                  state=>$dstate,
+               };
+            }
+         }
+      }
+      #print STDERR Dumper($FilterSet->{Analyse});
+      my $lnk=getModuleObject($self->getParent->Config,$analysedataobj);
+      if ($#applid!=-1){# load system installed software
+         $lnk->SetFilter({
+           systemid=>[keys(%{$FilterSet->{Analyse}->{systemids}})]
+         });
+      }
+      else{
+         $lnk->SetFilter({id=>\$current->{id}});
+      }
+      $lnk->SetCurrentView(qw(systemid system software denyupd denyupdvalidto
+                              releasekey version softwareid is_dbs is_mw));
+      my @fl=qw(id systemid softwareid);
+      if ($lnk->can("getAnalyseSoftwareStateRecordsIndexed")){
+         $FilterSet->{Analyse}->{ssoftware}=
+            $lnk->getAnalyseSoftwareStateRecordsIndexed(@fl);
+      }
+      else{
+         $FilterSet->{Analyse}->{ssoftware}=$lnk->getHashIndexed(@fl);
+      }
+
+
+      if ($#applid!=-1){# load related software instances
+         my $sw=getModuleObject($self->getParent->Config,
+                                "itil::swinstance");
+         $sw->SetFilter({cistatusid=>[3,4],
+                         applid=>\$current->{id}});
+         $FilterSet->{Analyse}->{swi}=[
+              $sw->getHashList(qw(id lnksoftwaresystemid fullname))];
+      }
+
+      my $ssoftware=$FilterSet->{Analyse}->{ssoftware}->{softwareid};
+
+      my @ruleset=@{$FilterSet->{Set}->{data}->{software}};
+
+      @ruleset=sort({$b->{comparator}<=>$a->{comparator}} @ruleset);
+
+
+      foreach my $swi (values(%{$FilterSet->{Analyse}->{ssoftware}->{id}})){
+         if ($swi->{is_mw}){
+            $resdstate->{group}->{MW}->{count}++;
+         }
+         if ($swi->{is_dbs}){
+            $resdstate->{group}->{DB}->{count}++;
+         }
+         RULESET: foreach my $swrec (@ruleset){
+            if ($swrec->{softwareid} eq  $swi->{softwareid}){
+               $FilterSet->{Analyse}->{relevantSoftwareInst}++;
+               if ($swi->{version}=~m/^\s*$/){
+                  push(@{$FilterSet->{Analyse}->{todo}},
+                        "- no version specified in software installaton ".
+                        "of $swrec->{softwareid} on system $swi->{systemid}");
+               }
+               if ($swrec->{startwith} ne ""){
+                  my $qstartwith=quotemeta($swrec->{startwith});
+                  if (!($swi->{version}=~m/^$qstartwith/i)){
+                     next RULESET;
+                  }
+               }
+               my $failpost="";
+               if ($swi->{denyupd}>0){
+                  $failpost=" but OK";
+                  if ($swi->{denyupdvalidto} ne ""){
+                      my $d=CalcDateDuration(
+                                        NowStamp("en"),$swi->{denyupdvalidto});
+                      if ($d->{totalminutes}<0){
+                         $failpost=" and not OK";
+                      }
+                  }
+               }
+               if ($swi->{releasekey}=~m/^0*$/){
+                  push(@{$FilterSet->{Analyse}->{todo}},
+                        "- version unusable in  ".
+                        "$swi->{software} on $swi->{system} ");
+                  $FilterSet->{Analyse}->{totalstate}="FAIL";
+                  push(@{$FilterSet->{Analyse}->{totalmsg}},
+                       "version unusable");
+                  last RULESET;
+               }
+               if (length($swrec->{releasekey})!=
+                   length($swi->{releasekey}) ||
+                   ($swi->{releasekey}=~m/^0*$/) ||
+                   ($swrec->{releasekey}=~m/^0*$/)){
+                  push(@{$FilterSet->{Analyse}->{todo}},
+                        "- releasekey missmatch in  ".
+                        "$swi->{software} on $swi->{system} ");
+                  $FilterSet->{Analyse}->{totalstate}="FAIL";
+                  push(@{$FilterSet->{Analyse}->{totalmsg}},
+                       "releasekey error");
+               }
+               else{
+                  if ($swrec->{comparator} eq "3"){
+                     if ($swrec->{releasekey} gt $swi->{releasekey}){
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- soon update $swi->{software} on ".
+                                 "system $swi->{system} ".
+                                 "from $swi->{version} to  $swrec->{version}");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{warn}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{warn}++;
+                           }
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="WARN".$failpost;
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} needs soon >=$swrec->{version}");
+                        last RULESET;
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "2"){
+                     if ($swrec->{releasekey} ne $swi->{releasekey} ||
+                         $swrec->{version} ne $swi->{version}){
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- only version $swi->{version} ".
+                                 " of $swi->{software} is allowed on  ".
+                                 " system $swi->{system} ");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{fail}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{fail}++;
+                           }
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} needs $swrec->{version}");
+                        last RULESET;
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "12"){
+                     if ($swrec->{releasekey} eq $swi->{releasekey} ||
+                         $swrec->{version} eq $swi->{version}){
+                        last RULESET;
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "10"){
+                     if ($swrec->{releasekey} eq $swi->{releasekey} ||
+                         $swrec->{version} eq $swi->{version}){
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                               "- remove disallowed version $swi->{software} ".
+                               " $swi->{version} from  system $swi->{system} ");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{fail}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{fail}++;
+                           }
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} disallowed $swrec->{version}");
+                        last RULESET;
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "11"){
+                     if ($swrec->{releasekey} gt $swi->{releasekey}){
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                               "- remove disallowed version $swi->{software} ".
+                               " $swi->{version} from  system $swi->{system} ");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{fail}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{fail}++;
+                           }
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} disallowed ".
+                             "lower then $swrec->{version}");
+                        last RULESET;
+                     }
+                  }
+                  elsif ($swrec->{comparator} eq "0"){
+                     if ($swrec->{releasekey} gt $swi->{releasekey}){
+                        if ($failpost ne " but OK"){
+                           push(@{$FilterSet->{Analyse}->{todo}},
+                                 "- update $swi->{software} on ".
+                                 "system $swi->{system} ".
+                                 "from $swi->{version} to  $swrec->{version}");
+                           if ($swi->{is_mw}){
+                              $resdstate->{group}->{MW}->{fail}++;
+                           }
+                           if ($swi->{is_dbs}){
+                              $resdstate->{group}->{DB}->{fail}++;
+                           }
+                        }
+                        if (!($FilterSet->{Analyse}->{totalstate}=~m/^FAIL/)){
+                           $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
+                        }
+                        push(@{$FilterSet->{Analyse}->{totalmsg}},
+                             "$swi->{software} needs >=$swrec->{version}");
+                        last RULESET;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   my @d;
+   if ($#applid!=-1){
+      { # system count
+         my $m=sprintf("analysed system count: %d",
+                         int(keys(%{$FilterSet->{Analyse}->{systemids}})));
+         if ($#{$FilterSet->{Analyse}->{systems}}==-1){
+            push(@d,"<font color=red>"."WARN: ".$m."</font>");
+         }
+         else{
+            push(@d,"INFO: ".$m);
+         }
+      }
+      # softwareinstallation count
+      if (int(keys(%{$FilterSet->{Analyse}->{systemids}}))!=0){
+         my $m=sprintf("analysed software installations count: %d",
+                        keys(%{$FilterSet->{Analyse}->{ssoftware}->{id}})+0);
+         if (keys(%{$FilterSet->{Analyse}->{ssoftware}->{id}})==0){
+            push(@d,"<font color=red>"."WARN: ".$m."</font>");
+         }
+         else{
+            push(@d,"INFO: ".$m);
+         }
+         { # check software instances
+            my $m=sprintf("analysed software instance count: %d",
+                            $#{$FilterSet->{Analyse}->{swi}}+1);
+            if ($#{$FilterSet->{Analyse}->{swi}}!=-1){
+               push(@d,"INFO: ".$m);
+            }
+            else{
+               push(@d,"<font color=red>"."WARN: ".$m."</font>");
+            }
+         }
+         my $m=sprintf("found <b>%d</b>".
+                       " relevant software installations for check",
+                       $FilterSet->{Analyse}->{relevantSoftwareInst});
+         push(@d,"INFO: ".$m);
+      }
+   }
+   my $finestate="green";
+   if ($FilterSet->{Analyse}->{totalstate} eq "WARN"){
+      $finestate="yellow";
+   }
+   elsif ($FilterSet->{Analyse}->{totalstate} eq "FAIL"){
+      $finestate="red";
+   }
+   my @resdstate;
+   foreach my $g (sort(keys(%{$FilterSet->{Analyse}->{dstate}->{group}}))){
+       push(@resdstate,"$g(".
+              $FilterSet->{Analyse}->{dstate}->{group}->{$g}->{count}."/".
+              $FilterSet->{Analyse}->{dstate}->{group}->{$g}->{warn}."/".
+              $FilterSet->{Analyse}->{dstate}->{group}->{$g}->{fail}.")");
+   }
+   push(@d,"INFO:  total state ".$FilterSet->{Analyse}->{totalstate});
+   push(@d,"INFO:  grouped state format (count/warn/fail)");
+   push(@d,"INFO:  grouped state ".join(" ",@resdstate));
+   push(@d,"<b>STATE:</b> <font color=$finestate>".$finestate."</font>");
+   
+   if ($self->Name eq "rawsoftwareanalysestate"){
+      Dumper($FilterSet->{Analyse});
+      return({xmlroot=>{
+         totalstate=>$FilterSet->{Analyse}->{totalstate},
+         dstate=>$FilterSet->{Analyse}->{dstate},
+         finestate=>$finestate,
+         totalmsg=>$FilterSet->{Analyse}->{totalmsg},
+         systems=>$FilterSet->{Analyse}->{systems},
+         software=>$FilterSet->{Analyse}->{softwareid},
+         relevantSoftwareInst=>$FilterSet->{Analyse}->{relevantSoftwareInst}
+      }});
+   }
+   if ($self->Name eq "softwareanalysestate"){
+      return("<div style='width:300px'>".join("<br>",@d)."</div>");
+   }
+   if ($self->Name eq "softwareanalysetodo" ||
+       $self->Name eq "osanalysetodo"){
+      return("<div style='width:500px'>".
+             join("<br>",@{$FilterSet->{Analyse}->{todo}})."</div>");
+   }
+   if ($self->Name eq "softwareinstrelstate" ||
+       $self->Name eq "softwarerelstate" ||
+       $self->Name eq "osanalysestate"){
+      return($FilterSet->{Analyse}->{totalstate});
+   }
+   if ($self->Name eq "softwareinstrelmsg" ||
+       $self->Name eq "softwarerelmsg"){
+      return(join("\n",@{$FilterSet->{Analyse}->{totalmsg}}));
+   }
+
+   return(join("<br>",@d));
+}
+
 
 
 
