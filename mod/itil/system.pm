@@ -26,7 +26,6 @@ use kernel::Field;
 use kernel::CIStatusTools;
 use finance::costcenter;
 use itil::lib::Listedit;
-use itil::lnksoftware;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink
         kernel::CIStatusTools);
@@ -656,7 +655,7 @@ sub new
                 group         =>'upd',
                 htmlnowrap    =>1,
                 label         =>'System OS analysed state',
-                onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
+                onRawValue    =>\&itil::lib::Listedit::calcSoftwareState),
      new kernel::Field::Htmlarea(
                 name          =>'osanalysetodo',
                 readonly      =>1,
@@ -667,31 +666,32 @@ sub new
                 htmldetail    =>0,
                 htmlnowrap    =>1,
                 label         =>'System OS analysed todo',
-                onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
+                onRawValue    =>\&itil::lib::Listedit::calcSoftwareState),
 
      new kernel::Field::Text(
                 name          =>'softwareset',
                 readonly      =>1,
-                group         =>'upd',
+                htmldetail    =>0,
                 selectsearch  =>sub{
                    my $self=shift;
                    my $ss=getModuleObject($self->getParent->Config,
                                           "itil::softwareset");
                    $ss->SecureSetFilter({cistatusid=>4});
                    my @l=$ss->getVal("name");
+                   unshift(@l,"");
                    return(@l);
                 },
                 searchable    =>1,
+                group         =>'softsetvalidation',
                 htmlwidth     =>'200px',
                 htmlnowrap    =>1,
-                htmldetail    =>0,
                 label         =>'validate against Software Set',
                 onPreProcessFilter=>sub{
                    my $self=shift;
                    my $hflt=shift;
                    if (defined($hflt->{$self->{name}})){
                       $self->getParent->Context->{FilterSet}=
-                          {$self->{name}=>[$hflt->{$self->{name}}]};
+                          {$self->{name}=>$hflt->{$self->{name}}};
                       delete( $hflt->{$self->{name}})
                    }
                    else{

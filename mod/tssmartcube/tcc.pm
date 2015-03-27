@@ -146,15 +146,15 @@ sub new
       #######################################################################
 
       new kernel::Field::Select(
-                name          =>'denyup',
+                name          =>'denyupselect',
                 label         =>'it is posible to update/upgrade OS',
                 group         =>'upd',
                 vjointo       =>'itil::upddeny',
-                vjoinon       =>['denyupdid'=>'id'],
+                vjoinon       =>['denyupd'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
-                name          =>'denyupdid',
+                name          =>'denyupd',
                 group         =>'upd',
                 default       =>'0',
                 label         =>'UpdDenyID',

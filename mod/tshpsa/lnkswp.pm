@@ -149,6 +149,26 @@ sub new
                 vjoinon       =>['softwareid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Boolean(
+                name          =>'is_dbs',
+                label         =>'is DBS (Databasesystem) software',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'w5basedata',
+                vjointo       =>'itil::software',
+                vjoinon       =>['softwareid'=>'id'],
+                vjoindisp     =>'is_dbs'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_mw',
+                label         =>'is MW (Middleware) software',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'w5basedata',
+                vjointo       =>'itil::software',
+                vjoinon       =>['softwareid'=>'id'],
+                vjoindisp     =>'is_mw'),
+
       new kernel::Field::Text(
                 name          =>'path',
                 label         =>'path',
@@ -164,17 +184,78 @@ sub new
                 label         =>'Scandate',
                 dataobjattr   =>'scandate'),
 
+     new kernel::Field::Text(
+                name          =>'softwareset',
+                readonly      =>1,
+                htmldetail    =>0,
+                selectsearch  =>sub{
+                   my $self=shift;
+                   my $ss=getModuleObject($self->getParent->Config,
+                                          "itil::softwareset");
+                   $ss->SecureSetFilter({cistatusid=>4});
+                   my @l=$ss->getVal("name");
+                   unshift(@l,"");
+                   return(@l);
+                },
+                searchable    =>1,
+                group         =>'softsetvalidation',
+                htmlwidth     =>'200px',
+                htmlnowrap    =>1,
+                label         =>'validate against Software Set',
+                onPreProcessFilter=>sub{
+                   my $self=shift;
+                   my $hflt=shift;
+                   if (defined($hflt->{$self->{name}})){
+                      my $f=$hflt->{$self->{name}};
+                      if (ref($f) ne "ARRAY"){
+                         $f=~s/^"(.*)"$/$1/;
+                         $f=[$f];
+                      }
+                      $self->getParent->Context->{FilterSet}={
+                         $self->{name}=>$f
+                      };
+                      delete( $hflt->{$self->{name}})
+                   }
+                   else{
+                      delete($self->getParent->Context->{FilterSet} );
+                   }
+                   return(0);
+                },
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $FilterSet=$self->getParent->Context->{FilterSet};
+                   return($FilterSet->{softwareset});
+                }),
+
+     new kernel::Field::Text(
+                name          =>'softwarerelstate',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
+                group         =>'softsetvalidation',
+                label         =>'Software release state',
+                onRawValue    =>\&calcSoftwareState),
+
+     new kernel::Field::Textarea(
+                name          =>'softwarerelmsg',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>0,
+                group         =>'softsetvalidation',
+                label         =>'Software release message',
+                onRawValue    =>\&calcSoftwareState),
+
 
       new kernel::Field::Select(
-                name          =>'denyup',
+                name          =>'denyupselect',
                 label         =>'it is posible to update Software',
                 group         =>'upd',
                 vjointo       =>'itil::upddeny',
-                vjoinon       =>['denyupdid'=>'id'],
+                vjoinon       =>['denyupd'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
-                name          =>'denyupdid',
+                name          =>'denyupd',
                 group         =>'upd',
                 default       =>'0',
                 label         =>'UpdDenyID',
@@ -185,6 +266,21 @@ sub new
                 group         =>'upd',
                 label         =>'comments to Update/Refresh posibilities',
                 dataobjattr   =>'denyupdcomments'),
+
+      new kernel::Field::Text(
+                name          =>'releasekey',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Releasekey',
+                depend        =>['version'],
+                searchable    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $version=$current->{version};
+                   return(itil::lib::Listedit::Version2Key($version)); 
+                }),
+
 
      new kernel::Field::Date(
                 name          =>'denyupdvalidto',
@@ -202,26 +298,70 @@ sub new
                 label         =>'Update/Upgrade reject valid to',
                 dataobjattr   =>'ddenyupdvalidto'),
 
-      new kernel::Field::Text(
-                name          =>'swpstate',
-                label         =>'Software Process state State',
-                group         =>'upd',
-                htmldetail    =>0,
-                searchable    =>0,
-                depend        =>['denyupdvalidto','denyupdid',
-                                 'denyupdcomments'],
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-
-                   return("OK");      # hier fehlt noch EINIGES!!!
-                })
-
    );
    $self->setWorktable("HPSA_lnkswp_of");
    $self->setDefaultView(qw(systemname class version path iname));
    return($self);
 }
+
+sub calcSoftwareState
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $class="tshpsa::lnkswp";
+
+   return(itil::lib::Listedit::calcSoftwareState($self,$current,$class));
+}
+
+sub getAnalyseSoftwareStateRecordsIndexed
+{
+   my $self=shift;
+   my @key=@_;
+   my $res={};
+
+   $self->SetCurrentView(qw(systemid class 
+                            system software denyupd denyupdvalidto
+                            releasekey version softwareid is_dbs is_mw));
+
+
+   $self->doInitialize();
+   @key=($self->{'fields'}->[0]) if ($#key==-1);
+   my ($rec,$msg)=$self->getFirst();
+   if (defined($rec)){
+      do{
+         my $ok=1;
+         if ($rec->{class} eq "Oracle_Database"){
+            $rec->{softwareid}=9;
+         }
+         if ($rec->{version} eq ""){
+            $ok=0;
+         }
+         if ($ok){
+            foreach my $key (@key){
+               my $v=$rec->{$key};
+               next if (!defined($v));
+               if (exists($res->{$key}->{$v})){
+                  if (ref($res->{$key}->{$v}) ne "ARRAY"){
+                     $res->{$key}->{$v}=[$res->{$key}->{$v}];
+                  }
+                  push(@{$res->{$key}->{$v}},$rec);
+               }
+               else{
+                  $res->{$key}->{$v}=$rec;
+               }
+            }
+         }
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+   #else{
+   #   msg(ERROR,"getHashIndexed returned '%s' on getFirst",$msg);
+   #}
+   return($res);
+}
+
+
 
 sub getSqlFrom
 {

@@ -3,6 +3,7 @@
 'fieldgroup.rel'=>{de=>'Zuordnung',en=>'Relation'},
 'fieldgroup.w5basedata'=>{de=>'W5Base/Darwin Daten',
                           en=>'W5Base/Darwin Data'},
+'fieldgroup.softsetvalidation'=>{de=>'SoftwareSet Prüfung',en=>'softwareset validation'},
 'Software-Key'=>{de=>'HPSA Software-Schlüssel'},
 'version'=>{de=>'Version'},
 'path'=>{de=>'Installationspfad'},
@@ -17,4 +18,7 @@
 'it is posible to update Software'=>{de=>'Update der Software möglich'},
 'Upgrade/Refresh reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
 'Update/Upgrade reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
+'validate against Software Set'=>{de=>'Prüfung gegen SoftwareSet'},
+'Software release state'=>{de=>'Softwareversionsstatus'},
+'Software release message'=>{de=>'Softwareversions-Meldung'},
 

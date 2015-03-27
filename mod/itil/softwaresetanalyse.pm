@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use itil::lnksoftware;
+use itil::lib::Listedit;
 use itil::appl;
 @ISA=qw(itil::appl);
 
@@ -40,7 +40,7 @@ sub new
                 group         =>'softsetvalidation',
                 htmlnowrap    =>1,
                 label         =>'SoftwareSet analysed raw state',
-                onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
+                onRawValue    =>\&itil::lib::Listedit::calcSoftwareState),
 	  new kernel::Field::Htmlarea(
                 name          =>'softwareanalysestate',
                 readonly      =>1,
@@ -49,7 +49,7 @@ sub new
                 group         =>'softsetvalidation',
                 htmlnowrap    =>1,
                 label         =>'SoftwareSet analysed state',
-                onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
+                onRawValue    =>\&itil::lib::Listedit::calcSoftwareState),
 	  new kernel::Field::Htmlarea(
                 name          =>'softwareanalysetodo',
                 readonly      =>1,
@@ -58,7 +58,7 @@ sub new
                 htmlwidth     =>'500px',
                 htmlnowrap    =>1,
                 label         =>'SoftwareSet analysed todo',
-                onRawValue    =>\&itil::lnksoftware::calcSoftwareState),
+                onRawValue    =>\&itil::lib::Listedit::calcSoftwareState),
    );
    $self->AddFields(
 	  new kernel::Field::Text(
