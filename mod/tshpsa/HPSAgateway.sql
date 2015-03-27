@@ -6,6 +6,18 @@
    Views von W5Base/Darwin aus zugegriffen (tshpsa::*).
 */ 
 
+/*
+  CREATE DATABASE LINK "HPSA"
+   CONNECT TO "T03TC_TI_DARWIN" IDENTIFIED BY 'xxxxxxxx'
+   USING '(DESCRIPTION=
+          (ADDRESS=
+          (PROTOCOL=TCP)
+          (HOST=164.29.111.252)
+          (PORT=59999))
+          (CONNECT_DATA=
+          (SID=cmdb)))';
+*/
+
 /** Overflow Tabel **/
 
 -- drop table "W5I_HPSA_lnkswp_of";
