@@ -267,6 +267,8 @@ sub Validate
       my $curapplgrpid=effVal($oldrec,$newrec,"applgrpid");
       delete($l->{applgrpid}->{$curapplgrpid});
       if (keys(%{$l->{applgrpid}})){
+         msg(ERROR,"doublicate applicationgroup request for ".
+                   $curapplgrpid." with ".join(",",keys(%{$l->{applgrpid}})));
          $self->LastMsg(ERROR,
               "application already belongs to an other applicationgroup");
          return(0);
