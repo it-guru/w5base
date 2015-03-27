@@ -574,6 +574,30 @@ sub new
                 group         =>'desc',
                 dataobjattr   =>"$worktable.implservicesupport"),
 
+
+      new kernel::Field::Duration(
+                name          =>'occreactiontime',
+                group         =>'desc',
+                visual        =>'hh:mm',
+                unit          =>'hh:mm',
+                label         =>'target occurrence reaction time',
+                align         =>'right',
+                searchable    =>0,
+                dataobjattr   =>$worktable.'.occreactiontime'),
+
+      new kernel::Field::Duration(
+                name          =>'occtotaltime',
+                group         =>'desc',
+                visual        =>'hh:mm',
+                unit          =>'hh:mm',
+                label         =>'target occurrence total treatment time',
+                align         =>'right',
+                searchable    =>0,
+                dataobjattr   =>$worktable.'.occtotaltime'),
+
+
+
+
      new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
