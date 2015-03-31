@@ -199,6 +199,22 @@ sub Validate
              sprintf($self->T("invalid phone number '%s'"),$phonenumber));
       return(0);
    }
+   if ($self->isParentWriteValid($parentobj,$refid)){
+      return(1);
+   }
+   if (!$self->LastMsg()){
+      $self->LastMsg(ERROR,"no write access");
+   }
+   return(0);
+}
+
+
+sub isParentWriteValid
+{
+   my $self=shift;
+   my $parentobj=shift;
+   my $refid=shift;
+
    #
    # Security check
    #
@@ -232,9 +248,23 @@ sub Validate
    else{
       return(1);
    }
-   $self->LastMsg(ERROR,"no write access");
    return(0);
 }
+
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $refid=$rec->{refid};
+   my $parentobj=$rec->{parentobj};
+
+   if ($self->isParentWriteValid($parentobj,$refid)){
+      return(1);
+   }
+   return(0);
+}
+
 
 
 sub isViewValid

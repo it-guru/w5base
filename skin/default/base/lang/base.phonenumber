@@ -4,3 +4,4 @@
 'Name'=>{de=>'Zweck',en=>'Usage'},
 'shorted Comments'=>{de=>'gekürzte Bemerkungen'},
 'invalid phone number'=>{de=>'ungültige Telefonnummer'},
+'no write access'=>{de=>'kein schreibender Zugriff zulässig'},
