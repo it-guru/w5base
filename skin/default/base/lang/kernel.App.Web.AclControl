@@ -4,3 +4,4 @@
 'ACL-Mode'=>{de=>'Zugriffsmodus'},
 "no '\%s' specified"=>{de=>"kein '\%s' angegeben"},
 'insufficient access to parent object'=>{de=>'keine ausreichenden Rechte auf das Elternobject'},
+"invalid refid specified '%s' in %s"=>{de=>"ungültige refid beim Zugriff auf '%s' in %s"}

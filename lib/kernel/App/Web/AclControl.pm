@@ -226,6 +226,7 @@ sub checkParentWriteAccess
    my $self=shift;
    my $pobj=shift;
    my $refid=shift;
+   my $mode=shift;
 
    if ($refid eq ""){
       $self->LastMsg(ERROR,"invalid '%s' specified",
@@ -234,7 +235,14 @@ sub checkParentWriteAccess
    $pobj->SetFilter({$pobj->IdField->Name()=>\$refid});
    my @l=$pobj->getHashList(qw(ALL));
    if ($#l==-1){
-      $self->LastMsg(ERROR,"invalid refid specified '%s'",$refid);
+      # Elternobjekt scheint nicht mehr zu existieren
+      if ($refid ne "" && !($refid=~m/[\*\?]/) &&
+          $pobj->Ping() && $mode eq "delete"){
+         #msg(INFO,"Cleanup on none existing parent record '$pobj' '$refid'");
+         return(1);
+      }
+      $self->LastMsg(ERROR,"invalid refid specified '%s' in %s",
+                     $refid,$pobj->Self);
       return(0); # parent object id does not exists
    }
    if ($#l!=0){
@@ -266,7 +274,7 @@ sub ValidateDelete
          $pobj=getModuleObject($self->Config,$parentobj);
       }
       if (defined($pobj)){
-         if (!$self->checkParentWriteAccess($pobj,$refid)){
+         if (!$self->checkParentWriteAccess($pobj,$refid,"delete")){
             $self->LastMsg(ERROR,"insufficient access to parent object");
             return(undef);
          }

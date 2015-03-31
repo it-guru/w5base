@@ -18,7 +18,6 @@ package passx::acl;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::App::Web;
 use kernel::App::Web::AclControl;
