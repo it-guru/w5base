@@ -1,0 +1,11 @@
+'tssm::chm_pso'=>{de=>'ServiceManager PSO-Übersicht',en=>'ServiceManager PSO-Overview'},
+'fieldgroup.downtimesum'=>{de=>'PSO-Übersicht',en=>'PSO-Overview'},
+'Application'=>{de=>'Anwendung'},
+'Application name'=>{de=>'Anwendungsname'},
+'Limited number of applications exceeded (max. 100)'=>
+   {
+    de=>'Limit für die Anzahl der Anwendungen überschritten (max. 100)'
+   },
+'operation mode'=>{de=>'vorwiegende Betriebsart (W5Base)',
+                   en=>'primary operation mode (W5Base)'},
+'opmode.unknown'=>{de=>'unbekannt',en=>'unknown'},

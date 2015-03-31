@@ -1,0 +1,3 @@
+'tssm::lnkusergroup'=>{de=>'ServiceManager Gruppenzuordnung',
+                       en=>'ServiceManager Grouprelation'},
+'User-Fullname'=>{de=>'vollqualifizierter Username'},

@@ -1,0 +1,4 @@
+'tssm::lnkticket'   =>{de=>'SC-Change Verknüpfung (Relation)',
+                       en=>'SC-Change Relation'},
+'Destination-ID'    =>{de=>'Ticket-ID',en=>'Ticket ID'},
+

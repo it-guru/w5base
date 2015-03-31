@@ -1,0 +1,3 @@
+'tssm::MyW5Base::incident'=>{
+               de=>'Tool: suche ITIL Incident über ServiceManager Incidentnummer',
+               en=>'Tool: search ITIL Incident by ServiceManager Incidentnumber'},

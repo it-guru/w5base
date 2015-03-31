@@ -1,0 +1,3 @@
+'tssm::inm_assignment'=>{de=>'ServiceManager Assignment',
+                         en=>'ServiceManager Assignment'},
+'fieldgroup.status'=>{de=>'Status',en=>'State'},

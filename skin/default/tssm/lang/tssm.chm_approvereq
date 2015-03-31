@@ -1,0 +1,3 @@
+'tssm::chm_approvereq'=>{de=>'Offene Approvals',en=>'Pending Approvals'},
+'Pending'=>{de=>'Offen (Current Approvals)',en=>'Pending (Current Approvals)'},
+'Group Email Address'=>{de=>'Gruppen Email Adresse'},
