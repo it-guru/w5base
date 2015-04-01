@@ -1,3 +1,6 @@
 'Output to one line'=>{de=>'Ausgabe als eine Zeile'},
 'show'=>{de=>'Anzeigen'},
 'Writes in one ASCII line.'=>{de=>'Alle Feldwerte werden eindeutig in einer Zeile ausgegeben'},
+'Inverse search only posible with one field'=>{de=>'Invers Suche nur möglich mit einem Ausgabefeld'},
+'no filter on output field'=>{de=>'keine Filterbedinung auf dem Ausgabefeld'},
+'correlation algorithm'=>{de=>'Verdichtungsverfahren'},

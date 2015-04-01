@@ -21,6 +21,8 @@ use vars qw(@ISA);
 use kernel;
 use base::load;
 use kernel::FormaterMultiOperation;
+use Text::ParseWords;
+
 @ISA    = qw(kernel::FormaterMultiOperation);
 
 
@@ -138,6 +140,7 @@ sub ProcessHead
 
    my @l=$app->getCurrentView();
    my @useField=Query->Param("useField");
+   my $useOneLineAlg=Query->Param("useOneLineAlg");
    my $d=$self->SUPER::ProcessHead($fh,$rec,$msg);
 
    if ($#l!=0){
@@ -162,10 +165,26 @@ sub ProcessHead
       }
       $d.="</select>";
       $d.="</td>";
-      $d.="<td width=1% valign=bottom>";
-      $d.="<input type=submit value=\"".
+      $d.="<td width=1% valign=bottom align=center>";
+      $d.="<table>";
+      $d.="<tr><td align=left>";
+      my @useOneLineAlg=qw(unique caseIgnoreInverse caseCheckedInverse);
+      $d.="<b>".$app->T("correlation algorithm",$self->Self).":</b><br>";
+      $d.="<select name=useOneLineAlg>";
+      foreach my $alg (@useOneLineAlg){
+         my $useOneLineAlgChecked="";
+         if ($useOneLineAlg eq $alg){
+            $useOneLineAlgChecked=" selected ";
+         }
+         $d.="<option value=\"$alg\" $useOneLineAlgChecked>$alg</option>";
+      }
+      $d.="</select>";
+      $d.="</td></tr><tr><td align=center>";
+
+      $d.="<br><input type=submit value=\"".
           $self->getParent->getParent->T("show",'kernel::Output::OneLine').
           "\">";
+      $d.="</td></tr></table>";
       $d.="</td>";
       $d.="</tr>";
       $d.="</table><br><br><hr>";
@@ -184,23 +203,71 @@ sub ProcessBottom
    my %l=();
    my @view=$app->getCurrentView();
    my @useField=Query->Param("useField");
+   my %search=$app->getSearchHash();
    if ($#view==0){
       @useField=@view;
    }
-   for(my $recno=0;$recno<=$#{$self->{recordlist}};$recno++){
-      for(my $fieldno=0;$fieldno<=$#{$self->{recordlist}->[$recno]};$fieldno++){
-         if (in_array(\@useField,$view[$fieldno])){
-            my $dval=$self->{recordlist}->[$recno]->[$fieldno];
-            if (ref($dval) eq "ARRAY"){
-               map({$l{$_}++} @$dval);
-            }
-            else{
-               $l{$dval}++;
+   my $useOneLineAlg=Query->Param("useOneLineAlg");
+   if ($useOneLineAlg ne "unique"){
+      if ($#useField!=0){
+         %l=(msg(ERROR,$app->T("Inverse search only posible with one field",
+                        $self->Self)));
+      }
+      my $f=$useField[0];
+      if ($search{$f}=~m/^\s*$/){
+         %l=(msg(ERROR,$app->T("no filter on output field",$self->Self)));
+      }
+      if (!keys(%l)){
+         my @words=parse_line('[,;]{0,1}\s+',0,$search{$f});
+         if ($useOneLineAlg eq "caseIgnoreInverse"){
+            map({$l{lc($_)}=$_} @words);
+         }
+         if ($useOneLineAlg eq "caseCheckedInverse"){
+            map({$l{$_}=$_} @words);
+         }
+         for(my $recno=0;$recno<=$#{$self->{recordlist}};$recno++){
+            for(my $fieldno=0;$fieldno<=$#{$self->{recordlist}->[$recno]};
+                $fieldno++){
+               if (in_array(\@useField,$view[$fieldno])){
+                  my $dval=$self->{recordlist}->[$recno]->[$fieldno];
+                  if ($useOneLineAlg eq "caseCheckedInverse"){
+                     if (ref($dval) eq "ARRAY"){
+                        map({delete($l{$_})} @$dval);
+                     }
+                     else{
+                        delete($l{$dval});
+                     }
+                  }
+                  if ($useOneLineAlg eq "caseIgnoreInverse"){
+                     if (ref($dval) eq "ARRAY"){
+                        map({delete($l{lc($_)})} @$dval);
+                     }
+                     else{
+                        delete($l{lc($dval)});
+                     }
+                  }
+               }
             }
          }
       }
    }
-   my @l=grep(!/^\s*$/,sort(keys(%l)));
+   else{
+      for(my $recno=0;$recno<=$#{$self->{recordlist}};$recno++){
+         for(my $fieldno=0;$fieldno<=$#{$self->{recordlist}->[$recno]};
+             $fieldno++){
+            if (in_array(\@useField,$view[$fieldno])){
+               my $dval=$self->{recordlist}->[$recno]->[$fieldno];
+               if (ref($dval) eq "ARRAY"){
+                  map({$l{$_}=$_} @$dval);
+               }
+               else{
+                  $l{$dval}=$dval;
+               }
+            }
+         }
+      }
+   }
+   my @l=grep(!/^\s*$/,sort(values(%l)));
    
    if (grep(/^\S+\@\S+\.\S+$/,@l)){   # output seems to be an email list
       $d.=join("; ",@l);
