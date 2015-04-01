@@ -501,7 +501,7 @@ sub TreeView
           "border-color:black;height:80px;width:100%;\">");
 
 
-      printf("Current");
+      print($rec->{name});
       printf("</div>");
       printf("</div>");
       printf("</div>");
