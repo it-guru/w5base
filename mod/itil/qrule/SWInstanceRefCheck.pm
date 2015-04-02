@@ -140,21 +140,29 @@ sub qcheckRecord
             }
          }
          if (!$swinstvalid){
-            push(@msg,
-                 "invalid or not existing software installation specified");
+            if ($self->isValidSoftwareInstallationMandatory($rec)){
+               push(@msg,
+                    "invalid or not existing software installation specified");
+            }
          }
       }
       
-
-
-
-
       if ($#msg!=-1){
          return(3,{qmsg=>[@msg],dataissue=>[@msg]});
       }
    }
 
    return(0,undef);
+
+}
+
+
+sub isValidSoftwareInstallationMandatory
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(1);
 
 }
 
