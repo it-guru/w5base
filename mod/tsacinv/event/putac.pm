@@ -294,14 +294,11 @@ sub ApplicationModified
    ($fh{instance},     $filename{instance}           )=$self->InitTransfer();
 
 
-   my $exclmand;
+   my @exclmand;
    {
       $mand->ResetFilter();
-      $mand->SetFilter("name"=>'Extern');
-      my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
-      if (defined($mandrec)){
-         $exclmand=$mandrec->{grpid};
-      }
+      $mand->SetFilter({name=>['Extern','DSS']});
+      @exclmand=$mand->getVal('grpid');
    }
   
 
@@ -319,10 +316,10 @@ sub ApplicationModified
    my %ciapplrel=();
    if (defined($rec)){
       do{
-        # msg(INFO,"dump=%s",Dumper($rec));
-        # msg(INFO,"id=$rec->{id}");
+         #msg(INFO,"dump=%s",Dumper($rec));
+         #msg(INFO,"id=$rec->{id}");
          my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.$rec->{id};
-         if ($rec->{mandatorid} ne $exclmand ){
+         if (!in_array(\@exclmand,$rec->{mandatorid})){
             msg(INFO,"process application=$rec->{name} jobname=$jobname");
             my $acapplrec;
             if ($rec->{applid} ne ""){
@@ -1271,7 +1268,7 @@ sub InitTransfer
 {
    my $self=shift;
    my $fh;
-   my $filename;
+  my $filename;
 
    if (!(($fh, $filename) = tempfile())){
       return({msg=>$self->msg(ERROR,'can\'t open tempfile'),exitcode=>1});
