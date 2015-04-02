@@ -12,8 +12,8 @@
    USING '(DESCRIPTION=
           (ADDRESS=
           (PROTOCOL=TCP)
-          (HOST=164.29.111.252)
-          (PORT=59999))
+          (HOST=164.28.47.244)
+          (PORT=1521))
           (CONNECT_DATA=
           (SID=cmdb)))';
 */
@@ -40,7 +40,7 @@ create or replace synonym W5I.HPSA_lnkswp_of
 -- drop materialized view "mview_HPSA_sysgrp";
 create materialized view "mview_HPSA_sysgrp"
    refresh complete start with sysdate
---   next sysdate+(1/24)*7
+   next sysdate+(1/24)*7
    as
 select grp.item_id,
        ddim.curdate,
@@ -52,13 +52,11 @@ from (select CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL curdate
       join CMDB_DATA.SAS_SERVER_GROUPS@hpsa grp 
           on ddim.curdate between grp.begin_date and grp.end_date;
 
-
-
-
 CREATE INDEX "HPSA_sysgrp_id" 
    ON "mview_HPSA_sysgrp"(item_id) online;
 CREATE INDEX "HPSA_sysgrp_name" 
    ON "mview_HPSA_sysgrp"(lower(group_name)) online;
+
 
 
 create or replace view "W5I_HPSA_sysgrp" as
@@ -72,7 +70,7 @@ create or replace synonym W5I.HPSA_sysgrp
 -- drop materialized view "mview_HPSA_lnkswp";
 create materialized view "mview_HPSA_lnkswp"
    refresh complete start with sysdate
---   next sysdate+(1/24)*7
+   next sysdate+(1/24)*7
    as
 select attr.item_id sysid,
        substr(replace(utl_i18n.string_to_raw(data =>
