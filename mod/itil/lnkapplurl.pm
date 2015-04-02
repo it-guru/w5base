@@ -20,8 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use itil::lib::Listedit;
-#use URI;
-#use URI::URL;
 @ISA=qw(kernel::App::Web::Listedit itil::lib::Listedit kernel::DataObj::DB);
 
 
