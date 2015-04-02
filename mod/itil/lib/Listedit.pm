@@ -504,9 +504,9 @@ sub calcSoftwareState
       $ss->SecureSetFilter($flt);
       my ($rec)=$ss->getOnlyFirst("name","software","osrelease");
       if (!defined($rec)){
-         my $setname;
-         $setname=" -".$FilterSet->{softwareset}->[0]."- ";
-         return("INVALID SOFTSET $setname SELECTED");
+         my $fsetname;
+         $fsetname=" -".$setname."- ";
+         return("INVALID SOFTSET $fsetname SELECTED");
       }
       #print STDERR Dumper($rec);
       $FilterSet->{Set}->{data}=$rec;
