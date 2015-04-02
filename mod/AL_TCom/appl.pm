@@ -401,7 +401,7 @@ sub ItemSummary
          }
       }
       if (keys(%systemids)){
-         my $l1=getModuleObject($self->Config,"hpsa::lnkswp");
+         my $l1=getModuleObject($self->Config,"tshpsa::lnkswp");
          my @swview=qw(fullname denyupd denyupdcomments 
                        softwarerelstate is_dbs is_mw
                        urlofcurrentrec);
