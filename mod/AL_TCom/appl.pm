@@ -406,7 +406,7 @@ sub ItemSummary
                        softwarerelstate is_dbs is_mw
                        urlofcurrentrec);
          $l1->ResetFilter();
-         $l1->SetFilter({systemid        =>[keys(%systemids)],
+         $l1->SetFilter({systemsystemid        =>[keys(%systemids)],
                          softwareset     =>$rm->{name}});
          my @l1=$l1->getHashList(@swview);
          push(@softstate,{
