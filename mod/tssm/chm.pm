@@ -94,35 +94,35 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'srcid1', #?
-                htmldetail    =>0,
+                htmldetail    =>1,
                 label         =>'Extern Change ID',
                 dataobjattr   =>"decode(cm3rm1.tsi_external_main_id,'null',NULL,".
                                        "cm3rm1.tsi_external_main_id)"),
 
       new kernel::Field::Text(
                 name          =>'srcid2', #?
-                htmldetail    =>0,
+                htmldetail    =>1,
                 label         =>'Extern Change',
                 dataobjattr   =>"decode(cm3rm1.tsi_extern,'null',NULL,".
                                        "cm3rm1.tsi_extern)"),
 
       new kernel::Field::Text(
                 name          =>'srcid3', #?
-                htmldetail    =>0,
+                htmldetail    =>1,
                 label         =>'Extern Change ID',
                 dataobjattr   =>"decode(cm3rm1.tsi_external_number,'null',NULL,".
                                        "cm3rm1.tsi_external_number)"),
 
       new kernel::Field::Text(
                 name          =>'srcid4', #?
-                htmldetail    =>0,
+                htmldetail    =>1,
                 sqlorder      =>"none",
                 label         =>'Extern Change ID',
                 dataobjattr   =>"cm3rm1.tsi_ext_interface_keys"),
 
       new kernel::Field::Text(
                 name          =>'srcid5', #?
-                htmldetail    =>0,
+                htmldetail    =>1,
                 sqlorder      =>"none",
                 label         =>'Extern Change ID',
                 dataobjattr   =>"cm3rm1.tsi_ext_interface_names"),
@@ -264,7 +264,7 @@ sub new
                 name          =>'validation',
                 label         =>'Validation',
                 searchable    =>0,
-                dataobjattr   =>'cm3rm1.justification'),
+                dataobjattr   =>'cm3rm1.tsi_validation'),
 
 ##      new kernel::Field::Textarea(
 ##                name          =>'serviceinfo',
@@ -315,6 +315,12 @@ sub new
                 group         =>'status',
                 label         =>'Current Status',
                 dataobjattr   =>'cm3rm1.status'),
+
+      new kernel::Field::Text(
+                name          =>'phase',
+                group         =>'status',
+                label         =>'Current Phase',
+                dataobjattr   =>'cm3rm1.current_phase'),
 
       new kernel::Field::Text(
                 name          =>'approvalstatus',

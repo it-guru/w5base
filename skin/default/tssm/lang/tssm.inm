@@ -47,3 +47,4 @@
 'Application'=>{de=>'Anwendung'},
 'Description'=>{de=>'Beschreibung'},
 'Incident create'=>{de=>'Incident erstellen'},
+'affected services'=>{de=>'betroffene Services'},

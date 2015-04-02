@@ -39,25 +39,25 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'Group ID',
-                dataobjattr   =>'dsccentralassignmentm1.unique_id'),
+                dataobjattr   =>'assignmentm1.name'),
 
       new kernel::Field::Link(
                 name          =>'groupid',
                 label         =>'GroupId',
                 uppersearch   =>1,
-                dataobjattr   =>'dsccentralassignmentm1.name'),
+                dataobjattr   =>'assignmentm1.name'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
                 ignorecase    =>1,
-                dataobjattr   =>'dsccentralassignmentm1.name'),
+                dataobjattr   =>'assignmentm1.name'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'dsccentralassignmentm1.name'),
+                dataobjattr   =>'assignmentm1.name'),
 
 
 #      new kernel::Field::TextDrop(
@@ -71,59 +71,59 @@ sub new
       new kernel::Field::Text(
                 name          =>'supervisor', # leider keine richtige reference
                 label         =>'Supervisor',
-                dataobjattr   =>'dsccentralassignmentm1.assgrp_response'),
+                dataobjattr   =>'assignmentm1.wdmanagername'),
 
 
       new kernel::Field::Email(
                 name          =>'groupmailbox',
                 label         =>'group mailbox',
                 ignorecase    =>1,
-                dataobjattr   =>'dsccentralassignmentm1.email_address'),
+                dataobjattr   =>'assignmentm1.tsi_group_email'),
 
-      new kernel::Field::SubList(
-                name          =>'users',
-                label         =>'Users',
-                group         =>'users',
-                forwardSearch =>1,
-                searchable    =>0,
-                vjointo       =>'tssm::lnkusergroup',
-                vjoinon       =>['groupid'=>'lgroup'],
-                vjoindisp     =>['username','luser']),
-
-      new kernel::Field::SubList(
-                name          =>'loginname',
-                translation   =>'tssm::user',
-                label         =>'User-Login',
-                group         =>'users',
-                htmldetail    =>0,
-                vjointo       =>'tssm::lnkusergroup',
-                vjoinon       =>['groupid'=>'lgroup'],
-                vjoindisp     =>['luser']),
-
-      new kernel::Field::SubList(
-                name          =>'memberemails',
-                label         =>'member email addresses',
-                group         =>'users',
-                searchable    =>0,
-                htmldetail    =>0,
-                vjointo       =>'tssm::lnkusergroup',
-                vjoinon       =>['groupid'=>'lgroup'],
-                vjoindisp     =>['useremail']),
+#      new kernel::Field::SubList(
+#                name          =>'users',
+#                label         =>'Users',
+#                group         =>'users',
+#                forwardSearch =>1,
+#                searchable    =>0,
+#                vjointo       =>'tssm::lnkusergroup',
+#                vjoinon       =>['groupid'=>'lgroup'],
+#                vjoindisp     =>['username','luser']),
+#
+#      new kernel::Field::SubList(
+#                name          =>'loginname',
+#                translation   =>'tssm::user',
+#                label         =>'User-Login',
+#                group         =>'users',
+#                htmldetail    =>0,
+#                vjointo       =>'tssm::lnkusergroup',
+#                vjoinon       =>['groupid'=>'lgroup'],
+#                vjoindisp     =>['luser']),
+#
+#      new kernel::Field::SubList(
+#                name          =>'memberemails',
+#                label         =>'member email addresses',
+#                group         =>'users',
+#                searchable    =>0,
+#                htmldetail    =>0,
+#                vjointo       =>'tssm::lnkusergroup',
+#                vjoinon       =>['groupid'=>'lgroup'],
+#                vjoindisp     =>['useremail']),
 
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
                 ignorecase    =>1,
-                dataobjattr   =>'dsccentralassignmentm1.brief_description'),
+                dataobjattr   =>'assignmentm1.tsi_description'),
 
       new kernel::Field::Boolean(
                 name          =>'ismanager',
-                label         =>'is manager group',
+                label         =>'is change manager group',
                 ignorecase    =>1,
                 group         =>'grouptype',
                 htmlhalfwidth =>1,
                 dataobjattr   =>
-                "decode(dsccentralassignmentm1.group_type_manager,'t',1,0)"),
+                "decode(assignmentm1.tsi_flag_chm_manager,'t',1,0)"),
 
       new kernel::Field::Boolean(
                 name          =>'isapprover',
@@ -132,16 +132,25 @@ sub new
                 group         =>'grouptype',
                 htmlhalfwidth =>1,
                 dataobjattr   =>
-                "decode(dsccentralassignmentm1.group_type_approver,'t',1,0)"),
+                "decode(assignmentm1.tsi_flag_chm_approver,'t',1,0)"),
 
       new kernel::Field::Boolean(
-                name          =>'isassignment',
-                label         =>'is assignment group',
+                name          =>'ischmassignment',
+                label         =>'is change assignment group',
                 ignorecase    =>1,
                 group         =>'grouptype',
                 htmlhalfwidth =>1,
                 dataobjattr   =>
-                "decode(dsccentralassignmentm1.group_type_assignment,'t',1,0)"),
+                "decode(assignmentm1.tsi_flag_type_change,'t',1,0)"),
+
+      new kernel::Field::Boolean(
+                name          =>'isinmassignment',
+                label         =>'is incident assignment group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(assignmentm1.tsi_flag_type_incident,'t',1,0)"),
 
       new kernel::Field::Boolean(
                 name          =>'isreviewer',
@@ -150,10 +159,10 @@ sub new
                 group         =>'grouptype',
                 htmlhalfwidth =>1,
                 dataobjattr   =>
-                "decode(dsccentralassignmentm1.group_type_reviewer,'t',1,0)"),
+                "decode(assignmentm1.tsi_chm_flag_reviewer,'t',1,0)"),
 
    );
-   $self->setDefaultView(qw(id name description));
+   $self->setDefaultView(qw(name description));
    return($self);
 }
 

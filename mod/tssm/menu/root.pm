@@ -85,9 +85,10 @@ sub Init
    $self->RegisterObj("itu.sm.problem.relations",
                       "tssm::lnk",
                       defaultacl=>['valid_user']);
-   
+
    $self->RegisterObj("itu.sm.krn",
                       "tmpl/welcome",
+                      prio=>2000,
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itu.sm.krn.group.lnkuser",
@@ -106,16 +107,33 @@ sub Init
                       "tssm::user",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.sm.krn.dev",
+                      "tssm::dev",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.sm.krn.user.lnkgroup",
                       "tssm::lnkusergroup",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itu.sm.krn.dictonary",                             # OK
+   $self->RegisterObj("itu.sm.krn.Dump",
+                      "tmpl/welcome",
+                      prio=>10,
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.sm.krn.Dump.dictonary",                        # OK
                       "tssm::DBDataDiconary",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itu.sm.krn.chmDataDump",                           # OK
+   $self->RegisterObj("itu.sm.krn.Dump.chmDataDump",                      # OK
                       "tssm::chmDumper",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.sm.krn.Dump.inmDataDump",                      # OK
+                      "tssm::inmDumper",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.sm.krn.Dump.devDataDump",                      # OK
+                      "tssm::devDumper",
                       defaultacl=>['admin']);
 
    return($self);

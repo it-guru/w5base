@@ -79,11 +79,11 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'contactsm1.first_name'),
 
-      new kernel::Field::Boolean(
-                name          =>'islogonuser',
-                label         =>'is real logon user',
-                upperserarch  =>1,
-                dataobjattr   =>"decode(contactsm1.groupprgn,'YES',1,0)"),
+#      new kernel::Field::Boolean(
+#                name          =>'islogonuser',
+#                label         =>'is real logon user',
+#                upperserarch  =>1,
+#                dataobjattr   =>"decode(contactsm1.groupprgn,'YES',1,0)"),
 
       new kernel::Field::Text(
                 name          =>'email',
@@ -96,18 +96,6 @@ sub new
                 group         =>'office',
                 label         =>'Phonenumber',
                 dataobjattr   =>'contactsm1.phone'),
-
-      new kernel::Field::Phonenumber(
-                name          =>'office_mobile',
-                group         =>'office',
-                label         =>'Mobile-Phonenumber',
-                dataobjattr   =>'contactsm1.car_phone'),
-
-      new kernel::Field::Phonenumber(
-                name          =>'office_facsimile',
-                group         =>'office',
-                label         =>'FAX-Number',
-                dataobjattr   =>'contactsm1.fax'),
 
       new kernel::Field::Text(
                 name          =>'sclocation',
@@ -240,9 +228,10 @@ sub mkFullname
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="operatorm1.name=contactsm1.user_id(+) AND ".
-             "(contactsm1.email is not NULL OR ".
-             "contactsm1.groupprgn='YES')";
+   my $where="operatorm1.name=contactsm1.user_id(+)";
+            # " AND ".
+            # "(contactsm1.email is not NULL OR ".
+            # "contactsm1.groupprgn='YES')";
    return($where);
 }
 
@@ -268,7 +257,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="scadm.operatorm1,scadm.contactsm1";
+   my $from="dh_operatorm1 operatorm1,dh_contctsm1 contactsm1";
    return($from);
 }
 

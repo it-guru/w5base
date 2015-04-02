@@ -63,10 +63,10 @@ sub new
                 htmlwidth     =>20,
                 dataobjattr   =>'probsummarym1.status'),
 
-      new kernel::Field::Text(
-                name          =>'softwareid',
-                label         =>'SoftwareID',
-                dataobjattr   =>'probsummarym1.tsi_main_ci_sw_name'),
+##      new kernel::Field::Text(
+##                name          =>'softwareid',
+##                label         =>'SoftwareID',
+##                dataobjattr   =>'probsummarym1.tsi_main_ci_sw_name'),
 
       new kernel::Field::Text(
                 name          =>'deviceid',
@@ -81,24 +81,22 @@ sub new
       new kernel::Field::Text(
                 name          =>'affservices',
                 sqlorder      =>"none",
+                htmldetail    =>0,
                 label         =>'affected services',
                 dataobjattr   =>'probsummarym1.affected_services'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
-                timezone      =>'CET',
                 label         =>'Created',
                 dataobjattr   =>'probsummarym1.open_time'),
 
       new kernel::Field::Date(
                 name          =>'downtimestart',
-                timezone      =>'CET',
                 label         =>'Downtime Start',
                 dataobjattr   =>'probsummarym1.downtime_start'),
 
       new kernel::Field::Date(
                 name          =>'downtimeend',
-                timezone      =>'CET',
                 label         =>'Downtime End',
                 dataobjattr   =>'probsummarym1.downtime_end'),
 
@@ -140,7 +138,7 @@ sub new
                 name          =>'hassignment',
                 group         =>'status',
                 label         =>'Home Assignment',
-                dataobjattr   =>'probsummarym1.tsi_ext_home_assignment'),
+                dataobjattr   =>'probsummarym1.open_group'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'iassignment',
@@ -203,7 +201,6 @@ sub new
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
-                timezone      =>'CET',
                 label         =>'SysModTime',
                 dataobjattr   =>'probsummarym1.sysmodtime'),
 
@@ -211,7 +208,6 @@ sub new
                 name          =>'createtime',
                 depend        =>['status'],
                 group         =>'close',
-                timezone      =>'CET',
                 label         =>'Create time',
                 dataobjattr   =>'probsummarym1.open_time'),
 
@@ -219,7 +215,6 @@ sub new
                 name          =>'closetime',
                 depend        =>['status'],
                 group         =>'close',
-                timezone      =>'CET',
                 label         =>'Closeing time',
                 dataobjattr   =>'probsummarym1.close_time'),
 
@@ -227,7 +222,6 @@ sub new
 ##                name          =>'workstart',
 ##                depend        =>['status'],
 ##                group         =>'close',
-##                timezone      =>'CET',
 ##                label         =>'Work Start',
 ##                dataobjattr   =>'probsummarym1.work_start'),
 
@@ -235,7 +229,6 @@ sub new
 ##                name          =>'workend',
 ##                depend        =>['status'],
 ##                group         =>'close',
-##                timezone      =>'CET',
 ##                label         =>'Work End',
 ##                dataobjattr   =>'probsummarym1.work_end'),
 
