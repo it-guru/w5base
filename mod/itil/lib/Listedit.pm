@@ -583,7 +583,10 @@ sub calcSoftwareState
                $FilterSet->{Analyse}->{systemids}->{$sid}=$srec;
                push(@{$FilterSet->{Analyse}->{systems}},
                     $FilterSet->{Analyse}->{systemids}->{$sid});
-               my @ruleset=@{$FilterSet->{Set}->{data}->{osrelease}};
+               my @ruleset;
+               if (ref($FilterSet->{Set}->{data}->{osrelease}) eq "ARRAY"){
+                  @ruleset=@{$FilterSet->{Set}->{data}->{osrelease}};
+               }
                @ruleset=sort({$a->{comparator}<=>$b->{comparator}} @ruleset);
 
                my $failpost="";
