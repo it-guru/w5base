@@ -403,7 +403,7 @@ sub ItemSummary
       if (keys(%systemids)){
          my $l1=getModuleObject($self->Config,"tshpsa::lnkswp");
          my @swview=qw(fullname denyupd denyupdcomments 
-                       softwarerelstate is_dbs is_mw
+                       softwarerelstate 
                        urlofcurrentrec);
          $l1->ResetFilter();
          $l1->SetFilter({systemsystemid        =>[keys(%systemids)],
@@ -414,7 +414,7 @@ sub ItemSummary
             i=>[@l1]
          });
          return(0) if (!$l1->Ping());
-         Dumper(\@softstate);
+         my $dump=Dumper(\@softstate);
          $summary->{hpsaswp}={record=>\@softstate};    # SET : hpsaswp fertig
       }
    }

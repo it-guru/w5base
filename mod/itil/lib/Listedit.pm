@@ -500,12 +500,15 @@ sub calcSoftwareState
       my $ss=getModuleObject($self->getParent->Config,
                              "itil::softwareset");
       my $setname=$FilterSet->{softwareset};
-      my $flt={cistatusid=>4,name=>$setname};
-      $ss->SecureSetFilter($flt);
+      my $flt={cistatusid=>\'4',name=>$setname};
+      $ss->SetFilter($flt);
       my ($rec)=$ss->getOnlyFirst("name","software","osrelease");
       if (!defined($rec)){
          my $fsetname;
          $fsetname=" -".$setname."- ";
+         if (ref($setname) eq "ARRAY"){
+            $fsetname=" -[".join(",",@$setname)."]- ";
+         }
          return("INVALID SOFTSET $fsetname SELECTED");
       }
       #print STDERR Dumper($rec);

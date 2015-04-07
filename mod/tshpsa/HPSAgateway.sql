@@ -74,10 +74,10 @@ create materialized view "mview_HPSA_lnkswp"
    as
 select attr.item_id sysid,
        substr(replace(utl_i18n.string_to_raw(data =>
-              attr.item_id||'-'||swi.swclass||'-'||
+              swi.swclass||'-HostID'||attr.item_id||'-'||
               swi.swpath||'-'||swi.iname),' ',''),0,3000) id,
-       attr.item_id||' - '||swi.swclass||' - '||
-       swi.swpath||' - '||swi.iname fullname,
+       swi.swclass||'-HostID'||attr.item_id||'-'||
+           swi.swpath||'-'||swi.iname fullname,
        ddim.curdate,
        swi.swclass,
        swi.swvers,

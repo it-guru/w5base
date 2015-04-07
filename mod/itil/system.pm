@@ -690,8 +690,14 @@ sub new
                    my $self=shift;
                    my $hflt=shift;
                    if (defined($hflt->{$self->{name}})){
-                      $self->getParent->Context->{FilterSet}=
-                          {$self->{name}=>$hflt->{$self->{name}}};
+                      my $f=$hflt->{$self->{name}};
+                      if (ref($f) ne "ARRAY"){
+                         $f=~s/^"(.*)"$/$1/;
+                         $f=[$f];
+                      }
+                      $self->getParent->Context->{FilterSet}={
+                         $self->{name}=>$f
+                      };
                       delete( $hflt->{$self->{name}})
                    }
                    else{
