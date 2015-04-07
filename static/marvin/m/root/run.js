@@ -10,6 +10,7 @@ $(document).bind("pagebeforecreate", function(){
    i18n.init({
    //        lng: 'en',
       debug: true,
+      lng:"de",
       lngWhitelist: ['de','en'],
       fallbackLng: false,
       defaultValueFromContent:false,

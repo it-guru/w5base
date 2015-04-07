@@ -6,7 +6,7 @@ function itemsummary2html(rec,o){
    var d={};
 
    var baseTags=new Array('dataquality','hardware','system','software',
-                          'interview');
+                          'hpsaswp','osroadmap','interview');
    for(tpos=0;tpos<baseTags.length;tpos++){
       var tag=baseTags[tpos];
       d[tag]=new Object();
@@ -53,6 +53,24 @@ function itemsummary2html(rec,o){
             }
          }
       }
+      if (tag=='osroadmap'){
+         d[tag].label="OS-Roadmap";
+         for(c=0;c<isum.osroadmap.record.length;c++){
+            d[tag].cnt.total+=1;
+            if (isum[tag].record[c].osroadmapstate=="OK"){
+               d[tag].cnt.ok++;
+            }
+            else if (isum[tag].record[c].osroadmapstate=="WARN"){
+               d[tag].cnt.warn++;
+            }
+            else if (isum[tag].record[c].osroadmapstate.match(/but OK$/)){
+               d[tag].cnt.commented++;
+            }
+            else{
+               d[tag].cnt.fail++;
+            }
+         }
+      }
       if (tag=='system'){
          d[tag].label="Betriebssystemversion";
          for(c=0;c<isum[tag].record.length;c++){
@@ -83,6 +101,25 @@ function itemsummary2html(rec,o){
             }
             else if (isum[tag].record[0].i[c].
                      softwareinstrelstate.match(/but OK$/)){
+               d[tag].cnt.commented++;
+            }
+            else{
+               d[tag].cnt.fail++;
+            }
+         }
+      }
+      if (tag=='hpsaswp'){
+         d[tag].label="HPSA-Prozess";
+         for(c=0;c<isum[tag].record[0].i.length;c++){
+            d[tag].cnt.total+=1;
+            if (isum[tag].record[0].i[c].softwarerelstate=="OK"){
+               d[tag].cnt.ok++;
+            }
+            else if (isum[tag].record[0].i[c].softwarerelstate=="WARN"){
+               d[tag].cnt.warn++;
+            }
+            else if (isum[tag].record[0].i[c].
+                     softwarerelstate.match(/but OK$/)){
                d[tag].cnt.commented++;
             }
             else{
