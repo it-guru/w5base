@@ -1,8 +1,6 @@
 'TS::qrule::ApplChangeAGroup'=>{
-   de=>'Prüfung ob Change Approver-Gruppen eingetragen sind',
-   en=>'check if there are change approvergroups defined'},
+   de=>'Prüfung ob eine technische Change Approver-Gruppe eingetragen ist',
+   en=>'check if there is a technical change approvergroup defined'},
 'there is no technical change approvergroup defined'=>{
    de=>'es wurde keine technische Change Approvergroup eingetragen'},
-'there is no business change approvergroup defined'=>{
-   de=>'es wurde keine fachliche Change Approvergroup eingetragen'},
 

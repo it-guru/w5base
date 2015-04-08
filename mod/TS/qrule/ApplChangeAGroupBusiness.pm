@@ -1,11 +1,11 @@
-package TS::qrule::ApplChangeAGroup;
+package TS::qrule::ApplChangeAGroupBusiness;
 #######################################################################
 =pod
 
 =head3 PURPOSE
 
 Checks if there is on an "installed/active" or "available" application
-a change approvergroup for technical side is defined.
+with Priority 1 or 2 a change approvergroup for business side is defined.
 If there is no valid approvergroup defined, an error will be proceeded.
 
 =head3 IMPORTS
@@ -15,7 +15,7 @@ NONE
 =cut
 #######################################################################
 #  W5Base Framework
-#  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2015  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -71,14 +71,15 @@ sub qcheckRecord
    return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
                                 $rec->{cistatusid}!=3) ||
                                $rec->{opmode} eq "license");
-   if (trim($rec->{scapprgroup}) eq ""){
-      $exitcode=3 if ($exitcode<3);
-      push(@{$desc->{qmsg}},
-           'there is no technical change approvergroup defined');
-      push(@{$desc->{dataissue}},
-           'there is no technical change approvergroup defined');
+   if ($rec->{customerprio} eq "1" || $rec->{customerprio} eq "2"){
+      if (trim($rec->{scapprgroup2}) eq ""){
+         $exitcode=3 if ($exitcode<3);
+         push(@{$desc->{qmsg}},
+              'there is no business change approvergroup defined');
+         push(@{$desc->{dataissue}},
+              'there is no business change approvergroup defined');
+      }
    }
-
    return($exitcode,$desc);
 }
 
