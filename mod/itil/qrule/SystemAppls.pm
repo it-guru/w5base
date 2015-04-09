@@ -4,12 +4,14 @@ package itil::qrule::SystemAppls;
 
 =head3 PURPOSE
 
-Every System in in CI-Status "installed/active" or "available", needs
+Every System in CI-Status "installed/active" or "available", needs
 at least 1 link to an application. If there are no applications assigned,
 this will produce an error. In this case the databoss of the logical
 system has to contact one (the corret one) databoss of an application
 to assign the system to the application.
 This rule is inactive, if the system is a workstation and no server/applicationserver.
+This rule is also inactive, if the system is a infrastructure system
+and there is a sufficient description documented in comments.
 
 
 =head3 IMPORTS
@@ -63,6 +65,19 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    return(0,undef) if (!($rec->{isapplserver}) && ($rec->{isworkstation}));
+
+   if ($rec->{isinfrastruct}) {
+      my $wcnt=split(/\s+/,$rec->{comments});
+
+      if ($wcnt<10) {
+         my $msg='description in field comments '.
+                 'not available resp. insufficient';
+         return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+      }
+
+      return(0,undef);
+   }
+
    if (ref($rec->{applications}) ne "ARRAY" || $#{$rec->{applications}}==-1){
       return(3,{qmsg=>['no application relations'],
                 dataissue=>['no application relations']});
