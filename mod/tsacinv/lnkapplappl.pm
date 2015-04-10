@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -53,6 +54,20 @@ sub new
                 weblinkto     =>'tsacinv::appl',
                 weblinkon     =>['lchildid'=>'id'],
                 dataobjattr   =>'amtsicustappl.name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'parent_applid',
+                label         =>'Parent ApplicationID',
+                vjointo       =>'tsacinv::appl',
+                vjoinon       =>['lparentid'=>'id'],
+                vjoindisp     =>'applid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'child_applid',
+                label         =>'Child ApplicationID',
+                weblinkto     =>'tsacinv::appl',
+                weblinkon     =>['lchildid'=>'id'],
+                dataobjattr   =>'amtsicustappl.code'),
 
       new kernel::Field::Text(
                 name          =>'type',
