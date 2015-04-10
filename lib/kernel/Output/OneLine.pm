@@ -208,14 +208,14 @@ sub ProcessBottom
       @useField=@view;
    }
    my $useOneLineAlg=Query->Param("useOneLineAlg");
-   if ($useOneLineAlg ne "unique"){
-      if ($#useField!=0){
-         %l=(msg(ERROR,$app->T("Inverse search only posible with one field",
+   if ($useOneLineAlg ne "unique" && $useOneLineAlg ne ""){
+      if ($#useField>0){
+         %l=(1=>msg(ERROR,$app->T("Inverse search only posible with one field",
                         $self->Self)));
       }
       my $f=$useField[0];
       if ($search{$f}=~m/^\s*$/){
-         %l=(msg(ERROR,$app->T("no filter on output field",$self->Self)));
+         %l=(1=>msg(ERROR,$app->T("no filter on output field",$self->Self)));
       }
       if (!keys(%l)){
          my @words=parse_line('[,;]{0,1}\s+',0,$search{$f});
