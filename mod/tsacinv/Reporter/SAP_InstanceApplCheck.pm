@@ -51,6 +51,7 @@ sub Process             # will be run as a spereate Process (PID)
 
    $o->SetFilter({assignmentgroup=>'C.SAP C.SAP.*',
                   tenant=>\'CS',
+                  status=>'!"out of operation"',
                   customer=>'DTAG.TEL-IT DTAG.TEL-IT.*'});
    my @fieldlist=grep(!/^p/,@{$self->{fieldlist}});
    my @l=$o->getHashList(@fieldlist);
