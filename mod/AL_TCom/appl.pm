@@ -381,7 +381,8 @@ sub ItemSummary
       my $o=getModuleObject($self->Config,"tssmartcube::tcc");
       $o->SetFilter({systemid=>[keys(%systemids)]});
       my @osroadmap=$o->getHashList(qw(systemid roadmap osroadmapstate 
-                                       urlofcurrentrec ));
+                                       urlofcurrentrec 
+                                       denyupd denyupdcomments));
       return(0) if (!$o->Ping());
       Dumper(\@osroadmap);
       $summary->{osroadmap}={record=>\@osroadmap};

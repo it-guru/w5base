@@ -75,7 +75,13 @@ sub new
                 vjoineditbase =>{deleted=>\'0'},
                 group         =>'inmchm',
                 async         =>'1',
-                searchable    =>0,
+                searchable    =>sub{
+                   my $self=shift;
+                   if ($self->getParent->IsMemberOf("admin")){
+                      return(1);
+                   }
+                   return(0);
+                },
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['acinmassignmentgroupid'=>'lgroupid'],
                 vjoindisp     =>'name'),
