@@ -66,6 +66,19 @@ sub new
                 label         =>'Data',
                 dataobjattr   =>'reportjob.comments'),
 
+      new kernel::Field::Number(
+                name          =>'textdatalines',
+                group         =>'data',
+                label         =>'Data Lines',
+                depend        =>['textdata'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $tmp=$current->{textdata};
+                   my $nr_of_lines = $tmp =~ tr/\n//; 
+                   return($nr_of_lines);
+                }),
+
       new kernel::Field::Date(
                 name          =>'validto',
                 group         =>'data',
