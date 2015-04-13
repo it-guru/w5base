@@ -119,7 +119,7 @@ sub new
                 label         =>'VSM HashTag',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'name',
-                vjoinon       =>['sdbid'=>'id']),
+                vjoinon       =>['id'=>'id']),
 
       new kernel::Field::Percent(
                 name          =>'vsmavail',
@@ -130,8 +130,7 @@ sub new
                 label         =>'VSM availibility',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'avail',
-                depend        =>['sdbid'],
-                vjoinon       =>['sdbid'=>'id']),
+                vjoinon       =>['id'=>'id']),
 
       new kernel::Field::Percent(
                 name          =>'vsmperf',
@@ -142,8 +141,7 @@ sub new
                 label         =>'VSM performance',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'perf',
-                depend        =>['sdbid'],
-                vjoinon       =>['sdbid'=>'id']),
+                vjoinon       =>['id'=>'id']),
 
       new kernel::Field::Percent(
                 name          =>'vsmquality',
@@ -154,8 +152,7 @@ sub new
                 label         =>'VSM quality',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'quality',
-                depend        =>['sdbid'],
-                vjoinon       =>['sdbid'=>'id']),
+                vjoinon       =>['id'=>'id']),
 
    );
    $self->AddGroup("contactpersons",translation=>'AL_TCom::businessservice');
