@@ -193,7 +193,7 @@ create materialized view "mview_HPSA_lnksystemsysgrp"
 --   next sysdate+(1/24)*7
    as
 
-select memb.item_id,
+select memb.item_source_id ||'-'||memb.server_item_id item_id,
        memb.item_source_id srcid,
        memb.server_item_id dstid,
        grp.group_name      srcname,
