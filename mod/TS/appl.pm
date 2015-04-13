@@ -499,7 +499,9 @@ sub calcBaseApplicationExpertGroup
    $o->SetFilter({name=>\@co});
    foreach my $corec ($o->getHashList(qw(itsemid))){
       if ($corec->{itsemid} ne ""){
-         push(@{$a{itsem}->{userid}},$corec->{itsemid});
+         if (!in_array($a{itsem}->{userid},$corec->{itsemid})){
+            push(@{$a{itsem}->{userid}},$corec->{itsemid});
+         }
       }
    }
 
