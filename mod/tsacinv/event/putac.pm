@@ -588,7 +588,7 @@ sub ApplicationModified
                   # prüfen ob in assetmanager beim kontierungsobjekt der
                   # passende customerlink eingetragen ist.
                   # ---
-                  $self->validateCostCenter4AssetManager($rec);
+                  #$self->validateCostCenter4AssetManager($rec);
 
                   my $acftprec={
                                    Appl=>{
