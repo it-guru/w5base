@@ -38,12 +38,14 @@ sub ItemSummaryDump
    my $self=shift;
 
    my $o=getModuleObject($self->Config,"AL_TCom::appl");
-   $o->SetFilter({name=>\'W5Base/Darwin'});
+   $o->SetFilter({name=>'W5Base/Darwin Netcool(P) GecCo(P) CCP(P)'});
    my $f=$o->getField("itemsummary");
    open(F,">ItemSummaryDump.xml");
+   printf F ("<root>\n");
    foreach my $rec ($o->getHashList(qw(itemsummary))){
       printf F ("%s\n\n",hash2xml($rec));
    }
+   printf F ("</root>\n");
    close(F);
    return({exitcode=>0});
 }
