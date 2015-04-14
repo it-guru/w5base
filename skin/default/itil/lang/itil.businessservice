@@ -93,4 +93,4 @@ Anwendung zur Verfügung stellen kann.',en=>'Welcome'},
 'implemented support times'=>{de=>'implementierte Supportzeiten'},
 'implemented service times'=>{de=>'implementierte Servicezeiten'},
 'target occurrence reaction time'=>{de=>'geforderte Vorfall Reaktionszeit'},
-'target occurrence total treatment time'=>{de=>'geforderte Vorfall Gesammtbehandlungszeit'}
+'target occurrence total treatment time'=>{de=>'geforderte Vorfall Gesamtbehandlungszeit'}
