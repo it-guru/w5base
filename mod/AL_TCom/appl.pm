@@ -404,7 +404,7 @@ sub ItemSummary
       if (keys(%systemids)){
          my $l1=getModuleObject($self->Config,"tshpsa::lnkswp");
          my @swview=qw(fullname denyupd denyupdcomments 
-                       softwarerelstate 
+                       softwarerelstate is_mw is_dbs
                        urlofcurrentrec);
          $l1->ResetFilter();
          $l1->SetFilter({systemsystemid        =>[keys(%systemids)],
