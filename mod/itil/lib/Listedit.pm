@@ -446,7 +446,14 @@ sub updateDenyHandling
          }
       }
       else{
-         $newrec->{denyupdvalidto}=undef;
+         if ($oldrec->{denyupdcomments} ne "" ||
+             $newrec->{denyupdcomments} ne ""){
+            $newrec->{denyupdcomments}="";
+         }
+         if ($oldrec->{denyupdvalidto} ne "" ||
+             $newrec->{denyupdvalidto} ne ""){
+            $newrec->{denyupdvalidto}=undef;
+         }
       }
    }
    if ($self->SelfAsParentObject() eq "itil::asset"){
@@ -459,6 +466,48 @@ sub updateDenyHandling
       }
    }
    return(1);
+}
+
+
+sub getupdateDenyHandlingScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var d=document.forms[0].elements['Formated_denyupd'];
+var r=document.forms[0].elements['Formated_refreshpland'];
+var c=document.forms[0].elements['Formated_denyupdcomments'];
+
+if (!d){
+   d=document.forms[0].elements['Formated_denyupselect']; // new style
+}
+
+if (d){
+   var v=d.options[d.selectedIndex].value;
+   if (v!="" && v!="0"){
+      if (r){
+         r.value="";
+         r.disabled=true;
+      }
+      if (c){
+         c.disabled=false;
+      }
+   }
+   else{
+      if (c){
+         c.value="";
+         c.disabled=true;
+      }
+      if (r){
+         r.disabled=false;
+      }
+   }
+}
+
+EOF
+   return($d);
 }
 
 sub Version2Key

@@ -56,6 +56,7 @@ sub new
       {id=>50 }, # Nein, fehlende Resourcen
       {id=>60 }, # Nein, fehlende oder negative Testergebnisse
       {id=>70 }, # Nein, hohes Risiko
+      {id=>99 }, # Nein, other 
       {id=>110 }, # Nein langfristig Technische Kompatibilitätsgründe
       {id=>120 }, # Nein, langfristig keine Freigabe durch Hersteller
       {id=>130 }, # Nein, langfristig keine Freigabe durch Kunde

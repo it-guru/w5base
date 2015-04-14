@@ -529,13 +529,32 @@ sub new
                 label         =>'Software release message',
                 onRawValue    =>\&itil::lib::Listedit::calcSoftwareState),
 
-     new kernel::Field::Select(
+#     new kernel::Field::Select(
+#                name          =>'denyupd',
+#                group         =>'upd',
+#                label         =>'installation update posible',
+#                value         =>[0,10,20,30,99],
+#                transprefix   =>'DENUPD.',
+#                dataobjattr   =>'lnksoftwaresystem.denyupd'),
+
+      new kernel::Field::Select(
+                name          =>'denyupselect',
+                label         =>'installation update posible',
+                jsonchanged   =>\&itil::lib::Listedit::getupdateDenyHandlingScript,
+                jsoninit      =>\&itil::lib::Listedit::getupdateDenyHandlingScript,
+                group         =>'upd',
+                vjointo       =>'itil::upddeny',
+                vjoinon       =>['denyupd'=>'id'],
+                vjoineditbase =>{id=>"!99"},   # 99 = sonstige Gründe = nicht zulässig
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
                 name          =>'denyupd',
                 group         =>'upd',
-                label         =>'installation update posible',
-                value         =>[0,10,20,30,99],
-                transprefix   =>'DENUPD.',
+                default       =>'0',
+                label         =>'UpdDenyID',
                 dataobjattr   =>'lnksoftwaresystem.denyupd'),
+
 
      new kernel::Field::Textarea(
                 name          =>'denyupdcomments',

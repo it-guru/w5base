@@ -10,66 +10,69 @@
    de=>'englische:Update/Refresh Möglichkeit'
 },
 'UpdateDeny(0)'=>{
-   de=>'Ja - falls zentrale/prozessuale Vorgaben dies notwendig machen',
+   de=>'Ja, entsprechend den zentralen Vorgaben zu HW-Refresh/SW-/OS-Update',
    en=>'Yes - if Processes or standards gives presets'
 },
 'UpdateDeny(5)'=>{
-   de=>'Nein - ein Update/Refresh wäre wirtschaftlich nicht sinnvoll',
+   de=>'Nein, da wirtschaftlich nicht vertretbar',
    en=>'No - an Update/Refresh would be uneconomic'
 },
 'UpdateDeny(10)'=>{
-   de=>'Nein - technische Kompatibilitätsgründe sprechen dagegen',
+   de=>'Nein, aus momentan technischen Kompatibilitätsgründen',
    en=>'No - technical incompatibility'
 },
 'UpdateDeny(20)'=>{
-   de=>'Nein - keine Freigabe vom Hersteller',
+   de=>'Nein, weil der Hersteller momentan keine Freigabe erteilt',
    en=>'No - there is no approval by producer'
 },
 'UpdateDeny(30)'=>{
-   de=>'Nein - keine Freigabe vom Kunden',
+   de=>'Nein, weil der Kunde  momentan die Freigabe verweigert',
    en=>'No - there is no approval by customer'
 },
 'UpdateDeny(38)'=>{
-   de=>'Nein - das System oder die Anwendung sind im Retirement',
+   de=>'Nein, wegen Retirement/wegen späterem Refresh/da im Orderprozess befindlich',
    en=>'No - system or application is in retirement'
 },
 'UpdateDeny(40)'=>{
-   de=>'Nein - fehlendes Budget',
+   de=>'Nein, weil momentan das Budget fehlt',
    en=>'No - there is no budget'
 },
 'UpdateDeny(50)'=>{
-   de=>'Nein - fehlende Resourcen',
+   de=>'Nein, weil momentan die Ressourcen fehlen',
    en=>'No - there are no resources'
 },
 'UpdateDeny(60)'=>{
-   de=>'Nein - fehlende oder negative Testergebnisse',
+   de=>'Nein, wegen momentan fehlender oder negativer Testergebnisse',
    en=>'No - missing or negative test results'
 },
 'UpdateDeny(70)'=>{
-   de=>'Nein - ein Update/Refresh wäre mit zu hohen Risiken verbunden',
+   de=>'Nein, wegen momentaner hoher Risiken bei der Durchführung/beim Betrieb',
    en=>'No - an Update/Refresh would be joined with high risks'
 },
 'UpdateDeny(110)'=>{
-   de=>'Nein - langfristig/dauerhafte technische Kompatibilitätsprobleme',
+   de=>'Nein, aus längerfristigen technischen Kompatibilitätsgründen',
    en=>'No - on a long-term base technical incompatibility'
 },
 'UpdateDeny(120)'=>{
-   de=>'Nein - langfristig/dauerhaft keine Freigabe vom Hersteller',
+   de=>'Nein, weil der Hersteller keine Freigabe erteilt',
    en=>'No - on a long-term base no approval by producer'
 },
 'UpdateDeny(130)'=>{
-   de=>'Nein - langfristig/dauerhaft keine Freigabe vom Kunden',
+   de=>'Nein, weil der Kunde die Freigabe grundsätzlich verweigert',
    en=>'No - on a long-term base no approval by customer'
 },
 'UpdateDeny(140)'=>{
-   de=>'Nein - langfristig/dauerhaft kein Budget',
+   de=>'Nein, weil auf absehbare Zeit das Budget fehlt',
    en=>'No - on a long-term base no budget'
 },
 'UpdateDeny(150)'=>{
-   de=>'Nein - langfristig/dauerhaft fehlende Resourcen',
+   de=>'Nein, weil längerfristig die Ressourcen fehlen',
    en=>'No - on a long-term base no resources'
 },
 'UpdateDeny(170)'=>{
-   de=>'Nein - langfristig/dauerhaft zu riskant',
+   de=>'Nein, wegen andauernden hoher Risiken bei der Durchführung/beim Betrieb',
    en=>'No - on a long-term base joined with to high risks'
 },
+'UpdateDeny(99)'=>{de=>'Nein - sonstige Gründe',
+              en=>'No - other reasons'},
+

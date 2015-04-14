@@ -410,16 +410,36 @@ sub new
                                 "datediff(sysdate(),asset.deprstart),".
                                 "datediff(sysdate(),asset.acquStart))"),
 
-     new kernel::Field::Select(
+#     new kernel::Field::Select(
+#                name          =>'denyupd',
+#                group         =>'upd',
+#                depend        =>['deprstart'],
+#                jsonchanged   =>\&getOnChangedScript,
+#                jsoninit      =>\&getOnChangedScript,
+#                label         =>'it is posible to refresh hardware',
+#                value         =>[0,5,10,20,25,28,30,35,38,40,99],
+#                transprefix   =>'DENUPD.',
+#                dataobjattr   =>'asset.denyupd'),
+
+      new kernel::Field::Select(
+                name          =>'denyupselect',
+                label         =>'it is posible to refresh hardware',
+                jsonchanged   =>\&itil::lib::Listedit::getupdateDenyHandlingScript,
+                jsoninit      =>\&itil::lib::Listedit::getupdateDenyHandlingScript,
+                group         =>'upd',
+                vjointo       =>'itil::upddeny',
+                vjoinon       =>['denyupd'=>'id'],
+                vjoineditbase =>{id=>"!99"},   # 99 = sonstige Gründe = nicht zulässig
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
                 name          =>'denyupd',
                 group         =>'upd',
-                depend        =>['deprstart'],
-                jsonchanged   =>\&getOnChangedScript,
-                jsoninit      =>\&getOnChangedScript,
-                label         =>'it is posible to refresh hardware',
-                value         =>[0,5,10,20,25,28,30,35,38,40,99],
-                transprefix   =>'DENUPD.',
+                default       =>'0',
+                label         =>'UpdDenyID',
                 dataobjattr   =>'asset.denyupd'),
+
+
 
      new kernel::Field::Date(
                 name          =>'refreshpland',
@@ -798,30 +818,30 @@ sub SelfAsParentObject    # this method is needed because existing derevations
    return("itil::asset");
 }
 
-sub getOnChangedScript
-{
-   my $self=shift;
-   my $app=$self->getParent();
-
-   my $d=<<EOF;
-
-var d=document.forms[0].elements['Formated_denyupd'];
-var r=document.forms[0].elements['Formated_refreshpland'];
-
-if (d && r){
-   var v=d.options[d.selectedIndex].value;
-   if (v!="" && v!="0"){
-      r.value="";
-      r.disabled=true;
-   }
-   else{
-      r.disabled=false;
-   }
-}
-
-EOF
-   return($d);
-}
+#sub getOnChangedScript
+#{
+#   my $self=shift;
+#   my $app=$self->getParent();
+#
+#   my $d=<<EOF;
+#
+#var d=document.forms[0].elements['Formated_denyupd'];
+#var r=document.forms[0].elements['Formated_refreshpland'];
+#
+#if (d && r){
+#   var v=d.options[d.selectedIndex].value;
+#   if (v!="" && v!="0"){
+#      r.value="";
+#      r.disabled=true;
+#   }
+#   else{
+#      r.disabled=false;
+#   }
+#}
+#
+#EOF
+#   return($d);
+#}
 
 
 sub getOnChangedAcquScript

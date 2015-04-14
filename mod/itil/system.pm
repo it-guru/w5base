@@ -616,13 +616,31 @@ sub new
                 label         =>'Keywords',
                 dataobjattr   =>'system.kwords'),
 
+#     new kernel::Field::Select(
+#                name          =>'denyupd',
+#                group         =>'upd',
+#                label         =>'it is posible to update/upgrade OS',
+#                value         =>[0,10,20,30,99],
+#                transprefix   =>'DENUPD.',
+#                dataobjattr   =>'system.denyupd'),
+
      new kernel::Field::Select(
-                name          =>'denyupd',
-                group         =>'upd',
-                label         =>'it is posible to update/upgrade OS',
-                value         =>[0,10,20,30,99],
-                transprefix   =>'DENUPD.',
-                dataobjattr   =>'system.denyupd'),
+               name          =>'denyupselect',
+               label         =>'it is posible to update/upgrade OS',
+               jsonchanged   =>\&itil::lib::Listedit::getupdateDenyHandlingScript,
+               jsoninit      =>\&itil::lib::Listedit::getupdateDenyHandlingScript,
+               group         =>'upd',
+               vjointo       =>'itil::upddeny',
+               vjoinon       =>['denyupd'=>'id'],
+               vjoineditbase =>{id=>"!99"},   # 99 = sonstige Gründe = nicht zulässig
+               vjoindisp     =>'name'),
+
+     new kernel::Field::Link(
+               name          =>'denyupd',
+               group         =>'upd',
+               default       =>'0',
+               label         =>'UpdDenyID',
+               dataobjattr   =>'system.denyupd'),
 
      new kernel::Field::Textarea(
                 name          =>'denyupdcomments',
