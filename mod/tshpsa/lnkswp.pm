@@ -232,6 +232,8 @@ sub new
                 readonly      =>1,
                 searchable    =>0,
                 htmldetail    =>0,
+                depend        =>[qw(softwareid softwarename software 
+                                    class denyupselect denyupd denyupdvalidto)],
                 group         =>'softsetvalidation',
                 label         =>'Software release state',
                 onRawValue    =>\&calcSoftwareState),
@@ -241,6 +243,8 @@ sub new
                 readonly      =>1,
                 searchable    =>0,
                 htmldetail    =>0,
+                depend        =>[qw(softwareid softwarename software 
+                                    class denyupselect denyupd denyupdvalidto)],
                 group         =>'softsetvalidation',
                 label         =>'Software release message',
                 onRawValue    =>\&calcSoftwareState),
@@ -310,8 +314,11 @@ sub calcSoftwareState
    my $current=shift;
 
    my $class="tshpsa::lnkswp";
+   my $f=$self->getParent->getField("softwarename");
+   my $softwarename=$f->RawValue($current);
 
-   return(itil::lib::Listedit::calcSoftwareState($self,$current,$class));
+
+   return(itil::lib::Listedit::calcSoftwareState($self,$current,$class,$softwarename));
 }
 
 sub getAnalyseSoftwareStateRecordsIndexed

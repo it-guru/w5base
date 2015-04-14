@@ -534,6 +534,7 @@ sub calcSoftwareState
    my $self=shift;
    my $current=shift;
    my $analysedataobj=shift;
+   my $forcesoftwarecallname=shift;
 
    if (!defined($analysedataobj) || $analysedataobj eq ""){
       $analysedataobj="itil::lnksoftwaresystem";
@@ -735,6 +736,10 @@ sub calcSoftwareState
 
 
       foreach my $swi (values(%{$FilterSet->{Analyse}->{ssoftware}->{id}})){
+         my $softwarecallname=$swi->{software};
+         if ($forcesoftwarecallname ne ""){
+            $softwarecallname=$forcesoftwarecallname;  # for f.e. HPSA Autodiscovery Data 
+         }                                             # with diffrent software frontend names
          if ($swi->{is_mw}){
             $resdstate->{group}->{MW}->{count}++;
          }
@@ -769,7 +774,7 @@ sub calcSoftwareState
                if ($swi->{releasekey}=~m/^0*$/){
                   push(@{$FilterSet->{Analyse}->{todo}},
                         "- version unusable in  ".
-                        "$swi->{software} on $swi->{system} ");
+                        "$softwarecallname on $swi->{system} ");
                   $FilterSet->{Analyse}->{totalstate}="FAIL";
                   push(@{$FilterSet->{Analyse}->{totalmsg}},
                        "version unusable");
@@ -781,7 +786,7 @@ sub calcSoftwareState
                    ($swrec->{releasekey}=~m/^0*$/)){
                   push(@{$FilterSet->{Analyse}->{todo}},
                         "- releasekey missmatch in  ".
-                        "$swi->{software} on $swi->{system} ");
+                        "$softwarecallname on $swi->{system} ");
                   $FilterSet->{Analyse}->{totalstate}="FAIL";
                   push(@{$FilterSet->{Analyse}->{totalmsg}},
                        "releasekey error");
@@ -791,7 +796,7 @@ sub calcSoftwareState
                      if ($swrec->{releasekey} gt $swi->{releasekey}){
                         if ($failpost ne " but OK"){
                            push(@{$FilterSet->{Analyse}->{todo}},
-                                 "- soon update $swi->{software} on ".
+                                 "- soon update $softwarecallname on ".
                                  "system $swi->{system} ".
                                  "from $swi->{version} to  $swrec->{version}");
                            if ($swi->{is_mw}){
@@ -805,7 +810,7 @@ sub calcSoftwareState
                            $FilterSet->{Analyse}->{totalstate}="WARN".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
-                             "$swi->{software} needs soon >=$swrec->{version}");
+                             "$softwarecallname needs soon >=$swrec->{version}");
                         last RULESET;
                      }
                   }
@@ -815,7 +820,7 @@ sub calcSoftwareState
                         if ($failpost ne " but OK"){
                            push(@{$FilterSet->{Analyse}->{todo}},
                                  "- only version $swi->{version} ".
-                                 " of $swi->{software} is allowed on  ".
+                                 " of $softwarecallname is allowed on  ".
                                  " system $swi->{system} ");
                            if ($swi->{is_mw}){
                               $resdstate->{group}->{MW}->{fail}++;
@@ -828,7 +833,7 @@ sub calcSoftwareState
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
-                             "$swi->{software} needs $swrec->{version}");
+                             "$softwarecallname needs $swrec->{version}");
                         last RULESET;
                      }
                   }
@@ -843,7 +848,7 @@ sub calcSoftwareState
                          $swrec->{version} eq $swi->{version}){
                         if ($failpost ne " but OK"){
                            push(@{$FilterSet->{Analyse}->{todo}},
-                               "- remove disallowed version $swi->{software} ".
+                               "- remove disallowed version $softwarecallname ".
                                " $swi->{version} from  system $swi->{system} ");
                            if ($swi->{is_mw}){
                               $resdstate->{group}->{MW}->{fail}++;
@@ -856,7 +861,7 @@ sub calcSoftwareState
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
-                             "$swi->{software} disallowed $swrec->{version}");
+                             "$softwarecallname disallowed $swrec->{version}");
                         last RULESET;
                      }
                   }
@@ -864,7 +869,7 @@ sub calcSoftwareState
                      if ($swrec->{releasekey} gt $swi->{releasekey}){
                         if ($failpost ne " but OK"){
                            push(@{$FilterSet->{Analyse}->{todo}},
-                               "- remove disallowed version $swi->{software} ".
+                               "- remove disallowed version $softwarecallname ".
                                " $swi->{version} from  system $swi->{system} ");
                            if ($swi->{is_mw}){
                               $resdstate->{group}->{MW}->{fail}++;
@@ -877,7 +882,7 @@ sub calcSoftwareState
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
-                             "$swi->{software} disallowed ".
+                             "$softwarecallname disallowed ".
                              "lower then $swrec->{version}");
                         last RULESET;
                      }
@@ -886,7 +891,7 @@ sub calcSoftwareState
                      if ($swrec->{releasekey} gt $swi->{releasekey}){
                         if ($failpost ne " but OK"){
                            push(@{$FilterSet->{Analyse}->{todo}},
-                                 "- update $swi->{software} on ".
+                                 "- update $softwarecallname on ".
                                  "system $swi->{system} ".
                                  "from $swi->{version} to  $swrec->{version}");
                            if ($swi->{is_mw}){
@@ -900,7 +905,7 @@ sub calcSoftwareState
                            $FilterSet->{Analyse}->{totalstate}="FAIL".$failpost;
                         }
                         push(@{$FilterSet->{Analyse}->{totalmsg}},
-                             "$swi->{software} needs >=$swrec->{version}");
+                             "$softwarecallname needs >=$swrec->{version}");
                         last RULESET;
                      }
                   }
