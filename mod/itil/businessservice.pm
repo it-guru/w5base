@@ -112,7 +112,7 @@ sub new
                 label         =>'Nature',
                 htmleditwidth =>'40%',
                 transprefix   =>'nat.',
-                value         =>['','IT-S','ES','TR'],
+                value         =>[undef,'IT-S','ES','TR'],
                 dataobjattr   =>"$worktable.nature"),
 
       new kernel::Field::Link(
