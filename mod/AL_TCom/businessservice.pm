@@ -235,7 +235,8 @@ sub Validate
       $self->LastMsg(ERROR,"invalid shortname on ES or TR businessservices");
       return(undef);
    }
-   if ($nature eq ""){ # in AL_TCom mode, natures mandatory
+   if ($self->isDataInputFromUserFrontend() &&
+       $nature eq ""){ # in AL_TCom mode, natures mandatory
       $self->LastMsg(ERROR,"invalid nature specified");
       return(undef);
    }
