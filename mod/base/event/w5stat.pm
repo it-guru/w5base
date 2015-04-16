@@ -62,7 +62,17 @@ sub w5stat
       push(@dstrange,$dstrange);
    }
 
+
    my $stat=getModuleObject($self->Config,"base::w5stat");
+   my $res=$stat->W5ServerCall("rpcMultiCacheQuery",$ENV{REMOTE_USER});
+   $res={} if (!defined($res));
+   if (!$stat->ValidateMandatorCache($res->{Mandator})){
+      return({
+         exitcode=>10,
+         exitmsg=>'can not communicate to w5server',
+      });
+   }
+
 
    foreach my $dstrange (@dstrange){
       $stat->recreateStats("w5stat",$module,$dstrange);

@@ -367,7 +367,16 @@ sub _storeStats
             foreach my $v (keys(%{$self->{stats}->{$group}->{$name}})){
                if (ref($self->{stats}->{$group}->{$name}->{$v})){
                   my $spanobj=$self->{stats}->{$group}->{$name}->{$v};
-                  $spanobj=$spanobj->intersection($basespan);
+                  if (!defined($spanobj) || !ref($spanobj)){
+                     printf STDERR ("spanobj=$spanobj\n");
+                     Stacktrace();
+                  }
+                  eval('$spanobj=$spanobj->intersection($basespan);');
+                  if ($@ ne ""){
+                     printf STDERR ("error=%s\n",$@);
+                     printf STDERR ("spanobj=%s\n",Dumper($spanobj));
+                     Stacktrace();
+                  } 
                   my $vv=$v.".count";
                   my @splist=$spanobj->as_list();
                   $self->{stats}->{$group}->{$name}->{$vv}=$#splist+1;
@@ -589,7 +598,10 @@ EOF
           $primrec->{nameid}>=2 &&
           !$self->IsMemberOf("admin")){
          printf("<br><hr><b>");
-         printf($self->T("Access to this report is not granted, because the minimum count of analysed users of %d is not reached."),$MinReportUserGroupCount);
+         printf($self->T("Access to this report is not granted, ".
+                         "because the minimum count of analysed ".
+                         "users of %d is not reached."),
+                $MinReportUserGroupCount);
          printf("</b><hr>");
       }
       else{
