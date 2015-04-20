@@ -30,6 +30,9 @@ sub new
    $self{uivisible}=0 if (!defined($self{uivisible}));
    my $self=bless($type->SUPER::new(%self),$type);
    $self->{WSDLfieldType}="Container" if (!defined($self->{WSDLfieldType}));
+   if (!defined($self->{sqlorder})){
+      $self->{sqlorder}='NONE';
+   }
    return($self);
 }
 
@@ -130,9 +133,9 @@ sub RawValue
    my $current=shift;
 
    return($self->SUPER::RawValue($current)) if (exists($self->{onRawValue}));
-   if (exists($current->{"___raw_container___".$self->Name})){
+   if (exists($current->{"w5___raw_container___".$self->Name})){
       $current->{$self->Name}=$current->{"___raw_container___".$self->Name};
-      delete($current->{"___raw_container___".$self->Name});
+      delete($current->{"w5___raw_container___".$self->Name});
    }
    if (ref($current->{$self->Name}) ne "HASH"){
       my %h=Datafield2Hash($current->{$self->Name});

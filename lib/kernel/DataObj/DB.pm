@@ -204,7 +204,7 @@ sub getSqlFields
       next if (!$field->selectable());
       my $selectfield=$field->getBackendName("select",$self->{DB});
       if ($field->Type() eq "Container"){
-         $fieldname="___raw_container___".$field->Name();
+         $fieldname="w5___raw_container___".$field->Name();
       }
       if (defined($selectfield)){
          # ToDo: u.U. muss $drivername noch berücksichtig werden, beim
