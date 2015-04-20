@@ -39,6 +39,11 @@ sub Init
                       prio=>10000,
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.TAD4Dsup.Statistics",
+                      "TAD4Dsup::stat",
+                      prio=>10000,
+                      defaultacl=>['admin']);
+   
    return(1);
 }
 
