@@ -134,7 +134,7 @@ sub RawValue
 
    return($self->SUPER::RawValue($current)) if (exists($self->{onRawValue}));
    if (exists($current->{"w5___raw_container___".$self->Name})){
-      $current->{$self->Name}=$current->{"___raw_container___".$self->Name};
+      $current->{$self->Name}=$current->{"w5___raw_container___".$self->Name};
       delete($current->{"w5___raw_container___".$self->Name});
    }
    if (ref($current->{$self->Name}) ne "HASH"){
