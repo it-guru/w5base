@@ -100,7 +100,6 @@ sub Init
                 vjoinon    =>['affectedapplicationid'=>'id'],
                 vjoindisp  =>'name',
                 container  =>'headref',
-                sortvalue  =>'asc',
                 group      =>'affected',
                 label      =>'Affected Application'),
 

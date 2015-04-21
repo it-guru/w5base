@@ -306,20 +306,18 @@ sub RawValue
    my $current=shift;
 
    if (exists($current->{$self->Name()})){
-      if (ref($current->{$self->Name()}) eq "ARRAY" &&
-          lc($self->{sortvalue}) ne 'none') {
-         my @n=@{$current->{$self->Name()}};
-         @n=sort({lc($a) cmp lc($b)} @n) if ($self->{sortvalue} eq 'asc');
-         @n=sort({lc($b) cmp lc($a)} @n) if ($self->{sortvalue} eq 'desc');
-
-         return(\@n);
-      }
-
       return($current->{$self->Name()});
    }
    if (defined($self->{container})){
       my $keyfield=$self->getParent->getField($self->{container});
       my $keyval=$keyfield->RawValue($current);
+
+      if (ref($keyval->{$self->{name}}) eq "ARRAY" &&
+          $#{$keyval->{$self->{name}}}>0) {
+         my @l=sort(@{$keyval->{$self->{name}}});
+         return(\@l);
+      }
+
       return($keyval->{$self->{name}});
    }
    my $keyfield=$self->getParent->getField($self->{keyhandler});
