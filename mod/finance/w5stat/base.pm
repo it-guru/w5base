@@ -40,6 +40,7 @@ sub getPresenter
           'custcontract'=>{
                          opcode=>\&displayCustContract,
                          overview=>\&overviewCustContract,
+                         group=>['Group'],
                          prio=>2000,
                       }
          );

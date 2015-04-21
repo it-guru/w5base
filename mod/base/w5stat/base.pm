@@ -46,14 +46,17 @@ sub getPresenter
                          overview=>\&overviewDataIssue,
                          opcode=>\&displayDataIssue,
                          prio=>2,
+                         group=>['Group']
                       },
           'wfact'=>{
                          opcode=>\&displayWorkflowActivity,
                          prio=>3,
+                         group=>['Group']
                       },
           'org'=>{
                          opcode=>\&displayOrg,
                          prio=>99999,
+                         group=>['Group']
                       }
          );
 
@@ -68,20 +71,15 @@ sub overviewW5Base
    my @l;
 
    my @flds=(
-             "Base.Total.User.Count"     =>'W5Base total user count',
-             "Base.Total.Group.Count"    =>'W5Base total group count',
-             "Base.Total.Contact.Count"  =>'W5Base total contact count',
-             "Base.Total.Workflow.Active.Count"  
-                                         =>'W5Base total active workflows',
-             "Base.Total.Workflow.Count"  
-                                         =>'W5Base total workflows',
-             "Base.Total.WorkflowAction.Count"  
-                                         =>'W5Base total workflow actions',
-             "Base.Total.UserLogon.Count"  
-                                         =>'W5Base User Logon Entrys',
-             "Base.Total.JobLog.Count"  
-                                         =>'W5Base Job-Log Entrys',
-             );
+      "Base.Total.User.Count"               =>'W5Base total user count',
+      "Base.Total.Group.Count"              =>'W5Base total group count',
+      "Base.Total.Contact.Count"            =>'W5Base total contact count',
+      "Base.Total.Workflow.Active.Count"    =>'W5Base total active workflows',
+      "Base.Total.Workflow.Count"           =>'W5Base total workflows',
+      "Base.Total.WorkflowAction.Count"     =>'W5Base total workflow actions',
+      "Base.Total.UserLogon.Count"          =>'W5Base User Logon Entrys',
+      "Base.Total.JobLog.Count"             =>'W5Base Job-Log Entrys',
+   );
 
    while(my $k=shift(@flds)){
       my $label=shift(@flds);
@@ -161,12 +159,40 @@ sub overviewDataIssue
    push(@l,[$app->T('unprocessed DataIssue Workflows'),
             $dataissues,$color,$delta]);
 
+   my $keyname='base.DataIssue.sleep56';
+   my $dataissues=0;
+   if (defined($primrec->{stats}->{$keyname})){
+      $dataissues=$primrec->{stats}->{$keyname}->[0];
+   }
+   my $keyname='base.DataIssue.dead';
+   if (defined($primrec->{stats}->{$keyname})){
+      $dataissues+=$primrec->{stats}->{$keyname}->[0];
+   }
+  
+   my $color="goldenrod";
+   if ($dataissues==0){
+      $color="black";
+   }
+   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+   if ($dataissues>($users*0.4) && $dataissues>5){
+      $color="red";
+   }
+   if ($dataissues>0){
+      push(@l,[$app->T('untreaded DataIssues longer then 8 weeks'),
+               $dataissues,$color,$delta]);
+   }
+
    my $keyname='base.Workflow.sleep56';
    my $wfcount=0;
    if (defined($primrec->{stats}->{$keyname})){
       $wfcount=$primrec->{stats}->{$keyname}->[0];
    }
-   if ($wfcount>0){
+   my $keyname='base.Workflow.dead';
+   if (defined($primrec->{stats}->{$keyname})){
+      $wfcount+=$primrec->{stats}->{$keyname}->[0];
+   }
+
+   if ($wfcount>0 && $wfcount!=$dataissues){
       push(@l,[$app->T('workflows untreaded longer then 8 weeks'),
                $wfcount,"red",undef]);
    }
@@ -501,7 +527,7 @@ sub processData
 
 
    if (my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/){
-      my @wfstat=qw(id eventstart class step eventend stateid
+      my @wfstat=qw(id eventstart class step eventend stateid mandatorid
                              fwdtarget fwdtargetid responsiblegrp mdate);
      
      
@@ -582,6 +608,8 @@ sub processRecord
    my $rec=shift;
    my %param=@_;
 
+
+
    if ($module eq "objectcount"){
       if ($rec->{objectname} eq "base::workflow"){
          $self->getParent->storeStatVar("Group",["admin"],{},
@@ -640,14 +668,53 @@ sub processRecord
                                      "Base.Total.Group.Count",1);
    }
    elsif ($module eq "base::workflow::notfinished"){
+      my $mdate=$rec->{mdate};
+      my $age=0;
+      if ($mdate ne ""){
+         my $d=CalcDateDuration($mdate,NowStamp("en"));
+         $age=$d->{totalminutes};
+      }
       if ($rec->{class} eq "base::workflow::DataIssue"){
          if ($rec->{stateid}!=5 && defined($rec->{responsiblegrp})){
+
             foreach my $resp (@{$rec->{responsiblegrp}}){
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.DataIssue.open",1);
                $self->getParent->storeStatVar("Group",$resp,
                                  {maxlevel=>1,method=>'concat'},
                                  "base.DataIssue.IdList.open",$rec->{id});
+            }
+         }
+         my $mandatorids=$rec->{mandatorid};
+         $mandatorids=[$mandatorids] if (ref($mandatorids) ne "ARRAY");
+         if ($#{$mandatorids}!=-1){
+            my $MandatorCache=$self->getParent->Cache->{Mandator}->{Cache};
+            foreach my $mandatorid (@{$mandatorids}){
+               my $mn=$MandatorCache->{grpid}->{$mandatorid}->{name};
+               $self->getParent->storeStatVar("Mandator",$mn,{
+                                                 nameid=>$mandatorid
+                                              },"base.DataIssue.open",1);
+               if ($rec->{stateid}!=5 && 
+                   $rec->{class} eq "base::workflow::DataIssue"){ 
+                  if ($age>259200){ # 1/2 Jahr
+                     $self->getParent->storeStatVar("Mandator",$mn,{
+                                                       nameid=>$mandatorid
+                                                    },
+                                                    "base.DataIssue.dead",1);
+                  }
+                  elsif ($age>80640){ # 8 Wochen
+                     $self->getParent->storeStatVar("Mandator",$mn,{
+                                                       nameid=>$mandatorid
+                                                    },
+                                                    "base.DataIssue.sleep56",1);
+                  }
+                  elsif ($age>40320){ # 4 Wochen
+                     $self->getParent->storeStatVar("Mandator",$mn,{
+                                                       nameid=>$mandatorid
+                                                    },
+                                                    "base.DataIssue.sleep28",1);
+                  }
+               }
             }
          }
       }
@@ -665,22 +732,10 @@ sub processRecord
          else{
             @responsiblegrp=("admin");
          }
-         my $mdate=$rec->{mdate};
-         my $age=0;
-         if ($mdate ne ""){
-            my $d=CalcDateDuration($mdate,NowStamp("en"));
-            $age=$d->{totalminutes};
-         }
          
          if ($rec->{stateid}!=5 && 
              $rec->{class} eq "base::workflow::DataIssue"){ # 8 Wochen
             my $acc=$rec->{involvedcostcenter};
-            if ($rec->{mandator} ne "" && $rec->{mandatorid} ne ""){
-               $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
-                                              {nameid=>$rec->{mandatorid},
-                                               nosplit=>1},
-                                              "base.DataIssue.open",1);
-            }
             if ($age>80640){
                if ($acc ne ""){
                   if ($rec->{involvedaccarea} ne ""){
@@ -693,25 +748,37 @@ sub processRecord
                                     {maxlevel=>1,method=>'concat'},
                                     "base.DataIssue.sleep56.id",$rec->{id});
                }
-               if ($rec->{mandator} ne "" && $rec->{mandatorid} ne ""){
-                  $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
-                                                 {nameid=>$rec->{mandatorid},
-                                                  nosplit=>1},
-                                                 "base.DataIssue.sleep56",1);
-               }
             }
-            if ($age>259200){
-               if ($rec->{mandator} ne "" && $rec->{mandatorid} ne ""){
-                  $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
-                                                 {nameid=>$rec->{mandatorid},
-                                                  nosplit=>1},
-                                                 "base.DataIssue.dead",1);
-               }
-            }
+
+
+
+            #if ($age>259200){
+            #   if ($rec->{mandator} ne "" && $rec->{mandatorid} ne ""){
+            #      $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+            #                                     {nameid=>$rec->{mandatorid},
+            #                                      nosplit=>1},
+            #                                     "base.DataIssue.dead",1);
+            #   }
+            #}
          }
 
 
          foreach my $resp (@responsiblegrp){
+            if ($rec->{stateid}!=5 && 
+                $rec->{class} eq "base::workflow::DataIssue"){ 
+               if ($age>259200){ # 1/2 Jahr
+                  $self->getParent->storeStatVar("Group",$resp,{},
+                                                 "base.DataIssue.dead",1);
+               }
+               elsif ($age>80640){ # 8 Wochen
+                  $self->getParent->storeStatVar("Group",$resp,{},
+                                                 "base.DataIssue.sleep56",1);
+               }
+               elsif ($age>40320){ # 4 Wochen
+                  $self->getParent->storeStatVar("Group",$resp,{},
+                                                 "base.DataIssue.sleep28",1);
+               }
+            }
             $self->getParent->storeStatVar("Group",$resp,{},
                                            "base.Workflow.open",1);
             if ($age>259200){ # 1/2 Jahr
@@ -721,10 +788,6 @@ sub processRecord
                                  {maxlevel=>1,method=>'concat'},
                                  "base.Workflow.dead.id",$rec->{id});
 
-               if ($rec->{class} eq "base::workflow::DataIssue") {
-                  $self->getParent->storeStatVar("Group",$resp,{},
-                                                 "base.DataIssue.dead",1);
-               }
             }
             elsif ($age>80640){ # 8 Wochen
                $self->getParent->storeStatVar("Group",$resp,{},
@@ -733,10 +796,6 @@ sub processRecord
                                  {maxlevel=>1,method=>'concat'},
                                  "base.Workflow.sleep56.id",$rec->{id});
 
-               if ($rec->{class} eq "base::workflow::DataIssue") {
-                  $self->getParent->storeStatVar("Group",$resp,{},
-                                                 "base.DataIssue.sleep56",1);
-               }
             }
             elsif ($age>40320){ # 4 Wochen
                $self->getParent->storeStatVar("Group",$resp,{},

@@ -45,26 +45,31 @@ sub getPresenter
           'appl'=>{
                          opcode=>\&displayAppl,
                          overview=>\&overviewAppl,
+                         group=>['Group'],
                          prio=>1000,
                       },
           'system'=>{
                          opcode=>\&displaySystem,
                          overview=>\&overviewSystem,
+                         group=>['Group'],
                          prio=>1001,
                       },
           'asset'=>{
                          opcode=>\&displayAsset,
                          overview=>\&overviewAsset,
+                         group=>['Group'],
                          prio=>1002,
                       },
           'swinstance'=>{
                          opcode=>\&displaySWInstance,
                          overview=>\&overviewSWInstance,
+                         group=>['Group'],
                          prio=>1003,
                       },
           'itilchange'=>{
                          opcode=>\&displayChange,
                          prio=>1101,
+                         group=>['Group'],
                       }
          );
 
@@ -432,14 +437,6 @@ sub processRecord
                                         "ITIL.Total.Application.Count",1);
 
       }
-      if ($rec->{dataissuestate} ne "OK" &&
-          (ref($rec->{dataissuestate}) eq "HASH" &&
-           $rec->{dataissuestate}->{dataissuestate} ne "OK")){
-         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
-                                        {nameid=>$rec->{mandatorid},
-                                         nosplit=>1},
-                                        "base.DataIssue.open",1);
-      }
    }
    if ($module eq "itil::system"){
       if ($rec->{cistatusid}==4){
@@ -454,18 +451,14 @@ sub processRecord
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "ITIL.Total.System.Count",1);
       }
-      if ($rec->{dataissuestate} ne "OK" &&
-          (ref($rec->{dataissuestate}) eq "HASH" &&
-           $rec->{dataissuestate}->{dataissuestate} ne "OK")){
-         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
-                                        {nameid=>$rec->{mandatorid},
-                                         nosplit=>1},
-                                        "base.DataIssue.open",1);
-      }
    }
    if ($module eq "itil::swinstance"){
       if ($rec->{cistatusid}==4){
          $self->getParent->storeStatVar("Group",[$rec->{swteam}],{},
+                                        "ITIL.SWInstance.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
                                         "ITIL.SWInstance.Count",1);
       }
       if ($rec->{cistatusid}<=5){

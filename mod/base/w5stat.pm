@@ -220,7 +220,7 @@ sub loadLateModifies
       } until(!defined($rec));
    }
    if (defined($self->{stats})){
-      printf STDERR ("stats=%s\n",Dumper($self->{stats}));
+      #printf STDERR ("stats=%s\n",Dumper($self->{stats}));
       $self->_storeStats($olddstrange);
       delete($self->{stats});
    }
@@ -368,7 +368,7 @@ sub _storeStats
                if (ref($self->{stats}->{$group}->{$name}->{$v})){
                   my $spanobj=$self->{stats}->{$group}->{$name}->{$v};
                   if (!defined($spanobj) || !ref($spanobj)){
-                     printf STDERR ("spanobj=$spanobj\n");
+                     #printf STDERR ("spanobj=$spanobj\n");
                      Stacktrace();
                   }
                   eval('$spanobj=$spanobj->intersection($basespan);');
@@ -722,8 +722,9 @@ sub Presenter
 
    my $requestid=$p;
    $requestid=~s/[^\d]//g;
-   if (Query->Param("search_name") ne ""){
-      my $name=Query->Param("search_name");
+   my $search_name=Query->Param("search_name");
+   if ($search_name ne ""){
+      my $name=$search_name;
       my $statname;
       my $statgrp;
       if (my ($g,$n)=$name=~m/^([^:]+)\s*:\s*(.*$)/){
@@ -737,6 +738,9 @@ sub Presenter
       $statname=~s/[\*\?]//g;
       $statgrp=~s/[\*\?]//g;
       $self->ResetFilter();
+      if ($statname=~m/\s/){
+         $statname='"'.$statname.'"';
+      }
       $self->SetFilter({fullname=>$statname,sgroup=>$statgrp,
                         dstrange=>"!*KW*"});
       my ($srec,$msg)=$self->getOnlyFirst(qw(descmonth sgroup id));
@@ -855,6 +859,41 @@ EOF
    foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
       push(@ol,$r->{id},$r->{fullname});
    }
+
+   my %grp=$self->getGroupsOf($ENV{REMOTE_USER},
+           ['RCFManager','RCFManager2'],"down");
+   if (keys(%grp)){
+      my $m=getModuleObject($self->Config,"base::mandator");
+      $m->SetFilter({grpid=>[keys(%grp)],
+                     cistatusid=>"<6"});
+
+
+      my @idl=();
+      foreach my $mrec ($m->getHashList(qw(name grpid))){
+         push(@idl,$mrec->{grpid});
+      }
+      my @statnamelst;
+      if ($#idl!=-1){
+         $self->ResetFilter();
+         $self->SecureSetFilter([
+                                 {dstrange=>\$dstrange,sgroup=>\'Mandator',
+                                  nameid=>\@idl},
+                                ]);
+         @statnamelst=$self->getHashList(qw(fullname id));
+         if ($#statnamelst==-1){   # seems to be the first day in month
+            $self->ResetFilter();
+            $self->SecureSetFilter([
+                                    {dstrange=>\$altdstrange,sgroup=>\'Group',
+                                     nameid=>\@idl},
+                                   ]);
+            @statnamelst=$self->getHashList(qw(fullname id));
+         }
+         foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
+            push(@ol,$r->{id},$r->{fullname});
+         }
+      }
+   }
+
    if (!defined($primrec) && $#ol!=-1){
       $requestid=$ol[0];
       ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
@@ -1018,6 +1057,14 @@ EOF
       my $mid=0;
       my %dirindex;
       foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
+         if (exists($P{$p}->{group})){
+            my $grprest=$P{$p}->{group};
+            $grprest=[$grprest] if (ref($grprest) ne "ARRAY");
+            if (!in_array($grprest,$primrec->{sgroup})){
+               next;
+            }
+         }
+
          my $parent;
          if (defined($P{$p}->{opcode})){
             my $prec=$P{$p};
