@@ -66,6 +66,7 @@ TSI-HELP: <a  style="color:white" href="callto:+498008744357">+49 800 8744357</a
 </div>
 
 <!--  Advtisor -->
+<!-- Advisor aktuell noch nicht aktiviert
 <div style="align:right;float:right;margin-left:5px;cursor:hand">
 <span onclick="window.top.displayHints();return(false);">
 <div title='no open messages' id='adv0' style='display:none;width:22;height:21;font-size:11px;float:left;text-align:center;vertical-align:middle;background-image:url("../../base/load/advice0.gif")'>
@@ -78,6 +79,7 @@ TSI-HELP: <a  style="color:white" href="callto:+498008744357">+49 800 8744357</a
 
 </span>
 </div>
+Advisor aktuell noch nicht aktiviert -->
 <!--   -------->
 
 </div>
