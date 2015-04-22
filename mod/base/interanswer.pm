@@ -84,6 +84,14 @@ sub new
                 dataobjattr   =>'interanswer.relevant'),
 
       new kernel::Field::Text(
+                name          =>'name_cistatus',
+                label         =>'Question cistatus',
+                htmldetail    =>0,
+                vjointo       =>'base::interview',
+                vjoinon       =>['interviewid'=>'id'],
+                vjoindisp     =>'cistatus'),
+
+      new kernel::Field::Text(
                 name          =>'answer',
                 label         =>'answer',
                 dataobjattr   =>'interanswer.answer'),
@@ -246,6 +254,17 @@ sub new
    $self->setWorktable("interanswer");
    return($self);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_name_cistatus"))){
+     Query->Param("search_name_cistatus"=>
+                  "\"".$self->T("CI-Status(4)","base::cistatus")."\"");
+   }
+}
+
 
 sub prepUploadRecord
 {

@@ -1,6 +1,7 @@
 'base::interanswer'=>{de=>'Interview Antwort',en=>'Interview Answer'},
 'answer'=>{de=>'Antwort'},
 'question'=>{de=>'Frage'},
+'Question cistatus'=>{de=>'Frage CI-Status'},
 'AnswerID'=>{de=>'AntwortID'},
 'parent Object'=>{de=>'Elternobjekt'},
 'parent ID'=>{de=>'Eltern-Element ID'},
