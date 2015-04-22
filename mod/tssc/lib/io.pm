@@ -743,18 +743,22 @@ sub extractAffectedApplication
    
    if (defined($rec->{relations}) && ref($rec->{relations} )eq "ARRAY"){
       foreach my $r (@{$rec->{relations}}){
-         if ($r->{dstobj} eq "tsacinv::appl"){
-            push(@chkapplid,$r->{dst});
-            msg(DEBUG,"add %s by entry in relations table",$r->{dst});
-            if ($r->{primary}=='1'){
-               push(@chkprimapplid,$r->{dst});
+         if (!($r->{dst}=~m/^\s*$/)){
+            if ($r->{dstobj} eq "tsacinv::appl"){
+               push(@chkapplid,$r->{dst});
+               msg(DEBUG,"add %s by entry in relations table",$r->{dst});
+               if ($r->{primary}=='1'){
+                  push(@chkprimapplid,$r->{dst});
+               }
             }
-         }
-         if ($r->{dstobj} eq "tsacinv::system"){
-            push(@chksystemid,$r->{dst});
+            if ($r->{dstobj} eq "tsacinv::system"){
+               push(@chksystemid,$r->{dst});
+            }
          }
       }
    }
+   msg(DEBUG,"pass2 found chkapplid=%s",join(",",@chkapplid));
+  
    if ($#chkprimapplid==-1){
       @chkprimapplid=@chkapplid;
    }
