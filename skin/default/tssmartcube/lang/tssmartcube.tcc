@@ -2,6 +2,8 @@
 'fieldgroup.default'=>{de=>'Allgemeine System Informationen',
                        en=>'General System Informations'},
 'fieldgroup.upd'=>{de=>'OS Update/Refresh Möglichkeiten',en=>'OS Update/Refresh posibilities'},
+'fieldgroup.w5rel'=>{de=>'W5Base Verbindung',en=>'W5Base conjunction'},
+'relevant logical System Config-Item'=>{de=>'relevantes System Config-Item'},
 'fieldgroup.ha'=>{de=>'Cluster Software',en=>'Cluster Software'},
 'fieldgroup.os'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'fieldgroup.hw'=>{de=>'Hardware',en=>'Hardware'},

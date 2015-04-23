@@ -80,6 +80,23 @@ sub new
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>['applicationnames']),
 
+      new kernel::Field::Link(
+                name          =>'w5systemid',
+                label         =>'W5BaseID of relevant System',
+                group         =>'w5basedata',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'id'),
+
+      new kernel::Field::Text(
+                name          =>'w5systemname',
+                label         =>'relevant logical System Config-Item',
+                group         =>'w5basedata',
+                searchable    =>0,
+                vjointo       =>'AL_TCom::system',
+                vjoinon       =>['w5systemid'=>'id'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',

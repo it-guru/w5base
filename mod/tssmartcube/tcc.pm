@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use kernel::Field::DataMaintContacts;
 use itil::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
@@ -634,6 +635,30 @@ sub new
 
       #######################################################################
 
+
+      new kernel::Field::Link(
+                name          =>'w5systemid',
+                label         =>'W5BaseID of relevant System',
+                group         =>'w5basedata',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'id'),
+
+      new kernel::Field::Text(
+                name          =>'w5systemname',
+                label         =>'relevant logical System Config-Item',
+                group         =>'w5basedata',
+                searchable    =>0,
+                vjointo       =>'AL_TCom::system',
+                vjoinon       =>['w5systemid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::DataMaintContacts(
+                vjointo       =>'itil::system',
+                vjoinon       =>['w5systemid'=>'id'],
+                group         =>'w5basedata'),
+               
+
       #######################################################################
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -804,7 +829,7 @@ sub Validate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default roadmap upd patch dsk ha  hw mon other source));
+   return(qw(header default roadmap upd patch dsk ha  hw mon other w5basedata source));
 }
 
 

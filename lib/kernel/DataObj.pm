@@ -1726,6 +1726,98 @@ sub SecureValidatedUpdateRecord
    return(undef);
 }
 
+sub getWriteAuthorizedContacts
+{
+   my $self=shift;
+   my $current=shift;
+   my $depend=shift;
+   my $maxlevel=shift;   # check against which maxresposelevel
+   my $resbuf=shift;     # hash to store result
+
+   sub  addUid
+   {
+      my $uid=shift; 
+      my $id=shift;
+      my $responselevel=shift;
+
+      if (!exists($uid->{$id})){
+         $uid->{$id}={
+            userid=>$id,
+            responselevel=>$responselevel
+         };                      
+         if (!defined($id)){
+            $uid->{$id}->{fullname}="further";
+         }
+      }                          
+      else{                      
+         if ($uid->{$id}->{responselevel}>$responselevel){
+            $uid->{$id}->{responselevel}=$responselevel;
+         }
+      }
+   }
+
+   foreach my $depfld (@{$depend}){
+      my $fld=$self->getField($depfld);
+      if (defined($fld)){
+         my $d=$fld->RawValue($current);
+         if ($depfld eq "contacts"){
+            if (ref($d) eq "ARRAY"){
+               foreach my $crec (@$d){
+                  my $r=$crec->{roles};
+                  $r=[$r] if (ref($r) ne "ARRAY");
+                  if (in_array($r,["write","admin"])){
+                     if ($crec->{target} eq "base::user"){
+                        if ($maxlevel>=30){
+                           addUid($resbuf,$crec->{targetid},30);
+                        }
+                     }
+                     if ($crec->{target} eq "base::grp"){
+                        if ($maxlevel>=50){
+                           my @l=$self->getMembersOf($crec->{targetid},
+                              "RMember",
+                              "direct"
+                           );
+                           foreach my $userid (@l){
+                              addUid($resbuf,$userid,50);
+                           }
+                           if ($maxlevel>=99){
+                              addUid($resbuf,undef,99);
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         else{
+            my $responselevel=1;
+            if ($depfld ne "databossid"){
+               $responselevel=20;
+            }
+            if ($maxlevel>=$responselevel){
+               addUid($resbuf,$d,$responselevel);
+            }
+         }
+      }
+   }
+   my @fill=grep({!exists($_->{fullname})} values(%$resbuf));
+   if ($#fill!=-1){
+      my $user=getModuleObject($self->Config,"base::user");
+      my @uid=map({$_->{userid}} @fill);
+      $user->SetFilter({userid=>\@uid,cistatusid=>\'4'});
+      foreach my $urec ($user->getHashList(qw(fullname talklang email))){
+         $resbuf->{$urec->{userid}}->{fullname}=$urec->{fullname};
+         $resbuf->{$urec->{userid}}->{talklang}=$urec->{talklang};
+         $resbuf->{$urec->{userid}}->{email}=$urec->{email};
+      }
+   }
+   
+   
+}
+
+
+
+
 sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
 
 {                                   # with write role
@@ -1742,9 +1834,11 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
 
    # target calculation
 
-   my $idfield=$self->IdField();
    my $databossfld=$self->getField("databossid");
    my $contactsfld=$self->getField("contacts");
+
+
+   my $idfield=$self->IdField();
    if (defined($idfield)){
       my $id=$idfield->RawValue($oldrec);
       if ($id ne ""){
@@ -1752,53 +1846,40 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
          $notifyparam{dataobjid}=$id;
       }
    }
-   if (defined($databossfld)){
-      my $databossid=$databossfld->RawValue($oldrec);
-      if ($databossid ne ""){
-         my $user=getModuleObject($self->Config,"base::user");
-         $user->SetFilter({userid=>\$databossid});
-         my ($urec)=$user->getOnlyFirst(qw(userid lastlang lang)); 
-         if (defined($urec)){
-            if ($urec->{lastlang} ne ""){
-               $notifyparam{lang}=$urec->{lastlang};
-            }
-            else{
-               if ($urec->{lang} ne ""){
-                  $notifyparam{lang}=$urec->{lang};
-               }
-            }
-            if ($urec->{userid} ne ""){
-               if (defined($notifyparam{emailto})){
-                  if (ref($notifyparam{emailto}) ne "ARRAY"){
-                     $notifyparam{emailto}=[$notifyparam{emailto}];
-                  }
-               }
-               else{
-                  $notifyparam{emailto}=[];
-               }
-               unshift(@{$notifyparam{emailto}},$urec->{userid});
-            }
+
+   my %ul;
+   $self->getWriteAuthorizedContacts($oldrec,[qw(databossid contacts)],30,\%ul);
+   my @ul=sort({$a->{responselevel}<=>$b->{responselevel}} values(%ul));
+   if ($ul[0]->{responselevel}==1){
+      if (defined($notifyparam{emailto})){
+         if (ref($notifyparam{emailto}) ne "ARRAY"){
+            $notifyparam{emailto}=[$notifyparam{emailto}];
          }
       }
-      my $contacts=$oldrec->{contacts};
-      if (ref($contacts) eq "ARRAY"){
-         if (!exists($notifyparam{emailcc})){
-            $notifyparam{emailcc}=[];
-         }
-         if (!ref($notifyparam{emailcc}) eq "ARRAY"){
-            $notifyparam{emailcc}=[$notifyparam{emailcc}];
-         }
-         foreach my $crec (@$contacts){
-            if ($crec->{target} eq "base::user"){
-               my $roles=$crec->{roles};
-               $roles=[$roles] if (ref($roles) ne "ARRAY");
-               if (in_array($roles,"write")){
-                  push(@{$notifyparam{emailcc}},$crec->{targetid});
-               }
+      else{
+         $notifyparam{emailto}=[];
+      }
+      my $cont=shift(@ul);
+      push(@{$notifyparam{emailto}},$cont->{userid});
+      $notifyparam{lang}=$cont->{talklang};
+   }
+   if ($#ul!=-1){  # uebrige Kontakte werden in den cc geschoben
+      if (!exists($notifyparam{emailcc})){
+         $notifyparam{emailcc}=[];
+      }
+      if (!ref($notifyparam{emailcc}) eq "ARRAY"){
+         $notifyparam{emailcc}=[$notifyparam{emailcc}];
+      }
+      foreach my $crec (@ul){
+         if (defined($crec->{userid})){
+            push(@{$notifyparam{emailcc}},$crec->{userid});
+            if (!defined($notifyparam{lang})){
+               $notifyparam{lang}=$crec->{talklang};
             }
          }
       }
    }
+
    my $lastlang;
    if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
       $lastlang=$ENV{HTTP_FORCE_LANGUAGE};

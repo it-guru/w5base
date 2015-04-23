@@ -1,4 +1,5 @@
 'Linenumber'             =>{de=>'Zeile',en=>'Line'                          },
+'Data maintenences contacts' =>{de=>'Datenpflegeberechtigte'               },
 'Modification-Date'      =>{de=>'Bearbeitungszeitpunkt'                     },
 'Modification-Date reverse'=>{de=>'Bearbeitungszeitpunkt absteigend sortiert'},
 'Creation-Date'          =>{de=>'Erstellungszeitpunkt'                      },

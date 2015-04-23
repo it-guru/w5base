@@ -8,4 +8,5 @@
                           en=>'W5Base/Darwin Data'},
 'W5Base Applications'=>{de=>'W5Base Anwendungen'},
 'running Processes'=>{de=>'Software-Prozesses'},
+'relevant logical System Config-Item'=>{de=>'relevantes System Config-Item'},
 

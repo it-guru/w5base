@@ -23,6 +23,8 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use itil::lib::Listedit;
+use kernel::Field::DataMaintContacts;
+
 
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
@@ -304,6 +306,28 @@ sub new
                 label         =>'Update/Upgrade reject valid to',
                 dataobjattr   =>'ddenyupdvalidto'),
 
+      new kernel::Field::Link(
+                name          =>'w5systemid',
+                label         =>'W5BaseID of relevant System',
+                group         =>'w5basedata',
+                vjointo       =>'itil::system',
+                vjoinon       =>['systemsystemid'=>'systemid'],
+                vjoindisp     =>'id'),
+
+      new kernel::Field::Text(
+                name          =>'w5systemname',
+                label         =>'relevant logical System Config-Item',
+                group         =>'w5basedata',
+                searchable    =>0,
+                vjointo       =>'AL_TCom::system',
+                vjoinon       =>['w5systemid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::DataMaintContacts(
+                vjointo       =>'itil::system',
+                vjoinon       =>['w5systemid'=>'id'],
+                group         =>'w5basedata'),
+
    );
    $self->setWorktable("HPSA_lnkswp_of");
    $self->setDefaultView(qw(systemname class version path iname));
@@ -331,7 +355,8 @@ sub getAnalyseSoftwareStateRecordsIndexed
 
    $self->SetCurrentView(qw(systemid class 
                             system software denyupd denyupdvalidto
-                            releasekey version softwareid is_dbs is_mw));
+                            releasekey version softwareid is_dbs is_mw
+                            w5basedata));
 
 
    $self->doInitialize();
