@@ -832,6 +832,16 @@ sub new
                 searchable    =>0,
                 label         =>'Last-Lang'),
 
+      new kernel::Field::Text(
+                name          =>'talklang',
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'userro',
+                depend        =>["accounts","lang"],
+                onRawValue    =>\&getLastLogon,
+                searchable    =>0,
+                label         =>'Talk-Lang'),
+
       new kernel::Field::SubList(
                 name          =>'groups',
                 label         =>'Groups',
@@ -994,6 +1004,12 @@ sub getLastLogon
       my $ulrec=$self->getParent->Context->{LogonData}->{$userid};
       return($ulrec->{logondate}) if ($name eq "lastlogon");
       return($ulrec->{lang}) if ($name eq "lastlang");
+      return($ulrec->{lang}) if ($name eq "talklang");
+   }
+   if ($name eq "talklang"){
+      my $lang=$current->{lang};
+      $lang="en" if ($lang eq "");
+      return($lang);
    }
    return("");
 }
