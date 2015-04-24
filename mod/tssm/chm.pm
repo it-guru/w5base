@@ -580,15 +580,15 @@ sub new
 ##                label         =>'Change-Manager fullname',
 ##                dataobjattr   =>'cm3rm1.coord_shortname'),
 
-#       new kernel::Field::SubList(
-#                name          =>'relations',
-#                label         =>'Relations',
-#                uivisible     =>0,
-#                group         =>'relations',
-#                vjointo       =>'tssm::lnk',
-#                vjoinon       =>['changenumber'=>'src'],
-#                vjoininhash   =>['dst','dstobj','primary'],
-#                vjoindisp     =>[qw(dst dstname primary)]),
+       new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Relations',
+                xuivisible     =>0,
+                group         =>'relations',
+                vjointo       =>'tssm::lnk',
+                vjoinon       =>['changenumber'=>'src'],
+                vjoininhash   =>['dst','dstobj','primary'],
+                vjoindisp     =>[qw(dst dstname primary)]),
 
 #      new kernel::Field::SubList(
 #                name          =>'configitems',
@@ -650,9 +650,15 @@ sub initSearchQuery
    my $self=shift;
    my $nowlabel=$self->T("now","kernel::App");
 
-   if (!defined(Query->Param("search_plannedend"))){
-     Query->Param("search_plannedend"=>">$nowlabel-1d AND <$nowlabel+14d");
+#   if (!defined(Query->Param("search_plannedend"))){
+#     Query->Param("search_plannedend"=>">$nowlabel-1d AND <$nowlabel+14d");
+#   }
+
+   if (!defined(Query->Param("search_changenumber"))){
+     Query->Param("search_changenumber"=>"C000191883 C000146354 ".
+                                         "C000222842 C000188772");
    }
+
 }
 
 

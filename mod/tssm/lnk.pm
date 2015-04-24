@@ -104,21 +104,22 @@ sub new
 ##                dsttypfield   =>'dstobj',
 ##                dstidfield    =>'dst'),
 
-##      new kernel::Field::Text(
-##                name          =>'dst',
-##                group         =>'dst',
-##                label         =>'Destination-ID',
-##                uppersearch   =>1,
-##                dataobjattr   =>
-##                   "decode(substr(depend,1,8),'org=TSI|',".
-##                   "reverse(".
-##                      "substr(substr(reverse(".
-##                         "dbms_lob.substr(screlationm1.descprgn,255,1)".
-##                      "),2,20),1,".
-##                   "instr(substr(reverse(".
-##                      "dbms_lob.substr(screlationm1.descprgn,255,1)".
-##                   "),2,20),'(')-1))  ".
-##                   ",screlationm1.depend)"),
+      new kernel::Field::Text(
+                name          =>'dst',
+                group         =>'dst',
+                label         =>'Destination-ID',
+                uppersearch   =>1,
+                sqlorder      =>'NONE',
+                dataobjattr   =>
+                   "decode(substr(dbms_lob.substr(dh_desc,255,1),1,8),'org=TSI|',".
+                   "reverse(".
+                      "substr(substr(reverse(".
+                         "dbms_lob.substr(screlationm1.dh_desc,255,1)".
+                      "),2,20),1,".
+                   "instr(substr(reverse(".
+                      "dbms_lob.substr(screlationm1.dh_desc,255,1)".
+                   "),2,20),'(')-1))  ".
+                   ",screlationm1.depend)"),
 
       new kernel::Field::Text(
                 name          =>'dstfilename',

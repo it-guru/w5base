@@ -63,60 +63,12 @@ sub new
                        dbname=>'tssm',
                        joinon=>['id'=>'logical_name'] 
                    },
-                ],
-                onRawValue    =>\&DataDumpSQL),
+                ]),
    );
 
    $self->setDefaultView(qw(linenumber changenumber 
                             fulldump));
    return($self);
-}
-
-
-sub DataDumpSQL
-{
-   my $self=shift;
-   my $current=shift;
-   my %rec=();
-
-   my $depend=$self->{depend};
-   my @depend;
-   if (ref($depend) eq "ARRAY"){
-      @depend=@$depend;
-   }
-   my @sqlctrl=@{$self->{sqldepend}};
-   while(my $k=shift(@sqlctrl)){
-     my $ctrl=shift(@sqlctrl);
-     my $fields="*";
-     my $from=$k;
-     my $where="";
-     $from=$ctrl->{from}   if (exists($ctrl->{from}));
-     $fields=$ctrl->{fields}     if (exists($ctrl->{fields}));
-     $where=$ctrl->{where} if (exists($ctrl->{where}));
-     if (exists($ctrl->{joinon}) && ref($ctrl->{joinon}) eq "ARRAY"){
-        my $srcval=$current->{$ctrl->{joinon}->[0]};
-        my $dstname=$ctrl->{joinon}->[1];
-        $where="(".$where.") and " if ($where ne "");
-        $where.=$dstname."='".$srcval."'";
-     }
-     my $cmd="select ".$fields." from ".$from." where ".$where;
-     $cmd=$ctrl->{cmd} if (exists($ctrl->{cmd}));
-     my $workdb=new kernel::database($self->getParent,$ctrl->{dbname});
-     if ($workdb->Connect()){
-        my @l=$workdb->getHashList($cmd);
-        if ($workdb->Ping()){
-           $rec{$k}={'SQLcommand'=>$cmd,
-                     'SQLdbname'=>$ctrl->{dbname},
-                     'Result'=>\@l};
-           $workdb->Disconnect();
-        }
-     }
-     if (!exists($rec{$k})){
-        $rec{$k}={SQLerror=>'query problem',
-                  SQLcmd=>$cmd};
-     }
-   }
-   return(\%rec);
 }
 
 

@@ -51,6 +51,7 @@ sub new
                 name          =>'fullname',
                 label         =>'Fullname',
                 ignorecase    =>1,
+                searchable    =>0,
                 dataobjattr   =>'assignmentm1.name'),
 
       new kernel::Field::Text(

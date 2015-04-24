@@ -36,6 +36,7 @@ sub Init
 
    $self->RegisterObj("itu.sm",                                           # OK
                       "tmpl/welcome",
+                      prio=>100,
                       defaultacl=>['admin',"support"]);
    
    $self->RegisterObj("itu.sm.change",                                    # OK
@@ -126,6 +127,10 @@ sub Init
 
    $self->RegisterObj("itu.sm.krn.Dump.chmDataDump",                      # OK
                       "tssm::chmDumper",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.sm.krn.Dump.tskDataDump",                      # OK
+                      "tssm::tskDumper",
                       defaultacl=>['admin']);
 
    $self->RegisterObj("itu.sm.krn.Dump.inmDataDump",                      # OK

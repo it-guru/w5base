@@ -49,27 +49,27 @@ sub new
                 searchable    =>1,
                 align         =>'left',
                 htmlwidth     =>'200px',
-                dataobjattr   =>'cm3tm1.numberprgn'),
-
-      new kernel::Field::Text(
-                name          =>'name',
-                label         =>'Task Brief Description',
-                ignorecase    =>1,
-                dataobjattr   =>'cm3tm1.brief_description'),
-
-      new kernel::Field::Text(
-                name          =>'status',
-                group         =>'status',
-                label         =>'Status',
-                ignorecase    =>1,
-                dataobjattr   =>'cm3tm1.status'),
+                dataobjattr   =>'cm3tm1.dh_number'),
 
 #      new kernel::Field::Text(
-#                name          =>'approvalstatus',
-#                label         =>'approval status',
-#                group         =>'status',
+#                name          =>'name',
+#                label         =>'Task Brief Description',
 #                ignorecase    =>1,
-#                dataobjattr   =>'cm3tm1.approval_status'),
+#                dataobjattr   =>'cm3tm1.brief_description'),
+#
+#      new kernel::Field::Text(
+#                name          =>'status',
+#                group         =>'status',
+#                label         =>'Status',
+#                ignorecase    =>1,
+#                dataobjattr   =>'cm3tm1.status'),
+#
+##      new kernel::Field::Text(
+##                name          =>'approvalstatus',
+##                label         =>'approval status',
+##                group         =>'status',
+##                ignorecase    =>1,
+##                dataobjattr   =>'cm3tm1.approval_status'),
 
       new kernel::Field::Date(
                 name          =>'plannedstart',
@@ -83,25 +83,25 @@ sub new
                 label         =>'Planned End',
                 dataobjattr   =>'cm3tm1.planned_end'),
 
-      new kernel::Field::Boolean(          # the field ci_down does not exists
-                name          =>'cidown',  # in scadm schema - but in scadm1.
-                timezone      =>'CET',     # => soo i build a hack to allow 
-                label         =>'PSO-Flag',     # the access on this field
-                dataobjattr   =>"decode(downtab.ci_down,'t','1','0')"),
-
-#      new kernel::Field::Date(
-#                name          =>'downstart',
-#                timezone      =>'CET',
-#                group         =>'downtime',
-#                label         =>'Down Start',
-#                dataobjattr   =>'cm3tm1.down_start'),
+#      new kernel::Field::Boolean(          # the field ci_down does not exists
+#                name          =>'cidown',  # in scadm schema - but in scadm1.
+#                timezone      =>'CET',     # => soo i build a hack to allow 
+#                label         =>'PSO-Flag',     # the access on this field
+#                dataobjattr   =>"decode(downtab.ci_down,'t','1','0')"),
 #
-#      new kernel::Field::Date(
-#                name          =>'downend',
-#                timezone      =>'CET',
-#                group         =>'downtime',
-#                label         =>'Down End',
-#                dataobjattr   =>'cm3tm1.down_end'),
+##      new kernel::Field::Date(
+##                name          =>'downstart',
+##                timezone      =>'CET',
+##                group         =>'downtime',
+##                label         =>'Down Start',
+##                dataobjattr   =>'cm3tm1.down_start'),
+##
+##      new kernel::Field::Date(
+##                name          =>'downend',
+##                timezone      =>'CET',
+##                group         =>'downtime',
+##                label         =>'Down End',
+##                dataobjattr   =>'cm3tm1.down_end'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -111,46 +111,46 @@ sub new
                 sqlorder      =>'NONE',
                 dataobjattr   =>'cm3tm1.description'),
 
-      new kernel::Field::SubList(
-                name          =>'relations',
-                label         =>'Relations',
-                group         =>'relations',
-                vjointo       =>'tssm::lnk',
-                vjoinon       =>['tasknumber'=>'src'],
-                vjoininhash   =>['dst','dstobj'],
-                vjoindisp     =>[qw(dst dstname)]),
-
-      new kernel::Field::Date(
-                name          =>'workstart',
-                timezone      =>'CET',
-                label         =>'Work Start',
-                dataobjattr   =>'cm3tm1.down_start'),
-
-      new kernel::Field::Date(
-                name          =>'workend',
-                timezone      =>'CET',
-                label         =>'Work End',
-                dataobjattr   =>'cm3tm1.down_end'),
-
-      new kernel::Field::Text(
-                name          =>'assignedto',
-                label         =>'Assigned to',
-                group         =>'contact',
-                ignorecase    =>1,
-                dataobjattr   =>'cm3tm1.assigned_to'),
-
-      new kernel::Field::Text(
-                name          =>'implementer',
-                label         =>'Implementer',
-                group         =>'contact',
-                ignorecase    =>1,
-                dataobjattr   =>'cm3tm1.assign_firstname'),
-
-      new kernel::Field::Text(
-                name          =>'editor',
-                group         =>'status',
-                label         =>'Editor',
-                dataobjattr   =>'cm3tm1.sysmoduser'),
+#      new kernel::Field::SubList(
+#                name          =>'relations',
+#                label         =>'Relations',
+#                group         =>'relations',
+#                vjointo       =>'tssm::lnk',
+#                vjoinon       =>['tasknumber'=>'src'],
+#                vjoininhash   =>['dst','dstobj'],
+#                vjoindisp     =>[qw(dst dstname)]),
+#
+#      new kernel::Field::Date(
+#                name          =>'workstart',
+#                timezone      =>'CET',
+#                label         =>'Work Start',
+#                dataobjattr   =>'cm3tm1.down_start'),
+#
+#      new kernel::Field::Date(
+#                name          =>'workend',
+#                timezone      =>'CET',
+#                label         =>'Work End',
+#                dataobjattr   =>'cm3tm1.down_end'),
+#
+#      new kernel::Field::Text(
+#                name          =>'assignedto',
+#                label         =>'Assigned to',
+#                group         =>'contact',
+#                ignorecase    =>1,
+#                dataobjattr   =>'cm3tm1.assigned_to'),
+#
+#      new kernel::Field::Text(
+#                name          =>'implementer',
+#                label         =>'Implementer',
+#                group         =>'contact',
+#                ignorecase    =>1,
+#                dataobjattr   =>'cm3tm1.assign_firstname'),
+#
+#      new kernel::Field::Text(
+#                name          =>'editor',
+#                group         =>'status',
+#                label         =>'Editor',
+#                dataobjattr   =>'cm3tm1.sysmoduser'),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
@@ -159,17 +159,18 @@ sub new
                 label         =>'SysModTime',
                 dataobjattr   =>'cm3tm1.sysmodtime'),
 
-      new kernel::Field::Date(
-                name          =>'createtime',
-                group         =>'status',
-                timezone      =>'CET',
-                label         =>'Create time',
-                dataobjattr   =>'cm3tm1.orig_date_entered'),
+#      new kernel::Field::Date(
+#                name          =>'createtime',
+#                group         =>'status',
+#                timezone      =>'CET',
+#                label         =>'Create time',
+#                dataobjattr   =>'cm3tm1.orig_date_entered'),
 
    );
 
    $self->{use_distinct}=0;
-   $self->setDefaultView(qw(linenumber changenumber name));
+   $self->setDefaultView(qw(linenumber changenumber tasknumber 
+                            name description));
    return($self);
 }
 
@@ -183,20 +184,39 @@ sub Initialize
    return(0);
 }
 
+
+sub initSearchQuery
+{
+   my $self=shift;
+   my $nowlabel=$self->T("now","kernel::App");
+
+#   if (!defined(Query->Param("search_plannedend"))){
+#     Query->Param("search_plannedend"=>">$nowlabel-1d AND <$nowlabel+14d");
+#   }
+
+   if (!defined(Query->Param("search_changenumber"))){
+     Query->Param("search_changenumber"=>"C000191883 C000146354 ".
+                                         "C000222842 C000188772");
+   }
+
+}
+
+
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cm3tm1,scadm1.cm3tm1 downtab";
+   my $from="dh_cm3tm1 cm3tm1";
+  #,scadm1.cm3tm1 downtab";
   # my $from="cm3tm1";
    return($from);
 }
 
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="cm3tm1.numberprgn=downtab.numberprgn";
-   return($where);
-}
+#sub initSqlWhere
+#{
+#   my $self=shift;
+#   my $where="cm3tm1.numberprgn=downtab.numberprgn";
+#   return($where);
+#}
 
 sub isQualityCheckValid
 {

@@ -1,4 +1,4 @@
-package tssm::inmDumper;
+package tssm::tskDumper;
 #  W5Base Framework
 #  Copyright (C) 2010  Hartmut Vogler (it@guru.de)
 #
@@ -39,34 +39,36 @@ sub new
                 label         =>'No.'),
 
       new kernel::Field::Id(
-                name          =>'id',
+                name          =>'tasknumber',
                 sqlorder      =>'desc',
                 searchable    =>1,
-                label         =>'Incident No.',
+                label         =>'Task No.',
                 htmlwidth     =>'20',
                 align         =>'left',
-                dataobjattr   =>'probsummarym1.dh_number'),
+                dataobjattr   =>'cm3tm1.dh_number'),
 
-      new kernel::Field::Text(
-                name          =>'name',
-                label         =>'Brief Description',
-                ignorecase    =>1,
-                dataobjattr   =>'probsummarym1.brief_description'),
-
+      new kernel::Field::Id(
+                name          =>'changenumber',
+                sqlorder      =>'desc',
+                searchable    =>1,
+                label         =>'Change No.',
+                htmlwidth     =>'20',
+                align         =>'left',
+                dataobjattr   =>'cm3tm1.parent_change'),
 
       new kernel::Field::DataDump(
                 name          =>'fulldump',
-                depend        =>['id'],
+                depend        =>['changenumber'],
                 label         =>'DataDump',
                 sqldepend     =>[
-                   'dh_probsummarym1'=>{
+                   'dh_cm3tm1'=>{
                        dbname=>'tssm',
-                       joinon=>['id'=>'dh_number'] 
-                   },
+                       joinon=>['tasknumber'=>'dh_number'] 
+                   }
                 ]),
    );
 
-   $self->setDefaultView(qw(linenumber id 
+   $self->setDefaultView(qw(linenumber changenumber 
                             fulldump));
    return($self);
 }
@@ -95,17 +97,16 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dh_probsummarym1 probsummarym1";
+   my $from="dh_cm3tm1 cm3tm1";
    return($from);
 }
 
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="(probsummarym1.last='t' or probsummarym1.last is null)";
-   my $where="";
-   return($where);
-}
+#sub initSqlWhere
+#{
+#   my $self=shift;
+#   my $where="(cm3rm1.last='t' or cm3rm1.last is null)";
+#   return($where);
+#}
 
 sub isViewValid
 {
