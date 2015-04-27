@@ -1,4 +1,4 @@
-package tssc::lib::io;
+package tssm::lib::io;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -649,9 +649,9 @@ sub mkChangeStoreRec
        $wfrec{tcomcoddownstart}=$ws;
        $wfrec{tcomcoddownend}=$we;
        $wfrec{tcomworktime}=$wt;
-       if ($rec->{tssc_chm_closingcommentsclosingcomments} ne ""){
+       if ($rec->{tssm_chm_closingcommentsclosingcomments} ne ""){
           $wfrec{tcomcodcomments}=
-                  $rec->{tssc_chm_closingcommentsclosingcomments};
+                  $rec->{tssm_chm_closingcommentsclosingcomments};
        }
        if (lc($rec->{reason}) ne "cus"){
           $wfrec{tcomcodcause}="appl.base.base";
@@ -1127,7 +1127,7 @@ sub getSC
    return(undef) if (!defined($sc));
 
    my $dataobjconnect=$self->Config->Param('DATAOBJCONNECT');
-   my $SCuri=$dataobjconnect->{tsscui};
+   my $SCuri=$dataobjconnect->{tssmui};
 
    if (!$sc->Connect($SCuri,uc($username),$password)){
       printf STDERR ("ERROR: ServiceCenter connect failed\n");

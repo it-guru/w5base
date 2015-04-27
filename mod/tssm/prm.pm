@@ -91,10 +91,43 @@ sub new
                 dataobjattr   =>'rootcausem1.initial_impact'),
 
       new kernel::Field::Text(
+                name          =>'risk',
+                group         =>'status',
+                label         =>'Event Risk',
+                dataobjattr   =>'rootcausem1.tsi_risk'),
+
+      new kernel::Field::Text(
+                name          =>'priority',
+                group         =>'status',
+                label         =>'Pritority',
+                dataobjattr   =>'rootcausem1.priority_code'),
+
+      new kernel::Field::Text(
                 name          =>'category',
                 group         =>'status',
                 label         =>'Category',
-                dataobjattr   =>'rootcausem1.category'),
+                dataobjattr   =>'rootcausem1.tsi_category'),
+
+      new kernel::Field::Text(
+                name          =>'subcat1',
+                group         =>'status',
+                htmldetail    =>\&onlyIfFilled,
+                label         =>'Sub Category 1',
+                dataobjattr   =>'rootcausem1.subcategory'),
+
+      new kernel::Field::Text(
+                name          =>'subcat2',
+                group         =>'status',
+                label         =>'Sub Category 2',
+                htmldetail    =>\&onlyIfFilled,
+                dataobjattr   =>'rootcausem1.product_type'),
+
+      new kernel::Field::Text(
+                name          =>'subcat3',
+                group         =>'status',
+                htmldetail    =>\&onlyIfFilled,
+                label         =>'Sub Category 3',
+                dataobjattr   =>'rootcausem1.problem_type'),
 
 ##      new kernel::Field::Select(
 ##                name          =>'analysetype',
@@ -111,33 +144,6 @@ sub new
 ##                transprefix   =>'SOLT.',
 ##                label         =>'Solution type',
 ##                dataobjattr   =>'rootcausem1.solution_type'),
-
-##      new kernel::Field::Text(
-##                name          =>'subcat1',
-##                group         =>'status',
-##                htmldetail    =>\&onlyIfFilled,
-##                label         =>'Sub Category 1',
-##                dataobjattr   =>'rootcausem1.subcat1'),
-
-##      new kernel::Field::Text(
-##                name          =>'subcat2',
-##                group         =>'status',
-##                label         =>'Sub Category 2',
-##                htmldetail    =>\&onlyIfFilled,
-##                dataobjattr   =>'rootcausem1.subcat2'),
-
-##      new kernel::Field::Text(
-##                name          =>'subcat3',
-##                group         =>'status',
-##                htmldetail    =>\&onlyIfFilled,
-##                label         =>'Sub Category 3',
-##                dataobjattr   =>'rootcausem1.subcat3'),
-
-      new kernel::Field::Text(
-                name          =>'priority',
-                group         =>'status',
-                label         =>'Pritority',
-                dataobjattr   =>'rootcausem1.priority_code'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'urgency',
@@ -197,8 +203,10 @@ sub new
                 name          =>'workarraound',
                 label         =>'Workaround',
                 group         =>'close',
+                htmldetail    =>0,
                 searchable    =>0,
-                dataobjattr   =>'rootcausem1.workaround'),
+                sqlorder      =>'NONE',
+                dataobjattr   =>'rootcausem1.resolution_clob'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'solutiontype',
@@ -206,13 +214,13 @@ sub new
 ##                label         =>'Solution Type',
 ##                dataobjattr   =>'rootcausem1.solution_type'),
 
-##      new kernel::Field::Select(
-##                name          =>'closetype',
-##                group         =>'close',
-##                label         =>'Close Type',
-##                transprefix   =>'closetype.',
-##                value         =>[qw(1 2 3)],
-##                dataobjattr   =>'rootcausem1.close_type'),
+      new kernel::Field::Select(
+                name          =>'closetype',
+                group         =>'close',
+                label         =>'Close Type',
+               # transprefix   =>'closetype.',
+               # value         =>[qw(1 2 3)],
+                dataobjattr   =>'rootcausem1.closure_code'),
 
 ##      new kernel::Field::Link(
 ##                name          =>'closetypeid',
@@ -220,12 +228,13 @@ sub new
 ##                label         =>'Close Type',
 ##                dataobjattr   =>'rootcausem1.close_type'),
 
-##      new kernel::Field::Textarea(
-##                name          =>'cause',
-##                label         =>'Cause',
-##                group         =>'close',
-##                searchable    =>0,
-##                dataobjattr   =>'rootcausea1.root_cause'),
+      new kernel::Field::Textarea(
+                name          =>'cause',
+                label         =>'Cause',
+                group         =>'close',
+                searchable    =>0,
+                sqlorder      =>'NONE',
+                dataobjattr   =>'rootcausem1.root_cause_clob'),
 
       new kernel::Field::Textarea(
                 name          =>'solution',
@@ -268,12 +277,12 @@ sub new
                 label         =>'Assignment',
                 dataobjattr   =>'rootcausem1.assignment'),
 
-##      new kernel::Field::Text(
-##                name          =>'assignedtouser',
-##                uppersearch   =>1,
-##                group         =>'contact',
-##                label         =>'Assigned worker',
-##                dataobjattr   =>'rootcausem1.assigned_to'),
+      new kernel::Field::Text(
+                name          =>'assignedtouser',
+                uppersearch   =>1,
+                group         =>'contact',
+                label         =>'Assigned worker',
+                dataobjattr   =>'rootcausem1.assignee_name'),
 
    );
    $self->{use_distinct}=0;

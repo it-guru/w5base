@@ -1,4 +1,4 @@
-package tssc::event::scchange;
+package tssm::event::smchange;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
-use tssc::lib::io;
-@ISA=qw(kernel::Event tssc::lib::io);
+use tssm::lib::io;
+@ISA=qw(kernel::Event tssm::lib::io);
 
 sub new
 {
@@ -39,22 +39,22 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("scchange","scchange",timeout=>$self->{timeout});
+   $self->RegisterEvent("smchange","smchange",timeout=>$self->{timeout});
 }
 
-sub scchange
+sub smchange
 {
    my $self=shift;
    my %param=@_;
 
    my $selfname=$self->Self();
    $self->InitScImportEnviroment();
-   my $chm=getModuleObject($self->Config,"tssc::chm");
+   my $chm=getModuleObject($self->Config,"tssm::chm");
    msg(DEBUG,"ServiceCenter chm is connected");
    $chm->SetCurrentView(qw(sysmodtime closetime changenumber name description 
                            fallback status assignedto
                            plannedstart plannedend srcid device implementor
-                           tssc_chm_closingcommentsclosingcomments assignarea
+                           tssm_chm_closingcommentsclosingcomments assignarea
                            workstart workend workduration resolvedby closedby
                            requestedby editor softwareid software deviceid
                            createtime type resources closecode approved addgrp

@@ -1,4 +1,4 @@
-package tssc::W5Server::ReadCtrl;
+package tssm::W5Server::ReadCtrl;
 use strict;
 use kernel;
 use kernel::date;
