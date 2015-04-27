@@ -160,6 +160,14 @@ sub qcheckRecord
          }
          msg(INFO,"organizationalstatus=$wiwstate --- w5base role=$level1role");
          
+         # ERROR-Meldung bei Org-Einheiten verhindern,
+         # die im wiw manuell gepflegt werden und 
+         # die es deshalb im Org-Baum nicht gibt.
+         if ($touid eq 'CZ100000') {
+            msg(INFO,"WIW Orgarea '%s' not available in orgtree. ".
+                     "Manually managed.",$touid);
+            $touid="";
+         }
 
          #
          # hinzufügen der Userrollen
