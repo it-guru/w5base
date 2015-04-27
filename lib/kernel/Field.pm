@@ -19,6 +19,7 @@ package kernel::Field;
 use strict;
 use vars qw(@ISA);
 use kernel;
+use kernel::cgi;
 use kernel::Field::Id;
 use kernel::Field::RecordUrl;
 use kernel::Field::Vector;
@@ -200,7 +201,14 @@ sub addWebLinkToFacility
          my $detailx=$self->getParent->DetailX();
          my $detaily=$self->getParent->DetailY();
          $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
-         my $dest="$target?AllowClose=1&search_$targetid=$targetval";
+         my $dest=$target;
+         if ($targetval=~m/\s/){  # id contains spaces - new since SM9 interf.
+            $targetval='"'.$targetval.'"';
+         }
+         $dest.="?".kernel::cgi::Hash2QueryString(
+            'AllowClose'=>1,
+            "search_$targetid"=>$targetval
+         );
          my $UserCache=$self->getParent->Cache->{User}->{Cache};
          if (defined($UserCache->{$ENV{REMOTE_USER}})){
             $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
