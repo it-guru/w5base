@@ -29,6 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -73,10 +74,23 @@ sub new
                 label         =>'DeviceID',
                 dataobjattr   =>'probsummarym1.logical_name'),
 
+      new kernel::Field::Text(
+                name          =>'devicename',
+                label         =>'Devicename',
+                vjointo       =>'tssm::dev',
+                vjoinon       =>['deviceid'=>'deviceid'],
+                vjoindisp     =>'fullname'),
+
 ##      new kernel::Field::Text(
 ##                name          =>'custapplication',
 ##                label         =>'Customer Application',
 ##                dataobjattr   =>'probsummarym1.dsc_service'),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'status',
+                label         =>'SysModTime',
+                dataobjattr   =>'probsummarym1.sysmodtime'),
 
       new kernel::Field::Text(
                 name          =>'affservices',
@@ -138,6 +152,8 @@ sub new
                 name          =>'hassignment',
                 group         =>'status',
                 label         =>'Home Assignment',
+                weblinkto     =>'tssm::group',
+                weblinkon     =>['hassignment'=>'fullname'],
                 dataobjattr   =>'probsummarym1.open_group'),
 
 ##      new kernel::Field::Text(
@@ -166,6 +182,8 @@ sub new
                 name          =>'cassignment',
                 group         =>'status',
                 label         =>'Current Assignment',
+                weblinkto     =>'tssm::group',
+                weblinkon     =>['cassignment'=>'fullname'],
                 dataobjattr   =>'probsummarym1.assignment'),
 
       new kernel::Field::Text(
@@ -197,12 +215,6 @@ sub new
 ##                group         =>'status',
 ##                label         =>'Reason by',
 ##                dataobjattr   =>'probsummarym1.reason_causedby'),
-
-      new kernel::Field::Date(
-                name          =>'sysmodtime',
-                group         =>'status',
-                label         =>'SysModTime',
-                dataobjattr   =>'probsummarym1.sysmodtime'),
 
       new kernel::Field::Date(
                 name          =>'createtime',
@@ -299,6 +311,19 @@ sub SetFilterForQualityCheck
    return(undef);
 }
 
+sub allowFurtherOutput
+{
+   my $self=shift;
+#   return(1) if ($self->isMemberOf("admin"));
+   return(0);
+}
+
+sub isUploadValid
+{
+   my $self=shift;
+
+   return(0);
+}
 
 
 sub getRecordImageUrl
@@ -319,6 +344,17 @@ sub getInvolvedAssignment
       $a{$rec->{assignment}}=1;
    }
    return([sort(keys(%a))]); 
+}
+
+sub initSearchQuery
+{
+   my $self=shift;
+   my $nowlabel=$self->T("now","kernel::App");
+
+   if (!defined(Query->Param("search_mdate"))){
+     Query->Param("search_mdate"=>">now-1h");
+   }
+
 }
 
 sub Initialize

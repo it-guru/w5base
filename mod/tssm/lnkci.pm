@@ -53,14 +53,22 @@ sub new
                     return lc $criticality;
                  }),
 
+#      new kernel::Field::Boolean(
+#                name          =>'civalid',
+#                group         =>'dst',
+#                label         =>'Valid',
+#                translation   =>'tssm::lnk',
+#                htmlwidth     =>'50',
+#                dataobjattr   =>"decode(".
+#                                "screlationm1.valid_ci,'t',1,'f',0,NULL)"),
+
       new kernel::Field::Boolean(
                 name          =>'civalid',
                 group         =>'dst',
                 label         =>'Valid',
                 translation   =>'tssm::lnk',
                 htmlwidth     =>'50',
-                dataobjattr   =>"decode(".
-                                "screlationm1.valid_ci,'t',1,'f',0,NULL)"),
+                dataobjattr   =>"'0'"),
 
       new kernel::Field::Text (
                 name          =>'dststatus',

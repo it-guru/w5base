@@ -141,6 +141,10 @@ sub Init
                       "tssm::devDumper",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itu.sm.krn.Dump.prmDataDump",                      # OK
+                      "tssm::prmDumper",
+                      defaultacl=>['admin']);
+
    return($self);
 }
 

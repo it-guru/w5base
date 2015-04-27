@@ -51,25 +51,25 @@ sub new
                 htmlwidth     =>'200px',
                 dataobjattr   =>'cm3tm1.dh_number'),
 
-#      new kernel::Field::Text(
-#                name          =>'name',
-#                label         =>'Task Brief Description',
-#                ignorecase    =>1,
-#                dataobjattr   =>'cm3tm1.brief_description'),
-#
-#      new kernel::Field::Text(
-#                name          =>'status',
-#                group         =>'status',
-#                label         =>'Status',
-#                ignorecase    =>1,
-#                dataobjattr   =>'cm3tm1.status'),
-#
-##      new kernel::Field::Text(
-##                name          =>'approvalstatus',
-##                label         =>'approval status',
-##                group         =>'status',
-##                ignorecase    =>1,
-##                dataobjattr   =>'cm3tm1.approval_status'),
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Task Brief Description',
+                ignorecase    =>1,
+                dataobjattr   =>'cm3tm1.brief_desc'),
+
+      new kernel::Field::Text(
+                name          =>'status',
+                group         =>'status',
+                label         =>'Status',
+                ignorecase    =>1,
+                dataobjattr   =>'cm3tm1.tsi_status'),
+
+      new kernel::Field::Text(
+                name          =>'approvalstatus',
+                label         =>'approval status',
+                group         =>'status',
+                ignorecase    =>1,
+                dataobjattr   =>'cm3tm1.approval_status'),
 
       new kernel::Field::Date(
                 name          =>'plannedstart',
@@ -83,12 +83,12 @@ sub new
                 label         =>'Planned End',
                 dataobjattr   =>'cm3tm1.planned_end'),
 
-#      new kernel::Field::Boolean(          # the field ci_down does not exists
-#                name          =>'cidown',  # in scadm schema - but in scadm1.
-#                timezone      =>'CET',     # => soo i build a hack to allow 
-#                label         =>'PSO-Flag',     # the access on this field
-#                dataobjattr   =>"decode(downtab.ci_down,'t','1','0')"),
-#
+      new kernel::Field::Boolean(          
+                name          =>'cidown',  
+                timezone      =>'CET',     
+                label         =>'PSO-Flag',  
+                dataobjattr   =>"decode(cm3tm1.ci_down,'t','1','0')"),
+
 ##      new kernel::Field::Date(
 ##                name          =>'downstart',
 ##                timezone      =>'CET',
@@ -119,19 +119,21 @@ sub new
 #                vjoinon       =>['tasknumber'=>'src'],
 #                vjoininhash   =>['dst','dstobj'],
 #                vjoindisp     =>[qw(dst dstname)]),
-#
-#      new kernel::Field::Date(
-#                name          =>'workstart',
-#                timezone      =>'CET',
-#                label         =>'Work Start',
-#                dataobjattr   =>'cm3tm1.down_start'),
-#
-#      new kernel::Field::Date(
-#                name          =>'workend',
-#                timezone      =>'CET',
-#                label         =>'Work End',
-#                dataobjattr   =>'cm3tm1.down_end'),
-#
+
+
+## Work-Start und Work-End an Tasks scheint weggefallen zu sein.
+##      new kernel::Field::Date(
+##                name          =>'workstart',
+##                timezone      =>'CET',
+##                label         =>'Work Start',
+##                dataobjattr   =>'cm3tm1.work_start'),
+##
+##      new kernel::Field::Date(
+##                name          =>'workend',
+##                timezone      =>'CET',
+##                label         =>'Work End',
+##                dataobjattr   =>'cm3tm1.work_end'),
+
 #      new kernel::Field::Text(
 #                name          =>'assignedto',
 #                label         =>'Assigned to',
@@ -159,12 +161,12 @@ sub new
                 label         =>'SysModTime',
                 dataobjattr   =>'cm3tm1.sysmodtime'),
 
-#      new kernel::Field::Date(
-#                name          =>'createtime',
-#                group         =>'status',
-#                timezone      =>'CET',
-#                label         =>'Create time',
-#                dataobjattr   =>'cm3tm1.orig_date_entered'),
+      new kernel::Field::Date(
+                name          =>'createtime',
+                group         =>'status',
+                timezone      =>'CET',
+                label         =>'Create time',
+                dataobjattr   =>'cm3tm1.orig_date_entered'),
 
    );
 

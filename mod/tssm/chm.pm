@@ -189,21 +189,21 @@ sub new
 #                vjointo       =>'tssm::chm_approvedgrp',
 #                vjoinon       =>['changenumber'=>'changenumber'],
 #                vjoindisp     =>[qw(name)]),
-#
-#      new kernel::Field::SubList(
-#                name          =>'tasks',
-#                label         =>'Tasks',
-#                htmlwidth     =>'300px',
-#                group         =>'tasks',
-#                forwardSearch =>1,
-#                vjointo       =>'tssm::chmtask',
-#                vjoinon       =>['changenumber'=>'changenumber'],
-#                vjoininhash   =>['plannedstart','plannedend',
-#                                 'tasknumber','name','cidown',
-#                                 'status','relations','implementer'],
-#                vjoindisp     =>[qw(plannedstart plannedend tasknumber status
-#                                    cidown name implementer)]),
-#
+
+      new kernel::Field::SubList(
+                name          =>'tasks',
+                label         =>'Tasks',
+                htmlwidth     =>'300px',
+                group         =>'tasks',
+                forwardSearch =>1,
+                vjointo       =>'tssm::chmtask',
+                vjoinon       =>['changenumber'=>'changenumber'],
+                vjoininhash   =>['plannedstart','plannedend',
+                                 'tasknumber','name','cidown',
+                                 'status','relations','implementer'],
+                vjoindisp     =>[qw(plannedstart plannedend tasknumber status
+                                    cidown name implementer)]),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
@@ -583,32 +583,32 @@ sub new
        new kernel::Field::SubList(
                 name          =>'relations',
                 label         =>'Relations',
-                xuivisible     =>0,
+                XXXuivisible     =>0,
                 group         =>'relations',
                 vjointo       =>'tssm::lnk',
                 vjoinon       =>['changenumber'=>'src'],
                 vjoininhash   =>['dst','dstobj','primary'],
                 vjoindisp     =>[qw(dst dstname primary)]),
 
-#      new kernel::Field::SubList(
-#                name          =>'configitems',
-#                label         =>'Configuration Items',
-#                group         =>'configitems',
-#                forwardSearch =>1,
-#                vjointo       =>'tssm::lnkci',
-#                vjoinon       =>['changenumber'=>'src'],
-#                vjoindisp     =>[qw(descname dstmodel dstcriticality
-#                                    civalid dststatus furtherciinfo)]),
+      new kernel::Field::SubList(
+                name          =>'configitems',
+                label         =>'Configuration Items',
+                group         =>'configitems',
+                forwardSearch =>1,
+                vjointo       =>'tssm::lnkci',
+                vjoinon       =>['changenumber'=>'src'],
+                vjoindisp     =>[qw(descname dstmodel dstcriticality
+                                    civalid dststatus furtherciinfo)]),
 
-#      new kernel::Field::SubList(
-#                name          =>'tickets',
-#                label         =>'Related Tickets',
-#                group         =>'tickets',
-#                forwardSearch =>1,
-#                vjointo       =>'tssm::lnkticket',
-#                vjoinon       =>['changenumber'=>'src'],
-#                vjoindisp     =>[qw(dst priority status)]),
-#
+      new kernel::Field::SubList(
+                name          =>'tickets',
+                label         =>'Related Tickets',
+                group         =>'tickets',
+                forwardSearch =>1,
+                vjointo       =>'tssm::lnkticket',
+                vjoinon       =>['changenumber'=>'src'],
+                vjoindisp     =>[qw(dst priority status)]),
+
       new kernel::Field::Text(
                 name          =>'editor',
                 group         =>'contact',
@@ -661,6 +661,20 @@ sub initSearchQuery
 
 }
 
+sub allowFurtherOutput
+{
+   my $self=shift;
+#   return(1) if ($self->isMemberOf("admin"));
+   return(0);
+}
+
+
+sub isUploadValid
+{
+   my $self=shift;
+
+   return(0);
+}
 
 
 sub Initialize

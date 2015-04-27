@@ -88,7 +88,7 @@ sub new
                 name          =>'impact',
                 group         =>'status',
                 label         =>'Business Impact',
-                dataobjattr   =>'rootcausem1.impact'),
+                dataobjattr   =>'rootcausem1.initial_impact'),
 
       new kernel::Field::Text(
                 name          =>'category',
@@ -151,23 +151,18 @@ sub new
                 label         =>'Triggered by',
                 dataobjattr   =>'rootcausem1.tsi_triggered_by'),
 
-##      new kernel::Field::Text(
-##                name          =>'softwareid',
-##                htmldetail    =>\&onlyIfFilled,
-##                label         =>'SoftwareID',
-##                dataobjattr   =>'rootcausem1.sw_name'),
-
       new kernel::Field::Text(
                 name          =>'deviceid',
                 htmldetail    =>\&onlyIfFilled,
                 label         =>'DeviceID',
                 dataobjattr   =>'rootcausem1.logical_name'),
 
-##      new kernel::Field::Text(
-##                name          =>'sysname',
-##                htmldetail    =>\&onlyIfFilled,
-##                label         =>'Systemname',
-##                dataobjattr   =>'rootcausem1.tsi_main_ci_system_name'),
+      new kernel::Field::Text(
+                name          =>'devicename',
+                label         =>'Devicename',
+                vjointo       =>'tssm::dev',
+                vjoinon       =>['deviceid'=>'deviceid'],
+                vjoindisp     =>'fullname'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'location',
@@ -225,12 +220,12 @@ sub new
 ##                label         =>'Close Type',
 ##                dataobjattr   =>'rootcausem1.close_type'),
 
-      new kernel::Field::Textarea(
-                name          =>'cause',
-                label         =>'Cause',
-                group         =>'close',
-                searchable    =>0,
-                dataobjattr   =>'rootcausea1.root_cause'),
+##      new kernel::Field::Textarea(
+##                name          =>'cause',
+##                label         =>'Cause',
+##                group         =>'close',
+##                searchable    =>0,
+##                dataobjattr   =>'rootcausea1.root_cause'),
 
       new kernel::Field::Textarea(
                 name          =>'solution',
@@ -239,21 +234,23 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'rootcausem1.resolution'),
 
-#      new kernel::Field::SubList(
-#                name          =>'relations',
-#                label         =>'Relations',
-#                group         =>'relations',
-#                vjointo       =>'tssm::lnk',
-#                vjoinon       =>['problemnumber'=>'src'],
-#                vjoininhash   =>['dst'],
-#                vjoindisp     =>[qw(dst dstname)]),
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Relations',
+                group         =>'relations',
+                vjointo       =>'tssm::lnk',
+                vjoinon       =>['problemnumber'=>'src'],
+                vjoininhash   =>['dst'],
+                vjoindisp     =>[qw(dst dstname)]),
 
-##      new kernel::Field::Text(
-##                name          =>'homeassignment',
-##                uppersearch   =>1,
-##                group         =>'contact',
-##                label         =>'Homeassignment',
-##                dataobjattr   =>'rootcausem1.home_assignment'),
+      new kernel::Field::Text(
+                name          =>'homeassignment',
+                uppersearch   =>1,
+                weblinkto     =>'tssm::group',
+                weblinkon     =>['assignedto'=>'fullname'],
+                group         =>'contact',
+                label         =>'Homeassignment',
+                dataobjattr   =>'rootcausem1.tsi_open_group'),
 
       new kernel::Field::Text(
                 name          =>'editor',
@@ -266,6 +263,8 @@ sub new
                 name          =>'assignedto',
                 uppersearch   =>1,
                 group         =>'contact',
+                weblinkto     =>'tssm::group',
+                weblinkon     =>['assignedto'=>'fullname'],
                 label         =>'Assignment',
                 dataobjattr   =>'rootcausem1.assignment'),
 
@@ -309,6 +308,22 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub allowFurtherOutput
+{
+   my $self=shift;
+#   return(1) if ($self->isMemberOf("admin"));
+   return(0);
+}
+
+sub isUploadValid
+{
+   my $self=shift;
+
+   return(0);
+}
+
+
 
 sub initSearchQuery
 {

@@ -7,6 +7,7 @@
 'fieldgroup.downtimesum'=>{de=>'PSO-Übersicht',en=>'PSO summary'},
 'fieldgroup.software'=>{de=>'betroffene Software/Anwendungen (deprecated)',en=>'affected Software/Applications (deprecated)'},
 'fieldgroup.configitems'=>{de=>'Configuration Items',en=>'Configuration Items'},
+'fieldgroup.relations'=>{de=>'Verknüpfungen',en=>'Relationen'},
 'fieldgroup.tickets'=>{de=>'Tickets (Relations)',en=>'Tickets (Relations'},
 
 'fieldgroup.close'=>{de=>'Abschluss Informationen',en=>'Closing Informations'},

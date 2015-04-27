@@ -37,7 +37,7 @@ sub new
                 label         =>'No.'),
 
       new kernel::Field::Id(
-                name          =>'devid',
+                name          =>'deviceid',
                 label         =>'LogicalName',
                 group         =>'source',
                 dataobjattr   =>'device2m1.logical_name'),
