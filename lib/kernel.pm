@@ -670,6 +670,9 @@ sub CalcDateDuration
    if (ref($d2)){
       $d2=$d2->ymd." ".$d2->hms;
    }
+   if ($d1 eq "" && $d2 eq ""){
+      return(undef);
+   }
    if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$d1=~
           m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
        (my ($weY,$weM,$weD,$weh,$wem,$wes)=$d2=~
