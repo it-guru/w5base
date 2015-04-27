@@ -40,13 +40,25 @@ sub new
                 align         =>'left',
                 label         =>'ID',
                 uivisible     =>'0',
-                dataobjattr   =>'f.fieldname'),
+                dataobjattr   =>'f.fullfieldname'),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                align         =>'left',
+                label         =>'full fieldpath',
+                dataobjattr   =>'lower(f.fullfieldname)'),
 
       new kernel::Field::Text(
                 name          =>'fieldname',
                 align         =>'left',
                 label         =>'Fieldname',
-                dataobjattr   =>'lower(f.fieldname)'),
+                dataobjattr   =>'f.fieldname'),
+
+      new kernel::Field::Text(
+                name          =>'tablename',
+                align         =>'left',
+                label         =>'Table',
+                dataobjattr   =>'f.tablename'),
 
       new kernel::Field::Text(
                 name          =>'datatype',
@@ -75,7 +87,7 @@ sub new
                 dataobjattr   =>'f.owner'),
 
    );
-   $self->setDefaultView(qw(linenumber schemaname fieldname datatype 
+   $self->setDefaultView(qw(linenumber schemaname fullname datatype 
                             datalenght isindexed));
    $self->setWorktable("f");
 
@@ -91,8 +103,10 @@ sub getSqlFrom
    if ($self->{DictionaryMode} eq "Oracle"){
       $from=<<EOF;
 (select distinct t.owner schemaname,
-       lower(t.owner||'.'||t.table_name||'.'||t.column_name) fieldname,
+       lower(t.owner||'.'||t.table_name||'.'||t.column_name) fullfieldname,
        t.data_type,
+       t.table_name tablename,
+       t.column_name fieldname,
        t.owner,
        t.data_length,
        decode(i.index_name,null,0,1) isindexed,
@@ -106,8 +120,10 @@ EOF
 
    if ($self->{DictionaryMode} eq "DB2"){
       $from=<<EOF;
-(select trim(tabschema)||'.'||trim(tabname)||'.'||colname fieldname,
+(select trim(tabschema)||'.'||trim(tabname)||'.'||colname fullfieldname,
         typename data_type,
+        trim(tabname) tablename,
+        colname fieldname,
         length   data_length,
         (select '1' from syscat.indexes
          where syscat.indexes.tabschema=syscat.columns.tabschema and
