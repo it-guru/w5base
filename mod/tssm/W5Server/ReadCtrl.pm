@@ -27,19 +27,19 @@ sub process
    }
 
    my %ctrl=(
-              'scchange'=>{
+              'smchange'=>{
                            laststart=>undef,
                            lastend=>undef,
                            suspend=>30, # dont start in first 15 minutes
                            AsyncID=>undef,
                           },
-              'scincident'=>{
+              'smincident'=>{
                            laststart=>undef,
                            lastend=>undef,
                            suspend=>30, # dont start in first 15 minutes
                            AsyncID=>undef,
                           },
-              'scproblem'=>{
+              'smproblem'=>{
                            laststart=>undef,
                            lastend=>undef,
                            suspend=>30,   # dont start in first 15 minutes
