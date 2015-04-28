@@ -20,6 +20,16 @@ use strict;
 use kernel;
 use kernel::date;
 use Digest::MD5 qw(md5_base64);
+use base 'Exporter';
+our @EXPORT;
+
+use constant {
+    TABpref => 'DH_',
+    SELpref => 'S_'
+};
+
+@EXPORT=qw(TABpref SELpref);
+
 
 
 

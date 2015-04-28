@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -44,90 +45,90 @@ sub new
                 searchable    =>1,
                 htmlwidth     =>'20',
                 align         =>'left',
-                dataobjattr   =>'rootcausem1.id'),
+                dataobjattr   =>SELpref.'rootcausem1.id'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Brief Description',
                 ignorecase    =>1,
-                dataobjattr   =>'rootcausem1.brief_description'),
+                dataobjattr   =>SELpref.'rootcausem1.brief_description'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 htmlwidth     =>100,
-                dataobjattr   =>'rootcausem1.status'),
+                dataobjattr   =>SELpref.'rootcausem1.status'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
                 searchable    =>0,
-                dataobjattr   =>'rootcausem1.description'),
+                dataobjattr   =>SELpref.'rootcausem1.description'),
 
       new kernel::Field::Text(
                 name          =>'creator',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Creator',
-                dataobjattr   =>'rootcausem1.opened_by'),
+                dataobjattr   =>SELpref.'rootcausem1.opened_by'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 sqlorder      =>'desc',
                 timezone      =>'CET',
                 label         =>'Created',
-                dataobjattr   =>'rootcausem1.open_time'),
+                dataobjattr   =>SELpref.'rootcausem1.open_time'),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 timezone      =>'CET',
                 label         =>'SysModTime',
-                dataobjattr   =>'rootcausem1.sysmodtime'),
+                dataobjattr   =>SELpref.'rootcausem1.sysmodtime'),
 
       new kernel::Field::Text(
                 name          =>'impact',
                 group         =>'status',
                 label         =>'Business Impact',
-                dataobjattr   =>'rootcausem1.initial_impact'),
+                dataobjattr   =>SELpref.'rootcausem1.initial_impact'),
 
       new kernel::Field::Text(
                 name          =>'risk',
                 group         =>'status',
                 label         =>'Event Risk',
-                dataobjattr   =>'rootcausem1.tsi_risk'),
+                dataobjattr   =>SELpref.'rootcausem1.tsi_risk'),
 
       new kernel::Field::Text(
                 name          =>'priority',
                 group         =>'status',
                 label         =>'Pritority',
-                dataobjattr   =>'rootcausem1.priority_code'),
+                dataobjattr   =>SELpref.'rootcausem1.priority_code'),
 
       new kernel::Field::Text(
                 name          =>'category',
                 group         =>'status',
                 label         =>'Category',
-                dataobjattr   =>'rootcausem1.tsi_category'),
+                dataobjattr   =>SELpref.'rootcausem1.tsi_category'),
 
       new kernel::Field::Text(
                 name          =>'subcat1',
                 group         =>'status',
                 htmldetail    =>\&onlyIfFilled,
                 label         =>'Sub Category 1',
-                dataobjattr   =>'rootcausem1.subcategory'),
+                dataobjattr   =>SELpref.'rootcausem1.subcategory'),
 
       new kernel::Field::Text(
                 name          =>'subcat2',
                 group         =>'status',
                 label         =>'Sub Category 2',
                 htmldetail    =>\&onlyIfFilled,
-                dataobjattr   =>'rootcausem1.product_type'),
+                dataobjattr   =>SELpref.'rootcausem1.product_type'),
 
       new kernel::Field::Text(
                 name          =>'subcat3',
                 group         =>'status',
                 htmldetail    =>\&onlyIfFilled,
                 label         =>'Sub Category 3',
-                dataobjattr   =>'rootcausem1.problem_type'),
+                dataobjattr   =>SELpref.'rootcausem1.problem_type'),
 
 ##      new kernel::Field::Select(
 ##                name          =>'analysetype',
@@ -155,13 +156,13 @@ sub new
                 name          =>'triggeredby',
                 group         =>'status',
                 label         =>'Triggered by',
-                dataobjattr   =>'rootcausem1.tsi_triggered_by'),
+                dataobjattr   =>SELpref.'rootcausem1.tsi_triggered_by'),
 
       new kernel::Field::Text(
                 name          =>'deviceid',
                 htmldetail    =>\&onlyIfFilled,
                 label         =>'DeviceID',
-                dataobjattr   =>'rootcausem1.logical_name'),
+                dataobjattr   =>SELpref.'rootcausem1.logical_name'),
 
       new kernel::Field::Text(
                 name          =>'devicename',
@@ -183,7 +184,7 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Create time',
-                dataobjattr   =>'rootcausem1.open_time'),
+                dataobjattr   =>SELpref.'rootcausem1.open_time'),
 
       new kernel::Field::Date(
                 name          =>'closetime',
@@ -191,7 +192,7 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Closeing time',
-                dataobjattr   =>'rootcausem1.close_time'),
+                dataobjattr   =>SELpref.'rootcausem1.close_time'),
 
       new kernel::Field::Duration(  
                 name          =>'workduration',
@@ -206,7 +207,7 @@ sub new
                 htmldetail    =>0,
                 searchable    =>0,
                 sqlorder      =>'NONE',
-                dataobjattr   =>'rootcausem1.resolution_clob'),
+                dataobjattr   =>SELpref.'rootcausem1.resolution_clob'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'solutiontype',
@@ -220,7 +221,7 @@ sub new
                 label         =>'Close Type',
                # transprefix   =>'closetype.',
                # value         =>[qw(1 2 3)],
-                dataobjattr   =>'rootcausem1.closure_code'),
+                dataobjattr   =>SELpref.'rootcausem1.closure_code'),
 
 ##      new kernel::Field::Link(
 ##                name          =>'closetypeid',
@@ -234,14 +235,14 @@ sub new
                 group         =>'close',
                 searchable    =>0,
                 sqlorder      =>'NONE',
-                dataobjattr   =>'rootcausem1.root_cause_clob'),
+                dataobjattr   =>SELpref.'rootcausem1.root_cause_clob'),
 
       new kernel::Field::Textarea(
                 name          =>'solution',
                 label         =>'Solution',
                 group         =>'close',
                 searchable    =>0,
-                dataobjattr   =>'rootcausem1.resolution'),
+                dataobjattr   =>SELpref.'rootcausem1.resolution'),
 
       new kernel::Field::SubList(
                 name          =>'relations',
@@ -259,14 +260,14 @@ sub new
                 weblinkon     =>['assignedto'=>'fullname'],
                 group         =>'contact',
                 label         =>'Homeassignment',
-                dataobjattr   =>'rootcausem1.tsi_open_group'),
+                dataobjattr   =>SELpref.'rootcausem1.tsi_open_group'),
 
       new kernel::Field::Text(
                 name          =>'editor',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Editor',
-                dataobjattr   =>'rootcausem1.sysmoduser'),
+                dataobjattr   =>SELpref.'rootcausem1.sysmoduser'),
 
       new kernel::Field::Text(
                 name          =>'assignedto',
@@ -275,14 +276,14 @@ sub new
                 weblinkto     =>'tssm::group',
                 weblinkon     =>['assignedto'=>'fullname'],
                 label         =>'Assignment',
-                dataobjattr   =>'rootcausem1.assignment'),
+                dataobjattr   =>SELpref.'rootcausem1.assignment'),
 
       new kernel::Field::Text(
                 name          =>'assignedtouser',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Assigned worker',
-                dataobjattr   =>'rootcausem1.assignee_name'),
+                dataobjattr   =>SELpref.'rootcausem1.assignee_name'),
 
    );
    $self->{use_distinct}=0;
@@ -366,7 +367,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dh_rootcausem1 rootcausem1";
+   my $from=TABpref."rootcausem1 ".SELpref."rootcausem1";
    return($from);
 }
 

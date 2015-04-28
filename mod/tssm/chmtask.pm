@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -41,7 +42,7 @@ sub new
                 align         =>'left',
                 weblinkto     =>'tssm::chm',
                 weblinkon     =>['changenumber'=>'changenumber'],
-                dataobjattr   =>'cm3tm1.parent_change'),
+                dataobjattr   =>SELpref.'cm3tm1.parent_change'),
 
       new kernel::Field::Id(
                 name          =>'tasknumber',
@@ -49,45 +50,46 @@ sub new
                 searchable    =>1,
                 align         =>'left',
                 htmlwidth     =>'200px',
-                dataobjattr   =>'cm3tm1.dh_number'),
+                dataobjattr   =>SELpref.'cm3tm1.dh_number'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Task Brief Description',
                 ignorecase    =>1,
-                dataobjattr   =>'cm3tm1.brief_desc'),
+                dataobjattr   =>SELpref.'cm3tm1.brief_desc'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 group         =>'status',
                 label         =>'Status',
                 ignorecase    =>1,
-                dataobjattr   =>'cm3tm1.tsi_status'),
+                dataobjattr   =>SELpref.'cm3tm1.tsi_status'),
 
       new kernel::Field::Text(
                 name          =>'approvalstatus',
                 label         =>'approval status',
                 group         =>'status',
                 ignorecase    =>1,
-                dataobjattr   =>'cm3tm1.approval_status'),
+                dataobjattr   =>SELpref.'cm3tm1.approval_status'),
 
       new kernel::Field::Date(
                 name          =>'plannedstart',
                 timezone      =>'CET',
                 label         =>'Planned Start',
-                dataobjattr   =>'cm3tm1.planned_start'),
+                dataobjattr   =>SELpref.'cm3tm1.planned_start'),
 
       new kernel::Field::Date(
                 name          =>'plannedend',
                 timezone      =>'CET',
                 label         =>'Planned End',
-                dataobjattr   =>'cm3tm1.planned_end'),
+                dataobjattr   =>SELpref.'cm3tm1.planned_end'),
 
       new kernel::Field::Boolean(          
                 name          =>'cidown',  
                 timezone      =>'CET',     
                 label         =>'PSO-Flag',  
-                dataobjattr   =>"decode(cm3tm1.ci_down,'t','1','0')"),
+                dataobjattr   =>"decode(".SELpref."cm3tm1.ci_down,".
+                                "'t','1','0')"),
 
 ##      new kernel::Field::Date(
 ##                name          =>'downstart',
@@ -109,7 +111,7 @@ sub new
                 searchable    =>0,
                 htmlwidth     =>300,
                 sqlorder      =>'NONE',
-                dataobjattr   =>'cm3tm1.description'),
+                dataobjattr   =>SELpref.'cm3tm1.description'),
 
 #      new kernel::Field::SubList(
 #                name          =>'relations',
@@ -134,13 +136,13 @@ sub new
 ##                label         =>'Work End',
 ##                dataobjattr   =>'cm3tm1.work_end'),
 
-#      new kernel::Field::Text(
-#                name          =>'assignedto',
-#                label         =>'Assigned to',
-#                group         =>'contact',
-#                ignorecase    =>1,
-#                dataobjattr   =>'cm3tm1.assigned_to'),
-#
+      new kernel::Field::Text(
+                name          =>'assignedto',
+                label         =>'Assigned to',
+                group         =>'contact',
+                ignorecase    =>1,
+                dataobjattr   =>SELpref.'cm3tm1.assign_dep'),
+
 #      new kernel::Field::Text(
 #                name          =>'implementer',
 #                label         =>'Implementer',
@@ -159,14 +161,14 @@ sub new
                 group         =>'status',
                 timezone      =>'CET',
                 label         =>'SysModTime',
-                dataobjattr   =>'cm3tm1.sysmodtime'),
+                dataobjattr   =>SELpref.'cm3tm1.sysmodtime'),
 
       new kernel::Field::Date(
                 name          =>'createtime',
                 group         =>'status',
                 timezone      =>'CET',
                 label         =>'Create time',
-                dataobjattr   =>'cm3tm1.orig_date_entered'),
+                dataobjattr   =>SELpref.'cm3tm1.orig_date_entered'),
 
    );
 
@@ -207,7 +209,7 @@ sub initSearchQuery
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dh_cm3tm1 cm3tm1";
+   my $from=TABpref."cm3tm1 ".SELpref."cm3tm1";
   #,scadm1.cm3tm1 downtab";
   # my $from="cm3tm1";
    return($from);

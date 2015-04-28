@@ -93,7 +93,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dh_rootcausem1 rootcausem1";
+   my $from=TABpref."rootcausem1 ".SELpref."rootcausem1";
    return($from);
 }
 

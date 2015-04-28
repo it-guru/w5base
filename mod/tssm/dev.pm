@@ -22,6 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -40,81 +42,82 @@ sub new
                 name          =>'deviceid',
                 label         =>'LogicalName',
                 group         =>'source',
-                dataobjattr   =>'device2m1.logical_name'),
+                dataobjattr   =>SELpref.'device2m1.logical_name'),
 
       new kernel::Field::Text(
                 name          =>'configitemid',
                 label         =>'ConfigItemID',
                 uppersearch   =>1,
-                dataobjattr   =>'device2m1.id'),
+                dataobjattr   =>SELpref.'device2m1.id'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Title',
                 searchable    =>0,
-                dataobjattr   =>'device2m1.title'),
+                dataobjattr   =>SELpref.'device2m1.title'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'CI-Name',
                 ignorecase    =>1,
-                dataobjattr   =>'device2m1.ci_name'),
+                dataobjattr   =>SELpref.'device2m1.ci_name'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 uppersearch   =>1,
-                dataobjattr   =>'device2m1.istatus'),
+                dataobjattr   =>SELpref.'device2m1.istatus'),
 
       new kernel::Field::Text(
                 name          =>'model',
                 label         =>'Model',
                 searchable    =>0,
-                dataobjattr   =>'device2m1.model'),
+                dataobjattr   =>SELpref.'device2m1.model'),
 
       new kernel::Field::Text(
                 name          =>'location',
                 label         =>'Location',
-                dataobjattr   =>'device2m1.location'),
+                dataobjattr   =>SELpref.'device2m1.location'),
 
       new kernel::Field::Text(
                 name          =>'assignmentgroup',
                 label         =>'Assignmentgroup',
                 weblinkto     =>'tssm::group',
                 weblinkon     =>['assignmentgroup'=>'fullname'],
-                dataobjattr   =>'device2m1.assignment'),
+                dataobjattr   =>SELpref.'device2m1.assignment'),
 
       new kernel::Field::Text(
                 name          =>'iassignmentgroup',
                 label         =>'Incident Assignmentgroup',
                 weblinkto     =>'tssm::group',
                 weblinkon     =>['iassignmentgroup'=>'fullname'],
-                dataobjattr   =>'device2m1.tsi_incident_assignment_group'),
+                dataobjattr   =>SELpref.
+                                'device2m1.tsi_incident_assignment_group'),
 
       new kernel::Field::Text(
                 name          =>'ucmdbid',
                 label         =>'uCMDB ID',
                 group         =>'source',
-                dataobjattr   =>'device2m1.ucmdb_id'),
+                dataobjattr   =>SELpref.'device2m1.ucmdb_id'),
 
       new kernel::Field::Text(
                 name          =>'mandantkey',
                 label         =>'MSS Key',
                 group         =>'source',
-                dataobjattr   =>'device2m1.tsi_mandant'),
+                dataobjattr   =>SELpref.'device2m1.tsi_mandant'),
 
       new kernel::Field::Text(
                 name          =>'mandantname',
                 label         =>'MSS Mandant',
                 group         =>'source',
-                dataobjattr   =>'device2m1.tsi_mandant_name'),
+                dataobjattr   =>SELpref.'device2m1.tsi_mandant_name'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
                 group         =>'source',
-                dataobjattr   =>'device2m1.sysmodtime'),
+                dataobjattr   =>SELpref.'device2m1.sysmodtime'),
    );
    $self->setDefaultView(qw(fullname model));
    return($self);
@@ -133,7 +136,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dh_device2m1 device2m1";
+   my $from=TABpref."device2m1 ".SELpref."device2m1";
    return($from);
 }
 

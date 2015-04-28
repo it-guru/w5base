@@ -45,24 +45,24 @@ sub new
                 label         =>'Incident No.',
                 htmlwidth     =>'20',
                 align         =>'left',
-                dataobjattr   =>'probsummarym1.dh_number'),
+                dataobjattr   =>SELpref.'probsummarym1.dh_number'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Brief Description',
                 ignorecase    =>1,
-                dataobjattr   =>'probsummarym1.brief_description'),
+                dataobjattr   =>SELpref.'probsummarym1.brief_description'),
 
       new kernel::Field::Link(
                 name          =>'rawname',
                 label         =>'Brief Description',
-                dataobjattr   =>'probsummarym1.brief_description'),
+                dataobjattr   =>SELpref.'probsummarym1.brief_description'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 htmlwidth     =>20,
-                dataobjattr   =>'probsummarym1.status'),
+                dataobjattr   =>SELpref.'probsummarym1.status'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'softwareid',
@@ -72,7 +72,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'deviceid',
                 label         =>'DeviceID',
-                dataobjattr   =>'probsummarym1.logical_name'),
+                dataobjattr   =>SELpref.'probsummarym1.logical_name'),
 
       new kernel::Field::Text(
                 name          =>'devicename',
@@ -90,46 +90,46 @@ sub new
                 name          =>'mdate',
                 group         =>'status',
                 label         =>'SysModTime',
-                dataobjattr   =>'probsummarym1.sysmodtime'),
+                dataobjattr   =>SELpref.'probsummarym1.sysmodtime'),
 
       new kernel::Field::Text(
                 name          =>'affservices',
                 sqlorder      =>"none",
                 htmldetail    =>0,
                 label         =>'affected services',
-                dataobjattr   =>'probsummarym1.affected_services'),
+                dataobjattr   =>SELpref.'probsummarym1.affected_services'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 label         =>'Created',
-                dataobjattr   =>'probsummarym1.open_time'),
+                dataobjattr   =>SELpref.'probsummarym1.open_time'),
 
       new kernel::Field::Date(
                 name          =>'downtimestart',
                 label         =>'Downtime Start',
-                dataobjattr   =>'probsummarym1.downtime_start'),
+                dataobjattr   =>SELpref.'probsummarym1.downtime_start'),
 
       new kernel::Field::Date(
                 name          =>'downtimeend',
                 label         =>'Downtime End',
-                dataobjattr   =>'probsummarym1.downtime_end'),
+                dataobjattr   =>SELpref.'probsummarym1.downtime_end'),
 
       new kernel::Field::Textarea(
                 name          =>'action',
                 label         =>'Description',
-                dataobjattr   =>'probsummarym1.action'),
+                dataobjattr   =>SELpref.'probsummarym1.action'),
 
       new kernel::Field::Textarea(
                 name          =>'actionlog',
                 label         =>'Actions',
                 searchable    =>0,
-                dataobjattr   =>'probsummarym1.update_action'),
+                dataobjattr   =>SELpref.'probsummarym1.update_action'),
 
       new kernel::Field::Textarea(       
                 name          =>'resolution',
                 label         =>'Resolution',
                 searchable    =>0,
-                dataobjattr   =>'probsummarym1.resolution'),
+                dataobjattr   =>SELpref.'probsummarym1.resolution'),
 
 #      new kernel::Field::SubList(
 #                name          =>'history',
@@ -154,7 +154,7 @@ sub new
                 label         =>'Home Assignment',
                 weblinkto     =>'tssm::group',
                 weblinkon     =>['hassignment'=>'fullname'],
-                dataobjattr   =>'probsummarym1.open_group'),
+                dataobjattr   =>SELpref.'probsummarym1.open_group'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'iassignment',
@@ -184,25 +184,25 @@ sub new
                 label         =>'Current Assignment',
                 weblinkto     =>'tssm::group',
                 weblinkon     =>['cassignment'=>'fullname'],
-                dataobjattr   =>'probsummarym1.assignment'),
+                dataobjattr   =>SELpref.'probsummarym1.assignment'),
 
       new kernel::Field::Text(
                 name          =>'priority',
                 group         =>'status',
                 label         =>'Priority',
-                dataobjattr   =>'probsummarym1.priority_code'),
+                dataobjattr   =>SELpref.'probsummarym1.priority_code'),
 
       new kernel::Field::Text(
                 name          =>'impact',
                 group         =>'status',
                 label         =>'Business Impact',
-                dataobjattr   =>'probsummarym1.initial_impact'),
+                dataobjattr   =>SELpref.'probsummarym1.initial_impact'),
      
       new kernel::Field::Text(
                 name          =>'causecode',
                 group         =>'status',
                 label         =>'Cause Code',
-                dataobjattr   =>'probsummarym1.cause_code'),
+                dataobjattr   =>SELpref.'probsummarym1.cause_code'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'reason',
@@ -221,14 +221,14 @@ sub new
                 depend        =>['status'],
                 group         =>'close',
                 label         =>'Create time',
-                dataobjattr   =>'probsummarym1.open_time'),
+                dataobjattr   =>SELpref.'probsummarym1.open_time'),
 
       new kernel::Field::Date(
                 name          =>'closetime',
                 depend        =>['status'],
                 group         =>'close',
                 label         =>'Closeing time',
-                dataobjattr   =>'probsummarym1.close_time'),
+                dataobjattr   =>SELpref.'probsummarym1.close_time'),
 
 ##      new kernel::Field::Date(
 ##                name          =>'workstart',
@@ -244,26 +244,26 @@ sub new
 ##                label         =>'Work End',
 ##                dataobjattr   =>'probsummarym1.work_end'),
 
-##      new kernel::Field::Text(
-##                name          =>'reportedby',
-##                uppersearch   =>1,
-##                group         =>'contact',
-##                label         =>'Reported by',
-##                dataobjattr   =>'probsummarym1.reported_by'),
+      new kernel::Field::Text(
+                name          =>'reportedby',
+                uppersearch   =>1,
+                group         =>'contact',
+                label         =>'Reported by',
+                dataobjattr   =>SELpref.'probsummarym1.alternate_contact'),
 
       new kernel::Field::Text(
                 name          =>'openedby',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Opened by',
-                dataobjattr   =>'probsummarym1.opened_by'),
+                dataobjattr   =>SELpref.'probsummarym1.opened_by'),
 
       new kernel::Field::Text(
                 name          =>'editor',
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Editor',
-                dataobjattr   =>'probsummarym1.sysmoduser'),
+                dataobjattr   =>SELpref.'probsummarym1.sysmoduser'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'contactlastname',
@@ -277,11 +277,11 @@ sub new
                 ignorecase    =>1,
                 group         =>'contact',
                 label         =>'Contact Name',
-                dataobjattr   =>'probsummarym1.contact_name'),
+                dataobjattr   =>SELpref.'probsummarym1.contact_name'),
 
       new kernel::Field::Text(
                 name          =>'page',
-                dataobjattr   =>'probsummarym1.page'),
+                dataobjattr   =>SELpref.'probsummarym1.page'),
    );
    $self->{use_distinct}=0;
 
@@ -380,7 +380,7 @@ sub getSqlFrom
 {
    my $self=shift;
    #my $from="probsummarym1,probsummarym1,probsummarya1,probsummarya5";
-   my $from="dh_probsummarym1 probsummarym1";
+   my $from=TABpref."probsummarym1 ".SELpref."probsummarym1";
    return($from);
 }
 

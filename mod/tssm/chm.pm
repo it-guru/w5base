@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -44,31 +45,31 @@ sub new
                 label         =>'Change No.',
                 htmlwidth     =>'20',
                 align         =>'left',
-                dataobjattr   =>'cm3rm1.dh_number'),
+                dataobjattr   =>SELpref.'cm3rm1.dh_number'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Brief Description',
                 ignorecase    =>1,
-                dataobjattr   =>'cm3rm1.brief_description'),
+                dataobjattr   =>SELpref.'cm3rm1.brief_description'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 timezone      =>'CET',
                 label         =>'Created',
-                dataobjattr   =>'cm3rm1.orig_date_entered'),
+                dataobjattr   =>SELpref.'cm3rm1.orig_date_entered'),
 
       new kernel::Field::Date(
                 name          =>'plannedstart',
                 timezone      =>'CET',
                 label         =>'Planed Start',
-                dataobjattr   =>'cm3rm1.planned_start'),
+                dataobjattr   =>SELpref.'cm3rm1.planned_start'),
 
       new kernel::Field::Date(
                 name          =>'plannedend',
                 timezone      =>'CET',
                 label         =>'Planed End',
-                dataobjattr   =>'cm3rm1.planned_end'),
+                dataobjattr   =>SELpref.'cm3rm1.planned_end'),
 
       new kernel::Field::Duration(
                 name          =>'plannedduration',
@@ -89,43 +90,44 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcid',
                 label         =>'Extern Change ID',
-                dataobjattr   =>"decode(cm3rm1.tsi_external_id,'null',NULL,".
-                                       "cm3rm1.tsi_external_id)"),
+                dataobjattr   =>"decode(".SELpref."cm3rm1.tsi_external_id,
+                                        'null',NULL,".
+                                         SELpref."cm3rm1.tsi_external_id)"),
 
-      new kernel::Field::Text(
-                name          =>'srcid1', #?
-                htmldetail    =>1,
-                label         =>'Extern Change ID',
-                dataobjattr   =>"decode(cm3rm1.tsi_external_main_id,'null',NULL,".
-                                       "cm3rm1.tsi_external_main_id)"),
-
-      new kernel::Field::Text(
-                name          =>'srcid2', #?
-                htmldetail    =>1,
-                label         =>'Extern Change',
-                dataobjattr   =>"decode(cm3rm1.tsi_extern,'null',NULL,".
-                                       "cm3rm1.tsi_extern)"),
-
-      new kernel::Field::Text(
-                name          =>'srcid3', #?
-                htmldetail    =>1,
-                label         =>'Extern Change ID',
-                dataobjattr   =>"decode(cm3rm1.tsi_external_number,'null',NULL,".
-                                       "cm3rm1.tsi_external_number)"),
-
-      new kernel::Field::Text(
-                name          =>'srcid4', #?
-                htmldetail    =>1,
-                sqlorder      =>"none",
-                label         =>'Extern Change ID',
-                dataobjattr   =>"cm3rm1.tsi_ext_interface_keys"),
-
-      new kernel::Field::Text(
-                name          =>'srcid5', #?
-                htmldetail    =>1,
-                sqlorder      =>"none",
-                label         =>'Extern Change ID',
-                dataobjattr   =>"cm3rm1.tsi_ext_interface_names"),
+#      new kernel::Field::Text(
+#                name          =>'srcid1', #?
+#                htmldetail    =>1,
+#                label         =>'Extern Change ID',
+#                dataobjattr   =>"decode(cm3rm1.tsi_external_main_id,'null',NULL,".
+#                                       "cm3rm1.tsi_external_main_id)"),
+#
+#      new kernel::Field::Text(
+#                name          =>'srcid2', #?
+#                htmldetail    =>1,
+#                label         =>'Extern Change',
+#                dataobjattr   =>"decode(cm3rm1.tsi_extern,'null',NULL,".
+#                                       "cm3rm1.tsi_extern)"),
+#
+#      new kernel::Field::Text(
+#                name          =>'srcid3', #?
+#                htmldetail    =>1,
+#                label         =>'Extern Change ID',
+#                dataobjattr   =>"decode(cm3rm1.tsi_external_number,'null',NULL,".
+#                                       "cm3rm1.tsi_external_number)"),
+#
+#      new kernel::Field::Text(
+#                name          =>'srcid4', #?
+#                htmldetail    =>1,
+#                sqlorder      =>"none",
+#                label         =>'Extern Change ID',
+#                dataobjattr   =>"cm3rm1.tsi_ext_interface_keys"),
+#
+#      new kernel::Field::Text(
+#                name          =>'srcid5', #?
+#                htmldetail    =>1,
+#                sqlorder      =>"none",
+#                label         =>'Extern Change ID',
+#                dataobjattr   =>"cm3rm1.tsi_ext_interface_names"),
 
 ##      new kernel::Field::Text(
 ##                name          =>'project',
@@ -160,7 +162,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'modelid',
                 label         =>'Model ID',
-                dataobjattr   =>'cm3rm1.tsi_referenced_model'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_referenced_model'),
 
 #      new kernel::Field::SubList(
 #                name          =>'approvalsreq',
@@ -208,7 +210,7 @@ sub new
                 name          =>'description',
                 label         =>'Description',
                 searchable    =>0,
-                dataobjattr   =>'cm3rm1.description'),
+                dataobjattr   =>SELpref.'cm3rm1.description'),
 
       new kernel::Field::Number(
                 name          =>'descriptionlength',
@@ -228,7 +230,7 @@ sub new
                 name          =>'fallback',
                 label         =>'Fallback',
                 searchable    =>0,
-                dataobjattr   =>'cm3rm1.backout_method'),
+                dataobjattr   =>SELpref.'cm3rm1.backout_method'),
 
 ##      new kernel::Field::Textarea(
 ##                name          =>'cause',
@@ -240,31 +242,31 @@ sub new
                 name          =>'chmtarget',
                 label         =>'Target of change',
                 searchable    =>0,
-                dataobjattr   =>'cm3rm1.tsi_target'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_target'),
 
       new kernel::Field::Textarea(
                 name          =>'riskomission',
                 label         =>'Risk of omission',
                 searchable    =>0,
-                dataobjattr   =>'cm3rm1.tsi_risk_omission'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_risk_omission'),
 
       new kernel::Field::Textarea(
                 name          =>'riskimplementation',
                 label         =>'Risk of implementation',
                 searchable    =>0,
-                dataobjattr   =>'cm3rm1.tsi_risk_impl'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_risk_impl'),
 
       new kernel::Field::Textarea(
                 name          =>'impactdesc',
                 label         =>'Impact description',
                 searchable    =>0,
-                dataobjattr   =>'cm3rm1.tsi_impact_desc'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_impact_desc'),
 
       new kernel::Field::Textarea(
                 name          =>'validation',
                 label         =>'Validation',
                 searchable    =>0,
-                dataobjattr   =>'cm3rm1.tsi_validation'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_validation'),
 
 ##      new kernel::Field::Textarea(
 ##                name          =>'serviceinfo',
@@ -308,37 +310,37 @@ sub new
                 htmldetail    =>0,
                 group         =>'status',
                 label         =>'Pritority',
-                dataobjattr   =>'cm3rm1.priority_code'),
+                dataobjattr   =>SELpref.'cm3rm1.priority_code'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 group         =>'status',
                 label         =>'Current Status',
-                dataobjattr   =>'cm3rm1.status'),
+                dataobjattr   =>SELpref.'cm3rm1.status'),
 
       new kernel::Field::Text(
                 name          =>'phase',
                 group         =>'status',
                 label         =>'Current Phase',
-                dataobjattr   =>'cm3rm1.current_phase'),
+                dataobjattr   =>SELpref.'cm3rm1.current_phase'),
 
       new kernel::Field::Text(
                 name          =>'approvalstatus',
                 group         =>'status',
                 label         =>'Approval Status',
-                dataobjattr   =>'cm3rm1.tsi_approval_status'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_approval_status'),
 
       new kernel::Field::Text(
                 name          =>'impact',
                 group         =>'status',
                 label         =>'Business Impact',
-                dataobjattr   =>'cm3rm1.impact_severity'),
+                dataobjattr   =>SELpref.'cm3rm1.impact_severity'),
 
       new kernel::Field::Text(
                 name          =>'requestedfrom',
                 group         =>'status',
                 label         =>'Requested from',
-                dataobjattr   =>'cm3rm1.misc3'),
+                dataobjattr   =>SELpref.'cm3rm1.misc3'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'urgency',
@@ -351,20 +353,20 @@ sub new
                 group         =>'status',
                 htmldetail    =>0,
                 label         =>'Reason',
-                dataobjattr   =>'cm3rm1.reason'),
+                dataobjattr   =>SELpref.'cm3rm1.reason'),
              
       new kernel::Field::Text(
                 name          =>'category',
                 group         =>'status',
                 htmldetail    =>0,
                 label         =>'Category',
-                dataobjattr   =>'cm3rm1.category'),
+                dataobjattr   =>SELpref.'cm3rm1.category'),
 
       new kernel::Field::Text(
                 name          =>'risk',
                 group         =>'status',
                 label         =>'Risk',
-                dataobjattr   =>'cm3rm1.risk_assessment'),
+                dataobjattr   =>SELpref.'cm3rm1.risk_assessment'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'type',
@@ -426,14 +428,14 @@ sub new
                 name          =>'complexity',
                 group         =>'status',
                 label         =>'Complexity',
-                dataobjattr   =>'cm3rm1.tsi_complexity'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_complexity'),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
                 timezone      =>'CET',
                 label         =>'SysModTime',
-                dataobjattr   =>'cm3rm1.sysmodtime'),
+                dataobjattr   =>SELpref.'cm3rm1.sysmodtime'),
 
       new kernel::Field::Date(
                 name          =>'createtime',
@@ -441,7 +443,7 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Create time',
-                dataobjattr   =>'cm3rm1.orig_date_entered'),
+                dataobjattr   =>SELpref.'cm3rm1.orig_date_entered'),
 
 #      new kernel::Field::Text(
 #                name          =>'closedby',
@@ -455,13 +457,13 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Closeing time',
-                dataobjattr   =>'cm3rm1.close_time'),
+                dataobjattr   =>SELpref.'cm3rm1.close_time'),
 
       new kernel::Field::Text(
                 name          =>'closecode',
                 group         =>'close',
                 label         =>'Close Code',
-                dataobjattr   =>'cm3rm1.tsi_close_code'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_close_code'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'resolvedby',
@@ -483,7 +485,7 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Work Start',
-                dataobjattr   =>'cm3rm1.tsi_kpi_work_start'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_kpi_work_start'),
 
       new kernel::Field::Date(
                 name          =>'workend',
@@ -491,7 +493,7 @@ sub new
                 group         =>'close',
                 timezone      =>'CET',
                 label         =>'Work End',
-                dataobjattr   =>'cm3rm1.tsi_kpi_work_end'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_kpi_work_end'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'workduration',
@@ -514,13 +516,13 @@ sub new
                 htmldetail    =>0,
                 ignorecase    =>1,
                 label         =>'Assign Area',
-                dataobjattr   =>'cm3rm1.tsi_assignarea'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_assignarea'),
 
       new kernel::Field::Link(
                 name          =>'rawassignarea',
                 label         =>'raw Assign Area',
                 htmldetail    =>0,
-                dataobjattr   =>'cm3rm1.tsi_assignarea'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_assignarea'),
 
       new kernel::Field::Text(
                 name          =>'customer',
@@ -528,28 +530,31 @@ sub new
                 sqlorder      =>"none",
                 group         =>'contact',
                 label         =>'Customer',
-                dataobjattr   =>'cm3rm1.misc4'),
+                dataobjattr   =>SELpref.'cm3rm1.misc4'),
 
       new kernel::Field::Link(
                 name          =>'rawcustomer',
                 group         =>'contact',
                 label         =>'raw Customer',
                 sqlorder      =>"none",
-                dataobjattr   =>'cm3rm1.misc4'),
+                dataobjattr   =>SELpref.'cm3rm1.misc4'),
 
       new kernel::Field::Text(
                 name          =>'requestedby',
                 group         =>'contact',
-                htmldetail    =>0,
+                weblinkto     =>'tssm::user',
+                weblinkon     =>['requestedby'=>'userid'],
                 label         =>'Requested By',
-                dataobjattr   =>'cm3rm1.requested_by'),
+                dataobjattr   =>SELpref.'cm3rm1.requested_by'),
 
-      new kernel::Field::Text(
-                name          =>'assignedto',
-                uppersearch   =>1,
-                group         =>'contact',
-                label         =>'Assigned To',
-                dataobjattr   =>'cm3rm1.assigned_to'),
+##  vermutlich nicht mehr im Datenmodel vorhanden
+##
+##      new kernel::Field::Text( 
+##                name          =>'assignedto',
+##                uppersearch   =>1,
+##                group         =>'contact',
+##                label         =>'Assigned To',
+##                dataobjattr   =>'cm3rm1.assigned_to'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'implementor',
@@ -563,7 +568,7 @@ sub new
                 uppersearch   =>1,
                 group         =>'contact',
                 label         =>'Changemanager group',
-                dataobjattr   =>'cm3rm1.coordinator'),
+                dataobjattr   =>SELpref.'cm3rm1.coordinator'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'coordinatorposix',
@@ -612,8 +617,10 @@ sub new
       new kernel::Field::Text(
                 name          =>'editor',
                 group         =>'contact',
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['editor'=>'loginname'],
                 label         =>'Editor',
-                dataobjattr   =>'cm3rm1.sysmoduser'),
+                dataobjattr   =>SELpref.'cm3rm1.sysmoduser'),
 
 ##      new kernel::Field::Text(  # notwendig, solange noch das NotifyINetwork
 ##                name          =>'addgrp', # verfahren verwendet wird.
@@ -763,7 +770,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dh_cm3rm1 cm3rm1";
+   my $from=TABpref."cm3rm1 ".SELpref."cm3rm1";
    return($from);
 }
 
