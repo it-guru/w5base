@@ -10,3 +10,5 @@
 'is reviewer group' =>{ de=>'Reviewer Gruppe'},
 'is assignment group' =>{ de=>'Assignment Gruppe'},
 'member email addresses'=>{de=>'Mitglieder-EMail Adressen'},
+'member User-Logins'=>{de=>'Mitglieder User-Login'},
+'member email addresses'=>{de=>'Mitglieder E-Mail'},

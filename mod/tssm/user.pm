@@ -22,6 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -38,96 +40,106 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'UserID',
-                dataobjattr   =>'contactsm1.contact_name'),
+                dataobjattr   =>SELpref.'contactsm1.contact_name'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                label         =>'Fullname',
+                label         =>'Contact name',
                 htmlwidth     =>'250',
                 searchable    =>0,
                 onRawValue    =>\&mkFullname,
                 depend        =>['name','email','firstname','loginname']),
 
-#      new kernel::Field::Text(
-#                name          =>'acfullname',
-#                label         =>'AC-Internal Fullname',
-#                htmlwidth     =>'250',
-#                ignorecase    =>1,
-#                dataobjattr   =>'amempldept.fullname'),
 
       new kernel::Field::Text(
                 name          =>'loginname',
                 label         =>'User-Login',
                 uppersearch   =>1,
-                dataobjattr   =>'operatorm1.name'),
-
-#      new kernel::Field::Text(
-#                name          =>'contactid',
-#                label         =>'ContactID',
-#                lowersearch   =>1,
-#                dataobjattr   =>'amempldept.contactid'),
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['loginname'=>'loginname'],
+                group         =>'account',
+                dataobjattr   =>SELpref.'operatorm1.name'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'contactsm1.last_name'),
+                dataobjattr   =>SELpref.'contactsm1.last_name'),
 
       new kernel::Field::Text(
                 name          =>'firstname',
                 label         =>'Firstname',
                 ignorecase    =>1,
-                dataobjattr   =>'contactsm1.first_name'),
+                dataobjattr   =>SELpref.'contactsm1.first_name'),
 
-#      new kernel::Field::Boolean(
-#                name          =>'islogonuser',
-#                label         =>'is real logon user',
-#                upperserarch  =>1,
-#                dataobjattr   =>"decode(contactsm1.groupprgn,'YES',1,0)"),
+      new kernel::Field::Boolean(
+                name          =>'islogonuser',
+                label         =>'is real logon user',
+                group         =>'account',
+                selectfix     =>1,
+                upperserarch  =>1,
+                dataobjattr   =>"decode(".SELpref."operatorm1.name,NULL,0,1)"),
 
       new kernel::Field::Text(
                 name          =>'email',
                 label         =>'E-Mail',
                 ignorecase    =>1,
-                dataobjattr   =>'contactsm1.email'),
+                dataobjattr   =>SELpref.'contactsm1.email'),
 
-      new kernel::Field::Phonenumber(
-                name          =>'office_phone',
-                group         =>'office',
-                label         =>'Phonenumber',
-                dataobjattr   =>'contactsm1.phone'),
+#      new kernel::Field::Phonenumber(
+#                name          =>'office_phone',
+#                group         =>'office',
+#                label         =>'Phonenumber',
+#                dataobjattr   =>SELpref.'contactsm1.phone'),
 
       new kernel::Field::Text(
-                name          =>'sclocation',
-                label         =>'SC-Location',
-                group         =>'office',
+                name          =>'company',
+                label         =>'Company',
                 ignorecase    =>1,
-                dataobjattr   =>'contactsm1.location_name'),
+                dataobjattr   =>SELpref.'contactsm1.company'),
 
       new kernel::Field::Text(
-                name          =>'schomeassignment',
-                label         =>'SC-HomeAssignment',
-                group         =>'office',
+                name          =>'companycode',
+                label         =>'Company Code',
+                ignorecase    =>1,
+                dataobjattr   =>SELpref.'contactsm1.company_code'),
+
+      new kernel::Field::Text(
+                name          =>'location',
+                label         =>'Location',
+                ignorecase    =>1,
+                dataobjattr   =>SELpref.'contactsm1.location_full_name'),
+
+      new kernel::Field::Text(
+                name          =>'locationcode',
+                label         =>'Location Code',
+                ignorecase    =>1,
+                dataobjattr   =>SELpref.'contactsm1.location'),
+
+      new kernel::Field::Text(
+                name          =>'homeassignment',
+                label         =>'HomeAssignment',
+                group         =>'account',
                 ignorecase    =>1,
                 weblinkto     =>'tssm::group',
-                weblinkon     =>['schomeassignment'=>'fullname'],
-                dataobjattr   =>'operatorm1.home_assignment'),
+                weblinkon     =>['homeassignment'=>'fullname'],
+                dataobjattr   =>SELpref.'operatorm1.tsi_home_assignment'),
 
-      new kernel::Field::Text(
-                name          =>'screspgroup',
-                label         =>'SC-ResponsibleGroup',
-                group         =>'source',
-                ignorecase    =>1,
-                weblinkto     =>'tssm::group',
-                weblinkon     =>['screspgroup'=>'fullname'],
-                dataobjattr   =>'operatorm1.resp_group'),
+#      new kernel::Field::Text(
+#                name          =>'screspgroup',
+#                label         =>'SC-ResponsibleGroup',
+#                group         =>'source',
+#                ignorecase    =>1,
+#                weblinkto     =>'tssm::group',
+#                weblinkon     =>['screspgroup'=>'fullname'],
+#                dataobjattr   =>SELpref.'operatorm1.resp_group'),
 
       new kernel::Field::Text(
                 name          =>'sctimezone',
                 label         =>'SC-Timezone',
-                group         =>'office',
+                group         =>'account',
                 ignorecase    =>1,
-                dataobjattr   =>'operatorm1.time_zone'),
+                dataobjattr   =>SELpref.'operatorm1.time_zone'),
 
 
 
@@ -160,29 +172,29 @@ sub new
                 vjoinon       =>['userid'=>'luser'],
                 vjoindisp     =>['groupname']),
 
-      new kernel::Field::Text(
-                name          =>'srcsys',
-                group         =>'source',
-                label         =>'Source-System',
-                dataobjattr   =>'contactsm1.external_system'),
+#      new kernel::Field::Text(
+#                name          =>'srcsys',
+#                group         =>'source',
+#                label         =>'Source-System',
+#                dataobjattr   =>SELpref.'contactsm1.external_system'),
                                                 
       new kernel::Field::Link(
                 name          =>'userid',
                 label         =>'User-ID',
                 upperserarch  =>1,
-                dataobjattr   =>"operatorm1.name"),
+                dataobjattr   =>SELpref."contactsm1.user_id"),
 
-      new kernel::Field::Text(
-                name          =>'srcid',
-                group         =>'source',
-                label         =>'Source-Id',
-                dataobjattr   =>'contactsm1.external_id'),
-
-      new kernel::Field::Date(
-                name          =>'srcload',
-                group         =>'source',
-                label         =>'Source-Load',
-                dataobjattr   =>'contactsm1.last_update'),
+#      new kernel::Field::Text(
+#                name          =>'srcid',
+#                group         =>'source',
+#                label         =>'Source-Id',
+#                dataobjattr   =>SELpref.'contactsm1.external_id'),
+#
+#      new kernel::Field::Date(
+#                name          =>'srcload',
+#                group         =>'source',
+#                label         =>'Source-Load',
+#                dataobjattr   =>SELpref.'contactsm1.last_update'),
 
 
                                                    
@@ -190,6 +202,12 @@ sub new
    $self->setDefaultView(qw(id loginname name firstname email));
    return($self);
 }
+
+sub isQualityCheckValid
+{
+   return(0);
+}
+
 
 sub mkFullname
 {
@@ -228,10 +246,7 @@ sub mkFullname
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="operatorm1.name=contactsm1.user_id(+)";
-            # " AND ".
-            # "(contactsm1.email is not NULL OR ".
-            # "contactsm1.groupprgn='YES')";
+   my $where=SELpref."contactsm1.user_id=".SELpref."operatorm1.name(+)";
    return($where);
 }
 
@@ -257,7 +272,8 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dh_operatorm1 operatorm1,dh_contctsm1 contactsm1";
+   my $from=TABpref."operatorm1 ".SELpref."operatorm1,".
+            TABpref."contctsm1 ".SELpref."contactsm1";
    return($from);
 }
 
@@ -265,7 +281,11 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   my @l=qw(default header account groups source);
+   if ($rec->{islogonuser}){
+      push(@l,"account");
+   }
+   return(@l);
 }
 
 sub isWriteValid
@@ -280,7 +300,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","office","groups","source");
+   return("header","default","account","groups","source");
 }
 
 

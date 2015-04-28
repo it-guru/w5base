@@ -22,6 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -34,9 +36,10 @@ sub new
       new kernel::Field::Id(      name       =>'id',
                                   label      =>'LinkID',
                                   align      =>'left',
-                                  dataobjattr=>
-         "concat(scadm1.dsccentralassignmenta1.name,concat('-',".
-         "scadm1.dsccentralassignmenta1.operators))"),
+                                  dataobjattr=>SELpref."assignmenta1.name||".
+                                               "'-'||".
+                                               SELpref."assignmenta1.operators"
+                                               ),
 
       new kernel::Field::TextDrop( name       =>'groupname',
                                    label      =>'Groupname',
@@ -46,11 +49,10 @@ sub new
                                    vjoindisp  =>'name'),
 
       new kernel::Field::TextDrop( name       =>'username',
-                                   label      =>'User-Fullname',
+                                   label      =>'Contact name',
                                    htmlwidth  =>'200px',
                                    searchable =>0,
                                    vjointo    =>'tssm::user',
-                                   vjoinbase  =>{'islogonuser'=>'1'},
                                    vjoinon    =>['luser'=>'userid'],
                                    vjoindisp  =>'fullname'),
 
@@ -68,13 +70,15 @@ sub new
                                    uppersearch=>1,
                                    htmlwidth  =>'80px',
                                    label      =>'Loginname',
+                                   weblinkto  =>'tssm::useraccount',
+                                   weblinkon  =>['luser'=>'loginname'],
                                    dataobjattr=>
-                                     'scadm1.dsccentralassignmenta1.operators'),
+                                     SELpref.'assignmenta1.operators'),
                                   
       new kernel::Field::Text(     name       =>'lgroup',
                                    uppersearch=>1,
                                    label      =>'Group',
-                                   dataobjattr=>'scadm1.dsccentralassignmenta1.name'),
+                                   dataobjattr=>SELpref.'assignmenta1.name'),
 
    );
    $self->setDefaultView(qw(id userfullname lgroup));
@@ -103,15 +107,20 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from=
-      "scadm1.dsccentralassignmenta1";
+   my $from=TABpref."assignmenta1 ".SELpref."assignmenta1, ".
+            TABpref."contctsm1 ".SELpref."chkcontact,".
+            TABpref."operatorm1 ".SELpref."chkuser";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   return("");
+   return(SELpref."assignmenta1.operators=".SELpref."chkcontact.user_id(+) ".
+          "and ".
+          SELpref."assignmenta1.operators=".SELpref."chkuser.name(+) ".
+          "and (".SELpref."chkuser.name is not null or ".
+          SELpref."chkcontact.user_id is not null)");
 }
 
 sub isViewValid
@@ -128,6 +137,12 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
+
+sub isQualityCheckValid
+{
+   return(0);
+}
+
 
 
 1;

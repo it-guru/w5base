@@ -81,35 +81,35 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'assignmentm1.tsi_group_email'),
 
-#      new kernel::Field::SubList(
-#                name          =>'users',
-#                label         =>'Users',
-#                group         =>'users',
-#                forwardSearch =>1,
-#                searchable    =>0,
-#                vjointo       =>'tssm::lnkusergroup',
-#                vjoinon       =>['groupid'=>'lgroup'],
-#                vjoindisp     =>['username','luser']),
-#
-#      new kernel::Field::SubList(
-#                name          =>'loginname',
-#                translation   =>'tssm::user',
-#                label         =>'User-Login',
-#                group         =>'users',
-#                htmldetail    =>0,
-#                vjointo       =>'tssm::lnkusergroup',
-#                vjoinon       =>['groupid'=>'lgroup'],
-#                vjoindisp     =>['luser']),
-#
-#      new kernel::Field::SubList(
-#                name          =>'memberemails',
-#                label         =>'member email addresses',
-#                group         =>'users',
-#                searchable    =>0,
-#                htmldetail    =>0,
-#                vjointo       =>'tssm::lnkusergroup',
-#                vjoinon       =>['groupid'=>'lgroup'],
-#                vjoindisp     =>['useremail']),
+      new kernel::Field::SubList(
+                name          =>'users',
+                label         =>'Users',
+                group         =>'users',
+                forwardSearch =>1,
+                searchable    =>0,
+                vjointo       =>'tssm::lnkusergroup',
+                vjoinon       =>['groupid'=>'lgroup'],
+                vjoindisp     =>['username','luser']),
+
+      new kernel::Field::SubList(
+                name          =>'loginname',
+                translation   =>'tssm::user',
+                label         =>'member User-Logins',
+                group         =>'users',
+                htmldetail    =>0,
+                vjointo       =>'tssm::lnkusergroup',
+                vjoinon       =>['groupid'=>'lgroup'],
+                vjoindisp     =>['luser']),
+
+      new kernel::Field::SubList(
+                name          =>'memberemails',
+                label         =>'member email addresses',
+                group         =>'users',
+                searchable    =>1,
+                htmldetail    =>0,
+                vjointo       =>'tssm::lnkusergroup',
+                vjoinon       =>['groupid'=>'lgroup'],
+                vjoindisp     =>['useremail']),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -213,6 +213,12 @@ sub getDetailBlockPriority
    my %param=@_;
    return("header","default","control","users");
 }
+
+sub isQualityCheckValid
+{
+   return(0);
+}
+
 
 
 
