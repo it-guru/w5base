@@ -171,7 +171,7 @@ sub FormatedResult
    if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlSubList"){
       if (!ref($d)){
          my $lang=$self->getParent->Lang();
-         $d=extractLangEntry($d,$lang);
+         $d=extractLangEntry($d,$lang,65535,65535);  # 64k lines and bytes
       }
       if (!$self->{AllowHtmlInput}){
          $d=quoteHtml($d);
@@ -181,7 +181,7 @@ sub FormatedResult
       else{
          $d=quoteHtml($d);
       }
-      $d=~s/\n/<br>\n/g;
+      $d=~s/\n/<br>\n/gs;
    }
    if ($FormatAs eq "SOAP"){
       return(quoteSOAP($d));
