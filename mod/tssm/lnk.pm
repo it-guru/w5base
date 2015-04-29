@@ -42,20 +42,14 @@ sub new
                 searchable    =>0,
                 htmldetail    =>0,
                 label         =>'LinkID',
-                dataobjattr   =>'screlationm1.ROWID'),
+                dataobjattr   =>SELpref.'screlationm1.ROWID'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'relation name',
                 uppersearch   =>1,
-                dataobjattr   =>"concat(screlationm1.source,".
-                                "concat('-',screlationm1.depend))"),
-
-      new kernel::Field::Text(
-                name          =>'type',
-                label         =>'relation type',
-                uppersearch   =>1,
-                dataobjattr   =>"screlationm1.type"),
+                dataobjattr   =>"concat(".SELpref."screlationm1.source,".
+                                "concat('-',".SELpref."screlationm1.depend))"),
 
       new kernel::Field::MultiDst (
                 name          =>'srcname',
@@ -76,103 +70,125 @@ sub new
                 group         =>'src',
                 label         =>'Source-ID',
                 uppersearch   =>1,
-                dataobjattr   =>'screlationm1.source'),
+                dataobjattr   =>SELpref.'screlationm1.source'),
 
       new kernel::Field::Text(
                 name          =>'srcfilename',
                 group         =>'src',
                 label         =>'Source-filename',
-                dataobjattr   =>'screlationm1.source_filename'),
+                dataobjattr   =>SELpref.'screlationm1.source_filename'),
 
       new kernel::Field::Text(
                 name          =>'srcobj',
                 group         =>'src',
                 label         =>'Source-obj',
-                dataobjattr   =>getObjDecode("screlationm1.source_filename")),
+                dataobjattr   =>getSrcDecode(
+                                  SELpref."screlationm1.source_filename")
+                                ),
 
-##      new kernel::Field::MultiDst (
-##                name          =>'dstname',
-##                group         =>'dst',
-##                label         =>'Destination name',
-##                htmlwidth     =>'200',
-##                htmleditwidth =>'400',
-##                dst           =>['tssm::chm' =>'name',
-##                                 'tssm::inm'=>'name',
-##                                 'tsacinv::system'=>'systemname',
-##                                 'tsacinv::appl'=>'name',
-##                                 'tssm::prm'=>'name'],
-##                dsttypfield   =>'dstobj',
-##                dstidfield    =>'dst'),
+      new kernel::Field::MultiDst (
+                name          =>'dstname',
+                group         =>'dst',
+                label         =>'Destination name',
+                altnamestore  =>'dstraw',
+                htmlwidth     =>'200',
+                dst           =>[
+                                 'tssm::chm' =>'name',
+                                 'tssm::chmtask'=>'name',
+                                 'tssm::inm'=>'name',
+                                 'tssm::dev'=>'fullname',
+                                 'tsacinv::system'=>'systemname',
+                                 'tsacinv::appl'=>'name',
+                                 'tssm::prm'=>'name'
+                                ],
+                dsttypfield   =>'dstsmobj',
+                dstidfield    =>'dstsmid'),
 
       new kernel::Field::Text(
-                name          =>'dst',
+                name          =>'dstraw',
+                selectfix     =>1,
                 group         =>'dst',
-                label         =>'Destination-ID',
-                uppersearch   =>1,
-                sqlorder      =>'NONE',
-                dataobjattr   =>
-                   "decode(substr(dbms_lob.substr(dh_desc,255,1),1,8),'org=TSI|',".
-                   "reverse(".
-                      "substr(substr(reverse(".
-                         "dbms_lob.substr(screlationm1.dh_desc,255,1)".
-                      "),2,20),1,".
-                   "instr(substr(reverse(".
-                      "dbms_lob.substr(screlationm1.dh_desc,255,1)".
-                   "),2,20),'(')-1))  ".
-                   ",screlationm1.depend)"),
+                label         =>'Destination SM Title',
+                dataobjattr   =>SELpref.'screlationm1.depend'),
 
       new kernel::Field::Text(
                 name          =>'dstfilename',
                 group         =>'dst',
-                label         =>'Destination-filename',
-                dataobjattr   =>'screlationm1.depend_filename'),
+                label         =>'Destination SM Filename',
+                dataobjattr   =>SELpref.'screlationm1.depend_filename'),
+
+      new kernel::Field::MultiDst (
+                name          =>'dstamname',
+                group         =>'amdst',
+                label         =>'Destination SACM Item',
+                altnamestore  =>'dstraw',
+                dst           =>[
+                                 'tsacinv::system'=>'fullname',
+                                 'tsacinv::appl'=>'fullname',
+                                 'tsacinv::asset'=>'name',
+                                ],
+                dsttypfield   =>'dstobj',
+                dstidfield    =>'dstid'),
 
       new kernel::Field::Text(
                 name          =>'dstobj',
-                group         =>'dst',
-                label         =>'Destination-obj',
-                dataobjattr   =>getObjDecode("screlationm1.depend_filename")),
+                group         =>'amdst',
+                label         =>'Destination-AMObj',
+                dataobjattr   =>getAMObjDecode(getAMIDfromDesc(),
+                                               getSMIDfromDesc())),
 
       new kernel::Field::Text(
-                name          =>'dstmodel',
-                group         =>'dst',
-                selectfix     =>1,
-                label         =>'Destination-Model',
-                dataobjattr   =>'device2m1dstdev.model'),
+                name          =>'dstid',
+                group         =>'amdst',
+                label         =>'Destination-AMID',
+                dataobjattr   =>getAMIDfromDesc()),
 
-##      new kernel::Field::Boolean(
-##                name          =>'primary',
-##                label         =>'Primary',
-##                markempty     =>1,
-##                dataobjattr   =>"decode(screlationm1.primary_ci,".
-##                                "'true',1,'false',0,NULL)"),
+      new kernel::Field::Text(
+                name          =>'dstsmobj',
+                group         =>'dst',
+                label         =>'Destination-SMObj',
+                dataobjattr   =>getSMObjDecode(getSMIDfromDesc())),
+
+      new kernel::Field::Text(
+                name          =>'dstsmid',
+                group         =>'dst',
+                label         =>'Destination-SMID',
+                dataobjattr   =>getSMIDfromDesc()),
+
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
                 timezone      =>'CET',
                 label         =>'Modification-Date',
-                dataobjattr   =>'screlationm1.sysmodtime'),
+                dataobjattr   =>SELpref.'screlationm1.sysmodtime'),
 
-      new kernel::Field::Textarea(
+      new kernel::Field::Boolean(
+                name          =>'dstvalid',
+                group         =>'status',
+                label         =>'Destination-Valid at insert time',
+                dataobjattr   =>
+                  "decode(".
+                     "substr(dbms_lob.substr(dh_desc),".
+                            "instr(dbms_lob.substr(dh_desc),'\n',1,1)+1,".
+                            "4),".
+                     "'true',1,0)"
+                ),
+
+      new kernel::Field::Text(
                 name          =>'rawdepend',
                 label         =>'raw Depend',
-                dataobjattr   =>'screlationm1.depend'),
-
-      new kernel::Field::Textarea(
-                name          =>'rawtype',
-                label         =>'raw type',
-                dataobjattr   =>'screlationm1.type'),
-
-      new kernel::Field::Textarea(
-                name          =>'rawdstmodel',
-                label         =>'raw dstmodel',
-                dataobjattr   =>'device2m1dstdev.model'),
-
+                dataobjattr   =>SELpref.'screlationm1.depend'),
+#
 #      new kernel::Field::Textarea(
-#                name          =>'description',
-#                label         =>'Description',
-#                dataobjattr   =>'screlationm1.descprgn'),
+#                name          =>'rawdstmodel',
+#                label         =>'raw dstmodel',
+#                dataobjattr   =>'device2m1dstdev.model'),
+#
+      new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>SELpref.'screlationm1.dh_desc'),
    );
    
    $self->{use_distinct}=0;
@@ -181,26 +197,73 @@ sub new
    return($self);
 }
 
+# ACHTUNG: Die Verknüpfungen aus SM heraus sind etwas PERVERS. Innerhalb der
+#          Darwin Web-Oberfläche werden wir mit SM Links arbeiten, d.h. wir
+#          werden versuchen die Links von SM in der Darwin Oberfläche 
+#          nachzubilden (also i.d.R. Links auf tssm::dev).
+#          Um die Verbindung zum Rest der Welt rechnen zu können, brauchen
+#          wir aber noch die Links auf AM (also tsacinv::system, tsacinv::appl)
+#          die dann in dstamobj bzw. dstamid zu finden sein werden.
 
 
-sub getObjDecode
+sub getSMIDfromDesc   # Link ID innerhalb von ServiceManager
+{
+   return("decode(depend_filename,'cm3r',depend,".
+                                 "'cm3t',depend,".
+                 "substr(dbms_lob.substr(dh_desc),1,".
+                 "instr(dbms_lob.substr(dh_desc),chr(10),1,1)-1))");
+}
+
+sub getAMIDfromDesc   # Link ID nach AssetManager
+{
+   return("reverse(substr(reverse(depend),2,".
+          "instr(substr(reverse(depend),2),'(')-1))");
+}
+
+sub getSrcDecode
 {
    my $varname=shift;
-   return("decode($varname,".
-      "'cm3r','tssm::chm',".
-      "'problem','tssm::prm',".
-      "'incidents','tssm::inm',".
-      "'device',".
-       "decode(device2m1dstdev.model,'APPLICATION','tsacinv::appl',".
-       "decode(device2m1dstdev.model,'LOGICAL SYSTEM','tsacinv::system',".
-       "decode(substr(depend,0,4),'APPL','tsacinv::appl',".
-       "decode(substr(depend,0,3),'GER','tsacinv::appl',".
-       "decode(substr(depend,0,1),'A','tsacinv::asset',".
-       "decode(substr(depend,0,1),'S','tsacinv::system',".
-         "decode(instr(depend,'|cit=amTsiCustAppl|'),0,".
-         "decode(instr(depend,'|cit=amPortfolio|'),0,NULL,".
-         "'tsacinv::system'),'tsacinv::appl')".
-       ")))))))");
+   return("decode($varname,'cm3r','tssm::chm',".
+                          "'problem','tssm::prm',".
+                          "'incidents','tssm::inm'".
+          ")");
+}
+
+sub getSMObjDecode
+{
+   my $varname=shift;
+   return(
+       "decode(depend_filename,'cm3r','tssm::chm',".
+                              "'cm3t','tssm::chmtask',".
+          "decode(substr($varname,0,1),'S','tsacinv::system',".
+                                      "'T','tssm::chmtask',".
+                                      "'A','tsacinv::appl',".
+             "decode(substr($varname,0,4),".
+                "'org=','tssm::dev')))");
+}
+
+sub isQualityCheckValid
+{
+   return(0);
+}
+
+
+sub getAMObjDecode
+{
+   my $depend=shift;
+   my $smid=shift;
+
+   return(
+       "decode(depend_filename,'cm3r',NULL,".
+                              "'cm3t',NULL,".
+          "decode(instr($smid,'|struct=table|cit=amTsiCustAppl|'),0,".
+               "decode(substr($depend,0,4),'SGER','tsacinv::system',".
+                                           "'APPL','tsacinv::appl',".
+                  "decode(substr($depend,0,1),".
+                     "'A','tsacinv::asset',".
+                     "'S','tsacinv::system')),".
+          "'tsacinv::appl')".
+       ")");
 }
 
 
@@ -218,7 +281,7 @@ sub Initialize
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),qw(src dst status));
+   return($self->SUPER::getDetailBlockPriority(@_),qw(src dst amdst status));
 }
 
 sub isViewValid
@@ -239,16 +302,16 @@ sub isWriteValid
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dh_screlationm1 screlationm1,dh_device2m1 device2m1dstdev";
+   my $from=TABpref."screlationm1 ".SELpref."screlationm1";
    return($from);
 }
 
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="screlationm1.depend=device2m1dstdev.id(+)";
-   return($where);
-}
+#sub initSqlWhere
+#{
+#   my $self=shift;
+#   my $where="screlationm1.depend=device2m1dstdev.id(+)";
+#   return($where);
+#}
 
 
 1;

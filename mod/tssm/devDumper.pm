@@ -23,6 +23,8 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::Field::DataDump;
+use tssm::lib::io;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new

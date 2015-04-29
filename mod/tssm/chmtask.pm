@@ -113,48 +113,53 @@ sub new
                 sqlorder      =>'NONE',
                 dataobjattr   =>SELpref.'cm3tm1.description'),
 
-#      new kernel::Field::SubList(
-#                name          =>'relations',
-#                label         =>'Relations',
-#                group         =>'relations',
-#                vjointo       =>'tssm::lnk',
-#                vjoinon       =>['tasknumber'=>'src'],
-#                vjoininhash   =>['dst','dstobj'],
-#                vjoindisp     =>[qw(dst dstname)]),
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'Relations',
+                group         =>'relations',
+                vjointo       =>'tssm::lnk',
+                vjoinon       =>['tasknumber'=>'src'],
+                vjoininhash   =>['dstname','dstobj'],
+                vjoindisp     =>[qw(dst dstname)]),
 
 
-## Work-Start und Work-End an Tasks scheint weggefallen zu sein.
-##      new kernel::Field::Date(
-##                name          =>'workstart',
-##                timezone      =>'CET',
-##                label         =>'Work Start',
-##                dataobjattr   =>'cm3tm1.work_start'),
-##
-##      new kernel::Field::Date(
-##                name          =>'workend',
-##                timezone      =>'CET',
-##                label         =>'Work End',
-##                dataobjattr   =>'cm3tm1.work_end'),
+      new kernel::Field::Date(
+                name          =>'workstart',
+                timezone      =>'CET',
+                label         =>'Work Start',
+                dataobjattr   =>SELpref.'cm3tm1.work_start'),
+
+      new kernel::Field::Date(
+                name          =>'workend',
+                timezone      =>'CET',
+                label         =>'Work End',
+                dataobjattr   =>SELpref.'cm3tm1.work_end'),
 
       new kernel::Field::Text(
                 name          =>'assignedto',
                 label         =>'Assigned to',
                 group         =>'contact',
                 ignorecase    =>1,
-                dataobjattr   =>SELpref.'cm3tm1.assign_dep'),
+                weblinkto     =>'tssm::group',
+                weblinkon     =>['assignedto'=>'fullname'],
+                dataobjattr   =>SELpref.'cm3tm1.assign_dept'),
 
-#      new kernel::Field::Text(
-#                name          =>'implementer',
-#                label         =>'Implementer',
-#                group         =>'contact',
-#                ignorecase    =>1,
-#                dataobjattr   =>'cm3tm1.assign_firstname'),
-#
-#      new kernel::Field::Text(
-#                name          =>'editor',
-#                group         =>'status',
-#                label         =>'Editor',
-#                dataobjattr   =>'cm3tm1.sysmoduser'),
+      new kernel::Field::Text(
+                name          =>'implementer',
+                label         =>'Implementer',
+                group         =>'contact',
+                ignorecase    =>1,
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['implementer'=>'loginname'],
+                dataobjattr   =>SELpref.'cm3tm1.assigned_to'),
+
+      new kernel::Field::Text(
+                name          =>'editor',
+                group         =>'status',
+                label         =>'Editor',
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['implementer'=>'loginname'],
+                dataobjattr   =>SELpref.'cm3tm1.sysmoduser'),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',

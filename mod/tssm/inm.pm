@@ -384,13 +384,18 @@ sub getSqlFrom
    return($from);
 }
 
+
 sub initSqlWhere
 {
    my $self=shift;
-   #my $where="probsummarym1.last='t'";
-   my $where="";
+   my $where;
+   #if ($ENV{REMOTE_USER} ne "dummy/admin"){
+      $where=SELpref."probsummarym1.tsi_mandant in (".
+         join(",",map({"'".$_."'"} MandantenRestriction())).")";
+   #}
    return($where);
 }
+
 
 sub isViewValid
 {

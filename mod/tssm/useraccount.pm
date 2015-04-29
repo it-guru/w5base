@@ -123,7 +123,7 @@ sub new
 
                                                    
    );
-   $self->setDefaultView(qw(loginname email));
+   $self->setDefaultView(qw(loginname email username));
    return($self);
 }
 
@@ -137,6 +137,23 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+
+   my $userid=$self->getCurrentUserId();
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(posix));
+   if (defined($urec) && $urec->{posix} ne ""){
+      if (!defined(Query->Param("search_loginname"))){
+        Query->Param("search_loginname"=>$urec->{posix});
+      }
+   }
+}
+
+
 
 sub getRecordImageUrl
 {

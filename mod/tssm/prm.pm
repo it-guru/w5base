@@ -339,8 +339,8 @@ sub initSearchQuery
 {
    my $self=shift;
 
-   if (!defined(Query->Param("search_sysmodtime"))){
-      Query->Param("search_sysmodtime"=>'>now-7d');
+   if (!defined(Query->Param("search_status"))){
+      Query->Param("search_status"=>'!Closed');
    }
 }
 
@@ -374,9 +374,14 @@ sub getSqlFrom
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="";
+   my $where;
+   #if ($ENV{REMOTE_USER} ne "dummy/admin"){
+      $where=SELpref."rootcausem1.tsi_mandant in (".
+         join(",",map({"'".$_."'"} MandantenRestriction())).")";
+   #}
    return($where);
 }
+
 
 sub isViewValid
 {

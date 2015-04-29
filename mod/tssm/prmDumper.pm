@@ -23,6 +23,8 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::Field::DataDump;
+use tssm::lib::io;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -45,18 +47,18 @@ sub new
                 label         =>'Problem No.',
                 htmlwidth     =>'20',
                 align         =>'left',
-                dataobjattr   =>'rootcausem1.id'),
+                dataobjattr   =>SELpref.'rootcausem1.id'),
 
       new kernel::Field::DataDump(
                 name          =>'fulldump',
                 depend        =>['changenumber'],
                 label         =>'DataDump',
                 sqldepend     =>[
-                   'dh_rootcausem1'=>{
+                   TABpref.'rootcausem1'=>{
                        dbname=>'tssm',
                        joinon=>['problemnumber'=>'id'] 
                    },
-                   'dh_screlationm1'=>{
+                   TABpref.'screlationm1'=>{
                        dbname=>'tssm',
                        joinon=>['problemnumber'=>'source'] 
                    }

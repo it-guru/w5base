@@ -63,11 +63,12 @@ sub getDetailBlockPriority                # posibility to change the block order
 sub initSqlWhere
 {
    my $self=shift;
-   my $where=$self->SUPER::initSqlWhere() .
-             "AND screlationm1.depend_filename IN".
-             " ('problem','rootcause','cm3r')";
+   my $where=$self->SUPER::initSqlWhere();
+   $where="($where) AND " if ($where ne "");
+   $where.="depend_filename IN ('problem','rootcause','cm3r')";
    return($where);
 }
+
 
 
 1;

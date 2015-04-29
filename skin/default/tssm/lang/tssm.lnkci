@@ -1,5 +1,5 @@
-'tssm::lnkci'       =>{de=>'SC Change - Configuration Item',
-                       en=>'SC Change - Configuration Item'},
+'tssm::lnkci'       =>{de=>'SM Change - Configuration Item - Relation',
+                       en=>'SM Change - Configuration Item - Relation'},
 'fieldgroup.src'    =>{de=>'Quelle',en=>'Source'},
 'fieldgroup.dst'    =>{de=>'Device',en=>'Device'},
 'fieldgroup.w5base' =>{de=>'zusätzliche Daten (W5Base)',

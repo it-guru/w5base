@@ -209,6 +209,27 @@ sub isQualityCheckValid
 }
 
 
+sub initSearchQuery
+{
+   my $self=shift;
+
+   my $userid=$self->getCurrentUserId();
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$user->getOnlyFirst(qw(posix));
+   if (defined($urec) && $urec->{posix} ne ""){
+      if (!defined(Query->Param("search_loginname"))){
+        Query->Param("search_loginname"=>$urec->{posix});
+      }
+   }
+   if (!defined(Query->Param("search_islogonuser"))){
+     Query->Param("search_islogonuser"=>$self->T("yes"));
+   }
+}
+
+
+
+
 sub mkFullname
 {
    my $self=shift;
@@ -301,16 +322,6 @@ sub getDetailBlockPriority
    my $grp=shift;
    my %param=@_;
    return("header","default","account","groups","source");
-}
-
-
-sub initSearchQuery
-{
-   my $self=shift;
-
-   if (!defined(Query->Param("search_islogonuser"))){
-     Query->Param("search_islogonuser"=>$self->T("yes"));
-   }
 }
 
 

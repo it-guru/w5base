@@ -55,17 +55,9 @@ sub Init
                       "tssm::lnk",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itu.sm.change.software",
-                      "tssm::chm_software",
-                      defaultacl=>['valid_user']);
-   
    $self->RegisterObj("itu.sm.change.device",
                       "tssm::chm_device",
                       defaultacl=>['admin',"support"]);
-   
-   $self->RegisterObj("itu.sm.change.timing",
-                      "tssm::chm_timingcheck",
-                      defaultacl=>['admin']);
    
    $self->RegisterObj("itu.sm.incident",
                       "tssm::inm",
@@ -92,25 +84,25 @@ sub Init
                       prio=>2000,
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.sm.krn.group.lnkuser",
-                      "tssm::lnkusergroup",
-                      defaultacl=>['admin']);
+   $self->RegisterObj("itu.sm.krn.user",
+                      "tssm::user",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.sm.krn.user.account",
+                      "tssm::useraccount",
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("itu.sm.krn.group",
                       "tssm::group",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.sm.krn.location",
-                      "tssm::location",
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itu.sm.krn.user",
-                      "tssm::user",
-                      defaultacl=>['valid_user']);
+   $self->RegisterObj("itu.sm.krn.group.lnkuser",
+                      "tssm::lnkusergroup",
+                      defaultacl=>['admin']);
 
    $self->RegisterObj("itu.sm.krn.dev",
                       "tssm::dev",
-                      defaultacl=>['valid_user']);
+                      defaultacl=>['admin']);
 
    $self->RegisterObj("itu.sm.krn.user.lnkgroup",
                       "tssm::lnkusergroup",

@@ -137,17 +137,6 @@ sub new
 ##                dataobjattr   =>'cm3rm1.project'),
 
 #      new kernel::Field::SubList(
-#                name          =>'software',
-#                label         =>'Software (deprecated)',
-#                group         =>'software',
-#                htmlwidth     =>'300px',
-#                htmldetail    =>0,
-#                searchable    =>0,
-#                vjointo       =>'tssm::chm_software',
-#                vjoinon       =>['changenumber'=>'changenumber'],
-#                vjoindisp     =>[qw(name)]),
-#
-#      new kernel::Field::SubList(
 #                name          =>'device',
 #                label         =>'Device (deprecated)',
 #                group         =>'device',
@@ -163,6 +152,16 @@ sub new
                 name          =>'modelid',
                 label         =>'Model ID',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_referenced_model'),
+
+      new kernel::Field::Text(
+                name          =>'mandant',
+                label         =>'ServiceManager Mandant',
+                dataobjattr   =>SELpref.'cm3rm1.tsi_mandant_name'),
+
+      new kernel::Field::Text(
+                name          =>'mandantid',
+                label         =>'ServiceManager Mandant ID',
+                dataobjattr   =>SELpref.'cm3rm1.tsi_mandant'),
 
 #      new kernel::Field::SubList(
 #                name          =>'approvalsreq',
@@ -588,12 +587,13 @@ sub new
        new kernel::Field::SubList(
                 name          =>'relations',
                 label         =>'Relations',
-                XXXuivisible     =>0,
+                uivisible     =>0,
+                searchable    =>0,
                 group         =>'relations',
                 vjointo       =>'tssm::lnk',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoininhash   =>['dst','dstobj','primary'],
-                vjoindisp     =>[qw(dst dstname primary)]),
+                vjoininhash   =>[qw(dstsmobj dstsmid dstid dstobj dstname)],
+                vjoindisp     =>[qw(dstname)]),
 
       new kernel::Field::SubList(
                 name          =>'configitems',
@@ -622,14 +622,6 @@ sub new
                 label         =>'Editor',
                 dataobjattr   =>SELpref.'cm3rm1.sysmoduser'),
 
-##      new kernel::Field::Text(  # notwendig, solange noch das NotifyINetwork
-##                name          =>'addgrp', # verfahren verwendet wird.
-##                sqlorder      =>"none",
-##                group         =>'contact',
-##                htmldetail    =>0,
-##                label         =>'Additional Groups',
-##                dataobjattr   =>'cm3rm1.additional_groups'),
-
       new kernel::Field::QualityOk(
                 uivisible     =>\&showQualityFields),
 
@@ -657,14 +649,14 @@ sub initSearchQuery
    my $self=shift;
    my $nowlabel=$self->T("now","kernel::App");
 
-#   if (!defined(Query->Param("search_plannedend"))){
-#     Query->Param("search_plannedend"=>">$nowlabel-1d AND <$nowlabel+14d");
-#   }
-
-   if (!defined(Query->Param("search_changenumber"))){
-     Query->Param("search_changenumber"=>"C000191883 C000146354 ".
-                                         "C000222842 C000188772");
+   if (!defined(Query->Param("search_plannedend"))){
+     Query->Param("search_plannedend"=>">$nowlabel-1d AND <$nowlabel+14d");
    }
+
+#   if (!defined(Query->Param("search_changenumber"))){
+#     Query->Param("search_changenumber"=>"C000191883 C000146354 C000002274 ".
+#                                         "C000222842 C000188772");
+#   }
 
 }
 
@@ -706,50 +698,50 @@ sub SetFilterForQualityCheck
 
 
 
-sub SecureSetFilter
-{
-   my $self=shift;
-   my @flt=@_;
-  
-   my @chmfilter; 
-   if (!$self->IsMemberOf("admin")){
-      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"direct");
-      my $MandatorCache=$self->Cache->{Mandator}->{Cache};
-      foreach my $grpid (@mandators){
-         if (defined($MandatorCache->{grpid}->{$grpid})){
-            my $mc=$MandatorCache->{grpid}->{$grpid};
-            if (defined($mc->{additional}) &&
-                ref($mc->{additional}->{tssmchmfilter}) eq "ARRAY"){
-               push(@chmfilter,@{$mc->{additional}->{tssmchmfilter}});
-            }
-         }
-      }
-      @chmfilter=grep(!/^\s*$/,@chmfilter);
-      my $chmfilter=join(" or ",@chmfilter);
-      @chmfilter=();
-      if (!(@chmfilter=$self->StringToFilter($chmfilter))){
-         $self->LastMsg(ERROR,"none or invalid mandator base filter '\%s'",
-                        $chmfilter);
-         return(undef);
-      }
-      my $userid=$self->getCurrentUserId();
-      my $user=getModuleObject($self->Config,"base::user");
-      $user->SetFilter({userid=>\$userid});
-      my ($urec,$msg)=$user->getOnlyFirst(qw(posix));
-      if (defined($urec) && $urec->{posix} ne ""){
-         my $usr=uc($urec->{posix});
-         push(@chmfilter,{requestedby=>\$usr});
-         push(@chmfilter,{implementor=>\$usr});
-         push(@chmfilter,{coordinator=>\$usr});
-         push(@chmfilter,{editor=>\$usr});
-      }
-      # ensure, that undefined mandators results to empty result
-      @chmfilter=("rawlocation"=>\'InvalidMandator') if ($#chmfilter==-1);
-      #msg(INFO,"chm mandator filter=%s\n",Dumper(\@chmfilter));
-      $self->SetNamedFilter("MandatorFilter",\@chmfilter);
-   }
-   return($self->SUPER::SecureSetFilter(@flt));
-}
+#sub SecureSetFilter
+#{
+#   my $self=shift;
+#   my @flt=@_;
+#  
+#   my @chmfilter; 
+#   if (!$self->IsMemberOf("admin")){
+#      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"direct");
+#      my $MandatorCache=$self->Cache->{Mandator}->{Cache};
+#      foreach my $grpid (@mandators){
+#         if (defined($MandatorCache->{grpid}->{$grpid})){
+#            my $mc=$MandatorCache->{grpid}->{$grpid};
+#            if (defined($mc->{additional}) &&
+#                ref($mc->{additional}->{tssmchmfilter}) eq "ARRAY"){
+#               push(@chmfilter,@{$mc->{additional}->{tssmchmfilter}});
+#            }
+#         }
+#      }
+#      @chmfilter=grep(!/^\s*$/,@chmfilter);
+#      my $chmfilter=join(" or ",@chmfilter);
+#      @chmfilter=();
+#      if (!(@chmfilter=$self->StringToFilter($chmfilter))){
+#         $self->LastMsg(ERROR,"none or invalid mandator base filter '\%s'",
+#                        $chmfilter);
+#         return(undef);
+#      }
+#      my $userid=$self->getCurrentUserId();
+#      my $user=getModuleObject($self->Config,"base::user");
+#      $user->SetFilter({userid=>\$userid});
+#      my ($urec,$msg)=$user->getOnlyFirst(qw(posix));
+#      if (defined($urec) && $urec->{posix} ne ""){
+#         my $usr=uc($urec->{posix});
+#         push(@chmfilter,{requestedby=>\$usr});
+#         push(@chmfilter,{implementor=>\$usr});
+#         push(@chmfilter,{coordinator=>\$usr});
+#         push(@chmfilter,{editor=>\$usr});
+#      }
+#      # ensure, that undefined mandators results to empty result
+#      @chmfilter=("rawlocation"=>\'InvalidMandator') if ($#chmfilter==-1);
+#      #msg(INFO,"chm mandator filter=%s\n",Dumper(\@chmfilter));
+#      $self->SetNamedFilter("MandatorFilter",\@chmfilter);
+#   }
+#   return($self->SUPER::SecureSetFilter(@flt));
+#}
 
 
 sub getDetailBlockPriority                # posibility to change the block order
@@ -774,14 +766,16 @@ sub getSqlFrom
    return($from);
 }
 
-#sub initSqlWhere
-#{
-#   my $self=shift;
-#   my $where="cm3rm1.numberprgn=cm3rm1.numberprgn and ".
-#             "(cm3rm1.lastprgn='t' or cm3rm1.lastprgn is null) ".
-#             "and cm3rm1.numberprgn=cm3ra43.numberprgn(+)";
-#   return($where);
-#}
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where;
+   #if ($ENV{REMOTE_USER} ne "dummy/admin"){
+      $where=SELpref."cm3rm1.tsi_mandant in (".
+         join(",",map({"'".$_."'"} MandantenRestriction())).")";
+   #}
+   return($where);
+}
 
 sub SetFilter
 {
@@ -818,7 +812,7 @@ sub isViewValid
    }
    if ($st ne "closed" && $st ne "rejected" && $st ne "resolved"){
       return(qw(contact default tickets configitems relations qc
-                status header software device tasks approvals downtimesum));
+                status header device tasks approvals downtimesum));
    }
    return("ALL");
 }

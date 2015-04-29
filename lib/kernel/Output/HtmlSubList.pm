@@ -167,7 +167,13 @@ EOF
          $style.="width:$field->{htmlwidth};";
       }
       $displayname="&nbsp;" if ($displayname eq "");
-      $d.="<th class=subheadfield style=\"$style\">".$displayname."</th>";
+      my $nowrap="";
+      if (defined($field->{nowrap}) && $field->{nowrap}==1){
+         $style.="white-space:nowrap;";
+         $nowrap=" nowrap";
+      }
+      $d.="<th class=subheadfield style=\"$style;$nowrap\">".
+          $displayname."</th>";
    }
    $d.="</tr></thead>\n<tbody>\n";
    return($d);

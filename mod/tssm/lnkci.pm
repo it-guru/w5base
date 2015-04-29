@@ -20,6 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use tssm::lnk;
+use tssm::lib::io;
+
 @ISA=qw(tssm::lnk);
 
 sub new
@@ -32,13 +34,8 @@ sub new
       new kernel::Field::Text (
                 name          =>'descname',
                 label         =>'Name',
-                depend        =>['description'],
                 htmlwidth     =>'200px',
-                onRawValue    =>sub {
-                    my $self   =shift;
-                    my $current=shift;
-                    return(split("\n",$current->{description}))[4];
-                 }),
+                dataobjattr   =>SELpref.'screlationm1.depend'),
 
       new kernel::Field::Text (
                 name          =>'dstcriticality',
@@ -49,44 +46,67 @@ sub new
                 onRawValue    =>sub {
                     my $self   =shift;
                     my $current=shift;
-                    my $criticality=(split("\n",$current->{description}))[0];
-                    return lc $criticality;
+                    my @desc=split("\n",$current->{description});
+                    my $criticality=$desc[3];
+                    if (uc($criticality) eq "N/A"){
+                       $criticality=undef;
+                    }
+                    return(lc($criticality));
                  }),
 
-#      new kernel::Field::Boolean(
-#                name          =>'civalid',
-#                group         =>'dst',
-#                label         =>'Valid',
-#                translation   =>'tssm::lnk',
-#                htmlwidth     =>'50',
-#                dataobjattr   =>"decode(".
-#                                "screlationm1.valid_ci,'t',1,'f',0,NULL)"),
-
-      new kernel::Field::Boolean(
-                name          =>'civalid',
+      new kernel::Field::Text (
+                name          =>'dstmodel',
                 group         =>'dst',
-                label         =>'Valid',
-                translation   =>'tssm::lnk',
-                htmlwidth     =>'50',
-                dataobjattr   =>"'0'"),
+                label         =>'Destination-Model',
+                htmlwidth     =>'80',
+                depend        =>['description'],
+                onRawValue    =>sub {
+                    my $self   =shift;
+                    my $current=shift;
+                    my @desc=split("\n",$current->{description});
+                    my $dstmodel=$desc[4];
+                    if ($dstmodel eq "" || uc($dstmodel) eq "N/A"){
+                       $dstmodel="unknown";
+                    }
+                    return(lc($dstmodel));
+                 }),
 
       new kernel::Field::Text (
                 name          =>'dststatus',
                 group         =>'dst',
                 label         =>'Status',
                 htmlwidth     =>'100',
+                nowrap        =>1,
                 depend        =>['description'],
                 onRawValue    =>sub {
                     my $self   =shift;
                     my $current=shift;
-                    my $status = (split("\n",$current->{description}))[2];
-                    return lc $status;
+                    my @desc=split("\n",$current->{description});
+                    my $status=$desc[2];
+                    if ($status eq "" || uc($status) eq "N/A"){
+                       $status="";
+                    }
+                    return(lc($status));
                  }),
+
+      new kernel::Field::Boolean(
+                name          =>'civalid',
+                group         =>'dst',
+                label         =>'Valid',
+                translation   =>'tssc::lnk',
+                nowrap        =>1,
+                dataobjattr   =>
+                  "decode(".
+                     "substr(dbms_lob.substr(dh_desc),".
+                            "instr(dbms_lob.substr(dh_desc),'\n',1,1)+1,".
+                            "4),".
+                     "'true',1,0)"
+                ),
 
       new kernel::Field::Textarea(
                 name          =>'furtherciinfo',
                 label         =>'further ci informations',
-                depend        =>['dst','dstobj'],
+                depend        =>['dstobj','dstid'],
                 weblinkto     =>sub{
                     my $self   =shift;
                     my $d      =shift;
@@ -94,17 +114,17 @@ sub new
                     my $p=$self->getParent();
 
                     my $dstobj=$p->getField("dstobj")->RawValue($current);
-                    my $dst=$p->getField("dst")->RawValue($current);
+                    my $dst=$p->getField("dstid")->RawValue($current);
 
                     my $weblinkto=undef;
                     my $weblinkon=undef;
                     if ($dstobj eq "tsacinv::appl"){
                        $weblinkto="itil::appl";   
-                       $weblinkon=['dst'=>'applid'];
+                       $weblinkon=['dstid'=>'applid'];
                     }
                     if ($dstobj eq "tsacinv::system"){
                        $weblinkto="itil::system";   
-                       $weblinkon=['dst'=>'systemid'];
+                       $weblinkon=['dstid'=>'systemid'];
                     }
                     return($weblinkto,$weblinkon);
                 },
@@ -117,18 +137,20 @@ sub new
                    my $d="unknown";
 
                    my $dstobj=$p->getField("dstobj")->RawValue($current);
-                   my $dst=$p->getField("dst")->RawValue($current);
+                   my $dst=$p->getField("dstid")->RawValue($current);
 
                    if ($dstobj eq "tsacinv::appl" && $dst ne ""){
                       my $o=getModuleObject($self->Config,"itil::appl");
                       $o->SetFilter({applid=>\$dst});
                       my ($rec)=$o->getOnlyFirst(qw(mandator opmode));
                       my @v;
-                      foreach my $var (qw(mandator opmode)){
-                         my $fld=$o->getField($var,$rec);
-                         if (defined($fld)){
-                            push(@v,$fld->Label($rec).": ".
-                                    $fld->FormatedDetail($rec));
+                      if (defined($rec)){
+                         foreach my $var (qw(mandator opmode)){
+                            my $fld=$o->getField($var,$rec);
+                            if (defined($fld)){
+                               push(@v,$fld->Label($rec).": ".
+                                       $fld->FormatedDetail($rec));
+                            }
                          }
                       }
                       $d=join("\n",@v);
@@ -167,8 +189,9 @@ sub isQualityCheckValid
 sub initSqlWhere
 {
    my $self=shift;
-   my $where=$self->SUPER::initSqlWhere() .
-             "AND screlationm1.depend_filename='device'";
+   my $where=$self->SUPER::initSqlWhere();
+   $where="($where) AND " if ($where ne "");
+   $where.="depend_filename='device'";
    return($where);
 }
 

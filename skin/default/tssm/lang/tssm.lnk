@@ -1,6 +1,7 @@
 'tssm::lnk'=>{de=>'ServiceManager Verknüpfung',en=>'ServiceManager Relation'},
 'relation name'=>{de=>'Verknüpfungsname'},
 'fieldgroup.status'=>{de=>'Status',en=>'State'},
+'fieldgroup.amdst'=>{de=>'SACM Zielverknüpfung',en=>'SACM Destination Relation'},
 'fieldgroup.src'=>{de=>'Source',en=>'Source'},
 'fieldgroup.dst'=>{de=>'Destination',en=>'Destination'},
 'Description'=>{de=>'Beschreibung'},
