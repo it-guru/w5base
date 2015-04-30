@@ -31,4 +31,26 @@ sub new
    return($self);
 }
 
+
+sub addSRCLinkToFacility
+{
+   my $self=shift;
+   my $d=shift;
+   my $current=shift;
+
+   if ($d ne ""){
+      if (defined($current->{srcsys}) &&
+          $current->{srcsys} eq "tssc::event::scchange"){
+         return("tssc::chm",['srcid'=>'changenumber']);
+      }
+      if (defined($current->{srcsys}) &&
+          $current->{srcsys} eq "tssm::event::smchange"){
+         return("tssm::chm",['srcid'=>'changenumber']);
+      }
+   }
+   return($self->SUPER::addSRCLinkToFacility($d,$current));
+
+}
+
+
 1;
