@@ -88,7 +88,7 @@ sub new
 #                dataobjattr   =>'cm3rm1.change_shortname'), 
 
       new kernel::Field::Text(
-                name          =>'srcid',
+                name          =>'exsrcid',
                 label         =>'Extern Change ID',
                 dataobjattr   =>"decode(".SELpref."cm3rm1.tsi_external_id,
                                         'null',NULL,".
@@ -622,6 +622,30 @@ sub new
                 label         =>'Editor',
                 dataobjattr   =>SELpref.'cm3rm1.sysmoduser'),
 
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>SELpref.
+                                'cm3rm1.tsi_external_main_id'),
+      new kernel::Field::Text(
+                name          =>'srcid',
+                depend        =>[qw(srcsys)],
+                weblinkto     =>sub{
+                   my $self=shift;
+                   my $d=shift;
+                   my $rec=shift;
+                   if ($rec->{srcsys} eq "CSC"){
+                      return("tssc::chm",
+                             ['srcid'=>'changenumber']);
+                   }
+                   return(undef);
+                },
+                group         =>'source',
+                label         =>'Source-ID',
+                dataobjattr   =>SELpref.
+                                'cm3rm1.tsi_external_number'),
+
       new kernel::Field::QualityOk(
                 uivisible     =>\&showQualityFields),
 
@@ -747,9 +771,8 @@ sub SetFilterForQualityCheck
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(status configitems tickets relations approvals
-             tasks downtimesum contact));
+   return(qw(header default status configitems tickets relations approvals
+             tasks downtimesum contact close source));
 }
 
 sub getRecordImageUrl
@@ -810,11 +833,16 @@ sub isViewValid
    if (defined($rec)){
       $st=$rec->{status};
    }
+   my @l=qw(header default status configitems tickets relations approvals
+             tasks downtimesum contact close);
+
    if ($st ne "closed" && $st ne "rejected" && $st ne "resolved"){
-      return(qw(contact default tickets configitems relations qc
-                status header device tasks approvals downtimesum));
+      @l=grep(!/^close$/,@l);
    }
-   return("ALL");
+   if ($rec->{srcsys} ne ""){
+      push(@l,"source");
+   }
+   return(@l);
 }
 
 sub isWriteValid

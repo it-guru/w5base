@@ -162,6 +162,24 @@ sub new
                 dataobjattr   =>
                 "decode(assignmentm1.tsi_chm_flag_reviewer,'t',1,0)"),
 
+      new kernel::Field::Boolean(
+                name          =>'isinmremote',
+                label         =>'is incident remote group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(assignmentm1.tsi_interface_name,NULL,0,1)"),
+
+      new kernel::Field::Boolean(
+                name          =>'ischmremote',
+                label         =>'is change remote group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(assignmentm1.tsi_chm_interface_name,NULL,0,1)"),
+
    );
    $self->setDefaultView(qw(name description));
    return($self);

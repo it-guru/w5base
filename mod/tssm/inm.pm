@@ -282,6 +282,31 @@ sub new
       new kernel::Field::Text(
                 name          =>'page',
                 dataobjattr   =>SELpref.'probsummarym1.page'),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>SELpref.
+                                'probsummarym1.tsi_ext_backbone_creator_sys'),
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-ID',
+                depend        =>[qw(srcsys)],
+                weblinkto     =>sub{
+                   my $self=shift;
+                   my $d=shift;
+                   my $rec=shift;
+                   if ($rec->{srcsys} eq "CSC"){
+                      return("tssc::chm",
+                             ['srcid'=>'changenumber']);
+                   } 
+                   return(undef);
+                },
+                dataobjattr   =>SELpref.
+                                'probsummarym1.tsi_ext_related_ids'),
+
    );
    $self->{use_distinct}=0;
 
@@ -371,7 +396,7 @@ sub Initialize
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),qw(status relations contact));
+   return(qw(header default status relations contact close source));
 }
 
 
@@ -389,10 +414,10 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where;
-   #if ($ENV{REMOTE_USER} ne "dummy/admin"){
+   if ($ENV{REMOTE_USER} ne "dummy/admin"){
       $where=SELpref."probsummarym1.tsi_mandant in (".
          join(",",map({"'".$_."'"} MandantenRestriction())).")";
-   #}
+   }
    return($where);
 }
 
@@ -405,10 +430,12 @@ sub isViewValid
    if (defined($rec)){
       $st=$rec->{status};
    }
-   #if ($st ne "closed" && $st ne "rejected"){
-   #   return(qw(contact default status header software device));
-   #}
-   return("ALL");
+   my @l=qw(header default status relations contact close source);
+
+   if ($rec->{srcsys} ne ""){
+      push(@l,"source");
+   }
+   return(@l);
 }
 
 sub isWriteValid
