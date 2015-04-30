@@ -293,15 +293,15 @@ sub mkProblemStoreRec
    $wfrec{class}=$oldclass;
    if (defined($updateto) && $#{$aids}!=-1 && 
        $oldclass eq "itil::workflow::problem"){
-      $wf->UpdateRecord({class=>'AL_TCom::workflow::problem'},
+      $wf->UpdateRecord({class=>'TS::workflow::problem'},
                         {id=>$updateto});
       #printf STDERR ("WARN: class changed on id $updateto\n");
-      $wfrec{class}='AL_TCom::workflow::problem';
-      $oldclass='AL_TCom::workflow::problem';
+      $wfrec{class}='TS::workflow::problem';
+      $oldclass='TS::workflow::problem';
    }
    if (!defined($updateto)){
       if ($#{$aids}!=-1){
-         $wfrec{class}='AL_TCom::workflow::problem';
+         $wfrec{class}='TS::workflow::problem';
       }
       else{
          $wfrec{class}='itil::workflow::problem';
@@ -346,6 +346,15 @@ sub mkChangeStoreRec
 
    if (ref($tasks) eq "ARRAY"){
       $ServiceManagerTaskCount=$#{$tasks}+1;
+   }
+   if ($rec->{plannedstart} eq "" ||
+       $rec->{plannedend} eq ""){
+      if ($#oldrec!=-1){
+         msg(ERROR,"exeption: change start/end removed on ".
+                   $rec->{changenumber});
+         return(undef);
+      }
+      return(undef);
    }
 
    $wfrec{srcid}=$rec->{changenumber};
@@ -639,7 +648,7 @@ sub mkChangeStoreRec
       $wfrec{step}='itil::workflow::change::extauthority';
    }
    if (!($oldrec[0]->{step}=~m/::postreflection$/) &&
-       $wfrec{class}=~m/^AL_TCom::/){
+       $wfrec{class}=~m/^TS::/){
        if ($rec->{srcid} ne "" && ($rec->{srcid}=~m/IN:[\d,-]+/)){
           my $srcid=$rec->{srcid};
          # $srcid=~s/^IN://i;
@@ -660,31 +669,6 @@ sub mkChangeStoreRec
           if (defined($dd) && defined($dh) && defined($dm)){
              $wt=$dd*24*60+$dh*60+$dm;
           }
-       }
-       if ($#{$aids}!=-1){ 
-          $wfrec{tcomcodrelevant}="yes";
-       }
-       else{
-          $wfrec{tcomcodrelevant}="no";
-       }
-       #$wfrec{tcomcodcontract}=join(", ",@{$wfrec{affectedcontract}});
-       $wfrec{tcomcodcause}="undef";
-       $wfrec{tcomcodchmrisk}=lc($rec->{risk});
-       if ($wfrec{tcomcodchmrisk} eq "risk undefined"){
-          $wfrec{tcomcodchmrisk}=undef;
-       }
-       if ($wfrec{tcomcodchmrisk} eq "" || $wfrec{tcomcodchmrisk} eq "0"){
-          $wfrec{tcomcodchmrisk}="low";
-       }
-       $wfrec{tcomcoddownstart}=$ws;
-       $wfrec{tcomcoddownend}=$we;
-       $wfrec{tcomworktime}=$wt;
-       if ($rec->{tssm_chm_closingcommentsclosingcomments} ne ""){
-          $wfrec{tcomcodcomments}=
-                  $rec->{tssm_chm_closingcommentsclosingcomments};
-       }
-       if (lc($rec->{reason}) ne "cus"){
-          $wfrec{tcomcodcause}="appl.base.base";
        }
    }
    $wfrec{srcload}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
@@ -786,14 +770,14 @@ sub mkIncidentStoreRec
 
    if (defined($updateto) && $#{$aids}!=-1 &&
        $oldclass eq "itil::workflow::incident"){
-      $wf->UpdateRecord({class=>'AL_TCom::workflow::incident'},
+      $wf->UpdateRecord({class=>'TS::workflow::incident'},
                         {id=>$updateto});
       #printf STDERR ("WARN: class incidentd on id $updateto\n");
-      $oldclass='AL_TCom::workflow::incident';
+      $oldclass='TS::workflow::incident';
    }
    if (!defined($updateto)){
       if ($#{$aids}!=-1){
-         $wfrec{class}='AL_TCom::workflow::incident';
+         $wfrec{class}='TS::workflow::incident';
       }
       else{
          $wfrec{class}='itil::workflow::incident';
