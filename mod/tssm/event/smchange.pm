@@ -50,13 +50,13 @@ sub smchange
    my $selfname=$self->Self();
    $self->InitScImportEnviroment();
    my $chm=getModuleObject($self->Config,"tssm::chm");
-   msg(DEBUG,"ServiceCenter chm is connected");
+   msg(DEBUG,"ServiceManager chm is connected");
    $chm->SetCurrentView(qw(sysmodtime closetime changenumber name description 
                            fallback status assignedto
                            plannedstart plannedend srcid device implementor
                            tssm_chm_closingcommentsclosingcomments assignarea
                            workstart workend workduration resolvedby closedby
-                           requestedby editor softwareid software deviceid
+                           requestedby editor relations
                            createtime type resources closecode approved addgrp
                            impact priority reason urgency category risk
                            closecode resolvetime project
@@ -106,7 +106,7 @@ sub smchange
             msg(ERROR,"db record problem: %s",$msg);
             return({exitcode=>2,msg=>$msg});
          }
-         $self->ProcessServiceCenterRecord($selfname,$rec,$chm);
+         $self->ProcessServiceManagerRecord($selfname,$rec,$chm);
          ($rec,$msg)=$chm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);

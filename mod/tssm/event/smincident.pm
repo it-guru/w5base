@@ -49,7 +49,7 @@ sub smincident
    $self->InitScImportEnviroment();
    my $selfname=$self->Self();
    my $inm=getModuleObject($self->Config,"tssm::inm");
-   msg(DEBUG,"ServiceCenter inm is connected");
+   msg(DEBUG,"ServiceManager inm is connected");
    $inm->SetCurrentView(qw(closetime incidentnumber name description status 
                            hassignment iassignment priority causecode reason
                            downtimestart downtimeend opentime 
@@ -93,7 +93,7 @@ sub smincident
             msg(ERROR,"db record problem: %s",$msg);
             return({exitcode=>2,msg=>$msg});
          }
-         $self->ProcessServiceCenterRecord($selfname,$rec,$inm);
+         $self->ProcessServiceManagerRecord($selfname,$rec,$inm);
          ($rec,$msg)=$inm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);

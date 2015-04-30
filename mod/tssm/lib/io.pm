@@ -62,7 +62,7 @@ sub InitScImportEnviroment
 
 
 
-sub ProcessServiceCenterRecord
+sub ProcessServiceManagerRecord
 {
    my $self=shift;
    my $selfname=shift;
@@ -235,17 +235,17 @@ sub mkProblemStoreRec
    $wfrec{stateid}=1;
    $wfrec{stateid}=21 if (lc($rec->{status}) eq "closed");
    $wfrec{additional}={
-      ServiceCenterProblemNumber=>$rec->{problemnumber},
-      ServiceCenterState=>$rec->{status},
-      ServiceCenterAssignedTo=>$rec->{assignedto},
-      ServiceCenterTriggeredBy=>$rec->{triggeredby},
-      ServiceCenterHomeAssignment=>$rec->{homeassignment},
-      ServiceCenterUrgency=>$rec->{urgency},
-      ServiceCenterPriority=>$rec->{priority},
-      ServiceCenterImpact=>$rec->{impact},
-      ServiceCenterSysModTime=>$rec->{sysmodtime},
-      ServiceCenterSoftwareID=>$rec->{softwareid},
-      ServiceCenterCreator=>$rec->{creator},
+      ServiceManagerProblemNumber=>$rec->{problemnumber},
+      ServiceManagerState=>$rec->{status},
+      ServiceManagerAssignedTo=>$rec->{assignedto},
+      ServiceManagerTriggeredBy=>$rec->{triggeredby},
+      ServiceManagerHomeAssignment=>$rec->{homeassignment},
+      ServiceManagerUrgency=>$rec->{urgency},
+      ServiceManagerPriority=>$rec->{priority},
+      ServiceManagerImpact=>$rec->{impact},
+      ServiceManagerSysModTime=>$rec->{sysmodtime},
+      ServiceManagerSoftwareID=>$rec->{softwareid},
+      ServiceManagerCreator=>$rec->{creator},
    };
    if (($rec->{priority}=~m/^\d+$/) &&
        $rec->{priority}>0 && $rec->{priority}<10){
@@ -339,11 +339,11 @@ sub mkChangeStoreRec
       $updateto=$oldrec[0]->{id};
       $oldclass=$oldrec[0]->{class};
    }
-   my $ServiceCenterTaskCount="?";
+   my $ServiceManagerTaskCount="?";
    my $tasks=$rec->{tasks};
 
    if (ref($tasks) eq "ARRAY"){
-      $ServiceCenterTaskCount=$#{$tasks}+1;
+      $ServiceManagerTaskCount=$#{$tasks}+1;
    }
 
    $wfrec{srcid}=$rec->{changenumber};
@@ -368,36 +368,36 @@ sub mkChangeStoreRec
   #    }
   # }
    $wfrec{additional}={
-      ServiceCenterChangeNumber=>$rec->{changenumber},
-      ServiceCenterTaskCount=>$ServiceCenterTaskCount,
-      ServiceCenterState=>$rec->{status},
-      ServiceCenterAssignedTo=>$rec->{assignedto},
-      ServiceCenterRisk=>$rec->{risk},
-      ServiceCenterCategory=>$rec->{category},
-      ServiceCenterUrgency=>$rec->{urgency},
-      ServiceCenterReason=>$rec->{reason},
-      ServiceCenterProject=>$rec->{project},
-      ServiceCenterType=>$rec->{type},
-      ServiceCenterPriority=>$rec->{priority},
-      ServiceCenterImpact=>$rec->{impact},
-      ServiceCenterRequestedBy=>$rec->{requestedby},
-      ServiceCenterSysModTime=>$rec->{sysmodtime},
-      ServiceCenterAssignArea=>$rec->{assignarea},
-      ServiceCenterSoftwareID=>$rec->{softwareid},
-      ServiceCenterWorkStart=>$rec->{workstart},
-      ServiceCenterWorkEnd=>$rec->{workend},
-      ServiceCenterWorkDuration=>$rec->{workduration}
+      ServiceManagerChangeNumber=>$rec->{changenumber},
+      ServiceManagerTaskCount=>$ServiceManagerTaskCount,
+      ServiceManagerState=>$rec->{status},
+      ServiceManagerAssignedTo=>$rec->{assignedto},
+      ServiceManagerRisk=>$rec->{risk},
+      ServiceManagerCategory=>$rec->{category},
+      ServiceManagerUrgency=>$rec->{urgency},
+      ServiceManagerReason=>$rec->{reason},
+      ServiceManagerProject=>$rec->{project},
+      ServiceManagerType=>$rec->{type},
+      ServiceManagerPriority=>$rec->{priority},
+      ServiceManagerImpact=>$rec->{impact},
+      ServiceManagerRequestedBy=>$rec->{requestedby},
+      ServiceManagerSysModTime=>$rec->{sysmodtime},
+     # ServiceManagerAssignArea=>$rec->{assignarea},
+      ServiceManagerSoftwareID=>$rec->{softwareid},
+      ServiceManagerWorkStart=>$rec->{workstart},
+      ServiceManagerWorkEnd=>$rec->{workend},
+      ServiceManagerWorkDuration=>$rec->{workduration}
    };
    msg(DEBUG,"===========================:");
    my $relations;
    my $relationupd=0;
    my $relationupd=1;
    if ($rec->{srcid} ne ""){
-      $wfrec{additional}->{ServiceCenterExternChangeID}=$rec->{srcid};
-      msg(DEBUG,"ServiceCenter ExternChangeID:".$rec->{srcid});
+      $wfrec{additional}->{ServiceManagerExternChangeID}=$rec->{srcid};
+      msg(DEBUG,"ServiceManager ExternChangeID:".$rec->{srcid});
    }
    if ($#oldrec==0){
-      if ($oldrec[0]->{additional}->{ServiceCenterExternChangeID}->[0] ne
+      if ($oldrec[0]->{additional}->{ServiceManagerExternChangeID}->[0] ne
           $rec->{srcid}){
          $relationupd++;
       }
@@ -414,26 +414,26 @@ sub mkChangeStoreRec
    }
 
 
-   if ($wfrec{additional}->{ServiceCenterClosedBy} ne
+   if ($wfrec{additional}->{ServiceManagerClosedBy} ne
        $rec->{closedby}){
-      $wfrec{additional}->{ServiceCenterClosedBy}=$rec->{closedby};
+      $wfrec{additional}->{ServiceManagerClosedBy}=$rec->{closedby};
    }
-   if ($wfrec{additional}->{ServiceCenterCloseCode} ne
+   if ($wfrec{additional}->{ServiceManagerCloseCode} ne
        $rec->{closecode}){
-      $wfrec{additional}->{ServiceCenterCloseCode}=$rec->{closecode};
+      $wfrec{additional}->{ServiceManagerCloseCode}=$rec->{closecode};
    }
-   if ($wfrec{additional}->{ServiceCenterResolveTime} ne
+   if ($wfrec{additional}->{ServiceManagerResolveTime} ne
        $rec->{resolvetime}){
-      $wfrec{additional}->{ServiceCenterResolveTime}=$rec->{resolvetime};
+      $wfrec{additional}->{ServiceManagerResolveTime}=$rec->{resolvetime};
    }
-   if ($wfrec{additional}->{ServiceCenterResolvedBy} ne
+   if ($wfrec{additional}->{ServiceManagerResolvedBy} ne
        $rec->{resolvedby}){
-      $wfrec{additional}->{ServiceCenterResolvedBy}=$rec->{resolvedby};
+      $wfrec{additional}->{ServiceManagerResolvedBy}=$rec->{resolvedby};
    }
 
    $wfrec{owner}=0;
    if (!($rec->{implementor}=~m/^\s*$/)){
-      $wfrec{additional}->{ServiceCenterImplementor}=$rec->{implementor};
+      $wfrec{additional}->{ServiceManagerImplementor}=$rec->{implementor};
       my $implementor=lc($rec->{implementor});
       $self->{user}->ResetFilter();
       $self->{user}->SetFilter({posix=>\$implementor});
@@ -459,10 +459,10 @@ sub mkChangeStoreRec
 
 
    if (!($rec->{coordinator}=~m/^\s*$/)){
-      $wfrec{additional}->{ServiceCenterCoordinator}=$rec->{coordinator};
+      $wfrec{additional}->{ServiceManagerCoordinator}=$rec->{coordinator};
    }
    if (!($rec->{resources}=~m/^\s*$/)){
-      $wfrec{additional}->{ServiceCenterResources}=$rec->{resources};
+      $wfrec{additional}->{ServiceManagerResources}=$rec->{resources};
    }
    $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{plannedstart},
                                                  "en","CET");
@@ -474,7 +474,7 @@ sub mkChangeStoreRec
    $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},
                                                 "en","CET");
    if (!($rec->{closecode}=~m/^\s*$/)){
-      $wfrec{additional}->{ServiceCenterCloseCode}=$rec->{closecode};
+      $wfrec{additional}->{ServiceManagerCloseCode}=$rec->{closecode};
    }
 
    if (lc($rec->{status}) eq "closed"){ # anpassung damit I-Network mappen kan
@@ -608,15 +608,15 @@ sub mkChangeStoreRec
 
    if (defined($updateto) && $#{$aids}!=-1 && 
        $oldclass eq "itil::workflow::change"){
-      $wf->UpdateRecord({class=>'AL_TCom::workflow::change'},
+      $wf->UpdateRecord({class=>'TS::workflow::change'},
                         {id=>$updateto});
       #printf STDERR ("WARN: class changed on id $updateto\n");
-      $wfrec{class}='AL_TCom::workflow::change';
-      $oldclass='AL_TCom::workflow::change';
+      $wfrec{class}='TS::workflow::change';
+      $oldclass='TS::workflow::change';
    }
    if (!defined($updateto)){
       if ($#{$aids}!=-1){
-         $wfrec{class}='AL_TCom::workflow::change';
+         $wfrec{class}='TS::workflow::change';
       }
       else{
          $wfrec{class}='itil::workflow::change';
@@ -689,6 +689,155 @@ sub mkChangeStoreRec
    return(\%wfrec,$updateto,$relations);
 }
 
+sub mkIncidentStoreRec
+{
+   my $self=shift;
+   my $rec=shift;
+   my $wf=shift;
+   my $selfname=shift;
+   my $obj=shift;
+   my $updateto;
+   my $oldclass;
+   my %wfrec=(srcsys=>$selfname);
+   my $app=$self->getParent();
+   $wf->SetFilter({srcsys=>\$selfname,srcid=>\$rec->{incidentnumber}});
+   my @oldrec=$wf->getHashList("id","class","step");
+   if ($#oldrec==0){
+      $updateto=$oldrec[0]->{id};
+      $oldclass=$oldrec[0]->{class};
+   }
+
+   $wfrec{srcid}=$rec->{incidentnumber};
+   $wfrec{name}=$rec->{name};
+   $wfrec{incidentdescription}=$rec->{action};
+   $wfrec{incidentresolution}=$rec->{resolution};
+   $wfrec{stateid}=1;
+   $wfrec{stateid}=17 if ($rec->{status} eq "closed");
+   $wfrec{additional}={
+      ServiceManagerIncidentNumber=>$rec->{incidentnumber},
+      ServiceManagerState=>$rec->{status},
+      ServiceManagerReason=>$rec->{reason},
+      ServiceManagerPriority=>$rec->{priority},
+      ServiceManagerHomeAssignment=>$rec->{hassignment},
+      ServiceManagerInitialAssignment=>$rec->{iassignment},
+      ServiceManagerResolvedAssignment=>$rec->{rassignment},
+      ServiceManagerSysModTime=>$rec->{sysmodtime},
+      ServiceManagerReportedBy=>$rec->{reportedby},
+      ServiceManagerInvolvedAssignment=>$rec->{involvedassignment},
+      ServiceManagerSoftwareID=>$rec->{softwareid},
+      ServiceManagerDowntimeStart=>$rec->{downtimestart},
+      ServiceManagerDowntimeEnd=>$rec->{downtimeend},
+   };
+   if (($rec->{priority}=~m/^\d+$/) &&
+       $rec->{priority}>0 && $rec->{priority}<10){
+      $wfrec{prio}=int($rec->{priority});
+   }
+   if (!($rec->{deviceid}=~m/^\s*$/)){
+      $wfrec{additional}->{ServiceManagerDeviceID}=$rec->{deviceid};
+   }
+   if (!($rec->{causecode}=~m/^\s*$/)){
+      $wfrec{additional}->{ServiceManagerCauseCode}=$rec->{causecode};
+   }
+   if (!($rec->{workstart}=~m/^\s*$/)){
+      $wfrec{additional}->{ServiceManagerWorkStart}=$rec->{workstart};
+   }
+   if (!($rec->{workend}=~m/^\s*$/)){
+      $wfrec{additional}->{ServiceManagerWorkEnd}=$rec->{workend};
+   }
+   $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{downtimestart},"en","CET");
+   my $downtimeend=$rec->{downtimeend};
+   $downtimeend=$rec->{downtimestart} if (!defined($downtimeend) ||
+                                          $downtimeend eq "");
+   $wfrec{eventend}=$app->ExpandTimeExpression($downtimeend,"en","CET");
+   $wfrec{mdate}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
+   $wfrec{createdate}=$app->ExpandTimeExpression($rec->{opentime},"en","CET");
+   $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},"en","CET");
+   #$rec->{softwareid}="CMDB" if ($rec->{incidentnumber} eq "GER03733409");
+
+   $wfrec{openuser}=undef;
+   $wfrec{openusername}=undef;
+   if ($rec->{reportedby}=~m/^[a-z0-9_-]{1,8}$/i){
+      $wfrec{openusername}="wiw/".lc($rec->{reportedby});
+      $self->{user}->SetFilter({posix=>\$rec->{reportedby}});
+      my $userid=$self->{user}->getVal("userid");
+      $wfrec{openuser}=$userid if (defined($userid));
+   }
+
+   my ($system,$systemid,
+       $anames,$aids,$primanames,$primaids,
+       $contrnames,$contrids,$contrmods,$mandator,$mandatorid,
+       $costcenter,$customername,$responseteam,$businessteam)=
+                        $self->extractAffectedApplication($rec);
+   $wfrec{affectedsystemid}=$systemid;
+   $wfrec{affectedsystem}=$system;
+   $wfrec{affectedapplicationid}=$aids;
+   $wfrec{affectedapplication}=$anames;
+   $wfrec{affectedcontractid}=$contrids;
+   $wfrec{customercontractmod}=$contrmods;
+   $wfrec{affectedcontract}=$contrnames;
+   $wfrec{involvedresponseteam}=$responseteam;
+   $wfrec{involvedbusinessteam}=$businessteam;
+   $wfrec{involvedcustomer}=$customername;
+   $wfrec{involvedcostcenter}=$costcenter;
+   $wfrec{mandator}=$mandator;
+   $wfrec{mandatorid}=$mandatorid;
+
+   if (defined($updateto) && $#{$aids}!=-1 &&
+       $oldclass eq "itil::workflow::incident"){
+      $wf->UpdateRecord({class=>'AL_TCom::workflow::incident'},
+                        {id=>$updateto});
+      #printf STDERR ("WARN: class incidentd on id $updateto\n");
+      $oldclass='AL_TCom::workflow::incident';
+   }
+   if (!defined($updateto)){
+      if ($#{$aids}!=-1){
+         $wfrec{class}='AL_TCom::workflow::incident';
+      }
+      else{
+         $wfrec{class}='itil::workflow::incident';
+      }
+      $wfrec{step}='itil::workflow::incident::extauthority';
+   }
+   if ($oldclass eq "itil::workflow::incident" ||
+       (defined($wfrec{class}) && 
+        ($wfrec{class}=~m/itil::workflow::incident/))){
+      $wfrec{stateid}=21;           # non AL DTAG is automaticly finished
+      # sollte jetzt auch mit sofort beenden funktionieren
+   }
+   if (!defined($oldrec[0]) || !($oldrec[0]->{step}=~m/::postreflection$/)){
+       my $ws=$app->ExpandTimeExpression($rec->{workstart},"en","CET");
+       my $we=$app->ExpandTimeExpression($rec->{workend},"en","CET");
+       my $wt=0;
+       if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$ws=~
+              m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
+           (my ($weY,$weM,$weD,$weh,$wem,$wes)=$we=~
+              m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
+          my ($dd,$dh,$dm,$ds);
+          eval('($dd,$dh,$dm,$ds)=Delta_DHMS("CET",$wsY,$wsM,$wsD,$wsh,$wsm,$wss,
+                                             $weY,$weM,$weD,$weh,$wem,$wes);
+               ');
+          if (defined($dd) && defined($dh) && defined($dm)){
+             $wt=$dd*24*60+$dh*60+$dm;
+          }
+       }
+       if ($#{$aids}!=-1){ 
+          $wfrec{tcomcodrelevant}="yes";
+       }
+       else{
+          $wfrec{tcomcodrelevant}="no";
+       }
+       $wfrec{tcomcodcause}="appl.base.base";
+       $wfrec{tcomworktime}=$wt;
+       if ($rec->{resolution} ne ""){
+          $wfrec{tcomcodcomments}=$rec->{resolution};
+       }
+   }
+
+   $wfrec{srcload}=$app->ExpandTimeExpression($rec->{closetime},"en","CET");
+   return(\%wfrec,$updateto);
+}
+
+
 sub extractAffectedApplication
 {
    my $self=shift;
@@ -735,51 +884,26 @@ sub extractAffectedApplication
    my @chkprimapplid;
    #  pass 1 : softwareid
    my @l1;
-   if (defined($rec->{softwareid})){
-      if (defined($tbreaktime2) && $tbreaktime2>0 && 
-          defined($rec->{changenumber})){
-         msg(INFO,"MODIFIED CHANGE Handling since $breaktime2 !!! ".
-                  "ignoreing softwareid");
-      }
-      else{
-         @l1=split(/[,\s;]+/,$rec->{softwareid});
-      }
-   }
 
    if (defined($rec->{custapplication})){
       push(@l1,split(/[,\s;]+/,$rec->{custapplication}));
    }
 
-
-
-   #  pass 2 : description
    my @l2;
-   if (defined($rec->{device}) && ref($rec->{device}) eq "ARRAY"){
-      foreach my $r (@{$rec->{device}}){
-         if (defined($tbreaktime1) && $tbreaktime1>0){
-            msg(INFO,"MODIFIED CHANGE Handling since $breaktime1 !!! ".
-                     "ignoreing device entries");
-         }
-         else{
-            if (my ($applid)=$r->{name}=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
-               push(@chkapplid,$applid);
-               msg(DEBUG,"add %s by entry in device field",$applid);
-            }
-         }
-      }
-   }
+
+
+
+
+
    
    if (defined($rec->{relations}) && ref($rec->{relations} )eq "ARRAY"){
       foreach my $r (@{$rec->{relations}}){
          if ($r->{dstobj} eq "tsacinv::appl"){
-            push(@chkapplid,$r->{dst});
+            push(@chkapplid,$r->{dstid});
             msg(DEBUG,"add %s by entry in relations table",$r->{dst});
-            if ($r->{primary}=='1'){
-               push(@chkprimapplid,$r->{dst});
-            }
          }
          if ($r->{dstobj} eq "tsacinv::system"){
-            push(@chksystemid,$r->{dst});
+            push(@chksystemid,$r->{dstid});
          }
       }
    }
@@ -788,11 +912,6 @@ sub extractAffectedApplication
    }
    #   pass 3 : affacted Softare
    my @l3;
-   if (defined($rec->{software})){
-      if (ref($rec->{software} eq "ARRAY")){
-         map({$_->{name}} @{$rec->{software}});
-      }
-   }
 
    #  pass 4 : make all unique with ignoring case
    my %u=();
@@ -833,15 +952,14 @@ sub extractAffectedApplication
    msg(DEBUG,"pre deviceid chkapplid=%s",join(",",@chkapplid));
    msg(DEBUG,"pre deviceid chkprimapplid=%s",join(",",@chkprimapplid));
 
-   my $dev=$rec->{deviceid};
-   if (defined($tbreaktime1) && $tbreaktime1>0){
-      $dev=undef;
-      msg(INFO,"MODIFIED CHANGE Handling since $breaktime1 !!! locical_name");
+   my $dev;
+   if (exists($rec->{deviceid})){ # for incident and problem TODO
+      $dev=$rec->{deviceid};
    }
-   if (my ($applid)=$dev=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
-      msg(DEBUG,"ApplicationID=%s",$applid);
-      push(@chkapplid,$applid);
-   }
+   #if (my ($applid)=$dev=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
+   #   msg(DEBUG,"ApplicationID=%s",$applid);
+   #   push(@chkapplid,$applid);
+   #}
    msg(DEBUG,"post deviceid chkapplid=%s",join(",",@chkapplid));
    if ($#chkapplid!=-1){
       $appl->ResetFilter();
@@ -992,186 +1110,6 @@ sub extractAffectedApplication
           \@custcontract,\@custcontractid,\@custcontractmod,
           \@mandator,\@mandatorid,\@costcenter,\@customername,
           \@responseteam,\@businessteam,$truecustomerprio);
-}
-
-
-sub mkIncidentStoreRec
-{
-   my $self=shift;
-   my $rec=shift;
-   my $wf=shift;
-   my $selfname=shift;
-   my $obj=shift;
-   my $updateto;
-   my $oldclass;
-   my %wfrec=(srcsys=>$selfname);
-   my $app=$self->getParent();
-   $wf->SetFilter({srcsys=>\$selfname,srcid=>\$rec->{incidentnumber}});
-   my @oldrec=$wf->getHashList("id","class","step");
-   if ($#oldrec==0){
-      $updateto=$oldrec[0]->{id};
-      $oldclass=$oldrec[0]->{class};
-   }
-
-   $wfrec{srcid}=$rec->{incidentnumber};
-   $wfrec{name}=$rec->{name};
-   $wfrec{incidentdescription}=$rec->{action};
-   $wfrec{incidentresolution}=$rec->{resolution};
-   $wfrec{stateid}=1;
-   $wfrec{stateid}=17 if ($rec->{status} eq "closed");
-   $wfrec{additional}={
-      ServiceCenterIncidentNumber=>$rec->{incidentnumber},
-      ServiceCenterState=>$rec->{status},
-      ServiceCenterReason=>$rec->{reason},
-      ServiceCenterPriority=>$rec->{priority},
-      ServiceCenterHomeAssignment=>$rec->{hassignment},
-      ServiceCenterInitialAssignment=>$rec->{iassignment},
-      ServiceCenterResolvedAssignment=>$rec->{rassignment},
-      ServiceCenterSysModTime=>$rec->{sysmodtime},
-      ServiceCenterReportedBy=>$rec->{reportedby},
-      ServiceCenterInvolvedAssignment=>$rec->{involvedassignment},
-      ServiceCenterSoftwareID=>$rec->{softwareid},
-      ServiceCenterDowntimeStart=>$rec->{downtimestart},
-      ServiceCenterDowntimeEnd=>$rec->{downtimeend},
-   };
-   if (($rec->{priority}=~m/^\d+$/) &&
-       $rec->{priority}>0 && $rec->{priority}<10){
-      $wfrec{prio}=int($rec->{priority});
-   }
-   if (!($rec->{deviceid}=~m/^\s*$/)){
-      $wfrec{additional}->{ServiceCenterDeviceID}=$rec->{deviceid};
-   }
-   if (!($rec->{causecode}=~m/^\s*$/)){
-      $wfrec{additional}->{ServiceCenterCauseCode}=$rec->{causecode};
-   }
-   if (!($rec->{workstart}=~m/^\s*$/)){
-      $wfrec{additional}->{ServiceCenterWorkStart}=$rec->{workstart};
-   }
-   if (!($rec->{workend}=~m/^\s*$/)){
-      $wfrec{additional}->{ServiceCenterWorkEnd}=$rec->{workend};
-   }
-   $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{downtimestart},"en","CET");
-   my $downtimeend=$rec->{downtimeend};
-   $downtimeend=$rec->{downtimestart} if (!defined($downtimeend) ||
-                                          $downtimeend eq "");
-   $wfrec{eventend}=$app->ExpandTimeExpression($downtimeend,"en","CET");
-   $wfrec{mdate}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
-   $wfrec{createdate}=$app->ExpandTimeExpression($rec->{opentime},"en","CET");
-   $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},"en","CET");
-   #$rec->{softwareid}="CMDB" if ($rec->{incidentnumber} eq "GER03733409");
-
-   $wfrec{openuser}=undef;
-   $wfrec{openusername}=undef;
-   if ($rec->{reportedby}=~m/^[a-z0-9_-]{1,8}$/i){
-      $wfrec{openusername}="wiw/".lc($rec->{reportedby});
-      $self->{user}->SetFilter({posix=>\$rec->{reportedby}});
-      my $userid=$self->{user}->getVal("userid");
-      $wfrec{openuser}=$userid if (defined($userid));
-   }
-
-   my ($system,$systemid,
-       $anames,$aids,$primanames,$primaids,
-       $contrnames,$contrids,$contrmods,$mandator,$mandatorid,
-       $costcenter,$customername,$responseteam,$businessteam)=
-                        $self->extractAffectedApplication($rec);
-   $wfrec{affectedsystemid}=$systemid;
-   $wfrec{affectedsystem}=$system;
-   $wfrec{affectedapplicationid}=$aids;
-   $wfrec{affectedapplication}=$anames;
-   $wfrec{affectedcontractid}=$contrids;
-   $wfrec{customercontractmod}=$contrmods;
-   $wfrec{affectedcontract}=$contrnames;
-   $wfrec{involvedresponseteam}=$responseteam;
-   $wfrec{involvedbusinessteam}=$businessteam;
-   $wfrec{involvedcustomer}=$customername;
-   $wfrec{involvedcostcenter}=$costcenter;
-   $wfrec{mandator}=$mandator;
-   $wfrec{mandatorid}=$mandatorid;
-
-   if (defined($updateto) && $#{$aids}!=-1 &&
-       $oldclass eq "itil::workflow::incident"){
-      $wf->UpdateRecord({class=>'AL_TCom::workflow::incident'},
-                        {id=>$updateto});
-      #printf STDERR ("WARN: class incidentd on id $updateto\n");
-      $oldclass='AL_TCom::workflow::incident';
-   }
-   if (!defined($updateto)){
-      if ($#{$aids}!=-1){
-         $wfrec{class}='AL_TCom::workflow::incident';
-      }
-      else{
-         $wfrec{class}='itil::workflow::incident';
-      }
-      $wfrec{step}='itil::workflow::incident::extauthority';
-   }
-   if ($oldclass eq "itil::workflow::incident" ||
-       (defined($wfrec{class}) && 
-        ($wfrec{class}=~m/itil::workflow::incident/))){
-      $wfrec{stateid}=21;           # non AL DTAG is automaticly finished
-      # sollte jetzt auch mit sofort beenden funktionieren
-   }
-   if (!defined($oldrec[0]) || !($oldrec[0]->{step}=~m/::postreflection$/)){
-       my $ws=$app->ExpandTimeExpression($rec->{workstart},"en","CET");
-       my $we=$app->ExpandTimeExpression($rec->{workend},"en","CET");
-       my $wt=0;
-       if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$ws=~
-              m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
-           (my ($weY,$weM,$weD,$weh,$wem,$wes)=$we=~
-              m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
-          my ($dd,$dh,$dm,$ds);
-          eval('($dd,$dh,$dm,$ds)=Delta_DHMS("CET",$wsY,$wsM,$wsD,$wsh,$wsm,$wss,
-                                             $weY,$weM,$weD,$weh,$wem,$wes);
-               ');
-          if (defined($dd) && defined($dh) && defined($dm)){
-             $wt=$dd*24*60+$dh*60+$dm;
-          }
-       }
-       if ($#{$aids}!=-1){ 
-          $wfrec{tcomcodrelevant}="yes";
-       }
-       else{
-          $wfrec{tcomcodrelevant}="no";
-       }
-       $wfrec{tcomcodcause}="appl.base.base";
-       $wfrec{tcomworktime}=$wt;
-       if ($rec->{resolution} ne ""){
-          $wfrec{tcomcodcomments}=$rec->{resolution};
-       }
-   }
-
-   $wfrec{srcload}=$app->ExpandTimeExpression($rec->{closetime},"en","CET");
-   return(\%wfrec,$updateto);
-}
-
-sub getSC
-{
-   my $self=shift;
-   my $username=shift;
-   my $password=shift;
-
-   my $sc;
-   eval("use SC::Customer::TSystems;\$sc=new SC::Customer::TSystems;");
-   msg(ERROR,"$@") if (!defined($sc));
-   return(undef) if (!defined($sc));
-
-   my $dataobjconnect=$self->Config->Param('DATAOBJCONNECT');
-   my $SCuri=$dataobjconnect->{tssmui};
-
-   if (!$sc->Connect($SCuri,uc($username),$password)){
-      printf STDERR ("ERROR: ServiceCenter connect failed\n");
-      printf STDERR ("ERROR: $username \@ $password\n");
-      $sc->Logout();
-      return(undef);
-   }
-   if (!$sc->Login()){
-      printf STDERR ("ERROR: SC URL=$SCuri\n");
-      printf STDERR ("ERROR: SC User=$username\n");
-      printf STDERR ("ERROR: ServiceCenter login failed\n");
-      $sc->Logout();
-      return(undef);
-   }
-   $sc->setDebugDirectory("/tmp/sc");
-   return($sc);
 }
 
 

@@ -48,7 +48,7 @@ sub smproblem
    my $selfname=$self->Self();
    $self->InitScImportEnviroment();
    my $prm=getModuleObject($self->Config,"tssm::prm");
-   msg(DEBUG,"ServiceCenter prm is connected");
+   msg(DEBUG,"ServiceManager prm is connected");
    $prm->SetCurrentView(qw(sysmodtime closetime problemnumber name description 
                            status assignedto priority impact urgency
                            solution deviceid
@@ -94,7 +94,7 @@ sub smproblem
             msg(ERROR,"db record problem: %s",$msg);
             return({exitcode=>2,msg=>$msg});
          }
-         $self->ProcessServiceCenterRecord($selfname,$rec,$prm);
+         $self->ProcessServiceManagerRecord($selfname,$rec,$prm);
          ($rec,$msg)=$prm->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);
