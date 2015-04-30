@@ -221,7 +221,8 @@ sub CheckFilter
                last CHK;
             }
             else{
-               foreach my $chk (@words){
+               my $wordschkok=0;
+               foreach my $chk (@words){  # default = OR
                   my @dataval=($rec->{$k});
                   @dataval=@{$rec->{$k}} if (ref($rec->{$k}) eq "ARRAY");
                   @dataval=values(%{$rec->{$k}}) if (ref($rec->{$k}) eq "HASH");
@@ -262,10 +263,14 @@ sub CheckFilter
                   if (defined($recok) && $recok>0){
                      $okcount++;
                   }
-                  if (defined($recok) && $recok==0){
-                     $failcount++;
-                     last CHK;
+                  if (!(defined($recok) && $recok==0)){
+                     $wordschkok++;
                   }
+                   
+               }
+               if ($wordschkok==0 && $#words!=-1){
+                  $failcount++;
+                  last CHK;
                }
             }
          } 
