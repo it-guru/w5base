@@ -75,13 +75,11 @@ sub new
       new kernel::Field::Date(
                 name          =>'cdate',
                 sqlorder      =>'desc',
-                timezone      =>'CET',
                 label         =>'Created',
                 dataobjattr   =>SELpref.'rootcausem1.open_time'),
 
       new kernel::Field::Date(
                 name          =>'sysmodtime',
-                timezone      =>'CET',
                 label         =>'SysModTime',
                 dataobjattr   =>SELpref.'rootcausem1.sysmodtime'),
 
@@ -182,7 +180,6 @@ sub new
                 name          =>'createtime',
                 depend        =>['status'],
                 group         =>'close',
-                timezone      =>'CET',
                 label         =>'Create time',
                 dataobjattr   =>SELpref.'rootcausem1.open_time'),
 
@@ -190,7 +187,6 @@ sub new
                 name          =>'closetime',
                 depend        =>['status'],
                 group         =>'close',
-                timezone      =>'CET',
                 label         =>'Closeing time',
                 dataobjattr   =>SELpref.'rootcausem1.close_time'),
 
@@ -287,7 +283,7 @@ sub new
 
    );
    $self->{use_distinct}=0;
-   $self->setDefaultView(qw(linenumber cdate problemnumber status name));
+   $self->setDefaultView(qw(cdate problemnumber status name workduration));
    return($self);
 }
 
@@ -343,8 +339,6 @@ sub initSearchQuery
       Query->Param("search_status"=>'!Closed');
    }
 }
-
-
 
 
 

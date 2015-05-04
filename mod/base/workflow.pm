@@ -29,7 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=6;
+   $param{MainSearchFieldLines}=7;
    my $self=bless($type->SUPER::new(%param),$type);
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));

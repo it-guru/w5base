@@ -74,33 +74,28 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'plannedstart',
-                timezone      =>'CET',
                 label         =>'Planned Start',
                 dataobjattr   =>SELpref.'cm3tm1.planned_start'),
 
       new kernel::Field::Date(
                 name          =>'plannedend',
-                timezone      =>'CET',
                 label         =>'Planned End',
                 dataobjattr   =>SELpref.'cm3tm1.planned_end'),
 
       new kernel::Field::Boolean(          
                 name          =>'cidown',  
-                timezone      =>'CET',     
                 label         =>'PSO-Flag',  
                 dataobjattr   =>"decode(".SELpref."cm3tm1.ci_down,".
                                 "'t','1','0')"),
 
 ##      new kernel::Field::Date(
 ##                name          =>'downstart',
-##                timezone      =>'CET',
 ##                group         =>'downtime',
 ##                label         =>'Down Start',
 ##                dataobjattr   =>'cm3tm1.down_start'),
 ##
 ##      new kernel::Field::Date(
 ##                name          =>'downend',
-##                timezone      =>'CET',
 ##                group         =>'downtime',
 ##                label         =>'Down End',
 ##                dataobjattr   =>'cm3tm1.down_end'),
@@ -125,13 +120,11 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'workstart',
-                timezone      =>'CET',
                 label         =>'Work Start',
                 dataobjattr   =>SELpref.'cm3tm1.work_start'),
 
       new kernel::Field::Date(
                 name          =>'workend',
-                timezone      =>'CET',
                 label         =>'Work End',
                 dataobjattr   =>SELpref.'cm3tm1.work_end'),
 
@@ -164,14 +157,12 @@ sub new
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
-                timezone      =>'CET',
                 label         =>'SysModTime',
                 dataobjattr   =>SELpref.'cm3tm1.sysmodtime'),
 
       new kernel::Field::Date(
                 name          =>'createtime',
                 group         =>'status',
-                timezone      =>'CET',
                 label         =>'Create time',
                 dataobjattr   =>SELpref.'cm3tm1.orig_date_entered'),
 

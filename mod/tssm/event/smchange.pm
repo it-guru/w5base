@@ -93,6 +93,7 @@ sub smchange
          %flt=(sysmodtime=>$param{sysmodtime});
       }
    }
+   $flt{plannedstart}="![EMPTY]";
    msg(DEBUG,"filter=%s",Dumper(\%flt));
    $chm->SetFilter(\%flt);
    my ($rec,$msg)=$chm->getFirst();

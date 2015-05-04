@@ -254,6 +254,12 @@ sub mkProblemStoreRec
        $rec->{priority}>0 && $rec->{priority}<10){
       $wfrec{prio}=int($rec->{priority});
    }
+   if (!($rec->{devicename}=~m/^\s*$/)){
+      $wfrec{additional}->{ServiceManagerDeviceName}=$rec->{devicename};
+   }
+   if (!($rec->{deviceid}=~m/^\s*$/)){
+      $wfrec{additional}->{ServiceManagerDeviceID}=$rec->{deviceid};
+   }
 
    $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{createtime},
                                                  "en","CET");
@@ -348,15 +354,15 @@ sub mkChangeStoreRec
    if (ref($tasks) eq "ARRAY"){
       $ServiceManagerTaskCount=$#{$tasks}+1;
    }
-   if ($rec->{plannedstart} eq "" ||
-       $rec->{plannedend} eq ""){
-      if ($#oldrec!=-1){
-         msg(ERROR,"exeption: change start/end removed on ".
-                   $rec->{changenumber});
-         return(undef);
-      }
-      return(undef);
-   }
+   #if ($rec->{plannedstart} eq "" ||
+   #    $rec->{plannedend} eq ""){
+   #   if ($#oldrec!=-1){
+   #      msg(ERROR,"exeption: change start/end removed on ".
+   #                $rec->{changenumber});
+   #      return(undef);
+   #   }
+   #   return(undef);
+   #}
 
    $wfrec{srcid}=$rec->{changenumber};
    $wfrec{name}=$rec->{name};
@@ -722,6 +728,9 @@ sub mkIncidentStoreRec
    if (($rec->{priority}=~m/^\d+$/) &&
        $rec->{priority}>0 && $rec->{priority}<10){
       $wfrec{prio}=int($rec->{priority});
+   }
+   if (!($rec->{devicename}=~m/^\s*$/)){
+      $wfrec{additional}->{ServiceManagerDeviceName}=$rec->{devicename};
    }
    if (!($rec->{deviceid}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceManagerDeviceID}=$rec->{deviceid};

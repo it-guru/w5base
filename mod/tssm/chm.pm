@@ -55,19 +55,16 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'cdate',
-                timezone      =>'CET',
                 label         =>'Created',
                 dataobjattr   =>SELpref.'cm3rm1.orig_date_entered'),
 
       new kernel::Field::Date(
                 name          =>'plannedstart',
-                timezone      =>'CET',
                 label         =>'Planed Start',
                 dataobjattr   =>SELpref.'cm3rm1.planned_start'),
 
       new kernel::Field::Date(
                 name          =>'plannedend',
-                timezone      =>'CET',
                 label         =>'Planed End',
                 dataobjattr   =>SELpref.'cm3rm1.planned_end'),
 
@@ -434,7 +431,6 @@ sub new
       new kernel::Field::Date(
                 name          =>'sysmodtime',
                 group         =>'status',
-                timezone      =>'CET',
                 label         =>'SysModTime',
                 dataobjattr   =>SELpref.'cm3rm1.sysmodtime'),
 
@@ -442,7 +438,6 @@ sub new
                 name          =>'createtime',
                 depend        =>['status'],
                 group         =>'close',
-                timezone      =>'CET',
                 label         =>'Create time',
                 dataobjattr   =>SELpref.'cm3rm1.orig_date_entered'),
 
@@ -456,7 +451,6 @@ sub new
                 name          =>'closetime',
                 depend        =>['status'],
                 group         =>'close',
-                timezone      =>'CET',
                 label         =>'Closeing time',
                 dataobjattr   =>SELpref.'cm3rm1.close_time'),
 
@@ -476,7 +470,6 @@ sub new
 ##                name          =>'resolvetime',
 ##                depend        =>['status'],
 ##                group         =>'close',
-##                timezone      =>'CET',
 ##                label         =>'Resolve time',
 ##                dataobjattr   =>'cm3rm1.resolve_time'),
 
@@ -484,7 +477,6 @@ sub new
                 name          =>'workstart',
                 depend        =>['status'],
                 group         =>'close',
-                timezone      =>'CET',
                 label         =>'Work Start',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_kpi_work_start'),
 
@@ -492,7 +484,6 @@ sub new
                 name          =>'workend',
                 depend        =>['status'],
                 group         =>'close',
-                timezone      =>'CET',
                 label         =>'Work End',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_kpi_work_end'),
 
