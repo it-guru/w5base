@@ -150,6 +150,15 @@ sub new
       new kernel::Field::Text(
                 name          =>'modelid',
                 label         =>'Model ID',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $current={};
+                   my %param=@_;
+                   $current=$param{current} if (exists($param{current}));
+                   return(1) if ($current->{$self->{name}} ne "");
+                   return(0);
+                },
                 dataobjattr   =>SELpref.'cm3rm1.tsi_referenced_model'),
 
       new kernel::Field::Text(

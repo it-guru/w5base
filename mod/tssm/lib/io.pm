@@ -535,6 +535,28 @@ sub mkChangeStoreRec
          $wfrec{affectedprojectid}=[];
       }
    }
+   if ($rec->{srcsys} eq "CSC"  &&      # prevent double load of changes
+       $rec->{srcid} ne ""){
+      $systemid=[];
+      $system=[];
+      $aids=[];
+      $anames=[];
+      $primaids=[];
+      $primanames=[];
+      $contrids=[];
+      $contrmods=[];
+      $contrnames=[];
+      $responseteam=[];
+      $businessteam=[];
+      $costcenter=[];
+      $customername=[];
+      $wfrec{affectedproject}=["SCC->SM9 Interface"];
+   }
+   else{
+      if (!exists($wfrec{affectedproject})){
+         $wfrec{affectedproject}=undef;
+      }
+   }
 
    $wfrec{affectedsystemid}=$systemid;
    $wfrec{affectedsystem}=$system;
@@ -705,6 +727,31 @@ sub mkIncidentStoreRec
        $contrnames,$contrids,$contrmods,$mandator,$mandatorid,
        $costcenter,$customername,$responseteam,$businessteam)=
                         $self->extractAffectedApplication($rec);
+
+
+
+   if ($rec->{srcsys} eq "SC-GER"  &&      # prevent double load of changes
+       $rec->{srcid} ne "" &&
+       $rec->{openedby}=~m/\.backbone\./){
+      $systemid=[];
+      $system=[];
+      $aids=[];
+      $anames=[];
+      $contrids=[];
+      $contrmods=[];
+      $contrnames=[];
+      $responseteam=[];
+      $businessteam=[];
+      $costcenter=[];
+      $customername=[];
+      $wfrec{affectedproject}=["SCC->SM9 Interface"];
+   }
+   else{
+      if (!exists($wfrec{affectedproject})){
+         $wfrec{affectedproject}=undef;
+      }
+   }
+
    $wfrec{affectedsystemid}=$systemid;
    $wfrec{affectedsystem}=$system;
    $wfrec{affectedapplicationid}=$aids;

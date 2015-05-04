@@ -53,6 +53,7 @@ sub smincident
    $inm->SetCurrentView(qw(closetime incidentnumber name description status 
                            hassignment iassignment priority causecode reason
                            downtimestart downtimeend opentime 
+                           openedby srcsys srcid
                            workstart workend resolution custapplication
                            softwareid deviceid devicename reportedby
                            action sysmodtime involvedassignment));
