@@ -87,7 +87,7 @@ sub new
 ##                dataobjattr   =>'probsummarym1.dsc_service'),
 
       new kernel::Field::Date(
-                name          =>'mdate',
+                name          =>'sysmodtime',
                 group         =>'status',
                 label         =>'SysModTime',
                 dataobjattr   =>SELpref.'probsummarym1.sysmodtime'),
@@ -113,6 +113,16 @@ sub new
                 name          =>'downtimeend',
                 label         =>'Downtime End',
                 dataobjattr   =>SELpref.'probsummarym1.downtime_end'),
+
+      new kernel::Field::Text(
+                name          =>'mandant',
+                label         =>'ServiceManager Mandant',
+                dataobjattr   =>SELpref.'probsummarym1.tsi_mandant_name'),
+
+      new kernel::Field::Text(
+                name          =>'mandantid',
+                label         =>'ServiceManager Mandant ID',
+                dataobjattr   =>SELpref.'probsummarym1.tsi_mandant'),
 
       new kernel::Field::Textarea(
                 name          =>'action',
@@ -280,10 +290,6 @@ sub new
                 dataobjattr   =>SELpref.'probsummarym1.contact_name'),
 
       new kernel::Field::Text(
-                name          =>'page',
-                dataobjattr   =>SELpref.'probsummarym1.page'),
-
-      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
@@ -376,8 +382,8 @@ sub initSearchQuery
    my $self=shift;
    my $nowlabel=$self->T("now","kernel::App");
 
-   if (!defined(Query->Param("search_mdate"))){
-     Query->Param("search_mdate"=>">now-1h");
+   if (!defined(Query->Param("search_sysmodtime"))){
+     Query->Param("search_sysmodtime"=>">now-1h");
    }
 
 }

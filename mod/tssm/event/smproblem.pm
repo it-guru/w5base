@@ -51,7 +51,7 @@ sub smproblem
    msg(DEBUG,"ServiceManager prm is connected");
    $prm->SetCurrentView(qw(sysmodtime closetime problemnumber name description 
                            status assignedto priority impact urgency
-                           solution deviceid
+                           solution deviceid devicename
                            createtime closetime srcid triggeredby
                            creator editor softwareid assignedto homeassignment
                            createtime type resources closecode));

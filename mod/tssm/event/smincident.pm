@@ -54,11 +54,11 @@ sub smincident
                            hassignment iassignment priority causecode reason
                            downtimestart downtimeend opentime 
                            workstart workend resolution custapplication
-                           softwareid deviceid reportedby
+                           softwareid deviceid devicename reportedby
                            action sysmodtime involvedassignment));
    my $focus="now";
-   my %flt=(closetime=>"\">$focus-24h\"");
-   if (!defined($param{incidentnumber}) && !defined($param{closetime}) &&
+   my %flt=(sysmodtime=>"\">$focus-24h\"");
+   if (!defined($param{incidentnumber}) && !defined($param{sysmodtime}) &&
        !defined($param{downtimeend})){
       $self->{wf}->SetFilter(srcsys=>\$selfname,srcload=>">now-3d");
       $self->{wf}->SetCurrentView(qw(srcload));
@@ -66,7 +66,7 @@ sub smincident
       my ($wfrec,$msg)=$self->{wf}->getOnlyFirst(qw(srcload));
       if (defined($wfrec)){
          $focus=$wfrec->{srcload};
-         %flt=(closetime=>"\">$focus-4m\"");
+         %flt=(sysmodtime=>"\">$focus-4m\"");
       }
    }
    else{
@@ -76,8 +76,8 @@ sub smincident
       if (defined($param{incidentnumber})){
          %flt=(incidentnumber=>\$param{incidentnumber});
       }
-      if (defined($param{closetime})){
-         %flt=(closetime=>$param{closetime});
+      if (defined($param{sysmodtime})){
+         %flt=(sysmodtime=>$param{sysmodtime});
       }
    }
    msg(DEBUG,"filter=%s",Dumper(\%flt));

@@ -45,6 +45,7 @@ sub MandantenRestriction
       50005300.005000 80008012.000000 80008999.000000 90009998.000100
 
       10001000.000100
+      10001000.004800
   );
   return(@l);
 }
@@ -742,7 +743,6 @@ sub mkIncidentStoreRec
    $wfrec{mdate}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
    $wfrec{createdate}=$app->ExpandTimeExpression($rec->{opentime},"en","CET");
    $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},"en","CET");
-   #$rec->{softwareid}="CMDB" if ($rec->{incidentnumber} eq "GER03733409");
 
    $wfrec{openuser}=undef;
    $wfrec{openusername}=undef;
@@ -881,10 +881,6 @@ sub extractAffectedApplication
 
    my @l2;
 
-
-
-
-
    
    if (defined($rec->{relations}) && ref($rec->{relations} )eq "ARRAY"){
       foreach my $r (@{$rec->{relations}}){
@@ -943,13 +939,14 @@ sub extractAffectedApplication
    msg(DEBUG,"pre deviceid chkprimapplid=%s",join(",",@chkprimapplid));
 
    my $dev;
-   if (exists($rec->{deviceid})){ # for incident and problem TODO
-      $dev=$rec->{deviceid};
+   if (exists($rec->{devicename})){ # for incident and problem TODO
+      $dev=$rec->{devicename};
    }
-   #if (my ($applid)=$dev=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
-   #   msg(DEBUG,"ApplicationID=%s",$applid);
-   #   push(@chkapplid,$applid);
-   #}
+   if (my ($applid)=$dev=~m/^.*\(((APPLGER|APPL|GER)\d+)\)$/){
+      msg(DEBUG,"ApplicationID from deviceid field=%s",$applid);
+      push(@chkapplid,$applid);
+   }
+
    msg(DEBUG,"post deviceid chkapplid=%s",join(",",@chkapplid));
    if ($#chkapplid!=-1){
       $appl->ResetFilter();
@@ -974,9 +971,20 @@ sub extractAffectedApplication
       }
    }
    else{
-      my @dev=split(/[,;\s]+/,$dev);
-      if ($#chksystemid!=-1){
-         push(@dev,@chksystemid);
+      my @dev=split(/[,;]+/,$dev);
+      if ($#chksystemid==-1){
+         for(my $c=0;$c<=$#dev;$c++){
+            my $dev=$dev[$c];
+            if (my ($name,$itemid)=$dev=~m/^(.*)\s+\((.+)\)$/){
+               if ($itemid=~m/^S/){
+                  $dev[$c]=lc($name);
+               }
+               else{
+                  $dev[$c]=$name;
+               }
+               push(@dev,$itemid);
+            }
+         }
       }
       @dev=grep(!/\</,@dev);
       @dev=grep(!/\>/,@dev);
