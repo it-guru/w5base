@@ -261,15 +261,11 @@ sub mkProblemStoreRec
       $wfrec{additional}->{ServiceManagerDeviceID}=$rec->{deviceid};
    }
 
-   $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{createtime},
-                                                 "en","CET");
-   $wfrec{eventend}=$app->ExpandTimeExpression($rec->{closetime},
-                                                 "en","CET");
-   $wfrec{mdate}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
-   $wfrec{createdate}=$app->ExpandTimeExpression($rec->{createtime},
-                                                 "en","CET");
-   $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},
-                                                "en","CET");
+   $wfrec{eventstart}=$rec->{createtime};
+   $wfrec{eventend}=$rec->{closetime};
+   $wfrec{mdate}=$rec->{sysmodtime};
+   $wfrec{createdate}=$rec->{createtime};
+   $wfrec{closedate}=$rec->{closetime};
    $wfrec{openuser}=undef;
    $wfrec{openusername}=undef;
    if ($rec->{creator}=~m/^[a-z0-9_-]{1,8}$/i){
@@ -325,7 +321,7 @@ sub mkProblemStoreRec
       $wfrec{openuser}=$userid if (defined($userid));
       $wfrec{step}='itil::workflow::problem::extauthority';
    }
-   $wfrec{srcload}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
+   $wfrec{srcload}=$rec->{sysmodtime};
    return(\%wfrec,$updateto);
 }
 
@@ -486,54 +482,14 @@ sub mkChangeStoreRec
    if (!($rec->{resources}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceManagerResources}=$rec->{resources};
    }
-   $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{plannedstart},
-                                                 "en","CET");
-   $wfrec{eventend}=$app->ExpandTimeExpression($rec->{plannedend},
-                                                 "en","CET");
-   $wfrec{mdate}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
-   $wfrec{createdate}=$app->ExpandTimeExpression($rec->{createtime},
-                                                 "en","CET");
-   $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},
-                                                "en","CET");
+   $wfrec{eventstart}=$rec->{plannedstart};
+   $wfrec{eventend}=$rec->{plannedend};
+   $wfrec{mdate}=$rec->{sysmodtime};
+   $wfrec{createdate}=$rec->{createtime};
+   $wfrec{closedate}=$rec->{closetime};
    if (!($rec->{closecode}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceManagerCloseCode}=$rec->{closecode};
    }
-
-   if (lc($rec->{status}) eq "closed"){ # anpassung damit I-Network mappen kan
-      $wfrec{additional}->{State4INetwork}=$rec->{status}." ".$rec->{closecode};
-   }
-   else{
-      $wfrec{additional}->{State4INetwork}=$rec->{status};
-   }
-   $wfrec{additional}->{EventStart4INetwork}=$app->ExpandTimeExpression(
-                                        $rec->{plannedstart},"en","CET","CET");
-   $wfrec{additional}->{EventEnd4INetwork}=$app->ExpandTimeExpression(
-                                        $rec->{plannedend},"en","CET","CET");
-
-   #
-   # ... für diesen Code Teil immer Markus Zeiss fragen
-   #
-   $wfrec{additional}->{Type4INetwork}=$rec->{type};
-
-#   nicht mehr notwendig laut ...
-#   https://darwin.telekom.de/darwin/auth/base/workflow/ById/13451155090001
-#   if ($rec->{name}=~m/[^a-z]regel-ipl/i){
-#      $wfrec{additional}->{Type4INetwork}="standard";
-#   }
-
-
-#   if (time()>1197242364){  # ca Mo. der 10.12.2007 aktiv
-#      if ($rec->{type}=~m/^standard$/i){
-#         $wfrec{additional}->{Type4INetwork}="trivial";
-#      }
-#      if ($rec->{type}=~m/^significant$/i){
-#         $wfrec{additional}->{Type4INetwork}="minor";
-#      }
-#      if ($rec->{urgency}=~m/^emergency$/i){
-#         $wfrec{additional}->{Type4INetwork}="emergency";
-#      }
-#   }
-
 
    # approval check for I-Network (TSM hat zugestimmt)
    my %approver=();
@@ -547,24 +503,6 @@ sub mkChangeStoreRec
             $approver{$agrp}=1 if ($agrp ne "");
          }
       }
-   }
-   my $masterapprove=["SDM.DTAG.FE.APPROVE","TI.TSI.INT.CHM.FE.CA"];
-   my $triggerapprove=["SDM.DTAG.APPROVE","TI.TSI.INT.CHM.CA"];
-   if (in_array([keys(%approver)],$masterapprove)){
-      msg(DEBUG,"AlApproveCompletly4INetwork masterapprove handling");
-      my $AlApproveCompletly=0;
-      my $ChmApproved=0;
-      if (ref($rec->{approved}) eq "ARRAY"){
-         foreach my $a (@{$rec->{approved}}){
-            foreach my $agrp (split(/\s/,$a->{name})){
-               $AlApproveCompletly=1 if (in_array($masterapprove,$agrp));
-               $ChmApproved=1 if (in_array($triggerapprove,$agrp));
-            }
-         }
-      }
-      $wfrec{additional}->{AlApproveCompletly4INetwork}=$AlApproveCompletly;
-      $wfrec{additional}->{ChangemanagementApproved}=$ChmApproved;
-      msg(DEBUG,"AlApproveCompletly4INetwork=$AlApproveCompletly");
    }
 
 
@@ -665,8 +603,8 @@ sub mkChangeStoreRec
          # $srcid=~s/^IN://i;
           $wfrec{tcomexternalid}=$srcid;
        }
-       my $ws=$app->ExpandTimeExpression($rec->{workstart},"en","CET");
-       my $we=$app->ExpandTimeExpression($rec->{workend},"en","CET");
+       my $ws=$rec->{workstart};
+       my $we=$rec->{workend};
        my $wt=0;
        if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$ws=~
               m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
@@ -682,7 +620,7 @@ sub mkChangeStoreRec
           }
        }
    }
-   $wfrec{srcload}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
+   $wfrec{srcload}=$rec->{sysmodtime};
    return(\%wfrec,$updateto,$relations);
 }
 
@@ -744,14 +682,14 @@ sub mkIncidentStoreRec
    if (!($rec->{workend}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceManagerWorkEnd}=$rec->{workend};
    }
-   $wfrec{eventstart}=$app->ExpandTimeExpression($rec->{downtimestart},"en","CET");
+   $wfrec{eventstart}=$rec->{downtimestart};
    my $downtimeend=$rec->{downtimeend};
    $downtimeend=$rec->{downtimestart} if (!defined($downtimeend) ||
                                           $downtimeend eq "");
-   $wfrec{eventend}=$app->ExpandTimeExpression($downtimeend,"en","CET");
-   $wfrec{mdate}=$app->ExpandTimeExpression($rec->{sysmodtime},"en","CET");
-   $wfrec{createdate}=$app->ExpandTimeExpression($rec->{opentime},"en","CET");
-   $wfrec{closedate}=$app->ExpandTimeExpression($rec->{closetime},"en","CET");
+   $wfrec{eventend}=$downtimeend;
+   $wfrec{mdate}=$rec->{sysmodtime};
+   $wfrec{createdate}=$rec->{opentime};
+   $wfrec{closedate}=$rec->{closetime};
 
    $wfrec{openuser}=undef;
    $wfrec{openusername}=undef;
@@ -804,8 +742,8 @@ sub mkIncidentStoreRec
       # sollte jetzt auch mit sofort beenden funktionieren
    }
    if (!defined($oldrec[0]) || !($oldrec[0]->{step}=~m/::postreflection$/)){
-       my $ws=$app->ExpandTimeExpression($rec->{workstart},"en","CET");
-       my $we=$app->ExpandTimeExpression($rec->{workend},"en","CET");
+       my $ws=$rec->{workstart};
+       my $we=$rec->{workend};
        my $wt=0;
        if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$ws=~
               m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
@@ -832,7 +770,7 @@ sub mkIncidentStoreRec
        }
    }
 
-   $wfrec{srcload}=$app->ExpandTimeExpression($rec->{closetime},"en","CET");
+   $wfrec{srcload}=$rec->{closetime};
    return(\%wfrec,$updateto);
 }
 
