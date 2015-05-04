@@ -51,6 +51,10 @@ sub Init
                       "tssm::chm_pso",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.sm.change.model",
+                      "tssm::chmmodel",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itu.sm.change.relations",
                       "tssm::lnk",
                       defaultacl=>['valid_user']);

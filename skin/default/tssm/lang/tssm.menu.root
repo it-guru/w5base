@@ -4,6 +4,7 @@
 'itu.sm.change.relations'=>{de=>'Verknüpfungen',en=>'Relations'},
 'itu.sm.change.task'=>{de=>'Task',en=>'Task'},
 'itu.sm.change.task.pso'=>{de=>'PSO',en=>'PSO'},
+'itu.sm.change.model'=>{de=>'ChangeModel',en=>'ChangeModel'},
 'itu.sm.change.device'=>{de=>'Device',en=>'Device'},
 'itu.sm.change.timing'=>{de=>'Interface timing',en=>'Interface timing'},
 'itu.sm.incident'=>{de=>'IncidentManagement',en=>'IncidentManagement'},

@@ -403,26 +403,30 @@ sub mkChangeStoreRec
    my $relations;
    my $relationupd=0;
    my $relationupd=1;
-   if ($rec->{srcid} ne ""){
-      $wfrec{additional}->{ServiceManagerExternChangeID}=$rec->{srcid};
-      msg(DEBUG,"ServiceManager ExternChangeID:".$rec->{srcid});
-   }
-   if ($#oldrec==0){
-      if ($oldrec[0]->{additional}->{ServiceManagerExternChangeID}->[0] ne
-          $rec->{srcid}){
-         $relationupd++;
-      }
-   }
-   else{
-      $relationupd++;
-   }
-   if ($relationupd){
-      if (my ($dstwfid)=$rec->{srcid}=~m/W5B:(\d{10,18})/){
-         $relations=[{dstwfid=>$dstwfid,
-                      name=>'commission',
-                      translation=>'itil::workflow::change'}];
-      }
-   }
+
+   #
+   #
+   #  Anscheinend über die SM9 Oberfläche nicht mehr ausfüllbar bzw. notwendig
+   #if ($rec->{exsrcid} ne ""){
+   #   $wfrec{additional}->{ServiceManagerExternChangeID}=$rec->{exsrcid};
+   #   msg(DEBUG,"ServiceManager ExternChangeID:".$rec->{exsrcid});
+   #}
+   #if ($#oldrec==0){
+   #   if ($oldrec[0]->{additional}->{ServiceManagerExternChangeID}->[0] ne
+   #       $rec->{exsrcid}){
+   #      $relationupd++;
+   #   }
+   #}
+   #else{
+   #   $relationupd++;
+   #}
+   #if ($relationupd){
+   #   if (my ($dstwfid)=$rec->{srcid}=~m/W5B:(\d{10,18})/){
+   #      $relations=[{dstwfid=>$dstwfid,
+   #                   name=>'commission',
+   #                   translation=>'itil::workflow::change'}];
+   #   }
+   #}
 
 
    if ($wfrec{additional}->{ServiceManagerClosedBy} ne

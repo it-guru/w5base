@@ -89,6 +89,8 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'exsrcid',
+                htmldetail    =>0,
+                searchable    =>0,
                 label         =>'Extern Change ID',
                 dataobjattr   =>"decode(".SELpref."cm3rm1.tsi_external_id,
                                         'null',NULL,".
@@ -797,7 +799,20 @@ sub initSqlWhere
       $where=SELpref."cm3rm1.tsi_mandant in (".
          join(",",map({"'".$_."'"} MandantenRestriction())).")";
    #}
+   my @states=$self->getStateFilter();
+   if ($#states!=-1){
+      $where.=" AND " if ($where ne "");
+      $where.=SELpref."cm3rm1.state in ".join(",",map({"'".$_."'"} @states));
+   }
    return($where);
+}
+
+sub getStateFilter
+{
+   my $self=shift;
+
+   return(qw(tsi.cm.view));
+
 }
 
 sub SetFilter
