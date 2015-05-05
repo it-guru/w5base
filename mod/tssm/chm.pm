@@ -827,7 +827,7 @@ sub SetFilter
       my @chnrs;
       foreach my $chnr (split /[\s,;]+/,$flt->{changenumber}) {
          if (my ($pref,$chnum)=$chnr=~m/^([><]{0,1})(\d{1,8})$/) {
-            $chnr=$pref.'CHM'.'0'x(8-length($chnum)).$chnum;       
+            $chnr=$pref.'C'.'0'x(8-length($chnum)).$chnum;       
          }
          push @chnrs,$chnr;
       }
