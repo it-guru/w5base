@@ -38,34 +38,32 @@ sub new
 
       new kernel::Field::Date(
                name           =>'plannedstart',
-               timezone       =>'CET',
                label          =>'Planned Start',
                translation    =>'tssm::chmtask',
-               dataobjattr    =>'cm3tm1.planned_start'),
+               dataobjattr    =>SELpref.'cm3tm1.planned_start'),
 
       new kernel::Field::Date(
                name           =>'plannedend',
-               timezone       =>'CET',
                label          =>'Planned End',
                translation    =>'tssm::chmtask',
-               dataobjattr    =>'cm3tm1.planned_end'),
+               dataobjattr    =>SELpref.'cm3tm1.planned_end'),
 
       new kernel::Field::Text(
                name           =>'tasknumber',
                label          =>'Task No.',
                translation    =>'tssm::chmtask',
-               dataobjattr    =>'cm3tm1.numberprgn'),
+               dataobjattr    =>SELpref.'cm3tm1.dh_number'),
 
       new kernel::Field::Text(
                name           =>'taskstatus',
                label          =>'Task Status',
-               dataobjattr    =>'cm3tm1.status'),
+               dataobjattr    =>SELpref.'cm3tm1.status'),
 
       new kernel::Field::Text(
                name           =>'changenumber',
                label          =>'Change No.',
                translation    =>'tssm::chmtask',
-               dataobjattr    =>'cm3tm1.parent_change'),
+               dataobjattr    =>SELpref.'cm3tm1.parent_change'),
 
       new kernel::Field::Text(
                name           =>'changestatus',
@@ -77,13 +75,13 @@ sub new
       new kernel::Field::Text(
                name           =>'appl',
                label          =>'Application',
-               dataobjattr    =>'screlationm1.depend'),
+               dataobjattr    =>SELpref.'screlationm1.depend'),
 
       new kernel::Field::Text(
                name           =>'applname',
                label          =>'Application name',
                searchable     =>0,
-               dataobjattr    =>'devicem1.system_name'),
+               dataobjattr    =>SELpref.'device2m1.title'),
 
       new kernel::Field::Select(
                name           =>'opmode',
@@ -158,17 +156,19 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="scadm1.screlationm1,scadm1.cm3tm1,scadm1.devicem1";
+   my $from=TABpref."screlationm1 ".SELpref."screlationm1,".
+            TABpref."cm3tm1 ".SELpref."cm3tm1,".
+            TABpref."device2m1 ".SELpref."device2m1";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="cm3tm1.ci_down='t' AND ".
-             "screlationm1.source=cm3tm1.numberprgn AND ".
-             "screlationm1.depend=devicem1.id AND ".
-             "devicem1.device_name='APPLICATION'";
+   my $where=SELpref."cm3tm1.ci_down='t' AND ".
+             SELpref."screlationm1.source=".SELpref."cm3tm1.parent_change AND ".
+             SELpref."screlationm1.depend=".SELpref."device2m1.title AND ".
+             SELpref."device2m1.model='APPLICATION'";
    return($where);
 }
 

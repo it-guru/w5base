@@ -79,7 +79,8 @@ sub new
                 label         =>'Devicename',
                 vjointo       =>'tssm::dev',
                 vjoinon       =>['deviceid'=>'deviceid'],
-                vjoindisp     =>'fullname'),
+                vjoindisp     =>'fullname',
+                dataobjattr   =>SELpref.'probsummarym1.tsi_ci_name'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'custapplication',
