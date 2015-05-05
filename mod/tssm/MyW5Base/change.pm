@@ -1,4 +1,4 @@
-package tssc::MyW5Base::change;
+package tssm::MyW5Base::change;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #

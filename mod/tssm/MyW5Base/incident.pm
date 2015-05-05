@@ -1,4 +1,4 @@
-package tssc::MyW5Base::incident;
+package tssm::MyW5Base::incident;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
