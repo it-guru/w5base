@@ -347,7 +347,7 @@ sub new
                 name          =>'requestedfrom',
                 group         =>'status',
                 label         =>'Requested from',
-                dataobjattr   =>SELpref.'cm3rm1.misc3'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_requested_from'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'urgency',
@@ -525,28 +525,20 @@ sub new
                 htmldetail    =>0,
                 dataobjattr   =>SELpref.'cm3rm1.tsi_assignarea'),
 
-      new kernel::Field::Text(
-                name          =>'customer',
-                ignorecase    =>1,
-                sqlorder      =>"none",
-                group         =>'contact',
-                label         =>'Customer',
-                dataobjattr   =>SELpref.'cm3rm1.misc4'),
-
-      new kernel::Field::Link(
-                name          =>'rawcustomer',
-                group         =>'contact',
-                label         =>'raw Customer',
-                sqlorder      =>"none",
-                dataobjattr   =>SELpref.'cm3rm1.misc4'),
-
-      new kernel::Field::Text(
-                name          =>'requestedby',
-                group         =>'contact',
-                weblinkto     =>'tssm::user',
-                weblinkon     =>['requestedby'=>'userid'],
-                label         =>'Requested By',
-                dataobjattr   =>SELpref.'cm3rm1.requested_by'),
+#      new kernel::Field::Text(
+#                name          =>'customer',
+#                ignorecase    =>1,
+#                sqlorder      =>"none",
+#                group         =>'contact',
+#                label         =>'Customer',
+#                dataobjattr   =>SELpref.'cm3rm1.misc4'),
+#
+#      new kernel::Field::Link(
+#                name          =>'rawcustomer',
+#                group         =>'contact',
+#                label         =>'raw Customer',
+#                sqlorder      =>"none",
+#                dataobjattr   =>SELpref.'cm3rm1.misc4'),
 
 ##  vermutlich nicht mehr im Datenmodel vorhanden
 ##
@@ -565,26 +557,49 @@ sub new
 ##                dataobjattr   =>'cm3rm1.assign_firstname'),
 
       new kernel::Field::Text(
-                name          =>'coordinator',
+                name          =>'chmmgrgrp',
+                uppersearch   =>1,
+                group         =>'chmcontact',
+                label         =>'Changemanager group',
+                weblinkto     =>'tssm::group',
+                weblinkon     =>['chmmgrgrp'=>'fullname'],
+                dataobjattr   =>SELpref.'cm3rm1.tsi_manager_group'),
+
+      new kernel::Field::Text(
+                name          =>'chmmgroper',
+                uppersearch   =>1,
+                group         =>'chmcontact',
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['chmmgroper'=>'loginname'],
+                label         =>'Changemanager operator',
+                dataobjattr   =>SELpref.'cm3rm1.tsi_manager_operator'),
+
+      new kernel::Field::Text(
+                name          =>'coordinatorgrp',
                 uppersearch   =>1,
                 group         =>'contact',
-                label         =>'Changemanager group',
+                weblinkto     =>'tssm::group',
+                weblinkon     =>['coordinatorgrp'=>'fullname'],
+                label         =>'Change Coordinator Group',
+                dataobjattr   =>SELpref.'cm3rm1.assign_dept'),
+
+      new kernel::Field::Text(
+                name          =>'coordinatoroper',
+                uppersearch   =>1,
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['coordinatoroper'=>'loginname'],
+                label         =>'Changemanager operator',
+                group         =>'contact',
+                label         =>'Change Coordinator',
                 dataobjattr   =>SELpref.'cm3rm1.coordinator'),
 
-##      new kernel::Field::Text(
-##                name          =>'coordinatorposix',
-##                uppersearch   =>1,
-##                group         =>'contact',
-##                label         =>'Changemanager',
-##                dataobjattr   =>'cm3rm1.coord_firstname'),
-
-##      new kernel::Field::Text(
-##                name          =>'coordinatorname',
-##                uppersearch   =>1,
-##                htmldetail    =>0,
-##                group         =>'contact',
-##                label         =>'Change-Manager fullname',
-##                dataobjattr   =>'cm3rm1.coord_shortname'),
+      new kernel::Field::Text(
+                name          =>'requestedby',
+                group         =>'contact',
+                weblinkto     =>'tssm::user',
+                weblinkon     =>['requestedby'=>'userid'],
+                label         =>'Change Requestor',
+                dataobjattr   =>SELpref.'cm3rm1.requested_by'),
 
        new kernel::Field::SubList(
                 name          =>'relations',
@@ -774,7 +789,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
    return(qw(header default status configitems tickets relations approvals
-             tasks downtimesum contact close source));
+             tasks downtimesum chmcontact contact close source));
 }
 
 sub getRecordImageUrl
@@ -827,7 +842,7 @@ sub SetFilter
       my @chnrs;
       foreach my $chnr (split /[\s,;]+/,$flt->{changenumber}) {
          if (my ($pref,$chnum)=$chnr=~m/^([><]{0,1})(\d{1,8})$/) {
-            $chnr=$pref.'C'.'0'x(8-length($chnum)).$chnum;       
+            $chnr=$pref.'C'.'0'x(9-length($chnum)).$chnum;       
          }
          push @chnrs,$chnr;
       }
@@ -849,7 +864,7 @@ sub isViewValid
       $st=$rec->{status};
    }
    my @l=qw(header default status configitems tickets relations approvals
-             tasks downtimesum contact close);
+             tasks downtimesum chmcontact contact close);
 
    if ($st ne "closed" && $st ne "rejected" && $st ne "resolved"){
       @l=grep(!/^close$/,@l);
@@ -866,244 +881,6 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
-
-sub getHtmlDetailPages
-{
-   my $self=shift;
-   my ($p,$rec)=@_;
-
-   return($self->SUPER::getHtmlDetailPages($p,$rec));
-   # VisualView ausgeblendet; muss angepasst werden
-   #
-   #return($self->SUPER::getHtmlDetailPages($p,$rec),
-   #       "VisualView"=>$self->T("Visual-View"));
-}
-
-sub getHtmlDetailPageContent
-{
-   my $self=shift;
-   my ($p,$rec)=@_;
-   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "VisualView");
-   my $page;
-   my $idname=$self->IdField->Name();
-   my $idval=$rec->{$idname};
-   
-   if ($p eq "VisualView"){
-      Query->Param("$idname"=>$idval);
-      $idval="NONE" if ($idval eq "");
-
-      my $q=new kernel::cgi({});
-      $q->Param("$idname"=>$idval);
-      my $urlparam=$q->QueryString();
-
-      $page="<iframe style=\"width:100%;height:100%;border-width:0;".
-            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
-            "src=\"VisualView?$urlparam\"></iframe>";
-   }
-   $page.=$self->HtmlPersistentVariables($idname);
-   return($page);
-}
-
-
-sub getValidWebFunctions
-{
-   my $self=shift;
-
-   return($self->SUPER::getValidWebFunctions(@_),"VisualView");
-}
-
-
-sub VisualView
-{
-   my $self=shift;
-
-   my %flt=$self->getSearchHash();
-   $self->ResetFilter();
-   $self->SecureSetFilter(\%flt);
-   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
-
-   print $self->HttpHeader();
-   print $self->HtmlHeader(
-                           style=>['default.css',
-                             'work.css',
-                             '../../../public/tssm/load/visual-view.css']);
-#
-   print("<body class=fullview><form>");
-   print $self->BuildVisualView($rec);
-   print("</form></body></html>");
-}
-
-sub BuildVisualView
-{
-   my $self=shift;
-   my $rec=shift;
-   my $d;
-
-   my $label="CR# ";
-
-
-
-   if ($rec->{changenumber} ne ""){
-      $label.=$rec->{changenumber};
-      $label.=" - ";
-   }
-
-
-   if ($rec->{risk} ne ""){
-      $label.=$rec->{risk};
-   }
-   else{
-      $label.="<font color=red>MISSING RISK</font>";
-   }
-   $label.=" - ";
-
-
-   if ($rec->{impact} ne ""){
-      $label.=$rec->{impact};
-   }
-   else{
-      $label.="<font color=red>MISSING IMPACT</font>";
-   }
-   $label.=" - ";
-
-
-   if ($rec->{type} ne ""){
-      $label.=$rec->{type};
-   }
-   else{
-      $label.="<font color=red>MISSING TYPE</font>";
-   }
-   $label.=" - ";
-
-   if ($rec->{reason} ne ""){
-      $label.=$rec->{reason};
-   }
-   else{
-      $label.="<font color=red>MISSING REASON</font>";
-   }
-   $label.=" - ";
-   my $templparam={WindowMode=>"HtmlDetail",current=>$rec};
-
-   my $qcok=$self->findtemplvar($templparam,"qcok");
-   my $starttime=$self->findtemplvar($templparam,"plannedstart","detail");
-   my $endtime=$self->findtemplvar($templparam,"plannedend","detail");
-   my $requestedby=$self->findtemplvar($templparam,"requestedby","detail");
-   my $description=$self->findtemplvar($templparam,"description","detail");
-   $description=~s/(\S{40,60})([,:;])/$1$2 /g; # break long lines
-
-   my $gr="#75D194";
-   my $rd="#F28C8C";
-   my $bl="#B9C5F5";
-
-   my $aprcol="";
-   my $crscol="";
-   my $bg="bgcolor";
-   $aprcol="$bg=\"$gr\"" if (lc($rec->{approvalstatus}) eq "approved");
-   $crscol="$bg=\"$bl\"" if (lc($rec->{currentstatus}) eq "work in progress");
-   my $qcflag="";
-   if (!$qcok){
-      $qcflag="<td rowspan=2 align=center>".
-              "<img src=\"../../base/load/alarm.gif\">".
-              "</td>";
-   }
-   
-
-
-   $d=<<EOF;
-<div class=label>$label</div>
-<table style="border-bottom-style:none;min-width:500px;width:auto;width:100%">
-<tr>
-<td width=80>Start:</td>
-<td>$starttime</td>$qcflag</tr>
-<tr>
-<td width=80>End:</td>
-<td>$endtime</td>
-</tr>
-</table>
-
-<table style="border-bottom-style:none;min-width:500px;width:auto;width:100%">
-<tr>
-<td width=80><u>Originator:</u><br>&nbsp;</td>
-<td width=107 $crscol>CR-Status:<br>
-<b>$rec->{currentstatus}</b></td>
-<td width=100 $aprcol>Approval:<br>
-<b>$rec->{approvalstatus}</b></td>
-<td>Owner:<br>
-<b>$requestedby</b></td>
-<td width=200>Assigned Group:<br>
-<b>$rec->{assignedto}</b></td>
-</tr>
-</table>
-
-<table style="min-width:500px;width:auto;width:100%"><tr>
-<td width=80><u>Change-Mgr:</u><br>&nbsp;</td>
-<td>Group:<br>
-<b>$rec->{coordinator}</b></td>
-<td>Released by:<br>
-<b>??</b></td>
-<td>Completion Code:</td>
-</tr>
-</table>
-
-<table style="margin-top:10px;min-width:500px;width:auto;width:100%">
-<tr>
-<td>
-  <table class=noborder>
-    <tr>
-     <td class=noborder align=right width=20%><b>Customer:</b></td>
-     <td class=noborder>$rec->{customer}</td>
-     <td class=noborder align=right width=20%><b>Ext. Change ID:</b></td>
-     <td class=noborder>$rec->{srcid}</td>
-    </tr>
-    <tr>
-     <td class=noborder align=right width=20%><b>Reason:</b></td>
-     <td class=noborder>$rec->{reason}</td>
-     <td class=noborder align=right width=20%><b>Project:</b></td>
-     <td class=noborder>??</td>
-    </tr>
-    <tr>
-     <td class=noborder align=right width=20%><b>Risk:</b></td>
-     <td class=noborder>$rec->{risk}</td>
-     <td class=noborder align=right width=20%><b>Int. Order:</b></td>
-     <td class=noborder>??</td>
-    </tr>
-    <tr>
-     <td class=noborder align=right width=20%><b>Req. Customer:</b></td>
-     <td class=noborder>??</td>
-     <td class=noborder align=right width=20%><b>&nbsp;</b></td>
-     <td class=noborder>&nbsp;</td>
-    </tr>
-  </table>
-</td>
-</tr><tr>
-<tr>
-<td>Brief-Description:<br>
-<b>$rec->{name}</b>
-</td>
-</tr>
-<tr>
-<td><b><u>Description:</b></u><br>
-<table style=\"width:100%;overflow:hidden;table-layout:fixed;padding:0;margin:0\">
-<tr><td style="min-height:80px;height:auto;height:80px">
-<pre class=multilinetext>$description</pre>
-</td></tr></table>
-</td>
-</tr>
-<tr>
-<td><b><u>Backout Method:</b></u><br>
-<table style=\"width:100%;overflow:hidden;table-layout:fixed;padding:0;margin:0\">
-<tr><td style="min-height:80px;height:auto;height:80px">
-<pre class=multilinetext>$rec->{fallback}</pre>
-</td></tr></table>
-</td>
-</tr>
-</table>
-
-EOF
-   return($d);
-}
-
-
 
 
 
