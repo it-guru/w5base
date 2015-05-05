@@ -1419,5 +1419,5 @@ create table lnkbusinessservicegrp (
   FOREIGN KEY (grp) 
           REFERENCES grp (grpid) ON DELETE CASCADE
 ) ENGINE=INNODB;
-alter table asset add acquStart datetime default NULL,add acquMode varchar(10) default 'PURCASE';
+alter table asset add acquStart datetime default NULL,add acquMode varchar(10) default 'PURCHASE';
 alter table businessservice add occreactiontime bigint(20), add occtotaltime bigint(20);
