@@ -165,7 +165,7 @@ sub CheckFilter
    my $rec=$self->tieRec();
    my @flt=$self->getFilterSet();
    return(1) if (!defined($rec));
-   return(1) if (!defined($#flt==-1));
+   return(1) if ($#flt==-1);
    my $failcount=0;
    my $okcount=0;
    CHK: foreach my $filter (@flt){
@@ -222,22 +222,51 @@ sub CheckFilter
             }
             else{
                my $wordschkok=0;
-               foreach my $chk (@words){  # default = OR
-                  my @dataval=($rec->{$k});
-                  @dataval=@{$rec->{$k}} if (ref($rec->{$k}) eq "ARRAY");
-                  @dataval=values(%{$rec->{$k}}) if (ref($rec->{$k}) eq "HASH");
+               my $conjunction; # AND relation
+
+               my @dataval=($rec->{$k});
+               @dataval=@{$rec->{$k}} if (ref($rec->{$k}) eq "ARRAY");
+               @dataval=values(%{$rec->{$k}}) if (ref($rec->{$k}) eq "HASH");
+
+               for (my $i=0;$i<=$#words;$i++) {
+                  my $chk=$words[$i];
+
+                  $conjunction=0; # default
+                  if ($i<$#words && $words[$i+1] eq 'AND') {
+                     $conjunction=1; # relation to next word is AND
+                  }
+
                   my $recok;
                   DATACHK: foreach my $dataval (@dataval){
                      if ($chk=~m/^>/){
                         $chk=~s/^>//;
                         if (!($dataval>$chk)){
                            $recok=0 if (!defined($recok));
+                           if ($conjunction) {
+                              # skip all words with AND relation
+                              while ($i<$#words && $words[$i+1] eq 'AND') {
+                                 $i+=2;
+                              }
+                           }
+                        }
+                        elsif ($conjunction) {
+                           $recok=0 if (!defined($recok));
+                           $i+=1; # skip next word. It's AND
                         }
                      }
                      elsif ($chk=~m/^</){
                         $chk=~s/^<//;
                         if (!($dataval<$chk)){
                            $recok=0 if (!defined($recok));
+                           if ($conjunction) {
+                              while ($i<$#words && $words[$i+1] eq 'AND') {
+                                 $i+=2;
+                              }
+                           }
+                        }
+                        elsif ($conjunction) {
+                           $recok=0 if (!defined($recok));
+                           $i+=1;
                         }
                      }
                      elsif ($chk=~m/^!/){
@@ -246,6 +275,15 @@ sub CheckFilter
                         $chk=~s/\*/\.*/g;
                         if (($dataval=~m/^$chk$/i)){
                            $recok=0 if (!defined($recok));
+                           if ($conjunction) {
+                              while ($i<$#words && $words[$i+1] eq 'AND') {
+                                 $i+=2;
+                              }
+                           }
+                        }
+                        elsif ($conjunction) {
+                           $recok=0 if (!defined($recok));
+                           $i+=1;
                         }
                      }
                      else{
@@ -254,9 +292,20 @@ sub CheckFilter
                         $chk=~s/\*/\.*/g;
                         if (!($dataval=~m/^$chk$/i)){
                            $recok=0 if (!defined($recok));
+                           if ($conjunction) {
+                              while ($i<$#words && $words[$i+1] eq 'AND') {
+                                 $i+=2;
+                              }
+                           }
                         }
                         else{
-                           $recok++;
+                           if ($conjunction) {
+                              $recok=0 if (!defined($recok));
+                              $i+=1;
+                           }
+                           else {
+                              $recok++;
+                           }
                         }
                      }
                   }
@@ -276,7 +325,6 @@ sub CheckFilter
          } 
       }
    }
-   return(1) if ($okcount>0 && $failcount==0); 
    return(0) if ($failcount); 
    return(1);
 }
