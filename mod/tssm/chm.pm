@@ -370,7 +370,6 @@ sub new
                 name          =>'type',
                 group         =>'status',
                 label         =>'Change Type (CBI)',
-                htmldetail    =>0,
                 dataobjattr   =>SELpref.'cm3rm1.initial_impact'),
 
 ##      new kernel::Field::Text(
