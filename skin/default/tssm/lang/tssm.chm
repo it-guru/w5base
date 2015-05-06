@@ -19,7 +19,7 @@
 'Assigned To'=>{de=>'Zugewiesen an'},
 'Change No.'=>{de=>'Change-Nummer'},
 'SysModTime'=>{de=>'letzte Bearbeitung'},
-'Risk'=>{de=>'Risiko (Risk)'},
+'Risk'=>{de=>'Risiko (Risk Type)'},
 'Location'=>{de=>'Standort (Location)'},
 'Project'=>{de=>'Projekt (Project)'},
 'Fallback'=>{de=>'Anulierungsverfahren (Fallback)'},
