@@ -22,6 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -31,35 +33,41 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name       =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name       =>'linenumber',
+                label      =>'No.'),
 
-      new kernel::Field::Id(        name       =>'changenumber',
-                                    label      =>'Change No.',
-                                    align      =>'left',
-                                    dataobjattr=>'cm3ra14.numberprgn'),
+      new kernel::Field::Text(        
+                name       =>'changenumber',
+                label      =>'Change No.',
+                align      =>'left',
+                
+                dataobjattr=>SELpref.'cm3ra7.dh_number'),
 
-      new kernel::Field::Text(      name       =>'name',
-                                    ignorecase =>1,
-                                    label      =>'Pending',
-                                    htmldetail =>0,
-                                    dataobjattr=>'cm3ra14.current_pending_groups'),
+      new kernel::Field::Text(      
+                name       =>'name',
+                ignorecase =>1,
+                label      =>'Pending',
+                htmldetail =>0,
+                dataobjattr=>SELpref.'cm3ra7.tsi_approvals_manual'),
 
-      new kernel::Field::Text(      name       =>'groupname',
-                                    label      =>'Pending',
-                                    htmlwidth  =>'200px',
-                                    vjointo    =>'tssm::group',
-                                    vjoinon    =>['name'=>'name'],
-                                    vjoindisp  =>['name']),
+      new kernel::Field::Text(      
+                name       =>'groupname',
+                label      =>'Pending',
+                htmlwidth  =>'200px',
+                vjointo    =>'tssm::group',
+                vjoinon    =>['name'=>'name'],
+                vjoindisp  =>['name']),
 
-      new kernel::Field::Text(      name       =>'groupmailbox',
-                                    label      =>'Group Email Address',
-                                    vjointo    =>'tssm::group',
-                                    vjoinon    =>['name'=>'name'],
-                                    vjoindisp  =>['groupmailbox']),
+      new kernel::Field::Text(      
+                name       =>'groupmailbox',
+                label      =>'Group Email Address',
+                vjointo    =>'tssm::group',
+                vjoinon    =>['name'=>'name'],
+                vjoindisp  =>['groupmailbox']),
    );
 
-   $self->setDefaultView(qw(linenumber groupname groupmailbox));
+   $self->setDefaultView(qw(linenumber changenumber groupname groupmailbox));
    $self->{use_distinct}=0;
 
    return($self);
@@ -79,7 +87,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cm3ra14";
+   my $from=TABpref."cm3ra7 ".SELpref."cm3ra7";
    return($from);
 }
 

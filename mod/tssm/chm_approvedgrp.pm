@@ -22,6 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -31,18 +33,21 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name       =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name       =>'linenumber',
+                label      =>'No.'),
 
-      new kernel::Field::Id(        name       =>'changenumber',
-                                    label      =>'Change No.',
-                                    align      =>'left',
-                                    dataobjattr=>'cm3ra9.numberprgn'),
+      new kernel::Field::Id(        
+                name       =>'changenumber',
+                label      =>'Change No.',
+                align      =>'left',
+                dataobjattr=>SELpref.'cm3ra9.dh_number'),
 
-      new kernel::Field::Textarea(  name       =>'name',
-                                    ignorecase =>1,
-                                    label      =>'Group approved',
-                                    dataobjattr=>'cm3ra9.approved_groups'),
+      new kernel::Field::Textarea(  
+                name       =>'name',
+                ignorecase =>1,
+                label      =>'Group approved',
+                dataobjattr=>SELpref.'cm3ra9.approved_groups'),
    );
 
    $self->setDefaultView(qw(linenumber changenumber name));
@@ -65,7 +70,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cm3ra9";
+   my $from=TABpref."cm3ra9 ".SELpref."cm3ra9";
    return($from);
 }
 

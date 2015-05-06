@@ -171,33 +171,33 @@ sub new
                 label         =>'ServiceManager Mandant ID',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_mandant'),
 
-#      new kernel::Field::SubList(
-#                name          =>'approvalsreq',
-#                label         =>'Approvals Required',
-#                group         =>'approvals',
-#                forwardSearch =>1,
-#                vjointo       =>'tssm::chm_approvereq',
-#                vjoinon       =>['changenumber'=>'changenumber'],
-#                vjoindisp     =>[qw(groupname groupmailbox)]),
-#
-#      new kernel::Field::SubList(
-#                name          =>'approvallog',
-#                label         =>'Approval Log',
-#                group         =>'approvals',
-#                forwardSearch =>1,
-#                vjointo       =>'tssm::chm_approvallog',
-#                vjoinon       =>['changenumber'=>'changenumber'],
-#                vjoindisp     =>[qw(timestamp name action)]),
-#
-#      new kernel::Field::SubList(
-#                name          =>'approved',   
-#                label         =>'Approved Groups',  
-#                htmldetail    =>0,
-#                htmlwidth     =>'200px',
-#                group         =>'approvals',
-#                vjointo       =>'tssm::chm_approvedgrp',
-#                vjoinon       =>['changenumber'=>'changenumber'],
-#                vjoindisp     =>[qw(name)]),
+      new kernel::Field::SubList(
+                name          =>'approvalsreq',
+                label         =>'Approvals Required',
+                group         =>'approvals',
+                forwardSearch =>1,
+                vjointo       =>'tssm::chm_approvereq',
+                vjoinon       =>['changenumber'=>'changenumber'],
+                vjoindisp     =>[qw(groupname groupmailbox)]),
+
+      new kernel::Field::SubList(
+                name          =>'approvallog',
+                label         =>'Approval Log',
+                group         =>'approvals',
+                forwardSearch =>1,
+                vjointo       =>'tssm::chm_approvallog',
+                vjoinon       =>['changenumber'=>'changenumber'],
+                vjoindisp     =>[qw(timestamp name action)]),
+
+      new kernel::Field::SubList(
+                name          =>'approved',   
+                label         =>'Approved Groups',  
+                htmldetail    =>0,
+                htmlwidth     =>'200px',
+                group         =>'approvals',
+                vjointo       =>'tssm::chm_approvedgrp',
+                vjoinon       =>['changenumber'=>'changenumber'],
+                vjoindisp     =>[qw(name)]),
 
       new kernel::Field::SubList(
                 name          =>'tasks',
@@ -629,7 +629,7 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tssm::lnkticket',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoindisp     =>[qw(dst priority status)]),
+                vjoindisp     =>[qw(dstname)]),
 
       new kernel::Field::Text(
                 name          =>'editor',
@@ -704,7 +704,7 @@ sub initSearchQuery
 sub allowFurtherOutput
 {
    my $self=shift;
-#   return(1) if ($self->isMemberOf("admin"));
+   return(1) if ($self->IsMemberOf("admin"));
    return(0);
 }
 

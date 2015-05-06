@@ -1,6 +1,6 @@
 package tssm::chm_approvallog;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2015  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -31,34 +32,34 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name       =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name       =>'linenumber',
+                label      =>'No.'),
 
-      new kernel::Field::Text(      name       =>'changenumber',
-                                    label      =>'Change No.',
-                                    align      =>'left',
-                                    dataobjattr=>'approvallogm1.unique_key'),
+      new kernel::Field::Text(      
+                name       =>'changenumber',
+                label      =>'Change No.',
+                align      =>'left',
+                dataobjattr=>SELpref.'cm3ra6.dh_number'),
 
-      new kernel::Field::Date(      name       =>'timestamp',
-                                    label      =>'Timestamp',
-                                    timezone   =>'CET',
-                                    htmlwidth  =>'200px',
-                                    dataobjattr=>'approvallogm1.sysmodtime'),
+      new kernel::Field::Date(      
+                name       =>'timestamp',
+                label      =>'Timestamp',
+                htmlwidth  =>'200px',
+                dataobjattr=>SELpref.'cm3ra6.tsi_approval_log_date'),
 
-      new kernel::Field::Text(      name       =>'name',
-                                    ignorecase =>1,
-                                    label      =>'Group',
-                                    htmlwidth  =>'200px',
-                                    dataobjattr=>'approvallogm1.groupprgn'),
+      new kernel::Field::Text(      
+                name       =>'name',
+                ignorecase =>1,
+                label      =>'Group',
+                htmlwidth  =>'200px',
+                dataobjattr=>SELpref.'cm3ra6.tsi_approval_log_group'),
 
-      new kernel::Field::Text(      name       =>'action',
-                                    ignorecase =>1,
-                                    label      =>'Action',
-                                    dataobjattr=>'approvallogm1.action'),
-
-      new kernel::Field::Textarea(  name       =>'statement',
-                                    label      =>'Statement',
-                                    dataobjattr=>'approvallogm1.comments'),
+      new kernel::Field::Text(      
+                name       =>'action',
+                ignorecase =>1,
+                label      =>'Action',
+                dataobjattr=>SELpref.'cm3ra6.tsi_approval_log_action')
    );
 
    $self->setDefaultView(qw(linenumber name action timestamp));
@@ -81,7 +82,7 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="approvallogm1";
+   my $from=TABpref."cm3ra6 ".SELpref."cm3ra6";
    return($from);
 }
 

@@ -27,29 +27,6 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
    
-   $self->AddFields(
-      new kernel::Field::MultiDst(
-                name          =>'priority',
-                group         =>'status',
-                label         =>'Priority',
-                translation   =>'tssm::lnk',
-                dst           =>['tssm::inm'=>'priority',
-                                 'tssm::prm'=>'priority',  
-                                 'tssm::chm'=>'urgency'],  
-                dsttypfield   =>'dstobj',
-                dstidfield    =>'dst'),
-
-      new kernel::Field::MultiDst(
-                name          =>'status',
-                group         =>'status',
-                label         =>'Status',
-                dst           =>['tssm::inm'    =>'status',
-                                 'tssm::prm'    =>'status',  
-                                 'tssm::chm'    =>'status'],  
-                dsttypfield   =>'dstobj',
-                dstidfield    =>'dst'),
-   );
-   
    $self->setDefaultView(qw(linenumber dst status sysmodtime));
    return($self);
 }
