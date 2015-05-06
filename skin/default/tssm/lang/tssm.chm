@@ -56,8 +56,6 @@
 'Service Info'=>{de=>'Change Management Info (ServiceMgmt Comments)'},
 'Complexity'=>{de=>'Komplexität (Complexity)'},
 'Criticality'=>{de=>'Kritikalität (Criticality)'},
-'Criticalities'=>{de=>'Kritikalitäten'},
-'Criticality calculated'=>{de=>'Kritikalität berechnet (calc.)'},
 'Type'=>{de=>'Change Typ (CBI)'},
 'Type calculated'=>{de=>'Change Typ berechnet (calc.)'},
 'Current Status'=>{de=>'Status'},
@@ -65,3 +63,4 @@
 'Approval Status'=>{de=>'Approval Status'},
 'Usage'=>{de=>'Betriebsart'},
 'Downtime summary'=>{de=>'PSO-Übersicht'},
+'Change Coordinator Group'=>{de=>'Change Coordinator Gruppe'},

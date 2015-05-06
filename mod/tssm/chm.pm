@@ -553,7 +553,7 @@ sub new
                 group         =>'chmcontact',
                 weblinkto     =>'tssm::useraccount',
                 weblinkon     =>['chmmgroper'=>'loginname'],
-                label         =>'Changemanager operator',
+                label         =>'Changemanager',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_manager_operator'),
 
       new kernel::Field::Text(
