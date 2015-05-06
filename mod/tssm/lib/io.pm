@@ -378,8 +378,8 @@ sub mkChangeStoreRec
    $wfrec{stateid}=1  if (lc($rec->{status}) eq "planning");
    $wfrec{stateid}=3  if (lc($rec->{status}) eq "reviewed");
    $wfrec{stateid}=3  if (lc($rec->{status}) eq "released");
-   $wfrec{stateid}=4  if (lc($rec->{status}) eq "work in process");
-   $wfrec{stateid}=4  if (lc($rec->{status}) eq "work in progress");
+   $wfrec{stateid}=4  if (lc($rec->{status}) eq "work_in_process");
+   $wfrec{stateid}=4  if (lc($rec->{status}) eq "work_in_progress");
    $wfrec{stateid}=7  if (lc($rec->{status}) eq "confirmed");
    $wfrec{stateid}=17 if (lc($rec->{status}) eq "resolved");
    $wfrec{stateid}=17 if (lc($rec->{status}) eq "closed");
