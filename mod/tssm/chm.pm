@@ -396,12 +396,6 @@ sub new
                 name          =>'criticality',
                 group         =>'status',
                 label         =>'Criticality',
-                dataobjattr   =>SELpref.'cm3rm1.tsi_ci_criticality'),
-
-      new kernel::Field::Text(
-                name          =>'criticalitycalc',
-                group         =>'status',
-                label         =>'Criticality calculated',
                 dataobjattr   =>SELpref.'cm3rm1.severity'),
 
 ##      new kernel::Field::Text(
