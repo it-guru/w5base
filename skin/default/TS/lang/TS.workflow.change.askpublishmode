@@ -1,0 +1,26 @@
+'MSG001'=>{
+de=>'Sehr geehrte Damen und Herren,
+
+hiermit informieren wir Sie über den beigefügten Change. 
+
+Sie erhalten diese Information weil eine Applikation aus Ihrem Verantwortungsbereich als TSM, CBM/IT-SeM oder AM direkt oder über eine kritische Schnittstelle von diesem Change betroffen ist, oder Sie sich die Changebenachrichtigung für eine der direkt betroffenen Anwendungen abonniert haben. 
+
+Bitte stellen Sie eine zeitnahe Bearbeitung sicher, falls von Ihnen Tasks oder Approvals bearbeitet werden müssen.
+
+Sollten Sie Einwände gegen die Maßnahme haben, machen Sie diese bitte innerhalb von 2 Arbeitstagen geltend.
+
+(Bitte beachten Sie, dass der beigefügte Direkt-Link die Information aus ServiceCenter mit einer Verzögerung von bis zu 15Min wiedergibt!)
+',
+
+
+en=>'Ladies and Gentlemen,
+
+you receive this information because one (or more) application(s) within your responsibility as TSM, CBM/IT-SeM or AM will be affected directly or via interface by the change below, or if you subscribed the Changenotification for one of the directly affected applications.
+
+In case you have approvals to give or tasks to perform please make sure to do it as soon as possible.
+
+Please keep a veto duration of 2 workdays.
+
+(please allow for a 15 minute delay before using the attached link)
+'},
+'TelekomIT Change notification'=>{de=>'TelekomIT Benachrichtigungsmodus'},
