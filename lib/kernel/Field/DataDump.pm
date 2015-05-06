@@ -38,11 +38,13 @@ sub new
             @depend=@$depend;
          }
          my @sqlctrl=@{$self->{sqldepend}};
+         $rec{order}=[];
          while(my $k=shift(@sqlctrl)){
            my $ctrl=shift(@sqlctrl);
            my $fields="*";
            my $from=$k;
            my $where="";
+           push(@{$rec{order}},$k);
            $from=$ctrl->{from}   if (exists($ctrl->{from}));
            $fields=$ctrl->{fields}     if (exists($ctrl->{fields}));
            $where=$ctrl->{where} if (exists($ctrl->{where}));
@@ -58,15 +60,19 @@ sub new
            if ($workdb->Connect()){
               my @l=$workdb->getHashList($cmd);
               if ($workdb->Ping()){
-                 $rec{$k}={'SQLcommand'=>$cmd,
-                           'SQLdbname'=>$ctrl->{dbname},
-                           'Result'=>\@l};
+                 $rec{res}->{$k}={
+                    'SQLcommand'=>$cmd,
+                    'SQLdbname'=>$ctrl->{dbname},
+                    'Result'=>\@l
+                 };
                  $workdb->Disconnect();
               }
            }
-           if (!exists($rec{$k})){
-              $rec{$k}={SQLerror=>'query problem',
-                        SQLcmd=>$cmd};
+           if (!exists($rec{res}->{$k})){
+              $rec{res}->{$k}={
+                 SQLerror=>'query problem',
+                 SQLcmd=>$cmd
+              };
            }
          }
          return(\%rec);
@@ -88,19 +94,21 @@ sub FormatedDetail
          $maxdatalen=37;
       }
       my $res="<table class=subtable>";
-      foreach my $k (sort(keys(%$d))){
-         if (ref($d->{$k}->{Result}) eq "ARRAY" &&
-             $#{$d->{$k}->{Result}}>-1){
-            $res.="<tr><td colspan=3 class=hl>$k</td></tr>";
+      for(my $setno=0;$setno<=$#{$d->{order}};$setno++){
+         my $k=$d->{order}->[$setno];
+         if (ref($d->{res}->{$k}->{Result}) eq "ARRAY" &&
+             $#{$d->{res}->{$k}->{Result}}>-1){
+            $res.="<tr><td colspan=3 class=hl><b>$k</b></td></tr>";
             my @l;
-            for(my $recno=0;$recno<=$#{$d->{$k}->{Result}};$recno++){
+            for(my $recno=0;$recno<=$#{$d->{res}->{$k}->{Result}};$recno++){
                my $n=keys(%{$d->{$k}->{Result}->[$recno]});
               # $n=$n+1;
                push(@l,"<tr><td rowspan=$n valign=top width=1%>".
                        "$recno</td>");
-               foreach my $name (sort(keys(%{$d->{$k}->{Result}->[$recno]}))){
+               my @fl=sort(keys(%{$d->{res}->{$k}->{Result}->[$recno]}));
+               foreach my $name (@fl){
                   push(@l,"<tr>") if ($#l!=0);
-                  my $d=$d->{$k}->{Result}->[$recno]->{$name};
+                  my $d=$d->{res}->{$k}->{Result}->[$recno]->{$name};
                   if (defined($d)){
                      $d=~s/\n/ /g;
                       

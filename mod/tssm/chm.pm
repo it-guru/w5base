@@ -190,16 +190,6 @@ sub new
                 vjoindisp     =>[qw(timestamp name action)]),
 
       new kernel::Field::SubList(
-                name          =>'approved',   
-                label         =>'Approved Groups',  
-                htmldetail    =>0,
-                htmlwidth     =>'200px',
-                group         =>'approvals',
-                vjointo       =>'tssm::chm_approvedgrp',
-                vjoinon       =>['changenumber'=>'changenumber'],
-                vjoindisp     =>[qw(name)]),
-
-      new kernel::Field::SubList(
                 name          =>'tasks',
                 label         =>'Tasks',
                 htmlwidth     =>'300px',
@@ -323,7 +313,7 @@ sub new
                 name          =>'status',
                 group         =>'status',
                 label         =>'Current Status',
-                dataobjattr   =>SELpref.'cm3rm1.status'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_status'),
 
       new kernel::Field::Text(
                 name          =>'phase',
@@ -341,7 +331,7 @@ sub new
                 name          =>'impact',
                 group         =>'status',
                 label         =>'Business Impact',
-                dataobjattr   =>SELpref.'cm3rm1.impact_severity'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_restriction'),
 
       new kernel::Field::Text(
                 name          =>'requestedfrom',
@@ -349,11 +339,12 @@ sub new
                 label         =>'Requested from',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_requested_from'),
 
-##      new kernel::Field::Text(
-##                name          =>'urgency',
-##                group         =>'status',
-##                label         =>'Urgency',
-##                dataobjattr   =>'cm3rm1.urgency'),
+      new kernel::Field::Text(
+                name          =>'urgency',
+                group         =>'status',
+                label         =>'Urgency',
+                dataobjattr   =>"decode(".SELpref."cm3rm1.emergency,'t',".
+                                "'emergency','normal')"),
 
       new kernel::Field::Text(
                 name          =>'reason',
@@ -373,14 +364,14 @@ sub new
                 name          =>'risk',
                 group         =>'status',
                 label         =>'Risk',
-                dataobjattr   =>SELpref.'cm3rm1.risk_assessment'),
+                dataobjattr   =>SELpref.'cm3rm1.tsi_risk_type'),
 
-##      new kernel::Field::Text(
-##                name          =>'type',
-##                group         =>'status',
-##                label         =>'Type',
-##                htmldetail    =>0,
-##                dataobjattr   =>'cm3rm1.class_field'),
+      new kernel::Field::Text(
+                name          =>'type',
+                group         =>'status',
+                label         =>'Change Type (CBI)',
+                htmldetail    =>0,
+                dataobjattr   =>SELpref.'cm3rm1.initial_impact'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'typecalc',
@@ -401,19 +392,17 @@ sub new
 ##                   return "$current->{type} (calc. $current->{typecalc})";
 ##                }),
 
-##      new kernel::Field::Text(
-##                name          =>'criticality',
-##                group         =>'status',
-##                label         =>'Criticality',
-##                htmldetail    =>0,
-##                dataobjattr   =>'cm3rm1.criticality'),
+      new kernel::Field::Text(
+                name          =>'criticality',
+                group         =>'status',
+                label         =>'Criticality',
+                dataobjattr   =>SELpref.'cm3rm1.tsi_ci_criticality'),
 
-##      new kernel::Field::Text(
-##                name          =>'criticalitycalc',
-##                group         =>'status',
-##                label         =>'Criticality calculated',
-##                htmldetail    =>0,
-##                dataobjattr   =>'cm3rm1.criticality_total'),
+      new kernel::Field::Text(
+                name          =>'criticalitycalc',
+                group         =>'status',
+                label         =>'Criticality calculated',
+                dataobjattr   =>SELpref.'cm3rm1.severity'),
 
 ##      new kernel::Field::Text(
 ##                name          =>'criticalities',

@@ -62,6 +62,18 @@ sub Init
    $self->RegisterObj("itu.sm.change.device",
                       "tssm::chm_device",
                       defaultacl=>['admin',"support"]);
+
+   $self->RegisterObj("itu.sm.change.ApprovalLog",
+                      "tssm::chm_approvallog",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.sm.change.ApprovalReq",
+                      "tssm::chm_approvereq",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.sm.change.ApprovedGrp",
+                      "tssm::chm_approvedgrp",
+                      defaultacl=>['admin']);
    
    $self->RegisterObj("itu.sm.incident",
                       "tssm::inm",

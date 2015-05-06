@@ -88,6 +88,10 @@ sub new
                        dbname=>'tssm',
                        joinon=>['changenumber'=>'dh_number'] 
                    },
+                   'dh_cm3ra5'=>{
+                       dbname=>'tssm',
+                       joinon=>['changenumber'=>'dh_number'] 
+                   },
                    'dh_cm3ra6'=>{
                        dbname=>'tssm',
                        joinon=>['changenumber'=>'dh_number'] 
