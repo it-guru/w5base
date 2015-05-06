@@ -49,6 +49,10 @@ sub new
                                    size       =>'10',
                                    dataobjattr=>'tOuSD'),
 
+      new kernel::Field::Text(   name       =>'sapid',
+                                 label      =>'SAP-OrganisationalID (tOuSapID)',
+                                 dataobjattr=>'tOuSapID'),
+
       new kernel::Field::TextDrop( name       =>'parent',
                                    label      =>'Parentgroup (tOuSuperior)',
                                    vjointo    =>'tswiw::orgarea',
