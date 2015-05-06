@@ -52,6 +52,26 @@ sub addSRCLinkToFacility
 
 }
 
+sub activateMailSend
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $wf=shift;
+   my $id=shift;
+   my $newmailrec=shift;
+   my $action=shift;
+
+   my %d=(step=>'base::workflow::mailsend::waitforspool',
+          emailsignatur=>'ChangeNotification: Telekom IT');
+   $self->linkMail($WfRec->{id},$id);
+   if (my $r=$wf->Store($id,%d)){
+      return(1);
+   }
+   return(0);
+}
+
+
+
 sub getStepByShortname
 {
    my $self=shift;
