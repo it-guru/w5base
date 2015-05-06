@@ -1,3 +1,3 @@
 'tssm::MyW5Base::change'=>{
-               de=>'Tool: suche ITIL Change über ServiceManager Changenummer',
-               en=>'Tool: search ITIL Changes by ServiceManager Changenumber'},
+          de=>'Tool: suche T-Systems Change über ServiceManager Changenummer',
+          en=>'Tool: search T-Systems Changes by ServiceManager Changenumber'},
