@@ -7,7 +7,7 @@
 <td valign=top style="height:20px;overflow:hidden">
 <div align=right>
 %SUPPORTINFO% &nbsp;
-<a target=_self href="#" onclick="window.top.displayHints();return(false):"> Hints-Test </a> &nbsp;
+<a target=_self href="#" onclick="window.top.displayHints();return(false);"> Hints-Test </a> &nbsp;
 %GLOBALHELP()%
 </div>
 
