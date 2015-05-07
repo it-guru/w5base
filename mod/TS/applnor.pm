@@ -178,6 +178,13 @@ sub autoFillAutogenField
                $pid{uc($urec->{luser})}++ if ($urec->{luser} ne "");
             }
          };
+         my $o=getModuleObject($self->Config,"tssm::group");
+         $o->SetFilter({name=>$refid});
+         foreach my $r ($o->getHashList(qw(users))){
+            foreach my $urec (@{$r->{users}}){
+               $pid{uc($urec->{luser})}++ if ($urec->{luser} ne "");
+            }
+         };
          $self->autoFillAddResultCache([$fld->{name},
                                         [keys(%pid)],
                                         $current->{srcparentid}]);

@@ -25,6 +25,27 @@ use kernel::Field;
 use kernel::CIStatusTools;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
+# Migration neues Dokumentenhandling:
+=head1
+update appladv set isactive=null where isactive=0;
+update applnor set isactive=null where isactive=0;
+delete from applnor using applnor, applnor as tmp
+where not applnor.id=tmp.id
+   and applnor.id<tmp.id
+   and tmp.isactive=1
+   and applnor.isactive=1
+   and applnor.appl=tmp.appl;
+alter table applnor add unique(appl,isactive), add refreshinfo1 datetime;
+delete from appladv using appladv, appladv as tmp
+where not appladv.id=tmp.id
+   and appladv.id<tmp.id
+   and tmp.isactive=1
+   and appladv.isactive=1
+   and appladv.appl=tmp.appl;
+alter table appladv add unique(appl,isactive), add refreshinfo1 datetime;
+=cut
+
+
 sub new
 {
    my $type=shift;
@@ -92,7 +113,7 @@ sub new
                 readonly      =>1,
                 selectsearch  =>sub{
                    my $self=shift;
-                   return(['"1" [LEER]',
+                   return(['1',
                            $self->getParent->T('yes - show only active')],
                           ['', 
                            $self->getParent->T('no - show all')]);
@@ -528,6 +549,7 @@ sub getSqlFrom
 }
 
 
+
 sub Validate
 {
    my $self=shift;
@@ -560,7 +582,14 @@ sub Validate
       my ($year, $month)=$self->Today_and_Now($tz);
       $newrec->{docdate}=sprintf("%04d-%02d",$year,$month);
    }
-      
+
+   if ($newrec->{dstate}==20){
+      my $o=$self->Clone();
+      $o->UpdateRecord({dstate=>30,
+                        rawisactive=>undef},{parentid=>$oldrec->{parentid},
+                                       dstateid=>"!30",
+                                       id=>"!$oldrec->{id}"});
+   }
    return(1);
 }
 
@@ -604,26 +633,44 @@ sub FinishWrite
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
    if (effChanged($oldrec,$newrec,"dstate")){
       if ($oldrec->{dstate} eq "10" && $newrec->{dstate} eq "20"){
-         my $o=$self->Clone();
-         $o->UpdateRecord({dstate=>30,
-                           isactive=>0},{parentid=>$oldrec->{parentid},
-                                          dstateid=>"!30",
-                                          id=>"!$oldrec->{id}"});
-         $o->ValidatedInsertRecord({parentid=>$oldrec->{parentid}});
+         my $o=$self->Clone();  # neuen automatisch generiteren Record erzeugen
+         $o->ValidatedInsertRecord({parentid=>$oldrec->{parentid},
+                                    rawisactive=>undef});
       }
    }
    if ($newrec->{dstate} eq "20"){
       my $o=$self->Clone();
-      $o->UpdateRecord({isactive=>0},{parentid=>$oldrec->{parentid},
+      $o->UpdateRecord({rawisactive=>undef},{parentid=>$oldrec->{parentid},
                                        id=>"!$oldrec->{id}"});
    }
    if ($newrec->{dstate} eq "30"){
       my $o=$self->Clone();
-      $o->UpdateRecord({isactive=>1},{parentid=>$oldrec->{parentid},
+      $o->UpdateRecord({rawisactive=>1},{parentid=>$oldrec->{parentid},
                                        dstateid=>\'10'});
    }
    return($bak);
 }
+
+
+sub SetFilter
+{
+   my $self=shift;
+
+   my $flt=$_[0];
+
+
+   if ($flt->{isactive}==1){
+      $self->SetNamedFilter("isACTIVE",[{isactive=>'1'},{parentid=>\undef}]);
+   }
+
+   delete($flt->{isactive});
+
+
+
+   return($self->SUPER::SetFilter(@_));
+}
+
+
 
 
 sub prepUploadFilterRecord

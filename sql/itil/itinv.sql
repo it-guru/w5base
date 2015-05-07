@@ -994,7 +994,7 @@ create table appladv (
   appl         bigint(20) NOT NULL,itnormodel bigint(20) default '0',
   dstate       int(1) default '10',
   isactive     int(1) default NULL,
-  docdate      char(7) default NULL,
+  docdate      char(7) default NULL,refreshinfo1 datetime,
   comments     longtext default NULL,
   additional   longtext default NULL,
   modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
@@ -1007,14 +1007,14 @@ create table appladv (
   PRIMARY KEY  (id),key(docdate),
   FOREIGN KEY fk_appl (appl)
               REFERENCES appl (id) ON DELETE CASCADE,
-  UNIQUE KEY `srcsys` (srcsys,srcid)
+  UNIQUE KEY `srcsys` (srcsys,srcid), unique(appl,isactive)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table applnor (
   id           bigint(20) NOT NULL,
   appl         bigint(20) NOT NULL,
   dstate       int(1) default '10',
   isactive     int(1) default NULL,
-  docdate      char(7) default NULL,
+  docdate      char(7) default NULL,refreshinfo1 datetime,
   comments     longtext default NULL,
   additional   longtext default NULL,
   modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
@@ -1027,7 +1027,7 @@ create table applnor (
   PRIMARY KEY  (id),key(docdate),
   FOREIGN KEY fk_appl (appl)
               REFERENCES appl (id) ON DELETE CASCADE,
-  UNIQUE KEY `srcsys` (srcsys,srcid)
+  UNIQUE KEY `srcsys` (srcsys,srcid), unique(appl,isactive)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table itnormodel (
   id           bigint(20) NOT NULL,

@@ -330,8 +330,10 @@ sub autoFillAutogenField
    }
    if ($fld->{name} eq "contractmodules"){
       my @modules;
-      my $f=$self->getField("custcontract");
+      my $o=$self->Clone();  # prevent commands run out of sync in MySQL
+      my $f=$o->getField("custcontract");
       my $d=$f->RawValue($current);
+      my $d=[];
 
       my @contractid=();
       foreach my $crec (@{$d}){
@@ -417,6 +419,8 @@ sub isWriteValid
                       $chkrec->{dstate}>10);
       }
       return(@l) if ($rec->{databossid} eq $userid ||
+                     $rec->{applmgrid} eq $userid ||
+                     $rec->{semid} eq $userid ||
                      $rec->{sem2id} eq $userid);
       if ($rec->{responseteamid} ne ""){
          return(@l) if ($self->IsMemberOf($rec->{responseteamid}));
