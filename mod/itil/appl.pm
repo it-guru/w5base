@@ -891,7 +891,8 @@ sub new
                                  'reltyp','systemcistatus',
                                  'shortdesc'],
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
-                                 'systemid','id','reltyp','shortdesc']),
+                                 'systemid','id','reltyp','shortdesc',
+                                 'assetassetname']),
 
       new kernel::Field::SubList(
                 name          =>'systemnames',

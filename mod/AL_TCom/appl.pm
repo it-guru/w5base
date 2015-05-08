@@ -212,7 +212,9 @@ sub ItemSummary
    my %systemids; # nachladen der Abschreibungsdaten aus AssetManager
    my %assetids;
    foreach my $sys (@{$summary->{systems}}){
-      $systemids{$sys->{systemsystemid}}=$sys if ($sys->{systemsystemid} ne "");
+      if ($sys->{systemsystemid} ne ""){
+         $systemids{$sys->{systemsystemid}}=ObjectRecordCodeResolver($sys);
+      }
    }
    if (keys(%systemids)){
       my $o=getModuleObject($self->Config,"tsacinv::system");
@@ -275,7 +277,7 @@ sub ItemSummary
                                      osanalysestate
                                      urlofcurrentrec));
       return(0) if (!$o->Ping());
-      Dumper(\@systems);
+      @systems=@{ObjectRecordCodeResolver(\@systems)};
       for(my $c=0;$c<=$#systems;$c++){
          push(@dataissues,$systems[$c]->{dataissuestate});
          delete($systems[$c]->{dataissuestate});
