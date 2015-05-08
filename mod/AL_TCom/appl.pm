@@ -21,6 +21,7 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field;
 use TS::appl;
+use Storable(qw(dclone));
 @ISA=qw(TS::appl);
 
 sub new
@@ -261,8 +262,7 @@ sub ItemSummary
       });
       return(0) if (!$l1->Ping());
       return(0) if (!$l2->Ping());
-      Dumper(\@softstate);
-      $summary->{software}={record=>\@softstate};      # SET : software fertig
+      $summary->{software}={record=>ObjectRecordCodeResolver(\@softstate)};
    }
    ###########################
    {
@@ -377,8 +377,7 @@ sub ItemSummary
                                        urlofcurrentrec 
                                        denyupd denyupdcomments));
       return(0) if (!$o->Ping());
-      Dumper(\@osroadmap);
-      $summary->{osroadmap}={record=>\@osroadmap};
+      $summary->{osroadmap}={record=>ObjectRecordCodeResolver(\@osroadmap)};
    }
 
    #######################################################################
@@ -398,17 +397,17 @@ sub ItemSummary
          my $l1=getModuleObject($self->Config,"tshpsa::lnkswp");
          my @swview=qw(fullname denyupd denyupdcomments 
                        softwarerelstate is_mw is_dbs
+                       systemname systemsystemid
                        urlofcurrentrec);
          $l1->ResetFilter();
          $l1->SetFilter({systemsystemid        =>[keys(%systemids)],
                          softwareset     =>$rm->{name}});
          my @l1=$l1->getHashList(@swview);
-         push(@softstate,{
+         my @softstate=({
             roadmap=>$rm->{name},
-            i=>[@l1]
+            i=>ObjectRecordCodeResolver(\@l1)
          });
          return(0) if (!$l1->Ping());
-         my $dump=Dumper(\@softstate);
          $summary->{hpsaswp}={record=>\@softstate};    # SET : hpsaswp fertig
       }
    }

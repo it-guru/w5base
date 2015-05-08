@@ -85,7 +85,7 @@ use Unicode::String qw(utf8 latin1 utf16);
              &Debug &UTF8toLatin1 &Html2Latin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
-             &Dumper &CSV2Hash
+             &Dumper &CSV2Hash &ObjectRecordCodeResolver
              &FancyLinks &ExpandW5BaseDataLinks &mkInlineAttachment 
              &FormatJsDialCall &HashExtr
              &mkMailInlineAttachment &haveSpecialChar
@@ -105,6 +105,38 @@ sub LangTable
 sub Dumper
 {
    return(Data::Dumper::Dumper(@_));
+}
+
+sub ObjectRecordCodeResolver
+{
+   my $back;
+   if (defined($_[0])){
+      my $deep=$_[1];
+      $deep=+1;
+      if ($deep>50){
+         $back=msg(ERROR,$_[0]." deep limit reached in ".
+                         "ObjectRecordCodeResolver");
+      }
+      elsif (ref($_[0]) eq "ARRAY"){
+         $back=[];
+         foreach my $rec (@{$_[0]}){
+            push(@{$back},ObjectRecordCodeResolver($rec,$deep)); 
+         }
+      }
+      elsif (ref($_[0]) eq "HASH"){
+         $back={};
+         foreach my $k (keys(%{$_[0]})){
+            $back->{$k}=ObjectRecordCodeResolver($_[0]->{$k},$deep);
+         }
+      }
+      elsif (ref($_[0])){
+         $back=msg(ERROR,$_[0]." not resolvable in ObjectRecordCodeResolver");
+      }
+      else{
+         $back="".$_[0];
+      }
+   }
+   return($back);
 }
 
 sub CSV2Hash
