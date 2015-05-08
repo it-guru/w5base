@@ -190,7 +190,7 @@ sub ItemSummary
    return(0) if (!$o->Ping());
 
    my $o=getModuleObject($self->Config,"itil::softwareset");
-   $o->SetFilter({name=>'"AO Engineering CIT Roadmap*"',
+   $o->SetFilter({name=>'"TEL-IT Patchmanagement*"',
                   cistatusid=>\'4'});
    my @roadmapname=$o->getHashList(qw(id name));
 
@@ -234,13 +234,6 @@ sub ItemSummary
    #######################################################################
    # neuer Versuch für RiManOS
 
-   # das muß rein, wenn der Alte Rotz oben raus fliegt
-   #my $o=getModuleObject($self->Config,"itil::softwareset");
-   #$o->SetFilter({name=>'"AO Engineering CIT Roadmap*"',
-   #               cistatusid=>\'4'});
-   #my @roadmapname=$o->getHashList(qw(id name));
-   #
-   #my @rm;
    my @dataissues;
    ###########################
    my $rm=$rm[0];
