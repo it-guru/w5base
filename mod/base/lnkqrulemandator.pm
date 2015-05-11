@@ -203,7 +203,6 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $origrec=shift;
-
    my $dataobj=effVal($oldrec,$newrec,"dataobj");
    if (defined($dataobj)){
       $dataobj=trim($dataobj);
@@ -251,6 +250,32 @@ sub Validate
       $self->LastMsg(ERROR,"dataobj not allowed for this qrule");
       return(undef);  
    }
+
+
+   # check for ambiguous dataobjects for current mandator
+   my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
+
+   my $m=getModuleObject($self->Config(),'base::mandator');
+   $m->SetFilter({grpid=>\$mandatorid});
+   my ($mandator,$msg)=$m->getOnlyFirst("name");
+   my $mname=$mandator->{name};
+   $mname='[any]' if ($mname eq "");
+
+   my $lnkqrm=getModuleObject($self->Config(),$self->Self);
+   $lnkqrm->SetFilter({mandatorid=>\$mandatorid});
+   my $dobjs=$lnkqrm->getHashIndexed("dataobj");
+
+   foreach my $dobj (keys %{$dobjs->{dataobj}}) {
+      my $o=getModuleObject($self->Config(),$dobj);
+      if ($o->SelfAsParentObject() eq $dataobjparent &&
+          $dobj ne $dataobj) {
+         $self->LastMsg(ERROR,"data object '%s' for mandator '%s' is ambiguous",
+                              $dataobj,$mname);
+         return(undef);  
+      }
+   }
+   
+
    return(1);
 }
 

@@ -10,4 +10,5 @@
 'invalid qruleid'=>{de=>'unkültige Quality Rule ID'},
 'dataobj not functional'=>{de=>'angegebenes Datenobjekt ist nicht funktionsfähig'},
 'dataobj not allowed for this qrule'=>{de=>'Datenobjekt ist für diese Quality Rule nicht zugelassen'},
+"data object '%s' for mandator '%s' is ambiguous"=>{de=>"Datenobjekt '%s' für Mandant '%s' ist nicht eindeutig"},
 'Rule-State'=>{de=>'Regel-Status'},
