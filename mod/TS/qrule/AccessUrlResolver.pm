@@ -69,6 +69,11 @@ sub qcheckRecord
    my $desc={qmsg=>[],solvtip=>[]};
    my @ipl;
    my $host=$rec->{hostname};
+
+   if ($rec->{network} eq "Telekom Product and Inovation Net"){
+      $desc->{qmsg}=['ignoring Telekom Product and Inovation Net'];
+      return($exitcode,$desc);
+   }
    if ($host eq ""){
       my $msg="can not identify hostname in:".$rec->{fullname};
       push(@{$desc->{qmsg}},$msg);
