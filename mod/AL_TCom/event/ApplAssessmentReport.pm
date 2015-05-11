@@ -66,7 +66,7 @@ sub ApplAssessmentReport
    #              recPreProcess=>\&recPreProcess,
                  filter=>{
                           mandator=>'Telekom* Extern',
-                          opmode=>\'prod',
+                          opmode=>['prod','cbreakdown'],
                           ictono=>'!""',
                           cistatusid=>'4'
                          },
@@ -75,7 +75,8 @@ sub ApplAssessmentReport
                  view=>[qw(name mandator 
                            cistatus ictono icto criticality 
                            itsem
-                           servicesupport drclass rtolevel rpolevel drc )]
+                           servicesupport drclass rtolevel rpolevel drc 
+                           opmode)]
                 },
                );
 
