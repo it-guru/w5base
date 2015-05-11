@@ -151,6 +151,11 @@ sub new
                 dataobjattr   =>'appl.mandator'),
 
       new kernel::Field::Link(
+                name          =>'applmgrid',
+                group         =>'sem',
+                dataobjattr   =>'appl.applmgr'),
+
+      new kernel::Field::Link(
                 name          =>'semid',
                 group         =>'sem',
                 readonly      =>1,
@@ -248,6 +253,15 @@ sub new
                 name          =>'customerid',
                 dataobjattr   =>'appl.customer'),
 
+      new kernel::Field::Date(
+                name          =>'refreshinfo1',
+                uivisible     =>0,
+                dataobjattr   =>"$worktable.refreshinfo1"),
+
+      new kernel::Field::Date(
+                name          =>'refreshinfo2',
+                uivisible     =>0,
+                dataobjattr   =>"$worktable.refreshinfo2"),
 
       new kernel::Field::Container(
                 name          =>'additional',
@@ -500,6 +514,7 @@ sub SecureSetFilter
        #          {sectargetid=>\@grpids,sectarget=>\'base::grp',
        #           secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
        #                     "*roles=?read?=roles*"},
+                 {applmgrid=>$userid},
                  {tsmid=>$userid},
                  {tsm2id=>$userid},
                  {opmid=>$userid},
