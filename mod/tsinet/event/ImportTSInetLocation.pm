@@ -169,6 +169,7 @@ sub ImportTSInetLocation
                    emailfrom=>'"TSINET to W5BaseDarwin" <no_reply@w5base.net>',
                    emailto=>['12023045810001'], # Fritscher
                    emailcc=>['12480761360002'], # Steiger.
+                   emailbcc=>['11634955570001'], # Junghans.
                   );
    }
 

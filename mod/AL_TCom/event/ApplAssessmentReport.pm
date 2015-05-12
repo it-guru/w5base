@@ -75,7 +75,7 @@ sub ApplAssessmentReport
                  view=>[qw(name mandator 
                            cistatus ictono icto criticality 
                            itsem
-                           servicesupport drclass rtolevel rpolevel drc 
+                           servicesupport drclass rtolevel rpolevel 
                            opmode)]
                 },
                );

@@ -107,6 +107,7 @@ sub new
                 group         =>'monisla',
                 label         =>'DR Class',
                 htmldetail    =>0,
+                uivisible     =>0,
                 dataobjattr   =>'appl.disasterrecclass'),
 
       new kernel::Field::Text(
