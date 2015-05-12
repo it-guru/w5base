@@ -68,6 +68,8 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>"$worktable.id"),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Link(
                 name          =>'srcparentid',
