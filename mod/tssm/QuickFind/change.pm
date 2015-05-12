@@ -1,6 +1,6 @@
-package tssc::QuickFind::change;
+package tssm::QuickFind::change;
 #  W5Base Framework
-#  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2015  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ sub ExtendStags
    my $self=shift;
    my $stags=shift;
    if ($ENV{REMOTE_USER} ne "anonymous"){
-      push(@$stags,"citsscchm","T-Systems ServiceCenter Change");
+      push(@$stags,"citssmchm","T-Systems ServiceManager Change");
    }
 }
 
@@ -49,18 +49,18 @@ sub CISearchResult
    my %param=@_;
 
    my @l;
-   if (grep(/^citsscchm$/,@$stag)){
-      my @searchtext=grep(/^CHM\d+$/,
+   if (grep(/^citssmchm$/,@$stag)){
+      my @searchtext=grep(/^C\d+$/,
                           grep(!/^\s*$/,split(/[\s;,]+/,$searchtext)));
       if ($#searchtext>10){
          @searchtext=$searchtext[1..10];
       }
       my $flt=[{changenumber=>\@searchtext}];
-      my $tschm=getModuleObject($self->getParent->Config,"tssc::chm");
-      $tschm->SetFilter($flt);
-      foreach my $rec ($tschm->getHashList(qw(changenumber name))){
+      my $tsmhm=getModuleObject($self->getParent->Config,"tssm::chm");
+      $tsmhm->SetFilter($flt);
+      foreach my $rec ($tsmhm->getHashList(qw(changenumber name))){
          my $dispname=$rec->{changenumber}.": ".$rec->{name};
-         push(@l,{group=>$self->getParent->T("tssc::chm","tssc::chm"),
+         push(@l,{group=>$self->getParent->T("tssm::chm","tssm::chm"),
                   id=>$rec->{changenumber},
                   parent=>$self->Self,
                   name=>$dispname});
@@ -114,25 +114,25 @@ sub QuickFindDetail
       }
    }
    else{
-      my $tschm=getModuleObject($self->getParent->Config,"tssc::chm");
-      $tschm->SetFilter({changenumber=>\$id});
+      my $tsmhm=getModuleObject($self->getParent->Config,"tssm::chm");
+      $tsmhm->SetFilter({changenumber=>\$id});
       my @l=qw(changenumber name);
-      my ($rec,$msg)=$tschm->getOnlyFirst(@l);
-      $tschm->ResetFilter();
-      if ($tschm->SecureSetFilter([{changenumber=>\$id}])){
-         my ($secrec,$msg)=$tschm->getOnlyFirst(qw(changenumber));
+      my ($rec,$msg)=$tsmhm->getOnlyFirst(@l);
+      $tsmhm->ResetFilter();
+      if ($tsmhm->SecureSetFilter([{changenumber=>\$id}])){
+         my ($secrec,$msg)=$tsmhm->getOnlyFirst(qw(changenumber));
      
          if (defined($rec)){
             $htmlresult="";
             if (defined($secrec)){
-               $htmlresult.=$self->addDirectLink($tschm,
+               $htmlresult.=$self->addDirectLink($tsmhm,
                                                  {search_changenumber=>$id});
             }
             $htmlresult.="<table>\n";
             foreach my $v (@l){
                if ($rec->{$v} ne ""){
-                  my $name=$tschm->getField($v)->Label();
-                  my $data=$tschm->findtemplvar({current=>$rec,
+                  my $name=$tsmhm->getField($v)->Label();
+                  my $data=$tsmhm->findtemplvar({current=>$rec,
                                                      mode=>"HtmlDetail"},
                                                $v,"formated");
                   $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
@@ -142,7 +142,7 @@ sub QuickFindDetail
          }
       }
       else{
-         my $msg=$tschm->findtemplvar({},"LASTMSG","formated");
+         my $msg=$tsmhm->findtemplvar({},"LASTMSG","formated");
          $htmlresult=$msg;
       }
    }
