@@ -225,7 +225,6 @@ sub Validate
       return(undef);  
    }
    my @dataobjparent=Class::ISA::self_and_super_path($dataobj);
-
    my $dataobjparent=$do->SelfAsParentObject();
 
    my $qr=getModuleObject($self->Config(),"base::qrule");
@@ -252,8 +251,10 @@ sub Validate
    }
 
 
-   # check for ambiguous dataobjects for current mandator
+   # check if really only one inheritance of dataobject is used
+   # for the current mandator
    my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
+   my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
 
    my $m=getModuleObject($self->Config(),'base::mandator');
    $m->SetFilter({grpid=>\$mandatorid});
@@ -262,19 +263,56 @@ sub Validate
    $mname='[any]' if ($mname eq "");
 
    my $lnkqrm=getModuleObject($self->Config(),$self->Self);
-   $lnkqrm->SetFilter({mandatorid=>\$mandatorid});
+   $lnkqrm->SetFilter({mandatorid=>\$mandatorid,
+                       cistatusid=>\'4'});
    my $dobjs=$lnkqrm->getHashIndexed("dataobj");
-
+   my %curdobj;
    foreach my $dobj (keys %{$dobjs->{dataobj}}) {
       my $o=getModuleObject($self->Config(),$dobj);
-      if ($o->SelfAsParentObject() eq $dataobjparent &&
-          $dobj ne $dataobj) {
-         $self->LastMsg(ERROR,"data object '%s' for mandator '%s' is ambiguous",
-                              $dataobj,$mname);
-         return(undef);  
+      if ($o->SelfAsParentObject() eq $dataobjparent) {
+         $curdobj{$dobj}++;
       }
    }
-   
+
+   my @curdobj=keys(%curdobj);
+
+   if ($#curdobj>0) {
+      my @msg=("Mandator '%s' uses several inheritances from '%s'",
+               $mname,$dataobjparent);
+      if ($cistatusid==4) {
+         $self->LastMsg(ERROR,@msg);
+         return(undef);
+      }
+
+      $self->LastMsg(WARN,@msg);
+   }   
+
+   if ($#curdobj==0) {
+      my $curdobj=$curdobj[0];
+
+      if ($dataobj ne $curdobj) {
+         if (in_array(\@dataobjparent,$curdobj)) {
+            my @msg=("All dataobjects '%s' with mandator '%s' ".
+                     "have to set to '%s'",$curdobj,$mname,$dataobj);
+            if ($cistatusid==4) {
+               $self->LastMsg(ERROR,@msg);
+               return(undef);
+            }
+
+            $self->LastMsg(WARN,@msg);
+         }
+         else {
+            my @msg=("Mandator '%s' uses dataobject '%s', not '%s'",
+                     $mname,$curdobj,$dataobj);
+            if ($cistatusid==4) {
+               $self->LastMsg(ERROR,@msg);
+               return(undef);
+            }
+
+            $self->LastMsg(WARN,@msg);
+         }
+      } 
+   }
 
    return(1);
 }
