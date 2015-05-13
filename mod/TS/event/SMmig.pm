@@ -25,7 +25,7 @@ use finance::costcenter;
 
 our %src;
 our %dst;
-our $DATE="20.01.2015";
+our $DATE="19.05.2015";
 our $WELLE="Welle1";
 our $CHANGE=0;
 
@@ -128,10 +128,10 @@ sub SMmig
       }
       printf LOG ("%s",msg(INFO,"%d applications are final affected ",
                                 $#newrec+1));
-     # if ($#{$self->{errMAP}}!=-1){
-     #    printf LOG ("%s",msg(ERROR,"break migration process due mapping errors"));
-     #    return({exitcode=>1,exitmsg=>'ERROR in mapping'});  
-     # }
+      if ($#{$self->{errMAP}}!=-1){
+         printf LOG ("%s",msg(ERROR,"break migration process due mapping errors"));
+      #   return({exitcode=>1,exitmsg=>'ERROR in mapping'});  
+      }
       # now we have a working @newrec list!
       foreach my $rec (@newrec){
          my %to=();
