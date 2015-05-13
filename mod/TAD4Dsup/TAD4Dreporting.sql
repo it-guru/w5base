@@ -56,67 +56,86 @@ BEGIN
                    select *
                    from "W5I_TAD4Dsup__system"
                    where (saphier='9TS_ES.9DTIT' or 
-                          saphier like '9TS_ES.9DTIT.%') and
-                         denv<>'OUT'
+                          saphier like '9TS_ES.9DTIT.%')
                  )
                  select
                     'totalsys.count'                                      label,
                     (select count(*) from totalsys)                       value
                  from dual
                  union all
-                 select
-                    'totalsys.cur.production.count'                       label,
-                    (select count(*)                                     
-                     from totalsys                                       
-                     where cenv='Production')                             value
-                 from dual                                               
-                 union all                                               
-                 select                                                  
-                    'totalsys.cur.integration.count'                      label,
-                    (select count(*)                                     
-                     from totalsys                                       
-                     where cenv='Integration')                            value
-                 from dual
+                 select 'totalsys.cur.'||
+                        lower(decode(cenv,
+                                     null,'empty',
+                              cenv)||'.count')                            label,
+                        count(*)                                          value
+                 from totalsys 
+                 where denv<>'OUT' 
+                 group by cenv
+                 union all
+                 select 'totalsys.dst.'||
+                        lower(decode(denv,
+                                     null,'empty',
+                              denv)||'.count')                            label,
+                        count(*)                                          value 
+                 from totalsys group by denv
+                 union all
+                 select 'totalsys.status.'||
+                        replace(lower(decode(agent_status,
+                                     null,'empty',
+                              agent_status)||'.count'),' ','_')           label,
+                        count(*)                                          value
+                 from totalsys
+                 where denv<>'OUT'
+                 group by agent_status
+                 union all
+                 select 'totalsys.agentversion.'||
+                        replace(lower(decode(agent_version,
+                                     null,'empty',
+                              agent_version)),'.','_')||'.count'          label,
+                        count(*)                                          value
+                 from  totalsys
+                 where denv<>'OUT'
+                 group by agent_version
                  union all
                  select
                     'telitsys.count'                                      label,
-                    (select count(*) from telitsys)                       value
+                    (select count(*) from telitsys
+                     where  denv<>'OUT'    )                              value
                  from dual
                  union all
-                 select
-                    'telitsys.cur.production.count'                       label,
-                    (select count(*)                                     
-                     from telitsys                                       
-                     where cenv='Production')                             value
-                 from dual                                               
-                 union all                                               
-                 select                                                  
-                    'telitsys.cur.integration.count'                      label,
-                    (select count(*)                                     
-                     from telitsys                                       
-                     where cenv='Integration')                            value
-                 from dual
+                 select 'telitsys.cur.'||
+                        lower(decode(cenv,
+                                     null,'empty',
+                              cenv)||'.count')                            label,
+                        count(*)                                          value
+                 from telitsys 
+                 where denv<>'OUT' 
+                 group by cenv
                  union all
-                 select
-                    'telitsys.dst.production.count'                       label,
-                    (select count(*)                                     
-                     from telitsys                                       
-                     where denv='Production')                             value
-                 from dual                                               
-                 union all                                               
-                 select                                                  
-                    'telitsys.dst.integration.count'                      label,
-                    (select count(*)                                     
-                     from telitsys                                       
-                     where denv='Integration')                            value
-                 from dual
-                 union all                                               
-                 select                                                  
-                    'telitsys.dst.empty.count'                            label,
-                    (select count(*)                                     
-                     from telitsys                                       
-                     where denv is null)                                  value
-                 from dual
+                 select 'telitsys.dst.'||
+                        lower(decode(denv,
+                                     null,'empty',
+                              denv)||'.count')                            label,
+                        count(*)                                          value 
+                 from telitsys group by denv
+                 union all
+                 select 'telitsys.status.'||
+                        replace(lower(decode(agent_status,
+                                     null,'empty',
+                              agent_status)||'.count'),' ','_')           label,
+                        count(*)                                          value
+                 from telitsys
+                 where denv<>'OUT'
+                 group by agent_status
+                 union all
+                 select 'telitsys.agentversion.'||
+                        replace(lower(decode(agent_version,
+                                     null,'empty',
+                              agent_version)),'.','_')||'.count'          label,
+                        count(*)                                          value
+                 from  telitsys
+                 where denv<>'OUT'
+                 group by agent_version
               ) metrics
              ) sdata_container
       from dual;
