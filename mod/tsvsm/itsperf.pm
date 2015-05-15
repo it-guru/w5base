@@ -51,13 +51,13 @@ sub new
                 name          =>'avail',
                 precision     =>2,
                 label         =>'availability',
-                dataobjattr   =>'verfuegbarkeit'),
+                dataobjattr   =>'verfuegbarkeit_taeglich'),
 
       new kernel::Field::Number(
                 name          =>'perf',
                 precision     =>2,
                 label         =>'performance',
-                dataobjattr   =>'performance'),
+                dataobjattr   =>'performance_taeglich'),
 
       new kernel::Field::Number(
                 name          =>'quality',
