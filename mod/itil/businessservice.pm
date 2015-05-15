@@ -1876,7 +1876,16 @@ sub getSqlFrom
        ref($flt[0]->{id})){
       my $id;
       if (ref($flt[0]->{id}) eq "ARRAY"){
-         $id=join(",",@{$flt[0]->{id}});
+         $id=join(",",map({
+            my $bk=$_;
+            if (!defined($bk)){
+               $bk="NULL";
+            }
+            else{
+               $bk="'$bk'";
+            }
+            $bk;
+         } @{$flt[0]->{id}}));
       }
       if (ref($flt[0]->{id}) eq "SCALAR"){
          $id=${$flt[0]->{id}};
