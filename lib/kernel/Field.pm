@@ -643,6 +643,14 @@ sub preProcessFilter
       }
 
    }
+   else{
+      if ($hflt->{$field} eq "[NONE]"){   # das wäre eine Idee, wie man mit
+         $self->getParent->LastMsg(ERROR, # der Suche nach leeren SubLists
+              $self->getParent->T("search for NONE only posible on sublists",
+                 $self->Self));           # umgehen könnte .... ist aber noch
+         $err=1;                          # nicht fertig.
+      }
+   }
    return($changed,$err);
 }
 
