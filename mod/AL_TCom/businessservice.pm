@@ -198,10 +198,6 @@ sub new
                 label         =>'Context-List',
                 vjointo       =>'AL_TCom::itscontext',
                 vjoinon       =>['id'=>'id'],
-             #   vjoinon       =>sub{
-             #      my $self=shift;
-             #      return(undef); 
-             #   },
                 vjoindisp     =>'scontextcode',
                 weblinkto     =>'NONE',
                 vjoinconcat  =>"\n"),
