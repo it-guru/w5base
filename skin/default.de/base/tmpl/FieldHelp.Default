@@ -39,7 +39,11 @@ In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
 <td nowrap valign=top><b>[LEER]</b></td>
 <td>... bei bestimmten Datenbank einträgen gibt es einen Unterschied
     zwischen "" und leer. Mit der Eingabe von [LEER] können Sie alle
-    Datensätze suchen, die im jeweiligen Feld "" oder NULL (leer) enthalten.</td>
+    Datensätze suchen, die im jeweiligen Feld "" oder NULL (leer) enthalten.
+    Bei verweisenden Felder (z.B. Unterlisten oder Listen) wird bei der Suche
+    nach [LEER] nicht danach gesucht, ob kleine Verweise in dem Feld vorhanden
+    sind, sondern es werden die Datensätze gesucht, die auf ein [LEER] Feld
+    verweisen. (was i.d.R. selten der Fall sein dürfte)</td>
 </tr>
 
 </table>
