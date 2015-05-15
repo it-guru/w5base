@@ -122,25 +122,47 @@ sub new
                 vjoinon       =>['id'=>'id']),
 
       new kernel::Field::Percent(
-                name          =>'vsmavail',
+                name          =>'vsmdavail',
                 precision     =>2,
                 readonly      =>1,
                 weblinkto     =>'NONE',
                 group         =>'VSMmeasurements',
-                label         =>'VSM availibility',
+                label         =>'VSM daily availibility',
                 vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'avail',
+                vjoindisp     =>'davail',
                 vjoinon       =>['id'=>'id']),
 
       new kernel::Field::Percent(
-                name          =>'vsmperf',
+                name          =>'vsmdperf',
                 precision     =>2,
                 readonly      =>1,
                 group         =>'VSMmeasurements',
                 weblinkto     =>'NONE',
-                label         =>'VSM performance',
+                label         =>'VSM daily performance',
                 vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'perf',
+                vjoindisp     =>'dperf',
+                vjoinon       =>['id'=>'id']),
+
+      new kernel::Field::Percent(
+                name          =>'vsmwavail',
+                precision     =>2,
+                readonly      =>1,
+                weblinkto     =>'NONE',
+                group         =>'VSMmeasurements',
+                label         =>'VSM weekly availibility',
+                vjointo       =>'tsvsm::itsperf',
+                vjoindisp     =>'wavail',
+                vjoinon       =>['id'=>'id']),
+
+      new kernel::Field::Percent(
+                name          =>'vsmwperf',
+                precision     =>2,
+                readonly      =>1,
+                group         =>'VSMmeasurements',
+                weblinkto     =>'NONE',
+                label         =>'VSM weekly performance',
+                vjointo       =>'tsvsm::itsperf',
+                vjoindisp     =>'wperf',
                 vjoinon       =>['id'=>'id']),
 
       new kernel::Field::Percent(

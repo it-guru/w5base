@@ -48,16 +48,28 @@ sub new
                 dataobjattr   =>'messzeitraum'),
 
       new kernel::Field::Number(
-                name          =>'avail',
+                name          =>'davail',
                 precision     =>2,
-                label         =>'availability',
+                label         =>'daily availability',
                 dataobjattr   =>'verfuegbarkeit_taeglich'),
 
       new kernel::Field::Number(
-                name          =>'perf',
+                name          =>'dperf',
                 precision     =>2,
-                label         =>'performance',
+                label         =>'daily performance',
                 dataobjattr   =>'performance_taeglich'),
+
+      new kernel::Field::Number(
+                name          =>'wavail',
+                precision     =>2,
+                label         =>'weekly availability',
+                dataobjattr   =>'verfuegbarkeit_woechentlich'),
+
+      new kernel::Field::Number(
+                name          =>'wperf',
+                precision     =>2,
+                label         =>'weekly performance',
+                dataobjattr   =>'performance_woechentlich'),
 
       new kernel::Field::Number(
                 name          =>'quality',
@@ -80,7 +92,10 @@ sub new
    );
    $self->setWorktable("darwin");
 
-   $self->setDefaultView(qw(name mperiod avail perf quality));
+   $self->setDefaultView(qw(name mperiod 
+                            davail dperf 
+                            wavail wperf 
+                            quality));
    return($self);
 }
 
