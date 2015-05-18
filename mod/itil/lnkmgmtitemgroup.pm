@@ -303,7 +303,7 @@ sub Validate
    }
 
 
-   my $timelimit=14;
+   my $timelimit=7;
    my $mgmtitemgroupid=effVal($oldrec,$newrec,"mgmtitemgroupid");
 
    my $o=getModuleObject($self->Config,"itil::mgmtitemgroup");
@@ -332,8 +332,8 @@ sub Validate
          if (effChanged($oldrec,$newrec,"lnkto")){
             my $d=CalcDateDuration(NowStamp("en"),$to);
             if ($d->{totaldays}<$timelimit){
-               $self->LastMsg(ERROR,"to must be at least $timelimit days ".
-                                    "in the future");
+               $self->LastMsg(ERROR,"to must be at least %d days ".
+                                    "in the future",$timelimit);
                return(undef);
             }
          }
@@ -343,7 +343,8 @@ sub Validate
       if (effChanged($oldrec,$newrec,"lnkfrom")){
          my $d=CalcDateDuration(NowStamp("en"),$from);
          if ($d->{totaldays}<$timelimit){
-            $self->LastMsg(ERROR,"from must be at least $timelimit days in the future");
+            $self->LastMsg(ERROR,"from must be at least %d days in the future",
+                                 $timelimit);
             return(undef);
          }
       }
