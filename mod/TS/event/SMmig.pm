@@ -43,6 +43,10 @@ sub SMmig
 {
    my $self=shift;
    my $filename=shift;
+   if ($filename eq "1" || $filename eq "0"){
+      $CHANGE=$filename;
+      $filename=shift;
+   }
    my $atdate=shift;
 
    $self->{MAP}={};
@@ -163,9 +167,10 @@ sub SMmig
             #%cc=();
             #%to=();
             if ($CHANGE){
+               my $orgold=ObjectRecordCodeResolver($oldrec[0]);
                if ($appl->ValidatedUpdateRecord($oldrec[0],$rec,{id=>\$rec->{id}})){
                   printf LOG ("%s",msg(INFO,"sucess '%s' (W5BaseID %s)",$rec->{name},$rec->{id}));
-                  my $txt=$self->getMailtext($lang,$oldrec[0],$rec,$fnewrec);
+                  my $txt=$self->getMailtext($lang,$orgold,$rec,$fnewrec);
                   $wfa->Notify("INFO",
                                'Changes made by Migration ServiceCenter to ServiceManager '.$WELLE,
                                $txt,
