@@ -5,7 +5,8 @@ package itil::qrule::AssetReferenced;
 =head3 PURPOSE
 
 The Quality Rule checks, if an Asset in CI-Status "installed/active"
-is "used" be at least ONE logical system in CI-Status "installed/active".
+is "used" be at least ONE logical system in CI-Status other than 
+"dipsosed of waste".
 If the CI-Status of the asset is not "marked as delete", it must
 be references by at least one logical system in any state.
 
@@ -71,7 +72,7 @@ sub qcheckRecord
                        $rec->{cistatusid}==1 ||
                        $rec->{cistatusid}==2);
 
-   my $sysflt={asset=>$rec->{name},cistatusid=>\'4'};
+   my $sysflt={asset=>$rec->{name},cistatusid=>[qw(1 2 3 4 5)]};
    if ($rec->{cistatusid}!=4){
       delete($sysflt->{cistatusid});
    }
