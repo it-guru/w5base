@@ -89,6 +89,9 @@ sub ProcessLineData
                }
             }
          }
+         else{
+            $data->[4]="???";
+         }
       }
    }
 }
