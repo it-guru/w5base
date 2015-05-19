@@ -41,6 +41,11 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'TS::swinstance',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'TS::system',
              target    =>'name',
              targetid  =>'id'
