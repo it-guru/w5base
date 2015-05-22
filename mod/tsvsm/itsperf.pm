@@ -59,12 +59,14 @@ sub new
                 name          =>'mperiod_from',
                 label         =>'measure period from',
                 timezone      =>'CET',
+                sqlorder      =>'NONE',
                 dataobjattr   =>'mfrom'),
 
       new kernel::Field::Date(
                 name          =>'mperiod_to',
                 label         =>'measure period to',
                 timezone      =>'CET',
+                sqlorder      =>'NONE',
                 dataobjattr   =>'mto'),
 
       new kernel::Field::Select(
