@@ -75,10 +75,15 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'islatest',
-                precision     =>0,
                 group         =>'source',
                 label         =>'is latest',
                 dataobjattr   =>'decode(islatest,NULL,0,islatest)'),
+
+      new kernel::Field::Link(
+                name          =>'rawislatest',
+                group         =>'source',
+                label         =>'is latest',
+                dataobjattr   =>'islatest'),
 
       new kernel::Field::Number(
                 name          =>'avail',

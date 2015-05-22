@@ -120,7 +120,7 @@ sub new
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'name',
                 weblinkto     =>'NONE',
-                vjoinbase     =>{'logtyp'=>\'day'},
+                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
                 vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
@@ -132,7 +132,7 @@ sub new
                 label         =>'VSM daily availibility',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'avail',
-                vjoinbase     =>{'logtyp'=>\'day'},
+                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
                 vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
@@ -144,7 +144,7 @@ sub new
                 label         =>'VSM daily performance',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'perf',
-                vjoinbase     =>{'logtyp'=>\'day'},
+                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
                 vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
@@ -156,7 +156,7 @@ sub new
                 label         =>'VSM weekly availibility',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'avail',
-                vjoinbase     =>{'logtyp'=>\'week'},
+                vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
                 vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
@@ -168,7 +168,7 @@ sub new
                 label         =>'VSM weekly performance',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'perf',
-                vjoinbase     =>{'logtyp'=>\'week'},
+                vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
                 vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
@@ -180,7 +180,7 @@ sub new
                 label         =>'VSM quality',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'quality',
-                vjoinbase     =>{'logtyp'=>\'week'},
+                vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
                 vjoinon       =>['id'=>'businessserviceid']),
 
    );
