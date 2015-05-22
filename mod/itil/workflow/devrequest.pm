@@ -513,6 +513,9 @@ sub getDefaultContractor
          foreach my $dev (values(%p0)){
             unshift(@devcon,$dev->{target},$dev->{targetid});
          }
+         if ($#devcon>4){
+            splice(@devcon,4);
+         }
       }
    }
    if ($#devcon==-1){
