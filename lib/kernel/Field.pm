@@ -926,11 +926,11 @@ sub RawValue
             map({
                    my %current=%{$_};
                    my $dispobj=$self->vjoinobj->getField($disp,\%current);
-                   if (defined($dispobj->{vjoinconcat})){
-                      $dispobjvjoinconcat=$dispobj->{vjoinconcat};
-                   }
                    if (!defined($dispobj)){
                       die("fail to find $disp in $self");
+                   }
+                   if (defined($dispobj->{vjoinconcat})){
+                      $dispobjvjoinconcat=$dispobj->{vjoinconcat};
                    }
                    my $bk=$dispobj->RawValue(\%current);
                    if (!$self->vjoinobj->Ping()){

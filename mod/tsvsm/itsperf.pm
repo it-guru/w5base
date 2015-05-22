@@ -35,7 +35,13 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'ID',
-                dataobjattr   =>"darwin_id"),
+                group         =>'source',
+                dataobjattr   =>"logid"),
+
+      new kernel::Field::Link(
+                name          =>'businessserviceid',
+                label         =>'BusinessServiceID',
+                dataobjattr   =>"businessserviceid"),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -43,45 +49,64 @@ sub new
                 dataobjattr   =>'hashtag'),
 
       new kernel::Field::Text(
-                name          =>'mperiod',
-                label         =>'measure period',
-                dataobjattr   =>'messzeitraum'),
+                name          =>'businessservice',
+                label         =>'Business Service',
+                vjointo       =>'AL_TCom::businessservice',
+                vjoinon       =>['businessserviceid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Date(
+                name          =>'mperiod_from',
+                label         =>'measure period from',
+                timezone      =>'CET',
+                dataobjattr   =>'mfrom'),
+
+      new kernel::Field::Date(
+                name          =>'mperiod_to',
+                label         =>'measure period to',
+                timezone      =>'CET',
+                dataobjattr   =>'mto'),
+
+      new kernel::Field::Select(
+                name          =>'logtyp',
+                label         =>'Log-Typ',
+                value         =>[qw(day week)],
+                dataobjattr   =>'logtyp'),
+
+      new kernel::Field::Boolean(
+                name          =>'islatest',
+                precision     =>0,
+                group         =>'source',
+                label         =>'is latest',
+                dataobjattr   =>'decode(islatest,NULL,0,islatest)'),
 
       new kernel::Field::Number(
-                name          =>'davail',
+                name          =>'avail',
                 precision     =>2,
-                label         =>'daily availability',
-                dataobjattr   =>'verfuegbarkeit_taeglich'),
+                unit          =>'%',
+                label         =>'availability',
+                dataobjattr   =>'avail'),
 
       new kernel::Field::Number(
-                name          =>'dperf',
+                name          =>'perf',
                 precision     =>2,
-                label         =>'daily performance',
-                dataobjattr   =>'performance_taeglich'),
-
-      new kernel::Field::Number(
-                name          =>'wavail',
-                precision     =>2,
-                label         =>'weekly availability',
-                dataobjattr   =>'verfuegbarkeit_woechentlich'),
-
-      new kernel::Field::Number(
-                name          =>'wperf',
-                precision     =>2,
-                label         =>'weekly performance',
-                dataobjattr   =>'performance_woechentlich'),
+                unit          =>'%',
+                label         =>'performance',
+                dataobjattr   =>'performance'),
 
       new kernel::Field::Number(
                 name          =>'quality',
                 precision     =>2,
+                unit          =>'%',
                 label         =>'quality',
                 dataobjattr   =>'quality'),
 
       new kernel::Field::Number(
                 name          =>'resptime',
                 precision     =>2,
+                unit          =>'ms',
                 label         =>'response time',
-                dataobjattr   =>'antwortzeit'),
+                dataobjattr   =>'resptime'),
 
       new kernel::Field::Number(
                 name          =>'trend',
@@ -89,13 +114,17 @@ sub new
                 label         =>'Trend',
                 dataobjattr   =>'trend'),
 
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'mdate')
    );
-   $self->setWorktable("darwin");
+   $self->setWorktable("measurementlog");
 
-   $self->setDefaultView(qw(name mperiod 
-                            davail dperf 
-                            wavail wperf 
-                            quality));
+   $self->setDefaultView(qw(name logtyp mperiod_from 
+                            avail perf quality));
    return($self);
 }
 
@@ -128,12 +157,12 @@ sub getDetailBlockPriority
 }
 
 
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/base/load/location.jpg?".$cgi->query_string());
-#}
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/base/load/w5stat.jpg?".$cgi->query_string());
+}
          
 
 sub isViewValid

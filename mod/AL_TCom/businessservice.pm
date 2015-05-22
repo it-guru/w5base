@@ -119,7 +119,9 @@ sub new
                 label         =>'VSM HashTag',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'name',
-                vjoinon       =>['id'=>'id']),
+                weblinkto     =>'NONE',
+                vjoinbase     =>{'logtyp'=>\'day'},
+                vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
                 name          =>'vsmdavail',
@@ -129,8 +131,9 @@ sub new
                 group         =>'VSMmeasurements',
                 label         =>'VSM daily availibility',
                 vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'davail',
-                vjoinon       =>['id'=>'id']),
+                vjoindisp     =>'avail',
+                vjoinbase     =>{'logtyp'=>\'day'},
+                vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
                 name          =>'vsmdperf',
@@ -140,8 +143,9 @@ sub new
                 weblinkto     =>'NONE',
                 label         =>'VSM daily performance',
                 vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'dperf',
-                vjoinon       =>['id'=>'id']),
+                vjoindisp     =>'perf',
+                vjoinbase     =>{'logtyp'=>\'day'},
+                vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
                 name          =>'vsmwavail',
@@ -151,8 +155,9 @@ sub new
                 group         =>'VSMmeasurements',
                 label         =>'VSM weekly availibility',
                 vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'wavail',
-                vjoinon       =>['id'=>'id']),
+                vjoindisp     =>'avail',
+                vjoinbase     =>{'logtyp'=>\'week'},
+                vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
                 name          =>'vsmwperf',
@@ -162,8 +167,9 @@ sub new
                 weblinkto     =>'NONE',
                 label         =>'VSM weekly performance',
                 vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'wperf',
-                vjoinon       =>['id'=>'id']),
+                vjoindisp     =>'perf',
+                vjoinbase     =>{'logtyp'=>\'week'},
+                vjoinon       =>['id'=>'businessserviceid']),
 
       new kernel::Field::Percent(
                 name          =>'vsmquality',
@@ -174,7 +180,8 @@ sub new
                 label         =>'VSM quality',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'quality',
-                vjoinon       =>['id'=>'id']),
+                vjoinbase     =>{'logtyp'=>\'week'},
+                vjoinon       =>['id'=>'businessserviceid']),
 
    );
    $self->AddGroup("contactpersons",translation=>'AL_TCom::businessservice');
