@@ -124,7 +124,7 @@ sub new
                 dataobjattr   =>'trend'),
 
       new kernel::Field::MDate(
-                name          =>'mdate',
+                name          =>'moddate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
