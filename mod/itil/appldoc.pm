@@ -600,11 +600,11 @@ sub Validate
       $newrec->{docdate}=sprintf("%04d-%02d",$year,$month);
    }
 
-   if ($newrec->{dstate}==20){
+   if (effChanged($oldrec,$newrec,"dstate") && $newrec->{dstate}==20){
       my $o=$self->Clone();
       $o->UpdateRecord({dstate=>30,
                         rawisactive=>undef},{parentid=>$oldrec->{parentid},
-                                       dstateid=>"!30 AND !10",
+                                       dstateid=>"!30",
                                        id=>"!$oldrec->{id}"});
    }
    return(1);
