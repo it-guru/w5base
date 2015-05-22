@@ -149,8 +149,7 @@ sub new
                    my $self=shift;     # use the 'isactive' ADV - else
                    my $current=shift;  # use the storedadvid
                    my $app=$self->getParent();
-                   if (!defined($current->{isactive}) ||
-                       !defined($current->{dstate}) ||
+                   if (!defined($current->{dstate}) ||
                        $current->{dstate}==10){
                       if ($current->{srcparentid} ne ""){
                          my $o=$app->ModuleObject("itil::appladv");
@@ -168,7 +167,7 @@ sub new
                    return($storedadvid);
                 }),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'storedadvid',
                 label         =>'stored ADV ID',
                 selectfix     =>1,

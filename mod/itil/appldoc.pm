@@ -604,7 +604,7 @@ sub Validate
       my $o=$self->Clone();
       $o->UpdateRecord({dstate=>30,
                         rawisactive=>undef},{parentid=>$oldrec->{parentid},
-                                       dstateid=>"!30",
+                                       dstateid=>"!30 AND !10",
                                        id=>"!$oldrec->{id}"});
    }
    return(1);
@@ -657,6 +657,12 @@ sub FinishWrite
    }
    if ($newrec->{dstate} eq "20"){
       my $o=$self->Clone();
+      $o->SetFilter({parentid=>\$oldrec->{parentid},dstate=>\'10'});
+      my ($chkrec,$msg)=$o->getOnlyFirst(qw(id));
+      if (!defined($chkrec)){ # ensure autogen Recrod exists
+         $o->ValidatedInsertRecord({parentid=>$oldrec->{parentid},
+                                    rawisactive=>undef});
+      }
       $o->UpdateRecord({rawisactive=>undef},{parentid=>$oldrec->{parentid},
                                        id=>"!$oldrec->{id}"});
    }
@@ -667,6 +673,7 @@ sub FinishWrite
    }
    return($bak);
 }
+
 
 
 sub SetFilter
