@@ -408,9 +408,6 @@ sub isWriteValid
       @modules=@{$modules[0]} if (ref($modules[0]) eq "ARRAY");
       push(@l,"nordef","advdef","misc",@modules);
 
-      my $userid=$self->getCurrentUserId();
-      return(@l) if ($self->IsMemberOf("admin"));
-
       # check on ankered applnor for current appladv
       my $nor=getModuleObject($self->Config,"itil::applnor");
       $nor->SetFilter({srcparentid=>\$rec->{srcparentid}});
@@ -418,6 +415,9 @@ sub isWriteValid
          return() if ($chkrec->{advid} eq $rec->{id} &&
                       $chkrec->{dstate}>10);
       }
+      my $userid=$self->getCurrentUserId();
+      return(@l) if ($self->IsMemberOf("admin"));
+
       return(@l) if ($rec->{databossid} eq $userid ||
                      $rec->{applmgrid} eq $userid ||
                      $rec->{semid} eq $userid ||
