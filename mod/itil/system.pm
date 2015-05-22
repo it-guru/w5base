@@ -1562,16 +1562,16 @@ sub isViewValid
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses phonenumbers sec applications
               location source customer history upd
-              attachments control systemclass interview);
+              attachments control systemclass interview qc);
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       push(@all,"vhost");
    }
    if (defined($rec) && $rec->{'isclusternode'}){
       push(@all,"cluster");
    }
-   if ($self->IsMemberOf("admin")){
-      push(@all,"qc");
-   }
+   #if ($self->IsMemberOf("admin")){
+   #   push(@all,"qc");
+   #}
    return(@all);
 }
 

@@ -1016,16 +1016,16 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc monisla env history control
               relations swinstancerules
-              softwareinst contacts attachments source swinstanceparam);
+              softwareinst contacts attachments source swinstanceparam qc);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
    }
    else{
       push(@all,"systems");
    }
-   if ($self->IsMemberOf("admin")){
-      push(@all,"qc");
-   }
+   #if ($self->IsMemberOf("admin")){
+   #   push(@all,"qc");
+   #}
    return(@all);
 }
 
