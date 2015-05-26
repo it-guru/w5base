@@ -255,6 +255,7 @@ sub Validate
    # for the current mandator
    my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
    my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
+   my $linkid=defined($oldrec)?$oldrec->{id}:'';
 
    my $m=getModuleObject($self->Config(),'base::mandator');
    $m->SetFilter({grpid=>\$mandatorid});
@@ -264,7 +265,8 @@ sub Validate
 
    my $lnkqrm=getModuleObject($self->Config(),$self->Self);
    $lnkqrm->SetFilter({mandatorid=>\$mandatorid,
-                       cistatusid=>\'4'});
+                       cistatusid=>\'4',
+                       id        =>"!$linkid"});
    my $dobjs=$lnkqrm->getHashIndexed("dataobj");
    my %curdobj;
    foreach my $dobj (keys %{$dobjs->{dataobj}}) {
