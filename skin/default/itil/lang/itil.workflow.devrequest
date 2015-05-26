@@ -13,6 +13,8 @@
 'fieldgroup.devreqstat'=>{de=>'detaillierte Klassifizierung/Priorisierung',en=>'detailes classification/priorisition'},
 'veto from application management of affected application'=>{de=>'Veto des Application-Managements der betroffenen Anwendung liegt vor'},
 'Prio calculated'=>{de=>'Prio berechnet'},
+'implementation effort'=>{en=>'implementation (only!) programming effort',
+                          de=>'geschätzer (nur!) Programmieraufwand'},
 'implementation effort class'=>{de=>'Aufwandsklasse für die Implementation des Requests'},
 'risk of implementation for affected application'=>{de=>'Risiko für die betroffenen Anwendung durch die Implementation'},
 'request is in primary purpose window of affected application'=>{de=>'Request passt in die primäre Aufgabe/Strategie der betroffenen Anwendung'},
