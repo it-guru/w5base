@@ -792,10 +792,10 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where;
-   #if ($ENV{REMOTE_USER} ne "dummy/admin"){
+   if ($ENV{REMOTE_USER} ne "dummy/admin"){
       $where=SELpref."cm3rm1.tsi_mandant in (".
          join(",",map({"'".$_."'"} MandantenRestriction())).")";
-   #}
+   }
    my @states=$self->getStateFilter();
    if ($#states!=-1){
       $where.=" AND " if ($where ne "");
@@ -824,10 +824,12 @@ sub SetFilter
       my @chnrs;
       foreach my $chnr (split /[\s,;]+/,$flt->{changenumber}) {
          if (my ($pref,$chnum)=$chnr=~m/^([><]{0,1})(\d{1,8})$/) {
-            $chnr=$pref.'C'.'0'x(9-length($chnum)).$chnum;       
-            $chnr=$pref.'SMCT-C'.'0'x(9-length($chnum)).$chnum;       
+            push(@chnrs,$pref.'C'.'0'x(9-length($chnum)).$chnum);       
+            push(@chnrs,$pref.'SMCT-C'.'0'x(9-length($chnum)).$chnum);       
          }
-         push @chnrs,$chnr;
+         else{
+            push(@chnrs,$chnr);
+         }
       }
 
       $_[0]->{changenumber}=join(' ',@chnrs);
