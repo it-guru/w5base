@@ -164,6 +164,7 @@ create materialized view "mview_TAD4D_adm_prod_inv"
 select 'tad4dp-'||adm_prod_inv.id              prod_inv_id,
        'tad4dp-'||adm_prod_inv.agent_id        agent_id,
        'tad4dp-'||adm_prod_inv.product_id      product_id,
+       'tad4dp-'||adm_prod_inv.branch_id        branch_id,
        'tad4dp-'||adm_prod_inv.component_id    component_id,
        adm_prod_inv.scope                      prod_inv_scope,
        to_date(substr(
@@ -183,6 +184,7 @@ union all
 select 'tad4di-'||adm_prod_inv.id              prod_inv_id,
        'tad4di-'||adm_prod_inv.agent_id        agent_id,
        'tad4di-'||adm_prod_inv.product_id      product_id,
+       'tad4di-'||adm_prod_inv.branch_id        branch_id,
        'tad4di-'||adm_prod_inv.component_id    component_id,
        adm_prod_inv.scope                      prod_inv_scope,
        to_date(substr(
@@ -209,10 +211,27 @@ CREATE INDEX "TAD4D_adm_prod_inv_id4"
    ON "mview_TAD4D_adm_prod_inv"(component_id) online;
 
 
+-- drop materialized view "mview_TAD4D_swcat_branch";
+create materialized view "mview_TAD4D_swcat_branch"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*6
+   as
+select 'tad4dp-'||swcat_branch.id              branch_id,
+       swcat_branch.type                       stype
+from swcat.branch@tad4d   swcat_branch
+union all
+select 'tad4di-'||swcat_branch.id              branch_id,
+       swcat_branch.type                       stype
+from swcat.branch@tad4di  swcat_branch;
+
+CREATE INDEX "TAD4D_swbranch_id1" 
+   ON "mview_TAD4D_swcat_branch"(branch_id) online;
+
+
 -- drop materialized view "mview_TAD4D_adm_vendor";
 create materialized view "mview_TAD4D_adm_vendor"
    refresh complete start with sysdate
-   next sysdate+(1/24)*3
+   next sysdate+(1/24)*6
    as
 select 'tad4dp-'||adm_vendor.id      vendor_id,
        adm_vendor.name               vendor_name
@@ -388,7 +407,12 @@ select "mview_TAD4D_adm_prod_inv".prod_inv_id         prod_inv_id,
        "mview_TAD4D_adm_agent".agent_id               agent_id,
        "mview_TAD4D_adm_agent".agent_hostname         agent_hostname,
        "mview_TAD4D_adm_agent".agent_scan_time        scan_time,
-       "mview_TAD4D_adm_agent".enviroment             enviroment
+       "mview_TAD4D_adm_agent".enviroment             enviroment,
+       NULL                                           isfreeofcharge
+--      decode("mview_TAD4D_adm_vendor".name,'IBM',
+--         decode("mview_TAD4D_adm_component".is_free_only,1,1,
+--          decode("mview_TAD4D_swcat_branch".stype,'10',1,0))
+--      ,NULL)                                         isfreeofcharge
 from "mview_TAD4D_adm_prod_inv"
      join "mview_TAD4D_adm_agent" 
        on "mview_TAD4D_adm_prod_inv".agent_id
@@ -402,6 +426,9 @@ from "mview_TAD4D_adm_prod_inv"
      join "mview_TAD4D_adm_vendor"
         on "mview_TAD4D_adm_swproduct".vendor_id
               ="mview_TAD4D_adm_vendor".vendor_id;
+--    join "mview_TAD4D_swcat_branch"
+--       on "mview_TAD4D_adm_prod_inv".branch_id
+--             ="mview_TAD4D_swcat_branch".branch_id;
 grant select on "W5I_TAD4D_software" to "W5I";
 create or replace synonym W5I.TAD4D_software 
    for "W5I_TAD4D_software";

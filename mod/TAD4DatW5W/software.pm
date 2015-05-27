@@ -122,11 +122,12 @@ sub new
                 group         =>'productinfo',
                 dataobjattr   =>'is_sub_cap'),
 
-#      new kernel::Field::Boolean(
-#                name          =>'isfreeofcharge',
-#                label         =>'free of charge',
-#                group         =>'productinfo',
-#                dataobjattr   =>'is_free_only'),
+      new kernel::Field::Boolean(
+                name          =>'isfreeofcharge',
+                label         =>'free of charge',
+                allowempty    =>1,
+                group         =>'productinfo',
+                dataobjattr   =>"isfreeofcharge"),
 
       new kernel::Field::Text(
                 name          =>'agentid',
