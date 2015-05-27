@@ -1,8 +1,8 @@
-Your relation to group "<b>%group%</b>" with your current role(s) "<b>%roles(formated)%</b>" has been expiered.  If you not contact the admin, this relation will be deleted in 4 weeks. The deletion of this relation posible reduces you functionalities or the visibility of datas. The deletion of this relation will not kill your access to this system! It is posible, that are already new realtions are defined, witch esure all functionialities for you or your organisational unit. 
+Your relation to group "<b>%group%</b>" with your current role(s) "<b>%roles(formated)%</b>" has been expiered.  If you do not contact the admin, this relation will be deleted in 4 weeks. It may happen, that the removal of this relationship will result in limited functionality or visibility of data. The removal of this relation will not terminate your access to this system! It is possible, that there are already new relations defined, which ensure access to all functionalities for you or your organisational unit. 
 
-If you have changed your organisational relation, ensure that all nessary entrys in the config management will be changed.
+If you have changed your organisational relation, ensure that all relevant entries in the configuration management are adjusted.
 
-Before you contact the admins, check the plausibility of your current group relations in "MyW5Base-&gr;Userpreferences". If you sure, there are problems, contact the admins by creating an admin-requst in "MyW5Base:start new workflow".
+Before you contact the admins, check the plausibility of your current group relations in "MyW5Base-&gt;Userpreferences". If you discover discrepansies please start an admin-requst in "MyW5Base:start new workflow".
 
-This is the one and only notification. No further notifications about this situation will be send.
+This is the one and only notification. No further notifications about this situation will be sent.
 

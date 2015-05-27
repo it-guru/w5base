@@ -349,7 +349,7 @@ sub NotifyUser
             if ($sitename ne ""){
                $notiy{name}=$sitename.": ".$notiy{name};
             }
-            $tmpl.="\n<br>".$self->T("list your current group relations").
+            $tmpl.="\n<br>".$self->T("List your current group relations").
                    ":<br>".$groupinfo;
             $tmpl.="\n<br>DirectLink:<br>".$directlink;
            
