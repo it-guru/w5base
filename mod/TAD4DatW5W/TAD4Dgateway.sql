@@ -417,6 +417,8 @@ from "mview_TAD4D_adm_prod_inv"
      join "mview_TAD4D_adm_agent" 
        on "mview_TAD4D_adm_prod_inv".agent_id
              ="mview_TAD4D_adm_agent".agent_id
+           and
+           "mview_TAD4D_adm_agent".agent_active=1
      join "mview_TAD4D_adm_swproduct"   
         on "mview_TAD4D_adm_prod_inv".product_id
               ="mview_TAD4D_adm_swproduct".swproduct_id
