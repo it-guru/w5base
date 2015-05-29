@@ -333,7 +333,8 @@ sub ItemSummary
            question=>$q->{name},
            questionprio=>$q->{prio},
            questionid=>$q->{id},
-           questionstate=>'FAIL'
+           questionstate=>'FAIL',
+           urlofcurrentrec=>$summary->{urlofcurrentrec}."/Interview"
         };
         if (exists($ia->{interviewid}->{$q->{id}})){
            my $a=$ia->{interviewid}->{$q->{id}};

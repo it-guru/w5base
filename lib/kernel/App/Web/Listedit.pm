@@ -313,12 +313,21 @@ sub ById
    $val="UNDEF" if ($val eq "");
    my %param;
    my $target="../Detail";
-   if (my ($id,$anker)=$val=~m/^(.*)\/fieldgroup.(.+)$/){
-      $target="../../Detail";
-      $val=$id;
-      $param{OpenURL}="#fieldgroup_".$anker;
+   while($val=~m/\//){
+      if (my ($anker)=$val=~m/\/fieldgroup.([^\/]+)$/){
+         $target="../".$target;
+         $val=~s/\/fieldgroup.(.+)$//;
+         $param{OpenURL}="#fieldgroup_".$anker;
+      }
+      elsif ($val=~m/\/Interview$/){
+         $param{ModeSelectCurrentMode}="HtmlInterviewLink";
+         $target="../".$target;
+         $val=~s/\/Interview$//;
+      }
+      else{
+         last;
+      }
    }
-   
    $param{$idname}=$val;
    $self->HtmlGoto($target,post=>\%param);
    return();

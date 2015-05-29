@@ -181,9 +181,12 @@ sub InterviewMainForm
                  "</select>";
    my $scomments="<textarea name=comments onchange=submitChange(this) ".
                  "rows=2 style=\"width:100%\"></textarea>";
+   $label=~s/['<>]//g;
 
    $d.=<<EOF;
 <script language="JavaScript">
+
+parent.document.title='Interview: $label';
 
 function qhelp(id)
 {
