@@ -67,7 +67,6 @@ sub new
                 name          =>'agentid',
                 label         =>'Agent ID',
                 group         =>'source',
-                ignorecase    =>1,
                 dataobjattr   =>'agent_id'),
 
       new kernel::Field::Date(
