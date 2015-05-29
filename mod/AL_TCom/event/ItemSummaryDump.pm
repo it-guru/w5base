@@ -41,7 +41,8 @@ sub ItemSummaryDump
    $o->SetFilter({name=>'W5Base/Darwin Netcool(P) GecCo(P) CCP(P)'});
    $o->SetFilter({name=>'CD-DWH_N_PROD'});
    my $f=$o->getField("itemsummary");
-   open(F,">ItemSummaryDump.xml");
+   open(F,">".$self->Config->Param("INSTDIR").
+              "/static/tmp/ItemSummaryDump.xml");
    printf F ("<root>\n");
    foreach my $rec ($o->getHashList(qw(itemsummary name id))){
       printf F ("%s\n\n",hash2xml($rec));
