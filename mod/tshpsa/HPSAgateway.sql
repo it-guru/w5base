@@ -146,7 +146,7 @@ create or replace synonym W5I.HPSA_lnkswp
 -- drop materialized view "mview_HPSA_system";
 create materialized view "mview_HPSA_system"
    refresh complete start with sysdate
---   next sysdate+(1/24)*7
+   next sysdate+(1/24)*12
    as
 select distinct system.item_id,
        ddim.curdate,
@@ -190,7 +190,7 @@ create or replace synonym W5I.HPSA_system
 -- drop materialized view "mview_HPSA_lnksystemsysgrp";
 create materialized view "mview_HPSA_lnksystemsysgrp"
    refresh complete start with sysdate
---   next sysdate+(1/24)*7
+   next sysdate+(1/24)*12
    as
 
 select memb.item_source_id ||'-'||memb.server_item_id item_id,
