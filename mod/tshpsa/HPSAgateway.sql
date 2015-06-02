@@ -109,7 +109,7 @@ from (select DATE_DIMENSION.FULL_DATE_LOCAL curdate
            '</f></r></x>' 
           )
           columns swid      FOR ORDINALITY,
-                  swclass   varchar2(40)  path 'f[1]',
+                  swclass   varchar2(60)  path 'f[1]',
                   swvers    varchar2(40)  path 'f[2]',
                   swpath    varchar2(512) path 'f[3]',
                   iname     varchar2(40)  path 'f[4]',
