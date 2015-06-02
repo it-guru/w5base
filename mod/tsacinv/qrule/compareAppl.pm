@@ -311,7 +311,8 @@ sub qcheckRecord
                              if ($newrec->{systemid} ne ""){
                                 $sys->ResetFilter();
                                 $sys->SetFilter({systemid=>
-                                                 \$newrec->{systemid}});
+                                                 \$newrec->{systemid},
+                                                 cistatusid=>"!6"});
                                 my ($sysrec,$msg)=$sys->getOnlyFirst(qw(id));
                                 if (defined($sysrec)){
                                    $systemid=$sysrec->{id};
@@ -319,7 +320,7 @@ sub qcheckRecord
                                 else{
                                    $mode="nop";
                                    push(@qmsg,"can not create relation to ".
-                                              "not existing system: ".
+                                              "not existing/active system: ".
                                               $newrec->{systemid});
                                    $errorlevel=3 if ($errorlevel<3);
                                 }
