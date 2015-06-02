@@ -37,9 +37,10 @@ sub new
       new kernel::Field::Linenumber(name     =>'linenumber',
                                     label    =>'No.'),
 
-      new kernel::Field::Link(     name       =>'tcid',
-                                   label      =>'PersonalID',
+      new kernel::Field::Text(     name       =>'tcid',
+                                   label      =>'tCID',
                                    size       =>'10',
+                                   group      =>'status',
                                    htmlwidth  =>'130',
                                    align      =>'left',
                                    dataobjattr=>'tCID'),

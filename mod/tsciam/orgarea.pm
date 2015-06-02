@@ -49,6 +49,10 @@ sub new
                                    size       =>'10',
                                    dataobjattr=>'tOuSD'),
 
+      new kernel::Field::Text(   name       =>'sapid',
+                                 label      =>'SAP-OrganisationalID (tOuSapID)',
+                                 dataobjattr=>'tOuSapID'),
+
       new kernel::Field::TextDrop( name       =>'bossfullname',
                                    label      =>'Boss',
                                    vjointo    =>'tsciam::user',
@@ -111,7 +115,9 @@ sub new
                                    label      =>'ParentID (tOuSuperior)',
                                    dataobjattr=>'tOuSuperior'),
 
-      new kernel::Field::Interface(name       =>'toumgr',
+      new kernel::Field::Text(     name       =>'toumgr',
+                                   htmldetail =>0,
+                                   label      =>'tOuMgr CIAMID',
                                    dataobjattr=>'tOuMgr'),
 
       new kernel::Field::QualityText(),
