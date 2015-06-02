@@ -566,7 +566,7 @@ sub isWriteValid
 
    return(undef) if (!defined($rec));
    return(undef) if (!($rec->{systemid}=~m/^S.*\d+$/) &&
-                     !($rec->{systemid}=~m/^\d{15,20}$/));
+                     !($rec->{systemid}=~m/^\d{14,20}$/));
    my @l=$self->SUPER::isWriteValid($rec,@_);
 
 
