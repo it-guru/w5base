@@ -193,12 +193,6 @@ sub initSearchQuery
 #   if (!defined(Query->Param("search_plannedend"))){
 #     Query->Param("search_plannedend"=>">$nowlabel-1d AND <$nowlabel+14d");
 #   }
-
-   if (!defined(Query->Param("search_changenumber"))){
-     Query->Param("search_changenumber"=>"C000191883 C000146354 ".
-                                         "C000222842 C000188772");
-   }
-
 }
 
 
