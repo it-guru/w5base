@@ -39,13 +39,14 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 group         =>'source',
-                label         =>'ItemID',
+                label         =>'SoftwareProcessID',
                 htmldetail    =>0,
                 dataobjattr   =>"id"),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'systemid',
-                label         =>'system id',
+                group         =>'source',
+                label         =>'ItemID',
                 dataobjattr   =>'sysid'),
 
       new kernel::Field::RecordUrl(),
