@@ -167,7 +167,12 @@ sub IfaceCompare
    $param{mode}="native" if (!defined($param{mode}));
    $param{AllowEmpty}=1 if (!defined($param{AllowEmpty}));
 
-   return if (!defined($obj->getField($origfieldname)));
+   my $origfieldobj=$obj->getField($origfieldname);
+   if (!defined($origfieldobj)){
+      msg(ERROR,"programm error - try to IfaceCompare to invalid field ".
+                $origfieldname);
+      return();
+   }
    my $takeremote=0;
    my $ask=1;
    if ($param{mode} eq "native" ||
@@ -179,7 +184,39 @@ sub IfaceCompare
             my $t2=$comprec->{$compfieldname};
             if (!defined($origrec->{$origfieldname}) ||
                 $comprec->{$compfieldname} ne $origrec->{$origfieldname}){
-               $takeremote++;
+               if (defined($origfieldobj) &&
+                   defined($origfieldobj->{vjointo})){
+                  my $vjoinobj=$origfieldobj->vjoinobj();
+                  if (defined($self->{vjoineditbase})){
+                     $vjoinobj->SetNamedFilter("EDITBASE",
+                                              $origfieldobj->{vjoineditbase});
+                  }
+                  my $rfield=$origfieldobj->{vjoindisp};
+                  if (ref($rfield) eq "ARRAY"){
+                     $rfield=$rfield->[0];
+                  }
+                  my $flt={$rfield=>\$comprec->{$compfieldname} };
+                  $vjoinobj->SetFilter($flt);
+                  my $sel=$origfieldobj->{vjoinon}->[1];
+                  my $idobj=$vjoinobj->IdField();
+                  if (defined($idobj)){
+                     $sel=$idobj->Name();
+                  }
+                  my @l=$vjoinobj->getHashList($sel);
+                  if ($#l==0){
+                     $takeremote++;
+                  }
+                  else{
+                     my $m="invalid or not importable value: ".
+                          $origfieldname."=>".$comprec->{$compfieldname};
+                     push(@$dataissue,$m);
+                     push(@$qmsg,$m);
+                     $$errorlevel=3;
+                  }
+               }
+               else{
+                  $takeremote++;
+               }
             }
          }
       }

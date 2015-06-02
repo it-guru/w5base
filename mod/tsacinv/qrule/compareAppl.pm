@@ -245,12 +245,6 @@ sub qcheckRecord
             }
          }
          $self->IfaceCompare($dataobj,
-                             $rec,"applnumber",
-                             $parrec,"ref",
-                             $forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'native');
-         $self->IfaceCompare($dataobj,
                              $rec,"description",
                              $parrec,"description",
                              $forcedupd,$wfrequest,
@@ -275,13 +269,6 @@ sub qcheckRecord
             $self->IfaceCompare($dataobj,
                                 $rec,"acinmassingmentgroup",
                                 $parrec,"iassignmentgroup",
-                                $forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native',
-                                AllowEmpty=>0);
-            $self->IfaceCompare($dataobj,
-                                $rec,"scapprgroup",
-                                $parrec,"capprovergroup",
                                 $forcedupd,$wfrequest,
                                 \@qmsg,\@dataissue,\$errorlevel,
                                 mode=>'native',
