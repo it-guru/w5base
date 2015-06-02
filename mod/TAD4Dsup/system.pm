@@ -565,7 +565,8 @@ sub isWriteValid
    my $rec=shift;  # if $rec is not defined, insert is validated
 
    return(undef) if (!defined($rec));
-   return(undef) if (!($rec->{systemid}=~m/^S.*\d+$/));
+   return(undef) if (!($rec->{systemid}=~m/^S.*\d+$/) &&
+                     !($rec->{systemid}=~m/^\d{15,20}$/));
    my @l=$self->SUPER::isWriteValid($rec,@_);
 
 
