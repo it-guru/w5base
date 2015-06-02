@@ -61,11 +61,16 @@ sub qcheckRecord
       $errorlevel=0;
       my $wiw=getModuleObject($self->getParent->Config(),"tswiw::orgarea");
       $wiw->SetFilter({touid=>\$rec->{srcid}});
-      my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(name shortname));
+      my ($wiwrec,$msg)=$wiw->getOnlyFirst(qw(name shortname sapid));
+      my $ext_refid1;
       if (defined($wiwrec)){
          if ($wiwrec->{name} ne $rec->{description}){
             $forcedupd->{description}=$wiwrec->{name};
          }
+         $ext_refid1='SAP:'.$wiwrec->{sapid} if ($wiwrec->{sapid} ne "");
+      }
+      if ($rec->{ext_refid1} ne $ext_refid1){
+         $forcedupd->{ext_refid1}=$ext_refid1;
       }
       {
          #######################################################

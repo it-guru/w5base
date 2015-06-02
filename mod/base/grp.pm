@@ -221,6 +221,38 @@ sub new
                 label         =>'Source-Id',
                 dataobjattr   =>'grp.srcid'),
 
+      new kernel::Field::Text(
+                name          =>'ext_refid1',
+                group         =>'source',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      my $d=$param{current}->{$self->{name}};
+                      return(1) if ($d ne "");
+                   }
+                   return(0);
+                },
+                label         =>'External RefID1',
+                dataobjattr   =>'grp.ext_refid1'),
+
+      new kernel::Field::Text(
+                name          =>'ext_refid2',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      my $d=$param{current}->{$self->{name}};
+                      return(1) if ($d ne "");
+                   }
+                   return(0);
+                },
+                group         =>'source',
+                label         =>'External RefID2',
+                dataobjattr   =>'grp.ext_refid2'),
+
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
