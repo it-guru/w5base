@@ -319,9 +319,11 @@ sub qcheckRecord
                                 }
                                 else{
                                    $mode="nop";
-                                   push(@qmsg,"can not create relation to ".
-                                              "not existing/active system: ".
-                                              $newrec->{systemid});
+                                   my $m="can not create relation to ".
+                                         "not existing/active system: ".
+                                         $newrec->{systemid};
+                                   push(@qmsg,$m);
+                                   push(@dataissue,$m);
                                    $errorlevel=3 if ($errorlevel<3);
                                 }
                              }
