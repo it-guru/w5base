@@ -100,28 +100,28 @@ sub new
    return($self);
 }   
 
-sub SetFilter
-{
-   my $self=shift;
-   my $flt=$_[0];
-
-   if (ref($flt) eq "HASH" && exists($flt->{appl}) &&
-       !ref($flt->{appl})) {
-      my $appl=getModuleObject($self->Config,'itil::appl');
-      $appl->SetFilter({ name       =>$flt->{appl},
-                         cistatusid =>'<6' });
-      my @applids=$appl->getVal('applid');
-      @applids=grep({defined $_} @applids);
-      if ($#applids >= 100) {
-         $self->LastMsg(ERROR,
-            "Limited number of applications exceeded (max. 100)");
-         return(undef);
-      }
-      $_[0]->{appl}=join(' ',@applids);
-   }
-
-   return($self->SUPER::SetFilter(@_));
-}
+#sub SetFilter
+#{
+#   my $self=shift;
+#   my $flt=$_[0];
+#
+#   if (ref($flt) eq "HASH" && exists($flt->{appl}) &&
+#       !ref($flt->{appl})) {
+#      my $appl=getModuleObject($self->Config,'itil::appl');
+#      $appl->SetFilter({ name       =>$flt->{appl},
+#                         cistatusid =>'<6' });
+#      my @applids=$appl->getVal('applid');
+#      @applids=grep({defined $_} @applids);
+#      if ($#applids >= 100) {
+#         $self->LastMsg(ERROR,
+#            "Limited number of applications exceeded (max. 100)");
+#         return(undef);
+#      }
+#      $_[0]->{appl}=join(' ',@applids);
+#   }
+#
+#   return($self->SUPER::SetFilter(@_));
+#}
 
 sub isQualityCheckValid
 {
