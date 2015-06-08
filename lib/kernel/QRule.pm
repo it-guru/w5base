@@ -187,9 +187,13 @@ sub IfaceCompare
                if (defined($origfieldobj) &&
                    defined($origfieldobj->{vjointo})){
                   my $vjoinobj=$origfieldobj->vjoinobj();
-                  if (defined($self->{vjoineditbase})){
+                  if (defined($origfieldobj->{vjoineditbase})){
                      $vjoinobj->SetNamedFilter("EDITBASE",
                                               $origfieldobj->{vjoineditbase});
+                  }
+                  if (defined($origfieldobj->{vjoinbase})){
+                     $vjoinobj->SetNamedFilter("BASE",
+                                              $origfieldobj->{vjoinbase});
                   }
                   my $rfield=$origfieldobj->{vjoindisp};
                   if (ref($rfield) eq "ARRAY"){
