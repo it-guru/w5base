@@ -166,7 +166,7 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from=TABpref."operatorm1 ".SELpref."operatorm1";
+   my $from="smadm1.operatorm1 ".SELpref."operatorm1";
    return($from);
 }
 
