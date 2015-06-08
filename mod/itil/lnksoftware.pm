@@ -1015,7 +1015,11 @@ sub VersionKeyGenerator
    my $newrec=shift;
 
    my $version=effVal($oldrec,$newrec,"version");
-   return(itil::lib::Listedit::Version2Key($version));
+   my $k=itil::lib::Listedit::Version2Key($version);
+   if (!defined($oldrec) || $oldrec->{releasekey} ne $k){
+      $newrec->{releasekey}=$k;
+   }
+   return($k);
 }
 
 
