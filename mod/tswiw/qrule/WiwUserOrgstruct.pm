@@ -72,6 +72,7 @@ sub qcheckRecord
    if (defined($urec)){ # found correct urec record for user
       if (defined($urec) && $urec->{email} ne "" &&
           $urec->{email} ne 'null@null.com' &&
+          (!($urec->{surname}=~m/_duplicate_/i)) &&
           $urec->{usertyp} eq "user"){     # it seems to be a correct email
          msg(INFO,"processing email addr '%s'",$urec->{email});
          my @curgrpid=$self->extractCurrentGrpIds($urec);

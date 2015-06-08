@@ -129,6 +129,18 @@ sub qcheckRecord
                      {userid=>\$rec->{userid}}); # try to use found posix
          }
       }
+      if ($wiwrec->{surname}=~m/_duplicate_/i){
+            $dataobj->Log(ERROR,"basedata",
+                   "Duplicate_ entry detected. The Contact '%s'\n".
+                   "will be marked as delete\n-",
+                   "\n-",
+                   $rec->{fullname});
+            my $user=getModuleObject($self->getParent->Config(),
+                                      "base::user");
+            $user->ValidatedUpdateRecord($rec,
+                     {cistatusid=>6},
+                     {userid=>\$rec->{userid}}); 
+      }
       if ($wiwrec->{office_state} eq "DTAG User"){
          if ($rec->{posix} ne ""){
             $dataobj->Log(ERROR,"basedata",

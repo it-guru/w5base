@@ -23,3 +23,4 @@
 'is VS-NfD instructed'=>{de=>'VS-NfD unterwiesen'},
 'boolean.true'=>{de=>'Ja'},
 'boolean.false'=>{de=>'Nein'},
+'_duplicate_ are not allowed to import from WhoIsWho'=>{de=>'_duplicate_ Einträge dürfen aus WhoIsWho nicht importiert werden'},

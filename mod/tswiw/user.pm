@@ -378,7 +378,16 @@ sub Import
       }
       return(undef);
    }
+
+
    my $wiwrec=$l[0];
+   if ($wiwrec->{surname}=~m/_duplicate_/i){
+      if (!$param->{quiet}){
+         $self->LastMsg(ERROR,
+               "_duplicate_ are not allowed to import from WhoIsWho");
+      }
+      return(undef);
+   }
    my $user=getModuleObject($self->Config,"base::user");
    $user->SetFilter([{'email'=>$wiwrec->{email}},{posix=>$wiwrec->{uid}}]);
    my ($userrec,$msg)=$user->getOnlyFirst(qw(ALL));
