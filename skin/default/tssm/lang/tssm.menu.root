@@ -18,6 +18,7 @@
 'itu.sm.krn.dictonary'=>{de=>'DBDictonary',en=>'DBDictonary'},
 'itu.sm.krn.group'=>{de=>'Gruppe',en=>'Group'},
 'itu.sm.krn.group.lnkuser'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
+'itu.sm.krn.company'=>{de=>'Gesellschaft',en=>'Company'},
 'itu.sm.krn.dev'=>{de=>'Device',en=>'Device'},
 'itu.sm.krn.user'=>{de=>'Kontakt',en=>'Contact'},
 'itu.sm.krn.user.account'=>{de=>'Account',en=>'Account'},

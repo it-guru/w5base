@@ -112,6 +112,10 @@ sub Init
                       "tssm::group",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.sm.krn.company",
+                      "tssm::company",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.sm.krn.group.lnkuser",
                       "tssm::lnkusergroup",
                       defaultacl=>['admin']);
