@@ -106,7 +106,10 @@ sub Connect
       }
       eval('
          use Net::SFTP::Foreign;
-         $comObj=Net::SFTP::Foreign->new(%param);
+         $comObj=do{
+            local $SIG{TERM} = "IGNORE";
+            Net::SFTP::Foreign->new(%param);
+         };
       ');
       if (!defined($comObj) || $@ ne ""){
          msg(ERROR,"fail to Connect communication Endpoint for $self->{mode} ".
