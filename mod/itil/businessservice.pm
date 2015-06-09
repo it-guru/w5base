@@ -585,6 +585,14 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>$worktable.'.occreactiontime'),
 
+      new kernel::Field::Percent(
+                name          =>'occreactiontimelevel',
+                group         =>'desc',
+                label         =>'reaction time degree of attainment',
+                searchable    =>0,
+                precision     =>0,
+                dataobjattr   =>$worktable.'.occreactiontimelevel'),
+
       new kernel::Field::Duration(
                 name          =>'occtotaltime',
                 group         =>'desc',
@@ -595,7 +603,13 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>$worktable.'.occtotaltime'),
 
-
+      new kernel::Field::Percent(
+                name          =>'occtotaltimelevel',
+                group         =>'desc',
+                label         =>'treatment time degree of attainment',
+                searchable    =>0,
+                precision     =>0,
+                dataobjattr   =>$worktable.'.occtotaltimelevel'),
 
 
      new kernel::Field::Container(
@@ -1974,7 +1988,16 @@ sub Validate
       $autogenmode++;
    }
 
-
+   foreach my $f (qw(occreactiontimelevel occtotaltimelevel)){
+     if (exists($newrec->{$f}) &&
+         effVal($oldrec,$newrec,$f)<0 ){
+        $newrec->{$f}=0;
+     }
+     if (exists($newrec->{$f}) &&
+         effVal($oldrec,$newrec,$f)>100 ){
+        $newrec->{$f}=100;
+     }
+   }
 
    if (exists($newrec->{version}) && $newrec->{version} ne ""){
       if (!($newrec->{version}=~m/^\d{1,2}(\.\d{1,2}){0,4}$/)){

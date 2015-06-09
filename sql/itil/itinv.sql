@@ -1421,3 +1421,4 @@ create table lnkbusinessservicegrp (
 ) ENGINE=INNODB;
 alter table asset add acquStart datetime default NULL,add acquMode varchar(10) default 'PURCHASE';
 alter table businessservice add occreactiontime bigint(20), add occtotaltime bigint(20);
+alter table businessservice add occreactiontimelevel int(20), add occtotaltimelevel int(20);

@@ -93,4 +93,6 @@ Anwendung zur Verfügung stellen kann.',en=>'Welcome'},
 'implemented support times'=>{de=>'implementierte Supportzeiten'},
 'implemented service times'=>{de=>'implementierte Servicezeiten'},
 'target occurrence reaction time'=>{de=>'geforderte Vorfall Reaktionszeit'},
-'target occurrence total treatment time'=>{de=>'geforderte Vorfall Gesamtbehandlungszeit'}
+'target occurrence total treatment time'=>{de=>'geforderte Vorfall Gesamtbehandlungszeit'},
+'treatment time degree of attainment'=>{de=>'Gesamtbehandlungszeit Erfüllungsgrad'},
+'reaction time degree of attainment'=>{de=>'Reaktionszeit Erfüllungsgrad'},
