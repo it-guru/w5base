@@ -1,4 +1,4 @@
-package tssc::ext::InstallCheck;
+package tssm::ext::InstallCheck;
 #  W5Base Framework
 #  Copyright (C) 2008  Hartmut Vogler (it@guru.de)
 #
