@@ -67,23 +67,18 @@ sub qcheckRecord
    return(0,undef) if (!($rec->{isapplserver}) && ($rec->{isworkstation}));
 
    if ($rec->{isinfrastruct}) {
-      my $wcnt=split(/\s+/,$rec->{comments});
-
-      if ($wcnt<10) {
-         my $msg='description in field comments '.
-                 'not available resp. insufficient';
-         return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+      if (ref($rec->{applications}) ne "ARRAY" || $#{$rec->{applications}}==-1){
+         my $wcnt=split(/\s+/,$rec->{comments});
+        
+         if ($wcnt<10) {
+            my $msg='description in field comments '.
+                    'not available resp. insufficient';
+            return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+         }
       }
-
       return(0,undef);
    }
-
-   if (ref($rec->{applications}) ne "ARRAY" || $#{$rec->{applications}}==-1){
-      return(3,{qmsg=>['no application relations'],
-                dataissue=>['no application relations']});
-   }
    return(0,undef);
-
 }
 
 
