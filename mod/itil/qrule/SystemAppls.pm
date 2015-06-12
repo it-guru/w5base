@@ -78,6 +78,11 @@ sub qcheckRecord
       }
       return(0,undef);
    }
+
+   if (ref($rec->{applications}) ne "ARRAY" || $#{$rec->{applications}}==-1){
+      return(3,{qmsg=>['no application relations'],
+                dataissue=>['no application relations']});
+   }
    return(0,undef);
 }
 
