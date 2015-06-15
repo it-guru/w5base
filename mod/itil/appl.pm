@@ -1189,14 +1189,56 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'maintwindow',
-                group         =>'misc',
+                group         =>'mutimes',
                 searchable    =>0, 
                 label         =>'Maintenance Window',
                 dataobjattr   =>'appl.maintwindow'),
 
+
+      new kernel::Field::TimeSpans(
+                name          =>'usetimes',
+                htmlwidth     =>'150px',
+                depend        =>['issupport'],
+                tspantype     =>{'M'=>'main use time',
+                                 'S'=>'sec. use time',
+                                 'O'=>'offline time'},
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent";
+                   if ($blk->[2] eq "on" || $blk->[2] eq "legend"){
+                      $blk->[4]="blue";
+                      $blk->[4]="lightblue" if ($blk->[3] eq "S");
+                      $blk->[4]="yellow" if ($blk->[3] eq "O");
+                   }
+                },
+                tspantypemaper=>sub{
+                   my $self=shift;
+                   my $type=shift;
+                   my $t=shift;
+                   $type=uc($type);
+                   $type="M" if ($type eq "");
+                   return($type);
+                },
+                tspanlegend   =>1,
+                tspandaymap   =>[1,1,1,1,1,1,1,0],
+                group         =>'mutimes',
+                label         =>'use-times',
+                dataobjattr   =>'appl.usetime'),
+
+      new kernel::Field::Textarea(
+                name          =>'tempexeptusetime',
+                group         =>'mutimes',
+                searchable    =>0, 
+                label         =>'temporary exeptions in use times',
+                htmlheight    =>40,
+                dataobjattr   =>'appl.tempexeptusetime'),
+
       new kernel::Field::Textarea(
                 name          =>'mainusetime',
-                group         =>'misc',
+                group         =>'mutimes',
                 searchable    =>0, 
                 label         =>'Main use time',
                 htmlheight    =>40,
@@ -1204,7 +1246,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'secusetime',
-                group         =>'misc',
+                group         =>'mutimes',
                 searchable    =>0, 
                 label         =>'Secondary use time',
                 htmlheight    =>40,
@@ -2072,6 +2114,7 @@ sub isViewValid
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control custcontracts customer delmgmt
               finance interfaces licenses monisla sodrgroup qc external itsem
+              mutimes  
               misc opmgmt phonenumbers services businessservices architect
               soclustgroup socomments source swinstances systems applurl
               technical workflowbasedata header inmchm interview efforts);
@@ -2091,7 +2134,7 @@ sub isWriteValid
 
    my @databossedit=qw(default interfaces finance opmgmt technical contacts misc
                        systems applurl attachments accountnumbers interview
-                       customer control phonenumbers monisla architect
+                       customer control phonenumbers monisla architect mutimes
                        sodrgroup soclustgroup socomments);
    if (!defined($rec)){
       return(@databossedit);
@@ -2229,7 +2272,7 @@ sub getDetailBlockPriority
              contacts phonenumbers 
              interfaces systems swinstances services businessservices applurl
              monisla sodrgroup
-             misc attachments control 
+             mutimes misc attachments control 
              soclustgroup socomments accountnumbers licenses 
              external source));
 }

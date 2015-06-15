@@ -29,8 +29,15 @@ sub new
    my $self={@_};
    $self->{valign}="top"     if (!defined($self->{valign}));
    $self->{tspantype}=['']   if (!defined($self->{tspantype})); 
+   if (!defined($self->{tspandaymap})){
+      $self->{tspandaymap}=[1,1,1,1,1,1,1,1];
+   }
+   if (!defined($self->{days})){
+      $self->{days}=[qw(sun mon tue wed thu fri sat HOL)];
+   }
    my $self=bless($type->SUPER::new(%$self),$type);
    $self->{_permitted}->{tspanlegend}=1;
+   $self->{_permitted}->{tspantypemaper}=1;
    return($self);
 }
 
@@ -66,6 +73,19 @@ sub Validate
    elsif (ref($self->{tspantype}) eq "ARRAY"){
       @tspantype=@{$self->{tspantype}};
    }
+
+   my @days=@{$self->{days}};
+   my @blockfix; # needs to be done, because posible missing days in daymap
+   for(my $dayno=0;$dayno<=$#days;$dayno++){
+      if ($self->{tspandaymap}->[$dayno]){
+         $blockfix[$dayno]=shift(@$newval);
+      }
+      else{
+         $blockfix[$dayno]="";
+      }
+   }
+   $newval=\@blockfix;
+   
    for(my $day=0;$day<=$#{$newval};$day++){
       $newval->[$day]=~s/[\(\)\s\+]//g;
       my @times;
@@ -74,7 +94,13 @@ sub Validate
          my $type="";
          if (my ($mtype)=$t=~m/^([a-z])/i){
             $t=~s/^([a-z])//i;
-            $type=uc($mtype);
+            $type=$mtype;
+         }
+         if (ref($self->{tspantypemaper}) eq "CODE"){
+            $type=&{$self->{tspantypemaper}}($self,$type,$t);
+         }
+         else{
+            $type=uc($type);
          }
          if (!in_array(\@tspantype,$type)){
             $self->getParent->LastMsg(ERROR,"invalid tspan type");
@@ -170,7 +196,7 @@ sub FormatedDetail
       $tab.="<td align=right>24h</td>";
       $tab.="</tr></table></td>";
       $tab.="<td>&nbsp;</td></tr>";
-      my @days=qw(sun mon tue wed thu fri sat HOL);
+      my @days=@{$self->{days}};
       my @blocks=split(/\+/,$d);
       my @fval;
       foreach my $blk (@blocks){
@@ -180,93 +206,96 @@ sub FormatedDetail
       }
       
       for(my $dayno=0;$dayno<=$#days;$dayno++){
-         my $day=$self->getParent->T($days[$dayno],$self->Self());
-         if ($dayno!=7){
-            $day="<b>$day</b>";
-         }
-         $tab.="<tr><td width=\"1%\">$day</td><td with=\"$spanareawidth\">";
-         if ($mode ne "edit"){
-            my @blks=();
-            foreach my $b (split(/,/,$fval[$dayno])){
-               if (my ($type,$starth,$startm,$endh,$endm)=$b=~
-                       m/^\s*([a-z]{0,1})(\d+):(\d+)-(\d+):(\d+)\s*$/i){
-                  my $sp=(($starth*60)+$startm)*100/1440;
-                  my $ep=(($endh*60)+$endm)*100/1440;
-                  push(@blks,[$sp,$ep,undef,$type]);
-               }
+         if ($self->{tspandaymap}->[$dayno]){
+            my $day=$self->getParent->T($days[$dayno],$self->Self());
+            if ($dayno!=7){
+               $day="<b>$day</b>";
             }
-            @blks=sort({$a->[0]<=>$b->[0]} @blks);
-            map({$_->[0]=int($_->[0]);$_->[1]=int($_->[1]);
-                 $_->[2]="on";} @blks);
-            my @blanks;
-            for(my $blk=1;$blk<=$#blks;$blk++){
-               if ($blks[$blk-1]->[1]!=$blks[$blk]->[0]){
-                  push(@blanks,[$blks[$blk-1]->[1],$blks[$blk]->[0],"off"]);
+            $tab.="<tr><td width=\"1%\">$day</td><td with=\"$spanareawidth\">";
+            if ($mode ne "edit"){
+               my @blks=();
+               foreach my $b (split(/,/,$fval[$dayno])){
+                  if (my ($type,$starth,$startm,$endh,$endm)=$b=~
+                          m/^\s*([a-z]{0,1})(\d+):(\d+)-(\d+):(\d+)\s*$/i){
+                     my $sp=(($starth*60)+$startm)*100/1440;
+                     my $ep=(($endh*60)+$endm)*100/1440;
+                     push(@blks,[$sp,$ep,undef,$type]);
+                  }
                }
-            }
-            if ($#blks>=0){
-               if ($blks[0]->[0]!=0){
-                  push(@blanks,[0,$blks[0]->[0],"off"]);
+               @blks=sort({$a->[0]<=>$b->[0]} @blks);
+               map({$_->[0]=int($_->[0]);$_->[1]=int($_->[1]);
+                    $_->[2]="on";} @blks);
+               my @blanks;
+               for(my $blk=1;$blk<=$#blks;$blk++){
+                  if ($blks[$blk-1]->[1]!=$blks[$blk]->[0]){
+                     push(@blanks,[$blks[$blk-1]->[1],$blks[$blk]->[0],"off"]);
+                  }
                }
-               if ($blks[$#blks]->[1]!=100){
-                  push(@blanks,[$blks[$#blks]->[1],100,"off"]);
+               if ($#blks>=0){
+                  if ($blks[0]->[0]!=0){
+                     push(@blanks,[0,$blks[0]->[0],"off"]);
+                  }
+                  if ($blks[$#blks]->[1]!=100){
+                     push(@blanks,[$blks[$#blks]->[1],100,"off"]);
+                  }
+               }
+               else{
+                  push(@blanks,[0,100,"off"]);
+               }
+               push(@blks,@blanks);
+               @blks=sort({$a->[0]<=>$b->[0]} @blks);
+               my $seg=0;
+               foreach my $blk (@blks){
+                  my $w=$blk->[1]-$blk->[0];
+
+                  if (ref($self->{tspantypeproc}) eq "CODE"){
+                     &{$self->{tspantypeproc}}($self,$current,$mode,$blk);
+                  }
+                  else{
+                     if ($blk->[2] eq "on"){
+                        $blk->[4]="blue";
+                     }
+                     else{
+                        $blk->[4]="transparent";
+                     }
+                  }
+                  my $color=$blk->[4];
+                  $tab.="<div id=\"$name.$dayno.$seg\" ".
+                        "style=\"background:$color;".
+                        "width:$w\%;height:18px;float:left;".
+                        "border-style:none;padding:0px;margin:0px\">";
+                  if ($color ne "transparent"){
+                     $tab.="<div style=\"border-style:solid;border-width:1px;".
+                           "height:16px;padding:0px;margin:0px;".
+                           "border-color:$color\">\n</div>";
+                  }
+                  else{
+                     $tab.="&nbsp;";
+                  }
+                  $tab.="</div>";
+                  $seg++;
                }
             }
             else{
-               push(@blanks,[0,100,"off"]);
+               $tab.="&nbsp;";
             }
-            push(@blks,@blanks);
-            @blks=sort({$a->[0]<=>$b->[0]} @blks);
-            my $seg=0;
-            foreach my $blk (@blks){
-               my $w=$blk->[1]-$blk->[0];
-
-               if (ref($self->{tspantypeproc}) eq "CODE"){
-                  &{$self->{tspantypeproc}}($self,$current,$mode,$blk);
-               }
-               else{
-                  if ($blk->[2] eq "on"){
-                     $blk->[4]="blue";
-                  }
-                  else{
-                     $blk->[4]="transparent";
-                  }
-               }
-               my $color=$blk->[4];
-               $tab.="<div id=\"$name.$dayno.$seg\" style=\"background:$color;".
-                     "width:$w\%;height:18px;float:left;".
-                     "border-style:none;padding:0px;margin:0px\">";
-               if ($color ne "transparent"){
-                  $tab.="<div style=\"border-style:solid;border-width:1px;".
-                        "height:16px;padding:0px;margin:0px;".
-                        "border-color:$color\">\n</div>";
-               }
-               else{
-                  $tab.="&nbsp;";
-               }
-               $tab.="</div>";
-               $seg++;
+            my $dis="";
+            $dis=" disabled " if ($mode ne "edit");
+            my $val=$fval[$dayno];
+            my @fromquery=Query->Param($name);
+            if ($mode eq "edit" && defined($fromquery[$dayno])){
+               $val=$fromquery[$dayno];
             }
+            $tab.="</td>".
+                  "<td><input name=$name $dis type=text value=\"$val\" ".
+                  "style=\"width:100%\"></td></tr>";
          }
-         else{
-            $tab.="&nbsp;";
-         }
-         my $dis="";
-         $dis=" disabled " if ($mode ne "edit");
-         my $val=$fval[$dayno];
-         my @fromquery=Query->Param($name);
-         if ($mode eq "edit" && defined($fromquery[$dayno])){
-            $val=$fromquery[$dayno];
-         }
-         $tab.="</td>".
-               "<td><input name=$name $dis type=text value=\"$val\" ".
-               "style=\"width:100%\"></td></tr>";
       }
       $tab.="</table>";
       my $legend="";
       my @tspantype;
       if (ref($self->{tspantype}) eq "HASH"){
-         @tspantype=keys(%{$self->{tspantype}});
+         @tspantype=sort(keys(%{$self->{tspantype}}));
       }
       elsif (ref($self->{tspantype}) eq "ARRAY"){
          @tspantype=@{$self->{tspantype}};

@@ -1422,3 +1422,4 @@ create table lnkbusinessservicegrp (
 alter table asset add acquStart datetime default NULL,add acquMode varchar(10) default 'PURCHASE';
 alter table businessservice add occreactiontime bigint(20), add occtotaltime bigint(20);
 alter table businessservice add occreactiontimelevel int(20), add occtotaltimelevel int(20);
+alter table appl add usetime text default NULL, add tempexeptusetime text default NULL;

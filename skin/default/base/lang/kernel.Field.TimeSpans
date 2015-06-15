@@ -9,3 +9,4 @@
 "invalid timespan format '\%s' - use f.e. 10:00-11:00, 15:00-18:30"=>{de=>"ungültiges Zeitspannen Format '\%s' - nutzen Sie z.B. 10:00-11:00, 15:00-18:30"},
 "overlap range '\%s'"=>{de=>"überlappender Zeitbereich '\%s'"},
 "range missmismatch '\%s'"=>{de=>"fehlerhafter Zeitbereich '\%s'"},
+'invalid tspan type'=>{de=>'ungültiger Zeitbereichstyp'},

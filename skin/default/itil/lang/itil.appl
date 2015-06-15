@@ -38,6 +38,8 @@
 'fieldgroup.customer'=>{de=>'Kunde/Auftraggeber',en=>'Customer'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'fieldgroup.accountnumbers'=>{de=>'Account Nummern',en=>'Account numbers'},
+'fieldgroup.mutimes'=>{de=>'Wartungs- und Nutzungszeiten',
+                       en=>'Maintenence and use-times'},
 'fieldgroup.workflowbasedata'=>{de=>'Workflow Basis-Daten',en=>'Workflow Base-Data'},
 'Account numbers'=>{de=>'Account Nummern'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
@@ -166,6 +168,9 @@
 'DBS Instance count'=>{de=>'DBS Instanz Anzahl'},
 'Instance count'=>{de=>'Instanz Anzahl'},
 'Interfaces count'=>{de=>'Schnittstellen Anzahl'},
-
-
-
+'use-times'=>{de=>'Nutzungszeiten'},
+'main use time'=>{de=>'Hauptnutzungszeit'},
+'sec. use time'=>{de=>'Nebennutzungszeit'},
+'offline time'=>{de=>'Offline-Zeit'},
+'invalid tspan type'=>{de=>'ungültiger Zeitbereichstyp'},
+'temporary exeptions in use times'=>{de=>'temporäre Abweichungen in den Nutzungszeiten'},
