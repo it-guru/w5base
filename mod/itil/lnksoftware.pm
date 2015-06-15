@@ -916,7 +916,7 @@ sub Validate
    }
 
    if ($version ne "" && exists($newrec->{version})){  #release details gen
-      VersionKeyGenerator($oldrec,$newrec);
+      #VersionKeyGenerator($oldrec,$newrec);
       if (my ($rel,$patch)=$version=~m/^(.*\d)(p\d.*)$/){
          $newrec->{patchkey}=$patch;
          $newrec->{majorminorkey}=$rel;
