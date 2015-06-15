@@ -50,7 +50,7 @@ sub SetFilter
 
    my %f1=(%{$flt[0]});
    $f1{stateid}="21";
-   $f1{mdate}=">now-14d";
+   $f1{mdate}=">now-365d";
    $f1{isdeleted}=\"0";
    $f1{class}=\"AL_TCom::workflow::eventnotify";
 
@@ -61,7 +61,7 @@ sub SetFilter
 
    my %f3=(%{$flt[0]});
    $f3{isdeleted}="1";
-   $f3{mdate}=">now-14d";
+   $f3{mdate}=">now-365d";
    $f3{class}=\"AL_TCom::workflow::eventnotify";
 
    @flt=([\%f1,\%f2,\%f3]);
