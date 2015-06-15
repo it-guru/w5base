@@ -209,6 +209,7 @@ sub qcheckRecord
 
          if (defined($parrec->{systemname})){
             $parrec->{systemname}=lc($parrec->{systemname});
+            $parrec->{systemname}=~s/\..*$//; # remove posible Domain part 
          }
          my $nameok=1;
          if ($parrec->{systemname} ne $rec->{name} &&
