@@ -25,7 +25,7 @@ use finance::costcenter;
 
 our %src;
 our %dst;
-our $DATE="03.06.2015";
+our $DATE="06.06.2015";
 our $WELLE="Welle3";
 our $CHANGE=0;
 
