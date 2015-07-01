@@ -38,6 +38,8 @@ sub new
                 label         =>'ItemID',
                 dataobjattr   =>"item_id"),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'name',
                 lowersearch   =>1,
@@ -107,6 +109,7 @@ sub new
 #                name          =>'rawscan',
 #                group         =>'source',
 #                htmldetail    =>0,
+#                sqlorder      =>'NONE',
 #                label         =>'raw Scan-Data',
 #                dataobjattr   =>"rawscan")
    );
