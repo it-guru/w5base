@@ -640,6 +640,7 @@ sub mkChangeStoreRec
        #$wfrec{tcomcodcontract}=join(", ",@{$wfrec{affectedcontract}});
        $wfrec{tcomcodcause}="undef";
        $wfrec{tcomcodchmrisk}=lc($rec->{risk});
+       $wfrec{tcomcodchmrisk}=~s/very_high/very high/;
        if ($wfrec{tcomcodchmrisk} eq "risk undefined"){
           $wfrec{tcomcodchmrisk}=undef;
        }
