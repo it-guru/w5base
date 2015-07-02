@@ -186,7 +186,7 @@ sub FormatedDetail
 #   $d.=" ".$self->{unit} if ($d ne "" && $mode eq "HtmlDetail");
    if ($mode eq "HtmlDetail" || $mode eq "edit"){
       my $spanareawidth="201"; # 201 because of rounding problems in ie
-      my $tab="<table border=1 width=\"100%\" height=\"100%\">";
+      my $tab="<table border=1 padding=0 margin=0 width=\"100%\">";
       $tab.="<tr><td>&nbsp;</td><td width=\"$spanareawidth\">";
       $tab.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>";
       $tab.="<td align=left width=\"10%\">0h</td>";
