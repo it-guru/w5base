@@ -58,17 +58,19 @@ sub new
                    my $d=shift;
                    my $current=shift;
                    my $secstate=$self->getParent->getCurrentSecState();
-                   if ($secstate<2){
-                      my $userid=$self->getParent->getCurrentUserId();
-                      if (!defined($userid) ||
-                           $current->{userid}!=$userid){
-                         sub ureplEmail
-                         {
-                            my $e=$_[0];
-                            $e=~s/[a-z]/?/g;
-                            return("($e)");
-                         } 
-                         $d=~s/\((.*\@.*)\)/ureplEmail($1)/e; 
+                   if ($W5V2::OperationContext eq "WebFrontend"){
+                      if ($secstate<2){
+                         my $userid=$self->getParent->getCurrentUserId();
+                         if (!defined($userid) ||
+                              $current->{userid}!=$userid){
+                            sub ureplEmail
+                            {
+                               my $e=$_[0];
+                               $e=~s/[a-z]/?/g;
+                               return("($e)");
+                            } 
+                            $d=~s/\((.*\@.*)\)/ureplEmail($1)/e; 
+                         }
                       }
                    }
                    return($d);
@@ -833,7 +835,7 @@ sub new
                 label         =>'Last-Lang'),
 
       new kernel::Field::Text(
-                name          =>'talklang',
+                name          =>'talklang', 
                 readonly      =>1,
                 htmldetail    =>0,
                 group         =>'userro',
