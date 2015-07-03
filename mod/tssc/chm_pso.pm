@@ -114,9 +114,9 @@ sub SetFilter
                          cistatusid =>'<6' });
       my @applids=$appl->getVal('applid');
       @applids=grep({defined $_} @applids);
-      if ($#applids >= 100) {
+      if ($#applids >= 150) {
          $self->LastMsg(ERROR,
-            "Limited number of applications exceeded (max. 100)");
+            "Limited number of applications exceeded (max. 150)");
          return(undef);
       }
       $_[0]->{appl}=join(' ',@applids);
