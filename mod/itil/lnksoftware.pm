@@ -766,6 +766,10 @@ sub calcLicMetrics   # licrelevantopmode licrelevantosrelease
    return(\@res);
 }
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::lnksoftware");
+}
 
 
 
@@ -865,6 +869,10 @@ sub Validate
             return(undef);
          }
       }
+   }
+   if ($newrec->{licsubofid} eq "" &&
+       $oldrec->{licsubofid} eq ""){
+      delete($newrec->{licsubofid});
    }
    if (effVal($oldrec,$newrec,"licsubofid") ne ""){
       if (effVal($oldrec,$newrec,"liccontractid") ne ""){
