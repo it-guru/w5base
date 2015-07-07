@@ -519,7 +519,7 @@ Sehr geehrter Datenverantwortlicher,
 aufgrund der ServiceCenter nach ServiceManager Migration müssen bei
 Software-Instanzen die von Ihnen datenverantwortet werden, 
 Assignmentgroups korrigiert werden.
-Wenn Sie nicht bis zum <b>10.06.2016 14:00 CET</b> selbst eine Umstellung auf
+Wenn Sie nicht bis zum <b>10.07.2015 14:00 CET</b> selbst eine Umstellung auf
 die neuen SM9 Assignmentgroups vornehmen, wird zentrall die Umstellung 
 nach folgender Mapping Tabelle vorgenommen:
 
@@ -552,7 +552,7 @@ Dear databoss,
 reasoned on the ServiceCenter to ServiceManager migration the 
 Assignmentgroups in your Software-Instances needs to be changed.
 If you do not have changed to the new SM9 groups 
-since <b>10.06.2016 14:00 CET</b>, the migration will be done by a
+since <b>10.07.2015 14:00 CET</b>, the migration will be done by a
 central job based on the following mapping table:
 
 $map
