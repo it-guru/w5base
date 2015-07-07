@@ -39,7 +39,242 @@ sub new
    return($self);
 }
 
-sub SMmig
+
+sub Init
+{
+   my $self=shift;
+
+   $self->RegisterEvent("SMmigAppl","SMmigAppl");
+   $self->RegisterEvent("SMmigSwi","SMmigSwi");
+   return(1);
+}
+
+
+sub SMmigSwi
+{
+   my $self=shift;
+   my $filename=shift;
+   if ($filename eq "1" || $filename eq "0"){
+      $CHANGE=$filename;
+      $filename=shift;
+   }
+   my $atdate=shift;
+   $self->{MAP}={};
+   $self->{errMAP}=[];
+   open(LOG,">SMmig.log");
+
+   printf LOG ("\n\n%s\n","-" x 70);
+   printf LOG ("%s",msg(INFO,"Starting migration process at %s",NowStamp("en")));
+   printf LOG ("%s",msg(INFO,"try to open file '$filename'"));
+   $ENV{REMOTE_USER}="service/ServiceManagerMig";
+   my $bak=$self->ProcessExcelImport($filename);
+
+   if ($bak->{exitcode} eq "0"){
+      my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      my @migrec;
+      my $swi=getModuleObject($self->Config,"TS::swinstance");
+      $swi->SetFilter({cistatusid=>"<6"});
+      my @mapfld=qw(acinmassingmentgroup scapprgroup);
+      
+      foreach my $rec ($swi->getHashList(qw(databossid 
+                                            fullname 
+                                            urlofcurrentrec
+                                            id),@mapfld)){
+         #last if ($#migrec==20);
+         my $eff=0;
+         foreach my $f (@mapfld){
+            if (($rec->{$f} ne "" &&
+                 exists($self->{MAP}->{$rec->{$f}}))){
+               $eff++;
+               printf LOG ("%s",msg(INFO,"for %s at %s exists map ent",
+                                         $rec->{fullname},$f));
+            }
+         }
+         if ($eff){
+            my $d=Dumper($rec);
+            push(@migrec,$rec);
+         }
+      }
+      printf LOG ("%s",msg(INFO,"found %d potential affected instances ".
+                                "records",$#migrec+1));
+      my @newrec;
+      foreach my $rec (@migrec){  # check target process
+         my $changechount=0;
+         my $errcount=0;
+         my $newrec={id=>$rec->{id},
+                     fullname=>$rec->{fullname},
+                     databossid=>$rec->{databossid}};
+         foreach my $f (@mapfld){
+            if (exists($self->{MAP}->{$rec->{$f}})){
+               my $fld=$swi->getField($f);
+               my $vjoinobj=$fld->vjoinobj->Clone(); 
+               if (defined($fld->{vjoinbase})){
+                  $vjoinobj->SetNamedFilter("BASE",$fld->{vjoinbase});
+               }
+               if (defined($fld->{vjoineditbase})){
+                  $vjoinobj->SetNamedFilter("EDITBASE",$fld->{vjoineditbase});
+               }
+               $vjoinobj->SetFilter({
+                  $fld->{vjoindisp}=>$self->{MAP}->{$rec->{$f}}
+               });
+               my @d=$vjoinobj->getHashList($fld->{vjoindisp});
+               if ($#d!=0){
+                  my $mis=$self->{MAP}->{$rec->{$f}};
+                  push(@{$self->{errMAP}},
+                       msg(ERROR,"miss $mis for $f in $rec->{fullname}"));
+                  $errcount++;
+               }
+               else{
+                  $newrec->{$f}=$self->{MAP}->{$rec->{$f}};
+               }
+               $changechount++;
+            }
+         }
+         if ($changechount==0 || $errcount!=0){
+            printf LOG ("%s",msg(INFO,"mapping error for instance '%s'",
+                                      $rec->{fullname}));
+         }
+         else{
+            push(@newrec,$newrec);
+         }
+      }
+      if ($#{$self->{errMAP}}!=-1){
+         printf LOG ("%s",join("",@{$self->{errMAP}}));
+      }
+      printf LOG ("%s",msg(INFO,"%d applications are final affected ",
+                                $#newrec+1));
+      if ($#{$self->{errMAP}}!=-1){
+         printf LOG ("%s",msg(ERROR,
+                              "break migration process due mapping errors"));
+      #   return({exitcode=>1,exitmsg=>'ERROR in mapping'});  
+      }
+      # now we have a working @newrec list!
+
+      my $olddataboossid=undef;
+      my @msgbuffer;
+
+      foreach my $rec (@newrec){
+         if ($olddataboossid ne $rec->{databossid} &&
+             $#msgbuffer!=-1){
+            $self->NotifyMsgBuffer($CHANGE,\@msgbuffer);
+         }
+         $olddataboossid=$rec->{databossid};
+
+         my %to=();
+         my %bcc=('11634953080001'=>1, # Vogler
+         );
+         my %cc=('13916949570000'=>1, # Pfisterer
+                 '12023707570001'=>1, # Chirstman);
+         );
+         $swi->SetFilter({id=>\$rec->{id}});
+         my @oldrec=$swi->getHashList(qw(ALL));
+         if ($#oldrec==0){
+            my $oldrec=ObjectRecordCodeResolver($oldrec[0]);
+            my $fnewrec={};
+            foreach my $f (@mapfld){
+               if (exists($rec->{$f})){
+                  $fnewrec->{$f}="<b>".$rec->{$f}."</b>";
+               }
+               else{
+                  $fnewrec->{$f}="- not changed -";
+               }
+            }
+            if ($CHANGE){
+               my %msg=(%$oldrec,fnewrec=>$fnewrec);
+               if ($swi->ValidatedUpdateRecord($oldrec[0],$rec,
+                                               {id=>\$rec->{id}})){
+                  printf LOG ("%s",msg(INFO,"sucess '%s' (W5BaseID %s)",
+                                   $rec->{name},$rec->{id}));
+                  push(@msgbuffer,\%msg);
+               }
+            }
+            else{
+               my %msg=(%$oldrec,fnewrec=>$fnewrec);
+               push(@msgbuffer,\%msg);
+            }
+         }
+      }
+      if ($#msgbuffer!=-1){
+         $self->NotifyMsgBuffer($CHANGE,\@msgbuffer);
+      }
+   }
+   return($bak);
+}
+
+
+sub NotifyMsgBuffer
+{
+   my $self=shift;
+   my $ischangemode=shift;
+   my $msgbuffer=shift;
+
+   my $lang="de";
+
+   my $databossid=$msgbuffer->[0]->{databossid};
+
+
+   if ($databossid ne ""){
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->ResetFilter();
+      $user->SetFilter({userid=>\$databossid});
+      my ($urec,$msg)=$user->getOnlyFirst(qw(fullname talklang));
+      $lang=$urec->{talklang};
+   }
+
+   my $map="";
+   foreach my $swi (@$msgbuffer){
+      $map.=sprintf("%s\n%s\n",
+                    $swi->{fullname},
+                    $swi->{urlofcurrentrec});
+      foreach my $k (sort(keys(%{$swi->{fnewrec}}))){
+         if ($swi->{$k} ne ""){
+            my $label="";
+            if ($k eq "acinmassingmentgroup"){
+              $label=" <font color=darkblue>Incident-Assignmentgroup:</font>\n";
+            }
+            if ($k eq "scapprgroup"){
+              $label=" <font color=darkblue>Change Approvergroup:</font>\n";
+            }
+            $map.=sprintf("%s  %s -&gt; %s\n",
+                          $label,$swi->{$k},$swi->{fnewrec}->{$k});
+         }
+      }
+      $map.="\n";
+   }
+   
+   my $text;
+   my $subject;
+
+   if ($ischangemode){
+      $subject="Changes made by ServiceCenter to ServiceManager Migration";
+      $text=$self->getMailtextSwi($lang,$map);
+   }
+   else{
+      $subject="Announcement Migration ServiceCenter to ServiceManager";
+      $text=$self->getPreMailtextSwi($lang,$map);
+   }
+   my %to=();
+   if ($databossid ne ""){
+      $to{$databossid}=1;
+   }
+   my %bcc=('11634953080001'=>1, # Vogler
+   );
+   my %cc=('13916949570000'=>1, # Pfisterer
+           '12023707570001'=>1, # Chirstman);
+   );
+
+   my $wfa=getModuleObject($self->Config,"base::workflowaction");
+   $wfa->Notify("INFO", $subject, $text,
+                emailto=>[keys(%to)],
+                emailbcc=>[keys(%bcc)],
+                emailcc=>[keys(%cc)]);
+
+   @{$msgbuffer}=();
+}
+
+
+
+sub SMmigAppl
 {
    my $self=shift;
    my $filename=shift;
@@ -170,7 +405,7 @@ sub SMmig
                my $orgold=ObjectRecordCodeResolver($oldrec[0]);
                if ($appl->ValidatedUpdateRecord($oldrec[0],$rec,{id=>\$rec->{id}})){
                   printf LOG ("%s",msg(INFO,"sucess '%s' (W5BaseID %s)",$rec->{name},$rec->{id}));
-                  my $txt=$self->getMailtext($lang,$orgold,$rec,$fnewrec);
+                  my $txt=$self->getMailtextAppl($lang,$orgold,$rec,$fnewrec);
                   $wfa->Notify("INFO",
                                'Changes made by Migration ServiceCenter to ServiceManager '.$WELLE,
                                $txt,
@@ -185,7 +420,7 @@ sub SMmig
                }
             }
             else{ # pre handling
-               my $pretxt=$self->getPreMailtext($lang,$oldrec[0],$rec,$fnewrec);
+               my $pretxt=$self->getPreMailtextAppl($lang,$oldrec[0],$rec,$fnewrec);
                $wfa->Notify("INFO",
                             'Announcement Migration ServiceCenter to ServiceManager '.$WELLE,
                             $pretxt,
@@ -200,7 +435,153 @@ sub SMmig
    return($bak);
 }
 
-sub getMailtext
+sub getMailtextSwi
+{
+   my $self=shift;
+   my $lang=shift;
+   my $map=shift;
+
+
+   if ($lang eq "de"){
+      my $d=<<EOF;
+Sehr geehrter Datenverantwortlicher,
+
+bei Ihren Software-Instanzen wurden die folgenden Änderungen
+an den Assignmentgroups vorgenommen:
+
+$map
+
+Falls Sie Fragen zu dieser Migration haben, wenden Sie sich bitte
+an die betreffenden Ansprechpartner aus dem Migrationsprojekt:
+
+<b>Panschow, Jürgen</b>     https://darwin.telekom.de/darwin/auth/base/user/ById/11695234600001
+
+Pfisterer, Wolfgang  https://darwin.telekom.de/darwin/auth/base/user/ById/13916949570000
+Christmann, Tobias   https://darwin.telekom.de/darwin/auth/base/user/ById/12023707570001
+
+
+oder das Projekt-Funktionspostfach 
+mailto:FMB_SCC2SM9_Rollout\@t-systems.com
+
+
+
+Mit freundlichem Gruss
+
+W5Base/Darwin Administration
+
+EOF
+      return($d);
+   }
+   else{
+      my $d=<<EOF;
+Dear databoss,
+
+the following changes on your software-instances have been done:
+
+$map
+
+If you got questions for this migration, please contact one of
+the following contacts from the migration project:
+
+<b>Panschow, Jürgen</b>     https://darwin.telekom.de/darwin/auth/base/user/ById/11695234600001
+
+Pfisterer, Wolfgang  https://darwin.telekom.de/darwin/auth/base/user/ById/13916949570000
+Christmann, Tobias   https://darwin.telekom.de/darwin/auth/base/user/ById/12023707570001
+
+
+or the Function-Mailbox
+mailto:FMB_SCC2SM9_Rollout\@t-systems.com
+
+
+
+Kind regards
+
+W5Base/Darwin Administration
+
+EOF
+      return($d);
+   }
+   return(undef);
+}
+
+
+sub getPreMailtextSwi
+{
+   my $self=shift;
+   my $lang=shift;
+   my $map=shift;
+
+
+   if ($lang eq "de"){
+      my $d=<<EOF;
+Sehr geehrter Datenverantwortlicher,
+
+aufgrund der ServiceCenter nach ServiceManager Migration müssen bei
+Software-Instanzen die von Ihnen datenverantwortet werden, 
+Assignmentgroups korrigiert werden.
+Wenn Sie nicht bis zum <b>10.06.2016 14:00 CET</b> selbst eine Umstellung auf
+die neuen SM9 Assignmentgroups vornehmen, wird zentrall die Umstellung 
+nach folgender Mapping Tabelle vorgenommen:
+
+$map
+Falls Sie Fragen zu dieser Migration haben, wenden Sie sich bitte
+an die betreffenden Ansprechpartner aus dem Migrationsprojekt:
+
+<b>Panschow, Jürgen</b>     https://darwin.telekom.de/darwin/auth/base/user/ById/11695234600001
+
+Pfisterer, Wolfgang  https://darwin.telekom.de/darwin/auth/base/user/ById/13916949570000
+Christmann, Tobias   https://darwin.telekom.de/darwin/auth/base/user/ById/12023707570001
+
+
+oder das Projekt-Funktionspostfach 
+mailto:FMB_SCC2SM9_Rollout\@t-systems.com
+
+
+
+Mit freundlichem Gruss
+
+W5Base/Darwin Administration
+
+EOF
+      return($d);
+   }
+   else{
+      my $d=<<EOF;
+Dear databoss,
+
+reasoned on the ServiceCenter to ServiceManager migration the 
+Assignmentgroups in your Software-Instances needs to be changed.
+If you do not have changed to the new SM9 groups 
+since <b>10.06.2016 14:00 CET</b>, the migration will be done by a
+central job based on the following mapping table:
+
+$map
+If you got questions for this migration, please contact one of
+the following contacts from the migration project:
+
+<b>Panschow, Jürgen</b>     https://darwin.telekom.de/darwin/auth/base/user/ById/11695234600001
+
+Pfisterer, Wolfgang  https://darwin.telekom.de/darwin/auth/base/user/ById/13916949570000
+Christmann, Tobias   https://darwin.telekom.de/darwin/auth/base/user/ById/12023707570001
+
+
+or the Function-Mailbox
+mailto:FMB_SCC2SM9_Rollout\@t-systems.com
+
+
+
+Kind regards
+
+W5Base/Darwin Administration
+
+EOF
+      return($d);
+   }
+   return(undef);
+}
+
+
+sub getMailtextAppl
 {
    my $self=shift;
    my $lang=shift;
@@ -295,7 +676,7 @@ EOF
 }
 
 
-sub getPreMailtext
+sub getPreMailtextAppl
 {
    my $self=shift;
    my $lang=shift;
