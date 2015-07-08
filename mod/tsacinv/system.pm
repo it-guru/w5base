@@ -874,7 +874,7 @@ sub SetFilter
 
       my %f2=(%{$flt[0]});
       $f2{status}='"out of operation"';
-      $f2{mdate}='>now-14d';
+      $f2{mdate}='>now-7d';
 
       @flt=([\%f1,\%f2]);
    }
