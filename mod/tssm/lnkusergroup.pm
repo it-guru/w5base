@@ -53,7 +53,7 @@ sub new
                                    htmlwidth  =>'200px',
                                    searchable =>0,
                                    vjointo    =>'tssm::user',
-                                   vjoinon    =>['luser'=>'userid'],
+                                   vjoinon    =>['luser'=>'loginname'],
                                    vjoindisp  =>'fullname'),
 
       new kernel::Field::TextDrop( name       =>'useremail',
@@ -63,7 +63,7 @@ sub new
                                    htmldetail =>0,
                                    vjointo    =>'tssm::user',
                                    vjoinbase  =>{'islogonuser'=>'1'},
-                                   vjoinon    =>['luser'=>'userid'],
+                                   vjoinon    =>['luser'=>'loginname'],
                                    vjoindisp  =>'email'),
 
       new kernel::Field::Text(     name       =>'luser',

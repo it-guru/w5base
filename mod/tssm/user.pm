@@ -267,7 +267,7 @@ sub mkFullname
 sub initSqlWhere
 {
    my $self=shift;
-   my $where=SELpref."contactsm1.user_id=".SELpref."operatorm1.name(+)";
+   my $where=SELpref."contactsm1.operator_id=".SELpref."operatorm1.name(+)";
    return($where);
 }
 
