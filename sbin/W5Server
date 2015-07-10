@@ -990,6 +990,7 @@ sub StartW5ServerProcess
       \$SIG{HUP}=\\&hup;
       \$SIG{INT}=\\&shutdown;
       \$SIG{USR2}='DEFAULT';
+      \$SIG{PIPE}='IGNORE';
       \$SIG{USR1}=sub{
          \$srv->{ServerGoesDown}=1;
       };
