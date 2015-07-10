@@ -108,6 +108,7 @@ sub Connect
          use Net::SFTP::Foreign;
          $comObj=do{
             local $SIG{TERM} = "IGNORE";
+            local $SIG{PIPE} = "IGNORE";
             Net::SFTP::Foreign->new(%param);
          };
       ');
