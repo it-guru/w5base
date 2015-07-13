@@ -86,6 +86,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name_cistatus',
                 label         =>'Question cistatus',
+                readonly      =>1,
                 htmldetail    =>0,
                 vjointo       =>'base::interview',
                 vjoinon       =>['interviewid'=>'id'],
@@ -206,6 +207,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'lastverify',
                 group         =>'source',
+                uploadable    =>0,
                 label         =>'last verify of anser',
                 dataobjattr   =>'interanswer.lastverify'),
 
