@@ -20,7 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
-@ISA=qw(kernel::Event);
+use kernel::App;
+@ISA=qw(kernel::Event kernel::App);
 
 
 sub new
@@ -58,7 +59,6 @@ sub ImportTSInetLocation
    $tsiloc->SetCurrentView(qw(ALL));
    #$tsiloc->SetCurrentOrder("NONE");
    #$tsiloc->SetFilter({location=>"Bamberg"});
-   #$tsiloc->SetFilter({location=>"Berlin"});
    my ($rec,$msg)=$tsiloc->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
@@ -160,16 +160,29 @@ sub ImportTSInetLocation
    $rel->DeleteAllFilteredRecords("ValidatedDeleteRecord");
 
 
-   if ($#problems!=-1){
+   if ($#problems!=-1) {
+      my $ifacemgrgrp ='14363337190001';
+      my $ifacemgrgrp2='14363337980001';
+
+      my @ifacemgr=$self->getMembersOf($ifacemgrgrp,"RMember","direct");
+      my @ifacemgr2=$self->getMembersOf($ifacemgrgrp2,"RMember","direct");
+   
+      if ($#ifacemgr==-1) {
+         return({msg=>'interface manager groups have no members',exitcode=>1})
+            if ($#ifacemgr2==-1);
+
+         @ifacemgr=@ifacemgr2;
+         undef @ifacemgr2;
+      }
+
       my $act=getModuleObject($self->Config,"base::workflowaction");
       $act->Notify(ERROR,"problems while tsinet to W5BaseDarwin sync",
                    "Found <b>".(($#problems)+1)." problems</b> ".
                    "while TSINET->W5Base locations syncronisation!\n\n".
                    join("\n",@problems),
                    emailfrom=>'"TSINET to W5BaseDarwin" <no_reply@w5base.net>',
-                   emailto=>['12023045810001'], # Fritscher
-                   emailcc=>['12480761360002'], # Steiger.
-                   emailbcc=>['11634955570001'], # Junghans.
+                   emailto=>\@ifacemgr,
+                   emailcc=>\@ifacemgr2
                   );
    }
 
