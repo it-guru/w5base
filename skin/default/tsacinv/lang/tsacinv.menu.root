@@ -17,6 +17,8 @@
 'ac.krn.service'=>{de=>'Leistungen',en=>'Services'},
 'ac.krn.location'=>{de=>'Standort',en=>'Location'},
 'ac.krn.sclocation'=>{de=>'SCLocation',en=>'SCLocation'},
+'ac.krn.sclocation.invalid'=>{de=>'invalid',en=>'invalid'},
+'ac.krn.sclocation.ismitem'=>{de=>'SM9map fehlerhaft',en=>'SM9map failed'},
 'ac.krn.costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
 'ac.krn.costcenter.dlvpartner'=>{de=>'DeliveryPartner',en=>'DeliveryPartner'},
 'ac.krn.customer'=>{de=>'Kunden',en=>'Customer'},

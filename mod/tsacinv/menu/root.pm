@@ -135,7 +135,15 @@ sub Init
    $self->RegisterObj("ac.krn.sclocation",
                       "tsacinv::sclocation",
                       defaultacl=>['valid_user']);
-   
+
+   $self->RegisterObj("ac.krn.sclocation.invalid",
+                      "tsacinv::invalid_sclocation",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("ac.krn.sclocation.ismitem",
+                      "tsacinv::invalid_smitem",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("ac.krn.costcenter",
                       "tsacinv::costcenter",
                       defaultacl=>['valid_user']);
