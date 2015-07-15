@@ -312,6 +312,19 @@ sub Init
                       "TS::chmmgmt",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itts.proc.softmgmt",
+                      "itil::softwareset",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itts.proc.softmgmt.analyse",
+                      "itil::softwaresetanalyse",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itts.proc.softmgmt.software",
+                      "itil::lnksoftwaresoftwareset",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.kern.projectroom.new",
                       "OSY::projectroom",
                       func=>'New',

@@ -506,6 +506,16 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itil.kern.autodisce.map",
+                      "itil::autodiscmap",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itil.kern.autodisce.rec",
+                      "itil::autodiscrec",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("itil.proc",
                       "tmpl/welcome",
                       prio=>20000);
