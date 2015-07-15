@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use itil::lib::Listedit;
+use tsacinv::costcenter;
 @ISA=qw(itil::lib::Listedit);
 
 sub new
@@ -60,6 +61,12 @@ sub new
                 dataobjattr   =>'e.customerlink'),
 
       new kernel::Field::Text(
+                name          =>'isaphier',
+                label         =>'SAP-Hier',
+                ignorecase    =>1,
+                dataobjattr   =>'e.saphier'),
+
+      new kernel::Field::Text(
                 name          =>'imsskey',
                 label         =>'MSS-Key',
                 ignorecase    =>1,
@@ -91,6 +98,16 @@ sub Initialize
    return(0);
 }
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_isaphier"))){
+     Query->Param("search_isaphier"=>
+                  "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
+   }
+}
+
+
 sub getSqlFrom
 {
    my $self=shift;
@@ -113,6 +130,7 @@ sub getSqlFrom
 
    $rest="and (($rest) or amtsisclocations.sclocationid is null)";
 
+   my $saphier=tsacinv::costcenter::getSAPhierSQL();
 
 
    my $from=<<EOF;
@@ -121,6 +139,7 @@ select amportfolio.assettag          id,
        amportfolio.name              name,
        amcostcenter.trimmedtitle     costcenter,
        amtsiaccsecunit.identifier    customerlink,
+       $saphier                      saphier,
        amtsisclocations.sclocationid msskey
        
 from amtsiswinstance 
@@ -146,6 +165,7 @@ select amtsicustappl.code            id,
        amtsicustappl.name            name,
        amcostcenter.trimmedtitle     costcenter,
        amtsiaccsecunit.identifier    customerlink,
+       $saphier                      saphier,
        amtsisclocations.sclocationid msskey
 
 from amtsicustappl
