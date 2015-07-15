@@ -501,6 +501,33 @@ sub isWriteValid
    return("default","acl","attachments") if ($rec->{owner}==$userid ||
                                              $self->IsMemberOf("admin") ||
                                              grep(/^write$/,@acl));
+
+
+   # write access for category admins
+   my $catobj=getModuleObject($self->Config,'faq::category');
+   my $catid=$rec->{faqcat};
+
+   while (defined($catid) && $catid ne '') {
+      $catobj->SetFilter({faqcatid=>$catid});
+      my ($d,$msg)=$catobj->getOnlyFirst(qw(acls parentid));
+
+      foreach my $acl (@{$d->{acls}}) {
+         if ($acl->{aclmode}=='admin' &&
+             $acl->{acltarget}=='base::user' &&
+             $acl->{acltargetid}==$userid) {
+            return("default","acl","attachments");
+         }
+         elsif ($acl->{aclmode}=='admin' &&
+                $acl->{acltarget}=='base::grp' &&
+                $self->IsMemberOf($acl->{acltargetid})) {
+            return("default","acl","attachments");
+         }
+      }
+
+      $catid=$d->{parentid};
+   }
+   
+
    return(undef);
 }
 
