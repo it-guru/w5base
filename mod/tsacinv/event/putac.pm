@@ -83,7 +83,7 @@ sub getAcGroupByW5BaseGroup
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS\.IMS\.IM2$/CSS.SDM.PSS.CIAM/i;
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS\.IMS\.IM3$/CSS.SDM.PSS.CIAM/i;
    $grpname=~s/^DTAG\.TSI\.Prod\.CS\.SDMSS\.PSS/CSS.SDM.PSS/i;
-   $grpname=~s/^DTAG\.TSI\.TI\.E-([A-Z]+).*/TI.$1/i;
+   $grpname=~s/^DTAG\.TSI\.TIT\.E-([A-Z]+).*/TIT.$1/i;
    if ($grpname ne ""){
       $acgrp->SetFilter({name=>$grpname}); 
       my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
@@ -437,50 +437,50 @@ sub ApplicationModified
                      $elements++;
                   }
                }
-               { # fill up missing system links by SAP application relations in AM
-                  if ($rec->{applid} ne ""){
-                     if (defined($acapplrec)){
-                        my $lnks=getModuleObject($self->Config,
-                                                 "tsacinv::lnkapplsystem");
-                        my $acla=getModuleObject($self->Config,
-                                                 "tsacinv::lnkapplappl");
-                        $acla->SetFilter({lparentid=>\$acapplrec->{id},
-                                          type=>\'SAP'});
-                        foreach my $lnkrec ($acla->getHashList(qw(ALL))){
-                           $lnks->ResetFilter();
-                           $lnks->SetFilter({lparentid=>\$lnkrec->{lchildid}});
-                           foreach my $srec ($lnks->getHashList(qw(systemid))){
-                              if (!exists($ciapplrel{$srec->{systemid}."-".
-                                                     $acapplrec->{applid}})){
-                                 my $externalid="SAPLNK-".$srec->{systemid}."-".
-                                                $acapplrec->{applid};
-                                 my $acftprec={
-                                      CI_APPL_REL=>{
-                                         EventID=>'link by SAP'.
-                                                  'appl relation '.
-                                                  $externalid,
-                                         Application=>$acapplrec->{applid},
-                                         Portfolio=>$srec->{systemid},
-                                         ExternalSystem=>'W5Base',
-                                         ExternalID=>$externalid,
-                                         Security_Unit=>"TS.DE",
-                                         Description=>
-                                              'fillup link by SAP'.
-                                              'application relation',
-                                         bDelete=>'0',
-                                         bActive=>'1',
-                                      }
-                                    };
-                                
-                                 my $fh=$fh{ci_appl_rel};
-                                 print $fh hash2xml($acftprec,{header=>0});
-                                 print $onlinefh hash2xml($acftprec,{header=>0});
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
+#               { # fill up missing system links by SAP application relations in AM
+#                  if ($rec->{applid} ne ""){
+#                     if (defined($acapplrec)){
+#                        my $lnks=getModuleObject($self->Config,
+#                                                 "tsacinv::lnkapplsystem");
+#                        my $acla=getModuleObject($self->Config,
+#                                                 "tsacinv::lnkapplappl");
+#                        $acla->SetFilter({lparentid=>\$acapplrec->{id},
+#                                          type=>\'SAP'});
+#                        foreach my $lnkrec ($acla->getHashList(qw(ALL))){
+#                           $lnks->ResetFilter();
+#                           $lnks->SetFilter({lparentid=>\$lnkrec->{lchildid}});
+#                           foreach my $srec ($lnks->getHashList(qw(systemid))){
+#                              if (!exists($ciapplrel{$srec->{systemid}."-".
+#                                                     $acapplrec->{applid}})){
+#                                 my $externalid="SAPLNK-".$srec->{systemid}."-".
+#                                                $acapplrec->{applid};
+#                                 my $acftprec={
+#                                      CI_APPL_REL=>{
+#                                         EventID=>'link by SAP'.
+#                                                  'appl relation '.
+#                                                  $externalid,
+#                                         Application=>$acapplrec->{applid},
+#                                         Portfolio=>$srec->{systemid},
+#                                         ExternalSystem=>'W5Base',
+#                                         ExternalID=>$externalid,
+#                                         Security_Unit=>"TS.DE",
+#                                         Description=>
+#                                              'fillup link by SAP'.
+#                                              'application relation',
+#                                         bDelete=>'0',
+#                                         bActive=>'1',
+#                                      }
+#                                    };
+#                                
+#                                 my $fh=$fh{ci_appl_rel};
+#                                 print $fh hash2xml($acftprec,{header=>0});
+#                                 print $onlinefh hash2xml($acftprec,{header=>0});
+#                              }
+#                           }
+#                        }
+#                     }
+#                  }
+#               }
                { # Application
                   my %posix=();
                   my %idno=();
@@ -534,7 +534,7 @@ sub ApplicationModified
                   }
                   if (!defined($assignment)){
                      $grpnotfound{$chkassignment}=1;
-                     $assignment="TI" 
+                     $assignment="TIT" 
                   }
                   my $criticality=$rec->{criticality};
                   $criticality=~s/^CR//;
@@ -808,11 +808,11 @@ sub ApplicationModified
                            }
                            else{
                               $grpnotfound{$assignment}=1;
-                              $assignment="TI";
+                              $assignment="TIT";
                            }
                         }
                         else{
-                           $assignment="TI";
+                           $assignment="TIT";
                         }
                         ########################################################
                         my $iassignment=$irec->{acinmassingmentgroup};
@@ -1367,7 +1367,7 @@ sub SWInstallModified
                              Customer=>"TS.DE",
                              Status=>"installed/active",
                              EventID=>$jobname,
-                             AssignmentGroup=>"TI",
+                             AssignmentGroup=>"TIT",
                              SoftwareVersion=>$rec->{version},
                              SoftwareName=>$rec->{software},
                              LicenseUnits=>$rec->{licencecount},
