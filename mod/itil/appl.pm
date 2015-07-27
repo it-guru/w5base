@@ -1237,7 +1237,7 @@ sub new
                    my $type=shift;
                    my $t=shift;
                    $type=uc($type);
-                   $type="M" if ($type eq "");
+                   #$type="M" if ($type eq "");
                    return($type);
                 },
                 tspanlegend   =>1,
