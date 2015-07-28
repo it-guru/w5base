@@ -82,7 +82,8 @@ $html=new HTML::Parser();
      # my $googleurl01="http://www.google.de/language_tools";
       my $googleurl02="http://translate.google.com/translate_a/t?".
                       "sl=$cursrclang&tl=$curdstlang";  
-      msg(INFO,"request: $googleurl02");
+      my $googleurl02="http://translate.google.com/translate_a/single";
+      #msg(INFO,"request0: $googleurl02");
      # my $response=$ua->request(GET($googleurl01));
      # if ($response->code ne "200"){
      #    msg(ERROR,"fail to init '$googleurl01' response code=".
@@ -97,31 +98,47 @@ $html=new HTML::Parser();
          $sendcursrc=$cursrc;
       }
 
-      my $response=$ua->request(POST($googleurl02,
-                       'Referer'=>'http://translate.google.com/translate_t',
-                       'Content_Type'=>'application/x-www-form-urlencoded',
-                       'Accept-Charset'=>'ISO-8859-15,utf-8;q=0.7,*;q=0.7',
-                       'Accept-Language'=>'de,en-jm;q=0.7,en;q=0.3',
-                       'Accept'=>'text/xml,application/xml,application/xhtml'.
-                                 '+xml,text/html;q=0.9,text/plain;q=0.8',
-                       'Content'=>['hl'=>'en',
-                                 'ie'=>'UTF8',
-                                 'text'=>$sendcursrc,
-                                 'sl'=>"$cursrclang",
-                                 'otf'=>"2",
-                                 'pc'=>"0",
-                                 'client'=>"t",
-                                 'tl'=>"$curdstlang"]));
-      #my $response=$ua->request(GET($googleurl02));
+
+      my %qparam=(
+        'hl'=>'en',
+        'ie'=>'UTF8',
+        'oe'=>'UTF8',
+        'q'=>$sendcursrc,
+        'sl'=>"$cursrclang",
+        'otf'=>"2",
+        'pc'=>"0",
+        'dt'=>[qw(bd ex ld md qca rw rm ss t at)],
+        'tk'=>"522795|634309",
+        'kc'=>"5",
+        'client'=>"t",
+        'tl'=>"$curdstlang"
+      );
+
+      my $c=new kernel::cgi(%qparam);
+      $googleurl02.="?".kernel::cgi::Hash2QueryString(%qparam);
+
+      msg(INFO,"request1: $googleurl02");
+
+
+#      my $response=$ua->request(POST($googleurl02,
+#                       'Referer'=>'http://translate.google.com/translate_a/single',
+#                       'Content_Type'=>'application/x-www-form-urlencoded',
+#                       'Accept-Charset'=>'ISO-8859-15,utf-8;q=0.7,*;q=0.7',
+#                       'Accept-Language'=>'de,en-jm;q=0.7,en;q=0.3',
+#                       'Accept'=>'text/xml,application/xml,application/xhtml'.
+#                                 '+xml,text/html;q=0.9,text/plain;q=0.8',
+#                       'Content'=>[%qparam]));
+      my $response=$ua->request(GET($googleurl02));
       if ($response->code ne "200"){
          msg(ERROR,"fail to get '$googleurl02' response code=".$response->code);
          $ua=undef;
       }
       $curdst="???";
       my $res=$response->content;
+    
       if ($res ne ""){
          $res=UTF8toLatin1($res);
-         #msg(INFO,"GoogleResponse=%s\n",$res);
+         #msg(INFO,"GoogleRawResponse=%s\n",$res);
          my $eenv=new Safe();
          my $res=$eenv->reval($res.";");
          if (ref($res) eq "ARRAY" &&
@@ -130,6 +147,8 @@ $html=new HTML::Parser();
             foreach my $resp (@{$res->[0]}){
                $curdst.=$resp->[0];
             }
+            msg(INFO,"GoogleQuery   =%s\n",$cursrc);
+            msg(INFO,"GoogleResponse=%s\n",$curdst);
          }
       }
       #open(F,">/tmp/googletrans02.html");
