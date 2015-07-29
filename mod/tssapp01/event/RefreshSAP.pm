@@ -308,6 +308,7 @@ sub processFile
          #   $if->SetFilter({'name'=>\$wrrec->{'name'}});
          #   my ($oldrec)=$if->getOnlyFirst(qw(name id));
             # validate against postible existing record
+            $wrrec->{'name'}=~s/^0+//; # remove leading 0 s
             if (exists($k{$wrrec->{'name'}})){
                # doublicate (known) entry
                next if ($wrrec->{'name'} eq "X-BCM98-1000");
