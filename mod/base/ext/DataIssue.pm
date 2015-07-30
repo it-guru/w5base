@@ -51,6 +51,11 @@ sub getControlRecord
              targetid  =>'grpid'
            },
            {
+             dataobj   =>'base::mandator',
+             target    =>'name',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'base::workflow',
              target    =>'name',
              targetid  =>'id'
@@ -71,6 +76,12 @@ sub DataIssueCompleteWriteRequest
 
    my $affectedobject=effVal($oldrec,$newrec,"affectedobject");
 
+   if ($affectedobject=~m/^base::mandator$/){
+      # create link to config Management
+      $newrec->{directlnktype}=effVal($oldrec,$newrec,"affectedobject");
+      $newrec->{directlnkid}=effVal($oldrec,$newrec,"affectedobjectid");
+      $newrec->{directlnkmode}="DataIssue";
+   }
    if ($affectedobject=~m/^base::grp$/){
       # create link to config Management
       $newrec->{directlnktype}=effVal($oldrec,$newrec,"affectedobject");

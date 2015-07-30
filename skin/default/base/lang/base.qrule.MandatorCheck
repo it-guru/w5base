@@ -1,0 +1,6 @@
+'base::qrule::MandatorCheck'=>{de=>'Überprüfung des Gruppenverweises in Mandanten',
+en=>'check group relation in mandators'
+},
+'mandator points to a deleted group'=>{de=>'Mandant verweist auf eine ungültige Gruppe'},
+'missing correct group relation'=>{de=>'keine gültige Gruppenzuordnung'},
+
