@@ -44,7 +44,7 @@ sub new
  
       new kernel::Field::RecordUrl(),
 
-      new kernel::Field::Mandator(allowany=>1),
+      new kernel::Field::Mandator(allowany=>1,allowall=>1),
 
       new kernel::Field::Link(
                 name          =>'mandatorid',

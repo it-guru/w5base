@@ -87,7 +87,8 @@ sub getPostibleValues
       #######################################################################
       foreach my $mandator (@mandators){
          if (defined($MandatorCache->{grpid}->{$mandator}) &&
-             $MandatorCache->{grpid}->{$mandator}->{cistatusid}==4){
+             ($MandatorCache->{grpid}->{$mandator}->{cistatusid}==4 ||
+              ($self->{allowall}))){
             push(@res,$mandator,$MandatorCache->{grpid}->{$mandator}->{name});
          }
       }
@@ -158,8 +159,13 @@ sub Validate
          else{ # check mandatorid
             my $chkid=effVal($oldrec,$newrec,$mandatoridname);
             my $m=getModuleObject($self->getParent->Config,"base::mandator");
-            $m->SetFilter({grpid=>\$chkid,
-                           cistatusid=>"<6"});
+            if ($self->{allowall}){
+               $m->SetFilter({grpid=>\$chkid});
+            }
+            else{
+               $m->SetFilter({grpid=>\$chkid,
+                              cistatusid=>"<6"});
+            }
             my ($mrec,$msg)=$m->getOnlyFirst(qw(grpid));
             if (!defined($mrec)){
                $app->LastMsg(ERROR,"invalid mandatorid");
