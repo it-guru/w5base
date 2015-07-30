@@ -1043,9 +1043,10 @@ sub FullView
           "border-color:silver;margin-top:20px;".
           "padding-bottom:10px;margin-right:10px\">");
 
-   my $c=FancyLinks(quoteHtml(
-                    extractLangEntry($rec->{hints},$lang,undef,1)));
-   $c=~s/\n/<br>\n/g;
+   my $t=quoteHtml(extractLangEntry($rec->{hints},$lang,undef,1));
+   $t=~s/\n/<br>\n/g;
+   my $c=FancyLinks($t);
+   $c=~s/\n/<br>\n/gs;
    printf("<div style=\"margin:5px;margin-top:5px\">".
           "<b>%s:</b><br>%s</div>",$self->T("Hints"),$c);
 
