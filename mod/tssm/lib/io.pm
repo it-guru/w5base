@@ -339,7 +339,8 @@ sub mkProblemStoreRec
       $wfrec{openuser}=$userid if (defined($userid));
       $wfrec{step}='itil::workflow::problem::extauthority';
    }
-   $wfrec{srcload}=$rec->{sysmodtime};
+   $wfrec{srcload}=$self->detectSrcLoad($rec->{sysmodtime},
+                                        $rec->{problemnumber},$rec);
    return(\%wfrec,$updateto);
 }
 
@@ -660,8 +661,25 @@ sub mkChangeStoreRec
           }
        }
    }
-   $wfrec{srcload}=$rec->{sysmodtime};
+   $wfrec{srcload}=$self->detectSrcLoad($rec->{sysmodtime},
+                                        $rec->{changenumber},$rec);
    return(\%wfrec,$updateto,$relations);
+}
+
+sub detectSrcLoad
+{
+   my $self=shift;
+   my $reqstamp=shift;
+   my $id=shift;
+   my $rec=shift;
+
+   my $d=CalcDateDuration($reqstamp,NowStamp("en"));
+   if (defined($d) && $d->{totalseconds}<0){
+      msg(ERROR,"desired srcload timestamp for $id is in the ".
+                "future '$reqstamp'");
+      $reqstamp=NowStamp("en");
+   }
+   return($reqstamp);
 }
 
 sub mkIncidentStoreRec
@@ -835,7 +853,8 @@ sub mkIncidentStoreRec
        }
    }
 
-   $wfrec{srcload}=$rec->{closetime};
+   $wfrec{srcload}=$self->detectSrcLoad($rec->{sysmodtime},
+                                        $rec->{incidentnumber},$rec);
    return(\%wfrec,$updateto);
 }
 
