@@ -40,5 +40,5 @@ EOF
 'Total: %d records'=>{de=>'Gesamtanzahl: %d Datens&auml;tze',
                       en=>'Total: %d records'},
 'Automatic data update'=>{de=>'Automatisches Daten-Update'},
-'based on datasource'=>{de=>'basierend auf die Datenquelle'},
+'based on datasource'=>{de=>'basierend auf der Datenquelle'},
 'the datasource'=>{de=>'die Datenquelle'},

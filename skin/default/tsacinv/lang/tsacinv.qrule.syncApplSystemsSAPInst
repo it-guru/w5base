@@ -1,0 +1,25 @@
+'tsacinv::qrule::syncApplSystemsSAPInst'=>{
+   de=>'Abgleich Systeme mit SAP-Instanzen in AssetManager',
+   en=>'Syncronize systems with SAP-Instances in AssetManager'
+},
+"System '%s' created"=>{de=>"System '%s' angelegt"},
+"Automatic creation of System '%s' failed"=>{
+   de=>"Automatisches Anlegen des Systems '%s' fehlgeschlagen"
+},
+"Relation with system '%s' added"=>{
+   de=>"Verknüpfung mit System '%s' hinzugefügt"
+},
+"Automatic relation with system '%s' failed"=>{
+   de=>"Automatische Verknüpfung mit System '%s' fehlgeschlagen"
+},
+"Relation with system '%s' removed"=>{
+de=>"Verknüpfung mit System '%s' entfernt"
+},
+"Automatic removal of relation with system '%s' failed"=>{
+   de=>"Automatisches Entfernen der Verknüpfung mit System '%s' fehlgeschlagen"
+},
+"Asset '%s' created"=>{de=>"Asset '%s' angelegt"},
+"Automatic creation of asset '%s' failed"=>{
+   de=>"Automatisches Anlegen des Assets '%s' fehlgeschlagen"
+},
+
