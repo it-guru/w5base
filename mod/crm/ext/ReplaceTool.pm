@@ -56,6 +56,22 @@ sub getControlRecord
              idfield      =>'processowner2id',
              targetlabel  =>'fullname'
            },
+           bsprocessprocessacl=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'crm::businessprocessacl',
+             target       =>'acltargetname',
+             idfield      =>'acltargetid',
+             targetlabel  =>'fullname',
+             baseflt      =>{acltarget=>\'base::grp'}
+           },
+           bsprocessprocessacl=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'crm::businessprocessacl',
+             target       =>'acltargetname',
+             idfield      =>'acltargetid',
+             targetlabel  =>'fullname',
+             baseflt      =>{acltarget=>\'base::user'}
+           },
          ];
    return($d);
 }

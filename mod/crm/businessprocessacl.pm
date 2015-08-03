@@ -32,6 +32,20 @@ sub new
 
    $param{acltable}="businessprocessacl";
    my $self=bless($type->SUPER::new(%param),$type);
+
+
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'fullname',
+                readonly      =>1,
+                depend        =>['refid','aclmode'],
+                label         =>'Fullname',
+                vjointo       =>'crm::businessprocess',
+                vjoinon       =>['refid'=>'id'],
+                vjoindisp     =>'fullname'),
+      insertafter=>'id'
+   );
+
    return($self);
 }
 
