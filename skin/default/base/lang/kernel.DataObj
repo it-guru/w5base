@@ -43,5 +43,4 @@ EOF
 'based on datasource'=>{de=>'basierend auf der Datenquelle'},
 'old value'=>{de=>'alter Inhalt'},
 'new value'=>{de=>'neuer Inhalt'},
-'based on datasource'=>{de=>'basierend auf der Datenquelle'},
 'the datasource'=>{de=>'die Datenquelle'},
