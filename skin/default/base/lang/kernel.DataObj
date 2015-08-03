@@ -41,4 +41,7 @@ EOF
                       en=>'Total: %d records'},
 'Automatic data update'=>{de=>'Automatisches Daten-Update'},
 'based on datasource'=>{de=>'basierend auf der Datenquelle'},
+'old value'=>{de=>'alter Inhalt'},
+'new value'=>{de=>'neuer Inhalt'},
+'based on datasource'=>{de=>'basierend auf der Datenquelle'},
 'the datasource'=>{de=>'die Datenquelle'},
