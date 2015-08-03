@@ -28,7 +28,7 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{fieldlist}=[qw(name id validto srcsys)];
-   $self->{name}="Reporing-Server - Monitor";
+   $self->{name}="Reporting-Server - Monitor";
    return($self);
 }
 
@@ -94,7 +94,7 @@ sub onChange
    }
    if ($msg ne ""){
       $msg="Dear W5Base User,\n\n".
-           "the following changes where detected in the report:\n\n".
+           "the following changes have been detected in the report:\n\n".
            $msg;
    }
 
