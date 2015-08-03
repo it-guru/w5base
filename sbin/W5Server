@@ -955,6 +955,7 @@ sub RunScheduler
    my $self=shift;
    $self->LoadSubObjs("W5Server","W5Server");
    foreach my $server (keys(%{$self->{W5Server}})){
+      #next if (!($server=~m/Reporter/));
       $self->StartW5ServerProcess($server);
    }
 
@@ -1021,15 +1022,17 @@ sub CheckW5ServerProcess
 {
    my $self=shift;
    foreach my $server (keys(%{$self->{W5Server}})){
-      my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID};
-      if (!kill(0,$pid)){
-         msg(ERROR,"W5Server $server was crashed - now restarting");
-         $self->NotifyAdmin("W5Server $server unexpected termination",
-                            "The W5Server $server has been terminated ".
-                            "unexpected. Now trying to restart.\n\n".
-                            "Sorry, but no further informations available ".
-                            "from this point of view.");
-         $self->StartW5ServerProcess($server);
+      if (exists($self->{W5ServerProcess}->{$server})){ # is schon mal gelaufen!
+         my $pid=$self->{W5ServerProcess}->{$server}->{AsyncID};
+         if (!kill(0,$pid)){
+            msg(ERROR,"W5Server $server was crashed - now restarting");
+            $self->NotifyAdmin("W5Server $server unexpected termination",
+                               "The W5Server $server has been terminated ".
+                               "unexpected. Now trying to restart.\n\n".
+                               "Sorry, but no further informations available ".
+                               "from this point of view.");
+            $self->StartW5ServerProcess($server);
+         }
       }
    }
 }

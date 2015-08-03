@@ -64,6 +64,7 @@ sub taskCreator          # creates new Prozess requests
    }
    my ($definterval,$deftimes)=$self->getDefaultIntervalMinutes();
    my ($nY,$nM,$nD,$nh,$nm,$ns)=Today_and_Now("en");
+
    $definterval=int($definterval);
    $definterval=1 if ($definterval<=0);
    if (ref($deftimes) eq "ARRAY"){
@@ -86,9 +87,9 @@ sub taskCreator          # creates new Prozess requests
    if ($d->{totalminutes}>$definterval){
       my $startTask=0;
       $startTask++ if ($#{$deftimes}==-1);
-      for(my $t=0;$t<$#{$deftimes};$t++){
+      for(my $t=0;$t<=$#{$deftimes};$t++){
          my $twinlow=$deftimes->[$t];
-         my $twinheight=($twinlow+(1/60)*4);
+         my $twinheight=($twinlow+(1/60)*30);
          my $nowfloat=$nh+(1/60*$nm);
          if ($twinlow<=$nowfloat){
             if ($twinheight>$nowfloat){

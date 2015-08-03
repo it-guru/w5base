@@ -75,7 +75,9 @@ sub Reporter
                    my $command=$buf;
                    $command=~s/\s*$//;
                    $self->processConsoleCommand(\%Reporter,
-                                                \%cons,$sock,$command);
+                                                \%cons,$sock,
+                                                \@slot,
+                                                $command);
                } else {
                    delete($cons{$sock});
                    $readable_handles->remove($sock);
@@ -98,6 +100,7 @@ sub processConsoleCommand
    my $reporter=shift;
    my $cons=shift;
    my $client=shift;
+   my $slot=shift;
    my $command=shift;
    my $reportjob=$reporter->{reportjob};
 
@@ -126,8 +129,21 @@ sub processConsoleCommand
       $d=~s/^.*?{/{/;
       printf $client ("status: %s\n",$d);
       printf $client ("Loaded modules:\n");
+      my @run;
+      foreach my $s (@{$slot}){
+         if (defined($s) && ref($s) eq "HASH" &&
+             defined($s->{task})){
+            push(@run,$s->{task}->{name});
+         }
+      }
       foreach my $module (sort(keys(%{$reportjob->{Reporter}}))){
-         printf $client ("- %s\n",$module);
+         my $r="";
+         if (in_array(\@run,$module)){
+            $r="running";
+         }
+         printf $client ("- %-42s %s %s\n",$module,
+                         $reportjob->{Reporter}->{$module}->{lastrun},
+                         $r);
       }
    }
    elsif ($command eq "shutdown"){
