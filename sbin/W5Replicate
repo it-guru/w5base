@@ -745,7 +745,7 @@ sub objectReplicationPhase1
                $replkey=undef;
             }
             if (!defined($replkeysec)){   # seek to synkey1 position in stream
-               if (!$dbi->InsertOrUpdate($ctrl,$srcrec)){
+               if (!$dbi->InsertOrUpdate($obj,$ctrl,$srcrec)){
                   msg(ERROR,"REPLICATION BREAK: fail to write in ".
                             "object '$ctrl->{'name'}'");
                   $dbi->rollback();
@@ -886,7 +886,7 @@ sub objectReplicationPhase2
          #                                   @{$ctrl->{'view'}});
          my ($rrec,$msg)=$obj->getOnlyFirst(@{$ctrl->{'view'}});
          if (defined($rrec)){
-            if (!$dbi->InsertOrUpdate($ctrl,$rrec)){
+            if (!$dbi->InsertOrUpdate($obj,$ctrl,$rrec)){
                msg(ERROR,"REPLICATION BREAK: fail to refresh in ".
                          "object '$ctrl->{'name'}'");
                $dbi->commit();
@@ -1303,7 +1303,7 @@ sub getHash
 sub preprocessRecord
 {
    my $self=shift;
-   my ($ctrl,$reqrec,$col)=@_;
+   my ($obj,$ctrl,$reqrec,$col)=@_;
    my %rec=(%$reqrec);
 
    if (exists($rec{'replkeypri'}) && exists($rec{'replkeysec'})){
@@ -1319,6 +1319,16 @@ sub preprocessRecord
       delete($rec{$k});
    }
    foreach my $fieldname (keys(%rec)){
+      my $fobj=$obj->getField($fieldname);
+      my $forceHashHandling=0;
+      if (defined($fobj)){
+         if ($fobj->Type() eq "XMLInterface"){
+            $forceHashHandling=1;
+         }
+      }
+      if ($forceHashHandling){
+         printf STDERR ("fifi forceHashHandling for field $fieldname in $obj\n");
+      }
       if (scalar($rec{$fieldname}) =~ m/^Container=HASH/) {
          $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
       }
@@ -1381,6 +1391,7 @@ sub isChanged
 sub InsertOrUpdate
 {
    my $self=shift;
+   my $obj=shift;
    my $ctrl=shift;
    my $reqrec=shift;
    my $dbtable=$ctrl->{'name'};
@@ -1388,7 +1399,7 @@ sub InsertOrUpdate
    my $col=$ctrl->{'col'};
    my ($bk,@w5v,@w5p,@w5b);
 
-   my $rec=$self->preprocessRecord($ctrl,$reqrec,$col);
+   my $rec=$self->preprocessRecord($obj,$ctrl,$reqrec,$col);
 
    my $cmd="select * from \"$dbtable\" where $idname=?";
    my $idval=$rec->{$idname};
