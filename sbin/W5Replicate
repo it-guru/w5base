@@ -1323,14 +1323,14 @@ sub preprocessRecord
       my $forceHashHandling=0;
       if (defined($fobj)){
          if ($fobj->Type() eq "XMLInterface"){
-            $forceHashHandling=1;
+            if (exists($rec{name}) && $rec{name} eq "W5Base/Darwin"){
+               $forceHashHandling=1;
+            }
          }
       }
-      if ($forceHashHandling){
-         printf STDERR ("fifi forceHashHandling for field $fieldname in $obj\n");
-      }
       if (scalar($rec{$fieldname}) =~ m/^Container=HASH/) {
-         $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
+         $rec{$fieldname}=$self->Hash2DataField($forceHashHandling,
+                                                $rec{$fieldname});
       }
       if (ref($rec{$fieldname}) eq "ARRAY"){
          if ($#{$rec{$fieldname}}>=0){
@@ -1338,7 +1338,8 @@ sub preprocessRecord
                $rec{$fieldname}=join("; ",@{$rec{$fieldname}});
             }
             else{
-               $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
+               $rec{$fieldname}=$self->Hash2DataField($forceHashHandling,
+                                                      $rec{$fieldname});
             }
          }
          else{
@@ -1346,7 +1347,8 @@ sub preprocessRecord
          }
       }
       if (ref($rec{$fieldname}) eq "HASH"){
-         $rec{$fieldname}=$self->Hash2DataField($rec{$fieldname});
+         $rec{$fieldname}=$self->Hash2DataField($forceHashHandling,
+                                                $rec{$fieldname});
       }
       # strip all field values to the max. length in the replication
       # schema. This prevent oracle SQL Errors
@@ -1373,7 +1375,8 @@ sub isChanged
    my $changecount=0;
    foreach my $k (keys(%$newrec)){
       if (!($k=~m/^w5repl.*$/i)){
-         my $new=$newrec->{$k};
+
+        my $new=$newrec->{$k};
          my $old=$oldrec->{$k};
          if (trim($new) ne trim($old)){
             $changecount++;
@@ -1532,9 +1535,14 @@ sub InsertOrUpdate
 sub Hash2DataField
 {
    my $self=shift;
+   my $forceHashHandling=shift;
    my $container=shift;
    my $element;
-   if (ref($container) eq "ARRAY"){
+
+   if ($forceHashHandling){
+     return(utf8(hash2xml($container))->latin1());
+   }
+   elsif (ref($container) eq "ARRAY"){
      return(utf8(hash2xml({'struct'=>{'entry'=>$container}}))->latin1());
    }
    elsif (exists($container->{'item'}) && 
