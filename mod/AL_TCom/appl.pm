@@ -379,6 +379,7 @@ sub ItemSummary
       $o->SetFilter({systemid=>[keys(%systemids)]});
       my @osroadmap=$o->getHashList(qw(systemid roadmap osroadmapstate 
                                        urlofcurrentrec os_base_setup
+                                       os_base_setup_color
                                        denyupd denyupdcomments));
       return(0) if (!$o->Ping());
       $summary->{osroadmap}={record=>ObjectRecordCodeResolver(\@osroadmap)};
@@ -428,9 +429,11 @@ sub ItemSummary
       $l1->SetFilter({systemid=>[keys(%systemids)]});
       $l1->SetCurrentView(qw(systemid rawsystemolaclass));
       my $l=$l1->getHashIndexed("systemid");
-      foreach my $sid (keys(%{$l->{systemid}})){
-         $summary->{systems}->{$sid}->{rawsystemolaclass}=
-            $l->{systemid}->{$sid}->{rawsystemolaclass};
+      if (ref($l->{systemid}) eq "HASH"){
+         foreach my $sid (keys(%{$l->{systemid}})){
+            $summary->{systems}->{$sid}->{rawsystemolaclass}=
+               $l->{systemid}->{$sid}->{rawsystemolaclass};
+         }
       }
    }
 
