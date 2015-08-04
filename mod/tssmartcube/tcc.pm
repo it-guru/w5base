@@ -189,7 +189,8 @@ sub new
                 group         =>'upd',
                 htmldetail    =>0,
                 searchable    =>0,
-                depend        =>['roadmap_state','denyupdvalidto','denyupd',
+                depend        =>['os_base_setup_state',
+                                 'denyupdvalidto','denyupd',
                                  'denyupdcomments'],
                 onRawValue    =>sub{
                    my $self=shift;
@@ -197,8 +198,12 @@ sub new
 
 
                    my $st="OK";
-                   $st="WARN" if ($current->{roadmap_state} eq "warning");
-                   $st="FAIL" if ($current->{roadmap_state} eq "critical");
+                   if ($current->{os_base_setup_state} eq "warning"){
+                      $st="WARN";
+                   }
+                   if ($current->{os_base_setup_state} eq "critical"){
+                      $st="FAIL";
+                   }
 
                    my $failpost="";
                    if ($current->{denyupd}==0){
