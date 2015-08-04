@@ -431,6 +431,7 @@ sub ItemSummary
       my $l=$l1->getHashIndexed("systemid");
       if (ref($l->{systemid}) eq "HASH"){
          foreach my $sid (keys(%{$l->{systemid}})){
+            print STDERR Dumper($summary->{systems}->{$sid}) if (ref($summary->{systems}->{$sid}) ne "HASH");
             $summary->{systems}->{$sid}->{rawsystemolaclass}=
                $l->{systemid}->{$sid}->{rawsystemolaclass};
          }
