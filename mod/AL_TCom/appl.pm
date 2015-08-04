@@ -417,6 +417,22 @@ sub ItemSummary
       }
    }
 
+   #######################################################################
+   # Daten aus AssetManager CDS "dazuladen"
+   my %systemids; 
+   foreach my $sys (@{$summary->{systems}}){
+      $systemids{$sys->{systemsystemid}}=$sys if ($sys->{systemsystemid} ne "");
+   }
+   if (keys(%systemids)){
+      my $l1=getModuleObject($self->Config,"tsacinv::system");
+      $l1->SetFilter({systemid=>[keys(%systemids)]});
+      $l1->SetCurrentView(qw(systemid rawsystemolaclass));
+      my $l=$l1->getHashIndexed("systemid");
+      foreach my $sid (keys(%{$l->{systemid}})){
+         $summary->{systems}->{$sid}->{rawsystemolaclass}=
+            $l->{systemid}->{$sid}->{rawsystemolaclass};
+      }
+   }
 
    return(1);
 }
