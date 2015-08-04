@@ -38,6 +38,10 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itu.W5Warehouse.itemsummary",
+                      "W5Warehouse::itemsum_debug",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("itu.W5Warehouse.system",
                       "W5Warehouse::system",
                       defaultacl=>['valid_user']);
