@@ -705,11 +705,19 @@ sub CalcDateDuration
    if ($d1 eq "" && $d2 eq ""){
       return(undef);
    }
-   if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$d1=~
-          m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
-       (my ($weY,$weM,$weD,$weh,$wem,$wes)=$d2=~
-          m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
+   if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss,$wsms)=$d1=~
+         m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})(\.\d{1,3}){0,1}$/) 
+       &&
+       (my ($weY,$weM,$weD,$weh,$wem,$wes,$wems)=$d2=~
+         m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})(\.\d{1,3}){0,1}$/)){
+      # $wsms and $wems will be ignored (ms part of timestamp)
       my ($dd,$dh,$dm,$ds);
+      $wsms=~s/^\.//;
+      $wems=~s/^\.//;
+      $wsms=undef if ($wsms eq "");
+      $wems=undef if ($wems eq "");
+      $wsms=999 if (defined($wsms) && $wsms>999);
+      $wems=999 if (defined($wems) && $wems>999);
       eval('($dd,$dh,$dm,$ds)=Delta_DHMS($tz,
                                          $wsY,$wsM,$wsD,$wsh,$wsm,$wss,
                                          $weY,$weM,$weD,$weh,$wem,$wes);');
@@ -724,6 +732,24 @@ sub CalcDateDuration
       $duration->{totalminutes}=($dd*24*60)+($dh*60)+$dm+(1/60*$ds);
       $duration->{totalseconds}=($dd*24*60*60)+($dh*60*60)+($dm*60)+$ds;
       $duration->{totaldays}=$duration->{totalminutes}/1440.0;
+      if ((defined($wsms) || defined($wems))){  # not final tested ms handling
+         if ($duration->{totalseconds}>0){      # (05.08.2015)
+            if (defined($wsms)){
+               $duration->{totalseconds}-=(1/1000)*$wsms;
+            }
+            if (defined($wems)){
+               $duration->{totalseconds}+=(1/1000)*$wems;
+            }
+         }
+         else{
+            if (defined($wsms)){
+               $duration->{totalseconds}+=(1/1000)*$wsms;
+            }
+            if (defined($wems)){
+               $duration->{totalseconds}-=(1/1000)*$wems;
+            }
+         }
+      }
       my $d="";
       $d.="${dd}d" if ($dd!=0);
       $d.=" "      if ($dh!=0 && $d ne "");

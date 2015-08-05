@@ -186,10 +186,24 @@ sub qcheckRecord
       }
       else{
          if (lc($parrec->{status}) eq lc("Retired")){
-            my $msg="the given ICTO-ID is marked as retired in CapeTS";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-            $errorlevel=3 if ($errorlevel<3);
+
+            my $retiredReached=1;
+            if ($parrec->{planned_retirement_date} ne ""){
+               my $t=CalcDateDuration(NowStamp("en"),
+                                      $parrec->{planned_retirement_date},
+                                      "GMT");
+               if (defined($t)){
+                  if ($t->{totalminutes}>0){
+                     $retiredReached=0;
+                  }
+               }  
+            }
+            if ($retiredReached){
+               my $msg="the given ICTO-ID is marked as retired in CapeTS";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
          }
       }
    }
