@@ -52,13 +52,26 @@ sub new
                 name          =>'its',
                 label         =>'Item summary',
                 searchable    =>0,
-                htmlheight    =>'400px',
+                htmlheight    =>'340px',
                 dataobjattr   =>'itemsummary'),
 
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                onRawValue    =>sub{'w5base'}),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                history       =>0,
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'w5repllastsucc'),
    );
 
+   $self->{use_distinct}=0;
    $self->setWorktable("cddwh_itemsummary");
-   $self->setDefaultView(qw(linenumber name id));
+   $self->setDefaultView(qw(linenumber name id srcload));
    return($self);
 }
 
