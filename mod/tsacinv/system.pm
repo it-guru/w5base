@@ -350,9 +350,22 @@ sub new
       new kernel::Field::Select(
                 name          =>'systemolaclass',
                 label         =>'System OLA Service Class',
-                value         =>['0','10','20','25','30'], 
+                value         =>['0','4','10','20','25','30','38'], 
                 transprefix   =>'SYSCLASS.',
                 dataobjattr   =>'amcomputer.seappcom'),
+
+      new kernel::Field::Text(
+                name          =>'rawsystemolaclass',
+                label         =>'raw System OLA Service Class',
+                dataobjattr   =>"decode(amcomputer.seappcom,".
+                                "'0','UNDEFINED',".
+                                "'4','UNIVERSAL',".
+                                "'10','CLASSIC',".
+                                "'20','STANDARDIZED',".
+                                "'25','STANDARDIZED SLICE',".
+                                "'30','APPCOM',".
+                                "'33','DCS',".
+                                "amcomputer.seappcom||'???')"),
 
       new kernel::Field::Text(
                 name          =>'priority',
