@@ -209,7 +209,9 @@ sub filterMatch
   my $match=0;
 
   if (exists($arg->{id})){   # is record-filter request
-
+     die('is no nich brogramierd');
+     exit(1);
+     
   }
   else{                      # is object filtering
      foreach my $frec (@$flt){
@@ -290,6 +292,11 @@ sub getOracleDBIConnectionHandle
    $dst->{'LongReadLen'} = 128000;
    $dst->doCmd("alter session set NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'");
    $dst->doCmd("alter session set NLS_NUMERIC_CHARACTERS='. '");
+   $dst->doCmd("alter session set TIME_ZONE='GMT'");
+   # set session TIME_ZONE to GMT to ensure to get a GMT timestamp
+   # while using CURRENT_DATE. Note: There is not way to ensure to get
+   # a GMT timestamp in SYSDATE on session level (SYSDATE timezone can
+   # only be set from system root! (not the DBA!))
    msg(INFO,"connect to replication target '$dbconnect' successfull");
    return($dst,uc($dbuser),lc($dbuser).'@'.lc($dbconnect));
 }
@@ -579,6 +586,7 @@ sub getRequestedReplicationObjects
             if (defined($id)){
                my $idname='id';
                $f{$idname}=\$id;
+               die('is noch nich brogramierd');
             }
             push(@objflt,\%f);
          }
@@ -722,7 +730,8 @@ sub objectReplicationPhase1
       else{
          $obj->SetFilter({}); # ensure that SetFilter is always be called
       }                       # for "hard" object filters (like workflows)
-      #$obj->SetFilter({assetid=>"LT-59204*"});
+      $obj->ResetFilter();
+      $obj->SetFilter({id=>"5275"});
       my @syncfields=@{$ctrl->{'replkeyfields'}};
       $obj->SetCurrentView(@syncfields,@{$ctrl->{'view'}});
       $obj->SetCurrentOrder(@syncfields);
@@ -848,7 +857,7 @@ sub objectReplicationPhase2
             $basewhere=
                   "where \"_$ctrl->{name}\".w5repllasttry<'$drec->{avg}' ".
                   "and \"_$ctrl->{name}\".w5repllasttry<".
-                       "SYSDATE-(1/24*$minrefreshlatency) ".
+                       "current_date-(1/24*$minrefreshlatency) ".
                   "and ROWNUM<=$n ";   # max refresh every $minrefreshlatency h
          }
       }
@@ -876,7 +885,7 @@ sub objectReplicationPhase2
          my $id=$rec->{$ctrl->{idname}};
          last SPLOOP if (exists($idseen{$id}));  # end if an ID is already seen
          $idseen{$id}++;
-         $dbi->doCmd("update \"_$ctrl->{name}\" set w5repllasttry=sysdate ".
+         $dbi->doCmd("update \"_$ctrl->{name}\" set w5repllasttry=current_date ".
                      "where refid=?",$id);
          $obj->ResetFilter();
          $obj->SetFilter({$ctrl->{idname}=>\$id});
@@ -971,9 +980,9 @@ sub objectReplicationPhase3
    my $cmd="delete from \"$ctrl->{name}\" ".
            "where \"$ctrl->{name}\".$ctrl->{idname} in ".
            "(select refid from \"_$ctrl->{name}\" where ".
-           "( \"_$ctrl->{name}\".w5repllastsucc<sysdate-14 and ".
+           "( \"_$ctrl->{name}\".w5repllastsucc<current_date-14 and ".
            "  \"_$ctrl->{name}\".w5replfailcnt>1) or ".
-           "( \"_$ctrl->{name}\".w5repllastsucc<sysdate-8 and ".
+           "( \"_$ctrl->{name}\".w5repllastsucc<current_date-8 and ".
            "  \"_$ctrl->{name}\".w5replfailcnt>8))";
    msg(INFO,"oracmd=$cmd");
    $dbi->doCmd($cmd);
@@ -1442,7 +1451,7 @@ sub InsertOrUpdate
       }
       if ($isChanged){
          push(@w5v,"w5replmdate");
-         push(@w5p,"sysdate");
+         push(@w5p,"current_date");
       }
       my $v=join(",",@v);
       my $updcmd="update \"$dbtable\" set $v where $idname=?";
@@ -1476,11 +1485,11 @@ sub InsertOrUpdate
       #my @place=map({'?'} @view);
      # if (exists($ctrl->{'col'}->{'w5replmdate'})){
      #    push(@w5v,'w5replmdate');
-     #    push(@w5p,'sysdate');
+     #    push(@w5p,'current_date');
      # }
      # if (exists($ctrl->{'col'}->{'w5replcdate'})){
      #    push(@w5v,'w5replcdate');
-     #    push(@w5p,'sysdate');
+     #    push(@w5p,'current_date');
      # }
       
       my $inscmd="insert into \"$dbtable\" ".
@@ -1494,9 +1503,9 @@ sub InsertOrUpdate
    }
    if ($bk){  # now store the current state of object in state table _
       push(@w5v,'w5repllastsucc');
-      push(@w5p,'sysdate');
+      push(@w5p,'current_date');
       push(@w5v,'w5repllasttry');
-      push(@w5p,'sysdate');
+      push(@w5p,'current_date');
       push(@w5v,"w5replfailcnt");
       push(@w5p,"0");
       my $cmd="select refid from \"_$dbtable\" where refid=?";
@@ -1513,10 +1522,10 @@ sub InsertOrUpdate
       else{
          if (!in_array(\@w5v,"w5replmdate")){
             push(@w5v,'w5replmdate');
-            push(@w5p,'sysdate');
+            push(@w5p,'current_date');
          }
          push(@w5v,'w5replcdate');
-         push(@w5p,'sysdate');
+         push(@w5p,'current_date');
          push(@w5v,'refid');
          push(@w5p,'?');
          push(@w5b,$idval);
