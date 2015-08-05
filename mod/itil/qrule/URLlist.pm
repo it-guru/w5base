@@ -14,8 +14,7 @@ NONE
 
 =head3 HINTS
 If there are software-instances of type ... 
-Apache 
-SunOne
+Apache, SunONE, IIS, OpenLDAP, LDAP-Server
 ... in CI-Status "installed/active" it is mandatory to enter
 at least one communication URL.
 
@@ -23,8 +22,7 @@ at least one communication URL.
 [de:]
 
 Wenn es bei einer Anwendung Software-Instanzen vom Type ...
-Apache
-SunOne
+Apache, SunONE, IIS, OpenLDAP, LDAP-Server
 ... im Status "installiert/aktiv" gibt,
 muss es auch min. eine Anwendungs-URL geben.
 
@@ -97,7 +95,7 @@ sub qcheckRecord
    }
 
    my $urlswi=0;
-   my @needed=qw(Apache SunOne);
+   my @needed=qw(Apache SunONE IIS OpenLDAP LDAP-Server);
    foreach my $swi (@{$rec->{swinstances}}){
       if (in_array(\@needed,$swi->{swnature})){
          $urlswi++;
