@@ -892,7 +892,7 @@ sub new
                                  'shortdesc'],
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
                                  'systemid','id','reltyp','shortdesc',
-                                 'assetassetname','iswebserver']),
+                                 'assetassetname']),
 
       new kernel::Field::SubList(
                 name          =>'systemnames',
@@ -1011,24 +1011,6 @@ sub new
                 htmleditwidth =>'30%',
                 label         =>'Application has no interfaces',
                 dataobjattr   =>'appl.is_applwithnoiface'),
-
-      new kernel::Field::Boolean(
-                name          =>'isnourlappl',
-                group         =>'control',
-                htmleditwidth =>'30%',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   if (defined($param{current}->{systems})) {
-                      foreach my $system (@{$param{current}->{systems}}) {
-                         return(1) if ($system->{iswebserver});
-                      }
-                   }
-                   return(0);
-                },
-                label         =>'Application has no communication URLs',
-                dataobjattr   =>'appl.is_applwithnocurl'),
 
       new kernel::Field::Boolean(
                 name          =>'isnotarchrelevant',

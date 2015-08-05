@@ -70,7 +70,6 @@
 'Application has no system components'=>{de=>'Anwendung hat keine System Komponenten'},
 'Application is not architecture relevant'=>{de=>'Anwendung ist nicht IT-Architektur relevant'},
 'Application has no interfaces'=>{de=>'Anwendung hat keine Schnittstellen'},
-'Application has no communication URLs'=>{de=>'Anwendung hat keine Kommunikations URLs'},
 'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien (USA) zu betreuen'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
 'changenotify'=>{de=>'Change-Benachrichtigung',en=>'Changenotification'},

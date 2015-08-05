@@ -19,8 +19,6 @@ SunOne
 ... in CI-Status "installed/active" it is mandatory to enter
 at least one communication URL.
 
-"Application has no communication URLs: yes" deactivates this check.
-But in this case must no communication URLs been listed.
 
 [de:]
 
@@ -30,9 +28,6 @@ SunOne
 ... im Status "installiert/aktiv" gibt,
 muss es auch min. eine Anwendungs-URL geben.
 
-Durch "Anwendung hat keine Kommunikations URLs: ja" kann diese 
-Überprüfung außer Kraft gesetzt werden. Allerdings dürfen dann auch
-keine Kommunikations URLs eingetragen sein.
 
 
 =cut
@@ -108,22 +103,13 @@ sub qcheckRecord
          $urlswi++;
       }
    }
-   if ($urlswi>0 && !$rec->{isnourlappl} && $#{$rec->{applurl}}==-1){
+   if ($urlswi>0 && $#{$rec->{applurl}}==-1){
       $errorlevel=3;
       my $msg="missing communication urls in application documentation";
       push(@dataissue,$msg);
       push(@qmsg,$msg);
    }
 
-   if ($rec->{isnourlappl} && $#{$rec->{applurl}}>=0){
-      $errorlevel=3;
-      my $msg="Communication URLs are conflicting ".
-              "with Control-/Automationinformations";
-      push(@dataissue,$msg);
-      push(@qmsg,$msg);
-   }
-
-   
    my @result=$self->HandleQRuleResults("None",
                  $dataobj,$rec,$checksession,
                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest,$forcedupd);
