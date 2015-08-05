@@ -419,7 +419,7 @@ sub ItemSummary
    }
 
    #######################################################################
-   # Daten aus AssetManager CDS "dazuladen"
+   # Daten aus AssetManager CDS "dazuladen" 
    my %systemids; 
    foreach my $sys (@{$summary->{systems}}){
       $systemids{$sys->{systemsystemid}}=$sys if ($sys->{systemsystemid} ne "");

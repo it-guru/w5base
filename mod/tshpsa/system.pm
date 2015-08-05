@@ -145,6 +145,39 @@ sub isQualityCheckValid
 }
 
 
+sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
+{
+   my $self=shift;
+   my @res=();
+
+   $self->SetCurrentView(qw(name systemid primaryip swps));
+
+   my ($rec,$msg)=$self->getFirst();
+   if (defined($rec)){
+      do{
+         my %e=(
+            section=>'SYSTEMNAME',
+            scanname=>$rec->{name}, 
+            quality=>-50     # relativ schlecht verlässlich
+         );
+         push(@res,\%e);
+         foreach my $swp (@{$rec->{swps}}){
+            my %e=(
+               section=>'SOFTWARE',
+               scanname=>$swp->{softwarename},
+               scanextra1=>$swp->{path},
+               scanextra2=>$swp->{version},
+               quality=>10     # relativ gut verlässlich
+            );
+            push(@res,\%e);
+         }
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+   return(@res);
+}
+
+
 
 
 sub getRecordImageUrl
