@@ -730,8 +730,8 @@ sub objectReplicationPhase1
       else{
          $obj->SetFilter({}); # ensure that SetFilter is always be called
       }                       # for "hard" object filters (like workflows)
-      $obj->ResetFilter();
-      $obj->SetFilter({id=>"5275"});
+      #$obj->ResetFilter();
+      #$obj->SetFilter({id=>"5275"});
       my @syncfields=@{$ctrl->{'replkeyfields'}};
       $obj->SetCurrentView(@syncfields,@{$ctrl->{'view'}});
       $obj->SetCurrentOrder(@syncfields);
