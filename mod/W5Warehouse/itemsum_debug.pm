@@ -82,11 +82,18 @@ sub Initialize
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   return(1) if (defined($self->{DB}));
+   return(0);
+}
+
+
+sub SetFilter {
+   my $self=shift;
+
    if (defined($self->{DB})){
       $self->{DB}->{db}->{LongReadLen}=4000000;
    }
-   return(1) if (defined($self->{DB}));
-   return(0);
+   $self->SUPER::SetFilter(@_);
 }
 
 
