@@ -472,6 +472,18 @@ sub getHtmlDetailPageContent
             "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
             "src=\"HtmlInterviewLink?$urlparam\"></iframe>";
    }
+   elsif ($p eq "HtmlAutoDiscManager"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval,view=>'SelUnproc');
+      my $urlparam=$q->QueryString();
+
+      $page="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"HtmlAutoDiscManager?$urlparam\"></iframe>";
+   }
    $page.=$self->HtmlPersistentVariables($idname);
    return($page);
 }
@@ -1977,6 +1989,10 @@ sub NotifiedValidatedUpdateRecord
             my $name=$namefld->FormatedDetail($oldrec,"AscV01");
             $subject.=" : ".$name;
          }
+         if ($notifycontrol->{datasource} ne ""){  #automatische zusammenstellen
+            $subject.=" ".$self->T("based on datasource")." ". # der subject
+                       $notifycontrol->{datasource};            # zeile
+         }
          my $text=$self->T("Dear databoss",'kernel::QRule');
          $text.=",\n\n";
          $text.=$self->T("there was done an update on a record ".
@@ -1988,13 +2004,23 @@ sub NotifiedValidatedUpdateRecord
          foreach my $k (keys(%$newrec)){
             my $kfld=$self->getField($k);
             if (defined($kfld) && $kfld->uivisible()){
-               $fldtext.="\n<b>".$kfld->Label()."</b>";
-               $fldtext.=":\n";
-               $fldtext.="old value:\n";
-               $fldtext.=$kfld->FormatedDetail(\%oldval,"HtmlV01");
-               $fldtext.="\n";                                  
-               $fldtext.="new value:\n";                        
-               $fldtext.=$kfld->FormatedDetail($newrec,"HtmlV01");;
+               $fldtext.="\n" if ($fldtext ne "");
+               $fldtext.="\n<b>".$kfld->Label().":</b>";
+               my $told=$kfld->FormatedDetail(\%oldval,"HtmlV01");
+               my $tnew=$kfld->FormatedDetail($newrec,"HtmlV01");
+               if (length($tnew.$told)>30){
+                  $fldtext.="\n";
+                  $fldtext.="<u>".
+                            $self->T("old value",'kernel::QRule').":</u>\n";
+                  $fldtext.=$told;
+                  $fldtext.="\n";                                  
+                  $fldtext.="<u>".
+                            $self->T("new value",'kernel::QRule').":</u>\n";
+                  $fldtext.=$tnew;
+               }
+               else{
+                  $fldtext.=" '".$told."' -> '".$tnew."'";
+               }
             }
          }
          return(undef) if ($fldtext eq "");
