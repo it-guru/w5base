@@ -331,6 +331,7 @@ sub new
 
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
+      new kernel::Field::IssueState(),
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'grp.lastqcheck'),
