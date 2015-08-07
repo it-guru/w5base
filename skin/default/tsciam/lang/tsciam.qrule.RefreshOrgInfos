@@ -1,0 +1,4 @@
+'tsciam::qrule::RefreshOrgInfos'=>{de=>'Abgleich von Gruppendaten mit CIAM',
+                                  en=>'sync of group informations from CIAM'},
+
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},

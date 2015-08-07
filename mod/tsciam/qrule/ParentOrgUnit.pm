@@ -1,0 +1,116 @@
+package tsciam::qrule::ParentOrgUnit;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+Validates the parent child structur of org-units against CIAM.
+
+=head3 IMPORTS
+
+NONE
+
+=cut
+#  W5Base Framework
+#  Copyright (C) 2015  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::QRule;
+@ISA=qw(kernel::QRule);
+
+sub new
+{
+   my $type=shift;
+   my %param=@_;
+   my $self=bless($type->SUPER::new(%param),$type);
+
+   return($self);
+}
+
+sub getPosibleTargets
+{
+   return(["base::grp"]);
+}
+
+sub qcheckRecord
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+   my $errorlevel=0;
+
+   if ($rec->{cistatusid}==4){
+      if ($rec->{srcsys} eq "CIAM"){
+         my @qmsg;
+         if ($rec->{srcid} eq ""){
+            push(@qmsg,"srcid is not defined");
+            return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+         }
+         $errorlevel=0;
+         my $ciam=getModuleObject($self->getParent->Config(),"tsciam::orgarea");
+         $ciam->SetFilter({toucid=>\$rec->{srcid}});
+         my ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
+         if (!defined($ciamrec)){
+            push(@qmsg,"orgunit id not found in CIAM");
+            return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+         }
+         if ($ciamrec->{toucid} eq "15131753" ){   # DTAG.TSI hängt in CIAM
+                                                   # NICHT direkt unter DTAG
+                                                   # - das kann somit nicht
+                                                   # geprüft werden
+         }
+         else{
+            my $grp=getModuleObject($self->getParent->Config(),"base::grp");
+            $grp->SetFilter({grpid=>\$rec->{parentid}});
+            my ($pgrp,$msg)=$grp->getOnlyFirst(qw(srcsys srcid));
+            if ($pgrp->{srcsys} ne "CIAM"){
+               return(0,{qmsg=>[
+                  'parent group is not from CIAM - '.
+                  'disabling parent sync']
+               });
+            }
+            else{
+               my $parentid=$ciamrec->{parentid};
+               if ($rec->{fullname} eq "DTAG.TSI.INT"){
+                  # bind LBUs direct to T-Systems International
+                  $parentid="15131753";
+               }
+               if ($parentid ne ""){
+                  my $grp=getModuleObject($self->getParent->Config(),
+                                          "base::grp");
+                  $grp->SetFilter({srcid=>\$parentid,
+                                   srcsys=>\'CIAM',
+                                   grpid=>\$rec->{parentid}});
+                  my ($prec,$msg)=$grp->getOnlyFirst(qw(ALL));
+                  if (!defined($prec)){
+                     push(@qmsg,"parent unit in CIAM doesn't matches");
+                     push(@qmsg,"parent tOuCID in CIAM is: ",$parentid);
+                     return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+                  }
+               }
+            }
+         }
+      }
+   }
+   return($errorlevel,undef);
+}
+
+
+
+1;

@@ -39,6 +39,8 @@ sub new
                                    align      =>'left',
                                    dataobjattr=>'tOuCID'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(     name       =>'name',
                                    label      =>'Orgarea-Name (tOuLD)',
                                    size       =>'10',
