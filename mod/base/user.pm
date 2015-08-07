@@ -224,6 +224,12 @@ sub new
                 group         =>'userid',
                 dataobjattr   =>'contact.posix_identifier'),
 
+      new kernel::Field::Text(
+                name          =>'dsid',
+                label         =>'Directory-Identifier',
+                group         =>'userid',
+                dataobjattr   =>'contact.ds_identifier'),
+
       new kernel::Field::Select(
                 name          =>'secstate',
                 uploadable    =>0,
@@ -1299,6 +1305,9 @@ sub Validate
    if ($fullname eq "" || ($fullname=~m/;/)){
       $self->LastMsg(ERROR,"invalid given or resulted fullname");
       return(0);
+   }
+   if (exists($newrec->{dsid})){
+      $newrec->{dsid}=undef if ($newrec->{dsid} eq "");
    }
    if (defined($newrec->{posix})){
       $newrec->{posix}=undef if ($newrec->{posix} eq "");

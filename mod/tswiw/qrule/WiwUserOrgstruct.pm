@@ -43,6 +43,11 @@ sub qcheckRecord
    my $rec=shift;
    my $errorlevel=0;
 
+
+   if ($rec->{dsid} ne ""){ # Das haben nur in CIAM gefundene Datensätze
+      return($errorlevel,undef);
+   }
+
    my $Config=$self->getParent->Config;
    $self->{SRCSYS}="WhoIsWho";
 
@@ -375,9 +380,19 @@ sub getGrpIdOf
 
    msg(DEBUG,"try to find touid=$wiwrec->{touid} in base::grp");
 
+   {  # prevent new create of groups, which already transfer to CIAM
+      $grp->ResetFilter();
+      $grp->SetFilter({ext_refid2=>'WhoIsWho:'.$wiwrec->{touid}});
+      my ($rec,$msg)=$grp->getOnlyFirst();
+      if (defined($rec)){
+         return($rec->{grpid});
+      }
+   }
+
+   $grp->ResetFilter();
    $grp->SetFilter({srcid=>\$wiwrec->{touid},srcsys=>\$self->{SRCSYS}});
    $grp->SetCurrentView(qw(grpid srcid srcsys srcload));
-   my ($rec,$msg)=$grp->getFirst();
+   my ($rec,$msg)=$grp->getOnlyFirst();
    if (defined($rec)){
       return($rec->{grpid});
    }

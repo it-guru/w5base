@@ -98,6 +98,9 @@ sub qcheckRecord
          }
       }
    }
+   else{
+      push(@qmsg,"no group with WhoIsWho authority");
+   }
    if (keys(%$forcedupd)){
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
                                           {grpid=>\$rec->{grpid}})){

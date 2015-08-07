@@ -53,11 +53,11 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
-   my $errorlevel=0;
+   my $errorlevel=undef;
+   my @qmsg;
 
    if ($rec->{cistatusid}==4){
       if ($rec->{srcsys} eq "WhoIsWho"){
-         my @qmsg;
          if ($rec->{srcid} eq ""){
             push(@qmsg,"srcid is not defined");
             return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
@@ -70,21 +70,27 @@ sub qcheckRecord
             push(@qmsg,"orgunit id not found in WhoIsWho");
             return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
          }
-         if ($wiwrec->{parentid} ne ""){
+         if ($rec->{parentid} ne "" && $wiwrec->{parentid} ne ""){
             my $grp=getModuleObject($self->getParent->Config(),"base::grp");
-            $grp->SetFilter({srcid=>\$wiwrec->{parentid},
-                             srcsys=>\'WhoIsWho',
-                             grpid=>\$rec->{parentid}});
+            $grp->SetFilter({grpid=>\$rec->{parentid}});
             my ($prec,$msg)=$grp->getOnlyFirst(qw(ALL));
-            if (!defined($prec)){
-               push(@qmsg,"parent unit in WhoIsWho doesn't matches");
-               push(@qmsg,"parent ID in WhoIsWho is: ",$wiwrec->{parentid});
-               return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+            if (defined($prec)){
+               if ($prec->{srcsys} eq "WhoIsWho" &&
+                   $prec->{srcid} ne $wiwrec->{parentid}){
+                  push(@qmsg,"parent unit in WhoIsWho doesn't matches");
+                  push(@qmsg,"parent ID in WhoIsWho is: ",$wiwrec->{parentid});
+                  return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+               }
             }
          }
+         $errorlevel=0;
       }
+      else{
+         push(@qmsg,"no group with WhoIsWho authority");
+      }
+
    }
-   return($errorlevel,undef);
+   return($errorlevel,{qmsg=>\@qmsg});
 }
 
 
