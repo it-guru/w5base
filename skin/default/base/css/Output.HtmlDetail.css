@@ -6,6 +6,14 @@ div.detailframe{
    margin-bottom:1px;
    background:#eeeeee;
 }
+div.backtotop{
+  position:absolute;
+  bottom:5;
+  right:2;
+  visible:hidden;
+  display:none;
+}
+
 
 body.fullview{
    background:#eaeaea;

@@ -89,6 +89,10 @@ sub ProcessHead
    }
    my $d="";
    $d.="<div id=HtmlDetail style=\"$newstyle\"><div style=\"padding:5px\">";
+   $d.="<div class='backtotop' id=BackToTop>".
+       "<a href='#index'>".
+       "<img border=0 src='../../base/load/backtotop.gif' width=20 height=20>".
+       "</a></div>";
    $d.="<form method=post target=_self enctype=\"multipart/form-data\">";
    $d.="<style>";
    $d.=$self->getStyle($fh,$rec,$msg,\@view,$view);
@@ -99,6 +103,7 @@ sub ProcessHead
 function DetailInit()  // used from asyncron sub data to restore position in
 {                      // page
    document.body.scrollTop=$scrolly;
+   startFixBackToTop();
    return;
 }
 EOF
@@ -107,6 +112,7 @@ EOF
       $d.=<<EOF;
 function DetailInit()  // used from asyncron sub data to restore position in
 {                      // page
+   startFixBackToTop();
    return;
 }
 EOF
@@ -118,6 +124,37 @@ function onNew()
    if (t){
       var e=document.getElementById("HtmlDetail");
       e.style.height=(t.offsetHeight-30)+"px";
+   }
+}
+function startFixBackToTop(){
+   setTimeout(function(){
+      setInterval(fixBackToTop,10);
+   },1000);
+}
+function fixBackToTop(){
+   var e=document.getElementById("BackToTop");
+   if (e){
+      if (document.body.scrollTop<20){
+         e.style.visibility="hidden";
+         e.style.display="none";
+      }
+      else{
+         e.style.visibility="visible";
+         e.style.display="block";
+         h=document.body.clientHeight;
+         var newtop=h+document.body.scrollTop-24;
+         var offset=newtop-e.offsetTop;
+         if (offset<h){
+            if (offset>1 && offset<h/2){
+               offset=offset/3;
+               newtop=e.offsetTop+offset;
+            }
+         }
+         else{
+            newtop=e.offsetTop+offset;
+         }
+         e.style.top=newtop+"px";
+      }
    }
 }
 function onResize()
