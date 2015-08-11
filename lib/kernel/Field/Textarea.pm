@@ -143,11 +143,25 @@ sub ViewArea    # for module defined view areas (f.e. javascript areas)
       $style1=" style='height:".($self->{htmlheight}+4)."px'";
       $style2=" style='height:".($self->{htmlheight}-4)."px'";
    }
+   
+   my $expandcode="var p=this.parentNode;p.style.height='auto';".
+                  "this.style.display='none';";
+   my $multilinetextexpand="<img onclick=\"$expandcode\" ".
+                           "class=\"multilinetextexpand\" ".
+                           "src='../../../public/base/load/vexpand.gif'>";
+   {
+      my @l=split(/\n/,$d);
+      if ($#l<5){
+         $multilinetextexpand="";
+      }
+   }
+
    $d="<table cellspacing=0 cellpadding=0 border=0 ".
       "style=\"width:100%;table-layout:fixed;padding:0;margin:0\">".
       "<tr><td width=1><img class=printspacer style=\"padding:0;margin:0\" ".
       "src=\"../../../public/base/load/empty.gif\" width=0 height=100>".
       "</td><td><div class=multilinetext$style1>".
+      $multilinetextexpand.
       "<pre class=multilinetext$style2>".
       mkInlineAttachment(
          ExpandW5BaseDataLinks($self->getParent,"HtmlDetail",
