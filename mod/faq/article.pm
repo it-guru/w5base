@@ -367,6 +367,50 @@ sub Validate
          return(0);
       }
    }
+   if (!defined($oldrec)){
+      my $catid=$newrec->{faqcat};
+      my $userid=$self->getCurrentUserId();
+      if ($catid ne ""){
+         my $catobj=getModuleObject($self->Config,'faq::category');
+         my $foundwrite=0;
+         my $writeok=0;
+         CHK: while (defined($catid) && $catid ne '') {
+            $catobj->SetFilter({faqcatid=>$catid});
+            my ($d,$msg)=$catobj->getOnlyFirst(qw(acls parentid));
+     
+            foreach my $acl (@{$d->{acls}}) {
+               if ($acl->{aclmode}=='add'){
+                  $foundwrite++;
+               }
+               if ($acl->{aclmode}=='add' ||
+                   $acl->{aclmode}=='admin'){
+                  if ($acl->{acltarget}=='base::user' &&
+                      $acl->{acltargetid}==$userid) {
+                     $writeok=1;
+                     last CHK;
+                  }
+                  elsif ($acl->{acltarget}=='base::grp' &&
+                         $self->IsMemberOf($acl->{acltargetid})) {
+                     $writeok=1;
+                     last CHK;
+                  }
+               }
+            }
+            $catid=$d->{parentid};
+         }
+         if ($foundwrite){
+            if (!$writeok){
+               $self->LastMsg(ERROR,"insufficient rights to create ".
+                                    "articles in requested catecory");
+               return(0);
+            }
+         }
+      }
+      else{
+         $self->LastMsg(ERROR,"no catecory defined");
+         return(0);
+      }
+   }
    if (!defined($oldrec) || defined($newrec->{kh})){
       if (!defined($newrec->{kh}->{kwords}) ||
           $#{$newrec->{kh}->{kwords}}==-1){

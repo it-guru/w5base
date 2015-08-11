@@ -29,3 +29,4 @@
 'multilang'=>{de=>'mehrsprachig',en=>'multilingual'},
 'Language'=>{de=>'Sprache'},
 'Published'=>{de=>'Veröffentlicht'},
+'insufficient rights to create articles in requested catecory'=>{de=>'ungenügende Rechte für das Hinzufügen von Artikeln in der geforderten Kategorie'},
