@@ -625,8 +625,17 @@ EOF
             $grouplabel.="&nbsp;<a title=\"$privacy\">".
                          "<font color=red>!</font></a>";
          }
+         my $detaiframeclassname="detailframe";
+         if ($currentfieldgroup ne ""){
+            $detaiframeclassname="detailframeread";
+         }
+         if ($currentfieldgroup eq $group ||
+             $self->getParent->{NewRecord}){
+            $detaiframeclassname="detailframeedit";
+         }
+
          $template{$group}.=<<EOF;
-<div class=detailframe>
+<div class="$detaiframeclassname">
 EOF
          if ($vMatrix->{grouplabel}->{$group}){
             $grouplabel{$group}=$grouplabel;

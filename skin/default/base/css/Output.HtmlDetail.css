@@ -2,10 +2,38 @@ div.detailframe{
    width:99%;
    border-style:solid;
    border-width:1px;
+   margin:1px;
+   margin-bottom:1px;
+   background:#eeeeee;
+}
+div.detailframeread{
+   width:99%;
+   border-style:solid;
+   border-width:1px;
+   margin:1px;
+   margin-bottom:1px;
+   background:#eeeeee;
+}
+div.detailframeedit{
+   width:99%;
+   border-style:solid;
+   border-width:2px;
+   border-color:black;
    margin:0px;
    margin-bottom:1px;
    background:#eeeeee;
 }
+
+div.detailframe h3{
+   color:black;
+}
+div.detailframeedit h3{
+   color:black;
+}
+div.detailframeread h3{
+   color:gray;
+}
+
 div.backtotop{
   position:absolute;
   bottom:5;
@@ -97,7 +125,6 @@ h3.grouplabel{
    margin:0px;
    margin-bottom:0px;
    margin-top:0px;
-   color:black;
 }
 
 div.detailfieldspec{
