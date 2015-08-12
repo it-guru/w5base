@@ -4,7 +4,7 @@ create table location (
   name       varchar(255) NOT NULL,
   cistatus   int(2)      NOT NULL, comments blob,
     label          varchar(40)  NOT NULL,
-    address1       varchar(40)  NOT NULL,
+    address1       varchar(60)  NOT NULL,
     address2       varchar(40)  default NULL,
     country        varchar(3)   NOT NULL,
     zipcode        varchar(6)   NOT NULL,
