@@ -50,7 +50,7 @@ sub new
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Htmlarea(
                 name          =>'advicetext',
                 label         =>'advice text',
                 dataobjattr   =>'useradvice.advicetext'),
@@ -165,26 +165,50 @@ sub currentAdviceList
    my $self=shift;
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','work.css',
-                                   'kernel.App.Web.css'],
+                                   'kernel.App.Web.css','useradvice.css'],
                            body=>1,form=>1,
                            title=>$self->T("user advices"));
+   $self->setAdviceFilter();
 
-   print("hi");
+   my $c=0;
 
+   my ($rec,$msg)=$self->getFirst();
+   if (defined($rec)){
+      do{
+         printf("<div id='%s' class='advice notacknowledged' ".
+                "onMouseOver='console.log(this);'>%s</div>\n",
+                $rec->{id},$rec->{advicetext});
+         $c++;
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+
+   if ($c==0){
+      print("No current messages");
+   }
 
    print $self->HtmlBottom(body=>1,form=>1);
 
 
 }
 
-sub countEntries
+
+sub setAdviceFilter
 {
    my $self=shift;
-   print $self->HttpHeader("text/xml");
 
    my $userid=$self->getCurrentUserId();
 
    $self->SetFilter({acknowledged=>0,userid=>\$userid});
+   $self->SetCurrentView(qw(acknowledged mdate advicetext id));
+}
+
+sub countEntries
+{
+   my $self=shift;
+   print $self->HttpHeader("text/xml");
+   $self->setAdviceFilter();
+
    my $n=$self->CountRecords();
 
    

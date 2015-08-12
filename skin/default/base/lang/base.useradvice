@@ -1,5 +1,6 @@
 'base::useradvice'=>{de=>'Benutzerhinweis',en=>'Userhint'},
 'advice text'=>{de=>'Hinweistext'},
+'user advices'=>{de=>'Nutzerbenachrichtigungen'},
 'acknowledge state'=>{de=>'Bestätigungsstatus'},
 'ACK.0'=>{de=>'offen',en=>'open'},
 'ACK.1'=>{de=>'gesehen',en=>'seen'},

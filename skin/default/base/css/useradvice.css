@@ -1,0 +1,13 @@
+div.advice{
+   border-style:solid;
+   border-color:gray;
+   margin:5px;
+   padding:2px;
+}
+
+div.acknowledged{
+   font-color:gray;
+}
+div.notacknowledged{
+   font-color:black;
+}
