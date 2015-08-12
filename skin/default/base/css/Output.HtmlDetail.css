@@ -370,6 +370,18 @@ img.printspacer{
       display:none;
       visiblity:hidden;
    } 
+   img.multilinetextexpand{
+      display:none;
+      visiblity:hidden;
+   }
+   div.directsublist{
+      display:none;
+      visiblity:hidden;
+   }
+   div.printbacktotop{
+      display:none;
+      visiblity:hidden;
+   }
    img.printspacer{
       display:block;
       visiblity:display;
@@ -395,10 +407,11 @@ img.printspacer{
    div.multilinehtml{
       height:auto;
       overflow:visible;
-      background:#ffffff;
+      background:transparent;
    }
    div.detailframe{
-      background:#ffffff;
+      background:transparent;
+      page-break-inside: avoid;
    }
    pre.multilinetext{
       height:auto;
@@ -406,10 +419,10 @@ img.printspacer{
    }
    body{
       overflow:visible;
-      background:#ffffff;
+      background:transparent;
    }
    body.fullview{
-      background: #FFFFFF;
+      background:transparent;
       background-color: #FFFFFF;
       margin:0px;
    }
@@ -425,6 +438,7 @@ img.printspacer{
       width:100%;
       height:100%;
       overflow:visible;
+      background:transparent;
    }
 }
 

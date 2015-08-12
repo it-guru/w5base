@@ -89,10 +89,11 @@ sub ProcessHead
    }
    my $d="";
    $d.="<div id=HtmlDetail style=\"$newstyle\"><div style=\"padding:5px\">";
-   $d.="<div class='backtotop' id=BackToTop>".
+   $d.="<div class='printbacktotop'>".
+       "<div class='backtotop' id=BackToTop>".
        "<a href='#index'>".
        "<img border=0 src='../../base/load/backtotop.gif' width=20 height=20>".
-       "</a></div>";
+       "</a></div></div>";
    $d.="<form method=post target=_self enctype=\"multipart/form-data\">";
    $d.="<style>";
    $d.=$self->getStyle($fh,$rec,$msg,\@view,$view);

@@ -145,13 +145,20 @@ sub ViewArea    # for module defined view areas (f.e. javascript areas)
    }
    
    my $expandcode="var p=this.parentNode;p.style.height='auto';".
+                  "var c=this.parentNode.childNodes;".
+                  "for(var i=0; i<c.length; i++) {".
+                  "if (c[i].nodeName.toLowerCase()=='div' ||".
+                  "c[i].nodeName.toLowerCase()=='pre') {".
+                  "c[i].style.height='auto';".
+                  "}".
+                  "}".
                   "this.style.display='none';";
    my $multilinetextexpand="<img onclick=\"$expandcode\" ".
                            "class=\"multilinetextexpand\" ".
                            "src='../../../public/base/load/vexpand.gif'>";
    {
       my @l=split(/\n/,$d);
-      if ($#l<5){
+      if ($#l<5 && length($d)<250){
          $multilinetextexpand="";
       }
    }
