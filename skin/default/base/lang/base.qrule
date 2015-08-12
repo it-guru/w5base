@@ -1,6 +1,7 @@
 'base::qrule'=>{de=>'Qualtiätsregel',en=>'Qualityrule'},
 'fail'=>{de=>'fehlgeschlagen'},
 'messy'=>{de=>'unschön'},
+'disabled'=>{de=>'deaktiviert'},
 'posible Target'=>{de=>'mögliche Datenobjekte'},
 'full QRule Name'=>{de=>'vollqualifizierter Name'},
 'Description'=>{de=>'Beschreibung'},
