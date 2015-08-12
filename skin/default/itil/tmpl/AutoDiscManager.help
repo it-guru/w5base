@@ -1,0 +1,13 @@
+<div style='margin:5px'>
+<b>AutoDiscovery related helps:</b><br>
+With the AutoDiscoveryManager it is posible, to use automatic detected facts for a simplified data management.<br>
+<br>
+Every Discovery-Record can be used "take once", if you only want to transfer the detected information only one time. If the AutoDiscovery Information is changed in the future, nothing will be changed automaticly - but a new aprovable AutoDiscovery Record will be generated.<br>
+<br>
+If you mark the Discovery-Record als "take automaticly", as much as posible information will be also in the future automaticly taken (f.e. for a Software-Installation the version informations will be automaticly taken).<br>
+<br>
+In both cases, depened from the discovered information, perhaps additional Informations needs to be typed in, to process the autodiscovery information.<br>
+<br>
+The last case, is handling bad discovery informations. If you see an AutoDiscovery Record, which is in your opinion bad, you should mark the record als "bad scan". You will never be irritated by Records with this mark.<br>
+</div>
+

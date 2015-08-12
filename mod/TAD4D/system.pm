@@ -105,7 +105,9 @@ sub new
                 vjointo       =>'TAD4D::software',
                 vjoinon       =>['agentid'=>'agentid'],
                 vjoinbase     =>{endtime=>\undef},
-                vjoindisp     =>['software','version','isremote']),
+                vjoindisp     =>['software','version','isremote',
+                                 'isfreeofcharge'],
+                vjoininhash   =>['software','version','isremote','scope']),
 
       new kernel::Field::SubList(
                 name          =>'nativesoftware',

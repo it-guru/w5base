@@ -251,7 +251,7 @@ sub new
                 vjoinbase     =>{softwarecistatusid=>"<=5"},
                 vjoindisp     =>['software','version','quantity','comments'],
                 vjoininhash   =>['softwarecistatusid','liccontractcistatusid',
-                                 'liccontractid',
+                                 'liccontractid','id',
                                  'software','version','quantity','softwareid']),
 
       new kernel::Field::SubList(
@@ -1645,6 +1645,15 @@ sub getHtmlDetailPages
           $rec->{perf3url} ne ""){
          push(@l,"PerfDat"=>$self->T("Performance"));
       }
+
+      my $id=Query->Param("id");
+      if ($id ne ""){
+         my $ad=getModuleObject($self->Config,'itil::autodiscrec');
+         $ad->SetFilter({disc_on_systemid=>\$id});
+         if ($ad->CountRecords()>0){
+            push(@l,"HtmlAutoDiscManager"=>$self->T("Autodiscovery"));
+         }
+      }
    }
    return(@l);
 }
@@ -1659,7 +1668,7 @@ sub getHtmlDetailPageContent
    my $idname=$self->IdField->Name();
    my $idval=$rec->{$idname};
 
-   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "PerfDat");
+
 
    if ($p eq "PerfDat"){
       my $perfurl;
@@ -1693,12 +1702,26 @@ EOF
 
       $page.="<iframe class=HtmlDetailPage name=HtmlDetailPage id=DISP01 ".
             "src=\"Empty\"></iframe>";
+      $page.=$self->HtmlPersistentVariables($idname);
+      return($page);
    }
-   $page.=$self->HtmlPersistentVariables($idname);
-   return($page);
+
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec));
 }
 
 
+sub HtmlAutoDiscManager
+{
+   my $self=shift;
+   my $ad=getModuleObject($self->Config,'itil::autodiscrec');
+
+   my $id=Query->Param("id");
+   my $view=Query->Param("view");
+   $view="SelUnproc" if ($view eq "");
+
+   print $ad->HtmlAutoDiscManager({view=>$view},[{disc_on_systemid=>\$id}]);
+   return(1);
+}
 
 
 sub getDetailBlockPriority
@@ -1711,6 +1734,16 @@ sub getDetailBlockPriority
              swinstances ipaddresses
              contacts monisla misc upd 
              attachments control source));
+}
+
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+
+   my @l=$self->SUPER::getValidWebFunctions();
+   push(@l,"HtmlAutoDiscManager");
+   return(@l);
 }
 
 sub preQualityCheckRecord

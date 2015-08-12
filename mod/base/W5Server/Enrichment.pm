@@ -7,6 +7,7 @@ use kernel::date;
 use kernel::W5Server;
 use FileHandle;
 use POSIX;
+use Time::HiRes(qw(sleep));
 use vars (qw(@ISA));
 @ISA=qw(kernel::W5Server);
 
@@ -173,7 +174,12 @@ sub taskCreator
          my @enrichRules=();
          foreach my $mandatorid (keys(%{$dataobjtoenrich{$dataobj}})){
             foreach my $qn (keys(%{$dataobjtoenrich{$dataobj}->{$mandatorid}})){
-               if (!($qrule->{qrule}->{$qn}->can("qenrichRecord"))){
+               if (defined($qrule->{qrule}->{$qn})){
+                  if (!($qrule->{qrule}->{$qn}->can("qenrichRecord"))){
+                     delete($dataobjtoenrich{$dataobj}->{$mandatorid}->{$qn});
+                  }
+               }
+               else{
                   delete($dataobjtoenrich{$dataobj}->{$mandatorid}->{$qn});
                }
             }
@@ -460,7 +466,7 @@ sub processEnrichment
    my $idname=$param->{idname};
    my $rec;
 
-   printf STDERR ("fifi $dataobj -> $id\n");
+   #printf STDERR ("fifi $dataobj -> $id\n");
    my $obj=getModuleObject($self->Config,$dataobj);
    if (defined($obj) && $idname ne ""){
       $obj->SetFilter({$idname=>\$id});
@@ -485,79 +491,15 @@ sub processEnrichment
             $rec=$reloadedRec;
          }
       }
+      
 
       $obj->ValidatedUpdateRecord($rec,{lastqenrich=>NowStamp("en"),
                                         mdate=>$rec->{mdate}},
                                   {$idname=>\$id});
+      sleep(0.3);
    }
 
    return(0);
-
-
-
-   my $add=getModuleObject($self->Config,"itil::autodiscdata");
-   my $ade=getModuleObject($self->Config,"itil::autodiscengine");
-   if (defined($add) && defined($ade)){ # itil:: seems to be installed
-      $ade->SetFilter({localdataobj=>\$dataobj});
-      foreach my $engine ($ade->getHashList(qw(ALL))){
-         my $rk;
-         $rk="systemid"     if ($dataobj eq "itil::system");
-         $rk="swinstanceid" if ($dataobj eq "itil::swinstance");
-         $add->SetFilter({$rk=>\$rec->{id},engine=>\$engine->{name}});
-         my ($oldadrec)=$add->getOnlyFirst(qw(ALL));
-         # check age of oldadrec - if newer then 24h - use old one
-            # todo
-
-         my $ado=getModuleObject($self->Config,$engine->{addataobj});
-         if (!exists($rec->{$engine->{localkey}})){
-            # autodisc key data does not exists in local object
-            msg(ERROR,"preQualityCheckRecord failed for $dataobj ".
-                      "local key $engine->{localkey} does not exists");
-            next;
-         }
-         if (defined($ado)){  # check if autodisc object name is OK
-            my $adokey=$ado->getField($engine->{adkey});
-            if (defined($adokey)){ # check if autodisc key is OK
-               my $adfield=$add->getField("data");
-               $ado->SetFilter({
-                  $engine->{adkey}=>\$rec->{$engine->{localkey}}
-               });
-               my ($adrec)=$ado->getOnlyFirst(qw(ALL));
-               if (defined($adrec)){
-                  if ($ado->Ping()){
-                     $adrec->{xmlstate}="OK";
-                     my $adxml=hash2xml({xmlroot=>$adrec});
-                     if (!defined($oldadrec)){
-                        $add->ValidatedInsertRecord({engine=>$engine->{name},
-                                                     $rk=>$rec->{id},
-                                                     data=>$adxml});
-                     }
-                     else{
-                        my $upd={data=>$adxml};
-                        my $chk=$adfield->RawValue($oldadrec);
-                        if (trim($upd->{data}) eq trim($chk)){  # wird verm.
-                           delete($upd->{data});    # sein, da XML im Aufbau
-                           $upd->{mdate}=$oldadrec->{mdate}; # dynamisch ist
-                        }
-                        $add->ValidatedUpdateRecord($oldadrec,$upd,{
-                           engine=>\$engine->{name},
-                           $rk=>\$rec->{id}
-                        });
-                     }
-                  }
-               }
-            }
-            $ado->{DB}->Disconnect();
-         }
-         else{
-            msg(ERROR,"preQualityCheckRecord failed for $dataobj ".
-                      "while load AutoDisc($engine->{name}) object ".
-                       $engine->{addataobj});
-         }
-         sleep(1); # reduce process load
-      }
-   }
-   # now qrule based enrichment
 }
 
 sub broadcast

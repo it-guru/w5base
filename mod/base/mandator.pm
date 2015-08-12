@@ -59,10 +59,9 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'mandator.cistatus'),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Group(
                 name          =>'groupname',
                 label         =>'Groupname',
-                vjointo       =>'base::grp',
                 vjoinon       =>['grpid'=>'grpid'],
                 readonly      =>sub{
                    my $self=shift;

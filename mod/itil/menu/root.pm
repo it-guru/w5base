@@ -274,10 +274,6 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itil.system.autodiscd",
-                      "itil::autodiscdata",
-                      defaultacl=>['admin']);
-   
    $self->RegisterObj("itil.asset",
                       "itil::asset",
                       defaultacl=>['valid_user']);
@@ -513,6 +509,11 @@ sub Init
    
    $self->RegisterObj("itil.kern.autodisce.rec",
                       "itil::autodiscrec",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itil.kern.autodisce.virt",
+                      "itil::autodiscvirt",
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
    

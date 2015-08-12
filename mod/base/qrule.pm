@@ -508,10 +508,10 @@ sub nativQualityCheck
          if (defined($control) && defined($control->{dataupdate})){
          }
          my $resulttext="OK";
-         $resulttext="fail"      if ($qresult!=0);
+         $resulttext="fail"      if (defined($qresult) && $qresult!=0);
          $resulttext="messy"     if ($qresult==1);
          $resulttext="warn"      if ($qresult==2);
-         $resulttext="undefined" if (!defined($qresult));
+         $resulttext="disabled" if (!defined($qresult));
          my $qrulelongname=$qrule->getName();
          my $hints=$qrule->getHints();
          my $havehints=$hints eq "" ? 0 : 1;

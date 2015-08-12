@@ -105,7 +105,9 @@ sub new
                 vjoinon       =>['agentid'=>'agentid'],
                 vjoinbase     =>{endtime=>\undef},
                 vjoindisp     =>['software','version','isremote',
-                                 'isfreeofcharge']),
+                                 'isfreeofcharge'],
+                vjoininhash   =>['software','version','isremote',
+                                 'isfreeofcharge','scope']),
 
       new kernel::Field::SubList(
                 name          =>'nativesoftware',
@@ -204,6 +206,46 @@ sub isQualityCheckValid
    my $rec=shift;
    return(0);
 }
+
+
+sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
+{
+   my $self=shift;
+   my @res=();
+
+   $self->SetCurrentView(qw(systemid systemname osrelease agentip software));
+
+   my ($rec,$msg)=$self->getFirst();
+   if (defined($rec)){
+      do{
+#         my %e=(
+#            section=>'SYSTEMNAME',
+#            scanname=>$rec->{systemname},
+#            quality=>0     # neutral verlässlich
+#         );
+#         push(@res,\%e);
+#         my %e=(
+#            section=>'IP',
+#            scanname=>$rec->{agentip},
+#            quality=>0     # neutral verlässlich
+#         );
+#         push(@res,\%e);
+         foreach my $sw (@{$rec->{software}}){
+            my %e=(
+               section=>'SOFTWARE',
+               scanname=>$sw->{software}, 
+               scanextra1=>$sw->{scope},
+               scanextra2=>$sw->{version},
+               quality=>-10     # relativ schlecht verlässlich
+            );
+            push(@res,\%e);
+         }
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+   return(@res);
+}
+
 
 
 

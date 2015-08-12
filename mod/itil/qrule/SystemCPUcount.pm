@@ -59,16 +59,7 @@ sub qcheckRecord
    my $checksession=shift;
    my $autocorrect=$checksession->{autocorrect};
 
-   #print STDERR Dumper($checksession);
 
-   # sampe AutoDiscovery data access
-   my $parent=$self->getParent();
-   my $add=$parent->getPersistentModuleObject("itil::autodiscdata");
-   $add->SetFilter({systemid=>\$rec->{id}});
-   my @l=$add->getHashList(qw(engine data));
-   my $fld=$add->getField("data",$l[0]);
-   my $addata=$fld->RawValue($l[0]);
-   
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    if ($rec->{cpucount}<=0){

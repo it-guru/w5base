@@ -155,12 +155,12 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
    my ($rec,$msg)=$self->getFirst();
    if (defined($rec)){
       do{
-         my %e=(
-            section=>'SYSTEMNAME',
-            scanname=>$rec->{name}, 
-            quality=>-50     # relativ schlecht verlässlich
-         );
-         push(@res,\%e);
+#         my %e=(
+#            section=>'SYSTEMNAME',
+#            scanname=>$rec->{name}, 
+#            quality=>-50     # relativ schlecht verlässlich
+#         );
+#         push(@res,\%e);
          foreach my $swp (@{$rec->{swps}}){
             my %e=(
                section=>'SOFTWARE',

@@ -1,0 +1,101 @@
+#AutoDiscManager{
+   overflow: auto;
+   height:1px;
+   padding:5px;
+}
+
+.AutoDiscRec{
+   text-align:left;
+   background-color:#E1E1E1;
+   padding:2px;
+   margin-bottom:15px;
+   border-style:solid;
+   border-color:gray;
+   border-width:1px;
+}
+.AutoDiscTitle{
+   border-bottom-style:solid;
+   border-color:gray;
+   padding:0;
+   margin:0;
+   border-width:1px;
+}
+
+.AutoDiscFilterMap{
+   margin-bottom:5px;
+}
+.AutoDiscDetail{
+   border-bottom-style:solid;
+   border-color:gray;
+   padding:0;
+   margin:0;
+   border-width:1px;
+   display:none;
+   margin:5px;
+}
+
+.AutoDiscOpLine{
+   text-align:right;
+   padding-top:2px;
+}
+.AutoDiscButton{
+   margin-left:10px;
+   width:70;
+}
+.AutoDiscDetailButton{
+   cursor:pointer;
+}
+.AutoDiscButton:disabled{
+   opacity: 0.4;
+   filter: alpha(opacity=40); /* msie */
+}
+.AutoDiscButton[disabled],.AutoDiscButton.disabled[disabled]{
+   opacity: 0.4;
+   filter: alpha(opacity=40); /* msie */
+}
+
+
+div.AutoDiscMapSel{
+   padding:2px;
+}
+select.AutoDiscMapSelector{
+}
+
+div.AutoDiscAddForm{
+   display:none;
+}
+
+
+div.AutoDiscOpLine{
+   display:table;
+
+}
+div.AutoDiscStatus{
+   display:table-cell;
+   text-align:left;
+   vertical-align: text-top;
+}
+div.AutoDiscButtonBar{
+   display:table-cell;
+   width:20%;
+   white-space:nowrap;
+}
+
+span.recSelektor{
+   cursor:pointer;
+   background-color:silver;
+   margin-left:3px;margin-right:3px;
+   padding:1px;
+   padding-left:3px;
+   padding-right:3px;
+   border-style:solid;border-width:1px;border-color:gray;
+   color:gray;
+}
+
+span.recSelektorAct{
+   font-weight:bold;
+   border-style-bottom:none;
+   color:black;
+   text-decoration: underline;
+}
+

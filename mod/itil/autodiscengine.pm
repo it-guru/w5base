@@ -106,6 +106,25 @@ sub new
                 label         =>'ad fieldname',
                 dataobjattr   =>'autodiscengine.adkey'),
 
+      new kernel::Field::Text(
+                name          =>'adreccount',
+                htmlwidth     =>'250px',
+                readonly      =>1,
+                group         =>'adstat',
+                label         =>'current existing autodisc-records',
+                dataobjattr   =>'(select count(*) from autodiscrec a '.
+                                'join autodiscent on a.entryid=autodiscent.id '.
+                                'where autodiscent.engine=autodiscengine.id)'),
+
+      new kernel::Field::Text(
+                name          =>'adent',
+                htmlwidth     =>'250px',
+                readonly      =>1,
+                group         =>'adstat',
+                label         =>'current autodisc affected config-items',
+                dataobjattr   =>'(select count(*) from autodiscent '.
+                                'where autodiscent.engine=autodiscengine.id)'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -169,7 +188,7 @@ sub isCopyValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default autoimport source));
+   return(qw(header default autoimport adstat source));
 }
 
 
@@ -213,6 +232,21 @@ sub Validate
          return(0);
       }
    }
+
+   if (exists($newrec->{addataobj})){
+      my $adobjname=effVal($oldrec,$newrec,"addataobj");
+      my $adobj=getModuleObject($self->Config,$adobjname);
+      if (!defined($adobj)){
+         $self->LastMsg(ERROR, "invalid AutoDiscovery Dataobject");
+         return(0);
+      }
+      if (!$adobj->can("extractAutoDiscData")){
+         $self->LastMsg(ERROR,"incompatible AutoDiscovery Dataobject");
+         return(0);
+      }
+   }
+
+
 
    return(1);
 }
