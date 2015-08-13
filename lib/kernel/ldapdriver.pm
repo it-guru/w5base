@@ -23,6 +23,7 @@ use kernel;
 use kernel::Universal;
 use Net::LDAP;
 use Unicode::Map8;
+use Time::HiRes;
 use Unicode::String qw(utf8 latin1);
 
 @ISA=qw(kernel::Universal);
@@ -124,8 +125,21 @@ sub execute
 
    if ($self->{ldap}){
        my $c=$self->getParent->Context;
-       #printf STDERR ("ldapdriver->execute:%s\n",Dumper(\@param));
+
+
+      my $sseconds=Time::HiRes::time();
+
        $c->{$self->{ldapname}}->{sth}=$self->{'ldap'}->search(@param);
+       my $eseconds=Time::HiRes::time();
+       if ($eseconds-$sseconds>5){
+         my $t=sprintf("%.3lf",$eseconds-$sseconds);
+         my $s=$self->getParent->Self();
+         my %p=@param;
+         my $q=$p{filter};
+         msg(WARN,"slow LDAP Query on $s with query $q (duration=$t sec)");
+       }
+
+
        if (!($c->{$self->{ldapname}}->{sth})){
           return(undef,msg(ERROR,"problem while LDAP search"));
        }

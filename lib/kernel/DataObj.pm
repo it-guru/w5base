@@ -133,6 +133,14 @@ sub preQualityCheckRecord
    return(1);
 }
 
+sub postQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(1);
+}
+
 sub SecureSetFilter
 {
    my $self=shift;

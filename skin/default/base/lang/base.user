@@ -143,3 +143,5 @@
 'SAL.f'=>{de=>'Frau',en=>'Miss'},
 'SAL.m'=>{de=>'Herr',en=>'Mister'},
 'STEVborderchange'=>{de=>'Info bei Änderung tangierender Elemente über die Funktion oder Rolle',en=>'automatic border-change notification by function or role'},
+'last Known Boss' =>{ de=>'letzter bekannter Vorgesetzter'},
+'last Known Boss IDs' =>{ de=>'letzter bekannter Vorgesetzter IDs'},
