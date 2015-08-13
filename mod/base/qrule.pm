@@ -656,6 +656,7 @@ sub nativQualityCheck
             }
          }
       }
+      $parent->postQualityCheckRecord($rec,@param);
       $W5V2::OperationContext=$oldcontext;
    }
 

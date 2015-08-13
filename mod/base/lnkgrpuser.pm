@@ -593,7 +593,7 @@ sub StoreLastKnownBoss  # the storeing of last known Boss-Email is needed,
          if ($#email!=-1){
             my $grp=getModuleObject($self->Config,"base::grp");
             $grp->UpdateRecord({lastknownbossemail=>join("\n",@email)},
-                               grpid=>\$grpid);
+                               {grpid=>\$grpid});
          }
       }
 

@@ -850,6 +850,20 @@ sub new
                 searchable    =>0,
                 label         =>'Talk-Lang'),
 
+      new kernel::Field::Link(
+                name          =>'lastknownbossid',
+                label         =>'last Known Boss IDs',
+                dataobjattr   =>'contact.lastknownboss'),
+
+      new kernel::Field::SubList(
+                name          =>'lastknownboss',
+                label         =>'last Known Boss',
+                htmldetail    =>0,
+                group         =>'userro',
+                vjointo       =>'base::user',
+                vjoinon       =>['lastknownbossid'=>'userid'],
+                vjoindisp     =>['fullname']),
+
       new kernel::Field::SubList(
                 name          =>'groups',
                 label         =>'Groups',
@@ -1100,6 +1114,53 @@ sub SecureValidate
    }
    return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
+
+sub postQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $userid=$rec->{userid};
+
+   if ($userid ne ""){
+      my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
+      $lnk->SetFilter({userid=>\$userid,nativroles=>[orgRoles()]});
+      my @grp;
+      foreach my $lnkrec ($lnk->getHashList(qw(grpid nativroles))){
+         my $roles=$lnkrec->{nativroles};
+         $roles=[$roles] if (ref($roles) ne "ARRAY");
+         $roles=[map({$_->{nativrole}} @{$roles})];
+         if (in_array($roles,"RBoss")){ # TL Handling
+            my $grp=getModuleObject($self->Config,"base::grp");
+            $grp->SetFilter({grpid=>\$lnkrec->{grpid}});
+            foreach my $grprec ($grp->getHashList(qw(parentid))){
+               push(@grp,$grprec->{parentid});
+            }
+         }
+         else{
+            push(@grp,$lnkrec->{grpid});
+         }
+      }
+      my %boss;
+      if ($#grp!=-1){
+         $lnk->ResetFilter();
+         $lnk->SetFilter({grpid=>\@grp,nativroles=>\"RBoss"});
+         foreach my $lnkrec ($lnk->getHashList(qw(userid))){
+            $boss{$lnkrec->{userid}}++;
+         }
+      }
+      my $boss=join(" ",sort(grep(!/^$userid$/,keys(%boss))));
+      if ($boss ne "" && $boss ne $rec->{lastknownbossid}){
+         printf STDERR ("Info: Update lastknownbossid on $userid to $boss\n");
+         my $op=$self->Clone();
+         $op->ValidatedUpdateRecord($rec,{lastknownbossid=>$boss},
+                                    {userid=>\$userid});
+      }
+   }
+
+   return(1);
+}
+
 
 sub Validate
 {
