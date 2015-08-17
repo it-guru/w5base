@@ -366,7 +366,7 @@ sub processFilterHash
          if (defined($fo->{lowersearch})){
             $sqlparam{lowersearch}=1;
          }
-         if (defined($fo->{ignorecase})){
+         if (defined($fo->{ignorecase}) && !ref($filter->{$fieldname})){
             $sqlparam{ignorecase}=1;
          }
          $sqlparam{sqldbh}=$self->{DB};
