@@ -37,6 +37,7 @@
 'SSL Certificate End'=>{de=>'SSL Zertifikat Ende'},
 'SSL State'=>{de=>'SSL Status'},
 'SSL last Certificate check'=>{de=>'SSL letzte Zertifikat Überprüfung'},
+'Notification of Certificate Expiration'=>{de=>'Benachrichtigung über Zertifikatsverfall'},
 'mangaged by rules of SOX'=>{de=>'Betreuung nach SOX (USA) Regeln'},
 'run on Cluster Service'=>{de=>'ausführen auf Cluster Service'},
 'cluster service application and instance application does not match'=>{

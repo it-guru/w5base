@@ -1338,6 +1338,23 @@ sub ExpandTimeExpression
       $found=1;
       $fail=0;
    }
+   elsif (($Y,$M,$D,$h,$m,$s)=$val=~
+          m/^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)/){
+      $val=~s/^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)//;
+      $srctimezone="GMT";
+      $Y=1971 if ($Y<1971);
+      $Y=2037 if ($Y>2037);
+      eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
+      if ($@ ne ""){
+         $self->LastMsg(ERROR,"ilegal expression '%s'",
+                                         $orgval);
+         return(undef);
+      }
+      
+      ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
+      $found=1;
+      $fail=0;
+   }
    elsif (($D,$M,$Y,$h,$m,$s)=$val=~
           m/^(\d+)\.(\d+)\.(\d+)\s+(\d+):(\d+):(\d+)/){
       $val=~s/^(\d+)\.(\d+)\.(\d+)\s+(\d+):(\d+):(\d+)//;

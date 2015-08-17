@@ -570,6 +570,15 @@ sub new
                 label         =>'SSL State',
                 dataobjattr   =>'swinstance.ssl_state'),
 
+      new kernel::Field::Date(
+                name          =>'sslexpnotify1',
+                history       =>0,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'ssl',
+                label         =>'Notification of Certificate Expiration',
+                dataobjattr   =>'swinstance.ssl_cert_exp_notify1'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',

@@ -1423,3 +1423,4 @@ alter table asset add acquStart datetime default NULL,add acquMode varchar(10) d
 alter table businessservice add occreactiontime bigint(20), add occtotaltime bigint(20);
 alter table businessservice add occreactiontimelevel int(20), add occtotaltimelevel int(20);
 alter table appl add usetime text default NULL, add tempexeptusetime text default NULL;
+alter table swinstance add ssl_cert_exp_notify1 datetime default NULL;

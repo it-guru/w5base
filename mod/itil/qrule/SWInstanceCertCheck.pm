@@ -5,7 +5,7 @@
 
 Checks the ssl expiration on swinstances in cistate "installed/active"
 or "available". If the expiration of the sslcheck url comes closer then
-6 weeks, an dataissue will be generated.
+1 week, a dataissue will be generated.
 
 =head3 IMPORTS
 
@@ -184,19 +184,65 @@ sub qcheckRecord
          $newrec->{editor}=$rec->{editor};
          my $swop=$dataobj->Clone();
          $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
-      }
 
-      if ($sslstate ne ""){
          if ($sslstate=~m/OK/){
             if (!defined($sslend)){
                my $m="SSL check: invalid or undefined sslend returend";
                return(3,{qmsg=>[$m],dataissue=>[$m]});
             }
-            my $now=NowStamp("en");
+
             my $d=CalcDateDuration($now,$sslend,"GMT");
-            my $max=7*6;
+
+            my $maxwarn=7*8;
+            my $max=7;
+
+            if ($d->{days}<$maxwarn) {
+               if (!$rec->{sslexpnotify1}) {
+                  $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
+                        emailcc=>['11634955120001']
+                     },{
+                        autosubject=>0,
+                        autotext=>0,
+                        mode=>'QualityCheck',
+                        datasource=>'Information about expiration '.
+                                    'of an SSL certificate'
+                     },sub {
+                        my $subject=$self->T('Expiration of an '.
+                                             'SSL certificate');
+                        $subject.=" ($rec->{name})";
+            
+                        my $user=getModuleObject($self->getParent->Config,
+                                                 "base::user");
+                        $user->SetFilter({userid=>\$rec->{databossid}});
+                        my ($databoss,$msg)=$user->getOnlyFirst(qw(tz));
+
+                        my $exp=$dataobj->getField('sslend')->
+                                   FormatedDetail($rec,undef);
+                        $exp.=" ".$databoss->{tz};
+                        $exp.=" (in $d->{days} ".$self->T('days').")";
+
+                        my $msg=$self->T('Dear databoss').",\n\n";
+                        $msg.=sprintf($self->T("SSL certificate ".
+                                               "for %s expires"),
+                                               $rec->{name});
+                        $msg.="\n\n".$self->T('Expiration date').":\n";
+                        $msg.="$exp\n\n";
+                        $msg.=$self->T('MSG01');
+
+                        $swop->UpdateRecord({sslexpnotify1=>$now});
+
+                        return($subject,$msg);
+                     });
+               }
+            }
+            else {
+               if ($rec->{sslexpnotify1}) {
+                  $swop->UpdateRecord({sslexpnotify1=>undef});
+               }
+            }
+
             if ($d->{days}<$max){
-               my $m="SSL certificate is nearly exiration";
+               my $m="SSL certificate is nearly expiration";
                return(3,{qmsg=>[$m],dataissue=>[$m]});
             }
          }
@@ -279,9 +325,15 @@ sub checkSSL
 
    $sock->close(SSL_fast_shutdown=>1);
 
+   my $sslbegin=$self->getParent->ExpandTimeExpression($begin_date,'en','GMT');
+   my $sslend=$self->getParent->ExpandTimeExpression($expire_date,'en','GMT');
+
+### (mz) Zum testen
+#$sslend=$self->getParent->ExpandTimeExpression('2015-08-20T23:59:59','en','GMT');
+### (mz) Zum testen
 
    msg(INFO,"ssl result begin=%s expire=%s",$begin_date,$expire_date);
-   return("check OK",$begin_date,$expire_date);
+   return("check OK",$sslbegin,$sslend);
 }
 
 
