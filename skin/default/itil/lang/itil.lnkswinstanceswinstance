@@ -1,5 +1,7 @@
 'itil::lnkswinstanceswinstance'=>{de=>'Software-Instanz Relation',en=>'Software-Instance relation'},
-'RELDEPEND'=>{de=>'"Ziel-Instanz" ist notwendig um aktuelle "Instanz" auszuführen'},
+'RELDEPEND'=>{de=>'"Ziel-Instanz" ist notwendig um aktuelle "Instanz" auszuführen',en=>'"target-Instance" is necessary to run current "Instance"'},
+'RELDIST'=>{de=>'"Ziel-Instanz" verteilt/balances Anforderungen/Requests auf die aktuelle "Instanz"',en=>'"target-Instance" distributes/balances request to the current "Instance"'},
 'target Instance'=>{de=>'Ziel Instanz'},
 'Instance'=>{de=>'Instanz'},
 'no write access'=>{de=>'kein Schreibzugriff auf die Instanz'},
+'invalid self referencing instance'=>{de=>'unzulässige selbst-Referenzierung der Instanz'},

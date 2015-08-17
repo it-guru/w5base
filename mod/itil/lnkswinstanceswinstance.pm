@@ -63,7 +63,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'conmode',
                 label         =>'Relation Type',
-                value         =>['RELDEPEND'],
+                value         =>['RELDEPEND','RELDIST'],
                 translation   =>'itil::lnkswinstanceswinstance',
                 dataobjattr   =>'lnkswinstanceswinstance.conmode'),
                                    
@@ -155,6 +155,10 @@ sub Validate
    my $toswi=effVal($oldrec,$newrec,"toswi");
    if ($toswi==0){
       $self->LastMsg(ERROR,"invalid to instance");
+      return(0);
+   }
+   if ($toswi eq $fromswi){
+      $self->LastMsg(ERROR,"invalid self referencing instance");
       return(0);
    }
    if ($self->isDataInputFromUserFrontend()){

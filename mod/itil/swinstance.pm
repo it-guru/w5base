@@ -380,6 +380,13 @@ sub new
                 label         =>'refered by',
                 group         =>'relations',
                 readonly      =>1,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   return(0) if ($param{currentfieldgroup} eq $self->{group});
+                   return(1);
+                },
                 vjointo       =>'itil::lnkswinstanceswinstance',
                 vjoineditbase =>{'cistatusid'=>"<=5"},
                 vjoinon       =>['id'=>'toswi'],
