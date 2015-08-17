@@ -196,8 +196,20 @@ sub new
 #                label         =>'Source-Load',
 #                dataobjattr   =>SELpref.'contactsm1.last_update'),
 
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>SELpref.'contactsm1.sysmodtime'),
 
-                                                   
+      new kernel::Field::TextDrop(
+                name          =>'editor',
+                group         =>'source',
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['editor'=>'loginname'],
+                label         =>'Editor',
+                dataobjattr   =>SELpref.'contactsm1.sysmoduser'),
    );
    $self->setDefaultView(qw(id loginname name firstname email));
    return($self);

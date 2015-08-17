@@ -55,6 +55,13 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'amemplgroup.name'),
 
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Name',
+                uivisible     =>0,
+                size          =>'20',
+                dataobjattr   =>'amemplgroup.name'),
+
       new kernel::Field::Boolean(
                 name          =>'deleted',
                 htmldetail    =>0,
@@ -131,7 +138,13 @@ sub new
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'amemplgroup.externalid'),
-                                                   
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amemplgroup.dtlastmodif'),
+
    );
    $self->setDefaultView(qw(lgroupid name supervisor srcsys srcid));
    return($self);

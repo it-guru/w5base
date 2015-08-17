@@ -50,7 +50,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
-                ignorecase    =>1,
+                uivisible     =>0,
                 searchable    =>0,
                 dataobjattr   =>'dsccentralassignmentm1.name'),
 

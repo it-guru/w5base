@@ -121,7 +121,21 @@ sub new
                 group         =>'profile',
                 dataobjattr   =>SELpref.'operatorm1.profile_service'),
 
-                                                   
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>SELpref.'operatorm1.sysmodtime'),
+
+      new kernel::Field::TextDrop(
+                name          =>'editor',
+                group         =>'source',
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['editor'=>'loginname'],
+                label         =>'Editor',
+                dataobjattr   =>SELpref.'operatorm1.sysmoduser'),
+
    );
    $self->setDefaultView(qw(loginname email username));
    return($self);

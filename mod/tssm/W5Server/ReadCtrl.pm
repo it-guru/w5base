@@ -44,6 +44,12 @@ sub process
                            lastend=>undef,
                            suspend=>30,   # dont start in first 15 minutes
                            AsyncID=>undef,
+                          },
+              'smgroup'=>{
+                           laststart=>undef,
+                           lastend=>undef,
+                           suspend=>5,   # dont start in first 15 minutes
+                           AsyncID=>undef,
                           }
              );
    my $evrt=getModuleObject($self->Config,"base::eventrouter");

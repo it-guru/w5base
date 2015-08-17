@@ -3,6 +3,7 @@
 'fieldgroup.users'             =>{ de=>'Gruppenmitglieder',en=>'Group-Members'},
 'fieldgroup.grouptype'         =>{ de=>'Gruppentyp',en=>'Group-Type'},
 'Fullname'    =>{ de=>'vollqualifizierter Name'},
+'active'    =>{ de=>'Aktiv'},
 'Description' =>{ de=>'Beschreibung'},
 'group mailbox' =>{ de=>'Gruppen Funktionsmailbox'},
 'is manager group' =>{ de=>'Manager Gruppe'},

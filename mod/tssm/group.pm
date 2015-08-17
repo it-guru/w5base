@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-#   $param{MainSearchFieldLines}=4;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -59,6 +59,11 @@ sub new
                 label         =>'Name',
                 ignorecase    =>1,
                 dataobjattr   =>'assignmentm1.name'),
+
+      new kernel::Field::Boolean(
+                name          =>'active',
+                label         =>'active',
+                dataobjattr   =>"decode(assignmentm1.tsi_inactive,'t',0,1)"),
 
 
 #      new kernel::Field::TextDrop(
@@ -180,6 +185,22 @@ sub new
                 dataobjattr   =>
                 "decode(assignmentm1.tsi_chm_interface_name,NULL,0,1)"),
 
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'assignmentm1.sysmodtime'),
+
+      new kernel::Field::TextDrop(
+                name          =>'editor',
+                group         =>'source',
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['editor'=>'loginname'],
+                label         =>'Editor',
+                dataobjattr   =>'assignmentm1.sysmoduser'),
+
+
    );
    $self->setDefaultView(qw(name description));
    return($self);
@@ -210,6 +231,18 @@ sub getSqlFrom
    return($from);
 }
 
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_active"))){
+     Query->Param("search_active"=>"\"".$self->T("boolean.true")."\"");
+   }
+}
+
+
+
+
 sub isViewValid
 {
    my $self=shift;
@@ -229,7 +262,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","control","users");
+   return("header","default","control","grouptype","users","source");
 }
 
 sub isQualityCheckValid
