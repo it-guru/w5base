@@ -182,8 +182,9 @@ sub qcheckRecord
          }
          $newrec->{mdate}=$rec->{mdate};
          $newrec->{editor}=$rec->{editor};
-         my $swop=$dataobj->Clone();
-         $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
+
+         my @qmsg;
+         my $errorlevel=0;
 
          if ($sslstate=~m/OK/){
             if (!defined($sslend)){
@@ -198,9 +199,7 @@ sub qcheckRecord
 
             if ($d->{days}<$maxwarn) {
                if (!$rec->{sslexpnotify1}) {
-                  $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
-                        emailcc=>['11634955120001']
-                     },{
+                  $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{},{
                         autosubject=>0,
                         autotext=>0,
                         mode=>'QualityCheck',
@@ -229,7 +228,7 @@ sub qcheckRecord
                         $msg.="$exp\n\n";
                         $msg.=$self->T('MSG01');
 
-                        $swop->UpdateRecord({sslexpnotify1=>$now});
+                        $newrec->{sslexpnotify1}=$now;
 
                         return($subject,$msg);
                      });
@@ -237,23 +236,30 @@ sub qcheckRecord
             }
             else {
                if ($rec->{sslexpnotify1}) {
-                  $swop->UpdateRecord({sslexpnotify1=>undef});
+                  $newrec->{sslexpnotify1}=undef;
                }
             }
 
             if ($d->{days}<$max){
-               my $m="SSL certificate is nearly expiration";
-               return(3,{qmsg=>[$m],dataissue=>[$m]});
+               push(@qmsg,"SSL certificate is nearly expiration");
+               $errorlevel=3 if ($errorlevel<3);
             }
          }
          else{
-            return(3,{qmsg=>["SSL check:".$sslstate],
-                      dataissue=>["SSL check:".$sslstate]});
+            push(@qmsg,"SSL check:".$sslstate);
+            $errorlevel=3 if ($errorlevel<3);
+         }
+
+         my $swop=$dataobj->Clone();
+         $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
+
+         if (defined(@qmsg)) {
+            return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@qmsg});
          }
       }
    }
-   return(0,undef);
 
+   return(0,undef);
 }
 
 sub checkSSL
@@ -329,13 +335,12 @@ sub checkSSL
    my $sslend=$self->getParent->ExpandTimeExpression($expire_date,'en','GMT');
 
 ### (mz) Zum testen
-#$sslend=$self->getParent->ExpandTimeExpression('2015-08-20T23:59:59','en','GMT');
+#$sslend=$self->getParent->ExpandTimeExpression('2015-08-30T23:59:59','en','GMT');
 ### (mz) Zum testen
 
    msg(INFO,"ssl result begin=%s expire=%s",$begin_date,$expire_date);
    return("check OK",$sslbegin,$sslend);
 }
-
 
 
 
