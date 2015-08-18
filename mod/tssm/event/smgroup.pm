@@ -96,13 +96,14 @@ sub smgroup
 
       
       my $flt=$incloader->{initflt};
-      if ($queryparam ne "reset"){
+      if ($queryparam eq ""){
          if (defined($start)){
             $flt->{mdate}='>="'.$start.'"';
          }
       }
       else{
-         msg(WARN,"quering without start parameter - reset is selected");
+         msg(WARN,"quering without start parameter - ".
+                  "reset or direct group selected");
       }
       if ($queryparam ne "" && $queryparam ne "reset"){
             $flt->{fullname}=\$queryparam;
@@ -133,7 +134,6 @@ sub smgroup
             }
          }until(!defined($grprec) || $c++>100);
       }
-      msg(INFO,"store queryparam $queryparam for ".$dataobj->Self);
       if (($queryparam eq "" ||
            $queryparam eq "reset") &&
           defined($laststamp)){    # letzten Zeitstempel im Joblog "merken"
@@ -151,9 +151,14 @@ sub smgroup
    msg(INFO,"loop end");
 
 
-   if ($queryparam eq ""){
+   if ($queryparam ne "reset"){
       $mgrp->ResetFilter();    # Refresh process
-      $mgrp->SetFilter({cistatusid=>"<6"});
+      if ($queryparam eq ""){
+         $mgrp->ResetFilter();
+      }
+      else{
+         $mgrp->SetFilter({fullname=>$queryparam});
+      }
       $mgrp->SetCurrentOrder("chkdate");
       $mgrp->SetCurrentView(qw(ALL));
       $mgrp->Limit(20,1);
@@ -263,28 +268,32 @@ sub handleSRec
    }
 
 
+
+
+
+
+
    my $newrec;
+   $newrec->{chkdate}=NowStamp("en");
    if (defined($sgrprec) || defined($cgrprec) || defined($agrprec)){  # General
       $newrec->{chkdate}=NowStamp("en");
       $newrec->{srcload}=NowStamp("en");
       $newrec->{cistatusid}=4;
-   }
-   else{
-      $newrec->{chkdate}=NowStamp("en");
-      $newrec->{cistatusid}=5;
    }
 
    if (defined($sgrprec)){                            # SM Handling
       if (!defined($oldrec) || $oldrec->{smid} ne $sgrprec->{id}){
          $newrec->{smid}=$sgrprec->{id};
       }
-      $newrec->{smdate}=NowStamp("en");
-   }
-   else{
-      if (defined($oldrec)){
-         $newrec->{smid}=undef   if ($oldrec->{smid} ne "");
-         $newrec->{smdate}=undef if ($oldrec->{smdate} ne "");
+      if (!defined($oldrec) || 
+          $oldrec->{ischmapprov} ne $sgrprec->{isapprover}){
+         $newrec->{ischmapprov}=$sgrprec->{isapprover};
       }
+      if (!defined($oldrec) || 
+          $oldrec->{isinmassign} ne $sgrprec->{isinmassignment}){
+         $newrec->{isinmassign}=$sgrprec->{isinmassignment};
+      }
+      $newrec->{smdate}=NowStamp("en");
    }
 
    if (defined($cgrprec)){                            # SC Handling
@@ -292,12 +301,6 @@ sub handleSRec
          $newrec->{scid}=$cgrprec->{id};
       }
       $newrec->{scdate}=NowStamp("en");
-   }
-   else{  # war mal da, ist nun aber wieder weg
-      if (defined($oldrec)){
-         $newrec->{scid}=undef   if ($oldrec->{scid} ne "");
-         $newrec->{scdate}=undef if ($oldrec->{scdate} ne "");
-      }
    }
 
    if (defined($agrprec)){                            # AM Handling
@@ -321,31 +324,73 @@ sub handleSRec
             }
          }
       }
-   }
-   else{  # war mal da, ist nun aber wieder weg
-      if (defined($oldrec)){
-         $newrec->{amid}=undef   if ($oldrec->{amid} ne "");
-         $newrec->{amdate}=undef if ($oldrec->{amdate} ne "");
+      if (!defined($oldrec) || 
+          $oldrec->{iscfmassign} ne "1"){
+         $newrec->{iscfmassign}=1;
       }
    }
 
-   if (!defined($oldrec)){
-      if (defined($sgrprec)){
-         $newrec->{fullname}=$sgrprec->{fullname};
+   my $lastseen=365;
+   my %lastseen;
+   {
+      foreach my $f (qw(smdate scdate amdate)){
+         my $d=effVal($oldrec,$newrec,$f);
+         if ($d ne ""){
+            my $nowstamp=NowStamp("en");
+            my $dur=CalcDateDuration($d,$nowstamp);
+            if (defined($dur)){
+               $lastseen{$f}=$dur->{totaldays};
+               if ($lastseen>$dur->{totaldays}){
+                  $lastseen=$dur->{totaldays};
+               }
+            }
+         }
       }
-      elsif (defined($agrprec)){
-         $newrec->{fullname}=$agrprec->{fullname};
-      }
-      $newrec->{smid}=$sgrprec->{id};
-      $newrec->{srcsys}=$firstseenon;
-#print STDERR "INS:".Dumper($newrec);
-      $dataobj->{mgrp}->ValidatedInsertRecord($newrec);
+   }
+   msg(INFO,"lastseen = $lastseen");
+   if ($lastseen>6){
+      $newrec->{cistatusid}=6;   # länger als 6 Tage nirgends gesehen
+   }
+   elsif ($lastseen>3){
+      $newrec->{cistatusid}=5;   # länger als 3 Tage nirgends gesehen
+   }
+   if ($lastseen>180){
+      msg(WARN,"delete of group $oldrec->{fullname} in $self");
+      $dataobj->{mgrp}->ValidatedDeleteRecord($oldrec);
    }
    else{
-#print STDERR "UPD:".Dumper($newrec);
-      $dataobj->{mgrp}->ValidatedUpdateRecord($oldrec,$newrec,{
-         id=>$oldrec->{id}
-      });
+      if (!defined($oldrec)){
+         if (defined($sgrprec)){
+            $newrec->{fullname}=$sgrprec->{fullname};
+         }
+         elsif (defined($agrprec)){
+            $newrec->{fullname}=$agrprec->{fullname};
+         }
+         $newrec->{smid}=$sgrprec->{id};
+         $newrec->{srcsys}=$firstseenon;
+      }
+      my @comments;
+      # consistence Checks
+      if (effVal($oldrec,$newrec,"isinmassign")){
+         if (!defined($lastseen{amdate}) || $lastseen{amdate}>1){
+            push(@comments,"missing incident assignmentgroup in AssetManager");
+         }
+      }
+      my $comments=join("\n",@comments);
+      if (effVal($oldrec,$newrec,"comments") ne $comments){
+         $newrec->{comments}=$comments;
+      }
+
+      if (!defined($oldrec)){
+         #print STDERR "INS:".Dumper($newrec);
+         $dataobj->{mgrp}->ValidatedInsertRecord($newrec);
+      }
+      else{
+         #print STDERR "UPD:".Dumper($newrec);
+         $dataobj->{mgrp}->ValidatedUpdateRecord($oldrec,$newrec,{
+            id=>$oldrec->{id}
+         });
+      }
    }
 }
 

@@ -22,7 +22,9 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use kernel::CIStatusTools;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
+        kernel::CIStatusTools);
 
 sub new
 {
@@ -44,14 +46,14 @@ sub new
                 dataobjattr   =>'metagrpmgmt.id'),
                                                   
       new kernel::Field::Text(
-                name          =>'name',
-                label         =>'Name',
-                dataobjattr   =>'metagrpmgmt.name'),
-
-      new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
                 dataobjattr   =>'metagrpmgmt.fullname'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Name',
+                dataobjattr   =>'metagrpmgmt.name'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -66,6 +68,14 @@ sub new
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
                 dataobjattr   =>'metagrpmgmt.cistatus'),
+
+      new kernel::Field::Date(
+                name          =>'chkdate',
+                history       =>0,
+                sqlorder      =>'desc',
+                group         =>'chk',
+                label         =>'last check date',
+                dataobjattr   =>'metagrpmgmt.chkdate'),
 
       new kernel::Field::Text(
                 name          =>'smid',
@@ -103,9 +113,34 @@ sub new
                 label         =>'Group seen in ServiceCenter',
                 dataobjattr   =>'metagrpmgmt.scdate'),
 
+      new kernel::Field::Boolean(
+                name          =>'ischmapprov',
+                label         =>'is change approver group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>'is_chmapprov'),
+
+      new kernel::Field::Boolean(
+                name          =>'isinmassign',
+                label         =>'is incident assinment group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>'is_inmassign'),
+
+      new kernel::Field::Boolean(
+                name          =>'iscfmassign',
+                label         =>'is config assinment group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>'is_cfmassign'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
+                group         =>'chk',
                 searchable    =>0,
                 dataobjattr   =>'metagrpmgmt.comments'),
 
@@ -160,14 +195,6 @@ sub new
                 dataobjattr   =>'metagrpmgmt.srcid'),
 
       new kernel::Field::Date(
-                name          =>'chkdate',
-                history       =>0,
-                sqlorder      =>'desc',
-                group         =>'source',
-                label         =>'Chk-Date',
-                dataobjattr   =>'metagrpmgmt.chkdate'),
-
-      new kernel::Field::Date(
                 name          =>'srcload',
                 history       =>0,
                 sqlorder      =>'desc',
@@ -205,7 +232,7 @@ sub initSearchQuery
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default ref source));
+   return(qw(header default grouptype ref chk source));
 }
 
 
@@ -215,8 +242,29 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   my $fullname=effVal($oldrec,$newrec,"fullname");
+   my $name=$fullname;
+   $name=~s/^.*\.//;
+   $name=~s/\[.*$//;
+   if (effVal($oldrec,$newrec,"name") ne $name){
+      $newrec->{name}=$name;
+   }
+
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,
+                                                    "fullname"));
    return(1);
 }
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+   $self->NotifyOnCIStatusChange($oldrec,$newrec);
+   return($bak);
+}
+
 
 
 sub isViewValid

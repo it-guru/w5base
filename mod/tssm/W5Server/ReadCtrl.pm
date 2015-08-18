@@ -68,7 +68,7 @@ sub process
             if ($ctrl{$eventname}->{'suspend'}>0){
                $ctrl{$eventname}->{'suspend'}--;
             }
-            if (currentRunnings(\%ctrl)<3){
+            if (currentRunnings(\%ctrl)<keys(%ctrl)){
                if (!defined($ctrl{$eventname}->{'AsyncID'}) &&
                    $ctrl{$eventname}->{'suspend'}<=0 &&
                    ((defined($ctrl{$eventname}->{'lastend'}) &&
