@@ -253,7 +253,7 @@ sub qcheckRecord
          my $swop=$dataobj->Clone();
          $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
 
-         if (defined(@qmsg)) {
+         if ($#qmsg!=-1) {
             return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@qmsg});
          }
       }
