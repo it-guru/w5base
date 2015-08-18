@@ -1921,9 +1921,8 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
    if (defined($text) && $notifycontrol->{autotext}){  # automatischen header
       my $ntext=$self->T("Dear databoss",'kernel::QRule'); # und fooder an den
       $ntext.=",\n\n";                                     # text anhängen
-      $ntext.=$self->T("there was done an update on a record ".
-                      "which is managed ".
-                      "by you based on",'kernel::QRule');
+      $ntext.=$self->T("an update has been made on a record for which ".
+                       "you are responsible - based on",'kernel::QRule');
       if ($notifycontrol->{datasource} ne ""){
          $ntext.=" ".$self->T("the datasource")." ".
                  $notifycontrol->{datasource};
@@ -1931,7 +1930,7 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
       $ntext.=" ".$notifycontrol->{mode}.".";
       $ntext.="\n";
       $ntext.="\n".$text."\n\n\n".
-               $self->T("This update did not delivers you of your ".
+               $self->T("This update does not relieve you of the ".
                         "data responsibility!",'kernel::QRule');
       $text=$ntext;
    }
@@ -2034,7 +2033,7 @@ sub NotifiedValidatedUpdateRecord
          return(undef) if ($fldtext eq "");
         
          $text.="\n".$fldtext."\n\n\n".
-               $self->T("This update did not delivers you of your ".
+               $self->T("This update does not relieve you of the ".
                         "data responsibility!",'kernel::QRule');
          return($subject,$text);
 
