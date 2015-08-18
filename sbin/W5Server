@@ -611,6 +611,7 @@ sub initAsyncEnv
       my $tasks=$self->getTasksHash();  # this should be done in RPC::Server,
       $tasks={};                        # but at this position, i didnt need
       $SIG{INT}='IGNORE';
+      #$SIG{INT}='DEFAULT';
       $SIG{HUP}='DEFAULT';
       $0.=" MONITOR";
       my @e;
@@ -1065,7 +1066,7 @@ sub sendSignalToAllRunningProcesses
 #   }
 #   sleep(1);
    foreach my $pid ($self->runningTasks()){
-      msg(DEBUG,"send Signal($signal) to event at pid %s",$pid);
+      msg(DEBUG,"send Signal($signal) to event at pid %s from '$0'",$pid);
       if (kill($signal,$pid)){
          $n++;
       }
@@ -1097,7 +1098,7 @@ sub pre_server_close_hook
 
    #$self->DumpJobSpool();
    my $statefile=$self->getOfflineStateFile();
-   msg(DEBUG,"server shutdown initiated");
+   msg(DEBUG,"server shutdown initiated in $$ ($0)");
    $self->sendSignalToAllRunningProcesses(2);
    if (defined($self->{EventSpool}) && keys(%{$self->{EventSpool}}) &&
        $statefile ne ""){
@@ -1204,6 +1205,7 @@ $statedir.="/" if (!($statedir=~m/^\/$/));
    }
 }
 
+$ServerParam{'no_close_by_child'}=1;
 
 if ($W5V2::Debug==0){
    $ServerParam{'setsid'}=1;

@@ -48,7 +48,7 @@ sub process
               'smgroup'=>{
                            laststart=>undef,
                            lastend=>undef,
-                           suspend=>5,   # dont start in first 15 minutes
+                           suspend=>30,   # dont start in first 15 minutes
                            AsyncID=>undef,
                           }
              );
