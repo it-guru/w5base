@@ -16,7 +16,7 @@
 'Tools.workflownew'=>{de=>'Neuen Workflow starten',en=>'start workflow'},
 'Tools.workproc'=>{de=>'Arbeitsprozess',en=>'Workprocess'},
 'Tools.workproc.new'=>{de=>'Neueingabe',en=>'New'},
-'Tools.workproc.item'=>{de=>'Porzess-Schritt',en=>'Workprocessitem'},
+'Tools.workproc.item'=>{de=>'Prozess-Schritt',en=>'Workprocessitem'},
 'Tools.webnotify'=>{de=>'Benachrichtigungstool',en=>'Notifcationtool'},
 'sysadm'=>{de=>'Systemverwaltung',en=>'Systemadministration'},
 'sysadm:Desc'=>{de=>"In diesem Modul können ".
