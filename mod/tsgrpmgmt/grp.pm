@@ -72,7 +72,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'chkdate',
                 history       =>0,
-                sqlorder      =>'desc',
+                sqlorder      =>'asc',
                 group         =>'chk',
                 label         =>'last check date',
                 dataobjattr   =>'metagrpmgmt.chkdate'),

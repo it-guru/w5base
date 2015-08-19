@@ -34,6 +34,15 @@ sub new
    return($self);
 }
 
+sub exttrim
+{
+   my $s=shift;
+   my $out="".$s; 
+   $out=~s/[^A-Z.0-9&a-z_+@ÄÖÜ\/(:#!,)äöü-]*$//;
+   $out=~s/^[^A-Z.0-9&a-z_+@ÄÖÜ\/(:#!,)äöü-]*//;
+   return($out);
+}
+
 sub Init
 {
    my $self=shift;
@@ -106,7 +115,7 @@ sub smgroup
                   "reset or direct group selected");
       }
       if ($queryparam ne "" && $queryparam ne "reset"){
-            $flt->{fullname}=\$queryparam;
+            $flt->{fullname}=$queryparam;
       }
       #printf STDERR ("fifi flt=%s\n",Dumper($flt));
       $dataobj->SetCurrentView(@{$incloader->{view}});
@@ -186,6 +195,8 @@ sub handleSRec
    my $agrprec=shift;
    my $cgrprec=shift;
 
+   my @comments;
+
    if (!defined($oldrec)){         # records from SM or AM
       if (defined($sgrprec)){
          $dataobj->{mgrp}->SetFilter({smid=>\$sgrprec->{id}});
@@ -201,10 +212,12 @@ sub handleSRec
       if (!defined($r)){  # mit Ids war der Datensatz nicht zu finden
          $dataobj->{mgrp}->ResetFilter();
          if (defined($sgrprec)){
-            $dataobj->{mgrp}->SetFilter({fullname=>\$sgrprec->{fullname}});
+            my $fullname=exttrim($sgrprec->{fullname});
+            $dataobj->{mgrp}->SetFilter({fullname=>\$fullname});
          }
          elsif (defined($agrprec)){
-            $dataobj->{mgrp}->SetFilter({fullname=>\$agrprec->{fullname}});
+            my $fullname=exttrim($agrprec->{fullname});
+            $dataobj->{mgrp}->SetFilter({fullname=>\$fullname});
          }
          else{
             die('havy problem');
@@ -238,7 +251,9 @@ sub handleSRec
          if ($#l>0){
             my %n;
             map({$n{$_->{fullname}}++} @l);
-            msg(ERROR,"not unique group for search on %s",join(", ",keys(%n)));
+            push(@comments,
+                 sprintf("not unique group for search on %s in AssetManager",
+                 join(", ",keys(%n))));
          }
          elsif ($#l==0){
            $agrprec=$l[0];
@@ -282,6 +297,10 @@ sub handleSRec
    }
 
    if (defined($sgrprec)){                            # SM Handling
+      if ($sgrprec->{fullname} ne exttrim($sgrprec->{fullname})){
+         push(@comments,"leading or trailing whitespaces on group ".
+                        "'$sgrprec->{fullname}' in ServiceManager");
+      }
       if (!defined($oldrec) || $oldrec->{smid} ne $sgrprec->{id}){
          $newrec->{smid}=$sgrprec->{id};
       }
@@ -297,6 +316,10 @@ sub handleSRec
    }
 
    if (defined($cgrprec)){                            # SC Handling
+      if ($cgrprec->{fullname} ne exttrim($cgrprec->{fullname})){
+         push(@comments,"leading or trailing whitespaces on group ".
+                        "'$cgrprec->{fullname}' in ServiceCenter");
+      }
       if (!defined($oldrec) || $oldrec->{scid} ne $cgrprec->{id}){
          $newrec->{scid}=$cgrprec->{id};
       }
@@ -304,6 +327,10 @@ sub handleSRec
    }
 
    if (defined($agrprec)){                            # AM Handling
+      if ($agrprec->{fullname} ne exttrim($agrprec->{fullname})){
+         push(@comments,"leading or trailing whitespaces on group ".
+                        "'$agrprec->{fullname}' in AssetManager");
+      }
       if (!defined($oldrec) || $oldrec->{amid} ne $agrprec->{lgroupid}){
          $newrec->{amid}=$agrprec->{lgroupid};
       }
@@ -369,10 +396,11 @@ sub handleSRec
          $newrec->{smid}=$sgrprec->{id};
          $newrec->{srcsys}=$firstseenon;
       }
-      my @comments;
       # consistence Checks
       if (effVal($oldrec,$newrec,"isinmassign")){
-         if (!defined($lastseen{amdate}) || $lastseen{amdate}>1){
+         my $fullname=effVal($oldrec,$newrec,"fullname");
+         if (($fullname=~m/^(TIT|TI)\..*$/) &&
+             (!defined($lastseen{amdate}) || $lastseen{amdate}>1)){
             push(@comments,"missing incident assignmentgroup in AssetManager");
          }
       }
