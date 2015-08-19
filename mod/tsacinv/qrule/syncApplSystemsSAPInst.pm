@@ -73,6 +73,9 @@ use kernel;
 use kernel::QRule;
 @ISA=qw(kernel::QRule);
 
+# Databoss for new systems/assets
+our $newCIDataboss='12808977330001';
+
 sub new
 {
    my $type=shift;
@@ -92,6 +95,15 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+
+   ##################################################################
+   # mz 2015-08-18 
+   # while testing under production conditions
+   # only these applications will be considered:
+   my @appl2chk=(qw(12199294360024 12199302380006 12962281170017
+                    13355257150001 14157032310001 250));
+   return(0,undef) if (!in_array(\@appl2chk,$rec->{id}));
+   ##################################################################
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    return(0,undef) if (!in_array($rec->{mgmtitemgroup},'SAP'));
@@ -160,9 +172,14 @@ sub qcheckRecord
          $w5id=$w5s->{id} if (defined($w5s->{id}));
 
          if (!defined($w5id)) {
+            my $uobj=getModuleObject($self->getParent->Config,"base::user");
+            $uobj->SetFilter({userid=>\$newCIDataboss,cistatusid=>[4]});
+            my ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
+            $newCIDataboss=$rec->{databossid} if (!defined($user));
+
             my $newrec={name=>$allsys{$sys2add}{name},
                         systemid=>$sys2add,
-                        databossid=>$rec->{databossid},
+                        databossid=>\$newCIDataboss,
                         mandatorid=>$rec->{mandatorid},
                         allowifupdate=>1,
                         cistatusid=>4};
@@ -271,7 +288,7 @@ sub chkAsset {
 
    if ($asset->CountRecords()==0) {
       my $newrec={name=>$assetasset->{assetid},
-                  databossid=>$rec->{databossid},
+                  databossid=>\$newCIDataboss,
                   mandatorid=>$rec->{mandatorid},
                   allowifupdate=>1,
                   cistatusid=>4};
