@@ -199,7 +199,8 @@ sub handleSRec
 
    if (!defined($oldrec)){         # records from SM or AM
       if (defined($sgrprec)){
-         $dataobj->{mgrp}->SetFilter({smid=>\$sgrprec->{id}});
+         my $smid='@@@'.$sgrprec->{id}.'@@@';
+         $dataobj->{mgrp}->SetFilter({smid=>\$smid});
       }
       elsif (defined($agrprec)){
          $dataobj->{mgrp}->SetFilter({amid=>\$agrprec->{lgroupid}});
@@ -228,7 +229,12 @@ sub handleSRec
    }
    if (!defined($sgrprec)){        # refresh records
       if (defined($oldrec)){
-         $dataobj->{sgrp}->SetFilter({id=>\$oldrec->{smid}});
+         my $smid=$oldrec->{smid};
+         if ($smid=~m/^@@@.*@@@$/){
+            $smid=~s/@@@$//;
+            $smid=~s/^@@@//;
+         }
+         $dataobj->{sgrp}->SetFilter({id=>\$smid});
         
          $dataobj->{sgrp}->SetCurrentOrder("NONE");
          my ($r,$msg)=$dataobj->{sgrp}->getOnlyFirst(qw(ALL));
@@ -301,8 +307,8 @@ sub handleSRec
          push(@comments,"leading or trailing whitespaces on group ".
                         "'$sgrprec->{fullname}' in ServiceManager");
       }
-      if (!defined($oldrec) || $oldrec->{smid} ne $sgrprec->{id}){
-         $newrec->{smid}=$sgrprec->{id};
+      if (!defined($oldrec) || $oldrec->{smid} ne '@@@'.$sgrprec->{id}.'@@@'){
+         $newrec->{smid}='@@@'.$sgrprec->{id}.'@@@';
       }
       if (!defined($oldrec) || 
           $oldrec->{ischmapprov} ne $sgrprec->{isapprover}){
@@ -345,7 +351,7 @@ sub handleSRec
             if (defined($r)){
                $sgrprec=$r;
                $newrec->{fullname}=$sgrprec->{fullname};
-               $newrec->{smid}=$sgrprec->{id};
+               $newrec->{smid}='@@@'.$sgrprec->{id}.'@@@';
                $newrec->{cistatusid}=4;
                $newrec->{srcload}=$sgrprec->{mdate};
             }
@@ -393,7 +399,6 @@ sub handleSRec
          elsif (defined($agrprec)){
             $newrec->{fullname}=$agrprec->{fullname};
          }
-         $newrec->{smid}=$sgrprec->{id};
          $newrec->{srcsys}=$firstseenon;
       }
       # consistence Checks
