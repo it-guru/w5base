@@ -80,6 +80,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'smid',
                 group         =>'ref',
+                binary        =>1,
                 label         =>'GroupID in ServiceManager',
                 dataobjattr   =>'metagrpmgmt.smid'),
 

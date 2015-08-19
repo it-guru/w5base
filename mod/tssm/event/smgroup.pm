@@ -199,7 +199,7 @@ sub handleSRec
 
    if (!defined($oldrec)){         # records from SM or AM
       if (defined($sgrprec)){
-         my $smid='@@@'.$sgrprec->{id}.'@@@';
+         my $smid=$sgrprec->{id};
          $dataobj->{mgrp}->SetFilter({smid=>\$smid});
       }
       elsif (defined($agrprec)){
@@ -230,10 +230,6 @@ sub handleSRec
    if (!defined($sgrprec)){        # refresh records
       if (defined($oldrec)){
          my $smid=$oldrec->{smid};
-         if ($smid=~m/^@@@.*@@@$/){
-            $smid=~s/@@@$//;
-            $smid=~s/^@@@//;
-         }
          $dataobj->{sgrp}->SetFilter({id=>\$smid});
         
          $dataobj->{sgrp}->SetCurrentOrder("NONE");
@@ -305,10 +301,10 @@ sub handleSRec
    if (defined($sgrprec)){                            # SM Handling
       if ($sgrprec->{fullname} ne exttrim($sgrprec->{fullname})){
          push(@comments,"leading or trailing whitespaces on group ".
-                        "'$sgrprec->{fullname}' in ServiceManager");
+                       "'".exttrim($sgrprec->{fullname})."' in ServiceManager");
       }
-      if (!defined($oldrec) || $oldrec->{smid} ne '@@@'.$sgrprec->{id}.'@@@'){
-         $newrec->{smid}='@@@'.$sgrprec->{id}.'@@@';
+      if (!defined($oldrec) || $oldrec->{smid} ne $sgrprec->{id}){
+         $newrec->{smid}=$sgrprec->{id};
       }
       if (!defined($oldrec) || 
           $oldrec->{ischmapprov} ne $sgrprec->{isapprover}){
@@ -324,7 +320,7 @@ sub handleSRec
    if (defined($cgrprec)){                            # SC Handling
       if ($cgrprec->{fullname} ne exttrim($cgrprec->{fullname})){
          push(@comments,"leading or trailing whitespaces on group ".
-                        "'$cgrprec->{fullname}' in ServiceCenter");
+                        "'".exttrim($cgrprec->{fullname})."' in ServiceCenter");
       }
       if (!defined($oldrec) || $oldrec->{scid} ne $cgrprec->{id}){
          $newrec->{scid}=$cgrprec->{id};
@@ -335,7 +331,7 @@ sub handleSRec
    if (defined($agrprec)){                            # AM Handling
       if ($agrprec->{fullname} ne exttrim($agrprec->{fullname})){
          push(@comments,"leading or trailing whitespaces on group ".
-                        "'$agrprec->{fullname}' in AssetManager");
+                        "'".exttrim($agrprec->{fullname})."' in AssetManager");
       }
       if (!defined($oldrec) || $oldrec->{amid} ne $agrprec->{lgroupid}){
          $newrec->{amid}=$agrprec->{lgroupid};
@@ -351,7 +347,7 @@ sub handleSRec
             if (defined($r)){
                $sgrprec=$r;
                $newrec->{fullname}=$sgrprec->{fullname};
-               $newrec->{smid}='@@@'.$sgrprec->{id}.'@@@';
+               $newrec->{smid}=$sgrprec->{id};
                $newrec->{cistatusid}=4;
                $newrec->{srcload}=$sgrprec->{mdate};
             }

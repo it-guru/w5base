@@ -511,8 +511,13 @@ sub Validate
    }
    if (!ref($newrec->{$self->Name()}) &&
        $self->Type() ne "File"){
-      my $txt=rmNonLatin1(trim($newrec->{$self->Name()}));
-      return({$self->Name()=>$txt});
+      if (!exists($self->{binary}) || $self->{binary} eq "0"){
+         my $txt=rmNonLatin1(trim($newrec->{$self->Name()}));
+         return({$self->Name()=>$txt});
+      }
+      else{
+         return({$self->Name()=>$newrec->{$self->Name()}});
+      }
    }
    return({$self->Name()=>$newrec->{$self->Name()}});
 }
