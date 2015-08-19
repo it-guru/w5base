@@ -250,6 +250,9 @@ sub Validate
    if (effVal($oldrec,$newrec,"name") ne $name){
       $newrec->{name}=$name;
    }
+   if (effVal($oldrec,$newrec,"chkdate") eq ""){
+      $newrec->{chkdate}="2000-01-01 00:00:00";
+   }
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,
                                                     "fullname"));

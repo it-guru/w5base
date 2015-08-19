@@ -272,6 +272,9 @@ sub handleSRec
       if (defined($oldrec) && $oldrec->{scid} ne ""){
          $sflt={id=>\$oldrec->{scid}};
       }
+      elsif (defined($oldrec) && $oldrec->{fullname} ne ""){
+         $sflt={fullname=>\$oldrec->{fullname}};
+      }
       elsif (defined($sgrprec)){
          if ($sgrprec->{fullname} ne ""){
             $sflt={fullname=>\$sgrprec->{fullname}};
