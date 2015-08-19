@@ -66,7 +66,7 @@ sub Process             # will be run as a spereate Process (PID)
    $i->SetFilter({archapplid=>[keys(%icto)]});
    foreach my $irec ($i->getHashList(qw(archapplid fullname description
                                         shortname status))){
-      my $mandator="Telekom IT";
+      my $mandator="TelekomIT";
       $m->ResetFilter();
       $m->SetFilter({name=>\$mandator,cistatusid=>\'4'});
       my ($mandatorid)=$m->getVal("grpid");
