@@ -76,7 +76,7 @@ sub ApplAssessmentReport
                            cistatus ictono icto criticality 
                            itsem
                            servicesupport drclass rtolevel rpolevel 
-                           opmode id)]
+                           opmode id maintwindow)]
                 },
                );
 
