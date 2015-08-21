@@ -2002,9 +2002,9 @@ sub NotifiedValidatedUpdateRecord
          }
          my $text=$self->T("Dear databoss",'kernel::QRule');
          $text.=",\n\n";
-         $text.=$self->T("there was done an update on a record ".
-                         "which is managed ".
-                         "by you based on",'kernel::QRule');
+         $text.=$self->T("an update has been made on a record for which ".
+                          "you are responsible - based on",'kernel::QRule');
+
          $text.=" ".$notifycontrol->{mode}.".\n";
        
          my $fldtext=""; 
