@@ -1,1 +1,1 @@
-This files are nessary for the itil::itstatus module
+This files are necessary for the itil::itstatus module

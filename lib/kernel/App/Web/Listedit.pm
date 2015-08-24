@@ -1403,7 +1403,8 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    }
    $htmlresult.="<tr><td colspan=2 align=center>";
    $htmlresult.="ERROR: ".
-                $self->T("you have not the nessary rights to view this record");
+                $self->T("You have not the necessary rights ".
+                         "to view this record");
    $htmlresult.="</td></tr>";
    $htmlresult.="</table>";
 

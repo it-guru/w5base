@@ -36,3 +36,5 @@
 "Info mail to databoss"=>{de=>"Info mail an den Datenverantwortlichen"},
 "centralized data upload to"=>{de=>"zentraler Datenload für"},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'You have not the necessary rights to view this record'=>{de=>'Sie haben nicht die erforderlichen Rechte, um diesen Datensatz zu sehen'},
+
