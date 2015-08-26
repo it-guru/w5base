@@ -7,7 +7,7 @@ package itil::qrule::SystemAppls;
 Every System in CI-Status "installed/active" or "available", needs
 at least 1 link to an application. If there are no applications assigned,
 this will produce an error. In this case the databoss of the logical
-system has to contact one (the corret one) databoss of an application
+system has to contact one (the correct one) databoss of an application
 to assign the system to the application.
 This rule is inactive, if the system is a workstation and no server/applicationserver.
 This rule is also inactive, if the system is a infrastructure system

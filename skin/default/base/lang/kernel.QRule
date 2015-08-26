@@ -1,4 +1,4 @@
 'Dear databoss'=>{de=>'Sehr geehrter Datenverantwortlicher'},
-'an update has been made on a record for which you are responsible - based on'=>{de=>'es wurde ein Update an einem von Ihnen verantworteten Datensatz durchgeführt - initiert durch'},
+'an update has been made on a record for which you are responsible - based on'=>{de=>'es wurde ein Update an einem von Ihnen verantworteten Datensatz durchgeführt - initiiert durch'},
 'This update does not relieve you of the data responsibility!'=>{de=>'Dieses Update entbindet Sie NICHT von Ihrer weiteren Datenverantwortung für dieses Element!'},
 'Automatic data update'=>{de=>'Automatisches Update'},

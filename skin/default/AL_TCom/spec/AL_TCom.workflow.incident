@@ -6,20 +6,20 @@ Der dadurch entstandene Arbeitsaufwand ist im folgenden
 Feld "Arbeitsaufwand" einzutragen.
 <hr>
 Diese Datenerfassung wurde durch Hr. Voetz, Tobias  bzw.
-Hr. Pavez Sandoval, Luis Alberto initiert (02.03.2007).
+Hr. Pavez Sandoval, Luis Alberto initiiert (02.03.2007).
 ',
 en=>'
 If you have done a rootcause analyses, you have to
 set this field to "yes".
 <hr>
 This data collect is initiarted by Hr. Voetz, Tobias  bzw.
-Hr. Pavez Sandoval, Luis Alberto initiert (02.03.2007).'},
+Hr. Pavez Sandoval, Luis Alberto initiiert (02.03.2007).'},
 'tcomworktime'=>{de=>'
 Der "Arbeitsaufwand" ist nur dann einzutragen, wenn eine
 Problemanaylse durchgefürt wurde.
 <hr>
 Diese Datenerfassung wurde durch Hr. Voetz, Tobias  bzw.
-Hr. Pavez Sandoval, Luis Alberto initiert (02.03.2007).
+Hr. Pavez Sandoval, Luis Alberto initiiert (02.03.2007).
 '},
 'tcomworktimespecial'=>{de=>'
 <b>Achtung:</b> Nach P800 sind Aufwände für Incidents im

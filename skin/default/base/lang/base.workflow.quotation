@@ -7,7 +7,7 @@
 'quotation posible'=>{de=>'Anfrage ist realisierbar/machbar'},
 'quotation is valid to date'=>{de=>'Angebot ist gültig bis'},
 'quotation elucidations and detail'=>{de=>'Angebots-Erläuterungen und Details'},
-'Initiated by'=>{de=>'Initiert/angefordert durch'},
+'Initiated by'=>{de=>'Initiiert/angefordert durch'},
 'Initiatorgroup'=>{de=>'Initiierende Gruppe'},
 'posible finish date of realisation'=>{de=>'mögliches Fertigstellungsdatum'},
 'estimated estimated for realisation'=>{de=>'geschätzter Arbeitsaufwand zur Realisierung'},

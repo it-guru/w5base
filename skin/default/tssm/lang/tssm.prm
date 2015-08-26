@@ -27,7 +27,7 @@
 'closetype.1'=>{de=>'Bekannter Fehler',  en=>'Known Error'},
 'closetype.2'=>{de=>'Problem gelöst',    en=>'Solved Problem'},
 'closetype.3'=>{de=>'keine Lösung',      en=>'Wrong Cause'},
-'Triggered by'=>{de=>'Initiert durch'},
+'Triggered by'=>{de=>'Initiiert durch'},
 'Sub Category 1'=>{de=>'Unterkategorie 1'},
 'Sub Category 2'=>{de=>'Unterkategorie 2'},
 'Sub Category 3'=>{de=>'Unterkategorie 3'},

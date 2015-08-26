@@ -222,7 +222,7 @@ sub getSqlFields
          my $joinon=$field->{vjoinon}->[0];
          my $joinonfield=$self->getField($joinon);
          if (!defined($joinonfield)){
-            die("vjoinon not corret in field $field->{name}");
+            die("vjoinon not correct in field $field->{name}");
          }
          if (!grep(/^$joinon$/,@view)){
             my $selectfield=$joinonfield->getBackendName("select",$self->{DB});
