@@ -11,7 +11,7 @@ synchronizes the system relations of the application automatically.
 
 Not yet existing assets and systems will be previously automatically created.
 
-If an automtic action fails, it produces an error.
+If an automatic action fails, it produces an error.
 
 =head3 IMPORTS
 
@@ -138,7 +138,6 @@ sub qcheckRecord
       $allsys{$sys->{systemsystemid}}{is_w5}++;
       $allsys{$sys->{systemsystemid}}{name}=$sys->{system};
    }
-   
    my @missingsys=grep {$allsys{$_}{is_sap} && !$allsys{$_}{is_w5}}
                        keys(%allsys);
 
@@ -189,19 +188,24 @@ sub qcheckRecord
             if (defined($assetid)) {
                $newrec->{asset}=$assetid;
                $w5id=$sysobj->ValidatedInsertRecord($newrec);
+
                if (defined($w5id)) {
                   ($w5s,$msg)=$sysobj->getOnlyFirst(qw(urlofcurrentrec));
-                  my $m=sprintf($self->T("System '%s' created"),
-                                $newrec->{name});
-                  push(@qmsg,$m);
-                  $m.="\n  $w5s->{urlofcurrentrec}";
-                  push(@notifymsg,$m);
+
+                  my $m='System created';
+                  push(@qmsg,$m.': '.$newrec->{name});
+
+                  my $nmsg=$self->T($m);
+                  $nmsg.=": ";
+                  $nmsg.=$newrec->{name};
+                  $nmsg.="\n";
+                  $nmsg.=$w5s->{urlofcurrentrec};                 
+                  push(@notifymsg,$nmsg);
                }
                else {
                   $errorlevel=3 if ($errorlevel<3);
-                  my $m=sprintf($self->T("Automatic creation ".
-                                         "of System '%s' failed"),
-                                $newrec->{name});
+                  my $m="Automatic creation of a System failed: ".
+                        $newrec->{name};
                   push(@qmsg,$m);
                   push(@dataissue,$m);
                }
@@ -214,16 +218,14 @@ sub qcheckRecord
                         comments=>'automatic added by qrule'};
 
             if ($applsys->ValidatedInsertRecord($newrec)) {
-               my $m=sprintf($self->T("Relation with system '%s' added"),
-                             $allsys{$sys2add}{name});
-               push(@qmsg,$m);
-               push(@notifymsg,$m);
+               my $m='Relation to system added';
+               push(@qmsg,$m.': '.$allsys{$sys2add}{name});
+               push(@notifymsg,$self->T($m).': '.$allsys{$sys2add}{name});
             }
             else {
+               my $m="Automatic relation with system failed: ".
+                     $allsys{$sys2add}{name};
                $errorlevel=3 if ($errorlevel<3);
-               my $m=sprintf($self->T("Automatic relation ".
-                                      "with system '%s' failed"),
-                             $allsys{$sys2add}{name});
                push(@qmsg,$m);
                push(@dataissue,$m);
             }
@@ -238,16 +240,14 @@ sub qcheckRecord
          my ($lnk,$msg)=$applsys->getOnlyFirst('id');
          my $lnkid=$applsys->ValidatedDeleteRecord($lnk);
          if (defined($lnkid)) {
-            my $m=sprintf($self->T("Relation with system '%s' removed"),
-                          $allsys{$sys2del}{name});
-            push(@qmsg,$m);
-            push(@notifymsg,$m);
+            my $m='Relation to system removed';
+            push(@qmsg,$m.': '.$allsys{$sys2del}{name});
+            push(@notifymsg,$self->T($m).': '.$allsys{$sys2del}{name});
          }
          else {
+            my $m="Automatic removal of relation to system failed: ".
+                  $allsys{$sys2del}{name};
             $errorlevel=3 if ($errorlevel<3);
-            my $m=sprintf($self->T("Automatic removal of relation ".
-                                   "with system '%s' failed"),
-                          $allsys{$sys2del}{name});
             push(@qmsg,$m);
             push(@dataissue,$m);
          }
@@ -294,15 +294,20 @@ sub chkAsset {
                   cistatusid=>4};
       if ($asset->ValidatedInsertRecord($newrec)) {
          my ($w5a,$msg)=$asset->getOnlyFirst(qw(urlofcurrentrec));
-         my $m=sprintf($self->T("Asset '%s' created"),$newrec->{name});
-         push(@$qmsg,$m);
-         $m.="\n  $w5a->{urlofcurrentrec}";
-         push(@$notifymsg,$m);
+
+         my $m='Asset created';
+         push(@$qmsg,$m.': '.$newrec->{name});
+
+         my $nmsg=$self->T($m);
+         $nmsg.=": ";
+         $nmsg.=$newrec->{name};
+         $nmsg.="\n";
+         $nmsg.=$w5a->{urlofcurrentrec};
+         push(@$notifymsg,$nmsg);
       }
       else {
          $$errorlevel=3 if ($errorlevel<3);
-         my $m=sprintf($self->T("Automatic creation of asset '%s' failed"),
-                       $newrec->{name});
+         my $m="Automatic creation of an asset failed: ".$newrec->{name};
          push(@$qmsg,$m);
          push(@$dataissue,$m);
          return(undef);
