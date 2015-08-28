@@ -29,13 +29,25 @@ No field specivication
 #######################################################################
 
 'issoxappl'=>{de=>'
-Die Anwendung wird nach SOX Richtlinien
-betreut, wenn die nutzende Firma an US-Börsen
-notiert ist.
-Sarbanes Oxley Act (SOX) triff hauptsächlich
-Anwendung aus dem Finanz Bereich
+Die Anwendung wird nach den Vorgaben
+aus dem ICS (Internal-Control-System) betreut.
+Alternativ erfolgt die Betreuung gemäß
+den Richtlinien aus SOX (Sarbanes Oxley Act),
+beispielsweise weil die nutzende Firma
+an US-Börsen notiert ist.
+SOX und ICS betrifft hauptsächlich
+Anwendungen aus dem Finanzbereich.
+',en=>'
+The application is managed by specifications
+according to the requirements of the
+ICS (Internal Control System).
+Alternatively, the application is managed
+according to SOX (Sarbanes Oxley Act) policies,
+for example because the using company
+is listed on US stock exchange.
+SOX and ICS applications concerns
+mainly to the financial sector.
 '},
-
 'kwords'=>{de=>'
 In diesem Feld können beliebige
 Worte eingetragen werden. Dies kann

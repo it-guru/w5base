@@ -1048,7 +1048,7 @@ sub new
                 name          =>'issoxappl',
                 group         =>'control',
                 htmleditwidth =>'30%',
-                label         =>'Application is mangaged by rules of SOX',
+                label         =>'Application is mangaged by rules of SOX or ICS',
                 dataobjattr   =>'appl.is_soxcontroll'),
 
       new kernel::Field::Text(

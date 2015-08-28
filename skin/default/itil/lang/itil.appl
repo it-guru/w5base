@@ -70,7 +70,7 @@
 'Application has no system components'=>{de=>'Anwendung hat keine System Komponenten'},
 'Application is not architecture relevant'=>{de=>'Anwendung ist nicht IT-Architektur relevant'},
 'Application has no interfaces'=>{de=>'Anwendung hat keine Schnittstellen'},
-'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien (USA) zu betreuen'},
+'Application is mangaged by rules of SOX or ICS'=>{de=>'Nach ICS oder SOX Richtlinien zu betreuen'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
 'changenotify'=>{de=>'Change-Benachrichtigung',en=>'Changenotification'},
 'STEVapplchanged'=>{de=>'Benachrichtigung bei hinzufügen/entfernen einer Anwendung',en=>'notification on add/remove of application'},

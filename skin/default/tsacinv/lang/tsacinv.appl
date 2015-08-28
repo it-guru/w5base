@@ -27,7 +27,7 @@
 'Application Description'=>{de=>'Anwendungsbeschreibung'},
 'Customer'=>{de=>'Kunde'},
 'Application Reference'=>{de=>'Anwendungs Referenz'},
-'Application is mangaged by rules of SOX'=>{de=>'Nach SOX Richtlinien zu betreuen'},
+'Application is mangaged by rules of SOX or ICS'=>{de=>'Nach ICS oder SOX Richtlinien zu betreuen'},
 'Criticality'=>{de=>'Kiritikalität'},
 'Priority'=>{de=>'Priorität'},
 'Application Maintenence Window'=>{de=>'Wartungsfenster'},

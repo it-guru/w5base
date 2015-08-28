@@ -354,7 +354,7 @@ sub new
                 name          =>'issoxappl',
                 group         =>'control',
                 htmleditwidth =>'30%',
-                label         =>'Application is mangaged by rules of SOX',
+                label         =>'Application is mangaged by rules of SOX or ICS',
                 dataobjattr   =>'amtsicustappl.soxrelevant'),
                                     
       new kernel::Field::Textarea(
