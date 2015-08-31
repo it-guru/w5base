@@ -105,6 +105,11 @@ sub qcheckRecord
                 $acroom=$geb.$acroom;
              }
           }
+
+          # fix serialno with whitespaces in AM
+          my $acserialno=$parrec->{serialno};
+          $acserialno=~s/^\s+|\s+$//g;
+
           $self->IfComp($dataobj,
                         $rec,"room",
                         {room=>$acroom},"room",
@@ -114,7 +119,7 @@ sub qcheckRecord
 
           $self->IfComp($dataobj,
                         $rec,"serialno",
-                        $parrec,"serialno",
+                        {serialno=>$acserialno},"serialno",
                         $autocorrect,$forcedupd,$wfrequest,
                         \@qmsg,\@dataissue,\$errorlevel,mode=>'string');
 
