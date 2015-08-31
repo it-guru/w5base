@@ -325,6 +325,14 @@ sub new
                 readonly      =>1,
                 label         =>'Application costcenter',
                 dataobjattr   =>'appl.conumber'),
+
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::appl',
+                dontrename    =>1,
+                readonly      =>1,
+                group         =>'applinfo',
+                uploadable    =>0,
+                fields        =>[qw(opmode)]),
                                                    
       new kernel::Field::Link(
                 name          =>'tsmid',
