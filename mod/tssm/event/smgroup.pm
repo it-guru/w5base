@@ -323,18 +323,20 @@ sub handleSRec
       if (!defined($oldrec) || $oldrec->{smid} ne $sgrprec->{id}){
          $newrec->{smid}=$sgrprec->{id};
       }
-      if (!defined($oldrec) || 
-          $oldrec->{ischmapprov} ne $sgrprec->{isapprover}){
-         $newrec->{ischmapprov}=$sgrprec->{isapprover};
+
+      my @fldmap=('isapprover'     =>'ischmapprov',
+                  'isinmassignment'=>'isinmassign',
+                  'admingroup'     =>'smadmgrp',
+                  'ismanager'      =>'ischmmgr',
+                  'isimplementor'  =>'ischmimpl',
+                  'iscoordinator'  =>'ischmcoord');
+      while(my ($sfld,$fld)=splice(@fldmap,0,2)){
+         if (!defined($oldrec) || 
+             $oldrec->{$fld} ne $sgrprec->{$sfld}){
+            $newrec->{$fld}=$sgrprec->{$sfld};
+         }
       }
-      if (!defined($oldrec) || 
-          $oldrec->{isinmassign} ne $sgrprec->{isinmassignment}){
-         $newrec->{isinmassign}=$sgrprec->{isinmassignment};
-      }
-      if (!defined($oldrec) || 
-          $oldrec->{smadmgrp} ne $sgrprec->{admingroup}){
-         $newrec->{smadmgrp}=$sgrprec->{admingroup};
-      }
+
       if ($sgrprec->{groupmailbox} ne ""){
          if (!defined($oldrec) || 
              $oldrec->{contactemail} ne exttrim($sgrprec->{groupmailbox})){

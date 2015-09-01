@@ -16,6 +16,8 @@
 'is incident remote group'=>{de=>'ist Incident-Remote Gruppe'},
 'is change remote group'=>{de=>'ist Change-Remote Gruppe'},
 'is reviewer group'=>{de=>'ist Change-Reviewer Gruppe'},
+'is implementor group'=>{de=>'ist Change-Implementer Gruppe'},
+'is coordinator group'=>{de=>'ist Change-Coordinator Gruppe'},
 'is change manager group'=>{de=>'ist Change-Manager Gruppe'},
 'is change assignment group'=>{de=>'ist Change-Assignment Gruppe'},
 'is incident assignment group'=>{de=>'ist Incident-Assignment Gruppe'},

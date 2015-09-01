@@ -156,15 +156,39 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'ischmapprov',
                 label         =>'is change approver group',
-                ignorecase    =>1,
+                allowempty    =>1,
                 group         =>'grouptype',
                 htmlhalfwidth =>1,
                 dataobjattr   =>'is_chmapprov'),
 
       new kernel::Field::Boolean(
+                name          =>'ischmimpl',
+                label         =>'is change implementor group',
+                allowempty    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>'is_chmimpl'),
+
+      new kernel::Field::Boolean(
+                name          =>'ischmmgr',
+                label         =>'is change manager group',
+                allowempty    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>'is_chmmgr'),
+
+      new kernel::Field::Boolean(
+                name          =>'ischmcoord',
+                label         =>'is change coordinator group',
+                allowempty    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>'is_chmcoord'),
+
+      new kernel::Field::Boolean(
                 name          =>'isinmassign',
                 label         =>'is incident assinment group',
-                ignorecase    =>1,
+                allowempty    =>1,
                 group         =>'grouptype',
                 htmlhalfwidth =>1,
                 dataobjattr   =>'is_inmassign'),
@@ -172,7 +196,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'iscfmassign',
                 label         =>'is config assinment group',
-                ignorecase    =>1,
+                allowempty    =>1,
                 group         =>'grouptype',
                 htmlhalfwidth =>1,
                 dataobjattr   =>'is_cfmassign'),

@@ -141,6 +141,24 @@ sub new
                 "decode(assignmentm1.tsi_flag_chm_approver,'t',1,0)"),
 
       new kernel::Field::Boolean(
+                name          =>'isimplementor',
+                label         =>'is implementor group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(assignmentm1.tsi_flag_chm_implementer,'t',1,0)"),
+
+      new kernel::Field::Boolean(
+                name          =>'iscoordinator',
+                label         =>'is coordinator group',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(assignmentm1.tsi_flag_chm_coordinator,'t',1,0)"),
+
+      new kernel::Field::Boolean(
                 name          =>'ischmassignment',
                 label         =>'is change assignment group',
                 ignorecase    =>1,
