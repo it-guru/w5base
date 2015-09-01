@@ -245,31 +245,42 @@ sub handleSRec
       }
    }
    if (!defined($agrprec)){        # read additional AssetManager Data
-      my $sflt;
+      my @sflt;
       if (defined($oldrec) && $oldrec->{amid} ne ""){
-         $sflt={lgroupid=>\$oldrec->{amid}};
+         push(@sflt,{lgroupid=>\$oldrec->{amid}});
       }
-      elsif (defined($sgrprec)){
+      if (defined($sgrprec)){
          if ($sgrprec->{fullname} ne ""){
-            $sflt={deleted=>\'0',fullname=>\$sgrprec->{fullname}};
+            push(@sflt,{deleted=>\'0',fullname=>\$sgrprec->{fullname}});
          }
       }
-      if (defined($sflt)){
-         $dataobj->{agrp}->SetFilter($sflt);
+      if ($#sflt!=-1){
+         $dataobj->{agrp}->SetFilter(\@sflt);
          my @l=$dataobj->{agrp}->getHashList(qw(ALL));
-         if ($#l>0){
-            my %n;
-            map({$n{$_->{fullname}}++} @l);
-            push(@comments,
-                 sprintf("not unique group for search on %s in AssetManager",
-                 join(", ",keys(%n))));
-         }
-         elsif ($#l==0){
+         if ($#l==0){
            $agrprec=$l[0];
          }
-         my ($r,$msg)=$dataobj->{agrp}->getOnlyFirst(qw(ALL));
-         $agrprec=$r;
-         
+         elsif($#l>0){
+            my %n;
+            map({$n{$_->{fullname}}++} @l);
+            if (keys(%n)==1){
+               $agrprec=$l[0];
+               push(@comments,"groupname not unique in AssetManager");
+            }
+            else{  # seems to be a rename - we only use record by id
+               if (defined($oldrec) && $oldrec->{amid} ne ""){
+                  L: foreach my $arec (@l){
+                     if ($arec->{lgroupid} eq $oldrec->{amid}){
+                        $agrprec=$arec;
+                        last L;
+                     }
+                  }
+               }
+               else{
+                  push(@comments,"unknown groupid problem in  AssetManager");
+               }
+            }
+         }
       }
    }
 
@@ -320,6 +331,16 @@ sub handleSRec
           $oldrec->{isinmassign} ne $sgrprec->{isinmassignment}){
          $newrec->{isinmassign}=$sgrprec->{isinmassignment};
       }
+      if (!defined($oldrec) || 
+          $oldrec->{smadmgrp} ne $sgrprec->{admingroup}){
+         $newrec->{smadmgrp}=$sgrprec->{admingroup};
+      }
+      if ($sgrprec->{groupmailbox} ne ""){
+         if (!defined($oldrec) || 
+             $oldrec->{contactemail} ne exttrim($sgrprec->{groupmailbox})){
+            $newrec->{contactemail}=exttrim($sgrprec->{groupmailbox});
+         }
+      }
       $newrec->{smdate}=NowStamp("en");
    }
 
@@ -343,6 +364,13 @@ sub handleSRec
          $newrec->{amid}=$agrprec->{lgroupid};
       }
       $newrec->{amdate}=NowStamp("en");
+      if ($agrprec->{supervisoremail} ne "" &&
+          effVal($oldrec,$newrec,"contactemail") eq ""){
+         if (!defined($oldrec) || 
+             $oldrec->{contactemail} ne exttrim($agrprec->{supervisoremail})){
+            $newrec->{contactemail}=exttrim($agrprec->{supervisoremail});
+         }
+      }
       if (defined($oldrec)){   # rename check (detect on AM rename)
          if ($oldrec->{fullname} ne exttrim($agrprec->{fullname})){ # rename op
             msg(WARN,"rename detected on metagroup id $oldrec->{id}\n".
@@ -405,6 +433,12 @@ sub handleSRec
       }
    }
    msg(INFO,"lastseen = $lastseen");
+
+   my $istelit=0;
+   my $fullname=effVal($oldrec,$newrec,"fullname");
+   if (($fullname=~m/^(TIT)([. ][^.]+)*$/)){
+      $istelit=1;
+   }
    if ($lastseen>6){
       $newrec->{cistatusid}=6;   # länger als 6 Tage nirgends gesehen
    }
@@ -428,9 +462,18 @@ sub handleSRec
       # consistence Checks
       if (effVal($oldrec,$newrec,"isinmassign")){
          my $fullname=effVal($oldrec,$newrec,"fullname");
-         if (($fullname=~m/^(TIT)(\.[^.]+)*$/) &&
-             (!defined($lastseen{amdate}) || $lastseen{amdate}>1)){
+         if ($istelit && (!defined($lastseen{amdate}) || $lastseen{amdate}>1)){
             push(@comments,"missing incident assignmentgroup in AssetManager");
+         }
+         if ($istelit && exttrim($fullname)=~m/\.CA$/){
+            push(@comments,"not allowed incident assignmentgroup ".
+                           "flag on .CA group");
+         }
+      }
+      if ($istelit){
+         if (exttrim($fullname)=~m/[^a-z0-9_.-]/i){
+            push(@comments,"invalid character in assignmentgroup ".
+                           "based on TelIT rules");
          }
       }
       my $comments=join("\n",@comments);

@@ -82,6 +82,8 @@ sub new
                 name          =>'smid',
                 group         =>'ref',
                 binary        =>1,
+                weblinkto     =>'tssm::group',
+                weblinkon     =>['smid'=>'id'],
                 label         =>'GroupID in ServiceManager',
                 dataobjattr   =>'metagrpmgmt.smid'),
 
@@ -92,8 +94,26 @@ sub new
                 dataobjattr   =>'metagrpmgmt.smdate'),
 
       new kernel::Field::Text(
+                name          =>'smadmgrp',
+                group         =>'ref',
+                label         =>'Admin Group in ServiceManager',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{$self->{name}} ne ""){
+                      return(1);
+                   }
+                   return(0);
+                },
+                dataobjattr   =>'metagrpmgmt.smadmgrp'),
+
+      new kernel::Field::Text(
                 name          =>'amid',
                 group         =>'ref',
+                weblinkto     =>'tsacinv::group',
+                weblinkon     =>['amid'=>'lgroupid'],
                 label         =>'GroupID in AssetManager',
                 dataobjattr   =>'metagrpmgmt.amid'),
 
@@ -106,6 +126,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'scid',
                 group         =>'ref',
+                weblinkto     =>'tssc::group',
+                weblinkon     =>['scid'=>'id'],
                 label         =>'GroupID in ServiceCenter',
                 dataobjattr   =>'metagrpmgmt.scid'),
 
@@ -114,6 +136,22 @@ sub new
                 group         =>'ref',
                 label         =>'Group seen in ServiceCenter',
                 dataobjattr   =>'metagrpmgmt.scdate'),
+
+      new kernel::Field::Email(
+                name          =>'contactemail',
+                group         =>'ref',
+                label         =>'Contact EMail',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{$self->{name}} ne ""){
+                      return(1);
+                   }
+                   return(0);
+                },
+                dataobjattr   =>'metagrpmgmt.contactemail'),
 
       new kernel::Field::Boolean(
                 name          =>'ischmapprov',

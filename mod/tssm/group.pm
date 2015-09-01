@@ -192,6 +192,22 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'assignmentm1.sysmodtime'),
 
+      new kernel::Field::Text(
+                name          =>'admingroup',
+                group         =>'source',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{$self->{name}} ne ""){
+                      return(1);
+                   }
+                   return(0);
+                },
+                label         =>'Admin-Group',
+                dataobjattr   =>'assignmentm1.tsi_responsible_group'),
+
       new kernel::Field::TextDrop(
                 name          =>'editor',
                 group         =>'source',
