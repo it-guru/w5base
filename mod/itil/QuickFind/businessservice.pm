@@ -42,7 +42,7 @@ sub CISearchResult
 
    my @l;
    if (grep(/^ci$/,@$stag) &&
-       (!defined($tag) || grep(/^$tag$/,qw(service)))) {
+       (!defined($tag) || grep(/^$tag$/,qw(businessservice)))) {
 
       my $flt=[{fullname=>"*$searchtext*",cistatusid=>"<=5",name=>"![empty]"},
                {id=>"$searchtext",cistatusid=>"<=5"}];
