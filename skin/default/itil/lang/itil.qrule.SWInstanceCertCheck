@@ -1,18 +1,18 @@
 'itil::qrule::SWInstanceCertCheck'=>{de=>'SSL URL Prüfung',en=>'SSL URL check'},
-'SSL certificate is nearly expiration'=>{de=>'SSL-Zertifikat verfällt demnächst'},
+'SSL certificate expires in a few days'=>{de=>'SSL-Zertifikat verfällt in wenigen Tagen'},
 'Expiration of an SSL certificate'=>{de=>'Ablauf eines SSL-Zertifikates'},
 'days'=>{de=>'Tagen'},
 'Expiration date'=>{de=>'Verfallsdatum'},
 'Dear databoss'=>{de=>'Sehr geehrter Datenverantwortlicher'},
 "SSL certificate for %s expires"=>{
    de=>"das SSL-Zertifikat für die Software-Instanz '%s' läuft demnächst ab.",
-   en=>"the SSL certificate for the software instance '%s' is nearly expiration."
+   en=>"the SSL certificate for the software instance '%s' is almost expired."
 },
 'MSG01'=>{
    de=>"Sie erhalten diese Nachricht einmalig, ".
        "d.h. es werden keine weiteren Erinnerungen hierzu versandt.\n\n".
        "Eine Woche vor Ablauf des Zertifikats wird ein DataIssue erzeugt.",
-   en=>"You receive this message only once, ".
-       "that means, there are no further reminders sent.\n\n".
-       "One week before expiry of the certificate, a DataIssue is created."
+   en=>"You receive this message only once - ".
+       "that means no further reminders will be sent.\n\n".
+       "A DataIssue is created one week before the certificate expiration."
 },

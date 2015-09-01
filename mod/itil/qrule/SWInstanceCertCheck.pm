@@ -216,7 +216,7 @@ sub qcheckRecord
                         my ($databoss,$msg)=$user->getOnlyFirst(qw(tz));
 
                         my $exp=$dataobj->getField('sslend')->
-                                   FormatedDetail($rec,undef);
+                                   FormatedDetail({sslend=>$sslend},undef);
                         $exp.=" ".$databoss->{tz};
                         $exp.=" (in $d->{days} ".$self->T('days').")";
 
@@ -241,7 +241,7 @@ sub qcheckRecord
             }
 
             if ($d->{days}<$max){
-               push(@qmsg,"SSL certificate is nearly expiration");
+               push(@qmsg,"SSL certificate expires in a few days");
                $errorlevel=3 if ($errorlevel<3);
             }
          }
@@ -333,10 +333,6 @@ sub checkSSL
 
    my $sslbegin=$self->getParent->ExpandTimeExpression($begin_date,'en','GMT');
    my $sslend=$self->getParent->ExpandTimeExpression($expire_date,'en','GMT');
-
-### (mz) Zum testen
-#$sslend=$self->getParent->ExpandTimeExpression('2015-08-30T23:59:59','en','GMT');
-### (mz) Zum testen
 
    msg(INFO,"ssl result begin=%s expire=%s",$begin_date,$expire_date);
    return("check OK",$sslbegin,$sslend);
