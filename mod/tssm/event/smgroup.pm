@@ -198,12 +198,16 @@ sub handleSRec
    my @comments;
 
    if (!defined($oldrec)){         # records from SM or AM
+      my $msgnote;
       if (defined($sgrprec)){
          my $smid=$sgrprec->{id};
          $dataobj->{mgrp}->SetFilter({smid=>\$smid});
+         $msgnote="join smid=$smid to";
       }
       elsif (defined($agrprec)){
-         $dataobj->{mgrp}->SetFilter({amid=>\$agrprec->{lgroupid}});
+         my $amid=$agrprec->{lgroupid};
+         $dataobj->{mgrp}->SetFilter({amid=>\$amid});
+         $msgnote="join amid=$amid to";
       }
       else{
          die('havy problem');
@@ -224,11 +228,14 @@ sub handleSRec
             die('havy problem');
          }
          ($r,$msg)=$dataobj->{mgrp}->getOnlyFirst(qw(ALL));
+         if (defined($r)){
+            msg(WARN,"$msgnote w5baseid=$r->{id} fullname=$r->{fullname}");
+         }
       }
       $oldrec=$r;
    }
    if (!defined($sgrprec)){        # refresh records
-      if (defined($oldrec)){
+      if (defined($oldrec) && $oldrec->{smid} ne ""){
          my $smid=$oldrec->{smid};
          $dataobj->{sgrp}->SetFilter({id=>\$smid});
         
@@ -289,10 +296,6 @@ sub handleSRec
 
 
 
-
-
-
-
    my $newrec;
    $newrec->{chkdate}=NowStamp("en");
    if (defined($sgrprec) || defined($cgrprec) || defined($agrprec)){  # General
@@ -340,15 +343,37 @@ sub handleSRec
          $newrec->{amid}=$agrprec->{lgroupid};
       }
       $newrec->{amdate}=NowStamp("en");
-      if (defined($oldrec)){   # rename check
-         if ($oldrec->{fullname} ne $agrprec->{fullname}){ # rename event
-            msg(INFO,"rename detected on metagroup id $oldrec->{id}\n".
+      if (defined($oldrec)){   # rename check (detect on AM rename)
+         if ($oldrec->{fullname} ne exttrim($agrprec->{fullname})){ # rename op
+            msg(WARN,"rename detected on metagroup id $oldrec->{id}\n".
                      "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
-            $dataobj->{sgrp}->SetFilter({fullname=>\$agrprec->{fullname}});
+            my $newfullname=exttrim($agrprec->{fullname});
+            $dataobj->{sgrp}->SetFilter({fullname=>\$newfullname});
             $dataobj->{sgrp}->SetCurrentOrder("NONE");
-            my ($r,$msg)=$dataobj->{sgrp}->getOnlyFirst(qw(ALL));
-            if (defined($r)){
-               $sgrprec=$r;
+            my ($srec,$msg)=$dataobj->{sgrp}->getOnlyFirst(qw(ALL));
+            if (defined($srec)){
+               $sgrprec=$srec;
+               $dataobj->{mgrp}->ResetFilter();
+               $dataobj->{mgrp}->SetFilter({fullname=>\$newfullname});
+               my ($chkrec,$msg)=$dataobj->{mgrp}->getOnlyFirst(qw(ALL));
+               if (defined($chkrec)){ # group already created by f.e. SM9
+                  msg(WARN,"group was already new created but it was ".
+                           "a rename on id ".
+                           "$chkrec->{id} - deaktivating this group now");
+                  $dataobj->{mgrp}->ValidatedUpdateRecord($chkrec,{
+                     cistatusid=>'6',
+                     smid=>undef,
+                     smdate=>undef,
+                     amid=>undef,
+                     amdate=>undef,
+                     scid=>undef,
+                     scdate=>undef,
+                     comments=>'data trash by rename operation - '.
+                               'SM bevor AM rename',
+                     },{
+                     id=>$chkrec->{id}
+                  });
+               }
                $newrec->{fullname}=$sgrprec->{fullname};
                $newrec->{smid}=$sgrprec->{id};
                $newrec->{cistatusid}=4;
@@ -403,7 +428,7 @@ sub handleSRec
       # consistence Checks
       if (effVal($oldrec,$newrec,"isinmassign")){
          my $fullname=effVal($oldrec,$newrec,"fullname");
-         if (($fullname=~m/^(TIT|TI)\..*$/) &&
+         if (($fullname=~m/^(TIT)(\.[^.]+)*$/) &&
              (!defined($lastseen{amdate}) || $lastseen{amdate}>1)){
             push(@comments,"missing incident assignmentgroup in AssetManager");
          }

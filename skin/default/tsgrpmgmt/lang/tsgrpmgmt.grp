@@ -2,7 +2,7 @@
 'fieldgroup.ref'=>{de=>'Referenzen',en=>'References'},
 'fieldgroup.grouptype'=>{de=>'Gruppentyp',en=>'Grouptype'},
 'fieldgroup.chk'=>{de=>'Prüf- und Import-Prozess',en=>'Check- and Import-Process'},
-'Fullname'=>{de=>'vollq. Name'},
+'Fullname'=>{de=>'Assignmentgroup',en=>'Assignmentgroup'},
 'GroupID in ServiceManager'=>{de=>'GruppenID in ServiceManager'},
 'GroupID in ServiceCenter'=>{de=>'GruppenID in ServiceCenter'},
 'GroupID in AssetManager'=>{de=>'GruppenID in AssetManager'},

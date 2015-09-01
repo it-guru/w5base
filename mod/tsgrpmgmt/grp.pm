@@ -53,6 +53,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
+                readonly      =>1,
                 dataobjattr   =>'metagrpmgmt.name'),
 
       new kernel::Field::Select(
@@ -142,7 +143,7 @@ sub new
                 name          =>'comments',
                 label         =>'Comments',
                 group         =>'chk',
-                searchable    =>0,
+                searchable    =>1,
                 dataobjattr   =>'metagrpmgmt.comments'),
 
       new kernel::Field::CDate(
