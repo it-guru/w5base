@@ -338,9 +338,14 @@ sub handleSRec
       }
 
       if ($sgrprec->{groupmailbox} ne ""){
-         if (!defined($oldrec) || 
-             $oldrec->{contactemail} ne exttrim($sgrprec->{groupmailbox})){
-            $newrec->{contactemail}=exttrim($sgrprec->{groupmailbox});
+         if (!($sgrprec->{groupmailbox}=~m/^.+\@.+$/)){
+            push(@comments,"invalid groupmailbox format in ServiceManager");
+         }
+         else{
+            if (!defined($oldrec) || 
+                $oldrec->{contactemail} ne exttrim($sgrprec->{groupmailbox})){
+               $newrec->{contactemail}=exttrim($sgrprec->{groupmailbox});
+            }
          }
       }
       $newrec->{smdate}=NowStamp("en");
