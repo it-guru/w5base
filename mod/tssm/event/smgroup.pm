@@ -337,14 +337,17 @@ sub handleSRec
          }
       }
 
-      if ($sgrprec->{groupmailbox} ne ""){
-         if (!($sgrprec->{groupmailbox}=~m/^.+\@.+$/)){
+      my $groupmailbox=exttrim($sgrprec->{groupmailbox});
+      if ($groupmailbox ne ""){
+         $groupmailbox=~s/[,;].*//; # use only first, if multiple specified
+         $groupmailbox=trim($groupmailbox);
+         if (!($groupmailbox=~m/^.+\@.+\..+$/)){
             push(@comments,"invalid groupmailbox format in ServiceManager");
          }
          else{
             if (!defined($oldrec) || 
-                $oldrec->{contactemail} ne exttrim($sgrprec->{groupmailbox})){
-               $newrec->{contactemail}=exttrim($sgrprec->{groupmailbox});
+                $oldrec->{contactemail} ne $groupmailbox){
+               $newrec->{contactemail}=$groupmailbox;
             }
          }
       }
@@ -371,13 +374,22 @@ sub handleSRec
          $newrec->{amid}=$agrprec->{lgroupid};
       }
       $newrec->{amdate}=NowStamp("en");
-      if ($agrprec->{supervisoremail} ne "" &&
-          effVal($oldrec,$newrec,"contactemail") eq ""){
-         if (!defined($oldrec) || 
-             $oldrec->{contactemail} ne exttrim($agrprec->{supervisoremail})){
-            $newrec->{contactemail}=exttrim($agrprec->{supervisoremail});
+
+      my $supervisoremail=exttrim($agrprec->{supervisoremail});
+      if ($supervisoremail ne "" && !exists($newrec->{contactemail})){
+         $supervisoremail=~s/[,;].*//; # use only first, if multiple specified
+         $supervisoremail=trim($supervisoremail);
+         if (!($supervisoremail=~m/^.+\@.+\..+$/)){
+            push(@comments,"invalid supervisoremail format in AssetManager");
+         }
+         else{
+            if (!defined($oldrec) || 
+                $oldrec->{contactemail} ne $supervisoremail){
+               $newrec->{contactemail}=$supervisoremail;
+            }
          }
       }
+
       if (defined($oldrec)){   # rename check (detect on AM rename)
          if ($oldrec->{fullname} ne exttrim($agrprec->{fullname})){ # rename op
             msg(WARN,"rename detected on metagroup id $oldrec->{id}\n".
