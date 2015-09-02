@@ -341,7 +341,7 @@ sub handleSRec
       if ($groupmailbox ne ""){
          $groupmailbox=~s/[,;].*//; # use only first, if multiple specified
          $groupmailbox=trim($groupmailbox);
-         if (!($groupmailbox=m/^\S+\@\S+\.\S+$/)){
+         if (!($groupmailbox=~m/^\S+\@\S+\.\S+$/)){
             push(@comments,"invalid groupmailbox format in ServiceManager");
          }
          else{
@@ -379,7 +379,7 @@ sub handleSRec
       if ($supervisoremail ne "" && !exists($newrec->{contactemail})){
          $supervisoremail=~s/[,;].*//; # use only first, if multiple specified
          $supervisoremail=trim($supervisoremail);
-         if (!($supervisoremail=m/^\S+\@\S+\.\S+$/)){
+         if (!($supervisoremail=~m/^\S+\@\S+\.\S+$/)){
             push(@comments,"invalid supervisoremail format in AssetManager");
          }
          else{
