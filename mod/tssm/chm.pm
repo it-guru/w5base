@@ -602,7 +602,7 @@ sub new
                 vjointo       =>'tssm::lnkci',
                 vjoinon       =>['changenumber'=>'src'],
                 vjoindisp     =>[qw(descname dstmodel dstcriticality
-                                    civalid dststatus furtherciinfo)]),
+                                    civalid dststatus)]),
 
       new kernel::Field::SubList(
                 name          =>'tickets',

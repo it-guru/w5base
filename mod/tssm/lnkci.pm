@@ -177,7 +177,8 @@ sub new
                 }),
    );
    
-   $self->setDefaultView(qw(linenumber dst dstname furtherciinfo));
+   $self->setDefaultView(qw(linenumber descname dstmodel dstcriticality
+                            civalid dststatus furtherciinfo));
    return($self);
 }
 
