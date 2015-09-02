@@ -34,7 +34,7 @@ sub new
                 name          =>'acinmassignmentgroupid',
                 group         =>'control',
                 label         =>'Incident Assignmentgroup ID',
-                container     =>'additional'),
+                dataobjattr   =>'appl.acinmassignmentgroupid'),
 
       new kernel::Field::Htmlarea(
                 name          =>'applicationexpertgroup',
@@ -72,55 +72,43 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
-                vjoineditbase =>{deleted=>\'0'},
+#                vjoineditbase =>{isinmassign=>\'1'},
                 group         =>'inmchm',
-                async         =>'1',
-                searchable    =>sub{
-                   my $self=shift;
-                   if ($self->getParent->IsMemberOf("admin")){
-                      return(1);
-                   }
-                   return(0);
-                },
-                vjointo       =>'tsacinv::group',
-                vjoinon       =>['acinmassignmentgroupid'=>'lgroupid'],
-                vjoindisp     =>'name'),
+                vjointo       =>'tsgrpmgmt::grp',
+                vjoinon       =>['acinmassignmentgroupid'=>'id'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
                 name          =>'scapprgroupid',
                 group         =>'control',
                 label         =>'Change Approvergroup technical ID',
-                container     =>'additional'),
+                dataobjattr   =>'appl.scapprgroupid'),
 
       new kernel::Field::Link(
                 name          =>'scapprgroupid2',
                 group         =>'control',
                 label         =>'Change Approvergroup business ID',
-                container     =>'additional'),
+                dataobjattr   =>'appl.scapprgroupid2'),
 
       new kernel::Field::TextDrop(
                 name          =>'scapprgroup',
                 label         =>'Change Approvergroup technical',
-                vjoineditbase =>{isapprover=>\'1'},
+#                vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
-                async         =>'1',
-                searchable    =>0,
                 AllowEmpty    =>1,
-                vjointo       =>'tssc::group',
+                vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['scapprgroupid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::TextDrop(
                 name          =>'scapprgroup2',
                 label         =>'Change Approvergroup business',
-                vjoineditbase =>{isapprover=>\'1'},
+#                vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
-                async         =>'1',
-                searchable    =>0,
                 AllowEmpty    =>1,
-                vjointo       =>'tssc::group',
+                vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['scapprgroupid2'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::TextDrop(
                 name          =>'icto',

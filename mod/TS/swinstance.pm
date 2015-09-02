@@ -34,34 +34,31 @@ sub new
                 name          =>'acinmassignmentgroupid',
                 group         =>'control',
                 label         =>'Incient Assignmentgroup ID',
-                container     =>'additional'),
+                dataobjattr   =>'swinstance.acinmassignmentgroupid'),
 
       new kernel::Field::TextDrop(
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
                 group         =>'inmchm',
-                async         =>'1',
-                searchable    =>0,
-                vjointo       =>'tsacinv::group',
-                vjoinon       =>['acinmassignmentgroupid'=>'lgroupid'],
-                vjoindisp     =>'name'),
+#                vjoineditbase =>{isinmassign=>\'1'},
+                vjointo       =>'tsgrpmgmt::grp',
+                vjoinon       =>['acinmassignmentgroupid'=>'id'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
                 name          =>'scapprgroupid',
                 group         =>'control',
                 label         =>'Change Approvergroup ID',
-                container     =>'additional'),
+                dataobjattr   =>'swinstance.scapprgroupid'),
 
       new kernel::Field::TextDrop(
                 name          =>'scapprgroup',
                 label         =>'Change Approvergroup',
-                vjoineditbase =>{isapprover=>\'1'},
+#                vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
-                async         =>'1',
-                searchable    =>0,
-                vjointo       =>'tssc::group',
+                vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['scapprgroupid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'fullname'),
    );
  
    return($self);
