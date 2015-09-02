@@ -210,7 +210,7 @@ sub doSearch
       return();
    }
    my $tag=undef;
-   if (my ($stag,$stxt)=$searchtext=~m/^\s*([^:]+)\s*:\s*(\S+.*)\S*$/){
+   if (my ($stag,$stxt)=$searchtext=~m/^\s*([^:'"]+)\s*:\s*(\S+.*)\S*$/){
       $tag=lc($stag);
       $searchtext=$stxt;
    }
