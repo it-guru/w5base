@@ -194,11 +194,30 @@ sub  calcViewMatrix
 
 
       # fifi fast solution:
-      $vMatrix->{uivisibleof}->[$c]=1 if ($fieldlist->[$c]->Type() eq "MatrixHeader");
- 
-      $vMatrix->{htmldetailof}->[$c]=$fieldlist->[$c]->htmldetail("HtmlDetail",
-            current=>$rec,
-            currentfieldgroup=>$currentfieldgroup);
+      if ($fieldlist->[$c]->Type() eq "MatrixHeader"){
+         $vMatrix->{uivisibleof}->[$c]=1;
+      }
+      if ($fieldlist->[$c]->{htmldetail} eq "NotEmpty"){
+         if (defined($rec)){
+            my $v=$fieldlist->[$c]->RawValue($rec);
+            if ($v ne ""){
+               $vMatrix->{htmldetailof}->[$c]=1;
+            }
+            else{
+               $vMatrix->{htmldetailof}->[$c]=0;
+            }
+         }
+         else{
+            $vMatrix->{htmldetailof}->[$c]=0;
+         }
+      }
+      else{ 
+         $vMatrix->{htmldetailof}->[$c]=
+            $fieldlist->[$c]->htmldetail("HtmlDetail",
+                                         current=>$rec,
+                                         currentfieldgroup=>$currentfieldgroup
+         );
+      }
       next if (!($vMatrix->{uivisibleof}->[$c]));
       next if (!($vMatrix->{htmldetailof}->[$c]));
        

@@ -97,16 +97,7 @@ sub new
                 name          =>'smadmgrp',
                 group         =>'ref',
                 label         =>'Admin Group in ServiceManager',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   if (exists($param{current}) &&
-                       $param{current}->{$self->{name}} ne ""){
-                      return(1);
-                   }
-                   return(0);
-                },
+                htmldetail    =>'NotEmpty',
                 dataobjattr   =>'metagrpmgmt.smadmgrp'),
 
       new kernel::Field::Text(
@@ -205,6 +196,7 @@ sub new
                 name          =>'comments',
                 label         =>'Comments',
                 group         =>'chk',
+                htmldetail    =>'NotEmpty',
                 searchable    =>1,
                 dataobjattr   =>'metagrpmgmt.comments'),
 
