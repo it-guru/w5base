@@ -118,15 +118,27 @@ sub new
                 vjoindisp     =>[qw(dst dstname)]),
 
 
-      new kernel::Field::Date(
+      new kernel::Field::Text(
                 name          =>'workstart',
                 label         =>'Work Start',
+                searchable    =>0,
                 dataobjattr   =>SELpref.'cm3tm1.work_start'),
 
-      new kernel::Field::Date(
+      new kernel::Field::Text(
                 name          =>'workend',
                 label         =>'Work End',
+                searchable    =>0,
                 dataobjattr   =>SELpref.'cm3tm1.work_end'),
+
+#      new kernel::Field::Date(
+#                name          =>'workstart',
+#                label         =>'Work Start',
+#                dataobjattr   =>SELpref.'cm3tm1.work_start'),
+#
+#      new kernel::Field::Date(
+#                name          =>'workend',
+#                label         =>'Work End',
+#                dataobjattr   =>SELpref.'cm3tm1.work_end'),
 
       new kernel::Field::Text(
                 name          =>'assignedto',
