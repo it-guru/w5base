@@ -211,6 +211,7 @@ sub new
                 selectfix     =>1,
                 htmlwidth     =>'1%',
                 htmldetail    =>0,
+                readonly      =>1,
                 group         =>'state',
                 label         =>'marked as delete',
                 dataobjattr   =>'wfhead.is_deleted'),
