@@ -1,5 +1,5 @@
 'TS::qrule::MandatorRules'=>{
-   de=>'T-Systems Regel zur automatischen W5Base/Darwin Mandatenzuordnung',
+   de=>'T-Systems Regel zur automatischen W5Base/Darwin Mandantenzuordnung',
    en=>'T-Systems rule for automatic W5Base/Darwin mandator mapping'
 },
 

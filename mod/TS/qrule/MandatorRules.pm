@@ -15,11 +15,34 @@ NONE
 
 [en:]
 
-Not documented
+The mandators of applications are assigned based on
+the SAP hierarchy defined in the affiliated Costcenters.
+
+* 9TS_ES.9DTIT.9ECS     is equal to CSO 
+
+* 9TS_ES.9DTIT.9EMC     is equal to MCS 
+
+* 9TS_ES.9DTIT.9ESSI    is equal to TSI 
+
+* 9TS_ES.9DTIT.9ESIL    is equal to TSI 
+
+* 9TS_ES.9DTIT.9EGS     is equal to GSO 
+
+* 9TS_ES.9DTIT.9ETS     is equal to TSO 
+
+The mapping is done only on config items in the following CI-States:
+
+available/in project |  installed/active | inactive/stored
+
+If the mandator of logical systems, software instances and assets is the same
+as the one on the superordinate CI, this mandator is used.
+If there are multiple different mandators, but they are TelekomIT_* mandators,
+the mandator "TelekomIT" is selected.
+In all other cases no mandator replacement takes place. 
 
 [de:]
 
-Die Mandaten von Anwendungen werden basierend auf der im angegebenen
+Die Mandanten von Anwendungen werden basierend auf der im angegebenen
 Kontierungsobjekt definierten SAP-Hierarchie zugeordnet.
 
 * 9TS_ES.9DTIT.9ECS     ist gleich CSO 
@@ -42,9 +65,9 @@ Das Mapping wird nur bei Config-Items im Status ...
 
 Bei logischen Systemen, Software-Instanzen und Assets wird der Mandant
 aus dem übergeordneten CI übernommen, wenn dieser immer auf den
-gleichen Mandaten verweist. Ist er unterschiedlich, aber immer in
+gleichen Mandanten verweist. Ist er unterschiedlich, aber immer in
 der TelekomIT_*, dann wird der Mandant "TelekomIT" gewählt. 
-In allen anderen Fällen erfolgt keine Mandatenanpassung.
+In allen anderen Fällen erfolgt keine Mandantenanpassung.
 
 
 =cut
