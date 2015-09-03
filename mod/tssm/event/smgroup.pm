@@ -23,6 +23,14 @@ use kernel::Event;
 use tssm::lib::io;
 @ISA=qw(kernel::Event tssm::lib::io);
 
+our @SMVIEW=qw(mdate fullname
+               iscoordinator isimplementor ismanager isinmassignment 
+               isapprover
+               admingroup);
+
+our @AMVIEW=qw(mdate fullname supervisoremail);
+
+
 sub new
 {
    my $type=shift;
@@ -76,13 +84,13 @@ sub smgroup
          dataobj=>$sgrp,
          recpos=>0,
          initflt=>{active=>1},
-         view=>[qw(mdate fullname)]
+         view=>\@SMVIEW
       },
       {
          dataobj=>$agrp,
          recpos=>1,
          initflt=>{deleted=>\'0'},
-         view=>[qw(mdate fullname)]
+         view=>\@AMVIEW
       }
    );
 
@@ -240,7 +248,7 @@ sub handleSRec
          $dataobj->{sgrp}->SetFilter({id=>\$smid});
         
          $dataobj->{sgrp}->SetCurrentOrder("NONE");
-         my ($r,$msg)=$dataobj->{sgrp}->getOnlyFirst(qw(ALL));
+         my ($r,$msg)=$dataobj->{sgrp}->getOnlyFirst(@SMVIEW);
          $sgrprec=$r;
       }
    }
@@ -256,7 +264,7 @@ sub handleSRec
       }
       if ($#sflt!=-1){
          $dataobj->{agrp}->SetFilter(\@sflt);
-         my @l=$dataobj->{agrp}->getHashList(qw(ALL));
+         my @l=$dataobj->{agrp}->getHashList(@AMVIEW);
          if ($#l==0){
            $agrprec=$l[0];
          }
@@ -397,7 +405,7 @@ sub handleSRec
             my $newfullname=exttrim($agrprec->{fullname});
             $dataobj->{sgrp}->SetFilter({fullname=>\$newfullname});
             $dataobj->{sgrp}->SetCurrentOrder("NONE");
-            my ($srec,$msg)=$dataobj->{sgrp}->getOnlyFirst(qw(ALL));
+            my ($srec,$msg)=$dataobj->{sgrp}->getOnlyFirst(@SMVIEW);
             if (defined($srec)){
                $sgrprec=$srec;
                $dataobj->{mgrp}->ResetFilter();
