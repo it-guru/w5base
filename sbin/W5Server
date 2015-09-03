@@ -991,8 +991,18 @@ sub StartW5ServerProcess
       }
       \$SIG{HUP}=\\&hup;
       \$SIG{INT}=\\&shutdown;
-      \$SIG{USR2}='DEFAULT';
-      \$SIG{PIPE}='IGNORE';
+
+      \$SIG{USR2}='IGNORE';  # war bisher auf default
+      \$SIG{USR2}=sub{
+          \$self->NotifyAdmin("$server usr2 erhalten pid=\$\$ \$0","usr2");
+      };
+      \$SIG{ALRM}=sub{
+          \$self->NotifyAdmin("$server alarm erhalten pid=\$\$ \$0","alarm");
+      };
+
+      \$SIG{PIPE}=sub{        # war vorher auf ignore
+          \$self->NotifyAdmin("$server pipe erhalten pid=\$\$ \$0","pipe");
+      };
       \$SIG{USR1}=sub{
          \$srv->{ServerGoesDown}=1;
       };
