@@ -429,9 +429,12 @@ sub handleSRec
             if ($smchecked){
                msg(INFO,"group $newfullname found in SM");
                $dataobj->{mgrp}->ResetFilter();
-               $dataobj->{mgrp}->SetFilter({fullname=>\$newfullname});
+               my $chknewfullname=uc($newfullname);
+               $dataobj->{mgrp}->SetFilter({fullname=>\$chknewfullname});
                my ($chkrec,$msg)=$dataobj->{mgrp}->getOnlyFirst(qw(ALL));
-               if (defined($chkrec)){ # group already created by f.e. SM9
+               if (defined($chkrec) &&
+                   $chkrec->{id} ne $oldrec->{id}){ 
+                           # group already created by f.e. SM9
                   msg(WARN,"group was already new created but it was ".
                            "a rename on id ".
                            "$chkrec->{id} - deaktivating this group now");
