@@ -522,7 +522,7 @@ sub handleSRec
          $dataobj->{mgrp}->ValidatedInsertRecord($newrec);
       }
       else{
-         print STDERR "UPD:".Dumper($newrec);
+         #print STDERR "UPD:".Dumper($newrec);
          $dataobj->{mgrp}->ValidatedUpdateRecord($oldrec,$newrec,{
             id=>$oldrec->{id}
          });
