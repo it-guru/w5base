@@ -328,6 +328,10 @@ sub handleSRec
          push(@comments,"leading or trailing whitespaces on group ".
                        "'".exttrim($sgrprec->{fullname})."' in ServiceManager");
       }
+      if ($sgrprec->{fullname} ne uc($sgrprec->{fullname})){
+         push(@comments,"invalid lower case characters on group ".
+                       "'".exttrim($sgrprec->{fullname})."' in ServiceManager");
+      }
       if (!defined($oldrec) || $oldrec->{smid} ne $sgrprec->{id}){
          $newrec->{smid}=$sgrprec->{id};
       }
@@ -399,14 +403,16 @@ sub handleSRec
       }
 
       if (defined($oldrec)){   # rename check (detect on AM rename)
-         if ($oldrec->{fullname} ne exttrim($agrprec->{fullname})){ # rename op
-            msg(WARN,"rename detected on metagroup id $oldrec->{id}\n".
+         if ($oldrec->{fullname} ne 
+             uc(exttrim($agrprec->{fullname}))){ # rename op
+            msg(WARN,"rename request detected on metagroup id $oldrec->{id} ".
                      "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
             my $newfullname=exttrim($agrprec->{fullname});
             $dataobj->{sgrp}->SetFilter({fullname=>\$newfullname});
             $dataobj->{sgrp}->SetCurrentOrder("NONE");
             my ($srec,$msg)=$dataobj->{sgrp}->getOnlyFirst(@SMVIEW);
             if (defined($srec)){
+               msg(INFO,"group $newfullname found in SM");
                $sgrprec=$srec;
                $dataobj->{mgrp}->ResetFilter();
                $dataobj->{mgrp}->SetFilter({fullname=>\$newfullname});
@@ -429,10 +435,13 @@ sub handleSRec
                      id=>$chkrec->{id}
                   });
                }
-               $newrec->{fullname}=$sgrprec->{fullname};
+               $newrec->{fullname}=uc(exttrim($sgrprec->{fullname}));
                $newrec->{smid}=$sgrprec->{id};
                $newrec->{cistatusid}=4;
                $newrec->{srcload}=$sgrprec->{mdate};
+            }
+            else{
+               msg(ERROR,"rename not posible, because SM9 group '$agrprec->{fullname}' is missing");
             }
          }
       }
@@ -479,10 +488,10 @@ sub handleSRec
    else{
       if (!defined($oldrec)){
          if (defined($sgrprec)){
-            $newrec->{fullname}=$sgrprec->{fullname};
+            $newrec->{fullname}=uc(exttrim($sgrprec->{fullname}));
          }
          elsif (defined($agrprec)){
-            $newrec->{fullname}=$agrprec->{fullname};
+            $newrec->{fullname}=uc(exttrim($agrprec->{fullname}));
          }
          $newrec->{srcsys}=$firstseenon;
       }
@@ -513,7 +522,7 @@ sub handleSRec
          $dataobj->{mgrp}->ValidatedInsertRecord($newrec);
       }
       else{
-         #print STDERR "UPD:".Dumper($newrec);
+         print STDERR "UPD:".Dumper($newrec);
          $dataobj->{mgrp}->ValidatedUpdateRecord($oldrec,$newrec,{
             id=>$oldrec->{id}
          });
