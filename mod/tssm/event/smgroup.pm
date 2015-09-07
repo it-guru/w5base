@@ -408,12 +408,26 @@ sub handleSRec
             msg(WARN,"rename request detected on metagroup id $oldrec->{id} ".
                      "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
             my $newfullname=exttrim($agrprec->{fullname});
-            $dataobj->{sgrp}->SetFilter({fullname=>\$newfullname});
-            $dataobj->{sgrp}->SetCurrentOrder("NONE");
-            my ($srec,$msg)=$dataobj->{sgrp}->getOnlyFirst(@SMVIEW);
-            if (defined($srec)){
+
+            my $smchecked=0;
+
+            if (uc($newfullname) ne uc($oldrec->{fullname})){
+               $dataobj->{sgrp}->ResetFilter();
+               $dataobj->{sgrp}->SetFilter({fullname=>\$newfullname});
+               $dataobj->{sgrp}->SetCurrentOrder("NONE");
+               my ($srec,$msg)=$dataobj->{sgrp}->getOnlyFirst(@SMVIEW);
+               if (defined($srec)){
+                  $smchecked=1;
+                  $sgrprec=$srec;
+               }
+            }
+            else{  # only a case change did not need to check against SM9
+               $smchecked=1;
+            }
+
+
+            if ($smchecked){
                msg(INFO,"group $newfullname found in SM");
-               $sgrprec=$srec;
                $dataobj->{mgrp}->ResetFilter();
                $dataobj->{mgrp}->SetFilter({fullname=>\$newfullname});
                my ($chkrec,$msg)=$dataobj->{mgrp}->getOnlyFirst(qw(ALL));
@@ -435,13 +449,11 @@ sub handleSRec
                      id=>$chkrec->{id}
                   });
                }
-               $newrec->{fullname}=uc(exttrim($sgrprec->{fullname}));
-               $newrec->{smid}=$sgrprec->{id};
+               $newrec->{fullname}=uc($newfullname);
                $newrec->{cistatusid}=4;
-               $newrec->{srcload}=$sgrprec->{mdate};
-            }
-            else{
-               msg(ERROR,"rename not posible, because SM9 group '$agrprec->{fullname}' is missing");
+               if (defined($sgrprec)){ # maybee there is a new smrec
+                  $newrec->{smid}=$sgrprec->{id};
+               }
             }
          }
       }
