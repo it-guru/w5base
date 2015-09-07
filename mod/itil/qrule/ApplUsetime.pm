@@ -4,8 +4,7 @@ package itil::qrule::ApplUsetime;
 
 =head3 PURPOSE
 
-For every Prio1-Application must be defined
-"Main use time" and "Secondary use time."
+For each Prio1-Application use times must be entered."
 
 =head3 IMPORTS
 
@@ -15,13 +14,13 @@ NONE
 
 [en:]
 
-In each Field "Main use time" and "Secondary use time" will be expected
-minimum two time specifications like "hh:mm".
+In timespan field "use-times"
+at least one entry is expected per weekday.
 
 [de:]
 
-In den Feldern "Hauptnutzungszeit" und "Nebennutzungszeit" werden
-jeweils mindestens zwei Zeitangaben in der Form "hh:mm" erwartet.
+Im Zeitbereichsfeld "Nutzungszeiten"
+wird pro Wochentag mindestens ein Eintrag erwartet.
 
 =cut
 #######################################################################
@@ -71,19 +70,17 @@ sub qcheckRecord
    return(0,undef) if ($rec->{customerprio}!=1 || 
                        ($rec->{cistatusid}!=4 &&
                         $rec->{cistatusid}!=5));
-   my @msg;
-   foreach my $field ('mainusetime','secusetime') {
-      if ($rec->{$field}=~m/^\s*$/) {
-         push(@msg,"$field not specified");
-      } else {
-         my @match=$rec->{$field}=~m/\b[0-2]?\d:[0-5]\d\b/g;
-         if ($#match<1) {
-            push(@msg,"no valid time specifications in field $field");
-         }
+
+   my $daymap=$dataobj->getField('usetimes')->{tspandaymap};
+   my @usetimes=split(/\+/,$rec->{usetimes});
+
+   foreach my $i (0..$#{$daymap}) {
+      if ($daymap->[$i] && $usetimes[$i]=~m/\(\)/) {
+         my $msg='entries in use times incomplete';
+         return(3,{qmsg=>$msg,dataissue=>$msg});
       }
    }
 
-   return(3,{qmsg=>\@msg,dataissue=>\@msg}) if ($#msg>-1);
    return(0,undef);
 }
 

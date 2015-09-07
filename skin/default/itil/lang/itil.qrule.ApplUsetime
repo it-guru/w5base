@@ -1,12 +1,3 @@
-'itil::qrule::ApplUsetime'=>{de=>'Prüfung der Haupt- und Nebennutzungszeiten',
-                             en=>'Check of main- and secondary use times'},
-'mainusetime not specified'=>{de=>'Hauptnutzungszeit nicht angegeben',
-                              en=>'Main use time not specified'},
-'secusetime not specified'=>{de=>'Nebennutzungszeit nicht angegeben',
-                             en=>'Secondary use time not specified'},
-'no valid time specifications in field mainusetime'=>
-      {de=>'keine gültigen Zeitangaben im Feld Hauptnutzungszeit',
-       en=>'no valid time specifications in field Main use time'},
-'no valid time specifications in field secusetime'=>
-      {de=>'keine gültigen Zeitangaben im Feld Nebennutzungszeit',
-       en=>'no valid time specifications in field Secondary use time'},
+'itil::qrule::ApplUsetime'=>{de=>'Prüfung der Nutzungszeiten',
+                             en=>'Check of use times'},
+'entries in use times incomplete'=>{de=>'Einträge unter Nutzungszeiten unvollständig'},
