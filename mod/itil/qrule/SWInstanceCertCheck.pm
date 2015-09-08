@@ -240,7 +240,11 @@ sub qcheckRecord
                }
             }
 
-            if ($d->{days}<$max){
+            if ($d->{days}<=0) {
+               push(@qmsg,"SSL certificate has expired");
+               $errorlevel=3 if ($errorlevel<3);
+            }
+            elsif ($d->{days}<$max) {
                push(@qmsg,"SSL certificate expires in a few days");
                $errorlevel=3 if ($errorlevel<3);
             }

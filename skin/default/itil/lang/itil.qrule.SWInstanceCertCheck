@@ -1,5 +1,6 @@
 'itil::qrule::SWInstanceCertCheck'=>{de=>'SSL URL Prüfung',en=>'SSL URL check'},
 'SSL certificate expires in a few days'=>{de=>'SSL-Zertifikat verfällt in wenigen Tagen'},
+'SSL certificate has expired'=>{de=>'SSL-Zertifikat ist abgelaufen'},
 'Expiration of an SSL certificate'=>{de=>'Ablauf eines SSL-Zertifikates'},
 'days'=>{de=>'Tagen'},
 'Expiration date'=>{de=>'Verfallsdatum'},
