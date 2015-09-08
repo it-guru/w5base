@@ -1,0 +1,5 @@
+'tsacinv::mandator'=>{de=>'AssetManager Mandantenverknüpfung',
+                      en=>'AssetManager Mandatorrelation'},
+'fieldgroup.acrelation'=>{de=>'AssetManager Verknüpfung',
+                          en=>'AssetManager Relation'},
+'AC Config-Item Export active'=>{de=>'AC Config-Item Export aktiv'},
