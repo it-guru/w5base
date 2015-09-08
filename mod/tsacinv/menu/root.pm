@@ -107,10 +107,6 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.krn.mandator",
-                      "tsacinv::mandator",
-                      defaultacl=>['admin']);
-   
    $self->RegisterObj("ac.krn.model",
                       "tsacinv::model",
                       defaultacl=>['valid_user']);

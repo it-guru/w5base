@@ -361,15 +361,6 @@ sub new
    return($self);
 }
 
-sub SecureSetFilter
-{
-   my $self=shift;
-   my @flt=@_;
-
-   return($self->addAltBCSetFilter(@flt));
-}
-
-
 
 sub Initialize
 {
