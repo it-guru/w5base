@@ -203,6 +203,15 @@ sub new
                 dataobjattr   =>
                 "decode(assignmentm1.tsi_chm_interface_name,NULL,0,1)"),
 
+      new kernel::Field::Boolean(
+                name          =>'isrespall',
+                label         =>'is responsilbe for all',
+                ignorecase    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>
+                "decode(assignmentm1.tsi_resp_all,NULL,0,1)"),
+
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',

@@ -192,6 +192,14 @@ sub new
                 htmlhalfwidth =>1,
                 dataobjattr   =>'is_cfmassign'),
 
+      new kernel::Field::Boolean(
+                name          =>'isresp4all',
+                label         =>'is responsilbe for all',
+                allowempty    =>1,
+                group         =>'grouptype',
+                htmlhalfwidth =>1,
+                dataobjattr   =>'is_resp4all'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',

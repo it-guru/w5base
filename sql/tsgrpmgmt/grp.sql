@@ -6,7 +6,7 @@ create table metagrpmgmt (
   cistatus   int(2)        NOT NULL,chkdate datetime default NULL,key(chkdate),
   is_chmmgr     bool default NULL, is_chmimpl     bool default NULL,
   is_chmassign  bool default NULL, is_chmcoord    bool default NULL,
-  is_chmapprov  bool default NULL, 
+  is_chmapprov  bool default NULL, is_resp4all    bool default NULL,
   is_chmreview  bool default NULL, 
   is_inmmgr     bool default NULL, 
   is_inmassign  bool default NULL, 

@@ -21,3 +21,4 @@
 'is change manager group'=>{de=>'ist Change-Manager Gruppe'},
 'is change assignment group'=>{de=>'ist Change-Assignment Gruppe'},
 'is incident assignment group'=>{de=>'ist Incident-Assignment Gruppe'},
+'is responsilbe for all'=>{de=>'ist verwendbar für alle'},

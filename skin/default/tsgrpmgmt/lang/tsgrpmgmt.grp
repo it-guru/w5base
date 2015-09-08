@@ -16,5 +16,6 @@
 'is change implementor group'=>{de=>'ist Change Implementor Group'},
 'is config assinment group'=>{de=>'ist Config-Assignmentgroup'},
 'is incident assinment group'=>{de=>'ist Incident-Assignmentgroup'},
+'is responsilbe for all'=>{de=>'ist verwendbar von allen'},
 'last check date'=>{de=>'Zeitpunkt der letzten Prüfung'},
 

@@ -25,7 +25,7 @@ use tssm::lib::io;
 
 our @SMVIEW=qw(mdate fullname
                iscoordinator isimplementor ismanager isinmassignment 
-               isapprover
+               isapprover isrespall
                admingroup);
 
 our @AMVIEW=qw(mdate fullname supervisoremail);
@@ -341,7 +341,9 @@ sub handleSRec
                   'admingroup'     =>'smadmgrp',
                   'ismanager'      =>'ischmmgr',
                   'isimplementor'  =>'ischmimpl',
-                  'iscoordinator'  =>'ischmcoord');
+                  'iscoordinator'  =>'ischmcoord',
+                  'isrespall'      =>'isresp4all'
+      );
       while(my ($sfld,$fld)=splice(@fldmap,0,2)){
          if (!defined($oldrec) || 
              $oldrec->{$fld} ne $sgrprec->{$sfld}){
@@ -519,6 +521,12 @@ sub handleSRec
          if ($istelit && exttrim($fullname)=~m/\.CA$/){
             push(@comments,"not allowed incident assignmentgroup ".
                            "flag on .CA group");
+         }
+      }
+      if (effVal($oldrec,$newrec,"isresp4all") eq "0"){
+         if ($istelit){
+            push(@comments,"no responsible for all set in SM - ".
+                           "based on TelIT rules");
          }
       }
       if ($istelit){
