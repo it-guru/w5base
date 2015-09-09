@@ -33,6 +33,7 @@ sub new
    $param{MainSearchFieldLines}=3 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{use_distinct}=0;
+   $self->{history}=[qw(insert modify delete)];
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -90,6 +91,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'smdate',
                 group         =>'ref',
+                history       =>0,
                 label         =>'Group seen in ServiceManager',
                 dataobjattr   =>'metagrpmgmt.smdate'),
 
@@ -111,6 +113,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'amdate',
                 group         =>'ref',
+                history       =>0,
                 label         =>'Group seen in AssetManager',
                 dataobjattr   =>'metagrpmgmt.amdate'),
 
@@ -125,6 +128,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'scdate',
                 group         =>'ref',
+                history       =>0,
                 label         =>'Group seen in ServiceCenter',
                 dataobjattr   =>'metagrpmgmt.scdate'),
 
