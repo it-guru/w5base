@@ -16,7 +16,9 @@ body{overflow:hidden}
 <td valign=top>
 <table width="100%" height="100%" cellspacing=0 cellpadding=0>
 <tr height="1%"><td><div class=globalLinks>
+<!--
 TSI-HELP: <a  style="color:white" href="callto:+498008744357">+49 800 8744357</a> 
+-->
 &nbsp;&nbsp;&nbsp;&nbsp;%SUPPORTINFO%
 </div></td></tr>
 <tr><td height="59" style="background:url(../load/id1276.jpg)"></td></tr>
@@ -51,7 +53,7 @@ TSI-HELP: <a  style="color:white" href="callto:+498008744357">+49 800 8744357</a
 <div class="navItem"><a target=_blank href="https://tsi-myworkroom.telekom.de/" title="MyWorkroom">MyWorkroom</a>
 </div>
 
-<div class="navItem"><a target=_blank href="http://q4dee1sy121.ffm.t-systems.com/sc-prod/index.do?lang=en" title="ServiceCenter Web-Interface">ServiceCenter</a>
+<div class="navItem"><a target=msel href="http://helpline.telekom.de" title="HelpLine">HelpLine</a>
 </div>
 
 
