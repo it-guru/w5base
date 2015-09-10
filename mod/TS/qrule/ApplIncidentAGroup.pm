@@ -101,7 +101,7 @@ sub qcheckRecord
    }
    else{
       my $o=getModuleObject($self->getParent->Config,"tsacinv::group");
-      $o->SetFilter({lgroupid=>\$rec->{acinmassignmentgroupid}});
+      $o->SetFilter({fullname=>\$rec->{acinmassignmentgroup}});
       my ($grec)=$o->getOnlyFirst(qw(id deleted));
       if ($o->Ping()){
          if (!defined($grec) || $grec->{deleted}){
