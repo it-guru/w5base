@@ -306,7 +306,7 @@ sub getRequestNatureOptions
    my $vv=['operation','project','modification','inquiry','other'];
    my @l;
    foreach my $v (@$vv){
-      push(@l,$v,$v);
+      push(@l,$v,$self->T($v));
    }
    return(@l);
 }
