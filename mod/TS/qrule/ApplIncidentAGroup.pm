@@ -91,8 +91,8 @@ sub qcheckRecord
    return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
                                $rec->{cistatusid}!=3) ||
                                $rec->{opmode} eq "license");
-
-   if ($rec->{acinmassingmentgroup}=~m/^\s*$/){
+   my $acinmassingmentgroup=$rec->{acinmassingmentgroup};
+   if ($acinmassingmentgroup=~m/^\s*$/){
       $exitcode=3 if ($exitcode<3);
       push(@{$desc->{qmsg}},
            'there is no incident assignmentgroup defined');
@@ -101,7 +101,8 @@ sub qcheckRecord
    }
    else{
       my $o=getModuleObject($self->getParent->Config,"tsacinv::group");
-      $o->SetFilter({fullname=>\$rec->{acinmassignmentgroup}});
+      my $flt={fullname=>\$acinmassingmentgroup};
+      $o->SetFilter($flt);
       my ($grec)=$o->getOnlyFirst(qw(id deleted));
       if ($o->Ping()){
          if (!defined($grec) || $grec->{deleted}){
