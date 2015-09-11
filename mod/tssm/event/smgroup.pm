@@ -447,6 +447,7 @@ sub handleSRec
                      cistatusid=>'6',
                      smid=>undef,
                      smdate=>undef,
+                     smadmgrp=>undef,
                      amid=>undef,
                      amdate=>undef,
                      scid=>undef,
@@ -461,6 +462,11 @@ sub handleSRec
                $newrec->{cistatusid}=4;
                if (defined($sgrprec)){ # maybee there is a new smrec
                   $newrec->{smid}=$sgrprec->{id};
+               }
+               else{
+                  $newrec->{smid}=undef;
+                  $newrec->{smdate}=undef;
+                  $newrec->{smadmgrp}=undef;
                }
             }
          }
