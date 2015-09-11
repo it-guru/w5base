@@ -1624,7 +1624,25 @@ sub Validate
       }
       return(0);
    }
+
    my $stateid=effVal($oldrec,$newrec,"stateid");
+
+   # new assign of deferred workflow if fwdtarget has changed
+   if ($stateid==5 &&
+       ((defined($newrec->{fwdtarget}) &&
+         effChanged($oldrec,$newrec,"fwdtarget")) ||
+        (defined($newrec->{fwdtargetid}) &&
+         effChanged($oldrec,$newrec,"fwdtargetid")))) {
+      $newrec->{stateid}=2;      
+      $stateid=effVal($oldrec,$newrec,"stateid");
+      $ENV{HTTP_FORCE_LANGUAGE}='en' if (!defined($ENV{HTTP_FORCE_LANGUAGE}));
+      my $note="Workflow switched to state ".$self->T("wfstate.$stateid");
+      $self->Action->StoreRecord($oldrec->{id},"note",
+                                 {translation=>'base::workflowaction'},
+                                 $note,undef);
+   }
+   ######################################################################
+ 
    if ($stateid>1){
       if ($oldrec->{autocopymode} ne ""){
          $newrec->{autocopymode}=undef;
@@ -1633,7 +1651,6 @@ sub Validate
          $newrec->{autocopydate}=undef;
       }
    }
-
 
    #
    # recalculation of responsible group
