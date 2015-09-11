@@ -72,7 +72,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
-#                vjoineditbase =>{isinmassign=>\'1'},
+                vjoineditbase =>{isinmassign=>\'1'},
                 group         =>'inmchm',
                 vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['acinmassignmentgroupid'=>'id'],
@@ -93,7 +93,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'scapprgroup',
                 label         =>'Change Approvergroup technical',
-#                vjoineditbase =>{ischmapprov=>\'1'},
+                vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
                 AllowEmpty    =>1,
                 vjointo       =>'tsgrpmgmt::grp',
@@ -103,7 +103,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'scapprgroup2',
                 label         =>'Change Approvergroup business',
-#                vjoineditbase =>{ischmapprov=>\'1'},
+                vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
                 AllowEmpty    =>1,
                 vjointo       =>'tsgrpmgmt::grp',

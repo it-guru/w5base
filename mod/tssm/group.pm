@@ -210,7 +210,7 @@ sub new
                 group         =>'grouptype',
                 htmlhalfwidth =>1,
                 dataobjattr   =>
-                "decode(assignmentm1.tsi_resp_all,NULL,0,1)"),
+                "decode(assignmentm1.tsi_resp_all,'t',1,0)"),
 
       new kernel::Field::Date(
                 name          =>'mdate',

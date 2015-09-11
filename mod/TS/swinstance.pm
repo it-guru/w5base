@@ -40,7 +40,7 @@ sub new
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
                 group         =>'inmchm',
-#                vjoineditbase =>{isinmassign=>\'1'},
+                vjoineditbase =>{isinmassign=>\'1'},
                 vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['acinmassignmentgroupid'=>'id'],
                 vjoindisp     =>'fullname'),
@@ -54,7 +54,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'scapprgroup',
                 label         =>'Change Approvergroup',
-#                vjoineditbase =>{ischmapprov=>\'1'},
+                vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
                 vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['scapprgroupid'=>'id'],
