@@ -71,6 +71,14 @@ sub new
                 sqlorder      =>'NONE',
                 dataobjattr   =>'mto'),
 
+      new kernel::Field::Text(
+                name          =>'mperiod',
+                htmldetail    =>0,
+                label         =>'measure period',
+                sqlorder      =>'NONE',
+                dataobjattr   =>"to_char(mfrom,'DD.MM.YYYY')||' - '|| ".
+                                "to_char(mto,'DD.MM.YYYY') || ' CET'"),
+
       new kernel::Field::Select(
                 name          =>'logtyp',
                 label         =>'Log-Typ',

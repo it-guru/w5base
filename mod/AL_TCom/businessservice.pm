@@ -159,6 +159,18 @@ sub new
                 vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
                 vjoinon       =>['id'=>'businessserviceid']),
 
+      new kernel::Field::Text(
+                name          =>'vsmdmperiod',
+                group         =>'VSMmeasurements',
+                readonly      =>1,
+                weblinkto     =>'NONE',
+                precision     =>2,
+                label         =>'VSM daily mperiod',
+                vjointo       =>'tsvsm::itsperf',
+                vjoindisp     =>'mperiod',
+                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
+                vjoinon       =>['id'=>'businessserviceid']),
+
       new kernel::Field::Percent(
                 name          =>'vsmwavail',
                 precision     =>2,
@@ -192,6 +204,18 @@ sub new
                 label         =>'VSM weekly quality',
                 vjointo       =>'tsvsm::itsperf',
                 vjoindisp     =>'quality',
+                vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
+                vjoinon       =>['id'=>'businessserviceid']),
+
+      new kernel::Field::Text(
+                name          =>'vsmwmperiod',
+                group         =>'VSMmeasurements',
+                readonly      =>1,
+                weblinkto     =>'NONE',
+                precision     =>2,
+                label         =>'VSM weekly mperiod',
+                vjointo       =>'tsvsm::itsperf',
+                vjoindisp     =>'mperiod',
                 vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
                 vjoinon       =>['id'=>'businessserviceid']),
 

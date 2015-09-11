@@ -2,6 +2,7 @@
                    en=>'VSM IT-Service Measurements'},
 'measure period from'=>{de=>'Messzeitraum - von'},
 'measure period to'=>{de=>'Messzeitraum - bis'},
+'measure period'=>{de=>'Messzeitraum'},
 'availability'=>{de=>'Verfügbarkeit'},
 'performance'=>{de=>'Performance'},
 'response time'=>{de=>'Antwortzeit'},
