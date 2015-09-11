@@ -419,8 +419,12 @@ sub handleSRec
                $dataobj->{sgrp}->SetCurrentOrder("NONE");
                my ($srec,$msg)=$dataobj->{sgrp}->getOnlyFirst(@SMVIEW);
                if (defined($srec)){
-                  $smchecked=1;
+                  $smchecked=2;
                   $sgrprec=$srec;
+               }
+               else{
+                  $smchecked=1;
+                  $sgrprec=undef;
                }
             }
             else{  # only a case change did not need to check against SM9
@@ -429,7 +433,6 @@ sub handleSRec
 
 
             if ($smchecked){
-               msg(INFO,"group $newfullname found in SM");
                $dataobj->{mgrp}->ResetFilter();
                my $chknewfullname=uc($newfullname);
                $dataobj->{mgrp}->SetFilter({fullname=>\$chknewfullname});
