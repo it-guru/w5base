@@ -416,7 +416,7 @@ sub _LoadUserInUserCache
          my ($rec,$msg)=$o->getOnlyFirst(qw(surname 
                                fullname country
                                userid givenname posix groups tz lang
-                               cistatusid secstate ipacl
+                               cistatusid secstate ipacl pagelimit
                                dialermode dialerurl dialeripref
                                email usersubst usertyp winsize
                                dateofvsnfd));
