@@ -1,6 +1,5 @@
 'itil::chmmgmt'=>{de=>'Anwendung - ChangeManagement Daten',
                   en=>'Application - ChangeManagment Data'},
 'fieldgroup.appldata'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
-'fieldgroup.mainusetimes'=>{de=>'Hauptnutzungszeiten',en=>'Main use times'},
 'write rejected - please first set chmgmt team'=>{de=>'Schreibzugriff nicht zulässig - bitte erst Changemanager Team eintragen'},
 'Change Management Function Contact'=>{de=>'Changemanagement Funktionskontakt'},

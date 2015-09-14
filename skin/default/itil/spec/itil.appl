@@ -103,13 +103,3 @@ Indirekte Nutzer (Schnittstellen) dürfen dabei nicht mit gezählt werden.
 The user count refers to DIRECT users of the application.
 Indirect users (Interfaces) must not consider.
 '},
-'mainusetime'=>{de=>'
-Es müssen mindestens zwei Zeitangaben im Format hh:mm angegeben werden.
-',en=>'
-It is necessary to enter at least two times in the format hh:mm.
-'},
-'secusetime'=>{de=>'
-Es müssen mindestens zwei Zeitangaben im Format hh:mm angegeben werden.
-',en=>'
-It is necessary to enter at least two times in the format hh:mm.
-'},
