@@ -64,3 +64,4 @@
 'Usage'=>{de=>'Betriebsart'},
 'Downtime summary'=>{de=>'PSO-Übersicht'},
 'Change Coordinator Group'=>{de=>'Change Coordinator Gruppe'},
+'Closure Comments'=>{de=>'Abschlußbemerkungen (Closure Comments)'},

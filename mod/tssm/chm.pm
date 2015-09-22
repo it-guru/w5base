@@ -207,6 +207,39 @@ sub new
                 name          =>'description',
                 label         =>'Description',
                 searchable    =>0,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (!($param{current}->{phase}=~m/^70 /) &&
+                       $param{current}->{phase}=~m/RFC/i){
+                      return(0);
+                   }
+                   return(1);
+                },
+                dataobjattr   =>SELpref.'cm3rm1.plan_clob'),
+
+      new kernel::Field::Textarea(
+                name          =>'rfcdescription',
+                label         =>'RFC Description',
+                depend        =>['description','phase'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (!($param{current}->{phase}=~m/^70 /) &&
+                       $param{current}->{phase}=~m/RFC/i){
+                      return(1);
+                   }
+                   return(0) if ($param{current}->{$self->Name()} eq "");
+                   my $l=length($param{current}->{$self->Name()});
+                   if (trim(substr($param{current}->{description},0,$l)) eq 
+                       trim($param{current}->{$self->Name()})){
+                      return(0);
+                   }
+                   return(1);
+                },
+                searchable    =>0,
                 dataobjattr   =>SELpref.'cm3rm1.description'),
 
       new kernel::Field::Number(
@@ -265,19 +298,6 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>SELpref.'cm3rm1.tsi_validation'),
 
-##      new kernel::Field::Textarea(
-##                name          =>'serviceinfo',
-##                label         =>'Service Info',
-##                searchable    =>0,
-##                dataobjattr   =>'cm3rm1.service_info_comments'),
-
-##      new kernel::Field::Textarea(
-##                name          =>'resources',
-##                label         =>'Resources',
-##                htmldetail    =>0,
-##                searchable    =>0,
-##                dataobjattr   =>'cm3ra43.resources'),
-
       new kernel::Field::JoinUniqMerge(
                 name          =>'pso',
                 label         =>'PSO',
@@ -312,11 +332,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'status',
                 group         =>'status',
+                selectfix     =>1,
                 label         =>'Current Status',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_status'),
 
       new kernel::Field::Text(
                 name          =>'phase',
+                selectfix     =>1,
                 group         =>'status',
                 label         =>'Current Phase',
                 dataobjattr   =>SELpref.'cm3rm1.current_phase'),
@@ -432,12 +454,6 @@ sub new
                 label         =>'Create time',
                 dataobjattr   =>SELpref.'cm3rm1.orig_date_entered'),
 
-#      new kernel::Field::Text(
-#                name          =>'closedby',
-#                group         =>'close',
-#                label         =>'Closed by',
-#                dataobjattr   =>'cm3rm1.closed_by'),
-
       new kernel::Field::Date(
                 name          =>'closetime',
                 depend        =>['status'],
@@ -446,23 +462,23 @@ sub new
                 dataobjattr   =>SELpref.'cm3rm1.close_time'),
 
       new kernel::Field::Text(
+                name          =>'resolutioncode',
+                group         =>'close',
+                label         =>'Resolution Code',
+                dataobjattr   =>SELpref.'cm3rm1.tsi_resolution_code'),
+
+      new kernel::Field::Text(
                 name          =>'closecode',
                 group         =>'close',
                 label         =>'Close Code',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_close_code'),
 
-##      new kernel::Field::Text(
-##                name          =>'resolvedby',
-##                group         =>'close',
-##                label         =>'Resolved by',
-##                dataobjattr   =>'cm3rm1.resolved_by'),
-
-##      new kernel::Field::Date(
-##                name          =>'resolvetime',
-##                depend        =>['status'],
-##                group         =>'close',
-##                label         =>'Resolve time',
-##                dataobjattr   =>'cm3rm1.resolve_time'),
+      new kernel::Field::Textarea(
+                name          =>'closurecomments',
+                label         =>'Closure Comments',
+                group         =>'close',
+                searchable    =>0,
+                dataobjattr   =>SELpref.'cm3rm1.closurecomments_clob'),
 
       new kernel::Field::Date(
                 name          =>'workstart',
@@ -478,21 +494,6 @@ sub new
                 label         =>'Work End',
                 dataobjattr   =>SELpref.'cm3rm1.tsi_kpi_work_end'),
 
-##      new kernel::Field::Text(
-##                name          =>'workduration',
-##                depend        =>['status'],
-##                group         =>'close',
-##                label         =>'Work Duration',
-##                dataobjattr   =>'cm3rm1.work_duration'),
-
-#      new kernel::Field::Import($self,
-#                vjointo       =>'tssm::chm_closingcomments',
-#                vjoinon       =>['changenumber'=>'changenumber'],
-#                vjoinconcat   =>"\n",
-#                group         =>"close",
-#                depend        =>['status'],
-#                fields        =>['closingcomments']),
-
       new kernel::Field::Text(
                 name          =>'assignarea',
                 group         =>'contact',
@@ -506,37 +507,6 @@ sub new
                 label         =>'raw Assign Area',
                 htmldetail    =>0,
                 dataobjattr   =>SELpref.'cm3rm1.tsi_assignarea'),
-
-#      new kernel::Field::Text(
-#                name          =>'customer',
-#                ignorecase    =>1,
-#                sqlorder      =>"none",
-#                group         =>'contact',
-#                label         =>'Customer',
-#                dataobjattr   =>SELpref.'cm3rm1.misc4'),
-#
-#      new kernel::Field::Link(
-#                name          =>'rawcustomer',
-#                group         =>'contact',
-#                label         =>'raw Customer',
-#                sqlorder      =>"none",
-#                dataobjattr   =>SELpref.'cm3rm1.misc4'),
-
-##  vermutlich nicht mehr im Datenmodel vorhanden
-##
-##      new kernel::Field::Text( 
-##                name          =>'assignedto',
-##                uppersearch   =>1,
-##                group         =>'contact',
-##                label         =>'Assigned To',
-##                dataobjattr   =>'cm3rm1.assigned_to'),
-
-##      new kernel::Field::Text(
-##                name          =>'implementor',
-##                uppersearch   =>1,
-##                group         =>'contact',
-##                label         =>'Coordinator',
-##                dataobjattr   =>'cm3rm1.assign_firstname'),
 
       new kernel::Field::Text(
                 name          =>'chmmgrgrp',
@@ -770,8 +740,8 @@ sub SetFilterForQualityCheck
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default status configitems tickets relations approvals
-             tasks downtimesum chmcontact contact close source));
+   return(qw(header default status close configitems tickets relations approvals
+             tasks downtimesum chmcontact contact source));
 }
 
 sub getRecordImageUrl
@@ -848,10 +818,16 @@ sub isViewValid
    if (defined($rec)){
       $st=$rec->{status};
    }
+   $st=lc($st);
    my @l=qw(header default status configitems tickets relations approvals
              tasks downtimesum chmcontact contact close);
 
-   if ($st ne "closed" && $st ne "rejected" && $st ne "resolved"){
+   if (defined($rec) &&
+       lc($rec->{status}) ne "closed" && 
+       lc($rec->{status}) ne "rejected" && 
+       lc($rec->{status}) ne "resolved" &&
+       !($rec->{phase}=~m/^60 /) &&
+       !($rec->{phase}=~m/^70 /)){
       @l=grep(!/^close$/,@l);
    }
    if ($rec->{srcsys} ne ""){
