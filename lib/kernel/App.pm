@@ -483,10 +483,11 @@ sub getGroupsOf
    my %allgrp=();
 
    my $UserCache=$self->Cache->{User}->{Cache};
-
    if (!defined($UserCache->{$AccountOrUserID})){
       $self->_LoadUserInUserCache($AccountOrUserID);
    }
+   $UserCache=$self->Cache->{User}->{Cache}; # address of UserCache can be
+                                             # changed by _LoadUserInUserCache
    my %directgroupage;
    if (defined($UserCache->{$AccountOrUserID})){
       $UserCache=$UserCache->{$AccountOrUserID}->{rec};
