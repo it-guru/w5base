@@ -29,7 +29,9 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+
    
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -117,28 +119,15 @@ sub new
                 vjoininhash   =>['dstname','dstobj'],
                 vjoindisp     =>[qw(dst dstname)]),
 
-
-      new kernel::Field::Text(
+      new kernel::Field::Date(
                 name          =>'workstart',
                 label         =>'Work Start',
-                searchable    =>0,
-                dataobjattr   =>SELpref.'cm3tm1.work_start'),
+                dataobjattr   =>SELpref.'cm3tm1.actualstart'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Date(
                 name          =>'workend',
                 label         =>'Work End',
-                searchable    =>0,
-                dataobjattr   =>SELpref.'cm3tm1.work_end'),
-
-#      new kernel::Field::Date(
-#                name          =>'workstart',
-#                label         =>'Work Start',
-#                dataobjattr   =>SELpref.'cm3tm1.work_start'),
-#
-#      new kernel::Field::Date(
-#                name          =>'workend',
-#                label         =>'Work End',
-#                dataobjattr   =>SELpref.'cm3tm1.work_end'),
+                dataobjattr   =>SELpref.'cm3tm1.actualend'),
 
       new kernel::Field::Text(
                 name          =>'assignedto',
@@ -202,9 +191,9 @@ sub initSearchQuery
    my $self=shift;
    my $nowlabel=$self->T("now","kernel::App");
 
-#   if (!defined(Query->Param("search_plannedend"))){
-#     Query->Param("search_plannedend"=>">$nowlabel-1d AND <$nowlabel+14d");
-#   }
+   if (!defined(Query->Param("search_plannedstart"))){
+     Query->Param("search_plannedstart"=>">$nowlabel AND <$nowlabel+1d");
+   }
 }
 
 
