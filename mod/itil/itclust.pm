@@ -129,7 +129,9 @@ sub new
                 subeditmsk    =>'subedit.services',
                 vjointo       =>'itil::lnkitclustsvc',
                 vjoinon       =>['id'=>'clustid'],
-                vjoindisp     =>['fullname','itservid','applicationnames']),
+                vjoindisp     =>['fullname','itservid','applicationnames'],
+                vjoininhash   =>['fullname','itservid',
+                                 'applicationnames','name']),
 
       new kernel::Field::SubList(
                 name          =>'systems',

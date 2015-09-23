@@ -89,7 +89,9 @@ sub qcheckRecord
                     my ($a,$b)=@_;
                     my $eq;
                  # printf STDERR ("compare $a->{itservid} = $b->{serviceid}\n"); 
-                    if ($a->{itservid} eq $b->{serviceid}){
+                    if ($a->{itservid} eq $b->{serviceid} ||
+                        (!defined($a->{itservid}) &&
+                         lc($a->{name}) eq lc($b->{name}))){
                        $eq=0;
                    #    $eq=1 if ($a->{comments} eq $b->{description});
                     }
