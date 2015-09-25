@@ -88,13 +88,17 @@ sub qcheckRecord
                  sub{  # comperator 
                     my ($a,$b)=@_;
                     my $eq;
-                 # printf STDERR ("compare $a->{itservid} = $b->{serviceid}\n"); 
                     if ($a->{itservid} eq $b->{serviceid} ||
                         (!defined($a->{itservid}) &&
                          lc($a->{name}) eq lc($b->{name}))){
                        $eq=0;
-                   #    $eq=1 if ($a->{comments} eq $b->{description});
+                       $eq=1 if ($a->{comments} eq $b->{usage} &&
+                                 lc($a->{name}) eq lc($b->{name}) &&
+                                 $a->{itservid} eq $b->{serviceid});
                     }
+                    # $eq undef = Record needs to be inserted
+                    # $eq   0   = Record needs to be updated
+                    # $eq   1   = Record is perfect equal and no update needed
                     return($eq);
                  },
                 sub{  # oprec generator
