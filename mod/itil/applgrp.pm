@@ -99,6 +99,15 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'applgrp.databoss'),
 
+      new kernel::Field::Group(
+                name          =>'responseorg',
+                label         =>'responsible Organisation',
+                vjoinon       =>'responseorgid'),
+
+      new kernel::Field::Link(
+                name          =>'responseorgid',
+                dataobjattr   =>"applgrp.responseorg"),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -333,7 +342,7 @@ sub Validate
    if (exists($newrec->{applgrpid}) && $applgrpid eq ""){
       $newrec->{applgrpid}=undef;
    }
-   $name=~s/[^a-z0-9:]/_/gi;
+   $name=~s/[^a-z0-9:-]/_/gi;
    if (exists($newrec->{name})){
       $newrec->{name}=$name;
    }

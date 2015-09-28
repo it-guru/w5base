@@ -5,3 +5,4 @@
 'Applicationgroup ID'=>{de=>'Anwendungsgruppen ID'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 "invalid applicationgroupname '%s'"=>{de=>"ungültiger Anwendungsgruppenname '%s'"},
+'responsible Organisation'=>{de=>"verantwortlicher Organisationsbereich"},

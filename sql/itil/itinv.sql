@@ -1424,3 +1424,4 @@ alter table businessservice add occreactiontime bigint(20), add occtotaltime big
 alter table businessservice add occreactiontimelevel int(20), add occtotaltimelevel int(20);
 alter table appl add usetime text default NULL, add tempexeptusetime text default NULL;
 alter table swinstance add ssl_cert_exp_notify1 datetime default NULL;
+alter table applgrp add responseorg bigint(20) default NULL;

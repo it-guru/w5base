@@ -59,20 +59,23 @@ sub Process             # will be run as a spereate Process (PID)
    }
    my $agrp=getModuleObject($self->Config,"itil::applgrp");
    my $m=getModuleObject($self->Config,"base::mandator");
+   my $grp=getModuleObject($self->Config,"base::grp");
    my $i=getModuleObject($self->Config,"tscape::archappl");
    my $la=getModuleObject($self->Config,"itil::lnkapplgrpappl");
 
    my $iname=$i->Self();
    $i->SetFilter({archapplid=>[keys(%icto)]});
+   my $c=0;;
    foreach my $irec ($i->getHashList(qw(archapplid fullname description
-                                        shortname status))){
+                                        shortname status organisation))){
+      $c++;
       my $mandator="TelekomIT";
       $m->ResetFilter();
       $m->SetFilter({name=>\$mandator,cistatusid=>\'4'});
       my ($mandatorid)=$m->getVal("grpid");
       my $shortname=$irec->{shortname};
       $shortname="NONAME ".$irec->{archapplid} if ($shortname eq "");
-      $shortname=~s/\s/_/g;
+      $shortname=~s/[^a-z0-9:-]/_/gi;
 
       $agrp->ResetFilter();
       $agrp->SetFilter({name=>$shortname,applgrpid=>"!".$irec->{archapplid}});
@@ -89,6 +92,16 @@ sub Process             # will be run as a spereate Process (PID)
          $cistatusid="6";
       }
 
+      my $responseorgid=undef;
+
+      my $debug;
+      my %lrec=(fullname=>$irec->{organisation});
+      if ($irec->{organisation} ne ""){
+         my $grpid=$grp->getIdByHashIOMapped("tscape::archappl",\%lrec,
+                                                 DEBUG=>\$debug);
+         $responseorgid=$grpid;
+      }
+
       my @idl=$agrp->ValidatedInsertOrUpdateRecord({
             cistatusid=>$cistatusid,
             name=>$shortname,
@@ -96,6 +109,7 @@ sub Process             # will be run as a spereate Process (PID)
             applgrpid=>$irec->{archapplid},
             comments=>$irec->{description},
             mandatorid=>$mandatorid,
+            responseorgid=>$responseorgid,
             srcid=>$irec->{archapplid},
             srcsys=>$iname,
             srcload=>$start
