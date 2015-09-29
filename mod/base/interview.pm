@@ -783,7 +783,9 @@ sub getHtmlEditElements
       $opmode="onchange=submitChange(this)";
    }
    
-   $HTMLrelevant="<select name=relevant $opmode >";
+   $HTMLrelevant="<table><tr height=20 border=0 cellspacing=0 cellpadding=0>".
+                 "<td valign=middle>".
+                 "<select name=relevant $opmode >";
    if (!defined($answer) && !$write){
       $HTMLrelevant.="<option value=\"\">?</option>";
    }
@@ -798,7 +800,7 @@ sub getHtmlEditElements
       $HTMLrelevant.="<option value=\"0\">".
                   $self->T("no")."</option>";
    }
-   $HTMLrelevant.="</select>";
+   $HTMLrelevant.="</select></td></tr></table>";
    $HTMLcomments="<table cellspacing=0 cellpadding=0>".
                  "<tr><td></td><td nowrap class=InterviewSubMenu>".
                  "Frage an Fragen-Ansprechpartner</td>".
@@ -809,13 +811,15 @@ sub getHtmlEditElements
    my $txt="";
    $txt=quoteHtml($answer->{comments}) if (defined($answer));
    $HTMLcomments.="<textarea name=comments $opmode ".
-                  "rows=5 style=\"width:100%\">".$txt."</textarea>";
+                  "rows=5 style=\"width:100%;resize:vertical\">".
+                  $txt."</textarea>";
    $HTMLanswer=" - ? - ";
-   my $HTMLVerifyButton=
-                "<div class=qverify>".
-                "<img border=0 ".
-                "src=\"../../../public/base/load/confirm_space.gif\">".
-                "</div>";
+   #my $HTMLVerifyButton=
+   #             "<div class=qverify>".
+   #             "<img border=0 ".
+   #             "src=\"../../../public/base/load/confirm_space.gif\">".
+   #             "</div>";
+   my $HTMLVerifyButton="";
    if ($write){
       if (defined($answer)){
          $irec->{needverify}=1;
@@ -872,7 +876,8 @@ sub getHtmlEditElements
       }
 
       $sel.="</select>";
-      my $p="<table class=Panswer><tr><td align=center>$sel</td>".
+      my $p="<table class=Panswer><tr height=20>".
+            "<td valign=middle align=center>$sel</td>".
             "</tr></table>";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
@@ -912,7 +917,7 @@ sub getHtmlEditElements
       }
       $sel.="</select>";
       $p="<table cellspacing=0 cellpadding=0 ".
-         "class=Panswer border=0><tr><td>$sel</td>$p".
+         "class=Panswer border=0><tr height=20><td valign=middle>$sel</td>$p".
           "</tr></table>";
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }

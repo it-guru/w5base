@@ -50,6 +50,8 @@ td.InterviewSubMenu{
 }
 div.InterviewQuest{
    margin-left:20px;
+   margin-right:5px;
+   border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:gray;
 }
 table.InterviewQuest{
    border-spacing:0; border-collapse:collapse;
@@ -112,12 +114,12 @@ td.Panswer {
    padding:0px;
 }
 div.Pseg1{
-   width:100%;height:20px;
+   width:100%;height:18px;
    background:green;
    cursor:crosshair;
 }
 div.Pseg0{
-   width:100%;height:20px;
+   width:100%;height:18px;
    background:red;
    cursor:crosshair;
 }

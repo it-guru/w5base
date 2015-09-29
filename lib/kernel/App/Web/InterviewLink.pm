@@ -68,6 +68,7 @@ sub InterviewSubForm
    my $lastquestclust;
    my @q;
    my $HTMLjs;
+   my $commenttxt=$self->T("add comments to your answer","base::interanswer");
    foreach my $qrec (@{$state->{TotalActiveQuestions}}){
       my $d;
       if ($imode eq "open"){
@@ -98,8 +99,10 @@ sub InterviewSubForm
                    "<td class=InterviewQuestHead width=180 ".
                    "align=center valign=top>".
                    $self->T("answer","base::interanswer").
-                   "</td><td width=1%><img border=0 ".
-                   "src=\"../../../public/base/load/confirm_space.gif\"></td>".
+                   "</td><td width=1%>".
+                   "<img border=0 ".
+                   "src=\"../../../public/base/load/confirm_space.gif\">".
+                   "</td>".
                    "<td width=1%><img border=0 width=8 height=12 ".
                    "src=\"../../../public/base/load/empty.gif\"></td>".
                    "</tr></table></div>";
@@ -117,11 +120,18 @@ sub InterviewSubForm
                 "id=answer$qrec->{id}>$qrec->{HTMLanswer}</div></td>".
                 "<td width=1% align=center valign=top>".
                 "<div id=verify$qrec->{id}>$qrec->{HTMLverify}</div>".
+                "<div class=qhelp onclick=switchExt($qrec->{id})>".
+                "<img border=0 ".
+                "title=\"$commenttxt\" ".
+                "src=\"../../../public/base/load/comment.gif\">".
+                "</div>".
                 "</td>".
                 "<td width=1% align=center valign=top>".
-                "<div class=qhelp onclick=qhelp($qrec->{id})><img border=0 ".
+                "<div class=qhelp onclick=qhelp($qrec->{id})>".
+                "<img border=0 ".
                 "src=\"../../../public/base/load/questionmark.gif\">".
-                "</div></td>".
+                "</div>".
+                "</td>".
                 "</tr>".
                 "<tr><td colspan=5>".
                 "<div id=EXT$qrec->{id} ".
