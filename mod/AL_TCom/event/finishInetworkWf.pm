@@ -64,28 +64,31 @@ sub finishinwf
    $wf->SetCurrentView(qw(id closedate class));
 
    my $c=0;
+   my $note="based on request ".
+            "https://darwin.telekom.de/darwin/auth/base/workflow/ById/".
+            "14435329980001";
 
    my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
    if (defined($rec)) {
       do {
          msg(INFO,"process $rec->{id} class=$rec->{class}");
-            if ($wfop->Action->StoreRecord($rec->{id},"wfautofinish",
-                {translation=>'base::workflowaction'},"",undef)) {
-               my $closedate=$rec->{closedate};
-               $closedate=NowStamp("en") if ($closedate eq "");
+         if ($wfop->Action->StoreRecord($rec->{id},"wfautofinish",
+             {translation=>'base::workflowaction'},$note,undef)) {
+            my $closedate=$rec->{closedate};
+            $closedate=NowStamp("en") if ($closedate eq "");
 
-               $wfop->UpdateRecord({stateid=>25,
-                                    closedate=>$closedate,
-                                    fwdtarget=>undef,
-                                    fwdtargetid=>undef,
-                                    step=>'base::workflow::request::finish'},
-                                   {id=>\$rec->{id}});
-               $c++;
-               $wfop->StoreUpdateDelta({id=>$rec->{id},
-                                        stateid=>$rec->{stateid}},
-                                       {id=>$rec->{id},
-                                        stateid=>25});
-            }
+            $wfop->UpdateRecord({stateid=>25,
+                                 closedate=>$closedate,
+                                 fwdtarget=>undef,
+                                 fwdtargetid=>undef,
+                                 step=>'base::workflow::request::finish'},
+                                {id=>\$rec->{id}});
+            $c++;
+            $wfop->StoreUpdateDelta({id=>$rec->{id},
+                                     stateid=>$rec->{stateid}},
+                                    {id=>$rec->{id},
+                                     stateid=>25});
+         }
          ($rec,$msg)=$wf->getNext();
        } until(!defined($rec));
    }
