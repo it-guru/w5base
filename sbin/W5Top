@@ -10,7 +10,6 @@ use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
 use vars qw($opt_v $opt_h $opt_autokill $opt_c $configname);
-$0="W5Event ".join(" ",@ARGV);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
                         'autokill'=>\$opt_autokill,
@@ -76,8 +75,17 @@ $W5V2::Query=new kernel::cgi({});
 
 
 
-my $pid=`ps -eo pid,comm | egrep "(apache|httpd)" | awk '{print \$1}'`;
-my @apid=split(/[\s\n]/,$pid);
+my $pid=`ps -eo pid,user,command | egrep "(apache|httpd|www-data|wwwrun)"`;
+
+my @apid;
+foreach my $l (split(/[\r\n]/,$pid)){
+   #printf STDERR ("fifi check $l\n");
+   if (my ($p,$cmd)=$l=~m/^\s*(\d+)\s+(apache|httpd|www)\S*\s*\S*(apache|httpd|www-data|wwwrun|w5)\S*/){
+      push(@apid,$p);
+   }
+}
+
+
 
 my %stat;
 my %userpcount;
@@ -112,7 +120,6 @@ foreach my $apid (@apid){
    $stat{$apid}->{cpu}=$cpu;
    $stat{$apid}->{sysuser}=$user;
    my $statefile="$statedir/$apid.pid";
-   #printf STDERR ("fifi check $statefile\n");
    my $t0=time();
    if (open(F,"<$statefile")){
       $stat{$apid}->{state}=1;
@@ -137,6 +144,7 @@ foreach my $apid (@apid){
       close(F);
    }
 }
+#print STDERR Dumper(\%stat);
 
 
 foreach my $apid (@apid){
@@ -270,6 +278,7 @@ foreach my $apid (@apid){
 }
 
 my @order=keys(%stat);
+#print Dumper(\%stat);
 
 @order=sort({my $bk=$stat{$b}->{duration} <=> $stat{$a}->{duration};
              if ($stat{$b}->{duration}==$stat{$a}->{duration}){
