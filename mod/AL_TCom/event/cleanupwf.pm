@@ -78,7 +78,7 @@ sub cleanupwf
                                fwddebtarget=>undef,
                                fwddebtargetid=>undef,
                                fwdtarget=>undef,
-                               fwdtarget=>undef});
+                               fwdtargetid=>undef});
          }
          ($rec,$msg)=$wf->getNext();
       } until(!defined($rec));
