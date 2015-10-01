@@ -76,6 +76,7 @@ sub RunWebApp
          }
       }
       else{
+         sysmsg(ERROR,"error while opening statefile $havestate");
          $havestate=undef;
       }
    }

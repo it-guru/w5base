@@ -159,27 +159,31 @@ foreach my $apid (@apid){
 
          my ($urec,$msg)=$user->getOnlyFirst(qw(email killtimeout
                                                 userid lastlang));
+         my $killtimeout=600;
          if (defined($urec)){
             if ($urec->{lastlang} ne ""){
                $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
             }
+            $killtimeout=$urec->{killtimeout};
          }
-         my $killtimeout=$urec->{killtimeout};
          if ($killtimeout<600){
             $killtimeout=1000;
          }
          my $forcekill=0;
-         if ($userpcount{$stat{$apid}->{user}}>1){
-            $forcekill=1;
-            $killtimeout=300;  # multi query timeout level 1
-         }
-         if ($userpcount{$stat{$apid}->{user}}>2){
-            $forcekill=1;
-            $killtimeout=180;  # multi query timeout  level 2
-         }
-         if ($userpcount{$stat{$apid}->{user}}>3){
-            $forcekill=1;
-            $killtimeout=30;  # multi query timeout  level 3
+         if ($stat{$apid}->{user} ne "" &&
+             $stat{$apid}->{user} ne "anonymous"){
+            if ($userpcount{$stat{$apid}->{user}}>1){
+               $forcekill=1;
+               $killtimeout=300;  # multi query timeout level 1
+            }
+            if ($userpcount{$stat{$apid}->{user}}>2){
+               $forcekill=1;
+               $killtimeout=180;  # multi query timeout  level 2
+            }
+            if ($userpcount{$stat{$apid}->{user}}>3){
+               $forcekill=1;
+               $killtimeout=30;  # multi query timeout  level 3
+            }
          }
          if ($stat{$apid}->{duration}>10800 || 
              $stat{$apid}->{duration}>$killtimeout){
