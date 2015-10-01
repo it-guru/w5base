@@ -157,6 +157,23 @@ sub new
                 label         =>'Application ID',
                 dataobjattr   =>'appl.applid'),
 
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'Systems',
+                group         =>'systems',
+                forwardSearch =>1,
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.appl',
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{systemcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['system','systemsystemid',
+                                 'reltyp','systemcistatus',
+                                 'shortdesc'],
+                vjoininhash   =>['system','systemsystemid','systemcistatus',
+                                 'systemid','id','reltyp','shortdesc',
+                                 'assetassetname']),
+
       new kernel::Field::Group(
                 name          =>'itsemteam',
                 htmldetail    =>sub{
@@ -876,23 +893,6 @@ sub new
                 searchable    =>0,
                 depend        =>['interfaces'],
                 onRawValue    =>\&calculateInterfacesCount),
-
-      new kernel::Field::SubList(
-                name          =>'systems',
-                label         =>'Systems',
-                group         =>'systems',
-                forwardSearch =>1,
-                allowcleanup  =>1,
-                subeditmsk    =>'subedit.appl',
-                vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{systemcistatusid=>"<=5"}],
-                vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>['system','systemsystemid',
-                                 'reltyp','systemcistatus',
-                                 'shortdesc'],
-                vjoininhash   =>['system','systemsystemid','systemcistatus',
-                                 'systemid','id','reltyp','shortdesc',
-                                 'assetassetname']),
 
       new kernel::Field::SubList(
                 name          =>'systemnames',

@@ -121,14 +121,6 @@ sub new
                 vjoindisp     =>'fullname'),
 
       new kernel::Field::Text(
-                name          =>'ictono',
-                htmldetail    =>0,
-                uploadable    =>0,
-                group         =>'architect',
-                label         =>'ICTO-ID',
-                dataobjattr   =>'appl.ictono'),
-
-      new kernel::Field::Text(
                 name          =>'ictoid',
                 htmldetail    =>0,
                 uploadable    =>0,
@@ -223,6 +215,17 @@ sub new
                 vjoindisp     =>'productionplanningoss')
    );
 
+
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'ictono',
+                htmldetail    =>0,
+                uploadable    =>0,
+                group         =>'architect',
+                label         =>'ICTO-ID',
+                dataobjattr   =>'appl.ictono'),
+     insertafter=>'systems'
+   );
 
 
 
