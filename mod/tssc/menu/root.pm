@@ -35,87 +35,87 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("sc",
+   $self->RegisterObj("itu.sc",
                       "tmpl/welcome",
                       defaultacl=>['admin',"support"]);
    
-   $self->RegisterObj("sc.change",
+   $self->RegisterObj("itu.sc.change",
                       "tssc::chm",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sc.change.task",
+   $self->RegisterObj("itu.sc.change.task",
                       "tssc::chmtask",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sc.change.task.pso",
+   $self->RegisterObj("itu.sc.change.task.pso",
                       "tssc::chm_pso",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sc.change.relations",
+   $self->RegisterObj("itu.sc.change.relations",
                       "tssc::lnk",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sc.change.software",
+   $self->RegisterObj("itu.sc.change.software",
                       "tssc::chm_software",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sc.change.device",
+   $self->RegisterObj("itu.sc.change.device",
                       "tssc::chm_device",
                       defaultacl=>['admin',"support"]);
    
-   $self->RegisterObj("sc.change.timing",
+   $self->RegisterObj("itu.sc.change.timing",
                       "tssc::chm_timingcheck",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("sc.incident",
+   $self->RegisterObj("itu.sc.incident",
                       "tssc::inm",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sc.incident.relations",
+   $self->RegisterObj("itu.sc.incident.relations",
                       "tssc::lnk",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sc.incident.assignment",
+   $self->RegisterObj("itu.sc.incident.assignment",
                       "tssc::inm_assignment",
                       defaultacl=>['admin',"support"]);
    
-   $self->RegisterObj("sc.problem",
+   $self->RegisterObj("itu.sc.problem",
                       "tssc::prm",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("sc.problem.relations",
+   $self->RegisterObj("itu.sc.problem.relations",
                       "tssc::lnk",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("sc.krn",
+   $self->RegisterObj("itu.sc.krn",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("sc.krn.mandator",
+   $self->RegisterObj("itu.sc.krn.mandator",
                       "tssc::mandator",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("sc.krn.group.lnkuser",
+   $self->RegisterObj("itu.sc.krn.group.lnkuser",
                       "tssc::lnkusergroup",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("sc.krn.group",
+   $self->RegisterObj("itu.sc.krn.group",
                       "tssc::group",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("sc.krn.location",
+   $self->RegisterObj("itu.sc.krn.location",
                       "tssc::location",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("sc.krn.user",
+   $self->RegisterObj("itu.sc.krn.user",
                       "tssc::user",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("sc.krn.user.lnkgroup",
+   $self->RegisterObj("itu.sc.krn.user.lnkgroup",
                       "tssc::lnkusergroup",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("sc.krn.dictonary",
+   $self->RegisterObj("itu.sc.krn.dictonary",
                       "tssc::DBDataDiconary",
                       defaultacl=>['admin']);
 

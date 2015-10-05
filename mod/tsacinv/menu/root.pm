@@ -35,136 +35,136 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("ac",
+   $self->RegisterObj("itu.ac",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.appl",
+   $self->RegisterObj("itu.ac.appl",
                       "tsacinv::appl",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.appl.lnkapplappl",
+   $self->RegisterObj("itu.ac.appl.lnkapplappl",
                       "tsacinv::lnkapplappl",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.appl.lnkapplsystem",
+   $self->RegisterObj("itu.ac.appl.lnkapplsystem",
                       "tsacinv::lnkapplsystem",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.system",
+   $self->RegisterObj("itu.ac.system",
                       "tsacinv::system",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.system.ipaddress",
+   $self->RegisterObj("itu.ac.system.ipaddress",
                       "tsacinv::ipaddress",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("ac.system.swinstall",
+   $self->RegisterObj("itu.ac.system.swinstall",
                       "tsacinv::lnksystemsoftware",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.itclust",
+   $self->RegisterObj("itu.ac.itclust",
                       "tsacinv::itclust",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.shstorage",
+   $self->RegisterObj("itu.ac.shstorage",
                       "tsacinv::sharedstorage",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.asset",
+   $self->RegisterObj("itu.ac.asset",
                       "tsacinv::asset",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.asset.fixedasset",
+   $self->RegisterObj("itu.ac.asset.fixedasset",
                       "tsacinv::fixedasset",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.asset.contract",
+   $self->RegisterObj("itu.ac.asset.contract",
                       "tsacinv::contract",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.license",
+   $self->RegisterObj("itu.ac.license",
                       "tsacinv::license",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.user",
+   $self->RegisterObj("itu.ac.user",
                       "tsacinv::user",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.user.groups",
+   $self->RegisterObj("itu.ac.user.groups",
                       "tsacinv::lnkusergroup",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.group",
+   $self->RegisterObj("itu.ac.group",
                       "tsacinv::group",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.swinstance",
+   $self->RegisterObj("itu.ac.swinstance",
                       "tsacinv::swinstance",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.krn",
+   $self->RegisterObj("itu.ac.krn",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.krn.model",
+   $self->RegisterObj("itu.ac.krn.model",
                       "tsacinv::model",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.krn.osrelease",
+   $self->RegisterObj("itu.ac.krn.osrelease",
                       "tsacinv::osrelease",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("ac.krn.osrelease.lnkw5b",
+   $self->RegisterObj("itu.ac.krn.osrelease.lnkw5b",
                       "tsacinv::lnkw5bosrelease",
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.krn.service",
+   $self->RegisterObj("itu.ac.krn.service",
                       "tsacinv::service",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.krn.location",
+   $self->RegisterObj("itu.ac.krn.location",
                       "tsacinv::location",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.krn.sclocation",
+   $self->RegisterObj("itu.ac.krn.sclocation",
                       "tsacinv::sclocation",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("ac.krn.sclocation.invalid",
+   $self->RegisterObj("itu.ac.krn.sclocation.invalid",
                       "tsacinv::invalid_sclocation",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("ac.krn.sclocation.ismitem",
+   $self->RegisterObj("itu.ac.krn.sclocation.ismitem",
                       "tsacinv::invalid_smitem",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("ac.krn.costcenter",
+   $self->RegisterObj("itu.ac.krn.costcenter",
                       "tsacinv::costcenter",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.krn.costcenter.dlvpartner",
+   $self->RegisterObj("itu.ac.krn.costcenter.dlvpartner",
                       "tsacinv::dlvpartner",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.krn.customer",
+   $self->RegisterObj("itu.ac.krn.customer",
                       "tsacinv::customer",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.krn.accountno",
+   $self->RegisterObj("itu.ac.krn.accountno",
                       "tsacinv::accountno",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("ac.krn.dictonary",
+   $self->RegisterObj("itu.ac.krn.dictonary",
                       "tsacinv::DBDataDiconary",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("ac.quality",
+   $self->RegisterObj("itu.ac.quality",
                       "tsacinv::quality_appl",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.quality.appl",
+   $self->RegisterObj("itu.ac.quality.appl",
                       "tsacinv::quality_appl",
                       defaultacl=>['valid_user']);
    
@@ -204,19 +204,19 @@ sub Init
                       prio=>20000,
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.ad",
+   $self->RegisterObj("itu.ac.ad",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("ac.ad.system",
+   $self->RegisterObj("itu.ac.ad.system",
                       "tsacinv::autodiscsystem",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.ad.system.ipaddress",
+   $self->RegisterObj("itu.ac.ad.system.ipaddress",
                       "tsacinv::autodiscipaddress",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("ac.ad.system.softwareinst",
+   $self->RegisterObj("itu.ac.ad.system.softwareinst",
                       "tsacinv::autodiscsoftware",
                       defaultacl=>['valid_user']);
    
