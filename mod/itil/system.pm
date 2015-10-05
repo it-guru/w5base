@@ -992,7 +992,7 @@ sub new
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjointo       =>'itil::ipaddress',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['webaddresstyp','name','cistatus',
+                vjoindisp     =>['webaddresstyp','fullname','cistatus',
                                  'dnsname','shortcomments'],
                 vjoininhash   =>['id','name','addresstyp',
                                  'cistatusid','networkid',

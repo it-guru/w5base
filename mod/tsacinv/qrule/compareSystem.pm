@@ -342,6 +342,28 @@ sub qcheckRecord
             $net->SetCurrentView(qw(id name));
             my $netarea=$net->getHashIndexed("name");
             my @opList;
+
+            #
+            # %cleanAmIPlist is neassasary, because multiple IP-Addresses
+            # can be in one networkcard record
+            #
+            my %cleanAmIPlist;
+            foreach my $amiprec (@{$parrec->{ipaddresses}}){
+               if ($amiprec->{ipv4address} ne ""){
+                  $cleanAmIPlist{$amiprec->{ipv4address}}={
+                     ipaddress=>$amiprec->{ipv4address},
+                     description=>$amiprec->{description}
+                  };
+               }
+               if ($amiprec->{ipv6address} ne ""){
+                  $cleanAmIPlist{$amiprec->{ipv6address}}={
+                     ipaddress=>$amiprec->{ipv6address},
+                     description=>$amiprec->{description}
+                  };
+               }
+            }
+            my @cleanAmIPlist=values(%cleanAmIPlist);
+
             my $res=OpAnalyse(
                        sub{  # comperator 
                           my ($a,$b)=@_;
@@ -396,7 +418,7 @@ sub qcheckRecord
                           }
                           return(undef);
                        },
-                       $rec->{ipaddresses},$parrec->{ipaddresses},\@opList,
+                       $rec->{ipaddresses},\@cleanAmIPlist,\@opList,
                        refid=>$rec->{id},netarea=>$netarea);
             if (!$res){
                my $opres=ProcessOpList($self->getParent,\@opList);

@@ -46,6 +46,28 @@ sub new
                 dataobjattr   =>'ipaddress.id'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                depend        =>['name'],
+                uivisible     =>0,
+                label         =>'IP-Address',
+                searchable    =>0,
+                onRawValue    =>sub{   # compress IPV6 Adresses
+                   my $self=shift;
+                   my $current=shift;
+                   my $d=$current->{name};
+                      $d=~s/0000:/0:/g;
+                      $d=~s/:0000/:0/g;
+                      $d=~s/(:)0+?([a-f1-9])/$1$2/gi;
+                      $d=~s/^0+?([a-f1-9])/$1$2/gi;
+                      $d=~s/:0:/::/gi;
+                      $d=~s/:0:/::/gi;
+                      $d=~s/:::::/:0:0:0:0:/gi;
+                      $d=~s/::::/:0:0:0:/gi;
+                      $d=~s/:::/:0:0:/gi;
+                   return($d);
+                }),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'IP-Address',
                 dataobjattr   =>'ipaddress.name'),

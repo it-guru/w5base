@@ -37,14 +37,51 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'IP-AddressID',
+                label         =>'NetworkCardID',
                 align         =>'left',
                 dataobjattr   =>'amnetworkcard.lnetworkcardid'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'IP-Address',
+                uivisible     =>0,
+                depend        =>['ipaddress'],
+                onRawValue    =>sub{   # compress IPV6 Adresses
+                   my $self=shift;
+                   my $current=shift;
+                   my $d=$current->{ipaddress};
+                      $d=~s/0000:/0:/g;
+                      $d=~s/:0000/:0/g;
+                      $d=~s/(:)0+?([a-f1-9])/$1$2/gi;
+                      $d=~s/^0+?([a-f1-9])/$1$2/gi;
+                      $d=~s/:0:/::/gi;
+                      $d=~s/:0:/::/gi;
+                      $d=~s/:::::/:0:0:0:0:/gi;
+                      $d=~s/::::/:0:0:0:/gi;
+                      $d=~s/:::/:0:0:/gi;
+                   return($d);
+                }),
+
+      new kernel::Field::Text(
                 name          =>'ipaddress',
                 label         =>'IP-Address',
+                searchable    =>0,
+                dataobjattr   =>"amnetworkcard.tcpipaddress|| ".
+                                "decode(amnetworkcard.tcpipaddress,NULL,'',".
+                                "decode(amnetworkcard.ipv6address,NULL,'',".
+                                "', ')) ||amnetworkcard.ipv6address"),
+
+      new kernel::Field::Text(
+                name          =>'ipv4address',
+                label         =>'IP-V4-Address',
+                htmldetail    =>'NotEmpty',
                 dataobjattr   =>'amnetworkcard.tcpipaddress'),
+
+      new kernel::Field::Text(
+                name          =>'ipv6address',
+                label         =>'IP-V6-Address',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'amnetworkcard.ipv6address'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
