@@ -484,11 +484,13 @@ sub new
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
                 label         =>'IP-Adresses',
+                searchable    =>0,
                 group         =>'ipaddresses',
                 vjointo       =>'tsacinv::ipaddress',
                 vjoinon       =>['systemid'=>'systemid'],
-                vjoindisp     =>[qw(ipaddress description)],
-                vjoininhash   =>[qw(ipaddress description dnsname)]),
+                vjoindisp     =>[qw(fullname description)],
+                vjoininhash   =>[qw(ipaddress ipv4address ipv6address 
+                                    description dnsname)]),
 
       new kernel::Field::SubList(
                 name          =>'applications',
