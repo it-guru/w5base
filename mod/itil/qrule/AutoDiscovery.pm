@@ -122,7 +122,7 @@ sub qcheckRecord
       #
       # load entry records based on engineids
       #
-      printf STDERR ("fifi AutoDisc 01.1 %s\n",Dumper(\@AdPreData));
+      #printf STDERR ("fifi AutoDisc 01.1 %s\n",Dumper(\@AdPreData));
 
       my %adentry=();
       {

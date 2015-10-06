@@ -92,7 +92,7 @@ sub new
    );
    $self->{use_distinct}=0;
 
-   $self->setDefaultView(qw(name systemid model scandate));
+   $self->setDefaultView(qw(software producer version path systemname scandate));
    return($self);
 }
 

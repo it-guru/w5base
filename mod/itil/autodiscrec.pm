@@ -781,59 +781,81 @@ sub AutoDiscProcessor
    }
 
 
-   my $userid=$self->getCurrentUserId();
-   if (!defined($adrec)){
-         $exitcode=10;
-         $exitmsg=msg(ERROR,"invalid or empty adid reference '$adid'");
-   }
-   else{
-      if ($mode eq "bad"){
-         if (!$self->ValidatedUpdateRecord($adrec,
-                                         {
-                                          state=>100,
-                                          lnkto_lnksoftware=>undef,
-                                          lnkto_system=>undef,
-                                          lnkto_asset=>undef,
-                                          approve_date=>NowStamp("en"),
-                                          approve_user=>$userid
-                                          },
-                                         {id=>\$adrec->{id}})){
-            $exitcode=98;
-            $exitmsg="ERROR: fail to link autodiscrecord";
-         }
-      }
-      elsif ($mode eq "reset"){
-         if (!$self->ValidatedUpdateRecord($adrec,
-                                         {
-                                          state=>'1',
-                                          lnkto_lnksoftware=>undef,
-                                          lnkto_system=>undef,
-                                          lnkto_asset=>undef,
-                                          approve_date=>NowStamp("en"),
-                                          approve_user=>$userid
-                                          },
-                                         {id=>\$adrec->{id}})){
-            $exitcode=98;
-            $exitmsg="ERROR: fail to link autodiscrecord";
-         }
-      }
-      elsif ($mode eq "auto" || $mode eq "once"){
-         my $state;
-         $state=10 if ($mode eq "once");
-         $state=20 if ($mode eq "auto");
+   $exitcode=100;
+   $exitmsg=msg(ERROR,"no access to '$adid'");
 
-         my $ado=getModuleObject($self->Config,"itil::autodiscrec");
-         ($exitcode,$exitmsg)=$ado->doTakeAutoDiscData($adrec,{
-            state=>$state,
-         },{
-            itclustsvcid=>scalar(Query->Param("itclustsvcid")),
-            softwareid=>scalar(Query->Param("softwareid")),
-            lnkto_lnksoftware=>scalar(Query->Param("SoftwareMapSelector"))
-         });
+   #
+   # Security Check
+   #
+   #print STDERR Dumper($adrec);
+
+   if (defined($adrec) && $adrec->{disc_on_systemid} ne ""){
+      my $sys=getModuleObject($self->Config,"itil::system"); 
+      $sys->SetFilter({id=>\$adrec->{disc_on_systemid}});
+      my ($sysrec)=$sys->getOnlyFirst(qw(ALL));
+      if (defined($sysrec) && $sys->isAutoDiscManagementAllowed($sysrec)){
+         $exitcode=0;
+         $exitmsg=undef;
+      }
+   }
+
+
+   if (!$exitcode){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($adrec)){
+            $exitcode=10;
+            $exitmsg=msg(ERROR,"invalid or empty adid reference '$adid'");
       }
       else{
-         $exitcode=1;
-         $exitmsg=msg(ERROR,"unknown ajax function call to AutoDiscProcessor");
+         if ($mode eq "bad"){
+            if (!$self->ValidatedUpdateRecord($adrec,
+                                            {
+                                             state=>100,
+                                             lnkto_lnksoftware=>undef,
+                                             lnkto_system=>undef,
+                                             lnkto_asset=>undef,
+                                             approve_date=>NowStamp("en"),
+                                             approve_user=>$userid
+                                             },
+                                            {id=>\$adrec->{id}})){
+               $exitcode=98;
+               $exitmsg="ERROR: fail to link autodiscrecord";
+            }
+         }
+         elsif ($mode eq "reset"){
+            if (!$self->ValidatedUpdateRecord($adrec,
+                                            {
+                                             state=>'1',
+                                             lnkto_lnksoftware=>undef,
+                                             lnkto_system=>undef,
+                                             lnkto_asset=>undef,
+                                             approve_date=>NowStamp("en"),
+                                             approve_user=>$userid
+                                             },
+                                            {id=>\$adrec->{id}})){
+               $exitcode=98;
+               $exitmsg="ERROR: fail to link autodiscrecord";
+            }
+         }
+         elsif ($mode eq "auto" || $mode eq "once"){
+            my $state;
+            $state=10 if ($mode eq "once");
+            $state=20 if ($mode eq "auto");
+
+            my $ado=getModuleObject($self->Config,"itil::autodiscrec");
+            ($exitcode,$exitmsg)=$ado->doTakeAutoDiscData($adrec,{
+               state=>$state,
+            },{
+               itclustsvcid=>scalar(Query->Param("itclustsvcid")),
+               softwareid=>scalar(Query->Param("softwareid")),
+               lnkto_lnksoftware=>scalar(Query->Param("SoftwareMapSelector"))
+            });
+         }
+         else{
+            $exitcode=1;
+            $exitmsg=msg(ERROR,
+                         "unknown ajax function call to AutoDiscProcessor");
+         }
       }
    }
 

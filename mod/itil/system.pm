@@ -1645,17 +1645,30 @@ sub getHtmlDetailPages
           $rec->{perf3url} ne ""){
          push(@l,"PerfDat"=>$self->T("Performance"));
       }
-
-      my $id=Query->Param("id");
-      if ($id ne ""){
-         my $ad=getModuleObject($self->Config,'itil::autodiscrec');
-         $ad->SetFilter({disc_on_systemid=>\$id});
-         if ($ad->CountRecords()>0){
-            push(@l,"HtmlAutoDiscManager"=>$self->T("Autodiscovery"));
+      if ($self->isAutoDiscManagementAllowed($rec)){
+         my $id=Query->Param("id");
+         if ($id ne ""){
+            my $ad=getModuleObject($self->Config,'itil::autodiscrec');
+            $ad->SetFilter({disc_on_systemid=>\$id});
+            if ($ad->CountRecords()>0){
+               push(@l,"HtmlAutoDiscManager"=>$self->T("Autodiscovery"));
+            }
          }
       }
    }
    return(@l);
+}
+
+sub isAutoDiscManagementAllowed
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @write=$self->isWriteValid($rec);
+   if (grep(/^(ALL|default)$/,@write)){
+      return(1);
+   }
+   return(0);
 }
 
 
