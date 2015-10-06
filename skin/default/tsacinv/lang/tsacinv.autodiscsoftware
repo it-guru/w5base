@@ -2,4 +2,8 @@
    de=>'AssetManager-AutoDiscovery: Softwareinstallation',
    en=>'AssetManager-AutoDiscovery: Softwareinstallations'
 },
+'path'=>{de=>'Installationspfad'},
+'Producer'=>{de=>'Hersteller'}
+
+
 

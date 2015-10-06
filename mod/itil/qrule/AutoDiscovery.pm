@@ -73,7 +73,6 @@ sub qcheckRecord
 
    my $ade=getModuleObject($dataobj->Config,"itil::autodiscengine");
    if (defined($ade)){ # itil:: seems to be installed
-      print STDERR ("fifi 01\n");
       my @AdPreData=();
       my %engines;
       $ade->SetFilter({localdataobj=>\$dataobjname,
@@ -107,11 +106,13 @@ sub qcheckRecord
                   }
                }
                else{
-                  msg(ERROR,"$ado is not AutoDiscovery compatibel : extractAutoDiscData");
+                  msg(ERROR,"$ado is not AutoDiscovery compatibel : ".
+                            "extractAutoDiscData");
                }
             }
          }
       }
+      #print STDERR ("fifi 01 AutoDisc: %s\n",Dumper(\@AdPreData));
       #
       # create Software-Mappings and remove douplicate informations
       #
@@ -121,7 +122,7 @@ sub qcheckRecord
       #
       # load entry records based on engineids
       #
-printf STDERR ("fifi AutoDisc 01\n");
+      #printf STDERR ("fifi AutoDisc 01.1 %s\n",Dumper(\@AdPreData));
 
       my %adentry=();
       {
@@ -151,7 +152,7 @@ printf STDERR ("fifi AutoDisc 01\n");
       #
       # load old discovery entries
       #
-printf STDERR ("fifi AutoDisc 02\n");
+      #printf STDERR ("fifi AutoDisc 02\n");
 
 
       my %oldrecs;
@@ -170,12 +171,12 @@ printf STDERR ("fifi AutoDisc 02\n");
          };
       }
 
-printf STDERR ("fifi AutoDisc 03\n");
+      #printf STDERR ("fifi AutoDisc 03\n");
       #
       # process all autodiscovery entries
       #
       foreach my $adrec (grep({$_->{valid}} @AdPreData)){
-         print STDERR Dumper($adrec);
+         #print STDERR Dumper($adrec);
          my $adent=$adentry{$adrec->{engineid}};
          $self->DiscoverData($ad,$rec,$adrec,$adent,
                              $engines{$adrec->{engineid}},\%oldrecs);
@@ -185,7 +186,7 @@ printf STDERR ("fifi AutoDisc 03\n");
       #
       # cleanup old autodiscovery entries
       #
-printf STDERR ("oldrecs=%s\n",Dumper(\%oldrecs));
+      #printf STDERR ("oldrecs=%s\n",Dumper(\%oldrecs));
 
       foreach my $id (keys(%oldrecs)){
          if ($oldrecs{$id}->{misscount}>2){
@@ -285,7 +286,7 @@ sub MapAutoDiscoveryPreData
          }
       }
    }
-   printf STDERR ("paths:\n%s\n",join("\n",keys(%paths)));
+   #printf STDERR ("paths:\n%s\n",join("\n",keys(%paths)));
    foreach my $ad (values(%paths)){
       $ad->{valid}++;
    }
@@ -345,7 +346,7 @@ sub DiscoverData
          }
          $updrec{srcload}=NowStamp("en");
          if (keys(%updrec)){
-printf STDERR ("Start Update in $ad %s\n",Dumper(\%updrec));
+            # printf STDERR ("Start Update in $ad %s\n",Dumper(\%updrec));
             $ad->ValidatedUpdateRecord($r,\%updrec,{id=>$r->{id}});
          }
          delete($oldrecs->{$r->{id}});

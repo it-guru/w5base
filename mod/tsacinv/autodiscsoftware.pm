@@ -59,12 +59,17 @@ sub new
                 label         =>'Version',
                 dataobjattr   =>'amtsiautodiscsw.version'),
 
+      new kernel::Field::Text(
+                name          =>'path',
+                label         =>'path',
+                dataobjattr   =>'amtsiautodiscsw.path'),
+
       new kernel::Field::TextDrop(
                 name          =>'systemname',
                 label         =>'Systemname',
                 vjointo       =>'tsacinv::autodiscsystem',
-                vjoinon       =>['systemautodiscid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoinon       =>['systemautodiscid'=>'systemdiscoveryid'],
+                vjoindisp     =>'systemname'),
 
       new kernel::Field::Link(
                 name          =>'systemautodiscid',

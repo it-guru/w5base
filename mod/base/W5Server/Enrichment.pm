@@ -480,6 +480,7 @@ sub processEnrichment
          my $dataModified=0;
          if ($qrule->can("qenrichRecord")){
            $dataModified=$qrule->qenrichRecord($obj,$rec,$param);
+           sleep(1); # top get no stress
          }
          $W5V2::OperationContext=$oldcontext;
          if ($dataModified){ # reload rec is a ToDo

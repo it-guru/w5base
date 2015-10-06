@@ -85,7 +85,8 @@ sub new
                 dataobjattr   =>'autodiscvirt.modifydate'),
 
    );
-   $self->setDefaultView(qw(name fullname cistatus mdate));
+   $self->setDefaultView(qw(elementname section scanname scanextra1 
+                            scanextra2  mdate));
    $self->setWorktable("autodiscvirt");
    return($self);
 }

@@ -119,6 +119,7 @@ sub new
                 vjointo       =>'tsacinv::autodiscsoftware',
                 vjoinon       =>['systemdiscoveryid'=>'systemautodiscid'],
                 vjoindisp     =>['software','version','producer'],
+                vjoininhash   =>['software','path','version','producer'],
                 vjoinbase     =>{scandate=>">now-14d"}),
 
       new kernel::Field::Date(
@@ -151,6 +152,41 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+
+sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
+{
+   my $self=shift;
+   my @res=();
+
+   $self->SetCurrentView(qw(name systemid softwareinstallations));
+
+   my ($rec,$msg)=$self->getFirst();
+   if (defined($rec)){
+      do{
+#         my %e=(
+#            section=>'SYSTEMNAME',
+#            scanname=>$rec->{name}, 
+#            quality=>-50     # relativ schlecht verlässlich
+#         );
+#         push(@res,\%e);
+         foreach my $s (@{$rec->{softwareinstallations}}){
+            my %e=(
+               section=>'SOFTWARE',
+               scanname=>$s->{software},
+               scanextra1=>$s->{path},
+               scanextra2=>$s->{version},
+               quality=>3     # relativ schlecht (keine gute Version)
+            );
+            push(@res,\%e);
+         }
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+   return(@res);
+}
+
+
 
 sub initSearchQuery
 {
