@@ -106,6 +106,7 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
             section=>$rec->{section},
             scanname=>$rec->{scanname},
             quality=>$rec->{quality},
+            processable=>1
          );
          foreach my $ename (qw(scanextra1 scanextra2 scanextra3)){
             if (exists($rec->{$ename}) &&

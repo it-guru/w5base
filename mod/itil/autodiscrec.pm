@@ -67,6 +67,13 @@ sub new
                 group         =>'source',
                 label         =>'StateID',   # 1=erfasst ; 10= 1x  ; 20=auto; 100=fail
                 dataobjattr   =>'autodiscrec.state'),
+
+      new kernel::Field::Boolean(
+                name          =>'processable',
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'processable',
+                dataobjattr   =>'autodiscrec.cleartoprocess'),
                                                   
       new kernel::Field::Text(
                 name          =>'scanname',
@@ -217,7 +224,7 @@ sub new
                 dataobjattr   =>'autodiscrec.srcload'),
 
    );
-   $self->setDefaultView(qw(scanname scanextra1 scanextra2 discon ));
+   $self->setDefaultView(qw(section scanname scanextra1 scanextra2 discon ));
    $self->setWorktable("autodiscrec");
    return($self);
 }
@@ -244,6 +251,17 @@ sub getSqlFrom
                  "on autodiscent.discon_swinstance=swinstance.id";
    return($from);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_processable"))){
+     Query->Param("search_processable"=>$self->T("yes"));
+   }
+}
+
+
 
 
 
@@ -956,12 +974,15 @@ sub HtmlAutoDiscManager
    else{
      foreach my $r (@$baseflt){
         $r->{state}=\'1';
+        $r->{processable}=\'1';  # nur Einträge, die zur Behandlung vorgesehen
      }
    }
+   #print STDERR Dumper($baseflt);
+
    $self->SetFilter($baseflt);
    my @adrec=$self->getHashList(qw(ALL));
 
-   #printf STDERR ("view=$view disc_on_systemid=$id adrec=%s\n",Dumper(\@adrec));
+   #printf STDERR ("adrec=%s\n",Dumper(\@adrec));
 
    my %discnam=();
 

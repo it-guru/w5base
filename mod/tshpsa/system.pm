@@ -167,7 +167,8 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
                scanname=>$swp->{softwarename},
                scanextra1=>$swp->{path},
                scanextra2=>$swp->{version},
-               quality=>10     # relativ gut verlässlich
+               quality=>10,    # relativ gut verlässlich
+               processable=>1
             );
             push(@res,\%e);
          }

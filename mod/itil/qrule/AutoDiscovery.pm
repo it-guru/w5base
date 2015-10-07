@@ -167,7 +167,8 @@ sub qcheckRecord
             state=>$r->{state},
             misscount=>$r->{misscount},
             scanextra1=>$r->{scanextra1},
-            scanextra2=>$r->{scanextra2}
+            scanextra2=>$r->{scanextra2},
+            processable=>$r->{processable}
          };
       }
 
@@ -316,6 +317,7 @@ sub DiscoverData
    my $newrec={
       section=>$adrec->{section},
       scanname=>$adrec->{scanname},
+      processable=>$adrec->{processable},
       entryid=>$adent->{id},
       srcsys=>$engine->{name},
       srcload=>NowStamp("en")
@@ -343,6 +345,9 @@ sub DiscoverData
          }
          if ($oldrecs->{$r->{id}}->{scanextra2} ne $adrec->{scanextra2}){
             $updrec{scanextra2}=$adrec->{scanextra2};
+         }
+         if ($oldrecs->{$r->{id}}->{processable} ne $adrec->{processable}){
+            $updrec{processable}=$adrec->{processable};
          }
          $updrec{srcload}=NowStamp("en");
          if (keys(%updrec)){

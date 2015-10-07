@@ -159,7 +159,8 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
    my $self=shift;
    my @res=();
 
-   $self->SetCurrentView(qw(name systemid softwareinstallations));
+   $self->SetCurrentView(qw(name systemid softwareinstallations
+                            ipaddresses));
 
    my ($rec,$msg)=$self->getFirst();
    if (defined($rec)){
@@ -176,7 +177,18 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
                scanname=>$s->{software},
                scanextra1=>$s->{path},
                scanextra2=>$s->{version},
-               quality=>3     # relativ schlecht (keine gute Version)
+               quality=>3,    # relativ schlecht (keine gute Version)
+               processable=>1
+            );
+            push(@res,\%e);
+         }
+         foreach my $s (@{$rec->{ipaddresses}}){
+            my %e=(
+               section=>'IPADDR',
+               scanname=>$s->{address},
+               scanextra2=>$s->{physicaladdress},
+               quality=>10,    # relativ verlässlich
+               processable=>0  # nicht verwendbar - da AM Master!
             );
             push(@res,\%e);
          }

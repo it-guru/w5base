@@ -67,7 +67,7 @@ create table autodiscrec (
   lnkto_lnksoftware  bigint(20),  assumed_lnksoftware  bigint(20),
   approve_user       bigint(20),
   approve_date       datetime,    misscount int(3) default '0',
-  comments    longtext     default NULL,
+  comments    longtext     default NULL, cleartoprocess int(1) default '1',
   editor      varchar(100) NOT NULL default '',
   realeditor  varchar(100) NOT NULL default '',
   createdate  datetime NOT NULL default '0000-00-00 00:00:00',
