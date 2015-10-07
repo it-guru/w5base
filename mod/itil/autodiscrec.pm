@@ -303,25 +303,28 @@ sub Validate
        effChanged($oldrec,$newrec,"scanextra1") ||
        effChanged($oldrec,$newrec,"scanextra2") ||
        effChanged($oldrec,$newrec,"scanextra3")){
-      printf STDERR ("AutoDiscRec - scandata has been changed!\n");
+      printf STDERR ("AutoDiscRec - scandata in autodiscrec '%s' ".
+                     "has been changed!\n",effVal($oldrec,$newrec,"id"));
 
-      printf STDERR ("AutoDiscRec - oldrec state=$oldrec->{state}!\n");
-      printf STDERR ("AutoDiscRec - newrec state=$newrec->{state}!\n");
-      if ($oldrec->{state} eq "20" &&
-          effVal($oldrec,$newrec,"state") eq "20"){
-         printf STDERR ("AutoDiscRec - do automatic Update!\n");
-         my ($exitcode,$exitmsg)=$self->doTakeAutoDiscData($oldrec,$newrec);
-         if ($exitcode){
-            return(0);
+      if ($oldrec->{state} ne ""){  # Datensatz wurde schonmal behandelt
+         printf STDERR ("AutoDiscRec - oldrec state=$oldrec->{state}!\n");
+         printf STDERR ("AutoDiscRec - newrec state=$newrec->{state}!\n");
+         if ($oldrec->{state} eq "20" &&
+             effVal($oldrec,$newrec,"state") eq "20"){
+            printf STDERR ("AutoDiscRec - do automatic Update!\n");
+            my ($exitcode,$exitmsg)=$self->doTakeAutoDiscData($oldrec,$newrec);
+            if ($exitcode){
+               return(0);
+            }
          }
-      }
-      if ($oldrec->{state} eq "10" &&
-          (!exists($newrec->{state}) || !defined($newrec->{state}))){
-         # Datenänderungen vorhanden, es wurde aber nur einmaliges Update
-         # zugelassen. Der Datensatz muß somit wieder als unbehandelt 
-         # angesehen werden.
-         printf STDERR ("AutoDiscRec - reset to unprocessed!\n");
-         $newrec->{state}="1";
+         if ($oldrec->{state} eq "10" &&
+             (!exists($newrec->{state}) || !defined($newrec->{state}))){
+            # Datenänderungen vorhanden, es wurde aber nur einmaliges Update
+            # zugelassen. Der Datensatz muß somit wieder als unbehandelt 
+            # angesehen werden.
+            printf STDERR ("AutoDiscRec - reset to unprocessed!\n");
+            $newrec->{state}="1";
+         }
       }
    }
      
