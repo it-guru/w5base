@@ -42,7 +42,7 @@ sub new
                                                   
       new kernel::Field::TextDrop(
                 name          =>'entry',
-                label         =>'Entry',
+                label         =>'AutoDiscEntryID',
                 vjointo       =>'itil::autodiscent',
                 vjoinon       =>['entryid'=>'id'],
                 vjoindisp     =>'id'),
@@ -71,6 +71,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'scanname',
                 sqlorder      =>'desc',
+                htmlwidth     =>'220px',
                 group         =>'source',
                 label         =>'Scanname',
                 dataobjattr   =>'autodiscrec.scanname'),
@@ -216,7 +217,7 @@ sub new
                 dataobjattr   =>'autodiscrec.srcload'),
 
    );
-   $self->setDefaultView(qw(scanname scanextra1 discon srcsys mdate));
+   $self->setDefaultView(qw(scanname scanextra1 scanextra2 discon ));
    $self->setWorktable("autodiscrec");
    return($self);
 }
@@ -251,7 +252,7 @@ sub isCopyValid
 {
    my $self=shift;
 
-   return(1);
+   return(0);
 }
 
 sub getDetailBlockPriority

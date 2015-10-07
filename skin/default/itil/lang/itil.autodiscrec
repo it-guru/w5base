@@ -1,0 +1,4 @@
+'itil::autodiscrec'=>{de=>'verdichteter AutoDisc Datensatz',en=>'compacted AutoDisc Record'},
+'Discovered on'=>{de=>'Erkannt auf/an'},
+'Miss count'=>{de=>'Anzahl Fehlüberprüfungen'},
+

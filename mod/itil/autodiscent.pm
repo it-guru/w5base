@@ -40,6 +40,21 @@ sub new
                 label         =>'W5BaseID',
                 dataobjattr   =>'autodiscent.id'),
 
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Fullname',
+                uivisible     =>0,
+                depend        =>['disc_on_system','engine'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $sys=$self->getParent->getField("disc_on_system",
+                               $current)->RawValue($current);
+                   my $eng=$self->getParent->getField("engine",
+                               $current)->RawValue($current);
+                   return($eng."-".$sys);
+                }),
+
       new kernel::Field::TextDrop(
                 name          =>'engine',
                 htmlwidth     =>'200px',
@@ -68,7 +83,17 @@ sub new
                 group         =>'source',
                 label         =>'discovered on SystemID',
                 dataobjattr   =>'autodiscent.discon_system'),
-                                                  
+
+
+      new kernel::Field::SubList(
+                name          =>'recs',
+                label         =>'AutoDiscRecords',
+                group         =>'rec',
+                forwardSearch =>1,
+                vjointo       =>'itil::autodiscrec',
+                vjoinon       =>['id'=>'entryid'],
+                vjoindisp     =>['section','scanname','mdate']),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -101,13 +126,13 @@ sub isCopyValid
 {
    my $self=shift;
 
-   return(1);
+   return(0);
 }
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default autoimport source));
+   return(qw(header default rec autoimport source));
 }
 
 
