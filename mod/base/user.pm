@@ -860,6 +860,7 @@ sub new
                 label         =>'last Known Boss',
                 htmldetail    =>0,
                 group         =>'userro',
+                searchable    =>0, # nicht suchbar, da kein db join möglich!
                 vjointo       =>'base::user',
                 vjoinon       =>['lastknownbossid'=>'userid'],
                 vjoindisp     =>['fullname']),
@@ -1151,7 +1152,7 @@ sub postQualityCheckRecord
       }
       my $boss=join(" ",sort(grep(!/^$userid$/,keys(%boss))));
       if ($boss ne "" && $boss ne $rec->{lastknownbossid}){
-         printf STDERR ("Info: Update lastknownbossid on $userid to $boss\n");
+         #printf STDERR ("Info: Update lastknownbossid on $userid to $boss\n");
          my $op=$self->Clone();
          $op->ValidatedUpdateRecord($rec,{lastknownbossid=>$boss},
                                     {userid=>\$userid});
