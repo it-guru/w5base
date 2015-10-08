@@ -78,6 +78,8 @@ sub getPosibleRoles
                                                  $self->Self),
          "staffloc"        =>$self->getParent->T("staffloc",
                                                  $self->Self),
+         "facmgr"          =>$self->getParent->T("facility manager",
+                                                 $self->Self),
          "infocontact"     =>$self->getParent->T("Information contact",
                                                  $self->Self),
          "evinfocontact"   =>$self->getParent->T("Event information contact",

@@ -9,3 +9,4 @@
 'privacy read'=>{de=>'vertrauliches lesen'},
 'Information contact'=>{de=>'Informationspartner'},
 'Event information contact'=>{de=>'Ereignis-Informationspartner'},
+'facility manager'=>{de=>'Hausmeister'},
