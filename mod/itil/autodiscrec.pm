@@ -312,37 +312,40 @@ sub Validate
    #printf("fifi 01 in $self\n");
    if (effChanged($oldrec,$newrec,"state")){   # statuswechsel auf
       my $s=$newrec->{state}; 
-      if ($s eq "10"){   # einmalig 
+      if ($s eq "10" || $s eq "20"){   # einmalig oder auto
          $self->doTakeAutoDiscData($oldrec,$newrec);
       }
    }
-   #printf("fifi 02 in $self\n");
-
-   if (effChanged($oldrec,$newrec,"scanname") ||
-       effChanged($oldrec,$newrec,"scanextra1") ||
-       effChanged($oldrec,$newrec,"scanextra2") ||
-       effChanged($oldrec,$newrec,"scanextra3")){
-      printf STDERR ("AutoDiscRec - scandata in autodiscrec '%s' ".
-                     "has been changed!\n",effVal($oldrec,$newrec,"id"));
-
-      if ($oldrec->{state} ne ""){  # Datensatz wurde schonmal behandelt
-         printf STDERR ("AutoDiscRec - oldrec state=$oldrec->{state}!\n");
-         printf STDERR ("AutoDiscRec - newrec state=$newrec->{state}!\n");
-         if ($oldrec->{state} eq "20" &&
-             effVal($oldrec,$newrec,"state") eq "20"){
-            printf STDERR ("AutoDiscRec - do automatic Update!\n");
-            my ($exitcode,$exitmsg)=$self->doTakeAutoDiscData($oldrec,$newrec);
-            if ($exitcode){
-               return(0);
-            }
+   else{
+      if (effChanged($oldrec,$newrec,"scanname") ||
+          effChanged($oldrec,$newrec,"scanextra1") ||
+          effChanged($oldrec,$newrec,"scanextra2") ||
+          effChanged($oldrec,$newrec,"scanextra3")){
+         if (defined($oldrec)){
+            printf STDERR ("AutoDiscRec - scandata in autodiscrec '%s' ".
+                           "has been changed!\n",effVal($oldrec,$newrec,"id"));
          }
-         if ($oldrec->{state} eq "10" &&
-             (!exists($newrec->{state}) || !defined($newrec->{state}))){
-            # Datenänderungen vorhanden, es wurde aber nur einmaliges Update
-            # zugelassen. Der Datensatz muß somit wieder als unbehandelt 
-            # angesehen werden.
-            printf STDERR ("AutoDiscRec - reset to unprocessed!\n");
-            $newrec->{state}="1";
+
+         if (defined($oldrec) &&
+             $oldrec->{state} ne ""){  # Datensatz wurde schonmal behandelt
+            printf STDERR ("AutoDiscRec - oldrec state=$oldrec->{state}!\n");
+            printf STDERR ("AutoDiscRec - newrec state=$newrec->{state}!\n");
+            if ($oldrec->{state} eq "20" &&
+                effVal($oldrec,$newrec,"state") eq "20"){
+               printf STDERR ("AutoDiscRec - do automatic Update!\n");
+               my ($exitcode,$exitmsg)=$self->doTakeAutoDiscData($oldrec,$newrec);
+               if ($exitcode){
+                  return(0);
+               }
+            }
+            if ($oldrec->{state} eq "10" &&
+                (!exists($newrec->{state}) || !defined($newrec->{state}))){
+               # Datenänderungen vorhanden, es wurde aber nur einmaliges Update
+               # zugelassen. Der Datensatz muß somit wieder als unbehandelt 
+               # angesehen werden.
+               printf STDERR ("AutoDiscRec - reset to unprocessed!\n");
+               $newrec->{state}="1";
+            }
          }
       }
    }
@@ -362,6 +365,8 @@ sub doTakeAutoDiscData
 
    my $section=effVal($oldrec,$newrec,"section");
 
+   printf STDERR ("doTakeAutoDiscData handling for autodiscrec '%s'\n",
+                  effVal($oldrec,$newrec,"id"));
    my $systemid=effVal($oldrec,$newrec,"lnkto_system");
    if (defined($initrelrec)){  # in this case, the adrec is not yet linked
       $systemid=$oldrec->{disc_on_systemid};
@@ -444,33 +449,11 @@ sub doTakeAutoDiscData
                $swi->SetFilter({id=>\$mapsel});
                my @l=$swi->getHashList(qw(ALL));
                if ($#l==0){
-                  my %upd;
-                  if (effVal($oldrec,$newrec,"scanextra2") ne "" &&
-                      $l[0]->{version} ne effVal($oldrec,$newrec,"scanextra2")){
-                     $upd{version}=effVal($oldrec,$newrec,"scanextra2");
-                  }
-                  if (effVal($oldrec,$newrec,"scanextra1") ne "" &&
-                      $l[0]->{instpath} ne 
-                      effVal($oldrec,$newrec,"scanextra1")){
-                     $upd{instpath}=effVal($oldrec,$newrec,"scanextra1");
-                  }
-                  if (keys(%upd)){
-                     if (!$swi->ValidatedUpdateRecord($l[0],\%upd,
-                                                      {id=>\$mapsel})){
-                        $exitcode=96;
-                        ($exitmsg)=$swi->LastMsg();
-                     }
-                  }
+                  # Achtung: Hier KEIN Update des Installations-Records!
+                  #          Das wird über die Validate in autodiscrec
+                  #          getriggert!
                   if ($exitcode eq "0"){
                      my $userid=$self->getCurrentUserId();
-
-                     #
-                     #
-                     # Achtung: beim State 100 oder 0 muß noch das Recht des
-                     #          Users gechecked werden
-                     #
-                     #
-
                      if (!$self->ValidatedUpdateRecord($oldrec,{
                             state=>$newrec->{state},
                             lnkto_lnksoftware=>$mapsel,
@@ -509,12 +492,23 @@ sub doTakeAutoDiscData
          if (defined($sysrec) && defined($swirec)){
             my %upd;
             my $scanextra2=effVal($oldrec,$newrec,"scanextra2");
-            if ($swirec->{version} ne $scanextra2){
-               $upd{version}=$scanextra2;
+            if (length($swirec->{version})>length($scanextra2)){
+               my $chklen=length($scanextra2);
+               my $old=substr($swirec->{version},0,$chklen+1);
+printf STDERR ("fifi 01 old=%s new=%s\n",$old,$scanextra2.".");
+               if ($old ne $scanextra2."."){
+                  $upd{version}=$scanextra2;  # upd da erster Teil ungleich
+               }
             }
+            else{
+               if ($swirec->{version} ne $scanextra2){
+                  $upd{version}=$scanextra2;
+               }
+            }
+            printf STDERR ("fifi SecureValidatedUpdateRecord in doTakeRemote\n");
             my $scanextra1=effVal($oldrec,$newrec,"scanextra1");
-            if ($swirec->{instpath} ne $scanextra1){
-               $upd{instpath}=$scanextra1;
+            if (trim($swirec->{instpath}) ne $scanextra1){
+               $upd{instpath}=trim($scanextra1);
             }
             if (keys(%upd)){
                if ($o->SecureValidatedUpdateRecord($swirec,
@@ -804,7 +798,7 @@ sub AutoDiscProcessor
 
 
    $exitcode=100;
-   $exitmsg=msg(ERROR,"no access to '$adid'");
+   $exitmsg="ERROR: no access to '$adid'";
 
    #
    # Security Check
@@ -848,9 +842,6 @@ sub AutoDiscProcessor
             if (!$self->ValidatedUpdateRecord($adrec,
                                             {
                                              state=>'1',
-                                             lnkto_lnksoftware=>undef,
-                                             lnkto_system=>undef,
-                                             lnkto_asset=>undef,
                                              approve_date=>NowStamp("en"),
                                              approve_user=>$userid
                                              },
@@ -950,11 +941,14 @@ sub HtmlAutoDiscManager
 
       $d.="Discovery-Datensätze:";
       my $act=" recSelektorAct" if ($view eq "SelUnproc");
-      $d.="<span id='SelUnproc' class=\"recSelektor$act\">unbehandelt</span>";
+      $d.="<span id='SelUnproc' class=\"recSelektor$act\">".
+          "unbehandelt</span>";
       my $act=" recSelektorAct" if ($view eq "SelBad");
-      $d.="<span id='SelBad' class=\"recSelektor$act\">makiert als fehlerhaft</span>";
+      $d.="<span id='SelBad' class=\"recSelektor$act\">".
+          "makiert als fehlerhaft</span>";
       my $act=" recSelektorAct" if ($view eq "SelAll");
-      $d.="<span id='SelAll' class=\"recSelektor$act\">alle behandelten</span>";
+      $d.="<span id='SelAll' class=\"recSelektor$act\">".
+          "alle behandelten</span>";
       $d.="</div>";
       $d.="</div>";
    }

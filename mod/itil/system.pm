@@ -1649,7 +1649,8 @@ sub getHtmlDetailPages
          my $id=Query->Param("id");
          if ($id ne ""){
             my $ad=getModuleObject($self->Config,'itil::autodiscrec');
-            $ad->SetFilter({disc_on_systemid=>\$id});
+            $ad->SetFilter({disc_on_systemid=>\$id,
+                            processable=>\'1'});
             if ($ad->CountRecords()>0){
                push(@l,"HtmlAutoDiscManager"=>$self->T("Autodiscovery"));
             }
