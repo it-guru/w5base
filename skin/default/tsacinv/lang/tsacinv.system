@@ -64,4 +64,4 @@
 'direct connected Shared-Storage Servers'=>{de=>'direkt verbundene Shared-Storage Server'},
 'direct connected Shared-Network Components'=>{de=>'direkt verbundene Shared-Netzwerk Komponenten'},
 'ordered backup jobs'=>{de=>'beauftragte Datensicherungen'},
-
+'AutoDiscovery Entry'=>{de=>'AutoDiscovery Eintrag'},

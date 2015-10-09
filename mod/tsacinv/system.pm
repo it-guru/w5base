@@ -673,6 +673,19 @@ sub new
                 # in assetmanager
                 dataobjattr   =>"amcomment.memcomment"),
 
+      new kernel::Field::Text(
+                name          =>'autodiscent',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                weblinkto     =>'tsacinv::autodiscsystem',
+                weblinkon     =>['systemid'=>'systemid'],
+                label         =>'AutoDiscovery Entry',
+                dataobjattr   =>"decode(amtsiautodiscovery.name,NULL,'',".
+                                "amtsiautodiscovery.name || ".
+                                "' ('||amtsiautodiscovery.assettag||') - '||".
+                                "amtsiautodiscovery.source)"),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
@@ -971,7 +984,7 @@ sub getSqlFrom
 #      " where amitemlistval.litemlistid=amitemlistval.litemlistid ".
 #      " and amitemizedlist.identifier='amPortfolioSecuritySet')  ".
 #      "securitysetval,".
-      "amtenant";
+      "amtenant,amtsiautodiscovery";
 
    return($from);
 }
@@ -991,7 +1004,8 @@ sub initSqlWhere
       "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
       "and amportfolio.lportfolioitemid=tbsm.lportfolioid(+) ".
       "and ammodel.name='LOGICAL SYSTEM' ".
-      "and amcomputer.lcommentid=amcomment.lcommentid(+) ";
+      "and amcomputer.lcommentid=amcomment.lcommentid(+) ".
+      "and amportfolio.assettag=amtsiautodiscovery.assettag(+) ";
 #      "and amportfolio.securityset=securitysetval.litemlistvalid(+) ";
    return($where);
 }
