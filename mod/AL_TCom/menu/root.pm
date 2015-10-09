@@ -483,6 +483,26 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.kern.autodisce",
+                      "itil::autodiscengine",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.kern.autodisce.map",
+                      "itil::autodiscmap",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.kern.autodisce.rec",
+                      "itil::autodiscrec",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.kern.autodisce.virt",
+                      "itil::autodiscvirt",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.proc",
                       "tmpl/welcome",
                       prio=>20000);

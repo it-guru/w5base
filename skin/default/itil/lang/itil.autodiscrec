@@ -2,4 +2,14 @@
 'Discovered on'=>{de=>'Erkannt auf/an'},
 'Miss count'=>{de=>'Anzahl Fehlüberprüfungen'},
 'processable'=>{de=>'behandelbar'},
+'First detected on AutoDiscoveryEngine'=>{de=>'Erstmalig auf der AutoDiscoveryEngine'},
+'The Software was detected as'=>{de=>'Die Software wurde gesannt als'},
+'in the Version'=>{de=>'in der Version'},
+'at the installationpath'=>{de=>'auf dem Installationspfad'},
+'This information was last seen at'=>{de=>'Diese Information wurde das letzte "gesehen" um '},
+'and was'=>{de=>'und konnte bisher'},
+'times not refreshed'=>{de=>'mal NICHT überprüft werden'},
+
+
+
 

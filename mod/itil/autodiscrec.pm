@@ -563,7 +563,7 @@ sub AutoDiscFormatEntry
 
    $d.="<div class='AutoDiscDetail' id=\"AutoDiscDetail$adrec->{id}\">";
    $d.="<p>";
-   $d.="Frist detected on AutoDiscoveryEngine";
+   $d.=$self->T("First detected on AutoDiscoveryEngine");
 
    my $elabel=$adrec->{enginefullname};
    if ($elabel ne ""){
@@ -576,28 +576,30 @@ sub AutoDiscFormatEntry
    $d.="at";
    $d.=" <i>".$adrec->{cdate}." GMT</i>. ";
    if ($adrec->{section} eq "SOFTWARE"){
-      $d.="The Software was detected as";
+      $d.=$self->T("The Software was detected as");
       $d.=" <b>\"$adrec->{scanname}\"</b> ";
-      $d.="in the Version";
+      $d.=$self->T("in the Version");
       $d.=" <b>\"".$adrec->{scanextra2}."\"</b> ";
-      $d.="at the installationpath";
+      $d.=$self->T("at the installationpath");
       $d.=" <b>\"".$adrec->{scanextra1}."\"</b>. ";
       
    }
    $d.="<br>";
-   $d.="This information was last seen at";
+   $d.=$self->T("This information was last seen at");
    $d.=" $adrec->{srcload} GMT";
    if ($adrec->{misscount}>0){
       $d.=" ";
-      $d.="and was";
+      $d.=$self->T("and was");
       $d.=$adrec->{misscount};
       $d.=" ";
-      $d.="times not refreshed";
+      $d.=$self->T("times not refreshed");
    }
    $d.=".";
    $d.="</p>";
-   if ($self->IsMemberOf("admin")){
-      $d.="<pre>NativeDiscoveryRecord:\n".Dumper($adrec)."</pre>";
+   if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+      if ($self->IsMemberOf("admin")){
+         $d.="<pre>NativeDiscoveryRecord:\n".Dumper($adrec)."</pre>";
+      }
    }
    $d.="</div>";
 
