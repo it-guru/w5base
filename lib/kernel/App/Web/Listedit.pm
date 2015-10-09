@@ -592,7 +592,13 @@ EOF
       $mainlines=2 if (!defined($mainlines));
       my @searchfields=@field;
 
+      #
+      # identify searchable fields and bring them in correct order
+      #
+
       my $idshifted=0;
+      my @tmpsearchfieldorder;
+
       while(my $fieldname=shift(@searchfields)){
          my $fo=$self->getField($fieldname); 
          my $type=$fo->Type();
@@ -609,6 +615,19 @@ EOF
                next;
             }
          }
+         push(@tmpsearchfieldorder,$fieldname);
+      }
+
+      # now we have a temporary order of all searchable fields
+      # in @tmpsearchfieldorder
+
+
+      # at this place, a user customizable order can be implemented
+
+
+      while(my $fieldname=shift(@tmpsearchfieldorder)){
+         my $fo=$self->getField($fieldname); 
+         my $type=$fo->Type();
          $defaultsearch=$fieldname if ($fo->defsearch);
          my $work=\$searchframe;
          $work=\$extframe if ($c>=$mainlines*2);

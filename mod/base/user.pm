@@ -218,27 +218,6 @@ sub new
                 label         =>'Surname',
                 dataobjattr   =>'contact.surname'),
 
-      new kernel::Field::Text(
-                name          =>'posix',
-                label         =>'POSIX-Identifier',
-                group         =>'userid',
-                dataobjattr   =>'contact.posix_identifier'),
-
-      new kernel::Field::Text(
-                name          =>'dsid',
-                label         =>'Directory-Identifier',
-                group         =>'userid',
-                dataobjattr   =>'contact.ds_identifier'),
-
-      new kernel::Field::Select(
-                name          =>'secstate',
-                uploadable    =>0,
-                label         =>'security state',
-                value         =>['1','2','3','4'],
-                transprefix   =>'SECSTATE.',
-                group         =>'userro',
-                dataobjattr   =>'contact.secstate'),
-
       new kernel::Field::Email(
                 name          =>'email',
                 label         =>'primary E-Mail',
@@ -267,26 +246,28 @@ sub new
                    },
                 dataobjattr   =>'contact.email'),
 
-      new kernel::Field::Text(
-                name          =>'ipacl',
-                uploadable    =>1,
-                label         =>'IP access control',
-                group         =>'userro',
-                dataobjattr   =>'contact.ipacl'),
+      new kernel::Field::SubList(
+                name          =>'emails',
+                label         =>'E-Mail adresses',
+                readonly      =>1,
+                group         =>'userid',
+                vjointo       =>'base::useremail',
+                vjoinbase     =>{'cistatusid'=>'<=4'}, # this is neassary for
+                vjoinon       =>['userid'=>'userid'],  # intial logon process!
+                vjoindisp     =>['email','cistatus','emailtyp'],
+                vjoininhash   =>['id','email','cistatusid','emailtyp']),
 
-      new kernel::Field::Number(
-                name          =>'killtimeout',
-                label         =>'limit query duration',
-                precision     =>0,
-                searchable    =>sub{
-                   my $self=shift;
-                   my $app=$self->getParent;
-                   return(1) if ($app->IsMemberOf("admin"));
-                   return(0);
-                },
-                unit          =>'sec',
-                group         =>'userro',
-                dataobjattr   =>'contact.killtimeout'),
+      new kernel::Field::SubList(
+                name          =>'allemails',
+                label         =>'all related E-Mail adresses',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'userid',
+                vjointo       =>'base::useremail',
+                vjoinon       =>['userid'=>'userid'],  
+                vjoindisp     =>['email','cistatus','emailtyp'],
+                vjoininhash   =>['id','email','cistatusid','emailtyp']),
 
       new kernel::Field::Date(
                 name          =>'gtcack',
@@ -315,44 +296,53 @@ sub new
                 group         =>'userro',
                 dataobjattr   =>'contact.gtctxt'),
                                   
-      new kernel::Field::Link(
-                name          =>'secstateid',
-                label         =>'Sec-StateID',
-                dataobjattr   =>'contact.secstate'),
+      new kernel::Field::Number(
+                name          =>'killtimeout',
+                label         =>'limit query duration',
+                precision     =>0,
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                unit          =>'sec',
+                group         =>'userro',
+                dataobjattr   =>'contact.killtimeout'),
+
+      new kernel::Field::Text(
+                name          =>'posix',
+                label         =>'POSIX-Identifier',
+                group         =>'userid',
+                dataobjattr   =>'contact.posix_identifier'),
+
+      new kernel::Field::Text(
+                name          =>'dsid',
+                label         =>'Directory-Identifier',
+                group         =>'userid',
+                dataobjattr   =>'contact.ds_identifier'),
 
       new kernel::Field::SubList(
                 name          =>'accounts',
                 label         =>'Accounts',
                 allowcleanup  =>1,
                 readonly      =>1,
+                depend        =>['usertyp'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   if ($current->{usertyp} eq "extern"){
+                      return(0);
+                   }
+                   return(1);
+                },
                 group         =>'userro',
                 vjointo       =>'base::useraccount',
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>['account','cdate'],
                 vjoininhash   =>['account','userid']),
-
-      new kernel::Field::SubList(
-                name          =>'emails',
-                label         =>'E-Mail adresses',
-                readonly      =>1,
-                group         =>'userro',
-                vjointo       =>'base::useremail',
-                vjoinbase     =>{'cistatusid'=>'<=4'}, # this is neassary for
-                vjoinon       =>['userid'=>'userid'],  # intial logon process!
-                vjoindisp     =>['email','cistatus','emailtyp'],
-                vjoininhash   =>['id','email','cistatusid','emailtyp']),
-
-      new kernel::Field::SubList(
-                name          =>'allemails',
-                label         =>'all related E-Mail adresses',
-                readonly      =>1,
-                htmldetail    =>0,
-                searchable    =>0,
-                group         =>'userro',
-                vjointo       =>'base::useremail',
-                vjoinon       =>['userid'=>'userid'],  
-                vjoindisp     =>['email','cistatus','emailtyp'],
-                vjoininhash   =>['id','email','cistatusid','emailtyp']),
 
       new kernel::Field::Phonenumber(
                 name          =>'office_mobile',
@@ -690,6 +680,27 @@ sub new
                 value         =>['',qw( officealways
                                         homealways)],
                 container     =>'options'),
+
+      new kernel::Field::Select(
+                name          =>'secstate',
+                uploadable    =>0,
+                label         =>'security state',
+                value         =>['1','2','3','4'],
+                transprefix   =>'SECSTATE.',
+                group         =>'userro',
+                dataobjattr   =>'contact.secstate'),
+
+      new kernel::Field::Link(
+                name          =>'secstateid',
+                label         =>'Sec-StateID',
+                dataobjattr   =>'contact.secstate'),
+
+      new kernel::Field::Text(
+                name          =>'ipacl',
+                uploadable    =>1,
+                label         =>'IP access control',
+                group         =>'userro',
+                dataobjattr   =>'contact.ipacl'),
 
       new kernel::Field::Boolean(
                 name          =>'allowifupdate',
@@ -1469,7 +1480,7 @@ sub isViewValid
       push(@pic,"picture","roles","interview","history");
    }
    if ($rec->{usertyp} eq "extern"){
-      @gl=qw(header name default comments groups userid userro control 
+      @gl=qw(header name default comments userid userro control 
                 office private qc);
       if ($self->IsMemberOf(["admin","support"])){
          push(@gl,"history");
