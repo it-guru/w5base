@@ -76,8 +76,8 @@ sub new
                 htmldetail    =>0,
                 label         =>'measure period',
                 sqlorder      =>'NONE',
-                dataobjattr   =>"to_char(mfrom,'DD.MM.YYYY')||' - '|| ".
-                                "to_char(mto,'DD.MM.YYYY') || ' CET'"),
+                dataobjattr   =>"to_char(mfrom,'DD.MM.YYYY HH24:MI')||' - '|| ".
+                                "to_char(mto,'DD.MM.YYYY HH24:MI') || ' CET'"),
 
       new kernel::Field::Select(
                 name          =>'logtyp',
