@@ -101,7 +101,8 @@ sub qcheckRecord
    # while testing under production conditions
    # only these applications will be considered:
    my @appl2chk=(qw(12199294360024 12199302380006 12962281170017
-                    13355257150001 14157032310001 250));
+                    13355257150001 14157032310001 250
+                    14446417290001 14446378280003 5271));
    return(0,undef) if (!in_array(\@appl2chk,$rec->{id}));
    ##################################################################
 
