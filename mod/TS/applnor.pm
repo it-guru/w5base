@@ -84,16 +84,16 @@ sub new
             if ($region eq "DE"){
                my $fo1=$self->getParent->getField("SUMMARYAMSecurityFlag");
                my $f1=$fo1->RawValue($current);
-               if (grep(/GS/,@$f1)){ # wenn System GS dann u.U. D6 Betrieb
-                  return("D6 (GS=?)");
+               if (grep(/GS/,@$f1)){ # wenn System GS dann u.U. DE6 Betrieb
+                  return("DE6 (GS=?)");
                }
-               return("D4 (VS-NfD=?)");
+               return("DE4 (VS-NfD=?)");
             }
             elsif ($region eq "EU"){
-               return("D3");
+               return("DE3");
             }
             elsif ($region eq "EUROPE"){
-               return("D2");
+               return("DE2");
             }
             else{
                return("S");
@@ -205,7 +205,7 @@ sub autoFillAutogenField
                 '70372 Stuttgart; Nauheimer Str. 98"'=>1);
       my %ucnt=('DE'=>1);
       if ($current->{normodel} eq "S" ||
-          $current->{normodel} eq "D3"){
+          $current->{normodel} eq "DE3"){
          %uadr=('04001 Kosice; Postova 18'=>1);
          %ucnt=('SK'=>1);
       }
@@ -232,7 +232,7 @@ sub autoFillAutogenField
                 '90441 Nürnberg; Hansastr. 45'=>1);
       my %ucnt=('DE'=>1);
       if ($current->{normodel} eq "S" ||
-          $current->{normodel} eq "D3"){
+          $current->{normodel} eq "DE3"){
          %uadr=('04001 Kosice; Postova 18'=>1);
          %ucnt=('SK'=>1);
       }
@@ -262,7 +262,7 @@ sub autoFillAutogenField
                 '70372 Stuttgart; Nauheimer Str. 98'=>1);
       my %ucnt=('DE'=>1);
       if ($current->{normodel} eq "S" ||
-          $current->{normodel} eq "D3"){
+          $current->{normodel} eq "DE3"){
          %uadr=('04001 Kosice; Postova 18'=>1);
          %ucnt=('SK'=>1);
       }
