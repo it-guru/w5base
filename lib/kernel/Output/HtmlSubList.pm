@@ -264,8 +264,28 @@ sub ProcessLine
 
             if (defined($weblinkto) && 
                 defined($weblinkon) && $weblinkto ne "none"){
-               $weblinkname=$weblinkto;
+
+               # dynamic target dataobj detection
+               if (ref($weblinkto) ne "SCALAR"){
+                  my $p=$self->getParent;
+                  $p=$p->getParent if (defined($p));
+                  if (defined($p) && $p->can("findNearestTargetDataObj")){
+                     $weblinkto=$p->findNearestTargetDataObj(
+                                $weblinkto,"sublist:".$self->getParent->Self);
+                  }
+                  if (!ref($self->{weblinkto})){ # 
+                     $field->{weblinkto}=$weblinkto;
+                  }
+               }
+               if (ref($weblinkto) eq "SCALAR"){
+                  $weblinkto=$$weblinkto; # dereferenzieren von weblinkto
+               }
+               $weblinkto=$$weblinkto if (ref($weblinkto) eq "SCALAR");
+               # dynamic target dataobj detection END
+
                my $target=$weblinkto;
+               $weblinkname=$weblinkto;
+
                $target=~s/::/\//g;
                $target="../../$target/Detail";
                $target=~s/"/ /g;

@@ -177,6 +177,19 @@ sub addWebLinkToFacility
    }
 
    if (defined($weblinkto) && defined($weblinkon) && lc($weblinkto) ne "none"){
+      # dynamic Target DataObject detection
+      if (ref($weblinkto) ne "SCALAR"){
+         if ($self->getParent->can("findNearestTargetDataObj")){
+            $weblinkto=$self->getParent->findNearestTargetDataObj($weblinkto,
+                       "field:".$self->Name);
+         }
+         if (!ref($self->{weblinkto})){ # if no reference, store it cached
+            $self->{weblinkto}=$weblinkto;
+         }
+      }
+      if (ref($weblinkto) eq "SCALAR"){
+         $weblinkto=$$weblinkto; # dereferenzieren von weblinkto
+      }
       my $target=$weblinkto;
       $target=~s/::/\//g;
       $target="../../$target/Detail";
@@ -380,6 +393,9 @@ sub vjoinobj
    my $self=shift;
    return(undef) if (!exists($self->{vjointo}));
    my $jointo=$self->{vjointo};
+   if (ref($jointo) eq "SCALAR"){
+      $jointo=$$jointo;
+   }
    my $vjoinRewrite={};
    my $p=$self->getParent;
    if (defined($p) && exists($p->{_vjoinRewrite})){

@@ -103,7 +103,7 @@ sub new
                 async         =>'1',
                 searchable    =>0,
                 readonly      =>1,
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'systemname'),
       new kernel::Field::Boolean(

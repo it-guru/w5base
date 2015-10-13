@@ -19,6 +19,7 @@ package base::qrule;
 use strict;
 use vars qw(@ISA);
 use Time::HiRes qw(gettimeofday);
+use Class::ISA;
 use kernel;
 use kernel::Field;
 use kernel::DataObj::Static;

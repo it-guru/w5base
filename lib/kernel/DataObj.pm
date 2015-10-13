@@ -18,6 +18,7 @@ package kernel::DataObj;
 #
 use strict;
 use vars qw(@ISA);
+use Class::ISA;
 use kernel;
 use kernel::App;
 use kernel::WSDLbase;
@@ -2270,6 +2271,51 @@ sub FinishView    # called on finsh view of one record (f.e. to reset caches)
    my $self=shift;
    my $rec=shift;
 
+}
+
+sub findNearestTargetDataObj
+{
+   my $self=shift;
+   my $to=shift;
+   my $requestedfor=shift;
+
+   my $s=$self->Self();
+   my ($m1,$m2,$dataobj);
+   if (($m1,$dataobj)=$to=~m/^([^:]+)::(.*)$/){
+      if (($m2)=$s=~m/^([^:]+)::/){
+         if ($m1 eq $m2){
+            return($to);
+         }
+      }
+   }
+   if ($dataobj ne "" && $m2 ne ""){
+      if ( -f "$W5V2::INSTDIR/mod/$m2/$dataobj.pm"){
+         my $nto="${m2}::${dataobj}";
+         eval("use $nto;"); # ensure all super objects are used
+         my @tree=Class::ISA::super_path($nto); 
+         #msg(INFO,"check from $to to $nto in $requestedfor");
+         if (in_array(\@tree,$to)){
+            msg(INFO,"rewrite for target of $requestedfor from $to to $nto");
+            return($nto);
+         }
+         else{
+            msg(ERROR,"invalid findNearestTargetDataObj in '$s' ".
+                      "from '$to' to '$nto' ".
+                      "requested for ".$requestedfor." needs SCALAR ref ".
+                      "because not unique dataobject names");
+         }
+        # my $chkobj=getModuleObject($self->Config,$nto);
+        # if (defined($chkobj)){
+        #    my @tree=Class::ISA::self_and_super_path($nto); 
+        #    return(\$nto);
+        # }
+        # else{
+        #    msg(ERROR,"invalid findNearestTargetDataObj in '$s' to '$nto' ".
+        #              "requested for ".$requestedfor);
+        # }
+      }
+   }
+   return(\$to);
 }
 
 sub SendRemoteEvent
