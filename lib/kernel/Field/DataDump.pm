@@ -88,7 +88,7 @@ sub FormatedDetail
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
    my $name=$self->Name();
-   if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlDetail"){
+   if ($FormatAs=~m/Html.*/){
       my $maxdatalen=78;
       if ($FormatAs eq "HtmlDetail"){
          $maxdatalen=37;
@@ -101,13 +101,17 @@ sub FormatedDetail
             $res.="<tr><td colspan=3 class=hl><b>$k</b></td></tr>";
             my @l;
             for(my $recno=0;$recno<=$#{$d->{res}->{$k}->{Result}};$recno++){
+             
                my $n=keys(%{$d->{$k}->{Result}->[$recno]});
               # $n=$n+1;
-               push(@l,"<tr><td rowspan=$n valign=top width=1%>".
-                       "$recno</td>");
+               push(@l,"<tr><td rowspan=$n valign=top width=5>[".
+                       "$recno]</td>");
                my @fl=sort(keys(%{$d->{res}->{$k}->{Result}->[$recno]}));
+               my $fno=0;
                foreach my $name (@fl){
-                  push(@l,"<tr>") if ($#l!=0);
+                  $fno++;
+                  #push(@l,"<tr>") if ($#l!=0);
+                  push(@l,"<td width=5></td>") if ($fno>1);
                   my $d=$d->{res}->{$k}->{Result}->[$recno]->{$name};
                   if (defined($d)){
                      $d=~s/\n/ /g;
@@ -127,7 +131,7 @@ sub FormatedDetail
                           "<td valign=top>".$d."</td>");
                   push(@l,"</tr>");
                }
-               push(@l,"</tr>") if ($#l==0);
+               #push(@l,"</tr>") if ($#l==0);
             }
             $res.=join("\n",@l);
          }
