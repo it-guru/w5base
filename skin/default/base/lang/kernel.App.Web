@@ -29,6 +29,7 @@
 'select dataview'=>{de=>"Datensichtweise wählen"},
 'list records for me as customer'=>{de=>"Datensätze, in deren Zusammenhang ich Kunde bin"},
 'list records of my organisational area'=>{de=>"Datensätze meines organisatorischen Bereiches"},
+'only assinged to personal me'=>{de=>"nur direkt an mich zugewiesene Datensätze"},
 'This operation clears all fields in the searchmask.\\n Click cancel, if you don\'t want to do this.'=>{de=>'Diese Funktion löscht den Inhalt aller Felder in der Suchmaske.\\nKlicken Sie auf Abbrechen, wenn Sie dies nicht möchten.'},
 'With this action, it is possible to lose data!'=>{de=>'Mit dieser Aktion könnten ungesicherte Eingaben verloren gehen!'},
 "access for user '\%s' to W5Base Framework rejected"=>{de=>"Zugriff für den Account '\%s' auf das W5Base Framework verwehrt"},

@@ -100,7 +100,7 @@ sub WSDLaddNativFieldList
 sub getDefaultStdButtonBar
 {
    my $self=shift;
-   return('%StdButtonBar(bookmark,deputycontrol,wfstatecontrol,teamviewcontrol,print,search)%');
+   return('%StdButtonBar(bookmark,deputycontrol,personalview,wfstatecontrol,teamviewcontrol,print,search)%');
 }
 
 sub getQueryTemplate
@@ -285,21 +285,28 @@ sub SetFilter
          $q1{stateid}.=" AND " if ($q1{stateid} ne "");
          $q1{stateid}.="5";
       }
-      $q2{fwdtargetid}=\@grpids;
-      $q2{fwdtarget}=\'base::grp';
-      $q2{stateid}.=" AND " if ($q2{stateid} ne "");
-      $q2{stateid}.="<20";
-      if ($vs eq "HIDEUNNECESSARY"){
+      if ($dc ne "PERSONAL"){
+         $q2{fwdtargetid}=\@grpids;
+         $q2{fwdtarget}=\'base::grp';
          $q2{stateid}.=" AND " if ($q2{stateid} ne "");
-         $q2{stateid}.=" !6 AND !5";  # hide defered pending
-      }
-      if ($vs eq "ONLYDEFFERED"){
-         $q2{stateid}.=" AND " if ($q2{stateid} ne "");
-         $q2{stateid}.="5";
+         $q2{stateid}.="<20";
+         if ($vs eq "HIDEUNNECESSARY"){
+            $q2{stateid}.=" AND " if ($q2{stateid} ne "");
+            $q2{stateid}.=" !6 AND !5";  # hide defered pending
+         }
+         if ($vs eq "ONLYDEFFERED"){
+            $q2{stateid}.=" AND " if ($q2{stateid} ne "");
+            $q2{stateid}.="5";
+         }
       }
       my %id=();  # this hack prevents searches over two keys (this is bad)
       $dataobj->ResetFilter();
-      $dataobj->SetFilter([\%q1,\%q2]);
+      if ($dc ne "PERSONAL"){
+         $dataobj->SetFilter([\%q1,\%q2]);
+      }
+      else{
+         $dataobj->SetFilter([\%q1]);
+      }
       my @l=$dataobj->getHashList(qw(id));
       map({$id{$_->{id}}=1} @l);
 

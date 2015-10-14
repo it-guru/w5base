@@ -1845,9 +1845,8 @@ sub findtemplvar
       if (grep(/^new$/,@param)){
          AddButton(\$d,"DoNewWin()","New");
       }
-      if (grep(/^deputycontrol$/,@param) ||
-          grep(/^teamviewcontrol$/,@param) ||
-          grep(/^exviewcontrol$/,@param)){
+      if (in_array(\@param,[qw(deputycontrol personalview 
+                               teamviewcontrol exviewcontrol)])){
          my $oldval=Query->Param("EXVIEWCONTROL");
          $d.="<select name=EXVIEWCONTROL>";
          if (grep(/^exviewcontrol$/,@param)||
@@ -1859,7 +1858,7 @@ sub findtemplvar
             $d.="<option value=\"\" ".
                 ">&lt; ".$self->T("select deputy control")." &gt;</option>";
          }
-         if (grep(/^deputycontrol$/,@param)){
+         if (in_array(\@param,"deputycontrol")){
             $d.="<option value=\"ADDDEP\"";
             $d.=" selected" if ($oldval eq "ADDDEP");
             $d.=">".$self->T('include deputy data')."</option>";
@@ -1867,18 +1866,24 @@ sub findtemplvar
             $d.=" selected" if ($oldval eq "DEPONLY");
             $d.=">".$self->T('list only records as deputy')."</option>";
          }
-         if (grep(/^exviewcontrol$/,@param)){
+         if (in_array(\@param,"exviewcontrol")){
             $d.="<option value=\"CUSTOMER\"";
             $d.=" selected" if ($oldval eq "CUSTOMER");
             $d.=">".$self->T('list records for me as customer')."</option>";
          }
-         if (grep(/^teamviewcontrol$/,@param)){
+         if (in_array(\@param,"teamviewcontrol")){
             $d.="<option value=\"TEAM\"";
             $d.=" selected" if ($oldval eq "TEAM");
             $d.=">".$self->T('list records of my organisational area').
                 "</option>";
          }
-         if (grep(/^teamusercontrol$/,@param)){
+         if (in_array(\@param,"personalview")){
+            $d.="<option value=\"PERSONAL\"";
+            $d.=" selected" if ($oldval eq "PERSONAL");
+            $d.=">".$self->T('only assinged to personal me').
+                "</option>";
+         }
+         if (in_array(\@param,"teamusercontrol")){
             my $userid=$self->getCurrentUserId(); 
             my %g=$self->getGroupsOf($userid, [orgRoles()], 'direct');
             my $u=getModuleObject($self->Config,"base::lnkgrpuser");
