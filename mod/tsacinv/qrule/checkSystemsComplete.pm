@@ -100,7 +100,7 @@ sub qcheckRecord
    $co=~s/-.*$//;
 
    $o->SetFilter({
-      status=>'!"out of operation"',
+      status=>'"in operation"',
       systemola=>'!*ONLY',
       conumber=>$co
    });
