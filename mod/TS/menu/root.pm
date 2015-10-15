@@ -116,7 +116,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.system",
-                      "OSY::system",
+                      "itil::system",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("itts.system.new",
@@ -292,7 +292,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.kern.projectroom",
-                      "OSY::projectroom",
+                      "itil::projectroom",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.kern.servicesupport",
@@ -326,7 +326,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.kern.projectroom.new",
-                      "OSY::projectroom",
+                      "itil::projectroom",
                       func=>'New',
                       defaultacl=>['valid_user']);
 
