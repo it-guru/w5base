@@ -1,4 +1,0 @@
-'OSY::workflow::diary'=>{de=>'Systemtechnik: Systemtagebuch',
-                         en=>'Systemtechnic: Systemdiary'},
-'daily_modified_sysdiary'=>{de=>'tgl. Systemtagebuch Report',
-                            en=>'daily Systemdiary report'},
