@@ -116,11 +116,11 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.system",
-                      "itil::system",
+                      "TS::system",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("itts.system.new",
-                      "itil::system",
+                      "TS::system",
                       func=>'New',
                       defaultacl=>['valid_user']);
 
@@ -165,11 +165,11 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.asset",
-                      "itil::asset",
+                      "TS::asset",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("itts.asset.new",
-                      "itil::asset",
+                      "TS::asset",
                       func=>'New',
                       defaultacl=>['valid_user']);
 
@@ -178,11 +178,11 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.itclust",
-                      "itil::itclust",
+                      "TS::itclust",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.itclust.new",
-                      "itil::itclust",
+                      "TS::itclust",
                       func=>'New',
                       defaultacl=>['valid_user']);
 
@@ -287,7 +287,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.kern.costcenter.new",
-                      "itil::costcenter",
+                      "TS::costcenter",
                       func=>'New',
                       defaultacl=>['valid_user']);
 
