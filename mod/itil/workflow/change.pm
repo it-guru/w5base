@@ -811,8 +811,8 @@ sub getPosibleButtons
    $PublishMode="direct" if ($PublishMode eq "");
    $self->getParent->getNotifyDestinations($PublishMode,$WfRec,\%em,\%cc,
                                                                \%ifappl);
-   msg(INFO,"IT-Eventnotification for ifappl: ".
-            join(", ",sort(keys(%ifappl))));
+   #msg(INFO,"IT-Eventnotification for ifappl: ".
+   #         join(", ",sort(keys(%ifappl))));
    my @email=sort(keys(%em));
    $self->Context->{CurrentTarget}=\@email;
    $self->Context->{CurrentTargetCC}=[keys(%cc)];

@@ -74,7 +74,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["itil::system","OSY::system","AL_TCom::system"]);
+   return(["itil::system","AL_TCom::system"]);
 }
 
 sub qcheckRecord

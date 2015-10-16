@@ -1226,7 +1226,7 @@ sub FinishSubWrite
    my $self=shift;
    my $id=shift;
    my %rec=();
-   msg(INFO,"default FinishSubWrite in $self on $id"); 
+   #msg(INFO,"default FinishSubWrite in $self on $id"); 
    my $idname=$self->IdField->Name();
 
    $self->SetFilter($idname=>\$id);

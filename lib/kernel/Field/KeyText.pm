@@ -111,7 +111,7 @@ sub preProcessFilter
             my $op="like";
             $op="=" if (($sword=~m/^\d+$/));
             my $subcmd="$cmd where fval $op '$sword' and name='$name'";
-            msg(INFO,"key searchcmd and=%s",$subcmd);
+            #msg(INFO,"key searchcmd and=%s",$subcmd);
             $self->getParent->Log(INFO,"sqlread",$subcmd.
                                   " (KeyText subcmd AND)");
             foreach my $rec ($db->getHashList($subcmd)){
