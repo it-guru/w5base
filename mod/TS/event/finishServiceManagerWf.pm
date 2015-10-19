@@ -45,7 +45,7 @@ sub finishServiceManagerWf
    my $wf=getModuleObject($self->Config,"base::workflow");
    my $wfop=$wf->Clone();
 
-   my $flt={srcsys=>'tsssc::*',
+   my $flt={srcsys=>'tssc::*',
             stateid=>\'<21'};
    $wf->SetFilter($flt);
    #$wf->Limit($param{max});
