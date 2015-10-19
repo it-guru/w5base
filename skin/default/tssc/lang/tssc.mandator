@@ -1,4 +1,0 @@
-'tssc::mandator'=>{de=>'AC Mandantenverknüpfung',
-                      en=>'AC Mandatorrelation'},
-'fieldgroup.screlation'=>{de=>'ServiceCenter Verknüpfung',
-                          en=>'ServiceCenter Relation'},

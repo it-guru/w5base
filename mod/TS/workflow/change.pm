@@ -40,10 +40,6 @@ sub addSRCLinkToFacility
 
    if ($d ne ""){
       if (defined($current->{srcsys}) &&
-          $current->{srcsys} eq "tssc::event::scchange"){
-         return("tssc::chm",['srcid'=>'changenumber']);
-      }
-      if (defined($current->{srcsys}) &&
           $current->{srcsys} eq "tssm::event::smchange"){
          return("tssm::chm",['srcid'=>'changenumber']);
       }

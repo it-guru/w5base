@@ -93,7 +93,7 @@ sub new
                 name          =>'civalid',
                 group         =>'dst',
                 label         =>'Valid',
-                translation   =>'tssc::lnk',
+                translation   =>'tssm::lnk',
                 nowrap        =>1,
                 dataobjattr   =>
                   "decode(".

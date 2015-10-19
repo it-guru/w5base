@@ -1,5 +1,0 @@
-'tssc::workflow::scapplinm'=>{de=>'ServiceCenter-Interface: Anwendungs-Incident',
-                              en=>'ServiceCenter-Interface: Application-Incident'},
-'tssc::workflow::scapplinm::tip'=>{
-de=>'Mit diesem Workflow kann ein Incident in ServiceCenter eröffnet werden'},
-'Request nature'=>{de=>'Incident Art'},

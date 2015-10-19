@@ -61,21 +61,6 @@ sub getStepByShortname
 }
 
 
-sub addSRCLinkToFacility
-{
-   my $self=shift;
-   my $d=shift;
-   my $current=shift;
-
-   if ($d ne ""){
-      if (defined($current->{srcsys}) &&
-          $current->{srcsys} ne ""){
-         return("tssc::chm",['srcid'=>'changenumber']);
-      }
-   }
-   return($self->SUPER::addSRCLinkToFacility($d,$current));
-
-}
 
 
 # itil::chmmgmt chmgrteam no more used, see 14246971890003
@@ -191,71 +176,6 @@ sub getDynamicFields
                                          htmldetail  =>0,
                                          group       =>'affected',
                                          container   =>'headref'),
-
-           # interface definition for I-Network access to ServiceCenter fields
-           new kernel::Field::Textarea(  name        =>'sclink_cause',
-                                         label       =>'SC - Cause',
-                                         htmldetail  =>0,
-                                         group       =>'source',
-                                         weblinkto   =>'NONE',
-                                         vjointo     =>'tssc::chm',
-                                         vjoinon    =>['srcid'=>'changenumber'],
-                                         vjoindisp   =>'cause'),
-
-           new kernel::Field::Text(      name        =>'sclink_requestedfrom',
-                                         label       =>'SC - Requested from',
-                                         htmldetail  =>0,
-                                         group       =>'source',
-                                         weblinkto   =>'NONE',
-                                         vjointo     =>'tssc::chm',
-                                         vjoinon    =>['srcid'=>'changenumber'],
-                                         vjoindisp   =>'requestedfrom'),
-
-           new kernel::Field::Textarea(  name        =>'sclink_chmtarget',
-                                         label       =>'SC - Target of Change',
-                                         htmldetail  =>0,
-                                         group       =>'source',
-                                         weblinkto   =>'NONE',
-                                         vjointo     =>'tssc::chm',
-                                         vjoinon    =>['srcid'=>'changenumber'],
-                                         vjoindisp   =>'chmtarget'),
-
-           new kernel::Field::Textarea(  name        =>'sclink_riskomission',
-                                         label       =>'SC - Risk of omission',
-                                         htmldetail  =>0,
-                                         group       =>'source',
-                                         weblinkto   =>'NONE',
-                                         vjointo     =>'tssc::chm',
-                                         vjoinon    =>['srcid'=>'changenumber'],
-                                         vjoindisp   =>'riskomission'),
-
-           new kernel::Field::Textarea(  name     =>'sclink_riskimplementation',
-                                         label       =>'SC - Risk of implementation',
-                                         htmldetail  =>0,
-                                         group       =>'source',
-                                         weblinkto   =>'NONE',
-                                         vjointo     =>'tssc::chm',
-                                         vjoinon    =>['srcid'=>'changenumber'],
-                                         vjoindisp   =>'riskimplementation'),
-
-           new kernel::Field::Textarea(  name        =>'sclink_impactdesc',
-                                         label       =>'SC - Impact description',
-                                         htmldetail  =>0,
-                                         group       =>'source',
-                                         weblinkto   =>'NONE',
-                                         vjointo     =>'tssc::chm',
-                                         vjoinon    =>['srcid'=>'changenumber'],
-                                         vjoindisp   =>'impactdesc'),
-
-           new kernel::Field::Textarea(  name        =>'sclink_validation',
-                                         label       =>'SC - Validation',
-                                         htmldetail  =>0,
-                                         group       =>'source',
-                                         weblinkto   =>'NONE',
-                                         vjointo     =>'tssc::chm',
-                                         vjoinon    =>['srcid'=>'changenumber'],
-                                         vjoindisp   =>'validation'),
-
    ));
 }
 

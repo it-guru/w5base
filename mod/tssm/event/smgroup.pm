@@ -70,12 +70,10 @@ sub smgroup
    my $sgrp=getModuleObject($self->Config,"tssm::group");
    my $mgrp=getModuleObject($self->Config,"tsgrpmgmt::grp");
    my $agrp=getModuleObject($self->Config,"tsacinv::group");
-   my $cgrp=getModuleObject($self->Config,"tssc::group");
    my $opagrp=$agrp->Clone();
    my $opsgrp=$sgrp->Clone();
    my $opmgrp=$mgrp->Clone();
-   my $opcgrp=$cgrp->Clone();
-   my %dataobj=(agrp=>$opagrp,sgrp=>$opsgrp,mgrp=>$opmgrp,cgrp=>$opcgrp);
+   my %dataobj=(agrp=>$opagrp,sgrp=>$opsgrp,mgrp=>$opmgrp);
 
    my $srcsys=$self->Self;
 
@@ -201,7 +199,6 @@ sub handleSRec
    my $oldrec=shift;
    my $sgrprec=shift;
    my $agrprec=shift;
-   my $cgrprec=shift;
 
    my @comments;
 
@@ -293,31 +290,11 @@ sub handleSRec
    }
 
 
-   if (!defined($cgrprec)){        # read additional ServiceCenter Data
-      my $sflt;
-      if (defined($oldrec) && $oldrec->{scid} ne ""){
-         $sflt={id=>\$oldrec->{scid}};
-      }
-      elsif (defined($oldrec) && $oldrec->{fullname} ne ""){
-         $sflt={fullname=>\$oldrec->{fullname}};
-      }
-      elsif (defined($sgrprec)){
-         if ($sgrprec->{fullname} ne ""){
-            $sflt={fullname=>\$sgrprec->{fullname}};
-         }
-      }
-      if (defined($sflt)){
-         $dataobj->{cgrp}->SetFilter($sflt);
-         my ($r,$msg)=$dataobj->{cgrp}->getOnlyFirst(qw(ALL));
-         $cgrprec=$r;
-      }
-   }
-
 
 
    my $newrec;
    $newrec->{chkdate}=NowStamp("en");
-   if (defined($sgrprec) || defined($cgrprec) || defined($agrprec)){  # General
+   if (defined($sgrprec) || defined($agrprec)){  # General
       $newrec->{chkdate}=NowStamp("en");
       $newrec->{srcload}=NowStamp("en");
       $newrec->{cistatusid}=4;
@@ -368,16 +345,6 @@ sub handleSRec
       $newrec->{smdate}=NowStamp("en");
    }
 
-   if (defined($cgrprec)){                            # SC Handling
-      if ($cgrprec->{fullname} ne exttrim($cgrprec->{fullname})){
-         push(@comments,"leading or trailing whitespaces on group ".
-                        "'".exttrim($cgrprec->{fullname})."' in ServiceCenter");
-      }
-      if (!defined($oldrec) || $oldrec->{scid} ne $cgrprec->{id}){
-         $newrec->{scid}=$cgrprec->{id};
-      }
-      $newrec->{scdate}=NowStamp("en");
-   }
 
    if (defined($agrprec)){                            # AM Handling
       if ($agrprec->{fullname} ne exttrim($agrprec->{fullname})){
@@ -450,8 +417,6 @@ sub handleSRec
                      smadmgrp=>undef,
                      amid=>undef,
                      amdate=>undef,
-                     scid=>undef,
-                     scdate=>undef,
                      comments=>'data trash by rename operation - '.
                                'SM bevor AM rename',
                      },{
@@ -480,7 +445,7 @@ sub handleSRec
    my $lastseen=365;
    my %lastseen;
    {
-      foreach my $f (qw(smdate scdate amdate)){
+      foreach my $f (qw(smdate amdate)){
          my $d=effVal($oldrec,$newrec,$f);
          if ($d ne ""){
             my $nowstamp=NowStamp("en");

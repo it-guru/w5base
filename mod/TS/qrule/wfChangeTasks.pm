@@ -60,24 +60,24 @@ sub qcheckRecord
    my $exitcode=0;
    my $desc={qmsg=>[],solvtip=>[]};
 
-   if ($rec->{srcid}=~m/^CHM.*$/){
-      my $type="";
-      if (ref($rec->{additional}) eq "HASH" &&
-          ref($rec->{additional}->{ServiceCenterType}) eq "ARRAY"){
-         $type=$rec->{additional}->{ServiceCenterType}->[0];
-      }
-      if ($type ne "standard"){    
-         my $chmtask=getModuleObject($self->getParent->Config,"tssc::chmtask");
-         if (defined($chmtask)){
-            $chmtask->SetFilter({changenumber=>\$rec->{srcid}});
-            if ($chmtask->CountRecords()==0){
-               $exitcode=3 if ($exitcode<3);
-               push(@{$desc->{qmsg}},
-                    'there is are no change tasks in ServiceCenter');
-            }
-         }
-      }
-   }
+   #if ($rec->{srcid}=~m/^CHM.*$/){
+   #   my $type="";
+   #   if (ref($rec->{additional}) eq "HASH" &&
+   #       ref($rec->{additional}->{ServiceCenterType}) eq "ARRAY"){
+   #      $type=$rec->{additional}->{ServiceCenterType}->[0];
+   #   }
+   #   if ($type ne "standard"){    
+   #      my $chmtask=getModuleObject($self->getParent->Config,"tssc::chmtask");
+   #      if (defined($chmtask)){
+   #         $chmtask->SetFilter({changenumber=>\$rec->{srcid}});
+   #         if ($chmtask->CountRecords()==0){
+   #            $exitcode=3 if ($exitcode<3);
+   #            push(@{$desc->{qmsg}},
+   #                 'there is are no change tasks in ServiceCenter');
+   #         }
+   #      }
+   #   }
+   #}
 
    return($exitcode,$desc);
 }

@@ -171,13 +171,13 @@ sub autoFillAutogenField
       my $gfld=$self->getField($fld->{group}."SCassignments",$current);
       my $refid=$gfld->RawValue($current);
       if (defined($refid) && $#{$refid}>=0){
-         my $o=getModuleObject($self->Config,"tssc::group");
-         $o->SetFilter({name=>$refid});
-         foreach my $r ($o->getHashList(qw(users))){
-            foreach my $urec (@{$r->{users}}){
-               $pid{uc($urec->{luser})}++ if ($urec->{luser} ne "");
-            }
-         };
+         #my $o=getModuleObject($self->Config,"tssc::group");
+         #$o->SetFilter({name=>$refid});
+         #foreach my $r ($o->getHashList(qw(users))){
+         #   foreach my $urec (@{$r->{users}}){
+         #      $pid{uc($urec->{luser})}++ if ($urec->{luser} ne "");
+         #   }
+         #};
          my $o=getModuleObject($self->Config,"tssm::group");
          $o->SetFilter({name=>$refid});
          foreach my $r ($o->getHashList(qw(users))){

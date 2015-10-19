@@ -301,16 +301,6 @@ sub new
                 group         =>'source',
                 label         =>'Source-ID',
                 depend        =>[qw(srcsys)],
-                weblinkto     =>sub{
-                   my $self=shift;
-                   my $d=shift;
-                   my $rec=shift;
-                   if ($rec->{srcsys} eq "CSC"){
-                      return("tssc::chm",
-                             ['srcid'=>'changenumber']);
-                   } 
-                   return(undef);
-                },
                 dataobjattr   =>SELpref.
                                 'probsummarym1.tsi_ext_related_ids'),
 

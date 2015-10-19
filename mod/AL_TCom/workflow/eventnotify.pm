@@ -58,16 +58,16 @@ sub getDynamicFields
                 label         =>'related incident ticket',
                 container     =>'headref'),
 
-      new kernel::Field::Htmlarea(
-                name          =>'eventinmrelations',
-                translation   =>'AL_TCom::workflow::eventnotify',
-                group         =>'eventnotifyinternal',
-                label         =>'ServiceCenter event relations',
-                htmldetail    =>0,
-                searchable    =>0,
-                readonly      =>1,
-                delend        =>['eventinmticket'],
-                onRawValue    =>\&calcSCrelations),
+      #new kernel::Field::Htmlarea(
+      #          name          =>'eventinmrelations',
+      #          translation   =>'AL_TCom::workflow::eventnotify',
+      #          group         =>'eventnotifyinternal',
+      #          label         =>'ServiceCenter event relations',
+      #          htmldetail    =>0,
+      #          searchable    =>0,
+      #          readonly      =>1,
+      #          delend        =>['eventinmticket'],
+      #          onRawValue    =>\&calcSCrelations),
 
       new kernel::Field::Number(
                 name          =>'eventkpistart2firstinfo',
@@ -175,25 +175,25 @@ sub getDynamicFields
                 label         =>'event initiating change number',
                 container     =>'headref'),
 
-      new kernel::Field::Textarea(
-                name          =>'eventscproblemcause',
-                translation   =>'AL_TCom::workflow::eventnotify',
-                onRawValue    =>\&loadDataFromSC,
-                group         =>'eventnotifyinternal',
-                readonly      =>1,
-                htmldetail    =>\&isSCproblemSet,
-                depend        =>['eventprmticket'],
-                label         =>'SC Problem cause'),
+      #new kernel::Field::Textarea(
+      #          name          =>'eventscproblemcause',
+      #          translation   =>'AL_TCom::workflow::eventnotify',
+      #          onRawValue    =>\&loadDataFromSC,
+      #          group         =>'eventnotifyinternal',
+      #          readonly      =>1,
+      #          htmldetail    =>\&isSCproblemSet,
+      #          depend        =>['eventprmticket'],
+      #          label         =>'SC Problem cause'),
 
-      new kernel::Field::Textarea(
-                name          =>'eventscproblemsolution',
-                translation   =>'AL_TCom::workflow::eventnotify',
-                group         =>'eventnotifyinternal',
-                depend        =>['eventprmticket'],
-                readonly      =>1,
-                htmldetail    =>\&isSCproblemSet,
-                onRawValue    =>\&loadDataFromSC,
-                label         =>'SC Problem soultion'),
+      #new kernel::Field::Textarea(
+      #          name          =>'eventscproblemsolution',
+      #          translation   =>'AL_TCom::workflow::eventnotify',
+      #          group         =>'eventnotifyinternal',
+      #          depend        =>['eventprmticket'],
+      #          readonly      =>1,
+      #          htmldetail    =>\&isSCproblemSet,
+      #          onRawValue    =>\&loadDataFromSC,
+      #          label         =>'SC Problem soultion'),
 
       new kernel::Field::Number(
                 name          =>'eventnetduration',
@@ -272,54 +272,53 @@ sub getDynamicFields
                 label         =>'Root-Cause found in less then 10wt',
                 container     =>'headref'),
 
-      new kernel::Field::Text(
-                name          =>'eventscprmstatus',
-                translation   =>'AL_TCom::workflow::eventnotify',
-                group         =>'eventnotifypost',
-                vjointo       =>'tssc::prm',
-                vjoinon       =>['eventprmticket'=>'problemnumber'],
-                weblinkto     =>'NONE',
-                vjoindisp     =>'status',
-                readonly      =>1,
-                htmldetail    =>0,
-                label         =>'SC Problem status'),
+      #new kernel::Field::Text(
+      #          name          =>'eventscprmstatus',
+      #          translation   =>'AL_TCom::workflow::eventnotify',
+      #          group         =>'eventnotifypost',
+      #          vjointo       =>'tssc::prm',
+      #          vjoinon       =>['eventprmticket'=>'problemnumber'],
+      #          weblinkto     =>'NONE',
+      #          vjoindisp     =>'status',
+      #          readonly      =>1,
+      #          htmldetail    =>0,
+      #          label         =>'SC Problem status'),
 
-      new kernel::Field::Text(
-                name          =>'eventscprmsolutiontype',
-                translation   =>'AL_TCom::workflow::eventnotify',
-                group         =>'eventnotifypost',
-                vjointo       =>'tssc::prm',
-                vjoinon       =>['eventprmticket'=>'problemnumber'],
-                weblinkto     =>'NONE',
-                vjoindisp     =>'solutiontype',
-                readonly      =>1,
-                htmldetail    =>0,
-                label         =>'SC Problem Solution Type'),
+      #new kernel::Field::Text(
+      #          name          =>'eventscprmsolutiontype',
+      #          translation   =>'AL_TCom::workflow::eventnotify',
+      #          group         =>'eventnotifypost',
+      #          vjointo       =>'tssc::prm',
+      #          vjoinon       =>['eventprmticket'=>'problemnumber'],
+      #          weblinkto     =>'NONE',
+      #          vjoindisp     =>'solutiontype',
+      #          readonly      =>1,
+      #          htmldetail    =>0,
+      #          label         =>'SC Problem Solution Type'),
 
-      new kernel::Field::Text(
-                name          =>'eventscprmclosetype',
-                translation   =>'AL_TCom::workflow::eventnotify',
-                group         =>'eventnotifypost',
-                vjointo       =>'tssc::prm',
-                vjoinon       =>['eventprmticket'=>'problemnumber'],
-                weblinkto     =>'NONE',
-                vjoindisp     =>'closetype',
-                readonly      =>1,
-                htmldetail    =>0,
-                label         =>'SC Problem Close Type'),
+      #new kernel::Field::Text(
+      #          name          =>'eventscprmclosetype',
+      #          translation   =>'AL_TCom::workflow::eventnotify',
+      #          group         =>'eventnotifypost',
+      #          vjointo       =>'tssc::prm',
+      #          vjoinon       =>['eventprmticket'=>'problemnumber'],
+      #          weblinkto     =>'NONE',
+      #          vjoindisp     =>'closetype',
+      #          readonly      =>1,
+      #          htmldetail    =>0,
+      #          label         =>'SC Problem Close Type'),
 
-      new kernel::Field::Text(
-                name          =>'eventscproblemstatus',
-                translation   =>'AL_TCom::workflow::eventnotify',
-                group         =>'eventnotifypost',
-                vjointo       =>'tssc::inm',
-                vjoinon       =>['eventinmticket'=>'incidentnumber'],
-                weblinkto     =>'NONE',
-                vjoindisp     =>'status',
-                readonly      =>1,
-                htmldetail    =>0,
-                label         =>'SC Incident status'),
-
+      #new kernel::Field::Text(
+      #          name          =>'eventscproblemstatus',
+      #          translation   =>'AL_TCom::workflow::eventnotify',
+      #          group         =>'eventnotifypost',
+      #          vjointo       =>'tssc::inm',
+      #          vjoinon       =>['eventinmticket'=>'incidentnumber'],
+      #          weblinkto     =>'NONE',
+      #          vjoindisp     =>'status',
+      #          readonly      =>1,
+      #          htmldetail    =>0,
+      #          label         =>'SC Incident status'),
       ));
 
 }
@@ -454,141 +453,141 @@ sub getNotificationSubject
 }
 
 
-sub calcSCrelations
-{
-   my $self=shift;
-   my $current=shift;
-   my $inm=$self->getParent->getField("eventinmticket")->RawValue($current);
-   my $sclnk=getModuleObject($self->getParent->Config,"tssc::lnk");
-   my $d;
-   my @treelist;
-   if ($inm ne ""){
-      my %chk;
-      my @path;
-      $d.=$self->getParent->calcSCrelationsSubTree($sclnk,\%chk,\@treelist,
-                                                   \@path,
-                                                   0,0,0,$inm,'tssc::inm');
-   }
-   my $raw=join("\n",map({join(",",@$_)} @treelist));
-   return({treelist=>\@treelist,RawValue=>$raw,
-           HtmlV01=>"<pre>$d</pre>"});
-}
+#sub calcSCrelations
+#{
+#   my $self=shift;
+#   my $current=shift;
+#   my $inm=$self->getParent->getField("eventinmticket")->RawValue($current);
+#   my $sclnk=getModuleObject($self->getParent->Config,"tssc::lnk");
+#   my $d;
+#   my @treelist;
+#   if ($inm ne ""){
+#      my %chk;
+#      my @path;
+#      $d.=$self->getParent->calcSCrelationsSubTree($sclnk,\%chk,\@treelist,
+#                                                   \@path,
+#                                                   0,0,0,$inm,'tssc::inm');
+#   }
+#   my $raw=join("\n",map({join(",",@$_)} @treelist));
+#   return({treelist=>\@treelist,RawValue=>$raw,
+#           HtmlV01=>"<pre>$d</pre>"});
+#}
 
-sub calcSCrelationsSubTree
-{
-   my $self=shift;
-   my $sclnk=shift;
-   my $chk=shift;
-   my $treelist=shift;
-   my $path=shift;
-   my $level=shift;
-   my $uplaypos=shift;
-   my $uplaymax=shift;
-   my $id=shift;
-   my $idobj=shift;
-   my $d;
-   return($d."...") if ($level>10);
-   return("") if (exists($chk->{$id}));
+#sub calcSCrelationsSubTree
+#{
+#   my $self=shift;
+#   my $sclnk=shift;
+#   my $chk=shift;
+#   my $treelist=shift;
+#   my $path=shift;
+#   my $level=shift;
+#   my $uplaypos=shift;
+#   my $uplaymax=shift;
+#   my $id=shift;
+#   my $idobj=shift;
+#   my $d;
+#   return($d."...") if ($level>10);
+#   return("") if (exists($chk->{$id}));
+#
+#   my $off=$level*10;
+#   my $offtd;
+#   my $state="unknown";
+#   if ($idobj ne ""){
+#      my $idfield;
+#      $idfield="problemnumber"   if ($idobj eq "tssc::prm");
+#      $idfield="changenumber"    if ($idobj eq "tssc::chm");
+#      $idfield="incidentnumber"  if ($idobj eq "tssc::inm");
+#      if (defined($idfield)){
+#         my $o=getModuleObject($self->Config,$idobj);
+#         if (defined($o)){
+#            $o->SetFilter({$idfield=>\$id});
+#            my ($r,$msg)=$o->getOnlyFirst(qw(status description));
+#            if (defined($r)){
+#               $state=lc($r->{status});
+#            }
+#         }
+#      }
+#      if ($state eq "closed"){
+#         $state="<font color=green>$state</font>";
+#      }
+#      else{
+#         $state="<font color=red>$state</font>";
+#      }
+#   }
+#   return() if ($level>2);
+#   
+#   $offtd="<td width=$off></td>" if ($off>0);
+#   $d.="\n<table border=0 cellspacing=0 cellpadding=0 width=100%>".
+#       "<tr>$offtd<td>$id ($state)</td></tr>\n"; 
+#   $chk->{$id}++;
+#   $sclnk->ResetFilter();
+#   if ($level==0){
+#      $sclnk->SetFilter({src=>\$id,dst=>"PRM*"});
+#   }
+#   if ($level>0){
+#      $sclnk->SetFilter({src=>\$id,dst=>"CHM*"});
+#   }
+#   my @rel=$sclnk->getHashList(qw(dst dstobj));
+#   if ($level==0){
+#      my @subprm;
+#      foreach my $prm (@rel){
+#         push(@subprm,$prm->{dst}) if ($prm->{dst}=~m/^PRM/);
+#      }
+#      if ($#subprm!=-1){
+#         $sclnk->SetFilter({src=>\@subprm,dst=>"PRM*"});
+#         my @subrel=$sclnk->getHashList(qw(dst dstobj));
+#         if ($#subrel!=-1){
+#            push(@rel,@subrel);
+#         }
+#      }
+#   }
+#   for(my $laypos=0;$laypos<=$#rel;$laypos++){
+#      push(@$path,$id);
+#      my $s=$self->calcSCrelationsSubTree($sclnk,$chk,$treelist,$path,
+#                                          $level+1,$laypos,$#rel,
+#                                          $rel[$laypos]->{dst},
+#                                          $rel[$laypos]->{dstobj});
+#      pop(@$path);
+#      if ($s ne ""){
+#         $d.="<tr>$offtd<td>".$s."</td></tr>\n";
+#      }
+#   }
+#   if ($#rel==-1){
+#      my @l=(@$path,$id);
+#      push(@$treelist,\@l);
+#   }
+#   $d.="</table>";
+#   return($d);
+#}
 
-   my $off=$level*10;
-   my $offtd;
-   my $state="unknown";
-   if ($idobj ne ""){
-      my $idfield;
-      $idfield="problemnumber"   if ($idobj eq "tssc::prm");
-      $idfield="changenumber"    if ($idobj eq "tssc::chm");
-      $idfield="incidentnumber"  if ($idobj eq "tssc::inm");
-      if (defined($idfield)){
-         my $o=getModuleObject($self->Config,$idobj);
-         if (defined($o)){
-            $o->SetFilter({$idfield=>\$id});
-            my ($r,$msg)=$o->getOnlyFirst(qw(status description));
-            if (defined($r)){
-               $state=lc($r->{status});
-            }
-         }
-      }
-      if ($state eq "closed"){
-         $state="<font color=green>$state</font>";
-      }
-      else{
-         $state="<font color=red>$state</font>";
-      }
-   }
-   return() if ($level>2);
-   
-   $offtd="<td width=$off></td>" if ($off>0);
-   $d.="\n<table border=0 cellspacing=0 cellpadding=0 width=100%>".
-       "<tr>$offtd<td>$id ($state)</td></tr>\n"; 
-   $chk->{$id}++;
-   $sclnk->ResetFilter();
-   if ($level==0){
-      $sclnk->SetFilter({src=>\$id,dst=>"PRM*"});
-   }
-   if ($level>0){
-      $sclnk->SetFilter({src=>\$id,dst=>"CHM*"});
-   }
-   my @rel=$sclnk->getHashList(qw(dst dstobj));
-   if ($level==0){
-      my @subprm;
-      foreach my $prm (@rel){
-         push(@subprm,$prm->{dst}) if ($prm->{dst}=~m/^PRM/);
-      }
-      if ($#subprm!=-1){
-         $sclnk->SetFilter({src=>\@subprm,dst=>"PRM*"});
-         my @subrel=$sclnk->getHashList(qw(dst dstobj));
-         if ($#subrel!=-1){
-            push(@rel,@subrel);
-         }
-      }
-   }
-   for(my $laypos=0;$laypos<=$#rel;$laypos++){
-      push(@$path,$id);
-      my $s=$self->calcSCrelationsSubTree($sclnk,$chk,$treelist,$path,
-                                          $level+1,$laypos,$#rel,
-                                          $rel[$laypos]->{dst},
-                                          $rel[$laypos]->{dstobj});
-      pop(@$path);
-      if ($s ne ""){
-         $d.="<tr>$offtd<td>".$s."</td></tr>\n";
-      }
-   }
-   if ($#rel==-1){
-      my @l=(@$path,$id);
-      push(@$treelist,\@l);
-   }
-   $d.="</table>";
-   return($d);
-}
 
 
-
-sub loadDataFromSC
-{
-   my $self=shift;
-   my $current=shift;
-
-   my $reffld=$self->getParent->getField("eventprmticket",$current);
-   return(undef) if (!defined($reffld));
-   my $prmid=$reffld->RawValue($current);
-   return(undef) if (!defined($prmid) || $prmid eq "");
-   my $scprm=getModuleObject($self->getParent->Config,"tssc::prm");
-   if (defined($scprm)){
-      $scprm->SetFilter({problemnumber=>\$prmid});
-      my ($prmrec,$msg)=$scprm->getOnlyFirst(qw(cause solution));
-      if (defined($prmrec)){ 
-         if ($self->Name eq "eventscproblemcause"){
-            return($prmrec->{cause});
-         }
-         if ($self->Name eq "eventscproblemsolution"){
-            return($prmrec->{solution});
-         }
-      }
-   }
-   
-   return(undef);
-
-}
+#sub loadDataFromSC
+#{
+#   my $self=shift;
+#   my $current=shift;
+#
+#   my $reffld=$self->getParent->getField("eventprmticket",$current);
+#   return(undef) if (!defined($reffld));
+#   my $prmid=$reffld->RawValue($current);
+#   return(undef) if (!defined($prmid) || $prmid eq "");
+#   my $scprm=getModuleObject($self->getParent->Config,"tssc::prm");
+#   if (defined($scprm)){
+#      $scprm->SetFilter({problemnumber=>\$prmid});
+#      my ($prmrec,$msg)=$scprm->getOnlyFirst(qw(cause solution));
+#      if (defined($prmrec)){ 
+#         if ($self->Name eq "eventscproblemcause"){
+#            return($prmrec->{cause});
+#         }
+#         if ($self->Name eq "eventscproblemsolution"){
+#            return($prmrec->{solution});
+#         }
+#      }
+#   }
+#   
+#   return(undef);
+#
+#}
 
 
 sub getFixNotifyDestinations

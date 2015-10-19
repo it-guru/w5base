@@ -1,3 +1,0 @@
-'tssc::MyW5Base::incident'=>{
-               de=>'Tool: suche ITIL Incident über ServiceCenter Incidentnummer',
-               en=>'Tool: search ITIL Incident by ServiceCenter Incidentnumber'},

@@ -1,6 +1,0 @@
-'tssc::workflow::scpassreq'=>{de=>'ServiceCenter-Interface: Usermanagement: Passwort Rücksetzung',
-                              en=>'ServiceCenter-Interface: Usermanagement: Passwort Reset'},
-'tssc::workflow::scpassreq::tip'=>{
-de=>'Mit diesem Workflow kann eine Passwort-Rücksetzung für verschiedenen Systeme beauftragt werden'},
-'Target System where user exists'=>{de=>'Zielsystem für die Passwortrücksetzung'},
-'user account to reset password'=>{de=>'Benutzerkennung'},

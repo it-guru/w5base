@@ -600,16 +600,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcid',
                 depend        =>[qw(srcsys)],
-                weblinkto     =>sub{
-                   my $self=shift;
-                   my $d=shift;
-                   my $rec=shift;
-                   if ($rec->{srcsys} eq "CSC"){
-                      return("tssc::chm",
-                             ['srcid'=>'changenumber']);
-                   }
-                   return(undef);
-                },
                 group         =>'source',
                 label         =>'Source-ID',
                 dataobjattr   =>SELpref.

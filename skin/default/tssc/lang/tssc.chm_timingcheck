@@ -1,5 +1,0 @@
-'tssc::chm_timingcheck'=>{de=>'ServiceCenter Change Veränderungs Check 100 Stunden',
-                          en=>'ServiceCenter 100h modifiy timing check'},
-'Timeslot'=>{de=>'Zeitfenster'},
-'count of modified changes'=>{de=>'Anzahl veränderter Changes'},
-'interface processed'=>{de=>'Interface Zeitzeiger'},

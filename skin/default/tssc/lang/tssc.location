@@ -1,7 +1,0 @@
-'tssc::location'=>{de=>'ServiceCenter Standort',en=>'ServiceCenter Location'},
-'Location name'=>{de=>'Standortname'},
-'Street address'=>{de=>'Strasse und Hausnummer'},
-'ZIP Code'=>{de=>'Postleitzahl'},
-'Location'=>{de=>'Ort'},
-'Country'=>{de=>'Land'},
-'Company'=>{de=>'Firma'},
