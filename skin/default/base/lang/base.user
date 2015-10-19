@@ -145,3 +145,7 @@
 'STEVborderchange'=>{de=>'Info bei Änderung tangierender Elemente über die Funktion oder Rolle',en=>'automatic border-change notification by function or role'},
 'last Known Boss' =>{ de=>'letzter bekannter Vorgesetzter'},
 'last Known Boss IDs' =>{ de=>'letzter bekannter Vorgesetzter IDs'},
+'Window-Handling'=>{de=>'Fensterverwaltung'},
+'windefault'=>{de=>'Standardbehandlung - immer neues Fenster'},
+'winminimal'=>{de=>'Datensatz im gleichen Fenster öffnen'},
+'winonlyone'=>{de=>'alle Datensätze nur in EINEM Fenster öffnen'},

@@ -1731,13 +1731,23 @@ sub getDetailFunctionsCode
    if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
       $winsize=$UserCache->{winsize};
    }
+   my $winname="_blank";
+   if (defined($UserCache->{winhandling}) && 
+       $UserCache->{winhandling} eq "winonlyone"){
+      $winname="W5BaseDataWindow";
+   }
+   if (defined($UserCache->{winhandling}) 
+       && $UserCache->{winhandling} eq "winminimal"){
+      $winname="W5B_".$self->Self."_".$id;
+      $winname=~s/[^a-z0-9]/_/gi;
+   }
    if ($winsize eq ""){
-      $copyo="openwin(\"Copy?CurrentIdToEdit=$id\",\"_blank\",".
+      $copyo="openwin(\"Copy?CurrentIdToEdit=$id\",\"$winname\",".
           "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
           "resizable=yes,scrollbars=auto\")";
    }
    else{
-      $copyo="custopenwin(\"Copy?CurrentIdToEdit=$id\",\"$winsize\",$detailx)";
+      $copyo="custopenwin(\"Copy?CurrentIdToEdit=$id\",\"$winsize\",$detailx,\"$winname\")";
    }
 
    my $d=<<EOF;

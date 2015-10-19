@@ -224,9 +224,19 @@ sub ProcessLine
             if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
                $winsize=$UserCache->{winsize};
             }
+            my $winname="_blank";
+            if (defined($UserCache->{winhandling}) &&
+                $UserCache->{winhandling} eq "winonlyone"){
+               $winname="W5BaseDataWindow";
+            }
+            if (defined($UserCache->{winhandling})
+                && $UserCache->{winhandling} eq "winminimal"){
+               $winname="W5B_".$app->Self."_".$id;
+               $winname=~s/[^a-z0-9]/_/gi;
+            }
             if ($dest ne ""){
                $lineonclick="custopenwin(\"$dest\",\"$winsize\",".
-                            "$detailx,$detaily)";
+                            "$detailx,$detaily,\"$winname\")";
             }
          }
       }

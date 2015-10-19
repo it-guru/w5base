@@ -230,8 +230,18 @@ sub addWebLinkToFacility
          if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
             $winsize=$UserCache->{winsize};
          }
+         my $winname="_blank";
+         if (defined($UserCache->{winhandling}) && 
+             $UserCache->{winhandling} eq "winonlyone"){
+            $winname="W5BaseDataWindow";
+         }
+         if (defined($UserCache->{winhandling}) 
+             && $UserCache->{winhandling} eq "winminimal"){
+            $winname="W5B_".$weblinkto."_".$targetval;
+            $winname=~s/[^a-z0-9]/_/gi;
+         }
          my $onclick="custopenwin('$dest','$winsize',".
-                     "$detailx,$detaily)";
+                     "$detailx,$detaily,'$winname')";
          #$d="<a class=sublink href=JavaScript:$onclick>".$d."</a>";
          my $context;
          if (defined($param{contextMenu})){

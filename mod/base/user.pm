@@ -653,6 +653,16 @@ sub new
                                  'f800','f1024'],
                 container     =>'options'),
 
+      new kernel::Field::Select(
+                name          =>'winhandling',
+                uploadable    =>0,
+                label         =>'Window-Handling',
+                htmleditwidth =>'50%',
+                group         =>'userparam',
+                default       =>'normal',
+                value         =>['windefault','winminimal','winonlyone'],
+                dataobjattr   =>'contact.winhandling'),
+
       new kernel::Field::Textarea(
                 name          =>'w5mailsig',
                 uploadable    =>0,

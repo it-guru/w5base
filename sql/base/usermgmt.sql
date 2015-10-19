@@ -366,3 +366,4 @@ create table useradvice (
 );
 alter table grp  add ext_refid1 varchar(40),add key(ext_refid1), add ext_refid2 varchar(80), add key(ext_refid2);
 alter table contact add lastknownboss char(128) default NULL;
+alter table contact add winhandling char(20) default 'windefault';

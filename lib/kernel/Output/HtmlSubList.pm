@@ -219,9 +219,18 @@ sub ProcessLine
             $dest=~s/"/ /g;
             my $detailx=$app->DetailX();
             my $detaily=$app->DetailY();
-
+            my $winname="_blank";
+            if (defined($UserCache->{winhandling}) &&
+                $UserCache->{winhandling} eq "winonlyone"){
+               $winname="W5BaseDataWindow";
+            }
+            if (defined($UserCache->{winhandling})
+                && $UserCache->{winhandling} eq "winminimal"){
+               $winname="W5B_".$dest."_".$id;
+               $winname=~s/[^a-z0-9]/_/gi;
+            }
             $lineonclick="custopenwin(\"$dest\",\"$winsize\",".
-                         "$detailx,$detaily)";
+                         "$detailx,$detaily,\"$winname\")";
          }
          else{
            $lineonclick=undef;
@@ -312,9 +321,19 @@ sub ProcessLine
                   $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
                   my %q=('AllowClose'=>1,
                          "search_$targetid"=>$targetval);
+                  my $winname="_blank";
+                  if (defined($UserCache->{winhandling}) &&
+                      $UserCache->{winhandling} eq "winonlyone"){
+                     $winname="W5BaseDataWindow";
+                  }
+                  if (defined($UserCache->{winhandling})
+                      && $UserCache->{winhandling} eq "winminimal"){
+                     $winname="W5B_".$weblinkto."_".$targetval;
+                     $winname=~s/[^a-z0-9]/_/gi;
+                  }
                   my $dest="$target?".kernel::cgi::Hash2QueryString(%q);
                   $fclick="custopenwin(\"$dest\",\"$winsize\",".
-                               "$detailx,$detaily)";
+                               "$detailx,$detaily,\"$winname\")";
                }
             }
          }
