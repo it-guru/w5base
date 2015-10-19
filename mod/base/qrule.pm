@@ -171,6 +171,7 @@ sub isQruleApplicable
    my $lnkrec=shift;
    my $rec=shift;
 
+   return(0) if (!defined($do));
    my $dataobjparent=$do->SelfAsParentObject();
    my @objlist=@$objlist;
    push(@objlist,Class::ISA::self_and_super_path($objlist->[0]));
