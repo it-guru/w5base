@@ -127,6 +127,11 @@ sub qcheckRecord
          if (!$pmexists){    # Wenn in Darwin kein Projektmanager erfasst, dann
             $autocorrect=1;  # darf der PM direkt aus CapeTS übernommen werden.
          }                   # request: 14151779290001
+ 
+         $autocorrect=1;     # Nach einer Meinungsänderung von Peter soll nun
+                             # mit dem Request 14447420560003 der 
+                             # Projektmanager IMMER hart übernommen werden.
+ 
          foreach my $pmid (@pm_soll){
             my $pmfound=0;
             foreach my $crec (@{$rec->{contacts}}){
