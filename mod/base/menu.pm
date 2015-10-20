@@ -763,7 +763,13 @@ sub LoginFail
 {
    my $self=shift;
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','menu.css']);
+   print $self->HtmlHeader(style=>[]);  # Styles are not posible (path problem)
+   #
+   # Achtung: Diese Seite darf nicht relativ innerhalb von W5Base Darwin
+   #          verlinken, da sie direkt als Error-Page im Apache konfiguriert
+   #          wird - und somit innerhalb jedes Contextes auftauchen kann
+   #
+   #
    print $self->getParsedTemplate("tmpl/LoginFail");
    print ("</html>");
 }
