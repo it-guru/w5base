@@ -6,8 +6,9 @@ package tsacinv::qrule::syncApplSystemsSAPInst;
 
 This rule checks an application in CI-Status "installed/active" or "available"
 with managed item group "SAP".
-It detects all systems of related SAP-Instances in AssetManager and
-synchronizes the system relations of the application automatically.
+It detects all systems in state 'in operation' of related SAP-Instances
+in AssetManager and synchronizes the system relations
+of the application automatically.
 
 Not yet existing assets and systems will be previously automatically created.
 
@@ -123,7 +124,8 @@ sub qcheckRecord
 
    # Systems in SAP-Relations
    my @sapapplids=map {$_->{lchildid}} @sapappls;
-   $acapplsys->SetFilter({lparentid=>\@sapapplids});
+   $acapplsys->SetFilter({lparentid=>\@sapapplids,
+                          sysstatus=>\'in operation'});
    my @sapsys=$acapplsys->getHashList(qw(systemid child sysstatus));
 
    # Systems in W5Base application
@@ -138,6 +140,7 @@ sub qcheckRecord
    foreach my $sys (@w5sys) {
       $allsys{$sys->{systemsystemid}}{is_w5}++;
       $allsys{$sys->{systemsystemid}}{name}=$sys->{system};
+      $allsys{$sys->{systemsystemid}}{w5cistatusid}=$sys->{systemcistatusid};
    }
    my @missingsys=grep {$allsys{$_}{is_sap} && !$allsys{$_}{is_w5}}
                        keys(%allsys);
@@ -145,12 +148,26 @@ sub qcheckRecord
    my @disusedsys=grep {$allsys{$_}{is_w5} && !$allsys{$_}{is_sap}}
                        keys(%allsys);
 
-   return(0,undef) if ($#missingsys==-1 && $#disusedsys==-1);
-
    my @qmsg;
    my @dataissue;
    my $errorlevel=0;
    my @notifymsg;
+
+   foreach my $sysid (keys(%allsys)) {
+      if ($allsys{$sysid}{is_sap} &&
+          $allsys{$sysid}{is_w5}  &&
+          $allsys{$sysid}{w5cistatusid}!=4) {
+         $errorlevel=3 if ($errorlevel<3);
+         my $m="CI-State ambiguous: ".$allsys{$sysid}{name};
+         push(@qmsg,$m);
+         push(@dataissue,$m);
+      }
+   }
+
+   if ($#missingsys==-1 && $#disusedsys==-1) {
+      return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue})
+   }
+
 
    $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
       emailcc=>['11634955120001'],
