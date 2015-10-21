@@ -1,13 +1,13 @@
 'you are not authorized to set this state, please wait for activation'=>{
-    de=>'Sie sind nicht berechtig, diesen Status zu setzen - bitte warten Sie auf die Aktivierung'},
+    de=>'Sie sind nicht berechtigt, diesen Status zu setzen - bitte warten Sie auf die Aktivierung'},
 'you are not authorized to set this state, please set state to "requested"'=>{
-    de=>'Sie sind nicht berechtig, diesen Status zu setzen - bitte setzen Sie den Status "angefordert"'},
+    de=>'Sie sind nicht berechtigt, diesen Status zu setzen - bitte setzen Sie den Status "angefordert"'},
 "you are only authorized to add in 'order' or 'reserved' state"=>{
     de=>"Sie sind nur berechtigt, Daten im Status 'angefordert' oder 'reserviert' hinzuzufügen"},
 'you are not authorized to set this state'=>{
-    de=>'Sie sind nicht berechtig, diesen Status zu setzen'},
+    de=>'Sie sind nicht berechtigt, diesen Status zu setzen'},
 'you are not authorized to create items with this state'=>{
-    de=>'Sie sind nicht berechtig, Einträge in diesem Status zu erzeugen'},
+    de=>'Sie sind nicht berechtigt, Einträge in diesem Status zu erzeugen'},
 'current state of the requested CI'=>{
     de=>'aktueller Status des angeforderten CI'},
 "Request to activate '\%s' in module '\%s'"=>{
@@ -22,17 +22,17 @@
 
  %s
 
-Please check the config item to "installed/activ" if
+Please check the config item to "installed/active" if
 it is ok.
 
-The complet list of config items of type "%s" can
+The complete list of config items of type "%s" can
 be viewed by 
 
   %s
 
-The requestor is automaticly informed by email about
+The requestor is automatically informed by email about
 your changes.
-',de=>'Von %s wurde hiermit angefordert, dass 
+',de=>'Von %s wurde hiermit angefordert, das 
 Config-Item "%s" zu aktivieren.
 
  %s
@@ -64,8 +64,8 @@ If you have set the CI-State to "requested" the admin will get a mail with your 
 
  %s
 
-Im Status "reserviert" ist es auch möglich, noch fehlende Informationen (z.B. Telefonnummern, Herstellerbeizeichnungen ...) in dem jeweiligen Config-Item nachzutragen.
-Wen Sie den CI-Status auf "angefordert" ändern, erhält der Admin eine E-Mail über diese Anforderung. Hat dann der Admin den Status auf "installiert/aktiv" geändert, so erhalten sie eine entsprechende Bestätigung.
+Im Status "reserviert" ist es auch möglich, noch fehlende Informationen (z.B. Telefonnummern, Herstellerbezeichnungen ...) in dem jeweiligen Config-Item nachzutragen.
+Wenn Sie den CI-Status auf "angefordert" ändern, erhält der Admin eine E-Mail über diese Anforderung. Hat dann der Admin den Status auf "installiert/aktiv" geändert, so erhalten Sie eine entsprechende Bestätigung.
 
 Die vollständige Liste der Config-Items vom Typ "%s" können Sie über folgenden Link ...
 
@@ -96,20 +96,20 @@ Die vollständige Liste der Config-Items vom Typ "%s" können Sie über folgenden L
 
 '},
 
-'MSG004'=>{en=>'The Config-Item "%s" has been droped by the admin. If you need detail informations about the reason of this acition, you can contact the admin by answering this mail.
+'MSG004'=>{en=>'The Config-Item "%s" has been dropped by the admin. If you need detail informations about the reason of this action, you can contact the admin by answering this mail.
 
-Normal resons are f.e. the naming want correct or the entry already exists by an other name.
+Normal reasons are f.e. the naming want correct or the entry already exists by an other name.
 
 ',de=>'Das angeforderte Config-Item "%s" wurde durch den Admin gelöscht. Wenn Sie weitere Information über den Grund der Löschung benötigen, so können Sie Ihre Fragen als Antwort auf diese Mail formulieren.
 
-Normale Gründe für eine solche Löschung sind z.B. dass die Namenskonvetionen nicht eingehalten wurden oder das Config-Item existiert bereits unter einem änlichen/anderen Namen.
+Normale Gründe für eine solche Löschung sind z.B., dass die Namenskonventionen nicht eingehalten wurden oder das Config-Item existiert bereits unter einem ähnlichen/anderen Namen.
 
 '},
 'MSG005'=>{en=>'%s: INSERT
 
 The Config-Item "%s" %shas been new inserted by "%s".
 
-Depending on your user rights, it is posible that the new record is not accessable by you.
+Depending on your user rights, it is possible that the new record is not accessable by you.
 
 ',de=>'%s: NEUEINGABE
 
@@ -126,9 +126,9 @@ Das Config-Item "%s" %swurde durch den User "%s" gelöscht.
 '},
 'MSG007'=>{en=>'%s: ACTIVATE
 
-The Config-Item "%s" %shas been acivated by "%s".
+The Config-Item "%s" %shas been activated by "%s".
 
-Depending on your user rights, it is posible that the new record is not accessable by you.
+Depending on your user rights, it is possible that the new record is not accessable by you.
 
 ',de=>'%s: AKTIVIERUNG
 
@@ -138,9 +138,9 @@ Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nic
 '},
 'MSG008'=>{en=>'%s: DEACTIVATE
 
-The Config-Item "%s" %shas been deacivated by "%s".
+The Config-Item "%s" %shas been deactivated by "%s".
 
-Depending on your user rights, it is posible that the new record is not accessable by you.
+Depending on your user rights, it is possible that the new record is not accessable by you.
 
 ',de=>'%s: DEAKTIVIERUNG
 
@@ -151,4 +151,4 @@ Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nic
 
 
 "invalid character in key field '\%s'"=>{de=>"ungültiges Zeichen in Schlüsselfeld '\%s'"},
-'MSG010'=>{de=>'im Mandaten "%s" ',en=>'at mandator "%s" '},
+'MSG010'=>{de=>'im Mandanten "%s" ',en=>'at mandator "%s" '},
