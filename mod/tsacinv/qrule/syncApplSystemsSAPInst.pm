@@ -189,7 +189,7 @@ sub qcheckRecord
          if (in_array(SAP_ADMINS,$sysrec->{databossid})) {
             if ($sysobj->ValidatedUpdateRecord($sysrec,{cistatusid=>4},
                                                {id=>\$sysrec->{id}})) {
-               ($sysrec,$msg)=$sysobj->getOnlyFirst(qw(name cistatusid));
+               ($sysrec,$msg)=$sysobj->getOnlyFirst(qw(ALL));
                $sysobj->NotifyWriteAuthorizedContacts($sysrec,undef,{
                    emailcc=>SAP_ADMINS,
                   },{
@@ -199,9 +199,9 @@ sub qcheckRecord
                    datasource=>'SAP-Instances in AssetManager'
                   },sub {
                      my $msg="- ".$sysrec->{name}.": ";
-                     $msg.=$self->T(sprintf("CI-State switched from %d to %d",
-                                            $allsys{$sysid}{w5cistatusid},
-                                            $sysrec->{cistatusid}));
+                     $msg.=sprintf($self->T("CI-State switched from %s to %s"),
+                                   $allsys{$sysid}{w5cistatusid},
+                                   $sysrec->{cistatusid});
                      return($sysrec->{name},$msg);
                   });
 
