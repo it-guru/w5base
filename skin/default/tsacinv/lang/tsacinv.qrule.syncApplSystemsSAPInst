@@ -2,6 +2,12 @@
    de=>'Abgleich Systeme mit SAP-Instanzen in AssetManager',
    en=>'Syncronize systems with SAP-Instances in AssetManager'
 },
+"CI-State switched from %d to %d"=>{
+   de=>"CI-Status von %d auf %d geändert"
+},
+"switched CI-State to installed/active"=>{
+   de=>"CI-Status auf installiert/aktiv geändert"
+},
 "CI-State ambiguous"=>{de=>"CI-Status nicht eindeutig"},
 "Relation to system added"=>{de=>"Verknüpfung mit System hinzugefügt"},
 "Automatic relation with system failed"=>{

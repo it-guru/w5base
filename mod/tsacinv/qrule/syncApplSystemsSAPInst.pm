@@ -74,8 +74,11 @@ use kernel;
 use kernel::QRule;
 @ISA=qw(kernel::QRule);
 
-# Databoss for new systems/assets
-our $newCIDataboss='12808977330001';
+use constant {
+   NEW_CI_DATABOSS =>'12808977330001', # Marek M.
+   SAP_ADMINS      =>[qw(12808977330001 12236427680001 11634955120001)]
+};
+
 
 sub new
 {
@@ -86,10 +89,30 @@ sub new
    return($self);
 }
 
+
 sub getPosibleTargets
 {
    return(["TS::appl"]);
 }
+
+
+sub getNewCIDataboss
+{
+   my $self=shift;
+
+   my $uobj=getModuleObject($self->getParent->Config,"base::user");
+   $uobj->SetFilter({userid=>NEW_CI_DATABOSS,cistatusid=>[4]});
+   my ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
+
+   return($user) if (defined($user));
+
+   $uobj->ResetFilter;
+   $uobj->SetFilter({userid=>SAP_ADMINS,cistatusid=>[4]});
+   ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
+
+   return($user);
+}
+
 
 sub qcheckRecord
 {
@@ -131,7 +154,6 @@ sub qcheckRecord
    # Systems in W5Base application
    $applsys->SetFilter({applid=>\$rec->{id}});
    my @w5sys=$applsys->getHashList(qw(systemsystemid system systemcistatusid));
-
    my %allsys;
    foreach my $sys (@sapsys) {
       $allsys{$sys->{systemid}}{is_sap}++;
@@ -153,31 +175,63 @@ sub qcheckRecord
    my $errorlevel=0;
    my @notifymsg;
 
+   # switch cistate of system to installed/active if not yet is
+   # only if databoss is member of SAP_ADMINS, otherwise create a data issue
    foreach my $sysid (keys(%allsys)) {
       if ($allsys{$sysid}{is_sap} &&
           $allsys{$sysid}{is_w5}  &&
           $allsys{$sysid}{w5cistatusid}!=4) {
-         $errorlevel=3 if ($errorlevel<3);
-         my $m="CI-State ambiguous: ".$allsys{$sysid}{name};
-         push(@qmsg,$m);
-         push(@dataissue,$m);
+
+         my $sysobj=getModuleObject($self->getParent->Config,"itil::system");
+         $sysobj->SetFilter({systemid=>\$sysid});
+         my ($sysrec,$msg)=$sysobj->getOnlyFirst(qw(id name databossid));
+
+         if (in_array(SAP_ADMINS,$sysrec->{databossid})) {
+            if ($sysobj->ValidatedUpdateRecord($sysrec,{cistatusid=>4},
+                                               {id=>\$sysrec->{id}})) {
+               ($sysrec,$msg)=$sysobj->getOnlyFirst(qw(name cistatusid));
+               $sysobj->NotifyWriteAuthorizedContacts($sysrec,undef,{
+                   emailcc=>SAP_ADMINS,
+                  },{
+                   autosubject=>1,
+                   autotext=>1,
+                   mode=>'QualityCheck',
+                   datasource=>'SAP-Instances in AssetManager'
+                  },sub {
+                     my $msg="- ".$sysrec->{name}.": ";
+                     $msg.=$self->T(sprintf("CI-State switched from %d to %d",
+                                            $allsys{$sysid}{w5cistatusid},
+                                            $sysrec->{cistatusid}));
+                     return($sysrec->{name},$msg);
+                  });
+
+               my $m='switched CI-State to installed/active';
+               push(@qmsg,$m.': '.$sysrec->{name});
+            }
+         }
+         else {
+            $errorlevel=3 if ($errorlevel<3);
+            my $m="CI-State ambiguous: ".$allsys{$sysid}{name};
+            push(@qmsg,$m);
+            push(@dataissue,$m);
+         }
       }
    }
+
 
    if ($#missingsys==-1 && $#disusedsys==-1) {
       return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue})
    }
 
-
    $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
-      emailcc=>['11634955120001'],
+      emailcc=>SAP_ADMINS,
    },{
       autosubject=>1,
       autotext=>1,
       mode=>'QualityCheck',
       datasource=>'SAP-Instances in AssetManager'
    },sub {
-      my $sysobj=getModuleObject($self->getParent->Config,"itil::system"); 
+      my $sysobj=getModuleObject($self->getParent->Config,"itil::system");
 
       # add missing system-relations to application
       foreach my $sys2add (@missingsys) {
@@ -189,14 +243,11 @@ sub qcheckRecord
          $w5id=$w5s->{id} if (defined($w5s->{id}));
 
          if (!defined($w5id)) {
-            my $uobj=getModuleObject($self->getParent->Config,"base::user");
-            $uobj->SetFilter({userid=>\$newCIDataboss,cistatusid=>[4]});
-            my ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
-            $newCIDataboss=$rec->{databossid} if (!defined($user));
-
+            my $databoss=$self->getNewCIDataboss;
+            $databoss=$rec->{databossid} if (!defined($databoss));
             my $newrec={name=>$allsys{$sys2add}{name},
                         systemid=>$sys2add,
-                        databossid=>\$newCIDataboss,
+                        databossid=>\$databoss,
                         mandatorid=>$rec->{mandatorid},
                         allowifupdate=>1,
                         cistatusid=>4};
@@ -305,8 +356,9 @@ sub chkAsset {
    $asset->SetFilter({name=>$assetasset->{assetid}});
 
    if ($asset->CountRecords()==0) {
+      my $databoss=$self->getNewCIDataboss;
       my $newrec={name=>$assetasset->{assetid},
-                  databossid=>\$newCIDataboss,
+                  databossid=>\$databoss,
                   mandatorid=>$rec->{mandatorid},
                   allowifupdate=>1,
                   cistatusid=>4};
