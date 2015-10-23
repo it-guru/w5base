@@ -9,3 +9,6 @@
 'cluster services needs correction'=>{de=>'Cluster-Services benötigen Korrekturen'},
 'cluster service list inconsistent to AssetManager'=>{de=>'Cluster Service Liste entspricht nicht den Vorgaben von AssetManager'},
 'cluster services invalid but automatic delete not posible (manual cleanup nessesary)'=>{de=>'Cluster-Service laut AssetManager nicht gültig aber automatische Bereinigung nicht möglich (manuelle Bereinigung notwendig!)'},
+'Multiple cluster services with same name found in AssetManager'=>{
+   de=>'Mehrere gleichnamige Cluster-Services in AssetManager gefunden'
+},

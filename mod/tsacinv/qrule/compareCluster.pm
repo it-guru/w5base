@@ -4,12 +4,28 @@ package tsacinv::qrule::compareCluster;
 
 =head3 PURPOSE
 
-This qulaity rule compares a W5Base cluster to an AssetManager cluster
-and updates on demand nessasary fields.
+This quality rule compares a W5Base cluster to an AssetManager cluster
+and updates on demand necessary fields.
+If there were found more than one Cluster services (Cluster-Packages)
+with the same name in AssetManager, this produces an error.
 
 =head3 IMPORTS
 
 - name of cluster
+
+=head3 HINTS
+More than one cluster packages with the same name, which are not in 
+status 'out of operation', are not allowed in AssetManager.
+In case of an error, please contact a person which is responsible
+for the data management in AssetManager.
+
+[de:]
+
+Gleichnamige Cluster-Packages, die nicht im Status 'out of operation' sind,
+dürfen in AssetManager nicht vorkommen.
+Im Fehlerfall kontaktieren Sie bitte einen für die Pflege der Daten in
+AssetManager zuständigen Ansprechpartner.
+
 
 =cut
 #######################################################################
@@ -76,6 +92,30 @@ sub qcheckRecord
          push(@dataissue,'given clusterid not found as active in AssetManager');
          $errorlevel=3 if ($errorlevel<3);
       }
+
+
+      # create data issue, if multiple services in AM
+      # with same name but different serviceid
+      # to avoid duplicate entry in lnkitclustsvc
+
+      my %svccnt;
+      foreach my $svc (@{$parrec->{services}}) {
+         if (lc($svc->{status}) ne 'out of operation') {
+            $svccnt{$svc->{name}}++;
+         }
+      }
+      my @dupsvc=grep({$svccnt{$_}>1} keys(%svccnt));
+
+      if ($#dupsvc!=-1) {
+         my $msg="Multiple cluster services with same name ".
+                 "found in AssetManager: ";
+         $msg.="@dupsvc";
+         $errorlevel=3 if ($errorlevel<3);
+         
+         return(3,{qmsg=>$msg,dataissue=>$msg});
+      }
+      
+
       $self->IfaceCompare($dataobj,
                           $rec,"name",
                           $parrec,"name",
