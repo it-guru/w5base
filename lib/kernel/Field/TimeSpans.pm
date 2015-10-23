@@ -41,6 +41,30 @@ sub new
    return($self);
 }
 
+
+sub Unformat
+{
+   my $self=shift;
+   my $formated=shift;
+   my $rec=shift;
+
+   if (defined($formated)){
+      $formated=[$formated] if (ref($formated) ne "ARRAY");
+      print STDERR Dumper($formated);
+      my @days=@{$self->{days}};
+      my $newstring;
+      for(my $dayno=0;$dayno<=$#days;$dayno++){
+         $newstring.="+" if ($newstring ne "");
+         my $day=$dayno;
+         $newstring.="$day($formated->[$dayno])";
+      }
+      return({$self->Name()=>$newstring});
+   }
+   return({});
+}
+
+
+
 sub Validate
 {
    my $self=shift;
@@ -185,6 +209,7 @@ sub FormatedDetail
 #   $d=join($vjoinconcat,@$d);
 #   $d.=" ".$self->{unit} if ($d ne "" && $mode eq "HtmlDetail");
    if ($mode eq "HtmlDetail" || $mode eq "edit"){
+      $name="Formated_$name";
       my $spanareawidth="201"; # 201 because of rounding problems in ie
       my $tab="<table border=1 padding=0 margin=0 width=\"100%\">";
       $tab.="<tr><td>&nbsp;</td><td width=\"$spanareawidth\">";
