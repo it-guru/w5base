@@ -103,3 +103,12 @@ Indirekte Nutzer (Schnittstellen) dürfen dabei nicht mit gezählt werden.
 The user count refers to DIRECT users of the application.
 Indirect users (Interfaces) must not consider.
 '},
+'usetimes'=>{de=>'
+Nutzungszeiten sind im Format VON:BIS zu erfassen. Es können pro
+Tag mehrere Zeitblöcke definiert werden. Jedem Zeitblock ist sein
+Typ voranzustellen. Die möglichen Typen sind in der Legende
+aufgeführt. z.B.<br>
+X07:00-08:00,X10:00-11:00,Z22:00-24:00
+',en=>'
+Use-Times
+'},
