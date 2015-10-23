@@ -124,6 +124,7 @@ sub w5statsend
    $MinReportUserGroupCount=int($MinReportUserGroupCount);
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*t-com.st"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*.ST.DB"});
+   #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.TSI.Prod.CS.SAPS.EG.TelCo2.CF"});
    $grp->SetCurrentView(qw(grpid fullname));
    my ($rec,$msg)=$grp->getFirst(unbuffered=>1);
    if (defined($rec)){
@@ -133,19 +134,26 @@ sub w5statsend
          $lnkgrp->ResetFilter();
          $lnkgrp->SetFilter({grpid=>\$rec->{grpid}});
          my @RBoss;
+         my @tempRBoss;
          my @RReportReceive;
          foreach my $lnkrec ($lnkgrp->getHashList(qw(userid lnkgrpuserid))){
             $lnkrole->ResetFilter();
             $lnkrole->SetFilter({lnkgrpuserid=>\$lnkrec->{lnkgrpuserid}});
             foreach my $lnkrolerec ($lnkrole->getHashList("role")){
                if ($lnkrolerec->{role} eq "RBoss"){
-                  push(@RBoss,$lnkrec->{userid});
+                  push(@tempRBoss,$lnkrec->{userid});
                }
                if ($lnkrolerec->{role} eq "RReportReceive"){
                   push(@RReportReceive,$lnkrec->{userid});
                }
             }
          }
+         # extract active Bosses
+         $user->SetFilter({userid=>\@tempRBoss,cistatusid=>'<=4'});
+         foreach my $urec ($user->getHashList("userid")){
+            push(@RBoss,$urec->{userid});
+         }
+
          if ($#RReportReceive==-1){
             $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVqreportbyorg',
                                       '110000002',\@RBoss,default=>1);
