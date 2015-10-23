@@ -38,6 +38,7 @@ sub new
    my $self=bless($type->SUPER::new(%$self),$type);
    $self->{_permitted}->{tspanlegend}=1;
    $self->{_permitted}->{tspantypemaper}=1;
+   $self->{_permitted}->{tspandaymap}=1;
    return($self);
 }
 

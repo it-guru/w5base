@@ -71,11 +71,14 @@ sub qcheckRecord
                        ($rec->{cistatusid}!=4 &&
                         $rec->{cistatusid}!=5));
 
-   my $daymap=$dataobj->getField('usetimes')->{tspandaymap};
+   my $daymap=$dataobj->getField('usetimes')->tspandaymap();
    my @usetimes=split(/\+/,$rec->{usetimes});
 
    foreach my $i (0..$#{$daymap}) {
-      if ($daymap->[$i] && $usetimes[$i]=~m/\(\)/) {
+      if ($daymap->[$i] && (
+          !defined($usetimes[$i]) || 
+          $usetimes[$i] eq "" || 
+          $usetimes[$i]=~m/\(\)/ ) ) {
          my $msg='entries in use times incomplete';
          return(3,{qmsg=>$msg,dataissue=>$msg});
       }
