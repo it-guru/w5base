@@ -7,7 +7,8 @@ package tsacinv::qrule::compareCluster;
 This quality rule compares a W5Base cluster to an AssetManager cluster
 and updates on demand necessary fields.
 If there were found more than one Cluster services (Cluster-Packages)
-with the same name in AssetManager, this produces an error.
+with the same name in AssetManager or if the Cluster name in
+AssetManager contains prohibited characters, an error is generated.
 
 =head3 IMPORTS
 
@@ -16,6 +17,9 @@ with the same name in AssetManager, this produces an error.
 =head3 HINTS
 More than one cluster packages with the same name, which are not in 
 status 'out of operation', are not allowed in AssetManager.
+
+The following characters only are allowed in Cluster name: a-zA-Z0-9_-
+
 In case of an error, please contact a person which is responsible
 for the data management in AssetManager.
 
@@ -23,6 +27,9 @@ for the data management in AssetManager.
 
 Gleichnamige Cluster-Packages, die nicht im Status 'out of operation' sind,
 dürfen in AssetManager nicht vorkommen.
+
+Im Cluster-Namen sind ausschließlich folgende Zeichen erlaubt: a-zA-Z0-9_-
+
 Im Fehlerfall kontaktieren Sie bitte einen für die Pflege der Daten in
 AssetManager zuständigen Ansprechpartner.
 
@@ -94,8 +101,9 @@ sub qcheckRecord
       }
 
 
-      # create data issue, if multiple services in AM
-      # with same name but different serviceid
+      ####################################################################### 
+      # create data issue, if multiple services with same name
+      # but different serviceids in AM;
       # to avoid duplicate entry in lnkitclustsvc
 
       my %svccnt;
@@ -114,7 +122,7 @@ sub qcheckRecord
          
          return(3,{qmsg=>$msg,dataissue=>$msg});
       }
-      
+      ####################################################################### 
 
       $self->IfaceCompare($dataobj,
                           $rec,"name",
@@ -122,7 +130,6 @@ sub qcheckRecord
                           $forcedupd,$wfrequest,
                           \@qmsg,\@dataissue,\$errorlevel,
                           mode=>'string');
-
       my @opList;
       my $res=OpAnalyse(
                  sub{  # comperator 
@@ -235,7 +242,15 @@ sub qcheckRecord
    }
 
    if (keys(%$forcedupd)){
-      if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
+      if (exists($forcedupd->{name}) &&
+          $forcedupd->{name}=~m/[^-a-z0-9_]/i) {
+         my $msg="prohibited characters found in AssetManager Cluster name: ".
+                 $forcedupd->{name};
+         push(@qmsg,$msg);
+         push(@dataissue,$msg);
+         $errorlevel=3 if ($errorlevel<3);
+      }
+      elsif ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
          push(@qmsg,"all desired fields has been updated: ".
                     join(", ",keys(%$forcedupd)));
       }

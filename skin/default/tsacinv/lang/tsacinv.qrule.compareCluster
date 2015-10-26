@@ -12,3 +12,6 @@
 'Multiple cluster services with same name found in AssetManager'=>{
    de=>'Mehrere gleichnamige Cluster-Services in AssetManager gefunden'
 },
+"prohibited characters found in AssetManager Cluster name"=>{
+  de=>"Der Cluster-Name in AssetManager enthält unzulässige Zeichen"
+},
