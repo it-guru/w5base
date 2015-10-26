@@ -15,6 +15,7 @@ AssetManager contains prohibited characters, an error is generated.
 - name of cluster
 
 =head3 HINTS
+
 More than one cluster packages with the same name, which are not in 
 status 'out of operation', are not allowed in AssetManager.
 
