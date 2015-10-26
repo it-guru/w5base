@@ -350,16 +350,32 @@ sub qcheckRecord
             my %cleanAmIPlist;
             foreach my $amiprec (@{$parrec->{ipaddresses}}){
                if ($amiprec->{ipv4address} ne ""){
-                  $cleanAmIPlist{$amiprec->{ipv4address}}={
-                     ipaddress=>$amiprec->{ipv4address},
-                     description=>$amiprec->{description}
-                  };
+                  if ($amiprec->{ipv4address}=~
+                      m/^\d{1,3}(\.\d{1,3}){3,3}$/){
+                     $cleanAmIPlist{$amiprec->{ipv4address}}={
+                        ipaddress=>$amiprec->{ipv4address},
+                        description=>$amiprec->{description}
+                     };
+                  }
+                  else{
+                     msg(WARN,"ignoring IPv4 invalid ".
+                              "'$amiprec->{ipv4address}' ".
+                              "for $parrec->{systemid}");
+                  }
                }
                if ($amiprec->{ipv6address} ne ""){
-                  $cleanAmIPlist{$amiprec->{ipv6address}}={
-                     ipaddress=>$amiprec->{ipv6address},
-                     description=>$amiprec->{description}
-                  };
+                  if ($amiprec->{ipv4address}=~
+                      m/^[a-f0-9]{1,4}(:[a-f0-9]{0,4}){4,8}$/){
+                     $cleanAmIPlist{$amiprec->{ipv6address}}={
+                        ipaddress=>$amiprec->{ipv6address},
+                        description=>$amiprec->{description}
+                     };
+                  }
+                  else{
+                     msg(INFO,"ignoring invalid IPv6 ".
+                              "'$amiprec->{ipv6address}' ".
+                              "for $parrec->{systemid}");
+                  }
                }
             }
             my @cleanAmIPlist=values(%cleanAmIPlist);
