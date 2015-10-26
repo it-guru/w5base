@@ -12,7 +12,7 @@
 'fieldgroup.map'=>{de=>'Karte',en=>'Map'},
 'fieldgroup.gmap'=>{de=>'Google Karte (wird demnächst entfernt)',en=>'Google Map'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
-'fieldgroup.org'=>{de=>'Organisationszuorndung',en=>'Organisation relation'},
+'fieldgroup.org'=>{de=>'Organisationszuordnung',en=>'Organisation relation'},
 'fieldgroup.gps'=>{de=>'GPS',en=>'GPS'},
 'fieldgroup.management'=>{de=>'Verwaltung',en=>'Management'},
 'fieldgroup.grprelations'=>{de=>'Organisations-Verknüpfungen',en=>'Organisation-Relations'},

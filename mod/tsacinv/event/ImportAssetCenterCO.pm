@@ -215,10 +215,10 @@ sub VerifyAssetManagerData
               #               "W5Base/Darwin erzeugt, aber keiner Anwendung ".
               #               "zugeordnet. Sie sind als SeM für die CO-Nummer ".
               #               "'$corec->{name}' des Systems in AssetManager ".
-              #               "erfasst. Die Zuorndung eines Systems zu ".
+              #               "erfasst. Die Zuordnung eines Systems zu ".
               #               "einer Anwendung ist nach den Config-Management ".
               #               "Regeln der AL DTAG zwingend. Sorgen Sie dafür, ".
-              #               "dass die korrekte Zuorndung zu einer Anwendung ".
+              #               "dass die korrekte Zuordnung zu einer Anwendung ".
               #               "in W5Base/Darwin eingetragen wird.");
                         printf FO ("%s;%s;%s;%s;%s;%s;%s;%s\n",
                                    $sysrec->{systemid},

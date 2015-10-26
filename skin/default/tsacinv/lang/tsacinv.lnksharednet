@@ -1,3 +1,3 @@
-'tsacinv::lnksharednet'=>{de=>'Zuorndung zu Shared-Netzwerk Komponenten',
+'tsacinv::lnksharednet'=>{de=>'Zuordnung zu Shared-Netzwerk Komponenten',
                               en=>'Relation to shared-network components'},
 

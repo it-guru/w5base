@@ -27,7 +27,7 @@
 'itu.ac.krn.dictonary'=>{de=>'DBDictonary',en=>'DBDictonary'},
 'itu.ac.group'=>{de=>'Gruppe',en=>'Group'},
 'itu.ac.user'=>{de=>'Benutzer',en=>'User'},
-'itu.ac.user.groups'=>{de=>'Gruppenzuorndung',en=>'Grouprelation'},
+'itu.ac.user.groups'=>{de=>'Gruppenzuordnung',en=>'Grouprelation'},
 'itu.ac.swinstance'=>{de=>'Softwareinstanz',en=>'Softwareinstance'},
 'itu.ac.krn.accountno'=>{de=>'Account-Nummer',en=>'Account-Number'},
 'itu.ac.quality'=>{de=>'Qualitätsanalysen',en=>'Quality-Analysys'},

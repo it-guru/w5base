@@ -6,7 +6,7 @@
 'parent Object'=>{de=>'Elternobjekt'},
 'parent ID'=>{de=>'Eltern-Element ID'},
 'fieldgroup.relation'=>{de=>'Objektzuordnungen',en=>'Object relations'},
-'fieldgroup.qrelation'=>{de=>'Fragezuorndungen',en=>'Question relations'},
+'fieldgroup.qrelation'=>{de=>'Fragezuordnungen',en=>'Question relations'},
 'fieldgroup.archiv'=>{de=>'Archiv',en=>'Archiv'},
 'insuficient rights to answer this question'=>{de=>'Nicht genügend Rechte, um diese Frage zu beantworten'},
 'unique query tag'=>{de=>'eindeutiges QTag'},
