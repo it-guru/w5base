@@ -61,6 +61,12 @@ nicht auf einzelne Bereiche/Funktionen.<br>
 <br>
 Innerhalb der Zeiten werden Changes, nach Vorliegen der 
 erforderlichen Approvals, über den Regelprozess freigegeben.<br>
+<br>
+Nutzungszeiten sind im Format VON-BIS zu erfassen. Es können pro
+Tag mehrere Zeitblöcke definiert werden. Jedem Zeitblock ist sein
+Typ voranzustellen. Die möglichen Typen sind in der Legende
+aufgeführt. z.B.<br>
+X07:00-08:00,X10:00-11:00,Z22:00-24:00
 ',
 'en'=>'
 <b>Main use time</b><br>
@@ -83,6 +89,9 @@ not the individual area / function.<br>
 The changes which take place during this time are 
 released according to the usual process, after presenting 
 the necessary approvals.<br>
+<br>
+The use times need to be in format "from-to". Multiple time blocks can be defined per day. Each time block is preceded by its type. All possible types are listed in the legend e.g.:<br>
+X07:00-08:00,Y10:00-11:00,Z22:00-24:00
 '
 }
 
