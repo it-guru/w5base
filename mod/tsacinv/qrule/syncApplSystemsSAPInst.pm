@@ -74,10 +74,8 @@ use kernel;
 use kernel::QRule;
 @ISA=qw(kernel::QRule);
 
-use constant {
-   NEW_CI_DATABOSS =>'12808977330001', # Marek M.
-   SAP_ADMINS      =>[qw(12808977330001 12236427680001 11634955120001)]
-};
+our $NEW_CI_DATABOSS='12808977330001'; # Marek M.
+our $SAP_ADMINS=[qw(12808977330001 12236427680001 11634955120001)];
 
 
 sub new
@@ -93,24 +91,6 @@ sub new
 sub getPosibleTargets
 {
    return(["TS::appl"]);
-}
-
-
-sub getNewCIDataboss
-{
-   my $self=shift;
-
-   my $uobj=getModuleObject($self->getParent->Config,"base::user");
-   $uobj->SetFilter({userid=>NEW_CI_DATABOSS,cistatusid=>[4]});
-   my ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
-
-   return($user) if (defined($user));
-
-   $uobj->ResetFilter;
-   $uobj->SetFilter({userid=>SAP_ADMINS,cistatusid=>[4]});
-   ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
-
-   return($user);
 }
 
 
@@ -169,29 +149,142 @@ sub qcheckRecord
 
    my @disusedsys=grep {$allsys{$_}{is_w5} && !$allsys{$_}{is_sap}}
                        keys(%allsys);
-
    my @qmsg;
    my @dataissue;
    my $errorlevel=0;
    my @notifymsg;
 
-   # switch cistate of system to installed/active if not yet is
-   # only if databoss is member of SAP_ADMINS, otherwise create a data issue
+   if ($#missingsys!=-1 || $#disusedsys!=-1) {
+      my @cc=@$SAP_ADMINS;
+      $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
+         emailcc=>\@cc,
+      },{
+         autosubject=>1,
+         autotext=>1,
+         mode=>'QualityCheck',
+         datasource=>'SAP-Instances in AssetManager'
+      },sub {
+         my $sysobj=getModuleObject($self->getParent->Config,"itil::system");
+
+         # add missing system-relations to application
+         foreach my $sys2add (@missingsys) {
+            $sysobj->ResetFilter();
+            $sysobj->SetFilter({systemid=>\$sys2add});
+            my ($w5s,$msg)=$sysobj->getOnlyFirst(qw(id));
+            my $w5id;
+            $w5id=$w5s->{id} if (defined($w5s->{id}));
+
+            if (!defined($w5id)) {
+               my $databoss=$self->getNewCIDataboss;
+               $databoss=$rec->{databossid} if (!defined($databoss));
+               my $newrec={name=>$allsys{$sys2add}{name},
+                           systemid=>$sys2add,
+                           databossid=>\$databoss,
+                           mandatorid=>$rec->{mandatorid},
+                           allowifupdate=>1,
+                           cistatusid=>4};
+               my $assetid=$self->chkAsset($newrec,$rec,
+                                           \$errorlevel,
+                                           \@qmsg,\@dataissue,\@notifymsg);
+               if (defined($assetid)) {
+                  $newrec->{asset}=$assetid;
+                  $w5id=$sysobj->ValidatedInsertRecord($newrec);
+
+                  if (defined($w5id)) {
+                     ($w5s,$msg)=$sysobj->getOnlyFirst(qw(urlofcurrentrec));
+                     my $m='System created';
+                     push(@qmsg,$m.': '.$newrec->{name});
+
+                     my $nmsg=$self->T($m);
+                     $nmsg.=": ";
+                     $nmsg.=$newrec->{name};
+                     $nmsg.="\n";
+                     $nmsg.=$w5s->{urlofcurrentrec};                 
+                     push(@notifymsg,$nmsg);
+                  }
+                  else {
+                     $errorlevel=3 if ($errorlevel<3);
+                     my $m="Automatic creation of a System failed: ".
+                           $newrec->{name};
+                     push(@qmsg,$m);
+                     push(@dataissue,$m);
+                  }
+               }
+            }
+
+            if (defined($w5id)) {
+               my $newrec={systemid=>$w5id,
+                           applid=>$rec->{id},
+                           comments=>'automatic added by qrule'};
+
+               if ($applsys->ValidatedInsertRecord($newrec)) {
+                  ($w5s,$msg)=$sysobj->getOnlyFirst(qw(cistatusid));
+                  $allsys{$sys2add}{is_w5}++;
+                  $allsys{$sys2add}{w5cistatusid}=$w5s->{cistatusid};
+                  my $m='Relation to system added';
+                  push(@qmsg,$m.': '.$allsys{$sys2add}{name});
+                  push(@notifymsg,$self->T($m).': '.$allsys{$sys2add}{name});
+               }
+               else {
+                  my $m="Automatic relation with system failed: ".
+                        $allsys{$sys2add}{name};
+                  $errorlevel=3 if ($errorlevel<3);
+                  push(@qmsg,$m);
+                  push(@dataissue,$m);
+               }
+            }
+         } 
+
+         # remove unused system-relations from application
+         foreach my $sys2del (@disusedsys) {
+            $applsys->ResetFilter();
+            $applsys->SetFilter({systemsystemid=>\$sys2del,
+                                 applapplid=>\$rec->{applid}});
+            my ($lnk,$msg)=$applsys->getOnlyFirst('id');
+            my $lnkid=$applsys->ValidatedDeleteRecord($lnk);
+            if (defined($lnkid)) {
+               my $m='Relation to system removed';
+               push(@qmsg,$m.': '.$allsys{$sys2del}{name});
+               push(@notifymsg,$self->T($m).': '.$allsys{$sys2del}{name});
+               delete($allsys{$sys2del});
+            }
+            else {
+               my $m="Automatic removal of relation to system failed: ".
+                     $allsys{$sys2del}{name};
+               $errorlevel=3 if ($errorlevel<3);
+               push(@qmsg,$m);
+               push(@dataissue,$m);
+            }
+         } 
+
+         if ($#notifymsg!=-1) {
+            return($rec->{name},join("\n\n",map({"- ".$_} @notifymsg)));
+         }
+         return(undef,undef);
+      });
+   }
+
+
+   #######################################################################
+   # switch cistate of system to installed/active if not yet is,
+   # but only if databoss is member of SAP_ADMINS,
+   # otherwise create a data issue
+
+   my $sysobj=getModuleObject($self->getParent->Config,"itil::system");
    foreach my $sysid (keys(%allsys)) {
       if ($allsys{$sysid}{is_sap} &&
           $allsys{$sysid}{is_w5}  &&
           $allsys{$sysid}{w5cistatusid}!=4) {
-
-         my $sysobj=getModuleObject($self->getParent->Config,"itil::system");
+         $sysobj->ResetFilter;
          $sysobj->SetFilter({systemid=>\$sysid});
          my ($sysrec,$msg)=$sysobj->getOnlyFirst(qw(id name databossid));
-
-         if (in_array(SAP_ADMINS,$sysrec->{databossid})) {
+         if (in_array($SAP_ADMINS,$sysrec->{databossid})) {
             if ($sysobj->ValidatedUpdateRecord($sysrec,{cistatusid=>4},
                                                {id=>\$sysrec->{id}})) {
                ($sysrec,$msg)=$sysobj->getOnlyFirst(qw(ALL));
+               my @cc=@$SAP_ADMINS;
                $sysobj->NotifyWriteAuthorizedContacts($sysrec,undef,{
-                   emailcc=>SAP_ADMINS,
+                   emailcc=>\@cc,
                   },{
                    autosubject=>1,
                    autotext=>1,
@@ -217,118 +310,27 @@ sub qcheckRecord
          }
       }
    }
-
-
-   if ($#missingsys==-1 && $#disusedsys==-1) {
-      return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue})
-   }
-
-   $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
-      emailcc=>SAP_ADMINS,
-   },{
-      autosubject=>1,
-      autotext=>1,
-      mode=>'QualityCheck',
-      datasource=>'SAP-Instances in AssetManager'
-   },sub {
-      my $sysobj=getModuleObject($self->getParent->Config,"itil::system");
-
-      # add missing system-relations to application
-      foreach my $sys2add (@missingsys) {
-         $sysobj->ResetFilter();
-         $sysobj->SetFilter({systemid=>\$sys2add});
-         my ($w5s,$msg)=$sysobj->getOnlyFirst(qw(id));
-
-         my $w5id;
-         $w5id=$w5s->{id} if (defined($w5s->{id}));
-
-         if (!defined($w5id)) {
-            my $databoss=$self->getNewCIDataboss;
-            $databoss=$rec->{databossid} if (!defined($databoss));
-            my $newrec={name=>$allsys{$sys2add}{name},
-                        systemid=>$sys2add,
-                        databossid=>\$databoss,
-                        mandatorid=>$rec->{mandatorid},
-                        allowifupdate=>1,
-                        cistatusid=>4};
-            my $assetid=$self->chkAsset($newrec,$rec,
-                                        \$errorlevel,
-                                        \@qmsg,\@dataissue,\@notifymsg);
-            if (defined($assetid)) {
-               $newrec->{asset}=$assetid;
-               $w5id=$sysobj->ValidatedInsertRecord($newrec);
-
-               if (defined($w5id)) {
-                  ($w5s,$msg)=$sysobj->getOnlyFirst(qw(urlofcurrentrec));
-
-                  my $m='System created';
-                  push(@qmsg,$m.': '.$newrec->{name});
-
-                  my $nmsg=$self->T($m);
-                  $nmsg.=": ";
-                  $nmsg.=$newrec->{name};
-                  $nmsg.="\n";
-                  $nmsg.=$w5s->{urlofcurrentrec};                 
-                  push(@notifymsg,$nmsg);
-               }
-               else {
-                  $errorlevel=3 if ($errorlevel<3);
-                  my $m="Automatic creation of a System failed: ".
-                        $newrec->{name};
-                  push(@qmsg,$m);
-                  push(@dataissue,$m);
-               }
-            }
-         }
-
-         if (defined($w5id)) {
-            my $newrec={systemid=>$w5id,
-                        applid=>$rec->{id},
-                        comments=>'automatic added by qrule'};
-
-            if ($applsys->ValidatedInsertRecord($newrec)) {
-               my $m='Relation to system added';
-               push(@qmsg,$m.': '.$allsys{$sys2add}{name});
-               push(@notifymsg,$self->T($m).': '.$allsys{$sys2add}{name});
-            }
-            else {
-               my $m="Automatic relation with system failed: ".
-                     $allsys{$sys2add}{name};
-               $errorlevel=3 if ($errorlevel<3);
-               push(@qmsg,$m);
-               push(@dataissue,$m);
-            }
-         }
-      } 
-
-      # remove unused system-relations from application
-      foreach my $sys2del (@disusedsys) {
-         $applsys->ResetFilter();
-         $applsys->SetFilter({systemsystemid=>\$sys2del,
-                              applapplid=>\$rec->{applid}});
-         my ($lnk,$msg)=$applsys->getOnlyFirst('id');
-         my $lnkid=$applsys->ValidatedDeleteRecord($lnk);
-         if (defined($lnkid)) {
-            my $m='Relation to system removed';
-            push(@qmsg,$m.': '.$allsys{$sys2del}{name});
-            push(@notifymsg,$self->T($m).': '.$allsys{$sys2del}{name});
-         }
-         else {
-            my $m="Automatic removal of relation to system failed: ".
-                  $allsys{$sys2del}{name};
-            $errorlevel=3 if ($errorlevel<3);
-            push(@qmsg,$m);
-            push(@dataissue,$m);
-         }
-      } 
-
-      if ($#notifymsg!=-1) {
-         return($rec->{name},join("\n\n",map({"- ".$_} @notifymsg)));
-      }
-      return(undef,undef);
-   });
-
+   #######################################################################
    return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue});
+}
+
+
+sub getNewCIDataboss
+{
+   my $self=shift;
+
+   my $uobj=getModuleObject($self->getParent->Config,"base::user");
+   $uobj->SetFilter({userid=>$NEW_CI_DATABOSS,cistatusid=>[4]});
+   my ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
+
+   return($user->{userid}) if (defined($user));
+
+   $uobj->ResetFilter;
+   $uobj->SetFilter({userid=>$SAP_ADMINS,cistatusid=>[4]});
+   ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
+
+   return($user->{userid}) if (defined($user));
+   return(undef);
 }
 
 
