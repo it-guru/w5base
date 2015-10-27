@@ -2295,7 +2295,7 @@ sub findNearestTargetDataObj
          my @tree=Class::ISA::super_path($nto); 
          #msg(INFO,"check from $to to $nto in $requestedfor");
          if (in_array(\@tree,$to)){
-            msg(INFO,"rewrite for target of $requestedfor from $to to $nto");
+            #msg(INFO,"rewrite for target of $requestedfor from $to to $nto");
             return($nto);
          }
          else{
@@ -3803,14 +3803,14 @@ sub LoadSpec
       }
    }
    my %filedone;
-   foreach my $lib (@libs){
+   foreach my $lib (reverse(@libs)){ # use the local spec as last (highest prio)
       my $filename=$self->getSkinFile($lib,addskin=>'default');
       if ($filename ne "" && !$filedone{$filename}){
          processSpecfile($filename,\%spec);
          $filedone{$filename}++;
       }
    }
-   foreach my $lib (@libs){
+   foreach my $lib (reverse(@libs)){ # use the local spec as last (highest prio)
       my $filename=$self->getSkinFile($lib);
       if ($filename ne "" && !$filedone{$filename}){
          processSpecfile($filename,\%spec);
