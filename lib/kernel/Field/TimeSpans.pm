@@ -19,7 +19,6 @@ package kernel::Field::TimeSpans;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field);
 
 
@@ -51,7 +50,6 @@ sub Unformat
 
    if (defined($formated)){
       $formated=[$formated] if (ref($formated) ne "ARRAY");
-      print STDERR Dumper($formated);
       my @days=@{$self->{days}};
       my $newstring;
       for(my $dayno=0;$dayno<=$#days;$dayno++){
