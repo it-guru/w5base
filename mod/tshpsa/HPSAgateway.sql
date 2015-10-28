@@ -119,6 +119,7 @@ create materialized view "mview_HPSA_system"
    next sysdate+(1/24)*12
    as
 select distinct system.item_id,
+       basesystem.server_id server_id,
        ddim.curdate,
        lower(system.host_name) hostname,
        lower(system.display_name) name,
@@ -132,6 +133,8 @@ from (select CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL curdate
             between SYSDATE-1 AND SYSDATE)  ddim
      join CMDB_DATA.SAS_SERVERS@hpsa system
           on ddim.curdate between system.begin_date and system.end_date
+     join CMDB_DATA.SAS_SERVERS_BASE@hpsa basesystem
+          on system.item_id=basesystem.item_id
      join CMDB_DATA.SAS_SERVER_CUST_ATTRIBUTES@hpsa attr_systemid
           on ddim.curdate
              between attr_systemid.begin_date and attr_systemid.end_date
