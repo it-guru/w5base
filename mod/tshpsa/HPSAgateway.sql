@@ -35,36 +35,6 @@ create or replace synonym W5I.HPSA_lnkswp_of
    for "W5I_HPSA_lnkswp_of";
 
 
-/*  ==== tshpsa::sysgrp ====== */
-
--- drop materialized view "mview_HPSA_sysgrp";
-create materialized view "mview_HPSA_sysgrp"
-   refresh complete start with sysdate
-   next sysdate+(1/24)*7
-   as
-select grp.item_id,
-       ddim.curdate,
-       grp.group_name
-from (select CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL curdate 
-      from CMDB_DATA.DATE_DIMENSION@hpsa 
-      where CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL 
-            between SYSDATE-1 AND SYSDATE)  ddim
-      join CMDB_DATA.SAS_SERVER_GROUPS@hpsa grp 
-          on ddim.curdate between grp.begin_date and grp.end_date;
-
-CREATE INDEX "HPSA_sysgrp_id" 
-   ON "mview_HPSA_sysgrp"(item_id) online;
-CREATE INDEX "HPSA_sysgrp_name" 
-   ON "mview_HPSA_sysgrp"(lower(group_name)) online;
-
-
-
-create or replace view "W5I_HPSA_sysgrp" as
-select * from "mview_HPSA_sysgrp";
-grant select on "W5I_HPSA_sysgrp" to "W5I";
-create or replace synonym W5I.HPSA_sysgrp 
-   for "W5I_HPSA_sysgrp";
-
 /*  ==== tshpsa::lnkswp ====== */
 
 -- drop materialized view "mview_HPSA_lnkswp";
@@ -183,44 +153,6 @@ select * from "mview_HPSA_system";
 grant select on "W5I_HPSA_system" to "W5I";
 create or replace synonym W5I.HPSA_system 
    for "W5I_HPSA_system";
-
-
-/*  ==== tshpsa::lnksystemsysgrp ====== */
-
--- drop materialized view "mview_HPSA_lnksystemsysgrp";
-create materialized view "mview_HPSA_lnksystemsysgrp"
-   refresh complete start with sysdate
-   next sysdate+(1/24)*12
-   as
-
-select memb.item_source_id ||'-'||memb.server_item_id item_id,
-       memb.item_source_id srcid,
-       memb.server_item_id dstid,
-       grp.group_name      srcname,
-       memb.latest_flag is_latest
-from (select DATE_DIMENSION.FULL_DATE_LOCAL curdate 
-      from CMDB_DATA.DATE_DIMENSION@hpsa 
-      where DATE_DIMENSION.FULL_DATE_LOCAL between SYSDATE-1 AND SYSDATE)  ddim
-      join CMDB_DATA.SAS_SERVER_GROUP_MEMBERS@hpsa memb 
-          on ddim.curdate between memb.begin_date and memb.end_date
-      join CMDB_DATA.SAS_SERVER_GROUPS@hpsa grp 
-          on ddim.curdate between grp.begin_date and grp.end_date
-             and memb.item_source_id=grp.item_id;
-
-CREATE INDEX "HPSA_lnksystemsysgrp_id" 
-   ON "mview_HPSA_lnksystemsysgrp"(item_id) online;
-CREATE INDEX "HPSA_lnksystemsysgrp_srcid" 
-   ON "mview_HPSA_lnksystemsysgrp"(srcid) online;
-CREATE INDEX "HPSA_lnksystemsysgrp_dstid" 
-   ON "mview_HPSA_lnksystemsysgrp"(dstid) online;
-CREATE INDEX "HPSA_lnksystemsysgrp_is_latest" 
-   ON "mview_HPSA_lnksystemsysgrp"(is_latest) online;
-
-create or replace view "W5I_HPSA_lnksystemsysgrp" as
-select * from "mview_HPSA_lnksystemsysgrp";
-grant select on "W5I_HPSA_lnksystemsysgrp" to "W5I";
-create or replace synonym W5I.HPSA_lnksystemsysgrp 
-   for "W5I_HPSA_lnksystemsysgrp";
 
 
 
