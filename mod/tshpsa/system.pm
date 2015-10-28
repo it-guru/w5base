@@ -78,7 +78,7 @@ sub new
                 name          =>'w5systemid',
                 label         =>'W5BaseID of relevant System',
                 group         =>'w5basedata',
-                vjointo       =>'itil::system',
+                vjointo       =>\'itil::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'id'),
 
@@ -87,7 +87,7 @@ sub new
                 label         =>'relevant logical System Config-Item',
                 group         =>'w5basedata',
                 searchable    =>0,
-                vjointo       =>'AL_TCom::system',
+                vjointo       =>\'AL_TCom::system',
                 vjoinon       =>['w5systemid'=>'id'],
                 vjoindisp     =>'name'),
 
