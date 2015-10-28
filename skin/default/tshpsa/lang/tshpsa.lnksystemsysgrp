@@ -1,4 +1,0 @@
-'tshpsa::lnksystemsysgrp'=>{de=>'HP-SA Systemgruppenverknüpfung',
-                            en=>'HP-SA Systemgroup relation'},
-'system group name'=>{de=>'Systemgruppenname'},
-'system group id'=>{de=>'Systemgruppen ID'},

@@ -57,14 +57,6 @@ sub new
                 dataobjattr   =>'pip'),
 
       new kernel::Field::SubList(
-                name          =>'sysgrps',
-                label         =>'Groups',
-                group         =>'sysgrps',
-                vjointo       =>'tshpsa::lnksystemsysgrp',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>[qw(sysgrpname sysgrpid)]),
-
-      new kernel::Field::SubList(
                 name          =>'swps',
                 label         =>'running Software-Processes',
                 group         =>'swps',

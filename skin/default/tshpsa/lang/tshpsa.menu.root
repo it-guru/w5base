@@ -1,4 +1,3 @@
 'itu.hpsa'=>{de=>'HP-SA',en=>'HP-SA'},
 'itu.hpsa.system'=>{de=>'System',en=>'System'},
-'itu.hpsa.system.sysgrp'=>{de=>'Sys-Gruppe',en=>'Sys-Group'},
 'itu.hpsa.system.process'=>{de=>'Softwareproz.',en=>'Softwareproc.'},
