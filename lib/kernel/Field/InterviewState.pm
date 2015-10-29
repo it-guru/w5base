@@ -146,59 +146,59 @@ sub dynCalc
 
    foreach my $q (@{$self->{TotalActiveQuestions}}){
       $qstat{$q->{id}}=0.0;
-      if ($q->{prio} ne ""){
-         my $curs=0.0;
-         my $a=undef;
-         if (exists($self->{AnsweredQuestions}->{interviewid}->{$q->{id}})){
-            $a=$self->{AnsweredQuestions}->{interviewid}->{$q->{id}};
+      my $prio=$q->{prio};
+      $prio=100 if ($q->{prio} eq "");  # if prio=undef use 100 (uninteressing)
+      my $curs=0.0;
+      my $a=undef;
+      if (exists($self->{AnsweredQuestions}->{interviewid}->{$q->{id}})){
+         $a=$self->{AnsweredQuestions}->{interviewid}->{$q->{id}};
+      }
+      if (!defined($a) || $a->{relevant}){
+         if ($q->{questtyp} eq "booleana"){
+            if (defined($a)){
+               $curs=100.0;
+            }
          }
-         if (!defined($a) || $a->{relevant}){
-            if ($q->{questtyp} eq "booleana"){
-               if (defined($a)){
-                  $curs=100.0;
-               }
-            }
-            elsif ($q->{questtyp} eq "boolean"){
-               if (defined($a) &&  $a->{answer} eq "1"){
-                  $curs=100.0;
-               }
-               else{
-                  $curs=0.0;
-               }
-            }
-            elsif ($q->{questtyp} eq "percenta"){
-               if (defined($a)){
-                  $curs=100.0;
-               }
-            }
-            elsif ($q->{questtyp} eq "percent" ||
-                   $q->{questtyp} eq "percent4"){
-               if (defined($a) && $a->{answer} ne ""){
-                  $curs=$a->{answer};
-               }
-               else{
-                  $curs=0.0;
-               }
+         elsif ($q->{questtyp} eq "boolean"){
+            if (defined($a) &&  $a->{answer} eq "1"){
+               $curs=100.0;
             }
             else{
-               if (defined($a) && $a->{answer} ne ""){
-                  $curs=100.0;
-               }
-               else{
-                  $curs=0.0;
-               }
+               $curs=0.0;
             }
-            my $n=1;
-            $n=5 if ($q->{prio}==1);
-            $n=2  if ($q->{prio}==2);
-            $qstat{$q->{id}}=$curs;
-            $s=$s+($curs*$n);
-            $nsum+=$n;
          }
-         if (defined($a) && !$a->{relevant}){
-            $qstat{$q->{id}}=100;
-            push(@notrelevant,$q->{id});
+         elsif ($q->{questtyp} eq "percenta"){
+            if (defined($a)){
+               $curs=100.0;
+            }
          }
+         elsif ($q->{questtyp} eq "percent" ||
+                $q->{questtyp} eq "percent4"){
+            if (defined($a) && $a->{answer} ne ""){
+               $curs=$a->{answer};
+            }
+            else{
+               $curs=0.0;
+            }
+         }
+         else{
+            if (defined($a) && $a->{answer} ne ""){
+               $curs=100.0;
+            }
+            else{
+               $curs=0.0;
+            }
+         }
+         my $n=1;
+         $n=5 if ($prio==1);
+         $n=2  if ($prio==2);
+         $qstat{$q->{id}}=$curs;
+         $s=$s+($curs*$n);
+         $nsum+=$n;
+      }
+      if (defined($a) && !$a->{relevant}){
+         $qstat{$q->{id}}=100;
+         push(@notrelevant,$q->{id});
       }
    }
    if ($nsum==0){
