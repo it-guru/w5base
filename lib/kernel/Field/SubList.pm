@@ -59,6 +59,23 @@ sub EditProcessor
                            title=>'W5BaseV1-System');
 
    my $dfield=$app->getField($field);
+
+
+   my $target=$dfield->{vjointo};
+   if (ref($target) ne "SCALAR"){
+      if ($self->getParent->can("findNearestTargetDataObj")){
+         $target=$self->getParent->findNearestTargetDataObj($target,
+                    "field:".$self->Name);
+      }
+      if (!ref($self->{target})){ # if no reference, store it cached
+         $dfield->{vjointo}=$target;
+      }
+   }
+
+
+
+
+
    $dfield->vjoinobjInit();
    my %forceparam=$app->getForceParamForSubedit($id,$dfield);
    foreach my $v (keys(%forceparam)){

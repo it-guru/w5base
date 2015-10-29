@@ -322,6 +322,10 @@ sub checkWriteValid
    return(0);
 }
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::lnkbscomp");
+}
 
 
 

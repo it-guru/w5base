@@ -2304,15 +2304,6 @@ sub findNearestTargetDataObj
                       "requested for ".$requestedfor." needs SCALAR ref ".
                       "because not unique dataobject names");
          }
-        # my $chkobj=getModuleObject($self->Config,$nto);
-        # if (defined($chkobj)){
-        #    my @tree=Class::ISA::self_and_super_path($nto); 
-        #    return(\$nto);
-        # }
-        # else{
-        #    msg(ERROR,"invalid findNearestTargetDataObj in '$s' to '$nto' ".
-        #              "requested for ".$requestedfor);
-        # }
       }
    }
    return(\$to);

@@ -407,7 +407,9 @@ EOF
                 "setEnterSubmit(document.forms[0],DoSubListEditAdd);".
                 "</script>");
       }
-      print $self->getParsedTemplate("tmpl/$app.$subeditmsk",{current=>$rec});
+      my $tmplName="tmpl/$app.$subeditmsk";
+      my $opt={ current=>$rec };
+      print $self->getParsedTemplate($tmplName,$opt);
    }
    print $self->findtemplvar({},"LASTMSG");
    if ($op eq "delete" || $op eq "save"){

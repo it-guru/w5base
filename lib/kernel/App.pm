@@ -418,7 +418,7 @@ sub _LoadUserInUserCache
                                userid givenname posix groups tz lang
                                cistatusid secstate ipacl pagelimit
                                dialermode dialerurl dialeripref
-                               email usersubst usertyp winsize
+                               email usersubst usertyp winsize winhandling
                                dateofvsnfd));
          if (defined($rec)){
             if ($rec->{ipacl} ne ""){
@@ -617,10 +617,29 @@ sub getTemplate
    my $filename;
 
    if (!($name=~m/\.js$/)){
-      $skinbase=$self->SkinBase() if (!defined($skinbase));
-      $name=$skinbase."/".$name;
-    
-      $filename=$self->getSkinFile($name);
+      if (!defined($skinbase)){
+         $skinbase=$self->SkinBase();
+         my $skinfilename=$skinbase."/".$name;
+         $filename=$self->getSkinFile($skinfilename);
+         if (!defined($filename)){
+            my $sp;
+            if ($self->can("SelfAsParentObject")){
+               $sp=$self->SelfAsParentObject();
+            }
+            if ($sp ne $self->Self()){
+               my ($altskinbase)=$sp=~m/^([^:]+)::/;
+               my $skinfilename=$altskinbase."/".$name;
+               my $f=$self->getSkinFile($skinfilename);
+               if (defined($f)){
+                  $filename=$f;
+               }
+            }
+         }
+      }
+      else{
+         $name=$skinbase."/".$name;
+         $filename=$self->getSkinFile($name);
+      }
    }
    else{
       my $instdir=$self->Config->Param("INSTDIR");
@@ -1006,7 +1025,6 @@ sub getSkinFile
    foreach my $skindir (@skindir){
       foreach my $skin (@skin){
          my $chkname=$skindir."/".$skin."/".$conftag;
-         #msg(INFO,"chkname='$chkname'");
          if ($conftag=~m/\*/){
             my @flist=glob($chkname);
             return(@flist) if ($#flist>=0);
