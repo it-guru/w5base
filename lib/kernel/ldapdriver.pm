@@ -131,7 +131,7 @@ sub execute
 
        $c->{$self->{ldapname}}->{sth}=$self->{'ldap'}->search(@param);
        my $eseconds=Time::HiRes::time();
-       if ($eseconds-$sseconds>5){
+       if ($eseconds-$sseconds>10){
          my $t=sprintf("%.3lf",$eseconds-$sseconds);
          my $s=$self->getParent->Self();
          my %p=@param;
