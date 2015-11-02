@@ -74,14 +74,12 @@ use kernel;
 use kernel::QRule;
 @ISA=qw(kernel::QRule);
 
-our $NEW_CI_DATABOSS='12808977330001'; # Marek M.
-our $SAP_ADMINS=[qw(12808977330001 12236427680001 11634955120001)];
-
 
 sub new
 {
    my $type=shift;
    my %param=@_;
+
    my $self=bless($type->SUPER::new(%param),$type);
 
    return($self);
@@ -99,6 +97,13 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+
+   my $newCIDataboss='12808977330001'; # Marek M.
+   my $sapAdminGroup='14462097390001';
+
+   my @sapAdmins=$dataobj->getMembersOf($sapAdminGroup);
+   $self->{newCIDataboss}=$newCIDataboss if (!defined($self->{newCIDataboss}));
+   $self->{sapAdmins}=\@sapAdmins if (!defined($self->{sapAdmins}));
 
    ##################################################################
    # mz 2015-08-18 
@@ -155,9 +160,10 @@ sub qcheckRecord
    my @notifymsg;
 
    if ($#missingsys!=-1 || $#disusedsys!=-1) {
-      my @cc=@$SAP_ADMINS;
+      my @cc=@{$self->{sapAdmins}};
       $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
          emailcc=>\@cc,
+         emailbcc=>['11634953080001','11634955120001'], # hv,mz
       },{
          autosubject=>1,
          autotext=>1,
@@ -278,13 +284,14 @@ sub qcheckRecord
          $sysobj->ResetFilter;
          $sysobj->SetFilter({systemid=>\$sysid});
          my ($sysrec,$msg)=$sysobj->getOnlyFirst(qw(id name databossid));
-         if (in_array($SAP_ADMINS,$sysrec->{databossid})) {
+         if (in_array($self->{sapAdmins},$sysrec->{databossid})) {
             if ($sysobj->ValidatedUpdateRecord($sysrec,{cistatusid=>4},
                                                {id=>\$sysrec->{id}})) {
                ($sysrec,$msg)=$sysobj->getOnlyFirst(qw(ALL));
-               my @cc=@$SAP_ADMINS;
+               my @cc=@{$self->{sapAdmins}};
                $sysobj->NotifyWriteAuthorizedContacts($sysrec,undef,{
                    emailcc=>\@cc,
+                   emailbcc=>['11634953080001','11634955120001'], # hv,mz
                   },{
                    autosubject=>1,
                    autotext=>1,
@@ -320,16 +327,20 @@ sub getNewCIDataboss
    my $self=shift;
 
    my $uobj=getModuleObject($self->getParent->Config,"base::user");
-   $uobj->SetFilter({userid=>$NEW_CI_DATABOSS,cistatusid=>[4]});
+   $uobj->SetFilter({userid=>$self->{newCIDataboss},cistatusid=>[3,4]});
    my ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
 
    return($user->{userid}) if (defined($user));
 
    $uobj->ResetFilter;
-   $uobj->SetFilter({userid=>$SAP_ADMINS,cistatusid=>[4]});
-   ($user,$msg)=$uobj->getOnlyFirst(qw(userid));
+   $uobj->SetFilter({userid=>$self->{sapAdmins},cistatusid=>[3,4]});
+   my @user=$uobj->getHashList(qw(userid fullname));
 
-   return($user->{userid}) if (defined($user));
+   if ($#user!=-1) {
+      @user=sort({$a->{fullname} cmp $b->{fullname}} @user);
+      return($user[0]->{userid});
+   }
+
    return(undef);
 }
 
