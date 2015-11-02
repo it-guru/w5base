@@ -18,6 +18,36 @@
           (SID=cmdb)))';
 */
 
+/** temporary Import Tabel for CSV Loading Interface **/
+create table "W5I_HPSA_system_import" (
+ objectid             VARCHAR2(40),
+ systemid             VARCHAR2(40),
+ hostname             VARCHAR2(128),
+ agentip              VARCHAR2(80),
+ managementip         VARCHAR2(80),
+ deleted              Number(*,0) default '0',
+ dmodifydate          DATE,
+ constraint "W5I_HPSA_system_import_pk" primary key (objectid)
+);
+grant select,insert,update,delete on "W5I_HPSA_system_import" to W5I;
+create or replace synonym W5I.HPSA_system_import
+   for "W5I_HPSA_system_import";
+
+create table "W5I_HPSA_lnkswp_import" (
+ objectid             VARCHAR2(40),
+ class                VARCHAR2(128),
+ version              VARCHAR2(40),
+ path                 VARCHAR2(255),
+ uname                VARCHAR2(40),
+ scandate             DATE,
+ deleted              Number(*,0) default '0',
+ dmodifydate          DATE
+);
+grant select,insert,update,delete on "W5I_HPSA_lnkswp_import" to W5I;
+create or replace synonym W5I.HPSA_lnkswp_import
+   for "W5I_HPSA_lnkswp_import";
+
+
 /** Overflow Tabel **/
 
 -- drop table "W5I_HPSA_lnkswp_of";
@@ -43,6 +73,7 @@ create materialized view "mview_HPSA_lnkswp"
    next sysdate+(1/24)*7
    as
 select attr.item_id sysid,
+       basesystem.server_id server_id,
        substr(replace(utl_i18n.string_to_raw(data =>
               swi.swclass||'-HostID'||attr.item_id||'-'||
               swi.swpath||'-'||swi.iname),' ',''),0,3000) id,
@@ -60,7 +91,9 @@ from (select DATE_DIMENSION.FULL_DATE_LOCAL curdate
       where DATE_DIMENSION.FULL_DATE_LOCAL between SYSDATE-1 AND SYSDATE)  ddim
       join  CMDB_DATA.SAS_SERVER_CUST_ATTRIBUTES@hpsa attr
           on ddim.curdate between attr.begin_date and attr.end_date
-             and attr.ATTRIBUTE_NAME='TI.CSO_ao_mw_scanner',
+             and attr.ATTRIBUTE_NAME='TI.CSO_ao_mw_scanner'
+      join CMDB_DATA.SAS_SERVERS_BASE@hpsa basesystem
+           on attr.item_id=basesystem.item_id,
       XMLTable ( '//x/r'
           passing XMLType( 
            '<x><r><f>' || 
@@ -140,8 +173,6 @@ from (select CMDB_DATA.DATE_DIMENSION.FULL_DATE_LOCAL curdate
              between attr_systemid.begin_date and attr_systemid.end_date
              and system.item_id=attr_systemid.item_id
              and attr_systemid.ATTRIBUTE_NAME='ITM_Service_ID'
-     join CMDB_DATA.SAS_SERVERS_BASE@hpsa base
-          on system.item_id=base.item_id
      join CMDB_DATA.SAS_SERVER_AGENT@hpsa agent
           on system.item_id=agent.item_id;
 

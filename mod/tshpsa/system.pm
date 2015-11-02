@@ -38,6 +38,11 @@ sub new
                 label         =>'ItemID',
                 dataobjattr   =>"item_id"),
 
+      new kernel::Field::Text(
+                name          =>'serverid',
+                label         =>'ServerID',
+                dataobjattr   =>'server_id'),
+
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Text(
