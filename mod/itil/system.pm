@@ -440,7 +440,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'osrelease',
                 group         =>'logsys',
-                htmleditwidth =>'40%',
+                htmleditwidth =>'80%',
                 label         =>'OS-Release',
                 vjointo       =>'itil::osrelease',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
