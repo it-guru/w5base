@@ -112,6 +112,12 @@ sub new
                 label         =>'Nature',
                 htmleditwidth =>'40%',
                 transprefix   =>'nat.',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if (defined($current));
+                   return(0);
+                },
                 value         =>[undef,'IT-S','ES','TR'],
                 dataobjattr   =>"$worktable.nature"),
 
@@ -166,7 +172,7 @@ sub new
                    my $mode=shift;
                    my %param=@_;
                    my $current=$param{current};
-
+               
                    return(1) if (defined($current) &&
                                  $current->{applid} ne "");
                    return(0);
@@ -2040,6 +2046,10 @@ sub Validate
    my $applid=effVal($oldrec,$newrec,"applid");
 
    if ($applid eq ""){
+      if (effVal($oldrec,$newrec,"nature") eq ""){
+         $self->LastMsg(ERROR,"gerneric Business Service need an application");
+         return(0);
+      }
       if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
          my $userid=$self->getCurrentUserId();
          if (!defined($oldrec)){
@@ -2063,6 +2073,11 @@ sub Validate
       }
    }
    else{
+      if (effVal($oldrec,$newrec,"nature") ne ""){
+         $self->LastMsg(ERROR,
+               "application only allowed on gerneric Business Service");
+         return(0);
+      }
       if ($self->isDataInputFromUserFrontend() && !$autogenmode){
          if (!$self->isParentWriteable($applid)){
             $self->LastMsg(ERROR,"no write access to specified application");
@@ -2246,8 +2261,11 @@ sub getHtmlDetailPages
 
    return($self->SUPER::getHtmlDetailPages($p,$rec)) if (!defined($rec));
 
-   return($self->SUPER::getHtmlDetailPages($p,$rec),
-          "TView"=>$self->T("Tree View"));
+   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
+   if ($rec->{nature} ne ""){
+      push(@l,"TView"=>$self->T("Tree View"));
+   }
+   return(@l);
 }
 
 sub getHtmlDetailPageContent

@@ -34,6 +34,9 @@ sub new
    $self->getField("contextlist")->{uivisible}=1;
    $self->getField("contextaliases")->{vjoinon}=['id'=>'taid'];
    $self->getField("contextaliases")->{uivisible}=1;
+   $self->getField("application")->{uivisible}=0;
+   $self->getField("srcapplication")->{uivisible}=0;
+
 
 
 

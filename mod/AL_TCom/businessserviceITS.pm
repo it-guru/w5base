@@ -47,6 +47,9 @@ sub new
                 vjoinon       =>['id'=>'its_id'],
                 vjoindisp     =>[qw(customer)]),
    );
+   $self->getField("application")->{uivisible}=0;
+   $self->getField("srcapplication")->{uivisible}=0;
+
 
    return($self);
 }

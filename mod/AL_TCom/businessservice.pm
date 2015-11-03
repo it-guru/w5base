@@ -30,11 +30,10 @@ sub new
    $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
-   $self->getField("application")->{weblinkto}="AL_TCom::appl";
-   $self->getField("srcapplication")->{vjointo}="AL_TCom::appl";
-   my $naturelist=$self->getField("nature")->{value};
-   @$naturelist=grep(!/^$/,@$naturelist);
 
+   #my $naturelist=$self->getField("nature")->{value};  # Generisch muss
+   #@$naturelist=grep(!/^$/,@$naturelist);              # auch für AL TCom
+                                                        # möglich bleiben
    $self->AddFields(
       new kernel::Field::Contact(
                 name          =>'requestor',
@@ -265,8 +264,6 @@ sub new
    );
    $self->setDefaultView(qw(fullname cistatus));
 
-   $self->getField("application")->{uivisible}=0;
-   $self->getField("srcapplication")->{uivisible}=0;
 
    return($self);
 }
@@ -296,10 +293,12 @@ sub Validate
       $self->LastMsg(ERROR,"invalid shortname on ES or TR businessservices");
       return(undef);
    }
-   if ($self->isDataInputFromUserFrontend() &&
-       $nature eq ""){ # in AL_TCom mode, natures mandatory
-      $self->LastMsg(ERROR,"invalid nature specified");
-      return(undef);
+   if (effChanged($oldrec,$newrec,"nature")){
+      if ($self->isDataInputFromUserFrontend() &&
+          $nature eq ""){ # in AL_TCom mode, natures mandatory
+         $self->LastMsg(ERROR,"invalid nature specified");
+         return(undef);
+      }
    }
    return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
 

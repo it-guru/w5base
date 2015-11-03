@@ -35,7 +35,8 @@ sub new
    $self->getField("contextaliases")->{vjoinon}=['id'=>'esid'];
    $self->getField("contextaliases")->{vjoinbase}={'taid'=>\undef};
    $self->getField("contextaliases")->{uivisible}=1;
-
+   $self->getField("application")->{uivisible}=0;
+   $self->getField("srcapplication")->{uivisible}=0;
 
 
    return($self);
