@@ -435,7 +435,7 @@ sub new
                 label         =>'provided Businessservices',
                 readonly      =>1,
                 group         =>'businessservices',
-                vjointo       =>'itil::businessservice',
+                vjointo       =>\'itil::businessservice',
                 vjoinon       =>['id'=>'servicecompapplid'],
                 vjoindisp     =>['fullname']),
 
