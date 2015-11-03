@@ -35,13 +35,8 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 group         =>'source',
-                label         =>'ItemID',
-                dataobjattr   =>"item_id"),
-
-      new kernel::Field::Text(
-                name          =>'serverid',
                 label         =>'ServerID',
-                dataobjattr   =>'server_id'),
+                dataobjattr   =>"server_id"),
 
       new kernel::Field::RecordUrl(),
 
