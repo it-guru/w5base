@@ -135,7 +135,7 @@ sub RefreshHPSA
       }
    }
    foreach my $file (@skipfiles){
-      msg(DEBUG,"cleanup(skiped) '$file'");
+      msg(WARN,"skiped file '$file' due multiple input files");
       my $res=`echo 'rename \"$file\" \"$file.skiped\"' |\
                sftp -b - \"$sftpsource\" 2>&1`;
       if ($?!=0){
@@ -143,7 +143,7 @@ sub RefreshHPSA
       }
    }
    foreach my $file (@failfiles){
-      msg(DEBUG,"cleanup(fail) '$file'");
+      msg(WARN,"fail to process file '$file' due structure problems");
       my $res=`echo 'rename \"$file\" \"$file.fail\"' |\
                sftp -b - \"$sftpsource\" 2>&1`;
       if ($?!=0){
