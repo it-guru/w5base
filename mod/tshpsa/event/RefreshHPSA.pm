@@ -150,6 +150,9 @@ sub RefreshHPSA
          $loaderror.=$res;
       }
    }
+   if ($filecnt==0){
+      msg(WARN,"no valid import file found/received");
+   }
    if ($filecnt>1){
       msg(WARN,"multiple files received");
    }
