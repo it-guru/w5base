@@ -1871,35 +1871,49 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
    my %ul;
    $self->getWriteAuthorizedContacts($oldrec,[qw(databossid contacts)],30,\%ul);
    my @ul=sort({$a->{responselevel}<=>$b->{responselevel}} values(%ul));
+
+   my %mailto;
+   if (defined($notifyparam{emailto})){
+      if (ref($notifyparam{emailto}) eq "ARRAY"){
+         %mailto=map({$_=>1} @{$notifyparam{emailto}});
+      }
+      else {
+         $mailto{$notifyparam{emailto}}++;
+      }
+   }
+
    if ($ul[0]->{responselevel}==1){
-      if (defined($notifyparam{emailto})){
-         if (ref($notifyparam{emailto}) ne "ARRAY"){
-            $notifyparam{emailto}=[$notifyparam{emailto}];
-         }
-      }
-      else{
-         $notifyparam{emailto}=[];
-      }
       my $cont=shift(@ul);
-      push(@{$notifyparam{emailto}},$cont->{userid});
+      $mailto{$cont->{userid}}++;
       $notifyparam{lang}=$cont->{talklang};
    }
-   if ($#ul!=-1){  # uebrige Kontakte werden in den cc geschoben
-      if (!exists($notifyparam{emailcc})){
-         $notifyparam{emailcc}=[];
+
+   my %mailcc;
+   if (defined($notifyparam{emailcc})){
+      if (ref($notifyparam{emailcc}) eq "ARRAY") {
+         %mailcc=map({$_=>1} @{$notifyparam{emailcc}});
       }
-      if (!ref($notifyparam{emailcc}) eq "ARRAY"){
-         $notifyparam{emailcc}=[$notifyparam{emailcc}];
+      else {
+         $mailcc{$notifyparam{emailcc}}++;
       }
+   }
+   
+   if ($#ul!=-1){ 
       foreach my $crec (@ul){
          if (defined($crec->{userid})){
-            push(@{$notifyparam{emailcc}},$crec->{userid});
+            $mailcc{$crec->{userid}}++;
             if (!defined($notifyparam{lang})){
                $notifyparam{lang}=$crec->{talklang};
             }
          }
       }
    }
+
+   foreach my $to (keys(%mailto)) {
+      delete($mailcc{$to}) if (exists($mailcc{$to}));
+   }
+   $notifyparam{emailto}=[keys(%mailto)];
+   $notifyparam{emailcc}=[keys(%mailcc)];
 
    my $lastlang;
    if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
