@@ -431,7 +431,10 @@ function setTitle()
    if ("$dragname"!=""){
       var toplineimage=document.getElementById("toplineimage");
       addEvent(toplineimage, 'dragstart', function (event) {
-         event.dataTransfer.setData('Text', "$dragname");
+         if (event.dataTransfer) {
+            event.dataTransfer.clearData(); 
+            event.dataTransfer.setData('Text', "$dragname");
+         }
       });
    }
    return(true);
