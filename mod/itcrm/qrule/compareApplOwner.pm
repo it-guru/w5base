@@ -76,12 +76,12 @@ sub qcheckRecord
       my ($parrec,$msg)=$par->getOnlyFirst(qw(businessowner));
       return(undef,undef) if (!$par->Ping());
 
-      $self->IfaceCompare($dataobj,
-                          $rec,"applowner",
-                          $parrec,"businessowner",
-                          $forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'text');
+      $self->IfComp($dataobj,
+                    $rec,"applowner",
+                    $parrec,"businessowner",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    \@qmsg,\@dataissue,\$errorlevel,
+                    mode=>'text');
    }
 
    if (keys(%$forcedupd)){

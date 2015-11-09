@@ -246,12 +246,12 @@ sub qcheckRecord
           }
           $wiwdata->{$fld}=rmNonLatin1($wiwdata->{$fld});
 
-          $self->IfaceCompare($dataobj,
-                     $rec,$fld,
-                     $wiwdata,$fld,
-                     $forcedupd,$wfrequest,
-                     \@qmsg,\@dataissue,\$errorlevel,
-                     mode=>'string');
+          $self->IfComp($dataobj,
+                        $rec,$fld,
+                        $wiwdata,$fld,
+                        $autocorrect,$forcedupd,$wfrequest,
+                        \@qmsg,\@dataissue,\$errorlevel,
+                        mode=>'string');
       }
 
       if (keys(%$forcedupd)){

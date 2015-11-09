@@ -77,12 +77,12 @@ sub qcheckRecord
       my ($parrec,$msg)=$par->getOnlyFirst(qw(itmanager));
       return(undef,undef) if (!$par->Ping());
 
-      $self->IfaceCompare($dataobj,
-                          $rec,"applmgr",
-                          $parrec,"itmanager",
-                          $forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'text');
+      $self->IfComp($dataobj,
+                    $rec,"applmgr",
+                    $parrec,"itmanager",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    \@qmsg,\@dataissue,\$errorlevel,
+                    mode=>'text');
    }
 
    if (keys(%$forcedupd)){

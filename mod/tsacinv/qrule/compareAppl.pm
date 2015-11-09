@@ -138,24 +138,22 @@ sub qcheckRecord
             }
          }
 
-
-
-         $self->IfaceCompare($dataobj,
-                             $rec,"conumber",
-                             $parrec,"conumber",
-                             $forcedupd,$wfrequest,\@qmsg,
-                             \@dataissue,\$errorlevel,
-                             mode=>'native');
+         $self->IfComp($dataobj,
+                       $rec,"conumber",
+                       $parrec,"conumber",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'native');
          if (!$rec->{haveitsem}){
             if ($parrec->{sememail} ne ""){
                my $semid=$tswiw->GetW5BaseUserID($parrec->{sememail});
                if (defined($semid)){
-                  $self->IfaceCompare($dataobj,
-                                      $rec,"semid",
-                                      {semid=>$semid},"semid",
-                                      $forcedupd,$wfrequest,\@qmsg,
-                                      \@dataissue,\$errorlevel,
-                                      mode=>'native');
+                  $self->IfComp($dataobj,
+                                $rec,"semid",
+                                {semid=>$semid},"semid",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'native');
                }
                else{
               #    $tswiw->Log(ERROR,"basedata",
@@ -171,12 +169,12 @@ sub qcheckRecord
          if ($parrec->{tsmemail} ne ""){
             my $tsmid=$tswiw->GetW5BaseUserID($parrec->{tsmemail});
             if (defined($tsmid)){
-               $self->IfaceCompare($dataobj,
-                                   $rec,"tsmid",
-                                   {tsmid=>$tsmid},"tsmid",
-                                   $forcedupd,$wfrequest,
-                                   \@qmsg,\@dataissue,\$errorlevel,
-                                   mode=>'native');
+               $self->IfComp($dataobj,
+                             $rec,"tsmid",
+                             {tsmid=>$tsmid},"tsmid",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'native');
             }
             else{
              #  $tswiw->Log(ERROR,"basedata",
@@ -190,12 +188,12 @@ sub qcheckRecord
          if ($parrec->{tsm2email} ne ""){
             my $tsmid=$tswiw->GetW5BaseUserID($parrec->{tsm2email});
             if (defined($tsmid)){
-               $self->IfaceCompare($dataobj,
-                                   $rec,"tsm2id",
-                                   {tsmid=>$tsmid},"tsmid",
-                                   $forcedupd,$wfrequest,
-                                   \@qmsg,\@dataissue,\$errorlevel,
-                                   mode=>'native');
+               $self->IfComp($dataobj,
+                             $rec,"tsm2id",
+                             {tsmid=>$tsmid},"tsmid",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'native');
             }
             else{
              #  $tswiw->Log(ERROR,"basedata",
@@ -209,12 +207,12 @@ sub qcheckRecord
          if ($parrec->{opmemail} ne ""){
             my $opmid=$tswiw->GetW5BaseUserID($parrec->{opmemail});
             if (defined($opmid)){
-               $self->IfaceCompare($dataobj,
-                                   $rec,"opmid",
-                                   {opmid=>$opmid},"opmid",
-                                   $forcedupd,$wfrequest,
-                                   \@qmsg,\@dataissue,\$errorlevel,
-                                   mode=>'native');
+               $self->IfComp($dataobj,
+                             $rec,"opmid",
+                             {opmid=>$opmid},"opmid",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'native');
             }
             else{
              #  $tswiw->Log(ERROR,"basedata",
@@ -228,12 +226,12 @@ sub qcheckRecord
          if ($parrec->{opm2email} ne ""){
             my $opmid=$tswiw->GetW5BaseUserID($parrec->{opm2email});
             if (defined($opmid)){
-               $self->IfaceCompare($dataobj,
-                                   $rec,"opm2id",
-                                   {opmid=>$opmid},"opmid",
-                                   $forcedupd,$wfrequest,
-                                   \@qmsg,\@dataissue,\$errorlevel,
-                                   mode=>'native');
+               $self->IfComp($dataobj,
+                             $rec,"opm2id",
+                             {opmid=>$opmid},"opmid",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'native');
             }
             else{
              #  $tswiw->Log(ERROR,"basedata",
@@ -244,35 +242,35 @@ sub qcheckRecord
              #            "from AssetManager\n-");
             }
          }
-         $self->IfaceCompare($dataobj,
-                             $rec,"description",
-                             $parrec,"description",
-                             $forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'text');
-         $self->IfaceCompare($dataobj,
-                             $rec,"currentvers",
-                             $parrec,"version",
-                             $forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'text');
+         $self->IfComp($dataobj,
+                       $rec,"description",
+                       $parrec,"description",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'text');
+         $self->IfComp($dataobj,
+                       $rec,"currentvers",
+                       $parrec,"version",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'text');
          if ($dataobj->getField("scapprgroup")){
-            $self->IfaceCompare($dataobj,
-                                $rec,"scapprgroup",
-                                $parrec,"capprovergroup",
-                                $forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native',
-                                AllowEmpty=>0);
+            $self->IfComp($dataobj,
+                          $rec,"scapprgroup",
+                          $parrec,"capprovergroup",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          \@qmsg,\@dataissue,\$errorlevel,
+                          mode=>'native',
+                          AllowEmpty=>0);
          }
          if ($dataobj->Self eq "AL_TCom::appl"){  # only for AL DTAG
-            $self->IfaceCompare($dataobj,
-                                $rec,"acinmassingmentgroup",
-                                $parrec,"iassignmentgroup",
-                                $forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native',
-                                AllowEmpty=>0);
+            $self->IfComp($dataobj,
+                          $rec,"acinmassingmentgroup",
+                          $parrec,"iassignmentgroup",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          \@qmsg,\@dataissue,\$errorlevel,
+                          mode=>'native',
+                          AllowEmpty=>0);
          }
          if ($rec->{allowifupdate}){
             # keys are in rec= systemsystemid

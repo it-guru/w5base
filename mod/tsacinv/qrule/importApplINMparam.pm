@@ -80,17 +80,18 @@ sub qcheckRecord
       }
       else{
          my $modrec={criticality=>"CR".lc($parrec->{criticality})};
-         $self->IfaceCompare($dataobj,
-                             $rec,"criticality",
-                             $modrec,"criticality",
-                             $forcedupd,$wfrequest,\@qmsg,\$errorlevel,
-                             mode=>'native');
-         $self->IfaceCompare($dataobj,
-                             $rec,"customerprio",
-                             $parrec,"customerprio",
-                             $forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
+         $self->IfComp($dataobj,
+                       $rec,"criticality",
+                       $modrec,"criticality",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'native');
+         $self->IfComp($dataobj,
+                       $rec,"customerprio",
+                       $parrec,"customerprio",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'integer');
          my $modrec={opmode=>lc($parrec->{usage})};
          if ($modrec->{opmode} eq "production"){
             $modrec->{opmode}="prod";
@@ -107,18 +108,12 @@ sub qcheckRecord
          else{
             $modrec->{opmode}="pilot";
          }
-         $self->IfaceCompare($dataobj,
-                             $rec,"opmode",
-                             $modrec,"opmode",
-                             $forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'string');
-      #   $self->IfaceCompare($dataobj,  # dies wird durch die "normale"
-      #                       $rec,"acinmassingmentgroup",  # quality rule
-      #                       $parrec,"iassignmentgroup",   # bereits gesynct
-      #                       $forcedupd,$wfrequest,
-      #                       \@qmsg,\@dataissue,\$errorlevel,
-      #                       mode=>'string');
+         $self->IfComp($dataobj,
+                       $rec,"opmode",
+                       $modrec,"opmode",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@qmsg,\@dataissue,\$errorlevel,
+                       mode=>'string');
       }
    }
 

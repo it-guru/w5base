@@ -149,7 +149,7 @@ sub T
 }
 
 
-sub IfaceCompare
+sub IfComp  # new version of IfaceCompare  - only this should be used from now!
 {
    my $self=shift;
    my $obj=shift;
@@ -157,6 +157,7 @@ sub IfaceCompare
    my $origfieldname=shift;
    my $comprec=shift;
    my $compfieldname=shift;
+   my $autocorrect=shift;
    my $forcedupd=shift;
    my $wfrequest=shift;
    my $qmsg=shift;
@@ -168,22 +169,28 @@ sub IfaceCompare
    $param{AllowEmpty}=1 if (!defined($param{AllowEmpty}));
 
    my $origfieldobj=$obj->getField($origfieldname);
-   if (!defined($origfieldobj)){
-      msg(ERROR,"programm error - try to IfaceCompare to invalid field ".
+   if (!defined($origfieldobj)) {
+      msg(ERROR,"programm error - try to IfComp to invalid field ".
                 $origfieldname);
       return();
    }
+
+   my $tmpExcluded=0;
+   if (defined($param{tmpCompareExclude}) &&
+       in_array($param{tmpCompareExclude},$origfieldname)) {
+      $tmpExcluded=1;
+   }
+
    my $takeremote=0;
-   my $ask=1;
+
    if ($param{mode} eq "native" ||
-       $param{mode} eq "string"){           # like nativ string compares
+       $param{mode} eq "string"){           # like native string compares
       if (exists($comprec->{$compfieldname})){
          if (defined($comprec->{$compfieldname})){
             $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
             my $t1=$origrec->{$origfieldname};
             my $t2=$comprec->{$compfieldname};
-            if (!defined($origrec->{$origfieldname}) ||
-                $comprec->{$compfieldname} ne $origrec->{$origfieldname}){
+            if (!defined($origrec->{$origfieldname}) || $t1 ne $t2) {
                if (defined($origfieldobj) &&
                    defined($origfieldobj->{vjointo})){
                   my $vjoinobj=$origfieldobj->vjoinobj();
@@ -210,7 +217,7 @@ sub IfaceCompare
                   if ($#l==0){
                      $takeremote++;
                   }
-                  else{
+                  elsif (!$tmpExcluded){
                      my $m="invalid or not importable value: ".
                           $origfieldname."=>".$comprec->{$compfieldname};
                      push(@$dataissue,$m);
@@ -278,177 +285,31 @@ sub IfaceCompare
          }
       }
    }
-   elsif ($param{mode} eq "integer"){  # like amounth of memory
-      if (exists($comprec->{$compfieldname}) &&
-          defined($comprec->{$compfieldname}) &&
-          $comprec->{$compfieldname}!=0 &&
-          (!defined($origrec->{$origfieldname}) ||
-           $origrec->{$origfieldname} ==0 ||
-           $comprec->{$compfieldname} != $origrec->{$origfieldname})){
-         if (defined($param{tolerance})){
-            if ( ($comprec->{$compfieldname}*((100+$param{tolerance})/100.0)<
-                  $origrec->{$origfieldname}) ||
-                 ($comprec->{$compfieldname}*((100-$param{tolerance})/100.0)>
-                  $origrec->{$origfieldname})){
-               $takeremote++;
-            }
-         }
-         else{
-            $takeremote++;
-         }
-      }
-   }
-   elsif ($param{mode} eq "boolean"){  # like true/false 1|0
-      if (exists($comprec->{$compfieldname}) &&
-          defined($comprec->{$compfieldname}) &&
-          (!defined($origrec->{$origfieldname}) ||
-           $comprec->{$compfieldname} != $origrec->{$origfieldname})){
-         
-         $takeremote++;
-      }
-   }
-   if ($takeremote){
-      my $compval;
-      if (exists($comprec->{$compfieldname})){
-         $compval=$comprec->{$compfieldname};
-         if ($param{mode} eq "boolean"){ 
-            if ($compval){ # some data cleanup in boolean mode 
-               $compval=1;
-            }
-            else{
-               $compval=0;
-            }
-         }
-      }
-      if ((exists($origrec->{allowifupdate}) && $origrec->{allowifupdate}) ||
-          !defined($origrec->{$origfieldname}) ||
-          $origrec->{$origfieldname}=~m/^\s*$/){
-         if (!(!$param{AllowEmpty} && $comprec->{$compfieldname} eq "")){
-            $forcedupd->{$origfieldname}=$compval;
-         }
-      }
-      else{
-         $wfrequest->{$origfieldname}=$compval;
-      }
-   }
-}
-
-sub IfComp  # new version of IfaceCompare  - only this should be used from now!
-{
-   my $self=shift;
-   my $obj=shift;
-   my $origrec=shift;
-   my $origfieldname=shift;
-   my $comprec=shift;
-   my $compfieldname=shift;
-   my $autocorrect=shift;
-   my $forcedupd=shift;
-   my $wfrequest=shift;
-   my $qmsg=shift;
-   my $dataissue=shift;
-   my $errorlevel=shift;
-   my %param=@_;
-
-   $param{mode}="native" if (!defined($param{mode}));
-   $param{AllowEmpty}=1 if (!defined($param{AllowEmpty}));
-
-   return if (!defined($obj->getField($origfieldname)));
-   my $takeremote=0;
-   my $ask=1;
-   if ($param{mode} eq "native" ||
-       $param{mode} eq "string"){           # like nativ string compares
-      if (exists($comprec->{$compfieldname})){
-         if (defined($comprec->{$compfieldname})){
-            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
-            my $t1=$origrec->{$origfieldname};
-            my $t2=$comprec->{$compfieldname};
-            if (!defined($origrec->{$origfieldname}) ||
-                $comprec->{$compfieldname} ne $origrec->{$origfieldname}){
-               $takeremote++;
-            }
-         }
-      }
-   }
-   elsif ($param{mode} eq "text"){          # for multiline text fields
-      if (exists($comprec->{$compfieldname})){
-         if (defined($comprec->{$compfieldname})){
-            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
-            my $t1=$origrec->{$origfieldname};
-            my $t2=$comprec->{$compfieldname};
-            $t1=~s/\r\n/\n/gs;
-            $t2=~s/\r\n/\n/gs;
-            $t2=~s/\s*$//gs;
-            if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
-               $takeremote++;
-            }
-         }
-      }
-   }
-   elsif ($param{mode} eq "leftouterlinkcreate" ||
-          $param{mode} eq "leftouterlink"){  # like servicesupprt links
-      if (exists($comprec->{$compfieldname}) &&
-          defined($comprec->{$compfieldname}) &&
-          (!defined($origrec->{$origfieldname}) ||
-           $comprec->{$compfieldname} ne $origrec->{$origfieldname})){
-         my $lnkfield=$obj->getField($origfieldname);
-         my $lnkobj=$lnkfield->{vjointo};
-         my $chkobj=getModuleObject($self->getParent->Config,$lnkobj);
-         if (defined($chkobj)){
-            $chkobj->SetFilter($lnkfield->{vjoindisp}=>
-                               "\"".$comprec->{$compfieldname}."\"");
-            my ($chkrec,$msg)=$chkobj->getOnlyFirst($lnkfield->{vjoinon}->[1]);
-            if (!defined($chkrec)){
-               if ($param{mode} eq "leftouterlinkcreate"){
-                  my $newrec={};
-                  if (ref($param{onCreate}) eq "HASH"){
-                     foreach my $k (keys(%{$param{onCreate}})){
-                        $newrec->{$k}=$param{onCreate}->{$k};
-                     }
-                  }
-                  #printf STDERR ("MSG: auto create element in '%s'\n%s\n",
-                  #               $chkobj->Self(),Dumper($newrec));
-                  $chkobj->ValidatedInsertRecord($newrec);
-                  $takeremote++;
-               }
-               else{
-                  msg(ERROR,"invalid value '$comprec->{$compfieldname}' ".
-                            "while qrule compare '$origfieldname' and ".
-                            "'$compfieldname'");
-               }
-            }
-            else{
-               $takeremote++;
-            }
-         }
-      }
-   }
    elsif ($param{mode} eq "date"){      
-      if (exists($comprec->{$compfieldname})){
-         if (defined($comprec->{$compfieldname})){
-            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
-            my $t1=$origrec->{$origfieldname};
-            my $t2=$comprec->{$compfieldname};
-            if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
-               $takeremote++;
-            }
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname})){
+         $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
+         my $t1=$origrec->{$origfieldname};
+         my $t2=$comprec->{$compfieldname};
+         if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
+            $takeremote++;
          }
       }
    }
    elsif ($param{mode} eq "day"){      
-      if (exists($comprec->{$compfieldname})){
-         if (defined($comprec->{$compfieldname})){
-            $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
-            my $t1=$origrec->{$origfieldname};
-            my $t2=$comprec->{$compfieldname};
-            $t1=~s/^(\d{4}-\d{2}-\d{2}).*/\1/;
-            $t2=~s/^(\d{4}-\d{2}-\d{2}).*/\1/;
-            if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
-               $takeremote++;
-            }
+      if (exists($comprec->{$compfieldname}) &&
+          defined($comprec->{$compfieldname})){
+         $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
+         my $t1=$origrec->{$origfieldname};
+         my $t2=$comprec->{$compfieldname};
+         $t1=~s/^(\d{4}-\d{2}-\d{2}).*/\1/;
+         $t2=~s/^(\d{4}-\d{2}-\d{2}).*/\1/;
+         if (!defined($origrec->{$origfieldname}) || $t1 ne $t2){
+            $takeremote++;
          }
       }
    }
-   elsif ($param{mode} eq "integer"){  # like amounth of memory
+   elsif ($param{mode} eq "integer"){  # like amount of memory
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&
           $comprec->{$compfieldname}!=0 &&
@@ -490,16 +351,25 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
             }
          }
       }
-      if ($autocorrect ||
-          (exists($origrec->{allowifupdate}) && $origrec->{allowifupdate}) ||
-          !defined($origrec->{$origfieldname}) ||
-          $origrec->{$origfieldname}=~m/^\s*$/){
-         if (!(!$param{AllowEmpty} && $comprec->{$compfieldname} eq "")){
-            $forcedupd->{$origfieldname}=$compval;
-         }
+
+      if ($tmpExcluded) {
+         push(@$qmsg,"different data, ".
+                     "but automatic update temporary deactivated: ".
+                     $origfieldobj->Label());
       }
-      else{
-         $wfrequest->{$origfieldname}=$compval;
+      else {
+         if ($autocorrect ||
+             (exists($origrec->{allowifupdate}) &&
+                     $origrec->{allowifupdate}) ||
+             !defined($origrec->{$origfieldname}) ||
+             $origrec->{$origfieldname}=~m/^\s*$/){
+            if ($param{AllowEmpty} || $comprec->{$compfieldname} ne ""){
+               $forcedupd->{$origfieldname}=$compval;
+            }
+         }
+         else{
+            $wfrequest->{$origfieldname}=$compval;
+         }
       }
    }
 }

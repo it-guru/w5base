@@ -113,20 +113,19 @@ sub qcheckRecord
          }
       }
 
+      $self->IfComp($dataobj,
+                    $rec,"isclusternode",
+                    \%parrec,"isclusternode",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    \@qmsg,\@dataissue,\$errorlevel,
+                    mode=>'boolean');
 
-      $self->IfaceCompare($dataobj,
-                          $rec,"isclusternode",
-                          \%parrec,"isclusternode",
-                          $forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'boolean');
-
-      $self->IfaceCompare($dataobj,
-                          $rec,"itclust",
-                          \%parrec,"itclust",
-                          $forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'leftouterlink');
+      $self->IfComp($dataobj,
+                    $rec,"itclust",
+                    \%parrec,"itclust",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    \@qmsg,\@dataissue,\$errorlevel,
+                    mode=>'leftouterlink');
       if (!$forcedupd->{isclusternode}){  # only take cluster relation if
          delete($forcedupd->{itclust});   # system is realy a cluster node
       }

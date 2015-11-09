@@ -125,12 +125,12 @@ sub qcheckRecord
       }
       ####################################################################### 
 
-      $self->IfaceCompare($dataobj,
-                          $rec,"name",
-                          $parrec,"name",
-                          $forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'string');
+      $self->IfComp($dataobj,
+                    $rec,"name",
+                    $parrec,"name",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    \@qmsg,\@dataissue,\$errorlevel,
+                    mode=>'string');
       my @opList;
       my $res=OpAnalyse(
                  sub{  # comperator 
