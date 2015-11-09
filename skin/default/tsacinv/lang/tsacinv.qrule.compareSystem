@@ -15,3 +15,6 @@
 'systemname with whitespace in AssetManager - contact oss to fix this!'=>{de=>'Systemname aus AssetManager enthält Leerzeichen - kontaktieren Sie OSS damit dies korrigiert wird!'},
 'systemname with DNS Domain in AssetManager - contact oss to fix this!'=>{de=>'Systemname aus AssetManager enthält DNS-Domain - kontaktieren Sie OSS damit dies korrigiert wird!'},
 'systemname from AssetManager not useable - contact oss to fix this!'=>{de=>'Systemname aus AssetManager ist nicht verwendbar - kontaktieren Sie OSS damit dies korrigiert wird!'},
+'different data, but automatic update temporary deactivated'=>{
+   de=>'unterschiedliche Daten, aber automatisches Update vorübergehend deaktiviviert'
+},
