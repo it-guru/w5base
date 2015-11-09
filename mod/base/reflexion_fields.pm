@@ -64,6 +64,11 @@ sub new
                 name          =>'type',
                 label         =>'Fieldtype'),
 
+      new kernel::Field::Text(
+                name          =>'referral',
+                htmlwidth     =>'300px',
+                label         =>'referral'),
+
       new kernel::Field::Htmlarea(
                 name          =>'spec',
                 label         =>'Specification'),
@@ -73,7 +78,7 @@ sub new
 
 
 
-   $self->setDefaultView(qw(linenumber fullname  type label));
+   $self->setDefaultView(qw(fullname  type label referral));
    return($self);
 }
 
@@ -111,6 +116,12 @@ sub getData
                   $rec{dataobjattr}=$fo->{dataobjattr};
                   $rec{spec}=$spec->{$fo->Name};
                   $rec{modnamelabel}=$o->T($modname,$modname);
+                  $rec{referral}="";
+                  if (exists($fo->{vjointo})){
+                     $rec{referral}=$modname."::".$fo->{vjoinon}->[0].
+                                    " -> ".
+                                    $fo->{vjointo}."::".$fo->{vjoinon}->[1];
+                  }
                   push(@data,\%rec);
                }
             }

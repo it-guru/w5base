@@ -8,3 +8,4 @@
 'Fieldtype'=>{de=>'Feldtyp'},
 'Specification'=>{de=>'Felderläuterungen'},
 'internal name'=>{de=>'interner Feldname'},
+'referral'=>{de=>'Verweis'},

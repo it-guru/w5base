@@ -23,9 +23,10 @@ use kernel::Field;
 use kernel::DataObj::Static;
 use kernel::App::Web::Listedit;
 use Text::Wrap;
+use Class::ISA;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
 
-$VERSION="1.0";
+$VERSION="1.1";
 $DESCRIPTION=<<EOF;
 Represend all existing dataobject in current
 running W5Base application.
@@ -69,18 +70,29 @@ sub new
                 name          =>'description',
                 label         =>'Description'),
 
+      new kernel::Field::Text(
+                name          =>'selfasparent',
+                label         =>'top object name'),
+
+      new kernel::Field::Textarea(
+                name          =>'pclasses',
+                label         =>'parent Classes'),
+
       new kernel::Field::Textarea(
                 name          =>'sqlfrom',
+                group         =>'sql',
                 label         =>'SQL From Base Defintion'),
 
       new kernel::Field::Textarea(
                 name          =>'sqlfields',
+                group         =>'sql',
                 label         =>'SQL Field Base Defintion'),
 
       new kernel::Field::Textarea(
                 name          =>'objectdef',
                 label         =>'IO-Object Defintion',
                 htmlheight    =>'400px',
+                group         =>'sql',
                 searchable    =>0,
                 depend        =>['fullname','modnamelabel',
                                  'sqlfrom','sqlfields'],
@@ -112,7 +124,7 @@ sub new
 
 
 
-   $self->setDefaultView(qw(linenumber fullname  modnamelabel));
+   $self->setDefaultView(qw(fullname modnamelabel selfasparent));
    return($self);
 }
 
@@ -138,6 +150,14 @@ sub getData
             my %rec=();
             $rec{fullname}=$modname;
             $rec{modnamelabel}=$o->T($modname,$modname);
+            my $sp=join(", ",Class::ISA::super_path($modname));
+            $rec{pclasses}=$sp;
+            if ($o->can("SelfAsParentObject")){
+               my $po=$o->SelfAsParentObject();
+               if ($po ne $modname){
+                  $rec{selfasparent}=$po;
+               }
+            }
             if ($modname->can("VERSION")){
                $rec{version}=$modname->VERSION;
             }
@@ -210,7 +230,12 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   my @l=qw(default header history);
+   
+   if (in_array([split(/,\s*/,$rec->{pclasses})],"kernel::DataObj::DB")){
+      push(@l,"sql");
+   }
+   return(@l);
 }
 
 sub isWriteValid
