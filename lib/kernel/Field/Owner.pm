@@ -139,10 +139,27 @@ sub FormatedDetail
       my $detailx=$app->DetailX();
       my $detaily=$app->DetailY();
       if ($mode eq "HtmlDetail"){
-         my $onclick="openwin(\"$target?AllowClose=1&userid=$targetid\",".
-                     "\"_blank\",".
-                     "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-                     "resizable=yes,scrollbars=no\")";
+         my $UserCache=$self->getParent->Cache->{User}->{Cache};
+         if (defined($UserCache->{$ENV{REMOTE_USER}})){
+            $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+         }
+         my $winsize="normal";
+         if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+            $winsize=$UserCache->{winsize};
+         }
+         my $winname="_blank";
+         if (defined($UserCache->{winhandling}) &&
+             $UserCache->{winhandling} eq "winonlyone"){
+            $winname="W5BaseDataWindow";
+         }
+         if (defined($UserCache->{winhandling})
+             && $UserCache->{winhandling} eq "winminimal"){
+            $winname="W5B_base::user_".$targetval;
+            $winname=~s/[^a-z0-9]/_/gi;
+         }
+         my $onclick="custopenwin('$target?AllowClose=1&userid=$targetid',".
+                    "'$winsize',".
+                     "$detailx,$detaily,'$winname')";
          $d="<a class=sublink href=JavaScript:$onclick>".$targetval."</a>";
       }
       else{
