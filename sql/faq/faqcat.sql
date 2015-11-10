@@ -14,7 +14,7 @@ CREATE TABLE faqcat (
    realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (faqcatid),
   UNIQUE KEY fullname (fullname),key name (name),key parentid (parentid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE faqcatacl (
   aclid bigint(20) NOT NULL,
   refid bigint(20) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE faqcatacl (
   PRIMARY KEY  (aclid),
   KEY faqid (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table faqcatacl add comments longtext;
 alter table faqcatacl add expiration datetime;
 alter table faqcatacl add alertstate varchar(10);

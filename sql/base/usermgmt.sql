@@ -113,7 +113,7 @@ CREATE TABLE contact (
   UNIQUE email(email),
   UNIQUE fullname (fullname),
   UNIQUE posix_identifier (posix_identifier), UNIQUE ds_id(ds_identifier),
-  KEY surname (surname),KEY managedbygrp(managedbygrp),
+  KEY surname (surname),KEY managedbygrp(managedby),
   KEY givenname (givenname),key(cistatus),
   KEY office_location (office_location),
   KEY private_location (private_location)
@@ -126,7 +126,7 @@ CREATE TABLE useraccount (
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (account),
   KEY userid (userid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE userlogon (
   account varchar(40) NOT NULL default '',
   loghour varchar(10) NOT NULL default '',
@@ -134,7 +134,7 @@ CREATE TABLE userlogon (
   logonbrowser varchar(128) default NULL,
   logonip varchar(20) default NULL,lang varchar(10),site varchar(128),
   PRIMARY KEY  (account,loghour),key(logondate)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 CREATE TABLE userstate (
   userid bigint(20) NOT NULL default '0',
   unused_warncount tinyint(4) default '0',
@@ -142,14 +142,14 @@ CREATE TABLE userstate (
   email_checked datetime default NULL,
   ipacl varchar(255) default NULL,
   PRIMARY KEY  (userid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE userview (
   id bigint(20) NOT NULL default '0',
   module varchar(128) NOT NULL default '',
   name varchar(10) NOT NULL default '',
   viewrevision int(11) NOT NULL default '0',
   viewdata longtext NOT NULL,
-  mdate timestamp(14) NOT NULL,
+  mdate timestamp NOT NULL,
   cdate datetime NOT NULL default '0000-00-00 00:00:00',
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
@@ -159,7 +159,7 @@ CREATE TABLE userview (
   KEY(userid),
   PRIMARY KEY  (id),
   UNIQUE KEY name (name,module,userid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table mandator (
   id         bigint(20) NOT NULL,
   name       varchar(40) NOT NULL, cistatus int(11) NOT NULL default '0',
@@ -180,7 +180,7 @@ create table mandator (
   UNIQUE KEY name (name),
   UNIQUE KEY grpid (grpid),key(cistatus),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE lnkcontact (
   id          bigint(20) NOT NULL,
   refid       bigint(20) NOT NULL,
@@ -202,7 +202,7 @@ CREATE TABLE lnkcontact (
   KEY refid (refid),
   unique key objcontact (refid,parentobj,target,targetid),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE infoabo (
   id         bigint(20)  NOT NULL,
   userid     bigint(20)  NOT NULL,
@@ -225,7 +225,7 @@ CREATE TABLE infoabo (
   KEY findnotiy (parentobj,refid,mode),
   UNIQUE KEY `srcsys` (srcsys,srcid),key(mode),
   unique key pk (userid,parentobj,refid,mode)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table lnkgrpuser add alertstate varchar(10);
 CREATE TABLE phonenumber (
   id         bigint(20)  NOT NULL,
@@ -246,7 +246,7 @@ CREATE TABLE phonenumber (
   KEY findrefid (parentobj,refid),
   UNIQUE KEY `srcsys` (srcsys,srcid),
   key pk (parentobj,refid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE lnkqrulemandator (
   lnkqrulemandatorid bigint(20) NOT NULL default '0',
   mandator   bigint(20)  NOT NULL default '0',
@@ -263,7 +263,7 @@ CREATE TABLE lnkqrulemandator (
   PRIMARY KEY  (lnkqrulemandatorid),
   UNIQUE KEY mandator (mandator,qrule),
   KEY qrule (qrule),key(expiration)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table lnkgrpuser add comments longtext default NULL;
 alter table lnkqrulemandator add dataobj varchar(40) default NULL,add key(dataobj);
 alter table lnkqrulemandator add additional blob;
@@ -329,7 +329,7 @@ create table userblacklist (
   UNIQUE email (email),
   UNIQUE posix_identifier (posix_identifier),
   UNIQUE account (account)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table contact add admcomments longtext default NULL;
 alter table contact add ipacl longtext default NULL;
 alter table infoabo add comments longtext default NULL;
@@ -363,7 +363,7 @@ create table useradvice (
   UNIQUE KEY `srcsys` (srcsys,srcid),
   KEY datarel (reldataobj,reldataobjid,acknowledged),
   KEY userrel (userid,acknowledged)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table grp  add ext_refid1 varchar(40),add key(ext_refid1), add ext_refid2 varchar(80), add key(ext_refid2);
 alter table contact add lastknownboss char(128) default NULL;
 alter table contact add winhandling char(20) default 'windefault';

@@ -10,7 +10,7 @@ CREATE TABLE wfattach (
   KEY createdate (createdate),
   KEY wfheadid (wfheadid),
   KEY wfdataid (wfdataid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE wfkey (
   id bigint(20) NOT NULL,
   name varchar(30) NOT NULL default '',
@@ -31,7 +31,7 @@ CREATE TABLE wfkey (
   KEY nameopendate (name,opendate,wfclass,fval),
   KEY nameclosedate (name,closedate,wfclass,fval),
   KEY wfstate (name,wfstate,wfclass,fval),KEY eventend (eventend), key wfclass (wfclass,wfstate,eventend)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE wfaction (
   wfactionid bigint(20) NOT NULL default '0',
   wfheadid bigint(20) NOT NULL default '0',
@@ -53,7 +53,7 @@ CREATE TABLE wfaction (
   KEY action (wfheadid,name),key(createuser,createdate),
   KEY modifydate (modifydate),key srcsys(srcid,srcsys),
   KEY wfheadid (wfheadid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE wfhead (
   wfheadid bigint(20) NOT NULL default '0',
   shortdescription varchar(250) NOT NULL default '',
@@ -92,7 +92,7 @@ CREATE TABLE wfhead (
   key fwd(fwdtarget,fwdtargetid,wfstate),
   key wfclass(wfclass,wfstep),
   key wfstep(wfstep)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE joblog (
   id bigint(20) NOT NULL default '0',
   method    varchar(128) NOT NULL default '',
@@ -107,7 +107,7 @@ CREATE TABLE joblog (
   KEY event  (event,method),key(pid),
   KEY createdate  (createdate),
   KEY modifydate  (modifydate,method,exitcode)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table wfaction add privatestate int(2) default '0';
 CREATE TABLE wfrelation (
   wfrelationid bigint(20) NOT NULL default '0',
@@ -128,7 +128,7 @@ CREATE TABLE wfrelation (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (wfrelationid),
   key srcid (srcwfid),key dstid (dstwfid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE wfworkspace (
   id          bigint(20) NOT NULL default '0',
   wfheadid    bigint(20) default NULL,
@@ -138,7 +138,7 @@ CREATE TABLE wfworkspace (
   createuser  bigint(20) NOT NULL default '0',
   createdate  datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY (id),key fwd(fwdtarget,fwdtargetid),key(wfheadid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table wfhead add directlnktype varchar(40) default NULL, add directlnkid bigint(20) default NULL,add directlnkmode varchar(20) default NULL,add key directlnk(directlnktype,directlnkid,wfstate,directlnkmode),add key directlnkev(directlnktype,directlnkid,eventend);
 CREATE TABLE wfrepjob (
   id          bigint(20) NOT NULL default '0',
@@ -172,7 +172,7 @@ CREATE TABLE wfrepjob (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table wfrepjob add cistatus int(2) NOT NULL;
 alter table wfrepjob add timezone varchar(20) NOT NULL;
 alter table wfrepjob add funccode text NOT NULL;
@@ -187,7 +187,7 @@ CREATE TABLE mailreqspool (
   procdate    datetime default NULL,
   PRIMARY KEY (id),
   key(md5sechash),key(createdate)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table wfhead add md5sechash char(22) default NULL, add key(md5sechash), add is_deleted boolean default '0', add eventtrigger varchar(128) default NULL, add acopymode char(20) default NULL, add acopydate datetime default NULL,add key acopy(wfstate,acopymode,acopydate);
 alter table wfattach add filename varchar(254) not NULL;
 alter table wfattach add mimetype varchar(128) not NULL;
@@ -213,7 +213,7 @@ create table workprocess (
   PRIMARY KEY  (id),KEY  (mandator),
   UNIQUE KEY name (name,mandator),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table workprocessitem (
   id          bigint(20) NOT NULL,
   workprocess bigint(20) NOT NULL,
@@ -234,7 +234,7 @@ create table workprocessitem (
   PRIMARY KEY  (id),key (orderkey),
   UNIQUE KEY name (workprocess,orderkey),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table workprocessitem add is_milestone int(1) default '0';
 set FOREIGN_KEY_CHECKS=0;
 alter table workprocess add FOREIGN KEY fk_workprocess_databoss (databoss)
@@ -290,4 +290,4 @@ CREATE TABLE reportjob (
   srcid        varchar(80) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY (id), key(reportname),key(lastrun),UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

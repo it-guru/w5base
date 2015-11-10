@@ -19,6 +19,6 @@ create table itil_infoabo (
   FOREIGN KEY fk_itil_infoabo_u (contact) 
           REFERENCES contacts (userid) ON DELETE CASCADE,
   key(affectedorgarea),key(affectedcustomer)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
 alter table itil_infoabo add eventmode varchar(20) default NULL;

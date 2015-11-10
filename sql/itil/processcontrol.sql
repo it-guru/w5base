@@ -19,7 +19,7 @@ create table softwareset (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnksoftwaresoftwareset (
   id           bigint(20) NOT NULL,
   softwareset  bigint(20) NOT NULL,
@@ -40,7 +40,7 @@ create table lnksoftwaresoftwareset (
   srcload      datetime    default NULL,
   PRIMARY KEY  (id), KEY software (software),key(releasekey),key(softwareset),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnkosreleasesoftwareset (
   id           bigint(20) NOT NULL,
   softwareset  bigint(20) NOT NULL,
@@ -59,4 +59,4 @@ create table lnkosreleasesoftwareset (
   srcload      datetime    default NULL,
   PRIMARY KEY  (id), KEY software (osrelease),key(softwareset),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

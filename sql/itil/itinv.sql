@@ -56,7 +56,7 @@ create table lnkapplcustcontract (
   KEY appl (appl),
   KEY custcontract (custcontract),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table system (
   id         bigint(20) NOT NULL,
   name       varchar(40) NOT NULL,
@@ -147,7 +147,7 @@ create table asset (
   KEY guardian (guardian),KEY guardian2 (guardian2), 
   KEY guardianteam (guardianteam),
   UNIQUE KEY `srcsys` (srcsys,srcid),key(location),key(hwmodel)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table platform (
   id         bigint(20) NOT NULL,
   name       varchar(20) NOT NULL,
@@ -166,7 +166,7 @@ create table platform (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table osrelease (
   id         bigint(20) NOT NULL,
   name       varchar(45) NOT NULL,
@@ -184,7 +184,7 @@ create table osrelease (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table producer (
   id          bigint(20)  NOT NULL,
   name        varchar(40) NOT NULL,
@@ -204,7 +204,7 @@ create table producer (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table software (
   id          bigint(20)  NOT NULL,
   name        varchar(80) NOT NULL,
@@ -226,7 +226,7 @@ create table software (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table network (
   id         bigint(20) NOT NULL,
   name       varchar(40) NOT NULL,
@@ -247,7 +247,7 @@ create table network (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table ipaddress (
   id         bigint(20) NOT NULL,
   name       varchar(45) NOT NULL, binnamekey char(128),
@@ -313,7 +313,7 @@ create table liccontract (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnkapplappl (
   id           bigint(20) NOT NULL,
   fromappl     bigint(20) NOT NULL,
@@ -335,7 +335,7 @@ create table lnkapplappl (
   KEY fromappl (fromappl),
   KEY toappl (toappl),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table hwmodel (
   id          bigint(20)  NOT NULL,
   fullname    varchar(80) NOT NULL,
@@ -402,7 +402,7 @@ create table lnksoftwaresystem (
   KEY software (software),KEY liccontract (liccontract),
   KEY system (system), FOREIGN KEY (software) REFERENCES software (id) ON DELETE RESTRICT,
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnkinstance (
   id                bigint(20) NOT NULL,
   lnksoftwaresystem bigint(20) NOT NULL,
@@ -421,7 +421,7 @@ create table lnkinstance (
   PRIMARY KEY  (id),
   UNIQUE name (name,lnksoftwaresystem),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table appl add is_soxcontroll   bool default '0';
 alter table appl add is_applwithnosys bool default '0';
 alter table system add systemtype varchar(20) default 'standard',add key(systemtype);
@@ -452,7 +452,7 @@ create table servicesupport (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table appl add servicesupport bigint(20) default NULL;
 alter table appl add key(servicesupport);
 alter table asset  add place varchar(40) default NULL;
@@ -483,7 +483,7 @@ create table systemnfsnas (
   PRIMARY KEY  (id),key(exportname),key(cistatus),
   UNIQUE KEY name (name,system),key(system),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnksystemnfsnas (
   id         bigint(20) NOT NULL,
   systemnfsnas    bigint(20) NOT NULL,
@@ -503,7 +503,7 @@ create table lnksystemnfsnas (
   PRIMARY KEY  (id),
   UNIQUE name (system,systemnfsnas),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table system add is_nas bool default '0';
 create table swinstance (
   id         bigint(20)   NOT NULL,
@@ -566,7 +566,7 @@ create table lnkswinstancesystem (
   KEY swinstance (swinstance),
   KEY system (system),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnkaccountingno (
   id           bigint(20)  NOT NULL,
   accountno    varchar(20) NOT NULL,
@@ -587,7 +587,7 @@ create table lnkaccountingno (
   UNIQUE acc (parentobj,accountno,refid),
   KEY accountno (accountno), KEY refid (refid),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnknfsnasipnet (
   id         bigint(20) NOT NULL,
   systemnfsnas    bigint(20) NOT NULL,
@@ -608,7 +608,7 @@ create table lnknfsnasipnet (
   PRIMARY KEY  (id),
   UNIQUE name (ip,network,systemnfsnas),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnkapplapplcomp (
   id           bigint(20) NOT NULL,
   lnkapplappl  bigint(20) NOT NULL,
@@ -639,7 +639,7 @@ create table lnkapplapplcomp (
   KEY lnkapplappl (lnkapplappl),               
   UNIQUE KEY `sortkey` (sortkey),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table system       add allowifupdate int(2) default 0;
 alter table appl         add allowifupdate int(2) default 0;
 alter table custcontract add allowifupdate int(2) default 0;
@@ -694,7 +694,7 @@ create table lickey (
   PRIMARY KEY  (id),
   KEY liccontract (liccontract),UNIQUE name (name,liccontract),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table lnksoftwaresystem add key(liccontract);
 create table lnklicappl (
   id           bigint(20) NOT NULL,
@@ -717,7 +717,7 @@ create table lnklicappl (
   KEY liccontract (liccontract),key(is_avforfuse),
   KEY appl (appl),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table system add is_avforfuse bool default '0', add key(is_avforfuse);
 alter table asset  add is_avforfuse bool default '0', add key(is_avforfuse);
 alter table appl   add eventlang  varchar(5) default NULL;
@@ -784,7 +784,7 @@ create table itclust (
   PRIMARY KEY  (id),key(mandator),key(lastqcheck),
   UNIQUE KEY name (fullname),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table swinstance add runonclusts int(2) default '0';
 alter table swinstance add itclusts bigint(20) default NULL,add key(itclusts);
 alter table servicesupport add iflathourscost float(5,2) default NULL;
@@ -823,7 +823,7 @@ create table dnsalias (
   PRIMARY KEY  (id),
   key dnsname(dnsname),
   UNIQUE KEY `srcsys` (srcsys,srcid), unique KEY (dnsalias,dnsname)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table appl  add applbasemoni varchar(20) default NULL;
 create table storageclass (
   id         bigint(20) NOT NULL,
@@ -1348,7 +1348,7 @@ create table licproduct (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table liccontract add licproduct bigint(20) default null;
 alter table liccontract add fullname varchar(512) not null;
 alter table lnksoftwaresystem add licsubof bigint(20) default null;
@@ -1369,7 +1369,7 @@ create table lnkapplconumber (
   PRIMARY KEY  (id),
   UNIQUE KEY name (appl,name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table businessservice add validfrom datetime default NULL, add validto datetime default NULL, add customer bigint(20)  default NULL, add repocycle varchar(20) default NULL;
 alter table businessservice add requ_mtbf int(10) default NULL,add impl_mtbf int(10) default NULL,add curr_mtbf int(10) default NULL, add requ_ttr varchar(20) default NULL,add impl_ttr int(10) default NULL,add  curr_ttr int(10) default NULL, add requ_avail_p double(8,2) default NULL,add impl_avail_p double(8,2) default NULL,add  curr_avail_p double(8,2) default NULL, add requ_respti varchar(20) default NULL,add impl_respti int(10) default NULL,add  curr_respti int(10) default NULL,add th_warn_avail double(8,2) default NULL, add th_crit_avail double(8,2) default NULL, add th_warn_respti double(8,2) default NULL, add th_crit_respti double(8,2) default NULL;
 alter table businessservice add th_warn_mtbf double(8,2) default NULL, add th_crit_mtbf double(8,2) default NULL,add th_warn_ttr double(8,2) default NULL, add th_crit_ttr double(8,2) default NULL;
@@ -1425,3 +1425,62 @@ alter table businessservice add occreactiontimelevel int(20), add occtotaltimele
 alter table appl add usetime text default NULL, add tempexeptusetime text default NULL;
 alter table swinstance add ssl_cert_exp_notify1 datetime default NULL;
 alter table applgrp add responseorg bigint(20) default NULL;
+use w5base;
+create table lnkbprocessappl (
+  id           bigint(20) NOT NULL,
+  bprocess     bigint(20) NOT NULL,
+  appl         bigint(20),
+  relevance    int(2)     NOT NULL,
+  comments     longtext    default NULL,
+  additional   longtext    default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',   
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,       
+  PRIMARY KEY  (id),
+  KEY bprocess (bprocess),
+  KEY appl (appl),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table lnkbprocesssystem (
+  id           bigint(20) NOT NULL,
+  bprocess     bigint(20) NOT NULL,
+  system       bigint(20) NOT NULL,
+  relevance    int(2)     NOT NULL,
+  comments     longtext    default NULL,
+  additional   longtext    default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',   
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,       
+  PRIMARY KEY  (id),
+  KEY bprocess (bprocess),
+  KEY system (system),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table lnkbprocessappl add appfailinfo longtext default NULL;
+alter table lnkbprocessappl add autobpnotify int(1) default '0';
+drop table lnkbprocesssystem;
+rename table lnkbprocessappl to lnkbprocessbusinessservice;
+alter table lnkbprocessbusinessservice add businessservice bigint(20) NOT NULL;
+set FOREIGN_KEY_CHECKS=0;
+alter table lnkbprocessbusinessservice add FOREIGN KEY fk_bs (businessservice) REFERENCES businessservice (id) ON DELETE CASCADE;
+set FOREIGN_KEY_CHECKS=1;
+alter table businessservice add databoss  bigint(20);
+alter table businessservice add mandator  bigint(20);
+alter table businessservice add nature  char(5) default '', add unique fullname(nature,name);
+alter table businessservice add contact1 bigint(20),add contact2 bigint(20),add contact3 bigint(20),add contact4 bigint(20),add contact5 bigint(20),add contact6 bigint(20),add contact7 bigint(20),add contact8 bigint(20),add contact9 bigint(20);
+alter table businessservice add shortname varchar(10);
+alter table businessservice drop key fullname, add unique fullname(nature,name,shortname);
+alter table businessservice add implservicesupport  bigint(20);
+alter table businessservice add lastqcheck datetime default NULL,add key(lastqcheck);

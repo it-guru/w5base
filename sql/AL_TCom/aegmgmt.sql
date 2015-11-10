@@ -20,6 +20,6 @@ create table AL_TCom_appl_aegmgmt (
   PRIMARY KEY  (id),
   FOREIGN KEY fk_appl (id)
               REFERENCES appl (id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table AL_TCom_appl_aegmgmt add leadprmmgr bigint(20);
 alter table AL_TCom_appl_aegmgmt add leadinmmgr bigint(20);

@@ -23,7 +23,7 @@ create table businessprocess (
   PRIMARY KEY  (id),key(mandator),key(indexno),
   UNIQUE KEY name (name,customer),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE businessprocessacl (
   aclid bigint(20) NOT NULL,
   refid bigint(20) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE businessprocessacl (
   PRIMARY KEY  (aclid),
   KEY faqid (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table businessprocess add eventlang  varchar(5) default 'de';
 update businessprocess set eventlang='de';
 alter table businessprocess add processowner bigint(20)  default NULL;

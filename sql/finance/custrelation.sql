@@ -33,7 +33,7 @@ create table custcontract (
   UNIQUE KEY contractid (contractid),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table custcontract add conumber varchar(20) default NULL;
 alter table custcontract add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table custcontract add databoss2 bigint(20)  default NULL;
@@ -55,7 +55,7 @@ create table custcontractmod (
   UNIQUE KEY contractid (contractid,name),
   UNIQUE KEY `srcsys` (srcsys,srcid),
   FOREIGN KEY fk_custcontract (contractid) REFERENCES custcontract (id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=0;
 alter table custcontract add FOREIGN KEY fk_custcontract_databoss (databoss)
           REFERENCES contact (userid) ON DELETE RESTRICT;

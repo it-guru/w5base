@@ -13,7 +13,7 @@ create table systemjob (
   createuser  bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),
   UNIQUE name (name) 
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE systemjobacl (
   aclid bigint(20) NOT NULL,
   refid bigint(20) NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE systemjobacl (
   PRIMARY KEY  (aclid),
   KEY refid (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE lnksystemjobsystem (
   id bigint(20) NOT NULL,
   system      bigint(20) NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE lnksystemjobsystem (
   unique key link (system,systemjob),
   key sj (systemjob),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table systemjob add remoteuser varchar(20) default 'w5base';
 alter table systemjob add param blob;
 create table systemjobtiming (
@@ -86,7 +86,7 @@ create table systemjobtiming (
   PRIMARY KEY  (id),
   key systemid (systemid,jobid) ,key(tinterval),key(cistatus),
   key(lastjobstart,lastexitcode),unique src (srcid,srcsys)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table systemjobtiming add runcount int(20) default '0';
 alter table systemjobacl add comments   longtext;
 alter table systemjobacl add expiration datetime;

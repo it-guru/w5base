@@ -47,10 +47,6 @@ sub Init
                       "tsciam::orgarea",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj('tswiw::QuickFind::user$',
-                      "tswiw::QuickFind::user",
-                      defaultacl=>['DTAG.TSI']);
-   
    return(1);
 }
 

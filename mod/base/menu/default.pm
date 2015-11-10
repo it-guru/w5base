@@ -105,10 +105,6 @@ sub Init
                       "base::infoabo",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("sysadm.user.infoabo",
-                      "base::infoabo",
-                      defaultacl=>['valid_user']);
-
    $self->RegisterObj("sysadm.user.email",
                       "base::useremail",
                       func=>'MainWithNew',

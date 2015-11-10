@@ -15,7 +15,7 @@ CREATE TABLE passxkey (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (keyid),
   UNIQUE (userid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE passxpassword (
   passwordid bigint(20) NOT NULL default '0',
   userid     bigint(20) NOT NULL default '0',
@@ -34,7 +34,7 @@ CREATE TABLE passxpassword (
   PRIMARY KEY (passwordid),
   KEY userid (userid),
   UNIQUE t (entryid,userid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE passxentry (
   entryid    bigint(20) NOT NULL default '0',
   systemname varchar(80) NOT NULL default '',
@@ -53,7 +53,7 @@ CREATE TABLE passxentry (
   PRIMARY KEY (entryid),
   KEY (modifyuser),key (entrytype),
   UNIQUE t (systemname,username,uniqueflag)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE passxacl (
   aclid bigint(20) NOT NULL,
   refid bigint(20) NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE passxacl (
   PRIMARY KEY  (aclid),
   KEY id (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table passxentry add comments varchar(80);
 CREATE TABLE passxlog (
   logid bigint(20) NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE passxlog (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (logid),
   KEY id (createuser),key (entryid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table passxacl add comments   longtext;
 alter table passxacl add expiration datetime;
 alter table passxacl add alertstate varchar(10);

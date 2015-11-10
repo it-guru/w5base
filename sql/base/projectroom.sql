@@ -36,7 +36,7 @@ create table projectroom (
   KEY aclpolicy (aclpolicy),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnkprojectroom (
   id           bigint(20) NOT NULL,
   projectroom  bigint(20) NOT NULL,
@@ -59,7 +59,7 @@ create table lnkprojectroom (
   KEY projectroom (projectroom),
   UNIQUE KEY `sortkey` (sortkey),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table projectroom add is_commercial  int(1) default '0';
 alter table projectroom add conumber       varchar(20) default NULL;
 alter table projectroom add is_allowlnkact int(1) default '0';

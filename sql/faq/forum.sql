@@ -38,7 +38,7 @@ CREATE TABLE forumtopic (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (id),
   KEY fullname (forumboard,name),key name(name),fulltext(comments,name)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 CREATE TABLE forumentry (
   id bigint(20) NOT NULL default '0',
   forumtopic bigint(20),
@@ -55,7 +55,7 @@ CREATE TABLE forumentry (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (id),
   key name (forumtopic),fulltext(comments)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 CREATE TABLE forumboardacl (
   aclid bigint(20) NOT NULL,
   refid bigint(20) NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE forumboardacl (
   PRIMARY KEY  (aclid),
   KEY id (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table forumboardacl add comments longtext;
 alter table forumboardacl add expiration datetime;
 alter table forumboardacl add alertstate varchar(10);
@@ -82,5 +82,5 @@ CREATE TABLE forumtopicread (
   clientipaddr  varchar(40) default NULL,
   PRIMARY KEY  (id),
   KEY forumread(forumtopic),key forumuser(createuser), key cdate(createdate)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table forumboard add boardheader blob;

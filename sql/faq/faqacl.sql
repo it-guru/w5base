@@ -13,7 +13,7 @@ CREATE TABLE faqacl (
   PRIMARY KEY  (aclid),
   KEY faqid (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table faqacl add comments   longtext;
 alter table faqacl add expiration datetime;
 alter table faqacl add alertstate varchar(10);

@@ -23,7 +23,7 @@ create table costcenter (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),KEY(fullname),KEY(mandator),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table costcenter add databoss bigint(20) default NULL,add key(databoss);
 alter table costcenter add is_directwfuse int(2) default '0';
 alter table costcenter add ldelmgr  bigint(20) default NULL,add key(ldelmgr);
@@ -53,7 +53,7 @@ create table costteamfixup (
   KEY durationstart(grpid,durationstart), KEY durationend(grpid,durationend),
   KEY name (name),KEY grpid (grpid),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=0;
 alter table costcenter add FOREIGN KEY fk_costcenter_databoss (databoss)
           REFERENCES contact (userid) ON DELETE RESTRICT;

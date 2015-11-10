@@ -45,7 +45,7 @@ create table history (
   PRIMARY KEY  (id),
   KEY name (name), KEY dataobject (dataobject,dataobjectid),
   UNIQUE KEY `srcsys` (srcsys,srcid),key (operation),key(createdate)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table eventspool (
   id         bigint(20)   NOT NULL,
   spooltag   varchar(80)  NOT NULL,
@@ -62,7 +62,7 @@ create table eventspool (
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),
   UNIQUE spooltag (spooltag) 
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table googlekeys (
   id         bigint(20)   NOT NULL,
   name       varchar(128) NOT NULL,
@@ -75,7 +75,7 @@ create table googlekeys (
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),
   UNIQUE name (name) 
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table location add gpslongitude varchar(40);
 alter table location add gpslatitude varchar(40);
 create table userdefault (
@@ -92,7 +92,7 @@ create table userdefault (
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),
   UNIQUE name (userid,name) 
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table userbookmark (
   id         bigint(20)   NOT NULL,
   userid     bigint(20)   default NULL,
@@ -108,7 +108,7 @@ create table userbookmark (
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),
   UNIQUE userid(userid,name) ,key name (name),key modifiydate(modifydate)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table w5stat (
   id         bigint(20)   NOT NULL,
   statgroup  varchar(40)  NOT NULL,
@@ -122,7 +122,7 @@ create table w5stat (
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload),
   UNIQUE userid(month,name,statgroup),key name (statgroup,name),key (nameid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table mailsignatur (
   id         bigint(20)   NOT NULL,
   name       varchar(128) NOT NULL,
@@ -141,7 +141,7 @@ create table mailsignatur (
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload),
   UNIQUE  nameuid(userid,name),key name (name)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table postitnote (
   id         bigint(20)   NOT NULL,
   name           varchar(20) NOT NULL,
@@ -156,7 +156,7 @@ create table postitnote (
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),
   key name (name) 
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table location add response bigint(20) default NULL;
 alter table location add response2 bigint(20) default NULL;
 alter table mailsignatur add fromaddress varchar(128) default NULL;
@@ -179,7 +179,7 @@ create table w5statmaster (
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload),
   UNIQUE statkey(monthkwday,name,statgroup,statname),key name (statgroup,name)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table eventrouter (
   id         bigint(20)  NOT NULL,
   cistatus   int(2)      NOT NULL,
@@ -201,7 +201,7 @@ create table eventrouter (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table interview (
   id         bigint(20)   NOT NULL,
   name       varchar(255) NOT NULL,
@@ -222,7 +222,7 @@ create table interview (
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),KEY (parentobj)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table interanswer(
   id         bigint(20)   NOT NULL,
   interviewid  bigint(20)   NOT NULL,
@@ -240,7 +240,7 @@ create table interanswer(
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),KEY (parentid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table interview add name_de varchar(255);
 alter table interview add questclust varchar(80);
 alter table interview add qtag varchar(80) not null, add unique key(qtag);
@@ -291,7 +291,7 @@ create table mandatordataacl(
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',
   PRIMARY KEY  (id),KEY m(parentobj,mandator),key (prio)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 #
 alter table interview add boundpviewgroup varchar(40) default NULL;
 alter table interview add boundpcontact   varchar(40) default NULL;
@@ -315,7 +315,7 @@ create table checklst (
   lastqcheck  datetime default NULL,
   PRIMARY KEY  (id),key(mandator),key(lastqcheck),
   UNIQUE KEY name (name)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table checklstent (
   id          bigint(20)   NOT NULL,
   checklst      bigint(20)   NOT NULL,
@@ -333,7 +333,7 @@ create table checklstent (
   lastqcheck  datetime default NULL,
   PRIMARY KEY  (id),key(lastqcheck),
   KEY checklst (checklst)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table mandatordataacl add unique(prio,parentobj,dataname,mandator);
 create table isocountry (
   id          bigint(20)   NOT NULL,
@@ -391,7 +391,7 @@ create table itemizedlist (
   srcid       varchar(20) default NULL,
   srcload     datetime    default NULL,
   PRIMARY KEY (id),unique(selectlabel,name)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table interview add additional  longtext default NULL;
 alter table location add mandator bigint(20) default NULL;
 create table iomap (
@@ -409,7 +409,7 @@ create table iomap (
   editor      varchar(100) NOT NULL default '',
   realeditor  varchar(100) NOT NULL default '',
   PRIMARY KEY (id),key(dataobject),key(createdate),key(cistatus,createdate)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table iomap add fullname varchar(65), add key(fullname);
 alter table isocountry add zipcodeexp varchar(128) default NULL;
 alter table location modify zipcode varchar(16) NOT NULL;
@@ -801,4 +801,4 @@ create table isocurrency (
   editor      varchar(100) NOT NULL default '',
   realeditor  varchar(100) NOT NULL default '',
   PRIMARY KEY (id),unique(token),unique(fullname)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

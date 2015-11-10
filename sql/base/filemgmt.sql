@@ -24,7 +24,7 @@ CREATE TABLE filemgmt (
   KEY parentid (parentid),
   KEY realfile (realfile),
   KEY name (name)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table filemgmt add entrytyp char(20)   default 'file';
 alter table filemgmt add additional longtext default NULL;
 CREATE TABLE fileacl (
@@ -41,7 +41,7 @@ CREATE TABLE fileacl (
   PRIMARY KEY  (aclid),
   KEY faqid (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table filemgmt add inheritrights int(1) default '1';
 alter table fileacl add comments   longtext;
 alter table fileacl add expiration datetime;
@@ -67,7 +67,7 @@ CREATE TABLE filesig (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (keyid),
   UNIQUE KEY fullname (parentobj,cistatus,username,name,labelpath)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE signedfile (
   fid         bigint(20) NOT NULL AUTO_INCREMENT,
   keyid       bigint(20) NOT NULL,
@@ -82,4 +82,4 @@ CREATE TABLE signedfile (
   KEY label (parentobj,parentid,isnewest), 
   key keyid (keyid), key(createdate),key(mandator),
   key(isnewest,createdate,label)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

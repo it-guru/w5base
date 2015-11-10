@@ -24,7 +24,7 @@ create table articlegroup (
   UNIQUE KEY srcsys (srcsys,srcid),
   UNIQUE KEY name (name),
   KEY qcheck (lastqcheck)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table articletag (
   id          bigint(20)  NOT NULL,
   name        varchar(128) NOT NULL,
@@ -42,7 +42,7 @@ create table articletag (
   PRIMARY KEY  (id),
   UNIQUE KEY srcsys (srcsys,srcid),
   KEY name (name)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table article (
   id          bigint(20)  NOT NULL,
   name        varchar(128) NOT NULL,
@@ -73,4 +73,4 @@ create table article (
   UNIQUE KEY shortname (shortname),
   UNIQUE KEY namegroup (articlegroup,name),
   KEY qcheck (lastqcheck)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

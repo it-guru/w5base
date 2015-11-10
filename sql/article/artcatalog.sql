@@ -149,10 +149,10 @@ create table artprodopttoken (
           REFERENCES artproduct (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+set FOREIGN_KEY_CHECKS=0;
 create table lnkartelementprod (
   id         bigint(20)  NOT NULL,
-  artdelivelement  bigint(20)  NOT NULL,
-  artproduct       bigint(20)  NOT NULL,
+  artdelivelement  bigint(20)  NOT NULL,artproduct       bigint(20)  NOT NULL,
   comments    longtext,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
@@ -161,8 +161,7 @@ create table lnkartelementprod (
   editor     varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
   srcsys     varchar(100) default 'w5base',
-  srcid      varchar(20) default NULL,
-  srcload    datetime    default NULL,
+  srcid      varchar(20) default NULL, srcload    datetime    default NULL,
   PRIMARY KEY  (id),           
   FOREIGN KEY deliveryelement (artdelivelement)
           REFERENCES artdelivelement (id) ON DELETE CASCADE,
@@ -170,6 +169,7 @@ create table lnkartelementprod (
           REFERENCES artproduct (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+set FOREIGN_KEY_CHECKS=1;
 create table lnkartprodprod (
   id         bigint(20)  NOT NULL,
   partproduct      bigint(20)  NOT NULL,

@@ -24,4 +24,4 @@ create table recsystspan (
   UNIQUE KEY tfrom (tfrom),
   UNIQUE KEY span  (tfrom,tto,userid,recsubsys),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

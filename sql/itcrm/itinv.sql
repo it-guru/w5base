@@ -22,7 +22,7 @@ create table itcrmappl (
   key(customer),
   KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table itcrmappl add custmgmttool varchar(20) default NULL;
 alter table itcrmappl add key(custmgmttool);
 alter table itcrmappl add businessowner bigint(20) default NULL;

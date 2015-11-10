@@ -14,7 +14,7 @@ CREATE TABLE menu (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (menuid),
   UNIQUE KEY name (config,fullname)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE menuacl (
   aclid bigint(20) NOT NULL,
   refid bigint(20) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE menuacl (
   PRIMARY KEY  (aclid),
   KEY faqid (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table menuacl add comments longtext;
 alter table menuacl add expiration datetime;
 alter table menuacl add alertstate varchar(10);

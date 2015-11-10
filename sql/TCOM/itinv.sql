@@ -34,6 +34,6 @@ create table TCOM_appl (
   key(ippl), key(ippl2),key(customer),
   UNIQUE KEY name (name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table TCOM_appl add custapplid varchar(20);
 drop table TCOM_appl;

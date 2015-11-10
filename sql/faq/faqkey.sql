@@ -8,4 +8,4 @@ CREATE TABLE faqkey (
   realeditor varchar(100) NOT NULL default '',
   UNIQUE KEY nameval (fval,name,id),
   KEY name (name,id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

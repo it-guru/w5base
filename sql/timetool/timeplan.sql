@@ -23,7 +23,7 @@ create table timeplan (
   UNIQUE KEY applid (id),key(tmode),
   UNIQUE KEY name (name),KEY(mandator),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table tspanentry (
   id         bigint(20) NOT NULL,
      tfrom         datetime    NOT NULL default '0000-00-00 00:00:00',
@@ -50,7 +50,7 @@ create table tspanentry (
   UNIQUE KEY tfrom (tfrom,entrytyp,useridref,timeplanref,subsys),
   UNIQUE KEY span  (tfrom,tto,dataref,useridref,timeplanref,subsys),
   UNIQUE KEY `srcsys` (srcsys,srcid),key (useridref)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table tspanentry add name varchar(40) default NULL,add key(name);
 alter table timeplan   add data longtext default NULL;
 alter table timeplan   add defstarthour int(2) default '0';
@@ -81,4 +81,4 @@ create table timeplanworkgroup (
   UNIQUE KEY applid (id),
   UNIQUE KEY name (name),KEY(mandator),
   UNIQUE KEY `srcsys` (srcsys,srcid)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
