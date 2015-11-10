@@ -250,13 +250,13 @@ sub ProcessLine
                                       current=>$rec
                                      },$fieldname,"formated");
          if ($data ne ""){
-            $data=~s/&/&amp;/g;
-            $data=~s/</&lt;/g;
+           # $data=~s/&/&amp;/g;
+           # $data=~s/</&lt;/g;
             #<wbr \/>
             $data=~s/((.)\2{39,})(\2)/\1\2/g; # linien Zeilen brechen
-            $data=~s/\\n/\n/g;
+            #$data=~s/\\n/\n/g;
             $data=~s/\\r//g;
-            $data=~s/>/&gt;/g;
+           # $data=~s/>/&gt;/g;
             $d.="<table cellspacing=0 cellpadding=0 border=0".
                 "width=99% style=\"table-layout:fixed\"><tr><td>";
             $d.="<pre class=multilinetext>".

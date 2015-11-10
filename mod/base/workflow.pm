@@ -3821,8 +3821,9 @@ sub getLineSubListData
                                                $self->getParent->Lang(),"GMT");
             $d.=": ";
             $d.=$self->getParent->T($arec->{name},$arec->{translation})."\n";
-            $d.=$arec->{comments}."\n" if ($arec->{comments} ne "");
-#Dumper($dd);
+            if ($arec->{comments} ne ""){
+               $d.=$arec->{comments}."\n";
+            }
          }
       }
       return($d);

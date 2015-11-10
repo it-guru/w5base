@@ -959,6 +959,7 @@ sub FancyLinks
 sub _ExpandW5BaseDataLinks
 {
    my $self=shift;
+   my $formats=shift;
    my $FormatAs=shift;
    my $raw=shift;
    my $targetobj=shift;
@@ -983,7 +984,7 @@ sub _ExpandW5BaseDataLinks
                   @d=("[EMPTY LINK]");
                }
                my $d=join(", ",@d);
-               if ($FormatAs eq "HtmlDetail"){
+               if (in_array($formats,$FormatAs)){
                   my $url=$targetobj;
                   $url=~s/::/\//g;
                   $url="../../$url/ById/$id";
@@ -1004,9 +1005,10 @@ sub ExpandW5BaseDataLinks
    my $self=shift;
    my $FormatAs=shift;
    my $data=shift;
-   return($data) if ($FormatAs ne "HtmlDetail");
+   my @formats=qw(HtmlWfActionlog HtmlDetail);
+   return($data) if (!in_array(\@formats,$FormatAs));
 
-   $data=~s#(w5base://([^\/]+)/([^\/]+)/([^\/]+)/([,0-9,a-z,A-Z_]+))#_ExpandW5BaseDataLinks($self,$FormatAs,$1,$2,$3,$4,$5)#ge;
+   $data=~s#(w5base://([^\/]+)/([^\/]+)/([^\/]+)/([,0-9,a-z,A-Z_]+))#_ExpandW5BaseDataLinks($self,\@formats,$FormatAs,$1,$2,$3,$4,$5)#ge;
 
    return($data);
 }

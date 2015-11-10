@@ -188,7 +188,9 @@ sub FormatedResult
    }
    $d=join($j,@{$d}) if (ref($d) eq "ARRAY");
 
-   if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlSubList"){
+   if ($FormatAs eq "HtmlV01" || 
+       $FormatAs eq "HtmlWfActionlog" ||
+       $FormatAs eq "HtmlSubList"){
       if (!ref($d)){
          my $lang=$self->getParent->Lang();
          $d=extractLangEntry($d,$lang,65535,65535);  # 64k lines and bytes
@@ -201,14 +203,17 @@ sub FormatedResult
       else{
          $d=quoteHtml($d);
       }
-      $d=~s/\n/<br>\n/gs;
+      if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlSubList"){
+         # target ist kein pre-Formated HTML Element
+         $d=~s/\n/<br>\n/gs;
+      }
    }
    if ($FormatAs eq "SOAP"){
       return(quoteSOAP($d));
    }
    $d=ExpandW5BaseDataLinks($self->getParent,$FormatAs,$d);
    
-   #printf STDERR ("fifi FormatAs=$FormatAs\n");
+   #printf STDERR ("fifi FormatAs=$FormatAs d=$d\n");
    return($d);
 }
 
