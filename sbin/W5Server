@@ -182,7 +182,7 @@ sub rpcCallSpooledEvent
 {
    my $self=shift;
    my %param=@_;
-   msg(DEBUG,"rpcCallSpooledEvent\n%s",Dumper(\@_));
+   #msg(DEBUG,"rpcCallSpooledEvent\n%s",Dumper(\@_));
    my $spooltag=$param{spooltag};  # tag label of the event (is unique)
    my $firstcalldelay=$param{firstcalldelay}; 
                                    # try to call the event in n seconds at first
@@ -303,8 +303,8 @@ $self->{EventRouterTable}=[$er->getHashList(qw(srceventtype srcmoduleobject srcs
       msg(ERROR,"loadEventRouterTable=$@");
    }
    else{
-      msg(DEBUG,"loadEventRouterTable new loaded");
-      msg(DEBUG,Dumper($self->{EventRouterTable}));
+      #msg(DEBUG,"loadEventRouterTable new loaded");
+      #msg(DEBUG,Dumper($self->{EventRouterTable}));
    }
 }
 

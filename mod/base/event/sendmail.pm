@@ -237,7 +237,7 @@ sub Sendmail
          $mail.="--$bound";
          $mail.="\n";
          $mail.="Content-Type: text/plain; charset=\"iso-8859-1\"\n\n";
-         printf STDERR ("%s\n",$mail);       
+         #printf STDERR ("%s\n",$mail);       
          {
             my $plaintext;
             for(my $blk=0;$blk<=$blkcount;$blk++){
