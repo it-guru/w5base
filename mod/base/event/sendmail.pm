@@ -225,7 +225,7 @@ sub Sendmail
          }
          $mail.="Cc: $cc\n" if ($cc ne "");
          $mail.="bcc: $bcc\n" if ($bcc ne "");
-         $mail.=mimeencode("Subject: ".$rec->{name})."\n";
+         $mail.="Subject: ".mimeencode($rec->{name})."\n";
          $mail.="Message-ID: <".$rec->{id}.'@'.$rec->{initialconfig}.'@'.
                 $rec->{initialsite}.'@'."W5Base>\n";
          $mail.="Mime-Version: 1.0\n";
