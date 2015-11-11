@@ -85,6 +85,7 @@ sub mimeencode {
 
 sub addword {
   my ($word, $line, $lines, $sameword) = @_;
+printf STDERR ("fifi0 addword word='$word' line='$$line'\n");
 
   # If the passed fragment is a new word (and not another part of the
   # previous): Check if it is MIME encoded
@@ -94,11 +95,14 @@ sub addword {
     my $charset = $1;
     my $newword = $2;
 
+printf STDERR ("fifi1 addword charset='$charset' newword='$newword'\n");
     if ($$line =~ /^(=\?[^\?]+\?[QqBb]\?)(.+)\?=$/) {
       # Previous word was encoded, too:
       # Delete the trailing "?=" and insert an underline character (=space)
-      # (space between to encoded words is ignored)
+      # (space between two encoded words is ignored)
+printf STDERR ("fifi 2 1='$1' 2='$2'\n");
       if ($1 eq $charset) {
+printf STDERR ("fifi 3 1='$1' 2='$2'\n");
         if (length($1.$2)+length($newword)>75) {
           my $delim = (@$lines) ? ' ' : '';
           push(@$lines, "$delim$1$2_?=\n");
@@ -127,7 +131,12 @@ sub addword {
       push(@$lines, "$delim${$line}\n");
       $$line = $word;
     } else {
-      $$line .= " =?ISO-8859-1?Q?=20?=$word";
+      if ($$line=~m/(=\?[^\?]+\?[QqBb]\?)(.+)\?=$/){
+         $$line .= " =?ISO-8859-1?Q?=20?=$word";
+      }
+      else{
+         $$line .= " $word";
+      }
     }
   } else {
     # line is empty

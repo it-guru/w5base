@@ -237,6 +237,7 @@ sub Sendmail
          $mail.="--$bound";
          $mail.="\n";
          $mail.="Content-Type: text/plain; charset=\"iso-8859-1\"\n\n";
+         printf STDERR ("%s\n",$mail);       
          {
             my $plaintext;
             for(my $blk=0;$blk<=$blkcount;$blk++){
@@ -425,7 +426,6 @@ sub Sendmail
          $mail.=$maildata;
 
          $mail.="\n--$relbound";
-         #printf STDERR ("%s\n",$mail);       
          #msg(DEBUG,"adding pictures to mail body as multiplart content");
          for(my $c=1;$c<=9;$c++){
             my $imgname="$template.bild$c.jpg";
