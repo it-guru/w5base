@@ -415,7 +415,6 @@ sub Validate
    my $targetid=effVal($oldrec,$newrec,"targetid");
    my $target=effVal($oldrec,$newrec,"target");
    if ($target eq "" || $targetid eq ""){
-      print STDERR "fifi ".Dumper($newrec);
       $self->LastMsg(ERROR,"no contact specified");
       return(0);
    }

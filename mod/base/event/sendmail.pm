@@ -18,7 +18,6 @@ package base::event::sendmail;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::Event;
 use kernel::mime;
@@ -212,9 +211,9 @@ sub Sendmail
                          } @emailbcc);
          }
          my $bcc=join(",\n ",@emailbcc);
-         msg(DEBUG,"building mail header\nto=%s\ncc=%s\nbcc=%s\nallowed=%s",
-             Dumper(\@emailto),Dumper(\@emailcc),Dumper(\@emailbcc),
-             Dumper(\@mailallow));
+         #msg(DEBUG,"building mail header\nto=%s\ncc=%s\nbcc=%s\nallowed=%s",
+         #    Dumper(\@emailto),Dumper(\@emailcc),Dumper(\@emailbcc),
+         #    Dumper(\@mailallow));
          if (defined($emailsig) && $emailsig->{fromaddress} ne ""){
             $mail.="From: $emailsig->{fromaddress}\n";
          }else{
@@ -274,12 +273,12 @@ sub Sendmail
                $additional{$k}=$additional->{$k};
             }
          }
-         msg(DEBUG,"add=%s",Dumper(\%additional));
+         #msg(DEBUG,"add=%s",Dumper(\%additional));
          my $currentlang=shift(@emaillang);
          my $formname="tmpl/$template.form.head";
          my $maildata="ERROR: critical application problem - ".
                       "mail template not found";
-         msg(DEBUG,"loading and parsing mail template");
+         #msg(DEBUG,"loading and parsing mail template");
          $app->setSkinBase($skinbase);
          my $sep=0;
          my %useadditional=%additional;
@@ -302,7 +301,7 @@ sub Sendmail
                                      });
          }
          $mail.=$maildata;
-         msg(DEBUG,"adding $blkcount datablocks to mail body");
+         #msg(DEBUG,"adding $blkcount datablocks to mail body");
          $mail.="<a name=\"separation.$sep\"></a>";
          $mail.="<div class=\"separation\" id=\"separation.$sep\">";
          $mail.="<div class=\"separationbackground\">";
@@ -331,7 +330,7 @@ sub Sendmail
                if (defined($emailbottom) && $emailbottom eq ""){
                   $emailbottom="<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>";
                }
-               msg(DEBUG,"try add blk $blk");
+               #msg(DEBUG,"try add blk $blk");
                if ($rec->{emailsubheader}->[$blk] ne "" &&
                    $rec->{emailsubheader}->[$blk] ne "0"){
                   my $sh=$rec->{emailsubheader}->[$blk];
@@ -399,13 +398,13 @@ sub Sendmail
                   $mail.="<div class=\"separation\" id=\"separation.$sep\">";
                   $mail.="<div class=\"separationbackground\">";
                }
-               msg(DEBUG,"add blk $blk ok");
+               #msg(DEBUG,"add blk $blk ok");
             }
             $mail.=$maildata;
          }
          $mail.="</div>";
          $mail.="</div>";
-         msg(DEBUG,"adding mail bottom");
+         #msg(DEBUG,"adding mail bottom");
          my $formname="tmpl/$template.form.bottom";
          my $maildata="ERROR: Mail template not found";
          if ($app->getSkinFile($app->SkinBase()."/".$formname)){
@@ -427,7 +426,7 @@ sub Sendmail
 
          $mail.="\n--$relbound";
          #printf STDERR ("%s\n",$mail);       
-         msg(DEBUG,"adding pictures to mail body as multiplart content");
+         #msg(DEBUG,"adding pictures to mail body as multiplart content");
          for(my $c=1;$c<=9;$c++){
             my $imgname="$template.bild$c.jpg";
             my $qimgname=quotemeta($imgname);
@@ -546,7 +545,7 @@ sub Sendmail
          if ($rec->{allowsms}==1 &&
              $self->Config->Param("SMSInterfaceScript") ne ""){
             my $smsscript=$self->Config->Param("SMSInterfaceScript");
-            msg(DEBUG,"prepare to call $smsscript");
+            #msg(DEBUG,"prepare to call $smsscript");
             my $user=getModuleObject($self->Config,"base::user");
             $user->SetFilter({email=>\@emailto});
             my @smsrec=$user->getHashList(qw(fullname sms 
@@ -563,7 +562,7 @@ sub Sendmail
                }
                if (defined($number)){
                   $number=~s/[\s-\/\(\)]//g;
-                  msg(DEBUG,"sending sms to $smsrec->{fullname}");
+                  #msg(DEBUG,"sending sms to $smsrec->{fullname}");
                   push(@numlist,$number);
                   if (open(F,"|".$smsscript." \"-s\" -- \"$number\"")){
                      print F $smstext;
@@ -583,7 +582,7 @@ sub Sendmail
             }
          }
          ####################################################################
-         msg(DEBUG,"deliver maildata to $sendmail");
+         #msg(DEBUG,"deliver maildata to $sendmail");
          my $bouncehandler=$self->Config->Param("MAILBOUNCEHANDLER");
          $bouncehandler='bounce@w5base.net' if ($bouncehandler eq "");
          if (open(F,"|".$sendmail." -f $bouncehandler -t")){
@@ -601,7 +600,7 @@ sub Sendmail
                close(D);
             }
          }
-         msg(DEBUG,"try to load next record");
+         #msg(DEBUG,"try to load next record");
          ($rec,$msg)=$wf->getNext();
       }until(!defined($rec));
    }

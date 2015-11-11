@@ -124,10 +124,10 @@ sub addword {
   if (length($$line) > 0) {
     if (length($$line) + length($word) >= 75) {
       my $delim = (@$lines) ? ' ' : '';
-      push(@$lines, "$delim$$line\n");
+      push(@$lines, "$delim${$line}\n");
       $$line = $word;
     } else {
-      $$line .= " $word";
+      $$line .= " =?ISO-8859-1?Q?=20?=$word";
     }
   } else {
     # line is empty
