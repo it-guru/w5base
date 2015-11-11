@@ -37,6 +37,11 @@ sub mimeencode {
   my $line = '';
   my @lines;
 
+  my $e=MIME::Words::encode_mimewords($text, 'Q', 'ISO-8859-1');
+  $e=~s/= =/=\n =/g;
+  return($e);
+  
+
   foreach my $word (@words) {
     my $sameword = 0;
     $word =~ s/\n//g;
@@ -108,15 +113,15 @@ printf STDERR ("fifi 3 1='$1' 2='$2'\n");
           push(@$lines, "$delim$1$2_?=\n");
           $$line = $word;
         } else {
-          $$line = $1 . $2 . '_' . $newword;
+          $$line=$1.$2.'_'.$newword;
         }
       } else {
         if (length("$$line $word")>75) {
           my $delim = (@$lines) ? ' ' : '';
           push(@$lines, "$delim$1$2_?=\n");
-          $$line = $word;
+          $$line=$word;
         } else {
-          $$line = "$1$2_?= $word";
+          $$line="$1$2_?= $word";
         }
       }
       return 0;
