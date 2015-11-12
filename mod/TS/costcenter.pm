@@ -34,7 +34,7 @@ sub new
                 name          =>'sappspentries',
                 group         =>'saprelation',
                 label         =>'TS SAP P01 PSP Entries',
-                vjointo       =>'tssapp01::psp',
+                vjointo       =>\'tssapp01::psp',
                 vjoinon       =>['name'=>'name'],
                 vjoinonfinish =>sub{
                    my $self=shift;
@@ -64,7 +64,7 @@ sub new
                 name          =>'sapcoentries',
                 group         =>'saprelation',
                 label         =>'TS SAP P01 CostCenter Entries',
-                vjointo       =>'tssapp01::costcenter',
+                vjointo       =>\'tssapp01::costcenter',
                 vjoinon       =>['name'=>'name'],
                 vjoinonfinish =>sub{
                    my $self=shift;
