@@ -117,21 +117,6 @@ sub new
                 label         =>'Group seen in AssetManager',
                 dataobjattr   =>'metagrpmgmt.amdate'),
 
-      new kernel::Field::Text(
-                name          =>'scid',
-                group         =>'ref',
-                weblinkto     =>'tssc::group',
-                weblinkon     =>['scid'=>'id'],
-                label         =>'GroupID in ServiceCenter',
-                dataobjattr   =>'metagrpmgmt.scid'),
-
-      new kernel::Field::Date(
-                name          =>'scdate',
-                group         =>'ref',
-                history       =>0,
-                label         =>'Group seen in ServiceCenter',
-                dataobjattr   =>'metagrpmgmt.scdate'),
-
       new kernel::Field::Email(
                 name          =>'contactemail',
                 group         =>'ref',
