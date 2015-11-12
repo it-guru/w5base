@@ -444,12 +444,21 @@ sub Validate
          return(undef);
       }
    }
-   if (!$self->finance::costcenter::ValidateCONumber(
-        $self->SelfAsParentObject,"name",$oldrec,$newrec)){
-      $self->LastMsg(ERROR,
-          $self->T("invalid number format '\%s' specified",
-                   "finance::costcenter"),$newrec->{name});
-      return(0);
+   if (effChanged($oldrec,$newrec,"name")){
+      if (!$self->finance::costcenter::ValidateCONumber(
+           $self->SelfAsParentObject,"name",$oldrec,$newrec)){
+         if ($self->IsMemberOf("admin")){
+            $self->LastMsg(WARN,
+                $self->T("invalid number format '\%s' specified",
+                         "finance::costcenter"),$newrec->{name});
+         }
+         else{
+            $self->LastMsg(ERROR,
+                $self->T("invalid number format '\%s' specified",
+                         "finance::costcenter"),$newrec->{name});
+            return(0);
+         }
+      }
    }
 
 
