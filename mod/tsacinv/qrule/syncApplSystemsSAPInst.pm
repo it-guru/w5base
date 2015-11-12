@@ -105,18 +105,6 @@ sub qcheckRecord
    $self->{newCIDataboss}=$newCIDataboss if (!defined($self->{newCIDataboss}));
    $self->{sapAdmins}=\@sapAdmins if (!defined($self->{sapAdmins}));
 
-   ##################################################################
-   # mz 2015-08-18 
-   # while testing under production conditions
-   # only these applications will be considered:
-   my @appl2chk=(qw(12199294360024 12199302380006 12962281170017
-                    13355257150001 14157032310001 250
-                    14446417290001 14446378280003 5271
-                    13355257150001 13355264910005
-                   ));
-   return(0,undef) if (!in_array(\@appl2chk,$rec->{id}));
-   ##################################################################
-
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    return(0,undef) if (!in_array($rec->{mgmtitemgroup},'SAP'));
 
