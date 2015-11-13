@@ -497,8 +497,8 @@ sub getRequestedReplicationObjects
             $blockedFields=[map({uc($_->{field})} @$l)];
             if (in_array($blockedFields,'')){
                $blocked=1;
-               msg(WARN,"debug info: blocked by blacklist ".
-                        "$tab->{'table_name'}");
+               #msg(WARN,"debug info: blocked by blacklist ".
+               #         "$tab->{'table_name'}");
             }
          }
          if (!$blocked){
