@@ -997,7 +997,7 @@ sub StartW5ServerProcess
              \$SIG{\$sig}=\\&hup;
              next;
           }
-          if (\$sig eq "__DIE__"){
+          if (\$sig eq "__DIE__" || \$sig eq "__WARN__"){
              \$SIG{\$sig}='default';
              next;
            #  \$SIG{\$sig}=sub{
