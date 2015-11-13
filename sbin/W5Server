@@ -983,29 +983,66 @@ sub StartW5ServerProcess
           \$srv->process();
       }
       sub hup{
+          \$self->NotifyAdmin("$server hup erhalten pid=\$orgpid:\$\$ \$0","hup");
           \$srv->reload();
       }
       sub shutdown{
+          #\$self->NotifyAdmin(
+          #    "\$server int (normal shutdown) pid=\$orgpid:\$\$ \$0","int");
           msg(DEBUG,"Server \$srv normal shutdown");
           \$srv->end();
       }
-      \$SIG{HUP}=\\&hup;
-      \$SIG{INT}=\\&shutdown;
-
-      \$SIG{USR2}='IGNORE';  # war bisher auf default
-      \$SIG{USR2}=sub{
-          \$self->NotifyAdmin("$server usr2 erhalten pid=\$\$ \$0","usr2");
-      };
-      \$SIG{ALRM}=sub{
-          \$self->NotifyAdmin("$server alarm erhalten pid=\$\$ \$0","alarm");
-      };
-
-      \$SIG{PIPE}=sub{        # war vorher auf ignore
-          \$self->NotifyAdmin("$server pipe erhalten pid=\$\$ \$0","pipe");
-      };
-      \$SIG{USR1}=sub{
-         \$srv->{ServerGoesDown}=1;
-      };
+      foreach my \$sig (keys(\%SIG)){
+          if (\$sig eq "HUP"){
+             \$SIG{\$sig}=\\&hup;
+             next;
+          }
+          if (\$sig eq "__DIE__"){
+             \$SIG{\$sig}='default';
+             next;
+           #  \$SIG{\$sig}=sub{
+           #      my \@loc = caller();
+           #      printf STDERR ("fifi __DIE__\\n");sleep(5);
+           #      \$self->NotifyAdmin(
+           #          "\$server DIE pid=\$orgpid:\$\$ \$0",join("\\n",\@loc));
+           #      return(1);
+           #  };
+           #  next;
+          }
+          if (\$sig eq "INT"){
+             \$SIG{INT}=\\&shutdown;
+             next;
+          }
+          if (\$sig eq "USR2"){
+             \$SIG{\$sig}='IGNORE';
+             next;
+          }
+          if (\$sig eq "CHLD"){
+             \$SIG{\$sig}='IGNORE';
+             next;
+          }
+          if (\$sig eq "PIPE"){
+             \$SIG{\$sig}=sub{
+                 \$self->NotifyAdmin(
+                    "\$server PIPE erhalten pid=\$orgpid:\$\$ \$0","PIPE");
+                 exit(1);  # any Pipe is broken
+             };
+             next;
+          }
+          if (\$sig eq "USR1"){
+             \$SIG{\$sig}=sub{
+                 \$self->NotifyAdmin(
+                   "\$server usr1=NormalShutdown erhalten pid=\$orgpid:\$\$ \$0","usr1");
+                \$srv->{ServerGoesDown}=1;
+             };
+             next;
+          }
+          #msg(DEBUG,"installing dummy signal handler for \$sig");
+          \$SIG{\$sig}=sub{
+              \$self->NotifyAdmin("\$server \$sig erhalten pid=\$orgpid:\$\$ \$0",\$sig);
+          };
+ 
+      }
       eval('
          \$self->W5ServerConnect();
          start(); 
@@ -1127,7 +1164,7 @@ sub pre_server_close_hook
 
 sub closeall
 {
-   for(my $c=3;$c<254;$c++){  # ensure, that all filehandles are closed
+   for(my $c=4;$c<254;$c++){  # ensure, that all filehandles are closed
       POSIX::close($c);
    }
 
