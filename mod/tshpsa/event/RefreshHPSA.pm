@@ -78,7 +78,7 @@ sub RefreshHPSA
    $SIG{INT} = sub { eval('remove_tree($tempdir);exit(1);') if (-d $tempdir);};
    msg(DEBUG,"Starting Refresh on $tempdir");
    my $res=`echo 'lcd \"$tempdir\"\nget *.csv' | 
-            sftp -q -b - \"$sftpsource\" 2>&1 >/dev/null `;
+            sftp -b - \"$sftpsource\" 2>&1 >/dev/null `;
    if ($?!=0){
       $loaderror=$res;
    }
