@@ -1,4 +1,4 @@
-'tscape::qrule::compareProjectManager'=>{de=>'Überprüfung ob der Proejekt Manager Kontakt mit CapeTS übereinstimmt',en=>'validate the ProjectManager against CapeTS'},
+'tscape::qrule::compareProjectManager'=>{de=>'Überprüfung ob der Projekt Manager Kontakt mit CapeTS übereinstimmt',en=>'validate the ProjectManager against CapeTS'},
 'removing projectmanager role from contact %s'=>{de=>'Entferung der Rolle Projektmanager vom Kontakt %s'},
 'removing projectmanager contact %s'=>{de=>'Entferung des Projektmanager Kontaktes %s'},
 'update roles of contact %s with projectmanager'=>{de=>'Aktualisierung des Kontaktes %s um Rolle Projektmanager'},
