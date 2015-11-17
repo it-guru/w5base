@@ -2,6 +2,7 @@
    de=>'Abgleich Systeme mit SAP-Instanzen in AssetManager',
    en=>'Syncronize systems with SAP-Instances in AssetManager'
 },
+"invalid system name detected"=>{de=>"ungültigen Systemnamen entdeckt"},
 "CI-State switched from %s to %s"=>{
    de=>"CI-Status von %s auf %s geändert"
 },

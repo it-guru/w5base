@@ -115,6 +115,11 @@ sub qcheckRecord
 
    return(0,undef) if ($#sapappls==-1);
 
+   my @qmsg;
+   my @dataissue;
+   my $errorlevel=0;
+   my @notifymsg;
+
    my $acapplsys=getModuleObject($self->getParent->Config,
                                  "tsacinv::lnkapplsystem");
    my $applsys=getModuleObject($self->getParent->Config,
@@ -126,13 +131,27 @@ sub qcheckRecord
                           sysstatus=>\'in operation'});
    my @sapsys=$acapplsys->getHashList(qw(systemid child sysstatus));
 
-   # Systems in W5Base application
+   # Systems in W5Base application; ignores systems without systemid
    $applsys->SetFilter({applid=>\$rec->{id}});
    my @w5sys=$applsys->getHashList(qw(systemsystemid system systemcistatusid));
+   @w5sys=grep({$_->{systemsystemid} ne ''} @w5sys);
+
    my %allsys;
+
    foreach my $sys (@sapsys) {
-      $allsys{$sys->{systemid}}{is_sap}++;
-      $allsys{$sys->{systemid}}{name}=lc($sys->{child});
+      my $name=lc(trim($sys->{child}));
+
+      if (length($name)<3 || haveSpecialChar($name) ||
+          $name=~m/^\d+$/) {
+         $errorlevel=3 if ($errorlevel<3);
+         my $m="invalid system name detected: ".$sys->{child};
+         push(@qmsg,$m);
+         push(@dataissue,$m);
+      }
+      else {
+         $allsys{$sys->{systemid}}{is_sap}++;
+         $allsys{$sys->{systemid}}{name}=$name;
+      }
    }
    foreach my $sys (@w5sys) {
       $allsys{$sys->{systemsystemid}}{is_w5}++;
@@ -144,10 +163,6 @@ sub qcheckRecord
 
    my @disusedsys=grep {$allsys{$_}{is_w5} && !$allsys{$_}{is_sap}}
                        keys(%allsys);
-   my @qmsg;
-   my @dataissue;
-   my $errorlevel=0;
-   my @notifymsg;
 
    if ($#missingsys!=-1 || $#disusedsys!=-1) {
       my @cc=@{$self->{sapAdmins}};
