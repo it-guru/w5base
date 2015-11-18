@@ -24,8 +24,16 @@ sub process
 {
    my $self=shift;
 
+   my $opmode=$self->getParent->Config->Param("W5BaseOperationMode");
+   my $ro=0;
+   if ($opmode eq "readonly"){
+      $ro=1;
+   }
+
    while(1){
-      $self->EnrichmentCollector();
+      if (!$ro){
+         $self->EnrichmentCollector();
+      }
       sleep(600);
    }
 }
