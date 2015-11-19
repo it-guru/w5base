@@ -47,7 +47,7 @@ sub rpcCallSerialEvent
       my $timeout=$self->{EventController}->getMaxEventTimeout($event);
       return($self->async(sub {
          my $tasks=$self->getTasksHash();  # this should be done in RPC::Server,
-         $tasks={};                        # but at this position, i didnt need
+         %{$tasks}=();                     # but at this position, i didnt need
          $0="W5Server '$event'";
          $self->initAsyncEnv($event,{param=>[@p]},'any');
          $SIG{USR1}='DEFAULT';
@@ -609,9 +609,9 @@ sub initAsyncEnv
    my $pid=fork();
    if ($pid==0){
       my $tasks=$self->getTasksHash();  # this should be done in RPC::Server,
-      $tasks={};                        # but at this position, i didnt need
+      %{$tasks}=();                     # but at this position, i didnt need
       $SIG{INT}='IGNORE';
-      #$SIG{INT}='DEFAULT';
+      $SIG{INT}='DEFAULT';
       $SIG{HUP}='DEFAULT';
       $0.=" MONITOR";
       my @e;
@@ -1112,6 +1112,8 @@ sub sendSignalToAllRunningProcesses
 #      }
 #   }
 #   sleep(1);
+   my $tasks=$self->getTasksHash();
+print STDERR "sendSignalToAllRunningProcesses:".Dumper($tasks);
    foreach my $pid ($self->runningTasks()){
       msg(DEBUG,"send Signal($signal) to event at pid %s from '$0'",$pid);
       if (kill($signal,$pid)){
@@ -1164,7 +1166,7 @@ sub pre_server_close_hook
 
 sub closeall
 {
-   for(my $c=4;$c<254;$c++){  # ensure, that all filehandles are closed
+   for(my $c=3;$c<254;$c++){  # ensure, that all filehandles are closed
       POSIX::close($c);
    }
 

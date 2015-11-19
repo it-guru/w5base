@@ -115,10 +115,10 @@ sub qcheckRecord
          }
          my @pm_soll=sort(keys(%pm_soll));
          my $lnkcontact;
-         if ($#pm_soll!=-1){
+         #if ($#pm_soll!=-1){
             $lnkcontact=getModuleObject($self->getParent->Config,
                                                  "base::lnkcontact");
-         }
+         #}
          my $pmexists=0;
          foreach my $crec (@{$rec->{contacts}}){
             my $roles=$crec->{roles};

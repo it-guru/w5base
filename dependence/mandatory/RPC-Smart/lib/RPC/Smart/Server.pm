@@ -197,7 +197,7 @@ sub async
    }
    my $pid=fork();
    if ($pid==0){
-      $tasks={}; # reset tasks hash in child process (prevent cleanups)
+      %{$tasks}=(); # reset tasks hash in child process (prevent cleanups)
       {  # cleanup paren multiplex server
          if (defined($self->{mux})){
             foreach my $fhs (%{$self->{mux}->{_fhs}}){
