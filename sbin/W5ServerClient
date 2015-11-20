@@ -2,7 +2,7 @@
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use RPC::Smart::Client;
-use Data::Dumper;
+use Sys::Hostname;
 use strict;
 use kernel;
 use kernel::config;
@@ -65,7 +65,8 @@ my $MyClient=new RPC::Smart::Client(%ClientParam);
 
 if (! defined($MyClient->Connect())){
    if (!($opt_n)){
-      msg(ERROR,"can't connect to server");
+      msg(ERROR,"can't connect from ".hostname()." to W5Server '".
+                $ClientParam{'PeerAddr'}."'");
    }
    exit(1);
 }
