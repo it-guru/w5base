@@ -234,7 +234,7 @@ sub handleSRec
          }
          ($r,$msg)=$dataobj->{mgrp}->getOnlyFirst(qw(ALL));
          if (defined($r)){
-            msg(WARN,"$msgnote w5baseid=$r->{id} fullname=$r->{fullname}");
+            #msg(WARN,"$msgnote w5baseid=$r->{id} fullname=$r->{fullname}");
          }
       }
       $oldrec=$r;
