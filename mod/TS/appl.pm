@@ -74,6 +74,7 @@ sub new
                 label         =>'Incident Assignmentgroup',
                 vjoineditbase =>{isinmassign=>\'1'},
                 group         =>'inmchm',
+                AllowEmpty    =>1,
                 vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['acinmassignmentgroupid'=>'id'],
                 vjoindisp     =>'fullname'),
@@ -667,6 +668,7 @@ sub Validate
          $newrec->{ictono}=undef;
       }
    }
+
    return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
 }
 

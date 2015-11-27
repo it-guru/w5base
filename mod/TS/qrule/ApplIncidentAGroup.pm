@@ -90,7 +90,8 @@ sub qcheckRecord
    my $desc={qmsg=>[],solvtip=>[]};
    return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
                                $rec->{cistatusid}!=3) ||
-                               $rec->{opmode} eq "license");
+                               $rec->{opmode} eq "license" ||
+                               $rec->{businessteam} eq "Extern");
    my $acinmassingmentgroup=$rec->{acinmassingmentgroup};
    if ($acinmassingmentgroup=~m/^\s*$/){
       $exitcode=3 if ($exitcode<3);

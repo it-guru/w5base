@@ -53,6 +53,7 @@ sub new
 
    );
    $self->setDefaultView(qw(id name));
+   $self->{history}=[qw(modify)];
    return($self);
 
 
@@ -73,7 +74,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default","acrelation","source");
+   return("header","default","acrelation","source","history");
 }
 
 

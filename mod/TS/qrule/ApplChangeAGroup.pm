@@ -70,7 +70,8 @@ sub qcheckRecord
    }
    return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
                                 $rec->{cistatusid}!=3) ||
-                               $rec->{opmode} eq "license");
+                               $rec->{opmode} eq "license" ||
+                               $rec->{businessteam} eq "Extern");
    if (trim($rec->{scapprgroup}) eq ""){
       $exitcode=3 if ($exitcode<3);
       push(@{$desc->{qmsg}},

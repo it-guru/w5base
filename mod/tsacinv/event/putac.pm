@@ -243,7 +243,9 @@ sub ApplicationModified
    my $mand=getModuleObject($self->Config,"tsacinv::mandator");
    my $mandconfig;
    my $acuser=getModuleObject($self->Config,"tsacinv::user");
-   my %filter=(cistatusid=>['3','4','5']);
+   my %filter=(cistatusid=>['3','4','5'],
+               acinmassingmentgroup=>\'*');
+   #my %filter=(cistatusid=>['3','4','5']);
    $self->{DebugMode}=0;
    if ($#appid!=-1){
       if (grep(/^debug$/i,@appid)){
@@ -270,7 +272,6 @@ sub ApplicationModified
    open(AMTODO,">/tmp/amsctodo.txt");
 
 
-
    my %w52ac=(0 =>'OTHER',
               5 =>'CUSTOMER RESPONSIBILITY',
               20=>'TEST',
@@ -294,14 +295,6 @@ sub ApplicationModified
    ($fh{instance},     $filename{instance}           )=$self->InitTransfer();
 
 
-   my @exclmand;
-   {
-      $mand->ResetFilter();
-      $mand->SetFilter({name=>['Extern','DSS']});
-      @exclmand=$mand->getVal('grpid');
-   }
-  
-
    my ($onlinefh,$onlinefilename);
    if (!(($onlinefh, $onlinefilename) = tempfile())){
       return({msg=>$self->msg(ERROR,'can\'t open tempfile'),exitcode=>1});
@@ -319,83 +312,506 @@ sub ApplicationModified
          #msg(INFO,"dump=%s",Dumper($rec));
          #msg(INFO,"id=$rec->{id}");
          my $jobname="W5Base.$self->{jobstart}.".NowStamp().'.Appl_'.$rec->{id};
-         if (!in_array(\@exclmand,$rec->{mandatorid})){
-            msg(INFO,"process application=$rec->{name} jobname=$jobname");
-            my $acapplrec;
-            if ($rec->{applid} ne ""){
-               $acappl->ResetFilter();
-               $acappl->SetFilter({applid=>\$rec->{applid}});
-               ($acapplrec,$msg)=$acappl->getOnlyFirst(qw(id applid
-                                                          assignmentgroup));
-           
+         msg(INFO,"process application=$rec->{name} jobname=$jobname");
+         my $acapplrec;
+         if ($rec->{applid} ne ""){
+            $acappl->ResetFilter();
+            $acappl->SetFilter({applid=>\$rec->{applid}});
+            ($acapplrec,$msg)=$acappl->getOnlyFirst(qw(id applid
+                                                       assignmentgroup));
+        
+         }
+         else{
+            $acappl->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+            ($acapplrec,$msg)=$acappl->getOnlyFirst(qw(id applid
+                                                       assignmentgroup));
+            die("AssetManager not online") if (!$acappl->Ping());
+            if (defined($acapplrec) && $acapplrec->{applid} ne ""){
+               $app->UpdateRecord({applid=>$acapplrec->{applid}},
+                                  {id=>\$rec->{id}});
             }
-            else{
-               $acappl->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
-               ($acapplrec,$msg)=$acappl->getOnlyFirst(qw(id applid
-                                                          assignmentgroup));
-               die("AssetManager not online") if (!$acappl->Ping());
-               if (defined($acapplrec) && $acapplrec->{applid} ne ""){
-                  $app->UpdateRecord({applid=>$acapplrec->{applid}},
-                                     {id=>\$rec->{id}});
+         }
+         die("AssetManager not online") if (!$acappl->Ping());
+         if (!($acapplrec->{assignmentgroup} eq "PSS" ||
+               ($acapplrec->{assignmentgroup}=~m/^PSS\./))){
+            my $CurrentEventId;
+            my $CurrentAppl=$rec->{name};
+            my $ApplU=0;
+            my $SysCount=0;
+            {  # systems
+               $applsys->SetFilter({applid=>\$rec->{id},
+                                    systemcistatusid=>['3','4']});
+               my @l=$applsys->getHashList(qw(id systemsystemid system
+                                              istest iseducation isref 
+                                              isapprovtest isdevel isprod
+                                              shortdesc systemid
+                                              srcsys srcid));
+               my @alreadyManuellRelated;
+               if ($rec->{applid} ne ""){
+                  $acapplsys->ResetFilter();
+                  $acapplsys->SetFilter({applid=>\$rec->{applid}});
+                  $acapplsys->SetCurrentView(qw(applid systemid srcsys srcid));
+                  foreach my $r ($acapplsys->getHashList(qw(
+                                  applid systemid srcsys srcid))){
+                     if (!in_array(\@alreadyManuellRelated,$r->{systemid})){
+                        if ($r->{srcsys} ne "W5Base"){
+                           push(@alreadyManuellRelated,$r->{systemid});
+                        }
+                     }
+                  }
+               }
+               foreach my $lnk (@l){
+                  next if (in_array(\@alreadyManuellRelated,
+                                    $lnk->{systemsystemid}));
+                  my $SysU=0;
+                  $SysU=20 if ($SysU<20 && $lnk->{istest}); 
+                  $SysU=30 if ($SysU<30 && $lnk->{iseducation}); 
+                  $SysU=40 if ($SysU<40 && $lnk->{isref}); 
+                  $SysU=50 if ($SysU<50 && $lnk->{isapprovtest}); 
+                  $SysU=60 if ($SysU<60 && $lnk->{isdevel}); 
+                  $SysU=70 if ($SysU<70 && $lnk->{isprod}); 
+                  $ApplU=$SysU if ($ApplU<$SysU);
+                  next if ($lnk->{systemsystemid}=~m/^\s*$/);
+                  # Die AM-SAPLNK werden von der XML Schnittstelle nur
+                  # "virtuell" erzeugt - sie dürfen also NICHT als normale
+                  # Relationen übertragen werden.
+                  next if ($lnk->{srcsys} eq "AM-SAPLNK");
+                  if ($rec->{allowifupdate}){
+                     # Wenn automatische Updates bei der Anwendung zugelassen
+                     # sind, dann dürfen Relationen, die automatisch aus AM
+                     # kamen, NICHT nach AM zurück geschrieben werden, da ja
+                     # dann AssetManager das führende System für die Relationen
+                     # ist.
+                     next if ($lnk->{srcsys} eq "AM");
+                  }
+                  $CurrentEventId="Add System '$lnk->{system}' to $CurrentAppl";
+                  my $externalid=$lnk->{id};
+                  if ($externalid eq ""){
+                     $externalid="C-".$rec->{id}."-".$lnk->{systemid};
+                  }
+                  my $acftprec={
+                      CI_APPL_REL=>{
+                         EventID=>$CurrentEventId,
+                         ExternalSystem=>'W5Base',
+                         ExternalID=>$externalid,
+                         Appl_ExternalSystem=>'W5Base',
+                         Appl_ExternalID=>$rec->{id},
+                         Port_ExternalSystem=>'W5Base',
+                         Port_ExternalID=>$lnk->{systemid},
+                         Security_Unit=>"TS.DE",
+                         Description=>$lnk->{shortdesc},
+                         bDelete=>'0',
+                         bActive=>'1',
+                      }
+                  };
+                  if ($rec->{applid} ne ""){
+                     $acftprec->{CI_APPL_REL}->{Application}=uc($rec->{applid});
+                  }    
+                  if ($lnk->{systemsystemid} ne ""){
+                     $acftprec->{CI_APPL_REL}->{Portfolio}=
+                            uc($lnk->{systemsystemid});
+                     $ciapplrel{"$acftprec->{CI_APPL_REL}->{Portfolio}".
+                                "-".
+                                $acftprec->{CI_APPL_REL}->{Application}}++;
+                  }
+
+                  $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
+                  my $fh=$fh{ci_appl_rel};
+                  print $fh hash2xml($acftprec,{header=>0});
+                  print $onlinefh hash2xml($acftprec,{header=>0});
+                  $SysCount++;
+                  $elements++;
                }
             }
-            die("AssetManager not online") if (!$acappl->Ping());
-            if (!($acapplrec->{assignmentgroup} eq "PSS" ||
-                  ($acapplrec->{assignmentgroup}=~m/^PSS\./))){
-               my $CurrentEventId;
-               my $CurrentAppl=$rec->{name};
-               my $ApplU=0;
-               my $SysCount=0;
-               {  # systems
-                  $applsys->SetFilter({applid=>\$rec->{id},
-                                       systemcistatusid=>['3','4']});
-                  my @l=$applsys->getHashList(qw(id systemsystemid system
-                                                 istest iseducation isref 
-                                                 isapprovtest isdevel isprod
-                                                 shortdesc systemid
-                                                 srcsys srcid));
-                  my @alreadyManuellRelated;
-                  if ($rec->{applid} ne ""){
-                     $acapplsys->ResetFilter();
-                     $acapplsys->SetFilter({applid=>\$rec->{applid}});
-                     $acapplsys->SetCurrentView(qw(applid systemid srcsys srcid));
-                     foreach my $r ($acapplsys->getHashList(qw(
-                                     applid systemid srcsys srcid))){
-                        if (!in_array(\@alreadyManuellRelated,$r->{systemid})){
-                           if ($r->{srcsys} ne "W5Base"){
-                              push(@alreadyManuellRelated,$r->{systemid});
+            { # Application
+               my %posix=();
+               my %idno=();
+               foreach my $userent (qw(tsm tsm2 opm opm2 sem databoss 
+                                       delmgr delmgr2)){
+                  if ($rec->{$userent} ne ""){
+                     $user->SetFilter({fullname=>\$rec->{$userent}});
+                     $user->SetCurrentView("posix","email");
+                     my ($rec,$msg)=$user->getFirst();
+                     if (defined($rec)){
+                        $posix{$userent}=lc($rec->{posix});
+                        if ($posix{$userent} ne ""){
+                           $acuser->ResetFilter();
+                           $acuser->SetFilter([
+                              {
+                                 loginname=>\$posix{$userent},
+                                 tenant=>\'CS'
+                              },
+                              {
+                                 ldapid=>\$posix{$userent},
+                                 tenant=>\'CS'
+                              },
+                              {
+                                 idno=>\$posix{$userent},
+                                 tenant=>\'CS'
+                              },
+                              {
+                                 email=>\$rec->{email},
+                                 tenant=>\'CS'
+                              }
+                           ]);
+                           my @l=$acuser->getHashList(qw(lempldeptid idno));
+                           if ($#l>-1 && $#l<3){
+                              $idno{$userent}=$l[0]->{idno};
                            }
                         }
                      }
                   }
-                  foreach my $lnk (@l){
-                     next if (in_array(\@alreadyManuellRelated,
-                                       $lnk->{systemsystemid}));
-                     my $SysU=0;
-                     $SysU=20 if ($SysU<20 && $lnk->{istest}); 
-                     $SysU=30 if ($SysU<30 && $lnk->{iseducation}); 
-                     $SysU=40 if ($SysU<40 && $lnk->{isref}); 
-                     $SysU=50 if ($SysU<50 && $lnk->{isapprovtest}); 
-                     $SysU=60 if ($SysU<60 && $lnk->{isdevel}); 
-                     $SysU=70 if ($SysU<70 && $lnk->{isprod}); 
-                     $ApplU=$SysU if ($ApplU<$SysU);
-                     next if ($lnk->{systemsystemid}=~m/^\s*$/);
-                     # Die AM-SAPLNK werden von der XML Schnittstelle nur
-                     # "virtuell" erzeugt - sie dürfen also NICHT als normale
-                     # Relationen übertragen werden.
-                     next if ($lnk->{srcsys} eq "AM-SAPLNK");
-                     if ($rec->{allowifupdate}){
-                        # Wenn automatische Updates bei der Anwendung zugelassen
-                        # sind, dann dürfen Relationen, die automatisch aus AM
-                        # kamen, NICHT nach AM zurück geschrieben werden, da ja
-                        # dann AssetManager das führende System für die Relationen
-                        # ist.
-                        next if ($lnk->{srcsys} eq "AM");
+                  $posix{$userent}="[NULL]" if (!defined($posix{$userent}));
+               }
+               my $chkassignment=$rec->{businessteam};
+               my $assignment=$self->getAcGroupByW5BaseGroup($chkassignment);
+               if (!defined($assignment)){
+                  if (exists($mandconfig->{grpid}->{$rec->{mandatorid}})){
+                     my $mrec=$mandconfig->{grpid}->{$rec->{mandatorid}};
+                     if (defined($mrec->{defaultassignment})){
+                        $assignment=$mrec->{defaultassignment};
+                        $grpnotfound{$chkassignment}=1;
                      }
-                     $CurrentEventId="Add System '$lnk->{system}' to $CurrentAppl";
-                     my $externalid=$lnk->{id};
+                  }
+               }
+               if (!defined($assignment)){
+                  $grpnotfound{$chkassignment}=1;
+                  $assignment="TIT";
+               }
+
+               my $chmapprgrp="[NULL]";
+               if ($rec->{scapprgroup} ne "") {
+                  $chmapprgrp=$rec->{scapprgroup};
+               }
+
+               my $criticality=$rec->{criticality};
+               $criticality=~s/^CR//;
+               if ($criticality eq ""){
+                  if ($rec->{customerprio}==1){
+                     $criticality="critical";
+                  }
+                  elsif ($rec->{customerprio}==2){
+                     $criticality="medium";
+                  }
+                  else{ 
+                     $criticality="none";
+                  }
+               }
+               ########################################################
+               my $applref="[NULL]";
+               if ($rec->{ictono} ne ""){
+                  $applref="CapeTS: ".$rec->{ictono};
+               }
+               ########################################################
+               my $issoxappl=$rec->{issoxappl};
+               $issoxappl="YES" if ($rec->{issoxappl});
+               $issoxappl="NO" if (!($rec->{issoxappl}));
+               $CurrentAppl="$rec->{name}($rec->{id})";
+               $CurrentEventId="Add Application $CurrentAppl";
+               $ApplU=10 if ($rec->{isnosysappl} && $SysCount==0);
+               $ApplU=5  if (lc($rec->{mandator}) eq "extern");
+               if ($rec->{opmode} ne ""){
+                  $ApplU=70 if ($rec->{opmode} eq "prod");
+                  $ApplU=60 if ($rec->{opmode} eq "devel");
+                  $ApplU=50 if ($rec->{opmode} eq "approvtest");
+                  $ApplU=40 if ($rec->{opmode} eq "reference");
+                  $ApplU=30 if ($rec->{opmode} eq "education");
+                  $ApplU=25 if ($rec->{opmode} eq "cbreakdown");
+                  $ApplU=20 if ($rec->{opmode} eq "test");
+               }
+               my $acstatus="IN OPERATION";
+               if ($rec->{cistatusid}==3){
+                  $acstatus="PROJECT";
+               }
+               if ($rec->{cistatusid}==5){
+                  $acstatus="OUT OF OPERATION";
+               }
+
+               # ---
+               # anhand der conumber checken, ob im SAP WIB gesetzt ist
+               # ---
+               # prüfen ob in assetmanager der customerlink notwendige
+               # customerlink existiert
+               # ---
+               # prüfen ob in assetmanager beim kontierungsobjekt der
+               # passende customerlink eingetragen ist.
+               # ---
+               #$self->validateCostCenter4AssetManager($rec);
+
+               my $acftprec={
+                                Appl=>{
+                                   Security_Unit=>"TS.DE",
+                                   Status=>$acstatus,
+                                   Priority=>$rec->{customerprio},
+                                   EventID=>$CurrentEventId,
+                                   AssignmentGroup=>$assignment,
+                                   CO_CC=>$rec->{conodenumber},
+                                   Description=>$rec->{description},
+                                   CustBusinessDesc=>$rec->{description},
+                                   Remarks=>$rec->{comments},
+                                   MaintWindow=>$rec->{maintwindow},
+                                   IncidentAG=>$rec->{acinmassingmentgroup},
+                                   ChangeAppr=>$chmapprgrp,
+                                   Version=>$rec->{currentvers},
+                                   SoxRelevant=>$issoxappl,
+                                   Criticality=>$criticality,
+                                   Technical_Contact=>$idno{tsm},
+                                   DataSupervisor=>$idno{databoss},
+                                   Service_Manager=>$idno{sem},
+                                   Deputy_Technical_Contact=>$idno{tsm2},
+                                   Lead_Del_manager=>$idno{opm},
+                                   Del_manager=>$idno{delmgr},
+                                   Deputy_Del_manager=>$idno{opm2},
+                                   bDelete=>'0',
+                                   Name=>$rec->{name},
+                                   Appl_Group=>$rec->{applgroup},
+                                   Appl_Ref=>$applref
+                                }
+                            };
+               $acftprec->{Appl}->{Customer}='TS.DE';
+               $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
+            
+               if (defined($acapplrec) && $acapplrec->{applid} ne "" &&
+                   ($acapplrec->{applid}=~m/^(APPL|GER)/)){
+                  $acftprec->{Appl}->{Code}=$acapplrec->{applid};
+                  $acftprec->{Appl}->{ExternalID}=$rec->{id};
+                  $acftprec->{Appl}->{ExternalSystem}="W5Base";
+               }
+               else{
+                  $acftprec->{Appl}->{ExternalSystem}="W5Base";
+                  $acftprec->{Appl}->{ExternalID}=$rec->{id};
+               }
+               if ((!exists($acftprec->{Appl}->{Code}) || 
+                     $acftprec->{Appl}->{Code} eq "") &&
+                   $rec->{applid} ne "" &&
+                   ($rec->{applid}=~m/^(APPL|GER)/)){
+                  $acftprec->{Appl}->{Code}=$rec->{applid};
+               }
+                    
+               $acftprec->{Appl}->{Description}=~s/[\n\r]/ /g;
+               $acftprec->{Appl}->{Version}=~s/[\n\r]/ /g;
+               my $fh=$fh{appl};
+               print $fh hash2xml($acftprec,{header=>0});
+               print $onlinefh hash2xml($acftprec,{header=>0});
+               $elements++;
+            }
+            { # Interfaces
+               $applappl->SetFilter({fromapplid=>\$rec->{id},
+                                     toapplcistatus=>\"4"});
+               my @l=$applappl->getHashList(qw(id toappl lnktoapplid conproto
+                                               toapplid conmode comments));
+               foreach my $lnk (@l){
+                  $CurrentEventId="Add Interface '$lnk->{toappl}' ".
+                                  "to $CurrentAppl";
+                  my $acftprec={
+                                   APPL_APPL_REL=>{
+                                      EventID=>$CurrentEventId,
+                                      ExternalSystem=>'W5Base',
+                                      ExternalID=>$lnk->{id},
+                                      C_Appl_ExternalSystem=>'W5Base',
+                                      C_Appl_ExternalID=>$lnk->{toapplid},
+                                      UseAssignment=>'Parent',
+                                      Type=>$lnk->{conproto},
+                                      ReplMode=>$lnk->{conmode},
+                                      Description=>$lnk->{comments},
+                                      Qty=>'1',
+                                      bDelete=>'0',
+                                   }
+                               };
+                   if (defined($acapplrec) && $acapplrec->{applid} ne ""){
+                      $acftprec->{APPL_APPL_REL}->{Parent_Appl}=
+                                                 $acapplrec->{applid};
+                      $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalSystem}='W5Base';
+                      $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalID}=$rec->{id};
+                   }
+                   else{
+                      $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalSystem}='W5Base';
+                      $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalID}=$rec->{id};
+                   }
+                   if ($lnk->{lnktoapplid} ne ""){   # only if in the child is
+                      $acftprec->{APPL_APPL_REL}->{Child_Appl}=    # an applid
+                                                 $lnk->{lnktoapplid};  # known
+                      my $fh=$fh{appl_appl_rel};
+                      print $fh hash2xml($acftprec,{header=>0});
+                      print $onlinefh hash2xml($acftprec,{header=>0});
+                      $elements++;
+                   }
+               }
+            }
+            {  # prepare contacts
+               if (ref($rec->{contacts}) eq "ARRAY"){
+                  foreach my $contact (@{$rec->{contacts}}){
+                     next if ($contact->{target} ne "base::user");
+                     $user->SetFilter({userid=>\$contact->{targetid}});
+                     $user->SetCurrentView(qw(ALL));
+                     my ($urec,$msg)=$user->getFirst();
+                     if (defined($urec)){
+                        my $idno;
+                        my $posix;
+                        if ($urec->{posix} ne ""){
+                           $posix=$urec->{posix};
+                           $acuser->SetFilter({ldapid=>\$urec->{posix}});
+                           $acuser->SetCurrentView(qw(lempldeptid));
+                           my ($acrec,$msg)=$acuser->getFirst();
+                           if (defined($acrec)){
+                              $idno=$acrec->{lempldeptid};
+                           }
+                        }
+                        elsif ($urec->{email} ne ""){
+                           $acuser->SetFilter({email=>\$urec->{email}});
+                           $acuser->SetCurrentView(qw(lempldeptid));
+                           my ($acrec,$msg)=$acuser->getFirst();
+                           if (defined($acrec)){
+                              $idno=$acrec->{lempldeptid};
+                           }
+                        }
+                        next if ($posix eq "");
+                        my $acftprec;
+                        if (defined($idno)){
+                           $CurrentEventId="Add Contact '$posix' ".
+                                           "to $CurrentAppl";
+           
+                           $acftprec={
+                                   APPL_CONTACT_REL=>{
+                                      EventID=>$CurrentEventId,
+                                      Appl_ExternalSystem=>'W5Base',
+                                      Appl_ExternalID=>$rec->{id},
+                                      Contact=>uc($posix),
+                                      Security_Unit=>"TS.DE",
+                                      Description=>'',
+                                      bDelete=>'0',
+                                   }
+                               };
+                        }
+                        else{
+                           $CurrentEventId="New Contact '$urec->{email}' ".
+                                           "to $CurrentAppl";
+                           $acftprec={
+                                   APPL_CONTACT_REL=>{
+                                      EventID=>$CurrentEventId,
+                                      Appl_ExternalSystem=>'W5Base',
+                                      Appl_ExternalID=>$rec->{id},
+                                      Description=>'',
+                                      Security_Unit=>"TS.DE",
+                                      Surname=>$urec->{surname},
+                                      Givenname=>$urec->{givenname},
+                                      EMail=>$urec->{email},
+                                      bDelete=>'0',
+                                   }
+                               };
+                        }
+                        my $fh=$fh{appl_contact_rel};
+                        print $fh hash2xml($acftprec,{header=>0});
+                        print $onlinefh hash2xml($acftprec,{header=>0});
+                        $elements++;
+                        
+                     }
+                  }
+               }
+            }
+            if ($rec->{applid} ne ""){ # prepare instances
+               $swinstance->ResetFilter();
+               $swinstance->SetFilter({applid=>\$rec->{id},
+                                       cistatusid=>['3','4']});
+               foreach my $irec ($swinstance->getHashList(qw(ALL))){
+
+                  if ($irec->{swinstanceid} eq ""){
+                     my $acswi=getModuleObject($self->Config,
+                                               "tsacinv::swinstance");
+                     $acswi->SetFilter({srcsys=>\'W5Base',srcid=>\$irec->{id}});
+                     my ($acswirec,$msg)=$acswi->getOnlyFirst(qw(swinstanceid));
+                     if (defined($acswirec) && $acswirec->{swinstanceid} ne ""){
+                        my $swi=$swinstance->Clone();
+                        $swi->UpdateRecord({
+                           swinstanceid=>$acswirec->{swinstanceid}},
+                           {id=>\$irec->{id}}
+                        );
+                     }
+                  }
+
+                  $CurrentEventId="Instance '$irec->{fullname}'";
+                  my $systemid;
+                  if ($irec->{system} ne ""){
+                     my $sys=getModuleObject($self->Config,"itil::system");
+                     $sys->SetFilter({id=>\$irec->{systemid}});
+                     my ($sysrec,$msg)=$sys->getOnlyFirst(qw(systemid));
+                     $systemid=$sysrec->{systemid};
+                  }
+                  if ($systemid ne ""){
+                     my $assignment=$irec->{swteam};
+                     if ($assignment ne ""){
+                        $acgrp->ResetFilter(); 
+                        $acgrp->SetFilter({name=>$assignment}); 
+                        my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
+                        if (defined($acgrprec)){
+                           $assignment=$acgrprec->{name};
+                        }
+                        else{
+                           $grpnotfound{$assignment}=1;
+                           $assignment="TIT";
+                        }
+                     }
+                     else{
+                        $assignment="TIT";
+                     }
+                     ########################################################
+                     my $iassignment=$irec->{acinmassingmentgroup};
+                     if ($iassignment eq ""){
+                        $iassignment="[NULL]";
+                     }
+                     ########################################################
+                     #
+                     # Info von Florian Sahlmann vom 11.06.2008:
+                     # SAP-Instance:    M079345
+                     # APPL_Instance:   M079346
+                     # DB-Instance:     M079347
+                     # SELECT BarCode from AmModel where Name = 'DB-INSTANCE';
+                     #
+                     #
+                     my $model="M079346";
+                     $model="M079345" if ($irec->{swnature}=~m/^SAP.*$/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/mysql/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/oracle/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/informix/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/mssql/i); 
+                     $model="M079347" if ($irec->{swnature}=~m/db2/i); 
+                     my $swi={Instances=>{
+                                EventID=>$CurrentEventId,
+                                ExternalSystem=>'W5Base',
+                                ExternalID=>$irec->{id},
+                                Parent=>uc($systemid),
+                                Name=>$irec->{fullname},
+                                Status=>"in operation",
+                                Model=>$model,
+                                Remarks=>$irec->{comments},
+                                Assignment=>$assignment,
+                                IncidentAG=>$iassignment,
+                                SC_Location_Id=>'1000.0043.0089',
+                                CostCenter=>$rec->{conodenumber},
+                                Security_Unit=>"TS.DE",
+                                CustomerLink=>"TS.DE",
+                                bDelete=>'0'
+                              }
+                             };
+                     if ($irec->{databossid} eq "12072167880012"){
+                        $swi->{Instances}->{SC_Location_Id}=
+                             "4787.0000.0000";
+                     }
+
+                     my $fh=$fh{instance};
+                     print $fh hash2xml($swi,{header=>0});
+                     print $onlinefh hash2xml($swi,{header=>0});
+                     $elements++;
+
+                     ##########################################################
+                     #
+                     # create relation to Application
+                     #
+                     $CurrentEventId="Add Instance '$irec->{fullname}' ".
+                                     "to $CurrentAppl";
+                     my $externalid=$irec->{id};
                      if ($externalid eq ""){
-                        $externalid="C-".$rec->{id}."-".$lnk->{systemid};
+                        $externalid="I-".$rec->{id}."-".$irec->{id};
                      }
                      my $acftprec={
                          CI_APPL_REL=>{
@@ -405,511 +821,31 @@ sub ApplicationModified
                             Appl_ExternalSystem=>'W5Base',
                             Appl_ExternalID=>$rec->{id},
                             Port_ExternalSystem=>'W5Base',
-                            Port_ExternalID=>$lnk->{systemid},
+                            Port_ExternalID=>$irec->{id},
                             Security_Unit=>"TS.DE",
-                            Description=>$lnk->{shortdesc},
                             bDelete=>'0',
                             bActive=>'1',
                          }
                      };
                      if ($rec->{applid} ne ""){
-                        $acftprec->{CI_APPL_REL}->{Application}=uc($rec->{applid});
-                     }    
-                     if ($lnk->{systemsystemid} ne ""){
+                        $acftprec->{CI_APPL_REL}->{Application}=
+                            uc($rec->{applid});
+                     }
+                     if ($irec->{swinstanceid} ne ""){
                         $acftprec->{CI_APPL_REL}->{Portfolio}=
-                               uc($lnk->{systemsystemid});
-                        $ciapplrel{"$acftprec->{CI_APPL_REL}->{Portfolio}".
-                                   "-".
-                                   $acftprec->{CI_APPL_REL}->{Application}}++;
+                               uc($irec->{swinstanceid});
                      }
 
-                     #
-                     # Workaround für AktiveBilling (Fachbereich Billing)
-                     #
-                     #if (!($rec->{businessteam}=~m/\.BILLING/i)){
-                     # laut Peter soll die Sache am 13.01. auch für Billing gelten
-                     $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
-                     #}
+                     $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$ApplU};
                      my $fh=$fh{ci_appl_rel};
                      print $fh hash2xml($acftprec,{header=>0});
                      print $onlinefh hash2xml($acftprec,{header=>0});
-                     $SysCount++;
                      $elements++;
+                     ##########################################################
                   }
                }
-#               { # fill up missing system links by SAP application relations in AM
-#                  if ($rec->{applid} ne ""){
-#                     if (defined($acapplrec)){
-#                        my $lnks=getModuleObject($self->Config,
-#                                                 "tsacinv::lnkapplsystem");
-#                        my $acla=getModuleObject($self->Config,
-#                                                 "tsacinv::lnkapplappl");
-#                        $acla->SetFilter({lparentid=>\$acapplrec->{id},
-#                                          type=>\'SAP'});
-#                        foreach my $lnkrec ($acla->getHashList(qw(ALL))){
-#                           $lnks->ResetFilter();
-#                           $lnks->SetFilter({lparentid=>\$lnkrec->{lchildid}});
-#                           foreach my $srec ($lnks->getHashList(qw(systemid))){
-#                              if (!exists($ciapplrel{$srec->{systemid}."-".
-#                                                     $acapplrec->{applid}})){
-#                                 my $externalid="SAPLNK-".$srec->{systemid}."-".
-#                                                $acapplrec->{applid};
-#                                 my $acftprec={
-#                                      CI_APPL_REL=>{
-#                                         EventID=>'link by SAP'.
-#                                                  'appl relation '.
-#                                                  $externalid,
-#                                         Application=>$acapplrec->{applid},
-#                                         Portfolio=>$srec->{systemid},
-#                                         ExternalSystem=>'W5Base',
-#                                         ExternalID=>$externalid,
-#                                         Security_Unit=>"TS.DE",
-#                                         Description=>
-#                                              'fillup link by SAP'.
-#                                              'application relation',
-#                                         bDelete=>'0',
-#                                         bActive=>'1',
-#                                      }
-#                                    };
-#                                
-#                                 my $fh=$fh{ci_appl_rel};
-#                                 print $fh hash2xml($acftprec,{header=>0});
-#                                 print $onlinefh hash2xml($acftprec,{header=>0});
-#                              }
-#                           }
-#                        }
-#                     }
-#                  }
-#               }
-               { # Application
-                  my %posix=();
-                  my %idno=();
-                  foreach my $userent (qw(tsm tsm2 opm opm2 sem databoss 
-                                          delmgr delmgr2)){
-                     if ($rec->{$userent} ne ""){
-                        $user->SetFilter({fullname=>\$rec->{$userent}});
-                        $user->SetCurrentView("posix","email");
-                        my ($rec,$msg)=$user->getFirst();
-                        if (defined($rec)){
-                           $posix{$userent}=lc($rec->{posix});
-                           if ($posix{$userent} ne ""){
-                              $acuser->ResetFilter();
-                              $acuser->SetFilter([
-                                 {
-                                    loginname=>\$posix{$userent},
-                                    tenant=>\'CS'
-                                 },
-                                 {
-                                    ldapid=>\$posix{$userent},
-                                    tenant=>\'CS'
-                                 },
-                                 {
-                                    idno=>\$posix{$userent},
-                                    tenant=>\'CS'
-                                 },
-                                 {
-                                    email=>\$rec->{email},
-                                    tenant=>\'CS'
-                                 }
-                              ]);
-                              my @l=$acuser->getHashList(qw(lempldeptid idno));
-                              if ($#l>-1 && $#l<3){
-                                 $idno{$userent}=$l[0]->{idno};
-                              }
-                           }
-                        }
-                     }
-                     $posix{$userent}="[NULL]" if (!defined($posix{$userent}));
-                  }
-                  my $chkassignment=$rec->{businessteam};
-                  my $assignment=$self->getAcGroupByW5BaseGroup($chkassignment);
-                  if (!defined($assignment)){
-                     if (exists($mandconfig->{grpid}->{$rec->{mandatorid}})){
-                        my $mrec=$mandconfig->{grpid}->{$rec->{mandatorid}};
-                        if (defined($mrec->{defaultassignment})){
-                           $assignment=$mrec->{defaultassignment};
-                           $grpnotfound{$chkassignment}=1;
-                        }
-                     }
-                  }
-                  if (!defined($assignment)){
-                     $grpnotfound{$chkassignment}=1;
-                     $assignment="TIT" 
-                  }
-                  my $criticality=$rec->{criticality};
-                  $criticality=~s/^CR//;
-                  if ($criticality eq ""){
-                     if ($rec->{customerprio}==1){
-                        $criticality="critical";
-                     }
-                     elsif ($rec->{customerprio}==2){
-                        $criticality="medium";
-                     }
-                     else{ 
-                        $criticality="none";
-                     }
-                  }
-                  ########################################################
-                  my $applref="[NULL]";
-                  if ($rec->{ictono} ne ""){
-                     $applref="CapeTS: ".$rec->{ictono};
-                  }
-                  ########################################################
-                  my $issoxappl=$rec->{issoxappl};
-                  $issoxappl="YES" if ($rec->{issoxappl});
-                  $issoxappl="NO" if (!($rec->{issoxappl}));
-                  $CurrentAppl="$rec->{name}($rec->{id})";
-                  $CurrentEventId="Add Application $CurrentAppl";
-                  $ApplU=10 if ($rec->{isnosysappl} && $SysCount==0);
-                  $ApplU=5  if (lc($rec->{mandator}) eq "extern");
-                  if ($rec->{opmode} ne ""){
-                     $ApplU=70 if ($rec->{opmode} eq "prod");
-                     $ApplU=60 if ($rec->{opmode} eq "devel");
-                     $ApplU=50 if ($rec->{opmode} eq "approvtest");
-                     $ApplU=40 if ($rec->{opmode} eq "reference");
-                     $ApplU=30 if ($rec->{opmode} eq "education");
-                     $ApplU=25 if ($rec->{opmode} eq "cbreakdown");
-                     $ApplU=20 if ($rec->{opmode} eq "test");
-                  }
-                  my $acstatus="IN OPERATION";
-                  if ($rec->{cistatusid}==3){
-                     $acstatus="PROJECT";
-                  }
-                  if ($rec->{cistatusid}==5){
-                     $acstatus="OUT OF OPERATION";
-                  }
-
-                  # ---
-                  # anhand der conumber checken, ob im SAP WIB gesetzt ist
-                  # ---
-                  # prüfen ob in assetmanager der customerlink notwendige
-                  # customerlink existiert
-                  # ---
-                  # prüfen ob in assetmanager beim kontierungsobjekt der
-                  # passende customerlink eingetragen ist.
-                  # ---
-                  #$self->validateCostCenter4AssetManager($rec);
-
-                  my $acftprec={
-                                   Appl=>{
-                                      Security_Unit=>"TS.DE",
-                                      Status=>$acstatus,
-                                      Priority=>$rec->{customerprio},
-                                      EventID=>$CurrentEventId,
-                                      AssignmentGroup=>$assignment,
-                                      CO_CC=>$rec->{conodenumber},
-                                      Description=>$rec->{description},
-                                      CustBusinessDesc=>$rec->{description},
-                                      Remarks=>$rec->{comments},
-                                      MaintWindow=>$rec->{maintwindow},
-                                      IncidentAG=>$rec->{acinmassingmentgroup},
-                                      Version=>$rec->{currentvers},
-                                      SoxRelevant=>$issoxappl,
-                                      Criticality=>$criticality,
-                                      Technical_Contact=>$idno{tsm},
-                                      DataSupervisor=>$idno{databoss},
-                                      Service_Manager=>$idno{sem},
-                                      Deputy_Technical_Contact=>$idno{tsm2},
-                                      Lead_Del_manager=>$idno{opm},
-                                      Del_manager=>$idno{delmgr},
-                                      Deputy_Del_manager=>$idno{opm2},
-                                      bDelete=>'0',
-                                      Name=>$rec->{name},
-                                      Appl_Group=>$rec->{applgroup},
-                                      Appl_Ref=>$applref
-                                   }
-                               };
-                  #
-                  # Workaround für AktiveBilling (Fachbereich Billing)
-                  #
-                  if (!($rec->{businessteam}=~m/\.BILLING/i)){
-                     $acftprec->{Appl}->{Customer}='TS.DE';
-                     if ($rec->{customer}=~m/^DTAG.T-Home/i){
-                        $acftprec->{Appl}->{Customer}="DTAG, T-COM";
-                     }
-                  }
-                  # laut Peter soll die Sache am 13.01. auch für Billing gelten
-                  $acftprec->{Appl}->{Usage}=$w52ac{$ApplU};
-               
-                  if (defined($acapplrec) && $acapplrec->{applid} ne "" &&
-                      ($acapplrec->{applid}=~m/^(APPL|GER)/)){
-                     $acftprec->{Appl}->{Code}=$acapplrec->{applid};
-                     $acftprec->{Appl}->{ExternalID}=$rec->{id};
-                     $acftprec->{Appl}->{ExternalSystem}="W5Base";
-                  }
-                  else{
-                     $acftprec->{Appl}->{ExternalSystem}="W5Base";
-                     $acftprec->{Appl}->{ExternalID}=$rec->{id};
-                  }
-                  if ((!exists($acftprec->{Appl}->{Code}) || 
-                        $acftprec->{Appl}->{Code} eq "") &&
-                      $rec->{applid} ne "" &&
-                      ($rec->{applid}=~m/^(APPL|GER)/)){
-                     $acftprec->{Appl}->{Code}=$rec->{applid};
-                  }
-                       
-                  $acftprec->{Appl}->{Description}=~s/[\n\r]/ /g;
-                  $acftprec->{Appl}->{Version}=~s/[\n\r]/ /g;
-                  my $fh=$fh{appl};
-                  print $fh hash2xml($acftprec,{header=>0});
-                  print $onlinefh hash2xml($acftprec,{header=>0});
-                  $elements++;
-               }
-               { # Interfaces
-                  $applappl->SetFilter({fromapplid=>\$rec->{id},
-                                        toapplcistatus=>\"4"});
-                  my @l=$applappl->getHashList(qw(id toappl lnktoapplid conproto
-                                                  toapplid conmode comments));
-                  foreach my $lnk (@l){
-                     $CurrentEventId="Add Interface '$lnk->{toappl}' ".
-                                     "to $CurrentAppl";
-                     my $acftprec={
-                                      APPL_APPL_REL=>{
-                                         EventID=>$CurrentEventId,
-                                         ExternalSystem=>'W5Base',
-                                         ExternalID=>$lnk->{id},
-                                         C_Appl_ExternalSystem=>'W5Base',
-                                         C_Appl_ExternalID=>$lnk->{toapplid},
-                                         UseAssignment=>'Parent',
-                                         Type=>$lnk->{conproto},
-                                         ReplMode=>$lnk->{conmode},
-                                         Description=>$lnk->{comments},
-                                         Qty=>'1',
-                                         bDelete=>'0',
-                                      }
-                                  };
-                      if (defined($acapplrec) && $acapplrec->{applid} ne ""){
-                         $acftprec->{APPL_APPL_REL}->{Parent_Appl}=
-                                                    $acapplrec->{applid};
-                         $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalSystem}='W5Base';
-                         $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalID}=$rec->{id};
-                      }
-                      else{
-                         $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalSystem}='W5Base';
-                         $acftprec->{APPL_APPL_REL}->{P_Appl_ExternalID}=$rec->{id};
-                      }
-                      if ($lnk->{lnktoapplid} ne ""){   # only if in the child is
-                         $acftprec->{APPL_APPL_REL}->{Child_Appl}=    # an applid
-                                                    $lnk->{lnktoapplid};  # known
-                         my $fh=$fh{appl_appl_rel};
-                         print $fh hash2xml($acftprec,{header=>0});
-                         print $onlinefh hash2xml($acftprec,{header=>0});
-                         $elements++;
-                      }
-                  }
-               }
-               {  # prepare contacts
-                  if (ref($rec->{contacts}) eq "ARRAY"){
-                     foreach my $contact (@{$rec->{contacts}}){
-                        next if ($contact->{target} ne "base::user");
-                        $user->SetFilter({userid=>\$contact->{targetid}});
-                        $user->SetCurrentView(qw(ALL));
-                        my ($urec,$msg)=$user->getFirst();
-                        if (defined($urec)){
-                           my $idno;
-                           my $posix;
-                           if ($urec->{posix} ne ""){
-                              $posix=$urec->{posix};
-                              $acuser->SetFilter({ldapid=>\$urec->{posix}});
-                              $acuser->SetCurrentView(qw(lempldeptid));
-                              my ($acrec,$msg)=$acuser->getFirst();
-                              if (defined($acrec)){
-                                 $idno=$acrec->{lempldeptid};
-                              }
-                           }
-                           elsif ($urec->{email} ne ""){
-                              $acuser->SetFilter({email=>\$urec->{email}});
-                              $acuser->SetCurrentView(qw(lempldeptid));
-                              my ($acrec,$msg)=$acuser->getFirst();
-                              if (defined($acrec)){
-                                 $idno=$acrec->{lempldeptid};
-                              }
-                           }
-                           next if ($posix eq "");
-                           my $acftprec;
-                           if (defined($idno)){
-                              $CurrentEventId="Add Contact '$posix' ".
-                                              "to $CurrentAppl";
-              
-                              $acftprec={
-                                      APPL_CONTACT_REL=>{
-                                         EventID=>$CurrentEventId,
-                                         Appl_ExternalSystem=>'W5Base',
-                                         Appl_ExternalID=>$rec->{id},
-                                         Contact=>uc($posix),
-                                         Security_Unit=>"TS.DE",
-                                         Description=>'',
-                                         bDelete=>'0',
-                                      }
-                                  };
-                           }
-                           else{
-                              $CurrentEventId="New Contact '$urec->{email}' ".
-                                              "to $CurrentAppl";
-                              $acftprec={
-                                      APPL_CONTACT_REL=>{
-                                         EventID=>$CurrentEventId,
-                                         Appl_ExternalSystem=>'W5Base',
-                                         Appl_ExternalID=>$rec->{id},
-                                         Description=>'',
-                                         Security_Unit=>"TS.DE",
-                                         Surname=>$urec->{surname},
-                                         Givenname=>$urec->{givenname},
-                                         EMail=>$urec->{email},
-                                         bDelete=>'0',
-                                      }
-                                  };
-                           }
-                           my $fh=$fh{appl_contact_rel};
-                           print $fh hash2xml($acftprec,{header=>0});
-                           print $onlinefh hash2xml($acftprec,{header=>0});
-                           $elements++;
-                           
-                        }
-                     }
-                  }
-               }
-               if ($rec->{applid} ne ""){ # prepare instances
-                  $swinstance->ResetFilter();
-                  $swinstance->SetFilter({applid=>\$rec->{id},
-                                          cistatusid=>['3','4']});
-                  foreach my $irec ($swinstance->getHashList(qw(ALL))){
-
-                     if ($irec->{swinstanceid} eq ""){
-                        my $acswi=getModuleObject($self->Config,
-                                                  "tsacinv::swinstance");
-                        $acswi->SetFilter({srcsys=>\'W5Base',srcid=>\$irec->{id}});
-                        my ($acswirec,$msg)=$acswi->getOnlyFirst(qw(swinstanceid));
-                        if (defined($acswirec) && $acswirec->{swinstanceid} ne ""){
-                           my $swi=$swinstance->Clone();
-                           $swi->UpdateRecord({
-                              swinstanceid=>$acswirec->{swinstanceid}},
-                              {id=>\$irec->{id}}
-                           );
-                        }
-                     }
-
-                     $CurrentEventId="Instance '$irec->{fullname}'";
-                     my $systemid;
-                     if ($irec->{system} ne ""){
-                        my $sys=getModuleObject($self->Config,"itil::system");
-                        $sys->SetFilter({id=>\$irec->{systemid}});
-                        my ($sysrec,$msg)=$sys->getOnlyFirst(qw(systemid));
-                        $systemid=$sysrec->{systemid};
-                     }
-                     if ($systemid ne ""){
-                        my $assignment=$irec->{swteam};
-                        if ($assignment ne ""){
-                           $acgrp->ResetFilter(); 
-                           $acgrp->SetFilter({name=>$assignment}); 
-                           my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
-                           if (defined($acgrprec)){
-                              $assignment=$acgrprec->{name};
-                           }
-                           else{
-                              $grpnotfound{$assignment}=1;
-                              $assignment="TIT";
-                           }
-                        }
-                        else{
-                           $assignment="TIT";
-                        }
-                        ########################################################
-                        my $iassignment=$irec->{acinmassingmentgroup};
-                        if ($iassignment eq ""){
-                           $iassignment="[NULL]";
-                        }
-                        ########################################################
-                        #
-                        # Info von Florian Sahlmann vom 11.06.2008:
-                        # SAP-Instance:    M079345
-                        # APPL_Instance:   M079346
-                        # DB-Instance:     M079347
-                        # SELECT BarCode from AmModel where Name = 'DB-INSTANCE';
-                        #
-                        #
-                        my $model="M079346";
-                        $model="M079345" if ($irec->{swnature}=~m/^SAP.*$/i); 
-                        $model="M079347" if ($irec->{swnature}=~m/mysql/i); 
-                        $model="M079347" if ($irec->{swnature}=~m/oracle/i); 
-                        $model="M079347" if ($irec->{swnature}=~m/informix/i); 
-                        $model="M079347" if ($irec->{swnature}=~m/mssql/i); 
-                        $model="M079347" if ($irec->{swnature}=~m/db2/i); 
-                        my $swi={Instances=>{
-                                   EventID=>$CurrentEventId,
-                                   ExternalSystem=>'W5Base',
-                                   ExternalID=>$irec->{id},
-                                   Parent=>uc($systemid),
-                                   Name=>$irec->{fullname},
-                                   Status=>"in operation",
-                                   Model=>$model,
-                                   Remarks=>$irec->{comments},
-                                   Assignment=>$assignment,
-                                   IncidentAG=>$iassignment,
-                                   SC_Location_Id=>'1000.0043.0089',
-                                   CostCenter=>$rec->{conodenumber},
-                                   Security_Unit=>"TS.DE",
-                                   CustomerLink=>"TS.DE",
-                                   bDelete=>'0'
-                                 }
-                                };
-                        if ($irec->{databossid} eq "12072167880012"){
-                           $swi->{Instances}->{SC_Location_Id}=
-                                "4787.0000.0000";
-                        }
-
-                        my $fh=$fh{instance};
-                        print $fh hash2xml($swi,{header=>0});
-                        print $onlinefh hash2xml($swi,{header=>0});
-                        $elements++;
-
-                        ##########################################################
-                        #
-                        # create relation to Application
-                        #
-                        $CurrentEventId="Add Instance '$irec->{fullname}' ".
-                                        "to $CurrentAppl";
-                        my $externalid=$irec->{id};
-                        if ($externalid eq ""){
-                           $externalid="I-".$rec->{id}."-".$irec->{id};
-                        }
-                        my $acftprec={
-                            CI_APPL_REL=>{
-                               EventID=>$CurrentEventId,
-                               ExternalSystem=>'W5Base',
-                               ExternalID=>$externalid,
-                               Appl_ExternalSystem=>'W5Base',
-                               Appl_ExternalID=>$rec->{id},
-                               Port_ExternalSystem=>'W5Base',
-                               Port_ExternalID=>$irec->{id},
-                               Security_Unit=>"TS.DE",
-                               bDelete=>'0',
-                               bActive=>'1',
-                            }
-                        };
-                        if ($rec->{applid} ne ""){
-                           $acftprec->{CI_APPL_REL}->{Application}=
-                               uc($rec->{applid});
-                        }
-                        if ($irec->{swinstanceid} ne ""){
-                           $acftprec->{CI_APPL_REL}->{Portfolio}=
-                                  uc($irec->{swinstanceid});
-                        }
-
-                        $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$ApplU};
-                        my $fh=$fh{ci_appl_rel};
-                        print $fh hash2xml($acftprec,{header=>0});
-                        print $onlinefh hash2xml($acftprec,{header=>0});
-                        $elements++;
-                        ##########################################################
-                     }
-                  }
-               }
-            } # end of PSS Exclude
-         }
-         else{
-            msg(INFO,"skipped application=$rec->{name} jobname=$jobname");
-         }
+            }
+         } # end of PSS Exclude
 
          ($rec,$msg)=$app->getNext();
       } until(!defined($rec));
