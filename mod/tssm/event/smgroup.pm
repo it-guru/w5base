@@ -117,8 +117,8 @@ sub smgroup
          }
       }
       else{
-         msg(WARN,"quering without start parameter - ".
-                  "reset or direct group selected");
+         #msg(WARN,"quering without start parameter - ".
+         #         "reset or direct group selected");
       }
       if ($queryparam ne "" && $queryparam ne "reset"){
             $flt->{fullname}=$queryparam;
@@ -374,8 +374,8 @@ sub handleSRec
       if (defined($oldrec)){   # rename check (detect on AM rename)
          if ($oldrec->{fullname} ne 
              uc(exttrim($agrprec->{fullname}))){ # rename op
-            msg(WARN,"rename request detected on metagroup id $oldrec->{id} ".
-                     "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
+            #msg(WARN,"rename request detected on metagroup id $oldrec->{id} ".
+            #         "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
             my $newfullname=exttrim($agrprec->{fullname});
 
             my $smchecked=0;
@@ -407,9 +407,9 @@ sub handleSRec
                if (defined($chkrec) &&
                    $chkrec->{id} ne $oldrec->{id}){ 
                            # group already created by f.e. SM9
-                  msg(WARN,"group was already new created but it was ".
-                           "a rename on id ".
-                           "$chkrec->{id} - deaktivating this group now");
+                  #msg(WARN,"group was already new created but it was ".
+                  #         "a rename on id ".
+                  #         "$chkrec->{id} - deaktivating this group now");
                   $dataobj->{mgrp}->ValidatedUpdateRecord($chkrec,{
                      cistatusid=>'6',
                      smid=>undef,
@@ -473,7 +473,7 @@ sub handleSRec
       $newrec->{cistatusid}=5;   # länger als 3 Tage nirgends gesehen
    }
    if ($lastseen>180){
-      msg(WARN,"delete of group $oldrec->{fullname} in $self");
+      #msg(WARN,"delete of group $oldrec->{fullname} in $self");
       $dataobj->{mgrp}->ValidatedDeleteRecord($oldrec);
    }
    else{
