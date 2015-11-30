@@ -236,7 +236,8 @@ sub processFile
           'hierarchy 10 ID'               =>'saphier10',
           'parent Co-Number'              =>'pconumber',
           'NOR-solution model'            =>'normodel',
-          'NOR-n'                         =>'norn'
+          'NOR-n'                         =>'norn',
+          'PSP_Element_OFI'               =>'ofientity'
       );
    }
    if ($type eq "costcenter"){
