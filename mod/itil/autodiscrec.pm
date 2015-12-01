@@ -1036,6 +1036,8 @@ sub HtmlAutoDiscManager
             my @l=$swiobj->getHashList(qw(ALL));
             $rec=$l[0];
          }
+         $oldrecid=$recid;
+         delete($control{software}); # Reset Software-Cache
       }
       my $htmlEnt=$self->AutoDiscFormatEntry($rec,$adrec,\%control);
       if ($htmlEnt ne ""){

@@ -74,8 +74,6 @@ sub Result
       push(@flt,{disc_on_systemid=>\@sysid,state=>\'1'});
    }
 
-printf STDERR ("fifi filter:%s\n",Dumper(\@flt));
-
    print $self->{DataObj}->HtmlAutoDiscManager({
       filterTypes=>0,
       allowReload=>0
