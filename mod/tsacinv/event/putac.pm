@@ -31,6 +31,16 @@ use HTML::Parser;           #
 use File::Temp qw(tempfile);
 @ISA=qw(kernel::Event);
 
+my %w52ac=(0 =>'OTHER',
+           5 =>'CUSTOMER RESPONSIBILITY',
+           20=>'TEST',
+           25=>'DISASTER',
+           30=>'TRAINING',
+           40=>'REFERENCE',
+           50=>'ACCEPTANCE',
+           60=>'DEVELOPMENT',
+           70=>'PRODUCTION');
+
 sub new
 {
    my $type=shift;
@@ -44,15 +54,58 @@ sub Init
 {
    my $self=shift;
 
-
-   $self->RegisterEvent("putac","ApplicationModified");
+   # old calls - abwärtskompatibilität
+   $self->RegisterEvent("putac","SendXmlToAM_appl");
    $self->RegisterEvent("putacasset","AssetModified",timeout=>40000);
-   $self->RegisterEvent("putacappl","ApplicationModified",timeout=>40000);
+   $self->RegisterEvent("putacappl","SendXmlToAM_appl",timeout=>40000);
+
+
+   #######################################################################
+   # new parallel Interface
+   $self->RegisterEvent("SendXmlToAM","SendXmlToAM");  # full transfer
+
+   $self->RegisterEvent("SendXmlToAM_appl","SendXmlToAM_appl",
+      timeout=>40000
+   );
+   $self->RegisterEvent("SendXmlToAM_instance","SendXmlToAM_instance",
+      timeout=>3600
+   );
+
+
+   #######################################################################
+
+
 #   $self->RegisterEvent("putac","SWInstallModified");
 #   $self->RegisterEvent("SWInstallModified","SWInstallModified");
-   $self->RegisterEvent("ApplicationModified","ApplicationModified");
-   $self->RegisterEvent("send2ac","sendFileToAssetManagerOnlineInterface");
    return(1);
+}
+
+sub SendXmlToAM
+{
+   my $self=shift;
+   my $obj=shift;
+
+   my @objlist=qw(appl instance);
+
+   if ($obj ne ""){
+      if (in_array(\@objlist,$obj)){
+         @objlist=($obj);
+      }
+      else{
+         return({exitmsg=>1,
+                 msg=>msg(ERROR,
+                          "invalid object request to SendXmlToAM ($obj)")});
+      }
+   }
+
+   foreach my $obj (@objlist){
+      my $bk=$self->W5ServerCall("rpcCallEvent","SendXmlToAM_$obj",@_);
+      if (!defined($bk->{AsyncID})){
+         return({exitmsg=>1,
+                 msg=>msg(ERROR,"can't call SendXmlToAM_$obj ")});
+      }
+   }
+   return({exitcode=>0,msg=>'ok'});
 }
 
 
@@ -226,34 +279,248 @@ sub AssetModified
 }
 
 
-sub ApplicationModified
+sub SendXmlToAM_instance
 {
    my $self=shift;
-   my @appid=@_;
+   my @w5id=@_;
+
+   my $elements=0;
+   my $w5appl=getModuleObject($self->Config,"itil::appl");
+   my $sys=getModuleObject($self->Config,"itil::system");
+   my $lnkitclustsvc=getModuleObject($self->Config,"itil::lnkitclustsvc");
+   my $swinstance=getModuleObject($self->Config,"TS::swinstance");
+   my $acgrp=getModuleObject($self->Config,"tsacinv::group");
+   my $user=getModuleObject($self->Config,"base::user");
+   my $mand=getModuleObject($self->Config,"tsacinv::mandator");
+   my $mandconfig;
+   my $acuser=getModuleObject($self->Config,"tsacinv::user");
+   my %filter=(cistatusid=>['3','4','5']);
+   $self->{DebugMode}=0;
+
+   if ($#w5id!=-1){  # same as  SendXmlToAM_appl
+      if (in_array(\@w5id,"debug")){
+         @w5id=grep(!/^debug$/i,@w5id);
+         $self->{DebugMode}=1;
+         msg(ERROR,"processing DebugMode - loading ids '%s'",join(",",@w5id));
+      }
+      $filter{id}=\@w5id;
+   }
+   {  # mandator init  # same as  SendXmlToAM_appl
+      $mand->SetFilter({cistatusid=>[3,4]});
+      $mand->SetCurrentView(qw(id grpid defaultassignmentid 
+                               defaultassignment doexport));
+      $mandconfig=$mand->getHashIndexed(qw(grpid doexport));
+      if (ref($mandconfig) ne "HASH"){
+         return({exitcode=>1,msg=>msg(ERROR,"can not read mandator config")});
+      }
+      my @mandid=map({$_->{grpid}} @{$mandconfig->{doexport}->{1}});
+      if ($#mandid==-1){
+         return({exitcode=>1,msg=>msg(ERROR,"no export mandator")});
+      }
+      $filter{mandatorid}=\@mandid;
+   }
+
+   $swinstance->SetFilter(\%filter);
+   $swinstance->SetCurrentView(qw(ALL));
+
+   my (%fh,%filename);
+   #($fh{appl},         $filename{appl}               )=$self->InitTransfer();
+   #($fh{appl_appl_rel},$filename{appl_appl_rel}      )=$self->InitTransfer();
+   ($fh{ci_appl_rel},  $filename{ci_appl_rel}        )=$self->InitTransfer();
+   #($fh{appl_contact_rel},$filename{appl_contact_rel})=$self->InitTransfer();
+   ($fh{instance},     $filename{instance}           )=$self->InitTransfer();
+
+
+
+   my ($irec,$msg)=$swinstance->getFirst();
+   $self->{jobstart}=NowStamp();
+   my %grpnotfound;
+   my %ciapplrel=();
+   if (defined($irec)){
+      do{
+         #msg(INFO,"dump=%s",Dumper($irec));
+         #msg(INFO,"id=$rec->{id}");
+         my $jobname="W5Base.$self->{jobstart}.".NowStamp().
+                     '.Instance'.$irec->{id};
+         msg(INFO,"process swinstance=$irec->{name} jobname=$jobname");
+         my $CurrentEventId="Instance '$irec->{fullname}'";
+         if ($irec->{swinstanceid} eq ""){
+            my $acswi=getModuleObject($self->Config,
+                                      "tsacinv::swinstance");
+            $acswi->SetFilter({srcsys=>\'W5Base',srcid=>\$irec->{id}});
+            my ($acswirec,$msg)=$acswi->getOnlyFirst(qw(swinstanceid));
+            if (defined($acswirec) && $acswirec->{swinstanceid} ne ""){
+               my $swi=$swinstance->Clone();
+               $swi->UpdateRecord({
+                  swinstanceid=>$acswirec->{swinstanceid}},
+                  {id=>\$irec->{id}}
+               );
+            }
+         }
+
+         my $amparentid;
+         my $costcenter;
+         if ($irec->{system} ne ""){
+            $sys->ResetFilter();
+            $sys->SetFilter({id=>\$irec->{systemid}});
+            my ($sysrec,$msg)=$sys->getOnlyFirst(qw(systemid));
+            $amparentid=$sysrec->{systemid};
+         }
+         if ($irec->{itclusts} ne ""){
+            $lnkitclustsvc->ResetFilter();
+            $lnkitclustsvc->SetFilter({id=>\$irec->{itclustsid}});
+            my ($itclustsrec,$msg)=$lnkitclustsvc->getOnlyFirst(qw(clusterid));
+            $amparentid=$itclustsrec->{clusterid};
+         }
+         if ($amparentid ne ""){
+            my $assignment=$irec->{swteam};
+            if ($assignment ne ""){
+               $acgrp->ResetFilter(); 
+               $acgrp->SetFilter({name=>$assignment}); 
+               my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
+               if (defined($acgrprec)){
+                  $assignment=$acgrprec->{name};
+               }
+               else{
+                  $grpnotfound{$assignment}=1;
+                  $assignment="TIT";
+               }
+            }
+            else{
+               $assignment="TIT";
+            }
+            ########################################################
+            my $iassignment=$irec->{acinmassingmentgroup};
+            #  if ($irec->{swinstanceid} ne "" || $iassignment ne ""){
+            if (1){
+               if ($iassignment eq ""){
+                  $iassignment="[NULL]";
+               }
+               ########################################################
+               #
+               # Info von Florian Sahlmann vom 11.06.2008:
+               # SAP-Instance:    M079345
+               # APPL_Instance:   M079346
+               # DB-Instance:     M079347
+               # SELECT BarCode from AmModel where Name = 'DB-INSTANCE';
+               #
+               #
+               my $model="M079346";
+               $model="M079345" if ($irec->{swnature}=~m/^SAP.*$/i); 
+               $model="M079347" if ($irec->{swnature}=~m/mysql/i); 
+               $model="M079347" if ($irec->{swnature}=~m/oracle/i); 
+               $model="M079347" if ($irec->{swnature}=~m/informix/i); 
+               $model="M079347" if ($irec->{swnature}=~m/mssql/i); 
+               $model="M079347" if ($irec->{swnature}=~m/db2/i); 
+               my $swi={
+                  Instances=>{
+                     EventID=>$CurrentEventId,
+                     ExternalSystem=>'W5Base',
+                     ExternalID=>$irec->{id},
+                     Parent=>uc($amparentid),
+                     Name=>$irec->{fullname},
+                     Status=>"in operation",
+                     Model=>$model,
+                     Remarks=>$irec->{comments},
+                     Assignment=>$assignment,
+                     IncidentAG=>$iassignment,
+                     SC_Location_Id=>'1000.0043.0089',
+                     #CostCenter=>$rec->{conodenumber},
+                     Security_Unit=>"TS.DE",
+                     CustomerLink=>"TS.DE",
+                     bDelete=>'0'
+                  }
+               };
+               if ($irec->{databossid} eq "12072167880012"){
+                  $swi->{Instances}->{SC_Location_Id}="4787.0000.0000";
+               }
+
+               my $fh=$fh{instance};
+               print $fh hash2xml($swi,{header=>0});
+               $elements++;
+
+               ##########################################################
+               #
+               # create relation to Application
+               #
+               my $applid=$irec->{applid};
+               $w5appl->ResetFilter();
+               $w5appl->SetFilter({id=>\$applid});
+               my ($arec)=$w5appl->getOnlyFirst(qw(ALL)); 
+               if (defined($arec)){
+                  my $CurrentAppl=$arec->{name};
+                  $CurrentEventId="Add Instance '$irec->{fullname}' ".
+                                  "to $CurrentAppl";
+                  my $externalid=$irec->{id};
+                  if ($externalid eq ""){
+                     $externalid="I-".$arec->{id}."-".$irec->{id};
+                  }
+                  my $acftprec={
+                      CI_APPL_REL=>{
+                         EventID=>$CurrentEventId,
+                         ExternalSystem=>'W5Base',
+                         ExternalID=>$externalid,
+                         Appl_ExternalSystem=>'W5Base',
+                         Appl_ExternalID=>$arec->{id},
+                         Port_ExternalSystem=>'W5Base',
+                         Port_ExternalID=>$irec->{id},
+                         Security_Unit=>"TS.DE",
+                         bDelete=>'0',
+                         bActive=>'1',
+                      }
+                  };
+                  if ($irec->{swinstanceid} ne ""){
+                     $acftprec->{CI_APPL_REL}->{Portfolio}=
+                            uc($irec->{swinstanceid});
+                  }
+                  if ($arec->{applid} ne ""){ # Realtion nur wenn Anwendung ID hat
+                     $acftprec->{CI_APPL_REL}->{Application}=uc($arec->{applid});
+                     #$acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$ApplU};
+                     my $fh=$fh{ci_appl_rel};
+                     print $fh hash2xml($acftprec,{header=>0});
+                     $elements++;
+                  }
+               }
+               ##########################################################
+            }
+         }
+         ($irec,$msg)=$swinstance->getNext();
+      } until(!defined($irec));
+   }
+
+   $self->TransferFile($fh{ci_appl_rel},$filename{ci_appl_rel}, "ci_appl_rel");
+   my $back=$self->TransferFile($fh{instance},$filename{instance},"instance");
+
+   return($back);
+}
+
+
+sub SendXmlToAM_appl
+{
+   my $self=shift;
+   my @w5id=@_;
 
    my $elements=0;
    my $acappl=getModuleObject($self->Config,"tsacinv::appl");
    my $applappl=getModuleObject($self->Config,"itil::lnkapplappl");
    my $applsys=getModuleObject($self->Config,"itil::lnkapplsystem");
    my $acapplsys=getModuleObject($self->Config,"tsacinv::lnkapplsystem");
-   my $swinstance=getModuleObject($self->Config,"TS::swinstance");
    my $acgrp=getModuleObject($self->Config,"tsacinv::group");
    my $app=getModuleObject($self->Config,"AL_TCom::appl");
    my $user=getModuleObject($self->Config,"base::user");
    my $mand=getModuleObject($self->Config,"tsacinv::mandator");
+   my $swinstance=getModuleObject($self->Config,"TS::swinstance");
    my $mandconfig;
    my $acuser=getModuleObject($self->Config,"tsacinv::user");
-   my %filter=(cistatusid=>['3','4','5'],
-               acinmassingmentgroup=>\'*');
-   #my %filter=(cistatusid=>['3','4','5']);
+   my %filter=(cistatusid=>['3','4','5']);
    $self->{DebugMode}=0;
-   if ($#appid!=-1){
-      if (grep(/^debug$/i,@appid)){
-         @appid=grep(!/^debug$/i,@appid);
+   if ($#w5id!=-1){
+      if (in_array(\@w5id,"debug")){
+         @w5id=grep(!/^debug$/i,@w5id);
          $self->{DebugMode}=1;
-         msg(ERROR,"processing DebugMode - loading ids '%s'",join(",",@appid));
+         msg(ERROR,"processing DebugMode - loading ids '%s'",join(",",@w5id));
       }
-      $filter{id}=\@appid;
+      $filter{id}=\@w5id;
    }
    {  # mandator init
       $mand->SetFilter({cistatusid=>[3,4]});
@@ -269,18 +536,8 @@ sub ApplicationModified
       }
       $filter{mandatorid}=\@mandid;
    }
-   open(AMTODO,">/tmp/amsctodo.txt");
 
 
-   my %w52ac=(0 =>'OTHER',
-              5 =>'CUSTOMER RESPONSIBILITY',
-              20=>'TEST',
-              25=>'DISASTER',
-              30=>'TRAINING',
-              40=>'REFERENCE',
-              50=>'ACCEPTANCE',
-              60=>'DEVELOPMENT',
-              70=>'PRODUCTION');
   # $filter{name}="*w5base*";
    $app->SetFilter(\%filter);
    $app->SetCurrentView(qw(ALL));
@@ -293,14 +550,6 @@ sub ApplicationModified
    ($fh{ci_appl_rel},  $filename{ci_appl_rel}        )=$self->InitTransfer();
    ($fh{appl_contact_rel},$filename{appl_contact_rel})=$self->InitTransfer();
    ($fh{instance},     $filename{instance}           )=$self->InitTransfer();
-
-
-   my ($onlinefh,$onlinefilename);
-   if (!(($onlinefh, $onlinefilename) = tempfile())){
-      return({msg=>$self->msg(ERROR,'can\'t open tempfile'),exitcode=>1});
-   }
-   print $onlinefh ("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\n");
-   print $onlinefh ("<XMLInterface>\n");
 
 
    my ($rec,$msg)=$app->getFirst();
@@ -332,8 +581,10 @@ sub ApplicationModified
             }
          }
          die("AssetManager not online") if (!$acappl->Ping());
-         if (!($acapplrec->{assignmentgroup} eq "PSS" ||
-               ($acapplrec->{assignmentgroup}=~m/^PSS\./))){
+         if ((!($acapplrec->{assignmentgroup} eq "PSS" ||     # NO PSS Elements
+               ($acapplrec->{assignmentgroup}=~m/^PSS\./))) &&
+             ($rec->{acinmassingmentgroup} ne "" ||           # INM AG needed
+              $rec->{applid} ne "")){
             my $CurrentEventId;
             my $CurrentAppl=$rec->{name};
             my $ApplU=0;
@@ -418,7 +669,6 @@ sub ApplicationModified
                   $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
                   my $fh=$fh{ci_appl_rel};
                   print $fh hash2xml($acftprec,{header=>0});
-                  print $onlinefh hash2xml($acftprec,{header=>0});
                   $SysCount++;
                   $elements++;
                }
@@ -537,7 +787,6 @@ sub ApplicationModified
                # passende customerlink eingetragen ist.
                # ---
                #$self->validateCostCenter4AssetManager($rec);
-
                my $acftprec={
                                 Appl=>{
                                    Security_Unit=>"TS.DE",
@@ -592,7 +841,6 @@ sub ApplicationModified
                $acftprec->{Appl}->{Version}=~s/[\n\r]/ /g;
                my $fh=$fh{appl};
                print $fh hash2xml($acftprec,{header=>0});
-               print $onlinefh hash2xml($acftprec,{header=>0});
                $elements++;
             }
             { # Interfaces
@@ -633,7 +881,6 @@ sub ApplicationModified
                                                  $lnk->{lnktoapplid};  # known
                       my $fh=$fh{appl_appl_rel};
                       print $fh hash2xml($acftprec,{header=>0});
-                      print $onlinefh hash2xml($acftprec,{header=>0});
                       $elements++;
                    }
                }
@@ -702,164 +949,17 @@ sub ApplicationModified
                         }
                         my $fh=$fh{appl_contact_rel};
                         print $fh hash2xml($acftprec,{header=>0});
-                        print $onlinefh hash2xml($acftprec,{header=>0});
                         $elements++;
                         
                      }
                   }
                }
             }
-            if ($rec->{applid} ne ""){ # prepare instances
-               $swinstance->ResetFilter();
-               $swinstance->SetFilter({applid=>\$rec->{id},
-                                       cistatusid=>['3','4']});
-               foreach my $irec ($swinstance->getHashList(qw(ALL))){
-
-                  if ($irec->{swinstanceid} eq ""){
-                     my $acswi=getModuleObject($self->Config,
-                                               "tsacinv::swinstance");
-                     $acswi->SetFilter({srcsys=>\'W5Base',srcid=>\$irec->{id}});
-                     my ($acswirec,$msg)=$acswi->getOnlyFirst(qw(swinstanceid));
-                     if (defined($acswirec) && $acswirec->{swinstanceid} ne ""){
-                        my $swi=$swinstance->Clone();
-                        $swi->UpdateRecord({
-                           swinstanceid=>$acswirec->{swinstanceid}},
-                           {id=>\$irec->{id}}
-                        );
-                     }
-                  }
-
-                  $CurrentEventId="Instance '$irec->{fullname}'";
-                  my $systemid;
-                  if ($irec->{system} ne ""){
-                     my $sys=getModuleObject($self->Config,"itil::system");
-                     $sys->SetFilter({id=>\$irec->{systemid}});
-                     my ($sysrec,$msg)=$sys->getOnlyFirst(qw(systemid));
-                     $systemid=$sysrec->{systemid};
-                  }
-                  if ($systemid ne ""){
-                     my $assignment=$irec->{swteam};
-                     if ($assignment ne ""){
-                        $acgrp->ResetFilter(); 
-                        $acgrp->SetFilter({name=>$assignment}); 
-                        my ($acgrprec,$msg)=$acgrp->getOnlyFirst(qw(name));
-                        if (defined($acgrprec)){
-                           $assignment=$acgrprec->{name};
-                        }
-                        else{
-                           $grpnotfound{$assignment}=1;
-                           $assignment="TIT";
-                        }
-                     }
-                     else{
-                        $assignment="TIT";
-                     }
-                     ########################################################
-                     my $iassignment=$irec->{acinmassingmentgroup};
-                     if ($iassignment eq ""){
-                        $iassignment="[NULL]";
-                     }
-                     ########################################################
-                     #
-                     # Info von Florian Sahlmann vom 11.06.2008:
-                     # SAP-Instance:    M079345
-                     # APPL_Instance:   M079346
-                     # DB-Instance:     M079347
-                     # SELECT BarCode from AmModel where Name = 'DB-INSTANCE';
-                     #
-                     #
-                     my $model="M079346";
-                     $model="M079345" if ($irec->{swnature}=~m/^SAP.*$/i); 
-                     $model="M079347" if ($irec->{swnature}=~m/mysql/i); 
-                     $model="M079347" if ($irec->{swnature}=~m/oracle/i); 
-                     $model="M079347" if ($irec->{swnature}=~m/informix/i); 
-                     $model="M079347" if ($irec->{swnature}=~m/mssql/i); 
-                     $model="M079347" if ($irec->{swnature}=~m/db2/i); 
-                     my $swi={Instances=>{
-                                EventID=>$CurrentEventId,
-                                ExternalSystem=>'W5Base',
-                                ExternalID=>$irec->{id},
-                                Parent=>uc($systemid),
-                                Name=>$irec->{fullname},
-                                Status=>"in operation",
-                                Model=>$model,
-                                Remarks=>$irec->{comments},
-                                Assignment=>$assignment,
-                                IncidentAG=>$iassignment,
-                                SC_Location_Id=>'1000.0043.0089',
-                                CostCenter=>$rec->{conodenumber},
-                                Security_Unit=>"TS.DE",
-                                CustomerLink=>"TS.DE",
-                                bDelete=>'0'
-                              }
-                             };
-                     if ($irec->{databossid} eq "12072167880012"){
-                        $swi->{Instances}->{SC_Location_Id}=
-                             "4787.0000.0000";
-                     }
-
-                     my $fh=$fh{instance};
-                     print $fh hash2xml($swi,{header=>0});
-                     print $onlinefh hash2xml($swi,{header=>0});
-                     $elements++;
-
-                     ##########################################################
-                     #
-                     # create relation to Application
-                     #
-                     $CurrentEventId="Add Instance '$irec->{fullname}' ".
-                                     "to $CurrentAppl";
-                     my $externalid=$irec->{id};
-                     if ($externalid eq ""){
-                        $externalid="I-".$rec->{id}."-".$irec->{id};
-                     }
-                     my $acftprec={
-                         CI_APPL_REL=>{
-                            EventID=>$CurrentEventId,
-                            ExternalSystem=>'W5Base',
-                            ExternalID=>$externalid,
-                            Appl_ExternalSystem=>'W5Base',
-                            Appl_ExternalID=>$rec->{id},
-                            Port_ExternalSystem=>'W5Base',
-                            Port_ExternalID=>$irec->{id},
-                            Security_Unit=>"TS.DE",
-                            bDelete=>'0',
-                            bActive=>'1',
-                         }
-                     };
-                     if ($rec->{applid} ne ""){
-                        $acftprec->{CI_APPL_REL}->{Application}=
-                            uc($rec->{applid});
-                     }
-                     if ($irec->{swinstanceid} ne ""){
-                        $acftprec->{CI_APPL_REL}->{Portfolio}=
-                               uc($irec->{swinstanceid});
-                     }
-
-                     $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$ApplU};
-                     my $fh=$fh{ci_appl_rel};
-                     print $fh hash2xml($acftprec,{header=>0});
-                     print $onlinefh hash2xml($acftprec,{header=>0});
-                     $elements++;
-                     ##########################################################
-                  }
-               }
-            }
-         } # end of PSS Exclude
+         } # end of exclude conditions
 
          ($rec,$msg)=$app->getNext();
       } until(!defined($rec));
    }
-   my %faillog=();
-   if (keys(%grpnotfound)){
-      $faillog{MissingGroup}={name=>[keys(%grpnotfound)]};
-   }
-   if (open(F,">/tmp/last.putac.faillog.xml")){
-      print F hash2xml(\%faillog,{header=>1});
-      close(F);
-   }
-   print $onlinefh ("</XMLInterface>\n");
-   close($onlinefh);
 
    $self->TransferFile($fh{appl_contact_rel},$filename{appl_contact_rel},
                        "appl_contact_rel");
@@ -867,10 +967,7 @@ sub ApplicationModified
                        "ci_appl_rel");
    $self->TransferFile($fh{appl_appl_rel},$filename{appl_appl_rel},
                        "appl_appl_rel");
-   $self->TransferFile($fh{instance},$filename{instance},
-                       "instance");
    my $back=$self->TransferFile($fh{appl},$filename{appl},"appl");
-   close(AMTODO);
 
 # temp deakiv, da div. Schnittstellenprobleme noch nicht geklärt sind.
 #   $self->sendFileToAssetManagerOnlineInterface($onlinefilename,$elements);
@@ -922,7 +1019,6 @@ sub validateCostCenter4AssetManager
                   '11634953080001'  # vogler
                ]
             );
-            printf AMTODO ($msgtext);
          }
          
          
@@ -955,7 +1051,6 @@ sub validateCostCenter4AssetManager
                         '11634953080001'  # vogler
                      ]
                   );
-                  printf AMTODO ($msgtext);
                }
             }
             else{
@@ -978,7 +1073,6 @@ sub validateCostCenter4AssetManager
                            '11634953080001'  # vogler
                         ]
                      );
-                     printf AMTODO ($msgtext);
                   }
                }
                else{
@@ -1003,7 +1097,6 @@ sub validateCostCenter4AssetManager
                               '11634953080001'  # vogler
                            ]
                         );
-                        printf AMTODO ($msgtext);
                      }
                   }
                }
@@ -1031,7 +1124,6 @@ sub validateCostCenter4AssetManager
                      '11634953080001'  # vogler
                   ]
                );
-               printf AMTODO ($msgtext);
             }
          }
       }
@@ -1237,21 +1329,26 @@ sub TransferFile
    }
    if ($ftp->Connect()){
       msg(INFO,"Connect to FTP Server OK '$ftp'");
-      my $jobname="w5base.".$self->{jobstart}.".xml";
+      my $jobname="w5base.".$self->{jobstart}.".".sprintf("%08d",$$).".xml";
       my $jobfile="$object/$jobname";
       msg(INFO,"Processing  job : '%s'",$jobfile);
       msg(INFO,"Processing  file: '%s'",$filename);
       if (!$self->{DebugMode}){
          my $transferOK=0;
-         if (!defined($ftp->Put($filename,$jobfile))){
-            msg(ERROR,"File $filename to $jobfile could not be transfered:".
-                      " $?, $!");
-            msg(ERROR,"FTP transfer failed at ".NowStamp("en")." GMT");
-            msg(ERROR,"trying to detect ftp error message ...");
-         #   my $s;
-         #   eval('$s=$ftp->size($jobfile);');
-         #   msg(ERROR,"size on remote site is $s ($@)");
-         #   msg(ERROR,"... detecting error message done.");
+         if ($self->Config->Param("W5BaseOperationMode") ne "dev"){
+            if (!defined($ftp->Put($filename,$jobfile))){
+               msg(ERROR,"File $filename to $jobfile could not be transfered:".
+                         " $?, $!");
+               msg(ERROR,"FTP transfer failed at ".NowStamp("en")." GMT");
+               msg(ERROR,"trying to detect ftp error message ...");
+            #   my $s;
+            #   eval('$s=$ftp->size($jobfile);');
+            #   msg(ERROR,"size on remote site is $s ($@)");
+            #   msg(ERROR,"... detecting error message done.");
+            }
+            else{
+               $transferOK++;
+            }
          }
          else{
             $transferOK++;
