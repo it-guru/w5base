@@ -191,7 +191,7 @@ sub processFile
       my $recno=shift;
       my %rec;
 
-      #print STDERR Dumper($recbuf);
+      print STDERR Dumper($recbuf);
       if ($#{$recbuf}<1){
          return(undef);
       }
@@ -209,17 +209,19 @@ sub processFile
          }
          my @content;
          for(my $row=1;$row<=$#{$recbuf};$row++){
-            my @c=split(/;/,$recbuf->[$row]);
-            my %crec;
-            for(my $c=0;$c<=$#structContent;$c++){
-               $crec{$structContent[$c]}=$c[$c]; 
+            if ($recbuf->[$row] ne "NV"){
+               my @c=split(/;/,$recbuf->[$row]);
+               my %crec;
+               for(my $c=0;$c<=$#structContent;$c++){
+                  $crec{$structContent[$c]}=$c[$c]; 
+               }
+               push(@content,\%crec);
             }
-            push(@content,\%crec);
          }
          $rec{content}=\@content;
       }
-      #print STDERR "recno=$recno\n";
-      #print STDERR Dumper(\%rec);
+      print STDERR "recno=$recno\n";
+      print STDERR Dumper(\%rec);
       return(\%rec);
    }
 
