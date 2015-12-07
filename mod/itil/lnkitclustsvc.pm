@@ -262,6 +262,14 @@ sub new
                 label         =>'W5Base Cluster ID',
                 dataobjattr   =>'qlnkitclustsvc.itclust'),
 
+      new kernel::Field::Text(
+                name          =>'clusterid',
+                htmldetail    =>0,
+                uploadable    =>0,
+                readonly      =>1,
+                label         =>'ClusterID',
+                dataobjattr   =>'itclust.itclustid'),
+
       new kernel::Field::SubList(
                 name          =>'software',
                 label         =>'Software',
