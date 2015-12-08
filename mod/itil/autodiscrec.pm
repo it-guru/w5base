@@ -142,6 +142,13 @@ sub new
                 label         =>'discovered on SystemID',
                 dataobjattr   =>'autodiscent.discon_system'),
 
+      new kernel::Field::Link(
+                name          =>'disc_on_swinstanceid',
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'discovered on InstanceID',
+                dataobjattr   =>'autodiscent.discon_swinstance'),
+
       new kernel::Field::Text(
                 name          =>'lnkto_lnksoftware',
                 sqlorder      =>'desc',
