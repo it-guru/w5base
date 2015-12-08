@@ -63,3 +63,25 @@
 'disclaimer'=>{
    de=>'Die Daten dürfen nur gebunden an den vereinbarten Zweck und innerhalb der definierten Applikation verarbeitet werden. Eine Weitergabe an andere Applikationen ist nur mit schriftlicher Zustimmung erlaubt. Die Partnerapplikation bestätigt, dass zum Zeitpunkt der Unterschrift und auch darüber hinaus jederzeit die Konzernvorgaben eingehalten werden und dass im speziellen die BR-Freigabe und das SDSK jederzeit aktuell und freigegeben vorliegt. Die Schnittstellenpartner behalten sich vor, diese Schnittstelle bei Nichteinhalten der Vereinbarungen oder bei gravierenden technischen Beeinträchtigungen abzuschalten.',
    en=>'The usage of data is only allowed for the agreed purpose and to be processed within the defined application. The disclosure of data to other applications is only allowed with written permission. The partner application confirms that all corporate guidelines are met at the time of signature and in the future and that especially the Working-Council release and the Standardized Data Privacy & Security Concept (SDSK) are always available and up to date. The interface partners reserve the right to disconnect this interface in case of non-compliance to the agreements, or in case of major technical drawbacks.'},
+'Dear Databoss'=>{de=>'Sehr geehrter Datenverantwortlicher'},
+'New Application interface to %s'=>{
+   de=>'Neue Anwendungsschnittstelle zu %s'
+},
+'An application interface to %s has been deleted'=>{
+   de=>'Eine Anwendungsschnittstelle zu %s wurde gelöscht'
+},
+'The status of Application interface to %s has been changed'=>{
+   de=>'Der Status einer Anwendungsschnittstelle zu %s wurde geändert'
+},
+"the application '%s' has deleted an application interface to '%s' on its side."=>{
+   de=>"die Anwendung '%s' hat auf ihrer Seite eine Anwendungsschnittstelle zu '%s' gelöscht."
+},
+"the application '%s' has on its side a new application interface to '%s' documented."=>{
+   de=>"die Anwendung '%s' hat auf ihrer Seite eine neue Anwendungsschnittstelle zu '%s' angelegt."
+},
+"the application '%s' has changed the status of an application interface to '%s'."=>{
+   de=>"die Anwendung '%s' hat auf ihrer Seite den Status einer Anwendungsschnittstelle zu '%s' geändert."
+},
+"Please perform the possibly needful modifications of the interface documentation at the application '%s'."=>{
+   de=>"Bitte führen Sie die evtl. notwendigen Anpassungen der Schnittstellendokumentation an der Anwendung '%s' durch."
+},
