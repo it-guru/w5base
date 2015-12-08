@@ -972,7 +972,7 @@ sub StartW5ServerProcess
    my $srvsub;
    my $srvcode=<<EOF;
       my \$tasks=\$self->getTasksHash();  # this should be done in RPC::Server,
-      \$tasks={};                         # but at this position, i didnt need
+      \%{\$tasks}=();                     # but at this position, i didnt need
                                           # a module update
       \$0="W5Sserver-".\$server;
       my \$orgpid=\$\$;
