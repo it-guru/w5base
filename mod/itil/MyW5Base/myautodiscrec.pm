@@ -74,6 +74,10 @@ sub Result
       push(@flt,{disc_on_systemid=>\@sysid,state=>\'1'});
    }
 
+   if ($#flt==-1){ # dummy filter to get sure no result
+      push(@flt,{disc_on_systemid=>[-1],disc_on_swinstanceid=>[-1]});
+   }
+
    print $self->{DataObj}->HtmlAutoDiscManager({
       filterTypes=>0,
       allowReload=>0
