@@ -113,16 +113,29 @@ sub ProcessServiceManagerRecord
       if ($chkname eq ""){ # siehe WF:13397595390001
          return;
       }
-      if (!defined($updateto) || $updateto eq ""){
-         my $eventend=$wfstorerec->{eventend};
-         my $eventstart=$wfstorerec->{eventstart};
-         if ($eventend ne "" && $eventstart ne ""){
-            my $duration=CalcDateDuration($eventstart,$eventend);
-            if ($duration->{totalseconds}<0){ # siehe WF:13397595390001
-               return;
-            }
+      #######################################################################
+      # Buggi Timestamp handling for SM9 rotz
+      $wfstorerec->{eventstart}=undef if ($wfstorerec->{eventstart}=~
+                                          m/^4000-01-01 /);
+      $wfstorerec->{eventend}=undef if ($wfstorerec->{eventend}=~
+                                          m/^4000-01-01 /);
+      if (!defined($wfstorerec->{eventstart}) &&
+          defined($wfstorerec->{eventend})){
+         $wfstorerec->{eventstart}=$wfstorerec->{eventend}
+      }
+      
+      my $eventend=$wfstorerec->{eventend};
+      my $eventstart=$wfstorerec->{eventstart};
+      if ($eventend ne "" && $eventstart ne ""){
+         my $duration=CalcDateDuration($eventstart,$eventend);
+         if ($duration->{totalseconds}<0){ 
+            $wfstorerec->{eventstart}=$wfstorerec->{eventend};
+            # this fix sets the start to the end, if end is bevor start.
+            # (this handles data junk from SM9)
          }
-         #
+      }
+      #######################################################################
+      if (!defined($updateto) || $updateto eq ""){
          msg(DEBUG,"PROCESS: try to create new workflow entry");
          if (my $id=$wf->Store(undef,$wfstorerec)){
             msg(DEBUG,"workflow id=%s created",$id);
