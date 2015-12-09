@@ -328,7 +328,7 @@ sub Validate
           effChanged($oldrec,$newrec,"scanextra1") ||
           effChanged($oldrec,$newrec,"scanextra2") ||
           effChanged($oldrec,$newrec,"scanextra3")){
-         if (defined($oldrec)){
+         if (defined($oldrec) && $oldrec->{state}>1){
             printf STDERR ("AutoDiscRec - scandata in autodiscrec '%s' ".
                            "has been changed!\n",effVal($oldrec,$newrec,"id"));
          }
