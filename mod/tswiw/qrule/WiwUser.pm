@@ -133,12 +133,12 @@ sub qcheckRecord
                      {userid=>\$rec->{userid}}); # try to use found posix
          }
       }
-      if ($wiwrec->{surname}=~m/_duplicate_/i){
+      if (($wiwrec->{surname}=~m/_duplicate_/i) && $rec->{cistatusid} ne "6"){
             $dataobj->Log(ERROR,"basedata",
-                   "Duplicate_ entry detected. The Contact '%s'\n".
+                   "Duplicate_ entry detected. The Contact '%s' (%s)\n".
                    "will be marked as delete\n-",
                    "\n-",
-                   $rec->{fullname});
+                   $rec->{fullname},$rec->{userid});
             my $user=getModuleObject($self->getParent->Config(),
                                       "base::user");
             $user->ValidatedUpdateRecord($rec,
