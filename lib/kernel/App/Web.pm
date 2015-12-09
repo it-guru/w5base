@@ -87,6 +87,10 @@ sub RunWebApp
    return if (!$W5V2::ObjCache{$objectkey}->InitRequest(cgi=>$cgi));
 
    my $bk=$W5V2::ObjCache{$objectkey}->Run();
+   if ($W5V2::InvalidateGroupCache){
+      $W5V2::ObjCache{$objectkey}->InvalidateGroupCache();
+   }
+
    if ($havestate ne ""){
       unlink($havestate);
    }

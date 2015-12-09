@@ -269,11 +269,13 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
+                readonly      =>1,
                 dataobjattr   =>"grp.modifydate"),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
+                readonly      =>1,
                 label         =>'secondary sync key',
                 dataobjattr   =>"lpad(grp.grpid,35,0)"),
 
@@ -677,7 +679,8 @@ sub FinishWrite
    # $self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}});
    $self->NotifyOnCIStatusChange($oldrec,$newrec);
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
-   $self->InvalidateGroupCache();
+  # $self->InvalidateGroupCache();
+   $W5V2::InvalidateGroupCache++;
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
