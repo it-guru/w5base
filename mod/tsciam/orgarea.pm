@@ -107,6 +107,13 @@ sub new
                                                  active=>'true'},
                                    vjoindisp  =>['fullname']),
 
+      new kernel::Field::SubList(  name       =>'subunits',
+                                   label      =>'Subunits',
+                                   group      =>'subunits',
+                                   vjointo    =>'tsciam::orgarea',
+                                   vjoinon    =>['toucid'=>'parentid'],
+                                   vjoindisp  =>['shortname','name']),
+
       new kernel::Field::TextDrop( name       =>'parent',
                                    label      =>'Parentgroup (tOuSuperior)',
                                    vjointo    =>'tsciam::orgarea',
@@ -243,7 +250,7 @@ sub doParentFix
       print("ERROR: no grpid sumited");
       return();
    }
-   my $wiw=getModuleObject($self->Config,"tswiw::orgarea");
+   my $ciam=getModuleObject($self->Config,"tsciam::orgarea");
    my $grp=getModuleObject($self->Config,"base::grp");
 
    #
@@ -261,13 +268,13 @@ sub doParentFix
       return();
    }
    #
-   # load current parent from wiw
+   # load current parent from ciam
    #
-   $wiw->SecureSetFilter({touid=>\$grprec->{srcid}});
-   my ($wiwrec)=$wiw->getOnlyFirst(qw(parentid));
+   $ciam->SecureSetFilter({toucid=>\$grprec->{srcid}});
+   my ($ciamrec)=$ciam->getOnlyFirst(qw(parentid));
 
-   if ($wiwrec->{parentid} eq ""){
-      print("ERROR: no parentid found in wiw");
+   if ($ciamrec->{parentid} eq ""){
+      print("ERROR: no parentid found in ciam");
       return();
    }
 
@@ -275,12 +282,12 @@ sub doParentFix
    # find new parent fullname
    #
    $grp->ResetFilter();
-   $grp->SecureSetFilter({srcid=>\$wiwrec->{parentid},srcsys=>\'WhoIsWho'});
+   $grp->SecureSetFilter({srcid=>\$ciamrec->{parentid},srcsys=>\'CIAM'});
    my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
    if (!defined($pgrprec)){
-      $self->Import({importname=>$wiwrec->{parentid}});
+      $self->Import({importname=>$ciamrec->{parentid}});
       $grp->ResetFilter();
-      $grp->SecureSetFilter({srcid=>\$wiwrec->{parentid},srcsys=>\'WhoIsWho'});
+      $grp->SecureSetFilter({srcid=>\$ciamrec->{parentid},srcsys=>\'CIAM'});
       my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
       if (!defined($pgrprec)){
          if (!$self->LastMsg()){
@@ -331,28 +338,28 @@ sub Import
       return(undef);
    }
    my @idimp;
-   my $wiw=getModuleObject($self->Config,"tswiw::orgarea");
+   my $ciam=getModuleObject($self->Config,"tsciam::orgarea");
    my $grp=getModuleObject($self->Config,"base::grp");
 
    my $ok=0;
    my $chkid=$orgid;
    while($#idimp<20){
-      $wiw->ResetFilter();
-      $wiw->SetFilter({touid=>\$chkid});
-      my ($wiwrec)=$wiw->getOnlyFirst(qw(ALL));
-      if (defined($wiwrec)){
+      $ciam->ResetFilter();
+      $ciam->SetFilter({toucid=>\$chkid});
+      my ($ciamrec)=$ciam->getOnlyFirst(qw(ALL));
+      if (defined($ciamrec)){
          $grp->ResetFilter();
-         $grp->SetFilter({srcid=>\$wiwrec->{touid},srcsys=>\'WhoIsWho'});
+         $grp->SetFilter({srcid=>\$ciamrec->{toucid},srcsys=>\'CIAM'});
          my ($grprec)=$grp->getOnlyFirst(qw(ALL));
          if (defined($grprec)){ # ok, grp already exists in W5Base
-            $self->LastMsg(INFO,"$wiwrec->{touid} = $grprec->{fullname}");
+            $self->LastMsg(INFO,"$ciamrec->{toucid} = $grprec->{fullname}");
             last;
          }
          else{
-            msg(INFO,"wiwid $wiwrec->{touid} not found in W5Base");
-            push(@idimp,$wiwrec->{touid});
+            msg(INFO,"ciamid $ciamrec->{toucid} not found in W5Base");
+            push(@idimp,$ciamrec->{toucid});
          }
-         $chkid=$wiwrec->{parentid};
+         $chkid=$ciamrec->{parentid};
          last if ($chkid eq "");
       }
       else{
@@ -360,16 +367,16 @@ sub Import
          return(undef);
       }
    }
-   foreach my $wiwid (reverse(@idimp)){
-      $wiw->ResetFilter();
-      $wiw->SetFilter({touid=>\$wiwid});
-      my ($wiwrec)=$wiw->getOnlyFirst(qw(ALL));
-      if (defined($wiwrec)){
+   foreach my $ciamid (reverse(@idimp)){
+      $ciam->ResetFilter();
+      $ciam->SetFilter({toucid=>\$ciamid});
+      my ($ciamrec)=$ciam->getOnlyFirst(qw(ALL));
+      if (defined($ciamrec)){
          my $grprec;
          $grp->ResetFilter();
-         if ($wiwrec->{parentid} ne ""){
-            $grp->SetFilter({srcid=>\$wiwrec->{parentid},
-                             srcsys=>\'WhoIsWho'});
+         if ($ciamrec->{parentid} ne ""){
+            $grp->SetFilter({srcid=>\$ciamrec->{parentid},
+                             srcsys=>\'CIAM'});
          }
          else{
             $grp->SetFilter({fullname=>\'DTAG.TSI'});
@@ -377,22 +384,22 @@ sub Import
          my ($grprec)=$grp->getOnlyFirst(qw(ALL));
          if (defined($grprec)){
 
-            my $newname=$wiwrec->{shortname};
+            my $newname=$ciamrec->{shortname};
             if ($newname eq ""){
                $self->LastMsg(ERROR,"no shortname for ".
-                                    "id '$wiwrec->{touid}' found");
+                                    "id '$ciamrec->{toucid}' found");
                return(undef);
             }
             $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
             $newname=~s/&/_u_/g;
             my %newgrp=(name=>$newname,
-                        srcsys=>'WhoIsWho',
-                        srcid=>$wiwrec->{touid},
+                        srcsys=>'CIAM',
+                        srcid=>$ciamrec->{toucid},
                         parentid=>$grprec->{grpid},
                         cistatusid=>4,
                         srcload=>NowStamp(),
                         comments=>"Description from WhoIsWho: ".
-                                  $wiwrec->{name});
+                                  $ciamrec->{name});
             msg(DEBUG,"Write=%s",Dumper(\%newgrp));
             if (my $back=$grp->ValidatedInsertRecord(\%newgrp)){
                $ok++;    
@@ -405,12 +412,12 @@ sub Import
                }
            
             }
-           # printf STDERR ("wiwrec=%s\n",Dumper($wiwrec));
+           # printf STDERR ("ciamrec=%s\n",Dumper($ciamrec));
            # printf STDERR ("grprec=%s\n",Dumper($grprec));
-           # printf STDERR ("fifi importing $wiwid\n");
+           # printf STDERR ("fifi importing $ciamid\n");
          }
          else{
-            printf STDERR ("fifi parentid $wiwrec->{parentid} not found\n");
+            printf STDERR ("fifi parentid $ciamrec->{parentid} not found\n");
          }
       }
    }

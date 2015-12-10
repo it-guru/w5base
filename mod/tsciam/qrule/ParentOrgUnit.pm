@@ -66,14 +66,16 @@ sub qcheckRecord
          my $ciam=getModuleObject($self->getParent->Config(),"tsciam::orgarea");
          $ciam->SetFilter({toucid=>\$rec->{srcid}});
          my ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
+       #  if (defined($ciamrec) &&
+       #      $ciamrec->{parentid} eq "15129408" ){ # TSI Vorstand wird 
+       #                                            # übersprungen
+       #     $ciam->ResetFilter();
+       #     $ciam->SetFilter({toucid=>\$ciamrec->{parentid}});
+       #     ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
+       #  }
          if (!defined($ciamrec)){
             push(@qmsg,"orgunit id not found in CIAM");
             return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
-         }
-         if ($ciamrec->{toucid} eq "15131753" ){   # DTAG.TSI hängt in CIAM
-                                                   # NICHT direkt unter DTAG
-                                                   # - das kann somit nicht
-                                                   # geprüft werden
          }
          else{
             my $grp=getModuleObject($self->getParent->Config(),"base::grp");
@@ -87,10 +89,10 @@ sub qcheckRecord
             }
             else{
                my $parentid=$ciamrec->{parentid};
-               if ($rec->{fullname} eq "DTAG.TSI.INT"){
-                  # bind LBUs direct to T-Systems International
-                  $parentid="15131753";
-               }
+       #        if ($rec->{fullname} eq "DTAG.TSI.INT"){
+       #           # bind LBUs direct to T-Systems International
+       #           $parentid="15131753";
+       #        }
                if ($parentid ne ""){
                   my $grp=getModuleObject($self->getParent->Config(),
                                           "base::grp");
@@ -100,7 +102,16 @@ sub qcheckRecord
                   my ($prec,$msg)=$grp->getOnlyFirst(qw(ALL));
                   if (!defined($prec)){
                      push(@qmsg,"parent unit in CIAM doesn't matches");
-                     push(@qmsg,"parent tOuCID in CIAM is: ",$parentid);
+                     $grp->ResetFilter();
+                     $grp->SetFilter({srcid=>\$parentid,srcsys=>\'CIAM'});
+                     my ($pgrprec,$msg)=$grp->getOnlyFirst(qw(ALL));
+                     if (defined($pgrprec)){
+                        push(@qmsg,"parent group as of CIAM is: ".
+                                   $pgrprec->{fullname});
+                     }
+                     else{
+                        push(@qmsg,"parent tOuCID in CIAM is: ",$parentid);
+                     }
                      return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
                   }
                }

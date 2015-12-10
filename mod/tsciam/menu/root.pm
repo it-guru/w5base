@@ -47,6 +47,16 @@ sub Init
                       "tsciam::orgarea",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.grp.ciamimport",
+                      "tsciam::orgarea",
+                      func=>'ImportOrgarea',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("sysadm.grp.ciampfix",
+                      "tsciam::orgarea",
+                      func=>'ParentGroupFix',
+                      defaultacl=>['admin']);
+
    return(1);
 }
 

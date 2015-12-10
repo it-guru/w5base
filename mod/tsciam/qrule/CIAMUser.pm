@@ -258,9 +258,9 @@ sub qcheckRecord
           }
           $ciamdata->{$fld}=rmNonLatin1($ciamdata->{$fld});
 
-          $self->IfaceCompare($dataobj,
+          $self->IfComp($dataobj,
                      $rec,$fld,
-                     $ciamdata,$fld,
+                     $ciamdata,$fld,0,
                      $forcedupd,$wfrequest,
                      \@qmsg,\@dataissue,\$errorlevel,
                      mode=>'string');
