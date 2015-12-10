@@ -61,9 +61,11 @@ sub getDescription
    my $selfname=$self->Self();
    $selfname=~s/::/\//g;
    my $filename=$instdir."/mod/${selfname}.pm";
-   my $html=`cd /tmp && pod2html --title none --noheader --noindex --infile=$filename`;
+   my $html=`cd /tmp && 
+             pod2html --title none --noheader --noindex --infile=$filename`;
    ($html)=$html=~m/<body[^>]*>(.*)<\/body>/smi;
    $html=~s/<p>\s*<\/p>//smi;
+   $html=~s/^\s*#.*$//gmi;
    $html=~s/<p><a name="__index__"><\/a><\/p>//smi;
 
    return($html);
