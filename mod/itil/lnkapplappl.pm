@@ -425,6 +425,65 @@ sub getRecordImageUrl
 }
 
 
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+
+   my $mode;
+   my ($applrec,$msg);
+
+   my $toapplChanged=0;
+   if (defined($oldrec) && effChanged($oldrec,$newrec,'toapplid')) {
+      $toapplChanged=1;
+   }
+
+   my $applobj=getModuleObject($self->Config,'itil::appl');
+
+   if (exists($newrec->{toapplid}) && 
+       (!defined($oldrec) || $toapplChanged)) {
+      $mode='InterfaceNew';
+   }
+   elsif (effChanged($oldrec,$newrec,'cistatusid')) {
+      $mode='InterfaceUpdate';
+      $newrec->{id}=$oldrec->{id} if (!defined($newrec->{id}));
+   }
+
+   if ($mode ne "") {
+      $applobj->SetFilter({id=>\$newrec->{fromapplid}});
+      ($applrec,$msg)=$applobj->getOnlyFirst(qw(name));
+      $newrec->{fromappl}=$applrec->{name};
+
+      $applobj->ResetFilter();
+      $applobj->SetFilter({id=>\$newrec->{toapplid}});
+      ($applrec,$msg)=$applobj->getOnlyFirst(qw(databossid contacts name));
+      $newrec->{toappl}=$applrec->{name};
+
+      $self->SetFilter({id=>$newrec->{id}});
+      my ($lnk,$msg)=$self->getOnlyFirst(qw(cistatus));
+      $newrec->{cistatus}=$lnk->{cistatus};
+
+      $applobj->NotifyWriteAuthorizedContacts($applrec,undef,
+                   {},{rec=>$newrec,mode=>$mode},
+                   \&NotifyIfPartner);
+   }
+
+   if ($toapplChanged) {
+      $applobj->ResetFilter();
+      $applobj->SetFilter({id=>\$oldrec->{toapplid}});
+      ($applrec,$msg)=$applobj->getOnlyFirst(qw(databossid contacts));
+      
+      $applobj->NotifyWriteAuthorizedContacts($applrec,undef,
+                   {},{rec=>$oldrec,mode=>'InterfaceDeleted'},
+                   \&NotifyIfPartner); 
+   }
+
+   return($bak);
+}
+
+
 sub FinishDelete
 {
    my $self=shift;
@@ -434,12 +493,101 @@ sub FinishDelete
    my $appl=getModuleObject($self->Config,'itil::appl');
    $appl->SetFilter({id=>\$oldrec->{toapplid}});
    my ($toappl,$msg)=$appl->getOnlyFirst(qw(databossid contacts));
+   $appl->NotifyWriteAuthorizedContacts($toappl,undef,
+             {},{rec=>$oldrec,mode=>'InterfaceDeleted'},
+             \&NotifyIfPartner);
 
-   $appl->NotifyWriteAuthorizedContacts($toappl,undef,{},
-                                        {rec=>$oldrec,
-                                         mode=>'InterfaceDeleted'},
-                                        \&NotifyIfPartner);
    return($bak);
+}
+ 
+
+sub NotifyIfPartner
+{
+   my $self=shift;
+   my $notifyparam=shift;
+   my $notifycontrol=shift;
+   my $subject;
+   my $text;
+
+   return(undef) if (ref($notifycontrol->{rec}) ne 'HASH');
+   my %rec=%{$notifycontrol->{rec}};
+
+   my $lnkobj=getModuleObject($self->Config,'itil::lnkapplappl');
+
+   # key = contype of fromappl
+   # val = possible contypes of toappl
+   my %contypeMap=(0=>[0,3],1=>[2,5],2=>[1,4],
+                   3=>[3,0],4=>[2,5],5=>[1,4]);
+
+   my %flt=(fromapplid=>\$rec{toapplid},
+            fromapplcistatus=>[3,4,5],
+            toapplid=>\$rec{fromapplid},
+            conproto=>\$rec{conproto},
+            contype=>$contypeMap{$rec{contype}},
+            cistatusid=>\'<6');
+
+   my $ifparam=$self->T('Interfacetype').': ';
+   $ifparam.=$self->T('contype.'.$rec{contype})."\n";
+   $ifparam.=$self->T('Interfaceprotocol').': ';
+   $ifparam.=$rec{conproto}."\n";
+   $ifparam.=$self->T('Interfacemode').': ';
+   $ifparam.=$rec{conmode}."\n";
+   $ifparam.=$self->T('Interface-State').': ';
+   $ifparam.=$rec{cistatus};
+
+   my $todomsg=sprintf($self->T("Please perform the possibly needful ".
+                                "modifications of the interface ".
+                                "documentation at the application '%s'."),
+                       $rec{toappl});
+   $text=$self->T("Dear Databoss").",\n\n";
+   if ($notifycontrol->{mode} eq 'InterfaceNew') {
+      $lnkobj->SetFilter(\%flt);
+      return(undef) if ($lnkobj->CountRecords()!=0);
+
+      $subject=sprintf($self->T("New Application interface to %s"),
+                       $rec{toappl});
+      $text.=sprintf($self->T("the application '%s' has on its side a new ".
+                              "application interface to '%s' documented."),
+                     $rec{fromappl},$rec{toappl});
+      $text.="\n\n";
+      $text.=$ifparam;
+      $text.="\n\n";
+      $text.=$todomsg;
+   }
+
+   if ($notifycontrol->{mode} eq 'InterfaceUpdate') {
+      $lnkobj->SetFilter(\%flt);
+      return(undef) if ($lnkobj->CountRecords()<1);
+     
+      $subject=sprintf($self->T("The status of Application interface ".
+                                "to %s has been changed"),
+                       $rec{toappl});
+      $text.=sprintf($self->T("the application '%s' has changed the status ".
+                              "of an application interface to '%s'."),
+                     $rec{fromappl},$rec{toappl});
+      $text.="\n\n";
+      $text.=$ifparam;
+      $text.="\n\n";
+      $text.=$todomsg;
+   }
+
+   if ($notifycontrol->{mode} eq 'InterfaceDeleted') {
+      $lnkobj->SetFilter(\%flt);
+      return(undef) if ($lnkobj->CountRecords()<1);
+
+      $subject=sprintf($self->T("An application interface ".
+                                "to %s has been deleted"),
+                       $rec{toappl});
+      $text.=sprintf($self->T("the application '%s' has deleted an ".
+                              "application interface to '%s' on its side."),
+                     $rec{fromappl},$rec{toappl});
+      $text.="\n\n";
+      $text.=$ifparam;
+      $text.="\n\n";
+      $text.=$todomsg;
+   }
+
+   return(($subject,$text));
 }
 
 
@@ -557,130 +705,7 @@ sub Validate
    }
 
 
-   # notify Interface partner, if new Interface or cistatus has changed
-   my $applobj=getModuleObject($self->Config,"itil::appl");
-   $applobj->SetFilter({id=>\$newrec->{toapplid}});
-   my ($applrec,$msg)=$applobj->getOnlyFirst(qw(databossid contacts));
-
-   my $mode;
-
-   if (exists($newrec->{toapplid}) && 
-       (!defined($oldrec) || $oldrec->{toapplid}!=$toapplid)) {
-      $mode='InterfaceNew';
-   }
-   elsif (effChanged($oldrec,$newrec,'cistatusid')) {
-      $mode='InterfaceUpdate';
-   }
-
-   if ($mode ne "") {
-      $applobj->NotifyWriteAuthorizedContacts($applrec,undef,{},
-         {rec=>$newrec,
-          mode=>$mode},
-         \&NotifyIfPartner
-      );
-   }
-
    return(1);
-}
- 
-
-sub NotifyIfPartner
-{
-   my $self=shift;
-   my $notifyparam=shift;
-   my $notifycontrol=shift;
-   my $subject;
-   my $text;
-
-   return(undef) if (ref($notifycontrol->{rec}) ne 'HASH');
-   my %rec=%{$notifycontrol->{rec}};
-
-   my $lnkapplappl=getModuleObject($self->Config,'itil::lnkapplappl');
-   my $applobj=getModuleObject($self->Config,'itil::appl');
-
-   my $applobj=getModuleObject($self->Config,'itil::appl');
-   my $cistatusobj=getModuleObject($self->Config,'base::cistatus');
-   $cistatusobj->SetFilter({id=>$rec{cistatusid}});
-   my ($cistatus)=$cistatusobj->getOnlyFirst(qw(name));
-      
-   my $fromappl;
-   my $toappl;
-   my ($appl,$msg);
-   $applobj->SetFilter({id=>$rec{fromapplid}});
-   ($appl,$msg)=$applobj->getOnlyFirst(qw(name));
-   $fromappl=$appl->{name};
-   $applobj->ResetFilter();
-   $applobj->SetFilter({id=>$rec{toapplid}});
-   ($appl,$msg)=$applobj->getOnlyFirst(qw(name));
-   $toappl=$appl->{name};
-
-   my %flt=(fromapplid=>\$rec{toapplid},
-            fromapplcistatus=>[3,4,5],
-            toapplid=>\$rec{fromapplid},
-            cistatusid=>\'<6');
-
-   my $ifparam=$self->T('Interfacetype').': ';
-   $ifparam.=$self->T('contype.'.$rec{contype})."\n";
-   $ifparam.=$self->T('Interfaceprotocol').': ';
-   $ifparam.=$rec{conproto}."\n";
-   $ifparam.=$self->T('Interfacemode').': ';
-   $ifparam.=$rec{conmode}."\n";
-   $ifparam.=$self->T('Interface-State').': ';
-   $ifparam.=$cistatus->{name};
-
-   my $todomsg=sprintf($self->T("Please perform the possibly needful ".
-                                "modifications of the interface ".
-                                "documentation at the application '%s'."),
-                       $toappl);
-   $text=$self->T("Dear Databoss").",\n\n";
-   if ($notifycontrol->{mode} eq 'InterfaceNew') {
-      $lnkapplappl->SetFilter(\%flt);
-      return(undef) if ($lnkapplappl->CountRecords()!=0);
-
-      $subject=sprintf($self->T("New Application interface to %s"),
-                       $toappl);
-      $text.=sprintf($self->T("the application '%s' has on its side a new ".
-                              "application interface to '%s' documented."),
-                     $fromappl,$toappl);
-      $text.="\n\n";
-      $text.=$ifparam;
-      $text.="\n\n";
-      $text.=$todomsg;
-   }
-
-   if ($notifycontrol->{mode} eq 'InterfaceUpdate') {
-      $lnkapplappl->SetFilter(\%flt);
-      return(undef) if ($lnkapplappl->CountRecords()<1);
-     
-      $subject=sprintf($self->T("The status of Application interface ".
-                                "to %s has been changed"),
-                       $toappl);
-      $text.=sprintf($self->T("the application '%s' has changed the status ".
-                              "of an application interface to '%s'."),
-                     $fromappl,$toappl);
-      $text.="\n\n";
-      $text.=$ifparam;
-      $text.="\n\n";
-      $text.=$todomsg;
-   }
-
-   if ($notifycontrol->{mode} eq 'InterfaceDeleted') {
-      $lnkapplappl->SetFilter(\%flt);
-      return(undef) if ($lnkapplappl->CountRecords()<1);
-
-      $subject=sprintf($self->T("An application interface ".
-                                "to %s has been deleted"),
-                       $toappl);
-      $text.=sprintf($self->T("the application '%s' has deleted an ".
-                              "application interface to '%s' on its side."),
-                     $fromappl,$toappl);
-      $text.="\n\n";
-      $text.=$ifparam;
-      $text.="\n\n";
-      $text.=$todomsg;
-   }
-
-   return(($subject,$text));
 }
 
 
