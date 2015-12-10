@@ -8,6 +8,8 @@ use kernel::W5Server;
 use FileHandle;
 use POSIX;
 use vars (qw(@ISA));
+use File::Temp qw(tempfile);
+
 @ISA=qw(kernel::W5Server);
 
 sub new
@@ -22,6 +24,16 @@ sub new
 sub process
 {
    my $self=shift;
+
+   foreach my $sig (qw(__DIE__ __WARN__ INT)){
+      $SIG{$sig}=sub{
+          my @loc = caller();
+          $self->NotifyAdmin(
+              "Reporter DIE pid=$$:",join("\\n",@loc));
+          exit(1);
+      };
+   }
+
 
    while(1){
       $self->Reporter();
@@ -361,6 +373,59 @@ sub reload
    my $self=shift;
    $self->{doForceCleanup}++;
 }
+
+
+sub NotifyAdmin
+{
+   my $self=shift;
+   my $subject=shift;
+   my $text=shift;
+
+   my @sendmailpath=qw(/usr/local/sbin/sendmail 
+                       /sbin/sendmail 
+                       /usr/sbin/sendmail 
+                       /usr/lib/sendmail
+                       /usr/lib/sbin/sendmail);
+   my $sendmail=undef;
+   foreach my $s (@sendmailpath){
+      if (-x $s){
+         $sendmail=$s;
+         last;
+      }
+   }
+   if (!defined($sendmail)){
+      printf STDERR ("ERROR no sendmail found\n");
+      exit(1);
+   }
+
+   my $user=$self->Config->Param("W5SERVERSERVICE");
+   my $sitename=$self->Config->Param("SITENAME");
+   if ($user eq ""){
+      $user=$self->Config->Param("W5SERVERUSER");
+   }
+   if ($sitename ne ""){
+      $sitename="W5Server: $sitename";
+   }
+   else{
+      $sitename="W5Server";
+   }
+   $sitename=~s/["']//g;
+   $user="root" if ($user eq "");
+   my ($fh,$filename)=tempfile();
+   if (defined($fh)){
+      printf $fh ("cat << EOF | $sendmail -t\n");
+      printf $fh ("To: %s\n",$user);
+      printf $fh ("From: %s\n","\"$sitename\" <W5Server>");
+      printf $fh ("Subject: %s\n",$subject);
+      printf $fh ("Content-Type: text/plain; charset=\"iso-8859-1\"\n\n");
+      print $fh ($text);
+      print $fh "\nEOF\n";
+      close($fh);
+      system("sh $filename");
+      unlink($filename);
+   }
+}
+
 
 
 

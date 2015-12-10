@@ -1113,7 +1113,7 @@ sub sendSignalToAllRunningProcesses
 #   }
 #   sleep(1);
    my $tasks=$self->getTasksHash();
-print STDERR "sendSignalToAllRunningProcesses:".Dumper($tasks);
+   #print STDERR "sendSignalToAllRunningProcesses:".Dumper($tasks);
    foreach my $pid ($self->runningTasks()){
       msg(DEBUG,"send Signal($signal) to event at pid %s from '$0'",$pid);
       if (kill($signal,$pid)){
