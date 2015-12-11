@@ -343,6 +343,19 @@ sub slotHandler
                exit(0);
             }
             else{
+               my $joblog=getModuleObject($self->Config,"base::joblog");
+               if (defined($joblog)){
+                  my $id=$joblog->ValidatedInsertRecord({
+                     event=>$self->Self,
+                     name=>"JobStart:$task->{name}",
+                     exitcode=>0,
+                     pid=>$pid,
+                     exitstate=>'starting',
+                     exitmsg=>''});
+               }
+               else{
+                  die("fail to create joblog object");
+               }
                $self->broadcast("starting job $task->{name} at ".
                                 "slot $c on pid $pid");
                $slot->[$c]->{pid}=$pid;
