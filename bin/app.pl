@@ -20,6 +20,7 @@ use strict;
 use FindBin ;
 $W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
 $W5V2::OperationContext="WebFrontend";
+$W5V2::InvalidateGroupCache=0;
 $W5V2::HistoryComments=undef;
 if (defined(&{FindBin::again})){
    FindBin::again();
