@@ -27,9 +27,17 @@ sub process
 
    foreach my $sig (qw(__DIE__ __WARN__ INT)){
       $SIG{$sig}=sub{
-          my @loc = caller();
+          my $loc="";
+          my $max_depth = 30;
+          my $i = 1;
+
+          while ( (my @call_details = (caller($i++))) && ($i<$max_depth) ) {
+            $loc.=printf("$i $call_details[1]($call_details[2]) ".
+                         "in $call_details[3]\n");
+          }
+
           $self->NotifyAdmin(
-              "Reporter DIE pid=$$:",join("\\n",@loc));
+              "Reporter DIE pid=$$:",$loc);
           exit(1);
       };
    }

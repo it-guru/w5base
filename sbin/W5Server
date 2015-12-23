@@ -1031,8 +1031,8 @@ sub StartW5ServerProcess
           }
           if (\$sig eq "USR1"){
              \$SIG{\$sig}=sub{
-                 \$self->NotifyAdmin(
-                   "\$server usr1=NormalShutdown erhalten pid=\$orgpid:\$\$ \$0","usr1");
+                 #\$self->NotifyAdmin(
+                 #  "\$server usr1=NormalShutdown erhalten pid=\$orgpid:\$\$ \$0","usr1");
                 \$srv->{ServerGoesDown}=1;
              };
              next;
