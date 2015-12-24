@@ -32,8 +32,8 @@ sub process
           my $i = 1;
 
           while ( (my @call_details = (caller($i++))) && ($i<$max_depth) ) {
-            $loc.=printf("$i $call_details[1]($call_details[2]) ".
-                         "in $call_details[3]\n");
+            $loc.=sprintf("$i $call_details[1]($call_details[2]) ".
+                          "in $call_details[3]\n");
           }
 
           $self->NotifyAdmin(
