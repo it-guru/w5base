@@ -215,7 +215,7 @@ sub new
 
    );
    $self->{dontSendRemoteEvent}=1;
-   $self->setDefaultView(qw(cdate editor fullname newstate));
+   $self->setDefaultView(qw(cdate editor operation fullname newstate));
    $self->setWorktable("history");
    return($self);
 }

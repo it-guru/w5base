@@ -32,7 +32,13 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{Worktable}="AL_TCom_appl_aegmgmt";
    $self->{useMenuFullnameAsACL}=$self->Self;
-   $self->{history}=[qw(insert modify delete)];
+
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
+
    my ($worktable,$workdb)=$self->getWorktable();
 
    $self->AddFields(

@@ -95,7 +95,11 @@ sub new
                                     customerprio criticality)]));
 
    $self->AddGroup("appldata",translation=>'itil::chmmgmt');
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{use_distinct}=1;
    $self->setDefaultView(qw(name mandator cistatus chmgrteam));
    $self->setWorktable("appl");

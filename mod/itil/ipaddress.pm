@@ -552,6 +552,21 @@ sub new
                 label         =>'secondary sync key',
                 dataobjattr   =>"lpad(ipaddress.id,35,'0')")
    );
+   $self->{history}={
+      insert=>[
+         'local',
+         {dataobj=>'itil::system', id=>'systemid',
+          field=>'name',as=>'ipaddresses'}
+      ],
+      update=>[
+         'local',
+         {dataobj=>'itil::system', id=>'systemid'}
+      ],
+      delete=>[
+         {dataobj=>'itil::system', id=>'systemid',
+          field=>'fullname',as=>'ipaddresses'}
+      ]
+   };
    $self->setDefaultView(qw(name system dnsname cistatus mdate));
    $self->setWorktable("ipaddress");
    return($self);
@@ -606,7 +621,8 @@ sub Validate
       $newrec->{is_notdeleted}=undef;
    }
    my $is_monitoring=effVal($oldrec,$newrec,"is_monitoring");
-   if ($is_monitoring ne "1" && $is_monitoring ne ""){
+   if ($is_monitoring ne "1" && $is_monitoring ne "" &&
+       defined($oldrec) && $oldrec->{is_monitoring} ne "0"){
       $newrec->{is_monitoring}=undef;
    }
    ##################################################################
@@ -828,6 +844,7 @@ sub isViewValid
    if ($self->IsMemberOf("admin") ||
        $self->IsMemberOf("w5base.itil.ipaddress.read") ||
        $self->isParentReadable($rec->{systemid},$rec->{itclustsvcid})){
+      push(@def,"history");
       push(@def,"relatedto","further");
       push(@def,"dnsaliases",) if ($rec->{dnsname} ne "");
    }

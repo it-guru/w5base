@@ -108,8 +108,11 @@ sub new
    );
    $self->setDefaultView(qw(id name cistatus mdate cdate));
    $self->setWorktable("platform");
-   $self->{history}=[qw(insert modify delete)];
-
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.itil.platform"],
                          uniquesize=>128};

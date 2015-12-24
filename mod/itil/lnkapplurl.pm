@@ -29,9 +29,21 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-   $self->{history}=[qw(insert modify delete)];
-
-   
+   $self->{history}={
+      insert=>[
+         {dataobj=>'itil::appl', id=>'applid',
+          field=>'name',as=>'applurl'}
+      ],
+      update=>[
+         'local',
+         {dataobj=>'itil::appl', id=>'applid',
+          field=>'name',as=>'applurl'}
+      ],
+      delete=>[
+         {dataobj=>'itil::appl', id=>'applid',
+          field=>'name',as=>'applurl'}
+      ]
+   };
 
    $self->AddFields(
       new kernel::Field::Linenumber(

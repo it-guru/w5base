@@ -111,7 +111,11 @@ sub new
    );
    $self->setDefaultView(qw(name description phase perftype mdate));
    $self->setWorktable("interface_tssapp01_gpk");
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    return($self);
 }
 

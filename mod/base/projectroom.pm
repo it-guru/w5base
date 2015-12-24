@@ -281,7 +281,11 @@ sub new
    $self->{workflowlink}={ workflowkey=>[id=>'affectedprojectid']
                          };
    $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
-   $self->{history}=[qw(modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(linenumber name projectname 
                             cistatus mandator mdate));
    $self->setWorktable("projectroom");

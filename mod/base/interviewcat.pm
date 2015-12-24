@@ -184,7 +184,12 @@ sub new
                 label         =>'ParentID',
                 dataobjattr   =>'interviewcat.parentid'),
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
+
    $self->{locktables}="interviewcat write, history write, iomap write, ".
                        "grp write";
    $self->setDefaultView(qw(fullname interviewcatid editor comments));

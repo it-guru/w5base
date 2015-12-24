@@ -811,8 +811,11 @@ sub new
    $self->LoadSubObjsOnDemand("workflow");
    $self->setDefaultView(qw(id class state name editor));
    $self->{ResultLineClickHandler}="Process";
-   $self->{history}=[qw(insert modify delete)];
-
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    return($self);
 }
 

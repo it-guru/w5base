@@ -1347,8 +1347,11 @@ sub new
                 dataobjattr   =>'lnkcontactcroles'),
 
    );
-   $self->{history}=[qw(insert modify delete)];
-
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(fullname cistatus application));
    return($self);
 }

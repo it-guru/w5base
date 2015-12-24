@@ -194,7 +194,11 @@ sub new
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.itil.licproduct"],
                          uniquesize=>120};
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
 
    $self->setWorktable("licproduct");
    return($self);

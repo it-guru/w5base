@@ -176,7 +176,11 @@ sub new
    $self->getField("cicistatusid")->{dataobjattr}='system.cistatus';
    $self->getField("mandatorid")->{dataobjattr}='system.mandator';
    $self->getField("databossid")->{dataobjattr}='system.databoss';
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(software version quantity system cdate));
    return($self);
 }

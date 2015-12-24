@@ -344,7 +344,11 @@ sub new
                 dataobjattr   =>'lnkcontact.targetid'),
 
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{use_distinct}=1;
 
    $self->setDefaultView(qw(system name cistatus mdate comments));

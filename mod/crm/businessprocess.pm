@@ -328,7 +328,12 @@ sub new
    );
    $self->setDefaultView(qw(linenumber selector cistatus importance));
    $self->setWorktable("businessprocess");
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
+
    $self->{workflowlink}={ workflowkey=>[id=>'affectedbusinessprocessid']
                          };
    $self->{use_distinct}=1;

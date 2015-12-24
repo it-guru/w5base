@@ -297,7 +297,11 @@ sub new
    $self->{workflowlink}->{workflowtyp}=[qw(base::workflow::DataIssue
                                             base::workflow::mailsend)];
 
-   $self->{history}=[qw(modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(linenumber fullname cistatus mandator mdate));
    $self->setWorktable("itclust");
    return($self);

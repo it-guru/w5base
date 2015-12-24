@@ -291,7 +291,11 @@ sub new
                 dataobjattr   =>'costcenter.lastqcheck'),
       new kernel::Field::QualityResponseArea()
    );
-   $self->{history}=[qw(modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.finance.costcenter"],
                          uniquesize=>20};

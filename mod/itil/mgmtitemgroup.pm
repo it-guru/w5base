@@ -210,7 +210,11 @@ sub new
       new kernel::Field::QualityResponseArea()
 
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(name cistatus grouptype cdate mdate));
    $self->setWorktable("mgmtitemgroup");
    $self->{CI_Handling}={uniquename=>"name",

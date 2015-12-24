@@ -1545,7 +1545,11 @@ sub new
                 dataobjattr   =>'appl.lastqenrich')
    );
    $self->AddGroup("external",translation=>'itil::appl');
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{workflowlink}={ workflowkey=>[id=>'affectedapplicationid']
                          };
    $self->{use_distinct}=1;

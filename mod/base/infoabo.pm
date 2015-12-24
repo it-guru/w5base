@@ -294,7 +294,22 @@ sub new
    $self->LoadSubObjs("ext/staticinfoabo","staticinfoabo");
    $self->{admwrite}=[qw(admin w5base.base.infoabo.write)]; 
    $self->{admread}=[@{$self->{admwrite}},"w5base.base.infoabo.read"];
-   $self->{history}=[qw(insert modify delete)];
+
+   $self->{history}={
+      update=>[
+         'local'
+      ],
+      delete=>[
+         {dataobj=>sub{
+             my $mode=shift;
+             my $oldrec=shift;
+             my $newrec=shift;
+             my $dataobj=effVal($oldrec,$newrec,"parentobj");
+             return($dataobj);
+          },id=>'refid', field=>'user',as=>'infoabos'}
+      ]
+   };
+
 
 
    #

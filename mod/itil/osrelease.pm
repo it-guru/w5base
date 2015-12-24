@@ -131,7 +131,11 @@ sub new
    );
    $self->setDefaultView(qw(name osclass cistatus mdate cdate));
    $self->setWorktable("osrelease");
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.osrelease"],
                          uniquesize=>255};

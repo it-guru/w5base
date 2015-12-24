@@ -41,7 +41,11 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    
    $self->AddFields(
       new kernel::Field::Linenumber(

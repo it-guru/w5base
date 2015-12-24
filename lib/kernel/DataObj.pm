@@ -1148,17 +1148,25 @@ sub FinishDelete
          $fo->FinishDelete($oldrec);
       }
    }
-   my $pid=Query->Param("RefFromId");
-   my $p=$self->getParent();
-   if (defined($p) && defined($pid) && $p->can("FinishSubDelete")){
-      $p->FinishSubDelete($pid);
-   }
-   my $wf=getModuleObject($self->Config,"base::workflow");
+   #
+   # FinishSubDelete based on RefFromId is buggy because all operations
+   # can only be done on the direkt parent of the sublist field. If there
+   # are operations on other objects done, there are errors inevitable
+   #
+   #my $pid=Query->Param("RefFromId");
+   #my $p=$self->getParent();
+   #if (defined($p) && defined($pid) && $p->can("FinishSubDelete")){
+   #   $p->FinishSubDelete($pid);
+   #}
    my $selfname=$self->SelfAsParentObject();
    my $idfield=$self->IdField();
    if (defined($idfield) && $self->Self() ne "base::history"){
       my $id=$idfield->RawValue($oldrec);
       if ($id ne ""){
+         my $history=getModuleObject($self->Config,"base::history");
+         $history->BulkDeleteRecord({dataobject=>[$self->SelfAsParentObject()],
+                                     dataobjectid=>\$id});
+         my $wf=getModuleObject($self->Config,"base::workflow");
          $wf->SetFilter({stateid=>"<20",class=>\"base::workflow::DataIssue",
                          directlnktype=>\$selfname,
                          directlnkid=>\$id});
@@ -1175,12 +1183,12 @@ sub FinishDelete
    }
 }
 
-sub FinishSubDelete                  # called, if a record in 
-{                                    # SubList has been deleted
-   my $self=shift;
-   my $id=shift;
-   return($self->FinishSubWrite($id));
-}
+#sub FinishSubDelete                  # called, if a record in 
+#{                                    # SubList has been deleted
+#   my $self=shift;
+#   my $id=shift;
+#   return($self->FinishSubWrite($id));
+#}
 
 sub FinishWrite
 {
@@ -1214,73 +1222,136 @@ sub FinishWrite
    foreach my $kh (@keyhandler){
       ProcessField($kh,$oldrec,$newrec);
    }
-   my $pid=Query->Param("RefFromId");
-   my $p=$self->getParent();
-   if (defined($p) && defined($pid) && $p->can("FinishSubWrite")){
-      $p->FinishSubWrite($pid);
-   }
+
+
+   #
+   # FinishSubWrite based on RefFromId is buggy because all operations
+   # can only be done on the direkt parent of the sublist field. If there
+   # are operations on other objects done, there are errors inevitable
+   #
+   #my $pid=Query->Param("RefFromId");
+   #my $p=$self->getParent();
+   #if (defined($p) && defined($pid) && $p->can("FinishSubWrite")){
+   #   $p->FinishSubWrite($pid);
+   #}
+
+
 }
 
-sub FinishSubWrite
-{
-   my $self=shift;
-   my $id=shift;
-   my %rec=();
-   #msg(INFO,"default FinishSubWrite in $self on $id"); 
-   my $idname=$self->IdField->Name();
-
-   $self->SetFilter($idname=>\$id);
-   $self->SetCurrentView(qw(ALL));
-   $self->ForeachFilteredRecord(sub{
-         my $rec=$_;
-         $self->ValidatedUpdateRecord($rec,{},{$idname=>\$rec->{$idname}});
-   });
-   return(undef);
-}
+#
+# FinishSubWrite based on RefFromId is buggy because all operations
+# can only be done on the direkt parent of the sublist field. If there
+# are operations on other objects done, there are errors inevitable
+#
+#sub FinishSubWrite
+#{
+#   my $self=shift;
+#   my $id=shift;
+#   my %rec=();
+#   #msg(INFO,"default FinishSubWrite in $self on $id"); 
+#   my $idname=$self->IdField->Name();
+#
+#   $self->SetFilter($idname=>\$id);
+#   $self->SetCurrentView(qw(ALL));
+#   $self->ForeachFilteredRecord(sub{
+#         my $rec=$_;
+#         $self->ValidatedUpdateRecord($rec,{},{$idname=>\$rec->{$idname}});
+#   });
+#   return(undef);
+#}
 
 sub StoreUpdateDelta
 {
    my $self=shift;
+   my $mode=shift;
    my $oldrec=shift;
    my $newrec=shift;
 
    if (defined($self->{history})){
-      $self->SetCurrentView(qw(ALL));
-      my @fieldlist=$self->getFieldObjsByView([$self->getCurrentView()],
-                                              oldrec=>$oldrec,
-                                              current=>$newrec,
-                                              opmode=>'StoreUpdateDelta');
-      my %delta=();
-      foreach my $fobj (@fieldlist){
-         if ($fobj->history){
-            my $field=$fobj->Name;
-            next if ($field eq "srcload" || $field eq "mdate" ||
-                     $fobj->Type() eq "File");
-            if (exists($newrec->{$field})){
-               next if (ref($oldrec->{$field}) eq "HASH" ||
-                        ref($newrec->{$field}) eq "HASH");
-               my $old=$oldrec->{$field};
-               my $new=$newrec->{$field};
-               $old=[$old] if (ref($old) ne "ARRAY");
-               $new=[$new] if (ref($new) ne "ARRAY");
-               $old=join(", ",sort(@{$old}));
-               $new=rmNonLatin1(join(", ",sort(@{$new})));
-               $new=~s/\r\n/\n/gs;
-               $old=~s/\r\n/\n/gs;
-               if (trim($new) ne trim($old)){
-                  $delta{$field}={'old'=>$old,'new'=>$new};
+      if (ref($self->{history}) ne "HASH"){
+         $self->{history}={
+            'update'=>'local'
+         };
+      }
+      if (exists($self->{history}->{$mode})){
+         my $logto=$self->{history}->{$mode};
+         $logto=[$logto] if (ref($logto) ne "ARRAY");
+         if ($mode eq "delete"){
+            foreach my $histtarget (@$logto){
+               if ($histtarget eq "local"){
+                  msg(WARN,"history in $self to local on delete or insert ".
+                           "is not supported");
+               }
+               else{
+                  $self->SetCurrentView(qw(ALL));
+                  my @fieldlist=$self->getFieldObjsByView(
+                     [$self->getCurrentView()],
+                     oldrec=>$oldrec,
+                     current=>$newrec,
+                     opmode=>'StoreUpdateDelta'
+                  );
+                  foreach my $fobj (@fieldlist){
+                     my $field=$fobj->Name;
+                     my $old=$oldrec->{$field};
+                     my $new=undef;
+                     $old=[$old] if (ref($old) ne "ARRAY");
+                     $old=join(", ",sort(@{$old}));
+                     $old=~s/\r\n/\n/gs;
+                     $self->HandleHistory(
+                        $mode,
+                        $histtarget,
+                        $oldrec,
+                        $newrec,$field,$old,$new
+                     );
+                  }
                }
             }
          }
-      }
-      if (keys(%delta)){   # optimices the request of field object list
-         foreach my $field (keys(%delta)){
-            my $old=$delta{$field}->{'old'};
-            my $new=$delta{$field}->{'new'};
+         if ($mode eq "update" || $mode eq "insert"){
+            $self->SetCurrentView(qw(ALL));
+            my @fieldlist=$self->getFieldObjsByView([$self->getCurrentView()],
+                                                    oldrec=>$oldrec,
+                                                    current=>$newrec,
+                                                    opmode=>'StoreUpdateDelta');
+            my %delta=();
             foreach my $fobj (@fieldlist){
-               if ($fobj->Name eq $field &&
-                   $fobj->history){
-                  $self->HandleHistory($oldrec,$newrec,$field,$old,$new);
+               if ($fobj->history){
+                  my $field=$fobj->Name;
+                  next if ($field eq "srcload" || $field eq "mdate" ||
+                           $fobj->Type() eq "File");
+                  if (exists($newrec->{$field})){
+                     next if (ref($oldrec->{$field}) eq "HASH" ||
+                              ref($newrec->{$field}) eq "HASH");
+                     my $old=$oldrec->{$field};
+                     my $new=$newrec->{$field};
+                     $old=[$old] if (ref($old) ne "ARRAY");
+                     $new=[$new] if (ref($new) ne "ARRAY");
+                     $old=join(", ",sort(@{$old}));
+                     $new=rmNonLatin1(join(", ",sort(@{$new})));
+                     $new=~s/\r\n/\n/gs;
+                     $old=~s/\r\n/\n/gs;
+                     if (trim($new) ne trim($old)){
+                        $delta{$field}={'old'=>$old,'new'=>$new};
+                     }
+                  }
+               }
+            }
+            if (keys(%delta)){   # optimices the request of field object list
+               foreach my $field (keys(%delta)){
+                  my $old=$delta{$field}->{'old'};
+                  my $new=$delta{$field}->{'new'};
+                  foreach my $fobj (@fieldlist){
+                     if ($fobj->Name eq $field &&
+                         $fobj->history){
+                        foreach my $histtarget (@$logto){
+                           $self->HandleHistory(
+                              $mode,
+                              $histtarget,
+                              $oldrec,
+                              $newrec,$field,$old,$new);
+                        }
+                     }
+                  }
                }
             }
          }
@@ -1289,6 +1360,82 @@ sub StoreUpdateDelta
 
    return(1);
 }
+
+sub HandleHistory
+{
+   my $self=shift;
+   my $mode=shift;
+   my $histtarget=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $field=shift;
+   my $oldval=shift;
+   my $newval=shift;
+
+   my $logparent;
+   my $h;
+   my $id;
+   my $dataobject;
+   my $histreclogid;
+
+   if ($histtarget ne "local"){
+      my $histfield=$histtarget->{field};
+      if (ref($histfield) eq "CODE"){
+         $histfield=&{$histfield}($mode,$oldrec,$newrec);
+      }
+      return(1) if ($field ne $histfield); 
+      my $dataobj=$histtarget->{dataobj};
+      my $dataobjid=$histtarget->{id};
+      if (ref($dataobj) eq "CODE"){
+         $dataobj=&{$dataobj}($mode,$oldrec,$newrec);
+      }
+      if (ref($dataobjid) eq "CODE"){
+         $dataobjid=&{$dataobjid}($mode,$oldrec,$newrec);
+      }
+      $logparent=getModuleObject($self->Config,$dataobj);
+      $h=getModuleObject($self->Config,"base::history");
+      $id=effVal($oldrec,$newrec,$dataobjid);
+      $field=$histtarget->{as};
+   }
+   else{
+      $logparent=$self;
+      my $idname=$logparent->IdField->Name();
+      $h=$logparent->getPersistentModuleObject("History","base::history");
+      $id=effVal($oldrec,$newrec,$idname);
+   }
+   
+   if (defined($logparent) && defined($h) && $id ne "" && $field ne ""){
+      $dataobject=$logparent->SelfAsParentObject();
+      my $idname=$logparent->IdField->Name();
+      my $histrec={name=>$field,
+                   dataobject=>$dataobject,
+                   dataobjectid=>$id,
+                   oldstate=>$oldval,
+                   newstate=>$newval,
+                   operation=>$mode};
+      my $comments;
+      if ($ENV{REMOTE_ADDR} ne ""){
+         $comments.="REMOTE_ADDR = $ENV{REMOTE_ADDR} \n";
+      }
+      if ($W5V2::OperationContext ne "WebFrontend" &&
+          $W5V2::OperationContext ne ""){
+         $comments.="CONTEXT = $W5V2::OperationContext \n";
+      }
+      if ($W5V2::HistoryComments ne ""){
+         $comments.=$W5V2::HistoryComments;
+      }
+      if (defined($comments)){
+         $histrec->{comments}=$comments;
+      }
+
+      $histreclogid=$h->ValidatedInsertRecord($histrec);
+   }
+   if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+      msg(INFO,"DELTAWRITE (%s(%s): %-10s : old=%s new=%s as base::history(%s)",
+               $dataobject,$id,$field,$oldval,$newval,$histreclogid);
+   }
+}
+
 
 sub NormalizeByIOMap
 {
@@ -1509,50 +1656,6 @@ sub getIOMap
    return($c->{$queryfrom}->{e});
 }
 
-sub HandleHistory
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $field=shift;
-   my $oldval=shift;
-   my $newval=shift;
-
-   if (ref($self->{history}) ne "ARRAY"){
-      $self->{history}=[$self->{history}]
-   }
-   my $h=$self->getPersistentModuleObject("History","base::history");
-   if (defined($h)){
-      my $dataobject=$self->SelfAsParentObject();
-      my $idname=$self->IdField->Name();
-      my $id=effVal($oldrec,$newrec,$idname);
-      my $histrec={name=>$field,
-                   dataobject=>$dataobject,
-                   dataobjectid=>$id,
-                   oldstate=>$oldval,
-                   newstate=>$newval,
-                   operation=>"modify"};
-      my $comments;
-      if ($ENV{REMOTE_ADDR} ne ""){
-         $comments.="REMOTE_ADDR = $ENV{REMOTE_ADDR} \n";
-      }
-      if ($W5V2::OperationContext ne "WebFrontend" &&
-          $W5V2::OperationContext ne ""){
-         $comments.="CONTEXT = $W5V2::OperationContext \n";
-      }
-      if ($W5V2::HistoryComments ne ""){
-         $comments.=$W5V2::HistoryComments;
-      }
-      if (defined($comments)){
-         $histrec->{comments}=$comments;
-      }
-
-      $h->ValidatedInsertRecord($histrec);
-   }
-   #msg(INFO,"DELTAWRITE: %-10s : old=%s new=%s",$field,$oldval,$newval);
-}
-
-
 sub ValidatedInsertOrUpdateRecord
 {
    my $self=shift;
@@ -1694,6 +1797,7 @@ sub ValidatedInsertRecordTransactionless
             my $bak=$self->InsertRecord($newrec);
             $self->SendRemoteEvent("ins",undef,$newrec,$bak) if ($bak);
             $self->FinishWrite(undef,$newrec) if ($bak);
+            $self->StoreUpdateDelta("insert",undef,$newrec) if ($bak);
             return($bak);
          }
          else{
@@ -2120,7 +2224,7 @@ sub ValidatedUpdateRecordTransactionless
                }
                $self->SendRemoteEvent("upd",$oldrec,$newrec);
                $self->FinishWrite($oldrec,$validatednewrec,\%comprec);
-               $self->StoreUpdateDelta($oldrec,\%comprec) if ($bak);
+               $self->StoreUpdateDelta("update",$oldrec,\%comprec) if ($bak);
                foreach my $v (keys(%$newrec)){
                   $oldrec->{$v}=$newrec->{$v};
                }
@@ -2275,6 +2379,7 @@ sub ValidatedDeleteRecordTransactionless
       $bak=$self->DeleteRecord($oldrec);
       $self->SendRemoteEvent("del",$oldrec,undef) if ($bak);
       $self->FinishDelete($oldrec) if ($bak); 
+      $self->StoreUpdateDelta("delete",$oldrec,undef) if ($bak);
    }
 
    return($bak);

@@ -453,9 +453,11 @@ sub new
                                             AL_TCom::workflow::change
                                             AL_TCom::workflow::eventnotify
                                             AL_TCom::workflow::incident)];
-
-   $self->{history}=[qw(insert modify delete)];
-
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(name custname cistatus));
    $self->setWorktable("itcrmappl");
    return($self);

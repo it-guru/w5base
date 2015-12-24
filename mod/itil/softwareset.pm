@@ -209,7 +209,11 @@ sub new
    #   new kernel::Field::QualityResponseArea()
    );
    $self->{use_distinct}=1;
-   $self->{history}=[qw(modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(linenumber name cistatus mandator mdate));
    $self->setWorktable("softwareset");
    return($self);

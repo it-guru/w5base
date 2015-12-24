@@ -134,7 +134,10 @@ sub HistoryResult
                my $dataobject=[$self->Self,$self->SelfAsParentObject()];
                $q{dataobject}=$dataobject;
                $q{dataobjectid}=\$dataobjectid;
-               $q{name}=\@fields;
+               if (!$self->IsMemberOf("admin")){
+                  $q{name}=\@fields;  # normal users can only be 
+                                      # see real readable fields (security!)
+               }
                my $listdate=Query->Param("ListTime");
                $q{cdate}=$listdate;
                $h->ResetFilter();

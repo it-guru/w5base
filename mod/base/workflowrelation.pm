@@ -232,8 +232,11 @@ sub new
                 label       =>'RealEditor',
                 dataobjattr =>'wfrelation.realeditor'),
    );
-   $self->{history}=[qw(insert modify delete)];
-
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(id name editor comments));
    $self->setWorktable("wfrelation");
    return($self);

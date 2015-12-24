@@ -271,7 +271,11 @@ sub new
    );
    $self->setDefaultView(qw(name description cdate mdate));
    $self->setWorktable("interface_tssapp01_01");
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    return($self);
 }
 

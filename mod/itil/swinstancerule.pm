@@ -355,7 +355,11 @@ sub new
                 dataobjattr   =>'swinstancerule.srcload')
                                                    
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(swinstance fullname cistatus mdate));
 
    $self->setWorktable("swinstancerule");

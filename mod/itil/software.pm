@@ -460,7 +460,11 @@ sub new
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.software"],
                          uniquesize=>255};
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{PhoneLnkUsage}=\&PhoneUsage;
 
    $self->setWorktable("software");

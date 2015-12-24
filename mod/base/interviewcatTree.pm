@@ -134,7 +134,9 @@ sub getSqlFrom
 EOF
       return($from);
    }
-   $self->LastMsg(ERROR,"not supported query");
+   if ($mode ne ""){
+      $self->LastMsg(ERROR,"not supported query");
+   }
    return(undef);
 }
 

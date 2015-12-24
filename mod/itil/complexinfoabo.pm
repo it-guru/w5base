@@ -201,8 +201,11 @@ sub new
    );
    $self->setDefaultView(qw(name cistatus eventstatclass 
                             affectedcustomer affectedorgarea ));
-   $self->{history}=[qw(insert modify delete)];
-
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setWorktable("itil_infoabo");
    return($self);
 }

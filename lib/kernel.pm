@@ -1062,6 +1062,7 @@ sub mkMailInlineAttachment
 }
 
 sub Stacktrace {
+  my $traceonly=shift;
   my ( $path, $line, $subr );
   my $max_depth = 30;
   my $i = 1;
@@ -1072,7 +1073,7 @@ sub Stacktrace {
                   "in $call_details[3]\n");
   }
   print STDERR ("--- End stack trace ---\n");
-  die();
+  die() if (!$traceonly);
 }
 
 

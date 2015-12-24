@@ -251,7 +251,11 @@ sub new
 
    );
    $self->{use_distinct}=0;
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(mdate parentobj parentid name relevant answer));
    $self->setWorktable("interanswer");
    return($self);

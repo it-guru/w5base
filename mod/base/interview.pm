@@ -377,7 +377,12 @@ sub new
                 dataobjattr   =>'interview.realeditor'),
 
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
+
    $self->setDefaultView(qw(linenumber interviewcat name mdate));
    $self->setWorktable("interview");
    return($self);

@@ -462,7 +462,11 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{use_distinct}=1;
    $self->setDefaultView(qw(linenumber name mandator cistatus software mdate));
    $self->setWorktable("liccontract");

@@ -53,7 +53,11 @@ sub new
 
    );
    $self->setDefaultView(qw(id name));
-   $self->{history}=[qw(modify)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    return($self);
 
 

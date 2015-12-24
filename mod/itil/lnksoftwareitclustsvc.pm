@@ -126,7 +126,11 @@ sub new
    $self->getField("cicistatusid")->{dataobjattr}='itclust.cistatus';
    $self->getField("mandatorid")->{dataobjattr}='itclust.mandator';
    $self->getField("databossid")->{dataobjattr}='itclust.databoss';
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(software version quantity itclustsvc cdate));
    return($self);
 }

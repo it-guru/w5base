@@ -744,7 +744,11 @@ sub new
    );
    $self->{workflowlink}={ workflowkey=>\&createWorkflowQuery
                          };
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{use_distinct}=1;
 
    $self->setDefaultView(qw(linenumber name hwmodel serialno 

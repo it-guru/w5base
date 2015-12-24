@@ -178,7 +178,11 @@ sub new
    
 
    );
-   $self->{history}=[qw(modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.base.workprocessitem"],
                          uniquesize=>80};

@@ -645,7 +645,11 @@ sub new
                 dataobjattr   =>'lnksoftwaresystem.realeditor'),
                                                    
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(software softwareproducer 
                             version quantity insttyp cdate));
    $self->setWorktable("lnksoftwaresystem");

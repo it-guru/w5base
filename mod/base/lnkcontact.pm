@@ -190,6 +190,7 @@ sub new
                 frontreadonly =>1,
                 sqlorder      =>'NONE',
                 uploadable    =>0,
+                history       =>0,
                 label         =>'Parent-Object',
                 dataobjattr   =>'lnkcontact.parentobj'),
 
@@ -197,6 +198,7 @@ sub new
                 name          =>'refid',
                 label         =>'RefID',
                 frontreadonly =>1,
+                history       =>0,
                 uploadable    =>0,
                 dataobjattr   =>'lnkcontact.refid'),
 
@@ -285,8 +287,23 @@ sub new
    $self->setDefaultView(qw(parentobj targetname cdate editor));
    $self->LoadSubObjs("ext/lnkcontact","lnkcontact");
    $self->setWorktable("lnkcontact");
-   $self->{history}=[qw(insert modify delete)];
-
+   $self->{history}={
+      insert=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ],
+      delete=>[
+         {dataobj=>sub{
+             my $mode=shift;
+             my $oldrec=shift;
+             my $newrec=shift;
+             my $dataobj=effVal($oldrec,$newrec,"parentobj");
+             return($dataobj);
+          },id=>'refid', field=>'targetname',as=>'contacts'}
+      ]
+   };
    return($self);
 }
 

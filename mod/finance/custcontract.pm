@@ -377,7 +377,11 @@ sub new
                 dataobjattr   =>'custcontract.lastqcheck'),
    );
    $self->{use_distinct}=1;
-   $self->{history}=[qw(modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{workflowlink}={ workflowkey=>[id=>'affectedcontractid']
                          };
    $self->setDefaultView(qw(linenumber name cistatus mandator mdate fullname));

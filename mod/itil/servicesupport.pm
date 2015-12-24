@@ -324,7 +324,11 @@ sub new
    );
    $self->setDefaultView(qw(name cistatus mdate cdate));
    $self->setWorktable("servicesupport");
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.servicesupport"],
                          uniquesize=>255};

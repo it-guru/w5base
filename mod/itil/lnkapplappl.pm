@@ -379,7 +379,22 @@ sub new
                 dataobjattr   =>'lnkapplappl.toappl'),
 
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      insert=>[
+         'local',
+         {dataobj=>'itil::appl', id=>'fromapplid',
+          field=>'toapplid',as=>'interfaces'}
+      ],
+      update=>[
+         'local'
+      ],
+      delete=>[
+         {dataobj=>'itil::appl', id=>'fromapplid',
+          field=>'fullname',as=>'interfaces'}
+      ]
+   };
+
+
    $self->setDefaultView(qw(fromappl toappl cistatus cdate editor));
    $self->setWorktable("lnkapplappl");
    return($self);

@@ -733,7 +733,11 @@ sub new
       new kernel::Field::EnrichLastDate(
                 dataobjattr   =>'swinstance.lastqenrich'),
    );
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{use_distinct}=1;
    $self->{workflowlink}={ workflowkey=>[id=>'id']
                          };

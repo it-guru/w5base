@@ -165,7 +165,11 @@ sub new
    
 
    );
-   $self->{history}=[qw(modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->setDefaultView(qw(team name costatus fixupmode fixupminutes mdate));
    $self->setWorktable("costteamfixup");
    return($self);

@@ -1220,9 +1220,12 @@ sub new
    # new kernel::Field::DatacareAssistant()
 
    );
-   $self->{workflowlink}={ workflowkey=>[id=>'affectedsystemid']
-                         };
-   $self->{history}=[qw(insert modify delete)];
+   $self->{workflowlink}={ workflowkey=>[id=>'affectedsystemid'] };
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
    $self->{use_distinct}=1;
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->AddGroup("control",translation=>'itil::system');

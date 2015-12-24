@@ -364,8 +364,7 @@ sub LoadQualityActivationLinks
    my ($rec,$msg)=$self->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
-         msg(INFO,"dataobject=$rec->{dataobj} ".
-                  "mandatorid=$rec->{mandatorid}");
+         #msg(INFO,"dataobject=$rec->{dataobj} mandatorid=$rec->{mandatorid}");
          if ($rec->{dataobj} ne ""){
             my $mandatorid=$rec->{mandatorid};
             my $qruleid=$rec->{qruleid};

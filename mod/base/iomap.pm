@@ -264,7 +264,11 @@ sub new
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","admin.itil.iomap"],
                          uniquesize=>255};
-   $self->{history}=[qw(insert modify delete)];
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
 
    $self->setWorktable("iomap");
    return($self);
