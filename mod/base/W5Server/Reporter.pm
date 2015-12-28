@@ -28,6 +28,9 @@ sub process
    foreach my $sig (qw(__DIE__ __WARN__ INT)){
       $SIG{$sig}=sub{
           my $loc="";
+          my @loc = caller(1);
+          $loc.=sprintf("$sig generated at line $loc[2] in $loc[1]:%s\n",@_);
+
           my $max_depth = 30;
           my $i = 1;
 
