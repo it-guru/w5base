@@ -112,7 +112,7 @@
 'CRmedium'=>{de=>'medium',en=>'medium'},
 'CRhigh'=>{de=>'high',en=>'high'},
 'CRcritical'=>{de=>'critical',en=>'critical'},
-'delete only posible, if there are no system, software instance, cluster service, interfaces, service components and contract relations'=>{de=>'löschen ist nur möglich, wenn keine System-, Schnittstellen-, Cluster Service-, Softwareinstanz-, Service Komponenten und Vertrags- beziehungen existieren - mögliche wäre, den CI-Status auf veraltet/gelöscht zu setzen'},
+'delete only posible, if there are no system, software instance, urls, cluster service, interfaces, service components and contract relations'=>{de=>'löschen ist nur möglich, wenn keine System-, Schnittstellen-, Cluster Service-, Softwareinstanz-, URLs, Service Komponenten und Vertrags- beziehungen existieren - mögliche wäre, den CI-Status auf veraltet/gelöscht zu setzen'},
 'primary operation mode'=>{de=>'Vorwiegende Betriebsart'},
 'opmode.'=>{de=>'',en=>''},
 'opmode.prod'=>{de=>'Produktion',en=>'Production'},

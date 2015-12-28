@@ -2237,11 +2237,12 @@ sub ValidateDelete
    if ($lock>0 ||
        $#{$rec->{systems}}!=-1 ||
        $#{$rec->{services}}!=-1 ||
+       $#{$rec->{applurl}}!=-1 ||
        $#{$rec->{swinstances}}!=-1 ||
        $#{$rec->{custcontracts}}!=-1){
       $self->LastMsg(ERROR,
           "delete only posible, if there are no system, ".
-          "software instance, cluster service, interfaces, service components ".
+          "software instance, urls, cluster service, interfaces, service components ".
           "and contract relations");
       return(0);
    }
