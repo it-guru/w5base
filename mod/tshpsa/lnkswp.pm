@@ -101,7 +101,7 @@ sub new
                 name          =>'systemname',
                 label         =>'Hostname',
                 group         =>'rel',
-                vjointo       =>'tshpsa::system',
+                vjointo       =>\'tshpsa::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 
@@ -110,7 +110,7 @@ sub new
                 label         =>'SystemID',
                 group         =>'rel',
                 selectfix     =>1,
-                vjointo       =>'tshpsa::system',
+                vjointo       =>\'tshpsa::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'systemid'),
 
@@ -120,7 +120,7 @@ sub new
                 group         =>'w5basedata',
                 searchable    =>0,
                 weblinkto     =>'none',
-                vjointo       =>'itil::system',
+                vjointo       =>\'itil::system',
                 vjoinon       =>['systemsystemid'=>'systemid'],
                 vjoindisp     =>['applicationnames']),
 
@@ -148,7 +148,7 @@ sub new
                 searchable    =>0,
                 group         =>'w5basedata',
                 vjoineditbase =>{cistatusid=>[3,4]},
-                vjointo       =>'itil::software',
+                vjointo       =>\'itil::software',
                 vjoinon       =>['softwareid'=>'id'],
                 vjoindisp     =>'name'),
 
@@ -159,7 +159,7 @@ sub new
                 depend        =>[qw(class software)],
                 readonly      =>1,
                 group         =>'w5basedata',
-                vjointo       =>'itil::software',
+                vjointo       =>\'itil::software',
                 vjoinon       =>['softwareid'=>'id'],
                 vjoindisp     =>'is_dbs'),
 
@@ -170,7 +170,7 @@ sub new
                 readonly      =>1,
                 depend        =>[qw(class software)],
                 group         =>'w5basedata',
-                vjointo       =>'itil::software',
+                vjointo       =>\'itil::software',
                 vjoinon       =>['softwareid'=>'id'],
                 vjoindisp     =>'is_mw'),
 
@@ -262,7 +262,7 @@ sub new
                 vjoineditbase =>{id=>"!99"},
                 jsonchanged   =>\&itil::lib::Listedit::getupdateDenyHandlingScript,
                 jsoninit      =>\&itil::lib::Listedit::getupdateDenyHandlingScript,
-                vjointo       =>'itil::upddeny',
+                vjointo       =>\'itil::upddeny',
                 vjoinon       =>['denyupd'=>'id'],
                 vjoindisp     =>'name'),
 
@@ -323,12 +323,12 @@ sub new
                 label         =>'relevant logical System Config-Item',
                 group         =>'w5basedata',
                 searchable    =>0,
-                vjointo       =>'AL_TCom::system',
+                vjointo       =>\'AL_TCom::system',
                 vjoinon       =>['w5systemid'=>'id'],
                 vjoindisp     =>'name'),
 
       new kernel::Field::DataMaintContacts(
-                vjointo       =>'itil::system',
+                vjointo       =>\'itil::system',
                 vjoinon       =>['w5systemid'=>'id'],
                 group         =>'w5basedata'),
 
