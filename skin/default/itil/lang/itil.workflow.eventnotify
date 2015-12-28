@@ -182,11 +182,11 @@
        "we want to inform you about the results of the root\n".
        "cause analysis and the initiated measures."
 },
-'if IT-Provider is responsible, it is not allowed to set a specific customer'=>{de=>'Wenn der IT-Provider verantwortlich ist, muß dieser konkret angegeben werden'},
+'if IT-Provider is responsible, it is not allowed to set a specific customer'=>{de=>'Wenn der IT-Provider verantwortlich ist, muss dieser konkret angegeben werden'},
 'if IT-Provider is responsible, it is not allowed to set a specific customer'=>{de=>'Wenn der IT-Provider verantwortlich ist, dann darf kein konkreter Kunde angegeben sein'},
 'missing specific responsible'=>{de=>'fehlender konkreter verantwortlicher Bereich'},
 'if customer is responsible, it is not allowed to set a specific IT-Provider'=>{de=>'Wenn der Kunde verantwortlich ist, dann darf kein konkreter IT-Provider angegeben sein'},
-'if customer is responsible, you need to set a specific customer'=>{de=>'Wenn der Kunde verantwortlich ist, muß dieser konkret angegeben werden'},
+'if customer is responsible, you need to set a specific customer'=>{de=>'Wenn der Kunde verantwortlich ist, muss dieser konkret angegeben werden'},
 "qc eventend can't be sooner as eventend"=>{de=>"Betriebsfreigabe kann nicht vor technisches Ereignisende sein"},
 'event is consequence of other events'=>{de=>'Ereignis ist Folgeeffekt eines anderen Ereignisses'},
 'consequence of events'=>{de=>'Ereignis ausgelöst durch'},

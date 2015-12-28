@@ -24,7 +24,7 @@
 'detailed classification/priorisation process'=>{de=>'detailliertes Klassifizierungsverfahren'},
 'benefit for the affected business process'=>{de=>'Nutzen für den betroffenen Geschäftsprozess'},
 'processmanager of business process has approved'=>{de=>'Zustimmung des Geschäftsprozess-Managers liegt vor'},
-'dependson'=>{de=>'der Workflow "%s" muß vor diesem Workflow gelößt werden',en=>'the workflow "%s" must be solved bevor this workflow'},
+'dependson'=>{de=>'der Workflow "%s" muss vor diesem Workflow gelöst werden',en=>'the workflow "%s" must be solved bevor this workflow'},
 'REV.dependson'=>{de=>'nach diesem Workflow kann der Workflow "%s" bearbeitet werden',en=>'after the current workflow the workflow "%s" can be processed'},
 'derivation'=>{de=>'Abgeleiteter Workflow "%s"',en=>'derivated workflow "%s"'},
 'REV.derivation'=>{de=>'Abgeleitet von Workflow "%s"',en=>'derivated from workflow "%s"'},

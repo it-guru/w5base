@@ -41,4 +41,4 @@
 'net event duration less or equal then 4h'=>{de=>'Netto Ereignisdauer <=4h'},
 'Root-Cause found in less then 10wt'=>{de=>'RC in weniger als 10AT gefunden'},
 'Root-Cause found at'=>{de=>'RC gefunden am'},
-'rc found date must be behind eventend'=>{de=>'RC gefunden Datum muß nach dem Ereignisende liegen'},
+'rc found date must be behind eventend'=>{de=>'RC gefunden Datum muss nach dem Ereignisende liegen'},

@@ -7,7 +7,7 @@
 <td colspan=2>Mit diesem Tool ist es möglich, aus dem T-Systems SAP P01
 Kostenstellen oder PSP-Elemente (Top-Element) in die W5Base
 Kontierungsobjekt-Datenbank zu importieren.
-Um ein Objekt zu importieren, muß entweder die PSP Top-Element oder
+Um ein Objekt zu importieren, muss entweder die PSP Top-Element oder
 die betreffende Kostenstelle angegeben werden.<br>
 Kann das Kontierungsobjekt im SAP P01 System gefunden werden, so
 wird es automatisch im Status installiert/aktiv in der Kontierungsobjekt

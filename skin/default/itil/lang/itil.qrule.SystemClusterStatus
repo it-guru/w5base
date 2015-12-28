@@ -1,3 +1,3 @@
 'itil::qrule::SystemClusterStatus'=>{de=>'Prüfung der Clusterzuordnung',en=>'Check on cluster relations'},
-'on a cluster node, there must be a valid cluster specified'=>{de=>'Bei einer Cluster-Node muß ein gültiger Cluster zugeordnet sein'},
+'on a cluster node, there must be a valid cluster specified'=>{de=>'Bei einer Cluster-Node muss ein gültiger Cluster zugeordnet sein'},
 'invalid refernece to inactiv cluster'=>{de=>'ungültige Referenz auf einen inaktiven Cluster'},
