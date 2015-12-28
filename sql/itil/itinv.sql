@@ -1236,7 +1236,7 @@ create table accessurl (
   srcsys      varchar(100) default 'w5base',
   srcid       varchar(20) default NULL,
   srcload     datetime    default NULL,
-  PRIMARY KEY  (id), KEY (appl),
+  PRIMARY KEY  (id), FOREIGN KEY appl (appl) REFERENCES appl (id) ON DELETE CASCADE,
   UNIQUE KEY fullname (fullname,network),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
