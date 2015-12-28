@@ -1222,6 +1222,9 @@ sub new
    );
    $self->{workflowlink}={ workflowkey=>[id=>'affectedsystemid'] };
    $self->{history}={
+      delete=>[
+         'local'
+      ],
       update=>[
          'local'
       ]

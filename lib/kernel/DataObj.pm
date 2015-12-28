@@ -1279,8 +1279,13 @@ sub StoreUpdateDelta
          if ($mode eq "delete"){
             foreach my $histtarget (@$logto){
                if ($histtarget eq "local"){
-                  msg(WARN,"history in $self to local on delete or insert ".
-                           "is not supported");
+                  my $label=$self->getRecordHeader($oldrec);
+                  $self->HandleHistory(
+                     $mode,
+                     $histtarget,
+                     $oldrec,
+                     $newrec,"ALL",$label,undef
+                  );
                }
                else{
                   $self->SetCurrentView(qw(ALL));
@@ -1383,7 +1388,7 @@ sub HandleHistory
       if (ref($histfield) eq "CODE"){
          $histfield=&{$histfield}($mode,$oldrec,$newrec);
       }
-      return(1) if ($field ne $histfield); 
+      return(1) if ($field ne "ALL" && $field ne $histfield); 
       my $dataobj=$histtarget->{dataobj};
       my $dataobjid=$histtarget->{id};
       if (ref($dataobj) eq "CODE"){
@@ -1668,6 +1673,7 @@ sub ValidatedInsertOrUpdateRecord
    my $idfname=$self->IdField()->Name();
    my $found=0;
    my @idlist=();
+         my $opobj=$self->Clone();
    $self->ForeachFilteredRecord(sub{
       my $rec=$_;
       my $changed=0;
@@ -1693,7 +1699,6 @@ sub ValidatedInsertOrUpdateRecord
                $newrec->{mdate}=$rec->{mdate};
             }
          }
-         my $opobj=$self->Clone();
          if (!($opobj->ValidatedUpdateRecord($rec,$newrec,
                {$idfname=>$rec->{$idfname}}))){
             msg(ERROR,"internal error on ValidatedInsertOrUpdateRecord %s ".

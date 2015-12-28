@@ -1546,6 +1546,9 @@ sub new
    );
    $self->AddGroup("external",translation=>'itil::appl');
    $self->{history}={
+      delete=>[
+         'local'
+      ],
       update=>[
          'local'
       ]

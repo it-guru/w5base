@@ -254,6 +254,11 @@ sub Init
                       func=>'Main',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sysadm.history",
+                      "base::history",
+                      func=>'Main',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("Tools",
                       "tmpl/welcome",
                       prio=>10,

@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=5 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -229,6 +230,35 @@ sub Validate
 
    return(1);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cdate"))){
+      Query->Param("search_cdate"=>'>now-24h');
+   }
+}
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf("admin")){
+      if ($#flt!=0 ||
+          ref($flt[0]) ne "HASH" ||
+          ref($flt[0]->{dataobjectid}) ne "SCALAR" ||
+          (ref($flt[0]->{dataobject}) ne "ARRAY" &&
+           ref($flt[0]->{dataobject}) ne "SCALAR")){
+         $self->LastMsg(ERROR,"this query is only allowed for Admins");
+         return(undef);
+      }
+   }
+   return($self->SetFilter(@flt));
+}
+
 
 
 sub isViewValid

@@ -74,6 +74,7 @@
 'sysadm.filesig'=>{de=>'Transfersignatur',en=>'Transfersig'},
 'sysadm.filesig.signedfile'=>{de=>'signierte Datei',en=>'signed file'},
 'sysadm.reportjob'=>{de=>'Report Job',en=>'Report Job'},
+'sysadm.history'=>{de=>'Verlauf',en=>'History'},
 'Tools.filemgmt'=>{de=>'Dateiverwaltung',en=>'Filemanagement'},
 'Tools.filemgmt.acl'=>{de=>'Dateirechte',en=>'Filerights'},
 'Tools.teamtools'=>{de=>'Team-Tools',en=>'Team-Tools'},
