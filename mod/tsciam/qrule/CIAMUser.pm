@@ -279,7 +279,7 @@ sub qcheckRecord
       }
       
       if (keys(%$wfrequest)){
-         my $msg="different values stored in WhoIsWho: ";
+         my $msg="different values stored in CIAM: ";
          push(@qmsg,$msg);
          push(@dataissue,$msg);
          $errorlevel=3 if ($errorlevel<3);
