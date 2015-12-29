@@ -44,6 +44,18 @@ sub new
       insertafter=>'id'
    );
 
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'menufullname',
+                vjointo       =>'base::menu',
+                vjoinon       =>['refid'=>'menuid'],
+                vjoindisp     =>'fullname',
+                label         =>'menu fullname'),
+      insertafter=>'id'
+   );
+   $self->setDefaultView(qw(aclid menufullname acltargetname));
+
+
    return($self);
 }
 
