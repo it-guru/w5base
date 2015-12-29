@@ -51,17 +51,18 @@ sub smchange
    $self->InitScImportEnviroment();
    my $chm=getModuleObject($self->Config,"tssm::chm");
    msg(DEBUG,"ServiceManager chm is connected");
-   $chm->SetCurrentView(qw(sysmodtime closetime changenumber name description 
-                           fallback status assignedto
-                           plannedstart plannedend srcid device implementor
-                           tssm_chm_closingcommentsclosingcomments assignarea
-                           workstart workend workduration resolvedby closedby
-                           requestedby editor relations
-                           createtime type resources closecode approved addgrp
-                           impact priority reason urgency category risk
-                           closecode resolvetime project
-                           coordinator coordinatorposix coordinatorname tasks
-                           srcsys srcid));
+   $chm->SetCurrentView(qw(addgrp approvalstatus approved assignarea
+                           assignedto category changenumber closecode
+                           closedby closetime complexity coordinator
+                           coordinatorname coordinatorposix createtime
+                           criticality description device editor
+                           fallback impact implementor name phase
+                           plannedend plannedstart priority project
+                           reason relations requestedby resolvedby
+                           resolvetime resources risk srcid srcsys
+                           status sysmodtime tasks type
+                           urgency workduration workend workstart));
+
    $chm->SetCurrentOrder("sysmodtime");
    msg(DEBUG,"view is set");
    my $focus="now";

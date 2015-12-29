@@ -399,15 +399,16 @@ sub mkChangeStoreRec
    $wfrec{name}=$rec->{name};
    $wfrec{changedescription}=$rec->{description};
    #$wfrec{changedescription}=~s/^-{10}description via Interface//;
-   $wfrec{stateid}=0;
+   $wfrec{stateid}=8; # init
+   $wfrec{stateid}=4  if (lc($rec->{status}) eq "open");
+   $wfrec{stateid}=17 if (lc($rec->{status}) eq "closed");
+   # the states below seems no more used in SM
    $wfrec{stateid}=1  if (lc($rec->{status}) eq "planning");
    $wfrec{stateid}=3  if (lc($rec->{status}) eq "reviewed");
-   $wfrec{stateid}=3  if (lc($rec->{status}) eq "released");
    $wfrec{stateid}=4  if (lc($rec->{status}) eq "work_in_process");
    $wfrec{stateid}=4  if (lc($rec->{status}) eq "work_in_progress");
    $wfrec{stateid}=7  if (lc($rec->{status}) eq "confirmed");
    $wfrec{stateid}=17 if (lc($rec->{status}) eq "resolved");
-   $wfrec{stateid}=17 if (lc($rec->{status}) eq "closed");
   # if ($wfrec{stateid}==17){
   #    if ($rec->{closecode} eq "rejected"){
   #       $wfrec{stateid}=24;
@@ -418,24 +419,24 @@ sub mkChangeStoreRec
   # }
    $wfrec{additional}={
       ServiceManagerChangeNumber=>$rec->{changenumber},
-      ServiceManagerTaskCount=>$ServiceManagerTaskCount,
-      ServiceManagerState=>$rec->{status},
-      ServiceManagerAssignedTo=>$rec->{assignedto},
-      ServiceManagerRisk=>$rec->{risk},
       ServiceManagerCategory=>$rec->{category},
-      ServiceManagerUrgency=>$rec->{urgency},
-      ServiceManagerReason=>$rec->{reason},
+      ServiceManagerState=>$rec->{status},
+      ServiceManagerPhase=>$rec->{phase},
+      ServiceManagerApprovalState=>$rec->{approvalstatus},
+      ServiceManagerRequestedBy=>$rec->{requestedby},
+      ServiceManagerAssignedTo=>$rec->{assignedto},
+      ServiceManagerTaskCount=>$ServiceManagerTaskCount,
       ServiceManagerProject=>$rec->{project},
       ServiceManagerType=>$rec->{type},
-      ServiceManagerPriority=>$rec->{priority},
+      ServiceManagerRisk=>$rec->{risk},
+      ServiceManagerUrgency=>$rec->{urgency},
+      ServiceManagerComplexity=>$rec->{complexity},
+      ServiceManagerCriticality=>$rec->{criticality},
       ServiceManagerImpact=>$rec->{impact},
-      ServiceManagerRequestedBy=>$rec->{requestedby},
-      ServiceManagerSysModTime=>$rec->{sysmodtime},
-     # ServiceManagerAssignArea=>$rec->{assignarea},
-      ServiceManagerSoftwareID=>$rec->{softwareid},
       ServiceManagerWorkStart=>$rec->{workstart},
       ServiceManagerWorkEnd=>$rec->{workend},
-      ServiceManagerWorkDuration=>$rec->{workduration}
+      ServiceManagerWorkDuration=>$rec->{workduration},
+      ServiceManagerSysModTime=>$rec->{sysmodtime}
    };
    msg(DEBUG,"===========================:");
    my $relations;
