@@ -73,10 +73,9 @@ sub qcheckRecord
    if ($rec->{email} ne "" && $rec->{cistatusid}<=5){
       my $ciam=getModuleObject($self->getParent->Config(),"tsciam::user");
       $ciam->SetFilter([
-         {email=>\$rec->{email},active=>\'true'},
-         {email2=>\$rec->{email},active=>\'true'},
-         {email3=>\$rec->{email},active=>\'true'},
-         #  {email4=>\$rec->{email},active=>\'true'}, # NICHT indiziert!
+         {email=>\$rec->{email},active=>\'true',primary=>\'true'},
+         {email2=>\$rec->{email},active=>\'true',primary=>\'true'},
+         {email3=>\$rec->{email},active=>\'true',primary=>\'true'}
       ]);
       my @l=$ciam->getHashList(qw(ALL));
       if ($#l==-1){
@@ -87,7 +86,8 @@ sub qcheckRecord
          $ciam->ResetFilter();
          msg(INFO,"OK, dann müssen wir eben noch in email4 nachsehen");
          $ciam->SetFilter([
-            {email4=>\$rec->{email},active=>\'true'}, # NICHT indiziert!
+            {email4=>\$rec->{email},active=>\'true',primary=>\'true'} 
+             # NICHT indiziert!
          ]);
          @l=$ciam->getHashList(qw(ALL));
       }
