@@ -693,6 +693,17 @@ sub FinishDelete
    my $oldrec=shift;
    my $bak=$self->SUPER::FinishDelete($oldrec);
 
+   my $grpid=$oldrec->{grpid};
+   if ($grpid ne ""){
+      my $lnkgrpuser=getModuleObject($self->Config,"base::lnkgrpuser");
+      $lnkgrpuser->SetFilter({'grpid'=>\$grpid});
+      $lnkgrpuser->SetCurrentView(qw(ALL));
+      my $op=$lnkgrpuser->Clone();
+      $lnkgrpuser->ForeachFilteredRecord(sub{
+                         $op->ValidatedDeleteRecord($_);
+                      });
+   }
+
    $self->InvalidateGroupCache();
    if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
       return(0);
