@@ -540,7 +540,6 @@ sub new
                 uppersearch   =>1,
                 weblinkto     =>'tssm::useraccount',
                 weblinkon     =>['coordinatoroper'=>'loginname'],
-                label         =>'Changemanager operator',
                 group         =>'contact',
                 label         =>'Change Coordinator',
                 dataobjattr   =>SELpref.'cm3rm1.coordinator'),
