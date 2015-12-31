@@ -57,6 +57,7 @@ sub Reporter
    my $self=shift;
  
    my $reportjob=getModuleObject($self->Config,"base::reportjob");
+   $reportjob->BackendSessionName("ForceUncached");
 
 
 
@@ -89,22 +90,23 @@ sub Reporter
        $self->slotHandler(\%Reporter,\@slot);  # executes tasks if is space 
        foreach my $sock (@$newsock) {      # in slots
            if ($sock == $main_socket) {
-               my $new_sock = $sock->accept();
-               $readable_handles->add($new_sock);
-               $cons{$new_sock}={handle=>$new_sock};
+              my $new_sock = $sock->accept();
+              $readable_handles->add($new_sock);
+              $cons{$new_sock}={handle=>$new_sock};
            } else {
                my $buf = <$sock>;
                if ($buf) {
-                   my $command=$buf;
-                   $command=~s/\s*$//;
-                   $self->processConsoleCommand(\%Reporter,
-                                                \%cons,$sock,
-                                                \@slot,
-                                                $command);
-               } else {
-                   delete($cons{$sock});
-                   $readable_handles->remove($sock);
-                   close($sock);
+                  my $command=$buf;
+                  $command=~s/\s*$//;
+                  $self->processConsoleCommand(\%Reporter,
+                                               \%cons,$sock,
+                                               \@slot,
+                                               $command);
+               }
+               else{
+                  delete($cons{$sock});
+                  $readable_handles->remove($sock);
+                  close($sock);
                }
            }
        }   

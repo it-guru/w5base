@@ -1130,7 +1130,7 @@ sub runningTasks
    my @l;
 
    my $tasks=$self->getTasksHash();
-   foreach my $pid (keys(%{$tasks})){  # sending alarm to current tasks
+   foreach my $pid (keys(%{$tasks})){  
       if (!exists($tasks->{$pid}->{exitcode})){
          push(@l,$pid);
       }

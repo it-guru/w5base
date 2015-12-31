@@ -99,24 +99,20 @@ sub Connect
       }
    }
    else{
-      if ($self->{dbconnect}=~m/^dbi:odbc:/i){  # cached funktioniert nicht
-         $self->{'db'}=DBI->connect(            # mit ODBC verbindungen
-            $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
-                         private_foo_cachekey=>$self.time().".".
-                         $BackendSessionName});
-         #msg(INFO,"use NOT cached datbase connection on ODBC");
-         if (defined($self->{'db'})){
-            if ($self->{'db'}->{private_inW5Transaction} ne ""){
-               $self->{'db'}->{AutoCommit}=0;
+      if (($self->{dbconnect}=~m/^dbi:odbc:/i) ||
+          ($self->{dbconnect}=~m/^dbi:db2:/i) ||
+          ($BackendSessionName eq "ForceUncached")){  
+         # cached funktioniert nicht bzw. nicht korrekt mit 
+         # ODBC und DB2 Datenverbindungen. Zusätzlich kann eine
+         # uncached Verbindung erzwungen werden, wenn der BackendSessionName
+         # auf "ForceUncached" gesetzt wird.
+         $self->{'db'}=DBI->connect(
+            $self->{dbconnect},
+            $self->{dbuser},$self->{dbpass},{
+                private_foo_cachekey=>$self.time().".".$BackendSessionName
             }
-         }
-      }
-      elsif ($self->{dbconnect}=~m/^dbi:db2:/i){# cached funktioniert nicht
-         $self->{'db'}=DBI->connect(            # mit DB2 verbindungen 
-            $self->{dbconnect},$self->{dbuser},$self->{dbpass},{  # fork probl.
-                         private_foo_cachekey=>$self.time().".".
-                         $BackendSessionName});
-         #msg(INFO,"use NOT cached datbase connection on ODBC");
+         );
+         #msg(INFO,"use NOT cached datbase connection in $self");
          if (defined($self->{'db'})){
             if ($self->{'db'}->{private_inW5Transaction} ne ""){
                $self->{'db'}->{AutoCommit}=0;

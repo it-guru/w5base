@@ -43,6 +43,7 @@ sub EnrichmentCollector
    my $self=shift;
  
    my $qrule=getModuleObject($self->Config,"base::qrule");
+   $qrule->BackendSessionName("ForceUncached");
 
    POSIX::nice(15); # process AutoDiscovery in lowest process priority
 
