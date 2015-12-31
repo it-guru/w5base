@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::LDAP;
 use kernel::Field;
+use HTML::TreeGrid;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::LDAP);
 
 sub new
@@ -449,6 +450,11 @@ sub Import
 sub TreeView
 {
    my $self=shift;
+   my $g=new HTML::TreeGrid(
+      fullpage=>0,
+      grid_minwidth=>600,
+      label=>'',
+   );
 
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
@@ -485,72 +491,69 @@ sub TreeView
       $self->SecureSetFilter({parentid=>\$rec->{touid}});
       @childs=$self->getHashList(qw(touid name parentid shortname
                                     bosssurname bossgivenname));
+      my @toppos;
+      my @curpos;
 
-
-      print("<div id=\"orgtree\" style=\"min-width:400px;margin:5px;margin-top:15px\">");
-
-      printf("<div id=\"parents\" style=\"width:100%%;text-align:center\">");
-      my $level=0;
-      foreach my $prec (@parents){
-         displayOrg($prec,$level);
-         $level++;
-         print("<br>");
+      my $row=2;
+      my $col=10;
+      @toppos=($col,$row);
+      foreach my $o (@parents){
+         displayOrg($g,$col,$row,$o);
+         $row+=4;
       }
-      printf("</div>");
+      $row+=1;
 
-      printf("<div id=\"current\" style=\"width:100%%;text-align:center;\">");
-   printf("<div style=\"width:1px;;border-left:1px solid #aaa;margin-left:50%;height:20px\"></div>");
-      printf("<div style=\"padding-left:40px;padding-right:40px\">");
-      printf("<div style=\"border-style:solid;border-width:1px;display:inline-block;".
-          "border-color:black;height:80px;width:100%;\">");
+      @curpos=($col,$row);
+      displayOrg($g,$col,$row,$rec,{
+          current=>1,
+      });
 
+      $row+=5;
 
-      print($rec->{name});
-      printf("</div>");
-      printf("</div>");
-      printf("</div>");
-
-      $level++;
-
-
-      printf("<div id=\"childs\" style=\"width:100%%;text-align:center\">");
-      foreach my $crec (@childs){
-         displayOrg($crec,$level);
-
+      $g->Line(@toppos,@curpos);
+      for(my $c=0;$c<=$#childs;$c++){
+         my $col=15;
+         if (int(($c+1)/2)!=($c+1)/2){ # ungerade
+            $col=5;
+         }
+         displayOrg($g,$col,$row,$childs[$c]);
+         $g->Line(@curpos,$curpos[0],$row-1);
+         $g->Line($curpos[0],$row-1,$col,$row-1);
+         $g->Line($col,$row-1,$col,$row);
+         if (int(($c+1)/2)==($c+1)/2){ # ungerade
+            $row+=5;
+         }
       }
-      printf("</div>");
-
-      printf("</div>"); # end of orgtree
+      printf("%s",$g->Render());
    }
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
 sub displayOrg
 {
-   my $prec=shift;
-   my $level=shift;
+   my $g=shift;   # Grid
+   my $x=shift;  
+   my $y=shift; 
+   my $prec=shift; 
+   my $param=shift; 
 
-   printf("<div style=\"display: inline-block;".
-          "margin-left:5px;margin-right:5px;margin-top:0px\">");
-   if ($level!=0){
-      printf("<div style=\"width:1px;border-left:1px solid #aaa;margin-left:50%;height:20px\"></div>");
-   }
-   printf("<div style=\"border-style:solid;border-width:1px;display: inline-block;".
-          "border-color:black;width:280px;height:80px;\">");
-   print("<table border=1 height=100% width=100%>");
-   my $label=$prec->{name};
-   if ($prec->{shortname} ne ""){
-      $label.="<br>(".$prec->{shortname}.")";
-   }
-   printf("<tr height=1%%><td align=center><b>%s</b></td></tr>",$label);
    my $boss=$prec->{bosssurname};
    $boss.=", " if ($boss ne "" && $prec->{bossgivenname} ne "");
    $boss.=$prec->{bossgivenname}; 
-   printf("<tr><td valign=top>%s<br>&nbsp;</td></tr>",$boss);
-   print("</table>");
-   
-   printf("</div>");
-   printf("</div>");
+
+   my $shortname=$prec->{shortname};
+   my $eParam={};
+   if ($param->{current}){
+      $shortname="<b>".$shortname."</b>";
+      $eParam->{entity_width}=200;
+   }
+  
+
+   $g->SetEntity($x,$y,$eParam,
+      Header=>$shortname,
+      Description=>$prec->{name},
+      Fooder=>$boss
+   );
 }
 
 

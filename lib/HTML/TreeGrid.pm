@@ -25,6 +25,7 @@ sub new
    $self{'connector_width'}="1"          if (!exists($self{'connector_width'}));
    $self{'entity_width'}="140"           if (!exists($self{'entity_width'}));
    $self{'entity_color'}="#EBEBEB"       if (!exists($self{'entity_color'}));
+   $self{'xmax'}=20                      if (!exists($self{'xmax'}));
 
 
    my $self = bless(\%self,$pkg);
@@ -71,6 +72,18 @@ sub Line
       return();
    }
 
+   if ($x1>$x2){
+      my $t=$x1;
+      $x1=$x2;
+      $x2=$t;
+   }
+   if ($y1>$y2){
+      my $t=$y1;
+      $y1=$y2;
+      $y2=$t;
+   }
+
+
    for(my $x=$x1;$x<$x2;$x++){
       push(@{$self->Cell($x,$y1)->{tdclass}},"tb");
    }
@@ -97,7 +110,11 @@ sub SetEntity
    my $self=shift;
    my $x1=shift;
    my $y1=shift;
-   my @param=@_;
+   my $param;
+   if (ref($_[0]) eq "HASH"){
+      $param=shift;
+   }
+   my @block=@_;
    my $name=$self->{'name'};
 
    my $row=$self->G->[$y1];
@@ -106,10 +123,24 @@ sub SetEntity
    }
    $self->G->[$y1]->[$x1]={} if (!defined($self->G->[$y1]->[$x1]));
 
-   my $e="<div class=\"${name}Entity\">";
+   my $e="<div class=\"${name}Entity\"";
+   my @style;
+   if (defined($param) && defined($param->{entity_width})){
+      push(@style,"width:".$param->{entity_width}."px;");
+      my $ml=int($param->{entity_width}/2);
+      push(@style,"margin-left:-".$ml."px;");
+   }
+   if (defined($param) && defined($param->{entity_color})){
+      push(@style,"background-color:".$param->{entity_color}.";");
+   }
+   if ($#style!=-1){
+      $e.=" style=\"".join("",@style)."\""; 
+   }
 
-   while(my $k=shift(@param)){
-      my $v=shift(@param);
+   $e.=">";
+
+   while(my $k=shift(@block)){
+      my $v=shift(@block);
       $e.="<div class=\"${name}Entity${k}\">".$v."</div>\n";
    }
    $e.="</div>";
@@ -145,7 +176,6 @@ sub Render
 {
    my $self=shift;
 
-   #print STDERR Dumper($self->{'G'});
    my $d="";
 
    $self->_addLevel2Grid(\$d);
@@ -171,18 +201,26 @@ sub _addLevel2Grid
    $t.="class=\"${name}Main\" cellspacing=\"0\" cellpadding=\"0\">\n";
    $t.="<tbody>\n";
    my $G=$self->G;
-   my $maxrow=0;
+   
+   my $maxrow=$#{$G};
    my $maxcol=0;
-   for(my $row=0;$row<=$#{$G};$row++){
-      $maxrow=$row if ($maxrow<$row);
-      for(my $col=0;$col<=$#{$G->[$row]};$col++){
-         $maxcol=$col if ($maxcol<$col);
+   if (defined($self->{'xmax'})){
+      $maxcol=$self->{'xmax'};
+   }
+   else{
+      for(my $row=0;$row<=$#{$G};$row++){
+         for(my $col=0;$col<=$#{$G->[$row]};$col++){
+            $maxcol=$col if ($maxcol<$col);
+         }
       }
    }
+   
+   #print STDERR Dumper($G);
    #$t.="<!-- maxcol=$maxcol maxrow=$maxrow -->\n";
-   for(my $row=0;$row<$maxrow;$row++){
+
+   for(my $row=0;$row<=$maxrow;$row++){
       $t.="<tr>\n";
-      for(my $col=0;$col<$maxcol;$col++){
+      for(my $col=0;$col<=$maxcol;$col++){
          my $td="";
          my $tdclass="";
          if (defined($G->[$row]->[$col]->{Entity})){
@@ -211,13 +249,14 @@ sub _addLevel1Grid
    my $d=shift;
    my $name=$self->{'name'};
    my $label=$self->{'label'};
+   my $grid_minwidth=$self->{'grid_minwidth'};
 
    $label=$S if (!exists($self->{'label'}));
 
    $$d="<table width=\"100%\" ".
        "class=\"${name}Envelope\" cellspacing=\"0\" cellpadding=\"0\">".
        "<tr><td>".
-       "<div style=\"width:750px\">".$label."</div>".
+       "<div style=\"width:${grid_minwidth}px\">".$label."</div>".
        "</td>".
        "<tr><td>".$$d."</td></tr>".
        "</table>";
