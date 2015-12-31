@@ -243,7 +243,7 @@ sub FinishWrite
          foreach my $k (keys(%$emailto)){
             my $lang="en";
             $user->ResetFilter();
-            $user->SetFilter({allemail=>\$k});
+            $user->SetFilter({allemails=>\$k});
             my ($urec)=$user->getOnlyFirst(qw(lastlang));
             if (defined($urec) && $urec->{lastlang} ne ""){
                $lang=$urec->{lastlang};
