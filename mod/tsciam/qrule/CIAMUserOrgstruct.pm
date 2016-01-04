@@ -95,9 +95,9 @@ sub qcheckRecord
          # loading the "should" sitiuation from ciam
          #
          msg(DEBUG,"trying to load userinformations from ciam");
-         $ciamusr->SetFilter([{email=>$urec->{email}},
-                             {email2=>$urec->{email}},
-                             {email3=>$urec->{email}}]);
+         $ciamusr->SetFilter([{email=>$urec->{email},active=>\'true'},
+                             {email2=>$urec->{email},active=>\'true'},
+                             {email3=>$urec->{email},active=>\'true'}]);
          my ($ciamrec,$msg)=$ciamusr->getOnlyFirst(qw(ALL));
          if (!defined($ciamrec)){
             if (defined($msg)){
@@ -424,35 +424,10 @@ sub createGrp
          return(undef);
       }
    }
-   elsif ($ciamrec->{parentid} eq "DE039607"){  # T-Deutschland
-      my @view=qw(id name);
-      $grp->SetFilter({fullname=>\"DTAG.TDG"});
-      $grp->SetCurrentView(@view);
-      my ($rec,$msg)=$grp->getFirst();
-      if (!defined($rec)){
-         $grp->SetFilter({fullname=>\"DTAG"});
-         $grp->SetCurrentView(@view);
-         my ($rec,$msg)=$grp->getFirst();
-         my $parentoftsi;
-         if (!defined($rec)){
-            my %newgrp=(name=>"DTAG",cistatusid=>4);
-            my $back=$grp->ValidatedInsertRecord(\%newgrp);
-            $parentoftsi=$back; 
-         }
-         else{
-            $parentoftsi=$rec->{grpid};
-         }
-         my %newgrp=(name=>"TDG",parent=>'DTAG',cistatusid=>4);
-         $parentid=$grp->ValidatedInsertRecord(\%newgrp);
-      }
-      else{
-         $parentid=$rec->{grpid}; 
-      }
-   }
    else{
-      # wenn keine parentid im WIW, dann mit DTAG.TSI "verbinden"
+      # wenn keine parentid im CIAM, dann mit DTAG "verbinden"
       my @view=qw(id name);
-      $grp->SetFilter({fullname=>\"DTAG.TSI"});
+      $grp->SetFilter({fullname=>\"DTAG"});
       $grp->SetCurrentView(@view);
       my ($rec,$msg)=$grp->getFirst();
       if (!defined($rec)){
@@ -478,6 +453,12 @@ sub createGrp
 
 
    my $newname=$ciamrec->{shortname};
+
+   if ($ciamrec->{toucid} eq "1134824"){
+      $newname="TMO";                     # missing CIAM tOuSD
+   }
+
+
    if ($newname eq ""){
       msg(ERROR,"no shortname for id '$ciamrec->{toucid}' found");
       return(undef);
