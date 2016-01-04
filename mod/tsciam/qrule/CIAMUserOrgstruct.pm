@@ -119,9 +119,11 @@ sub qcheckRecord
                   }
                }
                if ($old){
-                  if (!($urec->{email}=~m/\@telekom\.de$/i)){
+                  if (1){   # Expression !($urec->{email}=~m/\@telekom\.de$/i)){
+                            # now with CIAM Interface not needed - because
+                            # all Telekom contacts should be in CIAM
                      $ciamusr->Log(ERROR,"basedata",
-                                  "E-Mail '%s' not found in LDAP (WhoIsWho) ".
+                                  "E-Mail '%s' not found in LDAP (CIAM) ".
                                   "but with POSIX entry",$urec->{email});
                   }
                   else{
@@ -555,7 +557,7 @@ sub NotifyNewTeamRelation
       }
      
 
-      my %adr=(emailfrom=>'"WhoIsWho to W5BaseDarwin" <no_reply@w5base.net>',
+      my %adr=(emailfrom=>'"CIAM to W5BaseDarwin" <no_reply@w5base.net>',
                emailcc=>\@emailcc,
                emailbcc=>\@emailbcc);
       if (!$urec->{banalprotect}){
@@ -602,7 +604,7 @@ sub NotifyNewTeamRelation
       }
      
       $mailtext.="\n\nDirectLink:\n".$url;
-      my $label=$self->T("WhoIsWho to W5Base/Darwin automatic ".
+      my $label=$self->T("CIAM to W5Base/Darwin automatic ".
                          "organisation relation administration:");
       my $supportnote=$user->getParsedTemplate(
                         "tmpl/mailsend.supportnote",{

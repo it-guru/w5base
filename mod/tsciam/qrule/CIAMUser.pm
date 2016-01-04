@@ -93,7 +93,7 @@ sub qcheckRecord
       }
 
       if ($#l>0){
-         printf STDERR ("WiwUser: ununique email = '%s'\n",$rec->{email});
+         printf STDERR ("CIAM: ununique email = '%s'\n",$rec->{email});
          return(3,{qmsg=>['ununique email in CIAM '.$rec->{email}]});
       }
       my $msg;
@@ -101,7 +101,8 @@ sub qcheckRecord
       if (!defined($ciamrec)){
          if ($rec->{posix} ne ""){  # email adress change of existing WIW-Acc
             $ciam->ResetFilter();
-            $ciam->SetFilter({wiwid=>\$rec->{posix}});
+            $ciam->SetFilter({wiwid=>\$rec->{posix},
+                              active=>\'true',primary=>\'true'});
             ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
             if (defined($ciamrec) && 
                 lc($ciamrec->{email}) ne "" && 
@@ -109,8 +110,8 @@ sub qcheckRecord
                 lc($ciamrec->{email}) ne "unregistered"){
                my $newemail=lc($ciamrec->{email});
                if ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user"){
-                  printf STDERR ("WiwUser: email address change detected!\n".
-                                 "         from '%s' to '%s' for userid '%s'\n",
+                  printf STDERR ("CIAM: email address change detected!\n".
+                                 "      from '%s' to '%s' for userid '%s'\n",
                                  $rec->{email},$newemail,$rec->{posix});
                   my $user=getModuleObject($self->getParent->Config(),
                                            "base::user");
