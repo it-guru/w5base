@@ -2,12 +2,12 @@
 <!------------------------------------------------------>
 <div class=dialog style="width:400px">
 <table width="100%" cellpadding=4 cellspacing=4>
-<tr><td colspan=2><b>WhoIsWho User Import Tool</b></td></tr>
+<tr><td colspan=2><b>CIAM User Import Tool</b></td></tr>
 <tr>
-<td colspan=2>Mit diesem Tool können Sie Kontakte aus WhoIsWho
+<td colspan=2>Mit diesem Tool können Sie Kontakte aus CIAM
 in die W5Base Kontakteverwaltung importieren. Der Kontakt
 den Sie Importieren möchten, müssen Sie entweder über
-die <b>WhoIsWhoID</b> oder die <b>E-Mailadresse</b> spezifizieren.
+die <b>CIAMID</b> oder die <b>E-Mailadresse</b> spezifizieren.
 Wenn der Kontakt identifizert werden kann, und der Kontakt
 noch nicht existiert, dann wird dieser automatisch als "installiert/aktiv"
 erzeugt.</td></tr>

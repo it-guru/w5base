@@ -2,10 +2,10 @@
 <!------------------------------------------------------>
 <div class=dialog style="width:400px">
 <table width="100%" cellpadding=4 cellspacing=4>
-<tr><td colspan=2><b>WhoIsWho Orgarea Import Tool</b></td></tr>
+<tr><td colspan=2><b>CIAM Orgarea Import Tool</b></td></tr>
 <tr>
 <td colspan=2>With this tool, it is posible to import orgareas
-from T-Systems WhoIsWho directory into the W5Base Group
+from T-Systems CIAM directory into the W5Base Group
 database. The user you want to import can be specified
 by <b>CIAM</b> of the required orgarea .<br>
 If the orgarea can be found, it will be automaticly create as

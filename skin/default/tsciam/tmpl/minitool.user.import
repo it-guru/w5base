@@ -2,12 +2,12 @@
 <!------------------------------------------------------>
 <div class=dialog style="width:400px">
 <table width="100%" cellpadding=4 cellspacing=4>
-<tr><td colspan=2><b>WhoIsWho User Import Tool</b></td></tr>
+<tr><td colspan=2><b>CIAM User Import Tool</b></td></tr>
 <tr>
 <td colspan=2>With this tool, it is posible to import users
-from T-Systems WhoIsWho directory into the W5Base Contact
+from T-Systems CIAM directory into the W5Base Contact
 database. The user you want to import can be specified
-by <b>WhoIsWhoID</b> or <b>E-Mail address</b>.<br>
+by <b>CIAMID</b> or <b>E-Mail address</b>.<br>
 If the user can be found, it will be automaticly create as
 installed/active contact.</td></tr>
 <tr><td width=1% nowrap>Name (E-Mail or ID):</td>
