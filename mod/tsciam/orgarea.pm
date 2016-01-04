@@ -51,9 +51,15 @@ sub new
                                    size       =>'10',
                                    dataobjattr=>'tOuSD'),
 
-      new kernel::Field::Text(   name       =>'sapid',
-                                 label      =>'SAP-OrganisationalID (tOuSapID)',
-                                 dataobjattr=>'tOuSapID'),
+      new kernel::Field::Text(     name       =>'sapid',
+                                   label      =>'SAP-OrganisationalID '.
+                                                '(tOuSapID)',
+                                   dataobjattr=>'tOuSapID'),
+
+      new kernel::Field::Boolean(  name       =>'disabled',
+                                   value      =>['false','true'],
+                                   label      =>'inaktiv (tOuDisabled)',
+                                   dataobjattr=>'tOuDisabled'),
 
       new kernel::Field::TextDrop( name       =>'bossfullname',
                                    label      =>'Boss',
@@ -198,6 +204,17 @@ sub getValidWebFunctions
                                                   doParentFix
                                                   ParentGroupFix));
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_disabled"))){
+     Query->Param("search_disabled"=>"\"".$self->T("boolean.false")."\"");
+   }
+}
+
+
+
 
 
 sub ImportOrgarea

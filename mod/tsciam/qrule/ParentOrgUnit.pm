@@ -64,7 +64,7 @@ sub qcheckRecord
          }
          $errorlevel=0;
          my $ciam=getModuleObject($self->getParent->Config(),"tsciam::orgarea");
-         $ciam->SetFilter({toucid=>\$rec->{srcid}});
+         $ciam->SetFilter({toucid=>\$rec->{srcid},disabled=>\'false'});
          my ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
        #  if (defined($ciamrec) &&
        #      $ciamrec->{parentid} eq "15129408" ){ # TSI Vorstand wird 

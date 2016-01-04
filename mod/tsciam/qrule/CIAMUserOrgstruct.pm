@@ -226,7 +226,7 @@ sub qcheckRecord
             msg(ERROR,"can't find ciamid of user '%s'",$urec->{email});
             return($errorlevel,undef);
          }
-         $ciamorg->SetFilter({toumgr=>\$ciamid});
+         $ciamorg->SetFilter({toumgr=>\$ciamid,disabled=>\'false'});
          foreach my $ciamrec ($ciamorg->getHashList(
                               qw(toucid name parentid parent shortname))){
             if ($ciamrec->{toucid} ne ""){
