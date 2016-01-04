@@ -63,7 +63,7 @@ $html=new HTML::Parser();
       my $proxy=$self->Config->Param("http_proxy");
       if ($proxy ne ""){
          msg(INFO,"set proxy to $proxy");
-         $ua->proxy(['http', 'ftp'],$proxy);
+         $ua->proxy(['http','https', 'ftp'],$proxy);
       }
    }
 
@@ -82,7 +82,7 @@ $html=new HTML::Parser();
      # my $googleurl01="http://www.google.de/language_tools";
       my $googleurl02="http://translate.google.com/translate_a/t?".
                       "sl=$cursrclang&tl=$curdstlang";  
-      my $googleurl02="http://translate.google.com/translate_a/single";
+      my $googleurl02="https://translate.google.com/translate_a/single";
       #msg(INFO,"request0: $googleurl02");
      # my $response=$ua->request(GET($googleurl01));
      # if ($response->code ne "200"){
@@ -100,18 +100,19 @@ $html=new HTML::Parser();
 
 
       my %qparam=(
-        'hl'=>'en',
-        'ie'=>'UTF8',
-        'oe'=>'UTF8',
-        'q'=>$sendcursrc,
-        'sl'=>"$cursrclang",
-        'otf'=>"2",
-        'pc'=>"0",
-        'dt'=>[qw(bd ex ld md qca rw rm ss t at)],
-        'tk'=>"522795|634309",
-        'kc'=>"5",
-        'client'=>"t",
-        'tl'=>"$curdstlang"
+        'hl'=>'en',                                        #
+        'oe'=>'UTF-8',                                     #
+        'ie'=>'UTF-8',                                     #
+        'source'=>'btn',                                   #
+        'ssel'=>'3',                                       #
+        'tsel'=>'3',                                       #
+        'q'=>$sendcursrc,                                  #
+        'sl'=>"$cursrclang",                               #
+        'dt'=>[qw(bd ex ld md qca rw rm ss t at)],         #
+        'tk'=>"701488.824154",                             #
+        'kc'=>"0",                                         #
+        'client'=>"t",                                     #
+        'tl'=>"$curdstlang"                                #
       );
 
       my $c=new kernel::cgi(%qparam);
@@ -120,15 +121,19 @@ $html=new HTML::Parser();
       msg(INFO,"request1: $googleurl02");
 
 
-#      my $response=$ua->request(POST($googleurl02,
-#                       'Referer'=>'http://translate.google.com/translate_a/single',
-#                       'Content_Type'=>'application/x-www-form-urlencoded',
-#                       'Accept-Charset'=>'ISO-8859-15,utf-8;q=0.7,*;q=0.7',
-#                       'Accept-Language'=>'de,en-jm;q=0.7,en;q=0.3',
-#                       'Accept'=>'text/xml,application/xml,application/xhtml'.
-#                                 '+xml,text/html;q=0.9,text/plain;q=0.8',
-#                       'Content'=>[%qparam]));
-      my $response=$ua->request(GET($googleurl02));
+      #my $response=$ua->request(GET($googleurl02,
+      #                 'Referer'=>'https://translate.google.com/translate_a/single',
+      #                 'Content_Type'=>'application/x-www-form-urlencoded',
+      #                 'Accept-Charset'=>'ISO-8859-15,utf-8;q=0.7,*;q=0.7',
+      #                 'Accept-Language'=>'de,en-jm;q=0.7,en;q=0.3',
+      #                 'user-agent'=>'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36',
+      #                 'Content'=>[%qparam]));
+      my $req=HTTP::Request->new(GET=>$googleurl02);
+      $req->header('user-agent'=>'Mozilla/5.0 (X11; Linux x86_64)');
+      $req->header('Accept'=>'*/*');
+      $req->header('Host'=>'translate.google.com');
+
+      my $response=$ua->request($req);
       if ($response->code ne "200"){
          msg(ERROR,"fail to get '$googleurl02' response code=".$response->code);
          $ua=undef;
@@ -201,7 +206,7 @@ $html=new HTML::Parser();
    my $reference=$self->T("ATTENTION: The translation will done bei Google-Translation Services! Do not use this module for internal Informations!");
    my $dstdis="";
    if (!defined($ua)){
-      $curdst="LWP::UserAgent not available";
+      $curdst="LWP::UserAgent not available or Google Translation API Error";
       $dstdis="disabled";
    }
    print(<<EOF);
