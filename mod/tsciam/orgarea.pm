@@ -117,6 +117,7 @@ sub new
                                    label      =>'Subunits',
                                    group      =>'subunits',
                                    vjointo    =>'tsciam::orgarea',
+                                   vjoinbase  =>{disabled=>\'false'},
                                    vjoinon    =>['toucid'=>'parentid'],
                                    vjoindisp  =>['shortname','name']),
 
@@ -351,7 +352,7 @@ sub Import
 
    my $orgid=$param->{importname};
    if (!($orgid=~m/^\S{3,10}$/)){
-      $self->LastMsg(ERROR,"invalid name specified");
+      $self->LastMsg(ERROR,"invalid tOuCID specified");
       return(undef);
    }
    my @idimp;
@@ -373,7 +374,9 @@ sub Import
             last;
          }
          else{
-            msg(INFO,"ciamid $ciamrec->{toucid} not found in W5Base");
+            if (!$param->{silent}){
+               msg(INFO,"ciamid $ciamrec->{toucid} not found in W5Base");
+            }
             push(@idimp,$ciamrec->{toucid});
          }
          $chkid=$ciamrec->{parentid};
@@ -384,6 +387,7 @@ sub Import
          return(undef);
       }
    }
+   my $lastimportedgrpid=undef;
    foreach my $ciamid (reverse(@idimp)){
       $ciam->ResetFilter();
       $ciam->SetFilter({toucid=>\$ciamid});
@@ -396,36 +400,34 @@ sub Import
                              srcsys=>\'CIAM'});
          }
          else{
-            $grp->SetFilter({fullname=>\'DTAG.TSI'});
+            $grp->SetFilter({fullname=>\'DTAG'});
          }
          my ($grprec)=$grp->getOnlyFirst(qw(ALL));
          if (defined($grprec)){
-
-            my $newname=$ciamrec->{shortname};
-            if ($newname eq ""){
-               $self->LastMsg(ERROR,"no shortname for ".
-                                    "id '$ciamrec->{toucid}' found");
-               return(undef);
-            }
-            $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
-            $newname=~s/&/_u_/g;
+            my $newname=$self->findNewValidShortname(
+               $grp,
+               $grprec->{grpid},
+               $ciamrec
+            );
             my %newgrp=(name=>$newname,
                         srcsys=>'CIAM',
                         srcid=>$ciamrec->{toucid},
                         parentid=>$grprec->{grpid},
                         cistatusid=>4,
                         srcload=>NowStamp(),
-                        comments=>"Description from WhoIsWho: ".
+                        comments=>"Description from CIAM: ".
                                   $ciamrec->{name});
-            msg(DEBUG,"Write=%s",Dumper(\%newgrp));
             if (my $back=$grp->ValidatedInsertRecord(\%newgrp)){
                $ok++;    
-               msg(DEBUG,"ValidatedInsertRecord returned=$back");
                $grp->ResetFilter();
                $grp->SetFilter({grpid=>\$back});
                my ($grprec)=$grp->getOnlyFirst(qw(ALL));
                if ($grprec){
-                  $self->LastMsg(INFO,"$grprec->{srcid} = $grprec->{fullname}");
+                  if (!$param->{silent}){
+                     $self->LastMsg(INFO,"$grprec->{srcid} = ".
+                                         "$grprec->{fullname}");
+                  }
+                  $lastimportedgrpid=$grprec->{grpid};
                }
            
             }
@@ -439,10 +441,76 @@ sub Import
       }
    }
    if ($ok==$#idimp+1){
-      return(1);
+      return($lastimportedgrpid); 
    }
    $self->LastMsg(ERROR,"one or more operations failed");
    return(undef);
+}
+
+sub findNewValidShortname
+{
+   my $self=shift;
+   my $grpobj=shift;
+   my $pgrpid=shift;
+   my $ciamrec=shift;
+
+   my $newname=$ciamrec->{shortname};
+   if ($newname eq ""){
+      $newname="tOuSD";
+   }
+   $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
+   $newname=~s/&/_u_/g;
+   if (length($newname)>15){
+      $newname=substr($newname,0,15);
+   }
+   my $suffix="";
+   my $grprec;
+   my $loop=1;
+   do{
+      my $chkname=$newname.$suffix;
+      my %chkfld=(name=>\$chkname);
+      if (defined($pgrpid)){
+         $chkfld{parentid}=\$pgrpid;
+      }
+      else{
+         $chkfld{parentid}=undef;
+      }
+      $grpobj->ResetFilter();
+      $grpobj->SetFilter(\%chkfld);
+      ($grprec)=$grpobj->getOnlyFirst(qw(grpid srcsys srcid));
+      if (defined($grprec)){
+         $suffix=sprintf("-%02d",$loop);
+         $loop++;
+      }
+      else{
+         $newname=$chkname;
+      }
+      if ($loop>99){
+         msg(ERROR,"fail to create unique new shortname ".
+                   "for tOuCID='$ciamrec->{toucid}'");
+         return($newname); # das war wohl nix mit dem eindeutig machen
+      }
+   }while( defined($grprec) );
+   return($newname); 
+}
+
+
+sub getGrpIdOf
+{
+    my $self=shift;
+    my $ciamrec=shift;
+
+    my $grp=getModuleObject($self->Config,"base::grp");
+
+    $grp->SetFilter({srcid=>\$ciamrec->{toucid},srcsys=>'CIAM'});
+    $grp->SetCurrentView(qw(grpid srcid srcsys srcload));
+    my ($rec,$msg)=$grp->getFirst();
+    if (defined($rec)){
+       return($rec->{grpid});
+    }
+    else{
+       return($self->Import({importname=>$ciamrec->{toucid},silent=>1}));
+    }
 }
 
 1;

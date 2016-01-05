@@ -80,7 +80,7 @@ sub Validate
       $self->LastMsg(ERROR,"resulting fullname to long '$fn'");
       return(0);
    }
-   if (effChanged($oldrec,$newrec,"parentid")){
+   if (defined($oldrec) && effChanged($oldrec,$newrec,"parentid")){
       # tree validierung
       msg(INFO,"new parentid needs tree validierung");
       my $parentid=effVal($oldrec,$newrec,"parentid");

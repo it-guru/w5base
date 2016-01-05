@@ -90,6 +90,15 @@ sub qcheckRecord
              # NICHT indiziert!
          ]);
          @l=$ciam->getHashList(qw(ALL));
+         if ($#l==-1 &&
+             ( ($rec->{email}=~m/\@telekom\.de$/) ||
+               ($rec->{email}=~m/\@t-systems\.com$/))){
+            $dataobj->Log(ERROR,"basedata",
+                   "Contact '%s' seems to have leave ".
+                   " the DTAG concern. ".
+                   "\n-",
+                   $rec->{fullname});
+         }
       }
 
       if ($#l>0){

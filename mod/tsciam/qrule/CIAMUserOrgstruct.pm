@@ -317,7 +317,7 @@ sub addGrpLinkToUser
 
    my $app=$self->getParent();
    my $nowstamp=$app->ExpandTimeExpression("now","en","GMT","GMT");
-   my $grpid2add=$self->getGrpIdOf($grp,$ciamorg,$ciamrec);
+   my $grpid2add=$ciamorg->getGrpIdOf($ciamrec);
    if (defined($grpid2add)){
       $grpuser->SetFilter({userid=>\$urec->{userid},
                            grpid=>\$grpid2add});
@@ -379,107 +379,14 @@ sub addGrpLinkToUser
       }
    }
    else{
-      msg(ERROR,"Can't create group for user '$urec->{email}'");
+      msg(ERROR,"Can't create group tOuCID='$ciamrec->{toucid}' ".
+                "for user '$urec->{email}'");
       msg(ERROR,$self->getParent->LastMsg());
    }
    return(undef);
 }
 
 
-sub getGrpIdOf
-{
-   my $self=shift;
-   my $grp=shift;
-   my $ciamorg=shift;
-   my $ciamrec=shift;
-
-   msg(DEBUG,"try to find toucid=$ciamrec->{toucid} in base::grp");
-
-   $grp->SetFilter({srcid=>\$ciamrec->{toucid},srcsys=>\$self->{SRCSYS}});
-   $grp->SetCurrentView(qw(grpid srcid srcsys srcload));
-   my ($rec,$msg)=$grp->getFirst();
-   if (defined($rec)){
-      return($rec->{grpid});
-   }
-   return($self->createGrp($grp,$ciamorg,$ciamrec));
-
-}
-
-
-sub createGrp
-{
-   my $self=shift;
-   my $grp=shift;
-   my $ciamorg=shift;
-   my $ciamrec=shift;
-
-   msg(INFO,"try to create toucid=$ciamrec->{toucid} in base::grp");
-   my $parentid;
-   if (defined($ciamrec->{parentid})){
-      $ciamorg->SetFilter({toucid=>[$ciamrec->{parentid}]});
-      $ciamorg->SetCurrentView(qw(toucid name parentid parent shortname));
-      my ($ciamrec,$msg)=$ciamorg->getFirst();
-      $parentid=$self->getGrpIdOf($grp,$ciamorg,$ciamrec);
-      if (!defined($parentid)){
-         msg(ERROR,"problem in createGrp '$grp' from CIAM ".
-                   "tOuCID $ciamrec->{toucid}");
-         return(undef);
-      }
-   }
-   else{
-      # wenn keine parentid im CIAM, dann mit DTAG "verbinden"
-      my @view=qw(id name);
-      $grp->SetFilter({fullname=>\"DTAG"});
-      $grp->SetCurrentView(@view);
-      my ($rec,$msg)=$grp->getFirst();
-      if (!defined($rec)){
-         $grp->SetFilter({fullname=>\"DTAG"});
-         $grp->SetCurrentView(@view);
-         my ($rec,$msg)=$grp->getFirst();
-         my $parentoftsi;
-         if (!defined($rec)){
-            my %newgrp=(name=>"DTAG",cistatusid=>4);
-            my $back=$grp->ValidatedInsertRecord(\%newgrp);
-            $parentoftsi=$back; 
-         }
-         else{
-            $parentoftsi=$rec->{grpid};
-         }
-         my %newgrp=(name=>"TSI",parent=>'DTAG',cistatusid=>4);
-         $parentid=$grp->ValidatedInsertRecord(\%newgrp);
-      }
-      else{
-         $parentid=$rec->{grpid}; 
-      }
-   }
-
-
-   my $newname=$ciamrec->{shortname};
-
-   if ($ciamrec->{toucid} eq "1134824"){
-      $newname="TMO";                     # missing CIAM tOuSD
-   }
-
-
-   if ($newname eq ""){
-      msg(ERROR,"no shortname for id '$ciamrec->{toucid}' found");
-      return(undef);
-   }
-   ################################################################
-   $newname=~s/[^A-Z\.0-9,-]/_/gi;    # rewriting for some shit names
-   my %newgrp=(name=>$newname,
-               srcsys=>$self->{SRCSYS},
-               srcid=>$ciamrec->{toucid},
-               cistatusid=>4,
-               srcload=>NowStamp(),
-               comments=>"Description from CIAM: ".$ciamrec->{name});
-   $newgrp{name}=~s/&/_u_/g;
-   $newgrp{parentid}=$parentid if (defined($parentid));
-   my $back=$grp->ValidatedInsertRecord(\%newgrp);
-   msg(DEBUG,"ValidatedInsertRecord returned=$back");
-
-   return($back);
-}
 
 sub NotifyNewTeamRelation
 {

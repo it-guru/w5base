@@ -405,7 +405,7 @@ sub Validate
       trim(\$newrec->{name});
       $newrec->{name}=~s/[\.\s\*]/_/g;
       my $chkname=$newrec->{name};
-      if ($cistatus==6 || $oldrec->{cistatusid}==6){
+      if ($cistatus==6 || (defined($oldrec) && $oldrec->{cistatusid}==6)){
          $chkname=~s/\[.*?\]$//g;
       }
       if ($chkname eq "" || !($chkname=~m/^[\(\)a-zA-Z0-9_-]+$/)){
