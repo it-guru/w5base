@@ -505,7 +505,7 @@ sub getOrderIn
             }
             if ($rec->{target} eq "base::grp"){ 
                $g->SetFilter({grpid=>\$rec->{targetid},
-                              nativrole=>\'RMember',cistatusid=>\'4'});
+                              rawnativrole=>\'RMember',cistatusid=>\'4'});
                $g->SetCurrentOrder(qw(NONE));
                foreach my $urec ($g->getHashList(qw(email))){
                   $email{$urec->{email}}++;
@@ -534,7 +534,7 @@ sub getTeamBossID
       my $lnk=getModuleObject($self->getParent->Config,
                               "base::lnkgrpuser");
       $lnk->SetFilter({grpid=>\$teamid,
-                       nativroles=>'RBoss'});
+                       rawnativroles=>'RBoss'});
       my %bosslnk;
                      # at 20.02.2008 by Mr. Berdelmann F. it was requested
                      # that only one (the latest) boss should be displayed

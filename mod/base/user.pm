@@ -1150,7 +1150,7 @@ sub postQualityCheckRecord
 
    if ($userid ne ""){
       my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
-      $lnk->SetFilter({userid=>\$userid,nativroles=>[orgRoles()]});
+      $lnk->SetFilter({userid=>\$userid,rawnativroles=>[orgRoles()]});
       my @grp;
       foreach my $lnkrec ($lnk->getHashList(qw(grpid nativroles))){
          my $roles=$lnkrec->{nativroles};
@@ -1170,7 +1170,7 @@ sub postQualityCheckRecord
       my %boss;
       if ($#grp!=-1){
          $lnk->ResetFilter();
-         $lnk->SetFilter({grpid=>\@grp,nativroles=>\"RBoss"});
+         $lnk->SetFilter({grpid=>\@grp,rawnativroles=>\"RBoss"});
          foreach my $lnkrec ($lnk->getHashList(qw(userid))){
             $boss{$lnkrec->{userid}}++;
          }

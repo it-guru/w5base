@@ -1250,7 +1250,7 @@ sub getTeamBossID
       my $lnk=getModuleObject($self->getParent->Config,
                               "base::lnkgrpuser");
       $lnk->SetFilter({grpid=>\$teamid,
-                       nativroles=>'RBoss'});
+                       rawnativroles=>'RBoss'});
       foreach my $rec ($lnk->getHashList("userid")){
          if ($rec->{userid} ne ""){
             push(@teambossid,$rec->{userid});

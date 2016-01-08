@@ -231,6 +231,7 @@ sub new
                 label         =>'LineRoles',
                 htmldetail    =>'0',
                 readonly      =>'1',
+                searchable    =>'0',  # because low cardinality
                 vjointo       =>'base::lnkgrpuserrole',
                 vjoinon       =>['lnkgrpuserid'=>'lnkgrpuserid'],
                 vjoindisp     =>['role'],
@@ -241,10 +242,16 @@ sub new
                 label         =>'native roles',
                 htmldetail    =>'0',
                 readonly      =>'1',
+                searchable    =>'0',  # because low cardinality
                 vjointo       =>'base::lnkgrpuserrole',
                 vjoinon       =>['lnkgrpuserid'=>'lnkgrpuserid'],
                 vjoindisp     =>['nativrole'],
                 vjoininhash   =>['nativrole']),
+
+      new kernel::Field::Link(
+                name          =>'rawnativroles',  # search on roles only in
+                noselect      =>'1',              # this field !!!
+                dataobjattr   =>'lnkgrpuserrole.nativrole'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -435,6 +442,20 @@ sub new
    return($self);
 }
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable left outer join lnkgrpuserrole ".
+            "on $worktable.lnkgrpuserid=lnkgrpuserrole.lnkgrpuserid ";
+
+   return($from);
+}
+
+
 
 sub Validate
 {
@@ -586,7 +607,7 @@ sub StoreLastKnownBoss  # the storeing of last known Boss-Email is needed,
        grep(/^(RBoss|RBoss2)$/,@{$oldrec->{roles}},@{$newrec->{roles}})){
       my $lnk=getModuleObject($self->Config,$self->Self);
       $lnk->ResetFilter();
-      $lnk->SetFilter({grpid=>\$grpid,nativroles=>["RBoss","RBoss2"]});
+      $lnk->SetFilter({grpid=>\$grpid,rawnativroles=>["RBoss","RBoss2"]});
       my @l=$lnk->getHashList("email");
       if ($#l!=-1){
          my @email=grep(!/^\s*$/,map({$_->{email}} @l));

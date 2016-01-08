@@ -47,7 +47,7 @@ sub Process             # will be run as a spereate Process (PID)
    my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
 
    $lnk->SetFilter({group=>"dtag.tsi.ti dtag.tsi.ti.*",
-                    nativroles=>'RBoss'});
+                    rawnativroles=>'RBoss'});
    my %userid;
    foreach my $lrec ($lnk->getHashList(qw(userid))){
       $userid{$lrec->{userid}}++;
