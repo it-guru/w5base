@@ -12,6 +12,8 @@
 'Mobile-Phonenumber'=>{de=>'Handy'},
 'Phonenumber'=>{de=>'Telefonnummer'},
 'Sex'=>{de=>'Geschlecht'},
+'Street'=>{de=>'Straße'},
+'preferrredLanguage'=>{de=>'gewünschte Sprache'},
 'Activ'=>{de=>'Aktiv'},
 'Primary'=>{de=>'Primär'},
 'fieldgroup.office'=>{de=>'Büro-Kontakt',en=>'Office-Contact'},
