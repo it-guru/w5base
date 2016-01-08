@@ -108,9 +108,7 @@ sub Connect
          # auf "ForceUncached" gesetzt wird.
          $self->{'db'}=DBI->connect(
             $self->{dbconnect},
-            $self->{dbuser},$self->{dbpass},{
-                private_foo_cachekey=>$self.time().".".$BackendSessionName
-            }
+            $self->{dbuser},$self->{dbpass},{ }
          );
          #msg(INFO,"use NOT cached datbase connection in $self");
          if (defined($self->{'db'})){
@@ -121,9 +119,6 @@ sub Connect
       }
       else{
          my $private_foo_cachekey=$dbname."-".$$.".".$BackendSessionName;
-         #if (my $p=$self->getParent()){
-         #   $private_foo_cachekey.="_".$p->Self();
-         #}
          $self->{'db'}=DBI->connect_cached(
             $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
                mysql_enable_utf8 => 0,
