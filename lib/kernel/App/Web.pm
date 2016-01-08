@@ -902,6 +902,11 @@ sub ValidateUserCache
       $UserCache->{$ENV{REMOTE_USER}}->{state}=1;
       $UserCache->{$ENV{REMOTE_USER}}->{atime}=time();
    }
+   if ($W5V2::OperationContext ne "WebFrontend"){  # UserCache only makes
+      $UserCache->{$ENV{REMOTE_USER}}->{rec}={};   # sense in Web-Context
+      $UserCache->{$ENV{REMOTE_USER}}->{state}=1;
+      $UserCache->{$ENV{REMOTE_USER}}->{atime}=time();
+   }
    if ($W5V2::OperationContext ne "W5Server" &&   # do not load cache as W5Srv
        !defined($UserCache->{$ENV{REMOTE_USER}})){
       my $res=$self->W5ServerCall("rpcCacheQuery","User",$ENV{REMOTE_USER});
