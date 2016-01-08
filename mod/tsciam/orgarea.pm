@@ -460,6 +460,14 @@ sub findNewValidShortname
    }
    $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
    $newname=~s/&/_u_/g;
+   $newname =~ s/ä/ae/g;
+   $newname =~ s/ö/oe/g;
+   $newname =~ s/ü/ue/g;
+   $newname =~ s/Ä/Ae/g;
+   $newname =~ s/Ö/Oe/g;
+   $newname =~ s/Ü/Ue/g;
+   $newname =~ s/ß/sz/g;
+   $newname=~s/[^a-z0-9_-]/_/gi;
    if (length($newname)>15){
       $newname=substr($newname,0,15);
    }
