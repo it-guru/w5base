@@ -293,6 +293,10 @@ sub execute
    my $self=shift;
    my($statement, $attr, @bind_values) = @_;
 
+   #if (length($statement)>(1024*1024*5) ){
+   #   msg(ERROR,"oversized (>1M) Statement $statement\n");
+   #   Stacktrace();
+   #}
    if (lc($self->DriverName()) eq "mysql"){
       if ($ENV{REMOTE_USER} ne ""){  # ATTETION: MSSQL produces some errors
          $statement.=" /* W5BaseUser: $ENV{REMOTE_USER}($$) ".  # with
