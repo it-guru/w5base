@@ -173,9 +173,13 @@ sub doQualityCheck
             $total++;
             $c++;
             if ($self->LastMsg()>0){
-               msg(ERROR,"error messages while check of ".
-                         $stateparam->{idname}."='".$curid."' in ".
-                         $dataobj->Self());
+               my @l=$self->LastMsg();
+               #printf STDERR ("fifi x %s\n\n",join("\n",@l));
+               if (grep(/error/i,@l)){
+                  msg(ERROR,"error messages while check of ".
+                            $stateparam->{idname}."='".$curid."' in ".
+                            $dataobj->Self());
+               }
                $self->LastMsg("");
             }
             msg(DEBUG,"check record end");
