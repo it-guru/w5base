@@ -366,8 +366,8 @@ tmpCompareExclude=>\@tmpexcl,
                   }
                }
                if ($amiprec->{ipv6address} ne ""){
-                  if ($amiprec->{ipv4address}=~
-                      m/^[a-f0-9]{1,4}(:[a-f0-9]{0,4}){4,8}$/){
+                  if ($amiprec->{ipv6address}=~
+                      m/^[a-f0-9]{1,4}(:[a-f0-9]{0,4}){3,7}$/){
                      $cleanAmIPlist{$amiprec->{ipv6address}}={
                         ipaddress=>$amiprec->{ipv6address},
                         description=>$amiprec->{description}
