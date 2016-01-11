@@ -29,25 +29,36 @@ sub process
       $SIG{$sig}=sub{
           my $loc="";
           my @loc = caller(1);
-          $loc.=sprintf("$sig generated at line $loc[2] in $loc[1]:%s\n",@_);
+          if ($_[0] ne "INT"){
+             $loc.=sprintf("$sig generated at line $loc[2] in $loc[1]:%s\n",@_);
 
-          my $max_depth = 30;
-          my $i = 1;
+             my $max_depth = 30;
+             my $i = 1;
 
-          while ( (my @call_details = (caller($i++))) && ($i<$max_depth) ) {
-            $loc.=sprintf("$i $call_details[1]($call_details[2]) ".
-                          "in $call_details[3]\n");
+             while ( (my @call_details = (caller($i++))) && ($i<$max_depth) ) {
+               $loc.=sprintf("$i $call_details[1]($call_details[2]) ".
+                             "in $call_details[3]\n");
+             }
+
+             $self->NotifyAdmin(
+                 "Reporter DIE pid=$$:",$loc);
           }
-
-          $self->NotifyAdmin(
-              "Reporter DIE pid=$$:",$loc);
           exit(1);
       };
    }
 
+  my $opmode=$self->getParent->Config->Param("W5BaseOperationMode");
+   my $ro=0;
+   if ($opmode eq "readonly"){
+      $ro=1;
+   }
+
+
 
    while(1){
-      $self->Reporter();
+      if (!$ro){
+         $self->Reporter();
+      }
       sleep(600);
    }
 }
