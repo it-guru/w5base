@@ -4,9 +4,9 @@ package AL_TCom::qrule::ApplIncidentAGroup;
 
 =head3 PURPOSE
 
-Checks if there is on a "installed/active" or "available" application
-a incident assignmentgroup for assetcenter definied.
-If there is no valid assignmentgroup defined, an error will be procceded.
+Checks if there is on an "installed/active" or "available" application
+an incident assignmentgroup for assetcenter defined.
+If there is no valid assignmentgroup defined, an error will be proceeded.
 
 =head3 IMPORTS
 

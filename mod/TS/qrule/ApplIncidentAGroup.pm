@@ -4,9 +4,9 @@ package TS::qrule::ApplIncidentAGroup;
 
 =head3 PURPOSE
 
-Checks if there is on a "installed/active" or "available" application
-a incident assignmentgroup for assetcenter definied.
-If there is no valid assignmentgroup defined, an error will be procceded.
+Checks if there is on an "installed/active" or "available" application
+an incident assignmentgroup for assetcenter defined.
+If there is no valid assignmentgroup defined, an error will be proceeded.
 
 =head3 IMPORTS
 
@@ -14,31 +14,21 @@ NONE
 
 =head3 HINTS
 
-no english hints avalilable
+no english hints available
 
 [de:]
 
-Die Incident-Assignmengroup ist zwingend, wenn der Datensatz nach
-AssetManager exportiert werden soll/muß. Falls die Assignmengroup
-über ServiceCenter angelegt wurde, ist es wichtig das diese dort
+Die Incident-Assignmentgroup ist zwingend, wenn der Datensatz nach
+AssetManager exportiert werden soll/muss. Falls die Assignmentgroup
+über ServiceManager angelegt wurde, ist es wichtig, dass diese dort
 für den Export nach AssetManager markiert wurde. 
 Ansonsten kann die Gruppe nicht ausgewählt werden - obwohl diese
-u.U. in ServiceCenter angezeigt wird.
-Ansprechpartner für Assignmentgroups im allgemeinen sind in der
+u.U. in ServiceManager angezeigt wird.
+Ansprechpartner für Assignmentgroups im Allgemeinen ist in der
 TelekomIT ...
 
-Hr. Christmann
-
-https://darwin.telekom.de/darwin/auth/base/user/ById/12023707570001
-
-bzw.
-
-Hr. Beez
-
-https://darwin.telekom.de/darwin/auth/base/user/ById/11634954900005
-
-... Diese beiden Kollegen können entsprechende Aufträge zur Erstellung
-bzw. veränderung von Assignmentgroups einstellen.
+Wolfgang Pfisterer
+https://darwin.telekom.de/darwin/auth/base/user/ById/13916949570000
 
 
 =cut
