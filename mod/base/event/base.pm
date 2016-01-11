@@ -53,11 +53,11 @@ sub UserVerified
    my $mainuser=getModuleObject($self->Config,"base::user");
    my $grp=getModuleObject($self->Config,"base::grp");
    my $grpuser=getModuleObject($self->Config,"base::lnkgrpuser");
-   my $wiwusr=getModuleObject($self->Config,"tswiw::user");
-   my $wiworg=getModuleObject($self->Config,"tswiw::orgarea");
+   my $ciamusr=getModuleObject($self->Config,"tsciam::user");
+   my $ciamorg=getModuleObject($self->Config,"tsciam::orgarea");
 
-   if (!defined($wiwusr) ||
-       !defined($wiworg) ||
+   if (!defined($ciamusr) ||
+       !defined($ciamorg) ||
        !defined($grpuser)||
        !defined($user)   ||
        !defined($mainuser)   ||
@@ -82,7 +82,13 @@ sub UserVerified
                msg(INFO,"Quality check of useraccount '$account' OK");
             }
             else{
-               msg(ERROR,"Quality check of useraccount '$account' failed");
+               if ($self->LastMsg()>0){
+                  my @l=$self->LastMsg();
+                  if (grep(/error/i,@l)){
+                     msg(ERROR,"Quality check of ".
+                               "useraccount '$account' failed");
+                  }
+               }
                return({msg=>"qc fail '$account'",exitcode=>1});
             }
          }
