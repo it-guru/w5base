@@ -85,7 +85,7 @@ sub overviewW5Base
    my @flds=("ITIL.Total.Application.Count"=>'W5Base total application count',
              "ITIL.Total.Asset.Count"      =>'W5Base total asset count',
              "ITIL.Total.System.Count"     =>'W5Base total system count');
-   
+  
    while(my $k=shift(@flds)){
       my $label=shift(@flds);
       my $val=0;
@@ -140,12 +140,12 @@ sub overviewAppl
    my @l;
 
    my $keyname='ITIL.Application.Count';
-   if (defined($primrec->{stats}->{$keyname})){
-      my $color="black";
-      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
-      push(@l,[$app->T('Count of Application Config-Items'),
-               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
-   }
+   #if (defined($primrec->{stats}->{$keyname})){
+   #   my $color="black";
+   #   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+   #   push(@l,[$app->T('Count of Application Config-Items'),
+   #            $primrec->{stats}->{$keyname}->[0],$color,$delta]);
+   #}
 
    return(@l);
 }
@@ -184,12 +184,12 @@ sub overviewSystem
    my @l;
 
    my $keyname='ITIL.System.Count';
-   if (defined($primrec->{stats}->{$keyname})){
-      my $color="black";
-      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
-      push(@l,[$app->T('Count of System Config-Items'),
-               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
-   }
+   #if (defined($primrec->{stats}->{$keyname})){
+   #   my $color="black";
+   #   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+   #   push(@l,[$app->T('Count of System Config-Items'),
+   #            $primrec->{stats}->{$keyname}->[0],$color,$delta]);
+   #}
    return(@l);
 }
 
@@ -229,12 +229,12 @@ sub overviewAsset
    my @l;
 
    my $keyname='ITIL.Asset.Count';
-   if (defined($primrec->{stats}->{$keyname})){
-      my $color="black";
-      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
-      push(@l,[$app->T('Count of Asset Config-Items'),
-               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
-   }
+   #if (defined($primrec->{stats}->{$keyname})){
+   #   my $color="black";
+   #   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+   #   push(@l,[$app->T('Count of Asset Config-Items'),
+   #            $primrec->{stats}->{$keyname}->[0],$color,$delta]);
+   #}
    return(@l);
 }
 
@@ -299,12 +299,12 @@ sub overviewSWInstance
    my @l;
 
    my $keyname='ITIL.SWInstance.Count';
-   if (defined($primrec->{stats}->{$keyname})){
-      my $color="black";
-      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
-      push(@l,[$app->T('Count of Instance Config-Items'),
-               $primrec->{stats}->{$keyname}->[0],$color,$delta]);
-   }
+   #if (defined($primrec->{stats}->{$keyname})){
+   #   my $color="black";
+   #   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+   #   push(@l,[$app->T('Count of Instance Config-Items'),
+   #            $primrec->{stats}->{$keyname}->[0],$color,$delta]);
+   #}
    return(@l);
 }
 

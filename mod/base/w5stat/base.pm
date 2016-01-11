@@ -182,6 +182,12 @@ sub overviewDataIssue
                $dataissues,$color,$delta]);
    }
 
+   if ($#l!=-1){
+      unshift(@l,[$app->T('DataIssue Workflows'),undef]);
+   }
+
+   my @wf;
+
    my $keyname='base.Workflow.sleep56';
    my $wfcount=0;
    if (defined($primrec->{stats}->{$keyname})){
@@ -193,7 +199,7 @@ sub overviewDataIssue
    }
 
    if ($wfcount>0 && $wfcount!=$dataissues){
-      push(@l,[$app->T('workflows untreaded longer then 8 weeks'),
+      push(@wf,[$app->T('workflows untreaded longer then 8 weeks'),
                $wfcount,"red",undef]);
    }
 
@@ -203,8 +209,13 @@ sub overviewDataIssue
       $wfcount=$primrec->{stats}->{$keyname}->[0];
    }
    if ($wfcount>0){
-      push(@l,[$app->T('count of consequent ignored workflow'),
+      push(@wf,[$app->T('count of consequent ignored workflow'),
                $wfcount,"red",undef]);
+   }
+
+   if ($#wf!=-1){
+      unshift(@wf,[$app->T('generally Workflow view'),undef]);
+      push(@l,@wf);
    }
 
    return(@l);

@@ -107,13 +107,13 @@ p.header {
 
 <table id=tabelle width="654" border="0" cellspacing="0" cellpadding="0">
 <tr><td>
-<div style="margin-left:15px;margin-top:15px;width:600px">
+<div style="margin-left:10px;margin-top:15px;width:575px">
 Ladies and Gentlemen,<br>
 <br>
 below you will receive the latest Quality-Report %month% for "%fullname%". A detailed analysis / description of the figures is available via the following link.<br>
 <br>
 </div>
-<div style="margin-left:25px;margin-top:25px;margin-bottom:25px;width:600px">
+<div style="margin-left:10px;margin-top:25px;margin-bottom:25px;">
 <a class=detaillink title="click here, to see the detail report online" href="%directlink%"><b>Quality-Report %fullname%</b></a><br>
 %htmldata%
 </div>

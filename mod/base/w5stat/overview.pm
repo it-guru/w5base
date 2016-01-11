@@ -106,29 +106,42 @@ sub displayOverview
       }
    }
    $d.="\n<div class=overview>";
-   $d.="<table width=\"100%\" height=\"70%\">";
+   $d.="<table border=0 width=\"98%\" height=\"70%\">";
    my $class="unitdata";
+   my $subloopcnt=0;
    foreach my $rec (@ovdata){
+      $subloopcnt++;
+      my $text=$rec->[0];
       if ($#{$rec}!=0){
          my $color="black";
+         if (!defined($rec->[1])){
+            $text="<u>".$text."</u>";
+            if ($subloopcnt>1){
+               $text="<br>".$text;
+            }
+         }
+         else{
+            $text="&nbsp;".$text;
+         }
          if (defined($rec->[2])){
             $color=$rec->[2];
          }
          $d.="\n<tr height=1%>";
-         $d.="<td><div class=\"$class\">".$rec->[0]."</div></td>";
+         $d.="<td><div class=\"$class\">".$text."</div></td>";
          $d.="<td align=right width=50><font color=\"$color\"><b>".
              $rec->[1]."</b></font></td>";
          $d.="<td align=right width=50>".$rec->[3]."</td>";
          $d.="</tr>";
       }
       else{
+         $subloopcnt=0;
          if ($class eq "unitdata"){
             $d.="\n<tr height=1%><td colspan=3>&nbsp;</td></tr>";
             $class="subunitdata";
          }
          $d.="\n<tr height=1%>";
          $d.="<td colspan=3><div class=subunit>".$app->T("Subunit").": ".
-              $rec->[0]."</div></td>";
+              $text."</div></td>";
          $d.="</tr>";
       }
    }
