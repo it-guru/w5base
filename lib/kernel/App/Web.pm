@@ -902,7 +902,8 @@ sub ValidateUserCache
       $UserCache->{$ENV{REMOTE_USER}}->{state}=1;
       $UserCache->{$ENV{REMOTE_USER}}->{atime}=time();
    }
-   if ($W5V2::OperationContext ne "WebFrontend"){  # UserCache only makes
+   if (!defined($ENV{SERVER_SOFTWARE}) &&
+       !defined($UserCache->{$ENV{REMOTE_USER}})){  # UserCache only makes
       $UserCache->{$ENV{REMOTE_USER}}->{rec}={};   # sense in Web-Context
       $UserCache->{$ENV{REMOTE_USER}}->{state}=1;
       $UserCache->{$ENV{REMOTE_USER}}->{atime}=time();

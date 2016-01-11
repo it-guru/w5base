@@ -421,7 +421,9 @@ sub calcBaseApplicationExpertGroup
    # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14273593150005
    # (auch wenns eigentlich ein Schmarren ist)
    my $m=$appl->getField("businessteam")->RawValue($rec);
-   if ($m=~m/^DTAG\.TSI\.Prod\.CS\.SAPS(\.|$)/){
+   if (($m=~m/^DTAG\.TSI\.Prod\.CS\.SAPS(\.|$)/) ||
+       ($m=~m/^DTAG\.GHQ\.VTS\.TSI\.ITDiv\.GITO\.SAPS(\.|$)/) ||
+       ($m=~m/^DTAG\.TSY\.ITDiv\.CS\.SAPS(\.|$)/)){
       if ($rec->{tsmid} ne ""){
          push(@{$a{dba}->{userid}},$rec->{tsmid});
       }
