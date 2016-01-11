@@ -92,11 +92,11 @@ sub qcheckRecord
          @l=$ciam->getHashList(qw(ALL));
          if ($#l==-1 &&
              ( ($rec->{email}=~m/\@telekom\.de$/) ||
-               ($rec->{email}=~m/\@t-systems\.com$/))){
+               ($rec->{email}=~m/\@t-systems\.com$/)) &&
+             ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user")){
             $dataobj->Log(ERROR,"basedata",
                    "Contact '%s' seems to have leave ".
-                   " the DTAG concern. ".
-                   "\n-",
+                   " the DTAG concern.",
                    $rec->{fullname});
          }
       }
