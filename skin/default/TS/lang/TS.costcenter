@@ -1,2 +1,4 @@
 'TS::costcenter'=>{de=>'Kontierungsobjekt',en=>'CostCenter'},
 'fieldgroup.saprelation'=>{de=>'SAP Relationen',en=>'SAP Relations'},
+'OFI Entity'=>{de=>'OFI Element'},
+
