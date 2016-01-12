@@ -24,11 +24,13 @@ AssetManager exportiert werden soll/muss. Falls die Assignmentgroup
 für den Export nach AssetManager markiert wurde. 
 Ansonsten kann die Gruppe nicht ausgewählt werden - obwohl diese
 u.U. in ServiceManager angezeigt wird.
-Ansprechpartner für Assignmentgroups im Allgemeinen ist in der
-TelekomIT ...
 
-Wolfgang Pfisterer
-https://darwin.telekom.de/darwin/auth/base/user/ById/13916949570000
+Ansprechpartner für Assignmentgroups im Allgemeinen ist der 
+SPOC TelekomIT:
+
+FMB: SPOC_SM9_TEL-IT@t-systems.com
+
+TSN: https://tsn.telekom.de/groups/spoc-masterdata-sm9-f%C3%BCr-tel-it
 
 
 =cut
