@@ -43,6 +43,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::QRule;
+use itil::lib::Listedit;
 @ISA=qw(kernel::QRule);
 
 sub new
@@ -109,7 +110,20 @@ sub qcheckRecord
             else{
                my $res=$response->content;
                my @resipl=grep(!/^\s*$/,split(/\s+/,$res));
-               push(@ipl,@resipl);
+               my $msg;
+               my $ipfail=0;
+               foreach my $ip (@resipl){
+                  last if ($ipfail);
+                  if (!$self->itil::lib::Listedit::IPValidate($ip,\$msg)){
+                     $ipfail++;
+                  }
+               }
+               if ($ipfail){
+                  msg(ERROR,"restdns result invalid for $url");
+               }
+               else{
+                  push(@ipl,@resipl);
+               }
             }
          }
       }
