@@ -28,9 +28,8 @@ u.U. in ServiceManager angezeigt wird.
 Ansprechpartner für Assignmentgroups im Allgemeinen ist der 
 SPOC TelekomIT:
 
-FMB: SPOC_SM9_TEL-IT@t-systems.com
+https://darwin.telekom.de/darwin/auth/base/user/ById/14526036310001
 
-TSN: https://tsn.telekom.de/groups/spoc-masterdata-sm9-f%C3%BCr-tel-it
 
 
 =cut
