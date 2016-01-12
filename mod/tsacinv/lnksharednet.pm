@@ -40,7 +40,7 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'amTsiParentChild.ltsiparentchildid'),
+                dataobjattr   =>'TsiParentChild.ltsiparentchildid'),
 
       new kernel::Field::Text(
                 name          =>'description',
@@ -49,7 +49,7 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'amTsiParentChild.description'),
+                dataobjattr   =>'TsiParentChild.description'),
 
       new kernel::Field::Text(
                 name          =>'applid',
@@ -97,15 +97,9 @@ sub new
       new kernel::Field::Text(
                 name          =>'netnature',
                 label         =>'Network-Component Nature',
-                dataobjattr   =>'netparentnature.name'),
-
-
-      new kernel::Field::Text(
-                name          =>'netnature',
-                label         =>'Network-Component Nature',
                 size          =>'20',
                 ignorecase    =>1,
-                dataobjattr   =>'netparentnature.name'),
+                dataobjattr   =>'netpartnernature.name'),
 
       new kernel::Field::Link(
                 name          =>'lcomputerid',
@@ -130,39 +124,48 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amTsiParentChild,".
-            "amportfolio systemportfolio,".
-            "amcomputer,".
-            "amportfolio netportfolio,".
-            "amcomputer  netcomputer,".
-            "amportfolio netparentportfolio,".
-            "ammodel     netparentmodel,".
-            "amnature    netparentnature,".
-            "amtsirelportfappl,".
-            "amtsicustappl";
+   my $from="amcomputer ".
+    "join amportfolio systemportfolio ".
+     "on (amcomputer.litemid=systemportfolio.lportfolioitemid and ".
+         "systemportfolio.bdelete='0') ".
+    "join ( ".
+       "select ".
+               "amTsiParentChild.ltsiparentchildid,".
+               "amTsiParentChild.lparentid a,".
+               "amTsiParentChild.lchildid b,".
+               "amTsiParentChild.description ".
+       "from amTsiParentChild ".
+       "union all ".
+       "select ".
+               "amTsiParentChild.ltsiparentchildid,".
+               "amTsiParentChild.lchildid a,".
+               "amTsiParentChild.lparentid b,".
+               "amTsiParentChild.description ".
+       "from amTsiParentChild ".
+    ") TsiParentChild on systemportfolio.lportfolioitemid=TsiParentChild.a ".
+    "join amportfolio netportfolio ".
+     "on (TsiParentChild.b=netportfolio.lportfolioitemid and ".
+         "netportfolio.bdelete='0') ".
+    "join amcomputer netcomputer ".
+     "on (netcomputer.litemid=netportfolio.lportfolioitemid and ".
+         "netcomputer.status<>'out of operation') ".
+    "join amportfolio netpartnerportfolio ".
+     "on netportfolio.lparentid=netpartnerportfolio.lportfolioitemid ".
+    "join ammodel netpartnermodel ".
+     "on netpartnerportfolio.lmodelid=netpartnermodel.lmodelid ".
+    "join amnature netpartnernature ".
+     "on (netpartnermodel.lnatureid=netpartnernature.lnatureid and ".
+         "netpartnernature.name in ".
+         "('SWITCH','FIREWALL-BOX','FC-SWITCH','ROUTER')) ".
+    "left outer join amtsirelportfappl ".
+     "on (systemportfolio.lportfolioitemid=amtsirelportfappl.lportfolioid and ".
+         "amtsirelportfappl.bdelete='0') ".
+    "left outer join amtsicustappl ".
+     "on amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid ";
+
    return($from);
 }
 
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amTsiParentChild.lchildid=systemportfolio.lportfolioitemid ".
-      "and systemportfolio.bdelete='0' ".
-      "and amcomputer.litemid=systemportfolio.lportfolioitemid ".
-      "and amTsiParentChild.lparentid=netportfolio.lportfolioitemid  ".
-      "and netportfolio.lparentid=netparentportfolio.lportfolioitemid ".
-      "and netportfolio.bdelete='0'  ".
-      "and netparentportfolio.lmodelid=netparentmodel.lmodelid ".
-      "and netparentmodel.lnatureid=netparentnature.lnatureid ".
-      "and amtsirelportfappl.lportfolioid=systemportfolio.lportfolioitemid ".
-      "and amtsirelportfappl.bdelete='0' ".
-      "and netcomputer.litemid=netportfolio.lportfolioitemid ".
-      "and netcomputer.status<>'out of operation' ".
-      "and netparentnature.name in ".
-      "('SWITCH','FIREWALL-BOX','FC-SWITCH','ROUTER') ".
-      "and amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid ";
-   return($where);
-}
 
 
 sub isViewValid
