@@ -102,14 +102,19 @@ sub qcheckRecord
                msg(INFO,"set proxy to $proxy");
                $ua->proxy(['http', 'ftp'],$proxy);
             }
-            my $url="http://restdns.net/".$host;
+            my $url="http://api.hackertarget.com/dnslookup/?q=".$host;
             my $response=$ua->request(GET($url));
             if ($response->code ne "200"){
                msg(ERROR,"$self URL request $url failed");
             }
             else{
                my $res=$response->content;
-               my @resipl=grep(!/^\s*$/,split(/\s+/,$res));
+               my @lines=grep(/\S+\s+\S+\s+IN\s+A\s+/,split(/[\r\n]/,$res));
+               my @resipl=map({
+                 my $l=$_;
+                 $l=~s/^.*\s+(\S+)$/$1/;
+                 $l;
+               } @lines);
                my $msg;
                my $ipfail=0;
                foreach my $ip (@resipl){
@@ -119,7 +124,7 @@ sub qcheckRecord
                   }
                }
                if ($ipfail){
-                  msg(ERROR,"restdns result invalid for $url");
+                  msg(ERROR,"dnslookup API result invalid for $url");
                }
                else{
                   push(@ipl,@resipl);
