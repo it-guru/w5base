@@ -6,7 +6,7 @@ package TS::qrule::AccessUrlResolver;
 
 This rule checks the DNS resolv posibility of the hostname part
 in the URL. Urls at the networkarea "internet" will be resolved
-by http://restdns.net/
+by http://api.hackertarget.com/dnslookup
 
 =head3 IMPORTS
 
