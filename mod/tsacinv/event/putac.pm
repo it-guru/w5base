@@ -700,8 +700,7 @@ sub SendXmlToAM_appl
                                  tenant=>\'CS'
                               },
                               {
-                                 email=>\$rec->{email},
-                                 tenant=>\'CS'
+                                 email=>\$rec->{email}
                               }
                            ]);
                            my @l=$acuser->getHashList(qw(lempldeptid idno));
