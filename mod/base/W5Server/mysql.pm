@@ -92,7 +92,7 @@ sub process
 # is not present, the query is simply echoed back to the client.
 #
 
-my $port = '1234';
+my $port = '33306';
 my $database = 'myecho';
 my $table = 'mytable';
 my $field = 'myfield';
