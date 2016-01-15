@@ -66,6 +66,7 @@ sub process
 sub Reporter
 {
    my $self=shift;
+   my $ppid=getppid();
  
    my $reportjob=getModuleObject($self->Config,"base::reportjob");
    $reportjob->BackendSessionName("ForceUncached");
@@ -126,6 +127,7 @@ sub Reporter
           $self->taskCreator(\%Reporter);     
           $last_taskCreator=time();
        }
+       die('lost my parent W5Server process - not good') if (getppid()==1);
    }
    #######################################################################
 }

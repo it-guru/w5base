@@ -36,7 +36,7 @@ sub getDefaultIntervalMinutes
 {
    my $self=shift;
 
-   return(60,['6:00','20:30']);    
+   return(60,['5:30','20:30']);    
 }
 
 

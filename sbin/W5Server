@@ -936,10 +936,10 @@ sub pre_loop_hook
    $ENV{HOME}=$home if (-d $home);
 
    $SIG{USR1}=sub{          # soft restart
-      delete($self->{ServerHalt});
-      $self->{ServerGoesDown}=15;
-      $self->sendSignalToAllRunningProcesses(10);
-      msg(INFO,"Soft Shutdown handler initiated");
+      #delete($self->{ServerHalt});
+      #$self->{ServerGoesDown}=15;
+      #$self->sendSignalToAllRunningProcesses(10);
+      msg(INFO,"Soft Restart disabled - USR1 ignored");
    };
    $SIG{USR2}=sub{          # soft shutdown
       $self->{ServerHalt}=1;
@@ -974,6 +974,8 @@ sub StartW5ServerProcess
       my \$tasks=\$self->getTasksHash();  # this should be done in RPC::Server,
       \%{\$tasks}=();                     # but at this position, i didnt need
                                           # a module update
+      for(my \$c=3;\$c<254;\$c++){ POSIX::close(\$c); }  # needed on restart!
+
       \$0="W5Sserver-".\$server;
       my \$orgpid=\$\$;
       sub start{
@@ -1000,14 +1002,6 @@ sub StartW5ServerProcess
           if (\$sig eq "__DIE__" || \$sig eq "__WARN__"){
              \$SIG{\$sig}='default';
              next;
-           #  \$SIG{\$sig}=sub{
-           #      my \@loc = caller();
-           #      printf STDERR ("fifi __DIE__\\n");sleep(5);
-           #      \$self->NotifyAdmin(
-           #          "\$server DIE pid=\$orgpid:\$\$ \$0",join("\\n",\@loc));
-           #      return(1);
-           #  };
-           #  next;
           }
           if (\$sig eq "INT"){
              \$SIG{INT}=\\&shutdown;

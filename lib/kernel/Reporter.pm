@@ -89,14 +89,12 @@ sub taskCreator          # creates new Prozess requests
       $startTask++ if ($#{$deftimes}==-1);
       for(my $t=0;$t<=$#{$deftimes};$t++){
          my $twinlow=$deftimes->[$t];
-         my $twinheight=($twinlow+(1/60)*30);
+         my $twinheight=($twinlow+(1/60)*15);
          my $nowfloat=$nh+(1/60*$nm);
-         if ($twinlow<=$nowfloat){
-            if ($twinheight>$nowfloat){
-               if (!defined($deftimes->[$t+1]) || 
-                   $deftimes->[$t+1]>$nowfloat){
-                  $startTask++;
-               }
+         if ($twinlow<=$nowfloat && $twinheight>$nowfloat){
+            if (!defined($deftimes->[$t+1]) || 
+                $deftimes->[$t+1]>$nowfloat){
+               $startTask++;
             }
          }
          if ($twinlow>$nowfloat){ # weitere checks machen dann ohnehin
