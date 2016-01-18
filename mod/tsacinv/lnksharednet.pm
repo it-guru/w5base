@@ -134,14 +134,14 @@ sub getSqlFrom
                "amTsiParentChild.lparentid a,".
                "amTsiParentChild.lchildid b,".
                "amTsiParentChild.description ".
-       "from amTsiParentChild where externalsystem='AutoDiscovery' ".
+       "from amTsiParentChild where externalsystem='Autodiscovery' ".
        "union all ".
        "select ".
                "amTsiParentChild.ltsiparentchildid,".
                "amTsiParentChild.lchildid a,".
                "amTsiParentChild.lparentid b,".
                "amTsiParentChild.description ".
-       "from amTsiParentChild where externalsystem='AutoDiscovery' ".
+       "from amTsiParentChild where externalsystem='Autodiscovery' ".
     ") TsiParentChild on systemportfolio.lportfolioitemid=TsiParentChild.a ".
     "join amportfolio netportfolio ".
      "on (TsiParentChild.b=netportfolio.lportfolioitemid and ".
