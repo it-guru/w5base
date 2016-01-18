@@ -156,7 +156,7 @@ sub getSqlFrom
     "join amnature netpartnernature ".
      "on (netpartnermodel.lnatureid=netpartnernature.lnatureid and ".
          "netpartnernature.name in ".
-         "('SWITCH','FIREWALL-BOX','FC-SWITCH','ROUTER')) ".
+         "('SWITCH','FIREWALL-BOX','FIREWALL','FC-SWITCH','ROUTER')) ".
     "left outer join amtsirelportfappl ".
      "on (systemportfolio.lportfolioitemid=amtsirelportfappl.lportfolioid and ".
          "amtsirelportfappl.bdelete='0') ".
