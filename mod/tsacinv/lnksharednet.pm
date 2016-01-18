@@ -134,14 +134,14 @@ sub getSqlFrom
                "amTsiParentChild.lparentid a,".
                "amTsiParentChild.lchildid b,".
                "amTsiParentChild.description ".
-       "from amTsiParentChild ".
+       "from amTsiParentChild where externalsystem='AutoDiscovery' ".
        "union all ".
        "select ".
                "amTsiParentChild.ltsiparentchildid,".
                "amTsiParentChild.lchildid a,".
                "amTsiParentChild.lparentid b,".
                "amTsiParentChild.description ".
-       "from amTsiParentChild ".
+       "from amTsiParentChild where externalsystem='AutoDiscovery' ".
     ") TsiParentChild on systemportfolio.lportfolioitemid=TsiParentChild.a ".
     "join amportfolio netportfolio ".
      "on (TsiParentChild.b=netportfolio.lportfolioitemid and ".
@@ -154,9 +154,12 @@ sub getSqlFrom
     "join ammodel netpartnermodel ".
      "on netpartnerportfolio.lmodelid=netpartnermodel.lmodelid ".
     "join amnature netpartnernature ".
-     "on (netpartnermodel.lnatureid=netpartnernature.lnatureid and ".
-         "netpartnernature.name in ".
-         "('SWITCH','FIREWALL-BOX','FIREWALL','FC-SWITCH','ROUTER')) ".
+     "on netpartnermodel.lnatureid=netpartnernature.lnatureid ".
+    #     "netpartnernature.name in ".
+    #     "('SWITCH','FIREWALL-BOX','FIREWALL','FC-SWITCH','ROUTER')) ".
+    # "on (netpartnermodel.lnatureid=netpartnernature.lnatureid and ".
+    #     "netpartnernature.name in ".
+    #     "('SWITCH','FIREWALL-BOX','FIREWALL','FC-SWITCH','ROUTER')) ".
     "left outer join amtsirelportfappl ".
      "on (systemportfolio.lportfolioitemid=amtsirelportfappl.lportfolioid and ".
          "amtsirelportfappl.bdelete='0') ".
