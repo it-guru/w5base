@@ -31,19 +31,19 @@
 'Interface agreement'=>{de=>'Schnittstellenvereinbarung'},
 'Interfaceprotocol'=>{de=>'Protokoll'},
 'contype.0'=>{de=>'(<=>) bidirektionale kritische Kommunikation',
-              en=>'(<=>) bidrictional critical communication'},
+              en=>'(<=>) bidirectional critical communication'},
 'contype.1'=>{de=>'(>=>) kritische Daten werden versandt',
               en=>'(>=>) critical informations are send'},
 'contype.2'=>{de=>'(<=<) kritische Daten werden empfangen',
               en=>'(<=<) critical informations are received'},
 'contype.3'=>{de=>'(<->) bidirektionale unkritische Kommunikation',
-              en=>'(<->) bidrictional uncritical communication'},
+              en=>'(<->) bidirectional uncritical communication'},
 'contype.4'=>{de=>'(>->) unkritische Daten werden versandt',
               en=>'(>->) uncritical informations are send'},
 'contype.5'=>{de=>'(<-<) unkritische Daten werden empfangen',
               en=>'(<-<) uncritical informations are received'},
-'invalid from application'=>{de=>'unkgültige Anwendung bei "von"'},
-'invalid to application'=>{de=>'unkgültige Anwendung bei "nach"'},
+'invalid from application'=>{de=>'ungültige Anwendung bei "von"'},
+'invalid to application'=>{de=>'ungültige Anwendung bei "nach"'},
 'selected application is currently unuseable'=>{de=>'die ausgewählte Anwendung kann aktuell nicht verwendet werden'},
 'invalid characters in from service name'=>{de=>'ungültige Zeichen im von Servicename'},
 'invalid characters in to service name'=>{de=>'ungültige Zeichen im nach Servicename'},
@@ -73,15 +73,15 @@
 'The status of Application interface to %s has been changed'=>{
    de=>'Der Status einer Anwendungsschnittstelle zu %s wurde geändert'
 },
-"the application '%s' has deleted an application interface to '%s' on its side."=>{
+"from the side of application '%s' has been deleted an existing interface to your application '%s'."=>{
    de=>"die Anwendung '%s' hat auf ihrer Seite eine Anwendungsschnittstelle zu '%s' gelöscht."
 },
-"the application '%s' has on its side a new application interface to '%s' documented."=>{
+"from the side of application '%s' has been documented a new interface to your application '%s'."=>{
    de=>"die Anwendung '%s' hat auf ihrer Seite eine neue Anwendungsschnittstelle zu '%s' angelegt."
 },
 "the application '%s' has changed the status of an application interface to '%s'."=>{
    de=>"die Anwendung '%s' hat auf ihrer Seite den Status einer Anwendungsschnittstelle zu '%s' geändert."
 },
-"Please perform the possibly needful modifications of the interface documentation at the application '%s'."=>{
+"If necessary, please perform any needed modifications of the interface documentation on the application '%s'."=>{
    de=>"Bitte führen Sie die evtl. notwendigen Anpassungen der Schnittstellendokumentation an der Anwendung '%s' durch."
 },

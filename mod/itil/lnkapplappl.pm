@@ -550,9 +550,10 @@ sub NotifyIfPartner
    $ifparam.=$self->T('Interface-State').': ';
    $ifparam.=$rec{cistatus};
 
-   my $todomsg=sprintf($self->T("Please perform the possibly needful ".
-                                "modifications of the interface ".
-                                "documentation at the application '%s'."),
+   my $todomsg=sprintf($self->T("If necessary, please perform any ".
+                                "needed modifications of the ".
+                                "interface documentation ".
+                                "on the application '%s'."),
                        $rec{toappl});
    $text=$self->T("Dear Databoss").",\n\n";
    if ($notifycontrol->{mode} eq 'InterfaceNew') {
@@ -561,8 +562,9 @@ sub NotifyIfPartner
 
       $subject=sprintf($self->T("New Application interface to %s"),
                        $rec{toappl});
-      $text.=sprintf($self->T("the application '%s' has on its side a new ".
-                              "application interface to '%s' documented."),
+      $text.=sprintf($self->T("from the side of application '%s' ".
+                              "has been documented a new interface ".
+                              "to your application '%s'."),
                      $rec{fromappl},$rec{toappl});
       $text.="\n\n";
       $text.=$ifparam;
@@ -593,8 +595,9 @@ sub NotifyIfPartner
       $subject=sprintf($self->T("An application interface ".
                                 "to %s has been deleted"),
                        $rec{toappl});
-      $text.=sprintf($self->T("the application '%s' has deleted an ".
-                              "application interface to '%s' on its side."),
+      $text.=sprintf($self->T("from the side of application '%s' ".
+                              "has been deleted an existing interface ".
+                              "to your application '%s'."),
                      $rec{fromappl},$rec{toappl});
       $text.="\n\n";
       $text.=$ifparam;
