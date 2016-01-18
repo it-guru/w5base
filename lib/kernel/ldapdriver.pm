@@ -131,7 +131,11 @@ sub execute
 
        $c->{$self->{ldapname}}->{sth}=$self->{'ldap'}->search(@param);
        my $eseconds=Time::HiRes::time();
-       if ($eseconds-$sseconds>10){
+       my $slowlimit=20;
+       if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
+          $slowlimit=8;
+       }
+       if ($eseconds-$sseconds>$slowlimit){
          my $t=sprintf("%.3lf",$eseconds-$sseconds);
          my $s=$self->getParent->Self();
          my %p=@param;
