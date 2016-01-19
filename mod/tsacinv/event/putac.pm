@@ -187,7 +187,7 @@ sub mkAcFtpRecAsset
                     Security_Unit=>"TS.DE",
                     bDelete=>'0',
                     Location=>'/DE-BAMBERG-GUTENBERGSTR-13/',
-                    Sender_CostCenter=>$rec->{conodenumber},
+                    Sender_CostCenter=>$rec->{conumber},
                     AssignmentGroup=>$assignment,
                     IncidentAG=>$assignment,
                }
@@ -425,7 +425,7 @@ sub SendXmlToAM_instance
                      Assignment=>$assignment,
                      IncidentAG=>$iassignment,
                      SC_Location_Id=>'1000.0043.0089',
-                     #CostCenter=>$rec->{conodenumber},
+                     #CostCenter=>$rec->{conumber},
                      Security_Unit=>"TS.DE",
                      CustomerLink=>"TS.DE",
                      bDelete=>'0'
@@ -786,6 +786,10 @@ sub SendXmlToAM_appl
                # passende customerlink eingetragen ist.
                # ---
                #$self->validateCostCenter4AssetManager($rec);
+               my $conumber=$rec->{conumber};
+               if ($conumber=~m/^[a-z]-[a-z0-9]+$/i){
+                  $conumber=$rec->{conodenumber};
+               }
                my $acftprec={
                                 Appl=>{
                                    Security_Unit=>"TS.DE",
@@ -793,7 +797,7 @@ sub SendXmlToAM_appl
                                    Priority=>$rec->{customerprio},
                                    EventID=>$CurrentEventId,
                                    AssignmentGroup=>$assignment,
-                                   CO_CC=>$rec->{conodenumber},
+                                   CO_CC=>$conumber,
                                    Description=>$rec->{description},
                                    CustBusinessDesc=>$rec->{description},
                                    Remarks=>$rec->{comments},
@@ -972,164 +976,6 @@ sub SendXmlToAM_appl
 #   $self->sendFileToAssetManagerOnlineInterface($onlinefilename,$elements);
    return($back);
 }
-
-
-sub validateCostCenter4AssetManager
-{
-   my $self=shift;
-   my $rec=shift;
-   my $conumber=$rec->{conumber};
-   my $conodenumber=$rec->{conodenumber};
-   my $customer=$rec->{customer};
-   if (!exists($self->{amsctodocache})){
-      $self->{amsctodocache}={};
-   }
-   my $amsctodo=$self->{amsctodocache};
-
-   # oberste SCLocation der Deutschen Telekom (OS Mandant) in SM9 ist
-   # nach aktuellem Stand (05/2014) die SCLocationID 3863.0000.0000
-
-   my $psp=$self->getPersistentModuleObject("tssapp01::psp");
-   my $start=$self->getPersistentModuleObject("base::start");
-
-   $psp->SetFilter({name=>\$conumber});
-   my ($psprec,$msg)=$psp->getOnlyFirst(qw(bpmark status));
-
-   if (defined($psprec) && $psprec->{bpmark} eq "WIB"){
-      # CustomerLink/SC Location Handling only for WIP PSP Elements
-      my $scloc=$self->getPersistentModuleObject("tsacinv::sclocation");
-      $scloc->SetFilter({name=>\$customer});
-      my ($sclocrec,$msg)=$scloc->getOnlyFirst(qw(id name sclocationid));
-      if (!defined($sclocrec)){
-         my $msgtoken="MISS_SCLOC:$customer";
-         if (!exists($amsctodo->{$msgtoken})){
-            $amsctodo->{$msgtoken}++;
-            my $msgtext=sprintf("The ServiceCenter Location '$customer' is ".
-                                "missing. Please create a new SC Location ".
-                                "with the following parameters:\n\n".
-                                " Name:          $customer\n".
-                                " SC-LocationID: 3863.****.****\n".
-                                " Company:       DEUTSCHE TELEKOM\n".
-                                " SubCompany:    $customer\n");
-            $start->ToDoRequest(
-               undef,"SC-Location:$customer",
-               $msgtoken,$msgtext,
-               [
-                  '11634953080001'  # vogler
-               ]
-            );
-         }
-         
-         
-      }
-      else{
-         my $amcust=$self->getPersistentModuleObject("tsacinv::customer");
-         $amcust->SetFilter({name=>\$customer});
-         my ($amcustrec,$msg)=$amcust->getOnlyFirst(qw(name 
-                                                       defaultsclocationid
-                                                       defaultsclocation));
-         if (defined($amcustrec)){
-            if ($amcustrec->{defaultsclocationid} ne $sclocrec->{id}){
-
-               my $msgtoken="WRONGSCLOC:$customer";
-               if (!exists($amsctodo->{$msgtoken})){
-                  $amsctodo->{$msgtoken}++;
-                  my $msgtext=sprintf(
-                     "The Customer entry '$customer' in AssetManager\n".
-                     "has a wrong DefaultSCLocation. Please change\n".
-                     "the DefaultSCLocation for '$customer' at\n".
-                     "'Customers and Security Units' from ...\n".
-                     "  '$amcustrec->{defaultsclocation}'\n".
-                     "... to ...\n".
-                     "  '$customer'\n"
-                  );
-                  $start->ToDoRequest(
-                     undef,"AM-Customer:$customer",
-                     $msgtoken,$msgtext,
-                     [
-                        '11634953080001'  # vogler
-                     ]
-                  );
-               }
-            }
-            else{
-               # now check the customerlink in costcenter AM
-               my $amco=$self->getPersistentModuleObject("tsacinv::costcenter");
-               $amco->SetFilter({name=>\$conodenumber});
-               my ($amcorec,$msg)=$amco->getOnlyFirst(qw(name customer));
-               if (!defined($amcorec)){
-                  my $msgtoken="MISSCO:$conodenumber";
-                  if (!exists($amsctodo->{$msgtoken})){
-                     $amsctodo->{$msgtoken}++;
-                     my $msgtext=sprintf(
-                        "The costcenter entry for '$conodenumber' ".
-                        "in AssetManager is missing.\n"
-                     );
-                     $start->ToDoRequest(
-                        undef,"AM-CO:$conodenumber",
-                        $msgtoken,$msgtext,
-                        [
-                           '11634953080001'  # vogler
-                        ]
-                     );
-                  }
-               }
-               else{
-                  if ($amcorec->{customer} ne $customer){
-                     my $msgtoken="WRONGCUSTLNK:$customer";
-                     if (!exists($amsctodo->{$msgtoken})){
-                        $amsctodo->{$msgtoken}++;
-                        my $msgtext=sprintf(
-                           "The CustomerLink at costcenter '$conodenumber' ".
-                           "in AssetManager is wrong. ".
-                           "Please change the CustomerLink ".
-                           "for '$conodenumber' at ".
-                           "'Cost Centers' from ...\n".
-                           "  '$amcorec->{customer}'\n".
-                           "... to ...\n".
-                           "  '$customer'\n"
-                        );
-                        $start->ToDoRequest(
-                           undef,"AM-Customer:$customer",
-                           $msgtoken,$msgtext,
-                           [
-                              '11634953080001'  # vogler
-                           ]
-                        );
-                     }
-                  }
-               }
-            }
-         }
-         else{
-            my $msgtoken="MISSCUST:$customer";
-            if (!exists($amsctodo->{$msgtoken})){
-               $amsctodo->{$msgtoken}++;
-               my $msgtext=sprintf(
-                     "The Customer entry '$customer' in AssetManager\n".
-                     "is missing. Please create a new Entry\n".
-                     "in 'Customers and Security Units' with\n".
-                     "with the following parameters:\n\n".
-                     " Unit Identifier:   $customer\n".
-                     " Identifier:        $customer\n".
-                     " Description:       $customer\n".
-                     " Type:              Customer\n".
-                     " DefaultSCLocation: $customer\n"
-               );
-               $start->ToDoRequest(
-                  undef,"AM-Customer:$customer",
-                  $msgtoken,$msgtext,
-                  [
-                     '11634953080001'  # vogler
-                  ]
-               );
-            }
-         }
-      }
-   }
-}
-
-
 
 
 sub sendFileToAssetManagerOnlineInterface
