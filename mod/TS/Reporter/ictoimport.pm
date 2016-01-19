@@ -43,6 +43,8 @@ sub Process             # will be run as a spereate Process (PID)
 {
    my $self=shift;
 
+   return(0);
+
    my $appl=getModuleObject($self->Config,"TS::appl");
    $appl->SetFilter({cistatusid=>\'4'});
    my $oldictono;
