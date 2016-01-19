@@ -9,7 +9,7 @@
 'Costcenter type'=>{de=>'Kontierungsobjekt-Typ'},
 'CC.costcenter'=>{de=>'Kostenstelle',en=>'Costcenter'},
 'CC.costnode'=>{de=>'Kontierungsknoten',en=>'Costnode'},
-'CC.pspelement'=>{de=>'PSP-Element',en=>'PSP-Element'},
+'CC.pspelement'=>{de=>'WBS/PSP (Projectstrukturplan)',en=>'PSP/WBS (WorkBreakdownStructure)'},
 'CC.'=>{de=>'ANY',en=>'ANY'},
 'Accounting Area'=>{de=>'Buchungskreis'},
 'Contacts'=>{de=>'Kontakte'},
