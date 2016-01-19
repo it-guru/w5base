@@ -1166,6 +1166,7 @@ sub new
                 name          =>'applbasemoniteam',
                 group         =>'monisla',
                 label         =>'Application base monitoring resonsible Team',
+                AllowEmpty    =>1,
                 vjoinon       =>'applbasemoniteamid'),
 
       new kernel::Field::Link(
