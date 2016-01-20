@@ -21,7 +21,7 @@ create table interface_tssapp01_01 (
   saphier10    varchar(40) default NULL,
   pconumber    varchar(20) default NULL,
   normodel     varchar(5)  default NULL, ofientity varchar(40) default NULL,
-  norn         varchar(5)  default NULL,
+  norn         varchar(5)  default NULL, rawofientity varchar(40) default NULL,
   createdate   datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
   srcsys       varchar(100) default 'w5base',

@@ -1,0 +1,23 @@
+OFI Elemente gibt es in 3 Ebenen:
+
+Beispiel:
+
+T-T5A-202019077          Ebene 1
+T-T5A-202019077-10       Ebene 2
+T-T5A-202019077-10-0001  Ebene 3
+
+In der SAPP01 wird nur eine "komprimierte" Form
+des OFI Elementes geführt (ohne Bindestriche).
+
+Also wird ...
+T-T5A-202019077-10-0001
+... in der SAPP01 so ...
+TT5A202019077100001
+... geführt.
+
+Über die Schnittstelle wird die "alte" und korrekte
+Struktur wieder erzeugt und dann die SAPP01 Notation
+in rawofientity abgelegt.
+
+
+

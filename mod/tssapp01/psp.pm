@@ -53,6 +53,13 @@ sub new
                 dataobjattr   =>'interface_tssapp01_01.accarea'),
 
       new kernel::Field::Text(
+                name          =>'rawofientity',
+                label         =>'raw OFI Entity',
+                htmldetail    =>0,
+                searchable    =>0,
+                dataobjattr   =>'interface_tssapp01_01.rawofientity'),
+
+      new kernel::Field::Text(
                 name          =>'ofientity',
                 label         =>'OFI Entity',
                 dataobjattr   =>'interface_tssapp01_01.ofientity'),
