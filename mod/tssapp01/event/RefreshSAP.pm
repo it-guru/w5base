@@ -237,7 +237,7 @@ sub processFile
           'parent Co-Number'              =>'pconumber',
           'NOR-solution model'            =>'normodel',
           'NOR-n'                         =>'norn',
-          'PSP_Element_OFI'               =>'ofientity'
+          'PSP_Element_OFI'               =>'rawofientity'
       );
    }
    if ($type eq "costcenter"){
@@ -322,6 +322,22 @@ sub processFile
             }
             #   print Dumper($wrrec);
             $k{$wrrec->{'name'}}++;
+            if (defined($wrrec->{'rawofientity'})){
+               $wrrec->{'ofientity'}=$wrrec->{'rawofientity'};
+               my $ofi=$wrrec->{'ofientity'};
+               if (my (@ofi)=$ofi=~
+                   m/^([A-Z])([0-9A-Z]{3})([0-9A-Z]{9})([0-9]{2})([0-9]{4})$/i){
+                  $wrrec->{'ofientity'}=join("-",@ofi);
+               }
+               elsif (my (@ofi)=$ofi=~
+                   m/^([A-Z])([0-9A-Z]{3})([0-9A-Z]{9})([0-9]{2})$/i){
+                  $wrrec->{'ofientity'}=join("-",@ofi);
+               }
+               elsif (my (@ofi)=$ofi=~
+                   m/^([A-Z])([0-9A-Z]{3})([0-9A-Z]{9})$/i){
+                  $wrrec->{'ofientity'}=join("-",@ofi);
+               }
+            }
            
             # take remote record 
             $if->ValidatedInsertOrUpdateRecord($wrrec,
