@@ -84,6 +84,7 @@ sub qcheckRecord
    }
    else{
       if (lc($rec->{network}) eq "internet"){
+         return(undef);
          my $ua;
          eval('
             use LWP::UserAgent;
