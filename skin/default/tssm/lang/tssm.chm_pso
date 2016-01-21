@@ -1,6 +1,6 @@
 'tssm::chm_pso'=>{de=>'ServiceManager PSO-Übersicht',en=>'ServiceManager PSO-Overview'},
 'fieldgroup.downtimesum'=>{de=>'PSO-Übersicht',en=>'PSO-Overview'},
-'Application'=>{de=>'Anwendung'},
+'Application ID'=>{de=>'Anwendungs-ID'},
 'Application name'=>{de=>'Anwendungsname'},
 'Limited number of applications exceeded (max. 100)'=>
    {

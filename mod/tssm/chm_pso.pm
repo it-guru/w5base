@@ -57,7 +57,7 @@ sub new
       new kernel::Field::Text(
                name           =>'taskstatus',
                label          =>'Task Status',
-               dataobjattr    =>SELpref.'cm3tm1.status'),
+               dataobjattr    =>SELpref.'cm3tm1.tsi_status'),
 
       new kernel::Field::Text(
                name           =>'changenumber',
@@ -74,9 +74,9 @@ sub new
 
       new kernel::Field::Text(
                name           =>'appl',
-               label          =>'Application',
+               label          =>'Application ID',
                uppersearch    =>1,
-               dataobjattr    =>SELpref.'screlationm1.depend'),
+               dataobjattr    =>SELpref.'device2m1.id'),
 
       new kernel::Field::Text(
                name           =>'applname',
@@ -134,8 +134,8 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from=TABpref."screlationm1 ".SELpref."screlationm1,".
-            TABpref."cm3tm1 ".SELpref."cm3tm1,".
+   my $from=TABpref."cm3tm1 ".SELpref."cm3tm1,".
+            TABpref."cm3ta8 ".SELpref."cm3ta8,".
             TABpref."device2m1 ".SELpref."device2m1";
    return($from);
 }
@@ -144,8 +144,8 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where=SELpref."cm3tm1.ci_down='t' AND ".
-             SELpref."screlationm1.source=".SELpref."cm3tm1.parent_change AND ".
-             SELpref."screlationm1.depend=".SELpref."device2m1.title AND ".
+             SELpref."cm3tm1.dh_number=".SELpref."cm3ta8.dh_number AND ".
+             SELpref."cm3ta8.tsi_ci_name=".SELpref."device2m1.title AND ".
              SELpref."device2m1.model='APPLICATION'";
    return($where);
 }
