@@ -163,6 +163,12 @@ sub qcheckRecord
                 $urec->{fullname});
             return($errorlevel,undef);
          }
+         if ($ciamstate eq "Rumpfdatensatz"){
+            # Bisher (01/2016) keine Erklärung von den CIAM Leuten, was
+            # ein "Rumpfdatensatz" ist - also wird die org-Relation erstmal
+            # irgnoriert.
+            return($errorlevel,undef);
+         }
 
          my $level1role="RFreelancer";
          if ($ciamstate eq "Intern" ||

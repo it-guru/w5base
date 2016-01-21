@@ -98,6 +98,7 @@ sub qcheckRecord
                    "Contact '%s' seems to have leave ".
                    " the DTAG concern.",
                    $rec->{fullname});
+            return(0,{qmsg=>['telekom user not found']});
          }
       }
 
@@ -105,43 +106,67 @@ sub qcheckRecord
          printf STDERR ("CIAM: ununique email = '%s'\n",$rec->{email});
          return(3,{qmsg=>['ununique email in CIAM '.$rec->{email}]});
       }
+      
       my $msg;
       my $ciamrec=$l[0];
       if (!defined($ciamrec)){
-         if ($rec->{posix} ne ""){  # email adress change of existing WIW-Acc
-            $ciam->ResetFilter();
-            $ciam->SetFilter({wiwid=>\$rec->{posix},
-                              active=>\'true',primary=>\'true'});
-            ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
-            if (defined($ciamrec) && 
-                lc($ciamrec->{email}) ne "" && 
-                lc($ciamrec->{email}) ne "unknown" && 
-                lc($ciamrec->{email}) ne "unregistered"){
-               my $newemail=lc($ciamrec->{email});
-               if ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user"){
-                  printf STDERR ("CIAM: email address change detected!\n".
-                                 "      from '%s' to '%s' for userid '%s'\n",
-                                 $rec->{email},$newemail,$rec->{posix});
-                  my $user=getModuleObject($self->getParent->Config(),
-                                           "base::user");
-                  $user->SetFilter({email=>\$newemail});
-                  my ($alturec,$msg)=$user->getOnlyFirst(qw(ALL));
-                  if (defined($alturec)){
-                     printf STDERR ("CIAMUser: ".
-                                    "address change failed - ".
-                                    "problem not automatic repairable.\n");
-                     return(0,
-                        {qmsg=>['unrepairable email address change detected']});
-                  }
-                  if ($user->ValidatedUpdateRecord($rec,
-                      {email=>$newemail},
-                      {userid=>\$rec->{userid},posix=>\$rec->{posix}})){
-                     printf STDERR ("WiwUser: ".
-                                    "address change done sucessfuly.\n");
+         #####################################################################
+         # Change local primary email based on local known wiwid or ciamid
+         my @changeOperations=(
+            {
+              lfld=>'posix',
+              rfld=>'wiwid'
+            },
+            {
+              lfld=>'dsid',
+              rfld=>'tcid'
+            }
+         );
+         foreach my $chop (@changeOperations){
+            if ($rec->{$chop->{lfld}} ne ""){  
+               $ciam->ResetFilter();
+               my $chkval=$rec->{$chop->{rfld}};
+               if ($chop->{rfld} eq "tcid"){
+                  $chkval=~s/^tCID://;
+               }
+               $ciam->SetFilter({$chop->{rfld}=>\$chkval,
+                                 active=>\'true',primary=>\'true'});
+               ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
+               if (defined($ciamrec) && 
+                   lc($ciamrec->{email}) ne "" && 
+                   lc($ciamrec->{email}) ne "unknown" && 
+                   lc($ciamrec->{email}) ne "unregistered"){
+                  my $newemail=lc($ciamrec->{email});
+                  if ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user"){
+                     my $ue=getModuleObject($self->getParent->Config(),
+                                              "base::useremail");
+                     $ue->SetFilter({email=>\$newemail});
+                     my ($alturec,$msg)=$ue->getOnlyFirst(qw(ALL));
+                     if (defined($alturec)){
+                        if ($alturec->{emailtyp} eq "alternate"){
+                           $ue->DeleteRecord($alturec);
+                        }
+                     }
+                     if (!defined($alturec)){ # es ist platz bzw. es wurde
+                        # Platz geschaffen, um die neue Primary E-Mail 
+                        # aufnehmen zu können (doublicates dürften nicht
+                        # entstehen)
+                        my $user=getModuleObject($self->getParent->Config(),
+                                                 "base::user");
+                        if ($user->ValidatedUpdateRecord($rec,
+                            {email=>$newemail},
+                            {userid=>\$rec->{userid},posix=>\$rec->{posix}})){
+                          # printf STDERR ("WiwUser: ".
+                          #                "address change done sucessfuly.\n");
+                        }
+                     }
                   }
                }
             }
+            last if (defined($ciamrec));
          }
+         #####################################################################
+
          if (!defined($ciamrec)){
             return(0,{qmsg=>['user not found']});
          }
@@ -154,20 +179,76 @@ sub qcheckRecord
          if ($posix ne "" && $rec->{posix} ne $posix ){
             $forcedupd->{posix}=$posix;
          }
-         my $dsid=$ciamrec->{uid};
-         if ($dsid=~m/^.+\@.+$/){ # scheint eine sinnvolle ID zu sein
-            if ($dsid ne $rec->{dsid}){
-               $forcedupd->{dsid}=$dsid;
-            }
-            if ($rec->{posix} eq "" && !exists($forcedupd->{posix})){
-               # Mann könnte die Axxxxx als POSIX verwenden
-               if (my ($posix)=$dsid=~m/^(A\d{5,7})\@.*$/){
-                  if ($rec->{posix} ne $posix){
-                     $forcedupd->{posix}=lc($posix);
-                  }
+         my $dsid="tCID:".$ciamrec->{tcid};
+         if ($dsid ne $rec->{dsid}){
+            $forcedupd->{dsid}=$dsid;
+         }
+         if ($rec->{posix} eq "" && !exists($forcedupd->{posix})){
+            # Mann könnte die Axxxxx als POSIX verwenden
+            if (my ($posix)=$dsid=~m/^(A\d{5,7})\@.*$/){
+               if ($rec->{posix} ne $posix){
+                  $forcedupd->{posix}=lc($posix);
                }
             }
          }
+         #####################################################################
+         # alternate E-Mail handling
+         #####################################################################
+         my @emails=();
+         foreach my $emailattr (qw(email email2 email3 email4)){
+            my $emailtyp="alternate";
+            $emailtyp="primary" if ($emailattr eq "email");
+            if ($ciamrec->{$emailattr}=~m/^.+\@.+$/){
+               my $lcemail=lc($ciamrec->{$emailattr});
+               if (!in_array([map({$_->{email}} @emails)],$lcemail)){
+                  push(@emails,{
+                     emailtyp=>$emailtyp,
+                     email=>$lcemail
+                  });
+               }
+            }
+         }
+         foreach my $emailrec (@emails){
+            my $found=0;
+            foreach my $chkrec (@{$rec->{emails}}){
+               $found++ if ($chkrec->{email} eq $emailrec->{email});
+            }
+            if (!$found && $emailrec->{emailtyp} eq "alternate"){
+               my $ue=getModuleObject($self->getParent->Config(),
+                                        "base::useremail");
+               $ue->SetFilter({email=>\$emailrec->{email}});
+               my ($alturec,$msg)=$ue->getOnlyFirst(qw(ALL));
+               if (defined($alturec)){
+                  # need to remove alternate email adress from outer contact
+                  if ($alturec->{srcsys} ne "CIAM"){
+                     $dataobj->Log(ERROR,"basedata",
+                          "Fail to move alternate email '$emailrec->{email}' ".
+                          "to '$rec->{fullname}' - admin intervention ".
+                          "needed");
+                  }
+                  else{
+                     if ($ue->DeleteRecord($alturec)){
+                        $dataobj->Log(ERROR,"basedata",
+                            "Transfer alternate email '$emailrec->{email}' ".
+                            "from '$alturec->{user}' to '$rec->{fullname}' ".
+                            "sucessfuly done");
+                        $alturec=undef;
+                     }
+                  }
+               }
+               if (!defined($alturec)){
+                  $ue->ValidatedInsertRecord({
+                     cistatusid=>'4',
+                     email=>$emailrec->{email},
+                     srcsys=>'CIAM',
+                     userid=>$rec->{userid}
+                  });
+               }
+            }
+         }
+         #####################################################################
+         #printf STDERR ("fifi soll:\n%s\n\n",Dumper(\@emails));
+         #printf STDERR ("fifi ist:\n%s\n\n",Dumper($rec->{emails}));
 
       }
       if ($ciamrec->{office_state} eq "DTAG User"){
@@ -180,21 +261,6 @@ sub qcheckRecord
          }
          return($errorlevel,undef);
       }
-
-      # VSNfD Flag not exists in CIAM
-      # if (lc($ciamrec->{isVSNFD}) eq "ja" ||
-      #    lc($ciamrec->{isVSNFD}) eq "1"  ||
-      #    lc($ciamrec->{isVSNFD}) eq "yes" ||
-      #    lc($ciamrec->{isVSNFD}) eq "true"){
-      #   if ($rec->{dateofvsnfd} eq ""){
-      #      $forcedupd->{dateofvsnfd}=NowStamp("en"); 
-      #   }
-      #}
-      #else{
-      #   if ($rec->{dateofvsnfd} ne ""){
-      #      $forcedupd->{dateofvsnfd}=undef;
-      #   }
-      #}
 
       if (lc($ciamrec->{sex}) eq "w" ||
           lc($ciamrec->{sex}) eq "f"){
