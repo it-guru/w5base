@@ -181,7 +181,36 @@ sub qcheckRecord
          }
          my $dsid="tCID:".$ciamrec->{tcid};
          if ($dsid ne $rec->{dsid}){
-            $forcedupd->{dsid}=$dsid;
+            # check if dsid is NOT alread in use by an other contact
+            my $u=getModuleObject($self->getParent->Config(),"base::user");
+            $u->SetFilter({dsid=>\$dsid});
+            my ($alturec,$msg)=$u->getOnlyFirst(qw(ALL));
+            if (defined($alturec)){
+               if ($alturec->{userid} ne $rec->{userid}){
+                  # other contact has already requested dsid
+                  if ($alturec->{cistatusid}<3 ||
+                      $alturec->{cistatusid}==6){
+                     $dataobj->Log(ERROR,"basedata",
+                          "Delete doublicate contact ".
+                          "entry '$alturec->{fullname}' to store ".
+                          "$dsid for '$rec->{fullname}'");
+                     $u->ValidatedDeleteRecord($alturec);
+                     $alturec=undef;
+                  }
+                  else{
+                     $dataobj->Log(ERROR,"basedata",
+                          "Not correctable doublicate contact ".
+                          "entry '$alturec->{fullname}' ".
+                          "for '$rec->{fullname}'");
+                  }
+               }
+               else{
+                  $alturec=undef; 
+               }
+            }
+            if (!defined($alturec)){
+               $forcedupd->{dsid}=$dsid;
+            }
          }
          if ($rec->{posix} eq "" && !exists($forcedupd->{posix})){
             # Mann könnte die Axxxxx als POSIX verwenden
