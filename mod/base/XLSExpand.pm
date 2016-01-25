@@ -411,6 +411,8 @@ sub ProcessFile
          my $c=0;
          $oBook->AddCell($iSheet,$maxrow+2,0,"Summary:",0);
          my $sSheet=$oBook->AddWorksheet('Summary');
+         $sSheet->{Scale}=100;
+         $sSheet=$oBook->{'SheetCount'}-1; # Last Sheet Number;
          $c++;
          my %l;
          foreach my $k (keys(%globalrec)){
