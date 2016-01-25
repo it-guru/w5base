@@ -136,7 +136,6 @@ sub qcheckRecord
          }
          #################################################################### 
          # assetid compare 
-my @tmpexcl=qw(asset);
          if (!in_array($dataobj->needVMHost(),$rec->{systemtype})){
             if ($parrec->{assetassetid} ne ""){
                $self->IfComp($dataobj,
@@ -144,7 +143,6 @@ my @tmpexcl=qw(asset);
                              $parrec,"assetassetid",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-tmpCompareExclude=>\@tmpexcl,
                              mode=>'leftouterlinkcreate',
                              onCreate=>{
                                 comments=>
