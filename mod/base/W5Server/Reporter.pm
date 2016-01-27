@@ -356,9 +356,10 @@ sub slotHandler
 
                open(STDERR, ">&".fileno($newSTDERR));
                open(STDOUT, ">&".fileno($newSTDOUT));
-               for(my $cc=3;$cc<254;$cc++){  # ensure, that all 
-                  POSIX::close($cc);       # filehandles are closed
-               }
+
+               W5Server::CloseAllOpenFieldHandles();    
+               W5Server::MakeAllDBHsForkSafe();
+
                $0.="(".$task->{name}.")";
                my $reportermodules=$reporter->{reportjob}->{Reporter};
                my $bk=$reportermodules->{$task->{name}}->Process();

@@ -73,6 +73,8 @@ sub process
       my $sleep=$nextrun-$current;
       msg(DEBUG,"(%s) sleeping %d seconds",$self->Self,$sleep);
       $self->FullContextReset();
+      $sleep=60 if ($sleep>60);
+      die('lost my parent W5Server process - not good') if (getppid()==1);
       sleep($sleep);
    }
 }

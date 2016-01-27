@@ -45,6 +45,8 @@ sub process
                  $self->Self,$year,$month,$day,$h,$m,0);
       my $sleep=$nextrun-$current;
       msg(DEBUG,"(%s) sleeping %d seconds",$self->Self,$sleep);
+      $sleep=60 if ($sleep>60);
+      die('lost my parent W5Server process - not good') if (getppid()==1);
       sleep($sleep);
       
    }

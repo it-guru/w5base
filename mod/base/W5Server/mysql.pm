@@ -48,15 +48,20 @@ sub authorize
    $ua->SetFilter({account=>\$username});
    my $msg;
    ($uarec,$msg)=$ua->getOnlyFirst(qw(password userid));
-   print STDERR "useraccount=".Dumper($uarec);
+   #print STDERR "useraccount=".Dumper($uarec);
    if (!defined($uarec)){
       printf STDERR ("ERROR: user not found\n");
       return(undef);
    }
-   if (!$self->passwordMatches('123456')){
+   return(1);
+   if (!$self->passwordMatches("12345")){
       printf STDERR ("ERROR: password not match\n");
       return(undef);
    }
+   #if (!$self->passwordMatches($uarec->{password})){
+   #   printf STDERR ("ERROR: password not match\n");
+   #   return(undef);
+   #}
    printf STDERR ("=========== authorized fine =============\n");
    return(1);
 }
@@ -105,50 +110,57 @@ listen(SERVER_SOCK,1);
 
 print localtime()." [$$] Please use `mysql --host=127.0.0.1 --port=$port` to connect.\n";
 
+my $select=IO::Select->new();
+
+$select->add(\*SERVER_SOCK);
+
 while (1) {
-   if (my $remote_paddr = accept(my $remote_socket, SERVER_SOCK)){
-      my $myserver = W5Base::MySQL->new( 'socket' => $remote_socket ,
-                                         'parent' => $self->getParent);
-      
-    #  $myserver->sendServerHello();   # Those three together are identical to
-    #  my ($user,$database)=$myserver->readClientHello();
-      if ($myserver->handshake()){
-       #  $myserver->sendOK();      # which uses the default authorize() handler
-         my $pid=fork();
-         if ($pid==0){
-            while (1) {
-               my ($command, $data) = $myserver->readCommand();
-               print localtime()." [$$] Command: $command; User $user; Data: $data\n";
-               if (
-                  (not defined $command) ||
-                  ($command == DBIx::MyServer::COM_QUIT)
-               ) {
-                  last;
-               } elsif ($command == 3) {
-                  $myserver->sendDefinitions([$myserver->newDefinition( name => 'field' )]);
-                  if ($data eq 'show tables') {
-                     $myserver->sendRows([]);
+   if ($select->can_read(5)){
+      if (my $remote_paddr = accept(my $remote_socket, SERVER_SOCK)){
+         my $myserver = W5Base::MySQL->new( 'socket' => $remote_socket ,
+                                            'parent' => $self->getParent);
+         
+       #  $myserver->sendServerHello();   # Those three together are identical to
+       #  my ($user,$database)=$myserver->readClientHello();
+         if ($myserver->handshake()){
+          #  $myserver->sendOK();      # which uses the default authorize() handler
+            my $pid=fork();
+            if ($pid==0){
+               while (1) {
+                  my ($command, $data) = $myserver->readCommand();
+                  print localtime()." [$$] Command: $command; User $user; Data: $data\n";
+                  if (
+                     (not defined $command) ||
+                     ($command == DBIx::MyServer::COM_QUIT)
+                  ) {
+                     last;
+                  } elsif ($command == 3) {
+                     $myserver->sendDefinitions([$myserver->newDefinition( name => 'field' )]);
+                     if ($data eq 'show tables') {
+                        $myserver->sendRows([]);
+                     }
+                     elsif ($data eq 'select chief of developers') {
+                        $myserver->sendRows([['vogler hartmut']]);
+                     }
+                     elsif ($data eq 'show databases') {
+                        $myserver->sendRows([]);
+                     }
+                     elsif ($data eq 'select @@version_comment limit 1') {
+                        $myserver->sendRows([['W5Base']]);
+                     }
+                     else{
+                        $myserver->sendRows([['jo']]);
+                     }
+                  } else {
+                     $myserver->sendErrorUnsupported($command);
                   }
-                  elsif ($data eq 'select chief of developers') {
-                     $myserver->sendRows([['vogler hartmut']]);
-                  }
-                  elsif ($data eq 'show databases') {
-                     $myserver->sendRows([]);
-                  }
-                  elsif ($data eq 'select @@version_comment limit 1') {
-                     $myserver->sendRows([['W5Base']]);
-                  }
-                  else{
-                     $myserver->sendRows([['jo']]);
-                  }
-               } else {
-                  $myserver->sendErrorUnsupported($command);
                }
+               exit(0);
             }
-            exit(0);
          }
       }
-	}
+   }
+   die('lost my parent W5Server process - not good') if (getppid()==1);
 }
 
 }

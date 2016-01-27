@@ -29,7 +29,7 @@ sub process
    if ($opmode eq "readonly"){
       $ro=1;
    }
-
+   sleep(60);
    while(1){
       if (!$ro){
          $self->EnrichmentCollector();
@@ -98,6 +98,7 @@ sub EnrichmentCollector
           $self->taskCreator(\%SrvStat);     
           $last_taskCreator=time();
        }
+       die('lost my parent W5Server process - not good') if (getppid()==1);
    }
    #######################################################################
 }
@@ -407,9 +408,8 @@ sub slotHandler
 
                open(STDERR, ">&".fileno($newSTDERR));
                open(STDOUT, ">&".fileno($newSTDOUT));
-               for(my $cc=3;$cc<254;$cc++){  # ensure, that all 
-                  POSIX::close($cc);       # filehandles are closed
-               }
+               W5Server::CloseAllOpenFieldHandles();
+               W5Server::MakeAllDBHsForkSafe();
                $0.="(".$task->{name}.")";
                my $bk=$self->processEnrichment($task->{dataobj},
                                                $task->{id},

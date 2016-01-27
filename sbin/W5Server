@@ -16,6 +16,7 @@ use kernel::EventController;
 use IO::Select;
 use File::Temp qw(tempfile);
 use POSIX;
+use Fcntl;
 
 @ISA=qw(RPC::Smart::Server kernel::App);
 
@@ -599,7 +600,7 @@ sub initAsyncEnv
 
    delete($self->{W5Server});
    delete($self->{W5ServerProcess});
-   closeall();
+   W5Server::CloseAllOpenFieldHandles();
    $self->W5ServerConnect();
    #######################################################################
    # STDERR Handling
@@ -974,7 +975,10 @@ sub StartW5ServerProcess
       my \$tasks=\$self->getTasksHash();  # this should be done in RPC::Server,
       \%{\$tasks}=();                     # but at this position, i didnt need
                                           # a module update
-      for(my \$c=3;\$c<254;\$c++){ POSIX::close(\$c); }  # needed on restart!
+
+      W5Server::CloseAllOpenFieldHandles();     # needed on restart!
+
+      W5Server::MakeAllDBHsForkSafe();
 
       \$0="W5Sserver-".\$server;
       my \$orgpid=\$\$;
@@ -1153,18 +1157,31 @@ sub pre_server_close_hook
          close(F);
       }
    }
-   closeall();
+   CloseAllOpenFieldHandles();
    msg(DEBUG,"server is down");
    return($self->SUPER::pre_server_close_hook());
 }
 
-sub closeall
+sub CloseAllOpenFieldHandles
 {
    for(my $c=3;$c<254;$c++){  # ensure, that all filehandles are closed
-      POSIX::close($c);
+      if (fcntl($c,F_GETFD,0)){
+         msg(DEBUG,"Close File handle no $c in CloseAllOpenFieldHandles $0");
+         POSIX::close($c);
+      }
    }
-
 }
+
+sub MakeAllDBHsForkSafe {
+   my %drivers = DBI->installed_drivers;
+   foreach my $drh (values %drivers) {
+      foreach my $dbh (@{$drh->{ChildHandles}}){    
+         msg(DEBUG,"set $dbh in $drh to InactiveDestroy=1 in $0");
+         $dbh->{InactiveDestroy}=1;
+      }
+   }
+}
+
 #######################################################################
 package main;
 use vars qw($opt_v $opt_h $opt_c $configname);
