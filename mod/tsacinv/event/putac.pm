@@ -65,7 +65,7 @@ sub Init
    $self->RegisterEvent("SendXmlToAM","SendXmlToAM");  # full transfer
 
    $self->RegisterEvent("SendXmlToAM_appl","SendXmlToAM_appl",
-      timeout=>40000
+      timeout=>50000
    );
    $self->RegisterEvent("SendXmlToAM_instance","SendXmlToAM_instance",
       timeout=>3600
