@@ -41,7 +41,7 @@ sub process
              }
 
              $self->NotifyAdmin(
-                 "Reporter DIE pid=$$:",$loc);
+                 "ReporterJob DIE pid=$$:",$loc);
           }
           exit(1);
       };
@@ -361,6 +361,8 @@ sub slotHandler
                W5Server::MakeAllDBHsForkSafe();
 
                $0.="(".$task->{name}.")";
+
+
                my $reportermodules=$reporter->{reportjob}->{Reporter};
                my $bk=$reportermodules->{$task->{name}}->Process();
                if (defined($bk) && $bk>0){

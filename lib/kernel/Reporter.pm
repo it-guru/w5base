@@ -146,7 +146,7 @@ sub stderr             # will be called on stderr line output
    my $line=shift;
    my $task=shift;
    my $reporter=shift;
-   if (!($line=~m/^INFO:/)){
+   if (!($line=~m/^(INFO|DEBUG):/)){
       push(@{$task->{stderr}},$line);
       if (defined($task->{param}->{maxstderr})){
          if ($#{$task->{stderr}}>$task->{param}->{maxstderr}){

@@ -106,6 +106,15 @@ sub Call
    return(\%f);
 }
 
+sub DESTROY
+{
+   my $self=shift;
+   if (defined($self->{sock})){
+      $self->{sock}->close();
+   }
+
+}
+
 sub AUTOLOAD
 {
    my $self=shift;
