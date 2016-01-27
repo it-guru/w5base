@@ -20,11 +20,22 @@ sub process
    my $self=shift;
 
    my $opmode=$self->getParent->Config->Param("W5BaseOperationMode");
+   my $deepsleep=0;
    if ($opmode eq "readonly"){
+      $deepsleep++;
+   }
+   my $dbconnect=$self->getParent->Config->Param('DATAOBJCONNECT');
+   if (ref($dbconnect) ne "HASH" ||
+       $dbconnect->{tssm} eq ""){
+      $deepsleep++;
+   }
+
+   if ($deepsleep){
       while(1){
          sleep(3600);
       }
    }
+
 
    my %ctrl=(
               'smchange'=>{
@@ -127,6 +138,7 @@ sub process
      # printf STDERR ("fifi data=%s\n",Dumper(\%ctrl));
       $self->FullContextReset();
       sleep($looptimer);
+      die('lost my parent W5Server process - not good') if (getppid()==1);
    }
 }
 
