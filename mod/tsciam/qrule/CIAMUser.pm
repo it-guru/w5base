@@ -145,6 +145,13 @@ sub qcheckRecord
                      if (defined($alturec)){
                         if ($alturec->{emailtyp} eq "alternate"){
                            $ue->DeleteRecord($alturec);
+                           $alturec=undef;
+                        }
+                        if ($alturec->{emailtyp} eq "primary"){
+                           $dataobj->Log(ERROR,"basedata",
+                               "Fail to change primary email to ".
+                               "from '$alturec->{user}' ".
+                               "on '$rec->{fullname}' ");
                         }
                      }
                      if (!defined($alturec)){ # es ist platz bzw. es wurde
@@ -177,7 +184,18 @@ sub qcheckRecord
          my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
          my $posix=$posix[0];
          if ($posix ne "" && $rec->{posix} ne $posix ){
-            $forcedupd->{posix}=$posix;
+            my $user=getModuleObject($self->getParent->Config(),
+                                     "base::user");
+            $user->SetFilter({posix=>\$posix});
+            my ($alturec,$msg)=$user->getOnlyFirst(qw(ALL));
+            if (defined($alturec)){
+               $dataobj->Log(ERROR,"basedata",
+                   "Fail to set posix identifier '$posix' ".
+                   "on '$rec->{fullname}' ");
+            }
+            else{
+               $forcedupd->{posix}=$posix;
+            }
          }
          my $dsid="tCID:".$ciamrec->{tcid};
          if ($dsid ne $rec->{dsid}){
@@ -237,17 +255,18 @@ sub qcheckRecord
                }
             }
          }
+         #printf STDERR ("fifi emails:%s\n",Dumper(\@emails));
          foreach my $emailrec (@emails){
             my $found=0;
             foreach my $chkrec (@{$rec->{emails}}){
                $found++ if ($chkrec->{email} eq $emailrec->{email});
             }
-            if (!$found && $emailrec->{emailtyp} eq "alternate"){
+            if (!$found){
                my $ue=getModuleObject($self->getParent->Config(),
                                         "base::useremail");
                $ue->SetFilter({email=>\$emailrec->{email}});
                my ($alturec,$msg)=$ue->getOnlyFirst(qw(ALL));
-               if (defined($alturec)){
+               if (defined($alturec) && $alturec->{emailtyp} eq "alternate"){
                   # need to remove alternate email adress from outer contact
                   if ($alturec->{srcsys} ne "CIAM"){
                      $dataobj->Log(ERROR,"basedata",
@@ -265,13 +284,38 @@ sub qcheckRecord
                      }
                   }
                }
-               if (!defined($alturec)){
-                  $ue->ValidatedInsertRecord({
-                     cistatusid=>'4',
-                     email=>$emailrec->{email},
-                     srcsys=>'CIAM',
-                     userid=>$rec->{userid}
-                  });
+               if ($emailrec->{emailtyp} eq "alternate"){
+                  if (!defined($alturec)){
+                     $ue->ValidatedInsertRecord({
+                        cistatusid=>'4',
+                        email=>$emailrec->{email},
+                        srcsys=>'CIAM',
+                        userid=>$rec->{userid}
+                     });
+                  }
+                  else{
+                     $dataobj->Log(ERROR,"basedata",
+                         "Fail to set alternate email '$emailrec->{email}' ".
+                         "on '$rec->{fullname}'");
+                  }
+               }
+               if ($emailrec->{emailtyp} eq "primary"){
+                  if (!defined($alturec)){
+                    my $u=getModuleObject($self->getParent->Config(),
+                                          "base::user");
+                     if ($u->ValidatedUpdateRecord($rec,{
+                           email=>$emailrec->{email}
+                        },{userid=>$rec->{userid}})){
+                       $dataobj->Log(ERROR,"basedata",
+                           "Change primary email fro '$rec->{fullname}' ".
+                           " to '$emailrec->{email}' done");
+                     }
+                  }
+                  else{
+                     $dataobj->Log(ERROR,"basedata",
+                         "Fail to set primary email '$emailrec->{email}' ".
+                         "on '$rec->{fullname}'");
+                  }
                }
             }
          }
