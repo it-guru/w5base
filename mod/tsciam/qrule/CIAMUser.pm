@@ -284,7 +284,7 @@ sub qcheckRecord
          if ($rec->{posix} ne ""){
             $dataobj->Log(ERROR,"basedata",
                    "Contact '%s'\nseems to have an invalid posix entry. ".
-                   "The\nWIW Status 'DTAG User' is not a real contact!".
+                   "The\nCIAM Status 'DTAG User' is not a real contact!".
                    "\n-",
                    $rec->{fullname});
          }
@@ -320,6 +320,7 @@ sub qcheckRecord
           $ciamrec->{office_state} eq "Manager" ||
           $ciamrec->{office_state} eq "Employee-1st-Day" ||  # vor Eintrittsdat.
           $ciamrec->{office_state} eq "Freelancer" ||
+          $ciamrec->{office_state} eq "Rumpfdatensatz" ||
           $ciamrec->{office_state} eq "DTAG User"){
          $typeclass="user";
       }
@@ -339,7 +340,7 @@ sub qcheckRecord
          $ciam->Log(ERROR,"basedata",
                    "Contact type '$rec->{usertyp}' for ".
                    "'$rec->{fullname}' did not ".
-                   "match WIW state '$ciamrec->{office_state}'");
+                   "match CIAM state '$ciamrec->{office_state}'");
       }
 
       foreach my $fld (@fieldlist){

@@ -204,7 +204,7 @@ sub qcheckRecord
                if (defined($msg)){
                   msg(ERROR,"LDAP problem - Orgsearch:%s",$msg);
                }
-               msg(ERROR,"WIW Orgarea '%s' not found for user '%s'",
+               msg(ERROR,"CIAM Orgarea '%s' not found for user '%s'",
                    $toucid,$urec->{email});
             }
          }
