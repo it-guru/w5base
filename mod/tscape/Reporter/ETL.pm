@@ -45,7 +45,6 @@ sub Process             # will be run as a spereate Process (PID)
    my $srcdb=new kernel::database($self,"tscape");
    my $dstdb=new kernel::database($self,"w5base");
 
-   return(0);
 
    $srcdb->Connect();
    $dstdb->Connect();

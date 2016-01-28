@@ -36,7 +36,7 @@ sub getDefaultIntervalMinutes
 {
    my $self=shift;
 
-   return(60,['6:25','19:40']);    
+   return(60,['6:25','12:00','19:40']);    
 }
 
 sub Process             # will be run as a spereate Process (PID)
