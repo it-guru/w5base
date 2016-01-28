@@ -785,6 +785,7 @@ sub ProcessSpoolEvent
 sub run_dequeue
 {
    my $self = shift;
+
    if (exists($self->{'ServerGoesDown'})){
       if ($self->{'ServerGoesDown'}<=0 || $self->runningTasks()==0){
          if (exists($self->{'ServerHalt'})){
@@ -975,7 +976,6 @@ sub StartW5ServerProcess
       my \$tasks=\$self->getTasksHash();  # this should be done in RPC::Server,
       \%{\$tasks}=();                     # but at this position, i didnt need
                                           # a module update
-
       W5Server::CloseAllOpenFieldHandles();     # needed on restart!
 
       W5Server::MakeAllDBHsForkSafe();
@@ -1165,11 +1165,9 @@ sub pre_server_close_hook
 sub CloseAllOpenFieldHandles
 {
    for(my $c=3;$c<254;$c++){  # ensure, that all filehandles are closed
-      if (fcntl($c,F_GETFD,0)){
-         msg(DEBUG,"Close File handle no $c in CloseAllOpenFieldHandles $0");
-         POSIX::close($c);
-      }
+      POSIX::close($c);
    }
+   $W5V2::W5Server=undef;
 }
 
 sub MakeAllDBHsForkSafe {
