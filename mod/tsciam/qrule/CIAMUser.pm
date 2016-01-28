@@ -274,7 +274,7 @@ sub qcheckRecord
                           "to '$rec->{fullname}' - admin intervention ".
                           "needed");
                   }
-                  else{
+                  if (defined($alturec)){
                      if ($ue->DeleteRecord($alturec)){
                         $dataobj->Log(ERROR,"basedata",
                             "Transfer alternate email '$emailrec->{email}' ".
@@ -293,6 +293,28 @@ sub qcheckRecord
                         userid=>$rec->{userid}
                      });
                   }
+                  elsif (defined($alturec) && $alturec->{cistatusid}==6){
+                     my $u=getModuleObject($self->getParent->Config(),
+                                          "base::user");
+                     if ($u->ValidatedUpdateRecord($alturec,{
+                           email=>$alturec->{email}."old".time()
+                        },{userid=>$alturec->{userid}})){
+                        $dataobj->Log(ERROR,"basedata",
+                            "EMail on disposte of waste contact ".
+                            "record W5BaseID='$alturec->{userid}' changed");
+                        if ($ue->ValidatedInsertRecord({
+                               cistatusid=>'4',
+                               email=>$emailrec->{email},
+                               srcsys=>'CIAM',
+                               userid=>$rec->{userid}
+                            })){
+                           $dataobj->Log(ERROR,"basedata",
+                               "Change alternate email fro '$rec->{fullname}' ".
+                               " to '$emailrec->{email}' after ".
+                               "old contact update done");
+                        }
+                     }
+                  }
                   else{
                      $dataobj->Log(ERROR,"basedata",
                          "Fail to set alternate email '$emailrec->{email}' ".
@@ -301,14 +323,33 @@ sub qcheckRecord
                }
                if ($emailrec->{emailtyp} eq "primary"){
                   if (!defined($alturec)){
-                    my $u=getModuleObject($self->getParent->Config(),
+                     my $u=getModuleObject($self->getParent->Config(),
                                           "base::user");
                      if ($u->ValidatedUpdateRecord($rec,{
                            email=>$emailrec->{email}
                         },{userid=>$rec->{userid}})){
                        $dataobj->Log(ERROR,"basedata",
-                           "Change primary email fro '$rec->{fullname}' ".
+                           "Change primary email from '$rec->{fullname}' ".
                            " to '$emailrec->{email}' done");
+                     }
+                  }
+                  elsif (defined($alturec) && $alturec->{cistatusid}==6){
+                     my $u=getModuleObject($self->getParent->Config(),
+                                          "base::user");
+                     if ($u->ValidatedUpdateRecord($alturec,{
+                           email=>$alturec->{email}."old".time()
+                        },{userid=>$alturec->{userid}})){
+                        $dataobj->Log(ERROR,"basedata",
+                            "EMail on disposte of waste contact ".
+                            "record W5BaseID='$alturec->{userid}' changed");
+                        if ($u->ValidatedUpdateRecord($rec,{
+                              email=>$emailrec->{email}
+                            },{userid=>$rec->{userid}})){
+                           $dataobj->Log(ERROR,"basedata",
+                               "Change primary email fro '$rec->{fullname}' ".
+                               " to '$emailrec->{email}' after ".
+                               "old contact update done");
+                        }
                      }
                   }
                   else{
