@@ -202,8 +202,8 @@ sub getFinalLdapFilter
          my $orlist=MakeLikeList($sqlfield,$fieldobject,@orlist);
          my $norlist=MakeLikeList($sqlfield,$fieldobject,@norlist);
          $norlist="(!".$norlist.")" if ($norlist ne "");
-         msg(INFO,"orlist  ($sqlfield)=$orlist");
-         msg(INFO,"norlist ($sqlfield)=$norlist");
+         #msg(INFO,"orlist  ($sqlfield)=$orlist");
+         #msg(INFO,"norlist ($sqlfield)=$norlist");
          if ($orlist ne "" || $norlist ne ""){ 
             my $notempty=0;
             $notempty=1 if ($$where ne "");

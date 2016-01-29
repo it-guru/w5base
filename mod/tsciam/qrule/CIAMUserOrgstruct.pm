@@ -76,7 +76,7 @@ sub qcheckRecord
           $urec->{usertyp} eq "user"){     # it seems to be a correct email
          msg(INFO,"processing email addr '%s'",$urec->{email});
          my @curgrpid=$self->extractCurrentGrpIds($urec);
-         msg(INFO,"grpids='%s'",join(",",@curgrpid));
+         #msg(INFO,"grpids='%s'",join(",",@curgrpid));
          if ($#curgrpid!=-1){
             $grp->SetFilter({grpid=>\@curgrpid,
                              srcsys=>'WhoIsWho',
@@ -95,9 +95,12 @@ sub qcheckRecord
          # loading the "should" sitiuation from ciam
          #
          msg(DEBUG,"trying to load userinformations from ciam");
-         $ciamusr->SetFilter([{email=>$urec->{email},active=>\'true'},
-                             {email2=>$urec->{email},active=>\'true'},
-                             {email3=>$urec->{email},active=>\'true'}]);
+         $ciamusr->SetFilter([
+            {email=>$urec->{email},active=>\'true',primary=>\'true'},
+            {email2=>$urec->{email},active=>\'true',primary=>\'true'},
+            {email3=>$urec->{email},active=>\'true',primary=>\'true'},
+            {email4=>$urec->{email},active=>\'true',primary=>\'true'}
+         ]);
          my ($ciamrec,$msg)=$ciamusr->getOnlyFirst(qw(ALL));
          if (!defined($ciamrec)){
             if (defined($msg)){
@@ -152,15 +155,14 @@ sub qcheckRecord
          my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
          my $posix=$posix[0];
 
-         my $wrs=$ciamrec->{office_wrs};
          my $ciamstate=$ciamrec->{office_state};
 
          if ($ciamstate eq "DTAG User"){
             $ciamusr->Log(ERROR,"basedata",
                 "Contact '%s'\nseems to be a WebEx/SCP only user. ".
                 "Please check this and then clear the posix entry.".
-                "\n-",
-                $urec->{fullname});
+                "\n-",$urec->{fullname}
+            );
             return($errorlevel,undef);
          }
          if ($ciamstate eq "Rumpfdatensatz"){
@@ -169,49 +171,7 @@ sub qcheckRecord
             # irgnoriert.
             return($errorlevel,undef);
          }
-
-         my $level1role="RFreelancer";
-         if ($ciamstate eq "Intern" ||
-             $ciamstate eq "Manager" ||
-             $ciamstate eq "Employee"){
-            $level1role="REmployee";
-         }
-         if ($wrs eq "Auszubildender"){
-            $level1role="RApprentice";
-         }
-         msg(INFO,"organizationalstatus=$ciamstate --- w5base role=$level1role");
-         
-
-         #
-         # hinzufügen der Userrollen
-         #
-         if ($toucid ne ""){
-            $ciamorg->SetFilter({toucid=>\$toucid});
-            my ($ciamrec,$msg)=$ciamorg->getOnlyFirst(qw(toucid name parentid 
-                                                       parent shortname));
-            if (defined($ciamrec)){
-               my $bl=getModuleObject($dataobj->Config,"base::userblacklist");
-               if (!$bl->checkLock('lockorgtransfer',[
-                                   {posix=>$urec->{posix}},
-                                   {email=>\$urec->{email}}])){
-                  my $bk=$self->addGrpLinkToUser($grp,$ciamorg,$grpuser,
-                                                 $ciamrec,$urec,
-                                                 [$level1role,'RMember']);
-                  return($errorlevel,undef) if (defined($bk));
-               }
-            }
-            else{
-               if (defined($msg)){
-                  msg(ERROR,"LDAP problem - Orgsearch:%s",$msg);
-               }
-               msg(ERROR,"CIAM Orgarea '%s' not found for user '%s'",
-                   $toucid,$urec->{email});
-            }
-         }
-         else{
-            msg(DEBUG,"user '%s' has no orgarea",$urec->{email});
-         }
-
+         $self->addWorkrelationShip($grp,$grpuser,$urec,$toucid,$ciamstate);
 
 
          my @curbossgroups=$self->extractCurrentGrpIds($urec,["RBoss"]);
@@ -227,6 +187,7 @@ sub qcheckRecord
          }
 
 
+         ######################################################################
          #
          # hinzufügen der Leiter rollen
          #
@@ -248,7 +209,8 @@ sub qcheckRecord
          if ($#bossgrpsrcid!=-1){
             $ciamusr->Log(WARN,"basedata",
                          "removing RBoss from User '%s' on group toucid='%s'",
-                         $urec->{email},join(",",@bossgrpsrcid));
+                         $urec->{email},join(",",@bossgrpsrcid)
+            );
             my $lnkgrpuser=getModuleObject($Config,"base::lnkgrpuser");
             my $lnkgrpuserop=$lnkgrpuser->Clone();
             $grp->SetFilter({srcid=>\@bossgrpsrcid,
@@ -281,13 +243,111 @@ sub qcheckRecord
                      $lnkgrpuserop->ValidatedDeleteRecord($lnkrec);
                   }
                }
-            #   }
             }
          }
+         ######################################################################
+
+
+         ######################################################################
+         #
+         # hinzufügen alternativer Arbeitsverhältnisse
+         #
+         #msg(INFO,"---------------------------------------------------");
+         #msg(INFO,"hinzufügen alternativer Arbeitsverhälnisse zu tCID=".
+         #    $ciamrec->{tcid});
+         $ciamusr->ResetFilter();
+
+         $ciamusr->SetFilter(
+            {tcid=>\$ciamrec->{tcid},active=>\'true',primary=>\'false'},
+         );
+         my @wrlist=$ciamusr->getHashList(qw(tcid twrid toucid office_state));
+         my %grps;
+         if ($#wrlist!=-1){
+            %grps=$grp->getGroupsOf($urec->{userid},[qw(REmployee)],'up');
+         }
+         foreach my $wr (@wrlist){
+             my $ciamstate=$wr->{office_state};
+             if ($ciamstate eq "Employee"){
+                $ciamstate="RFreelancer"; # Sekundäre Arbeitsverhältnisse
+                                          # werden immer als Extern angesehen.
+             }
+             if (exists($grps{14516421600001})){ # Hautbereich der Azubis
+                $ciamstate="Apprentice"; # Es existiert noch ein Arbeitsv.
+                # im Azubi Bereich - das Sek. Arbeitsverhältnis muß also AZUBI
+                # sein.
+             }
+             my $toucid=$wr->{toucid};
+             $self->addWorkrelationShip($grp,$grpuser,$urec,$toucid,$ciamstate);
+         }
+         #msg(INFO,"---------------------------------------------------");
+         ######################################################################
+
+
       }
    }
    return($errorlevel,undef);
 }
+
+sub addWorkrelationShip
+{
+   my $self=shift;
+   my $grp=shift;
+   my $grpuser=shift;
+   my $urec=shift;
+   my $toucid=shift;
+   my $ciamstate=shift;
+
+   my $ciamorg=getModuleObject($self->getParent->Config,"tsciam::orgarea");
+
+   my $level1role="RFreelancer";
+   if ($ciamstate eq "Intern" ||
+       $ciamstate eq "Manager" ||
+       $ciamstate eq "Employee"){
+      $level1role="REmployee";
+   }
+   if ($ciamstate eq "Apprentice"){
+      $level1role="RApprentice";
+   }
+   msg(INFO,"organizationalstatus=$ciamstate --- w5base role=$level1role");
+   
+
+   #
+   # hinzufügen der Userrollen
+   #
+   if ($toucid ne ""){
+      $ciamorg->SetFilter({toucid=>\$toucid});
+      my ($ciamrec,$msg)=$ciamorg->getOnlyFirst(qw(toucid name parentid 
+                                                 parent shortname));
+      if (defined($ciamrec)){
+         my $bl=getModuleObject($self->getParent->Config,"base::userblacklist");
+         if (!$bl->checkLock('lockorgtransfer',[
+                             {posix=>$urec->{posix}},
+                             {email=>\$urec->{email}}])){
+            my $bk=$self->addGrpLinkToUser($grp,$ciamorg,$grpuser,
+                                           $ciamrec,$urec,
+                                           [$level1role,'RMember']);
+            msg(ERROR,"fail to add realtion to $toucid") if (defined($bk));
+         }
+      }
+      else{
+         if (defined($msg)){
+            msg(ERROR,"LDAP problem - Orgsearch:%s",$msg);
+         }
+         msg(ERROR,"CIAM Orgarea '%s' not found for user '%s'",
+             $toucid,$urec->{email});
+      }
+   }
+   else{
+      msg(DEBUG,"user '%s' has no orgarea",$urec->{email});
+   }
+}
+
+
+
+
+
+
+
 
 sub extractCurrentGrpIds
 {

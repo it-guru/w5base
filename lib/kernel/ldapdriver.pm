@@ -122,44 +122,44 @@ sub execute
 {
    my $self=shift;
    my @param=@_;
+   my %p=@param;
 
    if ($self->{ldap}){
-       my $c=$self->getParent->Context;
-
+      my $c=$self->getParent->Context;
 
       my $sseconds=Time::HiRes::time();
+      $c->{$self->{ldapname}}->{sth}=$self->{'ldap'}->search(@param);
+      my $eseconds=Time::HiRes::time();
+      my $slowlimit=20;
+      if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
+         $slowlimit=8;
+      }
+      if ($eseconds-$sseconds>$slowlimit){
+        my $t=sprintf("%.3lf",$eseconds-$sseconds);
+        my $s=$self->getParent->Self();
+        my $q=$p{filter};
+        msg(WARN,"slow LDAP Query on $s with query $q (duration=$t sec)");
+      }
+      $self->getParent->Log(INFO,"ldapread","query $p{filter} ".
+                            sprintf("%.2sec",$eseconds-$sseconds));
 
-       $c->{$self->{ldapname}}->{sth}=$self->{'ldap'}->search(@param);
-       my $eseconds=Time::HiRes::time();
-       my $slowlimit=20;
-       if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
-          $slowlimit=8;
-       }
-       if ($eseconds-$sseconds>$slowlimit){
-         my $t=sprintf("%.3lf",$eseconds-$sseconds);
-         my $s=$self->getParent->Self();
-         my %p=@param;
-         my $q=$p{filter};
-         msg(WARN,"slow LDAP Query on $s with query $q (duration=$t sec)");
-       }
 
-
-       if (!($c->{$self->{ldapname}}->{sth})){
-          return(undef,msg(ERROR,"problem while LDAP search"));
-       }
-       if ($c->{$self->{ldapname}}->{sth}->code()){
-          return(undef,msg(ERROR,"ldap-search:%s (%s)",
-                           $c->{$self->{ldapname}}->{sth}->error,
-                           Dumper(\@param)));
-       }
-                      
-       $c->{$self->{ldapname}}->{sthdata}=
-           [$c->{$self->{ldapname}}->{sth}->all_entries()];
-       $c->{$self->{ldapname}}->{sthcount}=
-           $#{$c->{$self->{ldapname}}->{sthdata}}+1;
-       #printf STDERR ("fifi kernel::ldapdriver found %d entries\n",
-       #               $#{$c->{$self->{ldapname}}->{sthdata}}+1);
-       return($c->{$self->{ldapname}}->{sth});
+      if (!($c->{$self->{ldapname}}->{sth})){
+         return(undef,msg(ERROR,"problem while LDAP search"));
+      }
+      if ($c->{$self->{ldapname}}->{sth}->code()){
+         return(undef,msg(ERROR,"ldap-search:%s (%s)",
+                          $c->{$self->{ldapname}}->{sth}->error,
+                          Dumper(\@param)));
+      }
+                     
+      $c->{$self->{ldapname}}->{sthdata}=
+          [$c->{$self->{ldapname}}->{sth}->all_entries()];
+      $c->{$self->{ldapname}}->{sthcount}=
+          $#{$c->{$self->{ldapname}}->{sthdata}}+1;
+      #printf STDERR ("fifi kernel::ldapdriver found %d entries\n",
+      #               $#{$c->{$self->{ldapname}}->{sthdata}}+1);
+      return($c->{$self->{ldapname}}->{sth});
    }
    return(undef);
 }
