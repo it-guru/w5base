@@ -519,10 +519,14 @@ sub Version2Key
    for(my $relpos=0;$relpos<5;$relpos++){
       $v[$relpos]=~s/\D//g;
       if ($v[$relpos]=~m/^\d+$/){
-         $relkey[$relpos]=sprintf("%04d",$v[$relpos]);
+         $relkey[$relpos]=sprintf("%06d",int($v[$relpos]));
+         if (length($relkey[$relpos])>6){
+            $relkey[$relpos]=substr($relkey[$relpos],
+                                    length($relkey[$relpos])-6);
+         }
       }
       else{
-         $relkey[$relpos]="0000";
+         $relkey[$relpos]="000000";
       }
    }
    return(join("",@relkey));

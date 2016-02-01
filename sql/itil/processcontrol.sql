@@ -25,7 +25,7 @@ create table lnksoftwaresoftwareset (
   softwareset  bigint(20) NOT NULL,
   software     bigint(20) NOT NULL,
   version      varchar(30),
-  releasekey   char(20) default '00000000000000000000',
+  releasekey   char(30) default '000000000000000000000000000000',
   comparator   int(1)   default '0', startwith varchar(20),
   comments     longtext    default NULL,
   additional   longtext    default NULL,
