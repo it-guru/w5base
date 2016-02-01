@@ -31,7 +31,7 @@
 },
 'UpdateDeny(38)'=>{
    de=>'Nein, wegen Retirement/wegen späterem Refresh/da im Orderprozess befindlich',
-   en=>'No - system or application is in retirement'
+   en=>'No - because of retirement/due to upcoming refresh/object is in order process'
 },
 'UpdateDeny(40)'=>{
    de=>'Nein, weil momentan das Budget fehlt',
@@ -51,11 +51,11 @@
 },
 'UpdateDeny(110)'=>{
    de=>'Nein, aus längerfristigen technischen Kompatibilitätsgründen',
-   en=>'No - on a long-term base technical incompatibility'
+   en=>'No - technical incompatibility on long-term base'
 },
 'UpdateDeny(120)'=>{
    de=>'Nein, weil der Hersteller keine Freigabe erteilt',
-   en=>'No - on a long-term base no approval by producer'
+   en=>'No - no approval by producer on long-term base'
 },
 'UpdateDeny(130)'=>{
    de=>'Nein, weil der Kunde die Freigabe grundsätzlich verweigert',
@@ -71,7 +71,7 @@
 },
 'UpdateDeny(170)'=>{
    de=>'Nein, wegen andauernden hoher Risiken bei der Durchführung/beim Betrieb',
-   en=>'No - on a long-term base joined with to high risks'
+   en=>'No - on a long-term base joined with too high risks'
 },
 'UpdateDeny(99)'=>{de=>'Nein - sonstige Gründe',
               en=>'No - other reasons'},
