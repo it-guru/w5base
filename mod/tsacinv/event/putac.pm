@@ -424,7 +424,7 @@ sub SendXmlToAM_instance
                      Remarks=>$irec->{comments},
                      Assignment=>$assignment,
                      IncidentAG=>$iassignment,
-                     SC_Location_Id=>'1000.0043.0089',
+                     SC_Location_Id=>'4787.0000.0000',
                      #CostCenter=>$rec->{conumber},
                      Security_Unit=>"TS.DE",
                      CustomerLink=>"TS.DE",
