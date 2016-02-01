@@ -277,6 +277,7 @@ sub qcheckRecord
                 # sein.
              }
              my $toucid=$wr->{toucid};
+             next if ($toucid eq "1446227"); # Arbeitverhälntisse auf DTAG.NULL
              $self->addWorkrelationShip($grp,$grpuser,$urec,$toucid,$ciamstate);
          }
          #msg(INFO,"---------------------------------------------------");
