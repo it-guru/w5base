@@ -81,8 +81,15 @@ sub new
                    my $self=shift;
                    my $hflt=shift;
                    if (defined($hflt->{$self->{name}})){
-                      $self->getParent->Context->{FilterSet}=
-                          {$self->{name}=>[$hflt->{$self->{name}}]};
+                      if ($hflt->{$self->{name}}=~m/^".*"$/ ||
+                          ref($hflt->{$self->{name}})){
+                         $self->getParent->Context->{FilterSet}=
+                             {$self->{name}=>$hflt->{$self->{name}}};
+                      }
+                      else{
+                         $self->getParent->Context->{FilterSet}=
+                             {$self->{name}=>[$hflt->{$self->{name}}]};
+                      }
                       delete( $hflt->{$self->{name}})
                    }
                    else{
