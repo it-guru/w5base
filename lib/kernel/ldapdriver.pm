@@ -22,9 +22,7 @@ use strict;
 use kernel;
 use kernel::Universal;
 use Net::LDAP;
-use Unicode::Map8;
 use Time::HiRes;
-use Unicode::String qw(utf8 latin1);
 
 @ISA=qw(kernel::Universal);
 
@@ -196,7 +194,7 @@ sub fetchrow
       foreach my $attr ($entry->attributes) {
          my @val=$entry->get_value($attr);
          for(my $c=0;$c<=$#val;$c++){
-            $val[$c]=utf8($val[$c])->latin1();
+            $val[$c]=utf8_to_latin1($val[$c]);
          }
          if ($#val>0){
             $rec{$attr}=\@val;
