@@ -2,7 +2,7 @@ use w5base;
 CREATE TABLE menu (
   menuid bigint(20) NOT NULL default '0',
   parentid bigint(20),
-  fullname varchar(40) NOT NULL default '',
+  fullname varchar(50) NOT NULL default '',
   target varchar(128) NOT NULL default '',
   func varchar(40) NOT NULL default '',
   config varchar(40) NOT NULL default '',
