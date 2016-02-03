@@ -1,4 +1,4 @@
-'TSSlovakia'=>{de=>'IT-Inventar TS Slovakia',en=>'IT-Inventory TS Slovakia'},
+'TSSlovakia'=>{de=>'IT-Inventar TS Slowakei',en=>'IT-Inventory TS Slovakia'},
 'TSSlovakia.custcontract'=>{de=>'Kundenvertrag',en=>'CustomerContract'},
 'TSSlovakia.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'TSSlovakia.custcontract.lnkappl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
