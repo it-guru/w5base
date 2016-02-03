@@ -256,7 +256,7 @@ sub new
                 readonly      =>1,
                 group         =>'userid',
                 vjointo       =>'base::useremail',
-                vjoinbase     =>{'cistatusid'=>'<=4'}, # this is neassary for
+                vjoinbase     =>{'cistatusid'=>'<=5'}, # this is neassary for
                 vjoinon       =>['userid'=>'userid'],  # intial logon process!
                 vjoindisp     =>['email','cistatus','emailtyp'],
                 vjoininhash   =>['id','email','cistatusid','emailtyp']),
