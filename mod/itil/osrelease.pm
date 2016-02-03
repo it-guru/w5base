@@ -112,19 +112,19 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'osrelease.modifyuser'),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'osrelease.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'osrelease.realeditor'),
    
 

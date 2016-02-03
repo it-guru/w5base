@@ -119,19 +119,19 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'custcontractmod.modifyuser'),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'custcontractmod.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'custcontractmod.realeditor')
    );
    $self->setDefaultView(qw(linenumber name cistatus mandator mdate fullname));

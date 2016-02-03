@@ -269,21 +269,21 @@ sub new
                 name          =>'owner',
                 readonly      =>1,
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>"$worktable.modifyuser"),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 readonly      =>1,
                 group         =>'source',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>"$worktable.editor"),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 readonly      =>1,
                 group         =>'source',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>"$worktable.realeditor"),
 
       new kernel::Field::Text(

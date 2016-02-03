@@ -227,7 +227,7 @@ sub new
                 name          =>'owner',
                 group         =>'source',
                 sqlorder      =>'NONE',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'lnkcontact.modifyuser'),
 
       new kernel::Field::Text(
@@ -267,14 +267,14 @@ sub new
                 name          =>'editor',
                 group         =>'source',
                 sqlorder      =>'NONE',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'lnkcontact.editor'),
                                                  
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 sqlorder      =>'NONE',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'lnkcontact.realeditor'),
 
       new kernel::Field::Link(

@@ -262,7 +262,7 @@ sub new
                 name          =>'editor',
                 uppersearch   =>1,
                 group         =>'contact',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>SELpref.'rootcausem1.sysmoduser'),
 
       new kernel::Field::Text(

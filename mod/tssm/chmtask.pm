@@ -150,7 +150,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'editor',
                 group         =>'status',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 weblinkto     =>'tssm::useraccount',
                 weblinkon     =>['implementer'=>'loginname'],
                 dataobjattr   =>SELpref.'cm3tm1.sysmoduser'),

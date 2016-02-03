@@ -208,7 +208,7 @@ sub new
                 group         =>'source',
                 weblinkto     =>'tssm::useraccount',
                 weblinkon     =>['editor'=>'loginname'],
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>SELpref.'contactsm1.sysmoduser'),
    );
    $self->setDefaultView(qw(id loginname name firstname email));

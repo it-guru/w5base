@@ -300,12 +300,12 @@ sub new
 
       new kernel::Field::Editor(
                 name          =>'editor',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'lnkgrpuser.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'lnkgrpuser.realeditor'),
 
       new kernel::Field::Text(

@@ -170,7 +170,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'passxentry.modifyuser'),
 
       new kernel::Field::Link(
@@ -188,13 +188,13 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'passxentry.editor'),
 
       new kernel::Field::RealEditor( 
                 name          =>'realeditor',
                 group         =>'source',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'passxentry.realeditor'),
 
       new kernel::Field::ListWebLink( 

@@ -176,7 +176,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'sig',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'faq.owner'),
 
       new kernel::Field::Link(
@@ -224,13 +224,13 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'sig',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'faq.editor'),
                                    
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'sig',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'faq.realeditor'),
                                    
       new kernel::Field::CDate(

@@ -471,7 +471,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'modifyuser')
    );
    $self->setWorktable("TAD4Dsup__system_of");

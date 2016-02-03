@@ -173,13 +173,13 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'lnkqrulemandator.editor'),
                                                  
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'lnkqrulemandator.realeditor'),
    );
    $self->setDefaultView(qw(mandator qrule cistatus cdate dataobj));

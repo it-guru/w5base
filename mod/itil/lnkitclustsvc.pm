@@ -173,7 +173,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'qlnkitclustsvc.modifyuser'),
                                    
       new kernel::Field::Text(
@@ -221,13 +221,13 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'qlnkitclustsvc.editor'),
                                                   
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'qlnkitclustsvc.realeditor'),
 
       new kernel::Field::Select(

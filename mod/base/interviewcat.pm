@@ -170,13 +170,13 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'id',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'interviewcat.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'id',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'interviewcat.realeditor'),
 
       new kernel::Field::Link(

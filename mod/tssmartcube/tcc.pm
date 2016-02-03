@@ -683,7 +683,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'modifyuser')
    );
    $self->setWorktable("smartcube_tcc_report_of");

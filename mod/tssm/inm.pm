@@ -273,7 +273,7 @@ sub new
                 name          =>'editor',
                 uppersearch   =>1,
                 group         =>'contact',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>SELpref.'probsummarym1.sysmoduser'),
 
 ##      new kernel::Field::Text(

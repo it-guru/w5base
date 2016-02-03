@@ -74,8 +74,7 @@ sub new
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
-   $self->setBase("OU=Standard,OU=Internal,".
-                  "OU=Users,OU=DE,DC=emea1,DC=cds,DC=t-internal,DC=com");
+   $self->setBase("OU=Users,OU=DE,DC=emea1,DC=cds,DC=t-internal,DC=com");
    $self->AddFields(
       new kernel::Field::Linenumber(name     =>'linenumber',
                                     label      =>'No.'),

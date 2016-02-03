@@ -206,12 +206,12 @@ sub new
 
       new kernel::Field::Editor(
                 name          =>'editor',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'history.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'history.realeditor'),
 
    );

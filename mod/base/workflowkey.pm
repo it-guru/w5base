@@ -72,14 +72,14 @@ sub new
                 name          =>'editor',
                 group         =>'source',
                 sqlorder      =>'none',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'wfkey.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 sqlorder      =>'none',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'wfkey.realeditor'),
    );
    $self->setDefaultView(qw(wfheadid name value cdate));

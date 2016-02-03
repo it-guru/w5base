@@ -197,7 +197,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'ownername',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'systemjobtiming.modifyuser'),
 
       new kernel::Field::Link(
@@ -209,13 +209,13 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'systemjobtiming.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'systemjobtiming.realeditor'),
 
    );

@@ -100,7 +100,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'of_modifyuser'),
 
       new kernel::Field::Interface(

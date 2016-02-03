@@ -280,28 +280,28 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>"$worktable.modifyuser"),
 
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
                 searchable    =>'0',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>"$worktable.modifyuser"),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
                 searchable    =>'0',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>"$worktable.editor"),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 searchable    =>'0',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>"$worktable.realeditor"),
 
       new kernel::Field::Link(

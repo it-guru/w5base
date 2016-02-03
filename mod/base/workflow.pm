@@ -611,13 +611,13 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'state',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'wfhead.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'state',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'wfhead.realeditor'),
 
       new kernel::Field::Container(
@@ -720,7 +720,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'state',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'wfhead.modifyuser'),
 
       new kernel::Field::KeyText(

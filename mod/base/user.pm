@@ -796,19 +796,19 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'userro',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'contact.modifyuser'),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'userro',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'contact.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'userro',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'contact.realeditor'),
 
       new kernel::Field::CDate(

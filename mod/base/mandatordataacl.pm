@@ -125,7 +125,7 @@ sub new
                 name          =>'owner',
                 group         =>'source',
                 sqlorder      =>'NONE',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'mandatordataacl.modifyuser'),
 
       new kernel::Field::CDate(
@@ -144,14 +144,14 @@ sub new
                 name          =>'editor',
                 group         =>'source',
                 sqlorder      =>'NONE',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'mandatordataacl.editor'),
                                                  
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 sqlorder      =>'NONE',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'mandatordataacl.realeditor')
    );
    $self->setDefaultView(qw(parentobj mandator dataname prio targetname aclmode));

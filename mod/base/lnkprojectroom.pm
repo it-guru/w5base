@@ -88,7 +88,7 @@ sub new
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
-                label         =>'Owner',
+                label         =>'last Editor',
                 dataobjattr   =>'lnkprojectroom.modifyuser'),
 
       new kernel::Field::Text(
@@ -124,13 +124,13 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'lnkprojectroom.editor'),
                                                  
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
-                label         =>'RealEditor',
+                label         =>'real Editor Account',
                 dataobjattr   =>'lnkprojectroom.realeditor'),
    );
    $self->setDefaultView(qw(parentobj refid cdate editor));

@@ -240,7 +240,7 @@ sub new
                 group         =>'source',
                 weblinkto     =>'tssm::useraccount',
                 weblinkon     =>['editor'=>'loginname'],
-                label         =>'Editor',
+                label         =>'Editor Account',
                 dataobjattr   =>'assignmentm1.sysmoduser'),
 
 
