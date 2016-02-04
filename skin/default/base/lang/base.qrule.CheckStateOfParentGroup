@@ -1,0 +1,2 @@
+'base::qrule::CheckStateOfParentGroup'=>{de=>'Statusüberprüfung der Elterngruppe',en=>'State-Check of parent group'},
+'parrent group invalid or in deleted state'=>{de=>'Elterngruppe ungültig oder im Status "veraltet/gelöscht"'},
