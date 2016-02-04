@@ -14,22 +14,43 @@ a BusinessApplication.
 
 =head3 HINTS
 
-Der ApplicationManager der für eine Anwendung verantwortlich
-ist, wird durch das zugehörige ICTO-Objekt aus CapeTS vorgeben.
+[en:]
+
+The Application Manager is responsible for an application, 
+specified by the associated ICTO object from CapeTS.
+
+This QualityRule ensures that in W5Base/Darwin the same 
+Application Manager is registered.
+
+Should be the wrong Application Manager reported by this rule, 
+this may be due to an incorrect entry in CapeTS or a wrong number 
+of ICTO application entry in W5Base/Darwin.
+
+IT architecture awarded via the tool CapeTS.
+
+Conact Person for CapeTS is Mr. Michael Appel...
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/12101322010001
+
+
+[de:]
+
+Der für eine Anwendung verantwortliche ApplicationManager 
+wird durch das zugehörige ICTO-Objekt aus CapeTS vorgegeben.
 
 Diese QualityRule stellt sicher, dass in W5Base/Darwin der
 gleiche ApplicationManager eingetragen ist.
 
 Sollte der falsche ApplicationManager durch diese Regel gemeldet
-werden, so kann dies an einem Fehleintrag in CapeTS oder einer
+werden, kann dies an einem Fehleintrag in CapeTS oder einer
 falschen ICTO Nummer beim Anwendungseintrag in W5Base/Darwin
 liegen.
 
 IT-Architektur über das Tool CapeTS vergeben. 
 
-Ansprechpartner für CapeTS ist Hr. Krohn ...
+Ansprechpartner für CapeTS ist Herr Michael Appel ...
 
-https://darwin.telekom.de/darwin/auth/base/user/ById/13627534400001
+https://darwin.telekom.de/darwin/auth/base/user/ById/12101322010001
 
 
 =cut
