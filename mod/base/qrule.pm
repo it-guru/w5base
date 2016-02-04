@@ -707,6 +707,8 @@ sub WinHandleQualityCheck
    my $CurrentIdToEdit=Query->Param("CurrentIdToEdit");
    my $mode=Query->Param("Mode");
    if (defined($mode) && $mode eq "process" && $CurrentIdToEdit ne ""){
+      my $reqautocorret=Query->Param("ForceAutoCorrectSession");
+      $reqautocorret=1 if ($reqautocorret ne "");
       #printf STDERR ("fifi env=%s\n",Dumper(\%ENV));
       #printf STDERR ("fifi query=%s\n",Query->Dumper());
       #printf STDERR ("fifi rec=%s\n",Dumper($rec));
@@ -716,6 +718,17 @@ sub WinHandleQualityCheck
       my %checksession=(checkstart=>time(),checkmode=>'web');
       if (exists($rec->{allowifupdate}) && $rec->{allowifupdate}==1){
          $checksession{autocorrect}=1;
+      }
+      if ($reqautocorret && !$checksession{autocorrect}){
+         # check if write is allowed
+         my @write=$dataobj->isWriteValid($rec);
+         my $wr=0;
+         if (in_array(\@write,[qw(ALL default)])){
+            $wr++;
+         }
+         if ($wr){
+            $checksession{autocorrect}=1;
+         }
       }
       my $checkresult=$self->nativQualityCheck($objlist,$rec,\%checksession);
       #print STDERR Dumper($checkresult);
@@ -747,6 +760,22 @@ sub WinHandleQualityCheck
    my $DetailPrint=$self->T("DetailPrint","kernel::App::Web::Listedit");
    my $qruleinfo=$self->T("open infos to quality rule");
    my $hintsav=$self->T("hints available");
+   my $autoctext=$self->T("autocorrect, if posible",'base::qrule');
+   my $act="";
+
+   my @write=$dataobj->isWriteValid($rec);
+   my $wr=0;
+   if (in_array(\@write,[qw(ALL default)])){
+      $wr++;
+   }
+   if ($wr){
+      $act="<input type=checkbox id=ForceAutoCorrectSession>".$autoctext;
+   }
+   if (exists($rec->{allowifupdate}) && $rec->{allowifupdate}==1){
+      $act="";
+   }
+
+
    $d.=<<EOF;
 <table width="100%" height="100%" border=0>
 <tr height=50><td>$handlermask</td></tr>
@@ -765,13 +794,20 @@ sub WinHandleQualityCheck
 
 </tr>
 <tr height=1%>
-<td align=right>
+<td>
+<table width=100% border=0>
+<tr>
+<td align="left">$act</td>
+<td align="right">
 <div class=buttonline>
 <input onclick="window.print();" type=button style="width:100px" value="$DetailPrint">
 <input onclick="processCheck();" type=button style="width:100px" value="recheck">
 <input onclick="window.close();" type=button style="width:100px" value="$DetailClose">
 <input type=hidden name=CurrentIdToEdit value="$CurrentIdToEdit">
 </div>
+</td>
+</tr>
+</table>
 </td>
 </tr>
 </table>
@@ -935,8 +971,16 @@ function addToResult(ruleid)
        }
     }
    }
+   var forceAutoCorrect=document.getElementById("ForceAutoCorrectSession");
+   var ForceAutoCorrectSessionParam="";
+   if (forceAutoCorrect){
+      if (forceAutoCorrect.checked){
+         ForceAutoCorrectSessionParam="&ForceAutoCorrectSession=1";
+      }
+   }
    xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-   var r=xmlhttp.send('Mode=process&CurrentIdToEdit='+'$CurrentIdToEdit');
+   var r=xmlhttp.send('Mode=process&CurrentIdToEdit='+'$CurrentIdToEdit'+
+                      ForceAutoCorrectSessionParam);
 }
 function resizeOut()
 {

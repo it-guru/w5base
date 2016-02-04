@@ -73,6 +73,7 @@ sub qcheckRecord
    my $wfrequest={};
    my $forcedupd={};
    my @qmsg;
+   my @msg;
    my $errorlevel=0;
 
    if ($rec->{cistatusid}<=5){
@@ -82,14 +83,25 @@ sub qcheckRecord
             $grp->SetFilter({grpid=>\$rec->{parentid}});
             my ($chkrec)=$grp->getOnlyFirst(qw(cistatusid grpid));
             if (!defined($chkrec) || $chkrec->{cistatusid}==6){
-               push(@qmsg,"parrent group invalid or in deleted state");
+               if ($autocorrect){
+                  if ($grp->ValidatedUpdateRecord($rec,{cistatusid=>6},
+                                         {grpid=>\$rec->{grpid}})){
+                     my $msg="deactivating group while parent deleted";
+                     push(@msg,$msg);
+                  }
+               }
+               else{
+                  my $msg="parrent group invalid or in deleted state";
+                  push(@msg,$msg);
+                  push(@qmsg,$msg);
+               }
             }
          }
       }
    }
    if ($#qmsg!=-1){
       $errorlevel=3 if ($errorlevel==0);
-      return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+      return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@msg});
    }
    return($errorlevel,undef);
 }

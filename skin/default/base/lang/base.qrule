@@ -9,4 +9,5 @@
 'Rule Infos'=>{de=>'Regelinformationen'},
 'hints available'=>{de=>'Hinweise zur Problembeseitigung vorhanden'},
 'open infos to quality rule'=>{de=>'Infos zur QualityRule öffnen'},
+'autocorrect, if posible'=>{de=>'automatisch korrigieren, falls möglich'}
 
