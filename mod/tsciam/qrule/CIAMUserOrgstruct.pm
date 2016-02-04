@@ -106,7 +106,8 @@ sub qcheckRecord
             if (defined($msg)){
                msg(ERROR,"LDAP problem:%s",$msg);
             }
-            if ($urec->{posix} ne "" && $urec->{cistatusid}<6){
+            if (($urec->{posix} ne "" || $urec->{dsid} ne "") && 
+                $urec->{cistatusid}<6){
                my $old=0;
                my $age;
                if ($urec->{lastlogon} eq ""){
@@ -127,7 +128,8 @@ sub qcheckRecord
                             # all Telekom contacts should be in CIAM
                      $ciamusr->Log(ERROR,"basedata",
                                   "E-Mail '%s' not found in LDAP (CIAM) ".
-                                  "but with POSIX entry",$urec->{email});
+                                  "but with POSIX or DSID entry",
+                                  $urec->{email});
                   }
                   else{
                      if (!defined($age) || $age>259200){ # half year
