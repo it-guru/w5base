@@ -96,7 +96,7 @@ sub new
                 name          =>'sapofientity',
                 group         =>'saprelation',
                 readonly      =>1,
-                label         =>'OFI Entity',
+                label         =>'OFI Element',
                 vjointo       =>\'tssapp01::psp',
                 vjoinon       =>['name'=>'name'],
                 vjoinonfinish =>sub{
