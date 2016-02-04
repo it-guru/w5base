@@ -75,33 +75,20 @@ sub qcheckRecord
       $ciam->SetFilter([
          {email=>\$rec->{email},active=>\'true',primary=>\'true'},
          {email2=>\$rec->{email},active=>\'true',primary=>\'true'},
-         {email3=>\$rec->{email},active=>\'true',primary=>\'true'}
+         {email3=>\$rec->{email},active=>\'true',primary=>\'true'},
+         {email4=>\$rec->{email},active=>\'true',primary=>\'true'} 
       ]);
       my @l=$ciam->getHashList(qw(ALL));
-      if ($#l==-1){
-         # Workaround für nicht indiziertes email4 Feld - da suchen wir
-         # dann nur, wenns wirklich sein muß.
-         # ACHTUNG: Uneindeutigkeiten gegenüber email4 können somit vermutlich
-         #          NICHT erkannt werden
-         $ciam->ResetFilter();
-         msg(INFO,"OK, dann müssen wir eben noch in email4 nachsehen");
-         $ciam->SetFilter([
-            {email4=>\$rec->{email},active=>\'true',primary=>\'true'} 
-             # NICHT indiziert!
-         ]);
-         @l=$ciam->getHashList(qw(ALL));
-         if ($#l==-1 &&
-             ( ($rec->{email}=~m/\@telekom\.de$/) ||
-               ($rec->{email}=~m/\@t-systems\.com$/)) &&
-             ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user")){
-            $dataobj->Log(ERROR,"basedata",
-                   "Contact '%s' seems to have leave ".
-                   " the DTAG concern.",
-                   $rec->{fullname});
-            return(0,{qmsg=>['telekom user not found']});
-         }
-      }
-
+      #if ($#l==-1 &&
+      #    ( ($rec->{email}=~m/\@telekom\.de$/) ||
+      #      ($rec->{email}=~m/\@t-systems\.com$/)) &&
+      #    ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user")){
+      #   $dataobj->Log(ERROR,"basedata",
+      #          "Contact '%s' seems to have leave ".
+      #          " the DTAG concern.",
+      #          $rec->{fullname});
+      #   return(0,{qmsg=>['telekom user not found']});
+      #}
       if ($#l>0){
          printf STDERR ("CIAM: ununique email = '%s'\n",$rec->{email});
          return(3,{qmsg=>['ununique email in CIAM '.$rec->{email}]});
@@ -125,12 +112,16 @@ sub qcheckRecord
          foreach my $chop (@changeOperations){
             if ($rec->{$chop->{lfld}} ne ""){  
                $ciam->ResetFilter();
-               my $chkval=$rec->{$chop->{rfld}};
+               my $chkval=$rec->{$chop->{lfld}};
                if ($chop->{rfld} eq "tcid"){
                   $chkval=~s/^tCID://;
                }
-               $ciam->SetFilter({$chop->{rfld}=>\$chkval,
-                                 active=>\'true',primary=>\'true'});
+               my $flt={
+                  $chop->{rfld}=>\$chkval,
+                  primary=>\'true',
+                  active=>\'true'
+               };
+               $ciam->SetFilter($flt);
                ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
                if (defined($ciamrec) && 
                    lc($ciamrec->{email}) ne "" && 
