@@ -69,7 +69,7 @@ sub Reporter
    my $ppid=getppid();
  
    my $reportjob=getModuleObject($self->Config,"base::reportjob");
-   $reportjob->BackendSessionName("ForceUncached");
+   #$reportjob->BackendSessionName("ForceUncached");
 
 
 
