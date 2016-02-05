@@ -110,6 +110,10 @@ sub utf8_to_latin1
 {
    my $utf8string=shift;
    $utf8string=~s/\xC3[\xb3]/o/g;
+   $utf8string=~s/\xC3[\xa0\xa1\xa2\xa3\xa4\xa5]/a/g;
+   $utf8string=~s/\xC3[\x80\x81\x82\x83\x84\x85]/A/g;
+   $utf8string=~s/\xC3[\xa8\xa9\xaa\xab]/e/g;
+   $utf8string=~s/\xC3[\x88\x89\x8a\x8b]/E/g;
    $utf8string=~s/\xC5\x81/L/g;
    $utf8string=~s/\xC5[\xba\xbc\xbe]/z/g;
    $utf8string=~s/\xC5[\xb9\xbb\xbd]/Z/g;
