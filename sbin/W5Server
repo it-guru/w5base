@@ -1176,6 +1176,7 @@ sub MakeAllDBHsForkSafe {
       foreach my $dbh (@{$drh->{ChildHandles}}){    
          msg(DEBUG,"set $dbh in $drh to InactiveDestroy=1 in $0");
          $dbh->{InactiveDestroy}=1;
+         $dbh->{mysql_auto_reconnect}=1;
       }
    }
 }
