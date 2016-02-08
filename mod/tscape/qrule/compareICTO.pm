@@ -4,8 +4,8 @@ package tscape::qrule::compareICTO;
 
 =head3 PURPOSE
 
-This qulaity rule compares the specified ICTO ID to CapeTS. A DataIssue
-will be produced, if the ICTO Objekt doesn't exists in CapeTS or it
+This quaity rule compares the specified ICTO ID to CapeTS. A DataIssue
+will be produced, if the ICTO Objekt doesn't exist in CapeTS or it
 is marked as "Retired" (if the application is in CI-status 3 or 4)
 
 =head3 IMPORTS
@@ -19,35 +19,31 @@ IT architecture by means of the tool CapeTS.
 
 The application manager should know the ICTO-Ids of his applications. 
 
-In the case that you cannot determine the ICTO-Id  
-please contact Mr. Krohn ...
+In case that you cannot determine the ICTO-Id  
+please contact the Helpdesk ...
 
-https://darwin.telekom.de/darwin/auth/base/user/ById/13627534400001  .
+https://darwin.telekom.de/darwin/auth/base/user/ById/14549173480001
 
-In case of problems determining the ICTO-Id please 
-contact  Mr. Striepecke ...
-
-https://darwin.telekom.de/darwin/auth/base/user/ById/13401048580000  .
 
 If you are sure that an application is not relevant for architecture 
 and is not configured in CapeTS (i.e. pure technical applications 
 that provide technical access to networks) , then there is the 
 possibility - in the configuration data of the application - 
-to set the flag  " Application is not architecture relevant:" to  "yes".
+to set the flag  "Application is not architecture relevant" to "yes".
 
 So there are two possibilities of providing correct data 
 concerning the architecture relevance of an application:
 
 1. Either the application is architecture relevant, then 
-the attribute  Application is not architecture 
-relevant: has to be set to no and a valid ICTO-Id has to 
+the attribute  "Application is not architecture 
+relevant" has to be set to "no" and a valid ICTO-Id has to 
 be entered.
 
 2. Or the application is not architecture relevant, then 
-the attribute  Application is not architecture relevant: has 
-to be set to yes and you are not allowed to enter an 
+the attribute "Application is not architecture relevant" has 
+to be set to "yes" and you are not allowed to enter an 
 ICTO-Id, i.e. you must delete the actual ICTO-Id, if one 
-is has been given already.
+has been given already.
 
 The rule which lead to this issue won't be executed on 
 this application anymore. 
@@ -59,35 +55,29 @@ IT-Architektur über das Tool CapeTS vergeben.
 Der Application-Manager einer Anwendung sollte die 
 betreffende ICTO-ID seiner Anwendung kennen.
 
-Sollte die ICTO-ID nicht bekannt sein, so kann 
-diese über Hr. Krohn ...
+Sollte die ICTO-ID nicht bekannt sein, 
+kontaktieren Sie bitte den HelpDesk:
 
-https://darwin.telekom.de/darwin/auth/base/user/ById/13627534400001
+https://darwin.telekom.de/darwin/auth/base/user/ById/14549173480001
 
-... erfragt werden. Sollte es Probleme bei der Ermittlung 
-der ICTO-ID geben, so können Sie Hr. Striepecke ...
-
-https://darwin.telekom.de/darwin/auth/base/user/ById/13401048580000
-
-... kontaktieren.
 
 Sollte sicher sein, dass eine Anwendung nicht durch die 
-IT-Architektur erfasst wird (z.B. ein rein technische Anwendung 
-die technischen Zugang zu Netzwerken ermöglicht), so muß in 
+IT-Architektur erfasst wird (z.B. eine rein technische Anwendung 
+die technischen Zugang zu Netzwerken ermöglicht), so muss in 
 den Config-Daten der Anwendung das Feld "Anwendung ist 
 nicht IT-Architektur relevant" = "Ja" gesetzt werden.
 
 Es gibt also zwei Möglichkeiten für die korrekte Angabe der 
-Architektur-Relevanz einer Applikation:
+Architektur-Relevanz einer Anwendung:
 
-1. Entweder ist die Anwenduung IT-Architektur-relevant, 
-dann muss das Attribut  Anwendung ist nicht IT-Architektur 
-relevant: auf nein gesetzt werden und es muss eine 
+1. Entweder ist die Anwendung IT-Architektur-relevant, 
+dann muss das Attribut "Anwendung ist nicht IT-Architektur 
+relevant" auf "nein" gesetzt werden und es muss eine 
 gültige ICTO-Id angegeben werden.
 
 2. Oder die Anwendung ist nicht IT-Architektur-relevant, 
-dann muss das Attribut  Anwendung ist nicht IT-Architektur 
-relevant: auf "ja" gesetzt werden und es darf keine 
+dann muss das Attribut "Anwendung ist nicht IT-Architektur 
+relevant" auf "ja" gesetzt werden und es darf keine 
 ICTO-Id angegeben werden.
 
 
