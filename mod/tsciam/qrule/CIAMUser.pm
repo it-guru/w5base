@@ -79,19 +79,19 @@ sub qcheckRecord
          {email4=>\$rec->{email},active=>\'true',primary=>\'true'} 
       ]);
       my @l=$ciam->getHashList(qw(ALL));
-      #if ($#l==-1 &&
-      #    ( ($rec->{email}=~m/\@telekom\.de$/) ||
-      #      ($rec->{email}=~m/\@t-systems\.com$/)) &&
-      #    ($rec->{usertyp} eq "extern" || $rec->{usertyp} eq "user")){
-      #   $dataobj->Log(ERROR,"basedata",
-      #          "Contact '%s' seems to have leave ".
-      #          " the DTAG concern.",
-      #          $rec->{fullname});
-      #   return(0,{qmsg=>['telekom user not found']});
-      #}
       if ($#l>0){
          printf STDERR ("CIAM: ununique email = '%s'\n",$rec->{email});
          return(3,{qmsg=>['ununique email in CIAM '.$rec->{email}]});
+      }
+      if ($#l==-1){               # no primary workrelation found - so we will
+         $ciam->ResetFilter();    # try to find  a secondary
+         $ciam->SetFilter([
+            {email=>\$rec->{email},active=>\'true',primary=>\'false'},
+            {email2=>\$rec->{email},active=>\'true',primary=>\'false'},
+            {email3=>\$rec->{email},active=>\'true',primary=>\'false'},
+            {email4=>\$rec->{email},active=>\'true',primary=>\'false'} 
+         ]);
+         @l=$ciam->getHashList(qw(ALL));
       }
       
       my $msg;
@@ -140,9 +140,9 @@ sub qcheckRecord
                         }
                         if ($alturec->{emailtyp} eq "primary"){
                            $dataobj->Log(ERROR,"basedata",
-                               "Fail to change primary email to ".
-                               "from '$alturec->{user}' ".
-                               "on '$rec->{fullname}' ");
+                               "Fail to move primary email '$newemail' ".
+                               "from '$alturec->{contactfullname}' ".
+                               "to '$rec->{fullname}' ");
                         }
                      }
                      if (!defined($alturec)){ # es ist platz bzw. es wurde
