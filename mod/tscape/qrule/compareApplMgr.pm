@@ -28,9 +28,9 @@ of ICTO application entry in W5Base/Darwin.
 
 IT architecture awarded via the tool CapeTS.
 
-Conact Person for CapeTS is Mr. Michael Appel...
+Please contact the support of CapeTS ...
 
-https://darwin.telekom.de/darwin/auth/base/user/ById/12101322010001
+https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
 
 [de:]
@@ -48,9 +48,9 @@ liegen.
 
 IT-Architektur über das Tool CapeTS vergeben. 
 
-Ansprechpartner für CapeTS ist Herr Michael Appel ...
+Bitte kontaktieren Sie den Support von CapeTS ...
 
-https://darwin.telekom.de/darwin/auth/base/user/ById/12101322010001
+https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
 
 =cut
