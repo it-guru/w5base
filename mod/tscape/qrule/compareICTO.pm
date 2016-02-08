@@ -14,12 +14,12 @@ is marked as "Retired" (if the application is in CI-status 3 or 4)
 
 =head3 HINTS
 
-Every application needs an ICTO-Id. This Id must be provided by 
+Every application needs an ICTO-ID. This ID must be provided by 
 IT architecture by means of the tool CapeTS.
 
-The application manager should know the ICTO-Ids of his applications. 
+The application manager should know the ICTO-IDs of his applications. 
 
-In case that you cannot determine the ICTO-Id  
+In case that you cannot determine the ICTO-ID  
 please contact the Helpdesk ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/14549173480001
@@ -36,13 +36,13 @@ concerning the architecture relevance of an application:
 
 1. Either the application is architecture relevant, then 
 the attribute  "Application is not architecture 
-relevant" has to be set to "no" and a valid ICTO-Id has to 
+relevant" has to be set to "no" and a valid ICTO-ID has to 
 be entered.
 
 2. Or the application is not architecture relevant, then 
 the attribute "Application is not architecture relevant" has 
 to be set to "yes" and you are not allowed to enter an 
-ICTO-Id, i.e. you must delete the actual ICTO-Id, if one 
+ICTO-ID, i.e. you must delete the actual ICTO-ID, if one 
 has been given already.
 
 The rule which lead to this issue won't be executed on 
@@ -73,12 +73,12 @@ Architektur-Relevanz einer Anwendung:
 1. Entweder ist die Anwendung IT-Architektur-relevant, 
 dann muss das Attribut "Anwendung ist nicht IT-Architektur 
 relevant" auf "nein" gesetzt werden und es muss eine 
-gültige ICTO-Id angegeben werden.
+gültige ICTO-ID angegeben werden.
 
 2. Oder die Anwendung ist nicht IT-Architektur-relevant, 
 dann muss das Attribut "Anwendung ist nicht IT-Architektur 
 relevant" auf "ja" gesetzt werden und es darf keine 
-ICTO-Id angegeben werden.
+ICTO-ID angegeben werden.
 
 
 Die Regel, die zu diesem Data-Issue führte, wird dann auf 

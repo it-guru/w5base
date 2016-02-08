@@ -14,18 +14,19 @@ a BusinessApplication.
 
 =head3 HINTS
 
-The Project Manager of an IT application is entered centrally in CapeTS via the ICT-Object and is only compared for the production environments in Darwin (valid for CI-States: "available/in project" and "installed/active")
+The Project Manager of an IT application is leading entered in CapeTS via the ICT-Object and is only compared for the production environments in Darwin (valid for CI-States: "available/in project" and "installed/active")
 
-Conact Person for Cape is Mr. Michael Appel ...
-https://darwin.telekom.de/darwin/auth/base/user/ById/12101322010001
+Please contact the Support of CapeTS ...
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
 [de:]
 
 Der Projektmanager IT-Applikation ist federführend in CapeTS über das ICTO Objekt gepflegt und wird nur für die Produktionsumgebungen in Darwin abgeglichen (gilt für CI-Status: "verfügbar/in Projektierung" und "installiert/aktiv")
 
-Ansprechpartner für CapeTS ist Hr. Michael Appel ...
+Bitte kontaktieren Sie den Support von CapeTS ...
 
-https://darwin.telekom.de/darwin/auth/base/user/ById/12101322010001
+https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
 =cut
 #######################################################################
