@@ -122,20 +122,58 @@ sub getSqlFrom
    return($worktable);
 }
 
-sub getSqlOrder
+sub getLdapOrder
 {
    my $self=shift;
    my ($worktable,$workdb)=$self->getBase();
-   my @order;
-   my @view=$self->getCurrentView();
+   my @order=();
+   my @view=$self->getFieldObjsByView([$self->getCurrentView()]);
 
-   foreach my $fieldname (@view){
-      my $field=$self->getField($fieldname);
-      if (defined($field->{dataobjattr})){
-         push(@order,$field->{dataobjattr});
+
+   my @o=$self->GetCurrentOrder();
+   if (!($#o==0 && uc($o[0]) eq "NONE")){
+      if ($#o==-1 || ($#o==0 && $o[0] eq "")){
+         foreach my $field (@view){
+            my $orderstring=$field->getBackendName("order",$self->{DB});
+            if (!defined($orderstring)){
+               if (defined($field->{vjoinon}) &&
+                   ref($field->{vjoinon}) eq "ARRAY"){
+                  my $jfld=$self->getField($field->{vjoinon}->[0]);
+                  if (defined($jfld)){
+                     my $orderstring=$jfld->getBackendName("order",
+                                      $self->{DB});
+                     if (defined($orderstring) &&
+                         !in_array(\@order,$orderstring)){
+                        push(@order,$orderstring);
+                     }
+                  }
+               }
+            }
+            else{
+               if (!in_array(\@order,$orderstring)){
+                  push(@order,$orderstring);
+               }
+            }
+         }
+         return(join(" ",@order));
       }
+      else{
+         foreach my $ofield (@o){
+            my $fieldname=$ofield;
+            $fieldname=~s/^[+-]//;
+            my $field=$self->getField($fieldname);
+            next if (!defined($field));
+            my $orderstring=$field->getBackendName("order",$self->{DB},$ofield);
+            next if (!defined($orderstring));
+            if (!in_array(\@order,$orderstring)){
+               push(@order,$orderstring);
+            }
+         }
+         return(join(" ",@order));
+      }
+      return("");
    }
-   return(join(",",@order));
+   return("");
 }
 
 sub initSqlWhere

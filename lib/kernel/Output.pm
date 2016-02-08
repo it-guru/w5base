@@ -214,7 +214,7 @@ sub WriteToStdout
    if ($msg ne ""){
       if ($self->getParent->can("HttpHeader")){
          print $app->HttpHeader("text/plain");
-         printf("%s",$msg);
+         printf("%s",rmNonLatin1($msg));
       }
       close(TMP);
       close($fh);

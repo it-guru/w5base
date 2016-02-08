@@ -22,6 +22,8 @@ use strict;
 use kernel;
 use kernel::Universal;
 use Net::LDAP;
+use Net::LDAP::Control::Sort;
+use Net::LDAP::Constant qw(LDAP_CONTROL_SORTRESULT);
 use Time::HiRes;
 
 @ISA=qw(kernel::Universal);
@@ -98,16 +100,6 @@ sub getErrorMsg
    return("getErrorMsg:ldap errorstring");
 }
 
-sub execute
-{
-   my $self=shift;
-   my @p=@_;
-
-   $self->checksoftlimit(\$p[0]);
-   #printf STDERR ("execute: %s\n",$p[0]);
-   return($self->SUPER::execute(@p)); 
-}
-
 sub checksoftlimit
 {
    my $self=shift;
@@ -124,6 +116,10 @@ sub execute
 
    if ($self->{ldap}){
       my $c=$self->getParent->Context;
+
+      my $ldaporderstring=$self->getParent->getLdapOrder();
+      my $sort = Net::LDAP::Control::Sort->new(order=>$ldaporderstring);
+      push(@param,"control"=>[$sort]);
 
       my $sseconds=Time::HiRes::time();
       $c->{$self->{ldapname}}->{sth}=$self->{'ldap'}->search(@param);
@@ -146,13 +142,57 @@ sub execute
          return(undef,msg(ERROR,"problem while LDAP search"));
       }
       if ($c->{$self->{ldapname}}->{sth}->code()){
+         $c->{$self->{ldapname}}->{sthdata}=[];
+         $c->{$self->{ldapname}}->{sthcount}=0;
          return(undef,msg(ERROR,"ldap-search:%s (%s)",
                           $c->{$self->{ldapname}}->{sth}->error,
                           Dumper(\@param)));
       }
+      my $resultsorted=0;
                      
-      $c->{$self->{ldapname}}->{sthdata}=
-          [$c->{$self->{ldapname}}->{sth}->all_entries()];
+      #{ # sort handling
+      #   my ($resp)=$c->{$self->{ldapname}}->{sth}->control(
+      #      LDAP_CONTROL_SORTRESULT
+      #   );
+      #   if (defined($resp)){
+      #      die('unexpeded sorted result'); # sort handling muß noch
+      #                                      # programmiert werden (hv 02/2016)
+      #   }
+      #}
+      if (!$resultsorted){    # do client sort
+         my $tmpres=[$c->{$self->{ldapname}}->{sth}->all_entries()];
+         my @sortkeys=split(/\s/,$ldaporderstring);
+         $tmpres=[sort({
+            my @cmpstr=([],[]);
+            my @sk=@sortkeys;
+            foreach my $sk (@sk){
+               my $c=0;
+               foreach my $entry ($a,$b){
+                  foreach my $attr ($entry->attributes) {
+                     if ($attr eq $sk){
+                        my @val=$entry->get_value($attr);
+                        for(my $c=0;$c<=$#val;$c++){
+                           $val[$c]=utf8_to_latin1($val[$c]);
+                        }
+                        push(@{$cmpstr[$c]},join(",",@val));
+                     }
+                  }
+                  $c++;
+               }
+            }
+            my $bk=0;
+            for(my $cc=0;$cc<=$#sk;$cc++){
+               $bk=$cmpstr[0]->[$cc] cmp $cmpstr[1]->[$cc];
+               last if ($bk!=0);
+            }
+            $bk;
+         } @{$tmpres})];
+         $c->{$self->{ldapname}}->{sthdata}=$tmpres;
+      }
+      else{
+         $c->{$self->{ldapname}}->{sthdata}=
+             [$c->{$self->{ldapname}}->{sth}->all_entries()];
+      }
       $c->{$self->{ldapname}}->{sthcount}=
           $#{$c->{$self->{ldapname}}->{sthdata}}+1;
       #printf STDERR ("fifi kernel::ldapdriver found %d entries\n",
