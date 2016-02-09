@@ -48,6 +48,16 @@ sub new
                 dataobjattr   =>"'unknown name'"),
 
       new kernel::Field::Text(
+                name          =>'systemid',
+                label         =>'SystemID',
+                dataobjattr   =>"sger"),
+
+      new kernel::Field::Text(
+                name          =>'assetid',
+                label         =>'AssetID',
+                dataobjattr   =>"ager"),
+
+      new kernel::Field::Text(
                 name          =>'vcores',
                 label         =>'vcores',
                 dataobjattr   =>"vcores"),
@@ -77,7 +87,7 @@ sub new
    );
    $self->{use_distinct}=0;
    #$self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(name vfarm));
+   $self->setDefaultView(qw(name systemid assetid ostype vfarm));
    $self->setWorktable("view_darwin_logical_system");
    return($self);
 }

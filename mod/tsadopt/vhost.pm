@@ -58,6 +58,11 @@ sub new
                 vjoinon       =>['vfarmid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Text(
+                name          =>'assetid',
+                label         =>'AssetID',
+                dataobjattr   =>"ager"),
+
       new kernel::Field::Link(
                 name          =>'vfarmid',
                 label         =>'vfarm id',
@@ -66,7 +71,7 @@ sub new
    );
    $self->{use_distinct}=0;
    #$self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(name type vfarm));
+   $self->setDefaultView(qw(name assetid type vfarm));
    $self->setWorktable("view_darwin_abstract_compute");
    return($self);
 }
