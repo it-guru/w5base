@@ -751,41 +751,42 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where;
-#   if ($ENV{REMOTE_USER} ne "dummy/admin"){
-#      $where=SELpref."cm3rm1.tsi_mandant in (".
-#         join(",",map({"'".$_."'"} MandantenRestriction())).")";
-#   }
-   my $SELpref=SELpref;
-
-$where=<<EOF;
-${SELpref}CM3RM1.dh_number in (
-      SELECT B."DH_NUMBER"
-      FROM SMREP1.DH_CM3RM1 B
-      WHERE B.TSI_MANDANT like '40004787.%'
-   union
-      SELECT CN."DH_NUMBER"
-      FROM SMREP1.DH_DEVICE2M1 D 
-           join SMREP1.DH_CM3RA10 CN on CN.TSI_CI_NAME = D.CI_NAME
-      WHERE D.TSI_MANDANT like '40004787.%'
-   union   
-      SELECT M."DH_NUMBER"
-      FROM SMREP1.DH_CM3RA8 M,SMREP1.DH_COMPANYM1 CO
-      WHERE M.TSI_MULTI_CUST_LIST = CO.COMPANY AND
-            CO.TSI_MANDANT like '40004787.%'
-   union
-      SELECT AA."DH_NUMBER"
-      FROM SMREP1.DH_CM3RA6 AA
-      WHERE AA.TSI_APPROVAL_LOG_GROUP='TIT.TSI.INT.CHM' or
-            AA.TSI_APPROVAL_LOG_GROUP like 'TIT.TSI.INT.CHM.%'
-   union         
-      SELECT CP."DH_NUMBER"
-      FROM SMREP1.DH_CM3RA7 CP
-      WHERE CP.TSI_APPROVALS_MANUAL='TIT.TSI.INT.CHM' or
-            CP.TSI_APPROVALS_MANUAL like 'TIT.TSI.INT.CHM.%'
-)
-EOF
-
-
+   if ($ENV{REMOTE_USER} ne "dummy/admin"){
+      $where=SELpref."cm3rm1.tsi_mandant in (".
+         join(",",map({"'".$_."'"} MandantenRestriction())).")";
+   }
+#
+#   my $SELpref=SELpref;
+#
+#$where=<<EOF;
+#${SELpref}CM3RM1.dh_number in (
+#      SELECT B."DH_NUMBER"
+#      FROM SMREP1.DH_CM3RM1 B
+#      WHERE B.TSI_MANDANT like '40004787.%'
+#   union
+#      SELECT CN."DH_NUMBER"
+#      FROM SMREP1.DH_DEVICE2M1 D 
+#           join SMREP1.DH_CM3RA10 CN on CN.TSI_CI_NAME = D.CI_NAME
+#      WHERE D.TSI_MANDANT like '40004787.%'
+#   union   
+#      SELECT M."DH_NUMBER"
+#      FROM SMREP1.DH_CM3RA8 M,SMREP1.DH_COMPANYM1 CO
+#      WHERE M.TSI_MULTI_CUST_LIST = CO.COMPANY AND
+#            CO.TSI_MANDANT like '40004787.%'
+#   union
+#      SELECT AA."DH_NUMBER"
+#      FROM SMREP1.DH_CM3RA6 AA
+#      WHERE AA.TSI_APPROVAL_LOG_GROUP='TIT.TSI.INT.CHM' or
+#            AA.TSI_APPROVAL_LOG_GROUP like 'TIT.TSI.INT.CHM.%'
+#   union         
+#      SELECT CP."DH_NUMBER"
+#      FROM SMREP1.DH_CM3RA7 CP
+#      WHERE CP.TSI_APPROVALS_MANUAL='TIT.TSI.INT.CHM' or
+#            CP.TSI_APPROVALS_MANUAL like 'TIT.TSI.INT.CHM.%'
+#)
+#EOF
+#
+#
 
 
    my @states=$self->getStateFilter();
