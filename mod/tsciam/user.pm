@@ -145,6 +145,13 @@ sub new
                                    vjoinon    =>['toucid'=>'toucid'],
                                    vjoindisp  =>'name'),
 
+      new kernel::Field::TextDrop( name       =>'shortname',
+                                   label      =>'tOuSD',
+                                   group      =>'office',
+                                   vjointo    =>'tsciam::orgarea',
+                                   vjoinon    =>['toucid'=>'toucid'],
+                                   vjoindisp  =>'shortname'),
+
       new kernel::Field::Text(     name       =>'office_state',
                                    group      =>'office',
                                    label      =>'Status',
@@ -205,7 +212,7 @@ sub new
                                    label      =>'Location',
                                    dataobjattr=>'l'),
 
-      new kernel::Field::Text(     name       =>'toucid',
+      new kernel::Field::Interface(name       =>'toucid',
                                    group      =>'office',
                                    label      =>'tOuCID',
                                    dataobjattr=>'tOuCID'),

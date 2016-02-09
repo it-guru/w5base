@@ -50,13 +50,25 @@ sub CISearchResult
 
    my @l;
    if (grep(/^citsciamuser$/,@$stag) &&
-       (!defined($tag) || grep(/^$tag$/,qw(wiw)))){
-      my $flt=[{surname=>"*$searchtext*"},
-               {uid=>\$searchtext},
-               {email=>\"*$searchtext*"}];
+       (!defined($tag) || grep(/^$tag$/,qw(ciam)))){
+      my $flt=[{surname=>"*$searchtext*",active=>'true'},
+               {uid=>\$searchtext,active=>'true'},
+               {email=>\"*$searchtext*",active=>'true'}];
+      if (my ($sn,$gn)=$searchtext=~m/^(.*),\s+(.*)$/){
+         $flt=[{surname=>"$sn*",givenname=>"$gn*",active=>'true'}];
+      }
+      if ($searchtext=~m/^[a-z0-9_]{2,8}$/){
+         push(@$flt,{wiwid=>\$searchtext,active=>'true'});
+      }
+      if ($searchtext=~m/^[0-9]{2,10}$/){
+         push(@$flt,{tcid=>\$searchtext,active=>'true'});
+      }
+
       my $wiwuser=getModuleObject($self->getParent->Config,"tsciam::user");
       $wiwuser->SetFilter($flt);
-      foreach my $rec ($wiwuser->getHashList(qw(surname givenname email))){
+      foreach my $rec ($wiwuser->getHashList(qw(twrid 
+                                                surname givenname 
+                                                email))){
          my $dispname=$rec->{name};
          if ($rec->{surname} ne ""){
             $dispname.=$rec->{surname};
@@ -70,7 +82,7 @@ sub CISearchResult
             $dispname.='('.$rec->{email}.')';
          }
          push(@l,{group=>$self->getParent->T("tsciam::user","tsciam::user"),
-                  id=>$rec->{id},
+                  id=>$rec->{twrid},
                   parent=>$self->Self,
                   name=>$dispname});
       }
@@ -84,24 +96,25 @@ sub QuickFindDetail
    my $id=shift;
    my $htmlresult="?";
 
-   my $tswiwuser=getModuleObject($self->getParent->Config,"tsciam::user");
-   $tswiwuser->SetFilter({id=>\$id});
-   my @l=qw(surname givenname email office_phone office_mobile);
-   my ($rec,$msg)=$tswiwuser->getOnlyFirst(@l);
-   $tswiwuser->ResetFilter();
-   $tswiwuser->SecureSetFilter([{id=>\$id}]);
-   my ($secrec,$msg)=$tswiwuser->getOnlyFirst(qw(id));
+   my $tsciamuser=getModuleObject($self->getParent->Config,"tsciam::user");
+   $tsciamuser->SetFilter({twrid=>\$id});
+   my @l=qw(surname givenname email wiwid tcid office_phone office_mobile
+            office shortname);
+   my ($rec,$msg)=$tsciamuser->getOnlyFirst(@l);
+   $tsciamuser->ResetFilter();
+   $tsciamuser->SecureSetFilter([{twrid=>\$id}]);
+   my ($secrec,$msg)=$tsciamuser->getOnlyFirst(qw(twrid));
 
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($tswiwuser,{search_id=>$id});
+         $htmlresult.=$self->addDirectLink($tsciamuser,{search_twrid=>$id});
       }
       $htmlresult.="<table>\n";
       foreach my $v (@l){
          if ($rec->{$v} ne ""){
-            my $name=$tswiwuser->getField($v)->Label();
-            my $data=$tswiwuser->findtemplvar({current=>$rec,
+            my $name=$tsciamuser->getField($v)->Label();
+            my $data=$tsciamuser->findtemplvar({current=>$rec,
                                                mode=>"HtmlDetail"},
                                          $v,"formated");
             $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
