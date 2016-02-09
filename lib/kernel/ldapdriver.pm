@@ -118,9 +118,9 @@ sub execute
       my $c=$self->getParent->Context;
 
       my $ldaporderstring=$self->getParent->getLdapOrder();
-      my $sort = Net::LDAP::Control::Sort->new(order=>$ldaporderstring);
-      push(@param,"control"=>[$sort]);
-
+      #my $sort = Net::LDAP::Control::Sort->new(order=>$ldaporderstring);
+      #push(@param,"control"=>[$sort]);
+      # - sort request did not work on whoishwo
       my $sseconds=Time::HiRes::time();
       $c->{$self->{ldapname}}->{sth}=$self->{'ldap'}->search(@param);
       my $eseconds=Time::HiRes::time();
