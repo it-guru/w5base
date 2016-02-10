@@ -110,7 +110,9 @@ p.header {
 <div style="margin-left:10px;margin-top:15px;width:575px">
 Ladies and Gentlemen,<br>
 <br>
-below you will receive the latest Quality-Report %month% for "%fullname%". A detailed analysis / description of the figures is available via the following link.<br>
+below you will receive the latest Quality-Report %month% for "%fullname%".<br>
+An exact definition of the color coding of the KPIs is not displayed because every KPI has its own evaluation logic. These definitions are shown and described in the detail pages by following the link below.<br>
+A detailed analysis / description of the figures is available via the following link.<br>
 <br>
 </div>
 <div style="margin-left:10px;margin-top:25px;margin-bottom:25px;">

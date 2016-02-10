@@ -110,7 +110,9 @@ p.header {
 <div style="margin-left:10px;margin-top:15px;width:575px">
 Sehr geehrte Damen und Herren,<br>
 <br>
-im folgenden erhalten Sie den aktuellen Quality-Report %month% für "%fullname%". Eine detaillierte Analyse/Beschreibung der Kennzahlen erhalten Sie über den folgenden Link.<br>
+im folgenden erhalten Sie den aktuellen Quality-Report %month% für "%fullname%".<br>
+Eine konkrete Definition, wann sich eine Kennzahl farblich verändert wird in der Übersicht nicht dargestellt, da jede Kennzahl eine eigene Bewertungslogik hat. Diese wird in den Reporting Detail-Seiten im folgenden Link dargestellt und beschrieben.<br>
+Eine detaillierte Analyse/Beschreibung der Kennzahlen erhalten Sie über den folgenden Link.<br>
 <br>
 </div>
 <div style="margin-left:10px;margin-top:25px;margin-bottom:25px">
