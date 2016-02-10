@@ -944,6 +944,10 @@ sub extractAffectedApplication
    if ($#chkprimapplid==-1){
       @chkprimapplid=@chkapplid;
    }
+   #   removing empty ApplicationIDs
+   @chkprimapplid=grep(!/^$/,@chkprimapplid);
+   @chkapplid=grep(!/^$/,@chkapplid);
+
    #   pass 3 : affacted Softare
    my @l3;
 
