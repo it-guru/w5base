@@ -1484,3 +1484,4 @@ alter table businessservice add shortname varchar(10);
 alter table businessservice drop key fullname, add unique fullname(nature,name,shortname);
 alter table businessservice add implservicesupport  bigint(20);
 alter table businessservice add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table accessurl add expiration datetime default NULL;

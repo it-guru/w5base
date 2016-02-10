@@ -71,6 +71,49 @@ sub qcheckRecord
    my @ipl;
    my $host=$rec->{hostname};
 
+   my $applid=$rec->{applid};
+   my $appok=0;
+   if ($applid ne ""){
+      $appok=1;
+      my $appl=getModuleObject($dataobj->Config,"itil::appl");
+      $appl->SetFilter({id=>\$applid});
+      my ($arec)=$appl->getOnlyFirst(qw(id cistatusid));
+      if (!defined($arec)){
+         $appok=0;
+      }
+      else{
+         if ($arec->{cistatusid}==6){
+            $appok=0;
+         }
+      }
+   }
+   if (!$appok){
+      if ($rec->{expiration} eq ""){
+         $dataobj->ValidatedUpdateRecord($rec,{
+               expiration=>scalar($dataobj->ExpandTimeExpression("now+28d"))
+            },{id=>\$rec->{id}});
+      }
+      my $d=CalcDateDuration(NowStamp("en"),$rec->{expiration});
+      if (defined($d)){
+         if ($d->{totalminutes}<0){
+            $dataobj->ValidatedDeleteRecord($rec);
+            $desc->{qmsg}=['URL deleted'];
+            return($exitcode,$desc);
+         }
+      }
+
+      $desc->{qmsg}=['Application inactive'];
+      return($exitcode,$desc);
+   }
+   else{
+      if ($rec->{expiration} ne ""){
+         $dataobj->ValidatedUpdateRecord($rec,{
+               expiration=>undef
+            },{id=>\$rec->{id}});
+      }
+   }
+
+
    if ($rec->{network} eq "Telekom Product and Inovation Net"){
       $desc->{qmsg}=['ignoring Telekom Product and Inovation Net'];
       return($exitcode,$desc);
