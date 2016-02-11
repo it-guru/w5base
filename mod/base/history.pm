@@ -249,9 +249,12 @@ sub SecureSetFilter
    if (!$self->IsMemberOf("admin")){
       if ($#flt!=0 ||
           ref($flt[0]) ne "HASH" ||
-          ref($flt[0]->{dataobjectid}) ne "SCALAR" ||
-          (ref($flt[0]->{dataobject}) ne "ARRAY" &&
-           ref($flt[0]->{dataobject}) ne "SCALAR")){
+          (ref($flt[0]->{dataobjectid}) ne "SCALAR" ||
+           (ref($flt[0]->{dataobject}) ne "ARRAY" &&
+            ref($flt[0]->{dataobject}) ne "SCALAR")
+           ) 
+          && (ref($flt[0]->{id}) ne "SCALAR")
+          && (ref($flt[0]->{id}) ne "ARRAY")){
          $self->LastMsg(ERROR,"this query is only allowed for Admins");
          return(undef);
       }
