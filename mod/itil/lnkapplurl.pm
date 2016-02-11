@@ -274,7 +274,14 @@ sub new
                 name          =>'applid',
                 label         =>'ApplID',
                 dataobjattr   =>'accessurl.appl'),
-                                                   
+
+      new kernel::Field::Date(
+                name          =>'expiration',
+                label         =>'Expiration-Date',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'accessurl.expiration'),
+
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
       new kernel::Field::QualityState(),
