@@ -1,3 +1,4 @@
 'admin info: relation expired'=>{de=>'Admin-Info: Zuordnung verfallen'},
-'relation expired'=>{de=>'Zuordnung demnächst verfallen'},
+'relation nearly expired'=>{de=>'Zuordnung demnächst verfallen'},
+'relation expired'=>{de=>'Zuordnung verfallen'},
 'List your current group relations'=>{de=>'Aktuelle Gruppenzuordnungen anzeigen'},

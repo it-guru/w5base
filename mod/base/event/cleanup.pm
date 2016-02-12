@@ -312,18 +312,26 @@ sub NotifyUser
       if ($lrec->{email} ne "" && ref($lrec->{roles}) eq "ARRAY"){
          my $lnkgrp=getModuleObject($self->Config,"base::lnkgrpuser");
          my $user=getModuleObject($self->Config,"base::user");
+         my $grp=getModuleObject($self->Config,"base::grp");
+         my $grpid=$lrec->{grpid};
          my $userid=$lrec->{userid};
          my $group=$lrec->{group};
          $user->SetFilter({userid=>\$userid});
          my ($urec,$msg)=$user->getOnlyFirst(qw(fullname lastlang email
                                                 cistatusid banalprotect));
-         if (defined($urec) && $urec->{cistatusid}==4 && $lrec->{roles} ne ""){
+         $grp->SetFilter({grpid=>\$grpid});
+         my ($grec,$msg)=$grp->getOnlyFirst(qw(fullname cistatusid ));
+         if (defined($urec) && $urec->{cistatusid}==4 && $lrec->{roles} ne "" &&
+             defined($grec)){
             if ($urec->{lastlang} ne ""){
                $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
             }
-            my $tmpl=$lnkgrp->getParsedTemplate(
-                     "tmpl/event.cleanup.relation.user",
-                     {current=>$lrec});
+            my $templatename="tmpl/event.cleanup.relation.user";
+            if ($grec->{cistatusid}==6){  # relation to deleted group
+               $templatename="tmpl/event.cleanup.dead.relation.user";
+            }
+
+            my $tmpl=$lnkgrp->getParsedTemplate($templatename,{current=>$lrec});
             my $baseurl=$self->Config->Param("EventJobBaseUrl");
             my $directlink=$baseurl."/auth/base/lnkgrpuser/Detail?".
                            "search_lnkgrpuserid=$lrec->{lnkgrpuserid}";
@@ -344,7 +352,10 @@ sub NotifyUser
                }
             }
             $notiy{emailcc}=[keys(%admins)];
-            $notiy{name}=$self->T("relation expired").": ".$group;
+            $notiy{name}=$self->T("relation nearly expired").": ".$group;
+            if ($grec->{cistatusid}==6){
+               $notiy{name}=$self->T("relation expired").": ".$group;
+            }
             my $sitename=$self->Config->Param("SITENAME");
             if ($sitename ne ""){
                $notiy{name}=$sitename.": ".$notiy{name};

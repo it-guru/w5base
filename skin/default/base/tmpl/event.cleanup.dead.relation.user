@@ -1,0 +1,6 @@
+Your relation to group "<b>%group%</b>" with your current role(s) "<b>%roles(formated)%</b>" has been expiered.  It may happen, that the removal of this relationship will result in limited functionality or visibility of data. The removal of this relation will not terminate your access to this system! It is possible, that there are already new relations defined, which ensure access to all functionalities for you or your organisational unit. 
+
+Before you contact the admins, check the plausibility of your current group relations in "MyW5Base-&gt;Userpreferences". If you discover discrepansies please start an admin-requst in "MyW5Base:start new workflow".
+
+This is the one and only notification. No further notifications about this situation will be sent.
+

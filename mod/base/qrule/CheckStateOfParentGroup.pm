@@ -84,11 +84,24 @@ sub qcheckRecord
             my ($chkrec)=$grp->getOnlyFirst(qw(cistatusid grpid));
             if (!defined($chkrec) || $chkrec->{cistatusid}==6){
                if ($autocorrect){
-                  if ($grp->ValidatedUpdateRecord($rec,{cistatusid=>6},
-                                         {grpid=>\$rec->{grpid}})){
-                     my $msg="deactivating group while parent deleted";
-                     push(@msg,$msg);
-                  }
+                 if ($grp->ValidatedUpdateRecord($rec,{cistatusid=>6},
+                                        {grpid=>\$rec->{grpid}})){
+                    my $msg="deactivating group while parent deleted";
+                    push(@msg,$msg);
+                 }
+                 if ($#{$rec->{users}}!=-1){
+                    my $l=getModuleObject($self->getParent->Config,
+                                          "base::lnkgrpuser");
+                    my $lop=$l->Clone();
+                    $l->SetFilter({grpid=>\$rec->{grpid},expiration=>\undef});
+                    foreach my $lnkrec ($l->getHashList(qw(ALL))){
+                       my $exp=$lop->ExpandTimeExpression("now+3d");
+                       $lop->ValidatedUpdateRecord($lnkrec,{expiration=>$exp},
+                             {lnkgrpuserid=>\$lnkrec->{lnkgrpuserid}});
+                    }
+                    
+
+                 }
                }
                else{
                   my $msg="parrent group invalid or in deleted state";
