@@ -228,28 +228,32 @@ sub Result
                       my $f2=$f2obj->RawValue($current);
                       my $f3=$f3obj->RawValue($current);
                       if ($f1 eq "EVre.customer" &&
-                          $f2=~m/^DTAG.TDG\.{0,1}/){
+                          $f2=~m/^DTAG\.TDG\.{0,1}/){
                          return("Customer");
                       }
                       if ($f1 eq "EVre.itprov" &&
-                          $f3=~m/^DTAG.TSI.TI\.{0,1}/){
+                          $f3=~m/^DTAG\.GHQ\.VTS\.TSI\.TI\.{0,1}/){
                          return("Telekom IT");
                       }
                       elsif ($f1 eq "EVre.itprov" &&
-                          $f3=~m/^DTAG.TSI.Prod\.{0,1}/){
+                          $f3=~m/^DTAG\.TSY\.ITDiv\.{0,1}/){
                          return("Delivery");
                       }
                       elsif ($f1 eq "EVre.itprov" &&
-                          $f3=~m/^DTAG.TSI$/){
+                          $f3=~m/^DTAG\.GHQ\.VTS\.TSI\.ITDiv\.{0,1}/){
+                         return("Delivery");
+                      }
+                      elsif ($f1 eq "EVre.itprov" &&
+                          $f3=~m/^DTAG\.TSI$/){
                          return("Telekom IT/Delivery");
                       }
                       elsif ($f1 eq "EVre.itprov" &&
-                          $f3=~m/^DTAG.TSI\.{0,1}/){
+                          $f3=~m/^DTAG\.TSI\.{0,1}/){
                          return("T-Systems");
                       }
                       if ($f1 eq "EVre.both" &&
-                          $f2=~m/^DTAG.TDG\.{0,1}/ &&
-                          $f3=~m/^DTAG.TSI.TI\.{0,1}/){
+                          $f2=~m/^DTAG\.TDG\.{0,1}/ &&
+                          $f3=~m/^DTAG\.TSI\.TI\.{0,1}/){
                          return("Customer/Telekom IT");
                       }
                    }
