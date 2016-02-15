@@ -17,3 +17,4 @@
 'no write access to requested application'=>{de=>'kein Schreibzugriff auf die ausgewählte Anwendung'},
 'last known IP-Adresses'=>{de=>'letzte bekannte IP Adressen'},
 'URL fullname'=>{de=>'URL Bezeichner'},
+'Expiration-Date'=>{de=>'Verfallsdatum'},

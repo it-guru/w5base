@@ -555,10 +555,14 @@ sub AutoDiscFormatEntry
       $s1="<font color='green'>";
       $s2="</font>";
    }
+   my $label=$adrec->{scanname};
+   if ($adrec->{scanextra2} ne ""){
+      $label.=" - ".$adrec->{scanextra2};
+   }
    $d.="<div class='AutoDiscTitle' adid='$adrec->{id}'>".
        "<table padding=0 margin=0>".
        "<tr><td valign=middle>$s1".
-       $adrec->{section}.": <b>".$adrec->{scanname}."</b> @ ".
+       $adrec->{section}.": <b>".$label."</b> @ ".
        $rec->{name}.
        "$s2</td>".
        "<td width=1%>".

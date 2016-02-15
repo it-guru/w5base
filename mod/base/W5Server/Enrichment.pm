@@ -29,7 +29,7 @@ sub process
    if ($opmode eq "readonly"){
       $ro=1;
    }
-   sleep(60);
+   #sleep(60);
    while(1){
       if (!$ro){
          $self->EnrichmentCollector();
@@ -180,7 +180,7 @@ sub taskCreator
       ######################################################################
       # Filter out QualityRules with no enrichment handler
       foreach my $dataobj (sort(keys(%dataobjtoenrich))){
-         $self->broadcast("check candidat: $dataobj");
+         #$self->broadcast("check candidat: $dataobj");
          my @enrichRules=();
          foreach my $mandatorid (keys(%{$dataobjtoenrich{$dataobj}})){
             foreach my $qn (keys(%{$dataobjtoenrich{$dataobj}->{$mandatorid}})){
@@ -203,7 +203,7 @@ sub taskCreator
       }
       ######################################################################
 
-      $self->broadcast("candidats are:".Dumper(\%dataobjtoenrich));
+      #$self->broadcast("candidats are:".Dumper(\%dataobjtoenrich));
 
       foreach my $dataobj (sort(keys(%dataobjtoenrich))){
          foreach my $mandatorid (keys(%{$dataobjtoenrich{$dataobj}})){
@@ -366,8 +366,10 @@ sub slotHandler
             $slot->[$c]->{task}->{exitcode}=$sig; 
             my $module=$slot->[$c]->{task}->{name};
             $self->broadcast("Finish ".$module." slot $c at PID $pid($sig)");
-            $self->broadcast("result:".
-                             join("\n",@{$slot->[$c]->{task}->{stderr}}));
+            if ($#{$slot->[$c]->{task}->{stderr}}>=0){
+               $self->broadcast("result:".
+                                join("\n",@{$slot->[$c]->{task}->{stderr}}));
+            }
             $slot->[$c]=undef;
          }
          else{
@@ -453,7 +455,7 @@ sub stderr             # will be called on stderr line output
    my $line=shift;
    my $task=shift;
    my $reporter=shift;
-   if (!($line=~m/^INFO:/)){
+   if (!($line=~m/^(INFO|DEBUG):/)){
       push(@{$task->{stderr}},$line);
       if (defined($task->{param}->{maxstderr})){
          if ($#{$task->{stderr}}>$task->{param}->{maxstderr}){
