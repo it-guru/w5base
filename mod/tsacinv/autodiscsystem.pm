@@ -172,10 +172,15 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
 #         );
 #         push(@res,\%e);
          foreach my $s (@{$rec->{softwareinstallations}}){
+            my $path=$s->{path};
+            if ($s->{software}=~m/Oracle Database/){
+               # remove inventory subtree from oracle install path
+               $path=~s#([0-9]+\.[0-9]\.[0-9]+[\\/][^\\/]+)[\\/].*$#$1#;
+            }
             my %e=(
                section=>'SOFTWARE',
                scanname=>$s->{software},
-               scanextra1=>$s->{path},
+               scanextra1=>$path,
                scanextra2=>$s->{version},
                quality=>3,    # relativ schlecht (keine gute Version)
                processable=>1
