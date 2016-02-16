@@ -87,7 +87,7 @@ create table autodiscmap (
   id          bigint(20)  NOT NULL,
   software    bigint(20),
   osrelease   bigint(20),
-  hwmodel     bigint(20),
+  probability int(2) default '9',
   engine      bigint(20)  NOT NULL,
   cistatus    int(2)      NOT NULL,
   scanname    varchar(128) NOT NULL,
@@ -112,7 +112,7 @@ create table autodiscmap (
               REFERENCES software (id) ON DELETE CASCADE,
   FOREIGN KEY fk_osrelease (osrelease)
               REFERENCES osrelease (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_hwmodel (hwmodel)
-              REFERENCES hwmodel (id) ON DELETE CASCADE
+#  FOREIGN KEY fk_hwmodel (hwmodel)
+#              REFERENCES hwmodel (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;

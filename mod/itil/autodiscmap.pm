@@ -76,6 +76,19 @@ sub new
                 name          =>'scanname',
                 label         =>'Scanname',
                 dataobjattr   =>'autodiscmap.scanname'),
+
+      new kernel::Field::Select(
+                name          =>'probability',
+                label         =>'probability',
+                transprefix   =>'prob.',
+                default       =>'9',
+                value         =>['1',
+                                 '5',
+                                 '9'],
+                sqlorder      =>'desc',
+                dataobjattr   =>'autodiscmap.probability'),
+
+
                                                   
                                                   
       new kernel::Field::CDate(
@@ -93,7 +106,7 @@ sub new
                 dataobjattr   =>'autodiscmap.modifydate'),
 
    );
-   $self->setDefaultView(qw(engine scanname software mdate));
+   $self->setDefaultView(qw(engine scanname software probability mdate));
    $self->setWorktable("autodiscmap");
    return($self);
 }

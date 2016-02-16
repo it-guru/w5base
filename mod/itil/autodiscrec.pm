@@ -372,8 +372,8 @@ sub doTakeAutoDiscData
 
    my $section=effVal($oldrec,$newrec,"section");
 
-   printf STDERR ("doTakeAutoDiscData handling for autodiscrec '%s'\n",
-                  effVal($oldrec,$newrec,"id"));
+   #printf STDERR ("doTakeAutoDiscData handling for autodiscrec '%s'\n",
+   #               effVal($oldrec,$newrec,"id"));
    my $systemid=effVal($oldrec,$newrec,"lnkto_system");
    if (defined($initrelrec)){  # in this case, the adrec is not yet linked
       $systemid=$oldrec->{disc_on_systemid};
@@ -502,7 +502,6 @@ sub doTakeAutoDiscData
             if (length($swirec->{version})>length($scanextra2)){
                my $chklen=length($scanextra2);
                my $old=substr($swirec->{version},0,$chklen+1);
-printf STDERR ("fifi 01 old=%s new=%s\n",$old,$scanextra2.".");
                if ($old ne $scanextra2."."){
                   $upd{version}=$scanextra2;  # upd da erster Teil ungleich
                }
@@ -512,7 +511,7 @@ printf STDERR ("fifi 01 old=%s new=%s\n",$old,$scanextra2.".");
                   $upd{version}=$scanextra2;
                }
             }
-            printf STDERR ("fifi SecureValidatedUpdateRecord in doTakeRemote\n");
+            #printf STDERR ("fifi SecureValidatedUpdateRecord in doTakeRemote\n");
             my $scanextra1=effVal($oldrec,$newrec,"scanextra1");
             if (trim($swirec->{instpath}) ne $scanextra1){
                $upd{instpath}=trim($scanextra1);
@@ -1007,7 +1006,9 @@ sub HtmlAutoDiscManager
    my $admap=getModuleObject($self->Config,'itil::autodiscmap');
    if (keys(%discnam)){
       $admap->SetFilter([values(%discnam)]);
-      @admap=$admap->getHashList(qw(software scanname softwareid engineid));
+      @admap=$admap->getHashList(qw(probability 
+                                    software scanname 
+                                    softwareid engineid));
       @admap=grep({
          my $bk=0;
          if ($_->{software} ne ""){
@@ -1018,8 +1019,8 @@ sub HtmlAutoDiscManager
    }
 
 
-#print STDERR Dumper(\@adrec);
-#print STDERR Dumper(\@admap);
+   #print STDERR Dumper(\@adrec);
+   #print STDERR Dumper(\@admap);
 
 
 

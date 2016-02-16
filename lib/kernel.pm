@@ -140,6 +140,9 @@ sub LangTable
 
 sub Dumper
 {
+   $Data::Dumper::Sortkeys = 1;
+   #$Data::Dumper::Deepcopy = 1;
+   
    return(Data::Dumper::Dumper(@_));
 }
 

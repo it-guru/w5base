@@ -80,6 +80,7 @@ sub qcheckRecord
                        cistatusid=>\'4'});
       foreach my $engine ($ade->getHashList(qw(ALL))){  # found aktive Engine
          $engines{$engine->{id}}={
+            id=>$engine->{id},
             name=>$engine->{name}
          };
          #print STDERR Dumper($engine);
@@ -178,6 +179,7 @@ sub qcheckRecord
       #
       foreach my $adrec (grep({$_->{valid}} @AdPreData)){
          #print STDERR Dumper($adrec);
+         next if (!$adrec->{valid});
          my $adent=$adentry{$adrec->{engineid}};
          $self->DiscoverData($ad,$rec,$adrec,$adent,
                              $engines{$adrec->{engineid}},\%oldrecs);
@@ -268,15 +270,18 @@ sub MapAutoDiscoveryPreData
          @targets=@{$ad->{alt}};
       }
       foreach my $target (@targets){
-         my $t=$ad->{scanname}." - ".$target;
+         my $t=$target;
+         #my $t=$ad->{scanname}." - ".$target;
+         if ($ad->{scanextra1} ne ""){
+            $t.=" @ ".$ad->{scanextra1};
+         }
          if (!exists($paths{$t})){
             $paths{$t}=$ad;
          }
          else{
-            if ($paths{$t}->{quality}==$ad->{quality} &&   # Geliche Engine
+            if ($paths{$t}->{quality}==$ad->{quality} &&   # Gleiche Engine
                 $paths{$t}->{engineid}==$ad->{engineid} && # mit untersch.
                 $paths{$t}->{scanextra1} ne $ad->{scanextra1}){ # produkten
-                $t.=" @ ".$ad->{scanextra1};
                 $paths{$t}=$ad;
             }
             else{
@@ -287,10 +292,9 @@ sub MapAutoDiscoveryPreData
          }
       }
    }
-   #printf STDERR ("paths:\n%s\n",join("\n",keys(%paths)));
-   foreach my $ad (values(%paths)){
-      $ad->{valid}++;
-   }
+   @{$AdPreData}=values(%paths);   # for the future, only use valid path recs
+   #printf STDERR ("\npaths1:\n%s\n",Dumper(\%paths));
+   #printf STDERR ("preData:\n%s\n",Dumper($AdPreData));
    #print STDERR Dumper(\%ADMAP);
 }
 
@@ -340,6 +344,7 @@ sub DiscoverData
    else{
       foreach my $r (@l){
          my %updrec=();
+         next if ($r->{engineid} ne $adrec->{engineid});
          if ($oldrecs->{$r->{id}}->{misscount}>0){
             $updrec{misscount}=0;
          }
