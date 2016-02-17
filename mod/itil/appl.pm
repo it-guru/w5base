@@ -370,6 +370,7 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 group         =>'opmgmt',
+                AllowEmpty    =>1,
                 label         =>'Operation Manager',
                 vjoinon       =>'opmid'),
 
