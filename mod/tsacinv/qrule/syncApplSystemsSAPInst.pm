@@ -108,6 +108,7 @@ sub qcheckRecord
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    return(0,undef) if (!in_array($rec->{mgmtitemgroup},'SAP'));
 
+   return(undef) if ($rec->{applid} eq "");
    my $acapplappl=getModuleObject($self->getParent->Config,
                                   "tsacinv::lnkapplappl");
    $acapplappl->SetFilter({parent_applid=>$rec->{applid},type=>\'SAP'});
