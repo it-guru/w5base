@@ -254,6 +254,7 @@ sub new
    return($self);
 }
 
+
 sub addDesasterRecoveryClassFields
 {
    my $self=shift;

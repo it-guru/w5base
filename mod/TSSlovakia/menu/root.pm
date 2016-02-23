@@ -56,11 +56,11 @@ sub Init
 #                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("TSSlovakia.appl",
-                      "TS::appl",
+                      "TSSlovakia::appl",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("TSSlovakia.appl.new",
-                      "TS::appl",
+                      "TSSlovakia::appl",
                       func=>'New',
                       prio=>1,
                       defaultacl=>['valid_user']);
