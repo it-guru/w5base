@@ -254,6 +254,130 @@ sub new
    return($self);
 }
 
+sub addDesasterRecoveryClassFields
+{
+   my $self=shift;
+
+
+   $self->AddFields(
+      new kernel::Field::Select(
+                name          =>'drclass',
+                group         =>'monisla',
+                label         =>'Disaster Recovery Class',
+                transprefix   =>'DR.',
+                value         =>['',
+                                 '0',
+                                 '1',
+                                 '2',
+                                 '3',
+                                 '4',
+                                 '5',
+                                 '6',
+                                 '7',
+                                ],
+                htmleditwidth =>'280px',
+                dataobjattr   =>'appl.disasterrecclass'),
+
+      new kernel::Field::Select(
+                name          =>'rtolevel',
+                group         =>'monisla',
+                label         =>'RTO Recovery Time Objective',
+                readonly      =>1,
+                transprefix   =>'RTO.',
+                value         =>['',
+                                 '0',
+                                 '1',
+                                 '2',
+                                 '3',
+                                 '4'],
+                dataobjattr   =>
+                                'if (appl.disasterrecclass=\'\',NULL,'.
+                                'if (appl.disasterrecclass=0,0,'.
+                                'if (appl.disasterrecclass=1,4,'.
+                                'if (appl.disasterrecclass=2,4,'.
+                                'if (appl.disasterrecclass=3,3,'.
+                                'if (appl.disasterrecclass=4,1,'.
+                                'if (appl.disasterrecclass=5,1,'.
+                                'if (appl.disasterrecclass=6,1,'.
+                                'if (appl.disasterrecclass=7,1,'.
+                                'NULL)))))))))'),
+
+      new kernel::Field::Select(
+                name          =>'rpolevel',
+                group         =>'monisla',
+                label         =>'RPO Recovery Point Objective',
+                readonly      =>1,
+                transprefix   =>'RPO.',
+                value         =>['',
+                                 '0',
+                                 '1',
+                                 '2',
+                                 '3',
+                                 '4',
+                                 '5'],
+                dataobjattr   =>
+                                'if (appl.disasterrecclass=\'\',NULL,'.
+                                'if (appl.disasterrecclass=0,0,'.
+                                'if (appl.disasterrecclass=1,3,'.
+                                'if (appl.disasterrecclass=2,3,'.
+                                'if (appl.disasterrecclass=3,3,'.
+                                'if (appl.disasterrecclass=4,2,'.
+                                'if (appl.disasterrecclass=5,2,'.
+                                'if (appl.disasterrecclass=6,2,'.
+                                'if (appl.disasterrecclass=7,2,'.
+                                'NULL)))))))))'),
+
+      new kernel::Field::Text(
+                name          =>'drc',
+                group         =>'monisla',
+                label         =>'DR Class',
+                htmldetail    =>0,
+                uivisible     =>0,
+                dataobjattr   =>'appl.disasterrecclass'),
+
+      new kernel::Field::Text(
+                name          =>'rto',
+                group         =>'monisla',
+                label         =>'RTO',
+                htmldetail    =>0,
+                dataobjattr   =>
+                                'if (appl.disasterrecclass=\'\',NULL,'.
+                                'if (appl.disasterrecclass=0,0,'.
+                                'if (appl.disasterrecclass=1,4,'.
+                                'if (appl.disasterrecclass=2,4,'.
+                                'if (appl.disasterrecclass=3,3,'.
+                                'if (appl.disasterrecclass=4,1,'.
+                                'if (appl.disasterrecclass=5,1,'.
+                                'if (appl.disasterrecclass=6,1,'.
+                                'if (appl.disasterrecclass=7,1,'.
+                                'NULL)))))))))'),
+
+      new kernel::Field::Text(
+                name          =>'rpo',
+                group         =>'monisla',
+                label         =>'RPO',
+                depend        =>['drc'],
+                htmldetail    =>0,
+                dataobjattr   =>
+                                'if (appl.disasterrecclass=\'\',NULL,'.
+                                'if (appl.disasterrecclass=0,0,'.
+                                'if (appl.disasterrecclass=1,3,'.
+                                'if (appl.disasterrecclass=2,3,'.
+                                'if (appl.disasterrecclass=3,3,'.
+                                'if (appl.disasterrecclass=4,2,'.
+                                'if (appl.disasterrecclass=5,2,'.
+                                'if (appl.disasterrecclass=6,2,'.
+                                'if (appl.disasterrecclass=7,2,'.
+                                'NULL)))))))))'),
+
+   );
+}
+
+
+
+
+
+
 
 sub calcTecApplicationExpertGroup
 {
