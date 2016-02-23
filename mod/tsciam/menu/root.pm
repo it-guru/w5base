@@ -47,6 +47,10 @@ sub Init
                       "tsciam::orgarea",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itu.ciam.location",
+                      "tsciam::location",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.grp.ciamimport",
                       "tsciam::orgarea",
                       func=>'ImportOrgarea',
