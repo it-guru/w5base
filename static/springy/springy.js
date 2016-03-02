@@ -68,6 +68,7 @@ Graph.prototype.addEdge = function(edge)
 {
 	this.edges.push(edge);
    
+   
 
 	if (typeof(this.adjacency[edge.source.id]) === 'undefined')
 	{
@@ -104,7 +105,9 @@ Graph.prototype.newNode = function(k,data)
 
 Graph.prototype.newEdge = function(k,source, target, data)
 {
-	var edge = new Edge(this.nextEdgeId++, source, target, data);
+	//var edge = new Edge(this.nextEdgeId++, source, target, data);
+
+	var edge = new Edge(k, source, target, data);
 	this.addEdge(edge);
 	return edge;
 };

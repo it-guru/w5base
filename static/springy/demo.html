@@ -4,12 +4,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 </head><body>
-<table width=100% border=1>
+<table width=100% border=1 height=100%>
 <tr>
-<td width=1%>
-<canvas id="canvas" width="1024" height="600"></canvas>
+<td >
+<div style='width:100%;height:100%;overflow:auto'>
+<canvas id="canvas" width="1" height="1"></canvas>
+</div>
 </td>
-<td valign=top>
+<td valign=top width=220>
 <div id="con" style="width:100%">
 </div>
 </td>
@@ -20,6 +22,9 @@
 canvas {
 	border: 1px solid #AAA;
 	background-color: #F6F6F6;
+}
+body{
+   margin:0;padding:0;
 }
 
 
@@ -41,8 +46,20 @@ canvas {
 window.onload = function() {
    var boxWidth = 150;
    var boxHeight = 25;
+   var width=null;
+   var height=null;
+   var PageSize=null;
+   var zoom = 35.0;
+   // half-assed drag and drop
+   var selected = null;
+   var nearest = null;
+   var dragged = null;
 
    var graph = new Graph();
+   var canvas = document.getElementById("canvas");
+   var ctx = canvas.getContext("2d");
+
+
 
 
 // Button
@@ -91,18 +108,27 @@ function addObject(dataobj,id){
    }
 }
 
-function addConnector(dataobj1,id1,dataobj2,id2){
+function addConnector(dataobj1,id1,dataobj2,id2,color){
    var k1=dataobj1+'::'+id1;
    var k2=dataobj2+'::'+id2;
    var k=k1+'::'+k2;
+   if (!color){
+      color=0;
+   }
+   var colors = ['#EDC951', '#6A4A3C', '#CC333F', '#EB6841', '#EDC951', '#7DBE3C', '#000000'];
+   console.log("addCon k=",k,"k1",k1,"k2",k2);
 
-   if (!graph.EdgeExists(k)){
-      var n1 = graph.NodeExists(k1);
-      var n2 = graph.NodeExists(k2);
+   if (k1!=k2){
+      if (!graph.EdgeExists(k)){
+         var n1 = graph.NodeExists(k1);
+         var n2 = graph.NodeExists(k2);
 
-      var e = graph.newEdge(k,n1, n2);
-      var colors = ['#00A0B0', '#6A4A3C', '#CC333F', '#EB6841', '#EDC951', '#7DBE3C', '#000000'];
-      e.data.stroke = '#EDC951';
+         var e = graph.newEdge(k,n1, n2);
+         e.data.stroke = colors[color];
+      }
+   }
+   else{
+      console.log("bug k1=k2",k);
    }
 }
 
@@ -156,19 +182,35 @@ addObject('itil::appl','5275');
 //	e.data.stroke = colors[Math.floor(Math.random() * colors.length)];
 //}
 
+setPageSize=function(s){
+   var x=100;
+   var y=100;
+   if (s=="A5"){
+      x=421;
+      y=590;
+   }
+   if (s=="A4"){
+      x=842;
+      y=590;
+   }
+   if (s=="A3"){
+      x=842;
+      y=1180;
+   }
+   var canvas = document.getElementById("canvas");
+   var ctx = canvas.getContext("2d");
+   console.log("set Size to "+s+" x="+x+" y="+y);
+
+   canvas.width=x;
+   canvas.height=y;
+   PageSize=s;
+   width=x;
+   height=y;
+}
+
+
 
 // -----------
-
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
-
-var width = canvas.width;
-var height = canvas.height;
-var zoom = 35.0;
-// half-assed drag and drop
-var selected = null;
-var nearest = null;
-var dragged = null;
 
 
 
@@ -230,7 +272,11 @@ showMain = function(){
    var d="";
    selected=null;
 
-   d+="Dies ist die Main Console<br><hr>";
+   d+="Seitenformat : &nbsp;<select id=pageSize>"+
+      "<option value='A5'>A5</option>"+
+      "<option value='A4'>A4</option>"+
+      "<option value='A3'>A3</option>"+
+      "</select><hr>";
    d+="<select id=dataobj name=dataobj style='width:100%'>";
    d+="<option value=''> &lt;- select object -&gt; </option>";
    d+="<option value='itil::appl'>Anwendung</option>";
@@ -242,6 +288,10 @@ showMain = function(){
    d+="<div id=Result style='width:100%;height:300px;overflow:auto'>";
    d+="</div>";
    $("#con").html(d);
+   $("#pageSize").val(PageSize);
+   $("#pageSize").change(function(e){
+        setPageSize($(this).val()); 
+   });
    $("#dosearch").click(function(e){
       var dataobj=$('#dataobj').val();
       var searchname=$('#searchname').val();
@@ -292,6 +342,10 @@ setObjectFocus = function(dataobj,dataobjid){
    d+="ObjectID:"+dataobjid+"<br><hr>";
    d+="<input class=addRelations dataobj='"+dataobj+"' dataobjid='"+dataobjid+
       "' type=button value='add relations'><br>";
+   if (dataobj=='itil::appl'){
+      d+="<input class=addInterfaces dataobj='"+dataobj+"' dataobjid='"+dataobjid+
+         "' type=button value='add interfaces'><br>";
+   }
    d+="<input class=delObject dataobj='"+dataobj+"' dataobjid='"+dataobjid+
       "' type=button value='del Object'><br>";
    $("#con").html(d);
@@ -303,6 +357,25 @@ setObjectFocus = function(dataobj,dataobjid){
       graph.delNode(k);
       selected=null;
       nearest=null;
+   });
+   $(".addInterfaces").click(function(e){
+      var dataobj=$(this).attr("dataobj");
+      var dataobjid=$(this).attr("dataobjid");
+      if (dataobj=="itil::appl"){
+         var w5obj=getModuleObject(W5Base,dataobj);
+         w5obj.SetFilter({id:dataobjid});
+         w5obj.findRecord("interfaces",function(data){
+            if (data[0]){
+               //for(c=0;c<data[0].interfaces.length;c++){
+               for(var c=0;c<data[0].interfaces.length;c++){
+                  var rel=data[0].interfaces[c];
+                  addObject('itil::appl',rel.toapplid);
+                  addConnector(dataobj,dataobjid,'itil::appl',rel.toapplid,1);
+               }
+            }
+            console.log("add Interaces done");
+         });
+      }
    });
    $(".addRelations").click(function(e){
       var dataobj=$(this).attr("dataobj");
@@ -396,7 +469,6 @@ jQuery(window).bind('mouseup',function(e){
 	}
 	dragged = null;
 });
-
 
 
 
@@ -617,10 +689,11 @@ function intersect_line_box(p1, p2, p3, w, h)
 	return false;
 }
 
+setPageSize("A4");
 showMain();
 setInterval(function(){
 	renderer.start();
-},1000);
+},100);
 
 };
 
