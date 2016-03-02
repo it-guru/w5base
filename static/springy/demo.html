@@ -1,6 +1,9 @@
 
 <!-- saved from url=(0045)http://dhotson.github.com/springy99/demo.html -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></head><body>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+</head><body>
 <table width=100% border=1>
 <tr>
 <td width=1%>
@@ -67,7 +70,7 @@ function addObject(dataobj,id){
    var k=dataobj+'::'+id;
 
    if (!DomObj[k]){
-      var o=graph.newNode({
+      var o=graph.newNode(k,{
          dataobj:dataobj,
          dataobjid:id,
          displayname:function(){
@@ -100,7 +103,7 @@ function addConnector(dataobj1,id1,dataobj2,id2){
       var n1 = DomObj[k1];
       var n2 = DomObj[k2];
 
-      var e = graph.newEdge(n1, n2);
+      var e = graph.newEdge(k,n1, n2);
       var colors = ['#00A0B0', '#6A4A3C', '#CC333F', '#EB6841', '#EDC951', '#7DBE3C', '#000000'];
       e.data.stroke = '#EDC951';
       DomCon[k]=e;
@@ -292,9 +295,18 @@ setObjectFocus = function(dataobj,dataobjid){
    d+="Object:"+dataobj+"<br>";
    d+="ObjectID:"+dataobjid+"<br><hr>";
    d+="<input class=addRelations dataobj='"+dataobj+"' dataobjid='"+dataobjid+
-      "' type=button value='add relations'>";
+      "' type=button value='add relations'><br>";
+   d+="<input class=delObject dataobj='"+dataobj+"' dataobjid='"+dataobjid+
+      "' type=button value='del Object'><br>";
    $("#con").html(d);
 
+   $(".delObject").click(function(e){
+      var dataobj=$(this).attr("dataobj");
+      var dataobjid=$(this).attr("dataobjid");
+      var k=dataobj+"::"+dataobjid;
+      delete DomObj[k];
+
+   });
    $(".addRelations").click(function(e){
       var dataobj=$(this).attr("dataobj");
       var dataobjid=$(this).attr("dataobjid");

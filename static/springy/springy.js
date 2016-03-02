@@ -54,14 +54,14 @@ Graph.prototype.addEdge = function(edge)
 	return edge;
 };
 
-Graph.prototype.newNode = function(data)
+Graph.prototype.newNode = function(k,data)
 {
-	var node = new Node(this.nextNodeId++, data);
+	var node = new Node(k, data);
 	this.addNode(node);
 	return node;
 };
 
-Graph.prototype.newEdge = function(source, target, data)
+Graph.prototype.newEdge = function(k,source, target, data)
 {
 	var edge = new Edge(this.nextEdgeId++, source, target, data);
 	this.addEdge(edge);
@@ -161,6 +161,12 @@ Layout.ForceDirected.prototype.spring = function(edge)
 Layout.ForceDirected.prototype.eachNode = function(callback)
 {
 	var t = this;
+
+  // var n=0; 
+  // for(var k in this.nodeSet){
+  //    callback.call(t, n, t.point(n));
+  // }
+
 	this.graph.nodes.forEach(function(n){
 		callback.call(t, n, t.point(n));
 	});
