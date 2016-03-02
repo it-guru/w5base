@@ -1,7 +1,17 @@
 
 <!-- saved from url=(0045)http://dhotson.github.com/springy99/demo.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></head><body>
+<table width=100% border=1>
+<tr>
+<td width=1%>
 <canvas id="canvas" width="1024" height="600"></canvas>
+</td>
+<td valign=top>
+<div id="con" style="width:100%">
+</div>
+</td>
+</tr>
+</table>
 
 <style>
 canvas {
@@ -9,15 +19,11 @@ canvas {
 	background-color: #F6F6F6;
 }
 
-@font-face {
-	font-family: 'UniversUltraCn';
-	src: url('UniversLTStd-UltraCn.otf');
-}
 
 </style>
 
 <link rel="stylesheet" href="../../auth/base/load/jquery.ui.css"></link>
-<script src="excanvas.js"></script>
+<xscript src="excanvas.js"></xscript>
 
 <script language="JavaScript" src="../../auth/base/load/J5Base.js">
 </script>
@@ -30,64 +36,126 @@ canvas {
 <script>
 
 window.onload = function() {
+   var boxWidth = 150;
+   var boxHeight = 25;
 
-var graph = new Graph();
-
-
-// generate a random graph
-
-var n = [];
-// for (var i=0; i<20; i += 1)
-// {
-// 	var samplenames = ['Dennis', 'hoshimo', 'ulahts', 'spork',
-// 		'NadiaP', 'formula99', 'Farid Najafi', 'CentralParker', 'gerardosullivan',
-// 		'EvOTION', 'kas', 'Chansdad', 'Lachlan'
-// 	];
-// 	var name = samplenames[Math.floor(Math.random() * samplenames.length)];
-// 	n[i] = graph.newNode({userid: ""+(i+295439), displayname: name});
-// }
-var i = 0;
-n[i++] = graph.newNode({userid:   5334, displayname: 'Matt Mickiewicz'});
-n[i++] = graph.newNode({userid:   6458, displayname: 'Mark Harbottle'});
-n[i++] = graph.newNode({userid:  21802, displayname: 'Lucas'});
-n[i++] = graph.newNode({userid:  67812, displayname: 'Lachlan'});
-n[i++] = graph.newNode({userid:  75543, displayname: 'craiga'});
-n[i++] = graph.newNode({userid:  97639, displayname: 'Chris Corbyn'});
-n[i++] = graph.newNode({userid: 110464, displayname: 'Luke Cuthbertson'});
-n[i++] = graph.newNode({userid: 118009, displayname: 'Paul Annesley'});
-n[i++] = graph.newNode({userid: 274359, displayname: 'Saph'});
-n[i++] = graph.newNode({userid: 285441, displayname: 'Jason Aiken'});
-n[i++] = graph.newNode({userid: 295449, displayname: 'Dennis'});
-n[i++] = graph.newNode({userid: 297313, displayname: 'richard'});
-n[i++] = graph.newNode({userid: 307351, displayname: 'Ryan'});
-n[i++] = graph.newNode({userid: 308644, displayname: 'Jason SH'});
-n[i++] = graph.newNode({userid: 329108, displayname: 'James Mansfield'});
-n[i++] = graph.newNode({userid: 335120, displayname: 'Dan'});
-n[i++] = graph.newNode({userid: 341773, displayname: 'Sarah Jane'});
-n[i++] = graph.newNode({userid: 347937, displayname: 'Patrick99'});
-n[i++] = graph.newNode({userid: 378839, displayname: 'Kristenholden'});
-n[i++] = graph.newNode({userid: 389377, displayname: 'steven99'});
-n[i++] = graph.newNode({userid: 393556, displayname: 'Garrett Sussman'});
-n[i++] = graph.newNode({userid: 401635, displayname: 'miranda_burford'});
+   var graph = new Graph();
 
 
-for (i=0; i<30; i += 1)
+// Button
+NodeButton = function(p,n)
 {
-	var i1 = Math.floor(Math.random() * n.length);
-	var i2 = i1;
+   this.parent = p;
+   this.n = n;
+};
 
-	while (i1 === i2) {
-		i2 = Math.floor(Math.random() * n.length);
-	}
+NodeButton.random = function()
+{
+   return new Vector(2.0 * (Math.random() - 0.5), 2.0 * (Math.random() - 0.5));
+};
 
-	var n1 = n[i1];
-	var n2 = n[i2];
 
-	var e = graph.newEdge(n1, n2);
+//	      ctx.strokeRect(s.x-boxWidth/2.0 + 2, (s.y+boxHeight/2.0) - 3,(boxWidth/3.0)-1,-14);
 
-	var colors = ['#00A0B0', '#6A4A3C', '#CC333F', '#EB6841', '#EDC951', '#7DBE3C', '#000000'];
-	e.data.stroke = colors[Math.floor(Math.random() * colors.length)];
+
+var DomObj=Object();
+var DomCon=Object();
+var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON',baseUrl:'../../' });
+
+
+function addObject(dataobj,id){
+   var k=dataobj+'::'+id;
+
+   if (!DomObj[k]){
+      var o=graph.newNode({
+         dataobj:dataobj,
+         dataobjid:id,
+         displayname:function(){
+           if (!this.rec){
+              var dst=this;
+              dst.rec={name:'???'};
+              var w5obj=getModuleObject(W5Base,dataobj);
+              w5obj.SetFilter({id:id});
+              w5obj.findRecord("id,name",function(data){
+                 if (data[0]){
+                    dst.rec=data[0];
+                 }
+              });
+           }
+           return(this.rec.name);
+         },
+         rec:undefined,
+         id:k
+      });
+      DomObj[k]=o;
+   }
 }
+
+function addConnector(dataobj1,id1,dataobj2,id2){
+   var k1=dataobj1+'::'+id1;
+   var k2=dataobj2+'::'+id2;
+   var k=k1+'::'+k2;
+
+   if (!DomCon[k]){
+      var n1 = DomObj[k1];
+      var n2 = DomObj[k2];
+
+      var e = graph.newEdge(n1, n2);
+      var colors = ['#00A0B0', '#6A4A3C', '#CC333F', '#EB6841', '#EDC951', '#7DBE3C', '#000000'];
+      e.data.stroke = '#EDC951';
+      DomCon[k]=e;
+   }
+}
+
+addObject('itil::appl','5275');
+//addObject('itil::system','12997630940017');
+
+//addConnector('itil::appl','5275','itil::system','12997630940017');
+
+
+
+//n[i++] = graph.newNode({userid:   5334, displayname: 'q8nwp'});
+//n[i++] = graph.newNode({userid:   6458, displayname: 'q4de8ncce100'});
+//n[i++] = graph.newNode({userid:  21802, displayname: 'q8nwr'});
+//n[i++] = graph.newNode({userid:  67812, displayname: 'q8nwv'});
+//n[i++] = graph.newNode({userid:  75543, displayname: 'g8ncc44dee01'});
+//n[i++] = graph.newNode({userid:  97639, displayname: 'W5Base/Darwin'});
+//n[i++] = graph.newNode({userid: 110464, displayname: 'Luke Cuthbertson'});
+//n[i++] = graph.newNode({userid: 118009, displayname: 'Paul Annesley'});
+//n[i++] = graph.newNode({userid: 274359, displayname: 'Saph'});
+//graph.newNode({userid: 274359, displayname: 'CapeTS'});
+//n[i++] = graph.newNode({userid: 285441, displayname: 'Jason Aiken'});
+//n[i++] = graph.newNode({userid: 295449, displayname: 'Dennis'});
+//n[i++] = graph.newNode({userid: 297313, displayname: 'richard'});
+//n[i++] = graph.newNode({userid: 307351, displayname: 'Ryan'});
+//n[i++] = graph.newNode({userid: 308644, displayname: 'Jason SH'});
+//n[i++] = graph.newNode({userid: 329108, displayname: 'James Mansfield'});
+//n[i++] = graph.newNode({userid: 335120, displayname: 'Dan'});
+//n[i++] = graph.newNode({userid: 341773, displayname: 'Sarah Jane'});
+//n[i++] = graph.newNode({userid: 347937, displayname: 'Patrick99'});
+//n[i++] = graph.newNode({userid: 378839, displayname: 'Kristenholden'});
+//n[i++] = graph.newNode({userid: 389377, displayname: 'steven99'});
+//n[i++] = graph.newNode({userid: 393556, displayname: 'Garrett Sussman'});
+//n[i++] = graph.newNode({userid: 401635, displayname: 'miranda_burford'});
+
+
+//for (i=0; i<3; i += 1)
+//{
+//	var i1 = Math.floor(Math.random() * n.length);
+//	var i2 = i1;
+//
+//	while (i1 === i2) {
+//		i2 = Math.floor(Math.random() * n.length);
+//	}
+//
+//	var n1 = n[i1];
+//	var n2 = n[i2];
+//
+//	var e = graph.newEdge(n1, n2);
+//
+//	var colors = ['#00A0B0', '#6A4A3C', '#CC333F', '#EB6841', '#EDC951', '#7DBE3C', '#000000'];
+//	e.data.stroke = colors[Math.floor(Math.random() * colors.length)];
+//}
 
 
 // -----------
@@ -97,7 +165,13 @@ var ctx = canvas.getContext("2d");
 
 var width = canvas.width;
 var height = canvas.height;
-var zoom = 45.0;
+var zoom = 35.0;
+// half-assed drag and drop
+var selected = null;
+var nearest = null;
+var dragged = null;
+
+
 
 var layout = new Layout.ForceDirected(graph, 500.0, 500.0, 0.5);
 
@@ -105,6 +179,8 @@ var layout = new Layout.ForceDirected(graph, 500.0, 500.0, 0.5);
 // calculate bounding box of graph layout.. with ease-in
 var currentBB = layout.getBoundingBox();
 var targetBB = {bottomleft: new Vector(-10, -10), topright: new Vector(10, 10)};
+
+
 
 setInterval(function(){
 	targetBB = layout.getBoundingBox()
@@ -119,44 +195,181 @@ setInterval(function(){
 
 // convert to/from screen coordinates
 toScreen = function(p) {
+   var w=width-80;
+   var h=height-40;
 	var size = currentBB.topright.subtract(currentBB.bottomleft);
-	var sx = p.subtract(currentBB.bottomleft).divide(size.x).x * width;
-	var sy = p.subtract(currentBB.bottomleft).divide(size.y).y * height;
-
+	var sx = p.subtract(currentBB.bottomleft).divide(size.x).x * w+40;
+	var sy = p.subtract(currentBB.bottomleft).divide(size.y).y * h+20;
 	return new Vector(sx, sy);
 };
 
+toNodeScreen = function(e,p) {
+   var se=toScreen(e.point.p);
+
+	return new Vector(boxWidth-((boxWidth/2.0)+se.x-p.x), se.y-p.y+(boxHeight/2.0));
+};
+
 fromScreen = function(s) {
+   var w=width;
+   var h=height;
 	var size = currentBB.topright.subtract(currentBB.bottomleft);
-	var px = (s.x / width) * size.x + currentBB.bottomleft.x;
-	var py = (s.y / height) * size.y + currentBB.bottomleft.y;
+	var px = (s.x / w) * size.x + currentBB.bottomleft.x;
+	var py = (s.y / h) * size.y + currentBB.bottomleft.y;
 
 	return new Vector(px, py);
 };
 
+addActivators = function(){
+   $('.addActivators').click(function(e){
+      var dataobj=$(this).attr("dataobj");
+      var dataobjid=$(this).attr("dataobjid");
+      addObject(dataobj,dataobjid);
+   });
+};
 
-// half-assed drag and drop
-var selected = null;
-var nearest = null;
-var dragged = null;
+showMain = function(){
+   var d="";
+   selected=null;
+
+   d+="Dies ist die Main Console<br><hr>";
+   d+="<select id=dataobj name=dataobj style='width:100%'>";
+   d+="<option value=''> &lt;- select object -&gt; </option>";
+   d+="<option value='itil::appl'>Anwendung</option>";
+   d+="<option value='itil::system'>System</option>";
+   d+="</select><br><center>";
+   d+="<input type=text id=searchname style='width:100%'><br>";
+   d+="<input type=button id=dosearch style='width:80%' value='Search'>";
+   d+="</center>";
+   d+="<div id=Result style='width:100%;height:300px;overflow:auto'>";
+   d+="</div>";
+   $("#con").html(d);
+   $("#dosearch").click(function(e){
+      var dataobj=$('#dataobj').val();
+      var searchname=$('#searchname').val();
+      if (dataobj=="itil::appl"){
+         var w5obj=getModuleObject(W5Base,dataobj);
+         w5obj.SetFilter({name:searchname,cistatusid:4});
+         w5obj.findRecord("name,id",function(data){
+            var d="";
+            if (data){
+               for(c=0;c<data.length;c++){
+                  d+="<li><div class=addActivators "+
+                     "dataobj='"+dataobj+"' "+
+                     "dataobjid='"+data[c].id+"'>"+
+                     data[c].name+"</div></li>";
+               }
+            }
+            $('#Result').html("<ul>"+d+"</ul>");
+            addActivators();
+         });
+      }
+      if (dataobj=="itil::system"){
+         var w5obj=getModuleObject(W5Base,dataobj);
+         w5obj.SetFilter({name:searchname,cistatusid:4});
+         w5obj.findRecord("name,id",function(data){
+            var d="";
+            if (data){
+               for(c=0;c<data.length;c++){
+                  d+="<li><div class=addActivators "+
+                     "dataobj='"+dataobj+"' "+
+                     "dataobjid='"+data[c].id+"'>"+
+                     data[c].name+"</div></li>";
+               }
+            }
+            $('#Result').html("<ul>"+d+"</ul>");
+            addActivators();
+         });
+      }
+   });
+   renderer.start();
+}
+
+
+setObjectFocus = function(dataobj,dataobjid){
+   var d="";
+
+   d+="<div align=right><a class=gotoMain>X</a></div><br>";
+   d+="Object:"+dataobj+"<br>";
+   d+="ObjectID:"+dataobjid+"<br><hr>";
+   d+="<input class=addRelations dataobj='"+dataobj+"' dataobjid='"+dataobjid+
+      "' type=button value='add relations'>";
+   $("#con").html(d);
+
+   $(".addRelations").click(function(e){
+      var dataobj=$(this).attr("dataobj");
+      var dataobjid=$(this).attr("dataobjid");
+      if (dataobj=="itil::appl"){
+         var w5obj=getModuleObject(W5Base,dataobj);
+         w5obj.SetFilter({id:dataobjid});
+         w5obj.findRecord("systems",function(data){
+            if (data[0]){
+               for(c=0;c<data[0].systems.length;c++){
+                  var rel=data[0].systems[c];
+                  addObject('itil::system',rel.systemid);
+                  addConnector(dataobj,dataobjid,'itil::system',rel.systemid);
+               }
+               console.log(data);
+            }
+         });
+      }
+      if (dataobj=="itil::system"){
+         var w5obj=getModuleObject(W5Base,dataobj);
+         w5obj.SetFilter({id:dataobjid});
+         w5obj.findRecord("systems",function(data){
+            if (data[0]){
+               for(c=0;c<data[0].systems.length;c++){
+                  var rel=data[0].systems[c];
+                  addObject('itil::system',rel.systemid);
+                  addConnector(dataobj,dataobjid,'itil::system',rel.systemid);
+               }
+               console.log(data);
+            }
+         });
+      }
+   });
+   $(".gotoMain").click(function(e){
+      showMain();
+   });
+   
+};
+
 
 jQuery('#canvas').mousedown(function(e){
 	var pos = jQuery(this).position();
-	var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
+   var clickPos=new Vector(e.pageX - pos.left,e.pageY - pos.top);
+	var p = fromScreen(clickPos);
 	selected = nearest = dragged = layout.nearest(p);
+   console.log("click x:",toNodeScreen(selected,clickPos));
+
+   console.log("selected",selected);
+   setObjectFocus(selected.node.data.dataobj,selected.node.data.dataobjid);
 
 	dragged.oldm = dragged.point.m;
 	dragged.olddata = dragged.node.data;
 	dragged.node.data = jQuery.extend(true, {}, dragged.node.data); // deep copy
 	dragged.point.m = 1000.0;
-
 	renderer.start();
 });
 
+
+
 jQuery('#canvas').mousemove(function(e){
 	var pos = jQuery(this).position();
-	var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
+   var mpos= new Vector( e.pageX - pos.left,e.pageY - pos.top);
+
+	var p = fromScreen(mpos);
 	nearest = layout.nearest(p);
+
+   var npos=toScreen(nearest.point.p);
+
+   var dist=Math.sqrt(Math.pow(npos.x-mpos.x,2)+Math.pow(npos.y-mpos.y,2));
+
+   if (dist>100){
+      nearest=null;
+   }
+
+   //console.log("mpos",mpos,"npos",npos,"dist",dist);
+
 
 	if (dragged !== null)
 	{
@@ -178,9 +391,6 @@ jQuery(window).bind('mouseup',function(e){
 
 
 
-var boxWidth = 100;
-var boxHeight = 38;
-
 var renderer = new Renderer(1, layout,
 	function clear()
 	{
@@ -189,15 +399,15 @@ var renderer = new Renderer(1, layout,
 		ctx.lineWidth = 0.1;
 		ctx.strokeStyle = "rgba(0,0,0,0.5)";
 
-		// ctx.beginPath();
-		// ctx.moveTo(toScreen(new Vector(-5,0)).x, toScreen(new Vector(-5,0)).y);
-		// ctx.lineTo(toScreen(new Vector(5,0)).x, toScreen(new Vector(5,0)).y);
-		// ctx.stroke();
+		 ctx.beginPath();
+		 ctx.moveTo(toScreen(new Vector(-5,0)).x, toScreen(new Vector(-5,0)).y);
+		 ctx.lineTo(toScreen(new Vector(5,0)).x, toScreen(new Vector(5,0)).y);
+		 ctx.stroke();
 
-		// ctx.beginPath();
-		// ctx.moveTo(toScreen(new Vector(0,5)).x, toScreen(new Vector(0,5)).y);
-		// ctx.lineTo(toScreen(new Vector(0,-5)).x, toScreen(new Vector(0,-5)).y);
-		// ctx.stroke();
+		 ctx.beginPath();
+		 ctx.moveTo(toScreen(new Vector(0,5)).x, toScreen(new Vector(0,5)).y);
+		 ctx.lineTo(toScreen(new Vector(0,-5)).x, toScreen(new Vector(0,-5)).y);
+		 ctx.stroke();
 	},
 	function drawEdge(edge, p1, p2)
 	{
@@ -284,9 +494,10 @@ var renderer = new Renderer(1, layout,
 		}
 		else if (nearest !== null && nearest.node === node)
 		{
-			ctx.fillStyle = "#FFFFFF";
+			ctx.fillStyle = "#FFFF00";
 			ctx.strokeStyle = "#000000";
 			ctx.lineWidth = 3;
+
 		}
 		else
 		{
@@ -311,52 +522,33 @@ var renderer = new Renderer(1, layout,
 		ctx.clip();
 
 		// render userid
-		if (typeof(node.data.userid) !== 'undefined')
+		if ((nearest !== null && nearest.node === node) )
 		{
 			ctx.save();
-			ctx.textAlign = "left";
-			ctx.textBaseline = "top";
-			ctx.font = "11px Helvetica Neue";
-			ctx.shadowBlur = 0;
-			ctx.shadowColor = '#FFFFFF';
-			ctx.shadowOffsetX = 1;
-			ctx.shadowOffsetY = -1;
-			ctx.fillStyle = "#000000";
-			ctx.fillText(node.data.userid, s.x - boxWidth/2.0 + 28, s.y - boxHeight/2.0 + 23);
-
-			// show avatar
-			if (typeof(node.data.avatarimg) === 'undefined')
-			{
-				node.data.avatarimg = new Image();
-				node.data.avatarimg.src = 'http://99designs.com/users/'+node.data.userid+'/avatar/1/nano';
-			}
-
-			try {
-				ctx.shadowColor = 'rgba(0,0,0,0.5)';
-				ctx.shadowOffsetX = 0;
-				ctx.shadowOffsetY = 0;
-				ctx.shadowBlur = 3;
-				ctx.drawImage(node.data.avatarimg, s.x - boxWidth/2.0 + 5, s.y - boxHeight/2.0 + 5, 18, 18);
-			}
-			catch (e)
-			{
-			}
+			//node.data.avatarimg = new Image();
+			//node.data.avatarimg.src = 'http://99designs.com/users/'+node.data.userid+'/avatar/1/nano';
+			//ctx.drawImage(node.data.avatarimg, s.x - boxWidth/2.0 + 5, s.y - boxHeight/2.0 + 5, 18, 18);
+		//	ctx.lineWidth = 1;
+	   //   ctx.strokeRect(s.x-boxWidth/2.0 + 2, (s.y+boxHeight/2.0) - 3,(boxWidth/3.0)-1,-14);
+	   //   ctx.strokeRect(s.x-boxWidth/2.0 + 2 +((boxWidth/3.0)),(s.y+boxHeight/2.0) - 3,(boxWidth/3.0)-1,-14);
+	   //   ctx.strokeRect(s.x-boxWidth/2.0 + 2 +(2*(boxWidth/3.0)),(s.y+boxHeight/2.0) - 3,(boxWidth/3.0)-1,-14);
 			ctx.restore();
 		}
 
 		// render displayname
 		if (typeof(node.data.displayname) !== 'undefined')
 		{
+         var displayname=node.data.displayname();
 			ctx.save();
-			ctx.textAlign = "left";
+			ctx.textAlign = "center";
 			ctx.textBaseline = "top";
-			ctx.font = "18px UniversUltraCn";
+			ctx.font = "14px Helvetica";
 			ctx.shadowBlur = 0;
 			ctx.shadowColor = '#FFFFFF';
 			ctx.shadowOffsetX = 1;
 			ctx.shadowOffsetY = -1;
 			ctx.fillStyle = "#000000";
-			ctx.fillText(node.data.displayname, s.x - boxWidth/2.0 + 28, s.y - boxHeight/2.0 + 7);
+			ctx.fillText(displayname, s.x  , s.y - 8 );
 			ctx.restore();
 		}
 
@@ -365,7 +557,6 @@ var renderer = new Renderer(1, layout,
 	}
 );
 
-renderer.start();
 
 
 // helpers for figuring out where to draw arrows
@@ -404,7 +595,13 @@ function intersect_line_box(p1, p2, p3, w, h)
 	return false;
 }
 
+showMain();
+setInterval(function(){
+	renderer.start();
+},1000);
+
 };
+
 </script>
 
 
