@@ -61,15 +61,13 @@ NodeButton.random = function()
 //	      ctx.strokeRect(s.x-boxWidth/2.0 + 2, (s.y+boxHeight/2.0) - 3,(boxWidth/3.0)-1,-14);
 
 
-var DomObj=Object();
-var DomCon=Object();
 var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON',baseUrl:'../../' });
 
 
 function addObject(dataobj,id){
    var k=dataobj+'::'+id;
 
-   if (!DomObj[k]){
+   if (!graph.NodeExists(k)){
       var o=graph.newNode(k,{
          dataobj:dataobj,
          dataobjid:id,
@@ -90,7 +88,6 @@ function addObject(dataobj,id){
          rec:undefined,
          id:k
       });
-      DomObj[k]=o;
    }
 }
 
@@ -99,14 +96,13 @@ function addConnector(dataobj1,id1,dataobj2,id2){
    var k2=dataobj2+'::'+id2;
    var k=k1+'::'+k2;
 
-   if (!DomCon[k]){
-      var n1 = DomObj[k1];
-      var n2 = DomObj[k2];
+   if (!graph.EdgeExists(k)){
+      var n1 = graph.NodeExists(k1);
+      var n2 = graph.NodeExists(k2);
 
       var e = graph.newEdge(k,n1, n2);
       var colors = ['#00A0B0', '#6A4A3C', '#CC333F', '#EB6841', '#EDC951', '#7DBE3C', '#000000'];
       e.data.stroke = '#EDC951';
-      DomCon[k]=e;
    }
 }
 
@@ -304,8 +300,9 @@ setObjectFocus = function(dataobj,dataobjid){
       var dataobj=$(this).attr("dataobj");
       var dataobjid=$(this).attr("dataobjid");
       var k=dataobj+"::"+dataobjid;
-      delete DomObj[k];
-
+      graph.delNode(k);
+      selected=null;
+      nearest=null;
    });
    $(".addRelations").click(function(e){
       var dataobj=$(this).attr("dataobj");
@@ -327,12 +324,12 @@ setObjectFocus = function(dataobj,dataobjid){
       if (dataobj=="itil::system"){
          var w5obj=getModuleObject(W5Base,dataobj);
          w5obj.SetFilter({id:dataobjid});
-         w5obj.findRecord("systems",function(data){
+         w5obj.findRecord("applications",function(data){
             if (data[0]){
-               for(c=0;c<data[0].systems.length;c++){
-                  var rel=data[0].systems[c];
-                  addObject('itil::system',rel.systemid);
-                  addConnector(dataobj,dataobjid,'itil::system',rel.systemid);
+               for(c=0;c<data[0].applications.length;c++){
+                  var rel=data[0].applications[c];
+                  addObject('itil::appl',rel.applid);
+                  addConnector('itil::appl',rel.applid,dataobj,dataobjid);
                }
                console.log(data);
             }
@@ -533,13 +530,26 @@ var renderer = new Renderer(1, layout,
 		ctx.rect(s.x - boxWidth/2.0+2, s.y - boxHeight/2.0+2, boxWidth-4, boxHeight-4);
 		ctx.clip();
 
+
+      // render Logo
+         if (node.data.dataobj=='itil::system'){
+			   node.data.avatarimg = new Image();
+			   node.data.avatarimg.src = '../../public/itil/load/system.jpg?HTTP_ACCEPT_LANGUAGE=de';
+         }
+         if (node.data.dataobj=='itil::appl'){
+			   node.data.avatarimg = new Image();
+			   node.data.avatarimg.src = '../../public/itil/load/appl.jpg?HTTP_ACCEPT_LANGUAGE=de';
+         }
+         if (node.data.avatarimg){
+			   ctx.save();
+	         ctx.drawImage(node.data.avatarimg,s.x-boxWidth/2.0,s.y-boxHeight/2.0,boxHeight,boxHeight);
+			   ctx.restore();
+         }
+      //
+
 		// render userid
 		if ((nearest !== null && nearest.node === node) )
 		{
-			ctx.save();
-			//node.data.avatarimg = new Image();
-			//node.data.avatarimg.src = 'http://99designs.com/users/'+node.data.userid+'/avatar/1/nano';
-			//ctx.drawImage(node.data.avatarimg, s.x - boxWidth/2.0 + 5, s.y - boxHeight/2.0 + 5, 18, 18);
 		//	ctx.lineWidth = 1;
 	   //   ctx.strokeRect(s.x-boxWidth/2.0 + 2, (s.y+boxHeight/2.0) - 3,(boxWidth/3.0)-1,-14);
 	   //   ctx.strokeRect(s.x-boxWidth/2.0 + 2 +((boxWidth/3.0)),(s.y+boxHeight/2.0) - 3,(boxWidth/3.0)-1,-14);

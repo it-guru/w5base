@@ -35,9 +35,39 @@ Graph.prototype.addNode = function(node)
 	return node;
 };
 
+Graph.prototype.NodeExists = function(k)
+{
+   if (this.nodeSet[k]){
+      return(this.nodeSet[k]);
+   }
+   return(undefined);
+};
+
+
+Graph.prototype.delNode = function(k)
+{
+   console.log("delNode "+k);
+   for(c=0;c<this.edges.length;c++){
+      //console.log("e=",this.edges[c]);
+      //console.log("source=",this.edges[c].source);
+      //console.log("target=",this.edges[c].target);
+      if (this.edges[c].target.id==k ||
+          this.edges[c].source.id==k){
+         this.edges.splice(c,1);
+         c--;
+      }
+   }
+   delete this.nodeSet[k];
+
+   this.notify();
+   return;
+};
+
+
 Graph.prototype.addEdge = function(edge)
 {
 	this.edges.push(edge);
+   
 
 	if (typeof(this.adjacency[edge.source.id]) === 'undefined')
 	{
@@ -53,6 +83,17 @@ Graph.prototype.addEdge = function(edge)
 	this.notify();
 	return edge;
 };
+
+Graph.prototype.EdgeExists = function(k)
+{
+   for(c=0;c<this.edges.length;c++){
+      if (this.edges[c].id==k){
+         return(this.edges[c]);
+      }
+   }
+   return(undefined);
+};
+
 
 Graph.prototype.newNode = function(k,data)
 {
@@ -162,20 +203,23 @@ Layout.ForceDirected.prototype.eachNode = function(callback)
 {
 	var t = this;
 
-  // var n=0; 
-  // for(var k in this.nodeSet){
-  //    callback.call(t, n, t.point(n));
-  // }
+   var n=0; 
+   for(var k in this.graph.nodeSet){
+      callback.call(t, this.graph.nodeSet[k], t.point(this.graph.nodeSet[k]));
+      n++;
+   }
 
-	this.graph.nodes.forEach(function(n){
-		callback.call(t, n, t.point(n));
-	});
+//	this.graph.nodes.forEach(function(n){
+//		callback.call(t, n, t.point(n));
+//	});
 };
 
 // callback should accept two arguments: Edge, Spring
 Layout.ForceDirected.prototype.eachEdge = function(callback)
 {
 	var t = this;
+
+
 	this.graph.edges.forEach(function(e){
 		callback.call(t, e, t.spring(e));
 	});
