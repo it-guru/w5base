@@ -72,14 +72,14 @@ Graph.prototype.addEdge = function(edge)
 
 	if (typeof(this.adjacency[edge.source.id]) === 'undefined')
 	{
-		this.adjacency[edge.source.id] = [];
+		this.adjacency[edge.source.id] = new Object();
 	}
 	if (typeof(this.adjacency[edge.source.id][edge.target.id]) === 'undefined')
 	{
-		this.adjacency[edge.source.id][edge.target.id] = [];
+		this.adjacency[edge.source.id][edge.target.id] = new Object();
 	}
 
-	this.adjacency[edge.source.id][edge.target.id].push(edge);
+	this.adjacency[edge.source.id][edge.target.id][edge.id]=edge;
 
 	this.notify();
 	return edge;
@@ -118,10 +118,14 @@ Graph.prototype.getEdges = function(node1, node2)
 	if (typeof(this.adjacency[node1.id]) !== 'undefined'
 		&& typeof(this.adjacency[node1.id][node2.id]) !== 'undefined')
 	{
-		return this.adjacency[node1.id][node2.id];
+      var l=new Array();
+      for(var k in this.adjacency[node1.id][node2.id]){
+         l.push(this.adjacency[node1.id][node2.id][k]);
+      }
+		return(l);
 	}
 
-	return [];
+	return([]);
 };
 
 

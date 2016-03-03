@@ -39,6 +39,12 @@ body{
 <script language="JavaScript" src="../../auth/base/load/jquery.ui.js">
 </script>
 
+<script language="JavaScript" src="./jquery.enterKey.js">
+</script>
+
+<script language="JavaScript" src="./jquery.mousewheel.js">
+</script>
+
 
 <script src="springy.js"></script>
 <script>
@@ -268,6 +274,16 @@ addActivators = function(){
    });
 };
 
+$(document).mousewheel(function(e) {
+   if (e.originalEvent.wheelDelta > 0 || e.originalEvent.detail < 0) {
+      console.log("mouse up");
+   }
+   else{
+      console.log("mouse down");
+   }
+   return(false);
+});
+
 showMain = function(){
    var d="";
    selected=null;
@@ -330,6 +346,9 @@ showMain = function(){
          });
       }
    });
+   $("#searchname").enterKey(function(){
+      $("#dosearch").trigger("click");
+   });
    renderer.start();
 }
 
@@ -385,9 +404,10 @@ setObjectFocus = function(dataobj,dataobjid){
          w5obj.SetFilter({id:dataobjid});
          w5obj.findRecord("systems",function(data){
             if (data[0]){
-               for(c=0;c<data[0].systems.length;c++){
+               for(var c=0;c<data[0].systems.length;c++){
                   var rel=data[0].systems[c];
                   addObject('itil::system',rel.systemid);
+                  console.log("add system",rel.systemid);
                   addConnector(dataobj,dataobjid,'itil::system',rel.systemid);
                }
                console.log(data);
