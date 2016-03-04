@@ -1196,6 +1196,17 @@ sub ValidActionCheck
 }
 
 
+sub cutIdenticalCharString
+{
+   my $self=shift;
+   my $text=shift;
+   my $len=shift;
+
+   $text=~s/(^|\n)(.)(\2{$len})\2*/$1$3/g;
+   return($text);
+}
+
+
 sub generateNotificationPreview
 {
    my $self=shift;

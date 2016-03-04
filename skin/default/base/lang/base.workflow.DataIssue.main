@@ -1,5 +1,5 @@
 'Save'=>{de=>'Aktion speichern/ausführen'},
-'posible action'=>{de=>'mögliche Aktion'},
+'possible action'=>{de=>'mögliche Aktion'},
 'empty or to short notes are not allowed'=>{de=>'leere oder zu kurze Notizen sind nicht erlaubt'},
 'abbort request'=>{de=>'DataIssue abbrechen'},
 

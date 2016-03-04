@@ -22,6 +22,7 @@ use kernel::date;
 use Digest::MD5 qw(md5_base64);
 use base 'Exporter';
 our @EXPORT;
+our @EXPORT_OK;
 
 use constant {
     TABpref => 'DH_',
@@ -29,6 +30,7 @@ use constant {
 };
 
 @EXPORT=qw(TABpref SELpref MandantenRestriction);
+@EXPORT_OK=qw(identifyW5UserFromGroup identifyW5UserFromOperator);
 
 
 sub MandantenRestriction
@@ -385,38 +387,21 @@ sub mkChangeStoreRec
    if (ref($tasks) eq "ARRAY"){
       $ServiceManagerTaskCount=$#{$tasks}+1;
    }
-   #if ($rec->{plannedstart} eq "" ||
-   #    $rec->{plannedend} eq ""){
-   #   if ($#oldrec!=-1){
-   #      msg(ERROR,"exeption: change start/end removed on ".
-   #                $rec->{changenumber});
-   #      return(undef);
-   #   }
-   #   return(undef);
-   #}
 
    $wfrec{srcid}=$rec->{changenumber};
    $wfrec{name}=$rec->{name};
    $wfrec{changedescription}=$rec->{description};
    #$wfrec{changedescription}=~s/^-{10}description via Interface//;
+
    $wfrec{stateid}=8; # init
-   $wfrec{stateid}=4  if (lc($rec->{status}) eq "open");
+   if (lc($rec->{status}) eq 'open') {
+      $wfrec{stateid}=1  if ($rec->{phase}=~m/^30/);
+      $wfrec{stateid}=2  if ($rec->{phase}=~m/^40/);
+      $wfrec{stateid}=4  if ($rec->{phase}=~m/^50/);
+      $wfrec{stateid}=18 if ($rec->{phase}=~m/^60/);
+   }
    $wfrec{stateid}=17 if (lc($rec->{status}) eq "closed");
-   # the states below seems no more used in SM
-   $wfrec{stateid}=1  if (lc($rec->{status}) eq "planning");
-   $wfrec{stateid}=3  if (lc($rec->{status}) eq "reviewed");
-   $wfrec{stateid}=4  if (lc($rec->{status}) eq "work_in_process");
-   $wfrec{stateid}=4  if (lc($rec->{status}) eq "work_in_progress");
-   $wfrec{stateid}=7  if (lc($rec->{status}) eq "confirmed");
-   $wfrec{stateid}=17 if (lc($rec->{status}) eq "resolved");
-  # if ($wfrec{stateid}==17){
-  #    if ($rec->{closecode} eq "rejected"){
-  #       $wfrec{stateid}=24;
-  #    }
-  #    if ($rec->{closecode} eq "unsuccesfull"){
-  #       $wfrec{stateid}=23;
-  #    }
-  # }
+
    $wfrec{additional}={
       ServiceManagerChangeNumber=>$rec->{changenumber},
       ServiceManagerCategory=>$rec->{category},
@@ -425,6 +410,7 @@ sub mkChangeStoreRec
       ServiceManagerApprovalState=>$rec->{approvalstatus},
       ServiceManagerRequestedBy=>$rec->{requestedby},
       ServiceManagerAssignedTo=>$rec->{assignedto},
+      ServiceManagerChmMgr=>$rec->{chmmgrgrp},
       ServiceManagerTaskCount=>$ServiceManagerTaskCount,
       ServiceManagerProject=>$rec->{project},
       ServiceManagerType=>$rec->{type},
@@ -624,14 +610,31 @@ sub mkChangeStoreRec
    }
 
 
-   if (defined($updateto) && $#{$aids}!=-1 && 
-       $oldclass eq "itil::workflow::change"){
-      $wf->UpdateRecord({class=>'TS::workflow::change'},
-                        {id=>$updateto});
-      #printf STDERR ("WARN: class changed on id $updateto\n");
-      $wfrec{class}='TS::workflow::change';
-      $oldclass='TS::workflow::change';
+   if (defined($updateto) && $#{$aids}!=-1) {
+      if ($oldclass eq "itil::workflow::change" ||
+          !($oldrec[0]->{step}=~m/^TS::/)) {
+         $wf->UpdateRecord({class=>'TS::workflow::change'},
+                           {id=>$updateto});
+         $wfrec{class}='TS::workflow::change';
+         $wfrec{step} ='TS::workflow::change::extauthority';
+         $oldclass='TS::workflow::change';
+      }
    }
+
+   # for compatibility with older Workflow step
+   if ($oldrec[0]->{step} eq 'itil::workflow::change::extauthority') {
+      if ($oldclass eq 'TS::workflow::change' && $#{$aids}!=-1) {
+         $wfrec{step}='TS::workflow::change::extauthority';
+      }
+      else {
+         $wf->UpdateRecord({class=>'itil::workflow::change'},
+                           {id=>$updateto});
+         $wfrec{class}='itil::workflow::change';
+         $wfrec{step}='itil::workflow::change::main';
+         $oldclass='itil::workflow::change';
+      }
+   }
+
    if (!defined($updateto)){
       if ($#{$aids}!=-1){
          $wfrec{class}='TS::workflow::change';
@@ -652,15 +655,14 @@ sub mkChangeStoreRec
          $wfrec{openuser}=$userid;
          $wfrec{openusername}="wiw/$posix";
       }
-      $wfrec{step}='itil::workflow::change::extauthority';
+      if ($wfrec{class}=~m/^TS::/) {
+         $wfrec{step}='TS::workflow::change::extauthority';
+      }
+      else {
+         $wfrec{step}='itil::workflow::change::main';
+      }
    }
-   if (!($oldrec[0]->{step}=~m/::postreflection$/) &&
-       $wfrec{class}=~m/^TS::/){
-       if ($rec->{srcid} ne "" && ($rec->{srcid}=~m/IN:[\d,-]+/)){
-          my $srcid=$rec->{srcid};
-         # $srcid=~s/^IN://i;
-          $wfrec{tcomexternalid}=$srcid;
-       }
+   if ($wfrec{class}=~m/^TS::/){
        my $ws=$rec->{workstart};
        my $we=$rec->{workend};
        my $wt=0;
@@ -1163,6 +1165,39 @@ sub extractAffectedApplication
 }
 
 
+sub identifyW5UserFromGroup
+{
+   my $self=shift;
+   my $name=shift;
+
+   my $lnk=getModuleObject($self->Config,'tssm::lnkusergroup');
+   $lnk->SetFilter({lgroup=>\$name});
+   return(undef) if (!$lnk->Ping());
+
+   my @operator=map {$_->{luser}} @{$lnk->getHashList(qw(luser))};
+
+   my $userobj=getModuleObject($self->Config,'base::user');
+   $userobj->SetFilter({posix=>\@operator});
+ 
+   my @user=map {$_->{userid}} @{$userobj->getHashList(qw(userid))};
+
+   return(@user) if(wantarray());
+   return(\@user);
+}
+
+
+sub identifyW5UserFromOperator
+{
+   my $self=shift;
+   my $name=shift;
+
+   my $userobj=getModuleObject($self->Config,'base::user');
+   $userobj->SetFilter({posix=>\$name});
+ 
+   my ($user,$msg)=$userobj->getOnlyFirst(qw(userid));
+
+   return($user->{userid});
+}
 
 
 

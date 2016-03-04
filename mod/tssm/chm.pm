@@ -49,7 +49,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Brief Description',
+                label         =>'Title',
                 ignorecase    =>1,
                 dataobjattr   =>SELpref.'cm3rm1.brief_description'),
 

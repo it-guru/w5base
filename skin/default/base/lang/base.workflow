@@ -79,7 +79,7 @@
 'STEVwfstatsendWeek'=>{de=>'wöchentlicher Status-Report über offene Workflows',
                        en=>'weekly Report about current jobs'},
 'invalid workflow short description spezified'=>{de=>'keine gültige Kurzbeschreibung'},
-'Posible actions'=>{de=>'mögliche Aktionen'},
+'Possible actions'=>{de=>'mögliche Aktionen'},
 'MandatorID'=>{de=>'Mandanten ID'},
 'mail has been successfuly transfered to spool'=>{de=>'Nachricht wurde erfolgreich an den Nachrichtenspool übergeben'},
 'file larger then max attachment size %d'=>{de=>'Anlage ist größer als %d bytes'},

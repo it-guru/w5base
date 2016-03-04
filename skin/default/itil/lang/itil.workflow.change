@@ -6,10 +6,11 @@
 
 'Change Fallback'=>{de=>'Change Wiederherstellungsverfahren'},
 'Change Description'=>{de=>'Change Beschreibung'},
-'Change-Planed-Start'=>{de=>'geplanter Beginn'},
-'Change-Planed-End'=>{de=>'geplantes Ende'},
+'Planned start'=>{de=>'geplanter Beginn'},
+'Planned end'=>{de=>'geplantes Ende'},
 'Changenumber'=>{de=>'Changenummer'},
 'sendchangeinfo'=>{de=>'Changebenachrichtigung',en=>'Changenotification'},
 'commission'=>{de=>'Beauftragung',en=>'Commission'},
 'REV.commission'=>{de=>'beauftragt',en=>'Commission to'},
+'Send'=>{de=>'Mail absenden',en=>'send email'},
 

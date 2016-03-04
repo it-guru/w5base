@@ -128,7 +128,7 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'posibleactions',
-                label         =>'Posible actions',
+                label         =>'Possible actions',
                 WSDLfieldType =>'ArrayOfStringItems',
                 onRawValue    =>\&getPosibleActions,
                 depend        =>['id']),
@@ -1078,7 +1078,7 @@ sub getPosibleActions
          msg(INFO,"check of actions in $class");
          my $app=$self->getParent;
          if (defined($class) && defined($app->{SubDataObj}->{$class})){
-            msg(INFO,"load posible actions from $class");
+            msg(INFO,"load possible actions from $class");
             @actions=$app->{SubDataObj}->{$class}->getPosibleActions($WfRec);
          }
       }

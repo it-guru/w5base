@@ -35,8 +35,6 @@ sub new
 }
 
 
-
-
 sub Init
 {
    my $self=shift;
@@ -46,6 +44,7 @@ sub Init
 
    $self->AddGroup("itilchange",translation=>'itil::workflow::change');
 }
+
 
 sub getDynamicFields
 {
@@ -74,14 +73,14 @@ sub getDynamicFields
                 name       =>'changestart',
                 translation=>'itil::workflow::change',
                 group      =>'itilchange',
-                label      =>'Change-Planed-Start',
+                label      =>'Planned start',
                 alias      =>'eventstart'),
 
       new kernel::Field::Date(    
                 name       =>'changeend',
                 translation=>'itil::workflow::change',
                 group      =>'itilchange',
-                label      =>'Change-Planed-End',
+                label      =>'Planned end',
                 alias      =>'eventend'),
 
       new kernel::Field::Textarea(
@@ -137,6 +136,7 @@ sub getDynamicFields
    ));
 }
 
+
 sub getStepByShortname
 {
    my $self=shift;
@@ -147,10 +147,18 @@ sub getStepByShortname
 }  
 
 
-   
+sub getNextStep
+{
+   my $self=shift;
+   my $currentstep=shift;
+   my $WfRec=shift;
 
+   if($currentstep=~m/::main$/){
+      return($self->getStepByShortname('publishpreview',$WfRec));
+   }
 
-
+   return($self->SUPER::getNextStep($currentstep,$WfRec));
+}
 
 
 sub IsModuleSelectable
@@ -161,12 +169,14 @@ sub IsModuleSelectable
    return(0);
 }
 
+
 sub InitWorkflow
 {
    my $self=shift;
 
    return(undef);
 }
+
 
 sub isViewValid
 {
@@ -175,6 +185,7 @@ sub isViewValid
    return(qw(ALL)) if (defined($rec));
    return(undef);
 }
+
 
 sub getDetailBlockPriority                # posibility to change the block order
 {
@@ -190,7 +201,6 @@ sub getNotifyDestinations
    my $emailto=shift;
    my $emailcc=shift;
    my $ifappl=shift;
-
    my $ia=getModuleObject($self->Config,"base::infoabo");
    my $applid=$WfRec->{affectedapplicationid};
    $applid=[$applid] if (ref($applid) ne "ARRAY");
@@ -200,13 +210,11 @@ sub getNotifyDestinations
    my @ccbyfunc;
    $appl->ResetFilter();
    $appl->SetFilter({id=>$applid});
-   my @fl=qw(semid sem2id tsmid tsm2id);
+   my @fl=qw(tsmid tsm2id);
    my @ifid;
    foreach my $rec ($appl->getHashList(@fl)){
       push(@tobyfunc,$rec->{tsmid})  if ($rec->{tsmid}>0);
       push(@ccbyfunc,$rec->{tsm2id}) if ($rec->{tsm2id}>0);
-      push(@tobyfunc,$rec->{semid})  if ($rec->{semid}>0);
-      push(@ccbyfunc,$rec->{sem2id}) if ($rec->{sem2id}>0);
    }
    if ($mode eq "all"){
       my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
@@ -228,8 +236,8 @@ sub getNotifyDestinations
 
       $appl->ResetFilter();
       $appl->SetFilter({id=>\@ifid,cistatusid=>"<=4"});
-      foreach my $rec ($appl->getHashList(@fl,"name")){
-         $ifappl->{$rec->{name}}=1;
+      foreach my $rec ($appl->getHashList(@fl,qw(name id))){
+         $ifappl->{$rec->{id}}=$rec->{name};
          push(@tobyfunc,$rec->{tsmid})  if ($rec->{tsmid}>0);
          push(@ccbyfunc,$rec->{tsm2id}) if ($rec->{tsm2id}>0);
       }
@@ -242,6 +250,7 @@ sub getNotifyDestinations
    return(undef);
 }
 
+
 sub activateMailSend
 {
    my $self=shift;
@@ -251,8 +260,7 @@ sub activateMailSend
    my $newmailrec=shift;
    my $action=shift;
 
-   my %d=(step=>'base::workflow::mailsend::waitforspool',
-          emailsignatur=>'ChangeNotification');
+   my %d=(step=>'base::workflow::mailsend::waitforspool');
    $self->linkMail($WfRec->{id},$id);
    if (my $r=$wf->Store($id,%d)){
       return(1);
@@ -260,12 +268,12 @@ sub activateMailSend
    return(0);
 }
 
+
 sub getPosibleActions
 {
    my $self=shift;
    my $WfRec=shift;
    my @l=qw(wffollowup);
-
    my $eventend=$WfRec->{eventend};
    my $age;
    if ($eventend ne ""){
@@ -288,8 +296,18 @@ sub getPosibleActions
          push(@l,"wfforcerevise");
       }
    }
+   if (defined($WfRec->{affectedapplicationid})) {
+      if ($self->notifyValid($WfRec,'all')) {
+         push(@l,'chmnotifyall');
+      }
+      if ($self->notifyValid($WfRec,'direct')) {
+         push(@l,'chmnotifydirect');
+      }
+   }
+
    return(@l);
 }
+
 
 sub getFollowupTargetUserids
 {
@@ -305,44 +323,15 @@ sub getFollowupTargetUserids
       foreach my $arec ($appl->getHashList(qw(tsmid))){
          push(@{$param->{addtarget}},$arec->{tsmid}) if ($arec->{tsmid} ne "");
       }
-
-      # itil::chmmgmt chmgrteam no more used, see 14246971890003
-      #
-      #if ($param->{note}=~m/\[chm\.\S+\]/){
-      #   my $usrgrp=getModuleObject($self->Config,"base::lnkgrpuserrole"); 
-      #   my $chm=getModuleObject($self->Config,"itil::chmmgmt"); 
-      #   $chm->SetFilter({id=>$WfRec->{affectedapplicationid}});
-      #   foreach my $chmrec ($chm->getHashList(qw(chmgrteamid chmgrfmbid))){
-      #      if ($chmrec->{chmgrfmbid} ne ""){
-      #         push(@{$param->{addcctarget}},$chmrec->{chmgrfmbid});
-      #      }
-      #      elsif ($chmrec->{chmgrteamid} ne ""){
-      #         $usrgrp->ResetFilter();
-      #         $usrgrp->SetFilter({grpid=>\$chmrec->{chmgrteamid},
-      #                             cistatusid=>[4,5],
-      #                             grpcistatusid=>[4],
-      #                             nativrole=>[orgRoles()]});
-      #         foreach my $lnkrec ($usrgrp->getHashList(qw(userid))){
-      #            # message not needed in errorlog
-      #            #msg(INFO,"add userid '$lnkrec->{userid}'");
-      #            push(@{$param->{addcctarget}},$lnkrec->{userid});
-      #         }
-      #      }
-      #   }
-      #   push(@{$param->{addcctarget}});
-      #}
    }
 }
-
-
 
 
 sub generateMailSet
 {
    my $self=shift;
    my ($WfRec,$additional,$emailprefix,$emailpostfix,
-       $emailtext,$emailsep,
-       $emailsubheader)=@_;
+       $emailtext,$emailsep,$emailsubheader)=@_;
    my @emailprefix=();
    my @emailpostfix=();
    my @emailtext=();
@@ -355,11 +344,10 @@ sub generateMailSet
    @emailsep=@$emailsep             if (ref($emailsep) eq "ARRAY");
    @emailsubheader=@$emailsubheader if (ref($emailsubheader) eq "ARRAY");
 
-
    my $baseurl;
    if ($ENV{SCRIPT_URI} ne ""){
       $baseurl=$ENV{SCRIPT_URI};
-      $baseurl=~s#/auth/.*$##;
+      $baseurl=~s|/auth/.*$||;
    }
 
    my $lang=$self->getParent->Lang();
@@ -411,21 +399,12 @@ sub generateMailSet
          }
       }
    }
-   #my $rel=$self->getField("relations",$WfRec);
-   #my $reldata=$rel->ListRel($WfRec->{id},"mail",{name=>\'consequenceof'});
-   #push(@emailprefix,$rel->Label().":");
-   #push(@emailtext,$reldata);
-   #push(@emailsubheader,0);
-   #push(@emailsep,0);
-   #push(@emailpostfix,"");
-   #delete($ENV{HTTP_FORCE_LANGUAGE});
 
    @$emailprefix=@emailprefix;
    @$emailpostfix=@emailpostfix;
    @$emailtext=@emailtext;
    @$emailsep=@emailsep;
    @$emailsubheader=@emailsubheader;
-
 }
 
 
@@ -436,80 +415,141 @@ sub isChangeManager
 
    my $mandator=$WfRec->{mandatorid};
    $mandator=[$mandator] if (!ref($mandator) eq "ARRAY");
+
    return(1) if ($self->getParent->IsMemberOf($mandator,"RCHManager","down"));
    return(1) if ($self->getParent->IsMemberOf("admin"));
+   return(0);
+}
 
-   # itil::chmmgmt chmgrteam no more used, see 14246971890003
-   #
-   #my $aid=$WfRec->{affectedapplicationid};
-   #$aid=[$aid] if (ref($aid) ne "ARRAY");
-   #my $chmmgmt=getModuleObject($self->getParent->Config,"itil::chmmgmt");
-   #$chmmgmt->SetFilter({id=>$aid});
-   #foreach my $arec ($chmmgmt->getHashList(qw(chmgrteamid))){
-   #   if ($arec->{chmgrteamid} ne ""){
-   #      return(1) if ($self->getParent->IsMemberOf($arec->{chmgrteamid}));
-   #   }
-   #}
-   
+
+sub notifyValid
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $mode=shift;
+
+   return($self->isChangeManager($WfRec));
+}
+
+
+#######################################################################
+# this step is no longer used.
+# Just for compatibility with old workflows in this step.
+# mz 28.01.2016
+
+package itil::workflow::change::extauthority;
+use vars qw(@ISA);
+use kernel;
+@ISA=qw(kernel::WfStep);
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(undef);
+}
+
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
 
    return(0);
 }
 
 
+sub getPosibleButtons
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my %b=();
+
+   return(%b);
+}
 
 
 #######################################################################
-package itil::workflow::change::extauthority;
+package itil::workflow::change::main;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfStep;
 @ISA=qw(kernel::WfStep);
 
-sub generateWorkspace
+sub generateWorkspacePages
 {
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
+   my $divset=shift;
+   my $selopt=shift;
+   my $height=shift;
+   my $vButtons=shift;
+   my $class='display:none;visibility:hidden';
+   my $d;
 
-   my $msg=$self->T("Externel authority");
-   my $templ;
-   if (grep(/^wfaddnote$/,@$actions)){
-      $templ.=$self->getDefaultNoteDiv($WfRec,$actions,'height'=>'50');
+   if (grep(/^wfaddnote$/,@$actions)) {
+      $$selopt.='<option value="wfaddnote">'.
+                    $self->T("wfaddnote",'base::workflow::actions').
+                "</option>\n";
+      $d=$self->getDefaultNoteDiv($WfRec,$actions,'height'=>'100');
+
+      $$divset.='<div id=OPwfaddnote data-visiblebuttons="SaveStep"'.
+                " class=\"$class\">$d</div>";
    }
-   $templ.=<<EOF;
-<div class=Question><table border=0><tr><td>$msg</td></tr></table></div>
-EOF
-   return($templ);
+   if (grep(/^chmnotifyall$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyall">'.
+                    $self->T('notifyall',$self->Self).
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T('helpnotifyall',$self->Self)."</td></tr>".
+          "</table></div>";
+
+      $$divset.='<div id=OPchmnotifyall data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+   if (grep(/^chmnotifydirect$/,@$actions)) {
+      $$selopt.='<option value="chmnotifydirect">'.
+                    $self->T('notifydirect',$self->Self).
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifydirect")."</td></tr>".
+          "</table></div>";
+
+      $$divset.='<div id=OPchmnotifydirect data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
 }
+
 
 sub getPosibleButtons
 {
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
-   my %buttons=();
+   my %b=();
 
-   if ($self->getParent->can("isPostReflector") &&
-       $self->getParent->isPostReflector($WfRec)){
-      $buttons{"PostReflection"}=$self->T('initiate postreflection');
-   }
-   if ($self->getParent->isChangeManager($WfRec)){
-      $buttons{"PublishInfo"}=$self->T('publish change notification');
-   }
    if (grep(/^wfaddnote$/,@$actions)){
-      $buttons{"wfaddnote"}=$self->T('add note');
+      $b{SaveStep}=$self->T('Save','base::workflow::request::main');
    }
-   return(%buttons);
+   if (grep(/^chmnotify/,@$actions)){
+      $b{NextStep}=$self->T('next Step','kernel::WfStep');
+   }
+   return(%b);
 }
+
 
 sub getWorkHeight
 {
    my $self=shift;
    my $WfRec=shift;
 
-   return(160) if ($WfRec->{state}<20);
+   return(180) if ($WfRec->{state}<20);
    return(120);
 }
+
 
 sub Validate
 {
@@ -525,233 +565,18 @@ sub Process
    my $action=shift;
    my $WfRec=shift;
    my $actions=shift;
+   my $op=Query->Param('OP');
 
-   if ($action eq "PostReflection"){
-      if ($self->getParent->can("isPostReflector") &&
-          $self->getParent->isPostReflector($WfRec)){
-         if (!$self->StoreRecord($WfRec,
-             {step=>'itil::workflow::change::postreflection'})){
-            return(0);
-         }
-         return(1);
+   if ($action eq "NextStep") {
+      if (($op eq "chmnotifyall" || $op eq "chmnotifydirect") &&
+          defined($WfRec)) {
+         Query->Param("PublishMode"=>"all")    if $op eq "chmnotifyall";
+         Query->Param("PublishMode"=>"direct") if $op eq "chmnotifydirect";
       }
    }
-   elsif ($action eq "PublishInfo"){
-      my @WorkflowStep=Query->Param("WorkflowStep");
-      if (defined($WfRec)){
-         my @WorkflowStep=Query->Param("WorkflowStep");
-         push(@WorkflowStep,$self->getParent->getStepByShortname(
-                                                  "askpublishmode",$WfRec));
-         Query->Param("WorkflowStep"=>\@WorkflowStep);
-      }
-      return(0);
-   }
-   elsif ($action eq "wfaddnote"){
-      my $note=Query->Param("note");
-      my $effort=Query->Param("Formated_effort");
-      my $h={};
-      $h->{note}=$note                     if ($note ne "");
-      $h->{effort}=$effort                 if ($effort ne "");
-      return($self->nativProcess($action,$h,$WfRec,$actions));
-   }
 
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
-
-
-
-
-#######################################################################
-package itil::workflow::change::postreflection;
-use vars qw(@ISA);
-use kernel;
-use kernel::WfStep;
-@ISA=qw(kernel::WfStep);
-
-sub generateWorkspace
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   my $msg=$self->T("post reflection: please correct the desiered data");
-   my $templ;
-   if (grep(/^wfaddnote$/,@$actions)){
-      $templ.=$self->getDefaultNoteDiv($WfRec,$actions,'height'=>'50');
-   }
-   my @acl=$self->getParent->isWriteValid($WfRec);
-   
-   if ($#acl!=-1){
-      $templ.=<<EOF;
-<div class=Question><table border=0><tr><td>$msg</td></tr></table></div>
-EOF
-   }
-   return($templ);
-}
-
-sub getPosibleButtons
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   my %buttons;
-   if ($self->getParent->can("isPostReflector") &&
-       $self->getParent->isPostReflector($WfRec)){
-      if ($WfRec->{stateid}!=21){
-         $buttons{"FinishReflection"}=$self->T('finish postreflection');
-      }
-      else{
-         $buttons{"InitReflection"}=$self->T('init postreflection');
-      }
-   }
-   if ($self->getParent->isChangeManager($WfRec)){
-      $buttons{"PublishInfo"}=$self->T('publish change notification');
-   }
-   if (grep(/^wfaddnote$/,@$actions)){
-      $buttons{"wfaddnote"}=$self->T('add note');
-   }
-   return(%buttons);
-}
-
-
-sub getWorkHeight
-{
-   my $self=shift;
-   my $WfRec=shift;
-
-   return(160) if ($WfRec->{state}<20);
-   return(120);
-}
-
-sub Process
-{
-   my $self=shift;
-   my $action=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   if ($action eq "FinishReflection"){
-      if ($self->getParent->can("isPostReflector") &&
-          $self->getParent->isPostReflector($WfRec)){
-         if (!$self->StoreRecord($WfRec,
-             {stateid=>21})){
-            return(0);
-         }
-         return(1);
-      }
-   }
-   if ($action eq "PublishInfo"){
-      my @WorkflowStep=Query->Param("WorkflowStep");
-      if (defined($WfRec)){
-         my @WorkflowStep=Query->Param("WorkflowStep");
-         push(@WorkflowStep,$self->getParent->getStepByShortname(
-                                                  "askpublishmode",$WfRec));
-         Query->Param("WorkflowStep"=>\@WorkflowStep);
-      }
-      return(0);
-   }
-   if ($action eq "InitReflection"){
-      if ($self->getParent->can("isPostReflector") &&
-          $self->getParent->isPostReflector($WfRec)){
-         if (!$self->StoreRecord($WfRec,
-             {stateid=>17})){
-            return(0);
-         }
-         return(1);
-      }
-   }
-   elsif ($action eq "wfaddnote"){
-      my $note=Query->Param("note");
-      my $effort=Query->Param("Formated_effort");
-      my $h={};
-      $h->{note}=$note                     if ($note ne "");
-      $h->{effort}=$effort                 if ($effort ne "");
-      return($self->nativProcess($action,$h,$WfRec,$actions));
-   }
-   return($self->SUPER::Process($action,$WfRec));
-}
-
-sub Validate
-{
-   my $self=shift;
-
-   return(1);
-}
-
-
-#######################################################################
-package itil::workflow::change::askpublishmode;
-use vars qw(@ISA);
-use kernel;
-use kernel::WfStep;
-@ISA=qw(kernel::WfStep);
-
-sub generateWorkspace
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $info=Query->Param("PublishInfoMsg");
-   if (!defined($info)){
-      $info=$self->getParent->T("MSG001");
-   }
-   my $templ=<<EOF;
-<table width="100%" height="110" cellspacing=0 cellpadding=0>
-<tr height="1%"><td>Benachrichtigungstext:</td></tr>
-<tr><td>
-<textarea name=PublishInfoMsg style="width:100%;height:100%">$info</textarea>
-</td>
-</tr></table>
-EOF
-   return($templ);
-}
-
-sub getPosibleButtons
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my %buttons=$self->SUPER::getPosibleButtons($WfRec);
-   $buttons{"PublishDirect"}=$self->T('only direct contacts');
-   $buttons{"PublishAll"}=$self->T('direct and interface contacts');
-   delete($buttons{BreakWorkflow});
-   delete($buttons{NextStep});
-   return(%buttons);
-}
-
-
-sub getWorkHeight
-{
-   my $self=shift;
-   my $WfRec=shift;
-
-   return(150);
-}
-
-sub Process
-{
-   my $self=shift;
-   my $action=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-
-   if ($action eq "PublishDirect"){
-      Query->Param("PublishMode"=>"direct");
-      if (defined($WfRec)){
-         my @WorkflowStep=Query->Param("WorkflowStep");
-         push(@WorkflowStep,"itil::workflow::change::publishpreview");
-         Query->Param("WorkflowStep"=>\@WorkflowStep);
-      }
-   }
-   if ($action eq "PublishAll"){
-      Query->Param("PublishMode"=>"all");
-      if (defined($WfRec)){
-         my @WorkflowStep=Query->Param("WorkflowStep");
-         push(@WorkflowStep,"itil::workflow::change::publishpreview");
-         Query->Param("WorkflowStep"=>\@WorkflowStep);
-      }
-   }
-   return($self->SUPER::Process($action,$WfRec));
-}
-
-
 
 
 #######################################################################
@@ -807,17 +632,17 @@ sub getPosibleButtons
    my %em=();
    my %cc=();
    my %ifappl=();
-   my $PublishMode=Query->Param("PublishMode");
+   my $PublishMode=Query->Param('PublishMode');
    $PublishMode="direct" if ($PublishMode eq "");
    $self->getParent->getNotifyDestinations($PublishMode,$WfRec,\%em,\%cc,
                                                                \%ifappl);
-   #msg(INFO,"IT-Eventnotification for ifappl: ".
-   #         join(", ",sort(keys(%ifappl))));
-   my @email=sort(keys(%em));
+   my @email  =sort(keys(%em));
+   my @emailcc=sort(keys(%cc));
    $self->Context->{CurrentTarget}=\@email;
-   $self->Context->{CurrentTargetCC}=[keys(%cc)];
-   delete($b{NextStep}) if ($#email==-1);
+   $self->Context->{CurrentTargetCC}=\@emailcc;
+   delete($b{NextStep});
    delete($b{BreakWorkflow});
+   $b{SaveStep}=$self->T('Send','itil::workflow::change');
 
    return(%b);
 }
@@ -831,6 +656,7 @@ sub getWorkHeight
    return(250);
 }
 
+
 sub Process
 {
    my $self=shift;
@@ -838,15 +664,11 @@ sub Process
    my $WfRec=shift;
    my $actions=shift;
 
-   if ($action eq "NextStep"){
-      my %em=();
-      my %cc=();
-      my %ifappl=();
-      my $PublishMode=Query->Param("PublishMode");
-      $PublishMode="direct" if ($PublishMode eq "");
-      $self->getParent->getNotifyDestinations($PublishMode,$WfRec,\%em,\%cc,
-                                                                  \%ifappl);
-      my @emailto=sort(keys(%em));
+   if ($action eq "SaveStep"){
+      my $emailfrom="unknown\@w5base.net";
+      my @emailto=@{$self->Context->{CurrentTarget}};
+      my @emailcc=@{$self->Context->{CurrentTargetCC}};
+
       my $id=$WfRec->{id};
       $self->getParent->getParent->Action->ResetFilter();
       $self->getParent->getParent->Action->SetFilter({wfheadid=>\$id});
@@ -892,8 +714,6 @@ sub Process
       #
       # calc from address
       #
-      my $emailfrom="unknown\@w5base.net";
-      my @emailcc=(keys(%cc));
       my $uobj=$self->getParent->getPersistentModuleObject("base::user");
       my $userid=$self->getParent->getParent->getCurrentUserId(); 
       $uobj->SetFilter({userid=>\$userid});
@@ -936,6 +756,7 @@ sub Process
              emailsubheader =>\@emailsubheader,
              additional     =>\%additional
             };
+
       if (my $id=$wf->Store(undef,$newmailrec)){
          if ($self->getParent->activateMailSend($WfRec,$wf,$id,
                                                 $newmailrec,$action)){
@@ -955,10 +776,6 @@ sub Process
    }
    return($self->SUPER::Process($action,$WfRec));
 }
-
-
-
-
 
 
 

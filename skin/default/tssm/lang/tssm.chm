@@ -13,7 +13,7 @@
 
 'fieldgroup.close'=>{de=>'Abschluss Informationen',en=>'Closing Informations'},
 'fieldgroup.device'=>{de=>'betroffene Geräte/Systeme (deprecated)',en=>'affected Devices/Systems (deprecated)'},
-'Brief Description'=>{de=>'Kurzbeschreibung'},
+'Title'=>{de=>'Titel'},
 'Description'=>{de=>'Beschreibung (Description)'},
 'Description length'=>{de=>'Beschreibungslänge'},
 'Assigned To'=>{de=>'Zugewiesen an'},

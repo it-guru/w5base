@@ -20,7 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::WfClass;
-use itil::workflow::change;
+use tssm::lib::io qw(identifyW5UserFromGroup);
+
 @ISA=qw(itil::workflow::change );
 
 sub new
@@ -48,6 +49,74 @@ sub addSRCLinkToFacility
 
 }
 
+
+sub getPosibleActions
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @l=$self->SUPER::getPosibleActions($WfRec);
+
+   return(@l) if (!$self->isChangeManager($WfRec));
+
+   my $phase=$WfRec->{additional}{ServiceManagerPhase}[0];
+   my $approvalstate=$WfRec->{additional}{ServiceManagerApprovalState}[0];
+
+   if ($phase=~m/^40/) {
+      # state 1 correspondends SM Phase 30 planning
+      # state 2 correspondends SM Phase 40 approval
+      my $history=getModuleObject($self->Config,'base::history');
+      $history->SetFilter({dataobjectid=>$WfRec->{id},
+                           name=>\'stateid',operation=>\'update',
+                           oldstate=>[1,4],newstate=>\2});
+      # oldstate 4 for compatibility with older workflows only
+
+      my @stateChg=$history->getHashList(qw(id cdate));
+      if ($#stateChg!=-1) {
+         Query->Param("ApproveSubmitID"=>$stateChg[0]->{id});
+      }
+
+      my @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
+                         $_->{comments}=~/^Approval request sent$/}
+                         @{$WfRec->{shortactionlog}});
+
+      # for compatibility with older notifications
+      if ($#notifies==-1) {
+         @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
+                         $_->{comments}=~/^\d+\. notification$/}
+                         @{$WfRec->{shortactionlog}});
+      }
+
+      if ($#notifies==-1) {
+         if ((($approvalstate eq 'pending' ||
+               $approvalstate eq 'denied') &&
+              $self->chmAuthority($WfRec) eq 'TIT') ||
+             $self->chmAuthority($WfRec) ne 'TIT') {
+            push(@l,'chmnotifyapprove');
+         }
+      }
+      else {
+         if (($approvalstate eq 'pending' ||
+              $approvalstate eq 'denied')) {
+            @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
+                            ($_->{comments}=~/^Approval request sent$/ ||
+                             $_->{comments}=~/^Approval reminder sent$/)}
+                            @{$WfRec->{shortactionlog}});
+            if ($#stateChg>0 &&
+                $stateChg[0]->{cdate} > $notifies[-1]->{cdate}) {
+               push(@l,'chmnotifyreschedule');
+            }
+            else {
+               push(@l,'chmnotifyremind')
+            }
+         }
+      }
+   }
+
+   push(@l,'chmnotifyreject');
+   return(@l);
+}
+
+
 sub activateMailSend
 {
    my $self=shift;
@@ -57,8 +126,10 @@ sub activateMailSend
    my $newmailrec=shift;
    my $action=shift;
 
-   my %d=(step=>'base::workflow::mailsend::waitforspool',
-          emailsignatur=>'ChangeNotification: Telekom IT');
+   my %d=(step=>'base::workflow::mailsend::waitforspool');
+   if (Query->Param('NotifyMode') ne 'announce') {
+      $d{emailsignatur}='ChangeNotification: Telekom IT';
+   }
    $self->linkMail($WfRec->{id},$id);
    if (my $r=$wf->Store($id,%d)){
       return(1);
@@ -67,13 +138,40 @@ sub activateMailSend
 }
 
 
+sub getNextStep
+{
+   my $self=shift;
+   my $currentstep=shift;
+   my $WfRec=shift;
+
+   if ($currentstep=~m/::extauthority$/) {
+      if ($self->isChangeManager($WfRec)) {
+         return($self->getStepByShortname('individualnote',$WfRec));
+      }
+      else {
+         return($self->getStepByShortname('publishpreview',$WfRec));
+      }
+   }
+   if ($currentstep=~m/::individualnote$/) {
+      return($self->getStepByShortname('publishpreview',$WfRec));
+   }
+
+   return($self->SUPER::getNextStep($currentstep,$WfRec));
+}
+
 
 sub getStepByShortname
 {
    my $self=shift;
    my $name=shift;
    my $WfRec=shift;
-   return("TS::workflow::change::".$name) if ($name eq "askpublishmode");
+
+   if ($name eq 'individualnote') {
+      return("TS::workflow::change::".$name);
+   }
+   if ($name eq 'publishpreview') {
+      return("TS::workflow::change::".$name);
+   }
 
    return($self->SUPER::getStepByShortname($name,$WfRec));
 }
@@ -82,69 +180,69 @@ sub getStepByShortname
 sub getNotifyDestinations
 {
    my $self=shift;
-   my $mode=shift;    # "direct" | "all"
+   my $mode=shift;    # direct|all|approve
    my $WfRec=shift;
    my $emailto=shift;
    my $emailcc=shift;
    my $ifappl=shift;
 
-   if ($mode ne "ALTCOMmode"){
-      return($self->SUPER::getNotifyDestinations($mode,
-                                                 $WfRec,$emailto,$emailcc));
-   }
-   my $ia=getModuleObject($self->Config,"base::infoabo");
-   my $applid=$WfRec->{affectedapplicationid};
-   $applid=[$applid] if (ref($applid) ne "ARRAY");
+   if ($mode eq 'direct' || $mode eq 'all') {
+      $self->SUPER::getNotifyDestinations($mode,$WfRec,$emailto,$emailcc,$ifappl);
+ 
+      my $ia=getModuleObject($self->Config,"base::infoabo");
+      my $applid=$WfRec->{affectedapplicationid};
+      $applid=[$applid] if (ref($applid) ne "ARRAY");
 
-   my $appl=getModuleObject($self->Config,"itil::appl");
-   my @tobyfunc;
-   my @ccbyfunc;
-   $appl->ResetFilter();
-   $appl->SetFilter({id=>$applid});
-   my @fl=qw(semid sem2id tsmid tsm2id applmgrid);
-   my @ifid;
-   foreach my $rec ($appl->getHashList(@fl)){
-      push(@tobyfunc,$rec->{tsmid})      if ($rec->{tsmid}>0);
-      push(@ccbyfunc,$rec->{tsm2id})     if ($rec->{tsm2id}>0);
-      push(@tobyfunc,$rec->{semid})      if ($rec->{semid}>0);
-      push(@ccbyfunc,$rec->{sem2id})     if ($rec->{sem2id}>0);
-      push(@tobyfunc,$rec->{applmgrid})  if ($rec->{applmgrid}>0);
-   }
-   my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
-   my $aaflt=[{toapplid=>$applid,
-               cistatusid=>[4],
-               fromapplcistatus=>[3,4,5]}];
-   $aa->SetFilter($aaflt);
-   foreach my $aarec ($aa->getHashList(qw(fromapplid toapplid contype
-                                        toapplcistatus))){
-      next if ($aarec->{contype}==4 ||
-               $aarec->{contype}==5 ||
-               $aarec->{contype}==3 );   # uncritical  communications
-      if (grep(/^$aarec->{fromapplid}$/,@$applid)){  # von mir eingetragen
-         next if ($aarec->{toapplcistatus}>4);       # not active filter
-         push(@ifid,$aarec->{toapplid});
-      }
-      else{                                          # von anderen eingetragen
-         push(@ifid,$aarec->{fromapplid});
-      }
-   }
-
-   my @fl=qw(tsmid tsm2id applmgrid);
-   if ($#ifid!=-1){
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      my @tobyfunc;
       $appl->ResetFilter();
-      $appl->SetFilter({id=>\@ifid,cistatusid=>"<=4"});
-      foreach my $rec ($appl->getHashList(@fl,"name")){
-         $ifappl->{$rec->{name}}=1;
-         push(@tobyfunc,$rec->{tsmid})      if ($rec->{tsmid}>0);
-         push(@ccbyfunc,$rec->{tsm2id})     if ($rec->{tsm2id}>0);
+      $appl->SetFilter({id=>$applid});
+      my @fl=qw(applmgrid);
+      foreach my $rec ($appl->getHashList(@fl)){
          push(@tobyfunc,$rec->{applmgrid})  if ($rec->{applmgrid}>0);
       }
-   }
-   $ia->LoadTargets($emailto,'*::appl',\'changenotify',$applid);
-   $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVchangeinfobyfunction',
+
+      if (ref($ifappl) eq 'HASH'){
+         my @ifid=keys(%$ifappl);
+         if ($#ifid!=-1) {
+            $appl->ResetFilter();
+            $appl->SetFilter({id=>\@ifid,cistatusid=>"<=4"});
+            foreach my $rec ($appl->getHashList(@fl)){
+               push(@tobyfunc,$rec->{applmgrid}) if ($rec->{applmgrid}>0);
+            }
+         }
+      }
+
+      $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVchangeinfobyfunction',
                              '100000004',\@tobyfunc,default=>1);
-   $ia->LoadTargets($emailcc,'base::staticinfoabo',\'STEVchangeinfobydepfunc',
-                             '100000005',\@ccbyfunc,default=>1);
+   }
+
+   if ($mode eq 'approve') {
+      my $appgrps=$self->getApproverGrp($WfRec,'pending');
+      return(undef) if ($#{$appgrps}==-1 || ref($appgrps) ne 'ARRAY');
+
+      # groups from CHM TelIT must not be informed
+      my @infogrps=grep(!/^TIT\.TSI\.INT\.CHM/,@$appgrps);
+
+      if ($self->chmAuthority($WfRec) ne 'TIT') {
+         # only TelIT-Approver will be informed about non-TelIT changes
+         @infogrps=grep(/^TIT\./,@infogrps);
+      }
+      return(undef) if ($#infogrps==-1);
+
+      my $lnkobj=getModuleObject($self->Config,'tssm::lnkusergroup');
+      my $userobj=getModuleObject($self->Config,'tssm::useraccount');
+
+      $lnkobj->SetFilter({lgroup=>\@infogrps});
+      my @grpuser=map {$_->{luser}} @{$lnkobj->getHashList('luser')};
+      $userobj->SetFilter({id=>\@grpuser,profile_change=>'![empty]'});
+      my @appmail=grep(/^\S+\@\S+\.\S+$/,
+                       map {$_->{email}} @{$userobj->getHashList('email')});
+      foreach my $email (@appmail) {
+         $emailto->{$email}=[] if (!exists($emailto->{$email}));
+      }
+   }
+  
 #printf STDERR ("fifi to=%s req=%s\n",Dumper($emailto),Dumper(\@tobyfunc));
 #printf STDERR ("fifi cc=%s req=%s\n",Dumper($emailcc),Dumper(\@ccbyfunc));
 
@@ -152,54 +250,808 @@ sub getNotifyDestinations
 }
 
 
+sub notifyValid
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $mode=shift;
+
+   return(0) if ($mode eq 'direct');
+   my $phase=$WfRec->{additional}{ServiceManagerPhase}[0];
+
+   if ($phase=~m/^30/) {
+      return(1) if ($self->isChangeManager($WfRec));
+
+      my $userid=$self->getParent->getCurrentUserId();
+      return(0) if (!$userid);
+
+      my $smchm=getModuleObject($self->Config,'tssm::chm');
+      $smchm->SetFilter({changenumber=>\$WfRec->{srcid}});
+      my ($rec,$msg)=$smchm->getOnlyFirst(qw(coordinatorgrp));
+
+      my $operator=$self->identifyW5UserFromGroup($rec->{coordinatorgrp});
+      return(1) if (in_array($operator,$userid));
+   }
+
+   return(0);
+}
+
+
+sub chmAuthority
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   if ($WfRec->{additional}{ServiceManagerChmMgr}[0]=~m/^TIT\.TSI\./) {
+      return('TIT');
+   }
+
+   return(undef);
+}
+
+
+sub formatTwoColumns
+{
+   my $self=shift;
+   my $data=shift;
+   my $width=shift;
+   my $ret='';
+
+   my @col1=sort(@$data);
+   my @col2=splice(@col1,abs(@col1/2)+(@col1%2));
+
+   for (my $i;$i<=$#col1;$i++) {
+      $ret.=sprintf("%-${width}s",$col1[$i]);
+      $ret.=$col2[$i] if ($i<=$#col2);
+      $ret.="\n";
+   }
+
+   return($ret);
+}
+
+
+sub getPSO
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   my $tz='GMT';
+   $tz=$ENV{HTTP_FORCE_TZ} if (defined($ENV{HTTP_FORCE_TZ}));
+
+   my $oldlang;
+   if (defined($ENV{HTTP_FORCE_LANGUAGE})) {
+      $oldlang=$ENV{HTTP_FORCE_LANGUAGE};
+   }
+
+   my $obj=getModuleObject($self->Config,'tssm::chm_pso');
+   $obj->SetFilter({changenumber=>\$WfRec->{srcid}});
+   my @psolist=$obj->getHashList(qw(plannedstart plannedend applname));
+
+   return(0) if (!$obj->Ping);
+
+   my %ret;
+   my $fo=$obj->getField('plannedstart');
+
+   my $tztxt;
+   foreach my $lang (qw(de en)) {
+      my @pso;
+      foreach my $i (0..$#psolist) {
+         $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+         my ($start)=$fo->getFrontendTimeString('HtmlDetail',
+                             $psolist[$i]->{plannedstart},$tz);
+         (my $end,$tztxt)=$fo->getFrontendTimeString('HtmlDetail',
+                                  $psolist[$i]->{plannedend},$tz);
+         my $appl=$psolist[$i]->{applname};
+
+         $start=~s/:\d\d$//;  # cut seconds
+         $end  =~s/:\d\d$//;
+         $appl =~s/\s(.*)$//; # cut ApplID
+
+         push(@pso,{plannedstart=>$start,plannedend=>$end,applname=>$appl});
+      }
+      @pso=sort {$a->{applname} cmp $b->{applname}} @pso;
+      $ret{$lang}=\@pso;
+   }
+
+   $ret{tz}=$tztxt;
+
+   if (defined($oldlang)) {
+      $ENV{HTTP_FORCE_LANGUAGE}=$oldlang;
+   }
+   else {
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+   }
+
+   return(\%ret);
+}
+
+
+sub getApproverGrp
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $flt=shift; # done|pending|all
+   my %groups;
+
+   $flt='all' if (!defined($flt));
+
+   my @mod;
+   push(@mod,'tssm::chm_approvereq')  if ($flt eq 'pending' || $flt eq 'all');
+   push(@mod,'tssm::chm_approvallog') if ($flt eq 'done'    || $flt eq 'all');
+
+   foreach my $m (@mod) {
+      my $obj=getModuleObject($self->Config,$m);
+      $obj->SetFilter({changenumber=>\$WfRec->{srcid}});
+
+      foreach my $grp (@{$obj->getHashList('name')}) {
+         $groups{$grp->{name}}++ if (defined($grp->{name}));
+      }
+      return(0) if (!$obj->Ping);
+   }
+
+   my @grplist=keys(%groups);
+   return(\@grplist);
+}
+
+
+sub generateMailSet
+{
+   my $self=shift;
+   my ($WfRec,$additional,$emailprefix,$emailpostfix,
+       $emailtext,$emailsep,$emaillang,$emailsubheader)=@_;
+   my @emailprefix=();
+   my @emailpostfix=();
+   my @emailtext=();
+   my @emailsep=();
+   my @emailsubheader=();
+
+   @emailprefix=@$emailprefix       if (ref($emailprefix) eq "ARRAY");
+   @emailpostfix=@$emailpostfix     if (ref($emailpostfix) eq "ARRAY");
+   @emailtext=@$emailtext           if (ref($emailtext) eq "ARRAY");
+   @emailsep=@$emailsep             if (ref($emailsep) eq "ARRAY");
+   @emailsubheader=@$emailsubheader if (ref($emailsubheader) eq "ARRAY");
+
+   my $baseurl;
+   if ($ENV{SCRIPT_URI} ne ""){
+      $baseurl=$ENV{SCRIPT_URI};
+      $baseurl=~s|/auth/.*$||;
+   }
+
+   # order of Textblocks
+   my @blocks=(qw(chgnr name start end pso chminfo description appl));
+
+   $ENV{HTTP_FORCE_TZ}='CET';
+   my %d;
+   my $notifymode=Query->Param('NotifyMode');
+   my $pso=$self->getPSO($WfRec);
+
+   foreach my $lang (qw(de en)) {
+      $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+      push(@$emaillang,$lang);
+
+      ## change
+      $d{$lang}{chgnr}{prefix}=$self->getParent->T("Changenumber",
+                                                   "itil::workflow::change");
+      $d{$lang}{chgnr}{txt}=$WfRec->{srcid}.
+                            "\n$baseurl/auth/base/workflow/ById/$WfRec->{id}";
+      if ($baseurl ne "") {
+         my $imgtitle=$self->getParent->T("current state of workflow",
+                                          "base::workflow");
+         $d{$lang}{chgnr}{postfix}=
+            "<img title=\"$imgtitle\" class=status border=0 ".
+                 "src=\"$baseurl/public/base/workflow/ShowState/".
+                       "$WfRec->{id}$lang\">";
+      }
+      $d{$lang}{chgnr}{sep}="<a name=\"lang.$lang\"></a>" if ($lang eq 'en');
+
+      ## title
+      my $name=$self->getField('name',$WfRec);
+      $d{$lang}{name}{prefix}=$name->Label();
+      $d{$lang}{name}{txt}=$name->FormatedResult($WfRec,'HtmlMail');
+
+      ## start / end
+      my $cs=$self->getField('changestart',$WfRec);
+      my $ce=$self->getField('changeend',$WfRec);
+      $d{$lang}{start}{prefix}=$cs->Label();
+      $d{$lang}{start}{txt}=$cs->FormatedResult($WfRec,'HtmlMail');
+      $d{$lang}{end}{prefix}=$ce->Label();
+      $d{$lang}{end}{txt}=$ce->FormatedResult($WfRec,'HtmlMail');
+
+      ## PSO
+      if ($notifymode ne 'reject') {
+         $d{$lang}{pso}{prefix}=$self->getParent->T("fieldgroup.downtimesum",
+                                                    "tssm::chm_pso");
+         if (ref($pso) ne 'HASH') {
+            $d{$lang}{pso}{txt}='???';
+         }
+         elsif ($#{$pso->{$lang}}==-1) {
+            $d{$lang}{pso}{txt}=$self->T('No planned service outage documented');
+         }
+         else {
+            my $psotxt=$self->T('All time data in timezone')." $pso->{tz}\n";
+            foreach my $p (@{$pso->{$lang}}) {
+               $psotxt.="$p->{plannedstart}&nbsp;-&nbsp;$p->{plannedend}";
+               $psotxt.="&nbsp;$p->{applname}\n";
+            }
+            $d{$lang}{pso}{txt}=$psotxt;
+         }
+      }
+      else {
+         @blocks=grep(!/^pso$/,@blocks);
+      }
+
+      ## Changemanager info block
+      my $chminfo;
+      my $authority=$self->chmAuthority($WfRec);
+
+      my $submit;
+      if (defined(Query->Param('ApproveSubmitID'))) {
+         my $id=Query->Param('ApproveSubmitID');
+         my $obj=getModuleObject($self->Config,'base::history');
+         $obj->SetFilter({id=>\$id});
+         my ($date,$msg)=$obj->getOnlyFirst(qw(cdate));
+         $submit=$obj->getField('cdate')->FormatedResult($date,'HtmlMail');
+      }
+
+      my $note;
+      if (defined(Query->Param('note_'.$lang)) &&
+          Query->Param('note_'.$lang) ne '') {
+         $note="\n<b>".$self->T('Remarks').":</b>\n";
+         $note.=Query->Param("note_".$lang);
+         $note.="\n" if ($notifymode ne 'reject');
+      }
+
+      if ($notifymode eq 'announce') {
+         my $pendinggrps=$self->getApproverGrp($WfRec,'pending');
+         my $pendingtxt;
+
+         if (ref($pendinggrps) ne 'ARRAY') {
+            $pendingtxt='???';
+         }
+         elsif ($#{$pendinggrps}==-1) {
+            $pendingtxt=$self->T('None')."\n";
+         }
+         else {
+            # show groups in 2 columns
+            $pendingtxt=$self->formatTwoColumns($pendinggrps,33);
+         }
+
+         $chminfo=$self->getParsedTemplate(
+                            'tmpl/ext.changenotify.announce.TIT',
+                            {skinbase=>'TS',
+                             static=>{pending=>$pendingtxt,
+                                      note=>$note}
+                            });
+      }
+      
+      if ($notifymode eq 'approve') {
+         my $tmpl;
+         my $pendingtxt;
+         my $approvedtxt;
+         my $pendinggrps=$self->getApproverGrp($WfRec,'pending');
+         my $approvedgrps=$self->getApproverGrp($WfRec,'done');
+         
+         if (defined($authority)) {
+            $tmpl='tmpl/ext.changenotify.approve.'.$authority;
+         }
+         else {
+            $tmpl='tmpl/ext.changenotify.approve';
+         }
+
+         if (ref($pendinggrps) ne 'ARRAY') {
+            $pendingtxt='???';
+         }
+         elsif ($#{$pendinggrps}==-1) {
+            $pendingtxt=$self->T('None')."\n";
+         }
+         else {
+            $pendingtxt=$self->formatTwoColumns($pendinggrps,33);
+         }
+
+         if (ref($approvedgrps) ne 'ARRAY') {
+            $approvedtxt='???';
+         }
+         elsif ($#{$approvedgrps}==-1) {
+            $approvedtxt=$self->T('None')."\n";
+         }
+         else {
+            $approvedtxt=$self->formatTwoColumns($approvedgrps,33);
+         }
+         $chminfo=$self->getParsedTemplate(
+                            $tmpl,
+                            {skinbase=>'TS',
+                             static=>{submit=>$submit,
+                                      pending=>$pendingtxt,
+                                      approved=>$approvedtxt,
+                                      note=>$note}
+                            });
+      }
+
+      if ($notifymode eq 'remind') {
+         my $tmpl;
+         my $pendingtxt;
+
+         my $pendinggrps=$self->getApproverGrp($WfRec,'pending');
+         if (ref($pendinggrps) ne 'ARRAY') {
+            $pendingtxt='???';
+         }
+         elsif ($#{$pendinggrps}==-1) {
+            $pendingtxt=$self->T('None')."\n";
+         }
+         else {
+            $pendingtxt=$self->formatTwoColumns($pendinggrps,33);
+         }
+
+         my @log=grep {$_->{name} eq 'sendchangeinfo' &&
+                       ($_->{comments} eq 'Approval request sent' ||
+                        $_->{comments} eq 'Approval reminder sent'||
+                        $_->{comments}=~m/^\d+\. notification$/)
+                      } @{$WfRec->{shortactionlog}};
+         my $obj=getModuleObject($self->Config,'base::workflowaction');
+         my $fo=$obj->getField('cdate');
+
+         my ($lastNotify)=$fo->getFrontendTimeString('HtmlDetail',
+                                                     $log[-1]->{cdate},
+                                                     $lang);
+         $lastNotify=~s/\s+.*$//; # cut time, only date is desired
+
+         my $remindCnt=grep {$_->{comments} eq 'Approval reminder sent'}
+                            @log;
+
+         if ($authority ne 'TIT' && $remindCnt==0) {
+            $tmpl='tmpl/ext.changenotify.remind1st';
+         }
+         else {
+            $tmpl='tmpl/ext.changenotify.remind';
+         }
+
+         $chminfo=$self->getParsedTemplate(
+                            $tmpl,
+                            {skinbase=>'TS',
+                             static=>{submit=>$submit,
+                                      approverequest=>$lastNotify,
+                                      pending=>$pendingtxt,
+                                      note=>$note}
+                            });
+      }
+
+      if ($notifymode eq 'reschedule') {
+         my $pendinggrps=$self->getApproverGrp($WfRec,'pending');
+         my $pendingtxt;
+
+         if (ref($pendinggrps) ne 'ARRAY') {
+            $pendingtxt='???';
+         }
+         elsif ($#{$pendinggrps}==-1) {
+            $pendingtxt=$self->T('None')."\n";
+         }
+         else {
+            $pendingtxt=$self->formatTwoColumns($pendinggrps,33);
+         }
+
+         $chminfo=$self->getParsedTemplate(
+                            'tmpl/ext.changenotify.reschedule',
+                            {skinbase=>'TS',
+                             static=>{submit=>$submit,
+                                      pending=>$pendingtxt,
+                                      note=>$note}
+                            });
+      }
+      
+      if ($notifymode eq 'reject') {
+         $chminfo=$self->getParsedTemplate(
+                            'tmpl/ext.changenotify.reject',
+                            {skinbase=>'TS',
+                             static=>{note=>$note}
+                            });
+      }
+
+      $d{$lang}{chminfo}{prefix}="Changemanager Info";
+      $d{$lang}{chminfo}{txt}=$chminfo;
+
+      ## description
+      my $desc=$self->getField('changedescription',$WfRec);
+      $d{$lang}{description}{prefix}=$desc->Label();
+      $d{$lang}{description}{txt}=$desc->FormatedResult($WfRec,'HtmlMail');
+
+      ## applications
+      my $appl=$self->getField('affectedapplication',$WfRec);
+      $d{$lang}{appl}{prefix}=$appl->Label();
+      $d{$lang}{appl}{txt}=$appl->FormatedResult($WfRec,'HtmlMail');
+   }
+
+   delete($ENV{HTTP_FORCE_LANGUAGE});
+
+   foreach my $lang (@$emaillang) {
+      foreach my $line (@blocks) {
+         push(@$emailprefix,  $d{$lang}{$line}{prefix});
+         push(@$emailtext,    $d{$lang}{$line}{txt});
+         push(@$emailpostfix, $d{$lang}{$line}{postfix});
+         push(@$emailsep,     $d{$lang}{$line}{sep});
+      }
+   }
+}
+
 #######################################################################
-package TS::workflow::change::askpublishmode;
+package TS::workflow::change::extauthority;
 use vars qw(@ISA);
 use kernel;
-@ISA=qw(itil::workflow::change::askpublishmode);
+@ISA=qw(itil::workflow::change::main);
+
+sub generateWorkspacePages
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $divset=shift;
+   my $selopt=shift;
+   my $height=shift;
+   my $class='display:none;visibility:hidden';
+   my $d;
+
+   $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt,$height);
+
+   if (grep(/^chmnotifyapprove$/,@$actions)) {
+      my $help;
+      if ($self->getParent->chmAuthority($WfRec) eq 'TIT') {
+         $help=$self->T("helpnotifyapprove");
+      }
+      else {
+         $help=$self->T("helpnotifyall");
+      }
+
+      $$selopt.='<option value="chmnotifyapprove">'.
+                    $self->T('notifyapprove').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>$help</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyapprove '.
+                     'data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+
+   if (grep(/^chmnotifyremind$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyremind">'.
+                    $self->T('notifyremind').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifyremind")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyremind '.
+                     'data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+
+   if (grep(/^chmnotifyreschedule$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyreschedule">'.
+                    $self->T('notifyreschedule').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifyapprove")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyreschedule '.
+                     'data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+
+   if (grep(/^chmnotifyreject$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyreject">'.
+                    $self->T('notifyreject').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifyall")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyreject data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+}
+
+
+sub getPosibleButtons
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my %b=$self->SUPER::getPosibleButtons($WfRec,$actions);
+
+   return(%b);
+}
+
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $op=Query->Param('OP');
+
+   if ($action eq "NextStep" && defined($WfRec)) {
+      if ($op eq "chmnotifyall") {
+         Query->Param("PublishMode"=>"all");
+         Query->Param("NotifyMode" =>"announce");
+      }
+      if ($op eq "chmnotifyapprove") {
+         if ($self->getParent->chmAuthority($WfRec) eq 'TIT' ) {
+            Query->Param("PublishMode"=>"approve");
+         }
+         else {
+            Query->Param("PublishMode"=>"all");
+         }
+         Query->Param("NotifyMode" =>"approve");
+      }
+      if ($op eq "chmnotifyremind") {
+         Query->Param("PublishMode"=>"approve");
+         Query->Param("NotifyMode" =>"remind");
+      }
+      if ($op eq "chmnotifyreschedule") {
+         Query->Param("PublishMode"=>"approve");
+         Query->Param("NotifyMode" =>"reschedule");
+      }
+      if ($op eq "chmnotifyreject") {
+         Query->Param("PublishMode"=>"all");
+         Query->Param("NotifyMode" =>"reject");
+      }
+   }
+
+   return($self->SUPER::Process($action,$WfRec,$actions));
+}
+
+
+#######################################################################
+package TS::workflow::change::individualnote;
+use vars qw(@ISA);
+use kernel;
+@ISA=qw(kernel::WfStep);
 
 sub generateWorkspace
 {
    my $self=shift;
    my $WfRec=shift;
-   my $info=Query->Param("PublishInfoMsg");
-   if (!defined($info)){
-      Query->Param("PublishInfoMsg"=>$self->getParent->T("MSG001"));
+   my $actions=shift;
+   my $colde='';
+   my $colen='';
+
+   my @queryparam=(qw(PublishMode NotifyMode
+                      ApproveSubmitID note_de note_en));
+   foreach my $p (@queryparam) {
+      if (defined(Query->Param($p))) {
+         $self->UserEnv->{queryparam}{$p}=Query->Param($p);
+      }
+      elsif (defined($self->UserEnv->{queryparam}{$p})) {
+         Query->Param($p=>$self->UserEnv->{queryparam}{$p});
+      }
    }
-   return($self->SUPER::generateWorkspace($WfRec));
+
+   if (!$self->notesValid()) {
+      $colde='color:red;' if (Query->Param('note_de')=~m/^\s*$/);
+      $colen='color:red;' if (Query->Param('note_en')=~m/^\s*$/);
+   }
+
+   my $templ="<p style=\"padding-top:5;padding-left:5;$colde\">".
+             'Zusatztext für den deutschsprachigen Teil</p>';
+   $templ.=$self->getDefaultNoteDiv($WfRec,$actions,(height=>55,
+                                                     mode  =>'simple',
+                                                     name  =>'note_de'));
+   $templ.="<p style=\"padding-left:5;$colen\">".
+           'additional text for the english part</p>';
+   $templ.=$self->getDefaultNoteDiv($WfRec,$actions,(height=>55,
+                                                     mode  =>'simple',
+                                                     name  =>'note_en'));
+   $templ.=$self->getParent->getParent->HtmlPersistentVariables(
+                                           qw(PublishMode NotifyMode
+                                              ApproveSubmitID));
+
+   return($templ);
 }
+
 
 sub getPosibleButtons
 {
    my $self=shift;
    my $WfRec=shift;
    my %buttons=$self->SUPER::getPosibleButtons($WfRec);
-   $buttons{"PublishTComMode"}=$self->T('TelekomIT Change notification');
    delete($buttons{BreakWorkflow});
-   delete($buttons{NextStep});
    return(%buttons);
 }
 
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(220);
+}
+
+
 sub Process
-{  
+{
    my $self=shift;
    my $action=shift;
    my $WfRec=shift;
    my $actions=shift;
 
-   if ($action eq "PublishTComMode"){
-      Query->Param("PublishMode"=>"ALTCOMmode");
-      if (defined($WfRec)){
-         my @WorkflowStep=Query->Param("WorkflowStep");
-         push(@WorkflowStep,$self->getParent->getStepByShortname(
-                                            "publishpreview",$WfRec));
-         Query->Param("WorkflowStep"=>\@WorkflowStep);
-      }
+   delete($self->UserEnv->{queryparam}) if ($action ne '');
+
+   if ($action eq 'NextStep') {
+      my $de=trim(Query->Param('note_de'));
+      my $en=trim(Query->Param('note_en'));
+      Query->Param(note_de=>$de);
+      Query->Param(note_en=>$en);
+      
+      return(0) if (!$self->notesValid());
    }
    return($self->SUPER::Process($action,$WfRec));
-}  
-   
+}
 
+
+sub notesValid
+{
+   my $self=shift;
+
+   if (!defined(Query->Param('note_de')) ||
+       !defined(Query->Param('note_en'))) {
+      return(1);
+   }
+
+   my $de=Query->Param('note_de');
+   my $en=Query->Param('note_en');
+   if (($de=~m/^\s*$/ && $en=~m/\S+/) ||
+       ($en=~m/^\s*$/ && $de=~m/\S+/)) {
+      return(0);
+   }
+
+   return(1);
+}
+
+
+######################################################################
+package TS::workflow::change::publishpreview;
+use vars qw(@ISA);
+use kernel;
+@ISA=qw(itil::workflow::change::publishpreview);
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   my @email=@{$self->Context->{CurrentTarget}};
+   my @emailcc=@{$self->Context->{CurrentTargetCC}};
+   my @emailprefix=();
+   my @emailpostfix=();
+   my @emailtext=();
+   my @emailsep=();
+   my @emaillang=();
+   my @emailsubheader=();
+   my %additional=();
+
+   $self->getParent->generateMailSet($WfRec,\%additional,
+                    \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
+                    \@emaillang,\@emailsubheader);
+
+   my @fittedText=map {$self->getParent->cutIdenticalCharString($_,65)}
+                      @emailtext;
+
+   return($self->generateNotificationPreview(emailtext=>\@fittedText,
+                                             emailprefix=>\@emailprefix,
+                                             emailsep=>\@emailsep,
+                                             emailsubheader=>\@emailsubheader,
+                                             cc=>\@emailcc,
+                                             to=>\@email).
+             $self->getParent->getParent->HtmlPersistentVariables(
+                                             qw(PublishMode NotifyMode
+                                                ApproveSubmitID
+                                                note_de note_en)));
+}
+
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "SaveStep"){
+      my $emailfrom="unknown\@w5base.net";
+      my @emailto=@{$self->Context->{CurrentTarget}};
+      my @emailcc=@{$self->Context->{CurrentTargetCC}};
+
+      if ($#emailto==-1 && $#emailcc==-1) {
+         $self->LastMsg(ERROR,"No recipients for this mail located");
+         return(0);
+      }
+
+      my $id=$WfRec->{id};
+      my $wf=getModuleObject($self->Config,"base::workflow");
+
+      my $subject;
+      my $sitename=$self->Config->Param("SITENAME");
+      if ($sitename ne ""){
+         $subject.=$sitename.": ";
+      }
+      $subject.=$WfRec->{srcid}.": " if ($WfRec->{srcid} ne "");
+      $subject.=$WfRec->{name};
+      $subject.=" - Change notification";
+
+      my @emailprefix=();
+      my @emailpostfix=();
+      my @emailtext=();
+      my @emailsep=();
+      my @emaillang=();
+      my @emailsubheader=();
+
+      my $headtext=$self->getParent->T("Changenumber","itil::workflow::change");
+
+      my %additional=(headcolor=>'#e6e6e6',eventtype=>'Change',
+                      headtext=>$headtext.": ".$WfRec->{srcid});
+
+      $self->getParent->generateMailSet($WfRec,\%additional,
+                       \@emailprefix,\@emailpostfix,\@emailtext,\@emailsep,
+                       \@emaillang,\@emailsubheader);
+      #
+      # calc from address
+      #
+      my $uobj=$self->getParent->getPersistentModuleObject("base::user");
+      my $userid=$self->getParent->getParent->getCurrentUserId();
+      $uobj->SetFilter({userid=>\$userid});
+      my ($userrec,$msg)=$uobj->getOnlyFirst(qw(email));
+      if (defined($userrec) && $userrec->{email} ne ""){
+         $emailfrom=$userrec->{email};
+         my $qemailfrom=quotemeta($emailfrom);
+         if (!grep(/^$qemailfrom$/i,@emailto) &&
+             !grep(/^$qemailfrom$/i,@emailcc)){
+            push(@emailcc,$emailfrom);
+         }
+      }
+
+      my @fittedText=map {$self->getParent->cutIdenticalCharString($_,65)}
+                         @emailtext;
+      my $newmailrec={
+             class    =>'base::workflow::mailsend',
+             step     =>'base::workflow::mailsend::dataload',
+             name     =>$subject,
+             emailfrom      =>$emailfrom,
+             emailto        =>\@emailto,
+             emailcc        =>\@emailcc,
+             emailprefix    =>\@emailprefix,
+             emailpostfix   =>\@emailpostfix,
+             emailtext      =>\@fittedText,
+             emailsep       =>\@emailsep,
+             emaillang      =>\@emaillang,
+             emailsubheader =>\@emailsubheader,
+             additional     =>\%additional
+            };
+      if (my $id=$wf->Store(undef,$newmailrec)){
+         if ($self->getParent->activateMailSend($WfRec,$wf,$id,
+                                                $newmailrec,$action)){
+            my $NotifyMode=Query->Param('NotifyMode');
+            my $comment='';
+            $comment='Announcement sent'      if ($NotifyMode eq 'announce');
+            $comment='Approval request sent'  if ($NotifyMode eq 'approve');
+            $comment='Approval reminder sent' if ($NotifyMode eq 'remind');
+            $comment='Rescheduled info sent'  if ($NotifyMode eq 'reschedule');
+            $comment='Change rejection sent'  if ($NotifyMode eq 'reject');
+
+            if ($wf->Action->StoreRecord(
+                $WfRec->{id},"sendchangeinfo",
+                {translation=>'itil::workflow::change'},
+                $comment,undef)){
+               Query->Delete("WorkflowStep");
+               return(1);
+            }
+         }
+      }
+      else{
+         return(0);
+      }
+      return(1);
+   }
+   return($self->SUPER::Process($action,$WfRec));
+}
 
 
 

@@ -1,0 +1,53 @@
+'notifyall'=>{de=>'Change-Ankündigung an direkte Kontakte und Schnittstellenpartner',
+              en=>'Change announcement to direct contacts and interface partner'},
+'notifyreject'=>{de=>'Change-Absage an direkte Kontakte und Schnittstellenpartner',
+                 en=>'Change rejection to direct contacts and interface partner'},
+'notifyapprove'=>{de=>"Aufforderung zum 'approve' versenden",
+                  en=>'Send approve request'},
+'notifyremind'=>{de=>"Erinnerung an 'approve' versenden",
+                 en=>'Send reminder of approve'},
+'notifyreschedule'=>{de=>"Aufforderung zum 'approve' nach Planzeitverschiebung versenden",
+                     en=>'Send approve request after rescheduling'},
+'helpnotifyall'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>AM, TSM und TSM-Verterter</li>".
+        "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
+            "zu direkt betroffenen Anwendungen bestehen.</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>AM, TSM and TSM deputies</li>".
+        "<li>Inteface partner with critical interfaces on their part ".
+            "to direct affected applications.".
+        "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+       "</ul>"
+},
+'helpnotifyapprove'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>Mitglieder der ServiceManager Approver-Gruppen ".
+            "mit offenen Approvals</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>Members of ServiceManager approver groups ".
+            "with pending approval.</li>".
+       "</ul>"
+},
+'helpnotifyremind'=>{
+   de=>"Erinnerung an ausstehende Approvals<br /><br />".
+       "Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>Mitglieder der ServiceManager Approver-Gruppen ".
+            "mit offenen Approvals</li>".
+       "</ul>",
+   en=>"Reminder of pending approvals<br /><br />".
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>Members of ServiceManager approver groups ".
+            "with pending approval.</li>".
+       "</ul>"
+},
+

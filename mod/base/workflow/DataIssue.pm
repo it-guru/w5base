@@ -556,7 +556,7 @@ use kernel::WfStep;
 #   $self->generateWorkspacePages($WfRec,$actions,\$divset,\$selopt);   
 #   my $oldop=Query->Param("OP");
 #   my $templ;
-#   my $pa=$self->getParent->T("posible action");
+#   my $pa=$self->getParent->T("possible action");
 #   $templ=<<EOF;
 #<table width="100%" height=148 border=0 cellspacing=0 cellpadding=0>
 #<tr height=1%><td width=1% nowrap>$pa &nbsp;</td>

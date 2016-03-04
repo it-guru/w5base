@@ -1,0 +1,34 @@
+'notifyall'=>{de=>'Change-Benachrichtigung an direkte Kontakte und Schnittstellenpartner',
+              en=>'Change notification of direct contacts and interface partner'},
+'notifydirect'=>{de=>'Change-Benachrichtigung nur an direkte Kontakte',
+                 en=>'Change notification of direct contacts only'},
+'helpnotifyall'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>TSM und TSM-Verterter</li>".
+        "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
+            "zu direkt betroffenen Anwendungen bestehen.</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>TSM and TSM deputies</li>".
+        "<li>Inteface partner with critical interfaces on their part ".
+            "to direct affected applications.".
+        "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+       "</ul>"
+},
+'helpnotifydirect'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>TSM und TSM-Verterter</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>TSM and TSM deputies</li>".
+        "<li>Subscriber of InfoAbo 'Changebenotification'</li>".
+       "</ul>"
+},
+
+

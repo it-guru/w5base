@@ -900,7 +900,7 @@ sub generateWorkspace
    if ($divset eq ""){
       return("<table width=\"100%\"><tr><td>&nbsp;</td></tr></table>");
    }
-   my $pa=$self->getParent->T("posible action");
+   my $pa=$self->getParent->T("possible action");
    my $tabheight=$wsheight-30;
    $tabheight=30 if ($tabheight<30);  # ensure, that tabheigh is not negativ
    $templ=<<EOF;
@@ -1305,6 +1305,8 @@ sub getDefaultNoteDiv
    my %param=@_;
    my $mode=$param{mode};
    $mode="addnote" if ($mode eq "");
+   my $name=$param{name};
+   $name="note" if ($name eq "");
 
    my $userid=$self->getParent->getParent->getCurrentUserId();
    my $initiatorid=$WfRec->{initiatorid};
@@ -1319,9 +1321,9 @@ sub getDefaultNoteDiv
       $noteheight=$param{height};
    }
 
-   my $note=Query->Param("note");
+   my $note=Query->Param($name);
    my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note ".
+         "<td colspan=2><textarea name=$name ".
          "onkeydown=\"textareaKeyHandler(this,event);\" ".
          "style=\"width:100%;resize:none;height:${noteheight}px\">".
          quoteHtml($note)."</textarea></td></tr>";

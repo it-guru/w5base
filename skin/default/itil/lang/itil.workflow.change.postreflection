@@ -1,7 +1,0 @@
-'post reflection: please correct the desiered data'=>{de=>'Nachbearbeitung: bitte passen Sie nun die notwendigen Daten an'},
-'finish postreflection'=>{de=>'Nachbetrachtung beenden'},
-'init postreflection'=>{de=>'Nachbetrachtung starten'},
-'add note'=>{de=>'Notiz hinzufügen'},
-'publish change notification'=>{de=>'Changebenachrichtigung versenden'},
-
-

@@ -1,3 +1,7 @@
 'TS::workflow::change'=>{de=>'T-Systems: Change',
                          en=>'T-Systems: Change'},
+'No planned service outage documented'=>{de=>'Keine geplante Service-Unterbrechung dokumentiert'},
+'None'=>{de=>'Keine'},
+'All time data in timezone'=>{de=>'Alle Zeitangaben in der Zeitzone'},
+'Remarks'=>{de=>'Bemerkungen'},
 

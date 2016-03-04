@@ -54,8 +54,8 @@ sub smchange
    $chm->SetCurrentView(qw(addgrp approvalstatus approved assignarea
                            assignedto category changenumber closecode
                            closedby closetime complexity coordinator
-                           coordinatorname coordinatorposix createtime
-                           criticality description device editor
+                           coordinatorname coordinatorposix chmmgrgrp
+                           createtime criticality description device editor
                            fallback impact implementor name phase
                            plannedend plannedstart priority project
                            reason relations requestedby resolvedby
