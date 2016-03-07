@@ -5,7 +5,7 @@ package tscape::qrule::compareProjectManager;
 =head3 PURPOSE
 
 This quality rule compares the Project Manager specified in 
-the ICTO Object on CapeTS to the ApplicationManager entry in
+the ICTO Object on CAPE to the ApplicationManager entry in
 a BusinessApplication.
 
 =head3 IMPORTS
@@ -14,17 +14,17 @@ a BusinessApplication.
 
 =head3 HINTS
 
-The Project Manager of an IT application is leading entered in CapeTS via the ICT-Object and is only compared for the production environments in Darwin (valid for CI-States: "available/in project" and "installed/active")
+The Project Manager of an IT application is leading entered in CAPE via the ICT-Object and is only compared for the production environments in Darwin (valid for CI-States: "available/in project" and "installed/active")
 
-Please contact the Support of CapeTS ...
+Please contact the Support of CAPE ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
 [de:]
 
-Der Projektmanager IT-Applikation ist federführend in CapeTS über das ICTO Objekt gepflegt und wird nur für die Produktionsumgebungen in Darwin abgeglichen (gilt für CI-Status: "verfügbar/in Projektierung" und "installiert/aktiv")
+Der Projektmanager IT-Applikation ist federführend in CAPE über das ICTO Objekt gepflegt und wird nur für die Produktionsumgebungen in Darwin abgeglichen (gilt für CI-Status: "verfügbar/in Projektierung" und "installiert/aktiv")
 
-Bitte kontaktieren Sie den Support von CapeTS ...
+Bitte kontaktieren Sie den Support von CAPE ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
@@ -95,7 +95,7 @@ sub qcheckRecord
          autosubject=>1,
          autotext=>1,
          mode=>'QualityCheck',
-         datasource=>'CapeTS'
+         datasource=>'CAPE'
       },sub {
          my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
          $par->SetFilter({archapplid=>\$rec->{ictono}});
@@ -129,7 +129,7 @@ sub qcheckRecord
             }
          }
          if (!$pmexists){    # Wenn in Darwin kein Projektmanager erfasst, dann
-            $autocorrect=1;  # darf der PM direkt aus CapeTS übernommen werden.
+            $autocorrect=1;  # darf der PM direkt aus CAPE übernommen werden.
          }                   # request: 14151779290001
  
          $autocorrect=1;     # Nach einer Meinungsänderung von Peter soll nun
@@ -254,7 +254,7 @@ sub qcheckRecord
    }
    if ($#dataissue!=-1){
       $errorlevel=3;
-      unshift(@dataissue,"different values stored in CapeTS:");
+      unshift(@dataissue,"different values stored in CAPE:");
       push(@qmsg,@dataissue);
    }
 

@@ -4,8 +4,8 @@ package tscape::qrule::compareICTO;
 
 =head3 PURPOSE
 
-This quaity rule compares the specified ICTO ID to CapeTS. A DataIssue
-will be produced, if the ICTO Objekt doesn't exist in CapeTS or it
+This quaity rule compares the specified ICTO ID to CAPE. A DataIssue
+will be produced, if the ICTO Objekt doesn't exist in CAPE or it
 is marked as "Retired" (if the application is in CI-status 3 or 4)
 
 =head3 IMPORTS
@@ -15,7 +15,7 @@ is marked as "Retired" (if the application is in CI-status 3 or 4)
 =head3 HINTS
 
 Every application needs an ICTO-ID. This ID must be provided by 
-IT architecture by means of the tool CapeTS.
+IT architecture by means of the tool CAPE.
 
 The application manager should know the ICTO-IDs of his applications. 
 
@@ -26,7 +26,7 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/14549173480001
 
 
 If you are sure that an application is not relevant for architecture 
-and is not configured in CapeTS (i.e. pure technical applications 
+and is not configured in CAPE (i.e. pure technical applications 
 that provide technical access to networks) , then there is the 
 possibility - in the configuration data of the application - 
 to set the flag  "Application is not architecture relevant" to "yes".
@@ -51,7 +51,7 @@ this application anymore.
 [de:]
 
 Jede Anwendung benötigt eine ICTO-ID. Diese wird von der 
-IT-Architektur über das Tool CapeTS vergeben. 
+IT-Architektur über das Tool CAPE vergeben. 
 Der Application-Manager einer Anwendung sollte die 
 betreffende ICTO-ID seiner Anwendung kennen.
 
@@ -169,7 +169,7 @@ sub qcheckRecord
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){
-         my $msg="the given ICTO-ID does not exist anymore in CapeTS";
+         my $msg="the given ICTO-ID does not exist anymore in CAPE";
          push(@qmsg,$msg);
          push(@dataissue,$msg);
          $errorlevel=3 if ($errorlevel<3);
@@ -189,7 +189,7 @@ sub qcheckRecord
                }  
             }
             if ($retiredReached){
-               my $msg="the given ICTO-ID is marked as retired in CapeTS";
+               my $msg="the given ICTO-ID is marked as retired in CAPE";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
                $errorlevel=3 if ($errorlevel<3);

@@ -5,7 +5,7 @@ package tscape::qrule::compareApplMgr;
 =head3 PURPOSE
 
 This quality rule compares the Application Manager specified in 
-the ICTO Object on CapeTS to the ApplicationManager entry in
+the ICTO Object on CAPE to the ApplicationManager entry in
 a BusinessApplication.
 
 =head3 IMPORTS
@@ -17,18 +17,18 @@ a BusinessApplication.
 [en:]
 
 The Application Manager is responsible for an application, 
-specified by the associated ICTO object from CapeTS.
+specified by the associated ICTO object from CAPE.
 
 This QualityRule ensures that in W5Base/Darwin the same 
 Application Manager is registered.
 
 Should be the wrong Application Manager reported by this rule, 
-this may be due to an incorrect entry in CapeTS or a wrong number 
+this may be due to an incorrect entry in CAPE or a wrong number 
 of ICTO application entry in W5Base/Darwin.
 
-IT architecture awarded via the tool CapeTS.
+IT architecture awarded via the tool CAPE.
 
-Please contact the support of CapeTS ...
+Please contact the support of CAPE ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
@@ -36,19 +36,19 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 [de:]
 
 Der für eine Anwendung verantwortliche ApplicationManager 
-wird durch das zugehörige ICTO-Objekt aus CapeTS vorgegeben.
+wird durch das zugehörige ICTO-Objekt aus CAPE vorgegeben.
 
 Diese QualityRule stellt sicher, dass in W5Base/Darwin der
 gleiche ApplicationManager eingetragen ist.
 
 Sollte der falsche ApplicationManager durch diese Regel gemeldet
-werden, kann dies an einem Fehleintrag in CapeTS oder einer
+werden, kann dies an einem Fehleintrag in CAPE oder einer
 falschen ICTO Nummer beim Anwendungseintrag in W5Base/Darwin
 liegen.
 
-IT-Architektur über das Tool CapeTS vergeben. 
+IT-Architektur über das Tool CAPE vergeben. 
 
-Bitte kontaktieren Sie den Support von CapeTS ...
+Bitte kontaktieren Sie den Support von CAPE ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
@@ -113,7 +113,7 @@ sub qcheckRecord
    #  Durch den Request ...
    #  https://darwin.telekom.de/darwin/auth/base/workflow/ById/14168384790001
    #  ... wurde gefordert, das für die Übernahme des ApplicationManagers
-   #  aus CapeTS nicht das "normale" Verfahrent über 
+   #  aus CAPE nicht das "normale" Verfahrent über 
    #  "automatisch Updates zulassen" verwendet werden soll.
    $autocorrect=1;
    
@@ -144,7 +144,7 @@ sub qcheckRecord
          }
       }
    }
-   my @result=$self->HandleQRuleResults("CapeTS",
+   my @result=$self->HandleQRuleResults("CAPE",
                  $dataobj,$rec,$checksession,
                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest,$forcedupd);
 
