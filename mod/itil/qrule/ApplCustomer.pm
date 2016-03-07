@@ -4,12 +4,47 @@ package itil::qrule::ApplCustomer;
 
 =head3 PURPOSE
 
-Every Application in CI-Status "installed/active" or "available", must
+Every Application in CI-Status "installed/active" or "available" must
 have a defined customer.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[de:]
+
+Bitte hinterlegen Sie einen Kunden an der Anwendung.
+Falls Sie die exakte Schreibweise des Kunden nicht kennen, 
+tragen Sie 'DTAG.*' ein, um alle Kunden von DTAG 
+in einer Drop-Down-Liste aufgelistet zu bekommen. 
+Wenn Sie einen vorhandenen Kundeneintrag löschen oder 
+einen veralteten Kunden eingetragen haben, 
+werden Sie diese Änderungen nicht speichern können, 
+solange Sie nicht einen gültigen Kunden eintragen.
+
+Verantwortlich: Datenverantwortlicher
+
+Bei Fragen wenden Sie sich bitte an den DARWIN Support: 
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+
+[en:]
+
+Please enter the customer of the application. 
+If you do not know the exact naming of the customer, 
+if you enter DTAG.*, you will get a list of all available customers 
+of DTAG in a drop-down menu. If you delete the previous customer entry 
+or the customer is deactivated, you will not be able to save the changes 
+until a valid customer is entered.
+
+Accountable: Databoss
+
+If you have any questions please contact the Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+
 
 =cut
 #######################################################################
