@@ -27,7 +27,7 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->{name}="ETL Job from CapeTS to Darwin v_darwin_export";
+   $self->{name}="ETL Job from CAPE to Darwin v_darwin_export";
    return($self);
 }
 

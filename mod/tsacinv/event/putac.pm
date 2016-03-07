@@ -749,7 +749,7 @@ sub SendXmlToAM_appl
                ########################################################
                my $applref="[NULL]";
                if ($rec->{ictono} ne ""){
-                  $applref="CapeTS: ".$rec->{ictono};
+                  $applref="CAPE: ".$rec->{ictono};
                }
                ########################################################
                my $issoxappl=$rec->{issoxappl};

@@ -1,4 +1,4 @@
-'itu.tscape'=>{de=>'CapeTS',en=>'CapeTS'},
+'itu.tscape'=>{de=>'CAPE',en=>'CAPE'},
 'itu.tscape.archappl'=>{de=>'ICT-Objekt',en=>'ICT-Object'},
 'itu.tscape.applver'=>{de=>'Anwendungsversion',en=>'Applicationversion'},
 'itu.tscape.archappl.role'=>{de=>'Rolle',en=>'Role'},

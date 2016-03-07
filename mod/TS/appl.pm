@@ -779,7 +779,7 @@ sub Validate
       my $ictoid=effVal($oldrec,$newrec,"ictoid");
       my $o=getModuleObject($self->Config,"tscape::archappl");
       if (!defined($o)){
-         $self->LastMsg(ERROR,"unable to connect capeTS");
+         $self->LastMsg(ERROR,"unable to connect cape");
          return(undef);
       }
       if ($ictoid ne ""){
