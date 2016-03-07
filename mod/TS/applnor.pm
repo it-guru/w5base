@@ -163,7 +163,11 @@ sub autoFillAutogenField
    $c->{autoFillAutogenField}={} if (!exists($c->{autoFillAutogenField}));
    $c=$c->{autoFillAutogenField};
 
-
+   my $normodel;
+   if ($fld->{name} ne "normodel"){
+      my $fld=$self->getField("normodel",$current);
+      $normodel=$fld->RawValue($current);
+   }
 
    if ($fld->{name} eq "MSystemOSDeliveryContactID" ||
        $fld->{name} eq "MHardwareOSDeliveryContactID"){
@@ -204,8 +208,8 @@ sub autoFillAutogenField
                 '65760 Eschborn; Mergenthaler Allee 38-42'=>1,
                 '70372 Stuttgart; Nauheimer Str. 98"'=>1);
       my %ucnt=('DE'=>1);
-      if ($current->{normodel} eq "S" ||
-          $current->{normodel} eq "DE3"){
+     
+      if ($normodel eq "S" || $normodel eq "DE3"){
          %uadr=('04001 Kosice; Postova 18'=>1);
          %ucnt=('SK'=>1);
       }
@@ -231,8 +235,7 @@ sub autoFillAutogenField
                 '80995 München; Dachauer Str. 651'=>1,
                 '90441 Nürnberg; Hansastr. 45'=>1);
       my %ucnt=('DE'=>1);
-      if ($current->{normodel} eq "S" ||
-          $current->{normodel} eq "DE3"){
+      if ($normodel eq "S" || $normodel eq "DE3"){
          %uadr=('04001 Kosice; Postova 18'=>1);
          %ucnt=('SK'=>1);
       }
@@ -261,8 +264,7 @@ sub autoFillAutogenField
                 '80995 München; Dachauer Str. 651'=>1,
                 '70372 Stuttgart; Nauheimer Str. 98'=>1);
       my %ucnt=('DE'=>1);
-      if ($current->{normodel} eq "S" ||
-          $current->{normodel} eq "DE3"){
+      if ($normodel eq "S" || $normodel eq "DE3"){
          %uadr=('04001 Kosice; Postova 18'=>1);
          %ucnt=('SK'=>1);
       }
