@@ -85,6 +85,7 @@ sub new
                 name          =>'normodel',
                 label         =>'relevant NOR-Solutionmodel',
                 readonly      =>'1',
+                selectfix     =>1,
                 searchable    =>0,
                 weblinkto     =>'NONE',
                 vjointo       =>'itil::appladv',
