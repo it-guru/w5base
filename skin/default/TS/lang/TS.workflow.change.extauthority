@@ -12,15 +12,17 @@
    de=>"Mail-Benachrichtigung an".
        "<ul>".
         "<li>AM, TSM und TSM-Verterter</li>".
+        "<li>Alle Schnittstellenpartner der direkt betroffenen Anwendungen</li>".
         "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
-            "zu direkt betroffenen Anwendungen bestehen.</li>".
+            "zu direkt betroffenen Anwendungen bestehen</li>".
         "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
        "</ul>",
    en=>"Mail notification to".
        "<ul>".
         "<li>AM, TSM and TSM deputies</li>".
+        "<li>All interface partner of direct affected applications</li>".
         "<li>Inteface partner with critical interfaces on their part ".
-            "to direct affected applications.".
+            "to direct affected applications".
         "<li>Subscriber of InfoAbo 'Changenotification'</li>".
        "</ul>"
 },

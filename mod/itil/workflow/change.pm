@@ -218,17 +218,32 @@ sub getNotifyDestinations
    }
    if ($mode eq "all"){
       my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
-      my $aaflt=[{toapplid=>$applid,
+
+      # all interface appls of prim. affected applications
+      my $aaflt=[{fromapplid=>$applid,
                   cistatusid=>[4],
-                  fromapplcistatus=>[3,4,5]}];
+                  toapplcistatus=>[3,4,5]}];
       $aa->SetFilter($aaflt);
-      foreach my $aarec ($aa->getHashList(qw(fromapplid toapplid contype
-                                           toapplcistatus))){
+      foreach my $aarec ($aa->getHashList(qw(toapplid))){
+         if (!in_array($applid,$aarec->{toapplid})){
+            push(@ifid,$aarec->{toapplid});
+         }
+      }
+
+      # all interface appls with critical interface
+      # to prim. affected applications on its side
+      $aaflt=[{toapplid=>$applid,
+               cistatusid=>[4],
+               fromapplcistatus=>[3,4,5]}];
+      $aa->ResetFilter();
+      $aa->SetFilter($aaflt);
+      foreach my $aarec ($aa->getHashList(qw(fromapplid contype))){
          next if ($aarec->{contype}==4 ||
                   $aarec->{contype}==5 ||
                   $aarec->{contype}==3 );   # uncritical  communications
-         if (!in_array($applid,$aarec->{fromapplid})){ # von der anderen
-            push(@ifid,$aarec->{fromapplid});           # seite eingetragen
+         if (!in_array($applid,$aarec->{fromapplid}) &&
+             !in_array(\@ifid,$aarec->{fromapplid})){
+            push(@ifid,$aarec->{fromapplid});        
          }
       }
    }
@@ -546,7 +561,7 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(180) if ($WfRec->{state}<20);
+   return(190) if ($WfRec->{state}<20);
    return(120);
 }
 
