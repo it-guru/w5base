@@ -31,35 +31,61 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Id(      name       =>'lmodelid',
-                                  label      =>'ModelID',
-                                  dataobjattr=>'assetmodel.lmodelid'),
+      new kernel::Field::Id(
+                name          =>'lmodelid',
+                label         =>'ModelID',
+                dataobjattr   =>'assetmodel.lmodelid'),
 
-      new kernel::Field::Text(    name       =>'name',
-                                  htmlwidth  =>'350px',
-                                  label      =>'Model',
-                                  ignorecase =>1,
-                                  dataobjattr=>'assetmodel.name'),
+      new kernel::Field::Text(
+                name          =>'name',
+                htmlwidth     =>'350px',
+                label         =>'Model',
+                ignorecase    =>1,
+                dataobjattr   =>'assetmodel.name'),
 
-      new kernel::Field::Text(    name       =>'barcode',
-                                  label      =>'BarCode',
-                                  ignorecase =>1,
-                                  dataobjattr=>'assetmodel.barcode'),
+      new kernel::Field::Text(
+                name          =>'barcode',
+                label         =>'BarCode',
+                ignorecase    =>1,
+                dataobjattr   =>'assetmodel.barcode'),
 
-      new kernel::Field::Text(    name       =>'nature',
-                                  label      =>'Nature',
-                                  ignorecase =>1,
-                                  dataobjattr=>'amnature.name'),
+      new kernel::Field::Text(
+                name          =>'nature',
+                label         =>'Nature',
+                ignorecase    =>1,
+                dataobjattr   =>'amnature.name'),
 
-      new kernel::Field::Text(    name       =>'barcode',
-                                  label      =>'BarCode',
-                                  ignorecase =>1,
-                                  dataobjattr=>'assetmodel.barcode'),
+      new kernel::Field::Text(
+                name          =>'barcode',
+                label         =>'BarCode',
+                ignorecase    =>1,
+                dataobjattr   =>'assetmodel.barcode'),
 
-      new kernel::Field::Float(   name       =>'assetpowerinput',
-                                  label      =>'PowerInput of Asset',
-                                  unit       =>'KVA',
-                                  dataobjattr=>'assetpowerinput.powerinput'),
+      new kernel::Field::Float(
+                name          =>'assetpowerinput',
+                label         =>'PowerInput of Asset',
+                unit          =>'KVA',
+                dataobjattr   =>'assetpowerinput.powerinput'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"assetmodel.dtlastmodif"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(assetmodel.lmodelid,35,'0')"),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'assetmodel.dtlastmodif'),
+
+
 
    );
    $self->setDefaultView(qw(lmodelid barcode name nature));

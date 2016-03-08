@@ -45,51 +45,61 @@ sub new
 
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name     =>'linenumber',
-                                  label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
 
 
-      new kernel::Field::Id(      name       =>'code',
-                                  label      =>'Code',
-                                  dataobjattr  =>'amlocation.barcode'),
+      new kernel::Field::Id(
+                name          =>'code',
+                label         =>'Code',
+                dataobjattr   =>'amlocation.barcode'),
 
-      new kernel::Field::Id(      name       =>'locationid',
-                                  label      =>'LocationID',
-                                  dataobjattr  =>'amlocation.llocaid'),
+      new kernel::Field::Interface(
+                name          =>'locationid',
+                label         =>'LocationID',
+                dataobjattr   =>'amlocation.llocaid'),
 
-      new kernel::Field::Text(    name       =>'fullname',
-                                  label      =>'Fullname',
-                                  ignorecase =>1,
-                                  dataobjattr     =>'amlocation.fullname'),
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Fullname',
+                ignorecase    =>1,
+                dataobjattr   =>'amlocation.fullname'),
 
-      new kernel::Field::Text(    name       =>'address1',
-                                  label      =>'Street',
-                                  ignorecase =>1,
-                                  dataobjattr=>'amlocation.address1'),
+      new kernel::Field::Text(
+                name          =>'address1',
+                label         =>'Street',
+                ignorecase    =>1,
+                dataobjattr   =>'amlocation.address1'),
 
-      new kernel::Field::Text(    name       =>'zipcode',
-                                  label      =>'ZIP',
-                                  dataobjattr=>'amlocation.zip'),
+      new kernel::Field::Text(
+                name          =>'zipcode',
+                label         =>'ZIP',
+                dataobjattr   =>'amlocation.zip'),
 
-      new kernel::Field::Text(    name       =>'country',
-                                  label      =>'Country',
-                                  ignorecase =>1,
-                                  dataobjattr=>'amcountry.isocode'),
+      new kernel::Field::Text(
+                name          =>'country',
+                label         =>'Country',
+                ignorecase    =>1,
+                dataobjattr   =>'amcountry.isocode'),
 
-      new kernel::Field::Text(    name       =>'location',
-                                  label      =>'Location',
-                                  ignorecase =>1,
-                                  dataobjattr=>'amlocation.city'),
+      new kernel::Field::Text(
+                name          =>'location',
+                label         =>'Location',
+                ignorecase    =>1,
+                dataobjattr   =>'amlocation.city'),
 
-      new kernel::Field::Text(    name       =>'locationtype',
-                                  label      =>'Location Type',
-                                  ignorecase =>1,
-                                  dataobjattr=>'amlocation.locationtype'),
+      new kernel::Field::Text(
+                name          =>'locationtype',
+                label         =>'Location Type',
+                ignorecase    =>1,
+                dataobjattr   =>'amlocation.locationtype'),
 
-      new kernel::Field::Text(    name       =>'name',
-                                  label      =>'Name',
-                                  ignorecase =>1,
-                                  dataobjattr=>'amlocation.name'),
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Name',
+                ignorecase    =>1,
+                dataobjattr   =>'amlocation.name'),
 
       new kernel::Field::OSMap(
                 name          =>'osmap',
@@ -180,6 +190,23 @@ sub new
                    return("../../base/iomap/MapTester?$q");
                 }),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"amlocation.dtlastmodif"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(amlocation.llocaid,35,'0')"),
+
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                label         =>'Modification-Date',
+                dataobjattr   =>'amlocation.dtlastmodif'),
    );
    $self->setDefaultView(qw(linenumber code locationid fullname 
                              zipcode location address1));
