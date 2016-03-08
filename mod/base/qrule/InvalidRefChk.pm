@@ -4,9 +4,9 @@ package base::qrule::InvalidRefChk;
 
 =head3 PURPOSE
 
-Checks if there contact or group referenzes in the current
-record, witch are marked as "disposed of waste".
-This qrule can check field with type ...
+Checks if there are contact or group references in the current
+record, whitch are marked as "disposed of waste".
+This qrule can check fields with type ...
 kernel::Field::ContactLnk
 kernel::Field::Contact
 kernel::Field::Group
@@ -15,6 +15,37 @@ kernel::Field::Databoss
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[de:]
+
+Prüft, ob der Datensatz veraltete Kontaktreferenzen enthält. 
+Ungültige Kontakte oder Gruppen im aktuellen Datensatz erkennt man 
+anhand einer Nummer in eckigen Klammern am Ende des Kontaktes. 
+Ein DataIssue wird erzeugt, wenn ein Datensatz einen oder mehrere 
+veraltete Kontakt/Gruppenreferenzen enthält. Um das DataIssue zu beheben, 
+muss man veraltete Kontakte am Datensatz finden und entfernen oder 
+bei Bedarf durch neue Kontakpersonen bzw. Gruppen mit entsprechenden 
+Rollen ersetzen.
+
+Bei Fragen wenden Sie sich bitte an den DARWIN Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+
+[en:]
+
+Checks, if there are invalid contact references on the CI. 
+Invalid contacts or groups can be identified 
+by a number in square brackets at the end. 
+A DataIssue is created when there are one or more invalid contacts on the CI. 
+The DataIssue can be resolved by finding and deleting 
+the invalid contact references. 
+If necessary, new users or groups with the corresponding roles can be added.
+
+If you have any questions please contact the Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
 
 =cut
 #######################################################################
