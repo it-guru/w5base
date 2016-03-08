@@ -4,15 +4,39 @@ package itil::qrule::ApplDesc;
 
 =head3 PURPOSE
 
-Every application in CI-Status "installed/active" or "available" need to
+Every application in CI-Status "installed/active" or "available" needs to
 have an application description. If there is no application description
 defined, an error will be produced.
-If the description have less then 15 words, the description will be
-used as not detailed enough. This will also create a DataIssue.
+If the description has less than 15 words, the description will taken
+as not detailed enough. This will also create a DataIssue.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Please enter a detailed description of the application. 
+The description has to have more than 15 words. 
+
+Accountable: Databoss, TSM
+
+If you have any questions please contact the Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+
+[de:]
+
+Bitte hinterlegen Sie eine detaillierte Beschreibung der Anwendung. 
+Die Beschreibung muss aus mehr als 15 Worten bestehen. 
+
+Verantwortlich: Datenverantwortlicher, TSM
+
+Bei Fragen wenden Sie sich bitte an den DARWIN Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
 
 =cut
 #######################################################################
