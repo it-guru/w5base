@@ -4,12 +4,32 @@ package itil::qrule::ApplCheckTSM;
 
 =head3 PURPOSE
 
-Every Application in CI-Status "installed/active","inactiv/stored" 
-or "available", must have a Technical Solution Manager.
+Every Application in CI-Status "installed/active","inactive/stored" 
+or "available" must have a Technical Solution Manager.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[de:]
+
+Bitte hinterlegen Sie einen zuständigen Technical Solution Manager (TSM), 
+der für die Applikationsumgebung zuständig ist. 
+
+Bei Fragen wenden Sie sich bitte an den DARWIN Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+
+[en:]
+
+Please enter the responsible Technical Solution Manager (TSM) 
+for the application environment.
+
+If you have any questions please contact the Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
 
 =cut
 #######################################################################
