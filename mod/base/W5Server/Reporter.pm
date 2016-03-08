@@ -359,7 +359,6 @@ sub slotHandler
 
                W5Server::CloseAllOpenFieldHandles();    
                W5Server::MakeAllDBHsForkSafe();
-
                $0.="(".$task->{name}.")";
 
 
