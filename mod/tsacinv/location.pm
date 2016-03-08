@@ -270,7 +270,9 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where="amlocation.lcountryid=amcountry.lcountryid(+) and ".
-             "amlocation.bdelete=0";
+             "amlocation.bdelete=0 and amlocation.llocaid>0 and ".
+             "amlocation.llocaid is not null and ".
+             "amlocation.dtlastmodif is not null";
    return($where);
 }
 
