@@ -14,13 +14,46 @@ NONE
 
 [en:]
 
-In timespan field "use-times"
-at least one entry is expected per weekday.
+It is necessary for every TOP-Application (priority 1) 
+to have the use-times defined. 
+This can be defined for every day of the week separately by setting the letter 
+for the use-time type (O=offline time, M=main time, S=secondary time) 
+and after it the time span in form "hh:mm-hh:mm". 
+If more than one time frame is needed for a particular day, 
+the different time spans must be separated by a comma.
+
+Example: S00:00-06:00, M06:00-17:00, S17:00-24:00
+
+Accountable: Applicationmanager
+
+For content questions, please contact the Change Management Telekom IT:
+https://darwin.telekom.de/darwin/auth/base/user/ById/13721598690001
+
+All other questions should be directed to the DARWIN Support, please:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
 
 [de:]
 
-Im Zeitbereichsfeld "Nutzungszeiten"
-wird pro Wochentag mindestens ein Eintrag erwartet.
+Für jede TOP-Anwendung (Priorität 1) ist eine Angabe der 
+Haupt- und Nebennutzungszeit zu hinterlegen. 
+Dies kann für jeden Wochentag separat eingetragen werden, 
+indem man den Buchstaben für die Nutzungszeitart angibt 
+(O=Offline-Zeit, M=Hauptnutzungszeit, S= Nebennutzungszeit) 
+und danach die Zeitspanne im Format "hh:mm-hh:mm" einträgt. 
+Es können pro Tag auch mehrere Zeitfenster eingetragen werden.
+Die einzelnen Angaben sind dabei durch Komma zu trennen. 
+
+Beispiel: S00:00-06:00, M06:00-17:00, S17:00-24:00
+
+Verantwortlich: Applicationmanager
+
+Für inhaltliche Fragen wenden Sie sich bitte an das Changemanagement Telekom IT:
+https://darwin.telekom.de/darwin/auth/base/user/ById/13721598690001
+
+Alle anderen Fragen richten Sie bitte an den DARWIN Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
 
 =cut
 #######################################################################
