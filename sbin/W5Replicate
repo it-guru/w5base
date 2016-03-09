@@ -729,7 +729,8 @@ sub objectReplicationPhase1
       }
       else{
          $obj->SetFilter({}); # ensure that SetFilter is always be called
-      }                       # for "hard" object filters (like workflows)
+         $obj->Limit($p1smallpack,0,0);  # for "hard" object filters (like workflows)
+      }              
       #$obj->ResetFilter();
       #$obj->SetFilter({id=>"5275"});
       my @syncfields=@{$ctrl->{'replkeyfields'}};
@@ -766,7 +767,7 @@ sub objectReplicationPhase1
             }
             ($srcrec,$msg)=$obj->getNext();
          } until(!defined($srcrec));
-         $dbi->commit();
+         my $bk=$dbi->commit();
       }
       if ($processed<2 && $candidates<2){
          $recinqueue=0;
