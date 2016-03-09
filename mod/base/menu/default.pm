@@ -453,7 +453,7 @@ sub Init
    
    $self->RegisterObj("Tools.translation",
                       "base::TextTranslation",
-                      defaultacl=>['valid_user']);
+                      defaultacl=>['admin']);
    
    $self->RegisterObj("Tools.translation.acronym",
                       "base::TextTranslation",
