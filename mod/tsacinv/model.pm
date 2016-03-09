@@ -29,6 +29,7 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->{use_distinct}=0;
    
    $self->AddFields(
       new kernel::Field::Id(
