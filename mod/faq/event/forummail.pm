@@ -148,21 +148,26 @@ sub sendForumMail
      #    my ($urec,$msg)=$user->getOnlyFirst(qw(email));
      #    $fromemail=$urec->{email} if (defined($urec) && $urec->{email} ne "");
      # }
-
-
-      if ($id=$wf->Store(undef,{class  =>'base::workflow::mailsend',
-                                step   =>'base::workflow::mailsend::dataload',
-                                name   =>$subject,
-                                emailfrom    =>$fromemail,
-                                emailbcc     =>\@emailto,
-                                additional   =>{label=>$label,
-                                            UnsubscribeInfo=>$UnsubscribeInfo},
-                                emailprefix  =>$emailprefix,
-                                emailtemplate=>"faq/faqmail",
-                                emailtext    =>$emailtext})){
-         my %d=(step=>'base::workflow::mailsend::waitforspool');
-         my $r=$wf->Store($id,%d);
-      }
+     
+     my @e=@emailto;
+     while(@e){
+        my @eblk=splice(@e,0,999);   # block mail in 999 adresslist max
+        my $nwfrec={
+           class  =>'base::workflow::mailsend',
+           step   =>'base::workflow::mailsend::dataload',
+           name   =>$subject,
+           emailfrom    =>$fromemail,
+           emailbcc     =>\@eblk,
+           additional   =>{label=>$label, UnsubscribeInfo=>$UnsubscribeInfo},
+           emailprefix  =>$emailprefix,
+           emailtemplate=>"faq/faqmail",
+           emailtext    =>$emailtext
+        };
+        if ($id=$wf->Store(undef,$nwfrec)){
+           my %d=(step=>'base::workflow::mailsend::waitforspool');
+           my $r=$wf->Store($id,%d);
+        }
+     }
    }
    return({exitcode=>'0'});
 }
