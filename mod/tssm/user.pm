@@ -203,6 +203,12 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>SELpref.'contactsm1.sysmodtime'),
 
+      new kernel::Field::Date(
+                name          =>'lastlogin',
+                group         =>'source',
+                label         =>'Last Login Date',
+                dataobjattr   =>SELpref.'operatorm1.last_login'),
+
       new kernel::Field::TextDrop(
                 name          =>'editor',
                 group         =>'source',

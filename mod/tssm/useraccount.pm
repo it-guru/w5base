@@ -69,6 +69,14 @@ sub new
                 dataobjattr   =>SELpref.'operatorm1.tsi_home_assignment'),
 
       new kernel::Field::Text(
+                name          =>'responsiblegroup',
+                label         =>'AdminGroup',
+                uppersearch   =>1,
+               # weblinkto     =>'tssm::group',
+               # weblinkon     =>['homeassignment'=>'fullname'],
+                dataobjattr   =>SELpref.'operatorm1.tsi_responsible_group'),
+
+      new kernel::Field::Text(
                 name          =>'username',
                 label         =>'Contact name',
                 vjointo       =>'tssm::user',
@@ -127,6 +135,12 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
                 dataobjattr   =>SELpref.'operatorm1.sysmodtime'),
+
+      new kernel::Field::Date(
+                name          =>'lastlogin',
+                group         =>'source',
+                label         =>'Last Login Date',
+                dataobjattr   =>SELpref.'operatorm1.last_login'),
 
       new kernel::Field::TextDrop(
                 name          =>'editor',

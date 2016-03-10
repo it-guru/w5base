@@ -7,3 +7,4 @@
 'FAX-Number'=>{ de=>'FAX'},
 'Phonenumber'=>{ de=>'Telefonnummer'},
 'is real logon user'=>{de=>'Echter Logon-User'},
+'Last Login Date'=>{de=>'letzter Login-Zeitpunkt'},

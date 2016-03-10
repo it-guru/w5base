@@ -3,4 +3,5 @@
 'fieldgroup.profile'=>{ de=>'Profile',en=>'Profile'},
 'Copntact name'    =>{ de=>'Kontakt Name'},
 'Contact name'    =>{ de=>'Kontakt Name'},
+'Last Login Date'=>{de=>'letzter Login-Zeitpunkt'},
 
