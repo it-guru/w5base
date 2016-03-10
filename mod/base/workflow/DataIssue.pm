@@ -309,7 +309,7 @@ sub isOptionalFieldVisible
    my %param=@_;
    my $name=$param{field}->Name();
 
-   return(1) if ($name eq "prio");
+   return(0) if ($name eq "prio");
    return(1) if ($name eq "name");
    return(1) if ($name eq "shortactionlog");
    return(1) if ($name eq "detaildescription");
