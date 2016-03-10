@@ -1014,6 +1014,8 @@ sub Process
              class    =>'base::workflow::mailsend',
              step     =>'base::workflow::mailsend::dataload',
              name     =>$subject,
+             emailtemplate  =>'changenotify',
+             skinbase       =>'itil',
              emailfrom      =>$emailfrom,
              emailto        =>\@emailto,
              emailcc        =>\@emailcc,
