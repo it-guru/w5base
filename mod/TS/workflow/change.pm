@@ -437,10 +437,11 @@ sub generateMailSet
       if ($baseurl ne "") {
          my $imgtitle=$self->getParent->T("current state of workflow",
                                           "base::workflow");
+         my $ilang="?HTTP_ACCEPT_LANGUAGE=$lang";
          $d{$lang}{chgnr}{postfix}=
             "<img title=\"$imgtitle\" class=status border=0 ".
                  "src=\"$baseurl/public/base/workflow/ShowState/".
-                       "$WfRec->{id}$lang\">";
+                       "$WfRec->{id}$ilang\">";
       }
       $d{$lang}{chgnr}{sep}="<a name=\"lang.$lang\"></a>" if ($lang eq 'en');
 

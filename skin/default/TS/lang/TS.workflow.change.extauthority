@@ -11,7 +11,7 @@
 'helpnotifyall'=>{
    de=>"Mail-Benachrichtigung an".
        "<ul>".
-        "<li>AM, TSM und TSM-Verterter</li>".
+        "<li>AM, TSM und TSM-Vertreter</li>".
         "<li>Alle Schnittstellenpartner der direkt betroffenen Anwendungen</li>".
         "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
             "zu direkt betroffenen Anwendungen bestehen</li>".
