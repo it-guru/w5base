@@ -16,12 +16,9 @@ NONE
 
 [en:]
 
-Purpose: 
-Checks if a technical Change Approvergroup is defined on all applications 
-CI-State "installed/active" or "available". A data issue is created when 
-no valid Change Approvergroup is entered. 
+Checks if in field 'Change Approvergroup technical' 
+a valid Change Approvergroup is entered. 
 
-Hints: 
 Enter the Approvergroup which is to be used for Changes on this application 
 from the technical point of view. Generally, it is the Approvergroup of the 
 respective Business Team. If the Approvergroup was created in ServiceManager, 
@@ -38,13 +35,9 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 [de:]
 
-Zweck: 
-Prüft alle Anwendungen im Status 'installiert/aktiv' und 
-'verfügbar/in Projektierung', ob eine technische Change Approvergroup 
-definiert ist. Ein DataIssue wird erzeugt, wenn keine gültige 
+Prüft, ob im Feld 'Change Approvergroup technisch' eine gültige 
 Change Approvergroup eingetragen ist.
 
-Hinweis: 
 Wählen Sie hier die Approvergroup, die bei Changes für diese Anwendung 
 aus technischer Sicht verwendet werden muss. Dies ist in der Regel 
 die Approvergroup des betreffenden Betriebsteams. Falls die Approvergroup 
