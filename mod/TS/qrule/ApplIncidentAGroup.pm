@@ -5,8 +5,8 @@ package TS::qrule::ApplIncidentAGroup;
 =head3 PURPOSE
 
 Checks if there is on an "installed/active" or "available" application
-an incident assignmentgroup for assetcenter defined.
-If there is no valid assignmentgroup defined, an error will be proceeded.
+an incident assignmentgroup for assetmanager defined.
+If there is no valid assignmentgroup defined, an error will be procceeded.
 
 =head3 IMPORTS
 
@@ -14,22 +14,41 @@ NONE
 
 =head3 HINTS
 
-no english hints available
+[en:]
+
+Checks if in field 'Incident Assignmentgroup'
+a valid Incident Assignmentgroup is entered.
+
+The Incident Assignmentgroup is necessary if the application 
+is to be exported to AssetMananger. If the Assignmentgroup was created 
+in ServiceManager, it is important to make sure it was marked for export to 
+AssetManager. Otherwise it is not possible to enter the group, even though 
+it might be displayed in ServiceManager.
+
+The contact for the Assignmentgroups in general is the TelekomIT SPOC:
+https://darwin.telekom.de/darwin/auth/base/user/ById/14526036310001
+
+If you have any questions please contact the Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
 
 [de:]
 
-Die Incident-Assignmentgroup ist zwingend, wenn der Datensatz nach
+Prüft, ob im Feld 'Incident Assignmentgroup' eine gültige
+Incident Assignmentgroup eingetragen ist.
+
+Die Incident Assignmentgroup ist zwingend, wenn der Datensatz nach
 AssetManager exportiert werden soll/muss. Falls die Assignmentgroup
 über ServiceManager angelegt wurde, ist es wichtig, dass diese dort
 für den Export nach AssetManager markiert wurde. 
 Ansonsten kann die Gruppe nicht ausgewählt werden - obwohl diese
 u.U. in ServiceManager angezeigt wird.
 
-Ansprechpartner für Assignmentgroups im Allgemeinen ist der 
-SPOC TelekomIT:
-
+Ansprechpartner für Assignmentgroups im Allgemeinen ist der SPOC TelekomIT:
 https://darwin.telekom.de/darwin/auth/base/user/ById/14526036310001
 
+Bei Fragen wenden Sie bitte an den DARWIN Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 
 =cut
