@@ -4,12 +4,45 @@ package itil::qrule::ApplOpmode;
 
 =head3 PURPOSE
 
-Every Application in in CI-Status "installed/active" or "available", needs
+Every Application in CI-Status "installed/active" or "available" needs
 to set a valid primary operation mode.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+It is necessary to fill the field primary operation mode to declare 
+the operation mode of the application, e.g. to enable the assignment 
+of criticality and priority.
+
+Please choose the proper operation mode from the possibilities provided 
+in a drop-down menu, according to the nature of the application. 
+E.g. in the case of a production environment, choose the operation mode 
+'Production', in case of test environment choose 'Test', etc.
+
+If you have any questions please contact the Darwin Support:
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+
+[de:]
+
+Das Feld vorwiegende Betriebsart ist zwingend zu befüllen, 
+um die Betriebsart der Anwendung bekannt zu geben, 
+z.B. für die Festlegung der Kritikalität und Priorität.
+
+Bitte wählen Sie aus den hinterlegten Wertevorräten eine Betriebsart aus, 
+welche auf die Umgebung der Anwendung zutrifft. Z.B. wenn es sich um eine 
+produktive Umgebung handelt, wählen Sie die Betriebsart 'Produktion', 
+für Testumgebungen 'Test', usw.
+
+Bei Fragen wenden Sie sich bitte an den Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
 
 =cut
 #######################################################################
