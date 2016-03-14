@@ -15,7 +15,7 @@ NONE
 
 [en:]
 
-It is necessary to fill the field primary operation mode to declare 
+It is necessary to fill the field 'primary operation mode' to declare 
 the operation mode of the application, e.g. to enable the assignment 
 of criticality and priority.
 
@@ -31,7 +31,7 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 [de:]
 
-Das Feld vorwiegende Betriebsart ist zwingend zu befüllen, 
+Das Feld 'vorwiegende Betriebsart' ist zwingend zu befüllen, 
 um die Betriebsart der Anwendung bekannt zu geben, 
 z.B. für die Festlegung der Kritikalität und Priorität.
 
