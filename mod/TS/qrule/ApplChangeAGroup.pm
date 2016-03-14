@@ -6,11 +6,58 @@ package TS::qrule::ApplChangeAGroup;
 
 Checks if there is on an "installed/active" or "available" application
 a change approvergroup for technical side is defined.
-If there is no valid approvergroup defined, an error will be proceeded.
+If there is no valid approvergroup defined, an error will be procceeded.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Purpose: 
+Checks if a technical Change Approvergroup is defined on all applications 
+CI-State "installed/active" or "available". A data issue is created when 
+no valid Change Approvergroup is entered. 
+
+Hints: 
+Enter the Approvergroup which is to be used for Changes on this application 
+from the technical point of view. Generally, it is the Approvergroup of the 
+respective Business Team. If the Approvergroup was created in ServiceManager, 
+it is important to make sure it was marked for Export to AssetManager. 
+Otherwise it is not possible to enter the group, even though it might be 
+displayed in ServiceManager.
+
+The contact for Assignmentgroups in general is the TelekomIT SPOC:
+https://darwin.telekom.de/darwin/auth/base/user/ById/14526036310001
+
+If you have any questions please contact the Darwin Support: 
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+
+[de:]
+
+Zweck: 
+Prüft alle Anwendungen im Status 'installiert/aktiv' und 
+'verfügbar/in Projektierung', ob eine technische Change Approvergroup 
+definiert ist. Ein DataIssue wird erzeugt, wenn keine gültige 
+Change Approvergroup eingetragen ist.
+
+Hinweis: 
+Wählen Sie hier die Approvergroup, die bei Changes für diese Anwendung 
+aus technischer Sicht verwendet werden muss. Dies ist in der Regel 
+die Approvergroup des betreffenden Betriebsteams. Falls die Approvergroup 
+über ServiceManager angelegt wurde, ist es wichtig, dass diese dort für 
+den Export nach AssetManager markiert wurde. Ansonsten kann die Gruppe 
+nicht ausgewählt werden, obwohl diese u.U. in ServiceManager angezeigt wird. 
+
+Ansprechpartner für Assignmentgroups im Allgemeinen ist der SPOC TelekomIT:
+https://darwin.telekom.de/darwin/auth/base/user/ById/14526036310001
+
+Bei Fragen wenden Sie bitte an den DARWIN Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
 
 =cut
 #######################################################################
