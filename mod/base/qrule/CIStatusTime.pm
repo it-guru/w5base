@@ -4,17 +4,49 @@ package base::qrule::CIStatusTime;
 
 =head3 PURPOSE
 
-Checks if Config-Itmes with CI-Status field. A record will be viewed as
-invalid, if a item in status ...
- - reserved             (cistatusid=1) longer then 8 weeks
- - on order             (cistatusid=2) longer then 8 weeks
- - available/in project (cistatusid=3) longer then 12 weeks
- - inactiv/stored       (cistatusid=5) longer then 12 weeks
-... no be modified (the modification date will be the check referenz).
+Validates CI-Status of Config-Itmes. A record will be viewed as
+invalid, if an item in status ...
+ - reserved             (cistatusid=1) longer than 8 weeks
+ - on order             (cistatusid=2) longer than 8 weeks
+ - available/in project (cistatusid=3) longer than 12 weeks
+ - inactiv/stored       (cistatusid=5) longer than 12 weeks
+... is unmodified (the modification date will be the check reference).
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+It is checked, if Config-Items in the state 'reserved', 'on order', 
+'available/in project' or 'inactiv/stored' are unmodified 
+for quite some time.
+
+Check whether the current CI-State is correct and up-to-date. 
+If not, change the CI-State to the correct one. 
+If the CI-State is correct despite the elapsed time-period, 
+consider possibilities of updating the CI, i.e. by adding 
+a comment regarding the CI-State on the CI itself. 
+
+If you have any questions please contact the Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+[de:]
+
+Es wird geprüft, ob  Config-Items im CI-Status 'reserviert', 
+'bestellt/angefordert', 'verfügbar/in Projektierung' und 
+'zeitweise inaktiv' über einen längeren Zeitraum nicht mehr verändert wurden.
+
+Prüfen Sie, ob der eingetragene CI-Status richtig und aktuell ist. 
+Falls nicht, ändern Sie den CI-Status auf den korrekten Wert. 
+Falls der eingetragene CI-Status immer noch zutrifft, 
+aktualisieren Sie das CI, z.B. indem Sie eine Bemerkung 
+über den CI-Status hinzufügen.
+
+Bei Fragen wenden Sie sich bitte an den DARWIN Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 =cut
 #######################################################################
