@@ -4,20 +4,30 @@ package tsacinv::qrule::compareAppl;
 
 =head3 PURPOSE
 
-This qulaity rule compares a W5Base application to an AssetManager application
-and updates on demand nessasary fields.
-Unattended Imports are only done, if the field "Allow automatic interface
-updates" is set to "yes".
+This QualityRule compares a W5Base application and its AssetManager 
+counterpart and updates the defined fields if necessary. 
+Automatic imports are only done if the field 
+"Allow automatic interface updates" is set to "yes".
 
 =head3 IMPORTS
 
-From AssetManager the fields CO-Number, ApplicationID, Application Number,
-CurrentVersion, CHM Approvergroup, INM Assignmentgroup and Description 
-are imported. SeM and TSM are imported, if
-it was successfuly to import the relatied contacts.
-#If Mandator is "Extern" and "Allow automatic interface updates" is set to "yes",
-#there will be also the Name of the application, the databoss and the cistatus 
-#imported from AssetManager.
+The fields CO-Number, ApplicationID, Application Number, CurrentVersion, 
+CHM Approvergroup, INM Assignmentgroup and Description 
+are imported from AssetManager. The Fields SeM and TSM are only imported 
+if the import of the related contacts was successful.
+
+=head3 HINTS
+
+[en:]
+
+Ensure that the data are correct and up-to-date in both 
+Darwin and AssetManager, and are identical in both databases.
+
+[de:]
+
+Vergewissern Sie sich, dass die Daten in Darwin und AssetManager 
+richtig und aktuell sind und in beiden Datenbaken übereinstimmen.
+
 
 =cut
 #######################################################################
