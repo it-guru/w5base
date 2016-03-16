@@ -11,6 +11,29 @@ have a defined business team.
 
 NONE
 
+=head3 HINTS
+
+[en:]
+
+Please enter an active Business Team. A non-active Business Team can be 
+identified by a number in square brackets in the name of the group. 
+Usually a Business Team is the organisational team 
+of the technical solution manager (TSM).
+
+On any questions please contact the Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+[de:]
+
+Bitte hinterlegen Sie ein aktives/gültiges Betriebsteam. 
+Ein ungültiges Betriebsteam können Sie an einer Nummer in eckigen Klammern 
+im Namen erkennen. In der Regel ist das Betriebsteam das Team, 
+in dem sich der TSM organisatorisch befindet.
+
+Bei Fragen wenden Sie sich bitte an den Darwin Support:
+https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+
+
 =cut
 #######################################################################
 #  W5Base Framework
