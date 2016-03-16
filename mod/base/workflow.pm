@@ -21,6 +21,7 @@ use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
+use kernel::Field::DRange;
 use kernel::Field;
 use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
@@ -37,7 +38,7 @@ sub new
    return(@result) if (defined($result[0]) eq "InitERROR");
    $self->{Action}=getModuleObject($self->Config,"base::workflowaction");
    return(undef) if (!defined($self->{Action}));
-   $self->{use_distinct}=0;
+   $self->{use_distinct}=1;
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -102,6 +103,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'urcencyindex',
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'urgency index',
                 htmlwidth     =>'10px',
                 unit          =>'1-1000 calculated',
@@ -342,6 +344,49 @@ sub new
                 onRawValue    =>\&getEventDay,
                 label         =>'Event-End day',
                 depend        =>['eventend']),
+
+      new kernel::Field::DRange(
+                name          =>'range',
+                noselect      =>'1',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'state',
+                label         =>'Event time window',
+                depend        =>[qw(ranges rangem rangee)]),
+
+      new kernel::Field::Date(
+                name          =>'ranges',
+                noselect      =>'1',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'state',
+                label         =>'Range Start only',
+                dataobjattr   =>'wfrange.s'),
+
+      new kernel::Field::Date(
+                name          =>'rangem',
+                noselect      =>'1',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'state',
+                label         =>'Range middle',
+                dataobjattr   =>'wfrange.m'),
+
+      new kernel::Field::Date(
+                name          =>'rangee',
+                noselect      =>'1',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'state',
+                label         =>'Range End only',
+                dataobjattr   =>'wfrange.e'),
+
+
+
                                   
       new kernel::Field::Date(
                 name          =>'invoicedate',
@@ -833,6 +878,43 @@ sub ById
    $self->HtmlGoto("../Process",post=>{$idname=>$val});
    return();
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+
+   my ($worktable,$workdb)=$self->getWorktable();
+
+
+   if ($mode eq "select"){
+      my $rangefilter=0;
+      foreach my $filter (@filter){
+         if (ref($filter) eq "HASH" && 
+             in_array([keys(%$filter)],[qw(ranges rangem rangee)])){
+            $rangefilter++;
+         }
+         if (ref($filter) eq "ARRAY"){
+            foreach my $filter (@$filter){
+               if (ref($filter) eq "HASH" && 
+                  in_array([keys(%$filter)],[qw(ranges rangem rangee)])){
+                 $rangefilter++;
+               }
+            }
+         }
+      }
+      if ($rangefilter){
+         $worktable.=" join wfrange on wfhead.wfheadid=wfrange.wfheadid";
+      }
+   }
+
+
+
+   return($worktable);
+}
+
 
 sub HtmlStatSetList
 {
