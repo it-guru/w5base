@@ -4,13 +4,31 @@ package TS::qrule::AppDatabossOfSubIsService;
 
 =head3 PURPOSE
 
-This rule analysis an application with cistatusid<6, if there are
-sub Config-Items (like systems or assets) with a databoss of user
-type "service". If this is true, a dataissue will be produced.
+This rule analyses all applications 
+(except those in the CI-State "disposed of waste"), 
+whether there are sub-Config-Items (e.g. systems or assets) where the databoss 
+is a user of the type "service". If this is true, a DataIssue is created.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Check the sub-CIs (e.g. the systems and/or hardware) of your application 
+for those that have a Service-User entered as databoss. 
+Ensure that a regular User takes over the databoss role for these CIs 
+in place of the Service-User.
+
+[de:]
+
+Prüfen Sie die sub-CIs (z.B. Systeme, Assets), die an Ihrer Anwendung hängen, 
+ob dort ein Service-User als Datenverantwortlicher eingetragen ist. 
+Sorgen Sie dafür, dass ein normaler User die Datenverantwortung 
+für diese CIs übernimmt.
+
 
 =cut
 #######################################################################
