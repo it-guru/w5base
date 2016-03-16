@@ -372,6 +372,9 @@ sub getBackendName
 
    return(undef) if (!defined($self->{dataobjattr}));
    return(undef) if (ref($self->{dataobjattr}) eq "ARRAY");
+   if (($mode eq "select" || $mode eq "order") && $self->{noselect}){
+      return(undef);
+   }
    if ($mode eq "select"){
       $_=$db->DriverName();
       case: {

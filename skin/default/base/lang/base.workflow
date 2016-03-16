@@ -24,6 +24,7 @@
 'postponed until'=>{de=>'Zurückgestellt bis'},
 'Event-Start'=>{de=>'Ereignis Beginn'},
 'Event-End'=>{de=>'Ereignis Ende'},
+'Event time window'=>{de=>'Ereignis Zeitfenster'},
 'invoice date'=>{de=>'Faktura-Referenzzeitpunkt'},
 'Event-Start day'=>{de=>'Ereignis Beginn Tag'},
 'Event-End day'=>{de=>'Ereignis Ende Tag'},

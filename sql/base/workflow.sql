@@ -291,3 +291,15 @@ CREATE TABLE reportjob (
   srcload      datetime    default NULL,
   PRIMARY KEY (id), key(reportname),key(lastrun),UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE wfrange (
+  wfheadid bigint(20) NOT NULL,
+  s datetime default NULL,
+  m datetime default NULL,
+  e datetime default NULL,
+  wfclass varchar(30),
+  KEY wfheadid (wfheadid),
+  key startonly(s),
+  key endonly(e),
+  key middle(m),
+  FOREIGN KEY (wfheadid) REFERENCES wfhead (wfheadid) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

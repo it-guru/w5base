@@ -579,7 +579,6 @@ sub getHashList
    else{
       $self->SetCurrentView($self->getDefaultView());
    }
-
    my ($rec,$msg)=$self->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
