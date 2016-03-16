@@ -25,6 +25,7 @@ CREATE PROCEDURE insinterval(id bigint,s timestamp, e timestamp,c varchar(30))
 BEGIN
    declare thisDate timestamp;
    declare nextDate timestamp;
+   declare padDate timestamp;
    declare ndays decimal;
    set thisDate = s;
    delete from wfrange where wfheadid=id;
@@ -38,12 +39,21 @@ BEGIN
       select cast((UNIX_TIMESTAMP(e)-UNIX_TIMESTAMP(s))/60/60/24 as decimal) 
       into ndays; 
       if (ndays>0 AND ndays<1000) THEN
+         insert into wfrange (wfheadid,m,wfclass) values(id,s,c);
+         select concat_ws(' ',date(s), '12:00:00') into padDate;
+         if (s<padDate) THEN
+            insert into wfrange (wfheadid,m,wfclass) values(id,padDate,c);
+         END IF;
          repeat
             select timestampadd(DAY,1,thisDate) into nextDate;
-            insert into wfrange (wfheadid,m,wfclass) values(id,nextDate,c);
+            if (nextDate<e AND nextDate>s) THEN
+               select concat_ws(' ',date(nextDate), '12:00:00') into padDate;
+               insert into wfrange (wfheadid,m,wfclass) values(id,padDate,c);
+            END IF;
             set thisDate = nextDate;
-            until thisDate >= e
+            until thisDate > e
          end repeat;
+         insert into wfrange (wfheadid,m,wfclass) values(id,e,c);
       END IF;
    END IF;
 END; //
@@ -79,7 +89,7 @@ insert into wfhead (wfheadid,eventstart,eventend,wfclass)
 
 select distinct wfhead.wfheadid,wfhead.eventstart,wfhead.eventend 
 from wfrange join wfhead on wfrange.wfheadid=wfhead.wfheadid 
-where (wfrange.m>'2016-01-01 00:00:00' AND wfrange.m<'2016-01-31 00:00:00') i
+where (wfrange.m>'2016-01-01 00:00:00' AND wfrange.m<'2016-01-31 00:00:00') 
       OR (wfrange.e>'2016-01-31 00:00:00') 
       OR (wfrange.s<'2016-01-01 00:00:00');
 
