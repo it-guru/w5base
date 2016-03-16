@@ -4,13 +4,40 @@ package itil::qrule::ApplCO;
 
 =head3 PURPOSE
 
-Checks if there is an "installed/active" Costcenter is selected in
-every application with an CI-Status "installed/active" or "available".
-If there is no valid Costcenter defined, an error will be procceded.
+Checks whether a Costcenter in the CI-State 'installed/active' is entered 
+on every application in the CI-State 'installed/active' 
+or 'available/in project'. 
+A data issue is created when no valid Costcenter is entered.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+In the block 'Application-Informations' in the field 'Costcenter' must be
+entered a valid Costcenter.
+
+If a Costcenter is entered on an application and this DataIssue is still 
+present even after a QualityCheck, please make sure that the Costcenter 
+itself is available in Darwin. One way to do this is to click on the entered 
+Costcenter - when get a record not found error it means that the Costcenter 
+is not available in Darwin and has to be created manually. 
+
+[de:]
+
+Im Block 'Anwendung-Daten' muss im Feld 'Kontierungsobjekt' ein gültiges
+Kontierungsobjekt eingetragen sein.
+
+Falls das DataIssue nach dem Auslösen eines QualityChecks weiterbesteht,
+obwohl ein Kontierungsobjekt hinterlegt ist, vergewissern Sie sich, dass das 
+angegebene Kontierungsobjekt in Darwin angelegt ist. 
+Wenn Sie das Kontierungsobjekt anklicken und die Meldung 
+'Datensatz nicht gefunden' bekommen, ist das Kontierungsobjekt in Darwin nicht 
+vorhanden und muss manuell angelegt werden. 
+
 
 =cut
 #######################################################################
