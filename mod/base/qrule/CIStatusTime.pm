@@ -30,9 +30,6 @@ If the CI-State is correct despite the elapsed time-period,
 consider possibilities of updating the CI, i.e. by adding 
 a comment regarding the CI-State on the CI itself. 
 
-If you have any questions please contact the Darwin Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
-
 [de:]
 
 Es wird geprüft, ob  Config-Items im CI-Status 'reserviert', 
@@ -44,9 +41,6 @@ Falls nicht, ändern Sie den CI-Status auf den korrekten Wert.
 Falls der eingetragene CI-Status immer noch zutrifft, 
 aktualisieren Sie das CI, z.B. indem Sie eine Bemerkung 
 über den CI-Status hinzufügen.
-
-Bei Fragen wenden Sie sich bitte an den DARWIN Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 =cut
 #######################################################################
