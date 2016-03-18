@@ -28,6 +28,7 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
 
+   $self->{'searchable'}=0;
    $self->{'showcomm'} = 0 if !defined($self->{'showcomm'});
 
    return($self);
@@ -394,7 +395,25 @@ sub FormatedResult
    my $current=shift;
    my $FormatAs=shift;
 
-   return("FieldHandler-Formated");
+   my @files;
+   my $excl='!';
+   $excl="<font color=red><b>!</b></font>" if ($FormatAs=~m/^html/i);
+
+   foreach my $attachment (@{$current->{attachments}}) {
+      if (!$attachment->{isprivate}) {
+         push(@files,$attachment->{name});
+      }
+      else {
+         my $prirec=$self->getFileManagementObj->loadPrivacyAcl(
+                              $attachment->{parentobj},
+                              $attachment->{parentrefid});
+         if ($prirec->{rw} || $self->getParent->IsMemberOf("admin")){
+            push(@files,$attachment->{name}.$excl);
+         }
+      }
+   }
+
+   return(join(', ',@files));
 }
 
 sub RawValue
