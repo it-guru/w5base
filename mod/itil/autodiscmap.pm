@@ -137,7 +137,10 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","autoimport") if ($self->IsMemberOf("admin"));
+   if ($self->IsMemberOf("admin") || 
+       $self->IsMemberOf("w5base.softwaremgmt.admin")){
+      return("default","autoimport");
+   }
    return(undef);
 }
 
