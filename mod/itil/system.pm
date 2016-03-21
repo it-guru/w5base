@@ -1651,7 +1651,7 @@ sub getHtmlDetailPages
           $rec->{perf3url} ne ""){
          push(@l,"PerfDat"=>$self->T("Performance"));
       }
-      if ($self->IsMemberOf("w5base.softwaremgmt") ||
+      if ($self->IsMemberOf("w5base.softwaremgmt.read") ||
           $self->isAutoDiscManagementAllowed($rec)){
          my $id=Query->Param("id");
          if ($id ne ""){
