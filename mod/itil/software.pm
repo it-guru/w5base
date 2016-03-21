@@ -458,7 +458,8 @@ sub new
    );
    $self->setDefaultView(qw(name id cistatus mdate cdate));
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.software"],
+                         activator=>["admin","admin.itil.software",
+                                     "w5base.softwaremgmt.admin"],
                          uniquesize=>255};
    $self->{history}={
       update=>[
@@ -681,7 +682,7 @@ sub isWriteValid
    if (defined($rec) && $rec->{pclass} eq "MAIN"){
       push(@l,"options");
    }
-   if ($self->IsMemberOf("admin")){
+   if ($self->IsMemberOf(["admin","w5base.softwaremgmt.admin"])){
       push(@l,"pclass");
    }
    return(@l);

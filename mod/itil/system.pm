@@ -1651,7 +1651,8 @@ sub getHtmlDetailPages
           $rec->{perf3url} ne ""){
          push(@l,"PerfDat"=>$self->T("Performance"));
       }
-      if ($self->isAutoDiscManagementAllowed($rec)){
+      if ($self->IsMemberOf("w5base.softwaremgmt") ||
+          $self->isAutoDiscManagementAllowed($rec)){
          my $id=Query->Param("id");
          if ($id ne ""){
             my $ad=getModuleObject($self->Config,'itil::autodiscrec');
