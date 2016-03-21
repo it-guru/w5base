@@ -4,9 +4,8 @@ package base::qrule::ContactRights;
 
 =head3 PURPOSE
 
-Checks if there is an "installed/active" CO-Number selected in
-every application with CI-Status "installed/active" or "available".
-If there is no valid CO-Number defined, an error will be procceeded.
+Checks if there at least one contact with rule 'write' is documented
+beside the databoss.
 
 =head3 IMPORTS
 
