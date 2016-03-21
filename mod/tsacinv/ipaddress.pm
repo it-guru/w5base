@@ -135,6 +135,12 @@ sub new
                 uppersearch   =>1),
 
       new kernel::Field::Text(
+                name          =>'type',
+                label         =>'Type',
+                ignorecase    =>1,
+                dataobjattr   =>'amnetworkcard.type'),
+
+      new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
                 dataobjattr   =>'amnetworkcard.description'),
