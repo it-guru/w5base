@@ -1478,6 +1478,14 @@ sub InvalidateCache
    }
 }
 
+sub isUploadValid  
+{
+   my $self=shift;
+   return(0) if (!$self->IsMemberOf("admin"));
+   return(1);
+}
+
+
 
 sub isViewValid
 {
