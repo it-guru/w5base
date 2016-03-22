@@ -248,28 +248,40 @@ sub new
                 depend        =>['os_base_setup_color'],
                 background    =>\&getTCCbackground,
                 ignorecase    =>1,
-                dataobjattr   =>'OS_BASE_SETUP'),
+                dataobjattr   =>"(case ".
+                    "when lower(OS_NAME) like '%windows%' then OS_NAME ".
+                    "else OS_BASE_SETUP ".
+                    "end)"),
 
       new kernel::Field::Text(
                 name          =>'os_base_setup_check',
                 label         =>'OS Base-Setup: CheckID',
                 group         =>['patch'],
                 htmldetail    =>0,
-                dataobjattr   =>'CHECK_OS'),
+                dataobjattr   =>"(case ".
+                    "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
+                    "else CHECK_ROADMAP ".
+                    "end)"),
 
       new kernel::Field::Text(
                 name          =>'os_base_setup_state',
                 label         =>'OS Base-Setup: State',
                 group         =>['patch'],
                 htmldetail    =>0,
-                dataobjattr   =>getTCCStateSQL('CHECK_OS')),
+                dataobjattr   =>getTCCStateSQL("(case ".
+                    "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
+                    "else CHECK_ROADMAP ".
+                    "end)")),
 
       new kernel::Field::Text(
                 name          =>'os_base_setup_color',
                 label         =>'OS Base-Setup: Color',
                 group         =>['patch'],
                 htmldetail    =>0,
-                dataobjattr   =>getTCCColorSQL('CHECK_OS')),
+                dataobjattr   =>getTCCColorSQL("(case ".
+                    "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
+                    "else CHECK_ROADMAP ".
+                    "end)")),
 
 
       new kernel::Field::Text(
