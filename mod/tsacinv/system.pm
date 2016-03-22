@@ -488,7 +488,7 @@ sub new
                 group         =>'ipaddresses',
                 vjointo       =>'tsacinv::ipaddress',
                 vjoinon       =>['systemid'=>'systemid'],
-                vjoindisp     =>[qw(fullname description)],
+                vjoindisp     =>[qw(fullname description type)],
                 vjoininhash   =>[qw(ipaddress ipv4address ipv6address 
                                     description dnsname)]),
 
