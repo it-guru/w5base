@@ -57,13 +57,11 @@ sub qcheckRecord
    my $autocorrect=$checksession->{autocorrect};
 
    my $businessteam=$rec->{businessteam};
-printf STDERR ("fifi $businessteam\n");
    if ($businessteam ne "" &&
        !($businessteam=~m/^DTAG\.GHQ\.VTS\.TSI\.ITDiv\.GITO\.SAPS\.{0,1}/i)){
       # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14556937410001
       return(undef); 
    }
-printf STDERR ("fifi x $rec->{opm}\n");
    return($self->SUPER::qcheckRecord($dataobj,$rec,$checksession))
 }
 

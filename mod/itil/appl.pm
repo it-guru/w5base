@@ -391,7 +391,9 @@ sub new
                 vjointo       =>'itil::swinstance',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>['fullname','swnature','is_dbs','is_mw']),
+                vjoindisp     =>['fullname','swnature','is_dbs','is_mw'],
+                vjoininhash   =>['fullname','swnature','is_dbs',
+                                 'is_mw','cistatusid']),
 
       new kernel::Field::Number(
                 name          =>'swinstancecount',

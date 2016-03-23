@@ -97,6 +97,7 @@ sub qcheckRecord
    my $urlswi=0;
    my @needed=qw(Apache SunONE IIS OpenLDAP LDAP-Server);
    foreach my $swi (@{$rec->{swinstances}}){
+      next if ($swi->{cistatusid}!=4);
       if (in_array(\@needed,$swi->{swnature})){
          $urlswi++;
       }
