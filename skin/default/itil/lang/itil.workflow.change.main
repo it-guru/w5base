@@ -1,11 +1,13 @@
-'notifyall'=>{de=>'Change-Benachrichtigung an direkte Kontakte und Schnittstellenpartner',
-              en=>'Change notification of direct contacts and interface partner'},
-'notifydirect'=>{de=>'Change-Benachrichtigung nur an direkte Kontakte',
-                 en=>'Change notification of direct contacts only'},
+'notifyall'=>{de=>'Benachrichtigung an direkte Kontakte und alle Schnittstellen',
+              en=>'Notification of direct contacts and all interfaces'},
+'notifycritical'=>{de=>'Benachrichtigung an direkte Kontakte und kritische Schnittstellen',
+              en=>'Notification of direct contacts and critical interfaces'},
+'notifydirect'=>{de=>'Benachrichtigung an direkte Kontakte',
+                 en=>'Notification of direct contacts'},
 'helpnotifyall'=>{
    de=>"Mail-Benachrichtigung an".
        "<ul>".
-        "<li>TSM und TSM-Vertreter</li>".
+        "<li>TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
         "<li>Alle Schnittstellenpartner der direkt betroffenen Anwendungen</li>".
         "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
             "zu direkt betroffenen Anwendungen bestehen</li>".
@@ -13,9 +15,27 @@
        "</ul>",
    en=>"Mail notification to".
        "<ul>".
-        "<li>TSM and TSM deputies</li>".
+        "<li>TSM and TSM deputies of direct affected applications</li>".
         "<li>All interface partner of direct affected applications</li>".
         "<li>Inteface partner with critical interfaces on their part ".
+            "to direct affected applications".
+        "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+       "</ul>"
+},
+'helpnotifycritical'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
+        "<li>Alle kritischen Schnittstellenpartner der direkt betroffenen Anwendungen</li>".
+        "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
+            "zu direkt betroffenen Anwendungen bestehen</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>TSM and TSM deputies of direct affected applications</li>".
+        "<li>All critical interface partner of direct affected applications</li>".
+        "<li>Interface partner with critical interfaces on their part ".
             "to direct affected applications".
         "<li>Subscriber of InfoAbo 'Changenotification'</li>".
        "</ul>"
@@ -23,12 +43,12 @@
 'helpnotifydirect'=>{
    de=>"Mail-Benachrichtigung an".
        "<ul>".
-        "<li>TSM und TSM-Vertreter</li>".
+        "<li>TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
         "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
        "</ul>",
    en=>"Mail notification to".
        "<ul>".
-        "<li>TSM and TSM deputies</li>".
+        "<li>TSM and TSM deputies of direct affected applications</li>".
         "<li>Subscriber of InfoAbo 'Changebenotification'</li>".
        "</ul>"
 },

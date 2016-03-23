@@ -196,7 +196,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 sub getNotifyDestinations
 {
    my $self=shift;
-   my $mode=shift;    # "direct" | "all"
+   my $mode=shift;    # direct|critical|all
    my $WfRec=shift;
    my $emailto=shift;
    my $emailcc=shift;
@@ -212,25 +212,31 @@ sub getNotifyDestinations
    $appl->SetFilter({id=>$applid});
    my @fl=qw(tsmid tsm2id);
    my @ifid;
+
    foreach my $rec ($appl->getHashList(@fl)){
       push(@tobyfunc,$rec->{tsmid})  if ($rec->{tsmid}>0);
       push(@ccbyfunc,$rec->{tsm2id}) if ($rec->{tsm2id}>0);
    }
-   if ($mode eq "all"){
+
+   if ($mode ne "direct"){
       my $aa=getModuleObject($self->Config,"itil::lnkapplappl");
 
-      # all interface appls of prim. affected applications
+      # interface appls of prim. affected applications
       my $aaflt=[{fromapplid=>$applid,
                   cistatusid=>[4],
                   toapplcistatus=>[3,4,5]}];
       $aa->SetFilter($aaflt);
-      foreach my $aarec ($aa->getHashList(qw(toapplid))){
+      foreach my $aarec ($aa->getHashList(qw(toapplid contype))){
+         next if ($mode eq "critical" &&
+                  ($aarec->{contype}==4 ||
+                   $aarec->{contype}==5 ||
+                   $aarec->{contype}==3));   # uncritical  communications
          if (!in_array($applid,$aarec->{toapplid})){
             push(@ifid,$aarec->{toapplid});
          }
       }
 
-      # all interface appls with critical interface
+      # interface appls with critical interface
       # to prim. affected applications on its side
       $aaflt=[{toapplid=>$applid,
                cistatusid=>[4],
@@ -246,17 +252,18 @@ sub getNotifyDestinations
             push(@ifid,$aarec->{fromapplid});        
          }
       }
-   }
-   if ($mode eq "all" && $#ifid!=-1){
 
-      $appl->ResetFilter();
-      $appl->SetFilter({id=>\@ifid,cistatusid=>"<=4"});
-      foreach my $rec ($appl->getHashList(@fl,qw(name id))){
-         $ifappl->{$rec->{id}}=$rec->{name};
-         push(@tobyfunc,$rec->{tsmid})  if ($rec->{tsmid}>0);
-         push(@ccbyfunc,$rec->{tsm2id}) if ($rec->{tsm2id}>0);
+      if ($#ifid!=-1) {
+         $appl->ResetFilter();
+         $appl->SetFilter({id=>\@ifid,cistatusid=>"<=4"});
+         foreach my $rec ($appl->getHashList(@fl,qw(name id))){
+            $ifappl->{$rec->{id}}=$rec->{name};
+            push(@tobyfunc,$rec->{tsmid})  if ($rec->{tsmid}>0);
+            push(@ccbyfunc,$rec->{tsm2id}) if ($rec->{tsm2id}>0);
+         }
       }
    }
+
    $ia->LoadTargets($emailto,'*::appl',\'changenotify',$applid);
    $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVchangeinfobyfunction',
                              '100000004',\@tobyfunc,default=>1);
@@ -314,6 +321,9 @@ sub getPosibleActions
    if (defined($WfRec->{affectedapplicationid})) {
       if ($self->notifyValid($WfRec,'all')) {
          push(@l,'chmnotifyall');
+      }
+      if ($self->notifyValid($WfRec,'critical')) {
+         push(@l,'chmnotifycritical');
       }
       if ($self->notifyValid($WfRec,'direct')) {
          push(@l,'chmnotifydirect');
@@ -516,7 +526,7 @@ sub generateWorkspacePages
    }
    if (grep(/^chmnotifyall$/,@$actions)) {
       $$selopt.='<option value="chmnotifyall">'.
-                    $self->T('notifyall',$self->Self).
+                    $self->T('notifyall','itil::workflow::change::main').
                 "</option>\n";
       $d="<div class=Question><table border=0>".
            "<tr><td>".$self->T('helpnotifyall',$self->Self)."</td></tr>".
@@ -525,12 +535,23 @@ sub generateWorkspacePages
       $$divset.='<div id=OPchmnotifyall data-visiblebuttons="NextStep"'.
                 " class=\"$class\">$d</div>";
    }
-   if (grep(/^chmnotifydirect$/,@$actions)) {
-      $$selopt.='<option value="chmnotifydirect">'.
-                    $self->T('notifydirect',$self->Self).
+   if (grep(/^chmnotifycritical$/,@$actions)) {
+      $$selopt.='<option value="chmnotifycritical">'.
+                    $self->T('notifycritical','itil::workflow::change::main').
                 "</option>\n";
       $d="<div class=Question><table border=0>".
-           "<tr><td>".$self->T("helpnotifydirect")."</td></tr>".
+           "<tr><td>".$self->T('helpnotifycritical',$self->Self)."</td></tr>".
+          "</table></div>";
+
+      $$divset.='<div id=OPchmnotifycritical data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+   if (grep(/^chmnotifydirect$/,@$actions)) {
+      $$selopt.='<option value="chmnotifydirect">'.
+                    $self->T('notifydirect','itil::workflow::change::main').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifydirect",$self->Self)."</td></tr>".
           "</table></div>";
 
       $$divset.='<div id=OPchmnotifydirect data-visiblebuttons="NextStep"'.
@@ -583,10 +604,12 @@ sub Process
    my $op=Query->Param('OP');
 
    if ($action eq "NextStep") {
-      if (($op eq "chmnotifyall" || $op eq "chmnotifydirect") &&
-          defined($WfRec)) {
-         Query->Param("PublishMode"=>"all")    if $op eq "chmnotifyall";
-         Query->Param("PublishMode"=>"direct") if $op eq "chmnotifydirect";
+      if (($op eq "chmnotifyall"      || 
+           $op eq "chmnotifycritical" || 
+           $op eq "chmnotifydirect") && defined($WfRec)) {
+         Query->Param("PublishMode"=>"all")      if $op eq "chmnotifyall";
+         Query->Param("PublishMode"=>"critical") if $op eq "chmnotifycritical";
+         Query->Param("PublishMode"=>"direct")   if $op eq "chmnotifydirect";
       }
    }
 

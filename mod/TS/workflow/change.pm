@@ -76,7 +76,7 @@ sub getPosibleActions
       }
 
       my @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
-                         $_->{comments}=~/^Approval request sent$/}
+                         $_->{comments}=~/^Approval request sent/}
                          @{$WfRec->{shortactionlog}});
 
       # for compatibility with older notifications
@@ -87,18 +87,24 @@ sub getPosibleActions
       }
 
       if ($#notifies==-1) {
-         if ((($approvalstate eq 'pending' ||
-               $approvalstate eq 'denied') &&
-              $self->chmAuthority($WfRec) eq 'TIT') ||
-             $self->chmAuthority($WfRec) ne 'TIT') {
+         my $chmmgr=$self->chmAuthority($WfRec);
+
+         if (($approvalstate eq 'pending' ||
+              $approvalstate eq 'denied') && $chmmgr eq 'TIT') {
             push(@l,'chmnotifyapprove');
+         }
+
+         if ($chmmgr ne 'TIT') {
+            push(@l,qw(chmnotifyapproveall
+                       chmnotifyapprovecritical
+                       chmnotifyapprovedirect));
          }
       }
       else {
          if (($approvalstate eq 'pending' ||
               $approvalstate eq 'denied')) {
             @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
-                            ($_->{comments}=~/^Approval request sent$/ ||
+                            ($_->{comments}=~/^Approval request sent/ ||
                              $_->{comments}=~/^Approval reminder sent$/)}
                             @{$WfRec->{shortactionlog}});
             if ($#stateChg>0 &&
@@ -112,7 +118,9 @@ sub getPosibleActions
       }
    }
 
-   push(@l,'chmnotifyreject');
+   push(@l,qw(chmnotifyrejectdirect
+              chmnotifyrejectcritical
+              chmnotifyrejectall));
    return(@l);
 }
 
@@ -180,13 +188,13 @@ sub getStepByShortname
 sub getNotifyDestinations
 {
    my $self=shift;
-   my $mode=shift;    # direct|all|approve
+   my $mode=shift;    # direct|critical|all|approve
    my $WfRec=shift;
    my $emailto=shift;
    my $emailcc=shift;
    my $ifappl=shift;
 
-   if ($mode eq 'direct' || $mode eq 'all') {
+   if ($mode eq 'direct' || $mode eq 'critical' || $mode eq 'all') {
       $self->SUPER::getNotifyDestinations($mode,$WfRec,$emailto,$emailcc,$ifappl);
  
       my $ia=getModuleObject($self->Config,"base::infoabo");
@@ -256,7 +264,6 @@ sub notifyValid
    my $WfRec=shift;
    my $mode=shift;
 
-   return(0) if ($mode eq 'direct');
    my $phase=$WfRec->{additional}{ServiceManagerPhase}[0];
 
    if ($phase=~m/^30/) {
@@ -423,6 +430,7 @@ sub generateMailSet
    $ENV{HTTP_FORCE_TZ}='CET';
    my %d;
    my $notifymode=Query->Param('NotifyMode');
+   my $publishmode=Query->Param('PublishMode');
    my $pso=$self->getPSO($WfRec);
 
    foreach my $lang (qw(de en)) {
@@ -518,11 +526,11 @@ sub generateMailSet
          }
 
          $chminfo=$self->getParsedTemplate(
-                            'tmpl/ext.changenotify.announce.TIT',
-                            {skinbase=>'TS',
-                             static=>{pending=>$pendingtxt,
-                                      note=>$note}
-                            });
+                     'tmpl/ext.changenotify.announce.'.$publishmode.'.TIT',
+                     {skinbase=>'TS',
+                      static=>{pending=>$pendingtxt,
+                               note=>$note}
+                     });
       }
       
       if ($notifymode eq 'approve') {
@@ -536,7 +544,7 @@ sub generateMailSet
             $tmpl='tmpl/ext.changenotify.approve.'.$authority;
          }
          else {
-            $tmpl='tmpl/ext.changenotify.approve';
+            $tmpl='tmpl/ext.changenotify.approve.'.$publishmode;
          }
 
          if (ref($pendinggrps) ne 'ARRAY') {
@@ -584,7 +592,7 @@ sub generateMailSet
          }
 
          my @log=grep {$_->{name} eq 'sendchangeinfo' &&
-                       ($_->{comments} eq 'Approval request sent' ||
+                       ($_->{comments}=~m/^Approval request sent/ ||
                         $_->{comments} eq 'Approval reminder sent'||
                         $_->{comments}=~m/^\d+\. notification$/)
                       } @{$WfRec->{shortactionlog}};
@@ -693,21 +701,49 @@ sub generateWorkspacePages
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt,$height);
 
    if (grep(/^chmnotifyapprove$/,@$actions)) {
-      my $help;
-      if ($self->getParent->chmAuthority($WfRec) eq 'TIT') {
-         $help=$self->T("helpnotifyapprove");
-      }
-      else {
-         $help=$self->T("helpnotifyall");
-      }
-
       $$selopt.='<option value="chmnotifyapprove">'.
                     $self->T('notifyapprove').
                 "</option>\n";
       $d="<div class=Question><table border=0>".
-           "<tr><td>$help</td></tr>".
+           "<tr><td>".$self->T("helpnotifyapprove")."</td></tr>".
           "</table></div>";
       $$divset.='<div id=OPchmnotifyapprove '.
+                     'data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+
+   if (grep(/^chmnotifyapproveall$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyapproveall">'.
+                    $self->T('notifyapproveall').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifyall")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyapproveall '.
+                     'data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+
+   if (grep(/^chmnotifyapprovecritical$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyapprovecritical">'.
+                    $self->T('notifyapprovecritical').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifycritical")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyapprovecritical '.
+                     'data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+
+   if (grep(/^chmnotifyapprovedirect$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyapprovedirect">'.
+                    $self->T('notifyapprovedirect').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifydirect")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyapprovedirect '.
                      'data-visiblebuttons="NextStep"'.
                 " class=\"$class\">$d</div>";
    }
@@ -736,14 +772,39 @@ sub generateWorkspacePages
                 " class=\"$class\">$d</div>";
    }
 
-   if (grep(/^chmnotifyreject$/,@$actions)) {
-      $$selopt.='<option value="chmnotifyreject">'.
-                    $self->T('notifyreject').
+   if (grep(/^chmnotifyrejectall$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyrejectall">'.
+                    $self->T('notifyrejectall').
                 "</option>\n";
       $d="<div class=Question><table border=0>".
            "<tr><td>".$self->T("helpnotifyall")."</td></tr>".
           "</table></div>";
-      $$divset.='<div id=OPchmnotifyreject data-visiblebuttons="NextStep"'.
+      $$divset.='<div id=OPchmnotifyrejectall'.
+                ' data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+
+   if (grep(/^chmnotifyrejectcritical$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyrejectcritical">'.
+                    $self->T('notifyrejectcritical').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifycritical")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyrejectcritical'.
+                ' data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
+
+   if (grep(/^chmnotifyrejectdirect$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyrejectdirect">'.
+                    $self->T('notifyrejectdirect').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifydirect")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyrejectdirect'.
+                ' data-visiblebuttons="NextStep"'.
                 " class=\"$class\">$d</div>";
    }
 }
@@ -773,13 +834,28 @@ sub Process
          Query->Param("PublishMode"=>"all");
          Query->Param("NotifyMode" =>"announce");
       }
+      if ($op eq "chmnotifycritical") {
+         Query->Param("PublishMode"=>"critical");
+         Query->Param("NotifyMode" =>"announce");
+      }
+      if ($op eq "chmnotifydirect") {
+         Query->Param("PublishMode"=>"direct");
+         Query->Param("NotifyMode" =>"announce");
+      }
       if ($op eq "chmnotifyapprove") {
-         if ($self->getParent->chmAuthority($WfRec) eq 'TIT' ) {
-            Query->Param("PublishMode"=>"approve");
-         }
-         else {
-            Query->Param("PublishMode"=>"all");
-         }
+         Query->Param("PublishMode"=>"approve");
+         Query->Param("NotifyMode" =>"approve");
+      }
+      if ($op eq "chmnotifyapproveall") {
+         Query->Param("PublishMode"=>"all");
+         Query->Param("NotifyMode" =>"approve");
+      }
+      if ($op eq "chmnotifyapprovecritical") {
+         Query->Param("PublishMode"=>"critical");
+         Query->Param("NotifyMode" =>"approve");
+      }
+      if ($op eq "chmnotifyapprovedirect") {
+         Query->Param("PublishMode"=>"direct");
          Query->Param("NotifyMode" =>"approve");
       }
       if ($op eq "chmnotifyremind") {
@@ -790,8 +866,16 @@ sub Process
          Query->Param("PublishMode"=>"approve");
          Query->Param("NotifyMode" =>"reschedule");
       }
-      if ($op eq "chmnotifyreject") {
+      if ($op eq "chmnotifyrejectall") {
          Query->Param("PublishMode"=>"all");
+         Query->Param("NotifyMode" =>"reject");
+      }
+      if ($op eq "chmnotifyrejectcritical") {
+         Query->Param("PublishMode"=>"critical");
+         Query->Param("NotifyMode" =>"reject");
+      }
+      if ($op eq "chmnotifyrejectdirect") {
+         Query->Param("PublishMode"=>"direct");
          Query->Param("NotifyMode" =>"reject");
       }
    }
@@ -1033,11 +1117,24 @@ sub Process
                                                 $newmailrec,$action)){
             my $NotifyMode=Query->Param('NotifyMode');
             my $comment='';
-            $comment='Announcement sent'      if ($NotifyMode eq 'announce');
-            $comment='Approval request sent'  if ($NotifyMode eq 'approve');
+
+            if ($NotifyMode eq 'announce') {
+               $comment='Announcement sent';
+               $comment.=" (".Query->Param('PublishMode').")";
+            }
+
+            if ($NotifyMode eq 'approve') {
+               $comment='Approval request sent';
+               $comment.=" (".Query->Param('PublishMode').")";
+            }
+
+            if ($NotifyMode eq 'reject') {
+               $comment='Change rejection sent';
+               $comment.=" (".Query->Param('PublishMode').")";
+            }
+
             $comment='Approval reminder sent' if ($NotifyMode eq 'remind');
             $comment='Rescheduled info sent'  if ($NotifyMode eq 'reschedule');
-            $comment='Change rejection sent'  if ($NotifyMode eq 'reject');
 
             if ($wf->Action->StoreRecord(
                 $WfRec->{id},"sendchangeinfo",

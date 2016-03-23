@@ -1,9 +1,17 @@
-'notifyall'=>{de=>'Change-Ankündigung an direkte Kontakte und Schnittstellenpartner',
-              en=>'Change announcement to direct contacts and interface partner'},
-'notifyreject'=>{de=>'Change-Absage an direkte Kontakte und Schnittstellenpartner',
-                 en=>'Change rejection to direct contacts and interface partner'},
-'notifyapprove'=>{de=>"Aufforderung zum 'approve' versenden",
-                  en=>'Send approve request'},
+'notifyrejectall'=>{de=>'Absage an direkte Kontakte und alle Schnittstellen',
+                 en=>'Rejection to direct contacts and all interfaces'},
+'notifyrejectcritical'=>{de=>'Absage an direkte Kontakte und kritische Schnittstellen',
+                 en=>'Rejection to direct contacts and critical interfaces'},
+'notifyrejectdirect'=>{de=>'Absage an direkte Kontakte',
+                 en=>'Rejection to direct contacts'},
+'notifyapprove'=>{de=>"Approve-Aufforderung an offene Approver-Gruppen",
+                  en=>'Approve request to pending approver groups'},
+'notifyapproveall'=>{de=>"Approve-Aufforderung an direkte Kontakte und alle Schnittstellen",
+                     en=>'Approve request to direct contacts and all interfaces'},
+'notifyapprovecritical'=>{de=>"Approve-Aufforderung an direkte Kontakte und kritische Schnittstellen",
+                          en=>'Approve request to direct contacts and critical interfaces'},
+'notifyapprovedirect'=>{de=>"Approve-Aufforderung an direkte Kontakte",
+                          en=>'Approve request to direct contacts'},
 'notifyremind'=>{de=>"Erinnerung an 'approve' versenden",
                  en=>'Send reminder of approve'},
 'notifyreschedule'=>{de=>"Aufforderung zum 'approve' nach Planzeitverschiebung versenden",
@@ -11,7 +19,7 @@
 'helpnotifyall'=>{
    de=>"Mail-Benachrichtigung an".
        "<ul>".
-        "<li>AM, TSM und TSM-Vertreter</li>".
+        "<li>AM, TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
         "<li>Alle Schnittstellenpartner der direkt betroffenen Anwendungen</li>".
         "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
             "zu direkt betroffenen Anwendungen bestehen</li>".
@@ -19,13 +27,44 @@
        "</ul>",
    en=>"Mail notification to".
        "<ul>".
-        "<li>AM, TSM and TSM deputies</li>".
+        "<li>AM, TSM and TSM deputies of direct affected applications</li>".
         "<li>All interface partner of direct affected applications</li>".
         "<li>Inteface partner with critical interfaces on their part ".
             "to direct affected applications".
         "<li>Subscriber of InfoAbo 'Changenotification'</li>".
        "</ul>"
 },
+'helpnotifycritical'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>AM, TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
+        "<li>Alle kritischen Schnittstellenpartner der direkt betroffenen Anwendungen</li>".
+        "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
+            "zu direkt betroffenen Anwendungen bestehen</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>AM, TSM and TSM deputies of direct affected applications</li>".
+        "<li>All critical interface partner of direct affected applications</li>".
+        "<li>Interface partner with critical interfaces on their part ".
+            "to direct affected applications".
+        "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+       "</ul>"
+},
+'helpnotifydirect'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>AM, TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>AM, TSM and TSM deputies of direct affected applications</li>".
+        "<li>Subscriber of InfoAbo 'Changebenotification'</li>".
+       "</ul>"
+},
+
 'helpnotifyapprove'=>{
    de=>"Mail-Benachrichtigung an".
        "<ul>".
