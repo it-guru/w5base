@@ -71,7 +71,7 @@ sub qcheckRecord
       $par->SetFilter({systemid=>\$rec->{systemid}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
-      if ($parrec->{assignmentgroup}="CS.DPS.DE.MSY" ||
+      if ($parrec->{assignmentgroup} eq "CS.DPS.DE.MSY" ||
           ($parrec->{assignmentgroup}=~m/^CS\.DPS\.DE\.MSY\..*$/)){
          # CS.DPS.DE.MSY Pflegt das SOX Flag in AM nicht
          # siehe: https://darwin.telekom.de/darwin/auth/base/workflow/ById/14072395420001
