@@ -333,6 +333,12 @@ sub ById
    return();
 }
 
+sub DataObjByIdHandler
+{
+   my $self=shift;
+   return($self->Self());
+}
+
 sub allowAnonymousByIdAccess
 {
    my $self=shift;
@@ -1056,6 +1062,7 @@ EOF
               "name=\"Result\" src=\"$welcomeurl\"></iframe>";
    print("<tr><td>$iframe</td></tr></table>");
 
+   my $selfname=$self->Self();
    my $persistentVari=
       "<input type=\"hidden\" name=\"UseLimit\" value=\"10\">".
       "<input type=\"hidden\" name=\"UseLimitStart\" value=\"0\">".
@@ -1063,7 +1070,7 @@ EOF
       "<input type=\"hidden\" name=\"BookmarkName\" value=\"$BookmarkName\">".
       "<input type=\"hidden\" name=\"CurrentView\" value=\"$CurrentView\">".
       "<input type=\"hidden\" name=\"ForceOrder\" value=\"$ForceOrder\">".
-      "<input type=\"hidden\" name=\"DataObj\" value=\"".$self->Self().\">";
+      "<input type=\"hidden\" name=\"DataObj\" value=\".$selfname.\">";
 
    print($persistentVari);
    print($self->HtmlBottom(body=>1,form=>1));

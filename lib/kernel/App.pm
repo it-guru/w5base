@@ -1176,6 +1176,16 @@ sub PreParseTimeExpression
          $f=sprintf("%04d/%02d",$Y,$M);
       }
    }
+   elsif (my ($y1,$m1,$d1,$y2,$m2,$d2)=
+          $val=~m/^\((\d{4})-(\d{2})-(\d{2}):(\d{4})-(\d{2})-(\d{2})\)$/gi){
+      #my ($syear,$smon,$sday);
+      #eval('($syear,$smon,$sday)=Monday_of_Week($W,$Y);');
+      if ($@ eq ""){
+         $val="\">=$y1-$m1-$d1 00:00:00\" AND ".
+              "\"<=$y2-$m2-$d2 23:59:59\"";
+         #$f=sprintf("%04d/CW%02d",$Y,$W);
+      }
+   }
    elsif (my ($Y,$W)=$val=~m/^\((\d+)[CK]W(\d+)\)$/gi){
       my ($syear,$smon,$sday);
       eval('($syear,$smon,$sday)=Monday_of_Week($W,$Y);');

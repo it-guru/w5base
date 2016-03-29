@@ -25,6 +25,7 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
 use base::lib::RightsOverview;
+use HTML::TreeGrid;
 @ISA=qw(kernel::App::Web::HierarchicalList kernel::DataObj::DB 
         kernel::CIStatusTools base::lib::RightsOverview);
 
@@ -438,7 +439,7 @@ sub getValidWebFunctions
    my $self=shift;
 
    return($self->SUPER::getValidWebFunctions(@_),"TeamView","TreeCreate",
-         "RightsOverview","RightsOverviewLoader","view");
+         "RightsOverview","RightsOverviewLoader","view","TreeView");
 }
 
 sub view
@@ -474,7 +475,8 @@ sub getHtmlDetailPages
 
    return($self->SUPER::getHtmlDetailPages($p,$rec),
           "TView"=>$self->T("Team View"),
-          "RView"=>$self->T("Rights overview"));
+          "RView"=>$self->T("Rights overview"),
+          "OView"=>$self->T("Organisation"));
 }
 
 sub getHtmlDetailPageContent
@@ -482,6 +484,7 @@ sub getHtmlDetailPageContent
    my $self=shift;
    my ($p,$rec)=@_;
    return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView"&&
+                                                               $p ne "OView"&&
                                                                $p ne "RView");
    my $page;
    my $idname=$self->IdField->Name();
@@ -501,6 +504,18 @@ sub getHtmlDetailPageContent
       $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
             "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
             "src=\"TeamView?$urlparam\"></iframe>";
+   }
+   if ($p eq "OView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" frameborder=\"0\" ".
+            "class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"TreeView?$urlparam\"></iframe>";
    }
    if ($p eq "RView"){
       Query->Param("$idname"=>$idval);
@@ -905,6 +920,231 @@ sub getParentGroupIdByType
 
 }
 
+
+
+sub TreeView
+{
+   my $self=shift;
+   my $g=new HTML::TreeGrid(
+      fullpage=>0,
+      grid_minwidth=>600,
+      entity_color=>'#e0e0e0',
+      label=>'',
+   );
+
+
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           title=>"Org:".$rec->{name},
+                           js=>['toolbox.js'],
+                           IEedge=>1,
+                           body=>1,
+                           style=>['default.css','work.css',
+                                   'kernel.App.Web.css',
+                                   'kernel.App.Web.DetailPage.css']);
+   print(<<EOF);
+<script language="JavaScript">
+function setTitle()
+{
+   parent.document.title=window.document.title;
+}
+addEvent(window, "load", setTitle);
+</script>
+EOF
+   if (defined($rec)){
+      my %gboss;
+      my @parents;
+      my @childs;
+      my $parent=$rec->{parentid};
+      $gboss{$rec->{grpid}}={};
+      while($parent ne ""){
+         $gboss{$parent}={};
+         $self->ResetFilter();
+         $self->SecureSetFilter({grpid=>\$parent});
+         my ($rec,$msg)=$self->getOnlyFirst(qw(grpid name parentid name
+                                               fullname description));
+         if (defined($rec)){
+            unshift(@parents,$rec);
+            $parent=$rec->{parentid};
+         }
+         else{
+            $parent=undef;
+         }
+      }
+      $self->ResetFilter();
+      $self->SecureSetFilter({parentid=>\$rec->{grpid},'cistatusid'=>"<6"});
+      @childs=$self->getHashList(qw(grpid name parentid fullname description));
+
+      #######################################################################
+      my %hiddenchilds;
+      my @hiddencheck;
+      foreach my $crec (@childs){
+         if ($crec->{grpid} ne ""){
+            $gboss{$crec->{grpid}}={};
+            push(@hiddencheck,$crec->{grpid});
+         }
+      }
+      if ($#hiddencheck!=-1){
+         $self->ResetFilter();
+         $self->SecureSetFilter({parentid=>join(" ",@hiddencheck)});
+         my @chkchilds=$self->getHashList(qw(grpid parentid));
+         foreach my $crec (@chkchilds){
+            $hiddenchilds{$crec->{parentid}}++; 
+         }
+      }
+      #######################################################################
+      if (keys(%gboss)){
+         my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
+         $lnk->SetFilter({rawnativroles=>['RBoss'],grpid=>[keys(%gboss)]});
+         my @blist=$lnk->getHashList(qw(grpid userid));
+         my @ui;
+         foreach my $e (@blist){
+            push(@ui,$e->{userid});
+         }
+         my $u=getModuleObject($self->Config,"base::user");
+         $u->SetFilter({userid=>\@ui});
+         $u->SetCurrentView(qw(userid givenname surname));
+         my $b=$u->getHashIndexed("userid");
+         foreach my $e (@blist){
+            if (exists($b->{userid}->{$e->{userid}})){
+               $gboss{$e->{grpid}}->{$e->{userid}}=$b->{userid}->{$e->{userid}};
+            }
+         }
+      }
+
+
+      #######################################################################
+      my @toppos;
+      my @curpos;
+      my $row=2;
+      my $col=10;
+      @toppos=($col,$row);
+      foreach my $o (@parents){
+         $self->displayOrg($g,$col,$row,$o,\%gboss);
+         $row+=8;
+      }
+      $row+=1;
+      #######################################################################
+
+      @curpos=($col,$row);
+      $self->displayOrg($g,$col,$row,$rec,\%gboss,{
+          current=>1,
+      });
+      $row+=9;
+      #######################################################################
+
+      $g->Line(@toppos,@curpos);
+      for(my $c=0;$c<=$#childs;$c++){
+         my $col=15;
+         if (int(($c+1)/2)!=($c+1)/2){ # ungerade
+            $col=5;
+         }
+         $self->displayOrg($g,$col,$row,$childs[$c],\%gboss);
+         $g->Line(@curpos,$curpos[0],$row-1);
+         $g->Line($curpos[0],$row-1,$col,$row-1);
+         $g->Line($col,$row-1,$col,$row);
+         if (exists($hiddenchilds{$childs[$c]->{grpid}})){
+            $g->Line($col,$row,$col,$row+6);
+            $self->displayFurtherLink($g,$col,$row+6);
+         }
+         if (int(($c+1)/2)==($c+1)/2){ # ungerade
+            $row+=9;
+         }
+      }
+      #######################################################################
+      print($g->Render());
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub displayFurtherLink
+{
+   my $self=shift;
+   my $g=shift;   # Grid
+   my $x=shift;  
+   my $y=shift; 
+   my $l="<div style='font-size:8px;text-align:center;".
+         "border-style:solid;border-color:gray;border-width:1px'>";
+   $l.="<b>. . .</b>";
+   $l.="</div>";
+
+   $g->SetBox($x,$y,20,$l);
+
+}
+
+sub displayOrg
+{
+   my $self=shift;
+   my $g=shift;   # Grid
+   my $x=shift;  
+   my $y=shift; 
+   my $prec=shift; 
+   my $gboss=shift; 
+   my $param=shift; 
+
+   my @boss;
+   if (keys(%{$gboss->{$prec->{grpid}}})){
+      foreach my $brec (values(%{$gboss->{$prec->{grpid}}})){
+         my $boss=$brec->{surname};
+         $boss.=", " if ($boss ne "" && $brec->{givenname} ne "");
+         $boss.=$brec->{givenname}; 
+
+         ###################################################################
+         my $UserCache=$self->Cache->{User}->{Cache};
+         if (defined($UserCache->{$ENV{REMOTE_USER}})){
+            $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+         }
+         my $winsize="normal";
+         if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+            $winsize=$UserCache->{winsize};
+         }
+         ###################################################################
+
+         my $detailx=$self->DetailX();
+         my $detaily=$self->DetailY();
+
+         my $winname="_blank";
+         my $onclick="custopenwin(\"../user/ById/$brec->{userid}\",".
+                     "\"$winsize\",".
+                     "$detailx,$detaily)";
+
+         $boss="<span onclick='$onclick' style='cursor:pointer'>$boss</span>";
+         push(@boss,$boss);
+      }
+   }
+   my $boss=join("<br>",@boss);
+
+
+   my $shortname=$prec->{name};
+   my $eParam={};
+   $eParam->{entity_width}=200;
+   if ($param->{current}){
+      $shortname="<b>".$shortname."</b>";
+      $eParam->{entity_width}=220;
+   }
+   else{
+      my $ac=Query->Param("AllowClose");
+      my $lnk="<a target=_top class=SimpleLink ".
+              "href=\"Detail?ModeSelectCurrentMode=OView&".
+              "AllowClose=$ac&".
+              "search_grpid=".$prec->{grpid}."\">";
+      $shortname=$lnk.$shortname."</a>";
+   }
+   my $comments=$prec->{description};
+
+   $g->SetEntity($x,$y,$eParam,
+      Header=>$shortname,
+      Description=>$comments,
+      Fooder=>$boss
+   );
+}
 
 
 

@@ -141,15 +141,54 @@ sub SetEntity
 
    while(my $k=shift(@block)){
       my $v=shift(@block);
-      $e.="<div class=\"${name}Entity${k}\">".$v."</div>\n";
+      if ($v ne ""){
+         $e.="<div class=\"${name}Entity${k}\">".$v."</div>\n";
+      }
    }
    $e.="</div>";
 
+   $self->G->[$y1]->[$x1]->{'Entity'}=$e;
+}
+
+sub SetBox
+{
+   my $self=shift;
+   my $x1=shift;
+   my $y1=shift;
+   my $width=shift;
+   my $html=shift;
+   my $param;
+   if (ref($_[0]) eq "HASH"){
+      $param=shift;
+   }
+   my @block=@_;
+   my $name=$self->{'name'};
+
+   my $row=$self->G->[$y1];
+   if (!defined($row)){
+      $self->G->[$y1]=[];
+   }
+   $self->G->[$y1]->[$x1]={} if (!defined($self->G->[$y1]->[$x1]));
+
+   my $e="<div ";
+   my @style;
+   push(@style,"width:".$width."px;");
+   my $ml=int($width/2);
+   push(@style,"margin-left:-".$ml."px;");
+   if (defined($param) && defined($param->{entity_color})){
+      push(@style,"background-color:".$param->{entity_color}.";");
+   }
+   if ($#style!=-1){
+      $e.=" style=\"".join("",@style)."\""; 
+   }
+
+   $e.=">$html</div>";
 
    $self->G->[$y1]->[$x1]->{'Entity'}=$e;
-
-
 }
+
+
+
 
 sub ClearCell
 {
@@ -196,7 +235,7 @@ sub _addLevel2Grid
 
    $label=$S if (!exists($self->{'label'}));
 
-   my $t="<table width=\"100%\" ";
+   my $t="<table border=0 width=\"100%\" ";
    #$t.="border=1 "; 
    $t.="class=\"${name}Main\" cellspacing=\"0\" cellpadding=\"0\">\n";
    $t.="<tbody>\n";
@@ -305,7 +344,7 @@ sub _addCss
        "   text-decoration:none;\n".
        "}\n";
    $s.="table.${name}Main tr{\n".
-       "   height:20px;\n".
+       "   height:10px;\n".
        "}\n";
    $s.="table.${name}Main tr td.b{\n".
        "   border-width:${connector_width}px;\n".

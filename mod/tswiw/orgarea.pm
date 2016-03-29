@@ -185,7 +185,7 @@ sub getHtmlDetailPages
    my ($p,$rec)=@_;
 
    return($self->SUPER::getHtmlDetailPages($p,$rec),
-          "TView"=>$self->T("Tree View"));
+          "TView"=>$self->T("Organisation"));
 }
 
 
@@ -205,9 +205,9 @@ sub getHtmlDetailPageContent
       my $q=new kernel::cgi({});
       $q->Param("$idname"=>$idval);
       my $urlparam=$q->QueryString();
-      $page="<link rel=\"stylesheet\" ".
-            "href=\"../../../static/lytebox/lytebox.css\" ".
-            "type=\"text/css\" media=\"screen\" />";
+#      $page="<link rel=\"stylesheet\" ".
+#            "href=\"../../../static/lytebox/lytebox.css\" ".
+#            "type=\"text/css\" media=\"screen\" />";
 
       $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
             "padding:0;margin:0\" frameborder=\"0\" ".
@@ -419,7 +419,6 @@ sub Import
                         srcload=>NowStamp(),
                         comments=>"Description from WhoIsWho: ".
                                   $wiwrec->{name});
-            #msg(DEBUG,"Write=%s",Dumper(\%newgrp));
             if (my $back=$grp->ValidatedInsertRecord(\%newgrp)){
                $ok++;    
                msg(DEBUG,"ValidatedInsertRecord returned=$back");
@@ -431,9 +430,6 @@ sub Import
                }
            
             }
-           # printf STDERR ("wiwrec=%s\n",Dumper($wiwrec));
-           # printf STDERR ("grprec=%s\n",Dumper($grprec));
-           # printf STDERR ("fifi importing $wiwid\n");
          }
          else{
             printf STDERR ("fifi parentid $wiwrec->{parentid} not found\n");
@@ -453,8 +449,11 @@ sub TreeView
    my $g=new HTML::TreeGrid(
       fullpage=>0,
       grid_minwidth=>600,
+      entity_color=>'#e0e0e0',
       label=>'',
    );
+
+
 
    my %flt=$self->getSearchHash();
    $self->ResetFilter();
@@ -464,12 +463,22 @@ sub TreeView
 
    print $self->HttpHeader();
    print $self->HtmlHeader(
-                           title=>"TreeView",
+                           title=>"Org:".$rec->{shortname},
                            js=>['toolbox.js'],
                            IEedge=>1,
                            body=>1,
                            style=>['default.css','work.css',
-                                   'kernel.App.Web.css']);
+                                   'kernel.App.Web.css',
+                                   'kernel.App.Web.DetailPage.css']);
+   print(<<EOF);
+<script language="JavaScript">
+function setTitle()
+{
+   parent.document.title=window.document.title;
+}
+addEvent(window, "load", setTitle);
+</script>
+EOF
    if (defined($rec)){
       my @parents;
       my @childs;
@@ -491,24 +500,43 @@ sub TreeView
       $self->SecureSetFilter({parentid=>\$rec->{touid}});
       @childs=$self->getHashList(qw(touid name parentid shortname
                                     bosssurname bossgivenname));
+
+      #######################################################################
+      my %hiddenchilds;
+      my @hiddencheck;
+      foreach my $crec (@childs){
+         if ($crec->{touid} ne ""){
+            push(@hiddencheck,$crec->{touid});
+         }
+      }
+      if ($#hiddencheck!=-1){
+         $self->ResetFilter();
+         $self->SecureSetFilter({parentid=>join(" ",@hiddencheck)});
+         my @chkchilds=$self->getHashList(qw(touid parentid));
+         foreach my $crec (@chkchilds){
+            $hiddenchilds{$crec->{parentid}}++; 
+         }
+      }
+      #######################################################################
+
       my @toppos;
       my @curpos;
-
       my $row=2;
       my $col=10;
       @toppos=($col,$row);
       foreach my $o (@parents){
-         displayOrg($g,$col,$row,$o);
-         $row+=4;
+         $self->displayOrg($g,$col,$row,$o);
+         $row+=8;
       }
       $row+=1;
+      #######################################################################
 
       @curpos=($col,$row);
-      displayOrg($g,$col,$row,$rec,{
+      $self->displayOrg($g,$col,$row,$rec,{
           current=>1,
       });
-
-      $row+=5;
+      $row+=9;
+      #######################################################################
 
       $g->Line(@toppos,@curpos);
       for(my $c=0;$c<=$#childs;$c++){
@@ -516,21 +544,42 @@ sub TreeView
          if (int(($c+1)/2)!=($c+1)/2){ # ungerade
             $col=5;
          }
-         displayOrg($g,$col,$row,$childs[$c]);
+         $self->displayOrg($g,$col,$row,$childs[$c]);
          $g->Line(@curpos,$curpos[0],$row-1);
          $g->Line($curpos[0],$row-1,$col,$row-1);
          $g->Line($col,$row-1,$col,$row);
+         if (exists($hiddenchilds{$childs[$c]->{touid}})){
+            $g->Line($col,$row,$col,$row+6);
+            $self->displayFurtherLink($g,$col,$row+6);
+         }
          if (int(($c+1)/2)==($c+1)/2){ # ungerade
-            $row+=5;
+            $row+=9;
          }
       }
-      printf("%s",$g->Render());
+      #######################################################################
+      print($g->Render());
    }
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
+sub displayFurtherLink
+{
+   my $self=shift;
+   my $g=shift;   # Grid
+   my $x=shift;  
+   my $y=shift; 
+   my $l="<div style='font-size:8px;text-align:center;".
+         "border-style:solid;border-color:gray;border-width:1px'>";
+   $l.="<b>. . .</b>";
+   $l.="</div>";
+
+   $g->SetBox($x,$y,20,$l);
+
+}
+
 sub displayOrg
 {
+   my $self=shift;
    my $g=shift;   # Grid
    my $x=shift;  
    my $y=shift; 
@@ -541,13 +590,45 @@ sub displayOrg
    $boss.=", " if ($boss ne "" && $prec->{bossgivenname} ne "");
    $boss.=$prec->{bossgivenname}; 
 
+   if ($boss ne "" && $prec->{mgrwiwid} ne ""){
+      #######################################################################
+      my $UserCache=$self->Cache->{User}->{Cache};
+      if (defined($UserCache->{$ENV{REMOTE_USER}})){
+         $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+      }
+      my $winsize="normal";
+      if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+         $winsize=$UserCache->{winsize};
+      }
+      #######################################################################
+
+      my $detailx=$self->DetailX();
+      my $detaily=$self->DetailY();
+
+      my $winname="_blank";
+      my $onclick="custopenwin(\"../user/ById/$prec->{mgrwiwid}\",".
+                  "\"$winsize\",".
+                  "$detailx,$detaily)";
+
+      $boss="<span onclick='$onclick' style='cursor:pointer'>$boss</span>";
+   }
+
+
    my $shortname=$prec->{shortname};
    my $eParam={};
+   $eParam->{entity_width}=200;
    if ($param->{current}){
       $shortname="<b>".$shortname."</b>";
-      $eParam->{entity_width}=200;
+      $eParam->{entity_width}=220;
    }
-  
+   else{
+      my $ac=Query->Param("AllowClose");
+      my $lnk="<a target=_top class=SimpleLink ".
+              "href=\"Detail?ModeSelectCurrentMode=TView&".
+              "AllowClose=$ac&".
+              "search_touid=".$prec->{touid}."\">";
+      $shortname=$lnk.$shortname."</a>";
+   }
 
    $g->SetEntity($x,$y,$eParam,
       Header=>$shortname,

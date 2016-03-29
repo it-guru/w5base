@@ -205,7 +205,7 @@ sub ProcessLine
             }
             else{
                if ($app->can($ResultLineClickHandler)){
-                  $dest=$app->Self();
+                  $dest=$app->DataObjByIdHandler();
                   $dest=~s/::/\//g;
                   my $lq=new kernel::cgi({});
                   $lq->Param($idfieldname=>$id);

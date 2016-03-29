@@ -4,6 +4,13 @@ body{
    background:#eaeaea;
 }
 
+a.SimpleLink:link, a.SimpleLink:visited, a.SimpleLink:active {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#353534;
+          }
+
+
 @media print {
    body{
       overflow:visible;
