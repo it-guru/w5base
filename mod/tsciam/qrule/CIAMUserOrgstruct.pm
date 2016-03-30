@@ -268,6 +268,15 @@ sub qcheckRecord
             %grps=$grp->getGroupsOf($urec->{userid},[qw(REmployee)],'up');
          }
          foreach my $wr (@wrlist){
+             if (defined($ciamrec) &&
+                 $ciamrec->{toucid} eq $wr->{toucid}){
+                $ciamusr->Log(ERROR,"basedata",
+                             "Contact '%s' has active primary AND secondary ".
+                             "CIAM workrelation to the same org ".
+                             "unit toucid='%s'",
+                             $urec->{fullname},$wr->{toucid});
+                next;
+             }
              my $ciamstate=$wr->{office_state};
              if ($ciamstate eq "Employee"){
                 $ciamstate="RFreelancer"; # Sekundäre Arbeitsverhältnisse
