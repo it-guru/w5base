@@ -959,7 +959,6 @@ sub new
                 transprefix   =>'opmode.',
                 value         =>['',
                                  'prod',
-                                 'pilot',
                                  'test',
                                  'devel',
                                  'education',
