@@ -79,35 +79,21 @@ sub QuickFindDetail
    my $id=shift;
    my $htmlresult="?";
 
-   my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
-   $dataobj->SetFilter({id=>\$id});
-   my ($rec,$msg)=$dataobj->getOnlyFirst(qw(systemid adm adm2 databoss
+   my $system=getModuleObject($self->getParent->Config,"itil::system");
+   $system->SetFilter({id=>\$id});
+   my ($rec,$msg)=$system->getOnlyFirst(qw(name systemid adm adm2 databoss
                                             phonenumbers adminteam
                                             applications));
-
-   $dataobj->ResetFilter();
-   $dataobj->SecureSetFilter([{id=>\$id}]);
-   my ($secrec,$msg)=$dataobj->getOnlyFirst(qw(id));
+   $system->ResetFilter();
+   $system->SecureSetFilter([{id=>\$id}]);
+   my ($secrec,$msg)=$system->getOnlyFirst(qw(id));
 
    if (defined($rec)){
       $htmlresult="";
       if (defined($secrec)){
-         $htmlresult.=$self->addDirectLink($dataobj,{search_id=>$id});
+         $htmlresult.=$self->addDirectLink($system,{search_id=>$id});
       }
-      $htmlresult.="<table>";
-      my @l=qw(systemid adm adm2 databoss adminteam);
-      foreach my $v (@l){
-         if ($rec->{$v} ne ""){
-            my $name=$dataobj->getField($v)->Label();
-            my $data=$dataobj->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
-                                         $v,"formated");
-            $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
-                         "<td valign=top>$data</td></tr>";
-         }
-      }
-      $htmlresult.=$self->addPhoneNumbers($dataobj,$rec,"phonenumbers",
-                                          ["phoneRB"]);
-      $htmlresult.="</table>";
+      $htmlresult.=$system->HtmlPublicDetail($rec,0);
    }
    return($htmlresult);
 }

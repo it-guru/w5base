@@ -396,6 +396,20 @@ sub doIPanalyse
    return(\%a);
 }
 
+sub getHtmlPublicDetailFields
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @l=qw(name systemid adm adm2 databoss
+            adminteam 
+            aciassignmentgroup accontrolcenter accontrolcenter2
+            applications);
+   return(@l);
+}
+
+
+
 
 
 

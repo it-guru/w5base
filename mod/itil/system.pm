@@ -1363,8 +1363,7 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   if (!$self->isDirectFilter(@flt) &&
-       !$self->IsMemberOf([qw(admin w5base.itil.system.read w5base.itil.read)],
+   if (!$self->IsMemberOf([qw(admin w5base.itil.system.read w5base.itil.read)],
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
@@ -1774,7 +1773,67 @@ sub preQualityCheckRecord
    return($self->itil::lib::Listedit::preQualityCheckRecord(@_));
 }
 
+sub getHtmlPublicDetailFields
+{
+   my $self=shift;
+   my $rec=shift;
 
+   my @l=qw(name systemid adm adm2 databoss
+            adminteam applications);
+   return(@l);
+}
+
+
+sub HtmlPublicDetail   # for display record in QuickFinder or with no access
+{
+   my $self=shift;
+   my $rec=shift;
+   my $header=shift;   # create a header with fullname or name
+
+   my $htmlresult="";
+   if ($header){
+      $htmlresult.="<table style='margin:5px'>\n";
+      $htmlresult.="<tr><td colspan=2 align=center><h1>";
+      $htmlresult.=$self->findtemplvar({current=>$rec,mode=>"Html"},
+                                      "name","formated");
+      $htmlresult.="</h1></td></tr>";
+   }
+   else{
+      $htmlresult.="<table>\n";
+   }
+   my @l=$self->getHtmlPublicDetailFields($rec);
+   foreach my $v (@l){
+      if ($v eq "applications"){
+         my $name=$self->getField($v)->Label();
+         my $data;
+         if (ref($rec->{$v}) eq "ARRAY" &&
+             $#{$rec->{$v}}!=-1){
+            $data=join("; ",sort(map({$_->{appl}} @{$rec->{$v}})));
+            if ($data ne ""){
+               $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
+                            "<td valign=top>$data</td></tr>\n";
+            }
+         }
+      }
+      elsif ($rec->{$v} ne ""){
+         my $name=$self->getField($v)->Label();
+         my $data=$self->findtemplvar({current=>$rec,mode=>"Html"},
+                                      $v,"formated");
+         $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
+                      "<td valign=top>$data</td></tr>\n";
+      }
+   }
+
+   if (ref($rec->{phonenumbers}) eq "ARRAY" &&
+       $#{$rec->{phonenumbers}}!=-1){
+      if (my $pn=$self->getField("phonenumbers")){
+         $htmlresult.=$pn->FormatForHtmlPublicDetail($rec,["phoneRB"]);
+      }
+   }
+   $htmlresult.="</table>\n";
+   return($htmlresult);
+
+}
 
 
 
