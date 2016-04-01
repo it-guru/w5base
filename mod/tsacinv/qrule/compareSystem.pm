@@ -253,7 +253,6 @@ sub qcheckRecord
             }
          }
 
-
          if ($nameok){
             $self->IfComp($dataobj,
                           $rec,"name",
@@ -349,10 +348,15 @@ sub qcheckRecord
             #
             my %cleanAmIPlist;
             foreach my $amiprec (@{$parrec->{ipaddresses}}){
+               my $mappedCIStatus=5;
+               if (lc($amiprec->{status}) eq "configured"){
+                  $mappedCIStatus=4;
+               }
                if ($amiprec->{ipv4address} ne ""){
                   if ($amiprec->{ipv4address}=~
                       m/^\d{1,3}(\.\d{1,3}){3,3}$/){
                      $cleanAmIPlist{$amiprec->{ipv4address}}={
+                        cistatusid=>$mappedCIStatus,
                         ipaddress=>$amiprec->{ipv4address},
                         description=>$amiprec->{description}
                      };
@@ -367,6 +371,7 @@ sub qcheckRecord
                   if ($amiprec->{ipv6address}=~
                       m/^[a-f0-9]{1,4}(:[a-f0-9]{0,4}){3,7}$/){
                      $cleanAmIPlist{$amiprec->{ipv6address}}={
+                        cistatusid=>$mappedCIStatus,
                         ipaddress=>$amiprec->{ipv6address},
                         description=>$amiprec->{description}
                      };
@@ -387,7 +392,8 @@ sub qcheckRecord
                           if ($a->{name} eq $b->{ipaddress}){
                              $eq=0;
                              $eq=1 if ($a->{comments} eq $b->{description} &&
-                                       $a->{srcsys} eq "AMCDS");
+                                       $a->{srcsys} eq "AMCDS" &&
+                                       $a->{cistatusid} eq $b->{cistatusid});
                           }
                           return($eq);
                        },
@@ -410,7 +416,7 @@ sub qcheckRecord
                                      DATAOBJ=>'itil::ipaddress',
                                      DATA=>{
                                         name      =>$newrec->{ipaddress},
-                                        cistatusid=>4,
+                                        cistatusid=>$newrec->{cistatusid},
                                         srcsys    =>'AMCDS',
                                         type      =>'1', # use sek. entry
                                         networkid =>$networkid,
