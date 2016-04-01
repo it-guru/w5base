@@ -1,0 +1,5 @@
+'TS::qrule::CheckMetaAssign'=>{de=>'Überprüfung der Assingment Gruppen',
+                               en=>'Check of Assignment Groups'},
+'use of deleted assignmentgroup'=>{de=>'Verwendung einer gelöschten Assignmentgroup'},
+
+
