@@ -428,8 +428,8 @@ sub Process
       }
    }
 
-   my @actions=$self->getPosibleActions($WfRec);
-   my %button=$StepObj->getPosibleButtons($WfRec,\@actions);
+   @actions=$self->getPosibleActions($WfRec);
+   %button=$StepObj->getPosibleButtons($WfRec,\@actions);
    my $workspace=$StepObj->generateWorkspace($WfRec,\@actions);
 
    my $nextbutton="";

@@ -14,8 +14,8 @@
                           en=>'Approve request to direct contacts'},
 'notifyremind'=>{de=>"Erinnerung an 'approve' versenden",
                  en=>'Send reminder of approve'},
-'notifyreschedule'=>{de=>"Aufforderung zum 'approve' nach Planzeitverschiebung versenden",
-                     en=>'Send approve request after rescheduling'},
+'notifyreschedule'=>{de=>"Aufforderung zum 'approve' nach Änderung versenden",
+                     en=>'Send approve request after modification'},
 'helpnotifyall'=>{
    de=>"Mail-Benachrichtigung an".
        "<ul>".

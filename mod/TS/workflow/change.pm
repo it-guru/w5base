@@ -33,6 +33,22 @@ sub new
 }
 
 
+sub getDynamicFields
+{
+   my $self=shift;
+   my %param=@_;
+   my @l=();
+
+   return($self->SUPER::getDynamicFields(%param),
+          $self->InitFields(
+           new kernel::Field::Date(
+                     name          =>'approvalphaseentry',
+                     label         =>'date approval phase entered',
+                     htmldetail    =>0,
+                     container     =>'headref')));
+}
+
+
 sub addSRCLinkToFacility
 {
    my $self=shift;
@@ -62,29 +78,9 @@ sub getPosibleActions
    my $approvalstate=$WfRec->{additional}{ServiceManagerApprovalState}[0];
 
    if ($phase=~m/^40/) {
-      # state 1 correspondends SM Phase 30 planning
-      # state 2 correspondends SM Phase 40 approval
-      my $history=getModuleObject($self->Config,'base::history');
-      $history->SetFilter({dataobjectid=>$WfRec->{id},
-                           name=>\'stateid',operation=>\'update',
-                           oldstate=>[1,4],newstate=>\2});
-      # oldstate 4 for compatibility with older workflows only
-
-      my @stateChg=$history->getHashList(qw(id cdate));
-      if ($#stateChg!=-1) {
-         Query->Param("ApproveSubmitID"=>$stateChg[0]->{id});
-      }
-
       my @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
                          $_->{comments}=~/^Approval request sent/}
                          @{$WfRec->{shortactionlog}});
-
-      # for compatibility with older notifications
-      if ($#notifies==-1) {
-         @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
-                         $_->{comments}=~/^\d+\. notification$/}
-                         @{$WfRec->{shortactionlog}});
-      }
 
       if ($#notifies==-1) {
          my $chmmgr=$self->chmAuthority($WfRec);
@@ -104,15 +100,31 @@ sub getPosibleActions
          if (($approvalstate eq 'pending' ||
               $approvalstate eq 'denied')) {
             @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
-                            ($_->{comments}=~/^Approval request sent/ ||
-                             $_->{comments}=~/^Approval reminder sent$/)}
+                            ($_->{comments}=~/^Approval request sent/   ||
+                             $_->{comments}=~/^Approval reminder sent$/ ||
+                             $_->{comments}=~/^Rescheduled info sent$/)}
                             @{$WfRec->{shortactionlog}});
-            if ($#stateChg>0 &&
-                $stateChg[0]->{cdate} > $notifies[-1]->{cdate}) {
-               push(@l,'chmnotifyreschedule');
-            }
-            else {
-               push(@l,'chmnotifyremind')
+
+            if ($#notifies!=-1) {
+               my $rescheduledata;
+               my $lastnotify=$notifies[-1];
+               my $wfa=getModuleObject($self->Config,"base::workflowaction");
+               $wfa->ResetFilter();
+               $wfa->SetFilter({id=>\$lastnotify->{id}});
+               my ($act,$msg)=$wfa->getOnlyFirst(qw(actionref));
+
+               if (ref($act->{actionref}) eq "HASH") {
+                  $rescheduledata=$act->{actionref}{rescheduledata}[0];
+               }
+
+               if ($lastnotify->{cdate} < $WfRec->{approvalphaseentry} ||
+                   (defined($rescheduledata) &&
+                    $rescheduledata ne $WfRec->{rescheduledatahash})) {
+                  push(@l,'chmnotifyreschedule');
+               }
+               else {
+                  push(@l,'chmnotifyremind')
+               }
             }
          }
       }
@@ -121,6 +133,7 @@ sub getPosibleActions
    push(@l,qw(chmnotifyrejectdirect
               chmnotifyrejectcritical
               chmnotifyrejectall));
+
    return(@l);
 }
 
@@ -455,7 +468,7 @@ sub generateMailSet
 
       ## title
       my $name=$self->getField('name',$WfRec);
-      $d{$lang}{name}{prefix}=$name->Label();
+      $d{$lang}{name}{prefix}=$self->T('Title');
       $d{$lang}{name}{txt}=$name->FormatedResult($WfRec,'HtmlMail');
 
       ## start / end
@@ -493,14 +506,8 @@ sub generateMailSet
       my $chminfo;
       my $authority=$self->chmAuthority($WfRec);
 
-      my $submit;
-      if (defined(Query->Param('ApproveSubmitID'))) {
-         my $id=Query->Param('ApproveSubmitID');
-         my $obj=getModuleObject($self->Config,'base::history');
-         $obj->SetFilter({id=>\$id});
-         my ($date,$msg)=$obj->getOnlyFirst(qw(cdate));
-         $submit=$obj->getField('cdate')->FormatedResult($date,'HtmlMail');
-      }
+      my $submitfld=$self->getField('approvalphaseentry');
+      my $submit=$submitfld->FormatedResult($WfRec,'HtmlMail');
 
       my $note;
       if (defined(Query->Param('note_'.$lang)) &&
@@ -899,7 +906,7 @@ sub generateWorkspace
    my $colen='';
 
    my @queryparam=(qw(PublishMode NotifyMode
-                      ApproveSubmitID note_de note_en));
+                      note_de note_en));
    foreach my $p (@queryparam) {
       if (defined(Query->Param($p))) {
          $self->UserEnv->{queryparam}{$p}=Query->Param($p);
@@ -925,8 +932,7 @@ sub generateWorkspace
                                                      mode  =>'simple',
                                                      name  =>'note_en'));
    $templ.=$self->getParent->getParent->HtmlPersistentVariables(
-                                           qw(PublishMode NotifyMode
-                                              ApproveSubmitID));
+                                           qw(PublishMode NotifyMode));
 
    return($templ);
 }
@@ -1028,7 +1034,6 @@ sub generateWorkspace
                                              to=>\@email).
              $self->getParent->getParent->HtmlPersistentVariables(
                                              qw(PublishMode NotifyMode
-                                                ApproveSubmitID
                                                 note_de note_en)));
 }
 
@@ -1117,6 +1122,7 @@ sub Process
                                                 $newmailrec,$action)){
             my $NotifyMode=Query->Param('NotifyMode');
             my $comment='';
+            my %actionref=();
 
             if ($NotifyMode eq 'announce') {
                $comment='Announcement sent';
@@ -1126,6 +1132,17 @@ sub Process
             if ($NotifyMode eq 'approve') {
                $comment='Approval request sent';
                $comment.=" (".Query->Param('PublishMode').")";
+               $actionref{rescheduledata}=$WfRec->{rescheduledatahash};
+            }
+
+            if ($NotifyMode eq 'remind') {
+               $comment='Approval reminder sent';
+               $actionref{rescheduledata}=$WfRec->{rescheduledatahash};
+            }
+
+            if ($NotifyMode eq 'reschedule') {
+               $comment='Rescheduled info sent';
+               $actionref{rescheduledata}=$WfRec->{rescheduledatahash};
             }
 
             if ($NotifyMode eq 'reject') {
@@ -1133,13 +1150,11 @@ sub Process
                $comment.=" (".Query->Param('PublishMode').")";
             }
 
-            $comment='Approval reminder sent' if ($NotifyMode eq 'remind');
-            $comment='Rescheduled info sent'  if ($NotifyMode eq 'reschedule');
-
             if ($wf->Action->StoreRecord(
                 $WfRec->{id},"sendchangeinfo",
-                {translation=>'itil::workflow::change'},
-                $comment,undef)){
+                {translation=>'itil::workflow::change',
+                 actionref=>\%actionref},
+                $comment)){
                Query->Delete("WorkflowStep");
                return(1);
             }

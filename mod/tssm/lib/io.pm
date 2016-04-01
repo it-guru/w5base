@@ -402,6 +402,12 @@ sub mkChangeStoreRec
    }
    $wfrec{stateid}=17 if (lc($rec->{status}) eq "closed");
 
+   if ($wfrec{stateid}==2 &&
+       (($#oldrec== 0 && $oldrec[0]->{stateid}==1) ||
+        ($#oldrec==-1 && $wfrec{stateid}==2))) {
+      $wfrec{approvalphaseentry}=$rec->{sysmodtime};
+   }
+
    $wfrec{additional}={
       ServiceManagerChangeNumber=>$rec->{changenumber},
       ServiceManagerCategory=>$rec->{category},
@@ -607,6 +613,15 @@ sub mkChangeStoreRec
      $essentialdata.="[".$rec->{plannedstart}."]";
      $essentialdata.="[".$rec->{plannedend}."]";
      $wfrec{essentialdatahash}=md5_base64($essentialdata);
+   }
+
+   { # rescheduled build name;start;end;description;validation
+     my $rescheduled=$wfrec{name}."|";
+     $rescheduled.="[".$rec->{plannedstart}."]";
+     $rescheduled.="[".$rec->{plannedend}."]";
+     $rescheduled.="[".$rec->{description}."]";
+     $rescheduled.="[".$rec->{validation}."]";
+     $wfrec{rescheduledatahash}=md5_base64($rescheduled);
    }
 
 

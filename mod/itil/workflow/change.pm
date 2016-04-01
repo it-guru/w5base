@@ -107,6 +107,12 @@ sub getDynamicFields
                 label      =>'hashed essential change data',
                 container  =>'headref'),
 
+      new kernel::Field::Link(  
+                name       =>'rescheduledatahash',
+                history    =>0,
+                label      =>'hashed data detecting change reschedule',
+                container  =>'headref'),
+
       new kernel::Field::KeyText(
                 name       =>'primaffectedapplication',
                 translation=>'itil::workflow::change',
@@ -442,7 +448,12 @@ sub isChangeManager
    $mandator=[$mandator] if (!ref($mandator) eq "ARRAY");
 
    return(1) if ($self->getParent->IsMemberOf($mandator,"RCHManager","down"));
-   return(1) if ($self->getParent->IsMemberOf("admin"));
+   
+   #if ($self->getParent->IsMemberOf("admin") &&
+   #    defined($WfRec->{applicationid})) {
+   #   return(1);
+   #}
+
    return(0);
 }
 

@@ -4,4 +4,5 @@
 'None'=>{de=>'Keine'},
 'All time data in timezone'=>{de=>'Alle Zeitangaben in der Zeitzone'},
 'Remarks'=>{de=>'Bemerkungen'},
+'Title'=>{de=>'Titel'},
 
