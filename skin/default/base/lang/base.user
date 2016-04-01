@@ -149,3 +149,4 @@
 'windefault'=>{de=>'Standardbehandlung - immer neues Fenster'},
 'winminimal'=>{de=>'Datensatz im gleichen Fenster öffnen'},
 'winonlyone'=>{de=>'alle Datensätze nur in EINEM Fenster öffnen'},
+'Last-External-Seen'=>{de=>'letzte externe Bestätigung'},

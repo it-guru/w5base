@@ -170,6 +170,21 @@ sub qcheckRecord
          }
       }
       else{
+         my $lastextseen;
+         if ($rec->{lastexternalseen} ne ""){
+            my $nowstamp=NowStamp("en");
+            my $duration=CalcDateDuration($rec->{lastexternalseen},$nowstamp);
+            if (defined($duration)){
+               $lastextseen=$duration->{days};
+            }
+         }
+         if (!defined($lastextseen) || $lastextseen>3){ # update only every 3d
+            if ($rec->{userid} ne ""){
+               $dataobj->UpdateRecord({
+                  lastexternalseen=>NowStamp("en")
+               },{userid=>\$rec->{userid}});
+            }
+         }
          my $uidlist=$ciamrec->{wiwid};
          $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
          my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});

@@ -848,6 +848,16 @@ sub new
                 dataobjattr   =>"lpad(contact.userid,35,'0')"),
 
       new kernel::Field::Date(
+                name          =>'lastexternalseen',
+                readonly      =>1,
+                group         =>'userro',
+                searchable    =>0,
+                dayonly       =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'Last-External-Seen',
+                dataobjattr   =>'contact.lastexternalseen'),
+
+      new kernel::Field::Date(
                 name          =>'lastlogon',
                 readonly      =>1,
                 group         =>'userro',
