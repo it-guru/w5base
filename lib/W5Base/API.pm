@@ -328,8 +328,9 @@ use Exporter;
 use Getopt::Long;
 use FindBin qw($RealScript);
 use Config;
+use POSIX qw(strftime);
 
-$VERSION = "1.0";
+$VERSION = "1.1";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -346,20 +347,26 @@ sub WARN()  {return("WARN")}
 sub DEBUG() {return("DEBUG")}
 sub INFO()  {return("INFO")}
 
+our $MsgTimestamp="";
+
 sub msg
 {
    my $type=shift;
    my $msg=shift;
    my $format="\%-6s \%s\n";
+   my $tspref="";
 
+   if ($MsgTimestamp ne ""){
+      $tspref=strftime($MsgTimestamp,localtime()); 
+   } 
    if ($type eq "ERROR" || $type eq "WARN"){
       foreach my $submsg (split(/\n/,$msg)){
-         printf STDERR ($format,$type.":",$submsg);
+         printf STDERR ($tspref.$format,$type.":",$submsg);
       }
    }
    else{
       foreach my $submsg (split(/\n/,$msg)){
-         printf STDOUT ($format,$type.":",$submsg) if ($Main::VERBOSE ||
+         printf STDOUT ($tspref.$format,$type.":",$submsg) if ($Main::VERBOSE ||
                                                        $type eq "INFO");
       }
    }
@@ -635,14 +642,18 @@ sub createConfig
          $$backexitmsg=$SOAP->transport->status;
       }
       else{
-         msg(ERROR,"HTTP transport error");
-         msg(ERROR,$SOAP->transport->status);
+         if (!$param{quiet}){
+            msg(ERROR,"HTTP transport error");
+            msg(ERROR,$SOAP->transport->status);
+         }
       }
       if (defined($backexitcode)){
          $$backexitcode=255;
       }
       else{
-         exit(255);
+         if (!$param{quiet}){
+            exit(255);
+         }
       }
    }
    if (defined($SOAPresult)){

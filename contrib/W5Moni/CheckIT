@@ -1,0 +1,435 @@
+#!/usr/bin/env perl 
+
+use lib qw(/opt/w5base2/lib /opt/w5base/lib);
+use strict;
+my ($T,$T0);
+
+BEGIN{
+   use Time::HiRes;
+   $T=Time::HiRes::time();
+   $T0=Time::HiRes::time();
+}
+
+use W5Base::API;
+use Net::DNS;
+use W5FastConfig;
+use Data::Dumper;
+use POSIX qw(strftime);
+use IO::Socket;
+
+
+
+my ($help,$verbose,$quiet,$base,$config,$loginuser,$loginpass,$timestampFormat,
+    $LOGDIR);
+my %P=("help"=>\$help,"config=s"=>\$config,"verbose+"=>\$verbose,
+       "logdir=s"=>\$LOGDIR,
+       "timestamp"=>\$timestampFormat,
+       "quiet+"=>\$quiet,"webuser=s"=>\$loginuser,"webpass=s"=>\$loginpass);
+####################### START of init phase ###########################
+my $optresult=XGetOptions(\%P,\&Help,undef,undef,".CheckIT",noautologin=>1);
+$W5Base::API::MsgTimestamp="%F %X ";
+if ($timestampFormat){
+   $W5Base::API::MsgTimestamp=$timestampFormat;
+}
+$Main::VERBOSE=1 if ($verbose);
+$LOGDIR="/var/log/w5base" if (!defined($LOGDIR));
+
+msg(INFO,"using config file '$config'") if (!$quiet);
+msg(DEBUG,"using logdir '$LOGDIR'");
+
+my $cfg=new W5FastConfig(sysconfdir=>'/etc/w5base');
+if (!defined($cfg)){
+   msg(ERROR,"fail to create generic W5FastConfig object");
+   exit(1);
+}
+if (!$cfg->readconfig($config)){
+   msg(ERROR,"fail to read config file '$config'");
+   exit(1);
+}
+if (! -d $LOGDIR){
+   msg(ERROR,"the log directory '$LOGDIR' does not exists");
+   exit(1);
+}
+LogPerformance("level0",['init','pid'],
+                         [sprintf("%.4lf",Time::HiRes::time()-$T),$$]);
+$T=Time::HiRes::time();
+####################### END of init phase #############################
+
+my ($site,$prot,$port,$ipaddr,$conf);
+#  DNS Checker  #######################################################
+{
+   $site=$cfg->Param("SITE");
+   if ($site eq ""){
+      msg(ERROR,"no SITE Parameter found in config");
+      exit(10);
+   }
+   msg(INFO,"DNS resolv check of '$site'") if (!$quiet);
+   my $res=new Net::DNS::Resolver();
+   my $query = $res->search($site);
+
+   my $acount=0;
+
+   if ($query){
+      foreach my $rr ($query->answer){
+         next unless($rr->type eq "A");
+         if ($ipaddr eq ""){
+            $ipaddr=$rr->address;
+         }
+         $acount++;
+      }
+   } 
+   else{
+      LogPerformance("state",
+         ['error'],
+         ["DNS resolv of SITE '$site' failed :".$res->errorstring()]
+      );
+      exit(100);
+   }
+   if ($acount==0){
+      LogPerformance("state",
+         ['error'],
+         ["no DNS adress record found for SITE '$site'"]
+      );
+      exit(101);
+   }
+   LogPerformance("level0",['dns','acount'],
+                            [sprintf("%.4lf",Time::HiRes::time()-$T),$acount]);
+   $T=Time::HiRes::time();
+}
+#######################################################################
+
+#######################################################################
+my $servicedef=$cfg->Param("SERVICEDEF");
+my $serviceres=$cfg->Param("SERVICERES");
+if ((defined($servicedef) && !defined($serviceres)) ||
+    (!defined($servicedef) && defined($serviceres))){
+   msg(ERROR,"missing SERVICE definitions (SERVICEDEF|SERVICERES) in conf");
+   exit(11);
+}
+if ((defined($servicedef) && ref($servicedef) ne "HASH") || 
+    (defined($serviceres) && ref($serviceres) ne "HASH")){
+   msg(ERROR,"invalid SERVICE definitions (SERVICEDEF|SERVICERES) in conf");
+   exit(12);
+}
+{
+   my $incompl=0;
+   my $_servicedef={};
+   foreach my $s (keys(%{$servicedef})){
+      my $err=0;
+      my $flt={};
+      my ($dataobj,$filter);
+      if (!exists($serviceres->{$s}) ||
+          $serviceres->{$s} eq ""){
+         $incompl++;
+      }
+      if (($dataobj,$filter)=$servicedef->{$s}=~
+          m/^(.*)\((.*)\)$/){
+         my @filter=split(/,/,$filter);
+         foreach my $f (@filter){
+            if (my ($field,$val)=$f=~m/^([^=]+)=(.*)$/){
+               $flt->{$field}=$val;
+            }
+            else{
+               $err++;
+            }
+         }
+      }
+      else{
+         $err++;
+      }
+      if ($err){
+         msg(ERROR,"wrong SERVICEDEF definitions in SERVICE=$s");
+         exit(13);
+      }
+      else{
+         $_servicedef->{$s}={dataobj=>$dataobj,filter=>$flt};
+      }
+   }
+   $servicedef=$_servicedef;
+   my $_serviceres={};
+   foreach my $s (keys(%{$serviceres})){
+      my $err=0;
+      if (!exists($servicedef->{$s}) ||
+          $servicedef->{$s} eq ""){
+         $incompl++;
+      }
+      if (my ($field,$val)=$serviceres->{$s}=~m/^\[1\]([^=]+)=(.*)$/){
+         $_serviceres->{$s}->{singlerec}={field=>$field,value=>$val};
+      }
+      elsif (my ($n)=$serviceres->{$s}=~m/^\[([0-9]+)\]$/){
+         $_serviceres->{$s}->{nrec}={count=>$n};
+      }
+      else{
+         $err++;
+      }
+      if ($err){
+         msg(ERROR,"wrong SERVICERES definitions in SERVICE=$s");
+         exit(14);
+      }
+   }
+   $serviceres=$_serviceres;
+   if ($incompl){
+      msg(ERROR,"incomplete SERVICE definitions (SERVICEDEF|SERVICERES) in conf");
+      exit(15);
+   }
+}
+
+
+#######################################################################
+
+
+#  Port Checker  ######################################################
+{
+   $port=$cfg->Param("PORT");
+   $prot=$cfg->Param("PROT");
+   if ($prot eq ""){
+      $prot="http";
+   }
+   if ($port eq ""){
+      if ($prot eq "http"){
+         $port="80";
+      }
+      if ($prot eq "https"){
+         $port="443";
+      }
+   }
+   msg(INFO,"TCP connect check to '$ipaddr:$port'") if (!$quiet);
+   my $socket = IO::Socket::INET->new(
+      PeerAddr=>$ipaddr,
+      PeerPort=>$port, 
+      Proto=>'tcp',
+      Timeout=>30
+   );
+   if ($socket){
+      LogPerformance("level0",['tcpconnect'],
+                               [sprintf("%.4lf",Time::HiRes::time()-$T)]);
+      $T=Time::HiRes::time();
+      close($socket);
+   }
+   else{
+      LogPerformance("state",
+         ['error'],
+         ["native tcp connect error while try to connect to '$ipaddr:$port'"]
+      );
+      exit(102);
+   }
+}
+#######################################################################
+
+
+#  API Connection #####################################################
+
+$conf=$cfg->Param("CONF");
+if ($conf eq ""){
+   $conf="w5base";
+}
+if (!$quiet){
+   msg(INFO,"W5API connection '$conf' at '$prot://$site:$port'");
+}
+my $base="$prot://$site:$port/$conf/public";
+my $apidebug=0;
+my $lang="en";
+if (!$quiet){
+   msg(INFO,"public W5API base '$base'");
+}
+my $Config;
+eval(' $Config=createConfig($base,undef,undef,$lang,$apidebug,quiet=>1); ');
+if (defined($Config)){
+   LogPerformance("level1",['public.ping'],
+                            [sprintf("%.4lf",Time::HiRes::time()-$T)]);
+   $T=Time::HiRes::time();
+}
+else{
+   LogPerformance("state",
+      ['error'],
+      ["public api access error to '$base'"]
+   );
+   exit(103);
+}
+
+$loginuser=$cfg->Param("USER");
+$loginpass=$cfg->Param("PASS");
+if ($loginuser ne "" && $loginpass ne ""){
+   $base="$prot://$site:$port/$conf/auth";
+   my $apidebug=0;
+   my $lang="en";
+   if (!$quiet){
+      msg(INFO,"auth W5API base '$base'");
+   }
+   my $Config;
+   eval(' 
+    $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug,quiet=>1); 
+   ');
+   if (defined($Config)){
+      LogPerformance("level1",['auth.ping'],
+                               [sprintf("%.4lf",Time::HiRes::time()-$T)]);
+      $T=Time::HiRes::time();
+   }
+   else{
+      LogPerformance("state",
+         ['error'],
+         ["public api access error to '$base'"]
+      );
+      exit(103);
+   }
+}
+else{
+   if (!$quiet){
+      msg(INFO,"skip auth access due missing USER or PASS");
+   }
+}
+
+#######################################################################
+
+
+#  Service Checks #####################################################
+{
+   my @snames;
+   my @sstates;
+   foreach my $s (sort(keys(%{$servicedef}))){
+      if (!$quiet){
+         msg(INFO,"check service '$s' on dataobject $servicedef->{$s}->{dataobj}");
+      }
+      push(@snames,$s);
+      $T=Time::HiRes::time();
+      my $o=getModuleObject($Config,$servicedef->{$s}->{dataobj});
+      my @res=$o->showFields();
+      my $idfield;
+      my @view;
+      foreach my $fld (@res){
+         if ($fld->{type} eq "Id"){
+            $idfield=$fld->{type};
+            if (defined($serviceres->{$s}->{nrec})){
+               push(@view,$idfield);
+            }
+         }
+         if (defined($serviceres->{$s}->{singlerec})){
+            if ($fld->{name} eq $serviceres->{$s}->{singlerec}->{field}){
+               push(@view,$fld->{name});
+            }
+         }
+      }
+      if ($#view==-1){
+         LogPerformance("state",
+            ['error'],
+            ["can not request configured view on service '$s'"]
+         );
+         push(@sstates,"ERROR");
+      }
+      else{
+         push(@view,$idfield);
+         $o->SetFilter($servicedef->{$s}->{filter});
+         my @l=$o->getHashList(@view);
+         if ($serviceres->{$s}->{singlerec}){
+            if ($#l==-1){
+               LogPerformance("state",
+                  ['error'],
+                  ["missing requested record for service '$s'"]
+               );
+               push(@sstates,"DOWN");
+            }
+            elsif ($#l>0){
+               LogPerformance("state",
+                  ['error'],
+                  ["unexpedted record count for service '$s'"]
+               );
+               push(@sstates,"DOWN");
+            }
+            else{
+               if ($l[0]->{$serviceres->{$s}->{singlerec}->{field}} ne 
+                   $serviceres->{$s}->{singlerec}->{value}){
+                  LogPerformance("state",
+                     ['error'],
+                     ["unexpedted result $serviceres->{$s}->{singlerec}->{field}=".
+                      "$l[0]->{$serviceres->{$s}->{singlerec}->{field}} for service '$s'"]
+                  );
+                  push(@sstates,"DOWN");
+               }
+               else{
+                  push(@sstates,sprintf("%.4lf",Time::HiRes::time()-$T));
+               }
+            }
+         }
+         elsif ($serviceres->{$s}->{nrec}){
+            if (($#l)+1!=$serviceres->{$s}->{nrec}->{count}){
+               LogPerformance("state",
+                  ['error'],
+                  ["unexpedted record count for service '$s'"]
+               );
+               push(@sstates,"DOWN");
+            }
+            else{
+               push(@sstates,sprintf("%.4lf",Time::HiRes::time()-$T));
+            }
+         }
+         else{
+            push(@sstates,"UNKNWON");
+         }
+      }
+   }
+   if ($#snames!=-1){
+      LogPerformance("service",\@snames,\@sstates);
+   }
+}
+
+#######################################################################
+
+
+
+##  END ###############################################################
+if (!$quiet){
+   msg(INFO,"Check finish");
+}
+LogPerformance("level0",['total','pid'],
+                         [sprintf("%.4lf",Time::HiRes::time()-$T0),$$]);
+
+exit(0);
+#######################################################################
+
+
+sub LogPerformance
+{
+   my $file=shift;
+   my $var=shift;    # Array Pointer  to names
+   my $val=shift;    # Array Pointer  to values  
+
+   if (open(F,">>${LOGDIR}/w5base.checkit.${file}.log")){
+      my $tspref="";
+      if ($W5Base::API::MsgTimestamp ne ""){
+         $tspref=strftime($W5Base::API::MsgTimestamp,localtime());
+      }
+      my @s;
+      for (my $c=0;$c<=$#{$var};$c++){
+          push(@s,sprintf("%s=%s",$var->[$c],$val->[$c]));
+      }
+      printf F ("%s%s\n",$tspref,join("; ",@s));
+      close(F);
+   }
+}
+
+
+
+
+sub Dumper
+{
+   $Data::Dumper::Sortkeys = 1;
+   return(Data::Dumper::Dumper(@_));
+}
+
+sub Help
+{
+   print(<<EOF);
+$RealScript --config file.conf [options] 
+
+   --config  config file name (with no path, /etc/w5base is the default dir)
+
+   --timestamp format of timestamps (default = '%F %X') 
+
+   --verbose display more details of operation process
+   --quiet   only errors would be displayed
+
+   --help    show this help
+EOF
+}
+
+
