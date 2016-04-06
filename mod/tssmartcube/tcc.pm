@@ -118,6 +118,7 @@ sub new
                 htmllabelwidth=>'250',
                 depend        =>['roadmap_color'],
                 group         =>['roadmap'],
+                sqlorder      =>'NONE',
                 dataobjattr   =>"(case ".
                     "when lower(OS_NAME) like '%windows%' then 'Windows' ".
                     "else OS_NAME ".
@@ -251,6 +252,7 @@ sub new
                 depend        =>['os_base_setup_color'],
                 background    =>\&getTCCbackground,
                 ignorecase    =>1,
+                sqlorder      =>'NONE',
                 dataobjattr   =>"(case ".
                     "when lower(OS_NAME) like '%windows%' then OS_NAME ".
                     "else OS_BASE_SETUP ".
@@ -261,6 +263,7 @@ sub new
                 label         =>'OS Base-Setup: CheckID',
                 group         =>['patch'],
                 htmldetail    =>0,
+                sqlorder      =>'NONE',
                 dataobjattr   =>"(case ".
                     "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
                     "else CHECK_ROADMAP ".
@@ -271,6 +274,7 @@ sub new
                 label         =>'OS Base-Setup: State',
                 group         =>['patch'],
                 htmldetail    =>0,
+                sqlorder      =>'NONE',
                 dataobjattr   =>getTCCStateSQL("(case ".
                     "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
                     "else CHECK_ROADMAP ".
@@ -281,6 +285,7 @@ sub new
                 label         =>'OS Base-Setup: Color',
                 group         =>['patch'],
                 htmldetail    =>0,
+                sqlorder      =>'NONE',
                 dataobjattr   =>getTCCColorSQL("(case ".
                     "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
                     "else CHECK_ROADMAP ".
