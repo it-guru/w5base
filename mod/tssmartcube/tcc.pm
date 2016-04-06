@@ -118,7 +118,10 @@ sub new
                 htmllabelwidth=>'250',
                 depend        =>['roadmap_color'],
                 group         =>['roadmap'],
-                dataobjattr   =>'OS_NAME'),
+                dataobjattr   =>"(case ".
+                    "when lower(OS_NAME) like '%windows%' then 'Windows' ".
+                    "else OS_NAME ".
+                    "end)"),
 
       new kernel::Field::Text(
                 name          =>'roadmap_check',
