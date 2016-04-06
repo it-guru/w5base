@@ -583,6 +583,8 @@ sub SendXmlToAM_appl
          die("AssetManager not online") if (!$acappl->Ping());
          if ((!($acapplrec->{assignmentgroup} eq "PSS" ||     # NO PSS Elements
                ($acapplrec->{assignmentgroup}=~m/^PSS\./))) &&
+             (!($acapplrec->{assignmentgroup} eq "GQ.PS" ||   # NO GQPS Elements
+               ($acapplrec->{assignmentgroup}=~m/^GQ\.PS\./))) &&
              ($rec->{acinmassingmentgroup} ne "" ||           # INM AG needed
               $rec->{applid} ne "")){
             my $CurrentEventId;
