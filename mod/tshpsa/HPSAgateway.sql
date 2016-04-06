@@ -22,7 +22,7 @@
 create table "W5I_HPSA_system_import" (
  objectid             VARCHAR2(40),
  systemid             VARCHAR2(40),
- hostname             VARCHAR2(128),
+ hostname             VARCHAR2(1024),
  agentip              VARCHAR2(80),
  managementip         VARCHAR2(80),
  deleted              Number(*,0) default '0',
@@ -38,7 +38,7 @@ create table "W5I_HPSA_lnkswp_import" (
  class                VARCHAR2(128),
  version              VARCHAR2(40),
  path                 VARCHAR2(255),
- uname                VARCHAR2(40),
+ uname                VARCHAR2(1024),
  scandate             DATE,
  deleted              Number(*,0) default '0',
  dmodifydate          DATE
@@ -71,21 +71,20 @@ create materialized view "mview_HPSA_lnkswp"
    refresh complete start with sysdate
    next sysdate+(1/24)*7
    as
-select objectid sysid,
-       objectid server_id,
+select item_id sysid,
+       item_id server_id,
        substr(replace(utl_i18n.string_to_raw(data =>
-              class||'-HostID'||objectid||'-'||
-              path||'-'||uname),' ',''),0,3000) id,
-       class||'-HostID'||objectid||'-'||
-          path||'-'||uname fullname,
-       dmodifydate curdate,
-       class swclass,
-       version swvers,
-       path swpath,
-       uname iname,
+              swclass||'-HostID'||item_id||'-'||
+              swpath||'-'||iname),' ',''),0,3000) id,
+       swclass||'-HostID'||item_id||'-'||
+          swpath||'-'||iname fullname,
+       mdate   curdate,
+       swclass swclass,
+       swvers  swvers,
+       swpath  swpath,
+       iname   iname,
        scandate
-
-from "W5I_HPSA_lnkswp_import" where deleted=0;
+from "W5XAUTOM_HPSA_UC128" where isdeleted=0;
 
 CREATE INDEX "HPSA_lnkswp_id" 
    ON "mview_HPSA_lnkswp"(id) online;
@@ -115,17 +114,21 @@ create materialized view "mview_HPSA_system"
    refresh complete start with sysdate
    next sysdate+(1/24)*12
    as
-select objectid  server_id,
-       dmodifydate curdate,
-       hostname hostname,
-       hostname name,
-       managementip pip,
-       systemid systemid
-
-from "W5I_HPSA_system_import" where deleted=0;
-
-
-
+with j as (select item_id,mdate,lower(hostname) lhostname,hostname,pip,systemid,
+           RANK() OVER (PARTITION BY item_id ORDER BY mdate DESC) dest_rank
+           from "W5XAUTOM_HPSA_UC128"
+           where regexp_like(systemid,'^S.{4,10}')
+           order by mdate),
+     s as (select distinct systemid
+           from "W5XAUTOM_HPSA_UC128"
+           where regexp_like(systemid,'^S.{4,10}'))
+SELECT j.item_id    server_id,
+       j.systemid   systemid,
+       j.mdate      curdate,
+       j.lhostname  hostname,
+       j.hostname   name,
+       j.pip        pip
+FROM s join j on s.systemid=j.systemid and dest_rank=1;
 
 
 CREATE INDEX "HPSA_system_id" 
