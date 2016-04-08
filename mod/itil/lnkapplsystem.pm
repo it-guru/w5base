@@ -673,6 +673,20 @@ sub new
                 }),
 
    );
+
+   $self->{history}={
+      insert=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ],
+      delete=>[
+         {dataobj=>'itil::appl', id=>'applid',
+          field=>'appl',as=>'systems'}
+      ]
+   };
+
    $self->setDefaultView(qw(appl system systemsystemid fraction cdate));
    $self->setWorktable("lnkapplsystem");
    return($self);
