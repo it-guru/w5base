@@ -345,45 +345,45 @@ sub new
                 label         =>'Event-End day',
                 depend        =>['eventend']),
 
-      new kernel::Field::DRange(
-                name          =>'range',
-                noselect      =>'1',
-                htmldetail    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                group         =>'state',
-                label         =>'Event time window',
-                depend        =>[qw(ranges rangem rangee)]),
-
-      new kernel::Field::Date(
-                name          =>'ranges',
-                noselect      =>'1',
-                htmldetail    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                group         =>'state',
-                label         =>'Range Start only',
-                dataobjattr   =>'wfrange.s'),
-
-      new kernel::Field::Date(
-                name          =>'rangem',
-                noselect      =>'1',
-                htmldetail    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                group         =>'state',
-                label         =>'Range middle',
-                dataobjattr   =>'wfrange.m'),
-
-      new kernel::Field::Date(
-                name          =>'rangee',
-                noselect      =>'1',
-                htmldetail    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                group         =>'state',
-                label         =>'Range End only',
-                dataobjattr   =>'wfrange.e'),
+#      new kernel::Field::DRange(
+#                name          =>'range',
+#                noselect      =>'1',
+#                htmldetail    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                group         =>'state',
+#                label         =>'Event time window',
+#                depend        =>[qw(ranges rangem rangee)]),
+#
+#      new kernel::Field::Date(
+#                name          =>'ranges',
+#                noselect      =>'1',
+#                htmldetail    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                group         =>'state',
+#                label         =>'Range Start only',
+#                dataobjattr   =>'wfrange.s'),
+#
+#      new kernel::Field::Date(
+#                name          =>'rangem',
+#                noselect      =>'1',
+#                htmldetail    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                group         =>'state',
+#                label         =>'Range middle',
+#                dataobjattr   =>'wfrange.m'),
+#
+#      new kernel::Field::Date(
+#                name          =>'rangee',
+#                noselect      =>'1',
+#                htmldetail    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                group         =>'state',
+#                label         =>'Range End only',
+#                dataobjattr   =>'wfrange.e'),
 
 
 
