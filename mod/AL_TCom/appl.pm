@@ -40,17 +40,9 @@ sub new
                 container     =>'additional'),
    );
    $self->addDesasterRecoveryClassFields(); # from TS::appl as field template
-   #  removed based on 
-   #  https://darwin.telekom.de/darwin/auth/base/workflow/ById/14135335110009
-   #$self->AddFields(
-   #   new kernel::Field::Text(
-   #             name          =>'applnumber',
-   #             searchable    =>0,
-   #             label         =>'Application number',
-   #             container     =>'additional'),
-   #   insertafter=>['applid'] 
-   #);
-   $self->getField("businessservices")->{vjointo}="AL_TCom::businessservice";
+   if (my $fobj=$self->getField("applowner")){
+      $fobj->{uivisible}=0;
+   }
 
    return($self);
 }

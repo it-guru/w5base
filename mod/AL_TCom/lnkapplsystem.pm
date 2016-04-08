@@ -1,6 +1,6 @@
 package AL_TCom::lnkapplsystem;
 #  W5Base Framework
-#  Copyright (C) 2010  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use itil::lnkapplsystem;
-@ISA=qw(itil::lnkapplsystem);
+use TS::lnkapplsystem;
+@ISA=qw(TS::lnkapplsystem);
 
 sub new
 {
