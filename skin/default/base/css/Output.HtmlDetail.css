@@ -284,7 +284,7 @@ textarea.multilinehtml{
    background:#ffffff;
 }
 
-textarea.multilinetext{
+textarea.multilinetext:enabled{
    height:96px;
    width:100%;
    margin:0px;
@@ -294,6 +294,18 @@ textarea.multilinetext{
    font-size:11px;
    color:black;
    background:#ffffff;
+}
+
+textarea.multilinetext:disabled{
+   height:96px;
+   width:100%;
+   margin:0px;
+   padding:0px;
+   font-weight:300;
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:11px;
+   color:gray;
+   background:##DEDEDE;
 }
 
 

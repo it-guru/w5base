@@ -177,6 +177,61 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'lnkapplappl.comments'),
 
+      new kernel::Field::Boolean(
+                name          =>'ifagreementneeded',
+                jsonchanged   =>\&getifagreementHandlingScript,
+                jsoninit      =>\&getifagreementHandlingScript,
+                group         =>'ifagreement',
+                label         =>'interface agreement necessary',
+                dataobjattr   =>'lnkapplappl.ifagreementneeded'),
+
+      new kernel::Field::Select(
+                name          =>'ifagreementlang',
+                label         =>'interface agreement language',
+                htmleditwidth =>'50%',
+                group         =>'ifagreement',
+                value         =>['',LangTable()],
+                dataobjattr   =>'lnkapplappl.ifagreementlang'),
+
+      new kernel::Field::File(
+                name          =>'ifagreementdoc',
+                label         =>'Interface-Agreement-Document',
+                content       =>'application/pdf',
+                searchable    =>0,
+                uploadable    =>0,
+                filename      =>'ifagreementdocname',
+                uploaddate    =>'ifagreementdocdate',
+                maxsize       =>'2097152',
+                group         =>'ifagreement',
+                dataobjattr   =>'lnkapplappl.ifagreementdoc'),
+
+      new kernel::Field::Text(
+                name          =>'ifagreementdocname',
+                label         =>'Interface-Agreement-Document Name',
+                searchable    =>0,
+                uploadable    =>0,
+                readonly      =>1,
+                group         =>'ifagreement',
+                dataobjattr   =>'lnkapplappl.ifagreementdocname'),
+
+      new kernel::Field::Date(
+                name          =>'ifagreementdocdate',
+                label         =>'Interface-Agreement-Document Date',
+                searchable    =>0,
+                uploadable    =>0,
+                readonly      =>1,
+                group         =>'ifagreement',
+                dataobjattr   =>'lnkapplappl.ifagreementdocdate'),
+
+     new kernel::Field::Textarea(
+                name          =>'ifagreementexclreason',
+                group         =>'ifagreement',
+                searchable    =>0,
+                htmldetail    =>'NotEmptyOrEdit',
+                depend        =>['ifagreementneeded'],
+                label         =>'reason on not needed interface agreement',
+                dataobjattr   =>'lnkapplappl.ifagreementexclreason'),
+
       new kernel::Field::Text(
                 name          =>'fromurl',
                 group         =>'comdetails',
@@ -418,8 +473,6 @@ sub initSearchQuery
 }
 
 
-
-
 sub getSqlFrom
 {
    my $self=shift;
@@ -438,6 +491,39 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/lnkapplappl.jpg?".$cgi->query_string());
 }
+
+
+sub getifagreementHandlingScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var d=document.forms[0].elements['Formated_ifagreementneeded'];
+var c=document.forms[0].elements['Formated_ifagreementexclreason'];
+
+if (d){
+   var v=d.options[d.selectedIndex].value;
+   if (v!="" && v!="0"){
+      if (c){
+         c.disabled=true;
+         //addClass(c,"disabledClass");
+      }
+   }
+   else{
+      if (c){
+         c.disabled=false;
+         //removeClass(c,"disabledClass");
+      }
+   }
+}
+
+EOF
+   return($d);
+}
+
+
 
 
 sub FinishWrite
@@ -701,6 +787,7 @@ sub Validate
       }
    }
 
+
    if (exists($newrec->{toapplid}) && 
        (!defined($oldrec) || $oldrec->{toapplid}!=$toapplid)){
       my $applobj=getModuleObject($self->Config,"itil::appl");
@@ -714,6 +801,10 @@ sub Validate
    }
 
    my $applid=effVal($oldrec,$newrec,"fromapplid");
+
+   if (exists($newrec->{ifagreementneeded}) && $newrec->{ifagreementneeded}){
+      $newrec->{ifagreementexclreason}='';
+   }
 
    if ($self->isDataInputFromUserFrontend()){
       if (!$self->isWriteOnApplValid($applid,"interfaces")){
@@ -730,7 +821,7 @@ sub Validate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default agreement comdetails impl
+   return(qw(header default ifagreement agreement comdetails impl
              interfacescomp desc classi source));
 }
 
@@ -741,7 +832,15 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   my @l=qw(header default ifagreement agreement comdetails impl
+             interfacescomp desc classi source); 
+   if (defined($rec) && exists($rec->{ifagreementneeded}) &&
+       !$rec->{ifagreementneeded}){
+      @l=grep(!/^agreement$/,@l);
+   }
+
+
+   return(@l);
 }
 
 sub SecureValidate
@@ -757,6 +856,7 @@ sub isWriteValid
    my $newrec=shift;
    my $applid=effVal($oldrec,$newrec,"fromapplid");
    my @editgroup=("default","interfacescomp","desc","agreement",
+                  "ifagreement",
                   "comdetails","impl","classi");
 
    return(@editgroup) if (!defined($oldrec) && !defined($newrec));
@@ -777,7 +877,7 @@ sub getRecordHtmlIndex
    my $grouplabel=shift;
    my @indexlist=$self->SUPER::getRecordHtmlIndex($rec,$id,$viewgroups,
                                                   $grouplist,$grouplabel);
-   push(@indexlist,{label=>$self->T('Interface agreement'),
+   push(@indexlist,{label=>$self->T('Interface agreement template'),
            href=>"InterfaceAgreement?id=$id",
            target=>"_blank"
           });

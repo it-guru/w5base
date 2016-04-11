@@ -197,7 +197,8 @@ sub  calcViewMatrix
       if ($fieldlist->[$c]->Type() eq "MatrixHeader"){
          $vMatrix->{uivisibleof}->[$c]=1;
       }
-      if ($fieldlist->[$c]->{htmldetail} eq "NotEmpty"){
+      if ($fieldlist->[$c]->{htmldetail} eq "NotEmpty" ||
+          $fieldlist->[$c]->{htmldetail} eq "NotEmptyOrEdit"){
          if (defined($rec)){
             my $v=$fieldlist->[$c]->RawValue($rec);
             if ($v ne ""){
@@ -219,7 +220,8 @@ sub  calcViewMatrix
          );
       }
       next if (!($vMatrix->{uivisibleof}->[$c]));
-      next if (!($vMatrix->{htmldetailof}->[$c]));
+      next if (!($vMatrix->{htmldetailof}->[$c]) &&
+                $fieldlist->[$c]->{htmldetail} ne "NotEmptyOrEdit");
        
       my @fieldgrouplist=($fieldlist->[$c]->{group});
       if (ref($fieldlist->[$c]->{group}) eq "ARRAY"){
@@ -228,6 +230,13 @@ sub  calcViewMatrix
       $vMatrix->{fieldgrouplist}->[$c]=\@fieldgrouplist;
       next if (!in_array($viewgroups,"ALL") &&
                !in_array($viewgroups,$vMatrix->{fieldgrouplist}->[$c]));
+      # next code is only running, if current field is in edit mode
+      if ($fieldlist->[$c]->{htmldetail} eq "NotEmptyOrEdit" &&
+          defined($currentfieldgroup) &&
+          in_array($currentfieldgroup,$vMatrix->{fieldgrouplist}->[$c])){
+         $vMatrix->{htmldetailof}->[$c]=1;
+      }
+      next if (!($vMatrix->{htmldetailof}->[$c]));
               
       $fieldlist->[$c]->extendFieldHeader($self->{WindowMode},$rec,
                                           \$self->{fieldHeaders}->{$name});
