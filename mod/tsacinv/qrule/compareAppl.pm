@@ -83,7 +83,7 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(0,undef) if ($rec->{cistatusid}!=4 &&
+   return(0,undef) if ($rec->{cistatusid}!=3 &&
                        $rec->{cistatusid}!=4 &&
                        $rec->{cistatusid}!=5); # ist notwendig, damit CIs
                                                # auch wieder aktiviert
