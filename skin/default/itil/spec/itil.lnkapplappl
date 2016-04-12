@@ -97,3 +97,35 @@ http://USER:PASSWORD\@HOST/PATH
 https://USER:PASSWORD\@HOST/PATH
 EOF
 
+'handleconfidential'=>{de=><<EOF,
+Wenn die Schnittstellendokumentation
+vertraulich behandelt werden soll, sind
+einige Felder (z.B. technisch Schnittstellen
+Beschreibung und Schnittstellenvereinbarung)
+nur noch von Personen lesbar, die auf
+eine der beiden beteiligten Anwendungen
+die Rolle "vertrauliches lesen" oder
+Schreibrechte vorweisen können.
+EOF
+en=><<EOF},
+If the interface documentation should
+be handled confidential, some fields
+(f.e. technical documentation and
+interface agreements) are only 
+readable for persons, how have
+the role "privacy read" or write
+rights on one of the both involved
+applications.
+EOF
+
+'implproject'=>{de=><<EOF,
+Optional kann der Projektname 
+angegeben werden, durch den die
+Schnittstelle implementiert wurde.
+EOF
+en=><<EOF},
+Optional you can specify the
+project name, which implements
+this interface.
+EOF
+
