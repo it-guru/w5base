@@ -93,3 +93,4 @@
 "If necessary, please perform any needed modifications of the interface documentation on the application '%s'."=>{
    de=>"Bitte führen Sie die evtl. notwendigen Anpassungen der Schnittstellendokumentation an der Anwendung '%s' durch."
 },
+'handle interface documentation confidential'=>{de=>'Schnittstellendokumentation vertraulich behandeln'},

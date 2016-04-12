@@ -188,7 +188,6 @@ sub new
       new kernel::Field::Select(
                 name          =>'ifagreementlang',
                 label         =>'interface agreement language',
-                htmleditwidth =>'50%',
                 group         =>'ifagreement',
                 value         =>['',LangTable()],
                 dataobjattr   =>'lnkapplappl.ifagreementlang'),
@@ -199,6 +198,7 @@ sub new
                 content       =>'application/pdf',
                 searchable    =>0,
                 uploadable    =>0,
+                types         =>['pdf','xls','doc'],
                 filename      =>'ifagreementdocname',
                 uploaddate    =>'ifagreementdocdate',
                 maxsize       =>'2097152',
@@ -338,6 +338,12 @@ sub new
                 value         =>[0,1,2],
                 htmleditwidth =>'200px',
                 dataobjattr   =>'lnkapplappl.exch_personal_data'),
+
+      new kernel::Field::Boolean(
+                name          =>'handleconfidential',
+                group         =>'classi',
+                label         =>'handle interface documentation confidential',
+                dataobjattr   =>'lnkapplappl.handleconfidential'),
 
 
       new kernel::Field::Text(
@@ -837,6 +843,23 @@ sub isViewValid
    if (defined($rec) && exists($rec->{ifagreementneeded}) &&
        !$rec->{ifagreementneeded}){
       @l=grep(!/^agreement$/,@l);
+   }
+   if (defined($rec) && $rec->{handleconfidential}){
+      my $foundprivread=0;
+      foreach my $appid ($rec->{fromapplid},$rec->{toapplid}){
+         my $acl=$self->loadPrivacyAcl('itil::appl',$appid);
+         if ($acl->{ro}){
+            $foundprivread++;
+            last;
+         }
+      }
+      if (!$foundprivread){
+         @l=grep(!/^agreement$/,@l);
+         @l=grep(!/^ifagreement$/,@l);
+         @l=grep(!/^impl$/,@l);
+         @l=grep(!/^desc$/,@l);
+         @l=grep(!/^comdetails$/,@l);
+      }
    }
 
 

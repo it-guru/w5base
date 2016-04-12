@@ -782,6 +782,8 @@ sub new
                 name          =>'picture',
                 label         =>'picture',
                 content       =>'image/jpg',
+                types         =>['jpg','jpeg'],
+                maxsize       =>1024*1024,
                 searchable    =>0,
                 uploadable    =>0,
                 group         =>'picture',
@@ -1426,28 +1428,6 @@ sub Validate
    }
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
-   }
-   if (exists($newrec->{picture})){
-      if ($newrec->{picture} ne ""){
-         no strict;
-         my $f=$newrec->{picture};
-         seek($f,0,SEEK_SET);
-         my $pic;
-         my $buffer;
-         my $size=0;
-         while (my $bytesread=read($f,$buffer,1024)) {
-            $pic.=$buffer;
-            $size+=$bytesread;
-            if ($size>10240){
-               $self->LastMsg(ERROR,"picure to large");
-               return(0);
-            }
-         }
-         $newrec->{picture}=$pic;
-      }
-      else{
-         $newrec->{picture}=undef;
-      }
    }
    if (exists($newrec->{killtimeout})){
       if (effVal($oldrec,$newrec,"killtimeout")<600){

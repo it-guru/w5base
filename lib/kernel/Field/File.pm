@@ -44,6 +44,11 @@ sub new
          return(undef);
       };
    }
+   $self->{size}="14" if (!exists($self->{size}) || $self->{size} eq "");
+   $self->{types}=['*'] if (!exists($self->{types}));
+   if (ref($self->{types}) ne "ARRAY"){
+      $self->{types}=split(/,\s*/,$self->{types});
+   }
    if (!defined($self->{content})){
       $self->{content}="application/octet-stream";
    }
@@ -93,11 +98,17 @@ sub FormatedDetail
          }
       }
       else{
-         return("&lt; noFile &gt;");
+         my $t=$self->getParent->T("no file",
+                                   "kernel::Field::File");
+         return("&lt; $t &gt;");
       }
    }
    if (($mode eq "edit" || $mode eq "workflow") && !defined($self->{vjointo})){
-      return($self->getHtmlInputArea());
+      my $delflag=0;
+      if ($d ne ""){
+         $delflag=1;
+      }
+      return($self->getHtmlInputArea($delflag));
    }
    if ($d ne ""){
       return($url);
@@ -108,7 +119,20 @@ sub FormatedDetail
 sub getHtmlInputArea
 {
    my $self=shift;
+   my $delflag=shift;
    my $name=$self->Name();
+   my $size=$self->{size};
+
+   my $delcode="";
+   if ($delflag){
+      my $t=$self->getParent->T("check box to delete file on save",
+                                "kernel::Field::File");
+      $delcode=<<EOF;
+<input type=checkbox id="ClearEntry$name" onclick="onChangeClear$name(this);">
+<label style="padding:0;margin:0" for="ClearEntry$name"><img title="$t" border=0 style="padding:0;margin:0" width=18 height=18 src="../../../public/base/load/trash.gif"></lable>
+EOF
+   }
+
    my $d=<<EOF;
 <script>
 function onChangeClear$name(e){
@@ -125,11 +149,9 @@ function onChangeClear$name(e){
    }
 }
 </script>
-<input id="FileEntry$name" type=file name=$name size=45>
+<input id="FileEntry$name" type=file name=$name size="$size">
 <input id="KillEntry$name" type=hidden name=$name disabled value="FORCECLEAR">
-<input type=checkbox id="ClearEntry$name" onclick="onChangeClear$name(this);">
-<label for="ClearEntry$name">Clear</lable>
-
+$delcode
 EOF
    return($d);
 }
@@ -156,10 +178,26 @@ sub Validate
           $newrec->{$self->Name()} ne "FORCECLEAR"){
          my $fname=sprintf("%s",$newrec->{$self->Name()});
          $fname=~s/^.*[\\\/]//; # strip path, if exists
+         my ($name,$ext)=$fname=~m/^(.*)\.([a-z0-9]{1,4})$/i;
+         $ext=lc($ext);
+         if (length($name)>25){
+            $name=substr($name,0,30);
+         }
+         $fname=$name.".".$ext;
+         if (!in_array($self->{types},"*")){
+            if (!in_array($self->{types},$ext)){
+               my $t=$self->getParent->T(
+                     'invalid file type - allowed are %s',
+                     "kernel::Field::File"
+               );
+               $t=sprintf($t,join(", ",@{$self->{types}}));
+               $self->getParent->LastMsg(ERROR,$t);
+               return(undef);
+            }
+         }
          if (exists($self->{filename})){
             $resrec->{$self->{filename}}=$fname;
          }
-         printf STDERR ("fifi fname=$fname\n");
          no strict;
          my $f=$newrec->{$self->Name()};
          seek($f,0,SEEK_SET);
@@ -169,9 +207,14 @@ sub Validate
          while (my $bytesread=read($f,$buffer,1024)) {
             $binstream.=$buffer;
             $size+=$bytesread;
-            if ($size>2097152){  # 2MB
-               $self->getParent->LastMsg(ERROR,"document to large");
-               return(0);
+            if ($size>$self->{maxsize}){  
+               my $t=$self->getParent->T(
+                     'document to large - max size %d bytes',
+                     "kernel::Field::File"
+               );
+               $t=sprintf($t,$self->{maxsize});
+               $self->getParent->LastMsg(ERROR,$t);
+               return(undef);
             }
          }
          $resrec->{$self->Name()}=$binstream;
@@ -213,8 +256,15 @@ sub ViewProcessor
          my ($rec,$msg)=$obj->getOnlyFirst(qw(ALL));
          if (defined($rec)){
             if ($obj->Ping()){
-               my $fo=$obj->getField($self->Name(),$rec);
-               $d=$fo->RawValue($rec);
+               my @l=$obj->isViewValid($rec);
+               if (in_array(\@l,"ALL") ||
+                   in_array(\@l,$self->{group})){ 
+                  my $fo=$obj->getField($self->Name(),$rec);
+                  $d=$fo->RawValue($rec);
+               }
+               else{
+                  msg(ERROR,"ileagal file attachment access $obj $refid");
+               }
             }
          }
       }
@@ -228,8 +278,6 @@ sub ViewProcessor
          }
       }
       my $filename=$self->{name}.$ext;
-
-      printf STDERR ("fifi length=%d\n",length($d));
 
       print $self->getParent->HttpHeader($self->{content},
               filename=>$filename);
