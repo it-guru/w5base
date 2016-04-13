@@ -539,53 +539,56 @@ sub FinishWrite
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
 
-   my $mode;
-   my ($applrec,$msg);
-
-   my $toapplChanged=0;
-   if (defined($oldrec) && effChanged($oldrec,$newrec,'toapplid')) {
-      $toapplChanged=1;
-   }
-
-   my $applobj=getModuleObject($self->Config,'itil::appl');
-
-   if (exists($newrec->{toapplid}) && 
-       (!defined($oldrec) || $toapplChanged)) {
-      $mode='InterfaceNew';
-   }
-   elsif (effChanged($oldrec,$newrec,'cistatusid')) {
-      $mode='InterfaceUpdate';
-      $newrec->{id}=$oldrec->{id} if (!defined($newrec->{id}));
-   }
-
-   if ($mode ne "") {
-      $applobj->SetFilter({id=>\$newrec->{fromapplid}});
-      ($applrec,$msg)=$applobj->getOnlyFirst(qw(name));
-      $newrec->{fromappl}=$applrec->{name};
-
-      $applobj->ResetFilter();
-      $applobj->SetFilter({id=>\$newrec->{toapplid}});
-      ($applrec,$msg)=$applobj->getOnlyFirst(qw(databossid contacts name));
-      $newrec->{toappl}=$applrec->{name};
-
-      $self->SetFilter({id=>$newrec->{id}});
-      my ($lnk,$msg)=$self->getOnlyFirst(qw(cistatus));
-      $newrec->{cistatus}=$lnk->{cistatus};
-
-      $applobj->NotifyWriteAuthorizedContacts($applrec,undef,
-                   {},{rec=>$newrec,mode=>$mode},
-                   \&NotifyIfPartner);
-   }
-
-   if ($toapplChanged) {
-      $applobj->ResetFilter();
-      $applobj->SetFilter({id=>\$oldrec->{toapplid}});
-      ($applrec,$msg)=$applobj->getOnlyFirst(qw(databossid contacts));
-      
-      $applobj->NotifyWriteAuthorizedContacts($applrec,undef,
-                   {},{rec=>$oldrec,mode=>'InterfaceDeleted'},
-                   \&NotifyIfPartner); 
-   }
+#   Remove Interface notification based on request
+#   https://darwin.telekom.de/darwin/auth/base/workflow/ById/14437067780001
+#
+#   my $mode;
+#   my ($applrec,$msg);
+#
+#   my $toapplChanged=0;
+#   if (defined($oldrec) && effChanged($oldrec,$newrec,'toapplid')) {
+#      $toapplChanged=1;
+#   }
+#
+#   my $applobj=getModuleObject($self->Config,'itil::appl');
+#
+#   if (exists($newrec->{toapplid}) && 
+#       (!defined($oldrec) || $toapplChanged)) {
+#      $mode='InterfaceNew';
+#   }
+#   elsif (effChanged($oldrec,$newrec,'cistatusid')) {
+#      $mode='InterfaceUpdate';
+#      $newrec->{id}=$oldrec->{id} if (!defined($newrec->{id}));
+#   }
+#
+#   if ($mode ne "") {
+#      $applobj->SetFilter({id=>\$newrec->{fromapplid}});
+#      ($applrec,$msg)=$applobj->getOnlyFirst(qw(name));
+#      $newrec->{fromappl}=$applrec->{name};
+#
+#      $applobj->ResetFilter();
+#      $applobj->SetFilter({id=>\$newrec->{toapplid}});
+#      ($applrec,$msg)=$applobj->getOnlyFirst(qw(databossid contacts name));
+#      $newrec->{toappl}=$applrec->{name};
+#
+#      $self->SetFilter({id=>$newrec->{id}});
+#      my ($lnk,$msg)=$self->getOnlyFirst(qw(cistatus));
+#      $newrec->{cistatus}=$lnk->{cistatus};
+#
+#      $applobj->NotifyWriteAuthorizedContacts($applrec,undef,
+#                   {},{rec=>$newrec,mode=>$mode},
+#                   \&NotifyIfPartner);
+#   }
+#
+#   if ($toapplChanged) {
+#      $applobj->ResetFilter();
+#      $applobj->SetFilter({id=>\$oldrec->{toapplid}});
+#      ($applrec,$msg)=$applobj->getOnlyFirst(qw(databossid contacts));
+#      
+#      $applobj->NotifyWriteAuthorizedContacts($applrec,undef,
+#                   {},{rec=>$oldrec,mode=>'InterfaceDeleted'},
+#                   \&NotifyIfPartner); 
+#   }
 
    return($bak);
 }
@@ -597,12 +600,15 @@ sub FinishDelete
    my $oldrec=shift;
    my $bak=$self->SUPER::FinishDelete($oldrec);
 
-   my $appl=getModuleObject($self->Config,'itil::appl');
-   $appl->SetFilter({id=>\$oldrec->{toapplid}});
-   my ($toappl,$msg)=$appl->getOnlyFirst(qw(databossid contacts));
-   $appl->NotifyWriteAuthorizedContacts($toappl,undef,
-             {},{rec=>$oldrec,mode=>'InterfaceDeleted'},
-             \&NotifyIfPartner);
+#   Remove Interface notification based on request
+#   https://darwin.telekom.de/darwin/auth/base/workflow/ById/14437067780001
+#
+#   my $appl=getModuleObject($self->Config,'itil::appl');
+#   $appl->SetFilter({id=>\$oldrec->{toapplid}});
+#   my ($toappl,$msg)=$appl->getOnlyFirst(qw(databossid contacts));
+#   $appl->NotifyWriteAuthorizedContacts($toappl,undef,
+#             {},{rec=>$oldrec,mode=>'InterfaceDeleted'},
+#             \&NotifyIfPartner);
 
    return($bak);
 }
