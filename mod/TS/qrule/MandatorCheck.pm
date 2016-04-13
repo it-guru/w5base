@@ -1,10 +1,10 @@
-package base::qrule::MandatorCheck;
+package TS::qrule::MandatorCheck;
 #######################################################################
 =pod
 
 =head3 PURPOSE
 
-If there is a mandator record which is not deleted, but referes to
+If there is a mandator record which installed/active, but referes to
 a group which is marked as "disposed of wasted", this will produce
 a DataIssue for admins.
 The admin needs to cleanup posible existing datas and set the 
@@ -17,7 +17,7 @@ NONE
 =cut
 #######################################################################
 #  W5Base Framework
-#  Copyright (C) 2010  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ NONE
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::QRule;
-@ISA=qw(kernel::QRule);
+use base::qrule::MandatorCheck;
+@ISA=qw(base::qrule::MandatorCheck);
 
 sub new
 {
@@ -48,53 +48,12 @@ sub new
    return($self);
 }
 
-sub getPosibleTargets
-{
-   return(["base::mandator"]);
-}
-
-sub qcheckRecord
-{
-   my $self=shift;
-   my $dataobj=shift;
-   my $rec=shift;
-
-   my @failmsg;
-
-   if ($self->isQruleApplicable($rec)){
-      my $grpid=$rec->{grpid};
-      if ($grpid eq "" || $grpid eq "0" || $grpid eq "-1"){
-         push(@failmsg,"missing correct group relation");
-      }
-      else{
-         my $grp=getModuleObject($dataobj->Config,"base::grp");
-         $grp->SetFilter({grpid=>\$grpid});
-         my @l=$grp->getHashList(qw(cistatusid grpid));
-         if ($#l!=0){
-            push(@failmsg,"no or not unique group entry");
-         }
-         else{
-            if ($l[0]->{cistatusid}==6){
-               push(@failmsg,"mandator points to a deleted group");
-            }
-         }
-      }
-   }
-
-
-   if ($#failmsg!=-1){
-      return(3,{qmsg=>[@failmsg],dataissue=>[@failmsg]});
-   }
-
-   return(0,undef);
-}
-
 sub isQruleApplicable
 {
    my $self=shift;
    my $rec=shift;
 
-   if ($rec->{cistatusid}<6){
+   if ($rec->{cistatusid}==4){
       return(1);
    }
    return(0);
