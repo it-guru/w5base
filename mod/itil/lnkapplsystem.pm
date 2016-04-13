@@ -50,6 +50,14 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'qlnkapplsystem.id'),
                                                  
+      new kernel::Field::Text(
+                name          =>'fullname',
+                htmlwidth     =>'250px',
+                label         =>'relation name',
+                searchable    =>0,
+                htmldetail    =>0,
+                dataobjattr   =>"concat(appl.name,' : ',system.name)"),
+                                                   
       new kernel::Field::TextDrop(
                 name          =>'appl',
                 htmlwidth     =>'250px',
@@ -683,7 +691,9 @@ sub new
       ],
       delete=>[
          {dataobj=>'itil::appl', id=>'applid',
-          field=>'appl',as=>'systems'}
+          field=>'system',as=>'systems'},
+         {dataobj=>'itil::system', id=>'systemid',
+          field=>'appl',as=>'applications'}
       ]
    };
 

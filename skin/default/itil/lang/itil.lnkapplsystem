@@ -9,6 +9,7 @@
 'fieldgroup.assetinfo'=>{de=>'Hardwareinformationen',
                           en=>'Assetinformations'},
 'Fraction'=>{de=>'Anteil des Systems an der Anwendung'},
+'relation name'=>{de=>'Verknüpfungsname'},
 'Application'=>{de=>'Anwendung'},
 'Application Customer'=>{de=>'Anwendungs Kunde'},
 'Application CI-State'=>{de=>'Anwendungs CI-Status'},
