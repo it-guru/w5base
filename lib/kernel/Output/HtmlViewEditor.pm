@@ -473,7 +473,8 @@ sub getFullFieldTreeSelect
       }
       $trgrp=~s/#.*$//g; #remove remarks
       $d.="<li class=liClosed id=tree_$c ".
-          "onMouseDown=\"return(false)\" xhead=1 onSelectStart=\"return(false)\" ".
+          "onMouseDown=\"return(false)\" ".
+          "xhead=1 onSelectStart=\"return(false)\" ".
           ">$trgrp";
       $c++;
       foreach my $fobj (@checkedobjs){

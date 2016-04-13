@@ -138,6 +138,20 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'lastlogin',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   if ($mode eq "ViewEditor"){
+                      return(0);
+                   }
+                   return(1);
+                },
                 group         =>'source',
                 label         =>'Last Login Date',
                 dataobjattr   =>SELpref.'operatorm1.last_login'),
