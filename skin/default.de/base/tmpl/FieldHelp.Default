@@ -32,7 +32,7 @@ In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
 <td nowrap valign=top><b>a* AND *s</b></td>
 <td>... mit einem großgeschriebenen AND können Sie mehrere Ausdrücke
     "und" verknüpfen. Im Beispiel werden z.B. die Datensätze aufgelistet,
-    ide mit a anfangen und gleichzeitig mit s aufhören.</td>
+    die mit a anfangen und gleichzeitig mit s aufhören.</td>
 </tr>
 
 <tr>
