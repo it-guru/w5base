@@ -155,6 +155,13 @@ sub new
                 name       =>'additional',
                 dataobjattr=>'mandator.additional'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'mandator.lastqcheck'),
+      new kernel::Field::QualityResponseArea(),
    );
    $self->setDefaultView(qw(linenumber name groupname cistatus cdate mdate));
    $self->setWorktable("mandator");

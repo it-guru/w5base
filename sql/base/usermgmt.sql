@@ -174,10 +174,10 @@ create table mandator (
   realeditor varchar(100) NOT NULL default '',
   srcsys     varchar(10) default 'w5base',
   srcid      varchar(20) default NULL,
-  srcload    datetime    default NULL,
+  srcload    datetime    default NULL,lastqcheck datetime default NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY applid (id),
-  UNIQUE KEY name (name),
+  UNIQUE KEY name (name),key(lastqcheck),
   UNIQUE KEY grpid (grpid),key(cistatus),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
