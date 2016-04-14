@@ -176,6 +176,7 @@ sub Validate
 
    my $resrec={};
 
+
    return($resrec) if (!exists($newrec->{$self->Name()}));
    if (exists($self->{maxsize})){
       if ($newrec->{$self->Name()} ne "" &&
@@ -259,8 +260,9 @@ sub Validate
             $resrec->{$self->{filename}}=undef;
          }
       }
+      return($resrec);
    }
-   return($resrec);
+   return({$self->Name()=>$newrec->{$self->Name()}});
 }
 
 
