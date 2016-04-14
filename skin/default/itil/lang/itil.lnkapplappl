@@ -22,7 +22,7 @@
 'Interface-Agreement-Document Name'=>{de=>'Schnittstellenvereinbarungs-Dateiname'},
 'Interface-Agreement-Document Date'=>{de=>'Schnittstellenvereinbarungs-Upload-Datum'},
 'from Application'=>{de=>'von Anwendung'},
-'reason on not needed interface agreement'=>{de=>'Begründung zur nicht-Notwendigkeit der Schnittstellenvereinbarung'},
+'reason on not needed interface agreement'=>{de=>'Begründung zur nicht-Notwendigkeit der Vereinbarung'},
 'to Application'=>{de=>'nach Anwendung'},
 'from URL'=>{de=>'von URL'},
 'Agreements'=>{de=>'Vereinbarungen und Rahmenbedinungen'},
