@@ -195,10 +195,10 @@ sub new
       new kernel::Field::File(
                 name          =>'ifagreementdoc',
                 label         =>'Interface-Agreement-Document',
-                content       =>'application/pdf',
                 searchable    =>0,
                 uploadable    =>0,
                 types         =>['pdf','xls','doc'],
+                mimetype      =>'ifagreementdoctype',
                 filename      =>'ifagreementdocname',
                 uploaddate    =>'ifagreementdocdate',
                 maxsize       =>'2097152',
@@ -222,6 +222,16 @@ sub new
                 readonly      =>1,
                 group         =>'ifagreement',
                 dataobjattr   =>'lnkapplappl.ifagreementdocdate'),
+
+      new kernel::Field::Text(
+                name          =>'ifagreementdoctype',
+                label         =>'Interface-Agreement-Document Type',
+                searchable    =>0,
+                uploadable    =>0,
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'ifagreement',
+                dataobjattr   =>'lnkapplappl.ifagreementdoctype'),
 
      new kernel::Field::Textarea(
                 name          =>'ifagreementexclreason',

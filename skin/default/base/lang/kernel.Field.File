@@ -1,4 +1,4 @@
 'check box to delete file on save'=>{de=>'ankreuzen, um vorhandene Datei beim Speichern zu löschen'},
 'no file'=>{de=>'keine Datei'},
-'document to large - max size %d bytes'=>{de=>'Dokument zu groß - maximale Größe %d Bytes'},
+'document to large - max size %s'=>{de=>'Dokument zu groß - maximale Größe %s'},
 'invalid file type - allowed are %s'=>{de=>'ungültiger Dateityp - erlaubt sind %s'},

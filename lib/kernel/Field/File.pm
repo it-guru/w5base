@@ -19,7 +19,6 @@ package kernel::Field::File;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field);
 
 
@@ -66,6 +65,11 @@ sub new
    if (exists($self->{uploaddate}) && $self->{uploaddate} ne ""){
       if (!in_array($self->{depend},$self->{uploaddate})){
          push(@{$self->{depend}},$self->{uploaddate});
+      }
+   }
+   if (exists($self->{mimetype}) && $self->{mimetype} ne ""){
+      if (!in_array($self->{depend},$self->{mimetype})){
+         push(@{$self->{depend}},$self->{mimetype});
       }
    }
    return($self);
@@ -208,11 +212,24 @@ sub Validate
             $binstream.=$buffer;
             $size+=$bytesread;
             if ($size>$self->{maxsize}){  
+               my $maxsize=$self->{maxsize};
+               if ($maxsize<1024){
+                  $maxsize="$maxsize bytes";
+               }
+               elsif ($maxsize<1024*1024){
+                  $maxsize=sprintf("%.1f kB",$maxsize/1024);
+               }
+               else{
+                  $maxsize=sprintf("%.1f MB",$maxsize/1024/1024);
+               }
+               if ($self->getParent->Lang() eq "de"){
+                  $maxsize=~s/\./,/g;
+               }
                my $t=$self->getParent->T(
-                     'document to large - max size %d bytes',
+                     'document to large - max size %s',
                      "kernel::Field::File"
                );
-               $t=sprintf($t,$self->{maxsize});
+               $t=sprintf($t,$maxsize);
                $self->getParent->LastMsg(ERROR,$t);
                return(undef);
             }
@@ -220,6 +237,17 @@ sub Validate
          $resrec->{$self->Name()}=$binstream;
          if (exists($self->{uploaddate})){
             $resrec->{$self->{uploaddate}}=NowStamp("en");
+         }
+         my $mimetype=$self->{content};
+         if (exists($self->{mimetype}) && $self->{mimetype} ne ""){
+            $resrec->{$self->{mimetype}}=undef;
+            if (my ($name,$ext)=$fname=~m/(.*)\.(\S{1,4})$/){
+               $self->getParent->ReadMimeTypes();
+               if (defined($self->getParent->{MimeType}->{lc($ext)})){
+                  $resrec->{$self->{mimetype}}=
+                    $self->getParent->{MimeType}->{lc($ext)};
+               }
+            }
          }
       }
       elsif($newrec->{$self->Name()} eq "FORCECLEAR"){
@@ -249,6 +277,8 @@ sub ViewProcessor
       my $obj=$self->getParent();
       my $idfield=$obj->IdField();
       my $d="";
+      my $content;
+      my $filename;
       if (defined($idfield)){
          $obj->ResetFilter();
          $obj->SecureSetFilter({$idfield->Name()=>\$refid});
@@ -261,6 +291,14 @@ sub ViewProcessor
                    in_array(\@l,$self->{group})){ 
                   my $fo=$obj->getField($self->Name(),$rec);
                   $d=$fo->RawValue($rec);
+                 if (exists($self->{mimetype})){
+                    my $fo=$obj->getField($self->{mimetype},$rec);   
+                    $content=$fo->RawValue($rec);
+                 }
+                 if (exists($self->{filename})){
+                    my $fo=$obj->getField($self->{filename},$rec);   
+                    $filename=$fo->RawValue($rec);
+                 }
                }
                else{
                   msg(ERROR,"ileagal file attachment access $obj $refid");
@@ -269,17 +307,28 @@ sub ViewProcessor
          }
       }
       my $ext=".bin";
-      if (my ($f1,$f2)=$self->{content}=~m/^(.*)\/(.*)$/){
+      if (!defined($content)){
+         $content=$self->{content};
+      }
+      if (my ($f1,$f2)=$content=~m/^(.*)\/(.*)$/){
          if ($f1 eq "image"){
             $ext=".$f2";
          }
          if ($f2 eq "pdf"){
             $ext=".pdf";
          }
+         if ($f2 eq "excel" || $f2 eq "vnd.ms-excel"){
+            $ext=".xls";
+         }
+         if ($f2 eq "msword"){
+            $ext=".doc";
+         }
       }
-      my $filename=$self->{name}.$ext;
+      if (!defined($filename)){
+         $filename=$self->{name}.$ext;
+      }
 
-      print $self->getParent->HttpHeader($self->{content},
+      print $self->getParent->HttpHeader($content,
               filename=>$filename);
       print $d;
       return;
