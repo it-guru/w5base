@@ -1,0 +1,2 @@
+#!/bin/bash
+ssh w5baseappl01 "env -i sudo -u w5base /bin/sh -c 'cd /apps/pkg/APPL01/var/opt/w5base && tar -cf - log/w5base.viewreq.*.gz log/w5base.query.*.gz log/w5base.soap.*.gz'" | tar -xvf -
