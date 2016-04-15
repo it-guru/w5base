@@ -49,6 +49,10 @@ sub Init
    $self->RegisterObj("itu.tscape.applver",
                       "tscape::applver",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tscape.nortarget",
+                      "tscape::nortarget",
+                      defaultacl=>['admin']);
    return($self);
 }
 

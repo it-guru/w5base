@@ -2,3 +2,4 @@
 'itu.tscape.archappl'=>{de=>'ICT-Objekt',en=>'ICT-Object'},
 'itu.tscape.applver'=>{de=>'Anwendungsversion',en=>'Applicationversion'},
 'itu.tscape.archappl.role'=>{de=>'Rolle',en=>'Role'},
+'itu.tscape.nortarget'=>{de=>'NOR Vorgabe',en=>'NOR Target'},
