@@ -47,7 +47,7 @@ u.U. in ServiceManager angezeigt wird.
 Ansprechpartner für Assignmentgroups im Allgemeinen ist der SPOC TelekomIT:
 https://darwin.telekom.de/darwin/auth/base/user/ById/14526036310001
 
-Bei Fragen wenden Sie bitte an den DARWIN Support:
+Bei Fragen wenden Sie sich bitte an den DARWIN Support:
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 
