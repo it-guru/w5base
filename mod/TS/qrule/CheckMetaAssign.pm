@@ -11,19 +11,20 @@ against her state.
 =head3 IMPORTS
 
 =head3 HINTS
-In Assignmentgroup fields (Change-Approver or Incident-Assignmentgroup)
-are only groups allowed, which are realy exists in AssetManager or
-ServiceManager.
-Incident-Assignmentgroups must exists in AssetManager AND ServiceManager!
+In fields Assignmentgroups (Change-Approver or Incident-Assignmentgroup)
+are only those groups allowed, which are in AssetManager or
+ServiceManager set as active.
+Incident-Assignmentgroups must be set as active in 
+AssetManager AND ServiceManager!
 
 [de:]
 
-In Assignmentgroup Felder (Change-Approver oder Incident-Assignmentgroup)
+In den Feldern Assignmentgroups (Change-Approver oder Incident-Assignmentgroup)
 sind nur Gruppen erlaubt, die auch wirklich in AssetManager oder 
-Servicemanager existieren.
+Servicemanager aktiv sind.
 
 Incident-Assignmentgroups müssen sowohl in AssetManager als auch in
-ServiceManager existieren.
+ServiceManager aktiv sind.
 
 =cut
 
