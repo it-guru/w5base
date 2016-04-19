@@ -199,6 +199,18 @@ sub getDetailBlockPriority                # posibility to change the block order
 }
 
 
+sub isOptionalFieldVisible
+{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   my $name=$param{field}->Name();
+
+   return(1) if ($name eq 'relations');
+   return($self->SUPER::isOptionalFieldVisible($mode,%param));
+}
+
+
 sub getNotifyDestinations
 {
    my $self=shift;
