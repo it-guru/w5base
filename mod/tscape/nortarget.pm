@@ -59,52 +59,81 @@ sub new
                 dataobjattr   =>'"W5BASEID"'),
 
       new kernel::Field::Text(
-                name          =>'bmodel_prod',
+                name          =>'itnormodel_prod',
                 group         =>'nortarget',
                 label         =>'OperationModel Prod',
                 dataobjattr   =>'"Betriebsmodell (Prod)"'),
 
       new kernel::Field::Text(
-                name          =>'bmodel_test',
+                name          =>'itnormodel_test',
                 group         =>'nortarget',
                 label         =>'OperationModel Test',
                 dataobjattr   =>'"Betriebsmodell (Test)"'),
 
       new kernel::Field::Text(
-                name          =>'bmodel_entw',
+                name          =>'itnormodel_entw',
                 group         =>'nortarget',
                 label         =>'OperationModel Entw',
                 dataobjattr   =>'"Betriebsmodell (Entw)"'),
 
       new kernel::Field::Text(
-                name          =>'bmodel_sonst1',
+                name          =>'itnormodel_sonst1',
                 group         =>'nortarget',
                 label         =>'OperationModel Sonst1',
                 dataobjattr   =>'"Betriebsmodell (Sonst1)"'),
 
       new kernel::Field::Text(
-                name          =>'bmodel_sonst2',
+                name          =>'itnormodel_sonst2',
                 group         =>'nortarget',
                 label         =>'OperationModel Sonst2',
                 dataobjattr   =>'"Betriebsmodell (Sonst2)"'),
 
       new kernel::Field::Text(
-                name          =>'bmodel_sonst3',
+                name          =>'itnormodel_sonst3',
                 group         =>'nortarget',
                 label         =>'OperationModel Sonst3',
                 dataobjattr   =>'"Betriebsmodell (Sonst3)"'),
 
       new kernel::Field::Text(
-                name          =>'bmodel_sonst4',
+                name          =>'itnormodel_sonst4',
                 group         =>'nortarget',
                 label         =>'OperationModel Sonst4',
                 dataobjattr   =>'"Betriebsmodell (Sonst4)"'),
 
       new kernel::Field::Text(
-                name          =>'bmodel_sonst5',
+                name          =>'itnormodel_sonst5',
                 group         =>'nortarget',
                 label         =>'OperationModel Sonst5',
                 dataobjattr   =>'"Betriebsmodell (Sonst5)"'),
+
+      new kernel::Field::Text(
+                name          =>'itnormodel',
+                group         =>'nortarget',
+                depend        =>[qw(itnormodel_prod   itnormodel_test   
+                                    itnormodel_entw 
+                                    itnormodel_sonst1 itnormodel_sonst2 
+                                    itnormodel_sonst3 itnormodel_sonst4 
+                                    itnormodel_sonst5)],
+                label         =>'effective NOR Model to use',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $dep=$self->{depend};
+                   my %m;
+                   foreach my $dep (@{$dep}){
+                      my $fld=$self->getParent->getField($dep);
+                      my $model=$fld->RawValue($current);
+                      $model=~s/ .*$//;
+                      next if ($model eq "S");
+                      next if ($model eq "");
+                      next if ($model eq "nicht relevant"); # sehr seltsam!
+                      $m{$model}++;
+                   }
+                   my @smodes=sort(keys(%m));
+                   my $mode=$smodes[0];
+                   $mode="S" if (!defined($mode));
+                   return($mode);
+                }),
 
       new kernel::Field::Text(
                 name          =>'persdata',
@@ -130,10 +159,17 @@ sub new
                 label         =>'Confirmer WIW-ID',
                 dataobjattr   =>'"WIW-ID Confirmer"'),
 
+      new kernel::Field::Date(
+                name          =>'mdate',
+                group         =>'source',
+                timezone      =>'CET',
+                label         =>'Confirmer Date',
+                dataobjattr   =>'"Confirmdate"'),
+
    );
    $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(id archapplid w5baseid appl));
+   $self->setDefaultView(qw(id archapplid appl itnormodel mdate));
    $self->setWorktable("V_DARWIN_EXPORT_NOR");
    return($self);
 }
