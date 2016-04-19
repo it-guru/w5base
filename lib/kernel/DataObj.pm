@@ -951,6 +951,12 @@ sub SecureValidate
    my $newrec=shift;
    my $wrgroups=shift;
    #msg(INFO,"SecureValidate in $self");
+   if (!defined($oldrec) && defined($newrec)){
+      if ($self->can("expandByDataACL")){
+         @{$wrgroups}=$self->expandByDataACL($newrec->{mandatorid},
+                                             @{$wrgroups});
+      }
+   }
    foreach my $wrfield (keys(%{$newrec})){
        my $fo=$self->getField($wrfield,$oldrec);
        if (defined($fo)){
@@ -984,22 +990,30 @@ sub SecureValidate
                !grep(/^.*\.$wrfield$/,@$wrgroups) && 
                !$writeok &&
                !($fo->Type() eq "Id"))){
-             my $fieldname=$wrfield;
-             msg(INFO,"wrgroups=".join(",",@$wrgroups));
-             msg(INFO,"writeok=$writeok");
-             if (defined($fo)){
-                my $label=$fo->Label();
-                my $fieldHeader="";
-                $fo->extendFieldHeader(
-                    "Upload",{},\$fieldHeader,
-                    $self->Self);
-                $label.=$fieldHeader;
-                $fieldname.="(".$label.")";
+             if (grep(/^!.*\.$wrfield$/,@$wrgroups)){
+                if (exists($newrec->{$wrfield}) && $newrec->{$wrfield} eq ""){
+                   delete($newrec->{$wrfield});
+                }
              }
-             my $msg=sprintf($self->T("write request to field '\%s' rejected"),
-                             $fieldname);
-             $self->LastMsg(ERROR,$msg);
-             return(0);
+             if (exists($newrec->{$wrfield})){
+                my $fieldname=$wrfield;
+                msg(INFO,"wrgroups=".join(",",@$wrgroups));
+                msg(INFO,"writeok=$writeok");
+                if (defined($fo)){
+                   my $label=$fo->Label();
+                   my $fieldHeader="";
+                   $fo->extendFieldHeader(
+                       "Upload",{},\$fieldHeader,
+                       $self->Self);
+                   $label.=$fieldHeader;
+                   $fieldname.="(".$label.")";
+                }
+                my $msg=sprintf($self->T(
+                                "write request to field '\%s' rejected"),
+                                $fieldname);
+                $self->LastMsg(ERROR,$msg);
+                return(0);
+             }
           }
        }
    }

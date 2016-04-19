@@ -1612,7 +1612,8 @@ sub getFieldObjsByView
    # 
    if (defined($param{current}) && exists($param{current}->{itnormodel})){
       if ($param{output} ne "kernel::Output::HtmlDetail"){
-         if (!$self->IsMemberOf("admin")){
+         if (!$self->IsMemberOf("admin") && 
+             !$self->IsMemberOf("w5base.itil.appl.securityread")){
             @l=grep({$_->{name} ne "itnormodel"} @l);
          }
       }
@@ -1993,10 +1994,19 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 }
          
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
+#sub SecureValidate
+#{
+#   my $self=shift;
+##   my $oldrec=shift;
+##   my $newrec=shift;
+##
+##   my $DataACLcheck=$self->SecureValidateCheckDataACL($oldrec,$newrec);
+##
+##   if (!$DataACLcheck){
+##      return($DataACLcheck);
+##   }
+#   return(kernel::DataObj::SecureValidate(@_));
+#}
 
 
 sub Validate
