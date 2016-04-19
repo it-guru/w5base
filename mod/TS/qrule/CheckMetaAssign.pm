@@ -24,7 +24,7 @@ sind nur Gruppen erlaubt, die auch wirklich in AssetManager oder
 Servicemanager aktiv sind.
 
 Incident-Assignmentgroups müssen sowohl in AssetManager als auch in
-ServiceManager aktiv sind.
+ServiceManager aktiv sein.
 
 =cut
 
