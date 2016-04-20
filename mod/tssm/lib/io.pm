@@ -375,7 +375,8 @@ sub mkChangeStoreRec
    my $app=$self->getParent();
    $wf->ResetFilter();
    $wf->SetFilter({srcsys=>\$selfname,srcid=>\$rec->{changenumber}});
-   my @oldrec=$wf->getHashList("id","class","stateid","step");
+   my @oldrec=$wf->getHashList("id","class","step",
+                               "stateid","headref");
    msg(DEBUG,"found on oldsearch %s",Dumper(\@oldrec));
    if ($#oldrec==0){
       $updateto=$oldrec[0]->{id};
@@ -402,10 +403,12 @@ sub mkChangeStoreRec
    }
    $wfrec{stateid}=17 if (lc($rec->{status}) eq "closed");
 
-   if ($wfrec{stateid}==2 &&
-       (($#oldrec== 0 && $oldrec[0]->{stateid}==1) ||
-        ($#oldrec==-1 && $wfrec{stateid}==2))) {
-      $wfrec{approvalphaseentry}=$rec->{sysmodtime};
+   if ($wfrec{stateid}==2) {
+      if (($#oldrec==0 && $oldrec[0]->{stateid}==1) ||
+          $#oldrec==-1                              ||
+          !defined($oldrec[0]->{headref}->{approvalphaseentry})) {
+         $wfrec{approvalphaseentry}=$rec->{sysmodtime};
+      }
    }
 
    $wfrec{additional}={
