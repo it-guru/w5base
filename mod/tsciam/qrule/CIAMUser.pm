@@ -371,6 +371,21 @@ sub qcheckRecord
          #printf STDERR ("fifi ist:\n%s\n\n",Dumper($rec->{emails}));
 
       }
+      if ((($ciamrec->{surname}=~m/^mustermann$/i) && 
+           ($ciamrec->{givenname}=~m/^max$/i) ) &&
+           $rec->{cistatusid} ne "6"){
+            $dataobj->Log(ERROR,"basedata",
+                   "Dummy entry detected. The Contact '%s'\n".
+                   "(userid=%s) will be marked as delete\n-".
+                   "\n-",
+                   $rec->{fullname},$rec->{userid});
+            my $user=getModuleObject($self->getParent->Config(),
+                                      "base::user");
+            $user->ValidatedUpdateRecord($rec,
+                     {cistatusid=>6},
+                     {userid=>\$rec->{userid}});
+            return(3,{qmsg=>['dummy contact detected']});
+      }
       if ($ciamrec->{office_state} eq "DTAG User"){
          if ($rec->{posix} ne ""){
             $dataobj->Log(ERROR,"basedata",

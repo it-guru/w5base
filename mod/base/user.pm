@@ -1525,6 +1525,7 @@ sub isViewValid
    my $secstate=$self->getCurrentSecState();
 
    if ($rec->{userid}!=$userid && 
+       $W5V2::OperationContext ne "QualityCheck" &&
        !(($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0) &&
          $self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"down"))){
       if ($secstate<2){
