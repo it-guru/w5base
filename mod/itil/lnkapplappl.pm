@@ -764,6 +764,20 @@ sub Validate
       }
    }
 
+   if (effVal($oldrec,$newrec,"cistatusid")<5) {
+      # check against flag 'isnoifaceappl' in fromappl
+      my $applobj=getModuleObject($self->Config,"itil::appl");
+      $applobj->SetFilter({id=>\$newrec->{fromapplid}});
+      my ($applrec,$msg)=$applobj->getOnlyFirst(qw(name isnoifaceappl));
+      if ($applrec->{isnoifaceappl}) {
+         my $msg=sprintf($self->T("Preset of '%s' is: ".
+                                  "'Application has no interfaces'"),
+                         $applrec->{name});
+         $self->LastMsg(ERROR,$msg);
+         return(0);
+      }
+   }
+
    if (!defined($oldrec)) {
       if (!exists($newrec->{htmlagreements})) {
          $newrec->{htmlagreements}=

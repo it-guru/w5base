@@ -880,6 +880,18 @@ sub new
                 group         =>'interfaces',
                 forwardSearch =>1,
                 subeditmsk    =>'subedit.appl',
+                depend        =>['isnoifaceappl','interfacescount'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}{isnoifaceappl} &&
+                       $param{current}{interfacescount}==0) {
+                      return(0);
+                   }
+                   return(1);
+                },
                 vjointo       =>'itil::lnkapplappl',
                 vjoinbase     =>[{toapplcistatus=>"<=5",cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'fromapplid'],
@@ -2048,6 +2060,13 @@ sub Validate
          $self->LastMsg(ERROR,
              $self->T("invalid number format '\%s' specified",
                       "finance::costcenter"),$newrec->{conumber});
+         return(0);
+      }
+   }
+   if ($newrec->{isnoifaceappl}) {
+      my $ifcnt=$self->getField('interfacescount')->RawValue($oldrec);
+      if ($ifcnt>0) {
+         $self->LastMsg(ERROR,$self->T("supernumerary interfaces existing"));
          return(0);
       }
    }

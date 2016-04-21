@@ -102,6 +102,7 @@
 'SLA availibility calculation base'=>{de=>'SLA Verfügbarkeit Berechnungsbasis'},
 'Service&Support Class'=>{de=>'Service & Support Klasse'},
 "value of '\%s' is not allowed"=>{de=>"der Inhalt von '\%s' ist nicht erlaubt"},
+'supernumerary interfaces existing'=>{de=>'überzählige Schnittstellen vorhanden'},
 'Keywords'=>{de=>'Schlüsselworte'},
 "value of '\%s' is not correct numeric"=>{de=>"der Inhalt von '\%s' ist nicht passend numerisch"},
 'NOR Model to use'=>{de=>'zu verwendendes NOR Lösungsmodel',

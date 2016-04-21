@@ -94,3 +94,7 @@
    de=>"Bitte führen Sie die evtl. notwendigen Anpassungen der Schnittstellendokumentation an der Anwendung '%s' durch."
 },
 'handle interface documentation confidential'=>{de=>'Schnittstellendokumentation vertraulich behandeln'},
+"Preset of '%s' is: 'Application has no interfaces'"=>{
+   de=>"Voreinstellung von '%s' ist: 'Anwendung hat keine Schnittstellen'"
+},
+
