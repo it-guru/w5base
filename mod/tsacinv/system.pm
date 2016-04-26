@@ -490,7 +490,7 @@ sub new
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>[qw(fullname description type)],
                 vjoininhash   =>[qw(ipaddress ipv4address ipv6address 
-                                    description dnsname)]),
+                                    description dnsname status)]),
 
       new kernel::Field::SubList(
                 name          =>'applications',
