@@ -29,8 +29,8 @@ Anwendung implementiert ist.
 
 Die Definition und der Zusammenhang der 
 einzelnen Level ist unter dem ...<br>
-<a href="https://darwin.telekom.de/darwin/auth/faq/article/ById/13959099930001"
- target="_blank">FAQ13959099930001</a><br>
+<a href="https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457"
+ target="_blank">SCM Dokument myMDS 85025</a><br>
 ... beschrieben.
 ',en=>'
 Disaster Recovery class, which is implemented 
@@ -38,8 +38,8 @@ for this application.
 
 The definition and relationship of each level 
 is described under the ...
-<a href="https://darwin.telekom.de/darwin/auth/faq/article/ById/13959099930001"
- target="_blank">FAQ13959099930001</a><br>
+<a href="https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457"
+ target="_blank">SCM Dokument myMDS 85025</a><br>
 '},
 'usetimes'=>{
 'de'=>'
