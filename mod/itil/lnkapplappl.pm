@@ -36,6 +36,8 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'lnkapplappl.id'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::TextDrop(
                 name          =>'fromappl',
                 htmlwidth     =>'250px',
@@ -760,8 +762,9 @@ sub Validate
 
    if (effVal($oldrec,$newrec,"cistatusid")<5) {
       # check against flag 'isnoifaceappl' in fromappl
+      my $fromapplid=effVal($oldrec,$newrec,"fromapplid");
       my $applobj=getModuleObject($self->Config,"itil::appl");
-      $applobj->SetFilter({id=>\$newrec->{fromapplid}});
+      $applobj->SetFilter({id=>\$fromapplid});
       my ($applrec,$msg)=$applobj->getOnlyFirst(qw(name isnoifaceappl));
       if ($applrec->{isnoifaceappl}) {
          my $msg=sprintf($self->T("Preset of '%s' is: ".
