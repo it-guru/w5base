@@ -87,9 +87,11 @@ sub new
                                  'CICS',
                                  'DB2',
                                  'DOKuStar',
+                                 'GPTR',
                                  'HP-NSK Pathway',
                                  'IIS',
                                  'IMS',  # IBM Information Management System
+                                 'IMS Connect',  # IBM IMS Client
                                  'Informix',
                                  'JacORB',
                                  'JBoss',
