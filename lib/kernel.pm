@@ -987,8 +987,10 @@ sub _FancyMailLinks
 sub FancyLinks
 {
    my $data=shift;
+   my $newline=chomp($data);
    $data=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}(["']{0,1}\s)#_FancyLinks("$1$2$3",$4)#ge;
    $data=~s#(http|https|telnet|news)(://\S+?)(\?\S+){0,1}$#_FancyLinks("$1$2$3",$4)#ge;
+   $data.="\n" if($newline);
    $data=~s#(mailto)(:\S+?)(\@)(\S+)#_FancyMailLinks("$1$2$3$4")#ge;
 
    return($data);
