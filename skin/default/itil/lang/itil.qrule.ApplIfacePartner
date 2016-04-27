@@ -1,0 +1,6 @@
+'itil::qrule::ApplIfacePartner'=>{
+   de=>'Prüfung auf nicht dokumentierte Schnittstellenzuordnungen',
+   en=>'check on not documented interface relations'
+},
+'Interface ID'=>{de=>'Schnittstellen-ID'},
+
