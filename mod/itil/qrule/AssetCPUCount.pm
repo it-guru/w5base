@@ -4,17 +4,35 @@ package itil::qrule::AssetCPUCount;
 
 =head3 PURPOSE
 
-Every asset needs one CPU at minimum to work. If there is no or 0 cpu-count
-defined on a phyiscal system in CI-Status "installed/active" or "available",
-this will produce an error.
-If the Core-Count is lower then the CPU-Count, this will also produce an
-error.
-A core count of more then 4096 and a cpucount of more then 1024 will be
-handled as not realistic.
+Every asset has to have at least one (1) CPU to work. A DataIssue is 
+generated, if there is either no or 0 CPU-count defined on a logical system 
+in CI-State "installed/active" or "available/in project". A DataIssue is also 
+generated, if the Core-Count is lower than the CPU-Count. A core count of more 
+than 4096 and a CPU-count of more than 1024 is considered not realistic.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Please enter a non-zero CPU count in the field 'CPU-Count' under 'Assetdata'.
+If the field 'allow automatic updates by interfaces' on the CI is set to 
+'yes', the data is automatically imported from Asset Manager. If the DataIssue 
+persists despite this, please contact the assignment group of the CI, 
+so the data can be changed in Asset Manager.
+
+[de:]
+
+Bitte tragen Sie einen CPU-Wert der ungleich Null ist in das Feld 
+'CPU-Anzahl' im Block 'Hardwaredaten' ein. Wenn am Datensatz das Feld 
+'automatisierte Updates durch Schnittstellen zulassen' auf 'ja' steht, 
+werden diese Angaben aus Asset Manager übertragen. Wenn dennoch DataIssues 
+erzeugt werden, wenden Sie sich bitte an die Assignment Gruppe des CI-s, 
+damit die Pflege in Asset Manager erfolgt.
+
 
 =cut
 #######################################################################
