@@ -551,6 +551,7 @@ sub FinishWrite
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
 
+   my $userid=$self->getCurrentUserId();
    my $mode;
    my ($applrec,$msg);
 
@@ -583,9 +584,8 @@ sub FinishWrite
       $self->SetFilter({id=>$newrec->{id}});
       my ($lnk,$msg)=$self->getOnlyFirst(qw(cistatus));
       $newrec->{cistatus}=$lnk->{cistatus};
-
       $applobj->NotifyWriteAuthorizedContacts($applrec,undef,
-                   {},{rec=>$newrec,mode=>$mode},
+                   {emailfrom=>$userid},{rec=>$newrec,mode=>$mode},
                    \&NotifyIfPartner);
    }
 
@@ -595,7 +595,7 @@ sub FinishWrite
       ($applrec,$msg)=$applobj->getOnlyFirst(qw(databossid contacts));
       
       $applobj->NotifyWriteAuthorizedContacts($applrec,undef,
-                   {},{rec=>$oldrec,mode=>'InterfaceDeleted'},
+                   {emailfrom=>$userid},{rec=>$oldrec,mode=>'InterfaceDeleted'},
                    \&NotifyIfPartner); 
    }
 
@@ -609,11 +609,12 @@ sub FinishDelete
    my $oldrec=shift;
    my $bak=$self->SUPER::FinishDelete($oldrec);
 
+   my $userid=$self->getCurrentUserId();
    my $appl=getModuleObject($self->Config,'itil::appl');
    $appl->SetFilter({id=>\$oldrec->{toapplid}});
    my ($toappl,$msg)=$appl->getOnlyFirst(qw(databossid contacts));
    $appl->NotifyWriteAuthorizedContacts($toappl,undef,
-             {},{rec=>$oldrec,mode=>'InterfaceDeleted'},
+             {emailfrom=>$userid},{rec=>$oldrec,mode=>'InterfaceDeleted'},
              \&NotifyIfPartner);
 
    return($bak);
@@ -632,6 +633,9 @@ sub NotifyIfPartner
    my %rec=%{$notifycontrol->{rec}};
 
    my $lnkobj=getModuleObject($self->Config,'itil::lnkapplappl');
+
+   $lnkobj->SetFilter({id=>$rec{id}});
+   my ($ifurl,$msg)=$lnkobj->getOnlyFirst('urlofcurrentrec');
 
    # key = contype of fromappl
    # val = possible contypes of toappl
@@ -652,7 +656,9 @@ sub NotifyIfPartner
    $ifparam.=$self->T('Interfacemode').': ';
    $ifparam.=$rec{conmode}."\n";
    $ifparam.=$self->T('Interface-State').': ';
-   $ifparam.=$rec{cistatus};
+   $ifparam.=$rec{cistatus}."\n\n";
+   $ifparam.="Details:\n";
+   $ifparam.=$ifurl->{urlofcurrentrec};
 
    my $todomsg=sprintf($self->T("If necessary, please perform any ".
                                 "needed modifications of the ".
@@ -661,6 +667,7 @@ sub NotifyIfPartner
                        $rec{toappl});
    $text=$self->T("Dear Databoss").",\n\n";
    if ($notifycontrol->{mode} eq 'InterfaceNew') {
+      $lnkobj->ResetFilter();
       $lnkobj->SetFilter(\%flt);
       return(undef) if ($lnkobj->CountRecords()!=0);
 
@@ -677,6 +684,7 @@ sub NotifyIfPartner
    }
 
    if ($notifycontrol->{mode} eq 'InterfaceUpdate') {
+      $lnkobj->ResetFilter();
       $lnkobj->SetFilter(\%flt);
       return(undef) if ($lnkobj->CountRecords()<1);
      
@@ -693,6 +701,7 @@ sub NotifyIfPartner
    }
 
    if ($notifycontrol->{mode} eq 'InterfaceDeleted') {
+      $lnkobj->ResetFilter();
       $lnkobj->SetFilter(\%flt);
       return(undef) if ($lnkobj->CountRecords()<1);
 
@@ -708,7 +717,6 @@ sub NotifyIfPartner
       $text.="\n\n";
       $text.=$todomsg;
    }
-
    return(($subject,$text));
 }
 
