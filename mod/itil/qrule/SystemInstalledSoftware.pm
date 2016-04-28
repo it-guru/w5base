@@ -4,17 +4,35 @@ package itil::qrule::SystemInstalledSoftware;
 
 =head3 PURPOSE
 
-Every System in in CI-Status "installed/active" or "available", may
-only use software products in software installations with an CI-Status
-of 3,4 or 5. In other cases, there will be a dataissue produced.
-For some instance types (OracleDB, Tomcat, Apache, Mysql) there will be
-a check done, if needed Software for these instances is installed
+Every System in CI-State "installed/active" or "available/in project" 
+may only use software products in software installations with a CI-State 
+of 3, 4 or 5. In other cases a DataIssue will be generated. A check is 
+executed for some instance types (OracleDB, Tomcat, Apache, Mysql) 
+to find out whether the software needed for these instances is installed 
 on the logical system.
-
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Please enter a software product that is installed on the system. 
+An overview of software that can be entered on a system can be found under 
+"IT-Inventory -> Basedata -> Software". You can find a more detailed 
+explanation in the FAQ Article
+https://darwin.telekom.de/darwin/auth/faq/article/ById/12560368290002
+
+[de:]
+
+Bitte tragen Sie ein Software-Produkt ein. Einen Überblick der Software, 
+die eingetragen werden kann, ist unter "IT-Inventar -> Stammdaten -> Software"
+zu finden. Eine detaillierte Beschreibung zum Eintragen von Software finden 
+Sie in dem FAQ-Artikel
+https://darwin.telekom.de/darwin/auth/faq/article/ById/12560368290002
+
 
 =cut
 #######################################################################
