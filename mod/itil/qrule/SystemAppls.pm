@@ -4,19 +4,37 @@ package itil::qrule::SystemAppls;
 
 =head3 PURPOSE
 
-Every System in CI-Status "installed/active" or "available", needs
-at least 1 link to an application. If there are no applications assigned,
-this will produce an error. In this case the databoss of the logical
-system has to contact one (the correct one) databoss of an application
-to assign the system to the application.
-This rule is inactive, if the system is a workstation and no server/applicationserver.
-This rule is also inactive, if the system is a infrastructure system
-and there is a sufficient description documented in comments.
-
+Every System in the CI-State "installed/active" or "available/in project" 
+has to be linked to at least one (1) application. If no applications 
+are assigned, a DataIssue is generated. In this case the databoss of the 
+logical system has to contact the databoss of the application the system 
+belongs to, to assign the system to the application. This rule is inactive 
+if the system is a workstation and not a server/applicationserver. 
+This rule is also inactive if the system is an infrastructure system and 
+a sufficient description is documented in the comments.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+An active system has to be linked to an active application. 
+The link between a system and an application is established on the 
+application side. Therefore it might be necessary for you to contact 
+the person responsible for maintaining the data of the application 
+and ask them to enter the system there.
+
+[de:]
+
+Ein aktives System muss mit einer aktiven Anwendung verknüpft sein. 
+Die Verbindung zwischen einem System und einer Anwendung wird an dem 
+Anwendungsdatensatz vorgenommen. Deshalb ist es möglich, dass Sie eine 
+für die Anwendung verantwortliche Person kontaktieren müssen, 
+um den Eintrag des Systems an der Anwendung durchzuführen.
+
 
 =cut
 #######################################################################
