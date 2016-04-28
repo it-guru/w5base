@@ -4,15 +4,28 @@ package itil::qrule::AssetReferenced;
 
 =head3 PURPOSE
 
-The Quality Rule checks, if an Asset in CI-Status "installed/active"
-is "used" be at least ONE logical system in CI-Status other than 
-"dipsosed of waste".
-If the CI-Status of the asset is not "marked as delete", it must
-be references by at least one logical system in any state.
+The QualityRule checks whether an Asset in CI-State "installed/active" 
+has at least one logical system assigned that is not in the CI-State 
+"dipsosed of waste". If the CI-State of the asset in AssetMananger 
+is not "marked as delete" it must be referenced by at least 
+one logical system in any state.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Please assign active systems to the asset or, if applicable, 
+change the CI-State of the asset.
+
+[de:]
+
+Bitte hinterlegen Sie aktive Systeme an dem Asset, oder, falls zutreffend, 
+ändern Sie den CI-Status des Assets.
+
 
 =cut
 #######################################################################
