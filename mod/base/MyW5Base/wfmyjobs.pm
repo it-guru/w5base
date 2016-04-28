@@ -348,10 +348,12 @@ sub SetFilter
          foreach my $rec ($dataobj->getHashList(qw(stateid  owner
                                                    fwdtarget 
                                                    fwdtargetid id))){
-            if (($rec->{stateid}==4 || $rec->{stateid}==1)  && 
-                $rec->{fwdtarget} eq "base::grp" &&
-                $rec->{owner}!=$userid){
-               next;
+            if ($dc eq "PERSONAL"){
+               if (($rec->{stateid}==4 || $rec->{stateid}==1)  && 
+                   $rec->{fwdtarget} eq "base::grp" &&
+                   $rec->{owner}!=$userid){
+                  next;
+               }
             }
             if ($vs eq "HIDEUNNECESSARY"){
                if (($rec->{stateid}==2)  && 
