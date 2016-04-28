@@ -4,10 +4,9 @@ package itil::qrule::SystemDB;
 
 =head3 PURPOSE
 
-A system containing a software instance based on a DBMS must flagged
-with systemclass databaseserver.
-Inconsistent entries between systemclass and software instances will
-produce an error.
+A system containing a software instance based on a DBMS must be marked 
+with the systemclass "databaseserver". Inconsistent entries of 
+systemclass and software instances generate a DataIssue.
 
 =head3 IMPORTS
 
@@ -15,22 +14,21 @@ NONE
 
 =head3 HINTS
 
-If there is a system marked as databaseserver (in systemclassification)
-there is need to have at least one software instance linked to the 
-locical system (or cluster complex) with a software installation based
-on a database software.
-In reverse if "is database server" is set to false, it is not allowed
-to have database instances on the logical system.
+If a system is marked as a database server (in the block "Systemclassification")
+it is necessary to have at least one software instance linked to the 
+logical system (or cluster complex) with a software installation based 
+on a database software. If a system is NOT marked as a database server 
+(the option "databaseserver" in "systemclassification" is set to "no"), 
+it is not allowed to have a database instance on that logical system.
 
 [de:]
 
 Wenn ein logisches System in der Systemklassifizierung als Datenbankserver
-markiert ist, dann muß min. eine Software-Instanz mit dem logischen
+markiert ist, dann muss min. eine Software-Instanz mit dem logischen
 System (oder Cluster Komplex) verbunden sein, die auf einer 
 Datenbanksoftware basiert.
-Umgekehrt ist muß darf falls ein System mit  "ist Datenbankserver"=nein
-markiert ist, auch keine Datenbank-Software-Instanz mit dem System
-verknüpft sein.
+Falls ein System KEIN Datenbank-Server ist ("ist Datenbankserver: nein"),
+darf auch keine Datenbank-Software-Instanz mit dem System verknüpft sein.
 
 
 =cut
