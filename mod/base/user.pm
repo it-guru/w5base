@@ -853,7 +853,12 @@ sub new
                 name          =>'lastexternalseen',
                 readonly      =>1,
                 group         =>'userro',
-                searchable    =>0,
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
                 dayonly       =>1,
                 htmldetail    =>'NotEmpty',
                 label         =>'Last-External-Seen',

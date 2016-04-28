@@ -122,26 +122,26 @@ sub qcheckRecord
                       $old=1;
                   }
                }
-               if ($old){
-                  if (1){   # Expression !($urec->{email}=~m/\@telekom\.de$/i)){
-                            # now with CIAM Interface not needed - because
-                            # all Telekom contacts should be in CIAM
-                     $ciamusr->Log(ERROR,"basedata",
-                                  "E-Mail '%s' not found in LDAP (CIAM) ".
-                                  "but with POSIX or DSID entry",
-                                  $urec->{email});
-                  }
-                  else{
-                     if (!defined($age) || $age>259200){ # half year
-                        $ciamusr->Log(ERROR,"basedata",
-                            "Contact '%s'\nseems to be a telekom ".
-                            "contact, which have\nleave the organisation.".
-                            "\nPlease check the existence. If he not\n".
-                            "leave the organisation, clear the posix entry.".
-                            "\n-",
-                            $urec->{fullname});
-                     }
-                  }
+               if ($old && $old->{lastexternalseen} eq ""){
+                 if (1){   # Expression !($urec->{email}=~m/\@telekom\.de$/i)){
+                           # now with CIAM Interface not needed - because
+                           # all Telekom contacts should be in CIAM
+                    $ciamusr->Log(ERROR,"basedata",
+                                 "E-Mail '%s' not found in LDAP (CIAM) ".
+                                 "but with POSIX or DSID entry",
+                                 $urec->{email});
+                 }
+                 else{
+                    if (!defined($age) || $age>259200){ # half year
+                       $ciamusr->Log(ERROR,"basedata",
+                           "Contact '%s'\nseems to be a telekom ".
+                           "contact, which have\nleave the organisation.".
+                           "\nPlease check the existence. If he not\n".
+                           "leave the organisation, clear the posix entry.".
+                           "\n-",
+                           $urec->{fullname});
+                    }
+                 }
                }
             }
             return($errorlevel,undef);
