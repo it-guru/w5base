@@ -4,13 +4,24 @@ package itil::qrule::SystemClusterStatus;
 
 =head3 PURPOSE
 
-This rule checks, if isclusternode=true if there are realy is a valid
-cluster is assigned. This rule also registeres a DataIssue, if the
-reference Cluster is not in cistatus "installed/active" or "available".
+This rule checks if "isclusternode"="true", if a valid cluster is assigned.
+This rule also creates a DataIssue if the referenced Cluster is not in 
+CI-State "installed/active" or "available/in project".
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+This rule checks if a valid cluster is assigned.
+
+[de:]
+
+Diese Regel prüft, ob ein gültiger Cluster eingetragen ist.
+
 
 =cut
 #######################################################################
