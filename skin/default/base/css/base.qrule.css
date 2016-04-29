@@ -1,0 +1,10 @@
+.further{
+   padding:5px;
+   margin:5px;
+   margin-top:30px;
+   background-color:lightgray;
+   width:80%;
+   max-width:500px;
+   overflow:auto;
+}
+

@@ -1081,7 +1081,8 @@ sub FullView
                            js=>'toolbox.js',
                            style=>['default.css',
                                    'kernel.App.Web.css',
-                                   'kernel.App.Web.DetailPage.css']);
+                                   'kernel.App.Web.DetailPage.css',
+                                   'base.qrule.css']);
    printf("<div style=\"margin-left:5px\">");
    printf("<h1>%s:</h1>",$self->T("Quality Rule"));
    printf("<h2 style=\"margin-top:20px\">%s</h2>",$rec->{name});
@@ -1116,6 +1117,17 @@ sub FullView
                                  "contact2","label"),$contact2);
    }
    print("</div>");
+
+   if (defined($rec)){
+      my $faq=getModuleObject($self->Config(),"faq::article");
+      if (defined($faq)){
+         my $further=$faq->getFurtherArticles("QualtiyRule ".$rec->{id},1);
+         if ($further ne ""){
+            print($further);
+         }
+      }
+   }
+
 
 
    print $self->HtmlBottom(body=>1);

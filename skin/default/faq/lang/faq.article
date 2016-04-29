@@ -20,7 +20,7 @@
 'View count'=>{de=>'Seitenaufrufe'},
 'faqartchanged'=>{de=>'Artikel geändert',en=>'Aricle changed'},
 'Further keywords'=>{de=>'weiterf. Schlüsselworte'},
-'further articles'=>{de=>'Weitere änliche oder weiterführende Artikel'},
+'further FAQ-articles'=>{de=>'Weitere ähnliche oder weiterführende FAQ-Artikel'},
 'View count'=>{de=>'Anzahl Vollbild Aufrufe'},
 'View frequeny'=>{de=>'Vollbild Aufrufe Häufung'},
 'View last'=>{de=>'letzter Vollbild Aufruf'},
