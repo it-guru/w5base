@@ -4,14 +4,30 @@ package tsacinv::qrule::compareSystemSOX;
 
 =head3 PURPOSE
 
-This qulaity rule compares a W5Base logical system to an AssetManager logical
-system and checks differences between the SOX state of the system.
-Only logical systems in W5Base with state not like 'reserved' or 'disposed of waste' will be checked.
-
+This QualityRule compares a W5Base/Darwin logical system to an AssetManager
+logical system and checks for differences between the SOX state of the system.
+Only logical systems in W5Base/Darwin with the CI-State different than 
+"reserved" and "disposed of waste" are checked.
 
 =head3 IMPORTS
 
 NOTHING
+
+=head3 HINTS
+
+[en:]
+
+The SOX value in DARWIN is usually inherited from the application.
+If this value differs from the value in AssetManager, the IT-SeM should 
+commission the change of values in Asset Manager by their system operation.
+
+[de:]
+
+Das SOX-Flag wird in W5Base/Darwin üblicherweise aus der Anwendung geerbt.
+Wenn sich dieser Wert von dem in AssetManager hinterlegten Wert unterscheidet,
+muss durch den IT-SeM ein Auftrag an den Systembetrieb erfolgen, damit
+die Daten in AssetManager gepflegt werden.
+
 
 =cut
 #######################################################################
