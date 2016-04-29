@@ -275,13 +275,33 @@ sub recordWriteOperators
    return($prim,$sec);
 }
 
+sub JSPlugin
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(js=>['J5Base.js'],
+                           body=>1,
+                           title=>'JSPlugin');
+   print(<<EOF);
+<script language="JavaScript">
+(function(window, document, undefined){
+   \$(document).ready(function() {
+      \$('#JSPlugin', window.parent.document).html("Hi User!");
+   });
+})(this,document);
+</script>
+
+EOF
+   print $self->HtmlBottom();
+}
+
 
 
 sub getValidWebFunctions
 {  
    my ($self)=@_;
    $self->doFrontendInitialize();
-   my @l=qw(NativMain Main mobileMain MainWithNew addAttach 
+   my @l=qw(NativMain JSPlugin Main mobileMain MainWithNew addAttach 
             NativResult Result Upload UploadWelcome UploadFrame
             Welcome Empty Detail Visual HtmlDetail HandleInfoAboSubscribe
             New Copy FormatSelect Bookmark startWorkflow
@@ -1601,7 +1621,22 @@ EOF
                  pages       =>[$self->getHtmlDetailPages($p,$rec)],
                  activpage  =>$p,
                  page        =>$page,
-                 actionbox   =>'<div id=IssueState>&nbsp;</div>'
+                 actionbox   =>
+"<div id=JSPlugin style='margin-top:3px;float:right'></div>
+ <div id=JSPluginLoader style='float:right'></div>
+ <script language=JavaScript>
+function createJSPluginLoader(){
+  var i = document.createElement('iframe');
+  i.src='JSPlugin';i.frameborder='0';i.width='0';i.height='0';
+  i.style.display='none';
+  document.getElementById('JSPluginLoader').appendChild(i);
+};
+if (window.addEventListener)
+   window.addEventListener('load', createJSPluginLoader, false);
+else if (window.attachEvent)
+   window.attachEvent('onload', createJSPluginLoader);
+else window.onload = createJSPluginLoader;
+</script><div id=IssueState>&nbsp;</div>"
                 );
 
 
@@ -1726,6 +1761,7 @@ sub getDetailFunctionsCode
    my $rec=shift;
    my $idname=$self->IdField->Name();
    my $id=$rec->{$idname};
+   my $sname=$self->Self();
 
    my $detailx=$self->DetailX();
    my $detaily=$self->DetailY();
@@ -1818,6 +1854,13 @@ function DetailHandleQualityCheck()
            "height=240,width=$detailx,toolbar=no,status=no,"+
            "resizable=yes,scrollbars=auto");
 }
+function DetailResearchEngine()
+{
+   openwin('../../base/ResearchEngine/StartWith/$sname/$id',
+           "ResearchEngine$id",
+           "height=800,width=1024,toolbar=no,status=yes,"+
+           "resizable=yes,scrollbars=auto");
+}
 function FinishHandleInfoAboSubscribe(returnVal,isbreak)
 {
    if (!isbreak){
@@ -1866,6 +1909,18 @@ sub getDetailFunctions
        $ENV{REMOTE_USER} ne "anonymous" &&
        $self->isQualityCheckValid($rec)){
       unshift(@f,$self->T("QualityCheck")=>"DetailHandleQualityCheck");
+   }
+   if (defined($rec)){
+      my $instdir=$self->Config->Param("INSTDIR");
+      my $s=$self->Self();
+      $s=~s/::/::Research::/;
+      $s=~s/::/\//g;
+      my $rmod=$instdir."/mod/".$s.".pm";
+      if (-f $rmod){
+         if ($self->IsMemberOf("admin")){
+            unshift(@f,$self->T("Research")=>"DetailResearchEngine");
+         }
+      }
    }
    return(@f);
 }
