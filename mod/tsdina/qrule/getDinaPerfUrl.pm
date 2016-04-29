@@ -3,12 +3,23 @@
 
 =head3 PURPOSE
 
-Check if the current system is known in DINA. If this is, the
-local perfurl is refreshed to allow display of "Performance" Tab
+Check if the system is known in DINA. If this is, the local perfurl is
+refreshed to display the "Performance" Tab.
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Make sure the system is also available in DINA.
+
+[de:]
+
+Püfen Sie, ob das System auch in DINA bekannt ist.
+
 
 =cut
 
