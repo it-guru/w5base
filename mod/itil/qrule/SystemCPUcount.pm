@@ -4,13 +4,26 @@ package itil::qrule::SystemCPUcount;
 
 =head3 PURPOSE
 
-Every system needs one CPU at minimum to work. If there is no or 0 cpu-count
-defined on a logical system in CI-Status "installed/active" or "available",
-this will produce an error.
+Every system has to have at least one (1) CPU to work. A DataIssue is 
+generated if there is either no or 0 CPU-count defined on a logical 
+system in CI-State "installed/active" or "available".
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Please enter a non-zero CPU count in the field "CPU-Count" under 
+"logical Systemdata".
+
+[de:]
+
+Bitte tragen Sie eine CPU-Anzahl in das Feld "CPU-Anzahl" im Block 
+"logische Systemdaten" ein. Der Wert darf nicht "0" sein.
+
 
 =cut
 #######################################################################
