@@ -6,46 +6,52 @@
    Views von W5Base/Darwin aus zugegriffen (TAD4DatW5W::*).
 */ 
 
-create or replace view "remote_TAD4D_adm_computer" as
-select 'tad4dp-'||adm_computer.computer_sys_id computer_sys_id,
-       adm_computer.computer_alias             computer_alias,
-       adm_computer.os_name                    os_name,
-       adm_computer.computer_model             computer_model,
-       adm_computer.sys_ser_num                sys_ser_num,
+-- drop materialized view "mview_TAD4D_adm_computer";
+create materialized view "mview_TAD4D_adm_computer"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*3
+   as
+select computer_sys_id,
+       computer_alias,
+       os_name,
+       computer_model,
+       sys_ser_num,
        to_date(substr(adm_computer.create_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                create_time,
        to_date(substr(adm_computer.update_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                update_time
-from adm.computer@tad4d adm_computer
+from adm_computer@tad4d
 union all
-select 'tad4di-'||adm_computer.computer_sys_id computer_sys_id,
-       adm_computer.computer_alias             computer_alias,
-       adm_computer.os_name                    os_name,
-       adm_computer.computer_model             computer_model,
-       adm_computer.sys_ser_num                sys_ser_num,
+select computer_sys_id,
+       computer_alias,
+       os_name,
+       computer_model,
+       sys_ser_num,
        to_date(substr(adm_computer.create_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                create_time,
        to_date(substr(adm_computer.update_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                update_time
-from adm.computer@tad4di adm_computer;
+from adm_computer@tad4di;
 
-begin
-   syncronizeTable('TAD4D_adm_computer','COMPUTER_SYS_ID');
-end;
-
-CREATE INDEX "cTAD4D_adm_lcomputer_alias" 
-   ON "cached_TAD4D_adm_computer"(lower(computer_alias)) online;
+CREATE INDEX "TAD4D_adm_computer_id" 
+   ON "mview_TAD4D_adm_computer"(computer_sys_id) online;
+CREATE INDEX "TAD4D_adm_lcomputer_alias" 
+   ON "mview_TAD4D_adm_computer"(lower(computer_alias)) online;
 
 
-create or replace view "remote_TAD4D_adm_agent" as
-select 'tad4dp-'||adm_agent.id                 agent_id,
-       'tad4dp-'||adm_agent.node_id            agent_node_id,
-       'prod'                                  enviroment,
-       adm_agent.custom_data1                  agent_custom_data1,
-       adm_agent.version                       agent_version,
-       adm_agent.ip_address                    agent_ip_address,
-       adm_agent.hostname                      agent_hostname,
-       adm_agent.status                        agent_statusid,
+-- drop materialized view "mview_TAD4D_adm_agent";
+create materialized view "mview_TAD4D_adm_agent"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*3
+   as
+select agent_id,
+       agent_node_id,
+       enviroment,
+       agent_custom_data1,
+       agent_version,
+       agent_ip_address,
+       agent_hostname,
+       agent_statusid,
        decode(adm_agent.status,
               '1','ok',
               '2','initializing',
@@ -56,9 +62,9 @@ select 'tad4dp-'||adm_agent.id                 agent_id,
               '7','missing software scan',
               '8','missing capacity scan',
               '-?-')                           agent_status,
-       adm_agent.os_name                       agent_osname,
-       adm_agent.os_version                    agent_osversion,
-       adm_agent.active                        agent_active,
+       agent_osname,
+       agent_osversion,
+       agent_active,
 
        to_date(substr(adm_agent.scan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_scan_time,
@@ -68,16 +74,16 @@ select 'tad4dp-'||adm_agent.id                 agent_id,
                                                agent_full_hwscan_time,
        to_date(substr(adm_agent.deleted_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_deleted_time
-   from custom.agent_v@tad4d adm_agent
+   from adm_agent@tad4d
 union all
-select 'tad4di-'||adm_agent.id                 agent_id,
-       'tad4di-'||adm_agent.node_id            agent_node_id,
-       'integ'                                 enviroment,
-       adm_agent.custom_data1                  agent_custom_data1,
-       adm_agent.version                       agent_version,
-       adm_agent.ip_address                    agent_ip_address,
-       adm_agent.hostname                      agent_hostname,
-       adm_agent.status                        agent_statusid,
+select agent_id,
+       agent_node_id,
+       enviroment,
+       agent_custom_data1,
+       agent_version,
+       agent_ip_address,
+       agent_hostname,
+       agent_statusid,
        decode(adm_agent.status,
               '1','ok',
               '2','initializing',
@@ -88,9 +94,9 @@ select 'tad4di-'||adm_agent.id                 agent_id,
               '7','missing software scan',
               '8','missing capacity scan',
               '-?-')                           agent_status,
-       adm_agent.os_name                       agent_osname,
-       adm_agent.os_version                    agent_osversion,
-       adm_agent.active                        agent_active,
+       agent_osname,
+       agent_osversion,
+       agent_active,
 
        to_date(substr(adm_agent.scan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_scan_time,
@@ -100,45 +106,36 @@ select 'tad4di-'||adm_agent.id                 agent_id,
                                                agent_full_hwscan_time,
        to_date(substr(adm_agent.deleted_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_deleted_time
-   from custom.agent_v@tad4di adm_agent;
+   from adm_agent@tad4di;
 
-begin
-   syncronizeTable('TAD4D_adm_agent','AGENT_ID');
-end;
 
-CREATE INDEX "cTAD4D_adm_agent_nodeid" 
-   ON "cached_TAD4D_adm_agent"(agent_node_id) online;
-CREATE INDEX "cTAD4D_adm_agent_systemid" 
-   ON "cached_TAD4D_adm_agent"(lower(agent_custom_data1)) online;
+CREATE INDEX "TAD4D_adm_agent_id" 
+   ON "mview_TAD4D_adm_agent"(agent_id) online;
+CREATE INDEX "TAD4D_adm_agent_nodeid" 
+   ON "mview_TAD4D_adm_agent"(agent_node_id) online;
+CREATE INDEX "TAD4D_adm_agent_systemid" 
+   ON "mview_TAD4D_adm_agent"(lower(agent_custom_data1)) online;
 
-create or replace view "remote_TAD4D_adm_instnativesw" as
-select 'tad4dp-'||
-       substr(adm_inst_native_sw.agent_id||'-'||
-              adm_inst_native_sw.native_id ||
-              lpad(rawtohex(install_path),128,'0'),0,200) id,
-       'tad4dp-'||adm_inst_native_sw.native_id  native_id,
-       'tad4dp-'||adm_inst_native_sw.agent_id   agent_id
-from adm.inst_native_sw@tad4d adm_inst_native_sw
+-- drop materialized view "mview_TAD4D_adm_instnativesw";
+create materialized view "mview_TAD4D_adm_instnativesw"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*3
+   as
+select * from adm_instnativesw@tad4d
 union all
-select 'tad4di-'||
-       substr(adm_inst_native_sw.agent_id||'-'||
-              adm_inst_native_sw.native_id ||
-              lpad(rawtohex(install_path),128,'0'),0,200) id,
-       'tad4di-'||adm_inst_native_sw.native_id  native_id,
-       'tad4di-'||adm_inst_native_sw.agent_id   agent_id
-from adm.inst_native_sw@tad4di adm_inst_native_sw;
+select * from adm_instnativesw@tad4di;
 
-begin
-   syncronizeTable('TAD4D_adm_instnativesw','ID');
-end;
-
-CREATE INDEX "cTAD4D_adm_instnativesw_id1" 
-   ON "cached_TAD4D_adm_instnativesw"(agent_id) online;
-CREATE INDEX "cTAD4D_adm_instnativesw_id2" 
-   ON "cached_TAD4D_adm_instnativesw"(native_id) online;
+CREATE INDEX "TAD4D_adm_instnativesw_id1" 
+   ON "mview_TAD4D_adm_instnativesw"(agent_id) online;
+CREATE INDEX "TAD4D_adm_instnativesw_id2" 
+   ON "mview_TAD4D_adm_instnativesw"(native_id) online;
 
 
-create or replace view "remote_TAD4D_adm_nativesw" as
+-- drop materialized view "mview_TAD4D_adm_nativesw";
+create materialized view "mview_TAD4D_adm_nativesw"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*3
+   as
 select 'tad4dp-'||adm_native_sw.id              native_id,
        adm_native_sw.package_name               package_name,
        adm_native_sw.package_version            package_version
@@ -149,22 +146,24 @@ select 'tad4di-'||adm_native_sw.id              native_id,
        adm_native_sw.package_version            package_version
 from adm.native_sw@tad4di  adm_native_sw;
 
-begin
-   syncronizeTable('TAD4D_adm_nativesw','NATIVE_ID');
-end;
-
-CREATE INDEX "cTAD4D_adm_nativesw_name" 
-   ON "cached_TAD4D_adm_nativesw"(lower(package_name)) online;
+CREATE INDEX "TAD4D_adm_nativesw_id" 
+   ON "mview_TAD4D_adm_nativesw"(native_id) online;
+CREATE INDEX "TAD4D_adm_nativesw_name" 
+   ON "mview_TAD4D_adm_nativesw"(lower(package_name)) online;
 
 
 
-create or replace view "remote_TAD4D_adm_prod_inv" as
-select 'tad4dp-'||adm_prod_inv.id              prod_inv_id,
-       'tad4dp-'||adm_prod_inv.agent_id        agent_id,
-       'tad4dp-'||adm_prod_inv.product_id      product_id,
-       'tad4dp-'||adm_prod_inv.branch_id        branch_id,
-       'tad4dp-'||adm_prod_inv.component_id    component_id,
-       adm_prod_inv.scope                      prod_inv_scope,
+-- drop materialized view "mview_TAD4D_adm_prod_inv";
+create materialized view "mview_TAD4D_adm_prod_inv"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*3
+   as
+select prod_inv_id,
+       agent_id,
+       product_id,
+       branch_id,
+       component_id,
+       prod_inv_scope,
        to_date(substr(
           decode(adm_prod_inv.start_time,
              '9999-12-31-00.00.00.000000',NULL,
@@ -175,16 +174,17 @@ select 'tad4dp-'||adm_prod_inv.id              prod_inv_id,
              '9999-12-31-00.00.00.000000',NULL,
              adm_prod_inv.end_time
           ),0,19),'YYYY-MM-DD-HH24.MI.SS')     prod_inv_end_time,
-       adm_prod_inv.is_remote                  prod_inv_is_remote,
-       adm_prod_inv.confidence_level           prod_inv_confidence_level
-from adm.prod_inv@tad4d   adm_prod_inv
+       prod_inv_is_remote,
+       prod_inv_confidence_level,
+       stype
+from adm_prod_inv@tad4d
 union all
-select 'tad4di-'||adm_prod_inv.id              prod_inv_id,
-       'tad4di-'||adm_prod_inv.agent_id        agent_id,
-       'tad4di-'||adm_prod_inv.product_id      product_id,
-       'tad4di-'||adm_prod_inv.branch_id        branch_id,
-       'tad4di-'||adm_prod_inv.component_id    component_id,
-       adm_prod_inv.scope                      prod_inv_scope,
+select prod_inv_id,
+       agent_id,
+       product_id,
+       branch_id,
+       component_id,
+       prod_inv_scope,
        to_date(substr(
           decode(adm_prod_inv.start_time,
              '9999-12-31-00.00.00.000000',NULL,
@@ -195,111 +195,74 @@ select 'tad4di-'||adm_prod_inv.id              prod_inv_id,
              '9999-12-31-00.00.00.000000',NULL,
              adm_prod_inv.end_time
           ),0,19),'YYYY-MM-DD-HH24.MI.SS')     prod_inv_end_time,
-       adm_prod_inv.is_remote                  prod_inv_is_remote,
-       adm_prod_inv.confidence_level           prod_inv_confidence_level
-from adm.prod_inv@tad4di  adm_prod_inv;
+       prod_inv_is_remote,
+       prod_inv_confidence_level,
+       stype
+from adm_prod_inv@tad4di;
 
-begin
-   syncronizeTable('TAD4D_adm_prod_inv','PROD_INV_ID');
-end;
-
-CREATE INDEX "cTAD4D_adm_prod_inv_id2" 
-   ON "cached_TAD4D_adm_prod_inv"(agent_id) online;
-CREATE INDEX "cTAD4D_adm_prod_inv_id3" 
-   ON "cached_TAD4D_adm_prod_inv"(product_id) online;
-CREATE INDEX "cTAD4D_adm_prod_inv_id4" 
-   ON "cached_TAD4D_adm_prod_inv"(component_id) online;
+CREATE INDEX "TAD4D_adm_prod_inv_id1" 
+   ON "mview_TAD4D_adm_prod_inv"(prod_inv_id) online;
+CREATE INDEX "TAD4D_adm_prod_inv_id2" 
+   ON "mview_TAD4D_adm_prod_inv"(agent_id) online;
+CREATE INDEX "TAD4D_adm_prod_inv_id3" 
+   ON "mview_TAD4D_adm_prod_inv"(product_id) online;
+CREATE INDEX "TAD4D_adm_prod_inv_id4" 
+   ON "mview_TAD4D_adm_prod_inv"(component_id) online;
 
 
--- create or replace view "remote_TAD4D_swcat_branch" as
--- select 'tad4dp-'||swcat_branch.id              branch_id,
---        swcat_branch.type                       stype
--- from swcat.branch@tad4d   swcat_branch
+-- drop materialized view "mview_TAD4D_swcat_branch";
+-- create materialized view "mview_TAD4D_swcat_branch"
+--    refresh complete start with sysdate
+--    next sysdate+(1/24)*6
+--    as
+-- select * from swcat_branch@tad4d
 -- union all
--- select 'tad4di-'||swcat_branch.id              branch_id,
---        swcat_branch.type                       stype
--- from swcat.branch@tad4di  swcat_branch;
+-- select * from swcat_branch@tad4di;
 -- 
--- begin
---    syncronizeTable('TAD4D_swcat_branch','BRANCH_ID');
--- end;
+-- CREATE INDEX "TAD4D_swbranch_id1" 
+--    ON "mview_TAD4D_swcat_branch"(branch_id) online;
 
-create or replace view "remote_TAD4D_adm_vendor" as
-select 'tad4dp-'||adm_vendor.id      vendor_id,
-       adm_vendor.name               vendor_name
-from adm.vendor@tad4d     adm_vendor
+
+-- drop materialized view "mview_TAD4D_adm_vendor";
+create materialized view "mview_TAD4D_adm_vendor"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*6
+   as
+select * from adm_vendor@tad4d
 union all
-select 'tad4di-'||adm_vendor.id      vendor_id,
-       adm_vendor.name               vendor_name
-from adm.vendor@tad4di     adm_vendor;
+select * from adm_vendor@tad4di;
 
-begin
-   syncronizeTable('TAD4D_adm_vendor','VENDOR_ID');
-end;
+CREATE INDEX "TAD4D_adm_vendor_id1" 
+   ON "mview_TAD4D_adm_vendor"(vendor_id) online;
 
-create or replace view "remote_TAD4D_adm_component" as
-select 'tad4dp-'||adm_component.id   component_id,
-       adm_component.is_free_only    is_free_only,
-       adm_component.name            component_name
-from adm.component@tad4d     adm_component
+
+-- drop materialized view "mview_TAD4D_adm_component";
+create materialized view "mview_TAD4D_adm_component"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*3
+   as
+select * from adm_component@tad4d
 union all
-select 'tad4di-'||adm_component.id   component_id,
-       adm_component.is_free_only    is_free_only,
-       adm_component.name            component_name
-from adm.component@tad4di     adm_component;
+select * from adm_component@tad4di;
 
-begin
-   syncronizeTable('TAD4D_adm_component','COMPONENT_ID');
-end;
+CREATE INDEX "TAD4D_adm_component_id1" 
+   ON "mview_TAD4D_adm_component"(component_id) online;
 
 
 
-
-create or replace view "remote_TAD4D_adm_swproduct" as
-select 'tad4dp-'||adm_swproduct.id          swproduct_id,
-       'tad4dp-'||adm_swproduct.vendor_id   vendor_id,
-       adm_swproduct.name                   swproduct_name,
-       adm_swproduct.version                swproduct_version,
-       adm_swproduct.is_pvu                 is_pvu,
-       adm_swproduct.is_rvu                 is_rvu,
-       adm_swproduct.is_sub_cap             is_sub_cap
-from adm.swproduct@tad4d  adm_swproduct
+-- drop materialized view "mview_TAD4D_adm_swproduct";
+create materialized view "mview_TAD4D_adm_swproduct"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*3
+   as
+select * from adm_swproduct@tad4d
 union all
-select 'tad4di-'||adm_swproduct.id          swproduct_id,
-       'tad4di-'||adm_swproduct.vendor_id   vendor_id,
-       adm_swproduct.name                   swproduct_name,
-       adm_swproduct.version                swproduct_version,
-       adm_swproduct.is_pvu                 is_pvu,
-       adm_swproduct.is_rvu                 is_rvu,
-       adm_swproduct.is_sub_cap             is_sub_cap
-from adm.swproduct@tad4di  adm_swproduct;
+select * from adm_swproduct@tad4di
 
-begin
-   syncronizeTable('TAD4D_adm_swproduct','SWPRODUCT_ID');
-end;
-
-CREATE INDEX "cTAD4D_adm_swproduct_id2" 
+CREATE INDEX "TAD4D_adm_swproduct_id1" 
+   ON "mview_TAD4D_adm_swproduct"(swproduct_id) online;
+CREATE INDEX "TAD4D_adm_swproduct_id2" 
    ON "mview_TAD4D_adm_swproduct"(vendor_id) online;
-
-
-CREATE OR REPLACE PROCEDURE "TAD4D_Refresh" AUTHID CURRENT_USER IS
-BEGIN
-   syncronizeTable('TAD4D_adm_computer','COMPUTER_SYS_ID');commit;
-   syncronizeTable('TAD4D_adm_agent','AGENT_ID');commit;
---   syncronizeTable('TAD4D_adm_instnativesw','ID');commit;
-   syncronizeTable('TAD4D_adm_nativesw','NATIVE_ID');commit;
-   syncronizeTable('TAD4D_adm_prod_inv','PROD_INV_ID');commit;
---    syncronizeTable('TAD4D_swcat_branch','BRANCH_ID');commit;
-   syncronizeTable('TAD4D_adm_vendor','VENDOR_ID');commit;
-   syncronizeTable('TAD4D_adm_component','COMPONENT_ID');commit;
-   syncronizeTable('TAD4D_adm_swproduct','SWPRODUCT_ID');commit;
-END "TAD4D_Refresh";
-
-begin
-   "TAD4D_Refresh"();
-end;
-
-
 
 
 /* Ebene 2 - Rekonstruktion der Datenzusammenhänge auf Basis
@@ -416,11 +379,10 @@ select "mview_TAD4D_adm_prod_inv".prod_inv_id         prod_inv_id,
        "mview_TAD4D_adm_agent".agent_hostname         agent_hostname,
        "mview_TAD4D_adm_agent".agent_scan_time        scan_time,
        "mview_TAD4D_adm_agent".enviroment             enviroment,
-       NULL                                           isfreeofcharge
---      decode("mview_TAD4D_adm_vendor".name,'IBM',
---         decode("mview_TAD4D_adm_component".is_free_only,1,1,
---          decode("mview_TAD4D_swcat_branch".stype,'10',1,0))
---      ,NULL)                                         isfreeofcharge
+      decode("mview_TAD4D_adm_vendor".vendor_name,'IBM',
+         decode("mview_TAD4D_adm_component".is_free_only,1,1,
+          decode("mview_TAD4D_adm_prod_inv".stype,'10',1,0))
+      ,NULL)                                         isfreeofcharge
 from "mview_TAD4D_adm_prod_inv"
      join "mview_TAD4D_adm_agent" 
        on "mview_TAD4D_adm_prod_inv".agent_id
@@ -436,9 +398,6 @@ from "mview_TAD4D_adm_prod_inv"
      join "mview_TAD4D_adm_vendor"
         on "mview_TAD4D_adm_swproduct".vendor_id
               ="mview_TAD4D_adm_vendor".vendor_id;
---    join "mview_TAD4D_swcat_branch"
---       on "mview_TAD4D_adm_prod_inv".branch_id
---             ="mview_TAD4D_swcat_branch".branch_id;
 grant select on "W5I_TAD4D_software" to "W5I";
 create or replace synonym W5I.TAD4D_software 
    for "W5I_TAD4D_software";
