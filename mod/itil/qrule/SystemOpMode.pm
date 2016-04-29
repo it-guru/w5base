@@ -1,4 +1,37 @@
 package itil::qrule::SystemOpMode;
+#######################################################################
+=pod
+
+=head3 PURPOSE
+
+This QualityRule checks whether the Systemclass and Operation mode of 
+a system with CI-State "available/in project" or "installed/active" are
+defined. A DataIssue is generated when no values are selected
+(all fields are set to no).
+
+=head3 IMPORTS
+
+NONE
+
+=head3 HINTS
+
+[en:]
+
+Please select the correct values in the fields "Systemclass" and 
+"Operation mode" according to the nature of the system. 
+E.g. for a database system belonging to a production environment application,
+set the fields "Databaseserver" and "Productionsystem" to "yes".
+
+[de:]
+
+Bitte wählen Sie in den Blocks "Systemklassifizierung" und "Betriebsart"
+die korrekten Werte, die der Nutzung des Systems entsprechen.
+Z.B. setzen Sie für ein Datenbanksystem einer Produkionsanwendung
+die Felder "Datenbankserver" und "Produktionssystem" auf "ja".
+
+
+=cut
+#######################################################################
 #  W5Base Framework
 #  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
 #
