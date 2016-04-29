@@ -4,15 +4,29 @@ package tsacinv::qrule::clusterSysCheck;
 
 =head3 PURPOSE
 
-This qulaity checks, if the current logical system is in AssetManager
-member of a cluster. If this true, the field is_clusternode must be
-set to true. if the cluster exists in w5base, the link to the cluster
-must be documented.
-
+This QualityRule checks, if the logical system is recorded as a part of 
+a cluster in AssetManager. If this is true, the field "is_clusternode"
+must be set to "true". If the cluster exists in W5Base/Darwin, 
+the link to the cluster must be documented.
 
 =head3 IMPORTS
 
 From AssetManager the relation to a cluster will be generated.
+
+=head3 HINTS
+
+[en:]
+
+Check whether the System is part of a cluster and whether the cluster 
+is available in W5Base/Darwin. If the needed cluster is not present 
+in W5Base/Darwin, it is necessary to create or import the cluster.
+
+[de:]
+
+Prüfen Sie, ob das System zu einem Cluster gehört und ob der Cluster in 
+W5base/Darwin vorhanden ist. Falls der benötigte Cluster noch nicht 
+vorhanden ist, muss er angelegt bzw. importiert werden.
+
 
 =cut
 #######################################################################
