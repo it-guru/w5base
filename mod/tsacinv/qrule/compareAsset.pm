@@ -4,15 +4,31 @@ package tsacinv::qrule::compareAsset;
 
 =head3 PURPOSE
 
-This qulaity rule compares a W5Base physical system to an AssetManager physical
-system (Asset) and updates on demand nessasary fields.
-Unattended Imports are only done, if the field "Allow automatic interface
-updates" is set to "yes".
-Only assets in W5Base with state "installed/active" will be synced!
+This QualityRule compares a W5Base physical system to an AssetManager 
+physical system (Asset) and updates the defined fields if necessary. 
+Automated imports are only done if the field "Allow automatic interface updates"
+is set to "yes".
+Only assets in W5Base/Darwin with the CI-State "installed/active" are synced!
 
 =head3 IMPORTS
 
 Location, Room, Memory, CPU-Count, Core-Count, SerialNo, CO-Number
+
+=head3 HINTS
+
+[en:]
+
+If the asset is maintained in AssetManager by the MU and only mirrored 
+to W5Base/Darwin, set the field "allow automatic updates by interfaces"
+in the block "Control-/Automationinformations" to "yes". 
+The data will be synced automatically.
+
+[de:]
+
+Falls das Asset in AssetManager durch die MU gepflegt wird, sollte 
+das Feld "automatisierte Updates durch Schnittstellen zulassen" im Block 
+"Steuerungs-/Automationsdaten" auf "ja" gesetzt werden.
+
 
 =cut
 
