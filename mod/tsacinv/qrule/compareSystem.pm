@@ -4,31 +4,44 @@ package tsacinv::qrule::compareSystem;
 
 =head3 PURPOSE
 
-This qulaity rule compares a W5Base logical system to an AssetManager logical
-system and updates on demand nessasary fields.
-Unattended Imports are only done, if the field "Allow automatic interface
-updates" is set to "yes".
-If a logical system is a workstation, no DataIssue Workflow is started on
-a missing systemid. If the SystemID is equal to the W5BaseID, no error
-will be reported, because the system is hadeled as "local only documented".
-Only logical systems in W5Base with state "installed/active" will be synced!
-
+This QualityRule compares a W5Base/Darwin logical system to an AssetManager
+logical system and updates the defined fields if necessary. Automated
+imports are only done if the field "Allow automatic interface updates"
+is set to "yes". If a logical system is a workstation, no DataIssue Workflow
+about a missing System ID is created. If the System ID is the same as the 
+W5BaseID, no error is generated, because the system is handled as a
+"locally documented only". Only logical systems in W5Base with state 
+"installed/active" are synced!
 
 =head3 IMPORTS
 
-From AssetManager the fields Memory, CPU-Count, CO-Number,
-Description, Systemname (since 04/2011) are imported.
-IP-Addresses can only be synced, if the field "Allow automatic interface
-updates" is set to "yes".
-If Mandator is set to "Extern" and "Allow automatic interface updates"
-is set to "yes", some aditional Imports are posible:
+The fields Memory, CPU-Count, CO-Number, Description, Systemname (since 04/2011)
+are imported from AssetManager. IP-Addresses can only be synced when the field 
+"Allow automatic interface updates" is set to "yes". If the Mandator is set to
+"Extern" and "Allow automatic interface updates" is set to "yes" some aditional
+Imports are posible:
 
 - "W5Base Administrator" field is set to the supervisor of Assignmentgroup in AC
 
-- "AC Assignmentgroup" is imported to comments field in W5Base
+- "AC Assignmentgroup" is imported to the comments field in W5Base
 
-If the system type is vmware, the AssetID from AssetManager will NOT
-be imported.
+If the system type is vmware, the AssetID from AssetManager will NOT be imported.
+
+=head3 HINTS
+
+[en:]
+
+If the logical system is maintained in AssetManager by the MU and only 
+mirrored to W5Base/Darwin, set the field "allow automatic updates by interfaces"
+in the block "Control-/Automationinformations" to "yes".
+The data will then be synchronised automatically.
+
+[de:]
+
+Falls das logische System in AssetManager durch die MU gepflegt ist,
+sollte das Feld "automatisierte Updates durch Schnittstellen zulassen"
+im Block "Steuerungs-/Automationsdaten" auf "ja" gesetzt werden.
+
 
 =cut
 #######################################################################
