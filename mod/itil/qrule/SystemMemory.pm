@@ -4,13 +4,26 @@ package itil::qrule::SystemMemory;
 
 =head3 PURPOSE
 
-Every system needs memory to work. If there is no or 0 memory size
-defined on a logical system in CI-Status "installed/active" or "available",
-this will produce an error.
+Every system has to have memory to work. A DataIssue is generated if 
+there is either no or 0 memory size defined on a logical system in 
+CI-State "installed/active" or "available/in project".
 
 =head3 IMPORTS
 
 NONE
+
+=head3 HINTS
+
+[en:]
+
+Please enter a non-zero memory value in the field "Memory" under 
+"logical Systemdata".
+
+[de:]
+
+Bitte tragen Sie einen Wert für den Arbeitsspeicher in das Feld 
+"Arbeitsspeicher" im Block "logische Systemdaten" ein.
+
 
 =cut
 #######################################################################
