@@ -19,19 +19,11 @@ NONE
 [en:]
 
 Please enter a non-zero CPU count in the field 'CPU-Count' under 'Assetdata'.
-If the field 'allow automatic updates by interfaces' on the CI is set to 
-'yes', the data is automatically imported from Asset Manager. If the DataIssue 
-persists despite this, please contact the assignment group of the CI, 
-so the data can be changed in Asset Manager.
 
 [de:]
 
 Bitte tragen Sie einen CPU-Wert der ungleich Null ist in das Feld 
-'CPU-Anzahl' im Block 'Hardwaredaten' ein. Wenn am Datensatz das Feld 
-'automatisierte Updates durch Schnittstellen zulassen' auf 'ja' steht, 
-werden diese Angaben aus Asset Manager übertragen. Wenn dennoch DataIssues 
-erzeugt werden, wenden Sie sich bitte an die Assignment Gruppe des CI-s, 
-damit die Pflege in Asset Manager erfolgt.
+'CPU-Anzahl' im Block 'Hardwaredaten' ein. 
 
 
 =cut
