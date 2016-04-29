@@ -15,6 +15,33 @@ needed.
 
 NONE
 
+=head3 HINTS
+
+[en:]
+
+A logical system must have a valid Costcenter in the field "Costcenter"
+in the block "Miscellaneous". If a Costcenter is entered and this 
+DataIssue is still present even after a QualityCheck, please make sure 
+that the Costcenter itself is available in Darwin.
+One way to do this is to click on the entered Costcenter - when you get 
+a "record not found" error it means that the Costcenter is not available 
+in Darwin and has to be created manually. To do this, go under 
+"IT-Inventory -> Basedata -> Costcenter -> New" and create the Costcenter.
+
+[de:]
+
+Am logischen System muss im Feld "Kontierungsobjekt" im Block "Sonstiges"
+ein Kontierungsobjekt hinterlegt sein. Falls ein Kontierungsobjekt 
+hinterlegt ist und das DataIssue nach dem Auslösen des QualityChecks 
+weiterhin besteht, vergewissern Sie sich, dass das Kontierungsobjekt 
+in W5Base/Darwin angelegt ist. 
+Wenn Sie das Kontierungsobjekt anklicken und die Meldung 
+"Datensatz nicht gefunden" bekommen, ist das Kontierungsobjekt noch nicht 
+in W5Base/Darwin vorhanden. Es muss unter
+"IT-Inventar -> Stammdaten -> Kontierungsobjekt -> Neueingabe"
+manuell angelegt werden.
+
+
 =cut
 #######################################################################
 #  W5Base Framework
