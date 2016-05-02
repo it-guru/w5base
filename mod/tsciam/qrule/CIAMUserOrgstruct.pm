@@ -122,7 +122,7 @@ sub qcheckRecord
                       $old=1;
                   }
                }
-               if ($old && $old->{lastexternalseen} eq ""){
+               if ($old && defined($rec) && $rec->{lastexternalseen} eq ""){
                  if (1){   # Expression !($urec->{email}=~m/\@telekom\.de$/i)){
                            # now with CIAM Interface not needed - because
                            # all Telekom contacts should be in CIAM
