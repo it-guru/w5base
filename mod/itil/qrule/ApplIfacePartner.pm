@@ -20,20 +20,19 @@ NONE
 
 [en:]
 
-This quality rule checks, if interface definitions to this application
-are existing, which are not yet documented here.
-The check also keeps the data direction in mind, i.e. send/send and
-receive/receive are not allowed.
+This Qrule checks whether there are interfaces referring to this application
+that are not present on this application itself. The Qrule checks the
+data direction (e.g. send/send and receive/receive are not allowed.)
+Please document the corresponding interface or contact the interface partner,
+in case this is an incorrect entry.
 
-Please document the corresponding interface, or contact the interface
-partner, if you are of the´mind, that this is an incorrect entry.
-
-In further questions please contact the Darwin Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+In case of further questions regarding Darwin
+please contact the Darwin Support:
+https://darwin.telekom.de/darwin/public/faq/article/ById/13388110470010
 
 [de:]
 
-Dieses Qualitätsregel prüft, ob es Schnittstelleneinträge zu dieser
+Diese Qualitätsregel prüft, ob es Schnittstelleneinträge zu dieser
 Anwendung gibt, die hier noch nicht dokumentiert sind.
 Dabei wird auch die Datenflussrichtung berücksichtigt,
 d.h. senden/senden und empfangen/empfangen sind nicht erlaubt.
@@ -42,8 +41,9 @@ Bitte legen Sie den korrespondierenden Schnittstelleintrag an,
 oder kontaktieren Sie den Schnittstellenpartner, falls Sie der Meinung
 sind, dass es sich um einen fehlerhaften Eintrag handelt.
 
-Bei weiteren Fragen wenden Sie sich bitte an den Darwin-Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+Bei weiteren Fragen bezüglich Darwin
+wenden Sie sich bitte an den Darwin-Support:
+https://darwin.telekom.de/darwin/public/faq/article/ById/13388110470010
 
 
 =cut
