@@ -278,18 +278,13 @@ sub Initialize
 }
 
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_saphier"))){
-#     Query->Param("search_saphier"=>
-#                  "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
-#   }
-#   if (!defined(Query->Param("search_denv"))){
-#     Query->Param("search_denv"=>
-#                  "\"!out of scope\"");
-#   }
-#}
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_scannerfound"))){
+     Query->Param("search_scannerfound"=>"\"".$self->T("boolean.false")."\"");
+   }
+}
 
 
 #sub isViewValid
