@@ -356,6 +356,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'rawsystemolaclass',
+                htmldetail    =>0,
                 label         =>'raw System OLA Service Class',
                 dataobjattr   =>"decode(amcomputer.seappcom,".
                                 "'0','UNDEFINED',".
