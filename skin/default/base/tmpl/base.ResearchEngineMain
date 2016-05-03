@@ -1,0 +1,749 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<title>W5Base Research and Analyse Engine - preBETA!</title>
+</head><body>
+<table width=100% border=0 cellspacing=0 cellpadding=0 height=100%>
+<tr height=1%><td colspan=2>%TITLEBAR%</td></tr>
+<tr><td><div id='canvasframe'><canvas id="canvas" width="1" height="1"></canvas>
+</div></td>
+<td valign=top width=220>
+<div id="con">
+</div>
+</td>
+</tr>
+<tr height=192><td colspan=2 valign=top><div id="tab">&nbsp;</div></td></tr>
+</table>
+
+<style>
+canvas {
+	border: 1px solid #AAA;
+	background-color: #F6F6F6;
+}
+body{
+   margin:0;padding:0;
+}
+
+
+</style>
+
+<link rel="stylesheet" href="../../../public/base/load/jquery.ui.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/default.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/base.ResearchEngine.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/work.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/jquery.dataTables.css"></link>
+<xscript src="excanvas.js"></xscript>
+
+
+<script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+
+<script language="JavaScript" src="../../../public/base/load/jquery.dataTables.js">
+</script>
+
+<script language="JavaScript" src="../../../public/base/load/jquery.ui.js">
+</script>
+
+<script language="JavaScript" src="../../../public/base/load/jquery.enterKey.js">
+</script>
+
+<script language="JavaScript" src="../../../public/base/load/jquery.mousewheel.js">
+</script>
+
+<script language="JavaScript" src="../../../auth/base/ResearchEngine/ClassLib">
+</script>
+
+<script src="../../../public/base/load/springy.js"></script>
+<script language="JavaScript" >
+
+var W5AppClass=function(){
+
+   this.ObjectBoxWidth=150;   // Area reserved for drawing
+   this.ObjectBoxHeight=25;   // Objects (all Objects needs to have the same
+                              // size)
+   this.Init=function(){
+      console.log("init W5AppClass");
+   }
+   this.Run=function(){
+      console.log("Run W5App");
+      this.graph = new Graph();
+      var canvas = document.getElementById("canvas");
+      this.ctx = canvas.getContext("2d");
+      this.layout = new Layout.ForceDirected(this.graph, 500.0, 500.0, 0.5);
+
+   };
+   this.toObjKey=function(dataobj,id){
+      return(dataobj+'::'+id);
+   };
+   // ============== Search handling  =====================
+   this.ClearSearchResult=function(){
+      $('#Result').html("");
+      this._ResultBuffer=new Array();
+   }
+   this.SearchStart=function(){
+      $('#Result').html("Searching ...");
+   }
+   this.SearchAddResultRecord=function(o){
+      this._ResultBuffer.push(o);
+   }
+   this.addActivators = function(){
+      $('.addActivators').click(function(e){
+         console.log("fifi click on ",$(this));
+         var dataobj=$(this).attr("dataobj");
+         var dataobjid=$(this).attr("dataobjid");
+         console.log("fifi click on "+dataobj+" id="+dataobjid);
+         W5App.addObject(dataobj,dataobjid);
+      });
+   };
+   this.SearchFinishResult=function(o){
+      var d="";
+      console.log("this.SearchFinishResult",this._ResultBuffer);
+      for(c=0;c<this._ResultBuffer.length;c++){
+         d+="<tr><td><div class=addActivators "+
+            "dataobj='"+this._ResultBuffer[c].dataobj+"' "+
+            "dataobjid='"+this._ResultBuffer[c].dataobjid+"'>"+
+            this._ResultBuffer[c].label+"</div></td></tr>";
+      }
+      $('#Result').html("<table class=SearchResult>"+d+"</table>");
+      $('#Result tr').hover(function() {
+          $(this).css('color', 'red');
+          $(this).css('cursor', 'pointer');
+      }, function() {
+          $(this).css('color', '');
+      });
+      this.addActivators();
+   }
+   // =====================================================
+
+   this.addObject=function(dataobj,id){
+      var k=dataobj+'::'+id;
+
+      if (!this.graph.NodeExists(k)){
+         var o=this.graph.newNode(k,{
+            w5obj:new DataObject[dataobj].Class(id),
+            app:this,
+            dataobj:dataobj,
+            dataobjid:id,
+            displayname:function(){
+               return(this.w5obj.displayname());
+            },
+            rec:undefined,
+            id:k
+         });
+         return(o);
+      }
+      return(this.graph.NodeExists(k));
+   };
+
+   this.addConnector=function(dataobj1,id1,dataobj2,id2,color){
+      var k1=this.toObjKey(dataobj1,id1);
+      var k2=this.toObjKey(dataobj2,id2);
+      console.log("addConnector k1",k1,"k2",k2);
+      return(this.addConnectorKK(k1,k2,color));
+   };
+   this.addConnectorKK=function(k1,k2,color){
+      var k=k1+'::'+k2;
+      if (!color){
+         color=0;
+      }
+      var colors=['#EDC951','#6A4A3C','#CC333F','#EB6841',
+                  '#EDC951','#7DBE3C','#000000'];
+
+      console.log("addConnectorKK k=",k,"k1",k1,"k2",k2);
+
+      if (k1!=k2){
+         if (!this.graph.EdgeExists(k)){
+            var n1 = this.graph.NodeExists(k1);
+            var n2 = this.graph.NodeExists(k2);
+
+            var e = this.graph.newEdge(k,n1, n2);
+            e.data.stroke = colors[color];
+         }
+      }
+      else{
+         console.log("bug k1=k2",k);
+      }
+   };
+
+   this.setObjectFocus = function(dataobj,dataobjid){
+      var k=dataobj+'::'+dataobjid;
+      if (node=this.graph.NodeExists(k)){
+         console.log("klick on ",node);
+         node.data.w5obj.onSetObjectFocus();
+      }
+      var d="";
+      return; 
+
+      $(".delObject").click(function(e){
+         var dataobj=$(this).attr("dataobj");
+         var dataobjid=$(this).attr("dataobjid");
+         var k=dataobj+"::"+dataobjid;
+         this.graph.delNode(k);
+         selected=null;
+         nearest=null;
+      });
+      $(".addInterfaces").click(function(e){
+         var dataobj=$(this).attr("dataobj");
+         var dataobjid=$(this).attr("dataobjid");
+         if (dataobj=="itil::appl"){
+            var w5obj=getModuleObject(W5Base,dataobj);
+            w5obj.SetFilter({id:dataobjid});
+            w5obj.findRecord("interfaces",function(data){
+               if (data[0]){
+                  //for(c=0;c<data[0].interfaces.length;c++){
+                  for(var c=0;c<data[0].interfaces.length;c++){
+                     var rel=data[0].interfaces[c];
+                     W5App.addObject('itil::appl',rel.toapplid);
+                     addConnector(dataobj,dataobjid,'itil::appl',rel.toapplid,1);
+                  }
+               }
+               console.log("add Interaces done");
+            });
+         }
+      });
+      $(".addSystems").click(function(e){
+         var dataobj=$(this).attr("dataobj");
+         var dataobjid=$(this).attr("dataobjid");
+         if (dataobj=="itil::appl"){
+            var w5obj=getModuleObject(W5Base,dataobj);
+            w5obj.SetFilter({id:dataobjid});
+            w5obj.findRecord("systems",function(data){
+               if (data[0]){
+                  for(var c=0;c<data[0].systems.length;c++){
+                     var rel=data[0].systems[c];
+                     W5App.addObject('itil::system',rel.systemid);
+                     console.log("add system",rel.systemid);
+                     addConnector(dataobj,dataobjid,'itil::system',rel.systemid);
+                  }
+                  console.log(data);
+               }
+            });
+         }
+         if (dataobj=="itil::system"){
+            var w5obj=getModuleObject(W5Base,dataobj);
+            w5obj.SetFilter({id:dataobjid});
+            w5obj.findRecord("applications",function(data){
+               if (data[0]){
+                  for(c=0;c<data[0].applications.length;c++){
+                     var rel=data[0].applications[c];
+                     W5App.addObject('itil::appl',rel.applid);
+                     addConnector('itil::appl',rel.applid,dataobj,dataobjid);
+                  }
+                  console.log(data);
+               }
+            });
+         }
+      });
+      $(".gotoMain").click(function(e){
+         showMain();
+      });
+   };
+
+   this.Config=function(){
+      if (!this._Config){
+         this._Config=createConfig({     
+            useUTF8:false, 
+            mode:'auth',
+            transfer:'JSON',baseUrl:'../../../' 
+         });
+      }
+      return(this._Config);
+   }
+};
+
+
+
+
+var W5App=new W5AppClass();
+W5App.Init();
+
+
+window.onload = function() {
+   var width=null;
+   var height=null;
+   // half-assed drag and drop
+   var selected = null;
+   var nearest = null;
+   var dragged = null;
+   W5App.Run();
+
+   // init J5Base Lib configuration
+   document.W5Base=createConfig({     
+      useUTF8:false, 
+      mode:'auth',
+      transfer:'JSON',baseUrl:'../../../' 
+   });
+
+
+   if ("%DATAOBJ%"!="" && "%DATAOBJID%"!=""){
+     W5App.addObject('%DATAOBJ%','%DATAOBJID%');
+   }
+
+
+   autoResizePage=function(){
+      var canvas = document.getElementById("canvas");
+      W5App.ctx = canvas.getContext("2d");
+      canvas.width=10;
+      canvas.height=10;
+      setTimeout(function(){
+         var newx=$('#canvasframe').width();
+         var newy=$('#canvasframe').height();
+         canvas.width=newx-4;
+         canvas.height=newy-4;
+         width=newx;
+         height=newy;
+      }, 10);
+   }
+
+
+
+// calculate bounding box of graph W5App.layout.. with ease-in
+var currentBB = W5App.layout.getBoundingBox();
+var targetBB = {bottomleft: new Vector(-10, -10), topright: new Vector(10, 10)};
+
+
+
+setInterval(function(){
+	targetBB = W5App.layout.getBoundingBox()
+
+   var t=targetBB.topright.x+"/"+targetBB.topright.y+" : "+
+         targetBB.bottomleft.x+"/"+targetBB.bottomleft.y;
+   var c=currentBB.topright.x+"/"+currentBB.topright.y+" : "+
+         currentBB.bottomleft.x+"/"+currentBB.bottomleft.y;
+
+   var bottomleftDelta=targetBB.bottomleft.subtract(currentBB.bottomleft);
+   var toprightDelta  =targetBB.topright.subtract(currentBB.topright);
+   var Delta=Math.abs(bottomleftDelta.x)+Math.abs(bottomleftDelta.y)+
+             Math.abs(toprightDelta.x)+Math.abs(toprightDelta.y);
+
+   if (Delta>0.1){ 
+      // current gets 20% closer to target every iteration
+      currentBB = {
+         bottomleft: currentBB.bottomleft.add(bottomleftDelta.divide(10)),
+         topright:   currentBB.topright.add(toprightDelta.divide(10))
+      };
+   }
+}, 20);
+
+// convert to/from screen coordinates
+toScreen = function(p) {
+   var w=width-80;
+   var h=height-40;
+	var size = currentBB.topright.subtract(currentBB.bottomleft);
+	var sx = p.subtract(currentBB.bottomleft).divide(size.x).x * w+40;
+	var sy = p.subtract(currentBB.bottomleft).divide(size.y).y * h+20;
+	return new Vector(sx, sy);
+};
+
+toNodeScreen = function(e,p) {
+   var se=toScreen(e.point.p);
+
+	return new Vector(W5App.ObjectBoxWidth-((W5App.ObjectBoxWidth/2.0)+se.x-p.x), se.y-p.y+(W5App.ObjectBoxHeight/2.0));
+};
+
+fromScreen = function(s) {
+   var w=width;
+   var h=height;
+	var size = currentBB.topright.subtract(currentBB.bottomleft);
+	var px = (s.x / w) * size.x + currentBB.bottomleft.x;
+	var py = (s.y / h) * size.y + currentBB.bottomleft.y;
+
+	return new Vector(px, py);
+};
+
+$(document).mousewheel(function(e) {
+   if (e.originalEvent.wheelDelta > 0 || e.originalEvent.detail < 0) {
+      console.log("mouse up");
+   }
+   else{
+      console.log("mouse down");
+   }
+   return(false);
+});
+
+showMain = function(){
+   %OBJLIST%
+   var d="<table id=maintable height=100% width=100%><tr height=1%><td>";
+   selected=null;
+
+   d+="<select id=dataobj name=dataobj style='width:100%'>";
+   d+="<option value=''> &lt;- select object -&gt; </option>";
+   for(var i=0;i<objlist.length;i++){
+      d+="<option value='"+objlist[i].name+"'>"+objlist[i].label+"</option>";
+   }
+   d+="</select><br><center>";
+   d+="</td></tr><tr height=1%><td>";
+   d+="<input type=text id=searchname style='width:100%'><br>";
+   d+="<input type=button id=dosearch value='Search'>";
+   d+="</center>";
+   d+="</td></tr><tr><td><div id=Result></div></td></tr>";
+   d+="</table>";
+   $("#con").html(d);
+   if ("%DATAOBJ%"!=""){
+      $("#dataobj" ).val("%DATAOBJ%");
+   }
+   $("#TST").click(function(e){
+      var d="<table id=tabtab class='display compact' >";
+      d+="<thead>";
+      d+="<tr>";
+      d+="<th>D1</th>";
+      d+="<th>D2</th>";
+      d+="<th>D3</th>";
+      d+="</tr>";
+      d+="</thead>";
+      d+="<tbody>";
+      d+="<tr>";
+      d+="<td>1D1</td>";
+      d+="<td>1D2</td>";
+      d+="<td>1D3</td>";
+      d+="</tr>";
+      d+="<tr>";
+      d+="<td>2D1</td>";
+      d+="<td>2D2</td>";
+      d+="<td>2D3</td>";
+      d+="</tr>";
+      d+="<tr>";
+      d+="<td>4D1</td>";
+      d+="<td>4D2</td>";
+      d+="<td>4D3</td>";
+      d+="</tr>";
+      d+="<tr>";
+      d+="<td>6D1</td>";
+      d+="<td>6D2</td>";
+      d+="<td>6D3</td>";
+      d+="</tr>";
+      d+="<tr>";
+      d+="<td>1D1</td>";
+      d+="<td>1D2</td>";
+      d+="<td>1D3</td>";
+      d+="</tr>";
+      d+="<tr>";
+      d+="<td>2D1</td>";
+      d+="<td>2D2</td>";
+      d+="<td>2D3</td>";
+      d+="</tr>";
+      d+="<tr>";
+      d+="<td>4D1</td>";
+      d+="<td>4D2</td>";
+      d+="<td>4D3</td>";
+      d+="</tr>";
+      d+="<tr>";
+      d+="<td>6D1</td>";
+      d+="<td>6D2</td>";
+      d+="<td>6D3</td>";
+      d+="</tr>";
+      d+="</tbody>";
+      d+="</table>";
+      $('#tab').html(d);
+      $('#tabtab').DataTable({
+         lengthMenu: [[5], [5]]
+      });
+   });
+   $("#dosearch").click(function(e){
+      var dataobj=$('#dataobj').val();
+      var searchname=$('#searchname').val();
+      console.log("search in "+dataobj,"val="+searchname);
+      W5App.ClearSearchResult();
+      W5App.SearchStart();
+      if (dataobj!=""){
+         DataObject[dataobj].handleSearch(searchname);
+      }
+   });
+   $("#searchname").enterKey(function(){
+      $("#dosearch").trigger("click");
+   });
+   renderer.start();
+}
+
+
+
+jQuery('#canvas').mousedown(function(e){
+	var pos = jQuery(this).position();
+   var clickPos=new Vector(e.pageX - pos.left,e.pageY - pos.top);
+	var p = fromScreen(clickPos);
+	selected = nearest = dragged = W5App.layout.nearest(p);
+   console.log("click x:",toNodeScreen(selected,clickPos));
+
+   console.log("selected",selected);
+   W5App.setObjectFocus(
+      selected.node.data.dataobj,
+      selected.node.data.dataobjid
+   );
+
+	dragged.oldm = dragged.point.m;
+	dragged.olddata = dragged.node.data;
+	dragged.node.data = jQuery.extend(true, {}, dragged.node.data); // deep copy
+	dragged.point.m = 1000.0;
+	renderer.start();
+});
+
+
+
+jQuery('#canvas').mousemove(function(e){
+	var pos = jQuery(this).position();
+   var mpos= new Vector( e.pageX - pos.left,e.pageY - pos.top);
+
+	var p = fromScreen(mpos);
+	nearest = W5App.layout.nearest(p);
+
+   var npos=toScreen(nearest.point.p);
+
+   var dist=Math.sqrt(Math.pow(npos.x-mpos.x,2)+Math.pow(npos.y-mpos.y,2));
+
+   if (dist>100){
+      nearest=null;
+   }
+
+   //console.log("mpos",mpos,"npos",npos,"dist",dist);
+
+
+	if (dragged !== null)
+	{
+		dragged.point.p.x = p.x;
+		dragged.point.p.y = p.y;
+	}
+
+	renderer.start();
+});
+
+jQuery(window).bind('mouseup',function(e){
+	if (dragged !== null)
+	{
+		dragged.node.data = dragged.olddata;
+	}
+	dragged = null;
+});
+
+
+
+var renderer = new Renderer(1, W5App.layout,
+	function clear()
+	{
+		W5App.ctx.clearRect(0,0,width,height);
+
+		W5App.ctx.lineWidth = 0.1;
+		W5App.ctx.strokeStyle = "rgba(0,0,0,0.5)";
+
+		 W5App.ctx.beginPath();
+		 W5App.ctx.moveTo(toScreen(new Vector(-5,0)).x, toScreen(new Vector(-5,0)).y);
+		 W5App.ctx.lineTo(toScreen(new Vector(5,0)).x, toScreen(new Vector(5,0)).y);
+		 W5App.ctx.stroke();
+
+		 W5App.ctx.beginPath();
+		 W5App.ctx.moveTo(toScreen(new Vector(0,5)).x, toScreen(new Vector(0,5)).y);
+		 W5App.ctx.lineTo(toScreen(new Vector(0,-5)).x, toScreen(new Vector(0,-5)).y);
+		 W5App.ctx.stroke();
+	},
+	function drawEdge(edge, p1, p2)
+	{
+		var x1 = toScreen(p1).x;
+		var y1 = toScreen(p1).y;
+		var x2 = toScreen(p2).x;
+		var y2 = toScreen(p2).y;
+
+		var direction = new Vector(x2-x1, y2-y1);
+		var normal = direction.normal().normalise();
+
+		var from = W5App.graph.getEdges(edge.source, edge.target);
+		var to = W5App.graph.getEdges(edge.target, edge.source);
+
+		var total = from.length + to.length;
+		var n = from.indexOf(edge);
+
+		var spacing = 6.0;
+
+		// Figure out how far off centre the line should be drawn
+		var offset = normal.multiply(-((total - 1) * spacing)/2.0 + (n * spacing));
+
+		var s1 = toScreen(p1).add(offset);
+		var s2 = toScreen(p2).add(offset);
+
+		var intersection = intersect_line_box(s1, s2, {x: x2-W5App.ObjectBoxWidth/2.0, y: y2-W5App.ObjectBoxHeight/2.0}, W5App.ObjectBoxWidth, W5App.ObjectBoxHeight);
+
+		if (!intersection)
+			intersection = s2;
+
+		var stroke = typeof(edge.data.stroke) !== 'undefined' ? edge.data.stroke : "#000000";
+		W5App.ctx.strokeStyle = stroke;
+
+		var arrowWidth;
+		var arrowLength;
+		if (selected !== null && (selected.node === edge.source || selected.node === edge.target))
+		{
+			W5App.ctx.lineWidth = 5;
+			arrowWidth = 7;
+			arrowLength = 10;
+		}
+		else
+		{
+			W5App.ctx.lineWidth = 2;
+			arrowWidth = 3;
+			arrowLength = 8;
+		}
+
+		// line
+		var lineEnd = intersection.subtract(direction.normalise().multiply(arrowLength * 0.5));
+
+		W5App.ctx.beginPath();
+		W5App.ctx.moveTo(s1.x, s1.y);
+		W5App.ctx.lineTo(lineEnd.x, lineEnd.y);
+		W5App.ctx.stroke();
+
+		// arrow
+		W5App.ctx.save();
+		W5App.ctx.fillStyle = stroke;
+		W5App.ctx.translate(intersection.x, intersection.y);
+		W5App.ctx.rotate(Math.atan2(y2 - y1, x2 - x1));
+		W5App.ctx.beginPath();
+		W5App.ctx.moveTo(-arrowLength, arrowWidth);
+		W5App.ctx.lineTo(0, 0);
+		W5App.ctx.lineTo(-arrowLength, -arrowWidth);
+		W5App.ctx.lineTo(-arrowLength * 0.8, -0);
+		W5App.ctx.closePath();
+		W5App.ctx.fill();
+		W5App.ctx.restore();
+	},
+	function drawNode(node, p)
+	{
+		var fill = typeof(node.data.fill) !== 'undefined' ? node.data.fill : "#FFFFFF";
+
+		var s = toScreen(p);
+
+
+		// box edge
+		if (selected !== null && selected.node === node)
+		{
+			W5App.ctx.fillStyle = "#F2EFD9";
+			W5App.ctx.strokeStyle = "#000000";
+			W5App.ctx.lineWidth = 2.5;
+		}
+		else if (nearest !== null && nearest.node === node)
+		{
+			W5App.ctx.fillStyle = "#FFFF00";
+			W5App.ctx.strokeStyle = "#000000";
+			W5App.ctx.lineWidth = 3;
+
+		}
+		else
+		{
+			W5App.ctx.fillStyle = "#FFFFFF";
+			W5App.ctx.strokeStyle = "#000000";
+			W5App.ctx.lineWidth = 1.5;
+		}
+
+		W5App.ctx.save();
+		W5App.ctx.shadowBlur = 5;
+		W5App.ctx.shadowColor = '#000000';
+		W5App.ctx.fillRect(s.x - W5App.ObjectBoxWidth/2.0, s.y - W5App.ObjectBoxHeight/2.0, W5App.ObjectBoxWidth, W5App.ObjectBoxHeight);
+		W5App.ctx.restore();
+
+		W5App.ctx.strokeRect(s.x - W5App.ObjectBoxWidth/2.0, s.y - W5App.ObjectBoxHeight/2.0, W5App.ObjectBoxWidth, W5App.ObjectBoxHeight);
+
+
+		// clip drawing within rectangle
+		W5App.ctx.save()
+		W5App.ctx.beginPath();
+		W5App.ctx.rect(s.x - W5App.ObjectBoxWidth/2.0+2, s.y - W5App.ObjectBoxHeight/2.0+2, W5App.ObjectBoxWidth-4, W5App.ObjectBoxHeight-4);
+		W5App.ctx.clip();
+
+
+      node.data.avatarimg=node.data.w5obj.getAvatarImage();
+      if (node.data.avatarimg){
+		   W5App.ctx.save();
+	      W5App.ctx.drawImage(node.data.avatarimg,
+                       s.x-W5App.ObjectBoxWidth/2.0,s.y-W5App.ObjectBoxHeight/2.0,
+                       W5App.ObjectBoxHeight,W5App.ObjectBoxHeight);
+		   W5App.ctx.restore();
+      }
+
+		// render userid
+		if ((nearest !== null && nearest.node === node) )
+		{
+		//	ctx.lineWidth = 1;
+	   //   ctx.strokeRect(s.x-W5App.ObjectBoxWidth/2.0 + 2, (s.y+W5App.ObjectBoxHeight/2.0) - 3,(W5App.ObjectBoxWidth/3.0)-1,-14);
+	   //   ctx.strokeRect(s.x-W5App.ObjectBoxWidth/2.0 + 2 +((W5App.ObjectBoxWidth/3.0)),(s.y+W5App.ObjectBoxHeight/2.0) - 3,(W5App.ObjectBoxWidth/3.0)-1,-14);
+	   //   ctx.strokeRect(s.x-W5App.ObjectBoxWidth/2.0 + 2 +(2*(W5App.ObjectBoxWidth/3.0)),(s.y+W5App.ObjectBoxHeight/2.0) - 3,(W5App.ObjectBoxWidth/3.0)-1,-14);
+			W5App.ctx.restore();
+		}
+
+		// render displayname
+		if (typeof(node.data.displayname) !== 'undefined')
+		{
+         var displayname=node.data.displayname();
+			W5App.ctx.save();
+			W5App.ctx.textAlign = "center";
+			W5App.ctx.textBaseline = "top";
+			W5App.ctx.font = "14px Helvetica";
+			W5App.ctx.shadowBlur = 0;
+			W5App.ctx.shadowColor = '#FFFFFF';
+			W5App.ctx.shadowOffsetX = 1;
+			W5App.ctx.shadowOffsetY = -1;
+			W5App.ctx.fillStyle = "#000000";
+			W5App.ctx.fillText(displayname, s.x  , s.y - 8 );
+			W5App.ctx.restore();
+		}
+
+		W5App.ctx.restore()
+
+	}
+);
+
+
+
+// helpers for figuring out where to draw arrows
+function intersect_line_line(p1, p2, p3, p4)
+{
+	var denom = ((p4.y - p3.y)*(p2.x - p1.x) - (p4.x - p3.x)*(p2.y - p1.y));
+
+	// lines are parallel
+	if (denom === 0) {
+		return false;
+	}
+
+	var ua = ((p4.x - p3.x)*(p1.y - p3.y) - (p4.y - p3.y)*(p1.x - p3.x)) / denom;
+	var ub = ((p2.x - p1.x)*(p1.y - p3.y) - (p2.y - p1.y)*(p1.x - p3.x)) / denom;
+
+	if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+		return false;
+	}
+
+	return new Vector(p1.x + ua * (p2.x - p1.x), p1.y + ua * (p2.y - p1.y));
+}
+
+function intersect_line_box(p1, p2, p3, w, h)
+{
+	var tl = {x: p3.x, y: p3.y};
+	var tr = {x: p3.x + w, y: p3.y};
+	var bl = {x: p3.x, y: p3.y + h};
+	var br = {x: p3.x + w, y: p3.y + h};
+
+	var result;
+	if (result = intersect_line_line(p1, p2, tl, tr)) { return result; } // top
+	if (result = intersect_line_line(p1, p2, tr, br)) { return result; } // right
+	if (result = intersect_line_line(p1, p2, br, bl)) { return result; } // bottom
+	if (result = intersect_line_line(p1, p2, bl, tl)) { return result; } // left
+
+	return false;
+}
+
+autoResizePage();
+
+$(window).resize(function() {
+   autoResizePage();
+});
+
+showMain();
+
+setInterval(function(){
+	renderer.start();
+},100);
+
+};
+
+</script>
+
+
+
+
+</body></html>

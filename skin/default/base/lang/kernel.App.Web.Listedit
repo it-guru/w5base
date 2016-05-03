@@ -2,6 +2,7 @@
 'Do you realy want delete record id %s ?'=>{de=>'Möchten Sie den Datensatz mit der id %s wirklich löschen?'},
 'DetailDelete'=>{de=>'löschen',en=>'delete'},
 'DetailCopy'=>{de=>'kopieren',en=>'copy'},
+'Research'     => {de=>'Erforschen'},
 'DetailClose'=>{de=>'schließen',en=>'close'},
 'DetailLogin'=>{de=>'W5Base login',en=>'W5Base login'},
 'DetailPrint'=>{de=>'drucken',en=>'print'},
