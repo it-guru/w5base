@@ -437,6 +437,7 @@ sub new
                 name          =>'businessservices',
                 label         =>'provided Businessservices',
                 readonly      =>1,
+                vjoinbase     =>{cistatusid=>"<=5"},
                 group         =>'businessservices',
                 vjointo       =>'itil::businessservice',
                 vjoinon       =>['id'=>'servicecompapplid'],
