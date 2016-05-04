@@ -286,7 +286,7 @@ sub JSPlugin
 <script language="JavaScript">
 (function(window, document, undefined){
    \$(document).ready(function() {
-      \$('#JSPlugin', window.parent.document).html("Hi User!");
+      // \$('#JSPlugin', window.parent.document).html("Hi User!");
    });
 })(this,document);
 </script>
