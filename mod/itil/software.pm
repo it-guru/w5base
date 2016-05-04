@@ -71,6 +71,11 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'software.cistatus'),
 
+      new kernel::Field::TextURL(
+                name          =>'iurl',
+                label         =>'Internet-Product-URL',
+                dataobjattr   =>'software.iurl'),
+
       new kernel::Field::TextDrop(
                 name          =>'producer',
                 label         =>'Producer',
@@ -589,7 +594,16 @@ sub Validate
          return(undef);
       }
    }
-
+   if (!defined($oldrec) ||
+       effChanged($oldrec,$newrec,"iurl")){
+      if (!$self->IsMemberOf("admin")){
+         if (effVal($oldrec,$newrec,"iurl") eq ""){
+            $self->LastMsg(ERROR,"specifing of internet product ".
+                                 "url is mandatory");
+            return(undef);
+         }
+      }
+   }
 
 
    if (!defined($oldrec) &&

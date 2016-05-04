@@ -22,8 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use kernel::Field::TextURL;
 use kernel::CIStatusTools;
-use URI;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
@@ -64,122 +64,14 @@ sub URLValidate
 {
    my $self=shift;
    my $name=shift;
-
-   my %uri;
-
-   $name=~s/^([A-Z,a-z]+)/lc($1)/ex;
-   if (($name=~m/\s/) || ($name=~m/^\s*$/)){
-      $uri{error}=("invalid URL specified");
-      return(\%uri);
-   }
-   if (URI->new($name)->path() eq "/"){
-      $name=~s{/\s*$}{};
-   }
-   
-   $uri{name}=$name;
-
-   $uri{scheme}=URI->new($name)->scheme();
-   if ($uri{scheme} eq ""){
-      $uri{error}=("URL syntax error or no scheme specified");
-      return(\%uri);
-   }
-
-   my @sok=qw(http ldap ldaps https file mailto sftp ftp ssh rlogin
-              oracle mysql informix scp pesit);
-   if (!in_array(\@sok,$uri{scheme})){
-      $uri{error}=("not supported scheme specified");
-      return(\%uri);
-   }
-
-   if (in_array([qw(ftp http ldap ldaps https file)],$uri{scheme})){
-      $uri{host}=lc(URI->new($name)->host());
-      if ($uri{host} eq ""){
-         $uri{error}=("can not identify host in URL");
-         return(\%uri);
-      }
-      $uri{port}=URI->new($name)->port();
-
-   } else {
-      my $befhost=qr{\@}; # character before the host
-      $befhost=qr{://} if (index($name,'@')==-1);
-         
-      my ($host,$port)=$name=~m/$befhost([^:\/]+)(?:\:(\d+))?/;
-      if (in_array([qw(ssh sftp scp pesit)],$uri{scheme})) {
-         $uri{host}=$host;
-         $uri{port}=$port if ($port);
-      }
-      if (!$uri{port}) {
-         $uri{port}=22 if ($uri{scheme} eq 'ssh');
-         $uri{port}=22 if ($uri{scheme} eq 'sftp');
-         $uri{port}=22 if ($uri{scheme} eq 'scp');
-      }
-   }
-
-   if ($uri{host}) {
-      if ($uri{host}=~m/^\d+\.\d+\.\d+\.\d+$/ || # IPv4
-          $uri{host}=~m/[\[\]]/) { # IPv6
-         my $ipcheckresult;
-         if (!$self->IPValidate($uri{host},\$ipcheckresult)) {
-            $uri{error}=$ipcheckresult;
-            return(\%uri);
-         }
-      }
-      elsif ($uri{host}=~m/[^A-Za-z0-9.:\-\[\]]/ || # allowed characters
-          $uri{host}=~m/(^\.)|([.\-]$)/ || # must not start with .
-                                           # or end with . or -
-          !($uri{host}=~m/\.[a-z]{2,}$/i)) # TLD must have more than 1 character
-      { 
-         $uri{error}=("invalid hostname");
-         return(\%uri);
-      }
-
-   }
-
-   return(\%uri);
+   return(kernel::Field::TextURL::URLValidate($name));
 }
 
 sub IPValidate {
    my $self=shift;
    my $ip=shift;
    my $msg=shift;
-   my $type;
-
-   if ($ip=~m/^\s*$/){
-      $$msg="invalid ip-address or empty specified";
-      return(undef);
-   }
-
-   if (my ($o1,$o2,$o3,$o4)=$ip=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/){
-      if (($o1<0 || $o1 >255 ||
-           $o2<0 || $o2 >255 ||
-           $o3<0 || $o3 >255 ||
-           $o4<0 || $o4 >255)||
-          ($o1==0 && $o2==0 && $o3==0 && $o4==0) ||
-          ($o1==255 && $o2==255 && $o3==255 && $o4==255)){
-         $$msg="invalid IPv4 address";
-         return(undef);
-      }
-      $type="IPv4";
-
-   } else {
-      $ip=~s/^\[(.*)\]$/$1/;
-      my @groups=split(/:/,$ip,-1);
-      
-      if (@groups!=8) {
-         $$msg="unknown ip-address format";
-         return(undef);
-      }
-
-      foreach my $g (@groups) {
-         if (!($g=~m/^[0-9a-f]{0,4}$/i)) {
-            $$msg="invalid IPv6 address";
-            return(undef);
-         }
-      }
-      $type="IPv6";
-   }
-
-   return($type);
+   return(kernel::Field::TextURL::IPValidate($ip,$msg));
 }
 
 
