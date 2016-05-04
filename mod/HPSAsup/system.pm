@@ -167,7 +167,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'dscope',
                 label         =>'Scope State',
-                value         =>['IN','OUT - no MW','OUT - SAP excl','OUT - outer'],
+                value         =>['IN','OUT - no MW','OUT - SAP excl','OUT - other'],
                 dataobjattr   =>'dscope'),
 
       new kernel::Field::Text(
@@ -312,6 +312,9 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_scannerfound"))){
      Query->Param("search_scannerfound"=>"\"".$self->T("boolean.false")."\"");
+   }
+   if (!defined(Query->Param("search_dscope"))){
+     Query->Param("search_dscope"=>"IN");
    }
 }
 
