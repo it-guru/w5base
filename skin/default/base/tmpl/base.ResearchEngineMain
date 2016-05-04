@@ -1,8 +1,17 @@
 <html><head>
+<style>
+canvas {
+	border: 1px solid #AAA;
+	background-color: #F6F6F6;
+}
+body{
+   margin:0;padding:0;
+}
+</style>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <title>W5Base Research and Analyse Engine - preBETA!</title>
-</head><body>
+</head><body><div id=MainStartup style='display:none'>
 <table width=100% border=0 cellspacing=0 cellpadding=0 height=100%>
 <tr height=1%><td colspan=2>%TITLEBAR%</td></tr>
 <tr><td><div id='canvasframe'><canvas id="canvas" width="1" height="1"></canvas>
@@ -15,17 +24,6 @@
 <tr height=192><td colspan=2 valign=top><div id="tab">&nbsp;</div></td></tr>
 </table>
 
-<style>
-canvas {
-	border: 1px solid #AAA;
-	background-color: #F6F6F6;
-}
-body{
-   margin:0;padding:0;
-}
-
-
-</style>
 
 <link rel="stylesheet" href="../../../public/base/load/jquery.ui.css"></link>
 <link rel="stylesheet" href="../../../public/base/load/default.css"></link>
@@ -50,6 +48,8 @@ body{
 
 <script language="JavaScript" src="../../../public/base/load/jquery.mousewheel.js">
 </script>
+<script language="JavaScript" src="../../../public/base/load/jquery.ellipsis.js">
+</script>
 
 <script language="JavaScript" src="../../../auth/base/ResearchEngine/ClassLib">
 </script>
@@ -62,6 +62,9 @@ var W5AppClass=function(){
    this.ObjectBoxWidth=150;   // Area reserved for drawing
    this.ObjectBoxHeight=25;   // Objects (all Objects needs to have the same
                               // size)
+   this._Loading=0;
+   this._LoadingStack=new Array();
+
    this.Init=function(){
       console.log("init W5AppClass");
    }
@@ -86,6 +89,29 @@ var W5AppClass=function(){
    }
    this.SearchAddResultRecord=function(o){
       this._ResultBuffer.push(o);
+   }
+   this.setLoading=function(cnt,label){
+      this._Loading+=cnt;
+      if (this._Loading<0){
+         this._Loading=0;
+      }
+      if (this._Loading==0){
+         $('#tab').html("");
+         for(var c=0;c<this._LoadingStack.length;c++){
+            this._LoadingStack[c]();
+         }
+         this._LoadingStack=new Array();
+      }
+      if (this._Loading>0){
+         $('#tab').html("<img src='../../../public/base/load/ajaxloader.gif'>"+
+                        "<br>"+label);
+      }
+   };
+   this.pushLoadingStack=function(f){
+      this._LoadingStack.push(f);
+   }
+   this.isLoading=function(){
+      return(this._Loading);
    }
    this.addActivators = function(){
       $('.addActivators').click(function(e){
@@ -125,8 +151,8 @@ var W5AppClass=function(){
             app:this,
             dataobj:dataobj,
             dataobjid:id,
-            displayname:function(){
-               return(this.w5obj.displayname());
+            shortname:function(){
+               return(this.w5obj.shortname());
             },
             rec:undefined,
             id:k
@@ -371,6 +397,7 @@ showMain = function(){
    d+="<option value=''> &lt;- select object -&gt; </option>";
    for(var i=0;i<objlist.length;i++){
       d+="<option value='"+objlist[i].name+"'>"+objlist[i].label+"</option>";
+      DataObject[objlist[i].name].label=objlist[i].label;
    }
    d+="</select><br><center>";
    d+="</td></tr><tr height=1%><td>";
@@ -462,14 +489,17 @@ jQuery('#canvas').mousedown(function(e){
 	var pos = jQuery(this).position();
    var clickPos=new Vector(e.pageX - pos.left,e.pageY - pos.top);
 	var p = fromScreen(clickPos);
-	selected = nearest = dragged = W5App.layout.nearest(p);
-   console.log("click x:",toNodeScreen(selected,clickPos));
+   nearest = dragged = W5App.layout.nearest(p);
+	selected=new Array(W5App.layout.nearest(p));
+   //console.log("click x:",toNodeScreen(selected,clickPos));
 
    console.log("selected",selected);
-   W5App.setObjectFocus(
-      selected.node.data.dataobj,
-      selected.node.data.dataobjid
-   );
+   if (selected.length==1){
+      W5App.setObjectFocus(
+         selected[0].node.data.dataobj,
+         selected[0].node.data.dataobjid
+      );
+   }
 
 	dragged.oldm = dragged.point.m;
 	dragged.olddata = dragged.node.data;
@@ -569,7 +599,8 @@ var renderer = new Renderer(1, W5App.layout,
 
 		var arrowWidth;
 		var arrowLength;
-		if (selected !== null && (selected.node === edge.source || selected.node === edge.target))
+		if (selected !== null && 
+          (selected[0].node===edge.source || selected[0].node===edge.target))
 		{
 			W5App.ctx.lineWidth = 5;
 			arrowWidth = 7;
@@ -612,8 +643,7 @@ var renderer = new Renderer(1, W5App.layout,
 
 
 		// box edge
-		if (selected !== null && selected.node === node)
-		{
+		if (selected!== null && selected[0].node === node){
 			W5App.ctx.fillStyle = "#F2EFD9";
 			W5App.ctx.strokeStyle = "#000000";
 			W5App.ctx.lineWidth = 2.5;
@@ -667,10 +697,10 @@ var renderer = new Renderer(1, W5App.layout,
 			W5App.ctx.restore();
 		}
 
-		// render displayname
-		if (typeof(node.data.displayname) !== 'undefined')
+		// render shortname
+		if (typeof(node.data.shortname) !== 'undefined')
 		{
-         var displayname=node.data.displayname();
+         var shortname=node.data.shortname();
 			W5App.ctx.save();
 			W5App.ctx.textAlign = "center";
 			W5App.ctx.textBaseline = "top";
@@ -680,7 +710,7 @@ var renderer = new Renderer(1, W5App.layout,
 			W5App.ctx.shadowOffsetX = 1;
 			W5App.ctx.shadowOffsetY = -1;
 			W5App.ctx.fillStyle = "#000000";
-			W5App.ctx.fillText(displayname, s.x  , s.y - 8 );
+			W5App.ctx.fillText(shortname, s.x  , s.y - 8 );
 			W5App.ctx.restore();
 		}
 
@@ -734,6 +764,7 @@ $(window).resize(function() {
 });
 
 showMain();
+$("#MainStartup").fadeIn(1000);
 
 setInterval(function(){
 	renderer.start();
@@ -746,4 +777,4 @@ setInterval(function(){
 
 
 
-</body></html>
+</div></body></html>

@@ -45,28 +45,33 @@ sub getJSObjectClass
       return(DataObjectBaseClass.call(this,o,dataobjid));
    };
    \$.extend(DataObject[o].Class.prototype,DataObjectBaseClass.prototype);
-   DataObject[o].Class.prototype.displayname=function(){
-      if (!this.rec){
+
+   DataObject[o].Class.prototype.loadShortRecord=function(){
          var dst=this;
-         dst.rec={name:'???'};  // define a default record
+         dst.rec={
+            fullname:'????',
+            name:'???'
+         };  // define a default record
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          w5obj.SetFilter({grpid:this.dataobjid});
-         w5obj.findRecord("grpid,name",function(data){
+         W5App.setLoading(1,"loading "+this.dataobj+" "+this.dataobjid);
+         w5obj.findRecord("id,name,fullname",function(data){
             if (data[0]){
                dst.rec=data[0];
             }
+            W5App.setLoading(-1);
          });
-      }
-      var displayname=this.rec.name;
-      //if (this.rec.givenname!=""){
-      //   if (this.rec.surname.length>20){
-      //      displayname+=", "+substr(this.rec.givenname,1)+".";
-      //   }
-      //   else{
-      //      displayname+=", "+this.rec.givenname;
-      //   }
-      //}
-      return(displayname);
+   };
+
+   DataObject[o].Class.prototype.shortname=function(){
+      if (!this.rec) this.loadShortRecord();
+      var shortname=this.rec.name;
+      return(shortname);
+   };
+   DataObject[o].Class.prototype.fullname=function(){
+      if (!this.rec) this.loadShortRecord();
+      var fullname=this.rec.fullname;
+      return(fullname);
    };
    DataObject[o].Class.prototype.getAvatarImage=function(){
       var i = new Image();

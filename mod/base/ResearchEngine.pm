@@ -75,47 +75,102 @@ DataObjectBaseClass.prototype.onStartWith=function(){
 };
 
 DataObjectBaseClass.prototype.onSetObjectFocus=function(){
-   console.log("on Select",this);
-   var d="<div class=ObjectWindow>";
+   var curthis=this;
+   var disp=function(){
+      var d="<div class=ObjectWindow>";
 
-   d+="<div class=ObjectWindowTitle>";
-   d+="<div align=right>"+
-      "<img id=ObjectWindowClose border=0 "+
-      "src='../../../public/base/load/subModClose.gif'>"+
-      "</div>";
-   d+="</div>";
-   d+=this.renderDetailData();
-   d+=this.renderDetailActions();
-   d+="</div>";
-   \$("#con").html(d);
-   \$("#ObjectWindowClose").click(function(e){
-        selected=null;
-        nearest=null;
-        showMain();
-   });
+      d+="<div class=ObjectWindowTitle>";
+      d+="<div align=right>"+
+         "<img id=ObjectWindowClose border=0 "+
+         "src='../../../public/base/load/subModClose.gif'>"+
+         "</div>";
+      d+="</div>";
+      d+=curthis.renderDetailData();
+      d+=curthis.renderDetailActions();
+      d+="</div>";
+      \$("#con").html(d);
+      \$(".jqellipsis").ellipsis();
+      \$("#ObjectWindowClose").click(function(e){
+           selected=null;
+           nearest=null;
+           showMain();
+      });
 
 
-
-
-   \$(".callAction").click(function(e){
-     var name=\$(this).attr("name");
-     var dataobj=\$(this).attr("dataobj");
-     var dataobjid=\$(this).attr("dataobjid");
-     var k=dataobj+'::'+dataobjid;
-     var node;
-     if (node=W5App.graph.NodeExists(k)){
-        node.data.w5obj.onAction(name);
-     }
-   });
+      \$(".callAction").click(function(e){
+        var name=\$(this).attr("name");
+        var dataobj=\$(this).attr("dataobj");
+        var dataobjid=\$(this).attr("dataobjid");
+        var k=dataobj+'::'+dataobjid;
+        var node;
+        if (node=W5App.graph.NodeExists(k)){
+           node.data.w5obj.onAction(name);
+        }
+      });
+   };
+   disp();
+   if (W5App.isLoading()){
+      W5App.pushLoadingStack(disp);
+   }
 };
 
 DataObjectBaseClass.prototype.renderDetailData=function(){
    var d="<div class=DetailData style='height:100px;overflow:auto'>";
-   d+="Object:"+this.dataobj+"<br>";
-   d+="ObjectID:"+this.dataobjid+"<br><hr>";
+   var data=this.gatherDetailData();
+   d+="<table border=1 width=100%>";
+   for(var c=0;c<data.length;c++){
+      var rec=data[c];
+      if (rec.type=='h1'){
+         d+="<tr><td colspan=2><div class='jqellipsis' "+
+            "style='font-weight:bold'>"+
+            rec.label+"</div></td></tr>";
+      }
+      else if (rec.type=='h2'){
+         d+="<tr><td colspan=2><div class='jqellipsis'>"+
+            rec.label+"</div></td></tr>";
+      }
+      else{
+         d+="<tr><td width=10 nowrap style='font-weight:bold'>"+
+            rec.label+":</td>";
+         d+="<td><div class='jqellipsis'>"+rec.value.text+
+            "</div></td></td></tr>";
+      }
+   }
+   d+="</table>";
    d+="</div>";
    return(d);
 };
+
+DataObjectBaseClass.prototype.gatherDetailData=function(){
+   var l=new Array();
+   l.push({
+      label:DataObject[this.dataobj].label,
+      type:'h1'
+   });
+   l.push({
+      label:this.fullname(),
+      type:'h1',
+   });
+   l.push({
+      label:'Type',
+      type:'text',
+      value:{
+         text:this.dataobj
+      }
+   });
+   l.push({
+      label:'Name',
+      type:'text',
+      value:{
+         text:this.shortname()
+      }
+   });
+   console.log("gatherDetailData",DataObject);
+   return(l);
+}
+
+
+
 
 DataObjectBaseClass.prototype.handleSearch=function(){
    alert("no search defined");
@@ -124,6 +179,7 @@ DataObjectBaseClass.prototype.handleSearch=function(){
 
 DataObjectBaseClass.prototype.renderDetailActions=function(){
    var d="<div class=DetailActions style='height:100px;overflow:auto'>";
+   var currentObject=this;
    var l=this.getPosibleActions();
    for(var c=0;c<l.length;c++){
       var e="<div>"+
@@ -151,7 +207,11 @@ DataObjectBaseClass.prototype.onAction=function(name){
 };
 
 
-DataObjectBaseClass.prototype.displayname=function(){
+DataObjectBaseClass.prototype.fullname=function(){
+   return("unkown");
+};
+
+DataObjectBaseClass.prototype.shortname=function(){
    return("unkown");
 };
 

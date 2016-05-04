@@ -46,29 +46,48 @@ sub getJSObjectClass
    };
    \$.extend(DataObject[o].Class.prototype,DataObjectBaseClass.prototype);
 
-   DataObject[o].Class.prototype.displayname=function(){
-      if (!this.rec){
+   DataObject[o].Class.prototype.loadShortRecord=function(){
          var dst=this;
-         dst.rec={surname:'???',givenname:''};  // define a default record
+         dst.rec={
+            fullname:'????',
+            surname:'???',
+            givenname:''
+         };  // define a default record
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          w5obj.SetFilter({userid:this.dataobjid});
-         w5obj.findRecord("id,surname,givenname",function(data){
+         W5App.setLoading(1,"loading "+this.dataobj+" "+this.dataobjid);
+         w5obj.findRecord("id,surname,givenname,fullname",function(data){
             if (data[0]){
                dst.rec=data[0];
             }
+            W5App.setLoading(-1);
          });
+   };
+
+   DataObject[o].Class.prototype.shortname=function(){
+      if (!this.rec){
+         this.loadShortRecord();
       }
-      var displayname=this.rec.surname;
+      var shortname=this.rec.surname;
       if (this.rec.givenname!=""){
          if (this.rec.surname.length>20){
-            displayname+=", "+substr(this.rec.givenname,1)+".";
+            shortname+=", "+substr(this.rec.givenname,1)+".";
          }
          else{
-            displayname+=", "+this.rec.givenname;
+            shortname+=", "+this.rec.givenname;
          }
       }
-      return(displayname);
+      return(shortname);
    };
+
+   DataObject[o].Class.prototype.fullname=function(){
+      if (!this.rec){
+         this.loadShortRecord();
+      }
+      var fullname=this.rec.fullname;
+      return(fullname);
+   };
+
    DataObject[o].Class.prototype.getPosibleActions=function(){
       return([{name:'addGroups',label:'add all related groups'},
               {name:'addOrgs',label:'add organisation groups'}]);
@@ -81,6 +100,7 @@ sub getJSObjectClass
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
          w5obj.SetFilter({userid:this.dataobjid});
+         W5App.setLoading(1,"groupadd "+this.dataobj);
          w5obj.findRecord("groups",function(data){
             if (data[0]){
                for(var c=0;c<data[0].groups.length;c++){
@@ -89,7 +109,7 @@ sub getJSObjectClass
                   W5App.addConnectorKK(skey,dkey,0);
                }
             }
-            console.log("add Groups=",data);
+            W5App.setLoading(-1);
          });
       }
       return([]);
@@ -105,6 +125,7 @@ sub getJSObjectClass
          var w5obj=getModuleObject(W5App.Config(),'$self->{dataobj}');
          var curDataObj='$self->{dataobj}';
          w5obj.SetFilter({fullname:searchstring,cistatusid:4});
+         W5App.setLoading(1,"searching "+this.dataobj);
          w5obj.findRecord("fullname,userid",function(data){
             if (data){
                for(c=0;c<data.length;c++){
@@ -116,6 +137,7 @@ sub getJSObjectClass
                }
             }
             W5App.SearchFinishResult();
+            W5App.setLoading(-1);
          });
    }
 

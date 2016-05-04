@@ -60,3 +60,9 @@ body{
    width:100%;
    background-color:#DCDCDC;
 }
+
+div.jqellipsis{
+   width:1px;
+   overflow:hidden;
+   white-space: nowrap; 
+}
