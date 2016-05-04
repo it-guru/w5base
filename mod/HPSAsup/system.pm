@@ -34,6 +34,7 @@ use tsacinv::system;
 create table "W5I_HPSAsup__system_of" (
    systemid     varchar2(40) not null,
    dscope       varchar2(20),
+   chm          varchar2(20),
    comments     varchar2(4000),
    modifyuser   number(*,0),
    modifydate   date,
@@ -44,10 +45,13 @@ create or replace view "W5I_HPSAsup__system" as
 select distinct "itil::system".id                 id,
                 "itil::system".name               systemname, 
                 "itil::system".systemid           systemid,
+                decode("W5I_HPSAsup__system_of".dscope,null,'IN',
+                       "W5I_HPSAsup__system_of".dscope)  dscope,
                 decode("W5I_HPSA_system".systemid,null,0,1)  hpsafnd,
                 decode("W5I_HPSA_lnkswp".server_id,null,0,1) scannerfnd,
                 "W5I_HPSAsup__system_of".systemid of_id,
                 "W5I_HPSAsup__system_of".comments,
+                "W5I_HPSAsup__system_of".chm,
                 "W5I_HPSAsup__system_of".modifyuser,
                 "W5I_HPSAsup__system_of".modifydate
        
@@ -103,7 +107,8 @@ where
     and not("itil::system".osrelease like 'Solaris%'        
         and "tsacinv::system".systemolaclass='30')     
        -- keine Systeme am Standort Kiel
-    and "itil::system".location not like 'DE.Kiel.%'      
+    and "itil::system".location not like 'DE.Kiel.Kronshagener_Weg_107.%'      
+    and "itil::system".location not like 'DE.Kiel.Kronshagener_Weg_107'      
        -- nur Systeme mit Betriebsart=Prod
     and "itil::system".isprod=1                   
        -- keine Systeme mit Systemklassifizierung=Infrastrutkur
@@ -116,6 +121,8 @@ grant select on "W5I_HPSAsup__system" to W5I;
 grant update,insert on "W5I_HPSAsup__system_of" to W5I;
 create or replace synonym W5I.HPSAsup__system for "W5I_HPSAsup__system";
 create or replace synonym W5I.HPSAsup__system_of for "W5I_HPSAsup__system_of";
+grant select on "W5I_HPSAsup__system_of" to W5_BACKUP_D1;
+grant select on "W5I_HPSAsup__system_of" to W5_BACKUP_W1;
 
 
 =cut
@@ -157,6 +164,19 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'systemid'),
 
+      new kernel::Field::Select(
+                name          =>'dscope',
+                label         =>'Scope State',
+                value         =>['IN','OUT - no MW','OUT - SAP excl','OUT - outer'],
+                dataobjattr   =>'dscope'),
+
+      new kernel::Field::Text(
+                name          =>'chm',
+                label         =>'Change triggered',
+                weblinkto     =>'tssm::chm',
+                weblinkon     =>['chm'=>'changenumber'],
+                dataobjattr   =>'chm'),
+
       new kernel::Field::Boolean(
                 name          =>'hpsafound',
                 label         =>'HPSA found',
@@ -179,37 +199,14 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'comments'),
 
-#      new kernel::Field::Textarea(
-#                name          =>'todo',
-#                label         =>'ToDo',
-#                readonly      =>1,
-#                dataobjattr   =>
-#                   "(case".
-#                   "   when systemid like 'HPSA%MISS'  then ".
-#                       "'* set systemid on system agent\n'".
-#                   "   else ''".
-#                   "end) ||".
-#                   "(case".
-#                   "   when cenv<>denv  ".
-#                   "        AND denv<>'CHK' ".
-#                   "        AND denv<>'DEFERRED' ".
-#                   "        AND denv<>'OUT' ".
-#                   "        AND denv<>'Shared' ".
-#                   "        then '* move system to '||denv||'\n'".
-#                   "   else ''".
-#                   "end) ||".
-#                   "(case".
-#                   "   when cenv='Both' then '* remove system ".
-#                                             "from one enviroment\n'".
-#                   "   else ''".
-#                   "end) ||".
-#                   "(case".
-#                   "   when denv is null and saphier like '9TS_ES.9DTIT.%' ".
-#                                         "then '* set destination ".
-#                                               "enviroment\n'".
-#                   "   else ''".
-#                   "end)"),
-
+      new kernel::Field::Text(
+                name          =>'applications',
+                group         =>'source',
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{systemcistatusid=>"4",applcistatusid=>"4"}],
+                vjoindisp     =>'appl', 
+                vjoinon       =>['systemid'=>'systemsystemid'],
+                label         =>'Applications'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
@@ -245,6 +242,38 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default tad4d w5basedata am source));
+}
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+
+   my $effdscope=effVal($oldrec,$newrec,"dscope");
+   if ($effdscope=~m/^OUT /){
+      if (length(effVal($oldrec,$newrec,"comments"))<10){
+         $self->LastMsg(ERROR,"setting out of scope needs meaningfu comments"); 
+         return(undef);
+      }
+      if (effVal($oldrec,$newrec,"chm") ne ""){
+         $newrec->{chm}=undef;
+      }
+   }
+   if (effChanged($oldrec,$newrec,"chm") &&
+       effVal($oldrec,$newrec,"chm") ne ""){
+      if ((effVal($oldrec,$newrec,"scannerfound")==1)){
+         $self->LastMsg(ERROR,"change number makes no sense - scanner exists"); 
+         return(undef);
+      }
+      if (!(effVal($oldrec,$newrec,"chm")=~m/^C\d{5,15}/)){
+         $self->LastMsg(ERROR,"change number seems not to be correct"); 
+         return(undef);
+      }
+   }
+
+   return(1);
 }
 
 
