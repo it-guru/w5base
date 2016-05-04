@@ -37,6 +37,11 @@ sub getJSObjectClass
    my $self=shift;
    my $app=shift;
    my $lang=shift;
+
+   my $addGroups=quoteHtml($self->getParent->T("add all related groups"));
+   my $addOrgs=quoteHtml($self->getParent->T("add organisation groups"));
+   my $orgRoles=join(" ",orgRoles());
+
    my $d=<<EOF;
 (function(window, document, undefined) {
    var o='$self->{dataobj}';
@@ -89,14 +94,14 @@ sub getJSObjectClass
    };
 
    DataObject[o].Class.prototype.getPosibleActions=function(){
-      return([{name:'addGroups',label:'add all related groups'},
-              {name:'addOrgs',label:'add organisation groups'}]);
-      return([]);
+      var l=DataObjectBaseClass.prototype.getPosibleActions.call(this);
+      l.push({name:'addGroups',label:'$addGroups'});
+      l.push({name:'addOrgs',label:'$addOrgs'});
+      return(l);
    };
    DataObject[o].Class.prototype.onAction=function(name){
       console.log('action=',name);
       if (name=='addGroups'){
-         console.log("curobj",this);
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
          w5obj.SetFilter({userid:this.dataobjid});
@@ -111,8 +116,27 @@ sub getJSObjectClass
             }
             W5App.setLoading(-1);
          });
+         return(1);
       }
-      return([]);
+      if (name=='addOrgs'){
+         var w5obj=getModuleObject(W5App.Config(),"base::lnkgrpuser");
+         var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
+         w5obj.SetFilter({userid:this.dataobjid,nativroles:'$orgRoles'});
+         W5App.setLoading(1,"groupadd "+this.dataobj);
+         w5obj.findRecord("grpid",function(data){
+            console.log("fifi ",data);
+            if (data[0]){
+               for(var c=0;c<data.length;c++){
+                  var dkey=W5App.toObjKey('base::grp',data[c].grpid);
+                  W5App.addObject('base::grp',data[c].grpid);
+                  W5App.addConnectorKK(skey,dkey,0);
+               }
+            }
+            W5App.setLoading(-1);
+         });
+         return(1);
+      }
+      return(DataObjectBaseClass.prototype.onAction.call(this,name));
    };
 
    DataObject[o].Class.prototype.getAvatarImage=function(){

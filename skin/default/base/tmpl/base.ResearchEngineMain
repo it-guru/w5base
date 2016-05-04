@@ -115,10 +115,8 @@ var W5AppClass=function(){
    }
    this.addActivators = function(){
       $('.addActivators').click(function(e){
-         console.log("fifi click on ",$(this));
          var dataobj=$(this).attr("dataobj");
          var dataobjid=$(this).attr("dataobjid");
-         console.log("fifi click on "+dataobj+" id="+dataobjid);
          W5App.addObject(dataobj,dataobjid);
       });
    };
@@ -142,6 +140,12 @@ var W5AppClass=function(){
    }
    // =====================================================
 
+   this.delObject=function(dataobj,id){
+      var k=dataobj+'::'+id;
+      this.graph.delNode(k);
+      //selected=null;
+      //nearest=null;
+   }
    this.addObject=function(dataobj,id){
       var k=dataobj+'::'+id;
 

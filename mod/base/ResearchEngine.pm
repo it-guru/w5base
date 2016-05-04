@@ -178,32 +178,42 @@ DataObjectBaseClass.prototype.handleSearch=function(){
 };
 
 DataObjectBaseClass.prototype.renderDetailActions=function(){
-   var d="<div class=DetailActions style='height:100px;overflow:auto'>";
+   var d="<div class=DetailActions style='height:100%;overflow:auto'>";
    var currentObject=this;
    var l=this.getPosibleActions();
+   d+="<table width=100%>";
    for(var c=0;c<l.length;c++){
-      var e="<div>"+
-            "<input class='callAction' "+
+      var logo="action_op.gif";
+      if (l[c].name.match(/^add/i)) logo="action_add.gif";
+      if (l[c].name.match(/^del/i)) logo="action_del.gif";
+      var e="<tr class='callAction' "+
             "name='"+l[c].name+"' style='text-align:left' "+
             "dataobj='"+this.dataobj+"' "+
             "dataobjid='"+this.dataobjid+
-            "' type=button value='"+l[c].label+"' style='width:100%'>"+
-            "</div>";
+            "'><td valign=top width=10>"+
+            "<img border=0 src='../../../public/base/load/"+logo+"'>"+
+            "</td><td valign=top>"+l[c].label+"</td></tr>";
       d+=e;
    }
+   d+="</table>";
    d+="</div>";
    return(d);
 };
 
 DataObjectBaseClass.prototype.getPosibleActions=function(){
-   return([{name:'xxx',label:'Hallo Welt'},
-           {name:'sdfs',label:'This is it'}]);
+   return([{name:'delThis',label:'delete Object'},
+           {name:'anyOp',label:'MachNix'}]);
    return([]);
 };
 
 DataObjectBaseClass.prototype.onAction=function(name){
-   console.log('process Action '+name+' on '+this.dataobjid);
-   return;
+   if (name=='delThis'){
+      W5App.delObject(this.dataobj,this.dataobjid);
+      selected=null;
+      nearest=null;
+      showMain();
+   }
+   return(0);
 };
 
 
