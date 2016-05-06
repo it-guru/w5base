@@ -100,7 +100,6 @@ sub getJSObjectClass
       return(l);
    };
    DataObject[o].Class.prototype.onAction=function(name){
-      console.log('action=',name);
       if (name=='addGroups'){
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
@@ -124,7 +123,6 @@ sub getJSObjectClass
          w5obj.SetFilter({userid:this.dataobjid,nativroles:'$orgRoles'});
          W5App.setLoading(1,"groupadd "+this.dataobj);
          w5obj.findRecord("grpid",function(data){
-            console.log("fifi ",data);
             if (data[0]){
                for(var c=0;c<data.length;c++){
                   var dkey=W5App.toObjKey('base::grp',data[c].grpid);
