@@ -4,8 +4,8 @@ package itil::qrule::RefCheckExternAppl;
 
 =head3 PURPOSE
 
-If there are no useful references (interfaces) which points to the 
-current check application are found, a DataIssue will be generated.
+If there are no useful references (interfaces) found which point 
+to the current application (check), a DataIssue will be generated.
 
 =head3 IMPORTS
 
