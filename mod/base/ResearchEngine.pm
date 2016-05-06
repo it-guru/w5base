@@ -80,7 +80,10 @@ DataObjectBaseClass.prototype.onSetObjectFocus=function(){
       var d="<div class=ObjectWindow>";
 
       d+="<div class=ObjectWindowTitle>";
-      d+="<div align=right>"+
+      d+="<div class=ObjectWindowTitleText>";
+      d+=DataObject[curthis.dataobj].label;
+      d+="</div>";
+      d+="<div class=ObjectWindowTitleButton>"+
          "<img id=ObjectWindowClose border=0 "+
          "src='../../../public/base/load/subModClose.gif'>"+
          "</div>";
@@ -88,7 +91,7 @@ DataObjectBaseClass.prototype.onSetObjectFocus=function(){
       d+=curthis.renderDetailData();
       d+=curthis.renderDetailActions();
       d+="</div>";
-      \$("#con").html(d);
+      \$("#ObjectDetail").html(d);
       \$(".jqellipsis").ellipsis();
       \$("#ObjectWindowClose").click(function(e){
            selected=null;
@@ -143,10 +146,6 @@ DataObjectBaseClass.prototype.renderDetailData=function(){
 
 DataObjectBaseClass.prototype.gatherDetailData=function(){
    var l=new Array();
-   l.push({
-      label:DataObject[this.dataobj].label,
-      type:'h1'
-   });
    l.push({
       label:this.fullname(),
       type:'h1',
