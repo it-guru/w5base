@@ -4,10 +4,8 @@ package itil::qrule::RefCheckExternAppl;
 
 =head3 PURPOSE
 
-Applications in Mandator "extern" are only needed to documentated references
-to application, witch are not full documentated in w5base.
-If there are no useful references which points to the current check 
-application are fund, a DataIssue will be generated.
+If there are no useful references (interfaces) which points to the 
+current check application are found, a DataIssue will be generated.
 
 =head3 IMPORTS
 
