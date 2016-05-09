@@ -1486,3 +1486,5 @@ alter table businessservice add implservicesupport  bigint(20);
 alter table businessservice add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table accessurl add expiration datetime default NULL;
 alter table lnkapplappl add ifagreementneeded int(1) default '1',add ifagreementdoc longblob,add ifagreementlang varchar(3),add ifagreementexclreason longtext,add ifagreementdocname varchar(255),add ifagreementdocdate datetime,add ifagreementdoctype varchar(255),add handleconfidential int(1) default '0';
+alter table software add iurl varchar(1024);
+alter table producer add iurl varchar(1024);
