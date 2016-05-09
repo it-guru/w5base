@@ -31,3 +31,5 @@
 'is MW (Middleware) software'=>{de=>'ist MW (Middleware) Software'},
 'on options, parent could not be deleted'=>{de=>'bei Optionen kann das Elternprodukt nicht gelöscht werden'},
 'on options, parent could not be changed'=>{de=>'bei Optionen kann das Elternprodukt nicht geändert werden'},
+'Internet-Product-URL'=>{de=>'Internet-Produkt-URL'},
+'specifing of internet product url is mandatory'=>{de=>'die Angabe der Internet-Produkt-URL ist zwingend'},
