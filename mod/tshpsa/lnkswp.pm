@@ -380,10 +380,17 @@ sub getAnalyseSoftwareStateRecordsIndexed
                my $v=$rec->{$key};
                next if (!defined($v));
                if (exists($res->{$key}->{$v})){
-                  if (ref($res->{$key}->{$v}) ne "ARRAY"){
-                     $res->{$key}->{$v}=[$res->{$key}->{$v}];
+                  if ($key eq "id"){
+                     msg(ERROR,"getAnalyseSoftwareStateRecordsIndexed for ".
+                               $self->Self." not unique id in record ".
+                               "'".$v."'");
                   }
-                  push(@{$res->{$key}->{$v}},$rec);
+                  else{
+                     if (ref($res->{$key}->{$v}) ne "ARRAY"){
+                        $res->{$key}->{$v}=[$res->{$key}->{$v}];
+                     }
+                     push(@{$res->{$key}->{$v}},$rec);
+                  }
                }
                else{
                   $res->{$key}->{$v}=$rec;
