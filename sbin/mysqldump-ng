@@ -441,7 +441,7 @@ sub process_engine
               my (@gz,@ready,@myderr,$wp,$save);
               my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
                  "$prog->{mysqldump} ".
-                 "-c --triggers --skip-extended-insert $db $first");
+                 "-c --triggers --routines --skip-extended-insert $db $first");
               $mydsel->add($myderr);
 
               # check for mysqldump errors
