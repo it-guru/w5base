@@ -1,0 +1,27 @@
+<html lang="de" altlang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="../../../public/base/load/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../../public/itil/load/lnkapplappl.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+    <title>Schnittstellenvereinbarung</title>
+  </head>
+  <body>
+    <div class="lnkdocument">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="20%" align="left"> 
+            <img class="logo" src="%LOGO%" />
+          </td>
+          <td>
+            <h1>Schnittstellenvereinbarung zwischen
+            <br />den Anwendungen
+            <br />%APPLA% und %APPLB%</h1>
+          </td>
+          <td width="20%" align="right">&nbsp;</td>
+        </tr>
+      </table>
+      <div class="doc">
+        <div class="disclaimer">Dieses Dokument beschreibt die im Service Asset und Configuration Management (SACM) hinterlegten
+        Kommunikationsbeziehungen zwischen den o.g. Anwendungen.</div>
+        <ol type='I' class="appl">

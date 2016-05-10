@@ -1,0 +1,14 @@
+<li>
+  <h1>Definition of interface from the '%APPL%' point of view</h1>
+  <div class="desc">
+    <h2>Application description:</h2>%DESCRIPTION%
+    <br />
+    <br /><h2>Contact person:</h2>The business counterpart for the application '%APPL%' is the Application Manager '%AM%'.
+    <br />The technical counterpart is the Technical Solution Manager '%TSM%'.
+    <br />
+    <br />The interfaces and the general conditions of interface functions are described in the following paragraphs
+    from the point of view of the application '%APPL%'.
+    <br />
+    <br />%DETAILS%
+  </div>
+</li>

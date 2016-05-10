@@ -97,4 +97,7 @@
 "Preset of '%s' is: 'Application has no interfaces'"=>{
    de=>"Voreinstellung von '%s' ist: 'Anwendung hat keine Schnittstellen'"
 },
+"The interface agreement is described from the point of view of application '%s'."=>{
+   de=>"Die Schnittstellenvereinbarung ist aus Sicht der Anwendung '%s' beschrieben."
+},
 

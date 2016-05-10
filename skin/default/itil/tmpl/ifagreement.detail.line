@@ -1,0 +1,6 @@
+<li>
+  <h1>%CONMODE%-communication by <u>%CONPROTO%</u> to application '%TARGET%'</h1>
+  <div class="comments">%COMMENTS%</div>
+  <div class="param">%PARAM%</div>
+  %DESCRIPTION%
+</li>

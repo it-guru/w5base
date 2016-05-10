@@ -1,0 +1,28 @@
+<html lang="%LANG%" altlang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="../../../public/base/load/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../../public/itil/load/lnkapplappl.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+    <title>Interface agreement</title>
+  </head>
+  <body>
+    <div class="lnkdocument">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="20%" align="left"> 
+            <img class="logo" src="%LOGO%" />
+          </td>
+          <td>
+            <h1>Interface agreement between
+            <br />applications
+            <br />%APPLA% and %APPLB%</h1>
+          </td>
+          <td width="20%" align="right">&nbsp;</td>
+        </tr>
+      </table>
+      <div class="doc">
+        <div class="disclaimer">This document describes communication relations,
+        recorded in Service Asset and Configuration Management (SACM), between the two above
+        mentioned applications.</div>
+        <ol type='I' class="appl">

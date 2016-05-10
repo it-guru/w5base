@@ -946,18 +946,23 @@ sub getRecordHtmlIndex
 sub InterfaceAgreement
 {
    my $self=shift;
-
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css',
-                                   'public/itil/load/lnkapplappl.css'],
-                           body=>1,form=>1,
-                           title=>$self->T("Interface agreement"));
-   print("<div class=lnkdocument>");
+   
    my $id=Query->Param("id");
    $self->ResetFilter();
    $self->SetFilter({id=>\$id,cistatusid=>"<=5"});
-   my ($masterrec,$msg)=$self->getOnlyFirst(qw(fromapplid toapplid));
+   my ($masterrec,$msg)=$self->getOnlyFirst(qw(fromapplid toapplid
+                                               ifagreementlang));
    if (defined($masterrec)){
+      my $oldlang;
+      my $lang=$self->Lang();
+      if (defined($ENV{HTTP_FORCE_LANGUAGE})) {
+         $oldlang=$ENV{HTTP_FORCE_LANGUAGE};
+      }
+      if ($masterrec->{ifagreementlang} ne '') {
+         $lang=$masterrec->{ifagreementlang};
+         $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+      }
+
       my $appl=getModuleObject($self->Config,"itil::appl");
       $appl->ResetFilter();
       $appl->SetFilter({id=>\$masterrec->{fromapplid}});
@@ -966,28 +971,8 @@ sub InterfaceAgreement
       $appl->SetFilter({id=>\$masterrec->{toapplid}});
       my ($ag2,$msg)=$appl->getOnlyFirst(qw(name id tsm applmgr description));
       my @l=($ag1,$ag2);
-      @l=sort({$a->{name} cmp $b->{cmp}} @l);
-      my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-      my $n="../../../public/itil/load/lnkapplappl.jpg?".$cgi->query_string();
+      @l=sort({$a->{name} cmp $b->{name}} @l);
 
-      print("<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>");
-      print("<td width=\"20%\" align=left><img class=logo src='$n'></td>");
-      print("<td>");
-      print ("<h1>Schnittstellenvereinbarungen zwischen den Anwendungen<br> ".
-             $l[0]->{name}." und ".$l[1]->{name}."</h1>");
-      print("</td>");
-      print("<td width=\"20%\" align=right>&nbsp;</td>");
-      print("</tr></table>");
-      print("<div class=doc>");
-      print("<div class=disclaimer>");
-      print("Dieses Dokument beschreibt die im Config-Management hinterlegten ".
-            "Kommunikationsbeziehungen zwischen den o.g. Anwendungen. ".
-            "Das Modul zur automatischen Generierung einer ".
-            "Schnittstellenvereinbarung ist akuell nur in deutscher ".
-            "Sprache vorhanden. Sollte Bedarf für ein englischsprachiges ".
-            "Schnittstellendokument bestehen, muss dieser als ".
-            "Entwicklerrequest angefordert werden.");
-      print("</div>");
       $l[0]->{targetid}=$l[1]->{id};
       $l[1]->{targetid}=$l[0]->{id};
       $l[0]->{targetname}=$l[1]->{name};
@@ -1030,138 +1015,126 @@ sub InterfaceAgreement
          }
       }
 
-      my $noTargetDefTxt=sprintf("<p class=attention>".
-            "Die Schnittstellenvereinbarung ist aus Sicht der ".
-            "Anwendung '%s' beschrieben.</p>",$ag1->{name});
+      my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+      my $n="../../../public/itil/load/lnkapplappl.jpg?".$cgi->query_string();
+      my $html=$self->HttpHeader("text/html");
 
-      print("<ol type='I' class=appl>");
-      foreach my $ctrl (@l){
-         print("<li>");
-         printf("<h1>Definition der Schnittstelle aus Sicht '%s'</h1>",
-                 $ctrl->{name});
+      my $skinbase='itil';
+      my $formname='head';
+      $html.=$self->getParsedTemplate("tmpl/ifagreement.form.$formname",
+                                      {skinbase=>$skinbase,
+                                       static  =>{LANG=>$lang,
+                                                  LOGO=>$n,
+                                                  APPLA=>$l[0]->{name},
+                                                  APPLB=>$l[1]->{name}}});
 
-         (my $desc=$ctrl->{description})=~s{\n}{<br>}g;
-         print("<div class=desc>");
-         printf("<h2>Anwendungsbeschreibung:</h1>%s",$desc);
-         print("<br><br>");
-         printf("<h2>Ansprechpartner:</h2>".
-                "Fachlicher Ansprechpartner für die Anwendung '%1\$s' ".
-                "ist der Application Manager '%2\$s'.<br> ".
-                "Technischer Ansprechpartner ist der ".
-                "Technical Solution Manager '%3\$s'.<br><br>".
-                "In den folgenden Absätzen wird die Sichtweise der ".
-                "Schnittstellen und die Rahmenbedinungen für dessen Funktion ".
-                "aus Sicht des Betreibers der Anwendung '%1\$s' beschrieben.",
-                $ctrl->{name},$ctrl->{applmgr},$ctrl->{tsm});
-         print("<br><br>");
-        # print "<xmp>".Dumper($ctrl)."</xmp>";
-         if ($#{$ctrl->{interface}}!=-1){
-            printf("<h2>Die Verbindungen in Richtung '%s' im Einzelnen:</h2>",
-                   $ctrl->{targetname});
-            print("<ol class=lnkapplappl type='a'>");
+      foreach my $ctrl (@l) {
+         my $details="<p class=\"attention\">".
+               sprintf($self->T("The interface agreement is described ".
+                                "from the point of view of application '%s'."),
+                                $ag1->{name}).
+                     "</p>";
+         (my $desc=$ctrl->{description})=~s{\n}{<br />}g;
+
+         if ($#{$ctrl->{interface}}!=-1) {
+            $details=$self->getParsedTemplate(
+                               "tmpl/ifagreement.detail.head",
+                               {skinbase=>$skinbase,
+                                static=>{TARGET=>$ctrl->{targetname}}
+                               });
             foreach my $ifrec (@{$ctrl->{interface}}){
-               print("<li>");
-               printf("<h1>%s-Kommunikation mittels <u>%s</u> zur ".
-                     "Anwendung '%s'</h1>",
-                     $ifrec->{conmode},$ifrec->{conproto},$ctrl->{targetname});
-               print("<div>");
+               my %templvar=(CONMODE =>$ifrec->{conmode},
+                             CONPROTO=>$ifrec->{conproto},
+                             TARGET  =>$ctrl->{targetname});
+
                if ($ifrec->{comments} ne ""){
-                  printf("<div class=comments>%s</div>",$ifrec->{comments});
+                  $templvar{COMMENTS}=$ifrec->{comments};
                }
 
-               if ($ifrec->{contype} ne ""){
-                  my $type=$self->T("contype.$ifrec->{contype}",
-                                    "itil::lnkapplappl");
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                         $self->getField("contype")->Label,
-                         $type);
-               }
-               if ($ifrec->{fromurl} ne ""){
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                          $self->getField("fromurl")->Label,
-                          $ifrec->{fromurl});
-               }
-               if ($ifrec->{fromservice} ne ""){
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                          $self->getField("fromservice")->Label,
-                          $ifrec->{fromservice});
-               }
-               if ($ifrec->{tourl} ne ""){
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                          $self->getField("tourl")->Label,
-                          $ifrec->{tourl});
-               }
-               if ($ifrec->{toservice} ne ""){
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                          $self->getField("toservice")->Label,
-                          $ifrec->{toservice});
-               }
-               if ($ifrec->{monitor} ne ""){
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                          $self->getField("monitor")->Label,
-                          $ifrec->{monitor});
-               }
-               if ($ifrec->{monitortool} ne ""){
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                          $self->getField("monitortool")->Label,
-                          $ifrec->{monitortool});
-               }
-               if ($ifrec->{monitorinterval} ne ""){
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                          $self->getField("monitorinterval")->Label,
-                          $ifrec->{monitorinterval});
-               }
-               if ($ifrec->{persrelated} ne ""){
-                  my $prel=$self->T("PERS.$ifrec->{persrelated}",
-                                    "itil::lnkapplappl");
-                  printf("<b>%s:</b>&nbsp;&nbsp;&nbsp;%s<br>",
-                          $self->getField("persrelated")->Label,
-                          $prel);
+               my @ifparam=qw(contype fromurl fromservice tourl toservice
+                              monitor monitortool monitorinterval
+                              persrelated);
+               foreach my $param (@ifparam) {
+                  if ($ifrec->{$param} ne "") {
+                     my $label=$self->getField($param)->Label;
+                     my $value;
+
+                     if ($param eq 'contype') {
+                        $value=$self->T("contype.$ifrec->{contype}");
+                     }
+                     elsif ($param eq 'persrelated') {
+                        $value=$self->T("PERS.$ifrec->{persrelated}");
+                     }
+                     else {
+                        $value=$ifrec->{$param};
+                     }
+
+                     $templvar{PARAM}.=$self->getParsedTemplate(
+                                                 "tmpl/ext.ifagreement.param",
+                                                 {skinbase=>$skinbase,
+                                                  static=>{
+                                                     LABEL=>$label,
+                                                     PARAM=>$value
+                                                 }});
+                  }
                }
 
-               if ($ifrec->{htmlagreements} ne ""){
-                  my $label=$self->getField("htmlagreements")->Label;
-                  printf("<div class=htmldescription>".
-                         "<b>%s</b><br><br>%s</div><br>",
-                         $label,$ifrec->{htmlagreements});
+               foreach my $desc (qw(htmlagreements htmldescription)) {
+                  if ($ifrec->{$desc} ne "") {
+                     my $label=$self->getField($desc)->Label;
+
+                     $templvar{DESCRIPTION}.=$self->getParsedTemplate(
+                                   "tmpl/ext.ifagreement.description",
+                                    {skinbase=>$skinbase,
+                                     static=>{
+                                        LABEL      =>$label,
+                                        DESCRIPTION=>$ifrec->{$desc}
+                                    }});
+                  }
                }
-               if ($ifrec->{htmldescription} ne ""){
-                  my $label=$self->getField("htmldescription")->Label;
-                  printf("<div class=htmldescription>".
-                         "<b>%s</b><br><br>%s</div><br>",
-                         $label,$ifrec->{htmldescription});
-               }
-               print("</div></li>");
+
+               $details.=$self->getParsedTemplate(
+                                   "tmpl/ifagreement.detail.line",
+                                    {skinbase=>$skinbase,
+                                     static=>\%templvar});
             }
-            print("</ol>");
+
+            $details.=$self->getParsedTemplate(
+                                "tmpl/ifagreement.detail.bottom",
+                                {skinbase=>$skinbase});
          }
-         else{
-            print($noTargetDefTxt);
-         }
-         print("</div></li>");
+
+         $formname='line';
+         $html.=$self->getParsedTemplate("tmpl/ifagreement.form.$formname",
+                                         {skinbase=>$skinbase,
+                                          static=>{
+                                             APPL       =>$ctrl->{name},
+                                             DESCRIPTION=>$desc,
+                                             AM         =>$ctrl->{applmgr},
+                                             TSM        =>$ctrl->{tsm},
+                                             DETAILS    =>$details
+                                         }});
       }
-      print("</ol>");
-      print("</div>");
-      print("<div class=disclaimer>");
-      print($self->T('state'),NowStamp("en"));
-      print("<br><br>");
-      print($self->T('disclaimer'));
-      print("</div>");
-      print("<div class=subscriber>");
-      print("<table class=subscriber>");
-      print("<tr height=50px>");
-      print("<td>&nbsp;</td>");
-      print("<td>&nbsp;</td>");
-      print("</tr>");
-      print("<tr>");
-      printf("<td>Datum, Unterschrift AM '%s'</td>",$l[0]->{name});
-      printf("<td>Datum, Unterschrift AM '%s'</td>",$l[1]->{name});
-      print("</tr>");
-      print("</table>");
-      print("</div>");
+
+      my $dateobj=new kernel::Field::Date();
+      $dateobj->setParent($self);
+      my ($date,$tz)=$dateobj->getFrontendTimeString("HtmlDetail",
+                                                     NowStamp("en"));
+      my $formname='bottom';
+      $html.=$self->getParsedTemplate("tmpl/ifagreement.form.$formname",
+                                      {skinbase=>$skinbase,
+                                       static  =>{NOW=>"$date $tz",
+                                                  APPLA=>$l[0]->{name},
+                                                  APPLB=>$l[1]->{name}}});
+      print $html;
+      
+      if (defined($oldlang)) {
+         $ENV{HTTP_FORCE_LANGUAGE}=$oldlang;
+      }
+      else {
+         delete($ENV{HTTP_FORCE_LANGUAGE});
+      }
    }
-   print("</div>");
-   print $self->HtmlBottom(body=>1,form=>1);
 }
 
 sub getValidWebFunctions
