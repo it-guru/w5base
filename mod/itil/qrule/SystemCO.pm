@@ -4,12 +4,12 @@ package itil::qrule::SystemCO;
 
 =head3 PURPOSE
 
-Checks if there is an "installed/active" Costcenter is selected in
-every application with an CI-Status "installed/active" or "available".
-If there is no valid Costcenter defined, an error will be procceded.
+Checks whether a Costcenter in the CI-State "installed/active" is entered
+on every logical system in the CI-State "installed/active" or
+"available/in project". A data issue is created when no valid Costcenter
+is entered.
 
-If the logical system is a workstation, the Costcenter is not
-needed.
+If the logical system is a workstation, the Costcenter is not needed.
 
 =head3 IMPORTS
 
