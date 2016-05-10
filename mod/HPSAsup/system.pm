@@ -114,7 +114,9 @@ where
        -- keine Systeme mit Systemklassifizierung=Infrastrutkur
     and "itil::system".isinfrastruct=0
        -- MU Status "hibernate" ausklammern
-    and "tsacinv::system".status not like 'hibernate';            
+    and "tsacinv::system".status not like 'hibernate'
+       -- Ausschluss von Mainframe
+    and "itil::system".osclass not like 'MAINFRAME';            
             
 
 grant select on "W5I_HPSAsup__system" to W5I;
