@@ -876,15 +876,15 @@ sub getHashList
                      }
                      my $v=$fobj->FormatedResult($resl[$c],"SOAP");
                      if (ref($v) eq "ARRAY"){
-                        $v=[map({latin1($_)->utf8();} @$v)];
+                        #$v=[map({latin1($_)->utf8();} @$v)];
                         if ($wsdl=~m/:ArrayOfStringItems$/){
                            $v=[map({SOAP::Data->type("xsd:string")
                                               ->value($_);} @$v)];
                         }
                      }
                      else{
-                        $v=latin1($v)->utf8() if (defined($v) &&
-                                                 $fobj->Type ne "XMLInterface");
+                        #$v=latin1($v)->utf8() if (defined($v) &&
+                        #                         $fobj->Type ne "XMLInterface");
                      }
                      if (defined($v)){
                         $cprec{$k}=SOAP::Data->type($wsdl)->value($v);
