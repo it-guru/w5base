@@ -174,6 +174,7 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'mdate',
+                timezone      =>'CET',
                 group         =>'source',
                 label         =>'Modification-Date',
                 dataobjattr   =>'amportfolio.dtlastmodif'),
