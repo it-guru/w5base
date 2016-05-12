@@ -142,14 +142,19 @@ sub Process
                $v=ExcelFmt("dd.mm.yyyy hh:mm:ss",$cell->{Val});
             }
             $isempty=0 if (!($v=~m/^\s*$/));
+            if ($v=~m/^'.*[^']$/){  # this indicates a text field formater
+               $v=~s/^'//;
+            }
             print msg(INFO,"cell (c=$col/r=$row)='%s'",$v) if ($self->{debug});
             if (!defined($self->{Fields}->[$col]) ||
                  $self->{Fields}->[$col] eq ""){
                if ($v ne ""){
-                  print(msg(ERROR,"data without header colum in col '%d'",$col));
+                  print(msg(ERROR,
+                            "data without header colum in col '%d'",$col));
                }
                else{
-                  print(msg(WARN,"data without header colum in col '%d'",$col));
+                  print(msg(WARN,
+                            "data without header colum in col '%d'",$col));
                }
             }
             else{
