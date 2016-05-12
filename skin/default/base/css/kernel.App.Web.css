@@ -70,6 +70,7 @@ td.fname{
    padding-left:4px;
    padding-right:5px;
    font-weight:bold;
+   vertical-align:top;
 }
 td.finput{
    border-style:solid;

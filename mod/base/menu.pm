@@ -97,12 +97,12 @@ sub new
                 subeditmsk    =>'subedit.menu',
                 allowcleanup  =>1,
                 group         =>'acl',
+                forwardSearch =>1,
                 vjoininhash   =>[qw(acltarget acltargetid aclmode)],
                 vjointo       =>'base::menuacl',
-                vjoinbase     =>{'aclparentobj'=>$self->Self()},
+                vjoinbase     =>[{'aclparentobj'=>$self->Self()}],
                 vjoinon       =>['menuid'=>'refid'],
                 vjoindisp     =>['acltargetname','aclmode']),
-
    );
    $self->{defaultlimit}=999999;
    $self->setDefaultView(qw(linenumber fullname target func config useobjacl));
