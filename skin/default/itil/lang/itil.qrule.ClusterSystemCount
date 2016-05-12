@@ -1,0 +1,5 @@
+'itil::qrule::ClusterSystemCount'=>{
+   de=>'Prüfung ob einem Cluster mindestens zwei Systeme zugeordnet sind',
+   en=>'Check if at least two systems are related to a cluster'
+},
+'Insufficient systems related'=>{de=>'Zu wenig Systeme zugeordnet'},
