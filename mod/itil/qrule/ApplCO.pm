@@ -17,8 +17,8 @@ NONE
 
 [en:]
 
-In the block 'Application-Informations' in the field 'Costcenter' must be
-entered a valid Costcenter.
+In the block 'Application-Informations' in the field 'Costcenter' 
+a valid Costcenter must be entered.
 
 If a Costcenter is entered on an application and this DataIssue is still 
 present even after a QualityCheck, please make sure that the Costcenter 
