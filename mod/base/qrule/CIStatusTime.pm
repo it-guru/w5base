@@ -20,14 +20,13 @@ NONE
 
 [en:]
 
-It is checked, if Config-Items in the state 'reserved', 'on order', 
-'available/in project' or 'inactiv/stored' are unmodified 
-for quite some time.
+This QualityRule checks if Config-Items in the state 'reserved', 'on order', 
+'available/in project' or 'inactive/stored' have gone unmodified for a 
+predefined period of time. 
 
-Check whether the current CI-State is correct and up-to-date. 
-If not, change the CI-State to the correct one. 
-If the CI-State is correct despite the elapsed time-period, 
-consider possibilities of updating the CI, i.e. by adding 
+Make sure the CI-State is correct and up-to-date. If not, change the CI-State 
+to the correct one. If the CI-State is correct despite the elapsed 
+time-period, consider possibilities of updating the CI, e.g. by adding 
 a comment regarding the CI-State on the CI itself. 
 
 [de:]
