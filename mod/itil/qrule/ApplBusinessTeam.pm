@@ -20,7 +20,7 @@ identified by a number in square brackets in the name of the group.
 Usually a Business Team is the organisational team 
 of the technical solution manager (TSM).
 
-On any questions please contact the Darwin Support:
+In case of further questions, please contact the Darwin Support:
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 [de:]
