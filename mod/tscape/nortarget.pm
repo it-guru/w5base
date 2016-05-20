@@ -40,6 +40,8 @@ sub new
                 htmldetail    =>0,
                 dataobjattr   =>'"REFSTR"'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'appl',
                 label         =>'W5Base Application',
@@ -51,6 +53,28 @@ sub new
                 name          =>'archapplid',
                 label         =>'ICTO-ID',
                 dataobjattr   =>'"ICTO-ID"'),
+
+      new kernel::Field::Boolean(
+                name          =>'nortargetdefined',
+                label         =>'NOR-Target defined',
+                dataobjattr   =>"CASE  ".
+                    "when (\"Betriebsmodell (Prod)\" is not null ".
+                      "and \"Betriebsmodell (Prod)\"<>'') OR ".
+                         "(\"Betriebsmodell (Test)\" is not null ".
+                      "and \"Betriebsmodell (Test)\"<>'') OR ".
+                         "(\"Betriebsmodell (Entw)\" is not null ".
+                      "and \"Betriebsmodell (Entw)\"<>'') OR ".
+                         "(\"Betriebsmodell (Sonst1)\" is not null ".
+                      "and \"Betriebsmodell (Sonst1)\"<>'') OR ".
+                         "(\"Betriebsmodell (Sonst2)\" is not null ".
+                      "and \"Betriebsmodell (Sonst2)\"<>'') OR ".
+                         "(\"Betriebsmodell (Sonst3)\" is not null ".
+                      "and \"Betriebsmodell (Sonst3)\"<>'') OR ".
+                         "(\"Betriebsmodell (Sonst4)\" is not null ".
+                      "and \"Betriebsmodell (Sonst4)\"<>'') OR ".
+                         "(\"Betriebsmodell (Sonst5)\" is not null ".
+                      "and \"Betriebsmodell (Sonst5)\"<>'') ".
+                    "then '1' else '0' END"),
 
       new kernel::Field::Text(
                 name          =>'w5baseid',
@@ -115,37 +139,46 @@ sub new
                                     itnormodel_sonst3 itnormodel_sonst4 
                                     itnormodel_sonst5)],
                 label         =>'effective NOR Model to use',
+                searchable    =>0,
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
                    my $dep=$self->{depend};
                    my %m;
+                   my $sfound=0;
                    foreach my $dep (@{$dep}){
                       my $fld=$self->getParent->getField($dep);
                       my $model=$fld->RawValue($current);
+                      next if ($model=~m/nicht relevant/); # sehr seltsam!
                       $model=~s/ .*$//;
-                      next if ($model eq "S");
+                      if ($model eq "S"){
+                         $sfound++;
+                         next;
+                      }
                       next if ($model eq "");
-                      next if ($model eq "nicht relevant"); # sehr seltsam!
                       $m{$model}++;
                    }
                    my @smodes=sort(keys(%m));
                    my $mode=$smodes[0];
-                   $mode="S" if (!defined($mode));
+                   if (!defined($mode) && $sfound){
+                      $mode="S";
+                   }
                    return($mode);
                 }),
 
-      new kernel::Field::Text(
+      new kernel::Field::Boolean(
                 name          =>'persdata',
                 group         =>'nortarget',
                 label         =>'Person related data',
-                dataobjattr   =>'"Personendaten"'),
+                dataobjattr   =>"CASE \"Personendaten\" ".
+                                "when 'yes' then '1' else '0' END"),
 
-      new kernel::Field::Text(
+      new kernel::Field::Boolean(
                 name          =>'tkdata',
                 group         =>'nortarget',
                 label         =>'TK-Data',
-                dataobjattr   =>'"TK-Bestandsdaten/TK-Verkehrsdaten"'),
+                dataobjattr   =>"CASE \"TK-Bestandsdaten/TK-Verkehrsdaten\" ".
+                                "when 'yes' then '1' else '0' END"),
 
       new kernel::Field::Text(
                 name          =>'cnfciam',
@@ -185,13 +218,19 @@ sub Initialize
    return(0);
 }
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_status"))){
-#     Query->Param("search_status"=>"\"!Retired\"");
-#   }
-#}
+sub initSearchQuery
+{
+   my $self=shift;
+
+   if (!defined(Query->Param("search_nortargetdefined"))){
+     Query->Param("search_nortargetdefined"=>
+                   "\"".$self->T("boolean.true")."\"");
+   }
+
+
+
+
+}
 
 
 
