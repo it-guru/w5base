@@ -1,0 +1,6 @@
+'based on informations from Cape, there has been a new NOR-Target document for the application %s created.'=>{de=>'basierend auf Informationen aus Cape, wurde ein neues NOR-Vorgabedokument für die Anwendung %s erstellt.'},
+'new NOR-Target document:'=>{de=>'neue NOR-Vorgabe:'},
+'The earlier NOR-Target document'=>{de=>'Das bisherige NOR-Vorgabedokument'},
+'has been archived.'=>{de=>'wurde archiviert.'},
+
+

@@ -270,18 +270,32 @@ sub new
                 label         =>'Additionalinformations',
                 dataobjattr   =>"$worktable.additional"),
 
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>"$worktable.srcsys"),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>"$worktable.srcid"),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                history       =>0,
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>"$worktable.srcload"),
+
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
                 dataobjattr   =>"$worktable.modifydate"),
-
-      new kernel::Field::Owner(
-                name          =>'owner',
-                group         =>'source',
-                label         =>'last Editor',
-                dataobjattr   =>"$worktable.modifyuser"),
 
       new kernel::Field::Owner(
                 name          =>'owner',
@@ -602,6 +616,10 @@ sub Validate
 
    if (effChanged($oldrec,$newrec,"dstate") && $newrec->{dstate}==20){
       my $o=$self->Clone();
+      if ($oldrec->{parentid} eq "" || $oldrec->{id} eq ""){
+         $self->LastMsg(ERROR,"havy problem ! - contact admin");
+         return(undef);
+      }
       $o->UpdateRecord({dstate=>30,
                         rawisactive=>undef},{parentid=>$oldrec->{parentid},
                                        dstateid=>"!30",

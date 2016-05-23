@@ -1883,6 +1883,81 @@ EOF
 }
 
 
+#
+# This is the native API for all W5Base Modules to get the W5BaseID of
+# a contact with AutoImport Option  (see: */ext/userImport.pm)
+#
+sub GetW5BaseUserID
+{
+   my $self=shift;
+   my $name=shift;
+   my $useAs=shift;   # userid | email | posix | dsid
+   my $param=shift;
+
+   if (($name=~m/\@/) && $useAs eq ""){
+      $useAs="email";
+   }
+
+   if ($useAs eq "" || $name=~m/^\s*$/ || $name=~m/\s/ ||
+       ($useAs ne "email" && 
+        $useAs ne "posix" &&
+        $useAs ne "userid" &&
+        $useAs ne "dsid")){
+      msg(ERROR,"invalid call of GetW5BaseUserID in base::user!");
+      Stacktrace();
+   }
+   for(my $loopcnt=0;$loopcnt<2;$loopcnt++){
+      $self->ResetFilter();
+      if ($useAs eq "email"){
+         my $n=lc($name);
+         $self->SetFilter({emails=>\$n});
+      }
+      elsif ($useAs eq "posix"){
+         $self->SetFilter({posix=>\$name});
+      }
+      elsif ($useAs eq "dsid"){
+         $self->SetFilter({dsid=>\$name});
+      }
+      elsif ($useAs eq "userid"){
+         $self->SetFilter({userid=>\$name});
+      }
+      else{
+         return(undef);
+      }
+      my ($userrec,$msg)=$self->getOnlyFirst(qw(fullname posix userid dsid));
+      if (defined($userrec)){
+         return($userrec->{userid},{
+             fullname=>$userrec->{fullname},
+             posix=>$userrec->{posix},
+             dsid=>$userrec->{dsid},
+         });
+      }
+      if ($loopcnt==0){
+         if (!exists($self->{userImport})){
+            $self->LoadSubObjs("ext/userImport","userImport");
+         }
+         my %p;
+         foreach my $k (sort(keys(%{$self->{userImport}}))){
+           my $q=$self->{userImport}->{$k}->getQuality($name,$useAs,$param);
+           $p{$k}=$q;
+         }
+         # try Import
+         foreach my $k (sort({$p{$a}<=>$p{$b}} keys(%p))){
+            msg(INFO,"try Import for $name ($useAs) with=$k");
+            if (my $userid=$self->{userImport}->{$k}->processImport(
+                   $name,$useAs,$param)){
+               $name=$userid;
+               $useAs="userid";
+               last;
+            }
+         }
+      }
+   }
+
+   return(undef);
+}
+
+
 
 
 1;
