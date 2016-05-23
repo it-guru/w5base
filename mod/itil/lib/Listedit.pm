@@ -634,8 +634,9 @@ sub calcSoftwareState
       foreach my $swi (values(%{$FilterSet->{Analyse}->{ssoftware}->{id}})){
          my $softwarecallname=$swi->{software};
          if ($forcesoftwarecallname ne ""){
-            $softwarecallname=$forcesoftwarecallname;  # for f.e. HPSA Autodiscovery Data 
-         }                                             # with diffrent software frontend names
+            $softwarecallname=$forcesoftwarecallname;  
+                              # for f.e. HPSA Autodiscovery Data 
+         }                    # with diffrent software frontend names
          if ($swi->{is_mw}){
             $resdstate->{group}->{MW}->{count}++;
          }
