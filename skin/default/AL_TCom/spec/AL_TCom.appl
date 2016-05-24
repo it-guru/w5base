@@ -87,6 +87,20 @@ the necessary approvals.<br>
 The use times need to be in format "from-to". Multiple time blocks can be defined per day. Each time block is preceded by its type. All possible types are listed in the legend e.g.:<br>
 X07:00-08:00,Y10:00-11:00,Z22:00-24:00
 '
-}
+},
+'itnormodel'=>{de=>'
+Für TelekomIT Anwendungen gilt, das bei Änderungen des zu
+verwendenen NOR-Lösungsmodels, diese in Cape im NOR-Pass
+eingetragen werden müssen.<br>
+Diese Änderung des NOR-Lösungsmodels in Cape wird dann
+automatisch per Schnittstelle innerhalb weniger Stunden
+nach W5Base/Darwin übernommen (durch die automatische
+Erstellung eines neuen NOR-Vorgabe Dokumentes).
+',en=>'
+For TelekomIT Applications are modifications on the
+NOR-Model need to done in Cape (NOR-Pass).<br>
+These changes will be transfert by an interface
+to W5Base/Darwin within a few hours. 
+'},
 
 
