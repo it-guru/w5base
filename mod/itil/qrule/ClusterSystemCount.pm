@@ -4,11 +4,11 @@ package itil::qrule::ClusterSystemCount;
 
 =head3 PURPOSE
 
-This rule checks if at least two systems in a CI-State unlike
-"disposed of waste" are related to a cluster in CI-State "installed/active"
-or "available/in project".
-Unless, and if the cluster was created before 8 weeks or more,
-a DataIssue is created.
+The quality rule checks if there are at least 2 cluster members
+(logical systems) in status other than "disposed of waste", assigned to
+a cluster in status "installed/active" or "available in project".
+A dataissue is generated if the cluster creation date is at least 8 weeks
+in the past.
 
 =head3 IMPORTS
 
@@ -18,11 +18,13 @@ NONE
 
 [en:]
 
-A cluster must have at least two systems related.
+A cluster must have at least two systems related in status other than
+"disposed of waste".
 
 [de:]
 
-Einem Cluster müssen mindestens zwei Systeme zugeordnet sein.
+Einem Cluster müssen mindestens zwei Systeme zugeordnet sein, die nicht
+im Status "veraltet/gelöscht" sind.
 
 
 =cut
