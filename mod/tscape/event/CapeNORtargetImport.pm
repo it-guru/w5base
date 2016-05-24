@@ -35,7 +35,10 @@ sub new
 sub CapeNORtargetImport
 {
    my $self=shift;
+   my %param=@_;
 
+   my $changedlimit=$param{changedlimit};
+   $changedlimit=10 if ($changedlimit eq "");
 
    my $start=">now-3Y";
    my $srcsys="Cape";
@@ -53,7 +56,6 @@ sub CapeNORtargetImport
                      itnormodel itnormodelid
                      processingpersdata processingtkgdata scddata
                      srcsys srcid srcload );
-
    $nor->SetFilter({srcsys=>\$srcsys});
    $nor->Limit(1);
    my @l=$nor->getHashList(qw(srcload));
@@ -66,7 +68,12 @@ sub CapeNORtargetImport
    my $nortarget=getModuleObject($self->Config,"tscape::nortarget");
    $nortarget->SetCurrentOrder("mdate");
    $nortarget->SetCurrentView(qw(ALL));
-   $nortarget->SetFilter({mdate=>$start,nortargetdefined=>\'1'});
+   if (!exists($param{debug})){
+      $nortarget->SetFilter({mdate=>$start,nortargetdefined=>\'1'});
+   }
+   else{
+      $nortarget->SetFilter({w5baseid=>$param{debug},nortargetdefined=>\'1'});
+   }
    my $downgrade=0;
    my $unchanged=0;
    my $changed=0;
@@ -108,8 +115,9 @@ sub CapeNORtargetImport
                $uid=$user->GetW5BaseUserID($nrec->{cnfciam},"dsid");
             }
             if ($nrec->{cnfciam} eq "" || $uid eq ""){
-               msg(ERROR,"invalid CIAM ID in datastream");
-               Stacktrace();
+               msg(ERROR,"can not import CIAM ID $nrec->{cnfciam} for ".
+                         "NOR Target $nrec->{appl}");
+               # Stacktrace();
             }
             my $nmodid=$itnormodel->{name}->{$nrec->{itnormodel}}->{id};
             msg(INFO,"NOR Model update for $nrec->{appl} ".
@@ -118,7 +126,7 @@ sub CapeNORtargetImport
             $appl->ResetFilter();
             $appl->SetFilter({id=>$nrec->{w5baseid},cistatusid=>"<6"});
             my ($arec)=$appl->getOnlyFirst(qw(ALL));
-            if (defined($arec) && $nmodid ne "" && $uid ne ""){
+            if (defined($arec) && $nmodid ne ""){
                $nor->ResetFilter();
                $nor->SetFilter({srcparentid=>\$nrec->{w5baseid},
                                 dstate=>'10'});
@@ -134,21 +142,29 @@ sub CapeNORtargetImport
                                    dstate=>'10'});
                   ($autorec)=$nor->getHashList(qw(ALL));
                }
-
-
-               if ($nor->ValidatedUpdateRecord($autorec,{
-                     itnormodelid=>$nmodid,
-                     processingpersdata=>$nrec->{persdata},
-                     processingtkgdata=>$nrec->{tkdata},
-                     owner=>$uid,
-                     srcsys=>$srcsys,
-                     srcload=>$nrec->{mdate},
-                     comments=>"AutoImport based on ...\n".
-                               $nrec->{urlofcurrentrec}
-                   },{id=>\$autorec->{id}})){
+               my $newrec={
+                  itnormodelid=>$nmodid,
+                  processingpersdata=>$nrec->{persdata},
+                  processingtkgdata=>$nrec->{tkdata},
+                  owner=>$uid,
+                  comments=>"AutoImport based on ...\n".
+                            $nrec->{urlofcurrentrec}
+               };
+               if (!exists($param{debug})){
+                  $newrec->{srcsys}=$srcsys;
+                  $newrec->{srcload}=$nrec->{mdate};
+               }
+               if ($uid){
+                  $newrec->{owner}=$uid;
+               }
+               if ($nor->ValidatedUpdateRecord($autorec,$newrec,{
+                      id=>\$autorec->{id}
+                   })){
                   $appl->NotifyWriteAuthorizedContacts($arec,{},{
-                        emailbcc=>[11634953080001,  # Vogler
-                                   13796024310000]  # Maske
+                        emailbcc=>[
+                              11634953080001,  # Vogler
+                          #    13796024310000   # Maske
+                        ]
                      },
                      {
                         autosubject=>1,
@@ -187,7 +203,7 @@ sub CapeNORtargetImport
             $unchanged++;
          }
          ($nrec,$msg)=$nortarget->getNext();
-      }until(!defined($nrec) || $changed>2);
+      }until(!defined($nrec) || $changed>$changedlimit);
    }
 
    return({

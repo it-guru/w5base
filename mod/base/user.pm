@@ -1926,11 +1926,16 @@ sub GetW5BaseUserID
       }
       my ($userrec,$msg)=$self->getOnlyFirst(qw(fullname posix userid dsid));
       if (defined($userrec)){
-         return($userrec->{userid},{
-             fullname=>$userrec->{fullname},
-             posix=>$userrec->{posix},
-             dsid=>$userrec->{dsid},
-         });
+         if (wantarray()){
+            return($userrec->{userid},{
+                fullname=>$userrec->{fullname},
+                posix=>$userrec->{posix},
+                dsid=>$userrec->{dsid},
+            });
+         }
+         else{
+            return($userrec->{userid});
+         }
       }
       if ($loopcnt==0){
          if (!exists($self->{userImport})){
