@@ -93,7 +93,18 @@ sub CapeNORtargetImport
                           isactive=>'1'});
          my @w5norlist=$nor->getHashList(@norfields);
          if ($#w5norlist!=0){
-            die("invalid nor document for $nrec->{w5baseid}");
+            msg(ERROR,"missing active nor target docuument ".
+                      "for w5baseid=$nrec->{w5baseid} ".
+                      "application=$nrec->{appl} ictoid=$nrec->{archapplid}");
+            $nor->ResetFilter();
+            $nor->SetFilter({srcparentid=>\$nrec->{w5baseid},
+                             dstate=>'10'});
+            @w5norlist=$nor->getHashList(@norfields);
+            if ($#w5norlist!=0){
+                msg(ERROR,"also missing auto created nor target docuument ".
+                          "application=$nrec->{appl}");
+               die();
+            }
          }
          # Compare       W5Base              Cape
          #
@@ -163,7 +174,7 @@ sub CapeNORtargetImport
                   $appl->NotifyWriteAuthorizedContacts($arec,{},{
                         emailbcc=>[
                               11634953080001,  # Vogler
-                          #    13796024310000   # Maske
+                              13796024310000   # Maske
                         ]
                      },
                      {
@@ -174,10 +185,12 @@ sub CapeNORtargetImport
                         my $ntext=$self->T("Dear databoss",'kernel::QRule');
                         $ntext.=",\n\n";
                         $ntext.=sprintf(
-                                $self->T("based on informations from Cape, ".
+                                $self->T("based on informations from Cape ".
+                                         "(NOR Pass of ICTO Object %s), ".
                                          "there has been a new NOR-Target ".
                                          "document for the application ".
-                                         "%s created."),$arec->{name});
+                                         "%s created."),
+                                         $nrec->{archapplid},$arec->{name});
                         $ntext.="\n\n";
                         $ntext.=$self->T("new NOR-Target document:");
                         $ntext.=" (NOR-Model=".$nrec->{itnormodel}.")";
@@ -187,7 +200,8 @@ sub CapeNORtargetImport
                         if (defined($oldnordoc)){
                            $ntext.="\n";
                            $ntext.=$self->T("The earlier NOR-Target document");
-                           $ntext.="...\n";
+                           $ntext.=" (NOR-Model=$oldnordoc->{itnormodel}) ";
+                           $ntext.=" ...\n";
                            $ntext.=$oldnordoc->{urlofcurrentrec};
                            $ntext.="\n...";
                            $ntext.=$self->T("has been archived.");
