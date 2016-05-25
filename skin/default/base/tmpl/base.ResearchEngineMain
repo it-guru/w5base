@@ -26,7 +26,8 @@ body{
 </div>
 </td>
 </tr>
-<tr height=192><td colspan=2 valign=top><div id="tab">&nbsp;</div></td></tr>
+<tr height=132><td colspan=2 valign=top><div id="tab">&nbsp;</div></td></tr>
+<tr height=30><td colspan=2 valign=top><div id='totalEnergy'></div></td></tr>
 </table>
 
 
@@ -118,19 +119,34 @@ var W5AppClass=function(){
    }
    this.setTabRenderer=function(){
       $('#workspace').html("");
+      var maxh=$('#workspace').height();
+      var maxw=$('#workspace').width();
       var newDataTable = $('<table/>',{
                     id: 'datatab',                  
-                    class: 'display compact'                   
+                    class: 'display compact'
                 }).prop({
                 });
       $('#workspace').append(newDataTable);
-      $('#datatab').append($('<thead><th>Fullname</th><th>Name</th><th>ObjectType</th></thead>'));
+      $('#datatab').append($("<thead>"+
+                             "<th>%FULLNAME%</th>"+
+                             "<th style='width:150px'>%NAME%</th>"+
+                             "<th style='width:150px'>%OBJECTTYPE%</th>"+
+                             "</thead>"));
+      function datatabResizer(){
+         datatab.page.len(2).draw(); 
+         var hmax=$('#workspace').height();
+         var maxn=Math.floor(((hmax-80)/30));
+         datatab.page.len(maxn).draw(); 
+      }
       var datatab=$('#datatab').DataTable({
-          pageLength: 50,
-          bLengthChange: false
+          paging: true,
+          bLengthChange: false,
+          //bProcessing: true,
+          pageLength: 2,
+          language: {
+             url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/German.json"
+          }
       });
-
-
 
 
       $('#datatab tbody').on( 'click', 'tr', function () {
@@ -153,7 +169,7 @@ var W5AppClass=function(){
       //   table.row('.selected').remove().draw( false );
       //});
       this.Renderer=new TabRenderer(1, W5App.layout,
-         function clear(){
+         function onStart(){
             datatab.clear().draw();
          },
          function drawEdge(edge, p1, p2){
@@ -172,12 +188,19 @@ var W5AppClass=function(){
                objname=DataObject[node.data.dataobj].label;
             }
             var r=datatab.row.add([fullname,shortname,objname]).draw().node();
-            $(r).attr('id',W5App.toObjKey(node.data.dataobj,node.data.dataobjid));
+            $(r).attr('id',
+                W5App.toObjKey(node.data.dataobj,node.data.dataobjid)
+            );
+            if (W5App.selected != null){
+               if (W5App.selected[0]===node){
+                  $(r).addClass('selected');
+               }
+            }
          },
          function finalze(){
+            datatabResizer();
          },
-         function resize(){
-         }
+         datatabResizer
       );
    }
    this.setPlanRenderer=function(){
@@ -191,24 +214,32 @@ var W5AppClass=function(){
       $('#workspace').append(newCanvas);
       var canvas = document.getElementById("canvas");
       this.ctx    = canvas.getContext("2d");
-      this.layout = new Layout.ForceDirected(this.graph, 500.0, 500.0, 0.5);
-      this.Renderer=new PlanRenderer(1, W5App.layout,
-         function clear()
+      if (!this.layout){
+         this.layout = new Layout.ForceDirected(this.graph, 500.0, 500.0, 0.5);
+      }
+      this.Renderer=new PlanRenderer(40, W5App.layout,
+         function onStart()
          {
-            W5App.ctx.clearRect(0,0,W5App.width,W5App.height);
+            if (document.getElementById("canvas")){
+               W5App.ctx.clearRect(0,0,W5App.width,W5App.height);
 
-            W5App.ctx.lineWidth = 0.1;
-            W5App.ctx.strokeStyle = "rgba(0,0,0,0.5)";
+               W5App.ctx.lineWidth = 0.1;
+               W5App.ctx.strokeStyle = "rgba(0,0,0,0.5)";
 
-             W5App.ctx.beginPath();
-             W5App.ctx.moveTo(toScreen(new Vector(-5,0)).x, toScreen(new Vector(-5,0)).y);
-             W5App.ctx.lineTo(toScreen(new Vector(5,0)).x, toScreen(new Vector(5,0)).y);
-             W5App.ctx.stroke();
+               W5App.ctx.beginPath();
+               W5App.ctx.moveTo(toScreen(new Vector(-5,0)).x, 
+                                toScreen(new Vector(-5,0)).y);
+               W5App.ctx.lineTo(toScreen(new Vector(5,0)).x, 
+                                toScreen(new Vector(5,0)).y);
+               W5App.ctx.stroke();
 
-             W5App.ctx.beginPath();
-             W5App.ctx.moveTo(toScreen(new Vector(0,5)).x, toScreen(new Vector(0,5)).y);
-             W5App.ctx.lineTo(toScreen(new Vector(0,-5)).x, toScreen(new Vector(0,-5)).y);
-             W5App.ctx.stroke();
+               W5App.ctx.beginPath();
+               W5App.ctx.moveTo(toScreen(new Vector(0,5)).x, 
+                                toScreen(new Vector(0,5)).y);
+               W5App.ctx.lineTo(toScreen(new Vector(0,-5)).x, 
+                                toScreen(new Vector(0,-5)).y);
+               W5App.ctx.stroke();
+            }
          },
          function drawEdge(edge, p1, p2)
          {
@@ -352,6 +383,12 @@ var W5AppClass=function(){
                W5App.ctx.restore();
             }
             W5App.ctx.restore()
+         },
+         function finalze(){
+           // datatabResizer();
+         },
+         function resize(){
+             this.start();
          }
       );
 
@@ -396,8 +433,9 @@ var W5AppClass=function(){
          if (W5App.dragged!==null){
             W5App.dragged.point.p.x = p.x;
             W5App.dragged.point.p.y = p.y;
+            W5App.Renderer.start();        // on mouse moving start rendering
          }
-         W5App.Renderer.start();
+         
       });
 
 
@@ -406,12 +444,13 @@ var W5AppClass=function(){
    this.Run=function(){
       $(".ControlButton").click(function(e){
          var id=$(this).attr("id");
-         console.log("click to "+id);
          if (id=="switchToTab"){
             W5App.setTabRenderer();
+            W5App.showMain();
          }
          if (id=="switchToPlan"){
             W5App.setPlanRenderer();
+            W5App.showMain();
          }
       });
       this.graph = new Graph();
@@ -442,6 +481,7 @@ var W5AppClass=function(){
             this._LoadingStack[c]();
          }
          this._LoadingStack=new Array();
+         W5App.Renderer.start();
       }
       if (this._Loading>0){
          $('#tab').html("<img src='../../../public/base/load/ajaxloader.gif'>"+
@@ -484,6 +524,7 @@ var W5AppClass=function(){
    this.delObject=function(dataobj,id){
       var k=dataobj+'::'+id;
       this.graph.delNode(k);
+      W5App.Renderer.start();
    }
    this.addObject=function(dataobj,id){
       var k=dataobj+'::'+id;
@@ -503,6 +544,7 @@ var W5AppClass=function(){
             rec:undefined,
             id:k
          });
+         W5App.Renderer.start();
          return(o);
       }
       return(this.graph.NodeExists(k));
@@ -511,7 +553,7 @@ var W5AppClass=function(){
    this.addConnector=function(dataobj1,id1,dataobj2,id2,color){
       var k1=this.toObjKey(dataobj1,id1);
       var k2=this.toObjKey(dataobj2,id2);
-      console.log("addConnector k1",k1,"k2",k2);
+      W5App.Renderer.start();
       return(this.addConnectorKK(k1,k2,color));
    };
    this.addConnectorKK=function(k1,k2,color){
@@ -522,8 +564,7 @@ var W5AppClass=function(){
       var colors=['#EDC951','#6A4A3C','#CC333F','#EB6841',
                   '#EDC951','#7DBE3C','#000000'];
 
-      console.log("addConnectorKK k=",k,"k1",k1,"k2",k2);
-
+      //console.log("addConnectorKK k=",k,"k1",k1,"k2",k2);
       if (k1!=k2){
          if (!this.graph.EdgeExists(k)){
             var n1 = this.graph.NodeExists(k1);
@@ -570,7 +611,8 @@ var W5AppClass=function(){
                   for(var c=0;c<data[0].interfaces.length;c++){
                      var rel=data[0].interfaces[c];
                      W5App.addObject('itil::appl',rel.toapplid);
-                     addConnector(dataobj,dataobjid,'itil::appl',rel.toapplid,1);
+                     addConnector(dataobj,dataobjid,
+                                  'itil::appl',rel.toapplid,1);
                   }
                }
                console.log("add Interaces done");
@@ -589,7 +631,8 @@ var W5AppClass=function(){
                      var rel=data[0].systems[c];
                      W5App.addObject('itil::system',rel.systemid);
                      console.log("add system",rel.systemid);
-                     addConnector(dataobj,dataobjid,'itil::system',rel.systemid);
+                     addConnector(dataobj,dataobjid,
+                                  'itil::system',rel.systemid);
                   }
                   console.log(data);
                }
@@ -611,7 +654,7 @@ var W5AppClass=function(){
          }
       });
       $(".gotoMain").click(function(e){
-         showMain();
+         W5App.showMain();
       });
    };
 
@@ -644,6 +687,101 @@ var W5AppClass=function(){
          _W5App.height=newy;
          _W5App.Renderer.Resize();
       }, 10);
+   }
+   this.showMain = function(){
+      %OBJLIST%
+      var d="<table id='MainSearchTable'><tr height=1%><td>";
+      W5App.selected=null;
+      W5App.nearest=null;
+
+      d+="<select id=dataobj name=dataobj style='width:100%'>";
+      d+="<option value=''> &lt;- select object -&gt; </option>";
+      for(var i=0;i<objlist.length;i++){
+         d+="<option value='"+objlist[i].name+"'>"+objlist[i].label+"</option>";
+         DataObject[objlist[i].name].label=objlist[i].label;
+      }
+      d+="</select><br><center>";
+      d+="</td></tr><tr height=1%><td>";
+      d+="<input type=text id=searchname style='width:100%'><br>";
+      d+="<input type=button id=dosearch value='Search'>";
+      d+="</center>";
+      d+="</td></tr><tr><td><div id=Result></div></td></tr>";
+      d+="</table>";
+      $("#ObjectDetail").html(d);
+      if ("%DATAOBJ%"!=""){
+         $("#dataobj" ).val("%DATAOBJ%");
+      }
+      $("#TST").click(function(e){
+         var d="<table id=tabtab class='display compact' >";
+         d+="<thead>";
+         d+="<tr>";
+         d+="<th>D1</th>";
+         d+="<th>D2</th>";
+         d+="<th>D3</th>";
+         d+="</tr>";
+         d+="</thead>";
+         d+="<tbody>";
+         d+="<tr>";
+         d+="<td>1D1</td>";
+         d+="<td>1D2</td>";
+         d+="<td>1D3</td>";
+         d+="</tr>";
+         d+="<tr>";
+         d+="<td>2D1</td>";
+         d+="<td>2D2</td>";
+         d+="<td>2D3</td>";
+         d+="</tr>";
+         d+="<tr>";
+         d+="<td>4D1</td>";
+         d+="<td>4D2</td>";
+         d+="<td>4D3</td>";
+         d+="</tr>";
+         d+="<tr>";
+         d+="<td>6D1</td>";
+         d+="<td>6D2</td>";
+         d+="<td>6D3</td>";
+         d+="</tr>";
+         d+="<tr>";
+         d+="<td>1D1</td>";
+         d+="<td>1D2</td>";
+         d+="<td>1D3</td>";
+         d+="</tr>";
+         d+="<tr>";
+         d+="<td>2D1</td>";
+         d+="<td>2D2</td>";
+         d+="<td>2D3</td>";
+         d+="</tr>";
+         d+="<tr>";
+         d+="<td>4D1</td>";
+         d+="<td>4D2</td>";
+         d+="<td>4D3</td>";
+         d+="</tr>";
+         d+="<tr>";
+         d+="<td>6D1</td>";
+         d+="<td>6D2</td>";
+         d+="<td>6D3</td>";
+         d+="</tr>";
+         d+="</tbody>";
+         d+="</table>";
+         $('#tab').html(d);
+         $('#tabtab').DataTable({
+            lengthMenu: [[5], [5]]
+         });
+      });
+      $("#dosearch").click(function(e){
+         var dataobj=$('#dataobj').val();
+         var searchname=$('#searchname').val();
+         console.log("search in "+dataobj,"val="+searchname);
+         W5App.ClearSearchResult();
+         W5App.SearchStart();
+         if (dataobj!=""){
+            DataObject[dataobj].handleSearch(searchname);
+         }
+      });
+      $("#searchname").enterKey(function(){
+         $("#dosearch").trigger("click");
+      });
+      W5App.Renderer.start();
    }
 };
 
@@ -735,100 +873,6 @@ $(document).mousewheel(function(e) {
    return(false);
 });
 
-showMain = function(){
-   %OBJLIST%
-   var d="<table id='MainSearchTable'><tr height=1%><td>";
-   W5App.selected=null;
-
-   d+="<select id=dataobj name=dataobj style='width:100%'>";
-   d+="<option value=''> &lt;- select object -&gt; </option>";
-   for(var i=0;i<objlist.length;i++){
-      d+="<option value='"+objlist[i].name+"'>"+objlist[i].label+"</option>";
-      DataObject[objlist[i].name].label=objlist[i].label;
-   }
-   d+="</select><br><center>";
-   d+="</td></tr><tr height=1%><td>";
-   d+="<input type=text id=searchname style='width:100%'><br>";
-   d+="<input type=button id=dosearch value='Search'>";
-   d+="</center>";
-   d+="</td></tr><tr><td><div id=Result></div></td></tr>";
-   d+="</table>";
-   $("#ObjectDetail").html(d);
-   if ("%DATAOBJ%"!=""){
-      $("#dataobj" ).val("%DATAOBJ%");
-   }
-   $("#TST").click(function(e){
-      var d="<table id=tabtab class='display compact' >";
-      d+="<thead>";
-      d+="<tr>";
-      d+="<th>D1</th>";
-      d+="<th>D2</th>";
-      d+="<th>D3</th>";
-      d+="</tr>";
-      d+="</thead>";
-      d+="<tbody>";
-      d+="<tr>";
-      d+="<td>1D1</td>";
-      d+="<td>1D2</td>";
-      d+="<td>1D3</td>";
-      d+="</tr>";
-      d+="<tr>";
-      d+="<td>2D1</td>";
-      d+="<td>2D2</td>";
-      d+="<td>2D3</td>";
-      d+="</tr>";
-      d+="<tr>";
-      d+="<td>4D1</td>";
-      d+="<td>4D2</td>";
-      d+="<td>4D3</td>";
-      d+="</tr>";
-      d+="<tr>";
-      d+="<td>6D1</td>";
-      d+="<td>6D2</td>";
-      d+="<td>6D3</td>";
-      d+="</tr>";
-      d+="<tr>";
-      d+="<td>1D1</td>";
-      d+="<td>1D2</td>";
-      d+="<td>1D3</td>";
-      d+="</tr>";
-      d+="<tr>";
-      d+="<td>2D1</td>";
-      d+="<td>2D2</td>";
-      d+="<td>2D3</td>";
-      d+="</tr>";
-      d+="<tr>";
-      d+="<td>4D1</td>";
-      d+="<td>4D2</td>";
-      d+="<td>4D3</td>";
-      d+="</tr>";
-      d+="<tr>";
-      d+="<td>6D1</td>";
-      d+="<td>6D2</td>";
-      d+="<td>6D3</td>";
-      d+="</tr>";
-      d+="</tbody>";
-      d+="</table>";
-      $('#tab').html(d);
-      $('#tabtab').DataTable({
-         lengthMenu: [[5], [5]]
-      });
-   });
-   $("#dosearch").click(function(e){
-      var dataobj=$('#dataobj').val();
-      var searchname=$('#searchname').val();
-      console.log("search in "+dataobj,"val="+searchname);
-      W5App.ClearSearchResult();
-      W5App.SearchStart();
-      if (dataobj!=""){
-         DataObject[dataobj].handleSearch(searchname);
-      }
-   });
-   $("#searchname").enterKey(function(){
-      $("#dosearch").trigger("click");
-   });
-   W5App.Renderer.start();
-}
 
 
 
@@ -846,12 +890,12 @@ $(window).resize(function() {
    W5App.autoResizePage();
 });
 
-showMain();
+W5App.showMain();
 $("#MainStartup").fadeIn(1000);
 
-setInterval(function(){
-	W5App.Renderer.start();
-},100);
+//setInterval(function(){
+//	W5App.Renderer.start();
+//},100);
 
 };
 

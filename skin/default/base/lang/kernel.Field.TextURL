@@ -1,0 +1,6 @@
+'invalid URL specified'=>{de=>'ungültige URL'},
+'URL syntax error or no scheme specified'=>{de=>'URL Syntax Fehler oder kein Schema angeben'},
+'not supported scheme specified'=>{de=>'nicht unterstütztes Schema verwendet'},
+'can not identify host in URL'=>{de=>'Host kann in URL nicht identifiziert werden'},
+
+
