@@ -109,7 +109,8 @@ sub ItemSummary
       }
    }
    if ($#mroadmaps==-1){
-      @roadmapname=@nativeroadmapname;
+      @roadmapname=grep({$_->{name} eq "TEL-IT Patchmanagement"} 
+                        @nativeroadmapname);
    }
    else{
       @roadmapname=@mroadmaps;
