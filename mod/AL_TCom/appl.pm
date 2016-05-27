@@ -22,6 +22,7 @@ use kernel;
 use kernel::Field;
 use TS::appl;
 use Storable(qw(dclone));
+use kernel::date;
 @ISA=qw(TS::appl);
 
 sub new
@@ -84,7 +85,35 @@ sub ItemSummary
    my $o=getModuleObject($self->Config,"itil::softwareset");
    $o->SetFilter({name=>'"TEL-IT Patchmanagement*"',
                   cistatusid=>\'4'});
-   my @roadmapname=$o->getHashList(qw(id name));
+   my @nativeroadmapname=$o->getHashList(qw(id name));
+   my @roadmapname;
+   my @mroadmaps;     # Roadmaps on month base
+   foreach my $r (@nativeroadmapname){
+      if (my ($year,$month)=$r->{name}
+          =~m/^TEL-IT Patchmanagement\s*([0-9]{4})[\/-]([0-9]{2})$/){
+         push(@mroadmaps,{
+            id=>$r->{id},
+            name=>$r->{name},
+            month=>$month,
+            year=>$year,
+            k=>sprintf("%04d%02d",$year,$month),
+         });
+      }
+   }
+   my ($cy,$cm)=Today_and_Now("GMT");
+   my $ckey=sprintf("%04d%02d",$cy,$cm);
+   if ($#mroadmaps!=-1){
+      @mroadmaps=grep({$_->{k} le $ckey} sort({$a->{k}<=>$b->{k}} @mroadmaps));
+      if ($#mroadmaps!=-1){
+         @mroadmaps=($mroadmaps[-1]);
+      }
+   }
+   if ($#mroadmaps==-1){
+      @roadmapname=@nativeroadmapname;
+   }
+   else{
+      @roadmapname=@mroadmaps;
+   }
 
    my @rm;
    
