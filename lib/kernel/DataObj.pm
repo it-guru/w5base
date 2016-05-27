@@ -700,7 +700,9 @@ sub getRelatedWorkflows
    $h->Limit($limit+2);
    $h->SetCurrentOrder("id");
    my %idl=();
-   map({$idl{$_->{id}}=$_} $h->getHashList(@internalWfView));
+   map({$idl{$_->{id}}=$_;
+      my $d=$_->{urlofcurrentrec};  # ensure field is resolved
+   } $h->getHashList(@internalWfView));
    if ($W5V2::OperationContext eq "WebFrontend"){
       if (keys(%idl)>$limit){
          $self->LastMsg(ERROR,$self->T("selection to ".
@@ -739,7 +741,10 @@ sub getRelatedWorkflows
          $h->SetFilter(\%qadd);
          $h->Limit($limit+2);
          $h->SetCurrentOrder("id");
-         map({$idl{$_->{id}}=$_;Dumper($_);} $h->getHashList(@internalWfView));
+         map({
+            $idl{$_->{id}}=$_;
+            my $d=$_->{urlofcurrentrec};  # ensure field is resolved
+         } $h->getHashList(@internalWfView));
       }
    }
    if ($W5V2::OperationContext eq "WebFrontend"){
