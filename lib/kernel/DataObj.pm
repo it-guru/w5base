@@ -630,7 +630,8 @@ sub getRelatedWorkflows
    my $param=shift;
    my $q={};
    my @internalWfView=qw(id isdeleted eventend stateid eventstart prio
-                         srcid srcsys name class fwdtarget fwdtargetid);
+                         srcid srcsys name class fwdtarget fwdtargetid
+                         urlofcurrentrec);
 
    my $idobj=$self->IdField();
 
