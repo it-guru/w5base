@@ -739,7 +739,7 @@ sub getRelatedWorkflows
          $h->SetFilter(\%qadd);
          $h->Limit($limit+2);
          $h->SetCurrentOrder("id");
-         map({$idl{$_->{id}}=$_} $h->getHashList(@internalWfView));
+         map({$idl{$_->{id}}=$_;Dumper($_);} $h->getHashList(@internalWfView));
       }
    }
    if ($W5V2::OperationContext eq "WebFrontend"){
