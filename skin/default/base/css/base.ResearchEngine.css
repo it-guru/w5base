@@ -46,7 +46,8 @@ body{
 #ControlButtons{
    width:100%;
    height:22px;
-   text-align:right;
+   margin-top:2px;
+   margin-bottom:2px;
 }
 
 .ControlButton{

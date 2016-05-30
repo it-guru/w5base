@@ -94,9 +94,7 @@ DataObjectBaseClass.prototype.onSetObjectFocus=function(){
       \$("#ObjectDetail").html(d);
       \$(".jqellipsis").ellipsis();
       \$("#ObjectWindowClose").click(function(e){
-           selected=null;
-           nearest=null;
-           showMain();
+           W5App.showMain();
       });
 
 
@@ -113,7 +111,10 @@ DataObjectBaseClass.prototype.onSetObjectFocus=function(){
    };
    disp();
    if (W5App.isLoading()){
-      W5App.pushLoadingStack(disp);
+      W5App.pushLoadingStack(function(){
+         disp();
+         W5App.Renderer.start();
+      });
    }
 };
 
@@ -205,12 +206,15 @@ DataObjectBaseClass.prototype.getPosibleActions=function(){
    return([]);
 };
 
+DataObjectBaseClass.prototype.getPosibleExtractors=function(){
+   return([{name:'dataobjid',label:'W5BaseID'},
+           {name:'dataobj'  ,label:'W5BaseObj'}]);
+};
+
 DataObjectBaseClass.prototype.onAction=function(name){
    if (name=='delThis'){
       W5App.delObject(this.dataobj,this.dataobjid);
-      selected=null;
-      nearest=null;
-      showMain();
+      W5App.showMain();
    }
    return(0);
 };
@@ -301,13 +305,19 @@ sub Main
       }
    }
    $objlist=$objlist."[".join(",\n",@objlist)."];";
+   my $fullname=$self->T("Fullname");
+   my $name=$self->T("Name");
+   my $objecttype=$self->T("ObjectType");
    my $opt={
       static=>{
           LANG      => $lang,
           DATAOBJ   => $dataobj,
           DATAOBJID => $dataobjid,
           OBJLIST   => $objlist,
-          TITLEBAR  => $getAppTitleBar
+          TITLEBAR  => $getAppTitleBar,
+          NAME      => $name,
+          FULLNAME  => $fullname,
+          OBJECTTYPE=> $objecttype,
       }
    };
 

@@ -37,6 +37,8 @@ sub getJSObjectClass
 {
    my $self=shift;
    my $app=shift;
+   my $lang=shift;
+
    my $d=<<EOF;
 (function(window, document, undefined) {
    var o='$self->{dataobj}';
@@ -45,6 +47,54 @@ sub getJSObjectClass
       return(DataObjectBaseClass.call(this,o,dataobjid));
    };
    \$.extend(DataObject[o].Class.prototype,DataObjectBaseClass.prototype);
+   DataObject[o].handleSearch=function(searchstring){
+         var w5obj=getModuleObject(W5App.Config(),'$self->{dataobj}');
+         var curDataObj='$self->{dataobj}';
+         w5obj.SetFilter({name:searchstring,cistatusid:4});
+         W5App.setLoading(1,"searching "+this.dataobj);
+         w5obj.findRecord("name,id",function(data){
+            if (data){
+               for(c=0;c<data.length;c++){
+                  W5App.SearchAddResultRecord({
+                     label:data[c].name,
+                     dataobj:curDataObj,
+                     dataobjid:data[c].id
+                  });
+               }
+            }
+            W5App.SearchFinishResult();
+            W5App.setLoading(-1);
+         });
+   }
+   DataObject[o].Class.prototype.loadShortRecord=function(){
+         var dst=this;
+         dst.rec={
+            name:'????'
+         };  // define a default record
+         var w5obj=getModuleObject(W5App.Config(),this.dataobj);
+         w5obj.SetFilter({id:this.dataobjid});
+         W5App.setLoading(1,"loading "+this.dataobj+" "+this.dataobjid);
+         w5obj.findRecord("id,name",function(data){
+            if (data[0]){
+               dst.rec=data[0];
+            }
+            W5App.setLoading(-1);
+         });
+   };
+   DataObject[o].Class.prototype.shortname=function(){
+      if (!this.rec){
+         this.loadShortRecord();
+      }
+      var shortname=this.rec.name;
+      return(shortname);
+   };
+
+   DataObject[o].Class.prototype.getAvatarImage=function(){
+      var i = new Image();
+      i.src = '../../../public/itil/load/appl.jpg'+
+              '?HTTP_ACCEPT_LANGUAGE=$lang';
+      return(i);
+   };
 })(this,document);
 EOF
    return($d);
