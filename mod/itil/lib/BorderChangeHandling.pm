@@ -120,7 +120,8 @@ sub BorderChangeHandling
          # calculation of contacts to notify
          if (keys(%{$border{'itil::appl'}})){
             my $appl=getModuleObject($self->Config,"itil::appl");
-            $appl->SetFilter({id=>[keys(%{$border{'itil::appl'}})]});
+            $appl->SetFilter({id=>[keys(%{$border{'itil::appl'}})],
+                              cistatusid=>"<6"});
             foreach my $arec ($appl->getHashList(qw(id name databossid))){
                if ($arec->{databossid} ne ""){
                   $u{emailto}->{$arec->{databossid}}++;
@@ -136,7 +137,8 @@ sub BorderChangeHandling
          # calculation of contacts to notify
          if (keys(%{$border{'itil::businessservice'}})){
             my $o=getModuleObject($self->Config,"itil::businessservice");
-            $o->SetFilter({id=>[keys(%{$border{'itil::businessservice'}})]});
+            $o->SetFilter({id=>[keys(%{$border{'itil::businessservice'}})],
+                           cistatusid=>"<6"});
             foreach my $lrec ($o->getHashList(qw(id fullname databossid))){
                if ($lrec->{databossid} ne ""){
                   $u{emailto}->{$lrec->{databossid}}++;
