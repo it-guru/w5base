@@ -281,7 +281,7 @@ sub qcheckRecord
    if ($dstmandator ne "" && $dstmandatorid ne ""){
       msg(INFO,"transfer $rec->{name} from '$curmandator' to '$dstmandator'");
       $forcedupd->{mandatorid}=$dstmandatorid;
-      $forcedupd->{mandator}=$dstmandator;
+     // $forcedupd->{mandator}=$dstmandator;
    }
    if (keys(%$forcedupd)){
       $dataobj->NotifiedValidatedUpdateRecord({
