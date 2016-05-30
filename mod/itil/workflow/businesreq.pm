@@ -121,6 +121,41 @@ sub getDynamicFields
 
 }
 
+sub getPosibleWorkflowDerivations
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my @l;
+
+   if ($WfRec->{stateid}<16){
+      push(@l,
+         {label=>$self->T('Initiate developer request'),
+          actor=>sub{
+             my $self=shift;
+             my $WfRec=shift;
+
+             return({
+                targeturl=>'New',
+                targetparam=>{
+                  Formated_name=>$WfRec->{name},
+                  Formated_detaildescription=>
+                                 $WfRec->{detaildescription},
+                  Formated_affectedapplication=>$WfRec->{affectedapplication},
+                  WorkflowClass=>'itil::workflow::devrequest'
+                }
+             });
+          },
+          name=>'initiatedevrequest'
+         },
+         );
+   }
+
+   return(@l);
+}
+
+
+
 sub checkextdescdesstart
 {
    my $self=shift;

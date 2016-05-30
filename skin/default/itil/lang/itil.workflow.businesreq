@@ -22,4 +22,7 @@
 'Preparation'=>{de=>'vorbereitende Maßnahmen'},
 'Dependencies'=>{de=>'Abhängigkeiten'},
 'Fallback'=>{de=>'Fallback Beschreibung'},
+'Initiate developer request'=>{de=>'Entwicklerrequest initiieren'},
+'derivation'=>{de=>'Ableitung'},
+'REV.derivation'=>{de=>'Abgeleitet von'},
 
