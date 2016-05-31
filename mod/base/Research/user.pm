@@ -146,7 +146,7 @@ sub getJSObjectClass
    DataObject[o].handleSearch=function(searchstring){
          var w5obj=getModuleObject(W5App.Config(),'$self->{dataobj}');
          var curDataObj='$self->{dataobj}';
-         w5obj.SetFilter({fullname:searchstring,cistatusid:4});
+         w5obj.SetFilter({fullname:searchstring,cistatusid:"<5"});
          W5App.setLoading(1,"searching "+this.dataobj);
          w5obj.findRecord("fullname,userid",function(data){
             if (data){
@@ -161,7 +161,12 @@ sub getJSObjectClass
             W5App.SearchFinishResult();
             W5App.setLoading(-1);
          });
-   }
+   };
+   DataObject[o].getPosibleExtractors=function(){
+      return([{name:'dataobjid',label:'W5BaseID'},
+              {name:'dataobj'  ,label:'W5BaseObj'}]);
+   };
+
 
 })(this,document);
 EOF

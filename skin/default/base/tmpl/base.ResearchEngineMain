@@ -32,7 +32,7 @@ body{
 </div>
 </td>
 </tr>
-<tr height=132><td colspan=3 valign=top><div id="dataExtractTab" style='width:100%;height:100%'>&nbsp;</div></td></tr>
+<tr height=132><td colspan=3 valign=top><div id="dataExtractTab" style='width:100%;height:100%;overflow:auto'>&nbsp;</div></td></tr>
 <tr height=30><td colspan=3 valign=top><div id='favExtractors'></div></td></tr>
 </table>
 
@@ -48,7 +48,9 @@ body{
 
 <script language="JavaScript" src="../../../auth/base/load/J5Base.js">
 </script>
-<script language="JavaScript" src="../../../auth/base/load/spin.js">
+<script language="JavaScript" src="../../../public/base/load/spin.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/datadumper.js">
 </script>
 
 <script language="JavaScript" src="../../../public/base/load/jquery.dataTables.js">
@@ -476,10 +478,36 @@ var W5AppClass=function(){
 
       W5App.autoResizePage();
    };
+   this.runExtractor=function(name){
+      W5App.setLoading(1,"runExtractor "+name);
+      var resultSet=new Object({
+          l:new Array(),
+          k:new Object(),
+          addObject:function(o){
+             if (!this.k[o.k]){
+                this.k[o.k]=o.k;
+                this.l.push(o.rec);
+             }
+          },
+          display:function(){
+             $('#dataExtractTab').html("<xmp>"+Dumper(this.l)+"</xmp>");
+             console.log("show ResultSet");
+          }
+      });
+      W5App.pushLoadingStack(function(){
+         resultSet.display();
+      });
+      W5App.graph.eachNode(function(node){
+          console.log("runExtractor on ",node," with name=",name);
+          node.data.w5obj.onAction(name,resultSet);
+      }); 
+      W5App.setLoading(-1);
+   };
    this.selectExtractor=function(){
      $('#dataExtractTab').html("Hi");
      %OBJLIST%
      var e=new Object();
+     var d="";
      console.log("o=",DataObject);
      for(var i=0;i<objlist.length;i++){
         console.log("load=",objlist[i].name);
@@ -490,7 +518,17 @@ var W5AppClass=function(){
            }
         }
      }
-     console.log("e=",e);
+     var l=Object.keys(e);
+     l.sort(function(a,b) { return(e[a].label>e[b].label ? 1:-1); });
+     for(var i=0;i<l.length;i++){
+        d+="<div style='maring-left:2px;margin-top:2px;width:180px;height:26px;border-style:solid;border-color:silver;border-width:1px;vertical-align:middle;display:table-cell;white-space: nowrap'><img id='"+e[l[i]].name+"' class=ControlExtract width=20 height=20 src='../../../public/base/load/functions.gif' style='cursor:pointer'><div style='display:inline-block;white-space: normal'>"+e[l[i]].label+"</div></div>";
+     }
+     $('#dataExtractTab').html(d);
+     $('.ControlExtract').click(function(e){
+        console.log("clicked extractor:",e);
+        var name=$(this).attr("id");
+        W5App.runExtractor(name);
+     });
    };
    this.Run=function(){
       $(".ControlButton").click(function(e){

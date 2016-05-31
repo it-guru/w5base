@@ -92,7 +92,7 @@ DataObjectBaseClass.prototype.onSetObjectFocus=function(){
       d+=curthis.renderDetailActions();
       d+="</div>";
       \$("#ObjectDetail").html(d);
-      \$(".jqellipsis").ellipsis();
+      \$(".jqellipsis").ellipsis();  // ... anzeigen bei Bedarf
       \$("#ObjectWindowClose").click(function(e){
            W5App.showMain();
       });
@@ -204,11 +204,6 @@ DataObjectBaseClass.prototype.getPosibleActions=function(){
    return([{name:'delThis',label:'delete Object'},
            {name:'anyOp',label:'MachNix'}]);
    return([]);
-};
-
-DataObjectBaseClass.prototype.getPosibleExtractors=function(){
-   return([{name:'dataobjid',label:'W5BaseID'},
-           {name:'dataobj'  ,label:'W5BaseObj'}]);
 };
 
 DataObjectBaseClass.prototype.onAction=function(name){
