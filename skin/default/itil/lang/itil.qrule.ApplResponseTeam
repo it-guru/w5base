@@ -1,3 +1,3 @@
-'itil::qrule::ApplResponseTeam'=>{de=>'Prüfung ob CBM Team bei Anwendung eingetragen ist',
-                             en=>'check if ther is a valid responseteam defined on application'},
+'itil::qrule::ApplResponseTeam'=>{de=>'Prüfung ob CBM/IT-Servicemanagement Team bei Anwendung eingetragen ist',
+                             en=>'check if there is a valid responseteam/IT-Servicemanagement Team defined on application'},
 'no responseteam/IT-Servicemanagement team defined'=>{de=>'kein CBM/IT-Servicemanagement Team definiert'},
