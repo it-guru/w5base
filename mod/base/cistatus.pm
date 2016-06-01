@@ -45,7 +45,8 @@ sub new
                      {id=>3 , info=>'verfügbarer status'},
                      {id=>4 , info=>'ci ist aktiv'},
                      {id=>5 , info=>'zeitweise deaktivert'},
-                     {id=>6 , info=>'verschrottet'}];
+                     {id=>6 , info=>'verschrottet'},
+                     {id=>7 , info=>'entsorgt'}];
    $self->setDefaultView(qw(id name info));
    return($self);
 }

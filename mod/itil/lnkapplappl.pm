@@ -58,7 +58,6 @@ sub new
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
                 label         =>'Interface-State',
-                vjoineditbase =>{id=>">0"},
                 vjointo       =>'base::cistatus',
                 vjoineditbase =>{id=>[3,4,5,6]},
                 default       =>'4',

@@ -69,7 +69,7 @@ sub new
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
-                vjoineditbase =>{id=>">0"},
+                vjoineditbase =>{id=>">0 AND <7"},
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
@@ -404,6 +404,10 @@ sub Validate
    my $origrec=shift;
 
    my $cistatus=effVal($oldrec,$newrec,"cistatusid");
+   if (defined($newrec) && exists($newrec->{cistatusid}) &&
+       $newrec->{cistatusid}==7){
+      return(1);
+   }
    if (defined($newrec->{name}) || !defined($oldrec)){
       trim(\$newrec->{name});
       $newrec->{name}=~s/[\.\s\*]/_/g;
@@ -473,6 +477,9 @@ sub getHtmlDetailPages
    my $self=shift;
    my ($p,$rec)=@_;
 
+   if (defined($rec) && $rec->{cistatusid}==7){
+      return($self->SUPER::getHtmlDetailPages($p,$rec));
+   }
    return($self->SUPER::getHtmlDetailPages($p,$rec),
           "TView"=>$self->T("Team View"),
           "RView"=>$self->T("Rights overview"),
@@ -580,6 +587,21 @@ sub getUserDiv
 }
 
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->isDirectFilter(@flt)){ 
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+
 
 sub TeamView   # erster Versuch der Teamview
 {
@@ -656,6 +678,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
 
+   return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
+
    return(qw(header default source)) if (!defined($rec) || 
                                   (defined($rec->{grpid}) && $rec->{grpid}<=0));
    return("ALL");
@@ -692,6 +716,16 @@ sub FinishWrite
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
+   if (exists($newrec->{cistatusid}) &&
+       $newrec->{cistatusid}==7 &&
+       $oldrec->{cistatusid}!=7){
+      my $grpid=$oldrec->{grpid};
+      my $j=getModuleObject($self->Config,"base::lnkgrpuser");
+      $j->BulkDeleteRecord({'grpid'=>\$grpid});
+      return(1);
+   }
+
 
    # $self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}});
    $self->NotifyOnCIStatusChange($oldrec,$newrec);

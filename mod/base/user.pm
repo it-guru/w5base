@@ -162,7 +162,7 @@ sub new
                 },
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
-                vjoineditbase =>{id=>">0"},
+                vjoineditbase =>{id=>">0 AND <7"},
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
@@ -1041,7 +1041,19 @@ sub formPhoneSql
    }
    return($s);
 }
-      
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+
+   }
+   return($self->SetFilter(@flt));
+}
 
 sub getLastLogon
 {
@@ -1216,6 +1228,11 @@ sub Validate
    if (!defined($cistatusid) && !defined($oldrec)){
       $newrec->{cistatusid}=1;
    } 
+   if (defined($newrec) && exists($newrec->{cistatusid}) && 
+       $newrec->{cistatusid}==7){
+      $newrec->{email}=undef;
+      return(1);
+   }
    if (!defined($oldrec)){
       $newrec->{secstate}=$self->Config->Param("DefaultUserSecState");
    }
@@ -1451,6 +1468,19 @@ sub FinishWrite
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
+   if (exists($newrec->{cistatusid}) && 
+       $newrec->{cistatusid}==7 &&
+       $oldrec->{cistatusid}!=7){
+      my $userid=$oldrec->{userid};
+      my $j=getModuleObject($self->Config,"base::useraccount");
+      $j->BulkDeleteRecord({'userid'=>\$userid});
+      my $j=getModuleObject($self->Config,"base::useremail");
+      $j->BulkDeleteRecord({'userid'=>\$userid,usertyp=>\'altemail'});
+      my $j=getModuleObject($self->Config,"base::lnkgrpuser");
+      $j->BulkDeleteRecord({'userid'=>\$userid});
+      return(1);
+   }
    $self->InvalidateCache($oldrec) if (defined($oldrec));
    $self->ValidateUserCache();
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
@@ -1487,6 +1517,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("default","header") if (!defined($rec));
+   return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @pic;
    my $userid=$self->getCurrentUserId();
    my @gl;
@@ -1580,6 +1611,9 @@ sub getHtmlDetailPages
    my $self=shift;
    my ($p,$rec)=@_;
 
+   if (defined($rec) && $rec->{cistatusid}==7){
+      return($self->SUPER::getHtmlDetailPages($p,$rec));
+   }
    return($self->SUPER::getHtmlDetailPages($p,$rec),
           "RView"=>$self->T("Rights overview"));
 }

@@ -48,6 +48,7 @@ sub process
                $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
             }
 
+            $self->CleanupWasted();
             $self->doCleanup();
             $self->CleanupWorkflows();
             $self->CleanupHistory();
@@ -127,6 +128,38 @@ sub CleanupInlineAttachments
          $op->ValidatedDeleteRecord($rec);
          ($rec,$msg)=$inline->getNext();
       } until(!defined($rec));
+   }
+}
+
+sub CleanupWasted
+{
+   my $self=shift;
+   my $CleanupWasted=$self->getParent->Config->Param("CleanupWasted");
+   $CleanupWasted="<now-5Y" if ($CleanupWasted eq "");
+
+   my @objlist=qw(base::user base::grp);
+
+   foreach my $obj (@objlist){
+      my $o=getModuleObject($self->getParent->Config,$obj);
+      my $idobj=$o->IdField();
+      if (defined($idobj)){
+         my $idname=$idobj->Name();
+         $o->SetFilter({cistatusid=>\'6',mdate=>$CleanupWasted});
+         $o->SetCurrentView(qw(ALL));
+         $o->SetCurrentOrder(qw(NONE));
+         $o->Limit(10);
+         my ($rec,$msg)=$o->getFirst(unbuffered=>1);
+         if (defined($rec)){
+            my $op=$o->Clone();
+            do{
+               if ($rec->{$idname} ne ""){
+                  $op->ValidatedUpdateRecord($rec,{cistatusid=>7},
+                                             {$idname=>\$rec->{$idname}});
+               }
+               ($rec,$msg)=$o->getNext();
+            } until(!defined($rec));
+         }
+      }
    }
 }
 

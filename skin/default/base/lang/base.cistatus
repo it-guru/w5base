@@ -9,3 +9,4 @@
 'CI-Status(4)'=>{de=>'installiert/aktiv',    en=>'installed/activ'    },
 'CI-Status(5)'=>{de=>'zeitweise inaktiv',    en=>'inactiv/stored'     },
 'CI-Status(6)'=>{de=>'veraltet/gelöscht',    en=>'disposed of waste'  },
+'CI-Status(7)'=>{de=>'entsorgt',             en=>'wasted'  },

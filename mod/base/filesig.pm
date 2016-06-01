@@ -50,6 +50,7 @@ sub new
                 label         =>'CI-State',
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
+                vjoineditbase =>{id=>">0 AND <7"},
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(

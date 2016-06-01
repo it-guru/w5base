@@ -135,7 +135,7 @@ sub new
                 htmleditwidth =>'40%',
                 readonly      =>1,
                 label         =>'Application CI-State',
-                vjoineditbase =>{id=>">0"},
+                vjoineditbase =>{id=>">0 AND <7"},
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),

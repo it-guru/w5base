@@ -76,7 +76,7 @@ sub new
                 name          =>'cistatus',
                 htmleditwidth =>'60%',
                 label         =>'CI-State',
-                vjoineditbase =>{id=>">0"},
+                vjoineditbase =>{id=>">0 AND <7"},
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),

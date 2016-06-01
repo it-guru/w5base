@@ -272,6 +272,9 @@ sub ProcessLine
    my $editgroups=[$app->isWriteValid($rec)];
    my $currentfieldgroup=Query->Param("CurrentFieldGroupToEdit"); 
    my $currentid=Query->Param("CurrentIdToEdit"); 
+   if (defined($rec) && exists($rec->{cistatusid}) && $rec->{cistatusid}==7){
+      $editgroups=[];
+   }
    $self->{fieldHeaders}={} if (!exists($self->{fieldHeaders}));
    if (!exists($self->{fieldsPageHeader})){
       $self->{fieldsPageHeader}=

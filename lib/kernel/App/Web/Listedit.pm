@@ -1617,8 +1617,14 @@ EOF
       my $page=$self->getHtmlDetailPageContent($p,$rec);
 
       my @WfFunctions=$self->getDetailFunctions($rec);
+      my @HtmlDetailPages=$self->getHtmlDetailPages($p,$rec);
+      if (defined($rec) && 
+          exists($rec->{cistatusid}) && $rec->{cistatusid}==7){
+         @WfFunctions=($self->T("DetailClose")=>'DetailClose');
+      }
+
       my %param=(functions   =>\@WfFunctions,
-                 pages       =>[$self->getHtmlDetailPages($p,$rec)],
+                 pages       =>\@HtmlDetailPages,
                  activpage  =>$p,
                  page        =>$page,
                  actionbox   =>
