@@ -504,14 +504,16 @@ sub getHtmlDetailPages
 
    if (defined($rec)){
       my @pa=('StandardDetail'=>$self->T("Standard-Detail"));
-      if (defined($self->{history})){
-         push(@pa,'HtmlHistory'=>$self->T("History"));
-      }
-      if (defined($self->{workflowlink})){
-         push(@pa,'HtmlWorkflowLink'=>$self->T("Workflows"));
-      }
-      if ($self->can("HtmlInterviewLink")){
-         push(@pa,'HtmlInterviewLink'=>$self->T("Interview"));
+      if (!exists($rec->{cistatusid}) || $rec->{cistatusid}!=7){
+         if (defined($self->{history})){
+            push(@pa,'HtmlHistory'=>$self->T("History"));
+         }
+         if (defined($self->{workflowlink})){
+            push(@pa,'HtmlWorkflowLink'=>$self->T("Workflows"));
+         }
+         if ($self->can("HtmlInterviewLink")){
+            push(@pa,'HtmlInterviewLink'=>$self->T("Interview"));
+         }
       }
       return(@pa);
    }
