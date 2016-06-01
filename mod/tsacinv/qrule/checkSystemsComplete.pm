@@ -6,11 +6,19 @@ package tsacinv::qrule::checkSystemsComplete;
 
 Checks if all systems on a specifice costobject are documented in
 it-invtory.
+
 All systems in AM are defined as ...
+
 state="!out of operation"
+
 systemola=!*ONLY
+
 ... as requested in ...
+
 https://darwin.telekom.de/darwin/auth/base/workflow/ById/14087131770001
+
+... and as an additional restriction, the customer link in AssetManager
+must point to DTAG.* 
 
 
 =head3 IMPORTS
@@ -96,13 +104,12 @@ sub qcheckRecord
 
 
    my $co=$rec->{name};
-   $co=~s/^[a-z]-//i;
-   $co=~s/-.*$//;
 
    $o->SetFilter({
       status=>'"in operation"',
       systemola=>'!*ONLY',
-      conumber=>$co
+      conumber=>\$co,
+      customerlink=>'DTAG.* DTAG'
    });
    my @soll=$o->getHashList(qw(systemname systemid));
 

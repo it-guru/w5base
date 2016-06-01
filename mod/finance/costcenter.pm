@@ -382,6 +382,19 @@ sub ValidateCONumber
          return(1);
       }
    }
+   else{
+      # check if already an active costcenter record exists
+      my $conumber=effVal($oldrec,$newrec,$fieldname);
+      if ($conumber ne ""){
+         my $o=getModuleObject($self->Config,"finance::costcenter");
+         $o->SetFilter({name=>\$conumber,cistatusid=>\'4'});
+         my ($corec)=$o->getOnlyFirst(qw(id));
+         if (defined($corec)){
+            return(1);
+         }
+      }
+
+   }
    return(0);
 
 
