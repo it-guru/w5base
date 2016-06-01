@@ -65,7 +65,8 @@ sub new
                 name          =>'grouptype',
                 htmleditwidth =>'80%',
                 label         =>'Group-type',
-                value         =>['PCONTROL','RLABEL'],
+                value         =>['PCONTROL','RLABEL','CFGROUP'],
+                selectfix     =>1,
                 dataobjattr   =>'mgmtitemgroup.grouptype'),
 
       new kernel::Field::Databoss(
@@ -262,7 +263,8 @@ sub Validate
    my $newrec=shift;
 
    if (!defined($oldrec) || defined($newrec->{name})){
-      if ($newrec->{name}=~m/^\s*$/ || !($newrec->{name}=~m/^[a-z0-9-()_]+$/i)){
+      if ($newrec->{name}=~m/^\s*$/ || 
+          !($newrec->{name}=~m/^[a-z0-9-():_]+$/i)){
          $self->LastMsg(ERROR,"invalid name specified");
          return(0);
       }
@@ -364,7 +366,15 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+
+   my @l=qw(header default comments contacts source);
+   if ($rec->{grouptype} eq "CFGROUP"){
+      push(@l,"applications");
+   }
+   else{
+      push(@l,qw(applications locations businessservices));
+   }
+   return(@l);
 }
 
 sub initSearchQuery
