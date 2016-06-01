@@ -12,5 +12,6 @@
           de=>'sie sind nicht berechtigt, andere Personen als Datenverantwortlicher zu definieren'},
 
 'PCONTROL'=>{de=>'Prozesssteuerung und CI-Gruppierung',en=>'processcontrol and CI-grouping'},
+'CFGROUP'=>{de=>'Change-Freeze Gruppe',en=>'Change-Freeze-Group'},
 'RLABEL'=>{de=>'Reporting Label',en=>'Reporting Label'},
 'fieldgroup.groupdetails'=>{de=>'Gruppendetails',en=>'Groupdetails'},

@@ -742,7 +742,7 @@ sub new
                 readonly      =>1,
                 vjoinbase     =>{'lnkfrom'=>'<now',
                                  'lnkto'=>'>now OR [EMPTY]',
-                                 'grouptype'=>\'PCONTROL',
+                                 'grouptype'=>['PCONTROL','CFGROUP'],
                                  'mgmtitemgroupcistatusid'=>\'4'},
                 weblinkto     =>'NONE',
                 vjoinon       =>['id'=>'applid'],
