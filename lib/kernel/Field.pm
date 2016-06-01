@@ -24,6 +24,7 @@ use kernel::Field::Id;
 use kernel::Field::RecordUrl;
 use kernel::Field::Vector;
 use kernel::Field::Text;
+use kernel::Field::TextURL;
 use kernel::Field::FlexBox;
 use kernel::Field::Databoss;
 use kernel::Field::Password;
