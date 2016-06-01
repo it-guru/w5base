@@ -172,7 +172,7 @@ var W5AppClass=function(){
       function datatabResizer(){
          datatab.page.len(2).draw(); 
          var hmax=$('#workspace').height();
-         var maxn=Math.floor(((hmax-80)/30));
+         var maxn=Math.floor(((hmax-100)/22));
          datatab.page.len(maxn).draw(); 
       }
       var datatab=$('#datatab').DataTable({
@@ -211,7 +211,7 @@ var W5AppClass=function(){
          },
          function drawEdge(edge, p1, p2){
          },
-         function drawNode(node, p){
+         function drawNode(node){
             var shortname='???';
             if (typeof(node.data.shortname)!=='undefined'){
                shortname=node.data.shortname();
@@ -480,6 +480,21 @@ var W5AppClass=function(){
    };
    this.runExtractor=function(name){
       W5App.setLoading(1,"runExtractor "+name);
+      %OBJLIST%
+      var extr;
+      foundExtr: for(var i=0;i<objlist.length;i++){
+         if (DataObject[objlist[i].name].getPosibleExtractors){
+            var l=DataObject[objlist[i].name].getPosibleExtractors();
+            for(var c=0;c<l.length;c++){
+               if (name==l[c].name){
+                  extr=l[c];
+                  break foundExtr;
+               } 
+            }
+         }
+      }
+      if (!extr) return;
+      console.log("ExtractorRec:",extr);
       var resultSet=new Object({
           l:new Array(),
           k:new Object(),
@@ -490,8 +505,20 @@ var W5AppClass=function(){
              }
           },
           display:function(){
-             $('#dataExtractTab').html("<xmp>"+Dumper(this.l)+"</xmp>");
-             console.log("show ResultSet");
+             if (!extr['table']){
+                var out=new Array();
+                console.log(this.l);
+                for(var i=0;i<this.l.length;i++){
+                   out.push(this.l[i][name]);
+                }
+                console.log("out:",out);
+                $('#dataExtractTab').html("<p class=ExtractorOutput>"+
+                                          out.join(", ")+
+                                          "</p>");  
+             }
+             else{  // use datatables output system
+                $('#dataExtractTab').html("<xmp>"+Dumper(this.l)+"</xmp>");
+             }
           }
       });
       W5App.pushLoadingStack(function(){
@@ -504,31 +531,32 @@ var W5AppClass=function(){
       W5App.setLoading(-1);
    };
    this.selectExtractor=function(){
-     $('#dataExtractTab').html("Hi");
-     %OBJLIST%
-     var e=new Object();
-     var d="";
-     console.log("o=",DataObject);
-     for(var i=0;i<objlist.length;i++){
-        console.log("load=",objlist[i].name);
-        if (DataObject[objlist[i].name].getPosibleExtractors){
-           var l=DataObject[objlist[i].name].getPosibleExtractors();
-           for(var c=0;c<l.length;c++){
-              e[l[c].name]=l[c];
-           }
-        }
-     }
-     var l=Object.keys(e);
-     l.sort(function(a,b) { return(e[a].label>e[b].label ? 1:-1); });
-     for(var i=0;i<l.length;i++){
-        d+="<div style='maring-left:2px;margin-top:2px;width:180px;height:26px;border-style:solid;border-color:silver;border-width:1px;vertical-align:middle;display:table-cell;white-space: nowrap'><img id='"+e[l[i]].name+"' class=ControlExtract width=20 height=20 src='../../../public/base/load/functions.gif' style='cursor:pointer'><div style='display:inline-block;white-space: normal'>"+e[l[i]].label+"</div></div>";
-     }
-     $('#dataExtractTab').html(d);
-     $('.ControlExtract').click(function(e){
-        console.log("clicked extractor:",e);
-        var name=$(this).attr("id");
-        W5App.runExtractor(name);
-     });
+      $('#dataExtractTab').html("Hi");
+      %OBJLIST%
+      var e=new Object();
+      var d="";
+      console.log("o=",DataObject);
+      for(var i=0;i<objlist.length;i++){
+         if (DataObject[objlist[i].name].getPosibleExtractors){
+            var l=DataObject[objlist[i].name].getPosibleExtractors();
+            for(var c=0;c<l.length;c++){
+               if (!e[l[c].name]){
+                  e[l[c].name]=l[c];
+               }
+            }
+         }
+      }
+      var l=Object.keys(e);
+      l.sort(function(a,b) { return(e[a].label>e[b].label ? 1:-1); });
+      for(var i=0;i<l.length;i++){
+         d+="<div style='maring-left:2px;margin-top:2px;width:180px;height:26px;border-style:solid;border-color:silver;border-width:1px;vertical-align:middle;display:table-cell;white-space: nowrap'><img id='"+e[l[i]].name+"' class=ControlExtract width=20 height=20 src='../../../public/base/load/functions.gif' style='cursor:pointer'><div style='display:inline-block;white-space: normal'>"+e[l[i]].label+"</div></div>";
+      }
+      $('#dataExtractTab').html(d);
+      $('.ControlExtract').click(function(e){
+         console.log("clicked extractor:",e);
+         var name=$(this).attr("id");
+         W5App.runExtractor(name);
+      });
    };
    this.Run=function(){
       $(".ControlButton").click(function(e){

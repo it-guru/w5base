@@ -112,7 +112,15 @@ sub getJSObjectClass
    DataObject[o].getPosibleExtractors=function(){
       return([{name:'dataobjid',label:'W5BaseID'},
               {name:'ipadr',label:'direct attached and active IP-Adresses'},
-              {name:'dataobj'  ,label:'W5BaseObj'}]);
+              {name:'dataobj'  ,label:'W5BaseObj'}
+            //  {name:'sample'   ,label:'W5BaseObj', table:[
+            //       {name:'s1',label:'Hansi'}, 
+            //       {name:'s2',label:'Fritzi'}
+            //     ]
+            //   }
+              ]);
+
+
    };
 
    DataObject[o].Class.prototype.getPosibleActions=function(){
@@ -163,7 +171,7 @@ sub getJSObjectClass
          });
          return(1);
       }
-      return(DataObjectBaseClass.prototype.onAction.call(this,name));
+      return(DataObjectBaseClass.prototype.onAction.call(this,name,resultSet));
    };
 
 

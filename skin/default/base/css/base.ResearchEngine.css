@@ -82,7 +82,8 @@ body{
 #datatab thead th,
 #datatab tbody td {
    white-space: nowrap;
-   height:30px;
+   xheight:11px;
+   height:auto;
    text-overflow:clip;
 }
 
@@ -140,3 +141,25 @@ tr.callAction:hover{
    background-color:yellow;
    cursor:pointer;
 }
+
+table.dataTable.compact thead th,
+table.dataTable.compact thead td {
+  padding: 1px 15px 1px 1px;
+}
+table.dataTable.compact tfoot th,
+table.dataTable.compact tfoot td {
+  padding: 1px;
+}
+table.dataTable.compact tbody th,
+table.dataTable.compact tbody td {
+  padding: 1px;
+}
+
+.ExtractorOutput{
+   font-family:monospace,Courier New,Adobe Courier,Courier;
+   font-size:14px;
+   color:black;
+   font-weight:800;
+   padding:4px;
+}
+

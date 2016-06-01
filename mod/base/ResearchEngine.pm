@@ -206,10 +206,24 @@ DataObjectBaseClass.prototype.getPosibleActions=function(){
    return([]);
 };
 
-DataObjectBaseClass.prototype.onAction=function(name){
+DataObjectBaseClass.prototype.onAction=function(name,resultSet){
    if (name=='delThis'){
       W5App.delObject(this.dataobj,this.dataobjid);
       W5App.showMain();
+   }
+   if (name=='dataobj'){
+      resultSet.addObject({k:this.dataobj,
+                      rec:{
+                         dataobj:this.dataobj
+                      }
+                  });
+   }
+   if (name=='dataobjid'){
+      resultSet.addObject({k:this.dataobjid,
+                      rec:{
+                         dataobjid:this.dataobjid
+                      }
+                  });
    }
    return(0);
 };

@@ -99,7 +99,7 @@ sub getJSObjectClass
       l.push({name:'addOrgs',label:'$addOrgs'});
       return(l);
    };
-   DataObject[o].Class.prototype.onAction=function(name){
+   DataObject[o].Class.prototype.onAction=function(name,resultSet){
       if (name=='addGroups'){
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
@@ -134,7 +134,7 @@ sub getJSObjectClass
          });
          return(1);
       }
-      return(DataObjectBaseClass.prototype.onAction.call(this,name));
+      return(DataObjectBaseClass.prototype.onAction.call(this,name,resultSet));
    };
 
    DataObject[o].Class.prototype.getAvatarImage=function(){

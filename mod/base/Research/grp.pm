@@ -62,6 +62,31 @@ sub getJSObjectClass
             W5App.setLoading(-1);
          });
    };
+   DataObject[o].Class.prototype.getPosibleActions=function(){
+      var l=DataObjectBaseClass.prototype.getPosibleActions.call(this);
+      l.push({name:'addMembers',label:'addMembers'});
+      return(l);
+   };
+   DataObject[o].Class.prototype.onAction=function(name,resultSet){
+      if (name=='addMembers'){
+         var w5obj=getModuleObject(W5App.Config(),"base::lnkgrpuser");
+         var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
+         w5obj.SetFilter({grpid:this.dataobjid,nativroles:'RMember'});
+         W5App.setLoading(1,"member Add "+this.dataobj);
+         w5obj.findRecord("userid",function(data){
+            if (data[0]){
+               for(var c=0;c<data.length;c++){
+                  var dkey=W5App.toObjKey('base::user',data[c].userid);
+                  W5App.addObject('base::user',data[c].userid);
+                  W5App.addConnectorKK(skey,dkey,0);
+               }
+            }
+            W5App.setLoading(-1);
+         });
+         return(1);
+      }
+      return(DataObjectBaseClass.prototype.onAction.call(this,name,resultSet));
+   };
 
    DataObject[o].Class.prototype.shortname=function(){
       if (!this.rec) this.loadShortRecord();

@@ -96,6 +96,9 @@ sub getJSObjectClass
       var shortname=this.rec.name;
       return(shortname);
    };
+   DataObject[o].Class.prototype.fullname=function(){
+      return(this.shortname());
+   };
 
    DataObject[o].Class.prototype.getAvatarImage=function(){
       var i = new Image();
@@ -112,7 +115,7 @@ sub getJSObjectClass
       return(l);
    };
 
-   DataObject[o].Class.prototype.onAction=function(name){
+   DataObject[o].Class.prototype.onAction=function(name,resultSet){
       if (name=='addIf'){
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
@@ -152,7 +155,7 @@ sub getJSObjectClass
          });
          return(1);
       }
-      return(DataObjectBaseClass.prototype.onAction.call(this,name));
+      return(DataObjectBaseClass.prototype.onAction.call(this,name,resultSet));
    };
 
 
