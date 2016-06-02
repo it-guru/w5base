@@ -122,6 +122,8 @@ sub utf8_to_latin1
    $utf8string=~s/\xC5[\xa8\xaa\xac\xae\xb0\b2]/U/g;
    $utf8string=~s/\xC5[\x83\x85\x87\x8a]/N/g;
    $utf8string=~s/\xC5[\x84\x86\x88\x89\x8b]/n/g;
+   $utf8string=~s/\xC5[\x99]/r/g;
+   $utf8string=~s/\xC3[\xAC\xAD\xAE\xAF]/i/g;
    $utf8string=~s/\xC5[\xb6\xb8]/Y/g;
    $utf8string=~s/\xC5[\x8d\x8f\x91\x93]/o/g;
    $utf8string=~s/\xC6[\xa1\xa3]/o/g;
