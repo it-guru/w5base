@@ -109,7 +109,7 @@ sub getSqlFrom
    my $self=shift;
    my $from=TABpref."assignmenta1 ".SELpref."assignmenta1, ".
             TABpref."contctsm1 ".SELpref."chkcontact,".
-            TABpref."operatorm1 ".SELpref."chkuser";
+            "smadm1.operatorm1 ".SELpref."chkuser";
    return($from);
 }
 
