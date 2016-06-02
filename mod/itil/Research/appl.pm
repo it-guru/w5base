@@ -136,6 +136,18 @@ sub getJSObjectClass
          });
          return(1);
       }
+      if (name=='appl'){
+         var dkey=W5App.toObjKey(this.dataobj,this.dataobjid);
+         resultSet.addObject({
+            k:dkey,
+            rec:{
+               name:this.shortname(),
+               dataobj:this.dataobj,
+               dataobjid:this.dataobjid
+            }
+         }); 
+         return(1);
+      }
       if (name=='addSystems'){
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          var skey=W5App.toObjKey(this.dataobj,this.dataobjid);

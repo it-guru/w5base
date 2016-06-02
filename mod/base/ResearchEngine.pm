@@ -99,14 +99,32 @@ DataObjectBaseClass.prototype.onSetObjectFocus=function(){
 
 
       \$(".callAction").click(function(e){
-        var name=\$(this).attr("name");
-        var dataobj=\$(this).attr("dataobj");
-        var dataobjid=\$(this).attr("dataobjid");
-        var k=dataobj+'::'+dataobjid;
-        var node;
-        if (node=W5App.graph.NodeExists(k)){
-           node.data.w5obj.onAction(name);
-        }
+         var name=\$(this).attr("name");
+         var dataobj=\$(this).attr("dataobj");
+         var dataobjid=\$(this).attr("dataobjid");
+         var k=dataobj+'::'+dataobjid;
+         var node;
+        
+         // Resultset definition
+         var resultSet=new Object({
+             addObject:function(o){
+                 if (o.rec.dataobj && o.rec.dataobjid){
+                    W5App.addObject(o.rec.dataobj,o.rec.dataobjid);
+                 }
+                 else{
+                    console.log("error in addObject",o);
+                 }
+             },
+             addConnector:function(skey,dkey,mode){
+                 W5App.addConnectorKK(skey,dkey,mode);
+             },
+             display:function(){
+             }
+         });
+
+         if (node=W5App.graph.NodeExists(k)){
+            node.data.w5obj.onAction(name,resultSet);
+         }
       });
    };
    disp();
@@ -172,11 +190,6 @@ DataObjectBaseClass.prototype.gatherDetailData=function(){
 
 
 
-DataObjectBaseClass.prototype.handleSearch=function(){
-   alert("no search defined");
-   return;
-};
-
 DataObjectBaseClass.prototype.renderDetailActions=function(){
    var d="<div class=DetailActions style='height:100%;overflow:auto'>";
    var currentObject=this;
@@ -201,9 +214,10 @@ DataObjectBaseClass.prototype.renderDetailActions=function(){
 };
 
 DataObjectBaseClass.prototype.getPosibleActions=function(){
-   return([{name:'delThis',label:'delete Object'},
-           {name:'anyOp',label:'MachNix'}]);
-   return([]);
+   return([
+           {name:'delThis',label:'delete Object'}
+          // ,{name:'anyOp',label:'MachNix'}
+          ]);
 };
 
 DataObjectBaseClass.prototype.onAction=function(name,resultSet){

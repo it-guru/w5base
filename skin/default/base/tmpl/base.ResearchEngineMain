@@ -504,14 +504,19 @@ var W5AppClass=function(){
                 this.l.push(o.rec);
              }
           },
+          delObject:function(key){
+             // connectors can't be used in Extractors
+          },
+          addConnector:function(skey,dkey,mode){
+             // connectors can't be used in Extractors
+          },
           display:function(){
              if (!extr['table']){
                 var out=new Array();
                 console.log(this.l);
                 for(var i=0;i<this.l.length;i++){
-                   out.push(this.l[i][name]);
+                   out.push(this.l[i]['name']);
                 }
-                console.log("out:",out);
                 $('#dataExtractTab').html("<p class=ExtractorOutput>"+
                                           out.join(", ")+
                                           "</p>");  
@@ -535,7 +540,6 @@ var W5AppClass=function(){
       %OBJLIST%
       var e=new Object();
       var d="";
-      console.log("o=",DataObject);
       for(var i=0;i<objlist.length;i++){
          if (DataObject[objlist[i].name].getPosibleExtractors){
             var l=DataObject[objlist[i].name].getPosibleExtractors();
@@ -819,7 +823,10 @@ var W5AppClass=function(){
       d+="<select id=dataobj name=dataobj style='width:100%'>";
       d+="<option value=''> &lt;- select object -&gt; </option>";
       for(var i=0;i<objlist.length;i++){
-         d+="<option value='"+objlist[i].name+"'>"+objlist[i].label+"</option>";
+         if (DataObject[objlist[i].name].handleSearch){
+            d+="<option value='"+objlist[i].name+"'>"+
+               objlist[i].label+"</option>";
+         }
          DataObject[objlist[i].name].label=objlist[i].label;
       }
       d+="</select><br><center>";
@@ -833,63 +840,6 @@ var W5AppClass=function(){
       if ("%DATAOBJ%"!=""){
          $("#dataobj" ).val("%DATAOBJ%");
       }
-      $("#TST").click(function(e){
-         var d="<table id=tabtab class='display compact' >";
-         d+="<thead>";
-         d+="<tr>";
-         d+="<th>D1</th>";
-         d+="<th>D2</th>";
-         d+="<th>D3</th>";
-         d+="</tr>";
-         d+="</thead>";
-         d+="<tbody>";
-         d+="<tr>";
-         d+="<td>1D1</td>";
-         d+="<td>1D2</td>";
-         d+="<td>1D3</td>";
-         d+="</tr>";
-         d+="<tr>";
-         d+="<td>2D1</td>";
-         d+="<td>2D2</td>";
-         d+="<td>2D3</td>";
-         d+="</tr>";
-         d+="<tr>";
-         d+="<td>4D1</td>";
-         d+="<td>4D2</td>";
-         d+="<td>4D3</td>";
-         d+="</tr>";
-         d+="<tr>";
-         d+="<td>6D1</td>";
-         d+="<td>6D2</td>";
-         d+="<td>6D3</td>";
-         d+="</tr>";
-         d+="<tr>";
-         d+="<td>1D1</td>";
-         d+="<td>1D2</td>";
-         d+="<td>1D3</td>";
-         d+="</tr>";
-         d+="<tr>";
-         d+="<td>2D1</td>";
-         d+="<td>2D2</td>";
-         d+="<td>2D3</td>";
-         d+="</tr>";
-         d+="<tr>";
-         d+="<td>4D1</td>";
-         d+="<td>4D2</td>";
-         d+="<td>4D3</td>";
-         d+="</tr>";
-         d+="<tr>";
-         d+="<td>6D1</td>";
-         d+="<td>6D2</td>";
-         d+="<td>6D3</td>";
-         d+="</tr>";
-         d+="</tbody>";
-         d+="</table>";
-         $('#tab').html(d);
-         $('#tabtab').DataTable({
-            lengthMenu: [[5], [5]]
-         });
-      });
       $("#dosearch").click(function(e){
          var dataobj=$('#dataobj').val();
          var searchname=$('#searchname').val();

@@ -112,6 +112,7 @@ sub getJSObjectClass
    DataObject[o].getPosibleExtractors=function(){
       return([{name:'dataobjid',label:'W5BaseID'},
               {name:'ipadr',label:'direct attached and active IP-Adresses'},
+              {name:'appl',label:'ApplicationNames'},
               {name:'dataobj'  ,label:'W5BaseObj'}
             //  {name:'sample'   ,label:'W5BaseObj', table:[
             //       {name:'s1',label:'Hansi'}, 
@@ -126,12 +127,13 @@ sub getJSObjectClass
    DataObject[o].Class.prototype.getPosibleActions=function(){
       var l=DataObjectBaseClass.prototype.getPosibleActions.call(this);
       var l=new Array();
-      l.push({name:'addApplications',label:'$addApps'});
+      l.push({name:'appl',label:'$addApps'});
+      l.push({name:'ipadr',label:'addIPAdresses'});
       return(l);
    };
 
    DataObject[o].Class.prototype.onAction=function(name,resultSet){
-      if (name=='addApplications'){
+      if (name=='appl'){
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
          w5obj.SetFilter({id:this.dataobjid});
@@ -140,11 +142,45 @@ sub getJSObjectClass
             console.log(data);
             if (data[0]){
                for(var c=0;c<data[0].applications.length;c++){
-                  var dkey=W5App.toObjKey('itil::appl',
-                                          data[0].applications[c].applid);
-                  W5App.addObject('itil::appl',
-                                  data[0].applications[c].applid);
-                  W5App.addConnectorKK(skey,dkey,0);
+                  var dkey=W5App.toObjKey(
+                     'itil::appl',
+                     data[0].applications[c].applid
+                  );
+                  resultSet.addObject({
+                     k:dkey,
+                     rec:{
+                        name:data[0].applications[c].appl,
+                        dataobj:'itil::appl',
+                        dataobjid:data[0].applications[c].applid
+                     }
+                  }); 
+                  resultSet.addConnector(skey,dkey,0);
+               }
+            }
+            W5App.setLoading(-1);
+         });
+         return(1);
+      }
+      if (name=='ipadr'){   // universal Action (Frontend Objects+Extractor)
+         var w5obj=getModuleObject(W5App.Config(),this.dataobj);
+         var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
+         w5obj.SetFilter({id:this.dataobjid});
+         W5App.setLoading(1,"extractip "+this.dataobj);
+         w5obj.findRecord("ipaddresses",function(data){
+            console.log(data);
+            if (data[0]){
+               for(var c=0;c<data[0].ipaddresses.length;c++){
+                  var dkey=W5App.toObjKey('itil::ipaddress',
+                                          data[0].ipaddresses[c].id);
+                  resultSet.addObject({
+                     k:dkey,
+                     rec:{
+                        name:data[0].ipaddresses[c].name,
+                        dataobj:'itil::ipaddress',
+                        dataobjid:data[0].ipaddresses[c].id
+                     }
+                  }); 
+                  resultSet.addConnector(skey,dkey,0);
                }
             }
             W5App.setLoading(-1);
