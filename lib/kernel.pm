@@ -81,7 +81,7 @@ use Unicode::String qw(utf8 latin1 utf16);
 @EXPORT = qw(&Query &LangTable &extractLanguageBlock 
              &globalContext &NowStamp &CalcDateDuration
              &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array
-             &hash2xml &xml2hash &effVal &effChanged 
+             &hash2xml &xml2hash &effVal &effChanged &effChangedVal
              &Debug &UTF8toLatin1 &Html2Latin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
@@ -692,9 +692,30 @@ sub effChanged
    my $oldrec=shift;
    my $newrec=shift;
    my $var=shift;
-   if (exists($newrec->{$var})){
-      if ($newrec->{$var} ne $oldrec->{$var}){
+   if (defined($newrec) && exists($newrec->{$var})){
+      if (defined($oldrec) && $newrec->{$var} ne $oldrec->{$var}){
          return(1);
+      }
+   }
+   return(undef);
+}
+
+#
+# detects the effective change of a given variable
+#
+sub effChangedVal
+{
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $var=shift;
+   if (defined($newrec) && exists($newrec->{$var})){
+      if (defined($oldrec)){
+         if ($newrec->{$var} ne $oldrec->{$var}){
+            return($newrec->{$var});
+         }
+      }
+      else{
+         return($newrec->{$var});
       }
    }
    return(undef);

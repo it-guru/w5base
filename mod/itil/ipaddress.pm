@@ -583,6 +583,27 @@ sub initSearchQuery
 }
 
 
+sub prepareToWasted
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   $newrec->{srcid}=undef;
+   $newrec->{srcload}=undef;
+
+   my $id=effVal($oldrec,$newrec,"id");
+
+   #my $o=getModuleObject($self->Config,"itil::system");
+   #if (defined($o)){
+   #   $o->BulkDeleteRecord({xxxxxxxx=>\$id});
+   #}
+
+   return(1);   # if undef, no wasted Transfer is allowed
+}
+
+
+
 
 
 sub Validate
@@ -590,6 +611,8 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   
+   return(1) if (effChangedVal($oldrec,$newrec,"cistatusid")==7);
 
    my $cistatusid=trim(effVal($oldrec,$newrec,"cistatusid"));
    if (!defined($cistatusid) || $cistatusid==0){
@@ -833,6 +856,19 @@ sub isParentOPvalid
    return(1);
 }
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+
+   }
+   return($self->SetFilter(@flt));
+}
+
 
 sub isViewValid
 {
@@ -840,6 +876,7 @@ sub isViewValid
    my $rec=shift;
    my @def=("header","default");
    return(@def) if (!defined($rec));
+   return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    push(@def,"source");
    if ($self->IsMemberOf("admin") ||
        $self->IsMemberOf("w5base.itil.ipaddress.read") ||

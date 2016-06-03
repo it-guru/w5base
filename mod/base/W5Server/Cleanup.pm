@@ -137,27 +137,39 @@ sub CleanupWasted
    my $CleanupWasted=$self->getParent->Config->Param("CleanupWasted");
    $CleanupWasted="<now-5Y" if ($CleanupWasted eq "");
 
-   my @objlist=qw(base::user base::grp);
-
+   my @objlist=$self->getParent->globalObjectList();
    foreach my $obj (@objlist){
       my $o=getModuleObject($self->getParent->Config,$obj);
-      my $idobj=$o->IdField();
-      if (defined($idobj)){
-         my $idname=$idobj->Name();
-         $o->SetFilter({cistatusid=>\'6',mdate=>$CleanupWasted});
-         $o->SetCurrentView(qw(ALL));
-         $o->SetCurrentOrder(qw(NONE));
-         $o->Limit(10);
-         my ($rec,$msg)=$o->getFirst(unbuffered=>1);
-         if (defined($rec)){
-            my $op=$o->Clone();
-            do{
-               if ($rec->{$idname} ne ""){
-                  $op->ValidatedUpdateRecord($rec,{cistatusid=>7},
-                                             {$idname=>\$rec->{$idname}});
-               }
-               ($rec,$msg)=$o->getNext();
-            } until(!defined($rec));
+      msg(DEBUG,"check for CleanupWasted $obj");
+      if ($o->can("prepareToWasted")){
+         my $idobj=$o->IdField();
+         my $mdatefld=$o->getField("mdate");
+         my $cistatusfld=$o->getField("cistatusid");
+         if (defined($idobj) && defined($mdatefld) && defined($cistatusfld) &&
+             $o->SelfAsParentObject() eq $obj){
+            msg(DEBUG,"start CleanupWasted on $obj");
+            my $idname=$idobj->Name();
+            $o->SetFilter({cistatusid=>\'6',mdate=>$CleanupWasted});
+            $o->SetCurrentView(qw(ALL));
+            $o->SetCurrentOrder(qw(NONE));
+            $o->Limit(100);
+            my ($rec,$msg)=$o->getFirst(unbuffered=>1);
+            if (defined($rec)){
+               my $op=$o->Clone();
+               do{
+                  if ($rec->{$idname} ne ""){
+                     my $newrec={cistatusid=>7};
+                     if ($op->prepareToWasted($rec,$newrec)){
+                        $op->ValidatedUpdateRecord($rec,$newrec,{
+                           $idname=>\$rec->{$idname}
+                        });
+                     }
+                  }
+                  ($rec,$msg)=$o->getNext();
+               } until(!defined($rec));
+            }
+            $o->ResetFilter();
+            $o->SetFilter({cistatusid=>\'7',mdate=>"<now-1Y"});
          }
       }
    }

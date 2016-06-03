@@ -396,6 +396,20 @@ sub SecureValidate
 }
 
 
+sub prepareToWasted
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   $newrec->{srcsys}=undef;
+   $newrec->{srcid}=undef;
+   $newrec->{srcload}=undef;
+
+   return(1);   # if undef, no wasted Transfer is allowed
+}
+
+
 sub Validate
 {
    my $self=shift;
@@ -403,11 +417,9 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   return(1) if (effChangedVal($oldrec,$newrec,"cistatusid")==7);
+
    my $cistatus=effVal($oldrec,$newrec,"cistatusid");
-   if (defined($newrec) && exists($newrec->{cistatusid}) &&
-       $newrec->{cistatusid}==7){
-      return(1);
-   }
    if (defined($newrec->{name}) || !defined($oldrec)){
       trim(\$newrec->{name});
       $newrec->{name}=~s/[\.\s\*]/_/g;

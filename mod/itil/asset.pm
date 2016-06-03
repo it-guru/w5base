@@ -958,6 +958,11 @@ sub SecureSetFilter
       }
       push(@flt,\@addflt);
    }
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+
+   }
    return($self->SetFilter(@flt));
 }
 
@@ -977,6 +982,7 @@ sub getSqlFrom
    return($from);
 }
 
+
 sub ValidateDelete
 {
    my $self=shift;
@@ -992,6 +998,28 @@ sub ValidateDelete
 }
 
 
+sub prepareToWasted
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   $newrec->{srcsys}=undef;
+   $newrec->{srcid}=undef;
+   $newrec->{srcload}=undef;
+   my $id=effVal($oldrec,$newrec,"id");
+
+   #my $o=getModuleObject($self->Config,"itil::lnkapplappl");
+   #if (defined($o)){
+   #   $o->BulkDeleteRecord({toapplid=>\$id});
+   #   $o->BulkDeleteRecord({fromapplid=>\$id});
+   #}
+
+   return(1);   # if undef, no wasted Transfer is allowed
+}
+
+
+
 
 sub Validate
 {
@@ -999,6 +1027,10 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+
+   if (effChangedVal($oldrec,$newrec,"cistatusid")==7){
+      return(1);
+   }
    if ((!defined($oldrec) || defined($newrec->{name})) &&
        (($newrec->{name}=~m/^\s*$/) || length($newrec->{name})<3 ||
          haveSpecialChar($newrec->{name}))){
@@ -1104,6 +1136,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
+   return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
 
    my @all=qw(default guardian physasset contacts control location 
               systems source qc applications

@@ -1217,6 +1217,22 @@ sub postQualityCheckRecord
 }
 
 
+sub prepareToWasted
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   $newrec->{posix}=undef;
+   $newrec->{dsid}=undef;
+   $newrec->{srcsys}=undef;
+   $newrec->{srcid}=undef;
+   $newrec->{srcload}=undef;
+
+   return(1);   # if undef, no wasted Transfer is allowed
+}
+
+
 sub Validate
 {
    my $self=shift;
@@ -1228,11 +1244,11 @@ sub Validate
    if (!defined($cistatusid) && !defined($oldrec)){
       $newrec->{cistatusid}=1;
    } 
-   if (defined($newrec) && exists($newrec->{cistatusid}) && 
-       $newrec->{cistatusid}==7){
+   if (effChangedVal($oldrec,$newrec,"cistatusid")==7){
       $newrec->{email}=undef;
       return(1);
    }
+
    if (!defined($oldrec)){
       $newrec->{secstate}=$self->Config->Param("DefaultUserSecState");
    }

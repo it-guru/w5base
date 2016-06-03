@@ -159,7 +159,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if (exists($newrec->{systemid})){
+   if (exists($newrec->{systemid}) && $newrec->{systemid} ne ""){
       $newrec->{systemid}=uc($newrec->{systemid}); # T-Systems Standard laut AM
    }
    return($self->SUPER::Validate($oldrec,$newrec));

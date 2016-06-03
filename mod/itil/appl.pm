@@ -2022,12 +2022,42 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 #}
 
 
+sub prepareToWasted
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   $newrec->{applid}=undef;
+   $newrec->{srcsys}=undef;
+   $newrec->{srcid}=undef;
+   $newrec->{srcload}=undef;
+   my $id=effVal($oldrec,$newrec,"id");
+
+   my $o=getModuleObject($self->Config,"itil::lnkapplappl");
+   if (defined($o)){
+      $o->BulkDeleteRecord({toapplid=>\$id});
+      $o->BulkDeleteRecord({fromapplid=>\$id});
+   }
+   my $o=getModuleObject($self->Config,"itil::lnkapplsystem");
+   if (defined($o)){
+      $o->BulkDeleteRecord({applid=>\$id});
+   }
+
+   return(1);   # if undef, no wasted Transfer is allowed
+}
+
+
+
 sub Validate
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (effChangedVal($oldrec,$newrec,"cistatusid")==7){
+      return(1);
+   }
    my $name=trim(effVal($oldrec,$newrec,"name"));
    
    if (length($name)<3 || haveSpecialChar($name) ||
@@ -2135,6 +2165,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
+   return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control custcontracts customer delmgmt
               finance interfaces licenses monisla sodrgroup qc external itsem

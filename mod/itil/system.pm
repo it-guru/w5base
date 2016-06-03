@@ -1390,12 +1390,40 @@ sub SecureSetFilter
       }
       push(@flt,\@addflt);
    }
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+   }
    return($self->SetFilter(@flt));
 }
 
 
+sub prepareToWasted
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
 
+   $newrec->{srcsys}=undef;
+   $newrec->{srcid}=undef;
+   $newrec->{srcload}=undef;
+   my $id=effVal($oldrec,$newrec,"id");
 
+   my $o=getModuleObject($self->Config,"itil::lnkapplsystem");
+   if (defined($o)){
+      $o->BulkDeleteRecord({systemid=>\$id});
+   }
+   my $o=getModuleObject($self->Config,"itil::lnksoftwaresystem");
+   if (defined($o)){
+      $o->BulkDeleteRecord({systemid=>\$id});
+   }
+   my $o=getModuleObject($self->Config,"itil::ipaddress");
+   if (defined($o)){
+      $o->BulkDeleteRecord({systemid=>\$id});
+   }
+
+   return(1);   # if undef, no wasted Transfer is allowed
+}
 
 
 
@@ -1404,6 +1432,12 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
+   if (effChangedVal($oldrec,$newrec,"cistatusid")==7){
+      $newrec->{systemid}=undef;
+      return(1);
+   }
+
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
    if (length($name)<3 || haveSpecialChar($name) ||
@@ -1563,6 +1597,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
+   return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(header default swinstances 
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses phonenumbers sec applications

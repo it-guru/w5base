@@ -108,6 +108,27 @@ sub ModuleObject
    return($o);
 }
 
+#
+# Collect all current valid object names for "getModuleObject" (with
+# no submodules or workflow objects)
+#
+sub globalObjectList
+{
+   my $self=shift;
+   my $instdir=$self->Config->Param("INSTDIR");
+   my $pat="$instdir/mod/*/*.pm";
+   my @objlist=map({
+      my $qi=quotemeta($instdir);
+      $_=~s/^$instdir//;
+      $_=~s/\/mod\///; $_=~s/\.pm$//;
+      $_=~s/\//::/g;
+      $_;
+   } grep({
+     -s $_;
+   } glob($pat)));
+   return(@objlist);
+}
+
 
 sub W5ServerCall
 {

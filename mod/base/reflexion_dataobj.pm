@@ -133,16 +133,7 @@ sub getData
    my $self=shift;
    my $c=$self->Context;
    if (!defined($c->{data})){
-      my $instdir=$self->Config->Param("INSTDIR");
-      msg(INFO,"recreate data on dir '%s'",$instdir);
-      my $pat="$instdir/mod/*/*.pm";
-      my @sublist=glob($pat);
-      @sublist=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$instdir//;
-                    $_=~s/\/mod\///; $_=~s/\.pm$//;
-                    $_=~s/\//::/g;
-                    $_;
-                   } @sublist);
+      my @sublist=$self->globalObjectList();
       my @data=();
       foreach my $modname (@sublist){
          my $o=getModuleObject($self->Config,$modname);
