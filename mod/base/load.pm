@@ -45,6 +45,9 @@ sub Run
          $ENV{HTTP_ACCEPT_LANGUAGE}=Query->Param("HTTP_ACCEPT_LANGUAGE");
       }
    }
+   if (defined(Query->Param("HTTP_FORCE_LANGUAGE"))){
+      $ENV{HTTP_FORCE_LANGUAGE}=Query->Param("HTTP_FORCE_LANGUAGE");
+   }
    #printf STDERR ("fifi load file: $func\n");
 
    if ($func=~m/^tmpl\//){

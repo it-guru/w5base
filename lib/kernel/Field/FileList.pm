@@ -116,9 +116,9 @@ sub ListFiles
    }
    $d="";
    if ($#filelist!=-1){
-
+      my $lang=$self->getParent->Lang();
       my %p=('tree'     =>\@filelist,
-             'rootimg'  =>'minifileroot.gif',
+             'rootimg'  =>"minifileroot.gif?HTTP_FORCE_LANGUAGE=$lang",
              'rootpath' =>'./',
              'hrefclass'=>'filelink',
              'showcomm' =>$self->{'showcomm'});

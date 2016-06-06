@@ -3976,7 +3976,8 @@ sub LoadSpec
    sub processSpecfile
    {
       my $filename=shift;
-      my $spec=shift;
+      my $specrec=shift;
+      my $lang=shift;
 
       my $speccode="";
       if (open(F,"<$filename")){
@@ -3992,8 +3993,8 @@ sub LoadSpec
       }
       else{
          foreach my $k (keys(%$s)){
-            if (defined($s->{$k}->{$lang})){
-               $spec->{$k}=$s->{$k}->{$lang};
+            if (defined($s->{$k}->{$lang}) && trim($s->{$k}->{$lang}) ne ""){
+               $specrec->{$k}=$s->{$k}->{$lang};
             }
          }
       }
@@ -4002,14 +4003,14 @@ sub LoadSpec
    foreach my $lib (reverse(@libs)){ # use the local spec as last (highest prio)
       my $filename=$self->getSkinFile($lib,addskin=>'default');
       if ($filename ne "" && !$filedone{$filename}){
-         processSpecfile($filename,\%spec);
+         processSpecfile($filename,\%spec,$lang);
          $filedone{$filename}++;
       }
    }
    foreach my $lib (reverse(@libs)){ # use the local spec as last (highest prio)
       my $filename=$self->getSkinFile($lib);
       if ($filename ne "" && !$filedone{$filename}){
-         processSpecfile($filename,\%spec);
+         processSpecfile($filename,\%spec,$lang);
          $filedone{$filename}++;
       }
    }
