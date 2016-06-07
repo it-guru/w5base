@@ -225,7 +225,8 @@ sub qcheckRecord
             }
             else{
                my $m=getModuleObject($dataobj->Config,"base::mandator");
-               $m->SetFilter({groupname=>\"DTAG.TSI.TI",cistatusid=>\'4'});
+               $m->SetFilter({groupname=>\"DTAG.GHQ.VTS.TSI.TI",
+                              cistatusid=>\'4'});
                my ($mrec)=$m->getOnlyFirst(qw(name grpid));
                if (defined($mrec)){
                   if ($mrec->{name} ne $rec->{mandator}){
@@ -266,7 +267,8 @@ sub qcheckRecord
             }
             else{
                my $m=getModuleObject($dataobj->Config,"base::mandator");
-               $m->SetFilter({groupname=>\"DTAG.TSI.TI",cistatusid=>\'4'});
+               $m->SetFilter({groupname=>\"DTAG.GHQ.VTS.TSI.TI",
+                              cistatusid=>\'4'});
                my ($mrec)=$m->getOnlyFirst(qw(name grpid));
                if (defined($mrec)){
                   if ($mrec->{name} ne $rec->{mandator}){
