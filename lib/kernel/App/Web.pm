@@ -1681,13 +1681,14 @@ sub findtemplvar
 
    sub AddButton
    {
+      my $s=shift;
       my $d=shift;
       my $href=shift;
       my $text=shift;
       my $class=shift;
        
       $class="button" if (!defined($class));
-      $$d.="<input class=$class type=button value=\"".$self->T($text)."\"".
+      $$d.="<input class=$class type=button value=\"".$s->T($text)."\"".
            "onclick=\"$href;\">";
    }
    if ($var eq "LASTMSG"){
@@ -1789,71 +1790,71 @@ sub findtemplvar
          my $id=Query->Param("CurrentIdToEdit");
          if ($id eq ""){
             if (grep(/^subadd$/,@param)){
-               AddButton(\$d,"DoSubListEditAdd()","Add");
+               AddButton($self,\$d,"DoSubListEditAdd()","Add");
             }
          }
          else{
             if (grep(/^subsave$/,@param)){
-               AddButton(\$d,"DoSubListEditSave()","Save");
+               AddButton($self,\$d,"DoSubListEditSave()","Save");
             }
             if (grep(/^subdelete$/,@param)){
-               AddButton(\$d,"DoSubListEditDelete()","Delete");
+               AddButton($self,\$d,"DoSubListEditDelete()","Delete");
             }
             if (grep(/^subcancel$/,@param)){
-               AddButton(\$d,"DoSubListEditCancel()","Cancel");
+               AddButton($self,\$d,"DoSubListEditCancel()","Cancel");
             }
          }
       }
       if (grep(/^search$/,@param)){
-         AddButton(\$d,"DoSearch()","Search");
+         AddButton($self,\$d,"DoSearch()","Search");
       }
       if (grep(/^analytic$/,@param)){
          if ($self->can("getAnalytics")){
             my @l=$self->getAnalytics();
             while(my $f=shift(@l)){
                my $n=shift(@l);
-               AddButton(\$d,"DoAnalytic('$f')",$n);
+               AddButton($self,\$d,"DoAnalytic('$f')",$n);
             }
          }
       }
       if (grep(/^save$/,@param)){
-         AddButton(\$d,"DoSave()","Save");
+         AddButton($self,\$d,"DoSave()","Save");
       }
       if (grep(/^preview$/,@param)){
-         AddButton(\$d,"DoPreview()","Preview");
+         AddButton($self,\$d,"DoPreview()","Preview");
       }
       if (grep(/^delete$/,@param)){
-         AddButton(\$d,"DoDelete()","Delete");
+         AddButton($self,\$d,"DoDelete()","Delete");
       }
       if (grep(/^extended$/,@param)){
-         AddButton(\$d,"SwitchExt()","Extended");
+         AddButton($self,\$d,"SwitchExt()","Extended");
       }
       if (grep(/^bookmark$/,@param)){
          if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
-            AddButton(\$d,"DoBookmark()","Bookmark");
+            AddButton($self,\$d,"DoBookmark()","Bookmark");
          }
       }
       if (grep(/^print$/,@param)){
-         AddButton(\$d,"DoPrint()","Print");
+         AddButton($self,\$d,"DoPrint()","Print");
       }
       if (grep(/^reset$/,@param)){
          my $msg=$self->T("This operation clears all fields in the ".
                           "searchmask.\\n Click cancel, if you don't ".
                           "want to do this.");
          $msg=~s/'/\\'/g;
-         AddButton(\$d,"DoResetMask('$msg')","Reset Search");
+         AddButton($self,\$d,"DoResetMask('$msg')","Reset Search");
       }
       if (grep(/^upload$/,@param)){
          if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
             if ($self->can("isUploadValid") && $self->isUploadValid()){
                if ($self->IsMemberOf(["admin","uploader"])){
-                  AddButton(\$d,"DoUpload()","Upload");
+                  AddButton($self,\$d,"DoUpload()","Upload");
                }
             }
          }
       }
       if (grep(/^new$/,@param)){
-         AddButton(\$d,"DoNewWin()","New");
+         AddButton($self,\$d,"DoNewWin()","New");
       }
       if (in_array(\@param,[qw(deputycontrol personalview 
                                teamviewcontrol exviewcontrol)])){

@@ -16,6 +16,13 @@ package tshpsa::event::RefreshHPSA;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+
+## Der Code sollte entsorgt werden, wenn die Schulte-Bunnert HPSA
+## Lösung beendet wird.
+
+
+
+
 use strict;
 use vars qw(@ISA);
 use kernel;

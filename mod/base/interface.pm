@@ -141,20 +141,20 @@ sub io
             }
          }
          my $oldumask=umask(0007);
-         if (open(F,">$requestdebugfile")){
-            binmode(F);
-            if (open(FI,"<$filename")){
-               binmode(FI);
+         if (open(my $F,">$requestdebugfile")){
+            binmode($F);
+            if (open(my $FI,"<$filename")){
+               binmode($FI);
                my $bsize=1024;
                my $data;
                while(1){
-                 my $nread = read(FI, $data, $bsize);
+                 my $nread = read($FI, $data, $bsize);
                  last if (!$nread);
-                 syswrite(F,$data,$nread);
+                 syswrite($F,$data,$nread);
                }
-               close(FI);
+               close($FI);
             }
-            close(F);
+            close($F);
          }
          umask($oldumask);
          ####################################################################

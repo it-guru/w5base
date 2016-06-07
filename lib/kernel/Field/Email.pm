@@ -60,7 +60,7 @@ sub Validate
          if (!($m=~m/^".*" <.*>$/)){
             $m=~s/[^a-z0-9_\.\@-]//gi;
          }
-         $_=$m;
+         $m;
       } @{$newvallist})];
    if (ref($newvalreq) eq "ARRAY"){
       return({$self->Name()=>$newvallist});

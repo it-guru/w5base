@@ -335,12 +335,14 @@ sub Validate
 
          if (defined($oldrec) &&
              $oldrec->{state} ne ""){  # Datensatz wurde schonmal behandelt
-            printf STDERR ("AutoDiscRec - oldrec state=$oldrec->{state}!\n");
-            printf STDERR ("AutoDiscRec - newrec state=$newrec->{state}!\n");
+            printf STDERR ("INFO: Status change on autodiscrec($oldrec->{id})".
+                           "\n      from state='$oldrec->{state}' to ".
+                           "state='$newrec->{state}'.\n");
             if ($oldrec->{state} eq "20" &&
                 effVal($oldrec,$newrec,"state") eq "20"){
                printf STDERR ("AutoDiscRec - do automatic Update!\n");
-               my ($exitcode,$exitmsg)=$self->doTakeAutoDiscData($oldrec,$newrec);
+               my ($exitcode,$exitmsg)=$self->doTakeAutoDiscData($oldrec,
+                                                                 $newrec);
                if ($exitcode){
                   return(0);
                }

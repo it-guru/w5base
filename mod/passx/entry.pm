@@ -299,6 +299,31 @@ sub mkConnectorURL
    return($ho);
 }
 
+#######################################################################
+# locale Funktion für generateMenuTree
+   sub sortTree
+   {
+      my $mlist=shift;
+      $mlist=[sort({ my $s1=$a->{label};
+                     my $s2=$b->{label};
+                     if (exists($a->{account})){
+                        $s1=$a->{name}.'@'.$a->{account};
+                     }
+                     if (exists($b->{account})){
+                        $s2=$b->{name}.'@'.$b->{account};
+                     }
+                     lc($s1) cmp lc($s2);
+                   } @$mlist)];
+      foreach my $mrec (@$mlist){
+         if (ref($mrec->{tree}) eq "ARRAY" && $#{$mrec->{tree}}!=-1){
+            $mrec->{tree}=sortTree($mrec->{tree});
+         }
+      }
+      return($mlist);
+   }
+#######################################################################
+
+
 sub generateMenuTree
 {
    my $self=shift;
@@ -541,26 +566,6 @@ sub generateMenuTree
         ($rec,$msg)=$self->getNext();
       } until(!defined($rec));
       $simplem.="</table>";
-   }
-   sub sortTree
-   {
-      my $mlist=shift;
-      $mlist=[sort({ my $s1=$a->{label};
-                     my $s2=$b->{label};
-                     if (exists($a->{account})){
-                        $s1=$a->{name}.'@'.$a->{account};
-                     }
-                     if (exists($b->{account})){
-                        $s2=$b->{name}.'@'.$b->{account};
-                     }
-                     lc($s1) cmp lc($s2);
-                   } @$mlist)];
-      foreach my $mrec (@$mlist){
-         if (ref($mrec->{tree}) eq "ARRAY" && $#{$mrec->{tree}}!=-1){
-            $mrec->{tree}=sortTree($mrec->{tree});
-         }
-      }
-      return($mlist);
    }
    @ml=@{sortTree(\@ml)};
    if ($#ml!=-1){

@@ -183,17 +183,29 @@ sub initSqlWhere
    return("");
 }
 
-sub getFinalLdapFilter
-{
-   my $self=shift;
-   my @filter=@_;
-#   my $where=$self->initSqlWhere();
-   my $where="";
+
+# local functions for getFinalLdapFilter
 
    sub dbQuote
    {
       return("NULL") if (!defined($_[0]));
       return("'".$_[0]."'");
+   }
+
+   sub MakeLikeList
+   {
+      my $sqlfield=shift;
+      my $fo=shift;
+      my @sub=();
+      foreach my $subval (@_){
+         my @vallist=$fo->prepareToSearch($subval);
+         foreach my $val (@vallist){
+            push(@sub,"($sqlfield=$val)");
+         }
+      }
+      my $sub=join("",@sub);
+      $sub="(|".$sub.")" if ($#sub>0);
+      return($sub);
    }
 
    sub AddOrList
@@ -204,21 +216,6 @@ sub getFinalLdapFilter
       my $param=shift;
       my @list=@_;
 
-      sub MakeLikeList
-      {
-         my $sqlfield=shift;
-         my $fo=shift;
-         my @sub=();
-         foreach my $subval (@_){
-            my @vallist=$fo->prepareToSearch($subval);
-            foreach my $val (@vallist){
-               push(@sub,"($sqlfield=$val)");
-            }
-         }
-         my $sub=join("",@sub);
-         $sub="(|".$sub.")" if ($#sub>0);
-         return($sub);
-      }
       if ($#list==-1){
          $$where="($$where) and " if ($$where ne "");
          $$where.="(1=0)";
@@ -281,6 +278,15 @@ sub getFinalLdapFilter
       }
       #msg(INFO,"AddOrList=$$where");
    }
+
+
+sub getFinalLdapFilter
+{
+   my $self=shift;
+   my @filter=@_;
+#   my $where=$self->initSqlWhere();
+   my $where="";
+
 
    my @l1where=();
    foreach my $filter (@filter){
