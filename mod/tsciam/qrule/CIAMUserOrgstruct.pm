@@ -152,7 +152,7 @@ sub qcheckRecord
          my $toucid=$ciamrec->{toucid};
          my $surname=$ciamrec->{surname};
          my $givenname=$ciamrec->{givenname};
-         my $uidlist=$ciamrec->{uid};
+         my $uidlist=$ciamrec->{wiwid};
          $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
          my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
          my $posix=$posix[0];
@@ -262,7 +262,8 @@ sub qcheckRecord
          $ciamusr->SetFilter(
             {tcid=>\$ciamrec->{tcid},active=>\'true',primary=>\'false'},
          );
-         my @wrlist=$ciamusr->getHashList(qw(tcid twrid toucid office_state));
+         my @wrlist=$ciamusr->getHashList(qw(tcid twrid wiwid
+                                             toucid office_state));
          my %grps;
          if ($#wrlist!=-1){
             %grps=$grp->getGroupsOf($urec->{userid},[qw(REmployee)],'up');
