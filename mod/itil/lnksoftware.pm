@@ -442,6 +442,7 @@ sub new
                 group         =>'options',
                 htmldetail    =>0,
                 searchable    =>0,
+                readonly      =>1,
                 vjointo       =>'itil::lnksoftwareoption',
                 vjoinon       =>['id'=>'parentid'],
                 vjoindisp     =>['software']),
