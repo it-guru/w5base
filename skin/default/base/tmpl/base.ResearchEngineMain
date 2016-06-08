@@ -44,6 +44,8 @@ body{
 <link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css"></link>
 <link rel="stylesheet" href="../../../public/base/load/jquery.dataTables.css"></link>
 <xscript src="excanvas.js"></xscript>
+<xscript data-main="scripts/main"  src="../../../public/base/load/require.js">
+</xscript>
 
 
 <script language="JavaScript" src="../../../auth/base/load/J5Base.js">
@@ -70,7 +72,10 @@ body{
 <script language="JavaScript" src="../../../auth/base/ResearchEngine/ClassLib">
 </script>
 
-<script src="../../../public/base/load/springy.js"></script>
+<script src="../../../public/base/load/reseach_graph.js"></script>
+<script src="../../../public/base/load/layout_springy.js"></script>
+<script src="../../../public/base/load/layout_dagre.js"></script>
+<script src="../../../public/base/load/reseach_renderer.js"></script>
 <script language="JavaScript" >
 var opts = {
   lines: 13 // The number of lines to draw
