@@ -109,7 +109,9 @@ sub help
         --tasks         number of tasks are be able running 
                         simultaneous [default:4]
 
-        --exclude       tables excluded for dump (seperat tables by comma)
+        --exclude       tables excluded for dump (seperat tables by comma).
+                        If you want to exclude stored procedures, you have
+                        to specify these information block as \@\@\@prod\@\@\@ .
 
         --convert       save dump in spezial database format (InnoDB|MyISAM)
 
@@ -203,8 +205,7 @@ sub check_db
       close(R);
     
       # clear mysql cache
-      system("$prog->{mysql} -e 'flush logs' $db") == 0 
-              or die("system command -mysql flush logs- failed:$?");
+      system("$prog->{mysql} -e 'flush logs' $db 2>/dev/null");
       system("$prog->{mysql} -e 'flush tables' $db") == 0 
               or die("system command -mysql flush tables- failed:$?");
    }
@@ -321,6 +322,7 @@ sub create_array_to_dump
    my @tabl=load_tables();
    my $found;
    my @tables;
+   push(@tabl,'@@@proc@@@');
    foreach my $tab (@tabl){
       if (%inputinclude){
          foreach my $data (keys(%inputinclude)){
@@ -419,8 +421,10 @@ sub process_engine
    my $tables=shift;
    my $dir=shift;
    my %processes;
-   do 
-   {
+
+
+
+   do {
       foreach my $k (keys(%processes)){
          delete($processes{$k})  if (!kill(0,$k));
       }
@@ -439,9 +443,16 @@ sub process_engine
               my $myderr=new IO::Handle();
               my $convert_flag=0;
               my (@gz,@ready,@myderr,$wp,$save);
-              my $mysqldump_pid=open3(undef,$mydrdr,$myderr,
-                 "$prog->{mysqldump} ".
-                 "-c --triggers --routines --skip-extended-insert $db $first");
+              my $cmd="$prog->{mysqldump} ".
+                      "-c --triggers --routines --skip-extended-insert ".
+                      "$db $first";
+              if ($first eq '@@@proc@@@'){
+                 $cmd="$prog->{mysqldump} ".
+                      "--routines --triggers --no-create-info --no-data ".
+                      "--no-create-db --skip-opt  ".
+                      "$db";
+              }
+              my $mysqldump_pid=open3(undef,$mydrdr,$myderr,$cmd);
               $mydsel->add($myderr);
 
               # check for mysqldump errors
