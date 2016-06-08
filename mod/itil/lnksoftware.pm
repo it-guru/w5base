@@ -1012,7 +1012,9 @@ sub isLicManager
    my $mandatorid=shift;
 
    if ($mandatorid ne ""){
-      my @lim=$self->getMembersOf($mandatorid, [qw(RLIOperator)],'up');
+      my @lim=$self->getMembersOf($mandatorid,
+                                  [qw(RLIManager RLIManager2 RLIOperator)],
+                                  'up');
       if ($#lim!=-1){
          return(1);
       }

@@ -25,6 +25,8 @@
 'RCAManager2'=>{ de=>'Kapazitätsmgmt.-Prozessmanager Vertreter', en=>'Capacitymgmt.-Manager deputy'},
 'RODManager'=>{ de=>'Orderprozessmanager', en=>'Order-Manager'},
 'RODManager2'=>{ de=>'Orderprozessmanager Vertreter', en=>'Order-Manager deputy'},
+'RLIManager'=>{ de=>'Lizenzprozessmanager', en=>'License-Manager'},
+'RLIManager2'=>{ de=>'Lizenzprozessmanager Vertreter', en=>'License-Manager deputy'},
 'RINOperator'=>{ de=>'Incident-Operator', en=>'Incident-Operator'},
 'RCAOperator'=>{ de=>'Kapazitätsmgmt.-Operator', en=>'Capacitymgmt.-Operator'},
 'RCHOperator'=>{ de=>'Change-Operator', en=>'Change-Operator'},

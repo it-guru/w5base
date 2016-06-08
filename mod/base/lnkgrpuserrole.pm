@@ -102,21 +102,23 @@ sub new
                                  'RINOperator',                # ITIL role
                                  'RCHManager',                 # ITIL role
                                  'RCHManager2',                # ITIL role
+                                 'RCHOperator',                # ITIL role
                                  'RCFManager',                 # ITIL role
                                  'RCFManager2',                # ITIL role
+                                 'RCFOperator',                # ITIL role
                                  'RPRManager',                 # ITIL role
                                  'RPRManager2',                # ITIL role
+                                 'RPROperator',                # ITIL role
                                  'RODManager',                 # ITIL role
                                  'RODManager2',                # ITIL role
+                                 'RODOperator',                # ITIL role
                                  'RCAManager',                 # ITIL role
                                  'RCAManager2',                # ITIL role
-                                 'RITDemandMgr',               # IT role
-                                 'RINOperator',                # ITIL role
-                                 'RCHOperator',                # ITIL role
-                                 'RCFOperator',                # ITIL role
-                                 'RPROperator',                # ITIL role
-                                 'RLIOperator',                # ITIL role
                                  'RCAOperator',                # ITIL role
+                                 'RLIManager',                 # ITIL role
+                                 'RLIManager2',                # ITIL role
+                                 'RLIOperator',                # ITIL role
+                                 'RITDemandMgr',               # IT role
                                  'RAdmin',                     # W5Base role
                                  'RDataAdmin',                 # W5Base role
                                  'RContactAdmin',              # W5Base role
