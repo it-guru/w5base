@@ -84,6 +84,7 @@ sub new
                 searchable    =>0,
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
+                vjoineditbase =>{cistatusid=>"<6",isembedded=>\'0'},
                 htmldetail    =>sub{
                    my $self=shift;
                    my $mode=shift;

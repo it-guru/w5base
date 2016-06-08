@@ -235,7 +235,7 @@ sub new
                 label         =>'System',
                 group         =>'systems',
                 vjointo       =>'itil::system',
-                vjoineditbase =>{'cistatusid'=>[2,3,4]},
+                vjoineditbase =>{'cistatusid'=>[2,3,4],isembedded=>\'0'},
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 

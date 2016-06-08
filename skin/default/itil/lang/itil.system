@@ -96,6 +96,8 @@
 'validate against Software Set'=>{de=>'Prüfung gegen SoftwareSet'},
 'System OS analysed state'=>{de=>'Betriebssystemversions-Analysestatus'},
 'System OS analysed todo'=>{de=>'Betriebssystemversions-Analyse ToDo'},
-
+'a clusternode can not be an embedded system'=>{de=>'Eine Clusternode kann kein Embedded System sein'},
+'an embedded systems can not have software installations'=>{de=>'Ein Embedded System darf keine Software-Installation aufweisen'},
+'an embedded systems can not have software instances'=>{de=>'Ein Embedded System darf keine Software-Instanzen aufweisen'},
 
 

@@ -57,4 +57,19 @@ server systems like VIOs, control stations
 or hardware monitoring servers are need
 to be marked als infrastructur systems.
 '},
+'isembedded'=>{de=>'
+Embedded Systeme sind "geschlossene" Systeme die für bestimmte, sehr
+genau definierte Aufgaben verwendet werden. Ein Eingriff auf die
+darauf laufende Software ist i.d.R. nicht möglich, da die Firmware auf
+Flash-Speichern als Image installiert ist. Auch ist meist die genaue 
+Hardwarestruktur nicht ermittelbar. Embeeded Systeme können
+z.B. Cryptoboxen, SetTop-Boxen, Steuersysteme o.ä. sein.
+',en=>'
+Embedded systems, also called "closed" systems, are used for specific 
+very precisely defined tasks. Access to the software running on these 
+systems is usually not possible due to the fact that the firmware 
+is installed as an image on an Flashmemory. Usually the hardware structure 
+cannot be determined. Examples for embedded systems are: 
+Cryptoboxes, SetTop-Boxes, control systems etc.
+'},
 

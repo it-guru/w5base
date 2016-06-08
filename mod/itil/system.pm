@@ -969,6 +969,13 @@ sub new
                 label         =>'ClusterNode',
                 dataobjattr   =>'system.is_clusternode'),
 
+      new kernel::Field::Boolean(
+                name          =>'isembedded',
+                selectfix     =>1,
+                group         =>'systemclass',
+                label         =>'Embedded System',
+                dataobjattr   =>'system.is_embedded'),
+
       new kernel::Field::TextDrop(
                 name          =>'itclust',
                 group         =>'cluster',
@@ -1461,6 +1468,35 @@ sub Validate
       }
    }
 
+   my $clusemberror=0;
+   if (effChangedVal($oldrec,$newrec,"isembedded")){
+      if (effVal($oldrec,$newrec,"isclusternode")){
+         $clusemberror=1;
+      }
+      if (ref($oldrec->{swinstances}) eq "ARRAY" &&
+          $#{$oldrec->{swinstances}}!=-1){
+         $self->LastMsg(ERROR,
+                    "an embedded systems can not have software instances");
+         return(0);
+      }
+      if (ref($oldrec->{software}) eq "ARRAY" &&
+          $#{$oldrec->{software}}!=-1){
+         $self->LastMsg(ERROR,
+                    "an embedded systems can not have software installations");
+         return(0);
+      }
+      print STDERR Dumper($oldrec->{software});
+   }
+   if (effChangedVal($oldrec,$newrec,"isclusternode")){
+      if (effVal($oldrec,$newrec,"isembedded")){
+         $clusemberror=1;
+      }
+   }
+   if ($clusemberror){
+      $self->LastMsg(ERROR,"a clusternode can not be an embedded system");
+      return(0);
+   }
+
 
    if (defined($newrec->{asset}) && $newrec->{asset} eq ""){
       $newrec->{asset}=undef;
@@ -1587,11 +1623,6 @@ sub needVMHost
 
 
 
-
-
-
-
-
 sub isViewValid
 {
    my $self=shift;
@@ -1608,6 +1639,12 @@ sub isViewValid
    }
    if (defined($rec) && $rec->{'isclusternode'}){
       push(@all,"cluster");
+   }
+   if (defined($rec) && $rec->{'isembedded'}){
+      @all=grep(!/^cluster$/,@all);
+      @all=grep(!/^attachments$/,@all);
+      @all=grep(!/^phonenumbers$/,@all);
+      @all=grep(!/^swinstances$/,@all);
    }
    #if ($self->IsMemberOf("admin")){
    #   push(@all,"qc");
