@@ -54,6 +54,11 @@ sub new
                 label         =>'ICTO-ID',
                 dataobjattr   =>'"ICTO-ID"'),
 
+      new kernel::Field::Text(
+                name          =>'organisation',
+                label         =>'Organisation',
+                dataobjattr   =>'Organisation'),
+
       new kernel::Field::Boolean(
                 name          =>'nortargetdefined',
                 label         =>'NOR-Target defined',
@@ -217,6 +222,21 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable join V_DARWIN_EXPORT ".
+            "on $worktable.\"ICTO-ID\"=V_DARWIN_EXPORT.ICTO_Nummer ";
+
+   return($from);
+}
+
+
 
 sub initSearchQuery
 {
