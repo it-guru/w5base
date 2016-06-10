@@ -5,7 +5,7 @@ aus AssetManager aufgefüllt. Wenn die Anwendung in W5Base/Darwin
 erzeugt wird, dann ist dieses Feld leer zu lassen.
 ',en=>'
 At T-Systems is this field automatically filled with the ApplicationID 
-from Asset Center. If the application is in W5Base/Darwin created, then 
+from AssetManager. If the application is in W5Base/Darwin created, then 
 this is to leave blank.
 '},
 #######################################################################

@@ -1,14 +1,14 @@
 'acinmassingmentgroup'=>{
    de=>'
-Geben Sie die Incident Assignmentgroup an, die im ServiceCenter bei 
+Geben Sie die Incident Assignmentgroup an, die im ServiceManager(SM9) bei 
 Incidents für diese Anwendung verwendet werden soll.
-Die Assignmentgroup muss in ServiceCenter so angelegt sein, 
+Die Assignmentgroup muss in ServiceManager(SM9) so angelegt sein, 
 dass diese nach AssetManager übertragen wird. 
 Nur dann ist sie hier auswählbar.
 ', en=>'
-Enter the Incident Assignmentgroup which is used in Service Center for 
+Enter the Incident Assignmentgroup which is used in ServiceManager(SM9) for 
 Incident Tickets regarding this application. 
-The Assignmentgroup must be available in Service Center and the group 
+The Assignmentgroup must be available in ServiceManager(SM9) and the group 
 has to have been transferred to Asset Manager. 
 Only then is the group selectable.
 '},
