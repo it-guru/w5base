@@ -44,6 +44,18 @@ erfasst. Alternativ muß der Datenverantwortliche des
 Kontierungsobjektes die betreffenden logischen Systeme
 selbst erfassen und in Darwin pflegen!
 
+[en:]
+All Systems assigned to an up to date cost center in Asset Manager, 
+have to be created in W5Base/Darwin under IT-Inventory > System as well.
+Attention: In case of an infrastructure system, the system has to 
+be marked as infrastructure system in Darwin as well (Systemclass).
+
+Creation of logical systems in Darwin is generally done by TSM of 
+the specific application. It is in the responsibility of 
+the databoss of the cost center to find a TSM, which then will 
+create the logical systems.  Alternatively the databoss of a cost center 
+has to create logical systems on his own and also maintain them in Darwin.
+
 =cut
 #######################################################################
 #
