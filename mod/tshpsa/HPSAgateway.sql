@@ -2,51 +2,7 @@
    in die W5Repo Kennung eingespielt werden. Über diese Definitionen 
    werden dann zyklisch die Daten aus HPSA in eine saubere und 
    indizierte Tabellenform gebracht.
-   Auf diese Daten wird dann mittels "W5I_HPSA_*"
-   Views von W5Base/Darwin aus zugegriffen (tshpsa::*).
 */ 
-
-/*
-  CREATE DATABASE LINK "HPSA"
-   CONNECT TO "T03TC_TI_DARWIN" IDENTIFIED BY 'xxxxxxxx'
-   USING '(DESCRIPTION=
-          (ADDRESS=
-          (PROTOCOL=TCP)
-          (HOST=164.28.47.244)
-          (PORT=1521))
-          (CONNECT_DATA=
-          (SID=cmdb)))';
-*/
-
-/** temporary Import Tabel for CSV Loading Interface **/
-create table "W5I_HPSA_system_import" (
- objectid             VARCHAR2(40),
- systemid             VARCHAR2(40),
- hostname             VARCHAR2(1024),
- agentip              VARCHAR2(80),
- managementip         VARCHAR2(80),
- deleted              Number(*,0) default '0',
- dmodifydate          DATE,
- constraint "W5I_HPSA_system_import_pk" primary key (objectid)
-);
-grant select,insert,update,delete on "W5I_HPSA_system_import" to W5I;
-create or replace synonym W5I.HPSA_system_import
-   for "W5I_HPSA_system_import";
-
-create table "W5I_HPSA_lnkswp_import" (
- objectid             VARCHAR2(40),
- class                VARCHAR2(128),
- version              VARCHAR2(40),
- path                 VARCHAR2(255),
- uname                VARCHAR2(1024),
- scandate             DATE,
- deleted              Number(*,0) default '0',
- dmodifydate          DATE
-);
-grant select,insert,update,delete on "W5I_HPSA_lnkswp_import" to W5I;
-create or replace synonym W5I.HPSA_lnkswp_import
-   for "W5I_HPSA_lnkswp_import";
-
 
 /** Overflow Tabel **/
 
