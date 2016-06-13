@@ -114,9 +114,17 @@ sub CapeNORtargetImport
          # 
          # Deltas on these informations are trigger to create a news
          # appladv document based on cape data
-         if ($w5norlist[0]->{itnormodel}         ne $nrec->{itnormodel} ||
-             $w5norlist[0]->{processingpersdata} ne $nrec->{persdata} ||
-             $w5norlist[0]->{processingtkgdata}  ne $nrec->{tkdata}){
+         my @changes;
+         if ($w5norlist[0]->{itnormodel} ne $nrec->{itnormodel}){
+            push(@changes,$self->T("NOR-Target"));
+         }
+         if ($w5norlist[0]->{processingpersdata} ne $nrec->{persdata}){
+            push(@changes,$self->T("Personal Data"));
+         }
+         if ($w5norlist[0]->{processingtkgdata}  ne $nrec->{tkdata}){
+            push(@changes,$self->T("Telecommunication Data"));
+         }
+         if ($#changes!=-1){
             if ($nrec->{itnormodel} eq "S" &&
                 $w5norlist[0]->{itnormodel} ne "S"){
                $downgrade++;
@@ -186,24 +194,25 @@ sub CapeNORtargetImport
                         $ntext.=",\n\n";
                         $ntext.=sprintf(
                                 $self->T("based on informations from Cape ".
-                                         "(NOR Pass of ICTO Object %s), ".
-                                         "there has been a new NOR-Target ".
-                                         "document for the application ".
-                                         "%s created."),
+                                         "(NOR Pass/VVZ of %s), ".
+                                         "the following attribute/s has/have been ".
+                                         "changed and a new NOR-Target document ".
+                                         "for the application %s  has been created:"),
                                          $nrec->{archapplid},$arec->{name});
                         $ntext.="\n\n";
+                        $ntext.=join("\n",@changes);
+                        $ntext.="\n\n";
                         $ntext.=$self->T("new NOR-Target document:");
-                        $ntext.=" (NOR-Model=".$nrec->{itnormodel}.")";
                         $ntext.="\n";
                         $ntext.=$autorec->{urlofcurrentrec};
                         $ntext.="\n";
+                        $ntext.="\n";
                         if (defined($oldnordoc)){
                            $ntext.="\n";
-                           $ntext.=$self->T("The earlier NOR-Target document");
-                           $ntext.=" (NOR-Model=$oldnordoc->{itnormodel}) ";
-                           $ntext.=" ...\n";
+                           $ntext.=$self->T("The former NOR-Target document");
+                           $ntext.="...\n";
                            $ntext.=$oldnordoc->{urlofcurrentrec};
-                           $ntext.="\n...";
+                           $ntext.="\n.... ";
                            $ntext.=$self->T("has been archived.");
                         }
                         return($arec->{name},$ntext);
