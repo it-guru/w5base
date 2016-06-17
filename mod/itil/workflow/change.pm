@@ -321,13 +321,18 @@ sub getPosibleActions
       $age=$d->{totalminutes};
    }
    if (!defined($age) || $age<5000){ # note add allowed 3.5 days after eventend
-      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write");
-      my $m=$WfRec->{mandatorid};
-      $m=[$m] if (ref($m) ne "ARRAY");
-      foreach my $ms (@$m){
-         if (grep(/^$ms$/,@mandators)){
-            push(@l,"wfaddnote");
-            last;
+      if ($self->isChangeManager($WfRec)) {
+         push(@l,"wfaddnote");
+      }
+      else {
+         my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write");
+         my $m=$WfRec->{mandatorid};
+         $m=[$m] if (ref($m) ne "ARRAY");
+         foreach my $ms (@$m){
+            if (grep(/^$ms$/,@mandators)){
+               push(@l,"wfaddnote");
+               last;
+            }
          }
       }
    }
