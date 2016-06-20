@@ -62,7 +62,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'osrelease',
-                label         =>'OS-Relases',
+                label         =>'OS-Release',
                 dataobjattr   =>'amtsiautodiscovery.os'),
 
       new kernel::Field::Text(
@@ -173,6 +173,8 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
 #         push(@res,\%e);
          foreach my $s (@{$rec->{softwareinstallations}}){
             my $path=$s->{path};
+            # at this point, there can be nativ scandata be patched to correct
+            # scan informations!  
             if ($s->{software}=~m/Oracle Database/){
                # remove inventory subtree from oracle install path
                $path=~s#([0-9]+\.[0-9]\.[0-9]+[\\/][^\\/]+)[\\/].*$#$1#;
