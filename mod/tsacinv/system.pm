@@ -1040,7 +1040,8 @@ sub getDetailBlockPriority
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),qw(ImportSystem));
+   return($self->SUPER::getValidWebFunctions(),
+          qw(ImportSystem AutoDiscoveryView));
 }  
 
 sub ImportSystem
@@ -1181,6 +1182,52 @@ sub Import
    }
    return($identifyby);
 }
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   my $systemid=$rec->{systemid};
+   my $o=getModuleObject($self->Config,"tsacinv::autodiscsystem");
+   $o->SetFilter({systemid=>\$systemid});
+   my ($chkrec)=$o->getOnlyFirst(qw(systemid));
+   print STDERR Dumper($chkrec);
+   if (!defined($chkrec)){
+      return($self->SUPER::getHtmlDetailPages($p,$rec));
+   }
+   return($self->SUPER::getHtmlDetailPages($p,$rec),
+          "AutoDiscoveryView"=>$self->T("AutoDiscovery"));
+}
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   if ($p ne "AutoDiscoveryView"){
+      return($self->SUPER::getHtmlDetailPageContent($p,$rec));
+   }
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{systemid};
+
+   if ($p eq "AutoDiscoveryView"){
+      Query->Param("systemid"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("search_systemid"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"../autodiscsystem/HtmlDetail?$urlparam\"></iframe>";
+   }
+   $page.=$self->HtmlPersistentVariables($idname);
+   return($page);
+}
+
+
 
 
 
