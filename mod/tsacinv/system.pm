@@ -1192,7 +1192,6 @@ sub getHtmlDetailPages
    my $o=getModuleObject($self->Config,"tsacinv::autodiscsystem");
    $o->SetFilter({systemid=>\$systemid});
    my ($chkrec)=$o->getOnlyFirst(qw(systemid));
-   print STDERR Dumper($chkrec);
    if (!defined($chkrec)){
       return($self->SUPER::getHtmlDetailPages($p,$rec));
    }
