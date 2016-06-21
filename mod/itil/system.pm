@@ -1645,6 +1645,7 @@ sub isViewValid
       @all=grep(!/^attachments$/,@all);
       @all=grep(!/^phonenumbers$/,@all);
       @all=grep(!/^swinstances$/,@all);
+      @all=grep(!/^software$/,@all);
    }
    #if ($self->IsMemberOf("admin")){
    #   push(@all,"qc");
