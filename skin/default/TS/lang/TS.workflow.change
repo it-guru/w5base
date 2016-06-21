@@ -5,4 +5,5 @@
 'All time data in timezone'=>{de=>'Alle Zeitangaben in der Zeitzone'},
 'Remarks'=>{de=>'Bemerkungen'},
 'Title'=>{de=>'Titel'},
+'Connection to SM9 failed'=>{de=>'Verbindung zu SM9 fehlgeschlagen'},
 

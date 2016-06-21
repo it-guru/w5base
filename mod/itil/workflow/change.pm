@@ -343,14 +343,14 @@ sub getPosibleActions
    }
    if (defined($WfRec->{affectedapplicationid})) {
       if ($self->notifyValid($WfRec,'all')) {
-         push(@l,'chmnotifyall');
+         push(@l,qw(chmnotifyall chmnotifycritical chmnotifydirect));
       }
-      if ($self->notifyValid($WfRec,'critical')) {
-         push(@l,'chmnotifycritical');
-      }
-      if ($self->notifyValid($WfRec,'direct')) {
-         push(@l,'chmnotifydirect');
-      }
+#      if ($self->notifyValid($WfRec,'critical')) {
+#         push(@l,'chmnotifycritical');
+#      }
+#      if ($self->notifyValid($WfRec,'direct')) {
+#         push(@l,'chmnotifydirect');
+#      }
    }
 
    return(@l);

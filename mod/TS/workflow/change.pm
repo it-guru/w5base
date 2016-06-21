@@ -290,6 +290,12 @@ sub notifyValid
       my ($rec,$msg)=$smchm->getOnlyFirst(qw(coordinatorgrp));
 
       my $operator=$self->identifyW5UserFromGroup($rec->{coordinatorgrp});
+
+      if ($operator==-1) {
+         $self->LastMsg(ERROR,"Connection to SM9 failed");
+         return(0);
+      }
+
       return(1) if (in_array($operator,$userid));
    }
 

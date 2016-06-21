@@ -1191,7 +1191,8 @@ sub identifyW5UserFromGroup
 
    my $lnk=getModuleObject($self->Config,'tssm::lnkusergroup');
    $lnk->SetFilter({lgroup=>\$name});
-   return(undef) if (!$lnk->Ping());
+
+   return(-1) if (!$lnk->Ping());
 
    my @operator=map {$_->{luser}} @{$lnk->getHashList(qw(luser))};
 
