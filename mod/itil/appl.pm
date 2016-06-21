@@ -1154,6 +1154,23 @@ sub new
                    selectlabel=>\'itil::appl::applbasemoni',
                    cistatusid=>\'4'
                 },
+                jsonchanged   =>"
+                   var elements=document.forms[0].elements;
+                   var moni=elements['Formated_applbasemoniname'];
+                   var stat=elements['Formated_applbasemonistatus'];
+                   if (moni && stat){
+                      var v=moni.options[moni.selectedIndex].value;
+                      if (v.match(/no monitoring/)){
+                         stat.value='NOMONI';
+                      }
+                      else{
+                         var s=stat.options[stat.selectedIndex].value;
+                         if (s=='NOMONI'){
+                            stat.value='';
+                         }
+                      }
+                   }
+                ",
                 vjoinon       =>['applbasemoni'=>'name'],
                 vjoindisp     =>'displaylabel',
                 htmleditwidth =>'200px'),
@@ -1175,6 +1192,23 @@ sub new
                                  'MONISIMPLE',
                                  'MONIAUTOIN'],
                 htmleditwidth =>'280px',
+                jsonchanged   =>"
+                   var elements=document.forms[0].elements;
+                   var moni=elements['Formated_applbasemoniname'];
+                   var stat=elements['Formated_applbasemonistatus'];
+                   if (moni && stat){
+                      var v=stat.options[stat.selectedIndex].value;
+                      if (v.match(/NOMONI/)){
+                         moni.value='-no monitoring-';
+                      }
+                      else{
+                         var s=moni.options[moni.selectedIndex].value;
+                         if (s=='-no monitoring-'){
+                            moni.value='';
+                         }
+                      }
+                   }
+                ",
                 dataobjattr   =>'appl.applbasemonistatus'),
 
       new kernel::Field::Group(
@@ -2085,6 +2119,15 @@ sub Validate
          return(0);
       }
    }
+   if (((effVal($oldrec,$newrec,"applbasemonistatus") eq "NOMONI" &&
+        effVal($oldrec,$newrec,"applbasemoni") ne "-no monitoring-")) ||
+       ((effVal($oldrec,$newrec,"applbasemonistatus") ne "NOMONI" &&
+         effVal($oldrec,$newrec,"applbasemoni") eq "-no monitoring-"))){
+      $self->LastMsg(ERROR,"invalid basemonitoring status combination");
+      return(0);
+   }
+
+
    if (exists($newrec->{conumber}) && $newrec->{conumber} ne ""){
       if (!$self->finance::costcenter::ValidateCONumber(
           $self->SelfAsParentObject,"conumber", $oldrec,$newrec)){

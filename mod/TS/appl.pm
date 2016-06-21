@@ -135,6 +135,7 @@ sub new
                 group         =>'monisla',
                 label         =>'responsible ControlCenter',
                 allowempty    =>1,
+                useNullEmpty  =>1,
                 vjointo       =>'base::grp',
                 vjoinbase     =>sub{
                    my $self=shift;

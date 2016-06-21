@@ -111,7 +111,7 @@ sub getPostibleValues
       my @res=(); 
       map({push(@res,$_->{$joinidfield},$_->{$self->{vjoindisp}})} @l);
       if ($self->{allowempty}==1){
-         unshift(@res,"","[none]");
+         unshift(@res,"","[".$self->getParent->T("none")."]");
       }
       return(@res);
    }
@@ -321,6 +321,12 @@ sub Validate
       if (($val eq "" || (ref($val) eq "ARRAY" && $#{$val}==-1)) 
           && $self->{allowempty}==1){
          if ($self->{useNullEmpty}){
+            if (defined($self->{vjointo}) &&
+                defined($self->{vjoinon}) &&
+                ref($self->{vjoinon}) eq "ARRAY"){
+               return({$self->{vjoinon}->[0]=undef});
+            }
+
             return({$self->Name()=>undef});
          }
          return({$self->Name()=>$val});
@@ -384,6 +390,10 @@ sub FormatedResult
    my $current=shift;
    my $FormatAs=shift;
    my $d=$self->RawValue($current);
+
+   if (!defined($d) && $self->{allowempty}==1 && ($FormatAs=~m/^Html/)){
+      return("[".$self->getParent->T("none")."]");
+   }
    if (!defined($d)){
       if (defined($self->{value}) && in_array($self->{value},undef)){
          $d=[undef];
@@ -392,6 +402,7 @@ sub FormatedResult
          $d=[];
       }
    }
+
    $d=[$d] if (ref($d) ne "ARRAY");
  
    my $res;
@@ -422,6 +433,9 @@ sub FormatedResult
            $self->getParent->T($self->{transprefix}.$_,$self->{translation})
                            } @{$d}));
    }
+
+
+
    if ($FormatAs=~m/^Html/){
       $res=~s/</&lt;/g;
       $res=~s/>/&gt;/g;
@@ -458,6 +472,10 @@ sub Unformat
          }
          else{
             $r->{$self->{vjoinon}->[0]}=$formated->[0];
+            if ($self->{allowempty}==1 && $self->{useNullEmpty}==1 &&
+                $formated->[0] eq ""){
+               $r->{$self->{vjoinon}->[0]}=undef;
+            }
          }
       }
       else{
