@@ -74,9 +74,10 @@ use W5Kernel;
 use kernel::date;
 use Scalar::Util qw(weaken);
 use Exporter;
-#use utf8; # scheint nicht notwendig zu sein 15.08.2008 hb
 use Encode;
 use Unicode::String qw(utf8 latin1 utf16);
+use charnames ':full';
+
 @ISA = qw(Exporter);
 @EXPORT = qw(&Query &LangTable &extractLanguageBlock 
              &globalContext &NowStamp &CalcDateDuration
@@ -109,36 +110,50 @@ sub latin1{return(&Unicode::String::latin1);}
 sub utf8_to_latin1
 {
    my $utf8string=shift;
-   $utf8string=~s/\xC3[\xb3]/o/g;
-   $utf8string=~s/\xC3[\xa0\xa1\xa2\xa3\xa5]/a/g;
-   $utf8string=~s/\xC3[\x80\x81\x82\x83\x85]/A/g;
-   $utf8string=~s/\xC4\x85/a/g;
-   $utf8string=~s/\xC4[\x87\x89\x8b\x8d]/c/g;
-   $utf8string=~s/\xC4[\x86\x88\x8a\x8c]/C/g;
-   $utf8string=~s/\xC3[\xa8\xa9\xaa\xab]/e/g;
-   $utf8string=~s/\xC4[\x93\x95\x97\x99\x9b]/e/g;
-   $utf8string=~s/\xC3[\x88\x89\x8a\x8b]/E/g;
-   $utf8string=~s/\xC4[\x92\x94\x96\x98\x9a]/E/g;
-   $utf8string=~s/\xC5\x81/L/g;
-   $utf8string=~s/\xC5[\xba\xbc\xbe]/z/g;
-   $utf8string=~s/\xC5[\xb9\xbb\xbd]/Z/g;
-   $utf8string=~s/\xC5[\xa9\xab\xad\xaf\xb1\xb3]/u/g;
-   $utf8string=~s/\xC5[\xa8\xaa\xac\xae\xb0\xb2]/U/g;
-   $utf8string=~s/\xC5[\x83\x85\x87\x8a]/N/g;
-   $utf8string=~s/\xC5[\x84\x86\x88\x89\x8b]/n/g;
-   $utf8string=~s/\xC5[\x98]/R/g;
-   $utf8string=~s/\xC5[\x99]/r/g;
-   $utf8string=~s/\xC3[\xAC\xAD\xAE\xAF]/i/g;
-   $utf8string=~s/\xC5[\xb6\xb8]/Y/g;
-   $utf8string=~s/\xC5[\x8d\x8f\x91\x93]/o/g;
-   $utf8string=~s/\xC6[\xa1\xa3]/o/g;
-   $utf8string=~s/\xC7[\x92]/o/g;
-   $utf8string=~s/\xC5[\x8c\x8e\x90\x92]/O/g;
-   # Codings from ISO_8859-15
-   $utf8string=~s/[\xf3\xf4\xf5\xf6\xf0]/o/g;
+   my $l=utf8($utf8string);
+   my @names=$l->name;
+   my $mapped;
 
-   my $l=utf8($utf8string)->latin1();
-   return($l);
+   # If there is no specialmap for a character,
+   # Latin letters a-zA-Z will be mapped like in this example:
+   #  original: 'LATIN SMALL LETTER A WITH GRAVE'
+   #  new:      'LATIN SMALL LETTER A'
+   #
+   # key => character from original string
+   # val => array ref with new substituted character(s)
+   my %specialmap=(
+      'LATIN CAPITAL LETTER A WITH DIAERESIS'=>
+         ['LATIN CAPITAL LETTER A WITH DIAERESIS'],
+      'LATIN CAPITAL LETTER O WITH DIAERESIS'=>
+         ['LATIN CAPITAL LETTER O WITH DIAERESIS'],
+      'LATIN CAPITAL LETTER U WITH DIAERESIS'=>
+         ['LATIN CAPITAL LETTER U WITH DIAERESIS'],
+      'LATIN SMALL LETTER A WITH DIAERESIS'=>
+         ['LATIN SMALL LETTER A WITH DIAERESIS'],
+      'LATIN SMALL LETTER O WITH DIAERESIS'=>
+         ['LATIN SMALL LETTER O WITH DIAERESIS'],
+      'LATIN SMALL LETTER U WITH DIAERESIS'=>
+         ['LATIN SMALL LETTER U WITH DIAERESIS'],
+   );
+
+   foreach my $n (@names) {
+      if (exists($specialmap{$n})) {
+         if (ref($specialmap{$n}) eq 'ARRAY') {
+            foreach my $newname (@{$specialmap{$n}}) {
+               $mapped.=chr(charnames::vianame($newname));
+            }
+         }
+         else {
+            $mapped.=chr(charnames::vianame($specialmap{$n}));
+         }
+      }
+      else {
+         $n=~s/^(LATIN (CAPITAL|SMALL) LETTER [A-Z]) WITH.*$/$1/;
+         $mapped.=chr(charnames::vianame($n));
+      }
+   }
+
+   return($mapped);
 }
 
 sub LangTable
