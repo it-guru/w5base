@@ -71,6 +71,8 @@ sub qcheckRecord
    my @dataissue;
 
    if ($rec->{email} ne "" && $rec->{cistatusid}<=5){
+      my $uidlist;
+      my $posix;
       my $ciam=getModuleObject($self->getParent->Config(),"tsciam::user");
       $ciam->SetFilter([
          {email=>\$rec->{email},active=>\'true',primary=>\'true'},
@@ -83,19 +85,48 @@ sub qcheckRecord
          printf STDERR ("CIAM: ununique email = '%s'\n",$rec->{email});
          return(3,{qmsg=>['ununique email in CIAM '.$rec->{email}]});
       }
-      if ($#l==-1){               # no primary workrelation found - so we will
-         $ciam->ResetFilter();    # try to find  a secondary
-         $ciam->SetFilter([
+
+      if ($#l==0){  # 1st try to detect uidlist
+         if (defined($l[0]->{wiwid}) && $l[0]->{wiwid} ne ""){
+            $uidlist=$l[0]->{wiwid};
+            $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
+            $uidlist=[grep(!/^\s*$/,@$uidlist)];
+         }
+      }
+
+      if ($#l==-1 || ($#l==0 && !defined($uidlist))){ 
+                                  # no primary workrelation found - so we will
+         $ciam->ResetFilter();    # try to find  a secondary (or primary has
+         $ciam->SetFilter([       # no wiwid
             {email=>\$rec->{email},active=>\'true',primary=>\'false'},
             {email2=>\$rec->{email},active=>\'true',primary=>\'false'},
             {email3=>\$rec->{email},active=>\'true',primary=>\'false'},
             {email4=>\$rec->{email},active=>\'true',primary=>\'false'} 
          ]);
-         @l=$ciam->getHashList(qw(ALL));
+         my @secl=$ciam->getHashList(qw(ALL));
+         if ($#secl!=-1){
+            if ($#l==-1){
+               @l=@secl;
+            }
+            if (!defined($uidlist) || $#{$uidlist}==-1){
+               foreach my $secrec (@secl){
+                  if (defined($secrec->{wiwid}) && $secrec->{wiwid} ne ""){
+                     $uidlist=$secrec->{wiwid};
+                     $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
+                     $uidlist=[grep(!/^\s*$/,@$uidlist)];
+                  }
+               }
+            }
+         }
       }
-      
       my $msg;
       my $ciamrec=$l[0];
+
+
+      my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
+      $posix=$posix[0];
+
+
       if (!defined($ciamrec)){
          #####################################################################
          # Change local primary email based on local known wiwid or ciamid
@@ -185,22 +216,27 @@ sub qcheckRecord
                },{userid=>\$rec->{userid}});
             }
          }
-         my $uidlist=$ciamrec->{wiwid};
-         $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
-         my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
-         my $posix=$posix[0];
-         if ($posix ne "" && $rec->{posix} ne $posix ){
-            my $user=getModuleObject($self->getParent->Config(),
-                                     "base::user");
-            $user->SetFilter({posix=>\$posix});
-            my ($alturec,$msg)=$user->getOnlyFirst(qw(ALL));
-            if (defined($alturec)){
-               $dataobj->Log(ERROR,"basedata",
-                   "Fail to set posix identifier '$posix' ".
-                   "on '$rec->{fullname}' ");
+         if ($posix ne ""){
+            if ($rec->{posix} ne $posix ){
+               my $user=getModuleObject($self->getParent->Config(),
+                                        "base::user");
+               $user->SetFilter({posix=>\$posix});
+               my ($alturec,$msg)=$user->getOnlyFirst(qw(ALL));
+               if (defined($alturec)){
+                  $dataobj->Log(ERROR,"basedata",
+                      "Fail to set posix identifier '$posix' ".
+                      "on '$rec->{fullname}' ");
+               }
+               else{
+                  $forcedupd->{posix}=$posix;
+               }
             }
-            else{
-               $forcedupd->{posix}=$posix;
+         }
+         else{
+            if ($rec->{posix} ne ""){
+               $dataobj->Log(ERROR,"basedata",
+                   "Posix Identifier '$rec->{posix}' for ".
+                   "'$rec->{fullname}' can not be verified");
             }
          }
          my $dsid="tCID:".$ciamrec->{tcid};
