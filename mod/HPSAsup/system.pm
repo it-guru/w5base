@@ -115,6 +115,8 @@ where
     and "itil::system".isinfrastruct=0
        -- Embedded Systeme ausklammern (da Scanner nicht möglich)
     and "itil::system".isembedded=0
+       -- Loadbalancer Systeme ausklammern (da Scanner nicht möglich)
+    and "itil::system".isloadbalacer=0
        -- MU Status "hibernate" ausklammern
     and "tsacinv::system".status not like 'hibernate'
        -- Ausschluss von Mainframe
