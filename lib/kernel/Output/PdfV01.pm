@@ -52,7 +52,7 @@ sub getDownloadFilename
 {
    my $self=shift;
 
-   return($self->SUPER::getDownloadFilename().".pdf");
+   return($self->kernel::Formater::getDownloadFilename().".pdf");
 }
 
 sub IsModuleSelectable
