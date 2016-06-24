@@ -2119,12 +2119,15 @@ sub Validate
          return(0);
       }
    }
-   if (((effVal($oldrec,$newrec,"applbasemonistatus") eq "NOMONI" &&
-        effVal($oldrec,$newrec,"applbasemoni") ne "-no monitoring-")) ||
-       ((effVal($oldrec,$newrec,"applbasemonistatus") ne "NOMONI" &&
-         effVal($oldrec,$newrec,"applbasemoni") eq "-no monitoring-"))){
-      $self->LastMsg(ERROR,"invalid basemonitoring status combination");
-      return(0);
+   if (exists($newrec->{applbasemonistatus}) ||
+       exists($newrec->{applbasemoni})){
+      if (((effVal($oldrec,$newrec,"applbasemonistatus") eq "NOMONI" &&
+           effVal($oldrec,$newrec,"applbasemoni") ne "-no monitoring-")) ||
+          ((effVal($oldrec,$newrec,"applbasemonistatus") ne "NOMONI" &&
+            effVal($oldrec,$newrec,"applbasemoni") eq "-no monitoring-"))){
+         $self->LastMsg(ERROR,"invalid basemonitoring status combination");
+         return(0);
+      }
    }
 
 
