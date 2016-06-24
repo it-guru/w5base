@@ -297,7 +297,8 @@ sub ItemSummary
    if (keys(%systemids)){
       my $o=getModuleObject($self->Config,"tssmartcube::tcc");
       $o->SetFilter({systemid=>[keys(%systemids)]});
-      my @osroadmap=$o->getHashList(qw(systemid roadmap osroadmapstate 
+      my @osroadmap=$o->getHashList(qw(systemid systemname 
+                                       roadmap osroadmapstate 
                                        urlofcurrentrec os_base_setup
                                        os_base_setup_color
                                        denyupd denyupdcomments));
