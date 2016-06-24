@@ -1178,7 +1178,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'applbasemoni',
                 group         =>'monisla',
-                label         =>'Application base monitoring',
+                label         =>'raw Application base monitoring',
                 dataobjattr   =>'appl.applbasemoni'),
 
 

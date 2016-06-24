@@ -175,5 +175,5 @@
 'offline time'=>{de=>'Offline-Zeit'},
 'invalid tspan type'=>{de=>'ungültiger Zeitbereichstyp'},
 'temporary exeptions in use times'=>{de=>'temporäre Abweichungen in den Nutzungszeiten'},
-'invalid basemonitoring status combination'=>{de=>'ungültige Basismonitoring/Status kombination'},
+'invalid basemonitoring status combination'=>{de=>'ungültige Basismonitoring/Status Kombination'},
 
