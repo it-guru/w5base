@@ -41,6 +41,10 @@ sub new
                             'roles','expiration','mdate','comments',
                             'srcsys','srcid','srcload'];
    }
+   if (!defined($self{'vjoinapidisp'})){
+      $self{'vjoinapidisp'}=['mdate','id','target','targetid','targetname',
+                             'comments','nativroles','roles'];
+   }
 
    my $self=bless($type->SUPER::new(%self),$type);
    return($self);

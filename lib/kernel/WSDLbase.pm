@@ -89,7 +89,12 @@ sub WSDLcommon
    $$XMLtypes.="<xsd:sequence>";
    $$XMLtypes.="<xsd:element name=\"roles\" type=\"xsd:string\" />";
    $$XMLtypes.="<xsd:element name=\"targetname\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"target\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"targetid\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"nativroles\" type=\"xsd:string\" />";
    $$XMLtypes.="<xsd:element name=\"comments\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"id\" type=\"xsd:string\" />";
+   $$XMLtypes.="<xsd:element name=\"mdate\" type=\"xsd:dateTime\" />";
    $$XMLtypes.="</xsd:sequence>";
    $$XMLtypes.="</xsd:complexType>";
    $$XMLtypes.="\n";

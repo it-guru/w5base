@@ -28,6 +28,7 @@ sub new
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{_permitted}->{forwardSearch}=1;
    $self->{_permitted}->{ignViewValid}=1;
+   $self->{_permitted}->{vjoinapidisp}=1;
    if (!defined($self->{WSDLfieldType})){
       $self->{WSDLfieldType}="SubListRecordArray";
    }
@@ -306,6 +307,12 @@ sub getSubListData
          if (defined($self->{vjoininhash}) &&
              ref($self->{vjoininhash}) eq "ARRAY"){
             @view=@{$self->{vjoininhash}};
+         }
+      }
+      if ($mode eq "XMLV01" || $mode eq "SOAP"){
+         if (defined($self->{vjoinapidisp}) &&
+             ref($self->{vjoinapidisp}) eq "ARRAY"){
+            @view=@{$self->{vjoinapidisp}};
          }
       }
       if (defined($self->{'vjoindisp'.$mode})){

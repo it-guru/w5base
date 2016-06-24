@@ -178,6 +178,23 @@ sub new
                 container     =>'croles',
                 getPostibleValues=>\&getPostibleRoleValues),
                                                  
+      new kernel::Field::Interface(
+                name          =>'nativroles',
+                label         =>'native Roles',
+                readonly      =>1,
+                history       =>0,
+                htmldetail    =>0,
+                uploadable    =>0,
+                depend        =>['roles','croles'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fld=$self->getParent->getField("roles",$current);
+                   my $roles=$fld->RawValue($current);
+                   $roles=[$roles] if (ref($roles) ne "ARRAY");
+                   return(join(", ",@$roles));
+                }),
+
       new kernel::Field::Link(
                 name          =>'fullname',
                 readonly      =>1,
@@ -207,12 +224,12 @@ sub new
                 sqlorder      =>'NONE',
                 dataobjattr   =>'lnkcontact.croles'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'target',
                 label         =>'Target-Typ',
                 dataobjattr   =>'target'),
                                                  
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'targetid',
                 dataobjattr   =>'targetid'),
 
