@@ -220,7 +220,6 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'comments',
-                searchable    =>0,
                 label         =>'Comments',
                 dataobjattr   =>'qlnkapplsystem.comments'),
 
