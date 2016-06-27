@@ -103,6 +103,17 @@ sub new
                 label         =>'Source-Id',
                 dataobjattr   =>'amtsirelappl.externalid'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>'amtsirelappl.dtlastmodif'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(amtsirelappl.lrelapplid,35,'0')")
 
    );
    $self->setDefaultView(qw(id parent child));
