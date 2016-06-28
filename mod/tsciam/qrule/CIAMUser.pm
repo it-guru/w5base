@@ -234,9 +234,27 @@ sub qcheckRecord
          }
          else{
             if ($rec->{posix} ne ""){
-               $dataobj->Log(ERROR,"basedata",
-                   "Posix Identifier '$rec->{posix}' for ".
-                   "'$rec->{fullname}' can not be verified");
+               my $o=getModuleObject($self->getParent->Config(),
+                                     "tswiw::user");
+               if (defined($o)){
+                  my $chkid=$rec->{posix};
+                  $o->SetFilter({uid=>\$chkid});
+                  my ($wiwrec,$msg)=$o->getOnlyFirst(qw(uid));
+                  if (defined($wiwrec)){
+                     $dataobj->Log(ERROR,"basedata",
+                         "WIWID '$rec->{posix}' for ".
+                         "'$rec->{fullname}' not found in CIAM (but ".
+                         "exists in WIW)");
+                  }
+                  else{
+                     $dataobj->Log(ERROR,"basedata",
+                         "Posix Identifier '$rec->{posix}' for ".
+                         "'$rec->{fullname}' should be reset to undefined");
+                  }
+               }
+
+
+
             }
          }
          my $dsid="tCID:".$ciamrec->{tcid};
