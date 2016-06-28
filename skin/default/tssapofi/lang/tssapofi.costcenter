@@ -1,0 +1,5 @@
+'tssapofi::costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
+'CostCenter'=>{de=>'Kostenstelle'},
+'Description'=>{de=>'Beschreibung'},
+'SAP hierarchy'=>{de=>'SAP Hierarchie'},
+'marked as deleted'=>{de=>'als gelöscht markiert'},

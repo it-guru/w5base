@@ -1,0 +1,7 @@
+'tssapofi::saphier'=>{de=>'SAP Hierarchie',en=>'SAP hierarchy'},
+'fieldgroup.costcenters'=>{de=>'Kostenstellen',en=>'CostCenters'},
+'fieldgroup.psps'=>{de=>'PSP Elemente',en=>'PSP Elements'},
+'Description'=>{de=>'Beschreibung'},
+'SAP hierarchy'=>{de=>'SAP Hierarchie'},
+'hierarchy path'=>{de=>'Hierarchie Pfad'},
+'marked as deleted'=>{de=>'als gelöscht markiert'},

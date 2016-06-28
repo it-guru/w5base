@@ -1,0 +1,4 @@
+'itu.tssapofi'=>{de=>'SAP OFI',en=>'SAP OFI'},
+'itu.tssapofi.PSP'=>{de=>'PSP Element',en=>'PSP Element'},
+'itu.tssapofi.costcenter'=>{de=>'Kostenstelle',en=>'CostCenter'},
+'itu.tssapofi.SAPHIER'=>{de=>'SAP Hierarchie',en=>'SAP Hierarchy'},

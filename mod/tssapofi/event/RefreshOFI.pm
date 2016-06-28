@@ -106,7 +106,7 @@ sub RefreshOFI
          $loaderror="fail to open dir '$tempdir': $?";
       }
    }
-   print STDERR Dumper(\@loadfiles);
+   #print STDERR Dumper(\@loadfiles);
 
    #######################################################################
    # after this, all useable files are in @loadfiles
@@ -118,10 +118,9 @@ sub RefreshOFI
       msg(INFO,"found file=$file");
       if ($file=~m/^DE_YT5A_DTIT/i){
          $self->loadKostFile(File::Spec->catfile($tempdir,$file),$file);
-        # $self->loadHierFile(File::Spec->catfile($tempdir,$file),$file);
       }
       elsif ($file=~m/^DE_KOST_\d+_Import/i){
-        # $self->loadKostFile(File::Spec->catfile($tempdir,$file),$file);
+         # kann ignoriert werden
       }
       elsif ($file=~m/^DE_WBS_\d+_Import/i){
          $self->loadWbsFile(File::Spec->catfile($tempdir,$file),$file);
@@ -170,6 +169,8 @@ sub loadWbsFile
    msg(DEBUG,"Oracle Database handle '$db'");
    my $n=0;
    if (open(my $fh,"<:encoding(Latin1)",$file)){   # structure check
+      $db->begin_work();
+      $db->do("update OFI_wbs_import set deleted=1");
       my %colmap;
       while(my $l=<$fh>){
           $n++;
@@ -185,141 +186,52 @@ sub loadWbsFile
              foreach my $k (sort(keys(%colmap))){
                 $r{$k}=$rec->[$colmap{$k}];
              }
-             # Diese Tabelle scheint einen Strukturefehler zu haben. Die
-             # Hierarchie-Zuordnung sieht eher nach SAPP01 aus.
 
              my %frec;
-             print Dumper(\%r);
+             #print Dumper(\%r);
              my $hierlink=trim($r{'hierarchy SL/AL'});
              my @fullname=grep(/$hierlink$/,keys(%SapHierMap));
 
 
              if ($hierlink eq ""){
-                $errmap{"emtpty".$r{'WBS-Number'}}=
-                   msg(ERROR,"emtpy 'hierarchy SL/AL' for WBS-Number '".
-                             $r{'WBS-Number'}."' at line $n");
+                #$errmap{"empty".$r{'WBS-Number'}}=
+                #   msg(ERROR,"emtpy 'hierarchy SL/AL' for WBS-Number '".
+                #             $r{'WBS-Number'}."' at line $n");
              } 
              elsif ($hierlink eq "0"){
-                $errmap{"emtpty".$r{'WBS-Number'}}=
-                   msg(ERROR,"zero 'hierarchy SL/AL' for WBS-Number '".
-                             $r{'WBS-Number'}."' at line $n");
+                #$errmap{"empty".$r{'WBS-Number'}}=
+                #   msg(ERROR,"zero 'hierarchy SL/AL' for WBS-Number '".
+                #             $r{'WBS-Number'}."' at line $n");
              } 
              elsif ($#fullname==-1){
-                $errmap{"inval".$r{'WBS-Number'}}=
-                   msg(ERROR,"not usable 'hierarchy SL/AL'='$hierlink' in WBS-Number '".
-                             "$r{'WBS-Number'}' not found at line $n");
+                #$errmap{"inval".$r{'WBS-Number'}}=
+                #   msg(ERROR,"not usable 'hierarchy SL/AL'='$hierlink' ".
+                #             "in WBS-Number '".
+                #             "$r{'WBS-Number'}' not found at line $n");
              } 
              elsif ($#fullname>0){
                 $errmap{"notuniq".$r{'WBS-Number'}}=
-                   msg(ERROR,"not usable 'hierarchy SL/AL'='$hierlink' in WBS-Number '".
+                   msg(ERROR,"not usable 'hierarchy SL/AL'='$hierlink' ".
+                             "in WBS-Number '".
                              "$r{'WBS-Number'}' not unique at line $n");
              } 
              else{
+                my $saphier=$fullname[0];
+                my $saphierobjectid=$SapHierMap{$saphier};
+                my $oid=uuid_to_string(create_uuid(UUID_V5,$r{'WBS-Number'}));
 
 
-
-             }
-          }
-      }
-      close($fh);
-   }
-   return(0);
-}
-
-
-
-
-sub loadKostFile
-{
-   my $self=shift;
-   my $file=shift;
-   my $shortname=shift;
-
-   msg(DEBUG,"process KostFile '$shortname'");
-   my $db=$self->getNativOracleDBIConnectionHandle("w5warehouse");
-   msg(DEBUG,"Oracle Database handle '$db'");
-   my $n=0;
-   if (open(my $fh,"<:encoding(Latin1)",$file)){   # structure check
-      $db->begin_work();
-      $db->do("update OFI_kost_import set deleted=1");
-      $db->do("update OFI_saphier_import set deleted=1");
-      my %colmap;
-      while(my $l=<$fh>){
-          $n++;
-          my $rec=parseCsvLine($fh,$l);
-          if ($n==1){
-             for(my $col=0;$col<=$#{$rec};$col++){
-                $colmap{$rec->[$col]}=$col;
-             }
-          }
-          else{
-             my %r;
-             foreach my $k (sort(keys(%colmap))){
-                $r{$k}=$rec->[$colmap{$k}];
-             }
-             my @hier;
-             for(my $c=1;$c<=15;$c++){
-                my $key=sprintf("Set Stufe %d",$c);
-                my $v=$r{$key};
-                $v="" if ($v eq "#");
-                push(@hier,$v);
-             }
-             for(my $c=$#hier;$c>1;$c--){
-                if ($hier[$c] eq ""){
-                   pop(@hier);
-                }
-                else{
-                   last;
-                }
-             }
-             $r{saphier}=join(".",@hier);
-
-             my $saphierid=uuid_to_string(create_uuid(UUID_V5,$r{saphier}));
-             { 
-                my $tabname="OFI_saphier_import";
-                my $lastname=$r{'Set Stufe LH'};
-                if (!exists($SapHierMap{$lastname})){
-                   if ($r{saphier} ne ""){
-                      my %rec=(
-                         objectid=>$saphierid,
-                         name=>$lastname,
-                         fullname=>$r{saphier}
-                      );
-                      $SapHierMap{$lastname}=$saphierid;
-                      {# handle import
-                         my @fld=keys(%rec);
-                         my $rv=$db->do("update $tabname ".
-                                        "set ".join(",",map({"$_=?"} @fld)).
-                                        ",dmodifydate=current_date,deleted=0 ".
-                                        "where objectid=?",{},
-                                        map({$rec{$_}} @fld),
-                                        $rec{objectid});
-                         if ($rv eq "0E0"){  # nothing effected
-                            $rv=$db->do("insert into $tabname ".
-                                        "(".join(",",@fld).",".
-                                        "dmodifydate,dcreatedate) ".
-                                        "values(".join(",",map({"?"} @fld)).
-                                        ",current_date,current_date) ",{},
-                                        map({$rec{$_}} @fld));
-                         }
-                         if ($rv ne "1"){
-                            msg(ERROR,"fatal error while handling import");
-                            return(0);
-                         }
-                      }
-                   }
-                }
-             }
-
-             { 
-                my $tabname="OFI_kost_import";
-                my $id=uuid_to_string(create_uuid(UUID_V5,$r{Kostenstelle}));
-                if ($r{Kostenstelle} ne ""){
+                if ($r{'delete'} ne "1"){
                    my %rec=(
-                      objectid=>$id,
-                      name=>$r{Kostenstelle},
-                      saphierid=>$saphierid,
-                      description=>$r{'KOST Bezeichnung'}
+                      objectid=>$oid,
+                      name=>$r{'WBS-Number'},
+                      saphierid=>$saphierobjectid,
+                      description=>$r{'description'},
+                      supervisor_ciamid=>$r{'supervisor'},
+                      servicemgr_ciamid=>$r{'service manager'},
+                      delivermgr_ciamid=>$r{'delivery manager'},
+                      company_code=>$r{'company code'},
+                      customer_link=>$r{'customer link'}
                    );
                    {# handle import
                       my @fld=keys(%rec);
@@ -349,6 +261,159 @@ sub loadKostFile
       $db->commit();
       close($fh);
    }
+   return(0);
+}
+
+
+
+
+sub loadKostFile
+{
+   my $self=shift;
+   my $file=shift;
+   my $shortname=shift;
+
+   msg(DEBUG,"process KostFile '$shortname'");
+   my $db=$self->getNativOracleDBIConnectionHandle("w5warehouse");
+   msg(DEBUG,"Oracle Database handle '$db'");
+   my $n=0;
+   if (open(my $fh,"<:encoding(Latin1)",$file)){   # structure check
+      $db->begin_work();
+      $db->do("update OFI_kost_import set deleted=1");
+      $db->do("update OFI_saphier_import set deleted=1");
+      my %colmap;
+      my %DirectSapHierMap;
+      while(my $l=<$fh>){
+          $n++;
+          my $rec=parseCsvLine($fh,$l);
+          if ($n==1){
+             for(my $col=0;$col<=$#{$rec};$col++){
+                $colmap{$rec->[$col]}=$col;
+             }
+          }
+          else{
+             my %r;
+             foreach my $k (sort(keys(%colmap))){
+                $r{$k}=$rec->[$colmap{$k}];
+             }
+             my @hier;
+             for(my $c=1;$c<=15;$c++){
+                my $key=sprintf("Set Stufe %d",$c);
+                my $v=$r{$key};
+                $v="" if ($v eq "#");
+                push(@hier,$v);
+             }
+             for(my $c=$#hier;$c>1;$c--){
+                if ($hier[$c] eq ""){
+                   pop(@hier);
+                }
+                else{
+                   last;
+                }
+             }
+             $r{saphierlist}=\@hier;
+             $r{saphier}=join(".",@hier);
+             $r{saphierid}=uuid_to_string(create_uuid(UUID_V5,$r{saphier}));
+             if (length($r{saphier})>2){ 
+                $DirectSapHierMap{$r{saphier}}=\%r;
+                my $tabname="OFI_kost_import";
+                if ($r{Kostenstelle} ne ""){
+                   my $id=uuid_to_string(create_uuid(UUID_V5,$r{Kostenstelle}));
+                   my %rec=(
+                      objectid=>$id,
+                      name=>$r{Kostenstelle},
+                      saphierid=>$r{saphierid},
+                      description=>$r{'KOST Bezeichnung'},
+                      company_code=>'8111'
+                   );
+                   {# handle import
+                      my @fld=keys(%rec);
+                      my $rv=$db->do("update $tabname ".
+                                     "set ".join(",",map({"$_=?"} @fld)).
+                                     ",dmodifydate=current_date,deleted=0 ".
+                                     "where objectid=?",{},
+                                     map({$rec{$_}} @fld),
+                                     $rec{objectid});
+                      if ($rv eq "0E0"){  # nothing effected
+                         $rv=$db->do("insert into $tabname ".
+                                     "(".join(",",@fld).",".
+                                     "dmodifydate,dcreatedate) ".
+                                     "values(".join(",",map({"?"} @fld)).
+                                     ",current_date,current_date) ",{},
+                                     map({$rec{$_}} @fld));
+                      }
+                      if ($rv ne "1"){
+                         msg(ERROR,"fatal error while handling import");
+                         return(0);
+                      }
+                   }
+                }
+             }
+          }
+      }
+      { # now create virual nodes in hierarchie, for elements which are
+        # not in costcenter list
+         foreach my $r (values(%DirectSapHierMap)){
+            my @hier=@{$r->{saphierlist}};
+            do{
+               my $checksaphier=join(".",@hier);
+               next if ($checksaphier eq "");
+               if (!exists($DirectSapHierMap{$checksaphier})){
+                  my %r=(
+                     saphierid=>uuid_to_string(create_uuid(UUID_V5,
+                                                           $r->{saphier})),
+                     'Set Stufe LH'=>$hier[$#hier],
+                     fullname=>$checksaphier,
+                     saphier=>$checksaphier
+                  );
+                  #print STDERR "add=".Dumper(\%r);
+                  $DirectSapHierMap{$checksaphier}=\%r;
+               }
+            }while(pop(@hier));
+         }
+      }
+     
+
+      foreach my $r (values(%DirectSapHierMap)){
+         my %r=%{$r};
+         my $tabname="OFI_saphier_import";
+         my $lastname=$r{'Set Stufe LH'};
+         if (!exists($SapHierMap{$lastname})){
+            if ($r{saphier} ne ""){
+               my %rec=(
+                  objectid=>$r{saphierid},
+                  name=>$lastname,
+                  fullname=>$r{saphier}
+               );
+               $SapHierMap{$lastname}=$r{saphierid};
+               {# handle import
+                  my @fld=keys(%rec);
+                  my $rv=$db->do("update $tabname ".
+                                 "set ".join(",",map({"$_=?"} @fld)).
+                                 ",dmodifydate=current_date,deleted=0 ".
+                                 "where objectid=?",{},
+                                 map({$rec{$_}} @fld),
+                                 $rec{objectid});
+                  if ($rv eq "0E0"){  # nothing effected
+                     $rv=$db->do("insert into $tabname ".
+                                 "(".join(",",@fld).",".
+                                 "dmodifydate,dcreatedate) ".
+                                 "values(".join(",",map({"?"} @fld)).
+                                 ",current_date,current_date) ",{},
+                                 map({$rec{$_}} @fld));
+                  }
+                  if ($rv ne "1"){
+                     msg(ERROR,"fatal error while handling import");
+                     return(0);
+                  }
+               }
+            }
+         }
+      }
+
+      $db->commit();
+      close($fh);
+   }
    #print Dumper(\%SapHierMap);
    return(0);
 }
@@ -356,88 +421,86 @@ sub loadKostFile
 
 
 
-sub loadHierFile
-{
-   my $self=shift;
-   my $file=shift;
-   my $shortname=shift;
-
-   my $tabname="OFI_saphier_import";
-   msg(DEBUG,"process HierFile '$shortname'");
-   my $db=$self->getNativOracleDBIConnectionHandle("w5warehouse");
-   msg(DEBUG,"Oracle Database handle '$db'");
-   my $n=0;
-   if (open(my $fh,"<:encoding(Latin1)",$file)){   # structure check
-      my @tree;
-      $db->begin_work();
-      $db->do("update $tabname set deleted=1");
-      while(my $l=<$fh>){
-          $n++;
-          my $label;
-          my $lastname;
-          my $rec=parseCsvLine($fh,$l);
-          if ($n==1 && $rec->[0] eq ""){
-             msg(ERROR,"structure error first level missing in $shortname");
-             return(0);
-          }
-          my $level=0;
-          for(my $col=0;$col<=$#{$rec} || $col<=$#tree ;$col++){
-             $level++ if ($level==0 && $rec->[$col] ne "" );
-             $level++ if ($level==1 && $rec->[$col] eq "" );
-             $level++ if ($level==2 && $rec->[$col] ne "" );
-             $level++ if ($level==3 && $rec->[$col] eq "" );
-             $tree[$col]=$rec->[$col] if ($level==1);
-             $tree[$col]=""           if ($level>=2);
-             $label=$rec->[$col]      if ($level==3);
-          }
-          for(my $col=$#tree;$col>=0;$col--){
-             if ($tree[$col] eq ""){
-                pop(@tree);
-             }
-             else{
-                $lastname=$tree[$col];
-                last;
-             }
-          }
-          @tree=grep(!/^\s*$/,@tree);    # compress path
-          my $id=uuid_to_string(create_uuid(UUID_V5, join(".",@tree)));
-          if ($label ne ""){
-             my %rec=(
-                objectid=>$id,
-                name=>$lastname,
-                fullname=>join(".",@tree),
-                description=>$label
-             );
-             $SapHierMap{$lastname}=$id;
-             {# handle import
-                my @fld=keys(%rec);
-                my $rv=$db->do("update $tabname ".
-                               "set ".join(",",map({"$_=?"} @fld)).
-                               ",dmodifydate=current_date,deleted=0 ".
-                               "where objectid=?",{},
-                               map({$rec{$_}} @fld),
-                               $rec{objectid});
-                if ($rv eq "0E0"){  # nothing effected
-                   $rv=$db->do("insert into $tabname ".
-                               "(".join(",",@fld).",dmodifydate,dcreatedate) ".
-                               "values(".join(",",map({"?"} @fld)).
-                               ",current_date,current_date) ",{},
-                               map({$rec{$_}} @fld));
-                }
-                if ($rv ne "1"){
-                   msg(ERROR,"fatal error while handling HPSA_system_import");
-                   return(0);
-                }
-             }
-          }
-      }
-      $db->commit();
-      close($fh);
-   }
-   return(0);
-}
-
-
+#sub loadHierFile
+#{
+#   my $self=shift;
+#   my $file=shift;
+#   my $shortname=shift;
+#
+#   my $tabname="OFI_saphier_import";
+#   msg(DEBUG,"process HierFile '$shortname'");
+#   my $db=$self->getNativOracleDBIConnectionHandle("w5warehouse");
+#   msg(DEBUG,"Oracle Database handle '$db'");
+#   my $n=0;
+#   if (open(my $fh,"<:encoding(Latin1)",$file)){   # structure check
+#      my @tree;
+#      $db->begin_work();
+#      $db->do("update $tabname set deleted=1");
+#      while(my $l=<$fh>){
+#          $n++;
+#          my $label;
+#          my $lastname;
+#          my $rec=parseCsvLine($fh,$l);
+#          if ($n==1 && $rec->[0] eq ""){
+#             msg(ERROR,"structure error first level missing in $shortname");
+#             return(0);
+#          }
+#          my $level=0;
+#          for(my $col=0;$col<=$#{$rec} || $col<=$#tree ;$col++){
+#             $level++ if ($level==0 && $rec->[$col] ne "" );
+#             $level++ if ($level==1 && $rec->[$col] eq "" );
+#             $level++ if ($level==2 && $rec->[$col] ne "" );
+#             $level++ if ($level==3 && $rec->[$col] eq "" );
+#             $tree[$col]=$rec->[$col] if ($level==1);
+#             $tree[$col]=""           if ($level>=2);
+#             $label=$rec->[$col]      if ($level==3);
+#          }
+#          for(my $col=$#tree;$col>=0;$col--){
+#             if ($tree[$col] eq ""){
+#                pop(@tree);
+#             }
+#             else{
+#                $lastname=$tree[$col];
+#                last;
+#             }
+#          }
+#          @tree=grep(!/^\s*$/,@tree);    # compress path
+#          my $id=uuid_to_string(create_uuid(UUID_V5, join(".",@tree)));
+#          if ($label ne ""){
+#             my %rec=(
+#                objectid=>$id,
+#                name=>$lastname,
+#                fullname=>join(".",@tree),
+#                description=>$label
+#             );
+#             $SapHierMap{$lastname}=$id;
+#             {# handle import
+#                my @fld=keys(%rec);
+#                my $rv=$db->do("update $tabname ".
+#                               "set ".join(",",map({"$_=?"} @fld)).
+#                               ",dmodifydate=current_date,deleted=0 ".
+#                               "where objectid=?",{},
+#                               map({$rec{$_}} @fld),
+#                               $rec{objectid});
+#                if ($rv eq "0E0"){  # nothing effected
+#                   $rv=$db->do("insert into $tabname ".
+#                               "(".join(",",@fld).",dmodifydate,dcreatedate) ".
+#                               "values(".join(",",map({"?"} @fld)).
+#                               ",current_date,current_date) ",{},
+#                               map({$rec{$_}} @fld));
+#                }
+#                if ($rv ne "1"){
+#                   msg(ERROR,"fatal error while handling HPSA_system_import");
+#                   return(0);
+#                }
+#             }
+#          }
+#      }
+#      $db->commit();
+#      close($fh);
+#   }
+#   return(0);
+#}
 
 
 
@@ -446,238 +509,6 @@ sub loadHierFile
 
 
 
-
-
-sub processFile
-{
-   my $self=shift;
-   my $file=shift;
-   my $reccnt=shift;
-
-   msg(DEBUG,"process '$file'");
-   my $db=$self->getNativOracleDBIConnectionHandle("w5warehouse");
-   msg(DEBUG,"Oracle Database handle '$db'");
-   my @structHead=();
-   my @structContent=qw(class version path uname scandate);
-
-   my $structError=0;
-   my $recno=0;
-
-
-   ####################################################################
-   sub recordUnpack
-   {
-      my $recbuf=shift;
-      my $recno=shift;
-      my %rec;
-
-      print STDERR Dumper($recbuf);
-      if ($#{$recbuf}<1){
-         return(undef);
-      }
-      $$recno++;
-      if ($$recno==1){    # 1= Header
-         my @l1=split(/;/,$recbuf->[0]);
-         shift(@l1); # @@@Next@@@ entfernen
-         @structHead=map({$_=~s/^<(.*)>$/$1/;$_} @l1);
-      }
-      else{
-         my @l1=split(/;/,$recbuf->[0]);
-         shift(@l1); # @@@Next@@@ entfernen
-         for(my $c=0;$c<=$#structHead;$c++){
-            $rec{$structHead[$c]}=$l1[$c];
-         }
-         my @content;
-         for(my $row=1;$row<=$#{$recbuf};$row++){
-            if ($recbuf->[$row] ne "NV"){
-               my @c=split(/;/,$recbuf->[$row]);
-               my %crec;
-               for(my $c=0;$c<=$#structContent;$c++){
-                  $crec{$structContent[$c]}=$c[$c]; 
-               }
-               push(@content,\%crec);
-            }
-         }
-         $rec{content}=\@content;
-      }
-      print STDERR "recno=$recno\n";
-      print STDERR Dumper(\%rec);
-      return(\%rec);
-   }
-
-   sub recordValidate
-   {
-      my $rec=shift;
-      my $recno=shift;
-      if ($$recno>=2){  # recno==1 = Header
-         if ($rec->{'SystemID'} eq "" || 
-             $rec->{'Server Identifier'} eq ""){
-            return(0);
-         }
-      }
-      $rec->{'Hostname'}=lc($rec->{'Hostname'});
-      foreach my $crec (@{$rec->{content}}){
-         $crec->{objectid}=$rec->{'Server Identifier'};
-      }
-      return(1);
-   }
-   sub recordProcess
-   {
-      my $rec=shift;
-      my $recno=shift;
-
-      {# handle HPSA_system_import
-         my @fldmap=(
-            'objectid'=>'Server Identifier',
-            'systemid'=>'SystemID',
-            'hostname'=>'Hostname',
-            'agentip'=>'PrimaryIP',
-            'managementip'=>'ManagamentIP',
-         );
-         my %fldmap=@fldmap;
-         my @fld=keys(%fldmap);
-
-         my $rv=$db->do("update HPSA_system_import ".
-                        "set ".join(",",map({"$_=?"} @fld)).
-                        ",dmodifydate=current_date,deleted=0 ".
-                        "where ".$fldmap[0]."=?",{},
-                        map({$rec->{$fldmap{$_}}} @fld),
-                        $rec->{$fldmap[1]});
-         if ($rv eq "0E0"){  # nothing effected
-            $rv=$db->do("insert into HPSA_system_import ".
-                        "(".join(",",@fld).",dmodifydate) ".
-                        "values(".join(",",map({"?"} @fld)).",current_date) ",
-                        {},
-                        map({$rec->{$fldmap{$_}}} @fld));
-         }
-         if ($rv ne "1"){
-            msg(ERROR,"fatal error while handling HPSA_system_import");
-            return(0);
-         }
-      }
-      {# handle W5I_HPSA_lnkswp_import
-         my @fldmap=(
-            'objectid'=>'objectid',
-            'class'=>'class',
-            'version'=>'version',
-            'path'=>'path',
-            'uname'=>'uname',
-            'scandate'=>'scandate',
-         );
-         my %fldmap=@fldmap;
-         my @fld=keys(%fldmap);
-
-         foreach my $crec (@{$rec->{content}}){
-            my $rv=$db->do("insert into HPSA_lnkswp_import ".
-                           "(".join(",",@fld).",dmodifydate) ".
-                           "values(".join(",",map({"?"} @fld)).
-                           ",current_date) ",
-                           {},
-                           map({$crec->{$fldmap{$_}}} @fld));
-            if ($rv ne "1"){
-               msg(ERROR,"fatal error while handling W5I_HPSA_lnkswp_import");
-               return(0);
-            }
-         }
-      }
-      return(1);
-   }
-   sub parseFile
-   {
-      my $filename=shift;
-      my $mode=shift;
-
-      if (open(my $fh,"<:encoding(Latin1)",$file)){   # structure check
-         my $n=0;
-         my $lastline;
-         my @recbuf;
-         while(my $l=<$fh>){
-            $n++;
-            $l=~s/\s*$//;
-            if ($n==1){
-               if (!($l=~m/^Export started at .*$/)){
-                  msg(ERROR,"Structure error in file $file - ".
-                            "start not correct");
-                  return(2);
-               }
-               else{
-                  next;
-               }
-            }
-            $lastline=$l;
-            if ($n>2 && $l=~m/^\@\@\@Next\@\@\@;/){
-               my $rec=recordUnpack(\@recbuf,\$recno);
-               if (!defined($rec)){
-                  msg(ERROR,"struture error in line $n");
-                  return(2);
-               }
-               if (!recordValidate($rec,\$recno)){
-                  msg(ERROR,"fatal value error in line $n");
-                  return(2);
-               }
-               if ($mode eq "final" && $recno>1){  # dont insert header
-                  if (!recordProcess($rec,\$recno)){
-                     msg(ERROR,"fatal process error in line $n");
-                     return(2);
-                  }
-               }
-               @recbuf=();
-            }
-            push(@recbuf,$l);
-            #printf("l%04d '%s'\n",$n,$l);
-         }
-         if (!($lastline=~m/^Export finished at .*$/)){
-            msg(ERROR,"Structure error in file $file - end not correct");
-            return(2);
-         }
-         else{
-            pop(@recbuf);
-            my $rec=recordUnpack(\@recbuf,\$recno);
-            if (!defined($rec)){
-               msg(ERROR,"struture error in line $n");
-               return(2);
-            }
-            if (!recordValidate($rec,\$recno)){
-               msg(ERROR,"fatal value error in line $n");
-               return(2);
-            }
-            if ($mode eq "final"){
-               if (!recordProcess($rec,\$recno)){
-                  msg(ERROR,"fatal process error in line $n");
-                  return(2);
-               }
-            }
-         }
-         close($fh);
-      }
-      return(1);
-   }
-
-   my $bk=parseFile($file,"preview");
-   return($bk) if ($bk!=1);
-
-   $recno=0;
-   if ($db->begin_work()){
-      $db->do("update HPSA_system_import set deleted=1");
-      $db->do("update HPSA_lnkswp_import set deleted=1");
-      my $bk=parseFile($file,"final");
-      $db->do("delete from HPSA_system_import ".
-              "where deleted=1");
-      $db->do("delete HPSA_lnkswp_import ".
-              "where deleted=1");
-      if ($db->commit()){
-         $$reccnt=$recno;
-         return($bk);
-      }
-      else{
-         die('commit for $file failed');
-      }
-   }
-   else{
-      die('begin_work for $file failed');
-   }
-   return(0); 
-}
 
 #
 # Connect to replication target oracle DB via DBI

@@ -1,0 +1,4 @@
+'tssapofi::psp'=>{de=>'PSP Element',en=>'PSP Element'},
+'Description'=>{de=>'Beschreibung'},
+'SAP hierarchy'=>{de=>'SAP Hierarchie'},
+'marked as deleted'=>{de=>'als gelöscht markiert'},
