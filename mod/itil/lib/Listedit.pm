@@ -587,7 +587,10 @@ sub calcSoftwareState
                      }
                   }
                }
-               $resdstate->{system}->{$lnkrec->{system}}={
+               my $systemname=$lnkrec->{system};
+               $systemname=~s/[^a-z0-9]/_/ig;
+               $resdstate->{system}->{$systemname}={
+                  systemname=>$lnkrec->{system},
                   state=>$dstate,
                };
             }
