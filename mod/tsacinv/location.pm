@@ -50,9 +50,9 @@ sub new
                 label         =>'No.'),
 
 
-      new kernel::Field::Interface(
+      new kernel::Field::Text(
                 name          =>'code',
-                label         =>'Code',
+                label         =>'BarCode',
                 dataobjattr   =>'amlocation.barcode'),
 
       new kernel::Field::Id(
