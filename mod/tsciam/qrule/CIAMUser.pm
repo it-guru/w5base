@@ -247,14 +247,18 @@ sub qcheckRecord
                          "exists in WIW)");
                   }
                   else{
-                     $dataobj->Log(ERROR,"basedata",
-                         "Posix Identifier '$rec->{posix}' for ".
-                         "'$rec->{fullname}' should be reset to undefined");
+                     my $u=getModuleObject($self->getParent->Config(),
+                                              "base::user");
+                     if ($u->ValidatedUpdateRecord($rec,{
+                           posix=>undef
+                        },{userid=>$rec->{userid}})){
+                        my $m="Posix Identifier '$rec->{posix}' for ".
+                              "'$rec->{fullname}' has been reset to undefined";
+                        push(@qmsg,$m);
+                        $dataobj->Log(ERROR,"basedata",$m);
+                     }
                   }
                }
-
-
-
             }
          }
          my $dsid="tCID:".$ciamrec->{tcid};
