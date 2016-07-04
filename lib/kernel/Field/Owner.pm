@@ -48,7 +48,9 @@ sub Validate
       return({}) if (!defined($userid));
       return({$name=>$userid});
    }
-   return({$name=>$newrec->{$name}});
+   my $userid=$newrec->{$name};
+   $userid=undef if ($userid eq "0");
+   return({$name=>$userid});
 }
 
 sub getDefaultValue
