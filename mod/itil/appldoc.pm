@@ -489,7 +489,7 @@ sub preProcessReadedRecord
       $o->BackendSessionName("preProcessReadedRecord"); # prevent sesssion reuse
                                                   # on sql cached_connect
       my ($id)=$o->ValidatedInsertRecord({parentid=>$rec->{srcparentid},
-                                          owner=>undef,
+                                          owner=>0,
                                           isactive=>1});
       $rec->{id}=$id;
       $rec->{isactive}="1";
