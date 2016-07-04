@@ -2032,6 +2032,10 @@ sub SecureSetFilter
       push(@flt,\@addflt);
       
    }
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+   }
    return($self->SetFilter(@flt));
 }
 
