@@ -90,11 +90,60 @@ sub qcheckRecord
    my $errorlevel=0;
 
    return(0,undef) if ($rec->{cistatusid}!=4);
-   if ($rec->{clusterid} ne ""){
-      my $par=getModuleObject($self->getParent->Config(),"tsacinv::itclust");
+
+   my ($parrec,$msg);
+   my $par=getModuleObject($self->getParent->Config(),"tsacinv::itclust");
+
+
+   #
+   # Level 0
+   #
+   if ($rec->{clusterid} ne ""){   # pruefen ob SYSTEMID von AssetManager
       $par->SetFilter({clusterid=>\$rec->{clusterid}});
-      my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
+      if (!defined($parrec)){
+         if ($rec->{clusterid} ne $rec->{id}){
+            # hier koennte u.U. noch eine Verbindung zu AM über
+            # den Namen aufgebaut werden
+         }
+      }
+   }
+
+   #
+   # Level 1
+   #
+   if (!defined($parrec)){      # pruefen ob wir bereits nach AM geschrieben
+      # try to find parrec by srcsys and srcid
+      $par->ResetFilter();
+      $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+      ($parrec)=$par->getOnlyFirst(qw(ALL));
+   }
+
+   #
+   # Level 2
+   #
+   if (defined($parrec)){
+      if ($rec->{clusterid} ne $parrec->{clusterid}){
+         $forcedupd->{clusterid}=$parrec->{clusterid};
+      }
+      if ($parrec->{srcsys} eq "W5Base"){
+         if ($rec->{srcsys} ne "w5base"){
+            $forcedupd->{srcsys}="w5base";
+         }
+      }
+      else{
+         if ($rec->{srcsys} ne "AssetManager"){
+            $forcedupd->{srcsys}="AssetManager";
+         }
+      }
+   }
+
+   #
+   # Level 3
+   #
+   return(0,undef) if ($rec->{clusterid} eq $rec->{id});
+   if ($rec->{clusterid} ne ""){
       if (!defined($parrec)){
          push(@qmsg,'given clusterid not found as active in AssetManager');
          push(@dataissue,'given clusterid not found as active in AssetManager');

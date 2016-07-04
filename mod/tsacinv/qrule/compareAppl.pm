@@ -88,24 +88,60 @@ sub qcheckRecord
                        $rec->{cistatusid}!=5); # ist notwendig, damit CIs
                                                # auch wieder aktiviert
                                                # werden.
-   if ($rec->{applid} ne ""){
-      my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
-      my $par=getModuleObject($self->getParent->Config(),"tsacinv::appl");
-      my $sys=getModuleObject($self->getParent->Config(),"itil::system");
-      $par->SetFilter({applid=>\$rec->{applid}});
-      my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
-      return(undef,undef) if (!$par->Ping());
 
+
+   my ($parrec,$msg);
+   my $par=getModuleObject($self->getParent->Config(),"tsacinv::appl");
+
+   #
+   # Level 0
+   #
+   if ($rec->{applid} ne ""){   # pruefen ob APPLID von AssetManager
+      $par->SetFilter({applid=>\$rec->{applid}});
+      ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){
-         # try to find parrec by srcsys and srcid
-         $par->ResetFilter();
-         $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
-         ($parrec)=$par->getOnlyFirst(qw(ALL));
-         if (defined($parrec) && $rec->{applid} ne $parrec->{applid}){
-            $forcedupd->{applid}=$parrec->{applid};
+         if ($rec->{applid} ne $rec->{id}){
+            # hier koennte u.U. noch eine Verbindung zu AM über
+            # den Namen aufgebaut werden
          }
       }
+   }
 
+   #
+   # Level 1
+   #
+   if (!defined($parrec)){      # pruefen ob wir bereits nach AM geschrieben
+      # try to find parrec by srcsys and srcid
+      $par->ResetFilter();
+      $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+      ($parrec)=$par->getOnlyFirst(qw(ALL));
+   }
+
+   #
+   # Level 2
+   #
+   if (defined($parrec)){
+      if ($rec->{applid} ne $parrec->{applid}){
+         $forcedupd->{applid}=$parrec->{applid};
+      }
+      if ($parrec->{srcsys} eq "W5Base"){
+         if ($rec->{srcsys} ne "w5base"){
+            $forcedupd->{srcsys}="w5base";
+         }
+      }
+      else{
+         if ($rec->{srcsys} ne "AssetManager"){
+            $forcedupd->{srcsys}="AssetManager";
+         }
+      }
+   }
+
+   #
+   # Level 3
+   #
+   return(0,undef) if ($rec->{applid} eq $rec->{id});
+   if ($rec->{applid} ne ""){
       if (!defined($parrec)){
          push(@qmsg,'given applicationid not found as active in AssetManager');
          push(@dataissue,
@@ -113,6 +149,8 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
       else{
+         my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
+         my $sys=getModuleObject($self->getParent->Config(),"itil::system");
          #
          # Filter for conumbers, which are allowed to use in darwin
          #

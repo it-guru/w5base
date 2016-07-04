@@ -38,8 +38,8 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'acassingmentgroup',
-                label         =>'AssetManager Assignmentgroup',
-                group         =>'admin',
+                label         =>'AM Assignmentgroup',
+                group         =>'amrel',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['acassignmentgroupid'=>'lgroupid'],
                 searchable    =>0,
@@ -59,7 +59,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'aciassignmentgroup',
                 label         =>'AM Incident-Assignmentgroup',
-                group         =>'admin',
+                group         =>'amrel',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['aciassignmentgroupid'=>'lgroupid'],
                 searchable    =>0,
@@ -73,7 +73,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'accontrolcenter',
                 label         =>'AM System ControlCenter',
-                group         =>'admin',
+                group         =>'amrel',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['accontrolcenter'=>'name'],
                 async         =>'1',
@@ -86,7 +86,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'accontrolcenter2',
                 label         =>'AM Application ControlCenter',
-                group         =>'admin',
+                group         =>'amrel',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['accontrolcenter2'=>'name'],
                 async         =>'1',
@@ -98,18 +98,19 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'acsystemname',
-                label         =>'AssetManager Systemname',
-                group         =>'logsys',
+                label         =>'AM Systemname',
+                group         =>'amrel',
                 async         =>'1',
                 searchable    =>0,
                 readonly      =>1,
                 vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'systemname'),
+
       new kernel::Field::Boolean(
                 name          =>'acsoxrelevant',
-                label         =>'AssetManager SOX relevant',
-                group         =>'logsys',
+                label         =>'AM SOX relevant',
+                group         =>'amrel',
                 searchable    =>0,
                 weblinkto     =>'NONE',
                 async         =>'1',
@@ -407,6 +408,23 @@ sub getHtmlPublicDetailFields
             applications);
    return(@l);
 }
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @l=$self->SUPER::isViewValid($rec);
+
+   if (defined($rec)){
+      if ($rec->{srcsys} eq "AssetManager"){
+         if (in_array(\@l,"default")){
+            push(@l,"amrel");
+         }
+      }
+   }
+   return(@l);
+}
+
 
 
 

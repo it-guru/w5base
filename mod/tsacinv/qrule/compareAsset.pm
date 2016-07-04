@@ -93,14 +93,60 @@ sub qcheckRecord
    my $errorlevel=0;
 
    return(0,undef) if ($rec->{cistatusid}!=4);
-   return(0,undef) if ($rec->{name}=~m/^ServiceID:/); 
-   return(0,undef) if ($rec->{name} eq $rec->{id}); 
-   if ($rec->{name} ne ""){
-      my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
+
+   my ($parrec,$msg);
+   my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
+
+   #
+   # Level 0
+   #
+   if ($rec->{name} ne ""){   # pruefen ob ASSETID von AssetManager
       $par->SetFilter({assetid=>\$rec->{name},
                        status=>'"!wasted"'});
-      my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
+      if (!defined($parrec)){
+         if ($rec->{name} ne $rec->{id}){
+            # hier koennte u.U. noch eine Verbindung zu AM über
+            # den Namen aufgebaut werden
+         }
+      }
+   }
+
+   #
+   # Level 1
+   #
+   if (!defined($parrec)){      # pruefen ob wir bereits nach AM geschrieben
+      # try to find parrec by srcsys and srcid
+      $par->ResetFilter();
+      $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+      ($parrec)=$par->getOnlyFirst(qw(ALL));
+   }
+
+   #
+   # Level 2
+   #
+   if (defined($parrec)){
+      if ($rec->{name} ne $parrec->{assetid}){
+         $forcedupd->{name}=$parrec->{assetid};
+      }
+      if ($parrec->{srcsys} eq "W5Base"){
+         if ($rec->{srcsys} ne "w5base"){
+            $forcedupd->{srcsys}="w5base";
+         }
+      }
+      else{
+         if ($rec->{srcsys} ne "AssetManager"){
+            $forcedupd->{srcsys}="AssetManager";
+         }
+      }
+   }
+
+   #
+   # Level 3
+   #
+   return(0,undef) if ($rec->{name} eq $rec->{id});
+   if ($rec->{name} ne ""){
       if (!defined($parrec)){
          push(@qmsg,'given assetid not found as active in AssetManager');
          push(@dataissue,'given assetid not found as active in AssetManager');
