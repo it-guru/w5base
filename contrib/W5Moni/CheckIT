@@ -268,7 +268,7 @@ if ($loginuser ne "" && $loginpass ne ""){
    else{
       LogPerformance("state",
          ['error'],
-         ["public api access error to '$base'"]
+         ["auth api access error to '$base'"]
       );
       exit(103);
    }
