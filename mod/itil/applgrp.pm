@@ -116,6 +116,14 @@ sub new
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
 
+      new kernel::Field::SubList(  
+                name       =>'applgrpinterfaces',
+                label      =>'Applicationgroup Interfaces',
+                group      =>'applgrpinterfaces',
+                subeditmsk =>'subedit.lnkapplgrpapplgrp',
+                vjointo    =>'itil::lnkapplgrpapplgrp',
+                vjoinon    =>['id'=>'fromapplgrpid'],
+                vjoindisp  =>['toapplgrp','relstatus']),
 
       new kernel::Field::Boolean(
                 name          =>'allowifupdate',
@@ -263,7 +271,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default applications contacts misc control
+   return(qw(header default applications applgrpinterfaces contacts misc control
              attachments source));
 }
 
@@ -425,7 +433,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default services contacts 
-                       applications
+                       applications applgrpinterfaces
                        misc attachments control);
    if (!defined($rec)){
       return(@databossedit);

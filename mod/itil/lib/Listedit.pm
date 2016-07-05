@@ -150,6 +150,22 @@ sub isWriteOnApplValid
    return(0);
 }
 
+sub isWriteOnApplGrpValid
+{
+   my $self=shift;
+   my $applgrpid=shift;
+   my $group=shift;
+
+   my $applgrp=$self->getPersistentModuleObject("itil::applgrp");
+   $applgrp->SetFilter({id=>\$applgrpid});
+   my ($arec,$msg)=$applgrp->getOnlyFirst(qw(ALL));
+   my @g=$applgrp->isWriteValid($arec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
 sub isWriteOnSwinstanceValid
 {
    my $self=shift;

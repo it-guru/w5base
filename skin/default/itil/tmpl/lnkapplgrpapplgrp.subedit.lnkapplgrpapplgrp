@@ -1,0 +1,13 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%toapplgrp(label)%:</td>
+         <td class=finput colspan=3>%toapplgrp(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname width=10%>%relstatus(label)%:</td>
+         <td class=finput colspan=3>%relstatus(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

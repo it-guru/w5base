@@ -1489,3 +1489,27 @@ alter table lnkapplappl add ifagreementneeded int(1) default '1',add ifagreement
 alter table software add iurl varchar(1024);
 alter table producer add iurl varchar(1024);
 alter table system add is_embedded bool default '0';
+create table lnkapplgrpapplgrp (
+  id         bigint(20) not null,
+   fromapplgrp       bigint(20) not null,
+   toapplgrp         bigint(20) not null,
+   planed_activation datetime DEFAULT NULL,
+   planed_retirement datetime DEFAULT NULL,
+   relstatus         int(2)   default '1',
+   contype           int(2)   default NULL,
+  additional longtext     default NULL,
+  comments   longtext     default NULL,
+  createdate datetime     NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime     NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20)   NOT NULL default '0',
+  modifyuser bigint(20)   NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20)  default NULL,
+  srcload    datetime     default NULL,
+  PRIMARY KEY  (id),
+  KEY fromapplgrp (fromapplgrp),
+  KEY toapplgrp (toapplgrp),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
