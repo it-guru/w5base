@@ -110,7 +110,7 @@ sub ProcessHead
          push(@sortnames,"Number");
       }
       else{
-         push(@sortnames,"String");
+         push(@sortnames,"CaseInsensitiveString");
       }
    }
    my $sortline=join(",",map({'"'.$_.'"'} @sortnames));
