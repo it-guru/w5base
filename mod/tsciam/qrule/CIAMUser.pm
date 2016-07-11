@@ -241,10 +241,14 @@ sub qcheckRecord
                   $o->SetFilter({uid=>\$chkid});
                   my ($wiwrec,$msg)=$o->getOnlyFirst(qw(uid));
                   if (defined($wiwrec)){
-                     $dataobj->Log(ERROR,"basedata",
-                         "WIWID '$rec->{posix}' for ".
-                         "'$rec->{fullname}' not found in CIAM (but ".
-                         "exists in WIW)");
+                     #
+                     # Ein Problem, das wir erstmal ignorieren
+                     #
+                     #
+                     #$dataobj->Log(ERROR,"basedata",
+                     #    "WIWID '$rec->{posix}' for ".
+                     #    "'$rec->{fullname}' not found in CIAM (but ".
+                     #    "exists in WIW)");
                   }
                   else{
                      my $u=getModuleObject($self->getParent->Config(),
