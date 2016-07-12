@@ -56,7 +56,8 @@ sub Init
 
    # old calls - abwärtskompatibilität
    $self->RegisterEvent("putac","SendXmlToAM_appl");
-   $self->RegisterEvent("putacasset","AssetModified",timeout=>40000);
+   $self->RegisterEvent("putacasset","SendXmlToAM_asset",timeout=>40000);
+   $self->RegisterEvent("putacsystem","SendXmlToAM_system",timeout=>40000);
    $self->RegisterEvent("putacappl","SendXmlToAM_appl",timeout=>40000);
 
 
@@ -150,6 +151,109 @@ sub getAcGroupByW5BaseGroup
    return(undef);
 }
 
+sub mkAcFtpRecSystem
+{
+   my $self=shift;
+   my $rec=shift;
+   my %param=@_;
+
+   my $CurrentEventId="Process System '$rec->{name}'";
+   my $inmassign=$rec->{acinmassingmentgroup};
+   my $cfmassign="TIT";
+   return(undef) if ($inmassign eq "");
+
+ 	
+   my $acrec={
+               LogSys=>{
+                    EventID=>$CurrentEventId,
+                    ExternalSystem=>'W5Base',
+                    ExternalID=>$rec->{id},
+                    Security_Unit=>"TS.DE",
+                    Status=>"in operation",
+                    Name=>$rec->{name},
+                    Usage=>"SERVER",
+                    bDelete=>'0',
+                    AssignmentGroup=>$cfmassign,
+                    IncidentAG=>$inmassign,
+                    Model_Code=>'MGER033048'
+               }
+             };
+
+   if ($rec->{mandator}=~m/^TelekomIT.*/){
+      $acrec->{LogSys}->{SC_Location_ID}="4787.0000.0000";
+   }
+   else{
+      return(undef);
+   }
+   print Dumper($acrec);
+   return($acrec);
+}
+
+sub SendXmlToAM_system
+{
+   my $self=shift;
+   my @systemname=@_;
+
+   my $system=getModuleObject($self->Config,"TS::system");
+   my $acsystem=getModuleObject($self->Config,"tsacinv::system");
+   my $acsystem=getModuleObject($self->Config,"tsacinv::system");
+
+   my %filter=(srcsys=>\'w5base',cistatusid=>[2,3,4,5]);
+   $self->{DebugMode}=0;
+   if ($#systemname!=-1){
+      if (grep(/^debug$/i,@systemname)){
+         @systemname=grep(!/^debug$/i,@systemname);
+         $self->{DebugMode}=1;
+         msg(ERROR,"processing DebugMode - loading '%s'",join(",",@systemname));
+      }
+      if ($#systemname!=-1){
+         $filter{name}=\@systemname;
+      }
+   }
+   my (%fh,%filename);
+
+   $self->{jobstart}=NowStamp();
+   ($fh{system},       $filename{system}               )=$self->InitTransfer();
+   $system->SetFilter(\%filter);
+   $system->SetCurrentView(qw(ALL));
+
+   my ($rec,$msg)=$system->getFirst(unbuffered=>1);
+
+   my $acnew=0;
+   my $acnewback=0;
+   if (defined($rec)){
+      do{
+         if (1){
+           # msg(INFO,"now searching externid W5Base/$rec->{id} in ac");
+           # $acsystem->SetFilter([{srcsys=>\'W5Base',srcid=>$rec->{id}},
+           #                      {systemid=>$rec->{name}}]); 
+           # my ($acrec,$msg)=$acsystem->getOnlyFirst(qw(systemid));
+           # if (defined($acrec)){
+           #    if (lc($acrec->{systemid}) ne lc($rec->{name})){
+           #       # transfer erfolgreich - Namensupdate in W5Base durchführen
+           #       # cistatus auf verfügbar stellen
+           #       $acnewback++;
+           #    }
+           # }
+           # else{
+               # system existiert noch nicht in AC und muß neu angelegt werden
+               my $acftprec=$self->mkAcFtpRecSystem($rec,initial=>1);
+               if (defined($acftprec)){
+                  my $fh=$fh{system};
+                  print $fh hash2xml($acftprec,{header=>0});
+                  $acnew++;
+               }
+           # }
+         }
+         
+         ($rec,$msg)=$system->getNext();
+      } until(!defined($rec));
+   }
+   msg(INFO,"count status: acnew=$acnew acnewback=$acnewback");
+   $self->TransferFile($fh{system},$filename{system},"logsys");
+}
+
+
 sub mkAcFtpRecAsset
 {
    my $self=shift;
@@ -157,17 +261,10 @@ sub mkAcFtpRecAsset
    my %param=@_;
 
    my $CurrentEventId="Process Asset '$rec->{name}'";
-   if ($rec->{conumber} eq ""){
-      msg(ERROR,$rec->{name}.
-                ": export request without conumber");
-      return(undef);
-   }
-   my $assignment=$self->getAcGroupByW5BaseGroup($rec->{guardianteam});
-   if (!defined($assignment)){
-      msg(ERROR,$rec->{name}.
-                ": no ac coresponding group '$rec->{guardianteam}'");
-      return(undef);
-   }
+
+   my $inmassign=$rec->{acinmassingmentgroup};
+   my $cfmassign="TIT";
+   return(undef) if ($inmassign eq "");
 
  	
    my $acrec={
@@ -177,7 +274,7 @@ sub mkAcFtpRecAsset
                     ExternalID=>$rec->{id},
                     Security_Unit=>"TS.DE",
                     Status=>"in work",
-                    Usage=>"Productive",
+                    Usage=>"HOUSING",
                     SerialNo=>$rec->{serialno},
                     lCPUNumber=>$rec->{cpucount},
                     Remarks=>$rec->{comments},
@@ -187,43 +284,32 @@ sub mkAcFtpRecAsset
                     Security_Unit=>"TS.DE",
                     bDelete=>'0',
                     Location=>'/DE-BAMBERG-GUTENBERGSTR-13/',
-                    Sender_CostCenter=>$rec->{conumber},
-                    AssignmentGroup=>$assignment,
-                    IncidentAG=>$assignment,
+                    AssignmentGroup=>$cfmassign,
+                    IncidentAG=>$inmassign,
+                    Model_Code=>'MGER033048'
                }
              };
-   if ($rec->{hwmodel} eq "PROLIANT DL580"){
-      $acrec->{Asset}->{Model_Code}="MGER033852";
-   }
-   else{
-      msg(ERROR,$rec->{name}.
-                ": export request model $rec->{hwmodel} not defined");
-      return(undef);
-   }
 
-   if ($rec->{mandator}=~m/AL DTAG/){
-      $acrec->{Asset}->{SC_Location_ID}="3826.0000.0000";# T-Com Bonn Land
-      $acrec->{Asset}->{CustomerLink}="TS.DE";           # ?
+   if ($rec->{mandator}=~m/^TelekomIT.*/){
+  #   $acrec->{Asset}->{SC_Location_ID}="4787.0000.0000";# T-Com Bonn Land
    }
    else{
-      msg(ERROR,$rec->{name}.
-                ": export request mandator $rec->{mandator} not defined");
       return(undef);
    }
+   print Dumper($acrec);
    return($acrec);
 }
 
-sub AssetModified
+sub SendXmlToAM_asset
 {
    my $self=shift;
    my @assetname=@_;
 
-   my $system=getModuleObject($self->Config,"itil::system");
-   my $asset=getModuleObject($self->Config,"itil::asset");
+   my $asset=getModuleObject($self->Config,"TS::asset");
    my $acsystem=getModuleObject($self->Config,"tsacinv::system");
    my $acasset=getModuleObject($self->Config,"tsacinv::asset");
 
-   my %filter=(cistatusid=>\'2',assetid=>\'',allowifupdate=>\'0');
+   my %filter=(srcsys=>\'w5base',cistatusid=>[2,3,4,5]);
    $self->{DebugMode}=0;
    if ($#assetname!=-1){
       if (grep(/^debug$/i,@assetname)){
@@ -231,14 +317,15 @@ sub AssetModified
          $self->{DebugMode}=1;
          msg(ERROR,"processing DebugMode - loading '%s'",join(",",@assetname));
       }
-      $filter{name}=\@assetname;
+      if ($#assetname!=-1){
+         $filter{name}=\@assetname;
+      }
    }
    my (%fh,%filename);
 
    $self->{jobstart}=NowStamp();
    ($fh{asset},       $filename{asset}               )=$self->InitTransfer();
-   ($fh{system},      $filename{system}              )=$self->InitTransfer();
-   $asset->SetFilter({cistatusid=>\'2'});
+   $asset->SetFilter(\%filter);
    $asset->SetCurrentView(qw(ALL));
 
    my ($rec,$msg)=$asset->getFirst(unbuffered=>1);
@@ -248,18 +335,18 @@ sub AssetModified
    if (defined($rec)){
       do{
          if (1){
-            msg(INFO,"now searching externid W5Base/$rec->{id} in ac");
-            $acasset->SetFilter([{srcsys=>\'W5Base',srcid=>$rec->{id}},
-                                 {assetid=>$rec->{name}}]); 
-            my ($acrec,$msg)=$acasset->getOnlyFirst(qw(assetid));
-            if (defined($acrec)){
-               if (lc($acrec->{assetid}) ne lc($rec->{name})){
-                  # transfer erfolgreich - Namensupdate in W5Base durchführen
-                  # cistatus auf verfügbar stellen
-                  $acnewback++;
-               }
-            }
-            else{
+           # msg(INFO,"now searching externid W5Base/$rec->{id} in ac");
+           # $acasset->SetFilter([{srcsys=>\'W5Base',srcid=>$rec->{id}},
+           #                      {assetid=>$rec->{name}}]); 
+           # my ($acrec,$msg)=$acasset->getOnlyFirst(qw(assetid));
+           # if (defined($acrec)){
+           #    if (lc($acrec->{assetid}) ne lc($rec->{name})){
+           #       # transfer erfolgreich - Namensupdate in W5Base durchführen
+           #       # cistatus auf verfügbar stellen
+           #       $acnewback++;
+           #    }
+           # }
+           # else{
                # asset existiert noch nicht in AC und muß neu angelegt werden
                my $acftprec=$self->mkAcFtpRecAsset($rec,initial=>1);
                if (defined($acftprec)){
@@ -267,7 +354,7 @@ sub AssetModified
                   print $fh hash2xml($acftprec,{header=>0});
                   $acnew++;
                }
-            }
+           # }
          }
          
          ($rec,$msg)=$asset->getNext();
@@ -275,7 +362,6 @@ sub AssetModified
    }
    msg(INFO,"count status: acnew=$acnew acnewback=$acnewback");
    $self->TransferFile($fh{asset},$filename{asset},"asset");
-   $self->TransferFile($fh{system},$filename{system},"logsys");
 }
 
 
@@ -1000,142 +1086,6 @@ sub sendFileToAssetManagerOnlineInterface
 }
 
 
-sub sendToAConlineIf
-{
-   my $self=shift;
-   my $filename=shift;
-   my $user=shift;
-   my $pass=shift;
-   my $iurl=shift;
-   my $elements=shift;
-
-   my $timeout=5+2.5*$elements;
-   if (open(F,"<$filename") && open(FO,">/tmp/last.AC.Online.put.xml")){
-      while(<F>){print FO ($_);}
-      close(FO);
-      close(F);
-   }
-   else{
-      msg(ERROR,"problems with opening '%s' or tempfile",$filename);
-   }
-   my $ua=new LWP::UserAgent();
-   my $CurrentTag;
-   my $ViewState;
-   my $EventValidation;
-   my $sendname=$filename;
-   $sendname=$filename.".xml" if (!($sendname=~m/\.xml$/i));
-   $sendname=~s/^.*\///;
-   $ua->cookie_jar(HTTP::Cookies->new(file => "$ENV{HOME}/.cookies.txt"));
-   my %SubmitForm=();
-   $ua->timeout(10);
-   msg(DEBUG,"requesting formular");
-   my $response=$ua->request(GET($iurl));
-   if ($response->code eq "200"){
-      msg(INFO,"Parsing original HTML Formular");
-      my $htmlp=new HTML::Parser();
-      $htmlp->handler(start=>sub {
-                            my ($self,$tag,$attr)=@_;
-                            if (lc($tag) eq "input"){
-                               $SubmitForm{$attr->{name}}=$attr->{value};
-                            }
-                         },'self, tagname, attr');
-      if (open(FO,">/tmp/last.AC.Online.form.html")){
-         print FO ($response->content);
-         close(FO);
-      }
-      eval('$htmlp->parse($response->content);');
-      if ($@ ne ""){
-         msg(ERROR,"html error '%s'",$@);
-         msg(ERROR,$response->content);
-         return(undef);
-      }
-   }
-   else{
-      msg(ERROR,"can't access web url '%s'",$iurl);
-      msg(ERROR,"%s",$response->as_string);
-      return(undef);
-   }
-   $SubmitForm{File1}=[$filename,$sendname,'Content-Type'=>'text/xml'];
-   $SubmitForm{txWSpwd}=$pass;
-   $SubmitForm{txwsLogin}=$user;
-   my $req=POST($iurl,Content_Type=>'form-data',Content=>[%SubmitForm]);
-   #
-   # Check the result (code must be 302)
-   #
-   $ua->timeout($timeout);
-   msg(DEBUG,"requesting operations with timeout=$timeout");
-   $response=$ua->request($req);
-   if ($response->code ne "302"){
-       msg(ERROR,"can't get expected web result. (%s) status_line='%s'",
-           $response->code,$response->status_line);
-       msg(DEBUG,"%s",$response->as_string);
-       return(undef);
-   }
-   #
-   # Load new Location
-   #
-   my $newiurl=$response->header("Location");
-   $iurl=~s/^(\S+:\/\/\S+?)\/.*$/$1$newiurl/;
-   msg(DEBUG,"Redirecting to : $iurl");
-   $ua->timeout(10);
-   $response=$ua->request(GET($iurl));
-   if (open(FO,">/tmp/last.AC.Online.result.xml")){
-      print FO ($response->content());
-      close(FO);
-   }
-   if ($response->code ne "200"){
-      msg(ERROR,"unexpected http repsonse code after redirct=%s",
-          $response->code);
-      msg(DEBUG,"%s",$response->as_string);
-      return(undef);
-   }
-   #
-   # Processing resulting XML file
-   #
-   my $xmlp=new XML::Parser();
-   my $CurrentEventID;
-   my $CurrentEventCode;
-   my $CurrentEventError;
-   my $CurrentEventKey;
-   $xmlp->setHandlers(Start=>sub {
-                         my ($p,$tag,%attr)=@_;
-                         $CurrentTag=$tag;
-                         $CurrentTag=undef if (lc($tag) eq lc("Response"));
-                      },
-                      End=>sub{
-                         my ($p,$tag,%attr)=@_;
-                         if (lc($tag) eq lc("Response")){
-                            if ($CurrentEventCode ne "0"){
-                               if (!($CurrentEventKey=~m/^\s*$/)){
-                                  $CurrentEventError.=" ($CurrentEventKey)";
-                               }
-                               msg(ERROR,"EventID: %s",$CurrentEventID);
-                               msg(ERROR,"%s",$CurrentEventError);
-                            }
-                         }
-                      },
-                      Char=>sub {
-                         my ($p,$s)=@_;
-                         if (lc($CurrentTag) eq lc("EventId")){
-                            $CurrentEventID=$s;
-                         }
-                         elsif (lc($CurrentTag) eq lc("Error_Code")){
-                            $CurrentEventCode=$s;
-                         }
-                         elsif (lc($CurrentTag) eq lc("Error_Desc")){
-                            $CurrentEventError=$s;
-                         }
-                         elsif (lc($CurrentTag) eq lc("Key")){
-                            $CurrentEventKey=$s;
-                         }
-                         else{
-                          #  msg(DEBUG,"($CurrentEventID) s=$s");
-                         }
-                      });
-   eval('$xmlp->parse($response->content);');
-   return(1) if ($@ eq "");
-   return(undef);
-}
 
 sub InitTransfer
 {
@@ -1180,7 +1130,7 @@ sub TransferFile
       msg(INFO,"Processing  file: '%s'",$filename);
       if (!$self->{DebugMode}){
          my $transferOK=0;
-         if ($self->Config->Param("W5BaseOperationMode") ne "dev"){
+         if ($self->Config->Param("W5BaseOperationMode") ne "devx"){
             if (!defined($ftp->Put($filename,$jobfile))){
                msg(ERROR,"File $filename to $jobfile could not be transfered:".
                          " $?, $!");

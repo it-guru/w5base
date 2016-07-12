@@ -1161,6 +1161,8 @@ sub Import
       # final: do the insert operation
       my $newrec={name=>$sysrec->{systemname},
                   systemid=>$sysrec->{systemid},
+                  srcid=>$sysrec->{systemid},
+                  srcsys=>'AssetManager',
                   allowifupdate=>1,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};

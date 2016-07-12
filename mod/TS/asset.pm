@@ -31,9 +31,9 @@ sub new
 
    $self->AddFields(
       new kernel::Field::TextDrop(
-                name          =>'acassingmentgroup',
+                name          =>'amrelacassingmentgroup',
                 label         =>'AssetManager Assignmentgroup',
-                group         =>'guardian',
+                group         =>'amrel',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['acassingmentgroup'=>'name'],
                 searchable    =>0,
@@ -42,9 +42,97 @@ sub new
                 vjointo       =>'tsacinv::asset',
                 vjoinon       =>['name'=>'assetid'],
                 vjoindisp     =>'assignmentgroup'),
+
+      new kernel::Field::Link(
+                name          =>'acinmassignmentgroupid',
+                group         =>'control',
+                label         =>'Incident Assignmentgroup ID',
+                dataobjattr   =>'asset.acinmassignmentgroupid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'acinmassingmentgroup',
+                label         =>'Incident Assignmentgroup',
+                vjoineditbase =>{isinmassign=>\'1'},
+                group         =>'inmchm',
+                AllowEmpty    =>1,
+                vjointo       =>'tsgrpmgmt::grp',
+                vjoinon       =>['acinmassignmentgroupid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'scapprgroupid',
+                group         =>'control',
+                label         =>'Change Approvergroup technical ID',
+                dataobjattr   =>'asset.scapprgroupid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'scapprgroup',
+                label         =>'Change Approvergroup',
+                vjoineditbase =>{ischmapprov=>\'1'},
+                group         =>'inmchm',
+                AllowEmpty    =>1,
+                vjointo       =>'tsgrpmgmt::grp',
+                vjoinon       =>['scapprgroupid'=>'id'],
+                vjoindisp     =>'fullname'),
+
    );
    return($self);
 }
+
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @l=$self->SUPER::isViewValid($rec);
+
+   if (defined($rec)){
+      if ($rec->{srcsys} eq "AssetManager"){
+         if (in_array(\@l,"default")){
+            push(@l,"amrel");
+         }
+      }
+      if ($rec->{srcsys} eq "w5base"){
+         if (in_array(\@l,"default")){
+            push(@l,"inmchm");
+         }
+      }
+   }
+   return(@l);
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @l=$self->SUPER::isWriteValid($rec);
+
+   if (defined($rec)){
+      if ($rec->{srcsys} eq "w5base"){
+         if (in_array(\@l,"default")){
+            push(@l,"inmchm");
+         }
+      }
+   }
+   return(@l);
+}
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my @l=$self->SUPER::getDetailBlockPriority(@_);
+   my $inserti=$#l;
+   for(my $c=0;$c<=$#l;$c++){
+      $inserti=$c+1 if ($l[$c] eq "default");
+   }
+   splice(@l,$inserti,$#l-$inserti,("inmchm",@l[$inserti..($#l+-1)]));
+   splice(@l,$inserti,$#l-$inserti,("amrel",@l[$inserti..($#l+-1)]));
+   return(@l);
+}
+
+
+
+
 
 
 

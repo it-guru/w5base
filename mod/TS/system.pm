@@ -31,13 +31,13 @@ sub new
 
    $self->AddFields(
       new kernel::Field::Link(
-                name          =>'acassignmentgroupid',
+                name          =>'acrelassignmentgroupid',
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'lassignmentid'),
 
       new kernel::Field::TextDrop(
-                name          =>'acassingmentgroup',
+                name          =>'acrelassingmentgroup',
                 label         =>'AM Assignmentgroup',
                 group         =>'amrel',
                 weblinkto     =>'tsacinv::group',
@@ -45,19 +45,19 @@ sub new
                 searchable    =>0,
                 readonly      =>1,
                 async         =>'1',
-                depend        =>['acassignmentgroupid'],
+                depend        =>['acrelassignmentgroupid'],
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'assignmentgroup'),
 
       new kernel::Field::Link(
-                name          =>'aciassignmentgroupid',
+                name          =>'acreliassignmentgroupid',
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'lincidentagid'),
 
       new kernel::Field::TextDrop(
-                name          =>'aciassignmentgroup',
+                name          =>'acreliassignmentgroup',
                 label         =>'AM Incident-Assignmentgroup',
                 group         =>'amrel',
                 weblinkto     =>'tsacinv::group',
@@ -65,10 +65,42 @@ sub new
                 searchable    =>0,
                 readonly      =>1,
                 async         =>'1',
-                depend        =>['aciassignmentgroupid'],
+                depend        =>['acreliassignmentgroupid'],
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'iassignmentgroup'),
+
+      new kernel::Field::Link(
+                name          =>'acinmassignmentgroupid',
+                group         =>'control',
+                label         =>'Incident Assignmentgroup ID',
+                dataobjattr   =>'system.acinmassignmentgroupid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'acinmassingmentgroup',
+                label         =>'Incident Assignmentgroup',
+                vjoineditbase =>{isinmassign=>\'1'},
+                group         =>'inmchm',
+                AllowEmpty    =>1,
+                vjointo       =>'tsgrpmgmt::grp',
+                vjoinon       =>['acinmassignmentgroupid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'scapprgroupid',
+                group         =>'control',
+                label         =>'Change Approvergroup technical ID',
+                dataobjattr   =>'system.scapprgroupid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'scapprgroup',
+                label         =>'Change Approvergroup',
+                vjoineditbase =>{ischmapprov=>\'1'},
+                group         =>'inmchm',
+                AllowEmpty    =>1,
+                vjointo       =>'tsgrpmgmt::grp',
+                vjoinon       =>['scapprgroupid'=>'id'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::TextDrop(
                 name          =>'accontrolcenter',
@@ -421,9 +453,46 @@ sub isViewValid
             push(@l,"amrel");
          }
       }
+      if ($rec->{srcsys} eq "w5base"){
+         if (in_array(\@l,"default")){
+            push(@l,"inmchm");
+         }
+      }
    }
    return(@l);
 }
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @l=$self->SUPER::isWriteValid($rec);
+
+   if (defined($rec)){
+      if ($rec->{srcsys} eq "w5base"){
+         if (in_array(\@l,"default")){
+            push(@l,"inmchm");
+         }
+      }
+   }
+   return(@l);
+}
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my @l=$self->SUPER::getDetailBlockPriority(@_);
+   my $inserti=$#l;
+   for(my $c=0;$c<=$#l;$c++){
+      $inserti=$c+1 if ($l[$c] eq "default");
+   }
+   splice(@l,$inserti,$#l-$inserti,("inmchm",@l[$inserti..($#l+-1)]));
+   splice(@l,$inserti,$#l-$inserti,("amrel",@l[$inserti..($#l+-1)]));
+   return(@l);
+}
+
+
+
 
 
 

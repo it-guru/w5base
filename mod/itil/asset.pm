@@ -629,7 +629,7 @@ sub new
                 value         =>['0','1'],
                 dataobjattr   =>'asset.no_sox_inherit'),
 
-         new kernel::Field::Boolean(
+      new kernel::Field::Boolean(
                 name          =>'allowifupdate',
                 group         =>'control',
                 label         =>'allow automatic updates by interfaces',

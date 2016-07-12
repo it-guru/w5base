@@ -92,7 +92,10 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(0,undef) if ($rec->{cistatusid}!=4);
+
+
+
+   #return(0,undef) if ($rec->{cistatusid}!=4);
 
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
@@ -139,216 +142,226 @@ sub qcheckRecord
          if ($rec->{srcsys} ne "AssetManager"){
             $forcedupd->{srcsys}="AssetManager";
          }
+         if ($rec->{srcid} ne $parrec->{assetid}){
+            $forcedupd->{srcid}=$parrec->{assetid};
+         }
+         $forcedupd->{srcload}=NowStamp("en");
       }
    }
 
    #
    # Level 3
    #
-   return(0,undef) if ($rec->{name} eq $rec->{id});
-   if ($rec->{name} ne ""){
-      if (!defined($parrec)){
-         push(@qmsg,'given assetid not found as active in AssetManager');
-         push(@dataissue,'given assetid not found as active in AssetManager');
-         $errorlevel=3 if ($errorlevel<3);
+   #return(0,undef) if ($rec->{name} eq $rec->{id});
+   if ($rec->{cistatusid}>5){
+      if ($rec->{srcid} ne ""){
+         $forcedupd->{srcid}=undef;
+         $forcedupd->{srcload}=undef;
       }
-      else{
-          # hack für die Spezialisten, die die AssetID in Kleinschrift
-          # erfasst haben.
-          if ($parrec->{assetid} ne $rec->{name}){
-             msg(INFO,"force rename of $rec->{name} to ".$parrec->{assetid});
-             $forcedupd->{name}=$parrec->{assetid};   
-          }
-          ################################################################
-          my $acroom=$parrec->{room};
-          my $acloc=$parrec->{tsacinv_locationfullname};
-          if ($acroom=~m/^\d{1,2}\.\d{3}$/){
-             if (my ($geb)=$acloc=~m#^/[^/]+/([A-Z]{1})/#){
-                $acroom=$geb.$acroom;
-             }
-          }
-
-          # fix serialno with whitespaces in AM
-          my $acserialno=$parrec->{serialno};
-          $acserialno=~s/^\s+|\s+$//g;
-
-          $self->IfComp($dataobj,
-                        $rec,"room",
-                        {room=>$acroom},"room",
-                        $autocorrect,$forcedupd,$wfrequest,
-                        \@qmsg,\@dataissue,\$errorlevel,
-                        mode=>'string');
-
-          $self->IfComp($dataobj,
-                        $rec,"serialno",
-                        {serialno=>$acserialno},"serialno",
-                        $autocorrect,$forcedupd,$wfrequest,
-                        \@qmsg,\@dataissue,\$errorlevel,mode=>'string');
-
-         $self->IfComp($dataobj,
-                       $rec,"memory",
-                       $parrec,"memory",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       \@qmsg,\@dataissue,\$errorlevel,
-                       tolerance=>5,mode=>'integer');
-
-         $self->IfComp($dataobj,
-                       $rec,"cpucount",
-                       $parrec,"cpucount",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       \@qmsg,\@dataissue,\$errorlevel,
-                       mode=>'integer');
-
-         if ($parrec->{acqumode} eq "1"){
-            $parrec->{acqumode}="RENTAL";
-         }
-         elsif ($parrec->{acqumode} eq "2"){
-            $parrec->{acqumode}="LEASE";
-         }
-         elsif ($parrec->{acqumode} eq "3"){
-            $parrec->{acqumode}="LOAN";
-         }
-         elsif ($parrec->{acqumode} eq "4"){
-            $parrec->{acqumode}="PROVISION";
-         }
-         elsif ($parrec->{acqumode} eq "6"){
-            $parrec->{acqumode}="FREE";
+   }
+   if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3){
+      if ($rec->{srcid} ne "" && $rec->{srcsys} eq "AssetManager"){
+         if (!defined($parrec)){
+            push(@qmsg,'given assetid not found as active in AssetManager');
+            push(@dataissue,
+                       'given assetid not found as active in AssetManager');
+            $errorlevel=3 if ($errorlevel<3);
          }
          else{
-            $parrec->{acqumode}="PURCHASE";
-         }
-         $self->IfComp($dataobj,
-                       $rec,"acqumode",
-                       $parrec,"acqumode",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       \@qmsg,\@dataissue,\$errorlevel,
-                       mode=>'string');
-         if ($autocorrect || $parrec->{acqumode} eq $rec->{acqumode}){
-            if ($parrec->{acqumode} ne "PURCHASE"){
-               $self->IfComp($dataobj,
-                             $rec,"startacqu",
-                             $parrec,"startacquisition",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'day');
-            }
-            else{
-               $self->IfComp($dataobj,
-                             $rec,"deprstart",
-                             $parrec,"deprstart",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'day');
+             # hack für die Spezialisten, die die AssetID in Kleinschrift
+             # erfasst haben.
+             if ($parrec->{assetid} ne $rec->{name}){
+                msg(INFO,"force rename of $rec->{name} to ".$parrec->{assetid});
+                $forcedupd->{name}=$parrec->{assetid};   
+             }
+             ################################################################
+             my $acroom=$parrec->{room};
+             my $acloc=$parrec->{tsacinv_locationfullname};
+             if ($acroom=~m/^\d{1,2}\.\d{3}$/){
+                if (my ($geb)=$acloc=~m#^/[^/]+/([A-Z]{1})/#){
+                   $acroom=$geb.$acroom;
+                }
+             }
 
-               $self->IfComp($dataobj,
-                             $rec,"deprend",
-                             $parrec,"deprend",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'day');
-            }
-         }
+             # fix serialno with whitespaces in AM
+             my $acserialno=$parrec->{serialno};
+             $acserialno=~s/^\s+|\s+$//g;
 
-         $self->IfComp($dataobj,
-                       $rec,"corecount",
-                       $parrec,"corecount",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       \@qmsg,\@dataissue,\$errorlevel,
-                       mode=>'integer');
+             $self->IfComp($dataobj,
+                           $rec,"room",
+                           {room=>$acroom},"room",
+                           $autocorrect,$forcedupd,$wfrequest,
+                           \@qmsg,\@dataissue,\$errorlevel,
+                           mode=>'string');
 
-         my $w5aclocation;
+             $self->IfComp($dataobj,
+                           $rec,"serialno",
+                           {serialno=>$acserialno},"serialno",
+                           $autocorrect,$forcedupd,$wfrequest,
+                           \@qmsg,\@dataissue,\$errorlevel,mode=>'string');
 
-#=$self->getW5ACLocationname($parrec->{locationid},
-#                          "QualityCheck of $rec->{name}");
-#         msg(INFO,"rec location=$rec->{location}");
-#         msg(INFO,"ac  location=$w5aclocation");
-         if ($parrec->{locationid} ne ""){
-            my $acloc=getModuleObject($self->getParent->Config(),
-                                      "tsacinv::location");
-            if (defined($acloc)){
-               $acloc->SetFilter({locationid=>\$parrec->{locationid}});
-               my ($aclocrec,$msg)=$acloc->getOnlyFirst(qw(w5loc_name));
-               if (defined($aclocrec)){
-                  my $r=$aclocrec->{w5loc_name};
-                  $r=[$r] if (ref($r) ne "ARRAY");
-                  $r=[sort(@$r)];
-                  if (defined($r->[0]) && $r->[0] ne ""){
-                     $w5aclocation=$r->[0];
-                  }
-               }
-            }
-            else{
-               msg(ERROR,"fail to create tsacinv::location object");
-            }
-         }
-
-
-         if (defined($w5aclocation)){ # only if a valid W5Base Location found
             $self->IfComp($dataobj,
-                          $rec,"location",
-                          {location=>$w5aclocation},"location",
+                          $rec,"memory",
+                          $parrec,"memory",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          \@qmsg,\@dataissue,\$errorlevel,
+                          tolerance=>5,mode=>'integer');
+
+            $self->IfComp($dataobj,
+                          $rec,"cpucount",
+                          $parrec,"cpucount",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          \@qmsg,\@dataissue,\$errorlevel,
+                          mode=>'integer');
+
+            if ($parrec->{acqumode} eq "1"){
+               $parrec->{acqumode}="RENTAL";
+            }
+            elsif ($parrec->{acqumode} eq "2"){
+               $parrec->{acqumode}="LEASE";
+            }
+            elsif ($parrec->{acqumode} eq "3"){
+               $parrec->{acqumode}="LOAN";
+            }
+            elsif ($parrec->{acqumode} eq "4"){
+               $parrec->{acqumode}="PROVISION";
+            }
+            elsif ($parrec->{acqumode} eq "6"){
+               $parrec->{acqumode}="FREE";
+            }
+            else{
+               $parrec->{acqumode}="PURCHASE";
+            }
+            $self->IfComp($dataobj,
+                          $rec,"acqumode",
+                          $parrec,"acqumode",
                           $autocorrect,$forcedupd,$wfrequest,
                           \@qmsg,\@dataissue,\$errorlevel,
                           mode=>'string');
-         }
-
-         #
-         # Filter for conumbers, which are allowed to use in darwin
-         #
-         if (defined($parrec->{conumber})){
-            if ($parrec->{conumber} eq ""){
-               $parrec->{conumber}=undef;
-            }
-            if (defined($parrec->{conumber})){
-               #
-               # hier muß der Check gegen die SAP P01 rein für die 
-               # Umrechnung auf PSP Elemente
-               #
-               if ($parrec->{conumber}=~m/^\S{10}$/){
-                  my $sappsp=getModuleObject($self->getParent->Config,
-                                             "tssapp01::psp");
-                  my $psp=$sappsp->CO2PSP_Translator($parrec->{conumber});
-                  $parrec->{conumber}=$psp if (defined($psp));
+            if ($autocorrect || $parrec->{acqumode} eq $rec->{acqumode}){
+               if ($parrec->{acqumode} ne "PURCHASE"){
+                  $self->IfComp($dataobj,
+                                $rec,"startacqu",
+                                $parrec,"startacquisition",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'day');
                }
+               else{
+                  $self->IfComp($dataobj,
+                                $rec,"deprstart",
+                                $parrec,"deprstart",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'day');
 
-               ###############################################################
-               my $co=getModuleObject($self->getParent->Config,
-                                      "finance::costcenter");
-               if (defined($co)){
-                  if (!($co->ValidateCONumber(
-                        $dataobj->SelfAsParentObject,"conumber", $parrec,
-                        {conumber=>$parrec->{conumber}}))){ # simulierter newrec
-                     $parrec->{conumber}=undef;
+                  $self->IfComp($dataobj,
+                                $rec,"deprend",
+                                $parrec,"deprend",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'day');
+               }
+            }
+
+            $self->IfComp($dataobj,
+                          $rec,"corecount",
+                          $parrec,"corecount",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          \@qmsg,\@dataissue,\$errorlevel,
+                          mode=>'integer');
+
+            my $w5aclocation;
+
+   #=$self->getW5ACLocationname($parrec->{locationid},
+   #                          "QualityCheck of $rec->{name}");
+   #         msg(INFO,"rec location=$rec->{location}");
+   #         msg(INFO,"ac  location=$w5aclocation");
+            if ($parrec->{locationid} ne ""){
+               my $acloc=getModuleObject($self->getParent->Config(),
+                                         "tsacinv::location");
+               if (defined($acloc)){
+                  $acloc->SetFilter({locationid=>\$parrec->{locationid}});
+                  my ($aclocrec,$msg)=$acloc->getOnlyFirst(qw(w5loc_name));
+                  if (defined($aclocrec)){
+                     my $r=$aclocrec->{w5loc_name};
+                     $r=[$r] if (ref($r) ne "ARRAY");
+                     $r=[sort(@$r)];
+                     if (defined($r->[0]) && $r->[0] ne ""){
+                        $w5aclocation=$r->[0];
+                     }
                   }
                }
                else{
-                  $parrec->{conumber}=undef;
+                  msg(ERROR,"fail to create tsacinv::location object");
                }
             }
+
+
+            if (defined($w5aclocation)){ # only if a valid W5Base Location found
+               $self->IfComp($dataobj,
+                             $rec,"location",
+                             {location=>$w5aclocation},"location",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'string');
+            }
+
+            #
+            # Filter for conumbers, which are allowed to use in darwin
+            #
+            if (defined($parrec->{conumber})){
+               if ($parrec->{conumber} eq ""){
+                  $parrec->{conumber}=undef;
+               }
+               if (defined($parrec->{conumber})){
+                  #
+                  # hier muß der Check gegen die SAP P01 rein für die 
+                  # Umrechnung auf PSP Elemente
+                  #
+                  if ($parrec->{conumber}=~m/^\S{10}$/){
+                     my $sappsp=getModuleObject($self->getParent->Config,
+                                                "tssapp01::psp");
+                     my $psp=$sappsp->CO2PSP_Translator($parrec->{conumber});
+                     $parrec->{conumber}=$psp if (defined($psp));
+                  }
+
+                  ###############################################################
+                  my $co=getModuleObject($self->getParent->Config,
+                                         "finance::costcenter");
+                  if (defined($co)){
+                     if (!($co->ValidateCONumber(
+                           $dataobj->SelfAsParentObject,"conumber", $parrec,
+                           {conumber=>$parrec->{conumber}}))){ # simulierter newrec
+                        $parrec->{conumber}=undef;
+                     }
+                  }
+                  else{
+                     $parrec->{conumber}=undef;
+                  }
+               }
+            }
+
+
+            $self->IfComp($dataobj,
+                          $rec,"conumber",
+                          $parrec,"conumber",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          \@qmsg,\@dataissue,\$errorlevel,
+                          mode=>'string');
+
+            return(undef,undef) if (!$par->Ping());
          }
-
-
-         $self->IfComp($dataobj,
-                       $rec,"conumber",
-                       $parrec,"conumber",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       \@qmsg,\@dataissue,\$errorlevel,
-                       mode=>'string');
-
-         return(undef,undef) if (!$par->Ping());
       }
-   }
-   else{
-      push(@qmsg,'no assetid specified');
-      push(@dataissue,'no assetid specified');
-      $errorlevel=3 if ($errorlevel<3);
    }
 
    if (keys(%$forcedupd)){
       #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
-         push(@qmsg,"all desired fields has been updated: ".
-                    join(", ",keys(%$forcedupd)));
+         my @fld=grep(!/^srcload$/,keys(%$forcedupd));
+         if ($#fld!=-1){
+            push(@qmsg,"all desired fields has been updated: ".join(", ",@fld));
+         }
       }
       else{
          push(@qmsg,$self->getParent->LastMsg());

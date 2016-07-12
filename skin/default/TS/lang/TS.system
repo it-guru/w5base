@@ -2,3 +2,4 @@
                en=>'T-Systems log. System'},
 
 'fieldgroup.amrel'=>{de=>'AssetManager Zuordnung',en=>'AssetManager Relation'},
+'fieldgroup.inmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
