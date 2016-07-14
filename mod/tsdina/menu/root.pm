@@ -42,6 +42,14 @@ sub Init
                       "tsdina::system",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.tsdina.system.swlist",
+                      "tsdina::swlist",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsdina.system.pslist",
+                      "tsdina::pslist",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.tsdina.swinstance",
                       "tsdina::swinstance",
                       defaultacl=>['valid_user']);

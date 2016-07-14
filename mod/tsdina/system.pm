@@ -181,32 +181,32 @@ sub new
                 name          =>'lpartype',
                 group         =>'lpar',
                 label         =>'LPAR Type',
-                dataobjattr   =>'dina_asset_info_vw.lpar_type'),
+                dataobjattr   =>'aixcfg.lpar_type'),
 
       new kernel::Field::Text(
                 name          =>'lparmode',
                 group         =>'lpar',
                 selectfix     =>1,
                 label         =>'LPAR Mode',
-                dataobjattr   =>'dina_asset_info_vw.lpar_mode'),
+                dataobjattr   =>'aixcfg.lpar_mode'),
 
      new kernel::Field::Text(
                 name          =>'ec',
                 group         =>'lpar',
                 label         =>'Entitled Capacity',
-                dataobjattr   =>'dina_asset_info_vw.entitled_capacity'),
+                dataobjattr   =>'aixcfg.entitled_capacity'),
 
       new kernel::Field::Text(
                 name          =>'sharedpoolid',
                 group         =>'lpar',
                 label         =>'Shared Pool ID',
-                dataobjattr   =>'dina_asset_info_vw.shared_pool_id'),
+                dataobjattr   =>'aixcfg.shared_pool_id'),
 
       new kernel::Field::Number(
                 name          =>'onlinevirtcpu',
                 group         =>'lpar',
                 label         =>'Online Virtual CPUs',
-                dataobjattr   =>'dina_asset_info_vw.online_virtual_cpus'),
+                dataobjattr   =>'aixcfg.online_virtual_cpus'),
 
       new kernel::Field::Text(
                 name          =>'actphyscpusinsystem',
@@ -218,7 +218,7 @@ sub new
                 name          =>'actcpusinspool',
                 group         =>'lpar',
                 label         =>'Active CPUs in Pool',
-                dataobjattr   =>'dina_asset_info_vw.active_cpus_in_pool'),
+                dataobjattr   =>'aixcfg.active_cpus_in_pool'),
 
       new kernel::Field::SubList(
                 name          =>'swinstances',
@@ -251,6 +251,9 @@ sub getSqlFrom
    my $from="d2dw_system_config_vw cfm ".
             "left outer join dina_darwin_map_vw w5map ".
             "on cfm.host_id = w5map.host_id ".
+            "left outer join d2dw_aix_config_vw aixcfg ".
+            "on (cfm.host_id=aixcfg.host_id and ".
+                "aixcfg.datetime = trunc(sysdate)) ".
             "left outer join dina_asset_info_vw ".
             "on cfm.host_id=dina_asset_info_vw.host_id";
    return($from);

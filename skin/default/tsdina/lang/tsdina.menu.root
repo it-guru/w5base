@@ -1,5 +1,7 @@
 'itu.tsdina'=>{de=>'Dina',en=>'Dina'},
 'itu.tsdina.system'=>{de=>'System',en=>'System'},
+'itu.tsdina.system.swlist'=>{de=>'Software',en=>'Software'},
+'itu.tsdina.system.pslist'=>{de=>'Prozess',en=>'Process'},
 'itu.tsdina.swinstance'=>{de=>'Software-Instanz',en=>'Software-Instance'},
 'itu.tsdina.swinstance.orafeature'=>{de=>'Oracle Feature',en=>'Oracle Feature'},
 'itu.tsdina.swinstance.oraoption'=>{de=>'Oracle Option',en=>'Oracle Option'},
