@@ -186,6 +186,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'lparmode',
                 group         =>'lpar',
+                selectfix     =>1,
                 label         =>'LPAR Mode',
                 dataobjattr   =>'dina_asset_info_vw.lpar_mode'),
 
