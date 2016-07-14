@@ -253,10 +253,11 @@ sub qcheckRecord
                   else{
                      my $u=getModuleObject($self->getParent->Config(),
                                               "base::user");
+                     my $orgposix=$rec->{posix};
                      if ($u->ValidatedUpdateRecord($rec,{
                            posix=>undef
                         },{userid=>$rec->{userid}})){
-                        my $m="Posix Identifier '$rec->{posix}' for ".
+                        my $m="Posix Identifier '$orgposix' for ".
                               "'$rec->{fullname}' has been reset to undefined";
                         push(@qmsg,$m);
                         $dataobj->Log(ERROR,"basedata",$m);
