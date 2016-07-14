@@ -120,8 +120,8 @@ from  (
    left outer join "tsacinv::system"
         on sysmapped.amsystemid="tsacinv::system".systemid
 
-   left outer join "W5I_ACT_costelement" w5_costelement
-        on "itil::system".conumber=w5_costelement.name
+   left outer join "mview_W5I_ACT_costelement" w5_costelement
+        on "itil::system".conumber=w5_costelement.sapname
    left outer join "W5I_ACT_costelement" am_costelement
         on "tsacinv::system".conumber=am_costelement.shortname;
 

@@ -183,6 +183,9 @@ grant update,insert on "W5I_TAD4Dsup__system_of" to W5I;
 create or replace synonym W5I.TAD4Dsup__system for "W5I_TAD4Dsup__system";
 create or replace synonym W5I.TAD4Dsup__system_of for "W5I_TAD4Dsup__system_of";
 
+grant select on "W5I_TAD4Dsup__system_of" to W5_BACKUP_D1;
+grant select on "W5I_TAD4Dsup__system_of" to W5_BACKUP_W1;
+
 
 =cut
 
@@ -534,6 +537,7 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_saphier"))){
      Query->Param("search_saphier"=>
+                  "\"K001YT5ATS_ES\" \"K001YT5ATS_ES.*\" ".
                   "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
    }
    if (!defined(Query->Param("search_denv"))){

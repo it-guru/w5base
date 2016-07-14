@@ -48,6 +48,13 @@ sub new
                 label         =>'hierarchy path',
                 dataobjattr   =>'ofi_saphier_import.fullname'),
 
+      new kernel::Field::Text(
+                name          =>'name',
+                nowrap        =>1,
+                uppersearch   =>1,
+                label         =>'shortname',
+                dataobjattr   =>'ofi_saphier_import.name'),
+
       new kernel::Field::SubList(
                 name          =>'psps',
                 label         =>'PSP Elements',
@@ -101,7 +108,7 @@ sub new
                 name          =>'srcload',
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'ofi_saphier_import.dmodifydate'),
+                dataobjattr   =>'ofi_saphier_import.dsrcload'),
 
    );
    $self->setDefaultView(qw(fullname cdate mdate));

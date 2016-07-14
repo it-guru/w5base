@@ -5,6 +5,7 @@ create table "W5I_OFI_saphier_import" (
  fullname             VARCHAR2(256),
  deleted              Number(*,0) default '0',
  dmodifydate          DATE,
+ dsrcload             DATE,
  dcreatedate          DATE,
  constraint "W5I_OFI_saphier_import_pk" primary key (objectid)
 );
@@ -25,6 +26,7 @@ create table "W5I_OFI_kost_import" (
  saphierid            VARCHAR2(40),
  deleted              Number(*,0) default '0',
  dmodifydate          DATE,
+ dsrcload             DATE,
  dcreatedate          DATE,
  constraint "W5I_OFI_kost_import_pk" primary key (objectid)
 );
@@ -48,6 +50,7 @@ create table "W5I_OFI_wbs_import" (
  saphierid            VARCHAR2(40),
  deleted              Number(*,0) default '0',
  dmodifydate          DATE,
+ dsrcload             DATE,
  dcreatedate          DATE,
  constraint "W5I_OFI_wbs_import_pk" primary key (objectid)
 );

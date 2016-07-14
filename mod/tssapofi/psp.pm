@@ -128,7 +128,7 @@ sub new
                 name          =>'srcload',
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'ofi_wbs_import.dmodifydate'),
+                dataobjattr   =>'ofi_wbs_import.dsrcload'),
 
    );
    $self->setDefaultView(qw(name description cdate mdate));

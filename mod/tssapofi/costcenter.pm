@@ -109,7 +109,7 @@ sub new
                 name          =>'srcload',
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'ofi_kost_import.dmodifydate'),
+                dataobjattr   =>'ofi_kost_import.dsrcload'),
 
    );
    $self->setDefaultView(qw(name description cdate mdate));

@@ -233,21 +233,37 @@ sub loadWbsFile
                       company_code=>$r{'company code'},
                       customer_link=>$r{'customer link'}
                    );
+                   foreach my $k (keys(%rec)){
+                      $rec{$k}=undef if ($rec{$k} eq "");
+                   }
                    {# handle import
                       my @fld=keys(%rec);
-                      my $rv=$db->do("update $tabname ".
+print STDERR Dumper(\%rec);
+
+                      my $lev0upd="update $tabname ".
+                                  "set dsrcload=current_date,deleted=0 ".
+                                  "where ".join(" and ",map({"$_=?"} @fld)); 
+                      printf STDERR ("lev0upd=%s\n",$lev0upd);
+                      printf STDERR ("param=%s\n",join(", ",map({$rec{$_}} @fld)));
+                      my $rv=$db->do($lev0upd,{},map({$rec{$_}} @fld));
+                      printf STDERR ("rv=$rv\n\n");
+                      if ($rv eq "0E0"){  # nothing effected
+                         $rv=$db->do("update $tabname ".
                                      "set ".join(",",map({"$_=?"} @fld)).
-                                     ",dmodifydate=current_date,deleted=0 ".
+                                     ",dmodifydate=current_date".
+                                     ",dsrcload=current_date,deleted=0 ".
                                      "where objectid=?",{},
                                      map({$rec{$_}} @fld),
                                      $rec{objectid});
-                      if ($rv eq "0E0"){  # nothing effected
-                         $rv=$db->do("insert into $tabname ".
-                                     "(".join(",",@fld).",".
-                                     "dmodifydate,dcreatedate) ".
-                                     "values(".join(",",map({"?"} @fld)).
-                                     ",current_date,current_date) ",{},
-                                     map({$rec{$_}} @fld));
+                         if ($rv eq "0E0"){  # nothing effected
+                            $rv=$db->do("insert into $tabname ".
+                                        "(".join(",",@fld).",".
+                                        "dsrcload,dcreatedate,dmodifydate) ".
+                                        "values(".join(",",map({"?"} @fld)).
+                                        ",current_date,current_date,".
+                                        "current_date) ",{},
+                                        map({$rec{$_}} @fld));
+                         }
                       }
                       if ($rv ne "1"){
                          msg(ERROR,"fatal error while handling import");
@@ -328,19 +344,27 @@ sub loadKostFile
                    );
                    {# handle import
                       my @fld=keys(%rec);
-                      my $rv=$db->do("update $tabname ".
-                                     "set ".join(",",map({"$_=?"} @fld)).
-                                     ",dmodifydate=current_date,deleted=0 ".
-                                     "where objectid=?",{},
-                                     map({$rec{$_}} @fld),
-                                     $rec{objectid});
+                      my $lev0upd="update $tabname ".
+                                  "set dsrcload=current_date,deleted=0 ".
+                                  "where ".join(" and ",map({"$_=?"} @fld));
+                      my $rv=$db->do($lev0upd,{},map({$rec{$_}} @fld));
                       if ($rv eq "0E0"){  # nothing effected
-                         $rv=$db->do("insert into $tabname ".
-                                     "(".join(",",@fld).",".
-                                     "dmodifydate,dcreatedate) ".
-                                     "values(".join(",",map({"?"} @fld)).
-                                     ",current_date,current_date) ",{},
-                                     map({$rec{$_}} @fld));
+                            $rv=$db->do("update $tabname ".
+                                        "set ".join(",",map({"$_=?"} @fld)).
+                                        ",dmodifydate=current_date,".
+                                        "dsrcload=current_date,deleted=0 ".
+                                        "where objectid=?",{},
+                                        map({$rec{$_}} @fld),
+                                        $rec{objectid});
+                         if ($rv eq "0E0"){  # nothing effected
+                            $rv=$db->do("insert into $tabname ".
+                                        "(".join(",",@fld).",".
+                                        "dsrcload,dcreatedate,dmodifydate) ".
+                                        "values(".join(",",map({"?"} @fld)).
+                                        ",current_date,current_date,".
+                                        "current_date) ",{},
+                                        map({$rec{$_}} @fld));
+                         }
                       }
                       if ($rv ne "1"){
                          msg(ERROR,"fatal error while handling import");
@@ -361,7 +385,7 @@ sub loadKostFile
                if (!exists($DirectSapHierMap{$checksaphier})){
                   my %r=(
                      saphierid=>uuid_to_string(create_uuid(UUID_V5,
-                                                           $r->{saphier})),
+                                                           $checksaphier)),
                      'Set Stufe LH'=>$hier[$#hier],
                      fullname=>$checksaphier,
                      saphier=>$checksaphier
@@ -388,19 +412,26 @@ sub loadKostFile
                $SapHierMap{$lastname}=$r{saphierid};
                {# handle import
                   my @fld=keys(%rec);
-                  my $rv=$db->do("update $tabname ".
+                  my $lev0upd="update $tabname ".
+                              "set dsrcload=current_date,deleted=0 ".
+                              "where ".join(" and ",map({"$_=?"} @fld)); 
+                  my $rv=$db->do($lev0upd,{},map({$rec{$_}} @fld));
+                  if ($rv eq "0E0"){  # nothing effected
+                     $rv=$db->do("update $tabname ".
                                  "set ".join(",",map({"$_=?"} @fld)).
-                                 ",dmodifydate=current_date,deleted=0 ".
+                                 ",dmodifydate=current_date,".
+                                 "dsrcload=current_date,deleted=0 ".
                                  "where objectid=?",{},
                                  map({$rec{$_}} @fld),
                                  $rec{objectid});
-                  if ($rv eq "0E0"){  # nothing effected
-                     $rv=$db->do("insert into $tabname ".
-                                 "(".join(",",@fld).",".
-                                 "dmodifydate,dcreatedate) ".
-                                 "values(".join(",",map({"?"} @fld)).
-                                 ",current_date,current_date) ",{},
-                                 map({$rec{$_}} @fld));
+                     if ($rv eq "0E0"){  # nothing effected
+                        $rv=$db->do("insert into $tabname ".
+                                    "(".join(",",@fld).",".
+                                    "dsrcload,dcreatedate,dmodifydate) ".
+                                    "values(".join(",",map({"?"} @fld)).
+                                    ",current_date,current_date,current_date) ",
+                                    {},map({$rec{$_}} @fld));
+                     }
                   }
                   if ($rv ne "1"){
                      msg(ERROR,"fatal error while handling import");
@@ -478,13 +509,13 @@ sub loadKostFile
 #                my @fld=keys(%rec);
 #                my $rv=$db->do("update $tabname ".
 #                               "set ".join(",",map({"$_=?"} @fld)).
-#                               ",dmodifydate=current_date,deleted=0 ".
+#                               ",dsrcload=current_date,deleted=0 ".
 #                               "where objectid=?",{},
 #                               map({$rec{$_}} @fld),
 #                               $rec{objectid});
 #                if ($rv eq "0E0"){  # nothing effected
 #                   $rv=$db->do("insert into $tabname ".
-#                               "(".join(",",@fld).",dmodifydate,dcreatedate) ".
+#                               "(".join(",",@fld).",dsrcload,dcreatedate) ".
 #                               "values(".join(",",map({"?"} @fld)).
 #                               ",current_date,current_date) ",{},
 #                               map({$rec{$_}} @fld));
