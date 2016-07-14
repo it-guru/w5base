@@ -153,13 +153,18 @@ sub qcheckRecord
    # Level 3
    #
    #return(0,undef) if ($rec->{name} eq $rec->{id});
-   if ($rec->{cistatusid}>5){
-      if ($rec->{srcid} ne ""){
-         $forcedupd->{srcid}=undef;
-         $forcedupd->{srcload}=undef;
-      }
-   }
-   if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3){
+   #
+   # Das zurücksetzen der srcid bei veraltet/gelöschten Elementen ist
+   # vielleicht doch keine so gute Idee
+   #
+   #if ($rec->{cistatusid}>5){
+   #   if ($rec->{srcid} ne ""){
+   #      $forcedupd->{srcid}=undef;
+   #      $forcedupd->{srcload}=undef;
+   #   }
+   #}
+   if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
+       $rec->{cistatusid}==5){
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "AssetManager"){
          if (!defined($parrec)){
             push(@qmsg,'given assetid not found as active in AssetManager');

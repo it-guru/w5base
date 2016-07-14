@@ -41,6 +41,8 @@ my %w52ac=(0 =>'OTHER',
            60=>'DEVELOPMENT',
            70=>'PRODUCTION');
 
+my %locmap;
+
 sub new
 {
    my $type=shift;
@@ -59,6 +61,8 @@ sub Init
    $self->RegisterEvent("putacasset","SendXmlToAM_asset",timeout=>40000);
    $self->RegisterEvent("putacsystem","SendXmlToAM_system",timeout=>40000);
    $self->RegisterEvent("putacappl","SendXmlToAM_appl",timeout=>40000);
+   $self->RegisterEvent("SendXmlToAM_system","SendXmlToAM_system",timeout=>40000);
+   $self->RegisterEvent("SendXmlToAM_asset","SendXmlToAM_asset",timeout=>40000);
 
 
    #######################################################################
@@ -154,6 +158,7 @@ sub getAcGroupByW5BaseGroup
 sub mkAcFtpRecSystem
 {
    my $self=shift;
+   my $arec=shift;
    my $rec=shift;
    my %param=@_;
 
@@ -161,6 +166,18 @@ sub mkAcFtpRecSystem
    my $inmassign=$rec->{acinmassingmentgroup};
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
+
+   my $s=getModuleObject($self->Config,"itil::system");
+   $s->SetFilter({asset=>\$rec->{asset},
+                  cistatusid=>[3,4,5]});
+   my @l=$s->getHashList(qw(id));
+
+   my $nsys=$#l+1;
+   if ($nsys<=0){
+      $nsys=1;
+   }
+   my $pSystemPartOfAsset=1/$nsys;
+   my $TXTpSystemPartOfAsset=sprintf("%0.2lf",$pSystemPartOfAsset);
 
  	
    my $acrec={
@@ -172,10 +189,14 @@ sub mkAcFtpRecSystem
                     Status=>"in operation",
                     Name=>$rec->{name},
                     Usage=>"SERVER",
+                    OlaClassSystem=>"FC-ONLY",
                     bDelete=>'0',
+                    lMemorySizeMb=>$rec->{memory},
+                    fCPUNumber=>$rec->{cpucount},
                     AssignmentGroup=>$cfmassign,
                     IncidentAG=>$inmassign,
-                    Model_Code=>'MGER033048'
+                    Model_Code=>'MGER033048',
+                    pSystemPartOfAsset=>$TXTpSystemPartOfAsset
                }
              };
 
@@ -185,7 +206,7 @@ sub mkAcFtpRecSystem
    else{
       return(undef);
    }
-   print Dumper($acrec);
+   $acrec->{LogSys}->{Parent_Assettag}=$arec->{assetid};
    return($acrec);
 }
 
@@ -195,7 +216,7 @@ sub SendXmlToAM_system
    my @systemname=@_;
 
    my $system=getModuleObject($self->Config,"TS::system");
-   my $acsystem=getModuleObject($self->Config,"tsacinv::system");
+   my $acasset=getModuleObject($self->Config,"tsacinv::asset");
    my $acsystem=getModuleObject($self->Config,"tsacinv::system");
 
    my %filter=(srcsys=>\'w5base',cistatusid=>[2,3,4,5]);
@@ -214,6 +235,7 @@ sub SendXmlToAM_system
 
    $self->{jobstart}=NowStamp();
    ($fh{system},       $filename{system}               )=$self->InitTransfer();
+
    $system->SetFilter(\%filter);
    $system->SetCurrentView(qw(ALL));
 
@@ -223,27 +245,18 @@ sub SendXmlToAM_system
    my $acnewback=0;
    if (defined($rec)){
       do{
-         if (1){
-           # msg(INFO,"now searching externid W5Base/$rec->{id} in ac");
-           # $acsystem->SetFilter([{srcsys=>\'W5Base',srcid=>$rec->{id}},
-           #                      {systemid=>$rec->{name}}]); 
-           # my ($acrec,$msg)=$acsystem->getOnlyFirst(qw(systemid));
-           # if (defined($acrec)){
-           #    if (lc($acrec->{systemid}) ne lc($rec->{name})){
-           #       # transfer erfolgreich - Namensupdate in W5Base durchführen
-           #       # cistatus auf verfügbar stellen
-           #       $acnewback++;
-           #    }
-           # }
-           # else{
-               # system existiert noch nicht in AC und muß neu angelegt werden
-               my $acftprec=$self->mkAcFtpRecSystem($rec,initial=>1);
+         if ($rec->{asset} ne ""){
+            $acasset->ResetFilter();
+            $acasset->SetFilter({assetid=>\$rec->{asset}});
+            my ($acassetrec,$msg)=$acasset->getOnlyFirst(qw(assetid));
+            if (defined($acassetrec)){
+               my $acftprec=$self->mkAcFtpRecSystem($acassetrec,$rec);
                if (defined($acftprec)){
                   my $fh=$fh{system};
                   print $fh hash2xml($acftprec,{header=>0});
                   $acnew++;
                }
-           # }
+            }
          }
          
          ($rec,$msg)=$system->getNext();
@@ -265,8 +278,59 @@ sub mkAcFtpRecAsset
    my $inmassign=$rec->{acinmassingmentgroup};
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
+   return(undef) if ($rec->{locationid} eq "");
 
- 	
+   if (!exists($locmap{$rec->{locationid}})){
+      msg(INFO,"try to find ac location for $rec->{locationid}");
+      $locmap{$rec->{locationid}}="0";
+      my $loc=getModuleObject($self->Config,"base::location");
+      $loc->SetFilter({id=>\$rec->{locationid}});
+      my ($w5locrec,$msg)=$loc->getOnlyFirst(qw(ALL));
+      if (defined($w5locrec)){
+         my $acloc=getModuleObject($self->Config,"tsacinv::location");
+
+         # 1st try
+         my %flt=(location=>$w5locrec->{location},
+                  locationtype=>\'Site',
+                  zipcode=>$w5locrec->{zipcode});
+         $acloc->ResetFilter();
+         $acloc->SetFilter(\%flt);
+         my @l=$acloc->getHashList(qw(fullname code w5locid));
+         foreach my $r (@l){
+            if (ref($r->{w5locid}) eq "ARRAY" &&
+                in_array($r->{w5locid},$rec->{locationid})){
+               $locmap{$rec->{locationid}}=$r->{fullname};
+            }
+         }
+
+
+
+         # 2nd try
+         if ($locmap{$rec->{locationid}} eq "0"){
+            my %flt=(location=>$w5locrec->{location},
+                     locationtype=>\'Site');
+            $acloc->ResetFilter();
+            $acloc->SetFilter(\%flt);
+            @l=$acloc->getHashList(qw(fullname code w5locid));
+         }
+         foreach my $r (@l){
+            if (ref($r->{w5locid}) eq "ARRAY" &&
+                in_array($r->{w5locid},$rec->{locationid})){
+               $locmap{$rec->{locationid}}=$r->{fullname};
+            }
+         }
+      }
+   }
+   return(undef) if ($locmap{$rec->{locationid}} eq "0");
+
+   my $place=$rec->{place};
+   if ($place ne "" && $rec->{room} ne ""){
+      $place=" / ".$place;
+   }
+   if ($rec->{room} ne ""){
+      $place=$rec->{room}.$place;
+   }
+	
    my $acrec={
                Asset=>{
                     EventID=>$CurrentEventId,
@@ -277,13 +341,15 @@ sub mkAcFtpRecAsset
                     Usage=>"HOUSING",
                     SerialNo=>$rec->{serialno},
                     lCPUNumber=>$rec->{cpucount},
+                    CPUspeedMhz=>$rec->{cpuspeed},
                     Remarks=>$rec->{comments},
                     BriefDescription=>$rec->{kwords},
-                    Place=>$rec->{place},
+                    Place=>$place,
+                    SlotNo=>$rec->{rack},
                     Description=>$rec->{comments},
                     Security_Unit=>"TS.DE",
                     bDelete=>'0',
-                    Location=>'/DE-BAMBERG-GUTENBERGSTR-13/',
+                    Location=>$locmap{$rec->{locationid}},
                     AssignmentGroup=>$cfmassign,
                     IncidentAG=>$inmassign,
                     Model_Code=>'MGER033048'
@@ -296,7 +362,6 @@ sub mkAcFtpRecAsset
    else{
       return(undef);
    }
-   print Dumper($acrec);
    return($acrec);
 }
 
