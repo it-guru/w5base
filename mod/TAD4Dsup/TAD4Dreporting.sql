@@ -6,34 +6,6 @@ create table "W5I_TAD4Dsup__stat" (
    constraint "W5I_TAD4Dsup__stat_pk" primary key (statdate)
 );
 
-alter table "W5I_TAD4Dsup__stat" add (total_cnt number(*));
-alter table "W5I_TAD4Dsup__stat" add (telit_cnt number(*));
-
-CREATE OR REPLACE PROCEDURE "W5I_TAD4Dsup__stat_proc" 
-   AUTHID CURRENT_USER IS 
-BEGIN 
-   delete from "W5I_TAD4Dsup__stat" where TO_CHAR(sysdate, 'YYYYMMDD')=statdate;
-   insert into "W5I_TAD4Dsup__stat" (statdate,modifydate,
-                                     total_cnt,
-                                     telit_cnt
-      )
-      with
-      totalsys as (
-        select *
-        from "W5I_TAD4Dsup__system"
-        where cenv<>'None'
-      ),
-      telitsys as (
-        select *
-        from "W5I_TAD4Dsup__system"
-        where saphier='9TS_ES.9DTIT' or saphier like '9TS_ES.9DTIT.%'
-      )
-      select TO_CHAR(sysdate, 'YYYYMMDD'),
-             sysdate,
-             (select count(*) from totalsys) total_cnt,
-             (select count(*) from telitsys) telit_cnt
-      from dual;
-END "W5I_TAD4Dsup__stat_proc";
 
 CREATE OR REPLACE PROCEDURE "W5I_TAD4Dsup__stat_proc" 
    AUTHID CURRENT_USER IS 
@@ -56,7 +28,10 @@ BEGIN
                    select *
                    from "W5I_TAD4Dsup__system"
                    where (saphier='9TS_ES.9DTIT' or 
-                          saphier like '9TS_ES.9DTIT.%')
+                          saphier like '9TS_ES.9DTIT.%' or
+                          saphier='K001YT5ATS_ES.K001YT5A_DTIT' or 
+                          saphier like 'K001YT5ATS_ES.K001YT5A_DTIT.%'
+                          )
                  )
                  select
                     'totalsys.count'                                      label,
