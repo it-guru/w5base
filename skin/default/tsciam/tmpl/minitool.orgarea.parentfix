@@ -43,7 +43,7 @@ function listGroups(res){
    d+="</table>";
    $('#op').html(d);
    $('#allcheck').click(function(){
-      if ($('#allcheck').attr('checked') ? 1:0){
+      if ($('#allcheck').is(':checked')){
          $('.selector').attr('checked',true);
       }
       else{
