@@ -537,8 +537,8 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_saphier"))){
      Query->Param("search_saphier"=>
-                  "\"K001YT5ATS_ES\" \"K001YT5ATS_ES.*\" ".
-                  "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
+           "\"K001YT5ATS_ES.K001YT5A_DTIT\" \"K001YT5ATS_ES.K001YT5A_DTIT.*\" ".
+           "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
    }
    if (!defined(Query->Param("search_denv"))){
      Query->Param("search_denv"=>
