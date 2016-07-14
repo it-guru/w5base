@@ -1,6 +1,6 @@
 package tsdina::system;
 #  W5Base Framework
-#  Copyright (C) 2014  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -41,112 +41,196 @@ sub new
                 name          =>'name',
                 label         =>'Systemname',
                 ignorecase    =>1,
-                dataobjattr   =>'servername'),
+                dataobjattr   =>'w5map.servername'),
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'SystemID',
-                dataobjattr   =>"systemid"),
+                group         =>'source',
+                label         =>'DinaHostID',
+                dataobjattr   =>"cfm.host_id"),
 
       new kernel::Field::Text(
                 name          =>'w5baseid',
                 label         =>'W5BaseID',
                 weblinkto     =>'itil::system',
                 weblinkon     =>['w5baseid'=>'id'],
-                dataobjattr   =>'w5baseid'),
+                dataobjattr   =>'w5map.w5baseid'),
 
       new kernel::Field::Text(
-                name          =>'hostid',
-                label         =>'HostID',
-                htmldetail    =>0,
-                dataobjattr   =>'host_id'),
+                name          =>'systemid',
+                label         =>'SystemID',
+                dataobjattr   =>'cfm.systemid'),
+
+      new kernel::Field::Text(
+                name          =>'assetid',
+                label         =>'AssetID',
+                dataobjattr   =>'cfm.assetid'),
+
+      new kernel::Field::Text(
+                name          =>'os_name',
+                group         =>'os',
+                label         =>'OS Name',
+                dataobjattr   =>'cfm.os'),
+
+      new kernel::Field::Text(
+                name          =>'os_type',
+                group         =>'os',
+                label         =>'OS Type',
+                dataobjattr   =>'cfm.os_type'),
+
+      new kernel::Field::Text(
+                name          =>'os_version',
+                group         =>'os',
+                label         =>'OS Version',
+                dataobjattr   =>'cfm.os_version'),
+
+      new kernel::Field::Text(
+                name          =>'os_revison',
+                group         =>'os',
+                label         =>'OS Revison',
+                dataobjattr   =>'cfm.os_revision'),
 
       new kernel::Field::Text(
                 name          =>'platform',
                 label         =>'Platform',
-                dataobjattr   =>'software_system'),
+                group         =>'lpar',
+                dataobjattr   =>'dina_asset_info_vw.software_system'),
 
       new kernel::Field::Text(
                 name          =>'t4dserverid',
-                label         =>'TAD4D ServerID',
-                dataobjattr   =>"CASE
-                                  WHEN HW_IMPLEMENTATION LIKE '(IBM)%'
-                                   AND VENDOR_SERIAL_NUMBER IS NOT NULL
-                                  THEN
-                                   'IBM'
-                                   || ' '
-                                   || SUBSTR (
-                                       SUBSTR (HW_IMPLEMENTATION,
-                                        INSTR (HW_IMPLEMENTATION,',')+1),1,
-                                        INSTR (
-                                         SUBSTR (HW_IMPLEMENTATION,
-                                          INSTR (HW_IMPLEMENTATION,',')+1),'-',
-                                          -1)
-                                        - 1)
-                                   || ' '
-                                   || VENDOR_SERIAL_NUMBER
-                                  ELSE NULL
-                                 END"),
+                label         =>'ServerID in TAD4D',
+                group         =>'lpar', 
+                dataobjattr   =>
+                  "CASE ".
+                   "WHEN dina_asset_info_vw.HW_IMPLEMENTATION LIKE '(IBM)%' ".
+                   " AND dina_asset_info_vw.VENDOR_SERIAL_NUMBER IS NOT NULL ".
+                   "THEN ".
+                   " 'IBM' ".
+                   " || ' ' ".
+                   " || SUBSTR ( ".
+                   "     SUBSTR (dina_asset_info_vw.HW_IMPLEMENTATION, ".
+                   "      INSTR (dina_asset_info_vw.HW_IMPLEMENTATION,',')+1),1, ".
+                   "      INSTR ( ".
+                   "       SUBSTR (dina_asset_info_vw.HW_IMPLEMENTATION, ".
+                   "        INSTR (dina_asset_info_vw.HW_IMPLEMENTATION,',')+1),'-', ".
+                   "        -1) ".
+                   "      - 1) ".
+                   " || ' ' ".
+                   " || dina_asset_info_vw.VENDOR_SERIAL_NUMBER ".
+                   "ELSE NULL ".
+                  "END"),
+
+      new kernel::Field::Text(
+                name          =>'hwmodel',
+                label         =>'Hardware Model',
+                group         =>'sysenv',
+                dataobjattr   =>'cfm.hw_model'),
 
       new kernel::Field::Text(
                 name          =>'dinaagent',
                 label         =>'DINA Agent',
-                dataobjattr   =>'dina_agent_version'),
+                group         =>'sysenv',
+                dataobjattr   =>'dina_asset_info_vw.dina_agent_version'),
+
+      new kernel::Field::Text(
+                name          =>'cpusockets',
+                label         =>'CPU Socket count ',
+                group         =>'sysenv',
+                dataobjattr   =>'cfm.cpu_sockets'),
+
+      new kernel::Field::Text(
+                name          =>'cpucorespersocket',
+                label         =>'CPU Cores per Socket',
+                group         =>'sysenv',
+                dataobjattr   =>'cfm.cpu_cores_per_socket'),
+
+      new kernel::Field::Text(
+                name          =>'corecount',
+                label         =>'Core Count',
+                group         =>'sysenv',
+                dataobjattr   =>'cfm.cpu_cores'),
+
+      new kernel::Field::Text(
+                name          =>'smtcount',
+                label         =>'SMT Count',
+                group         =>'sysenv',
+                dataobjattr   =>'cfm.threads'),
+
+      new kernel::Field::Text(
+                name          =>'memory_size',
+                label         =>'Memory Size',
+                unit          =>'MB',
+                group         =>'sysenv',
+                dataobjattr   =>'cfm.memory_size'),
+
+      new kernel::Field::Text(
+                name          =>'memory_size',
+                label         =>'Memory Size',
+                group         =>'sysenv',
+                dataobjattr   =>
+                   "CASE ".
+                   "WHEN cfm.memory_unit='GB' ".
+                   " THEN memory_size*1024 ".
+                   "WHEN cfm.memory_unit='MB' ".
+                   " THEN memory_size ".
+                   "ELSE ".
+                   " NULL ".
+                   "END"),
 
       new kernel::Field::Text(
                 name          =>'lpartype',
                 group         =>'lpar',
                 label         =>'LPAR Type',
-                dataobjattr   =>'lpar_type'),
+                dataobjattr   =>'dina_asset_info_vw.lpar_type'),
 
       new kernel::Field::Text(
                 name          =>'lparmode',
                 group         =>'lpar',
                 label         =>'LPAR Mode',
-                dataobjattr   =>'lpar_mode'),
+                dataobjattr   =>'dina_asset_info_vw.lpar_mode'),
 
      new kernel::Field::Text(
                 name          =>'ec',
                 group         =>'lpar',
                 label         =>'Entitled Capacity',
-                dataobjattr   =>'entitled_capacity'),
+                dataobjattr   =>'dina_asset_info_vw.entitled_capacity'),
 
       new kernel::Field::Text(
                 name          =>'sharedpoolid',
                 group         =>'lpar',
                 label         =>'Shared Pool ID',
-                dataobjattr   =>'shared_pool_id'),
+                dataobjattr   =>'dina_asset_info_vw.shared_pool_id'),
 
       new kernel::Field::Number(
                 name          =>'onlinevirtcpu',
                 group         =>'lpar',
                 label         =>'Online Virtual CPUs',
-                dataobjattr   =>'online_virtual_cpus'),
+                dataobjattr   =>'dina_asset_info_vw.online_virtual_cpus'),
 
       new kernel::Field::Text(
                 name          =>'actphyscpusinsystem',
                 group         =>'lpar',
                 label         =>'Active physical CPUs in System',
-                dataobjattr   =>'active_physical_cpus_in_system'),
+                dataobjattr   =>'dina_asset_info_vw.active_physical_cpus_in_system'),
 
       new kernel::Field::Text(
                 name          =>'actcpusinspool',
                 group         =>'lpar',
                 label         =>'Active CPUs in Pool',
-                dataobjattr   =>'active_cpus_in_pool'),
+                dataobjattr   =>'dina_asset_info_vw.active_cpus_in_pool'),
 
       new kernel::Field::SubList(
                 name          =>'swinstances',
                 label         =>'Software instances',
                 group         =>'swinstances',
                 vjointo       =>'tsdina::swinstance',
-                vjoinon       =>['id'=>'systemid'],
+                vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>[qw(dinainstancename)],
                 forwardSearch =>1,
       ),
 
    );
-   $self->setDefaultView(qw(name id platform));
+   $self->setDefaultView(qw(name systemid id platform));
    return($self);
 }
 
@@ -163,9 +247,21 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="dina_asset_info_vw";
+   my $from="d2dw_system_config_vw cfm ".
+            "left outer join dina_darwin_map_vw w5map ".
+            "on cfm.host_id = w5map.host_id ".
+            "left outer join dina_asset_info_vw ".
+            "on cfm.host_id=dina_asset_info_vw.host_id";
    return($from);
 }
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="current_date between cfm.valid_from and cfm.valid_to";
+   return($where);
+}
+
 
 
 sub getDetailBlockPriority
@@ -173,7 +269,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","lpar","swinstances");
+   return("header","default","os","sysenv","lpar","swinstances");
 }
 
 sub getRecordImageUrl
@@ -187,7 +283,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   my @view=qw(header default);
+   my @view=qw(header default sysenv os source);
    push (@view,'lpar') if (defined $rec->{lparmode});
    push (@view,'swinstances');
    return @view;

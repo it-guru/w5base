@@ -1,8 +1,9 @@
+-- drop materialized view "mview_W5I_ACT_costelement";
 create materialized view "mview_W5I_ACT_costelement"
    refresh complete start with sysdate
    next sysdate+(1/24)*3
    as
-select "ID","SAPNAME","NAME","SHORTNAME",
+select "ID","ACCAREA","SAPNAME","NAME","SHORTNAME",
        "BPMARK","SAPHIER","COTYPE","OFIENTITY" from (
    select cast("tssapp01::psp".id as VARCHAR2(40)) ID,
           "tssapp01::psp".name SAPNAME,
@@ -11,6 +12,7 @@ select "ID","SAPNAME","NAME","SHORTNAME",
           "tssapp01::psp".saphier SAPHIER,
           "tssapp01::psp".bpmark BPMARK,
           'psp' COTYPE,
+          "tssapp01::psp".accarea ACCAREA,
           "tssapp01::psp".rawofientity RAWOFIENTITY,
           "tssapp01::psp".ofientity OFIENTITY
          from (select max(id) id from (
@@ -21,15 +23,16 @@ select "ID","SAPNAME","NAME","SHORTNAME",
    
    union
 
-   select "W5I_OFI_wbs_import".objectid     ID,
-          "W5I_OFI_wbs_import".name         SAPNAME,
-          "W5I_OFI_wbs_import".name         NAME,
-          "W5I_OFI_wbs_import".name         SHORTNAME,
-          "W5I_OFI_saphier_import".fullname SAPHIER,
-          '-none-'                          BPMARK,
-          'psp'                             COTYPE,
-          "W5I_OFI_wbs_import".name         RAWOFIENTITY,
-          "W5I_OFI_wbs_import".name         OFIENTITY
+   select "W5I_OFI_wbs_import".objectid         ID,
+          "W5I_OFI_wbs_import".name             SAPNAME,
+          "W5I_OFI_wbs_import".name             NAME,
+          "W5I_OFI_wbs_import".name             SHORTNAME,
+          "W5I_OFI_saphier_import".fullname     SAPHIER,
+          '-none-'                              BPMARK,
+          'psp'                                 COTYPE,
+          "W5I_OFI_wbs_import".company_code     ACCAREA,
+          "W5I_OFI_wbs_import".name             RAWOFIENTITY,
+          "W5I_OFI_wbs_import".name             OFIENTITY
    from "W5I_OFI_wbs_import"
         left outer join "W5I_OFI_saphier_import"
           on "W5I_OFI_wbs_import".saphierid="W5I_OFI_saphier_import".objectid
@@ -44,27 +47,29 @@ select "ID","SAPNAME","NAME","SHORTNAME",
           saphier SAPHIER,
           '-none-' BPMARK,
           'costcenter' COTYPE,
+          accarea ACCAREA,
           NULL RAWOFIENTITY,
           NULL OFIENTITY
    from "tssapp01::costcenter"
    
    union
  
-   select "W5I_OFI_kost_import".objectid     ID,
-          "W5I_OFI_kost_import".name         SAPNAME,
-          "W5I_OFI_kost_import".name         NAME,
-          "W5I_OFI_kost_import".name         SHORTNAME,
-          "W5I_OFI_saphier_import".fullname SAPHIER,
-          '-none-'                          BPMARK,
-          'psp'                             COTYPE,
-          "W5I_OFI_kost_import".name        RAWOFIENTITY,
-          "W5I_OFI_kost_import".name        OFIENTITY
+   select "W5I_OFI_kost_import".objectid        ID,
+          "W5I_OFI_kost_import".name            SAPNAME,
+          "W5I_OFI_kost_import".name            NAME,
+          "W5I_OFI_kost_import".name            SHORTNAME,
+          "W5I_OFI_saphier_import".fullname     SAPHIER,
+          '-none-'                              BPMARK,
+          'costcenter'                          COTYPE,
+          "W5I_OFI_kost_import".company_code    ACCAREA,
+          "W5I_OFI_kost_import".name            RAWOFIENTITY,
+          "W5I_OFI_kost_import".name            OFIENTITY
    from "W5I_OFI_kost_import"
         left outer join "W5I_OFI_saphier_import"
           on "W5I_OFI_kost_import".saphierid="W5I_OFI_saphier_import".objectid
    where "W5I_OFI_kost_import".deleted='0'
   
-) costelement
+) costelement;
 
 CREATE INDEX "mview_W5I_ACT_costelement_name"
    ON "mview_W5I_ACT_costelement"(sapname) online;
@@ -72,14 +77,13 @@ CREATE INDEX "mview_W5I_ACT_costelement_name"
 
 
 create or replace view "W5I_ACT_costelement" as
-select 
+select
    "ID",
    "NAME",
    "SHORTNAME",
    "BPMARK",
    "SAPHIER",
    "COTYPE",
-   "OFIENTITY" 
-from "W5I_costelement_saphier";
-
+   "OFIENTITY"
+from "mview_W5I_ACT_costelement";
 
