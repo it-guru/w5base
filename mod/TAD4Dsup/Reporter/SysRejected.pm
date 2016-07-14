@@ -46,7 +46,9 @@ sub Process             # will be run as a spereate Process (PID)
    my $sys=getModuleObject($self->Config,"TAD4Dsup::system");
    $sys->SetFilter({
                     denv=>"rejected",
-                    saphier=>'"9TS_ES.9DTIT" "9TS_ES.9DTIT.*"'});
+                    saphier=>'"9TS_ES.9DTIT" "9TS_ES.9DTIT.*"'.
+                             '"K001YT5ATS_ES.K001YT5A_DTIT" '.
+                             '"K001YT5ATS_ES.K001YT5A_DTIT.*"'});
    foreach my $srec ($sys->getHashList(@{$self->{fieldlist}})){
       #next if ($srec->{systemname}=~m/^q4de3esy.*/);
       my $appl=$srec->{w5base_appl};
