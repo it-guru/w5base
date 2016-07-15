@@ -74,21 +74,11 @@ sub getJSObjectClass
       return([{name:'dataobjid',label:'W5BaseID'},
               {name:'dataobj'  ,label:'W5BaseObj'}]);
    };
+
    DataObject[o].Class.prototype.loadShortRecord=function(){
-         var dst=this;
-         dst.rec={
-            name:'????'
-         };  // define a default record
-         var w5obj=getModuleObject(W5App.Config(),this.dataobj);
-         w5obj.SetFilter({id:this.dataobjid});
-         W5App.setLoading(1,"loading "+this.dataobj+" "+this.dataobjid);
-         w5obj.findRecord("id,name",function(data){
-            if (data[0]){
-               dst.rec=data[0];
-            }
-            W5App.setLoading(-1);
-         });
+      this.loadRec("id,name");
    };
+
    DataObject[o].Class.prototype.shortname=function(){
       if (!this.rec){
          this.loadShortRecord();
@@ -99,6 +89,22 @@ sub getJSObjectClass
    DataObject[o].Class.prototype.fullname=function(){
       return(this.shortname());
    };
+
+   DataObject[o].Class.prototype.gatherDetailData=function(){
+      var l=DataObjectBaseClass.prototype.gatherDetailData.call(this);
+      l.push({
+         label:'AppMgr',
+         type:'text',
+         value:{
+            text:this.rec.applmgr
+         }
+      });
+      if (this.rec.mdate==undefined){
+         this.loadRec("id,name,applmgr,interfaces,systems,swinstances,mdate");
+      }
+      return(l);
+   };
+
 
    DataObject[o].Class.prototype.getAvatarImage=function(){
       var i = new Image();
@@ -152,7 +158,7 @@ sub getJSObjectClass
          var w5obj=getModuleObject(W5App.Config(),this.dataobj);
          var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
          w5obj.SetFilter({id:this.dataobjid});
-         W5App.setLoading(1,"addIf "+this.dataobj);
+         W5App.setLoading(1,"addSystems "+this.dataobj);
          w5obj.findRecord("systems",function(data){
             if (data[0]){
                for(var c=0;c<data[0].systems.length;c++){

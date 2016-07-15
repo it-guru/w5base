@@ -74,6 +74,26 @@ DataObjectBaseClass.prototype.onStartWith=function(){
    // Research Start with this object
 };
 
+DataObjectBaseClass.prototype.loadRec=function(view){
+   var dst=this;
+   if (dst.rec==undefined){
+      dst.rec={
+         name:'????',
+         fullname:'????'
+      };  
+   }
+   var w5obj=getModuleObject(W5App.Config(),this.dataobj);
+   w5obj.SetFilter({id:this.dataobjid});
+   W5App.setLoading(1,"loading "+this.dataobj+" "+this.dataobjid);
+   w5obj.findRecord(view,function(data){
+      if (data[0]){
+         dst.rec=data[0];
+      }
+      W5App.setLoading(-1);
+   });
+};
+
+
 DataObjectBaseClass.prototype.onSetObjectFocus=function(){
    var curthis=this;
    var disp=function(){
@@ -226,18 +246,27 @@ DataObjectBaseClass.prototype.onAction=function(name,resultSet){
       W5App.showMain();
    }
    if (name=='dataobj'){
-      resultSet.addObject({k:this.dataobj,
-                      rec:{
-                         dataobj:this.dataobj
-                      }
-                  });
+      // var dkey=W5App.toObjKey(this.dataobj,this.dataobjid);
+      resultSet.addObject({
+         k:this.dataobj,
+         rec:{
+            name:this.dataobj,
+            dataobj:this.dataobj,
+            dataobjid:this.dataobjid
+         }
+      }); 
+      return(1);
    }
    if (name=='dataobjid'){
-      resultSet.addObject({k:this.dataobjid,
-                      rec:{
-                         dataobjid:this.dataobjid
-                      }
-                  });
+      var dkey=W5App.toObjKey(this.dataobj,this.dataobjid);
+      resultSet.addObject({
+         k:dkey,
+         rec:{
+            name:this.dataobjid,
+            dataobj:this.dataobj,
+            dataobjid:this.dataobjid
+         }
+      }); 
    }
    return(0);
 };
