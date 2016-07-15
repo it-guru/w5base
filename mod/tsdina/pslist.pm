@@ -40,11 +40,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
+                searchable    =>0,
                 dataobjattr   =>'w5map.servername'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
+                uppersearch   =>1,
                 dataobjattr   =>'cfm.systemid'),
 
       new kernel::Field::Text(
