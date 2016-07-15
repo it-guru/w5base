@@ -335,7 +335,7 @@ sub Validate
 
          if (defined($oldrec) &&
              $oldrec->{state} ne ""){  # Datensatz wurde schonmal behandelt
-            printf STDERR ("INFO: Status change on autodiscrec($oldrec->{id})".
+            printf STDERR ("Status change on autodiscrec($oldrec->{id})".
                            "\n      from state='$oldrec->{state}' to ".
                            "state='$newrec->{state}'.\n");
             if ($oldrec->{state} eq "20" &&
