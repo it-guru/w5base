@@ -41,7 +41,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
-                ignorecase    =>1,
                 dataobjattr   =>'w5map.servername'),
 
       new kernel::Field::Text(
@@ -100,7 +99,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_scandate"))){
-     Query->Param("search_scandate"=>">now-1d");
+     Query->Param("search_scandate"=>">now-2d");
    }
 }
 

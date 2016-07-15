@@ -40,7 +40,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
-                ignorecase    =>1,
                 dataobjattr   =>'w5map.servername'),
 
       new kernel::Field::Text(
