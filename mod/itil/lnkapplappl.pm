@@ -873,7 +873,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @l=qw(header default ifagreement agreement comdetails impl
-             interfacescomp desc classi source); 
+             interfacescomp desc classi source history); 
    if (defined($rec) && exists($rec->{ifagreementneeded}) &&
        !$rec->{ifagreementneeded}){
       @l=grep(!/^agreement$/,@l);
@@ -893,6 +893,7 @@ sub isViewValid
          @l=grep(!/^impl$/,@l);
          @l=grep(!/^desc$/,@l);
          @l=grep(!/^comdetails$/,@l);
+         @l=grep(!/^history$/,@l);
       }
    }
 

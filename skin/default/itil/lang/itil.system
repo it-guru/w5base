@@ -16,6 +16,7 @@
 'fieldgroup.cluster'=>{de=>'Cluster',en=>'Cluster'},
 'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
 'fieldgroup.monisla'=>{de=>'Service Monitoring und SLA Überwachung',en=>'Service Monitoring and SLA'},
+'fieldgroup.softsetvalidation'=>{de=>'SoftwareSet Prüfung',en=>'softwareset validation'},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},
 'Memory'=>{de=>'Arbeitsspeicher'},
