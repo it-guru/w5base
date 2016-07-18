@@ -64,6 +64,11 @@ sub new
                 dataobjattr   =>'Status'),
 
       new kernel::Field::Text(
+                name          =>'applversid',
+                label         =>'Applicationversion ID',
+                dataobjattr   =>'APP_Nummer'),
+
+      new kernel::Field::Text(
                 name          =>'retirement_type',
                 label         =>'Retirement Type',
                 dataobjattr   =>'Retirement_Type'),
