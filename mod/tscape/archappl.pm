@@ -161,7 +161,26 @@ sub new
       new kernel::Field::Textarea(       
                 name          =>'description',
                 label         =>'description',
-                dataobjattr   =>'Beschreibung')
+                dataobjattr   =>'Beschreibung'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"Last_Update"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"right(replicate('0',35)+Internal_Key,35)"),
+
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                sqlorder      =>'none',    # in MSSQL zwingend!
+                label         =>'Modification-Date',
+                dataobjattr   =>'Last_Update'),
    );
    $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
@@ -196,7 +215,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","applvers","roles");
+   return("header","default","applvers","roles","appl","source");
 }
 
 
