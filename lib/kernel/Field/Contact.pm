@@ -76,8 +76,16 @@ sub contextMenu
                "'_blank',".
                "'height=$detaily,width=$detailx,toolbar=no,status=no,".
                "resizable=yes,scrollbars=no')";
-   my $rec=$self->getLastVjoinRec();
    my @ml=($self->getParent->T("Contact Detail")=>$onclick);
+   my $rec=$self->getLastVjoinRec();
+   if (!defined($rec)){
+      my $parent=$self->getParent()->Self();
+      if ($parent eq "base::user"){
+         if (ref($param{current}) eq "HASH"){
+            $rec=[$param{current}];
+         }
+      }
+   }
    if (defined($rec) && ref($rec) eq "ARRAY"){
       my $email=$rec->[0]->{email};
       if ($email ne ""){
