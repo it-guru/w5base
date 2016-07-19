@@ -603,12 +603,13 @@ sub calcSoftwareState
                      }
                   }
                }
-               my $systemname=$lnkrec->{system};
-               $systemname=~s/[^a-z0-9]/_/ig;
-               $resdstate->{system}->{$systemname}={
+               if (ref($resdstate->{system}->{record}) ne "ARRAY"){
+                  $resdstate->{system}->{record}=[];
+               }
+               push(@{$resdstate->{system}->{record}},{
                   systemname=>$lnkrec->{system},
                   state=>$dstate,
-               };
+               });
             }
          }
       }
