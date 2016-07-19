@@ -570,6 +570,51 @@ sub ValidateDelete
 
 
 
+sub HtmlPublicDetail   # for display record in QuickFinder or with no access
+{
+   my $self=shift;
+   my $rec=shift;
+   my $header=shift;   # create a header with fullname or name
+
+   my $htmlresult="";
+   if ($header){
+      $htmlresult.="<table style='margin:5px'>\n";
+      $htmlresult.="<tr><td colspan=2 align=center><h1>";
+      $htmlresult.=$self->findtemplvar({current=>$rec,mode=>"Html"},
+                                      "name","formated");
+      $htmlresult.="</h1></td></tr>";
+   }
+   else{
+      $htmlresult.="<table>\n";
+   }
+   my @l=qw( databoss );
+   foreach my $v (@l){
+      my $name=$self->getField($v)->Label();
+      my $data=$self->findtemplvar({current=>$rec,mode=>"Html"},
+                                   $v,"formated");
+      $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
+                   "<td valign=top>$data</td></tr>\n";
+   }
+
+   #if (my $pn=$self->getField("phonenumbers")){
+   #   $htmlresult.=$pn->FormatForHtmlPublicDetail($rec,["phoneRB"]);
+   #}
+   $htmlresult.="</table>\n";
+   #if ($rec->{description} ne ""){
+   #   my $desclabel=$self->getField("description")->Label();
+   #   my $desc=$rec->{description};
+   #   $desc=~s/\n/<br>\n/g;
+   #
+   #      $htmlresult.="<table><tr><td>".
+   #                   "<div style=\"height:60px;overflow:auto;color:gray\">".
+   #                   "\n<font color=black>$desclabel:</font><div>\n$desc".
+   #                   "</div></div>\n</td></tr></table>";
+   #   }
+   return($htmlresult);
+
+}
+
+
 
 
 
