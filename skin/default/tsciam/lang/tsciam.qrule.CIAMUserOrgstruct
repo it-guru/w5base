@@ -6,3 +6,4 @@
 'new org relation to'=>{de=>'Neue Organisationszuordnung zu'},
 'role update to'=>{de=>'Rollenaktualisierung innerhalb von'},
 'added roles'=>{de=>'hinzugefügte Rollen'},
+'double workrelation to the same org unit in CIAM'=>{de=>'doppeltes Arbeitsverhältnis zur gleichen Org-Einheit in CIAM'},

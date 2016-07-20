@@ -59,7 +59,8 @@ sub qcheckRecord
        !defined($user)   ||
        !defined($mainuser)   ||
        !defined($grp)){
-      msg(ERROR,"CIAMUserOrgstruct can't connect nesassary information objects");
+      msg(ERROR,"CIAMUserOrgstruct can't connect ".
+                "nesassary information objects");
       return($errorlevel,undef);
    }
 
@@ -146,8 +147,21 @@ sub qcheckRecord
             }
             return($errorlevel,undef);
          }
-
-
+         {  # doublicate Workrelation check
+            $ciamusr->ResetFilter();
+            $ciamusr->SetFilter({tcid=>\$ciamrec->{tcid},active=>\'true'});
+            my %o;
+            my @l=$ciamusr->getHashList(qw(toucid));
+            foreach my $r ($ciamusr->getHashList(qw(toucid))){
+               $o{$r->{toucid}}++;
+            }
+            foreach my $v (values(%o)){
+               if ($v>1){
+                  my $msg="double workrelation to the same org unit in CIAM";
+                  return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+               }
+            }
+         }
          my $ciamid=$ciamrec->{tcid};
          my $toucid=$ciamrec->{toucid};
          my $surname=$ciamrec->{surname};

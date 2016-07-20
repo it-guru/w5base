@@ -74,7 +74,7 @@ sub qcheckRecord
          my $llogon=$rec->{lastlogon};
          if ($llogon ne ""){
             my $d=CalcDateDuration($llogon,NowStamp("en"));
-            if (defined($d) && $d->{totalminutes}>80640){  # 8 weeks
+            if (defined($d) && $d->{totalminutes}>45360){  # 4,5 weeks
                $llogon=undef;
             }
          }
