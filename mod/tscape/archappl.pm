@@ -180,7 +180,7 @@ sub new
                 group         =>'source',
                 sqlorder      =>'none',    # in MSSQL zwingend!
                 label         =>'Modification-Date',
-                dataobjattr   =>'Last_Update'),
+                dataobjattr   =>"convert(DATETIME,Last_Update,20)"),
    );
    $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
