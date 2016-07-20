@@ -493,17 +493,10 @@ sub Import
    return(undef);
 }
 
-sub findNewValidShortname
+sub preFixShortname
 {
-   my $self=shift;
-   my $grpobj=shift;
-   my $pgrpid=shift;
-   my $ciamrec=shift;
+   my $newname=shift;
 
-   my $newname=$ciamrec->{shortname};
-   if ($newname eq ""){
-      $newname="tOuSD";
-   }
    $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
    $newname=~s/&/_u_/g;
    $newname =~ s/ä/ae/g;
@@ -517,6 +510,22 @@ sub findNewValidShortname
    if (length($newname)>15){
       $newname=substr($newname,0,15);
    }
+   return($newname);
+}
+
+
+sub findNewValidShortname
+{
+   my $self=shift;
+   my $grpobj=shift;
+   my $pgrpid=shift;
+   my $ciamrec=shift;
+
+   my $newname=$ciamrec->{shortname};
+   if ($newname eq ""){
+      $newname="tOuSD";
+   }
+   $newname=preFixShortname($newname);
    my $suffix="";
    my $grprec;
    my $loop=1;

@@ -115,7 +115,23 @@ sub qcheckRecord
       if ($rec->{ext_refid1} ne $ext_refid1){
          $forcedupd->{ext_refid1}=$ext_refid1;
       }
-      {
+      if (defined($ciamrec)){  # rename check
+         my $oldtousd;
+         my $curtousd;
+         if (exists($rec->{additional}->{tOuSD}) &&
+             ref($rec->{additional}->{tOuSD}) eq "ARRAY"){
+            $oldtousd=$rec->{additional}->{tOuSD}->[0];
+            $oldtousd=tsciam::orgarea::preFixShortname($oldtousd);
+         }
+         $curtousd=tsciam::orgarea::preFixShortname($ciamrec->{shortname});
+         if ($oldtousd ne "" && $oldtousd eq $rec->{name}){
+            if ($oldtousd ne $curtousd){
+               printf STDERR ("Group $rec->{fullname} needs to be ".
+                              "renamed (based on CIAM info)\n");
+            }
+         }
+      }
+      if (defined($ciamrec)){
          my @i;
          #######################################################
          push(@i,["CIAM tOuCID:",$ciamrec->{toucid}]);
@@ -144,6 +160,32 @@ sub qcheckRecord
             $forcedupd->{comments}=$c;
          }
       }
+      if (defined($ciamrec)){
+         my %newadditional=%{$rec->{additional}};
+         my $changed=0;
+         if (exists($newadditional{alternateGroupnameHR})){
+            $changed++;
+            delete($newadditional{alternateGroupnameHR});
+         }
+         if (!exists($newadditional{tOuSD}) ||
+              ref($newadditional{tOuSD}) ne "ARRAY" ||
+              $newadditional{tOuSD}->[0] ne $ciamrec->{shortname}){
+            $changed++;
+            $newadditional{tOuSD}=$ciamrec->{shortname};
+         }
+         if ($changed){
+            $forcedupd->{additional}=\%newadditional;
+         }
+      }
+
+
+      #printf STDERR ("store last known tOuSD\n");
+      #printf STDERR ("d=%s\n",Dumper($rec));
+     
+
+
+
+
    }
    elsif($rec->{fullname} eq "DTAG.TSI"){  # Migration von DTAG.TSI in CIAM
       $forcedupd->{srcsys}="CIAM";     
