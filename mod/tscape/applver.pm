@@ -122,7 +122,7 @@ sub new
                 group         =>'source',
                 sqlorder      =>'none',    # in MSSQL zwingend!
                 label         =>'Modification-Date',
-                dataobjattr   =>'convert(DATETIME,APP_Last_Update,20)'),
+                dataobjattr   =>'convert(VARCHAR,APP_Last_Update,20)'),
 
    );
    $self->{use_distinct}=0;
