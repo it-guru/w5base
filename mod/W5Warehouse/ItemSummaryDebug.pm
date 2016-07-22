@@ -18,7 +18,7 @@ sub new
                             mgmtitemgroup
                             dataissuecicount
                             dataissuefailcount
-                            asof));
+                            ));
    return($self);
 }
 
