@@ -85,7 +85,7 @@ sub AddAllFieldsFromWorktable
          }
          elsif ($fld->{fieldtype} eq "DATE"){
             push(@l,new kernel::Field::Date(
-                          name          =>"_".$name,
+                          name          =>"d_".$name,
                           searchable    =>0,
                           label         =>$label,
                           dataobjattr   =>"\"$fld->{fieldname}\""));
