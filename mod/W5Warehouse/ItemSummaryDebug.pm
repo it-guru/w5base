@@ -17,7 +17,8 @@ sub new
                             cistatus 
                             mgmtitemgroup
                             dataissuecicount
-                            dataissuefailcount));
+                            dataissuefailcount
+                            asof));
    return($self);
 }
 
