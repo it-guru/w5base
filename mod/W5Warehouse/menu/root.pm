@@ -70,6 +70,10 @@ sub Init
                       "W5Warehouse::UserGroupRelation",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itu.W5Warehouse.Rep.ItemSummaryDebug",
+                      "W5Warehouse::ItemSummaryDebug",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itu.W5Warehouse.krn",
                       "tmpl/welcome",
                       prio=>10000,
