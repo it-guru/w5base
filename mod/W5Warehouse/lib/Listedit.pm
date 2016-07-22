@@ -67,6 +67,15 @@ sub AddAllFieldsFromWorktable
                           label         =>$label,
                           dataobjattr   =>"\"$fld->{fieldname}\""));
          }
+         elsif ($fld->{fieldtype} eq "CLOB"){
+            push(@l,new kernel::Field::Text(
+                          name          =>$name,
+                          searchable    =>1,
+                          ignorecase    =>1,
+                          sqlorder      =>'none',
+                          label         =>$label,
+                          dataobjattr   =>"\"$fld->{fieldname}\""));
+         }
          elsif ($fld->{fieldtype} eq "NUMBER"){
             push(@l,new kernel::Field::Number(
                           name          =>$name,

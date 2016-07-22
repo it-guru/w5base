@@ -11,11 +11,13 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
    
-   $self->setWorktable("ItemSummaryDebug");
+   $self->setWorktable("ITEMSUMMARYDEBUG");
    $self->setDefaultView(qw(linenumber 
                             name 
                             cistatus 
-                            dataissuecicount));
+                            mgmtitemgroup
+                            dataissuecicount
+                            dataissuefailcount));
    return($self);
 }
 
