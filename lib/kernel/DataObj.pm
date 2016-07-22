@@ -1459,7 +1459,7 @@ sub HandleHistory
    if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
       msg(INFO,"DELTAWRITE (%s(%s): %-10s : old=%s new=%s as base::history(%s)",
                $dataobject,$id,$field,$oldval,$newval,$histreclogid);
-      if ($newval=~m/HASH\(/){
+      if ($newval=~m/^HASH\(/){
          Stacktrace();
       }
    }
