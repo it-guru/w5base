@@ -52,6 +52,15 @@ sub new
                 name          =>'name',
                 htmlwidth     =>'80px',
                 label         =>'Name',
+                readonly     =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(0) if (!defined($current));
+                   if ($self->getParent->IsMemberOf("admin")){
+                      return(0);
+                   }
+                   return(1);
+                },
                 dataobjattr   =>'asset.name'),
 
       new kernel::Field::Mandator(),

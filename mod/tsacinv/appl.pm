@@ -742,6 +742,8 @@ sub Import
                   applid=>$applrec->{applid},
                   allowifupdate=>$allowifupdate,
                   mandatorid=>$mandatorid,
+                  srcsys=>'AssetManager',
+                  srcid=>$applrec->{applid},
                   cistatusid=>4};
       if ($self->IsMemberOf("admin")){
          $newrec->{databossid}=$databossid;

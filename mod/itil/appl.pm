@@ -154,6 +154,13 @@ sub new
                 name          =>'applid',
                 htmlwidth     =>'100px',
                 htmleditwidth =>'150px',
+                readonly     =>sub{
+                   my $self=shift;
+                   if ($self->getParent->IsMemberOf("admin")){
+                      return(0);
+                   }
+                   return(1);
+                },
                 label         =>'Application ID',
                 dataobjattr   =>'appl.applid'),
 

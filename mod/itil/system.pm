@@ -91,6 +91,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
+                readonly     =>sub{
+                   my $self=shift;
+                   if ($self->getParent->IsMemberOf("admin")){
+                      return(0);
+                   }
+                   return(1);
+                },
                 dataobjattr   =>'system.systemid'),
 
       new kernel::Field::Databoss(),
