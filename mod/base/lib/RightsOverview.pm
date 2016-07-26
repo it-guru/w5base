@@ -79,6 +79,11 @@ sub RightsOverviewLoader
 
    print $self->HttpHeader();
 
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   }
+
    my $found;
    my $d="";
    my $topline="unknown check object!";
@@ -102,18 +107,54 @@ sub RightsOverviewLoader
          $obj->SetFilter(\%flt);
          my $targetlabel=$chk->{ctrlrec}->{targetlabel};
          $targetlabel="fullname" if ($targetlabel eq "");
-         foreach my $rec ($obj->getHashList($targetlabel)){
+         my $idfield=$obj->IdField();
+         my $idname=$idfield->Name();
+         foreach my $rec ($obj->getHashList($targetlabel,$idname)){
+            my $detailx=$obj->DetailX();
+            my $detaily=$obj->DetailY();
+
+            my $dest=$chk->{dataobj};
+            my $weblinkto=$dest;
+            my $targetval=$rec->{$chk->{ctrlrec}->{idfield}};
+            $dest=~s/::/\//g;
+            $dest="../../".$dest."/ById/".$rec->{$idname};
+
+            # Click
+            my $winsize="normal";
+            if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+               $winsize=$UserCache->{winsize};
+            }
+            my $winname="_blank";
+            if (defined($UserCache->{winhandling}) &&
+                $UserCache->{winhandling} eq "winonlyone"){
+               $winname="W5BaseDataWindow";
+            }
+            if (defined($UserCache->{winhandling})
+                && $UserCache->{winhandling} eq "winminimal"){
+               $winname="W5B_".$weblinkto."_".$targetval;
+               $winname=~s/[^a-z0-9]/_/gi;
+            }
+            my $onclick="custopenwin('$dest','$winsize',".
+                        "$detailx,$detaily,'$winname')";
+
+            my $pre="";
+            my $post="";
+            if ($chk->{ctrlrec}->{target} eq "databoss"){
+               $pre="<span onclick=\"$onclick\" class=\"sublink\">";
+               $post="</span>";
+            }
+
             if ($rec->{$targetlabel} ne ""){
-               $d.="<li>$rec->{$targetlabel}<br>";
+               $d.="<li>${pre}$rec->{$targetlabel}${post}<br>";
             }
             elsif ($rec->{fullname} ne ""){
-               $d.="<li>$rec->{fullname}<br>";
+               $d.="<li>${pre}$rec->{fullname}${post}<br>";
             }
             elsif ($rec->{name} ne ""){
-               $d.="<li>$rec->{name}<br>";
+               $d.="<li>${pre}$rec->{name}${post}<br>";
             }
             else{
-               $d.="<li>???<br>";
+               $d.="<li>${pre}???${post}<br>";
             }
             $found++;
          }
