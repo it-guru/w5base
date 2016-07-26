@@ -95,6 +95,7 @@ sub new
       new kernel::Field::Contact(
                 name          =>'applmgr',
                 label         =>'Application Manager',
+                searchable    =>0,
                 vjoinon       =>['applmgremail'=>'allemails']),
 
       new kernel::Field::Text(
