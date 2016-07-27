@@ -1,0 +1,3 @@
+'AL_TCom::qrule::ApplAttachSystemOverview'=>{de=>'Prüfung auf SystemOverview Anlage',en=>'Check for SystemOverview Attachment'},
+'there is no SystemOverview attachment found'=>{de=>'keine SystemOverview Anlage gefunden'},
+'requested SystemOverview name'=>{de=>'geforderter SystemOverview Name'},
