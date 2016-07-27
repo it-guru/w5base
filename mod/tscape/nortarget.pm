@@ -163,7 +163,7 @@ sub new
                       next if ($model eq "");
                       $m{$model}++;
                    }
-                   my @smodes=sort(keys(%m));
+                   my @smodes=sort({$b cmp $a} keys(%m));
                    my $mode=$smodes[0];
                    if (!defined($mode) && $sfound){
                       $mode="S";
