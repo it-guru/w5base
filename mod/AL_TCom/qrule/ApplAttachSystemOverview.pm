@@ -70,14 +70,12 @@ sub qcheckRecord
          $nameexpr=~s/-/_/; #Anscheinend soll der - als _ verwendet werden
          $nameexpr.="-".$rec->{name}."-SystemOverview-jjjjmmtt.pdf";
          my $found=0;
-         my $ne=$nameexpr;
-         $ne=~s/^/^/;
-         $ne=~s/$/\$/;
-         $ne=~s/-jjjjmmtt\./-\\d{8}./;
+         my ($ne)=$nameexpr=~m/(.*)jjjjmmtt/;
+
          if (exists($rec->{attachments}) &&
              ref($rec->{attachments}) eq "ARRAY"){
             foreach my $a (@{$rec->{attachments}}){
-               if ($a->{name}=~m/$ne/){
+               if ($a->{name}=~m/^\Q$ne\E\d{8}\.pdf$/){
                   $found++;
                }
             }
