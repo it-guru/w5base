@@ -97,6 +97,7 @@ sub new
                 name          =>'profile_change',
                 label         =>'Profile Change',
                 group         =>'profile',
+                sqlorder      =>'NONE',
                 dataobjattr   =>SELpref.'operatorm1.profile_change'),
 
       new kernel::Field::Text(
