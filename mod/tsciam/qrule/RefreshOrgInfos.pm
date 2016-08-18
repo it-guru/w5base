@@ -126,8 +126,19 @@ sub qcheckRecord
          $curtousd=tsciam::orgarea::preFixShortname($ciamrec->{shortname});
          if ($oldtousd ne "" && $oldtousd eq $rec->{name}){
             if ($oldtousd ne $curtousd){
-               printf STDERR ("Group $rec->{fullname} needs to be ".
-                              "renamed (based on CIAM info)\n");
+               my $basemsg="Rename of Org '$rec->{fullname}' needed - ".
+                           "based on CIAM new tOuSD '$curtousd'";
+               $dataobj->Log(ERROR,"basedata",$basemsg);
+               if ($dataobj->ValidatedUpdateRecord($rec,{name=>$curtousd},
+                                                   {grpid=>\$rec->{grpid}})){
+                  push(@qmsg,"all desired fields has been updated: name");
+               }
+               else{
+                  push(@qmsg,$basemsg);
+                  push(@qmsg,$self->getParent->LastMsg());
+                  $errorlevel=3 if ($errorlevel<3);
+                  return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+               }
             }
          }
       }
