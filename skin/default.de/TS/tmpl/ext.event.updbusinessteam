@@ -1,0 +1,15 @@
+Sehr geehrter Datenverantwortlicher,
+
+es wurde eine Änderung des Betriebsteams der Anwendung '%appl%' erkannt.
+
+<b>bisher:</b> %oldteam%
+<b>neu:</b> %newteam%
+
+Das Betriebsteam und evtl. vorhandene Kontaktverknüpfungen wurden automatisch aktualisiert.
+Alle mit der Anwendung verknüpften Configuration Items (Systeme, Assets, Cluster, Software-Instanzen) wurden ebenfalls aktualisiert.
+
+Folgende von Ihnen verantwortete Configuration-Items wurden aktualisiert:
+
+%items%
+Dieses Update ist eine einmalige Maßnahme im Rahmen von RefineIT um Ihnen manuelle Aufwände zu ersparen und entbindet Sie NICHT von Ihrer weiteren Datenverantwortung für die angegebenen Elemente!
+
