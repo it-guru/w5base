@@ -1085,7 +1085,8 @@ sub Import
    }
    $self->ResetFilter();
    $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(systemid systemname lassignmentid assetid));
+   my @l=$self->getHashList(qw(systemid systemname lassignmentid status
+                               assetid));
    if ($#l==-1){
       $self->LastMsg(ERROR,"SystemID not found in AssetManager");
       return(undef);
@@ -1094,8 +1095,17 @@ sub Import
       $self->LastMsg(ERROR,"SystemID not unique in AssetManager");
       return(undef);
    }
-
    my $sysrec=$l[0];
+
+   if ($sysrec->{status} eq "out of operation"){
+      $self->LastMsg(ERROR,"SystemID is out of operation");
+      return(undef);
+   }
+
+
+
+
+
    my $sys=getModuleObject($self->Config,"itil::system");
    $sys->SetFilter($flt);
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));

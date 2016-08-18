@@ -65,3 +65,4 @@
 'direct connected Shared-Network Components'=>{de=>'direkt verbundene Shared-Netzwerk Komponenten'},
 'ordered backup jobs'=>{de=>'beauftragte Datensicherungen'},
 'AutoDiscovery Entry'=>{de=>'AutoDiscovery Eintrag'},
+'SystemID is out of operation'=>{de=>'SystemID ist "out of operation"'},
