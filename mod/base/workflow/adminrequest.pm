@@ -105,6 +105,60 @@ sub getPosibleActions
 }
 
 
+sub getPosibleWorkflowDerivations
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my @l;
+
+   if ($WfRec->{stateid}<16 && $self->isCurrentForward($WfRec)){
+      push(@l,
+         {label=>$self->T('Initiate quotation request to developer'),
+          actor=>sub{
+             my $self=shift;
+             my $WfRec=shift;
+
+             return({
+                targeturl=>'New',
+                targetparam=>{
+                  Formated_name=>$WfRec->{name},
+                  Formated_quotationdetaildescription=>
+                                 $WfRec->{detaildescription},
+                  Formated_reqnature=>'RAppl.developer',
+                  Formated_affectedapplication=>"w5base",
+                  WorkflowClass=>'itil::workflow::quotation'
+                }
+             });
+          },
+          name=>'invoicerequest'
+         },
+         {label=>$self->T('Initiate request to businessteam'),
+          actor=>sub{
+             my $self=shift;
+             my $WfRec=shift;
+
+             return({
+                targeturl=>'New',
+                targetparam=>{
+                  Formated_name=>$WfRec->{name},
+                  Formated_detaildescription=>
+                                 $WfRec->{detaildescription},
+                  Formated_affectedapplication=>"w5base",
+                  WorkflowClass=>'itil::workflow::businesreq'
+                }
+             });
+          },
+          name=>'businesreq'
+         }
+         );
+   }
+
+   return(@l);
+}
+
+
+
 
 
 
