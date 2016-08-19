@@ -4,31 +4,55 @@ package AL_TCom::qrule::ApplAttachSystemOverview;
 
 =head3 PURPOSE
 
-Check if a prio1 application have an SystemOverview Attachment.
+Check if a prio1 application has a SystemOverview Attachment.
 
 =head3 IMPORTS
 
 NONE
 
 =head3 HINTS
-Every Pri1 application must have an attachment with the System-Plan. These
-plan must be name in convention ...
-  ICTO_xxxx-applikationsname-SystemOverview-jjjjmmtt.pdf
+This rule checks whether a system environment document with relevant 
+communication relations is present on a top application (priority 1).
 
-For further questions please contact Mr. Bell 
-https://darwin.telekom.de/darwin/auth/base/user/ById/13559244960000
+In case of a data issue, please check the name of the recorded document.
+
+Document name format should be: 
+ICTO-xxxx_Applikationsnamexxxx_SystemOverview_jjjjmmdd.pdf 
+
+If there is no System Overview document uploaded yet, 
+please upload one in the above mentioned format. 
+
+Background: 
+To speed up and to reduce the incident handling process in our complex 
+application landscape, a system environment document with all 
+communication relations is necessary.
+ 
+Requested by TelekomIT Service Management on 08/16 
+(https://darwin.telekom.de/darwin/auth/base/user/ById/13559244960000)
 
 
 [de:]
 
-Es wurde festgelegt, das jede Prio1 Anwendung einen Systemplan als
-PDF Anlage vorliegen haben muß.
-Dieser Systemplan muß unter der Namenskonvention ...
+Bei jeder TOP-Anwendung (Priorität 1) in W5Base/Darwin wird geprüft, 
+ob ein Dokument zur Systemumgebung mit den relevanten 
+Kommunikationsbeziehungen hinterlegt wurde.
 
-  ICTO_xxxx-applikationsname-SystemOverview-jjjjmmtt.pdf
+Falls Sie ein DataIssue haben bitten, wir Sie das Format zu überprüfen.
 
-... benannt sein. Bei Rückfragen wenden Sie sich bitte an Hr. Bell
-https://darwin.telekom.de/darwin/auth/base/user/ById/13559244960000
+Formatvorgabe:  ICTO-xxxx_Applikationsnamexxxx_SystemOverview_jjjjmmdd.pdf 
+
+Falls Sie bisher keine SystemOverview hinterlegt hatten, bitten wir Sie dies 
+im oben aufgezeigten Format nachzuholen.
+
+Hintergrund:
+Bei der Incident-Bearbeitung in unserer komplexen Anwendungslandschaft ist 
+eine dokumentierte Systemumgebung mit relevanten Kommunikationsbeziehungen 
+ein wichtiges Arbeitsmittel um die Ursachensuche zu beschleunigen und damit 
+mögliche Ausfallzeiten zu reduzieren. 
+
+Anforderungsrequest 08/16:
+Anforderung durch 'TelekomIT Service Management'
+(https://darwin.telekom.de/darwin/auth/base/user/ById/13559244960000)
 
 
 =cut
