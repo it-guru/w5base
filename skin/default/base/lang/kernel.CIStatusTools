@@ -1,9 +1,9 @@
 'you are not authorized to set this state, please wait for activation'=>{
     de=>'Sie sind nicht berechtigt, diesen Status zu setzen - bitte warten Sie auf die Aktivierung'},
-'you are not authorized to set this state, please set state to "requested"'=>{
-    de=>'Sie sind nicht berechtigt, diesen Status zu setzen - bitte setzen Sie den Status "angefordert"'},
+'you are not authorized to set this state, please set state to "on order"'=>{
+    de=>'Sie sind nicht berechtigt, diesen Status zu setzen - bitte setzen Sie den Status "bestellt/angefordert"'},
 "you are only authorized to add in 'order' or 'reserved' state"=>{
-    de=>"Sie sind nur berechtigt, Daten im Status 'angefordert' oder 'reserviert' hinzuzufügen"},
+    de=>"Sie sind nur berechtigt, Daten im Status 'bestellt/angefordert' oder 'reserviert' hinzuzufügen"},
 'you are not authorized to set this state'=>{
     de=>'Sie sind nicht berechtigt, diesen Status zu setzen'},
 'you are not authorized to create items with this state'=>{
@@ -50,7 +50,7 @@ Der o.g. Anforderer wird dann automatisch per E-Mail
 über die Aktiverung informiert.
 '},
 
-'MSG002'=>{en=>'You (%s) have reserved the "%s". For a full usability of this Config-Item, there is need to set it in state "installed/active". You can initiate the activation by settting the CI-State to "requested".
+'MSG002'=>{en=>'You (%s) have reserved the "%s". For a full usability of this Config-Item, there is need to set it in state "installed/active". You can initiate the activation by settting the CI-State to "on order".
 
  %s
 
@@ -59,13 +59,13 @@ be viewed by
 
   %s
 
-If you have set the CI-State to "requested" the admin will get a mail with your request. If the admin activates the Config-Item you will get an information by email.
-',de=>'Sie (%s) haben den Config-Eintrag "%s" reserviert. Um diesen Eintrag nutzen zu können, ist es notwendig den Status auf "installiert/aktiv" zu setzen. Sie können die Aktivierung dadurch in die Wege leiten, indem Sie den CI-Status auf "angefordert" ändern. 
+If you have set the CI-State to "on order" the admin will get a mail with your request. If the admin activates the Config-Item you will get an information by email.
+',de=>'Sie (%s) haben den Config-Eintrag "%s" reserviert. Um diesen Eintrag nutzen zu können, ist es notwendig den Status auf "installiert/aktiv" zu setzen. Sie können die Aktivierung dadurch in die Wege leiten, indem Sie den CI-Status auf "bestellt/angefordert" ändern. 
 
  %s
 
 Im Status "reserviert" ist es auch möglich, noch fehlende Informationen (z.B. Telefonnummern, Herstellerbezeichnungen ...) in dem jeweiligen Config-Item nachzutragen.
-Wenn Sie den CI-Status auf "angefordert" ändern, erhält der Admin eine E-Mail über diese Anforderung. Hat dann der Admin den Status auf "installiert/aktiv" geändert, so erhalten Sie eine entsprechende Bestätigung.
+Wenn Sie den CI-Status auf "bestellt/angefordert" ändern, erhält der Admin eine E-Mail über diese Anforderung. Hat dann der Admin den Status auf "installiert/aktiv" geändert, so erhalten Sie eine entsprechende Bestätigung.
 
 Die vollständige Liste der Config-Items vom Typ "%s" können Sie über folgenden Link ...
 
