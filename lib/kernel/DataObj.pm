@@ -1145,11 +1145,17 @@ sub isDirectFilter
                  return(1);
               }
            }
-           if (ref($flt[0]->{$idfieldname}) eq "SCALAR"){
+           elsif (ref($flt[0]->{$idfieldname}) eq "SCALAR"){
               if (${$flt[0]->{$idfieldname}}=~m/[\*\?]/){
                  return(0);
               }
               return(1);
+           }
+           else{
+              if (!ref($flt[0]->{$idfieldname}) &&
+                  ($flt[0]->{$idfieldname}=~m/^[0-9a-z_\-.]+$/i)){
+                 return(1);
+              }
            }
         }
      }

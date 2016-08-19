@@ -86,6 +86,46 @@ sub getPosibleTargets
    return([".*"]);
 }
 
+sub setReferencesToNull
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $reason=shift;
+   my $chkrec=shift;
+   my $rec=shift;
+
+   my $idfield=$dataobj->IdField();
+   if (defined($idfield)){
+      my $idname=$idfield->Name();
+      foreach my $ref (@{$chkrec->{r}}){
+         printf STDERR ("setReferencesToNull CleanupRec:%s\n",Dumper($ref));
+         if ($ref->{type} ne "ContactLnk"){
+            if ($ref->{type} ne "Databoss"){
+               printf STDERR ("setReferencesToNull on %s (%s) with ".
+                              "reason '$reason' in Field ".
+                              "'%s' (old=%s)\n",$dataobj->Self(),
+                              $rec->{$idname},$ref->{rawfield},
+                              $rec->{$ref->{rawfield}});
+               $dataobj->UpdateRecord({$ref->{rawfield}=>undef},
+                                      {$idname=>\$rec->{$idname}});
+            }
+         }
+         else{
+            printf STDERR ("setReferencesToNull on %s (%s) with ".
+                           "reason '$reason' in Field ".
+                           "'%s' recid=%s\n",$dataobj->Self(),
+                           $rec->{$idname},"lnkcontact",
+                           $ref->{rawrecid});
+            my $o=getModuleObject($dataobj->Config(),"base::lnkcontact");
+            $o->DeleteRecord({id=>\$ref->{rawrecid}});
+         }
+      }
+   }
+   else{
+      Stacktrace();
+   }
+}
+
 sub qcheckRecord
 {
    my $self=shift;
@@ -111,70 +151,117 @@ sub qcheckRecord
    my $grp=$dataobj->ModuleObject("base::grp");
    my @failmsg;
    my @dataissue;
+
+
+   my %chklst;
+
    foreach my $fobj (@fobjlst){
-      my $label=$fobj->Label();
-      my @checkids=();
       next if (!$fobj->uivisible());
+      my $rrec={
+         field=>$fobj->Name(),
+         label=>$fobj->Label(),
+         type=>$fobj->Type()
+      };
       if ($fobj->Type() ne "ContactLnk"){
          my $idfobj=$dataobj->getField($fobj->{vjoinon}->[0]);
+         $rrec->{rawfield}=$fobj->{vjoinon}->[0];
          if (defined($idfobj)){
             my $id=$idfobj->RawValue($rec);
             if ($id ne ""){
-               push(@checkids,$fobj->{vjointo});
-               push(@checkids,$id);
+               my $k=$fobj->{vjointo}."::".$id;
+               if (!exists($chklst{$k})){
+                  $chklst{$k}={
+                     target=>$fobj->{vjointo},
+                     targetid=>$id,
+                     r=>[$rrec]
+                  }
+               }
+               else{
+                  push(@{$chklst{$k}->{r}},$rrec);
+               }
             }
-
          }
       }
       else{
          my $val=$fobj->RawValue($rec);
          if (ref($val) eq "ARRAY"){
             foreach my $r (@$val){
-               if ($r->{target} eq "base::user"){
-                  push(@checkids,$r->{target},$r->{targetid});
-               }
-               if ($r->{target} eq "base::grp"){
-                  push(@checkids,$r->{target},$r->{targetid});
+               $rrec={%{$rrec}};
+               $rrec->{rawrecid}=$r->{id};
+               if ($r->{targetid} ne "" &&
+                   ($r->{target} eq "base::user" || 
+                    $r->{target} eq "base::grp")){
+                  my $k=$r->{target}."::".$r->{targetid};
+                  if (!exists($chklst{$k})){
+                     $chklst{$k}={
+                        target=>$r->{target},
+                        targetid=>$r->{targetid},
+                        r=>[$rrec]
+                     }
+                  }
+                  else{
+                     push(@{$chklst{$k}->{r}},$rrec);
+                  }
                }
             }
          } 
       }
-      while(my $target=shift(@checkids)){
-         my $targetid=shift(@checkids);
-         if ($target eq "base::grp"){
-            $grp->ResetFilter();
-            $grp->SetFilter({grpid=>\$targetid});
-            my ($chkrec)=$grp->getOnlyFirst(qw(cistatusid fullname));
-            if (!defined($chkrec)){
-               push(@failmsg,"'".$label."' ".
-                             $self->T("points to non existing record"));
-            }
-            else{
-               if ($chkrec->{cistatusid}>5 || $chkrec->{cistatusid}<3){
-                  push(@failmsg,$label.": ".$chkrec->{fullname}." ".
-                                $self->T("is invalid"));
+   }
+
+   foreach my $k (keys(%chklst)){
+      my $target=$chklst{$k}->{target};
+      my $targetid=$chklst{$k}->{targetid};
+      if ($target eq "base::grp"){
+         $grp->ResetFilter();
+         $grp->SetFilter({grpid=>\$targetid});
+         my ($chkrec)=$grp->getOnlyFirst(qw(cistatusid fullname));
+         if (!defined($chkrec)){
+            $self->setReferencesToNull($dataobj,"invalid",$chklst{$k},$rec);
+         }
+         else{
+            if ($chkrec->{cistatusid}>5 || $chkrec->{cistatusid}<3){
+               if ($chkrec->{cistatusid}==7){
+                  $self->setReferencesToNull($dataobj,"deleted",
+                                             $chklst{$k},$rec);
+               }
+               else{
+                  foreach my $ref (@{$chklst{$k}->{r}}){
+                     push(@failmsg,$ref->{label}.": ".$chkrec->{fullname}." ".
+                                   $self->T("is invalid"));
+                  }
                   push(@dataissue,$chkrec->{fullname});
                }
             }
          }
-         if ($target eq "base::user"){
-            $user->ResetFilter();
-            $user->SetFilter({userid=>\$targetid});
-            my ($chkrec)=$user->getOnlyFirst(qw(cistatusid fullname));
-            if (!defined($chkrec)){
-               push(@failmsg,"'".$label."' ".
-                             $self->T("points to non existing record"));
+      }
+      if ($target eq "base::user"){
+         $user->ResetFilter();
+         $user->SetFilter({userid=>\$targetid});
+         my ($chkrec)=$user->getOnlyFirst(qw(cistatusid fullname));
+         if (!defined($chkrec)){
+            foreach my $ref (@{$chklst{$k}->{r}}){
+               $self->setReferencesToNull($dataobj,"invalid",$chklst{$k},$rec);
             }
-            else{
-               if ($chkrec->{cistatusid}>5 || $chkrec->{cistatusid}<3){
-                  push(@failmsg,$label.": ".$chkrec->{fullname}." ".
-                                $self->T("is invalid"));
+         }
+         else{
+            if ($chkrec->{cistatusid}>5 || $chkrec->{cistatusid}<3){
+               if ($chkrec->{cistatusid}==7){
+                  $self->setReferencesToNull($dataobj,"deleted",
+                                             $chklst{$k},$rec);
+               }
+               else{
+                  foreach my $ref (@{$chklst{$k}->{r}}){
+                     push(@failmsg,$ref->{label}.": ".$chkrec->{fullname}." ".
+                                   $self->T("is invalid"));
+                  }
                   push(@dataissue,$chkrec->{fullname});
                }
             }
          }
       }
    }
+
+
    if ($#failmsg!=-1){
      # printf STDERR ("check fail:%s\n",Dumper(\@failmsg));
       return(3,{qmsg=>['There are invalid contact references!',@failmsg],
