@@ -751,7 +751,7 @@ sub AutoDiscFormatEntry
           "adid='$adrec->{id}' id='LoadOnce$adrec->{id}' ".
           "class='LoadOnce AutoDiscButton'>";
       $d.="<input type='image' src='../../itil/load/autodisc_bad.jpg' ".
-          "title='AutoDisc Daten fehlerhaft ober nicht verwendbar' ".
+          "title='AutoDisc Daten fehlerhaft oder nicht verwendbar' ".
           "adid='$adrec->{id}' id='BadScan$adrec->{id}' ".
           "class='BadScan AutoDiscButton'>";
       $d.="<input type='image' src='../../itil/load/autodisc_auto.jpg' ".
