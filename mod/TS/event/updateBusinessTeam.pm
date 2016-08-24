@@ -44,18 +44,10 @@ sub updbusinessteam
    my $self=shift;
 
    my $debug=grep(/^debug$/i,@_);
-   my $force=grep(/^force$/i,@_); # definitely take team of TSM/OPM
-                                  # as businessteam
    my @param=grep(/^id$|^mandatorid$/i,@_);
 
    if ($#param!=0) {
       my $msg="Entweder 'id' (Appl-ID) oder 'mandatorid' angeben!";
-      msg(ERROR,$msg);
-      return({exitcode=>1,msg=>$msg});
-   }
-
-   if ($force && lc($param[0]) ne 'id') {
-      my $msg="'force' nur in Verbindung mit 'id' (Appl-ID) erlaubt!";
       msg(ERROR,$msg);
       return({exitcode=>1,msg=>$msg});
    }
@@ -73,19 +65,14 @@ sub updbusinessteam
    my $itclustobj   =getModuleObject($self->Config,'itil::itclust');
    my $swinstanceobj=getModuleObject($self->Config,'itil::swinstance');
    my $assetobj     =getModuleObject($self->Config,'itil::asset');
+   my $lnkgrpuserobj=getModuleObject($self->Config,'base::lnkgrpuser');
    my $lnkcontactobj=getModuleObject($self->Config,'base::lnkcontact');
-   my $grpobj       =getModuleObject($self->Config,'base::grp');
-   my $ciamuserobj  =getModuleObject($self->Config,'tsciam::user');
 
    $applobj->SetFilter({$param[0]=>\@id,
                         cistatusid=>[3,4]});
    my @appls=$applobj->getHashList(qw(id name urlofcurrentrec
                                       businessteam businessteamid
                                       tsmid opmid databossid));
-   my %usercnt;   # count users in old CIAM group
-
-   # 'force' should be the standard
-   $force=1;
    
    foreach my $appl (@appls) {
 
@@ -97,63 +84,52 @@ sub updbusinessteam
       next if ($#bteamcontacts==-1);
 
       my $contact;
-      my $grps;
+      my @groups;
+      my $newteam;
       my $found=0;
 
       while ($#bteamcontacts!=-1 && !$found) {
          $contact=shift(@bteamcontacts);
-         $grps=$self->getPossibleGrps($contact);
 
-         if (in_array($grps,$appl->{businessteamid})) {
+         $lnkgrpuserobj->ResetFilter();
+         $lnkgrpuserobj->SetFilter({userid=>\$contact,
+                                    srcsys=>\'CIAM'});
+         @groups=$lnkgrpuserobj->getHashList(qw(srcload grpid group
+                                                expiration));
+         my @grpids=map($_->{grpid},@groups);
+
+         if (in_array(\@grpids,$appl->{businessteamid})) {
             $found++;
          }
       }
 
       next if (!$found);
-      next if ($#{$grps}==0);
+      next if ($#groups<1);
 
-      my $curteam=$self->getCurrentTeam($contact);
+      my @expgroupids=map {$_->{grpid}}
+                          grep(defined($_->{expiration}),@groups);
+      next if (!in_array(\@expgroupids,$appl->{businessteamid}));
 
-      next if (!defined($curteam->{grpid}));
-      next if ($curteam->{grpid}==$appl->{businessteamid});
+      my @possiblegrps=sort {$b->{srcload} cmp $a->{srcload}}
+                            grep(!defined($_->{expiration}),@groups);
+      my $newteam=$possiblegrps[0];
 
-      $grpobj->ResetFilter();
-      $grpobj->SetFilter({grpid=>$appl->{businessteamid}});
-      my ($oldgrp,$msg)=$grpobj->getOnlyFirst(qw(srcid name));
+      next if (!defined($newteam));
+      next if ($appl->{businessteamid}==$newteam->{grpid});
 
-      next if (!defined($oldgrp));
-
-      if (exists($usercnt{$oldgrp->{srcid}}) &&
-          $usercnt{$oldgrp->{srcid}}>0 && !$force) {
-         next;
-      }
-
-      if (!exists($usercnt{$oldgrp})) {
-         # count user in CIAM group only if not yet done
-         $ciamuserobj->ResetFilter();
-         $ciamuserobj->SetFilter({toucid=>$oldgrp->{srcid},
-                                  active=>\'true'});
-         my @oldgrpuser=$ciamuserobj->getHashList(qw(tcid));
-         $usercnt{$oldgrp->{srcid}}=scalar(@oldgrpuser);
-      }
-
-      if (!exists($usercnt{$oldgrp->{srcid}}) ||
-          ($usercnt{$oldgrp->{srcid}}>0 && !$force)) {
-         next;
-      }
 
       #######################################################################
       # OK, Busineesteam and all dependencies will be updated now
       #######################################################################
       my %oldrec=%$appl;
-      my %newrec=(businessteamid=>$curteam->{grpid});
+      my %newrec=(businessteamid=>$newteam->{grpid});
       my %paramlnkcontact=(oldgrp=>$appl->{businessteamid},
-                           newgrp=>$curteam->{grpid});
+                           newgrp=>$newteam->{grpid});
 
       # used for notification informations
       my %applinfo=(name=>$appl->{name},
                     oldteam=>$appl->{businessteam},
-                    newteam=>$curteam->{fullname});
+                    newteam=>$newteam->{group});
       my %dbossinfo;
       my $updated;
 
@@ -161,7 +137,7 @@ sub updbusinessteam
       msg(WARN,"Refresh Businessteam of '$oldrec{name}':\n".
                "----------------------------------------\n".
                "old: $oldrec{businessteam}\n".
-               "new: $curteam->{fullname}\n");
+               "new: $newteam->{group}\n");
       if (!$debug) {
          if (!$applobj->ValidatedUpdateRecord(\%oldrec,\%newrec,
                                               {id=>$appl->{id}})) {
@@ -202,7 +178,7 @@ sub updbusinessteam
                if (!$debug) {
                   if ($systemobj->ValidatedUpdateRecord(
                                      $system,
-                                     {adminteamid=>$curteam->{grpid}},
+                                     {adminteamid=>$newteam->{grpid}},
                                      {id=>\$system->{id}})) {
                      $updated++;
                   }
@@ -239,7 +215,7 @@ sub updbusinessteam
                   if (!$debug) {
                      if ($assetobj->ValidatedUpdateRecord(
                                        $asset,
-                                       {guardianteamid=>$curteam->{grpid}},
+                                       {guardianteamid=>$newteam->{grpid}},
                                        {id=>\$asset->{id}})) {
                         $updated++;
                      }
@@ -304,7 +280,7 @@ sub updbusinessteam
             if (!$debug) {
                if ($swinstanceobj->ValidatedUpdateRecord(
                                       $instance,
-                                      {swteamid=>$curteam->{grpid}},
+                                      {swteamid=>$newteam->{grpid}},
                                       {id=>\$instance->{id}})) {
                   $updated++;
                }
@@ -418,51 +394,5 @@ sub updateLnkContact
 }
 
  
-sub getPossibleGrps
-{
-   my $self=shift;
-   my $userid=shift;
-
-   return(undef) if (!defined($userid));
-
-   my $lnkgrpuserobj=getModuleObject($self->Config,'base::lnkgrpuser');
-
-   $lnkgrpuserobj->SetFilter({userid=>\$userid,
-                              srcsys=>\'CIAM'});
-   my $grps=$lnkgrpuserobj->getHashList(qw(grpid));
-   my @res=map({$_->{grpid}} @$grps);
-
-   return(\@res);
-}
-
-
-sub getCurrentTeam
-{
-   my $self=shift;
-   my $userid=shift;
-
-   my $userobj=getModuleObject($self->Config,'base::user');
-   my $grpobj=getModuleObject($self->Config,'base::grp');
-   my $ciamuserobj=getModuleObject($self->Config,'tsciam::user');
-
-   my $msg;
-   $userobj->SetFilter({userid=>\$userid});
-   (my $user,$msg)=$userobj->getOnlyFirst('dsid');
-   (my $tcid=$user->{dsid})=~s/tCID:(\d+)$/$1/;
-
-   $ciamuserobj->SetFilter({tcid=>$tcid,
-                            active=>\'true'});
-   (my $ciamuser,$msg)=$ciamuserobj->getOnlyFirst(qw(toucid));
-
-   $grpobj->SetFilter({srcsys=>\'CIAM',
-                       srcid=>$ciamuser->{toucid},
-                       cistatusid=>[3,4]});
-
-   (my $res,$msg)=$grpobj->getOnlyFirst(qw(grpid fullname));
-
-   return($res);
-}
-
-
 
 1;
