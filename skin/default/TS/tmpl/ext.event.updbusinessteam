@@ -1,15 +1,15 @@
 Dear Databoss,
 
-there was a change of the businessteam from application '%appl%' identified. 
+a change of the businessteam of application '%appl%' has been identified.
 
-<b>so far:</b> %oldteam%
-<b>new:</b> %newteam%
+<b>Old:</b> %oldteam%
+<b>New:</b> %newteam%
 
-The businessteam and possibly existing contact relations were updated automatically.
-All with the application related Configuration Items (systems, assets, cluster, software instances) were updated too.
+The businessteam and existing contact relations have been updated automatically.
+All configuration items related to the application (systems, assets, clusters, software instances) have been updated as well.
 
-The following Configuration Items, where you are responsible, were updated:
+The following Configuration Items which also fall under your responsibility have been updated:
 
 %items%
-This update is an unique action in the context of RefineIT to spare you from manual efforts and does NOT release you from your continuing responsibility for the listed elements!
+This update is an one-time action in the context of RefineIT, to spare you from manual efforts and does NOT relieve you from your continued responsibility for the listed elements!
 
