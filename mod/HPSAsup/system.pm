@@ -78,8 +78,10 @@ where
        "itil::appl".cistatusid=4 
        -- nur installiert/aktive Systeme
     and "itil::system".cistatusid=4  
-       -- nur Anwendungen der TOP100-TelekomIT CI-Group
-    and '; '||mgmtitemgroup||';'  like '%; TOP100-TelekomIT;%'
+       -- nur Anwendungen der TelekomIT Mandaten
+    and "itil::appl".mandator like 'TelekomIT%'
+       -- alle Prio1 Anwendungen
+    and "itil::appl".customerprio=1
        -- aber NICHT Anwendungen der CI-Group SAP
     and '; '||mgmtitemgroup||';'  not like '%; SAP;%' 
        -- nicht Anwendungen im Mandaten "Extern"
