@@ -444,7 +444,7 @@ sub process_engine
               my $convert_flag=0;
               my (@gz,@ready,@myderr,$wp,$save);
               my $cmd="$prog->{mysqldump} ".
-                      "-c --triggers --routines --skip-extended-insert ".
+                      "-c --triggers --skip-extended-insert ".
                       "$db $first";
               if ($first eq '@@@proc@@@'){
                  $cmd="$prog->{mysqldump} ".
