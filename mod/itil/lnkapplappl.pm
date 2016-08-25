@@ -113,6 +113,7 @@ sub new
                      ssh tuxedo TCP UC4 UCP/SMS utm X.31 XAPI xml
                      OTHER)],
                 default       =>'online',
+                selectfix     =>'1',
                 htmlwidth     =>'50px',
                 htmleditwidth =>'150px',
                 dataobjattr   =>'lnkapplappl.conprotocol'),
@@ -355,10 +356,22 @@ sub new
                 group         =>'classi',
                 label         =>'encrypted communication',
                 default       =>'0',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if ($rec->{iscrypted} eq "1");
+                   return(0);
+                },
                 transprefix   =>'CRYPT.',
-                value         =>[0,1,2,3],
+                value         =>[0,10,20,30],
                 htmleditwidth =>'200px',
-                dataobjattr   =>'lnkapplappl.iscrypted'),
+                dataobjattr   =>"if (lnkapplappl.conprotocol='https' or ".
+                                "lnkapplappl.conprotocol='ldaps' or ".
+                                "lnkapplappl.conprotocol='POP3S' or ".
+                                "lnkapplappl.conprotocol='sftp' or ".
+                                "lnkapplappl.conprotocol='sldap' or ".
+                                "lnkapplappl.conprotocol='ssh','1',".
+                                "lnkapplappl.iscrypted)"),
 
       new kernel::Field::Boolean(
                 name          =>'handleconfidential',

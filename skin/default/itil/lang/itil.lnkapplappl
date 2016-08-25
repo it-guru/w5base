@@ -65,9 +65,10 @@
 'PERS.2'=>{de=>'Ja',en=>'Yes'},
 'encrypted communication'=>{de=>'verschlüsselte Datenübertragung'},
 'CRYPT.0'=>{de=>'[unklar/nicht definiert]',en=>'[unknown]'},
-'CRYPT.1'=>{de=>'Nein',en=>'No'},
-'CRYPT.2'=>{de=>'Ja',en=>'Yes'},
-'CRYPT.3'=>{de=>'Ja - strong encryption',en=>'Yes - strong encryption'},
+'CRYPT.1'=>{de=>'Ja',en=>'Yes'},
+'CRYPT.10'=>{de=>'Ja',en=>'Yes'},
+'CRYPT.20'=>{de=>'Nein',en=>'No'},
+'CRYPT.30'=>{de=>'Ja - strong encryption',en=>'Yes - strong encryption'},
 'from Application CI-State'=>{de=>'von Anwendung CI-Status'},
 'to Application CI-State'=>{de=>'nach Anwendung CI-Status'},
 'state'=>{
