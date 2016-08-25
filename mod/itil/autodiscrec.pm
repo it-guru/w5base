@@ -956,13 +956,13 @@ sub HtmlAutoDiscManager
       $d.="Discovery-Datensätze:";
       my $act=" recSelektorAct" if ($view eq "SelUnproc");
       $d.="<span id='SelUnproc' class=\"recSelektor$act\">".
-          "unbehandelt</span>";
+          $self->T("unprocessed")."</span>";
       my $act=" recSelektorAct" if ($view eq "SelBad");
       $d.="<span id='SelBad' class=\"recSelektor$act\">".
-          "makiert als fehlerhaft</span>";
+          $self->T("marked as bad scan")."</span>";
       my $act=" recSelektorAct" if ($view eq "SelAll");
       $d.="<span id='SelAll' class=\"recSelektor$act\">".
-          "alle behandelten</span>";
+          $self->T("all processed ones")."</span>";
       $d.="</div>";
       $d.="</div>";
    }
