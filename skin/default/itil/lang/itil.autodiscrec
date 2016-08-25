@@ -5,6 +5,7 @@
 'unprocessed'=>{de=>'unbehandelt'},
 'marked as bad scan'=>{de=>'markiert als fehlerhaft'},
 'all processed ones'=>{de=>'alle behandelten'},
+'reset to unprocessed'=>{de=>'zurücksetzen auf unbehandelt'},
 'First detected on AutoDiscoveryEngine'=>{de=>'Erstmalig auf der AutoDiscoveryEngine'},
 'The Software was detected as'=>{de=>'Die Software wurde gescant als'},
 'in the Version'=>{de=>'in der Version'},

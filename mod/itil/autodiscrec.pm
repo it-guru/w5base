@@ -767,7 +767,7 @@ sub AutoDiscFormatEntry
       $d.="</div>";
       $d.="<div class='AutoDiscButtonBar' style='width:1%'>";
       $d.="<input type='image' src='../../itil/load/autodisc_reset.jpg' ".
-          "title='reset to unprocessed' ".
+          "title='".$self->T("reset to unprocessed")."' ".
           "adid='$adrec->{id}' id='ResetScan$adrec->{id}' ".
           "class='ResetScan AutoDiscButton'>";
       $d.="</div>"; # end of AutoDiscButtonBar
