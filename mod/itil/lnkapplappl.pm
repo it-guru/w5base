@@ -350,6 +350,16 @@ sub new
                 htmleditwidth =>'200px',
                 dataobjattr   =>'lnkapplappl.exch_personal_data'),
 
+      new kernel::Field::Select(
+                name          =>'iscrypted',
+                group         =>'classi',
+                label         =>'encrypted communication',
+                default       =>'0',
+                transprefix   =>'CRYPT.',
+                value         =>[0,1,2,3],
+                htmleditwidth =>'200px',
+                dataobjattr   =>'lnkapplappl.iscrypted'),
+
       new kernel::Field::Boolean(
                 name          =>'handleconfidential',
                 group         =>'classi',
