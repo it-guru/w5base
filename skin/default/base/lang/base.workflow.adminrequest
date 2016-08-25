@@ -4,3 +4,5 @@
 'invalid request description'=>{de=>'ungültige Anforderungsbeschreibung'},
 'Initiate quotation request to developer'=>{de=>'Angebotsanfrage beim Entwickler initiieren'},
 'Initiate request to businessteam'=>{de=>'Auftrag an den Anwendungsbetrieb initiieren'},
+'derivation'=>{de=>'Ableitung'},
+'REV.derivation'=>{de=>'Abgeleitet von'},
