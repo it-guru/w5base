@@ -569,6 +569,7 @@ sub AutoDiscFormatEntry
        "<td width=1%>".
        "<img border=0 height=15 class='AutoDiscDetailButton' ".
        "adid='$adrec->{id}' ".
+       "title='".$self->T("advanced AutoDiscovery record information")."' ".
        "src=\"../../../public/base/load/details.gif\"></td></tr>".
        "</table>".
        "</div>";
