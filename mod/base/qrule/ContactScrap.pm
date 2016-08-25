@@ -6,9 +6,9 @@ package base::qrule::ContactScrap;
 
 This rule analyses a contact for indicators if the contact
 needs to set as "disposed of waste".
-Contacts with a lastexternalseeni more then 8 weeks in the past are
+Contacts with a lastexternalseeni more then 6 weeks in the past are
 candidates to set as "disposed of waste". If there are logons on
-this contacts in the last 6 weeks, this indicates a inconsistency
+this contacts in the last 4,5 weeks, this indicates a inconsistency
 which will be logged in basedata logs. 
 
 =head3 IMPORTS
