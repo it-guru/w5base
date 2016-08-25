@@ -1471,6 +1471,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
+                selectfix     =>1,
                 label         =>'Source-System',
                 dataobjattr   =>'appl.srcsys'),
                                                    

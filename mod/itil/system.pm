@@ -1126,6 +1126,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'srcsys',
+                selectfix     =>1,
                 group         =>'source',
                 label         =>'Source-System',
                 dataobjattr   =>'system.srcsys'),
