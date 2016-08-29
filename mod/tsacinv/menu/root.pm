@@ -238,6 +238,10 @@ sub Init
                       "tsacinv::autodiscsoftware",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.ac.schain",
+                      "tsacinv::schain",
+                      defaultacl=>['valid_user']);
+   
    return(1);
 }
 

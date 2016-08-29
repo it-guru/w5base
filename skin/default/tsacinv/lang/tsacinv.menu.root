@@ -45,3 +45,4 @@
 'itu.ac.ad.system'=>{de=>'System',en=>'System'},
 'itu.ac.ad.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
 'itu.ac.ad.system.softwareinst'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
+'itu.ac.schain'=>{de=>'Servicekette',en=>'ServiceChain'},
