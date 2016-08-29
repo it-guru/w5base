@@ -1,4 +1,4 @@
-package tsacinv::schain;
+package tsacinv::lnkschain;
 #  W5Base Framework
 #  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
 #
@@ -37,101 +37,100 @@ sub new
 
 
       new kernel::Field::Id(
-                name          =>'schainid',
-                group         =>'source',
-                label         =>'SChainID',
-                dataobjattr   =>'amtsisalessrvcpkg.lsrvcpkgid'),
-
-      new kernel::Field::Text(
-                name          =>'code',
-                label         =>'ServiceChain Code',
-                uppersearch   =>1,
-                dataobjattr   =>'amtsisalessrvcpkg.code'),
-
-      new kernel::Field::Text(
-                name          =>'tenant',
-                label         =>'Tenant',
-                group         =>'source',
-                dataobjattr   =>'amtenant.code'),
-
-      new kernel::Field::Interface(
-                name          =>'tenantid',
-                label         =>'Tenant ID',
-                group         =>'source',
-                dataobjattr   =>'amtenant.ltenantid'),
-
-      new kernel::Field::Text(
-                name          =>'fullname',
-                label         =>'Service Chain Name',
-                ignorecase    =>1,
-                dataobjattr   =>'amtsisalessrvcpkg.name'),
+                name          =>'id',
+                label         =>'id',
+                dataobjattr   =>'schainrel.id'),
 
       new kernel::Field::Link(
-                name          =>'lcommentid',
-                dataobjattr   =>'amtsisalessrvcpkg.lcommentid'),
+                name          =>'lsspid',
+                label         =>'id',
+                dataobjattr   =>'schainrel.lsspid'),
 
-      new kernel::Field::Textarea(
-                name          =>'comments',
-                label         =>'Comments',
-                searchable    =>0,
-                vjointo       =>'tsacinv::comment',
-                vjoinon       =>['lcommentid'=>'lcommentid'],
-                vjoindisp     =>'comments'),
+      new kernel::Field::Text(
+                name          =>'itemid',
+                label         =>'Item ID',
+                dataobjattr   =>'schainrel.itemid'),
 
-      new kernel::Field::SubList(
-                name          =>'items',
-                label         =>'Items',
-                group         =>'items',
-                vjointo       =>'tsacinv::lnkschain',
-                vjoinon       =>['schainid'=>'lsspid'],
-                vjoindisp     =>[qw(name class itemid)]),
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Item Name',
+                htmlwidth     =>'300px',
+                dataobjattr   =>'schainrel.itemname'),
+
+      new kernel::Field::Text(
+                name          =>'class',
+                label         =>'Item Class',
+                htmlwidth     =>'140px',
+                uppersearch   =>1,
+                dataobjattr   =>'schainrel.itemclass'),
+
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amtsisalessrvcpkg.dtlastmodif'),
+                dataobjattr   =>'schainrel.dtlastmodif'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(amtsisalessrvcpkg.code,35,'0')"),
+                dataobjattr   =>"lpad(schainrel.lsspid,35,'0')"),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'amtsisalessrvcpkg.dtlastmodif'),
+                dataobjattr   =>'schainrel.dtlastmodif'),
 
    );
-   $self->setDefaultView(qw(linenumber code  fullname));
+   $self->setDefaultView(qw(linenumber id itemid name class));
    $self->{MainSearchFieldLines}=4;
    return($self);
 }
 
-sub getDetailBlockPriority
-{
-   my $self=shift;
-   return( qw(header default items  source));
-}
-
-
-
-
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="amtsisalessrvcpkg ".
-            "join amtenant ".
-            "on amtsisalessrvcpkg.ltenantid=amtenant.ltenantid ";
+   my $from=<<EOF;
+ (
+  select 'P'||amtsirelsspport.LTSIRELSSPPORTID            id,
+          amtsirelsspport.lsspid                          lsspid,
+          cast(amportfolio.assettag as VARCHAR2(40))      itemid,
+          cast(amportfolio.name as VARCHAR2(4000))         itemname,
+          cast(amportfolio.dfe547e741 as VARCHAR2(80))    itemclass,
+          NULL itemdataobj,
+          amtsirelsspport.dtlastmodif
+   from amtsirelsspport,amportfolio
+   where  amtsirelsspport.lportfolioid=amportfolio.lportfolioitemid
+          and amportfolio.bdelete=0
+          and amtsirelsspport.bdelete=0
+   union all
+   select 'A'||amtsirelsspappl.LTSIRELSSPAPPLID          id,
+          amtsirelsspappl.lsspid                         lsspid,
+          cast(amtsicustappl.code as VARCHAR(40))        itemid,
+          cast(amtsicustappl.name as VARCHAR2(4000))      itemname,
+          cast('APPLICATION' as VARCHAR2(80))            itemclass,
+          NULL itemdataobj,
+          amtsirelsspappl.dtlastmodif
+   from amtsirelsspappl,amtsicustappl
+   where  amtsirelsspappl.lapplicationid=amtsicustappl.ltsicustapplid
+          and amtsicustappl.bdelete=0
+          and amtsirelsspappl.bdelete=0
+) schainrel 
+EOF
    return($from);
 }
+
+
+
+
 
 sub initSqlWhere
 {
    my $self=shift;
    my $where="amtsisalessrvcpkg.bdelete=0";
+   my $where="";
    return($where);
 }
 
