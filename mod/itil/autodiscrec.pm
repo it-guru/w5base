@@ -954,7 +954,7 @@ sub HtmlAutoDiscManager
       $d.="<div class='AutoDiscFilterMap'>";
       $d.="<div style=\"line-height:20px;display:inline\">";
 
-      $d.="Discovery-Datensätze:";
+      $d.=$self->T("Discovery records").":";
       my $act=" recSelektorAct" if ($view eq "SelUnproc");
       $d.="<span id='SelUnproc' class=\"recSelektor$act\">".
           $self->T("unprocessed")."</span>";
