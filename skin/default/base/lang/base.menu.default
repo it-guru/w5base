@@ -14,6 +14,7 @@
 'Tools.workflow.repjob'=>{de=>'Report Job',en=>'Report Job'},
 'Tools.workflow.repjob.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.workflownew'=>{de=>'Neuen Workflow starten',en=>'start workflow'},
+'Tools.calendar'=>{de=>'Kalender',en=>'Calendar'},
 'Tools.workproc'=>{de=>'Arbeitsprozess',en=>'Workprocess'},
 'Tools.workproc.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.workproc.item'=>{de=>'Prozess-Schritt',en=>'Workprocessitem'},

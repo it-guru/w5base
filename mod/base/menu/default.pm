@@ -276,6 +276,11 @@ sub Init
                       prio=>2,
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("Tools.calendar",
+                      "base::CalendarEngine",
+                      prio=>3,
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("sysadm.itemizedlist",
                       "base::itemizedlist",
                       func=>'MainWithNew',

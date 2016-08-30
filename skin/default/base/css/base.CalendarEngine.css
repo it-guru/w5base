@@ -1,0 +1,49 @@
+.ObjectWindowTitle{
+   background-color:#30579f;
+   height:19px;
+   border-style:solid;
+   border-width:1px;
+   border-color:black;
+}
+.ObjectWindowTitleText{
+   color:#ffffff;
+   font-weight:bold;
+   text-decoration:none;
+   margin-top:2px;
+   margin-left:4px;
+   display:inline;
+   float:left;
+}
+.ObjectWindowTitleButton{
+   color:#ffffff;
+   font-weight:bold;
+   text-decoration:none;
+   display:inline;
+   float:right;
+   text-align:right;
+}
+
+body{
+   padding:0px;
+   margin:0px;
+   xmargin-top:3px;
+   xmargin-left:3px;
+   xbackground-color:#DCDCDC;
+}
+
+#MainStartup{
+   margin:0px;
+   padding:0px;
+}
+
+#xworkspace{
+   width:100%;
+   height:100%;
+   overflow:hidden;
+   margin:0px;
+   padding:0px;
+   border-style:solid;
+   border-width:1px;
+   border-color:gray;
+}
+
