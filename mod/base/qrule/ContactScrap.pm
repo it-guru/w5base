@@ -83,8 +83,9 @@ sub qcheckRecord
             if ($d->{totalminutes}>60480){     # 6 weeks
                if ($llogon eq ""){  # ok, cleanup
                   my $o=$dataobj->Clone();
-                  $o->ValidatedUpdateRecord($rec,{cistatusid=>6},{
-                     userid=>\$rec->{userid}
+                  $o->ValidatedUpdateRecord($rec,{
+                     cistatusid=>6,mdate=>NowStamp("en")
+                  },{userid=>\$rec->{userid}
                   });
                }
                else{               # error, logons without external ok
