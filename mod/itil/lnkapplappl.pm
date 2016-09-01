@@ -365,6 +365,7 @@ sub new
                 transprefix   =>'CRYPT.',
                 value         =>[0,10,20,30],
                 htmleditwidth =>'200px',
+                wrdataobjattr =>'iscrypted',
                 dataobjattr   =>"if (lnkapplappl.conprotocol='https' or ".
                                 "lnkapplappl.conprotocol='ldaps' or ".
                                 "lnkapplappl.conprotocol='POP3S' or ".
