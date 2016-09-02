@@ -200,7 +200,18 @@ sub qcheckRecord
                                            \@qmsg,\@dataissue,\@notifymsg);
                if (defined($assetid)) {
                   $newrec->{asset}=$assetid;
-                  $w5id=$sysobj->ValidatedInsertRecord($newrec);
+
+                  # make sure, that systemname not yet exists
+                  # with another systemid, caused of invalid 
+                  # data in AM
+                  $sysobj->ResetFilter();
+                  $sysobj->SetFilter({name=>$allsys{$sys2add}{name},
+                                      cistatusid=>\'<=5'});
+                  my ($s,$msg)=$sysobj->getOnlyFirst(qw(id));
+
+                  if (!defined($s)) {
+                     $w5id=$sysobj->ValidatedInsertRecord($newrec);
+                  }
 
                   if (defined($w5id)) {
                      ($w5s,$msg)=$sysobj->getOnlyFirst(qw(urlofcurrentrec));
