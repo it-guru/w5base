@@ -35,7 +35,7 @@ sub new
                 label         =>'AssetManager Assignmentgroup',
                 group         =>'amrel',
                 weblinkto     =>'tsacinv::group',
-                weblinkon     =>['acassingmentgroup'=>'name'],
+                weblinkon     =>['amrelacassingmentgroup'=>'name'],
                 searchable    =>0,
                 readonly      =>1,
                 async         =>'1',
