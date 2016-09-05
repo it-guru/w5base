@@ -63,7 +63,7 @@ BEGIN
                  where denv<>'OUT'
                  group by agent_status
                  union all
-                 select 'totalsys.agentversion.'||
+                 select 'totalsys.aver.'||
                         replace(lower(decode(agent_version,
                                      null,'empty',
                               agent_version)),'.','_')||'.count'          label,
@@ -103,7 +103,7 @@ BEGIN
                  where denv<>'OUT'
                  group by agent_status
                  union all
-                 select 'telitsys.agentversion.'||
+                 select 'telitsys.aver.'||
                         replace(lower(decode(agent_version,
                                      null,'empty',
                               agent_version)),'.','_')||'.count'          label,
