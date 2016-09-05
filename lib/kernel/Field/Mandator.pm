@@ -86,10 +86,19 @@ sub getPostibleValues
       } @mandators);
       #######################################################################
       foreach my $mandator (@mandators){
-         if (defined($MandatorCache->{grpid}->{$mandator}) &&
-             ($MandatorCache->{grpid}->{$mandator}->{cistatusid}==4 ||
-              ($self->{allowall}))){
-            push(@res,$mandator,$MandatorCache->{grpid}->{$mandator}->{name});
+         if (defined($MandatorCache->{grpid}->{$mandator})){
+            if (($MandatorCache->{grpid}->{$mandator}->{cistatusid}==4 ||
+                 ($self->{allowall}))){
+               push(@res,$mandator,
+                    $MandatorCache->{grpid}->{$mandator}->{name});
+            }
+            else{
+               if ($MandatorCache->{grpid}->{$mandator}->{cistatusid}==3 &&
+                   $self->getParent->IsMemberOf("admin")){
+                  push(@res,$mandator,
+                       $MandatorCache->{grpid}->{$mandator}->{name});
+               }
+            }
          }
       }
       if ($self->{allowany}){

@@ -271,10 +271,20 @@ sub getMandatorsOf
    CHK: foreach my $mid (keys(%{$MandatorCache->{id}})){
       my $mc=$MandatorCache->{id}->{$mid};
       if (in_array(\@roles,"write")){  # write only on active mandators allowed
-         next if ($mc->{cistatusid} ne "4");
+         if ($self->IsMemberOf("admin")){
+            next if ($mc->{cistatusid} ne "4" &&
+                     $mc->{cistatusid} ne "3");
+         }
+         else{
+            next if ($mc->{cistatusid} ne "4");
+         }
       }
       my $grpid=$mc->{grpid};
       $m{$grpid}=1 if (grep(/^$grpid$/,@grps));
+      if ($self->IsMemberOf("admin")){
+         $m{$grpid}=1;
+         next CHK;
+      }
       if (defined($mc->{contacts}) && ref($mc->{contacts}) eq "ARRAY"){
          foreach my $contact (@{$mc->{contacts}}){
             if ($contact->{target} eq "base::user"){
