@@ -50,7 +50,7 @@ Der o.g. Anforderer wird dann automatisch per E-Mail
 über die Aktiverung informiert.
 '},
 
-'MSG002'=>{en=>'You (%s) have reserved the "%s". For a full usability of this Config-Item, there is need to set it in state "installed/active". You can initiate the activation by settting the CI-State to "on order".
+'MSG002'=>{en=>'You (%s) have reserved the "%s". For a full usability of this Config-Item, there is need to set it in state "installed/active". You can initiate the activation by setting the CI-State to "on order".
 
  %s
 
