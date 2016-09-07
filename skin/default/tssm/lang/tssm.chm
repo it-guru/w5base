@@ -44,7 +44,7 @@
 'Changemanager operator'=>{de=>'Changemanager Operator'},
 'Extern Change ID'=>{de=>'externe Change ID (Extern Change ID)'},
 'Customer'=>{de=>'Kunde'},
-"none or invalid mandator base filter '\%s'"=>{de=>"kein oder ungültiger Mandaten Basis-Filter '\%s'"},
+"none or invalid mandator base filter '\%s'"=>{de=>"kein oder ungültiger Mandanten Basis-Filter '\%s'"},
 'Requested from'=>{de=>'Angefordert durch (Requested from)'},
 'Cause'=>{de=>'Grund (Cause)'},
 'Target of change'=>{de=>'Ziel des Changes (Target of change)'},

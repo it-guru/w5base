@@ -1,2 +1,2 @@
-'itil::qrule::RefCheckExternAppl'=>{de=>'Referenzierungsprüfung Appl im Mandaten Extern',en=>'Ref check in madator extern'},
+'itil::qrule::RefCheckExternAppl'=>{de=>'Referenzierungsprüfung Appl im Mandanten Extern',en=>'Ref check in mandator extern'},
 'no interfaces references found'=>{de=>'keine Schnittstellenreferenzen auf die aktuelle Anwendung gefunden'},

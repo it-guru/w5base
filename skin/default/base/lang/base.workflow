@@ -70,7 +70,7 @@
 'requested action is not allowed'=>{de=>'die angeforderte operation ist nicht zulässig'},
 'You can add a shortcut of this anker %s to your bookmarks, to access faster to this workflow.'=>{de=>'Sie können sich eine Bookmark auf diesen Anker %s in Ihrem Browser speichern, um auf den Workflow schneller zugreifen zu können.'},
 'Fulltext'=>{de=>'Volltext Suche'},
-'[all mandators]'=>{de=>'[alle Mandaten]'},
+'[all mandators]'=>{de=>'[alle Mandanten]'},
 'high'=>{de=>'hoch'},
 'normal'=>{de=>'normal'},
 'low'=>{de=>'niedrig'},

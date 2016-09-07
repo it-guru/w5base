@@ -1,4 +1,4 @@
-'base::mandatordataacl'=>{de=>'Mandaten Datenzugriffsregel',
+'base::mandatordataacl'=>{de=>'Mandanten Datenzugriffsregel',
                           en=>'Mandator data ACL'},
 'Parent-Object'=>{de=>'Elternobjekt'},
 'Target-Name'=>{de=>'Kontakt'},
