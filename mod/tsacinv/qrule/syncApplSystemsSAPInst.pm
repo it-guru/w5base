@@ -199,7 +199,7 @@ sub qcheckRecord
                                            \$errorlevel,
                                            \@qmsg,\@dataissue,\@notifymsg);
                if (defined($assetid)) {
-                  $newrec->{asset}=$assetid;
+                  $newrec->{assetid}=$assetid;
 
                   # make sure, that systemname not yet exists
                   # with another systemid, caused of invalid 
@@ -383,16 +383,23 @@ sub chkAsset {
    my ($assetasset,$msg)=$acasset->getOnlyFirst('assetid');
    return(undef) if (!defined($assetasset->{assetid}));
 
-   $asset->SetFilter({name=>$assetasset->{assetid}});
+   $asset->SetFilter([{srcid=>$assetasset->{assetid}},
+                      {name=>$assetasset->{assetid}}]);
+   my @foundassets=$asset->getHashList(qw(id name srcid srcsys cistatus));
+   my $id;
 
-   if ($asset->CountRecords()==0) {
+   if ($#foundassets==-1) {
       my $databoss=$self->getNewCIDataboss;
       my $newrec={name=>$assetasset->{assetid},
                   databossid=>\$databoss,
                   mandatorid=>$rec->{mandatorid},
                   allowifupdate=>1,
                   cistatusid=>4};
-      if ($asset->ValidatedInsertRecord($newrec)) {
+      $id=$asset->ValidatedInsertRecord($newrec);
+
+      if (defined($id)) {
+         $asset->ResetFilter();
+         $asset->SetFilter({id=>\$id});
          my ($w5a,$msg)=$asset->getOnlyFirst(qw(urlofcurrentrec));
 
          my $m='Asset created';
@@ -413,8 +420,15 @@ sub chkAsset {
          return(undef);
       }
    }
-
-   return($assetasset->{assetid});
+   elsif ($#foundassets==0) {
+      $id=$foundassets[0]->{id};
+   }
+   else {
+      msg(ERROR,"multiple assets found by qrule 'syncApplSystemsSAPInst':\n".
+                Dumper(\@foundassets));
+   }
+   
+   return($id);
 }
 
 
