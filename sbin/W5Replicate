@@ -698,32 +698,24 @@ sub objectReplicationPhase1
          }
 
          if (defined($replkey)){
-            if ($replkey ne $oldreplkey){  # do small steps
-               $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
-                                $ctrl->{idname}=>'![EMPTY]'
-                                });
-               $obj->Limit($p1smallpack,0,0);
+            $obj->SetFilter({'replkeypri'=>\$replkey,
+                            $ctrl->{idname}=>'![EMPTY]'
+                            });
+            my $n=$obj->CountRecords();
+            $obj->ResetFilter();
+            $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
+                             $ctrl->{idname}=>'![EMPTY]'
+                            });
+            if ($n>$p1smallpack-1){  # if multiple records have the same
+                                     # replkeypri - all must be synced in
+                                     # one "smallpack"
+               msg(WARN,"found $n records with the same replkey ".
+                        "'%s' in '%s'",
+                   $replkey,$ctrl->{name});
+               $obj->Limit($n+$p1smallpack,0,0);
             }
             else{
-               $obj->SetFilter({'replkeypri'=>\$replkey,
-                               $ctrl->{idname}=>'![EMPTY]'
-                               });
-               my $n=$obj->CountRecords();
-               $obj->ResetFilter();
-               $obj->SetFilter({'replkeypri'=>">=\"".$replkey."\"",
-                                $ctrl->{idname}=>'![EMPTY]'
-                               });
-               if ($n>$p1smallpack-1){  # if multiple records have the same
-                                        # replkeypri - all must be synced in
-                                        # one "smallpack"
-                  msg(WARN,"found $n records with the same replkey ".
-                           "'%s' in '%s'",
-                      $replkey,$ctrl->{name});
-                  $obj->Limit($n+$p1smallpack,0,0);
-               }
-               else{
-                  $obj->Limit($p1smallpack,0,0);
-               }
+               $obj->Limit($p1smallpack,0,0);
             }
          }
       }
