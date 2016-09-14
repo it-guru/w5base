@@ -1,4 +1,4 @@
-'faq::acl'=>{de=>'Zugriffsrechte',en=>'Accesscontrol'},
+'faq::acl'=>{de=>'FAQ Zugriffsrechte',en=>'FAQ Accesscontrol'},
 'AclID'=>{de=>'Rechte-ID'},
 'Target-Name'=>{de=>'Berechtigtenbezeichnung'},
 'Acl-Mode'=>{de=>'Zugriffsmodus'},
