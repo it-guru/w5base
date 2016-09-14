@@ -207,7 +207,7 @@ sub Validate
    elsif ($name=~m/^(win)/i){
       $newrec->{osclass}="WIN";
    }
-   elsif ($name=~m/^(os\/390|osd|z\/OS)/i){
+   elsif ($name=~m/^(os\/390|osd|z\/OS|z\/VM)/i){
       $newrec->{osclass}="MAINFRAME";
    }
    else{
