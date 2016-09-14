@@ -39,8 +39,57 @@ sub Init
    $self->RegisterEvent("AutoFinishWorkflows","AutoFinishWorkflows");
    $self->RegisterEvent("CleanupLnkGrpUser","LnkGrpUser");
    $self->RegisterEvent("CleanupWebFS","CleanupWebFS");
+   $self->RegisterEvent("CleanupLnkContact","CleanupLnkContact");
    return(1);
 }
+
+
+sub CleanupLnkContact
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $obj=getModuleObject($self->Config,"base::lnkcontact");
+   my $objop=$obj->Clone();
+   $obj->SetCurrentView(qw(ALL));
+   my ($rec,$msg)=$obj->getFirst(unbuffered=>1);
+   my $c=0;
+   my %o;
+   my $deletecount=0;
+   if (defined($rec)){
+      do{
+         my $needdelete=0;
+         msg(INFO,"process $rec->{parentobj} ($rec->{refid})");
+         if (!exists($o{$rec->{parentobj}})){
+            $o{$rec->{parentobj}}=
+               getModuleObject($self->Config,$rec->{parentobj}); 
+         }
+         if (!exists($o{$rec->{parentobj}}) || !defined($o{$rec->{parentobj}})){
+            $needdelete++;
+         }
+         if (!$needdelete){
+            my $idobj=$o{$rec->{parentobj}}->IdField(); 
+            if (!defined($idobj)){
+               die("fail to detect idobj in $rec->{parentobj}");
+            }
+            my $idname=$idobj->Name();
+            $o{$rec->{parentobj}}->ResetFilter();
+            $o{$rec->{parentobj}}->SetFilter({$idname=>\$rec->{refid}});
+            my ($refrec)=$o{$rec->{parentobj}}->getOnlyFirst($idname);
+            if (!defined($refrec)){
+               $needdelete++
+            }
+         }
+         if ($needdelete){
+            $objop->ValidatedDeleteRecord($rec);
+            $deletecount++;
+         }
+         ($rec,$msg)=$obj->getNext();
+      } until(!defined($rec));
+   }
+   return({exitcode=>0,deletecount=>$deletecount});
+}
+
 
 
 sub CleanupWebFS
