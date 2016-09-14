@@ -201,7 +201,7 @@ CREATE TABLE lnkcontact (
   PRIMARY KEY  (id),
   KEY refid (refid),
   unique key objcontact (refid,parentobj,target,targetid),
-  UNIQUE KEY `srcsys` (srcsys,srcid),KEY target(target,targetid)
+  UNIQUE KEY `srcsys` (srcsys,srcid),KEY target(targetid,target)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE infoabo (
   id         bigint(20)  NOT NULL,
