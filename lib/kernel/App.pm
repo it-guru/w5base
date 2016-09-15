@@ -264,24 +264,26 @@ sub getMandatorsOf
    my %groups=$self->getGroupsOf($AccountOrUserID,[orgRoles(),
                                qw(RCFManager RCFManager2)],
                                'both');
+   my %dgroups=$self->getGroupsOf($AccountOrUserID,[qw(RCFManager RCFManager2)],
+                                  'direct');
    my @grps=keys(%groups);
    my %m=();
   # my %m=map({($_=>1);}@grps);
    my $MandatorCache=$self->Cache->{Mandator}->{Cache};
+   my $isadmin=$self->IsMemberOf("admin");
    CHK: foreach my $mid (keys(%{$MandatorCache->{id}})){
       my $mc=$MandatorCache->{id}->{$mid};
-      if (in_array(\@roles,"write")){  # write only on active mandators allowed
-         if ($self->IsMemberOf("admin")){
-            next if ($mc->{cistatusid} ne "4" &&
-                     $mc->{cistatusid} ne "3");
-         }
-         else{
-            next if ($mc->{cistatusid} ne "4");
-         }
-      }
       my $grpid=$mc->{grpid};
+      if (in_array(\@roles,"write")){  # write only on active mandators allowed
+         next CHK if ($mc->{cistatusid} ne "4" &&
+                      $mc->{cistatusid} ne "3");
+         if ($mc->{cistatusid} eq "3"){
+            next CHK if (!$isadmin &&            # Admins and direct Config-Mgr
+                     !exists($dgroups{$grpid})); # of Mandators can work on
+         }                                       # "available" mandators
+      }
       $m{$grpid}=1 if (grep(/^$grpid$/,@grps));
-      if ($self->IsMemberOf("admin")){
+      if ($isadmin){
          $m{$grpid}=1;
          next CHK;
       }
