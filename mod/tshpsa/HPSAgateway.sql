@@ -73,11 +73,11 @@ create materialized view "mview_HPSA_system"
 with j as (select item_id,mdate,lower(hostname) lhostname,hostname,pip,systemid,
            RANK() OVER (PARTITION BY item_id ORDER BY mdate DESC) dest_rank
            from "W5XAUTOM_HPSA_UC128"
-           where regexp_like(systemid,'^S.{4,10}')
+           where regexp_like(systemid,'^S.{4,10}') and isdeleted=0
            order by mdate),
      s as (select distinct systemid
            from "W5XAUTOM_HPSA_UC128"
-           where regexp_like(systemid,'^S.{4,10}'))
+           where regexp_like(systemid,'^S.{4,10}') and isdeleted=0)
 SELECT j.item_id    server_id,
        j.systemid   systemid,
        j.mdate      curdate,
