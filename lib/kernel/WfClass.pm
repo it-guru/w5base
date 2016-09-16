@@ -293,6 +293,12 @@ sub isMarkDeleteValid
    return(0);
 }
 
+sub IsMemberOf
+{
+   my $self=shift;
+   return($self->getParent->IsMemberOf(@_));
+}
+
 
 sub preValidate
 {

@@ -270,7 +270,7 @@ sub getMandatorsOf
    my %m=();
   # my %m=map({($_=>1);}@grps);
    my $MandatorCache=$self->Cache->{Mandator}->{Cache};
-   my $isadmin=0; #$self->IsMemberOf("admin");
+   my $isadmin=$self->IsMemberOf("admin");
    CHK: foreach my $mid (keys(%{$MandatorCache->{id}})){
       my $mc=$MandatorCache->{id}->{$mid};
       my $grpid=$mc->{grpid};
