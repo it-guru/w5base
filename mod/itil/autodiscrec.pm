@@ -642,17 +642,26 @@ sub AutoDiscFormatEntry
             }
             my $s=getModuleObject($self->Config,'itil::lnksoftware');
             $s->SetFilter({id=>[keys(%{$control->{software}->{byid}})]});
-            foreach my $swrec ($s->getHashList(qw(fullname id))){
+            foreach my $swrec ($s->getHashList(qw(fullname id 
+                                                  itclustsvc system))){
                 $control->{software}->{byid}->{$swrec->{id}}->{fullname}=
                    $swrec->{fullname};
+                if (defined($swrec->{itclustsvc})){
+                   $control->{software}->{byid}->{$swrec->{id}}->{parent}=
+                      $swrec->{itclustsvc};
+                }
+                if (defined($swrec->{system})){
+                   $control->{software}->{byid}->{$swrec->{id}}->{parent}=
+                      $swrec->{system};
+                }
             }
          }
      
          $d.="<div class='AutoDiscMapSel'>";
-         $d.="Software zuordnen zu: ";
+         $d.=$self->T("Software assign to: ");
          $d.="<select name=SoftwareMapSelector adid='$adrec->{id}' ".
              "class=AutoDiscMapSelector>";
-         $d.="<option value=''>- bitte auswählen -</option>";
+         $d.="<option value=''>- ".$self->T("please select")." -</option>";
          $d.="<option value='newSysInst'>".
              "neue Software-Installation am logischen System</option>";
          foreach my $swi (sort({
@@ -681,6 +690,7 @@ sub AutoDiscFormatEntry
             $d.="<option value=''></option>";
             $d.="<option value='newClustInst'>".
                 "neue Software-Installation am Cluster-Service</option>";
+            my $oldparent=undef;
             foreach my $swi (sort({
                                $control->{software}->{byid}->{$a}->{fullname} 
                                  <=>
@@ -697,11 +707,23 @@ sub AutoDiscFormatEntry
                      }
                   }
                   if ($foundmap){
+                     if ($oldparent ne 
+                         $control->{software}->{byid}->{$swi}->{parent}){
+                        if ($oldparent ne ""){
+                           $d.="</optgroup>";
+                        }
+                        $oldparent=
+                         $control->{software}->{byid}->{$swi}->{parent};
+                        $d.="<optgroup label=\"".$oldparent."\">";
+                     }
                      $d.="<option value='$swi'>".
                          $control->{software}->{byid}->{$swi}->{fullname}.
                          "</option>";
                   }
                }
+            }
+            if ($oldparent ne ""){
+               $d.="</optgroup>";
             }
          }
          $d.="</select>";
