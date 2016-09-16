@@ -26,7 +26,8 @@ use itil::lib::Listedit;
 use Date::Parse;
 use DateTime;
 use File::Temp ();
-use Net::SSLeay qw(XN_FLAG_MULTILINE XN_FLAG_RFC2253);
+#use Net::SSLeay qw(XN_FLAG_MULTILINE XN_FLAG_RFC2253); # not before V1.45
+use Net::SSLeay;
 
 use vars qw(@ISA);
 
@@ -330,21 +331,48 @@ sub Validate
 
       # Subject
       my $subject=Net::SSLeay::X509_get_subject_name($x509);
-      $newrec->{subject}=Net::SSLeay::X509_NAME_print_ex($subject,
-                                                         XN_FLAG_MULTILINE);
+
+      ## sadly not before Net::SSLeay 1.45 available
+      ## $newrec->{subject}=Net::SSLeay::X509_NAME_print_ex($subject,
+      ##                                                    XN_FLAG_MULTILINE);
+      my $subject_oneline=Net::SSLeay::X509_NAME_oneline($subject);
+      $subject_oneline=~s{^/}{};
+      my %subject_elements=split(/[=\/]/,$subject_oneline);
+      my @skeylen=sort({$b<=>$a} map({length} keys(%subject_elements)));
+
+      my $subject_multiline='';
+      foreach my $l (sort(keys(%subject_elements))) {
+         $subject_multiline.=sprintf("%-*s = %s\n",$skeylen[0],
+                                     $l,$subject_elements{$l});
+      }
+      $newrec->{subject}=$subject_multiline;
+
       # Issuer
-      my $issuer_name=Net::SSLeay::X509_get_issuer_name($x509);
-      $newrec->{issuer}=Net::SSLeay::X509_NAME_print_ex($issuer_name,
-                                                        XN_FLAG_MULTILINE);
+      my $issuer=Net::SSLeay::X509_get_issuer_name($x509);
+
+      ## $newrec->{issuer}=Net::SSLeay::X509_NAME_print_ex($issuer,
+      ##                                                   XN_FLAG_MULTILINE);
+      my $issuer_oneline=Net::SSLeay::X509_NAME_oneline($issuer);
+      $issuer_oneline=~s{^/}{};
+      my %issuer_elements=split(/[=\/]/,$issuer_oneline);
+      my @ikeylen=sort({$b<=>$a} map({length} keys(%issuer_elements)));
+      my $issuer_multiline='';
+      foreach my $l (sort(keys(%issuer_elements))) {
+         $issuer_multiline.=sprintf("%-*s = %s\n",$ikeylen[0],
+                                     $l,$issuer_elements{$l});
+      }
+      $newrec->{issuer}=$issuer_multiline;
+
       # SerialNr. (hex format)
       my $serial=Net::SSLeay::X509_get_serialNumber($x509);
       $newrec->{serialno}=Net::SSLeay::P_ASN1_INTEGER_get_hex($serial);
 
       # Name
-      my $nameoneline=Net::SSLeay::X509_NAME_print_ex($issuer_name,
-                                               XN_FLAG_RFC2253);
-      my %nameelements=split(/[=,]/,$nameoneline);
-      $newrec->{name}=$nameelements{CN}.' - '.$newrec->{serialno};
+      ## my $nameoneline=Net::SSLeay::X509_NAME_print_ex($issuer_name,
+      ##                                                 XN_FLAG_RFC2253);
+      ## my %nameelements=split(/[=,]/,$nameoneline);
+      ## $newrec->{name}=$nameelements{CN}.' - '.$newrec->{serialno};
+      $newrec->{name}=$issuer_elements{CN}.' - '.$newrec->{serialno};
 
       # check if already expired
       my $duration=CalcDateDuration(NowStamp('en'),$newrec->{enddate});
