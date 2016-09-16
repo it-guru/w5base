@@ -1,0 +1,23 @@
+'itil::applwallet'=>{de=>'Anwendung-Zertifikat',en=>'Application certificate'},
+'fieldgroup.detail'=>{de=>'Detailinformationen',en=>'Detail informations'},
+'Application'=>{de=>'Anwendung'},
+'Owner'=>{de=>'Besitzer'},
+'Certificate begin'=>{de=>'Zertifikat Beginn'},
+'Certificate end'=>{de=>'Zertifikat Ende'},
+'Certificate file'=>{de=>'Zertifikats-Datei'},
+'Brief description'=>{de=>'Kurzbeschreibung'},
+'Issuer'=>{de=>'Aussteller'},
+'Serial Nr.'=>{de=>'Serien-Nr.'},
+'No certificate file selected'=>{de=>"Keine Zertifikats-Datei ausgewählt"},
+'No brief description specified'=>{de=>"Keine Kurzbeschreibung angegeben"},
+'Validity date is not interpretable'=>{
+   de=>'Das Gültigkeitsdatum ist nicht interpretierbar'
+},
+'Certificate expires soon'=>{
+   de=>'Das Zertifikat läuft bald ab'},
+'Certificate has already expired'=>{
+   de=>'Das Zertifikat ist bereits abgelaufen'},
+'No write access on specified application'=>{
+   de=>'Kein Schreibzugriff auf die angegebene Anwendung'},
+'Notification of Certificate Expiration'=>{
+   de=>'Benachrichtigung über Zertifikatsverfall'},

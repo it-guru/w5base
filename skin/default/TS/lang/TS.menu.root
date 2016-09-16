@@ -18,6 +18,8 @@
 'itts.appl.lnkapplcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itts.appl.lnkapplurl'=>{de=>'Kommunikations URL',en=>'Communication URL'},
 'itts.appl.lnkapplurl.new'=>{de=>'Neueingabe',en=>'New'},
+'itts.appl.applwallet'=>{de=>'Zertifikat',en=>'Certificate'},
+'itts.appl.applwallet.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.appl.adv'=>{de=>'NOR-Vorgaben',en=>'NOR-target'},
 'itts.appl.nor'=>{de=>'NOR-Nachweis',en=>'NOR-Verification'},
 'itts.system'=>{de=>'System',en=>'System'},

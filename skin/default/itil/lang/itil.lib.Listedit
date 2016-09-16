@@ -9,3 +9,18 @@
 'unknown ip-address format'=>{de=>'unbekanntes IP-Adressen Format'},
 'invalid IPv4 address'=>{de=>'ungültige IPv4 Adresse'},
 'invalid IPv6 address'=>{de=>'ungültige IPv6 Adresse'},
+'Expiration of a certificate'=>{de=>'Ablauf eines Zertifikates'},
+'days'=>{de=>'Tagen'},
+'Expiration date'=>{de=>'Verfallsdatum'},
+'Dear databoss'=>{de=>'Sehr geehrter Datenverantwortlicher'},
+"Certificate for %s expires"=>{
+   de=>"ein Zertifikat für '%s' läuft demnächst ab.",
+   en=>"a certificate for '%s' is almost expired."
+},
+'SSLEXP01'=>{
+   de=>"Sie erhalten diese Nachricht einmalig, ".
+       "d.h. es werden keine weiteren Erinnerungen hierzu versandt.",
+   en=>"You receive this message only once - ".
+       "that means no further reminders will be sent."
+},
+

@@ -923,7 +923,111 @@ sub calcSoftwareState
 }
 
 
+sub handleSSLExpiration
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+   my $parentobj=shift;
+   my $parentrec=shift;
+   my $param=shift;
+   my $newrec;
 
+   my $notifyfld=$param->{expnotifyfld};
+   my $endfld=$param->{expdatefld};
+
+   my $qmsg;
+   my $errorlevel;
+
+   if (!defined($notifyfld) || !defined($endfld) ||
+       !defined($rec->{$endfld})) {
+      return(undef);
+   }
+   if (!defined($parentobj)) {
+      $parentobj=$dataobj;
+      $parentrec=$rec;
+   }
+
+   # one-time notification; default: expiration < 8 weeks
+   my $warning=$param->{warning};
+   $warning=7*8 if (!defined($warning));
+
+   my $now=NowStamp('en');
+   my $d=CalcDateDuration($now,$rec->{$endfld},'GMT');
+
+   if ($d->{days}<$warning) {
+      if (!$rec->{$notifyfld}) {
+         my $uobj=getModuleObject($self->getParent->Config,'base::user');
+         $uobj->SetFilter({userid=>\$parentrec->{databossid},
+                           cistatusid=>\4});
+         my ($databoss,$msg)=$uobj->getOnlyFirst(qw(userid tz lastlang));
+
+         my %ul;
+         $parentobj->getWriteAuthorizedContacts($parentrec,
+                                                [qw(contacts)],30,\%ul);
+
+         my $emailto;
+         my @emailcc=keys(%ul);
+         my $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+         my $lang;
+         my $timezone;
+
+         if (defined($databoss->{userid})) {
+            $emailto=$databoss->{userid};
+            $lang=$databoss->{lastlang};
+            $timezone=$databoss->{tz};
+         }
+         else {
+            $uobj->ResetFilter();
+            $uobj->SetFilter({userid=>\@emailcc,cistatusid=>\4});
+            my @contacts=$uobj->getHashList(qw(userid tz lang));
+            $emailto=$contacts[0]->{userid};
+            $lang=$contacts[0]->{lastlang};
+            $timezone=$contacts[0]->{tz};
+         }
+
+         @emailcc=grep($_!=$emailto,@emailcc);
+
+         my %notifyparam=(emailto=>$emailto,
+                          emailcc=>\@emailcc);
+
+         my $subject=$self->T('Expiration of a certificate');
+
+         my $exp=$dataobj->getField($endfld)
+                         ->FormatedDetail({$endfld=>$rec->{$endfld}});
+         $exp.=" ".$timezone;
+         $exp.=" (in $d->{days} ".$self->T('days').")";
+
+         my $text=$self->T('Dear databoss').",\n\n";
+         $text.=sprintf($self->T("Certificate for %s expires"),
+                        $parentrec->{name});
+         $text.="\n\n".$self->T('Expiration date').":\n";
+         $text.="$exp\n\n";
+         $text.=$self->T('SSLEXP01')."\n\n";
+         $text.="DirectLink:\n".$rec->{urlofcurrentrec};
+
+         $newrec->{$notifyfld}=$now;
+         my $wfact=getModuleObject($self->getParent->Config,"base::workflowaction");
+         $wfact->Notify("INFO",$subject,$text,%notifyparam);
+
+         if (defined($lastlang)){
+            $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+         }
+         else{
+            delete($ENV{HTTP_FORCE_LANGUAGE});
+         }
+      }
+   }
+   elsif ($rec->{$notifyfld}) {
+         $newrec->{$notifyfld}=undef;
+   }
+
+   if (defined($newrec)) {
+      $dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>$rec->{id}});
+   }
+
+   return($d);
+}
 
 
 

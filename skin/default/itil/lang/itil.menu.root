@@ -14,6 +14,8 @@
 'itil.appl.lnkcustcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl.lnkapplurl'=>{de=>'Kommunikations URL',en=>'Communication URL'},
 'itil.appl.lnkapplurl.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.appl.applwallet'=>{de=>'Zertifikat',en=>'Certificate'},
+'itil.appl.applwallet.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},
 'itil.appl.lnksystem.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl.lnkapplappl'=>{de=>'Schnittstellen',en=>'Interfaces'},

@@ -9,6 +9,8 @@
 'AL_TCom.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkapplurl'=>{de=>'Kommunikations URL',en=>'Communication URL'},
 'AL_TCom.appl.lnkapplurl.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.appl.applwallet'=>{de=>'Zertifikat',en=>'Certificate'},
+'AL_TCom.appl.applwallet.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},
 'AL_TCom.appl.lnkcustcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkapplappl'=>{de=>'Schnittstellen',en=>'Interfaces'},

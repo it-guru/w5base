@@ -1514,3 +1514,28 @@ create table lnkapplgrpapplgrp (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table lnkapplappl add iscrypted int(1) default '0';
+create table wallet (
+   id             bigint(20) NOT NULL,
+   name           varchar(255) NOT NULL,
+   shortdesc      varchar(128) NOT NULL,
+   sslcert        blob,
+   sslcertdocname varchar(255),
+   sslcertdocdate datetime,
+   sslcertdoctype varchar(255),
+   applid         bigint(20) NOT NULL,
+   issuer         varchar(512) NOT NULL,
+   subject        varchar(512) NOT NULL,
+   serialno       varchar(32) NOT NULL,
+   startdate      datetime NOT NULL default '0000-00-00 00:00:00',
+   enddate        datetime NOT NULL default '0000-00-00 00:00:00',
+   exp_notify1    datetime,
+   createdate     datetime NOT NULL default '0000-00-00 00:00:00',
+   modifydate     datetime NOT NULL default '0000-00-00 00:00:00',
+   createuser     bigint(20) NOT NULL default '0',
+   modifyuser     bigint(20) NOT NULL default '0',
+   editor         varchar(100) NOT NULL default '',
+   realeditor     varchar(100) NOT NULL default '',
+   PRIMARY KEY (id),
+   UNIQUE KEY uk_name (name),
+   FOREIGN KEY fk_appl (applid) REFERENCES appl (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

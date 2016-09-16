@@ -155,6 +155,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.appl.applwallet",
+                      "itil::applwallet",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.appl.applwallet.new",
+                      "itil::applwallet",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.itclust",
                       "itil::itclust",
                       defaultacl=>['valid_user']);
