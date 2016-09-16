@@ -51,12 +51,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'refid',
                 frontreadonly =>1,
+                selectfix     =>1,
                 label         =>'ReferenceID',
                 dataobjattr   =>$acltable.'.refid'),
 
       new kernel::Field::Text(
                 name          =>'aclparentobj',
                 frontreadonly =>1,
+                selectfix     =>1,
                 label         =>'AclParentObj',
                 dataobjattr   =>$acltable.'.aclparentobj'),
 
@@ -255,7 +257,7 @@ sub checkParentWriteAccess
    if (!grep(/^acls$/,@grps) &&
        !grep(/^acl$/,@grps) &&
        !grep(/^ALL$/,@grps)){
-      msg(INFO,"access only for '%s'\n",join(",",@grps));
+      #msg(INFO,"access only for '%s'\n",join(",",@grps));
       return(0);
    }
 
@@ -314,8 +316,32 @@ sub isWriteValid
    return("ALL") if (!defined($rec));
    return("ALL") if (defined($self->getParent));
    return("ALL") if ($self->IsMemberOf("admin"));
+
+   my $refid=$rec->{refid};
+   my $parentobj=$rec->{aclparentobj};
+
+   if ($refid ne ""){
+      my $pobj;
+      if ($parentobj ne ""){
+         $pobj=getModuleObject($self->Config,$parentobj);
+      }
+      if (defined($pobj)){
+         if ($self->checkParentWriteAccess($pobj,$refid)){
+            return("ALL");
+         }
+      }
+   }
    return(undef);
 }
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
    
 

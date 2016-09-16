@@ -46,7 +46,21 @@ sub new
                 label         =>'FAQ Shortdescription'),
       insertafter=>['aclparentobj']
    );
-
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'fullname',
+                uploadable    =>0,
+                readonly      =>1,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fo=$self->getParent->getField("article");
+                   my $a=$fo->RawValue($current);
+                   return("ACL(".$current->{aclid}."):".$a);
+                },
+                label         =>'FAQ Shortdescription'),
+      insertafter=>['aclparentobj']
+   );
 
 
    return($self);
