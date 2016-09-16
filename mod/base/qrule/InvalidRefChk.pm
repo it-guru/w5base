@@ -11,6 +11,8 @@ kernel::Field::ContactLnk
 kernel::Field::Contact
 kernel::Field::Group
 kernel::Field::Databoss
+The rule removes references to contact or group enties, where the
+target record is in state "wasted".
 
 =head3 IMPORTS
 
@@ -28,6 +30,9 @@ veraltete Kontakt/Gruppenreferenzen enthält. Um das DataIssue zu beheben,
 muss man veraltete Kontakte am Datensatz finden und entfernen oder 
 bei Bedarf durch neue Kontakpersonen bzw. Gruppen mit entsprechenden 
 Rollen ersetzen.
+
+Die QualityRule entfernt Referenzen auf Kontakte oder Gruppen, bei denen
+der Zieldatensatz im Status "entsorgt" steht.
 
 Bei Fragen wenden Sie sich bitte an den DARWIN Support:
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
@@ -98,7 +103,7 @@ sub setReferencesToNull
    if (defined($idfield)){
       my $idname=$idfield->Name();
       foreach my $ref (@{$chkrec->{r}}){
-         printf STDERR ("setReferencesToNull CleanupRec:%s\n",Dumper($ref));
+         #printf STDERR ("setReferencesToNull CleanupRec:%s\n",Dumper($ref));
          if ($ref->{type} ne "ContactLnk"){
             if ($ref->{type} ne "Databoss"){
                printf STDERR ("setReferencesToNull on %s (%s) with ".
