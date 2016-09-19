@@ -119,10 +119,14 @@ sub qcheckRecord
       return($exitcode,$desc);
    }
    if ($host eq ""){
-      my $msg="can not identify hostname in:".$rec->{fullname};
+      my $msg="can not identify hostname in: ".$rec->{fullname};
       push(@{$desc->{qmsg}},$msg);
       push(@{$desc->{dataissue}},$msg);
-   }elsif ($host=~m/^\d+\.\d+\.\d+\.\d+$/){ # url redirects already to an ip
+   } elsif ($host=~m/\.\./){
+      my $msg="invalid hostname: ".$host;
+      push(@{$desc->{qmsg}},$msg);
+      push(@{$desc->{dataissue}},$msg);
+   } elsif ($host=~m/^\d+\.\d+\.\d+\.\d+$/){ # url redirects already to an ip
       push(@ipl,$host);
    }
    else{

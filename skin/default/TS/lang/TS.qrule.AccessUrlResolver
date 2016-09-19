@@ -4,3 +4,5 @@
 'can not resolv hostname'=>{de=>'Host-Name kann im DNS nicht aufgelöst werden'},
 'Application inactive'=>{de=>'Anwendung nicht aktiv'},
 'URL deleted'=>{de=>'URL gelöscht'},
+'invalid hostname'=>{de=>'ungültiger hostname'},
+'can not identify hostname in'=>{de=>'hostname nicht identifizierbar'},
