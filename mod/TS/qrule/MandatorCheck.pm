@@ -2,6 +2,8 @@ package TS::qrule::MandatorCheck;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 If there is a mandator record which installed/active, but referes to

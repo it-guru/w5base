@@ -2,6 +2,8 @@ package base::qrule::CIUnchanged;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if Config-Itmes is longer then 36 month not modified. If this is

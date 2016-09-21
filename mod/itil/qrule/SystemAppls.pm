@@ -2,6 +2,8 @@ package itil::qrule::SystemAppls;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every System in the CI-State "installed/active" or "available/in project" 

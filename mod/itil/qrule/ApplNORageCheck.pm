@@ -2,6 +2,8 @@ package itil::qrule::ApplNORageCheck;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if the NOR verification is older then 365d. If the nor verification

@@ -2,6 +2,8 @@ package base::qrule::ContactScrap;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This rule analyses a contact for indicators if the contact

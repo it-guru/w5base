@@ -2,6 +2,8 @@ package itil::qrule::SystemDB;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 A system containing a software instance based on a DBMS must be marked 

@@ -2,6 +2,8 @@ package base::qrule::CheckStateOfParentGroup;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Validates the parent of a group. If the parent is in state "disposed of waste"

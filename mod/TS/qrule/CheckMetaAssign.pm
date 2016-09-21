@@ -2,6 +2,8 @@ package TS::qrule::CheckMetaAssign;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks all referenced Meta-Assignmentgroups in current object

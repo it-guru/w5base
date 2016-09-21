@@ -2,6 +2,8 @@ package tswiw::qrule::ParentOrgUnit;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Validates the parent child structur of org-units against WhoIsWho.

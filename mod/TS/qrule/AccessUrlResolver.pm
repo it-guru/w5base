@@ -2,6 +2,8 @@ package TS::qrule::AccessUrlResolver;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This rule checks the DNS resolv posibility of the hostname part

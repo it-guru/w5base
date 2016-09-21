@@ -2,6 +2,8 @@ package itil::qrule::RBNum;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every Element in CI-Status "installed/active" or "available", must

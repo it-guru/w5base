@@ -2,6 +2,8 @@ package itil::qrule::ApplUsetime;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 For each Prio1-Application use times must be entered."

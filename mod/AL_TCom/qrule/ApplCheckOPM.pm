@@ -2,6 +2,8 @@ package AL_TCom::qrule::ApplCheckOPM;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every Application in CI-Status "installed/active","inactiv/stored" 

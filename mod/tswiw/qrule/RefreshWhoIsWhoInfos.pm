@@ -2,6 +2,8 @@ package tswiw::qrule::RefreshWhoIsWhoInfos;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Refreshes some Informations from WhoIsWho.

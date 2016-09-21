@@ -2,6 +2,8 @@ package tswiw::qrule::CreateAlternateGroupname;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Create a alternate groupname and store it in additional container.

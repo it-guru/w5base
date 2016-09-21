@@ -2,6 +2,8 @@ package itil::qrule::ApplIfacePartner;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 If another application (fromappl) has documented an interface with

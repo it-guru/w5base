@@ -2,6 +2,8 @@ package base::qrule::ProjectroomLifetime;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if a project room is installed/active outside the timerange

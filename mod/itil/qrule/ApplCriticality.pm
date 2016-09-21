@@ -2,6 +2,8 @@ package itil::qrule::ApplCriticality;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 If an application is in "installed/active", there must be a criticality

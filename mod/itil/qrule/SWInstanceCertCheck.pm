@@ -1,6 +1,8 @@
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks the ssl expiration on swinstances in cistate "installed/active"

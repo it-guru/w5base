@@ -2,6 +2,8 @@ package TS::qrule::ApplChangeAGroup;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if there is on an "installed/active" or "available" application

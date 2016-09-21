@@ -2,6 +2,8 @@ package itil::qrule::RefCheckExternAppl;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 If there are no useful references (interfaces) found which point 

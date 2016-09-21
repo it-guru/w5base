@@ -2,6 +2,8 @@ package AL_TCom::qrule::ApplAttachSystemOverview;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Check if a prio1 application has a SystemOverview Attachment.

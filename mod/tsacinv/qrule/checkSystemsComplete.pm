@@ -2,6 +2,8 @@ package tsacinv::qrule::checkSystemsComplete;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if all systems on a specifice costobject are documented in

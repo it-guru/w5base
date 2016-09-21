@@ -2,6 +2,8 @@ package tsacinv::qrule::clusterSysCheck;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This QualityRule checks, if the logical system is recorded as a part of 

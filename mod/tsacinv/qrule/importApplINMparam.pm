@@ -2,6 +2,8 @@ package tsacinv::qrule::importApplINMparam;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This Rule compares the Incident-Managemtn relevant paramters of an

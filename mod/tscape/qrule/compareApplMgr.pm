@@ -2,6 +2,8 @@ package tscape::qrule::compareApplMgr;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This quality rule compares the Application Manager specified in 

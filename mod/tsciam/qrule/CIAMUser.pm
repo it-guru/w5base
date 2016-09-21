@@ -2,6 +2,8 @@ package tsciam::qrule::CIAMUser;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This quality rule syncs to CIAM user contacts.

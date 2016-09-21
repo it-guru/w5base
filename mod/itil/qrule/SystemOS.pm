@@ -2,6 +2,8 @@ package itil::qrule::SystemOS;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every system needs to have specified an operation system release to work. 

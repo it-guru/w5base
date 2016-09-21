@@ -2,6 +2,8 @@ package itil::qrule::SystemClusterStatus;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This rule checks if "isclusternode"="true", if a valid cluster is assigned.

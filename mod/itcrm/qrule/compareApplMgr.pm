@@ -2,6 +2,8 @@ package itcrm::qrule::compareApplMgr;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This rule compares the application manager from the customer portal

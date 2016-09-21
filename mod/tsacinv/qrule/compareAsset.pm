@@ -2,6 +2,8 @@ package tsacinv::qrule::compareAsset;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This QualityRule compares a W5Base physical system to an AssetManager 

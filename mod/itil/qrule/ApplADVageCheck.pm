@@ -2,6 +2,8 @@ package itil::qrule::ApplADVageCheck;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 A ADV must exists for every application with cisatus=3|4 and an age

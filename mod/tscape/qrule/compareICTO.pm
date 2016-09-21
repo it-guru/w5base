@@ -2,6 +2,8 @@ package tscape::qrule::compareICTO;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This quaity rule compares the specified ICTO ID to CAPE. A DataIssue

@@ -2,6 +2,8 @@ package AL_TCom::qrule::ApplIface;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every application in CI-Status "installed/active" or "available" needs

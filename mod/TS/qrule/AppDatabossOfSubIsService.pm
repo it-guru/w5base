@@ -2,6 +2,8 @@ package TS::qrule::AppDatabossOfSubIsService;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This rule analyses all applications 

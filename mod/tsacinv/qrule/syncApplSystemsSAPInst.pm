@@ -2,6 +2,8 @@ package tsacinv::qrule::syncApplSystemsSAPInst;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This rule checks an application in CI-Status "installed/active" or "available"

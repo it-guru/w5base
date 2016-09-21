@@ -2,6 +2,8 @@ package base::qrule::CIStatusTime;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Validates CI-Status of Config-Itmes. A record will be viewed as

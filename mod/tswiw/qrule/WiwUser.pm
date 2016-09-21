@@ -2,6 +2,8 @@ package tswiw::qrule::WiwUser;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This quality rule syncs to WhoIsWho user contacts.

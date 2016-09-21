@@ -1,6 +1,8 @@
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Check if the system is known in DINA. If this is, the local perfurl is

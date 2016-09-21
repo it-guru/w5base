@@ -2,6 +2,8 @@ package itil::qrule::SystemCPUcount;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every system has to have at least one (1) CPU to work. A DataIssue is 

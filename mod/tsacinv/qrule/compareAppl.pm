@@ -2,6 +2,8 @@ package tsacinv::qrule::compareAppl;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This QualityRule compares a W5Base application and its AssetManager 

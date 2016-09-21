@@ -1,6 +1,8 @@
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if the related application, logical system and software installation

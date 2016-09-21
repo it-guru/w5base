@@ -2,6 +2,8 @@ package base::qrule::InvalidRefChk;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if there are contact or group references in the current

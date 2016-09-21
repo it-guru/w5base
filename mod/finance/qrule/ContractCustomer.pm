@@ -2,6 +2,8 @@ package finance::qrule::ContractCustomer;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if a Customer is definend in every contract with a CI-Status 

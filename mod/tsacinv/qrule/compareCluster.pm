@@ -2,6 +2,8 @@ package tsacinv::qrule::compareCluster;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This quality rule compares a W5Base cluster to an AssetManager cluster

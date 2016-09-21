@@ -2,6 +2,8 @@ package itil::qrule::ApplBusinessTeam;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every Application in CI-Status "installed/active" or "available", must

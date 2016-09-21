@@ -2,6 +2,8 @@ package itil::qrule::ApplIface;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every Application in in CI-Status "installed/active" or "available", needs

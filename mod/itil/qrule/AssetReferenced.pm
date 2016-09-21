@@ -2,6 +2,8 @@ package itil::qrule::AssetReferenced;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 The QualityRule checks whether an Asset in CI-State "installed/active" 

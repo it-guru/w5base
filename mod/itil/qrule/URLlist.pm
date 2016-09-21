@@ -2,6 +2,8 @@ package itil::qrule::URLlist;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Check if there are software instances on an application with CI-Status

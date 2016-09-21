@@ -2,6 +2,8 @@ package tsacinv::qrule::compareSystem;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This QualityRule compares a W5Base/Darwin logical system to an AssetManager

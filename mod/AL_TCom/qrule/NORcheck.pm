@@ -2,6 +2,8 @@ package AL_TCom::qrule::NORcheck;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checking if NOR-Nachweis und NOR-Vorgabe is valid and makes sense.

@@ -2,6 +2,8 @@ package base::qrule::ContactRights;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if there at least one contact with rule 'write' is documented

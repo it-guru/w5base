@@ -2,6 +2,8 @@ package itil::qrule::ApplCO;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks whether a Costcenter in the CI-State 'installed/active' is entered 

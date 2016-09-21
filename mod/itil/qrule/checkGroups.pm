@@ -2,6 +2,8 @@ package itil::qrule::checkGroups;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This qulaity rule checks the CI-Status of the groups, references in

@@ -2,6 +2,8 @@ package TS::qrule::HardwareLocation;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every asset needs to have specified a location on which the hardware

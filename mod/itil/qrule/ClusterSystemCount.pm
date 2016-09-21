@@ -2,6 +2,8 @@ package itil::qrule::ClusterSystemCount;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 The quality rule checks if there are at least 2 cluster members

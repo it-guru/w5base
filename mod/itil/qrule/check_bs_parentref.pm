@@ -2,6 +2,8 @@ package itil::qrule::check_bs_parentref;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every BusinessService CI-Status "installed/active","inactiv/stored" 

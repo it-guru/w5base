@@ -1,6 +1,8 @@
 package tssm::qrule::Change;
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 B<Checks the compliance with change quality rules>

@@ -2,6 +2,8 @@ package tscape::qrule::CapeBasedMandatorRules;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 REGEL ist noch in der Testphase !!!

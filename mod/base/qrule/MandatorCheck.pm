@@ -2,6 +2,8 @@ package base::qrule::MandatorCheck;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 If there is a mandator record which is not deleted, but referes to

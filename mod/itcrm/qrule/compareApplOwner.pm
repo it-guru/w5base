@@ -2,6 +2,8 @@ package itcrm::qrule::compareApplOwner;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This rule compares the application owner from the customer portal

@@ -2,6 +2,8 @@ package TS::qrule::wfChangeTasks;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if there are tasks in ServiceCenter for the current

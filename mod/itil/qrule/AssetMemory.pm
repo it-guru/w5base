@@ -2,6 +2,8 @@ package itil::qrule::AssetMemory;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every system needs memory to work. If there is no or 0 memory size

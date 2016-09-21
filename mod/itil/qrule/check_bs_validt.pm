@@ -2,6 +2,8 @@ package itil::qrule::check_bs_validt;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if a Business-Service in "installed/active" state is between

@@ -2,6 +2,8 @@ package TS::qrule::CocCostcenterSem;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if there is a Customer Business Manager defined in the costcenter object

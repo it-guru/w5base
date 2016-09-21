@@ -2,6 +2,8 @@ package itil::qrule::SystemOpMode;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This QualityRule checks whether the Systemclass and Operation mode of 

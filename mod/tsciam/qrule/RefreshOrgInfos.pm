@@ -2,6 +2,8 @@ package tsciam::qrule::RefreshOrgInfos;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Refreshes some Informations from CIAM.

@@ -2,6 +2,8 @@ package AL_TCom::qrule::HardwareRefresh;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checking the age of hardware/asset items. This quality rules controles

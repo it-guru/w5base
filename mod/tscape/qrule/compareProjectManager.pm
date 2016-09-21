@@ -2,6 +2,8 @@ package tscape::qrule::compareProjectManager;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 This quality rule compares the Project Manager specified in 

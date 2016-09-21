@@ -2,6 +2,8 @@ package base::qrule::WorkflowUntouched3;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if a workflow is longer the 3 months unmodified.

@@ -2,6 +2,8 @@ package itil::qrule::ApplDesc;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every application in CI-Status "installed/active" or "available" needs to

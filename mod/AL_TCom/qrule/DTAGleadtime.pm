@@ -2,6 +2,8 @@ package AL_TCom::qrule::DTAGleadtime;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 If there is an customercontract affected from the workflow to check,

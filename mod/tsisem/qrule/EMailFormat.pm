@@ -2,6 +2,8 @@ package tsisem::qrule::EMailFormat;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Checks if the used email spelling in a user (contact) record looks

@@ -2,6 +2,8 @@ package itil::qrule::SystemMemory;
 #######################################################################
 =pod
 
+=encoding latin1
+
 =head3 PURPOSE
 
 Every system has to have memory to work. A DataIssue is generated if 
