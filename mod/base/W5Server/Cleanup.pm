@@ -141,6 +141,9 @@ sub CleanupWasted
    foreach my $obj (@objlist){
       my $o=getModuleObject($self->getParent->Config,$obj);
       msg(DEBUG,"check for CleanupWasted $obj");
+      if (!defined($o)){
+         die("ERROR: can not create object $obj");
+      }
       if ($o->can("prepareToWasted")){
          my $idobj=$o->IdField();
          my $mdatefld=$o->getField("mdate");
