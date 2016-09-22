@@ -17,6 +17,17 @@
 'Discovery records'=>{de=>'Discovery-Datensätze'},
 'Software assign to: '=>{de=>'Software zuordnen zu: '},
 'please select'=>{de=>'bitte auswählen'},
-
+'One time import of data'=>{de=>'Einmalige Datenübernahme'},
+'Auto discovery data incorrect or unusable'=>{
+   de=>'AutoDisc-Daten fehlerhaft oder nicht verwendbar'
+},
+'Import data with automatic updates in the future'=>{
+   de=>'Daten übernehmen mit zukünftigen automatischen Aktualisierungen'
+},
+'new Softwareinstallation on system'=>{
+   de=>'neue Software-Installation am logischen System'
+},
+'new Softwareinstallation on Cluster-Services'=>{
+   de=>'neue Software-Installation am Cluster-Service'},
 
 

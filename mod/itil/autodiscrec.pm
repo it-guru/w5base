@@ -663,7 +663,7 @@ sub AutoDiscFormatEntry
              "class=AutoDiscMapSelector>";
          $d.="<option value=''>- ".$self->T("please select")." -</option>";
          $d.="<option value='newSysInst'>".
-             "neue Software-Installation am logischen System</option>";
+             $self->T('new Softwareinstallation on system')."</option>";
          foreach my $swi (sort({
                             $control->{software}->{byid}->{$a}->{fullname} 
                               <=>
@@ -689,7 +689,8 @@ sub AutoDiscFormatEntry
          if ($rec->{isclusternode}){
             $d.="<option value=''></option>";
             $d.="<option value='newClustInst'>".
-                "neue Software-Installation am Cluster-Service</option>";
+                 $self->T('new Softwareinstallation on Cluster-Services').
+                "</option>";
             my $oldparent=undef;
             foreach my $swi (sort({
                                $control->{software}->{byid}->{$a}->{fullname} 
@@ -770,15 +771,15 @@ sub AutoDiscFormatEntry
       $d.="</div>";
       $d.="<div class='AutoDiscButtonBar'>";
       $d.="<input type='image' src='../../itil/load/autodisc_once.jpg' ".
-          "title='einmalige Datenübernahme' disabled ".
+          "title='".$self->T('One time import of data')."' disabled ".
           "adid='$adrec->{id}' id='LoadOnce$adrec->{id}' ".
           "class='LoadOnce AutoDiscButton'>";
       $d.="<input type='image' src='../../itil/load/autodisc_bad.jpg' ".
-          "title='AutoDisc Daten fehlerhaft oder nicht verwendbar' ".
+          "title='".$self->T('Auto discovery data incorrect or unusable')."' ".
           "adid='$adrec->{id}' id='BadScan$adrec->{id}' ".
           "class='BadScan AutoDiscButton'>";
       $d.="<input type='image' src='../../itil/load/autodisc_auto.jpg' ".
-        "title='Daten übernehmen mit zukünftigem automatischen Aktualisierungen' ".
+        "title='".$self->T('Import data with automatic updates in the future')."' ".
           "adid='$adrec->{id}' disabled id='LoadAuto$adrec->{id}' ".
           "class='LoadAuto AutoDiscButton'>";
       $d.="</div>"; # end of AutoDiscButtonBar
