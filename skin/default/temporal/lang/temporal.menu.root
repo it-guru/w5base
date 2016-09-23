@@ -1,0 +1,6 @@
+'Tools.calendar'=>{de=>'Kalender',en=>'Calendar'},
+'Tools.calendar.plan'=>{de=>'Zeitplan',en=>'Timeplan'},
+'Tools.calendar.plan.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.calendar.plan.tspan'=>{de=>'Zeitspanne',en=>'Timespan'},
+'Tools.calendar.plan.tspan.new'=>{de=>'Neueingabe',en=>'New'},
+

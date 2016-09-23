@@ -21,7 +21,6 @@ use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
-use kernel::Field::DRange;
 use kernel::Field;
 use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
@@ -345,12 +344,12 @@ sub new
                 label         =>'Event-End day',
                 depend        =>['eventend']),
 
-      new kernel::Field::DRange(
-                name          =>'range',
+      new kernel::Field::TRange(
+                name          =>'trange',
                 noselect      =>'1',
                 htmldetail    =>0,
                 readonly      =>1,
-                searchable    =>0,
+                searchable    =>1,
                 group         =>'state',
                 label         =>'Event time window',
                 depend        =>[qw(ranges rangem rangee)]),
@@ -1546,6 +1545,20 @@ sub DataIssueCompleteWriteRequest
    }
    return(1);
 }
+
+sub SetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+   if ($self->getField("trange")->SetFilter(\@flt)){; # expand filter for 
+                                                      # timerange handling 
+      return($self->SUPER::SetFilter(@flt));
+   }
+   return(undef);
+}
+
+
+
 
 sub SetFilterForQualityCheck    # prepaire dataobject for automatic 
 {                               # quality check (nightly)

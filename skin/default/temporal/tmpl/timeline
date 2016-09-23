@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Timeline | Basic demo</title>
+
+  <style type="text/css">
+    body, html {
+      font-family: sans-serif;
+    }
+  </style>
+
+  <script src="../../../public/base/load/jquery.js"></script>
+  <script src="../../../public/base/load/toolbox.js"></script>
+  <script src="../../../public/base/load/subModal.js"></script>
+  <script src="../../../public/base/load/kernel.App.Web.js"></script>
+  <script src="../../../public/base/load/moment.min.js"></script>
+  <script src="../../../public/base/load/moment-with-locales.min.js"></script>
+  <script src="../../../static/visjs/dist/vis.js"></script>
+  <link href="../../../static/visjs/dist/vis.css" rel="stylesheet" type="text/css" />
+</head>
+<script language="JavaScript">
+
+function DoSearch()
+{
+   var d;
+   document.forms[0].action='../../base/workflow/Result';
+   document.forms[0].target='Result';
+   document.forms[0].elements['FormatAs'].value='HtmlV01';
+   document.forms[0].elements['UseLimitStart'].value='0';
+   document.forms[0].elements['UseLimit'].value='20';
+//   DisplayLoading(frames['Result'].document);
+   window.setTimeout("document.forms[0].submit();",1);
+   return;
+}
+
+$(document).ready(function(){
+  var container = document.getElementById('visualization');
+
+  // Create a DataSet (allows two way data-binding)
+  var items = new vis.DataSet([
+    {id: 1, content: 'item 1', start: '2016-03-20', end: '2016-03-22'},
+    {id: 2, content: 'item 2', start: '2016-03-14'},
+    {id: 3, content: 'Frozenzone 2016', start: '2016-03-01 00:00:00',end:'2016-03-31 12:00:00'},
+    {id: 4, content: 'item 4', start: '2016-03-16', end: '2016-03-19'},
+    {id: 5, content: 'item 5', start: '2016-03-25 00:00:00',end: '2016-03-28 12:00:00'},
+    {id: 7, content: 'itm 4', start: '2016-03-16', end: '2016-03-19'},
+    {id: 17, content: 'itm 4', start: '2016-03-16', end: '2016-03-19'},
+    {id: 27, content: 'itm 4', start: '2016-03-16', end: '2016-03-19'},
+    {id: 8, content: 'itm 5', start: '2016-03-25'}
+  ]);
+
+  // Configuration for the Timeline
+  var options = {
+     zoomMax: 2678400000,
+     zoomMin: 86400000*7,
+     height:200,
+     showCurrentTime: true,
+     locale: 'de'
+  };
+
+  // Create a Timeline
+  var timeline = new vis.Timeline(container, items, options);
+  timeline.on('select', function (prop) {
+    console.log("select",items.get(prop.items[0]));
+    var url="Result";
+    
+  });
+  //timeline.on('rangechange', function (prop) {
+  //  console.log("rangechange",prop.start,prop.end);
+  //  console.log("d",prop.start+(prop.end-prop.start));
+  //});
+  setEnterSubmit(document.forms[0],DoSearch);
+});
+
+
+</script>
+<style>
+body{
+   margin:0;
+   padding:0;
+   height:100\%;
+   overflow:hidden;
+}
+html{
+   height:100\%;
+}
+
+</style>
+
+
+<body><table style="width:100\%;height:100\%" border=1 cellspacing=0 cellpadding=0>
+<tr height=1\%><td valign=top>W5Base/Darwin - timeline Modul</td></tr>
+<tr height=1\%><td valign=top>
+<div id="visualization"></div>
+
+<form target="Result" action="Result">
+<input type="hidden" name="search_range" value="(2016-03-01:2016-03-07)">
+<input type="hidden" name="search_class" value="TS::workflow::change">
+<input type="hidden" name="FormatAs" value="HtmlV01">
+<input type="hidden" name="UseLimitStart" value="0">
+<input type="hidden" name="UseLimit" value="0">
+<input type="submit" name="DoSearch" value="Update" onclick="DoSearch();">
+</form>
+
+</td></tr>
+<tr><td valign=top>
+<iframe width="100\%" id=result name="Result" height="100\%" src="Welcome"></iframe>
+</td></tr>
+</table></body></html>
+

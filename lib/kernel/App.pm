@@ -1108,6 +1108,82 @@ sub T
    return($txt);
 }
 
+sub ExpandTRangeExpression
+{
+   my $self=shift;
+   my $val=shift;
+   my $srctimezone=shift;
+   my $dsttimezone=shift;
+   my $filename=shift;
+   my $opt=shift;
+   my $f=undef;
+
+   $dsttimezone="GMT" if (!defined($dsttimezone));
+   if (!defined($srctimezone)){
+      $srctimezone=$self->UserTimezone();
+   }
+   $opt={} if (!defined($opt));
+
+   my $res=undef;
+
+   #printf STDERR ("fifi val='$val'\n");
+
+   if ($val=~m/^currentmonth$/gi){
+      my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($srctimezone); 
+      my $max=Days_in_Month($Y,$M);
+      $val="$Y-$M-01 00:00:00/$Y-$M-$max 23:59:59";
+      $f=sprintf("%04d/%02d",$Y,$M);
+      #printf STDERR ("fifi02 val='$val'\n");
+   }
+   if (my ($Y1,$M1,$D1,$h1,$m1,$s1,$Y2,$M2,$D2,$h2,$m2,$s2)=
+          $val=~m/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s
+                   (\d{1,2}):(\d{1,2}):(\d{1,2})-
+                   (\d{1,2})\.(\d{1,2})\.(\d{4})\s
+                   (\d{1,2}):(\d{1,2}):(\d{1,2})$/xgi){
+      $val=sprintf("%04d-%02d-%02d %02d:%02d:%02d/".
+                   "%04d-%02d-%02d %02d:%02d:%02d",
+                   $D1,$M1,$Y1,$h1,$m1,$s1,
+                   $D2,$M2,$Y2,$h2,$m2,$s2);
+   }
+   if (my ($Y1,$M1,$D1,$Y2,$M2,$D2)=
+          $val=~m/^(\d{1,2})\.(\d{1,2})\.(\d{4})-
+                   (\d{1,2})\.(\d{1,2})\.(\d{4})$/xgi){
+      my ($h1,$m1,$s1,$h2,$m2,$s2)=(0,0,0,23,59,59);
+      $val=sprintf("%04d-%02d-%02d %02d:%02d:%02d/".
+                   "%04d-%02d-%02d %02d:%02d:%02d",
+                   $D1,$M1,$Y1,$h1,$m1,$s1,
+                   $D2,$M2,$Y2,$h2,$m2,$s2);
+   }
+   if (my ($Y1,$M1,$D1,$h1,$m1,$s1,$Y2,$M2,$D2,$h2,$m2,$s2)=
+          $val=~m/^(\d{4})-(\d{1,2})-(\d{1,2})\s
+                   (\d{1,2}):(\d{1,2}):(\d{1,2})\/
+                   (\d{4})-(\d{1,2})-(\d{1,2})\s
+                   (\d{1,2}):(\d{1,2}):(\d{1,2})$/xgi){
+      my ($time1,$time2);
+      if ($opt->{align} eq "day"){
+         if (!($h1==0  && $m1==0  && $s1==0 &&
+               $h2==23 && $m2==59 && $s2==59)){
+            return(undef);
+         } 
+      }
+      eval('$time1=Mktime($srctimezone,$Y1,$M1,$D1,$h1,$m1,$s1);');
+      eval('$time2=Mktime($srctimezone,$Y2,$M2,$D2,$h2,$m2,$s2);');
+      if ($time1>$time2){
+         return(undef);
+      }
+      ($Y1,$M1,$D1,$h1,$m1,$s1)=Localtime($dsttimezone,$time1);
+      ($Y2,$M2,$D2,$h2,$m2,$s2)=Localtime($dsttimezone,$time2);
+      $res=[sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+                    $Y1,$M1,$D1,$h1,$m1,$s1),
+            sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+                    $Y2,$M2,$D2,$h2,$m2,$s2)];
+   }
+
+   $$filename=$f if (ref($filename) eq "SCALAR");
+   return($res);
+}
+
+
 sub PreParseTimeExpression
 {
    my $self=shift;
