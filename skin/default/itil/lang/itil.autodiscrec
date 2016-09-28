@@ -7,9 +7,9 @@
 'all processed ones'=>{de=>'alle behandelten'},
 'reset to unprocessed'=>{de=>'zurücksetzen auf unbehandelt'},
 'First detected on AutoDiscoveryEngine'=>{de=>'Erstmalig auf der AutoDiscoveryEngine'},
-'The Software was detected as'=>{de=>'Die Software wurde gescant als'},
+'The Software was detected as'=>{de=>'Die Software wurde gescannt als'},
 'in the Version'=>{de=>'in der Version'},
-'at the installationpath'=>{de=>'auf dem Installationspfad'},
+'at the installation path'=>{de=>'auf dem Installationspfad'},
 'This information was last seen at'=>{de=>'Diese Information wurde das letzte Mal "gesehen" um '},
 'and was'=>{de=>'und konnte bisher'},
 'times not refreshed'=>{de=>'mal NICHT überprüft werden'},
@@ -24,10 +24,10 @@
 'Import data with automatic updates in the future'=>{
    de=>'Daten übernehmen mit zukünftigen automatischen Aktualisierungen'
 },
-'new Softwareinstallation on system'=>{
+'new software installation on system'=>{
    de=>'neue Software-Installation am logischen System'
 },
-'new Softwareinstallation on Cluster-Services'=>{
+'new software installation on Cluster-Services'=>{
    de=>'neue Software-Installation am Cluster-Service'},
 
 

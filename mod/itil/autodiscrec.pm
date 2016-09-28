@@ -593,7 +593,7 @@ sub AutoDiscFormatEntry
       $d.=" <b>\"$adrec->{scanname}\"</b> ";
       $d.=$self->T("in the Version");
       $d.=" <b>\"".$adrec->{scanextra2}."\"</b> ";
-      $d.=$self->T("at the installationpath");
+      $d.=$self->T("at the installation path");
       $d.=" <b>\"".$adrec->{scanextra1}."\"</b>. ";
       
    }
@@ -663,7 +663,7 @@ sub AutoDiscFormatEntry
              "class=AutoDiscMapSelector>";
          $d.="<option value=''>- ".$self->T("please select")." -</option>";
          $d.="<option value='newSysInst'>".
-             $self->T('new Softwareinstallation on system')."</option>";
+             $self->T('new software installation on system')."</option>";
          foreach my $swi (sort({
                             $control->{software}->{byid}->{$a}->{fullname} 
                               <=>
@@ -689,7 +689,7 @@ sub AutoDiscFormatEntry
          if ($rec->{isclusternode}){
             $d.="<option value=''></option>";
             $d.="<option value='newClustInst'>".
-                 $self->T('new Softwareinstallation on Cluster-Services').
+                 $self->T('new software installation on Cluster-Services').
                 "</option>";
             my $oldparent=undef;
             foreach my $swi (sort({
