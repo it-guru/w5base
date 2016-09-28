@@ -1135,6 +1135,14 @@ sub ExpandTRangeExpression
       $f=sprintf("%04d/%02d",$Y,$M);
       #printf STDERR ("fifi02 val='$val'\n");
    }
+   elsif ($val=~m/^nextmonth$/gi){
+      my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($srctimezone); 
+      ($Y,$M,$D)=Add_Delta_YM($srctimezone,$Y,$M,$D,0,1);
+      my $max=Days_in_Month($Y,$M);
+      $val="$Y-$M-01 00:00:00/$Y-$M-$max 23:59:59";
+      $f=sprintf("%04d/%02d",$Y,$M);
+   }
+
    if (my ($Y1,$M1,$D1,$h1,$m1,$s1,$Y2,$M2,$D2,$h2,$m2,$s2)=
           $val=~m/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s
                    (\d{1,2}):(\d{1,2}):(\d{1,2})-
@@ -1173,10 +1181,36 @@ sub ExpandTRangeExpression
       }
       ($Y1,$M1,$D1,$h1,$m1,$s1)=Localtime($dsttimezone,$time1);
       ($Y2,$M2,$D2,$h2,$m2,$s2)=Localtime($dsttimezone,$time2);
-      $res=[sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+      $res=[sprintf("%04d-%02d-%02dT%02d:%02d:%02d",
                     $Y1,$M1,$D1,$h1,$m1,$s1),
-            sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+            sprintf("%04d-%02d-%02dT%02d:%02d:%02d",
                     $Y2,$M2,$D2,$h2,$m2,$s2)];
+      printf STDERR ("fifi res= '%s' - '%s'\n",$res->[0],$res->[1]);
+   }
+   if (my ($Y1,$M1,$D1,$h1,$m1,$s1,$Y2,$M2,$D2,$h2,$m2,$s2)=
+          $val=~m/^(\d{4})-(\d{1,2})-(\d{1,2})T
+                   (\d{1,2}):(\d{1,2}):(\d{1,2})P
+                   (\d{4})-(\d{1,2})-(\d{1,2})T
+                   (\d{1,2}):(\d{1,2}):(\d{1,2})$/xgi){
+      my ($time1,$time2);
+      if ($opt->{align} eq "day"){
+         if (!($h1==0  && $m1==0  && $s1==0 &&
+               $h2==23 && $m2==59 && $s2==59)){
+            return(undef);
+         } 
+      }
+      eval('$time1=Mktime("GMT",$Y1,$M1,$D1,$h1,$m1,$s1);');
+      eval('$time2=Mktime("GMT",$Y2,$M2,$D2,$h2,$m2,$s2);');
+      if ($time1>$time2){
+         return(undef);
+      }
+      ($Y1,$M1,$D1,$h1,$m1,$s1)=Localtime($dsttimezone,$time1);
+      ($Y2,$M2,$D2,$h2,$m2,$s2)=Localtime($dsttimezone,$time2);
+      $res=[sprintf("%04d-%02d-%02dT%02d:%02d:%02d",
+                    $Y1,$M1,$D1,$h1,$m1,$s1),
+            sprintf("%04d-%02d-%02dT%02d:%02d:%02d",
+                    $Y2,$M2,$D2,$h2,$m2,$s2)];
+      printf STDERR ("fifi res= '%s' - '%s'\n",$res->[0],$res->[1]);
    }
 
    $$filename=$f if (ref($filename) eq "SCALAR");

@@ -72,6 +72,14 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'timeplan.cistatus'),
 
+      new kernel::Field::Select(
+                name          =>'planclass',
+                label         =>'timeplan class',
+                value         =>[qw( 
+                                     TCLASS.measureplan
+                                     TCLASS.unknown
+                                 )],
+                dataobjattr   =>'timeplan.tmode'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',

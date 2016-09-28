@@ -19,6 +19,7 @@ package temporal::CalendarEngine;
 use strict;
 use vars qw(@ISA);
 use kernel;
+use kernel::date;
 use kernel::App::Web;
 use CGI;
 @ISA=qw(kernel::App::Web);
@@ -36,7 +37,59 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main));
+   return(qw(Main EventList));
+}
+
+sub EventList
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/javascript",charset=>'UTF-8');
+   my %e=(
+      id     =>   '001',
+      start  =>   '2016-01-01T00:00:00',
+      end    =>   '2017-01-01T00:00:00',
+      title  =>   'Sample Event',
+   );
+   my $l=[\%e];
+
+   eval("use JSON;");
+   if ($@ eq ""){
+      my $json;
+      eval('$json=to_json($l, {ascii => 1});');
+      print STDERR $json;
+      print $json;
+   }
+   else{
+      printf STDERR ("ERROR: ganz schlecht: %s\n",$@);
+   }
+}
+
+
+sub getExMenuWidth
+{
+   my $self=shift;
+
+   return("150");
+
+}
+
+sub getFrontendTimezone
+{
+   my $self=shift;
+
+   my $timezone=$self->UserTimezone();
+   if (!defined($timezone)){
+      $timezone="GMT";
+   }
+   return($timezone);
+}
+
+sub getDataDetailCode
+{
+   my $self=shift;
+   my $d="function showDataDetail(e){alert('NOT IMPLEMENTED');}";
+   return($d);
 }
 
 
@@ -67,7 +120,23 @@ sub Main
    my $fullname=$self->T("Fullname");
    my $name=$self->T("Name");
    my $objecttype=$self->T("ObjectType");
+
+
+   my $ExMenuWidth=$self->getExMenuWidth();
+   my $ExMenu="<div id=ExMenu style=\"width:${ExMenuWidth}px\"></div>";
+   $ExMenu="" if ($ExMenuWidth eq "");
+
+   my $timezone=$self->getFrontendTimezone();
+   my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($timezone);
+
+   my $nowstamp=sprintf("%04d-%02d-%02d",$Y,$M,$D);
+
+   my $datadetailcode=$self->getDataDetailCode();
+
+   my $modalDiv=$self->HtmlSubModalDiv();
+
    my $opt={
+      skinbase=>'temporal',
       static=>{
           LANG      => $lang,
           DATAOBJ   => $dataobj,
@@ -76,9 +145,16 @@ sub Main
           TITLEBAR  => $getAppTitleBar,
           NAME      => $name,
           FULLNAME  => $fullname,
+          EXMENUDIV => $ExMenu,
+          NOWSTAMP  => $nowstamp,
+          TIMEZONE  => $timezone,
+          MODALDIV  => $modalDiv,
+          DATADETAILCODE  => $datadetailcode,
           OBJECTTYPE=> $objecttype,
       }
    };
+
+
 
    my $prog=$self->getParsedTemplate("tmpl/temporal.CalendarEngineMain",$opt);
    utf8::encode($prog);

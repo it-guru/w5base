@@ -630,7 +630,8 @@ EOF
       while(my $fieldname=shift(@searchfields)){
          my $fo=$self->getField($fieldname); 
          my $type=$fo->Type();
-         next if (!$fo->UiVisible("SearchMask"));
+         next if (!exists($fo->{searchable}) && !$fo->UiVisible("SearchMask"));
+         next if (exists($fo->{searchable}) && !($fo->{searchable}));
          if (!$fo->searchable()){
             if ($type eq "Id"){
                if ($#searchfields!=-1){

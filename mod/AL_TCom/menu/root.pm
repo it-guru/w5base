@@ -515,6 +515,22 @@ sub Init
                       "TS::chmmgmt",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.proc.ChangeManagement.mplan",
+                      "AL_TCom::measureplan",
+                      prio=>3,
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.proc.ChangeManagement.mplan.tspan",
+                      "temporal::tspan",
+                      prio=>3,
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.proc.ChangeManagement.mplan.tspan.new",
+                      "temporal::tspan",
+                      func=>'New',
+                      prio=>10,
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.proc.softmgmt",
                       "itil::softwareset",
                       func=>'MainWithNew',

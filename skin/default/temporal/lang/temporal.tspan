@@ -1,0 +1,13 @@
+'temporal::tspan'=>{en=>'Timespan',de=>'Zeitspanne'},
+'fieldgroup.mgmtitemgroup'=>{de=>'Verknüpfung CI-Gruppen',en=>'Relation CIGroup'},
+'time plan'=>{de=>'Zeitplan'},
+'from'=>{de=>'Von'},
+'to'=>{de=>'Bis'},
+'Range-Filter'=>{de=>'Zeitbereichsfilter'},
+'tspanentry name'=>{de=>'Zeitspannenbezeichnung'},
+'timespan subsystem'=>{de=>'Zeitbereichsart'},
+'SIMPLE'=>{de=>'Einfacher Zeitbereich',en=>'simple time span'},
+'MGMTITEMGRP'=>{de=>'Verweis auf zentral geführte CI-Gruppe',en=>'relation to central cigroup'},
+'central managed item group'=>{de=>'zentral geführte CI-Gruppe'},
+'color'=>{de=>'Farbe'}
+

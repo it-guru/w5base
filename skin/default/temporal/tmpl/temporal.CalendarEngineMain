@@ -1,22 +1,15 @@
 <html><head>
-<style>
-body{
-   margin:0;padding:0;
-}
-</style>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta charset='utf-8' />
 <link href='../../../static/fullcalendar/lib/fullcalendar.min.css' rel='stylesheet' />
 <link href='../../../static/fullcalendar/lib/fullcalendar.print.css' rel='stylesheet' media='print' />
 <link href='../../../static/fullcalendar/scheduler.min.css' rel='stylesheet' />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta charset='utf-8' />
 <title>W5Base Calendar Engine - preBETA!</title>
-</head><body><div id=MainStartup style='xdisplay:none'><table width=100% border=1 cellspacing=0 cellpadding=0 height=100%><tr height=1%><td colspan=3>%TITLEBAR%</td></tr><tr><td valign=top width=1%><div id='workspace' style="height:100%;overflow:auto"><div id=exmenu style="width:150px"></div>
+</head><body>%MODALDIV%<div id=MainStartup style='xdisplay:none'><table border=0 cellspacing=0 cellpadding=0 id=maintable><tr height=1%><td colspan=3>%TITLEBAR%</td></tr><tr><td valign=top width=1%><div id='workspace' style="height:100%;overflow:auto">%EXMENUDIV%
 </div></td><td valign=top>
-<table width=100% height=100% border=1><tr height=1%><td valign=top><div id='calendar'></div></td></tr>
-<tr><td valign=top>
-<div style="width:100%;height:100%;overflow:auto"><div id=exdata></div></div>
-</td></tr>
+<table width=100% height=100% border=0><tr height=1%><td valign=top><div id='calendar'></div></td><td></td></tr>
+<tr><td valign=top><div id=exdatadiv><div id=ExData></div></div></td></tr>
 </table></td></tr></table></div></body>
 
 
@@ -26,6 +19,71 @@ body{
 <link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css"></link>
 <link rel="stylesheet" href="../../../public/base/load/jquery.dataTables.css"></link>
 <link rel="stylesheet" href="../../../public/base/load/base.CalendarEngine.css"></link>
+
+
+<style>
+body{
+   margin:0;padding:0;
+}
+#maintable{
+   width:100%;
+   height:100%;
+}
+#exdatadiv{
+   width:100%;
+   height:100%;
+   overflow:auto
+}
+.forwardSearch{
+   text-align:right;
+   padding-right:5px;
+   cursor: pointer;
+   cursor: hand;
+}
+
+@media print{
+   body{
+      background-color:transparent;
+   }
+   #maintable{
+      width:100%;
+      height:auto;
+   }
+   .forwardSearch{
+      display:none;
+      visibilty:hidden;
+   }
+   #exdatadiv{
+      width:100%;
+      height:auto;
+      overflow:auto
+   }
+}
+
+.baron{
+   margin:0;
+   padding:0;
+   font-size:12px;
+   color:black;
+   height:15px;
+   background-color:#72A47E;
+   float:left;
+   overflow:hidden;
+}
+.baroff{
+   margin:0;
+   padding:0;
+   font-size:12px;
+   color:black;
+   height:15px;
+   background-color:transparent;
+   float:left;
+   overflow:hidden;
+}
+</style>
+
+
+
 <xscript src="excanvas.js"></xscript>
 <xscript data-main="scripts/main"  src="../../../public/base/load/require.js">
 </xscript>
@@ -36,6 +94,10 @@ body{
 <script language="JavaScript" src="../../../public/base/load/spin.js">
 </script>
 <script language="JavaScript" src="../../../public/base/load/datadumper.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/date.format.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/subModal.js">
 </script>
 
 <script language="JavaScript" src="../../../public/base/load/jquery.dataTables.js">
@@ -54,76 +116,129 @@ body{
 <script src='../../../static/fullcalendar/lang-all.js'></script>
 
 <script language="JavaScript" >
-
-   $(function() { // document ready
-      var initialLangCode = 'de';
-      $('#calendar').fullCalendar({
-         now: '2016-05-07',
-         editable: true,
-         aspectRatio: 2.0,
-         scrollTime: '00:00',
-         lang: initialLangCode,
-         schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
-               slotDuration: '01:00:00', 
-         header: {
-            left: 'today prev,next',
-            center: 'title',
-            right: 'timelineDay,timelineTenDay,timelineMonth,timelineWeek,month'
-         },
-         defaultView: 'timelineDay',
-eventRender: function (event, element) {
-        element.attr('href', 'javascript:void(0);');
-        element.click(function() {
-            $("#startTime").html(moment(event.start).format('MMM Do h:mm A'));
-            $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
-            $("#eventInfo").html(event.description);
-            $("#eventLink").attr('href', event.url);
-            $("#eventContent").dialog({ modal: true, title: event.title, width:350});
-        });
-    },
-         views: {
-//          timelineDay: {
-//             buttonText: ':15 slots',
-//             slotDuration: '00:15'
-//          },
-            timelineTenDay: {
-               type: 'timeline',
-               duration: { days: 10 }
-            }
-         },
-         resourceAreaWidth: '20%',
-         resourceLabelText: 'Changes',
-         eventMouseover:function( e, jsEvent, view ) {
-            $('#detail').html(e.id);
-         },
-         resources: [
-            { id: 'CHM000000001', title: 'Massnahme XX',
-             children: [
-               { id: 'd1', title: 'Changes' }
-            ] },
-            { id: 'CHM000000002', title: 'CHM000000002' },
-            { id: 'CHM000000003', title: 'CHM000000003' },
-         ],
-         events: [
-            { id: 'CHM000000001', resourceId: 'CHM000000001', start: '2016-05-07T02:00:00', end: '2016-05-07T07:00:00', title: 'CHM000000001: Dies ist die Change Beschreibung',editable:false },
-            { id: 'CHM000000002', resourceId: 'd1', start: '2016-05-07T03:00:00', end: '2016-05-07T04:30:00', title: 'CHM000000002: Dies ist die Change Beschreibung',editable:false },
-            { id: 'CHM000000003', resourceId: 'd1', start: '2016-05-01T03:00:00', end: '2017-05-07T04:40:00', title: 'CHM000000003: Dies ist die Change Beschreibung',editable:false },
-         ]
-      });
+var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+function startSpinner(){
+   var opts = {
+     lines: 12, // The number of lines to draw
+     length: 7, // The length of each line
+     width: 5, // The line thickness
+     radius: 20, // The radius of the inner circle
+     color: '#fff', // #rbg or #rrggbb
+     speed: 1, // Rounds per second
+     trail: 66, // Afterglow percentage
+     shadow: true // Whether to render a shadow
+   };
+   var target = document.getElementById('spin')
+   var spinner = new Spinner(opts).spin(target);
+}
+function endSpinner(){
+   $('#spin').html("");
+}
 
 
-setInterval(function(){  
-var d=$('#exdata').html();
-d+="xyxsdhfjksadhf<br>";
-$('#exdata').html(d);
-}, 1000);
-setInterval(function(){  
-var d=$('#exmenu').html();
-d+="xyxsdhfjksadhf<br>";
-$('#exmenu').html(d);
-}, 1000);
-   
+function calculatePercentBar(range_s,range_e,ev_s,ev_e){
+   //console.log("calculatePercentBar",range_s,range_e,ev_s,ev_e);
+   var eoverlab=false;
+   var soverlab=false;
+   var p1,p2,p3,t,t1,t3;
+   if (ev_s<range_s){
+      soverlab=true;
+      ev_s=range_s;
+      t1=0;
+   }
+   if (ev_e>range_e){
+      eoverlab=true;
+      ev_e=range_e;
+      t3=0;
+   }
+   if (soverlab && eoverlab){
+      p1=0; p2=100; p3=0;
+   }
+   else{
+      t=range_e-range_s;
+      if (!eoverlab){
+         t3=range_e-ev_e;
+      }
+      if (!soverlab){
+         t1=ev_s-range_s;
+      }
+      //console.log("t:",t," t1:",t1," t2(",t-(t3+t1),") t3:",t3);
+      p1=parseInt(t1*100/t);
+      p3=parseInt(t3*100/t);
+      p2=100-(p1+p3);
+   }
+
+   return([p1,p2,p3,soverlab,eoverlab]); 
+}
+
+%DATADETAILCODE%
+
+$(function() { // document ready
+   var initialLangCode = 'de';
+   $('#calendar').fullCalendar({
+      now: '%NOWSTAMP%',
+      timezone: '%TIMEZONE%',
+      aspectRatio: 2.3,
+      scrollTime: '00:00',
+      lang: initialLangCode,
+      schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+      slotDuration: '01:00:00', 
+      customButtons: {
+          refresh: {
+              text: 'refresh',
+              click: function() {
+                  $('#calendar').fullCalendar('refetchEvents');
+              }
+          },
+          new: {
+              text: 'new',
+              click: function() {
+                  alert("new not implemented now");
+              }
+          }
+      },
+      header: {
+         left: 'today prev,next refresh',
+         center: 'title',
+         right: 'timelineDay,timeline5TenDay,timelineWeek,month'
+      },
+      defaultView: 'timelineDay',
+
+      eventRender: function (event, element) {
+              element.attr('href', 'javascript:void(0);');
+              element.click(function() {
+                  showDataDetail(event);
+              });
+          },
+
+      views: {
+         timeline5TenDay: {
+            type: 'timeline',
+            duration: { days: 15 }
+         }
+      },
+      resourceAreaWidth: '20%',
+      loading: function (b) {
+         if (b){
+            //console.log("fifi evspinner start");
+            startSpinner(); 
+         }
+         else{
+            //console.log("fifi evspinner ende");
+            endSpinner(); 
+         }
+      },
+      eventAfterAllRender: function (view) {
+         $('#ExData').html("");
+         endSpinner(); 
+      },
+      resourceLabelText: 'Changes',
+      eventMouseover:function( e, jsEvent, view ) {
+         $('#detail').html(e.id);
+      },
+      events: 'EventList',
    });
+});
 
 
 
@@ -133,4 +248,5 @@ $('#exmenu').html(d);
 
 
 </script>
+<div id="spin" style="xdisplay:none;"></div>
 </html>

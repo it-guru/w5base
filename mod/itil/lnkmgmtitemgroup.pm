@@ -82,7 +82,7 @@ sub new
                 htmldetail    =>0,
                 dataobjattr   =>'mgmtitemgroup.grouptype'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'mgmtitemgroupid',
                 label         =>'managed item group ID',
                 dataobjattr   =>'lnkmgmtitemgroup.mgmtitemgroup'),

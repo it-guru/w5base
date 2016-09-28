@@ -79,11 +79,73 @@ sub new
                 label         =>'Range-Filter',
                 depend        =>['span_s','span_m','span_e']),
 
+      new kernel::Field::Select(
+                name          =>'subsys',
+                label         =>'timespan subsystem',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if (defined($rec));
+                   return(0);
+                },
+                value         =>[qw( 
+                                     SIMPLE
+                                     MGMTITEMGRP
+                                 )],
+                selectfix     =>1,
+                jsonchanged   =>\&getOnChangedScript,
+                dataobjattr   =>'tspanentry.subsys'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
                 searchable    =>0,
                 dataobjattr   =>'tspanentry.comments'),
+
+
+      new kernel::Field::TextDrop(
+                name          =>'mgmtitemgroupname',
+                vjointo       =>'itil::mgmtitemgroup',
+                vjoinon       =>['mgmtitemgroupid'=>'id'],
+                vjoindisp     =>'name',
+                group         =>'mgmtitemgroup',
+                label         =>'central managed item group'),
+
+      new kernel::Field::Interface(
+                name          =>'mgmtitemgroupid',
+                group         =>'mgmtitemgroup',
+                label         =>'central managed item id',
+                dataobjattr   =>'tspanentry.cigrpidref'),
+
+
+      new kernel::Field::Select(
+                name          =>'color',
+                label         =>'color',
+                group         =>['mgmtitemgroup'],
+                value         =>[qw( 
+                                     coral
+                                     crimson
+                                     darkred
+                                     darkslategray
+                                 )],
+                container     =>'additional'),
+
+      new kernel::Field::Select(
+                name          =>'planclass',
+                label         =>'timeplan class',
+                value         =>[qw( 
+                                     TCLASS.measureplan
+                                 )],
+                translation   =>'temporal::plan',
+                readonly      =>1,
+                htmldetail    =>0,
+                dataobjattr   =>'timeplan.tmode'),
+
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                uivisible     =>0,
+                dataobjattr   =>'tspanentry.additional'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -176,6 +238,24 @@ sub initSearchQuery
 #   }
 }
 
+sub getOnChangedScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+if (mode=="onchange"){
+   var f = document.forms[0];
+   for(var i=0,fLen=f.length;i<fLen;i++){
+     f.elements[i].readOnly=true;
+   }
+   document.forms[0].submit();
+}
+EOF
+   return($d);
+}
+
+
 
 
 sub getSqlFrom
@@ -224,7 +304,7 @@ sub getSqlFrom
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default source));
+   return(qw(header default mgmtitemgroup source));
 }
 
 
@@ -264,15 +344,31 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec) && $self->IsMemberOf("admin"));
-   return("ALL");
+
+   my $subsys;
+   my @l;
+
+   push(@l,"header","default");
+   if (!defined($rec)){
+      $subsys=Query->Param("Formated_subsys");
+     # push(@l,"header","default");
+   }
+   else{
+      $subsys=$rec->{subsys};
+      push(@l,"source");
+   }
+   if ($subsys eq "MGMTITEMGRP"){
+      push(@l,"mgmtitemgroup");
+   }
+
+   return(@l);
 }
 
 sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if ($self->IsMemberOf("admin"));
+   return("default","mgmtitemgroup") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 
