@@ -453,6 +453,23 @@ sub Unformat
    return({});
 }
 
+sub copyFrom
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $oldval=$self->RawValue($oldrec);
+
+   my $usertimezone=$ENV{HTTP_FORCE_TZ};
+   if (!defined($usertimezone)){
+      $usertimezone=$self->getParent->UserTimezone();
+   }
+
+   my ($d)=$self->getFrontendTimeString("edit",$oldval,$usertimezone);
+   return($d);
+}
+
+
+
 
 sub getXLSformatname
 {
