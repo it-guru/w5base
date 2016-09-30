@@ -6,10 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta charset='utf-8' />
 <title>W5Base Calendar Engine - preBETA!</title>
-</head><body><div id=MainStartup>%MODALDIV%<table border=0 cellspacing=0 cellpadding=0 id=maintable><tr height=1%><td colspan=3>%TITLEBAR%</td></tr><tr><td valign=top width=1%><div id='workspace' style="width:1%;height:100%;overflow:auto">%EXMENUDIV%
-</div></td><td valign=top>
-<table width=100% height=100% border=0><tr height=1%><td valign=top><div id='calendar'></div></td><td style="width:1%"></td></tr>
-<tr><td valign=top colspan=2 style="width:1%"><div id=exdatahead><div id=ExHead></div></div><div id=exdatadiv><div id=ExData></div></div></td></tr>
+</head><body><div id=MainStartup>%MODALDIV%<table border=0 cellspacing=0 cellpadding=0 id=maintable><tr height=1%><td colspan=3>%TITLEBAR%</td></tr><tr><td valign=top width=1%><div id='workspace' style="width:1%;height:100%;overflow:auto">%EXMENUDIV%</div></td><td valign=top><table width=100% height=100% border=0><tr height=1%><td valign=top><div id='calendar'></div></td><td style="width:1%"></td></tr><tr><td valign=top ><div id=exdatahead><div id=ExHead></div></div><div id=exdatadiv><div id=ExData></div></div></td><td></td></tr>
 </table></td></tr></table></div></body>
 
 
@@ -45,6 +42,45 @@ html,body{
 }
 #ExData{
 }
+table.ExDataRec{
+   background-color:#E2E2E2;
+   border: 1px solid gainsboro; 
+   border-collapse: collapse; 
+   width:100%;
+   padding: 10px; 
+   border-radius: 5px; 
+   margin: 5px; 
+   border-spacing: 0; 
+   border-collapse: separate; 
+}
+
+table.ExHead{
+   background-color:#D2D2D2;
+   border: 1px solid gainsboro; 
+   border-collapse: collapse; 
+   width:100%;
+   padding: 10px; 
+   border-radius: 5px; 
+   margin: 0px; 
+   border-spacing: 0; 
+   border-collapse: separate; 
+}
+
+
+
+
+
+
+
+
+span.actionButton{
+   cursor: pointer;
+   cursor: hand;
+   font-size:8px;
+}
+
+
+
 .forwardSearch{
    text-align:right;
    padding-right:5px;
@@ -67,7 +103,15 @@ html,body{
    #exdatadiv{
       width:100%;
       height:auto;
-      overflow:auto
+      overflow:visible;
+   }
+   #ExHead{
+      height:auto;
+      overflow:visible;
+   }
+   #ExData{
+      height:auto;
+      overflow:visible;
    }
 }
 
@@ -146,15 +190,52 @@ function endSpinner(){
    $('#spin').html("");
 }
 
+function doExpand(){
+   $('#calendar').toggle();
+   resizeLevel1();
+}
+
+function formatSeconds(sec){
+   var s="";
+
+   var days = parseInt( sec / 86400 );
+   var hours = parseInt( sec / 3600 ) % 24;
+   var minutes = parseInt( sec / 60 ) % 60;
+   var seconds = sec % 60;
+   if (days>0){
+      s+=days+"d "
+      if (hours>0){
+         s+=hours+"h "
+      }
+      if (minutes>0){
+         s+=minutes+"m "
+      }
+   }
+   else{
+      if (hours>0){
+         s+=hours+"h "
+      }
+      if (minutes>0){
+         s+=minutes+"m "
+      }
+      if (seconds>0){
+         s+=seconds+"s "
+      }
+   }
+   return(s);
+}
+
 function resizeLevel1(){
    console.log($('#exdatadiv').parent());
    var newexdata=$('#exdatadiv').parent().height();
-   console.log("newexdata=",newexdata);
-   $('#exdatadiv').height(newexdata);
+   var h=$('#exdatahead').height();
+   console.log("newexdata=",newexdata," h=",h);
+   $('#exdatadiv').height(newexdata-h-5);
 }
 
 function resizeLevel0(){
-   $('#exdatadiv').height(1);
+   var h=$('#exdatahead').height();
+   $('#exdatadiv').height(h);
    setTimeout(resizeLevel1,100);
 }
 
@@ -195,6 +276,7 @@ function calculatePercentBar(range_s,range_e,ev_s,ev_e){
 }
 
 function setDefaultExData(){
+   $('#ExHead').html("");
    $('#ExData').html("");
 }
 
@@ -230,7 +312,8 @@ $(function() { // document ready
          center: 'title',
          right: 'timelineDay,timeline5TenDay,timelineWeek,month'
       },
-      defaultView: 'timelineDay',
+      //defaultView: 'timelineDay',
+      defaultView: 'month',
 
       eventRender: function (event, element,view) {
          if (event.holiday!="1"){

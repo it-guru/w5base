@@ -1,9 +1,9 @@
 function formatDetailRec(rec,s,e){
    var t="";
    var p=calculatePercentBar(s,e,rec.eventstart,rec.eventend);
-   t+="<tr><td>";
+   t+="<tr><td><div style='margin:5px'>";
 
-   t+="<table width=100% border=1>";
+   t+="<table class=ExDataRec>";
    t+="<tr><td width=80><b>";
    t+=rec.srcid;
    t+="</b></td><td>";
@@ -16,9 +16,9 @@ function formatDetailRec(rec,s,e){
 
    t+="<table width=100% border=0 cellspacing=0 cellpadding=0>";
    t+="<tr><td width=50%>";
-   t+=rec.eventstart;
+   t+=rec.eventstart.format("dd.mm.yyyy hh:mm:ss");
    t+="</td><td width=50% align=right>";
-   t+=rec.eventend;
+   t+=rec.eventend.format("dd.mm.yyyy hh:mm:ss");
    t+="</tr>";
    t+="<tr>";
    t+="<td colspan=2>";
@@ -45,7 +45,7 @@ function formatDetailRec(rec,s,e){
    t+="</tr></table>";
 
    t+="</td></tr>";
-   t+="</table>";
+   t+="</table></div>";
 
    t+="</td></tr>";
    return(t);
@@ -90,11 +90,17 @@ function showExDataDetail(range,s,e,flt){
 
 
 
-      $("#ExDataDetail").html("Found "+cnt+" changes:<br>"+t+fooder);
+      $("#ExData").html(t+fooder);
+      resizeLevel0();
    });
 }
 
 
+function setDefaultExData(){
+   $('#ExHead').html("Das sind die verfügbaren Aktionen auf diese View");
+   $('#ExData').html("");
+   resizeLevel0();
+}
 
 
 
@@ -106,13 +112,25 @@ function showDataDetail(e){
 
 
    console.log(e);
-   d+="Maßnahme: "+e.title+"<br>";
-   d+="Start: "+e.start_formated+" &nbsp; ";
-   d+="End: "+e.end_formated+"<br>";
-   d+="Subsys: "+e.subsys+"<br>";
+   d+="<div>";
+   d+="<table class=ExHead>";
+   d+="<tr><td colspan=3><b>"+e.title+"</b>";
+   d+="<div style='float:right'>";
+   d+="<span class=actionButton onclick='doExpand();'>Expand</span>";
+   d+=" &bull; ";
+   d+="<span class=actionButton onclick='doPrint();'>Print</span>";
+   d+=" &bull; ";
+   d+="<span class=actionButton onclick='doSearch();'>Suchen</span>";
+   d+="</div>";
+   d+="</td></tr>";
    if (e.subsys=='MGMTITEMGRP'){
-      d+="mgmtitemgroup: "+e.mgmtitemgroupname+"<br>";
+      d+="<tr><td colspan=3>mgmtitemgroup: "+e.mgmtitemgroupname+"</td></tr>";
    }
+   d+="<tr><td align=left>"+ranges.format("dd.mm.yyyy hh:mm:ss")+"</td>";
+   d+="<td align=center>- ( "+formatSeconds((rangee-ranges)/1000)+" ) -</td>";
+   d+="<td align=right>"+rangee.format("dd.mm.yyyy hh:mm:ss")+"</td>";
+   d+="</tr></table>";
+   d+="</div>";
 
    var startdate=e.start_formated;
    startdate=startdate.replace(/ .*$/," 00:00:00");
@@ -120,7 +138,8 @@ function showDataDetail(e){
    enddate=enddate.replace(/ .*$/," 23:59:59");
 
    var range="\""+startdate+"/"+enddate+"\"";
-   $("#ExDataHead").html(d);
+   $("#ExData").html("");
+   $("#ExHead").html(d);
    var opts = {
      radius: 10,
      color: '#fff', // #rbg or #rrggbb
@@ -131,7 +150,7 @@ function showDataDetail(e){
      className:'microspinner',
      shadow: true // Whether to render a shadow
    };
-   var target = document.getElementById('ExData')
+   var target = document.getElementById('ExData');
    var spinner = new Spinner(opts).spin(target);
 
    var flt={

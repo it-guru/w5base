@@ -41,7 +41,9 @@ BEGIN
       END IF;
       if (ndays<0) THEN
          set msg = concat('MyTriggerError: tfrom tto not in sequence');
-        signal sqlstate '45000' set message_text = msg;
+        # signal just works from mysql 5.5
+        #signal sqlstate '45000' set message_text = msg;
+        call tfrom_tto_not_in_sequence;
       END IF;
    END IF;
 END; //
