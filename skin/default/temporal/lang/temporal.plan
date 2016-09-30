@@ -2,4 +2,5 @@
 'timeplan name'=>{de=>'Zeitplan-Bezeichnung'},
 'timeplan class'=>{de=>'Zeitplanklasse'},
 'TCLASS.measureplan'=>{de=>'Maßnahmenplan',en=>'plan of measures'},
+'TCLASS.holiday'=>{de=>'Feiertage',en=>'Holidays'},
 'TCLASS.unknown'=>{de=>'-unbekannt-',en=>'-unknown-'},

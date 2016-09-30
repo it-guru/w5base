@@ -56,16 +56,13 @@ sub EventList
    my $self=shift;
 
    print $self->HttpHeader("text/javascript",charset=>'UTF-8');
-   print STDERR Query->Dumper();
 
    my $timezone=Query->Param("timezone");
    if ($timezone eq ""){
       $timezone=$self->getFrontendTimezone();
    }
-
    my $s=Query->Param("start");
    my $e=Query->Param("end");
-
    my $trange="";
 
    if ($e ne "" && $s ne ""){
@@ -74,7 +71,7 @@ sub EventList
    my @l=();
 
    my $o=getModuleObject($self->Config,"temporal::tspan");
-   $o->SetFilter({
+   $o->SecureSetFilter({
       trange=>$trange,
       planclass=>\'TCLASS.measureplan'
    });
@@ -91,9 +88,6 @@ sub EventList
          subsys=>$ev->{subsys},
          start_formated=>$start,
          color=>$ev->{color},
-         editable=>'false',
-         startEditable=>'false',
-         durationEditable=>'false',
          end=>$end,
          end_formated=>$end,
          id=>$ev->{id},

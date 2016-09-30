@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta charset='utf-8' />
 <title>W5Base Calendar Engine - preBETA!</title>
-</head><body>%MODALDIV%<div id=MainStartup style='xdisplay:none'><table border=0 cellspacing=0 cellpadding=0 id=maintable><tr height=1%><td colspan=3>%TITLEBAR%</td></tr><tr><td valign=top width=1%><div id='workspace' style="height:100%;overflow:auto">%EXMENUDIV%
+</head><body>%MODALDIV%<div id=MainStartup style='display:none'><table border=0 cellspacing=0 cellpadding=0 id=maintable><tr height=1%><td colspan=3>%TITLEBAR%</td></tr><tr><td valign=top width=1%><div id='workspace' style="height:100%;overflow:auto">%EXMENUDIV%
 </div></td><td valign=top>
 <table width=100% height=100% border=0><tr height=1%><td valign=top><div id='calendar'></div></td><td></td></tr>
 <tr><td valign=top><div id=exdatadiv><div id=ExData></div></div></td></tr>
@@ -113,7 +113,7 @@ body{
 <script src='../../../static/fullcalendar/lib/moment.min.js'></script>
 <script src='../../../static/fullcalendar/lib/fullcalendar.min.js'></script>
 <script src='../../../static/fullcalendar/scheduler.min.js'></script>
-<script src='../../../static/fullcalendar/lang-all.js'></script>
+<script src='../../../static/fullcalendar/locale-all.js'></script>
 
 <script language="JavaScript" >
 var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
@@ -175,12 +175,13 @@ function calculatePercentBar(range_s,range_e,ev_s,ev_e){
 
 $(function() { // document ready
    var initialLangCode = 'de';
+   $('#MainStartup').fadeIn();
    $('#calendar').fullCalendar({
       now: '%NOWSTAMP%',
       timezone: '%TIMEZONE%',
       aspectRatio: 2.3,
       scrollTime: '00:00',
-      lang: initialLangCode,
+      locale: initialLangCode,
       schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
       slotDuration: '01:00:00', 
       customButtons: {
@@ -204,13 +205,21 @@ $(function() { // document ready
       },
       defaultView: 'timelineDay',
 
-      eventRender: function (event, element) {
-              element.attr('href', 'javascript:void(0);');
-              element.click(function() {
-                  showDataDetail(event);
-              });
-          },
-
+      eventRender: function (event, element,view) {
+         if (event.holiday!="1"){
+            element.attr('href', 'javascript:void(0);');
+            element.click(function() {
+                showDataDetail(event);
+            });
+         }
+         else{
+            var dateString = event.start.format("YYYY-MM-DD");
+            $(view.el[0]).find('.fc-day[data-date='+dateString+']')
+                            .css('background-color',event.color);
+            $(view.el[0]).find('.fc-widget-header[data-date^='+dateString+']')
+                            .css('background-color',event.color);
+         }
+      },
       views: {
          timeline5TenDay: {
             type: 'timeline',
@@ -236,17 +245,19 @@ $(function() { // document ready
       eventMouseover:function( e, jsEvent, view ) {
          $('#detail').html(e.id);
       },
-      events: 'EventList',
+      eventSources:[
+         {
+            url: 'HolidayList',
+            editable:false
+         },
+         {
+            url: 'EventList',
+            editable:false
+         }
+      ]
    });
 });
 
-
-
-
-
-
-
-
 </script>
-<div id="spin" style="xdisplay:none;"></div>
+<div id="spin"></div>
 </html>

@@ -51,7 +51,7 @@ sub new
                 label         =>'timeplan name',
                 dataobjattr   =>'timeplan.name'),
 
-      new kernel::Field::Mandator(),
+      new kernel::Field::Mandator(allowany=>1),
 
       new kernel::Field::Interface(
                 name          =>'mandatorid',
@@ -77,6 +77,7 @@ sub new
                 label         =>'timeplan class',
                 value         =>[qw( 
                                      TCLASS.measureplan
+                                     TCLASS.holiday
                                      TCLASS.unknown
                                  )],
                 dataobjattr   =>'timeplan.tmode'),

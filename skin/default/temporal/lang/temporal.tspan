@@ -7,6 +7,7 @@
 'tspanentry name'=>{de=>'Zeitspannenbezeichnung'},
 'timespan subsystem'=>{de=>'Zeitbereichsart'},
 'SIMPLE'=>{de=>'Einfacher Zeitbereich',en=>'simple time span'},
+'HOLIDAY'=>{de=>'Feiertag',en=>'Holiday'},
 'MGMTITEMGRP'=>{de=>'Verweis auf zentral geführte CI-Gruppe',en=>'relation to central cigroup'},
 'central managed item group'=>{de=>'zentral geführte CI-Gruppe'},
 'color'=>{de=>'Farbe'}

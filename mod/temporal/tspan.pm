@@ -59,6 +59,10 @@ sub new
                 label         =>'timeplan id',
                 dataobjattr   =>'tspanentry.timeplanref'),
 
+      new kernel::Field::Interface(
+                name          =>'mandatorid',
+                dataobjattr   =>'timeplan.mandator'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'tspanentry name',
@@ -91,6 +95,7 @@ sub new
                 value         =>[qw( 
                                      SIMPLE
                                      MGMTITEMGRP
+                                     HOLIDAY
                                  )],
                 selectfix     =>1,
                 jsonchanged   =>\&getOnChangedScript,
@@ -306,6 +311,41 @@ sub getDetailBlockPriority                # posibility to change the block order
    my $self=shift;
    return(qw(header default mgmtitemgroup source));
 }
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      push(@mandators,undef);
+      push(@mandators,\'0');
+      my $userid=$self->getCurrentUserId();
+      my @addflt;
+     # my @addflt=(
+     #            {sectargetid=>\$userid,sectarget=>\'base::user',
+     #             secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+     #                       "*roles=?read?=roles*"},
+     #            {sectargetid=>\@grpids,sectarget=>\'base::grp',
+     #             secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+     #                       "*roles=?read?=roles*"}
+     #           );
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         push(@addflt,
+                    {mandatorid=>\@mandators},
+                   );
+      }
+      else{
+         push(@addflt,
+                    {mandatorid=>[-99]},
+                   );
+      }
+      push(@flt,\@addflt);
+
+   return($self->SetFilter(@flt));
+}
+
 
 
 

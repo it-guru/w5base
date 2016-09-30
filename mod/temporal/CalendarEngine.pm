@@ -22,6 +22,7 @@ use kernel;
 use kernel::date;
 use kernel::App::Web;
 use CGI;
+use JSON;
 @ISA=qw(kernel::App::Web);
 
 
@@ -37,7 +38,7 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main EventList));
+   return(qw(Main EventList HolidayList));
 }
 
 sub EventList
@@ -58,6 +59,64 @@ sub EventList
       my $json;
       eval('$json=to_json($l, {ascii => 1});');
       print STDERR $json;
+      print $json;
+   }
+   else{
+      printf STDERR ("ERROR: ganz schlecht: %s\n",$@);
+   }
+}
+
+
+sub HolidayList
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/javascript",charset=>'UTF-8');
+
+   my $timezone=Query->Param("timezone");
+   if ($timezone eq ""){
+      $timezone=$self->getFrontendTimezone();
+   }
+   my $s=Query->Param("start");
+   my $e=Query->Param("end");
+   my $trange="";
+
+   if ($e ne "" && $s ne ""){
+      $trange="\"${s} 00:00:00/${e} 23:59:59\"";
+   }
+   my @l=();
+
+   my $o=getModuleObject($self->Config,"temporal::tspan");
+   $o->SecureSetFilter({
+      trange=>$trange,
+      subsys=>\'HOLIDAY'
+   });
+   foreach my $ev ($o->getHashList(qw(id tfrom tto name planid 
+                                      color subsys
+                                      mgmtitemgroupname mgmtitemgroupid))){
+      my $start=$self->ExpandTimeExpression($ev->{tfrom},"en","GMT",$timezone);
+      my $end=$self->ExpandTimeExpression($ev->{tto},"en","GMT",$timezone);
+      my %e=(
+         title=>$ev->{name},
+         start=>$start,
+         subsys=>$ev->{subsys},
+         start_formated=>$start,
+         holiday=>'1',
+         color=>'#DFEEDE',
+         textColor => '#000000',
+         end=>$end,
+         end_formated=>$end,
+         id=>$ev->{id},
+      );
+      push(@l,\%e);
+      print STDERR Dumper($ev);
+
+   }
+   eval("use JSON;");
+   if ($@ eq ""){
+      my $json;
+      eval('$json=to_json(\@l, {ascii => 1});');
+      print STDERR $json."\n";
       print $json;
    }
    else{
