@@ -120,8 +120,7 @@ function showDataDetail(e){
    enddate=enddate.replace(/ .*$/," 23:59:59");
 
    var range="\""+startdate+"/"+enddate+"\"";
-   d+="<div id=ExDataDetail style='position:relative'></div>";
-   $("#ExData").html(d);
+   $("#ExDataHead").html(d);
    var opts = {
      radius: 10,
      color: '#fff', // #rbg or #rrggbb
@@ -132,7 +131,7 @@ function showDataDetail(e){
      className:'microspinner',
      shadow: true // Whether to render a shadow
    };
-   var target = document.getElementById('ExDataDetail')
+   var target = document.getElementById('ExData')
    var spinner = new Spinner(opts).spin(target);
 
    var flt={
