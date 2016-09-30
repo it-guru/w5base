@@ -29,6 +29,8 @@ sub new
    my $self={@_};
    $self->{depend}=[] if (!defined($self->{depend}));
    $self->{htmldetail}=0 if (!defined($self->{htmldetail}));
+   $self->{readonly}=1   if (!defined($self->{readonly}));
+   $self->{noselect}=1   if (!defined($self->{noselect}));
    if (!defined($self->{uivisible})){
       $self->{uivisible}=sub{
           my $self=shift;

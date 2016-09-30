@@ -346,10 +346,6 @@ sub new
 
       new kernel::Field::TRange(
                 name          =>'trange',
-                noselect      =>'1',
-                htmldetail    =>0,
-                readonly      =>1,
-                searchable    =>1,
                 group         =>'state',
                 label         =>'Event time window',
                 depend        =>[qw(ranges rangem rangee)]),
