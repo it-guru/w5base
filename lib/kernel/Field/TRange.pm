@@ -29,8 +29,13 @@ sub new
    my $self={@_};
    $self->{depend}=[] if (!defined($self->{depend}));
    $self->{htmldetail}=0 if (!defined($self->{htmldetail}));
-   $self->{searchable}=1 if (!defined($self->{searchable}));
-   $self->{uivisible}=0 if (!defined($self->{uivisible}));
+   if (!defined($self->{uivisible})){
+      $self->{uivisible}=sub{
+          my $self=shift;
+          my $mode=shift;
+          return(($mode eq "SearchMask") ? 1 : 0);
+      };
+   }
    $self=bless($type->SUPER::new(%$self),$type);
    push(@{$self->{depend}},$self->{dsttypfield},$self->{dstidfield});
    if (ref($self->{dst}) ne "ARRAY" && $self->{dst} ne ""){

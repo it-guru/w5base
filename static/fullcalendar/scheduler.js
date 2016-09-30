@@ -1,6 +1,6 @@
 
 /*!
-FullCalendar Scheduler v1.3.3
+FullCalendar Scheduler v1.4.0
 Docs & License: http://fullcalendar.io/scheduler/
 (c) 2016 Adam Shaw
  */
@@ -19,16 +19,17 @@ Docs & License: http://fullcalendar.io/scheduler/
 		factory(jQuery, moment);
 	}
 })(function($, moment) {;
-var COL_MIN_WIDTH, Calendar, CalendarExtension, Class, ClippedScroller, CoordCache, DEFAULT_GRID_DURATION, DragListener, EmitterMixin, EnhancedScroller, EventRow, FC, Grid, HRowGroup, LICENSE_INFO_URL, ListenerMixin, MAX_AUTO_CELLS, MAX_AUTO_SLOTS_PER_LABEL, MAX_CELLS, MIN_AUTO_LABELS, PRESET_LICENSE_KEYS, RELEASE_DATE, ResourceAgendaView, ResourceBasicView, ResourceDayGrid, ResourceDayTableMixin, ResourceGridMixin, ResourceManager, ResourceMonthView, ResourceRow, ResourceTimeGrid, ResourceTimelineGrid, ResourceTimelineView, ResourceViewMixin, RowGroup, RowParent, STOCK_SUB_DURATIONS, ScrollFollower, ScrollFollowerSprite, ScrollJoiner, ScrollerCanvas, Spreadsheet, TimelineGrid, TimelineView, UPGRADE_WINDOW, VRowGroup, View, applyAll, capitaliseFirstLetter, compareByFieldSpecs, computeIntervalUnit, computeOffsetForSeg, computeOffsetForSegs, copyRect, cssToStr, debounce, detectWarningInContainer, divideDurationByDuration, divideRangeByDuration, durationHasTime, flexibleCompare, getContentRect, getOuterRect, getOwnCells, getRectHeight, getRectWidth, getScrollbarWidths, hContainRect, htmlEscape, intersectRanges, intersectRects, isImmuneUrl, isInt, isValidKey, joinRects, multiplyDuration, origDisplayEvents, origDisplayView, origGetSegClasses, origRenderSkeleton, origUnrenderSkeleton, parseFieldSpecs, processLicenseKey, proxy, renderingWarningInContainer, syncThen, testRectContains, testRectHContains, testRectVContains, timeRowSegsCollide, vContainRect,
+var COL_MIN_WIDTH, Calendar, CalendarExtension, Class, ClippedScroller, CoordCache, DEFAULT_GRID_DURATION, DragListener, EmitterMixin, EnhancedScroller, EventRow, FC, Grid, HRowGroup, LICENSE_INFO_URL, ListenerMixin, MAX_AUTO_CELLS, MAX_AUTO_SLOTS_PER_LABEL, MAX_CELLS, MIN_AUTO_LABELS, PRESET_LICENSE_KEYS, RELEASE_DATE, ResourceAgendaView, ResourceBasicView, ResourceDayGrid, ResourceDayTableMixin, ResourceGridMixin, ResourceManager, ResourceMonthView, ResourceRow, ResourceTimeGrid, ResourceTimelineGrid, ResourceTimelineView, ResourceViewMixin, RowGroup, RowParent, STOCK_SUB_DURATIONS, ScrollFollower, ScrollFollowerSprite, ScrollJoiner, ScrollerCanvas, Spreadsheet, TimelineGrid, TimelineView, UPGRADE_WINDOW, VRowGroup, View, applyAll, capitaliseFirstLetter, compareByFieldSpecs, computeIntervalUnit, computeOffsetForSeg, computeOffsetForSegs, copyRect, cssToStr, debounce, detectWarningInContainer, divideDurationByDuration, divideRangeByDuration, durationHasTime, flexibleCompare, getContentRect, getOuterRect, getOwnCells, getRectHeight, getRectWidth, getScrollbarWidths, hContainRect, htmlEscape, intersectRanges, intersectRects, isImmuneUrl, isInt, isValidKey, joinRects, multiplyDuration, origDisplayEvents, origDisplayView, origGetSegCustomClasses, origGetSegDefaultBackgroundColor, origGetSegDefaultBorderColor, origGetSegDefaultTextColor, origRenderSkeleton, origUnrenderSkeleton, parseFieldSpecs, processLicenseKey, proxy, renderingWarningInContainer, syncThen, testRectContains, testRectHContains, testRectVContains, timeRowSegsCollide, vContainRect,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty,
+  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   slice = [].slice;
 
 FC = $.fullCalendar;
 
-FC.schedulerVersion = "1.3.3";
+FC.schedulerVersion = "1.4.0";
 
-if (FC.internalApiVersion !== 5) {
+if (FC.internalApiVersion !== 6) {
   FC.warn('v' + FC.schedulerVersion + ' of FullCalendar Scheduler ' + 'is incompatible with v' + FC.version + ' of the core.\n' + 'Please see http://fullcalendar.io/support/ for more information.');
   return;
 }
@@ -1140,6 +1141,17 @@ CalendarExtension = (function(superClass) {
     this.resourceManager.resetResources();
   };
 
+  CalendarExtension.prototype.isSpanAllowed = function(span, constraint) {
+    var constrainToResourceIds, ref;
+    if (typeof constraint === 'object') {
+      constrainToResourceIds = this.getEventResourceIds(constraint);
+      if (constrainToResourceIds.length && (!span.resourceId || !(ref = span.resourceId, indexOf.call(constrainToResourceIds, ref) >= 0))) {
+        return false;
+      }
+    }
+    return CalendarExtension.__super__.isSpanAllowed.apply(this, arguments);
+  };
+
   CalendarExtension.prototype.getPeerEvents = function(span, event) {
     var filteredPeerEvents, isPeer, j, k, l, len, len1, len2, newResourceId, newResourceIds, peerEvent, peerEvents, peerResourceId, peerResourceIds;
     peerEvents = CalendarExtension.__super__.getPeerEvents.apply(this, arguments);
@@ -1389,11 +1401,17 @@ View.prototype.removeResource = function(resource) {
   return this.resetResources(this.calendar.resourceManager.topLevelResources);
 };
 
-origGetSegClasses = Grid.prototype.getSegClasses;
+origGetSegCustomClasses = Grid.prototype.getSegCustomClasses;
 
-Grid.prototype.getSegClasses = function(seg) {
+origGetSegDefaultBackgroundColor = Grid.prototype.getSegDefaultBackgroundColor;
+
+origGetSegDefaultBorderColor = Grid.prototype.getSegDefaultBorderColor;
+
+origGetSegDefaultTextColor = Grid.prototype.getSegDefaultTextColor;
+
+Grid.prototype.getSegCustomClasses = function(seg) {
   var classes, j, len, ref, resource;
-  classes = origGetSegClasses.apply(this, arguments);
+  classes = origGetSegCustomClasses.apply(this, arguments);
   ref = this.getSegResources(seg);
   for (j = 0, len = ref.length; j < len; j++) {
     resource = ref[j];
@@ -1402,56 +1420,52 @@ Grid.prototype.getSegClasses = function(seg) {
   return classes;
 };
 
-Grid.prototype.getSegSkinCss = function(seg) {
-  var event, eventColor, getResourceBackgroundColor, getResourceBorderColor, getResourceTextColor, optionColor, resources, source, sourceColor, view;
-  view = this.view;
-  event = seg.event;
-  source = event.source || {};
-  eventColor = event.color;
-  sourceColor = source.color;
-  optionColor = view.opt('eventColor');
+Grid.prototype.getSegDefaultBackgroundColor = function(seg) {
+  var currentResource, j, len, resources, val;
   resources = this.getSegResources(seg);
-  getResourceBackgroundColor = function() {
-    var currentResource, j, len, val;
-    val = null;
-    for (j = 0, len = resources.length; j < len; j++) {
-      currentResource = resources[j];
-      while (currentResource && !val) {
-        val = currentResource.eventBackgroundColor || currentResource.eventColor;
-        currentResource = currentResource._parent;
+  for (j = 0, len = resources.length; j < len; j++) {
+    currentResource = resources[j];
+    while (currentResource) {
+      val = currentResource.eventBackgroundColor || currentResource.eventColor;
+      if (val) {
+        return val;
       }
+      currentResource = currentResource._parent;
     }
-    return val;
-  };
-  getResourceBorderColor = function() {
-    var currentResource, j, len, val;
-    val = null;
-    for (j = 0, len = resources.length; j < len; j++) {
-      currentResource = resources[j];
-      while (currentResource && !val) {
-        val = currentResource.eventBorderColor || currentResource.eventColor;
-        currentResource = currentResource._parent;
+  }
+  return origGetSegDefaultBackgroundColor.apply(this, arguments);
+};
+
+Grid.prototype.getSegDefaultBorderColor = function(seg) {
+  var currentResource, j, len, resources, val;
+  resources = this.getSegResources(seg);
+  for (j = 0, len = resources.length; j < len; j++) {
+    currentResource = resources[j];
+    while (currentResource) {
+      val = currentResource.eventBorderColor || currentResource.eventColor;
+      if (val) {
+        return val;
       }
+      currentResource = currentResource._parent;
     }
-    return val;
-  };
-  getResourceTextColor = function() {
-    var currentResource, j, len, val;
-    val = null;
-    for (j = 0, len = resources.length; j < len; j++) {
-      currentResource = resources[j];
-      while (currentResource && !val) {
-        val = currentResource.eventTextColor;
-        currentResource = currentResource._parent;
+  }
+  return origGetSegDefaultBorderColor.apply(this, arguments);
+};
+
+Grid.prototype.getSegDefaultTextColor = function(seg) {
+  var currentResource, j, len, resources, val;
+  resources = this.getSegResources(seg);
+  for (j = 0, len = resources.length; j < len; j++) {
+    currentResource = resources[j];
+    while (currentResource) {
+      val = currentResource.eventTextColor;
+      if (val) {
+        return val;
       }
+      currentResource = currentResource._parent;
     }
-    return val;
-  };
-  return {
-    'background-color': event.backgroundColor || eventColor || getResourceBackgroundColor() || source.backgroundColor || sourceColor || view.opt('eventBackgroundColor') || optionColor,
-    'border-color': event.borderColor || eventColor || getResourceBorderColor() || source.borderColor || sourceColor || view.opt('eventBorderColor') || optionColor,
-    'color': event.textColor || getResourceTextColor() || source.textColor || view.opt('eventTextColor')
-  };
+  }
+  return origGetSegDefaultTextColor.apply(this, arguments);
 };
 
 Grid.prototype.getSegResources = function(seg) {
@@ -1750,6 +1764,11 @@ ResourceManager = (function(superClass) {
 
 })(Class);
 
+
+/*
+A view that structurally distinguishes events by resource
+ */
+
 ResourceViewMixin = {
   resourceTextFunc: null,
   unsetResources: function() {
@@ -1762,6 +1781,13 @@ ResourceViewMixin = {
     this.setResources(resources);
     this.setScroll(scrollState);
     return this.calendar.rerenderEvents();
+  },
+  isEventDraggable: function(event) {
+    return this.isEventResourceEditable(event) || View.prototype.isEventDraggable.call(this, event);
+  },
+  isEventResourceEditable: function(event) {
+    var ref, ref1, ref2;
+    return (ref = (ref1 = (ref2 = event.resourceEditable) != null ? ref2 : (event.source || {}).resourceEditable) != null ? ref1 : this.opt('eventResourceEditable')) != null ? ref : this.isEventGenerallyEditable(event);
   },
   getResourceText: function(resource) {
     return this.getResourceTextFunc()(resource);
@@ -1854,14 +1880,18 @@ ResourceGridMixin = {
     return event;
   },
   computeEventDrop: function(startSpan, endSpan, event) {
-    var allowResourceChange, dropLocation;
-    allowResourceChange = true;
-    if (!allowResourceChange && startSpan.resourceId !== endSpan.resourceId) {
-      return null;
+    var dropLocation;
+    if (this.view.isEventStartEditable(event)) {
+      dropLocation = Grid.prototype.computeEventDrop.apply(this, arguments);
+    } else {
+      dropLocation = FC.pluckEventDateProps(event);
     }
-    dropLocation = Grid.prototype.computeEventDrop.apply(this, arguments);
     if (dropLocation) {
-      dropLocation.resourceId = endSpan.resourceId;
+      if (this.view.isEventResourceEditable(event)) {
+        dropLocation.resourceId = endSpan.resourceId;
+      } else {
+        dropLocation.resourceId = startSpan.resourceId;
+      }
     }
     return dropLocation;
   },
@@ -6077,7 +6107,7 @@ FC.views.month.queryResourceClass = function(viewSpec) {
   }
 };
 
-RELEASE_DATE = '2016-07-31';
+RELEASE_DATE = '2016-09-04';
 
 UPGRADE_WINDOW = {
   years: 1,
