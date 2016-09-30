@@ -1798,7 +1798,8 @@ sub getDetailFunctionsCode
           "resizable=yes,scrollbars=auto\")";
    }
    else{
-      $copyo="custopenwin(\"Copy?CurrentIdToEdit=$id\",\"$winsize\",$detailx,\"$winname\")";
+      $copyo="custopenwin(\"Copy?CurrentIdToEdit=$id\",\"$winsize\",".
+             "$detailx,$detaily,\"$winname\")";
    }
 
    my $d=<<EOF;
