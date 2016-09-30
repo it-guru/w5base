@@ -1042,10 +1042,10 @@ sub Main
    }
    my $CurrentView=Query->Param("CurrentView");
    print $self->HttpHeader("text/html");
+   my $startcmd="document.getElementById('MainStartup').style.display='block';";
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.App.Web.css'],
-                           submodal=>1,
-                           body=>1,form=>1,
+                           submodal=>1, body=>1,form=>1, onload=>$startcmd,
                            title=>$self->T($self->Self,$self->Self));
    print ("<style>body{overflow:hidden}</style>");
    if ($param{nohead}){
@@ -1056,7 +1056,8 @@ sub Main
 </script>
 EOF
    }
-   print("<table style=\"border-collapse:collapse;width:100%;height:100%\" ".
+   print("<div id=MainStartup style='display:none'>".
+         "<table style=\"border-collapse:collapse;width:100%;height:100%\" ".
          "border=0 cellspacing=0 cellpadding=0>");
    if (!$param{nohead}){
       printf("<tr><td height=1%% style=\"padding:1px\" ".
@@ -1080,7 +1081,7 @@ EOF
 
    my $iframe="<iframe class=result id=result ".
               "name=\"Result\" src=\"$welcomeurl\"></iframe>";
-   print("<tr><td>$iframe</td></tr></table>");
+   print("<tr><td>$iframe</td></tr></table><div>");
 
    my $selfname=$self->Self();
    my $persistentVari=
