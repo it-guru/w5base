@@ -81,7 +81,24 @@ sub new
                                      TCLASS.vacation
                                      TCLASS.unknown
                                  )],
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if (defined($rec));
+                   return(0);
+                },
                 dataobjattr   =>'timeplan.tmode'),
+
+      new kernel::Field::Select(
+                name          =>'tz',
+                label         =>'Timezone',
+                value         =>['CET','GMT',DateTime::TimeZone::all_names()],
+                dataobjattr   =>'timeplan.timezone'),
+
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                group         =>'contacts'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -139,11 +156,41 @@ sub new
                 label         =>'secondary sync key',
                 dataobjattr   =>"lpad(timeplan.id,35,'0')"),
 
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
    );
-   $self->setDefaultView(qw(linenumber name cistatus mdate));
+   $self->setDefaultView(qw(linenumber name cistatus tz mdate));
    $self->setWorktable("timeplan");
    return($self);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable left outer join lnkcontact ".
+            "on lnkcontact.parentobj='$selfasparent' ".
+            "and $worktable.id=lnkcontact.refid ";
+
+   return($from);
+}
+
 
 sub initSearchQuery
 {
@@ -157,7 +204,7 @@ sub initSearchQuery
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default source));
+   return(qw(header default contacts source));
 }
 
 sub getRecordImageUrl
@@ -166,6 +213,41 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/temporal/load/plan.jpg?".$cgi->query_string());
 }
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if ( !$self->IsMemberOf([qw(admin)], "RMember")){
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                          [orgRoles(),qw(RMember RCFManager RCFManager2 
+                                         RAuditor RMonitor)],"both");
+      my @grpids=keys(%grps);
+
+      my $userid=$self->getCurrentUserId();
+      my @addflt=(
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"}
+                );
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         push(@addflt, {mandatorid=>\@mandators});
+      }
+      push(@flt,\@addflt);
+
+   }
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+   }
+   return($self->SetFilter(@flt));
+}
+
 
 
 
@@ -196,7 +278,9 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default") if ($self->IsMemberOf("admin"));
+   return("default","contacts") if ($self->IsMemberOf("admin"));
+
+
    return(undef);
 }
 

@@ -1185,7 +1185,7 @@ sub ExpandTRangeExpression
                     $Y1,$M1,$D1,$h1,$m1,$s1),
             sprintf("%04d-%02d-%02dT%02d:%02d:%02d",
                     $Y2,$M2,$D2,$h2,$m2,$s2)];
-      printf STDERR ("fifi res= '%s' - '%s'\n",$res->[0],$res->[1]);
+      #printf STDERR ("fifi res= '%s' - '%s'\n",$res->[0],$res->[1]);
    }
    if (my ($Y1,$M1,$D1,$h1,$m1,$s1,$Y2,$M2,$D2,$h2,$m2,$s2)=
           $val=~m/^(\d{4})-(\d{1,2})-(\d{1,2})T
@@ -1210,7 +1210,7 @@ sub ExpandTRangeExpression
                     $Y1,$M1,$D1,$h1,$m1,$s1),
             sprintf("%04d-%02d-%02dT%02d:%02d:%02d",
                     $Y2,$M2,$D2,$h2,$m2,$s2)];
-      printf STDERR ("fifi res= '%s' - '%s'\n",$res->[0],$res->[1]);
+      #printf STDERR ("fifi res= '%s' - '%s'\n",$res->[0],$res->[1]);
    }
 
    $$filename=$f if (ref($filename) eq "SCALAR");

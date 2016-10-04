@@ -1,6 +1,7 @@
 'temporal::plan'=>{de=>'Zeitplan',en=>'Timeplan'},
 'timeplan name'=>{de=>'Zeitplan-Bezeichnung'},
 'timeplan class'=>{de=>'Zeitplanklasse'},
+'Timezone'=>{ de=>'Zeitzone'},
 'TCLASS.measureplan'=>{de=>'Maßnahmenplan',en=>'plan of measures'},
 'TCLASS.holiday'=>{de=>'Feiertage',en=>'Holidays'},
 'TCLASS.vacation'=>{de=>'Schulferien',en=>'school vacations'},

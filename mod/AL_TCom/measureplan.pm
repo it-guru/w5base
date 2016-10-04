@@ -93,14 +93,14 @@ sub EventList
          id=>$ev->{id},
       );
       push(@l,\%e);
-      print STDERR Dumper($ev);
+      #print STDERR Dumper($ev);
 
    }
    eval("use JSON;");
    if ($@ eq ""){
       my $json;
       eval('$json=to_json(\@l, {ascii => 1});');
-      print STDERR $json."\n";
+      #print STDERR $json."\n";
       print $json;
    }
    else{

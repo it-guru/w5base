@@ -16,7 +16,7 @@ create table timeplan (
     prnapprovedline varchar(128) default NULL,
     lineheight      varchar(10) default 'auto',
     vbarcolor       varchar(20) default 'blue',
-  comments    longtext     default NULL,
+  comments    longtext     default NULL,timezone varchar(40) default 'GMT ',
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) default NULL,

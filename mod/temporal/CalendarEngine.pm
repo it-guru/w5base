@@ -21,13 +21,51 @@ use vars qw(@ISA);
 use kernel;
 use kernel::date;
 use kernel::App::Web;
+use Date::Holidays::DE;
 use CGI;
 use JSON;
 @ISA=qw(kernel::App::Web);
 
-
-sub new
-{
+my $holyname={
+  'neuj'=>{de=>"Neujahr"                  ,en=>"New Year's day"},
+  'hl3k'=>{de=>"Hl. 3 Koenige"            ,en=>"Epiphany"},
+  'weib'=>{de=>"Weiberfastnacht"          ,en=>"Fat Thursday"},
+  'romo'=>{de=>"Rosenmontag"              ,en=>"Carnival monday"},
+  'fadi'=>{de=>"Faschingsdienstag"        ,en=>"Shrove tuesday"},
+  'asmi'=>{de=>"Aschermittwoch"           ,en=>"Ash wednesday"},
+  'grdo'=>{de=>"Gruendonnerstag"          ,en=>"Maundy Thursday"},
+  'karf'=>{de=>"Karfreitag"               ,en=>"Good friday"},
+  'kars'=>{de=>"Karsamstag"               ,en=>"Holy Saturday"},
+  'osts'=>{de=>"Ostersonntag"             ,en=>"Easter sunday"},
+  'ostm'=>{de=>"Ostermontag"              ,en=>"Easter monday"},
+  'pfis'=>{de=>"Pfingstsonntag"           ,en=>"Whit sunday"},
+  'pfim'=>{de=>"Pfingstmontag"            ,en=>"Whit monday"},
+  'himm'=>{de=>"Himmelfahrtstag"          ,en=>"Ascension day"},
+  'fron'=>{de=>"Fronleichnam"             ,en=>"Corpus christi"},
+  '1mai'=>{de=>"Maifeiertag"              ,en=>"Labor day"},
+  '17ju'=>{de=>"Tag der deutschen Einheit",en=>"Reunion day"},
+  'frie'=>{de=>"Augsburger Friedensfest"  ,en=>"Augsburg peace day"},
+  'mari'=>{de=>"Mariae Himmelfahrt"       ,en=>"Assumption day"},
+  '3okt'=>{de=>"Tag der deutschen Einheit",en=>"Reunion day"},
+  'refo'=>{de=>"Reformationstag"          ,en=>"Reformation day"},
+  'alhe'=>{de=>"Allerheiligen"            ,en=>"All hallows day"},
+  'buss'=>{de=>"Buss- und Bettag"         ,en=>"Penance day"},
+  'votr'=>{de=>"Volkstrauertag"           ,en=>"Remembrance Day"},
+  'toso'=>{de=>"Totensonntag"             ,en=>"Sunday in com. of the dead"},
+  'adv1'=>{de=>"1. Advent"                ,en=>"1st sunday in advent"},
+  'adv2'=>{de=>"2. Advent"                ,en=>"2nd sunday in advent"},
+  'adv3'=>{de=>"3. Advent"                ,en=>"3rd sunday in advent"},
+  'adv4'=>{de=>"4. Advent"                ,en=>"4th sunday in advent"},
+  'heil'=>{de=>"Heiligabend"              ,en=>"Christmas eve"},
+  'wei1'=>{de=>"1. Weihnachtstag"         ,en=>"Christmas"},
+  'wei2'=>{de=>"2. Weihnachtstag"         ,en=>"Christmas"},
+  'silv'=>{de=>"Silvester"                ,en=>"New year's eve"}
+};   
+                                                                                
+           
+           
+sub new    
+{          
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
@@ -77,6 +115,7 @@ sub HolidayList
    if ($timezone eq ""){
       $timezone=$self->getFrontendTimezone();
    }
+   my $lang=$self->Lang();
    my $s=Query->Param("start");
    my $e=Query->Param("end");
    my $trange="";
@@ -85,6 +124,73 @@ sub HolidayList
       $trange="\"${s} 00:00:00/${e} 23:59:59\"";
    }
    my @l=();
+   printf STDERR ("fifi s=$s e=$e\n");
+   my ($year_start)=$s=~m/^([0-9]{4})-/;
+   my ($year_end)=$e=~m/^([0-9]{4})-/;
+
+
+   my $po=getModuleObject($self->Config,"temporal::plan");
+
+   $po->SecureSetFilter({planclass=>\'TCLASS.holiday'});
+   my @pl=$po->getHashList(qw(id planclass tz));
+   foreach my $plan (@pl){
+      if ($plan->{planclass} eq 'TCLASS.holiday' &&
+          $plan->{tz} eq 'Europe/Berlin' &&
+          $year_start>1900 && $year_start<2030 &&
+          $year_end>1900 && $year_end<2030 &&
+          $year_start<=$year_end){
+         #
+         # automatische deutsche Feiertags Berechnung
+         #
+         for(my $year=$year_start;$year<=$year_end;$year++){
+            my $h=Date::Holidays::DE::holidays(YEAR=>$year,WHERE=>['all']);
+            foreach my $hday (keys(%{$h->{holidays}})){
+               my @common=@{$h->{regions}->{common}} ;
+               my $r="normal";
+               if (in_array(\@common,$hday)){
+                  $r="national";
+               }
+               foreach my $region (grep(/^common$/,keys(%{$h->{regions}}))){
+                  if (in_array(@{$h->{regions}->{$region}},$hday)){
+                     $r="regional";
+                  }
+               }
+               my $hday_s=$h->{holidays}->{$hday}." 00:00:00";
+               my $hday_e=$h->{holidays}->{$hday}." 23:59:59";
+               my $start=$self->ExpandTimeExpression($hday_s,"en",
+                                                     $plan->{tz},$timezone);
+               my $end=$self->ExpandTimeExpression($hday_e,"en",
+                                                   $plan->{tz},$timezone);
+               if ($hday_s le $e && $hday_e ge $s){
+                  my $dayname=$hday;
+                  if (exists($holyname->{$dayname}->{$lang})){
+                     $dayname=$holyname->{$dayname}->{$lang};
+                  }
+                  my $color='#DFEEDE';
+                  $color='#F2F9F2' if ($r eq "normal");
+                  $color='#7EB77A' if ($r eq "national");
+                  my %e=(
+                     title=>$dayname,
+                     start=>$start,
+                     subsys=>"HOLYDAY",
+                     holiday=>'1',
+                     color=>$color,
+                     textColor => '#000000',
+                     end=>$end,
+                     id=>$hday
+                  );
+                  push(@l,\%e);
+               }
+            }
+         }
+         # printf STDERR ("h=%s\n",Dumper(\@h)); 
+
+
+
+
+      }
+   }
+
 
    my $o=getModuleObject($self->Config,"temporal::tspan");
    $o->SecureSetFilter({
@@ -109,14 +215,14 @@ sub HolidayList
          id=>$ev->{id},
       );
       push(@l,\%e);
-      print STDERR Dumper($ev);
+      #print STDERR Dumper($ev);
 
    }
    eval("use JSON;");
    if ($@ eq ""){
       my $json;
       eval('$json=to_json(\@l, {ascii => 1});');
-      print STDERR $json."\n";
+      #print STDERR $json."\n";
       print $json;
    }
    else{

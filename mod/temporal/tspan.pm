@@ -108,6 +108,13 @@ sub new
                 jsonchanged   =>\&getOnChangedScript,
                 dataobjattr   =>'tspanentry.subsys'),
 
+      new kernel::Field::Link(
+                name          =>'rawsubsys',
+                label         =>'timespan subsystem',
+                readonly      =>'1',
+                selectfix     =>1,
+                dataobjattr   =>'tspanentry.subsys'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
@@ -233,8 +240,20 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'tsrange.e'),
 
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
 
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
 
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
    );
    $self->setDefaultView(qw(linenumber planname name tfrom tto mdate));
    $self->setWorktable("tspanentry");
@@ -315,6 +334,13 @@ sub getSqlFrom
 
    }
 
+   $from.="left outer join lnkcontact ".
+          "on lnkcontact.parentobj='temporal::plan' ".
+          "and timeplan.id=lnkcontact.refid ";
+
+
+
+
    return($from);
 }
 
@@ -328,6 +354,7 @@ sub getDetailBlockPriority                # posibility to change the block order
 }
 
 
+
 sub SecureSetFilter
 {
    my $self=shift;
@@ -335,17 +362,22 @@ sub SecureSetFilter
 
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       push(@mandators,undef);
-      push(@mandators,\'0');
+      push(@mandators,'0');
+
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                          [orgRoles(),qw(RMember RCFManager RCFManager2 
+                                         RAuditor RMonitor)],"both");
+      my @grpids=keys(%grps);
       my $userid=$self->getCurrentUserId();
       my @addflt;
-     # my @addflt=(
-     #            {sectargetid=>\$userid,sectarget=>\'base::user',
-     #             secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-     #                       "*roles=?read?=roles*"},
-     #            {sectargetid=>\@grpids,sectarget=>\'base::grp',
-     #             secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-     #                       "*roles=?read?=roles*"}
-     #           );
+      my @addflt=(
+                 {sectargetid=>\$userid,sectarget=>\'base::user',
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"},
+                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
+                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                            "*roles=?read?=roles*"}
+                );
       if ($ENV{REMOTE_USER} ne "anonymous"){
          push(@addflt,
                     {mandatorid=>\@mandators},
@@ -397,12 +429,17 @@ sub Validate
    }
    my $po=getModuleObject($self->Config,"temporal::plan");
 
-   $po->SetFilter({id=>\$po});
-   my ($planrec)=$po->getHashList(qw(ALL));
+   $po->SetFilter({id=>\$planid});
+   my ($planrec)=$po->getOnlyFirst(qw(ALL));
    if (!defined($planrec)){
       $self->LastMsg(ERROR,"invalid timeplan specified");
       return(undef);
    }
+
+   #print STDERR "planrec=".Dumper($planrec);
+   #print STDERR "oldrec=".Dumper($oldrec);
+   #print STDERR "newrec=".Dumper($newrec);
+   
    if ($planrec->{planclass} eq "TCLASS.vacation" &&
        effVal($oldrec,$newrec,"subsys") ne "VACATION"){
       $self->LastMsg(ERROR,"invalid subsystem for this timeplan");
@@ -414,9 +451,6 @@ sub Validate
       return(undef);
    }
 
-   print STDERR "planrec=".Dumper($planrec);
-   print STDERR "newrec=".Dumper($newrec);
-   
 
    return(1);
 }
