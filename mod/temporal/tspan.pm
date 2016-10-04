@@ -52,6 +52,12 @@ sub new
                 vjoinon       =>['planid'=>'id'],
                 vjoindisp     =>'name',
                 label         =>'time plan',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if (defined($rec));
+                   return(0);
+                },
                 dataobjattr   =>'timeplan.name'),
 
       new kernel::Field::Interface(
@@ -96,6 +102,7 @@ sub new
                                      SIMPLE
                                      MGMTITEMGRP
                                      HOLIDAY
+                                     VACATION
                                  )],
                 selectfix     =>1,
                 jsonchanged   =>\&getOnChangedScript,
@@ -243,6 +250,14 @@ sub initSearchQuery
 #   }
 }
 
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/temporal/load/tspan.jpg?".$cgi->query_string());
+}
+
+
 sub getOnChangedScript
 {
    my $self=shift;
@@ -375,6 +390,33 @@ sub Validate
       $self->LastMsg(ERROR,"invalid internal name");
       return(undef);
    }
+   my $planid=effVal($oldrec,$newrec,"planid");
+   if ($planid eq ""){
+      $self->LastMsg(ERROR,"invalid timeplan specified");
+      return(undef);
+   }
+   my $po=getModuleObject($self->Config,"temporal::plan");
+
+   $po->SetFilter({id=>\$po});
+   my ($planrec)=$po->getHashList(qw(ALL));
+   if (!defined($planrec)){
+      $self->LastMsg(ERROR,"invalid timeplan specified");
+      return(undef);
+   }
+   if ($planrec->{planclass} eq "TCLASS.vacation" &&
+       effVal($oldrec,$newrec,"subsys") ne "VACATION"){
+      $self->LastMsg(ERROR,"invalid subsystem for this timeplan");
+      return(undef);
+   }
+   if ($planrec->{planclass} eq "TCLASS.holiday" &&
+       effVal($oldrec,$newrec,"subsys") ne "HOLIDAY"){
+      $self->LastMsg(ERROR,"invalid subsystem for this timeplan");
+      return(undef);
+   }
+
+   print STDERR "planrec=".Dumper($planrec);
+   print STDERR "newrec=".Dumper($newrec);
+   
 
    return(1);
 }

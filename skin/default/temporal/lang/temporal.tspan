@@ -8,7 +8,10 @@
 'timespan subsystem'=>{de=>'Zeitbereichsart'},
 'SIMPLE'=>{de=>'Einfacher Zeitbereich',en=>'simple time span'},
 'HOLIDAY'=>{de=>'Feiertag',en=>'Holiday'},
+'VACATION'=>{de=>'Schulferien',en=>'School Vaction'},
 'MGMTITEMGRP'=>{de=>'Verweis auf zentral geführte CI-Gruppe',en=>'relation to central cigroup'},
 'central managed item group'=>{de=>'zentral geführte CI-Gruppe'},
-'color'=>{de=>'Farbe'}
+'color'=>{de=>'Farbe'},
+'invalid timeplan specified'=>{de=>'ungültiger Zeitplan'},
+'invalid subsystem for this timeplan'=>{de=>'ungültige Zeitbereichsart für den gewählten Zeitplan'}
 

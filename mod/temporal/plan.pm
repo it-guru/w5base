@@ -78,6 +78,7 @@ sub new
                 value         =>[qw( 
                                      TCLASS.measureplan
                                      TCLASS.holiday
+                                     TCLASS.vacation
                                      TCLASS.unknown
                                  )],
                 dataobjattr   =>'timeplan.tmode'),
@@ -158,6 +159,14 @@ sub getDetailBlockPriority                # posibility to change the block order
    my $self=shift;
    return(qw(header default source));
 }
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/temporal/load/plan.jpg?".$cgi->query_string());
+}
+
 
 
 sub Validate
