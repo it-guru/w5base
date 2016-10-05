@@ -25,9 +25,7 @@ use kernel::Field;
 use itil::lib::Listedit;
 use Date::Parse;
 use DateTime;
-use File::Temp ();
-#use Net::SSLeay qw(XN_FLAG_MULTILINE XN_FLAG_RFC2253); # not before V1.45
-use Net::SSLeay;
+use Crypt::OpenSSL::X509;
 
 use vars qw(@ISA);
 
@@ -215,18 +213,6 @@ sub new
    return($self);
 }
 
-sub parseCertDate
-{
-   my $self=shift;
-   my $certdate=shift;
-
-   my $timestamp=(str2time($certdate)); # convert to Unix timestamp
-   return(undef) if(!defined($timestamp));
-
-   my $dt=DateTime->from_epoch(epoch=>$timestamp);
-   return($dt->ymd.' '.$dt->hms); # valid mySQL datetime format
-}
-
 
 sub SecureSetFilter
 {
@@ -267,15 +253,38 @@ sub isWriteValid
 }
 
 
-sub isUploadValid
+sub parseCertDate
 {
-   return(0);
+   my $self=shift;
+   my $certdate=shift;
+
+   my $timestamp=(str2time($certdate)); # convert to Unix timestamp
+   return(undef) if(!defined($timestamp));
+
+   my $dt=DateTime->from_epoch(epoch=>$timestamp);
+   return($dt->ymd.' '.$dt->hms); # valid mySQL datetime format
 }
 
 
-sub isQualityCheckValid
+sub formatedMultiline
 {
-   return(0);
+   my $self=shift;
+   my $entryobjs=shift;
+   my %elements;
+   my $multiline='';
+
+   foreach my $entry (@$entryobjs) {
+      my ($key,$val)=split(/=/,$entry->as_string(1));
+      $elements{$key}=$val;
+   }
+
+   my @keylen=sort({$b<=>$a} map({length} keys(%elements)));
+
+   foreach my $l (sort(keys(%elements))) {
+      $multiline.=sprintf("%-*s = %s\n",$keylen[0],$l,$elements{$l});
+   }
+
+   return($multiline);
 }
 
 
@@ -307,21 +316,15 @@ sub Validate
    }
 
    if (effChangedVal($oldrec,$newrec,'sslcert')) {
-      # generate tmpfile from sslcert; needed by Net::SSLeay
-      my $tmpfile=new File::Temp(UNLINK=>1);
-      print $tmpfile ($newrec->{sslcert});
-      seek($tmpfile,0,0); # reset file position
-      my $bio=Net::SSLeay::BIO_new_file($tmpfile,'rb');
-      my $x509=Net::SSLeay::PEM_read_bio_X509($bio);
+      my $x509=Crypt::OpenSSL::X509->new_from_string($newrec->{sslcert});
+
    
       # Startdate / Enddate
-      my $date=Net::SSLeay::X509_get_notBefore($x509);
-      my $notBefore=Net::SSLeay::P_ASN1_TIME_get_isotime($date);
-      $newrec->{startdate}=$self->parseCertDate($notBefore);
+      my $startdate=$x509->notBefore();
+      $newrec->{startdate}=$self->parseCertDate($startdate);
 
-      $date=Net::SSLeay::X509_get_notAfter($x509);
-      my $notAfter=Net::SSLeay::P_ASN1_TIME_get_isotime($date);
-      $newrec->{enddate}=$self->parseCertDate($notAfter);
+      my $enddate=$x509->notAfter();
+      $newrec->{enddate}=$self->parseCertDate($enddate);
 
       if (!defined($newrec->{startdate}) ||
           !defined($newrec->{enddate})) {
@@ -330,49 +333,19 @@ sub Validate
       }
 
       # Subject
-      my $subject=Net::SSLeay::X509_get_subject_name($x509);
-
-      ## sadly not before Net::SSLeay 1.45 available
-      ## $newrec->{subject}=Net::SSLeay::X509_NAME_print_ex($subject,
-      ##                                                    XN_FLAG_MULTILINE);
-      my $subject_oneline=Net::SSLeay::X509_NAME_oneline($subject);
-      $subject_oneline=~s{^/}{};
-      my %subject_elements=split(/[=\/]/,$subject_oneline);
-      my @skeylen=sort({$b<=>$a} map({length} keys(%subject_elements)));
-
-      my $subject_multiline='';
-      foreach my $l (sort(keys(%subject_elements))) {
-         $subject_multiline.=sprintf("%-*s = %s\n",$skeylen[0],
-                                     $l,$subject_elements{$l});
-      }
-      $newrec->{subject}=$subject_multiline;
+      my $sobjs=$x509->subject_name->entries();
+      $newrec->{subject}=$self->formatedMultiline($sobjs);
 
       # Issuer
-      my $issuer=Net::SSLeay::X509_get_issuer_name($x509);
-
-      ## $newrec->{issuer}=Net::SSLeay::X509_NAME_print_ex($issuer,
-      ##                                                   XN_FLAG_MULTILINE);
-      my $issuer_oneline=Net::SSLeay::X509_NAME_oneline($issuer);
-      $issuer_oneline=~s{^/}{};
-      my %issuer_elements=split(/[=\/]/,$issuer_oneline);
-      my @ikeylen=sort({$b<=>$a} map({length} keys(%issuer_elements)));
-      my $issuer_multiline='';
-      foreach my $l (sort(keys(%issuer_elements))) {
-         $issuer_multiline.=sprintf("%-*s = %s\n",$ikeylen[0],
-                                     $l,$issuer_elements{$l});
-      }
-      $newrec->{issuer}=$issuer_multiline;
+      my $iobjs=$x509->issuer_name->entries();
+      $newrec->{issuer}=$self->formatedMultiline($iobjs);
 
       # SerialNr. (hex format)
-      my $serial=Net::SSLeay::X509_get_serialNumber($x509);
-      $newrec->{serialno}=Net::SSLeay::P_ASN1_INTEGER_get_hex($serial);
+      $newrec->{serialno}=$x509->serial();
 
       # Name
-      ## my $nameoneline=Net::SSLeay::X509_NAME_print_ex($issuer_name,
-      ##                                                 XN_FLAG_RFC2253);
-      ## my %nameelements=split(/[=,]/,$nameoneline);
-      ## $newrec->{name}=$nameelements{CN}.' - '.$newrec->{serialno};
-      $newrec->{name}=$issuer_elements{CN}.' - '.$newrec->{serialno};
+      my ($cn)=grep({$_->type() eq 'CN'} @$iobjs);
+      $newrec->{name}=$cn->value().' - '.$newrec->{serialno};
 
       # check if already expired
       my $duration=CalcDateDuration(NowStamp('en'),$newrec->{enddate});
@@ -396,6 +369,18 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default detail source));
+}
+
+
+sub isUploadValid
+{
+   return(0);
+}
+
+
+sub isQualityCheckValid
+{
+   return(0);
 }
 
 
