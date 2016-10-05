@@ -117,7 +117,7 @@ sub Init
 
    $self->RegisterObj("itts.appl.applwallet",
                       "itil::applwallet",
-                      defaultacl=>['valid_user']);
+                      defaultacl=>['admin']);
 
    $self->RegisterObj("itts.appl.applwallet.new",
                       "itil::applwallet",
