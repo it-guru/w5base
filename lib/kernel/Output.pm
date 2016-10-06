@@ -61,6 +61,9 @@ sub setFormat
    if ($opt{NewRecord}==1){
       $self->{NewRecord}=1;
    }
+   if (!exists($opt{WindowEnviroment})){
+      $opt{WindowEnviroment}="normal";
+   }
    if ($opt{ignViewValid}==1){
       $self->{ignViewValid}=1;
    }

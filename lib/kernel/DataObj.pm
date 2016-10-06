@@ -3847,7 +3847,8 @@ sub DataObj_findtemplvar
             if (defined($opt->{currentfieldgroup})){
                if (($opt->{currentfieldgroup} eq $opt->{fieldgroup} &&
                     $opt->{currentid} eq $opt->{id}) ||
-                   !defined($current)){  # in New mode all fields are in edit
+                   !defined($current) ||# in New mode all fields are in edit
+                   $opt->{WindowEnviroment} eq "modal"){  
                   $mode="edit";          # mode
                }
             }

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta charset='utf-8' />
 <title>W5Base Calendar Engine - preBETA!</title>
-</head><body><div id=MainStartup>%MODALDIV%<table border=0 cellspacing=0 cellpadding=0 id=maintable><tr height=1%><td colspan=3>%TITLEBAR%</td></tr><tr><td valign=top width=1%><div id='workspace' style="width:1%;height:100%;overflow:auto">%EXMENUDIV%</div></td><td valign=top><table width=100% height=100% border=0><tr height=1%><td valign=top><div id='calendar'></div></td><td style="width:1%"></td></tr><tr><td valign=top ><div id=exdatahead><div id=ExHead></div></div><div id=exdatadiv><div id=ExData></div></div></td><td></td></tr>
+</head><body><div id=MainStartup style='display:none;visiblity:hidden;height:auto;min-height:100%;max-height:100%;'>%MODALDIV%<table border=0 cellspacing=0 cellpadding=0 id=maintable><tr height=1%><td colspan=3>%TITLEBAR%</td></tr><tr><td valign=top width=1%><div id='workspace' style="width:1%;height:100%;overflow:auto">%EXMENUDIV%</div></td><td valign=top><table width=100% height=100% border=0><tr height=1%><td valign=top><div id='calendar'></div></td><td style="width:1%"></td></tr><tr><td valign=top ><div id=exdatahead><div id=ExHead></div></div><div id=exdatadiv><div id=ExData></div></div></td><td></td></tr>
 </table></td></tr></table></div></body>
 
 
@@ -21,12 +21,6 @@
 <style>
 html,body{
    margin:0;padding:0;height:100%;overflow:hidden;
-}
-#MainStartup{
-   display:none;
-   height:auto;
-   min-height:100%;
-   max-height:100%;
 }
 #maintable{
    width:100%;
@@ -229,7 +223,6 @@ function resizeLevel1(){
    console.log($('#exdatadiv').parent());
    var newexdata=$('#exdatadiv').parent().height();
    var h=$('#exdatahead').height();
-   console.log("newexdata=",newexdata," h=",h);
    $('#exdatadiv').height(newexdata-h-5);
 }
 
@@ -285,6 +278,11 @@ function setDefaultExData(){
 $(function() { // document ready
    var initialLangCode = 'de';
    $('#MainStartup').fadeIn();
+   var buttons="today prev,next refresh";
+   if (newTimespanHandler){
+      buttons+=" new";
+   }
+ 
    $('#calendar').fullCalendar({
       now: '%NOWSTAMP%',
       timezone: '%TIMEZONE%',
@@ -303,12 +301,12 @@ $(function() { // document ready
           new: {
               text: 'new',
               click: function() {
-                  alert("new not implemented now");
+                 newTimespanHandler();
               }
           }
       },
       header: {
-         left: 'today prev,next refresh',
+         left: buttons,
          center: 'title',
          right: 'timelineDay,timeline5TenDay,timelineWeek,month'
       },

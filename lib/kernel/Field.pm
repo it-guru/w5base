@@ -87,6 +87,7 @@ use kernel::Field::MatrixHeader;
 use kernel::Field::DatacareAssistant;
 use kernel::Field::CryptText;
 use kernel::Field::TRange;
+use kernel::Field::RecordRights;
 use kernel::Universal;
 @ISA    = qw(kernel::Universal);
 

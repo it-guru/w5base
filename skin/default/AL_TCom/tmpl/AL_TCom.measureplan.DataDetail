@@ -1,3 +1,31 @@
+function onPopWinClose(sendReturnVal,isbreak){
+   if (!isbreak){
+      $('#calendar').fullCalendar('refetchEvents');
+   }
+}
+
+
+function newTimespanHandler(){
+   var target="../../temporal/tspan/ModalNew?";
+   target+="Formated_subsys=MGMTITEMGRP&Formated_planname=plan";
+   showPopWin(target,500,430,onPopWinClose);
+}
+
+
+function doEdit(entity){
+   var id=$(entity).attr("eid");
+   var target="../../temporal/tspan/ModalEdit?id="+id;
+   target+="&CurrentFieldGroupToEdit=default&CurrentIdToEdit="+id;
+   showPopWin(target,500,430,onPopWinClose);
+}
+
+function doDelete(entity){
+   var id=$(entity).attr("eid");
+   var target="../../temporal/tspan/DeleteRec?CurrentIdToEdit="+id;
+   showPopWin(target,500,200,onPopWinClose);
+}
+
+
 function formatDetailRec(rec,s,e){
    var t="";
    var p=calculatePercentBar(s,e,rec.eventstart,rec.eventend);
@@ -88,8 +116,6 @@ function showExDataDetail(range,s,e,flt){
       fooder+="<div class=forwardSearch>W5B:<img border=0 onclick=\""+cmd+"\" "+
               "src=\"../../../public/base/load/directlink.gif\"></div>";
 
-
-
       $("#ExData").html(t+fooder);
       resizeLevel0();
    });
@@ -116,11 +142,19 @@ function showDataDetail(e){
    d+="<table class=ExHead>";
    d+="<tr><td colspan=3><b>"+e.title+"</b>";
    d+="<div style='float:right'>";
-   d+="<span class=actionButton onclick='doExpand();'>Expand</span>";
+   if (e.recordDelete){
+      d+="<span class=actionButton eid='"+e.id+"' onclick='doDelete(this);'>Delete</span>";
+      d+=" &bull; ";
+   }
+   if (e.recordWrite){
+      d+="<span class=actionButton eid='"+e.id+"' onclick='doEdit(this);'>Edit</span>";
+      d+=" &bull; ";
+   }
+   d+="<span class=actionButton eid='"+e.id+"' onclick='doExpand(this);'>Expand</span>";
    d+=" &bull; ";
-   d+="<span class=actionButton onclick='doPrint();'>Print</span>";
+   d+="<span class=actionButton eid='"+e.id+"' onclick='doPrint(this);'>Print</span>";
    d+=" &bull; ";
-   d+="<span class=actionButton onclick='doSearch();'>Suchen</span>";
+   d+="<span class=actionButton eid='"+e.id+"' onclick='doSearch(this);'>Suchen</span>";
    d+="</div>";
    d+="</td></tr>";
    if (e.subsys=='MGMTITEMGRP'){
@@ -140,18 +174,18 @@ function showDataDetail(e){
    var range="\""+startdate+"/"+enddate+"\"";
    $("#ExData").html("");
    $("#ExHead").html(d);
-   var opts = {
-     radius: 10,
-     color: '#fff', // #rbg or #rrggbb
-     speed: 3, // Rounds per second
-     trail: 66, // Afterglow percentage
-     top:'50%',
-     left:'50%',
-     className:'microspinner',
-     shadow: true // Whether to render a shadow
-   };
+//   var opts = {
+//     radius: 10,
+//     color: '#fff', // #rbg or #rrggbb
+//     speed: 3, // Rounds per second
+//     trail: 66, // Afterglow percentage
+//     top:'50%',
+//     left:'50%',
+//     className:'microspinner',
+//     shadow: true // Whether to render a shadow
+//   };
    var target = document.getElementById('ExData');
-   var spinner = new Spinner(opts).spin(target);
+//   var spinner = new Spinner(opts).spin(target);
 
    var flt={
        checkrec:function(rec){
@@ -162,39 +196,40 @@ function showDataDetail(e){
        }
    };
 
-   if (e.subsys=='MGMTITEMGRP'){
-      flt.checkrec=function(rec){
-          if (rec.eventstart<rangee && rec.eventend>ranges){
-             if (rec.affectedapplicationid!=""){
-                var applid=rec.affectedapplicationid.split(/[,; ]+/);
-                for(ii=0;ii<applid.length;ii++){
-                   if (this.data[""+applid[ii]]=="1"){
-                      return(true);
-                   }
-                }
-             }
-          }
-          return(false);
-      }
-      var o=getModuleObject(W5Base,"itil::lnkmgmtitemgroup");
-      o.SetFilter({
-          mgmtitemgroupid:e.mgmtitemgroupid,
-          mgmtitemgroupcistatusid:"4",
-          lnkfrom:"<\""+e.end_formated+"\"",
-          lnkto:">\""+e.start_formated+"\" OR [EMPTY]"
-      });
-      o.findRecord("applid,locationid",function(data){
-         flt.data={};
-         for(c=0;c<data.length;c++){
-            if (data[c].applid && data[c].applid!=""){
-               flt.data[""+data[c].applid]="1";
-            }
-         }
-         showExDataDetail(range,ranges,rangee,flt);
-      });
-   }
-   else{
-      showExDataDetail(range,ranges,rangee,flt);
-   }
+//   if (e.subsys=='MGMTITEMGRP'){
+//      flt.checkrec=function(rec){
+//          if (rec.eventstart<rangee && rec.eventend>ranges){
+//             if (rec.affectedapplicationid!=""){
+//                var applid=rec.affectedapplicationid.split(/[,; ]+/);
+//                for(ii=0;ii<applid.length;ii++){
+//                   if (this.data[""+applid[ii]]=="1"){
+//                      return(true);
+//                   }
+//                }
+//             }
+//          }
+//          return(false);
+//      }
+//      var o=getModuleObject(W5Base,"itil::lnkmgmtitemgroup");
+//      o.SetFilter({
+//          mgmtitemgroupid:e.mgmtitemgroupid,
+//          mgmtitemgroupcistatusid:"4",
+//          lnkfrom:"<\""+e.end_formated+"\"",
+//          lnkto:">\""+e.start_formated+"\" OR [EMPTY]"
+//      });
+//      o.findRecord("applid,locationid",function(data){
+//         flt.data={};
+//         for(c=0;c<data.length;c++){
+//            if (data[c].applid && data[c].applid!=""){
+//               flt.data[""+data[c].applid]="1";
+//            }
+//         }
+//         showExDataDetail(range,ranges,rangee,flt);
+//      });
+//   }
+//   else{
+//      showExDataDetail(range,ranges,rangee,flt);
+//   }
+
 }
 

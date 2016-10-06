@@ -272,6 +272,12 @@ sub ProcessLine
    my $editgroups=[$app->isWriteValid($rec)];
    my $currentfieldgroup=Query->Param("CurrentFieldGroupToEdit"); 
    my $currentid=Query->Param("CurrentIdToEdit"); 
+   my $FilterViewGroups=Query->Param("FilterViewGroups");
+   if ($self->{WindowEnviroment} eq "modal" && $FilterViewGroups eq ""){
+      $FilterViewGroups="header,source";
+      Query->Param("FilterViewGroups"=>$FilterViewGroups);
+   }
+
    if (defined($rec) && exists($rec->{cistatusid}) && $rec->{cistatusid}==7){
       $editgroups=[];
    }
@@ -405,7 +411,7 @@ EOF
       #   $sfocus="setFocus(\"\");".
       #           "setEnterSubmit(document.forms[0],DetailEditSave);";
       }
-      $template{"header"}=<<EOF;
+      $template{"HEADER"}=<<EOF;
 <div id="context_menu" class="context_menu">
  <table cellspacing="1" cellpadding="2" border="0">
 
@@ -416,7 +422,34 @@ EOF
 
  </table>
 </div>
+<script language="JavaScript">
+function setTitle()
+{
+   var t=window.document.getElementById("WindowTitle");
+   if (t){
+      parent.document.title=t.innerHTML;
+      document.title=t.innerHTML;
+   }
+   if ("$dragname"!=""){
+      var toplineimage=document.getElementById("toplineimage");
+      if (toplineimage){
+         addEvent(toplineimage, 'dragstart', function (event) {
+            if (event.dataTransfer) {
+               event.dataTransfer.clearData(); 
+               event.dataTransfer.setData('Text', "$dragname");
+            }
+         });
+      }
+   }
+   return(true);
+}
+addEvent(window, "load", setTitle);
+$sfocus
+</script>
+<div style="display:none;visibility:hidden;" id=WindowTitle>$s: $headerval</div>
+EOF
 
+      $template{"header"}=<<EOF;
 <a name="index"></a>
 <div style="height:4px;border-width:0;overflow:hidden">&nbsp;</div>
 <div id=detailtopline class=detailtopline>
@@ -426,7 +459,6 @@ EOF
       <td class=detailtopline>
 <table border=0 cellspacing=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
 <td class=detailtopline align=left>$H
-<div style="display:none;visibility:hidden;" id=WindowTitle>$s: $headerval</div>
 </td></tr></table>
 </td>
       </tr><tr>
@@ -434,27 +466,6 @@ EOF
       </tr>
    </table>
 </div>
-
-<script language="JavaScript">
-function setTitle()
-{
-   var t=window.document.getElementById("WindowTitle");
-   parent.document.title=t.innerHTML;
-   if ("$dragname"!=""){
-      var toplineimage=document.getElementById("toplineimage");
-      addEvent(toplineimage, 'dragstart', function (event) {
-         if (event.dataTransfer) {
-            event.dataTransfer.clearData(); 
-            event.dataTransfer.setData('Text', "$dragname");
-         }
-      });
-   }
-   return(true);
-}
-addEvent(window, "load", setTitle);
-
-$sfocus
-</script>
 EOF
 
       my @fieldlist=@$recordview;
@@ -664,7 +675,8 @@ EOF
          if ($currentfieldgroup ne ""){
             $detaiframeclassname="detailframeread";
          }
-         if ($currentfieldgroup eq $group ||
+         if ($currentfieldgroup eq $group || 
+             $self->{WindowEnviroment} eq "modal" ||
              $self->getParent->{NewRecord}){
             $detaiframeclassname="detailframeedit";
          }
@@ -703,6 +715,8 @@ EOF
    my @blocks=$self->getParent->getParent->sortDetailBlocks([keys(%template)],
                                                             current=>$rec,
                                                             mode=>'HtmlDetail');
+   @blocks=("HEADER",grep(!/^HEADER$/,@blocks));
+   
    my @indexdata=$app->getRecordHtmlIndex($rec,$id,$viewgroups,
                                           \@blocks,\%grouplabel);
    if ($#indexdataaddon!=-1){
@@ -764,6 +778,8 @@ EOF
       $latelastmsg++;
    }
    foreach my $template (@blocks){
+      next if ($self->{WindowEnviroment} eq "modal" &&
+               in_array([split(/,/,$FilterViewGroups)],$template));
       my $dtemp=$template{$template};
       my $fieldgroup=$template;
       my %param=(id               =>$id,
@@ -773,6 +789,7 @@ EOF
                  fieldgroup       =>$fieldgroup,
                  editgroups       =>$editgroups,
                  viewgroups       =>$viewgroups,
+                 WindowEnviroment =>$self->{WindowEnviroment},
                  WindowMode       =>$self->{WindowMode},
                  currentfieldgroup=>$currentfieldgroup);
       $self->ParseTemplateVars(\$dtemp,\%param);
@@ -780,7 +797,7 @@ EOF
       $d.="\n<a name=\"I.$id.$fieldgroup\"></a>\n";
       if ($c>0 || $#detaillist==0){
          my @msglist;
-         if ($fieldgroup eq $currentfieldgroup || 
+         if ( $fieldgroup eq $currentfieldgroup || 
              ($fieldgroup eq "default" && $latelastmsg)){
             @msglist=$self->getParent->getParent->LastMsg();
          }
@@ -812,7 +829,7 @@ sub ProcessBottom
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
    my @pers=qw(CurrentFieldGroupToEdit isCopyFromId CurrentIdToEdit OP
-               ScrollY AllowClose CurrentDetailMode);
+               ScrollY AllowClose FilterViewGroups CurrentDetailMode);
    my $idname=$app->IdField->Name();
    if (defined($idname) && defined(Query->Param($idname))){
       push(@pers,$idname);

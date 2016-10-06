@@ -118,6 +118,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
+                htmlheight    =>'50px',
                 searchable    =>0,
                 dataobjattr   =>'tspanentry.comments'),
 
@@ -254,6 +255,7 @@ sub new
                 name          =>'secroles',
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
+      new kernel::Field::RecordRights()
    );
    $self->setDefaultView(qw(linenumber planname name tfrom tto mdate));
    $self->setWorktable("tspanentry");

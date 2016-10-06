@@ -304,7 +304,7 @@ sub getValidWebFunctions
    my @l=qw(NativMain JSPlugin Main mobileMain MainWithNew addAttach 
             NativResult Result Upload UploadWelcome UploadFrame
             Welcome Empty Detail Visual HtmlDetail HandleInfoAboSubscribe
-            New Copy FormatSelect Bookmark startWorkflow
+            New ModalNew ModalEdit Copy FormatSelect Bookmark startWorkflow
             DeleteRec InitWorkflow AsyncSubListView 
             EditProcessor ViewProcessor HandleQualityCheck
             ViewEditor ById ModuleObjectInfo);
@@ -790,9 +790,67 @@ sub InitNew    # Initialize Web New Form
    my ($self)=@_;
 }
 
+sub getCloseModalWindowCode
+{
+   my $self=shift;
+   my $isbreaked=shift;
+   my $d;
+   if ($isbreaked){ 
+      $d=<<EOF;
+<script language=JavaScript>
+parent.hidePopWin(false);
+</script>
+EOF
+   }
+   else{
+      $d=<<EOF;
+<script language=JavaScript>
+parent.hidePopWin(true);
+</script>
+EOF
+   }
+   return($d);
+}
+
+sub getCloseModalWindowCodeFinishDelete
+{
+   my $self=shift;
+   my $isbreaked=shift;
+   my $d;
+   if ($isbreaked){ 
+      $d=<<EOF;
+<script language=JavaScript>
+parent.hidePopWin(false);
+parent.FinishDelete();
+</script>
+EOF
+   }
+   else{
+      $d=<<EOF;
+<script language=JavaScript>
+parent.hidePopWin(true);
+parent.FinishDelete();
+</script>
+EOF
+   }
+   return($d);
+}
+
+
+
+sub ModalNew
+{
+   my $self=shift;
+   return($self->New(WindowEnviroment=>'modal'));
+}
+
+
 sub New
 {
-   my ($self)=@_;
+   my $self=shift;
+   my %param=@_;
+   my $WindowEnviroment=$param{WindowEnviroment};
+   $WindowEnviroment="normal" if ($WindowEnviroment eq "");
 
    my @groups=$self->isWriteValid();
    if ($#groups==-1 || !defined($groups[0])){
@@ -811,14 +869,27 @@ sub New
       if (Query->Param("ModeSelectCurrentMode") eq "new"){
          Query->Delete("ModeSelectCurrentMode");
       }
+      if ($WindowEnviroment eq "modal"){
+         print $self->HttpHeader("text/html");
+         print $self->HtmlHeader(style=>['default.css'],body=>1,
+                                 title=>"Closing ...");
+         print $self->getCloseModalWindowCode(0);
+         print $self->HtmlBottom(body=>1);
+         return();
+      }
       return($self->Detail());
    }
    my $output=new kernel::Output($self);
-   if (!($output->setFormat("HtmlDetail",NewRecord=>1,WindowMode=>'New'))){
+   if (!($output->setFormat("HtmlDetail",
+         NewRecord=>1,
+         WindowMode=>"New",
+         WindowEnviroment=>$WindowEnviroment))){
       msg(ERROR,"can't set output format 'HtmlDetail'");
       return();
    }
    my $page=$output->WriteToScalar(HttpHeader=>0);
+
+   my $title=undef;
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css',
@@ -838,6 +909,8 @@ sub New
    print TabSelectorTool("ModeSelect",%param);
    print $self->HtmlBottom(body=>1,form=>1);
 }
+
+
 
 sub DeleteRec
 {
@@ -884,12 +957,7 @@ sub DeleteRec
          }
       }
       if (!$error){
-         print(<<EOF);
-<script language=JavaScript>
-parent.hidePopWin(false);
-parent.FinishDelete();
-</script>
-EOF
+         print $self->getCloseModalWindowCodeFinishDelete();
          return();
       }
    }
@@ -1496,6 +1564,53 @@ sub HtmlDetail
       my $output=new kernel::Output($self);
       $self->SetCurrentView(qw(ALL));
       $param{WindowMode}="Detail";
+      $self->SetCurrentOrder("NONE");
+      if (!($output->setFormat("HtmlDetail",%param))){
+         msg(ERROR,"can't set output format 'HtmlDetail'");
+         return();
+      }
+      $output->WriteToStdout(HttpHeader=>1);
+   }
+   else{
+      print($self->noAccess());
+      return(undef);
+   }
+
+}
+
+
+sub ModalEdit
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $oprunning=0;
+   $oprunning=1 if (Query->Param("OP") ne "");
+   $self->ProcessDataModificationOP();
+   
+
+   if (Query->Param("CurrentFieldGroupToEdit") eq ""){
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(style=>['default.css'],body=>1,
+                              title=>"Closing ...");
+      if ($oprunning){
+         print $self->getCloseModalWindowCode(0);
+      }
+      else{
+         print $self->getCloseModalWindowCode(1);
+      }
+      print $self->HtmlBottom(body=>1);
+      return();
+   }
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+
+   if ($self->SecureSetFilter(\%flt)){
+      my $output=new kernel::Output($self);
+      $self->SetCurrentView(qw(ALL));
+      $param{WindowMode}="Detail";
+      $param{WindowEnviroment}="modal";
       $self->SetCurrentOrder("NONE");
       if (!($output->setFormat("HtmlDetail",%param))){
          msg(ERROR,"can't set output format 'HtmlDetail'");
