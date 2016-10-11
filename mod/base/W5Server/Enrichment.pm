@@ -29,7 +29,7 @@ sub process
    if ($opmode eq "readonly"){
       $ro=1;
    }
-   #sleep(60);
+   sleep(600);
    while(1){
       if (!$ro){
          $self->EnrichmentCollector();

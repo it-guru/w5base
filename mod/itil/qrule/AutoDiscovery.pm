@@ -115,7 +115,7 @@ sub qcheckRecord
             }
          }
       }
-      #print STDERR ("fifi 01 AutoDisc: %s\n",Dumper(\@AdPreData));
+      print STDERR ("fifi 01 AutoDisc: %s\n",Dumper(\@AdPreData));
       #
       # create Software-Mappings and remove douplicate informations
       #
@@ -125,7 +125,7 @@ sub qcheckRecord
       #
       # load entry records based on engineids
       #
-      #printf STDERR ("fifi AutoDisc 01.1 %s\n",Dumper(\@AdPreData));
+      printf STDERR ("fifi AutoDisc 01.1 %s\n",Dumper(\@AdPreData));
 
       my %adentry=();
       {
@@ -155,7 +155,7 @@ sub qcheckRecord
       #
       # load old discovery entries
       #
-      #printf STDERR ("fifi AutoDisc 02\n");
+      printf STDERR ("fifi AutoDisc 02\n");
 
 
       my %oldrecs;
@@ -175,7 +175,7 @@ sub qcheckRecord
          };
       }
 
-      #printf STDERR ("fifi AutoDisc 03\n");
+      printf STDERR ("fifi AutoDisc 03\n");
       #
       # process all autodiscovery entries
       #
@@ -191,7 +191,7 @@ sub qcheckRecord
       #
       # cleanup old autodiscovery entries
       #
-      #printf STDERR ("oldrecs=%s\n",Dumper(\%oldrecs));
+      printf STDERR ("oldrecs=%s\n",Dumper(\%oldrecs));
 
       foreach my $id (keys(%oldrecs)){
          if ($oldrecs{$id}->{misscount}>2){

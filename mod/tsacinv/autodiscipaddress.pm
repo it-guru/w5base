@@ -58,12 +58,12 @@ sub new
                 name          =>'systemname',
                 label         =>'Systemname',
                 vjointo       =>'tsacinv::autodiscsystem',
-                vjoinon       =>['systemautodiscid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoinon       =>['systemautodiscid'=>'systemdiscoveryid'],
+                vjoindisp     =>'systemname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'systemautodiscid',
-                label         =>'SystemID',
+                label         =>'System DiscoveryID',
                 dataobjattr   =>'amtsiautodiscinterfaces.lsystemautodiscid'),
 
       new kernel::Field::Date(
@@ -82,7 +82,7 @@ sub new
    );
    $self->{use_distinct}=0;
 
-   $self->setDefaultView(qw(name systemid model scandate));
+   $self->setDefaultView(qw(address scandate));
    return($self);
 }
 
