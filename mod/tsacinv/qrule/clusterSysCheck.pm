@@ -104,31 +104,29 @@ sub qcheckRecord
                if ($rec->{isembedded}){
                   $parrec{isembedded}=0;
                }
-               else{
-                  $parrec{isclusternode}=1;
-                  my $cl=getModuleObject($self->getParent->Config(),
-                                         "itil::itclust");
-                  $cl->SetFilter({clusterid=>\$amclust->{clusterid}});
-                  my ($w5clust,$msg)=$cl->getOnlyFirst(qw(id fullname cistatusid));
-                  if (defined($w5clust)){
-                     if ($w5clust->{cistatusid}>5){
-                        push(@qmsg,"can not create needed cluster relation: ".
-                             $w5clust->{'fullname'});
-                        $errorlevel=3 if ($errorlevel<3);
-                        $parrec{itclust}=undef;
-                     }
-                     else{
-                        $parrec{itclust}=$w5clust->{'fullname'};
-                     }
-                    # printf STDERR ("found\n");
-                    # printf STDERR ("amclust=%s\n",Dumper($amclust));
-                    # printf STDERR ("w5clust=%s\n",Dumper($w5clust));
+               $parrec{isclusternode}=1;
+               my $cl=getModuleObject($self->getParent->Config(),
+                                      "itil::itclust");
+               $cl->SetFilter({clusterid=>\$amclust->{clusterid}});
+               my ($w5clust,$msg)=$cl->getOnlyFirst(qw(id fullname cistatusid));
+               if (defined($w5clust)){
+                  if ($w5clust->{cistatusid}>5){
+                     push(@qmsg,"can not create needed cluster relation: ".
+                          $w5clust->{'fullname'});
+                     $errorlevel=3 if ($errorlevel<3);
+                     $parrec{itclust}=undef;
                   }
                   else{
-                     push(@qmsg,"ClusterID: '".$amclust->{clusterid}.
-                          "' not found in W5Base/Darwin");
-                     $errorlevel=3 if ($errorlevel<3);
+                     $parrec{itclust}=$w5clust->{'fullname'};
                   }
+                 # printf STDERR ("found\n");
+                 # printf STDERR ("amclust=%s\n",Dumper($amclust));
+                 # printf STDERR ("w5clust=%s\n",Dumper($w5clust));
+               }
+               else{
+                  push(@qmsg,"ClusterID: '".$amclust->{clusterid}.
+                       "' not found in W5Base/Darwin");
+                  $errorlevel=3 if ($errorlevel<3);
                }
             }
          }
