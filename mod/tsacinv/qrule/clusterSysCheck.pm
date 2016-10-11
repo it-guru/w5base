@@ -133,6 +133,13 @@ sub qcheckRecord
       }
 
       $self->IfComp($dataobj,
+                    $rec,"isembedded",
+                    \%parrec,"isembedded",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    \@qmsg,\@dataissue,\$errorlevel,
+                    mode=>'boolean');
+
+      $self->IfComp($dataobj,
                     $rec,"isclusternode",
                     \%parrec,"isclusternode",
                     $autocorrect,$forcedupd,$wfrequest,
