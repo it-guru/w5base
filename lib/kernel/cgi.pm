@@ -39,6 +39,14 @@ sub new
       }
    }
    $self=bless($self,$type);
+   if ($ENV{REQUEST_METHOD} eq "POST" && $ENV{QUERY_STRING} ne ""){
+      my $tmpcgi=new CGI($ENV{QUERY_STRING});
+      foreach my $v ($tmpcgi->param()){
+         my @val=$tmpcgi->param($v);
+         $#val==0 ? $self->{'cgi'}->param(-name=>$v,-value=>$val[0]):
+                    $self->{'cgi'}->param(-name=>$v,-value=>\@val);
+      }
+   }
  
    return($self);
 }
