@@ -124,7 +124,7 @@ sub HolidayList
       $trange="\"${s} 00:00:00/${e} 23:59:59\"";
    }
    my @l=();
-   printf STDERR ("fifi s=$s e=$e\n");
+   msg(INFO,"HolidayList query on temporal/CalendarEngine s=$s e=$e");
    my ($year_start)=$s=~m/^([0-9]{4})-/;
    my ($year_end)=$e=~m/^([0-9]{4})-/;
 
