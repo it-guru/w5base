@@ -13,5 +13,5 @@
 'central managed item group'=>{de=>'zentral geführte CI-Gruppe'},
 'color'=>{de=>'Farbe'},
 'invalid timeplan specified'=>{de=>'ungültiger Zeitplan'},
-'invalid subsystem for this timeplan'=>{de=>'ungültige Zeitbereichsart für den gewählten Zeitplan'}
-
+'invalid subsystem for this timeplan'=>{de=>'ungültige Zeitbereichsart für den gewählten Zeitplan'},
+'no write access to specified plan'=>{de=>'kein Schreibzugriff auf angegebenem Zeitplan'},

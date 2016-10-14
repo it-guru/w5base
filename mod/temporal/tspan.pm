@@ -437,6 +437,12 @@ sub Validate
       $self->LastMsg(ERROR,"invalid timeplan specified");
       return(undef);
    }
+   my @g=$po->isWriteValid($planrec);
+   if (!(grep(/^ALL$/,@g) || grep(/^default$/,@g))){
+      $self->LastMsg(ERROR,"no write access to specified plan");
+      return(undef);
+   }
+
 
    #print STDERR "planrec=".Dumper($planrec);
    #print STDERR "oldrec=".Dumper($oldrec);
@@ -482,11 +488,34 @@ sub isViewValid
    return(@l);
 }
 
+
+sub isWriteOnPlanValid
+{
+   my $self=shift;
+   my $planid=shift;
+   my $group=shift;
+
+   my $plan=$self->getPersistentModuleObject("temporal::plan");
+   $plan->SetFilter({id=>\$planid});
+   my ($crec,$msg)=$plan->getOnlyFirst(qw(ALL));
+   my @g=$plan->isWriteValid($crec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
+
+
 sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","mgmtitemgroup") if ($self->IsMemberOf("admin"));
+   return("ALL") if (!defined($rec));
+   if ($self->IsMemberOf("admin") ||
+       $self->isWriteOnPlanValid($rec->{planid},"default")){
+      return("default","mgmtitemgroup");
+   }
    return(undef);
 }
 

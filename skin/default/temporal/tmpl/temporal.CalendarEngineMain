@@ -49,12 +49,24 @@ table.ExDataRec{
 }
 
 table.ExHead{
-   background-color:#D2D2D2;
+   background-color:#F0F0F0;
    border: 1px solid gainsboro; 
    border-collapse: collapse; 
    width:100%;
    padding: 10px; 
    border-radius: 5px; 
+   margin: 0px; 
+   border-spacing: 0; 
+   border-collapse: separate; 
+}
+
+table.ExHeadForm{
+   background-color:#E2E2E2;
+   border: 1px solid gainsboro; 
+   border-collapse: collapse; 
+   width:95%;
+   padding: 6px; 
+   border-radius: 3px; 
    margin: 0px; 
    border-spacing: 0; 
    border-collapse: separate; 
@@ -71,6 +83,19 @@ span.actionButton{
    cursor: pointer;
    cursor: hand;
    font-size:8px;
+}
+
+
+span.base_workflow_link{
+   cursor: pointer;
+   cursor: hand;
+   font-style:italic;
+}
+
+span.tssm_chm_link{
+   cursor: pointer;
+   cursor: hand;
+   font-weight:bold;
 }
 
 
@@ -133,11 +158,6 @@ span.actionButton{
 
 
 
-<xscript src="excanvas.js"></xscript>
-<xscript data-main="scripts/main"  src="../../../public/base/load/require.js">
-</xscript>
-
-
 <script language="JavaScript" src="../../../auth/base/load/J5Base.js">
 </script>
 <script language="JavaScript" src="../../../public/base/load/spin.js">
@@ -166,6 +186,20 @@ span.actionButton{
 
 <script language="JavaScript" >
 var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+var App=Object();
+App.W5Base=W5Base;
+
+var escape = document.createElement('textarea');
+function escapeHTML(html) {
+    escape.textContent = html;
+    return escape.innerHTML;
+}
+
+function unescapeHTML(html) {
+    escape.innerHTML = html;
+    return escape.textContent;
+}
+
 function startSpinner(){
    var opts = {
      lines: 12, // The number of lines to draw
@@ -185,12 +219,13 @@ function endSpinner(){
 }
 
 function doExpand(){
+   $('#exdatadiv').height(5);
    $('#calendar').toggle();
    resizeLevel1();
 }
 
 function formatSeconds(sec){
-   var s="";
+   var s="~";
 
    var days = parseInt( sec / 86400 );
    var hours = parseInt( sec / 3600 ) % 24;
@@ -212,9 +247,6 @@ function formatSeconds(sec){
       if (minutes>0){
          s+=minutes+"m "
       }
-      if (seconds>0){
-         s+=seconds+"s "
-      }
    }
    return(s);
 }
@@ -228,9 +260,28 @@ function resizeLevel1(){
 
 function resizeLevel0(){
    var h=$('#exdatahead').height();
-   $('#exdatadiv').height(h);
+   //$('#exdatadiv').height(h);
+   $('#exdatadiv').height(5);
    setTimeout(resizeLevel1,100);
 }
+
+Date.prototype.frontendFormat = function() {
+  // use UCT functions, because all timestamps are already in frontend zone
+  var MM   = ("0"   + (this.getUTCMonth() + 1)).slice(-2);
+  var DD   = ("0"   + (this.getUTCDate())).slice(-2);
+  var YYYY = ("000" + (this.getUTCFullYear())).slice(-4);
+  var hh   = ("0"   + (this.getUTCHours())).slice(-2);
+  var mm   = ("0"   + (this.getUTCMinutes())).slice(-2);
+  var ss   = ("0"   + (this.getUTCSeconds())).slice(-2);
+
+  if ('%LANG%'=='de'){
+     return(DD+"."+MM+"."+YYYY+" "+hh+":"+mm+":"+ss);
+  }
+  else{
+     return(YYYY+"-"+MM+"-"+DD+" "+hh+":"+mm+":"+ss);
+  }
+};
+
 
 
 function calculatePercentBar(range_s,range_e,ev_s,ev_e){

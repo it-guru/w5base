@@ -75,7 +75,7 @@ sub EventList
       trange=>$trange,
       planclass=>\'TCLASS.measureplan'
    });
-   foreach my $ev ($o->getHashList(qw(id tfrom tto name planid 
+   foreach my $ev ($o->getHashList(qw(id tfrom tto name planid comments
                                       color subsys recordWrite recordDelete
                                       mgmtitemgroupname mgmtitemgroupid))){
       my $start=$self->ExpandTimeExpression($ev->{tfrom},"en","GMT",$timezone);
@@ -90,6 +90,7 @@ sub EventList
          recordDelete=>$ev->{recordDelete},
          start_formated=>$start,
          color=>$ev->{color},
+         comments=>$ev->{comments},
          end=>$end,
          end_formated=>$end,
          id=>$ev->{id},

@@ -214,6 +214,25 @@ sub getRecordImageUrl
    return("../../../public/temporal/load/plan.jpg?".$cgi->query_string());
 }
 
+
+sub isWriteOnPlanValid
+{
+   my $self=shift;
+   my $planid=shift;
+   my $group=shift;
+
+   my $plan=$self->getPersistentModuleObject("temporal::plan");
+   $plan->SetFilter({id=>\$planid});
+   my ($crec,$msg)=$plan->getOnlyFirst(qw(ALL));
+   my @g=$plan->isWriteValid($crec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
+
+
 sub SecureSetFilter
 {
    my $self=shift;

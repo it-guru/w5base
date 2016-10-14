@@ -39,9 +39,14 @@ sub new
       }
    }
    $self=bless($self,$type);
+   #
+   # Using full QUERY_STRING in POST Request did get problems in situations
+   # where forms get default values on open by passing query_strings
+   #
    if ($ENV{REQUEST_METHOD} eq "POST" && $ENV{QUERY_STRING} ne ""){
       my $tmpcgi=new CGI($ENV{QUERY_STRING});
       foreach my $v ($tmpcgi->param()){
+         next if (!($v=~m/^(MOD|FUNC|callback)$/));
          my @val=$tmpcgi->param($v);
          $#val==0 ? $self->{'cgi'}->param(-name=>$v,-value=>$val[0]):
                     $self->{'cgi'}->param(-name=>$v,-value=>\@val);
