@@ -69,6 +69,8 @@ sub new
                       "and \"Betriebsmodell (Test)\"<>'') OR ".
                          "(\"Betriebsmodell (Entw)\" is not null ".
                       "and \"Betriebsmodell (Entw)\"<>'') OR ".
+                         "(\"Betriebsmodell (Abnahme)\" is not null ".
+                      "and \"Betriebsmodell (Abnahme)\"<>'') OR ".
                          "(\"Betriebsmodell (Sonst1)\" is not null ".
                       "and \"Betriebsmodell (Sonst1)\"<>'') OR ".
                          "(\"Betriebsmodell (Sonst2)\" is not null ".
@@ -106,6 +108,12 @@ sub new
                 dataobjattr   =>'"Betriebsmodell (Entw)"'),
 
       new kernel::Field::Text(
+                name          =>'itnormodel_abn',
+                group         =>'nortarget',
+                label         =>'OperationModel Abnahme',
+                dataobjattr   =>'"Betriebsmodell (Abnahme)"'),
+
+      new kernel::Field::Text(
                 name          =>'itnormodel_sonst1',
                 group         =>'nortarget',
                 label         =>'OperationModel Sonst1',
@@ -139,7 +147,7 @@ sub new
                 name          =>'itnormodel',
                 group         =>'nortarget',
                 depend        =>[qw(itnormodel_prod   itnormodel_test   
-                                    itnormodel_entw 
+                                    itnormodel_entw itnormodel_abn
                                     itnormodel_sonst1 itnormodel_sonst2 
                                     itnormodel_sonst3 itnormodel_sonst4 
                                     itnormodel_sonst5)],
