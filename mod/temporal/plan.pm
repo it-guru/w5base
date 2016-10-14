@@ -219,13 +219,21 @@ sub isWriteOnPlanValid
 {
    my $self=shift;
    my $planid=shift;
-   my $group=shift;
 
    my $plan=$self->getPersistentModuleObject("temporal::plan");
-   $plan->SetFilter({id=>\$planid});
+   my %grps=$self->getGroupsOf($ENV{REMOTE_USER},[qw(RMember)],"up");
+   my @grpids=keys(%grps);
+
+   my $userid=$self->getCurrentUserId();
+   my @addflt=(
+              {sectargetid=>\$userid,sectarget=>\'base::user',
+               secroles=>"*roles=?write?=roles*"},
+              {sectargetid=>\@grpids,sectarget=>\'base::grp',
+               secroles=>"*roles=?write?=roles*" }
+             );
+   $plan->SetFilter({id=>\$planid},\@addflt);
    my ($crec,$msg)=$plan->getOnlyFirst(qw(ALL));
-   my @g=$plan->isWriteValid($crec);
-   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+   if (defined($crec)){
       return(1);
    }
    return(0);
