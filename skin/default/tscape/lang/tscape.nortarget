@@ -3,6 +3,7 @@
 'OperationModel Prod'=>{de=>'Betriebsmodel Prod'},
 'OperationModel Test'=>{de=>'Betriebsmodel Test'},
 'OperationModel Entw'=>{de=>'Betriebsmodel Entw'},
+'OperationModel Abnahme'=>{de=>'Betriebsmodel Abnahme'},
 'OperationModel Sonst1'=>{de=>'Betriebsmodel Sonst1'},
 'OperationModel Sonst2'=>{de=>'Betriebsmodel Sonst2'},
 'OperationModel Sonst3'=>{de=>'Betriebsmodel Sonst3'},
