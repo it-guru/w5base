@@ -71,6 +71,9 @@ sub getPostibleValues
       # on top of the  list
       my %groups=$self->getParent->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],
                                'up');
+      my %dgroups=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                           [qw(RCFManager RCFManager2)], 'direct');
+
       @mandators=sort({ 
           my $dista=999;
           my $distb=999;
@@ -94,7 +97,8 @@ sub getPostibleValues
             }
             else{
                if ($MandatorCache->{grpid}->{$mandator}->{cistatusid}==3 &&
-                   $self->getParent->IsMemberOf("admin")){
+                   (exists($dgroups{$mandator})||
+                    $self->getParent->IsMemberOf("admin"))){
                   push(@res,$mandator,
                        $MandatorCache->{grpid}->{$mandator}->{name});
                }
@@ -147,6 +151,7 @@ sub Validate
             return($self->SUPER::Validate($oldrec,$newrec,$currentstate));
          }
          my @mandators=$app->getMandatorsOf($ENV{REMOTE_USER},"write");
+printf STDERR ("fifi m=%s\n",Dumper(\@mandators));
          if (!defined($oldrec)){
             if (!defined($newrec->{$mandatoridname}) ||
                 ($newrec->{$mandatoridname}==0 && !$self->{allowany})){
