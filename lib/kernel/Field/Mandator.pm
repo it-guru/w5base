@@ -151,7 +151,6 @@ sub Validate
             return($self->SUPER::Validate($oldrec,$newrec,$currentstate));
          }
          my @mandators=$app->getMandatorsOf($ENV{REMOTE_USER},"write");
-printf STDERR ("fifi m=%s\n",Dumper(\@mandators));
          if (!defined($oldrec)){
             if (!defined($newrec->{$mandatoridname}) ||
                 ($newrec->{$mandatoridname}==0 && !$self->{allowany})){
