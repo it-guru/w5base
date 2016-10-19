@@ -48,6 +48,8 @@ sub new
                 size          =>'10',
                 group         =>'source',
                 dataobjattr   =>'grp.grpid'),
+
+      new kernel::Field::RecordUrl(),
                                   
       new kernel::Field::Text(
                 name          =>'fullname',
