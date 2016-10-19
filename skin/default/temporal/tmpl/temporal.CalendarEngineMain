@@ -330,7 +330,7 @@ $(function() { // document ready
    var initialLangCode = 'de';
    $('#MainStartup').fadeIn();
    var buttons="today prev,next refresh";
-   if (newTimespanHandler){
+   if (typeof(newTimespanHandler) === 'function'){
       buttons+=" new";
    }
  
