@@ -6,8 +6,8 @@ package tscape::qrule::CapeBasedMandatorRules;
 
 =head3 PURPOSE
 
-REGEL ist noch in der Testphase !!!
-Switches the mandator relation based on the defined t-systems ruleset
+Switches the mandator relation based on the organisation relation
+at the ICTO-Object in Cape.
 
 =head3 IMPORTS
 
@@ -16,21 +16,6 @@ NONE
 =head3 HINTS
 
 [en:]
-
-The mandators of applications are assigned based on
-the SAP hierarchy defined in the affiliated Costcenters.
-
-* 9TS_ES.9DTIT.9ECS     is equal to CSO 
-
-* 9TS_ES.9DTIT.9EMC     is equal to MCS 
-
-* 9TS_ES.9DTIT.9ESSI    is equal to TSI 
-
-* 9TS_ES.9DTIT.9ESIL    is equal to TSI 
-
-* 9TS_ES.9DTIT.9EGS     is equal to GSO 
-
-* 9TS_ES.9DTIT.9ETS     is equal to TSO 
 
 The mapping is done only on config items in the following CI-States:
 
@@ -45,19 +30,9 @@ In all other cases no mandator replacement takes place.
 [de:]
 
 Die Mandanten von Anwendungen werden basierend auf der im angegebenen
-Kontierungsobjekt definierten SAP-Hierarchie zugeordnet.
+ICTO-Objekt definierten Organisations-Zuorndung zugeordnet.
 
-* 9TS_ES.9DTIT.9ECS     ist gleich CSO 
 
-* 9TS_ES.9DTIT.9EMC     ist gleich MCS 
-
-* 9TS_ES.9DTIT.9ESSI    ist gleich TSI 
-
-* 9TS_ES.9DTIT.9ESIL    ist gleich TSI 
-
-* 9TS_ES.9DTIT.9EGS     ist gleich GSO 
-
-* 9TS_ES.9DTIT.9ETS     ist gleich TSO 
 
 Das Mapping wird nur bei Config-Items im Status ...
 
@@ -96,19 +71,6 @@ use vars qw(@ISA);
 use kernel;
 use kernel::QRule;
 @ISA=qw(kernel::QRule);
-
-
-sub mapCapeOrgToMandGrp
-{
-   my $curmandator=shift; 
-   my $org=shift; 
-   my $grp;
-
-   if (my ($sol)=$org=~m/^TS LBU DE T-IT E-([A-Z]{3}).*$/){
-      $grp="DTAG.GHQ.VTS.TSI.TI.E-".$sol;
-   }
-   return($grp);
-}
 
 
 
@@ -157,27 +119,28 @@ sub qcheckRecord
          my $grp;
          my $i=getModuleObject($dataobj->Config,"tscape::archappl");
          $i->SetFilter({archapplid=>\$icto});
-         my ($ictor)=$i->getOnlyFirst(qw(organisation archapplid));
+         my ($ictor)=$i->getOnlyFirst(qw(organisation archapplid orgareaid));
          if (defined($ictor) && $ictor->{organisation} ne ""){
-            $grp=mapCapeOrgToMandGrp($curmandatorid,$ictor->{organisation});
+            $grp=$ictor->{orgareaid};
          }
-         if ($grp ne ""){  # try to find target based on saphier
-            if ($grp ne ""){
-               my $m=getModuleObject($dataobj->Config,"base::mandator");
-               $m->SetFilter({groupname=>\$grp,cistatusid=>\'4'});
-               my ($mrec)=$m->getOnlyFirst(qw(name grpid));
-               if (!defined($mrec)){ 
-                  msg(ERROR,"can not identify mandator for group '$grp'");
-                  return(0,undef);
-               }
-               if ($curmandator ne $mrec->{name}){
-                  $dstmandator=$mrec->{name};
-                  $dstmandatorid=$mrec->{grpid};
-               }
-               else{
-                  msg(INFO,"mandant '$curmandator' passt");
-               }
+         if ($grp ne ""){
+            my $m=getModuleObject($dataobj->Config,"base::mandator");
+            $m->SetFilter({grpid=>\$grp,cistatusid=>['3','4']});
+            my ($mrec)=$m->getOnlyFirst(qw(name grpid));
+            if (!defined($mrec)){ 
+               msg(ERROR,"can not identify mandator for group '$grp'");
+               return(0,undef);
             }
+            if ($curmandator ne $mrec->{name}){
+               $dstmandator=$mrec->{name};
+               $dstmandatorid=$mrec->{grpid};
+            }
+            else{
+               msg(INFO,"mandant '$curmandator' passt");
+            }
+         }
+         else{
+            return(0,undef);
          }
       }
    }

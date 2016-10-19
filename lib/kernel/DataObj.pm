@@ -1617,6 +1617,9 @@ sub getIdByHashIOMapped
    }
 
    $self->ResetFilter();
+   if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
+      $$debug.="\nFlt: ".Dumper(\%flt),"\n" if ($debug);
+   }
    $self->SetFilter(\%flt);
    my $idfield=$self->IdField();
    my @l=$self->getVal($idfield->Name());

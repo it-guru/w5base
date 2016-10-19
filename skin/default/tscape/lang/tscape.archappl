@@ -3,6 +3,8 @@
 'description'=>{de=>'Beschreibung'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
 'fullname'=>{de=>'ICTO Objektbezeichnung',en=>'ICTO Objectname'},
+'OrgAreaID'=>{de=>'OrganisationsbereichID'},
+'mapped OrgArea'=>{de=>'zugeordneter Org-Bereich'},
 'fieldgroup.roles'=>{de=>'Rollen',en=>'Roles'},
 'fieldgroup.appl'=>{de=>'W5Base Anwendungszuordnung',
                     en=>'W5Base Applicationrelation'},

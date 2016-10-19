@@ -92,6 +92,33 @@ sub new
                 label         =>'Organisation',
                 dataobjattr   =>'Organisation'),
 
+      new kernel::Field::Group(
+                name          =>'orgarea',
+                readonly      =>1,
+                label         =>'mapped OrgArea',
+                vjoinon       =>'orgareaid'),
+
+      new kernel::Field::Link(
+                name          =>'orgareaid',
+                label         =>'OrgAreaID',
+                depend        =>['organisation'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $grp=getModuleObject($self->getParent->Config,
+                                               "base::grp");
+                   my $newrec={};
+                   my $d;
+                   $newrec->{fullname}=$current->{organisation};
+                   my @grpid=$grp->getIdByHashIOMapped(
+                                $self->getParent->Self,
+                                $newrec,DEBUG=>\$d);
+                   if ($#grpid>=0){
+                      return($grpid[0]);
+                   }
+                   return();
+                }),
+
       new kernel::Field::Contact(
                 name          =>'applmgr',
                 label         =>'Application Manager',
