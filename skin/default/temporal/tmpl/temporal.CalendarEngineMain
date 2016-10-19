@@ -172,8 +172,8 @@ span.tssm_chm_link{
 <script language="JavaScript" src="../../../public/base/load/jquery.dataTables.js">
 </script>
 
-<script language="JavaScript" src="../../../public/base/load/jquery.ui.js">
-</script>
+<xscript language="JavaScript" src="../../../public/base/load/jquery.ui.js">
+</xscript>
 
 <script language="JavaScript" src="../../../public/base/load/jquery.mousewheel.js">
 </script>
