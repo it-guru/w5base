@@ -46,6 +46,11 @@ sub getControlRecord
              targetid  =>'userid'
            },
            {
+             dataobj   =>'base::location',
+             target    =>'name',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'base::grp',
              target    =>'fullname',
              targetid  =>'grpid'
@@ -108,7 +113,8 @@ sub DataIssueCompleteWriteRequest
          return($obj->DataIssueCompleteWriteRequest($oldrec,$newrec,$WfRec));
       }
    }
-   if (($affectedobject=~m/::projectroom$/) ){
+   if (($affectedobject=~m/::projectroom$/) ||
+       ($affectedobject=~m/::location$/)){
       if (defined($newrec->{affectedobject}) &&
           $newrec->{affectedobject} eq $affectedobject){
          # create link to config Management

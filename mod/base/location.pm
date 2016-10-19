@@ -362,6 +362,7 @@ sub new
 
       new kernel::Field::Interview(),
       new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
