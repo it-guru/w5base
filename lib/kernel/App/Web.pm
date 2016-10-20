@@ -1438,11 +1438,8 @@ sub HtmlHeader
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html $langtag>
 <head>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 EOF
-  if ($param{IEedge}){
-     $d.='<meta http-equiv="X-UA-Compatible" content="IE=edge">';
-  }
-
   $d.=<<EOF;
 <script type="text/javascript" language="JavaScript">
 var CURLANG="$lang";
