@@ -3543,7 +3543,6 @@ sub getRecordHtmlIndex
    $viewgroups=[$viewgroups] if (ref($viewgroups) ne "ARRAY");
 
    foreach my $group (@$grouplist){
-print STDERR ("fifi group=$group\n");
       if ($group ne "header" && $group ne "HEADER" &&
           (grep(/^$group$/,@$viewgroups) || grep(/^ALL$/,@$viewgroups))){
         push(@indexlist,
