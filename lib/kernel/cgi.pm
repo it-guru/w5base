@@ -43,7 +43,7 @@ sub new
    # Using full QUERY_STRING in POST Request did get problems in situations
    # where forms get default values on open by passing query_strings
    #
-   if ($ENV{REQUEST_METHOD} eq "POST" && $ENV{QUERY_STRING} ne ""){
+   if ($ENV{REQUEST_METHOD} eq "POST" && $ENV{QUERY_STRING} ne "" && $#_==-1){
       my $tmpcgi=new CGI($ENV{QUERY_STRING});
       foreach my $v ($tmpcgi->param()){
          next if (!($v=~m/^(MOD|FUNC|callback)$/));
