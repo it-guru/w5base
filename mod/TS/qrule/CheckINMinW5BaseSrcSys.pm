@@ -12,6 +12,12 @@ Checks incident assignementgroup in ci's with srcsys=w5base
 
 =head3 HINTS
 
+A config-item which was created in Darwin and can or should be transferred to AssetManager, has to have a valid Incident Assignmentgroup.
+
+Beware! If the intention is to "refer" to a config. item in AssetManager (i.e. the mentioned CI is under the main responsibility of the IT-Division, or is generally maintained in AssetManager), then the CI may NOT be created anew. For this particular case you should use the function "Assetmanager Import" in Darwin.
+
+You can see whether a CI was created in Darwin or AssetManager based on the field "Source-System" under "Sourceinformations" on the CI (filled either with "w5base" or "AssetManager".
+
 
 
 [de:]
@@ -26,6 +32,8 @@ der IT-Division oder wird generell federführend in AssetManager
 dokumentiert), dann darf dies NICHT mittels Neueingabe erzeugt
 werden. In einem solchen Fall ist die "AssetManager Import"
 Funktion zu verwenden.
+
+Ob ein CI in Darwin oder AssetManager angelegt wurde können Sie anhand des Feldes "Quellsystem" unter "Quellinformationen" an dem CI ermitteln (befüllt entweder mit . "w5base" oder "AssetManager".
 
 =cut
 
