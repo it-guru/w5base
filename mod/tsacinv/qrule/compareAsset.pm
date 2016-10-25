@@ -143,7 +143,8 @@ sub qcheckRecord
       else{
          if ($rec->{srcsys} ne "AssetManager"){
             $forcedupd->{srcsys}="AssetManager";
-         }
+            $forcedupd->{allowifupdate}="1"; # Beim Switch auf AssetManager
+         }                                   # autoUpdate auf Ja
          if ($rec->{srcid} ne $parrec->{assetid}){
             $forcedupd->{srcid}=$parrec->{assetid};
          }

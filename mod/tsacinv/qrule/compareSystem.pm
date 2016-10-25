@@ -117,10 +117,24 @@ sub qcheckRecord
                        status=>'"!out of operation"'});
       ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
-      if (!defined($parrec)){
-         if ($rec->{systemid} ne $rec->{id}){
-            # hier koennte u.U. noch eine Verbindung zu AM über
-            # den Namen aufgebaut werden
+   }
+   if (!defined($parrec)){
+      if ($rec->{systemid} eq "" && 
+          $rec->{scapprgroupid} eq "" && # nur falls noch keine IAC gesetzt!
+          $rec->{srcsys} eq "w5base"){
+         # Hier wird versucht, eine Verbindung zu AssetManager über
+         # den Systemnamen aufzubauen
+         $par->ResetFilter();
+         $par->SetFilter({systemname=>$rec->{name},
+                          status=>'"!out of operation"'});
+         my @l=$par->getHashList(qw(ALL));
+         if ($#l==0){
+            if ($l[0]->{srcsys} eq ""){  # falsch, per neueingabe erfasstes
+               $parrec=$l[0];            # System in Darwin -> mußte eigentlich
+            }                            # per Import geladen werden
+         }
+         elsif($#l>0){
+            printf STDERR ("mysterious effect in qrule for $rec->{name}\n");
          }
       }
    }
@@ -150,7 +164,8 @@ sub qcheckRecord
       else{
          if ($rec->{srcsys} ne "AssetManager"){
             $forcedupd->{srcsys}="AssetManager";
-         }
+            $forcedupd->{allowifupdate}="1";  # Beim Switch auf AssetManager
+         }                                    # AutoUpdate auf Ja
          if ($rec->{srcid} ne $parrec->{systemid}){
             $forcedupd->{srcid}=$parrec->{systemid};
          }
