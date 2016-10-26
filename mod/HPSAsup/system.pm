@@ -62,7 +62,7 @@ from "itil::appl"
    on "itil::appl".id="W5I_ACT_itil::lnkapplsystem".applid
  join "itil::system"                 
    on "W5I_ACT_itil::lnkapplsystem".systemid="itil::system".id
- join "tsacinv::system"              
+ left outer join "tsacinv::system"              
    on "itil::system".systemid="tsacinv::system".systemid
  left outer join "W5I_HPSAsup__system_of"
     on "itil::system".systemid="W5I_HPSAsup__system_of".systemid
@@ -77,7 +77,7 @@ where
         -- nur installiert/aktive Anwendungen
        "itil::appl".cistatusid=4 
        -- nur installiert/aktive Systeme
-    and "itil::system".cistatusid=4  
+    and "itil::system".cistatusid in (3,4)
        -- nur Anwendungen der TelekomIT Mandaten
     and "itil::appl".mandator like 'TelekomIT%'
        -- alle Prio1 Anwendungen
@@ -120,7 +120,8 @@ where
        -- Loadbalancer Systeme ausklammern (da Scanner nicht möglich)
     and "itil::system".isloadbalacer=0
        -- MU Status "hibernate" ausklammern
-    and "tsacinv::system".status not like 'hibernate'
+    and ("tsacinv::system".status not like 'hibernate' or 
+         "tsacinv::system".status is null)
        -- Ausschluss von Mainframe
     and "itil::system".osclass not like 'MAINFRAME';            
             
