@@ -56,6 +56,11 @@ sub new
                 label         =>'Brief description',
                 dataobjattr   =>'wallet.shortdesc'),
 
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'wallet.comments'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
@@ -79,12 +84,11 @@ sub new
                 name          =>'sslcert',
                 label         =>'Certificate file',
                 types         =>['crt','cer','pem','der'],
-                mimetype      =>'sslcertdoctype',
                 filename      =>'sslcertdocname',
-                uploaddate    =>'sslcertdocdate',
                 maxsize       =>65533,
                 searchable    =>0,
                 uploadable    =>0,
+                allowempty    =>0,
                 dataobjattr   =>'wallet.sslcert'),
 
       new kernel::Field::Text(
@@ -95,24 +99,6 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 dataobjattr   =>'wallet.sslcertdocname'),
-
-      new kernel::Field::Date(
-                name          =>'sslcertdocdate',
-                label         =>'SSL-Certificate-Document Date',
-                searchable    =>0,
-                uploadable    =>0,
-                readonly      =>1,
-                htmldetail    =>0,
-                dataobjattr   =>'wallet.sslcertdocdate'),
-
-      new kernel::Field::Text(
-                name          =>'sslcertdoctype',
-                label         =>'SSL-Certificate-Document Type',
-                searchable    =>0,
-                uploadable    =>0,
-                readonly      =>1,
-                htmldetail    =>0,
-                dataobjattr   =>'wallet.sslcertdoctype'),
 
       new kernel::Field::Date(
                 name          =>'sslexpnotify1',
@@ -227,21 +213,23 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   my @secappl;
-   my $userid=$self->getCurrentUserId();
+   if (!$self->IsMemberOf("admin")) {
+      my @secappl;
+      my $userid=$self->getCurrentUserId();
 
-   my $lnkcontactobj=getModuleObject($self->Config,'base::lnkcontact');
-   $lnkcontactobj->SetFilter({target=>\'base::user',
-                              targetid=>\$userid,
-                              parentobj=>\'itil::appl',
-                              croles=>"*roles=?write?=roles* ".
-                                      "*roles=?privread?=roles*"});
-   my @authcontacts=$lnkcontactobj->getHashList(qw(refid));
+      my $lnkcontactobj=getModuleObject($self->Config,'base::lnkcontact');
+      $lnkcontactobj->SetFilter({target=>\'base::user',
+                                 targetid=>\$userid,
+                                 parentobj=>\'itil::appl',
+                                 croles=>"*roles=?write?=roles* ".
+                                         "*roles=?privread?=roles*"});
+      my @authcontacts=$lnkcontactobj->getHashList(qw(refid));
    
-   foreach my $lnkcontact (@authcontacts) {
-      push(@secappl,$lnkcontact->{refid});
+      foreach my $lnkcontact (@authcontacts) {
+         push(@secappl,$lnkcontact->{refid});
+      }
+      push(@flt,{applid=>\@secappl});
    }
-   push(@flt,{applid=>\@secappl});
 
    return($self->SetFilter(@flt));
 }

@@ -43,6 +43,7 @@ sub new
          return(undef);
       };
    }
+   $self->{allowempty}=1 if (!exists($self->{allowempty}));
    $self->{size}="14" if (!exists($self->{size}) || $self->{size} eq "");
    $self->{types}=['*'] if (!exists($self->{types}));
    if (ref($self->{types}) ne "ARRAY"){
@@ -109,7 +110,7 @@ sub FormatedDetail
    }
    if (($mode eq "edit" || $mode eq "workflow") && !defined($self->{vjointo})){
       my $delflag=0;
-      if ($d ne ""){
+      if ($d ne "" && $self->{allowempty}){
          $delflag=1;
       }
       return($self->getHtmlInputArea($delflag));
