@@ -47,10 +47,10 @@ If the events will be handled from an business team, enter this team.
 'icto'=>{
    de=>'
 Der Wert wird bei der Anlage eines ICTO-Objektes in Cape nach TIAB-Beschluss 
-erzeugt und für weitere Verweise an der Applikation in Darwin 
+erzeugt und für weitere Verweise an der Applikation in W5Base/Darwin 
 zur Verfügung gestellt.
 ', en=>'
 The value is generated when an ICTO object is created in Cape according 
 to the TIAB decision and made available for further references to the 
-application in Darwin.
+application in W5Base/Darwin.
 '},
