@@ -47,7 +47,10 @@ sub new
       my $tmpcgi=new CGI($ENV{QUERY_STRING});
       foreach my $v ($tmpcgi->param()){
          next if (!($v=~m/^(MOD|FUNC|callback)$/));
-         my @val=$tmpcgi->param($v);
+         my @val=( $tmpcgi->can('multi_param') ?
+                   $tmpcgi->multi_param($v):
+                   $tmpcgi->param($v));
+
          $#val==0 ? $self->{'cgi'}->param(-name=>$v,-value=>$val[0]):
                     $self->{'cgi'}->param(-name=>$v,-value=>\@val);
       }
@@ -69,20 +72,11 @@ sub Param
    if (defined($_[1])){
       return($self->{'cgi'}->param(-name=>$_[0],-value=>$_[1]));
    }
-  # if ($#_==0){
-  #    if (wantarray()){
-  #       my @v=$self->{'cgi'}->param(@_);
-  #       for (my $c=0;$c<=$#v;$c++){
-  #          $v[$c]=~s/&quote;/"/g;
-  #       }
-  #       return(@v);
-  #    }
-  #    else{
-  #       my $v=$self->{'cgi'}->param(@_);
-  #       $v=~s/&quote;/"/g;
-  #       return($v);
-  #    }
-  # }
+   if ($#_==0 && wantarray()){
+      return($self->{'cgi'}->can('multi_param') ?
+             $self->{'cgi'}->multi_param($_[0]):
+             $self->{'cgi'}->param($_[0]));
+   }
    return($self->{'cgi'}->param(@_));
 }
 
@@ -136,7 +130,9 @@ sub MultiVars
    my %h=();
 
    foreach my $v ($self->{'cgi'}->param()){
-      my @val=$self->{'cgi'}->param($v);
+      my @val=$self->{'cgi'}->can('multi_param') ?
+              $self->{'cgi'}->multi_param($v):
+              $self->{'cgi'}->param($v);
       if ($#val==0){
          $h{$v}=$val[0];
          $h{$v}=~s/&quote;/"/g;
