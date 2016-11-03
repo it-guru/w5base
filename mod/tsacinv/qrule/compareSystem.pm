@@ -129,7 +129,7 @@ sub qcheckRecord
                           status=>'"!out of operation"'});
          my @l=$par->getHashList(qw(ALL));
          if ($#l==0){
-            if ($l[0]->{srcsys} eq ""){  # falsch, per neueingabe erfasstes
+            if ($l[0]->{srcsys} ne "W5Base"){ #falsch, per neueingabe erfasstes
                $parrec=$l[0];            # System in Darwin -> mußte eigentlich
             }                            # per Import geladen werden
          }
