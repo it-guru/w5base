@@ -1,3 +1,0 @@
-'tsisem::qrule::EMailFormat'=>{de=>'Überprüfung der EMail Notation',
-                               en=>'Check on email notation'},
-'invalid email notation'=>{de=>'ungültiges Format der Mailadresse'},

@@ -1,6 +1,0 @@
-'tsisem::location'=>{de=>'ISEM Standort',en=>'ISEM Location'},
-'Location name'=>{de=>'Standortname'},
-'Street address'=>{de=>'Strasse und Hausnummer'},
-'ZIP Code'=>{de=>'Postleitzahl'},
-'Location'=>{de=>'Ort'},
-'Country'=>{de=>'Land'},
