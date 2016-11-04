@@ -233,6 +233,9 @@ sub isWriteOnPlanValid
              );
    $plan->SetFilter({id=>\$planid},\@addflt);
    my ($crec,$msg)=$plan->getOnlyFirst(qw(ALL));
+   if ($self->IsMemberOf("admin")){
+      return(1);
+   }
    if (defined($crec)){
       return(1);
    }
