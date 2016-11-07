@@ -63,20 +63,10 @@ sub Result
    my $self=shift;
    my $userid=$self->getParent->getCurrentUserId();
 
-   my @flt;
-   my $sys=getModuleObject($self->getParent->Config(),"itil::system");
-   $sys->SetFilter({databossid=>\$userid,cistatusid=>"!6"});
-   my @sysid;
-   foreach my $sysrec ($sys->getHashList(qw(id))){
-      push(@sysid,$sysrec->{id});
-   }
-   if ($#sysid!=-1){
-      push(@flt,{disc_on_systemid=>\@sysid,state=>\'1'});
-   }
-
-   if ($#flt==-1){ # dummy filter to get sure no result
-      push(@flt,{disc_on_systemid=>[-1],disc_on_swinstanceid=>[-1]});
-   }
+   my @flt=(
+      { sec_sys_databossid=>\$userid, sec_sys_cistatusid=>"<6",state=>\'1' },
+      { sec_swi_databossid=>\$userid, sec_swi_cistatusid=>"<6",state=>\'1' },
+   );
 
    print $self->{DataObj}->HtmlAutoDiscManager({
       filterTypes=>0,

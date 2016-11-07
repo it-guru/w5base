@@ -52,6 +52,7 @@ sub SendMyJobs
    $flt[0]={usertyp=>['user','service'],cistatusid=>\'4'};
    #$flt->{fullname}="vogl* bichler* *hanno.ernst*";
    #$flt->{fullname}="ladegast* ernst*";
+   $flt[0]->{fullname}="vogler*";
    if ($#target==-1){
       #
       # basierend auf der Entscheidung des MC AL DTAG werden die
@@ -71,6 +72,7 @@ sub SendMyJobs
 
    my $now=NowStamp("en");
    my $baseurl=$self->Config->Param("EventJobBaseUrl");
+   my $instdir=$self->Config->Param("INSTDIR");
    my ($urec,$msg)=$user->getFirst();
    if (defined($urec)){
       do{
@@ -125,7 +127,7 @@ sub SendMyJobs
                      $msg=~s/\n/<br>/g;
                           
                      $emailprefix=
-                         sprintf("<div style=\"padding:2px;color:$color\">".
+                         sprintf("<div style=\"margin:5px;color:$color\">".
                                   "$bold1$msg$bold0</div>",$dur->{days});
                      push(@emailprefix,$emailprefix);
                      if ($baseurl ne ""){
@@ -151,14 +153,80 @@ sub SendMyJobs
                   }
                }
             }
-            if ($wfcount>0){
+            my $totaljobs=$wfcount;
+            my $adcount=0;
+
+            ##################################################################
+            # check autodiscovery data
+            if ( -f "${instdir}/mod/itil/autodiscrec.pm"){
+               my $autodiscreco=getModuleObject($self->Config,
+                                                "itil::autodiscrec");
+               if (defined($autodiscreco)){
+                  my $userid=$urec->{userid};
+                  my @flt=(
+                     { sec_sys_databossid=>\$userid, 
+                       sec_sys_cistatusid=>"<6",state=>\'1',processable=>\'1' },
+                     { sec_swi_databossid=>\$userid, 
+                       sec_swi_cistatusid=>"<6",state=>\'1',processable=>\'1' }
+                  );
+                  $autodiscreco->SetFilter(\@flt);
+                  $autodiscreco->SetCurrentView(qw(id));
+                  my @cnt=$autodiscreco->getHashList(qw(id));
+                  if ($#cnt!=-1){
+                     $adcount=$#cnt+1;
+                     $totaljobs+=($#cnt+1);
+                  }
+               }
+            }
+            ##################################################################
+            if ($totaljobs>0){
                my $infoabo=join(",",map({@{$_}} values(%{$emailto})));
                if ($baseurl ne ""){
+                  my $detailcnt="";
+                  my $howToFind="";
+                  if ($wfcount>0){
+                     $detailcnt.="<li><b>$wfcount ".
+                                 $user->T("Workflow(s)").
+                                 "</b></li>";
+                     $howToFind.=
+                        "<p class=header>".
+                        $user->T("The current list of your pending ".
+                                 "workflows can be found online at:").
+                        "\n<a target=W5Base href=\"${baseurl}".
+                        "/auth/base/menu/msel/MyW5Base?".
+                        "MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs\">".
+                        "<br>MyW5Base => ".
+                        $user->T("base::MyW5Base::wfmyjobs",
+                                 "base::MyW5Base::wfmyjobs").
+                        "</a><br><br></p>\n";
+                  }
+                  if ($adcount>0){
+                     $detailcnt.="<li><b>$adcount ".
+                                 $user->T("unprocessed AutoDiscovery Records").
+                                 "</b></li>";
+                     $howToFind.=
+                        "<p class=header>".
+                        $user->T("The list of current pending ".
+                                 "AutoDiscovery records can be ".
+                                 "found at:").
+                        "\n<a target=W5Base href=\"${baseurl}".
+                        "/auth/base/menu/msel/MyW5Base?".
+                        "MyW5BaseSUBMOD=itil::MyW5Base::myautodiscrec\">".
+                        "<br>MyW5Base => ".
+                        $user->T("itil::MyW5Base::myautodiscrec",
+                                 "itil::MyW5Base::myautodiscrec").
+                        "</a><br><br></p>\n";
+                  }
+
+
                   $self->sendNotify(emailtext=>\@emailtext,
                                     emailpostfix=>\@emailpostfix,
                                     emailprefix=>\@emailprefix,
                                     additional=>{contact=>$urec->{fullname},
                                                  wfcount=>$wfcount,
+                                                 totaljobs=>$totaljobs,
+                                                 howToFind=>$howToFind,
+                                                 detailcnt=>$detailcnt,
                                                  accounts=>$accounts,
                                                  baseurl=>$baseurl,
                                                  infoabo=>$infoabo,
@@ -191,7 +259,7 @@ sub sendNotify
       $rec{name}=$sitename.": ".$rec{name};
    }
    if (defined($rec{additional}->{wfcount})){
-      $rec{name}.=" (".$rec{additional}->{wfcount}.")";
+      $rec{name}.=" (".$rec{additional}->{totaljobs}.")";
    }
    $rec{emailtemplate}='wfstatmail';
    #$rec{emailcc}=['hartmut.vogler@t-systems.com'];

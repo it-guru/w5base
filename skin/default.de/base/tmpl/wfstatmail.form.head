@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <style type="text/css">
 <!--
-body,p {
+body,p{
    margin: 0px;
    font-family: Arial, Helvetica, sans-serif;
    font-size: 12px;
@@ -11,6 +11,8 @@ body,p {
    border: 0px;
    background-color: #ffffff;
 }
+
+
 li{
    font-family: Arial, Helvetica, sans-serif;
    font-size: 12px;
@@ -72,16 +74,19 @@ pre.text {
 p.header {
    vertical-align: top;
    margin: 0px;
-   padding: 1px;
+   padding: 5px;
+   background-color:transparent;
 }
 
 p.unsubscribe {
    vertical-align: top;
    margin: 0px;
-   margin-top:5px;
+   margin-top:25px;
    padding: 1px;
    font-size:10px;
    text-align:center;
+   background-color:transparent;
+   font-weight:bold;
 }
 
 -->
@@ -99,11 +104,13 @@ p.unsubscribe {
 <table id=tabelle width="700" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td colspan=3">
-       <div style="width:100%;background-color:#ffffff;margin:20px;padding:10px;margin-top:0;margin-bottom:5px;overflow:hidden">
-          <p class=header>Sehr geehrte Damen und Herren,<br><br>
-im Folgenden erhalten Sie eine Aufstellung aller aktuell für Sie anstehenden Workflows. Diese Mail dient als Erinnerung, damit die Bearbeitung einzelnern Workflows nicht vergessen wird.<br>Für den Kontakt <b>"%contact%"</b> stehen aktuell <b>%wfcount% Workflow(s)</b> zur Bearbeitung an bzw. es sind Aktionen von Ihnen auszuführen.<br>
+       <div style="width:100%;margin:20px;padding:10px;margin-top:0;margin-bottom:5px;overflow:hidden"><br>
+          Sehr geehrte Damen und Herren,<br><br>
+im Folgenden erhalten Sie eine Aufstellung aller aktuell für Sie anstehenden Workflows. Diese Mail dient als Erinnerung, damit die Bearbeitung einzelnern Workflows nicht vergessen wird.<br><br>Für den Kontakt <b>"%contact%"</b> stehen aktuell ...
+<ul>%detailcnt%</ul>
+... zur Bearbeitung an bzw. es sind Aktionen von Ihnen auszuführen.<br>
 <br>
-<b><u>Aktuell anstehende Aufgaben/Workflows:</u></b>
+<b><u>Aktuell anstehende Aufgaben in folgenden Workflows:<br></u></b>
        </div>
     </td>
   </tr>

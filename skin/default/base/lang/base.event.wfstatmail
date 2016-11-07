@@ -1,2 +1,6 @@
 'weekly report current jobs'=>{de=>'wöchentlicher Report der aktuell anstehenden Aufgaben'},
 "unprocessed\nsince \%d days"=>{de=>"unbearbeitet\nseit \%d Tagen"},
+"Workflow(s)"=>{de=>"Workflow(s)"},
+"unprocessed AutoDiscovery Records"=>{de=>"unbehandelte AutoDiscovery Datensätze"},
+'The current list of your pending workflows can be found online at:'=>{de=>'Die aktuelle Liste der anstehenden Workflows finden Sie unter:'},
+'The list of current pending AutoDiscovery records can be found at:'=>{de=>'Die Liste der unbehandelten AutoDiscovery Datensätze finden Sie unter:'},

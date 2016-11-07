@@ -73,15 +73,17 @@ p.header {
    vertical-align: top;
    margin: 0px;
    padding: 1px;
+   background-color:transparent;
 }
 
 p.unsubscribe {
    vertical-align: top;
    margin: 0px;
-   margin-top:5px;
+   margin-top:25px;
    padding: 1px;
    font-size:10px;
    text-align:center;
+   background-color:transparent;
 }
 
 -->
@@ -99,11 +101,13 @@ p.unsubscribe {
 <table id=tabelle width="700" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td colspan=3">
-       <div style="width:100%;background-color:#ffffff;margin:20px;padding:10px;margin-top:0;margin-bottom:5px;overflow:hidden">
-          <p class=header>Ladies and Gentlemen,<br><br>
-hereafter, you will receive a list of all currently pending for your workflow. This mail serves as a reminder so that the individual processing workflows will not forget.<br>For the contact <b>"%contact%"</b> currently <b>%wfcount% Workflow(s)</b> are pending.<br>
+       <div style="width:100%;margin:20px;padding:10px;margin-top:0;margin-bottom:5px;overflow:hidden"><br>
+          Ladies and Gentlemen,<br><br>
+hereafter, you will receive a list of all currently pending for your workflow. This mail serves as a reminder so that the individual processing workflows will not forget.<br>For the contact <b>"%contact%"</b> currently ...
+<ul>%detailcnt%</ul>
+... are pending.<br>
 <br>
-<b><u>Currently pending Workflows:</u></b>
+<b><u>Currently pending Workflows actions:</u></b>
        </div>
     </td>
   </tr>

@@ -29,5 +29,9 @@
 },
 'new software installation on Cluster-Services'=>{
    de=>'neue Software-Installation am Cluster-Service'},
-
-
+'assumed system'=>{de=>'angenommenes logisches System'},
+'assumed ipaddress'=>{de=>'angenommene IP-Adresse'},
+'approve date'=>{de=>'Bestätigungsdatum'},
+'approve user'=>{de=>'Bestätiger'},
+'approved relation to software id'=>{de=>'bestätigte Relation zu Software ID'},
+'approved relation to system id'=>{de=>'bestätigte Relation zu System ID'},

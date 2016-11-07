@@ -117,14 +117,14 @@ sub new
                 name          =>'assumed_system',
                 sqlorder      =>'desc',
                 group         =>'source',
-                label         =>'assumed_system',
+                label         =>'assumed system',
                 dataobjattr   =>'autodiscrec.assumed_system'),
                                                   
       new kernel::Field::Text(
                 name          =>'assumed_ipaddress',
                 sqlorder      =>'desc',
                 group         =>'source',
-                label         =>'assumed_ipaddress',
+                label         =>'assumed ipaddress',
                 dataobjattr   =>'autodiscrec.assumed_ipaddress'),
                                                   
       new kernel::Field::Number(
@@ -152,26 +152,26 @@ sub new
       new kernel::Field::Text(
                 name          =>'lnkto_lnksoftware',
                 sqlorder      =>'desc',
-                label         =>'lnkto_lnksoftware',
+                label         =>'approved relation to software id',
                 dataobjattr   =>'autodiscrec.lnkto_lnksoftware'),
 
       new kernel::Field::Text(
                 name          =>'lnkto_system',
                 sqlorder      =>'desc',
-                label         =>'lnkto_system',
+                label         =>'approved relation to system id',
                 dataobjattr   =>'autodiscrec.lnkto_system'),
 
 
       new kernel::Field::Text(
                 name          =>'approve_date',
                 sqlorder      =>'desc',
-                label         =>'approve_date',
+                label         =>'approve date',
                 dataobjattr   =>'autodiscrec.approve_date'),
 
       new kernel::Field::Text(
                 name          =>'approve_user',
                 sqlorder      =>'desc',
-                label         =>'approve_user',
+                label         =>'approve user',
                 dataobjattr   =>'autodiscrec.approve_user'),
 
 
@@ -196,6 +196,26 @@ sub new
                 group         =>'source',
                 label         =>'Engine Fullname',
                 dataobjattr   =>'autodiscengine.fullname'),
+
+      new kernel::Field::Link(
+                name          =>'sec_sys_databossid',
+                noselect      =>'1',
+                dataobjattr   =>'system.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'sec_sys_cistatusid',
+                noselect      =>'1',
+                dataobjattr   =>'system.cistatus'),
+
+      new kernel::Field::Link(
+                name          =>'sec_swi_databossid',
+                noselect      =>'1',
+                dataobjattr   =>'swinstance.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'sec_swi_cistatusid',
+                noselect      =>'1',
+                dataobjattr   =>'swinstance.cistatus'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',

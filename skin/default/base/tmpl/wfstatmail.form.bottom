@@ -3,12 +3,11 @@
 <table id=tabelle width="700" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td colspan=3">
-       <div style="width:100%;background-color:#ffffff;margin:20px;padding:10px;margin-top:20px;margin-bottom:80px;overflow:hidden">
-          <p class=header>The current list of your pending workflows can be found online at:
-<br>
-<br><center>
-<a target=W5Base href="%baseurl%/auth/base/menu/msel/MyW5Base?MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs">"MyW5Base" => "my current jobs"</a><br>
-</center><p class=header><br>You are known with one of the accounts "<b>%accounts%</b>". With this account, you can login. Further informations about the loiginprocess you will find at the <a href="%baseurl%/public/base/menu/root">Start-Page</a>.<br>
+       <div style="width:100%;margin:20px;padding:10px;margin-top:20px;margin-bottom:80px;overflow:hidden">
+
+%howToFind%
+
+<p class=header><br>You are known with one of the accounts "<b>%accounts%</b>". With this account, you can login. Further informations about the loiginprocess you will find at the <a href="%baseurl%/public/base/menu/root">Start-Page</a>.<br>
 </p>
 <p class="unsubscribe">
 If you want to unsubscribe this report, you can do this by click at this <a target=W5Base href="%baseurl%/auth/base/menu/msel/sysadm/userenv/infoabo?DIRECT_cleanupid=%infoabo%">&lt;-&nbsp;Link&nbsp;-&gt;</a>.

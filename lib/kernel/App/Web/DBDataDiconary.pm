@@ -135,6 +135,21 @@ EOF
 EOF
    }
 
+   if ($self->{DictionaryMode} eq "MSSQL"){
+      $from=<<EOF;
+(select 
+   lower( table_catalog+'.'+table_name+'.'+column_name)           fullfieldname,
+   table_catalog                                                  schemaname,
+   table_name                                                     tablename, 
+   column_name                                                    fieldname,
+   table_catalog                                                  owner, 
+   data_type                                                      data_type,
+   NULL                                                           isindexed,
+   character_maximum_length                                       data_length
+from information_schema.columns) f
+EOF
+   }
+
 
 
    return($from);
