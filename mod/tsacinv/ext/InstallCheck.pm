@@ -36,7 +36,7 @@ sub getMandatoryModules
    my $self=shift;
 
 
-   return qw(DBD::Oracle);
+   return qw(DBD::Oracle Net::SFTP::Foreign);
 }
 
 
