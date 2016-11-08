@@ -126,14 +126,15 @@ if ($MaximumReplicationTime<20){
    $MaximumReplicationTime=20;
 }
 msg(DEBUG,"use MaximumReplicationTime=$MaximumReplicationTime seconds");
+my @slot;
 
 $SIG{ALRM}=sub{ 
+   print STDERR Dumper(\@slot);
    die("ERROR: hard programm termination by ".
        "MaximumReplicationTime=$MaximumReplicationTime") 
 };
 alarm($MaximumReplicationTime+10);
 
-my @slot;
 sub doShutdown{  # doShutdown handling if CTRL+C is pressed on main process
    printf STDERR ("doShutdown started...\n");
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
