@@ -837,11 +837,14 @@ sub getHtmlEditElements
          if ($irec->{needverify}){
             my $msg=$self->T("click to set answer as verified");
             $HTMLVerifyButton=
-                "<div class=qverify style=\"cursor:hand\" ".
+                "<div class=qverify id=\"HTMLverify$irec->{id}\" ".
                 "onclick=qverify($irec->{id}) >".
-                "<img border=0 title='$msg' alt='$msg' ".
+                "<img border=0 style=\"cursor:hand\" title='$msg' alt='$msg' ".
                 "src=\"../../../public/base/load/confirm_entry.gif\">".
                 "</div>";
+         }
+         else{
+            $HTMLVerifyButton="<div></div>";
          }
       }
    }
