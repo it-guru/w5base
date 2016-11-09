@@ -114,7 +114,7 @@ sub new
                 unit          =>'ms',
                 precision     =>'2',
                 label         =>'averaged record access time',
-                dataobjattr   =>'replicateobject.latency'),
+                dataobjattr   =>'replicateobject.avgrecaccess'),
 
       new kernel::Field::Date(
                 name          =>'last_phase1',

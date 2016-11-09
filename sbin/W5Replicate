@@ -129,7 +129,20 @@ msg(DEBUG,"use MaximumReplicationTime=$MaximumReplicationTime seconds");
 my @slot;
 
 $SIG{ALRM}=sub{ 
-   print STDERR Dumper(\@slot);
+   printf STDERR ("ERROR: hard termination start while replication ".
+                  "timelimit reached\n");
+   for(my $slotno=0;$slotno<$maxslots;$slotno++){
+      if (defined($slot[$slotno])){
+         printf STDERR ("slot %d used by %s in phase %d since %d seconds\n",
+            $slotno,
+            $slot[$slotno]->{job}->{name},
+            $slot[$slotno]->{job}->{phase},
+            time()-$slot[$slotno]->{job}->{start});
+      }
+   }
+   printf STDERR ("----------------\n");
+   printf STDERR ("d=%s\n",Dumper(\@slot));
+   
    die("ERROR: hard programm termination by ".
        "MaximumReplicationTime=$MaximumReplicationTime") 
 };
@@ -326,11 +339,16 @@ sub storeReplicateObjectStat
          die("ERROR: can not access replicate::obj for $ctrl->{name}");
       }
       my $now=NowStamp("en");
-      $ro->ValidatedUpdateRecord($rorec,{
+
+      my $updrec={
          "entrycount"=>$n,
          "last_phase$phase"=>$now,
          "maxlatency"=>$l
-      }, {id=>\$rorec->{id}});
+      };
+      if (defined($avgrecaccess)){
+         $updrec->{avgrecaccess}=$avgrecaccess;
+      }
+      $ro->ValidatedUpdateRecord($rorec,$updrec,{id=>\$rorec->{id}});
    }
 }
 
