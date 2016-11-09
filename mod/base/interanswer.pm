@@ -211,6 +211,24 @@ sub new
                 label         =>'last verify of anser',
                 dataobjattr   =>'interanswer.lastverify'),
 
+      new kernel::Field::Number(
+                name          =>'verifyage',
+                group         =>'source',
+                unit          =>'days',
+                uploadable    =>0,
+                readonly      =>1,
+                label         =>'age of verify',
+                dataobjattr   =>'datediff(now(),interanswer.lastverify)'),
+
+      new kernel::Field::Boolean(
+                name          =>'needverify',
+                group         =>'source',
+                uploadable    =>0,
+                readonly      =>1,
+                label         =>'verification necessary',
+                dataobjattr   =>'if (interview.necessverifyinterv<'.
+                                'datediff(now(),interanswer.lastverify),1,0)'),
+
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',

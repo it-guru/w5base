@@ -84,26 +84,26 @@ sub new
                 name          =>'name',
                 htmlwidth     =>'540px',
                 label         =>'Question',
-                depend        =>['name_label','name_de','name_en'],
+                depend        =>['name_label'],
                 searchable    =>0,
                 readonly      =>1,
                 onRawValue    =>\&getQuestionText),
 
-      new kernel::Field::Text(
-                name          =>'name_en',
-                searchable    =>0,
-                htmldetail    =>0,
-                htmlwidth     =>'540px',
-                label         =>'Question (en-default)',
-                dataobjattr   =>'interview.name'),
+     # new kernel::Field::Text(
+     #           name          =>'name_en',
+     #           searchable    =>0,
+     #           htmldetail    =>0,
+     #           htmlwidth     =>'540px',
+     #           label         =>'Question (en-default)',
+     #           dataobjattr   =>'interview.name'),
 
-      new kernel::Field::Text(
-                name          =>'name_de',
-                searchable    =>0,
-                htmldetail    =>0,
-                htmlwidth     =>'540px',
-                label         =>'Question (de)',
-                dataobjattr   =>'interview.name_de'),
+     # new kernel::Field::Text(
+     #           name          =>'name_de',
+     #           searchable    =>0,
+     #           htmldetail    =>0,
+     #           htmlwidth     =>'540px',
+     #           label         =>'Question (de)',
+     #           dataobjattr   =>'interview.name_de'),
 
       new kernel::Field::Textarea(
                 name          =>'name_label',
@@ -448,13 +448,13 @@ sub getQuestionText
    if ($current->{'name_label'} ne ""){
       return(extractLangEntry($current->{'name_label'},$lang,80,0));
    }
-   if ($lang eq "de" && $current->{'name_de'} ne ""){
-      return($current->{'name_de'});
-   }
-   if ($current->{'name_en'} eq ""){
-      return($current->{'name_de'});
-   }
-   return($current->{'name_en'});
+#   if ($lang eq "de" && $current->{'name_de'} ne ""){
+#      return($current->{'name_de'});
+#   }
+#   if ($current->{'name_en'} eq ""){
+#      return($current->{'name_de'});
+#   }
+   return("???");
 }
 
 
@@ -827,13 +827,7 @@ sub getHtmlEditElements
    my $HTMLVerifyButton="";
    if ($write){
       if (defined($answer)){
-         $irec->{needverify}=1;
-         if ($answer->{lastverify} ne ""){
-            my $d=CalcDateDuration($answer->{lastverify},NowStamp("en"));
-            if (!($d->{totaldays}>$irec->{necessverifyinterv})){
-               $irec->{needverify}=0;
-            }
-         }
+         $irec->{needverify}=$answer->{needverify};
          if ($irec->{needverify}){
             my $msg=$self->T("click to set answer as verified");
             $HTMLVerifyButton=

@@ -50,7 +50,29 @@ sub onRawValue
    my $parent=$self->getParent->SelfAsParentObject();
    my $answered=$self->getAnsweredQuestions($parent,$idname,$id);
    my $total=$self->getTotalActiveQuestions($parent,$idname,$id,$answered);
+
+
+   my $totalcnt=$#{$total}+1;
+   my $todo=0;
+   my $outdated=0;
+   if ($totalcnt>0){
+      foreach my $q (@{$total}){
+         if (!exists($answered->{interviewid}->{$q->{id}})){
+            $todo++;
+         }
+         else{
+            if ($answered->{interviewid}->{$q->{id}}->{needverify}){
+               $outdated++;
+            }
+         }
+      }
+   }
+
+
    my $state={TotalActiveQuestions=>$total,
+              total=>$totalcnt,
+              todo=>$todo,
+              outdated=>$outdated,
               AnsweredQuestions=>$answered};
    my %qStat;
    tie(%qStat,'kernel::Field::InterviewState::qStat',%$state);
@@ -66,20 +88,17 @@ sub FormatedResult
    my $mode=shift;
    my $d=$self->RawValue($current);
 
-   my $total=$#{$d->{TotalActiveQuestions}}+1;
-   my $todo=0;
-   if ($total>0){
-      foreach my $q (@{$d->{TotalActiveQuestions}}){
-         if (!exists($d->{AnsweredQuestions}->{interviewid}->{$q->{id}})){
-            $todo++;
-         }
-      }
-   }
+   my $totalcnt=$d->{qStat}->{total};
+   my $todo=$d->{qStat}->{todo};
+   my $outdated=$d->{qStat}->{outdated};
    if (($mode=~m/^Html/) || ($mode=~m/^Xls/)){
-      return("Total: $total / Open: $todo");
+      return("Total: $totalcnt / Open: $todo / Outdated: $outdated");
    }
-   return({total=>$total,todo=>$todo,qStat=>$d->{qStat},
-                                     questStat=>$d->{questStat}});
+   return({total=>$totalcnt,
+           todo=>$todo,
+           outdated=>$outdated,
+           qStat=>$d->{qStat},
+           questStat=>$d->{questStat}});
 }
 
 

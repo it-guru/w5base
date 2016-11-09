@@ -45,6 +45,7 @@ sub SendMyJobs
 {
    my $self=shift;
    my @target=@_;
+   my $sendcount=0;
 
    my $ia=getModuleObject($self->Config,"base::infoabo");
    my $user=getModuleObject($self->Config,"base::user");
@@ -85,6 +86,7 @@ sub SendMyJobs
             $userlang=$urec->{lang};
          }
          $userlang eq "en" if ($userlang eq "");
+         $userlang="en";
          #######################################################################
 
          my $emailto={};
@@ -100,6 +102,7 @@ sub SendMyJobs
             my @emailtext;
             my @emailpostfix;
             my @emailprefix;
+            my @emailsubtitle;
             my $wfcount=0;
             foreach my $wfrec (@l){
                my $imgtitle=$wfrec->{name};
@@ -112,6 +115,15 @@ sub SendMyJobs
                if ($dur->{days}>1 && $wfrec->{stateid}!=5){ # list no defereds
                   $wfcount++;                             
                   if ($wfcount<50){
+                     if ($wfcount==1){
+                       push(@emailsubtitle,
+                            "<table cellspacing=5 border=0><tr><td><b><u>".
+                            $user->T("Current pending workflows:").
+                            "</b></u></td></tr></table>");
+                     }
+                     else{
+                       push(@emailsubtitle,"");
+                     }
                      if ($wfrec->{stateid}<17){
                         if ( ($wfrec->{prio}<3 && $dur->{days}>3) ||
                              ($wfrec->{prio}<6 && $dur->{days}>14) ||
@@ -150,6 +162,7 @@ sub SendMyJobs
                     push(@emailtext,"...");
                     push(@emailpostfix,"");
                     push(@emailprefix,"");
+                    push(@emailsubtitle,"");
                   }
                }
             }
@@ -164,10 +177,18 @@ sub SendMyJobs
                if (defined($autodiscreco)){
                   my $userid=$urec->{userid};
                   my @flt=(
-                     { sec_sys_databossid=>\$userid, 
-                       sec_sys_cistatusid=>"<6",state=>\'1',processable=>\'1' },
-                     { sec_swi_databossid=>\$userid, 
-                       sec_swi_cistatusid=>"<6",state=>\'1',processable=>\'1' }
+                     { 
+                       sec_sys_databossid=>\$userid, 
+                       sec_sys_cistatusid=>"<6",
+                       state=>\'1',
+                       processable=>\'1' 
+                     },
+                     { 
+                       sec_swi_databossid=>\$userid, 
+                       sec_swi_cistatusid=>"<6",
+                       state=>\'1',
+                       processable=>\'1' 
+                     }
                   );
                   $autodiscreco->SetFilter(\@flt);
                   $autodiscreco->SetCurrentView(qw(id));
@@ -178,6 +199,38 @@ sub SendMyJobs
                   }
                }
             }
+            my $openInterviews=0;
+
+            foreach my $objname  (qw(base::location itil::appl itil::system)){
+               my $o=getModuleObject($self->Config,$objname);
+               $o->SetFilter({databossid=>$urec->{userid},cistatusid=>"<6"});
+               foreach my $cirec ($o->getHashList(qw(id urlofcurrentrec 
+                                                     name interviewst))){
+                  #print STDERR Dumper($cirec);
+                  if ($cirec->{interviewst}->{todo}>0 ||
+                      $cirec->{interviewst}->{outdated}>0){
+                     if ($openInterviews==0){
+                        push(@emailsubtitle,
+                            "<table cellspacing=5 border=0><tr><td><b><u>".
+                            $user->T("Current Config-Items with ".
+                                     "open or oudated answers:").
+                            "</b></u></td></tr></table>");
+                     }
+                     else{
+                        push(@emailsubtitle,"");
+                     }
+                     $openInterviews++;
+                     push(@emailtext,"$cirec->{name}\n".
+                                     "$cirec->{urlofcurrentrec}");
+                     push(@emailpostfix,"");
+                     push(@emailprefix,"");
+                  }
+               }
+            }
+            $totaljobs+=$openInterviews;
+
+
+
             ##################################################################
             if ($totaljobs>0){
                my $infoabo=join(",",map({@{$_}} values(%{$emailto})));
@@ -217,11 +270,19 @@ sub SendMyJobs
                                  "itil::MyW5Base::myautodiscrec").
                         "</a><br><br></p>\n";
                   }
+                  if ($openInterviews>0){
+                     $detailcnt.="<li><b>$openInterviews ".
+                        $user->T(
+                        "Config-Item Interviews with open or outdated answers").
+                                 "</b></li>";
 
+                  }
 
+                  $sendcount++;
                   $self->sendNotify(emailtext=>\@emailtext,
                                     emailpostfix=>\@emailpostfix,
                                     emailprefix=>\@emailprefix,
+                                    emailsubtitle=>\@emailsubtitle,
                                     additional=>{contact=>$urec->{fullname},
                                                  wfcount=>$wfcount,
                                                  totaljobs=>$totaljobs,
@@ -241,7 +302,7 @@ sub SendMyJobs
       }until(!defined($urec));
    }
 
-   return({msg=>'OK',exitcode=>0});
+   return({msg=>"OK - send $sendcount notifcations",exitcode=>0});
 }
 
 
