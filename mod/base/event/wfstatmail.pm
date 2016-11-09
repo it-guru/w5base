@@ -53,7 +53,7 @@ sub SendMyJobs
    $flt[0]={usertyp=>['user','service'],cistatusid=>\'4'};
    #$flt->{fullname}="vogl* bichler* *hanno.ernst*";
    #$flt->{fullname}="ladegast* ernst*";
-   $flt[0]->{fullname}="vogler*";
+   #$flt[0]->{fullname}="vogler*";
    if ($#target==-1){
       #
       # basierend auf der Entscheidung des MC AL DTAG werden die
