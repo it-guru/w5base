@@ -2,5 +2,9 @@
 "unprocessed\nsince \%d days"=>{de=>"unbearbeitet\nseit \%d Tagen"},
 "Workflow(s)"=>{de=>"Workflow(s)"},
 "unprocessed AutoDiscovery Records"=>{de=>"unbehandelte AutoDiscovery Datensätze"},
+"Config-Item Interviews with open or outdated answers"=>{de=>"Config-Item Interviews mit offenen oder veralteten Antworten"},
 'The current list of your pending workflows can be found online at:'=>{de=>'Die aktuelle Liste der anstehenden Workflows finden Sie unter:'},
 'The list of current pending AutoDiscovery records can be found at:'=>{de=>'Die Liste der unbehandelten AutoDiscovery Datensätze finden Sie unter:'},
+"Current pending workflows:"=>{de=>"Aktuell anstehende Aktionen in Workflows:"},
+"Current Config-Items with open or oudated answers:"=>{de=>"Config-Items mit offenen oder veralteten Interview-Antworten:"},
+

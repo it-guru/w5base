@@ -109,8 +109,6 @@ p.unsubscribe {
 im Folgenden erhalten Sie eine Aufstellung aller aktuell für Sie anstehenden Workflows. Diese Mail dient als Erinnerung, damit die Bearbeitung einzelnern Workflows nicht vergessen wird.<br><br>Für den Kontakt <b>"%contact%"</b> stehen aktuell ...
 <ul>%detailcnt%</ul>
 ... zur Bearbeitung an bzw. es sind Aktionen von Ihnen auszuführen.<br>
-<br>
-<b><u>Aktuell anstehende Aufgaben in folgenden Workflows:<br></u></b>
        </div>
     </td>
   </tr>

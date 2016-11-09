@@ -15,6 +15,7 @@
 'last verify of anser'=>{de=>'letzte Bestätigung der Antwort'},
 'Answer level'=>{de=>'Antwort Erreichungsgrad'},
 'add comments to your answer'=>{de=>'Kommentare an die Antwort hinzufügen'},
-
+'age of verify'=>{de=>'Alter der Bestätigung'},
+'verification necessary'=>{de=>'neue Bestätigung ist notwendig'},
 
 

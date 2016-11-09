@@ -106,8 +106,6 @@ p.unsubscribe {
 hereafter, you will receive a list of all currently pending for your workflow. This mail serves as a reminder so that the individual processing workflows will not forget.<br>For the contact <b>"%contact%"</b> currently ...
 <ul>%detailcnt%</ul>
 ... are pending.<br>
-<br>
-<b><u>Currently pending Workflows actions:</u></b>
        </div>
     </td>
   </tr>
