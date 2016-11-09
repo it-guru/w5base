@@ -86,7 +86,7 @@ sub SendMyJobs
             $userlang=$urec->{lang};
          }
          $userlang eq "en" if ($userlang eq "");
-         $userlang="en";
+         #$userlang="en";
          #######################################################################
 
          my $emailto={};
