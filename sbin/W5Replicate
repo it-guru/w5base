@@ -135,9 +135,9 @@ $SIG{ALRM}=sub{
       if (defined($slot[$slotno])){
          printf STDERR ("slot %d used by %s in phase %d since %d seconds\n",
             $slotno,
-            $slot[$slotno]->{job}->{name},
+            $slot[$slotno]->{name},
             $slot[$slotno]->{job}->{phase},
-            time()-$slot[$slotno]->{job}->{start});
+            time()-$slot[$slotno]->{start});
       }
    }
    printf STDERR ("----------------\n");
