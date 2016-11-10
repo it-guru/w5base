@@ -150,3 +150,9 @@
 'winminimal'=>{de=>'Datensatz im gleichen Fenster öffnen'},
 'winonlyone'=>{de=>'alle Datensätze nur in EINEM Fenster öffnen'},
 'Last-External-Seen'=>{de=>'letzte externe Bestätigung'},
+'User successful imported'           =>{
+         de=>'Kontakt erfolgreich importiert'},
+'%d user successful imported'        =>{
+         de=>'%d Kontakte erfolgreich importiert'},
+'%d from %d user successful imported'=>{
+         de=>'%d von %d Kontakten erfolgreich importiert'},

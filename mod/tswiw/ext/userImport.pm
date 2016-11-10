@@ -1,4 +1,4 @@
-package tsciam::ext::userImport;
+package tswiw::ext::userImport;
 #  W5Base Framework
 #  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
 #
@@ -37,7 +37,7 @@ sub getQuality
    my $name=shift;
    my $useAs=shift;
    my $param=shift;
-   return(1000);
+   return(2000);
 }
 
 
@@ -45,9 +45,9 @@ sub getImportIDFieldHelp
 {
    my $self=shift;
 
-   my $o=getModuleObject($self->getParent->Config,'tsciam::user');
-   my $txt='CIAM: ';
-   $txt.=$o->getField('tcid')->Label();
+   my $o=getModuleObject($self->getParent->Config,'tswiw::user');
+   my $txt='WhoIsWho: ';
+   $txt.=$o->getField('uid')->Label();
 
    return($txt);
 }
@@ -61,48 +61,36 @@ sub processImport
    my $param=shift;
 
    return(undef) if (!$name);
-   my $ciam=getModuleObject($self->getParent->Config,"tsciam::user");
+
+   my $wiw=getModuleObject($self->getParent->Config,"tswiw::user");
 
    my $flt; 
 
    if ($useAs eq "dsid"){
-      $flt={tcid=>\$name,active=>"true"};
+      $flt={uid=>\$name};
    }
    if ($useAs eq "email"){
-      $flt={email=>\$name,active=>"true",primary=>"true"};
+      $flt={email=>\$name};
    }
    if (!defined($flt)){
       $self->getParent->LastMsg(ERROR,"no acceptable filter");
       return(undef);
    }
-   $ciam->SetFilter($flt);
-   my @l=$ciam->getHashList(qw(tcid surname givenname email));
+   $wiw->SetFilter($flt);
+   my @l=grep($_->{surname}!~m/_duplicate_/i,
+              $wiw->getHashList(qw(uid surname givenname email)));
    if ($#l==-1){
       if (!$param->{quiet}){
-         $ciam->LastMsg(ERROR,"contact '$name' not found in ".
-                              "CIAM while Import");
+         $wiw->LastMsg(ERROR,"contact '$name' not found in ".
+                              "wiw while Import");
       }
       return(undef);
    }
-   #if ($#l>0){
-   #   if (!$param->{quiet}){
-   #      $self->LastMsg(ERROR,"contact not unique in CIAM");
-   #   }
-   #   return(undef);
-   #}
-
 
    my $imprec=$l[0];
 
-   #if ($wiwrec->{surname}=~m/_duplicate_/i){
-   #   if (!$param->{quiet}){
-   #      $self->LastMsg(ERROR,
-   #            "_duplicate_ are not allowed to import from WhoIsWho");
-   #   }
-   #   return(undef);
-   #}
    my $user=getModuleObject($self->getParent->Config,"base::user");
-   $user->SetFilter([{'email'=>$imprec->{email}},{dsid=>$imprec->{tcid}}]);
+   $user->SetFilter([{'email'=>$imprec->{email}},{dsid=>$imprec->{uid}}]);
    my ($userrec,$msg)=$user->getOnlyFirst(qw(ALL));
    my $identifyby=undef;
    if (defined($userrec)){
@@ -113,17 +101,13 @@ sub processImport
                                                {userid=>\$userrec->{userid}});
    }
    else{
-      my $uidlist=$imprec->{tcid};
-      $uidlist=[$uidlist] if (ref($uidlist) ne "ARRAY");
-      my @tcid=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
-      my $tcid=$tcid[0];
       $identifyby=$user->ValidatedInsertRecord({
          cistatusid=>4,
          usertyp=>'extern',
          allowifupdate=>1,
          surname=>$imprec->{surname},
          givenname=>$imprec->{givenname},
-         dsid=>$tcid,
+         dsid=>$imprec->{uid},
          email=>$imprec->{email}
       });
       return($identifyby);
@@ -131,7 +115,6 @@ sub processImport
 
    return(0);
 }
-
 
 
 

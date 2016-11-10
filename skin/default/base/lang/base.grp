@@ -32,3 +32,9 @@
 'Rights overview'              =>{ de=>'Referenz-Übersicht'},
 'organisational members'       =>{ de=>'organisatorische Mitglieder'},
 'boss'                         =>{ de=>'Leiter'},
+'orgarea successful imported'            =>{
+          de=>'Organisationseinheit erfolgreich importiert'},
+'%d orgareas successful imported'        =>{
+          de=>'%d Organisationseinheiten erfolgreich importiert'},
+'%d from %d orgareas successful imported'=>{
+          de=>'%d von %d Organisationseinheiten erfolgreich importiert'},

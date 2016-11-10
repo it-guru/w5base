@@ -110,6 +110,16 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.user.import",
+                      "base::user",
+                      func=>'ImportUser',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("sysadm.grp.import",
+                      "base::grp",
+                      func=>'ImportOrgarea',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.user.lnkcontact",
                       "base::lnkcontact",
                       defaultacl=>['admin']);

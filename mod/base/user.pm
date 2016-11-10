@@ -1806,7 +1806,7 @@ sub getValidWebFunctions
 {  
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(), qw(MyDetail SSHPublicKey 
-          AddrBook RightsOverview RightsOverviewLoader)); 
+          AddrBook RightsOverview RightsOverviewLoader ImportUser)); 
 }
 
 sub SelfAsParentObject    # this method is needed because existing derevations
@@ -1988,16 +1988,8 @@ sub GetW5BaseUserID
          }
       }
       if ($loopcnt==0){
-         if (!exists($self->{userImport})){
-            $self->LoadSubObjs("ext/userImport","userImport");
-         }
-         my %p;
-         foreach my $k (sort(keys(%{$self->{userImport}}))){
-           my $q=$self->{userImport}->{$k}->getQuality($name,$useAs,$param);
-           $p{$k}=$q;
-         }
          # try Import
-         foreach my $k (sort({$p{$a}<=>$p{$b}} keys(%p))){
+         foreach my $k ($self->getImportObjs($name,$useAs,$param)) {
             msg(INFO,"try Import for $name ($useAs) with=$k");
             if (my $userid=$self->{userImport}->{$k}->processImport(
                    $name,$useAs,$param)){
@@ -2012,6 +2004,100 @@ sub GetW5BaseUserID
    return(undef);
 }
 
+
+sub getImportObjs
+{
+   my $self=shift;
+   my $name=shift;
+   my $useAs=shift;
+   my $param=shift;
+
+   if (!exists($self->{userImport})){
+      $self->LoadSubObjs("ext/userImport","userImport");
+   }
+   my %p;
+   foreach my $k (sort(keys(%{$self->{userImport}}))){
+     my $q=$self->{userImport}->{$k}->getQuality($name,$useAs,$param);
+     $p{$k}=$q;
+   }
+
+   return(sort({$p{$a}<=>$p{$b}} keys(%p)));
+}
+
+
+sub ImportUser
+{
+   my $self=shift;
+   my $maxCnt=5;
+   my $success=0;
+   my %param=(quiet=>1);
+
+   my $importnames=Query->Param("importname");
+   my @importname=split(/\s+/,$importnames);
+   my @imported; # imported contacts
+
+   my @idhelp=();
+   my @importObjs=$self->getImportObjs(undef,undef,\%param);
+   foreach my $k (@importObjs) {
+      if ($self->{userImport}{$k}->can('getImportIDFieldHelp')) {
+         push(@idhelp,$self->{userImport}{$k}->getImportIDFieldHelp());
+      }
+   }
+   my $idhelp=' ';
+   $idhelp=' ('.join(', ',@idhelp).') ' if ($#idhelp!=-1);
+
+   if (Query->Param("DOIT")){
+      my $i=0;
+
+      while ($i<=$#importname && $i<$maxCnt) {
+         my $name=$importname[$i];
+         my $atCnt=($name=~tr/@//);
+
+         my $useAs;
+         $useAs='dsid'  if ($atCnt==0);
+         $useAs='email' if ($atCnt==1);
+
+         if (defined($useAs)) {
+            my @res=$self->GetW5BaseUserID($name,$useAs,{quiet=>1});
+            if (defined($res[0]) &&
+                !in_array(\@imported,$res[1]->{fullname})) {
+               push(@imported,$res[1]->{fullname});
+               $success++;
+            }
+         }
+
+         $i++;
+      }
+
+      if ($success && $success==$#importname+1) {
+         if ($success==1) {
+            $self->LastMsg(OK,"User successful imported");
+         }
+         else {
+            $self->LastMsg(OK,"%d user successful imported",$success);
+         }
+      }
+      else {
+         $self->LastMsg(WARN,"%d from %d user successful imported",
+                             $success,$#importname+1);
+      }
+
+      Query->Delete("importname");
+      Query->Delete("DOIT");
+   }
+
+   my $names=join("<br>",sort(@imported));
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importnames},
+                           body=>1,form=>1,
+                           title=>"Contact Import");
+   print $self->getParsedTemplate("tmpl/minitool.user.import",
+                                  {static=>{idhelp=>$idhelp,
+                                            imported=>$names}});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
 
 
 

@@ -1,0 +1,26 @@
+<table width="100%" height="100%"><tr><td align=center valign=center>
+<!------------------------------------------------------>
+<div class=dialog style="width:400px">
+<table width="100%" cellpadding=4 cellspacing=4>
+<tr><td colspan=2><b>Orgarea Import Tool</b></td></tr>
+<tr>
+<td colspan=2>With this tool it is possible to import orgareas
+from external directories into the W5Base Group
+database. The orgarea you want to import can be specified
+by the <b>Source ID</b>%idhelp%of the required orgarea .<br>
+If the orgarea can be found, it will be automatically created as
+installed/active group.</td></tr>
+<tr><td width=1% nowrap>Org-Area ID (max.5):</td>
+<td><input type=text class=finput name=importname value="%importname%"></td></tr>
+<tr>
+<td colspan=2 align=center><input name=DOIT type=submit value=" import "></td>
+</tr>
+</table>
+</div>
+<div style="text-align:left;width:400px;height:200px;overflow:auto">
+%LASTMSG(RAW)%
+<p>%imported%</p>
+</div>
+<!------------------------------------------------------>
+</td></tr></table>
+

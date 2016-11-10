@@ -457,7 +457,8 @@ sub getValidWebFunctions
    my $self=shift;
 
    return($self->SUPER::getValidWebFunctions(@_),"TeamView","TreeCreate",
-         "RightsOverview","RightsOverviewLoader","view","TreeView");
+         "RightsOverview","RightsOverviewLoader","view","TreeView",
+         "ImportOrgarea");
 }
 
 sub view
@@ -1195,7 +1196,145 @@ sub displayOrg
 }
 
 
+#
+# This is the native API for all W5Base Modules to get the W5BaseID of
+# a group with AutoImport Option  (see: */ext/orgareaImport.pm)
+#
+sub GetW5BaseGrpID
+{
+   my $self=shift;
+   my $name=shift;
+   my $useAs=shift;   # srcid|name|fullname|grpid
+   my $param=shift;
 
+   if ($useAs eq "" || $name=~m/^\s*$/ || $name=~m/\s/ ||
+       ($useAs ne "srcid" &&
+        $useAs ne "grpid" &&
+        $useAs ne "name" &&
+        $useAs ne "fullname")){
+      msg(ERROR,"invalid call of GetW5BaseUserID in base::user!");
+      Stacktrace();
+      return(undef);
+   }
+
+   for(my $loopcnt=0;$loopcnt<2;$loopcnt++){
+      $self->ResetFilter();
+      $self->SetFilter({$useAs=>\$name});
+
+      my ($grprec,$msg)=$self->getOnlyFirst(qw(grpid name fullname
+                                               srcsys srcid));
+      if (defined($grprec)){
+         if (wantarray()){
+            return($grprec->{grpid},$grprec);
+         }
+         else{
+            return($grprec->{grpid});
+         }
+      }
+      if ($loopcnt==0){
+         # try Import
+         foreach my $k ($self->getImportObjs($name,$useAs,$param)) {
+            msg(INFO,"try Import for $name ($useAs) with=$k");
+            if (my $grpid=$self->{orgareaImport}->{$k}->processImport(
+                   $name,$useAs,$param)){
+               $name=$grpid;
+               $useAs="grpid";
+               last;
+            }
+         }
+      }
+   }
+
+   return(undef);
+}
+
+
+sub getImportObjs
+{
+   my $self=shift;
+   my $name=shift;
+   my $useAs=shift;
+   my $param=shift;
+
+   if (!exists($self->{orgareaImport})){
+      $self->LoadSubObjs("ext/orgareaImport","orgareaImport");
+   }
+   my %p;
+   foreach my $k (sort(keys(%{$self->{orgareaImport}}))){
+     my $q=$self->{orgareaImport}->{$k}->getQuality($name,$useAs,$param);
+     $p{$k}=$q;
+   }
+
+   return(sort({$p{$a}<=>$p{$b}} keys(%p)));
+}
+
+
+sub ImportOrgarea
+{
+   my $self=shift;
+   my $maxCnt=5;
+   my $success=0;
+   my %param=(quiet=>1);
+
+   my $importnames=Query->Param("importname");
+   my @importname=split(/\s+/,$importnames);
+   my @imported; # imported orgareas
+
+   my @idhelp=();
+   my @importObjs=$self->getImportObjs(undef,undef,\%param);
+   foreach my $k (@importObjs) {
+      if ($self->{orgareaImport}{$k}->can('getImportIDFieldHelp')) {
+         push(@idhelp,$self->{orgareaImport}{$k}->getImportIDFieldHelp());
+      }
+   }
+   my $idhelp=' ';
+   $idhelp=' ('.join(', ',@idhelp).') ' if ($#idhelp!=-1);
+
+   if (Query->Param("DOIT")){
+      my $i=0;
+
+      while ($i<=$#importname && $i<$maxCnt) {
+         my $name=$importname[$i];
+
+         my @res=$self->GetW5BaseGrpID($name,'srcid',\%param);
+         if (defined($res[0]) &&
+             !in_array(\@imported,$res[1]->{fullname})) {
+            push(@imported,$res[1]->{fullname});
+            $success++;
+         }
+
+         $i++;
+      }
+
+      if ($success && $success==$#importname+1) {
+         if ($success==1) {
+            $self->LastMsg(OK,"orgarea successful imported");
+         }
+         else {
+            $self->LastMsg(OK,"%d orgareas successful imported",$success);
+         }
+      }
+      else {
+         $self->LastMsg(WARN,"%d from %d orgareas successful imported",
+                             $success,$#importname+1);
+      }
+
+      Query->Delete("importname");
+      Query->Delete("DOIT");
+   }
+
+   my $names=join("<br>",sort(@imported));
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importnames},
+                           body=>1,form=>1,
+                           title=>"Orgarea Import");
+   print $self->getParsedTemplate("tmpl/minitool.orgarea.import",
+                                  {static=>{idhelp=>$idhelp,
+                                            imported=>$names}});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
 
 
 

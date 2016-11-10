@@ -23,7 +23,6 @@ use kernel::App::Web;
 use kernel::DataObj::LDAP;
 use kernel::Field;
 use HTML::TreeGrid;
-
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::LDAP);
 
 sub new
@@ -203,8 +202,7 @@ sub isWriteValid
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),qw(ImportOrgarea 
-                                                  doParentFix
+   return($self->SUPER::getValidWebFunctions(),qw(doParentFix
                                                   TreeView
                                                   ParentGroupFix));
 }
@@ -264,29 +262,29 @@ sub initSearchQuery
 
 
 
-sub ImportOrgarea
-{
-   my $self=shift;
-
-   my $importname=Query->Param("importname");
-   if (Query->Param("DOIT")){
-      if ($self->Import({importname=>$importname})){
-   #      Query->Delete("importname");
-         $self->LastMsg(OK,"orgarea has been successfuly imported");
-      }
-      Query->Delete("DOIT");
-   }
-
-
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','work.css',
-                                   'kernel.App.Web.css'],
-                           static=>{importname=>$importname},
-                           body=>1,form=>1,
-                           title=>"WhoIsWho Import");
-   print $self->getParsedTemplate("tmpl/minitool.orgarea.import",{});
-   print $self->HtmlBottom(body=>1,form=>1);
-}
+#sub ImportOrgarea
+#{
+#   my $self=shift;
+#
+#   my $importname=Query->Param("importname");
+#   if (Query->Param("DOIT")){
+#      if ($self->Import({importname=>$importname})){
+#   #      Query->Delete("importname");
+#         $self->LastMsg(OK,"orgarea has been successfuly imported");
+#      }
+#      Query->Delete("DOIT");
+#   }
+#
+#
+#   print $self->HttpHeader("text/html");
+#   print $self->HtmlHeader(style=>['default.css','work.css',
+#                                   'kernel.App.Web.css'],
+#                           static=>{importname=>$importname},
+#                           body=>1,form=>1,
+#                           title=>"WhoIsWho Import");
+#   print $self->getParsedTemplate("tmpl/minitool.orgarea.import",{});
+#   print $self->HtmlBottom(body=>1,form=>1);
+#}
 
 #########################################################################
 # minitool ParentGroupFix based on ajax technic to reconnect parent group
@@ -349,7 +347,9 @@ sub doParentFix
    $grp->SecureSetFilter({srcid=>\$ciamrec->{parentid},srcsys=>\'CIAM'});
    my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
    if (!defined($pgrprec)){
-      $self->Import({importname=>$ciamrec->{parentid}});
+      my $orgareaImport=$self->ModuleObject('tsciam::ext::orgareaImport');
+      $orgareaImport->processImport($ciamrec->{parentid},'srcid',{quiet=>1});
+      #$self->Import({importname=>$ciamrec->{parentid}});
       $grp->ResetFilter();
       $grp->SecureSetFilter({srcid=>\$ciamrec->{parentid},srcsys=>\'CIAM'});
       my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
@@ -391,171 +391,171 @@ sub doParentFix
 
 #########################################################################
 
-sub Import
-{
-   my $self=shift;
-   my $param=shift;
-
-   my $orgid=$param->{importname};
-   if (!($orgid=~m/^\S{3,10}$/)){
-      $self->LastMsg(ERROR,"invalid tOuCID specified");
-      return(undef);
-   }
-   my @idimp;
-   my $ciam=getModuleObject($self->Config,"tsciam::orgarea");
-   my $grp=getModuleObject($self->Config,"base::grp");
-
-   my $ok=0;
-   my $chkid=$orgid;
-   while($#idimp<20){
-      $ciam->ResetFilter();
-      $ciam->SetFilter({toucid=>\$chkid});
-      my ($ciamrec)=$ciam->getOnlyFirst(qw(ALL));
-      if (defined($ciamrec)){
-         $grp->ResetFilter();
-         $grp->SetFilter({srcid=>\$ciamrec->{toucid},srcsys=>\'CIAM'});
-         my ($grprec)=$grp->getOnlyFirst(qw(ALL));
-         if (defined($grprec)){ # ok, grp already exists in W5Base
-            $self->LastMsg(INFO,"$ciamrec->{toucid} = $grprec->{fullname}");
-            last;
-         }
-         else{
-            if (!$param->{silent}){
-               msg(INFO,"ciamid $ciamrec->{toucid} not found in W5Base");
-            }
-            push(@idimp,$ciamrec->{toucid});
-         }
-         $chkid=$ciamrec->{parentid};
-         last if ($chkid eq "");
-      }
-      else{
-         $self->LastMsg(ERROR,"invalid orgid $chkid in tree");
-         return(undef);
-      }
-   }
-   my $lastimportedgrpid=undef;
-   foreach my $ciamid (reverse(@idimp)){
-      $ciam->ResetFilter();
-      $ciam->SetFilter({toucid=>\$ciamid});
-      my ($ciamrec)=$ciam->getOnlyFirst(qw(ALL));
-      if (defined($ciamrec)){
-         my $grprec;
-         $grp->ResetFilter();
-         if ($ciamrec->{parentid} ne ""){
-            $grp->SetFilter({srcid=>\$ciamrec->{parentid},
-                             srcsys=>\'CIAM'});
-         }
-         else{
-            $grp->SetFilter({fullname=>\'DTAG'});
-         }
-         my ($grprec)=$grp->getOnlyFirst(qw(ALL));
-         if (defined($grprec)){
-            my $newname=$self->findNewValidShortname(
-               $grp,
-               $grprec->{grpid},
-               $ciamrec
-            );
-            my %newgrp=(name=>$newname,
-                        srcsys=>'CIAM',
-                        srcid=>$ciamrec->{toucid},
-                        parentid=>$grprec->{grpid},
-                        cistatusid=>4,
-                        srcload=>NowStamp(),
-                        comments=>"Description from CIAM: ".
-                                  $ciamrec->{name});
-            if (my $back=$grp->ValidatedInsertRecord(\%newgrp)){
-               $ok++;    
-               $grp->ResetFilter();
-               $grp->SetFilter({grpid=>\$back});
-               my ($grprec)=$grp->getOnlyFirst(qw(ALL));
-               if ($grprec){
-                  if (!$param->{silent}){
-                     $self->LastMsg(INFO,"$grprec->{srcid} = ".
-                                         "$grprec->{fullname}");
-                  }
-                  $lastimportedgrpid=$grprec->{grpid};
-               }
-           
-            }
-           # printf STDERR ("ciamrec=%s\n",Dumper($ciamrec));
-           # printf STDERR ("grprec=%s\n",Dumper($grprec));
-           # printf STDERR ("fifi importing $ciamid\n");
-         }
-         else{
-            printf STDERR ("fifi parentid $ciamrec->{parentid} not found\n");
-         }
-      }
-   }
-   if ($ok==$#idimp+1){
-      return($lastimportedgrpid); 
-   }
-   $self->LastMsg(ERROR,"one or more operations failed");
-   return(undef);
-}
-
-sub preFixShortname
-{
-   my $newname=shift;
-
-   $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
-   $newname=~s/&/_u_/g;
-   $newname =~ s/ä/ae/g;
-   $newname =~ s/ö/oe/g;
-   $newname =~ s/ü/ue/g;
-   $newname =~ s/Ä/Ae/g;
-   $newname =~ s/Ö/Oe/g;
-   $newname =~ s/Ü/Ue/g;
-   $newname =~ s/ß/sz/g;
-   $newname=~s/[^a-z0-9_-]/_/gi;
-   if (length($newname)>15){
-      $newname=substr($newname,0,15);
-   }
-   return($newname);
-}
-
-
-sub findNewValidShortname
-{
-   my $self=shift;
-   my $grpobj=shift;
-   my $pgrpid=shift;
-   my $ciamrec=shift;
-
-   my $newname=$ciamrec->{shortname};
-   if ($newname eq ""){
-      $newname="tOuSD";
-   }
-   $newname=preFixShortname($newname);
-   my $suffix="";
-   my $grprec;
-   my $loop=1;
-   do{
-      my $chkname=$newname.$suffix;
-      my %chkfld=(name=>\$chkname);
-      if (defined($pgrpid)){
-         $chkfld{parentid}=\$pgrpid;
-      }
-      else{
-         $chkfld{parentid}=undef;
-      }
-      $grpobj->ResetFilter();
-      $grpobj->SetFilter(\%chkfld);
-      ($grprec)=$grpobj->getOnlyFirst(qw(grpid srcsys srcid));
-      if (defined($grprec)){
-         $suffix=sprintf("-%02d",$loop);
-         $loop++;
-      }
-      else{
-         $newname=$chkname;
-      }
-      if ($loop>99){
-         msg(ERROR,"fail to create unique new shortname ".
-                   "for tOuCID='$ciamrec->{toucid}'");
-         return($newname); # das war wohl nix mit dem eindeutig machen
-      }
-   }while( defined($grprec) );
-   return($newname); 
-}
+#sub Import
+#{
+#   my $self=shift;
+#   my $param=shift;
+#
+#   my $orgid=$param->{importname};
+#   if (!($orgid=~m/^\S{3,10}$/)){
+#      $self->LastMsg(ERROR,"invalid tOuCID specified");
+#      return(undef);
+#   }
+#   my @idimp;
+#   my $ciam=getModuleObject($self->Config,"tsciam::orgarea");
+#   my $grp=getModuleObject($self->Config,"base::grp");
+#
+#   my $ok=0;
+#   my $chkid=$orgid;
+#   while($#idimp<20){
+#      $ciam->ResetFilter();
+#      $ciam->SetFilter({toucid=>\$chkid});
+#      my ($ciamrec)=$ciam->getOnlyFirst(qw(ALL));
+#      if (defined($ciamrec)){
+#         $grp->ResetFilter();
+#         $grp->SetFilter({srcid=>\$ciamrec->{toucid},srcsys=>\'CIAM'});
+#         my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+#         if (defined($grprec)){ # ok, grp already exists in W5Base
+#            $self->LastMsg(INFO,"$ciamrec->{toucid} = $grprec->{fullname}");
+#            last;
+#         }
+#         else{
+#            if (!$param->{silent}){
+#               msg(INFO,"ciamid $ciamrec->{toucid} not found in W5Base");
+#            }
+#            push(@idimp,$ciamrec->{toucid});
+#         }
+#         $chkid=$ciamrec->{parentid};
+#         last if ($chkid eq "");
+#      }
+#      else{
+#         $self->LastMsg(ERROR,"invalid orgid $chkid in tree");
+#         return(undef);
+#      }
+#   }
+#   my $lastimportedgrpid=undef;
+#   foreach my $ciamid (reverse(@idimp)){
+#      $ciam->ResetFilter();
+#      $ciam->SetFilter({toucid=>\$ciamid});
+#      my ($ciamrec)=$ciam->getOnlyFirst(qw(ALL));
+#      if (defined($ciamrec)){
+#         my $grprec;
+#         $grp->ResetFilter();
+#         if ($ciamrec->{parentid} ne ""){
+#            $grp->SetFilter({srcid=>\$ciamrec->{parentid},
+#                             srcsys=>\'CIAM'});
+#         }
+#         else{
+#            $grp->SetFilter({fullname=>\'DTAG'});
+#         }
+#         my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+#         if (defined($grprec)){
+#            my $newname=$self->findNewValidShortname(
+#               $grp,
+#               $grprec->{grpid},
+#               $ciamrec
+#            );
+#            my %newgrp=(name=>$newname,
+#                        srcsys=>'CIAM',
+#                        srcid=>$ciamrec->{toucid},
+#                        parentid=>$grprec->{grpid},
+#                        cistatusid=>4,
+#                        srcload=>NowStamp(),
+#                        comments=>"Description from CIAM: ".
+#                                  $ciamrec->{name});
+#            if (my $back=$grp->ValidatedInsertRecord(\%newgrp)){
+#               $ok++;    
+#               $grp->ResetFilter();
+#               $grp->SetFilter({grpid=>\$back});
+#               my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+#               if ($grprec){
+#                  if (!$param->{silent}){
+#                     $self->LastMsg(INFO,"$grprec->{srcid} = ".
+#                                         "$grprec->{fullname}");
+#                  }
+#                  $lastimportedgrpid=$grprec->{grpid};
+#               }
+#           
+#            }
+#           # printf STDERR ("ciamrec=%s\n",Dumper($ciamrec));
+#           # printf STDERR ("grprec=%s\n",Dumper($grprec));
+#           # printf STDERR ("fifi importing $ciamid\n");
+#         }
+#         else{
+#            printf STDERR ("fifi parentid $ciamrec->{parentid} not found\n");
+#         }
+#      }
+#   }
+#   if ($ok==$#idimp+1){
+#      return($lastimportedgrpid); 
+#   }
+#   $self->LastMsg(ERROR,"one or more operations failed");
+#   return(undef);
+#}
+#
+#sub preFixShortname
+#{
+#   my $newname=shift;
+#
+#   $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
+#   $newname=~s/&/_u_/g;
+#   $newname =~ s/ä/ae/g;
+#   $newname =~ s/ö/oe/g;
+#   $newname =~ s/ü/ue/g;
+#   $newname =~ s/Ä/Ae/g;
+#   $newname =~ s/Ö/Oe/g;
+#   $newname =~ s/Ü/Ue/g;
+#   $newname =~ s/ß/sz/g;
+#   $newname=~s/[^a-z0-9_-]/_/gi;
+#   if (length($newname)>15){
+#      $newname=substr($newname,0,15);
+#   }
+#   return($newname);
+#}
+#
+#
+#sub findNewValidShortname
+#{
+#   my $self=shift;
+#   my $grpobj=shift;
+#   my $pgrpid=shift;
+#   my $ciamrec=shift;
+#
+#   my $newname=$ciamrec->{shortname};
+#   if ($newname eq ""){
+#      $newname="tOuSD";
+#   }
+#   $newname=preFixShortname($newname);
+#   my $suffix="";
+#   my $grprec;
+#   my $loop=1;
+#   do{
+#      my $chkname=$newname.$suffix;
+#      my %chkfld=(name=>\$chkname);
+#      if (defined($pgrpid)){
+#         $chkfld{parentid}=\$pgrpid;
+#      }
+#      else{
+#         $chkfld{parentid}=undef;
+#      }
+#      $grpobj->ResetFilter();
+#      $grpobj->SetFilter(\%chkfld);
+#      ($grprec)=$grpobj->getOnlyFirst(qw(grpid srcsys srcid));
+#      if (defined($grprec)){
+#         $suffix=sprintf("-%02d",$loop);
+#         $loop++;
+#      }
+#      else{
+#         $newname=$chkname;
+#      }
+#      if ($loop>99){
+#         msg(ERROR,"fail to create unique new shortname ".
+#                   "for tOuCID='$ciamrec->{toucid}'");
+#         return($newname); # das war wohl nix mit dem eindeutig machen
+#      }
+#   }while( defined($grprec) );
+#   return($newname); 
+#}
 
 
 sub getGrpIdOf
@@ -572,7 +572,12 @@ sub getGrpIdOf
        return($rec->{grpid});
     }
     else{
-       return($self->Import({importname=>$ciamrec->{toucid},silent=>1}));
+       my $orgareaImport=$self->ModuleObject('tsciam::ext::orgareaImport');
+       my $lastimportedgrpid=$orgareaImport->processImport($ciamrec->{toucid},
+                                                           'srcid',
+                                                           {quiet=>1});
+       return($lastimportedgrpid);
+       #return($self->Import({importname=>$ciamrec->{toucid},silent=>1}));
     }
 }
 

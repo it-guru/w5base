@@ -1,0 +1,27 @@
+<table width="100%" height="100%"><tr><td align=center valign=center>
+<!------------------------------------------------------>
+<div class=dialog style="width:400px">
+<table width="100%" cellpadding=4 cellspacing=4>
+<tr><td colspan=2><b>OrgArea Import Tool</b></td></tr>
+<tr>
+<td colspan=2>Mit diesem Tool können Sie Einheiten aus externen Systemen
+in die W5Base Gruppenverwaltung importieren. Die Org-Einheit,
+die Sie Importieren möchten, müssen Sie  über
+die <b>ID des Quellsystems</b>%idhelp%spezifizieren.
+Wenn die Einheit identifizert werden kann und noch nicht existiert,
+dann wird diese automatisch als "installiert/aktiv" erzeugt.</td>
+</tr>
+<tr><td width=1% nowrap>Org-Area ID (max.5):</td>
+<td><input type=text class=finput name=importname value="%importname%"></td></tr>
+<tr>
+<td colspan=2 align=center><input name=DOIT type=submit value=" importieren "></td>
+</tr>
+</table>
+</div>
+<div style="text-align:left;width:400px;height:200px;overflow:auto">
+%LASTMSG(RAW)%
+<p>%imported%</p>
+</div>
+<!------------------------------------------------------>
+</td></tr></table>
+
