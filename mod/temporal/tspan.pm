@@ -111,7 +111,6 @@ sub new
       new kernel::Field::Link(
                 name          =>'rawsubsys',
                 label         =>'timespan subsystem',
-                readonly      =>'1',
                 selectfix     =>1,
                 dataobjattr   =>'tspanentry.subsys'),
 
