@@ -106,8 +106,9 @@ sub URLValidate
       return(\%uri);
    }
 
-   my @sok=qw(http ldap ldaps https file mailto sftp ftp ssh rlogin
-              oracle mysql informix scp pesit);
+   my @nonStdSchema=qw(oracle net8 mssql mysql informix scp pesit sftp);
+
+   my @sok=(qw(http ldap ldaps https file mailto ftp ssh rlogin),@nonStdSchema);
    if (!in_array(\@sok,$uri{scheme})){
       $uri{error}=("not supported scheme specified");
       return(\%uri);
@@ -126,7 +127,7 @@ sub URLValidate
       $befhost=qr{://} if (index($name,'@')==-1);
          
       my ($host,$port)=$name=~m/$befhost([^:\/]+)(?:\:(\d+))?/;
-      if (in_array([qw(ssh sftp scp pesit)],$uri{scheme})) {
+      if (in_array(\@nonStdSchema,$uri{scheme})) {
          $uri{host}=$host;
          $uri{port}=$port if ($port);
       }
