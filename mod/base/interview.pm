@@ -947,10 +947,8 @@ sub getHtmlEditElements
       }
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
       my $lang=$self->Lang();
-      $HTMLjs.="\$(\"#dateinput$irec->{id}\").datepicker();\n";
-      $HTMLjs.="\$('#dateinput$irec->{id}').datepicker('option', ".
-               "\$.extend({},".
-               "\$.datepicker.regional['$lang']));\n";
+      $HTMLjs.="\$(\"#dateinput$irec->{id}\").datepicker(".
+               "\$.extend({},\$.datepicker.regional['$lang']));\n";
    }
    if (defined($answer) && !($answer->{relevant})){
       $HTMLanswer="&nbsp;";
