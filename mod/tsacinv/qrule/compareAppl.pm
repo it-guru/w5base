@@ -87,6 +87,7 @@ sub qcheckRecord
 
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),"tsacinv::appl");
+   my $user=getModuleObject($self->getParent->Config(),"base::user");
 
    #
    # Level 0
@@ -196,7 +197,7 @@ sub qcheckRecord
                           mode=>'native');
             if (!$rec->{haveitsem}){
                if ($parrec->{sememail} ne ""){
-                  my $semid=$tswiw->GetW5BaseUserID($parrec->{sememail});
+                  my $semid=$user->GetW5BaseUserID($parrec->{sememail},"email");
                   if (defined($semid)){
                      $self->IfComp($dataobj,
                                    $rec,"semid",
@@ -217,7 +218,7 @@ sub qcheckRecord
             }
 
             if ($parrec->{tsmemail} ne ""){
-               my $tsmid=$tswiw->GetW5BaseUserID($parrec->{tsmemail});
+               my $tsmid=$user->GetW5BaseUserID($parrec->{tsmemail},"email");
                if (defined($tsmid)){
                   $self->IfComp($dataobj,
                                 $rec,"tsmid",
@@ -236,7 +237,7 @@ sub qcheckRecord
                }
             }
             if ($parrec->{tsm2email} ne ""){
-               my $tsmid=$tswiw->GetW5BaseUserID($parrec->{tsm2email});
+               my $tsmid=$user->GetW5BaseUserID($parrec->{tsm2email},"email");
                if (defined($tsmid)){
                   $self->IfComp($dataobj,
                                 $rec,"tsm2id",
@@ -255,7 +256,7 @@ sub qcheckRecord
                }
             }
             if ($parrec->{opmemail} ne ""){
-               my $opmid=$tswiw->GetW5BaseUserID($parrec->{opmemail});
+               my $opmid=$user->GetW5BaseUserID($parrec->{opmemail},"email");
                if (defined($opmid)){
                   $self->IfComp($dataobj,
                                 $rec,"opmid",
@@ -274,7 +275,7 @@ sub qcheckRecord
                }
             }
             if ($parrec->{opm2email} ne ""){
-               my $opmid=$tswiw->GetW5BaseUserID($parrec->{opm2email});
+               my $opmid=$user->GetW5BaseUserID($parrec->{opm2email},"email");
                if (defined($opmid)){
                   $self->IfComp($dataobj,
                                 $rec,"opm2id",
@@ -427,9 +428,7 @@ sub qcheckRecord
                      if ($importname eq ""){
                         $importname=$acgrouprec->{supervisoremail};
                      }
-                     my $tswiw=getModuleObject($self->getParent->Config,
-                                               "tswiw::user");
-       #              my $newdatabossid=$tswiw->GetW5BaseUserID($importname);
+       #              my $newdatabossid=$user->GetW5BaseUserID($importname,"email");
        # noch nicht   if (defined($newdatabossid)){
        #                 $databossid=$newdatabossid;
        #              }

@@ -549,9 +549,9 @@ sub qcheckRecord
                   if ($importname eq ""){
                      $importname=$acgrouprec->{supervisoremail};
                   }
-                  my $tswiw=getModuleObject($self->getParent->Config,
-                                            "tswiw::user");
-                  my $databossid=$tswiw->GetW5BaseUserID($importname);
+                  my $user=getModuleObject($self->getParent->Config,
+                                            "base::user");
+                  my $databossid=$user->GetW5BaseUserID($importname,"email");
                   if (defined($databossid)){
                      $admid=$databossid;
                   }

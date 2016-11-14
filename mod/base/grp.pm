@@ -1212,7 +1212,7 @@ sub GetW5BaseGrpID
         $useAs ne "grpid" &&
         $useAs ne "name" &&
         $useAs ne "fullname")){
-      msg(ERROR,"invalid call of GetW5BaseUserID in base::user!");
+      msg(ERROR,"invalid call of GetW5BaseGrpID in base::grp!");
       Stacktrace();
       return(undef);
    }

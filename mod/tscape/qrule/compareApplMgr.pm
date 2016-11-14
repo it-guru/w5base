@@ -126,10 +126,9 @@ sub qcheckRecord
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
       if (defined($parrec)){
-         my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
          my $user=getModuleObject($self->getParent->Config,"base::user");
          if ($parrec->{applmgremail} ne ""){
-            my $applmgrid=$tswiw->GetW5BaseUserID($parrec->{applmgremail});
+            my $applmgrid=$user->GetW5BaseUserID($parrec->{applmgremail},"email");
             if ($applmgrid ne $rec->{applmgrid}){
                $user->SetFilter({userid=>\$applmgrid});
                my $applmgr=$user->getVal("fullname");

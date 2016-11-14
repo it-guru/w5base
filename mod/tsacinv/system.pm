@@ -1142,8 +1142,8 @@ sub Import
       my $importname=$acgrouprec->{supervisorldapid};
       $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
       # check 4: load Supervisor ID in W5Base
-      my $tswiw=getModuleObject($self->Config,"tswiw::user");
-      my $admid=$tswiw->GetW5BaseUserID($importname);
+      my $user=getModuleObject($self->Config,"base::user");
+      my $admid=$tswiw->GetW5BaseUserID($importname,"email");
       if (!defined($admid)){
          $self->LastMsg(WARN,"Can't import Supervisor as Admin");
       }

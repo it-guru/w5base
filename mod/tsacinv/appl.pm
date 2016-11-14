@@ -715,8 +715,8 @@ sub Import
       my $importname=$acgrouprec->{supervisorldapid};
       $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
       # check 4: load Supervisor ID in W5Base
-      my $tswiw=getModuleObject($self->Config,"tswiw::user");
-      my $databossid=$tswiw->GetW5BaseUserID($importname);
+      my $user=getModuleObject($self->Config,"base::user");
+      my $databossid=$user->GetW5BaseUserID($importname,"email");
       if (!defined($databossid)){
          $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
          return(undef);
