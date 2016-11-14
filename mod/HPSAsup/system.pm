@@ -80,8 +80,8 @@ where
     and "itil::system".cistatusid in (3,4)
        -- nur Anwendungen der TelekomIT Mandaten
     and "itil::appl".mandator like 'TelekomIT%'
-       -- alle Prio1 Anwendungen
-    and "itil::appl".customerprio=1
+       -- alle CI-Group: TOP100-TelekomIT Anwendungen
+    and '; '||mgmtitemgroup||';'  like '%; TOP100-TelekomIT;%'
        -- aber NICHT Anwendungen der CI-Group SAP
     and '; '||mgmtitemgroup||';'  not like '%; SAP;%' 
        -- nicht Anwendungen im Mandaten "Extern"
@@ -109,8 +109,9 @@ where
     and not("itil::system".osrelease like 'Solaris%'        
         and "tsacinv::system".systemolaclass='30')     
        -- keine Systeme am Standort Kiel
-    and "itil::system".location not like 'DE.Kiel.Kronshagener_Weg_107.%'      
-    and "itil::system".location not like 'DE.Kiel.Kronshagener_Weg_107'      
+    and (   "itil::system".location not like 'DE.Kiel.Kronshagener_Weg_107.%' 
+         or "itil::system".location not like 'DE.Kiel.Kronshagener_Weg_107'
+         or "itil::system".location is null )
        -- nur Systeme mit Betriebsart=Prod
     and "itil::system".isprod=1                   
        -- keine Systeme mit Systemklassifizierung=Infrastrutkur
