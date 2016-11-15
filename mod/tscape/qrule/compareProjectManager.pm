@@ -104,12 +104,12 @@ sub qcheckRecord
          my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
          return(undef,undef) if (!$par->Ping());
          if (defined($parrec)){
-            my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
+            my $user=getModuleObject($self->getParent->Config,"base::user");
             foreach my $r (@{$parrec->{roles}}){
                if (($r->{role} eq "Project Manager IT-System" ||
                     $r->{role} eq "Project Manager IT-Application") &&
                    $r->{email} ne ""){
-                  my $pmid=$tswiw->GetW5BaseUserID($r->{email});
+                  my $pmid=$user->GetW5BaseUserID($r->{email},"email");
                   if ($pmid ne ""){
                      $pm_soll{$pmid}++;
                   }
