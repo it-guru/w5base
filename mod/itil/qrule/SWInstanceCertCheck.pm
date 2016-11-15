@@ -35,6 +35,7 @@ NONE
 package Net::ProxySSLconnect;
 use IO::Socket::SSL;
 use URI;
+use kernel;
 use base 'IO::Socket::SSL';
 my $sockclass = 'IO::Socket::INET';
 $sockclass .= '6' if eval "require IO::Socket::INET6";
@@ -51,6 +52,7 @@ sub configure {
    }
    if ( $phost->scheme ne 'http' ) {
       $@ = "scheme ".$phost->scheme." not supported for https_proxy";
+      Stacktrace(1);
       return;
    }
    my $auth = '';
