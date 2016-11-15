@@ -1,0 +1,6 @@
+'base::campus'=>{de=>'Campus',en=>'Campus'},
+'fieldgroup.locations'=>{de=>'sekundär Standorte',en=>'secondary locations'},
+'Fullname'=>{de=>'Campus-Bezeichnung'},
+'primary Location'=>{de=>'primär Standort'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'Label'=>{de=>'Bezeichnung'},

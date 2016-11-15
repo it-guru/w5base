@@ -251,6 +251,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.location.campus",
+                      "base::campus",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("sysadm.location.campus.new",
+                      "base::campus",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.filesig",
                       "base::filesig",
                       defaultacl=>['valid_user']);

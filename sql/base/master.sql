@@ -802,3 +802,27 @@ create table isocurrency (
   realeditor  varchar(100) NOT NULL default '',
   PRIMARY KEY (id),unique(token),unique(fullname)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table campus (
+  id         bigint(20) NOT NULL,
+  cistatus   int(2)      NOT NULL, 
+  comments    blob,campusid varchar(20),
+  fullname    varchar(255),
+  isprim      tinyint    default '1',
+  plocationid bigint(20),
+  locationid  bigint(20)   NOT NULL,
+  label      varchar(40), databoss bigint(20) not null,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base', 
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),
+  FOREIGN KEY fk_campus_databoss (databoss)
+  REFERENCES contact (userid) ON DELETE RESTRICT,
+  UNIQUE KEY loc (locationid), UNIQUE KEY fullname(isprim,fullname),
+  UNIQUE KEY `srcsys` (srcsys,srcid),unique key campusid(campusid)
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
