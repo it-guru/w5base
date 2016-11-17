@@ -516,6 +516,12 @@ sub mkChangeStoreRec
    }
    $wfrec{eventstart}=$rec->{plannedstart};
    $wfrec{eventend}=$rec->{plannedend};
+   if ($rec->{workstart} ne ""){
+      $wfrec{eventstart}=$rec->{workstart};
+   }
+   if ($rec->{workend} ne ""){
+      $wfrec{eventend}=$rec->{workend};
+   }
    $wfrec{mdate}=$rec->{sysmodtime};
    $wfrec{createdate}=$rec->{createtime};
    $wfrec{closedate}=$rec->{closetime};
