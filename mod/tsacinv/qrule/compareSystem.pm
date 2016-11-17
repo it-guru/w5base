@@ -551,7 +551,8 @@ sub qcheckRecord
                   }
                   my $user=getModuleObject($self->getParent->Config,
                                             "base::user");
-                  my $databossid=$user->GetW5BaseUserID($importname,"email");
+                  my $databossid=$user->GetW5BaseUserID($importname,"posix",
+                                                        {quiet=>1});
                   if (defined($databossid)){
                      $admid=$databossid;
                   }
