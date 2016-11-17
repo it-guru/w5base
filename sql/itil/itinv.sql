@@ -798,10 +798,10 @@ alter table appl add socomments longtext default NULL;
 alter table appl add soslanumdrtests    int(3) default NULL;
 alter table appl add sosladrduration    int(5) default NULL;
 alter table appl add solastdrtestwf     bigint(20) default NULL;
-alter table appl add solastdrdate       datetime default NULL;
+#alter table appl add solastdrdate       datetime default NULL;
 alter table appl add soslaclustduration int(5) default NULL;
 alter table appl add solastclusttestwf  bigint(20) default NULL;
-alter table appl add solastclustswdate  datetime default NULL;
+#alter table appl add solastclustswdate  datetime default NULL;
 create table dnsalias (
   id         bigint(20) NOT NULL,
   cistatus   int(2)      NOT NULL,

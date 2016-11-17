@@ -1348,14 +1348,6 @@ sub new
                 vjoindisp     =>'eventend',
                 searchable    =>0),
 
-      new kernel::Field::Date(
-                name          =>'temp_solastdrdate',
-                label         =>'last Disaster-Recovery test date (temp)',
-                group         =>'sodrgroup',
-                searchable    =>0,
-                dayonly       =>1,
-                dataobjattr   =>'appl.solastdrdate'),
-
       new kernel::Field::Number(
                 name          =>'soslaclustduration',
                 label         =>'SLA maximum cluster service '.
@@ -1391,14 +1383,6 @@ sub new
                 dayonly       =>1,
                 readonly      =>1,
                 searchable    =>0),
-
-      new kernel::Field::Date(
-                name          =>'temp_solastclustswdate',
-                label         =>'last Cluster-Service switch date (temp)',
-                group         =>'soclustgroup',
-                searchable    =>0,
-                dayonly       =>1,
-                dataobjattr   =>'appl.solastclustswdate'),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
@@ -2385,9 +2369,9 @@ sub getDetailBlockPriority
              architect customer custcontracts 
              contacts phonenumbers 
              interfaces systems swinstances services businessservices applurl
-             monisla sodrgroup
+             monisla 
              mutimes misc attachments control 
-             soclustgroup socomments accountnumbers licenses 
+             sodrgroup soclustgroup socomments accountnumbers licenses 
              external source));
 }
 
