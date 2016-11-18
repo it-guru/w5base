@@ -1015,7 +1015,7 @@ sub StartW5ServerProcess
              \$SIG{\$sig}='IGNORE';
              next;
           }
-          if (\$sig eq "CHLD"){
+          if (\$sig eq "CHLD" || \$sig eq "CLD"){
              \$SIG{\$sig}='IGNORE';
              next;
           }
