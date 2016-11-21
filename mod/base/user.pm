@@ -1953,7 +1953,8 @@ sub GetW5BaseUserID
         $useAs ne "posix" &&
         $useAs ne "userid" &&
         $useAs ne "dsid")){
-      msg(ERROR,"invalid call of GetW5BaseUserID in base::user!");
+      msg(ERROR,"invalid call '$name'/$useAs of GetW5BaseUserID ".
+                "in base::user!");
       Stacktrace();
    }
    for(my $loopcnt=0;$loopcnt<2;$loopcnt++){
