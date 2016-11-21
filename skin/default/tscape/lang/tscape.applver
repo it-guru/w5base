@@ -7,5 +7,6 @@
 'fullname'=>{de=>'Anwendungsversion'},
 'Retirement Date'=>{de=>"Retirement Datum"},
 'Retirement Type'=>{de=>"Retirement Typ"},
+'Applicationversion ID'=>{de=>"AnwendungsversionsID"},
 
 

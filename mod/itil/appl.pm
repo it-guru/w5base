@@ -1307,11 +1307,30 @@ sub new
                 searchable    =>0, 
                 dataobjattr   =>'appl.socomments'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Select(
                 name          =>'soslanumdrtests',
+                label         =>'SLA number Disaster-Recovery test interval',
+                group         =>'sodrgroup',
+                htmleditwidth =>'220',
+                transprefix   =>'DRTESTPERYEAR.',
+                value         =>['0',
+                                 '0.3',
+                                 '0.5',
+                                 '1',
+                                 '2',
+                                 '4'],
+                default       =>'0.5',
+                searchable    =>0,
+                dataobjattr   =>'appl.soslanumdrtests'),
+
+      new kernel::Field::Number(
+                name          =>'soslanumdrtestinterval',
                 label         =>'SLA number Disaster-Recovery tests per year',
                 group         =>'sodrgroup',
                 htmleditwidth =>'120',
+                precision     =>2,
+                htmldetail    =>'0',
+                default       =>'0.5',
                 searchable    =>0,
                 dataobjattr   =>'appl.soslanumdrtests'),
 

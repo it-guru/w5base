@@ -795,7 +795,7 @@ alter table lnksoftwaresystem  add instdate datetime default NULL;
 update lnksoftwaresystem set instdate=createdate;
 alter table appl add sodefinition int(2) default '0';
 alter table appl add socomments longtext default NULL;
-alter table appl add soslanumdrtests    int(3) default NULL;
+alter table appl add soslanumdrtests    float(2) default '0.5';
 alter table appl add sosladrduration    int(5) default NULL;
 alter table appl add solastdrtestwf     bigint(20) default NULL;
 #alter table appl add solastdrdate       datetime default NULL;
