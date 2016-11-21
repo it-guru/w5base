@@ -326,7 +326,8 @@ sub autoFillAutogenField
       return("S");
    }
    if ($fld->{name} eq "applmodules"){
-      return(["MAppl","MSystemOS","MHardwareOS"]);
+      return([qw(MHardwareOS MSystemOS MDB MMiddleWare
+                 MAppl MStorage MBackupRest MNetwork)]);
    }
    if ($fld->{name} eq "contractmodules"){
       my @modules;
