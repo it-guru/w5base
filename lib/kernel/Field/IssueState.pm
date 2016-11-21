@@ -189,7 +189,7 @@ sub FormatedDetail
          my $id=$idfield->RawValue($current,$mode);
          my $divid="ViewProcessor_$self->{name}_$id";
          my $XMLUrl="$ENV{SCRIPT_URI}";
-         $XMLUrl=~s/^[a-z]+?://;
+         $XMLUrl=~s/^[a-z]+?://; # rm protocol to prevent reverse proxy issues
          my $parent=$self->getParent->Self;
          $parent=~s/::/\//g;
  

@@ -193,6 +193,7 @@ sub FormatedDetail
          my $id=$idfield->RawValue($current);
          my $divid="ViewProcessor_$self->{name}";
          my $XMLUrl="$ENV{SCRIPT_URI}";
+         $XMLUrl=~s/^[a-z]+?://; # rm protocol to prevent reverse proxy issues
          $XMLUrl.="/../ViewProcessor/XML/$self->{name}/$id";
          my $d="<div id=\"$divid\"><font color=silver>init ...</font></div>";
          $d=$self->addWebLinkToFacility($d,$current);
