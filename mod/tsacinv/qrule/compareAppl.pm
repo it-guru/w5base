@@ -197,7 +197,8 @@ sub qcheckRecord
                           mode=>'native');
             if (!$rec->{haveitsem}){
                if ($parrec->{sememail} ne ""){
-                  my $semid=$user->GetW5BaseUserID($parrec->{sememail},"email");
+                  my $semid=$user->GetW5BaseUserID($parrec->{sememail},"email",
+                                                   {quiet=>1});
                   if (defined($semid)){
                      $self->IfComp($dataobj,
                                    $rec,"semid",
@@ -218,7 +219,8 @@ sub qcheckRecord
             }
 
             if ($parrec->{tsmemail} ne ""){
-               my $tsmid=$user->GetW5BaseUserID($parrec->{tsmemail},"email");
+               my $tsmid=$user->GetW5BaseUserID($parrec->{tsmemail},"email",
+                                                {quiet=>1});
                if (defined($tsmid)){
                   $self->IfComp($dataobj,
                                 $rec,"tsmid",
@@ -237,7 +239,8 @@ sub qcheckRecord
                }
             }
             if ($parrec->{tsm2email} ne ""){
-               my $tsmid=$user->GetW5BaseUserID($parrec->{tsm2email},"email");
+               my $tsmid=$user->GetW5BaseUserID($parrec->{tsm2email},"email",
+                                                {quiet=>1});
                if (defined($tsmid)){
                   $self->IfComp($dataobj,
                                 $rec,"tsm2id",
@@ -256,7 +259,8 @@ sub qcheckRecord
                }
             }
             if ($parrec->{opmemail} ne ""){
-               my $opmid=$user->GetW5BaseUserID($parrec->{opmemail},"email");
+               my $opmid=$user->GetW5BaseUserID($parrec->{opmemail},"email",
+                                                {quiet=>1});
                if (defined($opmid)){
                   $self->IfComp($dataobj,
                                 $rec,"opmid",
@@ -275,7 +279,8 @@ sub qcheckRecord
                }
             }
             if ($parrec->{opm2email} ne ""){
-               my $opmid=$user->GetW5BaseUserID($parrec->{opm2email},"email");
+               my $opmid=$user->GetW5BaseUserID($parrec->{opm2email},"email",
+                                                {quiet=>1});
                if (defined($opmid)){
                   $self->IfComp($dataobj,
                                 $rec,"opm2id",
