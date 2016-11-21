@@ -106,9 +106,9 @@ sub URLValidate
       return(\%uri);
    }
 
-   my @nonStdSchema=qw(oracle net8 mssql mysql informix scp pesit sftp);
+   my @nonStdSchema=qw(oracle net8 mssql mysql informix scp ssh pesit sftp);
 
-   my @sok=(qw(http ldap ldaps https file mailto ftp ssh rlogin),@nonStdSchema);
+   my @sok=(qw(http ldap ldaps https file mailto ftp rlogin),@nonStdSchema);
    if (!in_array(\@sok,$uri{scheme})){
       $uri{error}=("not supported scheme specified");
       return(\%uri);
@@ -157,6 +157,7 @@ sub URLValidate
       }
 
    }
+print STDERR Dumper(\%uri);
 
    return(\%uri);
 }
