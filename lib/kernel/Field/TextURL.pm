@@ -157,7 +157,6 @@ sub URLValidate
       }
 
    }
-print STDERR Dumper(\%uri);
 
    return(\%uri);
 }
