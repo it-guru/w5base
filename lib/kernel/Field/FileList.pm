@@ -30,6 +30,7 @@ sub new
 
    $self->{'searchable'}=0;
    $self->{'showcomm'} = 0 if !defined($self->{'showcomm'});
+   $self->{'privoption'} = 1 if !defined($self->{'privoption'});
 
    return($self);
 }
@@ -151,7 +152,7 @@ sub HandleFILEADD
    }
    if (Query->Param("DO") ne ""){
       my $isprivate=0;
-      if (Query->Param("isprivate") ne ""){
+      if ($self->{privoption} && Query->Param("isprivate") ne ""){
          $isprivate=1;
       }
       my $fh=Query->Param("file");
@@ -207,16 +208,27 @@ EOF
    $d.="<td colspan=2><input type=file name=file size=40></td>";
    $d.="</tr><tr>".
        "<tr><td width=\"1%\" nowrap>".
-       $self->getParent->T("comments",'kernel::FileList')."</td>".
+       $self->getParent->T("comments",'kernel::FileList').":</td>".
        "<td colspan=2><input name=comments value=\"$comments\" ".
-       "type=text style=\"width:100%\"></tr>".
-       "<tr><td width=\"1%\" nowrap>".
-       $self->getParent->T("handle file as private",'kernel::FileList')."</td>".
-       "<td><input type=checkbox $isprivate name=isprivate></td>";
-   $d.="<td valign=bottom>".
-       "<input type=submit name=DO style=\"width:100%\" value=\"".
+       "type=text style=\"width:100%\"></tr>";
+
+   $d.="<tr>";
+   if ($self->{privoption}) {
+      $d.="<td width=\"1%\" nowrap>".
+           $self->getParent->T("handle file as private",'kernel::FileList').
+          "</td><td>".
+          "<input type=checkbox $isprivate name=isprivate>".
+          "</td>".
+          "<td valign=bottom>";
+   }
+   else {
+      $d.="<td>&nbsp;</td>".
+          "<td colspan=2 valign=bottom>";
+   }
+   $d.="<input type=submit name=DO style=\"width:100%\" value=\"".
        $self->getParent->T("Upload",'kernel::FileList')."\"></td>";
    $d.="</tr>";
+
    $d.="</table>";
    $d.="</div>";
    print $d;

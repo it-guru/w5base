@@ -258,6 +258,7 @@ sub new
       new kernel::Field::FileList(
                 name          =>'attachments',
                 showcomm      =>1,
+                privoption    =>0,
                 searchable    =>0,
                 onFileAdd     =>\&onFileAdd,
                 label         =>'Attachments',
