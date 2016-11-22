@@ -1,0 +1,9 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname style="width:20%">%location(label)%:</td>
+         <td class=finput style="width:80%">%location(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

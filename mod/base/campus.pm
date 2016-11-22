@@ -41,7 +41,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
-                htmldetail    =>0,
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
                 dataobjattr   =>'campus.fullname'),
 
       new kernel::Field::Text(      
@@ -77,26 +78,56 @@ sub new
                 htmlwidth     =>'200px',
                 dataobjattr   =>'campus.locationid'),
 
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                vjoineditbase =>{id=>">0 AND <7"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'campus.cistatus'),
+
       new kernel::Field::Databoss(),
 
       new kernel::Field::Link(
                 name          =>'databossid',
                 dataobjattr   =>'campus.databoss'),
 
-#      new kernel::Field::SubList(
-#                name          =>'locations',
-#                label         =>'locations',
-#                group         =>'locations',
-#                subeditmsk    =>'subedit.locations',
-#                forwardSearch =>1,
-#                vjointo       =>'base::lnkcampussubloc',
-#                vjoinon       =>['id'=>'plocationid'],
-#                vjoindisp     =>['location']),
+      new kernel::Field::SubList(
+                name          =>'seclocations',
+                label         =>'secondary locations',
+                group         =>'seclocations',
+                subeditmsk    =>'subedit.locations',
+                forwardSearch =>1,
+                vjointo       =>'base::lnkcampussubloc',
+                vjoinon       =>['id'=>'pcampusid'],
+                vjoindisp     =>['location']),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
                 group         =>'contacts'),
+
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                htmldetail    =>0,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $rec=$param{current};
+                   if (!defined($rec->{$self->Name()})){
+                      return(0);
+                   }
+                   return(1);
+                },
+                dataobjattr   =>'campus.additional'),
 
       new kernel::Field::Link(
                 name          =>'isprim',
@@ -170,7 +201,7 @@ sub Validate
    my $fullname=effVal($oldrec,$newrec,"fullname");
    my $newfullname="CAMPUS:".$locrec->{country}."-".$locrec->{location};
    if ($label ne ""){
-      $newfullname.=":".$label;
+      $newfullname.="-".$label;
    } 
    $newfullname=~s/\s/_/g;
    if ($newfullname ne $fullname){
@@ -203,12 +234,24 @@ sub Validate
    return(1);
 }
 
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   return(undef) if ($mode eq "delete");
+   return(undef) if ($mode eq "insert");
+   return(undef) if ($mode eq "update");
+   my $where="(campus.isprim='1')";
+   return($where);
+}
+
+
 
 sub getDetailBlockPriority
 {
    my $self=shift;
    return( qw(header default contacts 
-              locations source));
+              seclocations source));
 }
 
 
@@ -226,9 +269,38 @@ sub isViewValid
 sub isWriteValid
 {
    my ($self,$rec)=@_;
+   return("default") if (!defined($rec));
+   my $userid=$self->getCurrentUserId();
+
+
+   my @databossedit=qw(default contacts seclocations);
    if ($self->IsMemberOf("admin")){
-      return("default");
+      return(@databossedit);
    }
+
+   if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  ["RMember"],"both");
+      my @grpids=keys(%grps);
+      foreach my $contact (@{$rec->{contacts}}){
+         if ($contact->{target} eq "base::user" &&
+             $contact->{targetid} ne $userid){
+            next;
+         }
+         if ($contact->{target} eq "base::grp"){
+            my $grpid=$contact->{targetid};
+            next if (!grep(/^$grpid$/,@grpids));
+         }
+         my @roles=($contact->{roles});
+         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+         if (grep(/^write$/,@roles)){
+            return(@databossedit);
+         }
+      }
+   }
+
+
+
    return(undef);
 }
 
