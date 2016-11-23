@@ -542,6 +542,10 @@ sub SecureSetFilter
                  {delmgr2id=>$userid}
                 ]);
    }
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+   }
    return($self->SetFilter(@flt));
 }
 
