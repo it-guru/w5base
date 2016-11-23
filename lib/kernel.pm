@@ -694,6 +694,10 @@ sub effVal
    my $oldrec=shift;
    my $newrec=shift;
    my $var=shift;
+   if ((defined($newrec) && !ref($newrec)) || 
+       (defined($oldrec) && !ref($oldrec))){
+      Stacktrace();
+   }
    if (exists($newrec->{$var})){
       return($newrec->{$var});
    }
