@@ -144,7 +144,7 @@
 'Application switch-over behaviour defined'=>{de=>'Definitionen zur Umschalt/Schwenk/Recovery Strategie vorhanden'},
 'SLA number Disaster-Recovery test interval'=>{de=>'SLA Anzahl zugesicherter Disaster-Recovery Test Interval'},
 'SLA number Disaster-Recovery tests per year'=>{de=>'SLA Anzahl zugesicherter Disaster-Recovery Tests pro Jahr'},
-'SLA planned Disaster-Recovery duration'=>{de=>'SLA geplannte Dauer eines Disaster-Recoverys'},
+'SLA planned Disaster-Recovery duration'=>{de=>'SLA geplante Dauer eines Disaster-Recoverys'},
 'last Disaster-Recovery test (CHM-WorkflowID)'=>{de=>'letzter Disaster-Recovery test (CHM-WorkflowID)'},
 'last Disaster-Recovery test (WorkflowEnd)'=>{de=>'letzter Disaster-Recovery test (WorkflowEnd)'},
 'SLA maximum cluster service take over duration'=>{de=>'SLA maximale Cluster-Service Switch/Übernahme Dauer'},
