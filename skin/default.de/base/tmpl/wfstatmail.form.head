@@ -106,7 +106,7 @@ p.unsubscribe {
     <td colspan=3">
        <div style="width:100%;margin:20px;padding:10px;margin-top:0;margin-bottom:5px;overflow:hidden"><br>
           Sehr geehrte Damen und Herren,<br><br>
-im Folgenden erhalten Sie eine Aufstellung aller aktuell für Sie anstehenden Workflows. Diese Mail dient als Erinnerung, damit die Bearbeitung einzelnern Workflows nicht vergessen wird.<br><br>Für den Kontakt <b>"%contact%"</b> stehen aktuell ...
+im Folgenden erhalten Sie eine Aufstellung aller aktuell für Sie anstehenden Workflows. Diese Mail dient als Erinnerung, damit die Bearbeitung einzelner Workflows nicht vergessen wird.<br><br>Für den Kontakt <b>"%contact%"</b> stehen aktuell ...
 <ul>%detailcnt%</ul>
 ... zur Bearbeitung an bzw. es sind Aktionen von Ihnen auszuführen.<br>
        </div>
