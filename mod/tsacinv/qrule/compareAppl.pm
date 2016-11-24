@@ -433,10 +433,6 @@ sub qcheckRecord
                      if ($importname eq ""){
                         $importname=$acgrouprec->{supervisoremail};
                      }
-       #              my $newdatabossid=$user->GetW5BaseUserID($importname,"email");
-       # noch nicht   if (defined($newdatabossid)){
-       #                 $databossid=$newdatabossid;
-       #              }
                   }
                }
             }
