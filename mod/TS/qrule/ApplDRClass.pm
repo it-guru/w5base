@@ -7,6 +7,7 @@ package TS::qrule::ApplDRClass;
 =head3 PURPOSE
 
 Checks whether an "installed/active" application
+with primary operation mode "Production" or "Disaster Recovery"
 has a "Disaster Recovery Class" defined,
 otherwise an errror message is output.
 From a Disaster Recovery Class of "4" and more
@@ -88,6 +89,11 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+
+   if ($rec->{opmode} ne 'prod' &&
+       $rec->{opmode} ne 'cbreakdown') {
+      return(undef);
+   }
 
    return(0,undef) if ($rec->{cistatusid}!=4);
 
