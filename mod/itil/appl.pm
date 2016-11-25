@@ -1313,9 +1313,9 @@ sub new
                 group         =>'sodrgroup',
                 htmleditwidth =>'220',
                 transprefix   =>'DRTESTPERYEAR.',
-                value         =>['0',
-                                 '0.3',
+                value         =>[
                                  '0.5',
+                                 '0.3',
                                  '1',
                                  '2',
                                  '4'],
