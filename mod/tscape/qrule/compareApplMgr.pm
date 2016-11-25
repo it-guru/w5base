@@ -128,7 +128,8 @@ sub qcheckRecord
       if (defined($parrec)){
          my $user=getModuleObject($self->getParent->Config,"base::user");
          if ($parrec->{applmgremail} ne ""){
-            my $applmgrid=$user->GetW5BaseUserID($parrec->{applmgremail},"email");
+            my $applmgrid=$user->GetW5BaseUserID($parrec->{applmgremail},
+                          "email",{quiet=>1});
             if ($applmgrid ne $rec->{applmgrid}){
                $user->SetFilter({userid=>\$applmgrid});
                my $applmgr=$user->getVal("fullname");
