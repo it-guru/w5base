@@ -293,19 +293,21 @@ else{
       push(@snames,$s);
       $T=Time::HiRes::time();
       my $o=getModuleObject($Config,$servicedef->{$s}->{dataobj});
-      my @res=$o->showFields();
-      my $idfield;
       my @view;
-      foreach my $fld (@res){
-         if ($fld->{type} eq "Id"){
-            $idfield=$fld->{type};
-            if (defined($serviceres->{$s}->{nrec})){
-               push(@view,$idfield);
+      if (defined($o)){
+         my @res=$o->showFields();
+         my $idfield;
+         foreach my $fld (@res){
+            if ($fld->{type} eq "Id"){
+               $idfield=$fld->{type};
+               if (defined($serviceres->{$s}->{nrec})){
+                  push(@view,$idfield);
+               }
             }
-         }
-         if (defined($serviceres->{$s}->{singlerec})){
-            if ($fld->{name} eq $serviceres->{$s}->{singlerec}->{field}){
-               push(@view,$fld->{name});
+            if (defined($serviceres->{$s}->{singlerec})){
+               if ($fld->{name} eq $serviceres->{$s}->{singlerec}->{field}){
+                  push(@view,$fld->{name});
+               }
             }
          }
       }
