@@ -221,7 +221,7 @@ sub SendMyJobs
                      }
                      $openInterviews++;
                      push(@emailtext,"$cirec->{name}\n".
-                                     "$cirec->{urlofcurrentrec}");
+                                     "$cirec->{urlofcurrentrec}/Interview");
                      push(@emailpostfix,"");
                      push(@emailprefix,"");
                   }

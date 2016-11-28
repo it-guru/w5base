@@ -67,12 +67,8 @@ sub onRawValue
          }
       }
    }
-
-
    my $state={TotalActiveQuestions=>$total,
-              total=>$totalcnt,
-              todo=>$todo,
-              outdated=>$outdated,
+              total=>$totalcnt, todo=>$todo, outdated=>$outdated,
               AnsweredQuestions=>$answered};
    my %qStat;
    tie(%qStat,'kernel::Field::InterviewState::qStat',%$state);
@@ -88,9 +84,12 @@ sub FormatedResult
    my $mode=shift;
    my $d=$self->RawValue($current);
 
-   my $totalcnt=$d->{qStat}->{total};
-   my $todo=$d->{qStat}->{todo};
-   my $outdated=$d->{qStat}->{outdated};
+   my $totalcnt=$d->{total};
+   my $todo=$d->{todo};
+   my $outdated=$d->{outdated};
+   $totalcnt="0" if (!defined($totalcnt));
+   $todo="0" if (!defined($todo));
+   $outdated="0" if (!defined($outdated));
    if (($mode=~m/^Html/) || ($mode=~m/^Xls/)){
       return("Total: $totalcnt / Open: $todo / Outdated: $outdated");
    }

@@ -545,8 +545,10 @@ EOF
          if ($imode eq "open"){
             if (exists($state->{AnsweredQuestions}->
                        {interviewid}->{$qrec->{id}}) &&
-                $state->{AnsweredQuestions}->
-                      {interviewid}->{$qrec->{id}}->{answer} ne ""){
+                ($state->{AnsweredQuestions}->
+                      {interviewid}->{$qrec->{id}}->{answer} ne "" ||
+                 $state->{AnsweredQuestions}->
+                      {interviewid}->{$qrec->{id}}->{relevant} eq "0" )){
                next;
             }
          }
