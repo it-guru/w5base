@@ -12,7 +12,8 @@ has a "Disaster Recovery Class" defined,
 otherwise an errror message is output.
 From a Disaster Recovery Class of "4" and more
 it will checked whether the "Application switch-over behaviour"
-is defined, otherwise an error message is output.
+is defined and the "SLA number Disaster-Recovery test interval"
+is at least "1 test every 2 years", otherwise an error message is output.
 
 =head3 IMPORTS
 
@@ -25,8 +26,9 @@ NONE
 A "Disaster Recovery Class" must be defined.
 
 On "Disaster Recovery Class" >= 4 the definitions of
-"Application switch-over behaviour" are mandatory and
-the fields under "Disaster-Recovery" have to be maintained.
+"Application switch-over behaviour" are mandatory,
+the fields under "Disaster-Recovery" have to be maintained and
+minimum 1 Disaster-Recovery test every 2 years has to be assured.
 
 If you have any questions please contact the Darwin Support: 
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
@@ -38,8 +40,9 @@ Eine "Disaster Recovery Class" muss definiert sein.
 
 Bei "Disaster Recovery Class" >= 4 müssen
 "Definitionen zur Umschalt/Schwenk/Recovery Strategie"
-vorhanden sein und die entsprechenden Datenfelder unter
-"Disaster-Recovery" gepflegt werden.
+vorhanden sein, die entsprechenden Datenfelder unter
+"Disaster-Recovery" müssen gepflegt werden und
+es muss mindstens 1 Disaster-Recovery Test alle 2Jahre zugesichert werden.
 
 Bei Fragen wenden Sie sich bitte an den DARWIN Support:
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
@@ -90,21 +93,25 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   if ($rec->{opmode} ne 'prod' &&
-       $rec->{opmode} ne 'cbreakdown') {
-      return(undef);
-   }
-
-   return(0,undef) if ($rec->{cistatusid}!=4);
+   return(0,undef) if ($rec->{cistatusid}!=4 &&
+                       $rec->{cistatusid}!=3);
 
    if ($rec->{drclass}=='') {
-      my $msg=["no Disaster Recovery Class defined"];
-      return(3,{qmsg=>$msg,dataissue=>$msg});
+      my $msg="no Disaster Recovery Class defined";
+      return(3,{qmsg=>[$msg],dataissue=>[$msg]});
    }
 
-   if ($rec->{drclass}>3 && !$rec->{sodefinition}) {
-      my $msg=["no Application switch-over behaviour defined"];
-      return(3,{qmsg=>$msg,dataissue=>$msg});
+   if ($rec->{drclass}>3) {
+      if (!$rec->{sodefinition}) {
+         my $msg="no Application switch-over behaviour defined";
+         return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+      }
+
+      if ($rec->{soslanumdrtests}<0.5) {
+         my $msg="Minimum Disaster-Recovery test interval: ".
+                 $self->T('DRTESTPERYEAR.0.5','itil::appl');
+         return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+      }
    }
 
    return(0,undef);

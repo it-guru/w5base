@@ -142,7 +142,7 @@
 'Software-Depot path'=>{de=>'Software-Depot Pfad'},
 'invalid swdepot path spec'=>{de=>'ungültiger Software-Depot Pfad'},
 'Application switch-over behaviour defined'=>{de=>'Definitionen zur Umschalt/Schwenk/Recovery Strategie vorhanden'},
-'SLA number Disaster-Recovery test interval'=>{de=>'SLA Anzahl zugesicherter Disaster-Recovery Test Interval'},
+'SLA number Disaster-Recovery test interval'=>{de=>'SLA Anzahl zugesicherter Disaster-Recovery Test Intervall'},
 'SLA number Disaster-Recovery tests per year'=>{de=>'SLA Anzahl zugesicherter Disaster-Recovery Tests pro Jahr'},
 'SLA planned Disaster-Recovery duration'=>{de=>'SLA geplante Dauer eines Disaster-Recoverys'},
 'last Disaster-Recovery test (CHM-WorkflowID)'=>{de=>'letzter Disaster-Recovery test (CHM-WorkflowID)'},
