@@ -533,6 +533,7 @@ sub new
                 name          =>'usedsharedstorage',
                 label         =>'direct connected Shared-Storage Servers',
                 group         =>'usedsharedcomp',
+                htmldetail    =>0,
                 vjointo       =>'tsacinv::sharedstoragemnt',
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>[qw(storagename name)]),

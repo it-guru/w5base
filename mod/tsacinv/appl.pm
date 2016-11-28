@@ -406,6 +406,7 @@ sub new
                 label         =>'direct connected Shared-Storage Servers',
                 vjointo       =>'tsacinv::lnksharedstorage',
                 weblinkto     =>'NONE',
+                htmldetail    =>0,
                 vjoinon       =>['applid'=>'applid'],
                 vjoindisp     =>'storagename'),
 
@@ -414,6 +415,7 @@ sub new
                 group         =>'usedsharedcomp',
                 label         =>'direct connected Shared-Network Components',
                 vjointo       =>'tsacinv::lnksharednet',
+                htmldetail    =>0,
                 weblinkto     =>'NONE',
                 vjoinon       =>['applid'=>'applid'],
                 vjoindisp     =>'netname'),
