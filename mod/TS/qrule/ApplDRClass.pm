@@ -6,14 +6,14 @@ package TS::qrule::ApplDRClass;
 
 =head3 PURPOSE
 
-Checks whether an "installed/active" application
-with primary operation mode "Production" or "Disaster Recovery"
-has a "Disaster Recovery Class" defined,
+Checks whether an "installed/active" or "available/in project"
+application with primary operation mode "Production" or
+"Disaster Recovery" has a "Disaster Recovery Class" defined,
 otherwise an errror message is output.
-From a Disaster Recovery Class of "4" and more
-it will checked whether the "Application switch-over behaviour"
-is defined and the "SLA number Disaster-Recovery test interval"
-is at least "1 test every 2 years", otherwise an error message is output.
+From a Disaster Recovery Class of "4" and more it will checked
+whether the "Application switch-over behaviour" is defined and
+the "SLA number Disaster-Recovery test interval" is at least
+"1 test every 2 years", otherwise an error message is output.
 
 =head3 IMPORTS
 
@@ -96,7 +96,9 @@ sub qcheckRecord
    return(0,undef) if ($rec->{cistatusid}!=4 &&
                        $rec->{cistatusid}!=3);
 
-   if ($rec->{drclass}=='') {
+   if ($rec->{drclass} eq '' &&
+       ($rec->{opmode} eq 'prod' ||
+        $rec->{opmode} eq 'cbreakdown')) {
       my $msg="no Disaster Recovery Class defined";
       return(3,{qmsg=>[$msg],dataissue=>[$msg]});
    }
