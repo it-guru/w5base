@@ -1125,23 +1125,20 @@ sub Import
          $self->LastMsg(ERROR,"SystemID has no Assignment Group");
          return(undef);
       }
-      #printf STDERR Dumper($sysrec);
       # check 2: Assingment Group active
       my $acgroup=getModuleObject($self->Config,"tsacinv::group");
       $acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
-      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
+      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisoremail));
       if (!defined($acgrouprec)){
          $self->LastMsg(ERROR,"Can't find Assignment Group of system");
          return(undef);
       }
       # check 3: Supervisor registered
-      if ($acgrouprec->{supervisorldapid} eq "" &&
-          $acgrouprec->{supervisoremail} eq ""){
+      if ($acgrouprec->{supervisoremail} eq ""){
          $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
          return(undef);
       }
-      my $importname=$acgrouprec->{supervisorldapid};
-      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
+      my $importname=$acgrouprec->{supervisoremail};
       # check 4: load Supervisor ID in W5Base
       my $user=getModuleObject($self->Config,"base::user");
       my $admid=$user->GetW5BaseUserID($importname,"email");
