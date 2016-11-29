@@ -294,9 +294,9 @@ else{
       $T=Time::HiRes::time();
       my $o=getModuleObject($Config,$servicedef->{$s}->{dataobj});
       my @view;
+      my $idfield;
       if (defined($o)){
          my @res=$o->showFields();
-         my $idfield;
          foreach my $fld (@res){
             if ($fld->{type} eq "Id"){
                $idfield=$fld->{type};
