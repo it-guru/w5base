@@ -6,4 +6,6 @@
 'Prio of affected config item'=>{de=>'Prio des betroffenen Config-Items'},
 'affected orgarea'=>{de=>'betroffener Organisationsbereich'},
 'affected customer'=>{de=>'betroffener Kunde'},
+'Expiration-Date'=>{de=>'Verfallsdatum'},
+'Active'=>{de=>'Aktiv'},
 

@@ -22,3 +22,4 @@ create table itil_infoabo (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
 alter table itil_infoabo add eventmode varchar(20) default NULL;
+alter table itil_infoabo add active bool default '1';

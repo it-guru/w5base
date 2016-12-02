@@ -1335,6 +1335,7 @@ sub addComplexAbos
                  affectedcustomerid=>[keys(%allcustomer)],
                  affectedorgareaid=>[keys(%allorgarea)],
                  eventmode=>[$WfRec->{eventmode},undef],
+                 active=>\'1',
                  });
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass},undef],
@@ -1342,6 +1343,7 @@ sub addComplexAbos
                  affectedcustomerid=>[keys(%allcustomer)],
                  affectedorgareaid=>[undef],
                  eventmode=>[$WfRec->{eventmode},undef],
+                 active=>\'1',
                  });
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass},undef],
@@ -1349,12 +1351,14 @@ sub addComplexAbos
                  affectedcustomerid=>[undef],
                  affectedorgareaid=>[keys(%allorgarea)],
                  eventmode=>[$WfRec->{eventmode},undef],
+                 active=>\'1',
                  });
    }
    elsif ($WfRec->{eventmode} eq "EVk.net"){
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass}],
-                 eventmode=>[$WfRec->{eventmode},undef]
+                 eventmode=>[$WfRec->{eventmode},undef],
+                 active=>\'1',
                  });
    }
    elsif ($WfRec->{eventmode} eq "EVk.infraloc"){
@@ -1384,7 +1388,8 @@ sub addComplexAbos
                  affecteditemprio=>[$WfRec->{affecteditemprio},undef],
                  affectedcustomerid=>[keys(%allcustomer),undef],
                  affectedorgareaid=>[undef],
-                 eventmode=>[$WfRec->{eventmode},undef]
+                 eventmode=>[$WfRec->{eventmode},undef],
+                 active=>\'1',
                  });
       push(@flt,{mode=>\'eventinfo',cistatusid=>[3,4],
                  nativeventstatclass=>[$WfRec->{eventstatclass},undef],
@@ -1392,6 +1397,7 @@ sub addComplexAbos
                  affectedcustomerid=>[undef],
                  affectedorgareaid=>[keys(%allorgarea)],
                  eventmode=>[$WfRec->{eventmode},undef],
+                 active=>\'1',
                  });
    }
    elsif ($WfRec->{eventmode} eq "EVk.bprocess"){
@@ -1410,7 +1416,8 @@ sub addComplexAbos
                     affecteditemprio=>[$WfRec->{affecteditemprio},undef],
                     affectedcustomerid=>[keys(%allcustomer)],
                     affectedorgareaid=>[undef],
-                    eventmode=>[$WfRec->{eventmode},undef]
+                    eventmode=>[$WfRec->{eventmode},undef],
+                    active=>\'1',
                     });
       }
    }
@@ -1420,12 +1427,14 @@ sub addComplexAbos
                  affecteditemprio=>[$WfRec->{affecteditemprio},undef],
                  affectedcustomerid=>[undef],
                  affectedorgareaid=>[undef],
-                 eventmode=>[$WfRec->{eventmode},undef]
+                 eventmode=>[$WfRec->{eventmode},undef],
+                 active=>\'1',
                  });
    }
    if ($#flt!=-1){
       $complexabo->SetFilter(\@flt);
       foreach my $rec ($complexabo->getHashList(qw(email))){
+print STDERR ">>> ".$rec->{email}."\n" if ($rec->{email}=~m/adam/);
          $emailto->{$rec->{email}}++;
       }
    }

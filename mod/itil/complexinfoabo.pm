@@ -85,6 +85,13 @@ sub new
                 label         =>'Contact CI-StateID',
                 dataobjattr   =>'contact.cistatus'),
 
+      new kernel::Field::Boolean(
+                name          =>'active',
+                label         =>'Active',
+                htmleditwidth =>'30%',
+                default       =>1,
+                dataobjattr   =>'itil_infoabo.active'),
+
       new kernel::Field::Date(
                 name          =>'expiration',
                 label         =>'Expiration-Date',
