@@ -166,19 +166,19 @@ sub ItemSummary
       my @softstate;
       my $l1=getModuleObject($self->Config,"itil::lnksoftwaresystem");
       my $l2=getModuleObject($self->Config,"itil::lnksoftwareitclustsvc");
-      my @swview=qw(fullname denyupd denyupdcomments 
+      my @swview=qw(fullname denyupd denyupdcomments software version instpath
                     softwareinstrelstate is_dbs is_mw
                     urlofcurrentrec);
       $l1->ResetFilter();
       $l1->SetFilter({applications    =>\$current->{name},
                       softwareset     =>$rm->{name},
                       systemcistatusid=>"!6"});
-      my @l1=$l1->getHashList(@swview);
+      my @l1=$l1->getHashList(@swview,"systemsystemid");
       $l2->ResetFilter();
       $l2->SetFilter({applications    =>\$current->{name},
                       softwareset     =>$rm->{name},
                       itclustcistatus =>"!6"});
-      my @l2=$l2->getHashList(@swview);
+      my @l2=$l2->getHashList(@swview,"itclustsvc");
       push(@softstate,{
          roadmap=>$rm->{name},
          i=>[@l1,@l2]
