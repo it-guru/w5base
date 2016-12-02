@@ -109,7 +109,8 @@ sub qcheckRecord
                if (($r->{role} eq "Project Manager IT-System" ||
                     $r->{role} eq "Project Manager IT-Application") &&
                    $r->{email} ne ""){
-                  my $pmid=$user->GetW5BaseUserID($r->{email},"email");
+                  my $pmid=$user->GetW5BaseUserID($r->{email},"email",
+                                                  {quiet=>1});
                   if ($pmid ne ""){
                      $pm_soll{$pmid}++;
                   }
