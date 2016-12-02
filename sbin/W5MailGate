@@ -178,6 +178,9 @@ if (defined($m)){
             $io->close();
             my $fromemail=$useremail;
             my $name=$mailhead->get("Subject");
+            if ($name eq ""){
+               $name="-- NO SUBJECT --";
+            }
             if ($isdelerror && defined($email)){ # check on delivery error
                $name="Bounce";
                $fromemail=$email;
