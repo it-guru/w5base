@@ -142,6 +142,9 @@ if (defined($m)){
             $tag.=" VL:";
          }
          my $subject=$mailhead->get("Subject");
+         if ($subject eq ""){
+            $subject="-- NO SUBJECT --";
+         }
          my $qtag=quotemeta($tag);
          if (!($subject=~m/$tag/i)){
             $subject=$tag." ".$subject;
