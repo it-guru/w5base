@@ -36,8 +36,8 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("wfstatmail","SendMyJobs");
-   $self->RegisterEvent("wfstatsend","SendMyJobs");
+   $self->RegisterEvent("wfstatmail","SendMyJobs",timeout=>7200);
+   $self->RegisterEvent("wfstatsend","SendMyJobs",timeout=>7200);
    return(1);
 }
 
