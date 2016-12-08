@@ -93,7 +93,7 @@ sub Init
 
 
    $self->RegisterEvent("RefreshSAP",
-                        "RefreshSAP",timeout=>21600); # =6h
+                        "RefreshSAP",timeout=>25200); # =7h
    return(1);
 }
 
