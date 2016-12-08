@@ -1434,7 +1434,6 @@ sub addComplexAbos
    if ($#flt!=-1){
       $complexabo->SetFilter(\@flt);
       foreach my $rec ($complexabo->getHashList(qw(email))){
-print STDERR ">>> ".$rec->{email}."\n" if ($rec->{email}=~m/adam/);
          $emailto->{$rec->{email}}++;
       }
    }
