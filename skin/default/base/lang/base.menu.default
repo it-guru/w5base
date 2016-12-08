@@ -39,6 +39,8 @@
 'sysadm.location.lnklocationcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'sysadm.location.lnklocationgrp'=>{de=>'Verkn. Organisation',en=>'Link Org'},
 'sysadm.location.lnklocationinteranswer'=>{de=>'Interview',en=>'Interview'},
+'sysadm.location.campus'=>{de=>'Campus',en=>'Campus'},
+'sysadm.location.campus.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.grp.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.grp.treecreate'=>{de=>'TreeCreate',en=>'TreeCreate'},
 'sysadm.grp.rel'=>{de=>'Userzuordnungen',en=>'User-Relations'},
