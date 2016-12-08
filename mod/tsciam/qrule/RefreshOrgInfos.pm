@@ -34,6 +34,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::QRule;
+use tsciam::ext::orgareaImport;
 @ISA=qw(kernel::QRule);
 
 sub new
@@ -123,9 +124,10 @@ sub qcheckRecord
          if (exists($rec->{additional}->{tOuSD}) &&
              ref($rec->{additional}->{tOuSD}) eq "ARRAY"){
             $oldtousd=$rec->{additional}->{tOuSD}->[0];
-            $oldtousd=tsciam::orgarea::preFixShortname($oldtousd);
+            $oldtousd=tsciam::ext::orgareaImport::preFixShortname($oldtousd);
          }
-         $curtousd=tsciam::orgarea::preFixShortname($ciamrec->{shortname});
+         $curtousd=tsciam::ext::orgareaImport::preFixShortname(
+                                                  $ciamrec->{shortname});
          if ($oldtousd ne "" && $oldtousd eq $rec->{name}){
             if ($oldtousd ne $curtousd){
                my $basemsg="Rename of Org '$rec->{fullname}' needed - ".
