@@ -854,7 +854,7 @@ sub SendXmlToAM_appl
                                  tenant=>\'CS'
                               },
                               {
-                                 email=>\$rec->{email}
+                                 email=>\$rec->{email},
                                  deleted=>\'0',
                               }
                            ]);
