@@ -50,11 +50,6 @@ sub new
                 label         =>'No.'),
 
 
-      new kernel::Field::Text(
-                name          =>'code',
-                label         =>'BarCode',
-                dataobjattr   =>'amlocation.barcode'),
-
       new kernel::Field::Id(
                 name          =>'locationid',
                 label         =>'LocationID',
@@ -190,6 +185,12 @@ sub new
                    return("../../base/iomap/MapTester?$q");
                 }),
 
+      new kernel::Field::Text(
+                name          =>'code',
+                group         =>'source',
+                label         =>'BarCode',
+                dataobjattr   =>'amlocation.barcode'),
+
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
@@ -232,7 +233,14 @@ sub findW5LocID
    $newrec->{cistatusid}="4";
 
    return(undef) if ($newrec->{address1}=~m/^\s*$/);
-   return(undef) if ($newrec->{location}=~m/^\s*$/);
+
+   # Vorsichtige Annäherung: Eigentlich sollte es keine technische 
+   # Begründung geben, warum nicht auch ohne location ein IOMapping 
+   # gestartet werdend darf. Da ich bei Mainz Robert Koch Strasse 50
+   # mit AssetManager da ein Problem habe, deaktiviere ich die folgende
+   # Zeile
+   #return(undef) if ($newrec->{location}=~m/^\s*$/);
+   #
 
    foreach my $k (keys(%$newrec)){
       delete($newrec->{$k}) if (!defined($newrec->{$k}));
@@ -252,9 +260,9 @@ sub findW5LocID
    if ($#locid!=-1){
       return(\@locid);
    }
-   if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-      return($d);
-   }
+   #if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+   #   return($d);
+   #}
    return(undef);
 }
 
