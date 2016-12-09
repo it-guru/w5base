@@ -840,18 +840,22 @@ sub SendXmlToAM_appl
                            $acuser->SetFilter([
                               {
                                  loginname=>\$posix{$userent},
+                                 deleted=>\'0',
                                  tenant=>\'CS'
                               },
                               {
                                  ldapid=>\$posix{$userent},
+                                 deleted=>\'0',
                                  tenant=>\'CS'
                               },
                               {
                                  idno=>\$posix{$userent},
+                                 deleted=>\'0',
                                  tenant=>\'CS'
                               },
                               {
                                  email=>\$rec->{email}
+                                 deleted=>\'0',
                               }
                            ]);
                            my @l=$acuser->getHashList(qw(lempldeptid idno));
@@ -1051,7 +1055,8 @@ sub SendXmlToAM_appl
                         my $posix;
                         if ($urec->{posix} ne ""){
                            $posix=$urec->{posix};
-                           $acuser->SetFilter({ldapid=>\$urec->{posix}});
+                           $acuser->SetFilter({ldapid=>\$urec->{posix},
+                                               deleted=>\'0'});
                            $acuser->SetCurrentView(qw(lempldeptid));
                            my ($acrec,$msg)=$acuser->getFirst();
                            if (defined($acrec)){
@@ -1059,7 +1064,8 @@ sub SendXmlToAM_appl
                            }
                         }
                         elsif ($urec->{email} ne ""){
-                           $acuser->SetFilter({email=>\$urec->{email}});
+                           $acuser->SetFilter({email=>\$urec->{email},
+                                               deleted=>\'0'});
                            $acuser->SetCurrentView(qw(lempldeptid));
                            my ($acrec,$msg)=$acuser->getFirst();
                            if (defined($acrec)){
