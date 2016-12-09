@@ -49,7 +49,7 @@ sub new
                 htmlwidth     =>'250',
                 searchable    =>0,
                 onRawValue    =>\&mkFullname,
-                depend        =>['name','email','firstname']),
+                depend        =>['name','email','firstname','deleted']),
 
       new kernel::Field::Text(
                 name          =>'acfullname',
@@ -179,6 +179,9 @@ sub mkFullname
    if ($current->{email} ne ""){
       $fullname.=" " if ($fullname ne "");
       $fullname.="(".lc($current->{email}).")";
+   }
+   if ($current->{deleted}){
+      $fullname.="[0]";
    }
 
    return($fullname);
