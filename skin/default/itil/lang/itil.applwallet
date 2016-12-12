@@ -22,3 +22,4 @@
    de=>'Kein Schreibzugriff auf die angegebene Anwendung'},
 'Notification of Certificate Expiration'=>{
    de=>'Benachrichtigung über Zertifikatsverfall'},
+'Unknown file format'=>{de=>'Unbekanntes Dateiformat'},

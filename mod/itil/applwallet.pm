@@ -25,7 +25,7 @@ use kernel::Field;
 use itil::lib::Listedit;
 use Date::Parse;
 use DateTime;
-use Crypt::OpenSSL::X509;
+use Crypt::OpenSSL::X509 qw(FORMAT_PEM FORMAT_ASN1);
 
 use vars qw(@ISA);
 
@@ -312,8 +312,19 @@ sub Validate
    }
 
    if (effChangedVal($oldrec,$newrec,'sslcert')) {
-      my $x509=Crypt::OpenSSL::X509->new_from_string($newrec->{sslcert});
+      my $x509;
+      # try multiple file formats
+      eval('$x509=Crypt::OpenSSL::X509->new_from_string($newrec->{sslcert},
+                                                        FORMAT_PEM);');
+      if ($@ ne "") {
+         eval('$x509=Crypt::OpenSSL::X509->new_from_string($newrec->{sslcert},
+                                                           FORMAT_ASN1);');
+      }
 
+      if ($@ ne "") {
+         $self->LastMsg(ERROR,"Unknown file format");
+         return(0);      
+      }
    
       # Startdate / Enddate
       my $startdate=$x509->notBefore();
