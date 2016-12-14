@@ -867,7 +867,7 @@ sub getHtmlEditElements
    elsif ($irec->{questtyp} eq "select"){
       my $a="";
       $a=$answer->{answer} if (defined($answer));
-      my $sel="<select name=answer $opmode style=\"width:80px\">";
+      my $sel="<select name=answer $opmode style=\"width:100%\">";
       
       $sel.="<option ";
       $sel.="value=\"\"></option>";
