@@ -214,20 +214,25 @@ sub SecureSetFilter
    my @flt=@_;
 
    if (!$self->IsMemberOf("admin")) {
-      my @secappl;
       my $userid=$self->getCurrentUserId();
 
-      my $lnkcontactobj=getModuleObject($self->Config,'base::lnkcontact');
-      $lnkcontactobj->SetFilter({target=>\'base::user',
-                                 targetid=>\$userid,
-                                 parentobj=>\'itil::appl',
-                                 croles=>"*roles=?write?=roles* ".
-                                         "*roles=?privread?=roles*"});
-      my @authcontacts=$lnkcontactobj->getHashList(qw(refid));
-   
-      foreach my $lnkcontact (@authcontacts) {
-         push(@secappl,$lnkcontact->{refid});
-      }
+      my $applobj=getModuleObject($self->Config,'itil::appl');
+      $applobj->SetFilter([{sectarget=>\'base::user',
+                            sectargetid=>\$userid,
+                            secroles=>"*roles=?write?=roles* ".
+                                      "*roles=?privread?=roles*"},
+                           {databossid=>\$userid},
+                           {applmgrid=>\$userid},
+                           {tsmid=>\$userid},
+                           {tsm2id=>\$userid},
+                           {opmid=>\$userid},
+                           {opm2id=>\$userid},
+                           {semid=>\$userid},
+                           {sem2id=>\$userid},
+                           {delmgrid=>\$userid},
+                           {delmgr2id=>\$userid}]);
+      my @secappl=map($_->{id},$applobj->getHashList(qw(id)));
+
       push(@flt,{applid=>\@secappl});
    }
 
