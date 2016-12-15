@@ -342,6 +342,7 @@ sub addDesasterRecoveryClassFields
                 group         =>'monisla',
                 label         =>'RTO',
                 htmldetail    =>0,
+                readonly      =>1,
                 dataobjattr   =>
                                 'if (appl.disasterrecclass=\'\',NULL,'.
                                 'if (appl.disasterrecclass=0,0,'.
@@ -360,6 +361,7 @@ sub addDesasterRecoveryClassFields
                 label         =>'RPO',
                 depend        =>['drc'],
                 htmldetail    =>0,
+                readonly      =>1,
                 dataobjattr   =>
                                 'if (appl.disasterrecclass=\'\',NULL,'.
                                 'if (appl.disasterrecclass=0,0,'.
