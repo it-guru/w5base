@@ -1116,8 +1116,20 @@ sub Import
          $self->LastMsg(ERROR,"SystemID already exists in W5Base");
          return(undef);
       }
-      $identifyby=$sys->ValidatedUpdateRecord($w5sysrec,{cistatusid=>4},
-                                              {id=>\$w5sysrec->{id}});
+
+      my %newrec=(cistatusid=>4);
+      my $userid;
+
+      if ($self->isDataInputFromUserFrontend() &&
+          !$self->IsMemberOf("admin")) {
+         $userid=$self->getCurrentUserId();
+         $newrec{databossid}=$userid;
+      }
+
+      if ($sys->ValidatedUpdateRecord($w5sysrec,\%newrec,
+                                      {id=>\$w5sysrec->{id}})) {
+         $identifyby=$w5sysrec->{id};
+      }
    }
    else{
       # check 1: Assigmenen Group registered

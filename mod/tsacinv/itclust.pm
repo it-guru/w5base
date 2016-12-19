@@ -407,8 +407,20 @@ sub Import
          $self->LastMsg(ERROR,"ClusterID already exists in W5Base");
          return(undef);
       }
-      $identifyby=$itclust->ValidatedUpdateRecord($w5clustrec,{cistatusid=>4},
-                                              {id=>\$w5clustrec->{id}});
+
+      my %newrec=(cistatusid=>4);
+      my $userid;
+
+      if ($self->isDataInputFromUserFrontend() &&
+          !$self->IsMemberOf("admin")) {
+         $userid=$self->getCurrentUserId();
+         $newrec{databossid}=$userid;
+      }
+
+      if ($itclust->ValidatedUpdateRecord($w5clustrec,\%newrec,
+                                      {id=>\$w5clustrec->{id}})) {
+         $identifyby=$w5clustrec->{id};
+      }
    }
    else{
 
