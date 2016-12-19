@@ -48,7 +48,7 @@
 'Infrastructursystem'=>{de=>'Infrastruktursystem'},
 'Databaseserver'=>{de=>'Datenbankserver'},
 'Workstation'=>{de=>'Workstation/DesktopPC',en=>'Workstation/DesktopPC'},
-'you are not authorized to set other persons as databoss'=>{de=>'sie sind nicht berechtig andere Personen als Datanverantwortlicher einzutragen'},
+'you are not authorized to set other persons as databoss'=>{de=>'Sie sind nicht berechtigt, andere Personen als Datanverantwortlicher einzutragen'},
 'Room'=>{de=>'Raum'},
 'Place'=>{de=>'Platz'},
 'Application Customers'=>{de=>'Anwendungs Kunden'},
