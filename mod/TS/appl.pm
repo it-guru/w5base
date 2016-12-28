@@ -296,8 +296,8 @@ sub addDesasterRecoveryClassFields
                                 'if (appl.disasterrecclass=\'\',NULL,'.
                                 'if (appl.disasterrecclass=0,0,'.
                                 'if (appl.disasterrecclass=1,4,'.
-                                'if (appl.disasterrecclass=2,4,'.
-                                'if (appl.disasterrecclass=3,3,'.
+                                'if (appl.disasterrecclass=2,3,'.
+                                'if (appl.disasterrecclass=3,2,'.
                                 'if (appl.disasterrecclass=4,1,'.
                                 'if (appl.disasterrecclass=5,1,'.
                                 'if (appl.disasterrecclass=6,1,'.
@@ -347,8 +347,8 @@ sub addDesasterRecoveryClassFields
                                 'if (appl.disasterrecclass=\'\',NULL,'.
                                 'if (appl.disasterrecclass=0,0,'.
                                 'if (appl.disasterrecclass=1,4,'.
-                                'if (appl.disasterrecclass=2,4,'.
-                                'if (appl.disasterrecclass=3,3,'.
+                                'if (appl.disasterrecclass=2,3,'.
+                                'if (appl.disasterrecclass=3,2,'.
                                 'if (appl.disasterrecclass=4,1,'.
                                 'if (appl.disasterrecclass=5,1,'.
                                 'if (appl.disasterrecclass=6,1,'.
