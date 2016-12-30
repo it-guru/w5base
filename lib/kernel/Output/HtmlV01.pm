@@ -102,7 +102,7 @@ sub ProcessHead
 
    my $limit=$app->Limit();
    my $rows=$self->getParent->getParent->Rows();
-   if ($limit==0 || $limit>$rows){   # add web-browser table sort function
+   if ($limit==0 || $limit>=$rows){   # add web-browser table sort function
       my @sortnames;
       foreach my $field (@view){
          my $fieldname=$field->Name();
