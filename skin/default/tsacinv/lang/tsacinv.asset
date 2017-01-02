@@ -8,7 +8,7 @@
                        en=>'Maintenance'},
 'fieldgroup.components'=>{de=>'Komponenten',en=>'Components'},
 'PowerInput of Asset'=>{de=>'Stromverbrauch des Assets' },
-'Systems on Asset'=>{de=>'log. Systeme auf dem Assets' },
+'Systems on Asset'=>{de=>'log. Systeme auf dem Asset' },
 'Asset Serialnumber'=>{de=>'Asset Seriennummer' },
 'Tenant'=>{de=>'Instanz-Mieter'},
 'Age'=>{de=>'Alter'},
