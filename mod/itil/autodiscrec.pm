@@ -583,9 +583,21 @@ sub AutoDiscFormatEntry
    $d.="<div class='AutoDiscTitle' adid='$adrec->{id}'>".
        "<table padding=0 margin=0>".
        "<tr><td valign=middle>$s1".
-       $adrec->{section}.": <b>".$label."</b> @ ".
-       $rec->{name}.
-       "$s2</td>".
+       $adrec->{section}.": <b>".$label."</b> @ ";
+  
+   if ($adrec->{disc_on_systemid} ne ""){
+      my $onclick=
+         "custopenwin('../../itil/system/ById/$adrec->{disc_on_systemid}',".
+         "'normal',600,400,'_blank')";
+      $d.="<span class=sublink onclick=\"$onclick\">";
+   }
+   $d.=$rec->{name};
+   if ($adrec->{disc_on_systemid} ne ""){
+      $d.="</span>";
+   }
+
+
+   $d.="$s2</td>".
        "<td width=1%>".
        "<img border=0 height=15 class='AutoDiscDetailButton' ".
        "adid='$adrec->{id}' ".

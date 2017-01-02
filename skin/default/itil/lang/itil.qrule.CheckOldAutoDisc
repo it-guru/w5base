@@ -1,0 +1,7 @@
+'itil::qrule::CheckOldAutoDisc'=>{
+   de=>'Prüfung auf unbehandelte AutoDiscovery Daten',
+   en=>'Check on unprocessed AutoDiscovery Data'
+},
+'found unprocessed autodiscovery data'=>{
+   de=>'unbehandelte AutoDiscovery Daten vorgefunden'
+},
