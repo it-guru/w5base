@@ -208,6 +208,7 @@ sub new
                 name          =>'systemsonasset',
                 label         =>'Systems on Asset',
                 precision     =>'0',
+                searchable    =>0,
                 depend        =>[qw(lassetid)],
                 onRawValue    =>\&CalcSystemsOnAsset),
 
