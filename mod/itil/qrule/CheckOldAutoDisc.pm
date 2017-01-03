@@ -75,7 +75,7 @@ sub qcheckRecord
 
    my $ad=getModuleObject($self->getParent->Config,'itil::autodiscrec');
    $ad->SetFilter({disc_on_systemid=>\$rec->{id},
-                   cdate=>'<now-14d',
+                   cdate=>'<now-84d',
                    state=>[1],
                    processable=>\'1'});
    if ($ad->CountRecords()>0){
