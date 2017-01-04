@@ -304,6 +304,19 @@ sub Init
                       "itil::lnkassetcontact",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itil.asset.itfarm",
+                      "itil::itfarm",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.asset.itfarm.new",
+                      "itil::itfarm",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.asset.itfarm.lnkitfarmasset",
+                      "itil::lnkitfarmasset",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itil.liccontract",
                       "itil::liccontract",
                       defaultacl=>['valid_user']);

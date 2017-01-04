@@ -150,6 +150,22 @@ sub isWriteOnApplValid
    return(0);
 }
 
+sub isWriteOnITFarmValid
+{
+   my $self=shift;
+   my $itfarmid=shift;
+   my $group=shift;
+
+   my $itfarm=$self->getPersistentModuleObject("itil::itfarm");
+   $itfarm->SetFilter({id=>\$itfarmid});
+   my ($arec,$msg)=$itfarm->getOnlyFirst(qw(ALL));
+   my @g=$itfarm->isWriteValid($arec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
 sub isWriteOnApplGrpValid
 {
    my $self=shift;

@@ -91,6 +91,16 @@ sub new
                 dataobjattr   =>'asset.databoss'),
 
       new kernel::Field::TextDrop(
+                name          =>'itfarm',
+                group         =>'physasset',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'Serverfarm',
+                vjointo       =>'itil::lnkitfarmasset',
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>'itfarm'),
+
+      new kernel::Field::TextDrop(
                 name          =>'hwmodel',
                 htmlwidth     =>'130px',
                 group         =>'physasset',

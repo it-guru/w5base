@@ -1,0 +1,3 @@
+'itil::lnkitfarmasset'=>{de=>'Serverfarm - Hardware Verknüpfung',
+                         en=>'Serverfarm - Asset Relation'},
+'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},

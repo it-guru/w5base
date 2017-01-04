@@ -755,6 +755,16 @@ sub new
                 vjoindisp     =>'locationid'),
 
       new kernel::Field::TextDrop(
+                name          =>'itfarm',
+                group         =>'physys',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'Serverfarm',
+                vjointo       =>'itil::lnkitfarmasset',
+                vjoinon       =>['assetid'=>'assetid'],
+                vjoindisp     =>'itfarm'),
+
+      new kernel::Field::TextDrop(
                 name          =>'hwmodel',
                 readonly      =>1,
                 weblinkto     =>'none',

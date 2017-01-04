@@ -303,6 +303,19 @@ sub Init
                       "itil::lnkassetcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.asset.itfarm",
+                      "AL_TCom::itfarm",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.asset.itfarm.new",
+                      "AL_TCom::itfarm",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.asset.itfarm.lnkitfarmasset",
+                      "AL_TCom::lnkitfarmasset",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.liccontract",
                       "itil::liccontract",
                       defaultacl=>['valid_user']);
