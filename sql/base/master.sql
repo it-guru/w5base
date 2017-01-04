@@ -811,6 +811,7 @@ create table campus (
   plocationid bigint(20),
   locationid  bigint(20)   NOT NULL,
   label      varchar(40), databoss bigint(20) not null,
+  additional blob,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',
@@ -821,8 +822,7 @@ create table campus (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  FOREIGN KEY fk_campus_databoss (databoss)
-  REFERENCES contact (userid) ON DELETE RESTRICT,
+  KEY fullnamek(fullname),key label(label),
   UNIQUE KEY loc (locationid), UNIQUE KEY fullname(isprim,fullname),
-  UNIQUE KEY `srcsys` (srcsys,srcid),unique key campusid(campusid)
+  UNIQUE KEY `srcsys` (srcsys,srcid),key campusid(campusid)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
