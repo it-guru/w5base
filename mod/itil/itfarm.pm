@@ -80,6 +80,12 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'itfarm.cistatus'),
 
+      new kernel::Field::Databoss(),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'itfarm.databoss'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Farm name',
@@ -184,8 +190,29 @@ sub new
                 group         =>'source',
                 label         =>'real Editor Account',
                 dataobjattr   =>'itfarm.realeditor'),
-   
 
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'itfarm.lastqcheck'),
+      new kernel::Field::QualityResponseArea(),
    );
    $self->setDefaultView(qw(fullname cistatus mdate cdate));
    $self->setWorktable("itfarm");
@@ -199,6 +226,23 @@ sub new
                          uniquesize=>255};
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable left outer join lnkcontact ".
+            "on lnkcontact.parentobj='$selfasparent' ".
+            "and $worktable.id=lnkcontact.refid ";
+
+   return($from);
+}
+
+
 
 
 sub initSearchQuery
@@ -225,9 +269,9 @@ sub SecureValidate
    my $newrec=shift;
    my $wrgroups=shift;
 
-   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
-      return(0);
-   }
+   #if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+   #   return(0);
+   #}
    return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
@@ -237,9 +281,10 @@ sub getDetailBlockPriority
    return( qw(header default assets systems contacts  attachments source));
 }
 
-
-
-
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::itfarm");
+}
 
 
 
@@ -274,36 +319,32 @@ sub Validate
       return(0);
    }
 
-
-
    if (!defined($oldrec) || $oldrec->{fullname} ne $fullname){
       $newrec->{fullname}=$fullname;
    }
 
 
-
-#   my $name=effVal($oldrec,$newrec,"name");
-#   if ($name=~m/^AIX/i){
-#      $newrec->{osclass}="AIX";
-#   }
-#   elsif ($name=~m/linux/i){
-#      $newrec->{osclass}="LINUX";
-#   }
-#   elsif ($name=~m/^(solaris)/i){
-#      $newrec->{osclass}="SOLARIS";
-#   }
-#   elsif ($name=~m/^(HPUX|HP-UX)/i){
-#      $newrec->{osclass}="HPUX";
-#   }
-#   elsif ($name=~m/^(win)/i){
-#      $newrec->{osclass}="WIN";
-#   }
-#   elsif ($name=~m/^(os\/390|osd|z\/OS|z\/VM)/i){
-#      $newrec->{osclass}="MAINFRAME";
-#   }
-#   else{
-#      $newrec->{osclass}="MISC";
-#   }
+   ########################################################################
+   # standard security handling
+   #
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      my $userid=$self->getCurrentUserId();
+      if (!defined($oldrec)){
+         if (!defined($newrec->{databossid}) ||
+             $newrec->{databossid}==0){
+            my $userid=$self->getCurrentUserId();
+            $newrec->{databossid}=$userid;
+         }
+      }
+      if (defined($newrec->{databossid}) &&
+          $newrec->{databossid}!=$userid &&
+          $newrec->{databossid}!=$oldrec->{databossid}){
+         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
+                              "as databoss");
+         return(0);
+      }
+   }
+   ########################################################################
   
    return(1);
 }
@@ -336,10 +377,45 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-
    my $userid=$self->getCurrentUserId();
-   return("default","assets") if (!defined($rec) ||
-                         $self->IsMemberOf($self->{CI_Handling}->{activator}));
+
+   my @databossedit=qw(default assets contacts);
+
+
+   if (!defined($rec)){
+      return(@databossedit);
+   }
+   else{
+      if ($rec->{databossid}==$userid){
+         return(@databossedit);
+      }
+      if ($self->IsMemberOf("admin")){
+         return(@databossedit);
+      }
+      if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+         my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                     ["RMember"],"both");
+         my @grpids=keys(%grps);
+         foreach my $contact (@{$rec->{contacts}}){
+            if ($contact->{target} eq "base::user" &&
+                $contact->{targetid} ne $userid){
+               next;
+            }
+            if ($contact->{target} eq "base::grp"){
+               my $grpid=$contact->{targetid};
+               next if (!grep(/^$grpid$/,@grpids));
+            }
+            my @roles=($contact->{roles});
+            @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+            return(@databossedit) if (grep(/^write$/,@roles));
+         }
+      }
+      if ($rec->{mandatorid}!=0 &&
+         $self->IsMemberOf($rec->{mandatorid},["RCFManager","RCFManager2"],
+                           "down")){
+         return(@databossedit);
+      }
+   }
    return(undef);
 }
 

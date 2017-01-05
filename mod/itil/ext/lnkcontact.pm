@@ -118,6 +118,16 @@ sub getPosibleRoles
              "write"           =>$self->getParent->T("write",
                                                      $self->Self));
    }
+   if ($parentobj=~m/^.+::itfarm$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::itfarm$/)){
+      return(
+             "read"            =>$self->getParent->T("read",
+                                                     $self->Self),
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self));
+   }
    if ($parentobj=~m/^.+::liccontract$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&

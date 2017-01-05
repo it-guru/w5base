@@ -1,4 +1,5 @@
 'itil::itfarm'=>{de=>'Serverfarm',en=>'Serverfarm'},
 'Combound'=>{de=>'Verbund'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
 'fieldgroup.assets'=>{de=>'Hardware',en=>'Assets'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},

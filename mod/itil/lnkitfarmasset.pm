@@ -55,6 +55,11 @@ sub new
                 label         =>'Serverfarm ID',
                 dataobjattr   =>'lnkitfarmasset.itfarm'),
 
+      new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'Fullname',
+                dataobjattr   =>"concat(itfarm.fullname,'-',asset.name)"),
+
       new kernel::Field::TextDrop(
                 name          =>'asset',
                 htmlwidth     =>'250px',
@@ -167,10 +172,14 @@ sub getSqlFrom
 {
    my $self=shift;
    my $mode=shift;
-   my @filter=@_;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
 
-   my $from="lnkitfarmasset left outer join asset ".
-            "on lnkitfarmasset.asset=asset.id ";
+
+   my $from="$worktable left outer join asset ".
+            "on lnkitfarmasset.asset=asset.id ".
+            "left outer join itfarm ".
+            "on lnkitfarmasset.itfarm=itfarm.id";
 
    return($from);
 }
@@ -183,6 +192,18 @@ sub getRecordImageUrl
    return("../../../public/itil/load/lnkitfarmasset.jpg?".$cgi->query_string());
 }
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::lnkitfarmasset");
+}
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
 
 
 sub getDetailBlockPriority
@@ -232,12 +253,12 @@ sub isWriteValid
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my @editgroup=("default");
 
-
-   return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default") if ($self->IsMemberOf("admin"));
-#   return("default") if (!$self->isDataInputFromUserFrontend() &&
-#                         !defined($oldrec));
+   return(@editgroup) if (!defined($oldrec) && !defined($newrec));
+   my $itfarmid=$oldrec->{itfarmid};
+   return(@editgroup) if ($self->IsMemberOf("admin"));
+   return(@editgroup) if ($self->isWriteOnITFarmValid($itfarmid,"assets"));
 
    return(undef);
 }

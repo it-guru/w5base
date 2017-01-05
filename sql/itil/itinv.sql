@@ -1559,8 +1559,8 @@ create table itfarm (
   realeditor varchar(100) NOT NULL default '',
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(20) default NULL,
-  srcload    datetime    default NULL,
-  PRIMARY KEY  (id),
+  srcload    datetime    default NULL, lastqcheck datetime default NULL,
+  PRIMARY KEY  (id),KEY lastqcheck(lastqcheck),
   UNIQUE KEY itfarmid (itfarmid),
   UNIQUE KEY name (name),KEY(mandator),
   UNIQUE KEY `srcsys` (srcsys,srcid)

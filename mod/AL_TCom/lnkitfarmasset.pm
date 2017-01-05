@@ -1,4 +1,4 @@
-package AL_TCom::itfarmasset;
+package AL_TCom::lnkitfarmasset;
 #  W5Base Framework
 #  Copyright (C) 2017  Hartmut Vogler (it@guru.de)
 #
@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use TS::itfarmasset;
-@ISA=qw(TS::itfarmasset);
+use TS::lnkitfarmasset;
+@ISA=qw(TS::lnkitfarmasset);
 
 sub new
 {

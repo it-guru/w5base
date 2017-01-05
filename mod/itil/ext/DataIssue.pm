@@ -56,6 +56,11 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'itil::itfarm',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'itil::custcontract',
              target    =>'name',
              targetid  =>'id'
@@ -116,6 +121,7 @@ sub DataIssueCompleteWriteRequest
        ($affectedobject=~m/::itclust$/) ||
        ($affectedobject=~m/::mgmtitemgroup$/) ||
        ($affectedobject=~m/::businessservice$/) ||
+       ($affectedobject=~m/::itfarm$/) ||
        ($affectedobject=~m/::applnor$/) ||
        ($affectedobject=~m/::appladv$/) ||
        ($affectedobject=~m/::lnkapplurl$/) ||
