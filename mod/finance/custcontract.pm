@@ -68,7 +68,7 @@ sub new
                 name          =>'conumber',
                 htmlwidth     =>'100px',
                 label         =>'Costcenter',
-                weblinkto     =>'itil::costcenter',
+                weblinkto     =>'finance::costcenter',
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'custcontract.conumber'),
 
