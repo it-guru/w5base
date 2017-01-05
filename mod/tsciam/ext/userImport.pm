@@ -48,6 +48,8 @@ sub getImportIDFieldHelp
    my $o=getModuleObject($self->getParent->Config,'tsciam::user');
    my $txt='CIAM: ';
    $txt.=$o->getField('tcid')->Label();
+   $txt.='|';
+   $txt.=$o->getField('wiwid')->Label();
 
    return($txt);
 }
@@ -66,7 +68,12 @@ sub processImport
    my $flt; 
 
    if ($useAs eq "dsid"){
-      $flt={tcid=>\$name,active=>"true"};
+      if (trim($name)=~m/^\d+$/) {
+         $flt={tcid=>\$name,active=>"true"};
+      }
+      else {
+         $flt={wiwid=>\$name,active=>"true"};
+      }
    }
    if ($useAs eq "email"){
       $flt={email=>\$name,active=>"true",primary=>"true"};

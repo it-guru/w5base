@@ -1990,7 +1990,15 @@ sub GetW5BaseUserID
       }
       if ($loopcnt==0){
          # try Import
-         foreach my $k ($self->getImportObjs($name,$useAs,$param)) {
+
+         # e.g. 'tsciam::hans' forces import of user hans from ciam only
+         my @parts=split('::',$name,2); 
+         if ($#parts>0) {
+            ($param->{force},$name)=@parts;
+         }
+
+         my @iobj=$self->getImportObjs($name,$useAs,$param);
+         foreach my $k (@iobj) {
             msg(INFO,"try Import for $name ($useAs) with=$k");
             if (my $userid=$self->{userImport}->{$k}->processImport(
                    $name,$useAs,$param)){
@@ -2012,17 +2020,26 @@ sub getImportObjs
    my $name=shift;
    my $useAs=shift;
    my $param=shift;
+   my @ret;
 
    if (!exists($self->{userImport})){
       $self->LoadSubObjs("ext/userImport","userImport");
    }
+
+   if (defined($param->{force})) {
+      my $src=$param->{force}.'::ext::userImport';
+      push(@ret,$src) if (exists($self->{userImport}{$src}));
+      return(@ret);
+   }
+   
    my %p;
    foreach my $k (sort(keys(%{$self->{userImport}}))){
      my $q=$self->{userImport}->{$k}->getQuality($name,$useAs,$param);
      $p{$k}=$q;
    }
 
-   return(sort({$p{$a}<=>$p{$b}} keys(%p)));
+   @ret=sort({$p{$a}<=>$p{$b}} keys(%p));
+   return(@ret);
 }
 
 
@@ -2034,7 +2051,7 @@ sub ImportUser
    my %param=(quiet=>1);
 
    my $importnames=Query->Param("importname");
-   my @importname=split(/\s+/,$importnames);
+   my @importname=split(/\s+/,trim($importnames));
    my @imported; # imported contacts
 
    my @idhelp=();

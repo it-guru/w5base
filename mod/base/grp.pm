@@ -1233,7 +1233,15 @@ sub GetW5BaseGrpID
       }
       if ($loopcnt==0){
          # try Import
-         foreach my $k ($self->getImportObjs($name,$useAs,$param)) {
+
+         # e.g. 'tsciam::1234' forces import of group 1234 from ciam only
+         my @parts=split('::',$name,2);
+         if ($#parts>0) {
+            ($param->{force},$name)=@parts;
+         }
+
+         my @iobj=$self->getImportObjs($name,$useAs,$param);
+         foreach my $k (@iobj) {
             msg(INFO,"try Import for $name ($useAs) with=$k");
             if (my $grpid=$self->{orgareaImport}->{$k}->processImport(
                    $name,$useAs,$param)){
@@ -1255,17 +1263,26 @@ sub getImportObjs
    my $name=shift;
    my $useAs=shift;
    my $param=shift;
+   my @ret;
 
    if (!exists($self->{orgareaImport})){
       $self->LoadSubObjs("ext/orgareaImport","orgareaImport");
    }
+
+   if (defined($param->{force})) {
+      my $src=$param->{force}.'::ext::orgareaImport';
+      push(@ret,$src) if (exists($self->{orgareaImport}{$src}));
+      return(@ret);
+   }
+
    my %p;
    foreach my $k (sort(keys(%{$self->{orgareaImport}}))){
      my $q=$self->{orgareaImport}->{$k}->getQuality($name,$useAs,$param);
      $p{$k}=$q;
    }
 
-   return(sort({$p{$a}<=>$p{$b}} keys(%p)));
+   @ret=sort({$p{$a}<=>$p{$b}} keys(%p));
+   return(@ret);
 }
 
 
@@ -1277,7 +1294,7 @@ sub ImportOrgarea
    my %param=(quiet=>1);
 
    my $importnames=Query->Param("importname");
-   my @importname=split(/\s+/,$importnames);
+   my @importname=split(/\s+/,trim($importnames));
    my @imported; # imported orgareas
 
    my @idhelp=();
