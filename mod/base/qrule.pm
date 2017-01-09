@@ -219,30 +219,42 @@ sub calcParentAndObjlist
    $cache=$cache->{QualityRuleCompat};
 
    my $parentTransformationCount=0;
+   my $nonAnyRules=0;
    if ($parent->Self() ne "base::workflow"){
       if (!exists($cache->{$orgParentName})){
-         foreach my $lnkrec (@$potentialRuleList){
+         my @ruleorder=sort({
+            $b->{mandatorid}<=>$a->{mandatorid}  # Every Any Regel must be
+                                                 # processed at the end!
+         } @$potentialRuleList);
+         foreach my $lnkrec (@ruleorder){
             my $do=$self->getPersistentModuleObject($lnkrec->{dataobj});
             if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
                if ($parent->Self() ne $do->Self()){
-                  if ($parentTransformationCount==0){
-                     # rec muß neu gelesen werden!
-                     my $reloadedRec=$self->reloadRec($do,$rec);
-                     if (!defined($reloadedRec)){
-                        msg(ERROR,"parent transformation error ".
-                                  "while reread rec");
-                        return();
-                     }
-                     ${$calledRec}=$reloadedRec; # return new rec to caller
-                     $rec=$reloadedRec;
-                     $objlist=$do->getQualityCheckCompat($rec); 
-                     msg(INFO,"qrule parent transformation ".
-                              "from %s to %s done",
-                              $parent->Self(),$do->Self());
-                     $parent=$do;
+                  if ($lnkrec->{mandatorid}!=0){
+                     $parentTransformationCount++;
                   }
-                  else{
-                     msg(ERROR,"mulitple parent transformation detected");
+                  if ($b->{mandatorid}==0 && $parentTransformationCount!=0){
+                     # any rules are only allowed to do parentTransformation
+                     # if no other rules are exists
+                     if ($parentTransformationCount==0){
+                        # rec muß neu gelesen werden!
+                        my $reloadedRec=$self->reloadRec($do,$rec);
+                        if (!defined($reloadedRec)){
+                           msg(ERROR,"parent transformation error ".
+                                     "while reread rec");
+                           return();
+                        }
+                        ${$calledRec}=$reloadedRec; # return new rec to caller
+                        $rec=$reloadedRec;
+                        $objlist=$do->getQualityCheckCompat($rec); 
+                        msg(INFO,"qrule parent transformation ".
+                                 "from %s to %s done",
+                                 $parent->Self(),$do->Self());
+                        $parent=$do;
+                     }
+                     else{
+                        msg(ERROR,"mulitple parent transformation detected");
+                     }
                   }
                }
             }
@@ -319,7 +331,7 @@ sub calcFinalQruleList
    }
    #######################################################################
 
-   my @potentialRuleList=$lnkr->getHashList(qw(mdate qruleid dataobj));
+   my @potentialRuleList=$lnkr->getHashList(qw(mdate qruleid mandatorid dataobj));
 
    #######################################################################
    # Notwendige Parent-Transformation prüfen
