@@ -134,7 +134,11 @@ sub qcheckRecord
             }                            # per Import geladen werden
          }
          elsif($#l>0){
-            printf STDERR ("mysterious effect in qrule for $rec->{name}\n");
+            printf STDERR ("\nThe System with W5BaseID $rec->{id} has been\n");
+            printf STDERR ("created with 'New' but AssetManager Import\n");
+            printf STDERR ("seems to be the correct way.(Name=$rec->{name})\n");
+            printf STDERR ("The name is not unique in AM, so the problem\n");
+            printf STDERR ("can not be fixed automaticly.\n");
          }
       }
    }
