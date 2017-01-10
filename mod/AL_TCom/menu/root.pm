@@ -544,6 +544,15 @@ sub Init
                       prio=>10,
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.proc.ChangeManagement.Campus",
+                      "TS::campus",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("AL_TCom.proc.ChangeManagement.Campus.new",
+                      "TS::campus",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.proc.softmgmt",
                       "itil::softwareset",
                       func=>'MainWithNew',

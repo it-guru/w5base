@@ -148,6 +148,26 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'campus.modifydate'),
 
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'campus.srcsys'),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                label         =>'Source-Id',
+                dataobjattr   =>'campus.srcid'),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                label         =>'Source-Load',
+                dataobjattr   =>'campus.srcload'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',

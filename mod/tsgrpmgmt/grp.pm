@@ -354,7 +354,7 @@ sub isCopyValid
 {
    my $self=shift;
    my $copyfrom=shift;
-   return(1);
+   return(0);
 }
 
 
