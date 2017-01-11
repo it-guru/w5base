@@ -229,11 +229,12 @@ sub calcParentAndObjlist
          foreach my $lnkrec (@ruleorder){
             my $do=$self->getPersistentModuleObject($lnkrec->{dataobj});
             if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
+               if ($lnkrec->{mandatorid}!=0){
+                  $nonAnyRules++;
+               }
                if ($parent->Self() ne $do->Self()){
-                  if ($lnkrec->{mandatorid}!=0){
-                     $parentTransformationCount++;
-                  }
-                  if ($b->{mandatorid}==0 && $parentTransformationCount!=0){
+                  if (($lnkrec->{mandatorid}==0 && $nonAnyRules==0) ||
+                      ($lnkrec->{mandatorid}!=0)){
                      # any rules are only allowed to do parentTransformation
                      # if no other rules are exists
                      if ($parentTransformationCount==0){
