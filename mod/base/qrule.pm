@@ -253,7 +253,8 @@ sub calcParentAndObjlist
                         $parent=$do;
                      }
                      else{
-                        msg(ERROR,"mulitple parent transformation detected");
+                        msg(ERROR,"mulitple parent transformation detected ".
+                                  "in ".$lnkrec->{dataobj});
                      }
                   }
                }
