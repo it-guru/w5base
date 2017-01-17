@@ -63,6 +63,7 @@ sub Init
    $self->RegisterEvent("putacappl","SendXmlToAM_appl",timeout=>40000);
    $self->RegisterEvent("SendXmlToAM_system","SendXmlToAM_system",timeout=>40000);
    $self->RegisterEvent("SendXmlToAM_asset","SendXmlToAM_asset",timeout=>40000);
+   $self->RegisterEvent("SendXmlToAM_campus","SendXmlToAM_campus");
 
 
    #######################################################################
@@ -641,6 +642,96 @@ sub SendXmlToAM_instance
 
    $self->TransferFile($fh{ci_appl_rel},$filename{ci_appl_rel}, "ci_appl_rel");
    my $back=$self->TransferFile($fh{instance},$filename{instance},"instance");
+
+   return($back);
+}
+
+
+sub SendXmlToAM_campus
+{
+   my $self=shift;
+   my @w5id=@_;
+
+   my $elements=0;
+   my $acappl=getModuleObject($self->Config,"tsacinv::appl");
+   my $campus=getModuleObject($self->Config,"TS::campus");
+   my $user=getModuleObject($self->Config,"base::user");
+   my $acuser=getModuleObject($self->Config,"tsacinv::user");
+
+   my %filter=(cistatusid=>['3','4','5']);
+   $self->{DebugMode}=0;
+   if ($#w5id!=-1){
+      if (in_array(\@w5id,"debug")){
+         @w5id=grep(!/^debug$/i,@w5id);
+         $self->{DebugMode}=1;
+         msg(ERROR,"processing DebugMode - loading ids '%s'",join(",",@w5id));
+      }
+      $filter{id}=\@w5id;
+   }
+
+   $campus->SetFilter(\%filter);
+   $campus->SetCurrentView(qw(ALL));
+
+   my (%fh,%filename);
+   ($fh{campus},      $filename{campus}               )=$self->InitTransfer();
+
+
+   my ($rec,$msg)=$campus->getFirst();
+   $self->{jobstart}=NowStamp();
+   my %grpnotfound;
+   if (defined($rec)){
+      do{
+         my $jobname="W5Base.$self->{jobstart}.".NowStamp().
+                     '.Campus_'.$rec->{id};
+         msg(INFO,"process campus=$rec->{name} jobname=$jobname");
+         my $CurrentEventId="Add Campus $rec->{name} ($rec->{id})";
+         my $acapplrec;
+         if ($rec->{campusid} ne ""){
+            $acappl->ResetFilter();
+            $acappl->SetFilter({applid=>\$rec->{campusid}});
+            ($acapplrec,$msg)=$acappl->getOnlyFirst(qw(id applid
+                                                       assignmentgroup));
+        
+         }
+         else{
+            $acappl->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+            ($acapplrec,$msg)=$acappl->getOnlyFirst(qw(id applid
+                                                       assignmentgroup));
+            die("AssetManager not online") if (!$acappl->Ping());
+            if (defined($acapplrec) && $acapplrec->{applid} ne ""){
+               $campus->UpdateRecord({campusid=>$acapplrec->{applid}},
+                                  {id=>\$rec->{id}});
+            }
+         }
+         die("AssetManager not online") if (!$acappl->Ping());
+
+         my $assignment="TIT";
+         my $acstatus="IN OPERATION";
+         if ($rec->{acinmassingmentgroup} ne ""){
+            my $acftprec={
+                Appl=>{
+                   Security_Unit=>"TS.DE",
+                   Status=>$acstatus,
+                   Priority=>"3",
+                   EventID=>$CurrentEventId,
+                   AssignmentGroup=>$assignment,
+                   IncidentAG=>$rec->{acinmassingmentgroup},
+                   bDelete=>'0',
+                   Name=>$rec->{fullname}
+                }
+            };
+            $acftprec->{Appl}->{ExternalID}=$rec->{id};
+            $acftprec->{Appl}->{ExternalSystem}="W5Base";
+
+            my $fh=$fh{campus};
+            print $fh hash2xml($acftprec,{header=>0});
+         }
+
+         ($rec,$msg)=$campus->getNext();
+      } until(!defined($rec));
+   }
+
+   my $back=$self->TransferFile($fh{campus},$filename{campus},"appl");
 
    return($back);
 }

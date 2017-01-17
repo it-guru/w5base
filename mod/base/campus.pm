@@ -223,6 +223,14 @@ sub Validate
    if ($label ne ""){
       $newfullname.="-".$label;
    } 
+   $newfullname=~s/ü/ue/g;
+   $newfullname=~s/ö/oe/g;
+   $newfullname=~s/ä/ae/g;
+   $newfullname=~s/Ü/Ue/g;
+   $newfullname=~s/Ö/Oe/g;
+   $newfullname=~s/Ä/Ae/g;
+   $newfullname=~s/ß/ss/g;
+   $newfullname=~s/\s/_/g;
    $newfullname=~s/\s/_/g;
    if ($newfullname ne $fullname){
       $newrec->{fullname}=$newfullname;
