@@ -703,6 +703,19 @@ sub getHtmlDetailPageContent
       $page="<link rel=\"stylesheet\" ".
             "href=\"../../../static/lytebox/lytebox.css\" ".
             "type=\"text/css\" media=\"screen\" />";
+#######################################################################
+# Voting GUI Test
+if ($self->Config->Param("W5BaseOperationMode") eq "test" ||
+    $self->Config->Param("W5BaseOperationMode") eq "dev"){
+$page.="<script language=JavaScript>";
+$page.="function doRecordVote(parent,v){";
+$page.="var e=document.getElementById('RecordVote');";
+$page.="e.style.display='none';";
+$page.="}";
+$page.="</script>";
+$page.="<div id=RecordVote style='position:absolute;bottom:10px;right:20px;border-style:solid;border-width:1px;border-color:gray;border-radius:3px;xwidth:70px;xheight:30px;background-color:silver'><img onclick='doRecordVote(this,1);' title='find ich wirklich gut' src='../../base/load/up-vote.gif' width=28 height=28 border=0 style='margin:2px;margin-right:8px;cursor:pointer' ><img onclick='doRecordVote(this,0);' title='find ich wirklich scheisse' src='../../base/load/down-vote.gif' style='margin:2px;cursor:pointer' width=28 height=28 border=0></div>";
+}
+#######################################################################
 
       $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
             "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
