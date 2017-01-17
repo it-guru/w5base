@@ -713,7 +713,7 @@ $page.="var e=document.getElementById('RecordVote');";
 $page.="e.style.display='none';";
 $page.="}";
 $page.="</script>";
-$page.="<div id=RecordVote style='position:absolute;bottom:10px;right:20px;border-style:solid;border-width:1px;border-color:gray;border-radius:3px;xwidth:70px;xheight:30px;background-color:silver'><img onclick='doRecordVote(this,1);' title='find ich wirklich gut' src='../../base/load/up-vote.gif' width=28 height=28 border=0 style='margin:2px;margin-right:8px;cursor:pointer' ><img onclick='doRecordVote(this,0);' title='find ich wirklich scheisse' src='../../base/load/down-vote.gif' style='margin:2px;cursor:pointer' width=28 height=28 border=0></div>";
+$page.="<div id=RecordVote style='position:absolute;bottom:10px;right:20px;border-style:solid;border-width:1px;border-color:gray;border-radius:3px;xwidth:70px;xheight:30px;background-color:silver'><img onclick='doRecordVote(this,1);' title='find ich wirklich gut' src='../../base/load/up-vote.gif' width=28 height=28 border=0 style='margin:2px;margin-right:8px;cursor:pointer' ><img onclick='doRecordVote(this,0);' title='find ich wirklich scheisse' src='../../base/load/down-vote.png' style='margin:2px;cursor:pointer' width=28 height=28 border=0></div>";
 }
 #######################################################################
 
