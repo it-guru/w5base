@@ -811,7 +811,7 @@ create table campus (
   plocationid bigint(20),
   locationid  bigint(20)   NOT NULL,
   label      varchar(40), databoss bigint(20) not null,
-  additional blob,
+  additional blob,usetime text default NULL, tempexeptusetime text default NULL,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) NOT NULL default '0',

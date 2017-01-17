@@ -98,6 +98,47 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'campus.databoss'),
 
+      new kernel::Field::TimeSpans(
+                name          =>'usetimes',
+                htmlwidth     =>'150px',
+                depend        =>['issupport'],
+                tspantype     =>{'M'=>'main use time',
+                                 'S'=>'sec. use time',
+                                 'O'=>'offline time'},
+                tspantypeproc =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                   my $blk=shift;
+                   $blk->[4]="transparent"; 
+                   if ($blk->[2] eq "on" || $blk->[2] eq "legend"){
+                      $blk->[4]="blue";
+                      $blk->[4]="lightblue" if ($blk->[3] eq "S");
+                      $blk->[4]="yellow" if ($blk->[3] eq "O");
+                   }
+                },
+                tspantypemaper=>sub{
+                   my $self=shift;
+                   my $type=shift;
+                   my $t=shift;
+                   $type=uc($type);
+                   #$type="M" if ($type eq "");
+                   return($type);
+                },
+                tspanlegend   =>1,
+                tspandaymap   =>[1,1,1,1,1,1,1,0],
+                group         =>'mutimes',
+                label         =>'use-times',
+                dataobjattr   =>'campus.usetime'),
+
+      new kernel::Field::Textarea(
+                name          =>'tempexeptusetime',
+                group         =>'mutimes',
+                searchable    =>0,
+                label         =>'temporary exeptions in use times',
+                htmlheight    =>40,
+                dataobjattr   =>'campus.tempexeptusetime'),
+
       new kernel::Field::SubList(
                 name          =>'seclocations',
                 label         =>'secondary locations',
@@ -278,7 +319,7 @@ sub initSqlWhere
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default contacts 
+   return( qw(header default mutimes contacts 
               seclocations source));
 }
 
@@ -301,7 +342,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
 
-   my @databossedit=qw(default contacts seclocations);
+   my @databossedit=qw(default contacts mutimes seclocations);
    if ($self->IsMemberOf("admin")){
       return(@databossedit);
    }
@@ -331,6 +372,12 @@ sub isWriteValid
 
    return(undef);
 }
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("base::campus");
+}
+
 
 sub getRecordImageUrl
 {
