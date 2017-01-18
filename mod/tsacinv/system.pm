@@ -744,7 +744,7 @@ sub new
                 dataobjattr   =>"lpad(amportfolio.assettag,35,'0')")
 
    );
-   $self->{use_distinct}=1;
+   $self->{use_distinct}=0;
    $self->setDefaultView(qw(systemname status tsacinv_locationfullname 
                             systemid assetassetid));
    return($self);
