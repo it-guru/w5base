@@ -744,7 +744,7 @@ sub new
                 dataobjattr   =>"lpad(amportfolio.assettag,35,'0')")
 
    );
-   $self->{use_distinct}=0;
+   $self->{use_distinct}=1;
    $self->setDefaultView(qw(systemname status tsacinv_locationfullname 
                             systemid assetassetid));
    return($self);
@@ -967,48 +967,46 @@ sub SystemPartOfCorrection
 sub getSqlFrom
 {
    my $self=shift;
-   my $from=
-      "amcomputer,amportfolio,ammodel,amnature,amcomment,".
-      "(select amcostcenter.*,amtsiaccsecunit.identifier as customerlink ".
-      " from amcostcenter left outer ".
-      " join amtsiaccsecunit on ".
-      "amcostcenter.lcustomerlinkid=amtsiaccsecunit.lunitid ".
-      " where amcostcenter.bdelete=0) amcostcenter, ".
-      "amportfolio assetportfolio, ".
-      "(select distinct ".
-      "        amtsiservicetype.identifier ordered,amtsiservice.lportfolioid ".
-      " from amtsiservice,amtsiservicetype ".
-      " where amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
-      "       and amtsiservicetype.identifier='XMBSM'".
-      "       and amtsiservice.bdelete=0".
-      ") tbsm,".
-#      "(select amitemlistval.* from amitemlistval,amitemizedlist ".
-#      " where amitemlistval.litemlistid=amitemlistval.litemlistid ".
-#      " and amitemizedlist.identifier='amPortfolioSecuritySet')  ".
-#      "securitysetval,".
-      "amtenant,amtsiautodiscovery";
-
+   my $from="amcomputer ".
+      "join amportfolio ".
+      "  on amcomputer.litemid=amportfolio.lportfolioitemid ".
+      "join amportfolio assetportfolio ".
+      "  on amportfolio.lparentid=assetportfolio.lportfolioitemid ".
+      "join ammodel ".
+      "  on amportfolio.lmodelid=ammodel.lmodelid ".
+      "join amnature ".
+      "  on ammodel.lnatureid=amnature.lnatureid ".
+      "join amtenant ".
+      "  on amportfolio.ltenantid=amtenant.ltenantid ".
+      "left outer join (select amcostcenter.*,".
+      "                 amtsiaccsecunit.identifier as customerlink ".
+      "      from amcostcenter left outer ".
+      "      join amtsiaccsecunit on ".
+      "      amcostcenter.lcustomerlinkid=amtsiaccsecunit.lunitid ".
+      "      where amcostcenter.bdelete=0) amcostcenter ".
+      "  on amportfolio.lcostid=amcostcenter.lcostid ".
+      "left outer join (select distinct ".
+      "                 amtsiservicetype.identifier ordered,".
+      "                 amtsiservice.lportfolioid ".
+      "      from amtsiservice,amtsiservicetype ".
+      "      where ".
+      "      amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
+      "      and amtsiservicetype.identifier='XMBSM'".
+      "      and amtsiservice.bdelete=0) tbsm ".
+      "  on amportfolio.lportfolioitemid=tbsm.lportfolioid ".
+      "left outer join amcomment ".
+      "  on amcomputer.lcommentid=amcomment.lcommentid ".
+      "left outer join amtsiautodiscovery ".
+      "  on amportfolio.assettag=amtsiautodiscovery.assettag ";
    return($from);
 }
 
 sub initSqlWhere
 {
    my $self=shift;
-   my $where=
-      "amportfolio.bdelete=0 ".
-      "and amcomputer.bgroup=0 ".
-      "and assetportfolio.bdelete!=1 ".
-      "and amportfolio.lparentid=assetportfolio.lportfolioitemid(+) ".
-      "and amportfolio.lportfolioitemid=amcomputer.litemid ".
-      "and amportfolio.lmodelid=ammodel.lmodelid ".
-      "and ammodel.lnatureid=amnature.lnatureid ".
-      "and amportfolio.ltenantid=amtenant.ltenantid ".
-      "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
-      "and amportfolio.lportfolioitemid=tbsm.lportfolioid(+) ".
-      "and ammodel.name='LOGICAL SYSTEM' ".
-      "and amcomputer.lcommentid=amcomment.lcommentid(+) ".
-      "and amportfolio.assettag=amtsiautodiscovery.assettag(+) ";
-#      "and amportfolio.securityset=securitysetval.litemlistvalid(+) ";
+   my $where="amportfolio.bdelete=0 and amcomputer.bgroup=0 ".
+             "and assetportfolio.bdelete!=1 ".
+             "and ammodel.name='LOGICAL SYSTEM' ";
    return($where);
 }
 
