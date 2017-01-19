@@ -20,8 +20,8 @@ NONE
 
 [en:]
 
-Listet certificates expires in a few days or has already expired.
-To avoid incidents they have to renew in a short-term.
+Listed certificates are going to expire in a few days or have already expired.
+To avoid restrictions they have to be renewed as soon as possible.
 
 [de:]
 
