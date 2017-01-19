@@ -149,6 +149,8 @@ div.detailfieldspec{
 div.detailgroupspec{
    padding:2px;
    font-size:11px;
+   text-align:left;
+   margin-left:5px;
 }
 div.detailheadline{
    width:auto;

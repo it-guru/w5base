@@ -644,10 +644,14 @@ EOF
             }
          }
          my $grouplabel="fieldgroup.".$group;
+         my $groupspeclabel=$grouplabel;
+         if ($self->getParent->{NewRecord}){
+            $groupspeclabel="New.".$groupspeclabel;
+         }
          my $groupspec="";
-         if (defined($spec->{$grouplabel})){
+         if (defined($spec->{$groupspeclabel})){
             $groupspec="<div class=detailgroupspec>".
-                       $spec->{$grouplabel}."</div>";
+                       $spec->{$groupspeclabel}."</div>";
          }
          if (defined($grpentry) && defined($grpentry->{translation})){
             my $tr=$grpentry->{translation};

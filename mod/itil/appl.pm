@@ -51,6 +51,7 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 searchable    =>0,
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'appl.id'),
 
