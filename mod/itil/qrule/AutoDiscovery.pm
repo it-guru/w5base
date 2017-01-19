@@ -13,6 +13,23 @@ to set a valid primary operation mode.
 
 NONE
 
+=head3 HINTS
+
+[en:]
+
+To handle the installation of installed software in IT inventory 
+based on Autodiscovery data, please refer to the FAQ article:
+
+https://darwin.telekom.de/darwin/public/faq/article/ById/14845704850021
+
+[de:]
+
+Umgang mit der Übernahme von installierter Software ins IT Inventar 
+auf Basis Autodiscovery-Daten finden Sie im FAQ Artikel:
+
+https://darwin.telekom.de/darwin/public/faq/article/ById/14845704850021
+
+
 =cut
 #######################################################################
 #  W5Base Framework
