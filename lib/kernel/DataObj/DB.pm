@@ -498,8 +498,27 @@ sub getSqlCount
    my $group=$self->getSqlGroup("select",@filter);
    my @cmd;
    my $limitnum=$self->{_Limit};
+   
+
+   my $cntfield="*";
+
+   my $fobj=$self->IdField();
+
+   if (defined($fobj)){
+      my ($worktable,$workdb)=$self->getWorktable();
+      $workdb=$self->{DB} if (!defined($workdb));
+      my $dataobjattr=$fobj->getBackendName("select",$workdb);
+      if ($dataobjattr ne ""){     
+         $cntfield=$dataobjattr;
+         if ($self->{use_distinct}==1){     # distinct handling only posible, if
+            $cntfield="distinct $cntfield"; # an idfield exists
+         }
+      }
+   }
+
+
    foreach my $from (@from){
-      my $cmd="select  count(*) from $from";
+      my $cmd="select  count(".$cntfield.") from ".$from;
       $cmd.=" where ".$where if ($where ne "");
       $cmd.=" group by ".$group if ($group ne "");
 
