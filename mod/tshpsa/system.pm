@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   #$param{MainSearchFieldLines}=4;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -91,6 +91,20 @@ sub new
                 vjoinon       =>['w5systemid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Select(
+                name          =>'w5cistatus',
+                group         =>'w5basedata',
+                label         =>'relevant logical System CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['w5cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'w5cistatusid',
+                group         =>'w5basedata',
+                label         =>'CI-StateID',
+                dataobjattr   =>'w5cistatusid'),
+
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
@@ -118,6 +132,15 @@ sub Initialize
    return(@result) if (defined($result[0]) eq "InitERROR");
    return(1) if (defined($self->{DB}));
    return(0);
+}
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_w5cistatus"))){
+     Query->Param("search_w5cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
 }
 
 

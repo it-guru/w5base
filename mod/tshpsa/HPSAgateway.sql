@@ -93,7 +93,12 @@ CREATE INDEX "HPSA_system_hostname"
    ON "mview_HPSA_system"(hostname) online;
 
 create or replace view "W5I_HPSA_system" as
-select * from "mview_HPSA_system";
+select distinct "mview_HPSA_system".*,
+                itil__system.name w5systemname,
+                itil__system.cistatusid w5cistatusid
+from "mview_HPSA_system" 
+left outer join (select "itil::system".*,DENSE_RANK() OVER (PARTITION BY systemid ORDER BY cistatusid) rank from "itil::system") itil__system
+on "mview_HPSA_system".systemid=itil__system.systemid and itil__system.rank=1;
 grant select on "W5I_HPSA_system" to "W5I";
 create or replace synonym W5I.HPSA_system 
    for "W5I_HPSA_system";

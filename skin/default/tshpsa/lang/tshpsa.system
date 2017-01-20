@@ -9,4 +9,5 @@
 'W5Base Applications'=>{de=>'W5Base Anwendungen'},
 'running Processes'=>{de=>'Software-Prozesses'},
 'relevant logical System Config-Item'=>{de=>'relevantes System Config-Item'},
+'relevant logical System CI-State'=>{de=>'relevanter System CI-Status'},
 
