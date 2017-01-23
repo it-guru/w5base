@@ -370,7 +370,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
 
-   my @l=qw(header default comments contacts source);
+   my @l=qw(header default comments contacts source history);
    if ($rec->{grouptype} eq "CFGROUP"){
       push(@l,"applications");
    }
