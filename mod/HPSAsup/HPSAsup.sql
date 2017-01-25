@@ -147,8 +147,6 @@ where
     and "itil::system".isprod=1                   
        -- keine Systeme mit Systemklassifizierung=Infrastrutkur
     and "itil::system".isinfrastruct=0
-       -- keine Systeme mit Systemklassifizierung=Infrastrutkur
-    and "itil::system".isinfrastruct=0
        -- keine Systeme mit Systemklassifizierung=Backupserver
     and "itil::system".isbackupsrv=0
        -- keine Systeme mit Systemklassifizierung=Printer/Printserver
