@@ -17,8 +17,8 @@ NONE
 
 [en:]
 
-To handle the installation of installed software in IT inventory 
-based on Autodiscovery data, please refer to the FAQ article:
+How to handle the installation of installed software in IT inventory 
+based on Autodiscovery data can be found in this FAQ article:
 
 https://darwin.telekom.de/darwin/public/faq/article/ById/14845704850021
 
