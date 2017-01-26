@@ -77,6 +77,17 @@ sub new
                 align         =>'left',
                 dataobjattr   =>'amportfolio.assettag'),
 
+      new kernel::Field::Id(
+                name          =>'clusterid',
+                label         =>'ClusterID',
+                size          =>'13',
+                searchable    =>1,
+                uppersearch   =>1,
+                weblinkto     =>'tsacinv::itclust',
+                weblinkon     =>['clusterid'=>'clusterid'],
+                align         =>'left',
+                dataobjattr   =>'amclusterportfolio.assettag'),
+
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
                 label         =>'Assignment Group',
@@ -205,13 +216,13 @@ sub new
    return($self);
 }
 
-sub initSearchQuery
-{
-   my $self=shift;
-   if (!defined(Query->Param("search_name"))){
-     Query->Param("search_name"=>"Q4DE8NCO34*");
-   }
-}
+#sub initSearchQuery
+#{
+#   my $self=shift;
+#   if (!defined(Query->Param("search_name"))){
+#     Query->Param("search_name"=>"Q4DE8NCO34*");
+#   }
+#}
 
 
 
@@ -237,11 +248,21 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from=
-      "amcomputer, ".
-      "(select amportfolio.* from amportfolio ".
-      " where amportfolio.bdelete=0) amportfolio,ammodel,".
-      "(select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter";
+      "amcomputer ".
+      "join (select amportfolio.* from amportfolio ".
+      " where amportfolio.bdelete=0) amportfolio ".
+      "on amportfolio.lportfolioitemid=amcomputer.litemid ".
+      "join ammodel ".
+      "on amportfolio.lmodelid=ammodel.lmodelid and ".
+      "   ammodel.name='CLUSTER' ".
+      "left outer join (select amcostcenter.* from amcostcenter ".
+      " where amcostcenter.bdelete=0) amcostcenter ".
+      "on amportfolio.lcostid=amcostcenter.lcostid ".
+      "join amcomputer amcluster ".
+      "on amcomputer.lparentid=amcluster.lcomputerid ".
+      "join (select amportfolio.* from amportfolio ".
+      " where amportfolio.bdelete=0) amclusterportfolio ".
+      "on amclusterportfolio.lportfolioitemid=amcluster.litemid";
 
    return($from);
 }
@@ -250,11 +271,7 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where=
-      "amportfolio.lportfolioitemid=amcomputer.litemid ".
-      "and amportfolio.lmodelid=ammodel.lmodelid ".
-      "and amportfolio.lcostid=amcostcenter.lcostid(+) ".
-      "and ammodel.name='CLUSTER' ".
-      "and (amcomputer.clustertype='Cluster-Service' or ".
+      "(amcomputer.clustertype='Cluster-Service' or ".
       "     amcomputer.clustertype='Cluster-Package' or ".
       "     amcomputer.clustertype='Cluster-Packages') ".
       "and amcomputer.status<>'out of operation'";
@@ -378,8 +395,8 @@ sub Import
       my $importname=$acgrouprec->{supervisorldapid};
       $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
       # check 4: load Supervisor ID in W5Base
-      my $tswiw=getModuleObject($self->Config,"tswiw::user");
-      my $databossid=$tswiw->GetW5BaseUserID($importname);
+      my $user=getModuleObject($self->Config,"base::user");
+      my $databossid=$user->GetW5BaseUserID($importname,"email");
       if (!defined($databossid)){
          $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
          return(undef);

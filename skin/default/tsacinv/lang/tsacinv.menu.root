@@ -3,6 +3,7 @@
 'itu.ac.asset.contract'=>{de=>'Warungsvertr.',en=>'Maint.Contr.'},
 'itu.ac.asset'=>{de=>'Hardware',en=>'Asset'},
 'itu.ac.itclust'=>{de=>'Cluster',en=>'Cluster'},
+'itu.ac.itclust.service'=>{de=>'Service',en=>'Service'},
 'itu.ac.appl'=>{de=>'Anwendung',en=>'Application'},
 'itu.ac.appl.lnkapplappl'=>{de=>'Schnittstelle',en=>'Interface'},
 'itu.ac.appl.lnkapplsystem'=>{de=>'System zuord.',en=>'System rel.'},
