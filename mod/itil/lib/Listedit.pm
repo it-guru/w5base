@@ -946,39 +946,38 @@ sub handleSSLExpiration
    my $rec=shift;
    my $parentobj=shift;
    my $parentrec=shift;
-   my $qmsg=shift;
-   my $dataissue=shift;
-   my $errorlevel=shift;
    my $param=shift;
    my $newrec;
-
-   my $notifylevel=8*7; # 8 weeks = mail notification
-   my $issuelevel =1*7; # 1 week  = dataissue
 
    if (ref($param) ne 'HASH') {
       Stacktrace();
       return(0);
    }
-      
-   my $notifyfld=$param->{notifyfld};
 
-   my ($expfld)=grep({
-                        my $o=$dataobj->getField($_)->Self();
-                        $o eq 'kernel::Field::ExpDate';
-                     } $dataobj->getFieldList());
-   my $expfldobj=$dataobj->getField($expfld);
+   my $notifyfld=$param->{expnotifyfld};
+   my $endfld=$param->{expdatefld};
 
-   return(0) if (!defined($expfldobj));
+   my $qmsg;
+   my $errorlevel;
 
+   if (!defined($notifyfld) || !defined($endfld) ||
+       !defined($rec->{$endfld})) {
+      return(undef);
+   }
    if (!defined($parentobj)) {
       $parentobj=$dataobj;
       $parentrec=$rec;
    }
 
-   my $d=$expfldobj->getDuration($rec,'days');
+   # one-time notification; default: expiration < 8 weeks
+   my $warning=$param->{warning};
+   $warning=7*8 if (!defined($warning));
 
-   if ($d<$notifylevel) {
-      if (!defined($rec->{$notifyfld})) {
+   my $now=NowStamp('en');
+   my $d=CalcDateDuration($now,$rec->{$endfld},'GMT');
+
+   if ($d->{days}<$warning) {
+      if (!$rec->{$notifyfld}) {
          my $uobj=getModuleObject($self->getParent->Config,'base::user');
          $uobj->SetFilter({userid=>\$parentrec->{databossid},
                            cistatusid=>\4});
@@ -987,6 +986,7 @@ sub handleSSLExpiration
          my %ul;
          $parentobj->getWriteAuthorizedContacts($parentrec,
                                                 [qw(contacts)],30,\%ul);
+
          my $emailto;
          my @emailcc=keys(%ul);
          my $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
@@ -1014,9 +1014,10 @@ sub handleSSLExpiration
 
          my $subject=$self->T('Expiration of a certificate');
 
-         my $exp=$expfldobj->FormatedDetail({$expfld=>$rec->{$expfld}});
+         my $exp=$dataobj->getField($endfld)
+                         ->FormatedDetail({$endfld=>$rec->{$endfld}});
          $exp.=" ".$timezone;
-         $exp.=" (in $d ".$self->T('days').")";
+         $exp.=" (in $d->{days} ".$self->T('days').")";
 
          my $text=$self->T('Dear databoss').",\n\n";
          $text.=sprintf($self->T("Certificate for %s expires"),
@@ -1026,9 +1027,8 @@ sub handleSSLExpiration
          $text.=$self->T('SSLEXP01')."\n\n";
          $text.="DirectLink:\n".$rec->{urlofcurrentrec};
 
-         $newrec->{$notifyfld}=NowStamp('en');
-         my $wfact=getModuleObject($self->getParent->Config,
-                                   "base::workflowaction");
+         $newrec->{$notifyfld}=$now;
+         my $wfact=getModuleObject($self->getParent->Config,"base::workflowaction");
          $wfact->Notify("INFO",$subject,$text,%notifyparam);
 
          if (defined($lastlang)){
@@ -1039,7 +1039,7 @@ sub handleSSLExpiration
          }
       }
    }
-   elsif (defined($rec->{$notifyfld})) {
+   elsif ($rec->{$notifyfld}) {
          $newrec->{$notifyfld}=undef;
    }
 
@@ -1047,31 +1047,19 @@ sub handleSSLExpiration
       $dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>$rec->{id}});
    }
 
-   if ($d<$issuelevel) {
-      my $msg;
-
-      $$errorlevel=3 if ($$errorlevel<3);
-
-      if ($d<0) {
-         $msg='Certificate has expired';
-      }
-      else {
-         $msg='Certificate expires in a few days';
-      }
-
-      if ($parentobj==$dataobj) {
-         push(@$qmsg,$msg);
-         push(@$dataissue,$msg);
-      }
-      else {
-         push(@$qmsg,$msg.': '.$rec->{name});
-         push(@$dataissue,$msg.': '.$rec->{urlofcurrentrec});
-      }
-   }
-
-   return(1);
+   return($d);
 }
 
+
+# mz
+# Diese Funktion soll mal Expiration-Handling allgemein abhandeln können und
+# damit auch handleSSLExpiration ablösen.
+# Sie ist aber noch nicht fertig, noch nicht getestet und darf deshalb
+# aktuell noch nicht verwendet werden.
+sub handleExpiration
+{
+   return(1);
+}
 
 
 1;
