@@ -149,6 +149,20 @@ Das Config-Item "%s" %swurde durch den User "%s" deaktiviert.
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
 
+'MSG009'=>{en=>'%s: RUNDOWN REQUEST
+
+The user "%s" has been requested, to rundown/delete the Config-Item "%s" %s has been deactivated by "%s".
+%s
+Depending on your user rights, it is possible that the new record is not accessable by you.
+
+',de=>'%s: LOESCH-ANFORDERUNG
+
+Der User "%s" hat angefordert, das Config-Item "%s" %s zu löschen/deaktivieren.
+%s
+Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
+'},
+
 
 "invalid character in key field '\%s'"=>{de=>"ungültiges Zeichen in Schlüsselfeld '\%s'"},
 'MSG010'=>{de=>'im Mandanten "%s" ',en=>'at mandator "%s" '},
+"Request to rundown '%s' in module '%s'"=>{de=>"Lösch-Anforderung für '%s' im Modul '%s'"}

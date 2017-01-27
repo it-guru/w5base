@@ -1,6 +1,7 @@
 'unknown field selected for MultiEdit'=>{de=>'unbekanntes Feld in MultiEdit Operation'},
 'Field'=>{de=>'Feld'},
 'new value'=>{de=>'neuer Inhalt'},
+'comments'=>{de=>'Bemerkungen'},
 'invalid value for requested field'=>{de=>'ungültiger Inhalt für das angeforderte Feld'},
 'select field to modify'=>{de=>'Ändern in Feld'},
 'With this module it is able to change a field value in multiple records at one step'=>{de=>'Mit diesem Modul ist es möglich, Änderungen in einem Feld gleichzeitig in mehreren Datensätzen durchzuführen.'},

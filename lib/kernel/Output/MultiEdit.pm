@@ -63,14 +63,33 @@ sub getInputField
    $value=~s/"/&quot;/g;
    my $d;
 
+   my $size="";
+   if ($name eq "OPCOMMENT"){
+      $size=" maxlength=80 ";
+   }
+
    my $inputfield="<input type=\"text\" id=\"$name\" value=\"$value\" ".
-                  "name=\"$name\" style=\"width:100%\">";
+                  "name=\"$name\" style=\"width:100%\" $size>";
    my $width="100%";
    $d=<<EOF;
 <table style="table-layout:fixed;width:$width" cellspacing=0 cellpadding=0>
 <tr><td>$inputfield</td></tr></table>
 EOF
    return($d);
+}
+
+
+sub cleanOPCOMMENT
+{
+   my $self=shift;
+   my $txt=shift;
+
+   $txt=rmNonLatin1($txt);
+
+   $txt=~s/\n/ /g;
+   $txt=~s/['"<>]/ /g;
+
+   return($txt);
 }
 
 
@@ -81,6 +100,7 @@ sub MultiOperationHeader
 
    my $oldOPFIELD=$app->Query->Param("OPFIELD");
    my $oldOPVALUE=$app->Query->Param("OPVALUE");
+   my $oldOPCOMMENT=$self->cleanOPCOMMENT($app->Query->Param("OPCOMMENT"));
 
    my $s="<select name=OPFIELD style=\"width:100%\">";
    if ($oldOPFIELD eq ""){
@@ -110,12 +130,14 @@ sub MultiOperationHeader
    $s.="</select>";
 
 
-   my $d="<center><table style='margin-top:4px' class=data width=600>";
+   my $d="<center><table style='margin-top:4px' class=data width=90%>";
    $d.="<tr><th width=20%>".$app->T("Field")."</th>";
    $d.="<th>".$app->T("new value")."</th>";
+   $d.="<th>".$app->T("comments")."</th>";
    $d.="</tr>";
-   $d.="<tr><td width=40%>".$s."</td>";
-   $d.="<td width=60%>".$self->getInputField($oldOPVALUE,"OPVALUE")."</td>";
+   $d.="<tr><td width=30%>".$s."</td>";
+   $d.="<td width=50%>".$self->getInputField($oldOPVALUE,"OPVALUE")."</td>";
+   $d.="<td width=20%>".$self->getInputField($oldOPCOMMENT,"OPCOMMENT")."</td>";
    $d.="</tr>";
    $d.="</table></center>";
 
@@ -134,7 +156,14 @@ sub MultiOperationActionOn
 
    my $OPFIELD=$app->Query->Param("OPFIELD");
    my $OPVALUE=$app->Query->Param("OPVALUE");
+   my $OPCOMMENT=$self->cleanOPCOMMENT($app->Query->Param("OPCOMMENT"));
    $OPVALUE=trim($OPVALUE);
+
+   my $HistoryComments=trim($OPCOMMENT);
+   if (trim($HistoryComments) ne ""){
+      $W5V2::HistoryComments=$HistoryComments;
+   }
+
 
    my $fail=1;
 
@@ -166,6 +195,7 @@ sub MultiOperationActionOn
          $fail=1;
       }
    }
+   $W5V2::HistoryComments=undef;
    return(1) if (!$fail);
    return(0);
 }

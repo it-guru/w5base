@@ -150,6 +150,38 @@ sub new
 #                dataobjattr   =>'mgmtitemgroup.additional'),
 
       new kernel::Field::Text(
+                name          =>'rundownreqcomment',
+                searchable    =>sub{    # searchable for posible admins in
+                   my $self=shift;      # this object.
+                   return(1) if ($self->getParent()->IsMemberOf("admin"));
+                   return(0);
+                },
+                group         =>'rundownreq',
+                label         =>'CI-RunDown request description',
+                dataobjattr   =>'mgmtitemgroup.rundowncomment'),
+                                                   
+      new kernel::Field::Contact(
+                name          =>'rundownrequestor',
+                group         =>'rundownreq',
+                readonly      =>1,
+                label         =>'CI-RunDown requestor',
+                vjoinon       =>'rundownrequestorid'),
+
+      new kernel::Field::Link(
+                name          =>'rundownrequestorid',
+                group         =>'rundownreq',
+                dataobjattr   =>'mgmtitemgroup.rundownrequestor'),
+                                                   
+      new kernel::Field::Date(
+                name          =>'rundownreqdate',
+                readonly      =>1,
+                selectfix     =>1,
+                searchable    =>0,
+                group         =>'rundownreq',
+                label         =>'CI-RunDown request initiate point in time',
+                dataobjattr   =>'mgmtitemgroup.rundowndate'),
+
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
@@ -215,7 +247,13 @@ sub new
 
    );
    $self->{history}={
+      insert=>[
+         'local'
+      ],
       update=>[
+         'local'
+      ],
+      delete=>[
          'local'
       ]
    };
@@ -251,7 +289,7 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default comments applications businessservices 
+   return(qw(header default rundownreq comments applications businessservices 
              locations contacts source));
 }
 
@@ -264,6 +302,7 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $comprec=shift;
 
    if (!defined($oldrec) || defined($newrec->{name})){
       if ($newrec->{name}=~m/^\s*$/ || 
@@ -292,6 +331,10 @@ sub Validate
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
+   if (!$self->HandleRunDownRequests($oldrec,$newrec,$comprec,
+                                     %{$self->{CI_Handling}})){
+      return(0);
+   }
    return(1);
 }
 
@@ -301,7 +344,12 @@ sub FinishWrite
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $comprec=shift;
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+      return(0);
+   }
+   if (!$self->HandleRunDownRequests($oldrec,$newrec,$comprec,
+                                     %{$self->{CI_Handling}})){
       return(0);
    }
    return(1);
@@ -321,11 +369,11 @@ sub isWriteValid
    my $databossedit=0;
    if ($self->IsMemberOf($self->{CI_Handling}->{activator})){
       return("default","comments","applications","businessservices","locations",
-             "contacts");
+             "contacts","rundownreq");
    }
    if ($self->IsMemberOf("admin")){
       return("default","comments","applications","businessservices","locations",
-             "contacts");
+             "contacts","rundownreq");
    }
 
    my @databossgrp=("comments","contacts","applications","locations",
@@ -333,6 +381,13 @@ sub isWriteValid
 
    if ($rec->{cistatusid}<3){
       push(@databossgrp,"default");
+   }
+   if ($rec->{cistatusid}>3){
+      push(@databossgrp,"rundownreq");
+   }
+
+   if ($rec->{cistatusid}>3){
+      push(@databossgrp,"rundownreq");
    }
 
    if ($rec->{databossid}==$userid){
@@ -363,6 +418,38 @@ sub isWriteValid
    return(undef);
 }
 
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+   my $lock=0;
+
+
+   if ($lock>0 ||
+       $#{$rec->{applications}}!=-1 ||
+       $#{$rec->{locations}}!=-1 ||
+       $#{$rec->{businessservices}}!=-1){
+      $self->LastMsg(WARN,
+          "There are existing relations to this item group. If you delete ".
+          "this item group, all relations will also deleted.");
+      return(0);
+   }
+
+   return(1);
+}
+
+
+
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(0) if (!$self->IsMemberOf("admin"));
+
+   return($self->SUPER::isDeleteValid($rec));
+}
+
 
 sub isViewValid
 {
@@ -376,6 +463,9 @@ sub isViewValid
    }
    else{
       push(@l,qw(applications locations businessservices));
+   }
+   if ($rec->{rundownreqdate} ne "" && $rec->{cistatusid}<6){
+      push(@l,"rundownreq");
    }
    return(@l);
 }

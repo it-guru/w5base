@@ -290,6 +290,73 @@ sub HandleCIStatus
    return(1);
 }
 
+
+sub HandleRunDownRequests
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $comprec=shift;
+   my %param=@_;
+
+   $param{activator}="admin" if (!defined($param{activator}));
+   $param{activator}=[$param{activator}] if (ref($param{activator}) ne "ARRAY");
+   if (!defined($param{mode})){
+      my ($package,$filename, $line, $subroutine)=caller(1);
+      $subroutine=~s/^.*:://;
+      $param{mode}=$subroutine;
+   }
+   if ($param{mode} eq "Validate"){
+      #######################################################################
+      # ci "rundown" request handling
+      #######################################################################
+      if (exists($newrec->{rundownreqcomment})){
+         if (defined($newrec->{rundownreqcomment}) &&
+             $newrec->{rundownreqcomment} eq ""){
+            $newrec->{rundownreqcomment}=undef;
+            $comprec->{rundownreqcomment}=undef;
+            $newrec->{rundownreqdate}=undef;
+            if ($self->getField("rundownrequestorid")){
+               $newrec->{rundownrequestorid}=undef;
+            }
+         }
+         else{
+            $newrec->{rundownreqdate}=NowStamp("en");
+            if ($self->getField("rundownrequestorid")){
+               my $userid=$self->getCurrentUserId();
+               $newrec->{rundownrequestorid}=$userid;
+            }
+         }
+      }
+      if (!defined($oldrec) ||
+          (exists($newrec->{cistatusid}) &&
+           defined($oldrec->{rundownreqdate}) &&
+           ($newrec->{cistatusid} eq "4" ||
+            $newrec->{cistatusid} eq "3"))){
+         if ($self->getField("rundownreqdate")){
+            $newrec->{rundownreqdate}=undef;
+            $newrec->{rundownreqcomment}=undef;
+            $comprec->{rundownreqcomment}=undef;
+         }
+      }
+      #######################################################################
+   }
+   if ($param{mode} eq "FinishWrite"){
+      #######################################################################
+      # ci "rundown" request handling
+      #######################################################################
+      if (defined($oldrec) &&
+          exists($newrec->{rundownreqcomment}) &&
+          $newrec->{rundownreqcomment} ne "" &&
+          $newrec->{rundownreqcomment} ne $oldrec->{rundownreqcomment}){
+         $self->NotifyAdmin("rundown",$oldrec,$newrec,%param);
+         printf STDERR ("fifi now i should send a MAIL with='$newrec->{rundownreqcomment}'\n");
+      }
+      #######################################################################
+   }
+   return(1);
+}
+
 sub NotifyAdmin
 {
    my $self=shift;
@@ -371,6 +438,20 @@ sub NotifyAdmin
       $msg=$self->T("MSG004");
       $msg=sprintf($msg,$name);
       return() if ($creator==$userid);
+   }
+   if ($mode eq "rundown"){
+      $user->SetFilter({groups=>$param{activator}});
+      my @admin=$user->getHashList(qw(email givenname surname));
+      $notiy{emailto}=[map({$_->{email}} @admin)];
+      $notiy{emailcc}=[$creatorrec->{email}];
+      $wfname=$self->T("Request to rundown '%s' in module '%s'");
+      $wfname=sprintf($wfname,$name,$modulename);
+      $msg=$self->T("MSG009");
+      my $comments=$W5V2::HistoryComments;
+      if ($comments ne ""){
+         $comments="\n".$comments."\n";
+      }
+      $msg=sprintf($msg,$name,$fromname,$name,$url,$comments);
    }
    my $sitename=$self->Config->Param("SITENAME");
    my $subject=$wfname;
