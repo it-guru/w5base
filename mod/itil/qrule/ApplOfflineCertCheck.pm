@@ -82,26 +82,36 @@ sub qcheckRecord
    return(0,undef) if ($rec->{'cistatusid'}!=4 && 
                        $rec->{'cistatusid'}!=3);
 
+   my $mindays=7; # DataIssue, if expiration in < 1 week
    my $errorlevel=0;
    my @qmsg;
    my @dataissue;
 
    my $walletobj=getModuleObject($self->getParent->Config,'itil::applwallet');
    $walletobj->SetFilter({applid=>$rec->{id}});
+   my @certs=$walletobj->getHashList(qw(ALL));
 
-   foreach my $cert ($walletobj->getHashList(qw(ALL))) {
-      my $ok=$self->itil::lib::Listedit::handleSSLExpiration(
-                                            $walletobj,$cert,
-                                            $dataobj,$rec,
-                                            \@qmsg,\@dataissue,\$errorlevel,
-                                            {notifyfld=>'sslexpnotify1'});
-      if (!$ok) {
-         msg(ERROR,sprintf("QualityCheck of '%s' (%d) failed",
-                           $walletobj->Self(),$cert->{id}));
+   foreach my $cert (@certs) {
+      my $exp=$self->itil::lib::Listedit::handleSSLExpiration(
+                                             $walletobj,$cert,$dataobj,$rec,
+                                             {expnotifyfld=>'sslexpnotify1',
+                                              expdatefld=>'enddate'});
+      if ($exp->{days}<$mindays) {
+         $errorlevel=3 if ($errorlevel<3);
+         if ($exp->{days}<0) {
+            push(@qmsg,'Certificate has expired: '.$cert->{name});
+            push(@dataissue,'Certificate has expired: '.
+                            $cert->{urlofcurrentrec});
+         }
+         else {
+            push(@qmsg,'Certificate expires in a few days: '.$cert->{name});
+            push(@dataissue,'Certificate expires in a few days: '.
+                            $cert->{urlofcurrentrec});
+         }
       }
    }
 
-   if ($#qmsg!=-1) {
+   if (@qmsg) {
       return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue});
    }
 
