@@ -1046,7 +1046,13 @@ sub HtmlAutoDiscManager
    $self->SetFilter($baseflt);
    my @adrec=$self->getHashList(qw(ALL));
 
-   #printf STDERR ("adrec=%s\n",Dumper(\@adrec));
+   @adrec=sort({
+            my $bk=$a->{discon} cmp $b->{cmp};
+            if ($bk==0){
+               $bk=$a->{scanname} cmp $b->{scanname};
+            }
+            $bk;
+         } @adrec);
 
    my %discnam=();
 
