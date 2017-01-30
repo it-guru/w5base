@@ -80,9 +80,18 @@ sub Sendmail
    }
    else{
       msg(DEBUG,"Event($self):Sendmail cleanup");
-      $wf->SetFilter({class=>'base::workflow::mailsend',
-                      state=>\'6',
-                      mdate=>"<now-1h"});
+      $wf->SetFilter([
+                       {
+                         class=>'base::workflow::mailsend',
+                         state=>\'6',
+                         mdate=>"<now-1h"
+                       },
+                       {
+                         class=>'base::workflow::mailsend',
+                         state=>\'4',
+                         mdate=>"<now-12h"
+                       }
+                     ]);
       $wf->SetCurrentView(qw(ALL));
       $wf->Limit(100);
    }
@@ -229,7 +238,6 @@ sub Sendmail
          $mail.="Message-ID: <".$rec->{id}.'@'.$rec->{initialconfig}.'@'.
                 $rec->{initialsite}.'@'."W5Base>\n";
          $mail.="Mime-Version: 1.0\n";
-         $mail.="X-Vacation-Reply-To: hartmut.vogler\@t-systems.com\n";
          $mail.="Content-Type: multipart/mixed; boundary=\"$mixbound\"\n";
          $mail.="--$mixbound";
          $mail.="\n";
