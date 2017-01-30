@@ -235,6 +235,9 @@ sub Sendmail
          $mail.="Cc: $cc\n" if ($cc ne "");
          $mail.="bcc: $bcc\n" if ($bcc ne "");
          $mail.="Subject: ".mimeencode($rec->{name})."\n";
+         $mail.="Date: ".
+            $wf->ExpandTimeExpression($rec->{createdate},"RFC822","GMT","GMT").
+            "\n";
          $mail.="Message-ID: <".$rec->{id}.'@'.$rec->{initialconfig}.'@'.
                 $rec->{initialsite}.'@'."W5Base>\n";
          $mail.="Mime-Version: 1.0\n";
@@ -603,7 +606,7 @@ sub Sendmail
                             closedate=>NowStamp("en"),
                             step=>'base::workflow::mailsend::finish'};
                print D $mail;
-               print D "\n----\n".Dumper($finerec);
+               #print D "\n----\n".Dumper($finerec);
                $wf->Store($rec,$finerec);
                close(D);
             }
