@@ -246,7 +246,7 @@ sub getValidWebFunctions
 {
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(),"load","browser","Empty",
-          "WebRefresh","WebUpload","WebCreateDir","WebDAV");
+          "WebRefresh","WebUpload","WebChangeInherit","WebCreateDir","WebDAV");
 }
 
 
@@ -1026,15 +1026,30 @@ sub browser
                       "<img border=0 ".
                       "src=\"$prefix../../base/load/filemgmt_dir.gif\">".
                       "</div>";
+         my $diriconinherit ="<div class=fileimage>".
+                      "<img border=0 ".
+                      "src=\"$prefix../../base/load/filemgmt_diri.gif\">".
+                      "</div>";
          my $topicon ="<div class=fileimage>".
                       "<img border=0 ".
                       "src=\"$prefix../../base/load/filemgmt_top.gif\">".
                       "</div>";
          my $list="<div id=filelist>";
          if ($p ne "/" && $p ne "/index.html" && $p ne ""){
-            $list.="<div class=fileline>".
-                   "<a class=filelink href=\"$up\">${diricon}".
-                   "<div class=filename>..</div></a></div>";
+            if (defined($target->{fid}) && $target->{inheritrights}){
+               my $info=$self->T("inherit rights from parent directory"); 
+               $list.="<div class=fileline>".
+                      "<a class=filelink ".
+                      "title=\"$info\" href=\"$up\">${diriconinherit}".
+                      "<div class=filename>..</div></a></div>";
+            }
+            else{
+               my $info=$self->T("no rights inherit from parent directory"); 
+               $list.="<div class=fileline>".
+                      "<a class=filelink ".
+                      "title=\"$info\" href=\"$up\">${diricon}".
+                      "<div class=filename>..</div></a></div>";
+            }
          }
          else{
             $list.="<div class=fileline>".
@@ -1050,7 +1065,10 @@ sub browser
                $post="/index.html" if ($fl->{entrytyp} eq "dir");
                my $codedname=quoteQueryString($fl->{name});
                my $img=$fileicon;
-               $img=$diricon if ($fl->{entrytyp} eq "dir");
+               $img=$diriconinherit if ($fl->{entrytyp} eq "dir" &&
+                                        $fl->{inheritrights});
+               $img=$diricon        if ($fl->{entrytyp} eq "dir" &&
+                                        !$fl->{inheritrights});
                my $name="<div class=filename>$fl->{name}</div>";
                my $select="<div class=fileselect>";
                if ($op eq "delete"){
@@ -1079,22 +1097,34 @@ sub browser
          $page.="<input id=OP type=hidden name=OP ".
                 "value=\"".Query->Param("OP")."\">";
          $page.="</form></body>";
+         my $LInherit=$self->T("parent rights: inherit");
+         if (!$target->{inheritrights}){
+            $LInherit=$self->T("parent rights: ignore");
+         }
          my $LRefresh=$self->T("Refresh");
          my $LUploadFiles=$self->T("Upload files");
          my $LDeleteFiles=$self->T("Delete");
          my $LCreateDir=$self->T("Create directory");
          my $LChangeRights=$self->T("Modify rights");
+         my $InheritLine="";
+         if (defined($target->{fid}) && $self->IsMemberOf("admin")){
+            $InheritLine='<li>'.
+                         '<a class=action href="JavaScript:ChangeInherit()">'.
+                         $LInherit.
+                         '</a>';
+         }
          $page.=<<EOF;
 <div id=actionlist
-     style="position:absolute;width:200px;
+     style="position:absolute;width:240px;
             right:0px;top:19px;display:none;visible:hidden">
 <div class=actionlist>
 <ul class=actionlist>
-<li><a class=action href="JavaScript:Refresh()">$LRefresh</a><br>
-<li><a class=action href="JavaScript:UploadFiles()">$LUploadFiles</a><br>
-<li><a class=action href="JavaScript:DeleteFiles()">$LDeleteFiles</a><br>
-<li><a class=action href="JavaScript:CreateDir()">$LCreateDir</a></a>
-<li><a class=action href="JavaScript:ChangeRights()">$LChangeRights</a></a>
+<li><a class=action href="JavaScript:Refresh()">$LRefresh</a>
+<li><a class=action href="JavaScript:UploadFiles()">$LUploadFiles</a>
+<li><a class=action href="JavaScript:DeleteFiles()">$LDeleteFiles</a>
+<li><a class=action href="JavaScript:CreateDir()">$LCreateDir</a>
+<li><a class=action href="JavaScript:ChangeRights()">$LChangeRights</a>
+$InheritLine
 <!--
 <li><a class=action href="JavaScript:MoveFiles()">Move</a>
 <li><a class=action href="JavaScript:Rename()">Rename</a><br><br>
@@ -1139,7 +1169,11 @@ function ChangeRights()
    showPopWin('$prefix../../base/filemgmt/EditProcessor?'+
               'Field=acls&RefFromId=$target->{fid}',
               500,300,RestartApp);
-
+}
+function ChangeInherit()
+{
+   showPopWin('$prefix../../base/filemgmt/WebChangeInherit?$qparam',
+              500,100,RestartApp);
 }
 function DeleteFiles()
 {
@@ -1205,6 +1239,75 @@ sub WebRefresh
 {
    my $self=shift;
 
+}
+
+sub WebChangeInherit
+{
+   my $self=shift;
+   my $parentid=Query->Param("parentid");
+
+   my $header=$self->HttpHeader("text/html");
+   $header.=$self->HtmlHeader(style=>['default.css','mainwork.css',
+                                      'kernel.filemgmt.css',
+                                      'kernel.filemgmt.browser.css'],
+                              form=>1,multipart=>1,
+                              js=>['toolbox.js','subModal.js'],
+                              title=>$self->T("WebFS: Change rights inherit"));
+   $self->ResetFilter();
+   $self->SetFilter({fid=>\$parentid});
+   my ($rec)=$self->getOnlyFirst(qw(ALL));
+   if (defined($rec) && $self->IsMemberOf("admin")){
+      my $option="";
+      $option.="<input type=radio name='inherit' value='1'";
+      if ($rec->{inheritrights}){
+         $option.=" checked";
+      }
+      $option.=">".$self->T("yes"); 
+
+      $option.="<input type=radio name='inherit' value='0'";
+      if (!$rec->{inheritrights}){
+         $option.=" checked";
+      }
+      $option.=">".$self->T("no"); 
+      my $msg;
+      my $js="";
+      if (Query->Param("do")){
+         my %q=();
+         $q{parentid}=Query->Param("parentid");
+         my $inherit="0";
+         if (Query->Param("inherit") eq "1"){
+            $inherit="1";
+         }
+         if ($self->ValidatedUpdateRecord($rec,{inheritrights=>$inherit},
+                                           {fid=>\$parentid})){
+            $msg="<font color=green>OK</font>";
+            $js="<script language=\"JavaScript\">parent.RestartApp()</script>";
+         }
+         else{
+            $msg="<font color=red>".join("",$self->LastMsg())."</font>";
+         }
+      }
+      print $header;
+
+      
+
+      print("<table width=\"100%\" style=\"table-layout:fixed\" ".
+            "height=100% border=0>");
+      print("<tr><td colspan=2 valign=left align=center>".
+            $self->T("Inherit rights from parent directory").
+            ": ".$option."</td></tr>");
+
+
+      print("<tr><td colspan=2 valign=center align=center>".
+            "<input type=submit name=do style=\"width:200px\" ".
+            "value=\"".$self->T("save")."\"></td></tr>");
+      printf("<tr height=1%><td colspan=2 nowrap>".
+             "<div class=LastMsg style=\"overflow:hidden\">%s&nbsp;</div>".
+             "</td></tr>",$msg);
+      print("</table>$js");
+      print($self->HtmlPersistentVariables(qw(parentid)));
+      print("</form></body></html>");
+   }
 }
 
 sub WebUpload
