@@ -1047,7 +1047,7 @@ sub HtmlAutoDiscManager
    my @adrec=$self->getHashList(qw(ALL));
 
    @adrec=sort({
-            my $bk=$a->{discon} cmp $b->{cmp};
+            my $bk=$a->{discon} cmp $b->{discon};
             if ($bk==0){
                $bk=$a->{scanname} cmp $b->{scanname};
             }
