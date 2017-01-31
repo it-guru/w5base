@@ -114,7 +114,7 @@ The use times need to be in format "from-to". Multiple time blocks can be define
 X07:00-08:00,Y10:00-11:00,Z22:00-24:00
 '},
 'New.fieldgroup.default'=>{
-de=>'Bitte verwenden Sie die Funktion "Neueingabe" nur dann, wenn Sie wirklich ein <u>neues</u> Config-Item erfassen möchten. Sollte das Config-Item bereits in einem anderen Config-Management-System erfasst sein, verwenden Sie bitte die "Import" Funktion.',
-en=>'Please use the "New" function only in this cases, you realy want to create a <u>new</u> Config-Item. If the Config-Item already exists in an other Config-Management-System, you have to use the "Import" function.'
+de=>'<b>Achtung:</b> Bitte verwenden Sie die Funktion "Neueingabe" nur dann, wenn Sie wirklich ein <u>neues</u> Config-Item erfassen möchten. Sollte das Config-Item bereits in einem anderen Config-Management-System erfasst sein, verwenden Sie bitte die "Import" Funktion.',
+en=>'<b>Attention:</b> Please use the "New" function only in case you really want to create a <u>new</u> Config-Item. If the Config-Item already exists in another Config-Management-System, please use the "Import" function.'
 }
 

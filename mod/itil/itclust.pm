@@ -48,6 +48,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'Full Cluster Name',
                 dataobjattr   =>'itclust.fullname'),
 

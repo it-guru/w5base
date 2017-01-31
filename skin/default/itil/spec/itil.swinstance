@@ -38,4 +38,8 @@ directory in which the instance
 has stored her config and 
 enviroment informations.
 '},
+'New.fieldgroup.default'=>{
+de=>'<b>Achtung:</b> Bitte verwenden Sie die Funktion "Neueingabe" nur dann, wenn Sie wirklich ein <u>neues</u> Config-Item erfassen möchten. Sollte das Config-Item bereits in einem anderen Config-Management-System erfasst sein, verwenden Sie bitte die "Import" Funktion.',
+en=>'<b>Attention:</b> Please use the "New" function only in case you really want to create a <u>new</u> Config-Item. If the Config-Item already exists in another Config-Management-System, please use the "Import" function.'
+}
 
