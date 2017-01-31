@@ -108,119 +108,9 @@ sub new
                    " lnkcontact.target='base::user' and ".
                    " lnkcontact.parentobj='itil::businessservice' and ".
                    " croles like '%roles=\\'evmgr\\'=roles%'".
-                   " limit 1)"),
-
-      new kernel::Field::Text(
-                name          =>'vsmname',
-                precision     =>2,
-                readonly      =>1,
-                group         =>'VSMmeasurements',
-                label         =>'VSM HashTag',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'name',
-                weblinkto     =>'NONE',
-                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
-      new kernel::Field::Percent(
-                name          =>'vsmdavail',
-                precision     =>2,
-                readonly      =>1,
-                weblinkto     =>'NONE',
-                group         =>'VSMmeasurements',
-                label         =>'VSM daily availibility',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'avail',
-                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
-      new kernel::Field::Percent(
-                name          =>'vsmdperf',
-                precision     =>2,
-                readonly      =>1,
-                group         =>'VSMmeasurements',
-                weblinkto     =>'NONE',
-                label         =>'VSM daily performance',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'perf',
-                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
-      new kernel::Field::Percent(
-                name          =>'vsmdquality',
-                group         =>'VSMmeasurements',
-                readonly      =>1,
-                weblinkto     =>'NONE',
-                precision     =>2,
-                label         =>'VSM daily quality',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'quality',
-                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
-      new kernel::Field::Text(
-                name          =>'vsmdmperiod',
-                group         =>'VSMmeasurements',
-                readonly      =>1,
-                weblinkto     =>'NONE',
-                precision     =>2,
-                label         =>'VSM daily mperiod',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'mperiod',
-                vjoinbase     =>{'logtyp'=>\'day',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
-      new kernel::Field::Percent(
-                name          =>'vsmwavail',
-                precision     =>2,
-                readonly      =>1,
-                weblinkto     =>'NONE',
-                group         =>'VSMmeasurements',
-                label         =>'VSM weekly availibility',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'avail',
-                vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
-      new kernel::Field::Percent(
-                name          =>'vsmwperf',
-                precision     =>2,
-                readonly      =>1,
-                group         =>'VSMmeasurements',
-                weblinkto     =>'NONE',
-                label         =>'VSM weekly performance',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'perf',
-                vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
-      new kernel::Field::Percent(
-                name          =>'vsmwquality',
-                group         =>'VSMmeasurements',
-                readonly      =>1,
-                weblinkto     =>'NONE',
-                precision     =>2,
-                label         =>'VSM weekly quality',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'quality',
-                vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
-      new kernel::Field::Text(
-                name          =>'vsmwmperiod',
-                group         =>'VSMmeasurements',
-                readonly      =>1,
-                weblinkto     =>'NONE',
-                precision     =>2,
-                label         =>'VSM weekly mperiod',
-                vjointo       =>'tsvsm::itsperf',
-                vjoindisp     =>'mperiod',
-                vjoinbase     =>{'logtyp'=>\'week',rawislatest=>\'1'},
-                vjoinon       =>['id'=>'businessserviceid']),
-
+                   " limit 1)")
    );
    $self->AddGroup("contactpersons",translation=>'AL_TCom::businessservice');
-   $self->AddGroup("VSMmeasurements",translation=>'AL_TCom::businessservice');
 
    $self->AddFields(
       new kernel::Field::Text(
@@ -315,7 +205,6 @@ sub getDetailBlockPriority
       $inserti=$c+1 if ($l[$c] eq "desc");
    }
    splice(@l,$inserti,$#l-$inserti,("contactpersons",@l[$inserti..($#l+-1)]));
-   splice(@l,$inserti,$#l-$inserti,("VSMmeasurements",@l[$inserti..($#l+-1)]));
    return(@l);
 
 }
@@ -330,12 +219,6 @@ sub isViewValid
    if (in_array(\@l,["desc","ALL"])){
       push(@l,"contactpersons");
    }
-   if ($rec->{sdbid} ne ""){
-      if (in_array(\@l,["desc","ALL"])){
-         push(@l,"VSMmeasurements");
-      }
-   }
-
    return(@l);
 }
 
