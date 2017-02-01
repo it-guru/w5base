@@ -109,8 +109,7 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(0,undef) if (!($rec->{cistatusid}==3 || 
-                         $rec->{cistatusid}==4));
+   return(0,undef) if ($rec->{cistatusid}>5);
 
    #  Durch den Request ...
    #  https://darwin.telekom.de/darwin/auth/base/workflow/ById/14168384790001
