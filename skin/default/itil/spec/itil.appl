@@ -1,11 +1,12 @@
 'issoxappl'=>{de=>'
-Die Anwendung wird nach den Vorgaben
-aus dem ICS (Internal-Control-System) betreut.
-Alternativ erfolgt die Betreuung gemäß
-den Richtlinien aus SOX (Sarbanes Oxley Act),
-beispielsweise weil die nutzende Firma
+Die Anwendung wird nach den Vorgaben aus 
+dem ICS (Internal-Control-System) gültig 
+für den jeweiligen Bereich betreut.
+Alternativ erfolgt die Betreuung gemäß 
+den Richtlinien aus SOX (Sarbanes Oxley Act), 
+beispielsweise weil die nutzende Firma 
 an US-Börsen notiert ist.
-SOX und ICS betrifft hauptsächlich
+SOX und ICS betrifft hauptsächlich 
 Anwendungen aus dem Finanzbereich.
 ',en=>'
 The application is managed by specifications

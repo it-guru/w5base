@@ -25,11 +25,16 @@ commission the change of values in Asset Manager by their system operation.
 
 [de:]
 
-Das SOX-Flag wird in W5Base/Darwin üblicherweise aus der Anwendung geerbt.
-Wenn sich dieser Wert von dem in AssetManager hinterlegten Wert unterscheidet,
-muss durch den IT-SeM ein Auftrag an den Systembetrieb erfolgen, damit
-die Daten in AssetManager gepflegt werden.
+Das SOX-Flag wird in W5Base/Darwin standardmäßig aus einem Feld der 
+Anwendung geerbt: "Nach ICS oder SOX Richtlinien zu betreuen:".
+Wenn sich dieser Wert von dem in AssetManager hinterlegten Wert 
+unterscheidet, muss durch den IT-SeM ein Auftrag an den Systembetrieb 
+erfolgen, damit der SOX-konforme Berieb umgesetzt und dann die Daten 
+in AssetManager gepflegt werden.
 
+Der Anstoss dazu erfolgt üblicherweise durch den Application-Manager, 
+dessen Entscheidung hat Vorrang gegenüber Empfehlungen aus 
+Delivery-Einheiten!  
 
 =cut
 #######################################################################
@@ -91,18 +96,49 @@ sub qcheckRecord
       return(undef,undef) if (!$par->Ping());
       if ($parrec->{assignmentgroup} eq "CS.DPS.DE.MSY" ||
           ($parrec->{assignmentgroup}=~m/^CS\.DPS\.DE\.MSY\..*$/)){
-         # CS.DPS.DE.MSY Pflegt das SOX Flag in AM nicht
-         # siehe: https://darwin.telekom.de/darwin/auth/base/workflow/ById/14072395420001
+       # CS.DPS.DE.MSY Pflegt das SOX Flag in AM nicht
+       # siehe: 
+       # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14072395420001
          return(0,undef);
       }
       if (defined($parrec) && !$parrec->{soxrelevant}){ # only if no SOX is
          my $issox=$dataobj->getField("issox")->RawValue($rec); # set in AM
          if ($issox!=$parrec->{soxrelevant}){
-            my $msg="SOX relevance not matches the AM presets!".
-                    " - please check your order";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-            $errorlevel=3 if ($errorlevel<3);
+            my %appls;
+            my $isallsap=0;
+            # SAP erzeugt keine DataIssues based on 
+
+       # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14848210180001
+            if (ref($rec->{applications}) eq "ARRAY" && 
+                $#{$rec->{applications}}!=-1){
+               foreach my $appl (@{$rec->{applications}}){
+                  $appls{$appl->{applid}}++;
+               }
+               if (keys(%appls)){
+                  my $o=getModuleObject($self->getParent->Config(),
+                                        "itil::appl");
+                  $o->SetFilter({id=>[keys(%appls)]});
+                  my @l=$o->getHashList(qw(mgmtitemgroup));
+                  my $sapcnt=0;
+                  foreach my $a (@l){
+                     if (ref($a->{mgmtitemgroup}) eq "ARRAY"){
+                        if (in_array($a->{mgmtitemgroup},"SAP")){
+                           $sapcnt++;
+                        }
+                     }
+                  }
+                  if ($sapcnt>0 && $sapcnt==$#l+1){
+                     $isallsap=1;
+                  }
+               }
+            }
+            if (!$isallsap){
+               my $msg="SOX relevance not matches the AM presets!".
+                       " - please check your order";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
          }
       }
    }
