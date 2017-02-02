@@ -48,6 +48,7 @@ sub process
                $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
             }
 
+            $self->CleanupComplexInfoAbo();
             $self->CleanupIPEntries();
             if ($jobid ne ""){
                if ($joblog->Ping()){
@@ -78,6 +79,19 @@ sub process
       sleep($sleep);
    }
 }
+
+
+sub CleanupComplexInfoAbo
+{
+   my $self=shift;
+
+   my $CleanupInfoAbo=$self->getParent->Config->Param("CleanupInfoAbo");
+   $CleanupInfoAbo="<now-56d" if ($CleanupInfoAbo eq "");
+   msg(DEBUG,"(%s) Cleanup itil::complexinfoabo",$self->Self);
+   my $ia=getModuleObject($self->Config,"itil::complexinfoabo");
+   $ia->BulkDeleteRecord({'expiration'=>$CleanupInfoAbo});
+}
+
 
 sub CleanupIPEntries
 {

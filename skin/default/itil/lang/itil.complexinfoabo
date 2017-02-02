@@ -8,4 +8,9 @@
 'affected customer'=>{de=>'betroffener Kunde'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},
 'Active'=>{de=>'Aktiv'},
+'expiration to long in the past'=>{de=>'Verfallsdatum liegt zu weit in der Vergangenheit'},
+'set complex infoabo inactive due to expiration'=>{
+   de=>'setze InfoAbo inaktiv, da Verfallsdatum überschritten'
+},
+
 

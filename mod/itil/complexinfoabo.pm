@@ -236,6 +236,18 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (exists($newrec->{expiration}) &&
+       $newrec->{expiration} ne $oldrec->{expiration} &&
+       $newrec->{expiration} ne ""){
+      my $nowstamp=NowStamp("en");
+      my $expiration=effVal($oldrec,$newrec,"expiration");
+      my $duration=CalcDateDuration($nowstamp,$expiration);
+      if (!defined($duration) || $duration->{days}<0){
+         $self->LastMsg(ERROR,"expiration to long in the past");
+         return(undef);
+      }
+   }
+
 #   my $name=trim(effVal($oldrec,$newrec,"name"));
 #   if ($name=~m/\s/i){
 #      $self->LastMsg(ERROR,"invalid sitename '%s' specified",$name); 
