@@ -112,10 +112,10 @@ select distinct "itil::system".id                 id,
 from "itil::appl"
  left outer join "base::grp" bteam   
    on "itil::appl".businessteamid=bteam.grpid
- join "W5I_ACT_itil::lnkapplsystem"  
-   on "itil::appl".id="W5I_ACT_itil::lnkapplsystem".applid
+ join "W5I_ALL_itil::lnkapplsystem"  
+   on "itil::appl".id="W5I_ALL_itil::lnkapplsystem".applid
  join "itil::system"                 
-   on "W5I_ACT_itil::lnkapplsystem".systemid="itil::system".id
+   on "W5I_ALL_itil::lnkapplsystem".systemid="itil::system".id
  left outer join "tsacinv::system"              
    on "itil::system".systemid="tsacinv::system".systemid
  left outer join "W5I_HPSAsup__system_of"
