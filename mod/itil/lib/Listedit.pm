@@ -939,6 +939,11 @@ sub calcSoftwareState
 }
 
 
+# mz, 02.02.17
+# Diese Funktion ist veraltet und soll nicht mehr verwendet werden.
+# Sobald die beiden QRules 'ApplOfflineCertCheck' und 'SWInstanceCertCheck'
+# auf die Verwendung der neuen Funktion 'handleCertExpiration' umgestellt sind,
+# kann sich gelöscht werden.
 sub handleSSLExpiration
 {
    my $self=shift;
@@ -1051,15 +1056,148 @@ sub handleSSLExpiration
 }
 
 
-# mz
-# Diese Funktion soll mal Expiration-Handling allgemein abhandeln können und
-# damit auch handleSSLExpiration ablösen.
-# Sie ist aber noch nicht fertig, noch nicht getestet und darf deshalb
-# aktuell noch nicht verwendet werden.
-sub handleExpiration
+sub handleCertExpiration
 {
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+   my $parentobj=shift;
+   my $parentrec=shift;
+   my $qmsg=shift;
+   my $dataissue=shift;
+   my $errorlevel=shift;
+   my $param=shift;
+   my $newrec;
+
+   if (ref($param) ne 'HASH') {
+      Stacktrace();
+      return(0);
+   }
+
+   return(0) if (!defined($param->{expdatefld}));
+
+   my $endfld=$param->{expdatefld};
+   my $notifyfld=$param->{expnotifyfld};
+
+   my $notifylevel=8*7; # 8 weeks - mail notification
+   my $issuelevel =1*7; # 1 week  - dataissue
+
+   $notifylevel=$param->{notifylevel} if (exists($param->{notifylevel}));
+   $issuelevel =$param->{issuelevel}  if (exists($param->{issuelevel}));
+
+   if (!defined($parentobj)) {
+      $parentobj=$dataobj;
+      $parentrec=$rec;
+   }
+
+   my $d=CalcDateDuration(NowStamp('en'),$rec->{$endfld},'GMT');
+
+   if (defined($notifylevel)) {
+      if ($d->{days}<$notifylevel &&
+         ((defined($notifyfld) && !defined($rec->{$notifyfld})) ||
+          !defined($notifyfld))) {
+         my $uobj=getModuleObject($self->getParent->Config,'base::user');
+         $uobj->SetFilter({userid=>\$parentrec->{databossid},
+                           cistatusid=>\4});
+         my ($databoss,$msg)=$uobj->getOnlyFirst(qw(userid tz lastlang));
+
+         my %ul;
+         $parentobj->getWriteAuthorizedContacts($parentrec,
+                                                [qw(contacts)],30,\%ul);
+         my $emailto;
+         my @emailcc=keys(%ul);
+         my $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+         my $lang;
+         my $timezone;
+
+         if (defined($databoss->{userid})) {
+            $emailto=$databoss->{userid};
+            $lang=$databoss->{lastlang};
+            $timezone=$databoss->{tz};
+         }
+         else {
+            $uobj->ResetFilter();
+            $uobj->SetFilter({userid=>\@emailcc,cistatusid=>\4});
+            my @contacts=$uobj->getHashList(qw(userid tz lang));
+            $emailto=$contacts[0]->{userid};
+            $lang=$contacts[0]->{lastlang};
+            $timezone=$contacts[0]->{tz};
+         }
+
+         @emailcc=grep($_!=$emailto,@emailcc);
+
+         my %notifyparam=(emailto=>$emailto,
+                          emailcc=>\@emailcc);
+
+         my $subject=$self->T('Expiration of a certificate');
+
+         my $exp=$dataobj->getField($endfld)
+                         ->FormatedDetail({$endfld=>$rec->{$endfld}});
+         $exp.=" ".$timezone;
+
+         my $text=$self->T('Dear databoss').",\n\n";
+         if ($d->{totalminutes}>0) {
+           $exp.=sprintf(" (in %d %s)",$d->{days},$self->T('days'));
+           $text.=sprintf($self->T("Certificate for %s expires"),
+                          $parentrec->{name});
+         }
+         else {
+           $text.=sprintf($self->T("Certificate for %s has expired"),
+                          $parentrec->{name});
+         }
+         $text.="\n\n".$self->T('Expiration date').":\n";
+         $text.="$exp\n\n";
+         $text.=$self->T('SSLEXP01')."\n\n";
+         $text.="DirectLink:\n".$rec->{urlofcurrentrec};
+
+         $newrec->{$notifyfld}=NowStamp('en');
+         my $wfact=getModuleObject($self->getParent->Config,
+                                   "base::workflowaction");
+         $wfact->Notify("INFO",$subject,$text,%notifyparam);
+
+         if (defined($lastlang)){
+            $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+         }
+         else{
+            delete($ENV{HTTP_FORCE_LANGUAGE});
+         }
+      }
+      elsif ($d->{days}>=$notifylevel &&
+             defined($notifyfld) &&
+             defined($rec->{$notifyfld})) {
+            $newrec->{$notifyfld}=undef;
+      }
+   }
+
+   if (defined($newrec)) {
+      $dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>$rec->{id}});
+   }
+
+   if (defined($issuelevel) && $d->{days}<$issuelevel) {
+      my $msg;
+
+      $$errorlevel=3 if ($$errorlevel<3);
+
+      if ($d->{totalminutes}<0) {
+         $msg='Certificate has expired';
+      }
+      else {
+         $msg='Certificate expires in a few days';
+      }
+
+      if ($parentobj==$dataobj) {
+         push(@$qmsg,$msg);
+         push(@$dataissue,$msg);
+      }
+      else {
+         push(@$qmsg,$msg.': '.$rec->{name});
+         push(@$dataissue,$msg.': '.$rec->{urlofcurrentrec});
+      }
+   }
+
    return(1);
 }
+
 
 
 1;

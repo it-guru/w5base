@@ -102,6 +102,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::QRule;
+use itil::lib::Listedit;
 @ISA=qw(kernel::QRule);
 
 sub new
@@ -187,8 +188,12 @@ sub qcheckRecord
          $newrec->{mdate}=$rec->{mdate};
          $newrec->{editor}=$rec->{editor};
 
-         my @qmsg;
+         my $swop=$dataobj->Clone();
+         $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
+
          my $errorlevel=0;
+         my @qmsg;
+         my @dataissue;
 
          if ($sslstate=~m/OK/){
             if (!defined($sslend)){
@@ -196,73 +201,24 @@ sub qcheckRecord
                return(3,{qmsg=>[$m],dataissue=>[$m]});
             }
 
-            my $d=CalcDateDuration($now,$sslend,"GMT");
-
-            my $maxwarn=7*8;
-            my $max=7;
-
-            if ($d->{days}<$maxwarn) {
-               if (!$rec->{sslexpnotify1}) {
-                  $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{},{
-                        autosubject=>0,
-                        autotext=>0,
-                        mode=>'QualityCheck',
-                        datasource=>'Information about expiration '.
-                                    'of an SSL certificate'
-                     },sub {
-                        my $subject=$self->T('Expiration of an '.
-                                             'SSL certificate');
-                        $subject.=" ($rec->{name})";
-            
-                        my $user=getModuleObject($self->getParent->Config,
-                                                 "base::user");
-                        $user->SetFilter({userid=>\$rec->{databossid}});
-                        my ($databoss,$msg)=$user->getOnlyFirst(qw(tz));
-
-                        my $exp=$dataobj->getField('sslend')->
-                                   FormatedDetail({sslend=>$sslend},undef);
-                        $exp.=" ".$databoss->{tz};
-                        $exp.=" (in $d->{days} ".$self->T('days').")";
-
-                        my $msg=$self->T('Dear databoss').",\n\n";
-                        $msg.=sprintf($self->T("SSL certificate ".
-                                               "for %s expires"),
-                                               $rec->{name});
-                        $msg.="\n\n".$self->T('Expiration date').":\n";
-                        $msg.="$exp\n\n";
-                        $msg.=$self->T('MSG01');
-
-                        $newrec->{sslexpnotify1}=$now;
-
-                        return($subject,$msg);
-                     });
-               }
-            }
-            else {
-               if ($rec->{sslexpnotify1}) {
-                  $newrec->{sslexpnotify1}=undef;
-               }
-            }
-
-            if ($d->{days}<=0) {
-               push(@qmsg,"SSL certificate has expired");
-               $errorlevel=3 if ($errorlevel<3);
-            }
-            elsif ($d->{days}<$max) {
-               push(@qmsg,"SSL certificate expires in a few days");
-               $errorlevel=3 if ($errorlevel<3);
+            my $ok=$self->itil::lib::Listedit::handleCertExpiration(
+                                        $dataobj,$rec,undef,undef,
+                                        \@qmsg,\@dataissue,\$errorlevel,
+                                        {expnotifyfld=>'sslexpnotify1',
+                                         expdatefld=>'sslend'});
+            if (!$ok) {
+               msg(ERROR,sprintf("QualityCheck of '%s' (%d) failed",
+                                 $dataobj->Self(),$rec->{id}));
             }
          }
          else{
             push(@qmsg,"SSL check:".$sslstate);
+            push(@dataissue,"SSL check:".$sslstate);
             $errorlevel=3 if ($errorlevel<3);
          }
 
-         my $swop=$dataobj->Clone();
-         $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
-
          if ($#qmsg!=-1) {
-            return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+            return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue});
          }
       }
    }
@@ -280,6 +236,7 @@ sub checkSSL
    Env::C::setenv("HTTPS_VERSION","3",1);
    my $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
                                    SSL_version=>'SSLv23',
+                                   SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
                                    SSL_session_cache_size=>0);
    #my $errstr=IO::Socket::SSL->errstr();
@@ -288,6 +245,7 @@ sub checkSSL
       msg(INFO,"Step2.1: try to connect to %s:%s SSLv2",$host,$port);
       $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
                                    SSL_version=>'SSLv2',
+                                   SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
                                    SSL_session_cache_size=>0);
      # my $errstr=IO::Socket::SSL->errstr();
@@ -297,6 +255,7 @@ sub checkSSL
       msg(INFO,"Step2.2: try to connect to %s:%s SSLv23",$host,$port);
       $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
                                    SSL_version=>'SSLv23',
+                                   SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
                                    SSL_session_cache_size=>0);
      # my $errstr=IO::Socket::SSL->errstr();

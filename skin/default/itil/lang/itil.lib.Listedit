@@ -15,7 +15,11 @@
 'Dear databoss'=>{de=>'Sehr geehrter Datenverantwortlicher'},
 "Certificate for %s expires"=>{
    de=>"ein Zertifikat für '%s' läuft demnächst ab.",
-   en=>"a certificate for '%s' is almost expired."
+   en=>"a certificate for '%s' has almost expired."
+},
+"Certificate for %s has expired"=>{
+   de=>"ein Zertifikat für '%s' ist abgelaufen.",
+   en=>"a certificate for '%s' has expired."
 },
 'SSLEXP01'=>{
    de=>"Sie erhalten diese Nachricht einmalig, ".
