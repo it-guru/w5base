@@ -71,10 +71,11 @@ sub new
             my $newrec=shift;
             my $myname=$self->Name();
             return(undef) if (!defined($newrec) || !exists($newrec->{$myname}));
-            my $oldval=$oldrec->{$myname} if (defined($oldrec) && 
-                                              exists($oldrec->{$myname}));
-            my $newval=$newrec->{$myname} if (defined($newrec) && 
-                                              exists($newrec->{$myname}));
+            my ($oldval,$newval);
+            $oldval=$oldrec->{$myname} if (defined($oldrec) && 
+                                           exists($oldrec->{$myname}));
+            $newval=$newrec->{$myname} if (defined($newrec) && 
+                                           exists($newrec->{$myname}));
             my @addlist=();
             my @dellist=();
             my $idname=$self->getParent->IdField->Name();
@@ -149,6 +150,31 @@ sub new
                 label         =>'LinkID',
                 size          =>'10',
                 dataobjattr   =>'lnkgrpuser.lnkgrpuserid'),
+
+      new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'fullname',
+                onRawValue    =>sub{
+                    my $self=shift;
+                    my $current=shift;
+                    my $fullname=$current->{lnkgrpuserid};
+
+                    my ($f,$v);
+                    $f=$self->getParent->getField("user");
+                    $v=defined($f) ? $f->RawValue($current) : "?";
+                    $fullname.=":".$v;
+                   
+                    $f=$self->getParent->getField("group");
+                    $v=defined($f) ? $f->RawValue($current) : "?";
+                    $fullname.=":".$v;
+                   
+                    $f=$self->getParent->getField("roles");
+                    $v=defined($f) ? $f->RawValue($current) : "?";
+                    $v=ref($v) eq "ARRAY" ? join(", ",@$v):$v;
+                    $fullname.=":".$v;
+
+                    return($fullname);
+                }),
 
       new kernel::Field::TextDrop(
                 name          =>'user',
@@ -439,6 +465,18 @@ sub new
    );
    $self->setDefaultView(qw(lnkgrpuserid user group editor));
    $self->setWorktable("lnkgrpuser");
+   $self->{history}={
+      insert=>[
+         {dataobj=>'base::grp', id=>'grpid',
+          field=>'fullname',as=>'users'}
+      ],
+      update=>['local'],
+      delete=>[
+         {dataobj=>'base::grp', id=>'grpid',
+          field=>'fullname',as=>'users'}
+      ]
+   };
+
    return($self);
 }
 
