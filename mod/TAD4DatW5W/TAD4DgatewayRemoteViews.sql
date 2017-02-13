@@ -257,7 +257,7 @@ create materialized view "mview_TAD4D_adm_swproduct"
    as
 select * from adm_swproduct@tad4d
 union all
-select * from adm_swproduct@tad4di
+select * from adm_swproduct@tad4di;
 
 CREATE INDEX "TAD4D_adm_swproduct_id1" 
    ON "mview_TAD4D_adm_swproduct"(swproduct_id) online;
