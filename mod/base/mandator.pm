@@ -99,6 +99,7 @@ sub new
                 name          =>'contacts',
                 label         =>'Contacts',
                 class         =>'mandator',
+                vjoindisp     =>[qw(targetname targetweblink comments roles)],
                 vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
 

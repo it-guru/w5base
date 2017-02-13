@@ -57,7 +57,7 @@ sub new
       new kernel::Field::DynWebIcon(
                 name          =>'targetweblink',
                 searchable    =>0,
-                depend        =>['target','targetid'],
+                depend        =>[qw(target targetid alertstate expiration)],
                 uploadable    =>0,
                 htmlwidth     =>'5px',
                 htmldetail    =>0,
@@ -72,9 +72,29 @@ sub new
 
                    my $targetido=$self->getParent->getField("targetid");
                    my $targetid=$targetido->RawValue($current);
+
+                   my $expirationo=$self->getParent->getField("expiration");
+                   my $expiration=$expirationo->FormatedDetail($current,
+                                                               "HtmlDetail");
+                   my $msg;
                    my $img="<img ";
+                   if ($current->{alertstate} ne ""){
+                      $img.="style=\"border-width:1px;border-color:".
+                            "$current->{alertstate};border-style:solid; ".
+                            "background:$current->{alertstate}\" ";
+                      $msg=$self->getParent->T("entry expires at")." ".
+                           $expiration;
+                   }
+                   else{
+                      $img.="border=0 ";
+                   }
+                   $msg=~s/<.*?>//g;
                    $img.="src=\"../../base/load/directlink.gif\" ";
-                   $img.="title=\"\" border=0>";
+                   if ($msg ne ""){
+                      $img.=" title=\"$msg\"";
+                   }
+                   $img.=" border=0>";
+
                    my $dest;
                    if ($target eq "base::user"){
                       $dest="../../base/user/Detail?userid=$targetid";

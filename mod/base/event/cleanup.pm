@@ -40,7 +40,18 @@ sub Init
    $self->RegisterEvent("CleanupLnkGrpUser","LnkGrpUser");
    $self->RegisterEvent("CleanupWebFS","CleanupWebFS");
    $self->RegisterEvent("CleanupLnkContact","CleanupLnkContact");
+   $self->RegisterEvent("CleanupLnkMandatorContact","LnkMandatorContact");
    return(1);
+}
+
+
+sub LnkMandatorContact
+{
+   my $self=shift;
+   my %param=@_;
+   $param{flt}={parentobj=>'base::mandator'};
+
+   return($self->CleanupLnkContact(%param));
 }
 
 
@@ -52,6 +63,11 @@ sub CleanupLnkContact
    my $obj=getModuleObject($self->Config,"base::lnkcontact");
    my $objop=$obj->Clone();
    $obj->SetCurrentView(qw(ALL));
+   
+   if (exists($param{flt})) {
+      $obj->SetFilter($param{flt});
+   }
+
    my ($rec,$msg)=$obj->getFirst(unbuffered=>1);
    my $c=0;
    my %o;
@@ -77,9 +93,64 @@ sub CleanupLnkContact
             $o{$rec->{parentobj}}->SetFilter({$idname=>\$rec->{refid}});
             my ($refrec)=$o{$rec->{parentobj}}->getOnlyFirst($idname);
             if (!defined($refrec)){
-               $needdelete++
+               $needdelete++;
             }
          }
+
+         # handle mandator contacts
+         if ($rec->{parentobj} eq 'base::mandator') {
+            my $dur=CalcDateDuration($rec->{expiration},NowStamp('en'));
+
+            if (!defined($rec->{expiration})) {
+               if (defined($rec->{alertstate})) {
+                  $objop->ValidatedUpdateRecord($rec,
+                             {alertstate=>undef,
+                              editor=>$rec->{editor},
+                              realeditor=>$rec->{realeditor},
+                              mdate=>$rec->{mdate}},
+                             {id=>\$rec->{id}});
+               }
+            }
+            elsif ($dur->{days}>28) {
+               # delete, if more than 4 weeks expired
+               $needdelete++;
+            }
+            elsif ($dur->{days}>0) {
+               # set alertstate red and delete roles
+               if ($rec->{alertstate} ne 'red') {
+                  $objop->ValidatedUpdateRecord($rec,
+                             {alertstate=>'red',
+                              editor=>$rec->{editor},
+                              croles=>undef,
+                              realeditor=>$rec->{realeditor},
+                              mdate=>$rec->{mdate}},
+                             {id=>\$rec->{id}});
+               }
+            }
+            elsif ($dur->{days}>-21) {
+               # set alertstate orange
+               if ($rec->{alertstate} ne 'orange') {
+                  $objop->ValidatedUpdateRecord($rec,
+                             {alertstate=>'orange',
+                              editor=>$rec->{editor},
+                              realeditor=>$rec->{realeditor},
+                              mdate=>$rec->{mdate}},
+                             {id=>\$rec->{id}});
+               }
+            }
+            elsif ($dur->{days}>-28) {
+               # set alertstate yellow
+               if ($rec->{alertstate} ne 'yellow') {
+                  $objop->ValidatedUpdateRecord($rec,
+                             {alertstate=>'yellow',
+                              editor=>$rec->{editor},
+                              realeditor=>$rec->{realeditor},
+                              mdate=>$rec->{mdate}},
+                             {id=>\$rec->{id}});
+               }
+            }
+         }
+
          if ($needdelete){
             $objop->ValidatedDeleteRecord($rec);
             $deletecount++;

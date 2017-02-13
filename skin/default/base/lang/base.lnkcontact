@@ -10,3 +10,4 @@
 'no write access to requested contact'=>{de=>'kein Schreibzugriff auf den angeforderten Kontakt'},
 'empty parent object'=>{de=>'kein Elternelement definiert'},
 'Contact phone'=>{de=>'Kontakt-Telefonnummer'},
+'entry expires at'=>{de=>'Eintrag verfällt am'},

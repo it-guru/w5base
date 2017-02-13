@@ -372,7 +372,7 @@ sub new
                       $img.="style=\"border-width:1px;border-color:".
                             "$current->{alertstate};border-style:solid; ".
                             "background:$current->{alertstate}\" "; 
-                      $msg=$self->getParent->T("entry expieres at")." ".
+                      $msg=$self->getParent->T("entry expires at")." ".
                            $expiration;
                    }
                    else{
@@ -430,7 +430,7 @@ sub new
                       $img.="style=\"border-width:1px;border-color:".
                             "$current->{alertstate};border-style:solid; ".
                             "background:$current->{alertstate}\" "; 
-                      $msg=$self->getParent->T("entry expieres at")." ".
+                      $msg=$self->getParent->T("entry expires at")." ".
                            $expiration;
                    }
                    else{

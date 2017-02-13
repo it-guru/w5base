@@ -1,7 +1,7 @@
 'Group'=>{ de=>'Gruppe'},
 'User'=>{ de=>'Kontakt'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},
-'entry expieres at'=>{de=>'Eintrag verfällt am'},
+'entry expires at'=>{de=>'Eintrag verfällt am'},
 'Alert-State'=>{de=>'Alarm-Status'},
 'invalid group specified'=>{ de=>'ungültige Gruppe'},
 'base::lnkgrpuser'=>{ de=>'Gruppenverknüpfung',en=>'Grouprelation'},
