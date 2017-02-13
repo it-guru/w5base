@@ -24,8 +24,8 @@ create or replace synonym W5I.HPSA_lnkswp_of
 /*  ==== tshpsa::lnkswp ====== */
 -- drop materialized view "mview_HPSA_lnkswp";
 create materialized view "mview_HPSA_lnkswp"
-   refresh complete start with sysdate
-   next sysdate+(1/24)*7
+   refresh complete start with TRUNC(SYSDATE+1)+((1/24)*6)
+   next SYSDATE+1
    as
 select item_id sysid,
        item_id server_id,
@@ -67,8 +67,8 @@ create or replace synonym W5I.HPSA_lnkswp
 /*  ==== tshpsa::system ====== */
 -- drop materialized view "mview_HPSA_system";
 create materialized view "mview_HPSA_system"
-   refresh complete start with sysdate
-   next sysdate+(1/24)*12
+   refresh complete start with TRUNC(SYSDATE+1)+((1/24)*6)
+   next SYSDATE+1
    as
 with j as (select item_id,mdate,lower(hostname) lhostname,hostname,pip,systemid,
            RANK() OVER (PARTITION BY item_id ORDER BY mdate DESC) dest_rank
