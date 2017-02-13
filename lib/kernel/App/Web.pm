@@ -63,7 +63,7 @@ sub RunWebApp
       my $f;
       $havestate="$statedir/$$.pid";
       if (sysopen($f,$havestate,O_RDWR|O_CREAT|O_TRUNC)){
-         my $s="$ENV{'REMOTE_USER'};$MOD;".time().";\n";
+         my $s="$ENV{'REMOTE_USER'};$MOD;".time().";$ENV{REMOTE_ADDR};\n";
          my $nb=length($s);
          if (syswrite($f,$s,$nb)!=$nb){
             close($f);

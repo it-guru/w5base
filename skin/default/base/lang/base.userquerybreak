@@ -1,0 +1,4 @@
+'base::userquerybreak'=>{de=>'Abfrageabbruch',en=>'Query break'},
+'Contact'=>{de=>'Kontakt'},
+'Break after duration'=>{de=>'Abbruch nach Querydauer'},
+

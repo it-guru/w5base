@@ -368,3 +368,26 @@ alter table grp  add ext_refid1 varchar(40),add key(ext_refid1), add ext_refid2 
 alter table contact add lastknownboss char(128) default NULL;
 alter table contact add winhandling char(20) default 'windefault';
 alter table contact add lastexternalseen date;
+CREATE TABLE uservote (
+  id          bigint(20) NOT NULL,
+  refid       bigint(20) NOT NULL,
+  parentobj   varchar(80) NOT NULL,
+  entrymonth  char(7) NOT NULL,
+  voteval     int(4) NOT NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  editor varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  UNIQUE KEY voteinterval (entrymonth,createuser,parentobj,refid),
+  KEY uEntry (parentobj,refid,createuser)
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE userquerybreak (
+  id          bigint(20) NOT NULL,
+  userid      bigint(20) NOT NULL,
+  dataobj     varchar(80) NOT NULL,
+  duration    bigint(20),
+  clientip    varchar(80),
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (id),key(userid),key(createdate)
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;

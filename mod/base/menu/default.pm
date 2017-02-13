@@ -110,6 +110,10 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.user.querybreak",
+                      "base::userquerybreak",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.user.import",
                       "base::user",
                       func=>'ImportUser',

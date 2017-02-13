@@ -137,6 +137,7 @@ foreach my $apid (@apid){
          $stat{$apid}->{mod}=$d[1];
          $stat{$apid}->{start}=$d[2];
          $stat{$apid}->{duration}=$t0-$d[2];
+         $stat{$apid}->{clientip}=$d[3];
       }
       else{
          printf STDERR ("ERROR: inconsistend pid file at '$statefile'\n");
@@ -233,8 +234,20 @@ foreach my $apid (@apid){
                }
                if ((!($cmdresult == -1)) && $stat{$apid}->{sysuser} ne ""){
                   my $exitcode=$cmdresult >> 8;
+
                   my $act=getModuleObject($curconfig,"base::workflowaction");
                   $act->Cache->{W5Server}=$W5V2::W5Server;
+
+                  if (defined($urec)){
+                     my $blog=getModuleObject($curconfig,
+                                              "base::userquerybreak");
+                     $blog->ValidatedInsertRecord({
+                        userid=>$urec->{userid},
+                        tbreak=>$stat{$apid}->{duration},
+                        dataobj=>$stat{$apid}->{mod},
+                        clientip=>$stat{$apid}->{clientip}
+                     });
+                  }
                   my %param=(adminbcc=>1,
                              emailfrom=>'"W5Base Process-Controller" <>');
                   if (defined($urec)){
