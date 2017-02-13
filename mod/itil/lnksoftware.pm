@@ -876,8 +876,8 @@ sub Validate
          }
       }
    }
-   if ($newrec->{licsubofid} eq "" &&
-       $oldrec->{licsubofid} eq ""){
+   if ((defined($newrec) && $newrec->{licsubofid} eq "") &&
+       (defined($oldrec) && $oldrec->{licsubofid} eq "")){
       delete($newrec->{licsubofid});
    }
    if (effVal($oldrec,$newrec,"licsubofid") ne ""){
@@ -979,20 +979,19 @@ sub Validate
                msg(INFO,"alternate create of installation OK");
             }
             else{
-               #if (defined($oldrec)){
-               #   my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
-               #   my @lim=$self->getMembersOf($mandatorid, 
-               #                               [qw(RLIOperator)],'up');
-               #   if ($#lim==-1){
-               #      $self->LastMsg(ERROR,"system is not writeable for you");
-               #      return(undef);
-               #   }
-               #}
-               if ((!defined($oldrec) ||
-                    !($self->isInstanceRelationWriteable($oldrec->{id}))) &&
-                   !$self->isLicManager(effVal($oldrec,$newrec,"mandatorid"))){
+               if (!defined($oldrec)){
+                  msg(INFO,"new not allowed for any person");
                   $self->LastMsg(ERROR,"system is not writeable for you");
                   return(undef);
+               }
+               else{
+                  if (!$self->isInstanceRelationWriteable($oldrec->{id}) &&
+                      !$self->isLicManager(effVal($oldrec,$newrec,
+                                                  "mandatorid"))){
+                     msg(INFO,"no licensmanager and no instance writer");
+                     $self->LastMsg(ERROR,"system is not writeable for you");
+                     return(undef);
+                  }
                }
             }
          }
