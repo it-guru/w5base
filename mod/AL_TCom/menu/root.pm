@@ -265,6 +265,11 @@ sub Init
                       "itil::lnksoftwaresystem",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.software.new",
+                      "itil::lnksoftwaresystem",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system.software.matrix",
                       "itil::systemsoftwarematrix",
                       defaultacl=>['admin']);

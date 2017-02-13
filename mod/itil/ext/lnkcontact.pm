@@ -118,6 +118,14 @@ sub getPosibleRoles
              "write"           =>$self->getParent->T("write",
                                                      $self->Self));
    }
+   if ($parentobj=~m/^.+::software$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::software$/)){
+      return(
+             "pmanager"        =>$self->getParent->T("Productmanager",
+                                                     $self->Self));
+   }
    if ($parentobj=~m/^.+::itfarm$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&

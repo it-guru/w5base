@@ -136,6 +136,11 @@ sub new
                 htmleditwidth =>'100px',
                 dataobjattr   =>'software.rightsmgmt'),
 
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                group         =>'contacts'),
+
       new kernel::Field::PhoneLnk(
                 name          =>'phonenumbers',
                 searchable    =>0,
@@ -666,7 +671,8 @@ sub initSearchQuery
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default options doccontrol pclass phonenumbers source));
+   return(qw(header default options doccontrol pclass contacts 
+             phonenumbers source));
 }
 
 
@@ -697,7 +703,7 @@ sub isWriteValid
       push(@l,"options");
    }
    if ($self->IsMemberOf(["admin","w5base.softwaremgmt.admin"])){
-      push(@l,"pclass");
+      push(@l,"pclass","contacts");
    }
    return(@l);
 }

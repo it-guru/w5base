@@ -41,6 +41,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'LinkID',
+                htmldetail    =>'NotEmpty',
                 searchable    =>0,
                 dataobjattr   =>'lnksoftwaresystem.id'),
  
@@ -1047,6 +1048,23 @@ sub isViewValid
    return("ALL");
 }
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+                   # (1/ALL=Ok) or undef if record could/should be not deleted
+   my @l=grep(!/^$/,grep(!/^\!.*$/,grep(!/^.*\..+$/,
+              $self->isWriteValid($rec))));
+   return if ($#l==-1);
+   return(1) if (in_array(\@l,["ALL","default"]));
+   # Löschen geht noch nicht! - Das muß erst noch implementiert werden, das
+   # dann nach dem Löschen auch noch einem Mail an den Datenverantwortlichen
+   # erzeugt wird.
+   #return(1) if (in_array(\@l,["instdetail"]));
+   return;
+}
+
+
 sub isWriteValid
 {
    my $self=shift;
@@ -1083,6 +1101,9 @@ sub isWriteValid
    }
    my $mandatorid=$rec->{mandatorid};
    return("lic") if ($self->isLicManager($mandatorid));
+   if (defined($rec) && $self->checkAlternateInstCreateRights($rec)){
+      return("instdetail");
+   }
    return(undef);
 }
 
@@ -1143,14 +1164,40 @@ sub checkAlternateInstCreateRights
 
    my $sw=getModuleObject($self->Config,"itil::software");
    $sw->SetFilter({id=>\$softwareid});
-   my ($swrec,$msg)=$sw->getOnlyFirst(qw(depcompcontactid compcontactid));
-   return(0) if (!defined($swrec));
+   my ($rec,$msg)=$sw->getOnlyFirst(qw(depcompcontactid compcontactid
+                                         contacts));
+   return(0) if (!defined($rec));
    my $userid=$self->getCurrentUserId();
-   return(0) if ($swrec->{depcompcontactid} ne $userid &&
-                 $swrec->{compcontactid} ne $userid);  # first release of
-                                                       # trust checking - this
-                                                       # is not the final 
-                                                       # process!
+   if ($rec->{depcompcontactid} eq $userid || 
+       $rec->{compcontactid} eq $userid) {
+      $newrec->{alternateCreateRight}="1";
+      return(1);
+   }
+   my $foundpmanager=0;
+   if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  ["RMember"],"up");
+      my @grpids=keys(%grps);
+      foreach my $contact (@{$rec->{contacts}}){
+         if ($contact->{target} eq "base::user" &&
+             $contact->{targetid} ne $userid){
+            next;
+         }
+         if ($contact->{target} eq "base::grp"){
+            my $grpid=$contact->{targetid};
+            next if (!grep(/^$grpid$/,@grpids));
+         }
+         my @roles=($contact->{roles});
+         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+         if (in_array(\@roles,"pmanager")){
+            $foundpmanager++;
+         }
+      }
+   }
+   if (!$foundpmanager){
+      return(0);
+   }
+
    $newrec->{alternateCreateRight}="1";  # store information about alternate
                                          # process for FinishWrite
 

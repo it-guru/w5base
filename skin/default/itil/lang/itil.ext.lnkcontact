@@ -22,3 +22,4 @@
 'read contract'=>{de=>'lesen'},
 'write contract'=>{de=>'write'},
 'privacy read'=>{de=>'vertrauliches lesen'},
+'Productmanager'=>{de=>'Produktmanager'},

@@ -58,4 +58,5 @@
 'licensing contract is not active'=>{de=>'Lizenzierung ist nicht aktiv'},
 'not enouth free units in license'=>{de=>'nicht genügend freie Einheiten in der Lizenz'},
 'is sub licensed product of'=>{de=>'ist Unterproduktlizenz von'},
+'system is not writeable for you'=>{de=>'kein Schreibzugriff auf das angegebene System'},
 
