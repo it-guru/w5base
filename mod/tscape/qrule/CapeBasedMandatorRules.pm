@@ -17,28 +17,44 @@ NONE
 
 [en:]
 
-The mapping is done only on config items in the following CI-States:
+The mandators of applications are determined based on the org. unit of 
+the listed ICTO object.
 
-available/in project |  installed/active | inactive/stored
+The mapping is done only on applications with primary operation mode 
+"production" and "disaster recovery" and only in the following CI-States:
+ 
+available/in project | installed/active | inactive/stored
 
-If the mandator of logical systems, software instances and assets is the same
-as the one on the superordinate CI, this mandator is used.
-If there are multiple different mandators, but they are TelekomIT_* mandators,
-the mandator "TelekomIT" is selected.
-In all other cases no mandator replacement takes place. 
+Mandator of applications with other primary operation mode 
+(test, developmnet, etc.) should correspond with the org. unit of the 
+application manager.
+
+(Example : If the AM is in solution E-COO then the application should 
+have the mandator E-COO)
+ 
+If the mandator of logical systems, software instances and assets is the same 
+as the one on the superordinate CI, this mandator is used. 
+If there are multiple different mandators, but they are TelekomIT_* mandators, 
+the mandator "TelekomIT" is selected. In all other cases no 
+mandator replacement takes place.
 
 [de:]
 
 Die Mandanten von Anwendungen werden basierend auf der im angegebenen
-ICTO-Objekt definierten Organisations-Zuorndung zugeordnet.
+ICTO-Objekt definierten Organisations-Zuordnung zugeordnet.
 
+Das Mapping wird nur bei Anwendungen mit vorwiegender Betriebsart 
+"Produktion" oder "Katastrophenfall" und nur in den folgenden CI-Status 
+durchgeführt:
 
+verfügbar/in Projektierung  |  installiert/aktiv | zeitweise inaktiv
 
-Das Mapping wird nur bei Config-Items im Status ...
+Der Mandant einer Anwendung mit anderer vorwiegender Betriebsart 
+(Test, Entwicklung, usw.) soll der org. Einheit des Application Managers 
+entsprechen.
 
- verfügbar/in Projektierung  |  installiert/aktiv | zeitweise inaktiv
-
-... durchgeführt.
+(Beispiel: Ist der AM in der Solution E-COO soll die Anwendung 
+den Mandanten E-COO haben)
 
 Bei logischen Systemen, Software-Instanzen und Assets wird der Mandant
 aus dem übergeordneten CI übernommen, wenn dieser immer auf den
