@@ -46,7 +46,9 @@ sub getDefaultIntervalMinutes
               '13:00',
               '14:00',
               '15:00',
-              '16:00'
+              '16:00',
+              '17:00',
+              '18:00'
               ]);    
 }
 
@@ -57,7 +59,7 @@ sub Process             # will be run as a spereate Process (PID)
 
    my $smap=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
    $smap->SetFilter({mapstate=>\undef});
-   $smap->Limit(10);
+   $smap->Limit(50);
    my $smapop=$smap->Clone();
    my $sys=getModuleObject($self->Config,"itil::system");
    foreach my $mrec ($smap->getHashList(qw(ALL))){
@@ -84,11 +86,14 @@ sub Process             # will be run as a spereate Process (PID)
          $systemid=$l[0]->{systemid};
       }
       $smapop->ResetFilter();
-      my $bk=$smapop->ValidatedUpdateRecord($mrec,{
-         systemid=>$systemid,
-         mapstate=>$mapstate,
-         owner=>\undef
-      },{id=>$mrec->{id}});
+      if ($self->Config->Param("W5BaseOperationMode") eq "online" ||
+          $self->Config->Param("W5BaseOperationMode") eq "normal"){
+         my $bk=$smapop->ValidatedUpdateRecord($mrec,{
+            systemid=>$systemid,
+            mapstate=>$mapstate,
+            owner=>\undef
+         },{id=>$mrec->{id}});
+      }
    }
    $smap->ResetFilter();
    $smap->SetFilter({mapstate=>'"FAIL" "NOT FOUND" "NOT UNIQUE"'});
