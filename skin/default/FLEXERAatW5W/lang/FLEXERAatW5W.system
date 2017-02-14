@@ -1,0 +1,8 @@
+'FLEXERAatW5W::system'=>{de=>'FLEXERAatW5W: System',en=>'FLEXERAatW5W: System'},
+'fieldgroup.software'=>{de=>'Software',en=>'Software'},
+'Serialnumber'=>{de=>'Seriennummer'},
+'IP-Addresses'=>{de=>'IP-Adressen'},
+'CORE-Count'=>{de=>'Core-Anzahl'},
+'CPU-Count'=>{de=>'CPU-Anzahl'},
+'Scan-Date'=>{de=>'Scan-Datum'},
+
