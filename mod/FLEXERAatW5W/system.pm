@@ -114,14 +114,14 @@ sub new
 #                vjoininhash   =>['software','version','isremote',
 #                                 'isfreeofcharge','scope']),
 #
-#      new kernel::Field::SubList(
-#                name          =>'nativesoftware',
-#                label         =>'native Software',
-#                group         =>'software',
-#                htmldetail    =>0,
-#                vjointo       =>'FLEXERAatW5W::nativesoftware',
-#                vjoinon       =>['agentid'=>'agentid'],
-#                vjoindisp     =>['software','version']),
+      new kernel::Field::SubList(
+                name          =>'instpkgsoftware',
+                label         =>'installed Packaged-Software',
+                group         =>'software',
+                htmldetail    =>0,
+                vjointo       =>'FLEXERAatW5W::instpkgsoftware',
+                vjoinon       =>['id'=>'flexerasystemid'],
+                vjoindisp     =>['software','version']),
 
       new kernel::Field::Text(
                 name          =>'uuid',

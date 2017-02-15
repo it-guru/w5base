@@ -5,4 +5,5 @@
 'CORE-Count'=>{de=>'Core-Anzahl'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},
 'Scan-Date'=>{de=>'Scan-Datum'},
+'installed Packaged-Software'=>{de=>'installierte packetierte Software'},
 
