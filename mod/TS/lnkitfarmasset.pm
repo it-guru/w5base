@@ -1,4 +1,4 @@
-package TS::itfarmasset;
+package TS::lnkitfarmasset;
 #  W5Base Framework
 #  Copyright (C) 2017  Hartmut Vogler (it@guru.de)
 #
@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use itil::itfarmasset;
-@ISA=qw(itil::itfarmasset);
+use itil::lnkitfarmasset;
+@ISA=qw(itil::lnkitfarmasset);
 
 sub new
 {
