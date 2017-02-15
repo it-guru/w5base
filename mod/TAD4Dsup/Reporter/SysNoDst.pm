@@ -47,6 +47,8 @@ sub Process             # will be run as a spereate Process (PID)
    $sys->SetFilter({
                     denv=>"[EMPTY]",
                     saphier=>'"9TS_ES.9DTIT" "9TS_ES.9DTIT.*" '.
+                             '"YT5ATS_ES.YT5A_DTIT" '.
+                             '"YT5ATS_ES.YT5A_DTIT.*" '.
                              '"K001YT5ATS_ES.K001YT5A_DTIT" '.
                              '"K001YT5ATS_ES.K001YT5A_DTIT.*"'});
    foreach my $srec ($sys->getHashList(@{$self->{fieldlist}})){

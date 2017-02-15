@@ -30,7 +30,9 @@ BEGIN
                    where (saphier='9TS_ES.9DTIT' or 
                           saphier like '9TS_ES.9DTIT.%' or
                           saphier='K001YT5ATS_ES.K001YT5A_DTIT' or 
-                          saphier like 'K001YT5ATS_ES.K001YT5A_DTIT.%'
+                          saphier like 'K001YT5ATS_ES.K001YT5A_DTIT.%' or
+                          saphier='YT5ATS_ES.YT5A_DTIT' or 
+                          saphier like 'YT5ATS_ES.YT5A_DTIT.%'
                           )
                  )
                  select
