@@ -55,7 +55,7 @@ sub new
 
       new kernel::Field::Mandator(),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'mandatorid',
                 dataobjattr   =>'swinstance.mandator'),
 
@@ -193,11 +193,11 @@ sub new
                 label         =>'Instance ID',
                 dataobjattr   =>'swinstance.swinstanceid'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'swteamid',
                 dataobjattr   =>'swinstance.swteam'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
                 dataobjattr   =>'swinstance.cistatus'),
@@ -208,7 +208,7 @@ sub new
                 group         =>'adm',
                 vjoinon       =>['admid'=>'userid']),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'admid',
                 group         =>'adm',
                 dataobjattr   =>'swinstance.adm'),
@@ -219,7 +219,7 @@ sub new
                 group         =>'adm',
                 vjoinon       =>['adm2id'=>'userid']),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'adm2id',
                 group         =>'adm',
                 dataobjattr   =>'swinstance.adm2'),
