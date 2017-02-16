@@ -1,2 +1,8 @@
 'FLEXERAatW5W::instpkgsoftware'=>{de=>'FLEXERA: installierte packetierte Sofware',en=>'FLEXERA: installed packaged software'},
+'Publisher'=>{de=>'Hersteller'},
+'Product Title'=>{de=>'Software-Produkt'},
+'SoftwareTitleVersion'=>{de=>'Version'},
+'Inst-Date'=>{de=>'Installationsdatum'},
+'Scan-Date'=>{de=>'Scan-Datum'},
+
 

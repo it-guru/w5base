@@ -23,23 +23,23 @@ from "mview_FLEXERA_system"
 grant select on "W5I_FLEXERA_system" to W5I;
 create or replace synonym W5I.FLEXERA_system for "W5I_FLEXERA_system";
 
--- drop materialized view "mview_FLEXERA_instpkgsoftware";
-create materialized view "mview_FLEXERA_instpkgsoftware"
+-- drop materialized view "mview_FLEXERA_instsoftware";
+create materialized view "mview_FLEXERA_instsoftware"
    refresh complete start with sysdate
    next sysdate+(1/24)*18
    as
-select * from w5base.instpkgsoftware@flexerap;
+select * from w5base.instsoftware@flexerap;
 
-CREATE INDEX "FLEXERA_instpkgsoftware_id1"
-   ON "mview_FLEXERA_instpkgsoftware"(id) online;
-CREATE INDEX "FLEXERA_instpkgsoftware_id2"
-   ON "mview_FLEXERA_instpkgsoftware"(flexerasystemid) online;
+CREATE INDEX "FLEXERA_instsoftware_id1"
+   ON "mview_FLEXERA_instsoftware"(id) online;
+CREATE INDEX "FLEXERA_instsoftware_id2"
+   ON "mview_FLEXERA_instsoftware"(flexerasystemid) online;
 
-create or replace view "W5I_FLEXERA_instpkgsoftware" as
-select "mview_FLEXERA_instpkgsoftware".*
-from "mview_FLEXERA_instpkgsoftware";
+create or replace view "W5I_FLEXERA_instsoftware" as
+select "mview_FLEXERA_instsoftware".*
+from "mview_FLEXERA_instsoftware";
 
-grant select on "W5I_FLEXERA_instpkgsoftware" to W5I;
-create or replace synonym W5I.FLEXERA_instpkgsoftware for "W5I_FLEXERA_instpkgsoftware";
+grant select on "W5I_FLEXERA_instsoftware" to W5I;
+create or replace synonym W5I.FLEXERA_instsoftware for "W5I_FLEXERA_instsoftware";
 
 

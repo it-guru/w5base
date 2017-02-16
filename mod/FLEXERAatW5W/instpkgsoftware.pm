@@ -48,13 +48,19 @@ sub new
       new kernel::Field::Link(
                 name          =>'flexerasystemid',
                 label         =>'flexerasystemid',
-                dataobjattr   =>'FLEXERA_instpkgsoftware.FLEXERASYSTEMID'),
+                dataobjattr   =>'FLEXERA_instsoftware.FLEXERASYSTEMID'),
 
       new kernel::Field::Text(
                 name          =>'software',
-                label         =>'SoftwareTitleProduct',
+                label         =>'Product Title',
                 ignorecase    =>1,
                 dataobjattr   =>'PRODUCTNAME'),
+
+      new kernel::Field::Text(
+                name          =>'publisher',
+                label         =>'Publisher',
+                ignorecase    =>1,
+                dataobjattr   =>'PUBLISHERNAME'),
 
       new kernel::Field::Text(
                 name          =>'version',
@@ -68,11 +74,11 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'systemname'),
 
-      new kernel::Field::Textarea(
-                name          =>'comments',
-                label         =>'Comments',
-                ignorecase    =>1,
-                dataobjattr   =>'COMMENTS'),
+#      new kernel::Field::Textarea(
+#                name          =>'comments',
+#                label         =>'Comments',
+#                ignorecase    =>1,
+#                dataobjattr   =>'CMTS'),
 
       new kernel::Field::Date(
                 name          =>'instdate',
@@ -89,8 +95,8 @@ sub new
                 dataobjattr   =>'DISCDATE'),
 
    );
-   $self->setWorktable("FLEXERA_instpkgsoftware");
-   $self->setDefaultView(qw(systemname software version));
+   $self->setWorktable("FLEXERA_instsoftware");
+   $self->setDefaultView(qw(systemname publisher software version));
    return($self);
 }
 
