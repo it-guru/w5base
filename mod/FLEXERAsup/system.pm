@@ -33,10 +33,15 @@ use tsacinv::system;
 # -- drop table "W5I_FLEXERAsup__system_of";
 
 create table "W5I_FLEXERAsup__system_of" (
-   systemid     varchar2(40) not null,
-   comments     varchar2(4000),
-   modifyuser   number(*,0),
-   modifydate   date,
+   systemid            varchar2(40) not null,
+   comments            varchar2(4000),
+   rollout_package     number(*,0),
+   rollout_instplanned date,
+   rollout_hpoaavail   boolean,
+   rollout_ipv6        boolean,
+   rollout_issungzone  boolean,
+   modifyuser          number(*,0),
+   modifydate          date,
    constraint "W5I_TAD4Dsup__system_of_pk" primary key (systemid)
 );
 
@@ -52,17 +57,62 @@ select "W5I_system_universum".id,
        "W5I_system_universum".saphier,
        "W5I_system_universum".amcostelement costelement,
        decode("mview_FLEXERA_system".FLEXERASYSTEMID,NULL,0,1) flexerafnd,
+
+       "tsacinv::system".assetassetid            AM_assetid,
+       "tsacinv::system".systemola               AM_systemola,
+       decode("tsacinv::system".systemolaclass,
+              10,'CLASSIC',
+              20,'STANDARDIZED',
+              25,'STANDARDIZED SLICE',
+              30,'APPCOM','UNDEF')               AM_systemolaclass,
+       "tsacinv::system".status                  AM_systemstatus,
+       "tsacinv::system".securitymodel           AM_securitymodel,
+       "tsacinv::asset".modelname                AM_modelname,
+       "tsacinv::asset".cputype                  AM_assetcputype,
+       "tsacinv::asset".cpucount                 AM_assetcpucount,
+       "tsacinv::asset".corecount                AM_assetcorecount,
+       "tsacinv::asset".systemsonasset           AM_systemsonasset,
+       "tsacinv::asset".tsacinv_locationfullname AM_location,
+       "itil::system".mandator                   W5_mandator,
+       "itil::system".location                   W5_location,
+       "itil::system".osrelease                  W5_osrelease,
+       "itil::system".osclass                    W5_osclass,
+       "itil::system".isprod                     W5_isprod,
+       "itil::system".istest                     W5_istest,
+       "itil::system".isdevel                    W5_isdevel,
+       "itil::system".iseducation                W5_iseducation,
+       "itil::system".isapprovtest               W5_isapprovtest,
+       "itil::system".isreference                W5_isreference,
+
        "W5I_FLEXERAsup__system_of".systemid of_id,
        "W5I_FLEXERAsup__system_of".comments,
+       "W5I_FLEXERAsup__system_of".rollout_package,
+       "W5I_FLEXERAsup__system_of".rollout_instplanned,
+       "W5I_FLEXERAsup__system_of".rollout_hpoaavail,
+       "W5I_FLEXERAsup__system_of".rollout_ipv6,
+       "W5I_FLEXERAsup__system_of".rollout_issungzone,
+
        "W5I_FLEXERAsup__system_of".modifyuser,
        "W5I_FLEXERAsup__system_of".modifydate
 from "W5I_system_universum"
      left outer join "W5I_FLEXERAsup__system_of"
-        on "W5I_system_universum".systemid="W5I_FLEXERAsup__system_of".systemid
+        on "W5I_system_universum".systemid=
+           "W5I_FLEXERAsup__system_of".systemid
      left outer join "W5I_FLEXERA__systemidmap_of"
-        on "W5I_system_universum".systemid="W5I_FLEXERA__systemidmap_of".systemid
+        on "W5I_system_universum".systemid=
+           "W5I_FLEXERA__systemidmap_of".systemid
      left outer join "mview_FLEXERA_system"
-        on "W5I_FLEXERA__systemidmap_of".flexerasystemid="mview_FLEXERA_system".flexerasystemid;
+        on "W5I_FLEXERA__systemidmap_of".flexerasystemid=
+           "mview_FLEXERA_system".flexerasystemid
+     left outer join "itil::system"
+        on "W5I_system_universum".systemid=
+           "itil::system".systemid
+     left outer join "tsacinv::system"
+        on "W5I_system_universum".systemid=
+           "tsacinv::system".systemid
+     left outer join "tsacinv::asset"
+        on "tsacinv::system".assetassetid=
+           "tsacinv::asset".assetid;
 
 grant select on "W5I_FLEXERAsup__system" to W5I;
 create or replace synonym W5I.FLEXERAsup__system for "W5I_FLEXERAsup__system";
@@ -134,10 +184,115 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'costelement'),
 
+      new kernel::Field::Text(
+                name          =>'am_systemid',
+                group         =>'am',
+                label         =>'SystemID',
+                dataobjattr   =>'systemid'),
+
+      new kernel::Field::Text(
+                name          =>'am_systemola',
+                group         =>'am',
+                label         =>'SystemOLA',
+                dataobjattr   =>'am_systemola'),
+
+      new kernel::Field::Text(
+                name          =>'am_systemolaclass',
+                group         =>'am',
+                label         =>'SystemOLA Service Class',
+                dataobjattr   =>'am_systemolaclass'),
+
+      new kernel::Field::Text(
+                name          =>'am_systemstatus',
+                group         =>'am',
+                label         =>'System Status',
+                dataobjattr   =>'am_systemstatus'),
+
+      new kernel::Field::Text(
+                name          =>'am_securitymodel',
+                group         =>'am',
+                translation   =>'tsacinv::system',
+                label         =>'security flag',
+                dataobjattr   =>'am_securitymodel'),
+
+      new kernel::Field::Text(
+                name          =>'am_assetid',
+                group         =>'am',
+                label         =>'AssetID',
+                dataobjattr   =>'am_assetid'),
+
+      new kernel::Field::Text(
+                name          =>'am_modelname',
+                group         =>'am',
+                label         =>'Model',
+                dataobjattr   =>'am_modelname'),
+
+      new kernel::Field::Text(
+                name          =>'am_location',
+                group         =>'am',
+                label         =>'AMLocation',
+                dataobjattr   =>'am_location'),
+
+      new kernel::Field::Number(
+                name          =>'am_cpucount',
+                group         =>'am',
+                translation   =>'tsacinv::asset',
+                label         =>'Asset CPU count',
+                dataobjattr   =>'am_assetcpucount'),
+
+      new kernel::Field::Text(
+                name          =>'am_assetcputype',
+                group         =>'am',
+                translation   =>'tsacinv::asset',
+                label         =>'Asset CPU Typ',
+                dataobjattr   =>'am_assetcputype'),
+
+      new kernel::Field::Number(
+                name          =>'am_corecount',
+                group         =>'am',
+                translation   =>'tsacinv::asset',
+                label         =>'Asset Core count',
+                dataobjattr   =>'am_assetcorecount'),
+
+      new kernel::Field::Number(
+                name          =>'am_systemsonasset',
+                group         =>'am',
+                translation   =>'tsacinv::asset',
+                label         =>'Systems on Asset',
+                dataobjattr   =>'am_systemsonasset'),
+
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'comments'),
+
+      new kernel::Field::Date(
+                name          =>'ro_instplanned',
+                group         =>'rollout',
+                label         =>'planned install date',
+                dataobjattr   =>'rollout_instplanned'),
+
+      new kernel::Field::Boolean(
+                name          =>'ro_ipv6',
+                group         =>'rollout',
+                allowempty    =>1,
+                label         =>'IPv6',
+                dataobjattr   =>'rollout_ipv6'),
+
+      new kernel::Field::Boolean(
+                name          =>'ro_hpoaavail',
+                group         =>'rollout',
+                allowempty    =>1,
+                label         =>'HPOA available',
+                dataobjattr   =>'rollout_hpoaavail'),
+
+      new kernel::Field::Boolean(
+                name          =>'ro_issungzone',
+                group         =>'rollout',
+                allowempty    =>1,
+                label         =>'is SUN global Zone',
+                dataobjattr   =>'rollout_issungzone'),
 
       new kernel::Field::Text(
                 name          =>'w5base_appl',
@@ -149,6 +304,15 @@ sub new
                 depend        =>'systemid'),
 
       new kernel::Field::Text(
+                name          =>'w5base_applmgr',
+                searchable    =>0,
+                readonly      =>1,
+                group         =>'w5basedata',
+                label         =>'W5Base ApplicationManager',
+                onRawValue    =>\&tsacinv::system::AddW5BaseData,
+                depend        =>'systemid'),
+
+      new kernel::Field::Text(
                 name          =>'w5base_tsm',
                 searchable    =>0,
                 readonly      =>1,
@@ -156,6 +320,90 @@ sub new
                 label         =>'W5Base TSM',
                 onRawValue    =>\&tsacinv::system::AddW5BaseData,
                 depend        =>'systemid'),
+
+      new kernel::Field::Text(
+                name          =>'w5base_businessteam',
+                searchable    =>0,
+                readonly      =>1,
+                group         =>'w5basedata',
+                label         =>'W5Base Team',
+                onRawValue    =>\&tsacinv::system::AddW5BaseData,
+                depend        =>'systemid'),
+
+      new kernel::Field::Text(
+                name          =>'w5base_location',
+                readonly      =>1,
+                group         =>'w5basedata',
+                translation   =>'itil::asset',
+                label         =>'Location',
+                dataobjattr   =>'w5_location'),
+
+      new kernel::Field::Text(
+                name          =>'w5base_osrelease',
+                readonly      =>1,
+                group         =>'w5basedata',
+                translation   =>'itil::system',
+                label         =>'OS-Release',
+                dataobjattr   =>'w5_osrelease'),
+
+      new kernel::Field::Text(
+                name          =>'w5base_osclass',
+                readonly      =>1,
+                group         =>'w5basedata',
+                translation   =>'itil::system',
+                label         =>'OS-Class',
+                dataobjattr   =>'w5_osclass'),
+
+
+
+      new kernel::Field::Boolean(
+                name          =>'isprod',
+                group         =>'opmode',
+                translation   =>'itil::system',
+                htmlhalfwidth =>1,
+                label         =>'Productionsystem',
+                dataobjattr   =>'w5_isprod'),
+
+      new kernel::Field::Boolean(
+                name          =>'istest',
+                group         =>'opmode',
+                translation   =>'itil::system',
+                htmlhalfwidth =>1,
+                label         =>'Testsystem',
+                dataobjattr   =>'w5_istest'),
+
+      new kernel::Field::Boolean(
+                name          =>'isdevel',
+                group         =>'opmode',
+                translation   =>'itil::system',
+                htmlhalfwidth =>1,
+                label         =>'Developmentsystem',
+                dataobjattr   =>'w5_isdevel'),
+
+      new kernel::Field::Boolean(
+                name          =>'iseducation',
+                group         =>'opmode',
+                translation   =>'itil::system',
+                htmlhalfwidth =>1,
+                label         =>'Educationsystem',
+                dataobjattr   =>'w5_iseducation'),
+
+      new kernel::Field::Boolean(
+                name          =>'isapprovtest',
+                group         =>'opmode',
+                translation   =>'itil::system',
+                htmlhalfwidth =>1,
+                label         =>'Approval/Integration System',
+                dataobjattr   =>'w5_isapprovtest'),
+
+      new kernel::Field::Boolean(
+                name          =>'isreference',
+                group         =>'opmode',
+                translation   =>'itil::system',
+                htmlhalfwidth =>1,
+                label         =>'Referencesystem',
+                dataobjattr   =>'w5_isreference'),
+
 
       new kernel::Field::MDate(
                 name          =>'mdate',
@@ -190,7 +438,7 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default w5basedata source));
+   return( qw(header default rollout am w5basedata opmode source));
 }
 
 
@@ -266,6 +514,7 @@ sub isWriteValid
    my @l=$self->SUPER::isWriteValid($rec,@_);
 
 
+   return("default","rollout") if ($#l!=-1 && defined($rec) && $rec->{inflexera} ne "1");
    return("default") if ($#l!=-1);
    return(undef);
 }

@@ -767,6 +767,7 @@ sub AddW5BaseData
       my %l=();
       if (defined($rec)){
          my %appl=();
+         my %applmgr=();
          my %sem=();
          my %tsm=();
          my %businessteam=();
@@ -777,10 +778,12 @@ sub AddW5BaseData
                $w5appl->ResetFilter();
                $w5appl->SetFilter({id=>\$app->{applid}});
                my ($arec,$msg)=$w5appl->getOnlyFirst(qw(sem businessteam 
-                                                        semid tsm tsmid));
+                                                        semid tsm tsmid
+                                                        applmgr applmgrid));
                if (defined($arec)){
                   $sem{$arec->{semid}}=$arec->{sem};
                   $tsm{$arec->{tsmid}}=$arec->{tsm};
+                  $applmgr{$arec->{applmgrid}}=$arec->{applmgr};
                   $businessteam{$arec->{businessteam}}=$arec->{businessteam};
                }
             }
@@ -788,6 +791,7 @@ sub AddW5BaseData
          $l{w5base_appl}=[sort(values(%appl))];
          $l{w5base_sem}=[sort(values(%sem))];
          $l{w5base_tsm}=[sort(values(%tsm))];
+         $l{w5base_applmgr}=[sort(values(%applmgr))];
          $l{w5base_businessteam}=[sort(values(%businessteam))];
       }
       $c->{W5BaseSys}->{$systemid}=\%l;
