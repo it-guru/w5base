@@ -953,7 +953,7 @@ if (lc($mode) eq "export"){
       my @tab=create_array_to_dump();
       my @trg=load_triggers();
       my $proc=0;
-      my ($trgfh, $filename) = tempfile();
+      my ($trgfh) = tempfile();
       if (grep(/^\@\@\@proc\@\@\@$/,@tab)){
          $proc=1;
          @tab=grep(!/^\@\@\@proc\@\@\@$/,@tab);
@@ -1080,6 +1080,7 @@ if (lc($mode) eq "export"){
                  "\nmsg=$msg\nfailed:$?");
          }
       }
+      close($trgfh);
    }else{
       msg("ERROR","if mode=rename option --targetdb must be set");
       exit(1);
