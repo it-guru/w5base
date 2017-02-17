@@ -33,6 +33,8 @@ use Compress::Zlib;
 use Getopt::Long;
 use Cwd;
 use File::Path;
+use File::Temp qw(tempfile);
+use Fcntl;
 use POSIX;
 
 my $starttime=sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now);
@@ -102,7 +104,7 @@ sub help
 
         --file          file or files for import (seperat files by comma)
 
-        --mode          export, import or transfer [default:export]
+        --mode          export, import, rename or transfer [default:export]
 
         --targetdb      is needed in transfermode transfer
 
@@ -309,11 +311,24 @@ foreach my $in (keys(%inputinclude)){
 
 sub load_tables{
    # load available tables in a array
-   my $tabl=qx($prog->{mysql} -e 'show tables' $db) 
-         or die ("system command -mysql show tables- failed:$?");
+   my $tabl=qx($prog->{mysql} -e 'show tables' $db);
+   if ($?){
+      die ("system command -mysql show tables- failed:$?");
+   }
    my @tabl=split(/\n/,$tabl);
    shift(@tabl);
    return(@tabl);
+}
+
+sub load_triggers{
+   # load available tables in a array
+   my $trg=qx($prog->{mysql} -e 'show triggers' $db) ;
+   if ($?){
+       die ("system command -mysql show triggers- failed:$?");
+   }
+   my @trg=map({s/\s.*$//;$_} split(/\n/,$trg));
+   shift(@trg);
+   return(@trg);
 }
 
 # write tables to dump in a array
@@ -382,7 +397,7 @@ sub check_dir
    my @path;
    foreach my $dir (@$dir){
       opendir(DIR,"$dir") or die("ERROR: directory $dir could not open!\n");
-      my @files = grep {/^\w.*\.sql\.gz/}readdir(DIR);
+      my @files = grep {/^[a-zA-Z0-9\@_].*\.sql\.gz/}readdir(DIR);
       if (!@files){
          msg("ERROR","no *.sql.gz files in the $dir directory!");
          exit(1);
@@ -448,7 +463,7 @@ sub process_engine
                       "$db $first";
               if ($first eq '@@@proc@@@'){
                  $cmd="$prog->{mysqldump} ".
-                      "--routines --triggers --no-create-info --no-data ".
+                      "--routines --skip-triggers --no-create-info --no-data ".
                       "--no-create-db --skip-opt  ".
                       "$db";
               }
@@ -654,8 +669,16 @@ sub process_engine
               my $mydrdr=new IO::Handle();
 
               # open mysqldump handle
-              $mysqldump_pid=open3(undef,$mydrdr,$myderr,
-                                   "$prog->{mysqldump} $db $first");
+              my $cmd="$prog->{mysqldump} ".
+                      "-c --triggers --skip-extended-insert ".
+                      "$db $first";
+              if ($first eq '@@@proc@@@'){
+                 $cmd="$prog->{mysqldump} ".
+                      "--routines --skip-triggers --no-create-info --no-data ".
+                      "--no-create-db --skip-opt  ".
+                      "$db";
+              }
+              $mysqldump_pid=open3(undef,$mydrdr,$myderr,"$cmd");
               $mydumpsel->add($myderr);
              
               # check for mysqldump errors
@@ -775,7 +798,12 @@ sub process_engine
                  msg("ERROR","mysqlprocess=$$ mysql_waitpid_return=$wp");
               }
               exit(0);
-            }
+           }elsif($mode eq "rename"){
+             printf("ok rename\n");
+           }else{
+             msg("ERROR","unknown mode '$mode'");
+             exit(1);
+           }
          } else {       # parent process
            $processes{$pid}=$tables->[0];
            shift(@$tables);      
@@ -900,9 +928,166 @@ if (lc($mode) eq "export"){
    my @tab=create_array_to_dump();
    check_targetdb($targetdb);
    process_engine(\@tab);
+}elsif(lc($mode) eq "rename"){
+   check_db();
+   help();
+   if ($targetdb){
+      $mode="rename";
+      # check target db and source db not the same
+      if ($targetdb eq $db){
+         msg("ERROR","target database $targetdb ".
+             "and source database $db the same!");
+         exit(1);
+      }
+      include_tables();
+      exclude_tables();
+      check_targetdb($targetdb);
+
+
+      #my $msg=qx($prog->{mysql} -e 'create database $targetdb' 2>&1);
+      #if ($?){
+      #   die ("system command 'mysqladmin create $targetdb' ".
+      #        "\nmsg=$msg\nfailed:$?");
+      #}
+
+      my @tab=create_array_to_dump();
+      my @trg=load_triggers();
+      my $proc=0;
+      my ($trgfh, $filename) = tempfile();
+      if (grep(/^\@\@\@proc\@\@\@$/,@tab)){
+         $proc=1;
+         @tab=grep(!/^\@\@\@proc\@\@\@$/,@tab);
+         unshift(@tab,'@@@proc@@@');
+      }
+      if ($proc){
+         my $cmd="$prog->{mysqldump} ".
+                 "--triggers --routines --no-create-info --no-data ".
+                 "--no-create-db --skip-opt $db";
+         {
+            msg("INFO","storing trigger and procedure informations");
+            my $mydsel=new IO::Select();
+            my $mydrdr=new IO::Handle();
+            my $myderr=new IO::Handle();
+            my $mysqldump_pid=open3(undef,$mydrdr,$myderr,$cmd);
+            $mydsel->add($myderr);
+            $mydsel->add($mydrdr);
+            my @err;
+            while(my @ready = $mydsel->can_read(10)){
+               foreach my $chkfh (@ready){
+                  my $data=<$chkfh>;
+                  if ($chkfh eq $mydrdr){
+                     print $trgfh ($data);
+                  }
+                  if ($chkfh eq $myderr){
+                     if (defined($data) && $data ne ""){
+                        push(@err,$data);
+                     }
+                  }
+                  $mydsel->remove($chkfh) if eof($chkfh);
+               }
+            }
+            if ($#err!=-1){
+               foreach my $err (@err){
+                  msg("ERROR",$err);
+               }
+               msg("ERROR","storing trigger and procedure fails");
+               exit(1);
+            } 
+         }
+      }
+      foreach my $tab (@tab){
+         if ($tab eq '@@@proc@@@'){
+            foreach my $trg (@trg){
+               msg("INFO","drop trigger $trg");
+               my $msg;
+               $msg=qx($prog->{mysql} -e 'drop trigger $trg' $db 2>&1);
+               if ($?){
+                  die ("system command 'mysql drop trigger $trg' ".
+                       "\nmsg=$msg\nfailed:$?");
+               }
+            }
+         }
+         else{
+            msg("INFO","rename table $tab to target database $targetdb");
+            my $msg;
+            my $ren="rename table $db.$tab to $targetdb.$tab";
+            $msg=qx($prog->{mysql} -B -f -e '$ren' $db 2>&1);
+            if ($?){
+               die ("system command 'mysql rename $tab' ".
+                    "\nmsg=$msg\nfailed:$?");
+            }
+         }
+      }
+      if ($proc){
+         my $cmd="$prog->{mysql} $targetdb";
+         msg("INFO","restore trigger and procedure informations");
+         {
+            seek($trgfh,0,SEEK_SET);
+            my $mydsel=new IO::Select();
+            my $myin=new IO::Handle();
+            my $mydrdr=new IO::Handle();
+            my $myderr=new IO::Handle();
+            my $mysqldump_pid=open3($myin,$mydrdr,$myderr,$cmd);
+            $mydsel->add($myderr);
+            $mydsel->add($mydrdr);
+            $mydsel->add($myin);
+            my @err;
+            my @rdready;
+            my @wrready;
+            while((@wrready=$mydsel->can_write(1.0)) ||
+                  (@rdready = $mydsel->can_read(10))){
+               foreach my $chkfh (@wrready){
+                  if (my $line=<$trgfh>){
+                    # printf("write $line\n");
+                     print $myin ($line);
+                  }
+                  else{
+                    # printf("write end\n");
+                     $mydsel->remove($myin);
+                     $myin->close();
+                  }
+               }
+               foreach my $chkfh (@rdready){
+                  my $data=<$chkfh>;
+                  if (defined($data)){
+                     if ($chkfh eq $mydrdr){
+                        print ("OUT:".$data."\n");
+                     }
+                     if ($chkfh eq $myderr){
+                        if (defined($data) && $data ne ""){
+                           push(@err,$data);
+                        }
+                     }
+                  }
+                  $mydsel->remove($chkfh) if eof($chkfh);
+               }
+            }
+            if ($#err!=-1){
+               foreach my $err (@err){
+                  msg("ERROR",$err);
+               }
+               msg("ERROR","storing trigger and procedure fails");
+               exit(1);
+            } 
+         } 
+      }
+      {
+         msg("INFO","drop  database $db");
+         my $msg;
+         $msg=qx($prog->{mysql} -B -f -e 'drop database $db' $db 2>&1);
+         if ($?){
+            die ("system command 'mysql drop database $db' ".
+                 "\nmsg=$msg\nfailed:$?");
+         }
+      }
+   }else{
+      msg("ERROR","if mode=rename option --targetdb must be set");
+      exit(1);
+   }
+
 }else{
    msg("ERROR","unknow mode=$mode ".
-       "only this modes import, export or transfer\n");
+       "only this modes import, export, rename or transfer\n");
    exit(1);
 }
 
