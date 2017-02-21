@@ -94,6 +94,7 @@ use charnames ':full';
              &isDataInputFromUserFrontend &orgRoles &extractLangEntry
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16
              &utf8_to_latin1
+             &getClientAddrIdString
              &Stacktrace);
 
 sub utf8{return(&Unicode::String::utf8);}
@@ -199,6 +200,38 @@ sub ObjectRecordCodeResolver
       }
    }
    return($back);
+}
+
+sub getClientAddrIdString
+{
+   my $realclientendpoint=shift;
+   $realclientendpoint=0 if (!defined($realclientendpoint));
+
+   my $addr=undef;
+   if (exists($ENV{HTTP_X_FORWARDED_FOR}) &&
+       $ENV{HTTP_X_FORWARDED_FOR} ne ""){
+      if ($realclientendpoint){
+         $addr=$ENV{HTTP_X_FORWARDED_FOR};
+      }
+      else{
+         if ($ENV{HTTP_X_FORWARDED_FOR} ne $ENV{REMOTE_ADDR}){
+            $addr=$ENV{HTTP_X_FORWARDED_FOR}." (".$ENV{REMOTE_ADDR}.")";
+         }
+         else{
+            $addr=$ENV{HTTP_X_FORWARDED_FOR};
+         }
+      }
+   }
+   else{
+      if (exists($ENV{REMOTE_ADDR}) &&
+          $ENV{REMOTE_ADDR} ne ""){
+         $addr=$ENV{REMOTE_ADDR};
+      }
+   }
+   if (defined($addr)){  # sec hack - HTTP_X_FORWARDED_FOR is not 100% safe!
+      $addr=~s/[^0-9a-fA-F:. ()]/_/g;
+   }
+   return($addr);
 }
 
 sub CSV2Hash
@@ -755,7 +788,7 @@ sub Debug
 
 sub isDataInputFromUserFrontend
 {
-   if (($ENV{SCRIPT_URI} ne "" || $ENV{REMOTE_ADDR} ne "" ) &&
+   if (($ENV{SCRIPT_URI} ne "" || getClientAddrIdString() ne "" ) &&
        $W5V2::OperationContext ne "QualityCheck"){
       return(1);
    }

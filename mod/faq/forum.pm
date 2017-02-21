@@ -452,7 +452,7 @@ EOF
   if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
      $forumtopicread->InsertRecord({forumtopicid=>$torec->{id},
                                     cdate=>$now,
-                                    clientipaddr=>$ENV{REMOTE_ADDR},
+                                    clientipaddr=>getClientAddrIdString(),
                                     creatorid=>$self->getCurrentUserId()});
   }
 }

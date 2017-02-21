@@ -3245,7 +3245,7 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $clientname=$ENV{REMOTE_ADDR};
+   my $clientname=getClientAddrIdString(1);
    $clientname="127.0.0.1" if (!defined($clientname));
    return({$self->Name()=>$clientname}) if (!defined($oldrec));
 

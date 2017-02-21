@@ -63,7 +63,7 @@ sub RunWebApp
       my $f;
       $havestate="$statedir/$$.pid";
       if (sysopen($f,$havestate,O_RDWR|O_CREAT|O_TRUNC)){
-         my $s="$ENV{'REMOTE_USER'};$MOD;".time().";$ENV{REMOTE_ADDR};\n";
+         my $s="$ENV{'REMOTE_USER'};$MOD;".time().";".getClientAddrIdString().";\n";
          my $nb=length($s);
          if (syswrite($f,$s,$nb)!=$nb){
             close($f);
@@ -272,13 +272,13 @@ sub InitRequest
 
          $user="anonymous" if ($user eq "");
          if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
-            msg(INFO,"user '$user' logon from '$ENV{REMOTE_ADDR}'");
+            msg(INFO,"user '$user' logon from '".getClientAddrIdString()."'");
          }
          else{
             my $fldlst="account,loghour,logondate,logonbrowser,".
                        "logonip,lang,site";
             my $vallst="'$user','$loghour','$now',".
-                       "'$ENV{HTTP_USER_AGENT}','$ENV{REMOTE_ADDR}','$lang',".
+                       "'$ENV{HTTP_USER_AGENT}','".getClientAddrIdString()."','$lang',".
                        "'$site'"; 
             my $cmd="replace delayed into userlogon";
             $cmd.=" ($fldlst)";
@@ -523,10 +523,10 @@ sub ValidateCaches
       }
       if ($#{$UserCache->{$ENV{REMOTE_USER}}->{rec}->{ipacl}}!=-1){
          if (!in_array($UserCache->{$ENV{REMOTE_USER}}->{rec}->{ipacl},
-              $ENV{REMOTE_ADDR})){
+              getClientAddrIdString(1))){
             if (Query->Param("MOD") eq "base::interface"){
                printf("Status: 403 Forbidden - ".
-                      "your ip $ENV{REMOTE_ADDR} is not allowed in ipacl ".
+                      "your ip ".getClientAddrIdString(1)." is not allowed in ipacl ".
                       "for $ENV{REMOTE_USER}\n");
                printf("Content-type: text/xml\n\n".
                       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");

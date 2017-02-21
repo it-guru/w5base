@@ -2253,6 +2253,27 @@ sub prepUploadRecord                       # pre processing interface
             }
          }
       }
+      # Allow Admins to modify srcsys and srcid without write access
+      if (exists($newrec->{srcid}) && exists($newrec->{srcsys}) &&
+          exists($newrec->{$idname}) && $newrec->{$idname} ne "" &&
+          $self->IsMemberOf("admin")){
+         my $i=$self->Clone();
+         $i->SetFilter({$idname=>$newrec->{$idname}});
+         my ($oldrec,$msg)=$i->getOnlyFirst(qw(ALL));
+         if (defined($oldrec)){
+            my $nr={srcsys=>$newrec->{srcsys},srcid=>$newrec->{srcid}};
+            if ($nr->{srcsys} eq ""){
+               $nr->{srcsys}=undef;
+            }
+            if ($nr->{srcid} eq ""){
+               $nr->{srcid}=undef;
+            }
+            $i->ValidatedUpdateRecord($oldrec,$nr,
+                                      {$idname=>\$newrec->{$idname}});
+         }
+         delete($newrec->{srcid});
+         delete($newrec->{srcsys});
+      }
    }
    return(1);
 }
@@ -2542,7 +2563,8 @@ sub Upload
    }
    my $countok=0;
    my $countfail=0;
-   if (defined($file) && $file ne "" && ref($file) eq "Fh"){
+   if (defined($file) && $file ne "" && (ref($file) eq "Fh" ||
+                                         ref($file) eq "CGI::File::Temp")){
       my @stat=stat($file);
       if ($stat[7]<=0){
          print $self->HttpHeader("text/plain");
@@ -2595,7 +2617,8 @@ sub Upload
                                                $fldchk=0;
                                                last;
                                             }
-                                            if ($fobj->Name() ne "srcid"){
+                                            if ($fobj->Name() ne "srcid" &&
+                                                $fobj->Name() ne "srcsys"){
                                                $self->LastMsg(ERROR,
                                                   'field "%s" is not '.
                                                   'allowed to be '.

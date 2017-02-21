@@ -199,7 +199,7 @@ sub SendCryptedData
    $passxlog->ValidatedInsertRecord({name=>'ChangePassword of '.
                                            $erec->{account}.'@'.
                                            $erec->{name}.' from '.
-                                           $ENV{REMOTE_ADDR},
+                                           getClientAddrIdString(),
                                      entryid=>$erec->{id}});
    $mgr->StoreCryptData($erec->{id},$cryptdata,\@dest);
 

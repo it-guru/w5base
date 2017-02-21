@@ -332,7 +332,7 @@ sub WSDL
       $o->WSDLcommon($uri,$ns,$fp,$module,
                      \$XMLbinding,\$XMLportType,\$XMLmessage,\$XMLtypes);
       $self->Log(INFO,"soap",
-              "WSDL Query from $ENV{REMOTE_ADDR} for module $module");
+              "WSDL Query from ".getClientAddrIdString()." for module $module");
    }
    utf8::encode($XMLbinding);
    utf8::encode($XMLportType);
@@ -379,7 +379,7 @@ sub SOAP
    my $t0=[gettimeofday()];
    $ENV{CONTENT_TYPE}=~s/application\/x-www-form-urlencoded,\s*//; # for IE JS
    $self->Log(INFO,"soap",
-              "request: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
+              "request: user='$ENV{REMOTE_USER}' ip='".getClientAddrIdString()."'");
    $W5Base::SOAP=$self;
    $self->{SOAP}=SOAP::Transport::HTTP::CGI   
     -> dispatch_with($self->{NS})
@@ -655,7 +655,7 @@ sub deleteRecord
    my $id=$param->{IdentifiedBy};
 
    $self->Log(INFO,"soap",
-              "deleteRecord: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
+              "deleteRecord: user='$ENV{REMOTE_USER}' ip='".getClientAddrIdString()."'");
    $self->Log(INFO,"soap",
               "[$objectname] ($id)");
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));
@@ -717,7 +717,7 @@ sub getRelatedWorkflows
    my $fulltext=$param->{fulltext};
 
    $self->Log(INFO,"soap",
-        "getRelatedWorkflows: user='$ENV{REMOTE_USER}' ip='$ENV{REMOTE_ADDR}'");
+        "getRelatedWorkflows: user='$ENV{REMOTE_USER}' ip='".getClientAddrIdString()."'");
    $self->Log(INFO,"soap",
               "[$objectname] ($id)");
    $ENV{HTTP_FORCE_LANGUAGE}=$param->{lang} if (defined($param->{lang}));

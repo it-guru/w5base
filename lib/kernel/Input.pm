@@ -43,7 +43,9 @@ sub SetInput
    my $self=shift;
    my $input=shift;
 
-   $self->{IN}=$input if (ref($input) eq "Fh");
+
+   $self->{IN}=$input if (ref($input) eq "Fh" || 
+                          ref($input) eq "CGI::File::Temp");
    $self->{FORMAT}=undef;
    return(undef);
 }
@@ -54,7 +56,8 @@ sub isFormatUseable
    my $self=shift;
 
    msg(INFO,"isFormatUseable");
-   if (ref($self->{IN}) eq "Fh"){
+   if (ref($self->{IN}) eq "Fh" || 
+       ref($self->{IN}) eq "CGI::File::Temp"){
       my @formats=@{$self->{InpFormat}};
       msg(INFO,"Checking formats");
       while(my $ico=shift(@formats)){

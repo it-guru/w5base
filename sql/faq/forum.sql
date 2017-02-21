@@ -79,7 +79,7 @@ CREATE TABLE forumtopicread (
   forumtopic bigint(20),
   createdate    datetime NOT NULL default '0000-00-00 00:00:00',
   createuser    bigint(20) default NULL,
-  clientipaddr  varchar(40) default NULL,
+  clientipaddr  varchar(100) default NULL,
   PRIMARY KEY  (id),
   KEY forumread(forumtopic),key forumuser(createuser), key cdate(createdate)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

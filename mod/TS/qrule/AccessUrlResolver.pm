@@ -154,7 +154,9 @@ sub qcheckRecord
             my $url="https://ebs14.telekom.de/dns/resolv.php?q=".$host;
             my $response=$ua->request(GET($url));
             if ($response->code ne "200"){
-               msg(ERROR,"$self URL request $url failed");
+               msg(ERROR,"$self URL request $url failed code(".
+                         $response->code.")");
+               msg(ERROR,"response is ".$response->content);
             }
             else{
                my $res=$response->content;

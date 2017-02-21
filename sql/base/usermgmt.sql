@@ -132,7 +132,7 @@ CREATE TABLE userlogon (
   loghour varchar(10) NOT NULL default '',
   logondate datetime default NULL,
   logonbrowser varchar(128) default NULL,
-  logonip varchar(20) default NULL,lang varchar(10),site varchar(128),
+  logonip varchar(100) default NULL,lang varchar(10),site varchar(128),
   PRIMARY KEY  (account,loghour),key(logondate)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 CREATE TABLE userstate (

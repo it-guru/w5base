@@ -256,7 +256,7 @@ sub StoreCryptData
       $comments.="$name{$uid}\n";
    }
    if ($ENV{REMOTE_USER} eq "anonymous"){
-      $comments.="\n\nchanged from $ENV{REMOTE_ADDR}";
+      $comments.="\n\nchanged from ".getClientAddrIdString();
    }
    $self->SetFilter({entryid=>\$id});
    $self->ForeachFilteredRecord(sub{
