@@ -3230,6 +3230,7 @@ sub Validate
 
 package base::workflow::Field::initialclient;
 use strict;
+use kernel;
 use vars qw(@ISA);
 @ISA    = qw(kernel::Field::Text);
 
