@@ -269,6 +269,7 @@ sub checkSSL
       }
       msg(INFO,"Step2.2: try to connect over proxy %s",$proxy);
       $sock=new Net::ProxySSLconnect(PeerAddr=>"$host:$port",
+                                     SSL_verify_mode=>'SSL_VERIFY_NONE',
                                      SSL_session_cache_size=>0,
                                      Proxy=>$proxy);
    }
