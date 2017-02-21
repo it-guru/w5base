@@ -1570,6 +1570,7 @@ sub new
       new kernel::Field::XMLInterface(
                 name          =>'itemsummary',
                 label         =>'total Config-Item Summary',
+                readonly      =>1,
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -2268,7 +2269,7 @@ sub isWriteValid
       }
       if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
          my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                                     ["RMember"],"both");
+                                     ["RMember"],"up");
          my @grpids=keys(%grps);
          foreach my $contact (@{$rec->{contacts}}){
             if ($contact->{target} eq "base::user" &&
