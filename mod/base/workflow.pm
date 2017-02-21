@@ -3246,7 +3246,7 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $clientname=getClientAddrIdString(1);
+   my $clientname=kernel::getClientAddrIdString(1);
    $clientname="127.0.0.1" if (!defined($clientname));
    return({$self->Name()=>$clientname}) if (!defined($oldrec));
 
