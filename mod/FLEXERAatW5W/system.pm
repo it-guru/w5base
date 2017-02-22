@@ -123,6 +123,22 @@ sub new
                 vjoinon       =>['id'=>'flexerasystemid'],
                 vjoindisp     =>['software','version']),
 
+     new kernel::Field::Boolean(
+                name          =>'is_vm',
+                group         =>'vm',
+                label         =>'is virtualized system',
+                htmldetail    =>\&checkIfVM, 
+                selectfix     =>1,
+                dataobjattr   =>'ISVM'),
+
+     new kernel::Field::Boolean(
+                name          =>'is_vmhostmissing',
+                group         =>'vm',
+                htmldetail    =>\&checkIfVM, 
+                label         =>'is virtualization host missing',
+                dataobjattr   =>'ISVMHOSTMISSING'),
+
+
       new kernel::Field::Text(
                 name          =>'uuid',
                 group         =>'source',
@@ -140,8 +156,22 @@ sub new
                 name          =>'scandate',
                 group         =>'source',
                 sqlorder      =>'desc',
-                label         =>'Scan-Date',
+                label         =>'Inventory-Date',
                 dataobjattr   =>'INVENTORYDATE'),
+
+      new kernel::Field::Date(
+                name          =>'svscandate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Services-Inventory-Date',
+                dataobjattr   =>'SERVICESINVENTORYDATE'),
+
+      new kernel::Field::Date(
+                name          =>'hwscandate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Hardware-Inventory-Date',
+                dataobjattr   =>'HARDWAREINVENTORYDATE'),
 
    );
    $self->setWorktable("FLEXERA_system");
@@ -182,6 +212,21 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 }
+
+
+
+sub checkIfVM
+{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   my $current=$param{current};
+
+   return(0) if (!defined($current));
+   return(1) if ($current->{is_vm});
+   return(0);
+}
+
 
 
 sub isQualityCheckValid
@@ -251,7 +296,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default software source));
+   return(qw(header default software vm source));
 }  
 
 1;

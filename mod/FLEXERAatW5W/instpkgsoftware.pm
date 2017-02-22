@@ -72,6 +72,8 @@ sub new
                 name          =>'systemname',
                 label         =>'Systemname',
                 ignorecase    =>1,
+                vjointo       =>'FLEXERAatW5W::system',
+                vjoinon       =>['flexerasystemid'=>'id'],
                 dataobjattr   =>'systemname'),
 
 #      new kernel::Field::Textarea(
