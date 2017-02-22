@@ -442,6 +442,9 @@ sub new
    $self->{history}={
       update=>[
          'local'
+      ],
+      insert=>[
+         'local'
       ]
    };
 
