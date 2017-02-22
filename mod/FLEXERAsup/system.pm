@@ -33,16 +33,16 @@ use tsacinv::system;
 # -- drop table "W5I_FLEXERAsup__system_of";
 
 create table "W5I_FLEXERAsup__system_of" (
-   systemid            varchar2(40) not null,
+   refid               varchar2(80) not null,
    comments            varchar2(4000),
    rollout_package     number(*,0),
    rollout_instplanned date,
-   rollout_hpoaavail   boolean,
-   rollout_ipv6        boolean,
-   rollout_issungzone  boolean,
+   rollout_hpoaavail   number(*,0),
+   rollout_ipv6        number(*,0),
+   rollout_issungzone  number(*,0),
    modifyuser          number(*,0),
    modifydate          date,
-   constraint "W5I_TAD4Dsup__system_of_pk" primary key (systemid)
+   constraint "W5I_TAD4Dsup__system_of_pk" primary key (refid)
 );
 
 grant update,insert on "W5I_FLEXERAsup__system_of" to W5I;
@@ -88,7 +88,7 @@ select "W5I_system_universum".id,
        "itil::system".isapprovtest               W5_isapprovtest,
        "itil::system".isreference                W5_isreference,
 
-       "W5I_FLEXERAsup__system_of".systemid of_id,
+       "W5I_FLEXERAsup__system_of".refid of_id,
        "W5I_FLEXERAsup__system_of".comments,
        "W5I_FLEXERAsup__system_of".rollout_package,
        "W5I_FLEXERAsup__system_of".rollout_instplanned,
@@ -100,8 +100,8 @@ select "W5I_system_universum".id,
        "W5I_FLEXERAsup__system_of".modifydate
 from "W5I_system_universum"
      left outer join "W5I_FLEXERAsup__system_of"
-        on "W5I_system_universum".systemid=
-           "W5I_FLEXERAsup__system_of".systemid
+        on "W5I_system_universum".id=
+           "W5I_FLEXERAsup__system_of".refid
      left outer join "W5I_FLEXERA__systemidmap_of"
         on "W5I_system_universum".systemid=
            "W5I_FLEXERA__systemidmap_of".systemid
@@ -146,7 +146,7 @@ sub new
                 align         =>'left',
                 history       =>0,
                 dataobjattr   =>"id",
-                wrdataobjattr =>"systemid"),
+                wrdataobjattr =>"refid"),
 
       new kernel::Field::Text(
                 name          =>'systemname',
@@ -435,6 +435,7 @@ sub new
 
       new kernel::Field::Owner(
                 name          =>'owner',
+                history       =>0,
                 group         =>'source',
                 label         =>'last Editor',
                 dataobjattr   =>'modifyuser')
@@ -479,9 +480,9 @@ sub ValidatedUpdateRecord
    my $newrec=shift;
    my @filter=@_;
 
-   $filter[0]={id=>\$oldrec->{systemid}};
+   $filter[0]={id=>\$oldrec->{id}};
    if (!defined($oldrec->{ofid})){     # flexerasystemid verwenden
-      $newrec->{id}=$oldrec->{systemid};  # als Referenz in der Overflow die 
+      $newrec->{id}=$oldrec->{id};  # als Referenz in der Overflow die 
       return($self->SUPER::ValidatedInsertRecord($newrec));
    }
    return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
