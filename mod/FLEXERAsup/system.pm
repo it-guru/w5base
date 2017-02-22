@@ -57,7 +57,11 @@ select "W5I_system_universum".id,
        "W5I_system_universum".saphier,
        "W5I_system_universum".amcostelement costelement,
        decode("mview_FLEXERA_system".FLEXERASYSTEMID,NULL,0,1) flexerafnd,
-
+       "mview_FLEXERA_system".ISVM                             isvm,
+       "mview_FLEXERA_system".ISVMHOSTMISSING                  isvmhostmissing,
+       "mview_FLEXERA_system".INVENTORYDATE                    inventorydate,
+       "mview_FLEXERA_system".SERVICESINVENTORYDATE            servicesinventorydate,
+       "mview_FLEXERA_system".HARDWAREINVENTORYDATE            hardwareinventorydate,
        "tsacinv::system".assetassetid            AM_assetid,
        "tsacinv::system".systemola               AM_systemola,
        decode("tsacinv::system".systemolaclass,
@@ -140,6 +144,7 @@ sub new
                 label         =>'ID',
                 group         =>'source',
                 align         =>'left',
+                history       =>0,
                 dataobjattr   =>"id",
                 wrdataobjattr =>"systemid"),
 
@@ -161,6 +166,8 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'inflexera',
                 readonly      =>1,
+                group         =>'flexera',
+                selectfix     =>1,
                 label         =>'Flexera installed',
                 dataobjattr   =>"flexerafnd"),
 
@@ -183,6 +190,14 @@ sub new
                 ignorecase    =>1,
                 readonly      =>1,
                 dataobjattr   =>'costelement'),
+
+      new kernel::Field::Import( $self,
+                vjointo       =>'FLEXERAatW5W::system',
+                dontrename    =>1,
+                readonly      =>1,
+                group         =>'flexera',
+                uploadable    =>0,
+                fields        =>[qw(is_vm is_vmhostmissing scandate svscandate hwscandate)]),
 
       new kernel::Field::Text(
                 name          =>'am_systemid',
@@ -266,6 +281,12 @@ sub new
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'comments'),
+
+      new kernel::Field::Number(
+                name          =>'ro_package',
+                group         =>'rollout',
+                label         =>'package',
+                dataobjattr   =>'rollout_package'),
 
       new kernel::Field::Date(
                 name          =>'ro_instplanned',
@@ -418,6 +439,12 @@ sub new
                 label         =>'last Editor',
                 dataobjattr   =>'modifyuser')
    );
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
+
    $self->setWorktable("FLEXERAsup__system_of");
    $self->setDefaultView(qw(systemname systemid inflexera comments));
    return($self);
@@ -438,7 +465,7 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default rollout am w5basedata opmode source));
+   return( qw(header default flexera rollout am w5basedata opmode source));
 }
 
 
@@ -450,8 +477,8 @@ sub ValidatedUpdateRecord
    my @filter=@_;
 
    $filter[0]={id=>\$oldrec->{systemid}};
-   $newrec->{id}=$oldrec->{systemid};  # als Referenz in der Overflow die 
    if (!defined($oldrec->{ofid})){     # flexerasystemid verwenden
+      $newrec->{id}=$oldrec->{systemid};  # als Referenz in der Overflow die 
       return($self->SUPER::ValidatedInsertRecord($newrec));
    }
    return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
