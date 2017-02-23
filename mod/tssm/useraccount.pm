@@ -39,7 +39,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'Loginname',
+                label         =>'LoginID',
                 dataobjattr   =>SELpref.'operatorm1.name'),
 
       new kernel::Field::Text(

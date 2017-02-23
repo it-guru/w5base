@@ -39,7 +39,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'UserID',
+                label         =>'ID',
                 dataobjattr   =>SELpref.'contactsm1.contact_name'),
 
       new kernel::Field::Text(
@@ -178,7 +178,7 @@ sub new
 #                label         =>'Source-System',
 #                dataobjattr   =>SELpref.'contactsm1.external_system'),
                                                 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'userid',
                 label         =>'User-ID',
                 upperserarch  =>1,
