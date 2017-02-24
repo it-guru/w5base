@@ -95,11 +95,15 @@ sub qcheckRecord
          my $nameexpr=$rec->{ictono}."_xxxxx_SystemOverview_jjjjmmtt.pdf";
          my $ne=qr/^$rec->{ictono}_.+_SystemOverview_\d{8}\.pdf$/;
          my $found=0;
+         my $foundasprivate=0;
 
          if (exists($rec->{attachments}) &&
              ref($rec->{attachments}) eq "ARRAY"){
             foreach my $a (@{$rec->{attachments}}){
                if ($a->{name}=~m/$ne/){
+                  if ($a->{isprivate}){
+                     $foundasprivate++;
+                  }
                   $found++;
                }
             }
@@ -113,7 +117,13 @@ sub qcheckRecord
             push(@{$desc->{dataissue}},
                  $self->T('there is no SystemOverview attachment found'));
          }
-
+         if ($foundasprivate){
+            $exitcode=3 if ($exitcode<3);
+            my $m=$self->T('it is not allowed to mark SystemOverview '.
+                          'attachment as privacy');
+            push(@{$desc->{qmsg}},$m);
+            push(@{$desc->{dataissue}},$m);
+         }
       }
       else{
          return(undef);
