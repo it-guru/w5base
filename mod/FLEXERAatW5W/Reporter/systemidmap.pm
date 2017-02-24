@@ -58,10 +58,11 @@ sub Process             # will be run as a spereate Process (PID)
 
 
    my $smap=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
-   $smap->SetFilter({mapstate=>\undef});
+   $smap->SetFilter({mapstate=>[undef,""]});
    $smap->Limit(50);
    my $smapop=$smap->Clone();
    my $sys=getModuleObject($self->Config,"itil::system");
+   my $amsys=getModuleObject($self->Config,"tsacinv::system");
    foreach my $mrec ($smap->getHashList(qw(ALL))){
       my $systemname=$mrec->{systemname};
       $systemname=~s/\*//g;
@@ -76,6 +77,13 @@ sub Process             # will be run as a spereate Process (PID)
       my $mapstate="FAIL";
       my $systemid="";
       if ($#l==-1){
+         my $amname=uc($systemname);
+         $amsys->ResetFilter();
+         $amsys->SetFilter({systemname=>\$amname,
+                            status=>"\"!out of operation\""});
+         @l=$amsys->getHashList(qw(systemname systemid));
+      }
+      if ($#l==-1){
          $mapstate="NOT FOUND";
       }
       elsif ($#l>0){
@@ -87,6 +95,7 @@ sub Process             # will be run as a spereate Process (PID)
       }
       $smapop->ResetFilter();
       if ($self->Config->Param("W5BaseOperationMode") eq "online" ||
+         # $self->Config->Param("W5BaseOperationMode") eq "dev" ||
           $self->Config->Param("W5BaseOperationMode") eq "normal"){
          my $bk=$smapop->ValidatedUpdateRecord($mrec,{
             systemid=>$systemid,
