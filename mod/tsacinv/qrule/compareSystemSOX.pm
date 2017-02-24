@@ -19,9 +19,13 @@ NOTHING
 
 [en:]
 
-The SOX value in DARWIN is usually inherited from the application.
-If this value differs from the value in AssetManager, the IT-SeM should 
-commission the change of values in Asset Manager by their system operation.
+The SOX flag is inherited from W5Base/Darwin by default from a 
+field on the application: "Application is mangaged by rules of SOX or ICS".
+
+If this value differs from the value stored in AssetManager, the 
+IT-SeM has to create a request to system operation, so that the 
+SOX-compliant transaction is implemented and then the data is 
+maintained in AssetManager.
 
 [de:]
 
@@ -133,7 +137,7 @@ sub qcheckRecord
                }
             }
             if (!$isallsap){
-               my $msg="SOX relevance not matches the AM presets!".
+               my $msg="SOX relevance does not match the AM presets!".
                        " - please check your order";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
