@@ -86,7 +86,7 @@ sub FormatedDetail
                               cb(blobInfo.blobUri(), { title: file.name });
                             };
                             
-                            input.click();
+                            doClickOn(input);
                           },
 EOF
             }
