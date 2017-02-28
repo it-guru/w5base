@@ -484,11 +484,25 @@ sub EditProcessor
    my $id=Query->Param("RefFromId");
    my $seq=Query->Param("Seq");
    my $field=Query->Param("Field");
-   my $dfield=$self->getField($field);
+   my $edtmode="HtmlDetail";
+   my $dfield;
+   if ($field eq ""){
+      my $fp=Query->Param("FunctionPath");
+      $fp=~s/^\///;
+      my ($mode,$field,$refid,$seq)=split(/\//,$fp);
+      if (($mode=~m/^json\./) && $field ne ""){
+         $dfield=$self->getField($field);
+         return($dfield->EditProcessor($mode,$refid,$field,$seq));
+      }
+   }
+   if ($field ne ""){
+      $dfield=$self->getField($field);
+   }
    if (defined($dfield)){
-      return($dfield->EditProcessor($id,$field,$seq));
+      return($dfield->EditProcessor($edtmode,$id,$field,$seq));
    }
    else{
+
       print $self->HttpHeader("text/html");
       print "ERROR: EditProcessor no access to FunctionPath";
    }

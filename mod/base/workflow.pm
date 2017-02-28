@@ -3703,6 +3703,7 @@ sub ViewProcessor
 sub EditProcessor
 {
    my $self=shift;
+   my $edtmode=shift;
    my $refid=shift;
    my $fieldname=shift;
    my $seq=shift;
@@ -3881,6 +3882,7 @@ sub new
 sub EditProcessor
 {
    my $self=shift;
+   my $edtmode=shift;
    my $id=shift;
    return("");
 }

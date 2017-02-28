@@ -94,10 +94,11 @@ sub ProcessHead
        "<a href='#index'>".
        "<img border=0 src='../../base/load/backtotop.gif' width=20 height=20>".
        "</a></div></div>";
+   $d.=$self->{fieldsPageHeader};
    $d.="<form method=post target=_self enctype=\"multipart/form-data\">";
    $d.="<style>";
    $d.=$self->getStyle($fh,$rec,$msg,\@view,$view);
-   $d.="</style>\n".$self->{fieldsPageHeader};
+   $d.="</style>\n";
    $d.="<script type=\"text/javascript\" language=\"JavaScript\">\n";
    if ($scrolly!=0){
       $d.=<<EOF;

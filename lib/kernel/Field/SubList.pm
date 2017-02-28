@@ -48,6 +48,7 @@ sub vjoinobjInit
 sub EditProcessor
 {
    my $self=shift;
+   my $edtmode=shift;
    my $id=shift;
    my $seq=Query->Param("Seq");
    my $field=Query->Param("Field");

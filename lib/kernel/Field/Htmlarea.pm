@@ -55,12 +55,47 @@ sub FormatedDetail
       my $orgd=$d;
       $orgd=~s/&/&amp;/g;
       $d="";
-     # $d.="<table border=0 style=\"width:100%;table-layout:fixed;".
-     #     "padding:0;border-width:0;margin:0\">".
-     #     "<tr><td></div>";
-      $d.="<table border=0 style=\"width:100%;table-layout:fixed;padding:0;border-width:0;margin:0\"><tr><td><textarea id=Formated_$name name=Formated_$name class=multilinehtml></textarea></td></tr></table>";
+      my $image_uploading="";
+      {
+         my $idfieldobj=$self->getParent->IdField();
+         my $att=$self->getParent->getField("attachments");
+         if (defined($idfieldobj) && defined($att) && defined($current)){
+            my $refid=$current->{$idfieldobj->Name()};
+            if ($refid ne ""){
+               $image_uploading.="automatic_uploads: true,";
+               $image_uploading.="paste_data_images : true,";
+               $image_uploading.="images_reuse_filename: true,";
+               $image_uploading.="images_upload_url:'".
+                                 "EditProcessor/json.FILEADD/".
+                                 $att->Name().
+                                 "/".
+                                 "$refid/1',";
+               $image_uploading.=<<EOF;
+                  file_picker_callback: function(cb, value, meta) {
+                            var input = document.createElement('input');
+                            input.setAttribute('type', 'file');
+                            input.setAttribute('accept', 'image/*');
+                            input.onchange = function() {
+                              var file = this.files[0];
+                              var id = file.name;
+                              id=id.replace(/\.[^.]{1,4}\$/,"");
+                              var blobCache = 
+                                  tinymce.activeEditor.editorUpload.blobCache;
+                              var blobInfo = blobCache.create(id, file);
+                              blobCache.add(blobInfo);
+                              cb(blobInfo.blobUri(), { title: file.name });
+                            };
+                            
+                            input.click();
+                          },
+EOF
+            }
+         }
+      }
+      $d.="<table border=0 style=\"width:100%;table-layout:fixed;padding:0;border-width:0;margin:0\"><tr><td><textarea id=Formated_$name name=Formated_$name class=multilinehtml></textarea>
+
+</td></tr></table>";
       $d.="<textarea id=Data_$name style=\"visible:hidden;display:none\">$orgd</textarea>";
-     # $d.="</td></tr></table>";
       $d=<<EOF.$d;
 <script language=JavaScript 
         src="../../../static/tinymce/jscripts/tiny_mce/tinymce.min.js">
@@ -72,8 +107,10 @@ tinyMCE.init({
      	mode : "exact",
         elements : "Formated_$name",
         theme : "modern",
-        plugins: "autoresize link code nonbreaking image textcolor contextmenu lists",
-        nonbreaking_force_tab: true,
+        plugins: "autoresize link code nonbreaking image "+
+                 "textcolor contextmenu lists",
+        nonbreaking_force_tab: true, $image_uploading
+
         autoresize_max_height: 400,
         target_list: false,
 //        target_list: [
@@ -143,6 +180,7 @@ sub FormatedResult
    }
    return($d);
 }
+
 
 
 

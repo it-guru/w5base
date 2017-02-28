@@ -471,11 +471,11 @@ sub Validate
                       $le->{tag},$le->{attribute},$le->{value})}++;
          }
       }
-      if (keys(%e) && !grep(/FORCE_SAVE_ARTICLE/,$newrec->{data})){
-         $self->LastMsg(ERROR,"no FORCE_SAVE_ARTICLE and invalid html tags\n".
-                              join("\n",keys(%e)));
-         return(0);
-      }
+      #if (keys(%e) && !grep(/FORCE_SAVE_ARTICLE/,$newrec->{data})){
+      #   $self->LastMsg(ERROR,"no FORCE_SAVE_ARTICLE and invalid html tags\n".
+      #                        join("\n",keys(%e)));
+      #   return(0);
+      #}
       $newrec->{data}=~s/FORCE_SAVE_ARTICLE//g;
    }
    if (exists($newrec->{data})){
@@ -709,6 +709,13 @@ if ($self->Config->Param("W5BaseOperationMode") eq "test" ||
     $self->Config->Param("W5BaseOperationMode") eq "dev"){
 $page.="<script language=JavaScript>";
 $page.="function doRecordVote(parent,v){";
+$page.="var uservote;";
+$page.="if (v){";
+$page.="uservote='pro';";
+$page.="}";
+$page.="else{";
+$page.="uservote='contra';";
+$page.="}";
 $page.="var e=document.getElementById('RecordVote');";
 $page.="e.style.display='none';";
 $page.="}";

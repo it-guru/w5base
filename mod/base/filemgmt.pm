@@ -250,6 +250,18 @@ sub getValidWebFunctions
 }
 
 
+sub normalizeFilename
+{
+   my $self=shift;
+   my $filename=shift;
+
+   $filename.="";  # ensure remove blessed file handle
+   $filename=~s/^.*[\/\\]//;
+
+   return($filename);
+}
+
+
 
 sub Validate
 {
@@ -353,7 +365,7 @@ sub Validate
          $filename=$newrec->{file}->head()->get("Content-Disposition");
          ($filename)=$filename=~m/filename=\"(.+)\"/;
       }
-      $filename=~s/^.*[\/\\]//;
+      $filename=$self->normalizeFilename($filename);
       if (!defined($newrec->{name}) || $newrec->{name} eq "" ||
           ($newrec->{name}=~m/[\\\/]/)){   # if name is not set or has path
          $newrec->{name}=$filename;        # included

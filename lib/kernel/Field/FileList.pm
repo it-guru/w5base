@@ -141,6 +141,61 @@ sub getFileManagementObj
    return($fo);
 }
 
+sub HandleJSONFILEADD
+{
+   my $self=shift;
+   my $refid=shift;
+
+   my $parentobj=$self->{parentobj};
+   if (!defined($parentobj)){
+      $parentobj=$self->getParent->Self();
+   }
+   my $isprivate=0;
+   my $fh=Query->Param("file");
+   my $ok=0;
+   my %res=();
+   
+   if (defined($fh) && $fh ne ""){
+      my $fo=$self->getFileManagementObj();
+      my $filename=$fo->normalizeFilename($fh);
+      $fo->ResetFilter();
+      my %flt=(
+         name=>\$filename,
+         parentobj=>\$parentobj,
+         parentrefid=>\$refid
+      );
+
+      $fo->SetFilter(\%flt);
+      my ($oldrec)=$fo->getOnlyFirst(qw(fid name));
+      if (defined($oldrec)){
+         $res{location}="ViewProcessor/load/attachments/".
+                        $refid."/".$oldrec->{fid}."/".$filename;
+      }
+      else{
+         $fo->ResetFilter();
+         my %rec=(file=>$fh,
+                  isprivate=>$isprivate,
+                  parentobj=>$parentobj,
+                  parentrefid=>$refid,
+                  name=>$filename);
+         if (my $fid=$fo->ValidatedInsertRecord(\%rec)){
+            $ok=1;
+            if ($fid ne ""){
+               $res{location}="ViewProcessor/load/attachments/".
+                              $refid."/".$fid."/".$filename;
+            }
+         }
+      }
+   }
+  my $json;
+  eval("use JSON;\$json=new JSON();");
+  print $json->encode(\%res);
+  return();
+
+}
+
+
+
 sub HandleFILEADD
 {
    my $self=shift;
@@ -332,9 +387,17 @@ sub ViewProcessor
 sub EditProcessor
 {
    my $self=shift;
+   my $edtmode=shift;
    my $refid=shift;
    my $fieldname=shift;
    my $seq=shift;
+
+   if ($edtmode eq "json.FILEADD"){
+      print $self->getParent->HttpHeader("application/javascript");
+      return($self->HandleJSONFILEADD($refid));
+   }
+
+
    print $self->getParent->HttpHeader("text/html");
    print $self->getParent->HtmlHeader(style=>['default.css','work.css',
                                               'kernel.filemgmt.css'],
