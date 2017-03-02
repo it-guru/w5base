@@ -1148,14 +1148,17 @@ sub Import
          return(undef);
       }
       # check 3: Supervisor registered
-      if ($acgrouprec->{supervisoremail} eq ""){
-         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
-         return(undef);
-      }
+      #if ($acgrouprec->{supervisoremail} eq ""){
+      #   $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
+      #   return(undef);
+      #}
       my $importname=$acgrouprec->{supervisoremail};
       # check 4: load Supervisor ID in W5Base
       my $user=getModuleObject($self->Config,"base::user");
-      my $admid=$user->GetW5BaseUserID($importname,"email");
+      my $admid;
+      if ($importname ne ""){
+         $admid=$user->GetW5BaseUserID($importname,"email");
+      }
       #if (!defined($admid)){
       #   $self->LastMsg(WARN,"Can't import Supervisor as Admin");
       #}
