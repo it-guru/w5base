@@ -407,9 +407,25 @@ sub NotifyAdmin
    my $wfname;
    my %notiy;
    my $msg;
+
+   my $activator;
+   my @admin=();
+   if ($mode eq "request" || $mode eq "rundown") {
+      if (ref($param{activator}) eq 'ARRAY' &&
+          in_array($param{activator},'admin')) {
+         my @admgrps=grep(!/^admin$/,@{$param{activator}});
+         $user->SetFilter({groups=>\@admgrps});
+         @admin=$user->getHashList(qw(email givenname surname));
+      }
+
+      if ($#admin==-1) {
+         $user->ResetFilter();
+         $user->SetFilter({groups=>$param{activator}});
+         @admin=$user->getHashList(qw(email givenname surname));
+      }
+   }
+
    if ($mode eq "request"){
-      $user->SetFilter({groups=>$param{activator}});
-      my @admin=$user->getHashList(qw(email givenname surname));
       $notiy{emailto}=[map({$_->{email}} @admin)];
       $notiy{emailcc}=[$creatorrec->{email}];
       $wfname=$self->T("Request to activate '%s' in module '%s'");
@@ -440,8 +456,6 @@ sub NotifyAdmin
       return() if ($creator==$userid);
    }
    if ($mode eq "rundown"){
-      $user->SetFilter({groups=>$param{activator}});
-      my @admin=$user->getHashList(qw(email givenname surname));
       $notiy{emailto}=[map({$_->{email}} @admin)];
       $notiy{emailcc}=[$creatorrec->{email}];
       $wfname=$self->T("Request to rundown '%s' in module '%s'");
