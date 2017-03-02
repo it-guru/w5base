@@ -1156,9 +1156,9 @@ sub Import
       # check 4: load Supervisor ID in W5Base
       my $user=getModuleObject($self->Config,"base::user");
       my $admid=$user->GetW5BaseUserID($importname,"email");
-      if (!defined($admid)){
-         $self->LastMsg(WARN,"Can't import Supervisor as Admin");
-      }
+      #if (!defined($admid)){
+      #   $self->LastMsg(WARN,"Can't import Supervisor as Admin");
+      #}
       # check 5: find id of mandator "extern"
       my $mand=getModuleObject($self->Config,"base::mandator");
       $mand->SetFilter({name=>"extern"});
