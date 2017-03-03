@@ -18,6 +18,7 @@
 #
 use strict;
 use FindBin ;
+*CORE::GLOBAL::die = sub { require Carp; Carp::confess };
 $W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
 $W5V2::OperationContext="WebFrontend";
 $W5V2::InvalidateGroupCache=0;

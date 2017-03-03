@@ -20,6 +20,8 @@ use Fcntl;
 
 @ISA=qw(RPC::Smart::Server kernel::App);
 
+*CORE::GLOBAL::die = sub { require Carp; Carp::confess };
+
 #
 # This is the primary call to the W5Server. With this method all
 # event procedures can be initiated.
