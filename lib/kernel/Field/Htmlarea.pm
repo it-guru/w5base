@@ -72,6 +72,21 @@ sub FormatedDetail
                                  "$refid/1',";
                $image_uploading.=<<EOF;
                   file_picker_callback: function(cb, value, meta) {
+
+tinymce.activeEditor.windowManager.open({
+    title: "My html dialog",
+    width: 400,
+    height: 300,
+    body: [{
+        type: 'container',
+        html: "Hello world!"
+      },
+      {
+          type: 'button',
+          text: 'Upload',
+          onclick: function() {
+
+
                             var input = document.createElement('input');
                             input.setAttribute('type', 'file');
                             input.setAttribute('accept', 'image/*');
@@ -87,6 +102,34 @@ sub FormatedDetail
                             };
                             
                             doClickOn(input);
+
+
+
+          }
+      }
+    ]
+});
+
+//                            var input = document.createElement('input');
+//                            input.setAttribute('type', 'file');
+//                            input.setAttribute('accept', 'image/*');
+//                            input.onchange = function() {
+//                              var file = this.files[0];
+//                              var id = file.name;
+//                              id=id.replace(/\.[^.]{1,4}\$/,"");
+//                              var blobCache = 
+//                                  tinymce.activeEditor.editorUpload.blobCache;
+//                              var blobInfo = blobCache.create(id, file);
+//                              blobCache.add(blobInfo);
+//                              cb(blobInfo.blobUri(), { title: file.name });
+//                            };
+//                            
+//                            doClickOn(input);
+
+
+
+
+
                           },
 EOF
             }
