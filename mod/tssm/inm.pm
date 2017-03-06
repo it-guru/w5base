@@ -93,12 +93,12 @@ sub new
                 label         =>'SysModTime',
                 dataobjattr   =>SELpref.'probsummarym1.sysmodtime'),
 
-      new kernel::Field::Text(
-                name          =>'affservices',
-                sqlorder      =>"none",
-                htmldetail    =>0,
-                label         =>'affected services',
-                dataobjattr   =>SELpref.'probsummarym1.affected_services'),
+#      new kernel::Field::Text(
+#                name          =>'affservices',
+#                sqlorder      =>"none",
+#                htmldetail    =>0,
+#                label         =>'affected services',
+#                dataobjattr   =>SELpref.'probsummarym1.affected_services'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
