@@ -35,9 +35,11 @@ use tsacinv::system;
 create table "W5I_FLEXERAsup__system_of" (
    refid               varchar2(80) not null,
    comments            varchar2(4000),
-   rollout_package     number(*,0),
+   rollout_package     varchar2(40),
+   rollout_process     varchar2(40),
    rollout_instplanned date,
    rollout_hpoaavail   number(*,0),
+   rollout_hpsaavail   number(*,0),
    rollout_ipv6        number(*,0),
    rollout_issungzone  number(*,0),
    modifyuser          number(*,0),
@@ -71,6 +73,7 @@ select "W5I_system_universum".id,
               30,'APPCOM','UNDEF')               AM_systemolaclass,
        "tsacinv::system".status                  AM_systemstatus,
        "tsacinv::system".securitymodel           AM_securitymodel,
+       "tsacinv::system".assignmentgroup         AM_assignmentgroup,
        "tsacinv::asset".modelname                AM_modelname,
        "tsacinv::asset".cputype                  AM_assetcputype,
        "tsacinv::asset".cpucount                 AM_assetcpucount,
@@ -87,12 +90,19 @@ select "W5I_system_universum".id,
        "itil::system".iseducation                W5_iseducation,
        "itil::system".isapprovtest               W5_isapprovtest,
        "itil::system".isreference                W5_isreference,
-
+       (select min("itil::appl".customerprio) 
+        from "itil::appl","W5I_ACT_itil::lnkapplsystem"
+        where "itil::appl".id="W5I_ACT_itil::lnkapplsystem".applid 
+              and "W5I_ACT_itil::lnkapplsystem".systemid="itil::system".id) W5_appcustomerprio,
+       decode("W5I_TAD4D_system".enviroment,NULL,0,1) TAD4D_is,
        "W5I_FLEXERAsup__system_of".refid of_id,
        "W5I_FLEXERAsup__system_of".comments,
        "W5I_FLEXERAsup__system_of".rollout_package,
+       "W5I_FLEXERAsup__system_of".rollout_process,
        "W5I_FLEXERAsup__system_of".rollout_instplanned,
+       to_char("W5I_FLEXERAsup__system_of".rollout_instplanned,'iw') rollout_instplannedcw,
        "W5I_FLEXERAsup__system_of".rollout_hpoaavail,
+       "W5I_FLEXERAsup__system_of".rollout_hpsaavail,
        "W5I_FLEXERAsup__system_of".rollout_ipv6,
        "W5I_FLEXERAsup__system_of".rollout_issungzone,
 
@@ -116,7 +126,10 @@ from "W5I_system_universum"
            "tsacinv::system".systemid
      left outer join "tsacinv::asset"
         on "tsacinv::system".assetassetid=
-           "tsacinv::asset".assetid;
+           "tsacinv::asset".assetid
+     left outer join "W5I_TAD4D_system" 
+        on "W5I_FLEXERA__systemidmap_of".systemid=
+           "W5I_TAD4D_system".custom_data1;
 
 grant select on "W5I_FLEXERAsup__system" to W5I;
 create or replace synonym W5I.FLEXERAsup__system for "W5I_FLEXERAsup__system";
@@ -163,6 +176,13 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'systemid'),
 
+      new kernel::Field::Text(
+                name          =>'mandator',
+                label         =>'Mandator',
+                ignorecase    =>1,
+                readonly      =>1,
+                dataobjattr   =>'W5_mandator'),
+
       new kernel::Field::Boolean(
                 name          =>'inflexera',
                 readonly      =>1,
@@ -204,6 +224,12 @@ sub new
                 group         =>'am',
                 label         =>'SystemID',
                 dataobjattr   =>'systemid'),
+
+      new kernel::Field::Text(
+                name          =>'am_sysassignment',
+                group         =>'am',
+                label         =>'Assignmentgroup',
+                dataobjattr   =>'AM_assignmentgroup'),
 
       new kernel::Field::Text(
                 name          =>'am_systemola',
@@ -282,21 +308,34 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'comments'),
 
-      new kernel::Field::Number(
+      new kernel::Field::Text(
                 name          =>'ro_package',
                 group         =>'rollout',
                 label         =>'package',
+                htmldetail    =>\&is_rolloutVisible,
                 dataobjattr   =>'rollout_package'),
 
       new kernel::Field::Date(
                 name          =>'ro_instplanned',
+                dayonly       =>1,
                 group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
                 label         =>'planned install date',
                 dataobjattr   =>'rollout_instplanned'),
+
+      new kernel::Field::Number(
+                name          =>'ro_instplannedcw',
+                unit          =>'CW',
+                group         =>'rollout',
+                readonly      =>1,
+                htmldetail    =>\&is_rolloutVisible,
+                label         =>'planned install CW',
+                dataobjattr   =>'rollout_instplannedcw'),
 
       new kernel::Field::Boolean(
                 name          =>'ro_ipv6',
                 group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
                 allowempty    =>1,
                 label         =>'IPv6',
                 dataobjattr   =>'rollout_ipv6'),
@@ -304,13 +343,31 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'ro_hpoaavail',
                 group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
                 allowempty    =>1,
                 label         =>'HPOA available',
                 dataobjattr   =>'rollout_hpoaavail'),
 
       new kernel::Field::Boolean(
+                name          =>'ro_hpsaavail',
+                group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
+                allowempty    =>1,
+                label         =>'HPSA available',
+                dataobjattr   =>'rollout_hpsaavail'),
+
+      new kernel::Field::Boolean(
+                name          =>'ro_tad4d',
+                group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
+                readonly      =>1,
+                label         =>'TAD4D available',
+                dataobjattr   =>'tad4d_is'),
+
+      new kernel::Field::Boolean(
                 name          =>'ro_issungzone',
                 group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
                 allowempty    =>1,
                 label         =>'is SUN global Zone',
                 dataobjattr   =>'rollout_issungzone'),
@@ -323,6 +380,14 @@ sub new
                 label         =>'W5Base Application',
                 onRawValue    =>\&tsacinv::system::AddW5BaseData,
                 depend        =>'systemid'),
+
+      new kernel::Field::Text(
+                name          =>'w5base_applcustomerprio',
+                group         =>'w5basedata',
+                searchable    =>0,
+                readonly      =>1,
+                label         =>'W5Base Application Prio',
+                dataobjattr   =>'W5_appcustomerprio'),
 
       new kernel::Field::Text(
                 name          =>'w5base_applmgr',
@@ -454,6 +519,17 @@ sub new
    return($self);
 }
 
+sub is_rolloutVisible
+{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   return(0) if (ref($param{current}) eq "HASH" && $param{current}->{inflexera});
+   return(1);
+
+
+}
+
 
 
 sub getSqlFrom
@@ -469,7 +545,7 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default flexera rollout am w5basedata opmode source));
+   return( qw(header default rollout flexera am w5basedata opmode source));
 }
 
 
@@ -524,6 +600,8 @@ sub isViewValid
    my $rec=shift;
 
    my @l=$self->SUPER::isViewValid($rec);
+
+print STDERR ("d=%s\n",Dumper(\@l));
 
 #   if (in_array(\@l,"ALL")){
 #      if ($rec->{cenv} eq "Both"){
