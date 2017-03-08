@@ -2,6 +2,7 @@
 'itu.ac.asset.fixedasset'=>{de=>'Komponente',en=>'FixedAsset'},
 'itu.ac.asset.contract'=>{de=>'Warungsvertr.',en=>'Maint.Contr.'},
 'itu.ac.asset'=>{de=>'Hardware',en=>'Asset'},
+'itu.ac.asset.itfarm'=>{de=>'IT-Farm',en=>'IT-Farm'},
 'itu.ac.itclust'=>{de=>'Cluster',en=>'Cluster'},
 'itu.ac.itclust.service'=>{de=>'Service',en=>'Service'},
 'itu.ac.appl'=>{de=>'Anwendung',en=>'Application'},

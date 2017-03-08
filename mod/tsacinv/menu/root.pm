@@ -87,6 +87,10 @@ sub Init
                       "tsacinv::contract",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itu.ac.asset.itfarm",
+                      "tsacinv::itfarm",
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("itu.ac.license",
                       "tsacinv::license",
                       defaultacl=>['admin']);
