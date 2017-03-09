@@ -504,10 +504,15 @@ sub isSuspended
           $self->Cache->{Blacklist}->{tab}={objtype=>{}};
        }
     }
-    if ((!defined($field) || $field eq "") &&
-        exists($self->Cache->{Blacklist}->{tab}->{objtype}->{$dataobj}) &&
-        $self->Cache->{Blacklist}->{tab}->{objtype}->{$dataobj}->{field} eq ""){
-       return(1);
+    if ((!defined($field) || $field eq "")){
+       if (ref($self->Cache->{Blacklist}) eq "HASH"){
+          if (exists($self->Cache->{Blacklist}->{tab}->{objtype}->{$dataobj})){
+             my $r=$self->Cache->{Blacklist}->{tab}->{objtype}->{$dataobj};
+             if (ref($r) eq "HASH" && $r->{field} eq ""){
+                return(1);
+             }
+          }
+       }
     }
     return(0);
 }
