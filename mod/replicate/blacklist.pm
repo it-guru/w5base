@@ -176,6 +176,15 @@ sub Validate
 }
 
 
+sub isCopyValid
+{
+   my $self=shift;
+
+   return(1);
+}
+
+
+
 sub isViewValid
 {
    my $self=shift;
