@@ -500,6 +500,9 @@ sub isSuspended
           t=>$t,
           tab=>$bl
        }; 
+       if (ref($self->Cache->{Blacklist}->{tab}) ne "HASH"){
+          $self->Cache->{Blacklist}->{tab}={objtype=>{}};
+       }
     }
     if ((!defined($field) || $field eq "") &&
         exists($self->Cache->{Blacklist}->{tab}->{objtype}->{$dataobj}) &&
