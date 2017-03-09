@@ -1,5 +1,6 @@
 "Duplicate entry '\%s'"=>{de=>"Doppelter Eintrag '\%s'"},
 "W5Server unavailable - can't get unique id - please try later or contact the admin"=>{de=>'W5Server nicht verfügbar - bitte versuchen Sie es später noch mal oder kontaktieren den admin'},
 'no database connection or invalid database handle'=>{de=>'keine oder ungültige Datenbank-Verbindung'},
+'database connection temporary suspended'=>{de=>'Datenbankverbindung vorrübergehend nicht verfügbar'},
 'no record identifier returned by insert'=>{de=>'keine Datensatz ID nach Neueingabe erhalten'},
 'Delete not possible due to existing relations(s)'=>{de=>'Löschen nicht möglich, da Datensatz noch referenziert ist'},

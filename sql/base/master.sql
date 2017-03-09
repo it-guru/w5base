@@ -826,3 +826,19 @@ create table campus (
   UNIQUE KEY loc (locationid), UNIQUE KEY fullname(isprim,fullname),
   UNIQUE KEY `srcsys` (srcsys,srcid),key campusid(campusid)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE objblacklist (
+  id                   bigint(20),
+  objtype              varchar(40) NOT NULL,
+  field                varchar(40) NOT NULL default '',
+  status               tinyint(2),
+  expiration           datetime,replpartnerid        bigint(20) NOT NULL,
+  comments             longtext default NULL,
+  createdate           datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate           datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser           bigint(20) default NULL,
+  modifyuser           bigint(20) default NULL,
+  editor               varchar(100) NOT NULL default '',
+  realeditor           varchar(100) NOT NULL default '',
+  PRIMARY KEY (id),
+  UNIQUE KEY (objtype,field)
+) ENGINE=INNODB;

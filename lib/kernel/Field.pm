@@ -925,32 +925,38 @@ sub RawValue
       if (keys(%flt)>0){
          if ($#fltlst!=-1 && $joinval){ 
             if (!exists($c->{$joinkey})){
-               $self->vjoinobj->ResetFilter();
-               if (defined($self->{vjoinbase})){
-                  my $base=$self->{vjoinbase};
-                  if (ref($base) eq "CODE"){
-                     $base=&{$base}($self,$current);
-                  }
-                  if (defined($base)){
-                     if (ref($base) eq "HASH"){
-                        $base=[$base];
-                     }
-                     $self->vjoinobj->SetNamedFilter("BASE",@{$base});
-                  }
-               }
-               if (defined($self->vjoinobj) && $self->vjoinobj->Ping()){
-                  $self->vjoinobj->SetFilter(@fltlst);
-                  $c->{$joinkey}=[$self->vjoinobj->getHashList(@view)];
+               if ($self->vjoinobj->isSuspended()){
+                  return("[ERROR: information temporarily suspended]");
                }
                else{
-                  return("[ERROR: information temporarily unavailable]");
-               }
-               if ($#{$c->{$joinkey}}==-1){
-                  if (!$self->vjoinobj->Ping()){
-                    return("[ERROR: information temporarily unavailable]");
+                  $self->vjoinobj->ResetFilter();
+                  if (defined($self->{vjoinbase})){
+                     my $base=$self->{vjoinbase};
+                     if (ref($base) eq "CODE"){
+                        $base=&{$base}($self,$current);
+                     }
+                     if (defined($base)){
+                        if (ref($base) eq "HASH"){
+                           $base=[$base];
+                        }
+                        $self->vjoinobj->SetNamedFilter("BASE",@{$base});
+                     }
+                  }
+                  if (defined($self->vjoinobj) && $self->vjoinobj->Ping()){
+                     $self->vjoinobj->SetFilter(@fltlst);
+                     $c->{$joinkey}=[$self->vjoinobj->getHashList(@view)];
+                  }
+                  else{
+                     return("[ERROR: information temporarily unavailable]");
+                  }
+                  if ($#{$c->{$joinkey}}==-1){
+                     if (!$self->vjoinobj->Ping()){
+                       return("[ERROR: information temporarily unavailable]");
+                     }
                   }
                }
-               Dumper($c->{$joinkey}); # ensure that all subs are resolved
+               $c->{$joinkey}=ObjectRecordCodeResolver($c->{$joinkey});
+              # Dumper($c->{$joinkey}); # ensure that all subs are resolved
             }
             my %u=();
             my @rawlist=();

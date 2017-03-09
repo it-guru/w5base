@@ -531,6 +531,11 @@ sub getDefaultHtmlDetailPage
 sub doInitialize
 {
    my $self=shift;
+
+   if (!($self->Self=~m/^base::/) && $self->isSuspended()){
+      $self->{isInitalized}=0;
+      return(undef);
+   }
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
    return($self->{isInitalized});
 }
@@ -3437,7 +3442,8 @@ sub GetCurrentOrder
 sub SetCurrentView
 {
    my $self=shift;
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+
+   $self->doInitialize();
    if ($_[0] eq "ALL" && $#_==0){
       my $fh=$self->getFieldHash();
       $self->Context->{'CurrentView'}=[];

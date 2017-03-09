@@ -77,6 +77,7 @@ sub Process             # will be run as a spereate Process (PID)
    my $self=shift;
 
    my $appl=getModuleObject($self->Config,"TS::appl");
+   return(1) if ($appl->isSuspended());
    $appl->SetFilter({cistatusid=>\'4'});
    my $oldictono;
    my %icto=();
@@ -91,10 +92,16 @@ sub Process             # will be run as a spereate Process (PID)
       $oldictono=$arec->{ictono};
    }
    my $agrp=getModuleObject($self->Config,"itil::applgrp");
+   return(1) if ($agrp->isSuspended());
    my $m=getModuleObject($self->Config,"base::mandator");
+   return(1) if ($m->isSuspended());
    my $grp=getModuleObject($self->Config,"base::grp");
+   return(1) if ($grp->isSuspended());
    my $i=getModuleObject($self->Config,"tscape::archappl");
+   return(1) if ($i->isSuspended());
    my $la=getModuleObject($self->Config,"itil::lnkapplgrpappl");
+   return(1) if ($la->isSuspended());
+
 
    my $iname=$i->Self();
    $i->SetFilter({archapplid=>[keys(%icto)]});

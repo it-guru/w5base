@@ -109,4 +109,6 @@
 'sysadm.userenv.userview'=>{de=>'Datensichten',en=>'Dataviews'},
 'sysadm.userenv.bookmarks'=>{de=>'Bookmarks',en=>'Bookmarks'},
 'sysadm.userenv.bookmarks.new'=>{de=>'Neueingabe',en=>'New'},
+'sysadm.blacklist'=>{de=>'Datenobjekt-Blacklist',en=>'DataObj-Blacklist'},
+'sysadm.blacklist.new'=>{de=>'Neueingabe',en=>'New'},
 'MyW5Base.userenv'=>{de=>'Benutzereinstellungen',en=>'Userpreferences'},

@@ -282,6 +282,16 @@ sub Init
                       func=>'Main',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.blacklist",
+                      "base::blacklist",
+                      func=>'Main',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("sysadm.blacklist.new",
+                      "base::blacklist",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("Tools",
                       "tmpl/welcome",
                       prio=>10,

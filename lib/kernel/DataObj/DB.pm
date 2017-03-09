@@ -919,6 +919,11 @@ sub getFirst
 
    if (!defined($self->{DB})){
       $self->{isInitalized}=0;
+      if ($self->isSuspended()){
+         return(undef,
+                msg(ERROR,
+                $self->T("database connection temporary suspended")));
+      }
       return(undef,
              msg(ERROR,
              $self->T("no database connection or invalid database handle")));

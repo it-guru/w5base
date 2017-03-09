@@ -471,6 +471,45 @@ sub _LoadUserInUserCache
    return(0);
 }
 
+
+sub isSuspended
+{
+    my $self=shift;
+    my $dataobj=shift;
+    my $field=shift;
+    if ($dataobj=~m/^base::/){
+       return(0); # base:: objects can not be suspended
+    }
+
+    if (!defined($dataobj)){
+       $dataobj=$self->Self();
+    }
+    my $t=time();
+
+    if (!defined($self->Cache->{Blacklist}) ||
+        $self->Cache->{Blacklist}->{t}<$t-300){
+       my $o=$self->getPersistentModuleObject("base::blacklist");
+       $o->SetFilter({
+          status=>\'1',
+          expiration=>[undef,">now"]
+       });
+       $o->SetCurrentView(qw(objtype field));
+       my $bl=$o->getHashIndexed("objtype");
+       $bl=ObjectRecordCodeResolver($bl);
+       $self->Cache->{Blacklist}={
+          t=>$t,
+          tab=>$bl
+       }; 
+    }
+    if ((!defined($field) || $field eq "") &&
+        exists($self->Cache->{Blacklist}->{tab}->{objtype}->{$dataobj}) &&
+        $self->Cache->{Blacklist}->{tab}->{objtype}->{$dataobj}->{field} eq ""){
+       return(1);
+    }
+    return(0);
+}
+
+
 sub getInitiatorGroupsOf
 {
    my $self=shift;
