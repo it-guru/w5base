@@ -78,8 +78,8 @@ sub FormatedDetail
       if ($mode eq "ShortMsg"){         # SMS Modus
          $d=~s/^(.*\d+:\d+):\d+\s*$/$1/;   # cut seconds
       }
-      if ($mode eq "HtmlDetail" && $self->{dayonly}){
-         $d=~s/\d+:\d+:\d+.*$//;
+      if ($self->{dayonly}){
+         $d=~s/\s*\d+:\d+:\d+.*$//;
       }
       if ($mode eq "HtmlDetail" && (!$self->{dayonly} || $self->{dayonly}==2)){
          if (defined($delta) && $delta!=0){

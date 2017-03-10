@@ -42,6 +42,8 @@ create table "W5I_FLEXERAsup__system_of" (
    rollout_hpsaavail   number(*,0),
    rollout_ipv6        number(*,0),
    rollout_issungzone  number(*,0),
+   rollout_isitm6      number(*,0),
+   rollout_isrcrel     number(*,0),
    modifyuser          number(*,0),
    modifydate          date,
    constraint "W5I_TAD4Dsup__system_of_pk" primary key (refid)
@@ -104,6 +106,8 @@ select "W5I_system_universum".id,
        "W5I_FLEXERAsup__system_of".rollout_hpoaavail,
        "W5I_FLEXERAsup__system_of".rollout_hpsaavail,
        "W5I_FLEXERAsup__system_of".rollout_ipv6,
+       "W5I_FLEXERAsup__system_of".rollout_isitm6,
+       "W5I_FLEXERAsup__system_of".rollout_isrcrel,
        "W5I_FLEXERAsup__system_of".rollout_issungzone,
 
        "W5I_FLEXERAsup__system_of".modifyuser,
@@ -128,7 +132,7 @@ from "W5I_system_universum"
         on "tsacinv::system".assetassetid=
            "tsacinv::asset".assetid
      left outer join "W5I_TAD4D_system" 
-        on "W5I_FLEXERA__systemidmap_of".systemid=
+        on "W5I_system_universum".systemid=
            "W5I_TAD4D_system".custom_data1;
 
 grant select on "W5I_FLEXERAsup__system" to W5I;
@@ -173,6 +177,7 @@ sub new
                 name          =>'systemid',
                 label         =>'SystemID',
                 ignorecase    =>1,
+                selectfix     =>1,
                 readonly      =>1,
                 dataobjattr   =>'systemid'),
 
@@ -308,6 +313,19 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'comments'),
 
+      new kernel::Field::Select(
+                name          =>'ro_process',
+                group         =>'rollout',
+                value         =>['AUTOMATIC',
+                                 'MANUEL',
+                                 'OUT OF SCOPE'],
+                label         =>'Rollout process',
+                htmldetail    =>\&is_rolloutVisible,
+                uppersearch   =>1,
+                wrdataobjattr =>'rollout_process',
+                dataobjattr   =>"decode(rollout_process,NULL,'AUTOMATIC',".
+                                "rollout_process)"),
+
       new kernel::Field::Text(
                 name          =>'ro_package',
                 group         =>'rollout',
@@ -325,10 +343,13 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'ro_instplannedcw',
-                unit          =>'CW',
+                unit          =>sub{
+                   my $self=shift;
+                   return($self->getParent->T("CW",$self->getParent->Self()));
+                },
                 group         =>'rollout',
+                htmldeltail   =>'NotEmpty',
                 readonly      =>1,
-                htmldetail    =>\&is_rolloutVisible,
                 label         =>'planned install CW',
                 dataobjattr   =>'rollout_instplannedcw'),
 
@@ -347,6 +368,14 @@ sub new
                 allowempty    =>1,
                 label         =>'HPOA available',
                 dataobjattr   =>'rollout_hpoaavail'),
+
+      new kernel::Field::Boolean(
+                name          =>'ro_itm6',
+                group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
+                allowempty    =>1,
+                label         =>'ITM6 available',
+                dataobjattr   =>'rollout_isitm6'),
 
       new kernel::Field::Boolean(
                 name          =>'ro_hpsaavail',
@@ -371,6 +400,14 @@ sub new
                 allowempty    =>1,
                 label         =>'is SUN global Zone',
                 dataobjattr   =>'rollout_issungzone'),
+
+      new kernel::Field::Boolean(
+                name          =>'ro_rcrel',
+                group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
+                allowempty    =>1,
+                label         =>'Release-Container-Relevant',
+                dataobjattr   =>'rollout_isrcrel'),
 
       new kernel::Field::Text(
                 name          =>'w5base_appl',
@@ -524,7 +561,9 @@ sub is_rolloutVisible
    my $self=shift;
    my $mode=shift;
    my %param=@_;
-   return(0) if (ref($param{current}) eq "HASH" && $param{current}->{inflexera});
+   return(1); # rollout soll doch IMMER sichtbar sein
+   return(0) if (ref($param{current}) eq "HASH" && 
+                 $param{current}->{inflexera});
    return(1);
 
 
@@ -601,13 +640,19 @@ sub isViewValid
 
    my @l=$self->SUPER::isViewValid($rec);
 
-print STDERR ("d=%s\n",Dumper(\@l));
 
-#   if (in_array(\@l,"ALL")){
-#      if ($rec->{cenv} eq "Both"){
-#         return(qw(header source am default));
-#      }
-#   }
+   if (in_array(\@l,"ALL")){
+      my $sys=$self->getPersistentModuleObject("w5sys","itil::system");
+      if (defined($sys) && $rec->{systemid} ne ""){
+         $sys->SecureSetFilter({systemid=>\$rec->{systemid}});
+         my ($rec,$msg)=$sys->getOnlyFirst(qw(id)); 
+         if (defined($rec)){
+            return(@l);
+         }
+      }
+
+      return(qw(header default source));
+   }
    return(@l);
 }
 
@@ -623,8 +668,8 @@ sub isWriteValid
    my @l=$self->SUPER::isWriteValid($rec,@_);
 
 
-   return("default","rollout") if ($#l!=-1 && defined($rec) && $rec->{inflexera} ne "1");
-   return("default") if ($#l!=-1);
+   #return("default","rollout") if ($#l!=-1 && defined($rec) && $rec->{inflexera} ne "1");
+   return("default","rollout") if ($#l!=-1);
    return(undef);
 }
 

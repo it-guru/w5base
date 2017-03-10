@@ -11,3 +11,10 @@
 'planned install date'=>{de=>'geplantes Installationsdatum'},
 'is SUN global Zone'=>{de=>'ist SUN gZone'},
 'HPOA available'=>{de=>'HPOA verfügbar'},
+'CW'=>{de=>'KW'},
+'planned install CW'=>{de=>'geplannte Installations-Kalenderwoche'},
+'HPSA available'=>{de=>'HPSA verfügbar'},
+'TAD4D available'=>{de=>'TAD4D verfügbar'},
+'ITM6 available'=>{de=>'ITM6 verfügbar'},
+'Rollout process'=>{de=>'Rolloutverfahren'},
+
