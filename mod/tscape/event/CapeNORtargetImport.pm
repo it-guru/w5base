@@ -46,6 +46,10 @@ sub CapeNORtargetImport
    my $user=getModuleObject($self->Config,"base::user");
    my $appl=getModuleObject($self->Config,"itil::appl");
    my $itno=getModuleObject($self->Config,"itil::itnormodel");
+   if ($appl->isSuspended() ||
+       $itno->isSuspended()){
+      return({ exitcode=>0, msg=>'necessary objects suspended' });
+   }
    $itno->SetFilter({cistatusid=>'4'});
    $itno->SetCurrentView(qw(id name));
    my $itnormodel=$itno->getHashIndexed("name");
@@ -66,6 +70,9 @@ sub CapeNORtargetImport
 
 
    my $nortarget=getModuleObject($self->Config,"tscape::nortarget");
+   if ($nortarget->isSuspended()){
+      return({ exitcode=>0, msg=>'necessary objects suspended' });
+   }
    $nortarget->SetCurrentOrder("mdate");
    $nortarget->SetCurrentView(qw(ALL));
    if (!exists($param{debug})){
