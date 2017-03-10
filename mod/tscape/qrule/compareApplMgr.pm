@@ -121,6 +121,7 @@ sub qcheckRecord
 
    if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
+      return(undef,undef) if ($par->isSuspended());
       $par->SetFilter({archapplid=>\$rec->{ictono}});
       my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());

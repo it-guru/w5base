@@ -545,8 +545,8 @@ sub getRequestedReplicationObjects
       my $sth=$dbi->column_info(undef,$schema,$ctrl->{'name'},'%');
       foreach my $col ($sth->getHashList()){
          if (in_array($ctrl->{blockedFields},$col->{'column_name'})){
-            msg(WARN,"debug info: blocked by blacklist ".
-                      "$ctrl->{'name'} : $col->{'column_name'}");
+            #msg(WARN,"debug info: blocked by blacklist ".
+            #          "$ctrl->{'name'} : $col->{'column_name'}");
             next;
          }
          $ctrl->{'col'}->{lc($col->{'column_name'})}={
@@ -566,31 +566,37 @@ sub getRequestedReplicationObjects
       #
       my $obj=getModuleObject($Config,$ctrl->{'name'});
       if (defined($obj)){
-         my $idobj=$obj->IdField();
-         if (defined($idobj)){
-            my $idname=$idobj->Name();
-            $ctrl->{'idname'}=$idname;
-            if (exists($ctrl->{'col'}->{lc($idname)})){ # check on id col
-               $ctrl->{'valid'}=1;
-               $ctrl->{'replkeyfields'}=['replkeypri','replkeysec'];
-            }
-            else{
-               $ctrl->{'valid'}=0;
-               msg(ERROR,"id column '$idname' not exists in oracle ".
-                         "replication table  '$ctrl->{'name'}'");
-            }
-         }
-         my $syncobj=$obj->getField("replkeypri");
-         if (!defined($idobj)){  # id is mandatory for sync
-            msg(ERROR,"replication on object '$ctrl->{'name'}' ".
-                      "not posible - missing id field");
-            $ctrl->{'valid'}=0;
+         if ($obj->isSuspended()){
+            $ctrl->{'online'}=0;
          }
          else{
-            if (!defined($syncobj)){  # a synckey must be defined in w5base!
-               msg(ERROR,"remote object '$ctrl->{'name'}' ".
-                         "is not replication compatible");
+            $ctrl->{'online'}=1;
+            my $idobj=$obj->IdField();
+            if (defined($idobj)){
+               my $idname=$idobj->Name();
+               $ctrl->{'idname'}=$idname;
+               if (exists($ctrl->{'col'}->{lc($idname)})){ # check on id col
+                  $ctrl->{'valid'}=1;
+                  $ctrl->{'replkeyfields'}=['replkeypri','replkeysec'];
+               }
+               else{
+                  $ctrl->{'valid'}=0;
+                  msg(ERROR,"id column '$idname' not exists in oracle ".
+                            "replication table  '$ctrl->{'name'}'");
+               }
+            }
+            my $syncobj=$obj->getField("replkeypri");
+            if (!defined($idobj)){  # id is mandatory for sync
+               msg(ERROR,"replication on object '$ctrl->{'name'}' ".
+                         "not posible - missing id field");
                $ctrl->{'valid'}=0;
+            }
+            else{
+               if (!defined($syncobj)){  # a synckey must be defined in w5base!
+                  msg(ERROR,"remote object '$ctrl->{'name'}' ".
+                            "is not replication compatible");
+                  $ctrl->{'valid'}=0;
+               }
             }
          }
       }
@@ -629,7 +635,8 @@ sub getRequestedReplicationObjects
    }
    my $rprec=getReplicatePartnerRec($Config,$partner);
    foreach my $ctrl (@replicationOjects){  # ensure, that all replication obj
-      if ($ctrl->{'requested'} && $ctrl->{'valid'}){ # records are exists
+      if ($ctrl->{'requested'} && $ctrl->{'online'} &&
+          $ctrl->{'valid'}){ # records are exists
          my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
          $ctrl->{'entrycount'}=$rorec->{'entrycount'};
          $ctrl->{'commitblocksize'}=$rorec->{'commitblocksize'};

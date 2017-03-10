@@ -134,6 +134,7 @@ sub qcheckRecord
           ($rec->{opmode} eq "prod" || $rec->{opmode} eq "cbreakdown")){
          my $grp;
          my $i=getModuleObject($dataobj->Config,"tscape::archappl");
+         return(undef,undef) if ($i->isSuspended());
          $i->SetFilter({archapplid=>\$icto});
          my ($ictor)=$i->getOnlyFirst(qw(organisation archapplid orgareaid));
          if (defined($ictor) && $ictor->{organisation} ne ""){
@@ -164,6 +165,7 @@ sub qcheckRecord
       my $applid=$rec->{applid};
       if ($applid ne ""){
          my $appl=getModuleObject($dataobj->Config,"itil::appl");
+         return(undef,undef) if ($appl->isSuspended());
          $appl->SetFilter({id=>\$applid});
          my ($applrec)=$appl->getOnlyFirst(qw(mandator mandatorid));
          if (defined($applrec)){
@@ -184,6 +186,7 @@ sub qcheckRecord
       }
       if ($#applid!=-1){
          my $appl=getModuleObject($dataobj->Config,"itil::appl");
+         return(undef,undef) if ($appl->isSuspended());
          $appl->SetFilter({id=>\@applid});
          my %m;
          foreach my $arec ($appl->getHashList(qw(mandator mandatorid))){
@@ -226,6 +229,7 @@ sub qcheckRecord
       }
       if ($#sysid!=-1){
          my $sys=getModuleObject($dataobj->Config,"itil::system");
+         return(undef,undef) if ($sys->isSuspended());
          $sys->SetFilter({id=>\@sysid});
          my %m;
          foreach my $srec ($sys->getHashList(qw(mandator mandatorid))){
