@@ -97,6 +97,9 @@ select "W5I_system_universum".id,
         where "itil::appl".id="W5I_ACT_itil::lnkapplsystem".applid 
               and "W5I_ACT_itil::lnkapplsystem".systemid="itil::system".id) W5_appcustomerprio,
        decode("W5I_TAD4D_system".enviroment,NULL,0,1) TAD4D_is,
+       (select count(*) from  "W5I_TAD4D_software" 
+        where "W5I_TAD4D_system".agent_id="W5I_TAD4D_software".agent_id 
+              and is_sub_cap=1 and ROWNUM<=1 )   TAD4D_is_sub_cap,
        "W5I_FLEXERAsup__system_of".refid of_id,
        "W5I_FLEXERAsup__system_of".comments,
        "W5I_FLEXERAsup__system_of".rollout_package,
@@ -392,6 +395,14 @@ sub new
                 readonly      =>1,
                 label         =>'TAD4D available',
                 dataobjattr   =>'tad4d_is'),
+
+      new kernel::Field::Boolean(
+                name          =>'ro_tad4dsubcap',
+                group         =>'rollout',
+                htmldetail    =>\&is_rolloutVisible,
+                readonly      =>1,
+                label         =>'TAD4D SubCapacity',
+                dataobjattr   =>'tad4d_is_sub_cap'),
 
       new kernel::Field::Boolean(
                 name          =>'ro_issungzone',
