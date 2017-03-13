@@ -211,7 +211,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_scandate"))){
-     Query->Param("search_scandate"=>">now-7d");
+     Query->Param("search_scandate"=>">now-14d");
    }
 }
 
