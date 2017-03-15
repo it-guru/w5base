@@ -906,12 +906,11 @@ sub SetFilter
       my %f1=(%{$flt[0]});
       $f1{status}='!"out of operation"';
 
-#      my %f2=(%{$flt[0]});
-#      $f2{status}='"out of operation"';
-#      $f2{mdate}='>now-7d';
-#
-#      @flt=([\%f1,\%f2]);
-      @flt=([\%f1]);
+      my %f2=(%{$flt[0]});
+      $f2{status}='"out of operation"';
+      $f2{mdate}='>now-7d';
+
+      @flt=([\%f1,\%f2]);
    }
    return($self->SUPER::SetFilter(@flt));
 }
