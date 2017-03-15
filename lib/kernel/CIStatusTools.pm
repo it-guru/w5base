@@ -378,8 +378,16 @@ sub NotifyAdmin
    #delete($user->{DB});
    return() if ($creator==0);
    $user->SetFilter({userid=>\$creator});
-   my ($creatorrec,$msg)=$user->getOnlyFirst(qw(email givenname surname));
+   my ($creatorrec,$msg)=$user->getOnlyFirst(qw(givenname surname
+                                                email lastlang));
    return() if (!defined($creatorrec));
+
+   my $oldlang;
+   if (defined($ENV{HTTP_FORCE_LANGUAGE})) {
+      $oldlang=$ENV{HTTP_FORCE_LANGUAGE};
+   }
+   $ENV{HTTP_FORCE_LANGUAGE}=$creatorrec->{lastlang};
+
    my $fromname=$creatorrec->{surname};
    $fromname.=", " if ($creatorrec->{givenname} ne "" && $fromname ne "");
    $fromname.=$creatorrec->{givenname} if ($creatorrec->{givenname});
@@ -493,6 +501,14 @@ EOF
       my %d=(step=>'base::workflow::mailsend::waitforspool');
       my $r=$wf->Store($id,%d);
    }
+
+   if (defined($oldlang)) {
+      $ENV{HTTP_FORCE_LANGUAGE}=$oldlang;
+   }
+   else {
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+   }
+
    return(0);
 }
 

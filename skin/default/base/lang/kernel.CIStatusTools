@@ -18,21 +18,18 @@
     de=>"Aktivierung durchgeführt für '\%s' im Modul '\%s'"},
 "Drop notification for '\%s' in module '\%s'"=>{
     de=>"Löschungsbenachrichtigung für '\%s' im Modul '\%s'"},
-'MSG001'=>{en=>'From %s was requested to activate the config item "%s".
+'MSG001'=>{en=>'%s has requested activation of the config item "%s".
 
  %s
 
-Please check the config item to "installed/active" if
-it is ok.
+Please set the config item to "installed/active" after a successful check.
 
-The complete list of config items of type "%s" can
-be viewed by 
+The complete list of config items of type "%s" can be viewed under ... 
 
   %s
 
-The requestor is automatically informed by email about
-your changes.
-',de=>'Von %s wurde hiermit angefordert, das 
+The requestor is automatically informed about your changes via email.',
+de=>'Von %s wurde hiermit angefordert, das 
 Config-Item "%s" zu aktivieren.
 
  %s
@@ -75,12 +72,11 @@ Die vollständige Liste der Config-Items vom Typ "%s" können Sie über folgenden L
 
 '},
 
-'MSG003'=>{en=>'The requested Config-Item "%s" is now installed/active and in this way useable.
+'MSG003'=>{en=>'The requested Config-Item "%s" is now installed/active and is ready to be used.
 
  %s
 
-The complete list of config items of type "%s" can
-be viewed by 
+The complete list of config items of type "%s" can be viewed under ...
 
   %s
 
