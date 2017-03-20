@@ -425,6 +425,8 @@ $RealScript --config file.conf [options]
 
    --config  config file name (with no path, /etc/w5base is the default dir)
 
+   --logdir  directory to store the check logs (default dir: /var/log/w5base)
+
    --timestamp format of timestamps (default = '%F %X') 
 
    --verbose display more details of operation process
