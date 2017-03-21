@@ -15,7 +15,10 @@ sub new
    $self->setDefaultView(qw( 
                             d_last_refresh_date
                             name
-                            last_refresh_type));
+                            d_last_refresh_type
+                            d_next_refresh_date
+                            failcount
+                            is_broken));
    return($self);
 }
 
