@@ -763,7 +763,6 @@ sub objectReplicationPhase1
          $dbi->doCmd("lock table \"$ctrl->{name}\" IN EXCLUSIVE MODE");
          $dbi->doCmd("lock table \"_$ctrl->{name}\" IN EXCLUSIVE MODE");
          do{
-printf STDERR ("fifi $start+$phaselimit %s\n",time());
             last SPLOOP if ( $start+$phaselimit<time()); 
             $oldreplkey=$srcrec->{'replkeypri'};
             if ((defined($replkey) && $srcrec->{'replkeypri'} gt $replkey) || 
