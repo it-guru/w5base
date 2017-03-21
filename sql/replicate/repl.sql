@@ -31,7 +31,7 @@ CREATE TABLE replicateobject (
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (id),
   KEY replpartner (replpartner),
-  UNIQUE KEY name (name)
+  UNIQUE KEY name (name,replpartner)
 ) ENGINE=INNODB;
 CREATE TABLE replicatestat (
   id   bigint(20)    NOT NULL default '0',
