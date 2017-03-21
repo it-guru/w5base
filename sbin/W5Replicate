@@ -129,8 +129,8 @@ msg(DEBUG,"use MaximumReplicationTime=$MaximumReplicationTime seconds");
 my @slot;
 
 $SIG{ALRM}=sub{ 
-   printf STDERR ("ERROR: hard termination start while replication ".
-                  "timelimit reached\n");
+   printf STDERR ("ERROR: hard termination start at ".time().
+                  " while replication timelimit reached\n");
    for(my $slotno=0;$slotno<$maxslots;$slotno++){
       if (defined($slot[$slotno])){
          printf STDERR ("slot %d used by %s in phase %d since %d seconds\n",
@@ -471,19 +471,19 @@ sub getRequestedReplicationObjects
    # check if other W5Replication Action are already in process in
    # current schema - This needs read access to V$SESSION !
 
-#   my @buffer=$dbi->getHashList(
-#      "select * from V\$SESSION where ".
-#      "USERNAME=sys_context('USERENV', 'SESSION_USER') and ".
-#      "ACTION=sys_context('USERENV', 'ACTION') and ".
-#      "SID<>sys_context('USERENV', 'SID')");
-#   if ($#buffer!=-1){
-#      if (!$opt_f){
-#         $dbi->disconnect();
-#         msg(ERROR,"other sessions in current schema are already active");
-#         doShutdown();
-#         exit(101);
-#      }
-#   }
+   my @buffer=$dbi->getHashList(
+      "select * from V\$SESSION where ".
+      "USERNAME=sys_context('USERENV', 'SESSION_USER') and ".
+      "ACTION=sys_context('USERENV', 'ACTION') and ".
+      "SID<>sys_context('USERENV', 'SID')");
+   if ($#buffer!=-1){
+      if (!$opt_f){
+         $dbi->disconnect();
+         msg(ERROR,"other sessions in current schema are already active");
+         doShutdown();
+         exit(101);
+      }
+   }
 
 
    my $rprec=getReplicatePartnerRec($Config,$partner);
@@ -491,7 +491,7 @@ sub getRequestedReplicationObjects
    # loading blacklist informations
    my $blacklist=getModuleObject($Config,"replicate::blacklist");
    $blacklist->SetFilter({
-      replpartnerid=>\$rprec->{id},
+      replpartnerid=>[$rprec->{id},undef],
       status=>\'1',
       expiration=>[undef,">now"]
    });
@@ -1023,6 +1023,7 @@ sub createSlot
    my $nice=shift;
    my $ctrl=shift;
    my $job=shift;
+   my $phaselimit=shift;
    my $function=shift;
 
    my $pid=fork();
@@ -1048,7 +1049,8 @@ sub createSlot
       label=>$tasklabel,
       job=>$job,
       name=>$ctrl->{'name'},
-      start=>time()
+      start=>time(),
+      phaselimit=>$phaselimit
    });
 }
 
@@ -1147,7 +1149,8 @@ while(my $nextjob=shift(@joblist)){
                if ($nextjob->{'phase'}==1){
                   $currentStartPhase=1;
                   $slot[$slotno]=createSlot($self,"Phase1",1,
-                                            $replControl,$nextjob,sub{
+                                            $replControl,$nextjob,$phaselimit,
+                  sub{
                      objectReplicationPhase1($config,$phaselimit,$replControl);
                   });
                }
@@ -1168,14 +1171,16 @@ while(my $nextjob=shift(@joblist)){
                   $phaselimit=int($phaselimit);
                   $currentStartPhase=2;
                   $slot[$slotno]=createSlot($self,"Phase2",10,
-                                            $replControl,$nextjob,sub{
+                                            $replControl,$nextjob,$phaselimit,
+                  sub{
                      objectReplicationPhase2($config,$phaselimit,$replControl);
                   });
                }
                elsif ($nextjob->{'phase'}==3){  # cleanup
                   $currentStartPhase=3;
                   $slot[$slotno]=createSlot($self,"Phase3",2,
-                                            $replControl,$nextjob,sub{
+                                            $replControl,$nextjob,10,
+                  sub{
                      objectReplicationPhase3($config,10,$replControl);
                   });
                }
