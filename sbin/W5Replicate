@@ -142,7 +142,7 @@ $SIG{ALRM}=sub{
    }
    printf STDERR ("----------------\n");
    printf STDERR ("d=%s\n",Dumper(\@slot));
-   
+   doShutdown();   
    die("ERROR: hard programm termination by ".
        "MaximumReplicationTime=$MaximumReplicationTime") 
 };
@@ -702,7 +702,7 @@ sub objectReplicationPhase1
    $p1smallpack=$p1smallpack*5 if ($ctrl->{name} eq "base::workflow");
    my $oldreplkey;
    my $recinqueue=1;
-   while($ReplicationStart+$MaximumReplicationTime-10>time() &&
+   SPLOOP: while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
       my $syncstart;
       my $replkey;
@@ -747,7 +747,7 @@ sub objectReplicationPhase1
       }
       else{
          $obj->SetFilter({}); # ensure that SetFilter is always be called
-         $obj->Limit($p1smallpack,0,0);  # for "hard" object filters (like workflows)
+         $obj->Limit($p1smallpack,0,0);  # for "hard" object filters 
       }              
       #$obj->ResetFilter();
       #$obj->SetFilter({id=>"5275"});
@@ -763,6 +763,8 @@ sub objectReplicationPhase1
          $dbi->doCmd("lock table \"$ctrl->{name}\" IN EXCLUSIVE MODE");
          $dbi->doCmd("lock table \"_$ctrl->{name}\" IN EXCLUSIVE MODE");
          do{
+printf STDERR ("fifi $start+$phaselimit %s\n",time());
+            last SPLOOP if ( $start+$phaselimit<time()); 
             $oldreplkey=$srcrec->{'replkeypri'};
             if ((defined($replkey) && $srcrec->{'replkeypri'} gt $replkey) || 
                 (defined($replkeysec) && 
@@ -902,7 +904,8 @@ sub objectReplicationPhase2
       }
       foreach my $rec (@buffer){
          my $id=$rec->{$ctrl->{idname}};
-         last SPLOOP if (exists($idseen{$id}));  # end if an ID is already seen
+         last SPLOOP if (exists($idseen{$id}) || # end if an ID is already seen
+                         $start+$phaselimit<time()); 
          $idseen{$id}++;
          $dbi->doCmd("update \"_$ctrl->{name}\" set w5repllasttry=current_date ".
                      "where refid=?",$id);
