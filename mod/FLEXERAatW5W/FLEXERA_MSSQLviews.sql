@@ -36,21 +36,26 @@ from dbo.ComplianceComputer_MT
      left outer join dbo.VirtualMachine_MT
         on dbo.ComplianceComputer_MT.ComplianceComputerID=
            dbo.VirtualMachine_MT.ComplianceComputerID
+where ComplianceComputer_MT.ComplianceComputerStatusID<>4   -- ignore dummy records
 
 
 
 -- drop view w5base.INSTSOFTWARE;
 create view w5base.INSTSOFTWARE as
-select InstalledSoftware_MT.InstalledSoftwareID    ID,
-       ComplianceComputerID                        FLEXERASYSTEMID,
-       InstalledSoftware_MT.InstallDate            INSTDATE,
-       SoftwareTitle_S.Fullname                    FULLNAME,
-       SoftwareTitle_S.Comments                    CMTS,
-       SoftwareTitleProduct_S.ProductName          PRODUCTNAME,
-       SoftwareTitleVersion_S.VersionName          VERSION,
-       SoftwareTitleVersion_S.VersionWeight        VERSIONWEIGHT,
-       SoftwareTitlePublisher_S.PublisherName      PUBLISHERNAME,
-       InstalledSoftware_MT.DiscoveryDate          DISCDATE
+select InstalledSoftware_MT.InstalledSoftwareID          ID,
+       ComplianceComputerID                              FLEXERASYSTEMID,
+       InstalledSoftware_MT.InstallDate                  INSTDATE,
+       SoftwareTitle_S.Fullname                          FULLNAME,
+       SoftwareTitle_S.Comments                          CMTS,
+       SoftwareTitleProduct_S.ProductName                PRODUCTNAME,
+       IIF(SoftwareTitleVersion_S.VersionName is null OR
+           SoftwareTitleVersion_S.VersionName='',' ',
+           SoftwareTitleVersion_S.VersionName)           VERSION,
+       IIF(SoftwareTitleVersion_S.VersionWeight is null OR
+           SoftwareTitleVersion_S.VersionWeight='',' ',
+           SoftwareTitleVersion_S.VersionWeight)         VERSIONWEIGHT,
+       SoftwareTitlePublisher_S.PublisherName            PUBLISHERNAME,
+       InstalledSoftware_MT.DiscoveryDate                DISCDATE
                      
 from dbo.InstalledSoftware_MT
    join SoftwareTitle_S 
