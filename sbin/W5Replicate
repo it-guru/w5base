@@ -1000,10 +1000,10 @@ sub objectReplicationPhase3
    my $cmd="delete from \"$ctrl->{name}\" ".
            "where \"$ctrl->{name}\".$ctrl->{idname} in ".
            "(select refid from \"_$ctrl->{name}\" where ".
-           "( \"_$ctrl->{name}\".w5repllastsucc<current_date-14 and ".
+           "(( \"_$ctrl->{name}\".w5repllastsucc<current_date-14 and ".
            "  \"_$ctrl->{name}\".w5replfailcnt>1) or ".
            "( \"_$ctrl->{name}\".w5repllastsucc<current_date-8 and ".
-           "  \"_$ctrl->{name}\".w5replfailcnt>8))";
+           "  \"_$ctrl->{name}\".w5replfailcnt>8)) and ROWNUM<1000)";
    msg(INFO,"oracmd=$cmd");
    $dbi->doCmd($cmd);
    msg(INFO,"end:   phase 3 replication for $ctrl->{name}");
