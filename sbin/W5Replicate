@@ -159,7 +159,6 @@ sub doShutdown{  # doShutdown handling if CTRL+C is pressed on main process
          }
       }
    }
-   die("ERROR: hard programm termination by signal INT");
    exit();
 }
 

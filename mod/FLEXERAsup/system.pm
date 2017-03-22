@@ -44,6 +44,8 @@ create table "W5I_FLEXERAsup__system_of" (
    rollout_issungzone  number(*,0),
    rollout_isitm6      number(*,0),
    rollout_isrcrel     number(*,0),
+   rollout_oos_reason  varchar2(40),
+   rollout_oos_cluster varchar2(40),
    modifyuser          number(*,0),
    modifydate          date,
    constraint "W5I_TAD4Dsup__system_of_pk" primary key (refid)
@@ -99,7 +101,9 @@ select "W5I_system_universum".id,
        decode("W5I_TAD4D_system".enviroment,NULL,0,1) TAD4D_is,
        (select count(*) from  "W5I_TAD4D_software" 
         where "W5I_TAD4D_system".agent_id="W5I_TAD4D_software".agent_id 
-              and is_sub_cap=1 and ROWNUM<=1 )   TAD4D_is_sub_cap,
+           and is_sub_cap=1
+           and swproduct_name<>'IBM Tivoli Asset Discovery for Distributed' 
+           and ROWNUM<=1 )   TAD4D_is_sub_cap,
        "W5I_FLEXERAsup__system_of".refid of_id,
        "W5I_FLEXERAsup__system_of".comments,
        "W5I_FLEXERAsup__system_of".rollout_package,
@@ -112,6 +116,8 @@ select "W5I_system_universum".id,
        "W5I_FLEXERAsup__system_of".rollout_isitm6,
        "W5I_FLEXERAsup__system_of".rollout_isrcrel,
        "W5I_FLEXERAsup__system_of".rollout_issungzone,
+       "W5I_FLEXERAsup__system_of".rollout_oos_reason,
+       "W5I_FLEXERAsup__system_of".rollout_oos_cluster,
 
        "W5I_FLEXERAsup__system_of".modifyuser,
        "W5I_FLEXERAsup__system_of".modifydate
@@ -419,6 +425,46 @@ sub new
                 allowempty    =>1,
                 label         =>'Release-Container-Relevant',
                 dataobjattr   =>'rollout_isrcrel'),
+
+
+      new kernel::Field::Select(
+                name          =>'ro_outofscope_reason',
+                group         =>'rollout',
+                value         =>['CHASSI',
+                                 'CRYPTO',
+                                 'GS',
+                                 'STORAGE',
+                                 'NETWORK',
+                                 'OUTOFOP',
+                                 'RETIERED'
+                                 ],
+                label         =>'Out of Scope: reason',
+                transprefix   =>'REASON.',
+                useNullEmpty  =>1,
+                allowempty    =>1,
+                htmldetail    =>\&is_rolloutVisible,
+                dataobjattr   =>"rollout_oos_reason"),
+
+
+      new kernel::Field::Select(
+                name          =>'ro_outofscope_ecluster',
+                group         =>'rollout',
+                value         =>['CONNECT',
+                                 'ACCESS',
+                                 'OFFLINE',
+                                 'NOROUTE',
+                                 'INANAL',
+                                 'OUTOFOP',
+                                 'COMPAT'
+                                 ],
+                label         =>'Out of Scope: error cluster',
+                transprefix   =>'ERRCLUST.',
+                useNullEmpty  =>1,
+                allowempty    =>1,
+                htmldetail    =>\&is_rolloutVisible,
+                dataobjattr   =>"rollout_oos_cluster"),
+
+
 
       new kernel::Field::Text(
                 name          =>'w5base_appl',
