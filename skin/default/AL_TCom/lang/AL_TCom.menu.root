@@ -84,6 +84,7 @@
 'AL_TCom.proc.ChangeManagement.Campus.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.software'=>{de=>'Software',en=>'Software'},
 'AL_TCom.kern.software.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.kern.software.lnkcontact'=>{de=>'Verkn. Kontact',en=>'Link Contact'},
 'AL_TCom.kern.licproduct'=>{de=>'Lizenzprodukt',en=>'Lizenceproduct'},
 'AL_TCom.kern.licproduct.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.platform'=>{de=>'Plattform',en=>'Platform'},

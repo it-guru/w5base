@@ -85,6 +85,7 @@
 'itil.kern.osrelease.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.software'=>{de=>'Software',en=>'Software'},
 'itil.kern.software.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.kern.software.lnkcontact'=>{de=>'Verkn. Kontact',en=>'Link Contact'},
 'itil.kern.licproduct'=>{de=>'Lizenzprodukt',en=>'Lizenceproduct'},
 'itil.kern.licproduct.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.platform'=>{de=>'Plattform',en=>'Platform'},

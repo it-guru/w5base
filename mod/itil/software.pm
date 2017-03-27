@@ -139,6 +139,7 @@ sub new
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
+                vjointo       =>'itil::lnksoftwarecontact',
                 group         =>'contacts'),
 
       new kernel::Field::PhoneLnk(

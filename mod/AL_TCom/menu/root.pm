@@ -428,6 +428,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.kern.software.lnkcontact",
+                      "itil::lnksoftwarecontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.kern.licproduct",
                       "itil::licproduct",
                       defaultacl=>['valid_user']);
