@@ -64,7 +64,12 @@ sub getControlRecord
              dataobj   =>'base::workflow',
              target    =>'name',
              targetid  =>'id'
-           }
+           },
+           {
+             dataobj   =>'base::campus',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
          ];
 
 
@@ -156,6 +161,33 @@ sub DataIssueCompleteWriteRequest
          }
          if ($confrec->{mandator} ne ""){
             $newrec->{kh}->{mandator}=$confrec->{mandator};
+         }
+      }
+   }
+   if ($affectedobject=~m/::campus$/) {
+      if (defined($newrec->{affectedobject}) &&
+          $newrec->{affectedobject} eq $affectedobject){
+         # create link to config Management
+         $newrec->{directlnktype}=$newrec->{affectedobject};
+         $newrec->{directlnkid}=$newrec->{affectedobjectid};
+         $newrec->{directlnkmode}="DataIssue";
+      }
+      my $obj=getModuleObject($self->getParent->Config,$affectedobject);
+      my $affectedobjectid=effVal($oldrec,$newrec,"directlnkid");
+      $obj->SetFilter(id=>\$affectedobjectid);
+      my ($confrec,$msg)=$obj->getOnlyFirst(qw(databossid 
+                                               office_costcenter
+                                               office_accarea));
+      if (defined($confrec)){
+         if ($confrec->{databossid} ne ""){
+            $newrec->{fwdtarget}="base::user";
+            $newrec->{fwdtargetid}=$confrec->{databossid};
+            $newrec->{involvedcostcenter}=$confrec->{office_costcenter};
+            $newrec->{involvedaccarea}=$confrec->{office_accarea};
+         }
+         else{
+            $newrec->{fwdtarget}="base::grp";
+            $newrec->{fwdtargetid}="1";
          }
       }
    }

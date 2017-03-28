@@ -55,6 +55,11 @@ sub getControlRecord
              target    =>'name',
              targetid  =>'id'
            },
+           {
+             dataobj   =>'TS::campus',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
          ];
    return($d);
 }

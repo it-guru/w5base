@@ -1,0 +1,18 @@
+'tsgrpmgmt::lnkmetagrp'=>{de=>'T-Systems Meta-Gruppen Verknüpfung',
+                          en=>'T-Systems Meta group relation'},
+'Group'=>{de=>'Gruppe'},
+'Parent object'=>{de=>'Elternobjekt'},
+'RefID'=>{de=>'ReferenzID'},
+'Responsibility'=>{de=>'Zuständigkeit'},
+'technical'=>{de=>'technisch'},
+'functional'=>{de=>'fachlich'},
+'customer'=>{de=>'Kunde'},
+'No group specified'=>{de=>'Keine Gruppe angegeben'},
+'No parent object specified'=>{de=>'Kein Elternobjekt angegeben'},
+'No RefID specified'=>{de=>'Keine ReferenzID angegeben'},
+"Invalid dataobject '%s'"=>{de=>"Ungültiges Datenobjekt '%s'"},
+"Invalid object ID '%d'"=>{de=>"Ungültige Objekt ID '%d'"},
+'You have no write access on the given parent object'=>{
+   de=>'Sie haben auf das angegebene Elternobjekt keinen Schreibzugriff'
+},
+

@@ -40,11 +40,24 @@ sub new
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
                 vjoineditbase =>{isinmassign=>\'1',cistatusid=>'<6'},
-                group         =>'inmchm',
+                group         =>'inm',
                 AllowEmpty    =>1,
                 vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['acinmassignmentgroupid'=>'id'],
                 vjoindisp     =>'fullname'),
+
+      new kernel::Field::SubList(
+                name          =>'chmapprgroups',
+                label         =>'Change approver groups',
+                htmlwidth     =>'200px',
+                group         =>'chm',
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.approver',
+                vjointo       =>'TS::lnkcampuschmapprgrp',
+                vjoinbase     =>[{parentobj=>\'TS::campus'}],
+                vjoinon       =>['id'=>'refid'],
+                vjoindisp     =>['group','responsibility']),
+
    );
    return($self);
 }
@@ -59,7 +72,7 @@ sub isViewValid
    if (defined($rec)){
       if ($rec->{srcsys} eq "w5base"){
          if (in_array(\@l,"default")){
-            push(@l,"inmchm");
+            push(@l,("inm","chm"));
          }
       }
    }
@@ -75,7 +88,7 @@ sub isWriteValid
    if (defined($rec)){
       if ($rec->{srcsys} eq "w5base"){
          if (in_array(\@l,"default")){
-            push(@l,"inmchm");
+            push(@l,("inm","chm"));
          }
       }
    }
@@ -90,7 +103,7 @@ sub getDetailBlockPriority
    for(my $c=0;$c<=$#l;$c++){
       $inserti=$c+1 if ($l[$c] eq "default");
    }
-   splice(@l,$inserti,$#l-$inserti,("inmchm",@l[$inserti..($#l+-1)]));
+   splice(@l,$inserti,$#l-$inserti,("inm","chm",@l[$inserti..($#l+-1)]));
    #splice(@l,$inserti,$#l-$inserti,("amrel",@l[$inserti..($#l+-1)]));
    return(@l);
 }

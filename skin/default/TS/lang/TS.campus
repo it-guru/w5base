@@ -1,3 +1,4 @@
 'TS::campus'=>{de=>'T-Systems Campus',
                en=>'T-Systems Campus'},
-'fieldgroup.inmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
+'fieldgroup.inm'=>{de=>'Incident-Management',en=>'Incident management'},
+'fieldgroup.chm'=>{de=>'Change-Approver',en=>'Change approver'},

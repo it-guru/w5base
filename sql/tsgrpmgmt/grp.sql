@@ -45,3 +45,20 @@ create table metagrpmgmt (
   UNIQUE KEY fullname (fullname),
   UNIQUE KEY `srcsys` (srcsys,srcid),key `srcload` (srcsys,srcload)
 ) ENGINE=INNODB;
+CREATE TABLE lnkmetagrp (
+  id             bigint(20) NOT NULL,
+  targetid       bigint(20) NOT NULL,
+  refid          bigint(20) NOT NULL,
+  parentobj      varchar(40) NOT NULL,
+  responsibility varchar(20) default '',
+  createdate     datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate     datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser     bigint(20) NOT NULL default '0',
+  modifyuser     bigint(20) NOT NULL default '0',
+  editor         varchar(100) NOT NULL default '',
+  realeditor     varchar(100) NOT NULL default '',
+  PRIMARY KEY (id),
+  KEY parent (parentobj,refid),
+  UNIQUE KEY grp (targetid,parentobj,refid,responsibility),
+  FOREIGN KEY fk_metagrp (targetid) REFERENCES metagrpmgmt (id) ON DELETE CASCADE
+) ENGINE=INNODB;

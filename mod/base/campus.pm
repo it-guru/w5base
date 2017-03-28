@@ -233,6 +233,7 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'campus.realeditor'),
 
+      new kernel::Field::IssueState(),
 
    );
    $self->setDefaultView(qw(fullname));

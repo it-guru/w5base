@@ -1,0 +1,7 @@
+'TS::qrule::CampusChmApprGrp'=>{
+   de=>'Prüfung, ob eine ChangeApprover-Gruppe eingetragen ist',
+   en=>'Check if a change approver group is specified'
+},
+'No change approver group specified'=>{
+   de=>'keine ChangeApprover-Gruppe eingetragen'
+},
