@@ -82,6 +82,7 @@
 'AL_TCom.proc.ChangeManagement.mplan.tspan'=>{de=>'Maßnahme',en=>'measure span'},
 'AL_TCom.proc.ChangeManagement.mplan.tspan.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.proc.ChangeManagement.Campus.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.proc.ChangeManagement.Campus.lnkchmapprgrp'=>{de=>'ChmApprover',en=>'ChmApprover'},
 'AL_TCom.kern.software'=>{de=>'Software',en=>'Software'},
 'AL_TCom.kern.software.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.software.lnkcontact'=>{de=>'Verkn. Kontact',en=>'Link Contact'},

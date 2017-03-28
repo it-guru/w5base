@@ -562,6 +562,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.proc.ChangeManagement.Campus.lnkchmapprgrp",
+                      "TS::lnkcampuschmapprgrp",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.proc.softmgmt",
                       "itil::softwareset",
                       func=>'MainWithNew',
