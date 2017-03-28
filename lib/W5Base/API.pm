@@ -823,15 +823,29 @@ sub getHashList
    if (defined($self->{LIMITSTART})){
       $req->{limitstart}=$self->{LIMITSTART};
    }
-   my $SOAPresult=$self->SOAP->getHashList($req);
-   my $result=$self->_analyseSOAPresult($SOAPresult);
-   if (defined($result)){
-      $self->{exitcode}=$result->{exitcode};
-      if ($self->{exitcode}==0){
-         delete($self->{lastmsg});
-         return(@{$result->{records}});
+   my $SOAPresult;
+   eval('$SOAPresult=$self->SOAP->getHashList($req);');
+   if ($@){
+      if ($@=~m/^500 /){
+         $self->{exitcode}=500;
+         $self->{lastmsg}=$@;
       }
-      $self->{lastmsg}=$result->{lastmsg};
+      else{
+         $self->{exitcode}=1;
+         $self->{lastmsg}="unknown error: $@";
+      }
+      return;
+   }
+   else{
+      my $result=$self->_analyseSOAPresult($SOAPresult);
+      if (defined($result)){
+         $self->{exitcode}=$result->{exitcode};
+         if ($self->{exitcode}==0){
+            delete($self->{lastmsg});
+            return(@{$result->{records}});
+         }
+         $self->{lastmsg}=$result->{lastmsg};
+      }
    }
    return;
 }
