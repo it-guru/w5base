@@ -637,12 +637,14 @@ sub getRequestedReplicationObjects
       if ($ctrl->{'requested'} && $ctrl->{'online'} &&
           $ctrl->{'valid'}){ # records are exists
          my $rorec=getReplicateObjectRec($Config,$rprec,$ctrl,$dbi,$schema);
+         $ctrl->{'avgrecaccess'}=$rorec->{'avgrecaccess'};
          $ctrl->{'entrycount'}=$rorec->{'entrycount'};
          $ctrl->{'commitblocksize'}=$rorec->{'commitblocksize'};
          $ctrl->{'allow_phase1'}=$rorec->{'allow_phase1'};
          $ctrl->{'allow_phase2'}=$rorec->{'allow_phase2'};
          $ctrl->{'allow_phase3'}=$rorec->{'allow_phase3'};
          $ctrl->{'entrycount'}=0 if (!defined($ctrl->{'entrycount'}));
+         $ctrl->{'avgrecaccess'}=50 if (!defined($ctrl->{'avgrecaccess'}));
       }
    }
    $dbi->commit();
@@ -1140,10 +1142,12 @@ while(my $nextjob=shift(@joblist)){
    else{
       for(my $slotno=0;$slotno<$maxslots;$slotno++){
          # das muß noch besser werden - phaselimit calc!
-         my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*$maxslots-15;
+         my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*($maxslots/4);
          if ($phaselimit>($MaximumReplicationTime/3*2)){
             $phaselimit=$MaximumReplicationTime/3*2;
          }
+         msg(INFO,"calculated default phaselimit for $nextjob->{'replControl'}->{name} is $phaselimit");
+         msg(INFO,"current joblist size=".($#joblist+1));
          if (!defined($slot[$slotno])){
             my $replControl=$nextjob->{'replControl'};
             if ($replControl->{'valid'} && $replControl->{'requested'}){
@@ -1156,21 +1160,24 @@ while(my $nextjob=shift(@joblist)){
                   });
                }
                elsif ($nextjob->{'phase'}==2){ 
-                  my $avgrecaccesstime=0.05;
+                  #my $avgrecaccesstime=0.05;
+                  my $avgrecaccesstime=$replControl->{'avgrecaccess'}/1000;
+                  $avgrecaccesstime=0.05 if ($avgrecaccesstime<0.05);
                   $phase2entries=1 if ($phase2entries<=0);
                   my $restTime=$MaximumReplicationTime-20-
                                (time()-$ReplicationStart);
                   my $entrycount=$replControl->{'entrycount'};
                   $entrycount=1 if ($entrycount==0);
                   my $phaselimit=($restTime/$phase2entries/
-                                 ($totalRefreshEntries*$avgrecaccesstime))*
+                                 (($totalRefreshEntries/100)*$avgrecaccesstime))*
                                  $maxslots*$entrycount;
-                  $phaselimit=20 if ($phaselimit<20);
+                  $phaselimit=60 if ($phaselimit<60);
                   if ($phaselimit>$MaximumReplicationTime/3){
                      $phaselimit=$MaximumReplicationTime/3;
                   }
                   $phaselimit=int($phaselimit);
                   $currentStartPhase=2;
+                  msg(INFO,"calculated default phaselimit p2 for $nextjob->{'replControl'}->{name} is $phaselimit");
                   $slot[$slotno]=createSlot($self,"Phase2",10,
                                             $replControl,$nextjob,$phaselimit,
                   sub{
