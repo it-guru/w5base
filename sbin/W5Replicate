@@ -1172,8 +1172,12 @@ while(my $nextjob=shift(@joblist)){
                                  (($totalRefreshEntries/100)*$avgrecaccesstime))*
                                  $maxslots*$entrycount;
                   $phaselimit=60 if ($phaselimit<60);
-                  if ($phaselimit>$MaximumReplicationTime/3){
-                     $phaselimit=$MaximumReplicationTime/3;
+                  my $maxP2Limit=$MaximumReplicationTime/3;
+                  if ($avgrecaccesstime>10.0){   # if records slow, give him a little bit more time
+                     $maxP2Limit=$MaximumReplicationTime/3*2.5;
+                  }
+                  if ($phaselimit>$maxP2Limit){
+                     $phaselimit=$maxP2Limit;
                   }
                   $phaselimit=int($phaselimit);
                   $currentStartPhase=2;
