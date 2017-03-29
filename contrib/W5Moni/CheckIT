@@ -57,8 +57,11 @@ $T=Time::HiRes::time();
 
 my ($site,$prot,$port,$ipaddr,$conf);
 #  DNS Checker  #######################################################
-{
-   $site=$cfg->Param("SITE");
+$site=$cfg->Param("SITE");
+if ($ENV{HTTP_PROXY} || $ENV{HTTPS_PROXY}){
+   msg(INFO,"skip DNS resolv due PROXY mode");
+}
+else{
    if ($site eq ""){
       msg(ERROR,"no SITE Parameter found in config");
       exit(10);
@@ -179,9 +182,12 @@ if ((defined($servicedef) && ref($servicedef) ne "HASH") ||
 
 
 #  Port Checker  ######################################################
-{
-   $port=$cfg->Param("PORT");
-   $prot=$cfg->Param("PROT");
+$port=$cfg->Param("PORT");
+$prot=$cfg->Param("PROT");
+if ($ENV{HTTP_PROXY} || $ENV{HTTPS_PROXY}){
+   msg(INFO,"skip TCP connect check due PROXY mode");
+}
+else{
    if ($prot eq ""){
       $prot="http";
    }
@@ -228,6 +234,9 @@ if (!$quiet){
 }
 my $base="$prot://$site:$port/$conf/public";
 my $apidebug=0;
+if ($verbose>3){
+   $apidebug=1;
+}
 my $lang="en";
 if (!$quiet){
    msg(INFO,"public W5API base '$base'");
