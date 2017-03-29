@@ -437,7 +437,10 @@ sub new
                                  'STORAGE',
                                  'NETWORK',
                                  'OUTOFOP',
-                                 'RETIERED'
+                                 'RETIERED',
+                                 'ADS',
+                                 'VDS',
+                                 'TSG'
                                  ],
                 label         =>'Out of Scope: reason',
                 transprefix   =>'REASON.',
