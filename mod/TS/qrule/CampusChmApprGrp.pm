@@ -18,17 +18,14 @@ NONE
 
 [en:]
 
-Checks if in field 'Change approver' at least
-one valid Change Approvergroup is entered. 
+The Qrule checks if at least one valid Change Approvergroup is entered 
+in the field 'Change approver'.
 
 Enter the Approvergroup(s) which are used for Changes on this campus. 
 If the Approvergroup was created in ServiceManager, 
 it is important to make sure it was marked for Export to AssetManager. 
 Otherwise it is not possible to enter the group, even though it might be 
 displayed in ServiceManager.
-
-The contact for Assignmentgroups in general is the TelekomIT SPOC:
-https://darwin.telekom.de/darwin/auth/base/user/ById/14526036310001
 
 If you have any questions please contact the W5Base/Darwin Support: 
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
@@ -45,9 +42,6 @@ Falls die Approvergroup über ServiceManager angelegt wurde,
 ist es wichtig, dass diese dort für den Export nach AssetManager markiert wurde.
 Ansonsten kann die Gruppe nicht ausgewählt werden, 
 obwohl diese u.U. in ServiceManager angezeigt wird. 
-
-Ansprechpartner für Assignmentgroups im Allgemeinen ist der SPOC TelekomIT:
-https://darwin.telekom.de/darwin/auth/base/user/ById/14526036310001
 
 Bei Fragen wenden Sie sich bitte an den W5Base/DARWIN Support:
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001

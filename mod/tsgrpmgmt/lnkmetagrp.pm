@@ -129,12 +129,13 @@ sub isWriteOnParentValid
    my $rec=shift;
    my $parent_fldgrp=shift;
 
-   my $pobj=$self->getPersistentModuleObject('parentobj',$rec->{parentobj});
-   my ($prec,$msg)=$pobj->getOnlyFirst('ALL');
+   return(0) if (!defined($rec->{refid}));
 
-   if (!(defined($prec) && defined($rec->{refid}))) {
-      return(0);
-   }
+   my $pobj=$self->getPersistentModuleObject('parentobj',$rec->{parentobj});
+
+   my $idname=$pobj->IdField->Name();
+   $pobj->SetFilter($idname=>$rec->{refid});
+   my ($prec,$msg)=$pobj->getOnlyFirst('ALL');
 
    my @l=$pobj->isWriteValid($prec);
 

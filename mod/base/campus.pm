@@ -22,7 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use kernel::CIStatusTools;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
 {
@@ -301,7 +302,7 @@ sub Validate
       }
    }
 
-   return(1);
+   return($self->HandleCIStatusModification($oldrec,$newrec,"fullname"));
 }
 
 sub initSqlWhere
@@ -342,9 +343,9 @@ sub isWriteValid
    return("default") if (!defined($rec));
    my $userid=$self->getCurrentUserId();
 
-
    my @databossedit=qw(default contacts mutimes seclocations);
-   if ($self->IsMemberOf("admin")){
+   if ($rec->{databossid}==$userid ||
+       $self->IsMemberOf("admin")){
       return(@databossedit);
    }
 
