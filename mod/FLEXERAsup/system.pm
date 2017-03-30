@@ -691,9 +691,9 @@ sub initSearchQuery
            "\"YT5ATS_ES.YT5A_DTIT\" \"YT5ATS_ES.YT5A_DTIT.*\" ".
            "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
    }
-   if (!defined(Query->Param("search_inflexera"))){
-      Query->Param("search_inflexera"=>$self->T("no"));
-   }
+#   if (!defined(Query->Param("search_inflexera"))){
+#      Query->Param("search_inflexera"=>$self->T("no"));
+#   }
 }
 
 
