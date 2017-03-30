@@ -38,7 +38,7 @@ create table "W5I_FLEXERAsup__system_of" (
    rollout_package     varchar2(40),
    rollout_process     varchar2(40),
    rollout_instplanned date,
-   rollout_hpoaavail   number(*,0),
+   rollout_hpoaavail   varchar2(40),
    rollout_hpsaavail   number(*,0),
    rollout_ipv6        number(*,0),
    rollout_issungzone  number(*,0),
@@ -52,6 +52,9 @@ create table "W5I_FLEXERAsup__system_of" (
 );
 
 grant update,insert on "W5I_FLEXERAsup__system_of" to W5I;
+grant select on "W5I_FLEXERAsup__system_of" to W5_BACKUP_D1;
+grant select on "W5I_FLEXERAsup__system_of" to W5_BACKUP_W1;
+
 create or replace synonym W5I.FLEXERAsup__system_of for "W5I_FLEXERAsup__system_of";
 
 
@@ -372,13 +375,18 @@ sub new
                 label         =>'IPv6',
                 dataobjattr   =>'rollout_ipv6'),
 
-      new kernel::Field::Boolean(
+      new kernel::Field::Select(
                 name          =>'ro_hpoaavail',
                 group         =>'rollout',
-                htmldetail    =>\&is_rolloutVisible,
-                allowempty    =>1,
+                value         =>['online',
+                                 'offline',
+                                 'not_controlled'
+                                 ],
                 label         =>'HPOA available',
-                dataobjattr   =>'rollout_hpoaavail'),
+                useNullEmpty  =>1,
+                allowempty    =>1,
+                htmldetail    =>\&is_rolloutVisible,
+                dataobjattr   =>"rollout_hpoaavail"),
 
       new kernel::Field::Boolean(
                 name          =>'ro_itm6',
