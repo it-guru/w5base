@@ -104,6 +104,7 @@ select "W5I_system_universum".id,
            and is_sub_cap=1
            and swproduct_name<>'IBM Tivoli Asset Discovery for Distributed' 
            and swproduct_name<>'IBM Tivoli Monitoring' 
+           and prod_inv_end_time is null
            and ROWNUM<=1 )   TAD4D_is_sub_cap,
        "W5I_FLEXERAsup__system_of".refid of_id,
        "W5I_FLEXERAsup__system_of".comments,
