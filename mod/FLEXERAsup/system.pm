@@ -713,18 +713,18 @@ sub isViewValid
    my @l=$self->SUPER::isViewValid($rec);
 
 
-   if (in_array(\@l,["ALL","default"])){
-      my $sys=$self->getPersistentModuleObject("w5sys","itil::system");
-      if (defined($sys) && $rec->{systemid} ne ""){
-         $sys->SecureSetFilter({systemid=>\$rec->{systemid}});
-         my ($rec,$msg)=$sys->getOnlyFirst(qw(id)); 
-         if (defined($rec)){
-            return(@l);
-         }
-      }
-
-      return(qw(header default source));
-   }
+#   if (in_array(\@l,["ALL","default"])){
+#      my $sys=$self->getPersistentModuleObject("w5sys","itil::system");
+#      if (defined($sys) && $rec->{systemid} ne ""){
+#         $sys->SecureSetFilter({systemid=>\$rec->{systemid}});
+#         my ($rec,$msg)=$sys->getOnlyFirst(qw(id)); 
+#         if (defined($rec)){
+#            return(@l);
+#         }
+#      }
+#
+#      return(qw(header default source));
+#   }
    return(@l);
 }
 
