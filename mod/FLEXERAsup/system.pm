@@ -441,7 +441,9 @@ sub new
                                  'RETIERED',
                                  'ADS',
                                  'VDS',
-                                 'TSG'
+                                 'TSG',
+                                 'MAINFRAME',
+                                 'MISC'
                                  ],
                 label         =>'Out of Scope: reason',
                 transprefix   =>'REASON.',
