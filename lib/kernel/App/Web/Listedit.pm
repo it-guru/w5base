@@ -1647,6 +1647,8 @@ sub Detail
 
 
    my %flt=$self->getSearchHash();
+   return(undef) if (!%flt);
+
    $self->ResetFilter();
    if ($self->SecureSetFilter(\%flt)){
       $self->SetCurrentOrder("NONE");
