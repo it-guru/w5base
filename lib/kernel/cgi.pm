@@ -32,7 +32,12 @@ sub new
    else{
       if ( $ENV{QUERY_STRING} ne "MOD=base::interface&FUNC=SOAP" &&
            $ENV{QUERY_STRING} ne "FUNC=SOAP&MOD=base::interface"){
-         $self->{'cgi'}=new CGI(@_);
+         if ($#_==-1 && defined($W5V2::CurrentFastCGIRequest)){
+            $self->{'cgi'}=$W5V2::CurrentFastCGIRequest;
+         }
+         else{
+            $self->{'cgi'}=new CGI(@_);
+         }
       }
       else{
          $self->{'cgi'}=new CGI({MOD=>'base::interface',FUNC=>'SOAP'});
