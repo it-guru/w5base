@@ -1645,9 +1645,12 @@ sub Detail
    my $self=shift;
    my %param=@_;
 
-
    my %flt=$self->getSearchHash();
-   return(undef) if (!%flt);
+
+   if (!%flt) {
+      print($self->queryError($self->T('Query parameter missing')));
+      return(undef);
+   }
 
    $self->ResetFilter();
    if ($self->SecureSetFilter(\%flt)){

@@ -3,7 +3,7 @@
 <td align=center valign=center>
 <!----------------------------------------------------------------!>
 <table>
-<tr><td>Query-Error</td></tr>
+<tr><td><img src="../../base/load/queryerror.jpg"></td></tr>
 </table>
 <b>%extinfo%</b>
 %LASTMSG%
