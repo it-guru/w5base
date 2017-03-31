@@ -53,7 +53,8 @@ sub getOptionalModules
              Digest::SHA1 HTML::TreeBuilder  HTML::FormatText
              pdflib_pl DTP::pdf Archive::Zip
              Apache::DBI
-             GD DTP::jpg DTP::png);
+             GD DTP::jpg DTP::png
+             Proc::ProcessTable);
 }
 
 sub doSpecialCheck
