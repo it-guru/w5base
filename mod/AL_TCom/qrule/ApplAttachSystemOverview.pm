@@ -28,6 +28,8 @@ Background:
 To speed up and to reduce the incident handling process in our complex 
 application landscape, a system environment document with all 
 communication relations is necessary.
+
+It is not allowed to mark the system overview as private. Marking the system overview as private generates a dataissue.
  
 Requested by TelekomIT Service Management on 08/16 
 (https://darwin.telekom.de/darwin/auth/base/user/ById/13559244960000)
@@ -51,6 +53,8 @@ Bei der Incident-Bearbeitung in unserer komplexen Anwendungslandschaft ist
 eine dokumentierte Systemumgebung mit relevanten Kommunikationsbeziehungen 
 ein wichtiges Arbeitsmittel um die Ursachensuche zu beschleunigen und damit 
 mögliche Ausfallzeiten zu reduzieren. 
+
+Es ist nicht erlaubt, die SystemOverview Anlage als vertraulich zu markieren  dies generiert sonst ein DataIssue.
 
 Anforderungsrequest 08/16:
 Anforderung durch 'TelekomIT Service Management'
