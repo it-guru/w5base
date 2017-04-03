@@ -242,7 +242,7 @@ if (!$quiet){
    msg(INFO,"public W5API base '$base'");
 }
 my $Config;
-eval(' $Config=createConfig($base,undef,undef,$lang,$apidebug,quiet=>1); ');
+eval('$Config=createConfig($base,undef,undef,$lang,$apidebug,undef,undef,quiet=>1);');
 if (defined($Config)){
    LogPerformance("level1",['public.ping'],
                             [sprintf("%.4lf",Time::HiRes::time()-$T)]);
@@ -267,7 +267,7 @@ if ($loginuser ne "" && $loginpass ne ""){
    }
    my $Config;
    eval(' 
-    $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug,quiet=>1); 
+    $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug,undef,undef,quiet=>1); 
    ');
    if (defined($Config)){
       LogPerformance("level1",['auth.ping'],
