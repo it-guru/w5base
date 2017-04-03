@@ -105,6 +105,7 @@ sub qcheckRecord
    my @dataissue;
 
    my $lnkobj=getModuleObject($self->getParent->Config,'itil::lnkapplappl');
+   my $appl=getModuleObject($self->getParent->Config,'itil::appl');
    $lnkobj->SetFilter({toapplid=>\$rec->{id},
                        cistatusid=>[3,4],fromapplcistatus=>[3,4],
                        ifagreementneeded=>1});
@@ -117,10 +118,15 @@ sub qcheckRecord
                       in_array($contypeMap{$aa->{rawcontype}},$_->{contype})
                     } @{$rec->{interfaces}};
       if ($#ifok==-1) {
-         push(@msg,sprintf("%s (%s: %d)",$aa->{fromappl},
-                                         $self->T('Interface ID'),
-                                         $aa->{id}));
-         push(@dataissue,"$aa->{fromappl} -> $aa->{urlofcurrentrec}");
+         $appl->ResetFilter();
+         $appl->SetFilter({id=>\$aa->{fromapplid}});
+         my ($fromapplrec,$msg)=$appl->getOnlyFirst(qw(mandator));
+         if ($fromapplrec->{mandator} ne "Extern"){
+            push(@msg,sprintf("%s (%s: %d)",$aa->{fromappl},
+                                            $self->T('Interface ID'),
+                                            $aa->{id}));
+            push(@dataissue,"$aa->{fromappl} -> $aa->{urlofcurrentrec}");
+         }
       }
    }
    
