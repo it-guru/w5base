@@ -17,6 +17,26 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+################################################################
+package errHandler;
+sub TIEHANDLE{ 
+   my $class=shift;
+   bless {stderr=>$_[0]}; 
+}
+sub PRINT { 
+   my $self=shift;
+   my $fh=$self->{stderr};
+   foreach my $line (@_){
+      foreach my $subline (split(/\n/,$line)){
+         print $fh (sprintf("[%s] [w5base] [pid %d] %s\n",
+                            (scalar(localtime())),$$,$subline));
+      }
+   }
+}
+sub BINMODE{}
+################################################################
+
+package main;
 my %SHELLENV;
 BEGIN{
    %SHELLENV=(%ENV);
@@ -42,10 +62,19 @@ foreach my $path ("$W5V2::INSTDIR/mod","$W5V2::INSTDIR/lib"){
    unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
 }
 do "$W5V2::INSTDIR/lib/kernel/App/Web.pm";
+
 print STDERR ("ERROR: $@\n") if ($@ ne "");
 
-my $request = FCGI::Request();
+my $err = new IO::Handle;
+
+my $request = FCGI::Request(\*STDIN,\*STDOUT,$err);
 while($request->Accept()>=0){
+   #######################################################################
+   # Redirecting STDERR
+   my $errlog=FileHandle->new(">&STDERR");
+   $errlog->autoflush(1);
+   tie(*STDERR=>'errHandler',$errlog);
+   #######################################################################
    CGI::initialize_globals();
    my $fastreq;
    if ($ENV{'QUERY_STRING'} eq "MOD=base::interface&FUNC=SOAP"){
@@ -82,4 +111,16 @@ while($request->Accept()>=0){
          exit(0);
       }
    }
+}
+
+
+sub redirect_elog
+{
+    my ($file) = @_;
+    local *LCSTDERR;
+    open(LCSTDERR, ">>$file") or
+        die "Can't open log file $file";
+    open(STDERR, ">&LCSTDERR") or
+        die "can't redirect standard error";
+
 }
