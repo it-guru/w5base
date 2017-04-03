@@ -59,7 +59,7 @@ my ($site,$prot,$port,$ipaddr,$conf);
 #  DNS Checker  #######################################################
 $site=$cfg->Param("SITE");
 if ($ENV{HTTP_PROXY} || $ENV{HTTPS_PROXY}){
-   msg(INFO,"skip DNS resolv due PROXY mode");
+   msg(INFO,"skip DNS resolv due PROXY mode") if (!$quiet);
 }
 else{
    if ($site eq ""){
@@ -184,21 +184,21 @@ if ((defined($servicedef) && ref($servicedef) ne "HASH") ||
 #  Port Checker  ######################################################
 $port=$cfg->Param("PORT");
 $prot=$cfg->Param("PROT");
+if ($prot eq ""){
+   $prot="http";
+}
+if ($port eq ""){
+   if ($prot eq "http"){
+      $port="80";
+   }
+   if ($prot eq "https"){
+      $port="443";
+   }
+}
 if ($ENV{HTTP_PROXY} || $ENV{HTTPS_PROXY}){
-   msg(INFO,"skip TCP connect check due PROXY mode");
+   msg(INFO,"skip TCP connect check due PROXY mode") if (!$quiet);
 }
 else{
-   if ($prot eq ""){
-      $prot="http";
-   }
-   if ($port eq ""){
-      if ($prot eq "http"){
-         $port="80";
-      }
-      if ($prot eq "https"){
-         $port="443";
-      }
-   }
    msg(INFO,"TCP connect check to '$ipaddr:$port'") if (!$quiet);
    my $socket = IO::Socket::INET->new(
       PeerAddr=>$ipaddr,
