@@ -472,7 +472,7 @@ sub new
                                  'OUTOFOP',
                                  'COMPAT'
                                  ],
-                label         =>'Out of Scope: error cluster',
+                label         =>'error cluster',
                 transprefix   =>'ERRCLUST.',
                 useNullEmpty  =>1,
                 allowempty    =>1,
@@ -673,6 +673,34 @@ sub ValidatedUpdateRecord
       return($self->SUPER::ValidatedInsertRecord($newrec));
    }
    return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orgrec=shift;
+
+print STDERR Dumper($newrec);
+   if (effChanged($oldrec,$newrec,"ro_process") &&
+       $newrec->{ro_process} eq "OUT OF SCOPE"){
+      if (effVal($oldrec,$newrec,"ro_outofscope_reason") eq ""){
+         $self->LastMsg(ERROR,"no out of scope reason spezified");
+         return(undef);
+      }
+   }
+   if (effChanged($oldrec,$newrec,"ro_process") &&
+       $newrec->{ro_process} ne "OUT OF SCOPE"){
+      if (effVal($oldrec,$newrec,"ro_outofscope_reason") ne ""){
+         $self->LastMsg(ERROR,
+                     "out of scope reason not allowed in this rollout process");
+         return(undef);
+      }
+   }
+
+   return(1);
 }
 
 

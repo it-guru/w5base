@@ -18,7 +18,7 @@
 'ITM6 available'=>{de=>'ITM6 verfügbar'},
 'Rollout process'=>{de=>'Rolloutverfahren'},
 'Out of Scope: reason'=>{de=>'Out of Scope: Grund'},
-'Out of Scope: error cluster'=>{de=>'Out of Scope: Fehlercluster'},
+'error cluster'=>{de=>'Fehlercluster'},
 'ERRCLUST.CONNECT'=>{de=>'Konnectivität',en=>'connectivity'},
 'ERRCLUST.ACCESS'=>{de=>'kein Zugriff',en=>'no access'},
 'ERRCLUST.OFFLINE'=>{de=>'System Offline',en=>'system offline'},
@@ -33,4 +33,5 @@
 'REASON.NETWORK'=>{de=>'NETWORK,ROUTER,SWITCH',en=>'NETWORK,ROUTER,SWITCH'},
 'REASON.OUTOFOP'=>{de=>'OUT OF OPERATION',en=>'OUT OF OPERATION'},
 'REASON.RETIERED'=>{de=>'RETIERED',en=>'RETIERED'},
-
+'no out of scope reason spezified'=>{de=>"kein 'Out of Scope: Grund' angegeben"},
+'out of scope reason not allowed in this rollout process'=>{de=>"'Out of Scope: Grund' im gewählten Rolloutverfahren nicht zulässig"},
