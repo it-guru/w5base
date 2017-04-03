@@ -14,7 +14,7 @@ NONE
 
 =head3 HINTS
 This rule checks whether a system environment document with relevant 
-communication relations is present on a top application (priority 1).
+communication relations is present on a production or desaster recovery application.
 
 In case of a data issue, please check the name of the recorded document.
 
@@ -37,7 +37,7 @@ Requested by TelekomIT Service Management on 08/16
 
 [de:]
 
-Bei jeder TOP-Anwendung (Priorität 1) in W5Base/Darwin wird geprüft, 
+Bei jeder Produktions- und Katastrophenfall-Anwendung in W5Base/Darwin wird geprüft, 
 ob ein Dokument zur Systemumgebung mit den relevanten 
 Kommunikationsbeziehungen hinterlegt wurde.
 
@@ -94,7 +94,7 @@ sub qcheckRecord
    return($exitcode,$desc) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
 
 
-   if ($rec->{customerprio}==1){
+   if ($rec->{opmode} eq "prod" || $rec->{opmode} eq "cbreakdown"){
       if ($rec->{ictoid} ne ""){
          my $nameexpr=$rec->{ictono}."_xxxxx_SystemOverview_jjjjmmtt.pdf";
          my $ne=qr/^$rec->{ictono}_.+_SystemOverview_\d{8}\.pdf$/;
