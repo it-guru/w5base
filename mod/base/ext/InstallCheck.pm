@@ -52,7 +52,7 @@ sub getOptionalModules
              DTP JSON PDF::Reuse Spreadsheet::ParseExcel::Workbook
              Digest::SHA1 HTML::TreeBuilder  HTML::FormatText
              pdflib_pl DTP::pdf Archive::Zip
-             Apache::DBI
+             Apache::DBI FCGI
              GD DTP::jpg DTP::png
              Proc::ProcessTable);
 }

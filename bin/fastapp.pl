@@ -24,18 +24,12 @@ BEGIN{
 
 use strict;
 use FindBin ;
-use IO::Handle;
-use IO::File;
-use CGI::Fast(qw(:standard));
+use CGI;
+use FCGI;
 eval('use Proc::ProcessTable;');  # try to load Proc::ProcessTabel if exists
 
 
 *CORE::GLOBAL::die = sub { require Carp; Carp::confess };
-if (CGI::Fast->can("file_handles")){
-   CGI::Fast->file_handles({
-      fcgi_error_file_handle  => new IO::Handle(),
-   });
-}
 
 $W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
 
@@ -50,7 +44,20 @@ foreach my $path ("$W5V2::INSTDIR/mod","$W5V2::INSTDIR/lib"){
 do "$W5V2::INSTDIR/lib/kernel/App/Web.pm";
 print STDERR ("ERROR: $@\n") if ($@ ne "");
 
-while(my $fastreq=new CGI::Fast()){
+my $request = FCGI::Request();
+while($request->Accept()>=0){
+   CGI::initialize_globals();
+   my $fastreq;
+   if ($ENV{'QUERY_STRING'} eq "MOD=base::interface&FUNC=SOAP"){
+      # all operations in SOAP::Lite uses STDIN/STDOUT, so we need
+      # to create a dummy CGI Object with minimal variables and leafing
+      # IO Streams untouched.
+      $fastreq=CGI->new({MOD=>'base::interface',FUNC=>'SOAP'});
+   }
+   else{
+      $fastreq=CGI->new();
+   }
+
    for my $ev (keys(%SHELLENV)){  # Restore Enviroment
        if (($ev=~m/^(CLASSPATH|JAVA_HOME|PATH|LD_LIBRARY_PATH)$/) ||
            ($ev=~m/^PERL/) ||
