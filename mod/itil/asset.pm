@@ -43,11 +43,44 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 searchable    =>0,
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'asset.id'),
 
       new kernel::Field::RecordUrl(),
+
                                                   
+      new kernel::Field::Select(
+                name          =>'class',
+                label         =>'Asset Class',
+                searchable    =>0,
+                htmleditwidth =>'80px',
+                jsonchanged   =>\&getOnChangedClassScript,
+                jsoninit      =>\&getOnChangedClassScript,
+                readonly     =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(0) if (!defined($current));
+                   return(1);
+                },
+                selectfix     =>1,
+                value         =>[qw(
+                                      NATIVE
+                                      BUNDLE
+                                )],
+                dataobjattr   =>'asset.class'),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'FullName',
+                readonly      =>1,
+                uivisible     =>0,
+                dataobjattr   =>"if (asset.kwords<>'',".
+                                "concat(asset.name,'-',".
+                                "if (length(asset.kwords)>15,".
+                                "concat(substr(asset.kwords,1,15),'...'),".
+                                "asset.kwords)),asset.name)"),
+
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'80px',
@@ -62,6 +95,20 @@ sub new
                    return(1);
                 },
                 dataobjattr   =>'asset.name'),
+
+      new kernel::Field::Text(
+                name          =>'kwords',
+                label         =>'Keywords',
+                dataobjattr   =>'asset.kwords'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itfarm',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'Serverfarm',
+                vjointo       =>'itil::lnkitfarmasset',
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>'itfarm'),
 
       new kernel::Field::Mandator(),
 
@@ -89,16 +136,6 @@ sub new
       new kernel::Field::Link(
                 name          =>'databossid',
                 dataobjattr   =>'asset.databoss'),
-
-      new kernel::Field::TextDrop(
-                name          =>'itfarm',
-                group         =>'physasset',
-                readonly      =>1,
-                htmldetail    =>'NotEmpty',
-                label         =>'Serverfarm',
-                vjointo       =>'itil::lnkitfarmasset',
-                vjoinon       =>['id'=>'assetid'],
-                vjoindisp     =>'itfarm'),
 
       new kernel::Field::TextDrop(
                 name          =>'hwmodel',
@@ -566,12 +603,6 @@ sub new
                 label         =>'Refresh notification 3',
                 dataobjattr   =>'asset.refreshinfo3'),
 
-      new kernel::Field::Text(
-                name          =>'kwords',
-                group         =>'misc',
-                label         =>'Keywords',
-                dataobjattr   =>'asset.kwords'),
-
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -903,6 +934,20 @@ EOF
 
 
 
+sub getOnChangedClassScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+console.log("class changed");
+
+EOF
+   return($d);
+}
+
+
+
 
 
 
@@ -1158,9 +1203,15 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
 
-   my @all=qw(default guardian physasset contacts control location 
+   my @all=qw(default contacts control 
               systems source qc applications
-              phonenumbers misc attachments sec financeco history);
+              misc attachments history);
+
+   if ($rec->{class} eq "NATIVE"){
+      push(@all,qw(guardian physasset location sec financeco
+                   phonenumbers));
+
+   }
    if (($rec->{acqumode} eq "PURCHASE" && $rec->{deprstart} ne "") ||
        ($rec->{acqumode} ne "PURCHASE" && $rec->{startacqu} ne "")){
       push(@all,"upd");
@@ -1227,6 +1278,50 @@ sub getDetailBlockPriority
    return(qw(header default guardian phonenumbers location 
              physasset sec financeco upd contacts misc systems 
              applications attachments control source));
+}
+
+
+sub getHtmlPublicDetailFields
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @l=qw(mandator name guardian guardian2  databoss);
+   return(@l);
+}
+
+
+sub HtmlPublicDetail   # for display record in QuickFinder or with no access
+{
+   my $self=shift;
+   my $rec=shift;
+   my $header=shift;   # create a header with fullname or name
+
+   my $htmlresult="";
+   if ($header){
+      $htmlresult.="<table style='margin:5px'>\n";
+      $htmlresult.="<tr><td colspan=2 align=center><h1>";
+      $htmlresult.=$self->findtemplvar({current=>$rec,mode=>"Html"},
+                                      "name","formated");
+      $htmlresult.="</h1></td></tr>";
+   }
+   else{
+      $htmlresult.="<table>\n";
+   }
+   my @l=$self->getHtmlPublicDetailFields($rec);
+   foreach my $v (@l){
+      if ($rec->{$v} ne ""){
+         my $name=$self->getField($v)->Label();
+         my $data=$self->findtemplvar({current=>$rec,mode=>"Html"},
+                                      $v,"formated");
+         $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
+                      "<td valign=top>$data</td></tr>\n";
+      }
+   }
+
+   $htmlresult.="</table>\n";
+   return($htmlresult);
+
 }
 
 

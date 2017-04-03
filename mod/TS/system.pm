@@ -434,7 +434,7 @@ sub getHtmlPublicDetailFields
    my $self=shift;
    my $rec=shift;
 
-   my @l=qw(name systemid adm adm2 databoss
+   my @l=qw(name systemid mandator adm adm2 databoss
             adminteam 
             aciassignmentgroup accontrolcenter accontrolcenter2
             applications);

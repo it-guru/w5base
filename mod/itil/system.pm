@@ -321,10 +321,21 @@ sub new
                 group         =>'physys',
                 label         =>'Asset-Name',
                 AllowEmpty    =>1,
+                htmldetail    =>0,
                 vjointo       =>'itil::asset',
                 vjoineditbase =>{'cistatusid'=>"<=5"},
                 vjoinon       =>['assetid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'assetfullname',
+                group         =>'physys',
+                label         =>'Asset',
+                AllowEmpty    =>1,
+                vjointo       =>'itil::asset',
+                vjoineditbase =>{'cistatusid'=>"<=5"},
+                vjoinon       =>['assetid'=>'id'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Text(
                 name          =>'assetserialno',
@@ -1869,7 +1880,7 @@ sub getHtmlPublicDetailFields
    my $self=shift;
    my $rec=shift;
 
-   my @l=qw(name systemid adm adm2 databoss
+   my @l=qw(mandator name systemid adm adm2 databoss
             adminteam applications);
    return(@l);
 }

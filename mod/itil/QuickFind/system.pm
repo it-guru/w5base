@@ -81,9 +81,10 @@ sub QuickFindDetail
 
    my $system=getModuleObject($self->getParent->Config,"itil::system");
    $system->SetFilter({id=>\$id});
-   my ($rec,$msg)=$system->getOnlyFirst(qw(name systemid adm adm2 databoss
-                                            phonenumbers adminteam
-                                            applications));
+   my ($rec,$msg)=$system->getOnlyFirst(qw(mandator
+                                           name systemid adm adm2 databoss
+                                           phonenumbers adminteam
+                                           applications));
    $system->ResetFilter();
    $system->SecureSetFilter([{id=>\$id}]);
    my ($secrec,$msg)=$system->getOnlyFirst(qw(id));

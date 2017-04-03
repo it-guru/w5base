@@ -2528,7 +2528,7 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    else{
       $htmlresult.="<table>\n";
    }
-   my @l=qw(applmgr 
+   my @l=qw(mandator applmgr 
            sem sem2 delmgr delmgr2 tsm tsm2 databoss 
            businessteam systemnames);
    foreach my $v (@l){
