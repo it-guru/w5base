@@ -40,14 +40,6 @@ from  (
                  upper(decode(adm.agent.custom_data1,NULL,
                  'tad4d_p_miss',adm.agent.custom_data1))  systemid
              from adm.computer@tad4d join adm.agent@tad4d
-                  on adm.computer.computer_sys_id=adm.agent.id),
-   t4dsi as (select /*+ materialize */
-                 lower(regexp_replace(
-                 adm.computer.computer_alias,'\..*$','')) systemname,
-                 'tad4di-' || adm.computer.computer_sys_id tad4d_computer_sys_id,
-                 upper(decode(adm.agent.custom_data1,NULL,
-                 'tad4d_i_miss',adm.agent.custom_data1))  systemid
-             from adm.computer@tad4di join adm.agent@tad4di
                   on adm.computer.computer_sys_id=adm.agent.id)
 
       select substr(sysbase.systemname,0,255) systemname,
@@ -75,25 +67,13 @@ from  (
              decode(t4dspbysysid.tad4d_computer_sys_id,
                     NULL,decode(t4dspbyname.tad4d_computer_sys_id,NULL,NULL,
                                 t4dspbyname.tad4d_computer_sys_id),
-                    t4dspbysysid.tad4d_computer_sys_id) t4dpcomputer_sys_id,
-             decode(t4dsibysysid.systemid,NULL,
-                    decode(t4dsibyname.systemname,NULL,0,1),1) is_t4di,
-             decode(t4dsibysysid.systemid,
-                    NULL,decode(t4dsibyname.systemid,NULL,NULL,
-                                t4dsibyname.systemid),
-                    t4dsibysysid.systemid) t4disystemid,
-             decode(t4dsibysysid.tad4d_computer_sys_id,
-                    NULL,decode(t4dsibyname.tad4d_computer_sys_id,NULL,NULL,
-                                t4dsibyname.tad4d_computer_sys_id),
-                    t4dsibysysid.tad4d_computer_sys_id) t4dicomputer_sys_id
+                    t4dspbysysid.tad4d_computer_sys_id) t4dpcomputer_sys_id
       from (
          select w5sys.systemname,w5sys.systemid from w5sys
          union
          select amsys.systemname,amsys.systemid from amsys
          union
          select t4dsp.systemname,t4dsp.systemid from t4dsp
-         union
-         select t4dsi.systemname,t4dsi.systemid from t4dsi
       ) sysbase
      left outer join w5sys w5sysbyname
              on sysbase.systemname=w5sysbyname.systemname
@@ -109,11 +89,6 @@ from  (
              on upper(sysbase.systemname)=t4dspbyname.systemname
         left outer join t4dsp t4dspbysysid
              on sysbase.systemid=t4dspbysysid.systemid
-
-        left outer join t4dsi t4dsibyname
-             on upper(sysbase.systemname)=t4dsibyname.systemname
-        left outer join t4dsi t4dsibysysid
-             on sysbase.systemid=t4dsibysysid.systemid
    ) sysmapped
    left outer join "itil::system"
         on sysmapped.w5baseid="itil::system".id

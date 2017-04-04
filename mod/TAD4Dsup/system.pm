@@ -132,15 +132,8 @@ from "W5I_system_universum"
         on "W5I_system_universum".t4dpcomputer_sys_id=tad4dp_agent.agent_id
            and tad4dp_agent.agent_deleted_time is null
         
-     left outer join "mview_TAD4D_adm_agent" tad4di_agent
-        on "W5I_system_universum".t4dicomputer_sys_id=tad4di_agent.agent_id
-           and tad4di_agent.agent_deleted_time is null
-        
      left outer join "mview_TAD4D_adm_computer" tad4dp_computer
         on tad4dp_agent.agent_id=tad4dp_computer.computer_sys_id
-        
-     left outer join "mview_TAD4D_adm_computer" tad4di_computer
-        on tad4di_agent.agent_id=tad4di_computer.computer_sys_id
         
      left outer join "tsacinv::system"
         on "W5I_system_universum".systemid="tsacinv::system".systemid

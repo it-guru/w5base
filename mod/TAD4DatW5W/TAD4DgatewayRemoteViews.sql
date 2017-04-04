@@ -20,18 +20,7 @@ select computer_sys_id,
                                                create_time,
        to_date(substr(adm_computer.update_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                update_time
-from adm_computer@tad4d
-union all
-select computer_sys_id,
-       computer_alias,
-       os_name,
-       computer_model,
-       sys_ser_num,
-       to_date(substr(adm_computer.create_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               create_time,
-       to_date(substr(adm_computer.update_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               update_time
-from adm_computer@tad4di;
+from adm_computer@tad4d;
 
 CREATE INDEX "TAD4D_adm_computer_id" 
    ON "mview_TAD4D_adm_computer"(computer_sys_id) online;
@@ -74,40 +63,7 @@ select agent_id,
                                                agent_full_hwscan_time,
        to_date(substr(adm_agent.deleted_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
                                                agent_deleted_time
-   from adm_agent@tad4d
-union all
-select agent_id,
-       agent_node_id,
-       enviroment,
-       agent_custom_data1,
-       agent_version,
-       agent_ip_address,
-       agent_hostname,
-       agent_statusid,
-       decode(adm_agent.status,
-              '1','ok',
-              '2','initializing',
-              '3','not connecting',
-              '4','failed',
-              '5','unknown',
-              '6','incomplete',
-              '7','missing software scan',
-              '8','missing capacity scan',
-              '-?-')                           agent_status,
-       agent_osname,
-       agent_osversion,
-       agent_active,
-
-       to_date(substr(adm_agent.scan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               agent_scan_time,
-       to_date(substr(adm_agent.catalog_version,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               agent_catalog_version,
-       to_date(substr(adm_agent.full_hwscan_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               agent_full_hwscan_time,
-       to_date(substr(adm_agent.deleted_time,0,19),'YYYY-MM-DD-HH24.MI.SS')
-                                               agent_deleted_time
-   from adm_agent@tad4di;
-
+   from adm_agent@tad4d;
 
 CREATE INDEX "TAD4D_adm_agent_id" 
    ON "mview_TAD4D_adm_agent"(agent_id) online;
