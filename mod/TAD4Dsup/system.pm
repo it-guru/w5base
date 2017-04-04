@@ -48,10 +48,7 @@ select "W5I_system_universum".id,
        "W5I_system_universum".saphier,
        "W5I_system_universum".amcostelement costelement,
        (case
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=1 then 'Both'
           when "W5I_system_universum".is_t4dp=1 then 'Production'
-          when "W5I_system_universum".is_t4di=1 then 'Integration'
           else 'None'
        end) cenv ,
        
@@ -62,74 +59,47 @@ select "W5I_system_universum".id,
        ),'1',1,'0','1',0) agent_systemidunique,
 
        (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_status
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_status
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_status
           else null
        end) agent_status ,
        
        (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_version
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_version
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_version
           else null
        end) agent_version ,
        
        (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_osname
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_osname
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_osname
           else null
        end) agent_osname ,
 
        (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_osversion
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_osversion
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_osversion
           else null
        end) agent_osversion ,
 
        (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_active
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_active
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_active
           else null
        end) agent_active ,
 
        (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_full_hwscan_time
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_full_hwscan_time
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_full_hwscan_time
           else null
        end) agent_full_hwscan_time ,
 
        (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_scan_time
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_agent.agent_scan_time
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_agent.agent_scan_time
           else null
        end) agent_scan_time ,
 
        (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_computer.computer_model
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_computer.computer_model
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_computer.computer_model
           else null
        end) computer_model ,
 
       (case
-          when "W5I_system_universum".is_t4di=0 and
-               "W5I_system_universum".is_t4dp=1 then tad4dp_computer.sys_ser_num
-          when "W5I_system_universum".is_t4di=1 and
-               "W5I_system_universum".is_t4dp=0 then tad4di_computer.sys_ser_num
+          when "W5I_system_universum".is_t4dp=1 then tad4dp_computer.sys_ser_num
           else null
        end) computer_serialno ,
        "tsacinv::system".systemola     AM_systemola,

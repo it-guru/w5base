@@ -81,11 +81,6 @@ sub new
                 label         =>'found in TAD4D Prod',
                 dataobjattr   =>'is_t4dp'),
 
-      new kernel::Field::Boolean(
-                name          =>'is_t4di',
-                label         =>'found in TAD4D Integ',
-                dataobjattr   =>'is_t4di'),
-
       new kernel::Field::Text(
                 name          =>'amtype',
                 label         =>'AM Type',
@@ -108,7 +103,7 @@ sub new
 
    );
    $self->setWorktable("system_universum");
-   $self->setDefaultView(qw(systemname systemid is_w5 is_am is_t4dp is_t4di
+   $self->setDefaultView(qw(systemname systemid is_w5 is_am is_t4dp 
                             saphier));
    return($self);
 }
