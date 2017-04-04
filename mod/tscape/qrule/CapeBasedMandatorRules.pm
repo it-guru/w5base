@@ -209,7 +209,7 @@ sub qcheckRecord
             }
             else{
                my $m=getModuleObject($dataobj->Config,"base::mandator");
-               $m->SetFilter({groupname=>\"DTAG.GHQ.VTS.TSI.TI",
+               $m->SetFilter({groupname=>\"DTAG.GHQ.VTI.DTIT.TI",
                               cistatusid=>\'4'});
                my ($mrec)=$m->getOnlyFirst(qw(name grpid));
                if (defined($mrec)){
