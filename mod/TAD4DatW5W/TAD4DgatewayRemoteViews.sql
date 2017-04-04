@@ -139,16 +139,14 @@ CREATE INDEX "TAD4D_adm_prod_inv_id4"
 
 
 -- drop materialized view "mview_TAD4D_swcat_branch";
--- create materialized view "mview_TAD4D_swcat_branch"
---    refresh complete start with sysdate
---    next sysdate+(1/24)*6
---    as
--- select * from swcat_branch@tad4d
--- union all
--- select * from swcat_branch@tad4di;
--- 
--- CREATE INDEX "TAD4D_swbranch_id1" 
---    ON "mview_TAD4D_swcat_branch"(branch_id) online;
+create materialized view "mview_TAD4D_swcat_branch"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*6
+   as
+select * from swcat_branch@tad4d;
+
+CREATE INDEX "TAD4D_swbranch_id1" 
+   ON "mview_TAD4D_swcat_branch"(branch_id) online;
 
 
 -- drop materialized view "mview_TAD4D_adm_vendor";
