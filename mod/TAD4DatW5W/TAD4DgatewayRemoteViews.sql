@@ -77,9 +77,7 @@ create materialized view "mview_TAD4D_adm_instnativesw"
    refresh complete start with sysdate
    next sysdate+(1/24)*3
    as
-select * from adm_instnativesw@tad4d
-union all
-select * from adm_instnativesw@tad4di;
+select * from adm_instnativesw@tad4d;
 
 CREATE INDEX "TAD4D_adm_instnativesw_id1" 
    ON "mview_TAD4D_adm_instnativesw"(agent_id) online;
@@ -95,12 +93,7 @@ create materialized view "mview_TAD4D_adm_nativesw"
 select 'tad4dp-'||adm_native_sw.id              native_id,
        adm_native_sw.package_name               package_name,
        adm_native_sw.package_version            package_version
-from adm.native_sw@tad4d  adm_native_sw
-union all
-select 'tad4di-'||adm_native_sw.id              native_id,
-       adm_native_sw.package_name               package_name,
-       adm_native_sw.package_version            package_version
-from adm.native_sw@tad4di  adm_native_sw;
+from adm.native_sw@tad4d  adm_native_sw;
 
 CREATE INDEX "TAD4D_adm_nativesw_id" 
    ON "mview_TAD4D_adm_nativesw"(native_id) online;
@@ -133,28 +126,7 @@ select prod_inv_id,
        prod_inv_is_remote,
        prod_inv_confidence_level,
        stype
-from adm_prod_inv@tad4d
-union all
-select prod_inv_id,
-       agent_id,
-       product_id,
-       branch_id,
-       component_id,
-       prod_inv_scope,
-       to_date(substr(
-          decode(adm_prod_inv.start_time,
-             '9999-12-31-00.00.00.000000',NULL,
-             adm_prod_inv.start_time
-          ),0,19),'YYYY-MM-DD-HH24.MI.SS')     prod_inv_start_time,
-       to_date(substr(
-          decode(adm_prod_inv.end_time,
-             '9999-12-31-00.00.00.000000',NULL,
-             adm_prod_inv.end_time
-          ),0,19),'YYYY-MM-DD-HH24.MI.SS')     prod_inv_end_time,
-       prod_inv_is_remote,
-       prod_inv_confidence_level,
-       stype
-from adm_prod_inv@tad4di;
+from adm_prod_inv@tad4d;
 
 CREATE INDEX "TAD4D_adm_prod_inv_id1" 
    ON "mview_TAD4D_adm_prod_inv"(prod_inv_id) online;
@@ -184,9 +156,7 @@ create materialized view "mview_TAD4D_adm_vendor"
    refresh complete start with sysdate
    next sysdate+(1/24)*6
    as
-select * from adm_vendor@tad4d
-union all
-select * from adm_vendor@tad4di;
+select * from adm_vendor@tad4d;
 
 CREATE INDEX "TAD4D_adm_vendor_id1" 
    ON "mview_TAD4D_adm_vendor"(vendor_id) online;
@@ -197,9 +167,7 @@ create materialized view "mview_TAD4D_adm_component"
    refresh complete start with sysdate
    next sysdate+(1/24)*3
    as
-select * from adm_component@tad4d
-union all
-select * from adm_component@tad4di;
+select * from adm_component@tad4d;
 
 CREATE INDEX "TAD4D_adm_component_id1" 
    ON "mview_TAD4D_adm_component"(component_id) online;
@@ -211,9 +179,7 @@ create materialized view "mview_TAD4D_adm_swproduct"
    refresh complete start with sysdate
    next sysdate+(1/24)*3
    as
-select * from adm_swproduct@tad4d
-union all
-select * from adm_swproduct@tad4di;
+select * from adm_swproduct@tad4d;
 
 CREATE INDEX "TAD4D_adm_swproduct_id1" 
    ON "mview_TAD4D_adm_swproduct"(swproduct_id) online;
