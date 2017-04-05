@@ -33,6 +33,12 @@ sub PRINT {
       }
    }
 }
+sub PRINTF {
+   my $self=shift;
+   my $fmt=shift;
+   $self->PRINT(sprintf($fmt, @_));
+}
+
 sub BINMODE{}
 ################################################################
 
