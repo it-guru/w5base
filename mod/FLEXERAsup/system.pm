@@ -683,7 +683,6 @@ sub Validate
    my $newrec=shift;
    my $orgrec=shift;
 
-print STDERR Dumper($newrec);
    if (effChanged($oldrec,$newrec,"ro_process") &&
        $newrec->{ro_process} eq "OUT OF SCOPE"){
       if (effVal($oldrec,$newrec,"ro_outofscope_reason") eq ""){
@@ -697,6 +696,19 @@ print STDERR Dumper($newrec);
          $self->LastMsg(ERROR,
                      "out of scope reason not allowed in this rollout process");
          return(undef);
+      }
+   }
+   if (effChanged($oldrec,$newrec,"ro_process") &&
+       $oldrec->{ro_process} eq "AUTOMATIC" &&
+       $newrec->{ro_process} eq "MANUEL"){
+      if ($oldrec->{ro_outofscope_ecluster} ne ""){
+         foreach my $var (qw(ro_instplanned 
+                             ro_outofscope_ecluster 
+                             ro_package)){
+            if (!effChanged($oldrec,$newrec,$var)){
+               $newrec->{$var}=undef;
+            }
+         }
       }
    }
 
