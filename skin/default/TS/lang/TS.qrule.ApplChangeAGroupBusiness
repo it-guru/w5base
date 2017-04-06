@@ -1,6 +1,0 @@
-'TS::qrule::ApplChangeAGroupBusiness'=>{
-   de=>'Prüfung ob eine fachliche Change Approver-Gruppe eingetragen ist',
-   en=>'check if there is a business change approvergroup defined'},
-'there is no business change approvergroup defined'=>{
-   de=>'es wurde keine fachliche Change Approvergroup eingetragen'},
-
