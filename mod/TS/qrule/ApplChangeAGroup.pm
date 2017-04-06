@@ -114,12 +114,19 @@ sub qcheckRecord
                                 $rec->{cistatusid}!=3) ||
                                $rec->{opmode} eq "license" ||
                                $rec->{businessteam} eq "Extern");
-   if (trim($rec->{scapprgroup}) eq ""){
+   my $fnd=0;
+   if (ref($rec->{chmapprgroups}) eq "ARRAY"){
+      foreach my $arec (@{$rec->{chmapprgroups}}){
+         if ($arec->{responsibility} eq "technical"){
+            $fnd++;
+         }
+      }
+   }
+   if ($fnd==0){
       $exitcode=3 if ($exitcode<3);
-      push(@{$desc->{qmsg}},
-           'there is no technical change approvergroup defined');
-      push(@{$desc->{dataissue}},
-           'there is no technical change approvergroup defined');
+      my $msg='there is no technical change approvergroup defined';
+      push(@{$desc->{qmsg}},$msg);
+      push(@{$desc->{dataissue}},$msg);
    }
 
    return($exitcode,$desc);

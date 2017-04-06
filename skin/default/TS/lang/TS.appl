@@ -2,6 +2,8 @@
                   en=>'T-Systems Application'},
 'fieldgroup.architect'=>{de=>'Architektur',en=>'Architecture'},
 'fieldgroup.inmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
+'fieldgroup.inm'=>{de=>'Incident-Management',en=>'Incident management'},
+'fieldgroup.chm'=>{de=>'Change-Approver',en=>'Change approver'},
 'AM: official AssetManager Applicationname'=>{de=>'AM: offizieller AssetManager Anwendungsname'},
 'AM: Production Planning OSS'=>{de=>'AM: Produktions-Plannung OSS'},
 'Database Admin'=>{de=>'Datenbankadministrator'},

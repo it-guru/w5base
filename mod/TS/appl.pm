@@ -73,7 +73,7 @@ sub new
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
                 vjoineditbase =>{isinmassign=>\'1'},
-                group         =>'inmchm',
+                group         =>'inm',
                 AllowEmpty    =>1,
                 vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['acinmassignmentgroupid'=>'id'],
@@ -97,6 +97,7 @@ sub new
                 vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
                 AllowEmpty    =>1,
+                htmldetail    =>0,
                 vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['scapprgroupid'=>'id'],
                 vjoindisp     =>'fullname'),
@@ -107,9 +108,23 @@ sub new
                 vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
                 AllowEmpty    =>1,
+                htmldetail    =>0,
                 vjointo       =>'tsgrpmgmt::grp',
                 vjoinon       =>['scapprgroupid2'=>'id'],
                 vjoindisp     =>'fullname'),
+
+
+      new kernel::Field::SubList(
+                name          =>'chmapprgroups',
+                label         =>'Change approver groups',
+                htmlwidth     =>'200px',
+                group         =>'chm',
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.approver',
+                vjointo       =>'TS::lnkapplchmapprgrp',
+                vjoinbase     =>[{parentobj=>\'TS::appl'}],
+                vjoinon       =>['id'=>'refid'],
+                vjoindisp     =>['group','responsibility']),
 
       new kernel::Field::TextDrop(
                 name          =>'icto',
@@ -752,10 +767,25 @@ sub isWriteValid
    my $self=shift;
    my @l=$self->SUPER::isWriteValid(@_);
    if (grep(/^(technical|ALL)$/,@l)){
-      push(@l,"inmchm");
+      push(@l,"inmchm","chm","inm");
    }
    return(@l);
 }
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @l=$self->SUPER::isViewValid($rec,@_);
+
+   if (in_array(\@l,"inmchm")){
+      push(@l,"chm","inm");
+   }
+   return(@l);
+}
+
+
+
 
 sub getDetailBlockPriority
 {
@@ -765,7 +795,7 @@ sub getDetailBlockPriority
    for(my $c=0;$c<=$#l;$c++){
       $inserti=$c+1 if ($l[$c] eq "technical");
    }
-   splice(@l,$inserti,$#l-$inserti,("inmchm",@l[$inserti..($#l+-1)]));
+   splice(@l,$inserti,$#l-$inserti,("inmchm","chm","inm",@l[$inserti..($#l+-1)]));
    return(@l);
 
 }  
