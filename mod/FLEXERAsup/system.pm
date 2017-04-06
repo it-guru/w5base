@@ -321,6 +321,36 @@ sub new
                 label         =>'Systems on Asset',
                 dataobjattr   =>'am_systemsonasset'),
 
+      new kernel::Field::SubList(
+                name          =>'am_adminlanip',
+                label         =>'Admin-LAN IP',
+                group         =>'am',
+                htmldetail    =>0,
+                searchable    =>0,
+                vjointo       =>'tsacinv::ipaddress',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoinbase     =>{type=>"*ADMIN*FIRST*"},
+                vjoindisp     =>[qw(fullname description type)],
+                vjoininhash   =>[qw(ipaddress ipv4address ipv6address 
+                                    description dnsname status)]),
+
+      new kernel::Field::Boolean(
+                name          =>'am_haveadminlan',
+                group         =>'am',
+                label         =>'have adminlan connect',
+                depend        =>[qw(am_adminlanip)],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $ipl=$current->{am_adminlanip};
+                   my $fld=$self->getParent->getField("am_adminlanip");
+                   my $d=$fld->RawValue($current);
+                   if (defined($d) && ref($d) eq "ARRAY" && $#{$d}!=-1){
+                      return(1);
+                   }
+                   return(0);
+                }),
+
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -548,7 +578,6 @@ sub new
                 translation   =>'itil::system',
                 label         =>'OS-Class',
                 dataobjattr   =>'w5_osclass'),
-
 
 
       new kernel::Field::Boolean(

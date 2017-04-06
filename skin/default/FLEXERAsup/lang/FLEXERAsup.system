@@ -35,3 +35,4 @@
 'REASON.RETIERED'=>{de=>'RETIERED',en=>'RETIERED'},
 'no out of scope reason spezified'=>{de=>"kein 'Out of Scope: Grund' angegeben"},
 'out of scope reason not allowed in this rollout process'=>{de=>"'Out of Scope: Grund' im gewählten Rolloutverfahren nicht zulässig"},
+'have adminlan connect'=>{de=>'Admin-LAN Verbindung vorhanden'},
