@@ -117,6 +117,7 @@ sub DataIssueCompleteWriteRequest
 
    if (($affectedobject=~m/::appl$/)   ||
        ($affectedobject=~m/::custcontract$/) ||
+       ($affectedobject=~m/::supcontract$/) ||
        ($affectedobject=~m/::swinstance$/) ||
        ($affectedobject=~m/::itclust$/) ||
        ($affectedobject=~m/::mgmtitemgroup$/) ||

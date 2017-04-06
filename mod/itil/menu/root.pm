@@ -39,6 +39,15 @@ sub Init
                       prio=>100,
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itil.supcontract",
+                      "itil::supcontract",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.supcontract.new",
+                      "itil::supcontract",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.custcontract",
                       "itil::custcontract",
                       defaultacl=>['valid_user']);

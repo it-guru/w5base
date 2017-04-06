@@ -1,4 +1,6 @@
 'itil'=>{de=>'IT-Inventar',en=>'IT-Invetory'},
+'itil.supcontract'=>{de=>'Supportvertrag',en=>'SupportContract'},
+'itil.supcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.custcontract'=>{de=>'Kundenvertrag',en=>'CustomerContract'},
 'itil.custcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.custcontract.crono'=>{de=>'Vertrags-Chronologie',en=>'Contruct-Chronology'},

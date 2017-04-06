@@ -70,24 +70,37 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("AL_TCom.custcontract",
+   $self->RegisterObj("AL_TCom.contract",
+                      "tmpl/welcome",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("AL_TCom.contract.supcontract",
+                      "itil::supcontract",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("AL_TCom.contract.supcontract.new",
+                      "itil::supcontract",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.contract.custcontract",
                       "AL_TCom::custcontract",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("AL_TCom.custcontract.new",
+   $self->RegisterObj("AL_TCom.contract.custcontract.new",
                       "AL_TCom::custcontract",
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("AL_TCom.custcontract.crono",
+   $self->RegisterObj("AL_TCom.contract.custcontract.crono",
                       "itil::custcontractcrono",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("AL_TCom.custcontract.lnkappl",
+   $self->RegisterObj("AL_TCom.contract.custcontract.lnkappl",
                       "itil::lnkapplcustcontract",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("AL_TCom.custcontract.lnkappl.new",
+   $self->RegisterObj("AL_TCom.contract.custcontract.lnkappl.new",
                       "itil::lnkapplcustcontract",
                       func=>'New',
                       defaultacl=>['admin']);
