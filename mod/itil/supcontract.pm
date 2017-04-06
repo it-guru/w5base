@@ -52,13 +52,13 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'name',
-                searchable    =>0,
                 label         =>'Contract Number',
                 dataobjattr   =>'supcontract.name'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'Contract',
                 dataobjattr   =>"concat(producer.name,'-',supcontract.name,".
                                 "if (supcontract.fullname<>'',".
