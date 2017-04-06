@@ -241,36 +241,42 @@ sub new
       new kernel::Field::Text(
                 name          =>'am_systemid',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'SystemID',
                 dataobjattr   =>'systemid'),
 
       new kernel::Field::Text(
                 name          =>'am_sysassignment',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'Assignmentgroup',
                 dataobjattr   =>'AM_assignmentgroup'),
 
       new kernel::Field::Text(
                 name          =>'am_systemola',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'SystemOLA',
                 dataobjattr   =>'am_systemola'),
 
       new kernel::Field::Text(
                 name          =>'am_systemolaclass',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'SystemOLA Service Class',
                 dataobjattr   =>'am_systemolaclass'),
 
       new kernel::Field::Text(
                 name          =>'am_systemstatus',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'System Status',
                 dataobjattr   =>'am_systemstatus'),
 
       new kernel::Field::Text(
                 name          =>'am_securitymodel',
                 group         =>'am',
+                readonly      =>1,
                 translation   =>'tsacinv::system',
                 label         =>'security flag',
                 dataobjattr   =>'am_securitymodel'),
@@ -278,24 +284,28 @@ sub new
       new kernel::Field::Text(
                 name          =>'am_assetid',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'AssetID',
                 dataobjattr   =>'am_assetid'),
 
       new kernel::Field::Text(
                 name          =>'am_modelname',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'Model',
                 dataobjattr   =>'am_modelname'),
 
       new kernel::Field::Text(
                 name          =>'am_location',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'AMLocation',
                 dataobjattr   =>'am_location'),
 
       new kernel::Field::Number(
                 name          =>'am_cpucount',
                 group         =>'am',
+                readonly      =>1,
                 translation   =>'tsacinv::asset',
                 label         =>'Asset CPU count',
                 dataobjattr   =>'am_assetcpucount'),
@@ -303,6 +313,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'am_assetcputype',
                 group         =>'am',
+                readonly      =>1,
                 translation   =>'tsacinv::asset',
                 label         =>'Asset CPU Typ',
                 dataobjattr   =>'am_assetcputype'),
@@ -310,6 +321,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'am_corecount',
                 group         =>'am',
+                readonly      =>1,
                 translation   =>'tsacinv::asset',
                 label         =>'Asset Core count',
                 dataobjattr   =>'am_assetcorecount'),
@@ -317,6 +329,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'am_systemsonasset',
                 group         =>'am',
+                readonly      =>1,
                 translation   =>'tsacinv::asset',
                 label         =>'Systems on Asset',
                 dataobjattr   =>'am_systemsonasset'),
@@ -325,6 +338,7 @@ sub new
                 name          =>'am_adminlanip',
                 label         =>'Admin-LAN IP',
                 group         =>'am',
+                readonly      =>1,
                 htmldetail    =>0,
                 searchable    =>0,
                 vjointo       =>'tsacinv::ipaddress',
@@ -337,6 +351,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'am_haveadminlan',
                 group         =>'am',
+                readonly      =>1,
                 label         =>'have adminlan connect',
                 depend        =>[qw(am_adminlanip)],
                 onRawValue    =>sub{
@@ -583,6 +598,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isprod',
                 group         =>'opmode',
+                readonly      =>1,
                 translation   =>'itil::system',
                 htmlhalfwidth =>1,
                 label         =>'Productionsystem',
@@ -591,6 +607,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'istest',
                 group         =>'opmode',
+                readonly      =>1,
                 translation   =>'itil::system',
                 htmlhalfwidth =>1,
                 label         =>'Testsystem',
@@ -599,6 +616,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isdevel',
                 group         =>'opmode',
+                readonly      =>1,
                 translation   =>'itil::system',
                 htmlhalfwidth =>1,
                 label         =>'Developmentsystem',
@@ -607,6 +625,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'iseducation',
                 group         =>'opmode',
+                readonly      =>1,
                 translation   =>'itil::system',
                 htmlhalfwidth =>1,
                 label         =>'Educationsystem',
@@ -615,6 +634,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isapprovtest',
                 group         =>'opmode',
+                readonly      =>1,
                 translation   =>'itil::system',
                 htmlhalfwidth =>1,
                 label         =>'Approval/Integration System',
@@ -623,6 +643,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isreference',
                 group         =>'opmode',
+                readonly      =>1,
                 translation   =>'itil::system',
                 htmlhalfwidth =>1,
                 label         =>'Referencesystem',
