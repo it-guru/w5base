@@ -52,6 +52,7 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'name',
+                searchable    =>0,
                 label         =>'Contract Number',
                 dataobjattr   =>'supcontract.name'),
 

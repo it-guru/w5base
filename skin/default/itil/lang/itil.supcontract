@@ -50,3 +50,4 @@
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'Applications'=>{de=>'Anwendungen',en=>'Applications'},
 'no valid producer specified'=>{de=>'kein gültiger Lieferant angegeben'},
+'Contract'=>{de=>'Vertrag'},
