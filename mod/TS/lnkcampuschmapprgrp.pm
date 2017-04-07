@@ -38,7 +38,7 @@ sub new
                 vjoindisp     =>'fullname'),
       insertafter=>'id'
    );
-
+   $self->{secparentobj}='TS::campus';
    $self->getField('refid')->{htmldetail}=0;
    $self->setDefaultView(qw(campus group responsibility));
 

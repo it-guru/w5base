@@ -20,6 +20,7 @@
 'AL_TCom.appl.lnkapplappl.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},
 'AL_TCom.appl.lnksystem.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.appl.lnkchmapprgrp'=>{de=>'ChmApprover',en=>'ChmApprover'},
 'AL_TCom.appl.lnkapplcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'AL_TCom.appl.aegmgmt'=>{de=>'AEG Management',en=>'AEG Management'},
 'AL_TCom.appl.lnkapplinteranswer'=>{de=>'Interview',en=>'Interview'},

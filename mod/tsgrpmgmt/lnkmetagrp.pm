@@ -45,11 +45,13 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'parentobj',
+                frontreadonly =>1,
                 label         =>'Parent object',
                 dataobjattr   =>'lnkmetagrp.parentobj'),
 
       new kernel::Field::Text(
                 name          =>'refid',
+                frontreadonly =>1,
                 label         =>'RefID',
                 dataobjattr   =>'lnkmetagrp.refid'),
 
@@ -113,6 +115,12 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'lnkmetagrp.realeditor'),
 
+      new kernel::Field::Link(
+                name          =>'secparentobj',
+                label         =>'Security Parent-Object',
+                sqlorder      =>'NONE',
+                dataobjattr   =>'lnkmetagrp.parentobj'),
+
       );
 
 
@@ -120,6 +128,18 @@ sub new
    $self->setWorktable('lnkmetagrp');
 
    return($self);
+}
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (defined($self->{secparentobj})){
+      push(@flt,[{secparentobj=>\$self->{secparentobj}}]);
+   }
+   return($self->SetFilter(@flt));
 }
 
 
@@ -133,9 +153,12 @@ sub isWriteOnParentValid
 
    my $pobj=$self->getPersistentModuleObject('parentobj',$rec->{parentobj});
 
+   return(0) if (!defined($pobj));
    my $idname=$pobj->IdField->Name();
    $pobj->SetFilter($idname=>$rec->{refid});
    my ($prec,$msg)=$pobj->getOnlyFirst('ALL');
+   return(0) if (!defined($prec));
+   return(1) if (!$self->isDataInputFromUserFrontend());
 
    my @l=$pobj->isWriteValid($prec);
 

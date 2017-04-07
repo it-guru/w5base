@@ -177,6 +177,10 @@ sub Init
                       "AL_TCom::aegmgmt",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.appl.lnkchmapprgrp",
+                      "TS::lnkapplchmapprgrp",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.appl.lnksystem.new",
                       "itil::lnkapplsystem",
                       func=>'New',

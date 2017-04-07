@@ -38,7 +38,7 @@ sub new
                 vjoindisp     =>'name'),
       insertafter=>'id'
    );
-
+   $self->{secparentobj}='TS::appl';
    $self->getField('refid')->{htmldetail}=0;
    $self->setDefaultView(qw(appl group responsibility));
 
