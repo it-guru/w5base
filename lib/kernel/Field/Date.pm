@@ -509,10 +509,15 @@ sub prepUploadRecord   # prepair one record on upload
    my $newrec=shift;
    my $oldrec=shift;
    my $name=$self->Name();
-   if (defined($newrec->{$name})){
-      my $dn=$self->Unformat([$newrec->{$name}],$newrec);
-      return(undef) if (!defined($dn));
-      $newrec->{$name}=$dn->{$name};
+   if (exists($newrec->{$name})){
+      if (!defined($newrec->{$name})){
+         $newrec->{$name}=undef;
+      }
+      else{
+         my $dn=$self->Unformat([$newrec->{$name}],$newrec);
+         return(undef) if (!defined($dn));
+         $newrec->{$name}=$dn->{$name};
+      }
    }
    return(1);
 }
