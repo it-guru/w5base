@@ -137,10 +137,18 @@ sub Process
       for(my $col=0;$col<=$self->{'oWkS'}->{MaxCol};$col++){
          my $cell=$self->{'oWkS'}->{Cells}[$row][$col];
          if (defined($cell)){
-            my $v=$cell->{Val};
+            my $v=$cell->value();
+            $v=$cell->{Val} if ($v eq "");
+            
             if ($cell->{Type} eq "Date" && $v ne ""){
                $v=ExcelFmt("dd.mm.yyyy hh:mm:ss",$cell->{Val});
             }
+            if (my ($d,$m,$y,$H,$M,$S)=$v=~
+                m/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})\s
+                   ([0-9]{2}):([0-9]{2}):([0-9]{2})$/x){
+               $v=$y."-".$m."-".$d." ".$H.":".$M.":".$S;
+            }
+
             $isempty=0 if (!($v=~m/^\s*$/));
             if ($v=~m/^'.*[^']$/){  # this indicates a text field formater
                $v=~s/^'//;

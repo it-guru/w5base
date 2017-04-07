@@ -437,6 +437,10 @@ sub Unformat
       if ($self->{dayonly}){  # fix format als 12:00 GMT
          $dateparam{defhour}=12;
       }
+      if ($self->{dayonly}){      # prevent day switch for day only fields
+         $formated=~s/\s.*$//;    # if f.e. date is specified with 00:00:00 
+         $formated.=" 12:00:00";  # time (which is not needed)
+      }
       my $d=$self->getParent->ExpandTimeExpression($formated,"en",
                                                    undef,
                                                    $self->{timezone},
