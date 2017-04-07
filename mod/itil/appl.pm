@@ -2269,7 +2269,7 @@ sub isWriteValid
       }
       if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
          my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                                     ["RMember"],"up");
+                                     ["RMember"],"both");
          my @grpids=keys(%grps);
          foreach my $contact (@{$rec->{contacts}}){
             if ($contact->{target} eq "base::user" &&
