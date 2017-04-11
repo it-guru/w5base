@@ -65,6 +65,16 @@ create or replace synonym W5I.FLEXERAsup_syssystemidmap for "W5I_FLEXERAsup__sys
 grant select on "W5I_FLEXERA__systemidmap_of" to W5_BACKUP_D1;
 grant select on "W5I_FLEXERA__systemidmap_of" to W5_BACKUP_W1;
 
+-- cleanup command for deleted flexerasystemids
+delete from "W5I_FLEXERA__systemidmap_of" 
+where "W5I_FLEXERA__systemidmap_of".flexerasystemid in (
+select "W5I_FLEXERA__systemidmap_of".flexerasystemid 
+from "W5I_FLEXERA__systemidmap_of"
+left outer join "mview_FLEXERA_system"
+on "W5I_FLEXERA__systemidmap_of".flexerasystemid=
+"mview_FLEXERA_system".flexerasystemid
+where "mview_FLEXERA_system".flexerasystemid is null);
+
 
 =cut
 
