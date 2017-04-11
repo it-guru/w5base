@@ -37,8 +37,11 @@ sub getDefaultIntervalMinutes
    my $self=shift;
 
    return(10,['6:08',
+              '9:08',
               '10:08',
+              '11:08',
               '14:08',
+              '15:08',
               '18:08'
               ]);    
 }
@@ -49,8 +52,9 @@ sub Process             # will be run as a spereate Process (PID)
 
 
    my $smap=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
+   my $fchk=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
    $smap->SetFilter({mapstate=>[undef,""]});
-   $smap->Limit(50);
+   $smap->Limit(150);
    my $smapop=$smap->Clone();
    my $sys=getModuleObject($self->Config,"itil::system");
    my $amsys=getModuleObject($self->Config,"tsacinv::system");
@@ -88,9 +92,19 @@ sub Process             # will be run as a spereate Process (PID)
       if ($self->Config->Param("W5BaseOperationMode") eq "online" ||
          # $self->Config->Param("W5BaseOperationMode") eq "dev" ||
           $self->Config->Param("W5BaseOperationMode") eq "normal"){
+         $comment=$mrec->{comment};
+         $fchk->ResetFilter();
+         $fchk->SetFilter({systemid=>\$systemid});
+         my ($chkrec,$msg)=$fchk->getOnlyFirst(qw(ALL)); 
+         if (defined($chkrec)){
+            $fchk->ValidatedUpdateRecord($chkrec,{systemid=>''},
+                                         {id=>$chkrec->{id}});
+            $comment.="\nReplace flexeraid=$chkrec->{id}\n";
+         }
          my $bk=$smapop->ValidatedUpdateRecord($mrec,{
             systemid=>$systemid,
             mapstate=>$mapstate,
+            comment=>$comment,
             owner=>\undef
          },{id=>$mrec->{id}});
       }
