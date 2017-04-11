@@ -35,7 +35,7 @@ create table "W5I_FLEXERA__systemidmap_of" (
    flexerasystemid number(10) not null,
    systemid     varchar2(40),
    mapstate     varchar2(80),
-   mapuser      number(*,0),comments varchar2(4000),
+   mapuser      number(*,0),cmt varchar2(4000),
    firstdate    date,
    constraint "W5I_FLEXERA__ystemidmap_of_pk" primary key (flexerasystemid)
 );
@@ -51,7 +51,7 @@ select "mview_FLEXERA_system".flexerasystemid id,
        "W5I_FLEXERA__systemidmap_of".flexerasystemid of_id,
        "W5I_FLEXERA__systemidmap_of".mapstate,
        "W5I_FLEXERA__systemidmap_of".systemid,
-       "W5I_FLEXERA__systemidmap_of".comments,
+       "W5I_FLEXERA__systemidmap_of".cmt,
        "W5I_FLEXERA__systemidmap_of".mapuser,
        "W5I_FLEXERA__systemidmap_of".firstdate
 from "mview_FLEXERA_system"
@@ -120,9 +120,9 @@ sub new
                 dataobjattr   =>'mapstate'),
 
       new kernel::Field::Textarea(
-                name          =>'comment',
+                name          =>'coment',
                 label         =>'Comments',
-                dataobjattr   =>'"COMMENTS"'),
+                dataobjattr   =>'cmt'),
 
       new kernel::Field::Text(
                 name          =>'flexerasystemid',

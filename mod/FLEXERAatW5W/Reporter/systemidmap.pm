@@ -92,7 +92,7 @@ sub Process             # will be run as a spereate Process (PID)
       if ($self->Config->Param("W5BaseOperationMode") eq "online" ||
          # $self->Config->Param("W5BaseOperationMode") eq "dev" ||
           $self->Config->Param("W5BaseOperationMode") eq "normal"){
-         $comment=$mrec->{comment};
+         $comment=$mrec->{cmt};
          $fchk->ResetFilter();
          $fchk->SetFilter({systemid=>\$systemid});
          my ($chkrec,$msg)=$fchk->getOnlyFirst(qw(ALL)); 
@@ -104,7 +104,7 @@ sub Process             # will be run as a spereate Process (PID)
          my $bk=$smapop->ValidatedUpdateRecord($mrec,{
             systemid=>$systemid,
             mapstate=>$mapstate,
-            comment=>$comment,
+            cmt=>$comment,
             owner=>\undef
          },{id=>$mrec->{id}});
       }
