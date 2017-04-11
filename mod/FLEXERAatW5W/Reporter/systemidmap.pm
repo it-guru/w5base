@@ -92,7 +92,7 @@ sub Process             # will be run as a spereate Process (PID)
       if ($self->Config->Param("W5BaseOperationMode") eq "online" ||
          # $self->Config->Param("W5BaseOperationMode") eq "dev" ||
           $self->Config->Param("W5BaseOperationMode") eq "normal"){
-         $comment=$mrec->{cmt};
+         my $comment=$mrec->{cmt};
          $fchk->ResetFilter();
          $fchk->SetFilter({systemid=>\$systemid});
          my ($chkrec,$msg)=$fchk->getOnlyFirst(qw(ALL)); 
