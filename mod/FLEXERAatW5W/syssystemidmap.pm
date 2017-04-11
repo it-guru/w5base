@@ -122,7 +122,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'comment',
                 label         =>'Comments',
-                dataobjattr   =>'comments'),
+                dataobjattr   =>'"COMMENTS"'),
 
       new kernel::Field::Text(
                 name          =>'flexerasystemid',
