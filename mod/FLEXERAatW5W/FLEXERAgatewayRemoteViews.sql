@@ -10,6 +10,8 @@ CREATE INDEX "FLEXERA_system_id1"
    ON "mview_FLEXERA_system"(flexerasystemid) online;
 CREATE INDEX "FLEXERA_system_id2"
    ON "mview_FLEXERA_system"(systemname) online;
+CREATE INDEX "FLEXERA_system_id3"
+   ON "mview_FLEXERA_system"(systeminvhosttype) online;
 
 
 create or replace view "W5I_FLEXERA_system" as

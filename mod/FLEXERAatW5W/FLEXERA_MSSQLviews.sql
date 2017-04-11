@@ -11,6 +11,7 @@ select ComplianceComputer_MT.ComplianceComputerID  FLEXERASYSTEMID,
        NumberOfCores                               SYSTEMCORECOUNT,
        ProcessorType                               SYSTEMCPUTTYPE,
        MaxClockSpeed                               SYSTEMCPUSPEED,
+       ComplianceComputerType.DefaultValue         SYSTEMINVHOSTTYPE,
        ComplianceComputer_MT.TotalMemory           SYSTENMEMORY,
        ComplianceComputer_MT.ModelNo               ASSETMODLEL,
        ComplianceComputer_MT.SerialNo              ASSETSERIALNO,
@@ -36,6 +37,9 @@ from dbo.ComplianceComputer_MT
      left outer join dbo.VirtualMachine_MT
         on dbo.ComplianceComputer_MT.ComplianceComputerID=
            dbo.VirtualMachine_MT.ComplianceComputerID
+     join dbo.ComplianceComputerType
+        on dbo.ComplianceComputer_MT.ComplianceComputerTypeID=
+           dbo.ComplianceComputerType.ComplianceComputerTypeID
 where ComplianceComputer_MT.ComplianceComputerStatusID<>4   -- ignore dummy records
 
 

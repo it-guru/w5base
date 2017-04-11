@@ -7,7 +7,7 @@
 'SAP Hier'=>{de=>'SAP Hierarchie'},
 'package'=>{de=>'Paket'},
 'costelement'=>{de=>'Kontierungsobjekt'},
-'Flexera installed'=>{de=>'Flexera installiert'},
+'in Flexera known'=>{de=>'in Flexera bekannt'},
 'planned install date'=>{de=>'geplantes Installationsdatum'},
 'is SUN global Zone'=>{de=>'ist SUN gZone'},
 'HPOA available'=>{de=>'HPOA verfügbar'},

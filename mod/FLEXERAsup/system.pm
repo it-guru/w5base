@@ -66,6 +66,7 @@ select "W5I_system_universum".id,
        "W5I_system_universum".saphier,
        "W5I_system_universum".amcostelement costelement,
        decode("mview_FLEXERA_system".FLEXERASYSTEMID,NULL,0,1) flexerafnd,
+       "mview_FLEXERA_system".SYSTEMINVHOSTTYPE                systeminvhosttype,
        "mview_FLEXERA_system".ISVM                             isvm,
        "mview_FLEXERA_system".ISVMHOSTMISSING                  isvmhostmissing,
        "mview_FLEXERA_system".INVENTORYDATE                    inventorydate,
@@ -207,8 +208,15 @@ sub new
                 readonly      =>1,
                 group         =>'flexera',
                 selectfix     =>1,
-                label         =>'Flexera installed',
+                label         =>'in Flexera known',
                 dataobjattr   =>"flexerafnd"),
+
+      new kernel::Field::Text(
+                name          =>'flexerainvhosttype',
+                readonly      =>1,
+                group         =>'flexera',
+                label         =>'Flexera InvHostType',
+                dataobjattr   =>"systeminvhosttype"),
 
       new kernel::Field::Link(
                 name          =>'ofid',
