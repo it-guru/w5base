@@ -58,5 +58,7 @@
 'licensing contract is not active'=>{de=>'Lizenzierung ist nicht aktiv'},
 'not enouth free units in license'=>{de=>'nicht genügend freie Einheiten in der Lizenz'},
 'is sub licensed product of'=>{de=>'ist Unterproduktlizenz von'},
+'create of software installation record'=>{de=>'Neuer Software-Installationsdatensatz'},
+"We like to inform you as databoss of a system or cluster. A new software installation was made by %s .\n\n%s\n%s\n\nIf this is plausible to you, there is no todo and you can ignore this message. If not, contact %s and to clarify the this topic."=>{de=>"Hiermit informieren wir Sie als Datenverantwortlicher für ein System oder einen Cluster. Eine neue Software-Installation wurde von %s dokumentiert.\n\n%s\n%s\n\nWenn das für Sie plausibel ist, können Sie diese Mail ignorieren. Falls nicht, setzen Sie sich bitte mit %s in Verbindung um das Thema zu klären."},
 'system is not writeable for you'=>{de=>'kein Schreibzugriff auf das angegebene System'},
 

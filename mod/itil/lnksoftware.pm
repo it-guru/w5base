@@ -1214,23 +1214,50 @@ sub FinishWrite
          # send a mail to system/cluster databoss with cc on current user
          my $swi=$self->Clone();
          $swi->SetFilter({id=>\$newrec->{id}});
-         my ($swirec,$msg)=$swi->getOnlyFirst(qw(databossid fullname));
+         my ($swirec,$msg)=$swi->getOnlyFirst(qw(databossid fullname 
+                                                 urlofcurrentrec));
          if (defined($swirec) && $swirec->{databossid} ne ""){
             my $userid=$self->getCurrentUserId();
             my $u=getModuleObject($self->Config,"base::user");
+
+
             $u->SetFilter({userid=>\$swirec->{databossid},
                            cistatusid=>"<6"});
             my ($urec,$msg)=$u->getOnlyFirst(qw(lastlang));
-            my $lang=$urec->{lastlang};
+            my $lang="en";
+            if (defined($urec) && $urec->{lastlang} ne ""){
+               $lang=$urec->{lastlang};
+            }
+            $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+
+            $u->ResetFilter();
+            $u->SetFilter({userid=>\$userid,
+                           cistatusid=>"<6"});
+            my ($cururec,$msg)=$u->getOnlyFirst(qw(fullname));
+            my $curname=$ENV{REMOTE_USER};
+            if (defined($cururec) && $cururec->{fullname} ne ""){
+               $curname=$cururec->{fullname};
+            }
+
             my $wfa=getModuleObject($self->Config,"base::workflowaction");
-            $wfa->Notify("INFO","create of software installation",
-                         "Hello,\n\ni have create the software installation ".
-                         "<b>".$swirec->{fullname}."</b>".
-                         " for you.\n\nThis is original ".
-                         "your job, but through other dependencies, i had ".
-                         "need to do this for you.",
+            my $msg="We like to inform you as databoss of a system ".
+                    "or cluster. ".
+                    "A new software installation was made by %s .\n\n".
+                    "%s\n%s\n\n".
+                    "If this is plausible to you, there is no todo and you ".
+                    "can ignore this message. If not, contact %s and to ".
+                    "clarify the this topic.";
+                    
+            $wfa->Notify("INFO",
+                  $self->T("create of software installation record").
+                           " ".$swirec->{fullname},
+                         sprintf($self->T($msg),$curname,
+                                                $swirec->{fullname},
+                                                $swirec->{urlofcurrentrec},
+                                                $curname),
                          emailto=>$swirec->{databossid},
                          emailcc=>[11634953080001,$userid]);
+            delete($ENV{HTTP_FORCE_LANGUAGE});
          }
       }
    }
