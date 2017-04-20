@@ -430,6 +430,15 @@ function setTitle()
 {
    var t=window.document.getElementById("WindowTitle");
    if (t){
+      var query = parent.location.search.substring(1)
+      if (query.length){
+         if (parent.history != undefined && 
+             parent.history.pushState != undefined) {
+            var newpath=parent.location.pathname;
+            newpath=newpath.replace(/\\/Detail/,'/ById/${id}');  
+            parent.history.pushState({},document.title, newpath);
+         }
+      } 
       parent.document.title=t.innerHTML;
       document.title=t.innerHTML;
    }
