@@ -435,8 +435,8 @@ function setTitle()
          if (parent.history != undefined && 
              parent.history.pushState != undefined) {
             var newpath=parent.location.pathname;
-            //newpath=newpath.replace(/\\/Detail/,'/ById/${id}');  
-            newpath=newpath.replace(/AllowClose=(1|0)\$/,'');
+            //newpath=newpath.replace(/\\/Detail/,'/ById/${id}'); // not works 
+                                                                  // in IE
             parent.history.pushState({},document.title, newpath);
          }
       } 
