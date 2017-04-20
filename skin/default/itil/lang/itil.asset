@@ -33,7 +33,7 @@
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'Producer System-Handle'=>{de=>'Hersteller System-Handle'},
 'Producer Service&Support Class'=>{de=>'Hersteller Service&Support Class'},
-'Keywords'=>{de=>'Schlüsselworte'},
+'Short Description'=>{de=>'Kurzbeschreibung'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Costcenter'=>{de=>'Kontierungsobjekt'},
 'availabel for further use'=>{de=>'verfügbar für den Wiedereinsatz'},

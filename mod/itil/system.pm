@@ -64,6 +64,14 @@ sub new
                 dataobjattr   =>'system.name'),
 
       new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'Fullname',
+                readonly      =>1,
+                dataobjattr   =>"concat(system.name,".
+                                "if (system.shortdesc<>'',concat(' - ',".
+                                "system.shortdesc),''))"),
+
+      new kernel::Field::Link(
                 name          =>'signedfiletransfername',
                 label         =>'sigend file transfer name',
                 dataobjattr   =>'system.name'),
@@ -99,6 +107,11 @@ sub new
                    return(1);
                 },
                 dataobjattr   =>'system.systemid'),
+
+      new kernel::Field::Text(
+                name          =>'shortdesc',
+                label         =>'Short Description',
+                dataobjattr   =>'system.shortdesc'),
 
       new kernel::Field::Databoss(),
 
@@ -273,12 +286,6 @@ sub new
                                  'softwareinstname',
                                  'techproductstring',
                                  'techrelstring']),
-
-      new kernel::Field::Text(
-                name          =>'shortdesc',
-                group         =>'misc',
-                label         =>'Short Description',
-                dataobjattr   =>'system.shortdesc'),
 
       new kernel::Field::Contact(
                 name          =>'adm',

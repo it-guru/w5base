@@ -194,7 +194,6 @@ sub  calcViewMatrix
          $fieldlist->[$c]->UiVisible("HtmlDetail",current=>$rec);
 
 
-      # fifi fast solution:
       if ($fieldlist->[$c]->Type() eq "MatrixHeader"){
          $vMatrix->{uivisibleof}->[$c]=1;
       }
@@ -412,6 +411,9 @@ EOF
       #   $sfocus="setFocus(\"\");".
       #           "setEnterSubmit(document.forms[0],DetailEditSave);";
       }
+      my $titlestring="$headerval - $s";
+      $titlestring=~s/[<>"']//g;
+      $titlestring=~s/(&gt;|&lt;)//g;
       $template{"HEADER"}=<<EOF;
 <div id="context_menu" class="context_menu">
  <table cellspacing="1" cellpadding="2" border="0">
@@ -447,7 +449,7 @@ function setTitle()
 addEvent(window, "load", setTitle);
 $sfocus
 </script>
-<div style="display:none;visibility:hidden;" id=WindowTitle>$s: $headerval</div>
+<div style="display:none;visibility:hidden;" id=WindowTitle>$titlestring</div>
 EOF
 
       $template{"header"}=<<EOF;

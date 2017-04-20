@@ -76,7 +76,7 @@ sub new
                 readonly      =>1,
                 uivisible     =>0,
                 dataobjattr   =>"if (asset.kwords<>'',".
-                                "concat(asset.name,'-',".
+                                "concat(asset.name,' - ',".
                                 "if (length(asset.kwords)>15,".
                                 "concat(substr(asset.kwords,1,15),'...'),".
                                 "asset.kwords)),asset.name)"),
@@ -98,7 +98,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'kwords',
-                label         =>'Keywords',
+                label         =>'Short Description',
                 dataobjattr   =>'asset.kwords'),
 
       new kernel::Field::TextDrop(
