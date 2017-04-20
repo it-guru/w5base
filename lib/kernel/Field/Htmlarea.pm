@@ -113,11 +113,11 @@ tinyMCE.init({
         nonbreaking_force_tab: true, $image_uploading
 
         autoresize_max_height: 400,
-        target_list: false,
-//        target_list: [
-//        //    {title: 'None', value: ''},
-//            {title: 'New page', value: '_blank'}
-//        ],
+        target_list: true,
+        target_list: [
+            {title: 'New page', value: '_blank'}
+        ],
+        extended_valid_elements: 'a[href|target=_blank]',
         menubar : false,
         skin: "light",
         toolbar : "undo | styleselect forecolor backcolor | "+

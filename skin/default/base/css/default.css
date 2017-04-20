@@ -285,3 +285,6 @@ word-wrap: break-word; /* Internet Explorer 5.5+ */
 
 }
 
+div.TabSelectorModeSelect{
+   overflow:hidden; /* Für IE notwendig */
+}

@@ -368,6 +368,9 @@ sub Validate
          return(0);
       }
    }
+   if (effVal($oldrec,$newrec,"data") eq ""){
+      $newrec->{data}=" ";
+   }
    if (!defined($oldrec)){
       my $catid=$newrec->{faqcat};
       my $userid=$self->getCurrentUserId();
