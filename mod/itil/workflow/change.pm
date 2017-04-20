@@ -282,11 +282,39 @@ sub getNotifyDestinations
       }
    }
 
+   # infoabos
    $ia->LoadTargets($emailto,'*::appl',\'changenotify',$applid);
    $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVchangeinfobyfunction',
                              '100000004',\@tobyfunc,default=>1);
    $ia->LoadTargets($emailcc,'base::staticinfoabo',\'STEVchangeinfobydepfunc',
                              '100000005',\@ccbyfunc,default=>1);
+
+   # detect infocontacts
+   my $lnkcontactobj=getModuleObject($self->Config,'itil::lnkapplcontact');
+   my $uobj=getModuleObject($self->Config,'base::user');
+
+   $lnkcontactobj->SetFilter({refid=>$applid,
+                              croles=>'*roles=?infocontact?=roles*'});
+   my @infocontactids=map($_->{targetid},
+                          $lnkcontactobj->getHashList(qw(targetid)));
+   $uobj->SetFilter({userid=>\@infocontactids,
+                     cistatusid=>'<5',
+                     email=>'![EMPTY]'});
+   my @infocontacts=$uobj->getHashList(qw(email));
+
+   foreach my $contact (@infocontacts) {
+      my $email=$contact->{email};
+
+      if (!exists($emailto->{$email})) {
+         $emailto->{$email}++;
+      }
+   }
+   
+   foreach my $to (keys(%$emailto)) {
+      delete($emailcc->{$to});
+   }
+
+
    return(undef);
 }
 
@@ -547,7 +575,7 @@ sub generateWorkspacePages
       $$selopt.='<option value="wfaddnote">'.
                     $self->T("wfaddnote",'base::workflow::actions').
                 "</option>\n";
-      $d=$self->getDefaultNoteDiv($WfRec,$actions,'height'=>'100');
+      $d=$self->getDefaultNoteDiv($WfRec,$actions,'height'=>'110');
 
       $$divset.='<div id=OPwfaddnote data-visiblebuttons="SaveStep"'.
                 " class=\"$class\">$d</div>";
@@ -610,8 +638,9 @@ sub getWorkHeight
    my $self=shift;
    my $WfRec=shift;
 
-   return(190) if ($WfRec->{state}<20);
-   return(120);
+   return(206);
+   #return(190) if ($WfRec->{state}<20);
+   #return(120);
 }
 
 

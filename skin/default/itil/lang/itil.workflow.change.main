@@ -12,6 +12,7 @@
         "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
             "zu direkt betroffenen Anwendungen bestehen</li>".
         "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+        "<li>Kontakte mit der Rolle 'Informationspartner'</li>".
        "</ul>",
    en=>"Mail notification to".
        "<ul>".
@@ -20,6 +21,7 @@
         "<li>Inteface partner with critical interfaces on their part ".
             "to direct affected applications".
         "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+        "<li>Contacts with role 'Information contact'</li>".
        "</ul>"
 },
 'helpnotifycritical'=>{
@@ -30,6 +32,7 @@
         "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
             "zu direkt betroffenen Anwendungen bestehen</li>".
         "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+        "<li>Kontakte mit der Rolle 'Informationspartner'</li>".
        "</ul>",
    en=>"Mail notification to".
        "<ul>".
@@ -38,6 +41,7 @@
         "<li>Interface partner with critical interfaces on their part ".
             "to direct affected applications".
         "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+        "<li>Contacts with role 'Information contact'</li>".
        "</ul>"
 },
 'helpnotifydirect'=>{
@@ -45,11 +49,13 @@
        "<ul>".
         "<li>TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
         "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+        "<li>Kontakte mit der Rolle 'Informationspartner'</li>".
        "</ul>",
    en=>"Mail notification to".
        "<ul>".
         "<li>TSM and TSM deputies of direct affected applications</li>".
         "<li>Subscriber of InfoAbo 'Changebenotification'</li>".
+        "<li>Contacts with role 'Information contact'</li>".
        "</ul>"
 },
 
