@@ -51,6 +51,7 @@ sub new
                 name          =>'fullname',
                 label         =>'Fullname',
                 searchable    =>0,
+                readonly      =>1,
                 htmldetail    =>0,
                 dataobjattr   =>
                    "concat(software.name,".

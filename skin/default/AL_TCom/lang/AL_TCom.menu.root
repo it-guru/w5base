@@ -34,6 +34,7 @@
 'AL_TCom.itclust.lnkitclustsvc'=>{de=>'Service',en=>'Service'},
 'AL_TCom.itclust.lnkitclustsvc.appl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
 'AL_TCom.itclust.lnkitclustsvc.sw'=>{de=>'Softwareinst.',en=>'Softwareinst.'},
+'AL_TCom.itclust.lnkitclustsvc.sw.new'=>{de=>'Neueingabe',en=>'New.'},
 'AL_TCom.itclust.lnkitclustcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'AL_TCom.system'=>{de=>'System',en=>'System'},
 'AL_TCom.system.new'=>{de=>'Neueingabe',en=>'New'},

@@ -230,6 +230,11 @@ sub Init
                       "itil::lnksoftwareitclustsvc",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.itclust.lnkitclustsvc.sw.new",
+                      "itil::lnksoftwareitclustsvc",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.itclust.lnkitclustcontact",
                       "itil::lnkitclustcontact",
                       defaultacl=>['valid_user']);

@@ -36,6 +36,7 @@ sub new
                 htmlwidth     =>'100px',
                 weblinkto     =>'NONE',
                 group         =>'useableby',
+                readonly      =>1,
                 label         =>'useable by application',
                 vjointo       =>'itil::lnkitclustsvcappl',
                 vjoinon       =>['itclustsvcid'=>'itclustsvcid'],
