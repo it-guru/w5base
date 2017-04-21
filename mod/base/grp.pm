@@ -354,6 +354,7 @@ sub new
                        "lnkgrpuser write,".
                        "lnkgrpuserrole write,".
                        "wfhead write, ".
+                       "objblacklist write, ".
                        "wfkey write, wfaction write, iomap write, ".
                        "history write";
    return($self);
