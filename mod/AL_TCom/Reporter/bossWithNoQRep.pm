@@ -46,7 +46,7 @@ sub Process             # will be run as a spereate Process (PID)
 
    my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
 
-   $lnk->SetFilter({group=>"dtag.tsi.ti dtag.tsi.ti.*",
+   $lnk->SetFilter({group=>"DTAG.GHQ.VTI.DTIT DTAG.GHQ.VTI.DTIT.*",
                     rawnativroles=>'RBoss'});
    my %userid;
    foreach my $lrec ($lnk->getHashList(qw(userid))){
@@ -112,7 +112,8 @@ sub isViewValid
    my $rec=shift;
 
    return(1) if ($self->IsMemberOf("admin"));
-   return(1) if ($self->IsMemberOf("DTAG.TSI.TI",[qw(RCFManager RCFManager2)],
+   return(1) if ($self->IsMemberOf("DTAG.GHQ.VTI.DTIT",
+                                   [qw(RCFManager RCFManager2)],
                                    "up"));
 
    return(0);

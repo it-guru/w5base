@@ -119,8 +119,9 @@ sub isViewValid
    my $rec=shift;
 
    return(1) if ($self->IsMemberOf("admin"));
-   return(1) if ($self->IsMemberOf("DTAG.TSI.TI",[qw(RCFManager RCFManager2
-                                                     RCHManager RCHManager2)],
+   return(1) if ($self->IsMemberOf("DTAG.GHQ.VTI.DTIT",
+                                   [qw(RCFManager RCFManager2
+                                       RCHManager RCHManager2)],
                                    "up"));
 
    return(0);
