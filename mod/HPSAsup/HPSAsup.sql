@@ -159,6 +159,9 @@ where
     and "itil::system".isembedded=0
        -- Loadbalancer Systeme ausklammern (da Scanner nicht möglich)
     and "itil::system".isloadbalacer=0
+       -- Systeme die in AssetManager als ESXI Markiert sind ausklammern
+    and ("tsacinv::system".systemos not like 'VMWARE ESXI%' or
+         "tsacinv::system".systemos is null)
        -- MU Status "hibernate" ausklammern
     and ("tsacinv::system".status not like 'hibernate' or 
          "tsacinv::system".status is null)
