@@ -621,7 +621,7 @@ sub new
 sub showQualityFields {
    my $self=shift;
    my %grps=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                 ['RCHManager','RCHManager2']);
+                                 ['RCHManager','RCHManager2','RCHOperator']);
    return(1) if (keys(%grps));
    return(0);
 }

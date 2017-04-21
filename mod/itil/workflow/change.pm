@@ -492,7 +492,10 @@ sub isChangeManager
    my $mandator=$WfRec->{mandatorid};
    $mandator=[$mandator] if (!ref($mandator) eq "ARRAY");
 
-   return(1) if ($self->getParent->IsMemberOf($mandator,"RCHManager","down"));
+   return(1) if ($self->getParent->IsMemberOf($mandator,
+                                              ["RCHManager",
+                                               "RCHManager2",
+                                               "RCHOperator"],"down"));
    
    #if ($self->getParent->IsMemberOf("admin") &&
    #    defined($WfRec->{applicationid})) {
