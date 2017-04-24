@@ -90,6 +90,42 @@ sub extendFieldDefinition
 
 }
 
+sub extendCurrentRating
+{
+   my $self=shift;
+   my $vote=shift;
+
+   my $html;
+
+   if (defined($vote)){
+      my $red=1;
+      my $green=99;
+      if ($vote<-900){
+         $red=99;
+      }
+      elsif($vote<-50){
+         $red=60;
+      }
+      elsif($vote<100){
+         $red=20;
+      }
+      elsif($vote<500){
+         $red=10;
+      }
+      my $green=100-$red;
+      $html="<div style='float:clear'></div>".
+            "<div style='width:100%;margin:0;padding:0'>".
+            "<div style='float:left;marin:0;padding:0;width:${green}%;background-color:green;height:4px'>".
+            "&nbsp;".
+            "</div>".
+            "<div style='float:left;marin:0;padding:0;width:${red}%;background-color:red;height:4px'>".
+            "&nbsp;".
+            "</div>".
+            "</div>";
+   }
+   return($html);
+}
+
 sub extendHtmlDetailPageContent
 {
    my ($self,$base,$offset,$rec)=@_;
@@ -103,14 +139,18 @@ sub extendHtmlDetailPageContent
    my $selfname=$self->SelfAsParentObject();
    $selfname=~s/::/\//g;
 
+   my $m1=$self->T("well documented and up to date record",
+                   "kernel::App::Web::VoteLnk");
+
+   my $m2=$self->T("record bad documented or out of date",
+                   "kernel::App::Web::VoteLnk");
+
    my $initval=<<EOF;
-<img onclick='doRecordVote(this,1);' 
-     title='find ich wirklich gut' 
+<img onclick='doRecordVote(this,1);' title='$m1' 
      src='$base/base/load/up-vote.gif' 
      width=28 height=28 border=0 
      style='margin:2px;margin-right:8px;cursor:pointer' >
-<img onclick='doRecordVote(this,-1);' 
-     title='find ich wirklich scheisse' 
+<img onclick='doRecordVote(this,-1);' title='$m2' 
      src='$base/base/load/down-vote.png' 
      style='margin:2px;cursor:pointer' width=28 height=28 border=0>
 EOF
@@ -122,6 +162,9 @@ EOF
          " onload='doRecordVote(this,0);' ".
          "src='$base/base/load/loading.gif' ".
          "style='margin:2px;cursor:pointer' width=56 height=28 border=0>";
+   }
+   else{
+      $initval.=$self->extendCurrentRating($rec->{uservotelevel});
    }
 
    my $jscode=<<EOF;
@@ -141,19 +184,21 @@ function doRecordVote(parent,v){
      uservote='query';
    }
    path+=uservote;
-   console.log('vote',path);
+   //console.log('vote',path);
+   e.innerHTML='<img src="$base/base/load/loading.gif" '+
+               'width=56 height=28 border=0>';
    xmlhttp.open('POST',path);
    xmlhttp.onreadystatechange=function() {
       if (this.readyState == 4 && this.status == 200) {
          var myArr = JSON.parse(this.responseText);
          e.innerHTML=myArr[0].html;  
-         console.log(myArr);
+         //console.log(myArr);
       }
    };
    xmlhttp.send();
 }
 </script>
-<div id=RecordVote style='position:absolute;bottom:${offset}px;right:20px;border-style:solid;border-width:1px;border-color:gray;border-radius:3px;background-color:silver'>${initval}</div>
+<div id=RecordVote style='position:absolute;bottom:${offset}px;padding:1px;right:20px;width:80px;height:40px;border-style:solid;border-width:1px;border-color:gray;border-radius:3px;background-color:silver'>${initval}</div>
 EOF
    return($jscode);
 

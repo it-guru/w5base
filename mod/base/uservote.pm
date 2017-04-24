@@ -224,7 +224,14 @@ sub vote
          $o->SetFilter({$idname=>\$refid});
          my ($refrec,$msg)=$o->getOnlyFirst(qw(uservotelevel));
          if (defined($refrec)){
-            $html="<div>VoteLevel:".$refrec->{uservotelevel}."</div>";
+            if ($refrec->{uservotelevel}>-100){
+               $html="<b>good</b><br>I:$refrec->{uservotelevel}<br>";
+            }
+            else{
+               $html="<b>bad</b><br>I:$refrec->{uservotelevel}<br>";
+            }
+            
+            $html.=$self->extendCurrentRating($refrec->{uservotelevel});
             $uservotelevel=$refrec->{uservotelevel};
          }
       }
