@@ -225,7 +225,7 @@ sub vote
          my ($refrec,$msg)=$o->getOnlyFirst(qw(uservotelevel));
          if (defined($refrec)){
             $html="<div>VoteLevel:".$refrec->{uservotelevel}."</div>";
-            $uservotelevel=$rec->{uservotelevel};
+            $uservotelevel=$refrec->{uservotelevel};
          }
       }
    }
