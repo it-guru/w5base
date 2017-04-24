@@ -48,12 +48,16 @@ sub new
                                    vjoinon    =>['lgroup'=>'groupid'],
                                    vjoindisp  =>'name'),
 
+      # mz 21.04.17
+      # join on 'userid' seems to be the better way, because of lost
+      # operator to contact links in SM9
       new kernel::Field::TextDrop( name       =>'username',
                                    label      =>'Contact name',
                                    htmlwidth  =>'200px',
                                    searchable =>0,
                                    vjointo    =>'tssm::user',
-                                   vjoinon    =>['luser'=>'loginname'],
+                                 # vjoinon    =>['luser'=>'loginname'],
+                                   vjoinon    =>['luser'=>'userid'],
                                    vjoindisp  =>'fullname'),
 
       new kernel::Field::TextDrop( name       =>'useremail',
@@ -62,8 +66,9 @@ sub new
                                    searchable =>0,
                                    htmldetail =>0,
                                    vjointo    =>'tssm::user',
-                                   vjoinbase  =>{'islogonuser'=>'1'},
-                                   vjoinon    =>['luser'=>'loginname'],
+                                 # vjoinbase  =>{'islogonuser'=>'1'},
+                                 # vjoinon    =>['luser'=>'loginname'],
+                                   vjoinon    =>['luser'=>'userid'],
                                    vjoindisp  =>'email'),
 
       new kernel::Field::Text(     name       =>'luser',
