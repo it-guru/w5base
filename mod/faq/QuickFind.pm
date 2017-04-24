@@ -177,10 +177,18 @@ sub Welcome
 
    $faq->SecureSetFilter({categorie=>'W5Base*'});
 
-   foreach my $rec ($faq->getHashList(qw(name faqid))){
-      print insDoc("foldersTree",$rec->{name},
-                   "../../faq/article/ById/".
-                   "$rec->{faqid}");
+   foreach my $rec ($faq->getHashList(qw(uservotelevel name faqid))){
+      if ($rec->{uservotelevel}>-100){
+         my $pref=""; 
+         my $post=""; 
+         if ($rec->{uservotelevel}<0){
+            $pref="<font color=gray>"; 
+            $post="</font>"; 
+         }
+         print insDoc("foldersTree",$pref.$rec->{name}.$post,
+                      "../../faq/article/ById/".
+                      "$rec->{faqid}");
+      }
    }
    return(0);
 }
@@ -301,9 +309,15 @@ EOF
          $faq->ResetFilter();
          $faq->SecureSetFilter({kwords=>$kwords,
                                 lang=>[$self->Lang(),"multilang"]});
-         my @l=$faq->getHashList(qw(mdate name faqid));
+         my @l=$faq->getHashList(qw(uservotelevel mdate name faqid));
          my $loop=0;
          foreach my $rec (@l){
+            my $pref=""; 
+            my $post=""; 
+            if ($rec->{uservotelevel}<0){
+               $pref="<font color=gray>"; 
+               $post="</font>"; 
+            }
             if (!$found){
                print treeViewHeader($label,1);
                $found++;
@@ -313,7 +327,7 @@ EOF
                $tree="article";
                $loop++;
             }
-            print insDoc($tree,$rec->{name},
+            print insDoc($tree,$pref.$rec->{name}.$post,
                          "../../faq/article/ById/".
                          "$rec->{faqid}");
          }

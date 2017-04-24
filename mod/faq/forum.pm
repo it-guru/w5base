@@ -259,6 +259,7 @@ sub ShowTopic
                                      forumtopic=>$torec->{id}});
       }
    }
+   print $to->extendHtmlDetailPageContent("../../..",140,$torec);
 
    $en->ResetFilter();
    $en->SetFilter({forumtopic=>\$torec->{id}});

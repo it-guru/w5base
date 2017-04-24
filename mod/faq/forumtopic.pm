@@ -23,7 +23,10 @@ use kernel::App::Web::Listedit;
 use kernel::DataObj::DB;
 use kernel::Field;
 use faq::lib::forum;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use kernel::App::Web::VoteLink;
+
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
+        kernel::App::Web::VoteLink);
 
 
 
