@@ -279,6 +279,16 @@ sub checkSSL
    msg(INFO,"Step2: Connect done");
    msg(INFO,"Step3: try to load peer_certificate");
    my $cert = $sock->peer_certificate();
+
+   if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
+      my $dmp = $sock->dump_peer_certificate();
+      printf STDERR ("\nCert:\n%s\n\n",$dmp);
+      my $version = $sock->get_sslversion(); 
+      printf STDERR ("\nVersion:\n%s\n\n",$version);
+      my $cipher  = $sock->get_cipher(); 
+      printf STDERR ("\nChipher:\n%s\n\n",$cipher);
+   }
+
    my ($begin_date,$expire_date)=();
    if ($cert){
       msg(INFO,"Step4: peer_certificate loaded");
