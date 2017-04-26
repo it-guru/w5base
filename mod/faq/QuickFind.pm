@@ -360,6 +360,8 @@ EOF
 
       my $loop=0;
       foreach my $rec (@l){
+         my $pref=""; 
+         my $post=""; 
          if (!$found){
             print treeViewHeader($label,1);
             $found++;
