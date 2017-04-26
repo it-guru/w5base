@@ -369,7 +369,15 @@ EOF
             $tree="forum";
             $loop++;
          }
-         print insDoc($tree,$rec->{name},
+         if ($rec->{uservotelevel}<500){
+            $pref="<font color='gray'>"; 
+            $post="</font>"; 
+         }
+         elsif ($rec->{uservotelevel}<0){
+            $pref="<font color='dimgray'>"; 
+            $post="</font>"; 
+         }
+         print insDoc($tree,$pref.$rec->{name}.$post,
                       "../../faq/forum/Topic/".
                       "$rec->{id}");
       }
