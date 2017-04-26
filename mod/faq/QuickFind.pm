@@ -314,11 +314,11 @@ EOF
          foreach my $rec (@l){
             my $pref=""; 
             my $post=""; 
-            if ($rec->{uservotelevel}<500){
+            if ($rec->{uservotelevel}<-500){
                $pref="<font color='gray'>"; 
                $post="</font>"; 
             }
-            elsif ($rec->{uservotelevel}<0){
+            elsif ($rec->{uservotelevel}<-100){
                $pref="<font color='dimgray'>"; 
                $post="</font>"; 
             }
@@ -371,11 +371,11 @@ EOF
             $tree="forum";
             $loop++;
          }
-         if ($rec->{uservotelevel}<500){
+         if ($rec->{uservotelevel}<-500){
             $pref="<font color='gray'>"; 
             $post="</font>"; 
          }
-         elsif ($rec->{uservotelevel}<0){
+         elsif ($rec->{uservotelevel}<-100){
             $pref="<font color='dimgray'>"; 
             $post="</font>"; 
          }
