@@ -249,6 +249,7 @@ sub new
                 dataobjattr   =>'forumtopic.comments,forumtopic.name'),
 
    );
+   $self->extendFieldDefinition();
    $self->setDefaultView(qw(mdate name entrycount editor topicicon));
    $self->{DetailY}=520;
    $self->setWorktable("forumtopic");
@@ -335,7 +336,7 @@ sub getSqlFrom
           "on forumtopic.id=forumtopicread.forumtopic ".
           " and forumtopicread.createuser='$userid' ".
           " and forumtopicread.createdate>=forumtopic.modifydate";
-
+   $from=$self->extendSqlFrom($from,"forumtopic.id");
    return($from);
 }
 

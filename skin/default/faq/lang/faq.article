@@ -30,3 +30,4 @@
 'Language'=>{de=>'Sprache'},
 'Published'=>{de=>'Veröffentlicht'},
 'insufficient rights to create articles in requested catecory'=>{de=>'ungenügende Rechte für das Hinzufügen von Artikeln in der geforderten Kategorie'},
+'WARNING: This document is potentially in a bad quality or out of date!'=>{de=>'WARNUNG: Dieses Dokument ist möglicherweise in einer schlechten Qualität oder veraltet!'},

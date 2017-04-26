@@ -1,0 +1,6 @@
+'base::uservote'=>{de=>'Datenbewertung',en=>'Datavoting'},
+'Document quality'=>{de=>'Dokumentqualität'},
+'perfect'=>{de=>'perfekt'},
+'dubious'=>{de=>'bedenklich'},
+'bad'=>{de=>'schlecht'},
+'untrustworthy'=>{de=>'nicht vertrauenswürdig'},

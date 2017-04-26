@@ -187,20 +187,6 @@ sub new
                 label         =>'OwnerID',
                 dataobjattr   =>'faq.owner'),
                                    
-      new kernel::Field::Link(
-                name          =>'allow_uservote',
-                group         =>'source',
-                selectfix     =>1,
-                label         =>'AllowUserVote',
-                dataobjattr   =>'if (uservote.voteval is null,1,0)'),
-
-
-
-
-
-
-
-
                                    
       new kernel::Field::SubList(
                 name          =>'acls',
@@ -372,7 +358,7 @@ sub getSqlFrom
             "on faq.faqid=wfaqacl.refid and ".
             "wfaqacl.aclmode='write' and ".
             "wfaqacl.aclparentobj='faq::article' ";
-   $from=$self->extendSqlFrom($from);
+   $from=$self->extendSqlFrom($from,"faq.faqid");
    return($from);
 }
 
@@ -808,6 +794,11 @@ sub FullView
                                 'public/faq/load/faq.css']);
 #
    print("<body class=fullview><form>");
+   if ($rec->{uservotelevel}<-1000){
+      printf("<font color='red' size=3>%s</font><br>",
+             $self->T("WARNING: This document is potentially in a bad".
+                      " quality or out of date!"));
+   }
    print("<div class=fullview style=\"padding-bottom:10px\">".
          "<a target=_blank class=WindowTitle ".
          "href=\"ById/$rec->{faqid}\" ".

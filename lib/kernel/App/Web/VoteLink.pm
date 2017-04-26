@@ -24,8 +24,8 @@ sub extendSqlFrom
 {
    my $self=shift;
    my $from=shift;
+   my $reffield=shift;
 
-   my $reffield="faq.faqid";
    my $userid=$self->getCurrentUserId();
    my $selfname=$self->SelfAsParentObject();
    my $logstamp=$self->getLogStamp();
@@ -36,8 +36,29 @@ sub extendSqlFrom
           "uservote.createuser='${userid}' and ".
           "uservote.entrymonth='${logstamp}')";
 
-   $from.=" left outer join uservote uv  ".
-          "on (uv.refid=faq.faqid and uv.parentobj='${selfname}') ";
+   my $sql=
+      "sum(subuservote.voteval/".   # factor user voting
+
+      # factor age of uservoting
+         "(".
+         "if (datediff(now(),subuservote.createdate)=0,1,".
+             "datediff(now(),subuservote.createdate))".
+         "*".
+         "if (datediff(now(),subuservote.createdate)=0,1,".
+             "datediff(now(),subuservote.createdate))".
+         "/(3.65*3.65/2))". 
+         ")".
+      " as sumuservote";
+
+   $from.=" left outer join (".
+             "select ".
+             "subuservote.refid,".
+             "subuservote.parentobj,".
+             "max(subuservote.voteval) voteval,".
+             "$sql ".
+             "from uservote subuservote ".
+             "group by subuservote.refid) uv  ".
+          "on (uv.refid=${reffield} and uv.parentobj='${selfname}') ";
 
 
    return($from);
@@ -48,25 +69,16 @@ sub extendFieldDefinition
    my $self=shift;
 
    my $selfname=$self->SelfAsParentObject();
-   my $sql=
-      "(sum(uv.voteval/".   # factor user voting
+   my $mdatefld=$self->getField("mdate");
 
-      # factor age of uservoting
-         "(".
-         "if (datediff(now(),uv.createdate)=0,1,".
-             "datediff(now(),uv.createdate))".
-         "*".
-         "if (datediff(now(),uv.createdate)=0,1,".
-             "datediff(now(),uv.createdate))".
-         "/(3.65*3.65))". 
-         ")".
-      ")";
+   my $sql="if (uv.sumuservote is null,0,uv.sumuservote)";
 
-   $sql="if (${sql} is null,0,${sql})".
+   if (defined($mdatefld)){
+      my $dobjattr=$mdatefld->{dataobjattr};
        # factor age of parent record
- 
-        "+(if (365-datediff(now(),faq.modifydate)>-730,".
-        "(365-datediff(now(),faq.modifydate)),-730))*1.37";
+      $sql.="+(if (365-datediff(now(),$dobjattr)>-730,".
+        "(365-datediff(now(),$dobjattr)),-730))*1.37";
+   }
 
    $self->AddFields(
       new kernel::Field::Link(
@@ -114,14 +126,17 @@ sub extendCurrentRating
       }
       my $green=100-$red;
       $html="<div style='float:clear'></div>".
+            "<span title='QIndex:$vote'>".
             "<div style='width:100%;margin:0;padding:0'>".
-            "<div style='float:left;marin:0;padding:0;width:${green}%;background-color:green;height:4px'>".
+            "<div style='float:left;marin:0;padding:0;width:${green}%;".
+            "background-color:green;height:4px'>".
             "&nbsp;".
             "</div>".
-            "<div style='float:left;marin:0;padding:0;width:${red}%;background-color:red;height:4px'>".
+            "<div style='float:left;marin:0;padding:0;width:${red}%;".
+            "background-color:red;height:4px'>".
             "&nbsp;".
             "</div>".
-            "</div>";
+            "</div></span>";
    }
    return($html);
 }
@@ -191,14 +206,15 @@ function doRecordVote(parent,v){
    xmlhttp.onreadystatechange=function() {
       if (this.readyState == 4 && this.status == 200) {
          var myArr = JSON.parse(this.responseText);
-         e.innerHTML=myArr[0].html;  
+         var html=myArr[0].html;
+         e.innerHTML=html.replace(/%ROOT%/,'$base');  
          //console.log(myArr);
       }
    };
    xmlhttp.send();
 }
 </script>
-<div id=RecordVote style='position:absolute;bottom:${offset}px;padding:1px;right:20px;width:80px;height:40px;border-style:solid;border-width:1px;border-color:gray;border-radius:3px;background-color:silver'>${initval}</div>
+<div id=RecordVote style='position:absolute;text-align:center;bottom:${offset}px;padding:1px;right:20px;width:80px;height:40px;border-style:solid;border-width:1px;border-color:gray;border-radius:3px;background-color:silver'>${initval}</div>
 EOF
    return($jscode);
 

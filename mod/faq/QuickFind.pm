@@ -182,7 +182,7 @@ sub Welcome
          my $pref=""; 
          my $post=""; 
          if ($rec->{uservotelevel}<0){
-            $pref="<font color=gray>"; 
+            $pref="<font color='dimgray'>"; 
             $post="</font>"; 
          }
          print insDoc("foldersTree",$pref.$rec->{name}.$post,
@@ -314,8 +314,12 @@ EOF
          foreach my $rec (@l){
             my $pref=""; 
             my $post=""; 
-            if ($rec->{uservotelevel}<0){
-               $pref="<font color=gray>"; 
+            if ($rec->{uservotelevel}<500){
+               $pref="<font color='gray'>"; 
+               $post="</font>"; 
+            }
+            elsif ($rec->{uservotelevel}<0){
+               $pref="<font color='dimgray'>"; 
                $post="</font>"; 
             }
             if (!$found){
@@ -340,7 +344,7 @@ EOF
 
       my $fo=getModuleObject($self->Config,"faq::forumentry");
       $fo->SecureSetFilter({ftext=>$searchtext});
-      my @l=$fo->getHashList(qw(forumtopic));
+      my @l=$fo->getHashList(qw(uservotelevel forumtopic));
       foreach my $rec (@l){
          $id{$rec->{forumtopic}}++;
       }
@@ -352,7 +356,7 @@ EOF
       }
       $fo->ResetFilter();
       $fo->SecureSetFilter({id=>[keys(%id)]});
-      my @l=$fo->getHashList(qw(id name));
+      my @l=$fo->getHashList(qw(uservotelevel id name));
 
       my $loop=0;
       foreach my $rec (@l){

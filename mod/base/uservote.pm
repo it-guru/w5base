@@ -201,15 +201,19 @@ sub vote
          if ($self->IsMemberOf("admin")){
             $voteval=$voteval*3;
          }
+         else{
+            my $ulog=getModuleObject($self->Config,"base::userlogon");
+
+         }
         
          if ($voteval!=0){
-            printf STDERR ("fifi userid=$userid\n");
-            printf STDERR ("fifi logstamp=$logstamp\n");
-            printf STDERR ("fifi func=$func\n");
-            printf STDERR ("fifi p=$p\n");
-            printf STDERR ("fifi parentobj=$parentobj\n");
-            printf STDERR ("fifi refid=$refid\n");
-            printf STDERR ("fifi voteval=$voteval\n");
+            #printf STDERR ("fifi userid=$userid\n");
+            #printf STDERR ("fifi logstamp=$logstamp\n");
+            #printf STDERR ("fifi func=$func\n");
+            #printf STDERR ("fifi p=$p\n");
+            #printf STDERR ("fifi parentobj=$parentobj\n");
+            #printf STDERR ("fifi refid=$refid\n");
+            #printf STDERR ("fifi voteval=$voteval\n");
         
             $self->ValidatedInsertRecord({
                parentobj=>$parentobj,
@@ -224,12 +228,35 @@ sub vote
          $o->SetFilter({$idname=>\$refid});
          my ($refrec,$msg)=$o->getOnlyFirst(qw(uservotelevel));
          if (defined($refrec)){
-            if ($refrec->{uservotelevel}>-100){
-               $html="<b>good</b><br>I:$refrec->{uservotelevel}<br>";
+            my $state="green";
+            my $title="QIndex:".$refrec->{uservotelevel}." = ";
+            $title.=$self->T("Document quality");
+            $title.=": ";
+            if ($refrec->{uservotelevel}>1000){
+               $state="ok";
+               $title.=$self->T("perfect");
+            }
+            elsif ($refrec->{uservotelevel}<-1000){
+               $state="bad";
+               $title.=$self->T("untrustworthy");
+            }
+            elsif ($refrec->{uservotelevel}<-600){
+               $state="red";
+               $title.=$self->T("bad");
+            }
+            elsif ($refrec->{uservotelevel}<-100){
+               $state="yellow";
+               $title.=$self->T("dubious");
             }
             else{
-               $html="<b>bad</b><br>I:$refrec->{uservotelevel}<br>";
+               $state="green";
+               $title.=$self->T("OK");
             }
+
+
+
+            $html="<img style='margin-bottom:2px' title='${title}' ".
+                  "src='%ROOT%/base/load/doc-${state}.gif'><br>";
             
             $html.=$self->extendCurrentRating($refrec->{uservotelevel});
             $uservotelevel=$refrec->{uservotelevel};
