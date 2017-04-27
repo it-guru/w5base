@@ -213,7 +213,7 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   if (!$self->IsMemberOf("admin")) {
+   if (!$self->IsMemberOf([qw(admin itil.applwallet.read)]) {
       my $userid=$self->getCurrentUserId();
 
       my $applobj=getModuleObject($self->Config,'itil::appl');
