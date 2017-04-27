@@ -174,7 +174,7 @@ sub getPosibleActions
          push(@l,"takeover");
       }
       else{
-         if ($app->IsMemberOf(["admin","admin.workflow"])){
+         if ($app->IsMemberOf(["admin","w5base.base.workflow"])){
             push(@l,"takeover");
          }
       }
@@ -185,7 +185,7 @@ sub getPosibleActions
       }
    }
    if ($WfRec->{owner} ne $userid && 
-       $app->IsMemberOf(["admin","admin.workflow"])){
+       $app->IsMemberOf(["admin","w5base.base.workflow"])){
       push(@l,"takeover");
    }
 

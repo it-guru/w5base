@@ -297,7 +297,7 @@ sub new
       ]
    };
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.finance.costcenter"],
+                         activator=>["admin","w5base.finance.costcenter"],
                          uniquesize=>20};
    $self->setDefaultView(qw(name fullname cistatus mdate));
    $self->setWorktable("costcenter");

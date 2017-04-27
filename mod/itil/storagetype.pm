@@ -108,7 +108,7 @@ sub new
    $self->setDefaultView(qw(name cistatus cdate mdate));
    $self->setWorktable("storagetype");
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.storagetype"],
+                         activator=>["admin","w5base.itil.storagetype"],
                          uniquesize=>20};
    return($self);
 }

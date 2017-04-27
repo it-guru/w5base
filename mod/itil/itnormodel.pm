@@ -118,7 +118,7 @@ sub new
    $self->setDefaultView(qw(name nettobruttoratio slaavail cistatus cdate mdate));
    $self->setWorktable("itnormodel");
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.itnormodel"],
+                         activator=>["admin","w5base.itil.itnormodel"],
                          uniquesize=>40};
    return($self);
 }

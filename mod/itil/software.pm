@@ -469,7 +469,7 @@ sub new
    );
    $self->setDefaultView(qw(name id cistatus mdate cdate));
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.software",
+                         activator=>["admin",
                                      "w5base.softwaremgmt.admin"],
                          uniquesize=>255};
    $self->{history}={

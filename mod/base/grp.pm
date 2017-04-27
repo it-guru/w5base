@@ -345,7 +345,7 @@ sub new
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->{CI_Handling}={uniquename=>"fullname",
                          altname=>'name',
-                         activator=>["admin","admin.base.grp"],
+                         activator=>["admin","w5base.base.grp"],
                          uniquesize=>255};
 
    $self->setWorktable("grp");

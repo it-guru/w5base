@@ -106,7 +106,7 @@ sub new
                 subeditmsk    =>'subedit.asset',
                 vjointo       =>'itil::lnkitfarmasset',
                 vjoinon       =>['id'=>'itfarmid'],
-                vjoindisp     =>['asset','assetcistatus','comments']),
+                vjoindisp     =>['assetfullname','assetcistatus','comments']),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
@@ -222,7 +222,7 @@ sub new
       ]
    };
    $self->{CI_Handling}={uniquename=>"fullname",
-                         activator=>["admin","admin.itil.itfarm"],
+                         activator=>["admin","w5base.itil.itfarm"],
                          uniquesize=>255};
    return($self);
 }

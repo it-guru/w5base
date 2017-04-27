@@ -125,7 +125,7 @@ sub new
    $self->setDefaultView(qw(name nettobruttoratio slaavail cistatus cdate mdate));
    $self->setWorktable("storageclass");
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.storageclass"],
+                         activator=>["admin","w5base.itil.storageclass"],
                          uniquesize=>40};
    return($self);
 }

@@ -264,7 +264,7 @@ sub new
    );
    $self->setDefaultView(qw(mapprio queryfrom dataobj fullname comments));
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.iomap"],
+                         activator=>["admin","w5base.base.iomap"],
                          uniquesize=>255};
    $self->{history}={
       update=>[

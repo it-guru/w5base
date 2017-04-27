@@ -159,7 +159,7 @@ sub new
       ]
    };
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.base.workprocess"],
+                         activator=>["admin","w5base.base.workprocess"],
                          uniquesize=>80};
    $self->setDefaultView(qw(mandator name cistatus mdate));
    $self->setWorktable("workprocess");

@@ -165,7 +165,7 @@ sub new
    $self->setDefaultView(qw(name cistatus mdate));
    $self->setWorktable("network");
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.network"],
+                         activator=>["admin","w5base.itil.network"],
                          uniquesize=>255};
    return($self);
 }

@@ -239,7 +239,7 @@ sub new
       ]
    };
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.finance.ipnet"],
+                         activator=>["admin","w5base.finance.ipnet"],
                          uniquesize=>20};
    $self->setDefaultView(qw(name fullname cistatus mdate));
    $self->setWorktable("ipnet");

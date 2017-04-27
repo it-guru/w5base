@@ -260,7 +260,7 @@ sub new
    $self->setDefaultView(qw(name cistatus grouptype cdate mdate));
    $self->setWorktable("mgmtitemgroup");
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.mgmtitemgroup"],
+                         activator=>["admin","w5base.itil.mgmtitemgroup"],
                          uniquesize=>255};
    return($self);
 }

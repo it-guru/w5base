@@ -52,7 +52,7 @@ sub isPostReflector
    if (defined($rec) && 
        ref($rec->{affectedapplicationid}) eq "ARRAY" &&
        $#{$rec->{affectedapplicationid}}!=-1 &&
-       $self->getParent->IsMemberOf("admin","admin.cod")){
+       $self->getParent->IsMemberOf("admin","w5base.cod")){
       return(1);
    }
    else{

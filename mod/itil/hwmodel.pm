@@ -152,7 +152,7 @@ sub new
    $self->setDefaultView(qw(name producer cistatus cdate mdate));
    $self->setWorktable("hwmodel");
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.hwmodel"],
+                         activator=>["admin","w5base.itil.hwmodel"],
                          uniquesize=>255};
    return($self);
 }

@@ -935,7 +935,7 @@ sub getAdditionalMainButtons
 #
 #   if ($WfRec->{stateid}==17){
 #      if ($self->IsIncidentManager($WfRec) || 
-#          $self->getParent->IsMemberOf(["admin","admin.workflow"])){
+#          $self->getParent->IsMemberOf(["admin","w5base.base.workflow"])){
 #         push(@l,"rootcausei");
 #      }
 #   }

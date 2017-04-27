@@ -330,7 +330,7 @@ sub new
       ]
    };
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.servicesupport"],
+                         activator=>["admin","w5base.itil.servicesupport"],
                          uniquesize=>255};
    return($self);
 }

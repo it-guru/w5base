@@ -1229,7 +1229,7 @@ sub getPosibleActions
        $WfRec->{openuser}==$userid) || 
        $teammember!=0 || 
         $self->IsIncidentManager($WfRec) ||
-        $self->getParent->IsMemberOf(["admin","admin.workflow"])){
+        $self->getParent->IsMemberOf(["admin","w5base.base.workflow"])){
       push(@l,"addnote");
       push(@l,"timemod");
       if ($WfRec->{eventend} ne ""){
@@ -1239,7 +1239,7 @@ sub getPosibleActions
    if ($WfRec->{state}>=21){
       if (
        # $self->IsIncidentManager($WfRec) ||
-          $self->getParent->IsMemberOf(["admin","w5base.workflow.admin"])){
+          $self->getParent->IsMemberOf(["admin","w5base.base.workflow"])){
          push(@l,"reactivate");
       }
    }

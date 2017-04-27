@@ -137,7 +137,7 @@ sub new
       ]
    };
    $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","admin.itil.osrelease"],
+                         activator=>["admin","w5base.softwaremgmt.admin"],
                          uniquesize=>255};
    return($self);
 }
