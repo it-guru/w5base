@@ -13,7 +13,6 @@ http://www.debian.org/
 http://www.debian.org/releases/stable/installmanual
 
 
-
 Installation of W5Base on Debian 5.0 (Lenny):
 =============================================
 total diskspace needed (incl. os) : 4GB
