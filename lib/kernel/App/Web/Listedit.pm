@@ -1645,6 +1645,12 @@ sub Detail
    my $self=shift;
    my %param=@_;
 
+   if ($ENV{REQUEST_METHOD} eq "GET"){  # try to convert GET to POST
+      my %param=Query->MultiVars();
+      $self->HtmlGoto("Detail",post=>\%param);
+      return();
+   }
+
    my %flt=$self->getSearchHash();
 
    if (!%flt) {

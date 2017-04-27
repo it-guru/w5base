@@ -437,7 +437,10 @@ function setTitle()
             var newpath=parent.location.pathname;
             //newpath=newpath.replace(/\\/Detail/,'/ById/${id}'); // not works 
                                                                   // in IE
-            parent.history.pushState({},document.title, newpath);
+            
+            //parent.history.pushState({},document.title, newpath); // makes 
+                                                                    // Strg+R
+                                                                    // not work
          }
       } 
       parent.document.title=t.innerHTML;
@@ -462,6 +465,17 @@ $sfocus
 <div style="display:none;visibility:hidden;" id=WindowTitle>$titlestring</div>
 EOF
 
+      my $PlugCode;
+      #my $PlugCode=$app->getTemplate("tmpl/PlugCode","base");
+      #my $PlugCode=$app->getTemplate("tmpl/PlugCode","base");
+      #{
+      #   my %param=(id               =>$id,
+      #              current          =>$rec,
+      #              currentid        =>$currentid);
+      #   $self->ParseTemplateVars(\$PlugCode,\%param);
+      #}
+
+
       $template{"header"}=<<EOF;
 <a name="index"></a>
 <div style="height:4px;border-width:0;overflow:hidden">&nbsp;</div>
@@ -471,8 +485,10 @@ EOF
 <td rowspan=2 width=1%>$ByIdLinkStart$recordimg$ByIdLinkEnd</a></td>
       <td class=detailtopline>
 <table border=0 cellspacing=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
-<td class=detailtopline align=left>$H
-</td></tr></table>
+<td class=detailtopline align=left>${H}</td>
+</tr>
+<tr><td>${PlugCode}</td></tr>
+</table>
 </td>
       </tr><tr>
       <td class=detailtopline align=right>$subheader</td>
