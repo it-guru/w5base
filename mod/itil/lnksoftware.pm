@@ -1246,8 +1246,8 @@ sub FinishWrite
                     "A new software installation was made by %s .\n\n".
                     "%s\n%s\n\n".
                     "If this is plausible to you, there is no todo and you ".
-                    "can ignore this message. If not, contact %s and to ".
-                    "clarify the this topic.";
+                    "can ignore this message. If not, contact %s to ".
+                    "clarify this topic.";
                     
             $wfa->Notify("INFO",
                   $self->T("create of software installation record").
