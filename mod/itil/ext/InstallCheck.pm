@@ -36,7 +36,7 @@ sub getMandatoryModules
    my $self=shift;
 
 
-   return qw(NetAddr::IP URI URI::URL);
+   return qw(NetAddr::IP URI URI::URL Crypt::OpenSSL::X509);
 }
 
 
