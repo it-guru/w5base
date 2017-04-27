@@ -719,44 +719,54 @@ sub AutoDiscFormatEntry
             }
          }
          if ($rec->{isclusternode}){
-            $d.="<option value=''></option>";
-            $d.="<option value='newClustInst'>".
-                 $self->T('new software installation on Cluster-Services').
-                "</option>";
-            my $oldparent=undef;
-            foreach my $swi (sort({
-                               $control->{software}->{byid}->{$a}->{fullname} 
-                                 <=>
-                               $control->{software}->{byid}->{$b}->{fullname} 
-                             } keys(%{$control->{software}->{byid}}))){
-               if ($control->{software}->{byid}->{$swi}->{typ} eq "clust"){
-                  my $foundmap=0;
-                  foreach my $me (@{$control->{admap}}){
-                     if ($adrec->{engineid} eq $me->{engineid} &&
-                         $adrec->{scanname} eq $me->{scanname} &&
-                         $control->{software}->{byid}->{$swi}->{softwareid} eq 
-                           $me->{softwareid}){
-                        $foundmap++;
-                     }
-                  }
-                  if ($foundmap){
-                     if ($oldparent ne 
-                         $control->{software}->{byid}->{$swi}->{parent}){
-                        if ($oldparent ne ""){
-                           $d.="</optgroup>";
-                        }
-                        $oldparent=
-                         $control->{software}->{byid}->{$swi}->{parent};
-                        $d.="<optgroup label=\"".$oldparent."\">";
-                     }
-                     $d.="<option value='$swi'>".
-                         $control->{software}->{byid}->{$swi}->{fullname}.
-                         "</option>";
-                  }
+            my $hasclustservice=0;
+            foreach my $swi (keys($control->{software}{byid})) {
+               if ($control->{software}{byid}{$swi}{typ} eq 'clust') {
+                  $hasclustservice++;
+                  last;
                }
             }
-            if ($oldparent ne ""){
-               $d.="</optgroup>";
+
+            if ($hasclustservice) {
+               $d.="<option value=''></option>";
+               $d.="<option value='newClustInst'>".
+                    $self->T('new software installation on Cluster-Services').
+                   "</option>";
+               my $oldparent=undef;
+               foreach my $swi (sort({
+                                $control->{software}->{byid}->{$a}->{fullname}
+                                 <=>
+                                $control->{software}->{byid}->{$b}->{fullname} 
+                                } keys(%{$control->{software}->{byid}}))){
+                  if ($control->{software}->{byid}->{$swi}->{typ} eq "clust"){
+                     my $foundmap=0;
+                     foreach my $me (@{$control->{admap}}){
+                        if ($adrec->{engineid} eq $me->{engineid} &&
+                            $adrec->{scanname} eq $me->{scanname} &&
+                            $control->{software}->{byid}
+                               ->{$swi}->{softwareid} eq $me->{softwareid}){
+                           $foundmap++;
+                        }
+                     }
+                     if ($foundmap){
+                        if ($oldparent ne 
+                            $control->{software}->{byid}->{$swi}->{parent}){
+                           if ($oldparent ne ""){
+                              $d.="</optgroup>";
+                           }
+                           $oldparent=
+                            $control->{software}->{byid}->{$swi}->{parent};
+                           $d.="<optgroup label=\"".$oldparent."\">";
+                        }
+                        $d.="<option value='$swi'>".
+                            $control->{software}->{byid}->{$swi}->{fullname}.
+                            "</option>";
+                     }
+                  }
+               }
+               if ($oldparent ne ""){
+                  $d.="</optgroup>";
+               }
             }
          }
          $d.="</select>";
