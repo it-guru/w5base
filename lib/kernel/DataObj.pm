@@ -3897,6 +3897,22 @@ sub DataObj_findtemplvar
             return($fieldbase->{$var}->FormatedDetail($current,"edit",%FOpt));
          }
       }
+      if ($param[0] eq "jsonlatin" || $param[0] eq "json"){
+         eval('use JSON;$self->{JSON}=new JSON;');
+         if ($@ ne ""){
+            return(undef);
+         }
+         if ($param[0] eq "jsonlatin"){
+            $self->{JSON}->utf8(0);
+            $self->{JSON}->property(latin1=>1);
+         }
+         if ($param[0] eq "json"){
+            $self->{JSON}->utf8(1);
+            $self->{JSON}->property(utf8=>1);
+         }
+         my $d=$self->{JSON}->encode([$current->{$var}]);
+         return($d);
+      }
       if ($param[0] eq "storedworkspace"){
          return($fieldbase->{$var}->FormatedStoredWorkspace());
       }

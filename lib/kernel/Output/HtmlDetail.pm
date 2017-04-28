@@ -465,16 +465,28 @@ $sfocus
 <div style="display:none;visibility:hidden;" id=WindowTitle>$titlestring</div>
 EOF
 
+      #######################################################################
+      # PlugCode Implementation
       my $PlugCode;
-      #my $PlugCode=$app->getTemplate("tmpl/PlugCode","base");
-      #my $PlugCode=$app->getTemplate("tmpl/PlugCode","base");
-      #{
-      #   my %param=(id               =>$id,
-      #              current          =>$rec,
-      #              currentid        =>$currentid);
-      #   $self->ParseTemplateVars(\$PlugCode,\%param);
-      #}
+      my $userid=$self->getParent->getParent->getCurrentUserId();
+      my $po=$self->getParent->getParent->
+             getPersistentModuleObject("base::lnkuserw5plug");
+      my @parent=($self->getParent->getParent->Self(),
+                  $self->getParent->getParent->SelfAsParentObject());
 
+      $po->SetFilter({userid=>\$userid,parentobj=>\@parent});
+
+      foreach my $prec ($po->getHashList(qw(plugname plugcode))){
+         $PlugCode.="function W5Plug_".$prec->{plugname}."(){\n";
+         $PlugCode.=$prec->{plugcode};
+         $PlugCode.="\n}\n";
+         $PlugCode.="addEvent(window,'load',W5Plug_".$prec->{plugname}.");\n";
+      }
+      if ($PlugCode ne ""){
+         $PlugCode="<div id=PlugCode><br></div>".
+                   "<script language=\"JavaScript\">".$PlugCode."</script>";
+      }
+      #######################################################################
 
       $template{"header"}=<<EOF;
 <a name="index"></a>

@@ -54,6 +54,8 @@
 'sysadm.user.mailsig.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.user.infoabo'=>{de=>'Informations-Abo',en=>'Info-Abo'},
 'sysadm.user.infoabo.new'=>{de=>'Neueingabe',en=>'New'},
+'sysadm.user.plug'=>{de=>'W5Plug',en=>'W5Plug'},
+'sysadm.user.plug.lnkuser'=>{de=>'Verkn. Kontakt',en=>'Lnk. Contact'},
 'sysadm.user.subst'=>{de=>'Vertreterregelungen',en=>'Substitutions'},
 'sysadm.user.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.user.lnkcontact'=>{de=>'Kontaktverknüpfungen',en=>'Contactlinks'},

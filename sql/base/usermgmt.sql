@@ -391,3 +391,39 @@ CREATE TABLE userquerybreak (
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (id),key(userid),key(createdate)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE w5plug (
+  id         bigint(20) NOT NULL,
+  dataobj    varchar(80) NOT NULL,
+  plugmode   varchar(80) default 'HtmlDetail',
+  name       varchar(80) NOT NULL,
+  plugcode   longtext   default NULL,
+  comments   longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  UNIQUE KEY name (name),
+  key(createdate)
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE lnkuserw5plug (
+  id         bigint(20) NOT NULL,
+  plugid     bigint(20) NOT NULL,
+  userid     bigint(20) NOT NULL,
+  active     int(1)     default '1',
+  comments   longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  UNIQUE KEY u (userid,plugid),
+  KEY plutg (plugid),
+  key(createdate),
+  FOREIGN KEY fk_user (userid) REFERENCES contact (userid) ON DELETE CASCADE,
+  FOREIGN KEY fk_user (plugid) REFERENCES w5plug (id) ON DELETE CASCADE
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;

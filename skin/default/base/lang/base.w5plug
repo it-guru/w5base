@@ -1,0 +1,5 @@
+'base::w5plug'=>{de=>'W5Base Frontend Plug',en=>'W5Base Frontend Plug'},
+'Label'=>{de=>'Plug Bezeichnung'},
+'Note'=>{de=>'Bemerkungen'},
+'parent object'=>{de=>'Datenobjekt'},
+

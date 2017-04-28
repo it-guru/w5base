@@ -142,6 +142,16 @@ sub Init
                       func=>'Main',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sysadm.user.plug",
+                      "base::w5plug",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("sysadm.user.plug.lnkuser",
+                      "base::lnkuserw5plug",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.useraccount",
                       "base::useraccount",
                       defaultacl=>['admin']);
