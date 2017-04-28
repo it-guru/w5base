@@ -243,7 +243,7 @@ sub checkSSL
                                    SSL_version=>'SSLv23',
                                    SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
-                                   SSL_session_cache_size=>1);
+                                   SSL_session_cache_size=>0);
    #my $errstr=IO::Socket::SSL->errstr();
    #msg(ERROR,"connet error: $errstr");
    if (!defined($sock)){
@@ -252,7 +252,7 @@ sub checkSSL
                                    SSL_version=>'SSLv2',
                                    SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
-                                   SSL_session_cache_size=>1);
+                                   SSL_session_cache_size=>0);
      # my $errstr=IO::Socket::SSL->errstr();
      # msg(ERROR,"connet error: $errstr");
    }
@@ -262,7 +262,7 @@ sub checkSSL
                                    SSL_version=>'SSLv23',
                                    SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
-                                   SSL_session_cache_size=>1);
+                                   SSL_session_cache_size=>0);
      # my $errstr=IO::Socket::SSL->errstr();
      # msg(ERROR,"connet error: $errstr");
    }
@@ -275,7 +275,7 @@ sub checkSSL
       msg(INFO,"Step2.2: try to connect over proxy %s",$proxy);
       $sock=new Net::ProxySSLconnect(PeerAddr=>"$host:$port",
                                      SSL_verify_mode=>'SSL_VERIFY_NONE',
-                                     SSL_session_cache_size=>1,
+                                     SSL_session_cache_size=>0,
                                      Proxy=>$proxy);
    }
 
@@ -337,9 +337,9 @@ sub checkSSL
    ### $begin_date_str
 
 
-   #$sock->close(SSL_fast_shutdown=>1);  # Ich weis nicht mehr, warum ich
-                                         # das rein hatte (HV)
-   $sock->close();
+   $sock->close(SSL_fast_shutdown=>1);  # Ich weis nicht mehr, warum ich
+                                        # das rein hatte (HV)
+   #$sock->close();
 
    my $sslbegin=$self->getParent->ExpandTimeExpression($begin_date,'en','GMT');
    my $sslend=$self->getParent->ExpandTimeExpression($expire_date,'en','GMT');
