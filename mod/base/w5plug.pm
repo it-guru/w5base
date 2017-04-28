@@ -37,8 +37,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                uivisible     =>0,
-                sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'w5plug.id'),
                                                   
