@@ -129,6 +129,7 @@ sub qcheckRecord
                        $rec->{'cistatusid'}!=3);
    if ($rec->{'sslurl'} ne "" &&  # Eckige Klammern verhindern den autoscan
        !($rec->{'sslurl'}=~m/^\[.+\]$/)){
+      my $newrec={};
       my $sslurl=$rec->{'sslurl'};
       my $sslstate=$rec->{'sslstate'};
       my $sslend=$rec->{'sslend'};
@@ -158,7 +159,8 @@ sub qcheckRecord
          msg(DEBUG,"check %s",$rec->{fullname});
          eval('use Net::SSLeay;
                use IO::Socket::SSL;use Date::Parse;use Carp;
-               ($msg,$sslbegin,$sslend)=$self->checkSSL($sslhost,$sslport);'); 
+               ($msg,$sslbegin,$sslend)=
+                        $self->checkSSL($sslhost,$sslport,$newrec);'); 
          if ($@ ne ""){
             msg(INFO,"message from eval in checkSSL $@");
             $sslstate=$@;
@@ -172,7 +174,8 @@ sub qcheckRecord
       }
       if ($sslstate ne ""){
          my $now=NowStamp("en");
-         my $newrec={sslcheck=>$now,sslstate=>$sslstate};
+         $newrec->{sslcheck}=$now;
+         $newrec->{sslstate}=$sslstate;
          if (defined($sslend)){
             $newrec->{sslend}=sprintf("%s",$sslend);
          }
@@ -189,6 +192,7 @@ sub qcheckRecord
          $newrec->{editor}=$rec->{editor};
 
          my $swop=$dataobj->Clone();
+         #print STDERR Dumper($newrec);
          $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
 
          my $errorlevel=0;
@@ -231,6 +235,7 @@ sub checkSSL
    my $self=shift;
    my $host=shift;
    my $port=shift;
+   my $newrec=shift;
 
    msg(INFO,"Step2: try to connect to %s:%s SSLv3",$host,$port);
    Env::C::setenv("HTTPS_VERSION","3",1);
@@ -238,7 +243,7 @@ sub checkSSL
                                    SSL_version=>'SSLv23',
                                    SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
-                                   SSL_session_cache_size=>0);
+                                   SSL_session_cache_size=>1);
    #my $errstr=IO::Socket::SSL->errstr();
    #msg(ERROR,"connet error: $errstr");
    if (!defined($sock)){
@@ -247,7 +252,7 @@ sub checkSSL
                                    SSL_version=>'SSLv2',
                                    SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
-                                   SSL_session_cache_size=>0);
+                                   SSL_session_cache_size=>1);
      # my $errstr=IO::Socket::SSL->errstr();
      # msg(ERROR,"connet error: $errstr");
    }
@@ -257,7 +262,7 @@ sub checkSSL
                                    SSL_version=>'SSLv23',
                                    SSL_verify_mode=>'SSL_VERIFY_NONE',
                                    Timeout=>10,
-                                   SSL_session_cache_size=>0);
+                                   SSL_session_cache_size=>1);
      # my $errstr=IO::Socket::SSL->errstr();
      # msg(ERROR,"connet error: $errstr");
    }
@@ -270,7 +275,7 @@ sub checkSSL
       msg(INFO,"Step2.2: try to connect over proxy %s",$proxy);
       $sock=new Net::ProxySSLconnect(PeerAddr=>"$host:$port",
                                      SSL_verify_mode=>'SSL_VERIFY_NONE',
-                                     SSL_session_cache_size=>0,
+                                     SSL_session_cache_size=>1,
                                      Proxy=>$proxy);
    }
 
@@ -280,13 +285,20 @@ sub checkSSL
    msg(INFO,"Step3: try to load peer_certificate");
    my $cert = $sock->peer_certificate();
 
-   if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
-      my $dmp = $sock->dump_peer_certificate();
-      printf STDERR ("\nCert:\n%s\n\n",$dmp);
-      my $version = $sock->get_sslversion(); 
-      printf STDERR ("\nVersion:\n%s\n\n",$version);
-      my $cipher  = $sock->get_cipher(); 
-      printf STDERR ("\nChipher:\n%s\n\n",$cipher);
+   if (1){
+
+      my $certdump;
+      eval('$certdump=$sock->dump_peer_certificate();');
+      $newrec->{ssl_certdump}=$certdump if ($@ eq "");
+
+      my $version;
+      eval('$version = $sock->get_sslversion();');
+      $newrec->{ssl_version}=$version if ($@ eq "");
+  
+      my $cipher;
+      eval('$cipher=$sock->get_cipher();');
+      $newrec->{ssl_cipher}=$cipher if ($@ eq "");
+
    }
 
    my ($begin_date,$expire_date)=();
@@ -301,13 +313,33 @@ sub checkSSL
       msg(INFO,"Step6: date extraction done");
       $begin_date  = DateTime->from_epoch(epoch => str2time($beginDate));
       $expire_date = DateTime->from_epoch(epoch => str2time($expireDate));
+
+      my $certserial;
+      eval('$certserial=Net::SSLeay::X509_get_serialNumber($cert);');
+      $newrec->{ssl_cert_serialno}=
+         Net::SSLeay::P_ASN1_INTEGER_get_hex($certserial) if ($@ eq "");
+      if (main->can("Net::SSLeay::P_X509_get_signature_alg")){
+         my $cert_signature_algo;
+         eval('$cert_signature_algo=
+            Net::SSLeay::OBJ_obj2txt(
+               Net::SSLeay::P_X509_get_signature_alg($cert)
+            );
+         ');
+         $newrec->{ssl_cert_signature_algo}=$cert_signature_algo if ($@ eq "");
+      }
+      else{
+         $newrec->{ssl_cert_signature_algo}='need Net::SSLeay update to detect';
+      }
    }
    else{
       return("invalid peer cert response");
    }
    ### $begin_date_str
 
-   $sock->close(SSL_fast_shutdown=>1);
+
+   #$sock->close(SSL_fast_shutdown=>1);  # Ich weis nicht mehr, warum ich
+                                         # das rein hatte (HV)
+   $sock->close();
 
    my $sslbegin=$self->getParent->ExpandTimeExpression($begin_date,'en','GMT');
    my $sslend=$self->getParent->ExpandTimeExpression($expire_date,'en','GMT');

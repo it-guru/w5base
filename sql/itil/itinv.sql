@@ -114,8 +114,8 @@ create table system (
 create table asset (
   id         bigint(20) NOT NULL,
   name       varchar(40) default NULL,
-  cistatus   int(2)      NOT NULL,
-    mandator       bigint(20)  default NULL,
+  cistatus   int(2)      NOT NULL,class varchar(20) default 'NATIVE',
+    mandator       bigint(20)  default NULL,classagg varchar(40),
     guardian       bigint(20)  default NULL,
     guardian2      bigint(20)  default NULL,
     guardianteam   bigint(20)  default NULL,
@@ -1587,3 +1587,25 @@ create table lnkitfarmasset (
   FOREIGN KEY fk_asset (asset)   REFERENCES asset (id) ON DELETE RESTRICT,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
+create table lnkassetasset (
+  id         bigint(20) NOT NULL,
+  passet     bigint(20) NOT NULL,
+  casset     bigint(20) NOT NULL,
+  additional longtext   default NULL,
+  comments   longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY casset (casset),
+  FOREIGN KEY fk_casset (casset) REFERENCES asset (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_passet (passet) REFERENCES asset (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=INNODB;
+alter table swinstance add ssl_cipher varchar(40) default NULL,add ssl_certserial varchar(40) default NULL,add ssl_version varchar(40) default NULL,add ssl_certdump longtext   default NULL,add ssl_certsighash varchar(40) default NULL;

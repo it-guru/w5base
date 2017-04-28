@@ -579,6 +579,41 @@ sub new
                 label         =>'SSL State',
                 dataobjattr   =>'swinstance.ssl_state'),
 
+      new kernel::Field::Text(
+                name          =>'ssl_cipher',
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'detected SSL Cipher',
+                dataobjattr   =>'swinstance.ssl_cipher'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_version',
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'detected SSL Version',
+                dataobjattr   =>'swinstance.ssl_version'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_certdump',
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'detected SSL Certificate',
+                dataobjattr   =>'swinstance.ssl_certdump'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_cert_serialno',
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'detected SSL Certificate Serial',
+                dataobjattr   =>'swinstance.ssl_certserial'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_cert_signature_algo',
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'detected SSL Certificate signature algo',
+                dataobjattr   =>'swinstance.ssl_certsighash'),
+
       new kernel::Field::Date(
                 name          =>'sslexpnotify1',
                 history       =>0,
@@ -987,6 +1022,11 @@ sub Validate
       $newrec->{sslbegin}=undef;
       $newrec->{sslend}=undef;
       $newrec->{sslstate}=undef;
+      $newrec->{ssl_cipher}=undef;
+      $newrec->{ssl_version}=undef;
+      $newrec->{ssl_certdump}=undef;
+      $newrec->{ssl_cert_serialno}=undef;
+      $newrec->{ssl_cert_signature_algo}=undef;
       $newrec->{sslcheck}=undef;
    }
    if (effChanged($oldrec,$newrec,"systemid") &&  # reset software inst

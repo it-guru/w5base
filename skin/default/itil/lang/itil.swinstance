@@ -67,3 +67,8 @@
 'is DBS (Databasesystem) instance'=>{de=>'ist DBS (Datenbanksystem) Instanz'},
 'is DMS (Documentmanagement) instance'=>{de=>'ist DMS (Dokumentenmanagement) Instanz'},
 'is MW (Middleware) instance'=>{de=>'ist MW (Middleware) Instanz'},
+'detected SSL Cipher'=>{de=>'erkanntes SSL Verschlüsselungsverfahren'},
+'detected SSL Version'=>{de=>'erkanntes SSL Version'},
+'detected SSL Certificate'=>{de=>'erkanntes SSL Zertifikat'},
+'detected SSL Certificate Serial'=>{de=>'erkanntes SSL Zertifikat Seriennummer'},
+'detected SSL Certificate signature algo'=>{de=>'erkanntes SSL Zertifikat Signatur Algo'},
