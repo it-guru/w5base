@@ -192,7 +192,12 @@ sub doReplaceOperation
    my $opdataobj=getModuleObject($self->getParent->Config,$data->{dataobj});
    if (defined($dataobj)){
       my $idname=$dataobj->IdField->Name();
-      my %flt=($data->{idfield}=>\$searchid);
+      my %flt;
+      if (exists($data->{baseflt}) && ref($data->{baseflt}) eq "HASH"){
+         %flt=%{$data->{baseflt}};
+      }
+      $flt{$data->{idfield}}=\$searchid;
+
       my $cistatusobj=$dataobj->getField("cistatusid");
       if (defined($cistatusobj)){
          $flt{cistatusid}='<=5';

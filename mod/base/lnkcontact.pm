@@ -407,7 +407,6 @@ sub SecureSetFilter
 
 
 
-
 sub getPostibleRoleValues
 {
    my $self=shift;
@@ -483,7 +482,9 @@ sub Validate
       return(0);
    }
    if (defined($self->{secparentobj}) && $parentobj ne $self->{secparentobj}){
-      $self->LastMsg(ERROR,"invalid write request to requested parentobj");
+      my $msg=sprintf("invalid write request to requested parentobj=%s on ".
+                      "secparentobj=%s",$parentobj,$self->{secparentobj});
+      $self->LastMsg(ERROR,$msg);
       return(0);
    }
    if (!defined($refid) || $refid eq ""){

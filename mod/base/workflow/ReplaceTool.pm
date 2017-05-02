@@ -558,6 +558,7 @@ sub ProcessNext
          $self->LastMsg(ERROR,"no src specified");
          return(0);
       }
+      $f=trim($f);  # remove leading and trailing white spaces
      
       if (my $appl=$srcfield->Validate($WfRec,{$srcfield->Name()=>$f})){
 
@@ -567,6 +568,7 @@ sub ProcessNext
             $self->LastMsg(ERROR,"no dst specified");
             return(0);
          }
+         $f=trim($f);  # remove leading and trailing white spaces
         
          if (my $appl=$dstfield->Validate($WfRec,{$dstfield->Name()=>$f})){
             my $nextstep=$self->getParent->getNextStep($self->Self(),$WfRec);
