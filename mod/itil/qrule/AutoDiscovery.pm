@@ -238,6 +238,9 @@ sub MapAutoDiscoveryPreData
    foreach my $ad (@{$AdPreData}){
       $ad->{valid}=1;
       if ($ad->{section} eq "SOFTWARE"){
+         if ($ad->{scanextra1}=~m#^/mnt/#){
+            $ad->{valid}=0;  # ignore software on /mnt mount point
+         }
          push(@flt,{
             engineid=>\$ad->{engineid},
             scanname=>\$ad->{scanname},
