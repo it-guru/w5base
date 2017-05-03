@@ -253,7 +253,9 @@ sub new
                 htmlwidth     =>'20px',
                 readonly      =>1,
                 label         =>'Rel.Typ',
-                dataobjattr   =>'qlnkapplsystem.reltyp'),
+                dataobjattr   =>"if (qlnkapplsystem.numreltyp='20','cluster',".
+                                "if (qlnkapplsystem.numreltyp='30','instance',".
+                                "'direct'))"),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
@@ -763,6 +765,9 @@ sub getSqlFrom
    #
    my $datasourcerest1="1";
    my $datasourcerest2="system.cistatus<=5 and itclust.cistatus<=5";
+   my $datasourcerest3="system.cistatus<=5 ".
+                       "and swinstance.runonclusts=0 ".
+                       "and swinstance.cistatus<=5";
    if ($mode eq "select"){
       foreach my $f (@filter){
          if (ref($f) eq "HASH"){
@@ -785,10 +790,13 @@ sub getSqlFrom
                              join(",",map({"'".$_."'"} @sysid)).")";
                $datasourcerest2.=" and system.id in (".
                              join(",",map({"'".$_."'"} @sysid)).")";
+               $datasourcerest3.=" and system.id in (".
+                             join(",",map({"'".$_."'"} @sysid)).")";
             }
             if (exists($f->{applid}) && $f->{applid}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.appl='$f->{applid}'";
                $datasourcerest2.=" and lnkitclustsvcappl.appl='$f->{applid}'";
+               $datasourcerest3.=" and swinstance.appl='$f->{applid}'";
             }
             if (exists($f->{applid}) && ref($f->{applid}) eq "SCALAR"){
                $f->{applid}=[${$f->{applid}}];
@@ -798,24 +806,30 @@ sub getSqlFrom
                              join(",",map({"'".$_."'"} @{$f->{applid}})).")";
                $datasourcerest2.=" and lnkitclustsvcappl.appl in (".
                              join(",",map({"'".$_."'"} @{$f->{applid}})).")";
+               $datasourcerest3.=" and swinstance.appl in (".
+                             join(",",map({"'".$_."'"} @{$f->{applid}})).")";
             }
             if (exists($f->{id}) && $f->{id}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.id='$f->{id}'";
                $datasourcerest2.=" and 1=0";
+               $datasourcerest3.=" and 1=0";
             }
             if (exists($f->{id}) && ref($f->{id}) eq "ARRAY" &&
                 $#{$f->{id}}==0 && $f->{id}->[0]=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.id='$f->{id}->[0]'";
                $datasourcerest2.=" and 1=0";
+               $datasourcerest3.=" and 1=0";
             }
             if (exists($f->{id}) && ref($f->{id}) eq "SCALAR" &&
                 ${$f->{id}}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.id='${$f->{id}}'";
                $datasourcerest2.=" and 1=0";
+               $datasourcerest3.=" and 1=0";
             }
             if (exists($f->{systemid}) && $f->{systemid}=~m/^\d+$/){
                $datasourcerest1.=" and lnkapplsystem.system='$f->{systemid}'";
                $datasourcerest2.=" and system.id='$f->{systemid}'";
+               $datasourcerest3.=" and swinstance.system='$f->{systemid}'";
             }
             if (exists($f->{systemid}) && ref($f->{systemid}) eq "SCALAR"){
                $f->{systemid}=[${$f->{systemid}}];
@@ -825,6 +839,8 @@ sub getSqlFrom
                              join(",",map({"'".$_."'"} @{$f->{systemid}})).")";
                $datasourcerest2.=" and system.id in (".
                              join(",",map({"'".$_."'"} @{$f->{systemid}})).")";
+               $datasourcerest3.=" and swinstance.system in (".
+                             join(",",map({"'".$_."'"} @{$f->{systemid}})).")";
             }
          }
       }
@@ -833,6 +849,7 @@ sub getSqlFrom
 
    $datasourcerest1=" where $datasourcerest1" if ($datasourcerest1 ne ""); 
    $datasourcerest2=" where $datasourcerest2" if ($datasourcerest2 ne ""); 
+   $datasourcerest3=" where $datasourcerest3" if ($datasourcerest3 ne ""); 
 
 
    my $datasource=
@@ -852,9 +869,9 @@ sub getSqlFrom
         "lnkapplsystem.srcsys, ".
         "lnkapplsystem.srcid, ".
         "lnkapplsystem.srcload, ".
-        "'direct' reltyp ".
+        "'10' numrawreltyp ".
      "from lnkapplsystem $datasourcerest1 ".
-     "union ".
+     "union all ".
      "select ".
         "null id, ".
         "lnkitclustsvcappl.appl, ".
@@ -872,15 +889,45 @@ sub getSqlFrom
         "lnkitclustsvcappl.srcsys, ".
         "lnkitclustsvcappl.srcid, ".
         "lnkitclustsvcappl.srcload, ".
-        "'cluster' reltyp ".
+        "'20' numrawreltyp ".
      "from lnkitclustsvcappl ".
         "join lnkitclustsvc on lnkitclustsvc.id=lnkitclustsvcappl.itclustsvc ".
         "join itclust on itclust.id=lnkitclustsvc.itclust ".
         "join system on lnkitclustsvc.itclust=system.clusterid ".
         $datasourcerest2." ".
-        "group by system.id,lnkitclustsvcappl.appl";
+        "group by system.id,lnkitclustsvcappl.appl ".
+     "union all ".
+     "select ".
+        "null id, ".
+        "swinstance.appl, ".
+        "system.id system, ".
+        "concat('relation by software instance ',".
+               "swinstance.fullname) comments, ".
+        "null additional, ".
+        "100.0 fraction, ".
+        "swinstance.createdate createdate, ".
+        "swinstance.modifydate, ".
+        "swinstance.createuser, ".
+        "swinstance.modifyuser, ".
+        "swinstance.editor, ".
+        "swinstance.realeditor, ".
+        "swinstance.srcsys, ".
+        "swinstance.srcid, ".
+        "swinstance.srcload, ".
+        "'30' numrawreltyp ".
+     "from swinstance ".
+        "join system on swinstance.system=system.id ".
+        $datasourcerest3." ".
+        "group by system.id";
 
-   my $from="($datasource) qlnkapplsystem left outer join appl ".
+   my $fields="id,appl,system,comments,additional,fraction,createdate,".
+              "createuser,modifyuser,modifydate,".
+              "editor,realeditor,srcsys,srcid,srcload";
+
+   my $from="(select $fields,min(numrawreltyp) numreltyp ".
+            "from ($datasource) qqlnkapplsystem ".
+            "group by system,appl) qlnkapplsystem ".
+            "left outer join appl ".
             "on qlnkapplsystem.appl=appl.id ".
             "left outer join system ".
             "on qlnkapplsystem.system=system.id ".
