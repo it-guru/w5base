@@ -121,7 +121,7 @@ sub isViewValid
    return(1) if ($self->IsMemberOf("admin"));
    return(1) if ($self->IsMemberOf("DTAG.GHQ.VTI.DTIT",
                                    [qw(RCFManager RCFManager2
-                                       RCHManager RCHManager2)],
+                                       RCHManager RCHManager2 RCHOperator)],
                                    "up"));
 
    return(0);
