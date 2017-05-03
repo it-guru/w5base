@@ -18,7 +18,6 @@ package kernel::date;
 #
 use strict;
 use vars qw(@EXPORT @ISA);
-use Data::Dumper;
 use Date::Calc;
 use DateTime;
 use DateTime::Span;
@@ -31,8 +30,10 @@ use Exporter;
 
 sub BEGIN
 {
-   eval('use Env::C;');
-   eval('Env::C::setenv("TZ","GMT",1);');
+   if (defined($ENV{MOD_PERL})){
+      eval('use Env::C;');
+      eval('Env::C::setenv("TZ","GMT",1);');
+   }
    POSIX::tzset();   
 }
 
@@ -42,10 +43,12 @@ sub _tzset
    my $newtz=shift;
    my $oldtz=$ENV{TZ};
    $ENV{TZ}=$newtz;                   # compatible for none Env::C Enviroments
-   eval('Env::C::setenv("TZ",$newtz,1);');  # needed for mod_perl2
-   if ($@){
-      die("ERROR: perl module Env::C not installed - ".
-          "this causes maybee problems!");
+   if (defined($ENV{MOD_PERL})){
+      eval('Env::C::setenv("TZ",$newtz,1);');  # needed for mod_perl2
+      if ($@){
+         die("ERROR: perl module Env::C not installed - ".
+             "this causes maybee problems!");
+      }
    }
    POSIX::tzset();   
    return($oldtz);

@@ -238,7 +238,7 @@ sub checkSSL
    my $newrec=shift;
 
    msg(INFO,"Step2: try to connect to %s:%s SSLv3",$host,$port);
-   Env::C::setenv("HTTPS_VERSION","3",1);
+   $ENV{"HTTPS_VERSION"}="3";
    my $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
                                    SSL_version=>'SSLv23',
                                    SSL_verify_mode=>'SSL_VERIFY_NONE',
