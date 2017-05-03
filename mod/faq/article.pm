@@ -724,10 +724,7 @@ sub getHtmlDetailPageContent
             "type=\"text/css\" media=\"screen\" />";
       #######################################################################
       # Voting GUI Test
-      if ($self->Config->Param("W5BaseOperationMode") eq "test" ||
-          $self->Config->Param("W5BaseOperationMode") eq "dev"){
-         $page.=$self->extendHtmlDetailPageContent("../..",0,$rec);
-      }
+      $page.=$self->extendHtmlDetailPageContent("../..",0,$rec);
       #######################################################################
 
       $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
