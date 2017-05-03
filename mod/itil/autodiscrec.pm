@@ -720,8 +720,8 @@ sub AutoDiscFormatEntry
          }
          if ($rec->{isclusternode}){
             my $hasclustservice=0;
-            foreach my $swi (keys($control->{software}{byid})) {
-               if ($control->{software}{byid}{$swi}{typ} eq 'clust') {
+            foreach my $swi (keys(%{$control->{software}->{byid}})) {
+               if ($control->{software}->{byid}->{$swi}->{typ} eq 'clust') {
                   $hasclustservice++;
                   last;
                }
