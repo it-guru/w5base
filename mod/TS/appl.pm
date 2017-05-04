@@ -95,6 +95,7 @@ sub new
                 name          =>'scapprgroup',
                 label         =>'Change Approvergroup technical',
                 vjoineditbase =>{ischmapprov=>\'1'},
+                uivisible=>0,
                 group         =>'inmchm',
                 AllowEmpty    =>1,
                 htmldetail    =>0,
@@ -105,6 +106,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'scapprgroup2',
                 label         =>'Change Approvergroup business',
+                uivisible=>0,
                 vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
                 AllowEmpty    =>1,
