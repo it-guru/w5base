@@ -48,7 +48,7 @@
 'invalid name specified'=>{de=>'ungültiger Asset Name / AssetID'},
 'Deprecation Start'=>{de=>'Abschreibungsbeginn'},
 'Deprecation End'=>{de=>'Abschreibungsende'},
-"deprend can not be sooner as deprstart"=>{de=>"Abschreibungsende kann nicht vor Abschreibungsbegin liegen"},
+"deprend can not be sooner as deprstart"=>{de=>"Abschreibungsende kann nicht vor Abschreibungsbeginn liegen"},
 'DENUPD.0'=>{de=>'Ja - falls Vorgaben dies notwendig machen',en=>'Yes - if Processes gives presets'},
 'DENUPD.5' =>{de=>'Nein - vorerst nicht',
               en=>'No - for now'},
