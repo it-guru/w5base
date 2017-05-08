@@ -234,48 +234,49 @@ foreach my $apid (@apid){
                }
                if ((!($cmdresult == -1)) && $stat{$apid}->{sysuser} ne ""){
                   my $exitcode=$cmdresult >> 8;
-
-                  my $act=getModuleObject($curconfig,"base::workflowaction");
-                  $act->Cache->{W5Server}=$W5V2::W5Server;
-
-                  if (defined($urec)){
-                     my $blog=getModuleObject($curconfig,
-                                              "base::userquerybreak");
-                     $blog->ValidatedInsertRecord({
-                        userid=>$urec->{userid},
-                        tbreak=>$stat{$apid}->{duration},
-                        dataobj=>$stat{$apid}->{mod},
-                        clientip=>$stat{$apid}->{clientip}
-                     });
-                  }
-                  my %param=(adminbcc=>1,
-                             emailfrom=>'"W5Base Process-Controller" <>');
-                  if (defined($urec)){
-                     $param{emailto}=$urec->{email};
-                  }
-                  my $sitename=$curconfig->Param("SITENAME");
-                  my $d=$act->getParsedTemplate(
-                        "tmpl/w5top.killmessage",{
-                           static=>{
-                              sitename=>$sitename,
-                              modlong=>$modlong,
-                              killtimeout=>$killtimeout,
-                              duration=>$stat{$apid}->{duration},
-                              apid=>$apid
-                           }
+                  if ($curconfig->Param("W5BaseOperationMode") ne "readonly"){
+                     my $act=getModuleObject($curconfig,"base::workflowaction");
+                     $act->Cache->{W5Server}=$W5V2::W5Server;
+               
+                     if (defined($urec)){
+                        my $blog=getModuleObject($curconfig,
+                                                 "base::userquerybreak");
+                        $blog->ValidatedInsertRecord({
+                           userid=>$urec->{userid},
+                           tbreak=>$stat{$apid}->{duration},
+                           dataobj=>$stat{$apid}->{mod},
+                           clientip=>$stat{$apid}->{clientip}
                         });
-                  if ($exitcode==0){
-                     my $subject=sprintf($act->T(
-                        'Kill of query request on module "%s" (PID=%s)',
-                        'kernel::w5top'), $modlong,$apid);
-                     if ($curconfig->Param("W5BaseOperationMode") ne 
-                         "readonly"){
-                        $act->Notify("INFO",$subject,$d,%param);
                      }
-                  }
-                  else{
-                     printf STDERR ("%s\n",$consolemsg);
-                     printf STDERR ("ERROR: exitcode of call was not zero!\n");
+                     my %param=(adminbcc=>1,
+                                emailfrom=>'"W5Base Process-Controller" <>');
+                     if (defined($urec)){
+                        $param{emailto}=$urec->{email};
+                     }
+                     my $sitename=$curconfig->Param("SITENAME");
+                     my $d=$act->getParsedTemplate(
+                           "tmpl/w5top.killmessage",{
+                              static=>{
+                                 sitename=>$sitename,
+                                 modlong=>$modlong,
+                                 killtimeout=>$killtimeout,
+                                 duration=>$stat{$apid}->{duration},
+                                 apid=>$apid
+                              }
+                           });
+                     if ($exitcode==0){
+                        my $subject=sprintf($act->T(
+                           'Kill of query request on module "%s" (PID=%s)',
+                           'kernel::w5top'), $modlong,$apid);
+                        if ($curconfig->Param("W5BaseOperationMode") ne 
+                            "readonly"){
+                           $act->Notify("INFO",$subject,$d,%param);
+                        }
+                     }
+                     else{
+                        printf STDERR ("%s\n",$consolemsg);
+                        printf STDERR ("ERROR: exitcode of call was not zero!\n");
+                     }
                   }
                }
                else{
