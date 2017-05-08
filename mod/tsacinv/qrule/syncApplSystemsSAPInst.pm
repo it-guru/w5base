@@ -265,7 +265,9 @@ sub qcheckRecord
             $applsys->ResetFilter();
             $applsys->SetFilter({systemsystemid=>\$sys2del,
                                  applapplid=>\$rec->{applid}});
-            my ($lnk,$msg)=$applsys->getOnlyFirst('id');
+            my ($lnk,$msg)=$applsys->getOnlyFirst(qw(id reltyp));
+            next if ($lnk->{reltyp} ne 'direct');
+
             my $lnkid=$applsys->ValidatedDeleteRecord($lnk);
             if (defined($lnkid)) {
                my $m='Relation to system removed';
