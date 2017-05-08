@@ -2,3 +2,4 @@
                en=>'T-Systems Campus'},
 'fieldgroup.inm'=>{de=>'Incident-Management',en=>'Incident management'},
 'fieldgroup.chm'=>{de=>'Change-Approver',en=>'Change approver'},
+'Change approver groups'=>{de=>'Change-Approver Gruppen'},
