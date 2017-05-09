@@ -623,6 +623,17 @@ sub new
                 group         =>'source',
                 label         =>'Last-Load',
                 dataobjattr   =>'lnksoftwaresystem.srcload'),
+
+      new kernel::Field::Text(                         # a hidden field, to
+                name          =>'autodischint',        # track relation created
+                htmldetail    =>'0',                   # by AutoDiscManager
+                label         =>'AutoDiscovery Relation',
+                container     =>'additional'),
+                                                   
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                dataobjattr   =>'lnksoftwaresystem.additional'),
                                                    
       new kernel::Field::CDate(
                 name          =>'cdate',

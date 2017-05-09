@@ -217,6 +217,18 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'swinstance.cistatus'),
 
+      new kernel::Field::Text(
+                name          =>'autodischint',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                label         =>'AutoDiscovery Relation',
+                container     =>'additional'),
+
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                dataobjattr   =>'autodiscrec.additional'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -249,6 +261,14 @@ sub new
                 group         =>'source',
                 label         =>'Source-Load',
                 dataobjattr   =>'autodiscrec.srcload'),
+
+      new kernel::Field::Date(                     # information last seen
+                name          =>'backendload',     # from autodiscovery system
+                history       =>0,                 # in backend engine
+                htmldetail    =>'NotEmpty',
+                group         =>'source',
+                label         =>'Backend-Load',
+                dataobjattr   =>'autodiscrec.backendload')
 
    );
    $self->setDefaultView(qw(section scanname scanextra1 scanextra2 discon ));
@@ -428,6 +448,7 @@ sub doTakeAutoDiscData
             my $swi=getModuleObject($self->Config,'itil::lnksoftwaresystem');
             my $version=effVal($oldrec,$newrec,"scanextra2");
             my $instpath=effVal($oldrec,$newrec,"scanextra1");
+            my $autodischint=effVal($oldrec,$newrec,"autodischint");
             my $softwareid=$initrelrec->{softwareid};
             if ($softwareid ne ""){
                #printf STDERR ("fifi 03 mapsel=$mapsel\n");
@@ -436,6 +457,7 @@ sub doTakeAutoDiscData
                       version=>$version,
                       softwareid=>$softwareid,
                       instpath=>$instpath,
+                      autodischint=>$autodischint,
                       quantity=>1
                    })){
                   $exitcode=0;
@@ -453,12 +475,14 @@ sub doTakeAutoDiscData
             my $instpath=effVal($oldrec,$newrec,"scanextra1");
             my $softwareid=$initrelrec->{softwareid};
             my $itclustsvcid=$initrelrec->{itclustsvcid};
+            my $autodischint=effVal($oldrec,$newrec,"autodischint");
             if ($softwareid ne ""){
                if ($mapsel=$swi->SecureValidatedInsertRecord({
                       itclustsvcid=>$itclustsvcid,
                       version=>$version,
                       instpath=>$instpath,
                       softwareid=>$softwareid,
+                      autodischint=>$autodischint,
                       quantity=>1
                    })){
                   $exitcode=0;
@@ -538,6 +562,10 @@ sub doTakeAutoDiscData
             if (trim($swirec->{instpath}) ne $scanextra1){
                $upd{instpath}=trim($scanextra1);
             }
+            my $autodischint=effVal($oldrec,$newrec,"autodischint");
+            if (trim($swirec->{autodischint}) ne $autodischint){
+               $upd{autodischint}=trim($autodischint);
+            }
             if (keys(%upd)){
                if ($o->SecureValidatedUpdateRecord($swirec,
                                                    \%upd,{id=>\$swiid})){
@@ -564,6 +592,12 @@ sub AutoDiscFormatEntry
    my $rec=shift;
    my $adrec=shift;
    my $control=shift;
+
+   my $usertimezone=$ENV{HTTP_FORCE_TZ};
+   if (!defined($usertimezone)){
+      $usertimezone=$self->UserTimezone();
+   }
+
    my $d="<form id='AutoDiscFORM$adrec->{id}'>";
 
    my $s1="";
@@ -618,8 +652,12 @@ sub AutoDiscFormatEntry
       $elabel=$adrec->{enginename};
    }
    $d.=" <b>".$elabel."</b> ";
-   $d.="at";
-   $d.=" <i>".$adrec->{cdate}." GMT</i>. ";
+   $d.=$self->T("at");
+   {
+      my $fld=$self->getField('cdate');
+      my ($dstring)=$fld->FormatedDetail($adrec,"HtmlDetail");
+      $d.=" <i>".$dstring."</i>. ";
+   }
    if ($adrec->{section} eq "SOFTWARE"){
       $d.=$self->T("The Software was detected as");
       $d.=" <b>\"$adrec->{scanname}\"</b> ";
@@ -630,8 +668,17 @@ sub AutoDiscFormatEntry
       
    }
    $d.="<br>";
-   $d.=$self->T("This information was last seen at");
-   $d.=" $adrec->{srcload} GMT";
+   $d.=sprintf($self->T('This information was last seen in %s at'),
+               $adrec->{srcsys});
+   {
+      my $fld=$self->getField('srcload');
+      my ($dstring,$tz)=$fld->getFrontendTimeString("HtmlDetail",
+                                                $adrec->{srcload},
+                                                $usertimezone);
+      $d.=" ".$dstring." $tz ";
+   }
+      
+   #$d.=" ($adrec->{srcload} GMT)";
    if ($adrec->{misscount}>0){
       $d.=" ";
       $d.=$self->T("and was");
@@ -639,7 +686,17 @@ sub AutoDiscFormatEntry
       $d.=" ";
       $d.=$self->T("times not refreshed");
    }
-   $d.=".";
+   $d.=". ";
+   if ($adrec->{backendload} ne ""){
+      $d.=sprintf($self->T('The AutoDiscovery System %s has '.
+                           'detect this information (scandate) at'),
+                           $adrec->{srcsys});
+      {
+         my $fld=$self->getField('backendload');
+         my ($dstring)=$fld->FormatedDetail($adrec,"HtmlDetail");
+         $d.=" ".$dstring.". ";
+      }
+   }
    $d.="</p>";
    if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
       if ($self->IsMemberOf("admin")){

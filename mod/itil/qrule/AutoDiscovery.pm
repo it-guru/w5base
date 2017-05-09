@@ -346,7 +346,9 @@ sub DiscoverData
       processable=>$adrec->{processable},
       entryid=>$adent->{id},
       srcsys=>$engine->{name},
-      srcload=>NowStamp("en")
+      srcload=>NowStamp("en"),
+      backendload=>$adrec->{backendload},
+      autodischint=>$adrec->{autodischint}
    };
 
    if (exists($adrec->{scanextra1})){
@@ -370,11 +372,11 @@ sub DiscoverData
          if ($oldrecs->{$r->{id}}->{misscount}>0){
             $updrec{misscount}=0;
          }
-         if ($oldrecs->{$r->{id}}->{scanextra2} ne $adrec->{scanextra2}){
-            $updrec{scanextra2}=$adrec->{scanextra2};
-         }
-         if ($oldrecs->{$r->{id}}->{processable} ne $adrec->{processable}){
-            $updrec{processable}=$adrec->{processable};
+         foreach my $cmpvar (qw(scanextra2 processable backendload
+                                autodischint)){
+            if ($oldrecs->{$r->{id}}->{$cmpvar} ne $adrec->{$cmpvar}){
+               $updrec{$cmpvar}=$adrec->{$cmpvar};
+            }
          }
          $updrec{srcload}=NowStamp("en");
          if (keys(%updrec)){

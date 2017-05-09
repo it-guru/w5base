@@ -183,7 +183,10 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
                scanextra1=>$swp->{path},
                scanextra2=>$swp->{version},
                quality=>10,    # relativ gut verlässlich
-               processable=>1
+               processable=>1,
+               autodischint=>'HPSA: mwscanner: '.$rec->{systemid}.": ".
+                             $rec->{name}.": SOFTWARE: ".
+                             $swp->{softwarename}
             );
             push(@res,\%e);
          }

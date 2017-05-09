@@ -119,7 +119,8 @@ sub new
                 vjointo       =>'tsacinv::autodiscsoftware',
                 vjoinon       =>['systemdiscoveryid'=>'systemautodiscid'],
                 vjoindisp     =>['software','version','producer'],
-                vjoininhash   =>['software','path','version','producer'],
+                vjoininhash   =>['software','path','version','producer',
+                                 'scandate','id'],
                 vjoinbase     =>{scandate=>">now-14d"}),
 
       new kernel::Field::Date(
@@ -160,7 +161,7 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
    my @res=();
 
    $self->SetCurrentView(qw(name systemid softwareinstallations
-                            ipaddresses));
+                            ipaddresses srcsys systemdiscoveryid));
 
    my ($rec,$msg)=$self->getFirst();
    if (defined($rec)){
@@ -185,7 +186,13 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
                scanextra1=>$path,
                scanextra2=>$s->{version},
                quality=>3,    # relativ schlecht (keine gute Version)
-               processable=>1
+               processable=>1,
+               backendload=>$s->{scandate},
+               autodischint=>$rec->{srcsys}.": ".$rec->{systemdiscoveryid}.
+                             ": ".$rec->{systemid}.
+                             ": ".$rec->{name}.":SOFTWARE :".$s->{id}.": ".
+                             $s->{software}
+                             
             );
             push(@res,\%e);
          }

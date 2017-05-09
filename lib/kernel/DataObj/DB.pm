@@ -358,7 +358,12 @@ sub processFilterHash
             $sqlparam{timezone}=$fo->timezone();
          }
          if (defined($fo->{container})){
-            $sqlparam{containermode}=$fo->{container};
+            my $containername=$fo->{container};
+            my $cont=$self->getField($containername);
+            if (defined($cont) && $cont->{dataobjattr} ne ""){
+               $containername=$cont->{dataobjattr};
+            }
+            $sqlparam{containermode}=$containername;
          }
          if (defined($fo->{uppersearch})){
             $sqlparam{uppersearch}=1;
