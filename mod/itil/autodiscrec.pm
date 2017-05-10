@@ -775,16 +775,14 @@ sub AutoDiscFormatEntry
                }
             }
          }
-         if ($rec->{isclusternode}){
-            my $hasclustservice=0;
-            foreach my $swi (keys(%{$control->{software}->{byid}})) {
-               if ($control->{software}->{byid}->{$swi}->{typ} eq 'clust') {
-                  $hasclustservice++;
-                  last;
-               }
-            }
 
-            if ($hasclustservice) {
+         my @clustsvc;
+         if ($rec->{isclusternode} && $rec->{itclustid} ne "") {
+            my $s=getModuleObject($self->Config,'itil::lnkitclustsvc');
+            $s->SetFilter({clustid=>\$rec->{itclustid}});
+            @clustsvc=$s->getHashList(qw(fullname id));
+
+            if ($#clustsvc!=-1) {
                $d.="<option value=''></option>";
                $d.="<option value='newClustInst'>".
                     $self->T('new software installation on Cluster-Services').
@@ -831,13 +829,11 @@ sub AutoDiscFormatEntry
      
          $d.="<div class='AutoDiscAddForm' id='AutoDiscAddForm$adrec->{id}'>";
          $d.="<table border=0>";
-         if ($rec->{isclusternode}){
+         if ($#clustsvc!=-1){
             $d.="<tr class='newClustInst'><td width=20%>ClusterService:</td>";
             $d.="<td><select name=itclustsvcid>";
             if ($rec->{itclustid} ne ""){
-               my $s=getModuleObject($self->Config,'itil::lnkitclustsvc');
-               $s->SetFilter({clustid=>\$rec->{itclustid}});
-               foreach my $clustsrec ($s->getHashList(qw(fullname id))){
+               foreach my $clustsrec (@clustsvc) {
                   $d.="<option value=\"$clustsrec->{id}\">";
                   $d.="$clustsrec->{fullname}";
                   $d.="</option>";
