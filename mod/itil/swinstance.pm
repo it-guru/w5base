@@ -41,6 +41,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'swinstance.id'),
 

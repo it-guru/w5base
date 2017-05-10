@@ -84,6 +84,11 @@ sub HandleCIStatusModification
       $n{$idfield}="[NULL]";
       $oldrec=\%n;
    }
+   if (!defined($oldrec) && defined($newrec) && 
+       (!defined($newrec->{cistatusid}) || $newrec->{cistatusid} eq "")){
+      msg(INFO,"no cistatus specified - using cistatusid 1 as default");
+      $newrec->{cistatusid}="1";
+   }
 
    my $id=effVal($oldrec,$newrec,$idfield);
    my $cistatusid=effVal($oldrec,$newrec,"cistatusid");

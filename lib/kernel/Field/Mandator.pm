@@ -150,6 +150,18 @@ sub Validate
              $newrec->{$mandatoridname}==0){
             return($self->SUPER::Validate($oldrec,$newrec,$currentstate));
          }
+         # Calc new mandator
+         if (!exists($newrec->{$mandatoridname}) &&  # Allow write on mandator
+              exists($newrec->{$self->Name()})){     # by name on W5API call
+            if (my $nrec=$self->SUPER::Validate($oldrec,$newrec,$currentstate)){
+               foreach my $k (keys(%$nrec)){
+                  $newrec->{$k}=$nrec->{$k};
+               }
+            }
+            else{
+               return(undef);
+            }
+         }
          my @mandators=$app->getMandatorsOf($ENV{REMOTE_USER},"write");
          if (!defined($oldrec)){
             if (!defined($newrec->{$mandatoridname}) ||
