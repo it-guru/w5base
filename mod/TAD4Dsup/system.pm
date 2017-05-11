@@ -142,7 +142,7 @@ from "W5I_system_universum"
         on "tsacinv::system".assetassetid="tsacinv::asset".assetid;
 
 grant select on "W5I_TAD4Dsup__system" to W5I;
-grant update,insert on "W5I_TAD4Dsup__system_of" to W5I;
+grant select,update,insert on "W5I_TAD4Dsup__system_of" to W5I;
 create or replace synonym W5I.TAD4Dsup__system for "W5I_TAD4Dsup__system";
 create or replace synonym W5I.TAD4Dsup__system_of for "W5I_TAD4Dsup__system_of";
 

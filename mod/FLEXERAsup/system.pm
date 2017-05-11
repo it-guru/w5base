@@ -51,7 +51,7 @@ create table "W5I_FLEXERAsup__system_of" (
    constraint "W5I_TAD4Dsup__system_of_pk" primary key (refid)
 );
 
-grant update,insert on "W5I_FLEXERAsup__system_of" to W5I;
+grant select,update,insert on "W5I_FLEXERAsup__system_of" to W5I;
 grant select on "W5I_FLEXERAsup__system_of" to W5_BACKUP_D1;
 grant select on "W5I_FLEXERAsup__system_of" to W5_BACKUP_W1;
 

@@ -169,7 +169,7 @@ where
     and "itil::system".osclass not like 'MAINFRAME';
 
 grant select on "W5I_HPSAsup__system" to W5I;
-grant update,insert on "W5I_HPSAsup__system_of" to W5I;
+grant select,update,insert on "W5I_HPSAsup__system_of" to W5I;
 create or replace synonym W5I.HPSAsup__system for "W5I_HPSAsup__system";
 create or replace synonym W5I.HPSAsup__system_of for "W5I_HPSAsup__system_of";
 grant select on "W5I_HPSAsup__system_of" to W5_BACKUP_D1;
