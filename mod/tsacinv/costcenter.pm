@@ -167,6 +167,13 @@ sub new
                 group         =>'contact',
                 dataobjattr   =>'amcostcenter.lcustomerlinkid'),
 
+      new kernel::Field::Text(
+                name          =>'defsclocationid',
+                label         =>'Default SCLocationKey',
+                readonly      =>1,
+                group         =>'contact',
+                dataobjattr   =>'amtsisclocations.sclocationid'),
+
       new kernel::Field::SubList(
                 name          =>'deliverypartner',
                 label         =>'Deliverypartner',
@@ -372,6 +379,19 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="amcostcenter ".
+            "left outer join amtsiaccsecunit ".
+            "on amcostcenter.lcustomerlinkid=amtsiaccsecunit.lunitid ".
+            "left outer join amtsisclocations ".
+            "on amtsiaccsecunit.ldefaultsclocationid=amtsisclocations.ltsisclocationsid";
+   return($from);
+}
+
+
 
 sub initSqlWhere
 {

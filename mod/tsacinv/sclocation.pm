@@ -62,7 +62,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'sclocationid',
-                label         =>'SC-LocationID',
+                label         =>'SCLocationKey',
                 dataobjattr   =>'amtsisclocations.sclocationid'),
 
       new kernel::Field::Date(
