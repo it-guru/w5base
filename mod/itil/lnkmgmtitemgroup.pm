@@ -143,6 +143,7 @@ sub new
                 vjointo       =>'itil::mgmtitemgroup',
                 vjoinon       =>['mgmtitemgroupid'=>'id'],
                 group         =>"groupdetails",
+                readonly      =>1,
                 fields        =>['grouptype']),
 
       new kernel::Field::Text(
@@ -154,6 +155,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'notify1on',
                 group         =>'notifications',
+                uploadable    =>0,
                 uivisible     =>sub{
                    my $self=shift;
                    return(1) if ($self->getParent->IsMemberOf("admin"));
@@ -165,6 +167,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'notify1off',
                 group         =>'notifications',
+                uploadable    =>0,
                 uivisible     =>sub{
                    my $self=shift;
                    return(1) if ($self->getParent->IsMemberOf("admin"));
