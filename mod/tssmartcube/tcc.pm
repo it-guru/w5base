@@ -266,7 +266,7 @@ sub new
                 sqlorder      =>'NONE',
                 dataobjattr   =>"(case ".
                     "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
-                    "else CHECK_ROADMAP ".
+                    "else CHECK_OS ".
                     "end)"),
 
       new kernel::Field::Text(
@@ -277,7 +277,7 @@ sub new
                 sqlorder      =>'NONE',
                 dataobjattr   =>getTCCStateSQL("(case ".
                     "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
-                    "else CHECK_ROADMAP ".
+                    "else CHECK_OS ".
                     "end)")),
 
       new kernel::Field::Text(
@@ -288,7 +288,7 @@ sub new
                 sqlorder      =>'NONE',
                 dataobjattr   =>getTCCColorSQL("(case ".
                     "when lower(OS_NAME) like '%windows%' then CHECK_ROADMAP ".
-                    "else CHECK_ROADMAP ".
+                    "else CHECK_OS ".
                     "end)")),
 
 
