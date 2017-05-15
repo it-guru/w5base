@@ -41,8 +41,9 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                label         =>'Name',
-                uivisible     =>0,
+                label         =>'full CI-Name',
+                searchable    =>0,
+                htmldetail    =>0,
                 dataobjattr   =>"concat(concat(concat(amportfolio.name,' ('".
                                 "),amportfolio.assettag),')')"),
 
@@ -243,8 +244,10 @@ sub new
                 dataobjattr   =>"decode(amcomputer.addsysname,".
                                 "'+VS+','VS',".
                                 "'+VS++','VS',".
+                                "'++VS+','VS',".
                                 "'+GS+','GS',".
                                 "'+GS++','GS'".
+                                "'++GS+','GS'".
                                 ",'NONE')"),
 
       new kernel::Field::Text(

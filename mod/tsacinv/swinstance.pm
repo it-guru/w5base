@@ -41,7 +41,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                label         =>'Instance fullname',
+                label         =>'full CI-Name',
                 searchable    =>0,
                 uppersearch   =>1,
                 htmldetail    =>0,

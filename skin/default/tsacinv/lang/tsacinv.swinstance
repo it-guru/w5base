@@ -1,5 +1,5 @@
 'tsacinv::swinstance'=>{de=>'Software-Instanz',en=>'Software-Instance'},
-'Instance fullname'=>{de=>'vollst. Instanz-Name'},
+'full CI-Name'=>{de=>'vollständiger CI-Name'},
 'ServiceCenter Instance fullname'=>{de=>'ServiceCenter vollst. Instanz-Name'},
 'Instance name'=>{de=>'Instanzname'},
 'Tenant'=>{de=>'Instanz-Mieter'},

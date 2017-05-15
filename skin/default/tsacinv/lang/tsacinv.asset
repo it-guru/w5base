@@ -43,3 +43,4 @@
 'AQMODE.6'=>{de=>'kostenfrei',en=>'Free of charge'},
 'Acquisition Start'=>{de=>'Aufnahmedatum'},
 'Acquisition Mode'=>{de=>'Beschaffungsart'},
+'full CI-Name'=>{de=>'vollständiger CI-Name'},

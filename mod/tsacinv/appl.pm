@@ -47,8 +47,9 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                label         =>'Name',
-                uivisible     =>0,
+                label         =>'full CI-Name',
+                searchable    =>0,
+                htmldetail    =>0,
                 dataobjattr   =>"concat(concat(concat(amtsicustappl.name,' ('".
                                 "),amtsicustappl.code),')')"),
 

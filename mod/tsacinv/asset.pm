@@ -52,6 +52,14 @@ sub new
                 dataobjattr   =>'lower(amasset.status)'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'full CI-Name',
+                searchable    =>0,
+                htmldetail    =>0,
+                dataobjattr   =>"assetportfolio.assettag"),
+
+
+      new kernel::Field::Text(
                 name          =>'systemname',
                 vjointo       =>'tsacinv::system',
                 vjoinon       =>['lassetid'=>'lassetid'],
