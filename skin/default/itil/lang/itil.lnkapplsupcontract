@@ -12,4 +12,4 @@
 'Support Contract Customer'=>{de=>'Supportvertrags Kunde'},
 'Support ContractId'=>{de=>'Supportvertrags ID'},
 'Support Contract CI-State'=>{de=>'Supportvertrag CI-Status'},
-
+'a fraction greater 100 is not allowed'=>{de=>'ein Anteil größer 100 ist nicht erlaubt'},

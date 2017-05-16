@@ -127,14 +127,14 @@ sub new
 
 
       new kernel::Field::Contact(
-                name          =>'contructcoord',
+                name          =>'contractcoord',
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
-                label         =>'Contruct Coordinator',
-                vjoinon       =>'contructcoordid'),
+                label         =>'Contract Coordinator',
+                vjoinon       =>'contractcoordid'),
 
       new kernel::Field::Link(
-                name          =>'contructcoordid',
+                name          =>'contractcoordid',
                 dataobjattr   =>'supcontract.contractcoord'),
 
 
@@ -338,7 +338,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'description',
-                label         =>'contract details',
+                label         =>'Contract Details',
                 dataobjattr   =>'supcontract.description'),
 
 

@@ -243,6 +243,28 @@ sub Validate
    if ($fraction=~m/^\s*$/){
       $newrec->{fraction}=100;
    }
+   if ($fraction>100){
+      $self->LastMsg(ERROR,"a fraction greater 100 is not allowed");
+      return(undef);
+   }
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"fraction")){
+      my $cobj=$self->Clone();
+      my $supid=effVal($oldrec,$newrec,"supcontractid");
+      my $flt={supcontractid=>\$supid};
+      my $id=effVal($oldrec,$newrec,"id");
+      if ($id ne ""){
+         $flt->{id}="!\"$id\"";
+      }
+      $cobj->SetFilter($flt);
+      my $s=effVal($oldrec,$newrec,"fraction");
+      foreach my $chkrec ($cobj->getHashList(qw(fraction))){
+         $s+=$chkrec->{fraction};
+      }
+      if ($s>100){
+         $self->LastMsg(ERROR,"a fraction greater 100 is not allowed");
+         return(undef);
+      }
+   }
 
    if ($self->isDataInputFromUserFrontend()){
       my $contractid=effVal($oldrec,$newrec,"supcontractid");

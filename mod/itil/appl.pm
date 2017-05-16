@@ -873,7 +873,7 @@ sub new
                 name          =>'custcontracts',
                 label         =>'Customer Contracts',
                 group         =>'custcontracts',
-                subeditmsk    =>'subedit.appl',
+                readonly      =>1,
                 vjointo       =>'itil::lnkapplcustcontract',
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['custcontract','custcontractcistatus',
@@ -882,6 +882,19 @@ sub new
                 vjoininhash   =>['custcontractid','custcontractcistatusid',
                                  'modules',
                                  'custcontract','custcontractname']),
+
+      new kernel::Field::SubList(
+                name          =>'supcontracts',
+                label         =>'Support/Maintenence Contracts',
+                group         =>'supcontracts',
+                readonly      =>1,
+                vjointo       =>'itil::lnkapplsupcontract',
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['supcontract','supcontractcistatus',
+                                 'fraction'],
+                vjoinbase     =>[{supcontractcistatusid=>'<=5'}],
+                vjoininhash   =>['supcontractid','supcontractcistatusid',
+                                 'supcontract','supcontractname']),
 
       new kernel::Field::SubList(
                 name          =>'interfaces',
@@ -2230,7 +2243,8 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(accountnumbers history default applapplgroup applgroup
-              attachments contacts control custcontracts customer delmgmt
+              attachments contacts control supcontracts custcontracts 
+              customer delmgmt
               finance interfaces licenses monisla sodrgroup qc external itsem
               mutimes  
               misc opmgmt phonenumbers services businessservices architect
@@ -2320,7 +2334,17 @@ sub FinishDelete
    if (defined($refobj)){
       my $idname=$self->IdField->Name();
       my $id=$oldrec->{$idname};
-      $refobj->SetFilter({'appl'=>\$id});
+      $refobj->SetFilter({'applid'=>\$id});
+      $refobj->SetCurrentView(qw(ALL));
+      $refobj->ForeachFilteredRecord(sub{
+                         $refobj->ValidatedDeleteRecord($_);
+                      });
+   }
+   my $refobj=getModuleObject($self->Config,"itil::lnkapplsupcontract");
+   if (defined($refobj)){
+      my $idname=$self->IdField->Name();
+      my $id=$oldrec->{$idname};
+      $refobj->SetFilter({'applid'=>\$id});
       $refobj->SetCurrentView(qw(ALL));
       $refobj->ForeachFilteredRecord(sub{
                          $refobj->ValidatedDeleteRecord($_);
@@ -2369,10 +2393,12 @@ sub ValidateDelete
        $#{$rec->{services}}!=-1 ||
        $#{$rec->{applurl}}!=-1 ||
        $#{$rec->{swinstances}}!=-1 ||
+       $#{$rec->{supcontracts}}!=-1 ||
        $#{$rec->{custcontracts}}!=-1){
       $self->LastMsg(ERROR,
           "delete only posible, if there are no system, ".
-          "software instance, urls, cluster service, interfaces, service components ".
+          "software instance, urls, cluster service, interfaces, ".
+          "service components ".
           "and contract relations");
       return(0);
    }
@@ -2387,7 +2413,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(
           qw(header default itsem finance technical opmgmt delmgmt 
-             architect customer custcontracts 
+             architect customer custcontracts supcontracts
              contacts phonenumbers 
              interfaces systems swinstances services businessservices applurl
              monisla 

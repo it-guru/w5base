@@ -1,6 +1,7 @@
 'itil::appl'=>{de=>'Geschäftsanwendung',en=>'Business Application'},
 'fieldgroup.default'=>{de=>'Anwendung-Daten',en=>'Application-Informations'},
 'fieldgroup.custcontracts'=>{de=>'Kundenverträge',en=>'Customer Contracts'},
+'fieldgroup.supcontracts'=>{de=>'Support/Wartungsverträge',en=>'Support/Maintenence Contracts'},
 'fieldgroup.interfaces'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'fieldgroup.licenses'=>{de=>'Lizenzen',en=>'Licenses'},
 'fieldgroup.applurl'=>{de=>'Kommunikations URLs',en=>'Communication URLs'},
