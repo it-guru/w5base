@@ -439,7 +439,10 @@ sub Unformat
       }
       if ($self->{dayonly}){      # prevent day switch for day only fields
          $formated=~s/\s.*$//;    # if f.e. date is specified with 00:00:00 
-         $formated.=" 12:00:00";  # time (which is not needed)
+         if (($formated=~m/^\d{1,2}\.\d{1,2}\.\d{2,4}$/) ||
+             ($formated=~m/^\d{1,2}-\d{1,2}-\d{2,4}$/)){
+            $formated.=" 12:00:00";  # time (which is not needed)
+         }
       }
       my $d=$self->getParent->ExpandTimeExpression($formated,"en",
                                                    undef,
