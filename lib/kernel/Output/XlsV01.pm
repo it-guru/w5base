@@ -179,6 +179,14 @@ sub Format
       $format=$self->{'workbook'}->addformat(align=>'top',
                                           num_format => 'yyyy-mm-dd HH:MM:SS');
    }
+   elsif ($name eq "dayonly.de"){
+      $format=$self->{'workbook'}->addformat(align=>'top',
+                                          num_format => 'dd.mm.yyyy');
+   }
+   elsif ($name eq "dayonly.en"){
+      $format=$self->{'workbook'}->addformat(align=>'top',
+                                          num_format => 'yyyy-mm-dd');
+   }
    elsif ($name eq "longint"){
       $format=$self->{'workbook'}->addformat(align=>'top',num_format => '#');
    }
@@ -278,7 +286,7 @@ sub ProcessLine
       if (!defined($data)){
          $data="";
       }
-      if ($format=~m/^date\./){
+      if ($format=~m/^(date|dayonly)\./){
      # printf STDERR ("fifi: field=%s format=%s data=%s\n",$field->Name(),
      #                $format,$data);
          $self->{'worksheet'}->write_date_time($lineno,$cellno,$data,

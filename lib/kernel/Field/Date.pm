@@ -76,10 +76,10 @@ sub FormatedDetail
          }
       }
       if ($mode eq "ShortMsg"){         # SMS Modus
+         if ($self->{dayonly}){
+            $d=~s/\s*\d+:\d+:\d+.*$//;
+         }
          $d=~s/^(.*\d+:\d+):\d+\s*$/$1/;   # cut seconds
-      }
-      if ($self->{dayonly}){
-         $d=~s/\s*\d+:\d+:\d+.*$//;
       }
       if ($mode eq "HtmlDetail" && (!$self->{dayonly} || $self->{dayonly}==2)){
          if (defined($delta) && $delta!=0){
@@ -282,6 +282,7 @@ sub FormatedDetail
          $d=$self->getParent->ExpandTimeExpression($d,"ISO8601",
                                                       $usertimezone,
                                                       $usertimezone);
+         return($d);
       }
       if ($mode eq "SOAP"){
          my $usertimezone=$self->getParent->UserTimezone();
@@ -298,6 +299,9 @@ sub FormatedDetail
          if (defined($d)){
             $d="\\Date($d)\\";
          } 
+      }
+      if ($self->{dayonly}){
+         $d=~s/\s*\d+:\d+:\d+.*$//;
       }
       return($d);
    }
@@ -434,15 +438,9 @@ sub Unformat
       return({$self->Name()=>undef}) if ($formated=~m/^\s*$/);
       $formated=trim($formated);
       my %dateparam=();
-      if ($self->{dayonly}){  # fix format als 12:00 GMT
-         $dateparam{defhour}=12;
-      }
-      if ($self->{dayonly}){      # prevent day switch for day only fields
+      if ($self->{dayonly}){      # fix format als 12:00 GMT
+         $dateparam{defhour}=12;  # prevent day switch for day only fields
          $formated=~s/\s.*$//;    # if f.e. date is specified with 00:00:00 
-         if (($formated=~m/^\d{1,2}\.\d{1,2}\.\d{2,4}$/) ||
-             ($formated=~m/^\d{1,2}-\d{1,2}-\d{2,4}$/)){
-            $formated.=" 12:00:00";  # time (which is not needed)
-         }
       }
       my $d=$self->getParent->ExpandTimeExpression($formated,"en",
                                                    undef,
@@ -485,6 +483,9 @@ sub getXLSformatname
    my $xlsbgcolor=$self->xlsbgcolor;
    my $xlsbcolor=$self->xlsbcolor;
    my $f="date.".$self->getParent->Lang();
+   if ($self->{dayonly}){
+      $f="dayonly.".$self->getParent->Lang();
+   }
    my $colset=0;
    if (defined($xlscolor)){
       $f.=".color=\"".$xlscolor."\"";
