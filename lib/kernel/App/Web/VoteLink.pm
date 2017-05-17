@@ -37,18 +37,15 @@ sub extendSqlFrom
           "uservote.entrymonth='${logstamp}')";
 
    my $sql=
-      "sum(subuservote.voteval/".   # factor user voting
+      "sum(subuservote.voteval*".   # factor user voting
 
       # factor age of uservoting
          "(".
-         "if (datediff(now(),subuservote.createdate)=0,1,".
-             "datediff(now(),subuservote.createdate))".
-         "*".
-         "if (datediff(now(),subuservote.createdate)=0,1,".
-             "datediff(now(),subuservote.createdate))".
-         "/(3.65*3.65/2))". 
+         "730/if (datediff(now(),subuservote.createdate)=0,1,".
+             "if (datediff(now(),subuservote.createdate)>730,730,".
+             "datediff(now(),subuservote.createdate)))/1".
          ")".
-      " as sumuservote";
+      ") as sumuservote";
 
    $from.=" left outer join (".
              "select ".
@@ -64,6 +61,16 @@ sub extendSqlFrom
    return($from);
 }
 
+sub resetVoteLink
+{
+   my $self=shift;
+   my $refid=shift;
+
+   my $selfname=$self->SelfAsParentObject();
+   my $o=getModuleObject($self->Config,"base::uservote");
+   $o->BulkDeleteRecord({refid=>\$refid,parentobj=>\$selfname});
+}
+
 sub extendFieldDefinition
 {
    my $self=shift;
@@ -76,8 +83,8 @@ sub extendFieldDefinition
    if (defined($mdatefld)){
       my $dobjattr=$mdatefld->{dataobjattr};
        # factor age of parent record
-      $sql.="+(if (365-datediff(now(),$dobjattr)>-730,".
-        "(365-datediff(now(),$dobjattr)),-730))*1.37";
+      $sql.="+(if (730-datediff(now(),$dobjattr)>-365,".
+        "(730-datediff(now(),$dobjattr)),-365))*2.00";
    }
 
    $self->AddFields(

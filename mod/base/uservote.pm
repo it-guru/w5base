@@ -214,15 +214,16 @@ sub vote
             #printf STDERR ("fifi parentobj=$parentobj\n");
             #printf STDERR ("fifi refid=$refid\n");
             #printf STDERR ("fifi voteval=$voteval\n");
-        
-            $self->ValidatedInsertRecord({
-               parentobj=>$parentobj,
-               refid=>$refid,
-               entrymonth=>$logstamp,
-               voteval=>$voteval,
-               cdate=>NowStamp("en"),
-               creatorid=>$userid
-            });
+            if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+               $self->ValidatedInsertRecord({
+                  parentobj=>$parentobj,
+                  refid=>$refid,
+                  entrymonth=>$logstamp,
+                  voteval=>$voteval,
+                  cdate=>NowStamp("en"),
+                  creatorid=>$userid
+               });
+            }
          }
          my $idname=$idfield->Name();
          $o->SetFilter({$idname=>\$refid});
@@ -253,8 +254,6 @@ sub vote
                $title.=$self->T("OK");
             }
 
-
-
             $html="<img style='margin-bottom:2px' title='${title}' ".
                   "src='%ROOT%/base/load/doc-${state}.gif'><br>";
             
@@ -263,11 +262,6 @@ sub vote
          }
       }
    }
-
-
-
-
-
    my %e=(
       refid        =>  $refid,
       uservotelevel=>  $uservotelevel,

@@ -608,6 +608,7 @@ sub FinishWrite
    my $idobj=$self->IdField();
    my $idname=$idobj->Name();
 
+   $self->resetVoteLink($id); 
    my $url=$ENV{SCRIPT_URI};
    $url=~s/[^\/]+$//;
    $url.="ById/$id";
@@ -662,6 +663,18 @@ sub FinishWrite
 
    return($self->SUPER::FinishWrite($oldrec,$newrec));
 }
+
+
+sub FinishDelete
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $bak=$self->SUPER::FinishDelete($oldrec);
+
+   $self->resetVoteLink($oldrec->{faqid}); 
+   return($bak);
+}
+
 
 
 sub HandleInfoAboSubscribe
