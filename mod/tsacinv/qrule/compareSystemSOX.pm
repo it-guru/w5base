@@ -125,10 +125,11 @@ sub qcheckRecord
                   my @l=$o->getHashList(qw(mgmtitemgroup));
                   my $sapcnt=0;
                   foreach my $a (@l){
-                     if (ref($a->{mgmtitemgroup}) eq "ARRAY"){
-                        if (in_array($a->{mgmtitemgroup},"SAP")){
-                           $sapcnt++;
-                        }
+                     if (!ref($a->{mgmtitemgroup})){
+                        $a->{mgmtitemgroup}=[$a->{mgmtitemgroup}];
+                     }
+                     if (in_array($a->{mgmtitemgroup},"SAP")){
+                        $sapcnt++;
                      }
                   }
                   if ($sapcnt>0 && $sapcnt==$#l+1){
