@@ -320,7 +320,7 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'servicesupport.realeditor'),
    
-
+      new kernel::Field::RecordUrl(),
    );
    $self->setDefaultView(qw(name cistatus mdate cdate));
    $self->setWorktable("servicesupport");
