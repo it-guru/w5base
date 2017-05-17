@@ -2042,7 +2042,9 @@ sub getDetailFunctions
    if (defined($rec) && $self->isDeleteValid($rec)){
      # my $idname=$self->IdField->Name();
      # my $id=$rec->{$idname};
-      unshift(@f,$self->T("DetailDelete")=>"DetailDelete");
+      if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+         unshift(@f,$self->T("DetailDelete")=>"DetailDelete");
+      }
    }
    if (defined($rec) && $self->isCopyValid($rec)){
      # my $idname=$self->IdField->Name();
@@ -2056,7 +2058,9 @@ sub getDetailFunctions
    if (defined($rec) && $self->can("HandleQualityCheck") &&
        $ENV{REMOTE_USER} ne "anonymous" &&
        $self->isQualityCheckValid($rec)){
-      unshift(@f,$self->T("QualityCheck")=>"DetailHandleQualityCheck");
+      if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+         unshift(@f,$self->T("QualityCheck")=>"DetailHandleQualityCheck");
+      }
    }
    if (defined($rec)){
       my $instdir=$self->Config->Param("INSTDIR");

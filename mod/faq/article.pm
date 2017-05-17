@@ -1043,7 +1043,9 @@ sub HandleLastView
       $upd{viewlastbywriternotify}=undef;   # be later used for quality
    }                                        # check on faq articles
 
-   $self->UpdateRecord(\%upd,{faqid=>\$rec->{faqid}});
+   if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+      $self->UpdateRecord(\%upd,{faqid=>\$rec->{faqid}});
+   }
 }
 
 sub getDefaultHtmlDetailPage

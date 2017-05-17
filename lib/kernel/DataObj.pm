@@ -1808,6 +1808,10 @@ sub ValidatedInsertRecord
    my $newrec=shift;
 
    my $bk;
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      $self->LastMsg(ERROR,"W5BaseOperationMode=readonly");
+      return(undef);
+   }
    if ($self->StartTransaction("insert",undef,$newrec)){
       $bk=$self->ValidatedInsertRecordTransactionless($newrec);
    }
@@ -2275,6 +2279,10 @@ sub ValidatedUpdateRecord
    my @filter=@_;
 
    my $bk;
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      $self->LastMsg(ERROR,"W5BaseOperationMode=readonly");
+      return(undef);
+   }
    if ($self->StartTransaction("update",$oldrec,$newrec)){
       $bk=$self->ValidatedUpdateRecordTransactionless($oldrec,$newrec,@filter);
    }
@@ -2455,6 +2463,10 @@ sub ValidatedDeleteRecord
    my $oldrec=shift;
 
    my $bk;
+   if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
+      $self->LastMsg(ERROR,"W5BaseOperationMode=readonly");
+      return(undef);
+   }
    if ($self->StartTransaction("delete",$oldrec,undef)){
       $bk=$self->ValidatedDeleteRecordTransactionless($oldrec);
    }
