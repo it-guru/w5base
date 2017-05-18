@@ -152,263 +152,265 @@ sub qcheckRecord
             $errorlevel=3 if ($errorlevel<3);
          }
          else{
-            my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
-            my $sys=getModuleObject($self->getParent->Config(),"itil::system");
-            #
-            # Filter for conumbers, which are allowed to use in darwin
-            #
-            if (defined($parrec->{conumber})){
-               if ($parrec->{conumber} eq ""){
-                  $parrec->{conumber}=undef;
-               }
+            if ($rec->{srcsys} eq "AssetManager"){
+               my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
+               my $sys=getModuleObject($self->getParent->Config(),"itil::system");
+               #
+               # Filter for conumbers, which are allowed to use in darwin
+               #
                if (defined($parrec->{conumber})){
-                  #
-                  # hier muß der Check gegen die SAP P01 rein für die 
-                  # Umrechnung auf PSP Elemente
-                  #
-                  if ($parrec->{conumber}=~m/^\S{10}$/){
-                     my $sappsp=getModuleObject($self->getParent->Config,
-                                                "tssapp01::psp");
-                     my $psp=$sappsp->CO2PSP_Translator($parrec->{conumber});
-                     $parrec->{conumber}=$psp if (defined($psp));
-                  }
-
-                  ##############################################################
-                  my $co=getModuleObject($self->getParent->Config,
-                                         "finance::costcenter");
-                  if (defined($co)){
-                     if (!($co->ValidateCONumber(
-                           $dataobj->SelfAsParentObject,"conumber", $parrec,
-                           {conumber=>$parrec->{conumber}}))){ 
-                        $parrec->{conumber}=undef; # simulierter newrec
-                     }
-                  }
-                  else{
+                  if ($parrec->{conumber} eq ""){
                      $parrec->{conumber}=undef;
                   }
-               }
-            }
+                  if (defined($parrec->{conumber})){
+                     #
+                     # hier muß der Check gegen die SAP P01 rein für die 
+                     # Umrechnung auf PSP Elemente
+                     #
+                     if ($parrec->{conumber}=~m/^\S{10}$/){
+                        my $sappsp=getModuleObject($self->getParent->Config,
+                                                   "tssapp01::psp");
+                        my $psp=$sappsp->CO2PSP_Translator($parrec->{conumber});
+                        $parrec->{conumber}=$psp if (defined($psp));
+                     }
 
-            $self->IfComp($dataobj,
-                          $rec,"conumber",
-                          $parrec,"conumber",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'native');
-            if (!$rec->{haveitsem}){
-               if ($parrec->{sememail} ne ""){
-                  my $semid=$user->GetW5BaseUserID($parrec->{sememail},"email",
+                     ##############################################################
+                     my $co=getModuleObject($self->getParent->Config,
+                                            "finance::costcenter");
+                     if (defined($co)){
+                        if (!($co->ValidateCONumber(
+                              $dataobj->SelfAsParentObject,"conumber", $parrec,
+                              {conumber=>$parrec->{conumber}}))){ 
+                           $parrec->{conumber}=undef; # simulierter newrec
+                        }
+                     }
+                     else{
+                        $parrec->{conumber}=undef;
+                     }
+                  }
+               }
+
+               $self->IfComp($dataobj,
+                             $rec,"conumber",
+                             $parrec,"conumber",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'native');
+               if (!$rec->{haveitsem}){
+                  if ($parrec->{sememail} ne ""){
+                     my $semid=$user->GetW5BaseUserID($parrec->{sememail},"email",
+                                                      {quiet=>1});
+                     if (defined($semid)){
+                        $self->IfComp($dataobj,
+                                      $rec,"semid",
+                                      {semid=>$semid},"semid",
+                                      $autocorrect,$forcedupd,$wfrequest,
+                                      \@qmsg,\@dataissue,\$errorlevel,
+                                      mode=>'native');
+                     }
+                     else{
+                    #    $tswiw->Log(ERROR,"basedata",
+                    #              "CBM '$parrec->{sememail}' ".
+                    #              "for application '".$rec->{name}."' ".
+                    #              "can not be located in W5Base and WhoIsWho ".
+                    #              "while import(qrule) of application ".
+                    #              "from AssetManager\n-");
+                     }
+                  }
+               }
+
+               if ($parrec->{tsmemail} ne ""){
+                  my $tsmid=$user->GetW5BaseUserID($parrec->{tsmemail},"email",
                                                    {quiet=>1});
-                  if (defined($semid)){
+                  if (defined($tsmid)){
                      $self->IfComp($dataobj,
-                                   $rec,"semid",
-                                   {semid=>$semid},"semid",
+                                   $rec,"tsmid",
+                                   {tsmid=>$tsmid},"tsmid",
                                    $autocorrect,$forcedupd,$wfrequest,
                                    \@qmsg,\@dataissue,\$errorlevel,
                                    mode=>'native');
                   }
                   else{
-                 #    $tswiw->Log(ERROR,"basedata",
-                 #              "CBM '$parrec->{sememail}' ".
-                 #              "for application '".$rec->{name}."' ".
-                 #              "can not be located in W5Base and WhoIsWho ".
-                 #              "while import(qrule) of application ".
-                 #              "from AssetManager\n-");
+                   #  $tswiw->Log(ERROR,"basedata",
+                   #            "TSM '$parrec->{tsmemail}' ".
+                   #            "for application '".$rec->{name}."' ".
+                   #            "can not be located in W5Base and WhoIsWho ".
+                   #            "while import(qrule) of application ".
+                   #            "from AssetManager\n-");
                   }
                }
-            }
-
-            if ($parrec->{tsmemail} ne ""){
-               my $tsmid=$user->GetW5BaseUserID($parrec->{tsmemail},"email",
-                                                {quiet=>1});
-               if (defined($tsmid)){
-                  $self->IfComp($dataobj,
-                                $rec,"tsmid",
-                                {tsmid=>$tsmid},"tsmid",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native');
+               if ($parrec->{tsm2email} ne ""){
+                  my $tsmid=$user->GetW5BaseUserID($parrec->{tsm2email},"email",
+                                                   {quiet=>1});
+                  if (defined($tsmid)){
+                     $self->IfComp($dataobj,
+                                   $rec,"tsm2id",
+                                   {tsmid=>$tsmid},"tsmid",
+                                   $autocorrect,$forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'native');
+                  }
+                  else{
+                   #  $tswiw->Log(ERROR,"basedata",
+                   #            "TSM2 '$parrec->{tsm2email}' ".
+                   #            "for application '".$rec->{name}."' ".
+                   #            "can not be located in W5Base and WhoIsWho ".
+                   #            "while import(qrule) of application ".
+                   #            "from AssetManager\n-");
+                  }
                }
-               else{
-                #  $tswiw->Log(ERROR,"basedata",
-                #            "TSM '$parrec->{tsmemail}' ".
-                #            "for application '".$rec->{name}."' ".
-                #            "can not be located in W5Base and WhoIsWho ".
-                #            "while import(qrule) of application ".
-                #            "from AssetManager\n-");
+               if ($parrec->{opmemail} ne ""){
+                  my $opmid=$user->GetW5BaseUserID($parrec->{opmemail},"email",
+                                                   {quiet=>1});
+                  if (defined($opmid)){
+                     $self->IfComp($dataobj,
+                                   $rec,"opmid",
+                                   {opmid=>$opmid},"opmid",
+                                   $autocorrect,$forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'native');
+                  }
+                  else{
+                   #  $tswiw->Log(ERROR,"basedata",
+                   #            "OPM '$parrec->{opmemail}' ".
+                   #            "for application '".$rec->{name}."' ".
+                   #            "can not be located in W5Base and WhoIsWho ".
+                   #            "while import(qrule) of application ".
+                   #            "from AssetManager\n-");
+                  }
                }
-            }
-            if ($parrec->{tsm2email} ne ""){
-               my $tsmid=$user->GetW5BaseUserID($parrec->{tsm2email},"email",
-                                                {quiet=>1});
-               if (defined($tsmid)){
-                  $self->IfComp($dataobj,
-                                $rec,"tsm2id",
-                                {tsmid=>$tsmid},"tsmid",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native');
+               if ($parrec->{opm2email} ne ""){
+                  my $opmid=$user->GetW5BaseUserID($parrec->{opm2email},"email",
+                                                   {quiet=>1});
+                  if (defined($opmid)){
+                     $self->IfComp($dataobj,
+                                   $rec,"opm2id",
+                                   {opmid=>$opmid},"opmid",
+                                   $autocorrect,$forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'native');
+                  }
+                  else{
+                   #  $tswiw->Log(ERROR,"basedata",
+                   #            "OPM2 '$parrec->{opm2email}' ".
+                   #            "for application '".$rec->{name}."' ".
+                   #            "can not be located in W5Base and WhoIsWho ".
+                   #            "while import(qrule) of application ".
+                   #            "from AssetManager\n-");
+                  }
                }
-               else{
-                #  $tswiw->Log(ERROR,"basedata",
-                #            "TSM2 '$parrec->{tsm2email}' ".
-                #            "for application '".$rec->{name}."' ".
-                #            "can not be located in W5Base and WhoIsWho ".
-                #            "while import(qrule) of application ".
-                #            "from AssetManager\n-");
-               }
-            }
-            if ($parrec->{opmemail} ne ""){
-               my $opmid=$user->GetW5BaseUserID($parrec->{opmemail},"email",
-                                                {quiet=>1});
-               if (defined($opmid)){
-                  $self->IfComp($dataobj,
-                                $rec,"opmid",
-                                {opmid=>$opmid},"opmid",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native');
-               }
-               else{
-                #  $tswiw->Log(ERROR,"basedata",
-                #            "OPM '$parrec->{opmemail}' ".
-                #            "for application '".$rec->{name}."' ".
-                #            "can not be located in W5Base and WhoIsWho ".
-                #            "while import(qrule) of application ".
-                #            "from AssetManager\n-");
-               }
-            }
-            if ($parrec->{opm2email} ne ""){
-               my $opmid=$user->GetW5BaseUserID($parrec->{opm2email},"email",
-                                                {quiet=>1});
-               if (defined($opmid)){
-                  $self->IfComp($dataobj,
-                                $rec,"opm2id",
-                                {opmid=>$opmid},"opmid",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'native');
-               }
-               else{
-                #  $tswiw->Log(ERROR,"basedata",
-                #            "OPM2 '$parrec->{opm2email}' ".
-                #            "for application '".$rec->{name}."' ".
-                #            "can not be located in W5Base and WhoIsWho ".
-                #            "while import(qrule) of application ".
-                #            "from AssetManager\n-");
-               }
-            }
-            $self->IfComp($dataobj,
-                          $rec,"description",
-                          $parrec,"description",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'text');
-            $self->IfComp($dataobj,
-                          $rec,"currentvers",
-                          $parrec,"version",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'text');
-            if ($dataobj->getField("scapprgroup")){
                $self->IfComp($dataobj,
-                             $rec,"scapprgroup",
-                             $parrec,"capprovergroup",
+                             $rec,"description",
+                             $parrec,"description",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'native',
-                             AllowEmpty=>0);
-            }
-            if ($dataobj->Self eq "AL_TCom::appl"){  # only for AL DTAG
+                             mode=>'text');
                $self->IfComp($dataobj,
-                             $rec,"acinmassingmentgroup",
-                             $parrec,"iassignmentgroup",
+                             $rec,"currentvers",
+                             $parrec,"version",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'native',
-                             AllowEmpty=>0);
-            }
-            if ($rec->{allowifupdate}){
-               # keys are in rec= systemsystemid
-               # and in parrec  = systemid
-               my @opList;
-               my $res=OpAnalyse(
-                          sub{  # comperator 
-                             my ($a,$b)=@_;
-                             my $eq;
-                             if (uc($a->{systemsystemid}) 
-                                    eq uc($b->{systemid})){
-                                $eq=1;
-                             }
-                             return($eq);
-                          },
-                          sub{  # oprec generator
-                             my ($mode,$oldrec,$newrec,%p)=@_;
-                             if ($mode eq "insert" || $mode eq "update"){
-                                my $identifyby=undef;
-                                if ($mode eq "update"){
-                                   $identifyby=$oldrec->{id};
+                             mode=>'text');
+               if ($dataobj->getField("scapprgroup")){
+                  $self->IfComp($dataobj,
+                                $rec,"scapprgroup",
+                                $parrec,"capprovergroup",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'native',
+                                AllowEmpty=>0);
+               }
+               if ($dataobj->Self eq "AL_TCom::appl"){  # only for AL DTAG
+                  $self->IfComp($dataobj,
+                                $rec,"acinmassingmentgroup",
+                                $parrec,"iassignmentgroup",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'native',
+                                AllowEmpty=>0);
+               }
+               if ($rec->{allowifupdate}){
+                  # keys are in rec= systemsystemid
+                  # and in parrec  = systemid
+                  my @opList;
+                  my $res=OpAnalyse(
+                             sub{  # comperator 
+                                my ($a,$b)=@_;
+                                my $eq;
+                                if (uc($a->{systemsystemid}) 
+                                       eq uc($b->{systemid})){
+                                   $eq=1;
                                 }
-                                my $systemid;
-                                if ($newrec->{systemid} ne ""){
-                                   $sys->ResetFilter();
-                                   $sys->SetFilter({systemid=>
-                                                    \$newrec->{systemid},
-                                                    cistatusid=>"!6"});
-                                   my ($sysrec,$msg)=$sys->getOnlyFirst(qw(id));
-                                   if (defined($sysrec)){
-                                      $systemid=$sysrec->{id};
+                                return($eq);
+                             },
+                             sub{  # oprec generator
+                                my ($mode,$oldrec,$newrec,%p)=@_;
+                                if ($mode eq "insert" || $mode eq "update"){
+                                   my $identifyby=undef;
+                                   if ($mode eq "update"){
+                                      $identifyby=$oldrec->{id};
                                    }
-                                   else{
-                                      $mode="nop";
-                                      my $m="can not create relation to ".
-                                            "not existing/active system: ".
-                                            $newrec->{systemid};
-                                      push(@qmsg,$m);
-                                      push(@dataissue,$m);
-                                      $errorlevel=3 if ($errorlevel<3);
+                                   my $systemid;
+                                   if ($newrec->{systemid} ne ""){
+                                      $sys->ResetFilter();
+                                      $sys->SetFilter({systemid=>
+                                                       \$newrec->{systemid},
+                                                       cistatusid=>"!6"});
+                                      my ($sysrec,$msg)=$sys->getOnlyFirst(qw(id));
+                                      if (defined($sysrec)){
+                                         $systemid=$sysrec->{id};
+                                      }
+                                      else{
+                                         $mode="nop";
+                                         my $m="can not create relation to ".
+                                               "not existing/active system: ".
+                                               $newrec->{systemid};
+                                         push(@qmsg,$m);
+                                         push(@dataissue,$m);
+                                         $errorlevel=3 if ($errorlevel<3);
+                                      }
                                    }
+                                   my $srcsys="AM";
+                                   if ($newrec->{srcsys} eq "W5Base"){
+                                      if (!($newrec->{srcid}=~m/^SAPLNK-.*/)){
+                                         # prevent loop imports
+                                         return(undef);
+                                      }
+                                      else{
+                                         $srcsys="AM-SAPLNK";
+                                      }
+                                   }
+                                   
+                                   return({OP=>$mode,
+                                           MSG=>"$mode systemlink ".
+                                                "$newrec->{systemid} ".
+                                                "in W5Base",
+                                           IDENTIFYBY=>$identifyby,
+                                           DATAOBJ=>'itil::lnkapplsystem',
+                                           DATA=>{
+                                              srcsys    =>$srcsys,
+                                              applid    =>$p{refid},
+                                              systemid  =>$systemid
+                                              }
+                                           });
                                 }
-                                my $srcsys="AM";
-                                if ($newrec->{srcsys} eq "W5Base"){
-                                   if (!($newrec->{srcid}=~m/^SAPLNK-.*/)){
-                                      # prevent loop imports
-                                      return(undef);
-                                   }
-                                   else{
-                                      $srcsys="AM-SAPLNK";
-                                   }
+                                elsif ($mode eq "delete"){
+                                   return({OP=>$mode,
+                                           MSG=>"delete system ".
+                                                "$oldrec->{systemsystemid} ".
+                                                "from W5Base",
+                                           DATAOBJ=>'itil::lnkapplsystem',
+                                           IDENTIFYBY=>$oldrec->{id},
+                                           });
                                 }
-                                
-                                return({OP=>$mode,
-                                        MSG=>"$mode systemlink ".
-                                             "$newrec->{systemid} ".
-                                             "in W5Base",
-                                        IDENTIFYBY=>$identifyby,
-                                        DATAOBJ=>'itil::lnkapplsystem',
-                                        DATA=>{
-                                           srcsys    =>$srcsys,
-                                           applid    =>$p{refid},
-                                           systemid  =>$systemid
-                                           }
-                                        });
-                             }
-                             elsif ($mode eq "delete"){
-                                return({OP=>$mode,
-                                        MSG=>"delete system ".
-                                             "$oldrec->{systemsystemid} ".
-                                             "from W5Base",
-                                        DATAOBJ=>'itil::lnkapplsystem',
-                                        IDENTIFYBY=>$oldrec->{id},
-                                        });
-                             }
-                             return(undef);
-                          },
-                          $rec->{systems},$parrec->{systems},\@opList,
-                          refid=>$rec->{id},sys=>$sys);
-                if (!$res){
-                   my $opres=ProcessOpList($self->getParent,\@opList);
-                }
+                                return(undef);
+                             },
+                             $rec->{systems},$parrec->{systems},\@opList,
+                             refid=>$rec->{id},sys=>$sys);
+                   if (!$res){
+                      my $opres=ProcessOpList($self->getParent,\@opList);
+                   }
+               }
             }
          }
 
