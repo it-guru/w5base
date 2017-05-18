@@ -198,420 +198,422 @@ sub qcheckRecord
             $errorlevel=3 if ($errorlevel<3);
          }
          else{
-            #
-            # osrelease mapping
-            #
-            if (!($parrec->{systemos}=~/^\s*$/)){
-               my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
-               $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
-               my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
-               if (defined($maposrec)){
-                  if ($maposrec->{w5bosrelease} ne ""){
-                     $parrec->{systemos}=$maposrec->{w5bosrelease};
+            if ($rec->{srcsys} eq "AssetManager"){
+               #
+               # osrelease mapping
+               #
+               if (!($parrec->{systemos}=~/^\s*$/)){
+                  my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
+                  $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
+                  my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
+                  if (defined($maposrec)){
+                     if ($maposrec->{w5bosrelease} ne ""){
+                        $parrec->{systemos}=$maposrec->{w5bosrelease};
+                     }
+                     else{
+                        delete($parrec->{systemos});
+                     }
                   }
                   else{
+                     my %new=(extosrelease=>$parrec->{systemos},direction=>1);
+                     # try to find an already existing name in W5Base
+                     my $os=$dataobj->ModuleObject("itil::osrelease");
+                     $os->SetFilter({name=>'"'.$parrec->{systemos}.'"'});
+                     my ($w5osrec,$msg)=$mapos->getOnlyFirst(qw(name));
+                     if (defined($w5osrec)){
+                        $new{w5bosrelease}=$w5osrec->{name};
+                     }
+                     $mapos->ValidatedInsertRecord(\%new);
                      delete($parrec->{systemos});
                   }
                }
-               else{
-                  my %new=(extosrelease=>$parrec->{systemos},direction=>1);
-                  # try to find an already existing name in W5Base
-                  my $os=$dataobj->ModuleObject("itil::osrelease");
-                  $os->SetFilter({name=>'"'.$parrec->{systemos}.'"'});
-                  my ($w5osrec,$msg)=$mapos->getOnlyFirst(qw(name));
-                  if (defined($w5osrec)){
-                     $new{w5bosrelease}=$w5osrec->{name};
-                  }
-                  $mapos->ValidatedInsertRecord(\%new);
-                  delete($parrec->{systemos});
-               }
-            }
-            #################################################################### 
-            # assetid compare 
-            if (!in_array($dataobj->needVMHost(),$rec->{systemtype})){
-               if ($parrec->{assetassetid} ne ""){
-                  my $assetobj=getModuleObject($self->getParent->Config,
-                                               'itil::asset');
-                  $assetobj->SetFilter({srcsys=>'AssetManager',
-                                        srcid=>$parrec->{assetassetid}});
-                  my @w5asset=$assetobj->getHashList(qw(ALL));
-                  my $foundactive;
-                  foreach my $a (@w5asset) {
-                     if ($a->{cistatusid}==3 || $a->{cistatusid}==4) {
-                        $foundactive++;
+               #################################################################### 
+               # assetid compare 
+               if (!in_array($dataobj->needVMHost(),$rec->{systemtype})){
+                  if ($parrec->{assetassetid} ne ""){
+                     my $assetobj=getModuleObject($self->getParent->Config,
+                                                  'itil::asset');
+                     $assetobj->SetFilter({srcsys=>'AssetManager',
+                                           srcid=>$parrec->{assetassetid}});
+                     my @w5asset=$assetobj->getHashList(qw(ALL));
+                     my $foundactive;
+                     foreach my $a (@w5asset) {
+                        if ($a->{cistatusid}==3 || $a->{cistatusid}==4) {
+                           $foundactive++;
+                        }
                      }
-                  }
 
-                  if ($#w5asset!=-1 && !$foundactive) {
-                     # set asset installed/active before IfComp
-                     my $a=$w5asset[0];
-                     my $oldcistatus=$a->{cistatusid};
-                     
-                     $assetobj->ValidatedUpdateRecord($a,
-                                        {cistatusid=>4,
-                                         databossid=>$rec->{databossid}},
-                                        {id=>\$a->{id}}); 
-                  }
+                     if ($#w5asset!=-1 && !$foundactive) {
+                        # set asset installed/active before IfComp
+                        my $a=$w5asset[0];
+                        my $oldcistatus=$a->{cistatusid};
+                        
+                        $assetobj->ValidatedUpdateRecord($a,
+                                           {cistatusid=>4,
+                                            databossid=>$rec->{databossid}},
+                                           {id=>\$a->{id}}); 
+                     }
 
-                  $self->IfComp($dataobj,
-                                $rec,"asset",
-                                $parrec,"assetassetid",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'leftouterlinkcreate',
-                                onCreate=>{
-                                   comments=>
-                                      "automatically generated by QualityCheck",
-                                   cistatusid=>4,
-                                   allowifupdate=>1,
-                                   databossid=>$rec->{databossid},
-                                   mandatorid=>$rec->{mandatorid},
-                                   name=>$parrec->{assetassetid},
-                                   srcsys=>'AssetManager',
-                                   srcid=>$parrec->{assetassetid}});
+                     $self->IfComp($dataobj,
+                                   $rec,"asset",
+                                   $parrec,"assetassetid",
+                                   $autocorrect,$forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'leftouterlinkcreate',
+                                   onCreate=>{
+                                      comments=>
+                                         "automatically generated by QualityCheck",
+                                      cistatusid=>4,
+                                      allowifupdate=>1,
+                                      databossid=>$rec->{databossid},
+                                      mandatorid=>$rec->{mandatorid},
+                                      name=>$parrec->{assetassetid},
+                                      srcsys=>'AssetManager',
+                                      srcid=>$parrec->{assetassetid}});
+                  }
                }
-            }
-            else{  # special VM Host-system handling - vhostsystem needs to sync
-               my $assetid=$parrec->{assetassetid};
-               if ($assetid ne ""){
-                  my $sys=$dataobj->ModuleObject("tsacinv::system");
-                  $sys->SetFilter({
-                     assetassetid=>\$assetid,
-                     status=>\'in operation',
-                     usage=>['OSY-I: KONSOLSYSTEM HYPERVISOR',
-                             'OSY-I: KONSOLSYSTEM VMWARE']
-                  });
-                  my @l=$sys->getHashList(qw(systemname systemid));
-                  if ($#l==-1){
-                     $sys->ResetFilter();
+               else{  # special VM Host-system handling - vhostsystem needs to sync
+                  my $assetid=$parrec->{assetassetid};
+                  if ($assetid ne ""){
+                     my $sys=$dataobj->ModuleObject("tsacinv::system");
                      $sys->SetFilter({
                         assetassetid=>\$assetid,
                         status=>\'in operation',
-                        usage=>['OSY-I: KONSOLSYSTEM(BLADE&APPCOM)']
+                        usage=>['OSY-I: KONSOLSYSTEM HYPERVISOR',
+                                'OSY-I: KONSOLSYSTEM VMWARE']
                      });
-                     @l=$sys->getHashList(qw(systemname systemid));
-                  }
-                  if ($#l!=0){
-                     my $m='can not find a related VMWARE KONSOLSYSTEM '.
-                             'in AssetManager';
-                     push(@dataissue,$m);
-                     push(@qmsg,$m);
-                     $errorlevel=3 if ($errorlevel<3);
-                  }
-                  else{
-                     my $hostsystemsystemid=$l[0]->{systemid};
-                     my $o=getModuleObject($self->getParent->Config(),
-                                           "itil::system");
-                     $o->SetFilter({systemid=>\$hostsystemsystemid});
-                     my @h=$o->getHashList(qw(name));
-                     if ($#h<0){
-                        push(@qmsg,'can not find needed '.
-                                   'vm host system in IT-Inventar: '.
-                                   $l[0]->{systemname}." ".
-                                   'SystemID: '.$l[0]->{systemid});
+                     my @l=$sys->getHashList(qw(systemname systemid));
+                     if ($#l==-1){
+                        $sys->ResetFilter();
+                        $sys->SetFilter({
+                           assetassetid=>\$assetid,
+                           status=>\'in operation',
+                           usage=>['OSY-I: KONSOLSYSTEM(BLADE&APPCOM)']
+                        });
+                        @l=$sys->getHashList(qw(systemname systemid));
+                     }
+                     if ($#l!=0){
+                        my $m='can not find a related VMWARE KONSOLSYSTEM '.
+                                'in AssetManager';
+                        push(@dataissue,$m);
+                        push(@qmsg,$m);
                         $errorlevel=3 if ($errorlevel<3);
                      }
-                     if ($#h==0){
-                        $parrec->{vhostsystem}=$h[0]->{name};
+                     else{
+                        my $hostsystemsystemid=$l[0]->{systemid};
+                        my $o=getModuleObject($self->getParent->Config(),
+                                              "itil::system");
+                        $o->SetFilter({systemid=>\$hostsystemsystemid});
+                        my @h=$o->getHashList(qw(name));
+                        if ($#h<0){
+                           push(@qmsg,'can not find needed '.
+                                      'vm host system in IT-Inventar: '.
+                                      $l[0]->{systemname}." ".
+                                      'SystemID: '.$l[0]->{systemid});
+                           $errorlevel=3 if ($errorlevel<3);
+                        }
+                        if ($#h==0){
+                           $parrec->{vhostsystem}=$h[0]->{name};
+                        }
                      }
                   }
+                  $self->IfComp($dataobj,
+                                $rec,"vhostsystem",
+                                $parrec,"vhostsystem",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'string');
                }
-               $self->IfComp($dataobj,
-                             $rec,"vhostsystem",
-                             $parrec,"vhostsystem",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'string');
-            }
-            #################################################################### 
+               #################################################################### 
 
-            if (defined($parrec->{systemname})){
-               $parrec->{systemname}=lc($parrec->{systemname});
-               $parrec->{systemname}=~s/\..*$//; # remove posible Domain part 
-            }
-            my $nameok=1;
-            if ($parrec->{systemname} ne $rec->{name} &&
-                ($parrec->{systemname}=~m/\s/)){
-               $nameok=0;
-               my $m='systemname with whitespace in AssetManager - '.
-                     'contact oss to fix this!';
-               push(@qmsg,$m);
-               push(@dataissue,$m);
-               $errorlevel=3 if ($errorlevel<3);
-            }
-            if ($parrec->{systemname}=~m/\.\S{1,3}$/){
-               $parrec->{systemname}=~s/\..*//;
-               my $m='systemname with DNS Domain in AssetManager - '.
-                     'contact oss to fix this!';
-               push(@qmsg,$m);
-               push(@dataissue,$m);
-               $errorlevel=3 if ($errorlevel<3);
-            }
-
-            if ($parrec->{systemname}=~m/^\s*$/){  # könnte notwendig werden!
-               $nameok=0;
-               push(@qmsg,'systemname from AssetManager not useable - '.
-                          'contact oss to fix this!');
-               $errorlevel=3 if ($errorlevel<3);
-            }
-            if ($nameok){
-               $dataobj->ResetFilter();
-               $dataobj->SetFilter({name=>\$parrec->{systemname},
-                                    id=>"!".$rec->{id}});
-               my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
-               if (defined($chkrec)){
+               if (defined($parrec->{systemname})){
+                  $parrec->{systemname}=lc($parrec->{systemname});
+                  $parrec->{systemname}=~s/\..*$//; # remove posible Domain part 
+               }
+               my $nameok=1;
+               if ($parrec->{systemname} ne $rec->{name} &&
+                   ($parrec->{systemname}=~m/\s/)){
                   $nameok=0;
-                  my $m='systemname from AssetManager is already in use '.
-                        'by an other system - '.
-                        'contact OSS make the systemname unique!';
+                  my $m='systemname with whitespace in AssetManager - '.
+                        'contact oss to fix this!';
                   push(@qmsg,$m);
                   push(@dataissue,$m);
                   $errorlevel=3 if ($errorlevel<3);
                }
+               if ($parrec->{systemname}=~m/\.\S{1,3}$/){
+                  $parrec->{systemname}=~s/\..*//;
+                  my $m='systemname with DNS Domain in AssetManager - '.
+                        'contact oss to fix this!';
+                  push(@qmsg,$m);
+                  push(@dataissue,$m);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
+
+               if ($parrec->{systemname}=~m/^\s*$/){  # könnte notwendig werden!
+                  $nameok=0;
+                  push(@qmsg,'systemname from AssetManager not useable - '.
+                             'contact oss to fix this!');
+                  $errorlevel=3 if ($errorlevel<3);
+               }
+               if ($nameok){
+                  $dataobj->ResetFilter();
+                  $dataobj->SetFilter({name=>\$parrec->{systemname},
+                                       id=>"!".$rec->{id}});
+                  my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
+                  if (defined($chkrec)){
+                     $nameok=0;
+                     my $m='systemname from AssetManager is already in use '.
+                           'by an other system - '.
+                           'contact OSS make the systemname unique!';
+                     push(@qmsg,$m);
+                     push(@dataissue,$m);
+                     $errorlevel=3 if ($errorlevel<3);
+                  }
+               }
+
+               if ($nameok){
+                  $self->IfComp($dataobj,
+                                $rec,"name",
+                                $parrec,"systemname",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'string');
+               }
+
+               $self->IfComp($dataobj,
+                             $rec,"servicesupport",
+                             $parrec,"systemola",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'leftouterlinkcreate',
+                             onCreate=>{
+                                comments=>"automatically generated by QualityCheck",
+                                cistatusid=>4,
+                                name=>$parrec->{systemola}});
+               $self->IfComp($dataobj,
+                             $rec,"memory",
+                             $parrec,"systemmemory",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'integer',tolerance=>5);
+               $self->IfComp($dataobj,
+                             $rec,"cpucount",
+                             $parrec,"systemcpucount",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'integer');
+
+
+               #
+               # Filter for conumbers, which are allowed to use in darwin
+               #
+               if (defined($parrec->{conumber})){
+                  if ($parrec->{conumber} eq ""){
+                     $parrec->{conumber}=undef;
+                  }
+                  if (defined($parrec->{conumber})){
+                     #
+                     # hier muß der Check gegen die SAP P01 rein für die 
+                     # Umrechnung auf PSP Elemente
+                     #
+                     if ($parrec->{conumber}=~m/^\S{10}$/){
+                        my $sappsp=getModuleObject($self->getParent->Config,
+                                                   "tssapp01::psp");
+                        my $psp=$sappsp->CO2PSP_Translator($parrec->{conumber});
+                        $parrec->{conumber}=$psp if (defined($psp));
+                     }
+
+                     ###############################################################
+                     my $co=getModuleObject($self->getParent->Config,
+                                            "finance::costcenter");
+                     if (defined($co)){
+                        if (!($co->ValidateCONumber(
+                              $dataobj->SelfAsParentObject,"conumber", $parrec,
+                              {conumber=>$parrec->{conumber}}))){ # simulierter newrec
+                           $parrec->{conumber}=undef;
+                        }
+                     }
+                     else{
+                        $parrec->{conumber}=undef;
+                     }
+                  }
+               }
+
+
+
+
+               $self->IfComp($dataobj,
+                             $rec,"conumber",
+                             $parrec,"conumber",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'string');
+               $self->IfComp($dataobj,
+                             $rec,"osrelease",
+                             $parrec,"systemos",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'leftouterlink');
+               if ($rec->{allowifupdate}){
+                  my $net=getModuleObject($self->getParent->Config(),"itil::network");
+                  $net->SetCurrentView(qw(id name));
+                  my $netarea=$net->getHashIndexed("name");
+                  my @opList;
+
+                  #
+                  # %cleanAmIPlist is neassasary, because multiple IP-Addresses
+                  # can be in one networkcard record
+                  #
+                  my %cleanAmIPlist;
+                  foreach my $amiprec (@{$parrec->{ipaddresses}}){
+                     my $mappedCIStatus=5;
+                     if (lc($amiprec->{status}) eq "configured"){
+                        $mappedCIStatus=4;
+                     }
+                     if ($amiprec->{ipv4address} ne ""){
+                        if ($amiprec->{ipv4address}=~
+                            m/^\d{1,3}(\.\d{1,3}){3,3}$/){
+                           $cleanAmIPlist{$amiprec->{ipv4address}}={
+                              cistatusid=>$mappedCIStatus,
+                              ipaddress=>$amiprec->{ipv4address},
+                              description=>$amiprec->{description}
+                           };
+                        }
+                        else{
+                           msg(WARN,"ignoring IPv4 invalid ".
+                                    "'$amiprec->{ipv4address}' ".
+                                    "for $parrec->{systemid}");
+                        }
+                     }
+                     if ($amiprec->{ipv6address} ne ""){
+                        if ($amiprec->{ipv6address}=~
+                            m/^[a-f0-9]{1,4}(:[a-f0-9]{0,4}){3,7}$/){
+                           $cleanAmIPlist{$amiprec->{ipv6address}}={
+                              cistatusid=>$mappedCIStatus,
+                              ipaddress=>$amiprec->{ipv6address},
+                              description=>$amiprec->{description}
+                           };
+                        }
+                        else{
+                           msg(INFO,"ignoring invalid IPv6 ".
+                                    "'$amiprec->{ipv6address}' ".
+                                    "for $parrec->{systemid}");
+                        }
+                     }
+                  }
+                  my @cleanAmIPlist=values(%cleanAmIPlist);
+
+                  my $res=OpAnalyse(
+                             sub{  # comperator 
+                                my ($a,$b)=@_;
+                                my $eq;
+                                if ($a->{name} eq $b->{ipaddress}){
+                                   $eq=0;
+                                   $eq=1 if ($a->{comments} eq $b->{description} &&
+                                             $a->{srcsys} eq "AMCDS" &&
+                                             $a->{cistatusid} eq $b->{cistatusid});
+                                }
+                                return($eq);
+                             },
+                             sub{  # oprec generator
+                                my ($mode,$oldrec,$newrec,%p)=@_;
+                                if ($mode eq "insert" || $mode eq "update"){
+                                   my $networkid=$p{netarea}->{name}->
+                                                 {'Insel-Netz/Kunden-LAN'}->{id};
+                                   my $identifyby=undef;
+                                   if ($mode eq "update"){
+                                      $identifyby=$oldrec->{id};
+                                   }
+                                   if ($newrec->{ipaddress}=~m/^\s*$/){
+                                      $mode="nop";
+                                   }
+                                   return({OP=>$mode,
+                                           MSG=>"$mode ip $newrec->{ipaddress} ".
+                                                "in W5Base",
+                                           IDENTIFYBY=>$identifyby,
+                                           DATAOBJ=>'itil::ipaddress',
+                                           DATA=>{
+                                              name      =>$newrec->{ipaddress},
+                                              cistatusid=>$newrec->{cistatusid},
+                                              srcsys    =>'AMCDS',
+                                              type      =>'1', # use sek. entry
+                                              networkid =>$networkid,
+                                              comments  =>$newrec->{description},
+                                              systemid  =>$p{refid}
+                                              }
+                                           });
+                                }
+                                elsif ($mode eq "delete"){
+                                   my $networkid=$oldrec->{networkid};
+                                   if ($networkid ne $p{netarea}->{name}->
+                                                     {'Insel-Netz/Kunden-LAN'}->{id}){
+                                      return();
+                                   }
+                                   return({OP=>$mode,
+                                           MSG=>"delete ip $oldrec->{name} ".
+                                                "from W5Base",
+                                           DATAOBJ=>'itil::ipaddress',
+                                           IDENTIFYBY=>$oldrec->{id},
+                                           });
+                                }
+                                return(undef);
+                             },
+                             $rec->{ipaddresses},\@cleanAmIPlist,\@opList,
+                             refid=>$rec->{id},netarea=>$netarea);
+                  if (!$res){
+                     my $opres=ProcessOpList($self->getParent,\@opList);
+                  }
+               }
             }
 
-            if ($nameok){
+            if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
+               # forced updates on External Data
+               my $admid;
+               my $acgroup=getModuleObject($self->getParent->Config,"tsacinv::group");
+               $acgroup->SetFilter({lgroupid=>\$parrec->{lassignmentid}});
+               my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
+               if (defined($acgrouprec)){
+                  if ($acgrouprec->{supervisorldapid} ne "" ||
+                      $acgrouprec->{supervisoremail} ne ""){
+                     my $importname=$acgrouprec->{supervisorldapid};
+                     if ($importname eq ""){
+                        $importname=$acgrouprec->{supervisoremail};
+                     }
+                     my $user=getModuleObject($self->getParent->Config,
+                                               "base::user");
+                     my $databossid=$user->GetW5BaseUserID($importname,"posix",
+                                                           {quiet=>1});
+                     if (defined($databossid)){
+                        $admid=$databossid;
+                     }
+                  }
+               }
+               if ($admid ne ""){
+                  $self->IfComp($dataobj,
+                                $rec,"admid",
+                                {admid=>$admid},"admid",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'integer');
+               }
+               my $comments="";
+               if ($parrec->{assignmentgroup} ne ""){
+                  $comments.="\n" if ($comments ne "");
+                  $comments.="AssetManager AssignmentGroup: ".
+                             $parrec->{assignmentgroup};
+               }
+               if ($parrec->{conumber} ne ""){
+                  $comments.="\n" if ($comments ne "");
+                  $comments.="AssetManager CO-Number: ".
+                             $parrec->{conumber};
+               }
                $self->IfComp($dataobj,
-                             $rec,"name",
-                             $parrec,"systemname",
+                             $rec,"comments",
+                             {comments=>$comments},"comments",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'string');
             }
-
-            $self->IfComp($dataobj,
-                          $rec,"servicesupport",
-                          $parrec,"systemola",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'leftouterlinkcreate',
-                          onCreate=>{
-                             comments=>"automatically generated by QualityCheck",
-                             cistatusid=>4,
-                             name=>$parrec->{systemola}});
-            $self->IfComp($dataobj,
-                          $rec,"memory",
-                          $parrec,"systemmemory",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'integer',tolerance=>5);
-            $self->IfComp($dataobj,
-                          $rec,"cpucount",
-                          $parrec,"systemcpucount",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'integer');
-
-
-            #
-            # Filter for conumbers, which are allowed to use in darwin
-            #
-            if (defined($parrec->{conumber})){
-               if ($parrec->{conumber} eq ""){
-                  $parrec->{conumber}=undef;
-               }
-               if (defined($parrec->{conumber})){
-                  #
-                  # hier muß der Check gegen die SAP P01 rein für die 
-                  # Umrechnung auf PSP Elemente
-                  #
-                  if ($parrec->{conumber}=~m/^\S{10}$/){
-                     my $sappsp=getModuleObject($self->getParent->Config,
-                                                "tssapp01::psp");
-                     my $psp=$sappsp->CO2PSP_Translator($parrec->{conumber});
-                     $parrec->{conumber}=$psp if (defined($psp));
-                  }
-
-                  ###############################################################
-                  my $co=getModuleObject($self->getParent->Config,
-                                         "finance::costcenter");
-                  if (defined($co)){
-                     if (!($co->ValidateCONumber(
-                           $dataobj->SelfAsParentObject,"conumber", $parrec,
-                           {conumber=>$parrec->{conumber}}))){ # simulierter newrec
-                        $parrec->{conumber}=undef;
-                     }
-                  }
-                  else{
-                     $parrec->{conumber}=undef;
-                  }
-               }
-            }
-
-
-
-
-            $self->IfComp($dataobj,
-                          $rec,"conumber",
-                          $parrec,"conumber",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'string');
-            $self->IfComp($dataobj,
-                          $rec,"osrelease",
-                          $parrec,"systemos",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'leftouterlink');
-            if ($rec->{allowifupdate}){
-               my $net=getModuleObject($self->getParent->Config(),"itil::network");
-               $net->SetCurrentView(qw(id name));
-               my $netarea=$net->getHashIndexed("name");
-               my @opList;
-
-               #
-               # %cleanAmIPlist is neassasary, because multiple IP-Addresses
-               # can be in one networkcard record
-               #
-               my %cleanAmIPlist;
-               foreach my $amiprec (@{$parrec->{ipaddresses}}){
-                  my $mappedCIStatus=5;
-                  if (lc($amiprec->{status}) eq "configured"){
-                     $mappedCIStatus=4;
-                  }
-                  if ($amiprec->{ipv4address} ne ""){
-                     if ($amiprec->{ipv4address}=~
-                         m/^\d{1,3}(\.\d{1,3}){3,3}$/){
-                        $cleanAmIPlist{$amiprec->{ipv4address}}={
-                           cistatusid=>$mappedCIStatus,
-                           ipaddress=>$amiprec->{ipv4address},
-                           description=>$amiprec->{description}
-                        };
-                     }
-                     else{
-                        msg(WARN,"ignoring IPv4 invalid ".
-                                 "'$amiprec->{ipv4address}' ".
-                                 "for $parrec->{systemid}");
-                     }
-                  }
-                  if ($amiprec->{ipv6address} ne ""){
-                     if ($amiprec->{ipv6address}=~
-                         m/^[a-f0-9]{1,4}(:[a-f0-9]{0,4}){3,7}$/){
-                        $cleanAmIPlist{$amiprec->{ipv6address}}={
-                           cistatusid=>$mappedCIStatus,
-                           ipaddress=>$amiprec->{ipv6address},
-                           description=>$amiprec->{description}
-                        };
-                     }
-                     else{
-                        msg(INFO,"ignoring invalid IPv6 ".
-                                 "'$amiprec->{ipv6address}' ".
-                                 "for $parrec->{systemid}");
-                     }
-                  }
-               }
-               my @cleanAmIPlist=values(%cleanAmIPlist);
-
-               my $res=OpAnalyse(
-                          sub{  # comperator 
-                             my ($a,$b)=@_;
-                             my $eq;
-                             if ($a->{name} eq $b->{ipaddress}){
-                                $eq=0;
-                                $eq=1 if ($a->{comments} eq $b->{description} &&
-                                          $a->{srcsys} eq "AMCDS" &&
-                                          $a->{cistatusid} eq $b->{cistatusid});
-                             }
-                             return($eq);
-                          },
-                          sub{  # oprec generator
-                             my ($mode,$oldrec,$newrec,%p)=@_;
-                             if ($mode eq "insert" || $mode eq "update"){
-                                my $networkid=$p{netarea}->{name}->
-                                              {'Insel-Netz/Kunden-LAN'}->{id};
-                                my $identifyby=undef;
-                                if ($mode eq "update"){
-                                   $identifyby=$oldrec->{id};
-                                }
-                                if ($newrec->{ipaddress}=~m/^\s*$/){
-                                   $mode="nop";
-                                }
-                                return({OP=>$mode,
-                                        MSG=>"$mode ip $newrec->{ipaddress} ".
-                                             "in W5Base",
-                                        IDENTIFYBY=>$identifyby,
-                                        DATAOBJ=>'itil::ipaddress',
-                                        DATA=>{
-                                           name      =>$newrec->{ipaddress},
-                                           cistatusid=>$newrec->{cistatusid},
-                                           srcsys    =>'AMCDS',
-                                           type      =>'1', # use sek. entry
-                                           networkid =>$networkid,
-                                           comments  =>$newrec->{description},
-                                           systemid  =>$p{refid}
-                                           }
-                                        });
-                             }
-                             elsif ($mode eq "delete"){
-                                my $networkid=$oldrec->{networkid};
-                                if ($networkid ne $p{netarea}->{name}->
-                                                  {'Insel-Netz/Kunden-LAN'}->{id}){
-                                   return();
-                                }
-                                return({OP=>$mode,
-                                        MSG=>"delete ip $oldrec->{name} ".
-                                             "from W5Base",
-                                        DATAOBJ=>'itil::ipaddress',
-                                        IDENTIFYBY=>$oldrec->{id},
-                                        });
-                             }
-                             return(undef);
-                          },
-                          $rec->{ipaddresses},\@cleanAmIPlist,\@opList,
-                          refid=>$rec->{id},netarea=>$netarea);
-               if (!$res){
-                  my $opres=ProcessOpList($self->getParent,\@opList);
-               }
-            }
-         }
-
-         if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){
-            # forced updates on External Data
-            my $admid;
-            my $acgroup=getModuleObject($self->getParent->Config,"tsacinv::group");
-            $acgroup->SetFilter({lgroupid=>\$parrec->{lassignmentid}});
-            my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
-            if (defined($acgrouprec)){
-               if ($acgrouprec->{supervisorldapid} ne "" ||
-                   $acgrouprec->{supervisoremail} ne ""){
-                  my $importname=$acgrouprec->{supervisorldapid};
-                  if ($importname eq ""){
-                     $importname=$acgrouprec->{supervisoremail};
-                  }
-                  my $user=getModuleObject($self->getParent->Config,
-                                            "base::user");
-                  my $databossid=$user->GetW5BaseUserID($importname,"posix",
-                                                        {quiet=>1});
-                  if (defined($databossid)){
-                     $admid=$databossid;
-                  }
-               }
-            }
-            if ($admid ne ""){
-               $self->IfComp($dataobj,
-                             $rec,"admid",
-                             {admid=>$admid},"admid",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
-            }
-            my $comments="";
-            if ($parrec->{assignmentgroup} ne ""){
-               $comments.="\n" if ($comments ne "");
-               $comments.="AssetManager AssignmentGroup: ".
-                          $parrec->{assignmentgroup};
-            }
-            if ($parrec->{conumber} ne ""){
-               $comments.="\n" if ($comments ne "");
-               $comments.="AssetManager CO-Number: ".
-                          $parrec->{conumber};
-            }
-            $self->IfComp($dataobj,
-                          $rec,"comments",
-                          {comments=>$comments},"comments",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'string');
          }
          if ($rec->{asset} ne ""){
             my $par=getModuleObject($self->getParent->Config(),"tsacinv::asset");
