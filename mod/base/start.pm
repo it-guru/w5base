@@ -69,7 +69,12 @@ sub findtemplvar
                             userid=>$userid,mode=>\"foaddtopic"});
             my ($iarec,$msg)=$ia->getOnlyFirst(qw(id));
             if (!defined($iarec)){
-               my $msg=sprintf($self->T("You currently haven't subscribe the '\%s' Forum. By subscribing this forum, you will get useful informations for you. Klick OK if you wan't to subscribe this forum."),$_[2]);
+               my $msg=sprintf($self->T("You currently aren't subscribed ".
+                                        "to the '%s' forum. ".
+                                        "By subscribing to this forum, ".
+                                        "you will get useful information. ".
+                                        "Klick 'OK' if you wish to subscribe ".
+                                        "to this forum."),$_[2]);
                my $code=<<EOF;
 <script language="JavaScript">
 function ForumCheck()
