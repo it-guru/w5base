@@ -86,7 +86,7 @@ sub qcheckRecord
 
 
    return(0,undef) if ($rec->{cistatusid}!=4);
-   if ($rec->{systemid} ne ""){
+   if ($rec->{systemid} ne "" && $rec->{srcsys} eq "AssetManager"){
       my %parrec=(); 
       $parrec{isclusternode}=0;
       my $sys=getModuleObject($self->getParent->Config(),"tsacinv::system");
