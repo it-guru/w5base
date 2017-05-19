@@ -106,7 +106,9 @@ sub URLValidate
       return(\%uri);
    }
 
-   my @nonStdSchema=qw(oracle net8 mssql mysql informix scp ssh pesit sftp);
+   my @nonStdSchema=qw(oracle net8 mssql mysql informix scp 
+                       ssh pesit sftp
+                       tcp udp);
 
    my @sok=(qw(http ldap ldaps https file mailto ftp rlogin),@nonStdSchema);
    if (!in_array(\@sok,$uri{scheme})){

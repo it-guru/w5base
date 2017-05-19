@@ -18,3 +18,4 @@
 'last known IP-Adresses'=>{de=>'letzte bekannte IP Adressen'},
 'URL fullname'=>{de=>'URL Bezeichner'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},
+'Interface'=>{de=>'Schnittstelle'},

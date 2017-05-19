@@ -126,6 +126,22 @@ sub new
                 label         =>'only for internal communication in application',
                 dataobjattr   =>'accessurl.is_internal'),
 
+
+      new kernel::Field::TextDrop(
+                name          =>'lnkapplappl',
+                group         =>'urlinfo',
+                readonly      =>1,
+                label         =>'Interface',
+                vjointo       =>'itil::lnkapplappl',
+                vjoinon       =>['lnkapplapplid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
+                name          =>'lnkapplapplid',
+                selectfix     =>1,
+                label         =>'InterfaceID',
+                dataobjattr   =>'accessurl.lnkapplappl'),
+
       new kernel::Field::Text(
                 name          =>'scheme',
                 group         =>'urlinfo',
@@ -282,10 +298,12 @@ sub new
                 label         =>'CustomerID',
                 dataobjattr   =>'appl.customer'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'applid',
                 label         =>'ApplID',
-                dataobjattr   =>'accessurl.appl'),
+                wrdataobjattr =>'accessurl.appl',
+                dataobjattr   =>"if (accessurl.appl is not null,accessurl.appl,".
+                                "lnkapplappl.fromappl)"),
 
       new kernel::Field::Date(
                 name          =>'expiration',
@@ -311,8 +329,16 @@ sub new
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="accessurl left outer join appl ".
-            "on accessurl.appl=appl.id";
+   my $from="accessurl ".
+            "left outer join lnkapplappl ".
+            "on accessurl.lnkapplappl=lnkapplappl.id ".
+            "left outer join appl ".
+            "on appl.id=if (accessurl.appl is not null,".
+            "accessurl.appl,lnkapplappl.fromappl) ".
+            "join (select min(id) ugroupedid ".
+                  "from accessurl ".
+                  "group by fullname,network,appl) ugrouped ".
+            "on accessurl.id=ugrouped.ugroupedid";
    return($from);
 }
 
@@ -437,6 +463,8 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+
+   return(undef) if ($rec->{lnkapplapplid} ne "");
 
    my $applid=defined($rec) ? $rec->{applid} : undef;
 

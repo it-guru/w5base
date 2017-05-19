@@ -150,6 +150,25 @@ sub isWriteOnApplValid
    return(0);
 }
 
+
+sub isWriteOnApplApplValid
+{
+   my $self=shift;
+   my $lnkapplapplid=shift;
+   my $group=shift;
+
+   my $lnkapplappl=$self->getPersistentModuleObject("itil::lnkapplappl");
+   $lnkapplappl->SetFilter({id=>\$lnkapplapplid});
+   my ($arec,$msg)=$lnkapplappl->getOnlyFirst(qw(ALL));
+   my @g=$lnkapplappl->isWriteValid($arec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
+
+
 sub isWriteOnITFarmValid
 {
    my $self=shift;

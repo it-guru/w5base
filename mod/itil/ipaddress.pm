@@ -232,6 +232,18 @@ sub new
                 vjoinon       =>['id'=>'ipaddressid'],
                 vjoindisp     =>['appl']),
 
+      new kernel::Field::SubList(
+                name          =>'applications',
+                label         =>'Applications',
+                group         =>'further',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'itil::lnkapplip',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'ipaddressid'],
+                vjoininhash   =>['appl','applid'],
+                vjoindisp     =>['appl']),
+
       new kernel::Field::Text(
                 name          =>'applcustomer',
                 label         =>'Application Customer',

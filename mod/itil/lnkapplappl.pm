@@ -246,27 +246,42 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fromurl',
+                htmldetail    =>0,
                 group         =>'comdetails',
                 label         =>'from URL',
                 dataobjattr   =>'lnkapplappl.fromurl'),
 
       new kernel::Field::Text(
                 name          =>'fromservice',
+                htmldetail    =>0,
                 group         =>'comdetails',
                 label         =>'from Servicename',
                 dataobjattr   =>'lnkapplappl.fromservice'),
 
       new kernel::Field::Text(
                 name          =>'tourl',
+                htmldetail    =>0,
                 group         =>'comdetails',
                 label         =>'to URL',
                 dataobjattr   =>'lnkapplappl.tourl'),
 
       new kernel::Field::Text(
                 name          =>'toservice',
+                htmldetail    =>0,
                 group         =>'comdetails',
                 label         =>'to Servicename',
                 dataobjattr   =>'lnkapplappl.toservice'),
+
+      new kernel::Field::SubList(
+                name          =>'comlinks',
+                label         =>'Communicationslinks',
+                group         =>'comdetails',
+                forwardSearch =>1,
+                allowcleanup  =>1,
+                subeditmsk    =>'subedit.lnkapplappl',
+                vjointo       =>'itil::lnkapplapplurl',
+                vjoinon       =>['id'=>'lnkapplapplid'],
+                vjoindisp     =>['fullname']),
 
       new kernel::Field::Select(
                 name          =>'monitor',
@@ -376,6 +391,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'handleconfidential',
+                selectfix     =>1,
                 group         =>'classi',
                 label         =>'handle interface documentation confidential',
                 dataobjattr   =>'lnkapplappl.handleconfidential'),
@@ -912,12 +928,7 @@ sub isViewValid
          }
       }
       if (!$foundprivread){
-         @l=grep(!/^agreement$/,@l);
-         @l=grep(!/^ifagreement$/,@l);
-         @l=grep(!/^impl$/,@l);
-         @l=grep(!/^desc$/,@l);
-         @l=grep(!/^comdetails$/,@l);
-         @l=grep(!/^history$/,@l);
+         @l=grep(/^(default|source)$/,@l);
       }
    }
 

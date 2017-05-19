@@ -1609,3 +1609,5 @@ create table lnkassetasset (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
 alter table swinstance add ssl_cipher varchar(40) default NULL,add ssl_certserial varchar(40) default NULL,add ssl_version varchar(40) default NULL,add ssl_certdump longtext   default NULL,add ssl_certsighash varchar(40) default NULL;
+alter table accessurl add lnkapplappl bigint(20),add target_is_fromappl int(1) default '0', add notmultiple int(1) default '1', add from_fullname varchar(512), add from_scheme varchar(20), add from_hostname varchar(128), add from_ipport int(10), change appl appl bigint(20);
+alter table accessurl drop key fullname, add UNIQUE KEY fullname (fullname,network,notmultiple),add FOREIGN KEY lnkapplappl (lnkapplappl) REFERENCES lnkapplappl (id) ON DELETE CASCADE;
