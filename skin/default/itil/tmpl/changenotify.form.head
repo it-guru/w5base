@@ -23,7 +23,8 @@ li{
    background-color: #e6e6e6;
    margin: 0px;
    padding: 0px;
-   border: 0px;
+   border: 2px solid #e6e6e6;
+   border-collapse: collapse;
 }
 #tabelle .zelleWeiss {
    background-color: #FFFFFF;
@@ -34,7 +35,7 @@ li{
 #tabelle td {
    height: 20px;
    vertical-align: top;
-   padding: 0px;
+   padding: 2px 0 2px 0;
 }
 a:link     { color: #E20074; }
 a:visited  { color: #E20074; }
