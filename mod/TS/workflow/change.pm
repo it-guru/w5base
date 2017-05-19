@@ -82,18 +82,12 @@ sub getPosibleActions
                          $_->{comments}=~/^Approval request sent/}
                          @{$WfRec->{shortactionlog}});
 
-      if ($#notifies==-1) {
-         my $chmmgr=$self->chmAuthority($WfRec);
+      my $chmmgr=$self->chmAuthority($WfRec);
 
+      if ($#notifies==-1) {
          if (($approvalstate eq 'pending' ||
               $approvalstate eq 'denied') && $chmmgr eq 'TIT') {
             push(@l,'chmnotifyapprove');
-         }
-
-         if ($chmmgr ne 'TIT') {
-            push(@l,qw(chmnotifyapproveall
-                       chmnotifyapprovecritical
-                       chmnotifyapprovedirect));
          }
       }
       else {
@@ -127,6 +121,12 @@ sub getPosibleActions
                }
             }
          }
+      }
+
+      if ($chmmgr ne 'TIT') {
+         push(@l,qw(chmnotifyapproveall
+                    chmnotifyapprovecritical
+                    chmnotifyapprovedirect));
       }
    }
 
@@ -243,7 +243,7 @@ sub getNotifyDestinations
       return(undef) if ($#{$appgrps}==-1 || ref($appgrps) ne 'ARRAY');
 
       # groups from CHM TelIT must not be informed
-      my @infogrps=grep(!/^TIT\.TSI\.INT\.CHM/,@$appgrps);
+      my @infogrps=grep(!/^TIT\..*\.CHM/,@$appgrps);
 
       if ($self->chmAuthority($WfRec) ne 'TIT') {
          # only TelIT-Approver will be informed about non-TelIT changes
@@ -308,7 +308,7 @@ sub chmAuthority
    my $self=shift;
    my $WfRec=shift;
 
-   if ($WfRec->{additional}{ServiceManagerChmMgr}[0]=~m/^TIT\.TSI\./) {
+   if ($WfRec->{additional}{ServiceManagerChmMgr}[0]=~m/^TIT\./) {
       return('TIT');
    }
 
