@@ -118,7 +118,7 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
       $flt[0]->{cistatusid}=[1,2,3,4,5];
       if (my $mdate=$self->getField("mdate")){
          $flt[1]->{cistatusid}=[1,2,6];
-         $flt[1]->{mdate}=">now-14d";
+         $flt[1]->{mdate}=">now-28d";
       }
    }
    $self->SetFilter(\@flt);

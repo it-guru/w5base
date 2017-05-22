@@ -985,8 +985,8 @@ sub Log
       }
    }
    if (defined($LogCache->{$facility})){
-      if (defined($LogCache->{$facility}) &&
-          exists($LogCache->{$facility}->{usemsg})){
+      if ((defined($LogCache->{$facility}) &&
+          exists($LogCache->{$facility}->{usemsg})) || $W5V2::Debug){
          msg($mode,@_);
       }
       if (defined($LogCache->{$facility}->{fh})){
