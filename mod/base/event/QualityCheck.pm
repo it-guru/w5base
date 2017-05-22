@@ -73,6 +73,29 @@ sub QualityCheck
    else{
       my $obj=getModuleObject($self->Config,$dataobj);
       if (defined($obj)){
+         #
+         # lastqcheckoutofdate is needed, to ensure (new) edited records are
+         # prior handeled in QualityCHeck
+         #
+         my $lastqcheckoutofdate=$obj->getField("lastqcheckoutofdate");
+         if (!defined($lastqcheckoutofdate)){
+            my $mdate=$obj->getField("mdate");
+            my $lastqcheck=$obj->getField("lastqcheck");
+            if (defined($mdate) && defined($lastqcheck) &&
+                $mdate->{dataobjattr} ne "" &&
+                $lastqcheck->{dataobjattr} ne ""){
+               $obj->AddFields(
+                   new kernel::Field::Boolean(
+                             name          =>'lastqcheckoutofdate',
+                             label         =>'last QualityCheck out of Date',
+                             sqlorder      =>'desc',
+                             uivisible     =>0,
+                             dataobjattr   =>'('.$lastqcheck->{dataobjattr}.
+                                             '<'.$mdate->{dataobjattr}.')')
+               )
+            }
+         }
+
          my $basefilter;
          if ($obj->getField("mandatorid")){
             if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}})) &&
@@ -115,6 +138,9 @@ sub doQualityCheck
       unshift(@view,"lastqcheck");
       if (defined($idfieldobj)){
          push(@view,$idfieldobj->Name());
+      }
+      if ($dataobj->getField("lastqcheckoutofdate")){
+         unshift(@view,"lastqcheckoutofdate");
       }
    }
    else{
