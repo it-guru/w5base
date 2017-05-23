@@ -306,6 +306,12 @@ sub qcheckRecord
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'text');
                $self->IfComp($dataobj,
+                             $rec,"name",
+                             $parrec,"name",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'text');
+               $self->IfComp($dataobj,
                              $rec,"currentvers",
                              $parrec,"version",
                              $autocorrect,$forcedupd,$wfrequest,
@@ -464,21 +470,16 @@ sub qcheckRecord
          $errorlevel=3 if ($errorlevel<3);
       }
    }
-   if (keys(%$wfrequest)){
-#      printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
+  if (keys(%$wfrequest)){
+      my $msg="different values stored in AssetManager: ";
+      push(@qmsg,$msg);
+      push(@dataissue,$msg);
+      $errorlevel=3 if ($errorlevel<3);
    }
-
-   # now process workflow request for traditional W5Deltas
-
-   # todo
 
    #######################################################################
-
-   if ($#qmsg!=-1 || $errorlevel>0){
-      return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue});
-   }
-
-   return($errorlevel,undef);
+   return($self->HandleWfRequest($dataobj,$rec,
+                                 \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
 }
 
 
