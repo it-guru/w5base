@@ -89,7 +89,7 @@ sub new
                }
                return("DE4 (VS-NfD=?)");
             }
-            elsif ($region eq "EU"){
+            elsif ($region eq "EU" || $region eq "SK" || $region eq "HU"){
                return("DE3");
             }
             elsif ($region eq "EUROPE"){

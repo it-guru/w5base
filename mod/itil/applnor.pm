@@ -385,12 +385,13 @@ sub new
                     if ($#{$l}==-1){
                        return("?");
                     }
-                    # deliveryRegion needs to be a REGION - not a land!
-                    # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14906067140021
                     #
-                    #if ($#{$l}==0){
-                    #   return($l->[0]);
-                    #}
+                    # Achtung: Eine Erbringungsregion kann auch direkt ein
+                    #          Land sein (z.B. DE oder SK)
+                    #
+                    if ($#{$l}==0){
+                       return($l->[0]);
+                    }
                     my $c=getModuleObject($self->getParent->Config,
                                           "base::isocountry");
                     my @eu=$c->getCountryEntryByToken(1,"EU");
