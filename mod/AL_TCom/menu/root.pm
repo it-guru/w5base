@@ -160,6 +160,15 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+  $self->RegisterObj("AL_TCom.appl.lnkapplappl.comlink",
+                      "itil::lnkapplapplurl",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.appl.lnkapplappl.comlink.new",
+                      "itil::lnkapplapplurl",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.appl.lnkcustcontract",
                       "itil::lnkapplcustcontract",
                       defaultacl=>['admin']);

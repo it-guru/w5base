@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use itil::lib::Listedit;
+use itil::appl;
 @ISA=qw(itil::lib::Listedit);
 
 sub new
@@ -619,6 +620,54 @@ sub new
                 label         =>'AssetLocationID',
                 dataobjattr   =>'asset.location'),
 
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplsectarget',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplsectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplsecroles',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplmandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplbusinessteamid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.businessteam'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemappltsmid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemappltsm2id',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplopmid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplopm2id',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.opm2'),
+
+
+
       new kernel::Field::DynWebIcon(
                 name          =>'applweblink',
                 searchable    =>0,
@@ -936,7 +985,18 @@ sub getSqlFrom
             "left outer join system as vsystem ".
             "on system.vhostsystem=vsystem.id ".
             "left outer join asset as vasset ".
-            "on vsystem.asset=vasset.id";
+            "on vsystem.asset=vasset.id ".
+
+            "left outer join appl as secsystemappl ".
+            "on qlnkapplsystem.appl=secsystemappl.id and secsystemappl.cistatus<6 ".
+           
+            "left outer join lnkcontact secsystemlnkcontact ".
+            "on secsystemlnkcontact.parentobj='itil::appl' ".
+            "and qlnkapplsystem.appl=secsystemlnkcontact.refid ".
+           
+            "left outer join costcenter secsystemcostcenter ".
+            "on secsystemappl.conumber=secsystemcostcenter.name ";
+
    return($from);
 }
 
@@ -950,9 +1010,10 @@ sub SecureSetFilter
        !$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-      push(@flt,[
-                 {mandatorid=>\@mandators},
-                ]);
+      my @addflt;
+      push(@addflt,{mandatorid=>\@mandators});
+      $self->itil::appl::addApplicationSecureFilter(['secsystemappl'],\@addflt);
+      push(@flt,\@addflt);
    }
    return($self->SetFilter(@flt));
 }

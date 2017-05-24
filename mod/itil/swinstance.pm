@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
+use itil::appl;
 use itil::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
@@ -762,6 +763,51 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::Link(
+                name          =>'secsystemapplsectarget',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplsectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplsecroles',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplmandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplbusinessteamid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.businessteam'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemappltsmid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemappltsm2id',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplopmid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemapplopm2id',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.opm2'),
+
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
       new kernel::Field::QualityState(),
@@ -825,7 +871,18 @@ sub getSqlFrom
           "left outer join software ".
           "on lnksoftwaresystem.software=software.id ".
           "left outer join producer ".
-          "on software.producer=producer.id";
+          "on software.producer=producer.id ".
+
+          "left outer join appl as secsystemappl ".
+          "on swinstance.appl=secsystemappl.id and secsystemappl.cistatus<6 ".
+
+          "left outer join lnkcontact secsystemlnkcontact ".
+          "on secsystemlnkcontact.parentobj='itil::appl' ".
+          "and appl.id=secsystemlnkcontact.refid ".
+
+          "left outer join costcenter secsystemcostcenter ".
+          "on secsystemappl.conumber=secsystemcostcenter.name ";
+
 
    return($from);
 }
@@ -877,6 +934,9 @@ sub SecureSetFilter
                     {admid=>$userid},       {adm2id=>$userid},
                     {swteamid=>\@grpids}
                    );
+         $self->itil::appl::addApplicationSecureFilter(['secsystemappl'],\@addflt);
+      
+         push(@flt,\@addflt);
       }
       push(@flt,\@addflt);
    }

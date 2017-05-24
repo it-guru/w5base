@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use itil::lib::Listedit;
+use itil::appl;
 @ISA=qw(itil::lib::Listedit);
 
 sub new
@@ -490,6 +491,50 @@ sub new
                 label         =>'to ApplID',
                 dataobjattr   =>'lnkapplappl.toappl'),
 
+      new kernel::Field::Link(
+                name          =>'secfromapplsectarget',
+                noselect      =>'1',
+                dataobjattr   =>'fromappllnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplsectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappllnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplsecroles',
+                noselect      =>'1',
+                dataobjattr   =>'fromappllnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplmandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplbusinessteamid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.businessteam'),
+
+      new kernel::Field::Link(
+                name          =>'secfromappltsmid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'secfromappltsm2id',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplopmid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplopm2id',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.opm2'),
    );
    $self->{history}={
       insert=>[
@@ -537,7 +582,19 @@ sub getSqlFrom
             "left outer join appl as toappl ".
             "on lnkapplappl.toappl=toappl.id ".
             "left outer join appl as fromappl ".
-            "on lnkapplappl.fromappl=fromappl.id";
+            "on lnkapplappl.fromappl=fromappl.id ".
+
+            "left outer join lnkcontact toappllnkcontact ".
+            "on toappllnkcontact.parentobj='itil::appl' ".
+            "and toappl.id=toappllnkcontact.refid ".
+            "left outer join lnkcontact fromappllnkcontact ".
+            "on fromappllnkcontact.parentobj='itil::appl' ".
+            "and fromappl.id=fromappllnkcontact.refid ".
+
+            "left outer join costcenter toapplcostcenter ".
+            "on toappl.conumber=toapplcostcenter.name ".
+            "left outer join costcenter fromapplcostcenter ".
+            "on fromappl.conumber=fromapplcostcenter.name ";
    return($from);
 }
 
@@ -913,7 +970,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @l=qw(header default ifagreement agreement comdetails impl
-             interfacescomp desc classi source history); 
+             interfacescomp desc classi source history);
    if (defined($rec) && exists($rec->{ifagreementneeded}) &&
        !$rec->{ifagreementneeded}){
       @l=grep(!/^agreement$/,@l);
@@ -935,6 +992,23 @@ sub isViewValid
 
    return(@l);
 }
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
+                          "RMember")){
+      my @addflt;
+      $self->addApplicationSecureFilter(['secfromappl'],\@addflt);
+      push(@flt,\@addflt);
+   }
+
+   return($self->SetFilter(@flt));
+}
+
 
 sub SecureValidate
 {

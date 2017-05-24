@@ -70,6 +70,15 @@ sub new
                 vjoindisp     =>'name',
                 dataobjattr   =>'asset.name'),
                                                    
+      new kernel::Field::TextDrop(
+                name          =>'assetfullname',
+                htmlwidth     =>'250px',
+                label         =>'Asset Fullname',
+                vjoineditbase =>{'cistatusid'=>"<5"},
+                vjointo       =>'itil::asset',
+                vjoinon       =>['assetid'=>'id'],
+                vjoindisp     =>'fullname'),
+                                                   
       new kernel::Field::Link(
                 name          =>'assetid',
                 label         =>'Asset ID',

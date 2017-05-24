@@ -22,6 +22,8 @@
 'itil.appl.lnksystem.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl.lnkapplappl'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'itil.appl.lnkapplappl.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.appl.lnkapplappl.comlink'=>{de=>'Komm.Verb.',en=>'Com.Link'},
+'itil.appl.lnkapplappl.comlink.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.appl.lnkaccountingno'=>{de=>'Verkn. Account Nr.',en=>'Link Account No.'},
 'itil.appl.lnkapplcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itil.appl.lnkapplinteranswer'=>{de=>'Interview',en=>'Interview'},

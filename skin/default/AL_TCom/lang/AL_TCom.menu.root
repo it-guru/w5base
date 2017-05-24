@@ -18,6 +18,8 @@
 'AL_TCom.appl.lnkcustcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkapplappl'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'AL_TCom.appl.lnkapplappl.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.appl.lnkapplappl.comlink'=>{de=>'Komm.Verb.',en=>'Com.Link'},
+'AL_TCom.appl.lnkapplappl.comlink.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},
 'AL_TCom.appl.lnksystem.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.appl.lnkchmapprgrp'=>{de=>'ChmApprover',en=>'ChmApprover'},

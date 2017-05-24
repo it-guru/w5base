@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use itil::lib::Listedit;
+use itil::appl;
 @ISA=qw(kernel::App::Web::Listedit itil::lib::Listedit kernel::DataObj::DB);
 
 
@@ -255,8 +256,53 @@ sub new
                 group         =>'source',
                 label         =>'real Editor Account',
                 dataobjattr   =>'accessurl.realeditor'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplsectarget',
+                noselect      =>'1',
+                dataobjattr   =>'fromappllnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplsectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappllnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplsecroles',
+                noselect      =>'1',
+                dataobjattr   =>'fromappllnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplmandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplbusinessteamid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.businessteam'),
+
+      new kernel::Field::Link(
+                name          =>'secfromappltsmid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'secfromappltsm2id',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplopmid',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'secfromapplopm2id',
+                noselect      =>'1',
+                dataobjattr   =>'fromappl.opm2')
    );
-   $self->setDefaultView(qw(fullname lnkapplappl cdate));
+   $self->setDefaultView(qw(fullname network lnkapplappl cdate));
    $self->setWorktable("accessurl");
    return($self);
 }
@@ -266,7 +312,18 @@ sub getSqlFrom
    my $self=shift;
    my $from="accessurl ".
             "left outer join lnkapplappl ".
-            "on accessurl.lnkapplappl=lnkapplappl.id ";
+            "on accessurl.lnkapplappl=lnkapplappl.id ".
+
+            "left outer join appl fromappl ".
+            "on lnkapplappl.fromappl=fromappl.id ".
+
+            "left outer join lnkcontact fromappllnkcontact ".
+            "on fromappllnkcontact.parentobj='itil::appl' ".
+            "and fromappl.id=fromappllnkcontact.refid ".
+
+            "left outer join costcenter fromapplcostcenter ".
+            "on fromappl.conumber=fromapplcostcenter.name ";
+
    return($from);
 }
 
@@ -282,26 +339,20 @@ sub initSearchQuery
 
 
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
 
-#sub SecureSetFilter
-#{
-#   my $self=shift;
-#   my @flt=@_;
-#
-#   if (!$self->isDirectFilter(@flt) &&
-#       !$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
-#                          "RMember")){
-#      my $userid=$self->getCurrentUserId();
-#      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-#      push(@flt,[
-#                 {databossid=>\$userid},
-#                 {mandatorid=>\@mandators},
-#                ]);
-#   }
-#   return($self->SetFilter(@flt));
-#}
+   if (!$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
+                          "RMember")){
+      my @addflt;
+      $self->addApplicationSecureFilter(['secfromappl'],\@addflt);
+      push(@flt,\@addflt);
+   }
 
-
+   return($self->SetFilter(@flt));
+}
 
 
 sub Validate

@@ -2019,15 +2019,14 @@ sub getSqlFrom
 }
 
 
-sub SecureSetFilter
+sub addApplicationSecureFilter
 {
    my $self=shift;
-   my @flt=@_;
+   my $namespace=shift;
+   my $addflt=shift;
 
-   if (
-      #!$self->isDirectFilter(@flt) && 
-       !$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
-                          "RMember")){
+
+   foreach my $ns (@$namespace){ 
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
                           [orgRoles(),qw(RMember RCFManager RCFManager2 
@@ -2035,28 +2034,48 @@ sub SecureSetFilter
       my @grpids=keys(%grps);
 
       my $userid=$self->getCurrentUserId();
-      my @addflt=(
-                 {sectargetid=>\$userid,sectarget=>\'base::user',
-                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-                            "*roles=?read?=roles*"},
-                 {sectargetid=>\@grpids,sectarget=>\'base::grp',
-                  secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
-                            "*roles=?read?=roles*"}
-                );
-      if ($ENV{REMOTE_USER} ne "anonymous"){
-         push(@addflt,
-                    {mandatorid=>\@mandators},
-                    {databossid=>\$userid},
-                    {semid=>\$userid},       {sem2id=>\$userid},
-                    {tsmid=>\$userid},       {tsm2id=>\$userid},
-                    {opmid=>\$userid},       {opm2id=>\$userid},
-                    {delmgrid=>\$userid},    {delmgr2id=>\$userid},
-                    {businessteamid=>\@grpids},
-                    {responseteamid=>\@grpids}
-                   );
+      if ($self->getField($ns.'sectargetid')){
+         push(@$addflt,{$ns.'sectargetid'=>\$userid,
+            $ns.'sectarget'=>\'base::user',
+            $ns.'secroles'=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                      "*roles=?read?=roles*"}
+         );
       }
+      if ($self->getField($ns.'sectargetid')){
+         push(@$addflt,{$ns.'sectargetid'=>\$userid,
+            $ns.'sectarget'=>\'base::grp',
+            $ns.'secroles'=>"*roles=?write?=roles* *roles=?privread?=roles* ".
+                      "*roles=?read?=roles*"}
+         );
+      }
+      if ($ENV{REMOTE_USER} ne "anonymous"){
+         if ($self->getField($ns.'mandatorid')){
+            push(@$addflt,{$ns.'mandatorid'=>\@mandators});
+         }
+         foreach my $fld (qw(databossid semid sem2id tsmid tsm2id opmid opm2id delmgrid delmgr2id)){
+            if ($self->getField($ns.$fld)){
+               push(@$addflt,{$ns.$fld=>\$userid});
+            }
+         }
+         foreach my $fld (qw(businessteamid responseteamid)){
+            if ($self->getField($ns.$fld)){
+               push(@$addflt,{$ns.$fld=>\@grpids});
+            }
+         }
+      }
+   }
+}
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
+                          "RMember")){
+      my @addflt;
+      $self->addApplicationSecureFilter([''],\@addflt);
       push(@flt,\@addflt);
-      
    }
    if (!$self->isDirectFilter(@flt)){
       my @addflt=({cistatusid=>"!7"});

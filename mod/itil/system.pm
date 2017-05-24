@@ -26,6 +26,7 @@ use kernel::Field;
 use kernel::CIStatusTools;
 use finance::costcenter;
 use itil::lib::Listedit;
+use itil::appl;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink
         kernel::CIStatusTools);
@@ -157,17 +158,6 @@ sub new
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['tsmemail']),
 
-
-#      new kernel::Field::Text(
-#                name          =>'applicationnamesline',
-#                label         =>'Applicationnames line',
-#                group         =>'applications',
-#                htmldetail    =>0,
-#                searchable    =>0,
-#                vjointo       =>'itil::lnkapplsystem',
-#                vjoinbase     =>[{applcistatusid=>"<=4"}],
-#                vjoinon       =>['id'=>'systemid'],
-#                vjoindisp     =>['appl']),
 
       new kernel::Field::Text(
                 name          =>'customer',
@@ -640,14 +630,6 @@ sub new
                 group         =>'misc',
                 label         =>'Keywords',
                 dataobjattr   =>'system.kwords'),
-
-#     new kernel::Field::Select(
-#                name          =>'denyupd',
-#                group         =>'upd',
-#                label         =>'it is posible to update/upgrade OS',
-#                value         =>[0,10,20,30,99],
-#                transprefix   =>'DENUPD.',
-#                dataobjattr   =>'system.denyupd'),
 
      new kernel::Field::Select(
                name          =>'denyupselect',
@@ -1251,6 +1233,52 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.croles'),
 
+      new kernel::Field::Link(
+                name          =>'secsystemsectarget',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemsectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemsecroles',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemmandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'secsystembusinessteamid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.businessteam'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemtsmid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemtsm2id',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemopmid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemopm2id',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.opm2'),
+
+
       new kernel::Field::Interview(),
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
@@ -1431,6 +1459,8 @@ sub SecureSetFilter
                     {adminteamid=>\@grpids}
                    );
       }
+      $self->itil::appl::addApplicationSecureFilter(['secsystem'],\@addflt);
+
       push(@flt,\@addflt);
    }
    if (!$self->isDirectFilter(@flt)){
@@ -1521,7 +1551,6 @@ sub Validate
                     "an embedded systems can not have software installations");
          return(0);
       }
-      print STDERR Dumper($oldrec->{software});
    }
    if (effChangedVal($oldrec,$newrec,"isclusternode")){
       if (effVal($oldrec,$newrec,"isembedded")){
@@ -1598,14 +1627,27 @@ sub getSqlFrom
    my $mode=shift;
    my @flt=@_;
    my ($worktable,$workdb)=$self->getWorktable();
-   my $from="$worktable";
+   my $from="$worktable ";
 
-   $from.=" left outer join lnkcontact ".
+   $from.="left outer join lnkcontact ".
           "on lnkcontact.parentobj='itil::system' ".
           "and $worktable.id=lnkcontact.refid ".
-          " left outer join asset on system.asset=asset.id".
-          " left outer join system as vsystem on system.vhostsystem=vsystem.id".
-          " left outer join asset as vasset on vsystem.asset=vasset.id";
+          "left outer join asset on system.asset=asset.id ".
+          "left outer join system as vsystem on system.vhostsystem=vsystem.id ".
+          "left outer join asset as vasset on vsystem.asset=vasset.id ".
+
+          "left outer join lnkapplsystem as secsystemlnkapplsystem ".
+          "on $worktable.id=secsystemlnkapplsystem.system ".
+          "left outer join appl as secsystemappl ".
+          "on secsystemlnkapplsystem.id=secsystemappl.id and secsystemappl.cistatus<6 ".
+
+          "left outer join lnkcontact secsystemlnkcontact ".
+          "on secsystemlnkcontact.parentobj='itil::appl' ".
+          "and system.id=secsystemlnkcontact.refid ".
+
+          "left outer join costcenter secsystemcostcenter ".
+          "on secsystemappl.conumber=secsystemcostcenter.name ";
+
 
    return($from);
 }
