@@ -113,9 +113,9 @@ from "itil::appl"
  left outer join "base::grp" bteam   
    on "itil::appl".businessteamid=bteam.grpid
  join "W5I_ALL_itil::lnkapplsystem"  
-   on "itil::appl".id="W5I_ALL_itil::lnkapplsystem".applid
+   on "itil::appl".id="W5I_ALL_itil::lnkapplsystem".appl
  join "itil::system"                 
-   on "W5I_ALL_itil::lnkapplsystem".systemid="itil::system".id
+   on "W5I_ALL_itil::lnkapplsystem".system="itil::system".id
  left outer join "tsacinv::system"              
    on "itil::system".systemid="tsacinv::system".systemid
  left outer join "W5I_HPSAsup__system_of"
