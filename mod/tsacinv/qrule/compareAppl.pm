@@ -305,12 +305,17 @@ sub qcheckRecord
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'text');
-               $self->IfComp($dataobj,
-                             $rec,"name",
-                             $parrec,"name",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'text');
+               { 
+                  my $comprec={name=>$parrec->{name}}; # in AM spaces in app
+                  $comprec->{name}=~s/\s/_/g;          # names are allowed
+                  $self->IfComp($dataobj,
+                                $rec,"name",
+                                $comprec,"name",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'text');
+               }
+
                $self->IfComp($dataobj,
                              $rec,"currentvers",
                              $parrec,"version",
