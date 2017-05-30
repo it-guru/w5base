@@ -54,6 +54,7 @@
 'EVre.itprov'=>{de=>'IT-Provider',en=>'IT-Provider'},
 'EVre.both'=>{de=>'Kunde/IT-Provider',en=>'Customer/IT-Provider'},
 'EVre.analyse'=>{de=>'in Analyse',en=>'in analysis'},
+'EVre.fmajeure'=>{de=>'höhere Gewalt',en=>'Force majeure'},
 'EVk.appl'=>{de=>'Anwendungsereignis',en=>'Application'},
 'EVk.bprocess'=>{de=>'Geschäftsprozess',en=>'Businessprocess'},
 'EVk.net'=>{de=>'IP-Netzwerk Standort übergreifend',en=>'IP-Network location indipendent'},
@@ -183,7 +184,7 @@
        "cause analysis and the initiated measures."
 },
 'if IT-Provider is responsible, it is not allowed to set a specific customer'=>{de=>'Wenn der IT-Provider verantwortlich ist, muss dieser konkret angegeben werden'},
-'if IT-Provider is responsible, it is not allowed to set a specific customer'=>{de=>'Wenn der IT-Provider verantwortlich ist, dann darf kein konkreter Kunde angegeben sein'},
+'if IT-Provider is responsible, you need to set a specific IT-Provider'=>{de=>'Wenn der IT-Provider verantwortlich ist, muss dieser konkret angegeben werden'},
 'missing specific responsible'=>{de=>'fehlender konkreter verantwortlicher Bereich'},
 'if customer is responsible, it is not allowed to set a specific IT-Provider'=>{de=>'Wenn der Kunde verantwortlich ist, dann darf kein konkreter IT-Provider angegeben sein'},
 'if customer is responsible, you need to set a specific customer'=>{de=>'Wenn der Kunde verantwortlich ist, muss dieser konkret angegeben werden'},
@@ -192,3 +193,4 @@
 'consequence of events'=>{de=>'Ereignis ausgelöst durch'},
 'Affected applicationgroup'=>{de=>'betroffene Anwendungsgruppe'},
 'reporting groupname'=>{de=>'Reporting Gruppenname'},
+'no specific responsible allowed'=>{de=>'die Angabe eines konkreten Bereiches ist nicht zulässig'},

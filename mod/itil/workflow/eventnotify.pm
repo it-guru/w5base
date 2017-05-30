@@ -129,6 +129,13 @@ sub Validate
             return(0);
          }
       }
+      if ($eventstatrespo eq "EVre.fmajeure"){
+         if (effVal($oldrec,$newrec,"eventspecrespocustomerid") ne "" ||
+             effVal($oldrec,$newrec,"eventspecrespoitprovid") ne ""){
+            $self->LastMsg(ERROR,"no specific responsible allowed");
+            return(0);
+         }
+      }
    }
 
 
@@ -656,7 +663,8 @@ sub getDynamicFields
                                  'EVre.customer',
                                  'EVre.itprov',
                                  'EVre.both',
-                                 'EVre.analyse'
+                                 'EVre.analyse',
+                                 'EVre.fmajeure'
                                  ],
                 label         =>'Event responsibility',
                 container     =>'headref'),
