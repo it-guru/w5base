@@ -8,7 +8,7 @@ if echo "$1" | egrep -q 'https://'; then
 fi
 L="$*"
 
-if [ ! -z "W5BASEINSTDIR" ]; then
+if [ ! -z "$W5BASEINSTDIR"  -a -d "$W5BASEINSTDIR" ]; then
    echo "change to $W5BASEINSTDIR"
    cd $W5BASEINSTDIR
 fi
@@ -27,7 +27,7 @@ for f in $L; do
          sed -e "s#\(https://..*\?/.*/.*\?/workflow/ById/[0-9]\+\)#\n\1\n#g"|\
          egrep '^https://.*auth' | sort | uniq)
       if [ -z "$WF" ]; then
-         echo -e "ERROR: file $f have not any Workflow logs\n" >&2
+         /bin/echo -e "ERROR: file $f have not any Workflow logs\n" >&2
          BADFILE=1
       fi
    else
@@ -39,7 +39,7 @@ for f in $L; do
    if [ ! -z "$CHKWF" ]; then
       OTHERWF=$(echo "$WF" | grep -v "^$CHKWF")
       if [ ! -z "$OTHERWF" ]; then
-         echo -e "WARN:  workflow colision in $f\n       $OTHERWF\n" >&2
+         /bin/echo -e "WARN:  workflow colision in $f\n       $OTHERWF\n" >&2
          HAVECOLISTIONS=1
       else
          if [ "$BADFILE" != "1" ]; then
@@ -52,7 +52,7 @@ done
 if [ -z "$CHKWF" ]; then
    if [ ! -z "$ALLOTHERS" ]; then
       echo "All related outstanding workflows:"
-      echo -e "$ALLOTHERS" | sort | uniq
+      /bin/echo -e "$ALLOTHERS" | sort | uniq
       echo ""
    fi
    exit 0
