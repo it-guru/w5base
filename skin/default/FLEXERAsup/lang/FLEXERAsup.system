@@ -35,6 +35,7 @@
 'REASON.RETIERED'=>{de=>'RETIERED',en=>'RETIERED'},
 'REASON.ADS'=>{de=>'ADS',en=>'ADS'},
 'REASON.VDS'=>{de=>'VDS',en=>'VDS'},
+'REASON.TSG'=>{de=>'TSG',en=>'TSG'},
 'REASON.MAINFRAME'=>{de=>'MAINFRAME',en=>'MAINFRAME'},
 'REASON.MISC'=>{de=>'MISC',en=>'MISC'},
 'no out of scope reason spezified'=>{de=>"kein 'Out of Scope: Grund' angegeben"},
