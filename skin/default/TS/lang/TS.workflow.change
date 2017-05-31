@@ -6,4 +6,5 @@
 'Remarks'=>{de=>'Bemerkungen'},
 'Title'=>{de=>'Titel'},
 'Connection to SM9 failed'=>{de=>'Verbindung zu SM9 fehlgeschlagen'},
+'date approval phase entered'=>{de=>'Eintritt in Approval-Phase'},
 

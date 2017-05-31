@@ -61,7 +61,8 @@ sub smchange
                            reason relations requestedby resolvedby
                            resolvetime resources risk srcid srcsys
                            status sysmodtime tasks type validation
-                           urgency workduration workend workstart));
+                           urgency workduration workend workstart
+                           approvalsreq));
 
    $chm->SetCurrentOrder("sysmodtime");
    msg(DEBUG,"view is set");

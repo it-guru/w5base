@@ -30,6 +30,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -41,7 +42,6 @@ sub new
                 name       =>'changenumber',
                 label      =>'Change No.',
                 align      =>'left',
-                
                 dataobjattr=>SELpref.'cm3ra7.dh_number'),
 
       new kernel::Field::Text(      
@@ -55,6 +55,7 @@ sub new
                 name       =>'groupname',
                 label      =>'Pending',
                 htmlwidth  =>'200px',
+                searchable =>0,
                 vjointo    =>'tssm::group',
                 vjoinon    =>['name'=>'name'],
                 vjoindisp  =>['name']),
@@ -65,6 +66,19 @@ sub new
                 vjointo    =>'tssm::group',
                 vjoinon    =>['name'=>'name'],
                 vjoindisp  =>['groupmailbox']),
+
+      new kernel::Field::Text(
+                name          =>'chmmgrgrp',
+                uppersearch   =>1,
+                label         =>'Changemanager group',
+                dataobjattr   =>SELpref.'cm3rm1.tsi_manager_group'),
+
+      new kernel::Field::Text(
+                name          =>'type',
+                label         =>'Change Type (CBI)',
+                uppersearch   =>1,
+                dataobjattr   =>SELpref.'cm3rm1.initial_impact'),
+
    );
 
    $self->setDefaultView(qw(linenumber changenumber groupname groupmailbox));
@@ -87,7 +101,11 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from=TABpref."cm3ra7 ".SELpref."cm3ra7";
+   my $from=TABpref."cm3ra7 ".SELpref."cm3ra7 ".
+            "join ".TABpref."cm3rm1 ".SELpref."cm3rm1 ".
+              "on (".SELpref."cm3rm1.dh_number=".SELpref."cm3ra7.dh_number ".
+                     "and ".
+                     SELpref."cm3rm1.current_phase like '40%')";
    return($from);
 }
 

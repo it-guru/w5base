@@ -61,6 +61,11 @@ sub Init
                       func=>'Main',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj('AL_TCom::MyW5Base::ChangeNotChmMgr$',
+                      'AL_TCom::MyW5Base::ChangeNotChmMgr$',
+                      func=>'Main',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj('AL_TCom::MyW5Base::MIReport$',
                       'AL_TCom::MyW5Base::MIReport$',
                       func=>'Main',

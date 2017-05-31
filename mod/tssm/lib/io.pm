@@ -409,12 +409,19 @@ sub mkChangeStoreRec
    }
    $wfrec{stateid}=17 if (lc($rec->{status}) eq "closed");
 
+   my $chmmgr_pending;
+
    if ($wfrec{stateid}==2) {
       if (($#oldrec==0 && $oldrec[0]->{stateid}==1) ||
           $#oldrec==-1                              ||
           !defined($oldrec[0]->{headref}->{approvalphaseentry})) {
          $wfrec{approvalphaseentry}=$rec->{sysmodtime};
       }
+
+      # pending approvals of TelIT Changemanager
+      my @chm2approve=grep(/^TIT\..*\.CHM/,map({$_->{groupname}}
+                                               @{$rec->{approvalsreq}}));
+      $chmmgr_pending=join(', ',@chm2approve);
    }
 
    $wfrec{additional}={
@@ -468,7 +475,9 @@ sub mkChangeStoreRec
    #   }
    #}
 
-
+   if (defined($chmmgr_pending)) {
+      $wfrec{additional}->{ServiceManagerChmTITPending}=$chmmgr_pending;
+   }
    if ($wfrec{additional}->{ServiceManagerClosedBy} ne
        $rec->{closedby}){
       $wfrec{additional}->{ServiceManagerClosedBy}=$rec->{closedby};

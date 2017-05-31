@@ -1,0 +1,10 @@
+'AL_TCom::MyW5Base::ChangeNotChmMgr'=>{
+   de=>'Telekom IT: Changes mit offenen Approvals für CHM TelIT (ChmMgr nicht TelIT)',
+   en=>'Telekom IT: Changes with pending approvals for CHM TelIT (ChmMgr not TelIT)'
+},
+'only multi TSM responsibility'=>{de=>'nur multi TSM Verantwortung'},
+'only multi application changes'=>{de=>'nur multi Anwendungs-Changes'},
+'only applications with customer prio 1'=>{de=>'nur Anwendungen mit Kunden-Prio1'},
+'Change start timerange'=>{de=>'Change Beginn Zeitbereich'},
+'Special selection'=>{de=>'Spezialauswahl'},
+

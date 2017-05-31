@@ -2,3 +2,5 @@
 'Pending'=>{de=>'Offen (Current Approvals)',en=>'Pending (Current Approvals)'},
 'Group Email Address'=>{de=>'Gruppen Email Adresse'},
 'Change No.'=>{de=>'Changenummer'},
+'Changemanager group'=>{de=>'Changemanager Gruppe'},
+'Change Type (CBI)'=>{de=>'Change Typ (CBI)'},
