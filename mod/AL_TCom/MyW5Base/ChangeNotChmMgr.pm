@@ -83,8 +83,8 @@ sub Result
    my $search_type=Query->Param("search_TYPE");
 
    my $smflt={type=>$search_type,
-              name=>'TIT.TSI.INT.CHM*',
-              chmmgrgrp=>'!TIT.TSI.INT.CHM-MGR.CM'};
+              name=>'TIT.*.CHM*',
+              chmmgrgrp=>'!TIT.*'};
    my $approbj=$self->{approvereq};
    $approbj->ResetFilter();
    $approbj->SetFilter($smflt);
