@@ -136,8 +136,9 @@ sub Process
       my %rec=();
       for(my $col=0;$col<=$self->{'oWkS'}->{MaxCol};$col++){
          my $cell=$self->{'oWkS'}->{Cells}[$row][$col];
+         my $v="";
          if (defined($cell)){
-            my $v=$cell->value();
+            $v=$cell->value();
             $v=$cell->{Val} if ($v eq "");
             
             if ($cell->{Type} eq "Date" && $v ne ""){
@@ -153,21 +154,21 @@ sub Process
             if ($v=~m/^'.*[^']$/){  # this indicates a text field formater
                $v=~s/^'//;
             }
-            print msg(INFO,"cell (c=$col/r=$row)='%s'",$v) if ($self->{debug});
-            if (!defined($self->{Fields}->[$col]) ||
-                 $self->{Fields}->[$col] eq ""){
-               if ($v ne ""){
-                  print(msg(ERROR,
-                            "data without header colum in col '%d'",$col));
-               }
-               else{
-                  print(msg(WARN,
-                            "data without header colum in col '%d'",$col));
-               }
+         }
+         print msg(INFO,"cell (c=$col/r=$row)='%s'",$v) if ($self->{debug});
+         if (!defined($self->{Fields}->[$col]) ||
+              $self->{Fields}->[$col] eq ""){
+            if ($v ne ""){
+               print(msg(ERROR,
+                         "data without header colum in col '%d'",$col));
             }
             else{
-               $rec{$self->{Fields}->[$col]}=$v;
+               print(msg(WARN,
+                         "data without header colum in col '%d'",$col));
             }
+         }
+         else{
+            $rec{$self->{Fields}->[$col]}=$v;
          }
       }
       next if ($isempty);
