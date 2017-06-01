@@ -48,7 +48,7 @@ for f in $L; do
       fi
    fi
 done
-
+ALLOTHERS=$(echo "$ALLOTHERS" | sed -e 's/^\s*//' -e 's/\s*$//')
 if [ -z "$CHKWF" ]; then
    if [ ! -z "$ALLOTHERS" ]; then
       echo "All related outstanding workflows:"
