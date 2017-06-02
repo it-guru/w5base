@@ -306,7 +306,8 @@ sub getNotifyDestinations
       my $email=$contact->{email};
 
       if (!exists($emailto->{$email})) {
-         $emailto->{$email}++;
+         #$emailto->{$email}++;
+         $emailto->{$email}=[];
       }
    }
    
