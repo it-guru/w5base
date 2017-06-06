@@ -295,26 +295,41 @@ sub getNotifyDestinations
 
    $lnkcontactobj->SetFilter({refid=>$applid,
                               croles=>'*roles=?infocontact?=roles*'});
-   my @infocontactids=map($_->{targetid},
-                          $lnkcontactobj->getHashList(qw(targetid)));
+   $lnkcontactobj->SetCurrentView(qw(targetid refid));
+   my $applcontacts=$lnkcontactobj->getHashIndexed(qw(targetid refid));
+   my @infocontactids=keys(%{$applcontacts->{targetid}});
+
    $uobj->SetFilter({userid=>\@infocontactids,
                      cistatusid=>'<5',
                      email=>'![EMPTY]'});
-   my @infocontacts=$uobj->getHashList(qw(email));
+   my @infocontacts=$uobj->getHashList(qw(userid email));
+   
+   foreach my $user (@infocontacts) {
+      my $email=$user->{email};
+      my $target=$applcontacts->{targetid}->{$user->{userid}};
 
-   foreach my $contact (@infocontacts) {
-      my $email=$contact->{email};
+      my @applids=();
+      if (ref($target) eq 'ARRAY') {
+         @applids=map({$_->{refid}} @$target);
+      }
+      if (ref($target) eq 'HASH') {
+         @applids=($target->{refid});
+      }
 
-      if (!exists($emailto->{$email})) {
-         #$emailto->{$email}++;
-         $emailto->{$email}=[];
+      if (exists($emailto->{$email})) {
+         if (ref($emailto->{$email} eq 'ARRAY')) {
+            push(@{$emailto->{$email}},@applids);
+         }
+      }
+      else {
+         $emailto->{$email}=\@applids;
       }
    }
-   
+
+
    foreach my $to (keys(%$emailto)) {
       delete($emailcc->{$to});
    }
-
 
    return(undef);
 }
