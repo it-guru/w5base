@@ -626,6 +626,20 @@ sub new
                 dataobjattr   =>'system.conumber'),
 
       new kernel::Field::Text(
+                name          =>'dsid',
+                group         =>'misc',
+                label         =>'Directory-Identifier',
+                dataobjattr   =>"if (system.dsid is null,".
+                                "system.name,system.dsid)",
+                wrdataobjattr =>'system.dsid'),
+
+      new kernel::Field::Link(
+                name          =>'rawdsid',
+                group         =>'misc',
+                label         =>'raw Directory-Identifier',
+                dataobjattr   =>'system.dsid'),
+
+      new kernel::Field::Text(
                 name          =>'kwords',
                 group         =>'misc',
                 label         =>'Keywords',
@@ -1531,6 +1545,24 @@ sub Validate
          $self->LastMsg(ERROR,"invalid systemid '%s' specified",
                         $newrec->{systemid});
          return(0);
+      }
+   }
+
+   {
+      my $dsid=trim(effVal($oldrec,$newrec,"dsid"));
+      my $name=trim(effVal($oldrec,$newrec,"name"));
+      if ($dsid eq "" || $dsid eq $name){
+         if ($oldrec->{"rawdsid"} ne ""){
+            $newrec->{dsid}=undef;
+         }
+      }
+      else{
+         if (length($dsid)<3 || haveSpecialChar($dsid) ||
+             ($dsid=~m/^\d+$/)){ 
+            $self->LastMsg(ERROR,"invalid directory identifier '%s' specified",
+                           $dsid);
+            return(0);
+         }
       }
    }
 
