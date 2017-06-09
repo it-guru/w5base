@@ -8,7 +8,7 @@ if echo "$1" | egrep -q 'https://'; then
 fi
 L="$*"
 
-if [ ! -z "$W5BASEINSTDIR"  -a -d "$W5BASEINSTDIR" ]; then
+if [ ! -d .svn -a ! -z "$W5BASEINSTDIR"  -a -d "$W5BASEINSTDIR" ]; then
    echo "change to $W5BASEINSTDIR"
    cd $W5BASEINSTDIR
 fi
