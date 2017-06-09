@@ -48,11 +48,11 @@ for f in $L; do
       fi
    fi
 done
-ALLOTHERS=$(echo "$ALLOTHERS" | sed -e 's/^\s*//' -e 's/\s*$//')
+ALLOTHERS=$(/bin/echo -e "$ALLOTHERS" | sort | uniq)
 if [ -z "$CHKWF" ]; then
    if [ ! -z "$ALLOTHERS" ]; then
       echo "All related outstanding workflows:"
-      /bin/echo -e "$ALLOTHERS" | sort | uniq
+      /bin/echo -e "$ALLOTHERS" 
       echo ""
    fi
    exit 0
