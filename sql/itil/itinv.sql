@@ -1587,6 +1587,31 @@ create table lnkitfarmasset (
   FOREIGN KEY fk_asset (asset)   REFERENCES asset (id) ON DELETE RESTRICT,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
+create table lnkassetasset (
+  id         bigint(20) NOT NULL,
+  passet     bigint(20) NOT NULL,
+  casset     bigint(20) NOT NULL,
+  additional longtext   default NULL,
+  comments   longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY casset (casset),
+  FOREIGN KEY fk_casset (casset) REFERENCES asset (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_passet (passet) REFERENCES asset (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=INNODB;
+alter table swinstance add ssl_cipher varchar(40) default NULL,add ssl_certserial varchar(40) default NULL,add ssl_version varchar(40) default NULL,add ssl_certdump longtext   default NULL,add ssl_certsighash varchar(40) default NULL;
+alter table accessurl add lnkapplappl bigint(20),add target_is_fromappl int(1) default '0', add notmultiple int(1) default '1', add from_fullname varchar(512), add from_scheme varchar(20), add from_hostname varchar(128), add from_ipport int(10), change appl appl bigint(20);
+alter table accessurl drop key fullname, add UNIQUE KEY fullname (fullname,network,notmultiple),add FOREIGN KEY lnkapplappl (lnkapplappl) REFERENCES lnkapplappl (id) ON DELETE CASCADE;
+alter table system add dsid varchar(128);
 create table lnkitclustsvcsyspolicy (
   refid  varchar(80) NOT NULL,
   itclustsvc bigint(20) NOT NULL,
