@@ -15,4 +15,5 @@
 'to Application'=>{de=>'Ziel-Anwendung'},
 'Communication Link'=>{de=>'Kommunikationsverbindung'},
 'from url and to url an not be the same'=>{de=>'von URL und nach URL können nicht gleich sein'},
+"can't assign any interface application to from or to URL"=>{de=>'von und nach URL können keiner Anwendung zugeordnet werden'},
 
