@@ -102,7 +102,7 @@ sub DisplayMaintenanceWindow
    my $self=shift;
    my $file=$ENV{SCRIPT_URI};
    $file=~s/^.*\///;
-   my $skindir=$self->Config->Param("INSTDIR")."/skin/";
+   my $skindir=$W5V2::INSTDIR."/skin/";
    my $skin="default";
    $skin="default.de" if ($self->LowLevelLang() eq "de");
    my ($opmode)=$self->Config->Param("W5BaseOperationMode");

@@ -1094,6 +1094,9 @@ sub getSkinFile
       unshift(@skin,$param{addskin});
    }
    my @skindir=($baseskindir);
+   if ($#{$W5V2::INSTPATH}!=-1){
+      push(@skindir,map({$_."/skin"} @{$W5V2::INSTPATH}));
+   }
    my $modpath=$self->Config->Param("MODPATH");
    if ($modpath ne ""){
       foreach my $path (split(/:/,$modpath)){
@@ -1757,7 +1760,7 @@ sub LoadSubObjs
       my @sublist;
       my @disabled;
 
-      foreach my $path (@path){
+      foreach my $path (@path,@{$W5V2::INSTPATH}){
          my $pat="$path/mod/*/$extender/*.pm";
          if ($extender=~m/\//){
             $pat="$path/mod/*/$extender.pm";
@@ -1765,16 +1768,12 @@ sub LoadSubObjs
          unshift(@sublist,glob($pat)); 
          unshift(@disabled,glob($pat.".DISABLED")); 
       }
-
-      @sublist=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$qi//;
-                    $_=~s/\/mod\///; 
-                    $_;
+      @sublist=map({ $_=~s/^\/.*\/mod\///; 
+                     $_;
                    } @sublist);
 
-      @disabled=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$qi//;
-                    $_=~s/\/mod\///; 
+      @disabled=map({
+                    $_=~s/^\/.*\/mod\///; 
                     $_=~s/\.DISABLED//; 
                     $_."/" if (!($_=~m/\.pm$/));
                     $_;

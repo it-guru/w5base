@@ -19,15 +19,25 @@
 use strict;
 use FindBin ;
 *CORE::GLOBAL::die = sub { require Carp; Carp::confess };
-$W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
 $W5V2::OperationContext="WebFrontend";
 $W5V2::InvalidateGroupCache=0;
 $W5V2::HistoryComments=undef;
-if (defined(&{FindBin::again})){
-   FindBin::again();
-   $W5V2::INSTDIR="$FindBin::Bin/..";
+if (!defined($W5V2::INSTDIR)){
+   if (defined(&{FindBin::again})){
+      FindBin::again();
+      $W5V2::INSTDIR="$FindBin::Bin/..";
+   }
 }
-foreach my $path ("$W5V2::INSTDIR/mod","$W5V2::INSTDIR/lib"){
+$W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
+
+my @w5instpath;
+if ($ENV{W5BASEINSTDIR} ne ""){
+   @w5instpath=split(/:/,$ENV{W5BASEINSTDIR});
+   $W5V2::INSTDIR=shift(@w5instpath);
+   $W5V2::INSTPATH=\@w5instpath;
+}
+
+foreach my $path (map({$_."/mod",$_."/lib"} $W5V2::INSTDIR,@w5instpath)){
    my $qpath=quotemeta($path);
    unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
 }

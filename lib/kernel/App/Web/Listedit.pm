@@ -2063,7 +2063,7 @@ sub getDetailFunctions
       }
    }
    if (defined($rec)){
-      my $instdir=$self->Config->Param("INSTDIR");
+      my $instdir=$W5V2::INSTDIR;
       my $s=$self->Self();
       $s=~s/::/::Research::/;
       $s=~s/::/\//g;
