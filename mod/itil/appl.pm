@@ -791,7 +791,7 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 AllowEmpty    =>1,
-                group         =>'customer',
+                group         =>'functional',
                 label         =>'Application Manager',
                 vjoinon       =>'applmgrid'),
 
@@ -827,7 +827,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'avgusercount',
-                group         =>'customer',
+                group         =>'functional',
                 label         =>'average user count',
                 allowempty    =>1,
                 value         =>['0','10','50','100','250',
@@ -839,7 +839,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'namedusercount',
-                group         =>'customer',
+                group         =>'functional',
                 label         =>'named user count',
                 allowempty    =>1,
                 value         =>['0','10','50','100','250',
@@ -2266,9 +2266,10 @@ sub isViewValid
               customer delmgmt
               finance interfaces licenses monisla sodrgroup qc external itsem
               mutimes  
-              misc opmgmt phonenumbers services businessservices architect
+              misc opmgmt phonenumbers services businessservices 
               soclustgroup socomments source swinstances systems applurl
-              technical workflowbasedata header inmchm interview efforts);
+              technical workflowbasedata header inmchm interview efforts
+              functional);
    if (!$rec->{sodefinition}){
       @all=grep(!/^(socomments|soclustgroup|sodrgroup)$/,@all);
    }
@@ -2285,8 +2286,8 @@ sub isWriteValid
 
    my @databossedit=qw(default interfaces finance opmgmt technical contacts misc
                        systems applurl attachments accountnumbers interview
-                       customer control phonenumbers monisla architect mutimes
-                       sodrgroup soclustgroup socomments);
+                       customer control phonenumbers monisla mutimes
+                       sodrgroup soclustgroup socomments functional);
    if (!defined($rec)){
       return(@databossedit);
    }
@@ -2431,8 +2432,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default itsem finance technical opmgmt delmgmt 
-             architect customer custcontracts supcontracts
+          qw(header default functional itsem finance technical opmgmt delmgmt 
+             customer custcontracts supcontracts
              contacts phonenumbers 
              interfaces systems swinstances services businessservices applurl
              monisla 

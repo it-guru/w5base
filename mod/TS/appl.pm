@@ -131,7 +131,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'icto',
                 label         =>'ICTO Objectname',
-                group         =>'architect',
+                group         =>'functional',
                 async         =>'1',
                 AllowEmpty    =>1,
                 vjointo       =>'tscape::archappl',
@@ -143,7 +143,7 @@ sub new
                 htmldetail    =>0,
                 uploadable    =>0,
                 searchable    =>0,
-                group         =>'architect',
+                group         =>'functional',
                 label         =>'ICTO internal ID',
                 dataobjattr   =>'appl.ictoid'),
 
@@ -240,7 +240,7 @@ sub new
                 name          =>'ictono',
                 htmldetail    =>0,
                 uploadable    =>0,
-                group         =>'architect',
+                group         =>'functional',
                 label         =>'ICTO-ID',
                 dataobjattr   =>'appl.ictono'),
      insertafter=>'systems'
