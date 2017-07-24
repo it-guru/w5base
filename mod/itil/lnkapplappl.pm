@@ -1002,7 +1002,7 @@ sub SecureSetFilter
    if (!$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
                           "RMember")){
       my @addflt;
-      $self->addApplicationSecureFilter(['secfromappl'],\@addflt);
+      $self->itil::appl::addApplicationSecureFilter(['secfromappl'],\@addflt);
       push(@flt,\@addflt);
    }
 
