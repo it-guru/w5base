@@ -48,8 +48,6 @@ sub getPosibleRoles
       return(
          "applowner"       =>$self->getParent->T("Application owner",
                                              $self->Self),
-         "applmgr"         =>$self->getParent->T("Application manager",
-                                             $self->Self),
          "developercoord"  =>$self->getParent->T("Development coordination",
                                              $self->Self),
          "developerboss"   =>$self->getParent->T("Chief Developer",

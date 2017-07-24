@@ -39,13 +39,6 @@ sub getPosibleRoles
    my $parentobj=shift;
    my $current=shift;
 
-   if ($parentobj=~m/^.+::appl$/ ||
-       (defined($self->getParent) &&
-        defined($self->getParent->getParent) &&
-       $self->getParent->getParent->Self()=~m/^AL_TCom::appl$/)){
-      return("wbv"=>$self->getParent->T("T-Com:WBV",$self->Self),
-             "eb"=>$self->getParent->T("T-Com:EB",$self->Self));
-   }
    if ($parentobj=~m/^.+::custcontract$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
