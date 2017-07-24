@@ -248,9 +248,6 @@ sub HandleFILEADD
 
       print <<EOF  if ($ok);
 <script language=JavaScript>
-if (parent.document.forms[0].elements['file']){
-   parent.document.forms[0].elements['file'].value=null;
-}
 parent.document.forms[0].target='_self';
 parent.document.forms[0].submit();
 </script>
