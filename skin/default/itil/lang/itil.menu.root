@@ -36,6 +36,7 @@
 'itil.itclust.lnkitclustsvc'=>{de=>'Service',en=>'Service'},
 'itil.itclust.lnkitclustsvc.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.itclust.lnkitclustsvc.appl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
+'itil.itclust.lnkitclustsvc.sysrun'=>{de=>'System RunPolicy',en=>'System RunPolicy'},
 'itil.itclust.lnkitclustcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itil.system'=>{de=>'System',en=>'System'},
 'itil.system.new'=>{de=>'Neueingabe',en=>'New'},

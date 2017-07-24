@@ -185,6 +185,26 @@ sub isWriteOnITFarmValid
    return(0);
 }
 
+
+sub isWriteOnClusterValid
+{
+   my $self=shift;
+   my $itclustid=shift;
+   my $group=shift;
+
+   if ($itclustid ne ""){
+      my $c=getModuleObject($self->Config,"itil::itclust");
+      $c->SetFilter({id=>\$itclustid});
+      my ($cl,$msg)=$c->getOnlyFirst(qw(ALL));
+      my @g=$c->isWriteValid($cl);
+      if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+         return(1);
+      }
+   }
+   return(0);
+}
+
+
 sub isWriteOnApplGrpValid
 {
    my $self=shift;

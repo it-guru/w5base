@@ -171,6 +171,15 @@ sub new
                 label         =>'allow automatic updates by interfaces',
                 dataobjattr   =>'itclust.allowifupdate'),
 
+      new kernel::Field::Select(
+                name          =>'defrunpolicy',
+                htmleditwidth =>'80',
+                group         =>'control',
+                label         =>'default ClusterService on System Run Policy',
+                value         =>['allow','deny'],
+                dataobjattr   =>'defrunpolicy'),
+
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',

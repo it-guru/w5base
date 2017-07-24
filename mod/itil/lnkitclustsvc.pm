@@ -47,9 +47,11 @@ sub new
                 name          =>'fullname',
                 label         =>'full qualified Servicename',
                 readonly      =>1,
-                htmlwidth     =>'250px',
-                dataobjattr   =>
-             "concat(itclust.fullname,'.',qlnkitclustsvc.itsvcname,if (qlnkitclustsvc.subitsvcname<>'',concat('.',qlnkitclustsvc.subitsvcname),''))"),
+                htmlwidth     =>'280px',
+                dataobjattr   =>"concat(itclust.fullname,'.',".
+                                "qlnkitclustsvc.itsvcname,".
+                                "if (qlnkitclustsvc.subitsvcname<>'',".
+                                "concat('.',qlnkitclustsvc.subitsvcname),''))"),
 
       new kernel::Field::TextDrop(
                 name          =>'cluster',
@@ -114,15 +116,13 @@ sub new
                 label         =>'Systems',
                 group         =>'systems',
                 forwardSearch =>1,
-                readonly      =>1,
-                vjointo       =>'itil::system',
+                vjointo       =>'itil::lnkitclustsvcsyspolicy',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
-                vjoinon       =>['clustid'=>'itclustid'],
+                vjoinon       =>['id'=>'itclustsvcid'],
                 vjoindisp     =>['name','systemid',
                                  'cistatus',
-                                 'shortdesc'],
-                vjoininhash   =>['system','systemsystemid','systemcistatus',
-                                 'systemid']),
+                                 'shortdesc','runpolicy'],
+                vjoininhash   =>['system','systemid','runpolicy']),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
@@ -358,7 +358,7 @@ sub Validate
 
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       my $itclustid=effVal($oldrec,$newrec,"clustid");
-      if (!$self->isWriteOnClusterValid($itclustid)){
+      if (!$self->isWriteOnClusterValid($itclustid,"services")){
          $self->LastMsg(ERROR,"no write access to specified cluster");
          return(undef);
       }
@@ -401,23 +401,6 @@ sub isWriteValid
    return(undef);
 }
 
-
-sub isWriteOnClusterValid
-{
-   my $self=shift;
-   my $itclustid=shift;
-
-   if ($itclustid ne ""){
-      my $c=getModuleObject($self->Config,"itil::itclust");
-      $c->SetFilter({id=>\$itclustid});
-      my ($cl,$msg)=$c->getOnlyFirst(qw(ALL));
-      my @g=$c->isWriteValid($cl);
-      if (grep(/^(ALL|services)$/,@g)){
-         return(1);
-      }
-   }
-   return(0);
-}
 
 sub getDetailBlockPriority
 {

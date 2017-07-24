@@ -39,6 +39,7 @@
 'itts.itclust.lnkitclustsvc'=>{de=>'Service',en=>'Service'},
 'itts.itclust.lnkitclustsvc.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.itclust.lnkitclustsvc.appl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
+'itts.itclust.lnkitclustsvc.sysrun'=>{de=>'System RunPolicy',en=>'System RunPolicy'},
 'itts.asset'=>{de=>'Hardware',en=>'Hardware'},
 'itts.asset.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.asset.lnkassetcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},

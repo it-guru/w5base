@@ -35,6 +35,7 @@
 'AL_TCom.itclust.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.itclust.lnkitclustsvc'=>{de=>'Service',en=>'Service'},
 'AL_TCom.itclust.lnkitclustsvc.appl'=>{de=>'Verkn. Anwendung',en=>'Link Application'},
+'AL_TCom.itclust.lnkitclustsvc.sysrun'=>{de=>'System RunPolicy',en=>'System RunPolicy'},
 'AL_TCom.itclust.lnkitclustsvc.sw'=>{de=>'Softwareinst.',en=>'Softwareinst.'},
 'AL_TCom.itclust.lnkitclustsvc.sw.new'=>{de=>'Neueingabe',en=>'New.'},
 'AL_TCom.itclust.lnkitclustcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},

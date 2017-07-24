@@ -813,7 +813,12 @@ sub getSqlFrom
    # creating pre selection for subselect
    #
    my $datasourcerest1="1";
-   my $datasourcerest2="system.cistatus<=5 and itclust.cistatus<=5";
+   my $datasourcerest2="system.cistatus<=5 and itclust.cistatus<=5 ".
+                       "and (".
+                       "(lnkitclustsvcsyspolicy.runpolicy is null and ".
+                       "itclust.defrunpolicy<>'deny') or ".
+                       "(lnkitclustsvcsyspolicy.runpolicy is not null and ".
+                       "lnkitclustsvcsyspolicy.runpolicy<>'deny'))";
    my $datasourcerest3="system.cistatus<=5 ".
                        "and swinstance.runonclusts=0 ".
                        "and swinstance.cistatus<=5";
@@ -943,6 +948,9 @@ sub getSqlFrom
         "join lnkitclustsvc on lnkitclustsvc.id=lnkitclustsvcappl.itclustsvc ".
         "join itclust on itclust.id=lnkitclustsvc.itclust ".
         "join system on lnkitclustsvc.itclust=system.clusterid ".
+        "left join lnkitclustsvcsyspolicy ".
+           "on lnkitclustsvc.id=lnkitclustsvcsyspolicy.itclustsvc ".
+           " and lnkitclustsvcsyspolicy.system=system.id ".
         $datasourcerest2." ".
         "group by system.id,lnkitclustsvcappl.appl ".
      "union all ".

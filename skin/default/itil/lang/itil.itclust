@@ -7,3 +7,6 @@
 'delete only posible, if there are no services or software instance relations'=>{de=>'Löschen ist nur dann zulässig, wenn es keine Service oder Software-Instanz Verknüpfungen gibt'},
 'invalid cluster typ'=>{de=>'ungültiger Cluster Typ'},
 "invalid cluster name '%s'"=>{de=>"ungültiger Cluster name '%s'"},
+'default ClusterService on System Run Policy'=>{de=>'Standard ClusterService auf System "Run Policy"'},
+'System CI-State'=>{de=>'System CI-Status'},
+'Cluster CI-State'=>{de=>'Cluster CI-Status'},

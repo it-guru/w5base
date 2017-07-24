@@ -204,6 +204,10 @@ sub Init
                       "itil::lnkitclustsvcappl",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.itclust.lnkitclustsvc.sysrun",
+                      "itil::lnkitclustsvcsyspolicy",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.itclust.lnkitclustcontact",
                       "itil::lnkitclustcontact",
                       defaultacl=>['valid_user']);
