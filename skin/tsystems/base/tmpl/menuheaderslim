@@ -1,0 +1,36 @@
+<head>
+<style>
+body{overflow:hidden}
+</style>
+  <link type="text/css" href="../load/stylesStandard.css"
+ rel="stylesheet">
+</head>
+<body>
+<table width="100%" border=0 cellspacing=0 cellpadding=0>
+<tr>
+<td valign=top style="height:20px;overflow:hidden">
+<div class="navigationArea">
+<div class=OpMode>&nbsp;&nbsp;%opmode%
+</div>
+</td>
+<td valign=top style="height:20px;overflow:hidden">
+
+<div class="navigationArea">
+<div class="conNavigationHorizontal" id="conNavigation1346">
+
+<div align=right style='float:right'>
+%GLOBALHELP()%
+</div>
+
+</div>
+</div>
+
+</td>
+</tr>
+</table>
+<!-- cache loading img -->
+<img alt="loading" style="width:0;height:0" src="../../../static/base/img/loading.gif">
+
+
+</body>
+</html>

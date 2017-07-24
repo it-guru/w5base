@@ -646,11 +646,26 @@ EOF
       my $qs=kernel::cgi::Hash2QueryString(Query->MultiVars());
       $qs="?".$qs if ($qs ne "");
       my $mselurl="${rootpath}msel$menu$qs";
-      my $d=$self->getParsedTemplate("tmpl/menutopframe",{static=>
-                                                {  rootpath=>"../../..",
-                                                   menutopurl=>$menutopurl,
-                                                   mselurl=>$mselurl,
-                                                }});
+
+
+      my $W5UserInterface=$self->getW5UIMode();
+
+      my $menutopframeheight=100;
+      if ($W5UserInterface eq "slim"){
+         $menutopframeheight=21;
+      }
+      if ($W5UserInterface eq "fullscreen"){
+         $menutopframeheight=100;
+      }
+
+      my $d=$self->getParsedTemplate("tmpl/menutopframe",{
+         static=>{  
+            rootpath=>"../../..",
+            menutopurl=>$menutopurl,
+            mselurl=>$mselurl,
+            menutopframeheight=>$menutopframeheight
+         }
+      });
       print $d;
       print("<script language=\"JavaScript\">window.focus();</script>");
       print $self->HtmlBottom();
@@ -795,7 +810,7 @@ sub menuframe
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(target=>'msel',
-                              js=>['wz_tooltip.js'],
+                              js=>['toolbox.js','wz_tooltip.js'],
                              base=>'',
                             prefix=>$rootpath,
                            style=>['default.css','menu.css']);
@@ -833,7 +848,13 @@ sub menutop
    $opmode="OP-Mode: $opmode" if ($opmode ne "" && $opmode ne "online");
    $opmode="" if ($opmode eq "online");
 
-   print $self->getParsedTemplate("tmpl/menuheader",{
+   my $W5UserInterface=$self->getW5UIMode();
+
+   my $headertmpl="tmpl/menuheader";
+   if ($W5UserInterface eq "slim"){
+      $headertmpl="tmpl/menuheaderslim";
+   }
+   print $self->getParsedTemplate($headertmpl,{
                                    static=>{
                                        opmode=>$opmode,
                                        operationmode=>$operationmode,
@@ -841,6 +862,16 @@ sub menutop
                                    }});
    print $self->HtmlBottom(body=>1,form=>1);
 }
+
+sub getW5UIMode
+{
+   my $self=shift;
+
+   my $W5UserInterface=Query->Cookie("W5UI");
+   $W5UserInterface="normal" if ($W5UserInterface eq "");
+   return($W5UserInterface);
+}
+
 
 sub mT
 {

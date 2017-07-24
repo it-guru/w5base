@@ -1,0 +1,24 @@
+table{
+   padding:10px;
+   padding-top:20px;
+}
+td{
+   height:45px;
+   color:white;
+   padding:10px;
+   font-size:14;
+   cursor:pointer;
+}
+td:hover {
+   background-color:#4b737d;
+   font-weight:bold;
+}
+div{
+   padding:5px;
+}
+.normal{
+   background-color:#7d9ba0;
+}
+.dimgray{
+   background-color:dimgray;
+}

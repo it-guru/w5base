@@ -102,6 +102,66 @@ EOF
    return(undef);
 }
 
+sub anyQuestions
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'mainwork.css',
+                                   'public/faq/load/anyQuestions.css'],
+                           title=>"any Questions",
+                           js=>['toolbox.js','cookie.js'],
+                           body=>1,form=>1);
+
+   my $faq=getModuleObject($self->Config,"faq::article");
+   my $lang=$self->Lang();
+
+
+
+   $faq->SecureSetFilter({
+     categorie=>'W5Base*',
+     kwords=>'anyQuestions',
+     lang=>'multilang '.$lang
+   });
+
+   my $cnt=0;
+
+   foreach my $rec ($faq->getHashList(qw(name uservotelevel faqid))){
+      if ($rec->{uservotelevel}>-100){
+         my $class="normal"; 
+         if ($rec->{uservotelevel}<0){
+            $class="dimgray";
+         }
+         if ($cnt==0){
+            printf("<center><table width=80%>");
+         }
+         my $n=$rec->{name};
+         my $link=sprintf("javascript:openwin('%s','_blank',".
+                       "'height=400,width=640,toolbar=no,".
+                       "status=no,resizable=yes,scrollbars=auto')",
+                       "../../faq/article/ById/".$rec->{faqid}); 
+         $n=~s/^\d+[\s\.]*//;
+         printf("<tr><td class=\"$class\">".
+                "<div class=\"$class\" onclick=\"%s\">%s</div></td></tr>",
+                $link,$n);
+         
+         $cnt++;
+      }
+   }
+   if ($cnt>0){
+      printf("</table></center>");
+   }
+   else{
+      printf("<center><div class=\"normal\">%s</div></center>",
+         $self->T("Sorry, there are no answers for your questions"));
+   }
+
+
+   print $self->HtmlBottom(body=>1,form=>1);
+   return(0);
+}
+
 sub globalHelp
 {
    my $self=shift;
@@ -529,7 +589,8 @@ EOF
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main globalHelp Welcome Result QuickFindDetail mobileWAP Empty));
+   return(qw(Main anyQuestions globalHelp Welcome Result 
+             QuickFindDetail mobileWAP Empty));
 }
 
 sub QuickFindDetail
