@@ -95,7 +95,7 @@ sub Result
 
    my $wfflt={srcid=>\@chg2approve,
               stateid=>2,
-              class=>\'TS::workflow::change'};
+              class=>'*::workflow::change'};
 
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter($wfflt);

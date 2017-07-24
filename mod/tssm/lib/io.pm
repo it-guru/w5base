@@ -649,40 +649,26 @@ sub mkChangeStoreRec
    }
 
 
-   if (defined($updateto) && $#{$aids}!=-1) {
-      if ($oldclass eq "itil::workflow::change" ||
-          !($oldrec[0]->{step}=~m/^TS::/)) {
-         $wf->UpdateRecord({class=>'TS::workflow::change'},
-                           {id=>$updateto});
-         $wfrec{class}='TS::workflow::change';
-         $wfrec{step} ='TS::workflow::change::extauthority';
-         $oldclass='TS::workflow::change';
-      }
-   }
+   # mz 19.07.17
+   # try to simplify the classification of workflow class/step
+   # has to be monitored for a while
+   # previous version is commented below
 
-   # for compatibility with older Workflow step
-   if ($oldrec[0]->{step} eq 'itil::workflow::change::extauthority') {
-      if ($oldclass eq 'TS::workflow::change' && $#{$aids}!=-1) {
+   $wfrec{class}='TS::workflow::change';
+
+   if (defined($updateto)) {
+      # for compatibility with older Workflows
+      if ($oldclass ne $wfrec{class}) {
+         $wf->UpdateRecord({class=>$wfrec{class}},
+                           {id=>$updateto});
+         $wfrec{step} ='TS::workflow::change::extauthority';
+         $oldclass=$wfrec{class};
+      }
+      if ($oldrec[0]->{step} eq 'itil::workflow::change::extauthority') {
          $wfrec{step}='TS::workflow::change::extauthority';
       }
-      else {
-         $wf->UpdateRecord({class=>'itil::workflow::change'},
-                           {id=>$updateto});
-         $wfrec{class}='itil::workflow::change';
-         $wfrec{step}='itil::workflow::change::main';
-         $oldclass='itil::workflow::change';
-      }
    }
 
-   if (!defined($updateto)){
-      if ($#{$aids}!=-1){
-         $wfrec{class}='TS::workflow::change';
-      }
-      else{
-         $wfrec{class}='itil::workflow::change';
-         $wfrec{stateid}=21;           # non AL DTAG is automaticly finished
-      }
-   }
    if (!defined($updateto)){
       $wfrec{openuser}=undef;
       my $posix=lc($rec->{requestedby});
@@ -694,31 +680,100 @@ sub mkChangeStoreRec
          $wfrec{openuser}=$userid;
          $wfrec{openusername}="wiw/$posix";
       }
-      if ($wfrec{class}=~m/^TS::/) {
-         $wfrec{step}='TS::workflow::change::extauthority';
-      }
-      else {
-         $wfrec{step}='itil::workflow::change::main';
-      }
+
+      $wfrec{step}='TS::workflow::change::extauthority';
    }
-   if ($wfrec{class}=~m/^TS::/){
-       my $ws=$rec->{workstart};
-       my $we=$rec->{workend};
-       my $wt=0;
-       if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$ws=~
-              m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
-           (my ($weY,$weM,$weD,$weh,$wem,$wes)=$we=~
-              m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
-          my ($dd,$dh,$dm,$ds);
-          eval('($dd,$dh,$dm,$ds)=Delta_DHMS("CET",
-                                             $wsY,$wsM,$wsD,$wsh,$wsm,$wss,
-                                             $weY,$weM,$weD,$weh,$wem,$wes);
-               ');
-          if (defined($dd) && defined($dh) && defined($dm)){
-             $wt=$dd*24*60+$dh*60+$dm;
-          }
+
+    my $ws=$rec->{workstart};
+    my $we=$rec->{workend};
+    my $wt=0;
+    if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$ws=~
+           m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
+        (my ($weY,$weM,$weD,$weh,$wem,$wes)=$we=~
+           m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
+       my ($dd,$dh,$dm,$ds);
+       eval('($dd,$dh,$dm,$ds)=Delta_DHMS("CET",
+                                          $wsY,$wsM,$wsD,$wsh,$wsm,$wss,
+                                          $weY,$weM,$weD,$weh,$wem,$wes);
+            ');
+       if (defined($dd) && defined($dh) && defined($dm)){
+          $wt=$dd*24*60+$dh*60+$dm;
        }
-   }
+    }
+
+   # previous version
+#
+#   if (defined($updateto) && $#{$aids}!=-1) {
+#      if ($oldclass eq "itil::workflow::change" ||
+#          !($oldrec[0]->{step}=~m/^TS::/)) {
+#         $wf->UpdateRecord({class=>'TS::workflow::change'},
+#                           {id=>$updateto});
+#         $wfrec{class}='TS::workflow::change';
+#         $wfrec{step} ='TS::workflow::change::extauthority';
+#         $oldclass='TS::workflow::change';
+#      }
+#   }
+#
+#   # for compatibility with older Workflow step
+#   if ($oldrec[0]->{step} eq 'itil::workflow::change::extauthority') {
+#      if ($oldclass eq 'TS::workflow::change' && $#{$aids}!=-1) {
+#         $wfrec{step}='TS::workflow::change::extauthority';
+#      }
+#      else {
+#         $wf->UpdateRecord({class=>'itil::workflow::change'},
+#                           {id=>$updateto});
+#         $wfrec{class}='itil::workflow::change';
+#         $wfrec{step}='itil::workflow::change::main';
+#         $oldclass='itil::workflow::change';
+#      }
+#   }
+#
+#   if (!defined($updateto)){
+#      if ($#{$aids}!=-1){
+#         $wfrec{class}='TS::workflow::change';
+#      }
+#      else{
+#         $wfrec{class}='itil::workflow::change';
+#         $wfrec{stateid}=21;           # non AL DTAG is automaticly finished
+#      }
+#   }
+#   if (!defined($updateto)){
+#      $wfrec{openuser}=undef;
+#      my $posix=lc($rec->{requestedby});
+#      $wfrec{openusername}="wiw/$posix";
+#      $self->{user}->ResetFilter();
+#      $self->{user}->SetFilter({posix=>\$posix});
+#      my $userid=$self->{user}->getVal("userid");
+#      if (defined($userid)){
+#         $wfrec{openuser}=$userid;
+#         $wfrec{openusername}="wiw/$posix";
+#      }
+#      if ($wfrec{class}=~m/^TS::/) {
+#         $wfrec{step}='TS::workflow::change::extauthority';
+#      }
+#      else {
+#         $wfrec{step}='itil::workflow::change::main';
+#      }
+#   }
+#   if ($wfrec{class}=~m/^TS::/){
+#       my $ws=$rec->{workstart};
+#       my $we=$rec->{workend};
+#       my $wt=0;
+#       if ((my ($wsY,$wsM,$wsD,$wsh,$wsm,$wss)=$ws=~
+#              m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) &&
+#           (my ($weY,$weM,$weD,$weh,$wem,$wes)=$we=~
+#              m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/)){
+#          my ($dd,$dh,$dm,$ds);
+#          eval('($dd,$dh,$dm,$ds)=Delta_DHMS("CET",
+#                                             $wsY,$wsM,$wsD,$wsh,$wsm,$wss,
+#                                             $weY,$weM,$weD,$weh,$wem,$wes);
+#               ');
+#          if (defined($dd) && defined($dh) && defined($dm)){
+#             $wt=$dd*24*60+$dh*60+$dm;
+#          }
+#       }
+#   }
+
    $wfrec{srcload}=$self->detectSrcLoad($rec->{sysmodtime},
                                         $rec->{changenumber},$rec);
    return(\%wfrec,$updateto,$relations);
