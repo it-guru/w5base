@@ -1,6 +1,6 @@
 'itil::lnkapplsystem'=>{de=>'Anwendungs-Systemverknüpfung',
                               en=>'Application-System Link'},
-'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
+'fieldgroup.default'=>{de=>'Verknüpfungsinformation',
                        en=>'Linkinformations'},
 'fieldgroup.applinfo'=>{de=>'Anwendungsinformationen',
                         en=>'Applicationinformations'},

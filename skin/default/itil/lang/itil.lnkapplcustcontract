@@ -1,6 +1,6 @@
 'itil::lnkapplcustcontract'=>{de=>'Anwendungs-Kundenvertragsverknüpfung',
                               en=>'Application-CustomerContract Link'},
-'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
+'fieldgroup.default'=>{de=>'Verknüpfungsinformation',
                        en=>'Linkinformations'},
 'fieldgroup.relation'=>{de=>'Zuordnung',
                        en=>'Relation'},

@@ -1,5 +1,4 @@
 #!/bin/sh
-
 CHKWF=""
 ALLOTHERS=""
 if echo "$1" | egrep -q 'https://'; then

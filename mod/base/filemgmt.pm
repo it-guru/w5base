@@ -337,9 +337,12 @@ sub Validate
          my $bk=seek($f,0,SEEK_SET);
          seek($f,0,SEEK_SET);
          if (!$self->StoreFilehandle($f,$realfile,"preview")){
-            $self->LastMsg(ERROR,"can't store file");
+            if ($self->LastMsg()==0){
+               $self->LastMsg(ERROR,"can't store file");
+            }
             return(undef);
          }
+         seek($f,0,SEEK_SET);
          $context->{CurrentFileHandle}=$f;
       }
       my ($size,$atime,$mtime,$ctime,$blksize,$blocks);
@@ -619,7 +622,7 @@ sub FinishWrite
    if (defined($context->{CurrentFileHandle})){
       my $f=$context->{CurrentFileHandle};
       my $realfile=effVal($oldrec,$newrec,"realfile");
-      if (!$self->StoreFilehandle($f,$realfile)){
+      if (!$self->StoreFilehandle($f,$realfile,"FinishWrite")){
          return(undef);
       }
    }
@@ -653,6 +656,16 @@ sub sendFile
       $self->SetCurrentView(qw(ALL));
       ($rec,$msg)=$self->getFirst();
       if (!$self->isViewValid($rec)){
+         if ($ENV{REMOTE_USER} eq "anonymous"){
+            my $uri=$ENV{SCRIPT_URI};
+            $uri=~s#/public/#/auth/#;  # try to logon
+            $self->HtmlGoto($uri);
+         }
+         else{
+            printf("Status: 403 Forbidden - no access to file\n");
+            printf("Content-type: text/plain\n\n".
+                  "Forbidden\nYou don't have access to $ENV{SCRIPT_URI}\n");
+         }
          return(undef);
       }
    }
@@ -824,6 +837,9 @@ sub StoreFilehandle
          }
       }
    } 
+   my $maxw5doc=$self->Config->Param("MaxW5DocAttachment");
+   my $sz=0;
+   my $buffer;
    my $realfile="$w5root/$config/$filename";
    if ($mode eq "preview"){
       if (!open(F,">$realfile")){
@@ -831,12 +847,26 @@ sub StoreFilehandle
          return(undef);
       }
       close(F);
+      while (my $bytesread=read($fh,$buffer,1024)) {
+         $sz+=length($buffer);
+         if ($sz>$maxw5doc){
+            $self->LastMsg(ERROR,"Attachment upload is limited to %d bytes per file",
+                           $maxw5doc);
+            return(undef);
+         }
+         print F $buffer;
+      }
       unlink($realfile);
       return(1);
    }
    return(undef) if (!open(F,">$realfile"));
-   my $buffer;
    while (my $bytesread=read($fh,$buffer,1024)) {
+      $sz+=length($buffer);
+      if ($sz>$maxw5doc){
+         $self->LastMsg(ERROR,"Attachment upload is limited to %d bytes per file",
+                        $maxw5doc);
+         return(undef);
+      }
       print F $buffer;
    }
    close(F);

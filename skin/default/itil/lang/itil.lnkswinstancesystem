@@ -1,6 +1,6 @@
 'itil::lnkswinstancesystem'=>{de=>'Software-Instanz-Systemverknüpfung',
                               en=>'Software-Instance-System Link'},
-'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
+'fieldgroup.default'=>{de=>'Verknüpfungsinformation',
                        en=>'Linkinformations'},
 'fieldgroup.swinstanceinfo'=>{de=>'Instanz Informationen',
                         en=>'Instance informations'},

@@ -134,7 +134,6 @@ sub collectAnalyticsDataObjects
    $self->SecureSetFilter($q);
    $self->SetCurrentView(qw(parentid));
    my $i=$self->getHashIndexed("parentid");
-printf STDERR ("fifi i=%s\n",Dumper($i));
 
    my $interview=getModuleObject($self->Config,"base::interview");
    $interview->SetFilter({parentobj=>\$self->{secparentobj}});

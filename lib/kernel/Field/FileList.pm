@@ -57,6 +57,9 @@ function setFileListMode(o)
    var mode=document.forms[0].elements['MODE'];
    mode.value=o;
    op.value="";
+   if (document.forms[0].elements['file']){
+      document.forms[0].elements['file'].value=null;
+   }
    document.forms[0].target="_self";
    document.forms[0].submit();
 }
@@ -245,6 +248,9 @@ sub HandleFILEADD
 
       print <<EOF  if ($ok);
 <script language=JavaScript>
+if (parent.document.forms[0].elements['file']){
+   parent.document.forms[0].elements['file'].value=null;
+}
 parent.document.forms[0].target='_self';
 parent.document.forms[0].submit();
 </script>

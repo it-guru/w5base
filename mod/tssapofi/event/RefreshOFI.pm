@@ -117,13 +117,15 @@ sub RefreshOFI
       next if (!($file=~m/\.csv$/i));
       msg(INFO,"found file=$file");
       if ($file=~m/^DE_YT5A_DTIT/i){
-         $self->loadKostFile(File::Spec->catfile($tempdir,$file),$file);
+         $self->loadKostFile(File::Spec->catfile($tempdir,$file),$file,\$reccnt);
+         push(@procfiles,$file);
       }
       elsif ($file=~m/^DE_KOST_\d+_Import/i){
          # kann ignoriert werden
       }
       elsif ($file=~m/^DE_WBS_\d+_Import/i){
-         $self->loadWbsFile(File::Spec->catfile($tempdir,$file),$file);
+         $self->loadWbsFile(File::Spec->catfile($tempdir,$file),$file,\$reccnt);
+         push(@procfiles,$file);
       }
    }
    if (open(my $err,">OFI_Import_error.log")){
@@ -162,6 +164,7 @@ sub loadWbsFile
    my $self=shift;
    my $file=shift;
    my $shortname=shift;
+   my $reccnt=shift;
 
    my $tabname="OFI_wbs_import";
    msg(DEBUG,"process WbsFile '$shortname'");
@@ -222,6 +225,7 @@ sub loadWbsFile
 
 
                 if ($r{'delete'} ne "1"){
+                   $$reccnt++;
                    my %rec=(
                       objectid=>$oid,
                       name=>$r{'WBS-Number'},
@@ -288,6 +292,7 @@ sub loadKostFile
    my $self=shift;
    my $file=shift;
    my $shortname=shift;
+   my $reccnt=shift;
 
    msg(DEBUG,"process KostFile '$shortname'");
    my $db=$self->getNativOracleDBIConnectionHandle("w5warehouse");
@@ -335,6 +340,7 @@ sub loadKostFile
                 my $tabname="OFI_kost_import";
                 if ($r{Kostenstelle} ne ""){
                    my $id=uuid_to_string(create_uuid(UUID_V5,$r{Kostenstelle}));
+                   $$reccnt++;
                    my %rec=(
                       objectid=>$id,
                       name=>$r{Kostenstelle},

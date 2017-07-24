@@ -25,3 +25,5 @@
 'WebFS: Change rights inherit'=>{de=>'WebFS: Rechte aus Elternverzeichnis erben'},
 'save'=>{de=>'speichern'},
 'Inherit rights from parent directory'=>{de=>'Rechte vom Elternverzeichnis erben'},
+"can't store file"=>{de=>"Datei konnte nicht gespeichert werden"},
+"Attachment upload is limited to %d bytes per file"=>{de=>"Der Upload von Anlagen ist limitiert auf %d Bytes pro Datei"},

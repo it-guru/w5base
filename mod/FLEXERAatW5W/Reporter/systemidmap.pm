@@ -36,13 +36,13 @@ sub getDefaultIntervalMinutes
 {
    my $self=shift;
 
-   return(10,['6:08',
-              '9:08',
-              '10:08',
-              '11:08',
-              '14:08',
-              '15:08',
-              '18:08'
+   return(100,['6:15',
+               '9:15',
+               '10:15',
+               '11:15',
+               '14:15',
+               '15:15',
+               '18:15'
               ]);    
 }
 
@@ -50,12 +50,12 @@ sub Process             # will be run as a spereate Process (PID)
 {
    my $self=shift;
 
-
+   my $rmap=getModuleObject($self->Config,"FLEXERAatW5W::rawsystemidmapof");
    my $smap=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
    my $fchk=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
+   my $smapop=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
    $smap->SetFilter({mapstate=>[undef,""]});
-   $smap->Limit(150);
-   my $smapop=$smap->Clone();
+   $smap->Limit(500);
    my $sys=getModuleObject($self->Config,"itil::system");
    my $amsys=getModuleObject($self->Config,"tsacinv::system");
    foreach my $mrec ($smap->getHashList(qw(ALL))){
@@ -90,9 +90,16 @@ sub Process             # will be run as a spereate Process (PID)
       }
       $smapop->ResetFilter();
       if ($self->Config->Param("W5BaseOperationMode") eq "online" ||
-         # $self->Config->Param("W5BaseOperationMode") eq "dev" ||
+      #    $self->Config->Param("W5BaseOperationMode") eq "dev" ||
           $self->Config->Param("W5BaseOperationMode") eq "normal"){
          my $comment=$mrec->{cmt};
+         $rmap->ResetFilter();
+         $rmap->SetFilter({id=>"!".$mrec->{id},systemid=>\$systemid});
+         my ($rchkrec,$msg)=$rmap->getOnlyFirst(qw(ALL)); 
+         if (defined($rchkrec)){
+            msg(ERROR,"found id move from $rchkrec->{id} to $mrec->{id} in systemid $systemid");
+            $rmap->BulkDeleteRecord({id=>\$rchkrec->{id}});
+         }
          $fchk->ResetFilter();
          $fchk->SetFilter({systemid=>\$systemid});
          my ($chkrec,$msg)=$fchk->getOnlyFirst(qw(ALL)); 
@@ -116,6 +123,8 @@ sub Process             # will be run as a spereate Process (PID)
    foreach my $rec ($smap->getHashList(@{$self->{fieldlist}},"id")){
       $self->logRecord($rec);
    }
+   $rmap->ResetFilter();
+   $rmap->BulkDeleteRecord({mapstate=>\'NOT FOUND',mdate=>'<now-14d'});
    return(0);
 }
 

@@ -1,6 +1,6 @@
 'itil::lnkapplsupcontract'=>{de=>'Anwendungs-Supportvertragsverknüpfung',
                               en=>'Application-SupportContract Link'},
-'fieldgroup.default'=>{de=>'Verknüfpungsinformation',
+'fieldgroup.default'=>{de=>'Verknüpfungsinformation',
                        en=>'Linkinformations'},
 'fieldgroup.relation'=>{de=>'Zuordnung',
                        en=>'Relation'},

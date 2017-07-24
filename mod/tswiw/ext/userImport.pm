@@ -67,6 +67,9 @@ sub processImport
    my $flt; 
 
    if ($useAs eq "dsid"){
+      return(undef);
+   }
+   if ($useAs eq "posix"){
       $flt={uid=>\$name};
    }
    if ($useAs eq "email"){

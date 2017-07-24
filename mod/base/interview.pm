@@ -687,7 +687,8 @@ sub isWriteValid
    if (!defined($rec)){
       return("default","tech") if ($self->IsMemberOf("admin"));
       my $o=$self->Clone();
-      $o->SetFilter({contactid=>\$userid});
+      $o->SetFilter([{contactid=>\$userid},
+                     {contact2id=>\$userid}]);
       my ($rec,$msg)=$o->getOnlyFirst(qw(id));
       if (defined($rec)){
          return("default","tech");

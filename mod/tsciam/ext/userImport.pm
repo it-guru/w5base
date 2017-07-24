@@ -75,11 +75,14 @@ sub processImport
          $flt={wiwid=>\$name,active=>"true"};
       }
    }
+   if ($useAs eq "posix"){
+      $flt={wiwid=>\$name,active=>"true"};
+   }
    if ($useAs eq "email"){
       $flt={email=>\$name,active=>"true",primary=>"true"};
    }
    if (!defined($flt)){
-      $self->getParent->LastMsg(ERROR,"no acceptable filter");
+      $self->getParent->LastMsg(ERROR,"no acceptable filter $name/$useAs");
       return(undef);
    }
    $ciam->SetFilter($flt);

@@ -457,16 +457,13 @@ sub Validate
        !exists($newrec->{lastverify})){
       $newrec->{lastverify}=NowStamp("en");
    }
-#   my $name=trim(effVal($oldrec,$newrec,"name"));
-#   if ($name=~m/^\s*$/i){
-#      $self->LastMsg(ERROR,"invalid question specified"); 
-#      return(undef);
-#   }
-#   my $questclust=trim(effVal($oldrec,$newrec,"questclust"));
-#   if ($questclust=~m/^\s*$/i){
-#      $self->LastMsg(ERROR,"invalid question group specified"); 
-#      return(undef);
-#   }
+   if (defined($self->{secparentobj}) &&
+       (!defined($oldrec) &&
+        (!exists($newrec->{parentobj}) ||
+         $newrec->{parentobj} ne $self->{secparentobj})
+       )){
+      $newrec->{parentobj}=$self->{secparentobj};
+   }
    return(1);
 }
 

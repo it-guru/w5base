@@ -715,11 +715,15 @@ sub Import
          $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
          return(undef);
       }
+      my $importtype="posix";
       my $importname=$acgrouprec->{supervisorldapid};
-      $importname=$acgrouprec->{supervisoremail} if ($importname eq "");
+      if ($importname eq ""){
+         $importname=$acgrouprec->{supervisoremail};
+         $importtype="email";
+      }
       # check 4: load Supervisor ID in W5Base
       my $user=getModuleObject($self->Config,"base::user");
-      my $databossid=$user->GetW5BaseUserID($importname,"email");
+      my $databossid=$user->GetW5BaseUserID($importname,$importtype);
       if (!defined($databossid)){
          $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
          return(undef);

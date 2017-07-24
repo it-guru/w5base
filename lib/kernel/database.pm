@@ -80,7 +80,6 @@ sub Connect
          $self->{$v}=$p{$v}->{$dbname};
       }
    }
-   #msg(DEBUG,"fifi %s",Dumper($self));
    $ENV{NLS_LANG}="German_Germany.WE8ISO8859P15"; # for oracle connections
    my $BackendSessionName=$self->getParent->BackendSessionName();
    $BackendSessionName="default" if (!defined($BackendSessionName));
@@ -153,6 +152,8 @@ sub Connect
    # to prevent "no select statement currently executing" errors in mod_perl
    # enviroment, set exec_direct on ODBC connections
    $self->{db}->{odbc_exec_direct}=1;
+   $self->{db}->{RaiseError}=0;
+   $self->{db}->{PrintError}=0;
 
    if (uc($self->DriverName()) eq "ORACLE"){   # needed for primaryreplkey tech.
       $self->do("alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");

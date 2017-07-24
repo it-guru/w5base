@@ -139,6 +139,9 @@ sub qcheckRecord
          if ($rec->{srcsys} ne "w5base"){
             $forcedupd->{srcsys}="w5base";
          }
+         if ($rec->{srcid} ne ""){
+            $forcedupd->{srcid}=undef;
+         }
       }
       else{
          if ($rec->{srcsys} ne "AssetManager"){

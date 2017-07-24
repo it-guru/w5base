@@ -165,6 +165,7 @@ sub Finish
    my $reporter=shift;
 
 
+   $self->{lastrun}=NowStamp("en");
    if (ref($self->{fieldlist}) eq "ARRAY"){
       unshift(@{$task->{stdout}},join(";",@{$self->{fieldlist}}));
    }

@@ -941,13 +941,17 @@ sub getFirst
    my $baselimit=$self->Limit();
    $self->Context->{CurrentLimit}=$baselimit if ($baselimit>0);
    my $t0=[gettimeofday()];
-   if ((!defined($Apache::DBI::VERSION)) && (!$self->{DB}->{db}->ping())){
-      printf STDERR ("try to reconnect MySQL (HV-Workaround)\n");
-      my $newdbh=$self->{DB}->{db}->clone();
-      if ($newdbh->ping()){
-         $self->{DB}->{db}=$newdbh;
-      }
-   }
+   #
+   # remove Workaround, because now the DBI reconnect should handle all
+   # in the better and correct way.
+   #
+   #if ((!defined($Apache::DBI::VERSION)) && (!$self->{DB}->{db}->ping())){
+   #   printf STDERR ("try to reconnect MySQL (HV-Workaround)\n");
+   #   my $newdbh=$self->{DB}->{db}->clone();
+   #   if ($newdbh->ping()){
+   #      $self->{DB}->{db}=$newdbh;
+   #   }
+   #}
    if ($self->{DB}->execute($sqlcmd[0],\%attr)){
       my $t=tv_interval($t0,[gettimeofday()]);
       my $p=$self->Self();

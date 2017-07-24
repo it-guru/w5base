@@ -517,7 +517,12 @@ sub rawLabel
    my $self=shift;
    my $label=$self->{label};
    my $d="-NoLabelSet-";
-   $d=$label if ($label ne "");
+   if ($label ne ""){
+      $d=$label;
+   }
+   else{
+      $d="(".$self->Name().")";
+   }
    return($d);
 }
 

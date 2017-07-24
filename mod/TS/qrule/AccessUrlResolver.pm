@@ -146,12 +146,12 @@ sub qcheckRecord
             return(undef);
          }
          else{
-            my $proxy=$self->getParent->Config->Param("http_proxy");
-            if ($proxy ne ""){
-               msg(INFO,"set proxy to $proxy");
-               $ua->proxy(['http', 'ftp'],$proxy);
-            }
-            my $url="https://ebs14.telekom.de/dns/resolv.php?q=".$host;
+            #my $proxy=$self->getParent->Config->Param("http_proxy");
+            #if ($proxy ne ""){
+            #   msg(INFO,"set proxy to $proxy");
+            #   $ua->proxy(['http', 'ftp'],$proxy);
+            #}
+            my $url="http://10.175.42.25/dns/resolv.php?q=".$host;
             my $response=$ua->request(GET($url));
             if ($response->code ne "200"){
                msg(ERROR,"$self URL request $url failed code(".

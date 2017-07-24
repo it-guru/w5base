@@ -1,0 +1,95 @@
+<html>
+<head>
+<title>SimpleIPSearch</title>
+<script type='text/javascript'    
+   xsrc='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'>
+</script>
+
+<link rel="stylesheet" href="../../../auth/base/load/jquery.ui.css"></link>
+
+<script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+
+<script language="JavaScript" src="../../../auth/base/load/jquery.ui.js">
+</script>
+
+<script language="JavaScript">
+var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+
+function displayIP(res)
+{
+   var d="";
+   app=new Array();
+   currentAppl=new Array();
+   sys=new Array();
+   for(c=0;c<res.length;c++){
+      d+=res[c].name;
+      if (res[c].system){
+         d+=" found on system "+res[c].system;
+      }
+      d+="<br>";
+   }
+   $('#result').html(d);
+   $('#state').html("<font color=darkred>Step1 - "+res.length+
+                    " IP loaded</font>");
+//   window.setTimeout(loadSystems,1500);
+}
+
+
+function loadData()
+{
+   $('#state').html("<font color=darkred>loading data ...</font>");
+   var o=getModuleObject(W5Base,"itil::ipaddress");
+
+   o.SetFilter({cistatusid:"4",name:$('#ipaddr').val()});  
+   o.findRecord("name,id,system,itclustsvc",displayIP);
+}
+
+
+$(document).ready(function (){
+   $('#state').html("<font color=darkred>Ready for queries ...</font>");
+   $('#loadData').click(loadData);
+});
+
+
+
+</script>
+
+</head>
+<body>
+<!-- CONTROL -->
+<table border=0 width=100%>
+   <tr>
+      <td width=1% nowrap>IP-Adress:</td>
+      <td>
+         <input style="width:100%" type=text id=ipaddr value="10.169.20.*">
+      </td>
+      <td width=1% colspan=1 align=right>
+         <input type=button id=loadData value="Load Data">
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Status:</td>
+      <td><div id=state></div>
+      </td>
+      <td width=1% colspan=1 align=right>&nbsp;
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap></td>
+      <td><div id=processbar></div>
+      </td>
+      <td width=1% colspan=1 align=right>&nbsp;
+      </td>
+   </tr>
+</table>
+
+<!-- RESULT -->
+
+<div id=result>
+</div>
+
+
+</body>
+</html>
+
