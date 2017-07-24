@@ -100,6 +100,7 @@ sub Result
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter($wfflt);
    $self->{DataObj}->setDefaultView(qw(eventstart eventend srcid name
+                                       wffields.approvalphaseentry
                                        additional.ServiceManagerApprovalState
                                        additional.ServiceManagerChmTITPending
                                        shortactionlog));
