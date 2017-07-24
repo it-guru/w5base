@@ -489,6 +489,7 @@ sub isSuspended
     if (!defined($self->Cache->{Blacklist}) ||
         $self->Cache->{Blacklist}->{t}<$t-300){
        my $o=$self->getPersistentModuleObject("base::blacklist");
+       $o->BackendSessionName("BlackListHandling");
        $o->SetFilter({
           status=>\'1',
           expiration=>[undef,">now"]
