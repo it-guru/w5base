@@ -135,8 +135,17 @@ sub new
                    my $current=shift;
                    my $id;
                    if ($current->{class} ne ""){
-                      my ($iid)=$current->{class}=~m/\[(\d+)\]$/;
-                      $id=$iid;
+                      if ($current->{class} eq "Oracle DB" ||
+                          $current->{class} eq "Oracle_Database"){
+                         $id="9";
+                      }
+                      elsif ($current->{class} eq "Java"){
+                         $id="12687513960002";
+                      }
+                      else{
+                         my ($iid)=$current->{class}=~m/\[(\d+)\]$/;
+                         $id=$iid;
+                      }
                    }
                    return($id);
                 }),
