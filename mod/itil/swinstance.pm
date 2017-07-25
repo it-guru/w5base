@@ -90,6 +90,9 @@ sub new
                                  'DB2',
                                  'DOKuStar',
                                  'GPTR',
+                                 'HP ServiceManager',
+                                 'HP AssetManager',
+                                 'HP uCMDB',
                                  'HP-NSK Pathway',
                                  'IIS',
                                  'IMS',  # IBM Information Management System
