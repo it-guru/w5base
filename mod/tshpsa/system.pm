@@ -177,18 +177,21 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
 #         );
 #         push(@res,\%e);
          foreach my $swp (@{$rec->{swps}}){
-            my %e=(
-               section=>'SOFTWARE',
-               scanname=>$swp->{softwarename},
-               scanextra1=>$swp->{path},
-               scanextra2=>$swp->{version},
-               quality=>10,    # relativ gut verlässlich
-               processable=>1,
-               autodischint=>'HPSA: mwscanner: '.$rec->{systemid}.": ".
-                             $rec->{name}.": SOFTWARE: ".
-                             $swp->{softwarename}
-            );
-            push(@res,\%e);
+            if (!($swp->{version}=~m/^\s*$/) &&
+                ($swp->{version}=~m/^\d.*\./)){
+               my %e=(
+                  section=>'SOFTWARE',
+                  scanname=>$swp->{softwarename},
+                  scanextra1=>$swp->{path},
+                  scanextra2=>$swp->{version},
+                  quality=>10,    # relativ gut verlässlich
+                  processable=>1,
+                  autodischint=>'HPSA: mwscanner: '.$rec->{systemid}.": ".
+                                $rec->{name}.": SOFTWARE: ".
+                                $swp->{softwarename}
+               );
+               push(@res,\%e);
+            }
          }
          ($rec,$msg)=$self->getNext();
       } until(!defined($rec));
