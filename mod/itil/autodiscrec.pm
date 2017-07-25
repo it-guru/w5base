@@ -369,18 +369,18 @@ sub Validate
           effChanged($oldrec,$newrec,"scanextra2") ||
           effChanged($oldrec,$newrec,"scanextra3")){
          if (defined($oldrec) && $oldrec->{state}>1){
-            printf STDERR ("AutoDiscRec - scandata in autodiscrec '%s' ".
-                           "has been changed!\n",effVal($oldrec,$newrec,"id"));
+            #printf STDERR ("AutoDiscRec - scandata in autodiscrec '%s' ".
+            #               "has been changed!\n",effVal($oldrec,$newrec,"id"));
          }
 
          if (defined($oldrec) &&
              $oldrec->{state} ne ""){  # Datensatz wurde schonmal behandelt
-            printf STDERR ("Status change on autodiscrec($oldrec->{id})".
-                           "\n      from state='$oldrec->{state}' to ".
-                           "state='$newrec->{state}'.\n");
+            #printf STDERR ("Status change on autodiscrec($oldrec->{id})".
+            #               "\n      from state='$oldrec->{state}' to ".
+            #               "state='$newrec->{state}'.\n");
             if ($oldrec->{state} eq "20" &&
                 effVal($oldrec,$newrec,"state") eq "20"){
-               printf STDERR ("AutoDiscRec - do automatic Update!\n");
+            #   printf STDERR ("AutoDiscRec - do automatic Update!\n");
                my ($exitcode,$exitmsg)=$self->doTakeAutoDiscData($oldrec,
                                                                  $newrec);
                if ($exitcode){
@@ -392,7 +392,7 @@ sub Validate
                # Datenänderungen vorhanden, es wurde aber nur einmaliges Update
                # zugelassen. Der Datensatz muß somit wieder als unbehandelt 
                # angesehen werden.
-               printf STDERR ("AutoDiscRec - reset to unprocessed!\n");
+            #   printf STDERR ("AutoDiscRec - reset to unprocessed!\n");
                $newrec->{state}="1";
             }
          }
