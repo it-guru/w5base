@@ -1552,7 +1552,7 @@ sub Validate
       my $dsid=trim(effVal($oldrec,$newrec,"dsid"));
       my $name=trim(effVal($oldrec,$newrec,"name"));
       if ($dsid eq "" || $dsid eq $name){
-         if ($oldrec->{"rawdsid"} ne ""){
+         if (defined($oldrec) && $oldrec->{"rawdsid"} ne ""){
             $newrec->{dsid}=undef;
          }
       }
