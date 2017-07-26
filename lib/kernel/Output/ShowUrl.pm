@@ -109,7 +109,8 @@ sub ProcessHead
 
    foreach my $v (keys(%$q)){
       delete($q->{$v}) if (!defined($q->{$v}) || $q->{$v} eq "");
-      delete($q->{$v}) if ($v eq "UseLimit" || $v eq "UseLimitStart");
+      delete($q->{$v}) if (in_array([qw(UseLimit UseLimitStart 
+                                        MOD FUNC DataObj)],$v));
    }
    delete($q->{CurrentView}) if ($q->{CurrentView} eq "default");
    $q->{FormatAs}=~s/^.*;//;
@@ -132,7 +133,7 @@ sub ProcessHead
    $d=<<EOF;
 <link rel=stylesheet  href="../../base/load/default.css"></link>
 <link rel=stylesheet  href="../../base/load/frames.css"></link>
-<form method=POST target=bmcreate action="../../base/userbookmark/WebBookmarkCreate"><center><div class=winframe style="margin-top:5px;width:555px">
+<form method=POST target=bmcreate action="../../base/userbookmark/WebBookmarkCreate"><center><div class=winframe style="margin-top:5px;width:85%">
 <div class=winframehead>Bookmark create: (Beta - Modul!)
 </div>
 <table border=0 width=100%>
@@ -147,7 +148,7 @@ sub ProcessHead
 <tr>
 <td colspan=3>
 <iframe src="../../base/userbookmark/WebBookmarkCreate"
-        style="width:97%;height:40px;padding:5px" name=bmcreate></iframe></td>
+        style="width:97%;height:30px;padding:5px" name=bmcreate></iframe></td>
 </tr>
 </table>
 </div>
@@ -155,20 +156,24 @@ sub ProcessHead
 <br>
 </form>
 
-<div class=winframe style="width:555px">
+<div class=winframe style="width:95%">
 <div class=winframehead>Developer Informations:
 </div>
 <div class=winframebody>
 This Module allows developers to view direct access URL's to access
 data structures in W5Base.<br>
-<div class=winframe style="width:500px;overflow:auto;margin:20px;padding:5px">
-GET URL:<br>
-$url
+<div style="margin:5px;margin-right:10px">
+<div class=winframe style="width:100%;overflow:auto;margin:5px;padding:2px">
+<b>GET URL:</b>
+<XMP style='margin:0;padding:0'>$url</XMP>
 </div>
-<div class=winframe style="width:500px;overflow:auto;margin:20px;padding:5px">
-URI:<br>
-$ENV{SCRIPT_URI}
-<xmp>$p</xmp></div></div></div>
+<div class=winframe style="width:100%;overflow:auto;margin:5px;padding:2px">
+<b>URI:</b>
+<XMP style='margin:0;padding:0'>$ENV{SCRIPT_URI}</xmp>
+<xmp>$p</xmp></div>
+</div>
+</div>
+</div>
 EOF
 
    return($d);

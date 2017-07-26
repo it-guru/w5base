@@ -135,7 +135,15 @@ sub ProcessLine
    }
    $d=$self->FormatRecordStruct($d,$rec,$idname);
    # date hack, to get Date objects in JavaScript!
-   $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"/new Date("$2\/$3\/$1 $4:$5:$6 UTC")/g;
+   if ($self->Self() eq "kernel::Output::nativeJSON"){
+      $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"
+           /"$1-$2-$3T$4:$5:$6.000Z"/gx; # Dates should be stored in 
+                                         # JavaScripts toJSON Format
+   }
+   else{
+      $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"
+           /new Date("$2\/$3\/$1 $4:$5:$6 UTC")/gx;
+   }
    if ($lineno>1){
       $d="\n,".$d;
    }
