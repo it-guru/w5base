@@ -119,9 +119,23 @@ sub new
                 vjointo       =>'itil::lnkitclustsvcsyspolicy',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'itclustsvcid'],
-                vjoindisp     =>['name','systemid',
+                vjoindisp     =>['runpolicylevel','name','systemid',
                                  'cistatus',
                                  'shortdesc','runpolicy'],
+                vjoininhash   =>['system','systemid','runpolicy']),
+
+      new kernel::Field::SubList(
+                name          =>'posiblesystems',
+                label         =>'posible run on nodes',
+                group         =>'systems',
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkitclustsvcsyspolicy',
+                vjoinbase     =>[{
+                                  cistatusid=>"<=5",
+                                  runpolicy=>"!deny"
+                                 }],
+                vjoinon       =>['id'=>'itclustsvcid'],
+                vjoindisp     =>['name','systemid','cistatus','shortdesc'],
                 vjoininhash   =>['system','systemid','runpolicy']),
 
       new kernel::Field::SubList(

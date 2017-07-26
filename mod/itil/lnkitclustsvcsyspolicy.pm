@@ -50,7 +50,7 @@ sub new
                 label         =>'System',
                 readonly      =>1,
                 weblinkto     =>'itil::system',
-                weblinkon     =>['systemid'=>'id'],
+                weblinkon     =>['syssystemid'=>'id'],
                 dataobjattr   =>'qsystem.name'),
 
       new kernel::Field::Text(
@@ -125,6 +125,47 @@ sub new
                                 "is null,qitclust.defrunpolicy,".
                                 "qlnkitclustsvcsyspolicy.runpolicy)",
                 wrdataobjattr =>'runpolicy'),
+
+#      new kernel::Field::Link(
+#                name          =>'runpolicylevel',
+#                htmleditwidth =>'100',
+#                htmlwidth     =>'100',
+#                label         =>'Run Policy Level',
+#                dataobjattr   =>"case if (qlnkitclustsvcsyspolicy.runpolicy ".
+#                                "is null,qitclust.defrunpolicy,".
+#                                "qlnkitclustsvcsyspolicy.runpolicy) ".
+#                                "when 'allow DEFAULT' then '1' ".
+#                                "when 'allow'         then '2' ".
+#                                "else '9' end"),
+
+      new kernel::Field::DynWebIcon(
+                name          =>'runpolicylevel',
+                searchable    =>0,
+                htmlwidth     =>'5px',
+                htmldetail    =>0,
+                weblink       =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   my $e=$current->{runpolicylevel};
+                   my $name=$self->Name();
+                   my $app=$self->getParent();
+                   if ($mode=~m/html/i){
+                      return("<img ".
+                         "src=\"../../itil/load/runpolicy${e}.gif\" ".
+                         "title=\"\" border=0>");
+                   }
+                   return($e);
+                },
+                dataobjattr   =>"case if (qlnkitclustsvcsyspolicy.runpolicy ".
+                                "is null,qitclust.defrunpolicy,".
+                                "qlnkitclustsvcsyspolicy.runpolicy) ".
+                                "when 'allow DEFAULT' then '1' ".
+                                "when 'allow'         then '2' ".
+                                "else '9' end"),
+
+
 
       new kernel::Field::Link(
                 name          =>'clustid',

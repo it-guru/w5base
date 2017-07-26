@@ -17,3 +17,4 @@
 'invalid application specified'=>{de=>'ungültige Anwendung angegeben'},
 'no write access to specified cluster'=>{de=>'kein Schreibzugriff auf den angegeben Cluster'},
 'invalid service name'=>{de=>'ungültiger Servicename'},
+'posible run on nodes'=>{de=>'mögliche Ausführung auf ClusterNodes'},

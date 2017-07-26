@@ -44,11 +44,12 @@ sub CISearchResult
        (!defined($tag) || grep(/^$tag$/,qw(itclustsvc)))){
       my $flt=[{fullname=>"$searchtext",itclustcistatusid=>"<=5"},
                {applications=>"*$searchtext*",itclustcistatusid=>"<=5"},
-               {systems=>"$searchtext",itclustcistatusid=>"<=5"}];
+               {posiblesystems=>"$searchtext",itclustcistatusid=>"<=5"}];
       if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
          push(@$flt,{ipaddresses=>"$searchtext",itclustcistatusid=>"<=5"});
       }
-      my $dataobj=getModuleObject($self->getParent->Config,"itil::lnkitclustsvc");
+      my $dataobj=getModuleObject($self->getParent->Config,
+                                  "itil::lnkitclustsvc");
       $dataobj->SetFilter($flt);
       foreach my $rec ($dataobj->getHashList(qw(fullname))){
          my $dispname=$rec->{fullname};
