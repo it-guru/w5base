@@ -128,16 +128,6 @@ sub new
                 vjoinon       =>['id'=>'refid'],
                 vjoindisp     =>['group','responsibility']),
 
-      new kernel::Field::TextDrop(
-                name          =>'icto',
-                label         =>'ICTO Objectname',
-                group         =>'functional',
-                async         =>'1',
-                AllowEmpty    =>1,
-                vjointo       =>'tscape::archappl',
-                vjoinon       =>['ictoid'=>'id'],
-                vjoindisp     =>'fullname'),
-
       new kernel::Field::Text(
                 name          =>'ictoid',
                 htmldetail    =>0,
@@ -187,8 +177,6 @@ sub new
    #             container     =>'additional'),
    #   insertafter=>['applid'] 
    #);
-
-
 
    $self->AddFields(
       new kernel::Field::Text(
@@ -247,6 +235,18 @@ sub new
    );
 
 
+   $self->AddFields(
+      new kernel::Field::TextDrop(
+                name          =>'icto',
+                label         =>'ICTO Objectname',
+                group         =>'functional',
+                async         =>'1',
+                AllowEmpty    =>1,
+                vjointo       =>'tscape::archappl',
+                vjoinon       =>['ictoid'=>'id'],
+                vjoindisp     =>'fullname'),
+      insertbefore=>'applmgr'
+   );
 
 
    $self->{workflowlink}->{workflowtyp}=[qw(AL_TCom::workflow::diary

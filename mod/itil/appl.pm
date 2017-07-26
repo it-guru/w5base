@@ -828,7 +828,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'avgusercount',
                 group         =>'functional',
-                label         =>'average user count',
+                label         =>'Average user count',
                 allowempty    =>1,
                 value         =>['0','10','50','100','250',
                                  '500','800','1000','1500','2000','2500','3000',
@@ -840,7 +840,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'namedusercount',
                 group         =>'functional',
-                label         =>'named user count',
+                label         =>'Administrated user count',
                 allowempty    =>1,
                 value         =>['0','10','50','100','250',
                                  '500','800','1000','1500','2000','2500','3000',
