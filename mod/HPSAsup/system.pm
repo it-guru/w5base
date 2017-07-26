@@ -231,6 +231,21 @@ sub initSearchQuery
 }
 
 
+sub SetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if ($self->isDirectFilter(@flt)){
+      if (!exists($flt[0]->{scopemode})){
+         $flt[0]->{scopemode}=\"2017-";
+      }
+   }
+   return($self->SUPER::SetFilter(@flt));
+}
+
+
+
 #sub isViewValid
 #{
 #   my $self=shift;
