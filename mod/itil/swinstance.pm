@@ -962,9 +962,18 @@ sub Validate
          my $exp="[a-z,A-Z,0-9,_,\\-,\\.]+";
          $exp="[a-z,A-Z,0-9,_,:,\\\\,\/,\\-,\\.]+" if ($v eq "configdirpath");
          if ($autoname ne ""){
+            my $errmsg;
             if (!($autoname=~m/^$exp$/)){
-               $self->LastMsg(ERROR,"invalid value in ".$v);
-               return(0);
+               if ($v eq "autoname" && 
+                   $self->itil::lib::Listedit::IPValidate($autoname,\$errmsg)){
+                  # OK
+               }
+               else{
+                  msg(ERROR,"IPValidate error: $errmsg");
+                  $self->LastMsg(ERROR,$self->T("invalid value in field").
+                                 " ".$v);
+                  return(0);
+               }
             }
             $newrec->{$v}=lc($autoname) if ($v eq "autoname" &&
                                             $newrec->{$v} ne $autoname)
