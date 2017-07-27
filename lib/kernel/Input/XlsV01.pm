@@ -138,7 +138,7 @@ sub Process
          my $cell=$self->{'oWkS'}->{Cells}[$row][$col];
          my $v="";
          if (defined($cell)){
-            my $v=$cell->value();
+            $v=$cell->value();
             $v=$cell->{Val} if ($v eq "");
             if ($cell->{Type} eq "Date" && $v ne ""){
                $v=ExcelFmt("dd.mm.yyyy hh:mm:ss",$cell->{Val});
