@@ -93,7 +93,7 @@ create materialized view "mview_TAD4D_adm_nativesw"
 select 'tad4dp-'||adm_native_sw.id              native_id,
        adm_native_sw.package_name               package_name,
        adm_native_sw.package_version            package_version
-from adm.native_sw@tad4d  adm_native_sw;
+from adm.native_sw@tad4d  adm_native_sw where package_name is not null;
 
 CREATE INDEX "TAD4D_adm_nativesw_id" 
    ON "mview_TAD4D_adm_nativesw"(native_id) online;
@@ -177,7 +177,7 @@ create materialized view "mview_TAD4D_adm_swproduct"
    refresh complete start with sysdate
    next sysdate+(1/24)*3
    as
-select * from adm_swproduct@tad4d;
+select * from adm_swproduct@tad4d where swproduct_version is not null;
 
 CREATE INDEX "TAD4D_adm_swproduct_id1" 
    ON "mview_TAD4D_adm_swproduct"(swproduct_id) online;
