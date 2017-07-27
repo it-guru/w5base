@@ -8,6 +8,7 @@
 <div align=right>
 %SUPPORTINFO% &nbsp;
 <a target=_self href="#" onclick="window.top.displayHints();return(false);"> Hints-Test </a> &nbsp;
+%SKINSWITCHER()%
 %GLOBALHELP()%
 </div>
 

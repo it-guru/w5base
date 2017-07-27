@@ -9,6 +9,7 @@
 </td>
 <td align=right>
 %opmode%&nbsp;&nbsp;
+%SKINSWITCHER()%
 </td>
 </tr>
 </table>

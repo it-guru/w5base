@@ -20,7 +20,7 @@ function displayHints()
   <div id="TitleBar" class="TitleBar">
          <div id="popupTitle"></div>
          <div id="popupControls">
-            <img src="%rootpath%/darwin/public/base/load/subModClose.gif" 
+            <img src="%rootpath%/public/base/load/subModClose.gif" 
                  onclick="hidePopWin(true,true);" />
          </div>
       </div>

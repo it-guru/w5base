@@ -865,6 +865,13 @@ sub getSkin
 
    my @skin=split(/:/,$self->Config->Param('SKIN'));
    $skin[0]="default"                  if ($skin[0] eq "");
+   # Check if W5SKIN is set
+   my $userskin=Query->Cookie("W5SKIN");
+   if ($userskin ne ""){
+      if (in_array(\@skin,$userskin)){
+         @skin=($userskin);
+      }
+   }
    push(@skin,"default")               if (!grep(/^default$/,@skin));
    @skin=map({($_.".".$lang,$_)} @skin);
    return(@skin);

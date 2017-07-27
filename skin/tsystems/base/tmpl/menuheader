@@ -44,9 +44,7 @@ TSI-HELP: <a  style="color:white" href="callto:+498008744357">+49 800 8744357</a
 <div class="navItem" style="width:250px"><a target=work href="../../faq/QuickFind/anyQuestions" title="Hä?">Do you have any questions?</a>
 </div>
 
-<div align=right style='float:right'>
-%GLOBALHELP()%
-</div>
+<div align=right style='float:right'> %SKINSWITCHER()% %GLOBALHELP()% </div>
 
 <!--  Advtisor -->
 <!-- Advisor aktuell noch nicht aktiviert

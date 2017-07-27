@@ -1780,6 +1780,17 @@ sub findtemplvar
              "title=\"globalHelp\" alt=\"globalHelp\">".
              "<img border=0 alt=\"Help Icon\" src=\"$icon\"></a>");
    }
+   elsif ($var eq "SKINSWITCHER"){
+      my @skin=split(/:/,$self->Config->Param('SKIN'));
+      return("") if ($#skin<1);
+      my $newskin=$param[0];
+      my $icon="../../../public/base/load/skinswitcher.gif";
+      my $onclick="parent.showPopWin('../../../public/base/menu/SkinSwitcher',300,300);return(false);";
+      return("<a href=\"javascript:return(false);\" ".
+             "class=sublink onclick=\"$onclick\" ".
+             "title=\"Skin-Switcher - Change Look and Feel\">".
+             "<img border=0 alt=\"SkinSwitcher\" src=\"$icon\"></a>");
+   }
    elsif ($var eq "StdButtonBar"){
       my $d="<div class=buttonframe>";
       $d.="<table class=buttonframe><tr>";

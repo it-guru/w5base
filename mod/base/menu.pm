@@ -215,7 +215,7 @@ sub getValidWebFunctions
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(),
           "root","mobile","menutop","menuframe","msel","TableVersionChecker",
-          "LoginFail","IllegalTokenAccess");
+          "LoginFail","IllegalTokenAccess","SkinSwitcher");
 }
 
 #####################################################################
@@ -756,9 +756,6 @@ sub _mobileShowSubMenu
               $ment->{label}.
               "</li>";
    }
-print STDERR ("msel=%s\n",Dumper($ment)) if ($ment->{fullname} eq "itil.system");;
-
-  # printf STDERR ("fullname: %s\n",Dumper($ment));
    foreach my $mrec (@{$ment->{tree}}){
       $mainp.="<li data-theme=\"c\">";
       $mainp.="<a href=\"#page$mrec->{menuid}\" data-transition=\"flow\">";
@@ -786,6 +783,44 @@ sub LoginFail
    #
    #
    print $self->getParsedTemplate("tmpl/LoginFail");
+   print ("</html>");
+}
+
+sub SkinSwitcher
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(title=>'SkinSwitcher',
+                           style=>['default.css','work.css','skinswitcher.css'],
+                           js=>['toolbox.js','skinswitcher.js']); 
+
+   my @skin=split(/:/,$self->Config->Param('SKIN'));
+
+   printf("<div class=skinbox>");
+   printf("<h2>%s:</h2><br><hr>",$self->T("select a skin"));
+   printf("<div class=\"skinlist\">");
+   for(my $skinno=0;$skinno<=$#skin;$skinno++){
+      my $skinlabel="$skin[$skinno] Style";
+      my $skinname=$skin[$skinno];
+      $skinlabel="Default System" if ($skinno==0);
+      $skinname="" if ($skinno==0);
+      $skinlabel="W5Base Skin" if ($skin[$skinno] eq "default");
+      $skinlabel=~s/^(\S)/uc($1)/ge;
+      my $onclick="setSkin('".$skinname."');";
+      my $pref="";
+      my $post="";
+      if ($skinname eq Query->Cookie("W5SKIN")){
+         $pref="<b><u>";
+         $post="</b></u>";
+      }
+      printf("<a href=\"#\" onclick=\"$onclick\">$pref".
+             "$skinlabel$post</a>");
+   }
+   printf("</div><hr>");
+   printf("</div>");
+
+
+   print ("</body>");
    print ("</html>");
 }
 
