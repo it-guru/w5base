@@ -1,0 +1,13 @@
+<table width="100%" height="100%" border=0 cellspacing=0 cellpadding=0>
+<tr>
+<td>
+</td>
+</tr>
+<tr style="height:1px">
+<td align=right>
+%opmode%&nbsp;&nbsp;
+%SKINSWITCHER()%
+%GLOBALHELP()%
+</td>
+</tr>
+</table>

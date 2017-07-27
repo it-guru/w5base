@@ -1454,6 +1454,10 @@ EOF
    #if (defined($RootPath) && !defined($param{base})){
    #   $param{base}=$RootPath;
    #}
+   my $skinparam="";
+   my $userskin=Query->Cookie("W5SKIN");              # ensure cache reset
+   $skinparam="?SKIN=$userskin" if ($userskin ne ""); # on skin switch!
+                    
    if (defined($param{'style'})){
       my @style=$param{'style'};
       @style=@{$param{'style'}} if (ref($param{'style'}) eq "ARRAY");
@@ -1461,7 +1465,7 @@ EOF
          my $name=$style;
          $style="public/base/load/$style" if (!($style=~m/^public\//));
          $d.="<link rel=stylesheet type=\"text/css\" ".
-             "href=\"$param{prefix}$param{base}../../../$style\">".
+             "href=\"$param{prefix}$param{base}../../../$style?$skinparam\">".
              "\n";
       }
    }
@@ -1785,7 +1789,7 @@ sub findtemplvar
       return("") if ($#skin<1);
       my $newskin=$param[0];
       my $icon="../../../public/base/load/skinswitcher.gif";
-      my $onclick="parent.showPopWin('../../../public/base/menu/SkinSwitcher',300,300);return(false);";
+      my $onclick="parent.showPopWin('../../../public/base/menu/SkinSwitcher',400,300);return(false);";
       return("<a href=\"javascript:return(false);\" ".
              "class=sublink onclick=\"$onclick\" ".
              "title=\"Skin-Switcher - Change Look and Feel\">".
