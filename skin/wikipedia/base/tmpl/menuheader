@@ -10,6 +10,7 @@
 <td align=right>
 %opmode%&nbsp;&nbsp;
 %SKINSWITCHER()%
+%GLOBALHELP()%
 </td>
 </tr>
 </table>
