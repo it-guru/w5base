@@ -427,6 +427,11 @@ sub extendPageHeader
          $$curPageHeadRef.=
               "<script id=sortabletable language=\"JavaScript\" ".
               "src=\"../../base/load/sortabletable.js\"></script>\n";
+         $$curPageHeadRef.=
+              "<script language=JavaScript type=\"text/javascript\" ".
+              "src=\"../../../public/base/load/sortabletable_sorttype_idate.js\">".
+              "</script>\n";
+
       }
    }
 }

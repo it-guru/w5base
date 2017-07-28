@@ -92,6 +92,7 @@ sub ProcessHead
          "src=\"../../../public/base/load/toolbox.js\"></script>\n";
    $d.="<script language=JavaScript type=\"text/javascript\" ".
          "src=\"../../../public/base/load/OutputHtml.js\"></script>\n";
+       "</script>\n";
    $d.=$self->{fieldsPageHeader};
    $d.="<table class=maintable>\n";
    if (!Query->Param('$NOVIEWSELECT$')){
@@ -111,6 +112,9 @@ sub ProcessHead
                 $field->Type() eq "Linenumber"){
                push(@sortnames,"Number");
             }
+            elsif ($field->Type() eq "Date"){
+               push(@sortnames,"iDate");
+            } 
             else{
                push(@sortnames,"String");
             }
@@ -119,6 +123,9 @@ sub ProcessHead
       my $sortline=join(",",map({'"'.$_.'"'} "None",@sortnames));
       $d.="<script language=JavaScript type=\"text/javascript\" ".
             "src=\"../../../public/base/load/sortabletable.js\"></script>\n";
+      $d.="<script language=JavaScript type=\"text/javascript\" ".
+            "src=\"../../../public/base/load/sortabletable_sorttype_idate.js\">".
+          "</script>";
       $d.="<script language=JavaScript>\n";
       $d.="var SortTableResultTable;\n";
       $d.="addEvent(window,\"load\",InitTabResultTable);\n";

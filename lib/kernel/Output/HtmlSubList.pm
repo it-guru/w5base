@@ -106,11 +106,16 @@ sub ProcessHead
    my @sortnames;
    foreach my $fieldname (@view){
       my $field=$app->getField($fieldname);
-      if (defined($field) && $field->Type() eq "Number"){
-         push(@sortnames,"Number");
-      }
-      else{
-         push(@sortnames,"CaseInsensitiveString");
+      if (defined($field)) {
+         if ($field->Type() eq "Number") {
+            push(@sortnames,"Number");
+         }
+         elsif ($field->Type() eq "Date") {
+            push(@sortnames,"iDate");
+         }
+         else{
+            push(@sortnames,"CaseInsensitiveString");
+         }
       }
    }
    my $sortline=join(",",map({'"'.$_.'"'} @sortnames));
