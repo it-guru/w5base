@@ -247,6 +247,7 @@ sub new
                 name          =>'licrelevantcpucount',
                 group         =>'lic',
                 precision     =>0,
+                readonly      =>0,
                 searchable    =>0,
                 htmldetail    =>0,
                 label         =>'license relevant logical cpu count',
@@ -256,6 +257,7 @@ sub new
                 name          =>'licrelevantosrelease',
                 group         =>'lic',
                 searchable    =>0,
+                readonly      =>0,
                 htmldetail    =>0,
                 label         =>'license relevant os release',
                 onRawValue    =>\&calcLicMetrics),
@@ -264,6 +266,7 @@ sub new
                 name          =>'licrelevantsystemclass',
                 group         =>'lic',
                 searchable    =>0,
+                readonly      =>0,
                 htmldetail    =>0,
                 label         =>'license relevant system class',
                 onRawValue    =>\&calcLicMetrics),
@@ -272,6 +275,7 @@ sub new
                 name          =>'licrelevantopmode',
                 group         =>'lic',
                 searchable    =>0,
+                readonly      =>0,
                 htmldetail    =>0,
                 label         =>'license relevant operation mode',
                 onRawValue    =>\&calcLicMetrics),
@@ -628,6 +632,7 @@ sub new
                 name          =>'autodischint',        # track relation created
                 htmldetail    =>'0',                   # by AutoDiscManager
                 label         =>'AutoDiscovery Relation',
+                readonly      =>0,
                 container     =>'additional'),
                                                    
       new kernel::Field::Container(
