@@ -353,6 +353,7 @@ sub slotHandler
                $SIG{QUIT}='DEFAULT';
                $SIG{HUP}='DEFAULT';
                $SIG{CHLD}='DEFAULT';
+               $SIG{SEGV}='DEFAULT';
 
                open(STDERR, ">&".fileno($newSTDERR));
                open(STDOUT, ">&".fileno($newSTDOUT));
