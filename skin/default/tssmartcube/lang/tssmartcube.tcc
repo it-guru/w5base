@@ -13,7 +13,7 @@
 'fieldgroup.dsk'=>{de=>'Storage Connectivity Compliancy',en=>'Storage Connectivity Compliancy'},
 'fieldgroup.mon'=>{de=>'Monitoring',en=>'Monitoring'},
 'Productline'=>{de=>'Produktlinie'},
-'TCC total state'=>{de=>'TCC Gesammtstatus'},
+'TCC total state'=>{de=>'TCC Gesamtstatus'},
 'Report-Date'=>{de=>'Report-Datum'},
 'comments to Update/Refresh posibilities'=>{de=>'Bemerkungen zu den Update/Refresh Möglichkeiten'},
 'it is posible to update/upgrade OS'=>{de=>'Update/Upgrade des OS möglich'},

@@ -12,6 +12,6 @@
 'total count of applications'=>{de=>'Anwendungen'},
 'total count of specials'=>{de=>'Anzahl Sonderleistungen'},
 'total worktime of "special service" (projects)'=>{de=>'Arbeitsaufwand für Sonderleistungen (Projekte)'},
-'total worktime for "special service"'=>{de=>'Gesammt Arbeitsaufwände für Sonderleistungen'},
+'total worktime for "special service"'=>{de=>'Gesamt Arbeitsaufwände für Sonderleistungen'},
 'count of logical systems'=>{de=>'Anzahl logische Systeme'},
 'month of report'=>{de=>'Monat'},
