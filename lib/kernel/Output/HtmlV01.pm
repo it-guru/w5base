@@ -21,6 +21,7 @@ use vars qw(@ISA);
 use kernel;
 use base::load;
 use kernel::Output::HtmlSubList;
+use Class::ISA;
 @ISA    = qw(kernel::Formater);
 
 
@@ -112,7 +113,8 @@ sub ProcessHead
                 $field->Type() eq "Linenumber"){
                push(@sortnames,"Number");
             }
-            elsif ($field->Type() eq "Date"){
+            elsif (grep(/kernel::Field::Date/,
+                        Class::ISA::self_and_super_path($field->Self))>0) {
                push(@sortnames,"iDate");
             } 
             else{

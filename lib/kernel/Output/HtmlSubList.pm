@@ -21,6 +21,7 @@ use vars qw(@ISA);
 use kernel;
 use kernel::cgi;
 use base::load;
+use Class::ISA;
 @ISA    = qw(kernel::Formater);
 
 
@@ -110,7 +111,8 @@ sub ProcessHead
          if ($field->Type() eq "Number") {
             push(@sortnames,"Number");
          }
-         elsif ($field->Type() eq "Date") {
+         elsif (grep(/kernel::Field::Date/,
+                     Class::ISA::self_and_super_path($field->Self))>0) {
             push(@sortnames,"iDate");
          }
          else{
