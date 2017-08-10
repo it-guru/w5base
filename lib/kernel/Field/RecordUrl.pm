@@ -84,6 +84,9 @@ sub RawValue
             $url.="auth/$obj/ById/".$id;
          }
       }
+      if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+         $url=~s/^http:/https:/;
+      }
    }
    $current->{$self->{name}}=$url;
    return($url); 
