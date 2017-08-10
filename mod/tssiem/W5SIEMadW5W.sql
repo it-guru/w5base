@@ -11,7 +11,7 @@ create table "W5SIEM_secscan" (
 );
 
 grant select on "W5SIEM_secscan" to W5I;
-grant select,insert on "W5SIEM_secscan" to W5SIEM;
+grant select,insert,update,delete on "W5SIEM_secscan" to W5SIEM;
 create or replace synonym W5SIEM.secscan for "W5SIEM_secscan";
 create or replace synonym W5I.W5SIEM_secscan for "W5SIEM_secscan";
 
@@ -44,7 +44,7 @@ create table "W5SIEM_secent" (
 );
 
 grant select on "W5SIEM_secent" to W5I;
-grant select,insert on "W5SIEM_secent" to W5SIEM;
+grant select,insert,update,delete on "W5SIEM_secent" to W5SIEM;
 create or replace synonym W5SIEM.secent for "W5SIEM_secent";
 create or replace synonym W5I.W5SIEM_secent for "W5SIEM_secent";
 
