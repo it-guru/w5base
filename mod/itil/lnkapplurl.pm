@@ -136,7 +136,7 @@ sub new
                 vjoinon       =>['lnkapplapplid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'lnkapplapplid',
                 selectfix     =>1,
                 label         =>'InterfaceID',
@@ -298,7 +298,7 @@ sub new
                 label         =>'CustomerID',
                 dataobjattr   =>'appl.customer'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'applid',
                 label         =>'ApplID',
                 wrdataobjattr =>'accessurl.appl',
