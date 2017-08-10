@@ -4,6 +4,7 @@ create table "W5SIEM_secscan" (
  ictoid               VARCHAR2(20) not null,
  label                VARCHAR2(128) not null,
  pdfsummary           BLOB,
+ xmlsummary           CLOB,
  importdate           DATE not null,
  scandate             DATE not null,
  constraint "W5SIEM_secscan_pk" primary key (scanid)
