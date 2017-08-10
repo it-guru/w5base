@@ -27,7 +27,7 @@ create table "W5SIEM_secent" (
  title                VARCHAR2(4000) not null,
  vuln_status          VARCHAR2(40),
  ent_type             VARCHAR2(40),
- servertiy            NUMBER(2,0) not null,
+ severity             NUMBER(2,0) not null,
  port                 NUMBER(20,0),
  ssl                  NUMBER(1,0) default 0,
  first_detect         DATE not null,
