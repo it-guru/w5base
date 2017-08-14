@@ -38,12 +38,13 @@ sub new
    $self->{onRawValue}=\&onRawValue;
    $self->{uivisible}=sub {
       my $self=shift;
+      my $groups=["admin","support"];
       if ($self->getParent->can("IsMemberOf")){
-         return(1) if ($self->getParent->IsMemberOf("admin"));
+         return(1) if ($self->getParent->IsMemberOf($groups));
       }
       if ($self->getParent->can("getParent") &&
           defined($self->getParent->getParent())){
-         return(1) if ($self->getParent->getParent->IsMemberOf("admin"));
+         return(1) if ($self->getParent->getParent->IsMemberOf($groups));
       }
       return(0);
    } if (!defined($self->{uivisible}));
