@@ -2026,14 +2026,14 @@ sub addApplicationSecureFilter
    my $addflt=shift;
 
 
-   foreach my $ns (@$namespace){ 
-      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                          [orgRoles(),qw(RMember RCFManager RCFManager2 
-                                         RAuditor RMonitor)],"both");
-      my @grpids=keys(%grps);
+   my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
+   my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                       [orgRoles(),qw(RMember RCFManager RCFManager2 
+                                      RAuditor RMonitor)],"both");
+   my @grpids=keys(%grps);
+   my $userid=$self->getCurrentUserId();
 
-      my $userid=$self->getCurrentUserId();
+   foreach my $ns (@$namespace){ 
       if ($self->getField($ns.'sectargetid')){
          push(@$addflt,{$ns.'sectargetid'=>\$userid,
             $ns.'sectarget'=>\'base::user',

@@ -491,6 +491,8 @@ sub new
                 label         =>'to ApplID',
                 dataobjattr   =>'lnkapplappl.toappl'),
 
+
+
       new kernel::Field::Link(
                 name          =>'secfromapplsectarget',
                 noselect      =>'1',
@@ -535,6 +537,55 @@ sub new
                 name          =>'secfromapplopm2id',
                 noselect      =>'1',
                 dataobjattr   =>'fromappl.opm2'),
+
+
+
+      new kernel::Field::Link(
+                name          =>'sectoapplsectarget',
+                noselect      =>'1',
+                dataobjattr   =>'toappllnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'sectoapplsectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'toappllnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'sectoapplsecroles',
+                noselect      =>'1',
+                dataobjattr   =>'toappllnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'sectoapplmandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'toappl.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'sectoapplbusinessteamid',
+                noselect      =>'1',
+                dataobjattr   =>'toappl.businessteam'),
+
+      new kernel::Field::Link(
+                name          =>'sectoappltsmid',
+                noselect      =>'1',
+                dataobjattr   =>'toappl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'sectoappltsm2id',
+                noselect      =>'1',
+                dataobjattr   =>'toappl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'sectoapplopmid',
+                noselect      =>'1',
+                dataobjattr   =>'toappl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'sectoapplopm2id',
+                noselect      =>'1',
+                dataobjattr   =>'toappl.opm2'),
+
+
    );
    $self->{history}={
       insert=>[
@@ -1002,7 +1053,7 @@ sub SecureSetFilter
    if (!$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
                           "RMember")){
       my @addflt;
-      $self->itil::appl::addApplicationSecureFilter(['secfromappl'],\@addflt);
+      $self->itil::appl::addApplicationSecureFilter(['secfromappl','sectoappl'],\@addflt);
       push(@flt,\@addflt);
    }
 
