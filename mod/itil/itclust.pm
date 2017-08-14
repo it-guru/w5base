@@ -97,7 +97,7 @@ sub new
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
                 dataobjattr   =>'itclust.cistatus'),
