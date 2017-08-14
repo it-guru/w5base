@@ -88,10 +88,10 @@ sub QualityCheck
                    new kernel::Field::Boolean(
                              name          =>'lastqcheckoutofdate',
                              label         =>'last QualityCheck out of Date',
-                             sqlorder      =>'desc',
                              uivisible     =>0,
+                             noselect      =>1,
                              dataobjattr   =>'('.$lastqcheck->{dataobjattr}.
-                                             '<'.$mdate->{dataobjattr}.')')
+                                             '>'.$mdate->{dataobjattr}.')')
                )
             }
          }
