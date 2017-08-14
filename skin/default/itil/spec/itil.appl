@@ -94,7 +94,7 @@ Leistungen), z.B. Zeitaufwände des Betriebsteams
 Die Anzahl der Benutzer (insgesamt) bezieht sich auf DIREKTE Benutzer der Anwendung.
 Indirekte Nutzer (Schnittstellen) dürfen dabei nicht mitgezählt werden.
 ',en=>'
-The user count (on average in the same time period) refers to DIRECT users of the application.
+The user count (overall) refers to DIRECT users of the application.
 Indirect users (Interfaces) must not be considered.
 '},
 'avgusercount'=>{de=>'
@@ -102,7 +102,7 @@ Die Anzahl der Benutzer (durchschnittlich im gleichen Zeitraum) bezieht sich
 auf DIREKTE Benutzer der Anwendung.
 Indirekte Nutzer (Schnittstellen) dürfen dabei nicht mitgezählt werden.
 ',en=>'
-The user count (overall) refers to DIRECT users of the application.
+The user count (on average in the same time period) refers to DIRECT users of the application.
 Indirect users (Interfaces) must not be considered.
 '},
 'usetimes'=>{de=>'
