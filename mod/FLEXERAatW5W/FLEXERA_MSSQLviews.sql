@@ -1,5 +1,5 @@
--- drop view  w5base.SYSTEM;
-create view w5base.SYSTEM as
+-- drop view  dbo.customDarwinExportDevice;
+create view dbo.customDarwinExportDevice as
 select ComplianceComputer_MT.ComplianceComputerID  FLEXERASYSTEMID,            
        ComplianceComputer_MT.UUID                  UUID,
        ComplianceComputer_MT.TenantID              TENANTID,
@@ -44,8 +44,8 @@ where ComplianceComputer_MT.ComplianceComputerStatusID<>4   -- ignore dummy reco
 
 
 
--- drop view w5base.INSTSOFTWARE;
-create view w5base.INSTSOFTWARE as
+-- drop view dbo.customDarwinExportDeviceInst;
+create view dbo.customDarwinExportDeviceInst as
 select InstalledSoftware_MT.InstalledSoftwareID          ID,
        ComplianceComputerID                              FLEXERASYSTEMID,
        InstalledSoftware_MT.InstallDate                  INSTDATE,

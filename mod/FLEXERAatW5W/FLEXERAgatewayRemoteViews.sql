@@ -4,7 +4,7 @@ create materialized view "mview_FLEXERA_system"
    refresh complete start with sysdate
    next sysdate+(1/24)*3
    as
-select * from w5base.system@flexerap;
+select * from dbo.customDarwinExportDevice@flexerap;
 
 CREATE INDEX "FLEXERA_system_id1"
    ON "mview_FLEXERA_system"(flexerasystemid) online;
@@ -30,7 +30,7 @@ create materialized view "mview_FLEXERA_instsoftware"
    refresh complete start with sysdate
    next sysdate+(1/24)*18
    as
-select * from w5base.instsoftware@flexerap;
+select * from dbo.customDarwinExportDeviceInst@flexerap;
 
 CREATE INDEX "FLEXERA_instsoftware_id1"
    ON "mview_FLEXERA_instsoftware"(id) online;
