@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<style type="text/css">
+<!--
+body,p {
+   margin: 0px;
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 12px;
+   padding: 0px;
+   border: 0px;
+   background-color: #ffffff;
+}
+li{
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 12px;
+   margin-top: 2px;
+   margin-bottom: 2px;
+}
+#tabelle {
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 14px;
+   background-color: #e6e6e6;
+   margin: 0px;
+   padding: 0px;
+   border: 0px;
+}
+#tabelle .zelleWeiss {
+   background-color: #FFFFFF;
+   padding: 0px;
+   margin: 0px;
+   width: 530px;
+}
+#tabelle td {
+   height: 20px;
+   vertical-align: top;
+   padding: 0px;
+}
+a:link     { color: #E20074; }
+a:visited  { color: #E20074; }
+a:hover    { color: #E20074; }
+a:active   { color: #E20074; }
+a:link.userlink     { color: #E20074;font-size: 10px; }
+a:visited.userlink  { color: #E20074;font-size: 10px; }
+a:hover.userlink    { color: #E20074;font-size: 10px; }
+a:active.userlink   { color: #E20074;font-size: 10px; }
+td.col1   { width:121; }
+td.col2   { width:530; }
+td.col3   { width:103; }
+div.timestamp {
+   vertical-align: top;
+   margin: 0px;
+   padding: 0px;
+   padding-top: 6px;
+   padding-left: 2px;
+   font-size: 10px;
+   overflow:hidden;
+   width:121;
+}
+pre.text {
+   margin: 0px;
+   padding: 4px;
+   padding-bottom: 6px;
+   font-family:Courier New,Courier;
+   font-size:12px;
+   white-space: pre-wrap;       /* css-3 should we be so lucky... */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -pre-wrap;      /* Opera 4-6 ?? */
+   white-space: -o-pre-wrap;    /* Opera 7 ?? */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+p.header {
+   vertical-align: top;
+   margin: 0px;
+   padding: 1px;
+}
+div.separation{
+   height:820px;
+   width:754px;
+   background-color: #e6e6e6;
+}
+
+-->
+</style>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<table id=tabelle width="754" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td class=col1><img width=121 height=119 src="cid:sendmail.bild1.jpg" /></td>
+    <td class=col2><img width=530 height=119 src="cid:sendmail.bild2.jpg" /></td>
+    <td class=col3><img width=103 height=119 src="cid:sendmail.bild3.jpg"></td>
+  </tr>
+</table>
+<a name="lang.%currentlang%"></a>
+<table id=tabelle width="754" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td align=right>
+%langcontrol%&nbsp;&nbsp;
+</td>
+</tr>
+</table>
+

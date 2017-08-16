@@ -1,0 +1,12 @@
+#######################################################################
+'conumber'=>{de=>'
+Die Eingabe eines gültigen Kontierungsobjektes ist zwingend, wenn der Datensatz
+nach AssetManager übertragen werden soll!
+',en=>'
+The definition of a valid co-number is needed, if this record
+should be transfered to AssetManager.
+'},
+
+
+
+

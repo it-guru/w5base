@@ -1,0 +1,19 @@
+<!------------------------------------------------------------------------>
+<table class=tabelle width=754 border=0 cellspacing=0 cellpadding=0>
+  <tr> 
+    <td class=col1 width=121 nowrap valign=top>
+    <div class=timestamp>
+    %emailtstamp%
+    %emailprefix%
+    </div></td>
+    <td width=530 class="zelleWeiss" valign=top>
+       <div style="width:530;overflow:hidden">
+          <p class=header><u><b>%emailhead%</u></b></p>
+       </div>
+       <pre class="text">%emailtext%</pre>
+    </td><td class=col3 valign=top>%emailpostfix%</td>
+  </tr>
+  <tr height=2></tr>
+</table>
+<!------------------------------------------------------------------------>
+

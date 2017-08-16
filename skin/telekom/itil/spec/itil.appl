@@ -1,0 +1,87 @@
+#######################################################################
+'itil::appl'=>{de=>'
+Keine Modul Beschreibung
+',en=>'
+No modul specification
+'},
+#######################################################################
+'customerprio'=>{de=>'
+Die Kundenprioriät definiert, mit welcher Priorität der Kunde die
+Anwendung einstuft, d.h. durch diesen Wert wird die Wichtigkeit der 
+Anwendung für den Kunden beschrieben.
+',en=>'
+This is the customer priority. This meens, the priority of the
+application for the customer.
+'},
+'criticality'=>{de=>'
+Die Kiritkalität definiert, welche Auswirkung der Ausfall
+der Anwendung auf die Prozesse des Kunden hat.
+',en=>'
+The criticality defines which effects of a fault in this application
+for customers businessprocesses.
+'},
+#######################################################################
+'sem'=>{de=>'
+Keine Feldbeschreibung vorhanden
+',en=>'
+No field specivication
+'},
+#######################################################################
+
+'issoxappl'=>{de=>'
+Die Anwendung wird nach den Vorgaben
+aus dem ICS (Internal-Control-System) betreut.
+Alternativ erfolgt die Betreuung gemäß
+den Richtlinien aus SOX (Sarbanes Oxley Act),
+beispielsweise weil die nutzende Firma
+an US-Börsen notiert ist.
+SOX und ICS betrifft hauptsächlich
+Anwendungen aus dem Finanzbereich.
+',en=>'
+The application is managed by specifications
+according to the requirements of the
+ICS (Internal Control System).
+Alternatively, the application is managed
+according to SOX (Sarbanes Oxley Act) policies,
+for example because the using company
+is listed on US stock exchange.
+SOX and ICS applications concerns
+mainly to the financial sector.
+'},
+'kwords'=>{de=>'
+In diesem Feld können beliebige
+Worte eingetragen werden. Dies kann
+z.B. dazu verwendet werden um eine
+einfache Gruppierung von Systemen
+über die Suchfunktion zu erreichen.
+',en=>'
+In this field, you can enter any
+words. This can be used, to do a
+simple grouping of systems by
+search function.
+'},
+'servicesupport'=>{de=>'
+In diesem Feld wird die Service
+Klasse definiert, mit der die
+Anwendung dem Kunden zur Verfügung
+gestellt wird - es definiert
+also das Service-Verhältnis zwischen
+Betriebsteam und Endkunde der Anwendung.
+',en=>'
+This field defines the servicelevel
+between businessteam and customer.
+'},
+'applgroup'=>{de=>'
+Die Anwendungsgruppe dient rein
+als Filterkriterium bei Suchen
+oder Auswertungen. Es steht den
+Datenverantwortlichen frei, dieses
+Feld nach eigenem Ermessen zu
+verweden.
+',en=>'
+This is only a filter criterium. 
+'},
+
+
+
+

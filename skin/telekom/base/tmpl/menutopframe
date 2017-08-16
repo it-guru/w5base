@@ -1,0 +1,120 @@
+<script language="JavaScript">
+var contextClass = (window.AudioContext || 
+  window.webkitAudioContext || 
+  window.mozAudioContext || 
+  window.oAudioContext || 
+  window.msAudioContext);
+var beep;
+var ctx;
+if (contextClass){
+   ctx=new contextClass();
+   beep=function (duration, type, finishedCallback){
+      // Only 0-4 are valid types.
+      type = (type % 5) || 0;
+
+      if (typeof finishedCallback != "function") {
+          finishedCallback = function () {};
+      }
+
+      var osc = ctx.createOscillator();
+
+      osc.type = type;
+
+      osc.connect(ctx.destination);
+      osc.noteOn(0);
+
+      setTimeout(function () {
+          osc.noteOff(0);
+          finishedCallback();
+      }, duration);
+
+   };
+}
+else{
+   beep=function(){
+
+   };
+}
+
+
+
+var c=0;
+var xmlhttp;
+function refreshHintNotifier()
+{
+   c=c+1;
+
+   var adv0=window.frames['menutop'].document.getElementById('adv0');
+   var adv1=window.frames['menutop'].document.getElementById('adv1');
+   var e=window.frames['menutop'].document.getElementById('advcount');
+   if (e){
+      xmlhttp=getXMLHttpRequest();
+      xmlhttp.open("GET","../../../auth/base/useradvice/countEntries",true);
+      xmlhttp.onreadystatechange=function() {
+         if (e){
+            if (xmlhttp.readyState==4 && xmlhttp.status==200){
+               var x=xmlhttp.responseXML;
+               var openadvice=x.getElementsByTagName("openadvice");
+               var s=new String(openadvice[0].firstChild.nodeValue);
+               if (s.match(/\d/)){
+                  if (s>0){
+                     if (e.innerHTML!=s){
+                        e.innerHTML=s;
+                        beep(200, 1);
+                     }
+                     adv1.style.display='block';
+                     adv1.style.visiblity='visible';
+                     adv0.style.display='none';
+                     adv0.style.visiblity='hidden';
+                  }
+                  else{
+                     adv0.style.display='block';
+                     adv0.style.visiblity='visible';
+                     adv1.style.display='none';
+                     adv1.style.visiblity='hidden';
+                  }
+               }
+            }
+         }
+      };
+      xmlhttp.setRequestHeader('Content-Type',
+                               'application/x-www-form-urlencoded');
+      var r=xmlhttp.send();
+
+   }
+   window.setTimeout(refreshHintNotifier,30000);
+}
+
+function displayHints()
+{
+   showPopWin('../../base/useradvice/currentAdviceList',600,300,refreshHintNotifier);
+}
+window.setTimeout(refreshHintNotifier,4000);
+
+</script>
+<body style='overflow:hidden'><table width=100% height=100% border=0 cellspacing=0 cellpadding=0>
+<tr height=1%><td><iframe style="padding:0px;margin:0px" frameborder=0 width=100% height=%menutopframeheight% name=menutop id=fmenutop src="%menutopurl%"></iframe></td></tr>
+
+<tr><td><iframe style="padding:0px;margin:0px" width=100%  frameborder=0 height=100% name=msel src="%mselurl%"></iframe></td></tr>
+</table>
+<div id='popupMask'></div>
+<div id='popupContainer'>
+<div id='popupInner'>
+  <div id="TitleBar" class="TitleBar">
+         <div id="popupTitle"></div>
+         <div id="popupControls">
+            <img src="%rootpath%/public/base/load/subModClose.gif"
+                 onclick="hidePopWin(true,true);" />
+         </div>
+      </div>
+      <div id=popupData style="visible:hidden;display:none"></div>
+      <iframe src="%rootpath%/public/base/msg/loading"
+              style="background-color:transparent;width:100%"
+              scrolling="auto"
+              frameborder="0" allowtransparency="true"
+              class=popupFrame
+              id="popupFrame" name="popupFrame" ></iframe>
+
+</div>
+</div>
+</body>
