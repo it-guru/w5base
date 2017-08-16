@@ -114,6 +114,12 @@ sub Run
             $param{cache}=3600;
             $param{inline}=1 if (Query->Param("inline"));
          }
+         if ($ext eq "svg"){
+            $content="image/svg+xml";
+            $func=$self->Module."/img/".$func; 
+            $param{cache}=3600;
+            $param{inline}=1 if (Query->Param("inline"));
+         }
          if ($ext eq "png"){
             $content="image/png";
             $func=$self->Module."/img/".$func; 
@@ -153,7 +159,6 @@ sub Run
       if ($content eq ""){
          $content="text/html";
       }
-     
       print $self->HttpHeader($content,%param);
       foreach my $file (@$filename){
          if ($file ne ""){
