@@ -11,11 +11,8 @@ function SwitchMenuVisible()
    if (w5ui===undefined || w5ui==null || w5ui==""){
       w5ui="normal";
    }
-   if (w5ui=="slim"){
-      w5ui="normal";
-   }
    else if (w5ui=="fullscreen"){
-      w5ui="slim";
+      w5ui="normal";
    }
    else if (w5ui=="normal"){
       w5ui="fullscreen";
@@ -25,15 +22,7 @@ function SwitchMenuVisible()
    console.log("ui="+w5ui);
 
    if (m) {
-      if (w5ui=="slim") {
-         m.style.visibility="visible";
-         m.style.display="block";
-         mselframe.cols="100";
-         menutop.style.height="21px";
-         menutop.style.visibility="visible";
-         menutop.style.display="block";
-      }
-      else if (w5ui=="fullscreen") {
+      if (w5ui=="fullscreen") {
          m.style.visibility="hidden";
          m.style.display="none";
          m.oldmselframe=mselframe.cols;

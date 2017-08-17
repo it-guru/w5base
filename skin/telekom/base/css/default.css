@@ -3,15 +3,27 @@
    color: white;
    background-color:transparent;
 }
+body{
+   margin-top:2px;
+}
 
 #TitleBar{
    box-shadow: none;
    border-width:0px;
    background-color:#b90b64;
-   margin-top:2px;
-   margin-right:2px;
+   xmargin-top:2px;
+   xmargin-right:2px;
+   border-radius:4px;
 }
 
+#popupContainer{
+   margin:0px;
+   border-radius:6px;
+}
+
+span.OPMODE{
+   color:darkblue;
+}
 
 
 a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {

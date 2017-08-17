@@ -127,6 +127,7 @@ div.context_menu td.active {
 	z-index: 201;
 	top: 0px;
 	left: 0px;
+   background-color:#F3F3F3;
 	visibility:hidden;
         display:none;
 	padding: 0px;
@@ -136,9 +137,9 @@ div.context_menu td.active {
         overflow:hidden;
 }
 #popupInner {
-	background-color: #ffffff;
-        margin:0px;
-        padding:0px;
+	background-color: #F3F3F3;
+   margin:0px;
+   padding:0px;
 }
 
 div#UserJavaScript{

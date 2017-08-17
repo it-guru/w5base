@@ -80,7 +80,9 @@ sub findtemplvar
    }
    if ($var eq "TRANSLATE" && defined($_[2])){
       my $tr=$_[3];
-      $tr=$opt->{translation};
+      if (!defined($tr) || $tr eq ""){
+         $tr=$opt->{translation};
+      }
       my $t=$self->T($_[2],$tr);
       $self->ParseTemplateVars(\$t,$opt);
       return($t);

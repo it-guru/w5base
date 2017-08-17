@@ -1,0 +1,4 @@
+'OP-Mode: dev'=>{de=>'Entwicklung',en=>'Development'},
+'OP-Mode: online'=>{de=>'',en=>''},
+'OP-Mode: test'=>{de=>'Test',en=>'Test'},
+'OP-Mode: readonly'=>{de=>'ReadOnly',en=>'ReadOnly'},

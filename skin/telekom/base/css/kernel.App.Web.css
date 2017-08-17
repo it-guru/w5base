@@ -1,0 +1,8 @@
+@import url("kernel.App.Web.css?SKIN=default");
+div.searchframe{
+   border-radius:3px;
+}
+div.buttonframe{
+   border-radius:3px;
+}
+

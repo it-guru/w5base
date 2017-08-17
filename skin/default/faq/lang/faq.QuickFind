@@ -21,3 +21,4 @@ EOF
 'Config Item search'=>{de=>'Config Item suche'},
 'FAQ article search'=>{de=>'FAQ Artikel suche'},
 'Forum fulltext search'=>{de=>'Forum Volltext suche'},
+'anyQuestions'=>{de=>'Haben Sie Fragen?',en=>'Do you have any questions?'},

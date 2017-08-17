@@ -1,0 +1,10 @@
+@import url("frames.css?SKIN=default");
+div.winframehead{
+   background-color: #b90b64;
+   border-radius:4px;
+   padding-left:5px;
+}
+div.winframe{
+   border-radius:4px;
+}
+

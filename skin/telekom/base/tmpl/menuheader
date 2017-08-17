@@ -26,7 +26,7 @@ a:link, a:visited, a:active  {
 <table border=0 cellspacing=0 cellpadding=0 width=100% style='background-color:#e20074'>
 <tr height=78>
 <td width=395 style='background-size:cover;background-image:url(../load/thead_r.jpg); background-position:right 0px; background-repeat:no-repeat;'>&nbsp;</td>
-<td style='background-color:#b90b64'>&nbsp;</td>
+<td style='background-size:cover;background-image:url(../load/thead_m.jpg); background-position:right 0px; background-repeat:no-repeat;'>&nbsp;</td>
 <td width=395 style='background-size:cover;background-image:url(../load/thead_l.jpg); background-position:right 0px; background-repeat:no-repeat;'>&nbsp;</td>
 
 </tr>
@@ -37,10 +37,10 @@ a:link, a:visited, a:active  {
 <table width=100% cellspacing=0 cellpadding=0 border=0>
 <tr>
 <td width=200>
-<div style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem">Darwin CMS</div>
+<div style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem">%CONFIG(SITENAME)%  %fancyopmode%</div>
 </td>
 <td>
-<div style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem">Haben Sie Fragen?</div>
+<div style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem"><a href="../../faq/QuickFind/anyQuestions" target=work>%TRANSLATE(anyQuestions,faq::QuickFind)%</a></div>
 </td>
 <td align=right>
 %SKINSWITCHER()%

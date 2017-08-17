@@ -2,6 +2,16 @@
 div.detailtopline{
    background:#d6006e;
    background-image:linear-gradient(135deg, #d6006e 5%, white 80%);
+   border-radius:4px;
+}
+div.detailframe{
+   border-radius:4px;
+}
+div.detailframeedit{
+   border-radius:4px;
+}
+div.detailframeread{
+   border-radius:4px;
 }
 h2.detailtoplinename{
    color:white;
@@ -25,7 +35,8 @@ div.detailheadline{
 }
 
 span.detailfunctions, a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
-            color:white;
+     color:white;
+     font-weight:400;
 }
 
 

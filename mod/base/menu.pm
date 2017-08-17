@@ -878,10 +878,20 @@ sub menutop
                            body=>1,form=>1);
    my $operationmode=$self->Config->Param("W5BaseOperationMode");
    my $opmode=$operationmode;
+   my $fancyopmode=$operationmode;
    $opmode="" if ($opmode eq "normal");
    $opmode="<font color=darkred>$opmode</font>" if ($opmode eq "readonly");
    $opmode="OP-Mode: $opmode" if ($opmode ne "" && $opmode ne "online");
    $opmode="" if ($opmode eq "online");
+
+   $fancyopmode="" if ($opmode eq "normal");
+   if ($fancyopmode ne ""){
+      $fancyopmode="<span class=\"OPMODE OPMODE$operationmode\">".
+         $self->T("OP-Mode: ".$fancyopmode,"base::opmode")."</span>";
+   }
+
+
+
 
    my $W5UserInterface=$self->getW5UIMode();
 
@@ -892,6 +902,7 @@ sub menutop
    print $self->getParsedTemplate($headertmpl,{
                                    static=>{
                                        opmode=>$opmode,
+                                       fancyopmode=>$fancyopmode,
                                        operationmode=>$operationmode,
                                        rootpath=>$rootpath
                                    }});

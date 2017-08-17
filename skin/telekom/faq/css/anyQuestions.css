@@ -1,0 +1,13 @@
+@import url("anyQuestions.css?SKIN=default");
+td{
+   color:black;
+}
+td:hover {
+   background-color:#d6006e;
+}
+.normal{
+   background-color:#e20074;
+}
+.dimgray{
+   xbackground-color:dimgray;
+}
