@@ -1,10 +1,21 @@
 @import url("default.css?SKIN=default");
 .TitleBar {
-   background-color: #d6006e;
-   color: black;
+   color: white;
+   background-color:transparent;
 }
+
+#TitleBar{
+   box-shadow: none;
+   border-width:0px;
+   background-color:#b90b64;
+   margin-top:2px;
+   margin-right:2px;
+}
+
+
+
 a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
-   background-color: #d6006e;
-   color: black;
+   background-color: transparent;
+   color: white;
 }
 

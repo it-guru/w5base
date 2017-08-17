@@ -1,7 +1,20 @@
 @import url("Output.HtmlDetail.css?SKIN=default");
+div.detailframe{
+  background-color:#383638;
+}
+div.detailframeedit{
+  background-color:#383638;
+}
+div.detailframeread{
+  background-color:#383638;
+}
+#HtmlDetail{
+  background-color:gray;
+}
+
+
 div.detailtopline{
-   background:#d6006e;
-   background-image:linear-gradient(135deg, #d6006e 5%, white 80%);
+   background:black;
 }
 h2.detailtoplinename{
    color:white;
@@ -17,15 +30,15 @@ div.detailframeedit h3{
 div.detailheadline{
    color:white;
    box-shadow: none;
-   border-bottom: 2px solid #d6006e;
-   border-top: 2px solid #d6006e;
-   border-left: 2px solid #d6006e;
-   border-right: 2px solid #d6006e;
-   background-color:#BA1168;
+   background-color:black;
 }
 
 span.detailfunctions, a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
             color:white;
 }
+
+a.HtmlDetailIndex:link, a.HtmlDetailIndex:visited, a.HtmlDetailIndex:active {
+            color:black;
+          }
 
 

@@ -191,24 +191,28 @@ iframe.popupFrame {
 }
 
 .TitleBar {
-	background-color: #30579f;
+	background-color: transparent;
 	color: #ffffff;
 	font-weight: bold;
 	height: 19px;
-        overflow:hidden;
+   overflow:hidden;
 	padding: 0px;
 	margin: 0px;
 	padding-left: 3px;
-	border-bottom: 1px solid #000000;
-	border-top: 1px solid #78A3F2;
-	border-left: 1px solid #78A3F2;
-	border-right: 1px solid #204095;
 	position: relative;
-        white-space: nowrap;
+   white-space: nowrap;
 	z-index: 203;
 }
+#TitleBar{
+   box-shadow: none;
+	border-bottom: 1px solid #30579f;
+	border-top: 1px solid #30579f;
+	border-left: 1px solid #30579f;
+	border-right: 1px solid #30579f;
+   background-color:#30579f;
+}
 a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
-	background-color: #30579f;
+	background-color: transparent;
 	color: #ffffff;
 	font-weight: bold;
    text-decoration:none;

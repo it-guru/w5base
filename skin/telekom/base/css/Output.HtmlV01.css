@@ -1,11 +1,7 @@
 @import url("Output.HtmlV01.css?SKIN=default");
-body{
-    background: #383638;
-    color:black;
-}
-
 tr.linehighlight{
-   background:silver;
+   background:#D8E8E0;
+   background:#C9E7F0;
    cursor:pointer;
 }
 

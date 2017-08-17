@@ -1,0 +1,29 @@
+@import url("kernel.TabSelector.css?SKIN=default");
+
+a:link.ModeSelectFunctionLink,a:visited.ModeSelectFunctionLink,a:active.ModeSelectFunctionLink    {
+            color:silver;
+          }
+
+td.ModeSelectInactiv{
+   background-color:darkgray;
+}
+
+td.ModeSelectActiv{
+   background-color:gray;
+   border-bottom-color:gray;
+}
+
+span.ModeSelectActiv, a:visited.ModeSelectActiv, a:active.ModeSelectActiv, a:link.ModeSelectActiv    {
+            color:white;
+          }
+
+
+
+span.ModeSelectInactiv, a:link.ModeSelectInactiv, a:visited.ModeSelectInactiv, a:active.ModeSelectInactiv    {
+            color:#eaeaea;
+          }
+
+
+
+
+

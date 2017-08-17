@@ -30,17 +30,7 @@ ul.mktree  li   .nobullet {
    background:none;
    font-size: 10pt; 
 }
-a:link.menulink {
-   font-family:Arial,Adobe Helvetica,Helvetica;
-   text-decoration:none;
-   color:#16305e;
-}
-a:visited.menulink {
-   font-family:Arial,Adobe Helvetica,Helvetica;
-   text-decoration:none;
-   color:#16305e;
-}
-a:active.menulink {
+a:link.menulink, a:visited.menulink, a:active.menulink {
    font-family:Arial,Adobe Helvetica,Helvetica;
    text-decoration:none;
    color:#16305e;

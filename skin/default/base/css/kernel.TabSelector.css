@@ -19,7 +19,6 @@ table.ModeSelect{
 }
 
 td.ModeSelectInactiv{
-   background:blue;
    padding-left:5px;
    background:#dadada;
    border-color:gray;
@@ -31,7 +30,6 @@ td.ModeSelectInactiv{
 }
 
 td.ModeSelectActiv{
-   background:blue;
    padding-left:5px;
    background:#eaeaea;
    border-color:black;
@@ -72,10 +70,7 @@ a:link.ModeSelectFunctionLink,a:visited.ModeSelectFunctionLink,a:active.ModeSele
           }
 
 
-span.ModeSelectActiv,
-a:visited.ModeSelectActiv,
-a:active.ModeSelectActiv,
-a:link.ModeSelectActiv    {
+span.ModeSelectActiv, a:visited.ModeSelectActiv, a:active.ModeSelectActiv, a:link.ModeSelectActiv    {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#16305e;
@@ -83,10 +78,7 @@ a:link.ModeSelectActiv    {
             cursor: hand;
           }
 
-span.ModeSelectInactiv,
-a:link.ModeSelectInactiv,
-a:visited.ModeSelectInactiv,
-a:active.ModeSelectInactiv    {
+span.ModeSelectInactiv, a:link.ModeSelectInactiv, a:visited.ModeSelectInactiv, a:active.ModeSelectInactiv    {
             font-family:Arial,Adobe Helvetica,Helvetica;
             text-decoration:none;
             color:#26507e;
