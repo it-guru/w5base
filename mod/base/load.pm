@@ -36,6 +36,7 @@ sub Run
    my $self=shift;
    my $func=Query->Param("FUNC");
    my $instdir=$self->Config->Param("INSTDIR");
+   my $skin=Query->Param("SKIN");
    my $content;
    my $filename;
    my %param=();
@@ -64,30 +65,37 @@ sub Run
       print $self->getParsedTemplate($func,{translation=>$translation,
                                             static=>$static});
       print $self->HtmlBottom(body=>1,form=>1);
+      return(0);
    }
    elsif ($func=~m/^scriptpool\//){
       my ($script)=$func=~m/^scriptpool\/(.*)$/;
-      my $instdir=$self->Config->Param("INSTDIR");
+      my $instdirlist=$self->Config->Param("INSTDIR");
       $script=~s/[^a-z,0-9]//g;
-      if ( -f "$instdir/static/scriptpool/$script"){
-         print $self->HttpHeader("text/plain",filename=>$script);
-         if (open(F,"<$instdir/static/scriptpool/$script")){
-            my $prot=lc($ENV{SCRIPT_URI});
-            $prot=~s/:.*$//;
-            my $cfg=$self->Config->getCurrentConfigName();
-            while(my $l=<F>){
-               $l=~s/%%%HOST%%%/$ENV{SERVER_NAME}/g;
-               $l=~s/%%%PROT%%%/$prot/g;
-               $l=~s/%%%CONFIG%%%/$cfg/g;
-               print $l;
+      my $found=0;
+      foreach my $instdir (split(/:/,$instdirlist)){
+         if ( -f "$instdir/static/scriptpool/$script"){
+            $found=1;
+            print $self->HttpHeader("text/plain",filename=>$script);
+            if (open(F,"<$instdir/static/scriptpool/$script")){
+               my $prot=lc($ENV{SCRIPT_URI});
+               $prot=~s/:.*$//;
+               my $cfg=$self->Config->getCurrentConfigName();
+               while(my $l=<F>){
+                  $l=~s/%%%HOST%%%/$ENV{SERVER_NAME}/g;
+                  $l=~s/%%%PROT%%%/$prot/g;
+                  $l=~s/%%%CONFIG%%%/$cfg/g;
+                  print $l;
+               }
+               close(F);
             }
-            close(F);
+            last;
          }
       }
-      else{
+      if  (!$found){
          printf("Status: 404 Not Found\n");
          printf("Content-Type: text/plain\n\n");
       }
+      return(0);
    }
    else{
       if (my ($ext)=$func=~m/\.([a-z]{2,3})$/){
@@ -152,7 +160,12 @@ sub Run
       }
       if (ref($filename) ne "ARRAY"){
          if ($content ne "text/javascript"){
-            $filename=$self->getSkinFile($func);
+            my %opt=();
+            if ($skin ne ""){
+               $skin=~s/[^a-zA-Z0-9_-]//g;
+               $opt{addskin}=$skin;
+            }
+            $filename=$self->getSkinFile($func,%opt);
          }
          $filename=[$filename];
       }

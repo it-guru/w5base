@@ -39,6 +39,7 @@ sub BuildHtmlTree
    # tree->{target}       = target window
    # tree->{tree}         = array pointer auf untermenu
 
+   $control{imgparam}=""             if (!defined($control{imgparam}));
    $control{rootpath}="../"          if (!defined($control{rootpath}));
    $control{rootimg}="miniglobe.gif" if (!defined($control{rootimg}));
    my $d="<div>";
@@ -75,7 +76,8 @@ sub _TreeLine
          $d.="<a href=$control->{rootlink}>";
       }
       $d.="<img border=0 alt=\"root\" ".
-          "src=\"${rootpath}../../base/load/$control->{rootimg}\">";
+          "src=\"${rootpath}../../base/load/$control->{rootimg}".
+          "$control->{imgparam}\">";
       if (defined($control->{rootlink})){
          $d.="</a>";
       }
@@ -90,11 +92,13 @@ sub _TreeLine
          my $l=4;
          $l=1 if ($indent->[$c-1]>0);
          $d.="<img border=0 alt=\"+\" ".
-             "src=\"${rootpath}../../base/load/menu_bar_$l.gif\">";
+             "src=\"${rootpath}../../base/load/menu_bar_$l.gif".
+             "$control->{imgparam}\">";
       }
       my $imgname="menu_bar_${id}.gif";
       $d.="<img border=0 alt=\"+\" ".
-          "src=\"${rootpath}../../base/load/$imgname\">";
+          "src=\"${rootpath}../../base/load/$imgname".
+          "$control->{imgparam}\">";
       $d.="</td><td valign=center>";
       my $hrefclass;
       if (defined($control->{hrefclass})){

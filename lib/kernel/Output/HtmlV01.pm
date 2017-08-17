@@ -51,6 +51,14 @@ sub getHttpHeader
    my $d="";
    $d.=$app->HttpHeader("text/html");
    $d.=$app->HtmlHeader();
+   $d.=$app->HtmlHeader(style=>['default.css',
+                                'Output.HtmlSubList.css',
+                                'Output.HtmlViewLine.css',
+                                'Output.HtmlV01.css'],
+                        title=>'',
+                        body=>1,
+                        );
+
 
    return($d);
 }
@@ -426,11 +434,11 @@ sub getStyle
    my ($self,$fh)=@_;
    my $app=$self->getParent->getParent();
    my $d="";
-   $d.=$app->getTemplate("css/default.css","base");
-   $d.=$app->getTemplate("css/Output.HtmlSubList.css","base");
-   $d.=$app->getTemplate("css/Output.HtmlViewLine.css","base");
-   $d.=$app->getTemplate("css/Output.HtmlV01.css","base");
-   $d.="\@page { size:landscape }";
+#   $d.=$app->getTemplate("css/default.css","base");
+#   $d.=$app->getTemplate("css/Output.HtmlSubList.css","base");
+#   $d.=$app->getTemplate("css/Output.HtmlViewLine.css","base");
+#   $d.=$app->getTemplate("css/Output.HtmlV01.css","base");
+#   $d.="\@page { size:landscape }";
    return($d);
 }
 

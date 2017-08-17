@@ -1103,10 +1103,16 @@ sub MenuTab
    my $active=shift;
    my $rootlink=shift;
    my $d="\n";
+   my $skinparam="";
+
+   my $userskin=Query->Cookie("W5SKIN");              # ensure cache reset
+   $skinparam="?SKIN=$userskin" if ($userskin ne ""); # on skin switch!
+
    
    $d.=kernel::MenuTree::BuildHtmlTree(
                      tree=>$self->_getMenuEntryFinalList($active,"normal"),
                      hrefclass=>'menulink',
+                     imgparam =>$skinparam,
                      rootlink =>$rootlink,
                      rootpath => $rootpath);
    return($d);

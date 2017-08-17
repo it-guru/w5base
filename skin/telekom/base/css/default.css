@@ -1,0 +1,10 @@
+@import url("default.css?SKIN=default");
+.TitleBar {
+   background-color: #d6006e;
+   color: black;
+}
+a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
+   background-color: #d6006e;
+   color: black;
+}
+

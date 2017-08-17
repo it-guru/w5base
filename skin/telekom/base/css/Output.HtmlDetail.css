@@ -1,0 +1,11 @@
+@import url("Output.HtmlDetail.css?SKIN=default");
+div.detailtopline{
+   background:#d6006e;
+}
+h2.detailtoplinename{
+   xcolor:black;
+}
+div.detailheadline{
+   background:#e20074;
+}
+

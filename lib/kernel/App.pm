@@ -1091,12 +1091,18 @@ sub getSkinFile
    my $conftag=shift;
    my %param=@_;
    my $baseskindir=$self->getSkinDir();
-   my @skin=$self->getSkin();
+   my @skin;
  
    $conftag=~s/\.\./\./g;              # security hack
    $conftag=~s/^\///g;                 # security hack
 
    my @filename=();
+   if (defined($param{skin})){
+      @skin=($param{skin});
+   }
+   else{
+      @skin=$self->getSkin();
+   }
    if (defined($param{addskin})){
       unshift(@skin,$param{addskin});
    }

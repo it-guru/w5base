@@ -1465,7 +1465,7 @@ EOF
          my $name=$style;
          $style="public/base/load/$style" if (!($style=~m/^public\//));
          $d.="<link rel=stylesheet type=\"text/css\" ".
-             "href=\"$param{prefix}$param{base}../../../$style?$skinparam\">".
+             "href=\"$param{prefix}$param{base}../../../$style$skinparam\">".
              "\n";
       }
    }
