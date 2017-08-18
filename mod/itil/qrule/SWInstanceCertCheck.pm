@@ -13,6 +13,26 @@ or "available". If the expiration of the sslcheck url comes closer then
 
 NONE
 
+=head3 HINTS
+
+[en:]
+
+The Qrule checks on Software Instances in status "installed/active" or 
+"available/ in project" if the certificate is available via the filled out URL.
+It is important to ensure that the specified URL is accessible from the 
+W5Base environment. Appropriate firewall permissions must be in place for 
+this purpose.
+
+[de:]
+
+Die Qrule prüft an den Software-Instanzen im Status "installiert/aktiv" 
+oder "verfügbar/in Projektierung" ob das Zertifikat über die angegebene URL 
+abrufbar ist.
+Dabei ist darauf zu achten, dass die angegebene URL netzmäßig von der 
+W5Base-Umgebung aus erreichbar ist. Evtl. sind dafür entsprechende 
+Firewall-Freischaltungen zu beauftragen.
+
+
 =cut
 #######################################################################
 #  W5Base Framework
