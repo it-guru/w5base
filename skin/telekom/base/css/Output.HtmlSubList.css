@@ -1,6 +1,9 @@
 @import url("Output.HtmlSubList.css?SKIN=default");
 th.subheadfield{
-   background:#e20074;
+   background:#7f7f7f;
    color:white;
+}
+tr.linehighlight{
+   background:#C9E7F0;
 }
 
