@@ -50,7 +50,6 @@ sub getHttpHeader
    my $app=$self->getParent->getParent();
    my $d="";
    $d.=$app->HttpHeader("text/html");
-   $d.=$app->HtmlHeader();
    $d.=$app->HtmlHeader(style=>['default.css',
                                 'Output.HtmlSubList.css',
                                 'Output.HtmlViewLine.css',
