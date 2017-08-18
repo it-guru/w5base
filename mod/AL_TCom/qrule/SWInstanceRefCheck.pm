@@ -17,6 +17,25 @@ installation is mandatory.
 
 NONE
 
+=head3 HINTS
+
+[en:]
+
+The Qrule checks if the related application, logical system and software 
+installation to the current software instance is in status 
+"available/in project", "installed/active" or "inactive/stored".
+Referenced software installation by instances with type SAP/R2 or SAP/R3 
+is not mandatory.
+
+[de:]
+
+Die Qrule prüft ob die, mit der Software Instanz verbundene Anwendung, 
+log. System oder Software-Installation im Status "verfügbar/in Projektierung",
+"zeitweise inaktiv" oder "installiert/aktiv" und gültig ist.
+Bei Software-Instanzen vom Typ SAP/R2 oder SAP/R3 ist keine 
+Software-Installation notwendig.
+
+
 =cut
 #######################################################################
 #  W5Base Framework

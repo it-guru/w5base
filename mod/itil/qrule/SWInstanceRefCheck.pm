@@ -16,6 +16,21 @@ installation.
 
 NONE
 
+=head3 HINTS
+
+[en:]
+
+The Qrule checks if the related application, logical system and software
+installation to the current software instance is in status
+"available/in project", "installed/active" or "inactive/stored".
+
+[de:]
+
+Die Qrule prüft ob die, mit der Software Instanz verbundene Anwendung,
+log. System oder Software-Installation im Status "verfügbar/in Projektierung",
+"zeitweise inaktiv" oder "installiert/aktiv" und gültig ist.
+
+
 =cut
 #######################################################################
 #  W5Base Framework
