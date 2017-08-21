@@ -57,6 +57,12 @@ sub new
                 dataobjattr   =>'amnature.name'),
 
       new kernel::Field::Text(
+                name          =>'vendor',
+                label         =>'Vendor',
+                ignorecase    =>1,
+                dataobjattr   =>'ambrand.name'),
+
+      new kernel::Field::Text(
                 name          =>'barcode',
                 label         =>'BarCode',
                 ignorecase    =>1,
@@ -118,7 +124,8 @@ sub getSqlFrom
       "ammodel assetmodel,amnature,".
       "(select amfvmodel.fval PowerInput,lmodelid from amfvmodel,amfeature ".
       "where amfvmodel.lfeatid=amfeature.lfeatid and ".
-      " amfeature.sqlname='PowerInput') assetpowerinput";
+      " amfeature.sqlname='PowerInput') assetpowerinput,".
+      "ambrand";
    return($from);
 }
 
@@ -126,7 +133,8 @@ sub initSqlWhere
 {
    my $self=shift;
    my $where="assetmodel.lmodelid=assetpowerinput.lmodelid(+) and ".
-             "assetmodel.lnatureid=amnature.lnatureid(+) ";
+             "assetmodel.lnatureid=amnature.lnatureid(+) and ".
+             "assetmodel.lbrandid=ambrand.lbrandid(+) ";
    return($where);
 }
 
