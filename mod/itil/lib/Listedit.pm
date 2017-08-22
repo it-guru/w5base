@@ -197,7 +197,7 @@ sub isWriteOnClusterValid
       $c->SetFilter({id=>\$itclustid});
       my ($cl,$msg)=$c->getOnlyFirst(qw(ALL));
       my @g=$c->isWriteValid($cl);
-      if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      if (grep(/^(ALL|default)$/,@g) || grep(/^$group$/,@g)){
          return(1);
       }
    }
