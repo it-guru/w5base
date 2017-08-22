@@ -57,7 +57,7 @@ body{
 </style>
 EOF
    print("<table width=\"100%\" height=\"100%\" border=0 ".
-         "cellspacing=10 cellpadding=0>");
+         "cellspacing=0 cellpadding=0>");
    printf("<tr><td height=1%% valign=top>%s</td></tr>",$self->getAppTitleBar());
    print $self->getParsedTemplate("tmpl/XLSExpand",{});
    my @collabel=('A'..'Z');

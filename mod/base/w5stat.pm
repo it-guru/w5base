@@ -710,7 +710,7 @@ sub Presenter
    my ($func,$p)=$self->extractFunctionPath();
    my $rootpath=Query->Param("RootPath");
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','menu.css'],
+   print $self->HtmlHeader(style=>['menu.css','default.css'],
                            js=>['toolbox.js','subModal.js'],
                            body=>1,form=>1,action=>'../ShowEntry',
                            prefix=>$rootpath,
