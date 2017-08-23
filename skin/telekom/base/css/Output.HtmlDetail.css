@@ -1,7 +1,7 @@
 @import url("Output.HtmlDetail.css?SKIN=default");
 div.detailtopline{
    background:#d6006e;
-   background-image:linear-gradient(135deg, #d6006e 5%, white 80%);
+   background-image:linear-gradient(135deg, #d6006e 5%, #b90b64 80%);
    border-radius:4px;
 }
 div.detailframe{
@@ -32,6 +32,7 @@ div.detailheadline{
    border-left: 2px solid #d6006e;
    border-right: 2px solid #d6006e;
    background-color:#BA1168;
+w
 }
 
 span.detailfunctions, a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
