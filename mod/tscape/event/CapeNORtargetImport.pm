@@ -184,9 +184,18 @@ sub CapeNORtargetImport
                   $newrec->{owner}=$uid;
                }
                if ($nor->ValidatedUpdateRecord($autorec,$newrec,{
-                      id=>\$autorec->{id}
-                   })){
+                  my @emailcc=();
+                  if ($arec->{haveitsem}) {
+                     push(@emailcc,$arec->{itsemid});
+                     push(@emailcc,$arec->{itsem2id});
+                  }
+                  else {
+                     push(@emailcc,$arec->{semid});
+                     push(@emailcc,$arec->{sem2id});
+                  }
+
                   $appl->NotifyWriteAuthorizedContacts($arec,{},{
+                        emailcc=>\@emailcc,
                         emailbcc=>[
                               11634953080001,  # Vogler
                               13796024310000   # Maske
