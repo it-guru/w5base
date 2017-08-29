@@ -2974,11 +2974,9 @@ sub Result
          return();
       }
       my $uselimit=Query->Param("UseLimit");
-print STDERR ">>> UseLimit: ".Query->Param("UseLimit")."\n";
-print STDERR ">>> MyW5BaseSUBMOD: ".Query->Param("MyW5BaseSUBMOD")."\n";
       my $uselimitstart=Query->Param("UseLimitStart");
       $uselimitstart=0 if (!defined($uselimitstart));
-      if (defined($param{Limit}) && $uselimit eq ''){
+      if (defined($param{Limit})){
          $uselimit=$param{Limit};
       }
       if ($format eq "JSONP"){

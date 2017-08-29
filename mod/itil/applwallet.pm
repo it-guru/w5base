@@ -215,16 +215,10 @@ sub SecureSetFilter
 
    if (!$self->IsMemberOf([qw(admin support w5base.itil.applwallet.read)])) {
       my $userid=$self->getCurrentUserId();
-      my %grps=$self->getGroupsOf($userid,"RMember","up");
-      my @grpids=keys(%grps);
 
       my $applobj=getModuleObject($self->Config,'itil::appl');
       $applobj->SetFilter([{sectarget=>\'base::user',
                             sectargetid=>\$userid,
-                            secroles=>"*roles=?write?=roles* ".
-                                      "*roles=?privread?=roles*"},
-                           {sectarget=>\'base::grp',
-                            sectargetid=>\@grpids,
                             secroles=>"*roles=?write?=roles* ".
                                       "*roles=?privread?=roles*"},
                            {databossid=>\$userid},

@@ -104,7 +104,7 @@ sub Main
                            js=>['toolbox.js','subModal.js'],
                            body=>1,form=>1);
    print $self->HtmlSubModalDiv();
-   print Query->Dumper();
+   #print Query->Dumper();
    print("<table width=\"100%\" height=\"100%\" border=0 ".
          "cellspacing=0 cellpadding=0>");
    printf("<tr><td height=\"1%%\" valign=top>%s</td></tr>",
@@ -192,7 +192,7 @@ sub Main
    my ($target,$action)=$self->getOperationTarget();
    print <<EOF;
 <input type=hidden name=CurrentView>
-<input type=hidden name=UseLimit value="undef">
+<input type=hidden name=UseLimit>
 <input type=hidden name=UseLimitStart>
 <input type=hidden name=FormatAs value="$DefaultFormat">
 <style>body{overflow:hidden}</style>

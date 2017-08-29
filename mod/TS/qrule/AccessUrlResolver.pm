@@ -139,7 +139,6 @@ sub qcheckRecord
             use HTTP::Request::Common;
            
             $ua=new LWP::UserAgent(env_proxy=>0);
-            $ua->ssl_opts(verify_hostname=>0);
             $ua->timeout(60);
          ');
          if ($@ ne ""){
@@ -153,11 +152,8 @@ sub qcheckRecord
                $ua->proxy(['http', 'ftp'],$proxy);
             }
             #my $url="http://10.175.42.25/dns/resolv.php?q=".$host;
-            my $url="https://dnsresolver.w5base.net/resolv.php?q=".$host;
+            my $url="http://w5base.buckenhofen.de/resolv.php?q=".$host;
             my $response=$ua->request(GET($url));
-print STDERR ">>>\n";
-print STDERR Dumper($response);
-print STDERR ">>>\n";
             if ($response->code ne "200"){
                msg(ERROR,"$self URL request $url failed code(".
                          $response->code.")");
