@@ -183,7 +183,8 @@ sub CapeNORtargetImport
                if ($uid){
                   $newrec->{owner}=$uid;
                }
-               if ($nor->ValidatedUpdateRecord($autorec,$newrec,{
+               if ($nor->ValidatedUpdateRecord($autorec,$newrec,
+                                               {id=>\$autorec->{id}})) {
                   my @emailcc=();
                   if ($arec->{haveitsem}) {
                      push(@emailcc,$arec->{itsemid});
