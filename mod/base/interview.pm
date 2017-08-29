@@ -948,8 +948,21 @@ sub getHtmlEditElements
       }
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
       my $lang=$self->Lang();
-      $HTMLjs.="\$(\"#dateinput$irec->{id}\").datepicker(".
-               "\$.extend({},\$.datepicker.regional['$lang']));\n";
+      $HTMLjs.=<<EOF
+\$("#dateinput$irec->{id}").datepicker({onChangeMonthYear:
+   function(year,month,inst) {
+      console.log("onChangeMonthYear");
+      console.log(\$(this).datepicker("widget"));
+   }
+});
+EOF
+
+#      $HTMLjs.="\$(\"#dateinput$irec->{id}\").datepicker(".
+#                  "\$.extend({onChangeMonthYear:function(year,month,instance){".
+#                                                  "\$(this).attr(\"nosubmit\",1);".
+#"console.log(this)".
+#                                               "}".
+#                            "},\$.datepicker.regional['$lang']));\n";
    }
    if (defined($answer) && !($answer->{relevant})){
       $HTMLanswer="&nbsp;";

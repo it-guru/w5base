@@ -354,6 +354,7 @@ function loadForm(id,xmlobject)
 }
 function submitChange(o)
 {
+console.log("submitChange");
    var vname=o.name;
    var vval=o.value;
    var qid=o.form.name;
