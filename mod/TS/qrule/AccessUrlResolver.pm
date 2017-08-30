@@ -151,8 +151,7 @@ sub qcheckRecord
                msg(INFO,"set proxy to $proxy");
                $ua->proxy(['http', 'ftp'],$proxy);
             }
-            #my $url="http://10.175.42.25/dns/resolv.php?q=".$host;
-            my $url="http://w5base.buckenhofen.de/resolv.php?q=".$host;
+            my $url="http://dnsresolver.w5base.net/resolv.php?q=".$host;
             my $response=$ua->request(GET($url));
             if ($response->code ne "200"){
                msg(ERROR,"$self URL request $url failed code(".
