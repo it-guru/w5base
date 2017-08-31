@@ -138,7 +138,8 @@ sub qcheckRecord
             use LWP::UserAgent;
             use HTTP::Request::Common;
            
-            $ua=new LWP::UserAgent(env_proxy=>0);
+            $ua=new LWP::UserAgent(env_proxy=>0,
+                                   ssl_opts=>{verify_hostname=>0});
             $ua->timeout(60);
          ');
          if ($@ ne ""){
@@ -147,12 +148,30 @@ sub qcheckRecord
          }
          else{
             my $proxy=$self->getParent->Config->Param("http_proxy");
+            my $scheme='http';
+
             if ($proxy ne ""){
-               msg(INFO,"set proxy to $proxy");
-               $ua->proxy(['http', 'ftp'],$proxy);
+               # Package 'LWP::Protocol::connect' needed
+               # for https over proxy because of faulty
+               # 'perl-libwww-perl' respectively 'LWP::Protocol::https'
+               # in 'Oracle Linux Server release 7.3'
+               eval('
+                  use LWP::Protocol::https;
+                  use LWP::Protocol::connect;
+               ');
+               if ($@ eq '') {
+                  # use https
+                  $scheme='https';
+                  $proxy=~s/^.+:\/\/(.*)/connect:\/\/$1/;
+               }
+
+               msg(INFO,"set proxy to $proxy, use $scheme");
+               $ua->proxy(['https','http'],$proxy);
             }
-            my $url="http://dnsresolver.w5base.net/resolv.php?q=".$host;
+
+            my $url=$scheme."://dnsresolver.w5base.net/resolv.php?q=".$host;
             my $response=$ua->request(GET($url));
+
             if ($response->code ne "200"){
                msg(ERROR,"$self URL request $url failed code(".
                          $response->code.")");
