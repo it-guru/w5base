@@ -3,4 +3,6 @@
    en=>'check if there is a technical change approvergroup defined'},
 'there is no technical change approvergroup defined'=>{
    de=>'es wurde keine technische Change Approvergroup eingetragen'},
+'there are more than one technical change approvergroup defined'=>{
+   de=>'es wurden mehr als eine technische Change Approvergroup eingetragen'},
 

@@ -8,7 +8,8 @@ package TS::qrule::ApplChangeAGroup;
 
 Checks if there is on an "installed/active" or "available" application
 a change approvergroup for technical side is defined.
-If there is no valid approvergroup defined, an error will be procceeded.
+If there is no valid approvergroup defined, or more than one technical
+change approver groups are defined an error will be procceeded.
 
 =head3 IMPORTS
 
@@ -19,7 +20,7 @@ NONE
 [en:]
 
 Checks if in field 'Change Approvergroup technical' 
-a valid Change Approvergroup is entered. 
+strict one valid Change Approvergroup is entered. 
 
 Enter the Approvergroup which is to be used for Changes on this application 
 from the technical point of view. Generally, it is the Approvergroup of the 
@@ -37,7 +38,7 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 [de:]
 
-Prüft, ob im Feld 'Change Approvergroup technisch' eine gültige 
+Prüft, ob im Feld 'Change Approvergroup technisch' genau eine gültige 
 Change Approvergroup eingetragen ist.
 
 Wählen Sie hier die Approvergroup, die bei Changes für diese Anwendung 
@@ -102,14 +103,6 @@ sub qcheckRecord
    my $exitcode=0;
    my $desc={qmsg=>[],solvtip=>[]};
 
-   if ($rec->{cdate} ne ""){
-      my $now=NowStamp("en");
-      my $d=CalcDateDuration($rec->{cdate},$now,"GMT");
-      my $max=7*2;  # check only if application record is older than 2 weeks
-      if ($d->{days}<$max){
-         return($exitcode,$desc);
-      }
-   }
    return($exitcode,$desc) if (($rec->{cistatusid}!=4 && 
                                 $rec->{cistatusid}!=3) ||
                                $rec->{opmode} eq "license" ||
@@ -120,6 +113,22 @@ sub qcheckRecord
          if ($arec->{responsibility} eq "technical"){
             $fnd++;
          }
+      }
+   }
+   if ($fnd>1){
+      $exitcode=3 if ($exitcode<3);
+      my $msg='there are more than one '.
+              'technical change approvergroup defined';
+      push(@{$desc->{qmsg}},$msg);
+      push(@{$desc->{dataissue}},$msg);
+      return($exitcode,$desc);
+   }
+   if ($rec->{cdate} ne ""){
+      my $now=NowStamp("en");
+      my $d=CalcDateDuration($rec->{cdate},$now,"GMT");
+      my $max=7*2;  # check only if application record is older than 2 weeks
+      if ($d->{days}<$max){
+         return($exitcode,$desc);
       }
    }
    if ($fnd==0){
