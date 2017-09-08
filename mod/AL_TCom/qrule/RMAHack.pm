@@ -97,10 +97,12 @@ sub qcheckRecord
 
       foreach my $checkpraef (keys(%praeflist)){
          # analyse which qtags needs to be set to relevant=0 based on
-         # the given ..._Question01 anser
+         # the given ..._Question01 answer
+         # _Question11 should not be changed
          my %need;
          foreach my $qrec (values(%q)){
             if ($qrec->{qtag} ne $praeflist{$checkpraef} &&
+                 $qrec->{qtag} ne $checkpraef."Question11" &&
                 ($qrec->{qtag}=~m/^$checkpraef.*/)){
                $need{$qrec->{qtag}}=$qrec->{id};
             }
