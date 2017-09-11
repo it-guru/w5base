@@ -117,7 +117,7 @@ sub qcheckRecord
    }
    if ($fnd>1){
       $exitcode=3 if ($exitcode<3);
-      my $msg='there are more than one '.
+      my $msg='there is more than one '.
               'technical change approvergroup defined';
       push(@{$desc->{qmsg}},$msg);
       push(@{$desc->{dataissue}},$msg);
