@@ -243,6 +243,7 @@ function DoSearch()
    }
    document.forms[0].action="$action";
    document.forms[0].elements['FormatAs'].value="$DefaultFormat";
+   document.forms[0].elements['UseLimit'].value='';
    document.forms[0].submit();
 }
 

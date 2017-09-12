@@ -2976,7 +2976,7 @@ sub Result
       my $uselimit=Query->Param("UseLimit");
       my $uselimitstart=Query->Param("UseLimitStart");
       $uselimitstart=0 if (!defined($uselimitstart));
-      if (defined($param{Limit})){
+      if (defined($param{Limit}) && $uselimit eq ''){
          $uselimit=$param{Limit};
       }
       if ($format eq "JSONP"){
