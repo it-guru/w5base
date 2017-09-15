@@ -76,6 +76,7 @@ use Scalar::Util qw(weaken);
 use Exporter;
 use Encode;
 use Unicode::String qw(utf8 latin1 utf16);
+use POSIX;
 use charnames ':full';
 
 @ISA = qw(Exporter);
@@ -95,6 +96,7 @@ use charnames ':full';
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16
              &utf8_to_latin1
              &getClientAddrIdString
+             &is_POSIXmktime_Clean
              &Stacktrace);
 
 sub utf8{return(&Unicode::String::utf8);}
@@ -168,6 +170,14 @@ sub Dumper
    #$Data::Dumper::Deepcopy = 1;
    
    return(Data::Dumper::Dumper(@_));
+}
+
+sub is_POSIXmktime_Clean
+{
+   if (POSIX::mktime(0,0,0,1, 0, 2050-1900)>0){
+      return(1);
+   }
+   return(0);
 }
 
 sub ObjectRecordCodeResolver

@@ -1524,7 +1524,8 @@ sub ExpandTimeExpression
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);
-      $Y=2037 if ($Y>2037);
+      $Y=2037 if (!is_POSIXmktime_Clean() && $Y>2037);
+      $Y=2999 if (is_POSIXmktime_Clean()  && $Y>2999);
       eval('$time=Mktime($srctimezone,$Y,$M,1,0,0,0);');
       if ($@ ne ""){
          $self->LastMsg(ERROR,"ilegal month expression '%s'",
@@ -1545,7 +1546,8 @@ sub ExpandTimeExpression
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);
-      $Y=2037 if ($Y>2037);
+      $Y=2037 if (!is_POSIXmktime_Clean() && $Y>2037);
+      $Y=2999 if (is_POSIXmktime_Clean()  && $Y>2999);
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       if ($@ ne ""){
          $self->LastMsg(ERROR,"ilegal expression '%s'",
@@ -1562,7 +1564,8 @@ sub ExpandTimeExpression
       $val=~s/^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d*){0,1}Z//;
       $srctimezone="GMT";
       $Y=1971 if ($Y<1971);
-      $Y=2037 if ($Y>2037);
+      $Y=2037 if (!is_POSIXmktime_Clean() && $Y>2037);
+      $Y=2999 if (is_POSIXmktime_Clean()  && $Y>2999);
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       if ($@ ne ""){
          $self->LastMsg(ERROR,"ilegal expression '%s'",
@@ -1579,7 +1582,8 @@ sub ExpandTimeExpression
       $val=~s/^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)//;
       $srctimezone="GMT";
       $Y=1971 if ($Y<1971);
-      $Y=2037 if ($Y>2037);
+      $Y=2037 if (!is_POSIXmktime_Clean() && $Y>2037);
+      $Y=2999 if (is_POSIXmktime_Clean()  && $Y>2999);
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       if ($@ ne ""){
          $self->LastMsg(ERROR,"ilegal expression '%s'",
@@ -1597,7 +1601,8 @@ sub ExpandTimeExpression
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);
-      $Y=2037 if ($Y>2037);
+      $Y=2037 if (!is_POSIXmktime_Clean() && $Y>2037);
+      $Y=2999 if (is_POSIXmktime_Clean()  && $Y>2999);
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       if ($@ ne ""){
          $self->LastMsg(ERROR,"ilegal expression '%s'",
@@ -1616,7 +1621,8 @@ sub ExpandTimeExpression
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);
-      $Y=2037 if ($Y>2037);
+      $Y=2037 if (!is_POSIXmktime_Clean() && $Y>2037);
+      $Y=2999 if (is_POSIXmktime_Clean()  && $Y>2999);
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       if ($@ ne ""){
          $self->LastMsg(ERROR,"ilegal expression '%s'",
@@ -1635,7 +1641,8 @@ sub ExpandTimeExpression
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);
-      $Y=2037 if ($Y>2037);
+      $Y=2037 if (!is_POSIXmktime_Clean() && $Y>2037);
+      $Y=2999 if (is_POSIXmktime_Clean()  && $Y>2999);
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       if ($@ ne ""){
          msg(ERROR,$@);
@@ -1655,7 +1662,8 @@ sub ExpandTimeExpression
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);
-      $Y=2037 if ($Y>2037);
+      $Y=2037 if (!is_POSIXmktime_Clean() && $Y>2037);
+      $Y=2999 if (is_POSIXmktime_Clean()  && $Y>2999);
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
       if ($@ ne ""){
          msg(ERROR,$@);

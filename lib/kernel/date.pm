@@ -60,8 +60,15 @@ sub Localtime($@)
 {
    my $tz=shift;
    my $oldtz=_tzset($tz);
-   my ($year, $month, $day, $hour, $min, $sec, $doy, $dow, $dst)=
-      Date::Calc::Localtime(@_);
+   my ($year, $month, $day, $hour, $min, $sec, $doy, $dow, $dst);
+   if ((POSIX::mktime(0,0,0,1, 0, 2050-1900))>0){
+      ($sec,$min,$hour,$day,$month,$year,$doy, $dow, $dst)=POSIX::localtime(@_);
+      $year+=1900
+   }
+   else{
+      ($year, $month, $day, $hour, $min, $sec, $doy, $dow, $dst)=
+         Date::Calc::Localtime(@_);
+   }
    _tzset($oldtz);
    if (wantarray()){
       return($year, $month, $day, $hour, $min, $sec, $doy, $dow, $dst);
@@ -76,7 +83,14 @@ sub Mktime($@)
    my $oldtz=_tzset($tz);
 
    my $bk;
-   eval('$bk=Date::Calc::Mktime(@_);');
+   if (($bk=POSIX::mktime(0,0,0,1, 0, 2050-1900))>0){
+      my ($year,$month,$day, $hour,$min,$sec)=@_;
+      $year-=1900;
+      eval('$bk=POSIX::mktime($sec,$min,$hour,$day,$month,$year);');
+   }
+   else{
+      eval('$bk=Date::Calc::Mktime(@_);');
+   }
    _tzset($oldtz);
    return($bk);
 }
