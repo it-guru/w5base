@@ -84,10 +84,18 @@ sub qcheckRecord
       ]);
       my @l=$ciam->getHashList(qw(ALL));
       if ($#l>0){
-         printf STDERR ("CIAM: ununique email = '%s'\n",$rec->{email});
-         return(3,{qmsg=>['ununique email in CIAM '.$rec->{email}]});
+         #printf STDERR ("CIAM: ununique email = '%s'\n",$rec->{email});
+         #printf STDERR ("fifi1 %s\n",Dumper(\@l));
+         #return(3,{qmsg=>['ununique email in CIAM '.$rec->{email}]});
+         push(@qmsg,'not unique email in CIAM: '.$rec->{email}); 
+         $errorlevel=1 if ($errorlevel<1);
+         #map({ printf STDERR ("fifi wrid=%s\n",$_->{twrid}); } @l);
+         my @sorted=sort({
+            $b->{twrid} <=> $a->{twrid} 
+         } @l);
+         @l=shift(@sorted);  # take the entry with the highest twrid
+         #printf STDERR ("fifi take=$l[0]->{twrid}\n");
       }
-
       if ($#l==0){  # 1st try to detect uidlist
          if (defined($l[0]->{wiwid}) && $l[0]->{wiwid} ne ""){
             $uidlist=$l[0]->{wiwid};

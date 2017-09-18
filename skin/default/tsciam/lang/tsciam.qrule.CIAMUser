@@ -3,3 +3,4 @@
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
 'different values stored in CIAM'=>{de=>'in CIAM sind andere Inhalte gespeichert'},
 'dummy contact detected'=>{de=>'Dummy Kontakt erkannt'},
+'not unique email in CIAM'=>{de=>'uneindeutige E-Mail Adresse in CIAM'},

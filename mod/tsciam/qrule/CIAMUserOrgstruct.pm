@@ -42,6 +42,10 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
    my $errorlevel=0;
+   my $forcedupd={};
+   my $wfrequest={};
+   my @qmsg;
+   my @dataissue;
 
    my $Config=$self->getParent->Config;
    $self->{SRCSYS}="CIAM";
@@ -102,11 +106,31 @@ sub qcheckRecord
             {email3=>$urec->{email},active=>\'true',primary=>\'true'},
             {email4=>$urec->{email},active=>\'true',primary=>\'true'}
          ]);
-         my ($ciamrec,$msg)=$ciamusr->getOnlyFirst(qw(ALL));
-         if (!defined($ciamrec)){
-            if (defined($msg)){
-               msg(ERROR,"LDAP problem:%s",$msg);
+         my @l=$ciamusr->getHashList(qw(ALL));
+         my @allciament=sort({
+            $b->{twrid} <=> $a->{twrid}
+         } @l);
+         my $ciamrec=shift(@allciament);
+
+         {  # doublicate Workrelation check
+            $ciamusr->ResetFilter();
+            $ciamusr->SetFilter({tcid=>\$ciamrec->{tcid},active=>\'true'});
+            my %o;
+            foreach my $r ($ciamusr->getHashList(qw(toucid))){
+               $o{$r->{toucid}}++;
             }
+            foreach my $toucid (keys(%o)){
+               my $v=$o{$toucid};
+               if ($v>1){
+                  my $msg="double workrelation to the same org unit in CIAM: ".
+                          $toucid;
+                  push(@qmsg,$msg);
+                  $errorlevel=1 if ($errorlevel<1);
+               }
+            }
+         }
+
+         if (!defined($ciamrec)){
             if (($urec->{posix} ne "" || $urec->{dsid} ne "") && 
                 $urec->{cistatusid}<6){
                my $old=0;
@@ -146,21 +170,6 @@ sub qcheckRecord
                }
             }
             return($errorlevel,undef);
-         }
-         {  # doublicate Workrelation check
-            $ciamusr->ResetFilter();
-            $ciamusr->SetFilter({tcid=>\$ciamrec->{tcid},active=>\'true'});
-            my %o;
-            my @l=$ciamusr->getHashList(qw(toucid));
-            foreach my $r ($ciamusr->getHashList(qw(toucid))){
-               $o{$r->{toucid}}++;
-            }
-            foreach my $v (values(%o)){
-               if ($v>1){
-                  my $msg="double workrelation to the same org unit in CIAM";
-                  return(3,{qmsg=>[$msg],dataissue=>[$msg]});
-               }
-            }
          }
          my $ciamid=$ciamrec->{tcid};
          my $toucid=$ciamrec->{toucid};
@@ -312,7 +321,8 @@ sub qcheckRecord
 
       }
    }
-   return($errorlevel,undef);
+   return($self->HandleWfRequest($dataobj,$rec,
+                                 \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
 }
 
 sub addWorkrelationShip
