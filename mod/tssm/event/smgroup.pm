@@ -28,7 +28,7 @@ our @SMVIEW=qw(mdate fullname
                isapprover isrespall
                admingroup);
 
-our @AMVIEW=qw(mdate fullname supervisoremail);
+our @AMVIEW=qw(mdate fullname supervisoremail deleted);
 
 
 sub new
@@ -300,6 +300,14 @@ sub handleSRec
       $newrec->{cistatusid}=4;
    }
 
+   my @smfldmap=('isapprover'     =>'ischmapprov',
+                 'isinmassignment'=>'isinmassign',
+                 'admingroup'     =>'smadmgrp',
+                 'ismanager'      =>'ischmmgr',
+                 'isimplementor'  =>'ischmimpl',
+                 'iscoordinator'  =>'ischmcoord',
+                 'isrespall'      =>'isresp4all'
+   );
    if (defined($sgrprec)){                            # SM Handling
       if ($sgrprec->{fullname} ne exttrim($sgrprec->{fullname})){
          push(@comments,"leading or trailing whitespaces on group ".
@@ -313,15 +321,7 @@ sub handleSRec
          $newrec->{smid}=$sgrprec->{id};
       }
 
-      my @fldmap=('isapprover'     =>'ischmapprov',
-                  'isinmassignment'=>'isinmassign',
-                  'admingroup'     =>'smadmgrp',
-                  'ismanager'      =>'ischmmgr',
-                  'isimplementor'  =>'ischmimpl',
-                  'iscoordinator'  =>'ischmcoord',
-                  'isrespall'      =>'isresp4all'
-      );
-      while(my ($sfld,$fld)=splice(@fldmap,0,2)){
+      while(my ($sfld,$fld)=splice(@smfldmap,0,2)){
          if (!defined($oldrec) || 
              $oldrec->{$fld} ne $sgrprec->{$sfld}){
             $newrec->{$fld}=$sgrprec->{$sfld};
@@ -344,6 +344,29 @@ sub handleSRec
       }
       $newrec->{smdate}=NowStamp("en");
    }
+   else{
+      my $resetsmflags=1;
+      if (defined($oldrec) && $oldrec->{smdate} ne ""){
+         $resetsmflags=0;
+         my $nowstamp=NowStamp("en");
+         my $dur=CalcDateDuration($oldrec->{smdate},$nowstamp);
+         if (defined($dur)){
+            if ($dur->{totaldays}>14){
+               $resetsmflags=1;
+            }
+         }
+      }
+
+     
+      if ($resetsmflags){ 
+         foreach my $fld (values(@smfldmap)){
+            if (!defined($oldrec) || 
+                $oldrec->{$fld} ne ""){
+               $newrec->{$fld}=undef;
+            }
+         }
+      }
+   }
 
 
    if (defined($agrprec)){                            # AM Handling
@@ -354,7 +377,9 @@ sub handleSRec
       if (!defined($oldrec) || $oldrec->{amid} ne $agrprec->{lgroupid}){
          $newrec->{amid}=$agrprec->{lgroupid};
       }
-      $newrec->{amdate}=NowStamp("en");
+      if ($agrprec->{deleted} eq "0"){
+         $newrec->{amdate}=NowStamp("en");
+      }
 
       my $supervisoremail=exttrim($agrprec->{supervisoremail});
       if ($supervisoremail ne "" && !exists($newrec->{contactemail})){
