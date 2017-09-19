@@ -94,7 +94,7 @@ sub new
                                  'HP AssetManager',
                                  'HP uCMDB',
                                  'HP-NSK Pathway',
-                                 'IBM_HTTP_Server'
+                                 'IBM_HTTP_Server',
                                  'IIS',
                                  'IMS',  # IBM Information Management System
                                  'IMS Connect',  # IBM IMS Client
