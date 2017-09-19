@@ -157,7 +157,10 @@ sub doQualityCheck
    my $total=0;
    my $c=0;
    my $loopmax=50;
-   #my $loopmax=2;
+   if (0){ # for DEBUG only !!!
+      $loopmax=2;
+      $qualitycheckduration=5;
+   }
    do{
       $dataobj->ResetFilter();
       if (defined($basefilter)){
