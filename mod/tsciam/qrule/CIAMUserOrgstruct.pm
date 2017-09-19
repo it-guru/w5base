@@ -110,9 +110,13 @@ sub qcheckRecord
          my @allciament=sort({
             $b->{twrid} <=> $a->{twrid}
          } @l);
-         my $ciamrec=shift(@allciament);
+        
+         my $ciamrec;
+         if ($#allciament!=-1){
+            $ciamrec=shift(@allciament);
+         }
 
-         {  # doublicate Workrelation check
+         if (defined($ciamrec)){  # doublicate Workrelation check
             $ciamusr->ResetFilter();
             $ciamusr->SetFilter({tcid=>\$ciamrec->{tcid},active=>\'true'});
             my %o;
