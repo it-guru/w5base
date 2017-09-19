@@ -63,6 +63,7 @@ sub Localtime($@)
    my ($year, $month, $day, $hour, $min, $sec, $doy, $dow, $dst);
    if ((POSIX::mktime(0,0,0,1, 0, 2050-1900))>0){
       ($sec,$min,$hour,$day,$month,$year,$doy, $dow, $dst)=POSIX::localtime(@_);
+      $month+=1;
       $year+=1900
    }
    else{
@@ -85,6 +86,7 @@ sub Mktime($@)
    my $bk;
    if (($bk=POSIX::mktime(0,0,0,1, 0, 2050-1900))>0){
       my ($year,$month,$day, $hour,$min,$sec)=@_;
+      $month-=1;
       $year-=1900;
       eval('$bk=POSIX::mktime($sec,$min,$hour,$day,$month,$year);');
    }
