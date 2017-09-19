@@ -45,10 +45,23 @@ sub new
 sub DESTROY
 {
    my $self=shift;
-   if (defined($self->{ldap}) && $self->{ldap}->can("unbind")){
-      msg(DEBUG,"unbind - $self - $self->{ldapname}");
-      $self->{ldap}->unbind();
+   if (!defined($self->{SessionCacheKey})){
+      unbindHandle($self->{ldap});
+      delete($self->{ldap});
    }
+}
+
+
+sub unbindHandle
+{
+   my $ldaphandle=shift;
+   if (defined($ldaphandle) && $ldaphandle->can("unbind")){
+      $ldaphandle->unbind();
+   }
+   else{
+      return(0);
+   }
+   return(1);
 }
 
 
@@ -61,6 +74,26 @@ sub Connect
   # if ($self->{isConnected}){
   #    return($self->{'ldap'});
   # }
+   my $BackendSessionName=$self->getParent->BackendSessionName();
+   $BackendSessionName="default" if (!defined($BackendSessionName));
+
+   if ($BackendSessionName ne "ForceUncached"){
+      $self->{SessionCacheKey}=$BackendSessionName.':'.$ldapname; 
+      if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
+         my $cacheEntry=$LDAPConnectionPool::Session{$self->{SessionCacheKey}};
+         if (time()-$cacheEntry->{atime}<10){
+            $self->{ldap}=$cacheEntry->{ldap};
+            $self->{isConnected}=1;
+            return($self->{'ldap'});
+         }
+         else{
+            unbindHandle($cacheEntry->{ldap});
+            delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
+         }
+      }
+   }
+
+
    $p{ldapuser}=$self->getParent->Config->Param('DATAOBJUSER');
    $p{ldappass}=$self->getParent->Config->Param('DATAOBJPASS');
    $p{ldapserv}=$self->getParent->Config->Param('DATAOBJSERV');
@@ -90,6 +123,12 @@ sub Connect
    }
    else{
       $self->{isConnected}=1;
+      if (defined($self->{SessionCacheKey})){
+         $LDAPConnectionPool::Session{$self->{SessionCacheKey}}={
+            ldap=>$self->{'ldap'},
+            atime=>time()
+         };
+      }
    }
 
    return($self->{'ldap'});
@@ -261,6 +300,14 @@ sub do
    my $self=shift;
    my $cmd=shift;
 
+
+   if (defined($self->{SessionCacheKey})){
+      if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
+         my $cacheEntry=$LDAPConnectionPool::Session{$self->{SessionCacheKey}};
+         $cacheEntry->{atime}=time();
+      }
+   }
+
    $cmd.=" /* W5BaseUser: $ENV{REMOTE_USER} */" if ($ENV{REMOTE_USER} ne "");
    if ($self->{'db'}){
       if ($self->{'db'}->do($cmd,{},@_)){
@@ -271,6 +318,14 @@ sub do
       }
    }
    return(undef);
+}
+
+END{
+   foreach my $SessionCacheKey (keys(%LDAPConnectionPool::Session)){
+      my $cacheEntry=$LDAPConnectionPool::Session{$SessionCacheKey};
+      unbindHandle($cacheEntry->{ldap});
+      delete($LDAPConnectionPool::Session{$SessionCacheKey});
+   }
 }
 
 
