@@ -81,7 +81,7 @@ sub Connect
       $self->{SessionCacheKey}=$BackendSessionName.':'.$ldapname; 
       if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
          my $cacheEntry=$LDAPConnectionPool::Session{$self->{SessionCacheKey}};
-         if (time()-$cacheEntry->{atime}<10){
+         if (time()-$cacheEntry->{atime}<300){
             $self->{ldap}=$cacheEntry->{ldap};
             $self->{isConnected}=1;
             return($self->{'ldap'});
