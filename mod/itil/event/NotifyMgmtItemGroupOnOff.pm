@@ -227,30 +227,46 @@ sub getNotifyParam
       push(@mailccids,@staticCCids);
 
       # mailto
-      $user->ResetFilter;
-      $user->SetFilter({userid=>\$mailtoid});
-      my ($u)=$user->getOnlyFirst(qw(email lastlang tz));
-      my @to=($u->{email});
-      $mylnkrec{mailto}=\@to;
-      $mylnkrec{lang}  =$u->{lastlang};
-      $mylnkrec{tz}    =$u->{tz};
+      my $targetcnt=0;
+      if ($mailtoid ne ""){
+         $user->ResetFilter;
+         $user->SetFilter({userid=>\$mailtoid});
+         my ($u)=$user->getOnlyFirst(qw(email lastlang tz));
+         if (defined($u)){
+            my @to=($u->{email});
+            $mylnkrec{mailto}=\@to;
+            $mylnkrec{lang}  =$u->{lastlang};
+            $mylnkrec{tz}    =$u->{tz};
+            $targetcnt++;
+         }
+      }
+
       # mailcc
-      $user->ResetFilter;
-      $user->SetFilter({userid=>\@mailccids});
-      my @cc=map {$_->{email}} $user->getHashList('email');
-      $mylnkrec{mailcc}=\@cc;
+      if ($#mailccids!=-1){
+         $user->ResetFilter;
+         $user->SetFilter({userid=>\@mailccids});
+         my @cc=map {$_->{email}} $user->getHashList('email');
+         if ($#cc!=-1){
+            $mylnkrec{mailcc}=\@cc;
+            $targetcnt+=($#cc+1);
+         }
+      }
+      if ($targetcnt>0){
+         $mylnkrec{lang}="en" if ($mylnkrec{lang} eq "");
+         $mylnkrec{tz}="GMT"  if ($mylnkrec{tz} eq "");
 
-      my $format=$mylnkrec{lang};
-      my $lnkfrom=$lnkobj->ExpandTimeExpression($lnk->{lnkfrom},$format,
-                                                undef,$mylnkrec{tz});
-      $lnkfrom.=" ($mylnkrec{tz})";
-      $mylnkrec{lnkfrom}=$lnkfrom;
-      my $lnkto=$lnkobj->ExpandTimeExpression($lnk->{lnkto},$format,
-                                              undef,$mylnkrec{tz});
-      $lnkto.=" ($mylnkrec{tz})";
-      $mylnkrec{lnkto}=$lnkto;
+         my $format=$mylnkrec{lang};
+         my $lnkfrom=$lnkobj->ExpandTimeExpression($lnk->{lnkfrom},$format,
+                                                   undef,$mylnkrec{tz});
+         $lnkfrom.=" ($mylnkrec{tz})";
+         $mylnkrec{lnkfrom}=$lnkfrom;
+         my $lnkto=$lnkobj->ExpandTimeExpression($lnk->{lnkto},$format,
+                                                 undef,$mylnkrec{tz});
+         $lnkto.=" ($mylnkrec{tz})";
+         $mylnkrec{lnkto}=$lnkto;
 
-      push(@notifyparam,\%mylnkrec);
+         push(@notifyparam,\%mylnkrec);
+      }
    }
 
    return(\@notifyparam);
