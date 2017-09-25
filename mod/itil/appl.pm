@@ -2042,7 +2042,7 @@ sub addApplicationSecureFilter
          );
       }
       if ($self->getField($ns.'sectargetid')){
-         push(@$addflt,{$ns.'sectargetid'=>\$userid,
+         push(@$addflt,{$ns.'sectargetid'=>\@grpids,
             $ns.'sectarget'=>\'base::grp',
             $ns.'secroles'=>"*roles=?write?=roles* *roles=?privread?=roles* ".
                       "*roles=?read?=roles*"}
