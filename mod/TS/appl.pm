@@ -79,41 +79,41 @@ sub new
                 vjoinon       =>['acinmassignmentgroupid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
-                name          =>'scapprgroupid',
-                group         =>'control',
-                label         =>'Change Approvergroup technical ID',
-                dataobjattr   =>'appl.scapprgroupid'),
-
-      new kernel::Field::Link(
-                name          =>'scapprgroupid2',
-                group         =>'control',
-                label         =>'Change Approvergroup business ID',
-                dataobjattr   =>'appl.scapprgroupid2'),
-
-      new kernel::Field::TextDrop(
-                name          =>'scapprgroup',
-                label         =>'Change Approvergroup technical',
-                vjoineditbase =>{ischmapprov=>\'1'},
-                uivisible=>0,
-                group         =>'inmchm',
-                AllowEmpty    =>1,
-                htmldetail    =>0,
-                vjointo       =>'tsgrpmgmt::grp',
-                vjoinon       =>['scapprgroupid'=>'id'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::TextDrop(
-                name          =>'scapprgroup2',
-                label         =>'Change Approvergroup business',
-                uivisible=>0,
-                vjoineditbase =>{ischmapprov=>\'1'},
-                group         =>'inmchm',
-                AllowEmpty    =>1,
-                htmldetail    =>0,
-                vjointo       =>'tsgrpmgmt::grp',
-                vjoinon       =>['scapprgroupid2'=>'id'],
-                vjoindisp     =>'fullname'),
+#      new kernel::Field::Link(
+#                name          =>'scapprgroupid',
+#                group         =>'control',
+#                label         =>'Change Approvergroup technical ID',
+#                dataobjattr   =>'appl.scapprgroupid'),
+#
+#      new kernel::Field::Link(
+#                name          =>'scapprgroupid2',
+#                group         =>'control',
+#                label         =>'Change Approvergroup business ID',
+#                dataobjattr   =>'appl.scapprgroupid2'),
+#
+#      new kernel::Field::TextDrop(
+#                name          =>'scapprgroup',
+#                label         =>'Change Approvergroup technical',
+#                vjoineditbase =>{ischmapprov=>\'1'},
+#                uivisible=>0,
+#                group         =>'inmchm',
+#                AllowEmpty    =>1,
+#                htmldetail    =>0,
+#                vjointo       =>'tsgrpmgmt::grp',
+#                vjoinon       =>['scapprgroupid'=>'id'],
+#                vjoindisp     =>'fullname'),
+#
+#      new kernel::Field::TextDrop(
+#                name          =>'scapprgroup2',
+#                label         =>'Change Approvergroup business',
+#                uivisible=>0,
+#                vjoineditbase =>{ischmapprov=>\'1'},
+#                group         =>'inmchm',
+#                AllowEmpty    =>1,
+#                htmldetail    =>0,
+#                vjointo       =>'tsgrpmgmt::grp',
+#                vjoinon       =>['scapprgroupid2'=>'id'],
+#                vjoindisp     =>'fullname'),
 
 
       new kernel::Field::SubList(
