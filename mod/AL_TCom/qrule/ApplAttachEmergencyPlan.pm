@@ -68,7 +68,8 @@ sub qcheckRecord
    return($exitcode,$desc) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
 
 
-   if ($rec->{ictoid} ne ""){
+   if ($rec->{ictoid} ne "" &&
+       ($rec->{drclass} eq "3" || $rec->{drclass} eq "4")){
       my @nameexpr;
      
       my $ne=qr/^SCM_Emergency_Plan_$rec->{ictono}_.+_\d{8}\.pdf$/;
