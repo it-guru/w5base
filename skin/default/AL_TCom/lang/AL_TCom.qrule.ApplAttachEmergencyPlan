@@ -1,0 +1,2 @@
+'AL_TCom::qrule::ApplAttachEmergencyPlan'=>{de=>'Prüfung auf Notfallplan Anlage',en=>'Check for Emergency Plan Attachment'},
+'there is no Emergency Plan attachment found'=>{de=>'keine Notfallplan Anlage gefunden'},
