@@ -842,3 +842,4 @@ CREATE TABLE objblacklist (
   PRIMARY KEY (id),
   UNIQUE KEY (objtype,field)
 ) ENGINE=INNODB;
+alter table interview add themaresp bigint(20),add themaresp2 bigint(20);

@@ -133,6 +133,10 @@ sub new
                 name          =>'contact2id',
                 dataobjattr   =>'interview.contact2'),
 
+      new kernel::Field::Link(
+                name          =>'thematicresponsibleid',
+                dataobjattr   =>'interview.themaresp'),
+
       new kernel::Field::Contact(
                 name          =>'contact',
                 label         =>'Contact',
@@ -160,6 +164,12 @@ sub new
                    return(0);
                 },
                 vjoinon       =>'contact2id'),
+
+      new kernel::Field::Contact(
+                name          =>'thematicresponsible',
+                label         =>'thematically responsible',
+                AllowEmpty    =>1,
+                vjoinon       =>'thematicresponsibleid'),
 
       new kernel::Field::Text(
                 name          =>'qtag',
@@ -1006,6 +1016,16 @@ sub Question
           "<b>%s:</b><br>%s</div>",$self->T("explanation"),$c);
 
 
+   my $thematicresponsible=$self->findtemplvar({current=>$rec,
+                                   mode=>"HtmlDetail"},
+                                   "thematicresponsible","formated");
+   if ($rec->{thematicresponsible} ne ""){
+      printf("<div style=\"margin:5px;margin-top:20px\">".
+             "<b>%s:</b><br>%s</div>",
+             $self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
+                                 "thematicresponsible","label"),
+             $thematicresponsible);
+   }
    my $contact=$self->findtemplvar({current=>$rec,mode=>"HtmlDetail"},
                                    "contact","formated");
    if ($rec->{contact} ne ""){
