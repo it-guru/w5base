@@ -89,6 +89,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'ipnetname',
+                htmlwidth     =>'350',
                 label         =>'IP-Network Name',
                 vjointo       =>'itil::ipnet',
                 vjoinon       =>['ipnetid'=>'id'],
