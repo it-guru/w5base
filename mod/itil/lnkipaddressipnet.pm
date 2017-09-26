@@ -80,9 +80,11 @@ sub new
                 group         =>'ipnet',
                 dataobjattr   =>'ipnet.id'),
 
-      new kernel::Field::Text(
+      new kernel::Field::TextDrop(
                 name          =>'ipnet',
                 label         =>'IP-Network',
+                vjointo       =>'itil::ipnet',
+                vjoinon       =>['ipnetid'=>'id'],
                 dataobjattr   =>'ipnet.name'),
 
       new kernel::Field::TextDrop(
@@ -106,7 +108,18 @@ sub new
                 label         =>'IP-Network CI-StateID',
                 dataobjattr   =>'ipnet.cistatus'),
 
-
+      new kernel::Field::Number(
+                name          =>'activesubipnets',
+                label         =>'active Sub-IP-Nets',
+                translation   =>'itil::ipnet',
+                readonly      =>1,
+                uploadable    =>0,
+                dataobjattr   =>"(select count(*) from ipnet subipnet ".
+                                "where ipnet.network=subipnet.network ".
+                                "and subipnet.binnamekey like ".
+                                "ipnet.binnamekey ".
+                                "and subipnet.cistatus=4 ".
+                                "and ipnet.id<>subipnet.id)"),
       new kernel::Field::Text(
                 name          =>'networkid',
                 label         =>'Networkarea ID',
@@ -134,7 +147,7 @@ sub getSqlFrom
             "on ipaddress.binnamekey like ipnet.binnamekey and ".
                 "ipnet.network=ipaddress.network ".
             "join network on ".
-            "ipaddress.network=network.id";
+            "ipaddress.network=network.id ";
    return($from);
 }
 

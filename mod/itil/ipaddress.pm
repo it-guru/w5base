@@ -502,7 +502,8 @@ sub new
                 label         =>'IP-Networks',
                 group         =>'ipnets',
                 vjointo       =>'itil::lnkipaddressipnet',
-                vjoinbase     =>[{ipnetcistatusid=>"<=4"}],
+                vjoinbase     =>[{ipnetcistatusid=>"<=4",
+                                  activesubipnets=>'0'}],
                 vjoinon       =>['id'=>'ipaddressid'],
                 vjoindisp     =>['ipnet','ipnetname']),
 

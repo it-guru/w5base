@@ -5,3 +5,4 @@
 'Network'=>{de=>'Netzwerkbereich'},
 'Description'=>{de=>'Bemerkungen'},
 'active IP-Addesses'=>{de=>'aktive IP-Adressen'},
+'active Sub-IP-Nets'=>{de=>'aktive Sub-IP-Netzwerke'},

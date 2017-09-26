@@ -97,6 +97,18 @@ sub new
                                 "ipnet.binnamekey ".
                                 "and ipaddress.cistatus=4)"),
 
+      new kernel::Field::Number(
+                name          =>'activesubipnets',
+                label         =>'active Sub-IP-Nets',
+                readonly      =>1,
+                uploadable    =>0,
+                dataobjattr   =>"(select count(*) from ipnet subipnet ".
+                                "where ipnet.network=subipnet.network ".
+                                "and subipnet.binnamekey like ".
+                                "ipnet.binnamekey ".
+                                "and subipnet.cistatus=4 ".
+                                "and ipnet.id<>subipnet.id)"),
+
       new kernel::Field::Link(
                 name          =>'networkid',
                 label         =>'NetworkID',
