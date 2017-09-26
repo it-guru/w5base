@@ -935,7 +935,7 @@ alter table swinstance add admcomments longtext default NULL;
 create table ipnet (
   id         bigint(20) NOT NULL,
   name       varchar(45) NOT NULL, binnamekey char(128),
-  cistatus   int(2)      NOT NULL,
+  cistatus   int(2)      NOT NULL, label varchar(128),
     netmask        varchar(40) default NULL,
     network        bigint(20)  default NULL,
     description    longtext     default NULL,
@@ -949,8 +949,8 @@ create table ipnet (
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
-  PRIMARY KEY  (id),
-  unique(name),key(binnamekey),key(network),
+  PRIMARY KEY  (id),unique(label),
+  unique(name,network),key(binnamekey),key(network),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=0;
@@ -1628,3 +1628,15 @@ create table lnkitclustsvcsyspolicy (
   REFERENCES system (id) ON DELETE CASCADE
 );
 alter table itclust add defrunpolicy varchar(20) default 'allow';
+create table asset_tstamp (
+  id         bigint(20)  NOT NULL,
+  refid      bigint(20)  NOT NULL,
+  tstampname varchar(80) NOT NULL,
+  tstamp     datetime    NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime    NOT NULL default '0000-00-00 00:00:00',
+  comments   longtext    default NULL,
+  PRIMARY KEY  (id),
+  unique(refid,tstampname),
+  FOREIGN KEY fk_tstamp_asset (refid) 
+  REFERENCES asset (id) ON DELETE CASCADE
+);

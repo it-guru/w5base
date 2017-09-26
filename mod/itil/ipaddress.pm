@@ -496,6 +496,15 @@ sub new
                 label         =>'Additionalinformations',
                 dataobjattr   =>'ipaddress.additional'),
 
+      new kernel::Field::SubList(
+                name          =>'ipnets',
+                label         =>'IP-Networks',
+                group         =>'ipnets',
+                vjointo       =>'itil::lnkipaddressipnet',
+                vjoinbase     =>[{ipnetcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'ipaddressid'],
+                vjoindisp     =>['ipnet','ipnetname']),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -894,6 +903,7 @@ sub isViewValid
        $self->IsMemberOf("w5base.itil.ipaddress.read") ||
        $self->isParentReadable($rec->{systemid},$rec->{itclustsvcid})){
       push(@def,"history");
+      push(@def,"ipnets");
       push(@def,"relatedto","further");
       push(@def,"dnsaliases",) if ($rec->{dnsname} ne "");
    }
@@ -926,7 +936,7 @@ sub getRecordHtmlIndex
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default relatedto dnsaliases further source));
+   return(qw(header default relatedto dnsaliases ipnets further source));
 }
 
 

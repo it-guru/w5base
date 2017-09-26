@@ -1,0 +1,7 @@
+'itil::ipnet'=>{de=>'IP-Netzwerk',en=>'IP-Network'},
+'IP-Network name'=>{de=>'IP Netzwerkname'},
+'IP-Network Adress'=>{de=>'Netzwerkadresse'},
+'Netmask'=>{de=>'Netzwerkmaske'},
+'Network'=>{de=>'Netzwerkbereich'},
+'Description'=>{de=>'Bemerkungen'},
+'active IP-Addesses'=>{de=>'aktive IP-Adressen'},

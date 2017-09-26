@@ -86,6 +86,24 @@ sub new
                 },
                 dataobjattr   =>'network.additional'),
 
+      new kernel::Field::Number(
+                name          =>'activeipnets',
+                label         =>'active IP-Networks',
+                readonly      =>1,
+                uploadable    =>0,
+                dataobjattr   =>"(select count(*) from ipnet ".
+                                "where network.id=ipnet.network ".
+                                "and ipnet.cistatus=4)"),
+
+      new kernel::Field::Number(
+                name          =>'activeipaddresses',
+                label         =>'active IP-Addesses',
+                readonly      =>1,
+                uploadable    =>0,
+                dataobjattr   =>"(select count(*) from ipaddress ".
+                                "where network.id=ipaddress.network ".
+                                "and ipaddress.cistatus=4)"),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',

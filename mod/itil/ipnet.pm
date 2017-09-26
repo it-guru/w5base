@@ -19,8 +19,8 @@ package itil::ipnet;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use finance::lib::Listedit;
-@ISA=qw(finance::lib::Listedit);
+use itil::lib::Listedit;
+@ISA=qw(itil::lib::Listedit);
 
 sub new
 {
@@ -35,21 +35,27 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
-                searchable    =>0,
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'ipnet.id'),
                                                   
       new kernel::Field::Text(
+                name          =>'fullname',
+                htmlwidth     =>'120px',
+                label         =>'IP-Network name',
+                dataobjattr   =>'ipnet.label'), 
+
+      new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'120px',
-                label         =>'CO-Number',
+                label         =>'IP-Network Adress',
                 dataobjattr   =>'ipnet.name'),
 
       new kernel::Field::Text(
-                name          =>'accarea',
+                name          =>'netmask',
                 htmlwidth     =>'120px',
-                label         =>'Accounting Area',
-                dataobjattr   =>'ipnet.accarea'),
+                label         =>'Netmask',
+                dataobjattr   =>'ipnet.netmask'),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -65,115 +71,42 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'ipnet.cistatus'),
 
-      new kernel::Field::Text(
-                name          =>'fullname',
-                htmlwidth     =>'220px',
-                label         =>'CO-Shortdescription',
-                dataobjattr   =>'ipnet.fullname'),
-
-      new kernel::Field::TextDrop(
-                name          =>'databoss',
-                label         =>'Databoss',
-                vjointo       =>'base::user',
+      new kernel::Field::Select(
+                name          =>'network',
+                htmleditwidth =>'280px',
+                label         =>'Network',
+                vjointo       =>'itil::network',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['databossid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoinon       =>['networkid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
-                name          =>'databossid',
-                dataobjattr   =>'ipnet.databoss'),
-
-#      new kernel::Field::TextDrop(
-#                name          =>'ldelmgr',
-#                group         =>'delmgmt',
-#                label         =>'lead Delivery Manager',
-#                AllowEmpty    =>1,
-#                vjointo       =>'base::user',
-#                vjoinon       =>['ldelmgrid'=>'userid'],
-#                vjoindisp     =>'fullname'),
-#
-#      new kernel::Field::Link(
-#                name          =>'ldelmgrid',
-#                group         =>'delmgmt',
-#                dataobjattr   =>'ipnet.ldelmgr'),
-#
-#      new kernel::Field::TextDrop(
-#                name          =>'ldelmgr2',
-#                group         =>'delmgmt',
-#                label         =>'lead Deputy Delivery Manager',
-#                AllowEmpty    =>1,
-#                vjointo       =>'base::user',
-#                vjoinon       =>['ldelmgr2id'=>'userid'],
-#                vjoindisp     =>'fullname'),
-#
-#      new kernel::Field::Link(
-#                name          =>'ldelmgr2id',
-#                group         =>'delmgmt',
-#                dataobjattr   =>'ipnet.ldelmgr2'),
-
-
-      new kernel::Field::TextDrop(
-                name          =>'delmgrteam',
-                group         =>'delmgmt',
-                htmlwidth     =>'300px',
-                label         =>'Service Delivery-Management Team',
-                vjointo       =>'base::grp',
-                vjoinon       =>['delmgrteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::TextDrop(
-                name          =>'delmgr',
-                group         =>'delmgmt',
-                label         =>'Service Delivery Manager',
-                AllowEmpty    =>1,
-                vjointo       =>'base::user',
-                vjoinon       =>['delmgrid'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'delmgrid',
-                group         =>'delmgmt',
-                dataobjattr   =>'ipnet.delmgr'),
-
-      new kernel::Field::TextDrop(
-                name          =>'delmgr2',
-                group         =>'delmgmt',
-                AllowEmpty    =>1,
-                label         =>'Deputy Service Delivery Manager',
-                vjointo       =>'base::user',
-                vjoinon       =>['delmgr2id'=>'userid'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'delmgr2id',
-                group         =>'delmgmt',
-                dataobjattr   =>'ipnet.delmgr2'),
-
-
-      new kernel::Field::Link(
-                name          =>'delmgrteamid',
-                group         =>'delmgmt',
-                dataobjattr   =>'ipnet.delmgrteam'),
-
-      new kernel::Field::ContactLnk(
-                name          =>'contacts',
-                label         =>'Contacts',
-                class         =>'mandator',
-                vjoinbase     =>[{'parentobj'=>\'finance::ipnet'}],
-                vjoininhash   =>['targetid','target','roles'],
-                group         =>'contacts'),
 
       new kernel::Field::Textarea(
-                name          =>'comments',
-                label         =>'Comments',
-                dataobjattr   =>'ipnet.comments'),
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'ipnet.description'),
 
-      new kernel::Field::Boolean(
-                name          =>'isdirectwfuse',
-                group         =>'control',
-                htmleditwidth =>'30%',
-                label         =>'ipnet is direct useable by workflows',
-                dataobjattr   =>'ipnet.is_directwfuse'),
+      new kernel::Field::Number(
+                name          =>'activeipaddresses',
+                label         =>'active IP-Addesses',
+                readonly      =>1,
+                uploadable    =>0,
+                dataobjattr   =>"(select count(*) from ipaddress ".
+                                "where ipnet.network=ipaddress.network ".
+                                "and ipaddress.binnamekey like ".
+                                "ipnet.binnamekey ".
+                                "and ipaddress.cistatus=4)"),
+
+      new kernel::Field::Link(
+                name          =>'networkid',
+                label         =>'NetworkID',
+                dataobjattr   =>'ipnet.network'),
+
+      new kernel::Field::Link(
+                name          =>'binnamekey',
+                label         =>'Binary IP-Net',
+                selectfix     =>1,
+                dataobjattr   =>'ipnet.binnamekey'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -238,10 +171,10 @@ sub new
          'local'
       ]
    };
-   $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","w5base.finance.ipnet"],
-                         uniquesize=>20};
-   $self->setDefaultView(qw(name fullname cistatus mdate));
+   $self->{CI_Handling}={uniquename=>"fullname",
+                         activator=>["admin","w5base.itil.ipnet"],
+                         uniquesize=>120};
+   $self->setDefaultView(qw(name netmask fullname cistatus mdate));
    $self->setWorktable("ipnet");
    return($self);
 }
@@ -250,7 +183,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default delmgmt contacts control misc source));
+          qw(default control misc source));
 }
 
 
@@ -284,51 +217,100 @@ sub Validate
    my $newrec=shift;
 
 
-   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
-      if (!defined($oldrec) && !defined($newrec->{databossid})){
-         my $userid=$self->getCurrentUserId();
-         $newrec->{databossid}=$userid;
-      }
-      my $databossid=effVal($oldrec,$newrec,"databossid");
-      if (!defined($databossid) || $databossid eq ""){
-         $self->LastMsg(ERROR,"no write access - ".
-                              "you have to define databoss at first");
-         return(undef);
-      }
+   my $name=trim(effVal($oldrec,$newrec,"name"));
+   my $binnamekey="";
+   $name=~s/\s//g;
+   my $ip6str="";
+
+   if ($name=~m/\./){
+      $name=~s/^[0]+([1-9])/$1/g;
+      $name=~s/\.[0]+([1-9])/.$1/g;
    }
-   my $conummer=uc(effVal($oldrec,$newrec,"name"));
-   if ($conummer=~m/^\s*$/ || 
-       (!($conummer=~m/^[0-9]+$/) &&
-        !($conummer=~m/^[A-Z]-[0-9]+-[A-Z,0-9]+$/) )){
-      $self->LastMsg(ERROR,"invalid number format '\%s' specified",$conummer);
+   my $chkname=lc($name);
+
+   my $errmsg;
+   my $type=$self->IPValidate($chkname,\$errmsg);
+   if ($type eq "IPv4"){
+      my ($o1,$o2,$o3,$o4)=$chkname=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
+      $ip6str="0000:0000:0000:0000:0000:ffff:".
+              unpack("H2",pack('C',$o1)).
+              unpack("H2",pack('C',$o2)).":".
+              unpack("H2",pack('C',$o3)).
+              unpack("H2",pack('C',$o4));
+   }
+   elsif ($type eq "IPv6"){
+       $ip6str=$chkname;
+   }
+   else{
+      $self->LastMsg(ERROR,$self->T($errmsg,"itil::lib::Listedit"));
       return(0);
    }
-   $conummer=~s/^0+//g;
-   $newrec->{name}=$conummer;
 
-   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
-      my $userid=$self->getCurrentUserId();
-      if (!defined($oldrec)){
-         if (!defined($newrec->{databossid}) ||
-             $newrec->{databossid}==0){
-            my $userid=$self->getCurrentUserId();
-            $newrec->{databossid}=$userid;
-         }
-      }
-      if (defined($newrec->{databossid}) &&
-          $newrec->{databossid}!=$userid &&
-          $newrec->{databossid}!=$oldrec->{databossid}){
-         $self->LastMsg(ERROR,"you are not authorized to set other persons ".
-                              "as databoss");
-         return(0);
-      }
+   foreach my $okt (split(/:/,$ip6str)){
+      $binnamekey.=unpack("B16",pack("H4",$okt));
    }
 
-   
-#   if (defined($newrec->{cistatusid}) && $newrec->{cistatusid}>4){
-#      # validate if subdatastructures have a cistauts <=4 
-#      # if true, the new cistatus isn't alowed
-#   }
+
+   my $netmaskip6str="";
+   my $netmaskbinnamekey="";
+   my $netmask=trim(effVal($oldrec,$newrec,"netmask"));
+   my $netmasktype=$self->IPValidate($netmask,\$errmsg);
+
+
+   if ($netmasktype eq "IPv4"){
+      my ($o1,$o2,$o3,$o4)=$netmask=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
+      $netmaskip6str="0000:0000:0000:0000:0000:ffff:".
+              unpack("H2",pack('C',$o1)).
+              unpack("H2",pack('C',$o2)).":".
+              unpack("H2",pack('C',$o3)).
+              unpack("H2",pack('C',$o4));
+   }
+   elsif ($netmasktype eq "IPv6"){
+       $netmaskip6str=$netmask;
+   }
+   else{
+      $self->LastMsg(ERROR,$self->T($errmsg,"itil::lib::Listedit"));
+      return(0);
+   }
+
+   foreach my $okt (split(/:/,$netmaskip6str)){
+      $netmaskbinnamekey.=unpack("B16",pack("H4",$okt));
+   }
+
+   if ($type ne $netmasktype){
+      $self->LastMsg(ERROR,"netmask type an network type did not match");
+      return(0);
+   }
+   if (length($binnamekey) != length($netmaskbinnamekey)){
+      $self->LastMsg(ERROR,"binnamekey structure missmatsch");
+      return(0);
+   }
+   my $modnetmaskbinnamekey=$netmaskbinnamekey;
+   $modnetmaskbinnamekey=~s/0+$//;
+   my $netmaskl=length($modnetmaskbinnamekey);
+   my $networkl=length($binnamekey);
+   my $netbinkey=substr($binnamekey,0,$netmaskl).("_" x ($networkl-$netmaskl));
+
+   $binnamekey=$netbinkey;
+
+#printf STDERR ("fifi networklen=%d\n",$networkl-$netmaskl);
+#printf STDERR ("fifi netmask=$netmask \n");
+#printf STDERR ("ipnet: $binnamekey\n");
+#printf STDERR ("mask : $netmaskbinnamekey\n");
+#printf STDERR ("key  : $netbinkey\n");
+
+   if ($oldrec->{binnamekey} ne $binnamekey){
+      $newrec->{'binnamekey'}=$binnamekey;
+   }
+   if ($oldrec->{name} ne lc($name)){
+      $newrec->{'name'}=lc($name);
+   }
+
+
+
+
+
+
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);
 }
@@ -341,36 +323,7 @@ sub isWriteValid
 
    return() if (!($self->IsMemberOf("admin")));  # init phase!!! - no user wr
 
-
-   return("default") if (!defined($rec));
-   if (defined($rec) && !defined($rec->{databossid}) &&
-       !($self->IsMemberOf("admin"))){
-      return("default");
-   }
-
-   my @databossedit=("default","delmgmt","contacts","control");
-   return(@databossedit) if (defined($rec) && $self->IsMemberOf("admin"));
-   return(@databossedit) if (defined($rec) && $rec->{databossid}==$userid);
-
-   if (defined($rec->{contacts}) && ref($rec->{contacts}) eq "ARRAY"){
-      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
-                                  ["RMember"],"both");
-      my @grpids=keys(%grps);
-      foreach my $contact (@{$rec->{contacts}}){
-         if ($contact->{target} eq "base::user" &&
-             $contact->{targetid} ne $userid){
-            next;
-         }
-         if ($contact->{target} eq "base::grp"){
-            my $grpid=$contact->{targetid};
-            next if (!grep(/^$grpid$/,@grpids));
-         }
-         my @roles=($contact->{roles});
-         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
-         return(@databossedit) if (grep(/^write$/,@roles));
-      }
-   }
-   return();
+   return("default");
 }
 
 

@@ -80,6 +80,8 @@
 'AL_TCom.kern'=>{de=>'Stammdaten',en=>'Basedata'},
 'AL_TCom.kern.network'=>{de=>'Netzbereich',en=>'Networkarea'},
 'AL_TCom.kern.network.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.kern.network.ipnet'=>{de=>'IP-Netz',en=>'IP-Net'},
+'AL_TCom.kern.network.ipnet.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern.osrelease'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'AL_TCom.kern.osrelease.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.proc.mgmtitemgroup'=>{de=>'geführte CI Gruppe',en=>'managed CI group'},

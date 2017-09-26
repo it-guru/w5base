@@ -1,0 +1,6 @@
+'itil::lnkipaddressipnet'=>{de=>'IP-Adresse - IP-Netz Mapping',
+                            en=>'IP-Address - IP-Net Mapping'},
+'fieldgroup.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
+'fieldgroup.ipnet'=>{de=>'IP-Netzwerk',en=>'IP-Net'},
+'fieldgroup.networkarea'=>{de=>'Netzwerkbereich',en=>'Networkarea'},
+'IP-Netowrk Name'=>{de=>'IP-Netzwerkname'},
