@@ -34,6 +34,7 @@
 'invalid dns name'=>{de=>'ungüliger DNS Name'},
 'Systems location'=>{de=>'Systems Standort'},
 'Applicationnames'=>{de=>'Anwendungsnamen'},
+'Applications'=>{de=>'Anwendungen'},
 'fieldgroup.further'=>{de=>'weiterführende Informationen',en=>'further informations'},
 'Systems deputy TSM E-Mail'=>{de=>'Systems TSM Vertreter E-Mail'},
 'Application Customer'=>{de=>'Anwendungskunde'},

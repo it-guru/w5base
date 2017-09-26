@@ -226,6 +226,7 @@ sub new
                 label         =>'Applicationnames',
                 group         =>'further',
                 readonly      =>1,
+                searchable    =>0,
                 weblinkto     =>'NONE',
                 vjointo       =>'itil::lnkapplip',
                 vjoinbase     =>[{applcistatusid=>"<=4"}],
