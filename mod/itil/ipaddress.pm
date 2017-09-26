@@ -505,7 +505,7 @@ sub new
                 vjoinbase     =>[{ipnetcistatusid=>"<=4",
                                   activesubipnets=>'0'}],
                 vjoinon       =>['id'=>'ipaddressid'],
-                vjoindisp     =>['ipnet','ipnetname']),
+                vjoindisp     =>['ipnetname','ipnet']),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
