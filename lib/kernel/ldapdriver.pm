@@ -81,7 +81,7 @@ sub Connect
       $self->{SessionCacheKey}=$BackendSessionName.':'.$ldapname; 
       if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
          my $cacheEntry=$LDAPConnectionPool::Session{$self->{SessionCacheKey}};
-         if (time()-$cacheEntry->{atime}<300){
+         if (time()-$cacheEntry->{atime}<600){
             $self->{ldap}=$cacheEntry->{ldap};
             $self->{isConnected}=1;
             return($self->{'ldap'});
@@ -109,7 +109,7 @@ sub Connect
       }
    }
    if (!($self->{ldap}=Net::LDAP->new($self->{ldapserv},
-                                      timeout=>300,
+                                      timeout=>100,
                                       version=>'3',async=>0))){
       return(undef,msg(ERROR,"ldapbind '%s' while connect '%s'",
              $@,$self->{ldapserv}));
