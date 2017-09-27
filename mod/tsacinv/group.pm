@@ -64,7 +64,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'deleted',
-                htmldetail    =>0,
+                readonly      =>1,
                 label         =>'marked as delete',
                 dataobjattr   =>'amemplgroup.bdelete'),
 
@@ -124,6 +124,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'scgoupid',
                 group         =>'control',
+                htmldetail    =>0,
                 label         =>'ServiceCenter-GroupID',
                 dataobjattr   =>'amemplgroup.lscgroupid'),
                                                 
