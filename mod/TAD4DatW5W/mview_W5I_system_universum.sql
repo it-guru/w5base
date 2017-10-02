@@ -32,25 +32,16 @@ from  (
                     systemid                      systemid,
                     conumber                      conumber
              from "tsacinv::system"
-             where status='in operation'),
-   t4dsp as (select /*+ materialize */
-                 lower(regexp_replace(
-                 adm.computer.computer_alias,'\..*$','')) systemname,
-                 'tad4dp-' || adm.computer.computer_sys_id tad4d_computer_sys_id,
-                 upper(decode(adm.agent.custom_data1,NULL,
-                 'tad4d_p_miss',adm.agent.custom_data1))  systemid
-             from adm.computer@tad4d join adm.agent@tad4d
-                  on adm.computer.computer_sys_id=adm.agent.id)
+             where status='in operation')
+
 
       select substr(sysbase.systemname,0,255) systemname,
              upper(sysbase.systemid) systemid,
              decode(w5sysbysysid.id,
                     NULL,decode(w5sysbyname.id,NULL,0,
                                 1),1) is_w5,
-             decode(w5sysbysysid.id,
-                    NULL,decode(w5sysbyname.id,NULL,NULL,
-                                w5sysbyname.id),
-                    w5sysbysysid.id) w5baseid,
+             w5sysbysysid.id
+                 w5baseid,
              decode(amsysbysysid.systemid,
                     NULL,decode(amsysbyname.systemid,NULL,0,
                                 1),1) is_am,
@@ -58,22 +49,13 @@ from  (
                     NULL,decode(amsysbyname.systemid,NULL,NULL,
                                 amsysbyname.systemid),
                     amsysbysysid.systemid) amsystemid,
-             decode(t4dspbysysid.systemid,NULL,
-                    decode(t4dspbyname.systemname,NULL,0,1),1) is_t4dp,
-             decode(t4dspbysysid.systemid,
-                    NULL,decode(t4dspbyname.systemid,NULL,NULL,
-                                t4dspbyname.systemid),
-                    t4dspbysysid.systemid) t4dpsystemid,
-             decode(t4dspbysysid.tad4d_computer_sys_id,
-                    NULL,decode(t4dspbyname.tad4d_computer_sys_id,NULL,NULL,
-                                t4dspbyname.tad4d_computer_sys_id),
-                    t4dspbysysid.tad4d_computer_sys_id) t4dpcomputer_sys_id
+             '0'  is_t4dp,
+             NULL t4dpsystemid,
+             NULL t4dpcomputer_sys_id
       from (
          select w5sys.systemname,w5sys.systemid from w5sys
          union
          select amsys.systemname,amsys.systemid from amsys
-         union
-         select t4dsp.systemname,t4dsp.systemid from t4dsp
       ) sysbase
      left outer join w5sys w5sysbyname
              on sysbase.systemname=w5sysbyname.systemname
@@ -84,11 +66,6 @@ from  (
              on upper(sysbase.systemname)=amsysbyname.systemname
         left outer join amsys amsysbysysid
              on sysbase.systemid=amsysbysysid.systemid
-
-        left outer join t4dsp t4dspbyname
-             on upper(sysbase.systemname)=t4dspbyname.systemname
-        left outer join t4dsp t4dspbysysid
-             on sysbase.systemid=t4dspbysysid.systemid
    ) sysmapped
    left outer join "itil::system"
         on sysmapped.w5baseid="itil::system".id
