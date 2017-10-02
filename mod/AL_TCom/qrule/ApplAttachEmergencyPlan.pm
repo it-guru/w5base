@@ -69,7 +69,8 @@ sub qcheckRecord
 
 
    if ($rec->{ictoid} ne "" &&
-       ($rec->{drclass} eq "3" || $rec->{drclass} eq "4")){
+       ($rec->{drclass} eq "4" || $rec->{drclass} eq "5" ||
+        $rec->{drclass} eq "6" || $rec->{drclass} eq "7")){
       my @nameexpr;
      
       my $ne=qr/^SCM_Emergency_Plan_$rec->{ictono}_.+_\d{8}\.pdf$/;
