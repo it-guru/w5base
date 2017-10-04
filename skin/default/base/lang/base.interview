@@ -41,7 +41,7 @@
 'QT.select'=>{de=>'Select-Box',en=>'Select-Box'},
 'Contact'=>{de=>'Ansprechpartner'},
 'Deputy Contact'=>{de=>'Ansprechpartner Vertreter'},
-'thematically responsible'=>{de=>'thematisch Verantwortlicher'},
+'thematically Responsible'=>{de=>'thematisch Verantwortlicher'},
 'restriction'=>{de=>'Einschränkung'},
 'explanation'=>{de=>'Bemerkung'},
 'Interview Question Details'=>{de=>'Interview Frage Details'},

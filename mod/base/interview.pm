@@ -167,7 +167,7 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'thematicresponsible',
-                label         =>'thematically responsible',
+                label         =>'thematically Responsible',
                 AllowEmpty    =>1,
                 vjoinon       =>'thematicresponsibleid'),
 
