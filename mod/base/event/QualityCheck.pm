@@ -98,11 +98,13 @@ sub QualityCheck
 
          my $basefilter;
          if ($obj->getField("mandatorid")){
-            if (!grep(/^0$/,keys(%{$dataobjtocheck{$dataobj}})) &&
-                $dataobj ne "base::workflow"){
+            my @mandators=keys(%{$dataobjtocheck{$dataobj}});
+            @mandators=grep({$_ ne "0"} @mandators);
+            if ($#mandators!=-1  # use mandator filter if not only "ANY" rules exists
+                && $dataobj ne "base::workflow"){
                msg(INFO,"set (basefilter) mandatorid filter='%s'",
-                        join(",",keys(%{$dataobjtocheck{$dataobj}})));
-               $basefilter={mandatorid=>[keys(%{$dataobjtocheck{$dataobj}})]};
+                        join(",",@mandators));
+               $basefilter={mandatorid=>\@mandators};
             }
          }
          return($self->doQualityCheck($basefilter,$obj));
