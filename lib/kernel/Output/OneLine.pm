@@ -207,6 +207,7 @@ sub ProcessBottom
    if ($#view==0){
       @useField=@view;
    }
+
    my $useOneLineAlg=Query->Param("useOneLineAlg");
    if ($useOneLineAlg ne "unique" && $useOneLineAlg ne ""){
       if ($#useField>0){
@@ -226,9 +227,9 @@ sub ProcessBottom
             map({$l{$_}=$_} @words);
          }
          for(my $recno=0;$recno<=$#{$self->{recordlist}};$recno++){
-            for(my $fieldno=0;$fieldno<=$#{$self->{recordlist}->[$recno]};
-                $fieldno++){
-               if (in_array(\@useField,$view[$fieldno])){
+            for(my $fieldno=0;$fieldno<=$#{$self->{fieldobjects}};$fieldno++){
+               my $fieldobj=$self->{fieldobjects}->[$fieldno];
+               if (in_array(\@useField,$fieldobj->Name())){
                   my $dval=$self->{recordlist}->[$recno]->[$fieldno];
                   if ($useOneLineAlg eq "caseCheckedInverse"){
                      if (ref($dval) eq "ARRAY"){
@@ -253,9 +254,9 @@ sub ProcessBottom
    }
    else{
       for(my $recno=0;$recno<=$#{$self->{recordlist}};$recno++){
-         for(my $fieldno=0;$fieldno<=$#{$self->{recordlist}->[$recno]};
-             $fieldno++){
-            if (in_array(\@useField,$view[$fieldno])){
+         for(my $fieldno=0;$fieldno<=$#{$self->{fieldobjects}};$fieldno++){
+            my $fieldobj=$self->{fieldobjects}->[$fieldno];
+            if (in_array(\@useField,$fieldobj->Name())){
                my $dval=$self->{recordlist}->[$recno]->[$fieldno];
                if (ref($dval) eq "ARRAY"){
                   map({$l{$_}=$_} @$dval);
