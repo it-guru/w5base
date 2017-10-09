@@ -1,4 +1,4 @@
-package itil::qrule::CheckOldAutoDisc;
+package AL_TCom::qrule::CheckOldAutoDisc;
 #######################################################################
 =pod
 
@@ -17,12 +17,14 @@ NONE
 
 [en:]
 
-New AutoDiscovery Data needs to be processed within 12 weeks.
+New AutoDiscovery Data needs to be processed within 12 weeks. If there
+are only GDU SAP applications on the system, no check is done.
 
 [de:]
 
 Neue AutoDiscovery Daten müssen innerhalb von 12 Wochen 
-behandelt werden.
+behandelt werden. Wenn auf dem logischen System NUR GDU SAP Anwendungen 
+bereitgestellt werden, entfällt die Prüfung.
 
 
 =cut
@@ -48,7 +50,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::QRule;
-@ISA=qw(kernel::QRule);
+use itil::qrule::CheckOldAutoDisc;
+
+@ISA=qw(itil::qrule::CheckOldAutoDisc);
 
 sub new
 {
@@ -59,32 +63,6 @@ sub new
    return($self);
 }
 
-sub getPosibleTargets
-{
-   return(["itil::system"]);
-}
-
-sub qcheckRecord
-{  
-   my $self=shift;
-   my $dataobj=shift;
-   my $rec=shift;
-
-   return(0,undef) if (!$self->isAutodiscDataNeedToBeProcessed($dataobj,$rec));
-
-
-   my $ad=getModuleObject($self->getParent->Config,'itil::autodiscrec');
-   $ad->SetFilter({disc_on_systemid=>\$rec->{id},
-                   cdate=>'<now-84d',
-                   state=>[1],
-                   processable=>\'1'});
-   if ($ad->CountRecords()>0){
-      my $msg='found unprocessed autodiscovery data';
-      return(3,{qmsg=>[$msg],dataissue=>[$msg]});
-   }
-   return(0,undef);
-
-}
 
 sub isAutodiscDataNeedToBeProcessed
 {
@@ -93,6 +71,36 @@ sub isAutodiscDataNeedToBeProcessed
    my $rec=shift;
 
    return(0) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+
+   my %applid=();
+   foreach my $arec (@{$rec->{applications}}){
+      $applid{$arec->{applid}}++; 
+   }
+   my @applid=keys(%applid);
+
+   my %sapgrp=();
+
+   if ($#applid!=-1){
+      my $appl=getModuleObject($self->getParent->Config,"itil::appl");
+
+      $appl->SetFilter({id=>\@applid});
+
+      my @l=$appl->getHashList(qw(id mgmtitemgroup));
+
+      foreach my $arec (@l){
+         my $g=$arec->{mgmtitemgroup};
+         if (ref($g) ne "ARRAY"){
+            $g=[$g];
+         }
+         if (in_array($g,"SAP")){
+            $sapgrp{$arec->{id}}++;
+         }
+      }
+      if (keys(%applid)==keys(%sapgrp)){
+         return(0);   # Alles ist SAP Rotz (und brauch nicht gut sein)
+      }
+   }
+
    return(1);
 }
 
