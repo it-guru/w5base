@@ -629,7 +629,12 @@ sub new
                 label         =>'PC Phone Dialer Mode',
                 htmleditwidth =>'50%',
                 group         =>'userparam',
-                value         =>['',"Cisco WebDialer V1"],
+                value         =>[
+                                  '',
+                                  "Cisco WebDialer V1",
+                                  "HTML-Dial-Tag",
+                                  "HTML-0Dial-Tag"
+                               ],
                 dataobjattr   =>'contact.dialermode'),
 
       new kernel::Field::Text(

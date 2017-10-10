@@ -348,6 +348,27 @@ sub FormatJsDialCall
       my $cmd="$open;";
       return($cmd);
    }
+   elsif ($dialermode=~m/0dial-tag/i){
+      $phone=~s/[\s\/\-]//g;
+      $phone=~s/$qdialeripref/0/;
+      $phone=~s/[\s\/\-]//g;
+      $phone=~s/^\+/00/;
+      $dialerurl="tel:0$phone";
+
+      my $open="window.location.href='$dialerurl';";
+      my $cmd="$open;";
+      return($cmd);
+   }
+   elsif ($dialermode=~m/dial-tag/i){
+      $phone=~s/[\s\/\-]//g;
+      $phone=~s/$qdialeripref/0/;
+      $phone=~s/[\s\/\-]//g;
+      $dialerurl="tel:$phone";
+
+      my $open="window.location.href='$dialerurl';";
+      my $cmd="$open;";
+      return($cmd);
+   }
    return(undef);
 }
 
