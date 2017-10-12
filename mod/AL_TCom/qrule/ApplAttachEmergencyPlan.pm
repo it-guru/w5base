@@ -17,7 +17,7 @@ This rule checks whether a emergency plan document is present.
 
 In case of a data issue, please check the name of the recorded document.
 
-Document name format should be: 
+Document name format: 
 SCM_Emergency_Plan_ICTO-xxxx_DARWIN-Applicationname_jjjjmmdd.pdf 
 
 If there is no Emergency Plan  document uploaded yet, 
@@ -27,11 +27,12 @@ please upload one in the above mentioned format.
 [de:]
 Diese QualityRule prüft, ob ein Notfallplan Dokument hinterlegt ist.
 
-Falls Sie ein DataIssue haben bitten, wir Sie das Format zu überprüfen.
+Falls Sie ein DataIssue haben, bitten wir Sie das Format zu überprüfen.
 
+Format:
 SCM_Notfallplan_ICTO-xxxx_DARWIN-Applikationsname_jjjjmmdd.pdf 
 
-Falls Sie bisher keine SystemOverview hinterlegt hatten, bitten wir Sie dies 
+Falls Sie bisher keinen Notfallplan hinterlegt hatten, bitten wir Sie dies 
 im oben aufgezeigten Format nachzuholen.
 
 
