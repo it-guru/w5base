@@ -19,6 +19,7 @@ package kernel::Field::File;
 use strict;
 use vars qw(@ISA);
 use kernel;
+use File::Temp;
 @ISA    = qw(kernel::Field);
 
 
@@ -110,10 +111,12 @@ sub FormatedDetail
    }
    if (($mode eq "edit" || $mode eq "workflow") && !defined($self->{vjointo})){
       my $delflag=0;
-      if ($d ne "" && $self->{allowempty}){
-         $delflag=1;
+      my $directflag=0;
+      if ($d ne "") {
+         $delflag=1    if ($self->{allowempty});
+         $directflag=1 if ($self->{allowdirect});
       }
-      return($self->getHtmlInputArea($delflag));
+      return($self->getHtmlInputArea($delflag,$directflag));
    }
    if ($d ne ""){
       return($url);
@@ -125,6 +128,7 @@ sub getHtmlInputArea
 {
    my $self=shift;
    my $delflag=shift;
+   my $directflag=shift;
    my $name=$self->Name();
    my $size=$self->{size};
 
@@ -134,7 +138,20 @@ sub getHtmlInputArea
                                 "kernel::Field::File");
       $delcode=<<EOF;
 <input type=checkbox id="ClearEntry$name" onclick="onChangeClear$name(this);">
-<label style="padding:0;margin:0" for="ClearEntry$name"><img title="$t" border=0 style="padding:0;margin:0" width=18 height=18 src="../../../public/base/load/trash.gif"></lable>
+<label style="padding:0;margin:0" for="ClearEntry$name"><img title="$t" border=0 style="padding:0;margin:0" width=18 height=18 src="../../../public/base/load/trash.gif"></label>
+EOF
+   }
+
+   my $directcode="";
+   if ($directflag) {
+      my $di=$self->getParent->T("direct input",
+                                 "kernel::Field::File");
+      $directcode=<<EOF;
+<input type=checkbox id="DirectInput$name" onclick="onChangeDirectInput$name(this);">
+<label style="padding:0;margin:0" for="DirectInput$name">$di</label>
+<div id="DirectInputTextDiv$name" style="display:none;margin:2px 0;">
+   <textarea name=$name cols=40 rows=8 disabled></textarea>
+</div>
 EOF
    }
 
@@ -153,9 +170,28 @@ function onChangeClear$name(e){
       k.disabled=true;
    }
 }
+
+function onChangeDirectInput$name(e) {
+   m=document.getElementById('DirectInput$name');
+   tdiv=document.getElementById('DirectInputTextDiv$name');
+   t=tdiv.getElementsByTagName('textarea')[0];
+   f=document.getElementById('FileEntry$name');
+   if (m.checked) {
+      f.disabled=true;
+      t.disabled=false;
+      tdiv.style.display='block';
+   }
+   else {
+      f.disabled=false;
+      t.disabled=true;
+      tdiv.style.display='none';
+   }
+}
+
 </script>
 <input id="FileEntry$name" type=file name=$name size="$size">
 <input id="KillEntry$name" type=hidden name=$name disabled value="FORCECLEAR">
+$directcode
 $delcode
 EOF
    return($d);
@@ -174,23 +210,37 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-
    my $resrec={};
 
-
    return($resrec) if (!exists($newrec->{$self->Name()}));
+
    if (exists($self->{maxsize})){
       if ($newrec->{$self->Name()} ne "" &&
           $newrec->{$self->Name()} ne "FORCECLEAR"){
-         my $fname=sprintf("%s",$newrec->{$self->Name()});
-         $fname=~s/^.*[\\\/]//; # strip path, if exists
+         my $fname;
+         my $directinput=0;
+
+         if (ref($newrec->{$self->Name()}) ne "") {
+            $fname=sprintf("%s",$newrec->{$self->Name()});
+            $fname=~s/^.*[\\\/]//; # strip path, if exists
+         }
+         else {
+            $directinput=1;
+            $fname='directin.txt';
+            $resrec->{$self->{filename}}=$fname;
+
+            my $fh=new File::Temp(UNLINK=>1);
+            print $fh ($newrec->{$self->Name()});
+            $newrec->{$self->Name()}=$fh;
+         }
+
          my ($name,$ext)=$fname=~m/^(.*)\.([a-z0-9]{1,4})$/i;
          $ext=lc($ext);
          if (length($name)>25){
             $name=substr($name,0,30);
          }
          $fname=$name.".".$ext;
-         if (!in_array($self->{types},"*")){
+         if (!($directinput || in_array($self->{types},"*"))){
             if (!in_array($self->{types},$ext)){
                my $t=$self->getParent->T(
                      'invalid file type - allowed are %s',
@@ -265,8 +315,6 @@ sub Validate
    }
    return({$self->Name()=>$newrec->{$self->Name()}});
 }
-
-
 
 
 sub ViewProcessor

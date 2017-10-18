@@ -89,6 +89,7 @@ sub new
                 searchable    =>0,
                 uploadable    =>0,
                 allowempty    =>0,
+                allowdirect   =>1,
                 dataobjattr   =>'wallet.sslcert'),
 
       new kernel::Field::Text(

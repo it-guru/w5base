@@ -2,3 +2,4 @@
 'no file'=>{de=>'keine Datei'},
 'document to large - max size %s'=>{de=>'Dokument zu groß - maximale Größe %s'},
 'invalid file type - allowed are %s'=>{de=>'ungültiger Dateityp - erlaubt sind %s'},
+'direct input'=>{de=>'Direkteingabe'},
