@@ -709,24 +709,28 @@ sub Import
          $self->LastMsg(ERROR,"Can't find Assignment Group of system");
          return(undef);
       }
-      # check 3: Supervisor registered
-      if ($acgrouprec->{supervisorldapid} eq "" &&
-          $acgrouprec->{supervisoremail} eq ""){
-         $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
-         return(undef);
-      }
-      my $importtype="posix";
-      my $importname=$acgrouprec->{supervisorldapid};
-      if ($importname eq ""){
-         $importname=$acgrouprec->{supervisoremail};
-         $importtype="email";
-      }
-      # check 4: load Supervisor ID in W5Base
-      my $user=getModuleObject($self->Config,"base::user");
-      my $databossid=$user->GetW5BaseUserID($importname,$importtype);
-      if (!defined($databossid)){
-         $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
-         return(undef);
+      my $databossid=$self->getCurrentUserId();
+
+      if ($self->IsMemberOf("admin")){
+         # check 3: Supervisor registered
+         if ($acgrouprec->{supervisorldapid} eq "" &&
+             $acgrouprec->{supervisoremail} eq ""){
+            $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
+            return(undef);
+         }
+         my $importtype="posix";
+         my $importname=$acgrouprec->{supervisorldapid};
+         if ($importname eq ""){
+            $importname=$acgrouprec->{supervisoremail};
+            $importtype="email";
+         }
+         # check 4: load Supervisor ID in W5Base
+         my $user=getModuleObject($self->Config,"base::user");
+         $databossid=$user->GetW5BaseUserID($importname,$importtype);
+         if (!defined($databossid)){
+            $self->LastMsg(ERROR,"Can't import Supervisor as Databoss");
+            return(undef);
+         }
       }
       # check 5: find id of mandator "extern"
       my $mandatorid=Query->Param("mandatorid");
