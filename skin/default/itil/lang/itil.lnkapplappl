@@ -25,7 +25,7 @@
 'reason on not needed interface agreement'=>{de=>'Begründung zur nicht-Notwendigkeit der Vereinbarung'},
 'to Application'=>{de=>'nach Anwendung'},
 'from URL'=>{de=>'von URL'},
-'Agreements'=>{de=>'Vereinbarungen und Rahmenbedinungen'},
+'Agreements'=>{de=>'Vereinbarungen und Rahmenbedingungen'},
 'transfer of person related informations'=>{de=>'Übertragung personenbezogener Daten'},
 'to URL'=>{de=>'nach URL'},
 'Interface-State'=>{de=>'Schnittstellen-Status'},
