@@ -98,18 +98,8 @@ select "W5I_system_universum".id,
        "itil::system".iseducation                W5_iseducation,
        "itil::system".isapprovtest               W5_isapprovtest,
        "itil::system".isreference                W5_isreference,
-       (select min("itil::appl".customerprio) 
-        from "itil::appl","W5I_ACT_itil::lnkapplsystem"
-        where "itil::appl".id="W5I_ACT_itil::lnkapplsystem".applid 
-              and "W5I_ACT_itil::lnkapplsystem".systemid="itil::system".id) W5_appcustomerprio,
-       decode("W5I_TAD4D_system".enviroment,NULL,0,1) TAD4D_is,
-       (select count(*) from  "W5I_TAD4D_software" 
-        where "W5I_TAD4D_system".agent_id="W5I_TAD4D_software".agent_id 
-           and is_sub_cap=1
-           and swproduct_name<>'IBM Tivoli Asset Discovery for Distributed' 
-           and swproduct_name<>'IBM Tivoli Monitoring' 
-           and prod_inv_end_time is null
-           and ROWNUM<=1 )   TAD4D_is_sub_cap,
+       '0'                                       TAD4D_is,
+       '0'                                       TAD4D_is_sub_cap,
        "W5I_FLEXERAsup__system_of".refid of_id,
        "W5I_FLEXERAsup__system_of".comments,
        "W5I_FLEXERAsup__system_of".rollout_package,
@@ -145,10 +135,7 @@ from "W5I_system_universum"
            "tsacinv::system".systemid
      left outer join "tsacinv::asset"
         on "tsacinv::system".assetassetid=
-           "tsacinv::asset".assetid
-     left outer join "W5I_TAD4D_system" 
-        on "W5I_system_universum".systemid=
-           "W5I_TAD4D_system".custom_data1;
+           "tsacinv::asset".assetid;
 
 grant select on "W5I_FLEXERAsup__system" to W5I;
 create or replace synonym W5I.FLEXERAsup__system for "W5I_FLEXERAsup__system";

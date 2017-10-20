@@ -95,7 +95,7 @@ sub qcheckRecord
       my @AdPreData=();
       my %engines;
       $ade->SetFilter({localdataobj=>\$dataobjname,
-                   #    addataobj=>\'TAD4D::system',
+                   #    addataobj=>\'HPSA::system',
                        cistatusid=>\'4'});
       foreach my $engine ($ade->getHashList(qw(ALL))){  # found aktive Engine
          $engines{$engine->{id}}={

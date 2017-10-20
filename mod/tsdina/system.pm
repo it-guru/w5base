@@ -97,30 +97,6 @@ sub new
                 dataobjattr   =>'dina_asset_info_vw.software_system'),
 
       new kernel::Field::Text(
-                name          =>'t4dserverid',
-                label         =>'ServerID in TAD4D',
-                group         =>'lpar', 
-                dataobjattr   =>
-                  "CASE ".
-                   "WHEN dina_asset_info_vw.HW_IMPLEMENTATION LIKE '(IBM)%' ".
-                   " AND dina_asset_info_vw.VENDOR_SERIAL_NUMBER IS NOT NULL ".
-                   "THEN ".
-                   " 'IBM' ".
-                   " || ' ' ".
-                   " || SUBSTR ( ".
-                   "     SUBSTR (dina_asset_info_vw.HW_IMPLEMENTATION, ".
-                   "      INSTR (dina_asset_info_vw.HW_IMPLEMENTATION,',')+1),1, ".
-                   "      INSTR ( ".
-                   "       SUBSTR (dina_asset_info_vw.HW_IMPLEMENTATION, ".
-                   "        INSTR (dina_asset_info_vw.HW_IMPLEMENTATION,',')+1),'-', ".
-                   "        -1) ".
-                   "      - 1) ".
-                   " || ' ' ".
-                   " || dina_asset_info_vw.VENDOR_SERIAL_NUMBER ".
-                   "ELSE NULL ".
-                  "END"),
-
-      new kernel::Field::Text(
                 name          =>'hwmodel',
                 label         =>'Hardware Model',
                 group         =>'sysenv',
