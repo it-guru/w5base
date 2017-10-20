@@ -444,8 +444,12 @@ sub qcheckRecord
          #printf STDERR ("fifi ist:\n%s\n\n",Dumper($rec->{emails}));
 
       }
-      if ((($ciamrec->{surname}=~m/^mustermann$/i) && 
-           ($ciamrec->{givenname}=~m/^max$/i) ) &&
+      if (
+          ((($ciamrec->{surname}=~m/^mustermann$/i) && 
+           ($ciamrec->{givenname}=~m/^max$/i) ) ||
+           # robotics Accounts beginnen mit pn- im Vor oder Nachnamen
+           ($ciamrec->{email}=~m/^.*\.pn-.*\@external.*$/i) ||
+           ($ciamrec->{email}=~m/^pn-.*\@external.*$/i)) &&
            $rec->{cistatusid} ne "6"){
             $dataobj->Log(ERROR,"basedata",
                    "Dummy entry detected. The Contact '%s'\n".
