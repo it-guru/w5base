@@ -536,7 +536,8 @@ sub new
                 searchable    =>0,
                 readonly      =>1,
                 label         =>'W5Base Application Prio',
-                dataobjattr   =>'W5_appcustomerprio'),
+                onRawValue    =>\&tsacinv::system::AddW5BaseData,
+                depend        =>'systemid'),
 
       new kernel::Field::Text(
                 name          =>'w5base_applmgr',

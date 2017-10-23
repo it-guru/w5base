@@ -774,6 +774,7 @@ sub AddW5BaseData
          my %sem=();
          my %tsm=();
          my %businessteam=();
+         my %customerprio=();
          if (defined($rec->{applications}) && 
              ref($rec->{applications}) eq "ARRAY"){
             foreach my $app (@{$rec->{applications}}){
@@ -782,10 +783,12 @@ sub AddW5BaseData
                $w5appl->SetFilter({id=>\$app->{applid}});
                my ($arec,$msg)=$w5appl->getOnlyFirst(qw(sem businessteam 
                                                         semid tsm tsmid
+                                                        customerprio
                                                         applmgr applmgrid));
                if (defined($arec)){
                   $sem{$arec->{semid}}=$arec->{sem};
                   $tsm{$arec->{tsmid}}=$arec->{tsm};
+                  $customerprio{$arec->{customerprio}}=$arec->{customerprio};
                   $applmgr{$arec->{applmgrid}}=$arec->{applmgr};
                   $businessteam{$arec->{businessteam}}=$arec->{businessteam};
                }
@@ -795,6 +798,7 @@ sub AddW5BaseData
          $l{w5base_sem}=[sort(values(%sem))];
          $l{w5base_tsm}=[sort(values(%tsm))];
          $l{w5base_applmgr}=[sort(values(%applmgr))];
+         $l{w5base_applcustomerprio}=[sort(values(%customerprio))];
          $l{w5base_businessteam}=[sort(values(%businessteam))];
       }
       $c->{W5BaseSys}->{$systemid}=\%l;
