@@ -111,11 +111,13 @@ sub FormatedDetail
    }
    if (($mode eq "edit" || $mode eq "workflow") && !defined($self->{vjointo})){
       my $delflag=0;
-      my $directflag=0;
-      if ($d ne "") {
-         $delflag=1    if ($self->{allowempty});
-         $directflag=1 if ($self->{allowdirect});
+      if ($d ne "" && $self->{allowempty}){
+         $delflag=1;
       }
+
+      my $directflag=0;
+      $directflag=1 if ($self->{allowdirect});
+
       return($self->getHtmlInputArea($delflag,$directflag));
    }
    if ($d ne ""){
