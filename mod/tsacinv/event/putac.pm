@@ -196,9 +196,10 @@ sub mkAcFtpRecSystem
                     fCPUNumber=>$rec->{cpucount},
                     AssignmentGroup=>$cfmassign,
                     IncidentAG=>$inmassign,
-                    Model_Code=>'MGER033048',
                     pSystemPartOfAsset=>$TXTpSystemPartOfAsset
                }
+               # laut Rainer ist kein Model_Code
+               # bei Systemen notwendig     Model_Code=>'MGER033048',
              };
 
    if ($rec->{mandator}=~m/^TelekomIT.*/){
