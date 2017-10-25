@@ -775,13 +775,11 @@ $where=<<EOF;
          union
            SELECT AA."DH_NUMBER"
            FROM SMREP1.DH_CM3RA6 AA
-           WHERE AA.TSI_APPROVAL_LOG_GROUP='TIT.TSI.INT.CHM' OR
-             AA.TSI_APPROVAL_LOG_GROUP like 'TIT.TSI.INT.CHM.%'
+           WHERE AA.TSI_APPROVAL_LOG_GROUP like 'TIT.%'
          union
             SELECT CP."DH_NUMBER"
             FROM SMREP1.DH_CM3RA7 CP
-            WHERE CP.TSI_APPROVALS_MANUAL='TIT.TSI.INT.CHM' OR
-            CP.TSI_APPROVALS_MANUAL like 'TIT.TSI.INT.CHM.%'
+            WHERE CP.TSI_APPROVALS_MANUAL like 'TIT.%'
          )
 EOF
    }
