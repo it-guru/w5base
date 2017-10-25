@@ -1562,7 +1562,7 @@ create table itfarm (
   srcload    datetime    default NULL, lastqcheck datetime default NULL,
   PRIMARY KEY  (id),KEY lastqcheck(lastqcheck),
   UNIQUE KEY itfarmid (itfarmid),
-  UNIQUE KEY name (name),KEY(mandator),
+  UNIQUE KEY name (fullname),KEY(mandator),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
 create table lnkitfarmasset (
