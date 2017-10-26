@@ -99,6 +99,13 @@ sub qcheckRecord
       return(0,undef);
    }
 
+   if ($rec->{itfarm} ne "" && $rec->{cistatusid} eq "3" ){
+      # logical systems provided by an itfarm in state 
+      # "available/in project" does not need to have application relations
+      return(0,undef);
+   }
+
+
    if (ref($rec->{applications}) ne "ARRAY" || $#{$rec->{applications}}==-1){
       return(3,{qmsg=>['no application relations'],
                 dataissue=>['no application relations']});
