@@ -3,3 +3,7 @@
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'fieldgroup.assets'=>{de=>'Hardware',en=>'Assets'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'fieldgroup.applications'=>{de=>'beteiligte Anwendungen',en=>'involved Applications'},
+'Application names'=>{de=>'Anwendungsnamen'},
+'Applications'=>{de=>'Anwendungen'},
+

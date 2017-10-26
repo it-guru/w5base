@@ -132,6 +132,34 @@ sub new
                 vjoinon       =>['id'=>'itfarmid'],
                 vjoindisp     =>['assetid']),
 
+      new kernel::Field::Text(
+                name          =>'applicationnames',
+                label         =>'Application names',
+                group         =>'applications',
+                searchable    =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinon       =>['assetids'=>'assetid'],
+                vjoindisp     =>'appl'),
+
+      new kernel::Field::Link(
+                name          =>'applicationids',
+                label         =>'Applications IDs',
+                group         =>'applications',
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=5"}],
+                vjoinon       =>['assetids'=>'assetid'],
+                vjoindisp     =>'applid'),
+
+      new kernel::Field::SubList(
+                name          =>'applications',
+                label         =>'Applications',
+                group         =>'applications',
+                searchable    =>0,
+                vjointo       =>'itil::appl',
+                vjoinon       =>['applicationids'=>'id'],
+                vjoindisp     =>['name','itnormodel']),
+
                                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
