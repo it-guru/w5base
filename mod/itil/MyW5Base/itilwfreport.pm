@@ -256,6 +256,7 @@ sub SetFilter
    delete ($flt->{from});
 
    msg(INFO,"MyW5Base Dataobj Filter=%s",Dumper($flt));
+   $dataobj->ResetFilter();
    $dataobj->SetFilter($flt);
    #######################################################################
 
@@ -277,8 +278,7 @@ sub Result
    return(undef) if (!(my $f=$self->{Field}->{to}->Unformat($q{to})));
    $q{to}=$f->{to};
 
-   msg(INFO,"MyW5Base Filter=%s",Dumper(\%q));
-
+   #msg(INFO,"MyW5Base Filter=%s",Dumper(\%q));
    if (!$self->SetFilter(\%q)){
       if ($self->LastMsg()==0){
          $self->LastMsg(ERROR,"can not SetFilter on DataObj - unknown problem");
