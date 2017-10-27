@@ -181,44 +181,6 @@ sub new
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
                                  'systemid','id','reltyp','shortdesc',
                                  'assetassetname']),
-      new kernel::Field::Text(
-                name          =>'assetassetids',
-                label         =>'used AssetIDs',
-                group         =>'systems',
-                searchable    =>1,
-                uploadable    =>0,
-                htmldetail    =>0,
-                vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{systemcistatusid=>"<=5"},
-                                 {assetassetname=>'!""'}],
-                vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>'assetassetname'),
-
-      new kernel::Field::Link(
-                name          =>'assetids',
-                label         =>'used W5Base AssetIDs',
-                group         =>'systems',
-                searchable    =>0,
-                uploadable    =>0,
-                htmldetail    =>0,
-                vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{systemcistatusid=>"<=5"}],
-                vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>'assetid'),
-
-
-      new kernel::Field::Text(
-                name          =>'itfarms',
-                label         =>'used Serverfarms',
-                group         =>'systems',
-                searchable    =>0,  # funktioniert nicht wegen doppelt indirekt
-                uploadable    =>0,
-                htmldetail    =>0,
-                vjointo       =>'itil::itfarm',
-                vjoinon       =>['assetids'=>'assetids'],
-                vjoindisp     =>'fullname'),
-
-
       new kernel::Field::Group(
                 name          =>'itsemteam',
                 htmldetail    =>sub{
@@ -1038,14 +1000,44 @@ sub new
                                  'cbreakdown'],  # see also opmode at system
                 htmleditwidth =>'200px',
                dataobjattr   =>'appl.opmode'),
-      #
-      # removed based on 
-      # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14135335110009
-      #
-      #new kernel::Field::Text(
-      #          name          =>'applgroup',
-      #          label         =>'Application Group',
-      #          dataobjattr   =>'appl.applgroup'),
+
+      new kernel::Field::Text(
+                name          =>'assetassetids',
+                label         =>'used AssetIDs',
+                group         =>'systems',
+                searchable    =>1,
+                uploadable    =>0,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{systemcistatusid=>"<=5"},
+                                 {assetassetname=>'!""'}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>'assetassetname'),
+
+      new kernel::Field::Link(
+                name          =>'assetids',
+                label         =>'used W5Base AssetIDs',
+                group         =>'systems',
+                searchable    =>0,
+                uploadable    =>0,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{systemcistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>'assetid'),
+
+
+      new kernel::Field::Text(
+                name          =>'itfarms',
+                label         =>'used Serverfarms',
+                group         =>'systems',
+                searchable    =>0,  # funktioniert nicht wegen doppelt indirekt
+                uploadable    =>0,
+                htmldetail    =>0,
+                vjointo       =>'itil::itfarm',
+                vjoinon       =>['assetids'=>'assetids'],
+                vjoindisp     =>'fullname'),
+
 
       new kernel::Field::Textarea(
                 name          =>'description',
