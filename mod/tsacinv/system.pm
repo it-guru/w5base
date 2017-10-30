@@ -478,6 +478,7 @@ sub new
                 label         =>'Applications',
                 group         =>'applications',
                 vjointo       =>'tsacinv::lnkapplsystem',
+                vjoinbase     =>{deleted=>'0'},
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
                 vjoindisp     =>[qw(parent applid)],
                 vjoininhash   =>['parent','applid','usage','comments']),
@@ -489,6 +490,7 @@ sub new
                 searchable    =>0,
                 htmldetail    =>0,
                 vjointo       =>'tsacinv::lnkapplsystem',
+                vjoinbase     =>{deleted=>'0'},
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
                 vjoindisp     =>[qw(parent)]),
 
@@ -498,6 +500,7 @@ sub new
                 label         =>'ApplicationIDs',
                 group         =>'applications',
                 vjointo       =>'tsacinv::lnkapplsystem',
+                vjoinbase     =>{deleted=>'0'},
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
                 vjoindisp     =>[qw(applid)]),
 

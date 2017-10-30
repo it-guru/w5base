@@ -40,7 +40,13 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'LinkID',
-                dataobjattr   =>"amtsirelportfappl.lrelportfapplid"),
+                dataobjattr   =>'"id"'),
+
+     new kernel::Field::Boolean(
+                name          =>'deleted',
+                readonly      =>1,
+                label         =>'marked as delete',
+                dataobjattr   =>'"deleted"'),
 
       new kernel::Field::TextDrop(
                 name          =>'parent',
@@ -57,14 +63,14 @@ sub new
                 uppersearch   =>1,
                 htmlwidth     =>'100',
                 label         =>'ApplicationID',
-                dataobjattr   =>'amtsicustappl.code'),
+                dataobjattr   =>'"applid"'),
 
       new kernel::Field::Textarea(
                 name          =>'appldescription',
                 group         =>'appldata',
                 htmldetail    =>0,
                 label         =>'Application Description',
-                dataobjattr   =>'amtsicustappl.description'),
+                dataobjattr   =>'"appldescription"'),
 
       new kernel::Field::Text(
                 name          =>'usage',
@@ -72,7 +78,7 @@ sub new
                 group         =>'appldata',
                 htmldetail    =>0,
                 translation   =>'tsacinv::appl',
-                dataobjattr   =>'amtsicustappl.usage'),
+                dataobjattr   =>'"usage"'),
 
       new kernel::Field::Text(
                 name          =>'applconumber',
@@ -82,14 +88,14 @@ sub new
                 htmldetail    =>0,
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostid'=>'id'],
-                dataobjattr   =>'amcostcenter.trimmedtitle'),
+                dataobjattr   =>'"applconumber"'),
 
       new kernel::Field::Text(
                 name          =>'applcodescription',
                 group         =>'appldata',
                 htmldetail    =>0,
                 label         =>'Costcenter desc of application',
-                dataobjattr   =>'amcostcenter.field1'),
+                dataobjattr   =>'"applcodescription"'),
 
       new kernel::Field::Text(
                 name          =>'altbc',
@@ -97,7 +103,7 @@ sub new
                 readonly      =>1,
                 translation   =>'tsacinv::appl',
                 label         =>'Alternate BC',
-                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
+                dataobjattr   =>'"altbc"'),
 
       new kernel::Field::TextDrop(
                 name          =>'sem',
@@ -114,7 +120,7 @@ sub new
                 group         =>'appldata',
                 translation   =>'tsacinv::appl',
                 htmldetail    =>0,
-                dataobjattr   =>'amtsicustappl.lservicecontactid'),
+                dataobjattr   =>'"semid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'tsm',
@@ -131,7 +137,7 @@ sub new
                 group         =>'appldata',
                 htmldetail    =>0,
                 translation   =>'tsacinv::appl',
-                dataobjattr   =>'amtsicustappl.ltechnicalcontactid'),
+                dataobjattr   =>'"tsmid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'iassignmentgroup',
@@ -149,7 +155,7 @@ sub new
                 htmldetail    =>0,
                 translation   =>'tsacinv::appl',
                 label         =>'AC-Incident-AssignmentID',
-                dataobjattr   =>'amtsicustappl.lincidentagid'),
+                dataobjattr   =>'"lincidentagid"'),
 
 
 
@@ -161,14 +167,14 @@ sub new
                 htmldetail    =>0,
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostid'=>'id'],
-                dataobjattr   =>'sysamcostcenter.trimmedtitle'),
+                dataobjattr   =>'"sysconumber"'),
 
       new kernel::Field::Text(
                 name          =>'syscodescription',
                 group         =>'sysdata',
                 htmldetail    =>0,
                 label         =>'Costcenter desc of system',
-                dataobjattr   =>'sysamcostcenter.field1'),
+                dataobjattr   =>'"syscodescription"'),
 
       new kernel::Field::TextDrop(
                 name          =>'sysiassignmentgroup',
@@ -185,13 +191,13 @@ sub new
                 group         =>'sysdata',
                 htmldetail    =>0,
                 translation   =>'tsacinv::system',
-                dataobjattr   =>'amportfolio.lassignmentid'),
+                dataobjattr   =>'"lassignmentid"'),
 
       new kernel::Field::Text(
                 name          =>'sysstatus',
                 group         =>'sysdata',
                 label         =>'Status of system',
-                dataobjattr   =>'amcomputer.status'),
+                dataobjattr   =>'"sysstatus"'),
 
       new kernel::Field::Float(
                 name          =>'systemcpucount',
@@ -201,7 +207,7 @@ sub new
                 translation   =>'tsacinv::system',
                 unit          =>'CPU',
                 precision     =>0,
-                dataobjattr   =>'amcomputer.lcpunumber'),
+                dataobjattr   =>'"systemcpucount"'),
 
       new kernel::Field::Float(
                 name          =>'systemcpuspeed',
@@ -211,7 +217,7 @@ sub new
                 translation   =>'tsacinv::system',
                 unit          =>'MHz',
                 precision     =>0,
-                dataobjattr   =>'amcomputer.lcpuspeedmhz'),
+                dataobjattr   =>'"systemcpuspeed"'),
 
       new kernel::Field::Text(
                 name          =>'systemcputype',
@@ -220,7 +226,7 @@ sub new
                 htmldetail    =>0,
                 translation   =>'tsacinv::system',
                 unit          =>'MHz',
-                dataobjattr   =>'amcomputer.cputype'),
+                dataobjattr   =>'"systemcputype"'),
 
       new kernel::Field::Text(
                 name          =>'systemtpmc',
@@ -229,7 +235,7 @@ sub new
                 htmldetail    =>0,
                 translation   =>'tsacinv::system',
                 unit          =>'tpmC',
-                dataobjattr   =>'amcomputer.lProcCalcSpeed'),
+                dataobjattr   =>'"systemtpmc"'),
 
       new kernel::Field::Float(
                 name          =>'systemmemory',
@@ -239,7 +245,7 @@ sub new
                 translation   =>'tsacinv::system',
                 unit          =>'MB',
                 precision     =>0,
-                dataobjattr   =>'amcomputer.lmemorysizemb'),
+                dataobjattr   =>'"systemmemory"'),
 
 
       new kernel::Field::TextDrop(
@@ -247,30 +253,30 @@ sub new
                 label         =>'Child System',
                 weblinkto     =>'tsacinv::system',
                 weblinkon     =>['lsystemid'=>'systemid'],
-                dataobjattr   =>'amportfolio.name'),
+                dataobjattr   =>'"child"'),
 
       new kernel::Field::TextDrop(
                 name          =>'systemid',
                 label         =>'System ID',
                 weblinkto     =>'tsacinv::system',
                 weblinkon     =>['lsystemid'=>'systemid'],
-                dataobjattr   =>'amportfolio.assettag'),
+                dataobjattr   =>'"systemid"'),
 
       new kernel::Field::Text(
                 name          =>'systemola',
                 label         =>'System OLA',
-                dataobjattr   =>'amcomputer.olaclasssystem'),
+                dataobjattr   =>'"systemola"'),
 
       new kernel::Field::Text(
                 name          =>'systemstatus',
                 label         =>'System Status',
-                dataobjattr   =>'amcomputer.status'),
+                dataobjattr   =>'"systemstatus"'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
                 label         =>'Comments',
-                dataobjattr   =>'amtsirelportfappl.description'),
+                dataobjattr   =>'"comments"'),
 
       new kernel::Field::DynWebIcon(
                 name          =>'systemweblink',
@@ -306,58 +312,60 @@ sub new
       new kernel::Field::Link(
                 name          =>'lsystemid',
                 label         =>'lsystemid',
-                dataobjattr   =>'amportfolio.assettag'),
+                dataobjattr   =>'"lsystemid"'),
 
       new kernel::Field::Link(
                 name          =>'lparentid',
                 label         =>'lparentid',
-                dataobjattr   =>'amtsirelportfappl.lapplicationid'),
+                dataobjattr   =>'"lparentid"'),
 
       new kernel::Field::Link(
                 name          =>'lchildid',
                 label         =>'lchildid',
-                dataobjattr   =>'amtsirelportfappl.lportfolioid'),
+                dataobjattr   =>'"lchildid"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'amtsirelportfappl.dtlastmodif'),
+                dataobjattr   =>'"mdate"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 ignorecase    =>1,
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amtsirelportfappl.externalsystem'),
+                dataobjattr   =>'"srcsys"'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'amtsirelportfappl.externalid'),
+                dataobjattr   =>'"srcid"'),
 
       new kernel::Field::Date(
                 name          =>'srcload',
                 timezone      =>'CET',
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'amtsirelportfappl.dtimport'),
+                dataobjattr   =>'"srcload"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amtsirelportfappl.dtlastmodif'),
+                dataobjattr   =>'"replkeypri"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(amtsirelportfappl.lrelportfapplid,35,'0')")
+                dataobjattr   =>'"replkeysec"')
 
    );
    $self->setDefaultView(qw(id parent applid child systemid systemola));
+   $self->setWorktable("lnkapplsystem");
+
    return($self);
 }
 
@@ -378,31 +386,18 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/lnkapplsystem.jpg?".$cgi->query_string());
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_deleted"))){
+     Query->Param("search_deleted"=>$self->T("no"));
+   }
+}
+
+
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsirelportfappl,amportfolio,amcomputer,amtsicustappl,".
-            "(select amcostcenter.* from amcostcenter ".
-            " where amcostcenter.bdelete=0) amcostcenter,".
-            "(select amcostcenter.* from amcostcenter ".
-            " where amcostcenter.bdelete=0) sysamcostcenter";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   return("amtsirelportfappl.bdelete=0 and ".
-          "amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid and ".
-          "amtsirelportfappl.bactive=1 and amportfolio.bdelete=0 and ".
-          "amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid and ".
-          "amtsicustappl.lcostcenterid=amcostcenter.lcostid(+) and ".
-          "amportfolio.lcostid=sysamcostcenter.lcostid(+) and ".
-          "amportfolio.lportfolioitemid=amcomputer.litemid and ".
-          "amcomputer.status<>'out of operation'");
-}
 
 sub isViewValid
 {
