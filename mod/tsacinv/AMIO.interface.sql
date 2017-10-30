@@ -172,9 +172,9 @@ CREATE or REPLACE view appl as
 grant select on appl to public;
 
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::system ------------------------------------
+-- --------------------- tsacinv::system (pre) ------------------------------
 -- --------------------------------------------------------------------------
-CREATE or REPLACE VIEW system_acl AS
+CREATE or REPLACE VIEW system_acl_level0 AS     -- level0 = without shared
    select distinct amportfolio.assettag id
    from AM2107.amportfolio
       left outer join ( SELECT amcostcenter.*
@@ -196,6 +196,263 @@ CREATE or REPLACE VIEW system_acl AS
             (acl.customerlnk is not null or
              acl.acctno is not null or
              acl.assignment is not null);
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::ipaddress ---------------------------------
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW ipaddress_acl AS
+   SELECT
+      DISTINCT amnetworkcard.lnetworkcardid          id
+   FROM AM2107.amnetworkcard
+   JOIN system on system."lcomputerid"=amnetworkcard.lcompid;
+
+
+CREATE VIEW ipaddress AS
+   SELECT
+      DISTINCT amnetworkcard.lnetworkcardid          id,
+      amnetworkcard.tcpipaddress || 
+         decode ( amnetworkcard.tcpipaddress,
+         NULL, '', decode ( amnetworkcard.ipv6address,
+            NULL, '', ', '))
+         || amnetworkcard.ipv6address                AS "ipaddress",
+      amnetworkcard.tcpipaddress                     AS "ipv4address",
+      amnetworkcard.ipv6address                      AS "ipv6address",
+      amportfolio.assettag                           AS "systemid",
+      amportfolio.name                               AS "systemname",
+      amnetworkcard.status                           AS "status",
+      amnetworkcard.code                             AS "code",
+      amnetworkcard.subnetmask                       AS "netmask",
+      amnetworkcard.dnsname                          AS "dnsname",
+      amnetworkcard.dnsalias                         AS "dnsalias",
+      amnetworkcard.type                             AS "type",
+      amnetworkcard.description                      AS "description",
+      amnetworkcard.lcompid                          AS "lcomputerid",
+      amnetworkcard.laccountnoid                     AS "laccountnoid",
+      amnetworkcard.bdelete                          AS "bdelete",
+      amnetworkcard.dtlastmodif                      AS "replkeypri",
+      lpad (amnetworkcard.lnetworkcardid,35,'0')     AS "replkeysec"
+   FROM
+      AM2107.amnetworkcard
+      JOIN ipaddress_acl 
+         ON amnetworkcard.lnetworkcardid=ipaddress_acl.id
+      JOIN AM2107.amcomputer 
+         ON amcomputer.lcomputerid = amnetworkcard.lcompid 
+      JOIN ( SELECT amportfolio.* FROM AM2107.amportfolio
+             WHERE amportfolio.bdelete = 0 ) amportfolio
+         ON amportfolio.lportfolioitemid = amcomputer.litemid;
+
+grant select on ipaddress to public;
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::accountno ---------------------------------
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW accountno_acl AS
+   SELECT DISTINCT amtsiacctno.ltsiacctnoid id
+   from
+      AM2107.amtsiacctno
+      join appl
+         ON amtsiacctno.lapplicationid=appl."id"
+   union
+   SELECT DISTINCT amtsiacctno.ltsiacctnoid "id"
+   from
+      AM2107.amtsiacctno
+      join ipaddress
+         ON amtsiacctno.ltsiacctnoid=ipaddress."laccountnoid";
+
+CREATE or REPLACE VIEW accountno AS
+   SELECT
+      DISTINCT amtsiacctno.ltsiacctnoid              AS "id",
+      amtsiacctno.code                               AS "accnoid",
+      amtsiacctno.accountno                          AS "name",
+      amtsiacctno.ctrlflag                           AS "ctrlflag",
+      amcostcenter.trimmedtitle                      AS "conumber",
+      amtsiacctno.description                        AS "description",
+      amtsiacctno.lapplicationid                     AS "lapplicationid",
+      amtsiacctno.lcostcenterid                      AS "lcostcenterid"
+   FROM
+      AM2107.amtsiacctno 
+      LEFT OUTER JOIN (
+         SELECT amcostcenter.* FROM AM2107.amcostcenter
+         WHERE amcostcenter.bdelete = 0) amcostcenter
+         ON amtsiacctno.lcostcenterid = amcostcenter.lcostid
+      JOIN accountno_acl
+         on amtsiacctno.ltsiacctnoid=accountno_acl."id"
+   WHERE
+      amtsiacctno.bdelete = 0 AND amtsiacctno.ltsiacctnoid <> 0;
+
+grant select on accountno to public;
+
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::lnksharednet ------------------------------
+-- --------------------------------------------------------------------------
+
+-- drop materialized view mview_lnknet;
+CREATE MATERIALIZED VIEW mview_lnknet
+  refresh complete start with sysdate
+  next trunc(sysdate+1)+6/24
+  as
+   SELECT
+      DISTINCT TsiParentChild.ltsiparentchildid      AS "netlnkid",
+      TsiParentChild.description                     AS "description",
+      amtsicustappl.code                             AS "applid",
+      amtsicustappl.name                             AS "applname",
+      systemportfolio.assettag                       AS "systemsystemid",
+      systemportfolio.name                           AS "systemname",
+      netportfolio.assettag                          AS "netsystemid",
+      netportfolio.name                              AS "netname",
+      netpartnernature.name                          AS "netnature",
+      amcomputer.lcomputerid                         AS "lcomputerid"
+   FROM
+      AM2107.amcomputer
+      JOIN AM2107.amportfolio systemportfolio 
+         ON ( amcomputer.litemid = systemportfolio.lportfolioitemid
+              AND systemportfolio.bdelete = '0')
+      JOIN (
+         SELECT
+            amTsiParentChild.ltsiparentchildid,
+            amTsiParentChild.lparentid a,
+            amTsiParentChild.lchildid b,
+            amTsiParentChild.description
+         FROM AM2107.amTsiParentChild
+         WHERE externalsystem = 'Autodiscovery'
+         UNION ALL
+         SELECT
+            amTsiParentChild.ltsiparentchildid,
+            amTsiParentChild.lchildid a,
+            amTsiParentChild.lparentid b,
+            amTsiParentChild.description
+         FROM AM2107.amTsiParentChild
+         WHERE externalsystem = 'Autodiscovery'
+      ) TsiParentChild 
+         ON systemportfolio.lportfolioitemid = TsiParentChild.a
+      JOIN AM2107.amportfolio netportfolio 
+         ON ( TsiParentChild.b = netportfolio.lportfolioitemid
+              AND netportfolio.bdelete = '0')
+      JOIN AM2107.amcomputer netcomputer 
+         ON ( netcomputer.litemid = netportfolio.lportfolioitemid
+         AND netcomputer.status <> 'out of operation')
+      JOIN AM2107.amportfolio netpartnerportfolio 
+         ON netportfolio.lparentid = netpartnerportfolio.lportfolioitemid
+      JOIN AM2107.ammodel netpartnermodel 
+         ON netpartnerportfolio.lmodelid = netpartnermodel.lmodelid
+      JOIN AM2107.amnature netpartnernature 
+         ON netpartnermodel.lnatureid = netpartnernature.lnatureid
+      LEFT OUTER JOIN AM2107.amtsirelportfappl 
+         ON ( systemportfolio.lportfolioitemid = amtsirelportfappl.lportfolioid
+              AND amtsirelportfappl.bdelete = '0')
+      LEFT OUTER JOIN AM2107.amtsicustappl 
+         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid;
+
+CREATE INDEX mview_lnknet_i0
+   ON mview_lnknet ("netlnkid") online;
+CREATE INDEX mview_lnknet_i1
+   ON mview_lnknet ("lcomputerid") online;
+CREATE INDEX mview_lnknet_i2
+   ON mview_lnknet ("systemsystemid") online;
+CREATE INDEX mview_lnknet_i3
+   ON mview_lnknet ("applid") online;
+CREATE INDEX mview_lnknet_i4
+   ON mview_lnknet ("netsystemid") online;
+
+
+CREATE or REPLACE VIEW lnksharednet AS
+   select * 
+   from system_acl_level0
+      join mview_lnknet 
+         on system_acl_level0.id=mview_lnknet."systemsystemid"
+   where "netnature" is not null 
+      and "netnature" not in ('SERVER','TERMINAL-SERVER');
+   
+
+
+
+---
+---
+---  TTOODDOO:  Zugriff auf Shared-Resources !!!
+---
+---
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::lnksharedstorage --------------------------
+-- --------------------------------------------------------------------------
+
+-- drop materialized view mview_lnksharedstorage;
+CREATE MATERIALIZED VIEW mview_lnksharedstorage
+  refresh complete start with sysdate
+  next trunc(sysdate+1)+6/24
+  AS
+   SELECT
+      DISTINCT storageportfolio.assettag             AS "storageassetid",
+      storageportfolio.name                          AS "storagename",
+      amtsiprovsto.lprovidedstorageid                AS "storageid",
+      amcomputer.lcomputerid                         AS "lcomputerid",
+      systemportfolio.assettag                       AS "systemsystemid",
+      systemportfolio.name                           AS "systemname",
+      amtsicustappl.code                             AS "applid",
+      amtsicustappl.name                             AS "applname"
+   FROM AM2107.amtsiprovsto
+      JOIN AM2107.amportfolio storageportfolio
+         ON amtsiprovsto.lassetid = storageportfolio.lastid
+      JOIN AM2107.amtsiprovstomounts
+         ON amtsiprovsto.lprovidedstorageid=
+            amtsiprovstomounts.lprovidedstorageid
+      JOIN AM2107.amcomputer
+         ON amtsiprovstomounts.lcomputerid = amcomputer.lcomputerid
+      JOIN AM2107.amportfolio systemportfolio
+         ON amcomputer.litemid = systemportfolio.lportfolioitemid
+      JOIN AM2107.amtsirelportfappl
+         ON systemportfolio.lportfolioitemid = amtsirelportfappl.lportfolioid
+      JOIN AM2107.amtsicustappl
+         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
+   WHERE amtsiprovsto.bdelete = '0'
+      AND amtsiprovstomounts.bdelete = '0'
+      AND amtsirelportfappl.bdelete = 0;
+
+CREATE INDEX mview_lnksharedstorage_i0
+   ON mview_lnksharedstorage ("storageassetid") online;
+CREATE INDEX mview_lnksharedstorage_i1
+   ON mview_lnksharedstorage ("lcomputerid") online;
+CREATE INDEX mview_lnksharedstorage_i2
+   ON mview_lnksharedstorage ("systemsystemid") online;
+CREATE INDEX mview_lnksharedstorage_i3
+   ON mview_lnksharedstorage ("applid") online;
+
+
+
+CREATE or REPLACE VIEW lnksharedstorage_acl AS
+   SELECT DISTINCT "storageassetid" id
+   FROM mview_lnksharedstorage
+      JOIN system 
+         ON mview_lnksharedstorage."lcomputerid"=system."lcomputerid";
+
+CREATE or REPLACE VIEW lnksharedstorage AS
+   SELECT mview_lnksharedstorage.*
+   FROM mview_lnksharedstorage
+   JOIN lnksharedstorage_acl
+      ON lnksharedstorage_acl.id=mview_lnksharedstorage."storageassetid";
+
+grant select on lnksharedstorage to public;
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::system ------------------------------------
+-- --------------------------------------------------------------------------
+CREATE or REPLACE VIEW system_acl AS
+   select distinct * from (
+      select amportfolio.assettag id
+      from AM2107.amportfolio,system_acl_level0
+      where amportfolio.assettag=system_acl_level0.id
+      union 
+      select amportfolio.assettag id
+      from AM2107.amportfolio,lnksharednet
+      where amportfolio.assettag=lnksharednet."netsystemid"
+   )
+-- test: DEMD1XCP0002 (S20148097)  QDE8HV (S21938047)
 
 
 CREATE or REPLACE VIEW system AS
@@ -332,231 +589,29 @@ grant select on system to public;
 
 
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::ipaddress ---------------------------------
+-- --------------------- tsacinv::group ------------------------------------
 -- --------------------------------------------------------------------------
+CREATE VIEW grp_acl AS
+   select DISTINCT amemplgroup.barcode id
+   from AM2107.amemplgroup
+   where amemplgroup.lgroupid <> 0
+   
 
-CREATE or REPLACE VIEW ipaddress_acl AS
+CREATE VIEW grp AS
    SELECT
-      DISTINCT amnetworkcard.lnetworkcardid          AS "id"
-   FROM AM2107.amnetworkcard
-   JOIN system on system."lcomputerid"=amnetworkcard.lcompid;
+      DISTINCT amemplgroup.barcode                   AS "code",
+      amemplgroup.lgroupid                           AS "lgroupid",
+      amemplgroup.name                               AS "name",
+      amemplgroup.name                               AS "fullname",
+      amemplgroup.bdelete                            AS "deleted",
+      amemplgroup.phone                              AS "phone",
+      amemplgroup.lparentid                          AS "parentid",
+      amemplgroup.lsupervid                          AS "supervid",
+      amemplgroup.lscgroupid                         AS "scgoupid",
+      amemplgroup.externalsystem                     AS "srcsys",
+      amemplgroup.externalid                         AS "srcid",
+      amemplgroup.dtlastmodif                        AS "mdate"
+   FROM AM2107.amemplgroup
+      JOIN group_acl
+         ON amemplgroup.barcode=group_acl.id
 
-
-CREATE VIEW ipaddress AS
-   SELECT
-      DISTINCT amnetworkcard.lnetworkcardid          AS "id",
-      amnetworkcard.tcpipaddress || 
-         decode ( amnetworkcard.tcpipaddress,
-         NULL, '', decode ( amnetworkcard.ipv6address,
-            NULL, '', ', '))
-         || amnetworkcard.ipv6address                AS "ipaddress",
-      amnetworkcard.tcpipaddress                     AS "ipv4address",
-      amnetworkcard.ipv6address                      AS "ipv6address",
-      amportfolio.assettag                           AS "systemid",
-      amportfolio.name                               AS "systemname",
-      amnetworkcard.status                           AS "status",
-      amnetworkcard.code                             AS "code",
-      amnetworkcard.subnetmask                       AS "netmask",
-      amnetworkcard.dnsname                          AS "dnsname",
-      amnetworkcard.dnsalias                         AS "dnsalias",
-      amnetworkcard.type                             AS "type",
-      amnetworkcard.description                      AS "description",
-      amnetworkcard.lcompid                          AS "lcomputerid",
-      amnetworkcard.laccountnoid                     AS "laccountnoid",
-      amnetworkcard.bdelete                          AS "bdelete",
-      amnetworkcard.dtlastmodif                      AS "replkeypri",
-      lpad (amnetworkcard.lnetworkcardid,35,'0')     AS "replkeysec"
-   FROM
-      AM2107.amnetworkcard
-      JOIN ipaddress_acl 
-         ON amnetworkcard.lnetworkcardid=ipaddress_acl."id"
-      JOIN AM2107.amcomputer 
-         ON amcomputer.lcomputerid = amnetworkcard.lcompid 
-      JOIN ( SELECT amportfolio.* FROM AM2107.amportfolio
-             WHERE amportfolio.bdelete = 0 ) amportfolio
-         ON amportfolio.lportfolioitemid = amcomputer.litemid;
-
-grant select on ipaddress to public;
-
-
--- --------------------------------------------------------------------------
--- --------------------- tsacinv::accountno ---------------------------------
--- --------------------------------------------------------------------------
-
-CREATE or REPLACE VIEW accountno_acl AS
-   SELECT DISTINCT amtsiacctno.ltsiacctnoid "id"
-   from
-      AM2107.amtsiacctno
-      join appl
-         ON amtsiacctno.lapplicationid=appl."id"
-   union
-   SELECT DISTINCT amtsiacctno.ltsiacctnoid "id"
-   from
-      AM2107.amtsiacctno
-      join ipaddress
-         ON amtsiacctno.ltsiacctnoid=ipaddress."laccountnoid";
-
-CREATE or REPLACE VIEW accountno AS
-   SELECT
-      DISTINCT amtsiacctno.ltsiacctnoid              AS "id",
-      amtsiacctno.code                               AS "accnoid",
-      amtsiacctno.accountno                          AS "name",
-      amtsiacctno.ctrlflag                           AS "ctrlflag",
-      amcostcenter.trimmedtitle                      AS "conumber",
-      amtsiacctno.description                        AS "description",
-      amtsiacctno.lapplicationid                     AS "lapplicationid",
-      amtsiacctno.lcostcenterid                      AS "lcostcenterid"
-   FROM
-      AM2107.amtsiacctno 
-      LEFT OUTER JOIN (
-         SELECT amcostcenter.* FROM AM2107.amcostcenter
-         WHERE amcostcenter.bdelete = 0) amcostcenter
-         ON amtsiacctno.lcostcenterid = amcostcenter.lcostid
-      JOIN accountno_acl
-         on amtsiacctno.ltsiacctnoid=accountno_acl."id"
-   WHERE
-      amtsiacctno.bdelete = 0 AND amtsiacctno.ltsiacctnoid <> 0;
-
-grant select on accountno to public;
-
-
-
-
--- --------------------------------------------------------------------------
--- --------------------- tsacinv::lnksharednet ------------------------------
--- --------------------------------------------------------------------------
-
--- drop materialized view mview_lnksharednet
-CREATE MATERIALIZED VIEW mview_lnksharednet
-  refresh complete start with sysdate
-  next trunc(sysdate+1)+6/24
-  as
-   SELECT
-      DISTINCT TsiParentChild.ltsiparentchildid      AS "netlnkid",
-      TsiParentChild.description                     AS "description",
-      amtsicustappl.code                             AS "applid",
-      amtsicustappl.name                             AS "applname",
-      systemportfolio.assettag                       AS "systemsystemid",
-      systemportfolio.name                           AS "systemname",
-      netportfolio.assettag                          AS "netsystemid",
-      netportfolio.name                              AS "netname",
-      netpartnernature.name                          AS "netnature",
-      amcomputer.lcomputerid                         AS "lcomputerid"
-   FROM
-      AM2107.amcomputer
-      JOIN AM2107.amportfolio systemportfolio 
-         ON ( amcomputer.litemid = systemportfolio.lportfolioitemid
-              AND systemportfolio.bdelete = '0')
-      JOIN (
-         SELECT
-            amTsiParentChild.ltsiparentchildid,
-            amTsiParentChild.lparentid a,
-            amTsiParentChild.lchildid b,
-            amTsiParentChild.description
-         FROM AM2107.amTsiParentChild
-         WHERE externalsystem = 'Autodiscovery'
-         UNION ALL
-         SELECT
-            amTsiParentChild.ltsiparentchildid,
-            amTsiParentChild.lchildid a,
-            amTsiParentChild.lparentid b,
-            amTsiParentChild.description
-         FROM AM2107.amTsiParentChild
-         WHERE externalsystem = 'Autodiscovery'
-      ) TsiParentChild 
-         ON systemportfolio.lportfolioitemid = TsiParentChild.a
-      JOIN AM2107.amportfolio netportfolio 
-         ON ( TsiParentChild.b = netportfolio.lportfolioitemid
-              AND netportfolio.bdelete = '0')
-      JOIN AM2107.amcomputer netcomputer 
-         ON ( netcomputer.litemid = netportfolio.lportfolioitemid
-         AND netcomputer.status <> 'out of operation')
-      JOIN AM2107.amportfolio netpartnerportfolio 
-         ON netportfolio.lparentid = netpartnerportfolio.lportfolioitemid
-      JOIN AM2107.ammodel netpartnermodel 
-         ON netpartnerportfolio.lmodelid = netpartnermodel.lmodelid
-      JOIN AM2107.amnature netpartnernature 
-         ON netpartnermodel.lnatureid = netpartnernature.lnatureid
-      LEFT OUTER JOIN AM2107.amtsirelportfappl 
-         ON ( systemportfolio.lportfolioitemid = amtsirelportfappl.lportfolioid
-              AND amtsirelportfappl.bdelete = '0')
-      LEFT OUTER JOIN AM2107.amtsicustappl 
-         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid;
-
-CREATE INDEX mview_lnksharednet_i0
-   ON mview_lnksharednet ("netlnkid") online;
-CREATE INDEX mview_lnksharednet_i1
-   ON mview_lnksharednet ("lcomputerid") online;
-CREATE INDEX mview_lnksharednet_i2
-   ON mview_lnksharednet ("systemsystemid") online;
-CREATE INDEX mview_lnksharednet_i3
-   ON mview_lnksharednet ("applid") online;
-
-
-
----
----
----  TTOODDOO:  Zugriff auf Shared-Resources !!!
----
----
-
--- --------------------------------------------------------------------------
--- --------------------- tsacinv::lnksharedstorage --------------------------
--- --------------------------------------------------------------------------
-
--- drop materialized view mview_lnksharedstorage
-CREATE MATERIALIZED VIEW mview_lnksharedstorage
-  refresh complete start with sysdate
-  next trunc(sysdate+1)+6/24
-  AS
-   SELECT
-      DISTINCT storageportfolio.assettag             AS "storageassetid",
-      storageportfolio.name                          AS "storagename",
-      amtsiprovsto.lprovidedstorageid                AS "storageid",
-      amcomputer.lcomputerid                         AS "lcomputerid",
-      systemportfolio.assettag                       AS "systemsystemid",
-      systemportfolio.name                           AS "systemname",
-      amtsicustappl.code                             AS "applid",
-      amtsicustappl.name                             AS "applname"
-   FROM AM2107.amtsiprovsto
-      JOIN AM2107.amportfolio storageportfolio
-         ON amtsiprovsto.lassetid = storageportfolio.lastid
-      JOIN AM2107.amtsiprovstomounts
-         ON amtsiprovsto.lprovidedstorageid=
-            amtsiprovstomounts.lprovidedstorageid
-      JOIN AM2107.amcomputer
-         ON amtsiprovstomounts.lcomputerid = amcomputer.lcomputerid
-      JOIN AM2107.amportfolio systemportfolio
-         ON amcomputer.litemid = systemportfolio.lportfolioitemid
-      JOIN AM2107.amtsirelportfappl
-         ON systemportfolio.lportfolioitemid = amtsirelportfappl.lportfolioid
-      JOIN AM2107.amtsicustappl
-         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
-   WHERE amtsiprovsto.bdelete = '0'
-      AND amtsiprovstomounts.bdelete = '0'
-      AND amtsirelportfappl.bdelete = 0;
-
-CREATE INDEX mview_lnksharedstorage_i0
-   ON mview_lnksharedstorage ("storageassetid") online;
-CREATE INDEX mview_lnksharedstorage_i1
-   ON mview_lnksharedstorage ("lcomputerid") online;
-CREATE INDEX mview_lnksharedstorage_i2
-   ON mview_lnksharedstorage ("systemsystemid") online;
-CREATE INDEX mview_lnksharedstorage_i3
-   ON mview_lnksharedstorage ("applid") online;
-
-
-
-CREATE or REPLACE VIEW lnksharedstorage_acl AS
-   SELECT DISTINCT "storageassetid" "id"
-   FROM mview_lnksharedstorage
-      JOIN system 
-         ON mview_lnksharedstorage."lcomputerid"=system."lcomputerid";
-
-CREATE or REPLACE VIEW lnksharedstorage AS
-   SELECT mview_lnksharedstorage.*
-   FROM mview_lnksharedstorage
-   JOIN lnksharedstorage_acl
-      ON lnksharedstorage_acl."id"=mview_lnksharedstorage."storageassetid";
-
-grant select on lnksharedstorage to public;
