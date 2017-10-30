@@ -101,6 +101,7 @@ CREATE or REPLACE view appl as
       amtsicustappl.ltsicustapplid                   "id",
       amtsicustappl.name                             "name",
       LOWER ( amtsicustappl.status)                  "status",
+      '0'                                            "deleted",
       amtsicustappl.usage                            "usage",
       amtsicustappl.businessimpact                   "criticality",
       amtsicustappl.priority                         "customerprio",
@@ -250,16 +251,16 @@ grant select on ipaddress to public;
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW accountno_acl AS
-   SELECT DISTINCT amtsiacctno.ltsiacctnoid id
-   from
+   SELECT amtsiacctno.ltsiacctnoid id
+   FROM
       AM2107.amtsiacctno
       join appl
          ON amtsiacctno.lapplicationid=appl."id"
-   union
-   SELECT DISTINCT amtsiacctno.ltsiacctnoid "id"
-   from
+   UNION
+   SELECT amtsiacctno.ltsiacctnoid "id"
+   FROM
       AM2107.amtsiacctno
-      join ipaddress
+      JOIN ipaddress
          ON amtsiacctno.ltsiacctnoid=ipaddress."laccountnoid";
 
 CREATE or REPLACE VIEW accountno AS
@@ -462,6 +463,7 @@ CREATE or REPLACE VIEW system AS
       amportfolio.name                               AS "systemname",
       amportfolio.assettag                           AS "systemid",
       LOWER ( amcomputer.status)                     AS "status",
+      assetportfolio.bdelete                         AS "deleted",
       amcostcenter.trimmedtitle                      AS "conumber",
       amcostcenter.customerlink                      AS "customerlink",
       amcostcenter.lcostid                           AS "lcostcenterid",
@@ -582,8 +584,7 @@ CREATE or REPLACE VIEW system AS
          ON amcomputer.lcommentid = amcomment.lcommentid
       LEFT OUTER JOIN AM2107.amtsiautodiscovery 
          ON amportfolio.assettag = amtsiautodiscovery.assettag
-   WHERE amcomputer.bgroup = 0 
-      AND assetportfolio.bdelete != 1 AND ammodel.name = 'LOGICAL SYSTEM';
+   WHERE amcomputer.bgroup = 0 AND ammodel.name = 'LOGICAL SYSTEM';
 
 grant select on system to public;
 
@@ -649,3 +650,37 @@ FROM AM2107.amempldept
 
 grant select on usr to public;
 
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::lnkapplappl ------------------------------
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW lnkapplappl_acl AS
+   select distinct amtsirelappl.lrelapplid id
+   FROM AM2107.amtsirelappl
+      JOIN appl
+         ON amtsirelappl.lparentid=appl."id"
+
+
+CREATE VIEW lnkapplappl AS
+SELECT
+   amtsirelappl.lrelapplid                        AS "id",
+   amtsicustappl.name                             AS "child",
+   amtsicustappl.code                             AS "child_applid",
+   amtsirelappl.type                              AS "type",
+   amtsirelappl.lparentid                         AS "lparentid",
+   amtsirelappl.lchildid                          AS "lchildid",
+   amtsirelappl.bdelete                           AS "bdelete",
+   amtsirelappl.dtlastmodif                       AS "mdate",
+   amtsirelappl.externalsystem                    AS "srcsys",
+   amtsirelappl.externalid                        AS "srcid",
+   amtsirelappl.dtlastmodif                       AS "replkeypri",
+   lpad ( amtsirelappl.lrelapplid, 35, '0')       AS "replkeysec"
+FROM AM2107.amtsirelappl
+   JOIN lnkapplappl_acl
+      ON lnkapplappl_acl.id=amtsirelappl.lrelapplid
+   JOIN AM2107.amtsicustappl
+      ON amtsirelappl.lchildid = amtsicustappl.ltsicustapplid
+
+grant select on lnkapplappl to public;

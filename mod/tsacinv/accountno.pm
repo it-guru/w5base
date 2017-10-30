@@ -39,25 +39,25 @@ sub new
                 name          =>'id',
                 label         =>'RecordID',
                 align         =>'left',
-                dataobjattr   =>'amtsiacctno.ltsiacctnoid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'accnoid',
                 label         =>'Account Number ID',
                 ignorecase    =>1,
-                dataobjattr   =>'amtsiacctno.code'),
+                dataobjattr   =>'"accnoid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Account Number',
                 ignorecase    =>1,
-                dataobjattr   =>'amtsiacctno.accountno'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'ctrlflag',
                 label         =>'Control Flag',
                 ignorecase    =>1,
-                dataobjattr   =>'amtsiacctno.ctrlflag'),
+                dataobjattr   =>'"ctrlflag"'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
@@ -65,13 +65,13 @@ sub new
                 size          =>'15',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostcenterid'=>'id'],
-                dataobjattr   =>'amcostcenter.trimmedtitle'),
+                dataobjattr   =>'"conumber"'),
 
 
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Comments',
-                dataobjattr   =>'amtsiacctno.description'),
+                dataobjattr   =>'"description"'),
 
       new kernel::Field::TextDrop(
                 name          =>'appl',
@@ -92,15 +92,17 @@ sub new
       new kernel::Field::Link(
                 name          =>'lapplicationid',
                 label         =>'Application Link',
-                dataobjattr   =>'amtsiacctno.lapplicationid'),
+                dataobjattr   =>'"lapplicationid"'),
 
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenter Link',
-                dataobjattr   =>'amtsiacctno.lcostcenterid'),
+                dataobjattr   =>'"lcostcenterid"'),
 
    );
    $self->setDefaultView(qw(id accnoid name conumber ctrlflag));
+   $self->setWorktable("accountno");
+
    return($self);
 }
 
@@ -122,24 +124,6 @@ sub getRecordImageUrl
 }
          
 
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsiacctno,".
-      "(select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amtsiacctno.bdelete=0 and amtsiacctno.ltsiacctnoid<>0 ".
-             "and amtsiacctno.lcostcenterid=amcostcenter.lcostid(+) ";
-
-   return($where);
-}
 
 sub isViewValid
 {

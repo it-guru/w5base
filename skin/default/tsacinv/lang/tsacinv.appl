@@ -37,3 +37,4 @@
 'direct connected Shared-Network Components'=>{de=>'direkt verbundene Shared-Netzwerk Komponenten'},
 'is TBSM on one of systems ordered'=>{de=>'TBSM wurde für eines der Systeme beauftragt'},
 'full CI-Name'=>{de=>'vollständiger CI-Name'},
+'marked as delete'=>{de=>'gelöscht markiert'},

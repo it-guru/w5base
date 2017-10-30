@@ -68,18 +68,12 @@ sub new
                 label         =>'Status',
                 dataobjattr   =>'"status"'),
                                     
-#      new kernel::Field::Text(
-#                name          =>'tenant',
-#                label         =>'Tenant',
-#                group         =>'source',
-#                dataobjattr   =>"amtenant.code"),
-#                                    
-#      new kernel::Field::Interface(
-#                name          =>'tenantid',
-#                label         =>'Tenant ID',
-#                group         =>'source',
-#                dataobjattr   =>'amtenant.ltenantid'),
-                                    
+      new kernel::Field::Boolean(
+                name          =>'deleted',
+                readonly      =>1,
+                label         =>'marked as delete',
+                dataobjattr   =>'"deleted"'),
+
       new kernel::Field::Text(
                 name          =>'usage',
                 label         =>'Usage',
@@ -482,9 +476,10 @@ sub Initialize
 sub initSearchQuery
 {
    my $self=shift;
-  # if (!defined(Query->Param("search_tenant"))){
-  #   Query->Param("search_tenant"=>"CS");
-  # }
+
+   if (!defined(Query->Param("search_deleted"))){
+     Query->Param("search_deleted"=>$self->T("no"));
+   }
 }
 
 
