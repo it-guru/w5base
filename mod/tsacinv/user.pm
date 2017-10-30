@@ -41,7 +41,7 @@ sub new
                 name          =>'lempldeptid',
                 label         =>'UserID',
                 searchable    =>0,
-                dataobjattr   =>'amempldept.lempldeptid'),
+                dataobjattr   =>'"lempldeptid"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -56,73 +56,73 @@ sub new
                 label         =>'AC-Internal Fullname',
                 htmlwidth     =>'250',
                 ignorecase    =>1,
-                dataobjattr   =>'amempldept.fullname'),
+                dataobjattr   =>'"acfullname"'),
 
       new kernel::Field::Boolean(
                 name          =>'deleted',
                 htmldetail    =>0,
                 label         =>'marked as delete',
-                dataobjattr   =>'amempldept.bdelete'),
+                dataobjattr   =>'"deleted"'),
 
       new kernel::Field::Text(
                 name          =>'loginname',
                 label         =>'User-Login',
                 lowersearch   =>1,
-                dataobjattr   =>'amempldept.userlogin'),
+                dataobjattr   =>'"loginname"'),
 
       new kernel::Field::Text(
                 name          =>'contactid',
                 label         =>'ContactID',
                 lowersearch   =>1,
-                dataobjattr   =>'amempldept.contactid'),
+                dataobjattr   =>'"contactid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'amempldept.name'),
+                dataobjattr   =>'"name"'),
 
-      new kernel::Field::Text(
-                name          =>'tenant',
-                label         =>'Tenant',
-                group         =>'source',
-                dataobjattr   =>'amtenant.code'),
-
-      new kernel::Field::Interface(
-                name          =>'tenantid',
-                label         =>'Tenant ID',
-                group         =>'source',
-                dataobjattr   =>'amtenant.ltenantid'),
+#      new kernel::Field::Text(
+#                name          =>'tenant',
+#                label         =>'Tenant',
+#                group         =>'source',
+#                dataobjattr   =>'"tenant"'),
+#
+#      new kernel::Field::Interface(
+#                name          =>'tenantid',
+#                label         =>'Tenant ID',
+#                group         =>'source',
+#                dataobjattr   =>'"tenantid"'),
 
       new kernel::Field::Text(
                 name          =>'firstname',
                 label         =>'Firstname',
                 ignorecase    =>1,
-                dataobjattr   =>'amempldept.firstname'),
+                dataobjattr   =>'"firstname"'),
 
       new kernel::Field::Text(
                 name          =>'surname',
                 label         =>'Surname',
                 ignorecase    =>1,
-                dataobjattr   =>'amempldept.name'),
+                dataobjattr   =>'"surname"'),
 
       new kernel::Field::Text(
                 name          =>'givenname',
                 label         =>'Givenname',
                 ignorecase    =>1,
-                dataobjattr   =>'amempldept.firstname'),
+                dataobjattr   =>'"givenname"'),
 
       new kernel::Field::Text(
                 name          =>'email',
                 label         =>'E-Mail',
                 lowersearch   =>1,
-                dataobjattr   =>'amempldept.email'),
+                dataobjattr   =>'"email"'),
 
       new kernel::Field::Text(
                 name          =>'ldapid',
                 label         =>'LDAPID',
                 lowersearch   =>1,
-                dataobjattr   =>'amempldept.ldapid'),
+                dataobjattr   =>'"ldapid"'),
 
       new kernel::Field::SubList(
                 name          =>'groups',
@@ -136,27 +136,29 @@ sub new
                 label         =>'WEB-Password',
                 group         =>'sec',
                 lowersearch   =>1,
-                dataobjattr   =>'amempldept.webpassword'),
+                dataobjattr   =>'"webpassword"'),
 
       new kernel::Field::Text(
                 name          =>'idno',
                 label         =>'IDNo',
-                dataobjattr   =>'amempldept.idno'),
+                dataobjattr   =>'"idno"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amempldept.externalsystem'),
+                dataobjattr   =>'"srcsys"'),
                                                 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'amempldept.externalid'),
+                dataobjattr   =>'"srcid"'),
                                                    
    );
    $self->setDefaultView(qw(lempldeptid fullname name ldapid idno srcsys srcid));
+   $self->setWorktable("usr");
+
    return($self);
 }
 
@@ -205,22 +207,6 @@ sub getRecordImageUrl
 }
          
 
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amempldept,amtenant";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amempldept.lempldeptid<>0 ".
-             "and amempldept.ltenantid=amtenant.ltenantid ";
-
-   return($where);
-}
-
 sub isViewValid
 {
    my $self=shift;
@@ -243,9 +229,9 @@ sub initSearchQuery
    if (!defined(Query->Param("search_deleted"))){
      Query->Param("search_deleted"=>$self->T("no"));
    }
-   if (!defined(Query->Param("search_tenant"))){
-     Query->Param("search_tenant"=>"CS");
-   }
+  # if (!defined(Query->Param("search_tenant"))){
+  #   Query->Param("search_tenant"=>"CS");
+  # }
 }
 
 

@@ -615,3 +615,37 @@ CREATE VIEW grp AS
       JOIN group_acl
          ON amemplgroup.barcode=group_acl.id
 
+grant select on grp to public;
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::group ------------------------------------
+-- --------------------------------------------------------------------------
+CREATE or REPLACE VIEW usr_acl AS
+   select distinct amempldept.lempldeptid id
+   FROM AM2107.amempldept
+   where amempldept.lempldeptid<>0;
+
+CREATE or REPLACE VIEW usr AS
+SELECT
+   DISTINCT amempldept.lempldeptid                AS "lempldeptid",
+   amempldept.fullname                            AS "acfullname",
+   amempldept.bdelete                             AS "deleted",
+   amempldept.userlogin                           AS "loginname",
+   amempldept.contactid                           AS "contactid",
+   amempldept.name                                AS "name",
+   amempldept.firstname                           AS "firstname",
+   amempldept.name                                AS "surname",
+   amempldept.firstname                           AS "givenname",
+   amempldept.email                               AS "email",
+   amempldept.ldapid                              AS "ldapid",
+   amempldept.webpassword                         AS "webpassword",
+   amempldept.idno                                AS "idno",
+   amempldept.externalsystem                      AS "srcsys",
+   amempldept.externalid                          AS "srcid"
+FROM AM2107.amempldept
+   JOIN usr_acl 
+      on amempldept.lempldeptid=usr_acl.id;
+
+grant select on usr to public;
+
