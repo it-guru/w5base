@@ -44,3 +44,5 @@
 'Acquisition Start'=>{de=>'Aufnahmedatum'},
 'Acquisition Mode'=>{de=>'Beschaffungsart'},
 'full CI-Name'=>{de=>'vollständiger CI-Name'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+

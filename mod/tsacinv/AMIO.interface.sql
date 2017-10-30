@@ -96,8 +96,8 @@ CREATE or REPLACE view appl_acl as
 CREATE or REPLACE view appl as
    SELECT 
       amtsicustappl.code                             "applid",
-      concat(concat(concat(amtsicustappl.name,' ('),amtsicustappl.code),')')
-                                                     "fullname",
+      concat(concat(concat(amtsicustappl.name,' ('),
+      amtsicustappl.code),')')                       "fullname",
       amtsicustappl.ltsicustapplid                   "id",
       amtsicustappl.name                             "name",
       LOWER ( amtsicustappl.status)                  "status",
@@ -593,9 +593,9 @@ grant select on system to public;
 -- --------------------- tsacinv::group ------------------------------------
 -- --------------------------------------------------------------------------
 CREATE VIEW grp_acl AS
-   select DISTINCT amemplgroup.barcode id
-   from AM2107.amemplgroup
-   where amemplgroup.lgroupid <> 0
+   SELECT DISTINCT amemplgroup.barcode id
+   FROM AM2107.amemplgroup
+   WHERE amemplgroup.lgroupid <> 0
    
 
 CREATE VIEW grp AS
@@ -628,25 +628,25 @@ CREATE or REPLACE VIEW usr_acl AS
    where amempldept.lempldeptid<>0;
 
 CREATE or REPLACE VIEW usr AS
-SELECT
-   DISTINCT amempldept.lempldeptid                AS "lempldeptid",
-   amempldept.fullname                            AS "acfullname",
-   amempldept.bdelete                             AS "deleted",
-   amempldept.userlogin                           AS "loginname",
-   amempldept.contactid                           AS "contactid",
-   amempldept.name                                AS "name",
-   amempldept.firstname                           AS "firstname",
-   amempldept.name                                AS "surname",
-   amempldept.firstname                           AS "givenname",
-   amempldept.email                               AS "email",
-   amempldept.ldapid                              AS "ldapid",
-   amempldept.webpassword                         AS "webpassword",
-   amempldept.idno                                AS "idno",
-   amempldept.externalsystem                      AS "srcsys",
-   amempldept.externalid                          AS "srcid"
-FROM AM2107.amempldept
-   JOIN usr_acl 
-      on amempldept.lempldeptid=usr_acl.id;
+   SELECT
+      DISTINCT amempldept.lempldeptid                AS "lempldeptid",
+      amempldept.fullname                            AS "acfullname",
+      amempldept.bdelete                             AS "deleted",
+      amempldept.userlogin                           AS "loginname",
+      amempldept.contactid                           AS "contactid",
+      amempldept.name                                AS "name",
+      amempldept.firstname                           AS "firstname",
+      amempldept.name                                AS "surname",
+      amempldept.firstname                           AS "givenname",
+      amempldept.email                               AS "email",
+      amempldept.ldapid                              AS "ldapid",
+      amempldept.webpassword                         AS "webpassword",
+      amempldept.idno                                AS "idno",
+      amempldept.externalsystem                      AS "srcsys",
+      amempldept.externalid                          AS "srcid"
+   FROM AM2107.amempldept
+      JOIN usr_acl 
+         on amempldept.lempldeptid=usr_acl.id;
 
 grant select on usr to public;
 
@@ -664,24 +664,24 @@ CREATE or REPLACE VIEW lnkapplappl_acl AS
 
 
 CREATE or REPLACE VIEW lnkapplappl AS
-SELECT
-   amtsirelappl.lrelapplid                        AS "id",
-   amtsicustappl.name                             AS "child",
-   amtsicustappl.code                             AS "child_applid",
-   amtsirelappl.type                              AS "type",
-   amtsirelappl.lparentid                         AS "lparentid",
-   amtsirelappl.lchildid                          AS "lchildid",
-   amtsirelappl.bdelete                           AS "deleted",
-   amtsirelappl.dtlastmodif                       AS "mdate",
-   amtsirelappl.externalsystem                    AS "srcsys",
-   amtsirelappl.externalid                        AS "srcid",
-   amtsirelappl.dtlastmodif                       AS "replkeypri",
-   lpad ( amtsirelappl.lrelapplid, 35, '0')       AS "replkeysec"
-FROM AM2107.amtsirelappl
-   JOIN lnkapplappl_acl
-      ON lnkapplappl_acl.id=amtsirelappl.lrelapplid
-   JOIN AM2107.amtsicustappl
-      ON amtsirelappl.lchildid = amtsicustappl.ltsicustapplid;
+   SELECT
+      amtsirelappl.lrelapplid                        AS "id",
+      amtsicustappl.name                             AS "child",
+      amtsicustappl.code                             AS "child_applid",
+      amtsirelappl.type                              AS "type",
+      amtsirelappl.lparentid                         AS "lparentid",
+      amtsirelappl.lchildid                          AS "lchildid",
+      amtsirelappl.bdelete                           AS "deleted",
+      amtsirelappl.dtlastmodif                       AS "mdate",
+      amtsirelappl.externalsystem                    AS "srcsys",
+      amtsirelappl.externalid                        AS "srcid",
+      amtsirelappl.dtlastmodif                       AS "replkeypri",
+      lpad ( amtsirelappl.lrelapplid, 35, '0')       AS "replkeysec"
+   FROM AM2107.amtsirelappl
+      JOIN lnkapplappl_acl
+         ON lnkapplappl_acl.id=amtsirelappl.lrelapplid
+      JOIN AM2107.amtsicustappl
+         ON amtsirelappl.lchildid = amtsicustappl.ltsicustapplid;
 
 grant select on lnkapplappl to public;
 
@@ -700,61 +700,164 @@ CREATE or REPLACE VIEW lnkapplappl_acl AS
 
 
 CREATE or REPLACE VIEW lnkapplsystem AS
-SELECT
-   DISTINCT amtsirelportfappl.lrelportfapplid     AS "id",
-   amtsicustappl.code                             AS "applid",
-   amportfolio.bdelete                            AS "deleted",
-   amtsirelportfappl.bactive                      AS "isactive",
-   amtsicustappl.description                      AS "appldescription",
-   amtsicustappl.usage                            AS "usage",
-   amcostcenter.trimmedtitle                      AS "applconumber",
-   amcostcenter.field1                            AS "applcodescription",
-   amcostcenter.alternatebusinesscenter           AS "altbc",
-   amtsicustappl.lservicecontactid                AS "semid",
-   amtsicustappl.ltechnicalcontactid              AS "tsmid",
-   amtsicustappl.lincidentagid                    AS "lincidentagid",
-   sysamcostcenter.trimmedtitle                   AS "sysconumber",
-   sysamcostcenter.field1                         AS "syscodescription",
-   amportfolio.lassignmentid                      AS "lassignmentid",
-   amcomputer.status                              AS "sysstatus",
-   amcomputer.lcpunumber                          AS "systemcpucount",
-   amcomputer.lcpuspeedmhz                        AS "systemcpuspeed",
-   amcomputer.cputype                             AS "systemcputype",
-   amcomputer.lProcCalcSpeed                      AS "systemtpmc",
-   amcomputer.lmemorysizemb                       AS "systemmemory",
-   amportfolio.name                               AS "child",
-   amportfolio.assettag                           AS "systemid",
-   amcomputer.olaclasssystem                      AS "systemola",
-   amcomputer.status                              AS "systemstatus",
-   amtsirelportfappl.description                  AS "comments",
-   amportfolio.assettag                           AS "lsystemid",
-   amtsirelportfappl.lapplicationid               AS "lparentid",
-   amtsirelportfappl.lportfolioid                 AS "lchildid",
-   amtsirelportfappl.dtlastmodif                  AS "mdate",
-   amtsirelportfappl.externalsystem               AS "srcsys",
-   amtsirelportfappl.externalid                   AS "srcid",
-   amtsirelportfappl.dtimport                     AS "srcload",
-   amtsirelportfappl.dtlastmodif                  AS "replkeypri",
-   lpad(amtsirelportfappl.lrelportfapplid,35,'0') AS "replkeysec"
-FROM AM2107.amtsirelportfappl
-   JOIN lnkapplappl_acl
-      ON amtsirelportfappl.lrelportfapplid=lnkapplappl_acl.id
-   JOIN AM2107.amportfolio
-      ON amtsirelportfappl.lportfolioid = amportfolio.lportfolioitemid
-   JOIN AM2107.amcomputer
-      ON amportfolio.lportfolioitemid = amcomputer.litemid
-   JOIN AM2107.amtsicustappl
-      ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
-   LEFT OUTER JOIN ( SELECT amcostcenter.*
-          FROM AM2107.amcostcenter
-          WHERE amcostcenter.bdelete = 0) amcostcenter
-      ON amtsicustappl.lcostcenterid = amcostcenter.lcostid
-   LEFT OUTER JOIN ( SELECT amcostcenter.*
-          FROM AM2107.amcostcenter
-          WHERE amcostcenter.bdelete = 0) sysamcostcenter
-      ON amportfolio.lcostid = sysamcostcenter.lcostid
-WHERE amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
-   AND amcomputer.status <> 'out of operation';
+   SELECT
+      DISTINCT amtsirelportfappl.lrelportfapplid     AS "id",
+      amtsicustappl.code                             AS "applid",
+      amportfolio.bdelete                            AS "deleted",
+      amtsirelportfappl.bactive                      AS "isactive",
+      amtsicustappl.description                      AS "appldescription",
+      amtsicustappl.usage                            AS "usage",
+      amcostcenter.trimmedtitle                      AS "applconumber",
+      amcostcenter.field1                            AS "applcodescription",
+      amcostcenter.alternatebusinesscenter           AS "altbc",
+      amtsicustappl.lservicecontactid                AS "semid",
+      amtsicustappl.ltechnicalcontactid              AS "tsmid",
+      amtsicustappl.lincidentagid                    AS "lincidentagid",
+      sysamcostcenter.trimmedtitle                   AS "sysconumber",
+      sysamcostcenter.field1                         AS "syscodescription",
+      amportfolio.lassignmentid                      AS "lassignmentid",
+      amcomputer.status                              AS "sysstatus",
+      amcomputer.lcpunumber                          AS "systemcpucount",
+      amcomputer.lcpuspeedmhz                        AS "systemcpuspeed",
+      amcomputer.cputype                             AS "systemcputype",
+      amcomputer.lProcCalcSpeed                      AS "systemtpmc",
+      amcomputer.lmemorysizemb                       AS "systemmemory",
+      amportfolio.name                               AS "child",
+      amportfolio.assettag                           AS "systemid",
+      amcomputer.olaclasssystem                      AS "systemola",
+      amcomputer.status                              AS "systemstatus",
+      amtsirelportfappl.description                  AS "comments",
+      amportfolio.assettag                           AS "lsystemid",
+      amtsirelportfappl.lapplicationid               AS "lparentid",
+      amtsirelportfappl.lportfolioid                 AS "lchildid",
+      amtsirelportfappl.dtlastmodif                  AS "mdate",
+      amtsirelportfappl.externalsystem               AS "srcsys",
+      amtsirelportfappl.externalid                   AS "srcid",
+      amtsirelportfappl.dtimport                     AS "srcload",
+      amtsirelportfappl.dtlastmodif                  AS "replkeypri",
+      lpad(amtsirelportfappl.lrelportfapplid,35,'0') AS "replkeysec"
+   FROM AM2107.amtsirelportfappl
+      JOIN lnkapplappl_acl
+         ON amtsirelportfappl.lrelportfapplid=lnkapplappl_acl.id
+      JOIN AM2107.amportfolio
+         ON amtsirelportfappl.lportfolioid = amportfolio.lportfolioitemid
+      JOIN AM2107.amcomputer
+         ON amportfolio.lportfolioitemid = amcomputer.litemid
+      JOIN AM2107.amtsicustappl
+         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
+      LEFT OUTER JOIN ( SELECT amcostcenter.*
+             FROM AM2107.amcostcenter
+             WHERE amcostcenter.bdelete = 0) amcostcenter
+         ON amtsicustappl.lcostcenterid = amcostcenter.lcostid
+      LEFT OUTER JOIN ( SELECT amcostcenter.*
+             FROM AM2107.amcostcenter
+             WHERE amcostcenter.bdelete = 0) sysamcostcenter
+         ON amportfolio.lcostid = sysamcostcenter.lcostid
+   WHERE amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
+      AND amcomputer.status <> 'out of operation';
 
 grant select on lnkapplsystem to public;
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::osrelease ---------------------------------
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW osrelease_acl AS
+   SELECT DISTINCT amitemlistval.litemlistvalid      AS id
+   FROM AM2107.amitemlistval
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
+CREATE or REPLACE VIEW osrelease AS
+SELECT
+   amitemlistval.litemlistvalid                   AS "id",
+   amitemlistval.value                            AS "name",
+   amitemlistval.dtlastmodif                      AS "mdate",
+   amitemlistval.dtlastmodif                      AS "mdaterev"
+FROM AM2107.amitemizedlist
+   JOIN AM2107.amitemlistval
+      ON amitemizedlist.litemlistid = amitemlistval.litemlistid
+   JOIN osrelease_acl
+      ON amitemlistval.litemlistvalid=osrelease_acl.id
+WHERE amitemizedlist.identifier = 'amOS';
+
+grant select on osrelease to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::asset -------------------------------------
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW asset_acl AS
+   SELECT DISTINCT amportfolio.assettag               id
+      from AM2107.amportfolio
+      JOIN system 
+         on amportfolio.lportfolioitemid = system."lassetid"
+
+CREATE or REPLACE VIEW asset AS
+SELECT
+   DISTINCT assetportfolio.assettag               AS "assetid",
+   LOWER(amasset.status)                          AS "status",
+   assetportfolio.assettag                        AS "fullname",
+   assetportfolio.dtinvent                        AS "install",
+   assetportfolio.lassignmentid                   AS "lassignmentid",
+   amcostcenter.trimmedtitle                      AS "conumber",
+   amcostcenter.lcostid                           AS "lcostcenterid",
+   assetportfolio.room                            AS "room",
+   assetportfolio.place                           AS "place",
+   amasset.cputype                                AS "cputype",
+   decode(amasset.lmemorysizemb, 0, NULL, 
+          amasset.lmemorysizemb)                  AS "memory",
+   decode(amasset.lcpunumber, 0,NULL,
+          amasset.lcpunumber)                     AS "cpucount",
+   decode(amasset.imaxnumberprocessors, 0,NULL,
+          amasset.imaxnumberprocessors)           AS "cpumaxsup",
+   decode(amasset.lcpuspeedmhz,0,NULL,
+          amasset.lcpuspeedmhz)                   AS "cpuspeed",
+   decode(amasset.itotalnumberofcores,0,NULL,
+          amasset.itotalnumberofcores)            AS "corecount",
+   amasset.serialno                               AS "serialno",
+   amasset.inventoryno                            AS "inventoryno",
+   amasset.lmaintlevelid                          AS "maintlevelid",
+   amasset.seAcquModeTsi                          AS "acqumode",
+   amasset.dstartacqu                             AS "startacquisition",
+   amasset.mdeprcalc                              AS "mdepr",
+   amasset.mmaintrate                             AS "mmaint",
+   amasset.maintcond                              AS "maitcond",
+   assetportfolio.llocaid                         AS "locationid",
+   assetportfolio.lportfolioitemid                AS "lassetid",
+   amasset.lastid                                 AS "lassetassetid",
+   assetportfolio.lmodelid                        AS "lmodelid",
+   assetportfolio.dtlastmodif                     AS "replkeypri",
+   lpad(assetportfolio.assettag,35,'0')           AS "replkeysec",
+   assetportfolio.bdelete                         AS "deleted",
+   assetportfolio.dtcreation                      AS "cdate",
+   assetportfolio.dtlastmodif                     AS "mdate",
+   assetportfolio.externalsystem                  AS "srcsys",
+   assetportfolio.externalid                      AS "srcid"
+FROM AM2107.amasset
+   JOIN AM2107.amportfolio assetportfolio
+      ON assetportfolio.assettag = amasset.assettag
+   JOIN asset_acl
+      ON assetportfolio.assettag=asset_acl.id
+   JOIN AM2107.ammodel
+      ON assetportfolio.lmodelid = ammodel.lmodelid
+   LEFT OUTER JOIN AM2107.amlocation
+      ON assetportfolio.llocaid = amlocation.llocaid
+   LEFT OUTER JOIN ( SELECT amcostcenter.*
+         FROM AM2107.amcostcenter
+         WHERE amcostcenter.bdelete = 0) amcostcenter
+      ON amasset.lsendercostcenterid = amcostcenter.lcostid 
+   LEFT OUTER JOIN AM2107.amnature
+      ON ammodel.lnatureid = amnature.lnatureid
+WHERE ammodel.name NOT IN ('LOGICAL SYSTEM','CLUSTER','DB-INSTANCE');
+
+grant select on asset to public;
+
+
+
+
+
 
