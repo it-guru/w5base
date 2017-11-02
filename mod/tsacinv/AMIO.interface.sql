@@ -1,51 +1,4 @@
 -- --------------------------------------------------------------------------
--- ---------- Pruefsystem, ob alle notwendigen Tabellen erreichbar ----------
--- --------------------------------------------------------------------------
-
--- drop table "IFACE_REQ_OBJECTS";
-create table "IFACE_REQ_OBJECTS" (
-   owner        varchar2(33) not null,
-   object_name   varchar2(33) not null,
-   constraint "IFACE_REQ_OBJECTS_pk" primary key (owner,table_name)
-);
-
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSICUSTAPPL');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMCOSTCENTER');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMEMPLGROUP');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSISERVICE');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSISERVICETYPE');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSIRELPORTFAPPL');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMPORTFOLIO');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMCOMMENT');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTENANT');
-
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMCOMPUTER');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMMODEL');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMNATURE');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSIACCSECUNIT');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSIAUTODISCOVERY');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSIRELPORTFAPPL');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSISERVICE');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMTSISERVICETYPE');
-insert into "IFACE_REQ_OBJECTS" values('AM2107','AMNETWORKCARD');
-
-
-create or replace view "IFACE_MISS_OBJECTS" as
-select "IFACE_REQ_OBJECTS".owner,"IFACE_REQ_OBJECTS".object_name
-from "IFACE_REQ_OBJECTS"
-   left outer join ALL_OBJECTS
-      on "IFACE_REQ_OBJECTS".owner=ALL_OBJECTS.owner and
-         "IFACE_REQ_OBJECTS".object_name=ALL_OBJECTS.object_name
-where ALL_OBJECTS.object_name is null;
-
-
-select 'grant select on "'||owner||'"."'||object_name||
-                        '" to TEL_IT_DARWIN WITH GRANT OPTION;' sqlcmd 
-from ALL_OBJECTS 
-where owner='AM2107' and object_type in ('TABLE','VIEW');  
-
-
--- --------------------------------------------------------------------------
 -- --------------------- Interface Control Table ----------------------------
 -- --------------------------------------------------------------------------
 
@@ -66,7 +19,12 @@ insert into "IFACE_ACL" (ifuser,acctno) values('TEL_IT_DARWIN','8111');
 
 
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::system ------------------------------------
+-- --------------------- tsacinv::appl   ------------------------------------
+-- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen Anwendungs Datensatz wird dadurch eingeschraenkt,-
+-- - dass der Schnittstellen-User ueber die IFACE_ACL entweder den Zugriff  -
+-- - auf den Buchungskreis, die Assignmentgroup der Anwendung oder den aus  -
+-- - dem Kontierungsobjekt resultierenden Customer-Link haben muss.         -
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE view appl_acl as
@@ -91,7 +49,6 @@ CREATE or REPLACE view appl_acl as
             (acl.customerlnk is not null or
              acl.acctno is not null or
              acl.assignment is not null);
-
 
 CREATE or REPLACE view appl as
    SELECT 
@@ -175,6 +132,7 @@ grant select on appl to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::system (pre) ------------------------------
 -- --------------------------------------------------------------------------
+
 CREATE or REPLACE VIEW system_acl_level0 AS     -- level0 = without shared
    select distinct amportfolio.assettag id
    from AM2107.amportfolio
@@ -201,13 +159,16 @@ CREATE or REPLACE VIEW system_acl_level0 AS     -- level0 = without shared
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::ipaddress ---------------------------------
 -- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen IP-Adressdatensatz wird dadurch eingeschraenkt,  -
+-- - das der Datensatz nur dann sichtbar ist, wenn auch das dazugehoerige   -
+-- - logische System fuer den Schnittstellen-User sichtbar ist.             -
+-- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW ipaddress_acl AS
    SELECT
       DISTINCT amnetworkcard.lnetworkcardid          id
    FROM AM2107.amnetworkcard
    JOIN system on system."lcomputerid"=amnetworkcard.lcompid;
-
 
 CREATE VIEW ipaddress AS
    SELECT
@@ -292,6 +253,12 @@ grant select on accountno to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnksharednet ------------------------------
 -- --------------------------------------------------------------------------
+-- - Der Zugriff auf die Shared-Network Componenten wird dadurch            -
+-- - Eingegrenzt, das nur die Shared-Network Componenten an den fuer den    -
+-- - Schnittstellen-User sichtbaren logischen Systeme (und zwar nur die     -
+-- - logischen Systeme, die er auch wirklich DIREKT sehen darf) dargestellt -
+-- - werden.                                                                -
+-- --------------------------------------------------------------------------
 
 -- drop materialized view mview_lnknet;
 CREATE MATERIALIZED VIEW mview_lnknet
@@ -361,7 +328,6 @@ CREATE INDEX mview_lnknet_i3
 CREATE INDEX mview_lnknet_i4
    ON mview_lnknet ("netsystemid") online;
 
-
 CREATE or REPLACE VIEW lnksharednet AS
    select * 
    from system_acl_level0
@@ -370,17 +336,16 @@ CREATE or REPLACE VIEW lnksharednet AS
    where "netnature" is not null 
       and "netnature" not in ('SERVER','TERMINAL-SERVER');
    
+grant select on lnksharednet to public;
 
 
-
----
----
----  TTOODDOO:  Zugriff auf Shared-Resources !!!
----
----
 
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnksharedstorage --------------------------
+-- --------------------------------------------------------------------------
+-- - Die Relationen zwischen logischem System und shared-Storage            -
+-- - Componenten stehen jedem Schnittstellen-User zur Verfuegung.           -
+-- - Es wird keine Filterung durchgefuehrt.                                 -
 -- --------------------------------------------------------------------------
 
 -- drop materialized view mview_lnksharedstorage;
@@ -424,8 +389,6 @@ CREATE INDEX mview_lnksharedstorage_i2
 CREATE INDEX mview_lnksharedstorage_i3
    ON mview_lnksharedstorage ("applid") online;
 
-
-
 CREATE or REPLACE VIEW lnksharedstorage_acl AS
    SELECT DISTINCT "storageassetid" id
    FROM mview_lnksharedstorage
@@ -440,9 +403,20 @@ CREATE or REPLACE VIEW lnksharedstorage AS
 
 grant select on lnksharedstorage to public;
 
+
+
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::system ------------------------------------
 -- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen logischen System Datensatz wird dadurch          -
+-- - eingeschraenkt, dass der Schnittstellen-User ueber die IFACE_ACL       -
+-- - entweder den Zugriff auf den Buchungskreis, die Assignmentgroup        -
+-- - des logischen Systems oder den aus dem Kontierungsobjekt               -
+-- - resultierenden Customer-Link haben muss.                               -
+-- - Desweiteren werden alle System-Datensaetze sichtbar, die als           -
+-- - "shared-Network" Componenten erkannt wurden (1x tgl. ermittelt)        -
+-- --------------------------------------------------------------------------
+
 CREATE or REPLACE VIEW system_acl AS
    select distinct * from (
       select amportfolio.assettag id
@@ -452,7 +426,7 @@ CREATE or REPLACE VIEW system_acl AS
       select amportfolio.assettag id
       from AM2107.amportfolio,lnksharednet
       where amportfolio.assettag=lnksharednet."netsystemid"
-   )
+   );
 -- test: DEMD1XCP0002 (S20148097)  QDE8HV (S21938047)
 
 
@@ -573,7 +547,8 @@ CREATE or REPLACE VIEW system AS
          WHERE amcostcenter.bdelete = 0 ) amcostcenter 
          ON amportfolio.lcostid = amcostcenter.lcostid
       LEFT OUTER JOIN (
-         SELECT DISTINCT amtsiservicetype.identifier ordered, amtsiservice.lportfolioid
+         SELECT DISTINCT amtsiservicetype.identifier ordered, 
+                         amtsiservice.lportfolioid
          FROM AM2107.amtsiservice, AM2107.amtsiservicetype
          WHERE
             amtsiservice.lservicetypeid = amtsiservicetype.ltsiservicetypeid
@@ -589,14 +564,22 @@ CREATE or REPLACE VIEW system AS
 grant select on system to public;
 
 
+
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::group ------------------------------------
+-- --------------------- tsacinv::group -------------------------------------
 -- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen Assingmentgroup-Datensatz wird dadurch           -
+-- - Eingeschraenkt, das der betreffende Schnittstellen-User in der         -
+-- - IFACE_ACL aufgefuehrt sein muss. Ist dies der Fall, kann er alle       -
+-- - Assignmentgroup Datensaetze abrufen.                                   -
+-- --------------------------------------------------------------------------
+
 CREATE VIEW grp_acl AS
    SELECT DISTINCT amemplgroup.barcode id
    FROM AM2107.amemplgroup
-   WHERE amemplgroup.lgroupid <> 0
-   
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+   WHERE amemplgroup.lgroupid <> 0;
 
 CREATE VIEW grp AS
    SELECT
@@ -622,6 +605,7 @@ grant select on grp to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::group ------------------------------------
 -- --------------------------------------------------------------------------
+
 CREATE or REPLACE VIEW usr_acl AS
    select distinct amempldept.lempldeptid id
    FROM AM2107.amempldept
@@ -655,13 +639,15 @@ grant select on usr to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnkapplappl ------------------------------
 -- --------------------------------------------------------------------------
+-- - Einen Anwendungsschnittstellen-Datensatz sieht an Schnittstellen-User  -
+-- - dann, wenn er die betreffende Parent-Anwendung sieht.                  -
+-- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW lnkapplappl_acl AS
    select distinct amtsirelappl.lrelapplid id
    FROM AM2107.amtsirelappl
       JOIN appl
          ON amtsirelappl.lparentid=appl."id";
-
 
 CREATE or REPLACE VIEW lnkapplappl AS
    SELECT
@@ -690,7 +676,11 @@ grant select on lnkapplappl to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnkapplsystem -----------------------------
 -- --------------------------------------------------------------------------
-
+-- - Der Zugriff auf den Relationsdatensatz zwischen Anwendung und System   -
+-- - wird dadurch eingeschraenkt, das der Schnittstellen-User einen         -
+-- - Relationsdatensatz dann sieht, wenn er die darin aufgefuehrte          -
+-- - Anwendung sehen darf.                                                  -
+-- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW lnkapplappl_acl AS
    select distinct amtsirelportfappl.lrelportfapplid id
@@ -762,6 +752,11 @@ grant select on lnkapplsystem to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::osrelease ---------------------------------
 -- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen osrelease-Datensatz wird dadruch eingeschraenkt  -
+-- - das der Schnittstellen-User in der IFACE_ACL aufgefuehrt sein muss.    -
+-- - Ist dies der Fall, so sieht der Schnittstelle-User ALLE                -
+-- - Betriebssystem-Datensaetze.                                            -
+-- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW osrelease_acl AS
    SELECT DISTINCT amitemlistval.litemlistvalid      AS id
@@ -789,6 +784,10 @@ grant select on osrelease to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::asset -------------------------------------
 -- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen Asset Datensatz wird dadurch eingeschraenkt, das -
+-- - nur Datensaetze sichtbar sind, bei denen auch min. ein logisches       -
+-- - fuer den betreffenden Schnittsttellen-User sichtbar ist.               -
+-- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW asset_acl AS
    SELECT DISTINCT amportfolio.assettag               id
@@ -797,65 +796,275 @@ CREATE or REPLACE VIEW asset_acl AS
          on amportfolio.lportfolioitemid = system."lassetid"
 
 CREATE or REPLACE VIEW asset AS
-SELECT
-   DISTINCT assetportfolio.assettag               AS "assetid",
-   LOWER(amasset.status)                          AS "status",
-   assetportfolio.assettag                        AS "fullname",
-   assetportfolio.dtinvent                        AS "install",
-   assetportfolio.lassignmentid                   AS "lassignmentid",
-   amcostcenter.trimmedtitle                      AS "conumber",
-   amcostcenter.lcostid                           AS "lcostcenterid",
-   assetportfolio.room                            AS "room",
-   assetportfolio.place                           AS "place",
-   amasset.cputype                                AS "cputype",
-   decode(amasset.lmemorysizemb, 0, NULL, 
-          amasset.lmemorysizemb)                  AS "memory",
-   decode(amasset.lcpunumber, 0,NULL,
-          amasset.lcpunumber)                     AS "cpucount",
-   decode(amasset.imaxnumberprocessors, 0,NULL,
-          amasset.imaxnumberprocessors)           AS "cpumaxsup",
-   decode(amasset.lcpuspeedmhz,0,NULL,
-          amasset.lcpuspeedmhz)                   AS "cpuspeed",
-   decode(amasset.itotalnumberofcores,0,NULL,
-          amasset.itotalnumberofcores)            AS "corecount",
-   amasset.serialno                               AS "serialno",
-   amasset.inventoryno                            AS "inventoryno",
-   amasset.lmaintlevelid                          AS "maintlevelid",
-   amasset.seAcquModeTsi                          AS "acqumode",
-   amasset.dstartacqu                             AS "startacquisition",
-   amasset.mdeprcalc                              AS "mdepr",
-   amasset.mmaintrate                             AS "mmaint",
-   amasset.maintcond                              AS "maitcond",
-   assetportfolio.llocaid                         AS "locationid",
-   assetportfolio.lportfolioitemid                AS "lassetid",
-   amasset.lastid                                 AS "lassetassetid",
-   assetportfolio.lmodelid                        AS "lmodelid",
-   assetportfolio.dtlastmodif                     AS "replkeypri",
-   lpad(assetportfolio.assettag,35,'0')           AS "replkeysec",
-   assetportfolio.bdelete                         AS "deleted",
-   assetportfolio.dtcreation                      AS "cdate",
-   assetportfolio.dtlastmodif                     AS "mdate",
-   assetportfolio.externalsystem                  AS "srcsys",
-   assetportfolio.externalid                      AS "srcid"
-FROM AM2107.amasset
-   JOIN AM2107.amportfolio assetportfolio
-      ON assetportfolio.assettag = amasset.assettag
-   JOIN asset_acl
-      ON assetportfolio.assettag=asset_acl.id
-   JOIN AM2107.ammodel
-      ON assetportfolio.lmodelid = ammodel.lmodelid
-   LEFT OUTER JOIN AM2107.amlocation
-      ON assetportfolio.llocaid = amlocation.llocaid
-   LEFT OUTER JOIN ( SELECT amcostcenter.*
-         FROM AM2107.amcostcenter
-         WHERE amcostcenter.bdelete = 0) amcostcenter
-      ON amasset.lsendercostcenterid = amcostcenter.lcostid 
-   LEFT OUTER JOIN AM2107.amnature
-      ON ammodel.lnatureid = amnature.lnatureid
-WHERE ammodel.name NOT IN ('LOGICAL SYSTEM','CLUSTER','DB-INSTANCE');
+   SELECT
+      DISTINCT assetportfolio.assettag               AS "assetid",
+      LOWER(amasset.status)                          AS "status",
+      assetportfolio.assettag                        AS "fullname",
+      assetportfolio.dtinvent                        AS "install",
+      assetportfolio.lassignmentid                   AS "lassignmentid",
+      amcostcenter.trimmedtitle                      AS "conumber",
+      amcostcenter.lcostid                           AS "lcostcenterid",
+      assetportfolio.room                            AS "room",
+      assetportfolio.place                           AS "place",
+      amasset.cputype                                AS "cputype",
+      decode(amasset.lmemorysizemb, 0, NULL, 
+             amasset.lmemorysizemb)                  AS "memory",
+      decode(amasset.lcpunumber, 0,NULL,
+             amasset.lcpunumber)                     AS "cpucount",
+      decode(amasset.imaxnumberprocessors, 0,NULL,
+             amasset.imaxnumberprocessors)           AS "cpumaxsup",
+      decode(amasset.lcpuspeedmhz,0,NULL,
+             amasset.lcpuspeedmhz)                   AS "cpuspeed",
+      decode(amasset.itotalnumberofcores,0,NULL,
+             amasset.itotalnumberofcores)            AS "corecount",
+      amasset.serialno                               AS "serialno",
+      amasset.inventoryno                            AS "inventoryno",
+      amasset.lmaintlevelid                          AS "maintlevelid",
+      amasset.seAcquModeTsi                          AS "acqumode",
+      amasset.dstartacqu                             AS "startacquisition",
+      amasset.mdeprcalc                              AS "mdepr",
+      amasset.mmaintrate                             AS "mmaint",
+      amasset.maintcond                              AS "maitcond",
+      assetportfolio.llocaid                         AS "locationid",
+      assetportfolio.lportfolioitemid                AS "lassetid",
+      amasset.lastid                                 AS "lassetassetid",
+      assetportfolio.lmodelid                        AS "lmodelid",
+      assetportfolio.dtlastmodif                     AS "replkeypri",
+      lpad(assetportfolio.assettag,35,'0')           AS "replkeysec",
+      assetportfolio.bdelete                         AS "deleted",
+      assetportfolio.dtcreation                      AS "cdate",
+      assetportfolio.dtlastmodif                     AS "mdate",
+      assetportfolio.externalsystem                  AS "srcsys",
+      assetportfolio.externalid                      AS "srcid"
+   FROM AM2107.amasset
+      JOIN AM2107.amportfolio assetportfolio
+         ON assetportfolio.assettag = amasset.assettag
+      JOIN asset_acl
+         ON assetportfolio.assettag=asset_acl.id
+      JOIN AM2107.ammodel
+         ON assetportfolio.lmodelid = ammodel.lmodelid
+      LEFT OUTER JOIN AM2107.amlocation
+         ON assetportfolio.llocaid = amlocation.llocaid
+      LEFT OUTER JOIN ( SELECT amcostcenter.*
+            FROM AM2107.amcostcenter
+            WHERE amcostcenter.bdelete = 0) amcostcenter
+         ON amasset.lsendercostcenterid = amcostcenter.lcostid 
+      LEFT OUTER JOIN AM2107.amnature
+         ON ammodel.lnatureid = amnature.lnatureid
+   WHERE ammodel.name NOT IN ('LOGICAL SYSTEM','CLUSTER','DB-INSTANCE');
 
 grant select on asset to public;
 
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::lnkusergroup ------------------------------
+-- --------------------------------------------------------------------------
+-- - Die Relation zwischen User und Assignmentgroup ist dann fuer einen     -
+-- - Schnittstellen-User einsehbar, wenn er die zugehorige Assignmentgroup  -
+-- - sehen darf.                                                            -
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW lnkusergroup_acl AS
+   SELECT
+      DISTINCT concat (amrelemplgrp.lgroupid,
+         concat ( '-',amrelemplgrp.lempldeptid))     AS id
+   FROM
+      AM2107.amrelemplgrp
+      JOIN grp 
+         ON amrelemplgrp.lgroupid=grp."lgroupid";
+
+CREATE or REPLACE VIEW lnkusergroup AS
+   SELECT
+      DISTINCT concat (amrelemplgrp.lgroupid,
+         concat ( '-',amrelemplgrp.lempldeptid))     AS "id",
+      amrelemplgrp.lempldeptid                       AS "lempldeptid",
+      amrelemplgrp.lgroupid                          AS "lgroupid"
+   FROM
+      AM2107.amrelemplgrp
+      JOIN lnkusergroup_acl 
+         ON concat(amrelemplgrp.lgroupid,concat('-',amrelemplgrp.lempldeptid))=
+            lnkusergroup_acl.id;
+
+grant select on lnkusergroup to public;
+
+       
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::costcenter --------------------------------
+-- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen Kontierungs-Datensatz wird dadurch               -
+-- - eingeschraenkt, dass der Schnittstellen-User ueber die IFACE_ACL       -
+-- - entweder den Zugriff auf den Buchungskreis (des Kontierungsobjektes),  -
+-- - die Assignmentgroup des Kontierungsobjektes oder den aus dem           -
+-- - Kontierungsobjekt resultierenden Customer-Link haben muss.             -
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW costcenter_acl AS
+   SELECT DISTINCT amcostcenter.lcostid              AS id
+   FROM AM2107.amcostcenter
+      LEFT OUTER JOIN AM2107.amtsiaccsecunit customerlnk
+         ON amcostcenter.lcustomerlinkid = customerlnk.lunitid
+      join IFACE_ACL acl
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
+             ( acl.assignment is null) and
+             (amcostcenter.acctno like acl.acctno 
+                or acl.acctno is null) and
+             (customerlnk.identifier like acl.customerlnk 
+                or acl.customerlnk is null) and
+            (acl.customerlnk is not null or
+             acl.acctno is not null or
+             acl.assignment is not null);
+
+CREATE or REPLACE VIEW costcenter AS
+   SELECT amcostcenter.lcostid                       AS "id",
+      amcostcenter.trimmedtitle                      AS "name",
+      amcostcenter.title                             AS "untrimmedname",
+      decode(amcostcenter.flag9,'X', 1, 0)           AS "islocked",
+      amcostcenter.code                              AS "code",
+      amcostcenter.field1                            AS "description",
+      amcostcenter.alternatebusinesscenter           AS "bc",
+      amcostcenter.orgunit                           AS "orgunit",
+      (
+         SELECT decode(COUNT(*),0,0,1)
+         FROM AM2107.amportfolio p1
+            JOIN AM2107.amcomputer c1
+               ON p1.lportfolioitemid = c1.litemid 
+         WHERE p1.lcostid = amcostcenter.lcostid
+           AND LOWER(c1.status)!='out of operation') AS "usedbyactivesystems",
+      amcostcenter.ictonr                            AS "ictonr",
+      amcostcenter.bdelete                           AS "deleted",
+      amcostcenter.norsolutionmodel                  AS "norsolutionmodel",
+      amcostcenter.norinstructiontyp                 AS "norinstructiontyp",
+      amcostcenter.lleadingdeliverymanagerid         AS "delmgrid",
+      amcostcenter.lproductionplanningossid          AS "productionplanningossid",
+      amcostcenter.lcustomerlinkid                   AS "lcustomerid",
+      amtsiaccsecunit.identifier                     AS "customerlink",
+      amtsisclocations.sclocationid                  AS "defsclocationid",
+      amcostcenter.lservicemanagerid                 AS "semid",
+      decode ( amcostcenter.hier0id,'','-',
+         amcostcenter.hier0id)
+      || '.' || decode ( amcostcenter.hier1id,
+         '','-',amcostcenter.hier1id)
+      || '.' || decode ( amcostcenter.hier2id,
+         '','-',amcostcenter.hier2id)
+      || '.' || decode ( amcostcenter.hier3id,
+         '','-',amcostcenter.hier3id)
+      || '.' || decode ( amcostcenter.hier4id,
+         '','-',amcostcenter.hier4id)
+      || '.' || decode ( amcostcenter.hier5id,
+         '','-',amcostcenter.hier5id)
+      || '.' || decode ( amcostcenter.hier6id,
+         '','-',amcostcenter.hier6id)
+      || '.' || decode ( amcostcenter.hier7id,
+         '','-',amcostcenter.hier7id)
+      || '.' || decode ( amcostcenter.hier8id,
+         '','-',amcostcenter.hier8id)
+      || '.' || decode ( amcostcenter.hier9id,
+         '','-',amcostcenter.hier9id)                AS "saphier",
+      amcostcenter.hier0id                           AS "saphier0id",
+      amcostcenter.hier1id                           AS "saphier1id",
+      amcostcenter.hier2id                           AS "saphier2id",
+      amcostcenter.hier3id                           AS "saphier3id",
+      amcostcenter.hier4id                           AS "saphier4id",
+      amcostcenter.hier5id                           AS "saphier5id",
+      amcostcenter.hier6id                           AS "saphier6id",
+      amcostcenter.hier7id                           AS "saphier7id",
+      amcostcenter.hier8id                           AS "saphier8id",
+      amcostcenter.hier9id                           AS "saphier9id",
+      amcostcenter.externalsystem                    AS "srcsys",
+      amcostcenter.externalid                        AS "srcid",
+      amcostcenter.dtimport                          AS "srcload",
+      amcostcenter.dtlastmodif                       AS "mdate"
+   FROM AM2107.amcostcenter
+      JOIN costcenter_acl
+         ON amcostcenter.lcostid=costcenter_acl.id
+      LEFT OUTER JOIN AM2107.amtsiaccsecunit 
+         ON amcostcenter.lcustomerlinkid = amtsiaccsecunit.lunitid
+      LEFT OUTER JOIN AM2107.amtsisclocations 
+         ON amtsiaccsecunit.ldefaultsclocationid = amtsisclocations.ltsisclocationsid;
+
+grant select on costcenter to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::customer ----------------------------------
+-- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen CustomerLink-Datensatz wird dadurch              -
+-- - Eingeschraenkt, das der betreffende Schnittstellen-User in der         -
+-- - IFACE_ACL mit Zugriff auf den bestimmten CustomerLink aufgefuehrt      -
+-- - sein muss.                                                             -
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW customer_acl AS
+   SELECT DISTINCT amtsiaccsecunit.lunitid           AS id
+   FROM AM2107.amtsiaccsecunit
+      JOIN IFACE_ACL acl
+         ON acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
+             (acl.assignment is null) and
+             (acl.acctno is null) and
+             (amtsiaccsecunit.identifier like acl.customerlnk 
+                or acl.customerlnk is null) and
+            (acl.customerlnk is not null or
+             acl.acctno is not null or
+             acl.assignment is not null);
+
+CREATE or REPLACE VIEW customer AS
+   SELECT amtsiaccsecunit.lunitid                    AS "id",
+      amtsiaccsecunit.identifier                     AS "name",
+      amtsiaccsecunit.description                    AS "fullname",
+      amtsiaccsecunit.ldeliverymanagerid             AS "delmgrid",
+      amtsiaccsecunit.code                           AS "code",
+      amtsiaccsecunit.ldefaultsclocationid           AS "defaultsclocationid",
+      amtsiaccsecunit.dtlastmodif                    AS "mdate"
+   FROM AM2107.amtsiaccsecunit
+      JOIN customer_acl
+         ON amtsiaccsecunit.lunitid=customer_acl.id
+   WHERE amtsiaccsecunit.lunitid <> 0;
+
+grant select on customer to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::dlvpartner --------------------------------
+-- --------------------------------------------------------------------------
+-- - Der Zugriff auf die Delivery-Partner eines Kontierungsobjektes         -
+-- - wird dann gewaehrt, wenn der Zugriff auf das betreffende               -
+-- - Kontierungsobjekt erlaubt ist.                                         -
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW dlvpartner_acl AS
+   SELECT
+      DISTINCT amtsidlvpartner.ldeliverypartnerid    AS id
+   FROM
+      AM2107.amtsidlvpartner
+         JOIN costcenter_acl
+           ON amtsidlvpartner.lcostcenterid = costcenter_acl.id;
+
+CREATE or REPLACE VIEW dlvpartner AS
+   SELECT
+      DISTINCT amtsidlvpartner.ldeliverypartnerid    AS "id",
+      amcostcenter.trimmedtitle                      AS "name",
+      amtsidlvpartner.ldeliverymanagementid          AS "ldeliverymanagementid",
+      amtsidlvpartner.description                    AS "description",
+      amtsidlvpartner.ldeliverymanagerid             AS "delmgrid",
+      amtsidlvpartner.ldeputydeliverymanagerid       AS "delmgr2id",
+      amtsidlvpartner.lcommentid                     AS "lcommentid",
+      amtsidlvpartner.dtlastmodif AS "mdate"
+   FROM
+      AM2107.amtsidlvpartner
+         JOIN AM2107.amcostcenter
+           ON amtsidlvpartner.lcostcenterid = amcostcenter.lcostid
+   WHERE amcostcenter.bdelete = 0
+      AND amtsidlvpartner.bdelete = 0;
+
+grant select on dlvpartner to public;
+
+
+
+-- --------------------------------------------------------------------------
 
 
 

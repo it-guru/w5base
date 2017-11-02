@@ -37,7 +37,7 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 label         =>'ID',
-                dataobjattr   =>'amtsidlvpartner.ldeliverypartnerid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -45,7 +45,7 @@ sub new
                 translation   =>'tsacinv::costcenter',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['name'=>'name'],
-                dataobjattr   =>'amcostcenter.trimmedtitle'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::TextDrop(
                 name          =>'deliverymanagement',
@@ -56,14 +56,14 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'ldeliverymanagementid',
-                dataobjattr   =>'amtsidlvpartner.ldeliverymanagementid'),
+                dataobjattr   =>'"ldeliverymanagementid"'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 htmlwidth     =>'150px',
                 label         =>'Description',
                 ignorecase    =>1,
-                dataobjattr   =>'amtsidlvpartner.description'),
+                dataobjattr   =>'"description"'),
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
@@ -75,7 +75,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'delmgrid',
-                dataobjattr   =>'amtsidlvpartner.ldeliverymanagerid'),
+                dataobjattr   =>'"delmgrid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr2',
@@ -86,12 +86,12 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'delmgr2id',
-                dataobjattr   =>'amtsidlvpartner.ldeputydeliverymanagerid'),
+                dataobjattr   =>'"delmgr2id"'),
 
 
       new kernel::Field::Link(
                 name          =>'lcommentid',
-                dataobjattr   =>'amtsidlvpartner.lcommentid'),
+                dataobjattr   =>'"lcommentid"'),
       
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -105,8 +105,9 @@ sub new
                 name          =>'mdate',
                 sqlorder      =>'NONE',
                 label         =>'Modification-Date',
-                dataobjattr   =>'amtsidlvpartner.dtlastmodif')
+                dataobjattr   =>'"mdate"')
    );
+   $self->setWorktable("dlvpartner");
    $self->setDefaultView(qw(linenumber name description mdate));
    return($self);
 }
@@ -121,25 +122,6 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsidlvpartner,amcostcenter";
-   return($from);
-}  
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amtsidlvpartner.lcostcenterid=amcostcenter.lcostid and ".
-             "amcostcenter.bdelete=0 and amtsidlvpartner.bdelete=0";
-   return($where);
-}
-
-
-
-
 
 
 
