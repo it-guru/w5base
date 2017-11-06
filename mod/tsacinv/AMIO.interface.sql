@@ -170,14 +170,13 @@ CREATE or REPLACE VIEW ipaddress_acl AS
    FROM AM2107.amnetworkcard
    JOIN system on system."lcomputerid"=amnetworkcard.lcompid;
 
-CREATE VIEW ipaddress AS
+CREATE or REPLACE VIEW ipaddress AS
    SELECT
-      DISTINCT amnetworkcard.lnetworkcardid          id,
-      amnetworkcard.tcpipaddress || 
-         decode ( amnetworkcard.tcpipaddress,
-         NULL, '', decode ( amnetworkcard.ipv6address,
-            NULL, '', ', '))
-         || amnetworkcard.ipv6address                AS "ipaddress",
+      DISTINCT amnetworkcard.lnetworkcardid          "id",
+         amnetworkcard.tcpipaddress|| 
+         decode(amnetworkcard.tcpipaddress,NULL,'',
+         decode(amnetworkcard.ipv6address,NULL,'',
+         ', ')) ||amnetworkcard.ipv6address          AS "ipaddress",
       amnetworkcard.tcpipaddress                     AS "ipv4address",
       amnetworkcard.ipv6address                      AS "ipv6address",
       amportfolio.assettag                           AS "systemid",
@@ -682,7 +681,7 @@ grant select on lnkapplappl to public;
 -- - Anwendung sehen darf.                                                  -
 -- --------------------------------------------------------------------------
 
-CREATE or REPLACE VIEW lnkapplappl_acl AS
+CREATE or REPLACE VIEW lnkapplsystem_acl AS
    select distinct amtsirelportfappl.lrelportfapplid id
    FROM AM2107.amtsirelportfappl
    JOIN appl
@@ -727,8 +726,8 @@ CREATE or REPLACE VIEW lnkapplsystem AS
       amtsirelportfappl.dtlastmodif                  AS "replkeypri",
       lpad(amtsirelportfappl.lrelportfapplid,35,'0') AS "replkeysec"
    FROM AM2107.amtsirelportfappl
-      JOIN lnkapplappl_acl
-         ON amtsirelportfappl.lrelportfapplid=lnkapplappl_acl.id
+      JOIN lnkapplsystem_acl
+         ON amtsirelportfappl.lrelportfapplid=lnkapplsystem_acl.id
       JOIN AM2107.amportfolio
          ON amtsirelportfappl.lportfolioid = amportfolio.lportfolioitemid
       JOIN AM2107.amcomputer
@@ -1065,8 +1064,79 @@ grant select on dlvpartner to public;
 
 
 -- --------------------------------------------------------------------------
+-- --------------------- tsacinv::location ----------------------------------
+-- --------------------------------------------------------------------------
+-- - Der Zugriff auf die Standort-Datensaetze wird dadurch eingefschrankt   -
+-- - das der Schnittstellen-User in der IFACE_ACL aufgefuert sein muss.     -
+-- --------------------------------------------------------------------------
 
+CREATE or REPLACE VIEW location_acl AS
+   SELECT DISTINCT amlocation.llocaid      AS id
+   FROM AM2107.amlocation
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
 
+CREATE or REPLACE VIEW location AS
+   SELECT
+      DISTINCT amlocation.llocaid                    AS "locationid",
+      amlocation.fullname                            AS "fullname",
+      amlocation.address1                            AS "address1",
+      amlocation.zip                                 AS "zipcode",
+      amcountry.isocode                              AS "country",
+      amlocation.city                                AS "location",
+      amlocation.locationtype                        AS "locationtype",
+      amlocation.name                                AS "name",
+      amlocation.barcode                             AS "code",
+      amlocation.dtlastmodif                         AS "replkeypri",
+      lpad(amlocation.llocaid,35,'0')                AS "replkeysec",
+      amlocation.dtlastmodif                         AS "mdate"
+   FROM AM2107.amlocation
+      JOIN location_acl
+         ON amlocation.llocaid=location_acl.id
+      LEFT OUTER JOIN AM2107.amcountry
+         ON amlocation.lcountryid = amcountry.lcountryid
+   WHERE amlocation.bdelete = 0 AND amlocation.llocaid > 0
+      AND amlocation.llocaid IS NOT NULL AND amlocation.dtlastmodif IS NOT NULL;
 
+grant select on location to public;
 
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::lnksystemsoftware -------------------------
+-- --------------------------------------------------------------------------
+-- - Der Zugriff auf die Software-Installationsdatensaetze wird dadurch     -
+-- - eingeschraenkt, das nur die Software-Installationen sichtbar sind,     -
+-- - fuer die auch die betreffenden Systeme sichtbar sind.                  -
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW lnksystemsoftware_acl AS
+   SELECT
+      DISTINCT amportfolio.assettag                  AS id
+   from AM2107.amportfolio
+      JOIN system 
+         ON amportfolio.lparentid=system."lportfolioitemid";
+
+CREATE or REPLACE VIEW lnksystemsoftware AS
+   SELECT
+      DISTINCT amportfolio.assettag                  AS "id",
+      ammodel.name                                   AS "name",
+      amsoftinstall.lusecount                        AS "quantity",
+      ammodel.versionlevel                           AS "version",
+      amsoftinstall.folder                           AS "instpath",
+      amportfolio.lparentid                          AS "lparentid",
+      amsoftinstall.llicenseid                       AS "llicense",
+      amportfolio.dtcreation                         AS "cdate",
+      amsoftinstall.dtlastmodif                      AS "mdate"
+   FROM AM2107.amportfolio
+      JOIN lnksystemsoftware_acl
+         ON amportfolio.assettag=lnksystemsoftware_acl.id
+      JOIN AM2107.ammodel 
+         ON amportfolio.lmodelid = ammodel.lmodelid
+      LEFT OUTER JOIN AM2107.amnature
+         ON ammodel.lnatureid = amnature.lnatureid 
+      JOIN AM2107.amsoftinstall
+         ON amportfolio.lportfolioitemid = amsoftinstall.litemid
+   WHERE ammodel.certification = 'CSS' AND amnature.name = 'SW-INSTALLATION'
+      AND amportfolio.bdelete = 0;
+
+grant select on lnksystemsoftware to public;
 

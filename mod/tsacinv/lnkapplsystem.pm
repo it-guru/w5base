@@ -29,7 +29,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -41,12 +41,6 @@ sub new
                 name          =>'id',
                 label         =>'LinkID',
                 dataobjattr   =>'"id"'),
-
-     new kernel::Field::Boolean(
-                name          =>'deleted',
-                readonly      =>1,
-                label         =>'marked as delete',
-                dataobjattr   =>'"deleted"'),
 
       new kernel::Field::TextDrop(
                 name          =>'parent',
@@ -64,6 +58,26 @@ sub new
                 htmlwidth     =>'100',
                 label         =>'ApplicationID',
                 dataobjattr   =>'"applid"'),
+
+      new kernel::Field::TextDrop(
+                name          =>'child',
+                label         =>'Child System',
+                weblinkto     =>'tsacinv::system',
+                weblinkon     =>['lsystemid'=>'systemid'],
+                dataobjattr   =>'"child"'),
+
+      new kernel::Field::TextDrop(
+                name          =>'systemid',
+                label         =>'System ID',
+                weblinkto     =>'tsacinv::system',
+                weblinkon     =>['lsystemid'=>'systemid'],
+                dataobjattr   =>'"systemid"'),
+
+     new kernel::Field::Boolean(
+                name          =>'deleted',
+                readonly      =>1,
+                label         =>'marked as delete',
+                dataobjattr   =>'"deleted"'),
 
       new kernel::Field::Textarea(
                 name          =>'appldescription',
@@ -248,20 +262,6 @@ sub new
                 dataobjattr   =>'"systemmemory"'),
 
 
-      new kernel::Field::TextDrop(
-                name          =>'child',
-                label         =>'Child System',
-                weblinkto     =>'tsacinv::system',
-                weblinkon     =>['lsystemid'=>'systemid'],
-                dataobjattr   =>'"child"'),
-
-      new kernel::Field::TextDrop(
-                name          =>'systemid',
-                label         =>'System ID',
-                weblinkto     =>'tsacinv::system',
-                weblinkon     =>['lsystemid'=>'systemid'],
-                dataobjattr   =>'"systemid"'),
-
       new kernel::Field::Text(
                 name          =>'systemola',
                 label         =>'System OLA',
@@ -395,6 +395,17 @@ sub initSearchQuery
      Query->Param("search_deleted"=>$self->T("no"));
    }
 }
+
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default sysdata w5basedata source));
+}
+
+
+
 
 
          
