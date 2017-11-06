@@ -44,11 +44,14 @@ sub GetKeyCriterion
              'TS::appl::acapplname'=>{
                          label=>'IT-Inventar: AssetManager Applicationname',
                             in=>[qw(itil::appl::id)]},
-             'TS::appl::scapprgroup'=>{
+             'TS::appl::chmapprgroups1'=>{
                          label=>'IT-Inventar: Change Approvergroup technisch',
                             in=>[qw(itil::appl::id)]},
-             'TS::appl::scapprgroup2'=>{
+             'TS::appl::chmapprgroups2'=>{
                          label=>'IT-Inventar: Change Approvergroup fachlich',
+                            in=>[qw(itil::appl::id)]},
+             'TS::appl::chmapprgroups3'=>{
+                         label=>'IT-Inventar: Change Approvergroup Kunde',
                             in=>[qw(itil::appl::id)]},
              'TS::appl::ictono'=>{
                          label=>'IT-Inventar: Applikation: ICTO-ID',
@@ -100,24 +103,35 @@ sub ProcessLine
       }
    }
    if (defined($in->{'itil::appl::id'}) && 
-       exists($out->{'TS::appl::scapprgroup'})){
-      my $appl=$self->getParent->getPersistentModuleObject('TS::appl');
+       exists($out->{'TS::appl::chmapprgroups1'})){
+      my $lnk=$self->getParent->getPersistentModuleObject('TS::lnkapplchmapprgrp');
       my $id=[keys(%{$in->{'itil::appl::id'}})];
-      $appl->SetFilter({id=>$id});
-      foreach my $rec ($appl->getHashList("scapprgroup")){
-         if ($rec->{"scapprgroup"} ne ""){
-             $out->{'TS::appl::scapprgroup'}->{$rec->{"scapprgroup"}}++;
+      $lnk->SetFilter({refid=>$id,responsibility=>'technical'});
+      foreach my $rec ($lnk->getHashList("group")){
+         if ($rec->{"group"} ne ""){
+             $out->{'TS::appl::chmapprgroups1'}->{$rec->{"group"}}++;
          } 
       }
    }
    if (defined($in->{'itil::appl::id'}) && 
-       exists($out->{'TS::appl::scapprgroup2'})){
-      my $appl=$self->getParent->getPersistentModuleObject('TS::appl');
+       exists($out->{'TS::appl::chmapprgroups2'})){
+      my $lnk=$self->getParent->getPersistentModuleObject('TS::lnkapplchmapprgrp');
       my $id=[keys(%{$in->{'itil::appl::id'}})];
-      $appl->SetFilter({id=>$id});
-      foreach my $rec ($appl->getHashList("scapprgroup2")){
-         if ($rec->{"scapprgroup2"} ne ""){
-             $out->{'TS::appl::scapprgroup2'}->{$rec->{"scapprgroup2"}}++;
+      $lnk->SetFilter({refid=>$id,responsibility=>'functional'});
+      foreach my $rec ($lnk->getHashList("group")){
+         if ($rec->{"group"} ne ""){
+             $out->{'TS::appl::chmapprgroups2'}->{$rec->{"group"}}++;
+         } 
+      }
+   }
+   if (defined($in->{'itil::appl::id'}) && 
+       exists($out->{'TS::appl::chmapprgroups3'})){
+      my $lnk=$self->getParent->getPersistentModuleObject('TS::lnkapplchmapprgrp');
+      my $id=[keys(%{$in->{'itil::appl::id'}})];
+      $lnk->SetFilter({refid=>$id,responsibility=>'customer'});
+      foreach my $rec ($lnk->getHashList("group")){
+         if ($rec->{"group"} ne ""){
+             $out->{'TS::appl::chmapprgroups3'}->{$rec->{"group"}}++;
          } 
       }
    }
