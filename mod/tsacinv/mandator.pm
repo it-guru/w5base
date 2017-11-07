@@ -59,11 +59,6 @@ sub new
       ]
    };
    return($self);
-
-
-
-
-   return($self);
 }
 
 

@@ -43,12 +43,6 @@ sub new
    }
    $status->{searchable}=0;
 
-   my $tenant=$self->getField("tenant");
-   if (!defined($tenant)){
-      return(undef);
-   }
-   $tenant->{searchable}=0;
-
    $self->AddFields(
       new kernel::Field::Boolean(
                 name          =>'w5found',
@@ -87,7 +81,6 @@ sub SetFilter
       if (ref($flt) eq "HASH"){
          $flt->{saphier}="9TS_ES.9DTIT 9TS_ES.9DTIT.*";
          $flt->{status}='"in operation" "hibernate"';
-         $flt->{tenant}=['CS'];
       }
    }
 

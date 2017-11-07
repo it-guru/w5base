@@ -44,19 +44,25 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'assetportfolio.assettag'),
+                dataobjattr   =>'"assetid"'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'lower(amasset.status)'),
+                dataobjattr   =>'"status"'),
+
+      new kernel::Field::Boolean(
+                name          =>'deleted',
+                readonly      =>1,
+                label         =>'marked as delete',
+                dataobjattr   =>'"deleted"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'full CI-Name',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>"assetportfolio.assettag"),
+                dataobjattr   =>'"fullname"'),
 
 
       new kernel::Field::Text(
@@ -77,24 +83,12 @@ sub new
                 vjoindisp     =>'systemid',
                 label         =>'SystemID'),
 
-      new kernel::Field::Text(
-                name          =>'tenant',
-                label         =>'Tenant',
-                group         =>'source',
-                dataobjattr   =>'amtenant.code'),
-
-      new kernel::Field::Interface(
-                name          =>'tenantid',
-                label         =>'Tenant ID',
-                group         =>'source',
-                dataobjattr   =>'amtenant.ltenantid'),
-
       new kernel::Field::Date(
                 name          =>'install',
                 label         =>'Install Date',
                 timezone      =>'CET',
                 #dataobjattr   =>'amasset.dinstall'), # this seems to be dcreate
-                dataobjattr   =>'assetportfolio.dtinvent'),
+                dataobjattr   =>'"install"'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
@@ -106,7 +100,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'assetportfolio.lassignmentid'),
+                dataobjattr   =>'"lassignmentid"'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
@@ -114,12 +108,12 @@ sub new
                 size          =>'15',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostcenterid'=>'id'],
-                dataobjattr   =>'amcostcenter.trimmedtitle'),
+                dataobjattr   =>'"conumber"'),
 
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenterID',
-                dataobjattr   =>'amcostcenter.lcostid'),
+                dataobjattr   =>'"lcostcenterid"'),
 
       new kernel::Field::Text(
                 name          =>'sysconumber',
@@ -142,13 +136,13 @@ sub new
                 name          =>'room',
                 label         =>'Room',
                 group         =>"location",
-                dataobjattr   =>'assetportfolio.room'),
+                dataobjattr   =>'"room"'),
 
       new kernel::Field::Text(
                 name          =>'place',
                 label         =>'Place',
                 group         =>"location",
-                dataobjattr   =>'assetportfolio.place'),
+                dataobjattr   =>'"place"'),
 
       new kernel::Field::Import( $self,
                 weblinkto     =>'tsacinv::model',
@@ -164,53 +158,48 @@ sub new
                 label         =>'Asset Memory',
                 unit          =>'MB',
                 precision     =>'0',
-                dataobjattr   =>'decode(amasset.lmemorysizemb,0,NULL,'.
-                                'amasset.lmemorysizemb)'),
+                dataobjattr   =>'"memory"'),
 
       new kernel::Field::Text(
                 name          =>'cputype',
                 label         =>'Asset CPU type',
-                dataobjattr   =>'amasset.cputype'),
+                dataobjattr   =>'"cputype"'),
 
       new kernel::Field::Float(
                 name          =>'cpucount',
                 label         =>'Asset CPU count',
                 precision     =>'0',
-                dataobjattr   =>'decode(amasset.lcpunumber,0,NULL,'.
-                                'amasset.lcpunumber)'),
+                dataobjattr   =>'"cpucount"'),
 
       new kernel::Field::Number(
                 name          =>'cpumaxsup',
                 htmldetail    =>0,
                 label         =>'Asset max. CPU count supported',
-                dataobjattr   =>'decode(amasset.imaxnumberprocessors,0,NULL,'.
-                                'amasset.imaxnumberprocessors)'),
+                dataobjattr   =>'"cpumaxsup"'),
 
       new kernel::Field::Float(
                 name          =>'cpuspeed',
                 label         =>'Asset CPU speed',
                 unit          =>'Hz',
                 precision     =>'0',
-                dataobjattr   =>'decode(amasset.lcpuspeedmhz,0,NULL,'.
-                                'amasset.lcpuspeedmhz)'),
+                dataobjattr   =>'"cpuspeed"'),
 
       new kernel::Field::Float(
                 name          =>'corecount',
                 label         =>'Asset Core count',
                 precision     =>'0',
-                dataobjattr   =>'decode(amasset.itotalnumberofcores,0,NULL,'.
-                                'amasset.itotalnumberofcores)'),
+                dataobjattr   =>'"corecount"'),
 
       new kernel::Field::Text(
                 name          =>'serialno',
                 ignorecase    =>1,
                 label         =>'Asset Serialnumber',
-                dataobjattr   =>'amasset.serialno'),
+                dataobjattr   =>'"serialno"'),
 
       new kernel::Field::Text(
                 name          =>'inventoryno',
                 label         =>'Asset Inventoryno',
-                dataobjattr   =>'amasset.inventoryno'),
+                dataobjattr   =>'"inventoryno"'),
 
       new kernel::Field::Float(
                 name          =>'systemsonasset',
@@ -233,7 +222,7 @@ sub new
                 name          =>'maintlevelid',
                 group         =>'maint',
                 label         =>'Maint LevelID',
-                dataobjattr   =>'amasset.lmaintlevelid'),
+                dataobjattr   =>'"maintlevelid"'),
 
 
       new kernel::Field::Select(
@@ -242,7 +231,7 @@ sub new
                 group         =>'finanz',
                 transprefix   =>'AQMODE.',
                 value         =>[0,1,2,3,4,6],
-                dataobjattr   =>'amasset.seAcquModeTsi'),
+                dataobjattr   =>'"acqumode"'),
 
       new kernel::Field::Date(
                 name          =>'startacquisition',
@@ -258,7 +247,7 @@ sub new
                 depend        =>'acqumode',
                 label         =>'Acquisition Start',
                 timezone      =>'CET',
-                dataobjattr   =>'amasset.dstartacqu'),
+                dataobjattr   =>'"startacquisition"'),
 
       new kernel::Field::Number(
                 name          =>'age',
@@ -384,14 +373,14 @@ sub new
                    return(0);
                 },
                 group         =>'finanz',
-                dataobjattr   =>'amasset.mdeprcalc'),
+                dataobjattr   =>'"mdepr"'),
 
       new kernel::Field::Currency(
                 name          =>'mmaint',
                 label         =>'Asset Maint./Month',
                 size          =>'20',
                 group         =>'finanz',
-                dataobjattr   =>'amasset.mmaintrate'),
+                dataobjattr   =>'"mmaint"'),
 
       new kernel::Field::Float(
                 name          =>'powerinput',
@@ -405,27 +394,27 @@ sub new
                 name          =>'maitcond',
                 group         =>'maint',
                 label         =>'Maintenance Codition',
-                dataobjattr   =>'amasset.maintcond'),
+                dataobjattr   =>'"maitcond"'),
 
       new kernel::Field::Link(
                 name          =>'locationid',
                 label         =>'LocationID',
-                dataobjattr   =>'assetportfolio.llocaid'),
+                dataobjattr   =>'"locationid"'),
 
       new kernel::Field::Link(
                 name          =>'lassetid',
                 label         =>'LAssetPortfolioId',
-                dataobjattr   =>'assetportfolio.lportfolioitemid'),
+                dataobjattr   =>'"lassetid"'),
 
       new kernel::Field::Link(
                 name          =>'lassetassetid',
                 label         =>'LAssetId',
-                dataobjattr   =>'amasset.lastid'),
+                dataobjattr   =>'"lassetassetid"'),
 
       new kernel::Field::Link(
                 name          =>'lmodelid',
                 label         =>'LModelId',
-                dataobjattr   =>'assetportfolio.lmodelid'),
+                dataobjattr   =>'"lmodelid"'),
 
       new kernel::Field::SubList(
                 name          =>'fixedassets',
@@ -441,40 +430,41 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>"assetportfolio.dtlastmodif"),
+                dataobjattr   =>'"replkeypri"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(assetportfolio.assettag,35,'0')"),
+                dataobjattr   =>'"replkeysec"'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'assetportfolio.dtcreation'),
+                dataobjattr   =>'"cdate"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'assetportfolio.dtlastmodif'),
+                dataobjattr   =>'"mdate"'),
 
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'assetportfolio.externalsystem'),
+                dataobjattr   =>'"srcsys"'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'assetportfolio.externalid'),
+                dataobjattr   =>'"srcid"'),
 
    );
+   $self->setWorktable("asset");
    $self->setDefaultView(qw(assetid status tsacinv_locationfullname 
                             systemname serialno));
    return($self);
@@ -629,47 +619,18 @@ sub SetFilter
 
 
 
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amasset,amnature, amportfolio assetportfolio,ammodel, amlocation,".
-            "(select amcostcenter.* from amcostcenter ".
-            " where amcostcenter.bdelete=0) amcostcenter, amtenant ";
-
-
-   return($from);
-}
-
-
 sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"\"!wasted\"");
    }
-   if (!defined(Query->Param("search_tenant"))){
-     Query->Param("search_tenant"=>"CS");
+   if (!defined(Query->Param("search_deleted"))){
+     Query->Param("search_deleted"=>$self->T("no"));
    }
 }
 
 
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $naturerest="";
-   $naturerest="and ".
-      "ammodel.name NOT IN ('LOGICAL SYSTEM','CLUSTER','DB-INSTANCE')";
-   my $where=
-      "assetportfolio.assettag=amasset.assettag ".
-      "and assetportfolio.lmodelid=ammodel.lmodelid ".
-      "and assetportfolio.llocaid=amlocation.llocaid(+) ".
-      "and assetportfolio.ltenantid=amtenant.ltenantid ".
-      "and ammodel.lnatureid=amnature.lnatureid(+) ".
-      "and amasset.lsendercostcenterid=amcostcenter.lcostid(+) ".
-      "and assetportfolio.bdelete=0 ".$naturerest;
-   return($where);
-}
 
 sub isViewValid
 {
