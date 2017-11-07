@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<head>
+<script language="JavaScript" src="../../../auth/base/load/toolbox.js">
+</script>
+<script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/spin.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/datadumper.js">
+</script>
+
+
+<style>
+body{
+   font-family: "Segoe UI",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
+   font-size: 14px;
+   margin:0;
+   padding:0;
+}
+
+.pathfirst{
+  float:left;
+  height:30px;
+  vertical-align:middle;
+  text-align:center;
+  line-height:30px;
+  border-right:1px solid gray; 
+  padding-left:5px;
+  padding-right:5px;
+  width:30px;
+  cursor:pointer;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QoRDQoJODKJoQAAARtJREFUSMft1r8uhEEUBfDf7PfFn0KC2MSKSiNRy9Z4Ag+hUKqUxBvwEDrvoLIF0XgIJDYhFJbYXIUpNHyjoJA9zWQmN3PuuZlz56bHzSWYQKUBKcRZ9/6l170fTyFpxhCDOhPso5sPv0M/cYgdzDXEVjjHQZ03XWwUZHYbHGMd88pQtT7JKsEbIq8Ky6XlDzAiGZH8HuoUAne4afJLinSTwnNwW3I3+oh0cjRVC2tJWshG+xIhnlvt195M+2UZk02tDnfCZX218jSG7dwqht+T6K+GvbVIu+gUKDnFVp276TRmS+qbPhR0sFgQPoc0esIjkn9CUhXGV9nJP4lXZ5dfFP71D7jOTm4XTivDGgPsFWYXwSt6WVHR3PUOtcFL6u/8AiUAAAAASUVORK5CYII) no-repeat center center;
+}
+
+
+.pathentry{
+  float:left;
+  height:30px;
+  vertical-align:middle;
+  line-height:30px;
+  border-right:1px solid gray; 
+  padding-left:14px;
+  padding-right:4px;
+}
+
+.arrow{
+   float:left;
+   height:30px;
+   position: relative;
+   border-right:0px; 
+}
+
+.arrow::before , .arrow::after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent; 
+  border-left:10px solid gray; 
+}
+
+.arrow::after {
+  margin-left:-1px;
+  border-left:10px solid white; 
+}
+
+.mpath{
+  padding-top:1px;
+  margin-left:2px;
+  margin-right:2px;
+  height:30px;
+  border-bottom: 1px solid gray; 
+}
+
+div.explorerec{
+}
+
+  div.table { 
+      display: table; 
+      border-collapse:collapse; 
+      width:inherit;
+  }
+    div.tr { 
+      display:table-row; 
+    }
+    div.td { 
+      display:table-cell; 
+    }
+
+
+
+div.menu{
+  margin-left:50px;
+  display:flex;
+  flex-wrap:wrap;
+  display:none;
+}
+div.menugroup{
+  position:relative;
+  width: max-content;
+}
+div.box{
+  position:relative;
+  width:200px;
+  height:100px;
+  float:left;
+  background-color:lightgray;
+  border: 1px solid gray; 
+  padding:10px;
+  margin:10px;
+  cursor:pointer;
+}
+div.box:hover { 
+    background-color: white;
+}
+
+div.box div.head{
+  font-weight:bold;
+  width:100%;
+  border-bottom: 1px solid gray; 
+}
+div.box div.small{
+  font-color:gray;
+  text-align:right;
+  font-size: 8px;
+  position:absolute;
+  bottom:3;
+  right:3;
+}
+
+
+</style>
+</head>
+<body>
+<div id=explorer style='width:100%'>
+<div id="mpath" class=mpath>
+<div class="pathfirst"></div>
+<div class="pathentry arrow">Server</div>
+<div class="pathentry arrow">e8npr</div>
+<div class="pathentry arrow">IP</div>
+</div>
+
+
+<div id=explorerec class=explorerec>
+
+<div class=table style='width:100%'>
+<div id=e class=tr style='height: 40px;'>
+<div class=td style='height:40px;overflow-x:hidden;overflow-y:auto'>xxx </div>
+<div class=td style='height:40px;width:300px;overflow:auto;border-left:1px solid black'>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+aaaq<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+2432<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+aaaq<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+2432<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+aaaq<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+2432<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+aaaq<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+2432<br>
+xxx<br>
+xxx<br>
+xxx<br>
+xxx<br>
+
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+<div id=menu class=menu>
+<div id=menugroup class=menugroup>
+
+<div class=box>
+<div class=head>Server</div>
+<p>Dies ist der Beschreibungstext</p>
+<div class=small>Non-Specific</div>
+</div>
+
+<div class=box>
+<div class=head>Server</div>
+<p>Dies ist der Beschreibungstext</p>
+<div class=small>Non-Specific</div>
+</div>
+
+<div class=box>
+<div class=head>Server</div>
+<p>Dies ist der Beschreibungstext</p>
+<div class=small>Non-Specific</div>
+</div>
+
+<div class=box>
+<div class=head>Server</div>
+<p>Dies ist der sdfasd sadfa sdafsad sadfasadf sdfasdf sdafaBeschreibungstext</p>
+<div class=small>Non-Specific</div>
+</div>
+
+<div class=box>
+<div class=head>Server</div>
+<p>Dies ist der Beschreibungstext</p>
+<div class=small>Non-Specific</div>
+</div>
+
+<div class=box>
+<div class=head>Server</div>
+<p>Dies ist der Beschreibungstext</p>
+<div class=small>Non-Specific</div>
+</div>
+
+<div class=box>
+<div class=head>Server</div>
+<p>Dies ist der Beschreibungstext</p>
+<div class=small>Non-Specific</div>
+</div>
+
+</div> <!-- menugroup -->
+</div> <!-- menu -->
+
+
+
+
+
+
+
+<script language="JavaScript">
+
+function resizePage(){
+
+
+}
+
+
+
+
+$(document).ready(function(){
+//   var h=getViewportHeight();
+//   var tb=document.getElementById("TitleBar");
+//
+//  $('#e').height(h);
+
+
+});
+
+</script>
+
+</div>
+</body>
+</html>
+
