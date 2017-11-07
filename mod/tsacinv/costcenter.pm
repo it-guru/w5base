@@ -327,7 +327,6 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'srcload',
-                history       =>0,
                 group         =>'source',
                 label         =>'Source-Load',
                 dataobjattr   =>'"srcload"'),

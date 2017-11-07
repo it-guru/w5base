@@ -40,39 +40,39 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'SCLocationID',
-                dataobjattr   =>'amtsisclocations.ltsisclocationsid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 uppersearch   =>1,
-                dataobjattr   =>'amtsisclocations.sclocationname'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(      
                 name          =>'company',
                 ignorecase    =>1,
                 label         =>'Company',
-                dataobjattr   =>'amtsisclocations.companytxt'),
+                dataobjattr   =>'"company"'),
 
       new kernel::Field::Text(
                 name          =>'subcompany',
                 ignorecase    =>1,
                 label         =>'SubCompany',
-                dataobjattr   =>'amtsisclocations.subcompany'),
+                dataobjattr   =>'"subcompany"'),
 
       new kernel::Field::Text(
                 name          =>'sclocationid',
                 label         =>'SCLocationKey',
-                dataobjattr   =>'amtsisclocations.sclocationid'),
+                dataobjattr   =>'"sclocationid"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 timezone      =>'CET',
                 label         =>'Modification date',
-                dataobjattr   =>'amtsisclocations.dtlastmodif'),
+                dataobjattr   =>'"mdate"'),
    );
    $self->setDefaultView(qw(linenumber name company subcompany sclocationid));
-   $self->setWorktable("amtsisclocations");
+   $self->setWorktable("sclocation");
    return($self);
 }
 
@@ -85,16 +85,6 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
-
-#sub initSqlWhere
-#{
-#   my $self=shift;
-#   my $where="amtsiaccsecunit.lunitid<>0 ";
-#   return($where);
-#}
-
-
-         
 
 
 sub isViewValid

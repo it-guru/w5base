@@ -1140,3 +1140,190 @@ CREATE or REPLACE VIEW lnksystemsoftware AS
 
 grant select on lnksystemsoftware to public;
 
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::model -------------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Model-Datensaetze wird dadurch eingeschraenkt
+--   das der Schnittstellen-User in der IFACE_ACL aufgefuert sein muss.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW model_acl AS
+   SELECT assetmodel.lmodelid                        AS id
+   FROM AM2107.ammodel assetmodel
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER')
+   WHERE assetmodel.lmodelid<>'0';
+
+CREATE or REPLACE VIEW model AS
+   SELECT
+      assetmodel.lmodelid                            AS "lmodelid",
+      assetmodel.name                                AS "name",
+      assetmodel.barcode                             AS "barcode",
+      amnature.name                                  AS "nature",
+      ambrand.name                                   AS "vendor",
+      assetpowerinput.powerinput                     AS "assetpowerinput",
+      assetmodel.dtlastmodif                         AS "replkeypri",
+      lpad(assetmodel.lmodelid,35,'0')               AS "replkeysec",
+      assetmodel.dtlastmodif                         AS "mdate"
+   FROM AM2107.ammodel assetmodel
+      JOIN model_acl
+         ON assetmodel.lmodelid=model_acl.id
+      LEFT OUTER JOIN AM2107.amnature
+         ON assetmodel.lnatureid = amnature.lnatureid 
+      LEFT OUTER JOIN (
+            SELECT amfvmodel.fval PowerInput,lmodelid
+            FROM AM2107.amfvmodel
+               JOIN AM2107.amfeature
+                  ON amfvmodel.lfeatid = amfeature.lfeatid
+            WHERE amfeature.sqlname = 'PowerInput') assetpowerinput
+         ON assetmodel.lmodelid = assetpowerinput.lmodelid
+      LEFT OUTER JOIN AM2107.ambrand
+         ON assetmodel.lbrandid = ambrand.lbrandid;
+
+grant select on model to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::swinstance --------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf einen Software-Instanz Datensatz wird dadurch
+--   eingeschraenkt, dass der betreffende Schnittstellen-User ueber die
+--   IFACE_ACL entweder den Zugriff auf den Buchungskreis, die
+--   Assignmentgroup der Instanz oder den aus  dem Kontierungsobjekt
+--   resultierenden Customer-Link haben muss.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW swinstance_acl AS
+   select DISTINCT amtsiswinstance.lportfolioid   AS id
+   FROM AM2107.amtsiswinstance
+      JOIN (SELECT amportfolio.* FROM AM2107.amportfolio
+             WHERE amportfolio.bdelete = 0) amportfolio
+         ON amportfolio.lportfolioitemid = amtsiswinstance.lportfolioid
+      left outer join AM2107.amemplgroup assigrp
+         on amportfolio.lassignmentid = assigrp.lgroupid
+      LEFT OUTER JOIN ( SELECT amcostcenter.* FROM AM2107.amcostcenter
+            WHERE amcostcenter.bdelete = 0) amcostcenter
+      LEFT OUTER JOIN AM2107.amtsiaccsecunit customerlnk
+            on amcostcenter.lcustomerlinkid=customerlnk.lunitid
+      ON  amportfolio.lcostid = amcostcenter.lcostid
+      join IFACE_ACL acl
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
+             ( assigrp.name like acl.assignment 
+               or acl.assignment is null) and
+             (amcostcenter.acctno like acl.acctno 
+                or acl.acctno is null) and
+             (customerlnk.identifier like acl.customerlnk 
+                or acl.customerlnk is null) and
+            (acl.customerlnk is not null or
+             acl.acctno is not null or
+             acl.assignment is not null);
+
+CREATE or REPLACE VIEW swinstance AS
+   SELECT
+      DISTINCT concat(amportfolio.name,
+      concat(' (',concat(amportfolio.assettag, ')')))  AS "fullname",
+      concat(amportfolio.name,concat(' (',concat(amportfolio.code,
+               ')')))                                AS "scfullname",
+      amportfolio.name                               AS "name",
+      amportfolio.assettag                           AS "swinstanceid",
+      amportfolio.lassignmentid                      AS "lassignmentid",
+      amportfolio.lincidentagid                      AS "lincidentagid",
+      amcostcenter.trimmedtitle                      AS "conumber",
+      amcostcenter.lcostid                           AS "lcostcenterid",
+      amcostcenter.alternatebusinesscenter           AS "altbc",
+      amtsiswinstance.status                         AS "status",
+      amtsiswinstance.monitoringname                 AS "monname",
+      amtsiswinstance.lportfolioid                   AS "portfolioid",
+      amportfolio.dtlastmodif                        AS "mdate",
+      amportfolio.externalsystem                     AS "srcsys",
+      amportfolio.externalid                         AS "srcid"
+   FROM AM2107.amtsiswinstance
+      JOIN swinstance_acl
+         ON amtsiswinstance.lportfolioid=swinstance_acl.id
+      JOIN (SELECT amportfolio.* FROM AM2107.amportfolio
+             WHERE amportfolio.bdelete = 0) amportfolio
+         ON amportfolio.lportfolioitemid = amtsiswinstance.lportfolioid
+      JOIN AM2107.ammodel
+         ON amportfolio.lmodelid = ammodel.lmodelid
+      LEFT OUTER JOIN ( SELECT amcostcenter.* FROM AM2107.amcostcenter
+            WHERE amcostcenter.bdelete = 0) amcostcenter
+         ON  amportfolio.lcostid = amcostcenter.lcostid;
+
+grant select on swinstance to public;
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::sclocation --------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die ServiceCenter Location Datensaetze wird dadurch
+--   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
+--   sein muss.     
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW sclocation_acl AS
+   SELECT distinct amtsisclocations.ltsisclocationsid id
+   FROM AM2107.amtsisclocations
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
+CREATE or REPLACE VIEW sclocation AS
+   SELECT  amtsisclocations.ltsisclocationsid        AS "id",
+      amtsisclocations.sclocationname                AS "name",
+      amtsisclocations.companytxt                    AS "company",
+      amtsisclocations.subcompany                    AS "subcompany",
+      amtsisclocations.sclocationid                  AS "sclocationid",
+      amtsisclocations.dtlastmodif                   AS "mdate"
+   FROM AM2107.amtsisclocations
+      JOIN sclocation_acl
+         ON amtsisclocations.ltsisclocationsid=sclocation_acl.id;
+
+grant select on sclocation to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::autodiscsystem ----------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die logisches System im AutoDiscovery wird dadurch
+--   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
+--   sein muss.     
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW autodiscsystem_acl AS
+   SELECT distinct amtsiautodiscovery.lautodiscoveryid id
+   FROM AM2107.amtsiautodiscovery
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
+CREATE or REPLACE VIEW autodiscsystem AS
+   SELECT
+      amtsiautodiscovery.lautodiscoveryid            AS "systemdiscoveryid",
+      amtsiautodiscovery.name                        AS "systemname",
+      amtsiautodiscovery.name                        AS "fullname",
+      amtsiautodiscovery.assettag                    AS "systemid",
+      amtsiautodiscovery.model                       AS "model",
+      amtsiautodiscovery.os                          AS "osrelease",
+      amtsiautodiscovery.lmemorymb                   AS "memory",
+      amtsiautodiscovery.lcpucount                   AS "physcpucount",
+      amtsiautodiscovery.cputype                     AS "cputype",
+      amtsiautodiscovery.lcpuspeedmhz                AS "cpuspeed",
+      amtsiautodiscovery.itotalnumberofcores         AS "independcpucount",
+      amtsiautodiscovery.itotalnumberofcores * amtsiautodiscovery.smt AS "cpucount",
+      amtsiautodiscovery.serialno                    AS "serialno",
+      amtsiautodiscovery.dtscandate                  AS "scandate",
+      amtsiautodiscovery.source                      AS "srcsys"
+   FROM AM2107.amtsiautodiscovery
+      JOIN sclocation_acl
+         ON amtsiautodiscovery.lautodiscoveryid=sclocation_acl.id;
+
+grant select on autodiscsystem to public;
+
+
+
+
+
+
+

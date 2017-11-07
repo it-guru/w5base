@@ -35,66 +35,64 @@ sub new
       new kernel::Field::Id(
                 name          =>'lmodelid',
                 label         =>'ModelID',
-                dataobjattr   =>'assetmodel.lmodelid'),
+                dataobjattr   =>'"lmodelid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'350px',
                 label         =>'Model',
                 ignorecase    =>1,
-                dataobjattr   =>'assetmodel.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'barcode',
                 label         =>'BarCode',
                 ignorecase    =>1,
-                dataobjattr   =>'assetmodel.barcode'),
+                dataobjattr   =>'"barcode"'),
 
       new kernel::Field::Text(
                 name          =>'nature',
                 label         =>'Nature',
                 ignorecase    =>1,
-                dataobjattr   =>'amnature.name'),
+                dataobjattr   =>'"nature"'),
 
       new kernel::Field::Text(
                 name          =>'vendor',
                 label         =>'Vendor',
                 ignorecase    =>1,
-                dataobjattr   =>'ambrand.name'),
+                dataobjattr   =>'"vendor"'),
 
       new kernel::Field::Text(
                 name          =>'barcode',
                 label         =>'BarCode',
                 ignorecase    =>1,
-                dataobjattr   =>'assetmodel.barcode'),
+                dataobjattr   =>'"barcode"'),
 
       new kernel::Field::Float(
                 name          =>'assetpowerinput',
                 label         =>'PowerInput of Asset',
                 unit          =>'KVA',
-                dataobjattr   =>'assetpowerinput.powerinput'),
+                dataobjattr   =>'"assetpowerinput"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>"assetmodel.dtlastmodif"),
+                dataobjattr   =>'"replkeypri"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(assetmodel.lmodelid,35,'0')"),
+                dataobjattr   =>'"replkeysec"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'assetmodel.dtlastmodif'),
-
-
-
+                dataobjattr   =>'"mdate"')
    );
+   $self->setWorktable("model");
    $self->setDefaultView(qw(lmodelid barcode name nature));
    return($self);
 }
@@ -116,27 +114,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/model.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=
-      "ammodel assetmodel,amnature,".
-      "(select amfvmodel.fval PowerInput,lmodelid from amfvmodel,amfeature ".
-      "where amfvmodel.lfeatid=amfeature.lfeatid and ".
-      " amfeature.sqlname='PowerInput') assetpowerinput,".
-      "ambrand";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="assetmodel.lmodelid=assetpowerinput.lmodelid(+) and ".
-             "assetmodel.lnatureid=amnature.lnatureid(+) and ".
-             "assetmodel.lbrandid=ambrand.lbrandid(+) ";
-   return($where);
-}
 
 sub isViewValid
 {
