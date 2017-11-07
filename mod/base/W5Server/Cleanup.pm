@@ -139,7 +139,8 @@ sub CleanupWasted
 
    my @objlist=$self->getParent->globalObjectList();
    foreach my $obj (@objlist){
-      my $o=getModuleObject($self->getParent->Config,$obj);
+      my $o;
+      eval('$o=getModuleObject($self->getParent->Config,$obj);');
       msg(DEBUG,"check for CleanupWasted $obj");
       if (!defined($o)){
          die("ERROR: can not create object $obj");

@@ -50,7 +50,7 @@ sub getbasesql
    my $nice_sql = $sql->beautify;
 
 
-   printf ("\n\nCREATE VIEW \"$dataobj\" AS\n%s\n",$nice_sql);
+   printf ("\n\nCREATE or REPLACE VIEW \"$dataobj\" AS\n%s\n",$nice_sql);
 
 
    return({exitcode=>0,msg=>'ok'});
