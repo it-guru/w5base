@@ -39,7 +39,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'LinkID',
-                dataobjattr   =>'"id"'),
+                dataobjattr   =>"amtsirelappl.lrelapplid"),
 
       new kernel::Field::TextDrop(
                 name          =>'parent',
@@ -53,7 +53,7 @@ sub new
                 label         =>'Child Application',
                 weblinkto     =>'tsacinv::appl',
                 weblinkon     =>['lchildid'=>'id'],
-                dataobjattr   =>'"child"'),
+                dataobjattr   =>'amtsicustappl.name'),
 
       new kernel::Field::TextDrop(
                 name          =>'parent_applid',
@@ -67,62 +67,55 @@ sub new
                 label         =>'Child ApplicationID',
                 weblinkto     =>'tsacinv::appl',
                 weblinkon     =>['lchildid'=>'id'],
-                dataobjattr   =>'"child_applid"'),
-
-      new kernel::Field::Boolean(
-                name          =>'deleted',
-                readonly      =>1,
-                label         =>'marked as delete',
-                dataobjattr   =>'"deleted"'),
+                dataobjattr   =>'amtsicustappl.code'),
 
       new kernel::Field::Text(
                 name          =>'type',
                 label         =>'type',
-                dataobjattr   =>'"type"'),
+                dataobjattr   =>'amtsirelappl.type'),
 
       new kernel::Field::Interface(
                 name          =>'lparentid',
                 label         =>'lparentid',
-                dataobjattr   =>'"lparentid"'),
+                dataobjattr   =>'amtsirelappl.lparentid'),
 
       new kernel::Field::Interface(
                 name          =>'lchildid',
                 label         =>'lchildid',
-                dataobjattr   =>'"lchildid"'),
+                dataobjattr   =>'amtsirelappl.lchildid'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'"mdate"'),
+                dataobjattr   =>'amtsirelappl.dtlastmodif'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 ignorecase    =>1,
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'"srcsys"'),
+                dataobjattr   =>'amtsirelappl.externalsystem'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'"srcid"'),
+                dataobjattr   =>'amtsirelappl.externalid'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'"replkeypri"'),
+                dataobjattr   =>'amtsirelappl.dtlastmodif'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>'"replkeysec"')
+                dataobjattr   =>"lpad(amtsirelappl.lrelapplid,35,'0')")
 
    );
-   $self->setWorktable("lnkapplappl");
    $self->setDefaultView(qw(id parent child));
    return($self);
 }
@@ -143,16 +136,21 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/lnkapplappl.jpg?".$cgi->query_string());
 }
+         
 
-sub initSearchQuery
+sub getSqlFrom
 {
    my $self=shift;
-
-   if (!defined(Query->Param("search_deleted"))){
-     Query->Param("search_deleted"=>$self->T("no"));
-   }
+   my $from="amtsirelappl,amtsicustappl";
+   return($from);
 }
 
+sub initSqlWhere
+{
+   my $self=shift;
+   return("amtsirelappl.bdelete=0 and ".
+          "amtsirelappl.lchildid=amtsicustappl.ltsicustapplid");
+}
 
 sub isViewValid
 {

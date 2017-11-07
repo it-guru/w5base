@@ -9,4 +9,3 @@
 'Costcenter of system'=>{de=>'Kontierungsobjekt des Systems'},
 'Costcenter desc of system'=>{de=>'Kontierungsobjekt Beschreibung des Systems'},
 'Application Description'=>{de=>'Anwendungsbeschreibung'},
-'marked as delete'=>{de=>'gelöscht markiert'},

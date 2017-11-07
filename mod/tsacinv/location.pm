@@ -53,48 +53,48 @@ sub new
       new kernel::Field::Id(
                 name          =>'locationid',
                 label         =>'LocationID',
-                dataobjattr   =>'"locationid"'),
+                dataobjattr   =>'amlocation.llocaid'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Fullname',
                 ignorecase    =>1,
-                dataobjattr   =>'"fullname"'),
+                dataobjattr   =>'amlocation.fullname'),
 
       new kernel::Field::Text(
                 name          =>'address1',
                 label         =>'Street',
                 ignorecase    =>1,
-                dataobjattr   =>'"address1"'),
+                dataobjattr   =>'amlocation.address1'),
 
       new kernel::Field::Text(
                 name          =>'zipcode',
                 label         =>'ZIP',
-                dataobjattr   =>'"zipcode"'),
+                dataobjattr   =>'amlocation.zip'),
 
       new kernel::Field::Text(
                 name          =>'country',
                 label         =>'Country',
                 ignorecase    =>1,
-                dataobjattr   =>'"country"'),
+                dataobjattr   =>'amcountry.isocode'),
 
       new kernel::Field::Text(
                 name          =>'location',
                 label         =>'Location',
                 ignorecase    =>1,
-                dataobjattr   =>'"location"'),
+                dataobjattr   =>'amlocation.city'),
 
       new kernel::Field::Text(
                 name          =>'locationtype',
                 label         =>'Location Type',
                 ignorecase    =>1,
-                dataobjattr   =>'"locationtype"'),
+                dataobjattr   =>'amlocation.locationtype'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'"name"'),
+                dataobjattr   =>'amlocation.name'),
 
       new kernel::Field::OSMap(
                 name          =>'osmap',
@@ -189,29 +189,28 @@ sub new
                 name          =>'code',
                 group         =>'source',
                 label         =>'BarCode',
-                dataobjattr   =>'"code"'),
+                dataobjattr   =>'amlocation.barcode'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'"replkeypri"'),
+                dataobjattr   =>"amlocation.dtlastmodif"),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>'"replkeysec"'),
+                dataobjattr   =>"lpad(amlocation.llocaid,35,'0')"),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'"mdate"'),
+                dataobjattr   =>'amlocation.dtlastmodif'),
    );
-   $self->setWorktable("location");
    $self->setDefaultView(qw(linenumber code locationid fullname 
-                            zipcode location address1));
+                             zipcode location address1));
    $self->{MainSearchFieldLines}=4;
    return($self);
 }
@@ -268,6 +267,23 @@ sub findW5LocID
 }
 
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="amlocation, amcountry";
+   return($from);
+}
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="amlocation.lcountryid=amcountry.lcountryid(+) and ".
+             "amlocation.bdelete=0 and amlocation.llocaid>0 and ".
+             "amlocation.llocaid is not null and ".
+             "amlocation.dtlastmodif is not null";
+   return($where);
+}
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -282,6 +298,7 @@ sub Initialize
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->setWorktable("amlocation");
    return(1) if (defined($self->{DB}));
    return(0);
 }

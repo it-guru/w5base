@@ -33,7 +33,8 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(      name       =>'id',
                                   label      =>'LinkID',
-                                  dataobjattr=>'"id"'),
+                                  dataobjattr=>
+         "concat(amrelemplgrp.lgroupid,concat('-',amrelemplgrp.lempldeptid))"),
 
       new kernel::Field::TextDrop( name       =>'user',
                                    label      =>'Account',
@@ -53,17 +54,16 @@ sub new
                                    vjoinon    =>['lgroupid'=>'lgroupid'],
                                    vjoindisp  =>'name'),
 
-      new kernel::Field::Text(     name       =>'lempldeptid',
-                                   label      =>'lempldeptid',
-                                   dataobjattr=>'"lempldeptid"'),
-                                  
-      new kernel::Field::Text(     name       =>'lgroupid',
-                                   label      =>'lgroupid',
-                                   dataobjattr=>'"lgroupid"'),
+      new kernel::Field::Text(    name       =>'lempldeptid',
+                                  label      =>'lempldeptid',
+                                  dataobjattr=>'amrelemplgrp.lempldeptid'),
+
+      new kernel::Field::Text(    name       =>'lgroupid',
+                                  label      =>'lgroupid',
+                                  dataobjattr=>'amrelemplgrp.lgroupid'),
 
    );
-   $self->setWorktable("lnkusergroup");
-   $self->setDefaultView(qw(id lempldeptid lgroupid group userfullname));
+   $self->setDefaultView(qw(id lempldeptid lgroupid));
    return($self);
 }
 
@@ -84,6 +84,20 @@ sub getRecordImageUrl
    return("../../../public/base/load/user.jpg?".$cgi->query_string());
 }
          
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from=
+      "amrelemplgrp";
+   return($from);
+}
+
+sub initSqlWhere
+{
+   my $self=shift;
+   return("");
+}
 
 sub isViewValid
 {

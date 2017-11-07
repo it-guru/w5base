@@ -168,6 +168,14 @@ sub Init
                       "tsacinv::DBDataDiconary",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itu.ac.quality",
+                      "tsacinv::quality_appl",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.ac.quality.appl",
+                      "tsacinv::quality_appl",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("AL_TCom.system.acimport",
                       "tsacinv::system",
                       func=>'ImportSystem',

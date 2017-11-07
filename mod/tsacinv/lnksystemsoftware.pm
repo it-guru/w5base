@@ -48,7 +48,7 @@ sub new
                 searchable    =>1,
                 htmlwidth     =>'60px',
                 label         =>'SW-Install-ID',
-                dataobjattr   =>'"id"'),
+                dataobjattr   =>"amportfolio.assettag"),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -56,7 +56,7 @@ sub new
                 uppersearch   =>1,
                 htmlwidth     =>'380px',
                 size          =>'16',
-                dataobjattr   =>'"name"'),
+                dataobjattr   =>'ammodel.name'),
 
       new kernel::Field::TextDrop(
                 name          =>'system',
@@ -78,18 +78,18 @@ sub new
                 name          =>'quantity',
                 xhtmlwidth     =>'40px',
                 label         =>'Quantity',
-                dataobjattr   =>'"quantity"'),
+                dataobjattr   =>'amsoftinstall.lusecount'),
 
       new kernel::Field::Text(
                 name          =>'version',
                 label         =>'Version',
                 #dataobjattr   =>'amsoftinstall.versionlevel'),
-                dataobjattr   =>'"version"'),
+                dataobjattr   =>'ammodel.versionlevel'),
 
       new kernel::Field::Text(
                 name          =>'instpath',
                 label         =>'Folder',
-                dataobjattr   =>'"instpath"'),
+                dataobjattr   =>'amsoftinstall.folder'),
 
       new kernel::Field::TextDrop(
                 name          =>'license',
@@ -102,19 +102,19 @@ sub new
       new kernel::Field::Link(
                 name          =>'lparentid',
                 label         =>'ParentID',
-                dataobjattr   =>'"lparentid"'),
+                dataobjattr   =>'amportfolio.lparentid'),
 
       new kernel::Field::Text(
                 name          =>'llicense',
                 htmldetail    =>0,
                 label         =>'LicenseID',
-                dataobjattr   =>'"llicense"'),
+                dataobjattr   =>'amsoftinstall.llicenseid'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'"cdate"'),
+                dataobjattr   =>'amportfolio.dtcreation'),
 
       new kernel::Field::Text(
                 name          =>'applications',
@@ -142,10 +142,9 @@ sub new
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'"mdate"'),
+                dataobjattr   =>'amsoftinstall.dtlastmodif'),
    );
    $self->setDefaultView(qw(id name version system license quantity));
-    $self->setWorktable("lnksystemsoftware");
    return($self);
 }
 
@@ -164,6 +163,26 @@ sub getRecordImageUrl
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/lnkapplsystem.jpg?".$cgi->query_string());
+}
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="amportfolio,ammodel,amnature,amsoftinstall";
+   return($from);
+}  
+
+sub initSqlWhere
+{  
+   my $self=shift;
+   my $where=
+      "amportfolio.lportfolioitemid=amsoftinstall.litemid ".
+      "and amportfolio.lmodelid=ammodel.lmodelid ".
+      "and ammodel.certification='CSS' ".
+      "and ammodel.lnatureid=amnature.lnatureid(+) ".
+      "and amnature.name='SW-INSTALLATION' ".
+      "and amportfolio.bdelete=0 ";
+   return($where);
 }
 
 

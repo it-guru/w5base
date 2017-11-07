@@ -30,5 +30,3 @@
 'untrimmed CostCenter-No.'=>{de=>'ungekürtze Kostenstelle/CO/PSP'},
 'Production Planning OSS'=>{de=>'Produktionsplannung OSS'},
 'used by active systems'=>{de=>'verwendet durch logische Systeme'},
-'marked as delete'=>{de=>'gelöscht markiert'},
-

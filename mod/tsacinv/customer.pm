@@ -40,19 +40,19 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'UnitID',
-                dataobjattr   =>'"id"'),
+                dataobjattr   =>'amtsiaccsecunit.lunitid'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 uppersearch   =>1,
-                dataobjattr   =>'"name"'),
+                dataobjattr   =>'amtsiaccsecunit.identifier'),
 
       new kernel::Field::Text(      
                 name          =>'fullname',
                 ignorecase    =>1,
                 label         =>'Description',
-                dataobjattr   =>'"fullname"'),
+                dataobjattr   =>'amtsiaccsecunit.description'),
 
       new kernel::Field::TextDrop(
                 name          =>'delmgr',
@@ -64,12 +64,12 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'delmgrid',
-                dataobjattr   =>'"delmgrid"'),
+                dataobjattr   =>'amtsiaccsecunit.ldeliverymanagerid'),
 
       new kernel::Field::Text(
                 name          =>'code',
                 label         =>'Code',
-                dataobjattr   =>'"code"'),
+                dataobjattr   =>'amtsiaccsecunit.code'),
 
       new kernel::Field::TextDrop(
                 name          =>'defaultsclocation',
@@ -81,16 +81,16 @@ sub new
       new kernel::Field::Link(
                 name          =>'defaultsclocationid',
                 label         =>'defaultsclocationid',
-                dataobjattr   =>'"defaultsclocationid"'),
+                dataobjattr   =>'amtsiaccsecunit.ldefaultsclocationid'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 timezone      =>'CET',
                 label         =>'Modification date',
-                dataobjattr   =>'"mdate"'),
+                dataobjattr   =>'amtsiaccsecunit.dtlastmodif'),
    );
    $self->setDefaultView(qw(linenumber id name fullname));
-   $self->setWorktable("customer");
+   $self->setWorktable("amtsiaccsecunit");
    return($self);
 }
 
@@ -103,6 +103,17 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="amtsiaccsecunit.lunitid<>0 ";
+   return($where);
+}
+
+
+         
+
 
 sub isViewValid
 {

@@ -37,30 +37,29 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 label         =>'ID',
-                dataobjattr   =>'"id"'),
+                dataobjattr   =>'amitemlistval.litemlistvalid'),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'150px',
                 label         =>'Name',
                 ignorecase    =>1,
-                dataobjattr   =>'"name"'),
+                dataobjattr   =>'amitemlistval.value'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 sqlorder      =>'NONE',
                 label         =>'Modification-Date',
-                dataobjattr   =>'"mdate"'),
+                dataobjattr   =>'amitemlistval.dtlastmodif'),
 
       new kernel::Field::Date(
                 name          =>'mdaterev',
                 sqlorder      =>'desc',
                 uivisible     =>0,
                 label         =>'Modification-Date reverse',
-                dataobjattr   =>'"mdaterev"')
+                dataobjattr   =>'amitemlistval.dtlastmodif')
    );
    $self->setDefaultView(qw(linenumber name id mdate));
-   $self->setWorktable("osrelease");
    return($self);
 }
 
@@ -74,6 +73,23 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="amitemizedlist,amitemlistval ";
+   return($from);
+}  
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="amitemizedlist.litemlistid=amitemlistval.litemlistid and ".
+             "amitemizedlist.identifier='amOS' ";
+   return($where);
+}
+
+
 
 
 

@@ -44,14 +44,15 @@ sub new
                 label         =>'full CI-Name',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"fullname"'),
+                dataobjattr   =>"concat(concat(concat(amportfolio.name,' ('".
+                                "),amportfolio.assettag),')')"),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 uppersearch   =>1,
                 size          =>'16',
-                dataobjattr   =>'"systemname"'),
+                dataobjattr   =>'amportfolio.name'),
 
       new kernel::Field::Id(
                 name          =>'systemid',
@@ -60,18 +61,24 @@ sub new
                 searchable    =>1,
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'"systemid"'),
+                dataobjattr   =>'amportfolio.assettag'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'"status"'),
+                dataobjattr   =>'lower(amcomputer.status)'),
 
-      new kernel::Field::Boolean(
-                name          =>'deleted',
-                readonly      =>1,
-                label         =>'marked as delete',
-                dataobjattr   =>'"deleted"'),
+      new kernel::Field::Text(
+                name          =>'tenant',
+                label         =>'Tenant',
+                group         =>'source',
+                dataobjattr   =>'amtenant.code'),
+
+      new kernel::Field::Interface(
+                name          =>'tenantid',
+                label         =>'Tenant ID',
+                group         =>'source',
+                dataobjattr   =>'amtenant.ltenantid'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
@@ -79,7 +86,7 @@ sub new
                 size          =>'15',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostcenterid'=>'id'],
-                dataobjattr   =>'"conumber"'),
+                dataobjattr   =>'amcostcenter.trimmedtitle'),
 
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::location',
@@ -100,24 +107,24 @@ sub new
                 name          =>'customerlink',
                 label         =>'Customer (link)',
                 htmldetail    =>0,
-                dataobjattr   =>'"customerlink"'),
+                dataobjattr   =>'amcostcenter.customerlink'),
 
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenterID',
-                dataobjattr   =>'"lcostcenterid"'),
+                dataobjattr   =>'amcostcenter.lcostid'),
 
       new kernel::Field::Text(
                 name          =>'cocustomeroffice',
                 searchable    =>0,
                 label         =>'Customer Office',
                 size          =>'20',
-                dataobjattr   =>'"cocustomeroffice"'),
+                dataobjattr   =>'amcostcenter.customeroffice'),
 
       new kernel::Field::Text(
                 name          =>'bc',
                 label         =>'Business Center',
-                dataobjattr   =>'"bc"'),
+                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
 
       new kernel::Field::Text(
                 name          =>'saphier',
@@ -125,7 +132,7 @@ sub new
                 group         =>'saphier',
                 htmldetail    =>0,
                 ignorecase    =>1,
-                dataobjattr   =>'"saphier"'),
+                dataobjattr   =>tsacinv::costcenter::getSAPhierSQL()),
 
       new kernel::Field::TextDrop(
                 name          =>'supervisor',
@@ -138,7 +145,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'supervid',
                 label         =>'Supervisor ID',
-                dataobjattr   =>'"supervid"'),
+                dataobjattr   =>'amportfolio.lsupervid'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
@@ -173,56 +180,56 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'"lassignmentid"'),
+                dataobjattr   =>'amportfolio.lassignmentid'),
 
       new kernel::Field::Link(
                 name          =>'lincidentagid',
                 label         =>'AC-Incident-AssignmentID',
-                dataobjattr   =>'"lincidentagid"'),
+                dataobjattr   =>'amportfolio.lincidentagid'),
 
       new kernel::Field::Text(
                 name          =>'controlcenter',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['controlcenter'=>'name'],
                 label         =>'System ControlCenter',
-                dataobjattr   =>'"controlcenter"'),
+                dataobjattr   =>'amportfolio.controlcenter'),
 
       new kernel::Field::Text(
                 name          =>'controlcenter2',
                 weblinkto     =>'tsacinv::group',
                 weblinkon     =>['controlcenter2'=>'name'],
                 label         =>'Application ControlCenter',
-                dataobjattr   =>'"controlcenter2"'),
+                dataobjattr   =>'amportfolio.controlcenter2'),
 
       new kernel::Field::Text(
                 name          =>'usage',
                 group         =>'form',
                 label         =>'Usage',
-                dataobjattr   =>'"usage"'),
+                dataobjattr   =>'amportfolio.usage'),
 
       new kernel::Field::Text(
                 name          =>'type',
                 label         =>'Type',
                 group         =>'form',
-                dataobjattr   =>'"type"'),
+                dataobjattr   =>'amcomputer.computertype'),
 
       new kernel::Field::Text(
                 name          =>'model',
                 label         =>'Model',
                 group         =>'form',
-                dataobjattr   =>'"model"'),
+                dataobjattr   =>'ammodel.name'),
 
       new kernel::Field::Text(
                 name          =>'nature',
                 label         =>'Nature',
                 group         =>'form',
-                dataobjattr   =>'"nature"'),
+                dataobjattr   =>'amnature.name'),
 
       new kernel::Field::Boolean(
                 name          =>'soxrelevant',
                 label         =>'SOX relevant',
                 group         =>'form',
-                dataobjattr   =>'"soxrelevant"'),
+                dataobjattr   =>"decode(amportfolio.soxrelevant,'YES',1,0)"),
 
       new kernel::Field::Text(
                 name          =>'securitymodel',
@@ -234,27 +241,34 @@ sub new
                    return(0);
                 },
                 group         =>'form',
-                dataobjattr   =>'"securitymodel"'),
+                dataobjattr   =>"decode(amcomputer.addsysname,".
+                                "'+VS+','VS',".
+                                "'+VS++','VS',".
+                                "'++VS+','VS',".
+                                "'+GS+','GS',".
+                                "'+GS++','GS'".
+                                "'++GS+','GS'".
+                                ",'NONE')"),
 
       new kernel::Field::Text(
                 name          =>'altname',
                 label         =>'second name',
                 group         =>'form',
-                dataobjattr   =>'"altname"'),
+                dataobjattr   =>"amcomputer.addsysname"),
 
       new kernel::Field::Text(
                 name          =>'securityset',
                 label         =>'security set',
                 ignorecase    =>1,
                 group         =>'form',
-                dataobjattr   =>'"securityset"'),
+                dataobjattr   =>"amportfolio.securityset"),
 
       new kernel::Field::Float(
                 name          =>'systemcpucount',
                 label         =>'System CPU count',
                 unit          =>'CPU',
                 precision     =>0,
-                dataobjattr   =>'"systemcpucount"'),
+                dataobjattr   =>'amcomputer.itotalnumberofcores'),
 
       new kernel::Field::Float(  # temp. da es keine phys. cpu anzahl beim
                 name          =>'systeminvoicecpucount',  # logischen system
@@ -262,54 +276,54 @@ sub new
                 unit          =>'CPU',                   # grund: TMO 
                 htmldetail    =>0,                       # abrechnungsprozess
                 precision     =>1,
-                dataobjattr   =>'"systeminvoicecpucount"'),
+                dataobjattr   =>'amcomputer.fcpunumber'),
 
       new kernel::Field::Float(
                 name          =>'systemcpuspeed',
                 label         =>'System CPU speed',
                 unit          =>'MHz',
                 precision     =>0,
-                dataobjattr   =>'"systemcpuspeed"'),
+                dataobjattr   =>'amcomputer.lcpuspeedmhz'),
 
       new kernel::Field::Text(
                 name          =>'systemcputype',
                 label         =>'System CPU type',
                 unit          =>'MHz',
-                dataobjattr   =>'"systemcputype"'),
+                dataobjattr   =>'amcomputer.cputype'),
 
       new kernel::Field::Text(
                 name          =>'systemtpmc',
                 label         =>'System tpmC',
                 unit          =>'tpmC',
-                dataobjattr   =>'"systemtpmc"'),
+                dataobjattr   =>'amcomputer.lProcCalcSpeed'),
 
       new kernel::Field::Float(
                 name          =>'systemmemory',
                 label         =>'System Memory',
                 unit          =>'MB',
                 precision     =>0,
-                dataobjattr   =>'"systemmemory"'),
+                dataobjattr   =>'amcomputer.lmemorysizemb'),
 
       new kernel::Field::Text(
                 name          =>'virtualization',
                 htmldetail    =>0,
                 label         =>'Virualization Status',
-                dataobjattr   =>'"virtualization"'),
+                dataobjattr   =>'amcomputer.virtualization'),
 
       new kernel::Field::Text(
                 name          =>'systemos',
                 label         =>'System OS',
-                dataobjattr   =>'"systemos"'),
+                dataobjattr   =>'trim(amcomputer.operatingsystem)'),
 
       new kernel::Field::Text(
                 name          =>'systemospatchlevel',
                 label         =>'System OS patchlevel',
-                dataobjattr   =>'"systemospatchlevel"'),
+                dataobjattr   =>"amcomputer.osservicelevel"),
 
       new kernel::Field::Text(
                 name          =>'systemos',
                 label         =>'System OS',
-                dataobjattr   =>'"systemos"'),
+                dataobjattr   =>'trim(amcomputer.operatingsystem)'),
 
       new kernel::Field::Float(
                 name          =>'partofasset',
@@ -317,14 +331,14 @@ sub new
                 unit          =>'%',
                 depend        =>['lassetid','status'],
                 prepRawValue  =>\&SystemPartOfCorrection,
-                dataobjattr   =>'"partofasset"'),
+                dataobjattr   =>'amcomputer.psystempartofasset'),
 
       new kernel::Field::Float(
                 name          =>'nativepartofasset',
                 label      =>'System Part of Asset (native from AssetManager)',
                 htmldetail    =>0,
                 unit          =>'%',
-                dataobjattr   =>'"nativepartofasset"'),
+                dataobjattr   =>'amcomputer.psystempartofasset*100'),
 
 #      new kernel::Field::Text(
 #                name          =>'costallocactive',
@@ -334,30 +348,39 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemola',
                 label         =>'System OLA',
-                dataobjattr   =>'"systemola"'),
+                dataobjattr   =>'amcomputer.olaclasssystem'),
 
       new kernel::Field::Select(
                 name          =>'systemolaclass',
                 label         =>'System OLA Service Class',
                 value         =>['0','4','10','20','25','30','38'], 
                 transprefix   =>'SYSCLASS.',
-                dataobjattr   =>'"systemolaclass"'),
+                dataobjattr   =>'amcomputer.seappcom'),
 
       new kernel::Field::Text(
                 name          =>'rawsystemolaclass',
                 htmldetail    =>0,
                 label         =>'raw System OLA Service Class',
-                dataobjattr   =>'"rawsystemolaclass"'),
+                dataobjattr   =>"decode(amcomputer.seappcom,".
+                                "'0','UNDEFINED',".
+                                "'4','UNIVERSAL',".
+                                "'10','CLASSIC',".
+                                "'20','STANDARDIZED',".
+                                "'25','STANDARDIZED SLICE',".
+                                "'30','APPCOM',".
+                                "'33','DCS',".
+                                "amcomputer.seappcom||'???')"),
 
       new kernel::Field::Text(
                 name          =>'priority',
                 label         =>'Priority of system',
-                dataobjattr   =>'"priority"'),
+                dataobjattr   =>'amportfolio.priority'),
 
       new kernel::Field::Date(
                 name          =>'installdate',
                 label         =>'installation date',
-                dataobjattr   =>'"installdate"'),
+                dataobjattr   =>'decode(amportfolio.dtinvent,NULL,'.
+                              'assetportfolio.dtinvent,amportfolio.dtinvent)'),
 
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::asset',
@@ -399,27 +422,27 @@ sub new
       new kernel::Field::Link(
                 name          =>'partofassetdec',
                 label         =>'System Part of Asset',
-                dataobjattr   =>'"partofassetdec"'),
+                dataobjattr   =>'amcomputer.psystempartofasset'),
 
       new kernel::Field::Link(
                 name          =>'lcomputerid',
                 label         =>'AC-ComputerID',
-                dataobjattr   =>'"lcomputerid"'),
+                dataobjattr   =>'amcomputer.lcomputerid'),
 
       new kernel::Field::Link(
                 name          =>'lassetid',
                 label         =>'AC-AssetID',
-                dataobjattr   =>'"lassetid"'),
+                dataobjattr   =>'amportfolio.lparentid'),
 
       new kernel::Field::Interface(
                 name          =>'lclusterid',
                 label         =>'AC-lClusterID',
-                dataobjattr   =>'"lclusterid"'),
+                dataobjattr   =>'amcomputer.lparentid'),
 
       new kernel::Field::Link(
                 name          =>'lportfolioitemid',
                 label         =>'PortfolioID',
-                dataobjattr   =>'"lportfolioitemid"'),
+                dataobjattr   =>'amportfolio.lportfolioitemid'),
 
       new kernel::Field::Link(
                 name          =>'locationid',
@@ -431,7 +454,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'altbc',
                 label         =>'Alternate BC',
-                dataobjattr   =>'"altbc"'),
+                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
 
       new kernel::Field::SubList(
                 name          =>'orderedservices',
@@ -459,7 +482,7 @@ sub new
                 group         =>'orderedservices',
                 htmldetail    =>0,
                 label         =>'is TBSM ordered',
-                dataobjattr   =>'"tbsm_ordered"'),
+                dataobjattr   =>"decode(tbsm.ordered,'XMBSM',1,0)"),
 
 
       new kernel::Field::SubList(
@@ -478,7 +501,6 @@ sub new
                 label         =>'Applications',
                 group         =>'applications',
                 vjointo       =>'tsacinv::lnkapplsystem',
-                vjoinbase     =>{deleted=>'0'},
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
                 vjoindisp     =>[qw(parent applid)],
                 vjoininhash   =>['parent','applid','usage','comments']),
@@ -490,7 +512,6 @@ sub new
                 searchable    =>0,
                 htmldetail    =>0,
                 vjointo       =>'tsacinv::lnkapplsystem',
-                vjoinbase     =>{deleted=>'0'},
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
                 vjoindisp     =>[qw(parent)]),
 
@@ -500,7 +521,6 @@ sub new
                 label         =>'ApplicationIDs',
                 group         =>'applications',
                 vjointo       =>'tsacinv::lnkapplsystem',
-                vjoinbase     =>{deleted=>'0'},
                 vjoinon       =>['lportfolioitemid'=>'lchildid'],
                 vjoindisp     =>[qw(applid)]),
 
@@ -604,7 +624,7 @@ sub new
                    }
                    return(0);
                 },
-                dataobjattr   =>'"acmdbcontract"'),
+                dataobjattr   =>'amcomputer.servicename'),
 
       new kernel::Field::Text(
                 name          =>'acmdbcontractnumber',
@@ -619,13 +639,13 @@ sub new
                    return(0);
                 },
                 label         =>'ACMDB contractnumber',
-                dataobjattr   =>'"acmdbcontractnumber"'),
+                dataobjattr   =>'amcomputer.slanumber'),
 
       new kernel::Field::Date(
                 name          =>'instdate',
                 group         =>'source',
                 label         =>'system installation date',
-                dataobjattr   =>'"instdate"'),
+                dataobjattr   =>'amportfolio.dtinvent'),
 
       new kernel::Field::Textarea(
                 name          =>'merged_use_description',
@@ -656,7 +676,7 @@ sub new
                 #dataobjattr   =>"unistr(amcomment.memcomment)"),
                 # unistr could not be used becouse invalid backslash sequenses
                 # in assetmanager
-                dataobjattr   =>'"tcomments"'),
+                dataobjattr   =>"amcomment.memcomment"),
 
       new kernel::Field::Text(
                 name          =>'autodiscent',
@@ -666,19 +686,22 @@ sub new
                 weblinkto     =>'tsacinv::autodiscsystem',
                 weblinkon     =>['systemid'=>'systemid'],
                 label         =>'AutoDiscovery Entry',
-                dataobjattr   =>'"autodiscent"'),
+                dataobjattr   =>"decode(amtsiautodiscovery.name,NULL,'',".
+                                "amtsiautodiscovery.name || ".
+                                "' ('||amtsiautodiscovery.assettag||') - '||".
+                                "amtsiautodiscovery.source)"),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'"cdate"'),
+                dataobjattr   =>'amportfolio.dtcreation'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'"mdate"'),
+                dataobjattr   =>'amportfolio.dtlastmodif'),
 
 #      new kernel::Field::Date(
 #                name          =>'lastqcheck',
@@ -692,19 +715,19 @@ sub new
                 uivisible     =>0,
                 sqlorder      =>'desc',
                 label         =>'Modification-Date reverse',
-                dataobjattr   =>'"mdaterev"'),
+                dataobjattr   =>'amportfolio.dtlastmodif'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'"srcsys"'),
+                dataobjattr   =>'amportfolio.externalsystem'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'"srcid"'),
+                dataobjattr   =>'amportfolio.externalid'),
 
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
@@ -715,18 +738,16 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'"replkeypri"'),
+                dataobjattr   =>'amportfolio.dtlastmodif'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>'"replkeysec"'),
+                dataobjattr   =>"lpad(amportfolio.assettag,35,'0')")
 
    );
    $self->{use_distinct}=0;
-   $self->setWorktable("system");
- 
    $self->setDefaultView(qw(systemname status tsacinv_locationfullname 
                             systemid assetassetid));
    return($self);
@@ -871,9 +892,10 @@ sub initSearchQuery
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"\"!out of operation\"");
    }
-   if (!defined(Query->Param("search_deleted"))){
-     Query->Param("search_deleted"=>$self->T("no"));
+   if (!defined(Query->Param("search_tenant"))){
+     Query->Param("search_tenant"=>"CS");
    }
+
 }
 
 
@@ -952,6 +974,51 @@ sub SystemPartOfCorrection
    return($val);
 }
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="amcomputer ".
+      "join amportfolio ".
+      "  on amcomputer.litemid=amportfolio.lportfolioitemid ".
+      "join amportfolio assetportfolio ".
+      "  on amportfolio.lparentid=assetportfolio.lportfolioitemid ".
+      "join ammodel ".
+      "  on amportfolio.lmodelid=ammodel.lmodelid ".
+      "join amnature ".
+      "  on ammodel.lnatureid=amnature.lnatureid ".
+      "join amtenant ".
+      "  on amportfolio.ltenantid=amtenant.ltenantid ".
+      "left outer join (select amcostcenter.*,".
+      "                 amtsiaccsecunit.identifier as customerlink ".
+      "      from amcostcenter left outer ".
+      "      join amtsiaccsecunit on ".
+      "      amcostcenter.lcustomerlinkid=amtsiaccsecunit.lunitid ".
+      "      where amcostcenter.bdelete=0) amcostcenter ".
+      "  on amportfolio.lcostid=amcostcenter.lcostid ".
+      "left outer join (select distinct ".
+      "                 amtsiservicetype.identifier ordered,".
+      "                 amtsiservice.lportfolioid ".
+      "      from amtsiservice,amtsiservicetype ".
+      "      where ".
+      "      amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
+      "      and amtsiservicetype.identifier='XMBSM'".
+      "      and amtsiservice.bdelete=0) tbsm ".
+      "  on amportfolio.lportfolioitemid=tbsm.lportfolioid ".
+      "left outer join amcomment ".
+      "  on amcomputer.lcommentid=amcomment.lcommentid ".
+      "left outer join amtsiautodiscovery ".
+      "  on amportfolio.assettag=amtsiautodiscovery.assettag ";
+   return($from);
+}
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="amportfolio.bdelete=0 and amcomputer.bgroup=0 ".
+             "and assetportfolio.bdelete!=1 ".
+             "and ammodel.name='LOGICAL SYSTEM' ";
+   return($where);
+}
 
 sub isViewValid
 {

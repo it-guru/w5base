@@ -29,90 +29,88 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
   
    $self->AddFields(
       new kernel::Field::Linenumber(
-                name          =>'linenumber',
-                label         =>'No.'),
+                name       =>'linenumber',
+                label      =>'No.'),
 
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'CostCenterID',
-                dataobjattr   =>'"id"'),
+                dataobjattr   =>'amcostcenter.lcostid'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'CostCenter-No.',
-                dataobjattr   =>'"name"'),
+                dataobjattr   =>'amcostcenter.trimmedtitle'),
 
       new kernel::Field::Text(
                 name          =>'untrimmedname',
                 htmldetail    =>0,
                 searchable    =>0,
                 label         =>'untrimmed CostCenter-No.',
-                dataobjattr   =>'"untrimmedname"'),
+                dataobjattr   =>'amcostcenter.title'),
 
       new kernel::Field::Boolean(
                 name          =>'islocked',
                 label         =>'is locked',
-                dataobjattr   =>'"islocked"'),
-
-      new kernel::Field::Boolean(
-                name          =>'deleted',
-                readonly      =>1,
-                label         =>'marked as delete',
-                dataobjattr   =>'"deleted"'),
+                dataobjattr   =>"decode(amcostcenter.flag9,'X',1,0)"),
 
       new kernel::Field::Text(
                 name          =>'code',
                 label         =>'CostCenter-Code',
-                dataobjattr   =>'"code"'),
+                dataobjattr   =>'amcostcenter.code'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
-                dataobjattr   =>'"description"'),
+                dataobjattr   =>'amcostcenter.field1'),
 
       new kernel::Field::Text(
                 name          =>'bc',
                 label         =>'Business Center',
                 ignorecase    =>1,
-                dataobjattr   =>'"bc"'),
+                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
 
       new kernel::Field::Text(
                 name          =>'orgunit',
                 label         =>'Org-Unit',
                 ignorecase    =>1,
-                dataobjattr   =>'"orgunit"'),
+                dataobjattr   =>'amcostcenter.orgunit'),
 
       new kernel::Field::Boolean(
                 name          =>'usedbyactivesystems',
                 label         =>'used by logical systems',
                 htmldetail    =>0,
-                dataobjattr   =>'"usedbyactivesystems"'),
+                dataobjattr   =>
+                   "(select decode(count(*),0,0,1) ".
+                   "from amportfolio p1,amcomputer c1 ".
+                   " where p1.lportfolioitemid=c1.litemid and ".
+                   " p1.lcostid=amcostcenter.lcostid and ".
+                   " lower(c1.status)!='out of operation')"),
 
       new kernel::Field::Text(
                 name          =>'ictonr',
                 label         =>'ICTO-No',
                 group         =>'nor',
                 ignorecase    =>1,
-                dataobjattr   =>'"ictonr"'),
+                dataobjattr   =>'amcostcenter.ictonr'),
 
       new kernel::Field::Text(
                 name          =>'norsolutionmodel',
                 label         =>'Solution-Model',
                 group         =>'nor',
                 ignorecase    =>1,
-                dataobjattr   =>'"norsolutionmodel"'),
+                dataobjattr   =>'amcostcenter.norsolutionmodel'),
 
       new kernel::Field::Text(
                 name          =>'norinstructiontyp',
                 label         =>'Instruction-Typ',
                 group         =>'nor',
                 ignorecase    =>1,
-                dataobjattr   =>'"norinstructiontyp"'),
+                dataobjattr   =>'amcostcenter.norinstructiontyp'),
 
 #      new kernel::Field::Text(             # Aufgrund einer Info von Hr.
 #                name          =>'bnorcountryexcl',  # Schmied Rainer entfernt.
@@ -132,7 +130,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'delmgrid',
                 group         =>'contact',
-                dataobjattr   =>'"delmgrid"'),
+                dataobjattr   =>'amcostcenter.lleadingdeliverymanagerid'),
                                     
      new kernel::Field::TextDrop(
                 name          =>'sem',
@@ -154,7 +152,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'productionplanningossid',
                 group         =>'contact',
-                dataobjattr   =>'"productionplanningossid"'),
+                dataobjattr   =>'amcostcenter.lproductionplanningossid'),
 
       new kernel::Field::TextDrop(
                 name          =>'customer',
@@ -167,14 +165,14 @@ sub new
       new kernel::Field::Link(
                 name          =>'lcustomerid',
                 group         =>'contact',
-                dataobjattr   =>'"lcustomerid"'),
+                dataobjattr   =>'amcostcenter.lcustomerlinkid'),
 
       new kernel::Field::Text(
                 name          =>'defsclocationid',
                 label         =>'Default SCLocationKey',
                 readonly      =>1,
                 group         =>'contact',
-                dataobjattr   =>'"defsclocationid"'),
+                dataobjattr   =>'amtsisclocations.sclocationid'),
 
       new kernel::Field::SubList(
                 name          =>'deliverypartner',
@@ -197,7 +195,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'semid',
                 group         =>'contact',
-                dataobjattr   =>'"semid"'),
+                dataobjattr   =>'amcostcenter.lservicemanagerid'),
 
       new kernel::Field::SubList(
                 name          =>'applications',
@@ -221,7 +219,7 @@ sub new
                 label         =>'SAP costcenter hierarchy',
                 group         =>'saphier',
                 ignorecase    =>1,
-                dataobjattr   =>'"saphier"'),
+                dataobjattr   =>tsacinv::costcenter::getSAPhierSQL()),
 
       new kernel::Field::Text(
                 name          =>'saphier0id',
@@ -230,7 +228,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier0id"'),
+                dataobjattr   =>'amcostcenter.hier0id'),
 
       new kernel::Field::Text(
                 name          =>'saphier1id',
@@ -239,7 +237,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier1id"'),
+                dataobjattr   =>'amcostcenter.hier1id'),
 
       new kernel::Field::Text(
                 name          =>'saphier2id',
@@ -248,7 +246,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier2id"'),
+                dataobjattr   =>'amcostcenter.hier2id'),
 
       new kernel::Field::Text(
                 name          =>'saphier3id',
@@ -257,7 +255,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier3id"'),
+                dataobjattr   =>'amcostcenter.hier3id'),
 
       new kernel::Field::Text(
                 name          =>'saphier4id',
@@ -266,7 +264,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier4id"'),
+                dataobjattr   =>'amcostcenter.hier4id'),
 
       new kernel::Field::Text(
                 name          =>'saphier5id',
@@ -275,7 +273,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier5id"'),
+                dataobjattr   =>'amcostcenter.hier5id'),
 
       new kernel::Field::Text(
                 name          =>'saphier6id',
@@ -284,7 +282,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier6id"'),
+                dataobjattr   =>'amcostcenter.hier6id'),
 
       new kernel::Field::Text(
                 name          =>'saphier7id',
@@ -293,7 +291,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier7id"'),
+                dataobjattr   =>'amcostcenter.hier7id'),
 
       new kernel::Field::Text(
                 name          =>'saphier8id',
@@ -302,7 +300,7 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier8id"'),
+                dataobjattr   =>'amcostcenter.hier8id'),
 
       new kernel::Field::Text(
                 name          =>'saphier9id',
@@ -311,26 +309,26 @@ sub new
                 ignorecase    =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"saphier9id"'),
+                dataobjattr   =>'amcostcenter.hier9id'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'"srcsys"'),
+                dataobjattr   =>'amcostcenter.externalsystem'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'"srcid"'),
+                dataobjattr   =>'amcostcenter.externalid'),
 
       new kernel::Field::Date(
                 name          =>'srcload',
                 history       =>0,
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'"srcload"'),
+                dataobjattr   =>'amcostcenter.dtimport'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
@@ -339,7 +337,7 @@ sub new
                 dataobjattr   =>'amcostcenter.dtlastmodif')
    );
    $self->setDefaultView(qw(linenumber id name code description));
-   $self->setWorktable("costcenter");
+   $self->setWorktable("amcostcenter");
    return($self);
 }
 
@@ -362,9 +360,6 @@ sub initSearchQuery
    if (!defined(Query->Param("search_islocked"))){
      Query->Param("search_islocked"=>$self->T("no"));
    }
-   if (!defined(Query->Param("search_deleted"))){
-     Query->Param("search_deleted"=>$self->T("no"));
-   }
 }
 
 sub getDetailBlockPriority
@@ -384,6 +379,27 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="amcostcenter ".
+            "left outer join amtsiaccsecunit ".
+            "on amcostcenter.lcustomerlinkid=amtsiaccsecunit.lunitid ".
+            "left outer join amtsisclocations ".
+            "on amtsiaccsecunit.ldefaultsclocationid=amtsisclocations.ltsisclocationsid";
+   return($from);
+}
+
+
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="amcostcenter.bdelete=0";
+   return($where);
+}
+
 
 sub getRecordImageUrl
 {

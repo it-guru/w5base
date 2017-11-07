@@ -67,5 +67,3 @@
 'AutoDiscovery Entry'=>{de=>'AutoDiscovery Eintrag'},
 'SystemID is out of operation'=>{de=>'SystemID ist "out of operation"'},
 'full CI-Name'=>{de=>'vollständiger CI-Name'},
-'marked as delete'=>{de=>'gelöscht markiert'},
-

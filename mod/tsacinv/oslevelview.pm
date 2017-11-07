@@ -27,6 +27,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
+use CGI;
 @ISA=qw(kernel::App::Web);
 
 sub new
@@ -52,7 +53,7 @@ sub Main
    my $group=$self->getPersistentModuleObject("tsacinv::group");
 
    my %flt;
-   my $format='%-25s %s'."\n";
+   my $format='%-19s %s'."\n";
 
    my $name=Query->Param("systemname");
    if ($name ne "" && !($name=~m/[\*\?]/)){
