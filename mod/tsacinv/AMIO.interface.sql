@@ -1685,5 +1685,61 @@ grant select on itclust to public;
 
 
 
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::itclustservice ----------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf einen ClusterSerice-Datensatz ist dann gestattet,
+--   wenn der betreffende Cluster fuer den Schnittstellen-User sichtbar
+--   ist.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW itclustservice_acl AS
+   SELECT distinct "lclusterid" id
+   FROM itclust;
+
+CREATE or REPLACE VIEW itclustservice AS
+   SELECT
+      DISTINCT concat(amportfolio.name,concat(' (',
+            concat(amportfolio.assettag,')')))       AS "fullname",
+      amportfolio.name                               AS "name",
+      amcomputer.clustertype                         AS "type",
+      'Cluster-Service'                              AS "description",
+      amportfolio.assettag                           AS "serviceid",
+      amclusterportfolio.assettag                    AS "clusterid",
+      amportfolio.lassignmentid                      AS "lassignmentid",
+      amportfolio.lincidentagid                      AS "lincidentagid",
+      amcomputer.status                              AS "status",
+      amportfolio.usage                              AS "usage",
+      decode(amportfolio.soxrelevant,'YES',1,0)      AS "soxrelevant",
+      amcomputer.lparentid                           AS "lclusterid",
+      amcomputer.lcomputerid                         AS "lcomputerid",
+      amportfolio.externalsystem                     AS "srcsys",
+      amportfolio.externalid                         AS "srcid"
+   FROM AM2107.amcomputer
+      JOIN ( SELECT amportfolio.*
+             FROM AM2107.amportfolio
+             WHERE amportfolio.bdelete = 0) amportfolio 
+          ON amportfolio.lportfolioitemid = amcomputer.litemid
+      JOIN AM2107.ammodel 
+          ON amportfolio.lmodelid = ammodel.lmodelid 
+             AND ammodel.name = 'CLUSTER'
+      LEFT OUTER JOIN ( SELECT amcostcenter.*
+                        FROM AM2107.amcostcenter 
+                        WHERE amcostcenter.bdelete = 0) amcostcenter 
+          ON amportfolio.lcostid = amcostcenter.lcostid
+      JOIN AM2107.amcomputer amcluster 
+          ON amcomputer.lparentid = amcluster.lcomputerid
+      JOIN ( SELECT amportfolio.*
+         FROM AM2107.amportfolio
+         WHERE amportfolio.bdelete = 0) amclusterportfolio 
+         ON amclusterportfolio.lportfolioitemid = amcluster.litemid
+      JOIN itclustservice_acl
+         ON amcomputer.lparentid=itclustservice_acl.id
+   WHERE (amcomputer.clustertype = 'Cluster-Service'
+          OR amcomputer.clustertype = 'Cluster-Package'
+          OR amcomputer.clustertype = 'Cluster-Packages'
+         ) AND amcomputer.status <> 'out of operation';
+
+grant select on itclustservice to public;
 
 

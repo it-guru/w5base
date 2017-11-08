@@ -46,27 +46,26 @@ sub new
                 htmldetail    =>0,
                 htmlwidth     =>'250px',
                 align         =>'left',
-                dataobjattr   =>"concat(amportfolio.name,concat(' ('".
-                                ",concat(amportfolio.assettag,')')))"),
+                dataobjattr   =>'"fullname"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Clusterservice name',
                 uppersearch   =>1,
                 size          =>'16',
-                dataobjattr   =>'amportfolio.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'type',
                 label         =>'Clusterservice type',
                 uppersearch   =>1,
                 size          =>'16',
-                dataobjattr   =>'amcomputer.clustertype'),
+                dataobjattr   =>'"type"'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
-                dataobjattr   =>"'Cluster-Service'"),
+                dataobjattr   =>'"description"'),
 
       new kernel::Field::Id(
                 name          =>'serviceid',
@@ -75,7 +74,7 @@ sub new
                 searchable    =>1,
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amportfolio.assettag'),
+                dataobjattr   =>'"serviceid"'),
 
       new kernel::Field::Id(
                 name          =>'clusterid',
@@ -86,7 +85,7 @@ sub new
                 weblinkto     =>'tsacinv::itclust',
                 weblinkon     =>['clusterid'=>'clusterid'],
                 align         =>'left',
-                dataobjattr   =>'amclusterportfolio.assettag'),
+                dataobjattr   =>'"clusterid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
@@ -121,37 +120,37 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'amportfolio.lassignmentid'),
+                dataobjattr   =>'"lassignmentid"'),
 
       new kernel::Field::Link(
                 name          =>'lincidentagid',
                 label         =>'AC-Incident-AssignmentID',
-                dataobjattr   =>'amportfolio.lincidentagid'),
+                dataobjattr   =>'"lincidentagid"'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'amcomputer.status'),
+                dataobjattr   =>'"status"'),
 
       new kernel::Field::Text(
                 name          =>'usage',
                 label         =>'Usage',
-                dataobjattr   =>'amportfolio.usage'),
+                dataobjattr   =>'"usage"'),
 
       new kernel::Field::Boolean(
                 name          =>'soxrelevant',
                 label         =>'SOX relevant',
-                dataobjattr   =>"decode(amportfolio.soxrelevant,'YES',1,0)"),
+                dataobjattr   =>'"soxrelevant"'),
 
       new kernel::Field::Link(
                 name          =>'lclusterid',
                 label         =>'AC-PortfolioID',
-                dataobjattr   =>'amcomputer.lparentid'),
+                dataobjattr   =>'"lclusterid"'),
 
       new kernel::Field::Link(
                 name          =>'lcomputerid',
                 label         =>'ComputerID',
-                dataobjattr   =>'amcomputer.lcomputerid'),
+                dataobjattr   =>'"lcomputerid"'),
 
       new kernel::Field::SubList(
                 name          =>'backups',
@@ -163,67 +162,24 @@ sub new
                 vjoindisp     =>[qw(backupid stype subtype name
                                     dbinstance policy tfrom tto isactive)]),
 
-#      new kernel::Field::SubList(
-#                name          =>'applications',
-#                label         =>'Applications',
-#                group         =>'applications',
-#                vjointo       =>'tsacinv::lnkapplsystem',
-#                vjoinon       =>['lportfolioitemid'=>'lchildid'],
-#                vjoindisp     =>[qw(parent applid)]),
-
-#      new kernel::Field::SubList(
-#                name          =>'applicationnames',
-#                label         =>'Applicationnames',
-#                group         =>'applications',
-#                searchable    =>0,
-#                htmldetail    =>0,
-#                vjointo       =>'tsacinv::lnkapplsystem',
-#                vjoinon       =>['lportfolioitemid'=>'lchildid'],
-#                vjoindisp     =>[qw(parent)]),
-
-#      new kernel::Field::SubList(
-#                name          =>'applicationids',
-#                htmldetail    =>0,
-#                label         =>'ApplicationIDs',
-#                group         =>'applications',
-#                vjointo       =>'tsacinv::lnkapplsystem',
-#                vjoinon       =>['lportfolioitemid'=>'lchildid'],
-#                vjoindisp     =>[qw(applid)]),
-
-#      new kernel::Field::SubList(
-#                name          =>'software',
-#                label         =>'Software',
-#                group         =>'software',
-#                vjointo       =>'tsacinv::lnksystemsoftware',
-#                vjoinon       =>['lportfolioitemid'=>'lparentid'],
-#                vjoindisp     =>[qw(id name)]),
-
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amportfolio.externalsystem'),
+                dataobjattr   =>'"srcsys"'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'amportfolio.externalid'),
+                dataobjattr   =>'"srcid"'),
 
 
    );
+   $self->setWorktable("itclustservice");
    $self->setDefaultView(qw(fullname clusterid status assignmentgroup));
    return($self);
 }
-
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_name"))){
-#     Query->Param("search_name"=>"Q4DE8NCO34*");
-#   }
-#}
-
 
 
 sub Initialize
@@ -243,41 +199,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=
-      "amcomputer ".
-      "join (select amportfolio.* from amportfolio ".
-      " where amportfolio.bdelete=0) amportfolio ".
-      "on amportfolio.lportfolioitemid=amcomputer.litemid ".
-      "join ammodel ".
-      "on amportfolio.lmodelid=ammodel.lmodelid and ".
-      "   ammodel.name='CLUSTER' ".
-      "left outer join (select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter ".
-      "on amportfolio.lcostid=amcostcenter.lcostid ".
-      "join amcomputer amcluster ".
-      "on amcomputer.lparentid=amcluster.lcomputerid ".
-      "join (select amportfolio.* from amportfolio ".
-      " where amportfolio.bdelete=0) amclusterportfolio ".
-      "on amclusterportfolio.lportfolioitemid=amcluster.litemid";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=
-      "(amcomputer.clustertype='Cluster-Service' or ".
-      "     amcomputer.clustertype='Cluster-Package' or ".
-      "     amcomputer.clustertype='Cluster-Packages') ".
-      "and amcomputer.status<>'out of operation'";
-   return($where);
-}
-
 
 sub isViewValid
 {
