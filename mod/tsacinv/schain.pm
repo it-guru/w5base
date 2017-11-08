@@ -40,35 +40,23 @@ sub new
                 name          =>'schainid',
                 group         =>'source',
                 label         =>'SChainID',
-                dataobjattr   =>'amtsisalessrvcpkg.lsrvcpkgid'),
+                dataobjattr   =>'"schainid"'),
 
       new kernel::Field::Text(
                 name          =>'code',
                 label         =>'ServiceChain Code',
                 uppersearch   =>1,
-                dataobjattr   =>'amtsisalessrvcpkg.code'),
-
-      new kernel::Field::Text(
-                name          =>'tenant',
-                label         =>'Tenant',
-                group         =>'source',
-                dataobjattr   =>'amtenant.code'),
-
-      new kernel::Field::Interface(
-                name          =>'tenantid',
-                label         =>'Tenant ID',
-                group         =>'source',
-                dataobjattr   =>'amtenant.ltenantid'),
+                dataobjattr   =>'"code"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Service Chain Name',
                 ignorecase    =>1,
-                dataobjattr   =>'amtsisalessrvcpkg.name'),
+                dataobjattr   =>'"fullname"'),
 
       new kernel::Field::Link(
                 name          =>'lcommentid',
-                dataobjattr   =>'amtsisalessrvcpkg.lcommentid'),
+                dataobjattr   =>'"lcommentid"'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -90,21 +78,22 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amtsisalessrvcpkg.dtlastmodif'),
+                dataobjattr   =>'"replkeypri"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(amtsisalessrvcpkg.code,35,'0')"),
+                dataobjattr   =>'"replkeysec"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'amtsisalessrvcpkg.dtlastmodif'),
+                dataobjattr   =>'"mdate"'),
 
    );
+   $self->setWorktable("schain");
    $self->setDefaultView(qw(linenumber code  fullname));
    $self->{MainSearchFieldLines}=4;
    return($self);
@@ -119,33 +108,9 @@ sub getDetailBlockPriority
 
 
 
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsisalessrvcpkg ".
-            "join amtenant ".
-            "on amtsisalessrvcpkg.ltenantid=amtenant.ltenantid ";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amtsisalessrvcpkg.bdelete=0";
-   return($where);
-}
-
-
 sub initSearchQuery
 {
    my $self=shift;
-#   if (!defined(Query->Param("search_status"))){
-#     Query->Param("search_status"=>"\"!out of operation\"");
-#   }
-   if (!defined(Query->Param("search_tenant"))){
-     Query->Param("search_tenant"=>"CS");
-   }
-
 }
 
 
@@ -163,7 +128,6 @@ sub Initialize
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
-   $self->setWorktable("amlocation");
    return(1) if (defined($self->{DB}));
    return(0);
 }

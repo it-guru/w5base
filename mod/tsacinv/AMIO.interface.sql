@@ -342,9 +342,9 @@ grant select on lnksharednet to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnksharedstorage --------------------------
 -- --------------------------------------------------------------------------
--- - Die Relationen zwischen logischem System und shared-Storage            -
--- - Componenten stehen jedem Schnittstellen-User zur Verfuegung.           -
--- - Es wird keine Filterung durchgefuehrt.                                 -
+--   Die Relationen zwischen logischem System und shared-Storage
+--   Componenten stehen jedem Schnittstellen-User zur Verfuegung. 
+--   Es wird keine Filterung durchgefuehrt.
 -- --------------------------------------------------------------------------
 
 -- drop materialized view mview_lnksharedstorage;
@@ -407,13 +407,13 @@ grant select on lnksharedstorage to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::system ------------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf einen logischen System Datensatz wird dadurch          -
--- - eingeschraenkt, dass der Schnittstellen-User ueber die IFACE_ACL       -
--- - entweder den Zugriff auf den Buchungskreis, die Assignmentgroup        -
--- - des logischen Systems oder den aus dem Kontierungsobjekt               -
--- - resultierenden Customer-Link haben muss.                               -
--- - Desweiteren werden alle System-Datensaetze sichtbar, die als           -
--- - "shared-Network" Componenten erkannt wurden (1x tgl. ermittelt)        -
+--   Der Zugriff auf einen logischen System Datensatz wird dadurch
+--   eingeschraenkt, dass der Schnittstellen-User ueber die IFACE_ACL
+--   entweder den Zugriff auf den Buchungskreis, die Assignmentgroup
+--   des logischen Systems oder den aus dem Kontierungsobjekt
+--   resultierenden Customer-Link haben muss.
+--   Desweiteren werden alle System-Datensaetze sichtbar, die als
+--   "shared-Network" Componenten erkannt wurden (1x tgl. ermittelt)
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW system_acl AS
@@ -567,10 +567,10 @@ grant select on system to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::group -------------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf einen Assingmentgroup-Datensatz wird dadurch           -
--- - Eingeschraenkt, das der betreffende Schnittstellen-User in der         -
--- - IFACE_ACL aufgefuehrt sein muss. Ist dies der Fall, kann er alle       -
--- - Assignmentgroup Datensaetze abrufen.                                   -
+--   Der Zugriff auf einen Assingmentgroup-Datensatz wird dadurch
+--   Eingeschraenkt, das der betreffende Schnittstellen-User in der
+--   IFACE_ACL aufgefuehrt sein muss. Ist dies der Fall, kann er alle
+--   Assignmentgroup Datensaetze abrufen.
 -- --------------------------------------------------------------------------
 
 CREATE VIEW grp_acl AS
@@ -602,7 +602,11 @@ grant select on grp to public;
 
 
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::group ------------------------------------
+-- --------------------- tsacinv::user -------------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf einen Kontakt-Datensatz wird dadurch
+--   Eingeschraenkt, das der betreffende Schnittstellen-User in der
+--   IFACE_ACL aufgefuehrt sein muss.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW usr_acl AS
@@ -638,8 +642,8 @@ grant select on usr to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnkapplappl ------------------------------
 -- --------------------------------------------------------------------------
--- - Einen Anwendungsschnittstellen-Datensatz sieht an Schnittstellen-User  -
--- - dann, wenn er die betreffende Parent-Anwendung sieht.                  -
+--   Einen Anwendungsschnittstellen-Datensatz sieht an Schnittstellen-User
+--   dann, wenn er die betreffende Parent-Anwendung sieht.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW lnkapplappl_acl AS
@@ -675,10 +679,10 @@ grant select on lnkapplappl to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnkapplsystem -----------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf den Relationsdatensatz zwischen Anwendung und System   -
--- - wird dadurch eingeschraenkt, das der Schnittstellen-User einen         -
--- - Relationsdatensatz dann sieht, wenn er die darin aufgefuehrte          -
--- - Anwendung sehen darf.                                                  -
+--   Der Zugriff auf den Relationsdatensatz zwischen Anwendung und System
+--   wird dadurch eingeschraenkt, das der Schnittstellen-User einen
+--   Relationsdatensatz dann sieht, wenn er die darin aufgefuehrte
+--   Anwendung sehen darf.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW lnkapplsystem_acl AS
@@ -751,10 +755,10 @@ grant select on lnkapplsystem to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::osrelease ---------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf einen osrelease-Datensatz wird dadruch eingeschraenkt  -
--- - das der Schnittstellen-User in der IFACE_ACL aufgefuehrt sein muss.    -
--- - Ist dies der Fall, so sieht der Schnittstelle-User ALLE                -
--- - Betriebssystem-Datensaetze.                                            -
+--   Der Zugriff auf einen osrelease-Datensatz wird dadruch eingeschraenkt
+--   das der Schnittstellen-User in der IFACE_ACL aufgefuehrt sein muss.
+--   Ist dies der Fall, so sieht der Schnittstelle-User ALLE
+--   Betriebssystem-Datensaetze.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW osrelease_acl AS
@@ -783,9 +787,9 @@ grant select on osrelease to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::asset -------------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf einen Asset Datensatz wird dadurch eingeschraenkt, das -
--- - nur Datensaetze sichtbar sind, bei denen auch min. ein logisches       -
--- - fuer den betreffenden Schnittsttellen-User sichtbar ist.               -
+--   Der Zugriff auf einen Asset Datensatz wird dadurch eingeschraenkt, das
+--   nur Datensaetze sichtbar sind, bei denen auch min. ein logisches
+--   fuer den betreffenden Schnittsttellen-User sichtbar ist.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW asset_acl AS
@@ -859,9 +863,9 @@ grant select on asset to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnkusergroup ------------------------------
 -- --------------------------------------------------------------------------
--- - Die Relation zwischen User und Assignmentgroup ist dann fuer einen     -
--- - Schnittstellen-User einsehbar, wenn er die zugehorige Assignmentgroup  -
--- - sehen darf.                                                            -
+--   Die Relation zwischen User und Assignmentgroup ist dann fuer einen
+--   Schnittstellen-User einsehbar, wenn er die zugehorige Assignmentgroup
+--   sehen darf.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW lnkusergroup_acl AS
@@ -892,11 +896,11 @@ grant select on lnkusergroup to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::costcenter --------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf einen Kontierungs-Datensatz wird dadurch               -
--- - eingeschraenkt, dass der Schnittstellen-User ueber die IFACE_ACL       -
--- - entweder den Zugriff auf den Buchungskreis (des Kontierungsobjektes),  -
--- - die Assignmentgroup des Kontierungsobjektes oder den aus dem           -
--- - Kontierungsobjekt resultierenden Customer-Link haben muss.             -
+--   Der Zugriff auf einen Kontierungs-Datensatz wird dadurch
+--   eingeschraenkt, dass der Schnittstellen-User ueber die IFACE_ACL
+--   entweder den Zugriff auf den Buchungskreis (des Kontierungsobjektes),
+--   die Assignmentgroup des Kontierungsobjektes oder den aus dem
+--   Kontierungsobjekt resultierenden Customer-Link haben muss.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW costcenter_acl AS
@@ -990,10 +994,10 @@ grant select on costcenter to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::customer ----------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf einen CustomerLink-Datensatz wird dadurch              -
--- - Eingeschraenkt, das der betreffende Schnittstellen-User in der         -
--- - IFACE_ACL mit Zugriff auf den bestimmten CustomerLink aufgefuehrt      -
--- - sein muss.                                                             -
+--   Der Zugriff auf einen CustomerLink-Datensatz wird dadurch
+--   Eingeschraenkt, das der betreffende Schnittstellen-User in der
+--   IFACE_ACL mit Zugriff auf den bestimmten CustomerLink aufgefuehrt
+--   sein muss.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW customer_acl AS
@@ -1029,9 +1033,9 @@ grant select on customer to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::dlvpartner --------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf die Delivery-Partner eines Kontierungsobjektes         -
--- - wird dann gewaehrt, wenn der Zugriff auf das betreffende               -
--- - Kontierungsobjekt erlaubt ist.                                         -
+--   Der Zugriff auf die Delivery-Partner eines Kontierungsobjektes
+--   wird dann gewaehrt, wenn der Zugriff auf das betreffende
+--   Kontierungsobjekt erlaubt ist.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW dlvpartner_acl AS
@@ -1066,8 +1070,8 @@ grant select on dlvpartner to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::location ----------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf die Standort-Datensaetze wird dadurch eingefschrankt   -
--- - das der Schnittstellen-User in der IFACE_ACL aufgefuert sein muss.     -
+--   Der Zugriff auf die Standort-Datensaetze wird dadurch eingefschrankt
+--   das der Schnittstellen-User in der IFACE_ACL aufgefuert sein muss.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW location_acl AS
@@ -1103,9 +1107,9 @@ grant select on location to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnksystemsoftware -------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf die Software-Installationsdatensaetze wird dadurch     -
--- - eingeschraenkt, das nur die Software-Installationen sichtbar sind,     -
--- - fuer die auch die betreffenden Systeme sichtbar sind.                  -
+--   Der Zugriff auf die Software-Installationsdatensaetze wird dadurch
+--   eingeschraenkt, das nur die Software-Installationen sichtbar sind,
+--   fuer die auch die betreffenden Systeme sichtbar sind.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW lnksystemsoftware_acl AS
@@ -1311,19 +1315,231 @@ CREATE or REPLACE VIEW autodiscsystem AS
       amtsiautodiscovery.cputype                     AS "cputype",
       amtsiautodiscovery.lcpuspeedmhz                AS "cpuspeed",
       amtsiautodiscovery.itotalnumberofcores         AS "independcpucount",
-      amtsiautodiscovery.itotalnumberofcores * amtsiautodiscovery.smt AS "cpucount",
+      amtsiautodiscovery.itotalnumberofcores * 
+         amtsiautodiscovery.smt                      AS "cpucount",
       amtsiautodiscovery.serialno                    AS "serialno",
       amtsiautodiscovery.dtscandate                  AS "scandate",
       amtsiautodiscovery.source                      AS "srcsys"
    FROM AM2107.amtsiautodiscovery
-      JOIN sclocation_acl
-         ON amtsiautodiscovery.lautodiscoveryid=sclocation_acl.id;
+      JOIN autodiscsystem_acl
+         ON amtsiautodiscovery.lautodiscoveryid=autodiscsystem_acl.id;
 
 grant select on autodiscsystem to public;
 
 
 
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::itfarm ------------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Serverfarm wird dadurch
+--   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
+--   sein muss.     
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW itfarm_acl AS
+   SELECT distinct clu.litemid            AS id
+   FROM
+      AM2107.amcomputer sys
+      JOIN AM2107.amportfolio sysportfolio 
+         ON sysportfolio.lportfolioitemid = sys.litemid
+      JOIN AM2107.amportfolio assportfolio 
+         ON assportfolio.Lportfolioitemid = sysportfolio.lparentid
+      JOIN AM2107.amasset ass 
+         ON assportfolio.assettag = ass.assettag
+      JOIN AM2107.amcomputer clu 
+         ON sys.lparentid = clu.lcomputerid
+      JOIN AM2107.amportfolio cluportfolio 
+         ON cluportfolio.assettag = clu.assettag
+      JOIN IFACE_ACL acl
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER')
+   WHERE sysportfolio.usage LIKE 'OSY-_: KONSOLSYSTEM %'
+      AND sys.status <> 'out of operation';
+
+CREATE or REPLACE VIEW itfarm AS
+   SELECT
+      DISTINCT clu.litemid                           AS "lfarmid",
+      cluportfolio.name                              AS "name",
+      clu.assettag                                   AS "clusterid",
+      clu.status                                     AS "status"
+   FROM
+      AM2107.amcomputer sys
+      JOIN AM2107.amportfolio sysportfolio 
+         ON sysportfolio.lportfolioitemid = sys.litemid
+      JOIN AM2107.amportfolio assportfolio 
+         ON assportfolio.Lportfolioitemid = sysportfolio.lparentid
+      JOIN AM2107.amasset ass 
+         ON assportfolio.assettag = ass.assettag
+      JOIN AM2107.amcomputer clu 
+         ON sys.lparentid = clu.lcomputerid
+      JOIN itfarm_acl
+         ON clu.litemid=itfarm_acl.id
+      JOIN AM2107.amportfolio cluportfolio 
+         ON cluportfolio.assettag = clu.assettag
+   WHERE sysportfolio.usage LIKE 'OSY-_: KONSOLSYSTEM %'
+      AND sys.status <> 'out of operation';
+
+grant select on itfarm to public;
 
 
 
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::schain ------------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Serviceketten wird dadurch
+--   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
+--   sein muss.     
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW schain_acl AS
+   SELECT distinct amtsisalessrvcpkg.lsrvcpkgid      AS id
+   FROM
+      AM2107.amtsisalessrvcpkg
+      JOIN IFACE_ACL acl
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
+CREATE or REPLACE VIEW schain AS
+   SELECT
+      DISTINCT amtsisalessrvcpkg.lsrvcpkgid          AS "schainid",
+      amtsisalessrvcpkg.code                         AS "code",
+      amtsisalessrvcpkg.name                         AS "fullname",
+      amtsisalessrvcpkg.lcommentid                   AS "lcommentid",
+      amtsisalessrvcpkg.dtlastmodif                  AS "replkeypri",
+      lpad(amtsisalessrvcpkg.code,35,'0')            AS "replkeysec",
+      amtsisalessrvcpkg.dtlastmodif                  AS "mdate"
+   FROM AM2107.amtsisalessrvcpkg
+      JOIN schain_acl
+         ON amtsisalessrvcpkg.lsrvcpkgid=schain_acl.id
+   WHERE amtsisalessrvcpkg.bdelete = 0;
+
+grant select on schain to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::lnkschain ---------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Serviceketten Verknuepfungen wird dadurch
+--   eingeschraenkt das der Schnittstellen-User die betreffende Servicekette
+--   sehen muss, um den Zugriff auf den Verknuepfungsdatensatz zu bekommen.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW lnkschain_acl AS
+   SELECT distinct "schainid" id
+   FROM  schain;
+
+CREATE or REPLACE VIEW lnkschain AS
+   SELECT
+      DISTINCT schainrel.id                          AS "id",
+      schainrel.lsspid                               AS "lsspid",
+      schainrel.itemid                               AS "itemid",
+      schainrel.itemname                             AS "name",
+      schainrel.itemclass                            AS "class",
+      schainrel.dtlastmodif                          AS "replkeypri",
+      lpad(schainrel.lsspid,35,'0')                  AS "replkeysec",
+      schainrel.dtlastmodif                          AS "mdate"
+   FROM (SELECT
+            'P' || amtsirelsspport.LTSIRELSSPPORTID id,
+            amtsirelsspport.lsspid lsspid,
+            CAST(amportfolio.assettag  AS VARCHAR2 (40))    itemid,
+            CAST(amportfolio.name  AS VARCHAR2 (4000))      itemname,
+            CAST(amportfolio.dfe547e741   AS VARCHAR2 (80)) itemclass,
+            NULL                                            itemdataobj,
+            amtsirelsspport.dtlastmodif                   
+         FROM AM2107.amtsirelsspport, AM2107.amportfolio
+         WHERE
+            amtsirelsspport.lportfolioid = amportfolio.lportfolioitemid
+            AND amportfolio.bdelete = 0
+            AND amtsirelsspport.bdelete = 0
+            UNION ALL
+         SELECT
+            'A' || amtsirelsspappl.LTSIRELSSPAPPLID id,
+            amtsirelsspappl.lsspid lsspid,
+            CAST(amtsicustappl.code  AS VARCHAR (40))       itemid,
+            CAST(amtsicustappl.name  AS VARCHAR2 (4000))    itemname,
+            CAST('APPLICATION' AS VARCHAR2 (80))            itemclass,
+            NULL                                            itemdataobj,
+            amtsirelsspappl.dtlastmodif
+         FROM AM2107.amtsirelsspappl, AM2107.amtsicustappl
+         WHERE
+            amtsirelsspappl.lapplicationid = amtsicustappl.ltsicustapplid
+            AND amtsicustappl.bdelete = 0
+            AND amtsirelsspappl.bdelete = 0
+      ) schainrel
+      JOIN lnkschain_acl 
+         ON schainrel.lsspid=lnkschain_acl.id;
+
+grant select on lnkschain to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::license -----------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf einen Lizenz-Datensatz wird dadurch eingeschraenkt,     
+--   dass der Schnittstellen-User ueber die IFACE_ACL entweder den Zugriff 
+--   auf den Buchungskreis, die Assignmentgroup der Lizenz oder den aus
+--   dem Kontierungsobjekt resultierenden Customer-Link haben muss. 
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW license_acl AS
+   SELECT distinct amportfolio.assettag  id
+   FROM AM2107.amasset
+      JOIN (SELECT * FROM AM2107.amportfolio 
+            WHERE amportfolio.bdelete=0) amportfolio
+         ON amasset.assettag = amportfolio.assettag
+      LEFT OUTER JOIN (SELECT * 
+                       FROM AM2107.amcostcenter 
+                       WHERE amcostcenter.bdelete=0) amcostcenter
+         ON amportfolio.lcostid = amcostcenter.lcostid
+      left outer join AM2107.amemplgroup assigrp
+         on amportfolio.lassignmentid = assigrp.lgroupid
+      left outer join AM2107.amtsiaccsecunit customerlnk
+            on amcostcenter.lcustomerlinkid=customerlnk.lunitid
+      join IFACE_ACL acl
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
+             (assigrp.name like acl.assignment 
+                or acl.assignment is null) and
+             (amcostcenter.acctno like acl.acctno 
+                or acl.acctno is null) and
+             (customerlnk.identifier like acl.customerlnk 
+                or acl.customerlnk is null) and
+            (acl.customerlnk is not null or
+             acl.acctno is not null or
+             acl.assignment is not null);
+
+CREATE or REPLACE VIEW license AS
+   SELECT
+      amportfolio.assettag                           AS "licenseid",
+      amasset.status                                 AS "status",
+      ammodel.name                                   AS "name",
+      amportfolio.label                              AS "label",
+      amportfolio.lsupervid                          AS "supervid",
+      amcostcenter.lcostid                           AS "lcostcenterid",
+      amcostcenter.trimmedtitle                      AS "cocustomeroffice",
+      amcostcenter.alternatebusinesscenter           AS "bc",
+      amportfolio.lassignmentid                      AS "lassignmentid",
+      amportfolio.lparentid                          AS "lassetid",
+      amportfolio.lportfolioitemid                   AS "lportfolioitemid",
+      amportfolio.lastid                             AS "lastid",
+      amcostcenter.alternatebusinesscenter           AS "altbc",
+      amcomment.memcomment                           AS "comments",
+      amportfolio.externalsystem                     AS "srcsys",
+      amportfolio.externalid                         AS "srcid"
+   FROM AM2107.amasset
+      JOIN (SELECT * FROM AM2107.amportfolio 
+            WHERE amportfolio.bdelete=0) amportfolio
+         ON amasset.assettag = amportfolio.assettag
+      JOIN license_acl 
+         ON amportfolio.assettag=license_acl.id
+      JOIN AM2107.ammodel
+         ON amportfolio.lmodelid = ammodel.lmodelid
+      JOIN AM2107.amnature
+         ON ammodel.lnatureid = amnature.lnatureid
+      LEFT OUTER JOIN AM2107.amcomment
+         ON amasset.lcommentid = amcomment.lcommentid
+      LEFT OUTER JOIN (SELECT * 
+                       FROM AM2107.amcostcenter 
+                       WHERE amcostcenter.bdelete=0) amcostcenter
+         ON amportfolio.lcostid = amcostcenter.lcostid
+   WHERE amnature.name = 'SW-LICENSE';
 

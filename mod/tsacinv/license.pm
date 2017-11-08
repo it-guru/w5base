@@ -41,25 +41,25 @@ sub new
                 size          =>'13',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amportfolio.assettag'),
+                dataobjattr   =>'"licenseid"'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'amasset.status'),
+                dataobjattr   =>'"status"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Licensetyp',
                 uppersearch   =>1,
                 size          =>'16',
-                dataobjattr   =>'ammodel.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'label',
                 label         =>'Label',
                 size          =>'15',
-                dataobjattr   =>'amportfolio.label'),
+                dataobjattr   =>'"label"'),
 
       new kernel::Field::TextDrop(
                 name          =>'responsible',
@@ -71,25 +71,25 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'supervid',
-                dataobjattr   =>'amportfolio.lsupervid'),
+                dataobjattr   =>'"supervid"'),
 
 
 
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenterID',
-                dataobjattr   =>'amcostcenter.lcostid'),
+                dataobjattr   =>'"lcostcenterid"'),
 
       new kernel::Field::Text(
                 name          =>'cocustomeroffice',
                 label         =>'CO-Number/Customer Office',
                 size          =>'20',
-                dataobjattr   =>'amcostcenter.trimmedtitle'),
+                dataobjattr   =>'"cocustomeroffice"'),
 
       new kernel::Field::Text(
                 name          =>'bc',
                 label         =>'Business Center',
-                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
+                dataobjattr   =>'"bc"'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
@@ -101,31 +101,31 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'amportfolio.lassignmentid'),
+                dataobjattr   =>'"lassignmentid"'),
 
       new kernel::Field::Text(
                 name          =>'lassetid',
                 label         =>'AC-AssetID',
                 htmldetail    =>0,
-                dataobjattr   =>'amportfolio.lparentid'),
+                dataobjattr   =>'"lassetid"'),
 
       new kernel::Field::Text(
                 name          =>'lportfolioitemid',
                 label         =>'PortfolioID',
                 htmldetail    =>0,
-                dataobjattr   =>'amportfolio.lportfolioitemid'),
+                dataobjattr   =>'"lportfolioitemid"'),
 
       new kernel::Field::Text(
                 name          =>'lastid',
                 label         =>'lastid',
                 htmldetail    =>0,
-                dataobjattr   =>'amportfolio.lastid'),
+                dataobjattr   =>'"lastid"'),
 
       new kernel::Field::Link(
                 name          =>'altbc',
                 htmldetail    =>0,
                 label         =>'Alternate BC',
-                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
+                dataobjattr   =>'"altbc"'),
 
       new kernel::Field::SubList(
                 name          =>'software',
@@ -141,25 +141,25 @@ sub new
                 sqlorder      =>'none',
                 searchable    =>0,
                 label         =>'Comments',
-                dataobjattr   =>'amcomment.memcomment'),
+                dataobjattr   =>'"comments"'),
 
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amportfolio.externalsystem'),
+                dataobjattr   =>'"srcsys"'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'amportfolio.externalid'),
+                dataobjattr   =>'"srcid"'),
 
 
    );
    $self->{use_distinct}=0;
-
+   $self->setWorktable("license");
    $self->setDefaultView(qw(licenseid name assignmentgroup));
    return($self);
 }
@@ -182,32 +182,6 @@ sub getRecordImageUrl
    return("../../../public/tsacinv/load/license.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amasset,".
-      "(select amportfolio.* from amportfolio ".
-      " where amportfolio.bdelete=0) amportfolio,ammodel,amnature,amcomment,".
-      "(select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=
-  #    "amcontract.lcntrid=amportfolio.lportfolioitemid and ".
-      "amasset.assettag=amportfolio.assettag and ".
-      "amportfolio.lmodelid=ammodel.lmodelid ".
-      "and ammodel.lnatureid=amnature.lnatureid ".
-      "and amasset.lcommentid=amcomment.lcommentid(+) ".
-      "and amnature.name='SW-LICENSE' ".
-      "and amportfolio.lcostid=amcostcenter.lcostid(+) ";
-   return($where);
-}
 
 sub SecureSetFilter
 {

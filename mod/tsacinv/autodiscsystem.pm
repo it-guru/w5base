@@ -95,8 +95,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'cpucount',
                 label         =>'CPU-Count',
-                dataobjattr   =>'amtsiautodiscovery.itotalnumberofcores*'.
-                                'amtsiautodiscovery.smt'),
+                dataobjattr   =>'"cpucount"'),
 
       new kernel::Field::Text(
                 name          =>'serialno',
