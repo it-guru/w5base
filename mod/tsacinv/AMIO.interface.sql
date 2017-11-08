@@ -1329,6 +1329,64 @@ grant select on autodiscsystem to public;
 
 
 -- --------------------------------------------------------------------------
+-- --------------------- tsacinv::autodiscipaddress -------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die AutoDiscovery IP Daten wird dadurch freigegen,
+--   dass der Schnittstellen-User Zugriff auf den betreffenden 
+--   Datensatz fuer das AutoDiscovery-Logisches System hat.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW autodiscipaddress_acl AS
+   SELECT distinct "systemdiscoveryid" id
+   FROM autodiscsystem;
+
+CREATE or REPLACE VIEW autodiscipaddress AS
+   SELECT
+      amtsiautodiscinterfaces.linterfaceid           AS "id",
+      amtsiautodiscinterfaces.ipaddress              AS "address",
+      amtsiautodiscinterfaces.physicaladdress        AS "physicaladdress",
+      amtsiautodiscinterfaces.lsystemautodiscid      AS "systemautodiscid",
+      amtsiautodiscinterfaces.dtscan                 AS "scandate",
+      amtsiautodiscinterfaces.source                 AS "srcsys"
+   FROM AM2107.amtsiautodiscinterfaces
+      JOIN autodiscipaddress_acl
+         ON amtsiautodiscinterfaces.lsystemautodiscid=autodiscipaddress_acl.id;
+
+grant select on autodiscipaddress to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::autodiscsoftware --------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die AutoDiscovery Software Daten wird dadurch freigegen,
+--   dass der Schnittstellen-User Zugriff auf den betreffenden 
+--   Datensatz fuer das AutoDiscovery-Logisches System hat.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW autodiscsoftware_acl AS
+   SELECT distinct "systemdiscoveryid" id
+   FROM autodiscsystem;
+
+CREATE or REPLACE VIEW autodiscsoftware AS
+   SELECT
+      amtsiautodiscsw.ladswid                        AS "id",
+      amtsiautodiscsw.productname                    AS "software",
+      amtsiautodiscsw.manufacturer                   AS "producer",
+      amtsiautodiscsw.version                        AS "version",
+      amtsiautodiscsw.path                           AS "path",
+      amtsiautodiscsw.lautodiscsystemid              AS "systemautodiscid",
+      amtsiautodiscsw.dtscan                         AS "scandate",
+      amtsiautodiscsw.source                         AS "srcsys"
+   FROM AM2107.amtsiautodiscsw
+      JOIN autodiscsoftware_acl
+         ON amtsiautodiscsw.lautodiscsystemid=autodiscsoftware_acl.id;
+
+grant select on autodiscsoftware to public;
+
+
+
+-- --------------------------------------------------------------------------
 -- --------------------- tsacinv::itfarm ------------------------------------
 -- --------------------------------------------------------------------------
 --   Der Zugriff auf die Serverfarm wird dadurch
@@ -1542,4 +1600,90 @@ CREATE or REPLACE VIEW license AS
                        WHERE amcostcenter.bdelete=0) amcostcenter
          ON amportfolio.lcostid = amcostcenter.lcostid
    WHERE amnature.name = 'SW-LICENSE';
+
+grant select on license to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::itclust  ----------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf einen Cluster-Datensatz wird dadurch eingeschraenkt,     
+--   dass der Schnittstellen-User ueber die IFACE_ACL entweder den Zugriff 
+--   auf den Buchungskreis, die Assignmentgroup des Clusters oder den aus
+--   dem Kontierungsobjekt resultierenden Customer-Link haben muss. 
+--
+--   TODO: Es muessen auch Cluster an Systemen der TelIT "sichtbar werden"!!!
+--
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW itclust_acl AS
+   SELECT distinct amportfolio.assettag  id
+   FROM AM2107.amasset
+      JOIN (SELECT * FROM AM2107.amportfolio 
+            WHERE amportfolio.bdelete=0) amportfolio
+         ON amasset.assettag = amportfolio.assettag
+      LEFT OUTER JOIN (SELECT * 
+                       FROM AM2107.amcostcenter 
+                       WHERE amcostcenter.bdelete=0) amcostcenter
+         ON amportfolio.lcostid = amcostcenter.lcostid
+      left outer join AM2107.amemplgroup assigrp
+         on amportfolio.lassignmentid = assigrp.lgroupid
+      left outer join AM2107.amtsiaccsecunit customerlnk
+            on amcostcenter.lcustomerlinkid=customerlnk.lunitid
+      join IFACE_ACL acl
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
+             (assigrp.name like acl.assignment 
+                or acl.assignment is null) and
+             (amcostcenter.acctno like acl.acctno 
+                or acl.acctno is null) and
+             (customerlnk.identifier like acl.customerlnk 
+                or acl.customerlnk is null) and
+            (acl.customerlnk is not null or
+             acl.acctno is not null or
+             acl.assignment is not null);
+
+
+CREATE or REPLACE VIEW itclust AS
+   SELECT
+      DISTINCT concat(amportfolio.name,concat(' (',
+               concat(amportfolio.assettag,')')))    AS "fullname",
+      amportfolio.name                               AS "name",
+      amportfolio.assettag                           AS "clusterid",
+      amcomputer.status                              AS "status",
+      amportfolio.usage                              AS "usage",
+      amcomputer.clustertype                         AS "clustertype",
+      amportfolio.lassignmentid                      AS "lassignmentid",
+      amportfolio.lincidentagid                      AS "lincidentagid",
+      decode(amportfolio.soxrelevant, 'YES', 1, 0)   AS "soxrelevant",
+      amcomputer.lcomputerid                         AS "lclusterid",
+      amportfolio.lportfolioitemid                   AS "lportfolio",
+      amportfolio.lportfolioitemid                   AS "lportfolioitemid",
+      amportfolio.llocaid                            AS "locationid",
+      amportfolio.externalsystem                     AS "srcsys",
+      amportfolio.externalid                         AS "srcid"
+   FROM AM2107.amcomputer
+      JOIN ( SELECT amportfolio.*
+             FROM AM2107.amportfolio
+             WHERE amportfolio.bdelete = 0) amportfolio
+         ON amportfolio.lportfolioitemid = amcomputer.litemid
+      JOIN itclust_acl 
+         ON amportfolio.assettag=itclust_acl.id
+      JOIN AM2107.ammodel
+         ON amportfolio.lmodelid = ammodel.lmodelid
+      LEFT OUTER JOIN  ( SELECT amcostcenter.*
+              FROM AM2107.amcostcenter
+              WHERE amcostcenter.bdelete = 0) amcostcenter
+         ON amportfolio.lcostid = amcostcenter.lcostid
+   WHERE ammodel.name = 'CLUSTER'
+      AND ( amcomputer.clustertype = 'Cluster'
+         OR amcomputer.clustertype = 'Oracle RAC Cluster'
+      )
+      AND amcomputer.status <> 'out of operation';
+
+grant select on itclust to public;
+
+
+
+
 
