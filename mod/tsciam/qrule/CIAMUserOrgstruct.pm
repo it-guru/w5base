@@ -298,11 +298,15 @@ sub qcheckRecord
          foreach my $wr (@wrlist){
              if (defined($ciamrec) &&
                  $ciamrec->{toucid} eq $wr->{toucid}){
-                $ciamusr->Log(ERROR,"basedata",
-                             "Contact '%s' has active primary AND secondary ".
-                             "CIAM workrelation to the same org ".
-                             "unit toucid='%s'",
-                             $urec->{fullname},$wr->{toucid});
+                #
+                # User hat prim. und sec. zur gleichen Org-Einheit. Seit
+                # 11/2017 behandeln wir es nun so, dass das prim. 
+                # Verhältnis vor geht.
+                #$ciamusr->Log(ERROR,"basedata",
+                #             "Contact '%s' has active primary AND secondary ".
+                #             "CIAM workrelation to the same org ".
+                #             "unit toucid='%s'",
+                #             $urec->{fullname},$wr->{toucid});
                 next;
              }
              my $ciamstate=$wr->{office_state};
