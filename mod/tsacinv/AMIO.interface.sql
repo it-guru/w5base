@@ -289,71 +289,6 @@ grant select on lnksharednet to public;
 
 
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::lnksharedstorage --------------------------
--- --------------------------------------------------------------------------
---   Die Relationen zwischen logischem System und shared-Storage
---   Componenten stehen jedem Schnittstellen-User zur Verfuegung. 
---   Es wird keine Filterung durchgefuehrt.
--- --------------------------------------------------------------------------
-
--- drop materialized view lnksharedstorage_acl_l0;
-CREATE MATERIALIZED VIEW lnksharedstorage_acl_l0
-  refresh complete start with sysdate
-  next trunc(sysdate+1)+6/24
-  AS
-   SELECT
-      distinct storageportfolio.assettag             AS "storageassetid",
-      storageportfolio.name                          AS "storagename",
-      amtsiprovsto.lprovidedstorageid                AS "storageid",
-      amcomputer.lcomputerid                         AS "lcomputerid",
-      systemportfolio.assettag                       AS "systemsystemid",
-      systemportfolio.name                           AS "systemname",
-      amtsicustappl.code                             AS "applid",
-      amtsicustappl.name                             AS "applname"
-   FROM AM2107.amtsiprovsto
-      JOIN AM2107.amportfolio storageportfolio
-         ON amtsiprovsto.lassetid = storageportfolio.lastid
-      JOIN AM2107.amtsiprovstomounts
-         ON amtsiprovsto.lprovidedstorageid=
-            amtsiprovstomounts.lprovidedstorageid
-      JOIN AM2107.amcomputer
-         ON amtsiprovstomounts.lcomputerid = amcomputer.lcomputerid
-      JOIN AM2107.amportfolio systemportfolio
-         ON amcomputer.litemid = systemportfolio.lportfolioitemid
-      JOIN AM2107.amtsirelportfappl
-         ON systemportfolio.lportfolioitemid = amtsirelportfappl.lportfolioid
-      JOIN AM2107.amtsicustappl
-         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
-   WHERE amtsiprovsto.bdelete = '0'
-      AND amtsiprovstomounts.bdelete = '0'
-      AND amtsirelportfappl.bdelete = 0;
-
-CREATE INDEX lnksharedstorage_acl_l0_i0
-   ON lnksharedstorage_acl_l0 ("storageassetid") online;
-CREATE INDEX lnksharedstorage_acl_l0_i1
-   ON lnksharedstorage_acl_l0 ("lcomputerid") online;
-CREATE INDEX lnksharedstorage_acl_l0_i2
-   ON lnksharedstorage_acl_l0 ("systemsystemid") online;
-CREATE INDEX lnksharedstorage_acl_l0_i3
-   ON lnksharedstorage_acl_l0 ("applid") online;
-
-CREATE or REPLACE VIEW lnksharedstorage_acl AS
-   SELECT distinct "storageassetid" id
-   FROM lnksharedstorage_acl_l0
-      JOIN system 
-         ON lnksharedstorage_acl_l0."lcomputerid"=system."lcomputerid";
-
-CREATE or REPLACE VIEW lnksharedstorage AS
-   SELECT lnksharedstorage_acl_l0.*
-   FROM lnksharedstorage_acl_l0
-   JOIN lnksharedstorage_acl
-      ON lnksharedstorage_acl.id=lnksharedstorage_acl_l0."storageassetid";
-
-grant select on lnksharedstorage to public;
-
-
-
--- --------------------------------------------------------------------------
 -- --------------------- tsacinv::system ------------------------------------
 -- --------------------------------------------------------------------------
 --   Der Zugriff auf einen logischen System Datensatz wird dadurch
@@ -616,6 +551,71 @@ CREATE or REPLACE VIEW accountno AS
 
 grant select on accountno to public;
 
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::lnksharedstorage --------------------------
+-- --------------------------------------------------------------------------
+--   Die Relationen zwischen logischem System und shared-Storage
+--   Componenten stehen jedem Schnittstellen-User zur Verfuegung. 
+--   Es wird keine Filterung durchgefuehrt.
+-- --------------------------------------------------------------------------
+
+-- drop materialized view lnksharedstorage_acl_l0;
+CREATE MATERIALIZED VIEW lnksharedstorage_acl_l0
+  refresh complete start with sysdate
+  next trunc(sysdate+1)+6/24
+  AS
+   SELECT
+      distinct storageportfolio.assettag             AS "storageassetid",
+      storageportfolio.name                          AS "storagename",
+      amtsiprovsto.lprovidedstorageid                AS "storageid",
+      amcomputer.lcomputerid                         AS "lcomputerid",
+      systemportfolio.assettag                       AS "systemsystemid",
+      systemportfolio.name                           AS "systemname",
+      amtsicustappl.code                             AS "applid",
+      amtsicustappl.name                             AS "applname"
+   FROM AM2107.amtsiprovsto
+      JOIN AM2107.amportfolio storageportfolio
+         ON amtsiprovsto.lassetid = storageportfolio.lastid
+      JOIN AM2107.amtsiprovstomounts
+         ON amtsiprovsto.lprovidedstorageid=
+            amtsiprovstomounts.lprovidedstorageid
+      JOIN AM2107.amcomputer
+         ON amtsiprovstomounts.lcomputerid = amcomputer.lcomputerid
+      JOIN AM2107.amportfolio systemportfolio
+         ON amcomputer.litemid = systemportfolio.lportfolioitemid
+      JOIN AM2107.amtsirelportfappl
+         ON systemportfolio.lportfolioitemid = amtsirelportfappl.lportfolioid
+      JOIN AM2107.amtsicustappl
+         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
+   WHERE amtsiprovsto.bdelete = '0'
+      AND amtsiprovstomounts.bdelete = '0'
+      AND amtsirelportfappl.bdelete = 0;
+
+CREATE INDEX lnksharedstorage_acl_l0_i0
+   ON lnksharedstorage_acl_l0 ("storageassetid") online;
+CREATE INDEX lnksharedstorage_acl_l0_i1
+   ON lnksharedstorage_acl_l0 ("lcomputerid") online;
+CREATE INDEX lnksharedstorage_acl_l0_i2
+   ON lnksharedstorage_acl_l0 ("systemsystemid") online;
+CREATE INDEX lnksharedstorage_acl_l0_i3
+   ON lnksharedstorage_acl_l0 ("applid") online;
+
+CREATE or REPLACE VIEW lnksharedstorage_acl AS
+   SELECT distinct "storageassetid" id
+   FROM lnksharedstorage_acl_l0
+      JOIN system 
+         ON lnksharedstorage_acl_l0."lcomputerid"=system."lcomputerid";
+
+CREATE or REPLACE VIEW lnksharedstorage AS
+   SELECT lnksharedstorage_acl_l0.*
+   FROM lnksharedstorage_acl_l0
+   JOIN lnksharedstorage_acl
+      ON lnksharedstorage_acl.id=lnksharedstorage_acl_l0."storageassetid";
+
+grant select on lnksharedstorage to public;
 
 
 
