@@ -40,13 +40,13 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'assetportfolio.assettag'),
+                dataobjattr   =>'"assetid"'),
 
       new kernel::Field::Text(
                 name          =>'nature',
                 htmldetail    =>0,
                 label         =>'Nature',
-                dataobjattr   =>"amnature.name"),
+                dataobjattr   =>'"nature"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -60,26 +60,26 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
-                dataobjattr   =>"assetportfolio.name"),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'storagecode',
                 htmldetail    =>0,
                 searchable    =>0,
                 label         =>'StorageCode',
-                dataobjattr   =>'amtsiprovsto.code'),
+                dataobjattr   =>'"storagecode"'),
 
       new kernel::Field::Link(
                 name          =>'storageid',
                 sqlorder      =>'NONE',
                 label         =>'StorageID',
-                dataobjattr   =>'amtsiprovsto.lprovidedstorageid'),
+                dataobjattr   =>'"storageid"'),
 
      new kernel::Field::Text(
                 name          =>'exportname',
                 label         =>'Export Name',
                 ignorecase    =>1,
-                dataobjattr   =>'amtsiprovsto.exportname'),
+                dataobjattr   =>'"exportname"'),
 
      new kernel::Field::Text(
                 name          =>'location',
@@ -88,7 +88,7 @@ sub new
                 weblinkto     =>'tsacinv::location',
                 weblinkon     =>['locationid'=>'locationid'],
                 group         =>"location",
-                dataobjattr   =>'amlocation.fullname'),
+                dataobjattr   =>'"location"'),
 
       new kernel::Field::Text(
                 name          =>'systemnames',
@@ -149,22 +149,22 @@ sub new
                 label         =>'Tenant',
                 htmldetail    =>0,
                 group         =>'source',
-                dataobjattr   =>'amtenant.code'),
+                dataobjattr   =>'"tenant"'),
 
       new kernel::Field::Text(
                 name          =>'place',
                 label         =>'Place',
                 group         =>"location",
-                dataobjattr   =>'assetportfolio.place'),
+                dataobjattr   =>'"place"'),
 
       new kernel::Field::Link(
                 name          =>'locationid',
                 label         =>'LocationID',
-                dataobjattr   =>'assetportfolio.llocaid'),
+                dataobjattr   =>'"locationid"'),
 
       new kernel::Field::Link(
                 name          =>'lassetid',
-                dataobjattr   =>'amtsiprovsto.lassetid'),
+                dataobjattr   =>'"lassetid"'),
 
    );
    $self->setDefaultView(qw(fullname location place));

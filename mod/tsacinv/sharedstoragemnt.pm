@@ -38,41 +38,40 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'amtsiprovstomounts.lmountpointid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Mountpoint',
-                dataobjattr   =>"concat(concat(systemportfolio.name,':'),".
-                                "amtsiprovstomounts.mountpoint)"),
+                dataobjattr   =>'"fullname"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Path',
-                dataobjattr   =>'amtsiprovstomounts.mountpoint'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Link(
                 name          =>'lcomputerid',
                 label         =>'AC-ComputerID',
-                dataobjattr   =>'amcomputer.lcomputerid'),
+                dataobjattr   =>'"lcomputerid"'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 group         =>'system',
-                dataobjattr   =>'systemportfolio.name'),
+                dataobjattr   =>'"systemname"'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
                 group         =>'system',
-                dataobjattr   =>'systemportfolio.assettag'),
+                dataobjattr   =>'"systemid"'),
 
       new kernel::Field::Text(
                 name          =>'systemstatus',
                 label         =>'System Status',
                 group         =>'system',
-                dataobjattr   =>'amcomputer.status'),
+                dataobjattr   =>'"systemstatus"'),
 
       new kernel::Field::Text(
                 name          =>'storageassetid',
@@ -82,7 +81,7 @@ sub new
                 searchable    =>1,
                 group         =>'storage',
                 align         =>'left',
-                dataobjattr   =>'assetportfolio.assettag'),
+                dataobjattr   =>'"storageassetid"'),
 
       new kernel::Field::Text(
                 name          =>'storagefullname',
@@ -90,22 +89,21 @@ sub new
                 searchable    =>0,
                 group         =>'storage',
                 label         =>'storage full name',
-                dataobjattr   =>"concat(assetportfolio.name,".
-                                "concat(' (',".
-                                "concat(assetportfolio.assettag,')')))"),
+                dataobjattr   =>'"storagefullname"'),
 
       new kernel::Field::Text(
                 name          =>'storagename',
                 group         =>'storage',
                 label         =>'Storage-Name',
-                dataobjattr   =>"assetportfolio.name"),
+                dataobjattr   =>'"storagename"'),
 
       new kernel::Field::Link(
                 name          =>'sharedstorageid',
                 sqlorder      =>'NONE',
-                dataobjattr   =>'amtsiprovstomounts.lprovidedstorageid'),
+                dataobjattr   =>'"sharedstorageid"'),
 
    );
+   $self->setWorktable("sharedstoragemnt"); 
    $self->setDefaultView(qw(assetid stoid exportname location place));
    return($self);
 }
@@ -145,30 +143,6 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default system source));
-}
-
-
-
-
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsiprovstomounts,amcomputer,amportfolio systemportfolio,".
-            "amportfolio assetportfolio,amtsiprovsto";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amtsiprovstomounts.lprovidedstorageid=".
-             "amtsiprovsto.lprovidedstorageid ".
-             "and amtsiprovsto.lassetid=assetportfolio.lastid ".
-             "and amtsiprovstomounts.bdelete='0' ".
-             "and amtsiprovstomounts.lcomputerid=amcomputer.lcomputerid(+) ".
-             "and amcomputer.litemid=systemportfolio.lportfolioitemid(+) ";
-   return($where);
 }
 
 

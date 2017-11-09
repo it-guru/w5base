@@ -100,7 +100,7 @@ CREATE or REPLACE view appl as
          on amtsicustappl.lassignmentid = assigrp.lgroupid
       left outer join (
          SELECT
-            DISTINCT amtsiservicetype.identifier ordered,
+            distinct amtsiservicetype.identifier ordered,
             amtsicustappl.ltsicustapplid
          FROM
             AM2107.amtsiservice,
@@ -132,6 +132,37 @@ grant select on appl to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::system (pre) ------------------------------
 -- --------------------------------------------------------------------------
+
+
+-- drop materialized view system_acl_l0;
+CREATE MATERIALIZED VIEW system_acl_l0
+  refresh complete start with sysdate
+  next trunc(sysdate+1)+5.2/24
+  as
+  select distinct acl.ifuser,amportfolio.assettag id
+   from AM2107.amportfolio
+      left outer join ( SELECT amcostcenter.*
+                        FROM AM2107.amcostcenter
+                        WHERE amcostcenter.bdelete = 0) amcostcenter
+         on amportfolio.lcostid = amcostcenter.lcostid
+      left outer join AM2107.amemplgroup assigrp
+         on amportfolio.lassignmentid = assigrp.lgroupid
+      left outer join AM2107.amtsiaccsecunit customerlnk
+            on amcostcenter.lcustomerlinkid=customerlnk.lunitid
+      join IFACE_ACL acl
+         on  (assigrp.name like acl.assignment
+                or acl.assignment is null) and
+             (amcostcenter.acctno like acl.acctno
+                or acl.acctno is null) and
+             (customerlnk.identifier like acl.customerlnk
+                or acl.customerlnk is null) and
+            (acl.customerlnk is not null or
+             acl.acctno is not null or
+             acl.assignment is not null);
+
+CREATE INDEX system_acl_l0_i0
+   ON system_acl_l0 (id,ifuser) online;
+
 
 CREATE or REPLACE VIEW system_acl_level0 AS     -- level0 = without shared
    select distinct amportfolio.assettag id
@@ -166,13 +197,13 @@ CREATE or REPLACE VIEW system_acl_level0 AS     -- level0 = without shared
 
 CREATE or REPLACE VIEW ipaddress_acl AS
    SELECT
-      DISTINCT amnetworkcard.lnetworkcardid          id
+      distinct amnetworkcard.lnetworkcardid          id
    FROM AM2107.amnetworkcard
    JOIN system on system."lcomputerid"=amnetworkcard.lcompid;
 
 CREATE or REPLACE VIEW ipaddress AS
    SELECT
-      DISTINCT amnetworkcard.lnetworkcardid          "id",
+      distinct amnetworkcard.lnetworkcardid          "id",
          amnetworkcard.tcpipaddress|| 
          decode(amnetworkcard.tcpipaddress,NULL,'',
          decode(amnetworkcard.ipv6address,NULL,'',
@@ -225,7 +256,7 @@ CREATE or REPLACE VIEW accountno_acl AS
 
 CREATE or REPLACE VIEW accountno AS
    SELECT
-      DISTINCT amtsiacctno.ltsiacctnoid              AS "id",
+      distinct amtsiacctno.ltsiacctnoid              AS "id",
       amtsiacctno.code                               AS "accnoid",
       amtsiacctno.accountno                          AS "name",
       amtsiacctno.ctrlflag                           AS "ctrlflag",
@@ -259,20 +290,18 @@ grant select on accountno to public;
 -- - werden.                                                                -
 -- --------------------------------------------------------------------------
 
--- drop materialized view mview_lnknet;
-CREATE MATERIALIZED VIEW mview_lnknet
+
+-- drop materialized view lnksharednet_acl_l0;
+CREATE MATERIALIZED VIEW lnksharednet_acl_l0
   refresh complete start with sysdate
-  next trunc(sysdate+1)+6/24
+  next trunc(sysdate+1)+5.4/24
   as
    SELECT
-      DISTINCT TsiParentChild.ltsiparentchildid      AS "netlnkid",
+      distinct TsiParentChild.ltsiparentchildid      AS "netlnkid",
+      system_acl_l0.ifuser                           AS "IFUSER",
       TsiParentChild.description                     AS "description",
-      amtsicustappl.code                             AS "applid",
-      amtsicustappl.name                             AS "applname",
       systemportfolio.assettag                       AS "systemsystemid",
-      systemportfolio.name                           AS "systemname",
       netportfolio.assettag                          AS "netsystemid",
-      netportfolio.name                              AS "netname",
       netpartnernature.name                          AS "netnature",
       amcomputer.lcomputerid                         AS "lcomputerid"
    FROM
@@ -313,27 +342,50 @@ CREATE MATERIALIZED VIEW mview_lnknet
       LEFT OUTER JOIN AM2107.amtsirelportfappl 
          ON ( systemportfolio.lportfolioitemid = amtsirelportfappl.lportfolioid
               AND amtsirelportfappl.bdelete = '0')
-      LEFT OUTER JOIN AM2107.amtsicustappl 
-         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid;
+      JOIN system_acl_l0
+         ON systemportfolio.assettag=system_acl_l0.id;
 
-CREATE INDEX mview_lnknet_i0
-   ON mview_lnknet ("netlnkid") online;
-CREATE INDEX mview_lnknet_i1
-   ON mview_lnknet ("lcomputerid") online;
-CREATE INDEX mview_lnknet_i2
-   ON mview_lnknet ("systemsystemid") online;
-CREATE INDEX mview_lnknet_i3
-   ON mview_lnknet ("applid") online;
-CREATE INDEX mview_lnknet_i4
-   ON mview_lnknet ("netsystemid") online;
+CREATE INDEX lnksharednet_acl_l0_i0
+   ON lnksharednet_acl_l0 ("netlnkid") online;
+CREATE INDEX lnksharednet_acl_l0_i1
+   ON lnksharednet_acl_l0 ("lcomputerid") online;
+CREATE INDEX lnksharednet_acl_l0_i2
+   ON lnksharednet_acl_l0 ("systemsystemid") online;
+CREATE INDEX lnksharednet_acl_l0_i3
+   ON lnksharednet_acl_l0 ("netsystemid") online;
+
+
+CREATE or REPLACE VIEW lnksharednet_acl AS
+   select distinct lnksharednet_acl_l0."netlnkid" id
+   FROM lnksharednet_acl_l0
+   WHERE lnksharednet_acl_l0.ifuser=sys_context('USERENV', 'SESSION_USER'); 
 
 CREATE or REPLACE VIEW lnksharednet AS
-   select * 
-   from system_acl_level0
-      join mview_lnknet 
-         on system_acl_level0.id=mview_lnknet."systemsystemid"
-   where "netnature" is not null 
-      and "netnature" not in ('SERVER','TERMINAL-SERVER');
+   SELECT
+      distinct lnksharednet_acl_l0."netlnkid",
+      lnksharednet_acl_l0."description",
+      amtsicustappl.code                             AS "applid",
+      amtsicustappl.name                             AS "applname",
+      lnksharednet_acl_l0."systemsystemid",
+      systemportfolio.name                           AS "systemname",
+      lnksharednet_acl_l0."netsystemid",
+      netportfolio.name                              AS "netname",
+      lnksharednet_acl_l0."netnature",
+      lnksharednet_acl_l0."lcomputerid"
+   FROM lnksharednet_acl_l0
+      JOIN lnksharednet_acl
+         ON lnksharednet_acl_l0."netlnkid"=lnksharednet_acl.id
+      JOIN AM2107.amportfolio netportfolio
+         ON lnksharednet_acl_l0."netsystemid" = netportfolio.assettag
+      JOIN AM2107.amportfolio systemportfolio
+         ON lnksharednet_acl_l0."systemsystemid" = systemportfolio.assettag
+      LEFT OUTER JOIN AM2107.amtsirelportfappl 
+         ON ( systemportfolio.lportfolioitemid = amtsirelportfappl.lportfolioid
+              AND amtsirelportfappl.bdelete = '0')
+      LEFT OUTER JOIN AM2107.amtsicustappl 
+         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
+   WHERE  lnksharednet_acl_l0."netnature" is not null 
+      and lnksharednet_acl_l0."netnature" not in ('SERVER','TERMINAL-SERVER');
    
 grant select on lnksharednet to public;
 
@@ -353,7 +405,7 @@ CREATE MATERIALIZED VIEW mview_lnksharedstorage
   next trunc(sysdate+1)+6/24
   AS
    SELECT
-      DISTINCT storageportfolio.assettag             AS "storageassetid",
+      distinct storageportfolio.assettag             AS "storageassetid",
       storageportfolio.name                          AS "storagename",
       amtsiprovsto.lprovidedstorageid                AS "storageid",
       amcomputer.lcomputerid                         AS "lcomputerid",
@@ -389,7 +441,7 @@ CREATE INDEX mview_lnksharedstorage_i3
    ON mview_lnksharedstorage ("applid") online;
 
 CREATE or REPLACE VIEW lnksharedstorage_acl AS
-   SELECT DISTINCT "storageassetid" id
+   SELECT distinct "storageassetid" id
    FROM mview_lnksharedstorage
       JOIN system 
          ON mview_lnksharedstorage."lcomputerid"=system."lcomputerid";
@@ -416,16 +468,25 @@ grant select on lnksharedstorage to public;
 --   "shared-Network" Componenten erkannt wurden (1x tgl. ermittelt)
 -- --------------------------------------------------------------------------
 
+-- drop materialized view system_acl_l1;
+CREATE MATERIALIZED VIEW system_acl_l1
+  refresh complete start with sysdate
+  next trunc(sysdate+1)+5.6/24
+  as
+   select ifuser,"netsystemid" id from lnksharednet_acl_l0
+   union
+   select ifuser,id from system_acl_l0;
+
+CREATE INDEX system_acl_l1_i0
+   ON system_acl_l1 (id,ifuser) online;
+
+CREATE INDEX system_acl_l1_i1
+   ON system_acl_l1 (ifuser,id) online;
+
+
 CREATE or REPLACE VIEW system_acl AS
-   select distinct * from (
-      select amportfolio.assettag id
-      from AM2107.amportfolio,system_acl_level0
-      where amportfolio.assettag=system_acl_level0.id
-      union 
-      select amportfolio.assettag id
-      from AM2107.amportfolio,lnksharednet
-      where amportfolio.assettag=lnksharednet."netsystemid"
-   );
+   select distinct id from 
+       system_acl_l1 where ifuser=sys_context('USERENV', 'SESSION_USER');
 -- test: DEMD1XCP0002 (S20148097)  QDE8HV (S21938047)
 
 
@@ -546,7 +607,7 @@ CREATE or REPLACE VIEW system AS
          WHERE amcostcenter.bdelete = 0 ) amcostcenter 
          ON amportfolio.lcostid = amcostcenter.lcostid
       LEFT OUTER JOIN (
-         SELECT DISTINCT amtsiservicetype.identifier ordered, 
+         SELECT distinct amtsiservicetype.identifier ordered, 
                          amtsiservice.lportfolioid
          FROM AM2107.amtsiservice, AM2107.amtsiservicetype
          WHERE
@@ -574,7 +635,7 @@ grant select on system to public;
 -- --------------------------------------------------------------------------
 
 CREATE VIEW grp_acl AS
-   SELECT DISTINCT amemplgroup.barcode id
+   SELECT distinct amemplgroup.barcode id
    FROM AM2107.amemplgroup
    JOIN IFACE_ACL acl
       on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
@@ -582,7 +643,7 @@ CREATE VIEW grp_acl AS
 
 CREATE VIEW grp AS
    SELECT
-      DISTINCT amemplgroup.barcode                   AS "code",
+      distinct amemplgroup.barcode                   AS "code",
       amemplgroup.lgroupid                           AS "lgroupid",
       amemplgroup.name                               AS "name",
       amemplgroup.name                               AS "fullname",
@@ -616,7 +677,7 @@ CREATE or REPLACE VIEW usr_acl AS
 
 CREATE or REPLACE VIEW usr AS
    SELECT
-      DISTINCT amempldept.lempldeptid                AS "lempldeptid",
+      distinct amempldept.lempldeptid                AS "lempldeptid",
       amempldept.fullname                            AS "acfullname",
       amempldept.bdelete                             AS "deleted",
       amempldept.userlogin                           AS "loginname",
@@ -694,7 +755,7 @@ CREATE or REPLACE VIEW lnkapplsystem_acl AS
 
 CREATE or REPLACE VIEW lnkapplsystem AS
    SELECT
-      DISTINCT amtsirelportfappl.lrelportfapplid     AS "id",
+      distinct amtsirelportfappl.lrelportfapplid     AS "id",
       amtsicustappl.code                             AS "applid",
       amportfolio.bdelete                            AS "deleted",
       amtsirelportfappl.bactive                      AS "isactive",
@@ -762,7 +823,7 @@ grant select on lnkapplsystem to public;
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW osrelease_acl AS
-   SELECT DISTINCT amitemlistval.litemlistvalid      AS id
+   SELECT distinct amitemlistval.litemlistvalid      AS id
    FROM AM2107.amitemlistval
    JOIN IFACE_ACL acl
       on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
@@ -793,14 +854,14 @@ grant select on osrelease to public;
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW asset_acl AS
-   SELECT DISTINCT amportfolio.assettag               id
+   SELECT distinct amportfolio.assettag               id
       from AM2107.amportfolio
       JOIN system 
          on amportfolio.lportfolioitemid = system."lassetid"
 
 CREATE or REPLACE VIEW asset AS
    SELECT
-      DISTINCT assetportfolio.assettag               AS "assetid",
+      distinct assetportfolio.assettag               AS "assetid",
       LOWER(amasset.status)                          AS "status",
       assetportfolio.assettag                        AS "fullname",
       assetportfolio.dtinvent                        AS "install",
@@ -870,7 +931,7 @@ grant select on asset to public;
 
 CREATE or REPLACE VIEW lnkusergroup_acl AS
    SELECT
-      DISTINCT concat (amrelemplgrp.lgroupid,
+      distinct concat (amrelemplgrp.lgroupid,
          concat ( '-',amrelemplgrp.lempldeptid))     AS id
    FROM
       AM2107.amrelemplgrp
@@ -879,7 +940,7 @@ CREATE or REPLACE VIEW lnkusergroup_acl AS
 
 CREATE or REPLACE VIEW lnkusergroup AS
    SELECT
-      DISTINCT concat (amrelemplgrp.lgroupid,
+      distinct concat (amrelemplgrp.lgroupid,
          concat ( '-',amrelemplgrp.lempldeptid))     AS "id",
       amrelemplgrp.lempldeptid                       AS "lempldeptid",
       amrelemplgrp.lgroupid                          AS "lgroupid"
@@ -904,7 +965,7 @@ grant select on lnkusergroup to public;
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW costcenter_acl AS
-   SELECT DISTINCT amcostcenter.lcostid              AS id
+   SELECT distinct amcostcenter.lcostid              AS id
    FROM AM2107.amcostcenter
       LEFT OUTER JOIN AM2107.amtsiaccsecunit customerlnk
          ON amcostcenter.lcustomerlinkid = customerlnk.lunitid
@@ -1001,7 +1062,7 @@ grant select on costcenter to public;
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW customer_acl AS
-   SELECT DISTINCT amtsiaccsecunit.lunitid           AS id
+   SELECT distinct amtsiaccsecunit.lunitid           AS id
    FROM AM2107.amtsiaccsecunit
       JOIN IFACE_ACL acl
          ON acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
@@ -1040,7 +1101,7 @@ grant select on customer to public;
 
 CREATE or REPLACE VIEW dlvpartner_acl AS
    SELECT
-      DISTINCT amtsidlvpartner.ldeliverypartnerid    AS id
+      distinct amtsidlvpartner.ldeliverypartnerid    AS id
    FROM
       AM2107.amtsidlvpartner
          JOIN costcenter_acl
@@ -1048,7 +1109,7 @@ CREATE or REPLACE VIEW dlvpartner_acl AS
 
 CREATE or REPLACE VIEW dlvpartner AS
    SELECT
-      DISTINCT amtsidlvpartner.ldeliverypartnerid    AS "id",
+      distinct amtsidlvpartner.ldeliverypartnerid    AS "id",
       amcostcenter.trimmedtitle                      AS "name",
       amtsidlvpartner.ldeliverymanagementid          AS "ldeliverymanagementid",
       amtsidlvpartner.description                    AS "description",
@@ -1075,14 +1136,14 @@ grant select on dlvpartner to public;
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW location_acl AS
-   SELECT DISTINCT amlocation.llocaid      AS id
+   SELECT distinct amlocation.llocaid      AS id
    FROM AM2107.amlocation
    JOIN IFACE_ACL acl
       on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
 
 CREATE or REPLACE VIEW location AS
    SELECT
-      DISTINCT amlocation.llocaid                    AS "locationid",
+      distinct amlocation.llocaid                    AS "locationid",
       amlocation.fullname                            AS "fullname",
       amlocation.address1                            AS "address1",
       amlocation.zip                                 AS "zipcode",
@@ -1114,14 +1175,14 @@ grant select on location to public;
 
 CREATE or REPLACE VIEW lnksystemsoftware_acl AS
    SELECT
-      DISTINCT amportfolio.assettag                  AS id
+      distinct amportfolio.assettag                  AS id
    from AM2107.amportfolio
       JOIN system 
          ON amportfolio.lparentid=system."lportfolioitemid";
 
 CREATE or REPLACE VIEW lnksystemsoftware AS
    SELECT
-      DISTINCT amportfolio.assettag                  AS "id",
+      distinct amportfolio.assettag                  AS "id",
       ammodel.name                                   AS "name",
       amsoftinstall.lusecount                        AS "quantity",
       ammodel.versionlevel                           AS "version",
@@ -1201,7 +1262,7 @@ grant select on model to public;
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW swinstance_acl AS
-   select DISTINCT amtsiswinstance.lportfolioid   AS id
+   select distinct amtsiswinstance.lportfolioid   AS id
    FROM AM2107.amtsiswinstance
       JOIN (SELECT amportfolio.* FROM AM2107.amportfolio
              WHERE amportfolio.bdelete = 0) amportfolio
@@ -1227,7 +1288,7 @@ CREATE or REPLACE VIEW swinstance_acl AS
 
 CREATE or REPLACE VIEW swinstance AS
    SELECT
-      DISTINCT concat(amportfolio.name,
+      distinct concat(amportfolio.name,
       concat(' (',concat(amportfolio.assettag, ')')))  AS "fullname",
       concat(amportfolio.name,concat(' (',concat(amportfolio.code,
                ')')))                                AS "scfullname",
@@ -1415,7 +1476,7 @@ CREATE or REPLACE VIEW itfarm_acl AS
 
 CREATE or REPLACE VIEW itfarm AS
    SELECT
-      DISTINCT clu.litemid                           AS "lfarmid",
+      distinct clu.litemid                           AS "lfarmid",
       cluportfolio.name                              AS "name",
       clu.assettag                                   AS "clusterid",
       clu.status                                     AS "status"
@@ -1457,7 +1518,7 @@ CREATE or REPLACE VIEW schain_acl AS
 
 CREATE or REPLACE VIEW schain AS
    SELECT
-      DISTINCT amtsisalessrvcpkg.lsrvcpkgid          AS "schainid",
+      distinct amtsisalessrvcpkg.lsrvcpkgid          AS "schainid",
       amtsisalessrvcpkg.code                         AS "code",
       amtsisalessrvcpkg.name                         AS "fullname",
       amtsisalessrvcpkg.lcommentid                   AS "lcommentid",
@@ -1487,7 +1548,7 @@ CREATE or REPLACE VIEW lnkschain_acl AS
 
 CREATE or REPLACE VIEW lnkschain AS
    SELECT
-      DISTINCT schainrel.id                          AS "id",
+      distinct schainrel.id                          AS "id",
       schainrel.lsspid                               AS "lsspid",
       schainrel.itemid                               AS "itemid",
       schainrel.itemname                             AS "name",
@@ -1646,7 +1707,7 @@ CREATE or REPLACE VIEW itclust_acl AS
 
 CREATE or REPLACE VIEW itclust AS
    SELECT
-      DISTINCT concat(amportfolio.name,concat(' (',
+      distinct concat(amportfolio.name,concat(' (',
                concat(amportfolio.assettag,')')))    AS "fullname",
       amportfolio.name                               AS "name",
       amportfolio.assettag                           AS "clusterid",
@@ -1699,7 +1760,7 @@ CREATE or REPLACE VIEW itclustservice_acl AS
 
 CREATE or REPLACE VIEW itclustservice AS
    SELECT
-      DISTINCT concat(amportfolio.name,concat(' (',
+      distinct concat(amportfolio.name,concat(' (',
             concat(amportfolio.assettag,')')))       AS "fullname",
       amportfolio.name                               AS "name",
       amcomputer.clustertype                         AS "type",
@@ -1742,4 +1803,99 @@ CREATE or REPLACE VIEW itclustservice AS
 
 grant select on itclustservice to public;
 
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::schain ------------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Serviceketten wird dadurch
+--   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
+--   sein muss.     
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW service_acl AS
+   SELECT distinct amtsiservice.lserviceid id
+   FROM AM2107.amtsiservice
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
+CREATE or REPLACE VIEW service AS
+   SELECT
+      distinct amtsiservice.lserviceid               AS "serviceid",
+      amportfolio.assettag                           AS "systemid",
+      amtsiservicetype.identifier                    AS "name",
+      amtsiservicetype.type                          AS "type",
+      amtsiservicetype.unit                          AS "unit",
+      amtsiservice.description                       AS "description",
+      decode(amtsiservice.btechnical,0,1,1,0)        AS "isordered",
+      amtsiservice.btechnical                        AS "isdelivered",
+      amtsiservice.ammount                           AS "ammount"
+   FROM AM2107.amtsiservicetype
+      JOIN AM2107.amtsiservice
+         ON amtsiservice.lservicetypeid = amtsiservicetype.ltsiservicetypeid
+      JOIN service_acl
+         ON amtsiservice.lserviceid=service_acl.id
+      JOIN AM2107.amportfolio
+         ON amportfolio.lportfolioitemid = amtsiservice.lportfolioid
+      JOIN AM2107.amcomputer
+         ON amportfolio.lportfolioitemid = amcomputer.litemid
+   WHERE amtsiservice.bdelete = 0 AND amportfolio.bdelete = 0;
+
+grant select on service to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::sharedstoragemnt --------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Storage-Mountpoints wird dadurch eingeschraenkt,
+--   das der betreffende Schnittstellen-User auch das dazugehoerige
+--   System "sehen" muss.
+--
+--  TODO: Hier passt noch was nicht - es werden keine Mounts gefunden!
+--
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW sharedstoragemnt_acl AS
+   SELECT DISTINCT amtsiprovstomounts.lmountpointid      id
+   FROM  AM2107.amtsiprovstomounts
+   JOIN AM2107.amcomputer
+      ON amtsiprovstomounts.lcomputerid = amcomputer.lcomputerid
+   JOIN AM2107.amportfolio systemportfolio
+      ON amcomputer.litemid = systemportfolio.lportfolioitemid
+   JOIN system
+      ON systemportfolio.assettag=system."systemid";
+
+
+CREATE or REPLACE VIEW sharedstoragemnt AS
+   SELECT
+      DISTINCT amtsiprovstomounts.lmountpointid      AS "id",
+      concat (concat(systemportfolio.name, ':'),
+         amtsiprovstomounts.mountpoint)              AS "fullname",
+      amtsiprovstomounts.mountpoint                  AS "name",
+      amcomputer.lcomputerid                         AS "lcomputerid",
+      systemportfolio.name                           AS "systemname",
+      systemportfolio.assettag                       AS "systemid",
+      amcomputer.status                              AS "systemstatus",
+      assetportfolio.assettag                        AS "storageassetid",
+      concat (assetportfolio.name,
+         concat(' (',concat (assetportfolio.assettag,
+               ')')))                                AS "storagefullname",
+      assetportfolio.name                            AS "storagename",
+      amtsiprovstomounts.lprovidedstorageid          AS "sharedstorageid"
+   FROM AM2107.amtsiprovstomounts
+      JOIN sharedstoragemnt_acl
+         ON amtsiprovstomounts.lmountpointid=sharedstoragemnt_acl.id
+      JOIN AM2107.amcomputer
+         ON amtsiprovstomounts.lcomputerid = amcomputer.lcomputerid 
+      JOIN AM2107.amportfolio systemportfolio
+         ON amcomputer.litemid = systemportfolio.lportfolioitemid
+      JOIN AM2107.amtsiprovsto
+         ON amtsiprovstomounts.lprovidedstorageid=
+            amtsiprovsto.lprovidedstorageid
+      JOIN AM2107.amportfolio assetportfolio
+         ON  amtsiprovsto.lassetid = assetportfolio.lastid
+   WHERE amtsiprovstomounts.bdelete = '0';
+
+grant select on sharedstoragemnt to public;
 
