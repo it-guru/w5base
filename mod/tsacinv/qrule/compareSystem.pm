@@ -114,7 +114,8 @@ sub qcheckRecord
    #
    if ($rec->{systemid} ne ""){   # pruefen ob SYSTEMID von AssetManager
       $par->SetFilter({systemid=>\$rec->{systemid},
-                       status=>'"!out of operation"'});
+                       status=>'"!out of operation"',
+                       deleted=>\'0'});
       ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
    }

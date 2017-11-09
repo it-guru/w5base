@@ -150,8 +150,10 @@ grant select on appl to public;
 
 -- drop materialized view system_acl_l0;
 CREATE MATERIALIZED VIEW system_acl_l0
-  refresh complete start with sysdate
-  next trunc(sysdate+1)+5.2/24
+  -- refresh complete start with sysdate
+  -- next trunc(sysdate+1)+5.2/24
+  refresh complete start with trunc(sysdate+1)+5.2/24
+  next sysdate+0.125
   as
   select distinct acl.ifuser,amportfolio.assettag id
    from AM2107.amportfolio
@@ -177,29 +179,6 @@ CREATE MATERIALIZED VIEW system_acl_l0
 CREATE INDEX system_acl_l0_i0
    ON system_acl_l0 (id,ifuser) online;
 
-
-CREATE or REPLACE VIEW system_acl_level0 AS     -- level0 = without shared
-   select distinct amportfolio.assettag id
-   from AM2107.amportfolio
-      left outer join ( SELECT amcostcenter.*
-                        FROM AM2107.amcostcenter
-                        WHERE amcostcenter.bdelete = 0) amcostcenter
-         on amportfolio.lcostid = amcostcenter.lcostid
-      left outer join AM2107.amemplgroup assigrp
-         on amportfolio.lassignmentid = assigrp.lgroupid
-      left outer join AM2107.amtsiaccsecunit customerlnk
-            on amcostcenter.lcustomerlinkid=customerlnk.lunitid
-      join IFACE_ACL acl
-         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
-             (assigrp.name like acl.assignment 
-                or acl.assignment is null) and
-             (amcostcenter.acctno like acl.acctno 
-                or acl.acctno is null) and
-             (customerlnk.identifier like acl.customerlnk 
-                or acl.customerlnk is null) and
-            (acl.customerlnk is not null or
-             acl.acctno is not null or
-             acl.assignment is not null);
 
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::ipaddress ---------------------------------
@@ -285,7 +264,7 @@ CREATE or REPLACE VIEW accountno AS
          WHERE amcostcenter.bdelete = 0) amcostcenter
          ON amtsiacctno.lcostcenterid = amcostcenter.lcostid
       JOIN accountno_acl
-         on amtsiacctno.ltsiacctnoid=accountno_acl."id"
+         on amtsiacctno.ltsiacctnoid=accountno_acl.id
    WHERE
       amtsiacctno.bdelete = 0 AND amtsiacctno.ltsiacctnoid <> 0;
 
@@ -307,38 +286,35 @@ grant select on accountno to public;
 
 -- drop materialized view lnksharednet_acl_l0;
 CREATE MATERIALIZED VIEW lnksharednet_acl_l0
-  refresh complete start with sysdate
-  next trunc(sysdate+1)+5.4/24
+  -- refresh complete start with sysdate
+  -- next trunc(sysdate+1)+5.4/24
+  refresh complete start with trunc(sysdate+1)+5.4/24
+  next sysdate+0.125
   as
-   SELECT
-      distinct TsiParentChild.ltsiparentchildid      AS "netlnkid",
+   SELECT distinct TsiParentChild.ltsiparentchildid  AS "netlnkid",
       system_acl_l0.ifuser                           AS "IFUSER",
       TsiParentChild.description                     AS "description",
       systemportfolio.assettag                       AS "systemsystemid",
       netportfolio.assettag                          AS "netsystemid",
       netpartnernature.name                          AS "netnature",
       amcomputer.lcomputerid                         AS "lcomputerid"
-   FROM
-      AM2107.amcomputer
+   FROM AM2107.amcomputer
       JOIN AM2107.amportfolio systemportfolio 
          ON ( amcomputer.litemid = systemportfolio.lportfolioitemid
               AND systemportfolio.bdelete = '0')
-      JOIN (
-         SELECT
-            amTsiParentChild.ltsiparentchildid,
-            amTsiParentChild.lparentid a,
-            amTsiParentChild.lchildid b,
-            amTsiParentChild.description
-         FROM AM2107.amTsiParentChild
-         WHERE externalsystem = 'Autodiscovery'
-         UNION ALL
-         SELECT
-            amTsiParentChild.ltsiparentchildid,
-            amTsiParentChild.lchildid a,
-            amTsiParentChild.lparentid b,
-            amTsiParentChild.description
-         FROM AM2107.amTsiParentChild
-         WHERE externalsystem = 'Autodiscovery'
+      JOIN ( SELECT amTsiParentChild.ltsiparentchildid,
+                    amTsiParentChild.lparentid a,
+                    amTsiParentChild.lchildid b,
+                    amTsiParentChild.description
+                 FROM AM2107.amTsiParentChild
+                 WHERE externalsystem = 'Autodiscovery'
+             UNION ALL
+             SELECT amTsiParentChild.ltsiparentchildid,
+                    amTsiParentChild.lchildid a,
+                    amTsiParentChild.lparentid b,
+                    amTsiParentChild.description
+             FROM AM2107.amTsiParentChild
+             WHERE externalsystem = 'Autodiscovery'
       ) TsiParentChild 
          ON systemportfolio.lportfolioitemid = TsiParentChild.a
       JOIN AM2107.amportfolio netportfolio 
@@ -484,12 +460,16 @@ grant select on lnksharedstorage to public;
 
 -- drop materialized view system_acl_l1;
 CREATE MATERIALIZED VIEW system_acl_l1
-  refresh complete start with sysdate
-  next trunc(sysdate+1)+5.6/24
+  -- refresh complete start with sysdate
+  -- next trunc(sysdate+1)+5.6/24
+  refresh complete start with trunc(sysdate+1)+5.6/24
+  next sysdate+0.125
   as
-   select ifuser,"netsystemid" id from lnksharednet_acl_l0
-   union
-   select ifuser,id from system_acl_l0;
+   select distinct * from (
+      select ifuser,"netsystemid" id from lnksharednet_acl_l0
+      union
+      select ifuser,id from system_acl_l0
+   ) acltable;
 
 CREATE INDEX system_acl_l1_i0
    ON system_acl_l1 (id,ifuser) online;
@@ -648,14 +628,14 @@ grant select on system to public;
 --   Assignmentgroup Datensaetze abrufen.
 -- --------------------------------------------------------------------------
 
-CREATE VIEW grp_acl AS
+CREATE or replace VIEW grp_acl AS
    SELECT distinct amemplgroup.barcode id
    FROM AM2107.amemplgroup
    JOIN IFACE_ACL acl
       on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
    WHERE amemplgroup.lgroupid <> 0;
 
-CREATE VIEW grp AS
+CREATE or replace VIEW grp AS
    SELECT
       distinct amemplgroup.barcode                   AS "code",
       amemplgroup.lgroupid                           AS "lgroupid",
@@ -671,7 +651,7 @@ CREATE VIEW grp AS
       amemplgroup.dtlastmodif                        AS "mdate"
    FROM AM2107.amemplgroup
       JOIN group_acl
-         ON amemplgroup.barcode=group_acl.id
+         ON amemplgroup.barcode=group_acl.id;
 
 grant select on grp to public;
 
@@ -871,7 +851,7 @@ CREATE or REPLACE VIEW asset_acl AS
    SELECT distinct amportfolio.assettag               id
       from AM2107.amportfolio
       JOIN system 
-         on amportfolio.lportfolioitemid = system."lassetid"
+         on amportfolio.lportfolioitemid = system."lassetid";
 
 CREATE or REPLACE VIEW asset AS
    SELECT
@@ -971,28 +951,18 @@ grant select on lnkusergroup to public;
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::costcenter --------------------------------
 -- --------------------------------------------------------------------------
---   Der Zugriff auf einen Kontierungs-Datensatz wird dadurch
---   eingeschraenkt, dass der Schnittstellen-User ueber die IFACE_ACL
---   entweder den Zugriff auf den Buchungskreis (des Kontierungsobjektes),
---   die Assignmentgroup des Kontierungsobjektes oder den aus dem
---   Kontierungsobjekt resultierenden Customer-Link haben muss.
+--   Der Zugriff auf einen Kontierungs-Datensatz wird explizit NICHT
+--   durch die Filter in der IFACE_ACL eingeschraenkt (der Schnittstellen
+--   User muss darin nur mit min. einem Datensatz vorhanden sein), da
+--   dadurch Informationen zu Kontierungsobjekten zugaenglich werden 
+--   muessen, um z.B. auch Ansprechparnter ausfindig machen zu koennen.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW costcenter_acl AS
    SELECT distinct amcostcenter.lcostid              AS id
    FROM AM2107.amcostcenter
-      LEFT OUTER JOIN AM2107.amtsiaccsecunit customerlnk
-         ON amcostcenter.lcustomerlinkid = customerlnk.lunitid
       join IFACE_ACL acl
-         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
-             ( acl.assignment is null) and
-             (amcostcenter.acctno like acl.acctno 
-                or acl.acctno is null) and
-             (customerlnk.identifier like acl.customerlnk 
-                or acl.customerlnk is null) and
-            (acl.customerlnk is not null or
-             acl.acctno is not null or
-             acl.assignment is not null);
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
 
 CREATE or REPLACE VIEW costcenter AS
    SELECT amcostcenter.lcostid                       AS "id",
@@ -2040,7 +2010,7 @@ grant select on itfarmsystem to public;
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW itfarmconsole_acl AS
-   SELECT distinct amcomputer.conlitemid id
+   SELECT distinct amcomputer.litemid id
    FROM AM2107.amcomputer
    JOIN IFACE_ACL acl
       on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
@@ -2053,7 +2023,7 @@ SELECT
    con.assettag                                   AS "systemid",
    ass.assettag                                   AS "assetid",
    clu.assettag                                   AS "clusterid",
-   constatus                                      AS "status"
+   con.status                                     AS "status"
 FROM AM2107.amcomputer con
    JOIN itfarmconsole_acl
       ON con.litemid=itfarmconsole_acl.id
