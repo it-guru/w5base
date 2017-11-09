@@ -29,6 +29,7 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->{use_distinct}=0;
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -61,10 +62,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
-                searchable    =>0,
-                vjointo       =>'tsacinv::comment',
-                vjoinon       =>['lcommentid'=>'lcommentid'],
-                vjoindisp     =>'comments'),
+                dataobjattr   =>'"comments"'),
 
       new kernel::Field::SubList(
                 name          =>'items',

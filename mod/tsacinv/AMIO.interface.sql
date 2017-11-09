@@ -1531,17 +1531,19 @@ CREATE or REPLACE VIEW schain_acl AS
          on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
 
 CREATE or REPLACE VIEW schain AS
-   SELECT
-      distinct amtsisalessrvcpkg.lsrvcpkgid          AS "schainid",
+   SELECT amtsisalessrvcpkg.lsrvcpkgid          AS "schainid",
       amtsisalessrvcpkg.code                         AS "code",
       amtsisalessrvcpkg.name                         AS "fullname",
       amtsisalessrvcpkg.lcommentid                   AS "lcommentid",
+      amcomment.memcomment                           AS "comments",
       amtsisalessrvcpkg.dtlastmodif                  AS "replkeypri",
       lpad(amtsisalessrvcpkg.code,35,'0')            AS "replkeysec",
       amtsisalessrvcpkg.dtlastmodif                  AS "mdate"
    FROM AM2107.amtsisalessrvcpkg
       JOIN schain_acl
          ON amtsisalessrvcpkg.lsrvcpkgid=schain_acl.id
+      LEFT OUTER JOIN AM2107.amcomment
+         ON amtsisalessrvcpkg.lcommentid=amcomment.lcommentid
    WHERE amtsisalessrvcpkg.bdelete = 0;
 
 grant select on schain to public;

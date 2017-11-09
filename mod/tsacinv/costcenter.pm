@@ -31,6 +31,8 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+    $self->{use_distinct}=0;
+
   
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -335,7 +337,7 @@ sub new
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'amcostcenter.dtlastmodif')
+                dataobjattr   =>'"mdate"')
    );
    $self->setDefaultView(qw(linenumber id name code description));
    $self->setWorktable("costcenter");

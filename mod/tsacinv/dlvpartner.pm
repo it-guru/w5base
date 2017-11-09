@@ -89,18 +89,6 @@ sub new
                 dataobjattr   =>'"delmgr2id"'),
 
 
-      new kernel::Field::Link(
-                name          =>'lcommentid',
-                dataobjattr   =>'"lcommentid"'),
-      
-      new kernel::Field::Textarea(
-                name          =>'comments',
-                label         =>'Comments',
-                searchable    =>0,
-                vjointo       =>'tsacinv::comment', 
-                vjoinon       =>['lcommentid'=>'lcommentid'],
-                vjoindisp     =>'comments'),
-
       new kernel::Field::Date(
                 name          =>'mdate',
                 sqlorder      =>'NONE',
