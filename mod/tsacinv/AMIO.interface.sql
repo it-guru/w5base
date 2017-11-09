@@ -181,99 +181,6 @@ CREATE INDEX system_acl_l0_i0
 
 
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::ipaddress ---------------------------------
--- --------------------------------------------------------------------------
--- - Der Zugriff auf einen IP-Adressdatensatz wird dadurch eingeschraenkt,  -
--- - das der Datensatz nur dann sichtbar ist, wenn auch das dazugehoerige   -
--- - logische System fuer den Schnittstellen-User sichtbar ist.             -
--- --------------------------------------------------------------------------
-
-CREATE or REPLACE VIEW ipaddress_acl AS
-   SELECT
-      distinct amnetworkcard.lnetworkcardid          id
-   FROM AM2107.amnetworkcard
-   JOIN system on system."lcomputerid"=amnetworkcard.lcompid;
-
-CREATE or REPLACE VIEW ipaddress AS
-   SELECT
-      distinct amnetworkcard.lnetworkcardid          "id",
-         amnetworkcard.tcpipaddress|| 
-         decode(amnetworkcard.tcpipaddress,NULL,'',
-         decode(amnetworkcard.ipv6address,NULL,'',
-         ', ')) ||amnetworkcard.ipv6address          AS "ipaddress",
-      amnetworkcard.tcpipaddress                     AS "ipv4address",
-      amnetworkcard.ipv6address                      AS "ipv6address",
-      amportfolio.assettag                           AS "systemid",
-      amportfolio.name                               AS "systemname",
-      amnetworkcard.status                           AS "status",
-      amnetworkcard.code                             AS "code",
-      amnetworkcard.subnetmask                       AS "netmask",
-      amnetworkcard.dnsname                          AS "dnsname",
-      amnetworkcard.dnsalias                         AS "dnsalias",
-      amnetworkcard.type                             AS "type",
-      amnetworkcard.description                      AS "description",
-      amnetworkcard.lcompid                          AS "lcomputerid",
-      amnetworkcard.laccountnoid                     AS "laccountnoid",
-      amnetworkcard.bdelete                          AS "bdelete",
-      amnetworkcard.dtlastmodif                      AS "replkeypri",
-      lpad (amnetworkcard.lnetworkcardid,35,'0')     AS "replkeysec"
-   FROM
-      AM2107.amnetworkcard
-      JOIN ipaddress_acl 
-         ON amnetworkcard.lnetworkcardid=ipaddress_acl.id
-      JOIN AM2107.amcomputer 
-         ON amcomputer.lcomputerid = amnetworkcard.lcompid 
-      JOIN ( SELECT amportfolio.* FROM AM2107.amportfolio
-             WHERE amportfolio.bdelete = 0 ) amportfolio
-         ON amportfolio.lportfolioitemid = amcomputer.litemid;
-
-grant select on ipaddress to public;
-
-
--- --------------------------------------------------------------------------
--- --------------------- tsacinv::accountno ---------------------------------
--- --------------------------------------------------------------------------
-
-CREATE or REPLACE VIEW accountno_acl AS
-   SELECT amtsiacctno.ltsiacctnoid id
-   FROM
-      AM2107.amtsiacctno
-      join appl
-         ON amtsiacctno.lapplicationid=appl."id"
-   UNION
-   SELECT amtsiacctno.ltsiacctnoid "id"
-   FROM
-      AM2107.amtsiacctno
-      JOIN ipaddress
-         ON amtsiacctno.ltsiacctnoid=ipaddress."laccountnoid";
-
-CREATE or REPLACE VIEW accountno AS
-   SELECT
-      distinct amtsiacctno.ltsiacctnoid              AS "id",
-      amtsiacctno.code                               AS "accnoid",
-      amtsiacctno.accountno                          AS "name",
-      amtsiacctno.ctrlflag                           AS "ctrlflag",
-      amcostcenter.trimmedtitle                      AS "conumber",
-      amtsiacctno.description                        AS "description",
-      amtsiacctno.lapplicationid                     AS "lapplicationid",
-      amtsiacctno.lcostcenterid                      AS "lcostcenterid"
-   FROM
-      AM2107.amtsiacctno 
-      LEFT OUTER JOIN (
-         SELECT amcostcenter.* FROM AM2107.amcostcenter
-         WHERE amcostcenter.bdelete = 0) amcostcenter
-         ON amtsiacctno.lcostcenterid = amcostcenter.lcostid
-      JOIN accountno_acl
-         on amtsiacctno.ltsiacctnoid=accountno_acl.id
-   WHERE
-      amtsiacctno.bdelete = 0 AND amtsiacctno.ltsiacctnoid <> 0;
-
-grant select on accountno to public;
-
-
-
-
--- --------------------------------------------------------------------------
 -- --------------------- tsacinv::lnksharednet ------------------------------
 -- --------------------------------------------------------------------------
 -- - Der Zugriff auf die Shared-Network Componenten wird dadurch            -
@@ -620,6 +527,99 @@ grant select on system to public;
 
 
 -- --------------------------------------------------------------------------
+-- --------------------- tsacinv::ipaddress ---------------------------------
+-- --------------------------------------------------------------------------
+-- - Der Zugriff auf einen IP-Adressdatensatz wird dadurch eingeschraenkt,  -
+-- - das der Datensatz nur dann sichtbar ist, wenn auch das dazugehoerige   -
+-- - logische System fuer den Schnittstellen-User sichtbar ist.             -
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW ipaddress_acl AS
+   SELECT
+      distinct amnetworkcard.lnetworkcardid          id
+   FROM AM2107.amnetworkcard
+   JOIN system on system."lcomputerid"=amnetworkcard.lcompid;
+
+CREATE or REPLACE VIEW ipaddress AS
+   SELECT
+      distinct amnetworkcard.lnetworkcardid          "id",
+         amnetworkcard.tcpipaddress|| 
+         decode(amnetworkcard.tcpipaddress,NULL,'',
+         decode(amnetworkcard.ipv6address,NULL,'',
+         ', ')) ||amnetworkcard.ipv6address          AS "ipaddress",
+      amnetworkcard.tcpipaddress                     AS "ipv4address",
+      amnetworkcard.ipv6address                      AS "ipv6address",
+      amportfolio.assettag                           AS "systemid",
+      amportfolio.name                               AS "systemname",
+      amnetworkcard.status                           AS "status",
+      amnetworkcard.code                             AS "code",
+      amnetworkcard.subnetmask                       AS "netmask",
+      amnetworkcard.dnsname                          AS "dnsname",
+      amnetworkcard.dnsalias                         AS "dnsalias",
+      amnetworkcard.type                             AS "type",
+      amnetworkcard.description                      AS "description",
+      amnetworkcard.lcompid                          AS "lcomputerid",
+      amnetworkcard.laccountnoid                     AS "laccountnoid",
+      amnetworkcard.bdelete                          AS "bdelete",
+      amnetworkcard.dtlastmodif                      AS "replkeypri",
+      lpad (amnetworkcard.lnetworkcardid,35,'0')     AS "replkeysec"
+   FROM
+      AM2107.amnetworkcard
+      JOIN ipaddress_acl 
+         ON amnetworkcard.lnetworkcardid=ipaddress_acl.id
+      JOIN AM2107.amcomputer 
+         ON amcomputer.lcomputerid = amnetworkcard.lcompid 
+      JOIN ( SELECT amportfolio.* FROM AM2107.amportfolio
+             WHERE amportfolio.bdelete = 0 ) amportfolio
+         ON amportfolio.lportfolioitemid = amcomputer.litemid;
+
+grant select on ipaddress to public;
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::accountno ---------------------------------
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW accountno_acl AS
+   SELECT amtsiacctno.ltsiacctnoid id
+   FROM
+      AM2107.amtsiacctno
+      join appl
+         ON amtsiacctno.lapplicationid=appl."id"
+   UNION
+   SELECT amtsiacctno.ltsiacctnoid "id"
+   FROM
+      AM2107.amtsiacctno
+      JOIN ipaddress
+         ON amtsiacctno.ltsiacctnoid=ipaddress."laccountnoid";
+
+CREATE or REPLACE VIEW accountno AS
+   SELECT
+      distinct amtsiacctno.ltsiacctnoid              AS "id",
+      amtsiacctno.code                               AS "accnoid",
+      amtsiacctno.accountno                          AS "name",
+      amtsiacctno.ctrlflag                           AS "ctrlflag",
+      amcostcenter.trimmedtitle                      AS "conumber",
+      amtsiacctno.description                        AS "description",
+      amtsiacctno.lapplicationid                     AS "lapplicationid",
+      amtsiacctno.lcostcenterid                      AS "lcostcenterid"
+   FROM
+      AM2107.amtsiacctno 
+      LEFT OUTER JOIN (
+         SELECT amcostcenter.* FROM AM2107.amcostcenter
+         WHERE amcostcenter.bdelete = 0) amcostcenter
+         ON amtsiacctno.lcostcenterid = amcostcenter.lcostid
+      JOIN accountno_acl
+         on amtsiacctno.ltsiacctnoid=accountno_acl.id
+   WHERE
+      amtsiacctno.bdelete = 0 AND amtsiacctno.ltsiacctnoid <> 0;
+
+grant select on accountno to public;
+
+
+
+
+-- --------------------------------------------------------------------------
 -- --------------------- tsacinv::group -------------------------------------
 -- --------------------------------------------------------------------------
 --   Der Zugriff auf einen Assingmentgroup-Datensatz wird dadurch
@@ -632,7 +632,7 @@ CREATE or replace VIEW grp_acl AS
    SELECT distinct amemplgroup.barcode id
    FROM AM2107.amemplgroup
    JOIN IFACE_ACL acl
-      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER')
    WHERE amemplgroup.lgroupid <> 0;
 
 CREATE or replace VIEW grp AS
@@ -650,8 +650,8 @@ CREATE or replace VIEW grp AS
       amemplgroup.externalid                         AS "srcid",
       amemplgroup.dtlastmodif                        AS "mdate"
    FROM AM2107.amemplgroup
-      JOIN group_acl
-         ON amemplgroup.barcode=group_acl.id;
+      JOIN grp_acl
+         ON amemplgroup.barcode=grp_acl.id;
 
 grant select on grp to public;
 
@@ -2019,7 +2019,7 @@ CREATE or REPLACE VIEW itfarmconsole AS
 SELECT
    DISTINCT con.litemid                           AS "lconsid",
    clu.litemid                                    AS "lfarmid",
-   con.portfolio.name                             AS "name",
+   conportfolio.name                              AS "name",
    con.assettag                                   AS "systemid",
    ass.assettag                                   AS "assetid",
    clu.assettag                                   AS "clusterid",
