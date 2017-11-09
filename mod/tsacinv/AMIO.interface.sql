@@ -18,13 +18,27 @@ insert into "IFACE_ACL" values('TEL_IT_DARWIN','TIT',NULL,NULL);
 insert into "IFACE_ACL" (ifuser,acctno) values('TEL_IT_DARWIN','8111');
 
 
+
+-- --------------------------------------------------------------------------
+-- --------------------- iface ----------------------------------------------
+-- --------------------------------------------------------------------------
+--   Erlaubt es den Schnittstellen-Usern ihre eigenen aktiven ACLs 
+--   abzufragen.
+-- --------------------------------------------------------------------------
+CREATE or REPLACE view iface as
+   select * from IFACE_ACL
+   WHERE ifuser=sys_context('USERENV', 'SESSION_USER'); 
+
+grant select on iface to public;
+
+
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::appl   ------------------------------------
 -- --------------------------------------------------------------------------
--- - Der Zugriff auf einen Anwendungs Datensatz wird dadurch eingeschraenkt,-
--- - dass der Schnittstellen-User ueber die IFACE_ACL entweder den Zugriff  -
--- - auf den Buchungskreis, die Assignmentgroup der Anwendung oder den aus  -
--- - dem Kontierungsobjekt resultierenden Customer-Link haben muss.         -
+--   Der Zugriff auf einen Anwendungs Datensatz wird dadurch eingeschraenkt,
+--   dass der Schnittstellen-User ueber die IFACE_ACL entweder den Zugriff
+--   auf den Buchungskreis, die Assignmentgroup der Anwendung oder den aus
+--   dem Kontierungsobjekt resultierenden Customer-Link haben muss.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE view appl_acl as
@@ -399,8 +413,8 @@ grant select on lnksharednet to public;
 --   Es wird keine Filterung durchgefuehrt.
 -- --------------------------------------------------------------------------
 
--- drop materialized view mview_lnksharedstorage;
-CREATE MATERIALIZED VIEW mview_lnksharedstorage
+-- drop materialized view lnksharedstorage_acl_l0;
+CREATE MATERIALIZED VIEW lnksharedstorage_acl_l0
   refresh complete start with sysdate
   next trunc(sysdate+1)+6/24
   AS
@@ -431,26 +445,26 @@ CREATE MATERIALIZED VIEW mview_lnksharedstorage
       AND amtsiprovstomounts.bdelete = '0'
       AND amtsirelportfappl.bdelete = 0;
 
-CREATE INDEX mview_lnksharedstorage_i0
-   ON mview_lnksharedstorage ("storageassetid") online;
-CREATE INDEX mview_lnksharedstorage_i1
-   ON mview_lnksharedstorage ("lcomputerid") online;
-CREATE INDEX mview_lnksharedstorage_i2
-   ON mview_lnksharedstorage ("systemsystemid") online;
-CREATE INDEX mview_lnksharedstorage_i3
-   ON mview_lnksharedstorage ("applid") online;
+CREATE INDEX lnksharedstorage_acl_l0_i0
+   ON lnksharedstorage_acl_l0 ("storageassetid") online;
+CREATE INDEX lnksharedstorage_acl_l0_i1
+   ON lnksharedstorage_acl_l0 ("lcomputerid") online;
+CREATE INDEX lnksharedstorage_acl_l0_i2
+   ON lnksharedstorage_acl_l0 ("systemsystemid") online;
+CREATE INDEX lnksharedstorage_acl_l0_i3
+   ON lnksharedstorage_acl_l0 ("applid") online;
 
 CREATE or REPLACE VIEW lnksharedstorage_acl AS
    SELECT distinct "storageassetid" id
-   FROM mview_lnksharedstorage
+   FROM lnksharedstorage_acl_l0
       JOIN system 
-         ON mview_lnksharedstorage."lcomputerid"=system."lcomputerid";
+         ON lnksharedstorage_acl_l0."lcomputerid"=system."lcomputerid";
 
 CREATE or REPLACE VIEW lnksharedstorage AS
-   SELECT mview_lnksharedstorage.*
-   FROM mview_lnksharedstorage
+   SELECT lnksharedstorage_acl_l0.*
+   FROM lnksharedstorage_acl_l0
    JOIN lnksharedstorage_acl
-      ON lnksharedstorage_acl.id=mview_lnksharedstorage."storageassetid";
+      ON lnksharedstorage_acl.id=lnksharedstorage_acl_l0."storageassetid";
 
 grant select on lnksharedstorage to public;
 
@@ -1898,4 +1912,238 @@ CREATE or REPLACE VIEW sharedstoragemnt AS
    WHERE amtsiprovstomounts.bdelete = '0';
 
 grant select on sharedstoragemnt to public;
+
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::sharedstoragemnt --------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Fixed-Asset Elemente wird dadurch eingeschraenkt,
+--   das der betreffende Schnittstellen-User auch das dazugehoerige
+--   Asset "sehen" muss.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW fixedasset_acl AS
+   SELECT DISTINCT amfixedasset.fixedastno id 
+   FROM AM2107.amfixedasset
+      JOIN asset 
+         ON amfixedasset.assettag=asset."assetid";
+
+CREATE or REPLACE VIEW fixedasset AS
+   SELECT DISTINCT amfixedasset.fixedastno           AS "name",
+      amfixedasset.name                              AS "description",
+      amfixedasset.assettag                          AS "assetid",
+      amfixedasset.ddeprstart                        AS "deprstart",
+      amfixedasset.ddeprend                          AS "deprend",
+      amfixedasset.mdeprbasis                        AS "deprbase",
+      amfixedasset.mresidualvalue                    AS "residualvalue",
+      amfixedasset.mdeprrate                         AS "deprrate",
+      amfixedasset.inventoryno                       AS "inventoryno"
+   FROM
+      AM2107.amfixedasset
+      JOIN fixedasset_acl
+         ON amfixedasset.fixedastno=fixedasset_acl.id
+      JOIN AM2107.amrelfixedasset
+         ON amfixedasset.lfixedastid = amrelfixedasset.lfixedastid
+   WHERE amfixedasset.bdelete = '0';
+
+grant select on fixedasset to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::contract ----------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Serviceketten wird dadurch
+--   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
+--   sein muss.     
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW contract_acl AS
+   SELECT distinct amcontract.lcntrid   id
+   FROM AM2107.amcontract
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
+CREATE or REPLACE VIEW contract AS
+   SELECT amcontract.lcntrid                         AS "contractid",
+      amcontract.name                                AS "name",
+      ammodel.name                                   AS "model"
+   FROM AM2107.amcontract
+      JOIN contract_acl
+         ON amcontract.lcntrid=contract_acl.id
+      JOIN AM2107.ammodel
+         ON amcontract.lmodelid = ammodel.lmodelid
+      JOIN AM2107.amnature
+         ON ammodel.lnatureid = amnature.lnatureid;
+
+grant select on contract to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::itfarmsystem ------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf einen Datensatz wird dadurch eingeschraenkt,
+--   das der betreffende Schnittstellen-User auch das dazugehoerige
+--   System "sehen" muss.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW itfarmsystem_acl AS
+   SELECT DISTINCT sys.litemid id
+   FROM AM2107.amcomputer sys 
+      JOIN system on 
+         sys.assettag=system."systemid";
+
+CREATE or REPLACE VIEW itfarmsystem AS
+   SELECT DISTINCT sys.litemid                       AS "lsysid",
+      clu.litemid                                    AS "lfarmid",
+      sysportfolio.name                              AS "name",
+      sys.assettag                                   AS "systemid",
+      ass.assettag                                   AS "assetid",
+      clu.assettag                                   AS "clusterid",
+      sys.status                                     AS "status"
+   FROM AM2107.amcomputer con
+      JOIN AM2107.amportfolio conportfolio 
+         ON conportfolio.lportfolioitemid = con.litemid
+      JOIN AM2107.amportfolio assportfolio 
+         ON assportfolio.Lportfolioitemid = conportfolio.lparentid
+      JOIN AM2107.amasset ass 
+         ON assportfolio.assettag = ass.assettag
+      JOIN AM2107.amcomputer clu 
+         ON con.lparentid = clu.lcomputerid
+      JOIN AM2107.amportfolio sysportfolio 
+         ON assportfolio.Lportfolioitemid = sysportfolio.lparentid
+      JOIN AM2107.amcomputer sys 
+         ON sysportfolio.lportfolioitemid = sys.litemid
+      JOIN itfarmsystem_acl
+         ON sys.litemid=itfarmsystem_acl.id
+   WHERE conportfolio.usage LIKE 'OSY-_: KONSOLSYSTEM %'
+      AND sysportfolio.usage NOT LIKE 'OSY-_: KONSOLSYSTEM %'
+      AND clu.litemid <> '0';
+
+grant select on itfarmsystem to public;
+
+
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::itfarmconsole -----------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Datensaetze wird dadurch
+--   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
+--   sein muss.     
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW itfarmconsole_acl AS
+   SELECT distinct amcomputer.conlitemid id
+   FROM AM2107.amcomputer
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
+CREATE or REPLACE VIEW itfarmconsole AS
+SELECT
+   DISTINCT con.litemid                           AS "lconsid",
+   clu.litemid                                    AS "lfarmid",
+   con.portfolio.name                             AS "name",
+   con.assettag                                   AS "systemid",
+   ass.assettag                                   AS "assetid",
+   clu.assettag                                   AS "clusterid",
+   constatus                                      AS "status"
+FROM AM2107.amcomputer con
+   JOIN itfarmconsole_acl
+      ON con.litemid=itfarmconsole_acl.id
+   JOIN AM2107.amportfolio conportfolio 
+      ON conportfolio.lportfolioitemid = con.litemid
+   JOIN AM2107.amportfolio assportfolio 
+      ON assportfolio.Lportfolioitemid = conportfolio.lparentid
+   JOIN AM2107.amasset ass 
+      ON assportfolio.assettag = ass.assettag
+   JOIN AM2107.amcomputer clu 
+      ON con.lparentid = clu.lcomputerid
+WHERE conportfolio.usage LIKE 'OSY-_: KONSOLSYSTEM %'
+   AND clu.litemid <> '0';
+
+grant select on itfarmconsole to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::itfarmasset -------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Datensaetze wird dadurch
+--   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
+--   sein muss.     
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW itfarmasset_acl AS
+   SELECT DISTINCT assportfolio.lportfolioitemid id
+   FROM AM2107.amportfolio assportfolio
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
+CREATE or REPLACE VIEW itfarmasset AS
+   SELECT
+      DISTINCT assportfolio.lportfolioitemid         AS "lconsid",
+      clu.litemid                                    AS "lfarmid",
+      assportfolio.llocaid                           AS "locationid",
+      ass.assettag                                   AS "name",
+      ass.status                                     AS "status"
+   FROM AM2107.amcomputer sys
+      JOIN AM2107.amportfolio sysportfolio 
+         ON sysportfolio.lportfolioitemid = sys.litemid
+      JOIN AM2107.amportfolio assportfolio 
+         ON assportfolio.Lportfolioitemid = sysportfolio.lparentid
+      JOIN AM2107.amasset ass 
+         ON assportfolio.assettag = ass.assettag
+      JOIN AM2107.amcomputer clu 
+         ON sys.lparentid = clu.lcomputerid
+      JOIN itfarmasset_acl
+         ON assportfolio.lportfolioitemid=itfarmasset_acl.id
+   WHERE sysportfolio.usage LIKE 'OSY-_: KONSOLSYSTEM %'
+      AND sys.status <> 'out of operation' AND clu.litemid <> '0';
+
+grant select on itfarmasset to public;
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::backup ------------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf einen Datensatz wird dadurch eingeschraenkt,
+--   das der betreffende Schnittstellen-User auch das dazugehoerige
+--   System "sehen" muss.
+-- --------------------------------------------------------------------------
+CREATE or REPLACE VIEW backup_acl AS
+   SELECT distinct amtsibackup.lbackupid id
+   FROM AM2107.amtsibackup
+      JOIN system on system."lcomputerid"=amtsibackup.lcomputerid;
+
+CREATE or REPLACE VIEW backup AS
+   SELECT
+      DISTINCT amtsibackup.lbackupid                 AS "id",
+      amtsibackup.code                               AS "backupid",
+      amtsibackup.setype                             AS "stype",
+      amtsibackup.setype                             AS "type",
+      amtsibackup.setype                             AS "typeid",
+      amtsibackup.subtype                            AS "subtype",
+      amtsibackup.backupservice                      AS "name",
+      amtsibackup.groupname                          AS "bgroup",
+      concat(amtsibackup.expectedquantity,
+         concat(' ',amtsibackup.quantityunit))       AS "hexpectedquantity",
+      amtsibackup.savetimeframefrom                  AS "tfrom",
+      amtsibackup.savetimeframeto                    AS "tto",
+      amtsibackup.dbtype                             AS "dbtype",
+      amtsibackup.policy                             AS "policy",
+      amtsibackup.dbinstance                         AS "dbinstance",
+      amtsibackup.bactive                            AS "isactive",
+      amtsibackup.lcomputerid                        AS "lcomputerid"
+   FROM AM2107.amtsibackup
+      JOIN backup_acl
+         ON amtsibackup.lbackupid=backup_acl.id
+   WHERE amtsibackup.bdelete = 0;
+
+grant select on backup to public;
+
 

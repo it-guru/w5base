@@ -40,12 +40,12 @@ sub new
                 label         =>'BackupID',
                 htmldetail    =>0,
                 align         =>'left',
-                dataobjattr   =>'amtsibackup.lbackupid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'backupid',
                 label         =>'BackupID',
-                dataobjattr   =>'amtsibackup.code'),
+                dataobjattr   =>'"backupid"'),
 
       new kernel::Field::Select(
                 name          =>'stype',
@@ -53,84 +53,84 @@ sub new
                 label         =>'Typ',
                 depend        =>['typeid','type'],
                 transprefix   =>'SBACKTYP.', 
-                dataobjattr   =>'amtsibackup.setype'),
+                dataobjattr   =>'"stype"'),
 
       new kernel::Field::Select(
                 name          =>'type',
                 label         =>'Type',
                 depend        =>['typeid','stype'],
                 transprefix   =>'BACKTYP.', 
-                dataobjattr   =>'amtsibackup.setype'),
+                dataobjattr   =>'"type"'),
 
       new kernel::Field::Interface(
                 name          =>'typeid',
                 label         =>'TypeID',
-                dataobjattr   =>'amtsibackup.setype'),
+                dataobjattr   =>'"typeid"'),
 
       new kernel::Field::Text(
                 name          =>'subtype',
                 label         =>'Subtype',
-                dataobjattr   =>'amtsibackup.subtype'),
+                dataobjattr   =>'"subtype"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
-                dataobjattr   =>'amtsibackup.backupservice'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'bgroup',
                 label         =>'Group',
-                dataobjattr   =>'amtsibackup.groupname'),
+                dataobjattr   =>'"bgroup"'),
 
       new kernel::Field::Text(
                 name          =>'hexpectedquantity',
                 label         =>'expectedquantity',
-                dataobjattr   =>"concat(amtsibackup.expectedquantity,".
-                                "concat(' ',amtsibackup.quantityunit))"),
+                dataobjattr   =>'"hexpectedquantity"'),
 
       new kernel::Field::Text(
                 name          =>'tfrom',
                 group         =>'timeframe',
                 label         =>'from',
-                dataobjattr   =>'amtsibackup.savetimeframefrom'),
+                dataobjattr   =>'"tfrom"'),
 
       new kernel::Field::Text(
                 name          =>'tto',
                 group         =>'timeframe',
                 label         =>'to',
-                dataobjattr   =>'amtsibackup.savetimeframeto'),
+                dataobjattr   =>'"tto"'),
 
 
       new kernel::Field::Text(
                 name          =>'dbtype',
                 group         =>'dbbackup',
                 label         =>'DBType',
-                dataobjattr   =>'amtsibackup.dbtype'),
+                dataobjattr   =>'"dbtype"'),
 
       new kernel::Field::Text(
                 name          =>'policy',
                 group         =>'dbbackup',
                 label         =>'Policy',
-                dataobjattr   =>'amtsibackup.policy'),
+                dataobjattr   =>'"policy"'),
 
       new kernel::Field::Text(
                 name          =>'dbinstance',
                 group         =>'dbbackup',
                 label         =>'Instance',
-                dataobjattr   =>'amtsibackup.dbinstance'),
+                dataobjattr   =>'"dbinstance"'),
 
 
       new kernel::Field::Boolean(
                 name          =>'isactive',
                 label         =>'Active',
-                dataobjattr   =>'amtsibackup.bactive'),
+                dataobjattr   =>'"isactive"'),
 
       new kernel::Field::Link(
                 name          =>'lcomputerid',
                 label         =>'Computerid',
-                dataobjattr   =>'amtsibackup.lcomputerid'),
+                dataobjattr   =>'"lcomputerid"'),
 
    );
+   $self->setWorktable("backup"); 
    $self->setDefaultView(qw(linenumber backupid type
                             subtype name tfrom tto isactive));
    return($self);
@@ -153,28 +153,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/service.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsibackup";
- #           "(select amitemlistval.value,".
- #           "amitemlistval.litemlistvalid from amitemizedlist,amitemlistval ".
- #           "where amitemizedlist.litemlistid=amitemlistval.litemlistid and ".
- #           "amitemizedlist.identifier='TSI_amTsiBackup_DBType') dbtypelist";
-
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=
-             #"amtsibackup.dbtype=dbtypelist.litemlistvalid and ".
-             "amtsibackup.bdelete=0 ";
-   return($where);
-}
 
 sub isViewValid
 {
