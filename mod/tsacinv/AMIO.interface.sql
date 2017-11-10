@@ -1659,37 +1659,17 @@ grant select on license to public;
 --   dass der Schnittstellen-User ueber die IFACE_ACL entweder den Zugriff 
 --   auf den Buchungskreis, die Assignmentgroup des Clusters oder den aus
 --   dem Kontierungsobjekt resultierenden Customer-Link haben muss. 
---
---   TODO: Es muessen auch Cluster an Systemen der TelIT "sichtbar werden"!!!
---
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW itclust_acl AS
    SELECT distinct amportfolio.assettag  id
-   FROM AM2107.amasset
-      JOIN (SELECT * FROM AM2107.amportfolio 
-            WHERE amportfolio.bdelete=0) amportfolio
+   FROM AM2107.amcomputer
+      JOIN AM2107.amportfolio
+         ON amportfolio.lportfolioitemid = amcomputer.litemid
+      JOIN AM2107.amasset
          ON amasset.assettag = amportfolio.assettag
-      LEFT OUTER JOIN (SELECT * 
-                       FROM AM2107.amcostcenter 
-                       WHERE amcostcenter.bdelete=0) amcostcenter
-         ON amportfolio.lcostid = amcostcenter.lcostid
-      left outer join AM2107.amemplgroup assigrp
-         on amportfolio.lassignmentid = assigrp.lgroupid
-      left outer join AM2107.amtsiaccsecunit customerlnk
-            on amcostcenter.lcustomerlinkid=customerlnk.lunitid
-      join IFACE_ACL acl
-         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
-             (assigrp.name like acl.assignment 
-                or acl.assignment is null) and
-             (amcostcenter.acctno like acl.acctno 
-                or acl.acctno is null) and
-             (customerlnk.identifier like acl.customerlnk 
-                or acl.customerlnk is null) and
-            (acl.customerlnk is not null or
-             acl.acctno is not null or
-             acl.assignment is not null);
-
+      JOIN system
+         ON amcomputer.lcomputerid=system."lclusterid";
 
 CREATE or REPLACE VIEW itclust AS
    SELECT
@@ -1837,9 +1817,6 @@ grant select on service to public;
 --   Der Zugriff auf die Storage-Mountpoints wird dadurch eingeschraenkt,
 --   das der betreffende Schnittstellen-User auch das dazugehoerige
 --   System "sehen" muss.
---
---  TODO: Hier passt noch was nicht - es werden keine Mounts gefunden!
---
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW sharedstoragemnt_acl AS
@@ -1849,9 +1826,9 @@ CREATE or REPLACE VIEW sharedstoragemnt_acl AS
       ON amtsiprovstomounts.lcomputerid = amcomputer.lcomputerid
    JOIN AM2107.amportfolio systemportfolio
       ON amcomputer.litemid = systemportfolio.lportfolioitemid
-   JOIN system
-      ON systemportfolio.assettag=system."systemid";
-
+   JOIN system_acl_l0
+      ON systemportfolio.assettag=system_acl_l0.id
+         AND system_acl_l0.ifuser=sys_context('USERENV', 'SESSION_USER');
 
 CREATE or REPLACE VIEW sharedstoragemnt AS
    SELECT
@@ -1889,7 +1866,7 @@ grant select on sharedstoragemnt to public;
 
 
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::sharedstoragemnt --------------------------
+-- --------------------- tsacinv::fixedasset --------------------------------
 -- --------------------------------------------------------------------------
 --   Der Zugriff auf die Fixed-Asset Elemente wird dadurch eingeschraenkt,
 --   das der betreffende Schnittstellen-User auch das dazugehoerige

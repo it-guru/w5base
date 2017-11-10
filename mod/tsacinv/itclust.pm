@@ -80,18 +80,6 @@ sub new
                 uppersearch   =>1,
                 dataobjattr   =>'"clustertype"'),
 
-      new kernel::Field::Text(
-                name          =>'tenant',
-                label         =>'Tenant',
-                group         =>'source',
-                dataobjattr   =>'"tenant"'),
-
-      new kernel::Field::Interface(
-                name          =>'tenantid',
-                label         =>'Tenant ID',
-                group         =>'source',
-                dataobjattr   =>'"tenantid"'),
-
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
                 label         =>'Assignment Group',
