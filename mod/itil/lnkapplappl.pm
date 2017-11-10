@@ -220,7 +220,6 @@ sub new
       new kernel::Field::Date(
                 name          =>'ifagreementdocdate',
                 label         =>'Interface-Agreement-Document Date',
-                searchable    =>0,
                 uploadable    =>0,
                 readonly      =>1,
                 group         =>'ifagreement',
