@@ -72,7 +72,7 @@ CREATE or REPLACE view appl as
       amtsicustappl.ltsicustapplid                   "id",
       amtsicustappl.name                             "name",
       LOWER ( amtsicustappl.status)                  "status",
-      '0'                                            "deleted",
+      amtsicustappl.bdelete                          "deleted",
       amtsicustappl.usage                            "usage",
       amtsicustappl.businessimpact                   "criticality",
       amtsicustappl.priority                         "customerprio",

@@ -93,7 +93,8 @@ sub qcheckRecord
    # Level 0
    #
    if ($rec->{applid} ne ""){   # pruefen ob APPLID von AssetManager
-      $par->SetFilter({applid=>\$rec->{applid}});
+      $par->SetFilter({applid=>\$rec->{applid},
+                       deleted=>\'0'});
       ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){
