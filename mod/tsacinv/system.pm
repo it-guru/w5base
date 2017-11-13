@@ -401,7 +401,7 @@ sub new
                 label         =>'System Part of Asset',
                 dataobjattr   =>'"partofassetdec"'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'lcomputerid',
                 label         =>'AC-ComputerID',
                 dataobjattr   =>'"lcomputerid"'),
