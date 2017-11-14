@@ -173,6 +173,10 @@ sub CleanupWasted
             }
             $o->ResetFilter();
             $o->SetFilter({cistatusid=>\'7',mdate=>"<now-1Y"});
+            #
+            # TODO : Hartes Löschen aus der Datenbank. Da hab ich
+            #        noch Angst davor!
+            #
          }
       }
    }
