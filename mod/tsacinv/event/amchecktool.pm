@@ -37,6 +37,7 @@ sub Init
    my $self=shift;
 
 
+   $self->RegisterEvent("amfarmcheck","amfarmcheck");
    $self->RegisterEvent("amchecktool","amchecktool");
    $self->RegisterEvent("amVerifyGroupParents","amVerifyGroupParents");
    $self->RegisterEvent("ChkAppToW5Base","ChkAppToW5Base");
@@ -45,6 +46,34 @@ sub Init
 
 
 
+sub amfarmcheck
+{
+   my $self=shift;
+   msg(INFO,"ok start");
+
+   my $name="dcs*";
+   my %farmlist;
+
+   my $amfarm=getModuleObject($self->Config,"tsacinv::itfarm");
+   my $ecfarm=getModuleObject($self->Config,"tsadopt::vfarm");
+
+   $amfarm->SetFilter({status=>'!"out of operation"',
+                       name=>$name});
+   foreach my $frec ($amfarm->getHashList(qw(name))){
+      $farmlist{uc($frec->{name})}->{amcds}++;
+   }
+
+   $ecfarm->SetFilter({operational=>1,
+                       name=>$name});
+   foreach my $frec ($ecfarm->getHashList(qw(name))){
+      $farmlist{uc($frec->{name})}->{ecmdb}++;
+   }
+
+   
+
+   print Dumper(\%farmlist);
+
+}
 
 
 sub amchecktool

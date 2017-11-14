@@ -1656,9 +1656,9 @@ grant select on license to public;
 -- --------------------- tsacinv::itclust  ----------------------------------
 -- --------------------------------------------------------------------------
 --   Der Zugriff auf einen Cluster-Datensatz wird dadurch eingeschraenkt,     
---   dass der Schnittstellen-User ueber die IFACE_ACL entweder den Zugriff 
---   auf den Buchungskreis, die Assignmentgroup des Clusters oder den aus
---   dem Kontierungsobjekt resultierenden Customer-Link haben muss. 
+--   dass der Schnittstellen-User min. ein logisches System des betreffenden
+--   Clusters sehen muss. Ist dies der Fall, dann wird der Cluster-Datensatz
+--   sichtbar.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW itclust_acl AS
