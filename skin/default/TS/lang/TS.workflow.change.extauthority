@@ -4,6 +4,8 @@
                  en=>'Rejection to direct contacts and critical interfaces'},
 'notifyrejectdirect'=>{de=>'Absage an direkte Kontakte',
                  en=>'Rejection to direct contacts'},
+'notifyconfirm'=>{de=>"Confirm-Aufforderung an offene Implementer-Gruppen",
+                  en=>'Confirm request to pending implementer groups'},
 'notifyapprove'=>{de=>"Approve-Aufforderung an offene Approver-Gruppen",
                   en=>'Approve request to pending approver groups'},
 'notifyapproveall'=>{de=>"Approve-Aufforderung an direkte Kontakte und alle Schnittstellen",
@@ -68,6 +70,19 @@
         "<li>AM, TSM and TSM deputies of direct affected applications</li>".
         "<li>Subscriber of InfoAbo 'Changenotification'</li>".
         "<li>Contacts with role 'Information contact'</li>".
+       "</ul>"
+},
+
+'helpnotifyconfirm'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>Mitglieder der ServiceManager Implementer-Gruppen ".
+            "von noch nicht confirmed Tasks</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>Members of ServiceManager implementer groups ".
+            "of not yet confirmed tasks.</li>".
        "</ul>"
 },
 

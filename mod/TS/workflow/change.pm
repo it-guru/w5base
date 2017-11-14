@@ -76,13 +76,22 @@ sub getPosibleActions
 
    my $phase=$WfRec->{additional}{ServiceManagerPhase}[0];
    my $approvalstate=$WfRec->{additional}{ServiceManagerApprovalState}[0];
+   my $chmmgr=$self->chmAuthority($WfRec);
+
+   if ($phase=~m/^30/ && $chmmgr eq 'TIT') {
+      my $state=$self->getNotifyConfirmState();
+      my $smtask=getModuleObject($self->Config,'tssm::chmtask');
+      $smtask->SetFilter({changenumber=>\$WfRec->{srcid},
+                          status=>["$state"]});
+      my ($rec,$msg)=$smtask->getOnlyFirst(qw(ALL));
+
+      push(@l,'chmnotifyconfirm') if (defined($rec));
+   }
 
    if ($phase=~m/^40/) {
       my @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
                          $_->{comments}=~/^Approval request sent/}
                          @{$WfRec->{shortactionlog}});
-
-      my $chmmgr=$self->chmAuthority($WfRec);
 
       if ($#notifies==-1) {
          if (($approvalstate eq 'pending' ||
@@ -187,10 +196,8 @@ sub getStepByShortname
    my $name=shift;
    my $WfRec=shift;
 
-   if ($name eq 'individualnote') {
-      return("TS::workflow::change::".$name);
-   }
-   if ($name eq 'publishpreview') {
+   if (($name eq 'individualnote') ||
+       ($name eq 'publishpreview')) {
       return("TS::workflow::change::".$name);
    }
 
@@ -201,7 +208,7 @@ sub getStepByShortname
 sub getNotifyDestinations
 {
    my $self=shift;
-   my $mode=shift;    # direct|critical|all|approve
+   my $mode=shift;    # direct|critical|all|approve|confirm
    my $WfRec=shift;
    my $emailto=shift;
    my $emailcc=shift;
@@ -238,6 +245,16 @@ sub getNotifyDestinations
                              '100000004',\@tobyfunc,default=>1);
    }
 
+   if ($mode eq 'confirm') {
+      my $state=$self->getNotifyConfirmState();
+      my @infogrps=$self->getImplementorGrp($WfRec,'"'.$state.'"');
+      my @appmail=$self->getNotifyDestinationsFromSMGroups(\@infogrps);
+
+      foreach my $email (@appmail) {
+         $emailto->{$email}=[] if (!exists($emailto->{$email}));
+      }
+   }
+
    if ($mode eq 'approve') {
       my $appgrps=$self->getApproverGrp($WfRec,'pending');
       return(undef) if ($#{$appgrps}==-1 || ref($appgrps) ne 'ARRAY');
@@ -251,14 +268,8 @@ sub getNotifyDestinations
       }
       return(undef) if ($#infogrps==-1);
 
-      my $lnkobj=getModuleObject($self->Config,'tssm::lnkusergroup');
-      my $userobj=getModuleObject($self->Config,'tssm::useraccount');
+      my @appmail=$self->getNotifyDestinationsFromSMGroups(\@infogrps);
 
-      $lnkobj->SetFilter({lgroup=>\@infogrps});
-      my @grpuser=map {$_->{luser}} @{$lnkobj->getHashList('luser')};
-      $userobj->SetFilter({id=>\@grpuser,profile_change=>'![empty]'});
-      my @appmail=grep(/^\S+\@\S+\.\S+$/,
-                       map {$_->{email}} @{$userobj->getHashList('email')});
       foreach my $email (@appmail) {
          $emailto->{$email}=[] if (!exists($emailto->{$email}));
       }
@@ -330,6 +341,36 @@ sub formatTwoColumns
       $ret.=sprintf("%-${width}s",$col1[$i]);
       $ret.=$col2[$i] if ($i<=$#col2);
       $ret.="\n";
+   }
+
+   return($ret);
+}
+
+
+sub formatTaskList
+{
+   my $self=shift;
+   my $l=shift;
+
+   my $tobj=getModuleObject($self->Config,'tssm::chmtask');
+   my %colnames;
+   my $ret;
+
+   foreach my $fname (keys(%{$l->[0]})) {
+      $colnames{$fname}=$self->T($tobj->getField($fname)->label(),
+                                 'tssm::chmtask');
+   }
+
+   $ret=sprintf("%-14s %-14s %s\n",$colnames{tasknumber},
+                                   $colnames{implementer},
+                                   $colnames{assignedto});
+   $ret.="-"x70;
+   $ret.="\n";
+
+   foreach my $task (@$l) {
+      $ret.=sprintf("%-14s %-14s %s\n",$task->{tasknumber},
+                                       $task->{implementer},
+                                       $task->{assignedto});
    }
 
    return($ret);
@@ -417,6 +458,55 @@ sub getApproverGrp
 
    my @grplist=keys(%groups);
    return(\@grplist);
+}
+
+
+sub getImplementorGrp
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $taskstate=shift;
+
+   $taskstate='*' if (!defined($taskstate));
+   my %groups;
+
+   my $obj=getModuleObject($self->Config,'tssm::chmtask');
+   $obj->SetFilter({changenumber=>\$WfRec->{srcid},
+                    status=>$taskstate});
+   my %implgrps=map {$_->{assignedto}=>1}
+                    $obj->getHashList(qw(assignedto));
+
+   return(keys(%implgrps));
+}
+
+
+sub getNotifyConfirmState
+{
+   my $self=shift;
+
+   return('Review by Implementor');
+}
+
+
+sub getNotifyDestinationsFromSMGroups
+{
+   my $self=shift;
+   my $smgroups=shift;
+
+   my $lnkobj=getModuleObject($self->Config,'tssm::lnkusergroup');
+   my $userobj=getModuleObject($self->Config,'tssm::useraccount');
+
+   return(0) if (ref($smgroups ne 'ARRAY') || $#{$smgroups}==-1);
+   return(0) if (!$lnkobj->Ping);
+
+   $lnkobj->SetFilter({lgroup=>$smgroups});
+   my @grpuser=map {$_->{luser}} @{$lnkobj->getHashList('luser')};
+   $userobj->SetFilter({id=>\@grpuser,profile_change=>'![empty]'});
+   my %mailaddress=map {$_=>1}
+                       grep(/^\S+\@\S+\.\S+$/,
+                        map {$_->{email}} $userobj->getHashList('email'));
+
+   return(keys(%mailaddress));
 }
 
 
@@ -539,9 +629,28 @@ sub generateMailSet
          }
 
          $chminfo=$self->getParsedTemplate(
-                     'tmpl/ext.changenotify.announce.'.$publishmode.'.TIT',
+                     "tmpl/ext.changenotify.".
+                      "$notifymode.$publishmode.$authority",
                      {skinbase=>'TS',
                       static=>{pending=>$pendingtxt,
+                               note=>$note}
+                     });
+      }
+      
+      if ($notifymode eq 'confirm') {
+         my $taskstate=$self->getNotifyConfirmState();
+         my $tobj=getModuleObject($self->Config,'tssm::chmtask');
+         $tobj->SetFilter({changenumber=>\$WfRec->{srcid},
+                           status=>\$taskstate});
+         my $taskdetails=$tobj->getHashList(qw(tasknumber assignedto 
+                                               implementer));
+         my $tasklist=$self->formatTaskList($taskdetails);
+
+         $chminfo=$self->getParsedTemplate(
+                     "tmpl/ext.changenotify.$notifymode.$authority",
+                     {skinbase=>'TS',
+                      static=>{taskstatus=>$taskstate,
+                               tasklist=>$tasklist,
                                note=>$note}
                      });
       }
@@ -554,10 +663,10 @@ sub generateMailSet
          my $approvedgrps=$self->getApproverGrp($WfRec,'done');
          
          if (defined($authority)) {
-            $tmpl='tmpl/ext.changenotify.approve.'.$authority;
+            $tmpl="tmpl/ext.changenotify.$notifymode.$authority";
          }
          else {
-            $tmpl='tmpl/ext.changenotify.approve.'.$publishmode;
+            $tmpl="tmpl/ext.changenotify.$notifymode.$publishmode";
          }
 
          if (ref($pendinggrps) ne 'ARRAY') {
@@ -624,7 +733,7 @@ sub generateMailSet
             $tmpl='tmpl/ext.changenotify.remind1st';
          }
          else {
-            $tmpl='tmpl/ext.changenotify.remind';
+            $tmpl="tmpl/ext.changenotify.$notifymode";
          }
 
          $chminfo=$self->getParsedTemplate(
@@ -652,7 +761,7 @@ sub generateMailSet
          }
 
          $chminfo=$self->getParsedTemplate(
-                            'tmpl/ext.changenotify.reschedule',
+                            "tmpl/ext.changenotify.$notifymode",
                             {skinbase=>'TS',
                              static=>{submit=>$submit,
                                       pending=>$pendingtxt,
@@ -662,7 +771,7 @@ sub generateMailSet
       
       if ($notifymode eq 'reject') {
          $chminfo=$self->getParsedTemplate(
-                            'tmpl/ext.changenotify.reject',
+                            "tmpl/ext.changenotify.$notifymode",
                             {skinbase=>'TS',
                              static=>{note=>$note}
                             });
@@ -712,6 +821,18 @@ sub generateWorkspacePages
    my $d;
 
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt,$height);
+
+   if (grep(/^chmnotifyconfirm$/,@$actions)) {
+      $$selopt.='<option value="chmnotifyconfirm">'.
+                    $self->T('notifyconfirm').
+                "</option>\n";
+      $d="<div class=Question><table border=0>".
+           "<tr><td>".$self->T("helpnotifyconfirm")."</td></tr>".
+          "</table></div>";
+      $$divset.='<div id=OPchmnotifyconfirm '.
+                     'data-visiblebuttons="NextStep"'.
+                " class=\"$class\">$d</div>";
+   }
 
    if (grep(/^chmnotifyapprove$/,@$actions)) {
       $$selopt.='<option value="chmnotifyapprove">'.
@@ -854,6 +975,10 @@ sub Process
       if ($op eq "chmnotifydirect") {
          Query->Param("PublishMode"=>"direct");
          Query->Param("NotifyMode" =>"announce");
+      }
+      if ($op eq "chmnotifyconfirm") {
+         Query->Param("PublishMode"=>"confirm");
+         Query->Param("NotifyMode" =>"confirm");
       }
       if ($op eq "chmnotifyapprove") {
          Query->Param("PublishMode"=>"approve");
@@ -1133,6 +1258,10 @@ sub Process
             if ($NotifyMode eq 'announce') {
                $comment='Announcement sent';
                $comment.=" (".Query->Param('PublishMode').")";
+            }
+
+            if ($NotifyMode eq 'confirm') {
+               $comment='Confirm request sent';
             }
 
             if ($NotifyMode eq 'approve') {
