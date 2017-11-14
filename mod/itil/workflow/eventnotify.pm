@@ -1564,6 +1564,28 @@ sub getNotifyDestinations
       }
    }
 
+   if ($mode eq "custinfo"){
+      my $id=$WfRec->{id};
+      my $app=$self->getParent();
+      $app->Action->ResetFilter();
+      $app->Action->SetFilter({wfheadid=>\$id});
+      my @l=$app->Action->getHashList(qw(cdate name additional));
+      my $sendcustinfocount=0;
+      foreach my $arec (@l){
+         if ($arec->{name} eq "sendcustinfo"){
+            my $addemailto=$arec->{additional}->{emailto};
+            $addemailto=[$addemailto] if (ref($addemailto) ne "ARRAY");
+            my $addemailcc=$arec->{additional}->{emailcc};
+            $addemailcc=[$addemailcc] if (ref($addemailcc) ne "ARRAY");
+            my $addemailbcc=$arec->{additional}->{emailbcc};
+            $addemailbcc=[$addemailbcc] if (ref($addemailbcc) ne "ARRAY");
+            map({
+               $emailto->{$_}++;
+            } split(/[; ]+/,join(" ",@$addemailto,@$addemailcc,@$addemailbcc)));
+         }
+      }
+   }
+
 
 
    return(undef);
@@ -3404,6 +3426,7 @@ sub Process
       my $rawterminstart=Query->Param("terminstart");
       my $rawterminend=Query->Param("terminend");
 
+
       my $tstart=$self->getParent->ExpandTimeExpression($rawterminstart,"en");
       if (!defined($tstart)){
          return(undef);
@@ -3781,7 +3804,12 @@ sub Process
                                                 $newmailrec,$action)){
             if ($wf->Action->StoreRecord(
                 $WfRec->{id},"sendcustinfo",
-                {translation=>'itil::workflow::eventnotify'},
+                {translation=>'itil::workflow::eventnotify',
+                 additional=>{
+                     emailto=>join(";",@emailto),
+                     emailcc=>join(";",@emailcc),
+                     emailbcc=>join(";",@emailbcc)
+                 }},
                 "$sendcustinfocount. notification",undef)){
                Query->Delete("WorkflowStep");
                return(1);
