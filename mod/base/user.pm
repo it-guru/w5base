@@ -135,7 +135,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'usertyp',
-                label         =>'Usertyp',
+                label         =>'Usertype',
                 selectfix     =>1,
                 htmleditwidth =>'100px',
                 default       =>'extern',
@@ -252,7 +252,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'emails',
-                label         =>'E-Mail adresses',
+                label         =>'E-Mail addresses',
                 readonly      =>1,
                 group         =>'userid',
                 vjointo       =>'base::useremail',
@@ -263,7 +263,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'allemails',
-                label         =>'all related E-Mail adresses',
+                label         =>'all related E-Mail addresses',
                 readonly      =>1,
                 htmldetail    =>0,
                 searchable    =>0,
@@ -461,43 +461,43 @@ sub new
       new kernel::Field::Text(
                 name          =>'private_street',
                 group         =>'private',
-                label         =>'privat Street',
+                label         =>'private Street',
                 dataobjattr   =>'contact.private_street'),
 
       new kernel::Field::Text(
                 name          =>'private_zipcode',
                 group         =>'private',
-                label         =>'privat ZIP-Code',
+                label         =>'private ZIP-Code',
                 dataobjattr   =>'contact.private_zipcode'),
 
       new kernel::Field::Text(
                 name          =>'private_location',
                 group         =>'private',
-                label         =>'privat Location',
+                label         =>'private Location',
                 dataobjattr   =>'contact.private_location'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_facsimile',
                 group         =>'private',
-                label         =>'privat FAX-Number',
+                label         =>'private FAX-Number',
                 dataobjattr   =>'contact.private_facsimile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_elecfacsimile',
                 group         =>'private',
-                label         =>'privat electronical FAX-Number',
+                label         =>'private electronical FAX-Number',
                 dataobjattr   =>'contact.private_elecfacsimile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_mobile',
                 group         =>'private',
-                label         =>'privat Mobile-Phonenumber',
+                label         =>'private Mobile-Phonenumber',
                 dataobjattr   =>'contact.private_mobile'),
 
       new kernel::Field::Phonenumber(
                 name          =>'private_phone',
                 group         =>'private',
-                label         =>'privat Phonenumber',
+                label         =>'private Phonenumber',
                 dataobjattr   =>'contact.private_phone'),
 
 #      new kernel::Field::Text(
@@ -535,66 +535,66 @@ sub new
                 name          =>'dateofworksafty',
                 dayonly       =>1,
                 group         =>'introdution',
-                label         =>'date of "Work Safty" introdution',
+                label         =>'date of "Work Safety" introduction',
                 dataobjattr   =>'contact.dateofworksafty'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'dateofworksafty_edt',
                 group         =>'introdution',
-                label         =>'date of "Work Safty" introdution EDT',
+                label         =>'date of "Work Safety" introduction EDT',
                 dataobjattr   =>'contact.dateofworksafty_edt'),
 
       new kernel::Field::Date(
                 name          =>'dateofdatapriv',
                 dayonly       =>1,
                 group         =>'introdution',
-                label         =>'date of "Data Privacy" introdution',
+                label         =>'date of "Data Privacy" introduction',
                 dataobjattr   =>'contact.dateofdatapriv'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'dateofdatapriv_edt',
                 group         =>'introdution',
-                label         =>'date of "Data Privacy" introdution EDT',
+                label         =>'date of "Data Privacy" introduction EDT',
                 dataobjattr   =>'contact.dateofdatapriv_edt'),
 
       new kernel::Field::Date(
                 name          =>'dateofcorruprot',
                 dayonly       =>1,
                 group         =>'introdution',
-                label         =>'date of "Corruption Protection" introdution',
+                label         =>'date of "Corruption Protection" introduction',
                 dataobjattr   =>'contact.dateofcorruprot'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'dateofcorruprot_edt',
                 group         =>'introdution',
-                label         =>'date of "Corruption Protection" introdution EDT',
+                label         =>'date of "Corruption Protection" introduction EDT',
                 dataobjattr   =>'contact.dateofcorruprot_edt'),
 
       new kernel::Field::Date(
                 name          =>'dateofvsnfd',
                 dayonly       =>1,
                 group         =>'introdution',
-                label         =>'date of "VSnfD" introdution',
+                label         =>'date of "VSnfD" introduction',
                 dataobjattr   =>'contact.dateofvsnfd'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'dateofvsnfd_edt',
                 group         =>'introdution',
-                label         =>'date of "VSnfD" introdution EDT',
+                label         =>'date of "VSnfD" introduction EDT',
                 dataobjattr   =>'contact.dateofvsnfd_edt'),
 
       new kernel::Field::Date(
                 name          =>'dateofsecretpro',
                 dayonly       =>1,
                 group         =>'introdution',
-                label         =>'date of "Secret Protection" introdution',
+                label         =>'date of "Secret Protection" introduction',
                 dataobjattr   =>'contact.dateofsecretpro'),
 
-      new kernel::Field::Link(
-                name          =>'dateofvsnfd_edt',
+      new kernel::Field::Interface(
+                name          =>'dateofsecretpro_edt',
                 group         =>'introdution',
-                label         =>'date of "VSnfD" introdution EDT',
-                dataobjattr   =>'contact.dateofvsnfd_edt'),
+                label         =>'date of "Secret Protection" introduction EDT',
+                dataobjattr   =>'contact.dateofsecretpro_edt'),
 
       new kernel::Field::Select(
                 name          =>'tz',
@@ -615,7 +615,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'pagelimit',
                 label         =>'Pagelimit',
-                unit          =>'Entrys',
+                unit          =>'Entries',
                 uploadable    =>0,
                 htmleditwidth =>'50px',
                 group         =>'userparam',
@@ -769,7 +769,7 @@ sub new
                 name          =>'similarcontacts',
                 htmldetail    =>0,
                 uploadable    =>0,
-                label         =>'simialr contacts',
+                label         =>'similar contacts',
                 depend        =>['userid','email','surname','givenname'],
                 searchable    =>0,
                 onRawValue    =>\&findSimilarContacts,
@@ -970,7 +970,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'allphones',
-                label         =>'all nativ phone numbers',
+                label         =>'all native phone numbers',
                 searchable    =>sub{
                    my $self=shift;
                    my $app=$self->getParent;
@@ -1142,8 +1142,8 @@ sub SecureValidate
    if (!$self->IsMemberOf("admin")){
       if (!defined($oldrec)){
          if ($usertyp eq "" || $usertyp eq "user"){
-            $self->LastMsg(ERROR,"you are not autorized to create these ".
-                                 "usertyp");
+            $self->LastMsg(ERROR,"you are not authorized to create this ".
+                                 "usertype");
             return(0);
          }
       }

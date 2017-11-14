@@ -1,40 +1,40 @@
-'Usertyp'=>{ de=>'Kontakt Typ'},
+'Usertype'=>{ de=>'Kontakt Typ'},
 'Surname'=>{ de=>'Nachname'},
 'Givenname'=>{ de=>'Vorname'},
 'Salutation'=>{ de=>'Anrede'},
 'Country'=>{ de=>'Land'},
 'Fullname'=>{ de=>'vollqualifizierter Name'},
 'Street'=>{ de=>'Strasse'},
-'privat Street'=>{ de=>'priv. Strasse'},
+'private Street'=>{ de=>'priv. Strasse'},
 'Location'=>{ de=>'Ort'},
-'privat Location'=>{ de=>'priv. Ort'},
+'private Location'=>{ de=>'priv. Ort'},
 'ZIP-Code'=>{ de=>'PLZ'},
-'privat ZIP-Code'=>{ de=>'priv. PLZ'},
+'private ZIP-Code'=>{ de=>'priv. PLZ'},
 'electronical FAX-Number'=>{ de=>'elektronisches FAX'},
-'privat electronical FAX-Number'=>{ de=>'priv. elektr. FAX'},
+'private electronical FAX-Number'=>{ de=>'priv. elektr. FAX'},
 'FAX-Number'=>{ de=>'FAX'},
 'date of birth'=>{ de=>'Geburtsdatum'},
 'organisational Units'=>{de=>'organisatorische Einheiten'},
-'privat FAX-Number'=>{ de=>'priv. FAX'},
+'private FAX-Number'=>{ de=>'priv. FAX'},
 'Phonenumber'=>{ de=>'Telefonnummer'},
-'privat Phonenumber'=>{ de=>'priv. Telefonnummer'},
+'private Phonenumber'=>{ de=>'priv. Telefonnummer'},
 'Phonename'=>{ de=>'Rufnummernname'},
-'Phonename'=>{ de=>'Rufnummernname'},
+'Personal-Number'=>{ de=>'Personalnummer'},
 'CostCenter'=>{ de=>'Kostenstelle'},
 'Accounting Area'=>{ de=>'Buchungskreis'},
 'Mobile-Phonenumber'=>{ de=>'Handy-Nummer'},
-'privat Mobile-Phonenumber'=>{ de=>'priv. Handy-Nummer'},
+'private Mobile-Phonenumber'=>{ de=>'priv. Handy-Nummer'},
 'Accounts'=>{ de=>'Kennungen'},
 'primary E-Mail'=>{ de=>'primäre E-Mail'},
-'E-Mail adresses'=>{ de=>'E-Mail-Adressen'},
-'all related E-Mail adresses'=>{ de=>'alle verknüpften E-Mail-Adressen'},
-'all nativ phone numbers'=>{ de=>'alle generischen Telefonnummern'},
+'E-Mail addresses'=>{ de=>'E-Mail-Adressen'},
+'all related E-Mail addresses'=>{ de=>'alle verknüpften E-Mail-Adressen'},
+'all native phone numbers'=>{ de=>'alle generischen Telefonnummern'},
 'Admin Comments'=>{ de=>'Bemerkungen nur für Admins'},
 'Groups'=>{ de=>'Gruppen'},
 'Pagelimit'=>{ de=>'Seitenbegrenzung'},
-'simialr contacts'=>{ de=>'ähnliche Kontakte'},
+'similar contacts'=>{ de=>'ähnliche Kontakte'},
 'Room number'=>{ de=>'Raumnummer'},
-'Entrys'=>{ de=>'Zeilen'},
+'Entries'=>{ de=>'Zeilen'},
 'Window-Size'=>{ de=>'Fenster-Größe'},
 'Timezone'=>{ de=>'Zeitzone'},
 'Language'=>{ de=>'Sprache'},
@@ -48,32 +48,34 @@
 'f800'=>{ de=>'optimiert für 800x600 Bildschirmauflösung',
           en=>'optimized for 800x600 resolution'},
 'f1024'=>{ de=>'optimiert für 1024x768 Bildschirmauflösung',
-          en=>'optimiced for 1024x768 resolution'},
+          en=>'optimized for 1024x768 resolution'},
 'Last-Lang'=>{ de=>'letztmalig verwendete Sprache'},
 'Last-Logon'=>{ de=>'letzte Anmeldung'},
 'normal'=>{ de=>'normal'},
-'Substitiutions'=>{ de=>'Mögliche Vertreter',en=>'posible Debuties'},
+'Substitiutions'=>{ de=>'Mögliche Vertreter',en=>'possible Deputies'},
 'base::user'=>{ de=>'Kontakt',en=>'Contact'},
 'fieldgroup.default'=>{ de=>'Personalien',en=>'Person-Informations'},
 'fieldgroup.name'=>{ de=>'Name',en=>'Name'},
 'fieldgroup.office'=>{ de=>'Geschäfts-Kontakt',en=>'Office-ContactProfile'},
-'fieldgroup.personrelated'=>{ de=>'Personenbezogene Daten # - freiwillige Angaben',en=>'Person related'},
-'fieldgroup.introdution'=>{ de=>'Unterweisungen',en=>'Introdutions'},
+'fieldgroup.personrelated'=>{ de=>'Personenbezogene Daten # - freiwillige Angaben',
+                              en=>'Person related # - voluntary information'},
+'fieldgroup.introdution'=>{ de=>'Unterweisungen',en=>'Introductions'},
 'fieldgroup.officeacc'=>{ de=>'Geschäftliche-Buchungsinformation',en=>'Office-Accounting informations'},
 'fieldgroup.nativcontact'=>{ de=>'minimale Kontaktdaten',en=>'minimal Contactdata'},
 'fieldgroup.admcomments'=>{ de=>'administrative Kommentare',en=>'admin comments'},
-'fieldgroup.private'=>{ de=>'Privat-Kontakt # - freiwillige Angaben',en=>'Private-ContactProfile'},
+'fieldgroup.private'=>{ de=>'Privat-Kontakt # - freiwillige Angaben',
+                        en=>'Private contact # - voluntary information'},
 'fieldgroup.userparam'=>{ de=>'Umgebungseinstellungen',en=>'Profile'},
 'fieldgroup.userid'=>{ de=>'Kontakt-Identifikation',en=>'Contact-Identification'},
 'fieldgroup.userro'=>{ de=>'weitere Kontaktparameter',en=>'further contact parameters'},
 'fieldgroup.groups'=>{ de=>'Gruppenmitgliedschaften',en=>'Group-Memberships'},
 'fieldgroup.roles'=>{ de=>'Rollen',en=>'Roles'},
-'fieldgroup.picture'=>{ de=>'Bild',en=>'Picure'},
-'picture'=>{ de=>'Bild',en=>'Picure'},
+'fieldgroup.picture'=>{ de=>'Bild',en=>'Picture'},
+'picture'=>{ de=>'Bild',en=>'Picture'},
 'fieldgroup.comments'=>{ de=>'Bemerkungen',en=>'Comments'},
-'fieldgroup.usersubst'=>{ de=>'Vertreter',en=>'Debuties'},
+'fieldgroup.usersubst'=>{ de=>'Vertreter',en=>'Deputies'},
 'invalid given or resulted fullname'=>{de=>'ungültiger vollqualifizierter Name'},
-'you are not autorized to create these usertyp'=>{de=>'Sie sind nicht berechtigt, Kontakte diesen Typs zu erzeugen'},
+'you are not authorized to create this usertype'=>{de=>'Sie sind nicht berechtigt, Kontakte diesen Typs zu erzeugen'},
 'picture to large'=>{de=>'Bild ist zu groß'},
 'Roles'=>{de=>'Rollen'},
 'SMS Notification'=>{de=>'SMS Benachrichtigung (Testbetrieb)'},
@@ -110,29 +112,29 @@
 'EURO Car-rent driver number'=>{de=>'EURO Car-Vermietung Driver ID'},
 'SIXT Car-rent driver number'=>{de=>'SIXT Car-Vermietung Driver ID'},
 
-'date of "Work Safty" introdution'=>{
+'date of "Work Safety" introduction'=>{
    de=>'Datum der letzten "Arbeitsschutz" Unterweisung'},
-'date of "Work Safty" introdution EDT'=>{
+'date of "Work Safety" introduction EDT'=>{
    de=>'Datum der letzten "Arbeitsschutz" Unterweisung EDT'},
 
-'date of "Data Privacy" introdution'=>{
+'date of "Data Privacy" introduction'=>{
    de=>'Datum der letzten "Datenschutz" Unterweisung'},
-'date of "Data Privacy" introdution EDT'=>{
+'date of "Data Privacy" introduction EDT'=>{
    de=>'Datum der letzten "Datenschutz" Unterweisung EDT'},
 
-'date of "Corruption Protection" introdution'=>{
+'date of "Corruption Protection" introduction'=>{
    de=>'Datum der letzten "Korruptionsvermeidung" Unterweisung'},
-'date of "Corruption Protection" introdution EDT'=>{
+'date of "Corruption Protection" introduction EDT'=>{
    de=>'Datum der letzten "Korruptionsvermeidung" Unterweisung EDT'},
 
-'date of "VSnfD" introdution'=>{
+'date of "VSnfD" introduction'=>{
    de=>'Datum der letzten "VSnfD" Unterweisung'},
-'date of "VSnfD" introdution EDT'=>{
+'date of "VSnfD" introduction EDT'=>{
    de=>'Datum der letzten "VSnfD" Unterweisung EDT'},
 
-'date of "Secret Protection" introdution'=>{
+'date of "Secret Protection" introduction'=>{
    de=>'Datum der letzten "Geheimschutz" Unterweisung'},
-'date of "Secret Protection" introdution EDT'=>{
+'date of "Secret Protection" introduction EDT'=>{
    de=>'Datum der letzten "Geheimschutz" Unterweisung EDT'},
 
 'limit query duration'=>{de=>'Begrenzung der Abfragedauer'},
