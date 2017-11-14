@@ -197,7 +197,9 @@ sub FormatedDetail
    }
    $res=join($self->{vjoinconcat},@$res);
    if ($mode eq "HtmlDetail"){
-      $res.=" ".$self->{unit} if (defined($self->{unit}));
+      if (defined($self->{unit})) {
+         $res.=" ".$self->getParent->T($self->{unit},$self->{translation});
+      }
    }
 
    return($res);
