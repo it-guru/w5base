@@ -492,48 +492,6 @@ sub getRecordImageUrl
 }
          
 
-#sub getSqlFrom
-#{
-#   my $self=shift;
-#   my $from=
-#      "amtsicustappl, ".
-#      "(select amcostcenter.* from amcostcenter ".
-#      " where amcostcenter.bdelete=0) amcostcenter,amemplgroup assigrp,".
-#      "(select distinct ".
-#      "      amtsiservicetype.identifier ordered,amtsicustappl.ltsicustapplid ".
-#      " from amtsiservice,amtsiservicetype,amtsirelportfappl,amtsicustappl,".
-#      "      amportfolio ".
-#      " where amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
-#      "     and amtsiservicetype.identifier='XMBSM' ".
-#      "     and amtsiservice.bdelete=0 ".
-#      "     and amtsirelportfappl.bdelete=0 ".
-#      "     and amtsiservice.lportfolioid=amtsirelportfappl.lportfolioid ".
-#      "     and amtsirelportfappl.bactive=1 ".
-#      "     and amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid ".
-#      "     and amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid ".
-#      "     and amportfolio.bdelete=0 ".
-#      ") tbsm,".
-#      "amcomment amtsimaint,amcomment businessdesc,".
-#      "amtenant";
-#
-#   return($from);
-#}
-#
-#sub initSqlWhere
-#{
-#   my $self=shift;
-#   my $where=
-#      "amtsicustappl.bdelete=0 ".
-#      "and amtsicustappl.lmaintwindowid=amtsimaint.lcommentid(+) ".
-#      "and amtsicustappl.ltenantid=amtenant.ltenantid ".
-#      "and amtsicustappl.lcostcenterid=amcostcenter.lcostid(+) ".
-#      "and amtsicustappl.lcustbusinessdescid=businessdesc.lcommentid(+) ".
-#      "and amtsicustappl.lassignmentid=assigrp.lgroupid(+) ".
-#      "and amtsicustappl.ltsicustapplid=tbsm.ltsicustapplid(+) ";
-#   return($where);
-#}
-
-
 sub isViewValid
 {
    my $self=shift;
