@@ -1344,8 +1344,9 @@ grant select on sclocation to public;
 CREATE or REPLACE VIEW autodiscsystem_acl AS
    SELECT distinct amtsiautodiscovery.lautodiscoveryid id
    FROM AM2107.amtsiautodiscovery
-   JOIN IFACE_ACL acl
-      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+   JOIN system_acl_l1
+      ON amtsiautodiscovery.assettag=system_acl_l1.id
+         AND system_acl_l1.ifuser=sys_context('USERENV', 'SESSION_USER');
 
 CREATE or REPLACE VIEW autodiscsystem AS
    SELECT
