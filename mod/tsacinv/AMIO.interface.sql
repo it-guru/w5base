@@ -1337,8 +1337,8 @@ grant select on sclocation to public;
 -- --------------------- tsacinv::autodiscsystem ----------------------------
 -- --------------------------------------------------------------------------
 --   Der Zugriff auf die logisches System im AutoDiscovery wird dadurch
---   eingeschraenkt das der Schnittstellen-User in der IFACE_ACL aufgefuert
---   sein muss.     
+--   eingeschraenkt das der Schnittstellen-User das betreffende System
+--   bereits "sehen" muss.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE VIEW autodiscsystem_acl AS
