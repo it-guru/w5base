@@ -167,6 +167,7 @@ sub mkAcFtpRecSystem
    my $inmassign=$rec->{acinmassingmentgroup};
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
+   return(undef) if ($arec->{assetid} eq "");
 
    my $s=getModuleObject($self->Config,"itil::system");
    $s->SetFilter({asset=>\$rec->{asset},
