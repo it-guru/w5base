@@ -1388,6 +1388,8 @@ sub new
       new kernel::Field::WorkflowLink(
                 name          =>'olastdrtestwf',
                 AllowEmpty    =>1,
+                readonly      =>1,
+                htmldetail    =>0,
                 label         =>'last Disaster-Recovery test (CHM-WorkflowID)',
                 group         =>'sodrgroup',
                 vjoinon       =>'olastdrtestwfid'),
@@ -1395,6 +1397,8 @@ sub new
       new kernel::Field::Link(
                 name          =>'olastdrtestwfid',
                 label         =>'last Disaster-Recovery test (CHM-WorkflowID)',
+                readonly      =>1,
+                htmldetail    =>0,
                 group         =>'sodrgroup',
                 searchable    =>0,
                 dataobjattr   =>'appl.solastdrtestwf'),
@@ -1403,6 +1407,7 @@ sub new
                 name          =>'solastdrdate',
                 label         =>'last Disaster-Recovery test (WorkflowEnd)',
                 readonly      =>1,
+                htmldetail    =>0,
                 dayonly       =>1,
                 group         =>'sodrgroup',
                 vjointo       =>'base::workflow',
@@ -1423,6 +1428,8 @@ sub new
                 name          =>'solastclusttestwf',
                 label         =>'last Cluster-Service switch '.
                                 'test (CHM-WorkflowID)',
+                readonly      =>1,
+                htmldetail    =>0,
                 AllowEmpty    =>1,
                 group         =>'soclustgroup',
                 vjoinon       =>'solastclusttestwfid'),
@@ -1432,6 +1439,8 @@ sub new
                 htmleditwidth =>'120',
                 label         =>'last Cluster-Service switch test (WorkflowID)',
                 group         =>'soclustgroup',
+                htmldetail    =>0,
+                readonly      =>1,
                 searchable    =>0,
                 dataobjattr   =>'appl.solastclusttestwf'),
 
@@ -1444,6 +1453,7 @@ sub new
                 vjoindisp     =>'eventend',
                 dayonly       =>1,
                 readonly      =>1,
+                htmldetail    =>0,
                 searchable    =>0),
 
       new kernel::Field::FileList(
