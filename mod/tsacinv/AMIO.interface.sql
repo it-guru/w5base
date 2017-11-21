@@ -682,7 +682,6 @@ CREATE or REPLACE VIEW usr AS
       amempldept.firstname                           AS "givenname",
       amempldept.email                               AS "email",
       amempldept.ldapid                              AS "ldapid",
-      amempldept.webpassword                         AS "webpassword",
       amempldept.idno                                AS "idno",
       amempldept.externalsystem                      AS "srcsys",
       amempldept.externalid                          AS "srcid"

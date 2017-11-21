@@ -132,13 +132,6 @@ sub new
                 vjoindisp     =>['group']),
 
       new kernel::Field::Text(
-                name          =>'webpassword',
-                label         =>'WEB-Password',
-                group         =>'sec',
-                lowersearch   =>1,
-                dataobjattr   =>'"webpassword"'),
-
-      new kernel::Field::Text(
                 name          =>'idno',
                 label         =>'IDNo',
                 dataobjattr   =>'"idno"'),
