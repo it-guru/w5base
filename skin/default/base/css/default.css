@@ -241,6 +241,7 @@ div.sublink,span.sublink  {
             color:#16305e;
             cursor: pointer;
             cursor: hand;
+            white-space:nowrap;
           }
 
 a:link.emaillink    {
