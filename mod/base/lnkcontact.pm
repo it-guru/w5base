@@ -193,6 +193,7 @@ sub new
                 name          =>'roles',
                 label         =>'Roles',
                 htmleditwidth =>'100%',
+                searchable    =>0,
                 depend        =>['parentobj'],
                 multisize     =>5,
                 container     =>'croles',
