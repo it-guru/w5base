@@ -63,8 +63,6 @@ sub new
                 name          =>'conumber',
                 label         =>'CO-Number',
                 size          =>'15',
-                weblinkto     =>'tsacinv::costcenter',
-                weblinkon     =>['lcostcenterid'=>'id'],
                 dataobjattr   =>'"conumber"'),
 
 
@@ -92,12 +90,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'lapplicationid',
                 label         =>'Application Link',
-                dataobjattr   =>'"lapplicationid"'),
-
-      new kernel::Field::Link(
-                name          =>'lcostcenterid',
-                label         =>'CostCenter Link',
-                dataobjattr   =>'"lcostcenterid"'),
+                dataobjattr   =>'"lapplicationid"')
 
    );
    $self->setDefaultView(qw(id accnoid name conumber ctrlflag));

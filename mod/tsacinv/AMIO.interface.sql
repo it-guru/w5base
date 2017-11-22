@@ -316,15 +316,10 @@ CREATE MATERIALIZED VIEW system_acl_l1
 CREATE INDEX system_acl_l1_i0
    ON system_acl_l1 (id,ifuser) online;
 
-CREATE INDEX system_acl_l1_i1
-   ON system_acl_l1 (ifuser,id) online;
-
-
 CREATE or REPLACE VIEW system_acl AS
    select distinct id from 
-       system_acl_l1 where ifuser=sys_context('USERENV', 'SESSION_USER');
--- test: DEMD1XCP0002 (S20148097)  QDE8HV (S21938047)
-
+       system_acl_l1 
+   where ifuser=sys_context('USERENV', 'SESSION_USER');
 
 CREATE or REPLACE VIEW system AS
    SELECT
@@ -536,8 +531,7 @@ CREATE or REPLACE VIEW accountno AS
       amtsiacctno.ctrlflag                           AS "ctrlflag",
       amcostcenter.trimmedtitle                      AS "conumber",
       amtsiacctno.description                        AS "description",
-      amtsiacctno.lapplicationid                     AS "lapplicationid",
-      amtsiacctno.lcostcenterid                      AS "lcostcenterid"
+      amtsiacctno.lapplicationid                     AS "lapplicationid"
    FROM
       AM2107.amtsiacctno 
       LEFT OUTER JOIN (
@@ -949,94 +943,6 @@ grant select on lnkusergroup to public;
        
 
 -- --------------------------------------------------------------------------
--- --------------------- tsacinv::costcenter --------------------------------
--- --------------------------------------------------------------------------
---   Der Zugriff auf einen Kontierungs-Datensatz wird explizit NICHT
---   durch die Filter in der IFACE_ACL eingeschraenkt (der Schnittstellen
---   User muss darin nur mit min. einem Datensatz vorhanden sein), da
---   dadurch Informationen zu Kontierungsobjekten zugaenglich werden 
---   muessen, um z.B. auch Ansprechparnter ausfindig machen zu koennen.
--- --------------------------------------------------------------------------
-
-CREATE or REPLACE VIEW costcenter_acl AS
-   SELECT distinct amcostcenter.lcostid              AS id
-   FROM AM2107.amcostcenter
-      join IFACE_ACL acl
-         on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
-
-CREATE or REPLACE VIEW costcenter AS
-   SELECT amcostcenter.lcostid                       AS "id",
-      amcostcenter.trimmedtitle                      AS "name",
-      amcostcenter.title                             AS "untrimmedname",
-      decode(amcostcenter.flag9,'X', 1, 0)           AS "islocked",
-      amcostcenter.code                              AS "code",
-      amcostcenter.field1                            AS "description",
-      amcostcenter.alternatebusinesscenter           AS "bc",
-      amcostcenter.orgunit                           AS "orgunit",
-      (
-         SELECT decode(COUNT(*),0,0,1)
-         FROM AM2107.amportfolio p1
-            JOIN AM2107.amcomputer c1
-               ON p1.lportfolioitemid = c1.litemid 
-         WHERE p1.lcostid = amcostcenter.lcostid
-           AND LOWER(c1.status)!='out of operation') AS "usedbyactivesystems",
-      amcostcenter.ictonr                            AS "ictonr",
-      amcostcenter.bdelete                           AS "deleted",
-      amcostcenter.norsolutionmodel                  AS "norsolutionmodel",
-      amcostcenter.norinstructiontyp                 AS "norinstructiontyp",
-      amcostcenter.lleadingdeliverymanagerid         AS "delmgrid",
-      amcostcenter.lproductionplanningossid          AS "productionplanningossid",
-      amcostcenter.lcustomerlinkid                   AS "lcustomerid",
-      amtsiaccsecunit.identifier                     AS "customerlink",
-      amtsisclocations.sclocationid                  AS "defsclocationid",
-      amcostcenter.lservicemanagerid                 AS "semid",
-      decode ( amcostcenter.hier0id,'','-',
-         amcostcenter.hier0id)
-      || '.' || decode ( amcostcenter.hier1id,
-         '','-',amcostcenter.hier1id)
-      || '.' || decode ( amcostcenter.hier2id,
-         '','-',amcostcenter.hier2id)
-      || '.' || decode ( amcostcenter.hier3id,
-         '','-',amcostcenter.hier3id)
-      || '.' || decode ( amcostcenter.hier4id,
-         '','-',amcostcenter.hier4id)
-      || '.' || decode ( amcostcenter.hier5id,
-         '','-',amcostcenter.hier5id)
-      || '.' || decode ( amcostcenter.hier6id,
-         '','-',amcostcenter.hier6id)
-      || '.' || decode ( amcostcenter.hier7id,
-         '','-',amcostcenter.hier7id)
-      || '.' || decode ( amcostcenter.hier8id,
-         '','-',amcostcenter.hier8id)
-      || '.' || decode ( amcostcenter.hier9id,
-         '','-',amcostcenter.hier9id)                AS "saphier",
-      amcostcenter.hier0id                           AS "saphier0id",
-      amcostcenter.hier1id                           AS "saphier1id",
-      amcostcenter.hier2id                           AS "saphier2id",
-      amcostcenter.hier3id                           AS "saphier3id",
-      amcostcenter.hier4id                           AS "saphier4id",
-      amcostcenter.hier5id                           AS "saphier5id",
-      amcostcenter.hier6id                           AS "saphier6id",
-      amcostcenter.hier7id                           AS "saphier7id",
-      amcostcenter.hier8id                           AS "saphier8id",
-      amcostcenter.hier9id                           AS "saphier9id",
-      amcostcenter.externalsystem                    AS "srcsys",
-      amcostcenter.externalid                        AS "srcid",
-      amcostcenter.dtimport                          AS "srcload",
-      amcostcenter.dtlastmodif                       AS "mdate"
-   FROM AM2107.amcostcenter
-      JOIN costcenter_acl
-         ON amcostcenter.lcostid=costcenter_acl.id
-      LEFT OUTER JOIN AM2107.amtsiaccsecunit 
-         ON amcostcenter.lcustomerlinkid = amtsiaccsecunit.lunitid
-      LEFT OUTER JOIN AM2107.amtsisclocations 
-         ON amtsiaccsecunit.ldefaultsclocationid = amtsisclocations.ltsisclocationsid;
-
-grant select on costcenter to public;
-
-
-
--- --------------------------------------------------------------------------
 -- --------------------- tsacinv::customer ----------------------------------
 -- --------------------------------------------------------------------------
 --   Der Zugriff auf einen CustomerLink-Datensatz wird dadurch
@@ -1072,44 +978,6 @@ CREATE or REPLACE VIEW customer AS
    WHERE amtsiaccsecunit.lunitid <> 0;
 
 grant select on customer to public;
-
-
-
--- --------------------------------------------------------------------------
--- --------------------- tsacinv::dlvpartner --------------------------------
--- --------------------------------------------------------------------------
---   Der Zugriff auf die Delivery-Partner eines Kontierungsobjektes
---   wird dann gewaehrt, wenn der Zugriff auf das betreffende
---   Kontierungsobjekt erlaubt ist.
--- --------------------------------------------------------------------------
-
-CREATE or REPLACE VIEW dlvpartner_acl AS
-   SELECT
-      distinct amtsidlvpartner.ldeliverypartnerid    AS id
-   FROM
-      AM2107.amtsidlvpartner
-         JOIN costcenter_acl
-           ON amtsidlvpartner.lcostcenterid = costcenter_acl.id;
-
-CREATE or REPLACE VIEW dlvpartner AS
-   SELECT
-      distinct amtsidlvpartner.ldeliverypartnerid    AS "id",
-      amcostcenter.trimmedtitle                      AS "name",
-      amtsidlvpartner.ldeliverymanagementid          AS "ldeliverymanagementid",
-      amtsidlvpartner.description                    AS "description",
-      amtsidlvpartner.ldeliverymanagerid             AS "delmgrid",
-      amtsidlvpartner.ldeputydeliverymanagerid       AS "delmgr2id",
-      amtsidlvpartner.dtlastmodif AS "mdate"
-   FROM
-      AM2107.amtsidlvpartner
-         JOIN AM2107.amcostcenter
-           ON amtsidlvpartner.lcostcenterid = amcostcenter.lcostid
-         JOIN dlvpartner_acl 
-           ON amtsidlvpartner.ldeliverypartnerid=dlvpartner_acl.id
-   WHERE amcostcenter.bdelete = 0
-      AND amtsidlvpartner.bdelete = 0;
-
-grant select on dlvpartner to public;
 
 
 
@@ -2097,5 +1965,202 @@ CREATE or REPLACE VIEW backup AS
    WHERE amtsibackup.bdelete = 0;
 
 grant select on backup to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::costcenter --------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf einen Kontierungs-Datensatz wird explizit NICHT
+--   durch die Filter in der IFACE_ACL eingeschraenkt (der Schnittstellen
+--   User muss darin nur mit min. einem Datensatz vorhanden sein), da
+--   dadurch Informationen zu Kontierungsobjekten zugaenglich werden 
+--   muessen, um z.B. auch Ansprechparnter ausfindig machen zu koennen.
+-- --------------------------------------------------------------------------
+
+-- drop materialized view costcenter_acl_l0;
+CREATE MATERIALIZED VIEW costcenter_acl_l0
+  -- refresh complete start with sysdate
+  -- next trunc(sysdate+1)+5.6/24
+  refresh complete start with trunc(sysdate+1)+7.0/24
+  next sysdate+0.300
+  as
+   select distinct ifuser,lcostid from (
+      -- costcenter self by iface_acl
+      select acl.ifuser                                   ifuser,
+             amcostcenter.lcostid                         lcostid
+      from AM2107.amcostcenter
+         left outer join AM2107.amtsiaccsecunit customerlnk
+               on amcostcenter.lcustomerlinkid=customerlnk.lunitid
+         join IFACE_ACL acl
+            on (acl.assignment is null) and
+                (amcostcenter.acctno like acl.acctno
+                   or acl.acctno is null) and
+                (customerlnk.identifier like acl.customerlnk
+                   or acl.customerlnk is null) and
+               (acl.customerlnk is not null or
+                acl.acctno is not null or
+                acl.assignment is not null)
+      union all
+      -- appl costcenter
+      select acl.ifuser                                   ifuser,
+             amcostcenter.lcostid                         lcostid
+      from AM2107.amtsicustappl
+         left outer join ( SELECT amcostcenter.*
+                           FROM AM2107.amcostcenter
+                           WHERE amcostcenter.bdelete = 0) amcostcenter
+            on amtsicustappl.lcostcenterid = amcostcenter.lcostid
+         left outer join AM2107.amemplgroup assigrp
+            on amtsicustappl.lassignmentid = assigrp.lgroupid
+         left outer join AM2107.amtsiaccsecunit customerlnk
+               on amcostcenter.lcustomerlinkid=customerlnk.lunitid
+         join IFACE_ACL acl
+            on (assigrp.name like acl.assignment
+                   or acl.assignment is null) and
+                (amcostcenter.acctno like acl.acctno
+                   or acl.acctno is null) and
+                (customerlnk.identifier like acl.customerlnk
+                   or acl.customerlnk is null) and
+               (acl.customerlnk is not null or
+                acl.acctno is not null or
+                acl.assignment is not null)
+      union all
+      -- system costcenter
+      select system_acl_l1.ifuser                         ifuser,
+               amportfolio.lcostid                        lcostid
+        from system_acl_l1
+          JOIN AM2107.amportfolio
+               ON amportfolio.assettag=system_acl_l1.id
+      union all
+      -- asset costenter
+      select system_acl_l1.ifuser                         ifuser,
+             assetportfolio.lcostid                       lcostid
+        from system_acl_l1
+          JOIN AM2107.amportfolio
+               ON amportfolio.assettag=system_acl_l1.id
+          JOIN AM2107.amportfolio assetportfolio
+               ON amportfolio.lparentid=assetportfolio.lportfolioitemid
+      ) costcenter_acl;
+
+CREATE INDEX costcenter_acl_l0_i0
+   ON costcenter_acl_l0 (lcostid,ifuser) online;
+
+CREATE or REPLACE VIEW costcenter_acl AS
+   SELECT distinct amcostcenter.lcostid              AS id
+   FROM AM2107.amcostcenter
+      join costcenter_acl_l0 acl
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
+            acl.lcostid=amcostcenter.lcostid;
+
+CREATE or REPLACE VIEW costcenter AS
+   SELECT amcostcenter.lcostid                       AS "id",
+      amcostcenter.trimmedtitle                      AS "name",
+      amcostcenter.title                             AS "untrimmedname",
+      decode(amcostcenter.flag9,'X', 1, 0)           AS "islocked",
+      amcostcenter.code                              AS "code",
+      amcostcenter.field1                            AS "description",
+      amcostcenter.alternatebusinesscenter           AS "bc",
+      amcostcenter.orgunit                           AS "orgunit",
+      (
+         SELECT decode(COUNT(*),0,0,1)
+         FROM AM2107.amportfolio p1
+            JOIN AM2107.amcomputer c1
+               ON p1.lportfolioitemid = c1.litemid 
+         WHERE p1.lcostid = amcostcenter.lcostid
+           AND LOWER(c1.status)!='out of operation') AS "usedbyactivesystems",
+      amcostcenter.ictonr                            AS "ictonr",
+      amcostcenter.bdelete                           AS "deleted",
+      amcostcenter.norsolutionmodel                  AS "norsolutionmodel",
+      amcostcenter.norinstructiontyp                 AS "norinstructiontyp",
+      amcostcenter.lleadingdeliverymanagerid         AS "delmgrid",
+      amcostcenter.lproductionplanningossid          AS "productionplanningossid",
+      amcostcenter.lcustomerlinkid                   AS "lcustomerid",
+      amtsiaccsecunit.identifier                     AS "customerlink",
+      amtsisclocations.sclocationid                  AS "defsclocationid",
+      amcostcenter.lservicemanagerid                 AS "semid",
+      decode ( amcostcenter.hier0id,'','-',
+         amcostcenter.hier0id)
+      || '.' || decode ( amcostcenter.hier1id,
+         '','-',amcostcenter.hier1id)
+      || '.' || decode ( amcostcenter.hier2id,
+         '','-',amcostcenter.hier2id)
+      || '.' || decode ( amcostcenter.hier3id,
+         '','-',amcostcenter.hier3id)
+      || '.' || decode ( amcostcenter.hier4id,
+         '','-',amcostcenter.hier4id)
+      || '.' || decode ( amcostcenter.hier5id,
+         '','-',amcostcenter.hier5id)
+      || '.' || decode ( amcostcenter.hier6id,
+         '','-',amcostcenter.hier6id)
+      || '.' || decode ( amcostcenter.hier7id,
+         '','-',amcostcenter.hier7id)
+      || '.' || decode ( amcostcenter.hier8id,
+         '','-',amcostcenter.hier8id)
+      || '.' || decode ( amcostcenter.hier9id,
+         '','-',amcostcenter.hier9id)                AS "saphier",
+      amcostcenter.hier0id                           AS "saphier0id",
+      amcostcenter.hier1id                           AS "saphier1id",
+      amcostcenter.hier2id                           AS "saphier2id",
+      amcostcenter.hier3id                           AS "saphier3id",
+      amcostcenter.hier4id                           AS "saphier4id",
+      amcostcenter.hier5id                           AS "saphier5id",
+      amcostcenter.hier6id                           AS "saphier6id",
+      amcostcenter.hier7id                           AS "saphier7id",
+      amcostcenter.hier8id                           AS "saphier8id",
+      amcostcenter.hier9id                           AS "saphier9id",
+      amcostcenter.externalsystem                    AS "srcsys",
+      amcostcenter.externalid                        AS "srcid",
+      amcostcenter.dtimport                          AS "srcload",
+      amcostcenter.dtlastmodif                       AS "mdate"
+   FROM AM2107.amcostcenter
+      JOIN costcenter_acl
+         ON amcostcenter.lcostid=costcenter_acl.id
+      LEFT OUTER JOIN AM2107.amtsiaccsecunit 
+         ON amcostcenter.lcustomerlinkid = amtsiaccsecunit.lunitid
+      LEFT OUTER JOIN AM2107.amtsisclocations 
+         ON amtsiaccsecunit.ldefaultsclocationid = 
+            amtsisclocations.ltsisclocationsid
+   WHERE amcostcenter.lcostid<>'0';
+
+grant select on costcenter to public;
+
+
+
+-- --------------------------------------------------------------------------
+-- --------------------- tsacinv::dlvpartner --------------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf die Delivery-Partner eines Kontierungsobjektes
+--   wird dann gewaehrt, wenn der Zugriff auf das betreffende
+--   Kontierungsobjekt erlaubt ist.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW dlvpartner_acl AS
+   SELECT
+      distinct amtsidlvpartner.ldeliverypartnerid    AS id
+   FROM
+      AM2107.amtsidlvpartner
+         JOIN costcenter_acl
+           ON amtsidlvpartner.lcostcenterid = costcenter_acl.id;
+
+CREATE or REPLACE VIEW dlvpartner AS
+   SELECT
+      distinct amtsidlvpartner.ldeliverypartnerid    AS "id",
+      amcostcenter.trimmedtitle                      AS "name",
+      amtsidlvpartner.ldeliverymanagementid          AS "ldeliverymanagementid",
+      amtsidlvpartner.description                    AS "description",
+      amtsidlvpartner.ldeliverymanagerid             AS "delmgrid",
+      amtsidlvpartner.ldeputydeliverymanagerid       AS "delmgr2id",
+      amtsidlvpartner.dtlastmodif AS "mdate"
+   FROM
+      AM2107.amtsidlvpartner
+         JOIN AM2107.amcostcenter
+           ON amtsidlvpartner.lcostcenterid = amcostcenter.lcostid
+         JOIN dlvpartner_acl 
+           ON amtsidlvpartner.ldeliverypartnerid=dlvpartner_acl.id
+   WHERE amcostcenter.bdelete = 0
+      AND amtsidlvpartner.bdelete = 0;
+
+grant select on dlvpartner to public;
+
 
 

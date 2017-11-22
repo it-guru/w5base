@@ -499,6 +499,7 @@ sub CalcSystemsOnAsset
    my $sys=$self->getParent->getPersistentModuleObject("CalcSystemsOnAssetobj",
                                                        "tsacinv::system");
    my $assetid=$current->{lassetid};
+   return(undef) if ($assetid eq "" || $assetid eq "0");
    $sys->SetFilter({'lassetid'=>$assetid,status=>"\"!out of operation\""});
    my @l=$sys->getHashList(qw(lassetid));
    return($#l+1);
