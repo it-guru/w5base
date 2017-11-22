@@ -1099,12 +1099,13 @@ CREATE or REPLACE VIEW dlvpartner AS
       amtsidlvpartner.description                    AS "description",
       amtsidlvpartner.ldeliverymanagerid             AS "delmgrid",
       amtsidlvpartner.ldeputydeliverymanagerid       AS "delmgr2id",
-      amtsidlvpartner.lcommentid                     AS "lcommentid",
       amtsidlvpartner.dtlastmodif AS "mdate"
    FROM
       AM2107.amtsidlvpartner
          JOIN AM2107.amcostcenter
            ON amtsidlvpartner.lcostcenterid = amcostcenter.lcostid
+         JOIN dlvpartner_acl 
+           ON amtsidlvpartner.ldeliverypartnerid=dlvpartner_acl.id
    WHERE amcostcenter.bdelete = 0
       AND amtsidlvpartner.bdelete = 0;
 
