@@ -1506,7 +1506,6 @@ CREATE or REPLACE VIEW schain AS
    SELECT amtsisalessrvcpkg.lsrvcpkgid          AS "schainid",
       amtsisalessrvcpkg.code                         AS "code",
       amtsisalessrvcpkg.name                         AS "fullname",
-      amtsisalessrvcpkg.lcommentid                   AS "lcommentid",
       amcomment.memcomment                           AS "comments",
       amtsisalessrvcpkg.dtlastmodif                  AS "replkeypri",
       lpad(amtsisalessrvcpkg.code,35,'0')            AS "replkeysec",

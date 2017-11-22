@@ -55,10 +55,6 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'"fullname"'),
 
-      new kernel::Field::Link(
-                name          =>'lcommentid',
-                dataobjattr   =>'"lcommentid"'),
-
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
