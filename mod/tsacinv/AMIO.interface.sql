@@ -683,6 +683,7 @@ CREATE or REPLACE VIEW usr AS
       amempldept.email                               AS "email",
       amempldept.ldapid                              AS "ldapid",
       amempldept.idno                                AS "idno",
+      amempldept.externeid                           AS "ciamid",
       amempldept.externalsystem                      AS "srcsys",
       amempldept.externalid                          AS "srcid"
    FROM AM2107.amempldept
@@ -909,6 +910,7 @@ CREATE or REPLACE VIEW asset AS
       LEFT OUTER JOIN AM2107.amnature
          ON ammodel.lnatureid = amnature.lnatureid
    WHERE ammodel.name NOT IN ('LOGICAL SYSTEM','CLUSTER','DB-INSTANCE');
+-- TODO (exclude License)
 
 grant select on asset to public;
 
