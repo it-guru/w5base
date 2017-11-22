@@ -150,8 +150,6 @@ grant select on appl to public;
 
 -- drop materialized view system_acl_l0;
 CREATE MATERIALIZED VIEW system_acl_l0
-  -- refresh complete start with sysdate
-  -- next trunc(sysdate+1)+5.2/24
   refresh complete start with trunc(sysdate+1)+5.2/24
   next sysdate+0.125
   as
@@ -193,8 +191,6 @@ CREATE INDEX system_acl_l0_i0
 
 -- drop materialized view lnksharednet_acl_l0;
 CREATE MATERIALIZED VIEW lnksharednet_acl_l0
-  -- refresh complete start with sysdate
-  -- next trunc(sysdate+1)+5.4/24
   refresh complete start with trunc(sysdate+1)+5.4/24
   next sysdate+0.125
   as
@@ -204,7 +200,8 @@ CREATE MATERIALIZED VIEW lnksharednet_acl_l0
       systemportfolio.assettag                       AS "systemsystemid",
       netportfolio.assettag                          AS "netsystemid",
       netpartnernature.name                          AS "netnature",
-      amcomputer.lcomputerid                         AS "lcomputerid"
+      amcomputer.lcomputerid                         AS "lcomputerid",
+      current_date                                   AS "gendate"
    FROM AM2107.amcomputer
       JOIN AM2107.amportfolio systemportfolio 
          ON ( amcomputer.litemid = systemportfolio.lportfolioitemid
@@ -268,7 +265,8 @@ CREATE or REPLACE VIEW lnksharednet AS
       lnksharednet_acl_l0."netsystemid",
       netportfolio.name                              AS "netname",
       lnksharednet_acl_l0."netnature",
-      lnksharednet_acl_l0."lcomputerid"
+      lnksharednet_acl_l0."lcomputerid",
+      lnksharednet_acl_l0."gendate"
    FROM lnksharednet_acl_l0
       JOIN lnksharednet_acl
          ON lnksharednet_acl_l0."netlnkid"=lnksharednet_acl.id
@@ -302,8 +300,6 @@ grant select on lnksharednet to public;
 
 -- drop materialized view system_acl_l1;
 CREATE MATERIALIZED VIEW system_acl_l1
-  -- refresh complete start with sysdate
-  -- next trunc(sysdate+1)+5.6/24
   refresh complete start with trunc(sysdate+1)+5.6/24
   next sysdate+0.125
   as
@@ -1980,8 +1976,6 @@ grant select on backup to public;
 
 -- drop materialized view costcenter_acl_l0;
 CREATE MATERIALIZED VIEW costcenter_acl_l0
-  -- refresh complete start with sysdate
-  -- next trunc(sysdate+1)+5.6/24
   refresh complete start with trunc(sysdate+1)+7.0/24
   next sysdate+0.300
   as
