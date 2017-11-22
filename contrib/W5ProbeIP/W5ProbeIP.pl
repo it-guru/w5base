@@ -9,6 +9,7 @@ use Time::HiRes;
 
 
 my $q=new CGI();
+my @CERTBuffer;
 
 if (request_method() eq "POST"){
    ProbeIP();
@@ -165,6 +166,9 @@ sub resolv2ip
    return($r);
 }
 
+
+
+
 sub do_SSLCERT
 {
    my $r=shift;
@@ -181,6 +185,49 @@ sub do_SSLCERT
    eval('use DateTime;');
    eval('use Date::Parse;');
 
+   sub unpackCert
+   {
+      my $cert=shift;
+      my $sslcert={};
+
+      my $expire_date_asn1=Net::SSLeay::X509_get_notAfter($cert);
+      my $expireDate=Net::SSLeay::P_ASN1_UTCTIME_put2string(
+                     $expire_date_asn1);
+      ### $expire_date_str
+      my $begin_date_asn1 =Net::SSLeay::X509_get_notBefore($cert);
+      my $beginDate=Net::SSLeay::P_ASN1_UTCTIME_put2string($begin_date_asn1);
+      $sslcert->{ssl_cert_begin}="".
+          DateTime->from_epoch(epoch=>str2time($beginDate));
+      $sslcert->{ssl_cert_end}="".
+          DateTime->from_epoch(epoch=>str2time($expireDate));
+    
+      my $certserial;
+      eval('$certserial=Net::SSLeay::X509_get_serialNumber($cert);');
+      $sslcert->{ssl_cert_serialno}=
+         Net::SSLeay::P_ASN1_INTEGER_get_hex($certserial) if ($@ eq "");
+      if (main->can("Net::SSLeay::P_X509_get_signature_alg")){
+         my $cert_signature_algo;
+         eval('$cert_signature_algo=
+            Net::SSLeay::OBJ_obj2txt(
+               Net::SSLeay::P_X509_get_signature_alg($cert)
+            );
+         ');
+         if ($@ eq ""){
+            $sslcert->{ssl_cert_signature_algo}=$cert_signature_algo;
+         }
+      }
+      return($sslcert);
+   }
+
+   sub preConnectReadServerCerts
+   {
+      my ($ok,$ctx_store,$certname,$error,$cert,$depth) = @_;
+      my $sslcert=unpackCert($cert);
+      $sslcert->{name}=$certname;
+      push(@CERTBuffer,$sslcert);
+      return(1);
+   }
+
    if (!canTcpConnect($host,$port)){
       push(@{$r->{sslcert}->{log}},
           sprintf("Step0: generic tcp connect check %s:%s",$host,$port));
@@ -194,37 +241,46 @@ sub do_SSLCERT
    $ENV{"HTTPS_VERSION"}="3";
 
 
-
-   my $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
-                                   SSL_version=>'SSLv23',
-                                   SSL_verify_mode=>'SSL_VERIFY_NONE',
-                                   Timeout=>5,
-                                   SSL_session_cache_size=>0);
-   if (!defined($sock)){
+   @CERTBuffer=();
+   my $sock = IO::Socket::SSL->new(
+      PeerAddr=>"$host:$port",
+      SSL_version=>'SSLv23',
+      SSL_verify_mode=>'SSL_VERIFY_PEER',
+      Timeout=>5,
+      SSL_verify_callback=>\&preConnectReadServerCerts,
+      SSL_session_cache_size=>0
+   );
+   if (!defined($sock) && $#CERTBuffer==-1){
       push(@{$r->{sslcert}->{log}},
           sprintf("->result=%s",IO::Socket::SSL->errstr()));
    }
-   if (!defined($sock)){
+   if (!defined($sock) && $#CERTBuffer==-1){
       push(@{$r->{sslcert}->{log}},
           sprintf("Step2: try to connect to %s:%s SSLv2",$host,$port));
-      $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
-                                   SSL_version=>'SSLv2',
-                                   SSL_verify_mode=>'SSL_VERIFY_NONE',
-                                   Timeout=>5,
-                                   SSL_session_cache_size=>0);
-      if (!defined($sock)){
+      $sock = IO::Socket::SSL->new(
+         PeerAddr=>"$host:$port",
+         SSL_version=>'SSLv2',
+         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         SSL_verify_callback=>\&preConnectReadServerCerts,
+         Timeout=>5,
+         SSL_session_cache_size=>0
+      );
+      if (!defined($sock) && $#CERTBuffer==-1){
          push(@{$r->{sslcert}->{log}},
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
       }
    }
-   if (!defined($sock)){
+   if (!defined($sock) && $#CERTBuffer==-1){
       push(@{$r->{sslcert}->{log}},
           sprintf("Step3: try to connect to %s:%s SSLv3",$host,$port));
-      $sock = IO::Socket::SSL->new(PeerAddr=>"$host:$port",
-                                   SSL_version=>'SSLv3',
-                                   SSL_verify_mode=>'SSL_VERIFY_NONE',
-                                   Timeout=>5,
-                                   SSL_session_cache_size=>0);
+      $sock = IO::Socket::SSL->new(
+         PeerAddr=>"$host:$port",
+         SSL_version=>'SSLv3',
+         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         Timeout=>5,
+         SSL_verify_callback=>\&preConnectReadServerCerts,
+         SSL_session_cache_size=>0
+      );
       if (!defined($sock)){
          push(@{$r->{sslcert}->{log}},
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
@@ -245,37 +301,20 @@ sub do_SSLCERT
          eval('$cipher=$sock->get_cipher();');
          $r->{sslcert}->{ssl_cipher}=$cipher if ($@ eq "");
       }
-      my ($begin_date,$expire_date)=();
-
 
       if ($cert){
-         my $expire_date_asn1=Net::SSLeay::X509_get_notAfter($cert);
-         my $expireDate=Net::SSLeay::P_ASN1_UTCTIME_put2string(
-                        $expire_date_asn1);
-         ### $expire_date_str
-         my $begin_date_asn1 =Net::SSLeay::X509_get_notBefore($cert);
-         my $beginDate=Net::SSLeay::P_ASN1_UTCTIME_put2string($begin_date_asn1);
-         $r->{sslcert}->{ssl_cert_begin}="".
-             DateTime->from_epoch(epoch=>str2time($beginDate));
-         $r->{sslcert}->{ssl_cert_end}="".
-             DateTime->from_epoch(epoch=>str2time($expireDate));
-    
-         my $certserial;
-         eval('$certserial=Net::SSLeay::X509_get_serialNumber($cert);');
-         $r->{sslcert}->{ssl_cert_serialno}=
-            Net::SSLeay::P_ASN1_INTEGER_get_hex($certserial) if ($@ eq "");
-         if (main->can("Net::SSLeay::P_X509_get_signature_alg")){
-            my $cert_signature_algo;
-            eval('$cert_signature_algo=
-               Net::SSLeay::OBJ_obj2txt(
-                  Net::SSLeay::P_X509_get_signature_alg($cert)
-               );
-            ');
-            if ($@ eq ""){
-               $r->{sslcert}->{ssl_cert_signature_algo}=$cert_signature_algo;
-            }
-         }
+         $r->{sslcert}=unpackCert($cert);
       }
+      if ($#CERTBuffer!=-1){
+         $r->{sslcert}->{certtree}=\@CERTBuffer;
+      }
+      $r->{sslcert}->{method}="socket_peer_certifcate";
+      $r->{sslcert}->{exitcode}=0;
+   }
+   elsif ($#CERTBuffer!=-1){
+      $r->{sslcert}={%{$CERTBuffer[$#CERTBuffer]}};
+      $r->{sslcert}->{certtree}=\@CERTBuffer;
+      $r->{sslcert}->{method}="pre_verify_callback";
       $r->{sslcert}->{exitcode}=0;
    }
    else{
