@@ -857,6 +857,7 @@ CREATE or REPLACE VIEW asset AS
    SELECT
       distinct assetportfolio.assettag               AS "assetid",
       LOWER(amasset.status)                          AS "status",
+      ammodel.name                                   AS "assetmodel",
       assetportfolio.assettag                        AS "fullname",
       assetportfolio.dtinvent                        AS "install",
       assetportfolio.lassignmentid                   AS "lassignmentid",
@@ -908,9 +909,7 @@ CREATE or REPLACE VIEW asset AS
             WHERE amcostcenter.bdelete = 0) amcostcenter
          ON amasset.lsendercostcenterid = amcostcenter.lcostid 
       LEFT OUTER JOIN AM2107.amnature
-         ON ammodel.lnatureid = amnature.lnatureid
-   WHERE ammodel.name NOT IN ('LOGICAL SYSTEM','CLUSTER','DB-INSTANCE');
--- TODO (exclude License)
+         ON ammodel.lnatureid = amnature.lnatureid;
 
 grant select on asset to public;
 
