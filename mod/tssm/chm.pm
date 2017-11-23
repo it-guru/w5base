@@ -458,7 +458,7 @@ sub new
                 name          =>'closetime',
                 depend        =>['status'],
                 group         =>'close',
-                label         =>'Closeing time',
+                label         =>'Closing time',
                 dataobjattr   =>SELpref.'cm3rm1.close_time'),
 
       new kernel::Field::Text(

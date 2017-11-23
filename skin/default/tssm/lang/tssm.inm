@@ -6,6 +6,7 @@
 'fieldgroup.relations'=>{de=>'Verknüpfungen',en=>'Relations'},
 'Brief Description'=>{de=>'Kurzbeschreibung'},
 'Created'=>{de=>'Erstellt'},
+'Closing time'=>{de=>'Abschlusszeitpunkt'},
 'Downtime Start'=>{de=>'Ereignis Beginn'},
 'Downtime End'=>{de=>'Ereignis Ende'},
 'Reason'=>{de=>'Grund'},

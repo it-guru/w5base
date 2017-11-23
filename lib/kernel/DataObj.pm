@@ -285,7 +285,7 @@ sub StringToFilter
       while ($words[$c]=~m/\]$/){
          $words[$c]=~s/\]$//;
          if (!$inrawmode){
-            $self->LastMsg(ERROR,"structure error while closeing []");
+            $self->LastMsg(ERROR,"structure error while closing []");
             return;
          }
          $closerawmode++;

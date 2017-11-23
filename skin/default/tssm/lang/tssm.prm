@@ -19,7 +19,7 @@
 'Assigned worker'=>{de=>'Zugewiesener Bearbeiter'},
 'Homeassignment'=>{de=>'Erstellergruppe'},
 'Create time'=>{de=>'Erstellungszeitpunkt'},
-'Closeing time'=>{de=>'Abschlusszeitpunkt'},
+'Closing time'=>{de=>'Abschlusszeitpunkt'},
 'Work Duration'=>{de=>'Bearbeitungsdauer'},
 'Business Impact'=>{de=>'Geschäftsprozessbeeinträchtigung'},
 'Urgency'=>{de=>'Dringlichkeit'},

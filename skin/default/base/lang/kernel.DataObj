@@ -30,7 +30,7 @@ EOF
 'New'=>{de=>'Neueingabe'},
 "structure error in []"=>{de=>"Strukturfehler in []"},
 "structure error in ()"=>{de=>"Strukturfehler in ()"},
-"structure error while closeing []"=>{de=>"Strukturfehler beim Schließen von []"},
+"structure error while closing []"=>{de=>"Strukturfehler beim Schließen von []"},
 "or not allowed at begin of expression"=>{de=>"OR darf nicht am Anfang des Ausdruckes stehen"},
 "invalid attribute '\%s' used"=>{de=>"ungültiges Feld '\%s' verwendet"},
 "multiple definition of same attribute"=>{de=>"Mehrfachdefinition des gleichen Feldes"},

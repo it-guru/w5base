@@ -238,7 +238,7 @@ sub new
                 name          =>'closetime',
                 depend        =>['status'],
                 group         =>'close',
-                label         =>'Closeing time',
+                label         =>'Closing time',
                 dataobjattr   =>SELpref.'probsummarym1.close_time'),
 
 ##      new kernel::Field::Date(

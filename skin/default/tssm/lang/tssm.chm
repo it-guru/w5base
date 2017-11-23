@@ -32,7 +32,7 @@
 'Planed Start'=>{de=>'Geplanter Start (Planed Start)'},
 'Work End'=>{de=>'Arbeitsende (Work End)'},
 'Create time'=>{de=>'Erstellungszeitpunkt'},
-'Closeing time'=>{de=>'Abschluﬂzeitpunkt'},
+'Closing time'=>{de=>'Abschlusszeitpunkt'},
 'Resolved by'=>{de=>'Erledigt durch'},
 'Resolve time'=>{de=>'Erledigungszeitpunkt (Resolve time)'},
 'Closed by'=>{de=>'Abschluﬂ durch'},
