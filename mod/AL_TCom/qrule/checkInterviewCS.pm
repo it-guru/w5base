@@ -1,4 +1,4 @@
-package AL_TCom::qrule::checkInterviewDR;
+package AL_TCom::qrule::checkInterviewCS;
 #######################################################################
 =pod
 
@@ -6,7 +6,7 @@ package AL_TCom::qrule::checkInterviewDR;
 
 =head3 PURPOSE
 
-Checks and extend Interview-answers of DR-Test.
+Checks and extend Interview-answers of ClusterServiceSwitch-Test.
 
 =head3 IMPORTS
 
@@ -16,29 +16,17 @@ NONE
 
 [en:]
 
-Checks and extends Interviews-Answers on DR-Test topic.
+Checks and extends Interviews-Answers on ClusterServiceSwitch-Test topic.
 
 [de:]
 
-Prüft und erweitert die Interview-Antworten im Themenblock DR-Test.
+Prüft und erweitert die Interview-Antworten im Themenblock ClusterServiceSwitch-Test.
 Wenn die eingegebene Changenummber wie eine SM9 Changenummer aussieht,
-dann wird das Datum des letzten DR Tests automatisch aus dem Change
-entnommen und in die Antwort eingefügt.
-
-Über die SLA Vorgaben wird errechnet, wie alt der letzte DR Test 
-maximal sein darf. Ist dieser zu alt, wird ein DataIssue erzeugt.
-
-Ist das DR Test Plandatum weiter in der Zukunft, als das durch die
-SLA Vorgaben definierte Interval, so wird ein DataIssue erzeugt.
-
-Liegt das DR Test Plandatum länger als 8 Wochen vor dem letzten
-DR Test, so wird ein DataIssue erzeugt.
-
-Liegt der DR Test Plandatum länger als das halbe Test-Interval in
-der Vergangenheit, so wird ein DataIssue erzeugt.
+dann wird das Datum des letzten ClusterService Switch Tests automatisch 
+aus dem Change entnommen und in die Antwort eingefügt.
 
 Wurde eine Anwendung neu aufgebaut (und hat somit noch keinen
-"letzten DR Test", so sind die betreffenden Fragen alle auf
+"letzten ClusterService Switch Test", so sind die betreffenden Fragen alle auf
 "relevant"="nein" zu setzten.
 
 
@@ -113,15 +101,15 @@ sub qcheckRecord
    my $changenumberok=1;
    my $interviewchanged=0;
 
-   if (exists($iarec->{qtag}->{SOB_003}) &&
-       $iarec->{qtag}->{SOB_003}->{relevant} eq "1" &&
-       $iarec->{qtag}->{SOB_003}->{answer} ne ""){
-      my $changenumber=$iarec->{qtag}->{SOB_003}->{answer};
+   if (exists($iarec->{qtag}->{SOB_009}) &&
+       $iarec->{qtag}->{SOB_009}->{relevant} eq "1" &&
+       $iarec->{qtag}->{SOB_009}->{answer} ne ""){
+      my $changenumber=$iarec->{qtag}->{SOB_009}->{answer};
       if ($changenumber=~/^C\d+$/){
          $wf->SetFilter({srcid=>\$changenumber,srcsys=>'*change'});
          my ($wfrec,$msg)=$wf->getOnlyFirst(qw(eventend));
          if (defined($wfrec)){
-            my $qtag="SOB_004";
+            my $qtag="SOB_010";
             my $day=$wfrec->{eventend};
             $day=~s/ .*$//; # cut of time
             my ($y,$m,$d)=$day=~m/(\d+)-(\d+)-(\d+)/;
@@ -147,8 +135,8 @@ sub qcheckRecord
          }
          else{
             if (exists($rec->{interviewst}->{qStat}->{activeQuestions}->
-                       {qtag}->{SOB_003})){
-               my $msg="not existing Disaster-Recovery change number";
+                       {qtag}->{SOB_009})){
+               my $msg="not existing ClusterServiceSwitch change number";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
             }
@@ -156,65 +144,17 @@ sub qcheckRecord
       }
    }
    if (!exists(   # break, if answer on changenumber is not active
-        $rec->{interviewst}->{qStat}->{activeQuestions}->{qtag}->{SOB_003})){
+        $rec->{interviewst}->{qStat}->{activeQuestions}->{qtag}->{SOB_009})){
       return(undef);
    }
    if ($interviewchanged){
       $iarec=$self->readCurrentAnswers($ia,$rec);
    }
 
-   my $planday="";
-   if (defined($iarec->{qtag}->{SOB_005}) &&
-       $iarec->{qtag}->{SOB_005}->{relevant} eq "1"){
-      $planday=$iarec->{qtag}->{SOB_005}->{answer};
-   }
    my $lastday="";
-   if (defined($iarec->{qtag}->{SOB_004}) &&
-       $iarec->{qtag}->{SOB_004}->{relevant} eq "1"){
-      $lastday=$iarec->{qtag}->{SOB_004}->{answer};
-   }
-   $lastday=~s#/#.#g;
-   $planday=~s#/#.#g;
-   my $maxagedays=365;
-   if ($lastday ne "" && $rec->{soslanumdrtests}>0){
-      $maxagedays=365/$rec->{soslanumdrtests};
-      my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
-      if ($lday ne ""){
-         my $duration=CalcDateDuration(NowStamp("en"),$lday);
-         if (defined($duration) && $duration->{days}<($maxagedays*-1)){
-            my $msg="age of Disaster-Recovery Test violates SLA definition";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-         }
-      }
-   }
-   if ($lastday ne "" && $planday ne ""){
-      my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
-      my $pday=$wf->ExpandTimeExpression($planday,"en","GMT","GMT");
-      if ($lday ne "" && $pday ne ""){
-         my $duration=CalcDateDuration($lday,$pday);
-         if (defined($duration) && $duration->{days}<56){
-            my $msg="Disaster-Recovery Test plan date is bevor last test";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-         }
-      }
-      if ($#qmsg==-1 && $pday ne ""){
-         my $duration=CalcDateDuration(NowStamp("en"),$pday);
-         if (defined($duration) && $duration->{days}<(($maxagedays/2)*-1)){
-            my $msg="Disaster-Recovery Test plan date is in the past";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-         }
-      }
-      if ($#qmsg==-1 && $pday ne ""){
-         my $duration=CalcDateDuration(NowStamp("en"),$pday);
-         if (defined($duration) && $duration->{days}>$maxagedays){
-            my $msg="Disaster-Recovery Test plan date is to far in the future";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-         }
-      }
+   if (defined($iarec->{qtag}->{SOB_010}) &&
+       $iarec->{qtag}->{SOB_010}->{relevant} eq "1"){
+      $lastday=$iarec->{qtag}->{SOB_010}->{answer};
    }
 
 

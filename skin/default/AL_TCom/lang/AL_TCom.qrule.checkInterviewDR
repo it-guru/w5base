@@ -11,3 +11,9 @@
 'Disaster-Recovery Test plan date is to far in the future'=>{
  de=>'Disaster-Recovery Testdatum ist zu weit in der Zukunft'
 },
+'not existing Disaster-Recovery change number'=>{
+ de=>'nicht existierende Disaster-Recovery Changenummer'
+},
+'age of Disaster-Recovery Test violates SLA definition'=>{
+ de=>'Alter des letzten  Disaster-Recovery Test verletzt SLA vorgaben'
+},
