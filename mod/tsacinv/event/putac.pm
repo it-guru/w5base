@@ -197,10 +197,16 @@ sub mkAcFtpRecSystem
                     fCPUNumber=>$rec->{cpucount},
                     AssignmentGroup=>$cfmassign,
                     IncidentAG=>$inmassign,
-                    Model_Code=>'MGER033048',
-                    pSystemPartOfAsset=>$TXTpSystemPartOfAsset
+                    Model_Code=>'MGER033048'
                }
              };
+   #
+   # Wenn das Asset nicht Darwin "gehört", dann will die MU selbst den
+   # SystemPartOfAsset Wert definieren - ist zwar unlogisch - ist aber so (HV).
+   #
+   if ($arec->{srcsys} ne "W5Base"){
+      $acrec->{LogSys}->{pSystemPartOfAsset}=$TXTpSystemPartOfAsset;
+   }
 
    if ($rec->{mandator}=~m/^TelekomIT.*/){
       $acrec->{LogSys}->{SC_Location_ID}="4787.0000.0000";
@@ -250,7 +256,7 @@ sub SendXmlToAM_system
          if ($rec->{asset} ne ""){
             $acasset->ResetFilter();
             $acasset->SetFilter({assetid=>\$rec->{asset}});
-            my ($acassetrec,$msg)=$acasset->getOnlyFirst(qw(assetid));
+            my ($acassetrec,$msg)=$acasset->getOnlyFirst(qw(assetid srcsys));
             if (defined($acassetrec)){
                my $acftprec=$self->mkAcFtpRecSystem($acassetrec,$rec);
                if (defined($acftprec)){
