@@ -167,6 +167,7 @@ sub new
 
    );
    $self->setDefaultView(qw(loginname email username));
+   $self->{use_distinct}=0;
    return($self);
 }
 
