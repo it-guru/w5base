@@ -84,7 +84,8 @@ sub Result
 
    my $smflt={type=>$search_type,
               name=>'TIT.*.CHM*',
-              chmmgrgrp=>'!TIT.*'};
+              chmmgrgrp=>'!TIT.*',
+              phase=>'"40 Change Approval"'};
    my $approbj=$self->{approvereq};
    $approbj->ResetFilter();
    $approbj->SetFilter($smflt);

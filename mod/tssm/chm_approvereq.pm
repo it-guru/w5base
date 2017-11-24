@@ -79,6 +79,11 @@ sub new
                 uppersearch   =>1,
                 dataobjattr   =>SELpref.'cm3rm1.initial_impact'),
 
+      new kernel::Field::Text(
+                name          =>'phase',
+                selectfix     =>1,
+                label         =>'Current Phase',
+                dataobjattr   =>SELpref.'cm3rm1.current_phase'),
    );
 
    $self->setDefaultView(qw(linenumber changenumber groupname groupmailbox));
@@ -98,14 +103,29 @@ sub Initialize
 }
 
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_phase"))){
+     Query->Param("search_phase"=>'"40 Change Approval"');
+   }
+}
+
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where=SELpref."cm3ra7.tsi_approvals_manual is not null";
+   return($where);
+}
+
+
 sub getSqlFrom
 {
    my $self=shift;
    my $from=TABpref."cm3ra7 ".SELpref."cm3ra7 ".
             "join ".TABpref."cm3rm1 ".SELpref."cm3rm1 ".
-              "on (".SELpref."cm3rm1.dh_number=".SELpref."cm3ra7.dh_number ".
-                     "and ".
-                     SELpref."cm3rm1.current_phase like '40%')";
+              "on (".SELpref."cm3rm1.dh_number=".SELpref."cm3ra7.dh_number )";
    return($from);
 }
 
