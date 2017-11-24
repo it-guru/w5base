@@ -947,8 +947,19 @@ sub getHtmlEditElements
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
    }
    elsif ($irec->{questtyp} eq "date"){
+      my $lang=$self->Lang();
       my $txt="";
-      $txt=quoteHtml($answer->{answer}) if (defined($answer));
+      my $rawanswer;
+      $rawanswer=$answer->{answer} if (defined($answer)); 
+      if (my ($year,$month,$day)=$rawanswer=~m/^(\d+)-(\d+)-(\d+)$/){
+         if ($lang eq "de"){
+            $rawanswer="$day.$month.$year";
+         }
+         if ($lang eq "en"){
+            $rawanswer="$day/$month/$year";
+         }
+      }
+      $txt=quoteHtml($rawanswer);
       my $p="<input id=\"dateinput$irec->{id}\" style=\"width:100%\" ".
             "type=text $opmode name=answer value=\"".$txt."\">";
       if ($irec->{addquestdata} ne ""){
@@ -957,7 +968,6 @@ sub getHtmlEditElements
             "</td></tr></table>";
       }
       $HTMLanswer="<div style=\"width:100%;padding:1px;margin:0\">$p</div>";
-      my $lang=$self->Lang();
       $HTMLjs.="\$(\"#dateinput$irec->{id}\").datepicker(".
                "\$.extend({},\$.datepicker.regional['$lang']));\n";
    }

@@ -581,6 +581,21 @@ sub Store
 
    my ($write,$irec,$oldrec)=$self->getAnswerWriteState($i,$qid,
                                                         $parentid,$parentobj);
+   return(undef) if (!defined($irec));
+   if ($irec->{questtyp} eq "date"){
+      if ($vname eq "answer"){
+         # normalize date store format
+         if (my ($year,$month,$day)=$vval=~m/^(\d+)-(\d+)-(\d+)$/){
+            # format = OK
+         }
+         elsif (my ($day,$month,$year)=$vval=~m/^(\d+)\/(\d+)\/(\d+)$/){
+            $vval=$year."-".$month."-".$day;
+         }
+         elsif (my ($day,$month,$year)=$vval=~m/^(\d+)\.(\d+)\.(\d+)$/){
+            $vval=$year."-".$month."-".$day;
+         }
+      }
+   }
    if ($vname eq "comments" || $vname eq "answer" || 
        $vname eq "relevant" || $vname eq "lastverify"){
       if ($write){
