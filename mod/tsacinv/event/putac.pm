@@ -204,7 +204,7 @@ sub mkAcFtpRecSystem
    # Wenn das Asset nicht Darwin "gehört", dann will die MU selbst den
    # SystemPartOfAsset Wert definieren - ist zwar unlogisch - ist aber so (HV).
    #
-   if ($arec->{srcsys} ne "W5Base"){
+   if ($arec->{srcsys} eq "W5Base"){
       $acrec->{LogSys}->{pSystemPartOfAsset}=$TXTpSystemPartOfAsset;
    }
 
