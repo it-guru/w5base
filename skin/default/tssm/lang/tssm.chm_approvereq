@@ -4,3 +4,4 @@
 'Change No.'=>{de=>'Changenummer'},
 'Changemanager group'=>{de=>'Changemanager Gruppe'},
 'Change Type (CBI)'=>{de=>'Change Typ (CBI)'},
+'Current Phase'=>{de=>'aktuelle Phase'},

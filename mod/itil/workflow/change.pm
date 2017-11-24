@@ -512,12 +512,6 @@ sub isChangeManager
                                               ["RCHManager",
                                                "RCHManager2",
                                                "RCHOperator"],"down"));
-   
-   #if ($self->getParent->IsMemberOf("admin") &&
-   #    defined($WfRec->{applicationid})) {
-   #   return(1);
-   #}
-
    return(0);
 }
 

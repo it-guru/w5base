@@ -70,15 +70,12 @@ sub getPosibleActions
 {
    my $self=shift;
    my $WfRec=shift;
+
    my @l=$self->SUPER::getPosibleActions($WfRec);
-
-   return(@l) if (!$self->isChangeManager($WfRec));
-
+   my $isChmgr=$self->isChangeManager($WfRec);
    my $phase=$WfRec->{additional}{ServiceManagerPhase}[0];
-   my $approvalstate=$WfRec->{additional}{ServiceManagerApprovalState}[0];
-   my $chmmgr=$self->chmAuthority($WfRec);
 
-   if ($phase=~m/^30/ && $chmmgr eq 'TIT') {
+   if ($phase=~m/^30/ && $self->notifyValid($WfRec,'confirm')) {
       my $state=$self->getNotifyConfirmState();
       my $smtask=getModuleObject($self->Config,'tssm::chmtask');
       $smtask->SetFilter({changenumber=>\$WfRec->{srcid},
@@ -88,7 +85,12 @@ sub getPosibleActions
       push(@l,'chmnotifyconfirm') if (defined($rec));
    }
 
+   return(@l) if (!$isChmgr);
+
    if ($phase=~m/^40/) {
+      my $approvalstate=$WfRec->{additional}{ServiceManagerApprovalState}[0];
+      my $chmmgr=$self->chmAuthority($WfRec);
+
       my @notifies=grep({$_->{name} eq 'sendchangeinfo' &&
                          $_->{comments}=~/^Approval request sent/}
                          @{$WfRec->{shortactionlog}});
@@ -243,11 +245,20 @@ sub getNotifyDestinations
 
       $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVchangeinfobyfunction',
                              '100000004',\@tobyfunc,default=>1);
+#printf STDERR ("fifi to=%s req=%s\n",Dumper($emailto),Dumper(\@tobyfunc));
+#printf STDERR ("fifi cc=%s req=%s\n",Dumper($emailcc),Dumper(\@ccbyfunc));
    }
 
    if ($mode eq 'confirm') {
       my $state=$self->getNotifyConfirmState();
       my @infogrps=$self->getImplementorGrp($WfRec,'"'.$state.'"');
+
+      if ($self->chmAuthority($WfRec) ne 'TIT') {
+         # only TelIT-Implementer will be informed about non-TelIT changes
+         @infogrps=grep(/^TIT\./,@infogrps);
+      }
+      return(undef) if ($#infogrps==-1);
+
       my @appmail=$self->getNotifyDestinationsFromSMGroups(\@infogrps);
 
       foreach my $email (@appmail) {
@@ -275,9 +286,6 @@ sub getNotifyDestinations
       }
    }
   
-#printf STDERR ("fifi to=%s req=%s\n",Dumper($emailto),Dumper(\@tobyfunc));
-#printf STDERR ("fifi cc=%s req=%s\n",Dumper($emailcc),Dumper(\@ccbyfunc));
-
    return(undef);
 }
 
@@ -290,7 +298,8 @@ sub notifyValid
 
    my $phase=$WfRec->{additional}{ServiceManagerPhase}[0];
 
-   if ($phase=~m/^30/) {
+   if ($phase=~m/^30/ &&
+       ($mode eq 'all' || $mode eq 'confirm')) {
       return(1) if ($self->isChangeManager($WfRec));
 
       my $userid=$self->getParent->getCurrentUserId();
@@ -630,7 +639,7 @@ sub generateMailSet
 
          $chminfo=$self->getParsedTemplate(
                      "tmpl/ext.changenotify.".
-                      "$notifymode.$publishmode.$authority",
+                      "$notifymode.$publishmode.TIT",
                      {skinbase=>'TS',
                       static=>{pending=>$pendingtxt,
                                note=>$note}
@@ -647,7 +656,7 @@ sub generateMailSet
          my $tasklist=$self->formatTaskList($taskdetails);
 
          $chminfo=$self->getParsedTemplate(
-                     "tmpl/ext.changenotify.$notifymode.$authority",
+                     "tmpl/ext.changenotify.$notifymode.TIT",
                      {skinbase=>'TS',
                       static=>{taskstatus=>$taskstate,
                                tasklist=>$tasklist,
