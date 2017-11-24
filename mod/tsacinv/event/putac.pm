@@ -171,7 +171,7 @@ sub mkAcFtpRecSystem
 
    my $s=getModuleObject($self->Config,"itil::system");
    $s->SetFilter({asset=>\$rec->{asset},
-                  cistatusid=>[3,4,5]});
+                  cistatusid=>"<6"});
    my @l=$s->getHashList(qw(id));
 
    my $nsys=$#l+1;
