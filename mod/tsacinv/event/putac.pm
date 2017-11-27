@@ -181,6 +181,11 @@ sub mkAcFtpRecSystem
    my $pSystemPartOfAsset=1/$nsys;
    my $TXTpSystemPartOfAsset=sprintf("%0.2lf",$pSystemPartOfAsset);
 
+
+   my $memory=$rec->{memory};
+   $memory="1" if ($memory eq "");
+   my $cpucount=$rec->{cpucount};
+   $cpucount="1" if ($cpucount eq "");
  	
    my $acrec={
                LogSys=>{
@@ -193,8 +198,8 @@ sub mkAcFtpRecSystem
                     Usage=>"SERVER",
                     OlaClassSystem=>"FC-ONLY",
                     bDelete=>'0',
-                    lMemorySizeMb=>$rec->{memory},
-                    fCPUNumber=>$rec->{cpucount},
+                    lMemorySizeMb=>$memory,
+                    fCPUNumber=>$cpucount,
                     AssignmentGroup=>$cfmassign,
                     IncidentAG=>$inmassign,
                     Model_Code=>'MGER033048'
