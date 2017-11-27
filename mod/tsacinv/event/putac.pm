@@ -338,6 +338,10 @@ sub mkAcFtpRecAsset
    if ($rec->{room} ne ""){
       $place=$rec->{room}.$place;
    }
+   my $cpucount=$rec->{cpucount};
+   $cpucount="1" if ($cpucount eq "");
+   my $cpuspeed=$rec->{cpuspeed};
+   $cpuspeed="1" if ($cpuspeed eq "");
 	
    my $acrec={
                Asset=>{
@@ -347,14 +351,15 @@ sub mkAcFtpRecAsset
                     Security_Unit=>"TS.DE",
                     Status=>"in work",
                     Usage=>"HOUSING",
+                    CPUType=>'[NULL]',
                     SerialNo=>$rec->{serialno},
-                    ICPUNumber=>$rec->{cpucount},
-                    ICPUspeedMhz=>$rec->{cpuspeed},
+                    lCPUNumber=>$cpucount,
+                    lCPUspeedMhz=>$cpuspeed,
                     Remarks=>$rec->{comments},
                     BriefDescription=>$rec->{kwords},
                     Place=>$place,
                     SlotNo=>$rec->{rack},
-                    Description=>$rec->{comments},
+                    Remarks=>$rec->{comments},
                     Security_Unit=>"TS.DE",
                     bDelete=>'0',
                     Location_Code=>$locmap{$rec->{locationid}},
