@@ -324,7 +324,7 @@ sub mkAcFtpRecAsset
          foreach my $r (@l){
             if (ref($r->{w5locid}) eq "ARRAY" &&
                 in_array($r->{w5locid},$rec->{locationid})){
-               $locmap{$rec->{locationid}}=$r->{fullname};
+               $locmap{$rec->{locationid}}=$r->{code};
             }
          }
       }
@@ -348,8 +348,8 @@ sub mkAcFtpRecAsset
                     Status=>"in work",
                     Usage=>"HOUSING",
                     SerialNo=>$rec->{serialno},
-                    lCPUNumber=>$rec->{cpucount},
-                    CPUspeedMhz=>$rec->{cpuspeed},
+                    ICPUNumber=>$rec->{cpucount},
+                    ICPUspeedMhz=>$rec->{cpuspeed},
                     Remarks=>$rec->{comments},
                     BriefDescription=>$rec->{kwords},
                     Place=>$place,
@@ -357,7 +357,7 @@ sub mkAcFtpRecAsset
                     Description=>$rec->{comments},
                     Security_Unit=>"TS.DE",
                     bDelete=>'0',
-                    Location=>$locmap{$rec->{locationid}},
+                    Location_Code=>$locmap{$rec->{locationid}},
                     AssignmentGroup=>$cfmassign,
                     IncidentAG=>$inmassign,
                     Model_Code=>'MGER033048'
