@@ -50,11 +50,11 @@ sub patchMigDRClust
    # System operation
    #
    $appl->SetFilter({cistatusid=>"<6"});
-   $appl->SetFilter({name=>"W5*"});
+  # $appl->SetFilter({name=>"W5*"});
    $appl->SetCurrentView(qw(name id olastdrtestwf solastdrdate 
                             solastclusttestwf solastclustswdate));
    #$sys->SetNamedFilter("X",{name=>'!ab1*'});
-   $appl->Limit(10,0,0);
+  # $appl->Limit(10,0,0);
    my ($rec,$msg)=$appl->getFirst();
    if (defined($rec)){
       do{
