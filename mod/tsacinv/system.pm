@@ -243,6 +243,12 @@ sub new
                 dataobjattr   =>'"altname"'),
 
       new kernel::Field::Text(
+                name          =>'norsolutionclass',
+                label         =>'NORSolutionClass',
+                group         =>'form',
+                dataobjattr   =>'"norsolutionclass"'),
+
+      new kernel::Field::Text(
                 name          =>'securityset',
                 label         =>'security set',
                 ignorecase    =>1,

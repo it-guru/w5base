@@ -366,6 +366,14 @@ CREATE or REPLACE VIEW system AS
          '++VS+','VS',     '+GS+','GS',
          '+GS++','GS',     '++GS+','GS',
          'NONE')                                     AS "securitymodel",
+      (select amfvportfolio.valstring
+       from AM2107.amfvportfolio
+          join AM2107.amfeature
+             on amfvportfolio.lfeatid=amfeature.lfeatid
+          where amfeature.sqlname like 'TSI_NORSolutionClass'
+              and amfvportfolio.lportfolioitemid=
+                  amportfolio.lportfolioitemid
+      )                                              AS "norsolutionclass",
       amcomputer.addsysname                          AS "altname",
       amportfolio.securityset                        AS "securityset",
       amcomputer.itotalnumberofcores                 AS "systemcpucount",
