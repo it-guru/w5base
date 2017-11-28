@@ -350,6 +350,12 @@ sub new
                 dataobjattr   =>'"rawsystemolaclass"'),
 
       new kernel::Field::Text(
+                name          =>'operationcategory',
+                htmldetail    =>0,
+                label         =>'Operation Category',
+                dataobjattr   =>'"opcategory"'),
+
+      new kernel::Field::Text(
                 name          =>'priority',
                 label         =>'Priority of system',
                 dataobjattr   =>'"priority"'),

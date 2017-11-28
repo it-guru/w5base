@@ -380,6 +380,7 @@ CREATE or REPLACE VIEW system AS
       amcomputer.psystempartofasset                  AS "partofasset",
       amcomputer.psystempartofasset * 100            AS "nativepartofasset",
       amcomputer.olaclasssystem                      AS "systemola",
+      amcomputer.operationcategory                   AS "opcategory",
       amcomputer.seappcom                            AS "systemolaclass",
       decode ( amcomputer.seappcom,
          '0','UNDEFINED',    '4','UNIVERSAL',
