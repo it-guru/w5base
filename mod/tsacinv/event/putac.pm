@@ -186,6 +186,8 @@ sub mkAcFtpRecSystem
    $memory="1" if ($memory eq "");
    my $cpucount=$rec->{cpucount};
    $cpucount="1" if ($cpucount eq "");
+
+   my @acrec;
  	
    my $acrec={
                LogSys=>{
@@ -197,6 +199,7 @@ sub mkAcFtpRecSystem
                     Name=>$rec->{name},
                     Usage=>"SERVER",
                     OlaClassSystem=>"FC-ONLY",
+                    OperatingSystem=>"z CFCC 18",
                     bDelete=>'0',
                     lMemorySizeMb=>$memory,
                     fCPUNumber=>$cpucount,
@@ -217,10 +220,29 @@ sub mkAcFtpRecSystem
       $acrec->{LogSys}->{SC_Location_ID}="4787.0000.0000";
    }
    else{
-      return(undef);
+      return();
    }
    $acrec->{LogSys}->{Parent_Assettag}=$arec->{assetid};
-   return($acrec);
+
+   push(@acrec,$acrec);
+
+   my $ac2rec=\%{$acrec};
+   delete($ac2rec->{LogSys}->{Status});
+   push (@acrec,$ac2rec);
+
+
+   my $ac3rec={
+               LogSys=>{
+                    EventID=>$CurrentEventId,
+                    ExternalSystem=>'W5Base',
+                    ExternalID=>$rec->{id},
+                    Status=>"in operation",
+                    OperatingSystem=>"[NULL]",
+               }
+             };
+   push (@acrec,$ac3rec);
+
+   return(@acrec);
 }
 
 sub SendXmlToAM_system
@@ -263,12 +285,13 @@ sub SendXmlToAM_system
             $acasset->SetFilter({assetid=>\$rec->{asset}});
             my ($acassetrec,$msg)=$acasset->getOnlyFirst(qw(assetid srcsys));
             if (defined($acassetrec)){
-               my $acftprec=$self->mkAcFtpRecSystem($acassetrec,$rec);
-               if (defined($acftprec)){
-                  my $fh=$fh{system};
-                  print $fh hash2xml($acftprec,{header=>0});
-                  $acnew++;
-               }
+               foreach my $acftprec ($self->mkAcFtpRecSystem($acassetrec,$rec)){
+		       if (defined($acftprec)){
+			  my $fh=$fh{system};
+			  print $fh hash2xml($acftprec,{header=>0});
+			  $acnew++;
+		       }
+	       }
             }
          }
          
