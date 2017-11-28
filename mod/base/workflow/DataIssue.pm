@@ -223,7 +223,65 @@ sub DataIssueCompleteWriteRequest
 }
 
 
+sub setClearingDestinations
+{
+   my $self=shift;
+   my $newrec=shift;
+   my $mandator=shift;
 
+   my $clearinggrpname='ConfigMgmtClearing';
+   my $clearinggrpvalid=0;
+
+   my $grp=getModuleObject($self->Config,'base::grp');
+   $grp->SetFilter({fullname=>\$clearinggrpname,cistatusid=>4});
+   my ($clearinggrp,$msg)=$grp->getOnlyFirst(qw(grpid));
+
+   if (defined($clearinggrp)) {
+      my @clearingcontacts=$self->getMembersOf($clearinggrp->{grpid},
+                                               ["RMember"]);
+      if ($#clearingcontacts!=-1) {
+         $newrec->{fwdtarget}='base::grp';
+         $newrec->{fwdtargetid}=$clearinggrp->{grpid};
+         $clearinggrpvalid=1;
+      }
+   }
+
+   if (!$clearinggrpvalid) {
+
+      return(0) if (!defined($mandator));
+
+      # now search a Config-Manager
+      my @confmgr=$self->getMembersOf($mandator,["RCFManager"]);
+      {  # add posible deputies
+         my @confmgr2=$self->getMembersOf($mandator,["RCFManager2"]);
+         foreach my $uid (@confmgr2){
+            if (!in_array(\@confmgr,$uid)){
+               push(@confmgr,$uid);
+            }
+         }
+      }
+      if ($#confmgr==-1){
+         my @cf1=$self->getMembersOf($mandator,["RCFManager"],"up");
+         if ($#cf1!=-1){
+            push(@confmgr,$cf1[0]);
+         }
+         my @cf2=$self->getMembersOf($mandator,["RCFManager2"],"up");
+         push(@confmgr,@cf2);
+      }
+      my $cfmgr1=shift(@confmgr);
+      my $cfmgr2=shift(@confmgr);
+      if ($cfmgr1 ne ""){
+         $newrec->{fwdtarget}="base::user";
+         $newrec->{fwdtargetid}=$cfmgr1;
+      }
+      if ($cfmgr2 ne ""){
+         $newrec->{fwddebtarget}="base::user";
+         $newrec->{fwddebtargetid}=$cfmgr2;
+      }
+   }
+
+   return(1);
+}
 
 
 sub IsModuleSelectable

@@ -143,20 +143,9 @@ sub DataIssueCompleteWriteRequest
             $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};
             if (!defined($newrec->{fwdtargetid}) ||
                  $newrec->{fwdtargetid} eq ""){
-               # now search a Config-Manager
-               my @confmgr=$self->getParent->getMembersOf(
-                              $confrec->{mandatorid},
-                              ["RCFManager","RCFManager2"]);
-               my $cfmgr1=shift(@confmgr);
-               my $cfmgr2=shift(@confmgr);
-               if ($cfmgr1 ne ""){
-                  $newrec->{fwdtarget}="base::user";
-                  $newrec->{fwdtargetid}=$cfmgr1;
-               }
-               if ($cfmgr2 ne ""){
-                  $newrec->{fwddebtarget}="base::user";
-                  $newrec->{fwddebtargetid}=$cfmgr2;
-               }
+               $self->getParent->setClearingDestinations(
+                                    $newrec,
+                                    $confrec->{mandatorid});
             }
          }
          if ($confrec->{mandator} ne ""){

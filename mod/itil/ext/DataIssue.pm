@@ -163,42 +163,9 @@ sub DataIssueCompleteWriteRequest
             $newrec->{kh}->{mandatorid}=$confrec->{mandatorid};
             if (!defined($newrec->{fwdtargetid}) ||
                  $newrec->{fwdtargetid} eq ""){
-               # now search a Config-Manager
-               my @confmgr=$self->getParent->getMembersOf(
-                              $confrec->{mandatorid},
-                              ["RCFManager"]);
-               {  # add posible deputies
-                  my @confmgr2=$self->getParent->getMembersOf(
-                                 $confrec->{mandatorid},
-                                 ["RCFManager2"]);
-                  foreach my $uid (@confmgr2){
-                     if (!in_array(\@confmgr,$uid)){
-                        push(@confmgr,$uid);
-                     }
-                  }
-               }
-               if ($#confmgr==-1){
-                  my @cf1=$self->getParent->getMembersOf(
-                              $confrec->{mandatorid},
-                              ["RCFManager"],"up");
-                  if ($#cf1!=-1){
-                     push(@confmgr,$cf1[0]);
-                  }
-                  my @cf2=$self->getParent->getMembersOf(
-                              $confrec->{mandatorid},
-                              ["RCFManager2"],"up");
-                  push(@confmgr,@cf2);
-               }
-               my $cfmgr1=shift(@confmgr);
-               my $cfmgr2=shift(@confmgr);
-               if ($cfmgr1 ne ""){
-                  $newrec->{fwdtarget}="base::user";
-                  $newrec->{fwdtargetid}=$cfmgr1;
-               }
-               if ($cfmgr2 ne ""){
-                  $newrec->{fwddebtarget}="base::user";
-                  $newrec->{fwddebtargetid}=$cfmgr2;
-               }
+               $self->getParent->setClearingDestinations(
+                                    $newrec,
+                                    $confrec->{mandatorid});
             }
          }
          if ($confrec->{mandator} ne ""){
