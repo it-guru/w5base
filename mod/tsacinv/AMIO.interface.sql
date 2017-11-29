@@ -1202,8 +1202,7 @@ CREATE or REPLACE VIEW sclocation AS
    FROM AM2107.amtsisclocations
       JOIN sclocation_acl
          ON amtsisclocations.ltsisclocationsid=sclocation_acl.id
-   WHERE amtsisclocations.sclocationid not like '8%' and 
-         amtsisclocations.sclocationid not like 'S%';
+   WHERE amtsisclocations.sclocationid like '1%';
 
 grant select on sclocation to public;
 
