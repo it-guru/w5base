@@ -1816,9 +1816,10 @@ grant select on contract to public;
 
 CREATE or REPLACE VIEW itfarmsystem_acl AS
    SELECT DISTINCT sys.litemid id
-   FROM AM2107.amcomputer sys 
-      JOIN system on 
-         sys.assettag=system."systemid";
+   FROM AM2107.amcomputer sys
+      JOIN system_acl_l1 on
+         sys.assettag=system_acl_l1.id
+   WHERE system_acl_l1.ifuser=sys_context('USERENV', 'SESSION_USER');
 
 CREATE or REPLACE VIEW itfarmsystem AS
    SELECT DISTINCT sys.litemid                       AS "lsysid",
