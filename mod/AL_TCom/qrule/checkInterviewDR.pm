@@ -197,6 +197,7 @@ sub qcheckRecord
             my $msg="Disaster-Recovery Test plan date is bevor last test";
             push(@qmsg,$msg);
             push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
          }
       }
       if ($#qmsg==-1 && $pday ne ""){
@@ -205,6 +206,7 @@ sub qcheckRecord
             my $msg="Disaster-Recovery Test plan date is in the past";
             push(@qmsg,$msg);
             push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
          }
       }
       if ($#qmsg==-1 && $pday ne ""){
@@ -213,6 +215,7 @@ sub qcheckRecord
             my $msg="Disaster-Recovery Test plan date is to far in the future";
             push(@qmsg,$msg);
             push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
          }
       }
    }

@@ -281,7 +281,7 @@ sub addDesasterRecoveryClassFields
    $self->AddFields(
       new kernel::Field::Select(
                 name          =>'drclass',
-                group         =>'monisla',
+                group         =>'sodrgroup',
                 label         =>'Disaster Recovery Class',
                 transprefix   =>'DR.',
                 value         =>['',
@@ -299,7 +299,7 @@ sub addDesasterRecoveryClassFields
 
       new kernel::Field::Select(
                 name          =>'rtolevel',
-                group         =>'monisla',
+                group         =>'sodrgroup',
                 label         =>'RTO Recovery Time Objective',
                 readonly      =>1,
                 transprefix   =>'RTO.',
@@ -323,7 +323,7 @@ sub addDesasterRecoveryClassFields
 
       new kernel::Field::Select(
                 name          =>'rpolevel',
-                group         =>'monisla',
+                group         =>'sodrgroup',
                 label         =>'RPO Recovery Point Objective',
                 readonly      =>1,
                 transprefix   =>'RPO.',
@@ -348,7 +348,7 @@ sub addDesasterRecoveryClassFields
 
       new kernel::Field::Text(
                 name          =>'drc',
-                group         =>'monisla',
+                group         =>'sodrgroup',
                 label         =>'DR Class',
                 htmldetail    =>0,
                 uivisible     =>0,
@@ -356,7 +356,7 @@ sub addDesasterRecoveryClassFields
 
       new kernel::Field::Text(
                 name          =>'rto',
-                group         =>'monisla',
+                group         =>'sodrgroup',
                 label         =>'RTO',
                 htmldetail    =>0,
                 readonly      =>1,
@@ -374,7 +374,7 @@ sub addDesasterRecoveryClassFields
 
       new kernel::Field::Text(
                 name          =>'rpo',
-                group         =>'monisla',
+                group         =>'sodrgroup',
                 label         =>'RPO',
                 depend        =>['drc'],
                 htmldetail    =>0,

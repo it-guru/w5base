@@ -1640,3 +1640,4 @@ create table asset_tstamp (
   FOREIGN KEY fk_tstamp_asset (refid) 
   REFERENCES asset (id) ON DELETE CASCADE
 );
+alter table appl add soslanumclusttests    float(2) default '0.0';

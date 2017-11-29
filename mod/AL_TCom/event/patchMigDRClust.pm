@@ -51,7 +51,7 @@ sub patchMigDRClust
    #
    $appl->SetFilter({cistatusid=>"<6"});
   # $appl->SetFilter({name=>"W5*"});
-   $appl->SetCurrentView(qw(name id olastdrtestwf solastdrdate 
+   $appl->SetCurrentView(qw(name id olastdrtestwf solastdrdate socomments
                             solastclusttestwf solastclustswdate));
    #$sys->SetNamedFilter("X",{name=>'!ab1*'});
   # $appl->Limit(10,0,0);
@@ -89,7 +89,6 @@ sub patchRecord
          if (defined($iarec)){
             if ($iarec->{answer} ne $wfrec->{srcid} ||
                 $iarec->{relevant} eq "0"){
-               print STDERR Dumper($iarec);
                # update old answer rec
                $self->{ia}->ValidatedUpdateRecord(
                   $iarec,
@@ -111,6 +110,39 @@ sub patchRecord
          }
       }
    }
+   if ($rec->{socomments} ne ""){
+      my $qtag="SOB_004";
+      $self->{ia}->ResetFilter();
+      $self->{ia}->SetFilter({qtag=>\$qtag,
+                              parentid=>\$rec->{id},
+                              parentobj=>\'itil::appl'});
+      my ($iarec,$msg)=$self->{ia}->getOnlyFirst(qw(ALL));
+      if (defined($iarec)){
+         if ($iarec->{comments} ne $rec->{socomments} ||
+             $iarec->{relevant} eq "0"){
+            # update old answer rec
+            $self->{ia}->ValidatedUpdateRecord(
+               $iarec,
+               {
+                   relevant=>1,
+                   comments=>$rec->{socomments}
+               },{id=>$iarec->{id}});
+         }
+      }
+      else{
+         $self->{ia}->ValidatedInsertRecord(
+            {
+                parentid=>$rec->{id},
+                parentobj=>'itil::appl',
+                interviewid=>$self->{intv}->{qtag}->{$qtag}->{id},
+                relevant=>1,
+                comments=>$rec->{socomments}
+            },{id=>$iarec->{id}});
+      }
+
+   }
+
+ 
 
 
    if ($rec->{solastclusttestwf} ne ""){   # handle last Cluster Switch test

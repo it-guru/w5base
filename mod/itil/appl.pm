@@ -1056,14 +1056,6 @@ sub new
                 dataobjattr   =>'appl.allowifupdate'),
 
       new kernel::Field::Boolean(
-                name          =>'sodefinition',
-                group         =>'control',
-                htmleditwidth =>'30%',
-                label         =>'Application switch-over behaviour defined',
-                selectfix     =>1,
-                dataobjattr   =>'appl.sodefinition'),
-
-      new kernel::Field::Boolean(
                 name          =>'isnosysappl',
                 group         =>'control',
                 htmleditwidth =>'30%',
@@ -1345,6 +1337,8 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'socomments',
+                searchable    =>0,
+                htmldetail    =>0,
                 group         =>'socomments',
                 label         =>'comments to switch-over behaviour',
                 searchable    =>0, 
@@ -1414,6 +1408,23 @@ sub new
                 vjoinon       =>['olastdrtestwfid'=>'id'],
                 vjoindisp     =>'eventend',
                 searchable    =>0),
+
+      new kernel::Field::Select(
+                name          =>'soslanumclusttests',
+                label         =>'SLA number Cluster-Switch test interval',
+                group         =>'soclustgroup',
+                htmleditwidth =>'220',
+                transprefix   =>'CLUSTTESTPERYEAR.',
+                value         =>[
+                                 '0.5',
+                                 '0.3',
+                                 '1',
+                                 '2',
+                                 '4',
+                                 '0'],
+                default       =>'0.5',
+                searchable    =>0,
+                dataobjattr   =>'appl.soslanumclusttests'),
 
       new kernel::Field::Number(
                 name          =>'soslaclustduration',
@@ -2309,9 +2320,6 @@ sub isViewValid
               soclustgroup socomments source swinstances systems applurl
               technical workflowbasedata header inmchm interview efforts
               functional);
-   if (!$rec->{sodefinition}){
-      @all=grep(!/^(socomments|soclustgroup|sodrgroup)$/,@all);
-   }
 
    return(@all);
 }

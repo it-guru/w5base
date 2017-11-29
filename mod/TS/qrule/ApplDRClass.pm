@@ -39,7 +39,7 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 Eine "Disaster Recovery Class" muss definiert sein.
 
 Bei "Disaster Recovery Class" >= 4 müssen
-"Definitionen zur Umschalt/Schwenk/Recovery Strategie"
+Definitionen zur Umschalt/Schwenk/Recovery Strategie
 vorhanden sein, die entsprechenden Datenfelder unter
 "Disaster-Recovery" müssen gepflegt werden und
 es muss mindstens 1 Disaster-Recovery Test alle 2Jahre zugesichert werden.
@@ -104,11 +104,6 @@ sub qcheckRecord
    }
 
    if ($rec->{drclass}>3) {
-      if (!$rec->{sodefinition}) {
-         my $msg="no Application switch-over behaviour defined";
-         return(3,{qmsg=>[$msg],dataissue=>[$msg]});
-      }
-
       if ($rec->{soslanumdrtests}<0.5) {
          my $msg="Minimum Disaster-Recovery test interval: ".
                  $self->T('DRTESTPERYEAR.0.5','itil::appl');

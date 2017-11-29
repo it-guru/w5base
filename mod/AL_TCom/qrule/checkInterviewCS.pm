@@ -139,6 +139,7 @@ sub qcheckRecord
                my $msg="not existing ClusterServiceSwitch change number";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
             }
          }
       }
@@ -155,6 +156,21 @@ sub qcheckRecord
    if (defined($iarec->{qtag}->{SOB_010}) &&
        $iarec->{qtag}->{SOB_010}->{relevant} eq "1"){
       $lastday=$iarec->{qtag}->{SOB_010}->{answer};
+   }
+
+   $lastday=~s#/#.#g;
+   my $maxagedays=365;
+   if ($lastday ne "" && $rec->{soslanumclusttests}>0){
+      $maxagedays=365/$rec->{soslanumclusttests};
+      my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
+      if ($lday ne ""){
+         my $duration=CalcDateDuration(NowStamp("en"),$lday);
+         if (defined($duration) && $duration->{days}<($maxagedays*-1)){
+            my $msg="age of ClusterServiceSwitch Test violates SLA definition";
+            push(@qmsg,$msg);
+            push(@dataissue,$msg);
+         }
+      }
    }
 
 
