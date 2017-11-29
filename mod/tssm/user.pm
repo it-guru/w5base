@@ -61,6 +61,12 @@ sub new
                 dataobjattr   =>SELpref.'operatorm1.name'),
 
       new kernel::Field::Text(
+                name          =>'userid',
+                label         =>'User-ID',
+                uppersearch   =>1,
+                dataobjattr   =>SELpref."contactsm1.user_id"),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 ignorecase    =>1,
@@ -75,6 +81,8 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'islogonuser',
                 label         =>'is real logon user',
+                searchable    =>0,
+                htmldetail    =>0,
                 group         =>'account',
                 selectfix     =>1,
                 upperserarch  =>1,
@@ -178,12 +186,6 @@ sub new
 #                label         =>'Source-System',
 #                dataobjattr   =>SELpref.'contactsm1.external_system'),
                                                 
-      new kernel::Field::Text(
-                name          =>'userid',
-                label         =>'User-ID',
-                upperserarch  =>1,
-                dataobjattr   =>SELpref."contactsm1.user_id"),
-
 #      new kernel::Field::Text(
 #                name          =>'srcid',
 #                group         =>'source',
@@ -250,8 +252,8 @@ sub initSearchQuery
    $user->SetFilter({userid=>\$userid});
    my ($urec,$msg)=$user->getOnlyFirst(qw(posix));
    if (defined($urec) && $urec->{posix} ne ""){
-      if (!defined(Query->Param("search_loginname"))){
-        Query->Param("search_loginname"=>$urec->{posix});
+      if (!defined(Query->Param("search_userid"))){
+        Query->Param("search_userid"=>$urec->{posix});
       }
    }
    if (!defined(Query->Param("search_islogonuser"))){
