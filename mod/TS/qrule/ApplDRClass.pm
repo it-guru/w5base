@@ -25,10 +25,9 @@ NONE
 
 A "Disaster Recovery Class" must be defined.
 
-On "Disaster Recovery Class" >= 4 the definitions of
-"Application switch-over behaviour" are mandatory,
-the fields under "Disaster-Recovery" have to be maintained and
-minimum 1 Disaster-Recovery test every 2 years has to be assured.
+On "Disaster Recovery Class" >= 4 the fields under "Disaster-Recovery" 
+have to be maintained and minimum 1 Disaster-Recovery test 
+every 2 years has to be assured.
 
 If you have any questions please contact the Darwin Support: 
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
@@ -38,11 +37,9 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 Eine "Disaster Recovery Class" muss definiert sein.
 
-Bei "Disaster Recovery Class" >= 4 müssen
-Definitionen zur Umschalt/Schwenk/Recovery Strategie
-vorhanden sein, die entsprechenden Datenfelder unter
-"Disaster-Recovery" müssen gepflegt werden und
-es muss mindstens 1 Disaster-Recovery Test alle 2Jahre zugesichert werden.
+Bei "Disaster Recovery Class" >= 4 müssen die entsprechenden Datenfelder 
+unter "Disaster-Recovery" gepflegt werden und es muss mindstens 
+1 Disaster-Recovery Test alle 2Jahre zugesichert werden.
 
 Bei Fragen wenden Sie sich bitte an den DARWIN Support:
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001

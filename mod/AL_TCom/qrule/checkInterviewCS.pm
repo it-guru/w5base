@@ -21,7 +21,7 @@ Checks and extends Interviews-Answers on ClusterServiceSwitch-Test topic.
 [de:]
 
 Prüft und erweitert die Interview-Antworten im Themenblock ClusterServiceSwitch-Test.
-Wenn die eingegebene Changenummber wie eine SM9 Changenummer aussieht,
+Wenn die eingegebene Changenummer wie eine SM9 Changenummer aussieht,
 dann wird das Datum des letzten ClusterService Switch Tests automatisch 
 aus dem Change entnommen und in die Antwort eingefügt.
 
@@ -169,6 +169,7 @@ sub qcheckRecord
             my $msg="age of ClusterServiceSwitch Test violates SLA definition";
             push(@qmsg,$msg);
             push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
          }
       }
    }

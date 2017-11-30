@@ -15,5 +15,5 @@
  de=>'nicht existierende Disaster-Recovery Changenummer'
 },
 'age of Disaster-Recovery Test violates SLA definition'=>{
- de=>'Alter des letzten  Disaster-Recovery Test verletzt SLA vorgaben'
+ de=>'Alter des letzten Disaster-Recovery Tests verletzt SLA-Vorgaben'
 },

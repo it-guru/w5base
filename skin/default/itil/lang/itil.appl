@@ -145,7 +145,7 @@
 'SOX state'=>{de=>'SOX (USA) status'},
 'Software-Depot path'=>{de=>'Software-Depot Pfad'},
 'invalid swdepot path spec'=>{de=>'ungültiger Software-Depot Pfad'},
-'SLA number Disaster-Recovery test interval'=>{de=>'SLA Anzahl zugesicherter Disaster-Recovery Test Intervall'},
+'SLA number Disaster-Recovery test interval'=>{de=>'SLA Anzahl zugesicherter Disaster-Recovery Tests'},
 'SLA number Disaster-Recovery tests per year'=>{de=>'SLA Anzahl zugesicherter Disaster-Recovery Tests pro Jahr'},
 'SLA planned Disaster-Recovery duration'=>{de=>'SLA geplante Dauer eines Disaster-Recoverys'},
 'last Disaster-Recovery test (CHM-WorkflowID)'=>{de=>'letzter Disaster-Recovery test (CHM-WorkflowID)'},

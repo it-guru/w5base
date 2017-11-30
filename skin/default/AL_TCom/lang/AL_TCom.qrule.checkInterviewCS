@@ -5,3 +5,6 @@
 'not existing ClusterServiceSwitch change number'=>{
  de=>'nicht existierende ClusterServiceSwitch Changenummer'
 },
+'age of ClusterServiceSwitch Test violates SLA definition'=>{
+ de=>'Alter des letzten ClusterService-Switch Tests verletzt SLA-Vorgaben'
+},
