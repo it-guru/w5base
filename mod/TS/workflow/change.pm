@@ -72,6 +72,9 @@ sub getPosibleActions
    my $WfRec=shift;
 
    my @l=$self->SUPER::getPosibleActions($WfRec);
+
+   return(@l) if (!defined($WfRec->{affectedapplicationid}));
+
    my $isChmgr=$self->isChangeManager($WfRec);
    my $phase=$WfRec->{additional}{ServiceManagerPhase}[0];
 

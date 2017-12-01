@@ -512,6 +512,15 @@ sub isChangeManager
                                               ["RCHManager",
                                                "RCHManager2",
                                                "RCHOperator"],"down"));
+
+   if ($WfRec->{mandator}->[0] eq 'none') { # mandator 'None'
+      my %grps=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+                                             ["RCHManager",
+                                              "RCHManager2",
+                                              "RCHOperator"],"direct");
+      return(1) if (keys(%grps)>0);
+   }
+
    return(0);
 }
 
