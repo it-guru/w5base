@@ -39,7 +39,51 @@ sub Init
 
    $self->RegisterEvent("acgroupcheck","acgroupcheck");
    $self->RegisterEvent("acusercheck","acusercheck");
+   $self->RegisterEvent("ecmdbcheck","ecmdbcheck");
    return(1);
+}
+
+sub ecmdbcheck
+{
+   my $self=shift;
+   my $ecmdbfarm=getModuleObject($self->Config,"tsadopt::vfarm");
+   my $amfarm=getModuleObject($self->Config,"tsacinv::itfarm");
+
+   $amfarm->ResetFilter({status=>'"!out of operation"'});
+   my @l=$amfarm->getHashList(qw(lfarmid name status));
+   my $afarm=$amfarm->getHashIndexed(qw(lfarmid name));
+   
+
+  # print Dumper(\@l);
+
+  # exit(0);
+
+   $ecmdbfarm->SetFilter({operational=>'1'});
+   open(LOG,">adobt-am-comp.log");
+
+
+   my $map={};
+
+   foreach my $rec ($ecmdbfarm->getHashList(qw(name id ))){
+      my $name=$rec->{name};
+      $name=uc($name);
+      msg(INFO,"check $name");
+      printf LOG ("%-40s",$name);
+      if (exists($afarm->{name}->{$name})){
+         printf LOG (" -> NOT FOUND in AssetManager\n");
+      #   $map->{fail}->{
+      }
+      else{
+         printf LOG ("\n");
+      }
+   }
+
+
+
+
+   close(LOG);
+
+   return({exitcode=>0});
 }
 
 sub acusercheck
