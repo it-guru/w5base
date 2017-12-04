@@ -37,71 +37,70 @@ sub new
                 name          =>'systemdiscoveryid',
                 group         =>'source',
                 label         =>'DiscoveryID',
-                dataobjattr   =>'amtsiautodiscovery.lautodiscoveryid'),
+                dataobjattr   =>'"systemdiscoveryid"'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 ignorecase    =>1,
                 label         =>'Systemname',
-                dataobjattr   =>'amtsiautodiscovery.name'),
+                dataobjattr   =>'"systemname"'),
 
       new kernel::Field::Link(
                 name          =>'fullname',
                 label         =>'Systemname',
-                dataobjattr   =>'amtsiautodiscovery.name'),
+                dataobjattr   =>'"fullname"'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
-                dataobjattr   =>'amtsiautodiscovery.assettag'),
+                dataobjattr   =>'"systemid"'),
 
       new kernel::Field::Text(
                 name          =>'model',
                 label         =>'Model',
-                dataobjattr   =>'amtsiautodiscovery.model'),
+                dataobjattr   =>'"model"'),
 
       new kernel::Field::Text(
                 name          =>'osrelease',
                 label         =>'OS-Release',
-                dataobjattr   =>'amtsiautodiscovery.os'),
+                dataobjattr   =>'"osrelease"'),
 
       new kernel::Field::Text(
                 name          =>'memory',
                 label         =>'Memory',
                 unit          =>'MB',
-                dataobjattr   =>'amtsiautodiscovery.lmemorymb'),
+                dataobjattr   =>'"memory"'),
 
       new kernel::Field::Text(
                 name          =>'physcpucount',
                 label         =>'phys CPU-Count',
-                dataobjattr   =>'amtsiautodiscovery.lcpucount'),
+                dataobjattr   =>'"physcpucount"'),
 
       new kernel::Field::Text(
                 name          =>'cputype',
                 label         =>'CPU-Type',
-                dataobjattr   =>'amtsiautodiscovery.cputype'),
+                dataobjattr   =>'"cputype"'),
 
       new kernel::Field::Text(
                 name          =>'cpuspeed',
                 label         =>'CPU-Speed',
                 unit          =>'MHz',
-                dataobjattr   =>'amtsiautodiscovery.lcpuspeedmhz'),
+                dataobjattr   =>'"cpuspeed"'),
 
       new kernel::Field::Text(
                 name          =>'independcpucount',
                 label         =>'indipendent CPU-Count',
-                dataobjattr   =>'amtsiautodiscovery.itotalnumberofcores'),
+                dataobjattr   =>'"independcpucount"'),
 
       new kernel::Field::Text(
                 name          =>'cpucount',
                 label         =>'CPU-Count',
-                dataobjattr   =>'amtsiautodiscovery.itotalnumberofcores*'.
-                                'amtsiautodiscovery.smt'),
+                dataobjattr   =>'"cpucount"'),
 
       new kernel::Field::Text(
                 name          =>'serialno',
                 label         =>'Serialnumber',
-                dataobjattr   =>'amtsiautodiscovery.serialno'),
+                dataobjattr   =>'"serialno"'),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
@@ -127,18 +126,18 @@ sub new
                 name          =>'scandate',
                 group         =>'source',
                 label         =>'Scandate',
-                dataobjattr   =>'amtsiautodiscovery.dtscandate'),
+                dataobjattr   =>'"scandate"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amtsiautodiscovery.source'),
+                dataobjattr   =>'"srcsys"'),
 
 
    );
    $self->{use_distinct}=0;
-
+    $self->setWorktable("autodiscsystem");
    $self->setDefaultView(qw(name systemid model scandate));
    return($self);
 }
@@ -220,23 +219,6 @@ sub initSearchQuery
    if (!defined(Query->Param("search_scandate"))){
      Query->Param("search_scandate"=>">now-14d");
    }
-}
-
-
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsiautodiscovery";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="";
-   return($where);
 }
 
 

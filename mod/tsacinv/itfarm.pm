@@ -36,26 +36,26 @@ sub new
                 name          =>'lfarmid',
                 label         =>'ITFarmID',
                 group         =>'source',
-                dataobjattr   =>'clu.litemid'),
+                dataobjattr   =>'"lfarmid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'350px',
                 label         =>'ITFarm-Name',
                 ignorecase    =>1,
-                dataobjattr   =>'cluportfolio.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'clusterid',
                 label         =>'ClusterID',
                 ignorecase    =>1,
-                dataobjattr   =>'clu.assettag'),
+                dataobjattr   =>'"clusterid"'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 ignorecase    =>1,
-                dataobjattr   =>'clu.status'),
+                dataobjattr   =>'"status"'),
 
       new kernel::Field::Text(
                 name          =>'farmassets',
@@ -115,6 +115,7 @@ sub new
 #
 
    );
+   $self->setWorktable("itfarm");
    $self->setDefaultView(qw(name clusterid status));
    return($self);
 }
@@ -144,44 +145,9 @@ sub initSearchQuery
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"\"!out of operation\"");
    }
-#   if (!defined(Query->Param("search_tenant"))){
-#     Query->Param("search_tenant"=>"CS");
-#   }
 }
 
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=<<EOF;
-amcomputer sys
-   join amportfolio sysportfolio 
-      on sysportfolio.lportfolioitemid=sys.litemid
-   join amportfolio assportfolio 
-      on assportfolio.Lportfolioitemid=sysportfolio.lparentid
-   join amasset ass
-      on assportfolio.assettag=ass.assettag
-   join amcomputer clu 
-      on sys.lparentid=clu.lcomputerid
-   join amportfolio cluportfolio 
-      on cluportfolio.assettag=clu.assettag
-
-EOF
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=<<EOF;
-sysportfolio.usage like 'OSY-_: KONSOLSYSTEM %'
-and sys.status<>'out of operation'
-EOF
-   return($where);
-}
-
-
 sub isQualityCheckValid
 {
    my $self=shift;

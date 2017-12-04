@@ -11,6 +11,8 @@
 'itu.ac.system'=>{de=>'System',en=>'System'},
 'itu.ac.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
 'itu.ac.system.swinstall'=>{de=>'Software-Inst.',en=>'Software-Inst.'},
+'itu.ac.system.lnksharednet'=>{de=>'Verkn. SharedNet',en=>'SharedNet rel.'},
+'itu.ac.system.lnksharedstorage'=>{de=>'Verkn. SharedStor',en=>'SharedStor rel.'},
 'itu.ac.license'=>{de=>'Lizenz',en=>'License'},
 'itu.ac.shstorage'=>{de=>'shared Storage',en=>'shared Storage'},
 'itu.ac.krn'=>{de=>'Stammdaten',en=>'Kerneldata'},

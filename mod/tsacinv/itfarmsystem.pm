@@ -35,12 +35,12 @@ sub new
       new kernel::Field::Id(
                 name          =>'lsysid',
                 label         =>'ITFarmSystemID',
-                dataobjattr   =>'sys.litemid'),
+                dataobjattr   =>'"lsysid"'),
 
       new kernel::Field::Link(
                 name          =>'lfarmid',
                 label         =>'ITFarmID',
-                dataobjattr   =>'clu.litemid'),
+                dataobjattr   =>'"lfarmid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -49,52 +49,34 @@ sub new
                 htmlwidth     =>'250',
                 weblinkto     =>'tsacinv::system',
                 weblinkon     =>['systemid'=>'systemid'],
-                dataobjattr   =>'sysportfolio.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
                 uppersearch   =>1,
-                dataobjattr   =>'sys.assettag'),
+                dataobjattr   =>'"systemid"'),
 
       new kernel::Field::Text(
                 name          =>'assetid',
                 label         =>'AssetID',
                 uppersearch   =>1,
-                dataobjattr   =>'ass.assettag'),
+                dataobjattr   =>'"assetid"'),
 
       new kernel::Field::Text(
                 name          =>'clusterid',
                 label         =>'ClusterID',
                 ignorecase    =>1,
-                dataobjattr   =>'clu.assettag'),
+                dataobjattr   =>'"clusterid"'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 ignorecase    =>1,
-                dataobjattr   =>'sys.status'),
-
-#      new kernel::Field::Interface(
-#                name          =>'replkeypri',
-#                group         =>'source',
-#                label         =>'primary sync key',
-#                dataobjattr   =>"assetmodel.dtlastmodif"),
-#
-#      new kernel::Field::Interface(
-#                name          =>'replkeysec',
-#                group         =>'source',
-#                label         =>'secondary sync key',
-#                dataobjattr   =>"lpad(assetmodel.lmodelid,35,'0')"),
-#
-#      new kernel::Field::Date(
-#                name          =>'mdate',
-#                group         =>'source',
-#                label         =>'Modification-Date',
-#                dataobjattr   =>'assetmodel.dtlastmodif'),
-#
+                dataobjattr   =>'"status"'),
 
    );
+   $self->setWorktable("itfarmsystem"); 
    $self->setDefaultView(qw(name systemid status));
    return($self);
 }
@@ -124,45 +106,9 @@ sub initSearchQuery
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"\"!out of operation\"");
    }
-#   if (!defined(Query->Param("search_tenant"))){
-#     Query->Param("search_tenant"=>"CS");
-#   }
 }
 
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=<<EOF;
-amcomputer con
-   join amportfolio conportfolio
-      on conportfolio.lportfolioitemid=con.litemid
-   join amportfolio assportfolio
-      on assportfolio.Lportfolioitemid=conportfolio.lparentid
-   join amasset ass
-      on assportfolio.assettag=ass.assettag
-   join amcomputer clu
-      on con.lparentid=clu.lcomputerid
-   join amportfolio sysportfolio
-      on assportfolio.Lportfolioitemid=sysportfolio.lparentid
-   join amcomputer sys
-      on sysportfolio.lportfolioitemid=sys.litemid
-EOF
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=<<EOF;
-conportfolio.usage like 'OSY-_: KONSOLSYSTEM %'
-and sysportfolio.usage not like 'OSY-_: KONSOLSYSTEM %'
-and clu.litemid<>'0'
-EOF
-   return($where);
-}
-
 sub isQualityCheckValid
 {
    my $self=shift;

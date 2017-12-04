@@ -123,6 +123,7 @@ sub qcheckRecord
       status=>'"in operation"',
       systemola=>'!*ONLY',
       conumber=>\$co,
+      deleted=>\'0',
       customerlink=>'DTAG.* DTAG'
    });
    my @soll=$o->getHashList(qw(systemname systemid));

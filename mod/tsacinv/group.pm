@@ -41,39 +41,39 @@ sub new
                 label         =>'Code',
                 ignorecase    =>1,
                 searchable    =>0,
-                dataobjattr   =>'amemplgroup.barcode'),
+                dataobjattr   =>'"code"'),
 
       new kernel::Field::Id(
                 name          =>'lgroupid',
                 label         =>'LGroup ID',
-                dataobjattr   =>'amemplgroup.lgroupid'),
+                dataobjattr   =>'"lgroupid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 size          =>'20',
                 ignorecase    =>1,
-                dataobjattr   =>'amemplgroup.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Name',
                 uivisible     =>0,
                 size          =>'20',
-                dataobjattr   =>'amemplgroup.name'),
+                dataobjattr   =>'"fullname"'),
 
       new kernel::Field::Boolean(
                 name          =>'deleted',
                 readonly      =>1,
                 label         =>'marked as delete',
-                dataobjattr   =>'amemplgroup.bdelete'),
+                dataobjattr   =>'"deleted"'),
 
       new kernel::Field::Text(
                 name          =>'phone',
                 label         =>'Phone',
                 size          =>'20',
                 ignorecase    =>1,
-                dataobjattr   =>'amemplgroup.phone'),
+                dataobjattr   =>'"phone"'),
 
       new kernel::Field::TextDrop(
                 name          =>'parent',
@@ -115,39 +115,41 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'parentid',
-                dataobjattr   =>'amemplgroup.lparentid'),
+                dataobjattr   =>'"parentid"'),
                                                 
       new kernel::Field::Link(
                 name          =>'supervid',
-                dataobjattr   =>'amemplgroup.lsupervid'),
+                dataobjattr   =>'"supervid"'),
                                                 
       new kernel::Field::Text(
                 name          =>'scgoupid',
                 group         =>'control',
                 htmldetail    =>0,
                 label         =>'ServiceCenter-GroupID',
-                dataobjattr   =>'amemplgroup.lscgroupid'),
+                dataobjattr   =>'"scgoupid"'),
                                                 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amemplgroup.externalsystem'),
+                dataobjattr   =>'"srcsys"'),
                                                 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'amemplgroup.externalid'),
+                dataobjattr   =>'"srcid"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'amemplgroup.dtlastmodif'),
+                dataobjattr   =>'"mdate"'),
 
    );
    $self->setDefaultView(qw(lgroupid name supervisor srcsys srcid));
+   $self->setWorktable("grp");
+
    return($self);
 }
 
@@ -178,21 +180,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/group.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=
-      "amemplgroup";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amemplgroup.lgroupid<>0";
-   return($where);
-}
 
 sub isViewValid
 {

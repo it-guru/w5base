@@ -29,23 +29,23 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->{use_distinct}=1;
+   $self->{use_distinct}=0;
    
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'lconsid',
                 label         =>'ITFarmAssetID',
-                dataobjattr   =>'assportfolio.lportfolioitemid'),
+                dataobjattr   =>'"lconsid"'),
 
       new kernel::Field::Link(
                 name          =>'lfarmid',
                 label         =>'ITFarmID',
-                dataobjattr   =>'clu.litemid'),
+                dataobjattr   =>'"lfarmid"'),
 
       new kernel::Field::Link(
                 name          =>'locationid',
                 label         =>'LocationID',
-                dataobjattr   =>'assportfolio.llocaid'),
+                dataobjattr   =>'"locationid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -53,7 +53,7 @@ sub new
                 weblinkto     =>'tsacinv::asset',
                 weblinkon     =>['name'=>'assetid'],
                 ignorecase    =>1,
-                dataobjattr   =>'ass.assettag'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Import( $self,
                 weblinkto     =>'tsacinv::location',
@@ -67,28 +67,9 @@ sub new
                 name          =>'status',
                 label         =>'Status',
                 ignorecase    =>1,
-                dataobjattr   =>'ass.status'),
-
-#      new kernel::Field::Interface(
-#                name          =>'replkeypri',
-#                group         =>'source',
-#                label         =>'primary sync key',
-#                dataobjattr   =>"assetmodel.dtlastmodif"),
-#
-#      new kernel::Field::Interface(
-#                name          =>'replkeysec',
-#                group         =>'source',
-#                label         =>'secondary sync key',
-#                dataobjattr   =>"lpad(assetmodel.lmodelid,35,'0')"),
-#
-#      new kernel::Field::Date(
-#                name          =>'mdate',
-#                group         =>'source',
-#                label         =>'Modification-Date',
-#                dataobjattr   =>'assetmodel.dtlastmodif'),
-#
-
+                dataobjattr   =>'"status"')
    );
+   $self->setWorktable("itfarmasset"); 
    $self->setDefaultView(qw(name status));
    return($self);
 }
@@ -103,34 +84,6 @@ sub Initialize
    return(0);
 }
 
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=<<EOF;
-amcomputer sys
-   join amportfolio sysportfolio
-      on sysportfolio.lportfolioitemid=sys.litemid
-   join amportfolio assportfolio
-      on assportfolio.Lportfolioitemid=sysportfolio.lparentid
-   join amasset ass
-      on assportfolio.assettag=ass.assettag
-   join amcomputer clu
-      on sys.lparentid=clu.lcomputerid
-EOF
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=<<EOF;
-sysportfolio.usage like 'OSY-_: KONSOLSYSTEM %'
-and sys.status<>'out of operation'
-and clu.litemid<>'0'
-EOF
-   return($where);
-}
 
 sub isViewValid
 {

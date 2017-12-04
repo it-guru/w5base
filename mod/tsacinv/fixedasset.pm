@@ -42,13 +42,13 @@ sub new
                 size          =>'20',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amfixedasset.fixedastno'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 htmlwidth     =>'250px',
                 label         =>'Name',
-                dataobjattr   =>'amfixedasset.name'),
+                dataobjattr   =>'"description"'),
 
       new kernel::Field::Text(
                 name          =>'assetid',
@@ -56,43 +56,43 @@ sub new
                 size          =>'20',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amfixedasset.assettag'),
+                dataobjattr   =>'"assetid"'),
 
       new kernel::Field::Date(
                 name          =>'deprstart',
                 label         =>'Deprecation Start',
                 htmlwidth     =>'80px',
                 timezone      =>'CET',
-                dataobjattr   =>'amfixedasset.ddeprstart'),
+                dataobjattr   =>'"deprstart"'),
 
       new kernel::Field::Date(
                 name          =>'deprend',
                 label         =>'Deprecation End',
                 htmlwidth     =>'80px',
                 timezone      =>'CET',
-                dataobjattr   =>'amfixedasset.ddeprend'),
+                dataobjattr   =>'"deprend"'),
 
       new kernel::Field::Currency(
                 name          =>'deprbase',
                 htmlwidth     =>'80px',
                 label         =>'Deprecation Base',
-                dataobjattr   =>'amfixedasset.mdeprbasis'),
+                dataobjattr   =>'"deprbase"'),
 
       new kernel::Field::Currency(
                 name          =>'residualvalue',
                 label         =>'residual value',
                 size          =>'20',
-                dataobjattr   =>'amfixedasset.mresidualvalue'),
+                dataobjattr   =>'"residualvalue"'),
 
       new kernel::Field::Currency(
                 name          =>'deprrate',
                 label         =>'monthly Deprecation',
-                dataobjattr   =>'amfixedasset.mdeprrate'),
+                dataobjattr   =>'"deprrate"'),
 
       new kernel::Field::Text(
                 name          =>'inventoryno',
                 label         =>'Inventory No.',
-                dataobjattr   =>'amfixedasset.inventoryno'),
+                dataobjattr   =>'"inventoryno"'),
 
       new kernel::Field::Import( $self,
                 vjointo       =>'tsacinv::system',
@@ -104,9 +104,10 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassetid',
                 noselect      =>'1',
-                dataobjattr   =>'amrelfixedasset.lastid'),
+                dataobjattr   =>'"lassetid"'),
 
    );
+   $self->setWorktable("fixedasset"); 
    $self->setDefaultView(qw(name assetid deprstart deprend deprbase inventoryno));
    return($self);
 }
@@ -126,22 +127,6 @@ sub getRecordImageUrl
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/fixedasset.jpg?".$cgi->query_string());
-}
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amfixedasset,amrelfixedasset";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amfixedasset.lfixedastid=amrelfixedasset.lfixedastid and ".
-             "amfixedasset.bdelete='0'";
-   #my $where="amfixedasset.bdelete='0' and amfixedasset.legalunit is not null";
-   return($where);
 }
 
 sub isViewValid

@@ -5,3 +5,4 @@
 'Parent ApplicationID'=>{de=>'AnwendungsID'},
 'type'=>{de=>'Typ'},
 'fieldgroup.default'=>{de=>'Schnittstellendaten'},
+'marked as delete'=>{de=>'gelöscht markiert'},

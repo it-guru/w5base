@@ -39,7 +39,7 @@ sub new
                 name          =>'id',
                 label         =>'NetworkCardID',
                 align         =>'left',
-                dataobjattr   =>'amnetworkcard.lnetworkcardid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -66,22 +66,19 @@ sub new
                 name          =>'ipaddress',
                 label         =>'IP-Address',
                 searchable    =>0,
-                dataobjattr   =>"amnetworkcard.tcpipaddress|| ".
-                                "decode(amnetworkcard.tcpipaddress,NULL,'',".
-                                "decode(amnetworkcard.ipv6address,NULL,'',".
-                                "', ')) ||amnetworkcard.ipv6address"),
+                dataobjattr   =>'"ipaddress"'),
 
       new kernel::Field::Text(
                 name          =>'ipv4address',
                 label         =>'IP-V4-Address',
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>'amnetworkcard.tcpipaddress'),
+                dataobjattr   =>'"ipv4address"'),
 
       new kernel::Field::Text(
                 name          =>'ipv6address',
                 label         =>'IP-V6-Address',
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>'amnetworkcard.ipv6address'),
+                dataobjattr   =>'"ipv6address"'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
@@ -91,39 +88,39 @@ sub new
                 size          =>'13',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amportfolio.assettag'),
+                dataobjattr   =>'"systemid"'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 uppersearch   =>1,
                 size          =>'16',
-                dataobjattr   =>'amportfolio.name'),
+                dataobjattr   =>'"systemname"'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'amnetworkcard.status'),
+                dataobjattr   =>'"status"'),
 
       new kernel::Field::Text(
                 name          =>'code',
                 label         =>'Code',
-                dataobjattr   =>'amnetworkcard.code'),
+                dataobjattr   =>'"code"'),
 
       new kernel::Field::Text(
                 name          =>'netmask',
                 label         =>'Netmask',
-                dataobjattr   =>'amnetworkcard.subnetmask'),
+                dataobjattr   =>'"netmask"'),
 
       new kernel::Field::Text(
                 name          =>'dnsname',
                 label         =>'DNS-Name',
-                dataobjattr   =>'amnetworkcard.dnsname'),
+                dataobjattr   =>'"dnsname"'),
 
       new kernel::Field::Text(
                 name          =>'dnsalias',
                 label         =>'DNS-Alias',
-                dataobjattr   =>'amnetworkcard.dnsalias'),
+                dataobjattr   =>'"dnsalias"'),
 
       new kernel::Field::Text(
                 name          =>'accountno',
@@ -138,35 +135,36 @@ sub new
                 name          =>'type',
                 label         =>'Type',
                 ignorecase    =>1,
-                dataobjattr   =>'amnetworkcard.type'),
+                dataobjattr   =>'"type"'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
-                dataobjattr   =>'amnetworkcard.description'),
+                dataobjattr   =>'"description"'),
 
       new kernel::Field::Link(
                 name          =>'lcomputerid',
                 label         =>'Computerid',
-                dataobjattr   =>'amnetworkcard.lcompid'),
+                dataobjattr   =>'"lcomputerid"'),
 
       new kernel::Field::Link(
                 name          =>'laccountnoid',
                 label         =>'AccountNoID',
-                dataobjattr   =>'amnetworkcard.laccountnoid'),
+                dataobjattr   =>'"laccountnoid"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amnetworkcard.dtlastmodif'),
+                dataobjattr   =>'"replkeypri"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(amnetworkcard.lnetworkcardid,35,'0')")
+                dataobjattr   =>'"replkeysec"')
    );
+   $self->setWorktable("ipaddress");
    $self->setDefaultView(qw(linenumber systemid 
                             systemname ipaddress status description));
    return($self);
@@ -189,26 +187,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/service.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amnetworkcard,amcomputer,".
-            "(select amportfolio.* from amportfolio ".
-            " where amportfolio.bdelete=0) amportfolio";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amcomputer.lcomputerid=amnetworkcard.lcompid ".
-       "and amportfolio.lportfolioitemid=amcomputer.litemid ".
-       "and amnetworkcard.bdelete=0 ".
-       "and amnetworkcard.status<>'out of service' ";
-   return($where);
-}
 
 sub isViewValid
 {

@@ -41,18 +41,18 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'DiscoveryID',
-                dataobjattr   =>'amtsiautodiscinterfaces.linterfaceid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'address',
                 label         =>'IP-Address',
                 htmlwidth     =>'200px',
-                dataobjattr   =>'amtsiautodiscinterfaces.ipaddress'),
+                dataobjattr   =>'"address"'),
 
       new kernel::Field::Text(
                 name          =>'physicaladdress',
                 label         =>'physical Address',
-                dataobjattr   =>'amtsiautodiscinterfaces.physicaladdress'),
+                dataobjattr   =>'"physicaladdress"'),
 
       new kernel::Field::TextDrop(
                 name          =>'systemname',
@@ -64,23 +64,24 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemautodiscid',
                 label         =>'System DiscoveryID',
-                dataobjattr   =>'amtsiautodiscinterfaces.lsystemautodiscid'),
+                dataobjattr   =>'"systemautodiscid"'),
 
       new kernel::Field::Date(
                 name          =>'scandate',
                 group         =>'source',
                 label         =>'Scandate',
-                dataobjattr   =>'amtsiautodiscinterfaces.dtscan'),
+                dataobjattr   =>'"scandate"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amtsiautodiscinterfaces.source'),
+                dataobjattr   =>'"srcsys"'),
 
 
    );
    $self->{use_distinct}=0;
+   $self->setWorktable("autodiscipaddress");
 
    $self->setDefaultView(qw(address scandate));
    return($self);
@@ -105,22 +106,6 @@ sub initSearchQuery
    }
 }
 
-
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsiautodiscinterfaces";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="";
-   return($where);
-}
 
 
 sub getDetailBlockPriority

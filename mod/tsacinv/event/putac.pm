@@ -204,9 +204,10 @@ sub mkAcFtpRecSystem
                     lMemorySizeMb=>$memory,
                     fCPUNumber=>$cpucount,
                     AssignmentGroup=>$cfmassign,
-                    IncidentAG=>$inmassign,
-                    Model_Code=>'MGER033048'
+                    IncidentAG=>$inmassign
                }
+               # laut Rainer ist kein Model_Code
+               # bei Systemen notwendig     Model_Code=>'MGER033048',
              };
    #
    # Wenn das Asset nicht Darwin "gehört", dann will die MU selbst den

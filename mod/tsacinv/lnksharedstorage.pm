@@ -39,7 +39,7 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'storageportfolio.assettag'),
+                dataobjattr   =>'"storageassetid"'),
 
       new kernel::Field::Text(
                 name          =>'storagename',
@@ -48,32 +48,32 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'storageportfolio.name'),
+                dataobjattr   =>'"storagename"'),
 
       new kernel::Field::Link(
                 name          =>'storageid',
                 sqlorder      =>'NONE',
                 label         =>'StorageID',
-                dataobjattr   =>'amtsiprovsto.lprovidedstorageid'),
+                dataobjattr   =>'"storageid"'),
 
       new kernel::Field::Link(
                 name          =>'lcomputerid',
                 label         =>'AC-ComputerID',
-                dataobjattr   =>'amcomputer.lcomputerid'),
+                dataobjattr   =>'"lcomputerid"'),
 
       new kernel::Field::Text(
                 name          =>'systemsystemid',
                 label         =>'SystemID',
                 size          =>'20',
                 uppersearch   =>1,
-                dataobjattr   =>'systemportfolio.assettag'),
+                dataobjattr   =>'"systemsystemid"'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 size          =>'20',
                 ignorecase    =>1,
-                dataobjattr   =>'systemportfolio.name'),
+                dataobjattr   =>'"systemname"'),
 
       new kernel::Field::Text(
                 name          =>'applid',
@@ -81,16 +81,17 @@ sub new
                 size          =>'13',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amtsicustappl.code'),
+                dataobjattr   =>'"applid"'),
 
 
       new kernel::Field::Text(
                 name          =>'applname',
                 label         =>'Applicationname',
                 uppersearch   =>1,
-                dataobjattr   =>'amtsicustappl.name'),
+                dataobjattr   =>'"applname"'),
 
    );
+   $self->setWorktable("lnksharedstorage");
    $self->setDefaultView(qw(storageassetid storagename 
                             systemsystemid systemname 
                             applname applid));
@@ -106,35 +107,6 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsiprovsto,amportfolio storageportfolio,amtsiprovstomounts,".
-            "amcomputer,amportfolio systemportfolio,".
-            "amtsirelportfappl,amtsicustappl";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amtsiprovsto.lassetid=storageportfolio.lastid ".
-             "and amtsiprovsto.bdelete='0' ".
-             "and amtsiprovsto.lprovidedstorageid=".
-             "amtsiprovstomounts.lprovidedstorageid ".
-             "and amtsiprovstomounts.bdelete='0' ".
-             "and amtsiprovstomounts.lcomputerid=amcomputer.lcomputerid ".
-             "and amcomputer.litemid=systemportfolio.lportfolioitemid ".
-             "and systemportfolio.lportfolioitemid=".
-             "amtsirelportfappl.lportfolioid ".
-             "and amtsirelportfappl.bdelete=0 ".
-             "and amtsirelportfappl.lapplicationid=".
-             "amtsicustappl.ltsicustapplid";
-
-   return($where);
-}
-
 
 sub isViewValid
 {

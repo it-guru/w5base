@@ -40,7 +40,7 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'TsiParentChild.ltsiparentchildid'),
+                dataobjattr   =>'"netlnkid"'),
 
       new kernel::Field::Text(
                 name          =>'description',
@@ -49,7 +49,7 @@ sub new
                 uppersearch   =>1,
                 searchable    =>1,
                 align         =>'left',
-                dataobjattr   =>'TsiParentChild.description'),
+                dataobjattr   =>'"description"'),
 
       new kernel::Field::Text(
                 name          =>'applid',
@@ -57,56 +57,57 @@ sub new
                 size          =>'13',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amtsicustappl.code'),
+                dataobjattr   =>'"applid"'),
 
 
       new kernel::Field::Text(
                 name          =>'applname',
                 label         =>'Applicationname',
                 uppersearch   =>1,
-                dataobjattr   =>'amtsicustappl.name'),
+                dataobjattr   =>'"applname"'),
 
       new kernel::Field::Text(
                 name          =>'systemsystemid',
                 label         =>'System SystemID',
                 size          =>'20',
                 uppersearch   =>1,
-                dataobjattr   =>'systemportfolio.assettag'),
+                dataobjattr   =>'"systemsystemid"'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 size          =>'20',
                 ignorecase    =>1,
-                dataobjattr   =>'systemportfolio.name'),
+                dataobjattr   =>'"systemname"'),
 
       new kernel::Field::Text(
                 name          =>'netsystemid',
                 label         =>'Network-Component SystemID',
                 size          =>'20',
                 uppersearch   =>1,
-                dataobjattr   =>'netportfolio.assettag'),
+                dataobjattr   =>'"netsystemid"'),
 
       new kernel::Field::Text(
                 name          =>'netname',
                 label         =>'Network-Component Name',
                 size          =>'20',
                 ignorecase    =>1,
-                dataobjattr   =>'netportfolio.name'),
+                dataobjattr   =>'"netname"'),
 
       new kernel::Field::Text(
                 name          =>'netnature',
                 label         =>'Network-Component Nature',
                 size          =>'20',
                 ignorecase    =>1,
-                dataobjattr   =>'netpartnernature.name'),
+                dataobjattr   =>'"netnature"'),
 
       new kernel::Field::Link(
                 name          =>'lcomputerid',
                 label         =>'AC-ComputerID',
-                dataobjattr   =>'amcomputer.lcomputerid'),
+                dataobjattr   =>'"lcomputerid"'),
 
    );
+   $self->setWorktable("lnksharednet");
    $self->setDefaultView(qw(netlnkid description applname systemname netname));
    return($self);
 }
@@ -120,56 +121,6 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amcomputer ".
-    "join amportfolio systemportfolio ".
-     "on (amcomputer.litemid=systemportfolio.lportfolioitemid and ".
-         "systemportfolio.bdelete='0') ".
-    "join ( ".
-       "select ".
-               "amTsiParentChild.ltsiparentchildid,".
-               "amTsiParentChild.lparentid a,".
-               "amTsiParentChild.lchildid b,".
-               "amTsiParentChild.description ".
-       "from amTsiParentChild where externalsystem='Autodiscovery' ".
-       "union all ".
-       "select ".
-               "amTsiParentChild.ltsiparentchildid,".
-               "amTsiParentChild.lchildid a,".
-               "amTsiParentChild.lparentid b,".
-               "amTsiParentChild.description ".
-       "from amTsiParentChild where externalsystem='Autodiscovery' ".
-    ") TsiParentChild on systemportfolio.lportfolioitemid=TsiParentChild.a ".
-    "join amportfolio netportfolio ".
-     "on (TsiParentChild.b=netportfolio.lportfolioitemid and ".
-         "netportfolio.bdelete='0') ".
-    "join amcomputer netcomputer ".
-     "on (netcomputer.litemid=netportfolio.lportfolioitemid and ".
-         "netcomputer.status<>'out of operation') ".
-    "join amportfolio netpartnerportfolio ".
-     "on netportfolio.lparentid=netpartnerportfolio.lportfolioitemid ".
-    "join ammodel netpartnermodel ".
-     "on netpartnerportfolio.lmodelid=netpartnermodel.lmodelid ".
-    "join amnature netpartnernature ".
-     "on netpartnermodel.lnatureid=netpartnernature.lnatureid ".
-    #     "netpartnernature.name in ".
-    #     "('SWITCH','FIREWALL-BOX','FIREWALL','FC-SWITCH','ROUTER')) ".
-    # "on (netpartnermodel.lnatureid=netpartnernature.lnatureid and ".
-    #     "netpartnernature.name in ".
-    #     "('SWITCH','FIREWALL-BOX','FIREWALL','FC-SWITCH','ROUTER')) ".
-    "left outer join amtsirelportfappl ".
-     "on (systemportfolio.lportfolioitemid=amtsirelportfappl.lportfolioid and ".
-         "amtsirelportfappl.bdelete='0') ".
-    "left outer join amtsicustappl ".
-     "on amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid ";
-
-   return($from);
-}
-
-
 
 sub isViewValid
 {

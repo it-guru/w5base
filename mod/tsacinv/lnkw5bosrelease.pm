@@ -167,8 +167,6 @@ sub isViewValid
 
 
 
-
-
 sub isWriteValid
 {
    my $self=shift;

@@ -37,7 +37,7 @@ sub new
       new kernel::Field::Id(        name       =>'serviceid',
                                     label      =>'ServiceID',
                                     align      =>'left',
-                                    dataobjattr=>'amtsiservice.lserviceid'),
+                                    dataobjattr=>'"serviceid"'),
 
       new kernel::Field::Text(      name       =>'systemid',
                                     label      =>'SystemId',
@@ -45,44 +45,45 @@ sub new
                                     htmlwidth  =>50,
                                     uppersearch=>1,
                                     align      =>'left',
-                                    dataobjattr=>'amportfolio.assettag'),
+                                    dataobjattr=>'"systemid"'),
 
       new kernel::Field::Text(      name       =>'name',
                                     label      =>'Service Name',
                                     htmlwidth  =>50,
                                     ignorecase =>1,
-                                    dataobjattr=>'amtsiservicetype.identifier'),
+                                    dataobjattr=>'"name"'),
 
       new kernel::Field::Text(      name       =>'type',
                                     label      =>'Service Type',
                                     htmlwidth  =>200,
                                     ignorecase =>1,
-                                    dataobjattr=>'amtsiservicetype.type'),
+                                    dataobjattr=>'"type"'),
 
       new kernel::Field::Text(      name       =>'unit',
                                     label      =>'Unit',
                                     htmlwidth  =>50,
-                                    dataobjattr=>'amtsiservicetype.unit'),
+                                    dataobjattr=>'"unit"'),
 
       new kernel::Field::Text(      name       =>'description',
                                     label      =>'Service Description',
-                                    dataobjattr=>'amtsiservice.description'),
+                                    dataobjattr=>'"description"'),
 
       new kernel::Field::Boolean(   name       =>'isordered',
                                     label      =>'is ordered',
-                                    dataobjattr=>'decode(amtsiservice.btechnical,0,1,1,0)'),
+                                    dataobjattr=>'"isordered"'),
 
       new kernel::Field::Boolean(   name       =>'isdelivered',
                                     label      =>'is delivered',
-                                    dataobjattr=>'amtsiservice.btechnical'),
+                                    dataobjattr=>'"isdelivered"'),
 
       new kernel::Field::Float(     name       =>'ammount',
                                     label      =>'Ammount',
                                     htmlwidth  =>50,
                                     align      =>'right',
-                                    dataobjattr=>'amtsiservice.ammount'),
+                                    dataobjattr=>'"ammount"'),
 
    );
+   $self->setWorktable("service"); 
    $self->setDefaultView(qw(linenumber serviceid systemid name 
                             type ammount unit description));
    return($self);
@@ -105,27 +106,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/service.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsiservicetype,amtsiservice,amcomputer,amportfolio";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
-       "and amportfolio.lportfolioitemid=amcomputer.litemid ".
-       "and amportfolio.lportfolioitemid=amtsiservice.lportfolioid ".
-       "and amtsiservice.bdelete=0 ".
-       "and amportfolio.bdelete=0 ";
-   #    "and (amtsiservice.dstart<=sysdate or amtsiservice.dstart is null) ";
-   #    "and (amtsiservice.dend>=sysdate or amtsiservice.dend is null)) ";
-   return($where);
-}
-
 sub isViewValid
 {
    my $self=shift;

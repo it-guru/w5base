@@ -47,8 +47,7 @@ sub new
                 htmldetail    =>0,
                 htmlwidth     =>'100px',
                 align         =>'left',
-                dataobjattr   =>"concat(amportfolio.name,concat(' ('".
-                                ",concat(amportfolio.assettag,')')))"),
+                dataobjattr   =>'"fullname"'),
 
       new kernel::Field::Text(
                 name          =>'scfullname',
@@ -58,15 +57,14 @@ sub new
                 htmldetail    =>0,
                 htmlwidth     =>'100px',
                 align         =>'left',
-                dataobjattr   =>"concat(amportfolio.name,concat(' ('".
-                                ",concat(amportfolio.code,')')))"),
+                dataobjattr   =>'"scfullname"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Instance name',
                 uppersearch   =>1,
                 size          =>'16',
-                dataobjattr   =>'amportfolio.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Id(
                 name          =>'swinstanceid',
@@ -75,7 +73,7 @@ sub new
                 searchable    =>1,
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amportfolio.assettag'),
+                dataobjattr   =>'"swinstanceid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
@@ -111,12 +109,12 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'amportfolio.lassignmentid'),
+                dataobjattr   =>'"lassignmentid"'),
 
       new kernel::Field::Link(
                 name          =>'lincidentagid',
                 label         =>'AC-Incident-AssignmentID',
-                dataobjattr   =>'amportfolio.lincidentagid'),
+                dataobjattr   =>'"lincidentagid"'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
@@ -124,39 +122,27 @@ sub new
                 size          =>'15',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostcenterid'=>'id'],
-                dataobjattr   =>'amcostcenter.trimmedtitle'),
+                dataobjattr   =>'"conumber"'),
 
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenterID',
-                dataobjattr   =>'amcostcenter.lcostid'),
+                dataobjattr   =>'"lcostcenterid"'),
 
       new kernel::Field::Link(
                 name          =>'altbc',
                 label         =>'Alternate BC',
-                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
+                dataobjattr   =>'"altbc"'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'amtsiswinstance.status'),
-
-      new kernel::Field::Text(
-                name          =>'tenant',
-                label         =>'Tenant',
-                group         =>'source',
-                dataobjattr   =>'amtenant.code'),
-
-      new kernel::Field::Interface(
-                name          =>'tenantid',
-                label         =>'Tenant ID',
-                group         =>'source',
-                dataobjattr   =>'amtenant.ltenantid'),
+                dataobjattr   =>'"status"'),
 
       new kernel::Field::Text(
                 name          =>'monname',
                 label         =>'Monitoring name',
-                dataobjattr   =>'amtsiswinstance.monitoringname'),
+                dataobjattr   =>'"monname"'),
 
 #      new kernel::Field::SubList(
 #                name          =>'applications',
@@ -170,29 +156,28 @@ sub new
                 name          =>'portfolioid',
                 group         =>'source',
                 label         =>'AssetManager PortfolioID',
-                dataobjattr   =>'amtsiswinstance.lportfolioid'),
+                dataobjattr   =>'"portfolioid"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 timezone      =>'CET',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'amportfolio.dtlastmodif'),
+                dataobjattr   =>'"mdate"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amportfolio.externalsystem'),
+                dataobjattr   =>'"srcsys"'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'amportfolio.externalid'),
-
-
+                dataobjattr   =>'"srcid"')
    );
+   $self->setWorktable("swinstance");
    $self->setDefaultView(qw(fullname swinstanceid status assignmentgroup));
    return($self);
 }
@@ -200,14 +185,8 @@ sub new
 sub initSearchQuery
 {
    my $self=shift;
-#   if (!defined(Query->Param("search_name"))){
-#     Query->Param("search_name"=>"*DARWIN* Q4DE8NCO967*");
-#   }
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"!\"out of operation\"");
-   }
-   if (!defined(Query->Param("search_tenant"))){
-     Query->Param("search_tenant"=>"CS");
    }
 }
 
@@ -230,31 +209,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/swinstance.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=
-      "amtsiswinstance, ".
-      "(select amportfolio.* from amportfolio ".
-      " where amportfolio.bdelete=0) amportfolio,ammodel,".
-      "(select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter, amtenant";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=
-      "amportfolio.lportfolioitemid=amtsiswinstance.lportfolioid ".
-      "and amportfolio.lmodelid=ammodel.lmodelid ".
-      "and amportfolio.ltenantid=amtenant.ltenantid ".
-      "and amportfolio.lcostid=amcostcenter.lcostid(+) ";
-   return($where);
-}
-
 
 sub isViewValid
 {

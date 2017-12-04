@@ -41,25 +41,26 @@ sub new
                 size          =>'13',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amcontract.lcntrid'),
+                dataobjattr   =>'"contractid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Contract name',
                 uppersearch   =>1,
                 size          =>'16',
-                dataobjattr   =>'amcontract.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'model',
                 label         =>'Model',
                 uppersearch   =>1,
                 size          =>'16',
-                dataobjattr   =>'ammodel.name'),
+                dataobjattr   =>'"model"'),
 
 
    );
    $self->{use_distinct}=0;
+   $self->setWorktable("contract"); 
 
    $self->setDefaultView(qw(licenseid name model));
    return($self);
@@ -83,23 +84,6 @@ sub getRecordImageUrl
    return("../../../public/tsacinv/load/license.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amcontract,ammodel,amnature";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=
-      "amcontract.lmodelid=ammodel.lmodelid ".
-      "and ammodel.lnatureid=amnature.lnatureid ";
-   return($where);
-}
 
 sub SecureSetFilter
 {

@@ -63,6 +63,14 @@ sub Init
                       "tsacinv::lnksystemsoftware",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.ac.system.lnksharednet",
+                      "tsacinv::lnksharednet",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.ac.system.lnksharedstorage",
+                      "tsacinv::lnksharedstorage",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itu.ac.itclust",
                       "tsacinv::itclust",
                       defaultacl=>['admin']);
@@ -168,14 +176,6 @@ sub Init
                       "tsacinv::DBDataDiconary",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itu.ac.quality",
-                      "tsacinv::quality_appl",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("itu.ac.quality.appl",
-                      "tsacinv::quality_appl",
-                      defaultacl=>['valid_user']);
-   
    $self->RegisterObj("AL_TCom.system.acimport",
                       "tsacinv::system",
                       func=>'ImportSystem',

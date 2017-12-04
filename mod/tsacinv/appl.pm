@@ -43,58 +43,51 @@ sub new
                 size          =>'13',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'amtsicustappl.code'),
+                dataobjattr   =>'"applid"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'full CI-Name',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>"concat(concat(concat(amtsicustappl.name,' ('".
-                                "),amtsicustappl.code),')')"),
+                dataobjattr   =>'"fullname"'),
 
       new kernel::Field::Link(
                 name          =>'id',
                 label         =>'ApplicationID',
-                dataobjattr   =>'amtsicustappl.ltsicustapplid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Applicationname',
                 uppersearch   =>1,
-                dataobjattr   =>'amtsicustappl.name'),
+                dataobjattr   =>'"name"'),
                                     
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'lower(amtsicustappl.status)'),
+                dataobjattr   =>'"status"'),
                                     
-      new kernel::Field::Text(
-                name          =>'tenant',
-                label         =>'Tenant',
-                group         =>'source',
-                dataobjattr   =>'amtenant.code'),
-                                    
-      new kernel::Field::Interface(
-                name          =>'tenantid',
-                label         =>'Tenant ID',
-                group         =>'source',
-                dataobjattr   =>'amtenant.ltenantid'),
-                                    
+      new kernel::Field::Boolean(
+                name          =>'deleted',
+                readonly      =>1,
+                label         =>'marked as delete',
+                dataobjattr   =>'"deleted"'),
+
       new kernel::Field::Text(
                 name          =>'usage',
                 label         =>'Usage',
-                dataobjattr   =>'amtsicustappl.usage'),
+                dataobjattr   =>'"usage"'),
                                     
       new kernel::Field::Text(
                 name          =>'criticality',
                 label         =>'Criticality',
-                dataobjattr   =>'amtsicustappl.businessimpact'),
+                dataobjattr   =>'"criticality"'),
                                     
       new kernel::Field::Text(
                 name          =>'customerprio',
                 label         =>'Priority',
-                dataobjattr   =>'amtsicustappl.priority'),
+                dataobjattr   =>'"customerprio"'),
 
       new kernel::Field::TextDrop(
                 name          =>'customer',
@@ -105,7 +98,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'lcustomerid',
-                dataobjattr   =>'amcostcenter.lcustomerlinkid'),
+                dataobjattr   =>'"lcustomerid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'secunit',
@@ -116,7 +109,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'lsecunitid',
-                dataobjattr   =>'amtsicustappl.lsecurityunitid'),
+                dataobjattr   =>'"lsecunitid"'),
                                     
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
@@ -135,7 +128,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'lincidentagid',
                 label         =>'AM-Incident-AssignmentID',
-                dataobjattr   =>'amtsicustappl.lincidentagid'),
+                dataobjattr   =>'"lincidentagid"'),
 
 
       new kernel::Field::TextDrop(
@@ -148,7 +141,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'lchhangeapprid',
                 label         =>'AM-Change-ApproverID',
-                dataobjattr   =>'amtsicustappl.lchangeapprid'),
+                dataobjattr   =>'"lchhangeapprid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'cimplementorgroup',
@@ -160,7 +153,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'lchhangeimplid',
                 label         =>'AM-Change-ImplementorID',
-                dataobjattr   =>'amtsicustappl.lchangeimplid'),
+                dataobjattr   =>'"lchhangeimplid"'),
 
                                     
       new kernel::Field::TextDrop(
@@ -189,7 +182,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'semid',
-                dataobjattr   =>'amtsicustappl.lservicecontactid'),
+                dataobjattr   =>'"semid"'),
                                     
       new kernel::Field::TextDrop(
                 name          =>'tsm',
@@ -217,7 +210,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'tsmid',
-                dataobjattr   =>'amtsicustappl.ltechnicalcontactid'),
+                dataobjattr   =>'"tsmid"'),
                                     
       new kernel::Field::TextDrop(
                 name          =>'tsm2',
@@ -245,9 +238,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'tsm2id',
-                dataobjattr   =>'amtsicustappl.ldeputytechnicalcontactid'),
-
-
+                dataobjattr   =>'"tsm2id"'),
 
 
       new kernel::Field::TextDrop(
@@ -276,7 +267,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'opmid',
-                dataobjattr   =>'amtsicustappl.lleaddemid'),
+                dataobjattr   =>'"opmid"'),
                                     
       new kernel::Field::TextDrop(
                 name          =>'opm2',
@@ -304,20 +295,12 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'opm2id',
-                dataobjattr   =>'amtsicustappl.ldeputydemid'),
-
-
-
-
-
-
-
-
+                dataobjattr   =>'"opm2id"'),
                                     
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'amtsicustappl.lassignmentid'),
+                dataobjattr   =>'"lassignmentid"'),
                                     
       new kernel::Field::Text(
                 name          =>'conumber',
@@ -325,7 +308,7 @@ sub new
                 size          =>'15',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostid'=>'id'],
-                dataobjattr   =>'amcostcenter.trimmedtitle'),
+                dataobjattr   =>'"conumber"'),
                                     
       new kernel::Field::TextDrop(
                 name          =>'accountno',
@@ -338,42 +321,42 @@ sub new
       new kernel::Field::Text(
                 name          =>'ref',
                 label         =>'Application Reference',
-                dataobjattr   =>'amtsicustappl.ref'),
+                dataobjattr   =>'"ref"'),
 
       new kernel::Field::Link(
                 name          =>'lcostid',
                 label         =>'AC-CostcenterID',
-                dataobjattr   =>'amtsicustappl.lcostcenterid'),
+                dataobjattr   =>'"lcostid"'),
 
       new kernel::Field::Text(
                 name          =>'version',
                 label         =>'Version',
                 size          =>'16',
-                dataobjattr   =>'amtsicustappl.version'),
+                dataobjattr   =>'"version"'),
 
       new kernel::Field::Text(
                 name          =>'issoxappl',
                 group         =>'control',
                 htmleditwidth =>'30%',
                 label         =>'Application is mangaged by rules of SOX or ICS',
-                dataobjattr   =>'amtsicustappl.soxrelevant'),
+                dataobjattr   =>'"issoxappl"'),
                                     
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Application Description',
-                dataobjattr   =>'businessdesc.memcomment'),
+                dataobjattr   =>'"description"'),
 
       new kernel::Field::Textarea(
                 name          =>'maintwindow',
                 label         =>'Application Maintenence Window',
-                dataobjattr   =>'amtsimaint.memcomment'),
+                dataobjattr   =>'"maintwindow"'),
 
       new kernel::Field::Text(
                 name          =>'altbc',
                 htmldetail    =>0,
                 readonly      =>1,
                 label         =>'Alternate BC',
-                dataobjattr   =>'amcostcenter.alternatebusinesscenter'),
+                dataobjattr   =>'"altbc"'),
 
       new kernel::Field::SubList(
                 name          =>'interfaces',
@@ -388,7 +371,8 @@ sub new
                 group         =>'systems',
                 label         =>'Systems',
                 vjointo       =>'tsacinv::lnkapplsystem',
-                vjoinbase     =>{systemstatus=>"\"!out of operation\""},
+                vjoinbase     =>{systemstatus=>"\"!out of operation\"",
+                                 deleted=>'0'},
                 vjoinon       =>['id'=>'lparentid'],
                 vjoindisp     =>['child','systemweblink','systemid','comments'],
                 vjoininhash   =>['child','systemweblink','systemid','comments',
@@ -399,7 +383,7 @@ sub new
                 group         =>'systems',
                 htmldetail    =>0,
                 label         =>'is TBSM on one of systems ordered',
-                dataobjattr   =>"decode(tbsm.ordered,'XMBSM',1,0)"),
+                dataobjattr   =>'"tbsm_ordered"'),
 
       new kernel::Field::Text(
                 name          =>'usedsharedstoragesys',
@@ -425,31 +409,25 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'amtsicustappl.dtlastmodif'),
+                dataobjattr   =>'"replkeypri"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(amtsicustappl.code,35,'0')"),
+                dataobjattr   =>'"replkeysec"'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'amtsicustappl.dtcreation'),
+                dataobjattr   =>'"cdate"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'amtsicustappl.dtlastmodif'),
-
-#      new kernel::Field::Date(
-#                name          =>'lastqcheck',
-#                group         =>'source',
-#                label         =>'Quality Check last date',
-#                dataobjattr   =>'amtsicustappl.dqualitycheck'),
+                dataobjattr   =>'"mdate"'),
 
       new kernel::Field::Date(
                 name          =>'mdaterev',
@@ -457,30 +435,31 @@ sub new
                 uivisible     =>0,
                 sqlorder      =>'desc',
                 label         =>'Modification-Date reverse',
-                dataobjattr   =>'amtsicustappl.dtlastmodif'),
+                dataobjattr   =>'"mdaterev"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 ignorecase    =>1,
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amtsicustappl.externalsystem'),
+                dataobjattr   =>'"srcsys"'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'amtsicustappl.externalid'),
+                dataobjattr   =>'"srcid"'),
 
       new kernel::Field::Date(
                 name          =>'srcload',
                 timezone      =>'CET',
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'amtsicustappl.dtimport'),
+                dataobjattr   =>'"srcload"'),
 
    );
    $self->{use_distinct}=0;
+   $self->setWorktable("appl");
    $self->setDefaultView(qw(name applid usage conumber assignmentgroup));
    return($self);
 }
@@ -498,8 +477,9 @@ sub Initialize
 sub initSearchQuery
 {
    my $self=shift;
-   if (!defined(Query->Param("search_tenant"))){
-     Query->Param("search_tenant"=>"CS");
+
+   if (!defined(Query->Param("search_deleted"))){
+     Query->Param("search_deleted"=>$self->T("no"));
    }
 }
 
@@ -511,48 +491,6 @@ sub getRecordImageUrl
    return("../../../public/tsacinv/load/appl.jpg?".$cgi->query_string());
 }
          
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from=
-      "amtsicustappl, ".
-      "(select amcostcenter.* from amcostcenter ".
-      " where amcostcenter.bdelete=0) amcostcenter,amemplgroup assigrp,".
-      "(select distinct ".
-      "      amtsiservicetype.identifier ordered,amtsicustappl.ltsicustapplid ".
-      " from amtsiservice,amtsiservicetype,amtsirelportfappl,amtsicustappl,".
-      "      amportfolio ".
-      " where amtsiservice.lservicetypeid=amtsiservicetype.ltsiservicetypeid ".
-      "     and amtsiservicetype.identifier='XMBSM' ".
-      "     and amtsiservice.bdelete=0 ".
-      "     and amtsirelportfappl.bdelete=0 ".
-      "     and amtsiservice.lportfolioid=amtsirelportfappl.lportfolioid ".
-      "     and amtsirelportfappl.bactive=1 ".
-      "     and amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid ".
-      "     and amtsirelportfappl.lportfolioid=amportfolio.lportfolioitemid ".
-      "     and amportfolio.bdelete=0 ".
-      ") tbsm,".
-      "amcomment amtsimaint,amcomment businessdesc,".
-      "amtenant";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where=
-      "amtsicustappl.bdelete=0 ".
-      "and amtsicustappl.lmaintwindowid=amtsimaint.lcommentid(+) ".
-      "and amtsicustappl.ltenantid=amtenant.ltenantid ".
-      "and amtsicustappl.lcostcenterid=amcostcenter.lcostid(+) ".
-      "and amtsicustappl.lcustbusinessdescid=businessdesc.lcommentid(+) ".
-      "and amtsicustappl.lassignmentid=assigrp.lgroupid(+) ".
-      "and amtsicustappl.ltsicustapplid=tbsm.ltsicustapplid(+) ";
-   return($where);
-}
-
 
 sub isViewValid
 {

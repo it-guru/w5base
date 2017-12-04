@@ -41,28 +41,28 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'DiscoveryID',
-                dataobjattr   =>'amtsiautodiscsw.ladswid'),
+                dataobjattr   =>'"id"'),
 
       new kernel::Field::Text(
                 name          =>'software',
                 label         =>'Software',
                 htmlwidth     =>'350px',
-                dataobjattr   =>'amtsiautodiscsw.productname'),
+                dataobjattr   =>'"software"'),
 
       new kernel::Field::Text(
                 name          =>'producer',
                 label         =>'Producer',
-                dataobjattr   =>'amtsiautodiscsw.manufacturer'),
+                dataobjattr   =>'"producer"'),
 
       new kernel::Field::Text(
                 name          =>'version',
                 label         =>'Version',
-                dataobjattr   =>'amtsiautodiscsw.version'),
+                dataobjattr   =>'"version"'),
 
       new kernel::Field::Text(
                 name          =>'path',
                 label         =>'path',
-                dataobjattr   =>'amtsiautodiscsw.path'),
+                dataobjattr   =>'"path"'),
 
       new kernel::Field::TextDrop(
                 name          =>'systemname',
@@ -74,22 +74,23 @@ sub new
       new kernel::Field::Link(
                 name          =>'systemautodiscid',
                 label         =>'SystemID',
-                dataobjattr   =>'amtsiautodiscsw.lautodiscsystemid'),
+                dataobjattr   =>'"systemautodiscid"'),
 
       new kernel::Field::Date(
                 name          =>'scandate',
                 group         =>'source',
                 label         =>'Scandate',
-                dataobjattr   =>'amtsiautodiscsw.dtscan'),
+                dataobjattr   =>'"scandate"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'amtsiautodiscsw.source'),
+                dataobjattr   =>'"srcsys"'),
 
 
    );
+   $self->setWorktable("autodiscsoftware");
    $self->{use_distinct}=0;
 
    $self->setDefaultView(qw(software producer version path systemname scandate));
@@ -114,24 +115,6 @@ sub initSearchQuery
      Query->Param("search_scandate"=>">now-7d");
    }
 }
-
-
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsiautodiscsw";
-
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="";
-   return($where);
-}
-
 
 sub getDetailBlockPriority
 {

@@ -35,12 +35,12 @@ sub new
       new kernel::Field::Id(
                 name          =>'lconsid',
                 label         =>'ITFarmConsoleID',
-                dataobjattr   =>'conlitemid'),
+                dataobjattr   =>'"lconsid"'),
 
       new kernel::Field::Link(
                 name          =>'lfarmid',
                 label         =>'ITFarmID',
-                dataobjattr   =>'clu.litemid'),
+                dataobjattr   =>'"lfarmid"'),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -48,52 +48,33 @@ sub new
                 ignorecase    =>1,
                 weblinkto     =>'tsacinv::system',
                 weblinkon     =>['systemid'=>'systemid'],
-                dataobjattr   =>'conportfolio.name'),
+                dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
                 uppersearch   =>1,
-                dataobjattr   =>'conassettag'),
+                dataobjattr   =>'"systemid"'),
 
       new kernel::Field::Text(
                 name          =>'assetid',
                 label         =>'AssetID',
                 uppersearch   =>1,
-                dataobjattr   =>'ass.assettag'),
+                dataobjattr   =>'"assetid"'),
 
       new kernel::Field::Text(
                 name          =>'clusterid',
                 label         =>'ClusterID',
                 ignorecase    =>1,
-                dataobjattr   =>'clu.assettag'),
+                dataobjattr   =>'"clusterid"'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 ignorecase    =>1,
-                dataobjattr   =>'constatus'),
-
-#      new kernel::Field::Interface(
-#                name          =>'replkeypri',
-#                group         =>'source',
-#                label         =>'primary sync key',
-#                dataobjattr   =>"assetmodel.dtlastmodif"),
-#
-#      new kernel::Field::Interface(
-#                name          =>'replkeysec',
-#                group         =>'source',
-#                label         =>'secondary sync key',
-#                dataobjattr   =>"lpad(assetmodel.lmodelid,35,'0')"),
-#
-#      new kernel::Field::Date(
-#                name          =>'mdate',
-#                group         =>'source',
-#                label         =>'Modification-Date',
-#                dataobjattr   =>'assetmodel.dtlastmodif'),
-#
-
+                dataobjattr   =>'"status"')
    );
+   $self->setWorktable("itfarmconsole"); 
    $self->setDefaultView(qw(name systemid status));
    return($self);
 }
@@ -115,9 +96,6 @@ sub initSearchQuery
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"\"!out of operation\"");
    }
-#   if (!defined(Query->Param("search_tenant"))){
-#     Query->Param("search_tenant"=>"CS");
-#   }
 }
 
          
