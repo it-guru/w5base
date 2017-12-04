@@ -21,7 +21,7 @@ Checks and extends Interviews-Answers on DR-Test topic.
 [de:]
 
 Prüft und erweitert die Interview-Antworten im Themenblock DR-Test.
-Wenn die eingegebene Changenummber wie eine SM9 Changenummer aussieht,
+Wenn die eingegebene Changenummer wie eine SM9 Changenummer aussieht,
 dann wird das Datum des letzten DR Tests automatisch aus dem Change
 entnommen und in die Antwort eingefügt.
 
@@ -34,12 +34,34 @@ SLA Vorgaben definierte Interval, so wird ein DataIssue erzeugt.
 Liegt das DR Test Plandatum länger als 8 Wochen vor dem letzten
 DR Test, so wird ein DataIssue erzeugt.
 
-Liegt der DR Test Plandatum länger als das halbe Test-Interval in
+Liegt das DR Test Plandatum länger als das halbe Test-Intervall in
 der Vergangenheit, so wird ein DataIssue erzeugt.
 
 Wurde eine Anwendung neu aufgebaut (und hat somit noch keinen
 "letzten DR Test", so sind die betreffenden Fragen alle auf
-"relevant"="nein" zu setzten.
+"relevant"="nein" zu setzen.
+
+[en:]
+
+Checks and extends Interviews-Answers on DR-Test topic. When 
+the inserted change number looks like SM9 change number, the date of
+last DR test will be automatically filled out from the entered change.
+
+A DataIssue is created if max. age of the last DR test (calculated 
+based on the SLA guidlines) is too old. 
+
+A DataIssue is created if the date of the planned DR test is 
+set further in the future as the interval defined in the SLA guidlines.
+
+A DataIssue is created if the date of the planned DR test is 
+set 8 weeks before the last DR test.
+
+A DataIssue is created if the date of the planned DR test is 
+older then the half test-interval.
+
+In case of a new application (which doesnt have the "last DR 
+test") set all question under "relevant" to "no".
+
 
 
 =cut

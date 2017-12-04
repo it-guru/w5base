@@ -27,7 +27,17 @@ aus dem Change entnommen und in die Antwort eingefügt.
 
 Wurde eine Anwendung neu aufgebaut (und hat somit noch keinen
 "letzten ClusterService Switch Test", so sind die betreffenden Fragen alle auf
-"relevant"="nein" zu setzten.
+"relevant"="nein" zu setzen.
+
+[en:]
+
+Checks and extends Interviews-Answers on ClusterServiceSwitch-Test 
+topic. When the inserted change number looks like SM9 change number, 
+the date of last ClusterService Switch test will be automatically 
+filled out from the entered change.
+
+In case of a new application (which doesnt have the "last DR test") 
+set all question under "relevant" to "no".
 
 
 =cut
