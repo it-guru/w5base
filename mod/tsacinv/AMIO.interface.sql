@@ -666,6 +666,8 @@ grant select on grp to public;
 CREATE or REPLACE VIEW usr_acl AS
    select distinct amempldept.lempldeptid id
    FROM AM2107.amempldept
+   JOIN IFACE_ACL acl 
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER')
    where amempldept.lempldeptid<>0;
 
 CREATE or REPLACE VIEW usr AS
