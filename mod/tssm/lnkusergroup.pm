@@ -60,15 +60,20 @@ sub new
                                    vjoinon    =>['luser'=>'userid'],
                                    vjoindisp  =>'fullname'),
 
+      # mz 07.12.17
+      # must read from operator, not from contact,
+      # because more contacts with one userid are possible
+      # and that ist not good
       new kernel::Field::TextDrop( name       =>'useremail',
                                    label      =>'User-EMail',
                                    htmlwidth  =>'200px',
                                    searchable =>0,
                                    htmldetail =>0,
-                                   vjointo    =>'tssm::user',
+                                 # vjointo    =>'tssm::user',
                                  # vjoinbase  =>{'islogonuser'=>'1'},
-                                 # vjoinon    =>['luser'=>'loginname'],
-                                   vjoinon    =>['luser'=>'userid'],
+                                 # vjoinon    =>['luser'=>'userid'],
+                                   vjointo    =>'tssm::useraccount',
+                                   vjoinon    =>['luser'=>'loginname'],
                                    vjoindisp  =>'email'),
 
       new kernel::Field::Text(     name       =>'luser',
