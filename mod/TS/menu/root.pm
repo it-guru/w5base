@@ -147,11 +147,11 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.system.ipaddress",
-                      "itil::ipaddress",
+                      "TS::ipaddress",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("itts.system.ipaddress.new",
-                      "itil::ipaddress",
+                      "TS::ipaddress",
                       func=>'New',
                       defaultacl=>['admin']);
 

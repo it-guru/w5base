@@ -267,11 +267,11 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.system.ipaddress",
-                      "itil::ipaddress",
+                      "AL_TCom::ipaddress",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("AL_TCom.system.ipaddress.new",
-                      "itil::ipaddress",
+                      "AL_TCom::ipaddress",
                       func=>'New',
                       defaultacl=>['admin']);
 

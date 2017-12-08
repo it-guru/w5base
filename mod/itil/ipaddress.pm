@@ -606,6 +606,12 @@ sub initSearchQuery
 }
 
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::ipaddress");
+}
+
+
 sub prepareToWasted
 {
    my $self=shift;
