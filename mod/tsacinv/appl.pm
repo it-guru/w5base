@@ -40,58 +40,76 @@ sub new
       new kernel::Field::Id(
                 name          =>'applid',
                 label         =>'ApplicationID',
+                group         =>'appgen',
                 size          =>'13',
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'"applid"'),
+                dataobjattr   =>'generic_appl."applid"'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'full CI-Name',
+                group         =>'appgen',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"fullname"'),
+                dataobjattr   =>'generic_appl."fullname"'),
 
       new kernel::Field::Link(
                 name          =>'id',
                 label         =>'ApplicationID',
-                dataobjattr   =>'"id"'),
+                group         =>'appgen',
+                dataobjattr   =>'generic_appl."id"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Applicationname',
+                group         =>'appgen',
                 uppersearch   =>1,
-                dataobjattr   =>'"name"'),
+                dataobjattr   =>'generic_appl."name"'),
                                     
+      new kernel::Field::TextDrop(
+                name          =>'assignmentgroup',
+                label         =>'CFM Assignment Group',
+                group         =>'appgen',
+                vjointo       =>'tsacinv::group',
+                vjoinon       =>['lassignmentid'=>'lgroupid'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'"status"'),
+                group         =>'appgen',
+                dataobjattr   =>'generic_appl."status"'),
                                     
       new kernel::Field::Boolean(
                 name          =>'deleted',
                 readonly      =>1,
+                group         =>'appgen',
                 label         =>'marked as delete',
-                dataobjattr   =>'"deleted"'),
+                dataobjattr   =>'generic_appl."deleted"'),
 
       new kernel::Field::Text(
                 name          =>'usage',
                 label         =>'Usage',
+                group         =>'default',
                 dataobjattr   =>'"usage"'),
                                     
       new kernel::Field::Text(
                 name          =>'criticality',
                 label         =>'Criticality',
+                group         =>'default',
                 dataobjattr   =>'"criticality"'),
                                     
       new kernel::Field::Text(
                 name          =>'customerprio',
                 label         =>'Priority',
+                group         =>'default',
                 dataobjattr   =>'"customerprio"'),
 
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
+                group         =>'default',
                 vjointo       =>'tsacinv::customer',
                 vjoinon       =>['lcustomerid'=>'id'],
                 vjoindisp     =>'name'),
@@ -103,6 +121,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'secunit',
                 label         =>'SecurityUnit',
+                group         =>'default',
                 vjointo       =>'tsacinv::customer',
                 vjoinon       =>['lsecunitid'=>'id'],
                 vjoindisp     =>'name'),
@@ -112,15 +131,9 @@ sub new
                 dataobjattr   =>'"lsecunitid"'),
                                     
       new kernel::Field::TextDrop(
-                name          =>'assignmentgroup',
-                label         =>'CFM Assignment Group',
-                vjointo       =>'tsacinv::group',
-                vjoinon       =>['lassignmentid'=>'lgroupid'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::TextDrop(
                 name          =>'iassignmentgroup',
                 label         =>'INM Assignment Group',
+                group         =>'default',
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lincidentagid'=>'lgroupid'],
                 vjoindisp     =>'name'),
@@ -134,6 +147,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'capprovergroup',
                 label         =>'CHM Approver Group',
+                group         =>'default',
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lchhangeapprid'=>'lgroupid'],
                 vjoindisp     =>'name'),
@@ -146,6 +160,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'cimplementorgroup',
                 label         =>'CHM Implementor Group',
+                group         =>'default',
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lchhangeimplid'=>'lgroupid'],
                 vjoindisp     =>'name'),
@@ -159,6 +174,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'sem',
                 label         =>'Customer Business Manager',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
                 searchable    =>0,
@@ -167,6 +183,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'sememail',
                 htmldetail    =>0,
+                group         =>'default',
                 label         =>'Customer Business Manager E-Mail',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
@@ -175,6 +192,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'semldapid',
                 htmldetail    =>0,
+                group         =>'default',
                 label         =>'Customer Business Manager LDAPID',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['semid'=>'lempldeptid'],
@@ -187,6 +205,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'tsm',
                 label         =>'Technical Contact',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsmid'=>'lempldeptid'],
                 searchable    =>0,
@@ -196,6 +215,7 @@ sub new
                 name          =>'tsmemail',
                 htmldetail    =>0,
                 label         =>'Technical Contact E-Mail',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsmid'=>'lempldeptid'],
                 vjoindisp     =>'email'),
@@ -203,6 +223,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'tsmldapid',
                 htmldetail    =>0,
+                group         =>'default',
                 label         =>'Technical Contact LDAPID',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsmid'=>'lempldeptid'],
@@ -215,6 +236,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'tsm2',
                 label         =>'Deputy Technical Contact',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsm2id'=>'lempldeptid'],
                 searchable    =>0,
@@ -224,6 +246,7 @@ sub new
                 name          =>'tsm2email',
                 htmldetail    =>0,
                 label         =>'Deputy Technical Contact E-Mail',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsm2id'=>'lempldeptid'],
                 vjoindisp     =>'email'),
@@ -232,6 +255,7 @@ sub new
                 name          =>'tsm2ldapid',
                 htmldetail    =>0,
                 label         =>'Deputy Technical Contact LDAPID',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['tsm2id'=>'lempldeptid'],
                 vjoindisp     =>'ldapid'),
@@ -244,6 +268,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'opm',
                 label         =>'OPM Contact',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['opmid'=>'lempldeptid'],
                 searchable    =>0,
@@ -253,6 +278,7 @@ sub new
                 name          =>'opmemail',
                 htmldetail    =>0,
                 label         =>'OPM Contact E-Mail',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['opmid'=>'lempldeptid'],
                 vjoindisp     =>'email'),
@@ -261,6 +287,7 @@ sub new
                 name          =>'opmldapid',
                 htmldetail    =>0,
                 label         =>'OPM Contact LDAPID',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['opmid'=>'lempldeptid'],
                 vjoindisp     =>'ldapid'),
@@ -272,6 +299,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'opm2',
                 label         =>'Deputy OPM Contact',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['opm2id'=>'lempldeptid'],
                 searchable    =>0,
@@ -281,6 +309,7 @@ sub new
                 name          =>'opm2email',
                 htmldetail    =>0,
                 label         =>'Deputy OPM Contact E-Mail',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['opm2id'=>'lempldeptid'],
                 vjoindisp     =>'email'),
@@ -289,6 +318,7 @@ sub new
                 name          =>'opm2ldapid',
                 htmldetail    =>0,
                 label         =>'Deputy OPM Contact LDAPID',
+                group         =>'default',
                 vjointo       =>'tsacinv::user',
                 vjoinon       =>['opm2id'=>'lempldeptid'],
                 vjoindisp     =>'ldapid'),
@@ -300,11 +330,12 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'"lassignmentid"'),
+                dataobjattr   =>'generic_appl."lassignmentid"'),
                                     
       new kernel::Field::Text(
                 name          =>'conumber',
                 label         =>'CO-Number',
+                group         =>'default',
                 size          =>'15',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostid'=>'id'],
@@ -313,6 +344,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'accountno',
                 label         =>'Account-Number',
+                group         =>'default',
                 size          =>'15',
                 vjointo       =>'tsacinv::accountno',
                 vjoinon       =>['id'=>'lapplicationid'],
@@ -321,6 +353,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'ref',
                 label         =>'Application Reference',
+                group         =>'default',
                 dataobjattr   =>'"ref"'),
 
       new kernel::Field::Link(
@@ -331,6 +364,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'version',
                 label         =>'Version',
+                group         =>'default',
                 size          =>'16',
                 dataobjattr   =>'"version"'),
 
@@ -344,11 +378,13 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Application Description',
+                group         =>'default',
                 dataobjattr   =>'"description"'),
 
       new kernel::Field::Textarea(
                 name          =>'maintwindow',
                 label         =>'Application Maintenence Window',
+                group         =>'default',
                 dataobjattr   =>'"maintwindow"'),
 
       new kernel::Field::Text(
@@ -404,6 +440,15 @@ sub new
                 weblinkto     =>'NONE',
                 vjoinon       =>['applid'=>'applid'],
                 vjoindisp     =>'netname'),
+
+      new kernel::Field::Boolean(
+                name          =>'isgeneric',
+                readonly      =>1,
+                htmldetail    =>0,
+                selectfix     =>1,
+                group         =>'appgen',
+                label         =>'is generic only',
+                dataobjattr   =>'decode(appl."id",NULL,1,0)'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
@@ -496,6 +541,9 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
+   if ($rec->{isgeneric}){
+      return(qw(header appgen));
+   }
    return("ALL");
 }
 
@@ -505,6 +553,30 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from='generic_appl left outer join appl on generic_appl."id"=appl."id"';
+   return($from);
+}
+
+#sub initSqlWhere
+#{
+#   my $self=shift;
+#   my $where="amtsiprovsto.lassetid=assetportfolio.lastid ".
+#             "and amtsiprovsto.bdelete='0' ".
+#             "and assetportfolio.lmodelid=ammodel.lmodelid ".
+#             "and ammodel.lnatureid=amnature.lnatureid(+) ".
+#             "and amnature.name IN ('DISKSUBSYSTEM',".
+#             "'DISKSUBSYSTEM_COMP','NAS-FILER') ".
+#             "and assetportfolio.ltenantid=amtenant.ltenantid ".
+#             "and assetportfolio.llocaid=amlocation.llocaid(+) ";
+#   return($where);
+#}
+
+
 
 
 #sub schain
@@ -716,7 +788,7 @@ sub Import
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default interfaces systems usedsharedcomp
+   return(qw(header appgen default interfaces systems usedsharedcomp
              control
              w5basedata source));
 }

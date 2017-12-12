@@ -1,5 +1,6 @@
 'tsacinv::appl'=>{de=>'AssetManager Anwendung',
                   en=>'AssetManager Application'},
+'fieldgroup.appgen'=>{de=>'Anwendungskerndaten',en=>'Application generic data'},
 'fieldgroup.default'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
 'fieldgroup.interfaces'=>{de=>'Schnittstellen',en=>'Interfaces'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
@@ -38,3 +39,4 @@
 'is TBSM on one of systems ordered'=>{de=>'TBSM wurde für eines der Systeme beauftragt'},
 'full CI-Name'=>{de=>'vollständiger CI-Name'},
 'marked as delete'=>{de=>'gelöscht markiert'},
+'is generic only'=>{de=>'nur als Kerndatensatz vorhanden'},

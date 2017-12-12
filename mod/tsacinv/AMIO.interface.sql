@@ -143,6 +143,23 @@ CREATE or REPLACE view appl as
 
 grant select on appl to public;
 
+CREATE or REPLACE view generic_appl as
+   SELECT distinct
+      amtsicustappl.code                             "applid",
+      concat(concat(concat(amtsicustappl.name,' ('),
+      amtsicustappl.code),')')                       "fullname",
+      amtsicustappl.ltsicustapplid                   "id",
+      amtsicustappl.name                             "name",
+      LOWER ( amtsicustappl.status)                  "status",
+      amtsicustappl.bdelete                          "deleted",
+      amtsicustappl.lassignmentid                    "lassignmentid"
+   FROM
+      AM2107.amtsicustappl
+   JOIN IFACE_ACL acl
+      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+grant select on generic_appl to public;
+
+
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::system (pre) ------------------------------
 -- --------------------------------------------------------------------------
