@@ -639,6 +639,38 @@ CREATE or REPLACE VIEW lnksharedstorage AS
 grant select on lnksharedstorage to public;
 
 
+CREATE or REPLACE VIEW sharedstorage AS
+   SELECT DISTINCT assetportfolio.assettag           AS "assetid",
+      amnature.name                                  AS "nature",
+      assetportfolio.name||' ('||
+         assetportfolio.assettag||' - '||
+         amtsiprovsto.code||')'                      AS "fullname",
+      assetportfolio.name                            AS "name",
+      amtsiprovsto.code                              AS "storagecode",
+      amtsiprovsto.lprovidedstorageid                AS "storageid",
+      amtsiprovsto.exportname                        AS "exportname",
+      amlocation.fullname                            AS "location",
+      assetportfolio.place                           AS "place",
+      assetportfolio.llocaid                         AS "locationid",
+      amtsiprovsto.lassetid                          AS "lassetid"
+   FROM AM2107.amtsiprovsto
+      JOIN AM2107.amportfolio assetportfolio
+         ON amtsiprovsto.lassetid = assetportfolio.lastid
+      JOIN AM2107.ammodel
+         ON  assetportfolio.lmodelid = ammodel.lmodelid
+      LEFT OUTER JOIN AM2107.amnature
+         ON ammodel.lnatureid = amnature.lnatureid 
+      LEFT OUTER JOIN AM2107.amlocation
+         ON assetportfolio.llocaid = amlocation.llocaid
+      JOIN lnksharedstorage_acl
+         ON lnksharedstorage_acl.id=assetportfolio.assettag
+   WHERE amtsiprovsto.bdelete = '0'
+      AND amnature.name IN ('DISKSUBSYSTEM','DISKSUBSYSTEM_COMP','NAS-FILER');
+
+grant select on sharedstorage to public;
+
+
+
 
 -- --------------------------------------------------------------------------
 -- --------------------- tsacinv::group -------------------------------------

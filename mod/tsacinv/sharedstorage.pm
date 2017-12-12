@@ -33,7 +33,7 @@ sub new
 
    
    $self->AddFields(
-      new kernel::Field::Id(
+      new kernel::Field::Text(
                 name          =>'assetid',
                 label         =>'AssetId',
                 size          =>'20',
@@ -53,16 +53,14 @@ sub new
                 htmldetail    =>0,
                 searchable    =>0,
                 label         =>'full name',
-                dataobjattr   =>"concat(assetportfolio.name,".
-                                "concat(' (',".
-                                "concat(assetportfolio.assettag,')')))"),
+                dataobjattr   =>'"fullname"'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 dataobjattr   =>'"name"'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Id(
                 name          =>'storagecode',
                 htmldetail    =>0,
                 searchable    =>0,
@@ -144,13 +142,6 @@ sub new
                 vjoindisp     =>'applid'),
 
 
-     new kernel::Field::Text(
-                name          =>'tenant',
-                label         =>'Tenant',
-                htmldetail    =>0,
-                group         =>'source',
-                dataobjattr   =>'"tenant"'),
-
       new kernel::Field::Text(
                 name          =>'place',
                 label         =>'Place',
@@ -167,6 +158,7 @@ sub new
                 dataobjattr   =>'"lassetid"'),
 
    );
+   $self->setWorktable("sharedstorage");
    $self->setDefaultView(qw(fullname location place));
    return($self);
 }
@@ -188,10 +180,6 @@ sub initSearchQuery
    if (!defined(Query->Param("search_status"))){
      Query->Param("search_status"=>"\"!out of operation\"");
    }
-   if (!defined(Query->Param("search_tenant"))){
-     Query->Param("search_tenant"=>"CS");
-   }
-
 }
 
 
@@ -207,32 +195,6 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default location mountpoints
              source));
-}
-
-
-
-
-
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="amtsiprovsto,amtenant,amportfolio assetportfolio,".
-            "ammodel,amnature,amlocation";
-   return($from);
-}
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="amtsiprovsto.lassetid=assetportfolio.lastid ".
-             "and amtsiprovsto.bdelete='0' ".
-             "and assetportfolio.lmodelid=ammodel.lmodelid ".
-             "and ammodel.lnatureid=amnature.lnatureid(+) ".
-             "and amnature.name IN ('DISKSUBSYSTEM',".
-             "'DISKSUBSYSTEM_COMP','NAS-FILER') ".
-             "and assetportfolio.ltenantid=amtenant.ltenantid ".
-             "and assetportfolio.llocaid=amlocation.llocaid(+) ";
-   return($where);
 }
 
 
