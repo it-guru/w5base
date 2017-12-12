@@ -39,6 +39,10 @@ grant select on iface to public;
 --   dass der Schnittstellen-User ueber die IFACE_ACL entweder den Zugriff
 --   auf den Buchungskreis, die Assignmentgroup der Anwendung oder den aus
 --   dem Kontierungsobjekt resultierenden Customer-Link haben muss.
+--   Es wird sichergestellt, das ueber die View "GENERIC_APPL" wirklich
+--   jede Anwendung mit Ihren Kerndaten sichtbar wird, um z.B. Schnittstellen
+--   zu Anwendungen aufbauen zu koennen, die man normalerweise nicht 
+--   sehen duerfte.
 -- --------------------------------------------------------------------------
 
 CREATE or REPLACE view appl_acl as
@@ -157,6 +161,7 @@ CREATE or REPLACE view generic_appl as
       AM2107.amtsicustappl
    JOIN IFACE_ACL acl
       on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+
 grant select on generic_appl to public;
 
 
