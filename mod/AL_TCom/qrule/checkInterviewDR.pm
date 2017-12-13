@@ -215,7 +215,7 @@ sub qcheckRecord
       my $pday=$wf->ExpandTimeExpression($planday,"en","GMT","GMT");
       if ($lday ne "" && $pday ne ""){
          my $duration=CalcDateDuration($lday,$pday);
-         if (defined($duration) && $duration->{days}<56){
+         if (defined($duration) && $duration->{days}<-56){
             my $msg="Disaster-Recovery Test plan date is bevor last test";
             push(@qmsg,$msg);
             push(@dataissue,$msg);
