@@ -397,6 +397,14 @@ sub initSearchQuery
 }
 
 
+sub initSqlWhere
+{
+    my $self=shift;
+    return("\"isactive\"='1'");
+ }
+
+
+
 
 sub getDetailBlockPriority
 {
