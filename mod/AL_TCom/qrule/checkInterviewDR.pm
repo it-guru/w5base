@@ -207,6 +207,7 @@ sub qcheckRecord
             my $msg="age of Disaster-Recovery Test violates SLA definition";
             push(@qmsg,$msg);
             push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
          }
       }
    }
