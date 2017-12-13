@@ -373,16 +373,14 @@ sub formatTaskList
                                  'tssm::chmtask');
    }
 
-   $ret=sprintf("%-14s %-14s %s\n",$colnames{tasknumber},
-                                   $colnames{implementer},
-                                   $colnames{assignedto});
-   $ret.="-"x70;
+   $ret=sprintf("%-14s %s\n",$colnames{tasknumber},
+                             $colnames{assignedto});
+   $ret.="-"x45;
    $ret.="\n";
 
    foreach my $task (@$l) {
-      $ret.=sprintf("%-14s %-14s %s\n",$task->{tasknumber},
-                                       $task->{implementer},
-                                       $task->{assignedto});
+      $ret.=sprintf("%-14s %s\n",$task->{tasknumber},
+                                 $task->{assignedto});
    }
 
    return($ret);
@@ -654,8 +652,7 @@ sub generateMailSet
          my $tobj=getModuleObject($self->Config,'tssm::chmtask');
          $tobj->SetFilter({changenumber=>\$WfRec->{srcid},
                            status=>\$taskstate});
-         my $taskdetails=$tobj->getHashList(qw(tasknumber assignedto 
-                                               implementer));
+         my $taskdetails=$tobj->getHashList(qw(tasknumber assignedto));
          my $tasklist=$self->formatTaskList($taskdetails);
 
          $chminfo=$self->getParsedTemplate(
