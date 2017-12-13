@@ -198,7 +198,6 @@ sub mkAcFtpRecSystem
                     Status=>"in operation",
                     Name=>$rec->{name},
                     Usage=>"SERVER",
-                    OlaClassSystem=>"FC-ONLY",
                     OperatingSystem=>"z CFCC 18",
                     bDelete=>'0',
                     lMemorySizeMb=>$memory,
@@ -237,8 +236,7 @@ sub mkAcFtpRecSystem
                     EventID=>$CurrentEventId,
                     ExternalSystem=>'W5Base',
                     ExternalID=>$rec->{id},
-                    Status=>"in operation",
-                    OperatingSystem=>"[NULL]",
+                    Status=>"in operation"
                }
              };
    push (@acrec,$ac3rec);
