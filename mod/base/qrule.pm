@@ -229,6 +229,7 @@ sub calcParentAndObjlist
          foreach my $lnkrec (@ruleorder){
             my $do=$self->getPersistentModuleObject($lnkrec->{dataobj});
             if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
+printf STDERR ("found rule with '$lnkrec->{mandatorid}'\n");
                if ($lnkrec->{mandatorid}!=0){
                   $nonAnyRules++;
                }
@@ -264,9 +265,24 @@ sub calcParentAndObjlist
          $cache->{$orgParentName}={parent=>$parent->Self,objlist=>$objlist};
       }
       else{
-         $parent=getModuleObject($self->Config,
-                                 $cache->{$orgParentName}->{parent});
-         $objlist=$cache->{$orgParentName}->{objlist};
+         if ($parent ne $cache->{$orgParentName}->{parent}){
+            my $do=getModuleObject($self->Config,
+                                    $cache->{$orgParentName}->{parent});
+            my $reloadedRec=$self->reloadRec($do,$rec);
+            if (!defined($reloadedRec)){
+               msg(ERROR,"parent transformation error ".
+                         "while reread rec - Cached");
+               return();
+            }
+            ${$calledRec}=$reloadedRec; # return new rec to caller
+            $rec=$reloadedRec;
+            $objlist=$do->getQualityCheckCompat($rec); 
+            msg(INFO,"qrule parent transformation ".
+                     "from %s to %s done - Cached",
+                     $parent->Self(),$do->Self());
+            $parent=$do;
+          
+         }
       }
    }
    return($parent,$objlist);
