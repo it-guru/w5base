@@ -221,7 +221,8 @@ sub calcParentAndObjlist
    my $parentTransformationCount=0;
    my $nonAnyRules=0;
    if ($parent->Self() ne "base::workflow"){
-      if (!exists($cache->{$orgParentName})){
+      my $cache_identifier=$orgParentName.'::'.$rec->{mandatorid};
+      if (!exists($cache->{$cache_identifier})){
          my @ruleorder=sort({
             $b->{mandatorid}<=>$a->{mandatorid}  # Every Any Regel must be
                                                  # processed at the end!
@@ -261,12 +262,12 @@ sub calcParentAndObjlist
                }
             }
          }
-         $cache->{$orgParentName}={parent=>$parent->Self,objlist=>$objlist};
+         $cache->{$cache_identifier}={parent=>$parent->Self,objlist=>$objlist};
       }
       else{
-         if ($parent ne $cache->{$orgParentName}->{parent}){
+         if ($parent ne $cache->{$cache_identifier}->{parent}){
             my $do=getModuleObject($self->Config,
-                                    $cache->{$orgParentName}->{parent});
+                                    $cache->{$cache_identifier}->{parent});
             my $reloadedRec=$self->reloadRec($do,$rec);
             if (!defined($reloadedRec)){
                msg(ERROR,"parent transformation error ".
