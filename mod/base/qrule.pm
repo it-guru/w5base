@@ -229,7 +229,6 @@ sub calcParentAndObjlist
          foreach my $lnkrec (@ruleorder){
             my $do=$self->getPersistentModuleObject($lnkrec->{dataobj});
             if (my $qrule=$self->isQruleApplicable($do,$objlist,$lnkrec,$rec)){
-printf STDERR ("found rule with '$lnkrec->{mandatorid}'\n");
                if ($lnkrec->{mandatorid}!=0){
                   $nonAnyRules++;
                }
