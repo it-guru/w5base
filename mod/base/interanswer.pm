@@ -488,7 +488,7 @@ sub Validate
          if ($newrec->{answer} ne ""){
             if (!($newrec->{answer}=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ &&
                defined(
-                  ExpandTimeExpression($newrec->{answer},"en","GMT","GMT")))){
+                  $self->ExpandTimeExpression($newrec->{answer},"en","GMT","GMT")))){
                $answervalid=0;
             }
          }
