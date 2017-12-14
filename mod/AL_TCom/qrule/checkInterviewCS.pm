@@ -170,7 +170,9 @@ sub qcheckRecord
 
    $lastday=~s#/#.#g;
    my $maxagedays=365;
-   if ($lastday ne "" && $rec->{soslanumclusttests}>0){
+   if ($lastday ne "" &&
+       ($lastday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) &&
+       $rec->{soslanumclusttests}>0){
       $maxagedays=365/$rec->{soslanumclusttests};
       my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
       if ($lday ne ""){

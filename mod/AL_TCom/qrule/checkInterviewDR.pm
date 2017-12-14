@@ -198,7 +198,9 @@ sub qcheckRecord
    $lastday=~s#/#.#g;
    $planday=~s#/#.#g;
    my $maxagedays=365;
-   if ($lastday ne "" && $rec->{soslanumdrtests}>0){
+   if ($lastday ne "" && 
+       ($lastday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) &&
+       $rec->{soslanumdrtests}>0){
       $maxagedays=365/$rec->{soslanumdrtests};
       my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
       if ($lday ne ""){
@@ -211,7 +213,10 @@ sub qcheckRecord
          }
       }
    }
-   if ($lastday ne "" && $planday ne ""){
+   if ($lastday ne "" &&
+       ($lastday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) &&
+       $planday ne "" &&
+       ($planday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ){
       my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
       my $pday=$wf->ExpandTimeExpression($planday,"en","GMT","GMT");
       if ($lday ne "" && $pday ne ""){

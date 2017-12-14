@@ -202,6 +202,16 @@ sub dynCalc
                $curs=0.0;
             }
          }
+         elsif ($q->{questtyp} eq "date"){
+            if (defined($a) &&
+                $a ne "" &&
+                ($a=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)){
+               $curs=100.0;
+            }
+            else{
+               $curs=0.0;
+            }
+         }
          else{
             if (defined($a) && $a->{answer} ne ""){
                $curs=100.0;

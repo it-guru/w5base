@@ -17,5 +17,6 @@
 'add comments to your answer'=>{de=>'Kommentare an die Antwort hinzufügen'},
 'age of verify'=>{de=>'Alter der Bestätigung'},
 'verification necessary'=>{de=>'neue Bestätigung ist notwendig'},
-
+'invalid answer format'=>{de=>'ungültiges Antwort Format'},
+'invalid or deleted interview question'=>{de=>'ungültige oder bereits gelöschte Frage'},
 
