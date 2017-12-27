@@ -722,32 +722,32 @@ sub SendXmlToAM_itclust
    my %grpnotfound;
    if (defined($rec)){
       do{
-         my $jobname="W5Base.$self->{jobstart}.".NowStamp().
-                     '.Campus_'.$rec->{id};
-         msg(INFO,"process itclust=$rec->{name} jobname=$jobname");
-         my $CurrentEventId="Add Cluster $rec->{name} ($rec->{id})";
-         my $acitclustrec;
-         if ($rec->{itclustid} ne ""){
-            $acitclust->ResetFilter();
-            $acitclust->SetFilter({clusterid=>\$rec->{itclustid}});
-            ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id clusterid));
-        
-         }
-         else{
-            $acitclust->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
-            ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id applid
-                                                       assignmentgroup));
-            die("AssetManager not online") if (!$acitclust->Ping());
-            if (defined($acitclustrec) && $acitclustrec->{applid} ne ""){
-               $itclust->UpdateRecord({itclustid=>$acitclustrec->{applid}},
-                                  {id=>\$rec->{id}});
-            }
-         }
-         die("AssetManager not online") if (!$acitclust->Ping());
-
-         my $assignment="TIT";
-         my $acstatus="IN OPERATION";
          if ($rec->{acinmassingmentgroup} ne ""){
+            my $jobname="W5Base.$self->{jobstart}.".NowStamp().
+                        '.Campus_'.$rec->{id};
+            msg(INFO,"process itclust=$rec->{name} jobname=$jobname");
+            my $CurrentEventId="Add Cluster $rec->{name} ($rec->{id})";
+            my $acitclustrec;
+            if ($rec->{itclustid} ne ""){
+               $acitclust->ResetFilter();
+               $acitclust->SetFilter({clusterid=>\$rec->{itclustid}});
+               ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id clusterid));
+        
+            }
+            else{
+               $acitclust->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+               ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id itclustid
+                                                          assignmentgroup));
+               die("AssetManager not online") if (!$acitclust->Ping());
+               if (defined($acitclustrec) && $acitclustrec->{itclustid} ne ""){
+                  $itclust->UpdateRecord({itclustid=>$acitclustrec->{itclustid}},
+                                     {id=>\$rec->{id}});
+               }
+            }
+            die("AssetManager not online") if (!$acitclust->Ping());
+           
+            my $assignment="TIT";
+            my $acstatus="IN OPERATION";
             my $acftprec={
                 Clusters=>{
                    Security_Unit=>"TS.DE",
