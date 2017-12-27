@@ -126,7 +126,7 @@ sub Validate
    my $orgrec=shift;
 
    if (effChanged($oldrec,$newrec,"vsmloc")){
-      $newrec->{"vsmloc"}=~s/\s*/_/g;
+      $newrec->{"vsmloc"}=~s/\s+/_/g;
    }
    return(1);
 }

@@ -217,13 +217,13 @@ sub new
                 name          =>'vsmnetworkclass',
                 label         =>'Network Class',
                 value         =>["NET","Application","Central Services",
-                                 "FW","LB","SAN"],
+                                 "FW","LB","NAS","SAN"],
                 dataobjattr   =>'networkclass'),
 
       new kernel::Field::Text(
                 name          =>'vsmnetworktype',
                 label         =>'Network Type',
-                dataobjattr   =>'networkclass'),
+                dataobjattr   =>'networktype'),
 
       new kernel::Field::Text(
                 name          =>'vsm_link',
