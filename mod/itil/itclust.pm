@@ -503,7 +503,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL");
+   return(qw(header default history source services contacts 
+             attachments control systems misc));
 }
 
 sub isWriteValid

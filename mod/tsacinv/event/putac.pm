@@ -64,6 +64,7 @@ sub Init
    $self->RegisterEvent("SendXmlToAM_system","SendXmlToAM_system",timeout=>40000);
    $self->RegisterEvent("SendXmlToAM_asset","SendXmlToAM_asset",timeout=>40000);
    $self->RegisterEvent("SendXmlToAM_campus","SendXmlToAM_campus");
+   $self->RegisterEvent("SendXmlToAM_itclust","SendXmlToAM_itclust");
 
 
    #######################################################################
@@ -682,6 +683,97 @@ sub SendXmlToAM_instance
 
    $self->TransferFile($fh{ci_appl_rel},$filename{ci_appl_rel}, "ci_appl_rel");
    my $back=$self->TransferFile($fh{instance},$filename{instance},"instance");
+
+   return($back);
+}
+
+
+sub SendXmlToAM_itclust
+{
+   my $self=shift;
+   my @w5id=@_;
+
+   my $elements=0;
+   my $acitclust=getModuleObject($self->Config,"tsacinv::itclust");
+   my $itclust=getModuleObject($self->Config,"TS::itclust");
+   my $user=getModuleObject($self->Config,"base::user");
+   my $acuser=getModuleObject($self->Config,"tsacinv::user");
+
+   my %filter=(cistatusid=>['3','4','5']);
+   $self->{DebugMode}=0;
+   if ($#w5id!=-1){
+      if (in_array(\@w5id,"debug")){
+         @w5id=grep(!/^debug$/i,@w5id);
+         $self->{DebugMode}=1;
+         msg(ERROR,"processing DebugMode - loading ids '%s'",join(",",@w5id));
+      }
+      $filter{id}=\@w5id;
+   }
+
+   $itclust->SetFilter(\%filter);
+   $itclust->SetCurrentView(qw(ALL));
+
+   my (%fh,%filename);
+   ($fh{itclust},      $filename{itclust}               )=$self->InitTransfer();
+
+
+   my ($rec,$msg)=$itclust->getFirst();
+   $self->{jobstart}=NowStamp();
+   my %grpnotfound;
+   if (defined($rec)){
+      do{
+         my $jobname="W5Base.$self->{jobstart}.".NowStamp().
+                     '.Campus_'.$rec->{id};
+         msg(INFO,"process itclust=$rec->{name} jobname=$jobname");
+         my $CurrentEventId="Add Cluster $rec->{name} ($rec->{id})";
+         my $acitclustrec;
+         if ($rec->{itclustid} ne ""){
+            $acitclust->ResetFilter();
+            $acitclust->SetFilter({clusterid=>\$rec->{itclustid}});
+            ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id clusterid));
+        
+         }
+         else{
+            $acitclust->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+            ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id applid
+                                                       assignmentgroup));
+            die("AssetManager not online") if (!$acitclust->Ping());
+            if (defined($acitclustrec) && $acitclustrec->{applid} ne ""){
+               $itclust->UpdateRecord({itclustid=>$acitclustrec->{applid}},
+                                  {id=>\$rec->{id}});
+            }
+         }
+         die("AssetManager not online") if (!$acitclust->Ping());
+
+         my $assignment="TIT";
+         my $acstatus="IN OPERATION";
+         if ($rec->{acinmassingmentgroup} ne ""){
+            my $acftprec={
+                Clusters=>{
+                   Security_Unit=>"TS.DE",
+                   Status=>$acstatus,
+                   EventID=>$CurrentEventId,
+                   AssignmentGroup=>$assignment,
+                   IncidentAG=>$rec->{acinmassingmentgroup},
+                   bDelete=>'0',
+                   ClusterType=>'Cluster',
+                   Name=>$rec->{fullname}
+                }
+            };
+            $acftprec->{Clusters}->{ExternalID}=$rec->{id};
+            $acftprec->{Clusters}->{ExternalSystem}="W5Base";
+            $acftprec->{Clusters}->{SC_Location}="4787.0000.0000";
+            $acftprec->{Clusters}->{AC_Location}="LGER029687";
+
+            my $fh=$fh{itclust};
+            print $fh hash2xml($acftprec,{header=>0});
+         }
+
+         ($rec,$msg)=$itclust->getNext();
+      } until(!defined($rec));
+   }
+
+   my $back=$self->TransferFile($fh{itclust},$filename{itclust},"cluster");
 
    return($back);
 }

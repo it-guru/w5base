@@ -1,1 +1,3 @@
 'TS::itclust'=>{de=>'T-Systems IT Cluster',en=>'T-Systems IT Cluster'},
+'fieldgroup.inm'=>{de=>'Incident-Management',en=>'Incident management'},
+
