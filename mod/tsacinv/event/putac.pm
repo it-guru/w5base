@@ -200,7 +200,7 @@ sub mkAcFtpRecSystem
                     Name=>$rec->{name},
                     #Usage=>"SERVER",
                     Usage=>"HOUSING",
-                    OperatingSystem=>"OTHER",
+                    OperatingSystem=>"z CFCC 18",
                     CO_CC=>"[NULL]",
                     bDelete=>'0',
                     lMemorySizeMb=>$memory,
