@@ -201,6 +201,7 @@ sub mkAcFtpRecSystem
                     #Usage=>"SERVER",
                     Usage=>"HOUSING",
                     OperatingSystem=>"OTHER",
+                    CO_CC=>"[NULL]",
                     bDelete=>'0',
                     lMemorySizeMb=>$memory,
                     fCPUNumber=>$cpucount,
