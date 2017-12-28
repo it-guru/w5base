@@ -728,20 +728,22 @@ sub SendXmlToAM_itclust
             msg(INFO,"process itclust=$rec->{name} jobname=$jobname");
             my $CurrentEventId="Add Cluster $rec->{name} ($rec->{id})";
             my $acitclustrec;
-            if ($rec->{itclustid} ne ""){
+            if ($rec->{clusterid} ne ""){
                $acitclust->ResetFilter();
-               $acitclust->SetFilter({clusterid=>\$rec->{itclustid}});
+               $acitclust->SetFilter({clusterid=>\$rec->{clusterid}});
                ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id clusterid));
         
             }
             else{
                $acitclust->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
-               ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id itclustid
+               ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id clusterid
                                                           assignmentgroup));
                die("AssetManager not online") if (!$acitclust->Ping());
                if (defined($acitclustrec) && $acitclustrec->{clusterid} ne ""){
-                  $itclust->UpdateRecord({itclustid=>$acitclustrec->{clusterid}},
-                                     {id=>\$rec->{id}});
+                  my $itclustop=$itclust->Clone();
+                  $itclustop->UpdateRecord(
+                     {clusterid=>$acitclustrec->{clusterid}},
+                     {id=>\$rec->{id}});
                }
             }
             die("AssetManager not online") if (!$acitclust->Ping());
