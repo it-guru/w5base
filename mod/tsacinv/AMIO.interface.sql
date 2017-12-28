@@ -1599,8 +1599,19 @@ CREATE or REPLACE VIEW itclust_acl AS
          ON amportfolio.lportfolioitemid = amcomputer.litemid
       JOIN AM2107.amasset
          ON amasset.assettag = amportfolio.assettag
-      JOIN system
-         ON amcomputer.lcomputerid=system."lclusterid";
+      JOIN AM2107.ammodel
+         ON amportfolio.lmodelid = ammodel.lmodelid and
+            ammodel.name = 'CLUSTER'
+      LEFT OUTER JOIN AM2107.amemplgroup assigrp
+         on amportfolio.lassignmentid = assigrp.lgroupid
+      LEFT OUTER JOIN IFACE_ACL acl
+         on acl.ifuser=sys_context('USERENV', 'SESSION_USER') and
+             (assigrp.name like acl.assignment) and
+             (acl.acctno is null) and
+             (acl.customerlnk is null) 
+       LEFT OUTER JOIN system
+         ON amcomputer.lcomputerid=system."lclusterid"
+   WHERE system."lclusterid" is not null or acl.ifuser is not null;
 
 CREATE or REPLACE VIEW itclust AS
    SELECT
