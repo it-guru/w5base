@@ -1063,18 +1063,15 @@ sub SendXmlToAM_appl
                            $acuser->SetFilter([
                               {
                                  loginname=>\$posix{$userent},
-                                 deleted=>\'0',
-                                 tenant=>\'CS'
+                                 deleted=>\'0'
                               },
                               {
                                  ldapid=>\$posix{$userent},
-                                 deleted=>\'0',
-                                 tenant=>\'CS'
+                                 deleted=>\'0'
                               },
                               {
                                  idno=>\$posix{$userent},
-                                 deleted=>\'0',
-                                 tenant=>\'CS'
+                                 deleted=>\'0'
                               },
                               {
                                  email=>\$rec->{email},
