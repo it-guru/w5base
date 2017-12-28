@@ -739,8 +739,8 @@ sub SendXmlToAM_itclust
                ($acitclustrec,$msg)=$acitclust->getOnlyFirst(qw(id itclustid
                                                           assignmentgroup));
                die("AssetManager not online") if (!$acitclust->Ping());
-               if (defined($acitclustrec) && $acitclustrec->{itclustid} ne ""){
-                  $itclust->UpdateRecord({itclustid=>$acitclustrec->{itclustid}},
+               if (defined($acitclustrec) && $acitclustrec->{clusterid} ne ""){
+                  $itclust->UpdateRecord({itclustid=>$acitclustrec->{clusterid}},
                                      {id=>\$rec->{id}});
                }
             }
