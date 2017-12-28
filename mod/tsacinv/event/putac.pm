@@ -189,7 +189,7 @@ sub mkAcFtpRecSystem
    $cpucount="1" if ($cpucount eq "");
 
    my @acrec;
- 	
+    
    my $acrec={
                LogSys=>{
                     EventID=>$CurrentEventId,
@@ -281,18 +281,18 @@ sub SendXmlToAM_system
    my $acnewback=0;
    if (defined($rec)){
       do{
-         if ($rec->{asset} ne ""){
+         if ($rec->{asset} ne "" && $rec->{acinmassingmentgroup} ne ""){
             $acasset->ResetFilter();
             $acasset->SetFilter({assetid=>\$rec->{asset}});
             my ($acassetrec,$msg)=$acasset->getOnlyFirst(qw(assetid srcsys));
             if (defined($acassetrec)){
                foreach my $acftprec ($self->mkAcFtpRecSystem($acassetrec,$rec)){
-		       if (defined($acftprec)){
-			  my $fh=$fh{system};
-			  print $fh hash2xml($acftprec,{header=>0});
-			  $acnew++;
-		       }
-	       }
+                  if (defined($acftprec)){
+                     my $fh=$fh{system};
+                     print $fh hash2xml($acftprec,{header=>0});
+                     $acnew++;
+                  }
+               }
             }
          }
          
@@ -371,7 +371,7 @@ sub mkAcFtpRecAsset
    $cpucount="1" if ($cpucount eq "");
    my $cpuspeed=$rec->{cpuspeed};
    $cpuspeed="1" if ($cpuspeed eq "");
-	
+   
    my $acrec={
                Asset=>{
                     EventID=>$CurrentEventId,
