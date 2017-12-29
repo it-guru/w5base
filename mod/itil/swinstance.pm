@@ -538,6 +538,24 @@ sub new
                 label         =>'SSL Check URL',
                 dataobjattr   =>'swinstance.ssl_url'),
 
+      new kernel::Field::Select(
+                name          =>'ssl_network',
+                htmleditwidth =>'280px',
+                group         =>'ssl',
+                allowempty    =>1,
+                readonly      =>1,
+                label         =>'SSL Check Network',
+                vjointo       =>'itil::network',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['ssl_networkid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'ssl_networkid',
+                label         =>'NetworkID',
+                history       =>0,
+                dataobjattr   =>'swinstance.ssl_network'),
+
       new kernel::Field::Date(
                 name          =>'sslbegin',
                 history       =>0,

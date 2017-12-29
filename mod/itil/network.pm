@@ -66,6 +66,17 @@ sub new
                 label         =>'IP-Numbering unique',
                 dataobjattr   =>'network.uniquearea'),
 
+
+      new kernel::Field::TextURL(
+                name          =>'probeipurl',
+                label         =>'ProbeIP URL',
+                dataobjattr   =>'network.probeipurl'),
+
+      new kernel::Field::Text(
+                name          =>'probeipproxy',
+                label         =>'ProbeIP Proxy',
+                dataobjattr   =>'network.probeipproxy'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',

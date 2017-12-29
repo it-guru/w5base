@@ -1642,3 +1642,5 @@ create table asset_tstamp (
 );
 alter table appl add soslanumclusttests    float(2) default '0.0';
 alter table system add itnormodel bigint(20);
+alter table network add probeipurl varchar(128),add probeipproxy varchar(128);
+alter table swinstance add ssl_network bigint(20) default NULL;

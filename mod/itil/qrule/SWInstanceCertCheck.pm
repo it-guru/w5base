@@ -297,6 +297,12 @@ sub checkSSL
                                      SSL_verify_mode=>'SSL_VERIFY_NONE',
                                      SSL_session_cache_size=>0,
                                      Proxy=>$proxy);
+      if (defined($sock)){
+         $newrec->{ssl_networkid}="11811326390001";
+      }
+   }
+   else{
+      $newrec->{ssl_networkid}="11811326110001";
    }
 
    
