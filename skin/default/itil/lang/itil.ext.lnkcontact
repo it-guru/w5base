@@ -21,3 +21,4 @@
 'write contract'=>{de=>'write'},
 'privacy read'=>{de=>'vertrauliches lesen'},
 'Productmanager'=>{de=>'Produktmanager'},
+'Application manager deputy'=>{de=>'Applicationmanager Vertreter'},
