@@ -70,7 +70,7 @@
 'fieldgroup.customer'=>{de=>'verwendet durch Kunde',en=>'used by customer'},
 'Customer Contract'=>{de=>'Kundenvertrag'},
 'mangaged by rules of SOX'=>{de=>'Betreuung nach SOX (USA) Regeln'},
-'SOX state'=>{de=>'SOX (USA) status'},
+'SOX state'=>{de=>'SOX (USA) Status'},
 "invalid systemid '%s' specified"=>{de=>"ungültige SystemID '%s'"},
 "invalid system name '%s' specified"=>{de=>"ungültiger Systemname '%s'"},
 'monitoring resonsible Team'=>{de=>'Monitoring verantw. Team'},
@@ -100,6 +100,6 @@
 'a clusternode can not be an embedded system'=>{de=>'Eine Clusternode kann kein Embedded System sein'},
 'an embedded systems can not have software installations'=>{de=>'Ein Embedded System darf keine Software-Installation aufweisen'},
 'an embedded systems can not have software instances'=>{de=>'Ein Embedded System darf keine Software-Instanzen aufweisen'},
-"invalid directory identifier '%s' specified"=>{de=>"ungültiger Directory Identifier '%s' angegeben"}
-
-
+"invalid directory identifier '%s' specified"=>{de=>"ungültiger Directory Identifier '%s' angegeben"},
+'NOR Model to use'=>{de=>'zu verwendendes NOR Lösungsmodel',
+                     en=>'NOR Model to use'},

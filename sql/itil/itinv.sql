@@ -1641,3 +1641,4 @@ create table asset_tstamp (
   REFERENCES asset (id) ON DELETE CASCADE
 );
 alter table appl add soslanumclusttests    float(2) default '0.0';
+alter table system add itnormodel bigint(20);

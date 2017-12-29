@@ -458,6 +458,12 @@ sub qcheckRecord
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'leftouterlink');
+               $self->IfComp($dataobj,
+                             $rec,"itnormodel",
+                             $parrec,"norsolutionclass",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'leftouterlink');
                if ($rec->{allowifupdate}){
                   my $net=getModuleObject($self->getParent->Config(),"itil::network");
                   $net->SetCurrentView(qw(id name));

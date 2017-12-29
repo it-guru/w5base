@@ -586,6 +586,22 @@ sub new
                 label         =>'monitoring resonsible TeamID',
                 dataobjattr   =>'system.moniteam'),
 
+      new kernel::Field::Select(
+                name          =>'itnormodel',
+                label         =>'NOR Model to use',
+                group         =>'sec',
+                searchable    =>0,
+                allowempty    =>1,
+                vjoinon       =>['itnormodelid'=>'id'],
+                vjointo       =>'itil::itnormodel',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'itnormodelid',
+                group         =>'sec',
+                label         =>'NORmodelID',
+                dataobjattr   =>'system.itnormodel'),
 
       new kernel::Field::JoinUniqMerge(
                 name          =>'issox',
