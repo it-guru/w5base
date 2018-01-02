@@ -50,7 +50,7 @@ sub EurekaMigration
    my $filename=shift;
 
    msg(INFO,"try to open file '$filename'");
-   $ENV{REMOTE_USER}="service/EurekaMigration";
+   $ENV{REMOTE_USER}="service/ONEERP";
    my $exitcode=$self->ProcessExcelImport($filename);
 
    return({exitcode=>$exitcode});
@@ -124,11 +124,11 @@ sub ProcessLineData
       if (keys(%to)!=0){
          $wfa->Notify("INFO",
                       "CO/Kostenstellen/PSP Migration - ".
-                      "Eureka/TelekomIT - ".$data->[0]."->".$data->[1],
+                      "OneERP - ".$data->[0]."->".$data->[1],
                       "Sehr geehrte Damen und Herren,\n\n".
                       "Aufgrund einer notwendigen Umstellung von CO-Nummern ".
-                      "und Kostenstellen aufgrund des Eureka Projektes ".
-                      "(Telekom IT), wurden in W5Base/Darwin ".
+                      "und Kostenstellen aufgrund des OneERP Projektes ".
+                      "(T-Systems), wurden in W5Base/Darwin ".
                       "Korrekturen an Config-Items durchgeführt, die durch ".
                       "Sie datenverantwortet werden.\n\n".
                       "Im konkreten Fall wurde der Kostenknoten '<b>".
@@ -137,9 +137,7 @@ sub ProcessLineData
                       "Die Korrektur hat Auswirkungen auf die folgenden ".
                       "Config-Items:\n".$msg.
                       "\n\nBitte prüfen Sie im Bedarfsfall, ob diese ".
-                      "Umstellungen auch aus Ihrer Sicht korrekt sind. Bei ".
-                      "Rückfragen zu dieser Migration wenden Sie sich bitte ".
-                      "an den zuständigen Projektleiter Hr. Schulz, Rainer",
+                      "Umstellungen auch aus Ihrer Sicht korrekt sind.",
                       emailto=>[keys(%to)],
                       emailcc=>[keys(%cc)]);
       }
