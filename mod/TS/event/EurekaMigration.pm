@@ -76,9 +76,9 @@ sub ProcessLineData
    $self->{$o}->SetFilter({name=>\$data->[0]});
    my $total=0;
    my %to=();
-   my %cc=(11634953080001=>1,11634955570001=>1,
-           11634955470001=>1,11999553900001=>1,
-           12941417060008=>1);
+   my %cc=(11634953080001=>1,  # vogler
+           11634955470001=>1    # merx  
+           );
    my $msg="";
    my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
    foreach my $rec ($self->{$o}->getHashList(qw(ALL))){
