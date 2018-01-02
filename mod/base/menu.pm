@@ -804,7 +804,6 @@ sub SkinSwitcher
       my $skinname=$skin[$skinno];
       $skinlabel="Default System" if ($skinno==0);
       $skinname="" if ($skinno==0);
-      $skinlabel="W5Base Skin" if ($skin[$skinno] eq "default");
       $skinlabel=~s/^(\S)/uc($1)/ge;
       my $onclick="setSkin('".$skinname."');";
       my $pref="";
@@ -813,8 +812,24 @@ sub SkinSwitcher
          $pref="<b><u>";
          $post="</b></u>";
       }
-      printf("<a href=\"#\" onclick=\"$onclick\">$pref".
-             "$skinlabel$post</a>");
+      my $skinnamefile=$self->getSkinFile("base/tmpl/skinname",
+                                          skin=>$skin[$skinno]);
+      if (-f $skinnamefile){
+         if (open(SKINNAMEF,"<$skinnamefile")){
+            my $l1=<SKINNAMEF>;
+            if (!($l1=~m/^\s*$/)){
+               $skinlabel=trim($l1);
+            }
+            close(SKINNAMEF);
+         }
+      }
+      printf("<div>".
+             "<a href=\"#\" onclick=\"$onclick\">".
+             "<img style=\"vertical-align:middle;margin-right:10px\" ".
+             "src=\"../load/skinname.jpg?SKIN=$skin[$skinno]\">".
+             "$pref".
+             "$skinlabel$post</a>".
+             "</div>");
    }
    printf("</div><hr>");
    printf("</div>");
