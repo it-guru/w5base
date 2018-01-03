@@ -475,6 +475,9 @@ sub isWriteValid
          }
       }
    }
+   else{
+      push(@l,"inmchm");  # allow generell on Upload of new records
+   }                      # write on inmchm - not good -> but needed.
    return(@l);
 }
 
