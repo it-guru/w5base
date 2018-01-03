@@ -176,6 +176,18 @@ sub new
                 label         =>'Notification 1 (off)',
                 dataobjattr   =>'lnkmgmtitemgroup.notify1off'),
 
+      new kernel::Field::Date(
+                name          =>'rlnkto',
+                group         =>'notifications',
+                uploadable    =>0,
+                uivisible     =>sub{
+                   my $self=shift;
+                   return(1) if ($self->getParent->IsMemberOf("admin"));
+                   return(0);
+                },
+                label         =>'retracted lnkto',
+                dataobjattr   =>'lnkmgmtitemgroup.rlnkto'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -363,11 +375,11 @@ sub Validate
       $newrec->{notify1on}=undef;
    }   
    if (effChanged($oldrec,$newrec,"lnkto")) {
-      if (!defined $newrec->{lnkto}) {
-         $newrec->{notify1off}='1970-01-01 00:00:00';
-      } else {
-         $newrec->{notify1off}=undef;
+      if (!defined $newrec->{lnkto} &&
+           defined $oldrec->{notify1off}) {
+         $newrec->{rlnkto}=$oldrec->{lnkto};
       }
+      $newrec->{notify1off}=undef;
    }   
 
    return(1);

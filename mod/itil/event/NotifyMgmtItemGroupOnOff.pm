@@ -37,6 +37,7 @@ sub NotifyMgmtItemGroupOnOff
    my $self=shift;
    my %param=@_;
 
+   my @notifytypes=qw(PCONTROL CFGROUP);
    my $lnkobj=getModuleObject($self->Config,"itil::lnkmgmtitemgroup");
    my $user  =getModuleObject($self->Config,"base::user");
    my $msgcnt=0; # number of sent messages
@@ -44,7 +45,7 @@ sub NotifyMgmtItemGroupOnOff
    ## added to mgmtitemgroup
    $lnkobj->ResetFilter;
    $lnkobj->SetFilter({notify1on=>\'[EMPTY]',
-                       grouptype=>\'PCONTROL',
+                       grouptype =>\@notifytypes,
                        lnkfrom  =>'>now AND <=now+14d'});
 
    # collect all data needed for Notification
@@ -63,7 +64,7 @@ sub NotifyMgmtItemGroupOnOff
    ## removed from mgmtitemgroup
    $lnkobj->ResetFilter;
    $lnkobj->SetFilter({notify1off=>\'[EMPTY]',
-                       grouptype =>\'PCONTROL',
+                       grouptype =>\@notifytypes,
                        lnkto     =>'>now AND <=now+14d'});
 
    # collect all data needed for Notification
@@ -80,11 +81,12 @@ sub NotifyMgmtItemGroupOnOff
       }
    }
 
-   ## removed from mgmtitemgroup has been retracted
+   ## 'link to' from mgmtitemgroup has been retracted
    $lnkobj->ResetFilter;
-   $lnkobj->SetFilter({notify1off=>\'1970-00-00 00:00:00',
-                       grouptype =>\'PCONTROL',
-                       lnkto     =>'[EMPTY]'});
+   $lnkobj->SetFilter({notify1off=>\'[EMPTY]',
+                       grouptype =>\@notifytypes,
+                       lnkto     =>\'[EMPTY]',
+                       rlnkto    =>\'>now'});
 
    # collect all data needed for Notification
    $notifyparams=undef;
@@ -94,7 +96,8 @@ sub NotifyMgmtItemGroupOnOff
    foreach my $n (@$notifyparams) {
       my $r=$self->notify($n,'roff');
       if (defined($r)) {
-         $lnkobj->UpdateRecord({notify1off=>NowStamp("en")},
+         $lnkobj->UpdateRecord({notify1off=>NowStamp("en"),
+                                rlnkto=>undef},
                                {id=>$n->{id}});
          $msgcnt++;
       }
@@ -176,7 +179,7 @@ sub getNotifyParam
    my @notifyparam;
 
    my $l=$lnkobj->getHashList(qw(id applid locationid businessserviceid
-                                 lnkfrom lnkto mgmtitemgroup));
+                                 lnkfrom lnkto mgmtitemgroup grouptype));
    foreach my $lnk (@$l) {
       my $mailtoid;
       my @mailccids;

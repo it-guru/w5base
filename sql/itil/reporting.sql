@@ -80,3 +80,4 @@ alter table mgmtitemgroup add lastqcheck datetime default NULL,add key(lastqchec
 alter table lnkmgmtitemgroup add notify1on datetime default NULL;
 alter table lnkmgmtitemgroup add notify1off datetime default NULL;
 alter table mgmtitemgroup add rundowncomment longtext, add rundowndate datetime,add rundownrequestor bigint(20);
+alter table lnkmgmtitemgroup add rlnkto datetime default NULL;
