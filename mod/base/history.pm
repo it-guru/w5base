@@ -151,13 +151,13 @@ sub new
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   my $oldstate=quoteSOAP($current->{oldstate});
-                   my $newstate=quoteSOAP($current->{newstate});
+                   my $oldstate=quoteSOAP(Html2Latin1($current->{oldstate}));
+                   my $newstate=quoteSOAP(Html2Latin1($current->{newstate}));
                    my $diff;
-                   my %diffopt=(remove_open => "<font color=darkred>",
-                                remove_close => "</font>",
-                                append_open => "<font color=darkgreen>",
-                                append_close => "</font>");
+                   my %diffopt=(remove_open => "<font color=darkred><b>",
+                                remove_close => "</b></font>",
+                                append_open => "<font color=darkgreen><b>",
+                                append_close => "</b></font>");
 
                    eval(' 
                       use String::Diff;
@@ -173,7 +173,8 @@ sub new
                    return("<table width=\"100%\">".
                           "<tr><th align=left width=\"50%\">old:</th>".
                           "<th align=left width=\"50%\">new:</th></tr>".
-                          "<tr><td>$a</td><td>$b</td></tr>".
+                          "<tr><td  style=\"color:gray\">$a</td>".
+                          "<td  style=\"color:gray\">$b</td></tr>".
                           "</table>");
 
                 }),

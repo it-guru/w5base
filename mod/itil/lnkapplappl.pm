@@ -192,6 +192,7 @@ sub new
                 name          =>'ifagreementlang',
                 label         =>'interface agreement language',
                 group         =>'ifagreement',
+                htmleditwidth =>'200px',
                 value         =>['',LangTable()],
                 dataobjattr   =>'lnkapplappl.ifagreementlang'),
 
@@ -213,9 +214,22 @@ sub new
                 label         =>'Interface-Agreement-Document Name',
                 searchable    =>0,
                 uploadable    =>0,
+                htmldetail    =>0,
                 readonly      =>1,
                 group         =>'ifagreement',
                 dataobjattr   =>'lnkapplappl.ifagreementdocname'),
+
+      new kernel::Field::Select(
+                name          =>'ifagreementstate',
+                label         =>'Interface-Agreement state',
+                uploadable    =>1,
+                htmleditwidth =>'200px',
+                htmldetail    =>"NotEmpty",
+                transprefix   =>'IFSTATE.',
+                allowempty    =>1,
+                value         =>['CURRENT','NEEDMAINTENANCE'],
+                group         =>'ifagreement',
+                dataobjattr   =>'lnkapplappl.ifagreementstate'),
 
       new kernel::Field::Date(
                 name          =>'ifagreementdocdate',
@@ -913,6 +927,18 @@ sub Validate
          return(0);
       }
    }
+   if (exists($newrec->{ifagreementstate}) && $newrec->{ifagreementstate} eq ""){
+      $newrec->{ifagreementstate}="CURRENT";
+   }
+   if (exists($newrec->{ifagreementdoc})){
+      if ($newrec->{ifagreementdoc} eq ""){
+         $newrec->{ifagreementstate}=undef;
+      }
+      else{
+         $newrec->{ifagreementstate}="CURRENT";
+      }
+   }
+
 
    if (effVal($oldrec,$newrec,"cistatusid")<5) {
       # check against flag 'isnoifaceappl' in fromappl
