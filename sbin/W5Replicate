@@ -828,6 +828,21 @@ sub objectReplicationPhase2
    if ($ctrl->{commitblocksize}>0){
       $p2smallpack=$ctrl->{commitblocksize};
    }
+   my $recaccess_reservetime=0;
+   if (exists($ctrl->{avgrecaccess}) && $ctrl->{avgrecaccess} ne ""){
+      #
+      # calculate a reserve time for dataobjects with a huge record
+      # access time to prevent hard timeouts by process alarm (and
+      # the triggered abort message)
+      #
+      $recaccess_reservetime=
+              (($ctrl->{avgrecaccess}/1000)*
+               ($ctrl->{avgrecaccess}/1000))*0.03;
+      if ($recaccess_reservetime>180){
+         $recaccess_reservetime=180;
+      }
+   }
+   
 
    msg(INFO,"============================================");
    msg(INFO,"start: phase 2 replication for $ctrl->{name} - refresh");
@@ -885,7 +900,7 @@ sub objectReplicationPhase2
    }
    my %idseen=();
    SPLOOP: while($ReplicationStart+$MaximumReplicationTime-10>time() &&
-         $start+$phaselimit>time()){
+         $start+$phaselimit-$recaccess_reservetime>time()){
       my $curSyncTime=time()-$ReplicationStart;
 
       $dbi->doCmd("lock table \"$ctrl->{name}\" IN EXCLUSIVE MODE");
@@ -905,7 +920,7 @@ sub objectReplicationPhase2
       foreach my $rec (@buffer){
          my $id=$rec->{$ctrl->{idname}};
          last SPLOOP if (exists($idseen{$id}) || # end if an ID is already seen
-                         $start+$phaselimit<time()); 
+                         $start+$phaselimit-$recaccess_reservetime<time()); 
          $idseen{$id}++;
          $dbi->doCmd("update \"_$ctrl->{name}\" set w5repllasttry=current_date ".
                      "where refid=?",$id);
