@@ -309,6 +309,82 @@ grant select on lnksharednet to public;
 
 
 -- --------------------------------------------------------------------------
+-- --------------------- tsacinv::lnkapplsystem -----------------------------
+-- --------------------------------------------------------------------------
+--   Der Zugriff auf den Relationsdatensatz zwischen Anwendung und System
+--   wird dadurch eingeschraenkt, das der Schnittstellen-User einen
+--   Relationsdatensatz dann sieht, wenn er die darin aufgefuehrte
+--   Anwendung sehen darf.
+-- --------------------------------------------------------------------------
+
+CREATE or REPLACE VIEW lnkapplsystem_acl AS
+   select distinct amtsirelportfappl.lrelportfapplid id
+   FROM AM2107.amtsirelportfappl
+   JOIN appl
+      ON amtsirelportfappl.lapplicationid=appl."id";
+
+
+CREATE or REPLACE VIEW lnkapplsystem AS
+   SELECT
+      distinct amtsirelportfappl.lrelportfapplid     AS "id",
+      amtsicustappl.code                             AS "applid",
+      amportfolio.bdelete                            AS "deleted",
+      amtsirelportfappl.bactive                      AS "isactive",
+      amtsicustappl.description                      AS "appldescription",
+      amtsicustappl.usage                            AS "usage",
+      amcostcenter.trimmedtitle                      AS "applconumber",
+      amcostcenter.field1                            AS "applcodescription",
+      amcostcenter.alternatebusinesscenter           AS "altbc",
+      amtsicustappl.lservicecontactid                AS "semid",
+      amtsicustappl.ltechnicalcontactid              AS "tsmid",
+      amtsicustappl.lincidentagid                    AS "lincidentagid",
+      sysamcostcenter.trimmedtitle                   AS "sysconumber",
+      sysamcostcenter.field1                         AS "syscodescription",
+      amportfolio.lassignmentid                      AS "lassignmentid",
+      amcomputer.status                              AS "sysstatus",
+      amcomputer.lcpunumber                          AS "systemcpucount",
+      amcomputer.lcpuspeedmhz                        AS "systemcpuspeed",
+      amcomputer.cputype                             AS "systemcputype",
+      amcomputer.lProcCalcSpeed                      AS "systemtpmc",
+      amcomputer.lmemorysizemb                       AS "systemmemory",
+      amportfolio.name                               AS "child",
+      amportfolio.assettag                           AS "systemid",
+      amcomputer.olaclasssystem                      AS "systemola",
+      amcomputer.status                              AS "systemstatus",
+      amtsirelportfappl.description                  AS "comments",
+      amportfolio.assettag                           AS "lsystemid",
+      amtsirelportfappl.lapplicationid               AS "lparentid",
+      amtsirelportfappl.lportfolioid                 AS "lchildid",
+      amtsirelportfappl.dtlastmodif                  AS "mdate",
+      amtsirelportfappl.externalsystem               AS "srcsys",
+      amtsirelportfappl.externalid                   AS "srcid",
+      amtsirelportfappl.dtimport                     AS "srcload",
+      amtsirelportfappl.dtlastmodif                  AS "replkeypri",
+      lpad(amtsirelportfappl.lrelportfapplid,35,'0') AS "replkeysec"
+   FROM AM2107.amtsirelportfappl
+      JOIN lnkapplsystem_acl
+         ON amtsirelportfappl.lrelportfapplid=lnkapplsystem_acl.id
+      JOIN AM2107.amportfolio
+         ON amtsirelportfappl.lportfolioid = amportfolio.lportfolioitemid
+      JOIN AM2107.amcomputer
+         ON amportfolio.lportfolioitemid = amcomputer.litemid
+      JOIN AM2107.amtsicustappl
+         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
+      LEFT OUTER JOIN ( SELECT amcostcenter.*
+             FROM AM2107.amcostcenter
+             WHERE amcostcenter.bdelete = 0) amcostcenter
+         ON amtsicustappl.lcostcenterid = amcostcenter.lcostid
+      LEFT OUTER JOIN ( SELECT amcostcenter.*
+             FROM AM2107.amcostcenter
+             WHERE amcostcenter.bdelete = 0) sysamcostcenter
+         ON amportfolio.lcostid = sysamcostcenter.lcostid
+   WHERE amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
+      AND amcomputer.status <> 'out of operation';
+
+grant select on lnkapplsystem to public;
+
+
+-- --------------------------------------------------------------------------
 -- --------------------- tsacinv::system ------------------------------------
 -- --------------------------------------------------------------------------
 --   Der Zugriff auf einen logischen System Datensatz wird dadurch
@@ -329,10 +405,40 @@ CREATE MATERIALIZED VIEW system_acl_l1
       select ifuser,"netsystemid" id from lnksharednet_acl_l0
       union
       select ifuser,id from system_acl_l0
+      union
+      select distinct acl.ifuser ifuser,amportfolio.assettag id
+        from AM2107.amtsicustappl
+           left outer JOIN ( SELECT amcostcenter.*
+                             FROM AM2107.amcostcenter
+                             WHERE amcostcenter.bdelete = 0) amcostcenter
+              ON amtsicustappl.lcostcenterid = amcostcenter.lcostid
+           left outer JOIN AM2107.amemplgroup assigrp
+              ON amtsicustappl.lassignmentid = assigrp.lgroupid
+           left outer JOIN AM2107.amtsiaccsecunit customerlnk
+              ON amcostcenter.lcustomerlinkid=customerlnk.lunitid
+           JOIN IFACE_ACL acl
+              ON  (assigrp.name like acl.assignment
+                     or acl.assignment is null) and
+                  (amcostcenter.acctno like acl.acctno
+                     or acl.acctno is null) and
+                  (customerlnk.identifier like acl.customerlnk
+                     or acl.customerlnk is null) and
+                 (acl.customerlnk is not null or
+                  acl.acctno is not null or
+                  acl.assignment is not null)
+           JOIN AM2107.amtsirelportfappl
+              ON amtsirelportfappl.lapplicationid=amtsicustappl.ltsicustapplid
+           JOIN AM2107.amportfolio
+              ON amtsirelportfappl.lportfolioid = amportfolio.lportfolioitemid
+           JOIN AM2107.amcomputer
+              ON amcomputer.litemid = amportfolio.lportfolioitemid
    ) acltable;
 
 CREATE INDEX system_acl_l1_i0
    ON system_acl_l1 (id,ifuser) online;
+
+CREATE INDEX system_acl_l1_i1
+   ON system_acl_l1 (ifuser) online;
 
 CREATE or REPLACE VIEW system_acl AS
    select distinct id from 
@@ -784,82 +890,6 @@ CREATE or REPLACE VIEW lnkapplappl AS
 
 grant select on lnkapplappl to public;
 
-
-
--- --------------------------------------------------------------------------
--- --------------------- tsacinv::lnkapplsystem -----------------------------
--- --------------------------------------------------------------------------
---   Der Zugriff auf den Relationsdatensatz zwischen Anwendung und System
---   wird dadurch eingeschraenkt, das der Schnittstellen-User einen
---   Relationsdatensatz dann sieht, wenn er die darin aufgefuehrte
---   Anwendung sehen darf.
--- --------------------------------------------------------------------------
-
-CREATE or REPLACE VIEW lnkapplsystem_acl AS
-   select distinct amtsirelportfappl.lrelportfapplid id
-   FROM AM2107.amtsirelportfappl
-   JOIN appl
-      ON amtsirelportfappl.lapplicationid=appl."id";
-
-
-CREATE or REPLACE VIEW lnkapplsystem AS
-   SELECT
-      distinct amtsirelportfappl.lrelportfapplid     AS "id",
-      amtsicustappl.code                             AS "applid",
-      amportfolio.bdelete                            AS "deleted",
-      amtsirelportfappl.bactive                      AS "isactive",
-      amtsicustappl.description                      AS "appldescription",
-      amtsicustappl.usage                            AS "usage",
-      amcostcenter.trimmedtitle                      AS "applconumber",
-      amcostcenter.field1                            AS "applcodescription",
-      amcostcenter.alternatebusinesscenter           AS "altbc",
-      amtsicustappl.lservicecontactid                AS "semid",
-      amtsicustappl.ltechnicalcontactid              AS "tsmid",
-      amtsicustappl.lincidentagid                    AS "lincidentagid",
-      sysamcostcenter.trimmedtitle                   AS "sysconumber",
-      sysamcostcenter.field1                         AS "syscodescription",
-      amportfolio.lassignmentid                      AS "lassignmentid",
-      amcomputer.status                              AS "sysstatus",
-      amcomputer.lcpunumber                          AS "systemcpucount",
-      amcomputer.lcpuspeedmhz                        AS "systemcpuspeed",
-      amcomputer.cputype                             AS "systemcputype",
-      amcomputer.lProcCalcSpeed                      AS "systemtpmc",
-      amcomputer.lmemorysizemb                       AS "systemmemory",
-      amportfolio.name                               AS "child",
-      amportfolio.assettag                           AS "systemid",
-      amcomputer.olaclasssystem                      AS "systemola",
-      amcomputer.status                              AS "systemstatus",
-      amtsirelportfappl.description                  AS "comments",
-      amportfolio.assettag                           AS "lsystemid",
-      amtsirelportfappl.lapplicationid               AS "lparentid",
-      amtsirelportfappl.lportfolioid                 AS "lchildid",
-      amtsirelportfappl.dtlastmodif                  AS "mdate",
-      amtsirelportfappl.externalsystem               AS "srcsys",
-      amtsirelportfappl.externalid                   AS "srcid",
-      amtsirelportfappl.dtimport                     AS "srcload",
-      amtsirelportfappl.dtlastmodif                  AS "replkeypri",
-      lpad(amtsirelportfappl.lrelportfapplid,35,'0') AS "replkeysec"
-   FROM AM2107.amtsirelportfappl
-      JOIN lnkapplsystem_acl
-         ON amtsirelportfappl.lrelportfapplid=lnkapplsystem_acl.id
-      JOIN AM2107.amportfolio
-         ON amtsirelportfappl.lportfolioid = amportfolio.lportfolioitemid
-      JOIN AM2107.amcomputer
-         ON amportfolio.lportfolioitemid = amcomputer.litemid
-      JOIN AM2107.amtsicustappl
-         ON amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
-      LEFT OUTER JOIN ( SELECT amcostcenter.*
-             FROM AM2107.amcostcenter
-             WHERE amcostcenter.bdelete = 0) amcostcenter
-         ON amtsicustappl.lcostcenterid = amcostcenter.lcostid
-      LEFT OUTER JOIN ( SELECT amcostcenter.*
-             FROM AM2107.amcostcenter
-             WHERE amcostcenter.bdelete = 0) sysamcostcenter
-         ON amportfolio.lcostid = sysamcostcenter.lcostid
-   WHERE amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
-      AND amcomputer.status <> 'out of operation';
-
-grant select on lnkapplsystem to public;
 
 
 -- --------------------------------------------------------------------------
