@@ -221,6 +221,12 @@ div.multilinehtml{
    border-style:solid;
    text-overflow:clip;
 }
+div.multilinehtml h4{
+   display:block;
+   margin:0px;
+   margin-top:1.33em;
+   font-weight:bold;
+}
 div.containerlist{
    height:100px;
    overflow:auto;

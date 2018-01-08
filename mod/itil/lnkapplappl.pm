@@ -958,45 +958,42 @@ sub Validate
    if (!defined($oldrec)) {
       if (!exists($newrec->{htmlagreements})) {
          $newrec->{htmlagreements}=
-            "<ul>".
-            "<li><b>Ziel/Zweck der Schnittstelle - ".
-            "Purpose of the Interface</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Aufbau/Testphase - ".
-            "Setup/Testing Phase</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Regelverarbeitungen und Wartungen - ".
-            "Rule Processing and Maintenance</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Verhalten bei Datenfehlern (Ansp.) - ".
-            "Behaviour in case of Data Errors (Contact)</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Verhalten bei technischen Fehlern (Ansp.) - ".
-            "Behaviour in case of Technical Errors (Contact)</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Evtl. Regressanspruchsregelungen - ".
-            "Possible Regulations for Recourse Rights</b><br>".
-            "(nothing documented)</li>".
-            "</ul>";
+            "<h4>Ziel/Zweck der Schnittstelle - ".
+            "Purpose of the Interface</h4>".
+            "(nothing documented)".
+            "<h4>Aufbau/Testphase - ".
+            "Setup/Testing Phase</h4>".
+            "(nothing documented)".
+            "<h4>Regelverarbeitungen und Wartungen - ".
+            "Rule Processing and Maintenance</h4>".
+            "(nothing documented)".
+            "<h4>Verhalten bei Datenfehlern (Ansp.) - ".
+            "Behaviour in case of Data Errors (Contact)</h4>".
+            "(nothing documented)".
+            "<h4>Verhalten bei technischen Fehlern (Ansp.) - ".
+            "Behaviour in case of Technical Errors (Contact)</h4>".
+            "(nothing documented)".
+            "<h4>Evtl. Regressanspruchsregelungen - ".
+            "Possible Regulations for Recourse Rights</h4>".
+            "(nothing documented)";
       }
       if (!exists($newrec->{htmldescription})){
          $newrec->{htmldescription}=
-            "<ul>".
-            "<li><b>Technische Realisation (log. System, IP, usw.) - ".
-            "Technical Realisation (log. system, IP, etc.)</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Übertragungsvolumen/Datenmenge - ".
-            "Transfer Volumes</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Lieferzeiten/Lieferungs-Intervall - ".
-            "Delivery Times/Delivery Intervals</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Beschreibung des Monitorings - ".
-            "Detailed Description of Monitoring</b><br>".
-            "(nothing documented)</li>".
-            "<li><b>Inhalt/Felder - ".
-            "Content/Fields</b><br>".
-            "(nothing documented)</li>";
+            "<h4>Technische Realisation (log. System, IP, usw.) - ".
+            "Technical Realisation (log. system, IP, etc.)</h4>".
+            "(nothing documented)".
+            "<h4>Übertragungsvolumen/Datenmenge - ".
+            "Transfer Volumes</h4>".
+            "(nothing documented)".
+            "<h4>Lieferzeiten/Lieferungs-Intervall - ".
+            "Delivery Times/Delivery Intervals</h4>".
+            "(nothing documented)".
+            "<h4>Beschreibung des Monitorings - ".
+            "Detailed Description of Monitoring</h4>".
+            "(nothing documented)".
+            "<h4>Inhalt/Felder - ".
+            "Content/Fields</h4>".
+            "(nothing documented)";
       }
    }
 
