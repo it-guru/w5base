@@ -202,7 +202,7 @@ sub mkAcFtpRecSystem
                     Usage=>"HOUSING",
                     OperatingSystem=>"z CFCC 18",
                     #OperatingSystem=>"[NULL]",
-                    CO_CC=>"[NULL]",
+                    #CO_CC=>"[NULL]",
                     bDelete=>'0',
                     lMemorySizeMb=>$memory,
                     fCPUNumber=>$cpucount,
