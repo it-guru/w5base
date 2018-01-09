@@ -837,9 +837,9 @@ sub objectReplicationPhase2
       #
       $recaccess_reservetime=
               (($ctrl->{avgrecaccess}/1000)*
-               ($ctrl->{avgrecaccess}/1000))*0.06;
-      if ($recaccess_reservetime>180){
-         $recaccess_reservetime=180;
+               ($ctrl->{avgrecaccess}/1000))*0.08;
+      if ($recaccess_reservetime>300){
+         $recaccess_reservetime=300;
       }
       $ctrl->{recaccess_reservetime}=$recaccess_reservetime;
    }
