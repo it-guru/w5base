@@ -78,9 +78,13 @@ $W5V2::Query=new kernel::cgi({});
 my $pid=`ps -eo pid,user,command | egrep "(apache|httpd|www-data|wwwrun)"`;
 
 my @apid;
+
 foreach my $l (split(/[\r\n]/,$pid)){
    #printf STDERR ("fifi check $l\n");
-   if (my ($p,$cmd)=$l=~m/^\s*(\d+)\s+(apache|httpd|www)\S*\s*\S*(apache|httpd|www-data|wwwrun|w5)\S*/){
+   if (my ($p,$user,$cmd)=$l=~m/^\s*(\d+)\s+(apache|httpd|www|wwwrun)\s+(.*(apache|httpd).*)$/){
+      push(@apid,$p);
+   }
+   elsif (my ($p,$user,$cmd)=$l=~m/^\s*(\d+)\s+(apache|httpd|www|wwwrun)\s+(.*fastapp\.pl)\s*$/){
       push(@apid,$p);
    }
 }
