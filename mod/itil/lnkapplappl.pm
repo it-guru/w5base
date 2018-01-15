@@ -205,7 +205,7 @@ sub new
                 mimetype      =>'ifagreementdoctype',
                 filename      =>'ifagreementdocname',
                 uploaddate    =>'ifagreementdocdate',
-                maxsize       =>'2097152',
+                maxsize       =>'5242880',
                 group         =>'ifagreement',
                 dataobjattr   =>'lnkapplappl.ifagreementdoc'),
 

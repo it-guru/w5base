@@ -198,7 +198,7 @@ sub getOracleDBIConnectionHandle
 #
 # find system commandos sort, comm and diff
 #
-my @SYSCMD=qw(sort comm diff cat uniq dd);
+my @SYSCMD=qw(sort comm diff cat sftp uniq dd);
 my %SYSCMD;
 foreach my $dir (split(":",$ENV{PATH})){
    $dir.="/" if (!($dir=~m/\/$/));
@@ -212,8 +212,14 @@ foreach my $cmd (@SYSCMD){
       exit(1);
    }
 }
-#print Dumper(\%SYSCMD);
 
+if ($#ARGV<1){
+   msg(ERROR,"missing SourceSpec + DestinationTabel Syntax");
+   exit(1);
+}
+
+my @SOURCELIST=@ARGV;
+my $DSTTAB=pop(@SOURCELIST);
 
 
 
@@ -225,438 +231,480 @@ foreach my $cmd (@SYSCMD){
 my $TMP=tempdir(CLEANUP=>1);
 my $SRCCSV;  # source temp file
 my $CURCSV;  # current CSV 
-my $DSTTAB;  # dest sql table
 my @FIELDS;  # fieldlist in CSV 1st Line
 my $FIELDS;  # 1st Line of CSV
 my %stat=(start=>time(),clr=>0,upd=>0,ins=>0,del=>0,ilines=>undef,clines=>undef);
 
 
-if ($ARGV[0] eq ""){
-   msg(ERROR,"missing source");
-   exit(1);
-}
 
-if ($ARGV[1] eq ""){
-   msg(ERROR,"missing destination table name");
-   exit(1);
-}
-else{
-   $DSTTAB=$ARGV[1];
-}
+foreach my $SOURCE (@SOURCELIST){
+   #
+   # load original file
+   #
+
+   if ($ARGV[0]=~m/^sftp:/){
+      #  sftp://w5sftp/home/w5sapp01/incoming/P01DE_order_hier_DRW_*.csv
+      my $url=$ARGV[0];
+      my ($schema,$host,$dir,$filespec)=$url=~m#^(sftp)://([^/]+)(/.*)/([^/]+)$#;
+
+      msg (INFO,"schema=$schema");
+      msg (INFO,"host=$host");
+      msg (INFO,"dir=$dir");
+      msg (INFO,"filespec=$filespec");
+
+      my $res=`echo 'version' | $SYSCMD{sftp} -b - \"$host\" 2>&1`;
+      if ($?!=0){
+         msg(ERROR,"$res");
+         msg(ERROR,"connect check to $host failed");
+         exit(1);
+      }
+      my $ftptemp=tempdir(CLEANUP=>1);
+
+      
+      my $res=`echo 'cd $dir\nls $filespec'| $SYSCMD{sftp}  -b - \"$host\" 2>&1`;
+      if ($?!=0){
+         msg(ERROR,"$res");
+         msg(ERROR,"fail to load filelist from $host with filespec $filespec");
+         exit(1);
+      }
+
+
+printf("fifi res=%s\n",$res);
+
+      
+
+#      my $res=`echo 'lcd \"$ftptemp\"\ncd get *.csv' |
+#                sftp -b - \"$sftpsource\" 2>&1`;
+#      if ($?!=0){
+#         $loaderror=$res;
+#      }
+
+
+
+
+#   if (!defined($loaderror)){
+#      my $dh;
+#      if (opendir($dh,$tempdir)){
+#         @loadfiles=grep({ -f "$tempdir/$_" &&
+#                           !($_=~m/^\./) } readdir($dh));
+#         if ($#loadfiles==-1){
+#            $loaderror="error - no files transfered from '$sftpsource'";
+#         }
+#      }
+#      else{
+#         $loaderror="fail to open dir '$tempdir': $?";
+#      }
+#   }
 
 
 
 
 
-#
-# load original file
-#
+      exit(1);
 
-if ($ARGV[0]=~m/^sftp:/){
-   msg(ERROR,"source file %s",$ARGV[0]);
-   msg(ERROR,"load from sftp: not supported");
-   exit(1);
-}
-else{
-   if (-f $ARGV[0] && -r $ARGV[0]){
-      msg(ERROR,"transfer source file to temp space");
-      if (open(FI,"<$ARGV[0]")){
-         $FIELDS=<FI>;         
-         $stat{ifile}=$ARGV[0];
-         $stat{ifile}=~s/^.*[\\\/]//;
-         if (open(FO,">$TMP/base.csv")){
-            $stat{ilines}=0;
-            while(my $l=<FI>){
-               $stat{ilines}++;
-               if (length($l)>3200){
-                  msg(ERROR,"csv records with more then 3200 char are not supported");
-                  msg(ERROR,"input file $ARGV[0] line $stat{ilines}");
-                  exit(1);
+
+
+
+   }
+   else{
+      if (-f $ARGV[0] && -r $ARGV[0]){
+         msg(ERROR,"transfer source file to temp space");
+         if (open(FI,"<$ARGV[0]")){
+            $FIELDS=<FI>;         
+            $stat{ifile}=$ARGV[0];
+            $stat{ifile}=~s/^.*[\\\/]//;
+            if (open(FO,">$TMP/base.csv")){
+               $stat{ilines}=0;
+               while(my $l=<FI>){
+                  $stat{ilines}++;
+                  if (length($l)>3200){
+                     msg(ERROR,"csv records with more then 3200 char are not supported");
+                     msg(ERROR,"input file $ARGV[0] line $stat{ilines}");
+                     exit(1);
+                  }
+                  print FO $l;
                }
-               print FO $l;
+               close(FO);
             }
-            close(FO);
+            else{
+               MSG(ERROR,"fail to open temp csv");
+               exit(1);
+            }
+            close(FI);
          }
          else{
-            MSG(ERROR,"fail to open temp csv");
+            MSG(ERROR,"fail to open source csv '$ARGV[0]'");
             exit(1);
          }
-         close(FI);
+         my $cmd="$SYSCMD{cat} '$TMP/base.csv'|".
+                 "$SYSCMD{sort}|".
+                 "$SYSCMD{uniq}".
+                 ">'$TMP/source.csv'";
+         printf STDERR ("fifi cmd=$cmd\n");
+         system($cmd);
+         unlink("$TMP/base.csv");
+         if ($? == -1) {
+             msg(ERROR,"failed to execute: $!\n");
+             exit(1);
+         }
+         elsif ($? & 127) {
+             msg(ERROR,"child died with signal %d, %s coredump\n",
+                 ($? & 127),  ($? & 128) ? 'with' : 'without');
+             exit(1);
+         }
+         elsif (( $? >> 8)!=0) {
+             msg(ERROR,"child exited with value %d\n",$?>>8);
+             exit(1);
+         }
+         $SRCCSV=$TMP."/source.csv";
       }
       else{
-         MSG(ERROR,"fail to open source csv '$ARGV[0]'");
+         msg(ERROR,"source file %s",$ARGV[0]);
+         msg(ERROR,"can not open source file");
          exit(1);
       }
-      my $cmd="$SYSCMD{cat} '$TMP/base.csv'|".
-              "$SYSCMD{sort}|".
-              "$SYSCMD{uniq}".
-              ">'$TMP/source.csv'";
-      printf STDERR ("fifi cmd=$cmd\n");
-      system($cmd);
-      unlink("$TMP/base.csv");
-      if ($? == -1) {
-          msg(ERROR,"failed to execute: $!\n");
-          exit(1);
+   }
+   ProcessTempfile();
+}
+
+
+
+sub ProcessTempfile
+{
+   msg(INFO,"connect to Oracle database Schema");
+   my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
+
+   $FIELDS=~s/\s*$//;
+   my $c=1;
+   @FIELDS=map({
+      my $fld=sprintf("C%02d_",$c).$_;
+      $fld=~s/[^a-z0-9]/_/gi;
+      $fld=substr($fld,0,30);
+      $c++;
+      "$fld"
+   } @{csvlinesplit($FIELDS)});
+
+
+
+
+
+   #
+   # Sicherstellen das Zieltabelle vorhanden
+   #
+   my $found=0;
+   foreach my $tab (getOracleDBIschemaInfo($dbi,$schema)){
+      if ($tab->{TABLE_TYPE} eq "TABLE" &&
+          $tab->{'TABLE_NAME'} eq $DSTTAB){
+         $found++;
       }
-      elsif ($? & 127) {
-          msg(ERROR,"child died with signal %d, %s coredump\n",
-              ($? & 127),  ($? & 128) ? 'with' : 'without');
-          exit(1);
+   }
+   if (!$found){
+      my $sql="create table \"$DSTTAB\" (".
+              "\"W5_rawline\" varchar2(3200),".  # 3200 is oracle index limit!
+              "\"W5_key\" varchar2(40),".
+              "\"W5_mdate\" date not null,".
+              "\"W5_cdate\" date not null,".
+              "\"W5_isdel\" char(1) default '0',";
+      $sql.=join(",",map({"\"$_\" varchar2(40)"} @FIELDS));
+      $sql.=")";
+      my $bk=$dbi->doCmd($sql);
+      if ($bk ne "0E0"){
+         msg(ERROR,"fail to create target table");
+         exit(1);
       }
-      elsif (( $? >> 8)!=0) {
-          msg(ERROR,"child exited with value %d\n",$?>>8);
-          exit(1);
+      my $sql="create index \"${DSTTAB}_i1\" on \"$DSTTAB\" (\"W5_key\")";
+      my $bk=$dbi->doCmd($sql);
+      if ($bk ne "0E0"){
+         msg(ERROR,"fail to create i1 index for target table table");
+         exit(1);
       }
-      $SRCCSV=$TMP."/source.csv";
+      my $sql="create index \"${DSTTAB}_i2\" on \"$DSTTAB\" (\"W5_rawline\")";
+      my $bk=$dbi->doCmd($sql);
+      if ($bk ne "0E0"){
+         msg(ERROR,"fail to create i2 index for target table table");
+         exit(1);
+      }
+      my $sql="create index \"${DSTTAB}_i3\" on \"$DSTTAB\" (\"W5_mdate\")";
+      my $bk=$dbi->doCmd($sql);
+      if ($bk ne "0E0"){
+         msg(ERROR,"fail to create i3 index for target table table");
+         exit(1);
+      }
+   }
+
+
+
+   my $ins_sth=$dbi->prepare(
+      "insert into \"$DSTTAB\" ".
+      "(\"W5_rawline\",\"W5_key\",\"W5_cdate\",\"W5_mdate\"".
+      join("",map({",\"".$_."\""} @FIELDS)).
+      ") ".
+      " values(?,?,current_date,current_date".
+      join("",map({",?"} @FIELDS)).
+      ")"
+   );
+
+   my $upd_sth=$dbi->prepare(
+      "update \"$DSTTAB\" set ".
+      "\"W5_rawline\"=?,\"W5_mdate\"=current_date".
+      join("",map({",\"".$_."\"=?"} @FIELDS)).
+      " where \"W5_key\"=? and \"W5_isdel\"='0'"
+   );
+
+   my $clr_sth=$dbi->prepare(
+      "delete from \"$DSTTAB\" where \"W5_isdel\"='1' ".
+      "and \"W5_mdate\"<current_date-90  "
+   );
+
+
+   my $del_sth;
+
+   if ($opt_a){
+      $del_sth=$dbi->prepare(
+         "update \"$DSTTAB\" set \"W5_isdel\"='1' ".
+         "where \"W5_rawline\"=? and \"W5_isdel\"='0'"
+      );
    }
    else{
-      msg(ERROR,"source file %s",$ARGV[0]);
-      msg(ERROR,"can not open source file");
-      exit(1);
+      $del_sth=$dbi->prepare(
+         "delete from \"$DSTTAB\" ".
+         "where \"W5_rawline\"=? and \"W5_isdel\"='0'"
+      );
    }
-}
-printf("fifi TMP=$TMP  ARGV=%s\n",join(",",@ARGV));
-
-$FIELDS=~s/\s*$//;
-my $c=1;
-@FIELDS=map({
-   my $fld=sprintf("C%02d_",$c).$_;
-   $fld=~s/[^a-z0-9]/_/gi;
-   $fld=substr($fld,0,30);
-   $c++;
-   "$fld"
-} @{csvlinesplit($FIELDS)});
 
 
 
 
+   #
+   # bereits geladenen CSV Stand erzeugen
+   #
 
 
-
-
-
-
-   #msg(INFO,"start: phase 1 replication for $ctrl->{name} - new records");
-my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
-
-
-
-
-#
-# Sicherstellen das Zieltabelle vorhanden
-#
-my $found=0;
-foreach my $tab (getOracleDBIschemaInfo($dbi,$schema)){
-   if ($tab->{TABLE_TYPE} eq "TABLE" &&
-       $tab->{'TABLE_NAME'} eq $DSTTAB){
-      $found++;
-   }
-}
-if (!$found){
-   my $sql="create table \"$DSTTAB\" (".
-           "\"W5_rawline\" varchar2(3200),".  # 3200 is oracle index limit!
-           "\"W5_key\" varchar2(40),".
-           "\"W5_mdate\" date not null,".
-           "\"W5_cdate\" date not null,".
-           "\"W5_isdel\" char(1) default '0',";
-   $sql.=join(",",map({"\"$_\" varchar2(40)"} @FIELDS));
-   $sql.=")";
-   my $bk=$dbi->doCmd($sql);
-   if ($bk ne "0E0"){
-      msg(ERROR,"fail to create target table");
-      exit(1);
-   }
-   my $sql="create index \"${DSTTAB}_i1\" on \"$DSTTAB\" (\"W5_key\")";
-   my $bk=$dbi->doCmd($sql);
-   if ($bk ne "0E0"){
-      msg(ERROR,"fail to create i1 index for target table table");
-      exit(1);
-   }
-   my $sql="create index \"${DSTTAB}_i2\" on \"$DSTTAB\" (\"W5_rawline\")";
-   my $bk=$dbi->doCmd($sql);
-   if ($bk ne "0E0"){
-      msg(ERROR,"fail to create i2 index for target table table");
-      exit(1);
-   }
-   my $sql="create index \"${DSTTAB}_i3\" on \"$DSTTAB\" (\"W5_mdate\")";
-   my $bk=$dbi->doCmd($sql);
-   if ($bk ne "0E0"){
-      msg(ERROR,"fail to create i3 index for target table table");
-      exit(1);
-   }
-}
-
-
-
-my $ins_sth=$dbi->prepare(
-   "insert into \"$DSTTAB\" ".
-   "(\"W5_rawline\",\"W5_key\",\"W5_cdate\",\"W5_mdate\"".
-   join("",map({",\"".$_."\""} @FIELDS)).
-   ") ".
-   " values(?,?,current_date,current_date".
-   join("",map({",?"} @FIELDS)).
-   ")"
-);
-
-my $upd_sth=$dbi->prepare(
-   "update \"$DSTTAB\" set ".
-   "\"W5_rawline\"=?,\"W5_mdate\"=current_date".
-   join("",map({",\"".$_."\"=?"} @FIELDS)).
-   " where \"W5_key\"=? and \"W5_isdel\"='0'"
-);
-
-my $clr_sth=$dbi->prepare(
-   "delete from \"$DSTTAB\" where \"W5_isdel\"='1' ".
-   "and \"W5_mdate\"<current_date-90  "
-);
-
-
-my $del_sth;
-
-if ($opt_a){
-   $del_sth=$dbi->prepare(
-      "update \"$DSTTAB\" set \"W5_isdel\"='1' ".
-      "where \"W5_rawline\"=? and \"W5_isdel\"='0'"
-   );
-}
-else{
-   $del_sth=$dbi->prepare(
-      "delete from \"$DSTTAB\" ".
-      "where \"W5_rawline\"=? and \"W5_isdel\"='0'"
-   );
-}
-
-
-
-
-#
-# bereits geladenen CSV Stand erzeugen
-#
-
-
-if (open(F,">$TMP/sqlcurrent.csv")){
-   my $cmd="select \"W5_rawline\" from \"$DSTTAB\" where \"W5_isdel\"='0'";
-   my $sth=$dbi->prepare($cmd);
-   if ($sth->execute()){
-      $stat{clines}=0;
-      while(my $dbrec=$sth->fetchrow_hashref()){
-          if (!($dbrec->{W5_rawline}=~m/\n$/)){
-             msg(WARN,"line seperation error in target table - fixing it");
-             $del_sth->execute($dbrec->{W5_rawline});
-          }
-          else{
-             $stat{clines}++;
-             print F ($dbrec->{W5_rawline});
-          }
-      }
-   }
-   close(F);
-}
-
-
-my $cmd="$SYSCMD{cat} '$TMP/sqlcurrent.csv'|".
-        "$SYSCMD{sort}|".
-        "$SYSCMD{uniq}".
-        ">'$TMP/current.csv'";
-system($cmd);
-unlink("$TMP/sqlcurrent.csv");
-
-
-
-
-my $diffstream;
-my $cx;
-
-my $compcmd="$SYSCMD{comm} -3 \"$TMP/current.csv\" \"$TMP/source.csv\"";
-
-msg(INFO,"compare cmd = $compcmd");
-
-#exit(1);
-
-if (!open($diffstream,"$compcmd|")){
-    msg(ERROR,"fail to open diff stream $!");
-    exit(1);
-}
-
-sub csvlinesplit
-{
-   my $line=shift;
-   $line=~s/^\s*//;
-   $line=~s/\s*$//;
-   my $cols=[split(/;/,$line,-1)];
-   return($cols);
-}
-
-
-sub getDiffOperation
-{
-   my $s=shift;
-   my $bufsz=5;
-
-   if (!$main::streameof){
-      do{
-         my $line=<$s>;
-         if (!$line){
-            $main::streameof++;
-         }
-         else{
-            my $rawline=$line;
-            $rawline=~s/^\s*//;
-            my $cols=csvlinesplit($line);
-            my $newrec={
-               line=>$line,
-               rawline=>$rawline,
-               cols=>$cols
-            };
-            if ($opt_k>0){
-               $newrec->{key}=$cols->[$opt_k-1];
-            }
-            else{
-               $newrec->{key}=undef;
-            }
-            if ($newrec->{line}=~m/^\s/){
-               $newrec->{op}="insert";
-            }
-            else{
-               $newrec->{op}="delete";
-            }
-            push(@main::buffer,$newrec);
-         }
-      }while($#main::buffer<$bufsz && !$main::streameof);
-   }
-   return if ($#main::buffer==-1);
-   my $op;
-   $op=shift(@main::buffer);
-
-
-   if ($opt_k>0){
-      my $chkkey=$op->{key};
-      my $foundAltOp;
-      for(my $c=0;$c<=$#{main::buffer};$c++){
-         if ($main::buffer[$c]->{key} eq $chkkey){
-            $foundAltOp=$c;
-            last;
+   if (open(F,">$TMP/sqlcurrent.csv")){
+      my $cmd="select \"W5_rawline\" from \"$DSTTAB\" where \"W5_isdel\"='0'";
+      my $sth=$dbi->prepare($cmd);
+      if ($sth->execute()){
+         $stat{clines}=0;
+         while(my $dbrec=$sth->fetchrow_hashref()){
+             if (!($dbrec->{W5_rawline}=~m/\n$/)){
+                msg(WARN,"line seperation error in target table - fixing it");
+                $del_sth->execute($dbrec->{W5_rawline});
+             }
+             else{
+                $stat{clines}++;
+                print F ($dbrec->{W5_rawline});
+             }
          }
       }
-      if (defined($foundAltOp)){
-         if ($op->{op} eq "insert" &&
-             $main::buffer[$foundAltOp]->{op} eq "delete"){
-            splice(@main::buffer,$foundAltOp,1);
-            #msg(INFO,"insert befor delete on key $chkkey");
-            $op->{op}="update";
+      close(F);
+   }
+
+
+   my $cmd="$SYSCMD{cat} '$TMP/sqlcurrent.csv'|".
+           "$SYSCMD{sort}|".
+           "$SYSCMD{uniq}".
+           ">'$TMP/current.csv'";
+   system($cmd);
+   unlink("$TMP/sqlcurrent.csv");
+
+
+
+
+   my $diffstream;
+   my $cx;
+
+   my $compcmd="$SYSCMD{comm} -3 \"$TMP/current.csv\" \"$TMP/source.csv\"";
+
+   msg(INFO,"compare cmd = $compcmd");
+
+   #exit(1);
+
+   if (!open($diffstream,"$compcmd|")){
+       msg(ERROR,"fail to open diff stream $!");
+       exit(1);
+   }
+
+   sub csvlinesplit
+   {
+      my $line=shift;
+      $line=~s/^\s*//;
+      $line=~s/\s*$//;
+      my $cols=[split(/;/,$line,-1)];
+      return($cols);
+   }
+
+
+   sub getDiffOperation
+   {
+      my $s=shift;
+      my $bufsz=5;
+
+      if (!$main::streameof){
+         do{
+            my $line=<$s>;
+            if (!$line){
+               $main::streameof++;
+            }
+            else{
+               my $rawline=$line;
+               $rawline=~s/^\s*//;
+               my $cols=csvlinesplit($line);
+               my $newrec={
+                  line=>$line,
+                  rawline=>$rawline,
+                  cols=>$cols
+               };
+               if ($opt_k>0){
+                  $newrec->{key}=$cols->[$opt_k-1];
+               }
+               else{
+                  $newrec->{key}=undef;
+               }
+               if ($newrec->{line}=~m/^\s/){
+                  $newrec->{op}="insert";
+               }
+               else{
+                  $newrec->{op}="delete";
+               }
+               push(@main::buffer,$newrec);
+            }
+         }while($#main::buffer<$bufsz && !$main::streameof);
+      }
+      return if ($#main::buffer==-1);
+      my $op;
+      $op=shift(@main::buffer);
+
+
+      if ($opt_k>0){
+         my $chkkey=$op->{key};
+         my $foundAltOp;
+         for(my $c=0;$c<=$#{main::buffer};$c++){
+            if ($main::buffer[$c]->{key} eq $chkkey){
+               $foundAltOp=$c;
+               last;
+            }
          }
-         elsif ($op->{op} eq "delete" &&
-                $main::buffer[$foundAltOp]->{op} eq "insert"){
-            ($op)=splice(@main::buffer,$foundAltOp,1);
-            #msg(INFO,"delete befor insert on key $chkkey");
-            $op->{op}="update";
+         if (defined($foundAltOp)){
+            if ($op->{op} eq "insert" &&
+                $main::buffer[$foundAltOp]->{op} eq "delete"){
+               splice(@main::buffer,$foundAltOp,1);
+               #msg(INFO,"insert befor delete on key $chkkey");
+               $op->{op}="update";
+            }
+            elsif ($op->{op} eq "delete" &&
+                   $main::buffer[$foundAltOp]->{op} eq "insert"){
+               ($op)=splice(@main::buffer,$foundAltOp,1);
+               #msg(INFO,"delete befor insert on key $chkkey");
+               $op->{op}="update";
+            }
+            else{
+               msg(ERROR,"found invalid or not defined update constellation");
+               exit(1);
+            }
          }
-         else{
-            msg(ERROR,"found invalid or not defined update constellation");
+      }
+
+
+
+
+
+      
+      return($op); 
+   }
+
+
+
+
+
+   my $c=0;
+   my $sqlbk;
+   while(my $op=getDiffOperation($diffstream)){
+      $c++;
+      if ($op->{op} eq "insert"){
+         if ($#{$op->{cols}}!=$#FIELDS){
+            printf STDERR ("colcount missmatch\n");
+            printf STDERR ("l='%s'\n",$op->{rawline});
+            printf STDERR ("c='%s'\n",join(";",@{$op->{cols}}));
+            printf STDERR ("f='%s'\n",join(";",@FIELDS));
+            $stat{colcnterr}++;
+         }
+            if (!($sqlbk=$ins_sth->execute($op->{rawline},$op->{key},
+                                        @{$op->{cols}}))){
+            msg(ERROR,"fail");
             exit(1);
          }
+         $stat{ins}++;
       }
+      elsif($op->{op} eq "delete"){
+         if (!($sqlbk=$del_sth->execute(($op->{rawline})))){
+            msg(ERROR,"fail");
+            exit(1);
+         }
+         if ($sqlbk eq "0E0"){
+            printf STDERR ("fifi sqlbk=$sqlbk line=$op->{rawline}\n");
+         }
+         $stat{del}++;
+      }
+      elsif($op->{op} eq "update"){
+         if (!($sqlbk=$upd_sth->execute($op->{rawline},
+                                        @{$op->{cols}},$op->{key}))){
+            msg(ERROR,"update fail");
+            exit(1);
+         }
+         if ($sqlbk eq "0E0"){
+            msg(ERROR,"update fail on %s",Dumper($op));
+            exit(1);
+         }
+
+         $stat{upd}++;
+      }
+      else{
+         msg(ERROR,"operation '$op->{op}' not supported");
+         exit(1);
+      }
+      if ($c % 49 == 0){
+         $dbi->commit();
+         $stat{commit}++;
+      }
+      if ($c % 1000 == 0){
+         printf STDERR ("block:$c\n");
+      }
+     # printf("%d= size=%d op=%s\n",$c,length($op->{line}),$op->{op});
    }
 
 
 
 
-
-   
-   return($op); 
-}
-
-
-
-
-
-my $c=0;
-my $sqlbk;
-while(my $op=getDiffOperation($diffstream)){
-   $c++;
-   if ($op->{op} eq "insert"){
-      if ($#{$op->{cols}}!=$#FIELDS){
-         printf STDERR ("colcount missmatch\n");
-         printf STDERR ("l='%s'\n",$op->{rawline});
-         printf STDERR ("c='%s'\n",join(";",@{$op->{cols}}));
-         printf STDERR ("f='%s'\n",join(";",@FIELDS));
-         $stat{colcnterr}++;
-      }
-         if (!($sqlbk=$ins_sth->execute($op->{rawline},$op->{key},
-                                     @{$op->{cols}}))){
-         msg(ERROR,"fail");
-         exit(1);
-      }
-      $stat{ins}++;
-   }
-   elsif($op->{op} eq "delete"){
-      if (!($sqlbk=$del_sth->execute(($op->{rawline})))){
-         msg(ERROR,"fail");
-         exit(1);
-      }
-      if ($sqlbk eq "0E0"){
-         printf STDERR ("fifi sqlbk=$sqlbk line=$op->{rawline}\n");
-      }
-      $stat{del}++;
-   }
-   elsif($op->{op} eq "update"){
-      if (!($sqlbk=$upd_sth->execute($op->{rawline},
-                                     @{$op->{cols}},$op->{key}))){
-         msg(ERROR,"update fail");
-         exit(1);
-      }
-      if ($sqlbk eq "0E0"){
-         msg(ERROR,"update fail on %s",Dumper($op));
-         exit(1);
-      }
-
-      $stat{upd}++;
-   }
-   else{
-      msg(ERROR,"operation '$op->{op}' not supported");
+   if (!close($diffstream)){
+      msg(ERROR,"fail to process full diff stream $!");
       exit(1);
    }
-   if ($c % 49 == 0){
+
+   if (!($sqlbk=$clr_sth->execute())){
+      msg(ERROR,"cleanup fail");
+      exit(1);
+   }
+   if ($sqlbk ne "0E0"){
+      $stat{clr}=$sqlbk;
+   }
+
+   $stat{end}=time();
+   $stat{opcnt}=$stat{upd}+$stat{ins}+$stat{del};
+   $stat{duration}=$stat{end}-$stat{start};
+
+   print Dumper(\%stat);
+
+
+
+
+
       $dbi->commit();
-      $stat{commit}++;
-   }
-   if ($c % 1000 == 0){
-      printf STDERR ("block:$c\n");
-   }
-  # printf("%d= size=%d op=%s\n",$c,length($op->{line}),$op->{op});
+      $dbi->disconnect();
+
+   #printf STDERR ("replication duration=%d max=%d\n",time()-$ReplicationStart,
+   #               $MaximumReplicationTime);
+
 }
-
-
-
-
-if (!close($diffstream)){
-   msg(ERROR,"fail to process full diff stream $!");
-   exit(1);
-}
-
-if (!($sqlbk=$clr_sth->execute())){
-   msg(ERROR,"cleanup fail");
-   exit(1);
-}
-if ($sqlbk ne "0E0"){
-   $stat{clr}=$sqlbk;
-}
-
-$stat{end}=time();
-$stat{opcnt}=$stat{upd}+$stat{ins}+$stat{del};
-$stat{duration}=$stat{end}-$stat{start};
-
-print Dumper(\%stat);
-
-
-
-
-
-   $dbi->commit();
-   $dbi->disconnect();
-
-#printf STDERR ("replication duration=%d max=%d\n",time()-$ReplicationStart,
-#               $MaximumReplicationTime);
                
 exit(0);
 
