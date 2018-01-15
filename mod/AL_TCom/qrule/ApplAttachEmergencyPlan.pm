@@ -25,6 +25,7 @@ please upload one in the above mentioned format.
 
 
 [de:]
+
 Diese QualityRule prüft, ob ein Notfallplan Dokument hinterlegt ist.
 
 Falls Sie ein DataIssue haben, bitten wir Sie das Format zu überprüfen.
