@@ -99,7 +99,6 @@ CREATE or REPLACE view appl as
       businessdesc.memcomment                        "description",
       amtsimaint.memcomment                          "maintwindow",
       amcostcenter.alternatebusinesscenter           "altbc",
-      decode ( tbsm.ordered, 'XMBSM', 1, 0)          "tbsm_ordered",
       amtsicustappl.dtlastmodif                      "replkeypri",
       lpad ( amtsicustappl.code, 35, '0')            "replkeysec",
       amtsicustappl.dtcreation                       "cdate",
@@ -116,28 +115,6 @@ CREATE or REPLACE view appl as
          on amtsicustappl.lcostcenterid = amcostcenter.lcostid
       left outer join AM2107.amemplgroup assigrp
          on amtsicustappl.lassignmentid = assigrp.lgroupid
-      left outer join (
-         SELECT
-            distinct amtsiservicetype.identifier ordered,
-            amtsicustappl.ltsicustapplid
-         FROM
-            AM2107.amtsiservice,
-            AM2107.amtsiservicetype,
-            AM2107.amtsirelportfappl,
-            AM2107.amtsicustappl,
-            AM2107.amportfolio
-         WHERE
-            amtsiservice.lservicetypeid = amtsiservicetype.ltsiservicetypeid
-            AND amtsiservicetype.identifier = 'XMBSM'
-            AND amtsiservice.bdelete = 0
-            AND amtsirelportfappl.bdelete = 0
-            AND amtsiservice.lportfolioid = amtsirelportfappl.lportfolioid
-            AND amtsirelportfappl.bactive = 1
-            AND amtsirelportfappl.lapplicationid = amtsicustappl.ltsicustapplid
-            AND amtsirelportfappl.lportfolioid = amportfolio.lportfolioitemid
-            AND amportfolio.bdelete = 0
-         ) tbsm 
-         on amtsicustappl.ltsicustapplid = tbsm.ltsicustapplid
       left outer join AM2107.amcomment amtsimaint
          on amtsicustappl.lmaintwindowid = amtsimaint.lcommentid
       left outer join AM2107.amcomment businessdesc
@@ -535,7 +512,6 @@ CREATE or REPLACE VIEW system AS
       amcomputer.lparentid                           AS "lclusterid",
       amportfolio.lportfolioitemid                   AS "lportfolioitemid",
       amcostcenter.alternatebusinesscenter           AS "altbc",
-      decode(tbsm.ordered,'XMBSM', 1, 0)             AS "tbsm_ordered",
       amcomputer.servicename                         AS "acmdbcontract",
       amcomputer.slanumber                           AS "acmdbcontractnumber",
       amportfolio.dtinvent                           AS "instdate",
@@ -570,15 +546,6 @@ CREATE or REPLACE VIEW system AS
                ON amcostcenter.lcustomerlinkid = amtsiaccsecunit.lunitid
          WHERE amcostcenter.bdelete = 0 ) amcostcenter 
          ON amportfolio.lcostid = amcostcenter.lcostid
-      LEFT OUTER JOIN (
-         SELECT distinct amtsiservicetype.identifier ordered, 
-                         amtsiservice.lportfolioid
-         FROM AM2107.amtsiservice, AM2107.amtsiservicetype
-         WHERE
-            amtsiservice.lservicetypeid = amtsiservicetype.ltsiservicetypeid
-            AND amtsiservicetype.identifier = 'XMBSM'
-            AND amtsiservice.bdelete = 0 ) tbsm 
-         ON amportfolio.lportfolioitemid = tbsm.lportfolioid
       LEFT OUTER JOIN AM2107.amcomment 
          ON amcomputer.lcommentid = amcomment.lcommentid
       LEFT OUTER JOIN AM2107.amtsiautodiscovery 

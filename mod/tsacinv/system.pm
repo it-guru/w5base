@@ -466,14 +466,6 @@ sub new
                 vjoininhash   =>['name','type','ammount']),
 
 
-      new kernel::Field::Boolean(
-                name          =>'tbsm_ordered',
-                group         =>'orderedservices',
-                htmldetail    =>0,
-                label         =>'is TBSM ordered',
-                dataobjattr   =>'"tbsm_ordered"'),
-
-
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
                 label         =>'IP-Adresses',

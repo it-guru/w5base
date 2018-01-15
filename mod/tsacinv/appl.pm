@@ -414,13 +414,6 @@ sub new
                 vjoininhash   =>['child','systemweblink','systemid','comments',
                                  'srcsys','srcid']),
 
-      new kernel::Field::Boolean(
-                name          =>'tbsm_ordered',
-                group         =>'systems',
-                htmldetail    =>0,
-                label         =>'is TBSM on one of systems ordered',
-                dataobjattr   =>'"tbsm_ordered"'),
-
       new kernel::Field::Text(
                 name          =>'usedsharedstoragesys',
                 group         =>'usedsharedcomp',
