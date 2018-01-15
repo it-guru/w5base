@@ -1,0 +1,3 @@
+'itu.siem'=>{de=>'Qualys',en=>'Qualys'},
+'itu.siem.secscan'=>{de=>'SecScan',en=>'SecScan'},
+'itu.siem.secscan.entry'=>{de=>'SecEntry',en=>'SecEntry'},

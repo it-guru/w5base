@@ -1,0 +1,3 @@
+'tssiem::secent'=>{de=>'Qualys: SecEntry',en=>'Qualys: SecEntry'},
+'fieldgroup.scan'=>{de=>'Scan',en=>'Scan'},
+'first detect'=>{de=>'erstmalig erkannt'},
