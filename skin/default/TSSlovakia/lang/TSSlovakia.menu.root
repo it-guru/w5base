@@ -9,6 +9,8 @@
 'TSSlovakia.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'TSSlovakia.appl.lnkapplurl'=>{de=>'Kommunikations URL',en=>'Communication URL'},
 'TSSlovakia.appl.lnkapplurl.new'=>{de=>'Neueingabe',en=>'New'},
+'TSSlovakia.appl.applwallet'=>{de=>'Zertifikat',en=>'Certificate'},
+'TSSlovakia.appl.applwallet.new'=>{de=>'Neueingabe',en=>'New'},
 'TSSlovakia.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},
 'TSSlovakia.appl.lnkcustcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'TSSlovakia.appl.lnkapplappl'=>{de=>'Schnittstellen',en=>'Interfaces'},

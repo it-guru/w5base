@@ -9,6 +9,8 @@
 'TSHungary.appl.new'=>{de=>'Neueingabe',en=>'New'},
 'TSHungary.appl.lnkapplurl'=>{de=>'Kommunikations URL',en=>'Communication URL'},
 'TSHungary.appl.lnkapplurl.new'=>{de=>'Neueingabe',en=>'New'},
+'TSHungary.appl.applwallet'=>{de=>'Zertifikat',en=>'Certificate'},
+'TSHungary.appl.applwallet.new'=>{de=>'Neueingabe',en=>'New'},
 'TSHungary.appl.lnkcustcontract'=>{de=>'Verkn. Kundenvertrag',en=>'Link Cust. Contract'},
 'TSHungary.appl.lnkcustcontract.new'=>{de=>'Neueingabe',en=>'New'},
 'TSHungary.appl.lnkapplappl'=>{de=>'Schnittstellen',en=>'Interfaces'},
