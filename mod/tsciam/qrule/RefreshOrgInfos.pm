@@ -130,12 +130,15 @@ sub qcheckRecord
                                                   $ciamrec->{shortname});
          if ($oldtousd ne "" && $oldtousd eq $rec->{name}){
             if ($oldtousd ne $curtousd){
-               my $basemsg="Rename of Org '$rec->{fullname}' needed - ".
+               my $oldname=$rec->{fullname};
+               my $basemsg="Try rename of Org '$oldname' needed - ".
                            "based on CIAM new tOuSD '$curtousd'";
-               $dataobj->Log(ERROR,"basedata",$basemsg);
+               $dataobj->Log(WARN,"basedata",$basemsg);
                if ($dataobj->ValidatedUpdateRecord($rec,{name=>$curtousd},
                                                    {grpid=>\$rec->{grpid}})){
                   push(@qmsg,"all desired fields has been updated: name");
+                  my $basemsg="Rename of Org '$oldname' done";
+                  $dataobj->Log(WARN,"basedata",$basemsg);
                }
                else{
                   push(@qmsg,$basemsg);
