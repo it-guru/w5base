@@ -2,7 +2,7 @@
                                   en=>'AssetManager compare of log. system'},
 
 'no systemid specified'=>{de=>'keine SystemID definiert'},
-'given systemid not found as active in AssetManager'=>{de=>'angegebene SystemID im AssetManager nich aktiv'},
+'given systemid not found as active in AssetManager'=>{de=>'angegebene SystemID im AssetManager nicht aktiv'},
 
 'no assetid specified'=>{de=>'keine AssetID definiert'},
 'given assetid not found as active in AssetManager'=>{de=>'angegebene AssetID konnte im AssetManager nicht aktiv'},
