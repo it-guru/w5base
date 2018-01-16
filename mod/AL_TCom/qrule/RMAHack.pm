@@ -103,6 +103,7 @@ sub qcheckRecord
          foreach my $qrec (values(%q)){
             if ($qrec->{qtag} ne $praeflist{$checkpraef} &&
                  $qrec->{qtag} ne $checkpraef."Question11" &&
+                 $qrec->{qtag} ne $checkpraef."Question999" &&
                 ($qrec->{qtag}=~m/^$checkpraef.*/)){
                $need{$qrec->{qtag}}=$qrec->{id};
             }
