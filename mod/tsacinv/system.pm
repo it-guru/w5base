@@ -357,7 +357,6 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'operationcategory',
-                htmldetail    =>0,
                 label         =>'Operation Category',
                 dataobjattr   =>'"opcategory"'),
 
