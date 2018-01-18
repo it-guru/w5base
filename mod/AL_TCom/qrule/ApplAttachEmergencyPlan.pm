@@ -23,6 +23,9 @@ SCM_Emergency_Plan_ICTO-xxxx_DARWIN-Applicationname_jjjjmmdd.pdf
 If there is no Emergency Plan  document uploaded yet, 
 please upload one in the above mentioned format. 
 
+For further informations please contact Mr. Arlt ...
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/12651851320005
 
 [de:]
 
@@ -36,6 +39,9 @@ SCM_Notfallplan_ICTO-xxxx_DARWIN-Applikationsname_jjjjmmdd.pdf
 Falls Sie bisher keinen Notfallplan hinterlegt hatten, bitten wir Sie dies 
 im oben aufgezeigten Format nachzuholen.
 
+Für nähere Informationen kontaktieren Sie bitte Hr. Arlt ...
+
+https://darwin.telekom.de/darwin/auth/base/user/ById/12651851320005
 
 =cut
 #######################################################################
