@@ -1,6 +1,7 @@
 -- drop table "W5SIEM_secscan";
 create table "W5SIEM_secscan" (
    ref                VARCHAR2(32) not null,
+   id                 VARCHAR2(32) not null,
    ictoid             VARCHAR2(20) not null,
    type               VARCHAR2(32) not null,
    title              VARCHAR2(128) not null,
