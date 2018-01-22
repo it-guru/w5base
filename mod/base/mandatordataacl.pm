@@ -41,12 +41,18 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'mandatordataacl.id'),
 
-      new kernel::Field::Select(
+#      new kernel::Field::Select(
+#                name          =>'mandator',
+#                label         =>'Mandator',
+#                vjointo       =>'base::mandator',
+#                vjoinon       =>['mid'=>'id'],
+#                vjoindisp     =>'name'),
+
+      new kernel::Field::Mandator(
                 name          =>'mandator',
-                label         =>'Mandator',
-                vjointo       =>'base::mandator',
+                allowany      =>1,
                 vjoinon       =>['mid'=>'id'],
-                vjoindisp     =>'name'),
+                allowall      =>1),
 
       new kernel::Field::Link(
                 name          =>'mid',
@@ -196,7 +202,7 @@ sub Validate
       }
    }
    if (exists($newrec->{dataname})){
-      if (!($newrec->{dataname}=~m/^[a-z0-9\.]+$/i)){
+      if (!($newrec->{dataname}=~m/^[a-z0-9\._]+$/i)){
          $self->LastMsg(ERROR,"invalid dataname");
          return(0);
       }

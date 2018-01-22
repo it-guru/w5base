@@ -4,4 +4,21 @@ zur größten Nummer hin durchsucht.
 Sobald eine Matched, wird nicht
 weiter gesucht.
 ',en=>'
+The priorities are scaned from
+the smallest to highest. If there
+is a match, no further rules
+are searched.
 '},
+'dataname'=>{de=>'
+Dataname in Notation ...
+
+internerDatenblockname.internerFeldname
+
+... eingeben.
+',en=>'
+Dataname in notation ...
+
+internerDatenblockname.internerFeldname
+
+'},
+

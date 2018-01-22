@@ -27,10 +27,12 @@ use DateTime::TimeZone;
 use base::workflow::mailsend;
 use base::lib::RightsOverview;
 use kernel::CIStatusTools;
+use kernel::MandatorDataACL;
+
 @ISA=qw(kernel::App::Web::Listedit 
         kernel::DataObj::DB 
         kernel::App::Web::InterviewLink
-        kernel::CIStatusTools
+        kernel::CIStatusTools kernel::MandatorDataACL
         base::lib::RightsOverview);
 
 
@@ -1736,9 +1738,10 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
        ($rec->{creator}==$userid && $rec->{cistatusid}<3)){
-      return("name","userparam","office","officeacc","private","nativcontact",
+      my @l=("name","userparam","office","officeacc","private","nativcontact",
              "usersubst","control","officeacc","personrelated","introdution",
              "officeacc","interview","comments");
+      return($self->expandByDataACL(undef,@l));
    }
    # check if the user has a direct boss
    my $g=$self->getField("groups")->RawValue($rec);
@@ -1749,8 +1752,9 @@ sub isWriteValid
                if (grep(/^$orole$/,@{$grp->{roles}})){
                   if ($self->IsMemberOf($grp->{grpid},["RBoss","RBoss2"],
                                         "direct")){
-                     return("personrelated","introdution","private",
+                     my @l=("personrelated","introdution","private",
                             "officeacc","interview","office");
+                     return($self->expandByDataACL(undef,@l));
                      last;
                   }
                }
@@ -1760,8 +1764,9 @@ sub isWriteValid
    }
    if ($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0){
       if ($self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"down")){
-         return("introdution","private","officeacc","office",
+         my @l=("introdution","private","officeacc","office",
                 "comments","control");
+         return($self->expandByDataACL(undef,@l));
       }
    }
    return(undef);

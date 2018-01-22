@@ -19,6 +19,25 @@ package kernel::MandatorDataACL;
 use strict;
 use kernel;
 
+sub expandFieldgroupWithRule
+{
+   my $fieldgroups=shift;
+   my $pref=shift;
+   my $rule=shift;
+
+   if ($rule=~m/^[^.]+\.[^.]+$/){
+      push(@$fieldgroups,$pref.$rule);
+   }
+   else{
+      if ($pref eq "!"){
+         @$fieldgroups=grep(!/^$rule$/,@$fieldgroups);
+      }
+      else{
+         push(@$fieldgroups,$pref.$rule);
+      }
+   }
+}
+
 sub expandByDataACL
 {
    my $self=shift;
@@ -29,7 +48,10 @@ sub expandByDataACL
    my @flt;
    my %p=($self->Self=>1,$self->SelfAsParentObject=>1);
    foreach my $parentobj (keys(%p)){
-      push(@flt,{parentobj=>\$parentobj,mandatorid=>$mandator});
+      push(@flt,{
+         parentobj=>\$parentobj,
+         mandatorid=>[undef,$mandator]
+      });
    }
    $acl->SetFilter(\@flt);
    my $grps;
@@ -43,7 +65,7 @@ sub expandByDataACL
       if (!exists($chkdataname{$dataname})){
          if ($acl->{target} eq "base::grp"){
             if ($acl->{targetid}<0){
-               push(@fieldgroups,$pref.$acl->{dataname});
+               expandFieldgroupWithRule(\@fieldgroups,$pref,$acl->{dataname});
                $chkdataname{$dataname}++;
                next;
             }
@@ -51,14 +73,14 @@ sub expandByDataACL
                $grps={$self->getGroupsOf($userid,"RMember","up")};
             }
             if (exists($grps->{$acl->{targetid}})){
-               push(@fieldgroups,$pref.$acl->{dataname});
+               expandFieldgroupWithRule(\@fieldgroups,$pref,$acl->{dataname});
                $chkdataname{$dataname}++;
                next;
             }
          }
          if ($acl->{target} eq "base::user" &&
              $acl->{targetid}==$userid){
-            push(@fieldgroups,$pref.$acl->{dataname});
+            expandFieldgroupWithRule(\@fieldgroups,$pref,$acl->{dataname});
             $chkdataname{$dataname}++;
             next;
          }
