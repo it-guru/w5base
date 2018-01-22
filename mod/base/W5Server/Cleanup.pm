@@ -151,9 +151,14 @@ sub CleanupWasted
          my $cistatusfld=$o->getField("cistatusid");
          if (defined($idobj) && defined($mdatefld) && defined($cistatusfld) &&
              $o->SelfAsParentObject() eq $obj){
-            msg(DEBUG,"start CleanupWasted on $obj");
             my $idname=$idobj->Name();
-            $o->SetFilter({cistatusid=>\'6',mdate=>$CleanupWasted});
+            my $uCleanupWasted=$CleanupWasted;
+            if ($obj eq "base::user"){    # justified on person related data
+               $uCleanupWasted="<now-1Y"; # the privacy forces a limit of
+            }                             # 1 year is forced for storing 
+                                          # old person related informations
+            msg(DEBUG,"start CleanupWasted on $obj with mdate=$uCleanupWasted");
+            $o->SetFilter({cistatusid=>\'6',mdate=>$uCleanupWasted});
             $o->SetCurrentView(qw(ALL));
             $o->SetCurrentOrder(qw(NONE));
             $o->Limit(100);
@@ -188,7 +193,7 @@ sub CleanupHistory
    my $self=shift;
    my $hist=getModuleObject($self->getParent->Config,"base::history");
    my $CleanupHistory=$self->getParent->Config->Param("CleanupHistory");
-   $CleanupHistory="<now-730d" if ($CleanupHistory eq "");
+   $CleanupHistory="<now-1095d" if ($CleanupHistory eq "");
 
    $hist->SetFilter({cdate=>$CleanupHistory});
    $hist->SetCurrentView(qw(ALL));

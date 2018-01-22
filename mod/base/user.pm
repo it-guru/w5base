@@ -1228,11 +1228,18 @@ sub prepareToWasted
    my $oldrec=shift;
    my $newrec=shift;
 
-   $newrec->{posix}=undef;
-   $newrec->{dsid}=undef;
-   $newrec->{srcsys}=undef;
-   $newrec->{srcid}=undef;
-   $newrec->{srcload}=undef;
+   foreach my $v (qw( dateofdatapriv dateofdatapriv_edt
+                      dateofworksafty dateofworksafty_edt
+                      dateofcorruprot dateofcorruprot_edt
+                      dateofvsnfd dateofvsnfd_edt
+                      dateofsecretpro dateofsecretpro_edt
+                      private_elecfacsimile private_facsimile private_mobile
+                      private_phone private_street private_location
+                      private_zipcode persidentno
+                      posix dsid srcsys srcid srcload )){
+      $newrec->{$v}=undef;
+   }
+
 
    return(1);   # if undef, no wasted Transfer is allowed
 }
