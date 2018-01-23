@@ -34,6 +34,8 @@ create table "W5SIEM_secent" (
    ipaddress            VARCHAR2(45) not null,
    tracking_method      VARCHAR2(40),
    osname               VARCHAR2(128),
+   dns                  VARCHAR2(256),
+   netbios              VARCHAR2(256),
    ipstatus             VARCHAR2(128),
    qid                  NUMBER(20,0) not null,
    title                VARCHAR2(4000) not null,
