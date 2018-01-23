@@ -59,6 +59,10 @@ grant select,insert,update,delete on "W5SIEM_secent" to W5SIEM;
 create or replace synonym W5SIEM.secent for "W5SIEM_secent";
 create or replace synonym W5I.W5SIEM_secent for "W5SIEM_secent";
 
+CREATE INDEX "W5SIEM_secent_i0"
+   ON "W5SIEM_secent" (ref) online;
+
+
 
 -- drop table "W5SIEM_secscanruntime";
 create table "W5SIEM_secscanruntime" (

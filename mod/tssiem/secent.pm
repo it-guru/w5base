@@ -34,9 +34,50 @@ sub new
 
    $self->AddFields(
       new kernel::Field::Text(
+                name          =>'ictono',
+                group         =>'scan',
+                label         =>'ICTO-ID',
+                dataobjattr   =>"('ICTO-'||W5SIEM_secscan.ictoid)"),
+
+      new kernel::Field::Date(
+                name          =>'sdate',
+                label         =>'Scan date',
+                dataobjattr   =>'W5SIEM_secscan.launch_datetime'),
+
+      new kernel::Field::Text(
                 name          =>'ipaddress',
-                label         =>'IP-Address',
+                label         =>'IP',
                 dataobjattr   =>"W5SIEM_secent.ipaddress"),
+
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'possible W5Base System',
+                vjointo       =>'itil::system',
+                vjoinbase     =>[{cistatusid=>"<=4"}],
+                vjoinon       =>['ipaddress'=>'ipaddresses'],
+                vjoindisp     =>['name','applications']),
+
+      new kernel::Field::Text(
+                name          =>'tracking_method',
+                label         =>'Tracking Meth',
+                dataobjattr   =>"W5SIEM_secent.tracking_method"),
+
+      new kernel::Field::Text(
+                name          =>'os',
+                label         =>'OS',
+                htmlwidth     =>'200',
+                dataobjattr   =>"W5SIEM_secent.osname"),
+
+      new kernel::Field::Text(
+                name          =>'ipstatus',
+                label         =>'IP Status',
+                sqlorder      =>'NONE',
+                dataobjattr   =>"W5SIEM_secent.ipstatus"),
+
+      new kernel::Field::Text(
+                name          =>'qid',
+                label         =>'QID',
+                dataobjattr   =>"W5SIEM_secent.qid"),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -44,53 +85,85 @@ sub new
                 dataobjattr   =>"W5SIEM_secent.title"),
 
       new kernel::Field::Text(
+                name          =>'vuln_status',
+                label         =>'Vuln Status',
+                dataobjattr   =>"W5SIEM_secent.vuln_status"),
+
+      new kernel::Field::Text(
+                name          =>'ent_type',
+                label         =>'Type',
+                dataobjattr   =>"W5SIEM_secent.ent_type"),
+
+      new kernel::Field::Text(
+                name          =>'severity',
+                label         =>'Severity',
+                dataobjattr   =>"W5SIEM_secent.severity"),
+
+      new kernel::Field::Text(
+                name          =>'port',
+                label         =>'Port',
+                dataobjattr   =>"W5SIEM_secent.port"),
+
+      new kernel::Field::Text(
+                name          =>'ssl',
+                label         =>'SSL',
+                dataobjattr   =>"W5SIEM_secent.ssl"),
+
+      new kernel::Field::Date(
+                name          =>'firstdetect',
+                label         =>'First Detect',
+                dataobjattr   =>'W5SIEM_secent.first_detect'),
+
+      new kernel::Field::Date(
+                name          =>'lastdetect',
+                label         =>'Last Detect',
+                dataobjattr   =>'W5SIEM_secent.last_detect'),
+
+      new kernel::Field::Textarea(
+                name          =>'vendor_reference',
+                label         =>'Vendor Reference',
+                htmldetail    =>'NotEmpty',
+                sqlorder      =>'NONE',
+                dataobjattr   =>'W5SIEM_secent.vendor_reference'),
+
+      new kernel::Field::Textarea(
+                name          =>'impact',
+                label         =>'Impact',
+                htmldetail    =>'NotEmpty',
+                sqlorder      =>'NONE',
+                dataobjattr   =>'W5SIEM_secent.impact'),
+
+      new kernel::Field::Textarea(
+                name          =>'exploitability',
+                label         =>'Exploitability',
+                htmldetail    =>'NotEmpty',
+                sqlorder      =>'NONE',
+                dataobjattr   =>'W5SIEM_secent.exploitability'),
+
+      new kernel::Field::Textarea(
+                name          =>'associated_malware',
+                label         =>'Associated Malware',
+                htmldetail    =>'NotEmpty',
+                sqlorder      =>'NONE',
+                dataobjattr   =>'W5SIEM_secent.associated_malware'),
+
+      new kernel::Field::Text(
+                name          =>'pci_vuln',
+                label         =>'PCI Vuln',
+                dataobjattr   =>"W5SIEM_secent.pci_vuln"),
+
+      new kernel::Field::Text(
                 name          =>'category',
                 label         =>'Category',
                 dataobjattr   =>"W5SIEM_secent.category"),
 
       new kernel::Field::Text(
-                name          =>'osname',
-                label         =>'OS-Name',
-                dataobjattr   =>"W5SIEM_secent.osname"),
-
-      new kernel::Field::Text(
-                name          =>'ipstatus',
-                label         =>'IP-Status',
-                dataobjattr   =>"W5SIEM_secent.ipstatus"),
-
-      new kernel::Field::Date(
-                name          =>'firstdetect',
-                label         =>'first detect',
-                dataobjattr   =>'W5SIEM_secent.first_detect'),
-
-      new kernel::Field::Date(
-                name          =>'lastdetect',
-                label         =>'last detect',
-                dataobjattr   =>'W5SIEM_secent.last_detect'),
-
-      new kernel::Field::Textarea(
-                name          =>'impact',
-                label         =>'impact',
-                htmldetail    =>'NotEmpty',
-                dataobjattr   =>'W5SIEM_secent.impact'),
-
-      new kernel::Field::Textarea(
-                name          =>'vendor_reference',
-                htmldetail    =>'NotEmpty',
-                label         =>'vendor_reference',
-                dataobjattr   =>'W5SIEM_secent.vendor_reference'),
-
-      new kernel::Field::Text(
-                name          =>'ictono',
-                group         =>'scan',
-                label         =>'ICTO-ID',
-                dataobjattr   =>"('ICTO-'||W5SIEM_secscan.ictoid)"),
-
-      new kernel::Field::Text(
                 name          =>'scanname',
                 label         =>'Scan Title',
+                sqlorder      =>'NONE',
                 group         =>'scan',
                 dataobjattr   =>"W5SIEM_secscan.title"),
+
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -111,9 +184,18 @@ sub new
                 label         =>'Source-Load',
                 dataobjattr   =>'W5SIEM_secscan.importdate'),
 
+      new kernel::Field::Link(
+                name          =>'qref',
+                group         =>'source',
+                label         =>'Scan-Ref',
+                dataobjattr   =>'W5SIEM_secent.ref'),
+
    );
    $self->{use_distinct}=0;
-   $self->setDefaultView(qw(ictono ipaddress name firstdetect));
+   $self->setDefaultView(qw(ictono 
+        sdate ipaddress tracking_method os qid name vuln_status ent_type
+       severity port ssl firstdetect lastdetect vendor_reference impact
+       exploitability));
    $self->setWorktable("W5SIEM_secent");
    return($self);
 }

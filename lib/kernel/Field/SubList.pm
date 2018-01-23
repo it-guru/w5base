@@ -302,6 +302,15 @@ sub getSubListData
       }
 
       $self->vjoinobj->SetFilter(@fltlst);
+      if ($mode=~m/^Html/){
+         if ($self->{htmllimit}){
+            my $n=$self->vjoinobj->CountRecords();
+            $param{htmllimit}=$self->{htmllimit};
+            $param{CountRecords}=$n;
+            $n=$n-$self->{htmllimit};
+            $self->vjoinobj->Limit($self->{htmllimit},0,1);
+         }
+      }
 
       my @view=@{$self->{vjoindisp}};
       if ($mode eq "JSON" || $mode eq "JSONP"){

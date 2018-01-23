@@ -418,8 +418,17 @@ function SubListEdit(setid)
 EOF
    }
    if (defined($msg)){
-      if (!$self->{DisableMsg}){
-         $d.="<hr>msg=$msg<br>";
+      if ($msg ne "Limit reached" && !$self->{htmllimit}){
+         if (!$self->{DisableMsg}){
+            $d.="<hr>msg=$msg<br>";
+         }
+      }
+      else{
+         my $p=$self->getParent->getParent;
+         $d.="&nbsp;<b>$self->{htmllimit}</b> ".
+             $p->T("of").
+             " <b>$self->{CountRecords} ".
+             "</b><br>";
       }
    }
    $d.=$self->StoreQuery();

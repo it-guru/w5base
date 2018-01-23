@@ -1,2 +1,3 @@
 'klick to view &lt;%s&gt;'=>{de=>'klicken, um das Objekt &lt;%s&gt; anzuzeigen'},
 'record not editable at this point!'=>{de=>'Datensatz an dieser Stelle NICHT bearbeitbar!'},
+'of'=>{de=>'von'},

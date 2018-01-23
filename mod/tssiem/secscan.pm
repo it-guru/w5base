@@ -40,9 +40,16 @@ sub new
                 group         =>'source',
                 dataobjattr   =>"replace(ref,'/','_')"),
 
+      new kernel::Field::Link(
+                name          =>'qref',
+                label         =>'Qualys Ref',
+                group         =>'source',
+                dataobjattr   =>"ref"),
+
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'200px',
+                ignorecase    =>1,
                 label         =>'Title',
                 dataobjattr   =>"title"),
 
@@ -67,8 +74,28 @@ sub new
                 name          =>'sduration',
                 label         =>'Scan duration',
                 group         =>'results',
+                sqlorder      =>'ASC',
                 dataobjattr   =>"to_char(duration,'HH24:MI')"),
 
+      new kernel::Field::SubList(
+                name          =>'secents',
+                label         =>'Security Entries',
+                group         =>'results',
+                vjointo       =>'tssiem::secent',
+                htmllimit     =>10,
+                forwardSearch =>1,
+                vjoinon       =>['qref'=>'qref'],
+                vjoindisp     =>['ipaddress','name']),
+
+      new kernel::Field::Number(
+                name          =>'secentcnt',
+                label         =>'SecEnt count',
+                readonly      =>1,
+                group         =>'results',
+                htmldetail    =>0,
+                uploadable    =>0,
+                dataobjattr   =>"(select count(*) from W5SIEM_secent ".
+                                "where W5SIEM_secscan.ref=W5SIEM_secent.ref)"),
 
       new kernel::Field::Textarea(
                 name          =>'starget',
@@ -163,7 +190,7 @@ sub new
                 dataobjattr   =>"('Qualys_ICTO-'||lpad(ictoid,5,'0')||".
                                 "'_'||".
                                 "to_char(launch_datetime,'YYYYMMDDHH24MISS')||".
-                                "'_Standard_delta'||'.pdf')"),
+                                "'_standard_delta'||'.pdf')"),
 
       new kernel::Field::File(
                 name          =>'pdfvfwifull',
@@ -286,7 +313,7 @@ sub new
 
    );
    $self->{use_distinct}=0;
-   $self->setDefaultView(qw(sdate ictono name sduration));
+   $self->setDefaultView(qw(sdate ictono name sduration secentcnt));
    $self->setWorktable("W5SIEM_secscan");
    return($self);
 }
@@ -366,7 +393,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","results",'contact',"source");
+   return("header","default",'contact',"results","source");
 }
 
 

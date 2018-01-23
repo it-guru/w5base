@@ -76,6 +76,12 @@ sub setFormat
         "\$o=new kernel::Output::$format(\$self,\%opt);");
    if ($@ eq ""){
       $self->{Format}=$o;
+      if (exists($opt{htmllimit})){
+         $o->{htmllimit}=$opt{htmllimit};
+      }
+      if (exists($opt{CountRecords})){
+         $o->{CountRecords}=$opt{CountRecords};
+      }
       return(1);
    }
    my $emsg=$@;
@@ -327,6 +333,14 @@ sub WriteToScalar    # ToDo: viewgroups implementation
          syswrite(TMP,$self->Format->getHttpFooter());
       }
    }
+   if (($self->{Format}->Self=~/^kernel::Output::Html/)  &&
+       $msg eq "Limit reached"){
+      $msg="";
+   }
+
+   
+   
+
    if ($msg ne "" && $self->Format->{DisableMsg}!=1){
       close(TMP);
       close($fh);
