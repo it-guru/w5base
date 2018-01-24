@@ -87,7 +87,7 @@ sub qcheckRecord
    return(0,undef) if (!($rec->{cistatusid}==3 || 
                          $rec->{cistatusid}==4));
 
-   my %pm_soll;
+   my %am_soll;
    my @notifymsg;
 
    if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
@@ -109,17 +109,17 @@ sub qcheckRecord
             foreach my $r (@{$parrec->{roles}}){
                if (($r->{role} eq "Maintenance Responsible") &&
                    $r->{email} ne ""){
-                  my $pmid=$user->GetW5BaseUserID($r->{email},"email",
+                  my $amid=$user->GetW5BaseUserID($r->{email},"email",
                                                   {quiet=>1});
-                  if ($pmid ne ""){
-                     $pm_soll{$pmid}++;
+                  if ($amid ne ""){
+                     $am_soll{$amid}++;
                   }
                }
             }
          }
-         my @pm_soll=sort(keys(%pm_soll));
+         my @am_soll=sort(keys(%am_soll));
          my $lnkcontact;
-         #if ($#pm_soll!=-1){
+         #if ($#am_soll!=-1){
             $lnkcontact=getModuleObject($self->getParent->Config,
                                                  "base::lnkcontact");
          #}
@@ -139,13 +139,13 @@ sub qcheckRecord
                              # mit dem Request 14447420560003 der 
                              # Projektmanager IMMER hart übernommen werden.
  
-         foreach my $pmid (@pm_soll){
+         foreach my $amid (@am_soll){
             my $pmfound=0;
             foreach my $crec (@{$rec->{contacts}}){
                my $roles=$crec->{roles};
                $roles=[$roles] if (ref($roles) ne "ARRAY");
                if ($crec->{target} eq "base::user" &&
-                   $crec->{targetid} eq $pmid){
+                   $crec->{targetid} eq $amid){
                   $pmfound=1;
                   if (!in_array($roles,"applmgr2")){
                      if ($autocorrect){
@@ -154,11 +154,12 @@ sub qcheckRecord
                                       'applmgr2',$self->Self),
                              $crec->{targetname}));
                         ####################################################
+                        my @newroles=grep({defined($_)} @$roles,'applmgr2');
                         $lnkcontact->ValidatedUpdateRecord(
                                      {%$crec,
                                       refid=>$rec->{id},
                                       parentobj=>'itil::appl'},
-                                     {roles=>[@$roles,'applmgr2']},
+                                     {roles=>\@newroles},
                                      {id=>\$crec->{id}});
                         ####################################################
                      }
@@ -171,7 +172,7 @@ sub qcheckRecord
             }
             if (!$pmfound){
                my $user=getModuleObject($self->getParent->Config,"base::user");
-               $user->SetFilter({userid=>\$pmid});
+               $user->SetFilter({userid=>\$amid});
                my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
                if (defined($urec)){
                   if ($autocorrect){
@@ -202,7 +203,7 @@ sub qcheckRecord
             $roles=[$roles] if (ref($roles) ne "ARRAY");
             if ($crec->{target} ne "base::user" ||
                 ($crec->{target} eq "base::user" &&
-                 !in_array(\@pm_soll,$crec->{targetid}))){
+                 !in_array(\@am_soll,$crec->{targetid}))){
                if (in_array($roles,"applmgr2")){
                   my @newroles=grep(!/^applmgr2$/,@{$roles});
                   if ($#newroles==-1){

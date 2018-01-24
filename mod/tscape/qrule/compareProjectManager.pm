@@ -155,11 +155,13 @@ sub qcheckRecord
                                       'projectmanager',$self->Self),
                              $crec->{targetname}));
                         ####################################################
+                        my @newroles=grep({defined($_)} @$roles,
+                                                        'projectmanager');
                         $lnkcontact->ValidatedUpdateRecord(
                                      {%$crec,
                                       refid=>$rec->{id},
                                       parentobj=>'itil::appl'},
-                                     {roles=>[@$roles,'projectmanager']},
+                                     {roles=>\@newroles},
                                      {id=>\$crec->{id}});
                         ####################################################
                      }

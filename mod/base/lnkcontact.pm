@@ -477,6 +477,9 @@ sub Validate
       $parentobj=$self->{secparentobj};
       $newrec->{parentobj}=$parentobj;
    }
+   if (exists($newrec->{roles}) && ref($newrec->{roles}) eq "ARRAY"){
+      $newrec->{roles}=[grep({defined($_) && $_ ne ""} @{$newrec->{roles}})];
+   }
    my $refid=effVal($oldrec,$newrec,"refid");
    if (!defined($parentobj) || $parentobj eq ""){
       $self->LastMsg(ERROR,"empty parent object");
