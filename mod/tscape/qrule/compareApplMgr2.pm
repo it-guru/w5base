@@ -84,8 +84,8 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(0,undef) if (!($rec->{cistatusid}==3 || 
-                         $rec->{cistatusid}==4));
+   return(undef,undef) if (!($rec->{cistatusid}==3 || 
+                             $rec->{cistatusid}==4));
 
    my %am_soll;
    my @notifymsg;
@@ -255,6 +255,9 @@ sub qcheckRecord
          }
          return(undef,undef);
       });
+   }
+   else{
+      return(undef,undef);
    }
    if ($#dataissue!=-1){
       $errorlevel=3;
