@@ -1,6 +1,12 @@
 'itil::qrule::ApplIfacePartner'=>{
-   de=>'Prüfung auf nicht dokumentierte Schnittstellenzuordnungen',
-   en=>'Check of undocumented interface relations'
+   de=>'Prüfung auf unklare Schnittstellenzuordnungen',
+   en=>'Check for unclear interface relations'
 },
-'Interface ID'=>{de=>'Schnittstellen-ID'},
-
+'MSG01'=>{de=>'Es wurden unklare Schnittstellenzuordnungen erkannt:',
+          en=>'Unclear interface relations were detected:'},
+'MSG02'=>{de=>"Es wurden unklare Schnittstellenzuordnungen erkannt. ".
+              "Bitte klären Sie die Schnittstellendokumentation ".
+              "mit den Datenverantwortlichen der folgenden Anwendungen ab:",
+          en=>"Unclear interface relations were detected. ".
+              "Please clarify the interface documentation ".
+              "with the databoss of the following applications:"},

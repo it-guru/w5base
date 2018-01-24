@@ -7,7 +7,7 @@ package itil::qrule::ApplIfacePartner;
 =head3 PURPOSE
 
 If another application (fromappl) has documented an interface with
-cistatus 'available/in project' or 'installed/activ' to an 
+cistatus 'available/in project' or 'installed/active' to an 
 application (toappl), the toappl has to document the corresponding 
 interface on its side too.
 An error is caused, if the corresponding interface is missing,
@@ -22,30 +22,26 @@ NONE
 
 [en:]
 
-This Qrule checks whether there are interfaces referring to this application
-that are not present on this application itself. The Qrule checks the
-data direction (e.g. send/send and receive/receive are not allowed.)
-Please document the corresponding interface or contact the interface partner,
-in case this is an incorrect entry.
+The documentation of interfaces requires these relations 
+to be documented from both sides.
 
-In case of further questions regarding Darwin
-please contact the Darwin Support:
-https://darwin.telekom.de/darwin/public/faq/article/ById/13388110470010
+This QualityRule checks whether the specification has been adhered to. 
+It also checks the data flow direction.
+Data flows send/send and/or receive/receive are not allowed.
+
+For clarification please contact the Databoss of the respective application(s).
 
 [de:]
 
-Diese Qualitätsregel prüft, ob es Schnittstelleneinträge zu dieser
-Anwendung gibt, die hier noch nicht dokumentiert sind.
-Dabei wird auch die Datenflussrichtung berücksichtigt,
-d.h. senden/senden und empfangen/empfangen sind nicht erlaubt.
+Die Dokumentation von Schnittstellen an Anwendungen erfordert,
+dass diese auf beiden Seiten dokumentiert werden.
 
-Bitte legen Sie den korrespondierenden Schnittstelleintrag an,
-oder kontaktieren Sie den Schnittstellenpartner, falls Sie der Meinung
-sind, dass es sich um einen fehlerhaften Eintrag handelt.
+Diese Qualitätsregel prüft, ob diese Vorgabe eingehalten wurde.
+Bei dieser Prüfung wird auch die Datenflussrichtung geprüft.
+Senden/senden und empfangen/empfangen wird als nicht zulässig bewertet.
 
-Bei weiteren Fragen bezüglich Darwin
-wenden Sie sich bitte an den Darwin-Support:
-https://darwin.telekom.de/darwin/public/faq/article/ById/13388110470010
+Zur Klärung kontaktieren Sie bitte den Datenverantwortlichen 
+der aufgelisteten Anwendungen.
 
 
 =cut
@@ -103,6 +99,7 @@ sub qcheckRecord
                    3=>[0..5],4=>[0,2,3,5],5=>[0,1,3,4]);
    my @msg;
    my @dataissue;
+   my @issuedappl;
 
    my $lnkobj=getModuleObject($self->getParent->Config,'itil::lnkapplappl');
    my $appl=getModuleObject($self->getParent->Config,'itil::appl');
@@ -122,15 +119,22 @@ sub qcheckRecord
          $appl->SetFilter({id=>\$aa->{fromapplid}});
          my ($fromapplrec,$msg)=$appl->getOnlyFirst(qw(mandator));
          if ($fromapplrec->{mandator} ne "Extern"){
-            push(@msg,sprintf("%s (%s: %d)",$aa->{fromappl},
-                                            $self->T('Interface ID'),
-                                            $aa->{id}));
-            push(@dataissue,"$aa->{fromappl} -> $aa->{urlofcurrentrec}");
+            push(@issuedappl,$aa->{fromappl});
          }
       }
    }
+
+   if ($#issuedappl!=-1) {
+      my $appl=join(', ',@issuedappl);
+      push(@msg,'MSG01');
+      push(@msg,$appl);
+
+      push(@dataissue,'MSG02');
+      push(@dataissue,$appl);
+
+      return(3,{qmsg=>\@msg,dataissue=>\@dataissue});
+   }
    
-   return(3,{qmsg=>\@msg,dataissue=>\@dataissue}) if ($#msg!=-1);
    return(0,undef);
 }
 
