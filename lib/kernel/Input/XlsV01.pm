@@ -100,6 +100,9 @@ sub SetInput
       }
       my $ok=1;
       for(my $col=0;$col<=$#fieldnames;$col++){
+         if ($fieldnames[$col] eq "#UPLOAD_COMMENT_COLUMN#"){
+            $trfieldnames[$col]=$fieldnames[$col];
+         }
          if ($fieldnames[$col] ne "" && $trfieldnames[$col] eq ""){
             print msg(ERROR,"can't associate column name '%s'",
                       $fieldnames[$col]);
@@ -172,8 +175,8 @@ sub Process
       }
       next if ($isempty);
       $recno++;
-      print msg(INFO,"[start record %d ".
-                     "starting at line %d ".
+      delete($rec{'#UPLOAD_COMMENT_COLUMN#'});
+      print msg(INFO,"[start record %d starting at line %d ".
                      "with %d vars for '%s']",
                 $recno,$row,
                 scalar(keys(%rec)),

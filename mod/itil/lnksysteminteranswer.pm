@@ -65,6 +65,8 @@ sub new
                 vjointo       =>'itil::system',
                 group         =>'relation',
                 dontrename    =>1,
+                uploadable    =>0,
+                readonly      =>1,
                 fields        =>[qw(adminteam adminteamid 
                                     mandator mandatorid
                                     )]),
