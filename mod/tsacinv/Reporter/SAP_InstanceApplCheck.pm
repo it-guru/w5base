@@ -45,6 +45,7 @@ sub getDefaultIntervalMinutes
 sub Process             # will be run as a spereate Process (PID)
 {
    my $self=shift;
+   return(0);  # Reporter deaktiviert - ich denke der Job macht keinen Sinn mehr
 
    my $o=getModuleObject($self->Config,"tsacinv::appl");
    my $lnk=getModuleObject($self->Config,"tsacinv::lnkapplappl");
