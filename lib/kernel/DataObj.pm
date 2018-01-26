@@ -1298,6 +1298,7 @@ sub StoreUpdateDelta
    my $mode=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $deltanote=shift;
 
    if (defined($self->{history})){
       if (ref($self->{history}) ne "HASH"){
@@ -1316,7 +1317,7 @@ sub StoreUpdateDelta
                      $mode,
                      $histtarget,
                      $oldrec,
-                     $newrec,"ALL",$label,undef
+                     $newrec,"ALL",$label,undef,$deltanote
                   );
                }
                else{
@@ -1338,7 +1339,7 @@ sub StoreUpdateDelta
                         $mode,
                         $histtarget,
                         $oldrec,
-                        $newrec,$field,$old,$new
+                        $newrec,$field,$old,$new,$deltanote
                      );
                   }
                }
@@ -1385,7 +1386,7 @@ sub StoreUpdateDelta
                               $mode,
                               $histtarget,
                               $oldrec,
-                              $newrec,$field,$old,$new);
+                              $newrec,$field,$old,$new,$deltanote);
                         }
                      }
                   }
@@ -1408,6 +1409,7 @@ sub HandleHistory
    my $field=shift;
    my $oldval=shift;
    my $newval=shift;
+   my $deltanote=shift;
 
    my $logparent;
    my $h;
@@ -1464,6 +1466,9 @@ sub HandleHistory
       }
       if (defined($comments)){
          $histrec->{comments}=$comments;
+      }
+      if (defined($deltanote)){
+         $histrec->{comments}.="\n\n".$deltanote;
       }
 
       $histreclogid=$h->ValidatedInsertRecord($histrec);

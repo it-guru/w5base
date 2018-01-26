@@ -128,7 +128,7 @@ sub qcheckRecord
                });
             }
             elsif ($found eq "0"){
-               msg(INFO,"nothing needs to be done for $needtounrelevant");
+               #msg(INFO,"nothing needs to be done for $needtounrelevant");
             }
             else{
                $iaop->ValidatedUpdateRecord({

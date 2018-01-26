@@ -36,10 +36,6 @@ Rollen ersetzen.
 Die QualityRule entfernt Referenzen auf Kontakte oder Gruppen, bei denen
 der Zieldatensatz im Status "entsorgt" steht.
 
-Bei Fragen wenden Sie sich bitte an den DARWIN Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
-
-
 [en:]
 
 Checks, if there are invalid contact references on the CI. 
@@ -49,10 +45,6 @@ A DataIssue is created when there are one or more invalid contacts on the CI.
 The DataIssue can be resolved by finding and deleting 
 the invalid contact references. 
 If necessary, new users or groups with the corresponding roles can be added.
-
-If you have any questions please contact the Darwin Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
-
 
 =cut
 #######################################################################
@@ -93,44 +85,164 @@ sub getPosibleTargets
    return([".*"]);
 }
 
+
+sub NotifyContactDataModification
+{
+   my $self=shift;
+   my $operation=shift;
+   my $dataobj=shift;
+   my $reason=shift;
+   my $ref=shift;
+   my $rec=shift;
+   my $contactrec=shift;
+   my $add=shift;
+
+   my $targetid;
+   if (exists($rec->{databossid})){
+      $targetid=$rec->{databossid};
+   }
+   if ($operation eq "databosschange"){
+      $targetid=$add;
+   }
+   my %notifyparam;
+   my $notifycontrol={};
+   if ($targetid ne ""){
+      my $user=getModuleObject($dataobj->Config(),"base::user");
+      $user->SetFilter(userid=>\$targetid);
+      my ($targetrec)=$user->getOnlyFirst(qw(fullname email lang talklang));
+      if (defined($targetrec)){
+         $notifyparam{emailfrom}="\"W5Base Contact-Cleanup\" <>";
+         $notifyparam{emailto}=[$targetid]; 
+         $notifyparam{emailbcc}=[11634953080001];
+         $notifyparam{lang}=$targetrec->{lang} ne "" ? 
+                                $targetrec->{lang} : $targetrec->{talklang};
+         $notifyparam{lang}="en" if ($notifyparam{lang} eq "");
+         my $text;
+         my $lastlang;
+         if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
+            $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+         }
+         $ENV{HTTP_FORCE_LANGUAGE}=$notifyparam{lang};
+         my $subject;
+         my $mtemplate="base.qrule.InvalidRefChk.Notify.".$operation;
+         if ($operation eq "databosschange"){
+            $subject=$dataobj->T("databoss handover to you");
+         }
+         elsif ($operation eq "roledel"){
+            $subject=$dataobj->T("void role field");
+         }
+         elsif ($operation eq "contactdel"){
+            $subject=$dataobj->T("remove of contact entry");
+         }
+         my $fld=$dataobj->getRecordHeaderField();
+         my $datarecname="???";
+         my $fieldname="???";
+         if (defined($fld)){
+            $datarecname=$fld->RawValue($rec);
+            $subject.=": ".$datarecname;
+         }
+         my $fld=$dataobj->getField($ref->{field},$rec);
+         if (defined($fld)){
+            $fieldname=$fld->Label();
+         }
+        
+         my $text;
+         $text.=$dataobj->getParsedTemplate(
+             "tmpl/".$mtemplate,{
+                skinbase=>'base',
+                static=>{
+                   FIELDNAME=>$fieldname,
+                   CONFIGITEMNAME=>$datarecname,
+                   CONTACTNAME=>$contactrec->{fullname},
+                }
+         });
+         #$text.="\nDataobj: $dataobj \n";
+         #$text.="\n\n$operation\n".Dumper($contactrec);
+         #$text.="\n\nref\n".Dumper($ref);
+         my $idfield=$dataobj->IdField();
+         if (defined($idfield)){
+            $notifyparam{dataobj}=$dataobj->Self();
+            $notifyparam{dataobjid}=$rec->{$idfield->Name()};
+         }
+
+         if (defined($subject) && defined($text)){
+            if (!defined($notifycontrol->{wfact})){
+               $notifycontrol->{wfact}=getModuleObject($dataobj->Config,
+                                                       "base::workflowaction");
+            }
+            $notifycontrol->{wfact}->Notify("INFO",$subject,$text,%notifyparam);
+         }
+         if (defined($lastlang)){
+            $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+         }
+         else{
+            delete($ENV{HTTP_FORCE_LANGUAGE});
+         }
+
+      }
+   }
+}
+
+
+
+
+
+
+
+
 sub setReferencesToNull
 {
    my $self=shift;
    my $dataobj=shift;
    my $reason=shift;
-   my $chkrec=shift;
+   my $ref=shift;
    my $rec=shift;
+   my $contactrec=shift;
+
+   my $ReferenceIsStillInvalid=1;
 
    my $idfield=$dataobj->IdField();
-   if (defined($idfield)){
-      my $idname=$idfield->Name();
-      foreach my $ref (@{$chkrec->{r}}){
-         #printf STDERR ("setReferencesToNull CleanupRec:%s\n",Dumper($ref));
+   if (!defined($contactrec) || $contactrec->{cistatusid}==7){
+      if (defined($idfield)){
+         my $idname=$idfield->Name();
          if ($ref->{type} ne "ContactLnk"){
             if ($ref->{type} ne "Databoss"){
-               printf STDERR ("setReferencesToNull on %s (%s) with ".
-                              "reason '$reason' in Field ".
-                              "'%s' (old=%s)\n",$dataobj->Self(),
-                              $rec->{$idname},$ref->{rawfield},
-                              $rec->{$ref->{rawfield}});
                $dataobj->UpdateRecord({$ref->{rawfield}=>undef},
                                       {$idname=>\$rec->{$idname}});
+               $dataobj->StoreUpdateDelta("update",
+                  {$ref->{rawfield}=>$rec->{$ref->{rawfield}},
+                   $idname=>$rec->{$idname}},
+                  {$ref->{rawfield}=>undef,
+                   $idname=>$rec->{$idname}},
+                   $self->Self().
+                   "\nContact cistatus=$contactrec->{cistatusid}");
+               $self->NotifyContactDataModification("roledel",
+                                             $dataobj,$reason,$ref,
+                                             $rec,$contactrec);
+               $ReferenceIsStillInvalid=0;
             }
          }
          else{
-            printf STDERR ("setReferencesToNull on %s (%s) with ".
-                           "reason '$reason' in Field ".
-                           "'%s' recid=%s\n",$dataobj->Self(),
-                           $rec->{$idname},"lnkcontact",
-                           $ref->{rawrecid});
             my $o=getModuleObject($dataobj->Config(),"base::lnkcontact");
-            $o->DeleteRecord({id=>\$ref->{rawrecid}});
+            $o->SetFilter({id=>\$ref->{rawrecid}});
+            my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL));
+            if (defined($oldrec)){
+               $o->DeleteRecord({id=>\$ref->{rawrecid}});
+               $o->StoreUpdateDelta("delete", $oldrec, undef,
+                   $self->Self().
+                   "\nContact cistatus=$contactrec->{cistatusid}");
+               $self->NotifyContactDataModification("contactdel",
+                                             $dataobj,$reason,$ref,
+                                             $rec,$contactrec);
+            }
+            $ReferenceIsStillInvalid=0;
          }
       }
+      else{
+         Stacktrace();
+      }
    }
-   else{
-      Stacktrace();
-   }
+   return($ReferenceIsStillInvalid);
 }
 
 sub qcheckRecord
@@ -172,6 +284,8 @@ sub qcheckRecord
       if ($fobj->Type() ne "ContactLnk"){
          my $idfobj=$dataobj->getField($fobj->{vjoinon}->[0]);
          $rrec->{rawfield}=$fobj->{vjoinon}->[0];
+         $rrec->{rawvalue}=$rec->{$fobj->{vjoinon}->[0]};
+         $rrec->{vjointo}=$fobj->{vjointo};
          if (defined($idfobj)){
             my $id=$idfobj->RawValue($rec);
             if ($id ne ""){
@@ -199,6 +313,7 @@ sub qcheckRecord
                    ($r->{target} eq "base::user" || 
                     $r->{target} eq "base::grp")){
                   my $k=$r->{target}."::".$r->{targetid};
+                  $rrec->{vjointo}=$r->{target};
                   if (!exists($chklst{$k})){
                      $chklst{$k}={
                         target=>$r->{target},
@@ -221,22 +336,23 @@ sub qcheckRecord
       if ($target eq "base::grp"){
          $grp->ResetFilter();
          $grp->SetFilter({grpid=>\$targetid});
-         my ($chkrec)=$grp->getOnlyFirst(qw(cistatusid fullname));
+         my ($chkrec)=$grp->getOnlyFirst(qw(cistatusid fullname mdate));
          if (!defined($chkrec)){
-            $self->setReferencesToNull($dataobj,"invalid",$chklst{$k},$rec);
+            foreach my $ref (@{$chklst{$k}->{r}}){
+               $self->setReferencesToNull($dataobj,"invalid",$ref,$rec);
+            }
          }
          else{
             if ($chkrec->{cistatusid}>5 || $chkrec->{cistatusid}<3){
-               if ($chkrec->{cistatusid}==7){
-                  $self->setReferencesToNull($dataobj,"deleted",
-                                             $chklst{$k},$rec);
-               }
-               else{
-                  foreach my $ref (@{$chklst{$k}->{r}}){
-                     push(@failmsg,$ref->{label}.": ".$chkrec->{fullname}." ".
-                                   $self->T("is invalid"));
+               foreach my $ref (@{$chklst{$k}->{r}}){
+                  if ($self->setReferencesToNull($dataobj,"deleted",
+                                              $ref,$rec,$chkrec)){
+                     my $msg=$ref->{label}.": ".$chkrec->{fullname}." ".
+                             $self->T("is invalid");
+                     push(@failmsg,$msg);
+                     $msg=$ref->{label}.": ".$chkrec->{fullname};
+                     push(@dataissue,$msg);
                   }
-                  push(@dataissue,$chkrec->{fullname});
                }
             }
          }
@@ -244,35 +360,34 @@ sub qcheckRecord
       if ($target eq "base::user"){
          $user->ResetFilter();
          $user->SetFilter({userid=>\$targetid});
-         my ($chkrec)=$user->getOnlyFirst(qw(cistatusid fullname));
+         my ($chkrec)=$user->getOnlyFirst(qw(cistatusid fullname email
+                                             mdate lastknownbossid));
          if (!defined($chkrec)){
             foreach my $ref (@{$chklst{$k}->{r}}){
-               $self->setReferencesToNull($dataobj,"invalid",$chklst{$k},$rec);
+               $self->setReferencesToNull($dataobj,"invalid",$ref,$rec);
             }
          }
          else{
             if ($chkrec->{cistatusid}>5 || $chkrec->{cistatusid}<3){
-               if ($chkrec->{cistatusid}==7){
-                  $self->setReferencesToNull($dataobj,"deleted",
-                                             $chklst{$k},$rec);
-               }
-               else{
-                  foreach my $ref (@{$chklst{$k}->{r}}){
-                     push(@failmsg,$ref->{label}.": ".$chkrec->{fullname}." ".
-                                   $self->T("is invalid"));
+               foreach my $ref (@{$chklst{$k}->{r}}){
+                  if ($self->setReferencesToNull($dataobj,"deleted",
+                                                $ref,$rec,$chkrec)){
+                     my $msg=$ref->{label}.": ".$chkrec->{fullname}." ".
+                                   $self->T("is invalid");
+                     push(@failmsg,$msg);
+                     $msg=$ref->{label}.": ".$chkrec->{fullname};
+                     push(@dataissue,$msg);
                   }
-                  push(@dataissue,$chkrec->{fullname});
                }
             }
          }
       }
    }
-
-
    if ($#failmsg!=-1){
-     # printf STDERR ("check fail:%s\n",Dumper(\@failmsg));
-      return(3,{qmsg=>['There are invalid contact references!',@failmsg],
-                dataissue=>['There are invalid contact references!',@dataissue]});
+      return(3,{
+         qmsg=>['There are invalid contact references!',@failmsg],
+         dataissue=>['There are invalid contact references!',@dataissue]
+      });
    }
    
    return(0,undef);

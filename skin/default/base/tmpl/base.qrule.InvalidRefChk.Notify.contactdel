@@ -1,0 +1,10 @@
+Dear databoss,
+
+the contact "%FIELDNAME%" in the 
+Config-Item "%CONFIGITEMNAME%"
+is deleted because the 
+contact "%CONTACTNAME%" is nolonger 
+valid.
+
+
+
