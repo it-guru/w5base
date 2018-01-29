@@ -80,6 +80,7 @@ sub new
                 name          =>'network',
                 group         =>'urlinfo',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'Network',
                 vjointo       =>'itil::network',
                 vjoinon       =>['networkid'=>'id'],
@@ -128,6 +129,7 @@ sub new
                 name          =>'fromscheme',
                 group         =>'urlinfo',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'from Scheme',
                 dataobjattr   =>'accessurl.from_scheme'),
                                                    
@@ -135,6 +137,7 @@ sub new
                 name          =>'fromhostname',
                 group         =>'urlinfo',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'from Hostname',
                 dataobjattr   =>'accessurl.from_hostname'),
 
@@ -142,6 +145,7 @@ sub new
                 name          =>'fromipport',
                 group         =>'urlinfo',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'from IP-Port',
                 dataobjattr   =>'accessurl.from_ipport'),
 
@@ -150,6 +154,7 @@ sub new
                 name          =>'toscheme',
                 group         =>'urlinfo',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'to Scheme',
                 dataobjattr   =>'accessurl.scheme'),
                                                    
@@ -157,6 +162,7 @@ sub new
                 name          =>'tohostname',
                 group         =>'urlinfo',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'to Hostname',
                 dataobjattr   =>'accessurl.hostname'),
 
@@ -164,6 +170,7 @@ sub new
                 name          =>'toipport',
                 group         =>'urlinfo',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'to IP-Port',
                 dataobjattr   =>'accessurl.ipport'),
 
@@ -452,7 +459,7 @@ sub Validate
    my $srchost=effVal($oldrec,$newrec,"fromhostname");
    my $dsthost=effVal($oldrec,$newrec,"tohostname");
 
-   printf STDERR ("check comm from $srchost to $dsthost");
+   #printf STDERR ("check comm from $srchost to $dsthost");
    my $ip=getModuleObject($self->Config,"itil::ipaddress");
 
    my (@srclist,@dstlist);
@@ -565,16 +572,18 @@ sub Validate
       $newrec->{networkid}=$networkid;
    }
 
-   printf STDERR ("fifi networkid=$networkid\nsrchost %s\ndsthost %s\n",
-                  Dumper(\@srclist),
-                  Dumper(\@dstlist)
-   );
+   #printf STDERR ("fifi networkid=$networkid\nsrchost %s\ndsthost %s\n",
+   #               Dumper(\@srclist),
+   #               Dumper(\@dstlist)
+   #);
 
-
-   if ($#srclist==-1 && $#dstlist==-1){
-      $self->LastMsg(ERROR,
-                    "can't assign any interface application to from or to URL");
-      return(undef);
+   if ($fromurl ne "ANY"){  # if fromurl = ANY, it will treat as ANY IP of 
+                            # from application
+      if ($#srclist==-1 && $#dstlist==-1){
+         $self->LastMsg(ERROR,
+                  "can't assign any interface application to from or to URL");
+         return(undef);
+      }
    }
 
    my $targetisfromappl=effVal($oldrec,$newrec,"targetisfromappl");

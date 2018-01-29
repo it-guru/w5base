@@ -109,3 +109,5 @@
 'Interface-Agreement state'=>{de=>'Schnittstellenvereinbarungs-Status'},
 'IFSTATE.CURRENT'=>{de=>'aktuell'},
 'IFSTATE.NEEDMAINTENANCE'=>{de=>'überarbeitungspflichtig'},
+'Communicationslinks'=>{de=>'Kommunikationsdetails',
+                    en=>'Communication Details'},

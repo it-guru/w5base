@@ -337,6 +337,7 @@ sub getSqlFrom
             "accessurl.appl,lnkapplappl.fromappl) ".
             "join (select min(id) ugroupedid ".
                   "from accessurl ".
+                  "where (appl is not null or target_is_fromappl=1) ".
                   "group by fullname,network,appl) ugrouped ".
             "on accessurl.id=ugrouped.ugroupedid";
    return($from);

@@ -261,6 +261,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fromurl',
                 htmldetail    =>0,
+                uivisible     =>0,
                 group         =>'comdetails',
                 label         =>'from URL',
                 dataobjattr   =>'lnkapplappl.fromurl'),
@@ -268,6 +269,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fromservice',
                 htmldetail    =>0,
+                uivisible     =>0,
                 group         =>'comdetails',
                 label         =>'from Servicename',
                 dataobjattr   =>'lnkapplappl.fromservice'),
@@ -275,6 +277,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'tourl',
                 htmldetail    =>0,
+                uivisible     =>0,
                 group         =>'comdetails',
                 label         =>'to URL',
                 dataobjattr   =>'lnkapplappl.tourl'),
@@ -282,6 +285,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'toservice',
                 htmldetail    =>0,
+                uivisible     =>0,
                 group         =>'comdetails',
                 label         =>'to Servicename',
                 dataobjattr   =>'lnkapplappl.toservice'),
