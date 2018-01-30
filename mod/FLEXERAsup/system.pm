@@ -89,6 +89,7 @@ select "W5I_system_universum".id,
        "tsacinv::asset".systemsonasset           AM_systemsonasset,
        "tsacinv::asset".tsacinv_locationfullname AM_location,
        "itil::system".mandator                   W5_mandator,
+       "itil::system".cistatusid                 W5_cistatus,
        "itil::system".location                   W5_location,
        "itil::system".osrelease                  W5_osrelease,
        "itil::system".osclass                    W5_osclass,
@@ -174,6 +175,21 @@ sub new
                 size          =>'16',
                 readonly      =>1,
                 dataobjattr   =>'systemname'),
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                label         =>'CI-State',
+                readonly      =>1,
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Interface(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                readonly      =>1,
+                dataobjattr   =>'w5_cistatus'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
@@ -728,6 +744,13 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $orgrec=shift;
+
+
+   if (effVal($oldrec,$newrec,"ro_process") eq "" &&
+       effVal($oldrec,$newrec,"comments") eq ""){
+      $self->LastMsg(ERROR,"rollout process or comments needs to be specified");
+      return(undef);
+   }
 
    if (effChanged($oldrec,$newrec,"ro_process") &&
        $newrec->{ro_process} eq "OUT OF SCOPE"){
