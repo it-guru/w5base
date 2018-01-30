@@ -168,7 +168,9 @@ sub mkAcFtpRecSystem
    my $inmassign=$rec->{acinmassingmentgroup};
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
-   return(undef) if ($arec->{assetid} eq "");
+
+   # Wir "sehen" manche Assets nicht mehr - ist ein Problem
+   #return(undef) if ($arec->{assetid} eq "");
 
    my $s=getModuleObject($self->Config,"itil::system");
    $s->SetFilter({asset=>\$rec->{asset},
@@ -214,7 +216,7 @@ sub mkAcFtpRecSystem
    # Wenn das Asset nicht Darwin "gehört", dann will die MU selbst den
    # SystemPartOfAsset Wert definieren - ist zwar unlogisch - ist aber so (HV).
    #
-   if ($arec->{srcsys} eq "W5Base"){
+   if (defined($arec) && $arec->{srcsys} eq "W5Base"){
       $acrec->{LogSys}->{pSystemPartOfAsset}=$TXTpSystemPartOfAsset;
    }
 
@@ -224,7 +226,13 @@ sub mkAcFtpRecSystem
    else{
       return();
    }
-   $acrec->{LogSys}->{Parent_Assettag}=$arec->{assetid};
+   if (defined($arec)){  # alles gut - Asset Datensatz ist sichtbar
+      $acrec->{LogSys}->{Parent_Assettag}=$arec->{assetid};
+   }
+   else{
+      return(undef) if (!($rec->{asset}=~m/^A[0-9]{5,10}$/));
+      $acrec->{LogSys}->{Parent_Assettag}=$rec->{asset};
+   }
 
    push(@acrec,$acrec);
 
