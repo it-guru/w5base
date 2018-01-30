@@ -330,9 +330,20 @@ sub ItemSummary
          $l1->SetFilter({systemsystemid        =>[keys(%systemids)],
                          softwareset     =>$rm->{name}});
          my @l1=$l1->getHashList(@swview);
+
+      # https://darwin.telekom.de/darwin/auth/base/workflow/ById/15166147340001
+         my @l2=grep({   # filter HPSA Version Rotz
+            my $bk=0;
+            if (!($_->{version}=~m/^\s*$/) &&
+                ($_->{version}=~m/^\d.*\./)){
+               $bk=1;
+            }
+            $bk;
+         } @l1);
+
          my @softstate=({
             roadmap=>$rm->{name},
-            i=>ObjectRecordCodeResolver(\@l1)
+            i=>ObjectRecordCodeResolver(\@l2)
          });
          return(0) if (!$l1->Ping());
          $summary->{hpsaswp}={record=>\@softstate};    # SET : hpsaswp fertig
