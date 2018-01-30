@@ -275,6 +275,7 @@ sub SendXmlToAM_system
          $filter{name}=\@systemname;
       }
    }
+   $self->{DebugMode}=0;   # force non debug mode
    my (%fh,%filename);
 
    $self->{jobstart}=NowStamp();
@@ -293,13 +294,11 @@ sub SendXmlToAM_system
             $acasset->ResetFilter();
             $acasset->SetFilter({assetid=>\$rec->{asset}});
             my ($acassetrec,$msg)=$acasset->getOnlyFirst(qw(assetid srcsys));
-            if (defined($acassetrec)){
-               foreach my $acftprec ($self->mkAcFtpRecSystem($acassetrec,$rec)){
-                  if (defined($acftprec)){
-                     my $fh=$fh{system};
-                     print $fh hash2xml($acftprec,{header=>0});
-                     $acnew++;
-                  }
+            foreach my $acftprec ($self->mkAcFtpRecSystem($acassetrec,$rec)){
+               if (defined($acftprec)){
+                  my $fh=$fh{system};
+                  print $fh hash2xml($acftprec,{header=>0});
+                  $acnew++;
                }
             }
          }
