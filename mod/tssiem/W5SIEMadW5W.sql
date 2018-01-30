@@ -72,7 +72,7 @@ CREATE SEQUENCE "W5SIEM_secent_seq"
    INCREMENT BY 1
    CACHE 100;
 grant select on "W5SIEM_secent_seq" to W5SIEM;
-create or replace synonym W5SIEM.secent__seq for "W5SIEM_secent_seq";
+create or replace synonym W5SIEM.secent_seq for "W5SIEM_secent_seq";
 
 
 
