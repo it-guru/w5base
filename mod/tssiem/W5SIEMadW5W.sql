@@ -30,6 +30,7 @@ create or replace synonym W5I.W5SIEM_secscan for "W5SIEM_secscan";
 
 -- drop table "W5SIEM_secent";
 create table "W5SIEM_secent" (
+   id                   INTEGER not null,
    ref                  VARCHAR2(32) not null,
    ipaddress            VARCHAR2(45) not null,
    tracking_method      VARCHAR2(40),
@@ -54,7 +55,8 @@ create table "W5SIEM_secent" (
    pci_vuln             VARCHAR2(10),
    category             VARCHAR2(2000),
    constraint W5SIEM_secent_pk foreign key (ref)
-   REFERENCES "W5SIEM_secscan" (ref)
+   REFERENCES "W5SIEM_secscan" (ref),
+   constraint W5SIEM_secent_pk1 PRIMARY KEY (id)
 );
 grant select on "W5SIEM_secent" to W5I;
 grant select,insert,update,delete on "W5SIEM_secent" to W5SIEM;
@@ -63,6 +65,16 @@ create or replace synonym W5I.W5SIEM_secent for "W5SIEM_secent";
 
 CREATE INDEX "W5SIEM_secent_i0"
    ON "W5SIEM_secent" (ref) online;
+
+CREATE SEQUENCE "W5SIEM_secent_seq"
+   MINVALUE 1
+   START WITH 1
+   INCREMENT BY 1
+   CACHE 100;
+grant select on "W5SIEM_secent_seq" to W5SIEM;
+create or replace synonym W5SIEM.secent__seq for "W5SIEM_secent_seq";
+
+
 
 
 
