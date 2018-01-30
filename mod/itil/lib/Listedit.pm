@@ -421,11 +421,21 @@ sub updateDenyHandling
    }
    if ($self->SelfAsParentObject() eq "itil::asset"){
       if (effChanged($oldrec,$newrec,"denyupdvalidto") ||
+          effChanged($oldrec,$newrec,"refreshpland") ||
           effChanged($oldrec,$newrec,"denyupd") ||
           effChanged($oldrec,$newrec,"deprstart")){
-         $newrec->{refreshinfo1}=undef;
-         $newrec->{refreshinfo2}=undef;
-         $newrec->{refreshinfo3}=undef;
+         CHKLOOP: foreach my $var (qw(refreshinfo3 
+                                      refreshinfo2 
+                                      refreshinfo1)){
+            my $cur=effVal($oldrec,$newrec,$var);
+            if ($cur ne ""){
+               my $d=CalcDateDuration(NowStamp("en"),$cur);
+               if ($d->{days}>-28){
+                  last CHKLOOP;
+               }
+               $newrec->{$var}=undef;
+            }
+         }
       }
    }
    return(1);
