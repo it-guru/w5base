@@ -1457,6 +1457,30 @@ sub initSearchQuery
    }
 }
 
+sub getFieldObjsByView
+{
+   my $self=shift;
+   my $view=shift;
+   my %param=@_;
+
+   my @l=$self->SUPER::getFieldObjsByView($view,%param);
+
+   #
+   # hack to prevent display of "itnormodel" in outputs other then
+   # Standard-Detail
+   #
+   if (defined($param{current}) && exists($param{current}->{itnormodel})){
+      if ($param{output} ne "kernel::Output::HtmlDetail"){
+         if (!$self->IsMemberOf("admin") &&
+             !$self->IsMemberOf("w5base.itil.system.securityread")){
+            @l=grep({$_->{name} ne "itnormodel"} @l);
+         }
+      }
+   }
+   return(@l);
+}
+
+
 
 
 sub SecureSetFilter

@@ -1741,8 +1741,6 @@ sub getFieldObjsByView
          }
       }
    }
-
-
    return(@l);
 }
 
