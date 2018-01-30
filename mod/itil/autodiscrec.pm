@@ -171,10 +171,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'approve_user',
                 sqlorder      =>'desc',
-                label         =>'approve user',
+                htmldetail    =>0,
+                label         =>'approve user userid',
                 dataobjattr   =>'autodiscrec.approve_user'),
 
-
+      new kernel::Field::Contact(
+                name          =>'approve_user_contact',
+                label         =>'approve user',
+                vjoinon       =>'approve_user'),
                                                   
       new kernel::Field::Link(
                 name          =>'engineid',
