@@ -227,7 +227,7 @@ sub processFile
           'hierarchy TSI ID'              =>'saphier1',
           'hierarchy ESS/BSS ID'          =>'saphier2',
           'hierarchy ITO/SSM ID'          =>'saphier3',
-          'hierarchy BB-1'                =>'saphier4',
+          'hierarchy BB-1 ID'             =>'saphier4',
           'business center ID'            =>'saphier5',
           'customer center ID'            =>'saphier6',
           'customer team ID'              =>'saphier7',
