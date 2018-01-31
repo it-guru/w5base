@@ -4,3 +4,4 @@ this is the notification about you are the new databoss for the
 Config-Item "%CONFIGITEMNAME%" .
 The old databoss "%CONTACTNAME%" is nolonger valid.
 
+If you are not the correct databoss for the config item, please ensure that you transfer the data responsibility to the correct databoss.

@@ -138,19 +138,23 @@ sub setReferencesToNull
             my $idname=$idfield->Name();
             if ($ref->{type} ne "ContactLnk"){
                if ($ref->{type} ne "Databoss"){
-                  if ($dataobj->UpdateRecord({$ref->{rawfield}=>undef},
-                                         {$idname=>\$rec->{$idname}})){
-                     $dataobj->StoreUpdateDelta("update",
-                        {$ref->{rawfield}=>$rec->{$ref->{rawfield}},
-                         $idname=>$rec->{$idname}},
-                        {$ref->{rawfield}=>undef,
-                         $idname=>$rec->{$idname}},
-                         $self->Self().
-                         "\nContact cistatus=$contactrec->{cistatusid}");
-                     $self->NotifyContactDataModification("roledel",
-                                                   $dataobj,$reason,$ref,
-                                                   $rec,$contactrec);
-                     $ReferenceIsStillInvalid=0;
+                  if (!defined($contactrec) || $contactrec->{cistatusid}==7){
+                     # nur entsorgte Rollen sollen geNULLt werden
+                     # https://darwin.telekom.de/darwin/auth/base/workflow/ById/15053783010001
+                     if ($dataobj->UpdateRecord({$ref->{rawfield}=>undef},
+                                            {$idname=>\$rec->{$idname}})){
+                        $dataobj->StoreUpdateDelta("update",
+                           {$ref->{rawfield}=>$rec->{$ref->{rawfield}},
+                            $idname=>$rec->{$idname}},
+                           {$ref->{rawfield}=>undef,
+                            $idname=>$rec->{$idname}},
+                            $self->Self().
+                            "\nContact cistatus=$contactrec->{cistatusid}");
+                        $self->NotifyContactDataModification("roledel",
+                                                      $dataobj,$reason,$ref,
+                                                      $rec,$contactrec);
+                        $ReferenceIsStillInvalid=0;
+                     }
                   }
                }
                else{
