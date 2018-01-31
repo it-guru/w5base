@@ -122,8 +122,9 @@ sub setReferencesToNull
        (defined($contactrec) && $contactrec->{cistatusid}==6)){
       my $contact_old_enought=1;
       if (defined($contactrec) && exists($contactrec->{mdate}) &&
-          $contactrec->{mdate} ne ""){
-         my $now=NowStamp("en");
+          $contactrec->{mdate} ne "" &&
+          $contactrec->{cistatusid}==6){   # only cistatusid==6 gets a check
+         my $now=NowStamp("en");           # on old enought
          my $d=CalcDateDuration($contactrec->{mdate},$now,"GMT");
          my $max=7*4;  # check only if application record is older than 4 weeks
          if (!defined($d) || $d->{days}<$max){
