@@ -85,7 +85,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'commitblocksize',
                 label         =>'commit block size',
-                value         =>['25','50','75','100','125','150'],
+                value         =>['2','5','10','25','50','75','100','125','150'],
                 default       =>'50',
                 dataobjattr   =>'replicateobject.commitblocksize'),
 
