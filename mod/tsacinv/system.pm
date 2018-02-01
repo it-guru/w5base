@@ -44,7 +44,7 @@ sub new
                 label         =>'full CI-Name',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'"fullname"'),
+                dataobjattr   =>'system."fullname"'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
@@ -65,13 +65,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'"status"'),
+                dataobjattr   =>'system."status"'),
 
       new kernel::Field::Boolean(
                 name          =>'deleted',
                 readonly      =>1,
                 label         =>'marked as delete',
-                dataobjattr   =>'"deleted"'),
+                dataobjattr   =>'system."deleted"'),
 
       new kernel::Field::Text(
                 name          =>'conumber',
@@ -79,7 +79,7 @@ sub new
                 size          =>'15',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostcenterid'=>'id'],
-                dataobjattr   =>'"conumber"'),
+                dataobjattr   =>'system."conumber"'),
 
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::location',
@@ -100,12 +100,12 @@ sub new
                 name          =>'customerlink',
                 label         =>'Customer (link)',
                 htmldetail    =>0,
-                dataobjattr   =>'"customerlink"'),
+                dataobjattr   =>'system."customerlink"'),
 
       new kernel::Field::Link(
                 name          =>'lcostcenterid',
                 label         =>'CostCenterID',
-                dataobjattr   =>'"lcostcenterid"'),
+                dataobjattr   =>'system."lcostcenterid"'),
 
       new kernel::Field::Text(
                 name          =>'cocustomeroffice',
@@ -173,12 +173,12 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassignmentid',
                 label         =>'AC-AssignmentID',
-                dataobjattr   =>'"lassignmentid"'),
+                dataobjattr   =>'system."lassignmentid"'),
 
       new kernel::Field::Link(
                 name          =>'lincidentagid',
                 label         =>'AC-Incident-AssignmentID',
-                dataobjattr   =>'"lincidentagid"'),
+                dataobjattr   =>'system."lincidentagid"'),
 
       new kernel::Field::Text(
                 name          =>'controlcenter',
@@ -198,25 +198,25 @@ sub new
                 name          =>'usage',
                 group         =>'form',
                 label         =>'Usage',
-                dataobjattr   =>'"usage"'),
+                dataobjattr   =>'system."usage"'),
 
       new kernel::Field::Text(
                 name          =>'type',
                 label         =>'Type',
                 group         =>'form',
-                dataobjattr   =>'"type"'),
+                dataobjattr   =>'system."type"'),
 
       new kernel::Field::Text(
                 name          =>'model',
                 label         =>'Model',
                 group         =>'form',
-                dataobjattr   =>'"model"'),
+                dataobjattr   =>'system."model"'),
 
       new kernel::Field::Text(
                 name          =>'nature',
                 label         =>'Nature',
                 group         =>'form',
-                dataobjattr   =>'"nature"'),
+                dataobjattr   =>'system."nature"'),
 
       new kernel::Field::Boolean(
                 name          =>'soxrelevant',
@@ -234,7 +234,7 @@ sub new
                    return(0);
                 },
                 group         =>'form',
-                dataobjattr   =>'"securitymodel"'),
+                dataobjattr   =>'system."securitymodel"'),
 
       new kernel::Field::Text(
                 name          =>'altname',
@@ -253,7 +253,7 @@ sub new
                 label         =>'security set',
                 ignorecase    =>1,
                 group         =>'form',
-                dataobjattr   =>'"securityset"'),
+                dataobjattr   =>'system."securityset"'),
 
       new kernel::Field::Float(
                 name          =>'systemcpucount',
@@ -340,7 +340,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemola',
                 label         =>'System OLA',
-                dataobjattr   =>'"systemola"'),
+                dataobjattr   =>'system."systemola"'),
 
       new kernel::Field::Select(
                 name          =>'systemolaclass',
@@ -363,12 +363,12 @@ sub new
       new kernel::Field::Text(
                 name          =>'priority',
                 label         =>'Priority of system',
-                dataobjattr   =>'"priority"'),
+                dataobjattr   =>'system."priority"'),
 
       new kernel::Field::Date(
                 name          =>'installdate',
                 label         =>'installation date',
-                dataobjattr   =>'"installdate"'),
+                dataobjattr   =>'system."installdate"'),
 
       new kernel::Field::Import($self,
                 vjointo       =>'tsacinv::asset',
@@ -415,22 +415,22 @@ sub new
       new kernel::Field::Interface(
                 name          =>'lcomputerid',
                 label         =>'AC-ComputerID',
-                dataobjattr   =>'"lcomputerid"'),
+                dataobjattr   =>'system."lcomputerid"'),
 
       new kernel::Field::Link(
                 name          =>'lassetid',
                 label         =>'AC-AssetID',
-                dataobjattr   =>'"lassetid"'),
+                dataobjattr   =>'system."lassetid"'),
 
       new kernel::Field::Interface(
                 name          =>'lclusterid',
                 label         =>'AC-lClusterID',
-                dataobjattr   =>'"lclusterid"'),
+                dataobjattr   =>'system."lclusterid"'),
 
       new kernel::Field::Link(
                 name          =>'lportfolioitemid',
                 label         =>'PortfolioID',
-                dataobjattr   =>'"lportfolioitemid"'),
+                dataobjattr   =>'system."lportfolioitemid"'),
 
       new kernel::Field::Link(
                 name          =>'locationid',
@@ -628,7 +628,7 @@ sub new
                 name          =>'instdate',
                 group         =>'source',
                 label         =>'system installation date',
-                dataobjattr   =>'"instdate"'),
+                dataobjattr   =>'system."instdate"'),
 
       new kernel::Field::Textarea(
                 name          =>'merged_use_description',
@@ -675,13 +675,13 @@ sub new
                 name          =>'cdate',
                 group         =>'source',
                 label         =>'Creation-Date',
-                dataobjattr   =>'"cdate"'),
+                dataobjattr   =>'system."cdate"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
-                dataobjattr   =>'"mdate"'),
+                dataobjattr   =>'system."mdate"'),
 
 #      new kernel::Field::Date(
 #                name          =>'lastqcheck',
@@ -695,19 +695,19 @@ sub new
                 uivisible     =>0,
                 sqlorder      =>'desc',
                 label         =>'Modification-Date reverse',
-                dataobjattr   =>'"mdaterev"'),
+                dataobjattr   =>'system."mdaterev"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'"srcsys"'),
+                dataobjattr   =>'system."srcsys"'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'"srcid"'),
+                dataobjattr   =>'system."srcid"'),
 
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
@@ -718,22 +718,51 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>'"replkeypri"'),
+                dataobjattr   =>'system."replkeypri"'),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>'"replkeysec"'),
+                dataobjattr   =>'system."replkeysec"'),
 
    );
    $self->{use_distinct}=0;
    $self->setWorktable("system");
+
+
+   # Performance Hacks
+   $self->getField("assetassetid")->{dataobjattr}=
+      'asset."assetid"';
+
+   $self->getField("locationid")->{dataobjattr}=
+      'asset."locationid"';
+
+   $self->getField("tsacinv_locationfullname")->{dataobjattr}=
+      'location."fullname"';
+
  
    $self->setDefaultView(qw(systemname status tsacinv_locationfullname 
                             systemid assetassetid));
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+
+   # Performance Hack
+   my $from='system join asset on system."lassetid"=asset."lassetid" '.
+            'left outer join location '.
+            'on asset."locationid"=location."locationid"';
+
+   return($from);
+}
+
+
+
+
 
 sub AddW5BaseData
 {

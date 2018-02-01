@@ -762,7 +762,7 @@ sub objectReplicationPhase1
       if (defined($srcrec)){
          $recinqueue=1;
          my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
-                                 "IN EXCLUSIVE MODE WAIT 30");
+                                 "IN EXCLUSIVE MODE WAIT 120");
          if ($lockres ne "0E0"){
             msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
                       "hard break of phase 1");
@@ -770,7 +770,7 @@ sub objectReplicationPhase1
          }
 
          my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
-                                 "IN EXCLUSIVE MODE WAIT 30");
+                                 "IN EXCLUSIVE MODE WAIT 120");
          if ($lockres ne "0E0"){
             msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
                       "hard break of phase 1");
@@ -918,14 +918,14 @@ sub objectReplicationPhase2
       my $curSyncTime=time()-$ReplicationStart;
 
       my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
-                              "IN EXCLUSIVE MODE WAIT 30");
+                              "IN EXCLUSIVE MODE WAIT 120");
       if ($lockres ne "0E0"){
          msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
                    "hard break of phase 2");
          exit(1);
       }
       my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
-                              "IN EXCLUSIVE MODE WAIT 30");
+                              "IN EXCLUSIVE MODE WAIT 120");
       if ($lockres ne "0E0"){
          msg(ERROR,"can not get exclusive lock on \"_$ctrl->{name}\" - ".
                    "hard break of phase 2");
@@ -1039,14 +1039,14 @@ sub objectReplicationPhase3
  #  }
 
    my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
-                           "IN EXCLUSIVE MODE WAIT 30");
+                           "IN EXCLUSIVE MODE WAIT 120");
    if ($lockres ne "0E0"){
       msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
                 "hard break of phase 3");
       exit(1);
    }
    my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
-                           "IN EXCLUSIVE MODE WAIT 30");
+                           "IN EXCLUSIVE MODE WAIT 120");
    if ($lockres ne "0E0"){
       msg(ERROR,"can not get exclusive lock on \"_$ctrl->{name}\" - ".
                 "hard break of phase 3");
