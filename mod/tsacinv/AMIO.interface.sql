@@ -20,7 +20,7 @@ insert into "IFACE_ACL" (ifuser,acctno) values('TEL_IT_DARWIN','8111');
 CREATE INDEX iface_acl_i0 ON iface_acl (ifuser) online;
 CREATE INDEX iface_acl_i1 ON iface_acl (customerlnk,ifuser) online;
 CREATE INDEX iface_acl_i2 ON iface_acl (assignment,ifuser) online;
-CREATE INDEX iface_acl_i3 ON iface_acl (accno,ifuser) online;
+CREATE INDEX iface_acl_i3 ON iface_acl (acctno,ifuser) online;
 
 
 -- --------------------------------------------------------------------------
