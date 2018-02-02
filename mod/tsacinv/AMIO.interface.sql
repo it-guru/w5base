@@ -1053,8 +1053,8 @@ grant select on customer to public;
 CREATE or REPLACE VIEW location_acl AS
    SELECT distinct amlocation.llocaid      AS id
    FROM AM2107.amlocation
-   JOIN IFACE_ACL acl
-      on acl.ifuser=sys_context('USERENV', 'SESSION_USER');
+   WHERE (select count(ifuser) from IFACE_ACL acl
+          where ifuser=sys_context('USERENV', 'SESSION_USER'))>0;
 
 CREATE or REPLACE VIEW location AS
    SELECT
