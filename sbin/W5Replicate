@@ -762,7 +762,7 @@ sub objectReplicationPhase1
       if (defined($srcrec)){
          $recinqueue=1;
          my $lockwait=int($phaselimit*0.9);
-         $lockwait=5 if ($lockwait<5);
+         $lockwait=100 if ($lockwait<100);
          my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
                                  "IN EXCLUSIVE MODE WAIT $lockwait");
          if ($lockres ne "0E0"){
@@ -920,7 +920,7 @@ sub objectReplicationPhase2
       my $curSyncTime=time()-$ReplicationStart;
 
       my $lockwait=int($phaselimit*0.9);
-      $lockwait=5 if ($lockwait<5);
+      $lockwait=100 if ($lockwait<100);
       my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
                               "IN EXCLUSIVE MODE WAIT $lockwait");
       if ($lockres ne "0E0"){
@@ -1043,7 +1043,7 @@ sub objectReplicationPhase3
  #  }
 
    my $lockwait=int($phaselimit*0.9);
-   $lockwait=5 if ($lockwait<5);
+   $lockwait=100 if ($lockwait<100);
    my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
                            "IN EXCLUSIVE MODE WAIT $lockwait");
    if ($lockres ne "0E0"){
