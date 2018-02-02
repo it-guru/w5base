@@ -239,7 +239,8 @@ sub SecureSetFilter
    my $self=shift;
    my @flt=@_;
 
-   if (!$self->IsMemberOf([qw(admin w5base.tssiem.secent.read)],
+   if (!$self->IsMemberOf([qw(admin w5base.tssiem.secscan.read
+                                    w5base.tssiem.secent.read)],
                           "RMember")){
       my @addflt;
       $self->tssiem::secscan::addICTOSecureFilter(\@addflt);
