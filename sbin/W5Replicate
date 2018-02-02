@@ -762,7 +762,7 @@ sub objectReplicationPhase1
       if (defined($srcrec)){
          $recinqueue=1;
          my $lockwait=int($phaselimit*0.9);
-         $lockwait=100 if ($lockwait<100);
+         $lockwait=300 if ($lockwait<300);
          my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
                                  "IN EXCLUSIVE MODE WAIT $lockwait");
          if ($lockres ne "0E0"){
@@ -919,22 +919,22 @@ sub objectReplicationPhase2
          $start+$phaselimit-$recaccess_reservetime>time()){
       my $curSyncTime=time()-$ReplicationStart;
 
-      my $lockwait=int($phaselimit*0.9);
-      $lockwait=100 if ($lockwait<100);
-      my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
-                              "IN EXCLUSIVE MODE WAIT $lockwait");
-      if ($lockres ne "0E0"){
-         msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
-                   "hard break of phase 2");
-         exit(1);
-      }
-      my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
-                              "IN EXCLUSIVE MODE WAIT $lockwait");
-      if ($lockres ne "0E0"){
-         msg(ERROR,"can not get exclusive lock on \"_$ctrl->{name}\" - ".
-                   "hard break of phase 2");
-         exit(1);
-      }
+      #my $lockwait=int($phaselimit*0.9);
+      #$lockwait=100 if ($lockwait<100);
+      #my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
+      #                        "IN EXCLUSIVE MODE WAIT $lockwait");
+      #if ($lockres ne "0E0"){
+      #   msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
+      #             "hard break of phase 2");
+      #   exit(1);
+      #}
+      #my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
+      #                        "IN EXCLUSIVE MODE WAIT $lockwait");
+      #if ($lockres ne "0E0"){
+      #   msg(ERROR,"can not get exclusive lock on \"_$ctrl->{name}\" - ".
+      #             "hard break of phase 2");
+      #   exit(1);
+      #}
       my $cmd="select * from ".
               "(select $ctrl->{idname} from \"$ctrl->{name}\" ".
               " left outer join \"_$ctrl->{name}\" ".
@@ -1042,22 +1042,22 @@ sub objectReplicationPhase3
  #     die("can not create State-Record for phase 3 on $ctrl->{'name'}");
  #  }
 
-   my $lockwait=int($phaselimit*0.9);
-   $lockwait=100 if ($lockwait<100);
-   my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
-                           "IN EXCLUSIVE MODE WAIT $lockwait");
-   if ($lockres ne "0E0"){
-      msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
-                "hard break of phase 3");
-      exit(1);
-   }
-   my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
-                           "IN EXCLUSIVE MODE WAIT $lockwait");
-   if ($lockres ne "0E0"){
-      msg(ERROR,"can not get exclusive lock on \"_$ctrl->{name}\" - ".
-                "hard break of phase 3");
-      exit(1);
-   }
+   #my $lockwait=int($phaselimit*0.9);
+   #$lockwait=100 if ($lockwait<100);
+   #my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
+   #                        "IN EXCLUSIVE MODE WAIT $lockwait");
+   #if ($lockres ne "0E0"){
+   #   msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
+   #             "hard break of phase 3");
+   #   exit(1);
+   #}
+   #my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
+   #                        "IN EXCLUSIVE MODE WAIT $lockwait");
+   #if ($lockres ne "0E0"){
+   #   msg(ERROR,"can not get exclusive lock on \"_$ctrl->{name}\" - ".
+   #             "hard break of phase 3");
+   #   exit(1);
+   #}
    my $cmd="delete from \"$ctrl->{name}\" ".
            "where \"$ctrl->{name}\".$ctrl->{idname} in ".
            "(select refid from \"_$ctrl->{name}\" where ".
