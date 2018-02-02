@@ -37,7 +37,8 @@ sub new
                 name          =>'ictono',
                 group         =>'scan',
                 label         =>'ICTO-ID',
-                dataobjattr   =>"('ICTO-'||W5SIEM_secscan.ictoid)"),
+                dataobjattr   =>"W5SIEM_secscan.ictoid"),
+       #         dataobjattr   =>"('ICTO-'||W5SIEM_secscan.ictoid)"),
 
       new kernel::Field::Date(
                 name          =>'sdate',

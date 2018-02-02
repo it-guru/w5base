@@ -56,7 +56,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'ictono',
                 label         =>'ICTO-ID',
-                dataobjattr   =>"('ICTO-'||ictoid)"),
+                dataobjattr   =>"ictoid"),
+               # dataobjattr   =>"('ICTO-'||ictoid)"),
 
       new kernel::Field::Text(
                 name          =>'stype',
