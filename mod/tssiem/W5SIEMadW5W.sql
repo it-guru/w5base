@@ -49,6 +49,7 @@ create table "W5SIEM_secent" (
    last_detect          DATE,
    vendor_reference     VARCHAR2(4000),
    threat               clob,
+   results              clob,
    impact               clob,
    exploitability       clob,
    associated_malware   VARCHAR2(4000),
