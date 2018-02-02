@@ -761,7 +761,7 @@ sub objectReplicationPhase1
       my $processed=0;
       if (defined($srcrec)){
          $recinqueue=1;
-         my $lockwait=int($phaselimit*0.9);
+         my $lockwait=int($phaselimit*1.1);  # macht eigentlich keinen Sinn! HV
          $lockwait=300 if ($lockwait<300);
          my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
                                  "IN EXCLUSIVE MODE WAIT $lockwait");
