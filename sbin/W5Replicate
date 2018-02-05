@@ -761,8 +761,8 @@ sub objectReplicationPhase1
       my $processed=0;
       if (defined($srcrec)){
          $recinqueue=1;
-         my $lockwait=int($phaselimit*1.5);  # macht eigentlich keinen Sinn! HV
-         $lockwait=300 if ($lockwait<300);
+         #my $lockwait=int($phaselimit*1.5);  # macht eigentlich keinen Sinn! HV
+         #$lockwait=300 if ($lockwait<300);
          #my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
          #                        "IN EXCLUSIVE MODE WAIT $lockwait");
          #if ($lockres ne "0E0"){
@@ -772,7 +772,7 @@ sub objectReplicationPhase1
          #}
 
          my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
-                                 "IN EXCLUSIVE MODE WAIT $lockwait");
+                                 "IN EXCLUSIVE MODE");
          if ($lockres ne "0E0"){
             msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
                       "hard break of phase 1");
@@ -919,8 +919,8 @@ sub objectReplicationPhase2
          $start+$phaselimit-$recaccess_reservetime>time()){
       my $curSyncTime=time()-$ReplicationStart;
 
-      my $lockwait=int($phaselimit*1.5);
-      $lockwait=100 if ($lockwait<100);
+      #my $lockwait=int($phaselimit*1.5);
+      #$lockwait=100 if ($lockwait<100);
       #my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
       #                        "IN EXCLUSIVE MODE WAIT $lockwait");
       #if ($lockres ne "0E0"){
@@ -929,7 +929,7 @@ sub objectReplicationPhase2
       #   exit(1);
       #}
       my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
-                              "IN EXCLUSIVE MODE WAIT $lockwait");
+                              "IN EXCLUSIVE MODE");
       if ($lockres ne "0E0"){
          msg(ERROR,"can not get exclusive lock on \"_$ctrl->{name}\" - ".
                    "hard break of phase 2");
@@ -1042,8 +1042,8 @@ sub objectReplicationPhase3
  #     die("can not create State-Record for phase 3 on $ctrl->{'name'}");
  #  }
 
-   my $lockwait=int($phaselimit*1.9);
-   $lockwait=100 if ($lockwait<100);
+   #my $lockwait=int($phaselimit*1.9);
+   #$lockwait=100 if ($lockwait<100);
    #my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
    #                        "IN EXCLUSIVE MODE WAIT $lockwait");
    #if ($lockres ne "0E0"){
@@ -1052,7 +1052,7 @@ sub objectReplicationPhase3
    #   exit(1);
    #}
    my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
-                           "IN EXCLUSIVE MODE WAIT $lockwait");
+                           "IN EXCLUSIVE MODE");
    if ($lockres ne "0E0"){
       msg(ERROR,"can not get exclusive lock on \"_$ctrl->{name}\" - ".
                 "hard break of phase 3");
