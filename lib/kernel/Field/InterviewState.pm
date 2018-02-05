@@ -174,52 +174,53 @@ sub dynCalc
       if (exists($self->{AnsweredQuestions}->{interviewid}->{$q->{id}})){
          $a=$self->{AnsweredQuestions}->{interviewid}->{$q->{id}};
       }
-      if (!defined($a) || $a->{relevant}){
-         if ($q->{questtyp} eq "booleana"){
-            if (defined($a)){
-               $curs=100.0;
-            }
-         }
-         elsif ($q->{questtyp} eq "boolean"){
-            if (defined($a) &&  $a->{answer} eq "1"){
-               $curs=100.0;
-            }
-            else{
-               $curs=0.0;
-            }
-         }
-         elsif ($q->{questtyp} eq "percenta"){
-            if (defined($a)){
-               $curs=100.0;
-            }
-         }
-         elsif ($q->{questtyp} eq "percent" ||
-                $q->{questtyp} eq "percent4"){
-            if (defined($a) && $a->{answer} ne ""){
-               $curs=$a->{answer};
-            }
-            else{
-               $curs=0.0;
-            }
-         }
-         elsif ($q->{questtyp} eq "date"){
-            if (defined($a) &&
-                $a ne "" &&
-                ($a=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)){
-               $curs=100.0;
-            }
-            else{
-               $curs=0.0;
-            }
-         }
-         else{
-            if (defined($a) && $a->{answer} ne ""){
-               $curs=100.0;
-            }
-            else{
-               $curs=0.0;
-            }
-         }
+      if (defined($a)){
+         #if ($q->{questtyp} eq "booleana"){
+         #   if (defined($a)){
+         #      $curs=100.0;
+         #   }
+         #}
+         #elsif ($q->{questtyp} eq "boolean"){
+         #   if (defined($a) &&  $a->{answer} eq "1"){
+         #      $curs=100.0;
+         #   }
+         #   else{
+         #      $curs=0.0;
+         #   }
+         #}
+         #elsif ($q->{questtyp} eq "percenta"){
+         #   if (defined($a)){
+         #      $curs=100.0;
+         #   }
+         #}
+         #elsif ($q->{questtyp} eq "percent" ||
+         #       $q->{questtyp} eq "percent4"){
+         #   if (defined($a) && $a->{answer} ne ""){
+         #      $curs=$a->{answer};
+         #   }
+         #   else{
+         #      $curs=0.0;
+         #   }
+         #}
+         #elsif ($q->{questtyp} eq "date"){
+         #   if (defined($a) &&
+         #       $a ne "" &&
+         #       ($a=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)){
+         #      $curs=100.0;
+         #   }
+         #   else{
+         #      $curs=0.0;
+         #   }
+         #}
+         #else{
+         #   if (defined($a) && $a->{answer} ne ""){
+         #      $curs=100.0;
+         #   }
+         #   else{
+         #      $curs=0.0;
+         #   }
+         #}
+         $curs=$a->{answerlevel};
          my $n=1;
          $n=5 if ($prio==1);
          $n=2  if ($prio==2);
@@ -227,8 +228,10 @@ sub dynCalc
          $s=$s+($curs*$n);
          $nsum+=$n;
       }
+      else{
+         $qstat{$q->{id}}=0;
+      }
       if (defined($a) && !$a->{relevant}){
-         $qstat{$q->{id}}=100;
          push(@notrelevant,$q->{id});
       }
    }

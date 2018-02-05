@@ -114,7 +114,7 @@ sub getAnsweredQuestions
    $i->SetFilter({parentobj=>\$parentobj,
                   parentid=>\$id});
    $i->SetCurrentView(qw(interviewid answer relevant archiv comments
-                         lastverify needverify));
+                         lastverify needverify answerlevel));
 
    my $ial=$i->getHashIndexed(qw(interviewid));
 

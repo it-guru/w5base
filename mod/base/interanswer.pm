@@ -160,12 +160,10 @@ sub new
       new kernel::Field::Percent(
                 name          =>'answerlevel',
                 label         =>'Answer level',
-                htmldetail    =>0,
                 readonly      =>1,
                 dataobjattr   =>
-                   'if (ADDDATE(interanswer.lastverify,'.
-                       'interview.necessverifyinterv)<'.
-                       'now(),0, '.
+                   '(if (interanswer.id is not null '.
+                   'and interanswer.relevant=0,100,'.
                    'if (interanswer.answer is null '.
                    'or interanswer.answer="",0,'.
                    'CASE interview.questtyp '.
@@ -182,7 +180,15 @@ sub new
                                              'interanswer.answer="1",100,0) '.
                    ' ELSE "0" '.
                    'END'.
-                   '))'),
+                   '))*'.
+                   'if (ADDDATE(interanswer.lastverify,'.
+                       'interview.necessverifyinterv)<'.
+                       'DATE_SUB(now(), INTERVAL 29 DAY),'.
+                       '2.0/(ROUND(DATEDIFF(now(),'.
+                       'ADDDATE(interanswer.lastverify,'.
+                       'interview.necessverifyinterv))/7,0)-1)'.
+                       ',1.0))'   # 4weeks=0.5 8weeks=0.25 12weeks=0.16
+               ),
 
       new kernel::Field::Text(
                 name          =>'archiv',
