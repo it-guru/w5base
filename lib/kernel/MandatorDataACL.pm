@@ -47,10 +47,11 @@ sub expandByDataACL
    my $acl=$self->getPersistentModuleObject("base::mandatordataacl");
    my @flt;
    my %p=($self->Self=>1,$self->SelfAsParentObject=>1);
+   push(@$mandator,undef);
    foreach my $parentobj (keys(%p)){
       push(@flt,{
          parentobj=>\$parentobj,
-         mandatorid=>[undef,$mandator]
+         mandatorid=>$mandator
       });
    }
    $acl->SetFilter(\@flt);
