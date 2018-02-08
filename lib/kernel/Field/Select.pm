@@ -118,6 +118,47 @@ sub getPostibleValues
    return();
 }
 
+sub ViewProcessor                           # same handling as in
+{                                           # TextDrop fields!!!
+   my $self=shift;
+   my $mode=shift;
+   my $refid=shift;
+   if ($mode eq "XML" && $refid ne ""){
+      my $response={document=>{}};
+
+      my $obj=$self->getParent();
+      my $idfield=$obj->IdField();
+      if (defined($idfield)){
+         $obj->ResetFilter();
+         $obj->SetFilter({$idfield->Name()=>\$refid});
+         $obj->SetCurrentOrder("NONE");
+         my ($rec,$msg)=$obj->getOnlyFirst(qw(ALL));
+         if ($obj->Ping()){
+            my $fo=$obj->getField($self->Name(),$rec);
+            if (defined($fo) && defined($rec)){
+               my $d=$self->SUPER::FormatedResult($rec,$mode);
+               $d=[$d] if (ref($d) ne "ARRAY");
+               $response->{document}->{value}=$d;
+            }
+            else{
+               $response->{document}->{value}="";
+            }
+         }
+         else{
+            $response->{document}->{value}=
+               "[ERROR: layer 1 information temporarily unavailable]";
+         }
+      }
+      print $self->getParent->HttpHeader("text/xml");
+      print hash2xml($response,{header=>1});
+      #msg(INFO,hash2xml($response,{header=>1})); # only for debug
+      return;
+   }
+   return;
+}
+
+
+
 sub copyFrom
 {
    my $self=shift;
@@ -136,8 +177,11 @@ sub FormatedDetail
    my $self=shift;
    my $current=shift;
    my $mode=shift;
-   my $d=$self->RawValue($current,$mode);
    my $name=$self->Name();
+   if ($self->{async} && $mode eq "HtmlDetail"){
+      return($self->AsyncFieldPlaceholder($current,$mode));
+   }
+   my $d=$self->RawValue($current,$mode);
    $d=[$d] if (ref($d) ne "ARRAY");
    my $readonly=$self->readonly($current);
    if (($mode eq "workflow" || $mode eq "edit" ) 

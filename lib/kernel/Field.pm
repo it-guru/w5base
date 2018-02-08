@@ -1394,6 +1394,91 @@ sub WSDLfieldType
 }
 
 
+sub AsyncFieldPlaceholder
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $name=$self->Name();
+
+   my $d;
+
+   my $idfield=$self->getParent->IdField();
+   if (defined($idfield)){
+      my $id=$idfield->RawValue($current);
+      my $divid="ViewProcessor_$self->{name}";
+      my $XMLUrl="$ENV{SCRIPT_URI}";
+      $XMLUrl=~s/^[a-z]+?://; # rm protocol to prevent reverse proxy issues
+      $XMLUrl.="/../ViewProcessor/XML/$self->{name}/$id";
+      my $d="<div id=\"$divid\"><font color=silver>init ...</font></div>";
+      #
+      # Weblinks can't be resolved on async fields
+      # (destination field value is an async information)
+      $d=$self->addWebLinkToFacility($d,$current);
+      return(<<EOF);
+$d
+<script language="JavaScript">
+function onLoadViewProcessor_$self->{name}(timedout)
+{
+   var ResContainer=document.getElementById("$divid");
+   if (ResContainer && timedout==1){
+      ResContainer.innerHTML="ERROR: XML request timed out";
+      return;
+   }
+   // window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
+   // timeout handling ist noch bugy!
+   var xmlhttp=getXMLHttpRequest();
+   xmlhttp.open("POST","$XMLUrl",true);
+   xmlhttp.onreadystatechange=function() {
+      var r=document.getElementById("$divid");
+      if (r){
+         if (xmlhttp.readyState<4){
+            var t="<font color=silver>Loading ...</font>";
+            if (r.innerHTML!=t){
+               r.innerHTML=t;
+            }
+         }
+         if (xmlhttp.readyState==4 && 
+             (xmlhttp.status==200||xmlhttp.status==304)){
+            var xmlobject = xmlhttp.responseXML;
+            var result=xmlobject.getElementsByTagName("value");
+            if (result){
+               r.innerHTML="";
+               for(rid=0;rid<result.length;rid++){
+                  if (r.innerHTML!=""){
+                     r.innerHTML+=", ";
+                  }
+                  if (result[rid].childNodes[0]){
+                     r.innerHTML+=result[rid].childNodes[0].nodeValue;
+                  }
+               }
+            }
+            else{
+               r.innerHTML="ERROR: XML error";
+            }
+         }
+      }
+   };
+   xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+   var r=xmlhttp.send('Mode=XML');
+
+
+
+//   ResContainer.innerHTML="<font color=silver>"+
+//                          "- Informations isn't avalilable at now -"+
+//                          "</font>";
+}
+addEvent(window,"load",onLoadViewProcessor_$self->{name});
+</script>
+EOF
+   }
+   else{
+      return("- ERROR - no idfield - ");
+   }
+   return($d);
+}
+
+
 # Zugriffs funktionen
 
 1;
