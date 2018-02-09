@@ -405,8 +405,23 @@ sub getBackendName
       $_=$db->DriverName();
       case: {   # did not works on tsinet Oracle database
          /^oracle$/i and do {
-            return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS') ".
+            my $sqlorder="";
+            if (defined($self->{sqlorder})){
+               $sqlorder=$self->{sqlorder};
+            }
+            if ($sqlorder eq "desc"){
+               $sqlorder="";
+            }
+            else{
+               $sqlorder="desc";
+            }
+            # ordering on nativ fields gets better performance then ordering
+            # on a funktion. The result should be the same (but indexes can be
+            # used)
+            return("$self->{dataobjattr} $sqlorder ".
                    "NULLS FIRST"); # needed for QualityChecks
+            #return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS') ".
+            #       "NULLS FIRST"); # needed for QualityChecks
 
          };
       }
