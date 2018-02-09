@@ -80,6 +80,10 @@ sub new
                 label         =>'QID',
                 dataobjattr   =>"W5SIEM_secent.qid"),
 
+      # CERT Daten sind in QID= ...
+      # 86002, 38600,38170,38173,38169,38167 sind relevant, wobei 86002 das
+      # Zert.Detail hat.
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Title',
