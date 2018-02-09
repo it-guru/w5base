@@ -38,7 +38,6 @@ sub new
                 group         =>'scan',
                 label         =>'ICTO-ID',
                 dataobjattr   =>"W5SIEM_secscan.ictoid"),
-       #         dataobjattr   =>"('ICTO-'||W5SIEM_secscan.ictoid)"),
 
       new kernel::Field::Date(
                 name          =>'sdate',
@@ -54,6 +53,7 @@ sub new
                 name          =>'systems',
                 label         =>'possible W5Base System',
                 vjointo       =>'itil::system',
+                searchable    =>0,
                 vjoinbase     =>[{cistatusid=>"<=4"}],
                 vjoinon       =>['ipaddress'=>'ipaddresses'],
                 vjoindisp     =>['name','applications']),
@@ -176,7 +176,7 @@ sub new
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'W5SIEM_secent.ROWID'),
+                dataobjattr   =>'W5SIEM_secent.id'),
 
       new kernel::Field::Date(
                 name          =>'srcload',

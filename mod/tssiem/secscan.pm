@@ -38,7 +38,7 @@ sub new
                 label         =>'ID',
                 searchable    =>0,
                 group         =>'source',
-                dataobjattr   =>"replace(ref,'/','_')"),
+                dataobjattr   =>"ref"),
 
       new kernel::Field::Link(
                 name          =>'qref',
@@ -57,7 +57,6 @@ sub new
                 name          =>'ictono',
                 label         =>'ICTO-ID',
                 dataobjattr   =>"ictoid"),
-               # dataobjattr   =>"('ICTO-'||ictoid)"),
 
       new kernel::Field::Text(
                 name          =>'stype',

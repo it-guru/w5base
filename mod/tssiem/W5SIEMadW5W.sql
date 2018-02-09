@@ -27,6 +27,11 @@ grant select,insert,update,delete on "W5SIEM_secscan" to W5SIEM;
 create or replace synonym W5SIEM.secscan for "W5SIEM_secscan";
 create or replace synonym W5I.W5SIEM_secscan for "W5SIEM_secscan";
 
+CREATE INDEX "W5SIEM_secscan_i0"
+   ON "W5SIEM_secscan" (ictoid) online;
+
+CREATE INDEX "W5SIEM_secscan_i2"
+   ON "W5SIEM_secscan" (launch_datetime) online;
 
 -- drop table "W5SIEM_secent";
 create table "W5SIEM_secent" (
@@ -66,6 +71,12 @@ create or replace synonym W5I.W5SIEM_secent for "W5SIEM_secent";
 
 CREATE INDEX "W5SIEM_secent_i0"
    ON "W5SIEM_secent" (ref) online;
+
+CREATE INDEX "W5SIEM_secent_i1"
+   ON "W5SIEM_secent" (ipaddress) online;
+
+CREATE INDEX "W5SIEM_secent_i2"
+   ON "W5SIEM_secent" (launch_datetime) online;
 
 CREATE SEQUENCE "W5SIEM_secent_seq"
    MINVALUE 1
