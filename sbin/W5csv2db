@@ -267,9 +267,13 @@ foreach my $SOURCE (@SOURCELIST){
          msg(ERROR,"fail to load filelist from $host with filespec $filespec");
          exit(1);
       }
+      foreach my $remotefile (split(/\n/,$res)){
+          printf("Prozessing=%s\n",$remotefile);
 
 
-printf("fifi res=%s\n",$res);
+      }
+
+
 
       
 
