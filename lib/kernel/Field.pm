@@ -1414,7 +1414,7 @@ sub AsyncFieldPlaceholder
       #
       # Weblinks can't be resolved on async fields
       # (destination field value is an async information)
-      $d=$self->addWebLinkToFacility($d,$current);
+      #$d=$self->addWebLinkToFacility($d,$current);
       return(<<EOF);
 $d
 <script language="JavaScript">

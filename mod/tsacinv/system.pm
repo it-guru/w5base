@@ -953,6 +953,9 @@ sub SetFilter
 
       @flt=([\%f1,\%f2]);
    }
+   #print STDERR Dumper(\@flt);
+   #Stacktrace(1);
+   #sleep(10);
    return($self->SUPER::SetFilter(@flt));
 }
 

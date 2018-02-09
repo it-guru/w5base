@@ -160,7 +160,8 @@ sub ViewProcessor
          if ($obj->Ping()){
             my $fo=$obj->getField($self->Name(),$rec);
             if (defined($fo) && defined($rec)){
-               my $d=$fo->RawValue($rec);
+               my $d=$fo->FormatedDetail($rec,$mode);
+               $d=$self->addWebLinkToFacility($d,$rec);
                $d=[$d] if (ref($d) ne "ARRAY");
                $response->{document}->{value}=$d;
             }

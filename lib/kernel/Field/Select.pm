@@ -137,6 +137,8 @@ sub ViewProcessor                           # same handling as in
             my $fo=$obj->getField($self->Name(),$rec);
             if (defined($fo) && defined($rec)){
                my $d=$self->SUPER::FormatedResult($rec,$mode);
+               $d=$self->addWebLinkToFacility($d,$rec);
+
                $d=[$d] if (ref($d) ne "ARRAY");
                $response->{document}->{value}=$d;
             }
