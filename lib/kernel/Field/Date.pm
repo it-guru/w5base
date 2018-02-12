@@ -415,13 +415,16 @@ sub getBackendName
             else{
                $sqlorder="desc";
             }
+            if ($self->getParent->{use_distinct}){
+               return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS') ".
+                      "NULLS FIRST"); # needed for QualityChecks
+            }
             # ordering on nativ fields gets better performance then ordering
             # on a funktion. The result should be the same (but indexes can be
-            # used)
+            # used) - but if select distinct is used, you have to use the same
+            # exprestion as in select (Oracle rules are mysterious)
             return("$self->{dataobjattr} $sqlorder ".
                    "NULLS FIRST"); # needed for QualityChecks
-            #return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS') ".
-            #       "NULLS FIRST"); # needed for QualityChecks
 
          };
       }
