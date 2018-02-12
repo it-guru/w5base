@@ -341,6 +341,20 @@ sub new
                 vjoinon       =>['w5systemid'=>'id'],
                 group         =>'w5basedata'),
 
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                selectfix     =>1,
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>"'T03TC_UC128.UC128_1_MW_REPORT\@XAUTOM'"),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                history       =>0,
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'srcload'),
+
    );
    $self->setWorktable("HPSA_lnkswp_of");
    $self->setDefaultView(qw(systemname class version path iname));

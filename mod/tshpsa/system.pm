@@ -105,19 +105,26 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'w5cistatusid'),
 
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                selectfix     =>1,
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>"'T03TC_UC128.UC128_1_MW_REPORT\@XAUTOM'"),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                history       =>0,
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'srcload'),
+
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
                 label         =>'Modification-Date',
                 dataobjattr   =>'curdate'),
 
-#      new kernel::Field::Textarea(
-#                name          =>'rawscan',
-#                group         =>'source',
-#                htmldetail    =>0,
-#                sqlorder      =>'NONE',
-#                label         =>'raw Scan-Data',
-#                dataobjattr   =>"rawscan")
    );
    $self->setWorktable("HPSA_system");
    $self->setDefaultView(qw(name systemid primaryip mdate));

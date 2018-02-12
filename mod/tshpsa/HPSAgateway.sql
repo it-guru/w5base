@@ -39,8 +39,9 @@ select item_id sysid,
        swvers  swvers,
        swpath  swpath,
        iname   iname,
-       scandate
-from "W5XAUTOM_HPSA_UC128" where isdeleted=0;
+       scandate,
+       current_date srcload
+from  T03TC_UC128.UC128_1_MW_REPORT@XAUTOM where isdeleted=0;
 
 CREATE INDEX "HPSA_lnkswp_id" 
    ON "mview_HPSA_lnkswp"(id) online;
@@ -72,18 +73,19 @@ create materialized view "mview_HPSA_system"
    as
 with j as (select item_id,mdate,lower(hostname) lhostname,hostname,pip,systemid,
            RANK() OVER (PARTITION BY item_id ORDER BY mdate DESC) dest_rank
-           from "W5XAUTOM_HPSA_UC128"
+           from  T03TC_UC128.UC128_1_MW_REPORT@XAUTOM
            where regexp_like(systemid,'^S.{4,10}') and isdeleted=0
            order by mdate),
      s as (select distinct systemid
-           from "W5XAUTOM_HPSA_UC128"
+           from  T03TC_UC128.UC128_1_MW_REPORT@XAUTOM
            where regexp_like(systemid,'^S.{4,10}') and isdeleted=0)
 SELECT j.item_id    server_id,
        j.systemid   systemid,
        j.mdate      curdate,
        j.lhostname  hostname,
        j.hostname   name,
-       j.pip        pip
+       j.pip        pip,
+       current_date srcload
 FROM s join j on s.systemid=j.systemid and dest_rank=1;
 
 
