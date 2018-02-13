@@ -21,6 +21,7 @@
 'faqartchanged'=>{de=>'Artikel geändert',en=>'Aricle changed'},
 'Further keywords'=>{de=>'weiterf. Schlüsselworte'},
 'further FAQ-articles'=>{de=>'Weitere ähnliche oder weiterführende FAQ-Artikel'},
+'related FAQ-articles'=>{de=>'In Beziehung stehende FAQ-Artikel'},
 'View count'=>{de=>'Anzahl Vollbild Aufrufe'},
 'View frequeny'=>{de=>'Vollbild Aufrufe Häufung'},
 'View last'=>{de=>'letzter Vollbild Aufruf'},

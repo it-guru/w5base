@@ -646,7 +646,7 @@ sub Notify
          $baseurl=~s/\/auth\/.*$//;
          my $url=$baseurl;
          $url.="/auth/$dataobj/ById/".$dataobjid;
-         $text.="\n\n\n";
+         $text.="\n";
          $text.=$url;
          $text.="\n\n";
       }
@@ -655,9 +655,18 @@ sub Notify
          $baseurl.="/" if (!($baseurl=~m/\/$/));
          my $url=$baseurl;
          $url.="/auth/$dataobj/ById/".$dataobjid;
-         $text.="\n\n\n";
+         $text.="\n";
          $text.=$url;
          $text.="\n\n";
+      }
+   }
+   if ($param{faqkey} ne ""){
+      my $faq=getModuleObject($self->Config(),"faq::article");
+      if (defined($faq)){
+         my $further=$faq->getRawArticles($param{faqkey});
+         if ($further ne ""){
+            $text.=$further;
+         }
       }
    }
 

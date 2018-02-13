@@ -164,7 +164,10 @@ sub NotifyContactDataModification
             $notifyparam{dataobj}=$dataobj->Self();
             $notifyparam{dataobjid}=$rec->{$idfield->Name()};
          }
-
+         my ($package,$filename,$line)=caller();
+         if ($package ne ""){
+            $notifyparam{faqkey}="$package";
+         }
          if (defined($subject) && defined($text)){
             if (!defined($notifycontrol->{wfact})){
                $notifycontrol->{wfact}=getModuleObject($dataobj->Config,

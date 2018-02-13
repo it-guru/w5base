@@ -137,6 +137,8 @@ sub new
                 size          =>'10',
                 group         =>'sig',
                 dataobjattr   =>'faq.faqid'),
+
+      new kernel::Field::RecordUrl(),
                                     
       new kernel::Field::Number(
                 name          =>'viewcount',
@@ -892,6 +894,30 @@ addEvent(window, "load", setTitle);
 EOF
    print $self->HtmlBottom(body=>1,form=>1);
 }
+
+sub getRawArticles
+{
+   my $self=shift;
+   my $words=shift;
+   my $further="";
+
+   $self->ResetFilter();
+   $self->SecureSetFilter({kwords=>$words});
+   $self->Limit(11);
+   my @fl=$self->getHashList(qw(mdate faqid name urlofcurrentrec));
+
+   foreach my $frec (@fl){
+      my $label=$frec->{name};
+      $further.=$label."\n";
+      $further.=$frec->{urlofcurrentrec}."\n\n";
+   }
+   if ($further ne ""){
+      $further="\n\n".$self->T("related FAQ-articles").":\n".$further;
+   }
+
+   return($further);
+}
+
 
 sub getFurtherArticles
 {
