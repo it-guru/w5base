@@ -1,9 +1,5 @@
-Dear databoss,
+Sehr geehrter Datenverantwortlicher,
 
-the role "%FIELDNAME%" in the Config-Item 
-"%CONFIGITEMNAME%" is set to empty because 
-the old contact "%CONTACTNAME%" is 
-nolonger valid.
+die Rolle "%FIELDNAME%" auf dem Config-Item "%CONFIGITEMNAME%" wurde auf leer gesetzt, da der alte Kontakt "%CONTACTNAME%" nicht mehr gültig ist.
 
-
-
+Direct Link to the affected data object : 

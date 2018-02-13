@@ -1,10 +1,6 @@
 Sehr geehrter Datenverantwortlicher,
 
-die Kontakverknüpfung "%FIELDNAME%" im  
-Config-Item "%CONFIGITEMNAME%"
-wurde entfernt, da der Kontakt
- "%CONTACTNAME%" nicht länger
-gültig ist.
+der Kontakt "%CONTACTNAME%" im 
+Config-Item "%CONFIGITEMNAME%" wurde entfernt, da der Kontakt nicht mehr gültig ist.
 
-
-
+Direktlink zum betreffenden Datensatz: 

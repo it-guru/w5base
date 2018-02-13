@@ -1,9 +1,7 @@
 Dear databoss,
+ 
+the role "%FIELDNAME%" on the Config-Item
+"%CONFIGITEMNAME%" is set to empty because
+the old contact "%CONTACTNAME%" is no longer valid.
 
-the role "%FIELDNAME%" in the Config-Item 
-"%CONFIGITEMNAME%" is set to empty because 
-the old contact "%CONTACTNAME%" is 
-nolonger valid.
-
-
-
+Direct Link to the affected data object : 

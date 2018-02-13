@@ -1,7 +1,8 @@
 Dear databoss,
-
-this is the notification about you are the new databoss for the
+ 
+this notification informs you that you are the new databoss for the
 Config-Item "%CONFIGITEMNAME%" .
-The old databoss "%CONTACTNAME%" is nolonger valid.
-
+The old databoss "%CONTACTNAME%" is no longer valid.
 If you are not the correct databoss for the config item, please ensure that you transfer the data responsibility to the correct databoss.
+
+Direct Link to the affected data object :

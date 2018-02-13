@@ -1,10 +1,7 @@
 Dear databoss,
 
-the contact "%FIELDNAME%" in the 
+the contact "%CONTACTNAME%" in the 
 Config-Item "%CONFIGITEMNAME%"
-is deleted because the 
-contact "%CONTACTNAME%" is nolonger 
-valid.
+is deleted because the contact is nolonger valid.
 
-
-
+Direct Link to the affected data object: 

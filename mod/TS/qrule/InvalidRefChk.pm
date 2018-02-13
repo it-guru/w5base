@@ -161,26 +161,29 @@ sub setReferencesToNull
                   # set lastknownbossid as new databoss
                   my ($lastbossid)=split(/\s+/,$contactrec->{lastknownbossid});
                   if ($lastbossid ne ""){
-                     my $bk=$dataobj->UpdateRecord({
-                           $ref->{rawfield}=>$lastbossid
-                        },{$idname=>\$rec->{$idname}});
-                     if ($bk){
-                        $dataobj->StoreUpdateDelta("update",
-                           {$ref->{rawfield}=>$rec->{$ref->{rawfield}},
-                            $idname=>$rec->{$idname}},
-                           {$ref->{rawfield}=>$lastbossid,
-                            $idname=>$rec->{$idname}},
-                           $self->Self().
-                           "\nDataboss replace by lastknownbossid");
-                        $self->NotifyContactDataModification("databosschange",
-                                                      $dataobj,$reason,$ref,
-                                                      $rec,$contactrec,
-                                                      $lastbossid);
-                        $ReferenceIsStillInvalid=0;
-                     }
-                     else{
-                        msg(ERROR,"fail to set databoss in InvalidRefCheck");
-                        Stacktrace();
+                     my $o=getModuleObject($dataobj->Config,"base::user");
+                     $o->SetFilter({userid=>\$lastbossid});
+                     my ($newbossrec,$msg)=$o->getOnlyFirst(qw(usertyp )); 
+                     if (defined($newbossrec) &&
+                         $newbossrec->{usertyp} eq "user"){
+                        my $bk=$dataobj->UpdateRecord({
+                              $ref->{rawfield}=>$lastbossid
+                           },{$idname=>\$rec->{$idname}});
+                        if ($bk){
+                           $dataobj->StoreUpdateDelta("update",
+                              {$ref->{rawfield}=>$rec->{$ref->{rawfield}},
+                               $idname=>$rec->{$idname}},
+                              {$ref->{rawfield}=>$lastbossid,
+                               $idname=>$rec->{$idname}},
+                              $self->Self().
+                              "\nDataboss replace by lastknownbossid");
+                           $self->NotifyContactDataModification(
+                                                         "databosschange",
+                                                         $dataobj,$reason,$ref,
+                                                         $rec,$contactrec,
+                                                         $lastbossid);
+                           $ReferenceIsStillInvalid=0;
+                        }
                      }
                   }
                }
