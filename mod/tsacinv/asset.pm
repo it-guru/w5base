@@ -22,8 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::Dumper;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use tsacinv::lib::tools;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB tsacinv::lib::tools);
 
 sub new
 {
@@ -256,17 +256,14 @@ sub new
       new kernel::Field::Number(
                 name          =>'age',
                 group         =>'finanz',
-                depend        =>['assetid','acqumode','startacquisition'],
                 htmldetail    =>0,
-                searchable    =>0,
-                onRawValue    =>\&CalcDep,
+                dataobjattr   =>'"asset_age"',
                 label         =>'Age',
                 unit          =>'days'),
 
        new kernel::Field::Date(
                 name          =>'deprstart',
                 group         =>'finanz',
-                searchable    =>0,
                 htmldetail    =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -275,7 +272,7 @@ sub new
                    return(1) if ($current->{acqumode}==0);
                    return(0);
                 },
-                onRawValue    =>\&CalcDep,
+                dataobjattr   =>'"asset_deprstart"',
                 label         =>'Deprecation Start',
                 timezone      =>'CET'),
 
@@ -283,7 +280,6 @@ sub new
       new kernel::Field::Date(
                 name          =>'deprend',
                 group         =>'finanz',
-                searchable    =>0,
                 htmldetail    =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -292,15 +288,13 @@ sub new
                    return(1) if ($current->{acqumode}==0);
                    return(0);
                 },
-                depend        =>['assetid','acqumode'],
-                onRawValue    =>\&CalcDep,
+                dataobjattr   =>'"asset_deprend"',
                 label         =>'Deprecation End',
                 timezone      =>'CET'),
 
       new kernel::Field::Date(
                 name          =>'compdeprstart',
                 group         =>'finanz',
-                depend        =>['assetid','acqumode'],
                 htmldetail    =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -309,16 +303,13 @@ sub new
                    return(1) if ($current->{acqumode}==0);
                    return(0);
                 },
-                searchable    =>0,
-                onRawValue    =>\&CalcDep,
+                dataobjattr   =>'"asset_compdeprstart"',
                 label         =>'Component Deprecation Start',
                 timezone      =>'CET'),
 
       new kernel::Field::Date(
                 name          =>'compdeprend',
                 group         =>'finanz',
-                searchable    =>0,
-                depend        =>['assetid','acqumode'],
                 htmldetail    =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -327,15 +318,13 @@ sub new
                    return(1) if ($current->{acqumode}==0);
                    return(0);
                 },
-                onRawValue    =>\&CalcDep,
+                dataobjattr   =>'"asset_compdeprend"',
                 label         =>'Component Deprecation End',
                 timezone      =>'CET'),
 
       new kernel::Field::Currency(
                 name          =>'deprbase',
                 group         =>'finanz',
-                searchable    =>0,
-                depend        =>['assetid','acqumode'],
                 htmldetail    =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -344,7 +333,7 @@ sub new
                    return(1) if ($current->{acqumode}==0);
                    return(0);
                 },
-                onRawValue    =>\&CalcDep,
+                dataobjattr   =>'"asset_deprbase"',
                 label         =>'deprication base'),
 
       new kernel::Field::Currency(
@@ -358,9 +347,7 @@ sub new
                    return(1) if ($current->{acqumode}==0);
                    return(0);
                 },
-                searchable    =>0,
-                depend        =>['assetid','acqumode'],
-                onRawValue    =>\&CalcDep,
+                dataobjattr   =>'"asset_residualvalue"',
                 label         =>'residual value'),
 
       new kernel::Field::Currency(
@@ -391,6 +378,7 @@ sub new
                 vjointo       =>'tsacinv::model',
                 vjoinon       =>['lmodelid'=>'lmodelid'],
                 vjoindisp     =>'assetpowerinput',
+                htmldetail    =>0,
                 label         =>'PowerInput of Asset',
                 unit          =>'KVA'),
 
@@ -480,6 +468,7 @@ sub Initialize
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->amInitializeOraSession();
    return(1) if (defined($self->{DB}));
    return(0);
 }
@@ -505,101 +494,101 @@ sub CalcSystemsOnAsset
    return($#l+1);
 }
 
-sub CalcDep
-{
-   my $self=shift;
-   my $current=shift;
-   my $name=$self->Name();
-   my $assetid=$current->{assetid};
-   my $context=$self->getParent->Context();
-   return(undef) if (!defined($assetid) || $assetid eq "");
-   if (!defined($context->{CalcDep}->{$assetid})){
-      $context->{CalcDep}->{$assetid}=
-           $self->getParent->CalcDepr($current,$assetid);
-   }
-   return($context->{CalcDep}->{$assetid}->{$name});
-}
-
-sub CalcDepr
-{
-   my $self=shift;
-   my $current=shift;
-   my $assetid=shift;
-   my $ac=$self->getPersistentModuleObject("CalcDepr","tsacinv::fixedasset");
-
-   my $compdeprend;
-   my $compdeprstart;
-   my $deprend;
-   my $deprstart;
-   my $residualvalue;
-   my $deprbase;
-   my $age;
-   if ($current->{acqumode}==0){
-      if ($assetid ne ""){
-         $ac->ResetFilter();
-         $ac->SetFilter({assetid=>\$assetid});
-         my @fal=$ac->getHashList(qw(deprend deprstart deprbase residualvalue));
-         my $maxdeprbase=0; 
-         foreach my $fa (@fal){
-            $maxdeprbase=$fa->{deprbase} if ($fa->{deprbase}>$maxdeprbase);
-         }
-         foreach my $fa (@fal){
-            $residualvalue+=$fa->{residualvalue};
-            $deprbase+=$fa->{deprbase};
-            if ($maxdeprbase==$fa->{deprbase}){
-               $deprend=$fa->{deprend}         if (!defined($deprend));
-               $deprstart=$fa->{deprstart}     if (!defined($deprstart));
-            }
-            else{
-               $compdeprend=$fa->{deprend}     if (!defined($compdeprend));
-               $compdeprstart=$fa->{deprstart} if (!defined($compdeprstart));
-               if ($compdeprend lt $fa->{deprend}){
-                  $compdeprend=$fa->{deprend};
-               }
-               if ($compdeprstart gt $fa->{deprstart}){
-                  $compdeprstart=$fa->{deprstart};
-               }
-            }
-         }
-      }
-      $compdeprend=$deprend     if (!defined($compdeprend));
-      $compdeprstart=$deprstart if (!defined($compdeprstart));
-
-      if ($deprstart ne ""){
-         my $d=CalcDateDuration($deprstart,NowStamp("en"));
-         if (defined($d)){
-            $age=int($d->{totaldays});
-         }
-      }
-
-      
-
-      return({compdeprend=>$compdeprend,compdeprstart=>$compdeprstart,
-              deprend=>$deprend,deprstart=>$deprstart,
-              deprbase=>$deprbase,
-              age=>$age,
-              residualvalue=>$residualvalue});
-   }
-   else{
-      my $startacquisition=$current->{startacquisition}; 
-      my $age;
-      if ($startacquisition ne ""){
-         my $d=CalcDateDuration($startacquisition,NowStamp("en"));
-         if (defined($d)){
-            $age=int($d->{totaldays});
-         }
-      }
-
-      return({compdeprend=>undef,compdeprstart=>undef,
-              deprend=>undef,deprstart=>undef,
-              deprbase=>undef,
-              age=>$age,
-              residualvalue=>undef});
-   }
-   
-
-
-}
+#sub CalcDep
+#{
+#   my $self=shift;
+#   my $current=shift;
+#   my $name=$self->Name();
+#   my $assetid=$current->{assetid};
+#   my $context=$self->getParent->Context();
+#   return(undef) if (!defined($assetid) || $assetid eq "");
+#   if (!defined($context->{CalcDep}->{$assetid})){
+#      $context->{CalcDep}->{$assetid}=
+#           $self->getParent->CalcDepr($current,$assetid);
+#   }
+#   return($context->{CalcDep}->{$assetid}->{$name});
+#}
+#
+#sub CalcDepr
+#{
+#   my $self=shift;
+#   my $current=shift;
+#   my $assetid=shift;
+#   my $ac=$self->getPersistentModuleObject("CalcDepr","tsacinv::fixedasset");
+#
+#   my $compdeprend;
+#   my $compdeprstart;
+#   my $deprend;
+#   my $deprstart;
+#   my $residualvalue;
+#   my $deprbase;
+#   my $age;
+#   if ($current->{acqumode}==0){
+#      if ($assetid ne ""){
+#         $ac->ResetFilter();
+#         $ac->SetFilter({assetid=>\$assetid});
+#         my @fal=$ac->getHashList(qw(deprend deprstart deprbase residualvalue));
+#         my $maxdeprbase=0; 
+#         foreach my $fa (@fal){
+#            $maxdeprbase=$fa->{deprbase} if ($fa->{deprbase}>$maxdeprbase);
+#         }
+#         foreach my $fa (@fal){
+#            $residualvalue+=$fa->{residualvalue};
+#            $deprbase+=$fa->{deprbase};
+#            if ($maxdeprbase==$fa->{deprbase}){
+#               $deprend=$fa->{deprend}         if (!defined($deprend));
+#               $deprstart=$fa->{deprstart}     if (!defined($deprstart));
+#            }
+#            else{
+#               $compdeprend=$fa->{deprend}     if (!defined($compdeprend));
+#               $compdeprstart=$fa->{deprstart} if (!defined($compdeprstart));
+#               if ($compdeprend lt $fa->{deprend}){
+#                  $compdeprend=$fa->{deprend};
+#               }
+#               if ($compdeprstart gt $fa->{deprstart}){
+#                  $compdeprstart=$fa->{deprstart};
+#               }
+#            }
+#         }
+#      }
+#      $compdeprend=$deprend     if (!defined($compdeprend));
+#      $compdeprstart=$deprstart if (!defined($compdeprstart));
+#
+#      if ($deprstart ne ""){
+#         my $d=CalcDateDuration($deprstart,NowStamp("en"));
+#         if (defined($d)){
+#            $age=int($d->{totaldays});
+#         }
+#      }
+#
+#      
+#
+#      return({compdeprend=>$compdeprend,compdeprstart=>$compdeprstart,
+#              deprend=>$deprend,deprstart=>$deprstart,
+#              deprbase=>$deprbase,
+#              age=>$age,
+#              residualvalue=>$residualvalue});
+#   }
+#   else{
+#      my $startacquisition=$current->{startacquisition}; 
+#      my $age;
+#      if ($startacquisition ne ""){
+#         my $d=CalcDateDuration($startacquisition,NowStamp("en"));
+#         if (defined($d)){
+#            $age=int($d->{totaldays});
+#         }
+#      }
+#
+#      return({compdeprend=>undef,compdeprstart=>undef,
+#              deprend=>undef,deprstart=>undef,
+#              deprbase=>undef,
+#              age=>$age,
+#              residualvalue=>undef});
+#   }
+#   
+#
+#
+#}
 
 
 sub SetFilter

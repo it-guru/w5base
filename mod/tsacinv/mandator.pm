@@ -21,7 +21,9 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field;
 use base::mandator;
-@ISA=qw(base::mandator);
+use tsacinv::lib::tools;
+
+@ISA=qw(base::mandator tsacinv::lib::tools);
 
 sub new
 {

@@ -22,7 +22,9 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use tsacinv::lib::tools;
+
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB tsacinv::lib::tools);
 
 sub new
 {
@@ -46,6 +48,11 @@ sub new
                                     uppersearch=>1,
                                     align      =>'left',
                                     dataobjattr=>'"systemid"'),
+
+      new kernel::Field::Interface(
+                name          =>'lcomputerid',
+                label         =>'AC-ComputerID',
+                dataobjattr   =>'"lcomputerid"'),
 
       new kernel::Field::Text(      name       =>'name',
                                     label      =>'Service Name',
@@ -95,6 +102,7 @@ sub Initialize
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->amInitializeOraSession();
    return(1) if (defined($self->{DB}));
    return(0);
 }

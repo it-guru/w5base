@@ -27,7 +27,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
-@ISA=qw(kernel::App::Web);
+use tsacinv::lib::tools;
+
+@ISA=qw(kernel::App::Web tsacinv::lib::tools);
 
 sub new
 {

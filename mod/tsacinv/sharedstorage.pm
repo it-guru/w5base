@@ -22,7 +22,9 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use tsacinv::lib::tools;
+
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB tsacinv::lib::tools);
 
 sub new
 {
@@ -169,6 +171,7 @@ sub Initialize
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->amInitializeOraSession();
    return(1) if (defined($self->{DB}));
    return(0);
 }

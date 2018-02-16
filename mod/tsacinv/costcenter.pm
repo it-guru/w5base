@@ -22,8 +22,8 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::Dumper;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use tsacinv::lib::tools;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB tsacinv::lib::tools);
 
 sub new
 {
@@ -206,7 +206,7 @@ sub new
                 label         =>'Applications',
                 group         =>'applications',
                 vjointo       =>'tsacinv::appl',
-                vjoinon       =>['name'=>'conumber'],
+                vjoinon       =>['id'=>'lcostid'],
                 vjoindisp     =>[qw(fullname)]),
 
       new kernel::Field::SubList(
@@ -215,7 +215,7 @@ sub new
                 group         =>'systems',
                 vjointo       =>'tsacinv::system',
                 vjoinbase     =>{status=>"\"!out of operation\""},
-                vjoinon       =>['name'=>'conumber'],
+                vjoinon       =>['id'=>'lcostcenterid'],
                 vjoindisp     =>[qw(fullname)]),
 
       new kernel::Field::Text(
@@ -382,6 +382,7 @@ sub Initialize
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->amInitializeOraSession();
    return(1) if (defined($self->{DB}));
    return(0);
 }

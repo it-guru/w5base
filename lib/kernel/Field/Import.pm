@@ -71,6 +71,12 @@ sub new
          $fo{weblinkto}=$param{weblinkto};
          $fo{weblinkon}=$param{weblinkon};
       }
+      if (defined($param{async})){
+         $fo{async}=$param{async};
+      }
+      if (defined($param{htmldetail})){
+         $fo{htmldetail}=$param{htmldetail};
+      }
       $fo{vjoinconcat}=$param{vjoinconcat} if (defined($param{vjoinconcat}));
       $fo{depend}=$param{depend}           if (defined($param{depend}));
       if (!defined($param{group})){

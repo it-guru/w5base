@@ -73,11 +73,13 @@ sub new
       new kernel::Field::Date(
                 name          =>'startdate',
                 label         =>'Start-Date',
+                sqlorder      =>'desc',
                 dataobjattr   =>'replicatestat.startdate'),
                                                   
       new kernel::Field::Date(
                 name          =>'enddate',
                 label         =>'End-Date',
+                sqlorder      =>'desc',
                 dataobjattr   =>'replicatestat.enddate'),
                                                   
    );

@@ -20,7 +20,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use itil::lib::Listedit;
-@ISA=qw(itil::lib::Listedit);
+use tsacinv::lib::tools;
+
+@ISA=qw(itil::lib::Listedit tsacinv::lib::tools);
 
 sub new
 {
@@ -71,6 +73,7 @@ sub Initialize
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->amInitializeOraSession();
    return(1) if (defined($self->{DB}));
    return(0);
 }

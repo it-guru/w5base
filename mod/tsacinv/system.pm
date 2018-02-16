@@ -24,6 +24,7 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use tsacinv::lib::tools;
 use tsacinv::costcenter;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB tsacinv::lib::tools);
 
 sub new
@@ -92,6 +93,7 @@ sub new
                 vjoinon       =>['lassetid'=>'lassetid'],
                 weblinkto     =>'none',
               #  weblinkon     =>['lassetid'=>'lassetid'],
+                htmldetail    =>0,
                 prefix        =>"asset",
                 group         =>"location",
                 fields        =>[qw(room place)]),
@@ -321,6 +323,7 @@ sub new
                 name          =>'partofasset',
                 label         =>'System Part of Asset',
                 unit          =>'%',
+                htmldetail    =>0,
                 depend        =>['lassetid','status'],
                 prepRawValue  =>\&SystemPartOfCorrection,
                 dataobjattr   =>'"partofasset"'),
@@ -377,7 +380,17 @@ sub new
                 weblinkon     =>['lassetid'=>'lassetid'],
                 prefix        =>"asset",
                 group         =>"assetdata",
-                fields        =>[qw(assetid serialno inventoryno modelname 
+                fields        =>[qw(assetid)]),
+
+      new kernel::Field::Import($self,
+                vjointo       =>'tsacinv::asset',
+                vjoinon       =>['lassetid'=>'lassetid'],
+                weblinkto     =>'tsacinv::asset',
+                weblinkon     =>['lassetid'=>'lassetid'],
+                prefix        =>"asset",
+                htmldetail    =>0,
+                group         =>"assetdata",
+                fields        =>[qw(serialno inventoryno modelname 
                                     powerinput cpucount cputype cpuspeed 
                                     corecount
                                     systemsonasset maitcond maintlevel)]),
@@ -386,6 +399,7 @@ sub new
                 vjointo       =>'tsacinv::asset',
                 vjoinon       =>['lassetid'=>'lassetid'],
                 prefix        =>"asset",
+                htmldetail    =>0,
                 group         =>"assetfinanz",
                 fields        =>[qw( mdepr mmaint)]),
 
@@ -420,6 +434,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'lassetid',
                 label         =>'AC-AssetID',
+                selectfix     =>1,
                 dataobjattr   =>'system."lassetid"'),
 
       new kernel::Field::Interface(
@@ -450,7 +465,7 @@ sub new
                 group         =>'orderedservices',
                 vjointo       =>'tsacinv::service',
                 vjoinbase     =>[{'isdelivered'=>\'0'}],
-                vjoinon       =>['systemid'=>'systemid'],
+                vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>[qw(name type ammount unit)],
                 vjoininhash   =>['name','type','ammount']),
 
@@ -460,7 +475,7 @@ sub new
                 group         =>'services',
                 vjointo       =>'tsacinv::service',
                 vjoinbase     =>[{'isdelivered'=>\'1'}],
-                vjoinon       =>['systemid'=>'systemid'],
+                vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>[qw(name type ammount unit)],
                 vjoininhash   =>['name','type','ammount']),
 
@@ -471,7 +486,7 @@ sub new
                 searchable    =>0,
                 group         =>'ipaddresses',
                 vjointo       =>'tsacinv::ipaddress',
-                vjoinon       =>['systemid'=>'systemid'],
+                vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>[qw(fullname description type)],
                 vjoininhash   =>[qw(ipaddress ipv4address ipv6address 
                                     description dnsname status)]),
@@ -733,13 +748,16 @@ sub new
 
    # Performance Hacks
    $self->getField("assetassetid")->{dataobjattr}=
-      'asset."assetid"';
+      '"assetid"';
 
    $self->getField("locationid")->{dataobjattr}=
-      'asset."locationid"';
+      '"locationid"';
 
    $self->getField("tsacinv_locationfullname")->{dataobjattr}=
-      'location."fullname"';
+      '"locationfullname"';
+
+   $self->getField("tsacinv_locationlocation")->{dataobjattr}=
+      '"locationlocation"';
 
  
    $self->setDefaultView(qw(systemname status tsacinv_locationfullname 
@@ -748,17 +766,17 @@ sub new
 }
 
 
-sub getSqlFrom
-{
-   my $self=shift;
-
-   # Performance Hack
-   my $from='system join asset on system."lassetid"=asset."lassetid" '.
-            'left outer join location '.
-            'on asset."locationid"=location."locationid"';
-
-   return($from);
-}
+#sub getSqlFrom
+#{
+#   my $self=shift;
+#
+#   # Performance Hack
+#   my $from='system join asset on system."lassetid"=asset."lassetid" '.
+#            'left outer join location '.
+#            'on asset."locationid"=location."locationid"';
+#
+#   return($from);
+#}
 
 
 
@@ -892,6 +910,7 @@ sub Initialize
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"tsac"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   $self->amInitializeOraSession();
    return(1) if (defined($self->{DB}));
    return(0);
 }
