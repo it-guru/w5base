@@ -166,8 +166,22 @@ sub new
                 name          =>'scanname',
                 label         =>'Scan Title',
                 sqlorder      =>'NONE',
+                weblinkto     =>'tssiem::secscan',
+                weblinkon     =>['scanqref'=>'qref'],
                 group         =>'scan',
                 dataobjattr   =>"W5SIEM_secscan.title"),
+
+      new kernel::Field::Text(
+                name          =>'scanqref',
+                group         =>'source',
+                label         =>'Scan-ID',
+                dataobjattr   =>'W5SIEM_secscan.ref'),
+
+      new kernel::Field::Link(
+                name          =>'scanid',
+                label         =>'Scan ID',
+                group         =>'scan',
+                dataobjattr   =>"W5SIEM_secscan.id"),
 
       new kernel::Field::Textarea(
                 name          =>'results',
