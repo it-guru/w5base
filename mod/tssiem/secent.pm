@@ -169,6 +169,13 @@ sub new
                 group         =>'scan',
                 dataobjattr   =>"W5SIEM_secscan.title"),
 
+      new kernel::Field::Textarea(
+                name          =>'results',
+                label         =>'Results',
+                htmldetail    =>'NotEmpty',
+                sqlorder      =>'NONE',
+                dataobjattr   =>'W5SIEM_secent.results'),
+
 
       new kernel::Field::Text(
                 name          =>'srcsys',

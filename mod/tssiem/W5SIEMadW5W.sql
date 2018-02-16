@@ -33,6 +33,9 @@ CREATE INDEX "W5SIEM_secscan_i0"
 CREATE INDEX "W5SIEM_secscan_i2"
    ON "W5SIEM_secscan" (launch_datetime) online;
 
+CREATE INDEX "W5SIEM_secscan_i3"
+   ON "W5SIEM_secscan" (id) online;
+
 -- drop table "W5SIEM_secent";
 create table "W5SIEM_secent" (
    id                   INTEGER not null,
@@ -77,6 +80,9 @@ CREATE INDEX "W5SIEM_secent_i1"
 
 CREATE INDEX "W5SIEM_secent_i2"
    ON "W5SIEM_secent" (launch_datetime) online;
+
+CREATE INDEX "W5SIEM_secent_i3"
+   ON "W5SIEM_secent" (id) online;
 
 CREATE SEQUENCE "W5SIEM_secent_seq"
    MINVALUE 1
