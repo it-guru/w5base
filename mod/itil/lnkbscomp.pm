@@ -30,16 +30,16 @@ sub new
   
    my $dst           =[
                        'itil::systemmonipoint' =>'fullname',
+                       'itil::businessservice'=>'fullname',
                        'itil::system' =>'name',
                        'itil::appl'=>'name',
-                       'itil::businessservice'=>'fullname'
                       ];
 
    my $vjoineditbase =[
                        {'systemcistatusid'=>'<5'},
                        {'cistatusid'=>"<5"},
                        {'cistatusid'=>"<5"},
-                       {'cistatusid'=>"<5"}
+                       {'cistatusid'=>"<5"},
                       ];
 
    $self->AddFields(
@@ -267,6 +267,18 @@ sub Validate
       }
       else{
          $newrec->{lnkpos}=undef;  # allow multiple lines without lnkpos
+      }
+   }
+   my $businessserviceid=effVal($oldrec,$newrec,"businessserviceid");
+   my $objtype=effVal($oldrec,$newrec,"objtype");
+   if ($objtype eq "itil::businessservice"){
+      for(my $r=1;$r<=3;$r++){
+         my $idfld="obj${r}id";
+         my $id=effVal($oldrec,$newrec,$idfld);
+         if ($id eq $businessserviceid){
+            $self->LastMsg(ERROR,"a business service an not contain herself");
+            return(0);
+         }
       }
    }
 

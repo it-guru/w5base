@@ -89,6 +89,23 @@ sub new
                 dataobjattr   =>"$worktable.shortname"),
 
 
+      new kernel::Field::Mandator( 
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if ($current->{applid} ne "");
+                   return(0);
+                },
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(1);
+                   return(1) if (defined($current));
+                   return(0);
+                }),
+
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
@@ -110,7 +127,9 @@ sub new
                 name          =>'nature',
                 sqlorder      =>'desc',
                 label         =>'Nature',
-                htmleditwidth =>'40%',
+                htmleditwidth =>'60%',
+                default       =>'SVC',
+                selectfix     =>'1',
                 transprefix   =>'nat.',
                 readonly      =>sub{
                    my $self=shift;
@@ -118,7 +137,9 @@ sub new
                    return(1) if (defined($current));
                    return(0);
                 },
-                value         =>[undef,'IT-S','ES','TR'],
+                jsonchanged   =>\&getOnChangedScript,
+                jsoninit      =>\&getOnChangedScript,
+                value         =>[undef,'SVC','IT-S','ES','TR'],
                 dataobjattr   =>"$worktable.nature"),
 
       new kernel::Field::Link(
@@ -141,7 +162,7 @@ sub new
                    if (defined($param{current})){
                       return(1);
                    }
-                   return(0);
+                   return(1);
                 },
                 readonly      =>sub{
                    my $self=shift;
@@ -219,23 +240,6 @@ sub new
                 name          =>'funcmgrid',
                 label         =>'functional mgr id',
                 dataobjattr   =>"$worktable.funcmgr"),
-
-      new kernel::Field::Mandator( 
-                readonly      =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   return(1) if ($current->{applid} ne "");
-                   return(0);
-                },
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-
-                   return(1) if (defined($current));
-                   return(0);
-                }),
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
@@ -1356,6 +1360,39 @@ sub new
    return($self);
 }
 
+
+sub getOnChangedScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var s=document.forms[0].elements['Formated_nature'];
+var dboss=document.forms[0].elements['Formated_databoss'];
+var appl=document.forms[0].elements['Formated_srcapplication'];
+
+if (s && dboss && appl ){
+   var v=s.options[s.selectedIndex].value;
+   if (v==""){
+      appl.disabled=false;
+   }
+   else{
+      appl.disabled=true;
+   }
+   if (v=="SVC"){
+      dboss.disabled=false;
+   }
+   else{
+      dboss.disabled=true;
+   }
+}
+
+EOF
+   return($d);
+}
+
+
 sub calcBackgroundFlagColor
 {
    my $self=shift;
@@ -2178,6 +2215,9 @@ sub isViewValid
    else{
       push(@l,qw(contacts desc uservicecomp servicecomp grprelations
                  attachments reporting sla moni monicomments));
+   }
+   if (defined($rec) && $rec->{nature} eq "SVC"){
+      @l=grep(!/^grprelations$/,@l);
    }
    push(@l,qw(businessprocesses source));
    return(@l);

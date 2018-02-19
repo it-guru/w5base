@@ -2,8 +2,7 @@
    <table class=editframe>
       <tr>
          <td class=fname width=10%>%objtype(label)%:</td>
-         <td class=finput colspan=2>%objtype(sublistedit)%</td>
-         <td class=fname nowrap>%lnkpos(sublistedit)%</td>
+         <td class=finput colspan=3>%objtype(sublistedit)%</td>
       </tr>
       <tr>
          <td class=fname width=10%>%name(label)%:</td>
@@ -17,7 +16,13 @@
       </tr>
       <tr>
          <td class=fname width=10%>%comments(label)%:</td>
-         <td class=finput colspan=3>%comments(sublistedit)%</td>
+         <td class=finput colspan=2>%comments(sublistedit)%</td>
+         <td class=fname nowrap>
+            <table cellspacing=0 cellpadding=0 border=0>
+            <tr><td class=finput>Seq.Pos.:</td>
+                <td>%lnkpos(sublistedit)%</td></tr>
+            </table>
+         </td>
       </tr>
    </table>
 </div>
