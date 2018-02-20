@@ -163,8 +163,10 @@ sub setReferencesToNull
                   if ($lastbossid ne ""){
                      my $o=getModuleObject($dataobj->Config,"base::user");
                      $o->SetFilter({userid=>\$lastbossid});
-                     my ($newbossrec,$msg)=$o->getOnlyFirst(qw(usertyp )); 
+                     my ($newbossrec,$msg)=$o->getOnlyFirst(qw(usertyp 
+                                                               cistatusid)); 
                      if (defined($newbossrec) &&
+                         $newbossrec->{cistatusid} eq "4" &&
                          $newbossrec->{usertyp} eq "user"){
                         my $bk=$dataobj->UpdateRecord({
                               $ref->{rawfield}=>$lastbossid
