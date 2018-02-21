@@ -239,7 +239,9 @@ sub FormatedDetail
    my $res=$self->FormatedResult($current,$mode);
    $res=[$res] if (ref($res) ne "ARRAY");
    if ($mode eq "HtmlDetail"){
-      $res=[map({$self->addWebLinkToFacility($_,$current)} @{$res})];
+      if (!(ref($d) eq "ARRAY" && $#{$d}==0 && !defined($d->[0]))){
+         $res=[map({$self->addWebLinkToFacility($_,$current)} @{$res})];
+      }
    }
    $res=join($self->{vjoinconcat},@$res);
    if ($mode eq "HtmlDetail"){

@@ -445,15 +445,19 @@ sub getSqlSelect
    my ($distinct,@fields)=$self->getSqlFields();
    my @filter=$self->getFilterSet();
    my $where=$self->getSqlWhere("select",@filter);
-   my @from=$self->getSqlFrom("select",@filter);
    my $group=$self->getSqlGroup("select",@filter);
    my $order=$self->getSqlOrder("select",@filter);
+   my @from=$self->getSqlFrom("select",@filter);
    my $limitnum=$self->{_Limit};
    my $drivername=defined($self->{DB}) ? $self->{DB}->DriverName():undef;
    my @cmd;
    return(undef) if ($#from==-1 || $from[0] eq "");
    foreach my $from (@from){
-      my $cmd="select ".$distinct.join(",",@fields)." from $from";
+      my $cmd="select "; 
+      #if ($limitnum>0){  # not good - it reduces performance in some cases!
+      #   $cmd.=" /*+ FIRST_ROWS(".($limitnum).") */ ";
+      #}
+      $cmd.=$distinct.join(",",@fields)." from $from";
       $cmd.=" where ".$where if ($where ne "");
       $cmd.=" group by ".$group if ($group ne "");
       $cmd.=" order by ".$order if ($order ne "");
@@ -499,8 +503,8 @@ sub getSqlCount
 
    my @filter=$self->getFilterSet();
    my $where=$self->getSqlWhere("select",@filter);
-   my @from=$self->getSqlFrom("select",@filter);
    my $group=$self->getSqlGroup("select",@filter);
+   my @from=$self->getSqlFrom("select",@filter);
    my @cmd;
    my $limitnum=$self->{_Limit};
    

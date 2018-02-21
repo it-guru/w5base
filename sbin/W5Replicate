@@ -856,6 +856,8 @@ sub objectReplicationPhase2
       if ($recaccess_reservetime>300){
          $recaccess_reservetime=300;
       }
+      $recaccess_reservetime=0;         # neuesten Erekenntnissen nach bringt
+                                        # das nichts (HV)
       $ctrl->{recaccess_reservetime}=$recaccess_reservetime;
    }
    

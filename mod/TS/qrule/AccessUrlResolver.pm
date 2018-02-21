@@ -120,125 +120,36 @@ sub qcheckRecord
       $desc->{qmsg}=['ignoring Telekom Product and Inovation Net'];
       return($exitcode,$desc);
    }
-   if ($host eq ""){
-      my $msg="can not identify hostname in: ".$rec->{fullname};
-      push(@{$desc->{qmsg}},$msg);
-      push(@{$desc->{dataissue}},$msg);
-   } elsif ($host=~m/\.\./){
-      my $msg="invalid hostname: ".$host;
-      push(@{$desc->{qmsg}},$msg);
-      push(@{$desc->{dataissue}},$msg);
-   } elsif ($host=~m/^\d+\.\d+\.\d+\.\d+$/){ # url redirects already to an ip
-      push(@ipl,$host);
-   }
-   else{
-      if (lc($rec->{network}) eq "internet"){
-         my $ua;
-         eval('
-            use LWP::UserAgent;
-            use HTTP::Request::Common;
-           
-            $ua=new LWP::UserAgent(env_proxy=>0,
-                                   ssl_opts=>{verify_hostname=>0});
-            $ua->timeout(60);
-         ');
-         if ($@ ne ""){
-            msg(ERROR,$@);
-            return(undef);
+
+
+   my $url=$rec->{'name'};
+   my $networkid=$rec->{networkid};
+   my $res=itil::lib::Listedit::probeUrl($dataobj,$url,[qw(DNSRESOLV)],
+                                         $networkid);
+   if (defined($res) && ref($res) eq "HASH"){
+      if ($res->{exitcode} eq "0"){
+         if (ref($res->{dnsresolver}) eq "HASH" &&
+             $res->{dnsresolver}->{exitcode} eq "0"){
+            @ipl=@{$res->{dnsresolver}->{ipaddress}};
          }
-         else{
-            my $proxy=$self->getParent->Config->Param("http_proxy");
-            my $scheme='http';
-
-            if ($proxy ne ""){
-               # Package 'LWP::Protocol::connect' needed
-               # for https over proxy because of faulty
-               # 'perl-libwww-perl' respectively 'LWP::Protocol::https'
-               # in 'Oracle Linux Server release 7.3'
-               eval('
-                  use LWP::Protocol::https;
-                  use LWP::Protocol::connect;
-               ');
-               if ($@ eq '') {
-                  # use https
-                  $scheme='https';
-                  $proxy=~s/^.+:\/\/(.*)/connect:\/\/$1/;
-               }
-
-               msg(INFO,"set proxy to $proxy, use $scheme");
-               $ua->proxy(['https','http'],$proxy);
-            }
-
-            my $url=$scheme."://dnsresolver.w5base.net/resolv.php?q=".$host;
-            my $response=$ua->request(GET($url));
-
-            if ($response->code ne "200"){
-               msg(ERROR,"$self URL request $url failed code(".
-                         $response->code.")");
-               msg(ERROR,"response is ".$response->content);
-            }
-            else{
-               my $res=$response->content;
-               my @lines=grep(/\S+\s+A\s+/,split(/[\r\n]/,$res));
-               my @resipl=map({
-                 my $l=$_;
-                 $l=~s/^.*\s+(\S+)$/$1/;
-                 $l;
-               } @lines);
-               my $msg;
-               my $ipfail=0;
-               foreach my $ip (@resipl){
-                  last if ($ipfail);
-                  if (!$self->itil::lib::Listedit::IPValidate($ip,\$msg)){
-                     $ipfail++;
-                  }
-               }
-               if ($ipfail){
-                  msg(ERROR,"dnslookup API result invalid for $url");
-               }
-               else{
-                  push(@ipl,@resipl);
-               }
-            }
-         }
+      }
+      elsif ($res->{exitcode} eq "101"){
+         return(undef,{qmsg=>"temporary ERROR: ".$res->{exitmsg}});
       }
       else{
-         my $res;
-         eval('
-            use Net::DNS;
-            $res=Net::DNS::Resolver->new();
-         ');
-         if ($@ ne ""){
-            msg(ERROR,$@);
-            return(undef);
-         }
-         else{
-            my $query=$res->search($host);
-            if ($query){
-               foreach my $rr ($query->answer) {
-                  next unless($rr->type eq "A");
-                  push(@ipl,$rr->address);
-               }
-               if ($#ipl==-1){
-                  my $msg="can not find any ip for: ".$host;
-                  push(@{$desc->{qmsg}},$msg);
-                  push(@{$desc->{dataissue}},$msg);
-               }
-            }
-            elsif ($res->errorstring eq "NXDOMAIN" ||
-                   $res->errorstring eq "NOERROR"){
-               my $msg="can not resolv hostname: ".$host;
-               push(@{$desc->{qmsg}},$msg);
-               push(@{$desc->{dataissue}},$msg);
-            }
-            else{
-               msg(ERROR,$self->Self()." query failed: ".$res->errorstring.
-                         " for ".$host);
-               return(undef);
-            }
-         }
+         return(undef,{
+            qmsg=>"ERROR: unknon problem while itil::lib::Listedit::probeUrl"
+         });
       }
    }
+   else{
+      return(undef,{
+         qmsg=>"ERROR: interal itil::lib::Listedit::probeUrl problem"
+      });
+   }
+
+
+
    my $lastip=getModuleObject($self->getParent->Config,"itil::lnkapplurlip");
    my $srcload=NowStamp("en");
    foreach my $ip (@ipl){

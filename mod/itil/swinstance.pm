@@ -547,7 +547,6 @@ sub new
                 htmleditwidth =>'280px',
                 group         =>'ssl',
                 allowempty    =>1,
-                readonly      =>1,
                 label         =>'SSL Check Network',
                 vjointo       =>'itil::network',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -610,6 +609,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'ssl_cipher',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'ssl',
                 label         =>'detected SSL Cipher',
                 dataobjattr   =>'swinstance.ssl_cipher'),
@@ -617,6 +617,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'ssl_version',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'ssl',
                 label         =>'detected SSL Version',
                 dataobjattr   =>'swinstance.ssl_version'),
@@ -624,6 +625,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'ssl_certdump',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'ssl',
                 label         =>'detected SSL Certificate',
                 dataobjattr   =>'swinstance.ssl_certdump'),
@@ -631,6 +633,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'ssl_cert_serialno',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'ssl',
                 label         =>'detected SSL Certificate Serial',
                 dataobjattr   =>'swinstance.ssl_certserial'),
@@ -638,6 +641,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'ssl_cert_signature_algo',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'ssl',
                 label         =>'detected SSL Certificate signature algo',
                 dataobjattr   =>'swinstance.ssl_certsighash'),
@@ -1114,7 +1118,8 @@ sub Validate
       }
    }
 
-   if (effChanged($oldrec,$newrec,"sslurl")){
+   if (effChanged($oldrec,$newrec,"sslurl") ||
+       effChanged($oldrec,$newrec,"ssl_networkid")){
       $newrec->{sslbegin}=undef;
       $newrec->{sslend}=undef;
       $newrec->{sslstate}=undef;
