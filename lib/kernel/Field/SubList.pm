@@ -154,16 +154,23 @@ EOF
             my $vjoinbaseok=1;
             if (defined($self->{vjoinbase})){
                $vjoinbaseok=0;
+               my $vjoinbase;
                if (ref($self->{vjoinbase}) eq "ARRAY" &&
                    $#{$self->{vjoinbase}}==0){
                   if (ref($self->{vjoinbase}->[0]) eq "HASH"){
-                     foreach my $k (keys(%{$self->{vjoinbase}->[0]})){
-                         my $v=$self->{vjoinbase}->[0]->{$k};
-                         $v=$$v if (ref($v) eq "SCALAR");
-                         $target.="&search_$k=".quoteQueryString($v);
-                     }
-                     $vjoinbaseok=1;
+                     $vjoinbase=$self->{vjoinbase}->[0];
                   } 
+               }
+               if (ref($self->{vjoinbase}) eq "HASH"){
+                  $vjoinbase=$self->{vjoinbase};
+               }
+               if (ref($vjoinbase) eq "HASH"){
+                  foreach my $k (keys(%{$vjoinbase})){
+                      my $v=$vjoinbase->{$k};
+                      $v=$$v if (ref($v) eq "SCALAR");
+                      $target.="&search_$k=".quoteQueryString($v);
+                  }
+                  $vjoinbaseok=1;
                }
             }
             if ($vjoinbaseok){ 

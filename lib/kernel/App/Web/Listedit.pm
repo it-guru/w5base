@@ -616,7 +616,9 @@ EOF
    if ($param{nosearch}){
       my %search=$self->getSearchHash();
       foreach my $k (keys(%search)){
-         $d.="<input type=hidden value=\"$search{$k}\" name=search_$k>";
+         my $val=$search{$k};
+         $val=~s/"/&quote;/g;
+         $d.="<input type=hidden value=\"$val\" name=search_$k>";
       }
       return($d);
    }
