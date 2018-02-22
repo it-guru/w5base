@@ -356,7 +356,7 @@ sub ItemSummary
    foreach my $sys (@{$summary->{systems}}){
       $systemids{$sys->{systemsystemid}}=$sys if ($sys->{systemsystemid} ne "");
    }
-   if (keys(%systemids)){
+   if (keys(%systemids)>0 && keys(%systemids)<=250){
       my $l1=getModuleObject($self->Config,"tsacinv::system");
       $l1->SetFilter({systemid=>[keys(%systemids)]});
       $l1->SetCurrentView(qw(systemid rawsystemolaclass));

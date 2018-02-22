@@ -171,6 +171,7 @@ sub new
                 group         =>'systems',
                 forwardSearch =>1,
                 allowcleanup  =>1,
+                htmllimit     =>200,
                 subeditmsk    =>'subedit.appl',
                 vjointo       =>'itil::lnkapplsystem',
                 vjoinbase     =>[{systemcistatusid=>"<=5"}],
@@ -900,6 +901,7 @@ sub new
                 label         =>'Interfaces',
                 group         =>'interfaces',
                 forwardSearch =>1,
+                htmllimit     =>200,
                 subeditmsk    =>'subedit.appl',
                 depend        =>['isnoifaceappl','interfacescount'],
                 htmldetail    =>sub{
