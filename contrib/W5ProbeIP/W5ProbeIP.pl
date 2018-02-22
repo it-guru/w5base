@@ -147,6 +147,7 @@ while ( ($k,$v) = each(%ssl3ciphers) ) {
 
 package main;
 
+
 my $q=new CGI();
 my @CERTBuffer;
 
@@ -164,6 +165,7 @@ exit(0);
 
 sub ProbeIP()
 {
+   $|=1;
    print $q->header(
       -type=>'application/json',
       -expires=>'+10s',
@@ -172,6 +174,11 @@ sub ProbeIP()
    my $r={};
 
    my $uri=new URI($q->param("url"));
+   $SIG{ALRM}=sub{
+      die("W5ProbeIP timeout for $uri");
+   };
+   alarm(30);
+
    my $scheme=$uri->scheme();
    if (ref($uri) ne "URI::_foreign"){
       $uri->path("");
