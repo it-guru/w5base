@@ -292,11 +292,11 @@ sub resolv2ip
          elsif ($res->errorstring eq "NXDOMAIN" ||
                 $res->errorstring eq "NOERROR"){
             $r->{error}="invalid dns name";
-            $r->{exitcode}=100;
+            $r->{exitcode}=101;
          }
          else{
             $r->{error}="dns query failed";
-            $r->{exitcode}=1;
+            $r->{exitcode}=102;
             return(undef);
          }
       }
@@ -457,7 +457,7 @@ sub do_SSLCERT
       $r->{sslcert}->{exitcode}=0;
    }
    else{
-      $r->{sslcert}->{exitcode}=1;
+      $r->{sslcert}->{exitcode}=201;
    }
 }
 
@@ -585,9 +585,11 @@ sub do_IPCONNECT
    if ($res){
       $r->{ipconnect}->{open}=1;
       $r->{ipconnect}->{time}=$t2-$t1;
+      $r->{ipconnect}->{exitcode}=0;
    }
    else{
       $r->{ipconnect}->{open}=0;
+      $r->{ipconnect}->{exitcode}=501;
    }
    if ($ENV{W5ProbeIP_SourceIP} ne ""){
       $r->{ipconnect}->{sourceip}=$ENV{W5ProbeIP_SourceIP};
