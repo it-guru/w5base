@@ -79,6 +79,7 @@ sub new
                 name          =>'farmsystems',
                 label         =>'ITFarm Systemnames',
                 ignorecase    =>1,
+                forwardSearch =>1,
                 group         =>'systems',
                 vjointo       =>'tsacinv::itfarmsystem',
                 vjoinon       =>['lfarmid'=>'lfarmid'],
