@@ -111,50 +111,68 @@ sub qcheckRecord
             $sslstate="Check OK";
             if (ref($res->{sslcert}) eq "HASH" && 
                 $res->{sslcert}->{exitcode} eq "0"){
-               $forcedupd->{sslbegin}=$self->getParent->ExpandTimeExpression(
-                  $res->{sslcert}->{ssl_cert_begin},'en','GMT');
-               $forcedupd->{sslend}=$self->getParent->ExpandTimeExpression(
-                  $res->{sslcert}->{ssl_cert_end},'en','GMT');
-               $sslend=$forcedupd->{sslend};
-               $forcedupd->{ssl_cipher}=
-                  $res->{sslcert}->{ssl_cipher};
-               $forcedupd->{ssl_version}=
-                  $res->{sslcert}->{ssl_version};
-               $forcedupd->{ssl_cert_serialno}=
-                  $res->{sslcert}->{ssl_cert_serialno};
-               $forcedupd->{ssl_certdump}=
-                  $res->{sslcert}->{certtree}->[
-                      $#{$res->{sslcert}->{certtree}}]->{name};
-               if ($res->{networkid} ne "" &&
-                   $res->{networkid} ne $networkid &&
-                   ($rec->{ssl_networkid} eq "" ||
-                    $rec->{ssl_networkid} eq "0")){
-                  # no networkarea was defined, and we found one, so we set
-                  # it fix
-                  my $swop=$dataobj->Clone();
-                  $swop->SetFilter({id=>\$rec->{id}}); 
-                  my ($oldrec,$msg)=$swop->getOnlyFirst(qw(ALL)); 
-                  $swop->ValidatedUpdateRecord($oldrec,{
-                     ssl_networkid=>$res->{networkid}
-                  },{id=>\$rec->{id}});
+               if ($res->{sslcert}->{ssl_cert_begin} eq "" ||
+                   $res->{sslcert}->{ssl_cert_end} eq ""){
+                  printf STDERR ("ERROR: missing SSL Cert Data $url\n%s\n",
+                                 Dumper($res));
+               }
+               else{
+                  $forcedupd->{sslbegin}=$self->getParent->ExpandTimeExpression(
+                     $res->{sslcert}->{ssl_cert_begin},'en','GMT');
+                  $forcedupd->{sslend}=$self->getParent->ExpandTimeExpression(
+                     $res->{sslcert}->{ssl_cert_end},'en','GMT');
+                  $sslend=$forcedupd->{sslend};
+                  $forcedupd->{ssl_cipher}=
+                     $res->{sslcert}->{ssl_cipher};
+                  $forcedupd->{ssl_version}=
+                     $res->{sslcert}->{ssl_version};
+                  $forcedupd->{ssl_cert_serialno}=
+                     $res->{sslcert}->{ssl_cert_serialno};
+                  $forcedupd->{ssl_certdump}=
+                     $res->{sslcert}->{certtree}->[
+                         $#{$res->{sslcert}->{certtree}}]->{name};
+                  if ($res->{networkid} ne "" &&
+                      $res->{networkid} ne $networkid &&
+                      ($rec->{ssl_networkid} eq "" ||
+                       $rec->{ssl_networkid} eq "0")){
+                     # no networkarea was defined, and we found one, so we set
+                     # it fix
+                     my $swop=$dataobj->Clone();
+                     $swop->SetFilter({id=>\$rec->{id}}); 
+                     my ($oldrec,$msg)=$swop->getOnlyFirst(qw(ALL)); 
+                     $swop->ValidatedUpdateRecord($oldrec,{
+                        ssl_networkid=>$res->{networkid}
+                     },{id=>\$rec->{id}});
+                  }
                }
             }
          }
          elsif ($res->{exitcode} eq "101"){
+            $sslstate="DNS query error";
             return(undef,{qmsg=>"temporary ERROR: ".$res->{exitmsg}});
          }
-         elsif ($res->{exitcode} eq "100"){
+         elsif ($res->{exitcode} eq "102"){
             $sslstate="invalid DNS name or unkonwn host";
          }
+         elsif ($res->{exitcode} eq "501"){
+            $sslstate="tcp connect error";
+         }
+         elsif ($res->{exitcode} eq "999"){
+            $sslstate="selected network area is not available for ssl checks";
+         }
+         elsif ($res->{exitcode} eq "9999"){
+            $sslstate="unable to find network area for ssl checks";
+         }
          else{
-            return(undef,{
-               qmsg=>"ERROR: unknon problem while itil::lib::Listedit::probeUrl"
-            });
+            my $msg="unknon problem (exitcode=$res->{exitcode}) ".
+                    "while itil::lib::Listedit::probeUrl";
+            msg(ERROR,$msg." while check $url");
+            return(undef,{ qmsg=>$msg });
          }
       }
       else{
          return(undef,{
-            qmsg=>"ERROR: interal itil::lib::Listedit::probeUrl problem"
+            qmsg=>"ERROR: internal itil::lib::Listedit::probeUrl problem"
          });
       }
       $forcedupd->{sslstate}=$sslstate;

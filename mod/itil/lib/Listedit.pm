@@ -329,7 +329,7 @@ $ua->timeout(60);
 $ua->agent("Mozilla/5.0 (X11; U; Linux i686; de-AT; rv:1.8.1.4) Gecko/20070509 SeaMonkey/1.1.2");
 ');
       if ($@ ne ""){
-         $d->{exitcode}=100;
+         $d->{exitcode}=1100;
          $d->{exitmsg}=$@;
       }
       else{
@@ -356,14 +356,14 @@ $ua->agent("Mozilla/5.0 (X11; U; Linux i686; de-AT; rv:1.8.1.4) Gecko/20070509 S
          if ($res eq ""){
             msg(ERROR,"can not contact probeip url '$url' at ".
                       "network '$nrec->{name}'");
-            $d->{exitcode}=101;
+            $d->{exitcode}=1101;
             $d->{exitmsg}="probeip url not accessable";
             return($d);
          }
          my $rdata;
          eval("use JSON; \$rdata=decode_json(\$res);");
          if ($@ ne ""){
-            $d->{exitcode}=200;
+            $d->{exitcode}=1200;
             $d->{exitmsg}=$@;
          }
          if (ref($rdata) eq "HASH"){
@@ -375,7 +375,7 @@ $ua->agent("Mozilla/5.0 (X11; U; Linux i686; de-AT; rv:1.8.1.4) Gecko/20070509 S
             }
          }
          else{
-            $d->{exitcode}=101;
+            $d->{exitcode}=1201;
             msg(ERROR,"invalid JSON response from probeip ".
                       "url '$probeipurl' at ".
                       "network '$nrec->{name}' while query to '$url'");
@@ -416,7 +416,7 @@ sub probeUrl
          }
       }
       return({
-         exitcode=>91,
+         exitcode=>9999,
          exitmsg=>"ERROR: unable to find url in any networkarea"
       });
    }
