@@ -148,8 +148,10 @@ while ( ($k,$v) = each(%ssl3ciphers) ) {
 package main;
 
 
+my $r={};
 my $q=new CGI();
 my @CERTBuffer;
+my $ScriptTimeout=30;
 
 if (request_method() eq "POST"){
    ProbeIP();
@@ -163,6 +165,35 @@ else{
 exit(0);
 
 
+sub outputResults
+{
+   foreach my $k (keys(%$r)){
+      if (ref($r->{$k}) eq "HASH"){
+         if (exists($r->{$k}->{exitcode}) && 
+             $r->{$k}->{exitcode} ne "0"){
+            if ($r->{exitcode}<$r->{$k}->{exitcode}){
+               $r->{exitcode}=$r->{$k}->{exitcode};
+               if (defined($r->{$k}->{exitmsg})){
+                  $r->{exitmsg}=$r->{$k}->{exitmsg};
+               }
+            }
+         }
+      }
+   }
+   if (!exists($r->{exitcode})){
+      $r->{exitcode}=0;
+   }
+   my $t2=Time::HiRes::time();
+   $r->{duration}=$t2-$t1;
+
+   print to_json($r,{ 
+      utf8=>1, 
+      pretty=>1 
+   });
+}
+
+
+
 sub ProbeIP()
 {
    $|=1;
@@ -171,13 +202,13 @@ sub ProbeIP()
       -expires=>'+10s',
       -charset=>'utf-8'
    );
-   my $r={};
 
    my $uri=new URI($q->param("url"));
    $SIG{ALRM}=sub{
-      die("W5ProbeIP timeout for $uri");
+      outputResults();
+      die("W5ProbeIP timeout for $uri after $ScriptTimeout seconds");
    };
-   alarm(30);
+   alarm($ScriptTimeout);
 
    my $scheme=$uri->scheme();
    if (ref($uri) ne "URI::_foreign"){
@@ -217,26 +248,7 @@ sub ProbeIP()
    do_SSLCIPHERS($r)   if (grep(/^SSLCIPHERS$/,@operation));
    do_REVDNS($r)       if (grep(/^REVDNS$/,@operation));
    do_IPCONNECT($r)    if (grep(/^IPCONNECT$/,@operation));
-   foreach my $k (keys(%$r)){
-      if (ref($r->{$k}) eq "HASH"){
-         if (exists($r->{$k}->{exitcode}) && 
-             $r->{$k}->{exitcode} ne "0"){
-            if ($r->{exitcode}<$r->{$k}->{exitcode}){
-               $r->{exitcode}=$r->{$k}->{exitcode};
-            }
-         }
-      }
-   }
-   if (!exists($r->{exitcode})){
-      $r->{exitcode}=0;
-   }
-   my $t2=Time::HiRes::time();
-   $r->{duration}=$t2-$t1;
-
-   print to_json($r,{ 
-      utf8=>1, 
-      pretty=>1 
-   });
+   outputResults();
 }
 
 sub do_DNSRESOLV
@@ -388,6 +400,8 @@ sub do_SSLCERT
        sprintf("Step1: try to connect to %s:%s SSLv23",$host,$port));
    $ENV{"HTTPS_VERSION"}="3";
 
+   $r->{sslcert}->{exitcode}=199;
+   $r->{sslcert}->{exitmsg}="connect timeout after $ScriptTimeout seconds";
    @CERTBuffer=();
    my $sock = IO::Socket::SSL->new(
       PeerAddr=>"$host:$port",
@@ -433,6 +447,8 @@ sub do_SSLCERT
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
       }
    }
+   delete($r->{sslcert}->{exitcode}); # remove timeout flag
+   delete($r->{sslcert}->{exitmsg});
    if (defined($sock)){
       my $cert = $sock->peer_certificate();
       if ($cert){
@@ -518,7 +534,7 @@ sub do_SSLCIPHERS
       push(@{$r->{sslcert}->{log}},
           sprintf("Step0: generic tcp connect check %s:%s",$host,$port));
       $r->{sslciphers}->{error}="can not tcp connect to $host:$port";
-      $r->{sslciphers}->{exitcode}=1;
+      $r->{sslciphers}->{exitcode}=199;
       return;
    }
    my $sock = IO::Socket::SSL->new(   # first try a simple SSL Connect

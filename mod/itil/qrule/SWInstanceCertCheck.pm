@@ -163,6 +163,10 @@ sub qcheckRecord
          elsif ($res->{exitcode} eq "9999"){
             $sslstate="unable to find network area for ssl checks";
          }
+         elsif ($res->{exitcode} eq "199"){
+            $sslstate=$res->{exitmsg};
+            $sslstate="generel problem while ProbeIP" if ($sslstate eq "");
+         }
          else{
             my $msg="unknon problem (exitcode=$res->{exitcode}) ".
                     "while itil::lib::Listedit::probeUrl";
