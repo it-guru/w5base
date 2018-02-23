@@ -134,7 +134,8 @@ sub qcheckRecord
          }
       }
       elsif ($res->{exitcode} eq "101"){
-         return(undef,{qmsg=>"temporary ERROR: ".$res->{exitmsg}});
+         my $msg="can not resolv hostname";
+         return(3,{qmsg=>$msg,dataissue=>$msg});
       }
       else{
          return(undef,{

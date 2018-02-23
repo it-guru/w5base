@@ -54,6 +54,7 @@ sub new
                 name          =>'id',
                 label         =>'URL ID',
                 searchable    =>0,
+                group         =>'source',
                 dataobjattr   =>'accessurl.id'),
       new kernel::Field::RecordUrl(),
                                                  
@@ -131,7 +132,8 @@ sub new
                 name          =>'lnkapplappl',
                 group         =>'urlinfo',
                 readonly      =>1,
-                label         =>'Interface',
+                htmldetail    =>'NotEmpty',
+                label         =>'derivated from Interface',
                 vjointo       =>'itil::lnkapplappl',
                 vjoinon       =>['lnkapplapplid'=>'id'],
                 vjoindisp     =>'fullname'),
