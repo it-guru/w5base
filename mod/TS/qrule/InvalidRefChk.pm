@@ -164,8 +164,21 @@ sub setReferencesToNull
                      my $o=getModuleObject($dataobj->Config,"base::user");
                      $o->SetFilter({userid=>\$lastbossid});
                      my ($newbossrec,$msg)=$o->getOnlyFirst(qw(usertyp 
-                                                               cistatusid)); 
+                                                               cistatusid
+                                                               groups)); 
+                     my $is_currently_boss=0;
+                     if (ref($newbossrec) eq "HASH" &&
+                         ref($newbossrec->{groups}) eq "ARRAY"){
+                        foreach my $grprec (@{$newbossrec->{groups}}){
+                           if (ref($grprec->{roles}) eq "ARRAY" &&
+                               grep(/^RBoss$/,@{$grprec->{roles}})){
+                              $is_currently_boss++;
+                           }
+                        }
+                     }
+
                      if (defined($newbossrec) &&
+                         $is_currently_boss>0 &&
                          $newbossrec->{cistatusid} eq "4" &&
                          $newbossrec->{usertyp} eq "user"){
                         my $bk=$dataobj->UpdateRecord({

@@ -1188,7 +1188,8 @@ sub postQualityCheckRecord
       my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
       $lnk->SetFilter({userid=>\$userid,rawnativroles=>[orgRoles()]});
       my @grp;
-      foreach my $lnkrec ($lnk->getHashList(qw(grpid nativroles))){
+      my @orggroups=$lnk->getHashList(qw(grpid nativroles));
+      foreach my $lnkrec (@orggroups){
          my $roles=$lnkrec->{nativroles};
          $roles=[$roles] if (ref($roles) ne "ARRAY");
          $roles=[map({$_->{nativrole}} @{$roles})];
@@ -1212,8 +1213,10 @@ sub postQualityCheckRecord
          }
       }
       my $boss=join(" ",sort(grep(!/^$userid$/,keys(%boss))));
-      if ($boss ne "" && $boss ne $rec->{lastknownbossid}){
+      if (($boss ne "" || $#orggroups!=-1)  && 
+          $boss ne $rec->{lastknownbossid}){
          #printf STDERR ("Info: Update lastknownbossid on $userid to $boss\n");
+         $boss=undef if ($boss eq "");
          my $op=$self->Clone();
          $op->ValidatedUpdateRecord($rec,{lastknownbossid=>$boss},
                                     {userid=>\$userid});
