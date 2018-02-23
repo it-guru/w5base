@@ -1,0 +1,10 @@
+'itil::workflow::processreq'=>{de=>'ITIL Support/Anfrage an das Prozess-Management',
+                               en=>'ITIL Support/Request to the Processmanagement'},
+'itil::workflow::processreq::tip'=>{
+   de=>'Dieser Text müsste dann mit Sorgfalt durch Zusammenarbeit von '.
+       'Peter/Carina/Hartmut/Markus/Anja erstellt werden.'
+},
+'IT business process'=>{de=>'IT Geschäftsprozess'},
+'Could not find a responsible contact'=>{
+   de=>'Es konnte kein zuständiger Kontakt gefunden werden'
+},

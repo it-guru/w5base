@@ -174,6 +174,18 @@ sub new
                 name          =>'processowner2id',
                 dataobjattr   =>'businessprocess.processowner2'),
 
+      new kernel::Field::Text(
+                name          =>'processmgrrole',
+                label         =>'Processmanager (native)',
+                group         =>'procroles',
+                dataobjattr   =>'businessprocess.processmgrrole'),
+
+      new kernel::Field::Text(
+                name          =>'processmgr2role',
+                label         =>'Processmanager deputy (native)',
+                group         =>'procroles',
+                dataobjattr   =>'businessprocess.processmgr2role'),
+
       new kernel::Field::Select(
                 name          =>'customerprio',
                 group         =>'procdesc',
@@ -625,11 +637,15 @@ sub isWriteValid
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   return("default","procdesc","misc","acl") if (!defined($rec) ||
+
+   my @admedit;
+   @admedit=("procroles") if ($self->IsMemberOf("admin"));
+
+   return("default","procdesc","misc","acl",@admedit) if (!defined($rec) ||
                          ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
                          $self->IsMemberOf($self->{CI_Handling}->{activator}));
 
-   my @databossedit=qw(default procdesc misc acl);
+   my @databossedit=("default","procdesc","misc","acl",@admedit);
 
    if ($rec->{databossid}==$userid ||
        $self->IsMemberOf($self->{CI_Handling}->{activator})){
@@ -654,7 +670,7 @@ sub isWriteValid
          }
       }
    }
-   return($self->expandByDataACL($rec->{mandatorid}));
+   return($self->expandByDataACL($rec->{mandatorid}),@admedit);
 }
 
 

@@ -549,6 +549,62 @@ sub getInitiatorGroupsOf
 }
 
 
+sub getGroupsByRoles
+{
+   my $self=shift;
+   my $grpid=shift;
+   my $roles=shift;
+   my $maxdistance=shift;
+
+   my $distance=0;
+   my %res;
+
+   $roles=[$roles] if (ref($roles) ne 'ARRAY');
+   @$roles=grep(!/^\s*$/,@$roles);
+
+   my $grp=$self->getPersistentModuleObject('base::grp');
+   my $userrole=$self->getPersistentModuleObject('base::lnkgrpuserrole');
+   $userrole->SetCurrentView(qw(nativrole cdate
+                                grpid grpfullname
+                                userid userfullname));
+
+   while (defined($grpid) && $grpid ne '' &&
+          !(defined($maxdistance) && $distance>$maxdistance)) {
+      $userrole->ResetFilter();
+      $userrole->SetFilter({cistatusid=>\4,
+                            grpcistatusid=>\4,
+                            grpid=>\$grpid,
+                            nativrole=>$roles});
+      my $lnk=$userrole->getHashIndexed(qw(nativrole));
+
+      $grp->ResetFilter();
+      $grp->SetFilter({grpid=>\$grpid});
+      my ($curgrp,$msg)=$grp->getOnlyFirst(qw(parentid description));
+
+      if (defined($lnk->{nativrole})) {
+         my %roles;
+         foreach my $role (keys(%{$lnk->{nativrole}})) {
+            if (ref($lnk->{nativrole}->{$role}) ne 'ARRAY') {
+               $lnk->{nativrole}->{$role}=[$lnk->{nativrole}->{$role}];
+            }
+
+            my @sorted=sort {$b->{cdate} cmp $a->{cdate}}
+                             @{$lnk->{nativrole}->{$role}};
+            $roles{$role}=\@sorted;
+         }
+         $res{$grpid}->{roles}=\%roles;
+         $res{$grpid}->{distance}=$distance;
+         $res{$grpid}->{description}=$curgrp->{description};
+      }
+
+      $grpid=$curgrp->{parentid};
+      $distance++;
+   }
+
+   return(%res);
+}
+
+
 sub getGroupsOf
 {
    my $self=shift;
