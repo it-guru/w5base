@@ -197,7 +197,7 @@ sub qcheckRecord
          }
 
          my $ok=$self->itil::lib::Listedit::handleCertExpiration(
-                                     $dataobj,$rec,undef,undef,
+                                     $dataobj,$oldrec,undef,undef,
                                      \@qmsg,\@dataissue,\$errorlevel,
                                      {expnotifyfld=>'sslexpnotify1',
                                       expdatefld=>'sslend'});
