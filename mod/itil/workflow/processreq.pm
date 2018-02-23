@@ -277,5 +277,14 @@ sub nativProcess
 }
 
 
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return("300");
+}
+
+
 
 1;
