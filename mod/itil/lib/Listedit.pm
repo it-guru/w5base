@@ -403,16 +403,27 @@ sub probeUrl
    my $networkid=shift;
 
    if ($networkid ne "" && $networkid ne "0"){
-      return(_probeUrl($self,$url,$checks,$networkid));
+      my $tempchk=_probeUrl($self,$url,$checks,$networkid);
+      if (ref($tempchk) eq "HASH" &&
+          $tempchk->{exitcode} eq "502"   # Bad Gateway
+         ){  # sleep some time and make a second try
+         sleep(10);
+         $tempchk=_probeUrl($self,$url,$checks,$networkid);
+      }
+      return($tempchk);
+
+
    }
    else{
       my $na=getModuleObject($self->Config,"itil::network");
       $na->SetFilter({cistatusid=>'4',probeipurl=>'!""'});
       foreach my $netrec ($na->getHashList(qw(ALL))){
-         my $tempchk=_probeUrl($self,$url,$checks,$netrec->{id});
-         if (ref($tempchk) eq "HASH" &&
-             $tempchk->{exitcode} eq "0" ){
-            return($tempchk);
+         if ($netrec->{id} ne "0" && $netrec->{id} ne ""){
+            my $tempchk=probeUrl($self,$url,$checks,$netrec->{id});
+            if (ref($tempchk) eq "HASH" &&
+                $tempchk->{exitcode} eq "0" ){
+               return($tempchk);
+            }
          }
       }
       return({

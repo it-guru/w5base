@@ -113,8 +113,8 @@ sub qcheckRecord
                 $res->{sslcert}->{exitcode} eq "0"){
                if ($res->{sslcert}->{ssl_cert_begin} eq "" ||
                    $res->{sslcert}->{ssl_cert_end} eq ""){
-                  printf STDERR ("ERROR: missing SSL Cert Data $url\n%s\n",
-                                 Dumper($res));
+                  printf STDERR ("ERROR: missing SSL start/end data ".
+                                 "in $url\n%s\n",Dumper($res));
                }
                else{
                   $forcedupd->{sslbegin}=$self->getParent->ExpandTimeExpression(
@@ -154,7 +154,10 @@ sub qcheckRecord
          elsif ($res->{exitcode} eq "102"){
             $sslstate="invalid DNS name or unkonwn host";
          }
-         elsif ($res->{exitcode} eq "501"){
+         elsif ($res->{exitcode} eq "201"){
+            $sslstate="unable to create ssl connection to host";
+         }
+         elsif ($res->{exitcode} eq "51"){
             $sslstate="tcp connect error";
          }
          elsif ($res->{exitcode} eq "999"){
@@ -191,7 +194,7 @@ sub qcheckRecord
 
 
       if ($sslstate=~m/OK/){
-         if (!defined($sslend)){
+         if (!defined($oldrec->{sslend}) || $oldrec->{sslend} eq ""){
             my $m="SSL check: invalid or undefined sslend returend";
             return(3,{qmsg=>[$m],dataissue=>[$m]});
          }

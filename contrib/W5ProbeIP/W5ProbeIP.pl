@@ -412,7 +412,7 @@ sub do_SSLCERT
       push(@{$r->{sslcert}->{log}},
           sprintf("Step0: generic tcp connect check %s:%s",$host,$port));
       $r->{sslcert}->{error}="can not tcp connect to $host:$port";
-      $r->{sslcert}->{exitcode}=501;
+      $r->{sslcert}->{exitcode}=51;
       return;
    }
 
@@ -747,7 +747,7 @@ sub do_IPCONNECT
    }
    else{
       $r->{ipconnect}->{open}=0;
-      $r->{ipconnect}->{exitcode}=501;
+      $r->{ipconnect}->{exitcode}=51;
    }
    if ($ENV{W5ProbeIP_SourceIP} ne ""){
       $r->{ipconnect}->{sourceip}=$ENV{W5ProbeIP_SourceIP};
