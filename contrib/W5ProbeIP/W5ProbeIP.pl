@@ -399,9 +399,8 @@ sub do_SSLCERT
       return;
    }
 
-   push(@{$r->{sslcert}->{log}},
-       sprintf("Step1: try to connect to %s:%s SSLv23",$host,$port));
-   $ENV{"HTTPS_VERSION"}="3";
+   #push(@{$r->{sslcert}->{log}},
+   #    sprintf("Step1: try to connect to %s:%s SSLv23",$host,$port));
 
    $r->{sslcert}->{exitcode}=199;
    $r->{sslcert}->{exitmsg}="connect timeout after $ScriptTimeout seconds";
@@ -412,15 +411,34 @@ sub do_SSLCERT
    if (!defined($sock) && $#CERTBuffer==-1){
       $step++;
       push(@{$r->{sslcert}->{log}},
+          sprintf("Step${step}: try to connect to %s:%s auto",$host,$port));
+      $sock = IO::Socket::SSL->new(
+         PeerAddr=>"$host:$port",
+         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         Timeout=>10,
+         SSL_verify_callback=>\&preConnectReadServerCerts,
+         SSL_session_cache_size=>0
+      );
+      if (!defined($sock)){
+         push(@{$r->{sslcert}->{log}},
+             sprintf("->result=%s",IO::Socket::SSL->errstr()));
+      }
+   }
+
+   if (!defined($sock) && $#CERTBuffer==-1){
+      $step++;
+      push(@{$r->{sslcert}->{log}},
           sprintf("Step${step}: try to connect to %s:%s SSLv3",$host,$port));
+      $ENV{"HTTPS_VERSION"}="3";
       $sock = IO::Socket::SSL->new(
          PeerAddr=>"$host:$port",
          SSL_version=>'SSLv3',
          SSL_verify_mode=>'SSL_VERIFY_PEER',
-         Timeout=>5,
+         Timeout=>10,
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
       );
+      delete($ENV{"HTTPS_VERSION"});
       if (!defined($sock)){
          push(@{$r->{sslcert}->{log}},
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
@@ -455,7 +473,7 @@ sub do_SSLCERT
          PeerAddr=>"$host:$port",
          SSL_version=>'TLSv11',
          SSL_verify_mode=>'SSL_VERIFY_PEER',
-         Timeout=>5,
+         Timeout=>10,
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
       );
@@ -475,7 +493,7 @@ sub do_SSLCERT
          SSL_version=>'SSLv2',
          SSL_verify_mode=>'SSL_VERIFY_PEER',
          SSL_verify_callback=>\&preConnectReadServerCerts,
-         Timeout=>5,
+         Timeout=>10,
          SSL_session_cache_size=>0
       );
       if (!defined($sock) && $#CERTBuffer==-1){
@@ -492,7 +510,7 @@ sub do_SSLCERT
          PeerAddr=>"$host:$port",
          SSL_version=>'SSLv23',
          SSL_verify_mode=>'SSL_VERIFY_PEER',
-         Timeout=>5,
+         Timeout=>10,
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
       );
