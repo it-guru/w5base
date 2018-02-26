@@ -558,16 +558,34 @@ sub do_SSLCERT
       }
       if (1){
          my $certdump;
-         eval('$certdump=$sock->dump_peer_certificate();');
-         $r->{sslcert}->{ssl_certdump}=$certdump if ($@ eq "");
+         if (!$sock->can("dump_peer_certificate")){
+            push(@{$r->{sslcert}->{log}},
+             "missing dump_peer_certificate in $sock to get cert details");
+         }
+         else{
+            eval('$certdump=$sock->dump_peer_certificate();');
+            $r->{sslcert}->{ssl_certdump}=$certdump if ($@ eq "");
+         }
      
          my $version;
-         eval('$version = $sock->get_sslversion();');
-         $r->{sslcert}->{ssl_version}=$version if ($@ eq "");
+         if (!$sock->can("get_sslversion")){
+            push(@{$r->{sslcert}->{log}},
+             "missing get_sslversion in $sock to get cert details");
+         }
+         else{
+            eval('$version = $sock->get_sslversion();');
+            $r->{sslcert}->{ssl_version}=$version if ($@ eq "");
+         }
      
          my $cipher;
-         eval('$cipher=$sock->get_cipher();');
-         $r->{sslcert}->{ssl_cipher}=$cipher if ($@ eq "");
+         if (!$sock->can("get_cipher")){
+            push(@{$r->{sslcert}->{log}},
+             "missing get_cipher in $sock to get cert details");
+         }
+         else{
+            eval('$cipher=$sock->get_cipher();');
+            $r->{sslcert}->{ssl_cipher}=$cipher if ($@ eq "");
+         }
       }
 
       if ($#CERTBuffer!=-1){
