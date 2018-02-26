@@ -149,6 +149,7 @@ package main;
 
 
 my $r={};
+my $t1;
 my $q=new CGI();
 my @CERTBuffer;
 my $ScriptTimeout=30;
@@ -184,6 +185,8 @@ sub outputResults
       $r->{exitcode}=0;
    }
    my $t2=Time::HiRes::time();
+   $r->{startunixtime}=$t1;
+   $r->{endunixtime}=$t2;
    $r->{duration}=$t2-$t1;
 
    print to_json($r,{ 
@@ -241,7 +244,7 @@ sub ProbeIP()
       }
 
    }
-   my $t1=Time::HiRes::time();
+   $t1=Time::HiRes::time();
    my @operation=$q->param("operation");
    do_DNSRESOLV($r)    if (grep(/^DNSRESOLV$/,@operation));
    do_SSLCERT($r)      if (grep(/^SSLCERT$/,@operation));
@@ -403,34 +406,9 @@ sub do_SSLCERT
    $r->{sslcert}->{exitcode}=199;
    $r->{sslcert}->{exitmsg}="connect timeout after $ScriptTimeout seconds";
    @CERTBuffer=();
-   my $sock = IO::Socket::SSL->new(
-      PeerAddr=>"$host:$port",
-      SSL_version=>'SSLv23',
-      SSL_verify_mode=>'SSL_VERIFY_PEER',
-      Timeout=>5,
-      SSL_verify_callback=>\&preConnectReadServerCerts,
-      SSL_session_cache_size=>0
-   );
-   if (!defined($sock) && $#CERTBuffer==-1){
-      push(@{$r->{sslcert}->{log}},
-          sprintf("->result=%s",IO::Socket::SSL->errstr()));
-   }
-   if (!defined($sock) && $#CERTBuffer==-1){
-      push(@{$r->{sslcert}->{log}},
-          sprintf("Step2: try to connect to %s:%s SSLv2",$host,$port));
-      $sock = IO::Socket::SSL->new(
-         PeerAddr=>"$host:$port",
-         SSL_version=>'SSLv2',
-         SSL_verify_mode=>'SSL_VERIFY_PEER',
-         SSL_verify_callback=>\&preConnectReadServerCerts,
-         Timeout=>5,
-         SSL_session_cache_size=>0
-      );
-      if (!defined($sock) && $#CERTBuffer==-1){
-         push(@{$r->{sslcert}->{log}},
-             sprintf("->result=%s",IO::Socket::SSL->errstr()));
-      }
-   }
+
+
+
    if (!defined($sock) && $#CERTBuffer==-1){
       push(@{$r->{sslcert}->{log}},
           sprintf("Step3: try to connect to %s:%s SSLv3",$host,$port));
@@ -447,6 +425,44 @@ sub do_SSLCERT
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
       }
    }
+
+
+   if (!defined($sock) && $#CERTBuffer==-1){
+      push(@{$r->{sslcert}->{log}},
+          sprintf("Step2: try to connect to %s:%s SSLv2",$host,$port));
+      $sock = IO::Socket::SSL->new(
+         PeerAddr=>"$host:$port",
+         SSL_version=>'SSLv2',
+         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         SSL_verify_callback=>\&preConnectReadServerCerts,
+         Timeout=>5,
+         SSL_session_cache_size=>0
+      );
+      if (!defined($sock) && $#CERTBuffer==-1){
+         push(@{$r->{sslcert}->{log}},
+             sprintf("->result=%s",IO::Socket::SSL->errstr()));
+      }
+   }
+
+
+   if (!defined($sock) && $#CERTBuffer==-1){
+      my $sock = IO::Socket::SSL->new(
+         PeerAddr=>"$host:$port",
+         SSL_version=>'SSLv23',
+         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         Timeout=>5,
+         SSL_verify_callback=>\&preConnectReadServerCerts,
+         SSL_session_cache_size=>0
+      );
+      if (!defined($sock) && $#CERTBuffer==-1){
+         push(@{$r->{sslcert}->{log}},
+             sprintf("->result=%s",IO::Socket::SSL->errstr()));
+      }
+   }
+
+
+
+
    delete($r->{sslcert}->{exitcode}); # remove timeout flag
    delete($r->{sslcert}->{exitmsg});
    if (defined($sock)){
