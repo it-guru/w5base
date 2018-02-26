@@ -582,7 +582,7 @@ sub do_SSLCERT
          }
      
          my $version;
-         if (!$sock->can("get_sslversion")){
+         if (!$sock->can("get_sslversion")){   # IO::Socket::SSL 1.964 needed!
             push(@{$r->{sslcert}->{log}},
              "missing get_sslversion in $sock to get cert details");
          }
