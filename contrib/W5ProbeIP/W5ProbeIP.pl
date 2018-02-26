@@ -348,12 +348,21 @@ sub do_SSLCERT
    my $host=$r->{target}->{host};
    my $port=$r->{target}->{port};
 
-   foreach my $mod (qw( IO::Socket::SSL Net::SSLeay IO::Socket::INET IO::Socket::INET6
-                    DateTime HTTP::Date Date::Parse)){
+
+   foreach my $mod (qw( IO::Socket::SSL Net::SSLeay IO::Socket::INET 
+                        IO::Socket::INET6
+                        DateTime HTTP::Date Date::Parse)){
       eval("use $mod;");
       if ($@ ne ""){
          printf STDERR ("W5ProbeIO: fail to load $mod for do_SSLCERT\n");
+         $r->{sslcert}->{error}="W5ProbeIP Installation problem - missing ".
+                                "module $mod";
+         $r->{sslcert}->{exitcode}=1;
+         return();
       }
+      my $v;
+      eval("\$v=\$${mod}::VERSION;");
+      push(@{$r->{sslcert}->{log}},"use module $mod in version $v");
    }
 
    sub unpackCert
@@ -554,7 +563,12 @@ sub do_SSLCERT
    if (defined($sock)){
       my $cert = $sock->peer_certificate();
       if ($cert){
-         $r->{sslcert}=unpackCert($cert);
+         my $C=unpackCert($cert);
+         if (ref($C) eq "HASH"){
+            foreach my $k (keys(%$C)){
+               $r->{sslcert}->{$k}=$C->{$k};
+            }
+         }
       }
       if (1){
          my $certdump;
