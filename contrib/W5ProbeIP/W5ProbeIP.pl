@@ -206,7 +206,8 @@ sub ProbeIP()
       -charset=>'utf-8'
    );
 
-   my $uri=new URI($q->param("url"));
+   my $url=$q->param("url");
+   my $uri=new URI($url);
    $SIG{ALRM}=sub{
       outputResults();
       die("W5ProbeIP timeout for $uri after $ScriptTimeout seconds");
@@ -245,7 +246,7 @@ sub ProbeIP()
 
    }
    $t1=Time::HiRes::time();
-   my @operation=$q->param("operation");
+   my @operation=$q->multi_param("operation");
    do_DNSRESOLV($r)    if (grep(/^DNSRESOLV$/,@operation));
    do_SSLCERT($r)      if (grep(/^SSLCERT$/,@operation));
    do_SSLCIPHERS($r)   if (grep(/^SSLCIPHERS$/,@operation));
@@ -341,12 +342,13 @@ sub do_SSLCERT
    my $host=$r->{target}->{host};
    my $port=$r->{target}->{port};
 
-   eval('use IO::Socket::SSL;');
-   eval('use Net::SSLeay;');
-   eval('use IO::Socket::INET;');
-   eval('use IO::Socket::INET6;');
-   eval('use DateTime;');
-   eval('use Date::Parse;');
+   foreach my $mod (qw( IO::Socket::SSL Net::SSLeay IO::Socket::INET IO::Socket::INET6
+                    DateTime HTTP::Date Date::Parse)){
+      eval("use $mod;");
+      if ($@ ne ""){
+         printf STDERR ("W5ProbeIO: fail to load $mod for do_SSLCERT\n");
+      }
+   }
 
    sub unpackCert
    {
@@ -395,7 +397,7 @@ sub do_SSLCERT
       push(@{$r->{sslcert}->{log}},
           sprintf("Step0: generic tcp connect check %s:%s",$host,$port));
       $r->{sslcert}->{error}="can not tcp connect to $host:$port";
-      $r->{sslcert}->{exitcode}=1;
+      $r->{sslcert}->{exitcode}=501;
       return;
    }
 
@@ -412,13 +414,16 @@ sub do_SSLCERT
       $step++;
       push(@{$r->{sslcert}->{log}},
           sprintf("Step${step}: try to connect to %s:%s auto",$host,$port));
-      $sock = IO::Socket::SSL->new(
+      eval('$sock = IO::Socket::SSL->new(
          PeerAddr=>"$host:$port",
-         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         SSL_verify_mode=>SSL_VERIFY_PEER,
          Timeout=>10,
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
-      );
+      );');
+      if ($@ ne ""){
+         printf STDERR ("W5ProbeIP IO::Socket::SSL->new step${step} = $@\n");
+      }
       if (!defined($sock)){
          push(@{$r->{sslcert}->{log}},
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
@@ -430,14 +435,17 @@ sub do_SSLCERT
       push(@{$r->{sslcert}->{log}},
           sprintf("Step${step}: try to connect to %s:%s SSLv3",$host,$port));
       $ENV{"HTTPS_VERSION"}="3";
-      $sock = IO::Socket::SSL->new(
+      eval('$sock = IO::Socket::SSL->new(
          PeerAddr=>"$host:$port",
-         SSL_version=>'SSLv3',
-         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         SSL_version=>"SSLv3",
+         SSL_verify_mode=>SSL_VERIFY_PEER,
          Timeout=>10,
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
-      );
+      );');
+      if ($@ ne ""){
+         printf STDERR ("W5ProbeIP IO::Socket::SSL->new step${step} = $@\n");
+      }
       delete($ENV{"HTTPS_VERSION"});
       if (!defined($sock)){
          push(@{$r->{sslcert}->{log}},
@@ -458,6 +466,9 @@ sub do_SSLCERT
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
       );
+      if ($@ ne ""){
+         printf STDERR ("W5ProbeIP IO::Socket::SSL->new step${step} = $@\n");
+      }
       if (!defined($sock)){
          push(@{$r->{sslcert}->{log}},
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
@@ -469,14 +480,17 @@ sub do_SSLCERT
       $step++;
       push(@{$r->{sslcert}->{log}},
           sprintf("Step${step}: try to connect to %s:%s TLSv11",$host,$port));
-      $sock = IO::Socket::SSL->new(
+      eval('$sock = IO::Socket::SSL->new(
          PeerAddr=>"$host:$port",
-         SSL_version=>'TLSv11',
-         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         SSL_version=>"TLSv11",
+         SSL_verify_mode=>SSL_VERIFY_PEER,
          Timeout=>10,
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
-      );
+      );');
+      if ($@ ne ""){
+         printf STDERR ("W5ProbeIP IO::Socket::SSL->new step${step} = $@\n");
+      }
       if (!defined($sock)){
          push(@{$r->{sslcert}->{log}},
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
@@ -488,14 +502,17 @@ sub do_SSLCERT
       $step++;
       push(@{$r->{sslcert}->{log}},
           sprintf("Step${step}: try to connect to %s:%s SSLv2",$host,$port));
-      $sock = IO::Socket::SSL->new(
+      eval('$sock = IO::Socket::SSL->new(
          PeerAddr=>"$host:$port",
-         SSL_version=>'SSLv2',
-         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         SSL_version=>"SSLv2",
+         SSL_verify_mode=>SSL_VERIFY_PEER,
          SSL_verify_callback=>\&preConnectReadServerCerts,
          Timeout=>10,
          SSL_session_cache_size=>0
-      );
+      );');
+      if ($@ ne ""){
+         printf STDERR ("W5ProbeIP IO::Socket::SSL->new step${step} = $@\n");
+      }
       if (!defined($sock) && $#CERTBuffer==-1){
          push(@{$r->{sslcert}->{log}},
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
@@ -506,14 +523,17 @@ sub do_SSLCERT
       $step++;
       push(@{$r->{sslcert}->{log}},
           sprintf("Step${step}: try to connect to %s:%s SSLv23",$host,$port));
-      my $sock = IO::Socket::SSL->new(
+      eval('my $sock = IO::Socket::SSL->new(
          PeerAddr=>"$host:$port",
-         SSL_version=>'SSLv23',
-         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         SSL_version=>"SSLv23",
+         SSL_verify_mode=>SSL_VERIFY_PEER,
          Timeout=>10,
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
-      );
+      );');
+      if ($@ ne ""){
+         printf STDERR ("W5ProbeIP IO::Socket::SSL->new step${step} = $@\n");
+      }
       if (!defined($sock) && $#CERTBuffer==-1){
          push(@{$r->{sslcert}->{log}},
              sprintf("->result=%s",IO::Socket::SSL->errstr()));
@@ -709,7 +729,7 @@ sub canTcpConnect
    my $sock = IO::Socket::INET->new(
       PeerAddr => $host,PeerPort => $port,
       Proto => "tcp",
-      Timeout => 5 
+      Timeout => 15 
    );
    if (defined($sock)){
       if ($ENV{W5ProbeIP_SourceIP} eq ""){
