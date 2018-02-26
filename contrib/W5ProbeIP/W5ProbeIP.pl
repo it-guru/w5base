@@ -246,7 +246,13 @@ sub ProbeIP()
 
    }
    $t1=Time::HiRes::time();
-   my @operation=$q->multi_param("operation");
+   my @operation;
+   if ($q->can("multi_param")){
+      @operation=$q->multi_param("operation");
+   }
+   else{
+      @operation=$q->param("operation");
+   }
    do_DNSRESOLV($r)    if (grep(/^DNSRESOLV$/,@operation));
    do_SSLCERT($r)      if (grep(/^SSLCERT$/,@operation));
    do_SSLCIPHERS($r)   if (grep(/^SSLCIPHERS$/,@operation));
