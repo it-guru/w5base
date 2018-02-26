@@ -341,6 +341,7 @@ $ua->agent("Mozilla/5.0 (X11; U; Linux i686; de-AT; rv:1.8.1.4) Gecko/20070509 S
                $ua->proxy(['http','https'],$probeipproxy);
             }
          }
+         $ua->timeout(200);
          my $req=POST($probeipurl,[url=>$url,operation=>$checks]);
          $req->header('user-agent'=>'Mozilla/5.0 (X11; Linux x86_64)');
          $req->header('Accept'=>'*/*');
@@ -379,6 +380,7 @@ $ua->agent("Mozilla/5.0 (X11; U; Linux i686; de-AT; rv:1.8.1.4) Gecko/20070509 S
             msg(ERROR,"invalid JSON response from probeip ".
                       "url '$probeipurl' at ".
                       "network '$nrec->{name}' while query to '$url'");
+            print STDERR "DEBUG INfo:".Dumper($rdata);
             $d->{exitmsg}="probeip url answers with invalid json data";
          }
       }
