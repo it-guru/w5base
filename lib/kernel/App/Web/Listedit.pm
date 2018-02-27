@@ -576,7 +576,9 @@ sub getParsedSearchTemplate
    if (defined($UserCache->{$ENV{REMOTE_USER}})){
       $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
    }
-   $self->initSearchQuery();
+   if (!$param{nosearch}){      # Search mask needs only to be initialized, if
+      $self->initSearchQuery(); # searchmask is realy useable
+   }
    if (defined($UserCache->{pagelimit}) && $UserCache->{pagelimit} ne ""){
       $pagelimit=$UserCache->{pagelimit};
    }
@@ -618,6 +620,8 @@ EOF
       foreach my $k (keys(%search)){
          my $val=$search{$k};
          $val=~s/"/&quote;/g;
+         $val=~s/</&lt;/g;
+         $val=~s/>/&gt;/g;
          $d.="<input type=hidden value=\"$val\" name=search_$k>";
       }
       return($d);
