@@ -89,6 +89,7 @@ use kernel::Field::CryptText;
 use kernel::Field::TRange;
 use kernel::Field::RecordRights;
 use kernel::Universal;
+use Text::ParseWhere;
 @ISA    = qw(kernel::Universal);
 
 sub new
@@ -580,6 +581,44 @@ sub prepareToSearch
    return($filter);
 }
 
+
+sub interpreteVJOINSubListFilter
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $hflt=shift;
+   my $searchfield=shift;
+
+   my $subfilter;
+
+   if ($searchfield->[0] ne "" && $hflt ne ""){
+      if ($hflt=~m/^[a-z,0-9]+\s*=/ || $hflt=~m/^[0-9]+\s*=/){
+         #$self->getParent->LastMsg(ERROR,
+         #  $self->getParent->T("complex subfilter expression ".
+         #                      "not supported in $self->{name}",
+         #        $self->Self));
+         my $p=new Text::ParseWhere();
+         my ($h,$err)=$p->fltHashFromExpression("SIMPLE",$hflt,$searchfield);
+         if (!defined($h)){
+            $self->getParent->LastMsg(ERROR,"err=$err");
+         }
+         else{
+            $subfilter=$h;
+         }
+      }
+      else{
+         $subfilter={$searchfield->[0]=>$hflt};
+      }
+   }
+   else{
+      $self->getParent->LastMsg(ERROR,
+        $self->getParent->T("invalid sublist filter in field $self->{name}",
+              $self->Self));
+   }
+   return($subfilter);
+}
+
+
 sub preProcessFilter
 {
    my $self=shift;
@@ -596,17 +635,19 @@ sub preProcessFilter
    if (defined($fobj->{vjointo}) && !defined($fobj->{dataobjattr})){
       $fobj->vjoinobj->ResetFilter();
       my $loadfield=$fobj->{vjoinon}->[1];
-      my $searchfield=$fobj->{vjoindisp};
+      my @searchfield;
       if (ref($fobj->{vjoindisp}) eq "ARRAY"){
          for(my $findex=0;$findex<=$#{$fobj->{vjoindisp}};$findex++){
             my $sfobj=$fobj->vjoinobj->getField($fobj->{vjoindisp}->[$findex]);
             if (defined($sfobj)){
                if ($sfobj->Self ne "kernel::Field::DynWebIcon"){
-                  $searchfield=$fobj->{vjoindisp}->[$findex];
-                  last;
+                  push(@searchfield,$fobj->{vjoindisp}->[$findex]);
                }
             }
          }
+      }
+      else{
+         @searchfield=($fobj->{vjoindisp});
       }
       if (defined($fobj->{vjoinbase})){
          my $base=$fobj->{vjoinbase};
@@ -620,18 +661,28 @@ sub preProcessFilter
       }
 
       my @keylist=();
+
+
+      my $subflt=$self->interpreteVJOINSubListFilter($fobj->vjoinobj,
+                                                     $hflt->{$field},
+                                                     \@searchfield);
+      if (!defined($subflt)){
+         return($changed,
+             "error while compilining ".
+             "expression '$hflt->{$field}' for field $self->{name}");
+      }
+
       if (exists($fobj->{vjoinreverse})){
-         my %flt=($searchfield=>$hflt->{$field});
          my $localFld=$fobj->{vjoinreverse}->[0];
          my $remoteFld=$fobj->{vjoinreverse}->[1];
          $fobj->vjoinobj->ResetFilter();
-         if ($fobj->vjoinobj->SetFilter(\%flt)){
+         if ($fobj->vjoinobj->SetFilter($subflt)){
             $fobj->vjoinobj->SetCurrentView($remoteFld);
             delete($hflt->{$field});
             my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
             @keylist=keys(%{$d->{$remoteFld}});
-            if (($flt{$searchfield}=~m/\[LEER\]/) || 
-                ($flt{$searchfield}=~m/\[EMPTY\]/)){
+            if (($hflt->{$field}=~m/\[LEER\]/) || 
+                ($hflt->{$field}=~m/\[EMPTY\]/)){
                push(@keylist,undef,"");
             }
             if ($#keylist==-1){
@@ -649,10 +700,9 @@ sub preProcessFilter
          }
       }
       else{
-         my %flt=($searchfield=>$hflt->{$field});
          my $localFld=$fobj->{vjoinon}->[0];
          my $remoteFld=$fobj->{vjoinon}->[1];
-         if ($fobj->vjoinobj->SetFilter(\%flt)){
+         if ($fobj->vjoinobj->SetFilter($subflt)){
             if (defined($hflt->{$localFld}) &&
                 !defined($self->{dataobjattr})){
                $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
@@ -662,8 +712,8 @@ sub preProcessFilter
             delete($hflt->{$field});
             my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
             @keylist=keys(%{$d->{$remoteFld}});
-            if (($flt{$searchfield}=~m/\[LEER\]/) || 
-                ($flt{$searchfield}=~m/\[EMPTY\]/)){
+            if (($hflt->{$field}=~m/\[LEER\]/) || 
+                ($hflt->{$field}=~m/\[EMPTY\]/)){
                push(@keylist,undef,"");
             }
             if ($#keylist==-1){
@@ -1315,6 +1365,9 @@ sub getFieldHelpUrl
    my $type=$self->Type();
    if ($type=~m/Date$/){
       return("../../base/load/tmpl/FieldHelp.Date");
+   }
+   if ($type=~m/SubList$/){
+      return("../../base/load/tmpl/FieldHelp.SubList");
    }
    if ($self->{FieldHelp} ne "0"){
       return("../../base/load/tmpl/FieldHelp.Default");

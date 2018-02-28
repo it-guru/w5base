@@ -126,6 +126,99 @@ sub _checkSyn
    return(1);
 }
 
+
+   sub _getCurH
+   {
+      my $curh=shift;
+      my $flt=shift;
+       if (!defined($$curh)){
+          $$curh={};
+          push(@$flt,$$curh);
+       }
+       return($$curh);
+   }
+
+
+
+sub fltHashFromExpression
+{
+   my $self=shift;
+   my $mode=shift;  # SIMPLE = like and sql are equal, " and ' makes no diff
+   my $WhereExp=shift;
+   my $fieldlist=shift;
+
+   #
+   # Pass1: parse words
+   #
+   my @w=$self->_parseWords($WhereExp);
+
+
+   #
+   # Pass2: classify element list
+   #
+   my @e=$self->_classifyElements(@w);
+
+   #
+   # Pass3: check syntax and structur 
+   #
+   my @flt=();
+   my $curh=undef;
+
+   
+   while(my $e=shift(@e)){
+      if ($e->{type} eq "COM"){
+         if (!defined($curh)){
+            return(undef,"boolean operation on invalid position");
+         }
+         if (uc($e->{name}) eq "AND"){
+            my $h=_getCurH(\$curh,\@flt);
+         }
+         if (uc($e->{name}) eq "OR"){
+            $curh=undef;
+            my $h=_getCurH(\$curh,\@flt);
+         }
+      }
+      elsif ($e->{type} eq "VARNAME"){
+         if (($e->{name}=~m/^[0-9]+$/) && 
+             $e->{name}==int($e->{name})){
+            if (defined($fieldlist->[int($e->{name})])){
+               $e->{name}=$fieldlist->[int($e->{name})];
+            }
+            else{
+               return(undef,"invalid field index '$e->{name}'");
+            }
+         }
+         if (!grep(/^$e->{name}$/,@$fieldlist)){
+            return(undef,"invalid field name '$e->{name}'");
+         }
+         if (my $op=shift(@e)){
+            if ($op->{type} eq "COM"){
+               if (my $val=shift(@e)){
+                  if ($val->{type} eq "CONST" ||
+                      $val->{type} eq "VALUE"){
+                     if ($mode eq "SIMPLE"){
+                        if ($op->{name} eq "=" ||
+                            $op->{name} eq "like"){
+                           my $h=_getCurH(\$curh,\@flt);
+                           $h->{$e->{name}}=$val->{val};
+                        }
+                        elsif (lc($op->{name}) eq "in"){
+                           return(undef,"comperator 'in' is not ".
+                                        "supported in simple mode");
+                        }
+                     }
+                  }
+               }
+            }
+            else{
+               return(undef,"missing comperator near '$op->{name}'");
+            }
+         }
+      }
+   }
+   return(\@flt);
+}
+
 sub compileExpression
 {
    my $self=shift;
