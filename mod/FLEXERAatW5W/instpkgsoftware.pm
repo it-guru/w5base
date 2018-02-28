@@ -83,7 +83,7 @@ sub new
 #                dataobjattr   =>'CMTS'),
 
       new kernel::Field::Date(
-                name          =>'instdate',
+                name          =>'swinstdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Inst-Date',
