@@ -1339,6 +1339,46 @@ sub new
    return($self);
 }
 
+
+sub getFieldList
+{
+   my $self=shift;
+   my $context=shift;
+
+   my @fobjs=$self->SUPER::getFieldList();
+   if ($context ne "SearchTemplate"){  
+      if ($self->IsMemberOf("admin")){
+         push(@fobjs,"indicol_2345252");
+      }
+   }
+
+   return(@fobjs);
+}
+
+
+sub getField
+{
+   my $self=shift;
+   my $fullfieldname=shift;
+   my $deprec=shift;
+ 
+   if (my ($indicolid)=$fullfieldname=~m/^indicol_([0-9]{5,10})$/){
+      if ($self->IsMemberOf("admin")){
+         my $f=new kernel::Field::Text(
+                      name          =>"indicol_$indicolid",
+                      label         =>'IP-Count',
+                      group         =>'ipaddresses',
+                      dataobjattr   =>"(select count(*) from ".
+                                      "ipaddress where ".
+                                      "system.id=ipaddress.system)");
+         $self->InitFields($f);
+         return($f);
+      }
+   }
+   return($self->SUPER::getField($fullfieldname,$deprec));
+}
+
+
 sub getTeamBossID
 {
    my $self=shift;

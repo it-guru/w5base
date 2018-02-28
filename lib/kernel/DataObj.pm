@@ -3115,7 +3115,7 @@ sub getGroup
 sub getFieldList
 {
    my $self=shift;
-   my %param=@_;
+   my $context=shift;
 
    return() if (!defined($self->{'FieldOrder'}));
    my @fl=(@{$self->{'FieldOrder'}});
@@ -3166,6 +3166,9 @@ sub getFieldObjsByView
          if (exists($self->{'Field'}->{$fieldname})){
             $fobj=$self->{'Field'}->{$fieldname};
          } 
+         if (!defined($fobj)){  # maybe a dynamic user specific field
+            $fobj=$self->getField($fieldname);  # this is needed to allow
+         }                                      # user specific fields
          if (defined($fobj)){
             if ($fobj->Type() eq "Dynamic"){
                my @dlist=$fobj->fields(%param);
@@ -3477,8 +3480,10 @@ sub SetCurrentView
       my $fh=$self->getFieldHash();
       $self->Context->{'CurrentView'}=[];
       foreach my $f ($self->getFieldList()){
-         if ($fh->{$f}->selectable()){
-            push(@{$self->Context->{'CurrentView'}},$f);
+         if (defined($fh->{$f})){
+            if ($fh->{$f}->selectable()){
+               push(@{$self->Context->{'CurrentView'}},$f);
+            }
          }
       }
       @{$self->Context->{'CurrentView'}}=
@@ -3850,7 +3855,15 @@ sub DataObj_findtemplvar
       $fieldbase=$self->getFieldHash(); 
    }
 
+   my $fieldobj;
    if (exists($fieldbase->{$var})){
+      $fieldobj=$fieldbase->{$var};
+   }
+   else{
+      $fieldobj=$self->getField($var);
+   }
+
+   if (defined($fieldobj)){
       my $current=$opt->{current};
       my $defmode=Query->Param("FormatAs");
       my %FOpt=(WindowMode=>$opt->{WindowMode});
@@ -3858,14 +3871,14 @@ sub DataObj_findtemplvar
       my $mode=$defmode;
       $mode=$opt->{mode} if (defined($opt->{mode}));
       if (!defined($param[0])){
-         return($fieldbase->{$var}->RawValue($current));
+         return($fieldobj->RawValue($current));
       }
       if ($param[0] eq "formated" || $param[0] eq "detail" || 
           $param[0] eq "sublistedit" || $param[0] eq "forceedit"){
          if (exists($opt->{viewgroups})){
-            my @fieldgrouplist=($fieldbase->{$var}->{group});
+            my @fieldgrouplist=($fieldobj->{group});
             if (ref($fieldbase->{$var}->{group}) eq "ARRAY"){
-               @fieldgrouplist=@{$fieldbase->{$var}->{group}};
+               @fieldgrouplist=@{$fieldobj->{group}};
             }
             my $viewok=0;
             foreach my $fieldgroup (@fieldgrouplist){
@@ -3879,10 +3892,10 @@ sub DataObj_findtemplvar
             }
          }
          if ($param[0] eq "formated"){
-            my $d=$fieldbase->{$var}->FormatedResult($current,$mode,%FOpt);
+            my $d=$fieldobj->FormatedResult($current,$mode,%FOpt);
             return($d);
          }
-         if ($param[0] eq "detail"){
+         elsif ($param[0] eq "detail"){
             if (defined($opt->{currentfieldgroup})){
                if (($opt->{currentfieldgroup} eq $opt->{fieldgroup} &&
                     $opt->{currentid} eq $opt->{id}) ||
@@ -3892,9 +3905,9 @@ sub DataObj_findtemplvar
                }
             }
             if (exists($opt->{editgroups})){
-               my @fieldgrouplist=($fieldbase->{$var}->{group});
-               if (ref($fieldbase->{$var}->{group}) eq "ARRAY"){
-                  @fieldgrouplist=@{$fieldbase->{$var}->{group}};
+               my @fieldgrouplist=($fieldobj->{group});
+               if (ref($fieldobj->{group}) eq "ARRAY"){
+                  @fieldgrouplist=@{$fieldobj->{group}};
                }
                my $editok=0;
                foreach my $fieldgroup (@fieldgrouplist){
@@ -3915,15 +3928,15 @@ sub DataObj_findtemplvar
                   $mode=$defmode;
                }
             }
-            my $d=$fieldbase->{$var}->FormatedDetail($current,$mode,%FOpt);
+            my $d=$fieldobj->FormatedDetail($current,$mode,%FOpt);
             if ($mode eq "HtmlDetail"){
-               my $add=$fieldbase->{$var}->detailadd($current,%FOpt);
+               my $add=$fieldobj->detailadd($current,%FOpt);
                $d.=$add if (defined($add));
             }
             return($d);
          }
-         if ($param[0] eq "sublistedit" || $param[0] eq "forceedit"){
-            return($fieldbase->{$var}->FormatedDetail($current,"edit",%FOpt));
+         elsif ($param[0] eq "sublistedit" || $param[0] eq "forceedit"){
+            return($fieldobj->FormatedDetail($current,"edit",%FOpt));
          }
       }
       if ($param[0] eq "jsonlatin" || $param[0] eq "json"){
@@ -3943,24 +3956,24 @@ sub DataObj_findtemplvar
          return($d);
       }
       if ($param[0] eq "storedworkspace"){
-         return($fieldbase->{$var}->FormatedStoredWorkspace());
+         return($fieldobj->FormatedStoredWorkspace());
       }
-      if ($param[0] eq "search"){
-         return($fieldbase->{$var}->FormatedSearch());
+      elsif ($param[0] eq "search"){
+         return($fieldobj->FormatedSearch());
       }
-      if ($param[0] eq "label"){
-         return($fieldbase->{$var}->Label($mode));
+      elsif ($param[0] eq "label"){
+         return($fieldobj->Label($mode));
       }
-      if ($param[0] eq "searchlabel"){
-         my $l=$fieldbase->{$var}->Label($mode);
+      elsif ($param[0] eq "searchlabel"){
+         my $l=$fieldobj->Label($mode);
          if (length($l)>35){
             $l=substr($l,0,23)."...".substr($l,length($l)-8,8);
          }
          return($l);
       }
-      if ($param[0] eq "detailunit"){
+      elsif ($param[0] eq "detailunit"){
          if ($opt->{WindowMode} ne "HtmlDetailEdit"){
-            my $unit=$fieldbase->{$var}->unit;
+            my $unit=$fieldobj->unit;
             if (defined($unit)){
                return(" ".$self->T($unit,$self->Self));
             } 

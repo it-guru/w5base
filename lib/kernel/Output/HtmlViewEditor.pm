@@ -458,8 +458,13 @@ sub getFullFieldTreeSelect
       my $trgrp;
       my @checkedobjs;
       foreach my $fobj (@{$sgrp{$grp}}){
-         next if (!$fobj->UiVisible("ViewEditor"));
-         push(@checkedobjs,$fobj);
+         if (ref($fobj) eq "HASH"){
+            printf STDERR ("SYSTEMERROR: invalid fobj in $self\n");
+         }
+         else{
+            next if (!$fobj->UiVisible("ViewEditor"));
+            push(@checkedobjs,$fobj);
+         }
       }
       next if ($#checkedobjs==-1);
       if (defined($translation{$grp})){

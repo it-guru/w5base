@@ -631,7 +631,7 @@ EOF
    }
    else{
       # autogen search template
-      my @field=$self->getFieldList();
+      my @field=$self->getFieldList("SearchTemplate");
     
       my $searchframe="";
       my $extframe="";
