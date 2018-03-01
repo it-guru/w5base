@@ -111,21 +111,9 @@ sub CleanupLnkContact
                              {id=>\$rec->{id}});
                }
             }
-            elsif ($dur->{days}>28) {
-               # delete, if more than 4 weeks expired
-               $needdelete++;
-            }
             elsif ($dur->{days}>0) {
-               # set alertstate red and delete roles
-               if ($rec->{alertstate} ne 'red') {
-                  $objop->ValidatedUpdateRecord($rec,
-                             {alertstate=>'red',
-                              editor=>$rec->{editor},
-                              croles=>undef,
-                              realeditor=>$rec->{realeditor},
-                              mdate=>$rec->{mdate}},
-                             {id=>\$rec->{id}});
-               }
+               # delete roles
+               $needdelete++;
             }
             elsif ($dur->{days}>-21) {
                # set alertstate orange
