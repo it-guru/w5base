@@ -3167,7 +3167,7 @@ sub getFieldObjsByView
             $fobj=$self->{'Field'}->{$fieldname};
          } 
          if (!defined($fobj)){  # maybe a dynamic user specific field
-            $fobj=$self->getField($fieldname);  # this is needed to allow
+        #    $fobj=$self->getField($fieldname);  # this is needed to allow
          }                                      # user specific fields
          if (defined($fobj)){
             if ($fobj->Type() eq "Dynamic"){
