@@ -1,0 +1,378 @@
+<html>
+<head>
+<link rel="stylesheet" href="../../../public/base/load/default.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/work.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/jquery.dataTables.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/vis.min.css"></link>
+<style>
+body{
+   margin:0;padding:0;
+}
+#main{
+margin:0px;
+padding:0px;
+border-style:solid;
+border-color:gray;
+border-width:2px;
+}
+#mpath{
+border-style:solid;
+border-color:blue;
+border-width:1px;
+margin:0px;
+padding:0px;
+}
+#workspace{
+border-style:solid;
+border-color:green;
+border-width:1px;
+margin:0px;
+padding:0px;
+}
+#workspace{
+border-style:solid;
+border-color:green;
+border-width:1px;
+margin:0px;
+padding:0px;
+overflow:auto;
+background-color:#ffffff;
+}
+
+
+#netmap{
+border-style:solid;
+border-color:black;
+border-width:1px;
+margin:0px;
+padding:0px;
+float:left;
+overflow:auto;
+}
+
+#dbrec{
+border-style:solid;
+border-color:red;
+border-width:1px;
+margin:0px;
+padding:0px;
+width:200px;
+float:left;
+overflow:auto;
+}
+
+
+#cons{
+border-style:solid;
+border-color:yellow;
+border-widt:1px;
+margin:0px;
+padding:0px;
+height:50px;
+}
+</style>
+
+
+<style>
+
+
+.parent {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content:center;
+  justify-content:center;
+  -webkit-flex-wrap:wrap;
+  flex-wrap:wrap;
+  
+  xbackground: #FFD54F;
+  margin: 0 auto;
+  width: 96%;
+  margin-top:20px;
+}
+
+.parent .item,
+.parent .dummyItem{
+  width: 240px;
+  height: 140px;
+  margin:10px;
+  border-color: #e0e0e0;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.parent .dummyItem {
+  height: 0px;
+  border-style: none;
+}
+
+.mtile{
+  background-color: #e0e0e0;
+  width:100%;
+  height:100%;
+  cursor:pointer;
+}
+.mtile:hover{
+  background-color: #ffffff;
+  transition: background-color 0.4s;
+}
+
+</style>
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<title>W5Explore - preBETA!</title>
+</head><body><div id='main'></div></body>
+<script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/spin.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/datadumper.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/vis.min.js">
+</script>
+
+<script langauge="JavaScript">
+
+var W5ExploreClass=function(){
+
+   this.ResizeLayout=function(){
+      this.main && $(this.main).height(1);
+      this.workspace && $(this.workspace).height(1);
+      this.netmap && $(this.netmap).height(1);
+      this.dbrec && $(this.dbrec).height(1);
+
+      $(this.main).outerHeight(
+          $(window).innerHeight());
+      if (this.cons){
+         $(this.workspace).outerHeight(
+           $(this.main).innerHeight()-
+           $(this.cons).outerHeight()-
+           $(this.mpath).outerHeight()-1);
+      }
+      else{
+         $(this.workspace).outerHeight(
+           $(this.main).innerHeight()-
+           $(this.mpath).outerHeight()-1);
+      }
+      if (this.netmap){
+         $(this.netmap).outerHeight(
+             $(this.workspace).innerHeight());
+      }
+      if (this.dbrec){
+         $(this.dbrec).outerHeight(
+             $(this.workspace).innerHeight());
+      }
+      if (this.netmap){
+         $(this.netmap).outerWidth(
+             $(this.workspace).innerWidth()-
+             $(this.dbrec).outerWidth()-1);
+      }
+   };
+
+   this.LayoutBase=function(){
+      this.main = document.getElementById('main');
+      this.main.innerHTML = '';
+
+      this.mpath = document.createElement('div');
+      this.mpath.id = 'mpath';
+      this.mpath.innerHTML = 'Menü<br>xxx';
+      this.main.appendChild(this.mpath);
+
+      this.workspace = document.createElement('div');
+      this.workspace.id = 'workspace';
+      this.main.appendChild(this.workspace);
+      //workspace.innerHTML = 'ws';
+
+   };
+
+   this.LayoutMenuLayer=function(){
+      this.LayoutBase();
+      this.ResizeLayout();
+   };
+   this.LayoutNetworkMap=function(){
+      this.LayoutBase();
+      this.netmap = document.createElement('div');
+      this.netmap.id = 'netmap';
+      this.workspace.appendChild(this.netmap);
+      this.netmap.innerHTML = 'netmap';
+
+      this.dbrec = document.createElement('div');
+      this.dbrec.id = 'dbrec';
+      this.workspace.appendChild(this.dbrec);
+      this.dbrec.innerHTML = 'dbrec';
+
+      this.cons = document.createElement('div');
+      this.cons.id = 'cons';
+      this.cons.innerHTML = 'COns';
+      this.main.appendChild(this.cons);
+      this.ResizeLayout();
+   };
+
+   this.Init=function(){
+      this.LayoutMenuLayer();
+   };
+
+     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="390" height="65">' +
+            '<rect x="0" y="0" width="100%" height="100%" fill="#7890A7" stroke-width="20" stroke="#ffffff" ></rect>' +
+            '<foreignObject x="15" y="10" width="100%" height="100%">' +
+            '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
+            ' <em>I</em> am' +
+            '</div>' +
+            '</foreignObject>' +
+            '</svg>';
+     var url = "data:image/svg+xml;charset=utf-8,"+ encodeURIComponent(svg);
+
+   this.SampleMap=function(){
+      this.LayoutNetworkMap();
+    var nodes = [
+       { id: 1, level: 1,
+         color: 'gray',
+         label: 'This is a\nsingle-font label', x: -120, y: -120 },
+       { id: 2, font: { multi: 'md' ,face: 'monospace', align: 'left' ,level:2}, 
+         label: '*This is a*\nmonospace font with\n3Zeilen\n<code>xxx</code>', x: -40, y: -40, },
+       { id: 3, font: { multi: 'html', level: 2,size: 14 , bold: '15px courier blue'}, 
+         label: 'itil::appl\n<code>Zeile2</code>\n<code>Zeile3</code>', x: 4, y: 40, group:'appl' },
+       { id: 4, font: { multi: 'md', face: 'georgia', level:3 }, 
+         label: '*This* is a\n_markdown_ *_multi-_ font* `label`', x: 120, y: 120, level:3},
+       { id: 44, font: { multi: 'md', face: 'georgia' }, label:'W5Base/Darwin',borderWidth:1,shapeProperties: {
+            useBorderWithImage:true
+          },
+         image:'https://darwin.telekom.de/darwin/public/itil/load/appl.jpg', shape:'image',x:100,y:200},
+       { id: 45, level:1,font: { multi: 'md', face: 'georgia' }, label:'qde8hv',borderWidth:1,shapeProperties: {
+            useBorderWithImage:true
+          },
+         image:'https://darwin.telekom.de/darwin/public/itil/load/system.jpg', shape:'image',x:100,y:200},
+     ];
+
+
+     var edges = [
+       {from: 1, to: 2, label: "single to default",arrows: 'to'},
+       {from: 2, to: 3, label: "default to <b>html</b>" },
+       {from: 2, to: 4, label: "XXX",font: {align: 'middle'} },
+       {from: 3, to: 4,  label: "*html* to _md_" },
+       {from: 3, to: 44 },
+     ];
+
+     var data = {
+       nodes: nodes,
+       edges: edges
+     };
+     var options = {
+       edges: {
+         font: {
+           size: 12
+         },
+         smooth: true,
+       },
+       nodes: {
+         shape: 'box',
+         borderWidth:1,
+         color: {
+            border: 'black',
+            background: '#6AAFFF'
+         },
+         level:5,
+         font: {
+           bold: {
+             color: '#0077aa'
+           }
+         }
+       },
+       groups: {
+          'appl': {
+            shape: 'box',
+            level: 2,
+            color: '#FF9900' // orange
+          }
+       },
+
+       layout: {
+          hierarchical: {
+            sortMethod: 'directed'
+          }
+        },
+       physics: {
+         enabled: false
+       }
+     };
+     var network = new vis.Network(this.netmap, data, options);
+
+
+    network.on("click", function (params) {
+        params.event = "[original event]";
+        if (params.nodes[0]){
+           dbrec.innerHTML = '<h2>Click event: on '+params.nodes[0]+'</h2><xmp>' + JSON.stringify(params, null, 4)+"</xmp>";
+        }
+        else{
+           dbrec.innerHTML='';
+        }
+        console.log("click",params.nodes[0]);
+        if (W5Explore.cons){
+           console.log("remove cons");
+           $("#cons").remove();
+           delete(this.cons);
+           W5Explore.ResizeLayout();
+        }
+        
+        
+    });
+
+
+
+   };
+   this.SampleMenu=function(){
+      this.LayoutMenuLayer();
+     
+      var p=document.createElement('div');
+      $(p).addClass("parent");
+      this.workspace.appendChild(p);
+      console.log("fifi 01");
+
+      var c;
+      for(c=0;c<10;c++){
+         var e=document.createElement('div');
+         $(e).addClass("item");
+         var m=document.createElement('div');
+         $(m).addClass("mtile");
+         $(m).html("<b>This is "+c+"</b><br>xxx");
+         e.appendChild(m);
+         p.appendChild(e);
+      }
+      for(c=0;c<10;c++){
+         var e=document.createElement('div');
+         $(e).addClass("dummyItem");
+         p.appendChild(e);
+      }
+
+   }
+};
+
+
+
+
+
+var W5Explore=new W5ExploreClass();
+W5Explore.Init();
+
+$(window).resize(function() {
+   W5Explore.ResizeLayout();
+});
+
+//W5Explore.SampleMap();
+W5Explore.SampleMenu();
+
+
+
+
+</script>
+
+
+
+</html>
