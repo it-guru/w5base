@@ -430,17 +430,19 @@ sub getFullFieldTreeSelect
 
    foreach my $field ($app->getFieldList()){
       my $fobj=$app->getField($field);
-      my $grplist=$fobj->{group};
-      $grplist=[$grplist] if (ref($grplist) ne "ARRAY");
-      foreach my $grp (@$grplist){
-         if (defined($fobj->{translation})){
-            $translation{$grp}=[] if (!defined($translation{$grp}));
-            if (!grep(/^$fobj->{translation}$/,@{$translation{$grp}})){
-               push(@{$translation{$grp}},$fobj->{translation});
+      if ($fobj){
+         my $grplist=$fobj->{group};
+         $grplist=[$grplist] if (ref($grplist) ne "ARRAY");
+         foreach my $grp (@$grplist){
+            if (defined($fobj->{translation})){
+               $translation{$grp}=[] if (!defined($translation{$grp}));
+               if (!grep(/^$fobj->{translation}$/,@{$translation{$grp}})){
+                  push(@{$translation{$grp}},$fobj->{translation});
+               }
             }
+            $sgrp{$grp}=[] if (!defined($sgrp{$grp}));
+            push(@{$sgrp{$grp}},$fobj);
          }
-         $sgrp{$grp}=[] if (!defined($sgrp{$grp}));
-         push(@{$sgrp{$grp}},$fobj);
       }
    }
    my $c=0;

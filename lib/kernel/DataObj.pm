@@ -3163,12 +3163,18 @@ sub getFieldObjsByView
       }
       my $fobj;
       if (!defined($container)){
-         if (exists($self->{'Field'}->{$fieldname})){
+         if (exists($self->{'Field'}) &&
+             exists($self->{'Field'}->{$fieldname})){
             $fobj=$self->{'Field'}->{$fieldname};
          } 
-         if (!defined($fobj)){  # maybe a dynamic user specific field
-        #    $fobj=$self->getField($fieldname);  # this is needed to allow
-         }                                      # user specific fields
+         if ((caller(1))[3] ne "base::workflow::getSubDataObjFieldObjsByView" &&
+             !defined($fobj)){  # maybe a dynamic user specific field
+            $fobj=$self->getField($fieldname);  # this is needed to allow
+                                                # user specific fields
+           # This getField is not allowed in an getSubDataObjFieldObjsByView
+         }
+    
+         
          if (defined($fobj)){
             if ($fobj->Type() eq "Dynamic"){
                my @dlist=$fobj->fields(%param);
