@@ -71,12 +71,14 @@ create materialized view "mview_HPSA_system"
    refresh complete start with TRUNC(SYSDATE+1)+((1/24)*6)
    next SYSDATE+1
    as
-with j as (select item_id,mdate,lower(hostname) lhostname,hostname,pip,systemid,
+with j as (select item_id,mdate,lower(hostname) lhostname,hostname,pip,
+               regexp_replace(systemid,'([[:space:][:cntrl:]]+)$','') systemid,
            RANK() OVER (PARTITION BY item_id ORDER BY mdate DESC) dest_rank
            from  T03TC_UC128.UC128_1_MW_REPORT@XAUTOM
            where regexp_like(systemid,'^S.{4,10}') and isdeleted=0
            order by mdate),
-     s as (select distinct systemid
+     s as (select distinct  
+            regexp_replace(systemid,'([[:space:][:cntrl:]]+)$','') systemid
            from  T03TC_UC128.UC128_1_MW_REPORT@XAUTOM
            where regexp_like(systemid,'^S.{4,10}') and isdeleted=0)
 SELECT j.item_id    server_id,
