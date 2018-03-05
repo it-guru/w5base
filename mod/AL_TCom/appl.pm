@@ -196,7 +196,8 @@ sub ItemSummary
       my @systems=$o->getHashList(qw(name denyupd denyupdcomments 
                                      dataissuestate
                                      osanalysestate
-                                     urlofcurrentrec));
+                                     urlofcurrentrec
+                                     servicesupport));
       return(0) if (!$o->Ping());
       @systems=@{ObjectRecordCodeResolver(\@systems)};
       for(my $c=0;$c<=$#systems;$c++){
