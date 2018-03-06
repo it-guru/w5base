@@ -207,6 +207,20 @@ sub qcheckRecord
                               mode=>'string');
 
                 $self->IfComp($dataobj,
+                              $rec,"place",
+                              $parrec,"place",
+                              $autocorrect,$forcedupd,$wfrequest,
+                              \@qmsg,\@dataissue,\$errorlevel,
+                              mode=>'string');
+
+                $self->IfComp($dataobj,
+                              $rec,"rack",
+                              $parrec,"rack",
+                              $autocorrect,$forcedupd,$wfrequest,
+                              \@qmsg,\@dataissue,\$errorlevel,
+                              mode=>'string');
+
+                $self->IfComp($dataobj,
                               $rec,"serialno",
                               {serialno=>$acserialno},"serialno",
                               $autocorrect,$forcedupd,$wfrequest,
@@ -225,6 +239,13 @@ sub qcheckRecord
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');
+
+               $self->IfComp($dataobj,
+                             $rec,"hwmodel",
+                             $parrec,"modelname",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'leftouterlinkbaselogged');
 
                if ($parrec->{acqumode} eq "1"){
                   $parrec->{acqumode}="RENTAL";
@@ -279,6 +300,13 @@ sub qcheckRecord
                $self->IfComp($dataobj,
                              $rec,"corecount",
                              $parrec,"corecount",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'integer');
+
+               $self->IfComp($dataobj,
+                             $rec,"cpuspeed",
+                             $parrec,"cpuspeed",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');

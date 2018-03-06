@@ -209,13 +209,24 @@ sub qcheckRecord
                if (!($parrec->{systemos}=~/^\s*$/)){
                   my $mapos=$dataobj->ModuleObject("tsacinv::lnkw5bosrelease");
                   $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
-                  my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(id w5bosrelease));
+                  my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(ALL));
                   if (defined($maposrec)){
                      if ($maposrec->{w5bosrelease} ne ""){
                         $parrec->{systemos}=$maposrec->{w5bosrelease};
                      }
-                     else{
-                        delete($parrec->{systemos});
+                     else{  # try automatic map update
+                        my $os=$dataobj->ModuleObject("itil::osrelease");
+                        my $osname=$parrec->{systemos};
+                        $osname=~s/"//g;
+                        $osname='"'.$osname.'"';
+                        $os->SetFilter({name=>$osname,cistatusid=>4});
+                        my ($osrec,$msg)=$os->getOnlyFirst(qw(ALL));
+                        if (defined($osrec)){
+                           msg(INFO,"auto update tsacinv::lnkw5bosrelease");
+                           $mapos->ValidatedUpdateRecord($maposrec,
+                                   {w5bosrelease=>$osrec->{name}},
+                                   {id=>\$maposrec->{id}});
+                        }
                      }
                   }
                   else{
@@ -228,7 +239,6 @@ sub qcheckRecord
                         $new{w5bosrelease}=$w5osrec->{name};
                      }
                      $mapos->ValidatedInsertRecord(\%new);
-                     delete($parrec->{systemos});
                   }
                }
                #################################################################### 
@@ -457,7 +467,7 @@ sub qcheckRecord
                              $parrec,"systemos",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlink');
+                             mode=>'leftouterlinkbaselogged');
                if ($dataobj->getField("itnormodel")){
                   $self->IfComp($dataobj,
                                 $rec,"itnormodel",

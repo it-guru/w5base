@@ -1340,6 +1340,37 @@ sub new
 }
 
 
+
+sub genIndivAttr
+{
+   my $self=shift;
+
+   my $context=$self->Context;
+   if (!exists($context->{indivAttr})){
+      msg(INFO,"genereat Indiv Attr");
+      sleep(1);
+      $context->{indivAttr}={};
+      foreach my $indicolid (qw(23124564 
+                                23451 23141234 2134123421 234123 1423214 4523
+                                24123 21341236 76542 1242341 6426543
+                                424123 421341236 476542 41242341 46426543
+                                2341234)){
+         my $f=new kernel::Field::Text(
+                      name          =>"indicol_$indicolid",
+                      label         =>'IP-Count'.$indicolid,
+                      group         =>'ipaddresses',
+                      htmldetail    =>0,
+                      dataobjattr   =>"(select count(*)+$indicolid from ".
+                                      "ipaddress where ".
+                                      "system.id=ipaddress.system)");
+         $self->InitFields($f);
+         $context->{indivAttr}->{$f->Name()}=$f;
+      }
+   }
+   return($context->{indivAttr});
+}
+
+
 sub getFieldList
 {
    my $self=shift;
@@ -1348,7 +1379,8 @@ sub getFieldList
    my @fobjs=$self->SUPER::getFieldList();
    if ($context ne "SearchTemplate"){  
       if ($self->IsMemberOf("admin")){
-         push(@fobjs,"indicol_2345252");
+         my $indivAttr=$self->genIndivAttr();
+         push(@fobjs,sort(keys(%$indivAttr)));
       }
    }
 
@@ -1364,15 +1396,10 @@ sub getField
  
    if (my ($indicolid)=$fullfieldname=~m/^indicol_([0-9]{5,10})$/){
       if ($self->IsMemberOf("admin")){
-         my $f=new kernel::Field::Text(
-                      name          =>"indicol_$indicolid",
-                      label         =>'IP-Count',
-                      group         =>'ipaddresses',
-                      dataobjattr   =>"(select count(*) from ".
-                                      "ipaddress where ".
-                                      "system.id=ipaddress.system)");
-         $self->InitFields($f);
-         return($f);
+         my $indivAttr=$self->genIndivAttr();
+         if (exists($indivAttr->{$fullfieldname})){
+            return($indivAttr->{$fullfieldname});
+         }
       }
    }
    return($self->SUPER::getField($fullfieldname,$deprec));

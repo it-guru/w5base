@@ -109,12 +109,14 @@ sub new
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
+                vjointo       =>\'base::user',
                 label         =>'Editor Account',
                 dataobjattr   =>'tsacinv_lnkw5bosrelease.editor'),
                                                   
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
+                vjointo       =>\'base::user',
                 label         =>'real Editor Account',
                 dataobjattr   =>'tsacinv_lnkw5bosrelease.realeditor'),
 

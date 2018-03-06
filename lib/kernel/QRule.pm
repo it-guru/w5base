@@ -250,6 +250,7 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
       }
    }
    elsif ($param{mode} eq "leftouterlinkcreate" ||
+          $param{mode} eq "leftouterlinkbaselogged" ||
           $param{mode} eq "leftouterlink"){  # like servicesupprt links
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&
@@ -274,6 +275,13 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                   #               $chkobj->Self(),Dumper($newrec));
                   $chkobj->ValidatedInsertRecord($newrec);
                   $takeremote++;
+               }
+               elsif ($param{mode} eq "leftouterlinkbaselogged"){
+                   $obj->Log(ERROR,"basedata",
+                        "Missing key '$comprec->{$compfieldname}' while ".
+                        "try to import '$compfieldname' in '".
+                        $obj->Self."'".
+                        "\n-");
                }
                else{
                   msg(ERROR,"invalid value '$comprec->{$compfieldname}' ".
