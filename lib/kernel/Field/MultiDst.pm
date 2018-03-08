@@ -221,6 +221,7 @@ sub Validate
    my $selectivetyp=$self->getSelectiveTypeVal($oldrec,$newrec);
    if ($newval ne ""){
       if (!($newval=~m/^\*/)){
+         $newval=trim($newval);  # remove all spaces
          foreach my $dststruct (@{$self->{dstobj}}){
             next if (defined($selectivetyp) && 
                      $selectivetyp ne $dststruct->{name});

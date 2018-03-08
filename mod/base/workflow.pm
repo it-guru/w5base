@@ -322,6 +322,7 @@ sub new
                 xlswidth      =>'18',
                 sqlorder      =>'desc',
                 selectfix     =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'state',
                 label         =>'Event-End',
                 dataobjattr   =>'wfhead.eventend'),
@@ -645,6 +646,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'closedate',
                 group         =>'state',
+                htmldetail    =>'NotEmpty',
                 label         =>'Close-Date',
                 dataobjattr   =>'wfhead.closedate'),
                                   
@@ -3316,6 +3318,7 @@ sub ListRel
       foreach my $rec ($fo->getHashList(qw(mdate id dstwfid srcwfid
                                            translation additional
                                            dstwfheadref srcwfheadref
+                                           dststate srcstate
                                            dstwfname srcwfname name comments))){
          if (defined($rec)){
             if ($mode ne "mail"){
@@ -3371,6 +3374,10 @@ sub ListRel
             next if ($mode eq "" && !$fo->isViewValid($rec));
             my $label=$rec->{name};
             my $partner=$rec->{dstwfname};
+            my $partnerstateid=$rec->{dststate};
+            my $stateobj=$fo->getField("dststate");
+            my $partnerstate=$stateobj->FormatedDetail($rec);
+
             my $iid=$rec->{dstwfid};
             my $lnkid=$rec->{dstwfid};
             if ($rec->{dstwfsrcid} ne ""){
@@ -3383,6 +3390,9 @@ sub ListRel
                }
                $lnkid=$rec->{srcwfid};
                $partner=$rec->{srcwfname};
+               $partnerstate=$rec->{srcstate};
+               $stateobj=$fo->getField("srcstate");
+               $partnerstate=$stateobj->FormatedDetail($rec);
             }
             my $trlabel=$self->getParent->T($transpref.$label,
                                             $rec->{translation}); 
@@ -3390,8 +3400,10 @@ sub ListRel
                $trlabel=sprintf($trlabel,$iid);
             }
             else{
-               $trlabel.=" $iid";
+               $trlabel.=" : $iid";
             }
+
+
             $relcount++;
             if ($mode eq "mail"){
                $d.="---\n" if ($d ne "");
@@ -3422,9 +3434,20 @@ sub ListRel
                #print STDERR Dumper($rec->{additional});
                #print STDERR Dumper($rec->{dstwfheadref});
                #print STDERR Dumper($rec->{srcwfheadref});
+               my $actstart="<b>";
+               my $actend="<b>";
+               if ($partnerstateid>20){
+                  $actstart="<font color=gray>";
+                  $actend="</font>";
+               }
                $d.="<td $onclick style=\"border-top:solid;border-width:1px;".
-                   "border-top-color:silver\"><b>".$trlabel.
-                   "</b> $pref</td></tr>";
+                   "border-top-color:silver\">".
+                   "<div style='float:left'>$actstart".$trlabel.
+                   "$actend $pref</div>".
+                   "<div style='float:right;white-space:nowrap;".
+                   "width:30%;text-align:right'>".
+                   "$actstart$partnerstate$actend</div>".
+                   "</td></tr>";
                if ($partner ne ""){
                   $d.="<tr><td></td><td $onclick>$partner</td></tr>";
                }

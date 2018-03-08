@@ -1196,8 +1196,8 @@ sub generateWorkspacePages
          my $d="<div id='wfstartnewContainer' unselectable=\"on\" ".
                "style=\"height:90px;border-style:solid;".
                "-moz-user-select:none;khtml-user-select: none;".
-               "border-color:gray;border-width:1px;overflow:auto;".
-               "padding:5px\">";
+               "border-color:gray;xborder-width:1px;overflow:auto;".
+               "padding:5px\" class=\"noselect\">";
          $d.="<script language=JavaScript>";
          $d.="function markDerivateWorkflowLine(o){";
          $d.=" var blk=document.getElementById('wfstartnewContainer');";

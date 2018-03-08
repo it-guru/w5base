@@ -252,7 +252,9 @@ sub new
    $self->{workflowlink}->{workflowtyp}=[qw(AL_TCom::workflow::diary
                                             OSY::workflow::diary
                                             itil::workflow::businesreq
+                                            itil::workflow::businessact
                                             itil::workflow::devrequest
+                                            itil::workflow::opmeasure
                                             AL_TCom::workflow::businesreq
                                             THOMEZMD::workflow::businesreq
                                             base::workflow::DataIssue
@@ -744,6 +746,26 @@ sub calcWorkflowStart
    if (grep(/^AL_TCom::workflow::diary$/,@l)){
       $r->{'AL_TCom::workflow::diary'}={
                                           name=>'Formated_appl'
+                                       };
+   }
+   if (grep(/^itil::workflow::devrequest$/,@l)){
+      $r->{'itil::workflow::devrequest'}={
+                                          name=>'Formated_affectedapplication'
+                                       };
+   }
+   if (grep(/^itil::workflow::businessact$/,@l)){
+      $r->{'itil::workflow::businessact'}={
+                                          name=>'Formated_affectedapplication'
+                                       };
+   }
+   if (grep(/^itil::workflow::businesreq$/,@l)){
+      $r->{'itil::workflow::businesreq'}={
+                                          name=>'Formated_affectedapplication'
+                                       };
+   }
+   if (grep(/^itil::workflow::opmeasure$/,@l)){
+      $r->{'itil::workflow::opmeasure'}={
+                                          name=>'Formated_affectedapplication'
                                        };
    }
    if (grep(/^AL_TCom::workflow::eventnotify$/,@l)){

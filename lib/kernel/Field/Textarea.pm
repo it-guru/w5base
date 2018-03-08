@@ -86,7 +86,8 @@ sub EditArea    # for module defined edit areas (f.e. javascript areas)
       $style2=" style='height:".($self->{htmlheight}-4)."px'";
    }
    $d="<div class=multilinetext$style1>".
-      "<textarea onkeydown=\"if (window.textareaKeyHandler){".
+      "<textarea style='resize:none' ".
+      "onkeydown=\"if (window.textareaKeyHandler){".
       "textareaKeyHandler(this,event);}\" ".
       "cols=$self->{cols} name=Formated_$name ".
       "class=multilinetext$style2>".quoteHtml($d)."</textarea></div>";

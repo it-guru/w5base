@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use Data::Dumper;
+use base::workflow;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -70,6 +71,16 @@ sub new
                 vjoinon       =>['srcwfid'=>'id'],
                 vjoindisp     =>'name',
                 dataobjattr   =>'srcwfhead.shortdescription'),
+
+      new base::workflow::Field::state(
+                name          =>'srcstate',
+                htmldetail    =>0,
+                selectfix     =>1,
+                label         =>'Source Workflow-State',
+                transprefix   =>'wfstate.',
+                translation   =>'base::workflow',
+                readonly      =>1,
+                dataobjattr   =>'srcwfhead.wfstate'),
                                   
       new kernel::Field::Container(
                 name          =>'srcwfadditional',
@@ -105,6 +116,16 @@ sub new
                 vjoinon       =>['dstwfid'=>'id'],
                 vjoindisp     =>'name',
                 dataobjattr   =>'dstwfhead.shortdescription'),
+                                  
+      new base::workflow::Field::state(
+                name          =>'dststate',
+                htmldetail    =>0,
+                selectfix     =>1,
+                label         =>'Destination Workflow-State',
+                transprefix   =>'wfstate.',
+                translation   =>'base::workflow',
+                readonly      =>1,
+                dataobjattr   =>'dstwfhead.wfstate'),
                                   
       new kernel::Field::Container(
                 name          =>'dstwfadditional',

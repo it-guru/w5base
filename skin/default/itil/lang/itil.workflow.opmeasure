@@ -1,0 +1,7 @@
+'itil::workflow::opmeasure'=>{de=>'ITIL Betriebs-Maßnahme',en=>'ITIL Operations measure'},
+'Initiate request to businessteam'=>{de=>'Auftrag an den Anwendungsbetrieb initieren'},
+'Initiate developer request'=>{de=>'Auftrag an die Entwicklung initieren'},
+'itil::workflow::opmeasure::tip'=>{de=>'Mit diesem Workflow können innerhalb einer Applikation Aufgaben und Maßnahmen zugewiesen und überwacht werden. Das erstellen der Maßnahme kann nur durch steuernde Rollen der jeweiligen Applikation durchgeführt werden.'},
+'assign measure to'=>{de=>'Maßnahme zuweisen an'},
+'derivation'=>{de=>'Ableitung'},
+'REV.derivation'=>{de=>'Abgeleitet von'},
