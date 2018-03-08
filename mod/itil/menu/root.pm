@@ -604,6 +604,12 @@ sub Init
                       "itil::lnkmgmtitemgroupcontact",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj('itil::workflow::opmeasure$',
+                      "base::workflow",
+                      func=>'New',
+                      param=>'WorkflowClass=itil::workflow::opmeasure',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj('itil::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',
