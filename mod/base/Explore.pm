@@ -50,8 +50,14 @@ sub Main
    print $self->HttpHeader("text/html",charset=>'UTF-8');
 
    my $getAppTitleBar=$self->getAppTitleBar();
+   my $BASE=$ENV{REQUEST_URI};
+   $BASE=~s#/Explore/Main.*?$#/Explore/Main#;
 
-   my $opt={};
+   my $opt={
+      static=>{
+         BASE=>$BASE
+      }
+   };
 
    my $prog=$self->getParsedTemplate("tmpl/base.Explore",$opt);
    utf8::encode($prog);

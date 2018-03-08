@@ -307,6 +307,7 @@ sub getValidWebFunctions
             New ModalNew ModalEdit Copy FormatSelect Bookmark startWorkflow
             DeleteRec InitWorkflow AsyncSubListView 
             EditProcessor ViewProcessor HandleQualityCheck
+jsExplore
             ViewEditor ById ModuleObjectInfo);
    if ($self->can("HtmlHistory")){
       push(@l,qw(HtmlHistory HistoryResult));
@@ -318,6 +319,27 @@ sub getValidWebFunctions
       push(@l,qw(HtmlInterviewLink));
    }
    return(@l);
+}
+
+sub jsExplore
+{
+   my $self=shift;
+   my $dataobj=$self->Self();
+
+   print $self->HttpHeader("text/javascript");
+
+   print(<<EOF);
+(function(window, document, undefined) {
+   ClassLib['${dataobj}']=function(){
+      this.f=function(){
+         console.log("this is f");
+      };
+   };
+   console.log("obj loaded");
+})(this,document);
+
+EOF
+
 }
 
 sub ById

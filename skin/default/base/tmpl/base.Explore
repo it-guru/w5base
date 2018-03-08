@@ -1,5 +1,6 @@
 <html>
 <head>
+<base href="%BASE%">
 <link rel="stylesheet" href="../../../public/base/load/default.css"></link>
 <link rel="stylesheet" href="../../../public/base/load/work.css"></link>
 <link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css"></link>
@@ -7,69 +8,79 @@
 <link rel="stylesheet" href="../../../public/base/load/vis.min.css"></link>
 <style>
 body{
-   margin:0;padding:0;
-}
-#main{
-margin:0px;
-padding:0px;
-border-style:solid;
-border-color:gray;
-border-width:2px;
-}
-#mpath{
-border-style:solid;
-border-color:blue;
-border-width:1px;
-margin:0px;
-padding:0px;
-}
-#workspace{
-border-style:solid;
-border-color:green;
-border-width:1px;
-margin:0px;
-padding:0px;
-}
-#workspace{
-border-style:solid;
-border-color:green;
-border-width:1px;
-margin:0px;
-padding:0px;
-overflow:auto;
-background-color:#ffffff;
+ margin:0;padding:0;
 }
 
+#main{
+ margin:0px;
+ padding:0px;
+ border-style:solid;
+ border-color:gray;
+ border-width:2px;
+}
+
+#mpath{
+ border-style:solid;
+ xborder-color:blue;
+ border-width:1px;
+ margin:0px;
+ padding:0px;
+ vertical-align:middle;
+ height:26px;
+}
+
+#mpathfirst{
+ width:20px;
+ line-height:25px;
+ xbackground-color:gray;
+ text-align:center;
+ float:left;
+ margin:0px;
+ padding:0px;
+ transform: rotate(45deg);
+ font-size:20px;
+}
+
+
+
+#workspace{
+ border-style:solid;
+ border-color:green;
+ border-width:1px;
+ margin:0px;
+ padding:0px;
+ overflow:auto;
+ background-color:#ffffff;
+}
 
 #netmap{
-border-style:solid;
-border-color:black;
-border-width:1px;
-margin:0px;
-padding:0px;
-float:left;
-overflow:auto;
+ border-style:solid;
+ border-color:black;
+ border-width:1px;
+ margin:0px;
+ padding:0px;
+ float:left;
+ overflow:auto;
 }
 
 #dbrec{
-border-style:solid;
-border-color:red;
-border-width:1px;
-margin:0px;
-padding:0px;
-width:200px;
-float:left;
-overflow:auto;
+ border-style:solid;
+ border-color:red;
+ border-width:1px;
+ margin:0px;
+ padding:0px;
+ width:200px;
+ float:left;
+ overflow:auto;
 }
 
-
 #cons{
-border-style:solid;
-border-color:yellow;
-border-widt:1px;
-margin:0px;
-padding:0px;
-height:50px;
+ border-style:solid;
+ border-color:yellow;
+ border-widt:1px;
+ margin:0px;
+ padding:0px;
+ height:50px;
 }
 </style>
 
@@ -97,27 +108,103 @@ height:50px;
 .parent .dummyItem{
   width: 240px;
   height: 140px;
-  margin:10px;
-  border-color: #e0e0e0;
-  border-width: 1px;
-  border-style: solid;
 }
 
 .parent .dummyItem {
-  height: 0px;
+  height:0;
   border-style: none;
 }
 
 .mtile{
-  background-color: #e0e0e0;
   width:100%;
   height:100%;
+}
+
+.mtiletxt{
+  position:relative;
+  height:70%;
+  margin:10px;
+  background-color:#e0e0e0;
+  color:#424242;
+  border-style:solid;
+  border-color:#e0e0e0;
+  border-width:1px;
+  padding:10px;
   cursor:pointer;
 }
-.mtile:hover{
+
+.mtiletxt span{
+  font-size:18px;
+  font-weight:400;
+}
+
+.mtiletxt small{
+  font-size:85%;
+  font-weight:400;
+  position:absolute;
+  right:15px;
+  bottom:10px;
+  color:#bdbdbd;
+}
+
+.mtiletxt:hover{
   background-color: #ffffff;
   transition: background-color 0.4s;
 }
+
+</style>
+
+
+<style>
+.breadcrumb-arrows li {
+  display: inline-block;
+  line-height: 26px;
+  position: relative;
+  margin:0;
+  padding:0;
+  padding-left:10px;
+  font-size:15px;
+}
+.breadcrumb-arrows li:before {
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  left: -1px;
+  border-style: solid;
+  border-width: 13px 0 13px 8px;
+  border-color: transparent transparent transparent #F3F3F3;
+  z-index: 100;
+}
+//.breadcrumb-arrows li:last-child:before {
+//  border-color: transparent;
+//}
+.breadcrumb-arrows a:after {
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  left: 0px;
+  border-style: solid;
+  border-width: 13px 0 13px 8px;
+  xborder-color: transparent transparent transparent #cfc;
+  border-color: transparent transparent transparent black;
+  z-index: 10;
+}
+.breadcrumb-arrows .active a {
+  font-weight: bold;
+}
+.breadcrumb-arrows a {
+  display: block;
+  xbackground: #ccc;
+  padding: 0 10px;
+  cursor:pointer;
+}
+.breadcrumb-arrows a:hover {
+  font-weight: bold;
+}
+
+
 
 </style>
 
@@ -129,6 +216,8 @@ height:50px;
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <title>W5Explore - preBETA!</title>
 </head><body><div id='main'></div></body>
+<script language="JavaScript" src="../../../public/base/load/promise.js">
+</script>
 <script language="JavaScript" src="../../../auth/base/load/J5Base.js">
 </script>
 <script language="JavaScript" src="../../../public/base/load/spin.js">
@@ -137,8 +226,26 @@ height:50px;
 </script>
 <script language="JavaScript" src="../../../public/base/load/vis.min.js">
 </script>
+<script language="JavaScript" src="../../../public/base/load/require.js">
+</script>
 
 <script langauge="JavaScript">
+var ClassLib=new Array();
+
+
+Object.defineProperty(Object.prototype, "extend", { 
+    value: function(obj) {
+        if (obj){
+           for (var i in obj) {
+              if (obj.hasOwnProperty(i)) {
+                 this[i] = obj[i];
+              }
+           }
+        }
+        return(this);
+    },
+    enumerable : false
+});
 
 var W5ExploreClass=function(){
 
@@ -182,7 +289,34 @@ var W5ExploreClass=function(){
 
       this.mpath = document.createElement('div');
       this.mpath.id = 'mpath';
-      this.mpath.innerHTML = 'Menü<br>xxx';
+
+      var mfirst = document.createElement('div');
+      mfirst.id='mpathfirst';
+      mfirst.innerHTML="\u2756";
+      this.mpath.appendChild(mfirst);
+
+      var ul = document.createElement('ul');
+      $(ul).addClass("breadcrumb-arrows");
+      this.mpath.appendChild(ul);
+
+      var m = document.createElement('li');
+      m.innerHTML="<a>Anwendungsexplorer</a>";
+      ul.appendChild(m);
+
+      var m = document.createElement('li');
+      m.innerHTML="<a>W5Base/Darwin</a>";
+      ul.appendChild(m);
+
+      var m = document.createElement('li');
+      m.innerHTML="<a>qde8hv</a>";
+      ul.appendChild(m);
+
+
+  //    var m = document.createElement('div');
+  //    $(m).css("clear","left");
+  //    this.mpath.appendChild(m);
+
+      //this.mpath.innerHTML = 'Menü<br>xxx';
       this.main.appendChild(this.mpath);
 
       this.workspace = document.createElement('div');
@@ -231,7 +365,7 @@ var W5ExploreClass=function(){
 
    this.SampleMap=function(){
       this.LayoutNetworkMap();
-    var nodes = [
+    var nodesArray = [
        { id: 1, level: 1,
          color: 'gray',
          label: 'This is a\nsingle-font label', x: -120, y: -120 },
@@ -250,6 +384,7 @@ var W5ExploreClass=function(){
           },
          image:'https://darwin.telekom.de/darwin/public/itil/load/system.jpg', shape:'image',x:100,y:200},
      ];
+     nodes = new vis.DataSet(nodesArray);
 
 
      var edges = [
@@ -303,6 +438,12 @@ var W5ExploreClass=function(){
        }
      };
      var network = new vis.Network(this.netmap, data, options);
+//  network.once("beforeDrawing", function() {
+//      network.focus(2, {
+//        scale: 12
+//      });
+//    });
+    
 
 
     network.on("click", function (params) {
@@ -324,6 +465,149 @@ var W5ExploreClass=function(){
         
     });
 
+    var Config=function(){
+       return(
+          new Promise(function(ok,error){
+             if (!this._Config){
+                this._Config=createConfig({
+                   useUTF8:false,
+                   mode:'auth',
+                   transfer:'JSON',baseUrl:'../../../'
+                });
+             }
+             ok(this._Config);
+          })
+       )
+    };
+
+
+
+    var getUserRec=function(tAct){
+       if (tAct==null){tAct={}}
+       return(
+          new Promise(function(ok,reject){
+             Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'base::user');
+                w5obj.SetFilter({posix:"hvogler"});
+                w5obj.findRecord("fullname,userid",function(data){
+                   ok(tAct.extend({userrec:data[0]}));
+                },function(exception){
+                   console.log("got error from call");
+                   reject(exception);
+                });
+             }).catch(function(){
+                console.log("can not get config");
+                reject(null); 
+             });
+          })
+       )
+    };
+
+    var addDynNodes2=function(tAct){
+       if (tAct==null){tAct={}}
+       return(
+          new Promise(function(res,rej){
+             var newId = (Math.random() * 1e7).toString(32);
+             nodes.add({id:newId, label:"OK2"});
+             console.log("ok2");
+             res(tAct.extend({ok2:'ok'}));
+          })
+       )
+    };
+
+    var addDynNodes3=function(tAct){
+       if (tAct==null){tAct={}}
+       return(
+         new Promise(function(resolve,reject){
+            var newId = (Math.random() * 1e7).toString(32);
+            nodes.add({id:newId, label:"OK3"});
+            console.log("ok3");
+            resolve(tAct.extend({ok3:"cc"}));
+         })
+       )
+    };
+
+    var addDynNodes4=function(tAct){
+       if (tAct==null){tAct={}}
+       return(
+         new Promise(function(resolve,reject){
+            var newId = (Math.random() * 1e7).toString(32);
+            nodes.add({id:newId, label:"OK4"});
+            console.log("ok4");
+            resolve(tAct.extend({ok4:"This is the end"}));
+         })
+       )
+    };
+
+    getUserRec().then(function(buf){
+          console.log("getUserRec res:",buf);
+          return(addDynNodes2(buf));
+       }).then(function(buf){
+          console.log("addDynNodes2 res:",buf);
+          return(addDynNodes3(buf));
+       }).then(function(buf){
+          console.log("addDynNodes3 res:",buf);
+          return(addDynNodes4(buf));
+       }).then(function(buf){
+          console.log("addDynNodes4 res:",buf);
+       }).catch(function(errobj){
+          console.log("irgendwass ist schlecht:",errobj);
+       }).done();
+
+Promise.all([getUserRec(),addDynNodes4()]).then(function(r){
+  console.log("values",r); 
+}).catch(function(e){
+  console.log("bad",e); 
+
+});
+
+console.log("pre load");
+$.getScript( "../../itil/appl/jsExplore", function( data, textStatus, jqxhr ) {
+   console.log("itil/appl is loaded",ClassLib);
+}).fail(function(e){
+   console.log("fail",e);
+});
+
+ClassLib['itil::system']=function(){
+   this.f=function(){
+      alert("this is  in sysf");
+   };
+};
+
+console.log("post load");
+
+var o=new ClassLib['itil::system']();
+o.f();
+console.log(o);
+
+
+
+
+//    var c=0;
+//    setInterval(function(){
+//        c++;
+//        if (c<10){
+//          
+//           var newId = (Math.random() * 1e7).toString(32);
+//           nodes.add({id:newId, label:"I'm new!",level:c});
+//        }
+//        if (c==11){
+//              network.fit({
+//                    animation: {
+//                       duration: 3000
+//                 }
+//              });
+//        }
+//        if (c==1100){
+//      network.focus(2, {
+//        scale: 12
+//      });
+//
+//        }
+//    },20);
+
+
+
 
 
    };
@@ -339,10 +623,13 @@ var W5ExploreClass=function(){
       for(c=0;c<10;c++){
          var e=document.createElement('div');
          $(e).addClass("item");
+         var tile=document.createElement('div');
+         $(tile).addClass("mtile");
          var m=document.createElement('div');
-         $(m).addClass("mtile");
-         $(m).html("<b>This is "+c+"</b><br>xxx");
-         e.appendChild(m);
+         $(m).addClass("mtiletxt");
+         $(m).html("<span>This is "+c+"</span><p>Hallo, dies ist ein kleiner Text</p><small>infotxt</small>");
+         tile.appendChild(m);
+         e.appendChild(tile);
          p.appendChild(e);
       }
       for(c=0;c<10;c++){
@@ -365,8 +652,8 @@ $(window).resize(function() {
    W5Explore.ResizeLayout();
 });
 
-//W5Explore.SampleMap();
-W5Explore.SampleMenu();
+W5Explore.SampleMap();
+//W5Explore.SampleMenu();
 
 
 

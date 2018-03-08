@@ -39,6 +39,10 @@ a:link, a:visited, a:active  {
 <td width=185>
 <div style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem">%CONFIG(SITENAME)%  %fancyopmode%</div>
 </td>
+<td width=1%>
+<div style="font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem"><a href="../../base/Explore/Main/xxx" target=msel>X</a></div>
+
+</td>
 <td>
 <div style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem"><a href="../../faq/QuickFind/anyQuestions" target=work>%TRANSLATE(anyQuestions,faq::QuickFind)%</a></div>
 </td>
