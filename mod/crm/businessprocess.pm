@@ -174,16 +174,40 @@ sub new
                 name          =>'processowner2id',
                 dataobjattr   =>'businessprocess.processowner2'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Select(
                 name          =>'processmgrrole',
-                label         =>'Processmanager (native)',
+                label         =>'Processmanager',
                 group         =>'procroles',
+                value         =>['RINManager','RCHManager','RCFManager',
+                                 'RPRManager','RODManager','RCAManager',
+                                 'RLIManager',
+                                ],
                 dataobjattr   =>'businessprocess.processmgrrole'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Select(
                 name          =>'processmgr2role',
-                label         =>'Processmanager deputy (native)',
+                label         =>'Processmanager deputy',
                 group         =>'procroles',
+                value         =>['RINManager2','RCHManager2','RCFManager2',
+                                 'RPRManager2','RODManager2','RCAManager2',
+                                 'RLIManager2',
+                                ],
+                dataobjattr   =>'businessprocess.processmgr2role'),
+
+      new kernel::Field::Interface(
+                name          =>'nativprocessmgrrole',
+                readonly      =>1,
+                history       =>0,
+                htmldetail    =>0,
+                uploadable    =>0,
+                dataobjattr   =>'businessprocess.processmgrrole'),
+
+      new kernel::Field::Interface(
+                name          =>'nativprocessmgr2role',
+                readonly      =>1,
+                history       =>0,
+                htmldetail    =>0,
+                uploadable    =>0,
                 dataobjattr   =>'businessprocess.processmgr2role'),
 
       new kernel::Field::Select(

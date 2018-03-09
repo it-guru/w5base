@@ -20,7 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use base::workflow::request;
-@ISA=qw(base::workflow::request);
+use itil::workflow::base;
+@ISA=qw(base::workflow::request itil::workflow::base);
 
 sub new
 {
@@ -39,12 +40,21 @@ sub getDynamicFields
    my $class;
 
    return($self->InitFields(
-      new kernel::Field::Select(  name          =>'process',
-                                  label         =>'IT business process',
-                                  htmleditwidth =>'60%',
-                                  getPostibleValues=>\&getPossibleProcess,
-                                  container     =>'headref'),
-      ));
+      new kernel::Field::Select(
+                name          =>'process',
+                label         =>'IT business process',
+                htmleditwidth =>'60%',
+                getPostibleValues=>\&getPossibleProcess,
+                container     =>'headref'),
+
+      new kernel::Field::KeyText(
+                name       =>'affectedbusinessprocessid',
+                htmldetail =>0,
+                searchable =>0,
+                readonly   =>1,
+                keyhandler =>'kh',
+                container  =>'headref'),
+   ));
 }
 
 
@@ -58,12 +68,13 @@ sub getPossibleProcess
    my $bpobj=getModuleObject($self->Config,'itil::businessprocess');
 
    $bpobj->SetFilter([
-              {nature=>\'PROCESS',processmgrrole=>'R*',cistatusid=>\4},
-              {nature=>\'PROCESS',processmgr2role=>'R*',cistatusid=>\4},
+              {nature=>\'PROCESS',nativprocessmgrrole=>'R*',cistatusid=>\4},
+              {nature=>\'PROCESS',nativprocessmgr2role=>'R*',cistatusid=>\4},
    ]);
 
    my @proclist=$bpobj->getHashList(qw(id name customerid
-                                       processmgrrole processmgr2role));
+                                       nativprocessmgrrole
+                                       nativprocessmgr2role));
 
    # calc relevant processmanager groups (@relprocs) sorted by distance
    my @customerids=map {$_->{customerid}} @proclist;
@@ -83,8 +94,8 @@ sub getPossibleProcess
    my %procfound;
 
    foreach my $proc (@relprocs) {
-      my @mgrroles=($proc->{processmgrrole},
-                    $proc->{processmgr2role});
+      my @mgrroles=($proc->{nativprocessmgrrole},
+                    $proc->{nativprocessmgr2role});
       @mgrroles=grep(!/^\s*$/,@mgrroles);
 
    USERGROUP:
@@ -162,26 +173,44 @@ sub getResponsibleTarget
 }
 
 
+sub isWorkflowManager
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   if (defined($WfRec->{id}) &&   # only if a workflow exists, a workflow
+       $WfRec->{stateid}<16){     # manager can be calculated
+      my $userid=$self->getParent->getCurrentUserId();
+
+      my @devcon=grep {defined($_)} $self->getDefaultContractor($WfRec);
+
+      while(my $target=shift(@devcon)){
+         my $targetid=shift(@devcon);
+         if ($target eq "base::user" && $targetid eq $userid){
+            return(1);
+         }
+      }
+   }
+   return(0);
+}
+
+
 sub getDefaultContractor
 {
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
 
-   if (in_array($actions,'wfforward')) {
-      my ($grpid,@targets)=split('#',$WfRec->{process});
+   my ($grpid,@targets)=split('#',$WfRec->{process});
 
-      if ($#targets==-1) {
-         $self->LastMsg(ERROR,"Could not find a responsible contact");
-         return(undef);
-      }
-      my $fwdtargetid=shift(@targets);
-      my @wsref=map {('base::user',$_)} @targets;
-
-      return(undef,'base::user',$fwdtargetid,undef,undef,@wsref);
+   if ($#targets==-1) {
+      $self->LastMsg(ERROR,"Could not find a responsible contact");
+      return(undef);
    }
+   my $fwdtargetid=shift(@targets);
+   my @wsref=map {('base::user',$_)} @targets;
 
-   return($self->SUPER::getDefaultContractor($WfRec,$actions));
+   return(undef,'base::user',$fwdtargetid,undef,undef,@wsref);
 }
 
 
@@ -284,7 +313,6 @@ sub getWorkHeight
 
    return("300");
 }
-
 
 
 1;
