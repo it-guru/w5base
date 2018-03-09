@@ -3,14 +3,18 @@
       <tr>
          <td class=fname width=10%>%software(label)%:</td>
          <td class=finput width=40%>%software(sublistedit)%</td>
-         <td class=fname width=10%>%liccontract(label)%:</td>
-         <td class=finput width=40%>%liccontract(sublistedit)%</td>
+         <td class=fname width=10%>%version(label)%:</td>
+         <td class=finput width=18%>%version(sublistedit)%</td>
       </tr>
       <tr>
-         <td class=fname>%version(label)%:</td>
-         <td class=finput>%version(sublistedit)%</td>
+         <td class=fname width=10%>%liccontract(label)%:</td>
+         <td class=finput width=40%>%liccontract(sublistedit)%</td>
          <td class=fname>%quantity(label)%:</td>
          <td class=finput>%quantity(sublistedit)%</td>
+      </tr>
+      <tr>
+         <td class=fname>%instpath(label)%:</td>
+         <td colspan=3 class=finput>%instpath(sublistedit)%</td>
       </tr>
    </table>
 </div>

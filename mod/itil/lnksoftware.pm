@@ -871,6 +871,11 @@ sub Validate
    my $origrec=shift;
 
 
+   my $softwareid=effVal($oldrec,$newrec,"softwareid");
+   if ($softwareid==0){
+      $self->LastMsg(ERROR,"invalid software specified");
+      return(undef);
+   }
    my $instpath=effVal($oldrec,$newrec,"instpath");
    if ($instpath ne ""){
       if (!($instpath=~m/^\/[a-z0-9\.\\_\/:-]+$/i) &&
@@ -878,12 +883,31 @@ sub Validate
          $self->LastMsg(ERROR,"invalid installation path");
          return(undef);
       }
+      my $chkobj=$self->Clone();
+      my $flt={softwareid=>\$softwareid,instpath=>\$instpath};
+      my $systemid=effVal($oldrec,$newrec,"systemid");
+      if ($systemid ne ""){
+         $flt->{systemid}=\$systemid;
+      }
+      my $itclustsvcid=effVal($oldrec,$newrec,"itclustsvcid");
+      if ($itclustsvcid ne ""){
+         $flt->{itclustsvcid}=\$itclustsvcid;
+      }
+      if (defined($oldrec)){
+         $flt->{id}="!\"$oldrec->{id}\"";
+      }
+      $chkobj->SetFilter($flt);
+      if ($chkobj->CountRecords()>0){
+         $self->LastMsg(ERROR,"installation with selected software ".
+                              "already exists at specified installpath");
+         return(undef);
+      }
    }
-   my $softwareid=effVal($oldrec,$newrec,"softwareid");
-   if ($softwareid==0){
-      $self->LastMsg(ERROR,"invalid software specified");
-      return(undef);
-   }
+
+
+
+
+
    if (defined($oldrec)){
       if (effChanged($oldrec,$newrec,"softwareid")){
          if (ref($oldrec->{options}) eq "ARRAY" &&
