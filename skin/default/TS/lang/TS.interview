@@ -1,5 +1,5 @@
-'TS::interview'=>{de=>'T-Systems Config-Item-Interview',
-                  en=>'T-Systems Config-Item-Interview'},
+'TS::interview'=>{de=>'Deutsche Telekom Config-Item-Interview',
+                  en=>'Deutsche Telekom Config-Item-Interview'},
 'fieldgroup.attr'=>{de=>'Frage-Attribute',
                     en=>'Question-Attributes'},
 'effects on MTTR'=>{de=>'beeinflusst MTTR'},

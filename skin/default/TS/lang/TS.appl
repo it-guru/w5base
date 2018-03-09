@@ -1,5 +1,5 @@
-'TS::appl'=>{de=>'T-Systems Anwendung',
-                  en=>'T-Systems Application'},
+'TS::appl'=>{de=>'Deutsche Telekom Anwendung',
+                  en=>'Deutsche Telekom Application'},
 'fieldgroup.inmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
 'fieldgroup.inm'=>{de=>'Incident-Management',en=>'Incident management'},
 'fieldgroup.chm'=>{de=>'Change-Approver',en=>'Change approver'},
