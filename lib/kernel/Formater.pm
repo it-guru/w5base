@@ -91,6 +91,13 @@ sub getDataObj
    return($self->getParent->getParent()); #default handler
 }
 
+sub forceDownloadAsAttachment
+{
+   my $self=shift;
+
+   return(0);
+}
+
 sub DownloadHeader
 {
    my $self=shift;
@@ -101,7 +108,7 @@ sub DownloadHeader
    if (ref($self->getParent())){
       $download=$self->getParent->{download};
    }
-   if ($download){
+   if ($download || $self->forceDownloadAsAttachment()){
       $d.="Content-Disposition: attachment; filename=".
           $self->getDownloadFilename()."\n";
    }

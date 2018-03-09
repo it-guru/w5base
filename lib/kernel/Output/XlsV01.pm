@@ -39,6 +39,14 @@ sub IsModuleSelectable
    }
    return(1);
 }
+
+sub forceDownloadAsAttachment
+{
+   my $self=shift;
+
+   return(1);
+}
+
 sub getRecordImageUrl
 {
    return("../../../public/base/load/icon_xls.gif");

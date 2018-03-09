@@ -140,7 +140,6 @@ sub ProcessLine
             }
             $o->setParent($self->getParent());
             my %env=(mode=>'Init');
-#printf STDERR ("fifi pre IsModuleSelectable on $o\n");
             if ($o->IsModuleSelectable(%env)){
                $self->Cache->{OutputHandlerCache}->{$f}=$o;
             }
@@ -178,7 +177,12 @@ sub ProcessLine
       if ($o->IsModuleSelectable(%env)){
          my %rec=();
          $rec{download}=$o->IsModuleDownloadable(%env);
-         $rec{function}="DirectView";
+         if ($o->forceDownloadAsAttachment()){
+            $rec{function}="DirectDownload";
+         }
+         else{
+            $rec{function}="DirectView";
+         }
          $rec{name}=$f;
          $rec{icon}=$o->getRecordImageUrl();
          $rec{mimetype}=$o->MimeType();
@@ -216,6 +220,9 @@ sub ProcessLine
 <td width=1% nowrap>
 EOF
     #$d.=<<EOF if ($frec->{download});
+
+
+
     if ($frec->{download}){
        my $t1=$app->T("create a direct access url for the current data").': '.
               $frec->{label};
