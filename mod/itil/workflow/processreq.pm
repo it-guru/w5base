@@ -46,15 +46,7 @@ sub getDynamicFields
                 htmleditwidth =>'60%',
                 getPostibleValues=>\&getPossibleProcess,
                 container     =>'headref'),
-
-      new kernel::Field::KeyText(
-                name       =>'affectedbusinessprocessid',
-                htmldetail =>0,
-                searchable =>0,
-                readonly   =>1,
-                keyhandler =>'kh',
-                container  =>'headref'),
-   ));
+   ),$self->SUPER::getDynamicFields(%param));
 }
 
 
@@ -117,7 +109,8 @@ sub getPossibleProcess
                }
             }
 
-            my $optname=join('#',($resp->{groupid},@{$resp->{targetid}}));
+            my $optname=join('#',($proc->{id},$resp->{groupid},
+                                  @{$resp->{targetid}}));
             my $optval=$proc->{name};
             $optval.=' ('.$resp->{group}.')';
 
@@ -201,7 +194,7 @@ sub getDefaultContractor
    my $WfRec=shift;
    my $actions=shift;
 
-   my ($grpid,@targets)=split('#',$WfRec->{process});
+   my ($procid,$grpid,@targets)=split('#',$WfRec->{process});
 
    if ($#targets==-1) {
       $self->LastMsg(ERROR,"Could not find a responsible contact");
@@ -295,14 +288,20 @@ EOF
 sub nativProcess
 {
    my $self=shift;
-   my $h=$_[1];
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
 
    if ($h->{process} eq '') {
       $self->LastMsg(ERROR,"No IT Business process selected");
       return(undef);
    }
 
-   return($self->SUPER::nativProcess(@_));
+   my ($businessprocessid)=split('#',$h->{process},2);
+   $h->{affectedbusinessprocessid}=$businessprocessid;
+
+   return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
 }
 
 
