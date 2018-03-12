@@ -261,12 +261,14 @@ sub qcheckRecord
    my @fobjlst;
    foreach my $fieldname ($dataobj->getFieldList(current=>$rec)){
       my $fobj=$dataobj->getField($fieldname);
-      my $t=$fobj->Type();
-      next if ($fobj->{readonly} eq "1");
-      my $htmldetail=$fobj->htmldetail("HtmlDetail",current=>$rec);
-      next if (!$htmldetail);
-      if (defined($fobj) && $fobj->Type()=~m/^($chkfieldtypes)$/){
-         push(@fobjlst,$fobj);
+      if (defined($fobj)){
+         my $t=$fobj->Type();
+         next if ($fobj->{readonly} eq "1");
+         my $htmldetail=$fobj->htmldetail("HtmlDetail",current=>$rec);
+         next if (!$htmldetail);
+         if (defined($fobj) && $fobj->Type()=~m/^($chkfieldtypes)$/){
+            push(@fobjlst,$fobj);
+         }
       }
    }
    my $user=$dataobj->ModuleObject("base::user");

@@ -896,7 +896,9 @@ sub finishWriteRequestHash
    my @fieldlist=$self->getFieldList();
    foreach my $field (@fieldlist){
       my $fo=$self->getField($field);
-      $fo->finishWriteRequestHash($oldrec,$newrec);
+      if (defined($fo)){
+         $fo->finishWriteRequestHash($oldrec,$newrec);
+      }
    }
    return($rec);
 }
