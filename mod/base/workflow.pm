@@ -3303,6 +3303,22 @@ sub ListRel
 
    my $linecolor=1;
    my $relcount=0;
+
+   my $isadmin=0;
+   my @relations;
+
+   if ($mode eq "edit"){  # parameters only neasesary in edit mode
+      $isadmin=$self->getParent->IsMemberOf("admin"); 
+      my $wf=$self->getParent;
+      $wf->ResetFilter();
+      $wf->SetFilter({id=>\$refid});
+      my ($WfRec,$msg)=$wf->getOnlyFirst(qw(ALL));
+      if (defined($WfRec)){
+         my %relmap=$self->getPosibleRelations($WfRec);
+         @relations=values(%relmap);
+      }
+   }
+
    while(my $flt=shift(@oplist)){
       my $ico=shift(@oplist);
       my $transpref=shift(@oplist);
@@ -3319,7 +3335,8 @@ sub ListRel
                                            translation additional
                                            dstwfheadref srcwfheadref
                                            dststate srcstate
-                                           dstwfname srcwfname name comments))){
+                                           dstwfname srcwfname 
+                                           name comments))){
          if (defined($rec)){
             if ($mode ne "mail"){
                if (!$headadd){
@@ -3431,6 +3448,22 @@ sub ListRel
                   $pref="($pref)" if ($pref ne "");
                   $pref.=" " if ($pref ne "");
                }
+               if ($mode eq "edit"){
+                  if (!$isadmin){
+                     if ($transpref eq "REV."){
+                        $onclick="";   # REV Records are not editable by user
+                     }
+                     else{
+                        if (!in_array(\@relations,$rec->{name})){
+                           $onclick="";
+                        }
+                     }
+                     if ($onclick eq ""){
+                        $onclick=
+                           "onclick=\"alert('This record is read only');\"";
+                     }
+                  }
+               }
                #print STDERR Dumper($rec->{additional});
                #print STDERR Dumper($rec->{dstwfheadref});
                #print STDERR Dumper($rec->{srcwfheadref});
@@ -3445,7 +3478,7 @@ sub ListRel
                    "<div style='float:left'>$actstart".$trlabel.
                    "$actend $pref</div>".
                    "<div style='float:right;white-space:nowrap;".
-                   "width:30%;text-align:right'>".
+                   "width:30%;margin-right:5px;text-align:right'>".
                    "$actstart$partnerstate$actend</div>".
                    "</td></tr>";
                if ($partner ne ""){

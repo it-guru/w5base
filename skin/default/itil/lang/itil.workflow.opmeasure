@@ -7,3 +7,5 @@ en=>'With this workflow you can assign and supervise tasks and measures within a
 'assign measure to'=>{de=>'Maßnahme zuweisen an'},
 'derivation'=>{de=>'Ableitung'},
 'REV.derivation'=>{de=>'Abgeleitet von'},
+'info'=>{de=>'Informativer Verweis auf "%s"',en=>'informational link to "%s"'},
+'REV.info'=>{de=>'Informativ verwiesen von "%s"',en=>'informational linked from "%s"'},

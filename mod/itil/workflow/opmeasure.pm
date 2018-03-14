@@ -305,11 +305,20 @@ sub isWriteValid
 {
    my $self=shift;
    my @l=$self->SUPER::isWriteValid(@_);
+   my $WfRec=shift;
+
    push(@l,"extdesc") if (!defined($_[0]));
    if (grep(/^default$/,@l)){
       push(@l,"customerdata");
       push(@l,"extdesc");
    }
+   my $userid=$self->getParent->getCurrentUserId();
+   if ($WfRec->{fwdtarget} eq 'base::user' &&
+       $userid==$WfRec->{fwdtargetid} &&
+       $WfRec->{stateid}==4){
+      push(@l,"relations");
+   }
+
    @l=grep(!/^init$/,@l);
    return(@l);
 }
@@ -330,7 +339,7 @@ sub getPosibleRelations
 {
    my $self=shift;
    my $WfRec=shift;
-   return("itil::workflow::opmeasure"=>'relchange'); 
+   return("itil::workflow::opmeasure"=>'info'); 
 }
 
 sub WSDLaddNativFieldList
