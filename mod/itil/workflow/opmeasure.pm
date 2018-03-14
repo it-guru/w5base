@@ -74,6 +74,24 @@ sub getPosibleWorkflowDerivations
 
    if ($WfRec->{stateid}<16){
       push(@l,
+         {label=>$self->T('Initiate operation measure'),
+          actor=>sub{
+             my $self=shift;
+             my $WfRec=shift;
+
+             return({
+                targeturl=>'New',
+                targetparam=>{
+                  Formated_name=>$WfRec->{name},
+                  Formated_detaildescription=>
+                                 $WfRec->{detaildescription},
+                  Formated_affectedapplication=>$WfRec->{affectedapplication},
+                  WorkflowClass=>'itil::workflow::opmeasure'
+                }
+             });
+          },
+          name=>'initiateopmeasure'
+         },
          {label=>$self->T('Initiate developer request'),
           actor=>sub{
              my $self=shift;
@@ -205,19 +223,24 @@ sub isWorkflowManager
    if (defined($WfRec->{id}) &&   # only if a workflow exists, a workflow
        $WfRec->{stateid}<16){     # manager can be calculated
       my $userid=$self->getParent->getCurrentUserId();
-     
-      my @devcon=$self->getDefaultContractor($WfRec);
-     
-      my $msg=shift(@devcon);
-     
-      while(my $target=shift(@devcon)){
-         my $targetid=shift(@devcon);
-         if ($target eq "base::user" && $targetid eq $userid){
-            return(1);
+      if (!($WfRec->{fwdtarget} eq "base::user" && # check if i have already
+            $WfRec->{fwdtargetid} eq $userid) &&   # the workflow
+          !($WfRec->{owner} eq $userid &&          # check if i was the last
+            $WfRec->{stateid} eq "2")){            # worker
+         my $affectedapplicationid=$WfRec->{affectedapplicationid};
+         if (ref($affectedapplicationid) ne "ARRAY"){
+            $affectedapplicationid=[$affectedapplicationid];
          }
-         if ($target eq "base::grp" && $targetid ne ""){
-            if ($self->getParent->IsMemberOf($targetid,"RMember","direct")){
-               return(1);
+         my @roleidfields=qw(applmgrid tsmid tsm2id opmid opm2id);
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         $appl->SetFilter({id=>$affectedapplicationid});
+         foreach my $apprec ($appl->getHashList(@roleidfields)){
+            foreach my $r (@roleidfields){
+               if (exists($apprec->{$r}) &&
+                   $apprec->{$r} ne "" &&
+                   $apprec->{$r} eq $userid){
+                  return(1);
+               }
             }
          }
       }
@@ -234,7 +257,10 @@ sub getDefaultContractor
    my $target;
    my $flt;
 
-   return(undef,$WfRec->{target},$WfRec->{targetid});
+   if (exists($WfRec->{target}) && exists($WfRec->{targetid})){
+      return(undef,$WfRec->{target},$WfRec->{targetid});
+   }
+   return();
 }
 
 sub getPosibleActions
