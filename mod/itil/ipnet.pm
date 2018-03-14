@@ -42,6 +42,15 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 htmlwidth     =>'120px',
+                uivisible     =>0,
+                label         =>'IP-Network name',
+                dataobjattr   =>"concat(ipnet.label,' (', ".
+                                "ipnet.name,'/',".
+                                "ipnet.netmask,')')"), 
+
+      new kernel::Field::Text(
+                name          =>'label',
+                htmlwidth     =>'120px',
                 label         =>'IP-Network name',
                 dataobjattr   =>'ipnet.label'), 
 
@@ -89,6 +98,14 @@ sub new
       new kernel::Field::Number(
                 name          =>'activeipaddresses',
                 label         =>'active IP-Addesses',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if (!defined($current));
+                   return(1);
+                },
                 readonly      =>1,
                 uploadable    =>0,
                 dataobjattr   =>"(select count(*) from ipaddress ".
@@ -100,6 +117,14 @@ sub new
       new kernel::Field::Number(
                 name          =>'activesubipnets',
                 label         =>'active Sub-IP-Nets',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if (!defined($current));
+                   return(1);
+                },
                 readonly      =>1,
                 uploadable    =>0,
                 dataobjattr   =>"(select count(*) from ipnet subipnet ".
@@ -229,6 +254,14 @@ sub Validate
    my $newrec=shift;
 
 
+   my $networkid=effVal($oldrec,$newrec,"networkid");
+   if (!$self->isWriteOnNetworkValid($networkid)){
+      $self->LastMsg(ERROR,
+              "no write access, to modify ip-networks in selected networkarea");
+      return(0);
+   }
+
+
    my $name=trim(effVal($oldrec,$newrec,"name"));
    my $binnamekey="";
    $name=~s/\s//g;
@@ -266,7 +299,33 @@ sub Validate
    my $netmaskip6str="";
    my $netmaskbinnamekey="";
    my $netmask=trim(effVal($oldrec,$newrec,"netmask"));
+
+   if (my ($bits)=$netmask=~m/^\/([0-9]+)$/){
+      if (($type eq "IPv4" &&
+           ($bits<=1 || $bits>=31)) ||
+          ($type eq "IPv6" &&
+           ($bits<=1 || $bits>=127))){
+         $self->LastMsg(ERROR,"netmask bits out of range");
+         return(0);
+      } 
+      else{
+         # rewrite short netmask to full notation
+         if ($type eq "IPv4"){
+            my $bitstr=("1" x $bits ).("0" x (32-$bits));
+            $netmask=join(".",map({oct("0b".$_)} unpack("(A8)*",$bitstr)));
+         }
+         if ($type eq "IPv6"){
+            my $bitstr=("1" x $bits ).("0" x (128-$bits));
+            $netmask=join(":",map({
+                                 sprintf("%04x",oct("0b".$_))
+                             } unpack("(A16)*",$bitstr)));
+         }
+      }
+      $newrec->{netmask}=$netmask;
+   }
    my $netmasktype=$self->IPValidate($netmask,\$errmsg);
+
+
 
 
    if ($netmasktype eq "IPv4"){
@@ -333,9 +392,16 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   return() if (!($self->IsMemberOf("admin")));  # init phase!!! - no user wr
-
-   return("default");
+   if (!defined($rec)){
+      return("default");
+   }
+   else{
+      my $networkid=$rec->{networkid};
+      if ($self->isWriteOnNetworkValid($networkid)){
+         return("default");
+      }
+   }
+   return();
 }
 
 

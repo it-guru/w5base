@@ -6,3 +6,4 @@
 'Description'=>{de=>'Bemerkungen'},
 'active IP-Addesses'=>{de=>'aktive IP-Adressen'},
 'active Sub-IP-Nets'=>{de=>'aktive Sub-IP-Netzwerke'},
+'no write access, to modify ip-networks in selected networkarea'=>{de=>'kein Schreibzugriff auf den gewählten Netzwerkbereich'},

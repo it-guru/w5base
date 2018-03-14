@@ -272,6 +272,43 @@ sub isWriteOnSoftwaresetValid
 }
 
 
+sub isWriteOnNetworkValid
+{
+   my $self=shift;
+   my $networkid=shift;
+   my $userid=$self->getCurrentUserId();
+
+
+   my $network=$self->getPersistentModuleObject("itil::network");
+   $network->SetFilter({id=>\$networkid});
+   my ($nrec,$msg)=$network->getOnlyFirst(qw(ALL));
+   if (defined($nrec->{contacts}) && ref($nrec->{contacts}) eq "ARRAY"){
+      my %grps=$self->getGroupsOf($ENV{REMOTE_USER},
+                                  ["RMember"],"both");
+      my @grpids=keys(%grps);
+      foreach my $contact (@{$nrec->{contacts}}){
+         if ($contact->{target} eq "base::user" &&
+             $contact->{targetid} ne $userid){
+            next;
+         }
+         if ($contact->{target} eq "base::grp"){
+            my $grpid=$contact->{targetid};
+            next if (!grep(/^$grpid$/,@grpids));
+         }
+         my @roles=($contact->{roles});
+         @roles=@{$contact->{roles}} if (ref($contact->{roles}) eq "ARRAY");
+         if (grep(/^write$/,@roles)){
+            return(1);
+         }
+      }
+   }
+   if ($self->IsMemberOf("admin")){
+       return(1);
+   }
+   return(0);
+}
+
+
 sub isWriteOnBProcessValid
 {
    my $self=shift;

@@ -573,6 +573,24 @@ sub Init
                       "tmpl/welcome",
                       prio=>20000);
 
+   $self->RegisterObj("AL_TCom.network",
+                      "itil::network",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("AL_TCom.network.ipnet",
+                      "itil::ipnet",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("AL_TCom.network.intercon",
+                      "itil::netintercon",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("AL_TCom.network.intercon.new",
+                      "itil::netintercon",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("AL_TCom.proc.ChangeManagement",
                       "TS::chmmgmt",
                       defaultacl=>['admin']);

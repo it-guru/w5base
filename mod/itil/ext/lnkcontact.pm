@@ -163,7 +163,17 @@ sub getPosibleRoles
         defined($self->getParent->getParent) &&
        $self->getParent->getParent->Self()=~m/^.+::network$/)){
       return(
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
              "techcontact"     =>$self->getParent->T("Technical Contact",
+                                                     $self->Self));
+   }
+   if ($parentobj=~m/^.+::netintercon$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::netintercon$/)){
+      return(
+             "write"           =>$self->getParent->T("write",
                                                      $self->Self));
    }
    if ($parentobj=~m/^.+::businessservice$/ ||

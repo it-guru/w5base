@@ -604,6 +604,18 @@ sub Init
                       "itil::lnkmgmtitemgroupcontact",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itil.network",
+                      "itil::network",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.network.ipnet",
+                      "itil::ipnet",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.network.intercon",
+                      "itil::netintercon",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj('itil::workflow::opmeasure$',
                       "base::workflow",
                       func=>'New',
