@@ -90,6 +90,11 @@ sub qcheckRecord
 
    if ($rec->{srcsys} eq "w5base" &&
        exists($rec->{cistatusid}) && in_array([$rec->{cistatusid}],[3,4,5])){
+      if ($dataobj->Self=~m/::system$/){
+         if ($rec->{'systemtype'} eq "abstract"){  # INM Group makes only
+            return(undef,undef); # sense, if the system can be transfered to AM
+         }
+      }
       # TS::appl    -> acinmassignmentgroupid
       # TS::system  -> acinmassignmentgroupid
       # TS::asset   -> acinmassignmentgroupid
