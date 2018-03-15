@@ -98,14 +98,14 @@ my $statedir=$curconfig->Param("LogState");
 
 msg(DEBUG,"start cleanup of statedir='$statedir'");
 if (opendir(D,$statedir)){
-   while(my$de=readdir(D)){
-      next if (!($de=~m/\.pid$/));
+   while(my $de=readdir(D)){
+      next if (!($de=~m/^\d+\.pid$/));
       my $pidfile=$statedir."/".$de;
       my $mtime=(stat($pidfile))[9];
       if (defined($mtime) && $mtime>0){
          my $age=time()-$mtime;
-         if ($age>(3600*6)){
-            msg(DEBUG,sprintf("rm stale pid '%s' older then 6h\n",$de));
+         if ($age>(3600*24)){
+            msg(DEBUG,sprintf("rm stale pid '%s' older then 24h\n",$de));
             unlink($pidfile);
          }
       }
