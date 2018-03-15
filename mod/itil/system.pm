@@ -55,6 +55,7 @@ sub new
                 sqlorder      =>'desc',
                 searchable    =>0,
                 label         =>'W5BaseID',
+                group         =>'source',
                 dataobjattr   =>'system.id'),
 
       new kernel::Field::RecordUrl(),
@@ -480,9 +481,9 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'systemtype',
-                group         =>'logsys',
                 default       =>'standard',
                 htmleditwidth =>'40%',
+                selectfix     =>1,
                 label         =>'logical system type',
                 value         =>['standard',
                                  'vmware',
@@ -495,6 +496,7 @@ sub new
                                  'LDomain',              # sun logische Domain
                                  'HDomain',              # sun hardware Domain
                                  'lpar',                 # z/os
+                                 'abstract'
                                  ],
                 dataobjattr   =>'system.systemtype'),
 
@@ -1854,6 +1856,13 @@ sub isViewValid
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       push(@all,"vhost");
    }
+   if (defined($rec) && $rec->{'systemtype'} eq "abstract"){
+      @all=grep(!/^physys$/,@all);
+      @all=grep(!/^location$/,@all);
+   }
+   if (defined($rec) && $rec->{'isclusternode'}){
+      push(@all,"cluster");
+   }
    if (defined($rec) && $rec->{'isclusternode'}){
       push(@all,"cluster");
    }
@@ -1880,6 +1889,9 @@ sub isWriteValid
                        monisla misc opmode upd
                        physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
+   if (defined($rec) && $rec->{'systemtype'} eq "abstract"){
+      @databossedit=grep(!/^physys$/,@all);
+   }
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       @databossedit=grep(!/^physys$/, @databossedit);
       push(@databossedit,"vhost");
