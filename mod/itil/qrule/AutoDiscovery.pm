@@ -335,6 +335,7 @@ sub DiscoverData
    my $engine=shift;
    my $oldrecs=shift;
 
+
    my $flt={
       section=>\$adrec->{section},
       scanname=>\$adrec->{scanname},
@@ -351,12 +352,12 @@ sub DiscoverData
       autodischint=>$adrec->{autodischint}
    };
 
-   if (exists($adrec->{scanextra1})){
+   if (exists($adrec->{scanextra1})){     # scandata and scanextra1 need unique
       my $scanextra1=limitlen($adrec->{scanextra1},128,1);
       $flt->{scanextra1}=\$scanextra1;
       $newrec->{scanextra1}=$scanextra1;
    }
-   if (exists($adrec->{scanextra2})){
+   if (exists($adrec->{scanextra2})){    # scanextra2 is aditional
       $newrec->{scanextra2}=$adrec->{scanextra2};
    }
    $ad->ResetFilter();
@@ -366,9 +367,18 @@ sub DiscoverData
       $ad->ValidatedInsertRecord($newrec);
    }
    else{
+      my $cnt=0;
       foreach my $r (@l){
          my %updrec=();
          next if ($r->{engineid} ne $adrec->{engineid});
+         $cnt++;
+         if ($cnt>1){  # double Record found
+            msg(WARN,"double adrec detected '$adrec->{autodischint}'");
+            msg(WARN,"(This message is only for debugging and ".
+                     "needs to be removed in ".
+                     "the future by development)");
+            next;
+         }
          if ($oldrecs->{$r->{id}}->{misscount}>0){
             $updrec{misscount}=0;
          }
