@@ -1890,7 +1890,7 @@ sub isWriteValid
                        physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
    if (defined($rec) && $rec->{'systemtype'} eq "abstract"){
-      @databossedit=grep(!/^physys$/,@all);
+      @databossedit=grep(!/^physys$/,@databossedit);
    }
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       @databossedit=grep(!/^physys$/, @databossedit);

@@ -427,7 +427,7 @@ sub vjoinobj
       #msg(INFO,"create of '%s' in $self %s",$jointo,$self->{_vjoinRewrite});
       my $o=getModuleObject($self->getParent->Config,$jointo,$joinparam);
       foreach my $fobj ($o->getFieldObjsByView(["ALL"])){
-         if (defined($fobj->{vjointo})){
+         if (defined($fobj) && defined($fobj->{vjointo})){
             if (defined($vjoinRewrite->{$fobj->{vjointo}})){
                $fobj->{vjointo}=$vjoinRewrite->{$fobj->{vjointo}};
             }
