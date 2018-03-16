@@ -89,7 +89,6 @@ sub validateSearchQuery
       $rec{en}=$tr->{en}->{$tag} if (defined($tr->{en}->{$tag}));;
       push(@{$self->{'data'}},\%rec);
    }
-   printf STDERR ("d=%s\n",Dumper($self->{'data'})); 
    return(1);
 }
 

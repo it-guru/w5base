@@ -586,7 +586,8 @@ sub getParsedSearchTemplate
    if (Query->Param("AutoSearch")){
       $AutoSearch="addEvent(window,\"load\",DoSearch);\n";
    }
-   my $name="tmpl/".$self->App.".search";
+   my $name="tmpl/".$self->Self.".search";
+   $name=~s/::/./g;
 
    my $d=<<EOF;
 <script language="JavaScript">
