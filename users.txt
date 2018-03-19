@@ -1,4 +1,4 @@
-w5base = w5base <w5base>
+w5base = w5base <system@w5base.net>
 voglerh = Hartmut, Vogler <hartmut.vogler@t-systems.com>
 it-guru = Hartmut, Vogler <hartmut.vogler@t-systems.com>
 zeism = Markus, Zeis <markus.zeis@t-systems.com>
