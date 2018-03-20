@@ -1,6 +1,7 @@
 'tssm::user'=>{de=>'ServiceManager Kontakt',en=>'ServiceManager Contact'},
 'fieldgroup.groups'=>{ de=>'Gruppenmitgliedschaften',en=>'Group-Memberships'},
 'fieldgroup.account'=>{ de=>'ServiceManager Logon-Account',en=>'ServiceManager Logon-Account'},
+'fieldgroup.secgroups'=>{ de=>'Security Groups',en=>'Security Groups'},
 'Contact name'    =>{ de=>'Kontakt Name'},
 'Firstname'   =>{ de=>'Vorname'},
 'Name'   =>{ de=>'Nachname'},

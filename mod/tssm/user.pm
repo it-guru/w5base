@@ -63,6 +63,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'userid',
                 label         =>'User-ID',
+                weblinkto     =>'tssm::useraccount',
+                weblinkon     =>['userid'=>'loginname'],
                 uppersearch   =>1,
                 dataobjattr   =>SELpref."contactsm1.user_id"),
 
@@ -180,23 +182,13 @@ sub new
                 vjoinon       =>['userid'=>'luser'],
                 vjoindisp     =>['groupname']),
 
-#      new kernel::Field::Text(
-#                name          =>'srcsys',
-#                group         =>'source',
-#                label         =>'Source-System',
-#                dataobjattr   =>SELpref.'contactsm1.external_system'),
-                                                
-#      new kernel::Field::Text(
-#                name          =>'srcid',
-#                group         =>'source',
-#                label         =>'Source-Id',
-#                dataobjattr   =>SELpref.'contactsm1.external_id'),
-#
-#      new kernel::Field::Date(
-#                name          =>'srcload',
-#                group         =>'source',
-#                label         =>'Source-Load',
-#                dataobjattr   =>SELpref.'contactsm1.last_update'),
+      new kernel::Field::SubList(
+                name          =>'secgroups',
+                label         =>'SecurityGroups',
+                group         =>'secgroups',
+                vjointo       =>'tssm::secgroup',
+                vjoinon       =>['userid'=>'userid'],
+                vjoindisp     =>['secgroup']),
 
       new kernel::Field::Date(
                 name          =>'mdate',
@@ -336,7 +328,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   my @l=qw(default header account groups source);
+   my @l=qw(default header account groups secgroups source);
    if ($rec->{islogonuser}){
       push(@l,"account");
    }
@@ -355,7 +347,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","account","groups","source");
+   return("header","default","account","groups","secgroups","source");
 }
 
 

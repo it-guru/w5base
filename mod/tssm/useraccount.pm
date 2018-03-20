@@ -93,6 +93,14 @@ sub new
                 vjoinon       =>['loginname'=>'luser'],
                 vjoindisp     =>['groupname']),
 
+      new kernel::Field::SubList(
+                name          =>'secgroups',
+                label         =>'SecurityGroups',
+                group         =>'secgroups',
+                vjointo       =>'tssm::secgroup',
+                vjoinon       =>['loginname'=>'userid'],
+                vjoindisp     =>['secgroup']),
+
       new kernel::Field::Text(
                 name          =>'profile_change',
                 label         =>'Profile Change',
@@ -233,7 +241,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default",'profile',"groups","source");
+   return("header","default",'profile',"groups","secgroups","source");
 }
 
 sub isQualityCheckValid
