@@ -319,6 +319,16 @@ sub reloadRec
 }
 
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
+
 sub calcFinalQruleList
 {
    my $self=shift;

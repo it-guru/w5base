@@ -2144,8 +2144,15 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
       my $nsubject=$self->T("Automatic data update");
       $nsubject.=" ".$subject if ($subject ne "");
       if ($notifycontrol->{datasource} ne ""){  # automatische zusammenstellen
-         $nsubject.=" ".$self->T("based on datasource")." ". # der subject
-                    $notifycontrol->{datasource};            # zeile
+         if ($notifycontrol->{datasource}=~m/::qrule::/){
+            $nsubject.=" ".$self->T("based on QualityRule")." \"". # der subject
+                $self->T($notifycontrol->{datasource},
+                         $notifycontrol->{datasource})."\"";
+         }
+         else{
+            $nsubject.=" ".$self->T("based on datasource")." ". # der subject
+                       $notifycontrol->{datasource};            # zeile
+         }
       }
       $subject=$nsubject;
    }
@@ -2160,9 +2167,14 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
       }
       $ntext.=" ".$notifycontrol->{mode}.".";
       $ntext.="\n";
+      if ($notifycontrol->{datasource}=~m/::qrule::/){
+         $ntext.="For Details of underlying ruleset, check QualityRule ...\n";
+         $ntext.="$notifycontrol->{datasource}\n\n";
+      }
       $ntext.="\n".$text."\n\n\n".
                $self->T("This update does not relieve you of the ".
                         "data responsibility!",'kernel::QRule');
+      $ntext.="\n";
       $text=$ntext;
    }
 
@@ -2216,21 +2228,22 @@ sub NotifiedValidatedUpdateRecord
          adminbcc=>1,
          lang=>'en',
       );
+      $notifycontrol->{autosubject}=1;
 
       $self->NotifyWriteAuthorizedContacts($oldrec,$newrec,
                                            \%notifyparam,$notifycontrol,sub {
          my $self=shift;
          my $notifyparam=shift;
 
-         my $subject=$self->T("Automatic data update",'kernel::QRule');
-         if (defined($namefld)){
-            my $name=$namefld->FormatedDetail($oldrec,"AscV01");
-            $subject.=" : ".$name;
-         }
-         if ($notifycontrol->{datasource} ne ""){  #automatische zusammenstellen
-            $subject.=" ".$self->T("based on datasource")." ". # der subject
-                       $notifycontrol->{datasource};            # zeile
-         }
+        # my $subject=$self->T("Automatic data update",'kernel::QRule');
+        # if (defined($namefld)){
+        #    my $name=$namefld->FormatedDetail($oldrec,"AscV01");
+        #    $subject.=" : ".$name;
+        # }
+        # if ($notifycontrol->{datasource} ne ""){  #automatische zusammenstellen
+        #    $subject.=" ".$self->T("based on datasource")." ". # der subject
+        #               $notifycontrol->{datasource};            # zeile
+        # }
          my $text=$self->T("Dear databoss",'kernel::QRule');
          $text.=",\n\n";
          $text.=$self->T("an update has been made on a record for which ".
@@ -2263,16 +2276,28 @@ sub NotifiedValidatedUpdateRecord
          }
          return(undef) if ($fldtext eq "");
         
-         $text.="\n".$fldtext."\n\n\n".
-               $self->T("This update does not relieve you of the ".
+         $text.="\n".$fldtext."\n\n\n";
+
+         if (($notifycontrol->{datasource}=~m/::qrule::/) &&
+             $self->can("getAbsolutByIdUrl")){
+            my $url=$self->getAbsolutByIdUrl($notifycontrol->{datasource},{
+               dataobj=>'base::qrule',
+               path=>'FView'
+            });
+            if (defined($url)){
+               $text.=$self->T(
+                   "For Details of underlying ruleset, check QualityRule",
+                   'kernel::DataObj').
+                   " ...\n";
+               $text.="$url\n\n";
+            }
+         }
+         $text.=$self->T("This update does not relieve you of the ".
                         "data responsibility!",'kernel::QRule');
-         return($subject,$text);
+         $text.="\n";
+         return("",$text);
 
       });
-
-
-
-
    }
 
    return($bk);

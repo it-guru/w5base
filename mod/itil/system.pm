@@ -1349,24 +1349,28 @@ sub genIndivAttr
 
    my $context=$self->Context;
    if (!exists($context->{indivAttr})){
-      msg(INFO,"genereat Indiv Attr");
-      sleep(1);
       $context->{indivAttr}={};
-      foreach my $indicolid (qw(23124564 
-                                23451 23141234 2134123421 234123 1423214 4523
-                                24123 21341236 76542 1242341 6426543
-                                424123 421341236 476542 41242341 46426543
-                                2341234)){
-         my $f=new kernel::Field::Text(
-                      name          =>"indicol_$indicolid",
-                      label         =>'IP-Count'.$indicolid,
-                      group         =>'ipaddresses',
-                      htmldetail    =>0,
-                      dataobjattr   =>"(select count(*)+$indicolid from ".
-                                      "ipaddress where ".
-                                      "system.id=ipaddress.system)");
-         $self->InitFields($f);
-         $context->{indivAttr}->{$f->Name()}=$f;
+      if ($W5V2::OperationContext ne "QualityCheck"){
+         msg(INFO,"genereat Indiv Attr");
+         sleep(1);
+         foreach my $indicolid (qw(23124564 
+                                   23451 23141234 2134123421 234123 1423214 4523
+                                   24123 21341236 76542 1242341 6426543
+                                   424123 421341236 476542 41242341 46426543
+                                   2341234)){
+            my $f=new kernel::Field::Text(
+                         name          =>"indicol_$indicolid",
+                         label         =>'IP-Count'.$indicolid,
+                         group         =>'ipaddresses',
+                         htmldetail    =>0,
+                         dataobjattr   =>"(select count(*)+$indicolid from ".
+                                         "ipaddress where ".
+                                         "system.id=ipaddress.system)");
+            $self->InitFields($f);
+            $context->{indivAttr}->{$f->Name()}=$f;
+         }
+      }
+      else{
       }
    }
    return($context->{indivAttr});

@@ -344,6 +344,11 @@ sub ById
          $target="../".$target;
          $val=~s/\/Interview$//;
       }
+      elsif ($val=~m/\/FView$/){
+         $param{ModeSelectCurrentMode}="FView";
+         $target="../".$target;
+         $val=~s/\/FView$//;
+      }
       else{
          last;
       }
@@ -352,6 +357,43 @@ sub ById
    $self->HtmlGoto($target,post=>\%param);
    return();
 }
+
+sub getAbsolutByIdUrl
+{
+   my $self=shift;
+   my $id=shift;
+   my $param=shift;
+   my $url;
+
+   my $baseurl;
+   my $obj=$param->{dataobj};
+   if (!defined($obj)){
+      $obj=$self->Self();
+   }
+   $obj=~s/::/\//g;
+   if ($ENV{SCRIPT_URI} ne ""){
+      $baseurl=$ENV{SCRIPT_URI};
+      $baseurl=~s/\/auth\/.*$//;
+      $url=$baseurl;
+      $url.="/auth/$obj/ById/".$id;
+   }
+   else{
+      my $baseurl=$self->Config->Param("EventJobBaseUrl");
+      $baseurl.="/" if (!($baseurl=~m/\/$/));
+      $url=$baseurl;
+      $url.="auth/$obj/ById/".$id;
+   }
+   if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+      $url=~s/^http:/https:/;
+   }
+   if ($param->{path} ne ""){
+      $url.="/".$param->{path};
+   }
+   return($url);
+}
+
+
+
 
 sub DataObjByIdHandler
 {

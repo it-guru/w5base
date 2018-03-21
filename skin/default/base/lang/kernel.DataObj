@@ -41,6 +41,8 @@ EOF
                       en=>'Total: %d records'},
 'Automatic data update'=>{de=>'Automatisches Daten-Update'},
 'based on datasource'=>{de=>'basierend auf der Datenquelle'},
+'based on QualityRule'=>{de=>'basierend auf der QualityRule'},
 'old value'=>{de=>'alter Inhalt'},
 'new value'=>{de=>'neuer Inhalt'},
 'the datasource'=>{de=>'die Datenquelle'},
+'For Details of underlying ruleset, check QualityRule'=>{de=>'Nähere Informationen zum zugrundeligenden Regelwerk, finden Sie in der QualityRule'},

@@ -611,9 +611,7 @@ sub FinishWrite
    my $idname=$idobj->Name();
 
    $self->resetVoteLink($id); 
-   my $url=$ENV{SCRIPT_URI};
-   $url=~s/[^\/]+$//;
-   $url.="ById/$id";
+   my $url=$self->getAbsolutByIdUrl($id);
    $url=~s#/public/#/auth/#g;
    my $lang=$self->Lang();
 

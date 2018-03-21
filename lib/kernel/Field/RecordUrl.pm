@@ -68,24 +68,7 @@ sub RawValue
    if (defined($idobj)){
       my $id=$idobj->RawValue($current);
       if ($id ne ""){
-         my $baseurl;
-         my $obj=$self->getParent->Self();
-         $obj=~s/::/\//g;
-         if ($ENV{SCRIPT_URI} ne ""){
-            $baseurl=$ENV{SCRIPT_URI};
-            $baseurl=~s/\/auth\/.*$//;
-            $url=$baseurl;
-            $url.="/auth/$obj/ById/".$id;
-         }
-         else{
-            my $baseurl=$self->getParent->Config->Param("EventJobBaseUrl");
-            $baseurl.="/" if (!($baseurl=~m/\/$/));
-            $url=$baseurl;
-            $url.="auth/$obj/ById/".$id;
-         }
-      }
-      if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
-         $url=~s/^http:/https:/;
+         $url=$self->getParent->getAbsolutByIdUrl($id,{});
       }
    }
    $current->{$self->{name}}=$url;
