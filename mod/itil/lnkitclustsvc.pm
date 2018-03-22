@@ -292,7 +292,7 @@ sub new
                 allowcleanup  =>1,
                 forwardSearch =>1,
                 vjointo       =>'itil::lnksoftwaresystem',
-                vjoinbase     =>[{softwarecistatusid=>"<=5"}],
+                vjoinbase     =>[{softwarecistatusid=>"<=6"}],
                 vjoinon       =>['id'=>'itclustsvcid'],
                 vjoindisp     =>['software','version','quantity','comments'],
                 vjoininhash   =>['softwarecistatusid','liccontractcistatusid',
