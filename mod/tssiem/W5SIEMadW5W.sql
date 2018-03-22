@@ -87,6 +87,9 @@ CREATE INDEX "W5SIEM_secent_i3"
 CREATE INDEX "W5SIEM_secent_i3"
    ON "W5SIEM_secent" (pci_vuln) online;
 
+CREATE INDEX "W5SIEM_secent_i4"
+   ON "W5SIEM_secent" (qid) online;
+
 
 CREATE SEQUENCE "W5SIEM_secent_seq"
    MINVALUE 1
