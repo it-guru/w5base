@@ -23,3 +23,4 @@
 'Notification of Certificate Expiration'=>{
    de=>'Benachrichtigung über Zertifikatsverfall'},
 'Unknown file format'=>{de=>'Unbekanntes Dateiformat'},
+'Issuer DN'=>{de=>'Aussteller DN'},

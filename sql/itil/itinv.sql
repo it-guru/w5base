@@ -1692,3 +1692,5 @@ create table netintercon (
   FOREIGN KEY fk_epa (epa_systemid)  REFERENCES system (id) ON DELETE RESTRICT,
   FOREIGN KEY fk_epb (epb_systemid)  REFERENCES system (id) ON DELETE RESTRICT
 ) ENGINE=INNODB;
+alter table wallet add issuerdn varchar(256);
+alter table swinstance add ssl_certissuerdn varchar(256);

@@ -73,3 +73,4 @@
 'detected SSL Certificate'=>{de=>'erkanntes SSL Zertifikat'},
 'detected SSL Certificate Serial'=>{de=>'erkanntes SSL Zertifikat Seriennummer'},
 'detected SSL Certificate signature algo'=>{de=>'erkanntes SSL Zertifikat Signatur Algo'},
+'detected SSL Issuer DN'=>{de=>'erkannte SSL Zertifikat Aussteller DN'},

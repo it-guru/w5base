@@ -385,6 +385,19 @@ sub do_SSLCERT
       eval('$certserial=Net::SSLeay::X509_get_serialNumber($cert);');
       $sslcert->{ssl_cert_serialno}=
          Net::SSLeay::P_ASN1_INTEGER_get_hex($certserial) if ($@ eq "");
+
+      my $issuerdn;
+      eval('$issuerdn=Net::SSLeay::X509_NAME_print_ex('.
+                      'Net::SSLeay::X509_get_issuer_name($cert),'.
+                      'Net::SSLeay::XN_FLAG_DN_REV);');
+      if ($@ eq ""){
+         $sslcert->{ssl_cert_issuerdn}=$issuerdn;
+         # Bugfix some formating errors in Net::SSLeay lib
+         $sslcert->{ssl_cert_issuerdn}=~s#/street=#, street=#g;
+         $sslcert->{ssl_cert_issuerdn}=~s#/postalCode=#, postalCode=#g;
+      }
+
+
       if (main->can("Net::SSLeay::P_X509_get_signature_alg")){
          my $cert_signature_algo;
          eval('$cert_signature_algo=

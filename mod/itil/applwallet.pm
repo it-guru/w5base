@@ -138,6 +138,14 @@ sub new
                 dataobjattr   =>'wallet.issuer'),
 
       new kernel::Field::Text(
+                name          =>'issuerdn',
+                label         =>'Issuer DN',
+                group         =>'detail',
+                htmldetail    =>1,
+                readonly      =>1,
+                dataobjattr   =>'wallet.issuerdn'),
+
+      new kernel::Field::Text(
                 name          =>'serialno',
                 label         =>'Serial Nr.',
                 group         =>'detail',
@@ -324,12 +332,14 @@ sub Validate
    }
 
    if (effChangedVal($oldrec,$newrec,'sslcert')) {
+   #if (1) {
+      my $sslcertfile=effVal($oldrec,$newrec,"sslcert");
       my $x509;
       # try multiple file formats
-      eval('$x509=Crypt::OpenSSL::X509->new_from_string($newrec->{sslcert},
+      eval('$x509=Crypt::OpenSSL::X509->new_from_string($sslcertfile,
                                                         FORMAT_PEM);');
       if ($@ ne "") {
-         eval('$x509=Crypt::OpenSSL::X509->new_from_string($newrec->{sslcert},
+         eval('$x509=Crypt::OpenSSL::X509->new_from_string($sslcertfile,
                                                            FORMAT_ASN1);');
       }
 
@@ -358,6 +368,8 @@ sub Validate
       # Issuer
       my $iobjs=$x509->issuer_name->entries();
       $newrec->{issuer}=$self->formatedMultiline($iobjs);
+
+      $newrec->{issuerdn}=$x509->issuer();
 
       # SerialNr. (hex format)
       $newrec->{serialno}=$x509->serial();

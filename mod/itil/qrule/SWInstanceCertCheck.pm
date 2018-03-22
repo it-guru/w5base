@@ -128,6 +128,8 @@ sub qcheckRecord
                      $res->{sslcert}->{ssl_version};
                   $forcedupd->{ssl_cert_serialno}=
                      $res->{sslcert}->{ssl_cert_serialno};
+                  $forcedupd->{ssl_cert_issuerdn}=
+                     $res->{sslcert}->{ssl_cert_issuerdn};
                   $forcedupd->{ssl_certdump}=
                      $res->{sslcert}->{certtree}->[
                          $#{$res->{sslcert}->{certtree}}]->{name};

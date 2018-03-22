@@ -639,6 +639,14 @@ sub new
                 dataobjattr   =>'swinstance.ssl_certserial'),
 
       new kernel::Field::Text(
+                name          =>'ssl_cert_issuerdn',
+                readonly      =>1,
+                xhtmldetail    =>'NotEmpty',
+                group         =>'ssl',
+                label         =>'detected SSL Issuer DN',
+                dataobjattr   =>'swinstance.ssl_certissuerdn'),
+
+      new kernel::Field::Text(
                 name          =>'ssl_cert_signature_algo',
                 readonly      =>1,
                 htmldetail    =>'NotEmpty',
