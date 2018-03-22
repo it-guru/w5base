@@ -7,7 +7,7 @@
 
 Checks the ssl expiration on swinstances in cistate "installed/active"
 or "available". If the expiration of the sslcheck url comes closer then
-1 week, a dataissue will be generated.
+2 week, a dataissue will be generated.
 
 =head3 IMPORTS
 

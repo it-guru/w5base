@@ -1197,7 +1197,7 @@ sub handleCertExpiration
    my $notifyfld=$param->{expnotifyfld};
 
    my $notifylevel=8*7; # 8 weeks - mail notification
-   my $issuelevel =1*7; # 1 week  - dataissue
+   my $issuelevel =2*7; # 2 week  - dataissue
 
    $notifylevel=$param->{notifylevel} if (exists($param->{notifylevel}));
    $issuelevel =$param->{issuelevel}  if (exists($param->{issuelevel}));

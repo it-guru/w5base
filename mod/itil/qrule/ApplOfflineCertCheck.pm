@@ -10,7 +10,7 @@ Checks the expiration of certificates on applications in cistate
 If the expiration date is in lesser than 8 weeks, an one-time notification 
 will be sent to write authorized contacts of the application.
 
-A dataissue will be generated if the expiration date is in lesser than 1 week.
+A dataissue will be generated if the expiration date is in lesser than 2 week.
 
 =head3 IMPORTS
 
