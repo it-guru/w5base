@@ -493,9 +493,22 @@ sub Validate
       if ($irec->{questtyp} eq "date"){
          if ($newrec->{answer} ne ""){
             if (!($newrec->{answer}=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ &&
-               defined(
-                  $self->ExpandTimeExpression($newrec->{answer},"en","GMT","GMT")))){
+               defined($self->ExpandTimeExpression($newrec->{answer},
+                                                   "en","GMT","GMT")))){
                $answervalid=0;
+            }
+         }
+      }
+      if ($irec->{questtyp} eq "select"){
+         if ($newrec->{answer} ne ""){
+            my @selectlist=$i->getPosibleSelectValues($irec->{addquestdata});
+            $answervalid=0;
+            while(my $k=shift(@selectlist)){
+               if (my $v=shift(@selectlist)){
+                  if ($k eq $newrec->{answer}){
+                     $answervalid=1;
+                  }
+               }
             }
          }
       }

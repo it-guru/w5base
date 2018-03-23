@@ -314,8 +314,9 @@ sub new
 #  prio undef = ignored by calc of attainment level
 #
 
-      new kernel::Field::Text(
+      new kernel::Field::Textarea(
                 name          =>'addquestdata',
+                htmlheight    =>40,
                 label         =>'additional quest data',
                 dataobjattr   =>'interview.addquerydata'),
 
@@ -785,6 +786,33 @@ sub checkAnserWrite
    return($parentrw);
 }
 
+sub getPosibleSelectValues
+{
+   my $self=shift;
+   my $seldata=shift;
+
+   my $lang=$self->Lang();
+   my $langseldata=extractLangEntry($seldata,$lang,65535,65535); 
+   $langseldata=~s/\n/\|/g; 
+   my @r;
+
+   foreach my $selkey (split(/\|/,$langseldata)){
+      $selkey=trim($selkey);
+      if ($selkey ne ""){
+         if (my ($k,$v)=$selkey=~m/^(.*)=(.*)$/){
+            $k=~s/[^a-z0-9_]/_/gi;
+            push(@r,trim($k),trim($v));
+         }
+         else{
+            my $k=$selkey;
+            $k=~s/[^a-z0-9_]/_/gi;
+            push(@r,$k,$selkey);
+         }
+      }
+   }
+   return(@r);
+}
+
 sub getHtmlEditElements
 {
    my $self=shift;
@@ -882,10 +910,15 @@ sub getHtmlEditElements
       
       $sel.="<option ";
       $sel.="value=\"\"></option>";
-      foreach my $opt (split(/\|/,$irec->{addquestdata})){
-         $sel.="<option ";
-         $sel.="selected " if (trim($a) eq trim($opt));
-         $sel.="value=\"$opt\">$opt</option>";
+
+      my @selectlist=$self->getPosibleSelectValues($irec->{addquestdata});
+
+      while(my $k=shift(@selectlist)){
+         if (my $v=shift(@selectlist)){
+            $sel.="<option ";
+            $sel.="selected " if (trim($a) eq trim($k));
+            $sel.="value=\"$k\">".quoteHtml($v)."</option>";
+         }
       }
 
       $sel.="</select>";

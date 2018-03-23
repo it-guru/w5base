@@ -295,7 +295,7 @@ create table mandatordataacl(
 #
 alter table interview add boundpviewgroup varchar(40) default NULL;
 alter table interview add boundpcontact   varchar(40) default NULL;
-alter table interview add addquerydata    varchar(128) default NULL;
+alter table interview add addquerydata    varchar(512) default NULL;
 create table checklst (
   id          bigint(20)   NOT NULL,
   name        varchar(128) NOT NULL,
