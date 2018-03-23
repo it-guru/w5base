@@ -246,6 +246,7 @@ sub mkAcFtpRecSystem
                     EventID=>$CurrentEventId,
                     ExternalSystem=>'W5Base',
                     ExternalID=>$rec->{id},
+                    Parent_Assettag=>$rec->{asset},
                     Status=>"in operation"
                }
              };
