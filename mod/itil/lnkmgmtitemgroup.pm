@@ -103,6 +103,7 @@ sub new
                  label         =>'Application',
                  vjointo       =>'itil::appl',
                  vjoineditbase =>{'cistatusid'=>"4"},
+                 SoftValidate  =>1,
                  vjoinon       =>['applid'=>'id'],
                  vjoindisp     =>'name'),
 
@@ -117,6 +118,7 @@ sub new
                  label         =>'Location',
                  vjointo       =>'base::location',
                  vjoineditbase =>{'cistatusid'=>"4"},
+                 SoftValidate  =>1,
                  vjoinon       =>['locationid'=>'id'],
                  vjoindisp     =>'name'),
 
@@ -131,6 +133,7 @@ sub new
                  label         =>'Businessservice',
                  vjointo       =>'itil::businessservice',
                  vjoineditbase =>{'cistatusid'=>"<=5"},
+                 SoftValidate  =>1,
                  vjoinon       =>['businessserviceid'=>'id'],
                  vjoindisp     =>'name'),
 
