@@ -492,7 +492,7 @@ sub Validate
       }
       if ($irec->{questtyp} eq "date"){
          if ($newrec->{answer} ne ""){
-            if (!($newrec->{answer}=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ &&
+            if (!($newrec->{answer}=~m/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/ &&
                defined($self->ExpandTimeExpression($newrec->{answer},
                                                    "en","GMT","GMT")))){
                $answervalid=0;
