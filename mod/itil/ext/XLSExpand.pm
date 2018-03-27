@@ -92,6 +92,9 @@ sub GetKeyCriterion
                 'itil::appl::criticality'  =>{
                     label=>'IT-Inventar: Application: Kritikalität'
                },
+                'itil::appl::contactinfocontact'  =>{
+                    label=>'IT-Inventar: Application: Informationspartner'
+               },
                 'itil::system::ipaddress::name'   =>{
                     label=>'IT-Inventar: System: IP-Address'
                },
@@ -282,6 +285,25 @@ sub ProcessLine
          }
       }
    }
+   if (defined($in->{'itil::appl::id'}) &&
+       exists($out->{'itil::appl::contactinfocontact'})){
+      my $appl=$self->getParent->getPersistentModuleObject('itil::appl');
+      my $id=[keys(%{$in->{'itil::appl::id'}})];
+      $appl->SetFilter({id=>$id});
+      foreach my $rec ($appl->getHashList(qw(contacts))){
+         if (ref($rec->{contacts}) eq "ARRAY"){
+            foreach my $contactrec (@{$rec->{contacts}}){
+               my $roles=$contactrec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if (in_array($roles,"infocontact")){
+                  $out->{'itil::appl::contactinfocontact'}->{
+                        $contactrec->{targetname}}++;
+               }
+            }
+         }
+      }
+   }
+
    foreach my $syssekvar (qw(osrelease name location systemid)){
       if (exists($out->{'itil::system::'.$syssekvar}) &&
           defined($in->{'itil::system::id'})){
