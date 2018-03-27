@@ -87,6 +87,13 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'scannerfnd'),
 
+      new kernel::Field::Text(
+                name          =>'w5osclass',
+                readonly      =>1,
+                translation   =>'itil::system',
+                label         =>'OS-Class',
+                dataobjattr   =>'osclass'),
+
       new kernel::Field::Link(
                 name          =>'ofid',
                 label         =>'Overflow ID',
@@ -134,7 +141,8 @@ sub new
                 dataobjattr   =>'modifyuser')
    );
    $self->setWorktable("HPSAsup__system_of");
-   $self->setDefaultView(qw(systemname systemid hpsafound scannerfound comments));
+   $self->setDefaultView(qw(systemname systemid w5osclass 
+                            hpsafound scannerfound comments));
    return($self);
 }
 
