@@ -191,7 +191,7 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
          if (defined($comprec->{$compfieldname})){
             $origrec->{$origfieldname}=trim($origrec->{$origfieldname});
             my $t1=$origrec->{$origfieldname};
-            my $t2=$comprec->{$compfieldname};
+            my $t2=trim($comprec->{$compfieldname});
             if (!defined($origrec->{$origfieldname}) || $t1 ne $t2) {
                if (defined($origfieldobj) &&
                    defined($origfieldobj->{vjointo})){
