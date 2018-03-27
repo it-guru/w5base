@@ -32,6 +32,9 @@ Therefore it applies  for/to:
 
 A DataIssue is generated when RefreshData - 6 months has been reached.
 
+If the system is provided by a serverfarm, no notification to the
+applicationmanager is done.
+
 Further information or contacts can be found at ...
 https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
 
@@ -50,6 +53,9 @@ Somit gilt:
  RefreshData = DeadLine oder denyupdvalidto falls denyupdvalidto gültig ist.
 
 Ein DataIssue wird erzeugt, wenn RefreshData - 6 Monate erreicht ist.
+
+Handelt es sich um ein System, das über eine Serverfarm bereitgestellt
+wird, erfolgt keine Benachrichtigung an den ApplicationManager.
 
 Weitere Infos bzw. Ansprechpartner finden Sie unter ...
 https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
@@ -158,8 +164,10 @@ sub finalizeNotifyParam
    my $notifyparam=shift;
    my $mode=shift;
 
-   $notifyparam->{emailto}=[$self->getApplmgrUserIds($rec)];
-   $notifyparam->{emailcc}=[12855121480002]; # Günther F. 
+   if ($rec->{itfarm} eq ""){
+      $notifyparam->{emailto}=[$self->getApplmgrUserIds($rec)];
+      $notifyparam->{emailcc}=[12855121480002]; # Günther F. 
+   }
 }
 
 
