@@ -9,3 +9,4 @@
 'edit'              => {de=>'bearbeiten'},
 'finish edit'       => {de=>'bearbeiten beenden'},
 'Condition to:'     => {de=>'Stand:'},
+'continue save with comments'=>{de=>'speichern mit Kommentaren fortsetzen'},

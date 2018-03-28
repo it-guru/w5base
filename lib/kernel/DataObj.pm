@@ -438,7 +438,9 @@ sub getHtmlDetailPageContent
       Query->Delete("OpenURL");
 
       $page="<iframe style=\"width:100%;height:100%;border-width:0;".
-            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "padding:0;margin:0\" ".
+            "id=HtmlDetailPage ".
+            "class=HtmlDetailPage name=HtmlDetailPage ".
             "src=\"HtmlDetail?$urlparam\"></iframe>";
    }
    elsif ($p eq "HtmlHistory"){

@@ -281,6 +281,9 @@ sub HandleCIStatus
             if ($newrec->{cistatusid}==4 && $oldrec->{cistatusid}<3){
                $self->NotifyAdmin("activate",$oldrec,$newrec,%param);
             }
+            if ($newrec->{cistatusid}==6 && $oldrec->{cistatusid}<3){
+               $self->NotifyAdmin("reject",$oldrec,$newrec,%param);
+            }
          }
       }
    }
@@ -467,6 +470,19 @@ sub NotifyAdmin
       $msg=$self->T("MSG004");
       $msg=sprintf($msg,$name);
       return() if ($creator==$userid);
+   }
+   if ($mode eq "reject"){
+      $notiy{emailto}=[$creatorrec->{email}];
+      $wfname=$self->T("Reject notification for '%s' in module '%s'");
+      $wfname=sprintf($wfname,$name,$modulename);
+      $msg=$self->T("MSG011");
+      my $comments="";
+      if ($W5V2::HistoryComments ne ""){
+         $comments.="\n<b>".$self->T("argumentation").":</b>\n";
+         $comments.=$W5V2::HistoryComments;
+         $comments.="\n\n";
+      }
+      $msg=sprintf($msg,$name,$name,$comments);
    }
    if ($mode eq "rundown"){
       $notiy{emailto}=[map({$_->{email}} @admin)];

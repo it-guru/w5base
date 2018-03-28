@@ -16,6 +16,8 @@
     de=>"Reservierungs-Bestätigung für '\%s' im Modul '\%s'"},
 "Activation notification for '\%s' in module '\%s'"=>{
     de=>"Aktivierung durchgeführt für '\%s' im Modul '\%s'"},
+"Reject notification for '\%s' in module '\%s'"=>{
+    de=>"Ablehnung für '\%s' im Modul '\%s'"},
 "Drop notification for '\%s' in module '\%s'"=>{
     de=>"Löschungsbenachrichtigung für '\%s' im Modul '\%s'"},
 'MSG001'=>{en=>'%s has requested activation of the config item "%s".
@@ -103,26 +105,26 @@ Normale Gründe für eine solche Löschung sind z.B., dass die Namenskonventionen n
 '},
 'MSG005'=>{en=>'%s: INSERT
 
-The Config-Item "%s" %shas been new inserted by "%s".
+The Config-Item "%s" %s has been new inserted by "%s".
 
 Depending on your user rights, it is possible that the new record is not accessable by you.
 
 ',de=>'%s: NEUEINGABE
 
-Das Config-Item "%s" %swurde durch den User "%s" neu erzeugt.
+Das Config-Item "%s" %s wurde durch den User "%s" neu erzeugt.
 
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
 'MSG006'=>{en=>'%s: DELETE
 
-The Config-Item "%s" %shas been new deleted by "%s".
+The Config-Item "%s" %s has been new deleted by "%s".
 ',de=>'%s: LÖSCHUNG
 
 Das Config-Item "%s" %swurde durch den User "%s" gelöscht.
 '},
 'MSG007'=>{en=>'%s: ACTIVATE
 
-The Config-Item "%s" %shas been activated by "%s".
+The Config-Item "%s" %s has been activated by "%s".
 
 Depending on your user rights, it is possible that the new record is not accessable by you.
 
@@ -134,13 +136,13 @@ Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nic
 '},
 'MSG008'=>{en=>'%s: DEACTIVATE
 
-The Config-Item "%s" %shas been deactivated by "%s".
+The Config-Item "%s" %s has been deactivated by "%s".
 
 Depending on your user rights, it is possible that the new record is not accessable by you.
 
 ',de=>'%s: DEAKTIVIERUNG
 
-Das Config-Item "%s" %swurde durch den User "%s" deaktiviert.
+Das Config-Item "%s" %s wurde durch den User "%s" deaktiviert.
 
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
@@ -161,4 +163,18 @@ Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nic
 
 "invalid character in key field '\%s'"=>{de=>"ungültiges Zeichen in Schlüsselfeld '\%s'"},
 'MSG010'=>{de=>'im Mandanten "%s" ',en=>'at mandator "%s" '},
-"Request to rundown '%s' in module '%s'"=>{de=>"Lösch-Anforderung für '%s' im Modul '%s'"}
+"Request to rundown '%s' in module '%s'"=>{de=>"Lösch-Anforderung für '%s' im Modul '%s'"},
+'MSG011'=>{en=>'%s: REJECT
+
+The activation of Config-Item has been rejected.
+%s
+Depending on your user rights, it is possible that the new record is not accessable by you.
+
+',de=>'%s: ABLEHNUNG
+
+Die Aktivierung des Config-Item "%s" wurde abgelehnt.
+%s
+Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
+'},
+'argumentation'=>{de=>'Begründung'},
+

@@ -1438,6 +1438,11 @@ sub HandleSave
       ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
       #$self->SetCurrentView();
    }
+   my $HistoryComments=Query->Param("HistoryComments");
+   if (trim($HistoryComments) ne ""){
+      $W5V2::HistoryComments=$HistoryComments;
+      Query->Delete("HistoryComments");
+   }
    my $newrec=$self->getWriteRequestHash("web",$oldrec);
    if ($self->LastMsg()!=0){
       return(undef);
@@ -2063,6 +2068,18 @@ function FinishHandleInfoAboSubscribe(returnVal,isbreak)
    if (!isbreak){
       document.location.href=document.location.href;
    }
+}
+
+function HistoryCommentedSave(commentfld)
+{
+   var HtmlDetailPage=document.getElementById("HtmlDetailPage");
+   if (HtmlDetailPage){
+      if (HtmlDetailPage.contentWindow.HistoryCommentedDetailEditSave){
+         HtmlDetailPage.contentWindow.HistoryCommentedDetailEditSave(
+            commentfld.value);
+      }
+   }
+   hidePopWin();
 }
 
 function checkEditmode(e) // this handling prevents klick on X in window

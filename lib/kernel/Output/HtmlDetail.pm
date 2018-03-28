@@ -333,6 +333,16 @@ addEvent(window, "load", setBG);
 EOF
    }
 
+   {
+      # add translated button text for historycommented save
+      my $t=$self->getParent->getParent->T("continue save with comments");
+      $d.="<script language=\"JavaScript\">\n";
+      $d.="document.HistoryCommentedSaveButtonText='$t';\n";
+      $d.="</script>\n";
+   }
+   
+
+
    my $module=$app->Module();
    my $appname=$app->App();
    my @detaillist=$app->getSkinFile("$module/tmpl/$appname.detail.*");
@@ -426,6 +436,7 @@ EOF
  </table>
 </div>
 <script language="JavaScript">
+var shiftKey=0;
 function setTitle()
 {
    var t=window.document.getElementById("WindowTitle");
@@ -460,6 +471,16 @@ function setTitle()
    return(true);
 }
 addEvent(window, "load", setTitle);
+addEvent(window, "keydown",function(e){
+  if (e.key=="Shift"){
+     shiftKey=1;
+  }
+});
+addEvent(window, "keyup",function(e){
+  if (e.key=="Shift"){
+     shiftKey=0;
+  }
+});
 $sfocus
 </script>
 <div style="display:none;visibility:hidden;" id=WindowTitle>$titlestring</div>
