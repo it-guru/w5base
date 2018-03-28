@@ -307,7 +307,7 @@ sub getValidWebFunctions
             New ModalNew ModalEdit Copy FormatSelect Bookmark startWorkflow
             DeleteRec InitWorkflow AsyncSubListView 
             EditProcessor ViewProcessor HandleQualityCheck
-jsExplore
+            jsExplore
             ViewEditor ById ModuleObjectInfo);
    if ($self->can("HtmlHistory")){
       push(@l,qw(HtmlHistory HistoryResult));
@@ -321,21 +321,90 @@ jsExplore
    return(@l);
 }
 
+sub jsExploreLabelFieldname
+{
+   my $self=shift;
+   my $o=$self->getRecordHeaderField();
+
+   if (defined($o)){
+      return($o->Name());
+   }
+   return();
+}
+
 sub jsExplore
 {
    my $self=shift;
    my $dataobj=$self->Self();
 
+   my $recordimageurl=$self->getRecordImageUrl();
+   my $fieldnamelabel=$self->jsExploreLabelFieldname();
+   my $fieldnameid=$self->IdField->Name();
+
+
    print $self->HttpHeader("text/javascript");
 
    print(<<EOF);
 (function(window, document, undefined) {
-   ClassLib['${dataobj}']=function(){
-      this.f=function(){
-         console.log("this is f");
-      };
+
+   ClassDataObjLib['${dataobj}']=new Object();
+   ClassDataObjLib['${dataobj}']=function(dataobjid){
+      return(ClassDataObj.call(this,o,dataobjid));
    };
-   console.log("obj loaded");
+
+   ClassDataObjLib['${dataobj}']=function(id,initialLabel,initialX,initialY){
+       this.label=initialLabel;
+       this.dataobj='${dataobj}';
+       this.dataobjid=id;
+       this.font={
+          multi:'md',
+          face:'georgia'
+       };
+       this.borderWidth=1;
+       this.shapeProperties={
+          useBorderWithImage:true
+       };
+       this.image='${recordimageurl}';
+       this.shape='image';
+       this.group=this.dataobj;
+       this.x=initialX;
+       this.y=initialY;
+       this.initLevel=0;
+       this.fieldnamelabel='${fieldnamelabel}';
+       this.fieldnameid='${fieldnameid}';
+       this.id=W5Explore.toObjKey(this.dataobj,this.dataobjid);
+       var that=this;
+       setTimeout(function(){
+          new Promise(function(ok,reject){
+             that.app.Config().then(function(Config){
+                   var w5obj=getModuleObject(Config,that.dataobj);
+                   console.log("w5obj",w5obj);
+                   var flt=new Object();
+                   flt[that.fieldnameid]=that.dataobjid;
+                   w5obj.SetFilter(flt);
+                   w5obj.findRecord(that.fieldnamelabel,function(data){
+                      if (data[0]){
+                         that.update({label:data[0][that.fieldnamelabel]});
+                         ok(1);
+                      }
+                      else{
+                         that.update({label:that.label+" ?"});
+                         reject(1);
+                      }
+                   },function(exception){
+                      that.update({label:'?'});
+                      reject(1);
+                   });
+             }).catch(function(){
+                console.log("can not get config");
+                reject(null);
+             });
+          });
+          that.initLevel++;
+       },10);
+   };
+  \$.extend(ClassDataObjLib['${dataobj}'].prototype,ClassDataObj.prototype);
+
 })(this,document);
 
 EOF

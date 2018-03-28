@@ -230,7 +230,10 @@ body{
 </script>
 
 <script langauge="JavaScript">
-var ClassLib=new Array();
+
+
+
+
 
 
 Object.defineProperty(Object.prototype, "extend", { 
@@ -247,8 +250,44 @@ Object.defineProperty(Object.prototype, "extend", {
     enumerable : false
 });
 
-var W5ExploreClass=function(){
 
+
+
+
+
+
+
+
+
+// #######################################################################
+
+// Global DataObj Class lib
+var ClassDataObjLib=new Array();
+
+// Top Class for all DataObjs
+(function(window, document, undefined) {
+   ClassDataObj=function(dataobj,id){
+      console.log("constructor ClassDataObj called",dataobj,id);
+   };
+   ClassDataObj.prototype.update=function(o){
+      o.id=this.id;
+      this.parent.update(o);
+   };
+   console.log("ClassDataObj loaded");
+})(this,document);
+
+
+//////////////////////////////////////////////////////////////////////////
+// Main Application Class
+
+var W5ExploreClass=function(){
+   this.InitObjectStore=function(){
+      this.node = new vis.DataSet();
+      this.edge = new vis.DataSet();
+   };
+   this.toObjKey=function(dataobj,id){
+      return(dataobj+'::'+id);
+   };
    this.ResizeLayout=function(){
       this.main && $(this.main).height(1);
       this.workspace && $(this.workspace).height(1);
@@ -350,8 +389,49 @@ var W5ExploreClass=function(){
    };
 
    this.Init=function(){
+      this.InitObjectStore();
       this.LayoutMenuLayer();
    };
+
+   this.loadDataObjClass=function(dataobj){
+      var dataobjpath=dataobj.replace('::','/');
+      return(
+          new Promise(function(res,rej){
+             if (ClassDataObjLib[dataobj]){
+                res(ClassDataObjLib[dataobj]);
+             }
+             else{
+                $.getScript("../../"+dataobjpath+"/jsExplore", 
+                function( data, textStatus, jqxhr ) {
+                   console.log("itil/appl is loaded",ClassDataObjLib);
+                   res(ClassDataObjLib[dataobj]);
+                }).fail(function(e){
+                   console.log("fail",e);
+                   rej("ERROR: can not resolv dataobj "+dataobj);
+                });
+             }
+          })
+       );
+   };
+
+   this.addNode=function(dataobj,id,initialLabel,initialX,initialY){
+      return(
+          new Promise(function(res,rej){
+              W5Explore.loadDataObjClass(dataobj).then(
+                 function(DataObjClassPrototype){
+                    var o=new DataObjClassPrototype(id,initialLabel,
+                                                    initialX,initialY);
+                    console.log("ok o loaded",o,this);
+                    W5Explore.node.add(o);
+                    o.parent=W5Explore.node;
+                    o.app=W5Explore;
+                    res(o);
+                 });
+          })
+      )
+   };
+
+
 
      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="390" height="65">' +
             '<rect x="0" y="0" width="100%" height="100%" fill="#7890A7" stroke-width="20" stroke="#ffffff" ></rect>' +
@@ -365,39 +445,39 @@ var W5ExploreClass=function(){
 
    this.SampleMap=function(){
       this.LayoutNetworkMap();
-    var nodesArray = [
-       { id: 1, level: 1,
-         color: 'gray',
-         label: 'This is a\nsingle-font label', x: -120, y: -120 },
-       { id: 2, font: { multi: 'md' ,face: 'monospace', align: 'left' ,level:2}, 
-         label: '*This is a*\nmonospace font with\n3Zeilen\n<code>xxx</code>', x: -40, y: -40, },
-       { id: 3, font: { multi: 'html', level: 2,size: 14 , bold: '15px courier blue'}, 
-         label: 'itil::appl\n<code>Zeile2</code>\n<code>Zeile3</code>', x: 4, y: 40, group:'appl' },
-       { id: 4, font: { multi: 'md', face: 'georgia', level:3 }, 
-         label: '*This* is a\n_markdown_ *_multi-_ font* `label`', x: 120, y: 120, level:3},
-       { id: 44, font: { multi: 'md', face: 'georgia' }, label:'W5Base/Darwin',borderWidth:1,shapeProperties: {
-            useBorderWithImage:true
-          },
-         image:'https://darwin.telekom.de/darwin/public/itil/load/appl.jpg', shape:'image',x:100,y:200},
-       { id: 45, level:1,font: { multi: 'md', face: 'georgia' }, label:'qde8hv',borderWidth:1,shapeProperties: {
-            useBorderWithImage:true
-          },
-         image:'https://darwin.telekom.de/darwin/public/itil/load/system.jpg', shape:'image',x:100,y:200},
-     ];
-     nodes = new vis.DataSet(nodesArray);
-
-
-     var edges = [
-       {from: 1, to: 2, label: "single to default",arrows: 'to'},
-       {from: 2, to: 3, label: "default to <b>html</b>" },
-       {from: 2, to: 4, label: "XXX",font: {align: 'middle'} },
-       {from: 3, to: 4,  label: "*html* to _md_" },
-       {from: 3, to: 44 },
-     ];
+//    var nodesArray = [
+//       { id: 1, level: 1,
+//         color: 'gray',
+//         label: 'This is a\nsingle-font label', x: -120, y: -120 },
+//       { id: 2, font: { multi: 'md' ,face: 'monospace', align: 'left' ,level:2}, 
+//         label: '*This is a*\nmonospace font with\n3Zeilen\n<code>xxx</code>', x: -40, y: -40, },
+//       { id: 3, font: { multi: 'html', level: 2,size: 14 , bold: '15px courier blue'}, 
+//         label: 'itil::appl\n<code>Zeile2</code>\n<code>Zeile3</code>', x: 4, y: 40, group:'appl' },
+//       { id: 4, font: { multi: 'md', face: 'georgia', level:3 }, 
+//         label: '*This* is a\n_markdown_ *_multi-_ font* `label`', x: 120, y: 120, level:3},
+//       { id: 44, font: { multi: 'md', face: 'georgia' }, label:'W5Base/Darwin',borderWidth:1,shapeProperties: {
+//            useBorderWithImage:true
+//          },
+//         image:'https://darwin.telekom.de/darwin/public/itil/load/appl.jpg', shape:'image',x:100,y:200},
+//       { id: 45, level:1,font: { multi: 'md', face: 'georgia' }, label:'qde8hv',borderWidth:1,shapeProperties: {
+//            useBorderWithImage:true
+//          },
+//         image:'https://darwin.telekom.de/darwin/public/itil/load/system.jpg', shape:'image',x:100,y:200},
+//     ];
+//     nodes = new vis.DataSet(nodesArray);
+//
+//
+//     var edges = [
+//       {from: 1, to: 2, label: "single to default",arrows: 'to'},
+//       {from: 2, to: 3, label: "default to <b>html</b>" },
+//       {from: 2, to: 4, label: "XXX",font: {align: 'middle'} },
+//       {from: 3, to: 4,  label: "*html* to _md_" },
+//       {from: 3, to: 44 },
+//     ];
 
      var data = {
-       nodes: nodes,
-       edges: edges
+       nodes: this.node,
+       edges: this.edge
      };
      var options = {
        edges: {
@@ -407,12 +487,6 @@ var W5ExploreClass=function(){
          smooth: true,
        },
        nodes: {
-         shape: 'box',
-         borderWidth:1,
-         color: {
-            border: 'black',
-            background: '#6AAFFF'
-         },
          level:5,
          font: {
            bold: {
@@ -421,11 +495,9 @@ var W5ExploreClass=function(){
          }
        },
        groups: {
-          'appl': {
-            shape: 'box',
-            level: 2,
-            color: '#FF9900' // orange
-          }
+          'itil::appl':         { level: 2 },
+          'itil::swinstance':   { level: 3 },
+          'itil::system':       { level: 4 }
        },
 
        layout: {
@@ -437,7 +509,7 @@ var W5ExploreClass=function(){
          enabled: false
        }
      };
-     var network = new vis.Network(this.netmap, data, options);
+     this.network = new vis.Network(this.netmap, data, options);
 //  network.once("beforeDrawing", function() {
 //      network.focus(2, {
 //        scale: 12
@@ -446,7 +518,7 @@ var W5ExploreClass=function(){
     
 
 
-    network.on("click", function (params) {
+    this.network.on("click", function (params) {
         params.event = "[original event]";
         if (params.nodes[0]){
            dbrec.innerHTML = '<h2>Click event: on '+params.nodes[0]+'</h2><xmp>' + JSON.stringify(params, null, 4)+"</xmp>";
@@ -454,16 +526,31 @@ var W5ExploreClass=function(){
         else{
            dbrec.innerHTML='';
         }
-        console.log("click",params.nodes[0]);
-        if (W5Explore.cons){
-           console.log("remove cons");
-           $("#cons").remove();
-           delete(this.cons);
-           W5Explore.ResizeLayout();
-        }
+//        console.log("click",params.nodes[0]);
+//        if (W5Explore.cons){
+//           console.log("remove cons");
+//           $("#cons").remove();
+//           delete(this.cons);
+//           W5Explore.ResizeLayout();
+//        }
         
         
     });
+
+    this.Config=function(){
+       return(
+          new Promise(function(ok,error){
+             if (!this._Config){
+                this._Config=createConfig({
+                   useUTF8:false,
+                   mode:'auth',
+                   transfer:'JSON',baseUrl:'../../../'
+                });
+             }
+             ok(this._Config);
+          })
+       )
+    };
 
     var Config=function(){
        return(
@@ -539,46 +626,30 @@ var W5ExploreClass=function(){
        )
     };
 
-    getUserRec().then(function(buf){
-          console.log("getUserRec res:",buf);
-          return(addDynNodes2(buf));
-       }).then(function(buf){
-          console.log("addDynNodes2 res:",buf);
-          return(addDynNodes3(buf));
-       }).then(function(buf){
-          console.log("addDynNodes3 res:",buf);
-          return(addDynNodes4(buf));
-       }).then(function(buf){
-          console.log("addDynNodes4 res:",buf);
-       }).catch(function(errobj){
-          console.log("irgendwass ist schlecht:",errobj);
-       }).done();
+//    getUserRec().then(function(buf){
+//          console.log("getUserRec res:",buf);
+//          return(addDynNodes2(buf));
+//       }).then(function(buf){
+//          console.log("addDynNodes2 res:",buf);
+//          return(addDynNodes3(buf));
+//       }).then(function(buf){
+//          console.log("addDynNodes3 res:",buf);
+//          return(addDynNodes4(buf));
+//       }).then(function(buf){
+//          console.log("addDynNodes4 res:",buf);
+//       }).catch(function(errobj){
+//          console.log("irgendwass ist schlecht:",errobj);
+//       }).done();
 
-Promise.all([getUserRec(),addDynNodes4()]).then(function(r){
-  console.log("values",r); 
-}).catch(function(e){
-  console.log("bad",e); 
+//Promise.all([getUserRec(),addDynNodes4()]).then(function(r){
+//  console.log("values",r); 
+//}).catch(function(e){
+//  console.log("bad",e); 
+//
+//});
 
-});
 
-console.log("pre load");
-$.getScript( "../../itil/appl/jsExplore", function( data, textStatus, jqxhr ) {
-   console.log("itil/appl is loaded",ClassLib);
-}).fail(function(e){
-   console.log("fail",e);
-});
 
-ClassLib['itil::system']=function(){
-   this.f=function(){
-      alert("this is  in sysf");
-   };
-};
-
-console.log("post load");
-
-var o=new ClassLib['itil::system']();
-o.f();
-console.log(o);
 
 
 
@@ -653,6 +724,20 @@ $(window).resize(function() {
 });
 
 W5Explore.SampleMap();
+
+Promise.all([
+  W5Explore.addNode("itil::appl","5275","Darwin",100,100),
+  W5Explore.addNode("itil::appl","13736266300011","W5Ware",100,100),
+  W5Explore.addNode("itil::system","44","TestSysA",100,100),
+  W5Explore.addNode("itil::system","45","TestSysB",100,100),
+  W5Explore.addNode("itil::system","46","TestSysC",100,100),
+  W5Explore.addNode("itil::swinstance","13042773570001","Instance",100,100)
+]).then(function(){
+   console.log("OK, all loaded");
+  W5Explore.network.fit();   
+});
+
+
 //W5Explore.SampleMenu();
 
 
