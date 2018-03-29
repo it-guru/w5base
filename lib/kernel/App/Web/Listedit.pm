@@ -348,14 +348,11 @@ sub jsExplore
 (function(window, document, undefined) {
 
    ClassDataObjLib['${dataobj}']=new Object();
-   ClassDataObjLib['${dataobj}']=function(dataobjid){
-      return(ClassDataObj.call(this,o,dataobjid));
-   };
-
    ClassDataObjLib['${dataobj}']=function(id,initialLabel,initialX,initialY){
        this.label=initialLabel;
        this.dataobj='${dataobj}';
        this.dataobjid=id;
+       ClassDataObj.call();
        this.font={
           multi:'md',
           face:'georgia'
@@ -375,10 +372,9 @@ sub jsExplore
        this.id=W5Explore.toObjKey(this.dataobj,this.dataobjid);
        var that=this;
        setTimeout(function(){
-          new Promise(function(ok,reject){
+          var p=new Promise(function(ok,reject){
              that.app.Config().then(function(Config){
                    var w5obj=getModuleObject(Config,that.dataobj);
-                   console.log("w5obj",w5obj);
                    var flt=new Object();
                    flt[that.fieldnameid]=that.dataobjid;
                    w5obj.SetFilter(flt);
@@ -399,6 +395,11 @@ sub jsExplore
                 console.log("can not get config");
                 reject(null);
              });
+          });
+          p.then(function(){
+          }).catch(function(){
+             that.app.console.log("ERROR","fail to validated '"+
+                                  initialLabel);  
           });
           that.initLevel++;
        },10);

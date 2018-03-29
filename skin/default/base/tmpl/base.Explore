@@ -75,12 +75,13 @@ body{
 }
 
 #cons{
- border-style:solid;
- border-color:yellow;
- border-widt:1px;
+ border-width:0px;
  margin:0px;
  padding:0px;
- height:50px;
+ height:55px;
+ overflow:hidden;
+ overflow-y:auto;
+ font-family: monospace;
 }
 </style>
 
@@ -261,19 +262,22 @@ Object.defineProperty(Object.prototype, "extend", {
 
 // #######################################################################
 
-// Global DataObj Class lib
-var ClassDataObjLib=new Array();
+var ClassDataObjLib=new Object();
+var ClassAppletLib=new Object();
 
 // Top Class for all DataObjs
 (function(window, document, undefined) {
-   ClassDataObj=function(dataobj,id){
-      console.log("constructor ClassDataObj called",dataobj,id);
+   ClassDataObj=function(){
+      console.log("top constructor ClassDataObj called",dataobj,id);
    };
    ClassDataObj.prototype.update=function(o){
       o.id=this.id;
       this.parent.update(o);
    };
-   console.log("ClassDataObj loaded");
+   ClassApplet=function(){
+      console.log("top constructor ClassApplet");
+   };
+
 })(this,document);
 
 
@@ -281,6 +285,32 @@ var ClassDataObjLib=new Array();
 // Main Application Class
 
 var W5ExploreClass=function(){
+   this.console=new Object();
+
+   this.spinnerOpts={
+        lines: 13 // The number of lines to draw
+      , length: 28 // The length of each line
+      , width: 8 // The line thickness
+      , radius: 22 // The radius of the inner circle
+      , scale: 1 // Scales overall size of the spinner
+      , corners: 1 // Corner roundness (0..1)
+      , color: '#000' // #rgb or #rrggbb or array of colors
+      , opacity: 0.25 // Opacity of the lines
+      , rotate: 0 // The rotation offset
+      , direction: 1 // 1: clockwise, -1: counterclockwise
+      , speed: 1 // Rounds per second
+      , trail: 60 // Afterglow percentage
+      , fps: 20 // Frames per second when using setTimeout() 
+      , zIndex: 2e9 // The z-index (defaults to 2000000000)
+      , className: 'spinner' // The CSS class to assign to the spinner
+      , top: '50%' // Top position relative to parent
+      , left: '50%' // Left position relative to parent
+      , shadow: false // Whether to render a shadow
+      , hwaccel: false // Whether to use hardware acceleration
+      , position: 'relative' // Element positioning
+      , id:'spinner'
+   };
+
    this.InitObjectStore=function(){
       this.node = new vis.DataSet();
       this.edge = new vis.DataSet();
@@ -296,10 +326,10 @@ var W5ExploreClass=function(){
 
       $(this.main).outerHeight(
           $(window).innerHeight());
-      if (this.cons){
+      if (this.console.div){
          $(this.workspace).outerHeight(
            $(this.main).innerHeight()-
-           $(this.cons).outerHeight()-
+           $(this.console.div).outerHeight()-
            $(this.mpath).outerHeight()-1);
       }
       else{
@@ -381,10 +411,10 @@ var W5ExploreClass=function(){
       this.workspace.appendChild(this.dbrec);
       this.dbrec.innerHTML = 'dbrec';
 
-      this.cons = document.createElement('div');
-      this.cons.id = 'cons';
-      this.cons.innerHTML = 'COns';
-      this.main.appendChild(this.cons);
+      this.console.div = document.createElement('div');
+      this.console.div.id = 'cons';
+      this.console.div.innerHTML = '';
+      this.main.appendChild(this.console.div);
       this.ResizeLayout();
    };
 
@@ -395,24 +425,67 @@ var W5ExploreClass=function(){
 
    this.loadDataObjClass=function(dataobj){
       var dataobjpath=dataobj.replace('::','/');
+      if (ClassDataObjLib[dataobj]){
+         return(Promise.resolve(ClassDataObjLib[dataobj]));
+      }
       return(
           new Promise(function(res,rej){
-             if (ClassDataObjLib[dataobj]){
-                res(ClassDataObjLib[dataobj]);
-             }
-             else{
                 $.getScript("../../"+dataobjpath+"/jsExplore", 
                 function( data, textStatus, jqxhr ) {
                    console.log("itil/appl is loaded",ClassDataObjLib);
                    res(ClassDataObjLib[dataobj]);
-                }).fail(function(e){
-                   console.log("fail",e);
+                }).fail(function(e,parseerror){
+                   if (e.readyState==0){
+                      alert("fail to load script");
+                   }
+                   else{
+                      alert("script parse error "+parseerror);
+                   }
                    rej("ERROR: can not resolv dataobj "+dataobj);
                 });
-             }
           })
        );
    };
+
+   this.loadApplets=function(){
+      return(
+          new Promise(function(res,rej){
+                $.getScript("jsApplets", 
+                function( data, textStatus, jqxhr ) {
+                   console.log("Applets is loaded");
+                   res(1);
+                }).fail(function(e,parseerror){
+                   if (e.readyState==0){
+                      alert("fail to load script");
+                   }
+                   else{
+                      alert("script parse error "+parseerror);
+                   }
+                   console.log("fail",e);
+                   rej(0);
+                });
+          })
+       );
+   };
+
+   this.loadAppletClass=function(appletname){
+     // if (ClassDataObjLib[dataobj]){
+     //    return(Promise.resolve(ClassDataObjLib[dataobj]));
+     // }
+     // return(
+     //     new Promise(function(res,rej){
+     //           $.getScript("../../"+dataobjpath+"/jsExplore", 
+     //           function( data, textStatus, jqxhr ) {
+     //              console.log("itil/appl is loaded",ClassDataObjLib);
+     //              res(ClassDataObjLib[dataobj]);
+     //           }).fail(function(e){
+     //              console.log("fail",e);
+     //              rej("ERROR: can not resolv dataobj "+dataobj);
+     //           });
+     //     })
+     //  );
+   };
+
 
    this.addNode=function(dataobj,id,initialLabel,initialX,initialY){
       return(
@@ -421,7 +494,6 @@ var W5ExploreClass=function(){
                  function(DataObjClassPrototype){
                     var o=new DataObjClassPrototype(id,initialLabel,
                                                     initialX,initialY);
-                    console.log("ok o loaded",o,this);
                     W5Explore.node.add(o);
                     o.parent=W5Explore.node;
                     o.app=W5Explore;
@@ -432,84 +504,90 @@ var W5ExploreClass=function(){
    };
 
 
+   this.console.log=function(level,text){
+      var currentdate = new Date(); 
+      var datetime =  currentdate.getDate() + "/"
+                      + (currentdate.getMonth()+1)  + "." 
+                      + currentdate.getFullYear() + " "  
+                      + currentdate.getHours() + ":"  
+                      + currentdate.getMinutes() + ":" 
+                      + currentdate.getSeconds();
+      if (this.div){
+         var curConsVal=this.div.innerHTML.split("\n");
+         var maxcons=10;
+         if (curConsVal.length>=maxcons){
+            curConsVal=curConsVal.splice(maxcons*-1);
+            this.div.innerHTML=curConsVal.join("\n");
+         }
+         var color="<font>";
+         if (level=="ERROR"){
+            color="<red>";
+         }
+         var line=datetime+" "+color+level+": "+text+"</font><br>\n";
+         line=line.replace(' ','&nbsp;');
+         line=line.replace('<red>','<font color=red>');
+         this.div.innerHTML+=line;
+         $(this.div).scrollTop($(this.div).prop("scrollHeight"));
+      }
+      else{
+         console.log("W5Explore",level,text);
+      }
+   };
 
-     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="390" height="65">' +
-            '<rect x="0" y="0" width="100%" height="100%" fill="#7890A7" stroke-width="20" stroke="#ffffff" ></rect>' +
-            '<foreignObject x="15" y="10" width="100%" height="100%">' +
-            '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
-            ' <em>I</em> am' +
-            '</div>' +
-            '</foreignObject>' +
-            '</svg>';
-     var url = "data:image/svg+xml;charset=utf-8,"+ encodeURIComponent(svg);
+
+   this.Config=function(){
+      return(
+         new Promise(function(ok,error){
+            if (!this._Config){
+               this._Config=createConfig({
+                  useUTF8:false,
+                  mode:'auth',
+                  transfer:'JSON',baseUrl:'../../../'
+               });
+            }
+            ok(this._Config);
+         })
+      )
+   };
+
 
    this.SampleMap=function(){
       this.LayoutNetworkMap();
-//    var nodesArray = [
-//       { id: 1, level: 1,
-//         color: 'gray',
-//         label: 'This is a\nsingle-font label', x: -120, y: -120 },
-//       { id: 2, font: { multi: 'md' ,face: 'monospace', align: 'left' ,level:2}, 
-//         label: '*This is a*\nmonospace font with\n3Zeilen\n<code>xxx</code>', x: -40, y: -40, },
-//       { id: 3, font: { multi: 'html', level: 2,size: 14 , bold: '15px courier blue'}, 
-//         label: 'itil::appl\n<code>Zeile2</code>\n<code>Zeile3</code>', x: 4, y: 40, group:'appl' },
-//       { id: 4, font: { multi: 'md', face: 'georgia', level:3 }, 
-//         label: '*This* is a\n_markdown_ *_multi-_ font* `label`', x: 120, y: 120, level:3},
-//       { id: 44, font: { multi: 'md', face: 'georgia' }, label:'W5Base/Darwin',borderWidth:1,shapeProperties: {
-//            useBorderWithImage:true
-//          },
-//         image:'https://darwin.telekom.de/darwin/public/itil/load/appl.jpg', shape:'image',x:100,y:200},
-//       { id: 45, level:1,font: { multi: 'md', face: 'georgia' }, label:'qde8hv',borderWidth:1,shapeProperties: {
-//            useBorderWithImage:true
-//          },
-//         image:'https://darwin.telekom.de/darwin/public/itil/load/system.jpg', shape:'image',x:100,y:200},
-//     ];
-//     nodes = new vis.DataSet(nodesArray);
-//
-//
-//     var edges = [
-//       {from: 1, to: 2, label: "single to default",arrows: 'to'},
-//       {from: 2, to: 3, label: "default to <b>html</b>" },
-//       {from: 2, to: 4, label: "XXX",font: {align: 'middle'} },
-//       {from: 3, to: 4,  label: "*html* to _md_" },
-//       {from: 3, to: 44 },
-//     ];
-
-     var data = {
-       nodes: this.node,
-       edges: this.edge
-     };
-     var options = {
-       edges: {
-         font: {
-           size: 12
-         },
-         smooth: true,
-       },
-       nodes: {
-         level:5,
-         font: {
-           bold: {
-             color: '#0077aa'
-           }
-         }
-       },
-       groups: {
-          'itil::appl':         { level: 2 },
-          'itil::swinstance':   { level: 3 },
-          'itil::system':       { level: 4 }
-       },
-
-       layout: {
-          hierarchical: {
-            sortMethod: 'directed'
+      var data = {
+        nodes: this.node,
+        edges: this.edge
+      };
+      var options = {
+        edges: {
+          font: {
+            size: 12
+          },
+          smooth: true,
+        },
+        nodes: {
+          level:5,
+          font: {
+            bold: {
+              color: '#0077aa'
+            }
           }
         },
-       physics: {
-         enabled: false
-       }
-     };
-     this.network = new vis.Network(this.netmap, data, options);
+        groups: {
+           'itil::appl':         { level: 2 },
+           'itil::swinstance':   { level: 3 },
+           'itil::system':       { level: 4 }
+        },
+     
+        layout: {
+           hierarchical: {
+             sortMethod: 'directed'
+           }
+         },
+        physics: {
+          enabled: false
+        }
+      };
+      this.network = new vis.Network(this.netmap, data, options);
 //  network.once("beforeDrawing", function() {
 //      network.focus(2, {
 //        scale: 12
@@ -518,178 +596,73 @@ var W5ExploreClass=function(){
     
 
 
-    this.network.on("click", function (params) {
-        params.event = "[original event]";
-        if (params.nodes[0]){
-           dbrec.innerHTML = '<h2>Click event: on '+params.nodes[0]+'</h2><xmp>' + JSON.stringify(params, null, 4)+"</xmp>";
-        }
-        else{
-           dbrec.innerHTML='';
-        }
-//        console.log("click",params.nodes[0]);
-//        if (W5Explore.cons){
-//           console.log("remove cons");
-//           $("#cons").remove();
-//           delete(this.cons);
-//           W5Explore.ResizeLayout();
-//        }
-        
-        
-    });
-
-    this.Config=function(){
-       return(
-          new Promise(function(ok,error){
-             if (!this._Config){
-                this._Config=createConfig({
-                   useUTF8:false,
-                   mode:'auth',
-                   transfer:'JSON',baseUrl:'../../../'
-                });
-             }
-             ok(this._Config);
-          })
-       )
-    };
-
-    var Config=function(){
-       return(
-          new Promise(function(ok,error){
-             if (!this._Config){
-                this._Config=createConfig({
-                   useUTF8:false,
-                   mode:'auth',
-                   transfer:'JSON',baseUrl:'../../../'
-                });
-             }
-             ok(this._Config);
-          })
-       )
-    };
-
-
-
-    var getUserRec=function(tAct){
-       if (tAct==null){tAct={}}
-       return(
-          new Promise(function(ok,reject){
-             Config().then(function(cfg){
-                var w5obj=getModuleObject(cfg,'base::user');
-                w5obj.SetFilter({posix:"hvogler"});
-                w5obj.findRecord("fullname,userid",function(data){
-                   ok(tAct.extend({userrec:data[0]}));
-                },function(exception){
-                   console.log("got error from call");
-                   reject(exception);
-                });
-             }).catch(function(){
-                console.log("can not get config");
-                reject(null); 
-             });
-          })
-       )
-    };
-
-    var addDynNodes2=function(tAct){
-       if (tAct==null){tAct={}}
-       return(
-          new Promise(function(res,rej){
-             var newId = (Math.random() * 1e7).toString(32);
-             nodes.add({id:newId, label:"OK2"});
-             console.log("ok2");
-             res(tAct.extend({ok2:'ok'}));
-          })
-       )
-    };
-
-    var addDynNodes3=function(tAct){
-       if (tAct==null){tAct={}}
-       return(
-         new Promise(function(resolve,reject){
-            var newId = (Math.random() * 1e7).toString(32);
-            nodes.add({id:newId, label:"OK3"});
-            console.log("ok3");
-            resolve(tAct.extend({ok3:"cc"}));
-         })
-       )
-    };
-
-    var addDynNodes4=function(tAct){
-       if (tAct==null){tAct={}}
-       return(
-         new Promise(function(resolve,reject){
-            var newId = (Math.random() * 1e7).toString(32);
-            nodes.add({id:newId, label:"OK4"});
-            console.log("ok4");
-            resolve(tAct.extend({ok4:"This is the end"}));
-         })
-       )
-    };
-
-//    getUserRec().then(function(buf){
-//          console.log("getUserRec res:",buf);
-//          return(addDynNodes2(buf));
-//       }).then(function(buf){
-//          console.log("addDynNodes2 res:",buf);
-//          return(addDynNodes3(buf));
-//       }).then(function(buf){
-//          console.log("addDynNodes3 res:",buf);
-//          return(addDynNodes4(buf));
-//       }).then(function(buf){
-//          console.log("addDynNodes4 res:",buf);
-//       }).catch(function(errobj){
-//          console.log("irgendwass ist schlecht:",errobj);
-//       }).done();
-
-//Promise.all([getUserRec(),addDynNodes4()]).then(function(r){
-//  console.log("values",r); 
-//}).catch(function(e){
-//  console.log("bad",e); 
-//
-//});
-
-
-
-
-
-
-
-//    var c=0;
-//    setInterval(function(){
-//        c++;
-//        if (c<10){
-//          
-//           var newId = (Math.random() * 1e7).toString(32);
-//           nodes.add({id:newId, label:"I'm new!",level:c});
-//        }
-//        if (c==11){
-//              network.fit({
-//                    animation: {
-//                       duration: 3000
-//                 }
-//              });
-//        }
-//        if (c==1100){
-//      network.focus(2, {
-//        scale: 12
-//      });
-//
-//        }
-//    },20);
-
-
-
-
-
+      this.network.on("click", function (params) {
+          params.event = "[original event]";
+          if (params.nodes[0]){
+             dbrec.innerHTML = '<h2>Click event: on '+params.nodes[0]+
+                               '</h2><xmp>' + JSON.stringify(params, null, 4)+
+                               "</xmp>";
+          }
+          else{
+             dbrec.innerHTML='';
+          }
+      });
    };
+
+   this.showAppletList=function(){
+      $("#workspace").html("");
+      var p=document.createElement('div');
+      $(p).addClass("parent");
+      $(this.workspace).append(p);
+      var appletKey=Object.keys(ClassAppletLib);
+      var appletCnt=appletKey.length;
+      for(var c=0;c<appletCnt;c++){
+         var k=appletKey[c];
+         var e=document.createElement('div');
+         $(e).addClass("item");
+         var tile=document.createElement('div');
+         $(tile).addClass("mtile");
+         var m=document.createElement('div');
+         $(m).addClass("mtiletxt");
+         var htmltext="<span>"+ClassAppletLib[k].desc.label+"</span>";
+         htmltext+="<p>"+ClassAppletLib[k].desc.description+"</p>";
+         htmltext+="<small>"+ClassAppletLib[k].desc.sublabel+"</small>";
+         $(m).html(htmltext);
+         tile.appendChild(m);
+         e.appendChild(tile);
+         p.appendChild(e);
+      }
+      for(var c=0;c<appletCnt;c++){
+         var e=document.createElement('div');
+         $(e).addClass("dummyItem");
+         p.appendChild(e);
+      }
+   }
+
+
+
+   this.MainMenu=function(){
+      var app=this;
+      this.LayoutMenuLayer();
+      var target = document.body;
+      var spinner = new Spinner(W5Explore.spinnerOpts).spin(target);
+      this.loadApplets().then(function(){
+         app.showAppletList();
+         $(".spinner").hide();
+      }).catch(function(e){
+         $(".spinner").hide();
+         console.log("e=",e);
+         $("#workspace").html("not OK");
+      });
+   }
+
+
    this.SampleMenu=function(){
       this.LayoutMenuLayer();
      
       var p=document.createElement('div');
       $(p).addClass("parent");
       this.workspace.appendChild(p);
-      console.log("fifi 01");
-
       var c;
       for(c=0;c<10;c++){
          var e=document.createElement('div');
@@ -723,22 +696,32 @@ $(window).resize(function() {
    W5Explore.ResizeLayout();
 });
 
-W5Explore.SampleMap();
 
-Promise.all([
-  W5Explore.addNode("itil::appl","5275","Darwin",100,100),
-  W5Explore.addNode("itil::appl","13736266300011","W5Ware",100,100),
-  W5Explore.addNode("itil::system","44","TestSysA",100,100),
-  W5Explore.addNode("itil::system","45","TestSysB",100,100),
-  W5Explore.addNode("itil::system","46","TestSysC",100,100),
-  W5Explore.addNode("itil::swinstance","13042773570001","Instance",100,100)
-]).then(function(){
-   console.log("OK, all loaded");
-  W5Explore.network.fit();   
-});
+if (0){
+   W5Explore.SampleMap();
 
-
-//W5Explore.SampleMenu();
+   W5Explore.console.log("INFO","loading scenario ...");
+   Promise.all([
+      W5Explore.loadDataObjClass("itil::appl"),
+      W5Explore.loadDataObjClass("itil::system")
+   ]).then(function(){
+      Promise.all([
+        W5Explore.addNode("itil::appl","5275","Darwin",100,100),
+        W5Explore.addNode("itil::appl","13736266300011","W5Ware",100,100),
+        W5Explore.addNode("itil::system","44","TestSysA",100,100),
+        W5Explore.addNode("itil::system","45","TestSysB",100,100),
+        W5Explore.addNode("itil::system","46","TestSysC",100,100),
+        W5Explore.addNode("itil::swinstance","13042773570001","Instance",100,100)
+      ]).then(function(){
+         console.log("OK, all loaded");
+        W5Explore.network.fit();   
+        W5Explore.console.log("INFO","finished scenario load");
+      });
+   });
+}
+else{
+   W5Explore.MainMenu();
+}
 
 
 

@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
-use CGI;
+use JSON;
 @ISA=qw(kernel::App::Web);
 
 sub new
@@ -28,14 +28,14 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->LoadSubObjs("Research","Research");
+   $self->LoadSubObjsOnDemand("Explore","Explore");
    return($self);
 }
 
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main));
+   return(qw(Main jsApplets));
 }
 
 
@@ -62,6 +62,29 @@ sub Main
    my $prog=$self->getParsedTemplate("tmpl/base.Explore",$opt);
    utf8::encode($prog);
    print($prog);
+}
+
+sub jsApplets
+{
+   my $self=shift;
+   my $lang=$self->Lang();
+
+   print $self->HttpHeader("text/javascript");
+
+   printf("(function(window, document, undefined){\n");
+   my $jsengine=new JSON();
+   foreach my $sobj (values(%{$self->{Explore}})){
+      my $d;
+      if ($sobj->can("getObjectInfo")){
+         $d=$sobj->getObjectInfo($self,$lang);
+      }
+      if (defined($d)){
+         my $selfname=$sobj->Self();
+         my $jsdata=$jsengine->encode($d);
+         printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+      }
+   }
+   printf("})(this,document);\n\n");
 }
 
 
