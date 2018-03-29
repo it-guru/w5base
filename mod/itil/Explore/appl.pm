@@ -44,12 +44,21 @@ sub getJSObjectClass
 
    my $d=<<EOF;
 (function(window, document, undefined) {
-   var o='${selfname}';
-   DataObject[o]=new Object();
-   DataObject[o].Class=function(dataobjid){
-      return(DataObjectBaseClass.call(this,o,dataobjid));
+   var applet='${selfname}';
+   ClassAppletLib[applet].class=function(app){
+      ClassApplet.call(this,app);
    };
-   \$.extend(DataObject[o].Class.prototype,DataObjectBaseClass.prototype);
+   \$.extend(ClassAppletLib[applet].class.prototype,ClassApplet.prototype);
+
+   ClassAppletLib[applet].class.prototype.run=function(){
+      var appletobj=this;
+      this.app.showDialog(function(){
+         var d="this is $self , $app,  $lang";
+         return(d);
+      },function(){
+         appletobj.exit();
+      });
+   };
 
 })(this,document);
 EOF

@@ -29,7 +29,6 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless({%param},$type);
-   $self->{dataobj}='itil::appl';
    return($self);
 }
 
@@ -39,144 +38,11 @@ sub getJSObjectClass
    my $app=shift;
    my $lang=shift;
 
-    my $addIf=quoteHtml($self->getParent->T("add interfaces"));
-    my $addSys=quoteHtml($self->getParent->T("add systems"));
-
 
    my $d=<<EOF;
-(function(window, document, undefined) {
-   var o='$self->{dataobj}';
-   DataObject[o]=new Object();
-   DataObject[o].Class=function(dataobjid){
-      return(DataObjectBaseClass.call(this,o,dataobjid));
-   };
-   \$.extend(DataObject[o].Class.prototype,DataObjectBaseClass.prototype);
-   DataObject[o].handleSearch=function(searchstring){
-         var w5obj=getModuleObject(W5App.Config(),'$self->{dataobj}');
-         var curDataObj='$self->{dataobj}';
-         w5obj.SetFilter({name:searchstring,cistatusid:4});
-         W5App.setLoading(1,"searching "+this.dataobj);
-         w5obj.findRecord("name,id",function(data){
-            if (data){
-               for(c=0;c<data.length;c++){
-                  W5App.SearchAddResultRecord({
-                     label:data[c].name,
-                     dataobj:curDataObj,
-                     dataobjid:data[c].id
-                  });
-               }
-            }
-            W5App.SearchFinishResult();
-            W5App.setLoading(-1);
-         });
-   }
-   DataObject[o].getPosibleExtractors=function(){
-      return([{name:'dataobjid',label:'W5BaseID'},
-              {name:'dataobj'  ,label:'W5BaseObj'}]);
-   };
-
    DataObject[o].Class.prototype.loadShortRecord=function(){
       this.loadRec("id,name");
    };
-
-   DataObject[o].Class.prototype.shortname=function(){
-      if (!this.rec){
-         this.loadShortRecord();
-      }
-      var shortname=this.rec.name;
-      return(shortname);
-   };
-   DataObject[o].Class.prototype.fullname=function(){
-      return(this.shortname());
-   };
-
-   DataObject[o].Class.prototype.gatherDetailData=function(){
-      var l=DataObjectBaseClass.prototype.gatherDetailData.call(this);
-      l.push({
-         label:'AppMgr',
-         type:'text',
-         value:{
-            text:this.rec.applmgr
-         }
-      });
-      if (this.rec.mdate==undefined){
-         this.loadRec("id,name,applmgr,interfaces,systems,swinstances,mdate");
-      }
-      return(l);
-   };
-
-
-   DataObject[o].Class.prototype.getAvatarImage=function(){
-      var i = new Image();
-      i.src = '../../../public/itil/load/appl.jpg'+
-              '?HTTP_ACCEPT_LANGUAGE=$lang';
-      return(i);
-   };
-
-   DataObject[o].Class.prototype.getPosibleActions=function(){
-      var l=DataObjectBaseClass.prototype.getPosibleActions.call(this);
-      var l=new Array();
-      l.push({name:'addIf',label:'$addIf'});
-      l.push({name:'addSystems',label:'$addSys'});
-      return(l);
-   };
-
-   DataObject[o].Class.prototype.onAction=function(name,resultSet){
-      if (name=='addIf'){
-         var w5obj=getModuleObject(W5App.Config(),this.dataobj);
-         var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
-         w5obj.SetFilter({id:this.dataobjid});
-         W5App.setLoading(1,"addIf "+this.dataobj);
-         w5obj.findRecord("interfaces",function(data){
-            if (data[0]){
-               console.log(data);
-               for(var c=0;c<data[0].interfaces.length;c++){
-                  var dkey=W5App.toObjKey('itil::appl',
-                                          data[0].interfaces[c].toapplid);
-                  W5App.addObject('itil::appl',
-                                  data[0].interfaces[c].toapplid);
-                  W5App.addConnectorKK(skey,dkey,0);
-               }
-            }
-            W5App.setLoading(-1);
-         });
-         return(1);
-      }
-      if (name=='appl'){
-         var dkey=W5App.toObjKey(this.dataobj,this.dataobjid);
-         resultSet.addObject({
-            k:dkey,
-            rec:{
-               name:this.shortname(),
-               dataobj:this.dataobj,
-               dataobjid:this.dataobjid
-            }
-         }); 
-         return(1);
-      }
-      if (name=='addSystems'){
-         var w5obj=getModuleObject(W5App.Config(),this.dataobj);
-         var skey=W5App.toObjKey(this.dataobj,this.dataobjid);
-         w5obj.SetFilter({id:this.dataobjid});
-         W5App.setLoading(1,"addSystems "+this.dataobj);
-         w5obj.findRecord("systems",function(data){
-            if (data[0]){
-               for(var c=0;c<data[0].systems.length;c++){
-                  var dkey=W5App.toObjKey('itil::system',
-                                          data[0].systems[c].systemid);
-                  W5App.addObject('itil::system',
-                                  data[0].systems[c].systemid);
-                  W5App.addConnectorKK(skey,dkey,0);
-               }
-            }
-            W5App.setLoading(-1);
-         });
-         return(1);
-      }
-      return(DataObjectBaseClass.prototype.onAction.call(this,name,resultSet));
-   };
-
-
 
 
 })(this,document);

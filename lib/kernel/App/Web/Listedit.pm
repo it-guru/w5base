@@ -352,7 +352,7 @@ sub jsExplore
        this.label=initialLabel;
        this.dataobj='${dataobj}';
        this.dataobjid=id;
-       ClassDataObj.call();
+       ClassDataObj.call(this);
        this.font={
           multi:'md',
           face:'georgia'
@@ -397,6 +397,7 @@ sub jsExplore
              });
           });
           p.then(function(){
+             var x=1;
           }).catch(function(){
              that.app.console.log("ERROR","fail to validated '"+
                                   initialLabel);  
@@ -404,7 +405,7 @@ sub jsExplore
           that.initLevel++;
        },10);
    };
-  \$.extend(ClassDataObjLib['${dataobj}'].prototype,ClassDataObj.prototype);
+   \$.extend(ClassDataObjLib['${dataobj}'].prototype,ClassDataObj.prototype);
 
 })(this,document);
 

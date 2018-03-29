@@ -71,17 +71,32 @@ sub jsApplets
 
    print $self->HttpHeader("text/javascript");
 
+   my $appletcall;
+   if (defined(Query->Param("FunctionPath"))){
+      $appletcall=Query->Param("FunctionPath");
+   }
+   $appletcall=~s/^\///;
+   $appletcall=~s/\//::/g;
+
    printf("(function(window, document, undefined){\n");
-   my $jsengine=new JSON();
-   foreach my $sobj (values(%{$self->{Explore}})){
-      my $d;
-      if ($sobj->can("getObjectInfo")){
-         $d=$sobj->getObjectInfo($self,$lang);
+   if ($appletcall ne ""){
+      if (exists($self->{Explore}->{$appletcall})){
+         sleep(2);
+         print($self->{Explore}->{$appletcall}->getJSObjectClass($self,$lang));
       }
-      if (defined($d)){
-         my $selfname=$sobj->Self();
-         my $jsdata=$jsengine->encode($d);
-         printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+   }
+   else{
+      my $jsengine=new JSON();
+      foreach my $sobj (values(%{$self->{Explore}})){
+         my $d;
+         if ($sobj->can("getObjectInfo")){
+            $d=$sobj->getObjectInfo($self,$lang);
+         }
+         if (defined($d)){
+            my $selfname=$sobj->Self();
+            my $jsdata=$jsengine->encode($d);
+            printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+         }
       }
    }
    printf("})(this,document);\n\n");

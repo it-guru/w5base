@@ -1,11 +1,16 @@
+<!DOCTYPE html>
 <html>
 <head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <base href="%BASE%">
-<link rel="stylesheet" href="../../../public/base/load/default.css"></link>
-<link rel="stylesheet" href="../../../public/base/load/work.css"></link>
-<link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css"></link>
-<link rel="stylesheet" href="../../../public/base/load/jquery.dataTables.css"></link>
-<link rel="stylesheet" href="../../../public/base/load/vis.min.css"></link>
+<link rel="stylesheet" href="../../../public/base/load/default.css">
+<link rel="stylesheet" href="../../../public/base/load/work.css">
+<link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css">
+<link rel="stylesheet" href="../../../public/base/load/jquery.dataTables.css">
+<link rel="stylesheet" href="../../../public/base/load/vis.min.css">
+
+
+<!-- Main Layout  Handling -->
 <style>
 body{
  margin:0;padding:0;
@@ -40,8 +45,6 @@ body{
  transform: rotate(45deg);
  font-size:20px;
 }
-
-
 
 #workspace{
  border-style:solid;
@@ -86,8 +89,50 @@ body{
 </style>
 
 
+<!-- Modal Dialog  Handling -->
 <style>
+.modal-background {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1001; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
 
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    padding-top: 5px;
+    border: 1px solid #888;
+    width: 80%; 
+    height: 40%;
+}
+
+.closebtn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.closebtn:hover,
+.closebtn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+</style>
+
+
+<!-- TILE Handling -->
+<style>
 
 .parent {
   display: -webkit-flex;
@@ -107,7 +152,7 @@ body{
 
 .parent .item,
 .parent .dummyItem{
-  width: 240px;
+  width: 260px;
   height: 140px;
 }
 
@@ -156,6 +201,7 @@ body{
 </style>
 
 
+<!-- Top Application Path  Handling -->
 <style>
 .breadcrumb-arrows li {
   display: inline-block;
@@ -204,9 +250,6 @@ body{
 .breadcrumb-arrows a:hover {
   font-weight: bold;
 }
-
-
-
 </style>
 
 
@@ -216,7 +259,7 @@ body{
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <title>W5Explore - preBETA!</title>
-</head><body><div id='main'></div></body>
+</head><body><div id='main'></div>
 <script language="JavaScript" src="../../../public/base/load/promise.js">
 </script>
 <script language="JavaScript" src="../../../auth/base/load/J5Base.js">
@@ -250,6 +293,7 @@ Object.defineProperty(Object.prototype, "extend", {
     },
     enumerable : false
 });
+console.log("fifi 01");
 
 
 
@@ -268,14 +312,22 @@ var ClassAppletLib=new Object();
 // Top Class for all DataObjs
 (function(window, document, undefined) {
    ClassDataObj=function(){
-      console.log("top constructor ClassDataObj called",dataobj,id);
+      console.log("top constructor ClassDataObj called",
+                  this.dataobj,this.dataobjid);
    };
    ClassDataObj.prototype.update=function(o){
       o.id=this.id;
       this.parent.update(o);
    };
-   ClassApplet=function(){
+   ClassApplet=function(app){
+      this.app=app;
       console.log("top constructor ClassApplet");
+   };
+   ClassApplet.prototype.run=function(){
+      alert("no run() defined in this Applet");
+   };
+   ClassApplet.prototype.exit=function(){
+      // maybe cleanup old objects
    };
 
 })(this,document);
@@ -286,6 +338,7 @@ var ClassAppletLib=new Object();
 
 var W5ExploreClass=function(){
    this.console=new Object();
+   this.runingApplet=new Object();
 
    this.spinnerOpts={
         lines: 13 // The number of lines to draw
@@ -391,8 +444,7 @@ var W5ExploreClass=function(){
       this.workspace = document.createElement('div');
       this.workspace.id = 'workspace';
       this.main.appendChild(this.workspace);
-      //workspace.innerHTML = 'ws';
-
+      this.spinner = new Spinner(W5Explore.spinnerOpts).spin(this.main);
    };
 
    this.LayoutMenuLayer=function(){
@@ -426,21 +478,16 @@ var W5ExploreClass=function(){
    this.loadDataObjClass=function(dataobj){
       var dataobjpath=dataobj.replace('::','/');
       if (ClassDataObjLib[dataobj]){
+         console.log("load "+dataobj+" from cache");
          return(Promise.resolve(ClassDataObjLib[dataobj]));
       }
       return(
           new Promise(function(res,rej){
                 $.getScript("../../"+dataobjpath+"/jsExplore", 
                 function( data, textStatus, jqxhr ) {
-                   console.log("itil/appl is loaded",ClassDataObjLib);
+                   console.log(dataobj+" is loaded",ClassDataObjLib);
                    res(ClassDataObjLib[dataobj]);
                 }).fail(function(e,parseerror){
-                   if (e.readyState==0){
-                      alert("fail to load script");
-                   }
-                   else{
-                      alert("script parse error "+parseerror);
-                   }
                    rej("ERROR: can not resolv dataobj "+dataobj);
                 });
           })
@@ -462,28 +509,47 @@ var W5ExploreClass=function(){
                       alert("script parse error "+parseerror);
                    }
                    console.log("fail",e);
-                   rej(0);
+                   rej(e);
                 });
           })
        );
    };
 
-   this.loadAppletClass=function(appletname){
-     // if (ClassDataObjLib[dataobj]){
-     //    return(Promise.resolve(ClassDataObjLib[dataobj]));
-     // }
-     // return(
-     //     new Promise(function(res,rej){
-     //           $.getScript("../../"+dataobjpath+"/jsExplore", 
-     //           function( data, textStatus, jqxhr ) {
-     //              console.log("itil/appl is loaded",ClassDataObjLib);
-     //              res(ClassDataObjLib[dataobj]);
-     //           }).fail(function(e){
-     //              console.log("fail",e);
-     //              rej("ERROR: can not resolv dataobj "+dataobj);
-     //           });
-     //     })
-     //  );
+   this.loadAppletClass=function(applet){
+      if (ClassAppletLib[applet].class){
+         console.log("load applet "+applet+" from cache");
+         return(Promise.resolve(ClassAppletLib[applet].class));
+      }
+      $(".spinner").show();
+      return(
+         new Promise(function(res,rej){
+               $.getScript("jsApplets/"+applet, 
+               function( data, textStatus, jqxhr ) {
+                  console.log("Applets code is loaded");
+                  $(".spinner").hide();
+                  res(ClassAppletLib[applet].class);
+               }).fail(function(e,parseerror){
+                  console.log("fail",e);
+                  rej(e);
+               });
+         })
+      );
+   };
+
+   this.runApplet=function(applet){
+      var app=this;
+      if (app.runingApplet[applet]){
+         app.runingApplet[applet].run();
+      }
+      else{
+         W5Explore.loadAppletClass(applet).then(function(AppletClassPrototype){
+            app.runingApplet[applet]=new AppletClassPrototype(app);
+            app.runingApplet[applet].run();
+         }).catch(function(e){
+            $(".spinner").hide();
+            alert("Applet "+applet+" execution error.");
+         });
+      }
    };
 
 
@@ -562,7 +628,7 @@ var W5ExploreClass=function(){
           font: {
             size: 12
           },
-          smooth: true,
+          smooth: true
         },
         nodes: {
           level:5,
@@ -609,7 +675,27 @@ var W5ExploreClass=function(){
       });
    };
 
+   this.showDialog=function(genContent,exitCode){
+      var modal=document.createElement('div');
+      $(modal).id='myModal';
+      $(modal).addClass('modal-background');
+      var modalframe=document.createElement('div');
+      $(modalframe).addClass('modal-content');
+      $(modalframe).append("<span class='closebtn'>&times;</span>");
+      $(modalframe).append(genContent());
+      $(modal).append(modalframe);
+      $(this.workspace).append(modal);
+      $(".closebtn").click(function(){
+         $(modal).remove();
+         exitCode();
+      }); 
+      $(modal).show();
+   }
+
+
+
    this.showAppletList=function(){
+      var app=this;
       $("#workspace").html("");
       var p=document.createElement('div');
       $(p).addClass("parent");
@@ -621,7 +707,12 @@ var W5ExploreClass=function(){
          var e=document.createElement('div');
          $(e).addClass("item");
          var tile=document.createElement('div');
+         $(tile).attr("data-id",k);
          $(tile).addClass("mtile");
+         $(tile).click(function(e){
+             var applet=$(this).attr("data-id");
+             app.runApplet(applet);
+         });
          var m=document.createElement('div');
          $(m).addClass("mtiletxt");
          var htmltext="<span>"+ClassAppletLib[k].desc.label+"</span>";
@@ -644,8 +735,6 @@ var W5ExploreClass=function(){
    this.MainMenu=function(){
       var app=this;
       this.LayoutMenuLayer();
-      var target = document.body;
-      var spinner = new Spinner(W5Explore.spinnerOpts).spin(target);
       this.loadApplets().then(function(){
          app.showAppletList();
          $(".spinner").hide();
@@ -654,34 +743,6 @@ var W5ExploreClass=function(){
          console.log("e=",e);
          $("#workspace").html("not OK");
       });
-   }
-
-
-   this.SampleMenu=function(){
-      this.LayoutMenuLayer();
-     
-      var p=document.createElement('div');
-      $(p).addClass("parent");
-      this.workspace.appendChild(p);
-      var c;
-      for(c=0;c<10;c++){
-         var e=document.createElement('div');
-         $(e).addClass("item");
-         var tile=document.createElement('div');
-         $(tile).addClass("mtile");
-         var m=document.createElement('div');
-         $(m).addClass("mtiletxt");
-         $(m).html("<span>This is "+c+"</span><p>Hallo, dies ist ein kleiner Text</p><small>infotxt</small>");
-         tile.appendChild(m);
-         e.appendChild(tile);
-         p.appendChild(e);
-      }
-      for(c=0;c<10;c++){
-         var e=document.createElement('div');
-         $(e).addClass("dummyItem");
-         p.appendChild(e);
-      }
-
    }
 };
 
@@ -727,6 +788,7 @@ else{
 
 
 </script>
+</body>
 
 
 
