@@ -1136,6 +1136,7 @@ sub Validate
       $newrec->{ssl_certdump}=undef;
       $newrec->{ssl_cert_serialno}=undef;
       $newrec->{ssl_cert_signature_algo}=undef;
+      $newrec->{ssl_cert_issuerdn}=undef;
       $newrec->{sslcheck}=undef;
    }
    if (effChanged($oldrec,$newrec,"systemid") &&  # reset software inst
