@@ -609,7 +609,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'lang',
                 label         =>'Language',
-                htmleditwidth =>'50%',
+                htmleditwidth =>'50px',
                 group         =>'userparam',
                 value         =>['',LangTable()],
                 dataobjattr   =>'contact.lang'),

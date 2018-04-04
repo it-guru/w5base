@@ -1356,13 +1356,18 @@ sub getFieldHelpUrl
 {
    my $self=shift;
 
+   my $type=$self->Type();
    if (defined($self->{FieldHelp})){
       if (ref($self->{FieldHelp}) eq "CODE"){
          return(&{$self->{FieldHelp}}($self));
       }
-      return($self->{FieldHelp});
+      if ($self->{FieldHelp}=~m/\//){ # FieldHelp seems to be a URL
+         return($self->{FieldHelp});
+      }
+      else{
+         $type=$self->{FieldHelp};
+      }
    }
-   my $type=$self->Type();
    if ($type=~m/Date$/){
       return("../../base/load/tmpl/FieldHelp.Date");
    }

@@ -1,29 +1,65 @@
 The search field '<b>%label%</b>' is a SubList search field.
-In this case you can use the following expressions and wildcards:<br>
+You can use the following expressions and wildcards that always refer to the first column (column index 0) of the SubList without special formulations:<br>
 <br>
 <table width="100%">
 
 <tr>
 <td>*</td>
-<td>stands for any kind and count of characters</td>
+<td>... stands for any number of characters</td>
 </tr>
 
 <tr>
 <td>?</td>
-<td>stands for on arbitrary character</td>
+<td>... stands for exactly one character</td>
 </tr>
 
 <tr>
 <td>!</td>
-<td>negates your expresssion. So if you write !Hans, you will get all
+<td>... negates your expresssion. So if you write !Hans, you will get all
     records with no "Hans" in '%label%'.
 </tr>
 
 <tr>
-<td>...</td>
-<td>there are more expression, but they are'nt documented at now</td>
+<td nowrap valign=top><b>"Hello Welt"</b></td>
+<td>... if you write several expressions separate by blanks 
+    this corresponds to an OR search. If you should
+    you can enclose the words in quotation marks
+    then in the example exactly the content "Hello World" will be searched.
+    </td>
 </tr>
+
+
+<tr>
+<td nowrap valign=top><b>[EMPTY]</b></td>
+<td>...  for certain database entries there is a difference
+    between "" and empty. By typing [EMPTY] you can change all the
+    Find records that contain "" or NULL in the respective field.
+    For referencing fields (for example, sublists or lists), 
+    the system does not search for empty references in the field
+    but the records are searched for that point to a [EMPTY] target field.
+    refer. (which is usually a rarely case)</td>
+</tr>
+
 </table>
+
+
+<br>
+<b>Complex filter criterias:</b><br>
+It is also possible to filter several columns of the SubList and link them logically. The columns can be specified with their internal field names or the column index (0=the first column).<br>
+<br>
+For example, you can ...<br>
+<br>
+<b>0="h*" and 0="*s" and 1="müller" or  0="f*" and 0="*z" and surname="müller"</b>
+<br>
+<br>
+... use as filter expression.  Please note that no brackets can be used. AND blocks are automatically bracketed internally, so the OR operator can only be used to assign or denote multiple OR blocks.
+<br>
+<br>
+A field can also be filtered in the notation for single field filters.
+
+
+
+
 <script language="JavaScript">
 function SendData(t)
 {

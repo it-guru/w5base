@@ -1498,7 +1498,6 @@ sub new
 
       new kernel::Field::PhoneLnk(
                 name          =>'phonenumbers',
-                searchable    =>0,
                 label         =>'Phonenumbers',
                 group         =>'phonenumbers',
                 vjoinbase     =>[{'parentobj'=>\'itil::appl'}],

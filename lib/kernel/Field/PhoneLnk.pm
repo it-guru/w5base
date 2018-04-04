@@ -20,7 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field::SubList;
-use Data::Dumper;
 @ISA    = qw(kernel::Field::SubList);
 
 
@@ -28,9 +27,10 @@ sub new
 {
    my $type=shift;
    my %self=@_;
-   $self{vjointo}="base::phonenumber"   if (!defined($self{vjointo}));
-   $self{vjoinon}=['id'=>'refid']      if (!defined($self{vjoinon}));
-   $self{allowcleanup}=1               if (!defined($self{allowcleanup}));
+   $self{vjointo}="base::phonenumber"    if (!defined($self{vjointo}));
+   $self{vjoinon}=['id'=>'refid']        if (!defined($self{vjoinon}));
+   $self{allowcleanup}=1                 if (!defined($self{allowcleanup}));
+   $self{'FieldHelp'}="SubList"          if (!defined($self{'FieldHelp'}));
    if (!defined($self{vjoindisp})){
       $self{vjoindisp}=['phonenumber','name','shortedcomments'];
    }
