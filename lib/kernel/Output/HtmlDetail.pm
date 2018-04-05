@@ -209,7 +209,13 @@ sub  calcViewMatrix
             }
          }
          else{
-            $vMatrix->{htmldetailof}->[$c]=0;
+            if ($fieldlist->[$c]->{htmldetail} eq "NotEmptyOrEdit" &&
+                !defined($rec)){
+               $vMatrix->{htmldetailof}->[$c]=1;
+            }
+            else{
+               $vMatrix->{htmldetailof}->[$c]=0;
+            }
          }
       }
       else{ 
