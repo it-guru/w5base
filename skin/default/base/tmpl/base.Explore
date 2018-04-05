@@ -311,14 +311,15 @@ var ClassAppletLib=new Object();
 
 // Top Class for all DataObjs
 (function(window, document, undefined) {
-   ClassDataObj=function(){
-      console.log("top constructor ClassDataObj called",
-                  this.dataobj,this.dataobjid);
+
+   ClassDataObj=function(app){
+      this.app=app;
    };
    ClassDataObj.prototype.update=function(o){
       o.id=this.id;
-      this.parent.update(o);
+      this.parentNodeDataSet.update(o);
    };
+
    ClassApplet=function(app){
       this.app=app;
       console.log("top constructor ClassApplet");
@@ -422,6 +423,10 @@ var W5ExploreClass=function(){
       this.mpath.appendChild(ul);
 
       var m = document.createElement('li');
+      m.innerHTML="<a href='Main'>W5Explore</a>";
+      ul.appendChild(m);
+
+      var m = document.createElement('li');
       m.innerHTML="<a>Anwendungsexplorer</a>";
       ul.appendChild(m);
 
@@ -478,14 +483,14 @@ var W5ExploreClass=function(){
    this.loadDataObjClass=function(dataobj){
       var dataobjpath=dataobj.replace('::','/');
       if (ClassDataObjLib[dataobj]){
-         console.log("load "+dataobj+" from cache");
+         //console.log("load "+dataobj+" from cache");
          return(Promise.resolve(ClassDataObjLib[dataobj]));
       }
       return(
           new Promise(function(res,rej){
                 $.getScript("../../"+dataobjpath+"/jsExplore", 
                 function( data, textStatus, jqxhr ) {
-                   console.log(dataobj+" is loaded",ClassDataObjLib);
+                   console.log(dataobj+" is initial loaded",ClassDataObjLib);
                    res(ClassDataObjLib[dataobj]);
                 }).fail(function(e,parseerror){
                    rej("ERROR: can not resolv dataobj "+dataobj);
@@ -553,20 +558,37 @@ var W5ExploreClass=function(){
    };
 
 
-   this.addNode=function(dataobj,id,initialLabel,initialX,initialY){
+   this.addNode=function(dataobj,id,initialLabel,nodeTempl){
       return(
           new Promise(function(res,rej){
               W5Explore.loadDataObjClass(dataobj).then(
                  function(DataObjClassPrototype){
-                    var o=new DataObjClassPrototype(id,initialLabel,
-                                                    initialX,initialY);
-                    W5Explore.node.add(o);
-                    o.parent=W5Explore.node;
-                    o.app=W5Explore;
+                    var o=new DataObjClassPrototype(id,initialLabel,nodeTempl);
+                    //var curobj=W5Explore.node._data[o.id];
+                    var curobj=W5Explore.node.get(o.id);
+                    if (!curobj){
+                       W5Explore.node.add(o);
+                       o.parentNodeDataSet=W5Explore.node;
+                       o.app=W5Explore;
+                       o.refreshLabel();
+                    }
+                    else{
+                       res(curobj);
+                    }
                     res(o);
                  });
           })
       )
+   };
+
+
+   this.addEdge=function(fromid,toid,edgeTempl){
+      var edgeid=fromid+"::"+toid;
+      if (!W5Explore.edge.get(edgeid)){
+         var e={id:edgeid,from:fromid,to:toid};
+         $.extend(e,edgeTempl);
+         W5Explore.edge.add(e);
+      }
    };
 
 
@@ -617,6 +639,58 @@ var W5ExploreClass=function(){
    };
 
 
+   this.ShowNetworkMap=function(MapParamTempl){
+      var app=this;
+      this.LayoutNetworkMap();
+      var data = {
+        nodes: this.node,
+        edges: this.edge
+      };
+      var options = {
+        edges: {
+          font: {
+            size: 12
+          },
+          smooth: true
+        },
+        nodes: {
+          font: {
+            bold: {
+              color: '#0077aa'
+            }
+          }
+        }
+      };
+      $.extend(options,MapParamTempl);
+console.log("MapParamTempl",MapParamTempl);
+console.log("final options",options);
+      this.network = new vis.Network(this.netmap, data, options);
+//  network.once("beforeDrawing", function() {
+//      network.focus(2, {
+//        scale: 12
+//      });
+//    });
+      this.network.on("stabilized", function () {
+         if ($(".spinner").is(":visible")){
+            $(".spinner").hide();
+console.log("nodes=",app.node,"edges=",app.edge);
+            app.console.log("INFO","autolayout done");
+         }
+         this.setOptions( { physics: false } );
+      });
+      this.network.on("click", function (params) {
+          params.event = "[original event]";
+          if (params.nodes[0]){
+             dbrec.innerHTML = '<h2>Click event: on '+params.nodes[0]+
+                               '</h2><xmp>' + JSON.stringify(params, null, 4)+
+                               "</xmp>";
+          }
+          else{
+             dbrec.innerHTML='';
+          }
+      });
+   };
+
    this.SampleMap=function(){
       this.LayoutNetworkMap();
       var data = {
@@ -631,17 +705,11 @@ var W5ExploreClass=function(){
           smooth: true
         },
         nodes: {
-          level:5,
           font: {
             bold: {
               color: '#0077aa'
             }
           }
-        },
-        groups: {
-           'itil::appl':         { level: 2 },
-           'itil::swinstance':   { level: 3 },
-           'itil::system':       { level: 4 }
         },
      
         layout: {

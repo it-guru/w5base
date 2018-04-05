@@ -493,22 +493,25 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'lnkapplappl.realeditor'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'fromapplid',
                 label         =>'from ApplID',
                 dataobjattr   =>'lnkapplappl.fromappl'),
+
+      new kernel::Field::Interface(
+               name          =>'fromapplopmode',
+               label         =>'from Appl primary operation mode',
+               dataobjattr   =>'fromappl.opmode'),
 
       new kernel::Field::Link(
                 name          =>'lnktoapplid',
                 label         =>'to ApplicationID',
                 dataobjattr   =>'toappl.applid'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'toapplid',
                 label         =>'to ApplID',
                 dataobjattr   =>'lnkapplappl.toappl'),
-
-
 
       new kernel::Field::Link(
                 name          =>'secfromapplsectarget',

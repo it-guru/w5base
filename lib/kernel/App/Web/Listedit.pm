@@ -348,11 +348,11 @@ sub jsExplore
 (function(window, document, undefined) {
 
    ClassDataObjLib['${dataobj}']=new Object();
-   ClassDataObjLib['${dataobj}']=function(id,initialLabel,initialX,initialY){
+   ClassDataObjLib['${dataobj}']=function(id,initialLabel,nodeTempl){
        this.label=initialLabel;
        this.dataobj='${dataobj}';
        this.dataobjid=id;
-       ClassDataObj.call(this);
+       ClassDataObj.call(this,W5Explore);
        this.font={
           multi:'md',
           face:'georgia'
@@ -364,33 +364,34 @@ sub jsExplore
        this.image='${recordimageurl}';
        this.shape='image';
        this.group=this.dataobj;
-       this.x=initialX;
-       this.y=initialY;
+       \$.extend(this,nodeTempl);
        this.initLevel=0;
        this.fieldnamelabel='${fieldnamelabel}';
        this.fieldnameid='${fieldnameid}';
-       this.id=W5Explore.toObjKey(this.dataobj,this.dataobjid);
+       this.id=this.app.toObjKey(this.dataobj,this.dataobjid);
+   };
+   ClassDataObjLib['${dataobj}'].prototype.refreshLabel=function(){
        var that=this;
        setTimeout(function(){
           var p=new Promise(function(ok,reject){
              that.app.Config().then(function(Config){
-                   var w5obj=getModuleObject(Config,that.dataobj);
-                   var flt=new Object();
-                   flt[that.fieldnameid]=that.dataobjid;
-                   w5obj.SetFilter(flt);
-                   w5obj.findRecord(that.fieldnamelabel,function(data){
-                      if (data[0]){
-                         that.update({label:data[0][that.fieldnamelabel]});
-                         ok(1);
-                      }
-                      else{
-                         that.update({label:that.label+" ?"});
-                         reject(1);
-                      }
-                   },function(exception){
-                      that.update({label:'?'});
-                      reject(1);
-                   });
+                var w5obj=getModuleObject(Config,that.dataobj);
+                var flt=new Object();
+                flt[that.fieldnameid]=that.dataobjid;
+                w5obj.SetFilter(flt);
+                w5obj.findRecord(that.fieldnamelabel,function(data){
+                   if (data[0]){
+                      that.update({label:data[0][that.fieldnamelabel]});
+                      ok(1);
+                   }
+                   else{
+                      // that.update({label:that.label+" ?"});
+                      reject(that.label+" not found");
+                   }
+                },function(exception){
+                   // that.update({label:'?'});
+                   reject(1);
+                });
              }).catch(function(){
                 console.log("can not get config");
                 reject(null);
@@ -398,12 +399,13 @@ sub jsExplore
           });
           p.then(function(){
              var x=1;
-          }).catch(function(){
-             that.app.console.log("ERROR","fail to validated '"+
-                                  initialLabel);  
+          }).catch(function(e){
+             console.log("error in validation ",e);
+           //  that.app.console.log("ERROR","fail to validated '"+
+           //                       initialLabel);  
           });
           that.initLevel++;
-       },10);
+       },100);
    };
    \$.extend(ClassDataObjLib['${dataobj}'].prototype,ClassDataObj.prototype);
 
