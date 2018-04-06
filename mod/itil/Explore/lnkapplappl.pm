@@ -61,15 +61,13 @@ sub getJSObjectClass
                    cistatusid:"4",
                    fromapplcistatus:'4',
                    fromapplopmode:'prod',
+                   conproto:'DB-Connection DB-Connection',
                    toapplcistatus:'4'
                 });
                 w5obj.findRecord("fromappl,fromapplid,toappl,toapplid",
                                  function(data){
                    // detect all objects need to be preloaded
                    var cnt=data.length;
-                   if (cnt>2000){
-                      cnt=2000;
-                   }
                    var preLoad=[W5Explore.loadDataObjClass("itil::appl")];
                    app.console.log("INFO","found "+data.length+
                                           " interface records");
@@ -161,7 +159,7 @@ sub getObjectInfo
 
    return({
       label=>"Application Interfaces",
-      description=>"Build a map of all technical interfaces of productive Applications",
+      description=>"Build a map of all technical DB interfaces of all productive Applications",
       sublabel=>"IT-Inventar",
       prio=>'500'
    });
