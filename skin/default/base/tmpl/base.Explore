@@ -201,6 +201,37 @@ body{
 </style>
 
 
+<!-- Dialog  Masks -->
+<style>
+div.SearchInp{
+  padding:5px;
+  background-color: #f0f0f0;
+  line-height:25px;
+}
+input#SearchInp{
+  width:90%
+}
+div.SearchLabel{
+  padding:5px;
+  line-height:25px;
+  background-color: #f0f0f0;
+}
+div#SearchContainer{
+  height:200px;
+  border-top:1px solid black
+}
+div#SearchResult{
+  height:100%;
+  overflow-x:hidden;
+  overflow-y:scroll;
+}
+
+</style>
+
+
+
+
+
 <!-- Top Application Path  Handling -->
 <style>
 .breadcrumb-arrows li {
@@ -269,8 +300,6 @@ body{
 <script language="JavaScript" src="../../../public/base/load/datadumper.js">
 </script>
 <script language="JavaScript" src="../../../public/base/load/vis.min.js">
-</script>
-<script language="JavaScript" src="../../../public/base/load/require.js">
 </script>
 
 <script langauge="JavaScript">
@@ -767,6 +796,7 @@ console.log("nodes=",app.node,"edges=",app.edge);
          exitCode();
       }); 
       $(modal).show();
+      $(modalframe).find("input:text:visible:first").focus();
    }
 
 

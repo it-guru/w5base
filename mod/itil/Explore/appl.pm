@@ -53,8 +53,40 @@ sub getJSObjectClass
    ClassAppletLib[applet].class.prototype.run=function(){
       var appletobj=this;
       this.app.showDialog(function(){
-         var d="this is $self , $app,  $lang";
-         return(d);
+         var dialog = document.createElement('div');
+         \$(dialog).css("height","80%");
+         \$(dialog).append("<table id=SearchTab width=100% border=0>"+  
+                           "<tr height=1%><td width=10%>"+
+                           "<form id=SearchFrm><div class='SearchLabel'>"+
+                           "Suchen:</div></td><td>"+
+                           "<div class='SearchLabel'>"+
+                           "<input type=text name=SearchInp id=SearchInp>"+
+                           "</div></form></td></tr>"+
+                           "<tr><td colspan=2 valign=top>"+
+                           "<div id=SearchContainer>"+
+                           "<div id=SearchResult></div>"+
+                           "</div>"+
+                           "</td></tr>"+
+                           "</table>");
+         \$(dialog).find("#SearchTab").height("200px");
+         \$(dialog).find("#SearchInp").focus();
+         \$(dialog).find("#SearchResult").html(
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"+
+               "xc<br>"
+         );
+         return(dialog);
       },function(){
          appletobj.exit();
       });
