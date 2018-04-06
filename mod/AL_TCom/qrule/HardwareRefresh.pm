@@ -145,10 +145,12 @@ sub isHardwareRefreshCheckNeeded
          }
       }
    }
-   if (!(grep(/^9TS_ES\.9DTIT\./,@saphier) ||  # kann keine SAPHIER festgestellt
-        ($#saphier==-1))){    # werden oder liegt sie in der TelIT, dann checken
-      return(0);
-   }
+#   Das mit den SAP Hierarchien läuft nach der OFI Umstellung nicht mehr 
+#   100 % sauber.
+#   if (!(grep(/^9TS_ES\.9DTIT\./,@saphier) ||  # kann keine SAPHIER festgestellt
+#        ($#saphier==-1))){    # werden oder liegt sie in der TelIT, dann checken
+#      return(0);
+#   }
    #######################################################################
 
 
