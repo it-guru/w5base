@@ -308,6 +308,11 @@ sub Init
                       param=>'MSG=Hallo%20dies%20ist%20die%20Nachricht',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.explore",
+                      "base::Explore",
+                      prio=>1,
+                      defaultacl=>['admin']);
+   
    $self->RegisterObj("Tools.workflow",
                       "base::workflow",
                       prio=>1,

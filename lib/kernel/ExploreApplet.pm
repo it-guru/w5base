@@ -31,5 +31,33 @@ sub new
    return($self);
 }
 
+
+
+sub getObjectPrio
+{
+   my $self=shift;
+   my $app=shift;
+   my $lang=shift;
+
+   return(500);
+}
+
+
+
+sub getObjectInfo
+{
+   my $self=shift;
+   my $app=shift;
+   my $lang=shift;
+
+   return({
+      label=>$app->T($self->Self,$self->Self),
+      description=>$app->T("description",$self->Self),
+      sublabel=>$app->T("sublabel",$self->Self),
+      prio=>$self->getObjectPrio($app,$lang)
+   });
+}
+
+
 1;
 

@@ -151,20 +151,6 @@ EOF
    return($d);
 }
 
-sub getObjectInfo
-{
-   my $self=shift;
-   my $app=shift;
-   my $lang=shift;
-
-   return({
-      label=>"Application Interfaces",
-      description=>"Build a map of all technical DB interfaces of all productive Applications",
-      sublabel=>"IT-Inventar",
-      prio=>'500'
-   });
-}
-
 
 
 1;

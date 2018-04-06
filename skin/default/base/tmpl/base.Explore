@@ -415,7 +415,16 @@ var W5ExploreClass=function(){
 
       var mfirst = document.createElement('div');
       mfirst.id='mpathfirst';
-      mfirst.innerHTML="\u2756";
+      if (window.name=='msel'){  //in this case, i in fullwindow with title mode
+         mfirst.innerHTML="\u2756";
+         $(mfirst).css("cursor","pointer");
+         $(mfirst).click(function(){
+            window.location="../menu/msel";
+         });
+      }
+      else{
+         mfirst.innerHTML="\u2756";
+      }
       this.mpath.appendChild(mfirst);
 
       var ul = document.createElement('ul');

@@ -65,20 +65,4 @@ EOF
    return($d);
 }
 
-sub getObjectInfo
-{
-   my $self=shift;
-   my $app=shift;
-   my $lang=shift;
-
-   return({
-      label=>"Applications",
-      description=>"Show all Relations to applications CI",
-      sublabel=>"IT-Inventar",
-      prio=>'100'
-   });
-}
-
-
-
 1;

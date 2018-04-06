@@ -36,11 +36,11 @@ a:link, a:visited, a:active  {
 <tr height=23><td style='background-color:#e20074'>
 <table width=100% cellspacing=0 cellpadding=0 border=0>
 <tr>
-<td width=185>
+<td width=200>
 <div style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem">%CONFIG(SITENAME)%  %fancyopmode%</div>
 </td>
-<td width=1%>
-<div style="font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem"><a href="../../base/Explore/Main/xxx" target=msel>X</a></div>
+<td width=150>
+<div style="font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.3;font-size:0.7rem"><a href="../../base/Explore/Main" target=msel><img width=11 height=11 src="../../base/load/exploreico.gif">&nbsp;&nbsp;W5Data-Explorer</a></div>
 
 </td>
 <td>
