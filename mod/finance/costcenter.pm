@@ -83,7 +83,7 @@ sub new
                 readonly      =>1,
                 label         =>'Costcenter label',
                 dataobjattr   =>"if (costcenter.fullname<>'',".
-                                "concat(costcenter.name,': ',".
+                                "concat(costcenter.name,' : ',".
                                 "costcenter.fullname),costcenter.name)"),
 
       new kernel::Field::Text(
