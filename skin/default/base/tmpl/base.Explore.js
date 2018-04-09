@@ -128,6 +128,26 @@ body{
     cursor: pointer;
 }
 
+.purebtn{
+   color: rgba(0,0,0,.8);
+   padding: .5em 1em;
+   border: transparent;
+   background-color: #e6e6e6;
+   text-decoration: none;
+   border-radius: 2px;
+   display: inline-block;
+   zoom: 1;
+   white-space: nowrap;
+   -webkit-user-drag: none;
+   user-select: none;
+   font-size:100%;
+   cursor: pointer;
+   margin: 2px;
+}
+.purebtn:hover{
+   background-image: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
+}
+
 </style>
 
 
@@ -217,7 +237,7 @@ div.SearchLabel{
   background-color: #f0f0f0;
 }
 div#SearchContainer{
-  height:200px;
+  height:100%;
   border-top:1px solid black
 }
 div#SearchResult{
@@ -277,10 +297,14 @@ div#SearchResult{
   xbackground: #ccc;
   padding: 0 10px;
   cursor:pointer;
+  text-decoration: none;
+  color: black;
 }
 .breadcrumb-arrows a:hover {
-  font-weight: bold;
+  xfont-weight: bold;
+  color: darkblue;
 }
+
 </style>
 
 
@@ -357,6 +381,7 @@ var ClassAppletLib=new Object();
       alert("no run() defined in this Applet");
    };
    ClassApplet.prototype.exit=function(){
+      this.app.setMPath();
       // maybe cleanup old objects
    };
 
@@ -413,12 +438,12 @@ var W5ExploreClass=function(){
          $(this.workspace).outerHeight(
            $(this.main).innerHeight()-
            $(this.console.div).outerHeight()-
-           $(this.mpath).outerHeight()-1);
+           $(this.mpathline).outerHeight()-1);
       }
       else{
          $(this.workspace).outerHeight(
            $(this.main).innerHeight()-
-           $(this.mpath).outerHeight()-1);
+           $(this.mpathline).outerHeight()-1);
       }
       if (this.netmap){
          $(this.netmap).outerHeight(
@@ -439,8 +464,8 @@ var W5ExploreClass=function(){
       this.main = document.getElementById('main');
       this.main.innerHTML = '';
 
-      this.mpath = document.createElement('div');
-      this.mpath.id = 'mpath';
+      this.mpathline = document.createElement('div');
+      this.mpathline.id = 'mpath';
 
       var mfirst = document.createElement('div');
       mfirst.id='mpathfirst';
@@ -454,35 +479,12 @@ var W5ExploreClass=function(){
       else{
          mfirst.innerHTML="\u2756";
       }
-      this.mpath.appendChild(mfirst);
+      this.mpathline.appendChild(mfirst);
 
-      var ul = document.createElement('ul');
-      $(ul).addClass("breadcrumb-arrows");
-      this.mpath.appendChild(ul);
-
-      var m = document.createElement('li');
-      m.innerHTML="<a href='Main'>W5Explore</a>";
-      ul.appendChild(m);
-
-      var m = document.createElement('li');
-      m.innerHTML="<a>Anwendungsexplorer</a>";
-      ul.appendChild(m);
-
-      var m = document.createElement('li');
-      m.innerHTML="<a>W5Base/Darwin</a>";
-      ul.appendChild(m);
-
-      var m = document.createElement('li');
-      m.innerHTML="<a>qde8hv</a>";
-      ul.appendChild(m);
-
-
-  //    var m = document.createElement('div');
-  //    $(m).css("clear","left");
-  //    this.mpath.appendChild(m);
-
-      //this.mpath.innerHTML = 'Menü<br>xxx';
-      this.main.appendChild(this.mpath);
+      this.mpath = document.createElement('ul');
+      $(this.mpath).addClass("breadcrumb-arrows");
+      this.mpathline.appendChild(this.mpath);
+      this.main.appendChild(this.mpathline);
 
       this.workspace = document.createElement('div');
       this.workspace.id = 'workspace';
@@ -511,6 +513,49 @@ var W5ExploreClass=function(){
       this.console.div.innerHTML = '';
       this.main.appendChild(this.console.div);
       this.ResizeLayout();
+   };
+
+   this.setMPath=function(){
+      var app=this;
+      var url=document.location.href;
+      url=url.replace(/\/Explore\/Main.*$/,"/Explore/Main");
+
+      this.mpath.innerHTML = '';
+      var m = document.createElement('li');
+      m.innerHTML="<a href='"+url+"'>Explore</a>";
+      $(m).find("a").click(function(e){
+         app.MainMenu(); 
+         e.preventDefault();
+      });
+      $(this.mpath).append(m);
+      var paramstack=new Array();
+      var appletname;
+      if (arguments){
+         for(mi=0;mi<arguments.length;mi++){
+            url+="/";
+            url+=arguments[mi].mtag;
+            var m = document.createElement('li');
+            m.innerHTML="<a href='"+url+"'>"+arguments[mi].label+"</a>";
+            if (mi==0){
+               appletname=arguments[mi].mtag;
+               $(m).find("a").click(function(e){
+                  app.LayoutMenuLayer();
+                  app.showAppletList();
+                  app.runApplet(appletname);
+                  e.preventDefault();
+               });
+            }
+            else{
+               paramstack.push(arguments[mi].mtag);
+               $(m).find("a").click(function(e){
+                  app.runApplet(appletname,paramstack);
+                  e.preventDefault();
+               });
+            }
+            $(this.mpath).append(m);
+         }
+      }
+      window.history.pushState("objectstring", "Applet",url);
    };
 
    this.Init=function(){
@@ -579,20 +624,33 @@ var W5ExploreClass=function(){
       );
    };
 
-   this.runApplet=function(applet){
+   this.runApplet=function(applet,paramstack){
       var app=this;
       if (app.runingApplet[applet]){
-         app.runingApplet[applet].run();
+         if (paramstack){
+            app.runingApplet[applet].run(paramstack);
+         }
+         else{
+            app.runingApplet[applet].run();
+         }
       }
       else{
          W5Explore.loadAppletClass(applet).then(function(AppletClassPrototype){
             app.runingApplet[applet]=new AppletClassPrototype(app);
-            app.runingApplet[applet].run();
+            if (paramstack){
+               app.runingApplet[applet].run(paramstack);
+            }
+            else{
+               app.runingApplet[applet].run();
+            }
+            $(".spinner").hide();
          }).catch(function(e){
             $(".spinner").hide();
             alert("Applet "+applet+" execution error.");
          });
       }
+      app.setMPath({ label:ClassAppletLib[applet].desc.label, mtag:applet });
+
    };
 
 
@@ -839,11 +897,32 @@ console.log("nodes=",app.node,"edges=",app.edge);
 
 
 
-   this.MainMenu=function(){
+   this.MainMenu=function(runpath){
       var app=this;
       this.LayoutMenuLayer();
       this.loadApplets().then(function(){
-         app.showAppletList();
+console.log("runpath=",runpath);
+         if (runpath.length==0){
+            app.showAppletList();
+            app.setMPath();
+         }
+         else{
+            app.showAppletList();
+            var applet=runpath.shift();
+console.log("new runpath=",runpath);
+            app.loadAppletClass(applet).then(function(AppletClassPrototype){
+               if (runpath.length==0){
+                  app.runApplet(applet);
+               }
+               else{
+console.log("start applet",applet," with runpath",runpath);
+                  app.runApplet(applet,runpath);
+               }
+            }).catch(function(e){
+               $(".spinner").hide();
+               alert("Applet "+applet+" execution error.");
+            });
+         }
          $(".spinner").hide();
       }).catch(function(e){
          $(".spinner").hide();
@@ -865,33 +944,11 @@ $(window).resize(function() {
 });
 
 
-if (0){
-   W5Explore.SampleMap();
+var runurl=document.location.href;
+runurl=runurl.replace(/^.*\/Explore\/Main[\/]{0,1}/,"");
+var runpath=runurl.split("/");
 
-   W5Explore.console.log("INFO","loading scenario ...");
-   Promise.all([
-      W5Explore.loadDataObjClass("itil::appl"),
-      W5Explore.loadDataObjClass("itil::system")
-   ]).then(function(){
-      Promise.all([
-        W5Explore.addNode("itil::appl","5275","Darwin",100,100),
-        W5Explore.addNode("itil::appl","13736266300011","W5Ware",100,100),
-        W5Explore.addNode("itil::system","44","TestSysA",100,100),
-        W5Explore.addNode("itil::system","45","TestSysB",100,100),
-        W5Explore.addNode("itil::system","46","TestSysC",100,100),
-        W5Explore.addNode("itil::swinstance","13042773570001","Instance",100,100)
-      ]).then(function(){
-         console.log("OK, all loaded");
-        W5Explore.network.fit();   
-        W5Explore.console.log("INFO","finished scenario load");
-      });
-   });
-}
-else{
-   W5Explore.MainMenu();
-}
-
-
+W5Explore.MainMenu(runpath);
 
 
 </script>

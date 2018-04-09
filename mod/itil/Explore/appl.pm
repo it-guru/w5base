@@ -42,59 +42,16 @@ sub getJSObjectClass
  #   my $addOrgs=quoteHtml($self->getParent->T("add organisation groups"));
  #   my $orgRoles=join(" ",orgRoles());
 
-   my $d=<<EOF;
-(function(window, document, undefined) {
-   var applet='${selfname}';
-   ClassAppletLib[applet].class=function(app){
-      ClassApplet.call(this,app);
-   };
-   \$.extend(ClassAppletLib[applet].class.prototype,ClassApplet.prototype);
 
-   ClassAppletLib[applet].class.prototype.run=function(){
-      var appletobj=this;
-      this.app.showDialog(function(){
-         var dialog = document.createElement('div');
-         \$(dialog).css("height","80%");
-         \$(dialog).append("<table id=SearchTab width=100% border=0>"+  
-                           "<tr height=1%><td width=10%>"+
-                           "<form id=SearchFrm><div class='SearchLabel'>"+
-                           "Suchen:</div></td><td>"+
-                           "<div class='SearchLabel'>"+
-                           "<input type=text name=SearchInp id=SearchInp>"+
-                           "</div></form></td></tr>"+
-                           "<tr><td colspan=2 valign=top>"+
-                           "<div id=SearchContainer>"+
-                           "<div id=SearchResult></div>"+
-                           "</div>"+
-                           "</td></tr>"+
-                           "</table>");
-         \$(dialog).find("#SearchTab").height("200px");
-         \$(dialog).find("#SearchInp").focus();
-         \$(dialog).find("#SearchResult").html(
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"+
-               "xc<br>"
-         );
-         return(dialog);
-      },function(){
-         appletobj.exit();
-      });
+   my $opt={
+      skinbase=>'itil',
+      static=>{
+         SELFNAME=>$selfname
+      }
    };
-
-})(this,document);
-EOF
-   return($d);
+   my $prog=$app->getParsedTemplate("tmpl/itil.Explore.appl.js",$opt);
+   utf8::encode($prog);
+   return($prog);
 }
 
 1;

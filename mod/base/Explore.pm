@@ -59,7 +59,7 @@ sub Main
       }
    };
 
-   my $prog=$self->getParsedTemplate("tmpl/base.Explore",$opt);
+   my $prog=$self->getParsedTemplate("tmpl/base.Explore.js",$opt);
    utf8::encode($prog);
    print($prog);
 }

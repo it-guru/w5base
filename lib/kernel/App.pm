@@ -753,7 +753,7 @@ sub getTemplate
    my $maskfound=0;
    my $filename;
 
-   if (!($name=~m/\.js$/)){
+   if (!($name=~m/\.js$/) || ($name=~m/tmpl\/.*\.js$/)){
       if (!defined($skinbase)){
          $skinbase=$self->SkinBase();
          my $skinfilename=$skinbase."/".$name;
