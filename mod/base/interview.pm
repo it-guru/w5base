@@ -800,12 +800,12 @@ sub getPosibleSelectValues
       $selkey=trim($selkey);
       if ($selkey ne ""){
          if (my ($k,$v)=$selkey=~m/^(.*)=(.*)$/){
-            $k=~s/[^a-z0-9_]/_/gi;
+            $k=~s/[^a-z0-9_!<>]/_/gi;
             push(@r,trim($k),trim($v));
          }
          else{
             my $k=$selkey;
-            $k=~s/[^a-z0-9_]/_/gi;
+            $k=~s/[^a-z0-9_!<>]/_/gi;
             push(@r,$k,$selkey);
          }
       }
