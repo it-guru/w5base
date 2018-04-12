@@ -90,6 +90,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'w5osclass',
                 readonly      =>1,
+                ignorecase    =>1,
                 translation   =>'itil::system',
                 label         =>'OS-Class',
                 dataobjattr   =>'osclass'),
