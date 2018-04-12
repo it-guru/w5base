@@ -53,6 +53,15 @@ sub new
                 label         =>'Fullname',
                 htmlwidth     =>'300px',
                 readonly      =>'1',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(1);
+                   }
+                   return(0);
+                },
                 dataobjattr   =>'swinstance.fullname'),
 
       new kernel::Field::Mandator(),
@@ -79,65 +88,19 @@ sub new
       new kernel::Field::Select(
                 name          =>'swnature',
                 htmleditwidth =>'40%',
+                group         =>'env',
                 label         =>'Instance type',
-                value         =>['ActiveMQ',
-                                 'Apache',
-                                 'Apple WebObjects',
-                                 'BEA WebLogic',
-                                 'BEA Tuxedo',
-                                 'Business Objects',
-                                 'CICS',
-                                 'DB2',
-                                 'DOKuStar',
-                                 'GPTR',
-                                 'HP ServiceManager',
-                                 'HP AssetManager',
-                                 'HP uCMDB',
-                                 'HP-NSK Pathway',
-                                 'IBM_HTTP_Server',
-                                 'IIS',
-                                 'IMS',  # IBM Information Management System
-                                 'IMS Connect',  # IBM IMS Client
-                                 'Informix',
-                                 'JacORB',
-                                 'JBoss',
-                                 'Jetty',
-                                 'Karaf',
-                                 'LDAP-Server',
-                                 'Loadbalancer',
-                                 'Memcached',
-                                 'MuleSource',
-                                 'MQSeries',
-                                 'MSSQL',
-                                 'MySQL',
-                                 'Nginx',
-                                 'OpenLDAP',
-                                 'Oracle ASM',
-                                 'Oracle DB Server',
-                                 'Oracle Appl Server',
-                                 'Oracle TimesTen DB',
-                                 'Oracle SOA-Suite',
-                                 'Oracle Transparent Gateway',
-                                 'PHP-fpm',
-                                 'PostgeSQL',
-                                 'SAP/R2',
-                                 'SAP/R3',
-                                 'SAP HANA',
-                                 'SAP Netweaver',
-                                 'SAP Router',
-                                 'SAP Webdispatcher',
-                                 'Subversion Repository',
-                                 'SunONE',
-                                 'StreamServe',
-                                 'Teradata',
-                                 'Tomcat',
-                                 'Visibroker',
-                                 'WebSphere Appl Server',
-                                 'WebSphere Business Monitor',
-                                 'WebSphere Message Broker',
-                                 'WebSphere Process Server',
-                                 'WebSphere Service Registry/Repository',
-                                 'Other'],
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return($self->getParent->getPosibleInstanceTypes($current->{posibleinstanceidentify}));
+                },
+                dataobjattr   =>'swinstance.swnature'),
+     
+      new kernel::Field::Interface(
+                name          =>'rawswnature',
+                group         =>'env',
+                label         =>'raw Instance type',
                 dataobjattr   =>'swinstance.swnature'),
 
       new kernel::Field::TextDrop(
@@ -159,6 +122,15 @@ sub new
                 label         =>'Application Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['applconumber'=>'name'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current})){
+                      return(1);
+                   }
+                   return(0);
+                },
                 readonly      =>'1',
                 dataobjattr   =>'appl.conumber'),
 
@@ -322,6 +294,15 @@ sub new
                 label         =>'Name of installed software',
                 group         =>'softwareinst',
                 dataobjattr   =>'software.name'),
+
+      new kernel::Field::Link(
+                name          =>'posibleinstanceidentify',
+                htmldetail    =>0,
+                selectfix     =>1,
+                readonly      =>1,
+                label         =>'posible instance identify',
+                group         =>'softwareinst',
+                dataobjattr   =>'software.instanceidentify'),
 
       new kernel::Field::Boolean(
                 name          =>'is_dbs',
@@ -868,6 +849,22 @@ sub new
    return($self);
 }
 
+sub getPosibleInstanceTypes
+{
+   my $self=shift;
+   my $posibleinstanceidentify=shift;
+
+   my @l;
+   if ($posibleinstanceidentify ne ""){
+      my @k=map({trim($_)} split(/\|/,$posibleinstanceidentify));
+      foreach my $k (@k){
+         push(@l,$k,$k);
+      }
+   }
+   push(@l,"Other","Other");
+   return(@l); 
+}
+
 sub isCopyValid
 {
    my $self=shift;
@@ -1019,16 +1016,68 @@ sub Validate
       }
    }
 
+   my $applid=effVal($oldrec,$newrec,"applid");
+   my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
+   if ($applid eq "" && $cistatusid>2 && $cistatusid<6){
+      $self->LastMsg(ERROR,"CI-Status level needs a valid application specification");
+      return(0);
+   }
+   if ($cistatusid<6){ # validation process for swnature handling
+      my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
+      my @posible=("Other");
+      if (effChanged($oldrec,$newrec,"lnksoftwaresystemid")){
+         my $lnksoftwaresystem=$newrec->{lnksoftwaresystemid};
+         if ($lnksoftwaresystem ne ""){
+            my $lnksoftware=getModuleObject($self->Config(),"itil::lnksoftware");
+            $lnksoftware->SetFilter({id=>\$lnksoftwaresystem});
+            my ($swirec)=$lnksoftware->getOnlyFirst(qw(softwareid));
+            if (defined($swirec) && $swirec->{softwareid} ne ""){
+               my $software=getModuleObject($self->Config(),"itil::software");
+               $software->SetFilter({id=>\$swirec->{softwareid}});
+               my ($swrec)=$software->getOnlyFirst(qw(instanceid));
+               if (defined($swrec)){
+                  my @k=$self->getPosibleInstanceTypes($swrec->{instanceid});
+                  @posible=();
+                  while(my $k=shift(@k)){
+                     push(@posible,$k);
+                     my $label=shift(@k);
+                  }
+                  if ($swnature eq "Other" && $#posible>0){
+                     $swnature="";
+                  }
+               }   
+            }
+         }
+      }
+      else{
+         if (defined($oldrec)){
+            my $posibleinstanceidentify=effVal($oldrec,$newrec,"posibleinstanceidentify");
+            my @k=$self->getPosibleInstanceTypes($posibleinstanceidentify);
+            @posible=();
+            while(my $k=shift(@k)){
+               push(@posible,$k);
+               my $label=shift(@k);
+            }
+         }
+      }
+      if (!in_array(\@posible,$swnature)){
+         $swnature=$posible[0];
+      }
+      if ($swnature ne trim(effVal($oldrec,$newrec,"swnature"))){
+         if (defined($oldrec)){
+            $self->LastMsg(WARN,"automatic swnature changed");
+         }
+         $newrec->{rawswnature}=$swnature;
+         $newrec->{swnature}=$swnature;
+      }
+   }
+
    my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
    my $name=trim(effVal($oldrec,$newrec,"name"));
    my $addname=trim(effVal($oldrec,$newrec,"addname"));
    my $swtype=trim(effVal($oldrec,$newrec,"swtype"));
    my $swport=trim(effVal($oldrec,$newrec,"swport"));
    my $swinstanceid=trim(effVal($oldrec,$newrec,"swinstanceid"));
-   if ($swnature=~m/^\s*$/){
-      $self->LastMsg(ERROR,"invalid swnature");
-      return(0);
-   }
    if (exists($newrec->{name})){
       $newrec->{name}=$name;
    }
