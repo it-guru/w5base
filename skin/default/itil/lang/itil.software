@@ -24,6 +24,7 @@
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'phoneHot'=>{de=>'Hotline',en=>'Hotline'},
 'Product Class'=>{de=>'Produkt Klasse'},
+'Instance idenficator'=>{de=>'Instanztypbezeichner'},
 'parent product'=>{de=>'Elternprodukt'},
 'Options'=>{de=>'Optionen'},
 'is DBS (Databasesystem) software'=>{de=>'ist DBS (Datenbanksystem) Software'},

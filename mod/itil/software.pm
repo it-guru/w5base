@@ -120,6 +120,7 @@ sub new
                 label         =>'Release Expression',
                 dataobjattr   =>'software.releaseexp'),
 
+
       new kernel::Field::Boolean(
                 name          =>'docsig',
                 group         =>'doccontrol',
@@ -192,6 +193,12 @@ sub new
                 vjointo       =>'itil::software',
                 vjoinon       =>['parentid'=>'id'],
                 vjoindisp     =>'fullname'),
+                                                   
+      new kernel::Field::Text(
+                name          =>'instanceid',
+                group         =>'pclass',
+                label         =>'Instance idenficator',
+                dataobjattr   =>'software.instanceidentify'),
                                                    
       new kernel::Field::Boolean(
                 name          =>'is_dbs',

@@ -11,3 +11,16 @@ A Software is documentation significant, if
 the documentation of an software installation
 is extremly important!
 '},
+#######################################################################
+'instanceid'=>{de=>'
+Auflistung aller möglichen Instanz-Typ 
+Bezeichnungen für diese Software.
+Falls mehrere angegeben werden, sind
+diese durch | zu trennen.
+',en=>'
+List of all posible Instanz-Typs for
+this software product. 
+If there are more then one, a seperation
+by | is needed.
+'},
+#######################################################################

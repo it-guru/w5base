@@ -1694,3 +1694,4 @@ create table netintercon (
 ) ENGINE=INNODB;
 alter table wallet add issuerdn varchar(256);
 alter table swinstance add ssl_certissuerdn varchar(256);
+alter table software add instanceidentify varchar(256);
