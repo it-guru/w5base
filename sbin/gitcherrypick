@@ -56,7 +56,6 @@ my %commitdt;
 my @commitlst=$repo->command("log","--cherry-pick",
                              "--format=format:%H",
                              "--right-only",
-                             "--reverse",
                              $branch."...".$masterbranch);
 
 if ($opt_v){
@@ -70,7 +69,7 @@ if ($#commitlst==-1){
 }
 
 if ($#picklst==-1){
-   system("git log --cherry-pick --oneline --right-only prod...master");
+   system("git log --cherry-pick --reverse --date-order --oneline --right-only prod...master");
    exit(0);
 }
 
