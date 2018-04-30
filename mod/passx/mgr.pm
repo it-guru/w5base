@@ -586,6 +586,8 @@ function CheckPasswordState()
 {
    var work=document.getElementById("TabSelectorModeSelect");
    var info=document.getElementById("RunInfo");
+   console.log("fifi re=",parent.returnpressed);
+   console.log("fifi pass=",parent.document.forms[0].rsaphrase.value);
    if (parent.document.forms[0].rsaphrase.value.length<5 ||
        parent.returnpressed==false){
       work.style.visibility="hidden";
@@ -1138,8 +1140,12 @@ function inputkeyhandler()        //IE Variante
 
 function RestartWorkspace()
 {
+   window.returnpressed=true;
    window.frames['CryptoWorkspace'].document.location.href="Workspace$directopenparam";
-   window.frames['CryptoOut'].document.location.href="CryptoOut";
+   
+   if (window.frames['CryptoOut']){
+      window.frames['CryptoOut'].document.location.href="CryptoOut";
+   }
 }
 window.onload=function(){
    window.document.forms[0].rsaphrase.focus();
