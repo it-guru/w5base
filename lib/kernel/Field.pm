@@ -618,6 +618,26 @@ sub interpreteVJOINSubListFilter
    return($subfilter);
 }
 
+sub preParseInputValues
+{
+   my $self=shift;
+   my $newval=shift;
+
+   if ($newval eq "[SELF]" ||
+       $newval eq "[ICH]"){
+     my $UserCache=$self->getParent->Cache->{User}->{Cache};
+     if (defined($UserCache->{$ENV{REMOTE_USER}})){
+        $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+        if (ref($UserCache) eq "HASH" && $UserCache->{fullname} ne ""){
+           my $fullname=$UserCache->{fullname};
+           $newval=~s/(\[SELF\]|\[ICH\])/"$fullname"/g;
+        }
+     }
+   }
+
+   return($newval);
+}
+
 
 sub preProcessFilter
 {
@@ -628,6 +648,19 @@ sub preProcessFilter
    my $changed=0;
    my $err;
 
+   if ($hflt->{$field} eq "[SELF]" ||
+       $hflt->{$field} eq "[ICH]"){ 
+     my $UserCache=$self->getParent->Cache->{User}->{Cache};
+     if (defined($UserCache->{$ENV{REMOTE_USER}})){
+        $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+        if (ref($UserCache) eq "HASH" && $UserCache->{fullname} ne ""){
+           my $fullname=$UserCache->{fullname};
+           $hflt->{$field}=~s/(\[SELF\]|\[ICH\])/"$fullname"/g;
+           $changed=1;
+           return($changed,$err); 
+        }
+     }
+   }
    if (defined($self->{onPreProcessFilter}) &&
        ref($self->{onPreProcessFilter}) eq "CODE"){
       return(&{$self->{onPreProcessFilter}}($self,$hflt));

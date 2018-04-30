@@ -46,6 +46,13 @@ In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
     verweisen. (was i.d.R. selten der Fall sein dürfte)</td>
 </tr>
 
+<tr>
+<td nowrap valign=top><b>[ICH]</b></td>
+<td>... dieser Ausdruck wird durch den eigenen, vollständigen 
+    Kontaktnamen ersetzt.
+    </td>
+</tr>
+
 </table>
 <script language="JavaScript">
 function SendData(t)

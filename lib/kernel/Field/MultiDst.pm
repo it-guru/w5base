@@ -215,13 +215,17 @@ sub Validate
    my $newrec=shift;
    my $name=$self->Name();
    return({}) if (!exists($newrec->{$name}));
-   my $newval=$newrec->{$name};
+   my $newval=$self->preParseInputValues($newrec->{$name});
    $self->initialize() if (!$self->{isinitialized});
 
    my $selectivetyp=$self->getSelectiveTypeVal($oldrec,$newrec);
    if ($newval ne ""){
       if (!($newval=~m/^\*/)){
          $newval=trim($newval);  # remove all spaces
+         if (($newval=~m/^"/) && ($newval=~m/"$/)){
+            $newval=~s/^"//;
+            $newval=~s/"$//;
+         }
          foreach my $dststruct (@{$self->{dstobj}}){
             next if (defined($selectivetyp) && 
                      $selectivetyp ne $dststruct->{name});

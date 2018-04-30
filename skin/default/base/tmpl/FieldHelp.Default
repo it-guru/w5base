@@ -20,6 +20,14 @@ In this case you can use the following expressions and wildcards:<br>
 </tr>
 
 <tr>
+<td nowrap valign=top><b>[SELF]</b></td>
+<td>... this expression will be replaced by the current fullqualified
+    contact name.
+    </td>
+</tr>
+
+
+<tr>
 <td>...</td>
 <td>there are more expression, but they are'nt documented at now</td>
 </tr>

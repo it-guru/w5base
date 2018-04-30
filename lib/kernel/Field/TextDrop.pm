@@ -45,8 +45,14 @@ sub Validate
    my $comprec=shift;        # values vor History Handling
    my $name=$self->Name();
    return({}) if (!exists($newrec->{$name}));
-   my $newval=$newrec->{$name};
+   my $newval=$self->preParseInputValues($newrec->{$name});
+   if (($newval=~m/^"/) && ($newval=~m/"$/)){
+      $newval=~s/^"//;
+      $newval=~s/"$//;
+   }
+
    my $disp=$self->{vjoindisp};
+
 
    $disp=$disp->[0] if (ref($disp) eq "ARRAY");
    my $filter={$disp=>'"'.trim($newval).'"'};
