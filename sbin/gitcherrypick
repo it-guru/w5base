@@ -212,7 +212,7 @@ if ($opt_v){
 }
 
 for(my $c=0;$c<=$#picklst;$c++){
-   my @out=$repo->command("cherry-pick","-x",$picklst[$c]);
+   my @out=$repo->command("cherry-pick","-x","-X","theirs",$picklst[$c]);
    printf("%s\n",join("\n",@out));
 }
 
