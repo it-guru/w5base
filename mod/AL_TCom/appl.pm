@@ -137,7 +137,7 @@ sub ItemSummary
          $systemids{$sys->{systemsystemid}}=ObjectRecordCodeResolver($sys);
       }
    }
-   if (keys(%systemids)){
+   if (keys(%systemids) && keys(%systemids)<=250){
       my $o=getModuleObject($self->Config,"tsacinv::system");
       $o->SetFilter({systemid=>[keys(%systemids)]});
       foreach my $acrec ($o->getHashList(qw(systemid assetassetid))){
