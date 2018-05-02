@@ -155,11 +155,12 @@ for(my $c=0;$c<=$#picklst;$c++){
    for(my $s=0;$s<=$#commitlst;$s++){
       if (substr($commitlst[$s],0,length($picklst[$c])) eq $picklst[$c] &&
           $commitlst[$s] ne $picklst[$c]){
-         $picklst[$c]=$commitlst[$s];
          printf("INFO: expand %s to %s\n",$picklst[$c],$commitlst[$s]);
+         $picklst[$c]=$commitlst[$s];
       }
    }
 }
+exit;
 
 # Check posibility and order picks
 my %reqcommids;
