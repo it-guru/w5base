@@ -384,7 +384,8 @@ sub ProcessFile
                     $globalrec{$kout}->{$v}++;
                  }
                  my $sep=",";
-                 my $sep=";" if ($kout=~m/mail/);
+                 $sep=";" if ($kout=~m/mail/);    # use ; for contact and
+                 $sep=";" if ($kout=~m/contact/); # mail keys
                  my $d=join("$sep ",@d);
                  if (defined($outrec{$kout})){
                     $oBook->AddCell($iSheet,$row,$outrec{$kout},$d,0);
