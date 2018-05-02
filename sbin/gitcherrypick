@@ -121,6 +121,11 @@ if ($#picklst==0 && $picklst[0] eq "tree"){
    {
       my $indent=shift;
       my $deplst=shift;
+      my $path=shift;
+
+      if (!defined($path)){
+         $path=[];
+      }
 
       foreach my $k (keys(%$deplst)){
          #printf("%s%s %s\n"," " x $indent,$k);
@@ -130,11 +135,16 @@ if ($#picklst==0 && $picklst[0] eq "tree"){
             $l=substr($l,0,77-$indent)."...";
          }
          printf("%s%s\n"," " x $indent,$l);
+         push(@$path,$k);
          if (ref($deplst->{$k}) eq "HASH"){
-            showDepEnt($indent+1,$deplst->{$k});
+            showDepEnt($indent+1,$deplst->{$k},$path);
          }
          if ($indent==0){
-            printf("\n");
+            if ($#$path>0){
+               printf("\n-> %s\n",join(" ",@$path));
+            }
+            $path=[];
+            printf("\n\n");
          }
       }
 
