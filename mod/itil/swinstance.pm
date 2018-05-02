@@ -90,6 +90,9 @@ sub new
                 htmleditwidth =>'40%',
                 group         =>'env',
                 label         =>'Instance type',
+                onPreProcessFilter=>sub{
+                   return(0,undef);
+                },
                 getPostibleValues=>sub{
                    my $self=shift;
                    my $current=shift;

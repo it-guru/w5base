@@ -262,6 +262,11 @@ sub preProcessFilter
    my $changed=0;
    my $err;
 
+   if (defined($self->{onPreProcessFilter}) &&
+       ref($self->{onPreProcessFilter}) eq "CODE"){
+      return(&{$self->{onPreProcessFilter}}($self,$hflt));
+   }
+
    if (!defined($self->{vjointo})){
       my $oldval=$hflt->{$field};
       my @options=$fobj->getPostibleValues(undef,undef);
