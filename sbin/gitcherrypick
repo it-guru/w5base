@@ -160,7 +160,6 @@ for(my $c=0;$c<=$#picklst;$c++){
       }
    }
 }
-exit;
 
 # Check posibility and order picks
 my %reqcommids;
