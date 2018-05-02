@@ -56,6 +56,7 @@ my %commitdt;
 my @commitlst=$repo->command("log","--cherry-pick",
                              "--format=format:%H",
                              "--right-only",
+                             "--reverse",
                              $branch."...".$masterbranch);
 
 if ($opt_v){
@@ -187,7 +188,7 @@ if ($opt_v){
 for(my $c=0;$c<=$#picklst;$c++){
    my $files=$commitlst{$picklst[$c]};
    my $incheck=0;
-   for(my $s=0;$s<=$#commitlst;$s++){
+   for(my $s=$#commitlst;$s>=0;$s--){ 
       if ($picklst[$c] eq $commitlst[$s]){
          $incheck=1;
       }
