@@ -219,6 +219,16 @@ sub new
                 group         =>'ifagreement',
                 dataobjattr   =>'lnkapplappl.ifagreementdocname'),
 
+      new kernel::Field::Number(
+                name          =>'ifagreementdocsz',
+                label         =>'Interface-Agreement-Document Size',
+                searchable    =>0,
+                uploadable    =>0,
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'ifagreement',
+                dataobjattr   =>'length(lnkapplappl.ifagreementdoc)'),
+
       new kernel::Field::Select(
                 name          =>'ifagreementstate',
                 label         =>'Interface-Agreement state',

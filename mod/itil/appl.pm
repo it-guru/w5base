@@ -920,7 +920,8 @@ sub new
                 vjoinon       =>['id'=>'fromapplid'],
                 vjoindisp     =>['toappl','contype','conproto','conmode'],
                 vjoininhash   =>['toappl','contype','conproto','conmode',
-                                 'toapplid', 'comments']),
+                                 'toapplid', 'comments','id','cistatusid',
+                                 'ifagreementdocsz','ifagreementneeded']),
 
       new kernel::Field::Number(
                 name          =>'interfacescount',
@@ -1898,7 +1899,17 @@ sub calculateInterfacesCount
    my $sysfld=$self->getParent->getField("interfaces");
    my $s=$sysfld->RawValue($current);
    return(0) if (!ref($s) eq "ARRAY");
-   return($#{$s}+1);
+
+   my $c=0;
+   foreach my $irec (@$s){
+      if (lc($irec->{conproto}) ne "unknown" &&
+          ($irec->{cistatusid}>2 && $irec->{cistatusid}<6) &&
+          ($irec->{ifagreementneeded} eq "1") &&
+          ($irec->{ifagreementdocsz} ne "" && $irec->{ifagreementdocsz}>10000)){
+         $c++;
+      }
+   }
+   return($c);
 }
 
 sub calculateInstanceCount
