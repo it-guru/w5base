@@ -10,6 +10,7 @@
 'Interconnect Network Name'=>{de=>'Kopplungs-IP-Netzwerk'},
 'Interconnect name'=>{de=>'Kopplungsname'},
 'Interconnect bandwidth'=>{de=>'Kopplungs-Bandbreite'},
+'LBW.0'=>{de=>'[undefiniert]',en=>'[undefined]'},
 'LBW.2000'=>{de=>'2M Bit',en=>'2 MBit'},
 'LBW.10000'=>{de=>'10 MBit',en=>'10 MBit'},
 'LBW.100000'=>{de=>'100 MBit',en=>'100 MBit'},
