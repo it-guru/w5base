@@ -487,6 +487,7 @@ sub new
                 group         =>'ipaddresses',
                 vjointo       =>'tsacinv::ipaddress',
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
+                vjoinbase     =>{deleted=>'0'},
                 vjoindisp     =>[qw(fullname description type)],
                 vjoininhash   =>[qw(ipaddress ipv4address ipv6address 
                                     description dnsname status)]),

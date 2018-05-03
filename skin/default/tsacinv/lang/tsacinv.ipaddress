@@ -6,4 +6,4 @@
 'fieldgroup.default'=>{de=>'IP-Daten',en=>'IP-Data'},
 'fieldgroup.finance'=>{de=>'Verrechnungsdaten',en=>'Accounting informations'},
 'Account Number'=>{de=>'Account Nummer'},
-
+'marked as delete'=>{de=>'gelöscht markiert'},

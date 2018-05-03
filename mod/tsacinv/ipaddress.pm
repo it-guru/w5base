@@ -139,6 +139,13 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'"type"'),
 
+      new kernel::Field::Boolean(
+                name          =>'deleted',
+                readonly      =>1,
+                label         =>'marked as delete',
+                dataobjattr   =>'"bdelete"'),
+
+
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
