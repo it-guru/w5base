@@ -1,5 +1,6 @@
 #!/bin/sh
 COMMITID=$(git rev-parse HEAD)
+echo ""
 echo "Commit: https://github.com/it-guru/w5base/commit/${COMMITID}"
 git diff-tree --no-commit-id --name-only -r $COMMITID | sed -e 's/^/ /g'
 
