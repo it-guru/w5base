@@ -980,8 +980,8 @@ sub MkFunc
    my $js=shift;
    my $name=shift;
 
-   return("<a class=$class href=JavaScript:$js>".
-     $self->getParent->getParent->T($name,"kernel::Output::HtmlDetail")."</a>");
+   return("<span class=$class onclick=$js>".
+     $self->getParent->getParent->T($name,"kernel::Output::HtmlDetail")."</span>");
 }
 
 sub DetailFunctions
