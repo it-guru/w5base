@@ -121,7 +121,7 @@ sub new
                 htmldetail    =>0,
                 vjointo       =>'FLEXERAatW5W::instpkgsoftware',
                 vjoinon       =>['id'=>'flexerasystemid'],
-                vjoindisp     =>['software','version']),
+                vjoindisp     =>['software','version','classification']),
 
      new kernel::Field::Boolean(
                 name          =>'is_vm',

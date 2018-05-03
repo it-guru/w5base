@@ -69,6 +69,12 @@ sub new
                 dataobjattr   =>'VERSION'),
 
       new kernel::Field::Text(
+                name          =>'classification',
+                label         =>'Classification',
+                ignorecase    =>1,
+                dataobjattr   =>'CLASSIFICATION'),
+
+      new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 ignorecase    =>1,
@@ -98,7 +104,7 @@ sub new
 
    );
    $self->setWorktable("FLEXERA_instsoftware");
-   $self->setDefaultView(qw(systemname publisher software version));
+   $self->setDefaultView(qw(systemname publisher software version classification));
    return($self);
 }
 
