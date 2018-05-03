@@ -68,7 +68,13 @@ sub RawValue
    if (defined($idobj)){
       my $id=$idobj->RawValue($current);
       if ($id ne ""){
-         $url=$self->getParent->getAbsolutByIdUrl($id,{});
+         if ($self->getParent->can("getAbsolutByIdUrl")){
+            $url=$self->getParent->getAbsolutByIdUrl($id,{});
+         }
+         else{
+            msg(ERROR,"no getAbsolutByIdUrl method in ".
+                      $self->getParent()." for id=$id");
+         }
       }
    }
    $current->{$self->{name}}=$url;
