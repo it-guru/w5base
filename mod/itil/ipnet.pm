@@ -41,12 +41,13 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'fullname',
-                htmlwidth     =>'120px',
-                uivisible     =>0,
+                htmlwidth     =>'200px',
                 label         =>'IP-Network name',
-                dataobjattr   =>"concat(ipnet.label,' (', ".
+                htmldetail    =>0,
+                dataobjattr   =>"concat(network.name,': ',".
+                                "concat(ipnet.label,' (', ".
                                 "ipnet.name,'/',".
-                                "ipnet.netmask,')')"), 
+                                "ipnet.netmask,')'))"), 
 
       new kernel::Field::Text(
                 name          =>'label',
@@ -222,6 +223,22 @@ sub getDetailBlockPriority
    return($self->SUPER::getDetailBlockPriority(@_),
           qw(default control misc source));
 }
+
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable ".
+      "left outer join network on $worktable.network=network.id ";
+   return($from);
+}
+
+
 
 
 
