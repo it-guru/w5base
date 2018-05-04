@@ -89,6 +89,7 @@ sub new
                 name          =>'swnature',
                 htmleditwidth =>'40%',
                 group         =>'env',
+                selectfix     =>1,
                 label         =>'Instance type',
                 onPreProcessFilter=>sub{
                    return(0,undef);
@@ -1021,9 +1022,13 @@ sub Validate
 
    my $applid=effVal($oldrec,$newrec,"applid");
    my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
-   if ($applid eq "" && $cistatusid>2 && $cistatusid<6){
-      $self->LastMsg(ERROR,"CI-Status level needs a valid application specification");
-      return(0);
+   if (effChanged($oldrec,$newrec,"cistatusid") ||
+       !defined($oldrec)){
+      if ($applid eq "" && $cistatusid>2 && $cistatusid<6){
+         $self->LastMsg(ERROR,
+            "CI-Status level needs a valid application specification");
+         return(0);
+      }
    }
    if ($cistatusid<6){ # validation process for swnature handling
       my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
