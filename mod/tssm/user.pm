@@ -68,6 +68,12 @@ sub new
                 uppersearch   =>1,
                 dataobjattr   =>SELpref."contactsm1.user_id"),
 
+      new kernel::Field::Interface(
+                name          =>'contactkey',
+                label         =>'Contact Key',
+                dataobjattr   =>"(".SELpref.'contactsm1.user_id'."||'-'||".
+                                    SELpref.'contactsm1.contact_name'.")"),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',

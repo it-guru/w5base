@@ -42,6 +42,13 @@ sub new
                 label         =>'LoginID',
                 dataobjattr   =>SELpref.'operatorm1.name'),
 
+
+      new kernel::Field::Interface(
+                name          =>'contactkey',
+                label         =>'Contact Key',
+                dataobjattr   =>"(".SELpref.'operatorm1.name'."||'-'||".
+                                    SELpref.'operatorm1.contact_name'.")"),
+
       new kernel::Field::Text(
                 name          =>'loginname',
                 label         =>'Loginname',
@@ -80,7 +87,7 @@ sub new
                 name          =>'username',
                 label         =>'Contact name',
                 vjointo       =>'tssm::user',
-                vjoinon       =>['loginname'=>'userid'],
+                vjoinon       =>['contactkey'=>'contactkey'],
                 vjoindisp     =>'fullname',
                 searchable    =>'0'),
 
