@@ -21,7 +21,7 @@ NONE
 
 [en:]
 
-Please enter a software product that is installed on the system. 
+Please enter a valid software product that is installed on the system. 
 An overview of software that can be entered on a system can be found under 
 "IT-Inventory -> Basedata -> Software". You can find a more detailed 
 explanation in the FAQ Article
@@ -29,8 +29,9 @@ https://darwin.telekom.de/darwin/auth/faq/article/ById/12560368290002
 
 [de:]
 
-Bitte tragen Sie ein Software-Produkt ein. Einen Überblick der Software, 
-die eingetragen werden kann, ist unter "IT-Inventar -> Stammdaten -> Software"
+Bitte tragen Sie ein gültiges Software-Produkt ein. 
+Einen Überblick der Software, die eingetragen werden kann, ist 
+unter "IT-Inventar -> Stammdaten -> Software"
 zu finden. Eine detaillierte Beschreibung zum Eintragen von Software finden 
 Sie in dem FAQ-Artikel
 https://darwin.telekom.de/darwin/auth/faq/article/ById/12560368290002
