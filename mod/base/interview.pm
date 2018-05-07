@@ -800,16 +800,21 @@ sub getPosibleSelectValues
       $selkey=trim($selkey);
       if ($selkey ne ""){
          if (my ($k,$v)=$selkey=~m/^(.*)=(.*)$/){
-            $k=~s/[^a-z0-9_!<>]/_/gi;
+            $k=~s/^\s*//gi;
+            $k=~s/\s*$//gi;
+            $k=~s/[^a-z0-9_!<> -]/_/gi;
             push(@r,trim($k),trim($v));
          }
          else{
             my $k=$selkey;
-            $k=~s/[^a-z0-9_!<>]/_/gi;
+            $k=~s/^\s*//gi;
+            $k=~s/\s*$//gi;
+            $k=~s/[^a-z0-9_!<> -]/_/gi;
             push(@r,$k,$selkey);
          }
       }
    }
+print STDERR Dumper(\@r);
    return(@r);
 }
 
@@ -912,9 +917,9 @@ sub getHtmlEditElements
       $sel.="value=\"\"></option>";
 
       my @selectlist=$self->getPosibleSelectValues($irec->{addquestdata});
-
-      while(my $k=shift(@selectlist)){
-         if (my $v=shift(@selectlist)){
+      my ($k,$v);
+      while(defined($k=shift(@selectlist))){
+         if (defined($v=shift(@selectlist))){
             $sel.="<option ";
             $sel.="selected " if (trim($a) eq trim($k));
             $sel.="value=\"$k\">".quoteHtml($v)."</option>";
