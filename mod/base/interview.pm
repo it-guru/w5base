@@ -814,7 +814,6 @@ sub getPosibleSelectValues
          }
       }
    }
-print STDERR Dumper(\@r);
    return(@r);
 }
 
