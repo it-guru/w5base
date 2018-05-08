@@ -1,0 +1,4 @@
+'itil::itcloud'=>{de=>'Cloud',en=>'Cloud'},
+'fieldgroup.areas'=>{de=>'Cloud Areas',en=>'Cloud Areas'},
+'Full Cloud Name'=>{de=>'vollständiger Cloud-Name'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
