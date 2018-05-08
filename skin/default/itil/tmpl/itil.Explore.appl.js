@@ -116,6 +116,8 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
 
    ClassAppletLib[applet].class.prototype.run=function(){
       var appletobj=this;
+      this.app.node.clear();
+      this.app.edge.clear();
       if (arguments.length){
          var dataobj=arguments[0][0];
          var dataobjid=arguments[0][1];
@@ -145,13 +147,14 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
          });
       }
       else{
-         this.app.node.clear();
-         this.app.edge.clear();
          this.app.showDialog(function(){
             var dialog = document.createElement('div');
-            $(dialog).append("<h1>"+ClassAppletLib['%SELFNAME%'].desc.label+
-                             "</h1>");
-            $(dialog).append("<table id=SearchTab width=100% border=0>"+  
+            $(dialog).css("height","100%");
+            $(dialog).append("<table id=SearchTab width=97% height=90% "+
+                              "border=0>"+  
+                              "<tr height=1%><td >"+
+           "<h1>"+ClassAppletLib['%SELFNAME%'].desc.label+"</h1>"+
+                              "</td></tr>"+
                               "<tr height=1%><td width=10%>"+
                               "<form id=SearchFrm><div class='SearchLabel'>"+
                               "Suchen:</div></td><td>"+
@@ -164,7 +167,6 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
                               "</div>"+
                               "</td></tr>"+
                               "</table>");
-            $(dialog).find("#SearchTab").height("300px");
             $(dialog).find("#SearchInp").focus();
             $(dialog).find("#SearchInp").on('keypress', function (e) {
                if(e.which === 13){

@@ -346,7 +346,6 @@ Object.defineProperty(Object.prototype, "extend", {
     },
     enumerable : false
 });
-console.log("fifi 01");
 
 
 
@@ -532,6 +531,7 @@ var W5ExploreClass=function(){
       var appletname;
       if (arguments){
          for(mi=0;mi<arguments.length;mi++){
+
             url+="/";
             url+=arguments[mi].mtag;
             var m = document.createElement('li');
@@ -546,8 +546,11 @@ var W5ExploreClass=function(){
                });
             }
             else{
-               paramstack.push(arguments[mi].mtag);
+               paramstack=arguments[mi].mtag.split('/');
+
+
                $(m).find("a").click(function(e){
+console.log("start applet with param stack=",appletname,paramstack);
                   app.runApplet(appletname,paramstack);
                   e.preventDefault();
                });
@@ -633,6 +636,7 @@ var W5ExploreClass=function(){
          else{
             app.runingApplet[applet].run();
          }
+         $(".spinner").hide();
       }
       else{
          W5Explore.loadAppletClass(applet).then(function(AppletClassPrototype){
@@ -901,21 +905,18 @@ console.log("nodes=",app.node,"edges=",app.edge);
       var app=this;
       this.LayoutMenuLayer();
       this.loadApplets().then(function(){
-console.log("runpath=",runpath);
-         if (runpath.length==0){
+         if (runpath==undefined || runpath.length==0){
             app.showAppletList();
             app.setMPath();
          }
          else{
             app.showAppletList();
             var applet=runpath.shift();
-console.log("new runpath=",runpath);
             app.loadAppletClass(applet).then(function(AppletClassPrototype){
                if (runpath.length==0){
                   app.runApplet(applet);
                }
                else{
-console.log("start applet",applet," with runpath",runpath);
                   app.runApplet(applet,runpath);
                }
             }).catch(function(e){
@@ -946,7 +947,9 @@ $(window).resize(function() {
 
 var runurl=document.location.href;
 runurl=runurl.replace(/^.*\/Explore\/Main[\/]{0,1}/,"");
-var runpath=runurl.split("/");
+runurl=runurl.replace(/\?.*$/,""); // remove query parameters
+var runpath=runurl.split("/").filter(function(e){console.log("e=",e);if (e==""){return(false)}else{return(true)}});
+console.log("runurl=",runurl,"runpath=",runpath,"n=",runpath.length);
 
 W5Explore.MainMenu(runpath);
 

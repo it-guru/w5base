@@ -31,6 +31,35 @@ sub new
    return($self);
 }
 
+sub getJSObjectClass
+{
+   my $self=shift;
+   my $app=shift;
+   my $lang=shift;
+   my $selfname=$self->Self();
+
+   my $skinbase=$selfname;
+   $skinbase=~s/::.*$//;
+
+   my $opt={
+      skinbase=>$skinbase,
+      static=>{
+         SELFNAME=>$selfname
+      }
+   };
+   my $tmpl=$selfname;
+   $tmpl=~s/::/./g;
+   $tmpl="tmpl/".$tmpl.".js";
+
+printf STDERR ("load skinbase=$skinbase tmpl=$tmpl\n");
+   
+   my $prog=$app->getParsedTemplate($tmpl,$opt);
+   utf8::encode($prog);
+   return($prog);
+}
+
+
+
 
 
 sub getObjectPrio

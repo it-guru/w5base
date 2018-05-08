@@ -31,45 +31,4 @@ sub new
    return($self);
 }
 
-sub getJSObjectClass
-{
-   my $self=shift;
-   my $app=shift;
-   my $lang=shift;
-   my $selfname=$self->Self();
-
- #   my $addGroups=quoteHtml($self->getParent->T("add all related groups"));
- #   my $addOrgs=quoteHtml($self->getParent->T("add organisation groups"));
- #   my $orgRoles=join(" ",orgRoles());
-
-   my $d=<<EOF;
-(function(window, document, undefined) {
-   var o='${selfname}';
-   DataObject[o]=new Object();
-   DataObject[o].Class=function(dataobjid){
-      return(DataObjectBaseClass.call(this,o,dataobjid));
-   };
-   \$.extend(DataObject[o].Class.prototype,DataObjectBaseClass.prototype);
-
-})(this,document);
-EOF
-   return($d);
-}
-
-sub getObjectInfo
-{
-   my $self=shift;
-   my $app=shift;
-   my $lang=shift;
-
-   return({
-      label=>"User visualisation",
-      description=>"Makes it postible to visual User relations to groups",
-      sublabel=>"Central Data",
-      prio=>'500'
-   });
-}
-
-
-
 1;

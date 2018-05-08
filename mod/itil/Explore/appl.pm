@@ -31,27 +31,4 @@ sub new
    return($self);
 }
 
-sub getJSObjectClass
-{
-   my $self=shift;
-   my $app=shift;
-   my $lang=shift;
-   my $selfname=$self->Self();
-
- #   my $addGroups=quoteHtml($self->getParent->T("add all related groups"));
- #   my $addOrgs=quoteHtml($self->getParent->T("add organisation groups"));
- #   my $orgRoles=join(" ",orgRoles());
-
-
-   my $opt={
-      skinbase=>'itil',
-      static=>{
-         SELFNAME=>$selfname
-      }
-   };
-   my $prog=$app->getParsedTemplate("tmpl/itil.Explore.appl.js",$opt);
-   utf8::encode($prog);
-   return($prog);
-}
-
 1;
