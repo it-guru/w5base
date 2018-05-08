@@ -44,8 +44,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'contactkey',
                 label         =>'Contact Key',
-                dataobjattr   =>"(".SELpref.'chkuser.name'."||'-'||".
-                                    SELpref.'chkuser.contact_name'.")"),
+                dataobjattr   =>SELpref.'chkuser.contact_name'),
 
       new kernel::Field::TextDrop( name       =>'groupname',
                                    label      =>'Groupname',

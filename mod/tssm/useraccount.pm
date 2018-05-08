@@ -46,8 +46,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'contactkey',
                 label         =>'Contact Key',
-                dataobjattr   =>"(".SELpref.'operatorm1.name'."||'-'||".
-                                    SELpref.'operatorm1.contact_name'.")"),
+                dataobjattr   =>SELpref.'operatorm1.contact_name'),
 
       new kernel::Field::Text(
                 name          =>'loginname',
