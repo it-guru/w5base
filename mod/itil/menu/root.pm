@@ -403,6 +403,24 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itil.cloud",
+                      "itil::itcloud",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.cloud.new",
+                      "itil::itcloud",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.cloud.area",
+                      "itil::itcloudarea",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itil.cloud.area.new",
+                      "itil::itcloudarea",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.kern",
                       "tmpl/welcome");
    

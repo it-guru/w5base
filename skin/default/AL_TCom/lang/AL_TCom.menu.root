@@ -152,3 +152,7 @@
 'itservices.ta.contact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itservices.ta.lnkgrp'=>{de=>'Verkn. Organisation',en=>'Link Organisation'},
 'itservices.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.cloud'=>{de=>'Cloud',en=>'Cloud'},
+'AL_TCom.cloud.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.cloud.area'=>{de=>'Area',en=>'Area'},
+'AL_TCom.cloud.area.new'=>{de=>'Neueingabe',en=>'New'},

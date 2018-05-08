@@ -420,6 +420,24 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.cloud",
+                      "AL_TCom::itcloud",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.cloud.new",
+                      "AL_TCom::itcloud",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.cloud.area",
+                      "AL_TCom::itcloudarea",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.cloud.area.new",
+                      "AL_TCom::itcloudarea",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.kern",
                       "tmpl/welcome");
    
