@@ -1,4 +1,4 @@
-package itil::Research::appl;
+package base::Explore::grp;
 #  W5Base Framework
 #  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
 #
@@ -19,9 +19,8 @@ package itil::Research::appl;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Research;
-@ISA=qw(kernel::Research);
-
+use kernel::ExploreApplet;
+@ISA=qw(kernel::ExploreApplet);
 
 
 sub new
@@ -37,13 +36,20 @@ sub getJSObjectClass
    my $self=shift;
    my $app=shift;
    my $lang=shift;
+   my $selfname=$self->Self();
 
+ #   my $addGroups=quoteHtml($self->getParent->T("add all related groups"));
+ #   my $addOrgs=quoteHtml($self->getParent->T("add organisation groups"));
+ #   my $orgRoles=join(" ",orgRoles());
 
    my $d=<<EOF;
-   DataObject[o].Class.prototype.loadShortRecord=function(){
-      this.loadRec("id,name");
+(function(window, document, undefined) {
+   var o='${selfname}';
+   DataObject[o]=new Object();
+   DataObject[o].Class=function(dataobjid){
+      return(DataObjectBaseClass.call(this,o,dataobjid));
    };
-
+   \$.extend(DataObject[o].Class.prototype,DataObjectBaseClass.prototype);
 
 })(this,document);
 EOF
@@ -57,11 +63,13 @@ sub getObjectInfo
    my $lang=shift;
 
    return({
-      name=>$self->{dataobj},
-      label=>$app->T($self->{dataobj},$self->{dataobj}),
-      prio=>'500'
+      label=>"Group visualisation",
+      description=>"Makes it postible to visual Groups with alle members",
+      sublabel=>"Central Data",
+      prio=>'501'
    });
 }
+
 
 
 1;

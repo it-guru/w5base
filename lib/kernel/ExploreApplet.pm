@@ -1,6 +1,6 @@
-package itil::Research::appl;
+package kernel::ExploreApplet;
 #  W5Base Framework
-#  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2017  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,39 +16,33 @@ package itil::Research::appl;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-use strict;
+#
 use vars qw(@ISA);
+use strict;
 use kernel;
-use kernel::Research;
-@ISA=qw(kernel::Research);
+use kernel::Universal;
 
-
+@ISA=qw(kernel::Universal);
 
 sub new
 {
    my $type=shift;
-   my %param=@_;
-   my $self=bless({%param},$type);
+   my $self=bless({@_},$type);
    return($self);
 }
 
-sub getJSObjectClass
+
+
+sub getObjectPrio
 {
    my $self=shift;
    my $app=shift;
    my $lang=shift;
 
-
-   my $d=<<EOF;
-   DataObject[o].Class.prototype.loadShortRecord=function(){
-      this.loadRec("id,name");
-   };
-
-
-})(this,document);
-EOF
-   return($d);
+   return(500);
 }
+
+
 
 sub getObjectInfo
 {
@@ -57,11 +51,13 @@ sub getObjectInfo
    my $lang=shift;
 
    return({
-      name=>$self->{dataobj},
-      label=>$app->T($self->{dataobj},$self->{dataobj}),
-      prio=>'500'
+      label=>$app->T($self->Self,$self->Self),
+      description=>$app->T("description",$self->Self),
+      sublabel=>$app->T("sublabel",$self->Self),
+      prio=>$self->getObjectPrio($app,$lang)
    });
 }
 
 
 1;
+

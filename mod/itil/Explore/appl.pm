@@ -1,6 +1,6 @@
-package itil::Research::appl;
+package itil::Explore::appl;
 #  W5Base Framework
-#  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,9 +19,8 @@ package itil::Research::appl;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Research;
-@ISA=qw(kernel::Research);
-
+use kernel::ExploreApplet;
+@ISA=qw(kernel::ExploreApplet);
 
 
 sub new
@@ -37,31 +36,22 @@ sub getJSObjectClass
    my $self=shift;
    my $app=shift;
    my $lang=shift;
+   my $selfname=$self->Self();
+
+ #   my $addGroups=quoteHtml($self->getParent->T("add all related groups"));
+ #   my $addOrgs=quoteHtml($self->getParent->T("add organisation groups"));
+ #   my $orgRoles=join(" ",orgRoles());
 
 
-   my $d=<<EOF;
-   DataObject[o].Class.prototype.loadShortRecord=function(){
-      this.loadRec("id,name");
+   my $opt={
+      skinbase=>'itil',
+      static=>{
+         SELFNAME=>$selfname
+      }
    };
-
-
-})(this,document);
-EOF
-   return($d);
+   my $prog=$app->getParsedTemplate("tmpl/itil.Explore.appl.js",$opt);
+   utf8::encode($prog);
+   return($prog);
 }
-
-sub getObjectInfo
-{
-   my $self=shift;
-   my $app=shift;
-   my $lang=shift;
-
-   return({
-      name=>$self->{dataobj},
-      label=>$app->T($self->{dataobj},$self->{dataobj}),
-      prio=>'500'
-   });
-}
-
 
 1;

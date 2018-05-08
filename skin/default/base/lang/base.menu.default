@@ -3,6 +3,7 @@
 'Tools.XLSExpand'=>{de=>'XLSExpand',en=>'XLSExpand'},
 'Tools.projectroom'=>{de=>'Projektraum',en=>'Projectroom'},
 'Tools.projectroom.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.explore'=>{de=>'Data-Explorer',en=>'Data-Explorer'},
 'Tools.workflow'=>{de=>'Workflow System',en=>'Workflow System'},
 'Tools.workflow.action'=>{de=>'Actionen',en=>'Actions'},
 'Tools.workflow.action.x'=>{de=>'Erweitert',en=>'Extended'},

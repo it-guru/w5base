@@ -307,6 +307,7 @@ sub getValidWebFunctions
             New ModalNew ModalEdit Copy FormatSelect Bookmark startWorkflow
             DeleteRec InitWorkflow AsyncSubListView 
             EditProcessor ViewProcessor HandleQualityCheck
+            jsExplore
             ViewEditor ById ModuleObjectInfo);
    if ($self->can("HtmlHistory")){
       push(@l,qw(HtmlHistory HistoryResult));
@@ -318,6 +319,100 @@ sub getValidWebFunctions
       push(@l,qw(HtmlInterviewLink));
    }
    return(@l);
+}
+
+sub jsExploreLabelFieldname
+{
+   my $self=shift;
+   my $o=$self->getRecordHeaderField();
+
+   if (defined($o)){
+      return($o->Name());
+   }
+   return();
+}
+
+sub jsExplore
+{
+   my $self=shift;
+   my $dataobj=$self->Self();
+
+   my $recordimageurl=$self->getRecordImageUrl();
+   my $fieldnamelabel=$self->jsExploreLabelFieldname();
+   my $fieldnameid=$self->IdField->Name();
+
+
+   print $self->HttpHeader("text/javascript");
+
+   print(<<EOF);
+(function(window, document, undefined) {
+
+   ClassDataObjLib['${dataobj}']=new Object();
+   ClassDataObjLib['${dataobj}']=function(id,initialLabel,nodeTempl){
+       this.label=initialLabel;
+       this.dataobj='${dataobj}';
+       this.dataobjid=id;
+       ClassDataObj.call(this,W5Explore);
+       this.font={
+          multi:'md',
+          face:'georgia'
+       };
+       this.borderWidth=1;
+       this.shapeProperties={
+          useBorderWithImage:true
+       };
+       this.image='${recordimageurl}';
+       this.shape='image';
+       this.group=this.dataobj;
+       \$.extend(this,nodeTempl);
+       this.initLevel=0;
+       this.fieldnamelabel='${fieldnamelabel}';
+       this.fieldnameid='${fieldnameid}';
+       this.id=this.app.toObjKey(this.dataobj,this.dataobjid);
+   };
+   ClassDataObjLib['${dataobj}'].prototype.refreshLabel=function(){
+       var that=this;
+       setTimeout(function(){
+          var p=new Promise(function(ok,reject){
+             that.app.Config().then(function(Config){
+                var w5obj=getModuleObject(Config,that.dataobj);
+                var flt=new Object();
+                flt[that.fieldnameid]=that.dataobjid;
+                w5obj.SetFilter(flt);
+                w5obj.findRecord(that.fieldnamelabel,function(data){
+                   if (data[0]){
+                      that.update({label:data[0][that.fieldnamelabel]});
+                      ok(1);
+                   }
+                   else{
+                      // that.update({label:that.label+" ?"});
+                      reject(that.label+" not found");
+                   }
+                },function(exception){
+                   // that.update({label:'?'});
+                   reject(1);
+                });
+             }).catch(function(){
+                console.log("can not get config");
+                reject(null);
+             });
+          });
+          p.then(function(){
+             var x=1;
+          }).catch(function(e){
+             console.log("error in validation ",e);
+           //  that.app.console.log("ERROR","fail to validated '"+
+           //                       initialLabel);  
+          });
+          that.initLevel++;
+       },100);
+   };
+   \$.extend(ClassDataObjLib['${dataobj}'].prototype,ClassDataObj.prototype);
+
+})(this,document);
+
+EOF
+
 }
 
 sub ById

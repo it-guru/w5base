@@ -1,0 +1,3 @@
+'itil::Explore::lnkapplappl'=>{en=>'Application DB Interfaces',de=>'Anwendungs DB Schnittstellen'},
+'description'=>{de=>'Generierung einer Karte aller produktiven DB-Schnittstellen',en=>'Build a map of all technical DB interfaces of all productive Applications'},
+'sublabel'=>{de=>'IT-Inventar',en=>'IT-Inventory'},

@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
-use CGI;
+use JSON;
 @ISA=qw(kernel::App::Web);
 
 sub new
@@ -28,14 +28,14 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->LoadSubObjs("Research","Research");
+   $self->LoadSubObjsOnDemand("Explore","Explore");
    return($self);
 }
 
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main));
+   return(qw(Main jsApplets));
 }
 
 
@@ -50,12 +50,56 @@ sub Main
    print $self->HttpHeader("text/html",charset=>'UTF-8');
 
    my $getAppTitleBar=$self->getAppTitleBar();
+   my $BASE=$ENV{REQUEST_URI};
+   $BASE=~s#/Explore/Main.*?$#/Explore/Main#;
 
-   my $opt={};
+   my $opt={
+      static=>{
+         BASE=>$BASE
+      }
+   };
 
-   my $prog=$self->getParsedTemplate("tmpl/base.Explore",$opt);
+   my $prog=$self->getParsedTemplate("tmpl/base.Explore.js",$opt);
    utf8::encode($prog);
    print($prog);
+}
+
+sub jsApplets
+{
+   my $self=shift;
+   my $lang=$self->Lang();
+
+   print $self->HttpHeader("text/javascript");
+
+   my $appletcall;
+   if (defined(Query->Param("FunctionPath"))){
+      $appletcall=Query->Param("FunctionPath");
+   }
+   $appletcall=~s/^\///;
+   $appletcall=~s/\//::/g;
+
+   printf("(function(window, document, undefined){\n");
+   if ($appletcall ne ""){
+      if (exists($self->{Explore}->{$appletcall})){
+         sleep(2);
+         print($self->{Explore}->{$appletcall}->getJSObjectClass($self,$lang));
+      }
+   }
+   else{
+      my $jsengine=new JSON();
+      foreach my $sobj (values(%{$self->{Explore}})){
+         my $d;
+         if ($sobj->can("getObjectInfo")){
+            $d=$sobj->getObjectInfo($self,$lang);
+         }
+         if (defined($d)){
+            my $selfname=$sobj->Self();
+            my $jsdata=$jsengine->encode($d);
+            printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+         }
+      }
+   }
+   printf("})(this,document);\n\n");
 }
 
 

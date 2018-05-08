@@ -7,22 +7,16 @@ function SwitchMenuVisible()
    var m=document.getElementById("MenuTree");
    var mselframe=parent.document.getElementById("mselframe");
    var menutop=top.document.getElementById("fmenutop");
-   var w5ui=getSiteCookie("W5UI");
-   if (w5ui===undefined || w5ui==null || w5ui==""){
-      w5ui="normal";
-   }
-   else if (w5ui=="fullscreen"){
-      w5ui="normal";
-   }
-   else if (w5ui=="normal"){
-      w5ui="fullscreen";
-   }
-   setCookie("W5UI",w5ui,99999,"/");
-
-   console.log("ui="+w5ui);
 
    if (m) {
-      if (w5ui=="fullscreen") {
+      if (m.style.display=="none") {
+         m.style.visibility="visible";
+         m.style.display="block";
+         mselframe.cols=m.oldmselframe;
+         menutop.style.visibility="visible";
+         menutop.style.display="block";
+      }
+      else {
          m.style.visibility="hidden";
          m.style.display="none";
          m.oldmselframe=mselframe.cols;
@@ -30,15 +24,6 @@ function SwitchMenuVisible()
          menutop.style.visibility="hidden";
          menutop.style.display="none";
       }
-      else{
-         m.style.visibility="visible";
-         m.style.display="block";
-         mselframe.cols=m.oldmselframe;
-         menutop.style.height="100px";
-         menutop.style.visibility="visible";
-         menutop.style.display="block";
-      }
-      menutop.src="menutop";
    }
 }
 </script>
