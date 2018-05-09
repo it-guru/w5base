@@ -355,7 +355,7 @@ sub jsExplore
        ClassDataObj.call(this,W5Explore);
        this.font={
           multi:'md',
-          face:'georgia'
+          face:'arial'
        };
        this.borderWidth=1;
        this.shapeProperties={
@@ -369,6 +369,18 @@ sub jsExplore
        this.fieldnamelabel='${fieldnamelabel}';
        this.fieldnameid='${fieldnameid}';
        this.id=this.app.toObjKey(this.dataobj,this.dataobjid);
+       this.nodeMethods={
+          hideNode:{
+             label:"hide Element",
+             exec:function(){
+                 console.log("call hideNode on ",this);
+                 var curobj=this.app.node.get(this.id);
+                 if (curobj){
+                    this.app.node.remove(curobj);
+                 }
+             }
+          }
+       };
    };
    ClassDataObjLib['${dataobj}'].prototype.refreshLabel=function(){
        var that=this;
@@ -380,8 +392,10 @@ sub jsExplore
                 flt[that.fieldnameid]=that.dataobjid;
                 w5obj.SetFilter(flt);
                 w5obj.findRecord(that.fieldnamelabel,function(data){
+                   var newlabel=data[0][that.fieldnamelabel];
+                   newlabel=newlabel.replace(/ /," \\n");
                    if (data[0]){
-                      that.update({label:data[0][that.fieldnamelabel]});
+                      that.update({label:newlabel});
                       ok(1);
                    }
                    else{

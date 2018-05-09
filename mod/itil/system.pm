@@ -65,7 +65,7 @@ sub new
                 label         =>'Name',
                 dataobjattr   =>'system.name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'fullname',
                 label         =>'Fullname',
                 readonly      =>1,

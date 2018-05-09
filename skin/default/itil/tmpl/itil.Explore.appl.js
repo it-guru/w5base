@@ -5,13 +5,14 @@
    };
    $.extend(ClassAppletLib[applet].class.prototype,ClassApplet.prototype);
 
+   ClassAppletLib[applet].class.prototype.searchFilter='';
+   ClassAppletLib[applet].class.prototype.searchResult='';
    ClassAppletLib[applet].class.prototype.loadItems=function(param){
      var dataobj=param[0];
      var dataobjid=param[1];
      var app=this.app;
      return(
         new Promise(function(ok,reject){
-console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
            app.Config().then(function(cfg){
               var w5obj=getModuleObject(cfg,dataobj);
                 w5obj.SetFilter({ id:dataobjid });
@@ -72,10 +73,29 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
 
 
 
+   ClassAppletLib[applet].class.prototype.setSearchResult=function(dialog,res){
+      var appletobj=this;
+      $(dialog).find("#SearchResult").html(res);
+      $(dialog).find("#SearchResult").height(   // fix result height
+         $(dialog).find("#SearchResult").height()+180
+      );
+
+      $(dialog).find(".appstart").click(function(e){
+         console.log("click eon ",$(this).attr("data-id"));
+         console.log("click eon ",$(this).attr("data-dataobj"));
+
+         var id=$(this).attr("data-id");
+         var dataobj=$(this).attr("data-dataobj");
+         appletobj.run([dataobj,id]);
+      });
+      appletobj.searchResult=$(dialog).find("#SearchResult").html();
+   }
+
    ClassAppletLib[applet].class.prototype.searchItems=function(dialog,flt){
       var appletobj=this;
       this.app.Config().then(function(cfg){
          var w5obj=getModuleObject(cfg,'itil::appl');
+         appletobj.searchFilter=flt;
          if (flt.indexOf("*")==-1 && flt.indexOf(" ")==-1){
             flt="*"+flt+"*";
          }
@@ -93,19 +113,7 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
                     ">"+
                     data[c].name+"</div>";
             }
-            $(dialog).find("#SearchResult").height(   // fix result height
-               $(dialog).find("#SearchResult").height()
-            );
-            $(dialog).find("#SearchResult").html(res);
-
-            $(dialog).find(".appstart").click(function(e){
-               console.log("click eon ",$(this).attr("data-id"));
-               console.log("click eon ",$(this).attr("data-dataobj"));
-
-               var id=$(this).attr("data-id");
-               var dataobj=$(this).attr("data-dataobj");
-               appletobj.run([dataobj,id]);
-            });
+            appletobj.setSearchResult(dialog,res);
          },function(e){
             $(dialog).find("#SearchResult").html("Fail");
          });
@@ -124,9 +132,9 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
          this.app.ShowNetworkMap({
             physics: {
                barnesHut:{
-                  gravitationalConstant:-4100
+                  gravitationalConstant:-50000
                },
-               enabled: true
+               enabled: true   // || "once"
             }
          });
          this.app.console.log("INFO","loading scenario ...");
@@ -167,7 +175,9 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
                               "</div>"+
                               "</td></tr>"+
                               "</table>");
+            $(dialog).find("#SearchInp").val(appletobj.searchFilter);
             $(dialog).find("#SearchInp").focus();
+            appletobj.setSearchResult(dialog,appletobj.searchResult);
             $(dialog).find("#SearchInp").on('keypress', function (e) {
                if(e.which === 13){
                   $(this).attr("disabled", "disabled");
@@ -176,6 +186,7 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
                   $(dialog).find("#SearchInp").focus();
                }
             });
+            $(".spinner").hide();
             return(dialog);
          },function(){
             appletobj.exit();

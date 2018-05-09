@@ -305,8 +305,16 @@ div#SearchResult{
   color: darkblue;
 }
 
+
+
 </style>
 
+
+<style>
+.nodeMethodCall{
+  cursor:pointer;
+}
+</style>
 
 
 
@@ -425,37 +433,43 @@ var W5ExploreClass=function(){
    this.toObjKey=function(dataobj,id){
       return(dataobj+'::'+id);
    };
-   this.ResizeLayout=function(){
-      this.main && $(this.main).height(1);
-      this.workspace && $(this.workspace).height(1);
-      this.netmap && $(this.netmap).height(1);
-      this.dbrec && $(this.dbrec).height(1);
-
-      $(this.main).outerHeight(
-          $(window).innerHeight());
-      if (this.console.div){
-         $(this.workspace).outerHeight(
-           $(this.main).innerHeight()-
-           $(this.console.div).outerHeight()-
-           $(this.mpathline).outerHeight()-1);
+   this.ResizeLayout=function(level2){
+      if (!level2){
+         var app=this;
+         this.main && $(this.main).height(1);
+         this.workspace && $(this.workspace).height(1);
+         this.netmap && $(this.netmap).height(1);
+         this.netmap && $(this.netmap).width(1);
+         this.dbrec && $(this.dbrec).height(1);
+        // setTimeout(function(){app.ResizeLayout(1);}, 1);
       }
-      else{
-         $(this.workspace).outerHeight(
-           $(this.main).innerHeight()-
-           $(this.mpathline).outerHeight()-1);
-      }
-      if (this.netmap){
-         $(this.netmap).outerHeight(
-             $(this.workspace).innerHeight());
-      }
-      if (this.dbrec){
-         $(this.dbrec).outerHeight(
-             $(this.workspace).innerHeight());
-      }
-      if (this.netmap){
-         $(this.netmap).outerWidth(
-             $(this.workspace).innerWidth()-
-             $(this.dbrec).outerWidth()-1);
+      if (!level2){
+         $(this.main).outerHeight(
+             $(window).innerHeight());
+         if (this.console.div){
+            $(this.workspace).outerHeight(
+              $(this.main).innerHeight()-
+              $(this.console.div).outerHeight()-
+              $(this.mpathline).outerHeight());
+         }
+         else{
+            $(this.workspace).outerHeight(
+              $(this.main).innerHeight()-
+              $(this.mpathline).outerHeight()-5);
+         }
+         if (this.netmap){
+            $(this.netmap).outerHeight(
+                $(this.workspace).innerHeight());
+         }
+         if (this.dbrec){
+            $(this.dbrec).outerHeight(
+                $(this.workspace).innerHeight());
+         }
+         if (this.netmap){
+            $(this.netmap).outerWidth(
+                $(this.workspace).innerWidth()-
+                $(this.dbrec).outerWidth()-5);
+         }
       }
    };
 
@@ -617,7 +631,7 @@ console.log("start applet with param stack=",appletname,paramstack);
                $.getScript("jsApplets/"+applet, 
                function( data, textStatus, jqxhr ) {
                   console.log("Applets code is loaded");
-                  $(".spinner").hide();
+        //          $(".spinner").hide();
                   res(ClassAppletLib[applet].class);
                }).fail(function(e,parseerror){
                   console.log("fail",e);
@@ -636,7 +650,7 @@ console.log("start applet with param stack=",appletname,paramstack);
          else{
             app.runingApplet[applet].run();
          }
-         $(".spinner").hide();
+         // $(".spinner").hide(); # hide needs to be done from applet
       }
       else{
          W5Explore.loadAppletClass(applet).then(function(AppletClassPrototype){
@@ -647,7 +661,7 @@ console.log("start applet with param stack=",appletname,paramstack);
             else{
                app.runingApplet[applet].run();
             }
-            $(".spinner").hide();
+           // $(".spinner").hide(); # hide needs to be done from applet
          }).catch(function(e){
             $(".spinner").hide();
             alert("Applet "+applet+" execution error.");
@@ -753,17 +767,18 @@ console.log("start applet with param stack=",appletname,paramstack);
           },
           smooth: true
         },
+        interaction: { 
+          multiselect: true
+        },
         nodes: {
-          font: {
-            bold: {
-              color: '#0077aa'
-            }
-          }
         }
       };
+      var usephysicsonce=false;
+      if (MapParamTempl.physics && MapParamTempl.physics.enabled=="once"){
+         usephysicsonce=true;
+         MapParamTempl.physics.enabled=true; 
+      }
       $.extend(options,MapParamTempl);
-console.log("MapParamTempl",MapParamTempl);
-console.log("final options",options);
       this.network = new vis.Network(this.netmap, data, options);
 //  network.once("beforeDrawing", function() {
 //      network.focus(2, {
@@ -773,17 +788,47 @@ console.log("final options",options);
       this.network.on("stabilized", function () {
          if ($(".spinner").is(":visible")){
             $(".spinner").hide();
-console.log("nodes=",app.node,"edges=",app.edge);
             app.console.log("INFO","autolayout done");
+            app.console.log("INFO","fit map");
+            app.network.fit({
+               animation: true
+            });
          }
-         this.setOptions( { physics: false } );
+         if (usephysicsonce){
+            this.setOptions( { physics: false } );
+         }
       });
       this.network.on("click", function (params) {
           params.event = "[original event]";
           if (params.nodes[0]){
-             dbrec.innerHTML = '<h2>Click event: on '+params.nodes[0]+
-                               '</h2><xmp>' + JSON.stringify(params, null, 4)+
-                               "</xmp>";
+             var n;
+             var out="<p>Element:<br>";
+             var methods=Object();
+             var selectedNodes=params.nodes;
+             for(n=0;n<selectedNodes.length;n++){
+                var nodeobj=app.node.get(selectedNodes[n]);
+                console.log("select "+n+"=",nodeobj);
+                out+=nodeobj.label+"<br>";
+                for (var m in nodeobj.nodeMethods){
+                   methods[m]++;
+                }
+             }
+             out+="<br>Mehtods:<br></p>";
+             var mdiv=document.createElement('ul');
+             $(mdiv).addClass("nodeMethods");
+             for (var m in methods){
+                $(mdiv).append("<li><span class=nodeMethodCall data-id='"+m+
+                               "'>"+m+"</span></li>");
+             }
+             $(mdiv).find(".nodeMethodCall").click(function(e){
+                var methodName=$(this).attr("data-id");
+                for(n=0;n<selectedNodes.length;n++){
+                   var nodeobj=app.node.get(selectedNodes[n]);
+                   nodeobj.nodeMethods[methodName].exec.call(nodeobj);
+                }
+             });
+             $(dbrec).html(out); 
+             $(dbrec).append(mdiv); 
           }
           else{
              dbrec.innerHTML='';
@@ -806,12 +851,12 @@ console.log("nodes=",app.node,"edges=",app.edge);
         },
         nodes: {
           font: {
+            face: "arial",
             bold: {
               color: '#0077aa'
             }
           }
         },
-     
         layout: {
            hierarchical: {
              sortMethod: 'directed'
@@ -831,7 +876,7 @@ console.log("nodes=",app.node,"edges=",app.edge);
 
 
       this.network.on("click", function (params) {
-          params.event = "[original event]";
+          //params.event = "[original event]";
           if (params.nodes[0]){
              dbrec.innerHTML = '<h2>Click event: on '+params.nodes[0]+
                                '</h2><xmp>' + JSON.stringify(params, null, 4)+
@@ -862,6 +907,11 @@ console.log("nodes=",app.node,"edges=",app.edge);
    }
 
 
+
+   this.showW5ExploreLogo=function(){
+      var app=this;
+      $("#workspace").html("<br><br><center><h1>W5Explore</h1></center>");
+   }
 
    this.showAppletList=function(){
       var app=this;
@@ -908,9 +958,11 @@ console.log("nodes=",app.node,"edges=",app.edge);
          if (runpath==undefined || runpath.length==0){
             app.showAppletList();
             app.setMPath();
+            $(".spinner").hide();
          }
          else{
-            app.showAppletList();
+            app.showW5ExploreLogo();
+            $(".spinner").show();
             var applet=runpath.shift();
             app.loadAppletClass(applet).then(function(AppletClassPrototype){
                if (runpath.length==0){
@@ -924,7 +976,6 @@ console.log("nodes=",app.node,"edges=",app.edge);
                alert("Applet "+applet+" execution error.");
             });
          }
-         $(".spinner").hide();
       }).catch(function(e){
          $(".spinner").hide();
          console.log("e=",e);
@@ -949,7 +1000,7 @@ var runurl=document.location.href;
 runurl=runurl.replace(/^.*\/Explore\/Main[\/]{0,1}/,"");
 runurl=runurl.replace(/\?.*$/,""); // remove query parameters
 var runpath=runurl.split("/").filter(function(e){console.log("e=",e);if (e==""){return(false)}else{return(true)}});
-console.log("runurl=",runurl,"runpath=",runpath,"n=",runpath.length);
+//console.log("runurl=",runurl,"runpath=",runpath,"n=",runpath.length);
 
 W5Explore.MainMenu(runpath);
 
