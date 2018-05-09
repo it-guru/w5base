@@ -56,6 +56,12 @@ sub new
                 name          =>'cloud',
                 htmlwidth     =>'150px',
                 label         =>'Cloud',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if (defined($rec));
+                   return(0);
+                },
                 vjointo       =>'itil::itcloud',
                 vjoinon       =>['cloudid'=>'id'],
                 vjoineditbase =>{'cistatusid'=>[3,4]},
@@ -63,6 +69,19 @@ sub new
                                                    
       new kernel::Field::Text(
                 name          =>'name',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   if (defined($rec)){
+                      my $itcloudid=$rec->{"cloudid"};
+                      if ($self->getParent->isWriteOnITCloudValid($itcloudid,
+                           "default")){
+                         return(0);
+                      }
+                   }
+                   return(1) if (defined($rec));
+                   return(0);
+                },
                 label         =>'cloud area name',
                 dataobjattr   =>'qitcloudarea.name'),
 
@@ -82,21 +101,54 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'appl',
                 label         =>'Application',
-                xreadonly      =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   if (defined($rec)){
+                      my $itcloudid=$rec->{"cloudid"};
+                      if ($rec->{cistatusid}!=4){
+                         if ($self->getParent->isWriteOnITCloudValid($itcloudid,
+                             "default")){
+                            return(0);
+                         }
+                      }
+                   }
+                   return(1) if (defined($rec));
+                   return(0);
+                },
                 vjointo       =>'itil::appl',
                 vjoineditbase =>{'cistatusid'=>[2,3,4]},
                 vjoinon       =>['applid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'applid',
+                selectfix     =>1,
                 dataobjattr   =>'qitcloudarea.appl'),
+
+      new kernel::Field::Textarea(
+                name          =>'description',
+                searchable    =>0,
+                label         =>'Cloud Area description',
+                dataobjattr   =>'qitcloudarea.description'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
                 label         =>'Comments',
                 dataobjattr   =>'qitcloudarea.comments'),
+
+      new kernel::Field::Text(
+                name          =>'conumber',
+                translation   =>'itil::appl',
+                htmleditwidth =>'150px',
+                htmlwidth     =>'100px',
+                group         =>'appl',
+                label         =>'Costcenter',
+                weblinkto     =>'itil::costcenter',
+                weblinkon     =>['conumber'=>'name'],
+                dataobjattr   =>'appl.conumber'),
+
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -177,7 +229,7 @@ sub new
                                                   
       new kernel::Field::Link(
                 name          =>'itcloudcistatusid',
-                label         =>'Cluster CI-State',
+                label         =>'Cloud CI-State',
                 readonly      =>1,
                 group         =>'cloudinfo',
                 dataobjattr   =>'itcloud.cistatus'),
@@ -189,26 +241,41 @@ sub new
                 group         =>'cloudinfo',
                 dataobjattr   =>'itcloud.mandator'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'cloudid',
+                selectfix     =>1,
                 htmldetail    =>0,
                 uploadable    =>0,
                 label         =>'W5Base Cloud ID',
                 dataobjattr   =>'qitcloudarea.itcloud'),
 
    );
-   $self->setDefaultView(qw(fullname applications  cdate));
+   $self->setDefaultView(qw(fullname appl conumber  cdate));
    $self->setWorktable("itcloudarea");
    return($self);
 }
 
 
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/itcloudarea.jpg?".$cgi->query_string());
-#}
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/itcloudarea.jpg?".$cgi->query_string());
+}
+
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
          
 
 sub getSqlFrom
@@ -216,9 +283,22 @@ sub getSqlFrom
    my $self=shift;
    my $from="itcloudarea qitcloudarea  ".
             "left outer join itcloud ".
-            "on qitcloudarea.itcloud=itcloud.id";
+            "on qitcloudarea.itcloud=itcloud.id ".
+            "left outer join appl ".
+            "on qitcloudarea.appl=appl.id";
    return($from);
 }
+
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 
 sub SecureSetFilter
@@ -252,24 +332,54 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-   if (exists($newrec->{itservid})){
-      if ($newrec->{itservid} eq ""){
-         $newrec->{itservid}=undef;
+
+   my $itcloudid=effVal($oldrec,$newrec,"cloudid");
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      if (!defined($oldrec)){
+         if (!$self->isWriteOnITCloudValid($itcloudid,"areas")){
+            $self->LastMsg(ERROR,"no write access to specified cloud");
+            return(undef);
+         }
       }
    }
-
-   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
-      my $itcloudid=effVal($oldrec,$newrec,"cloudid");
-      if (!$self->isWriteOnClusterValid($itcloudid,"services")){
-         $self->LastMsg(ERROR,"no write access to specified clouder");
-         return(undef);
-      }
+   my $applid=effVal($oldrec,$newrec,"applid");
+   if ($applid eq ""){
+      $self->LastMsg(ERROR,"no valid application specified");
+      return(0);
    }
    my $name=effVal($oldrec,$newrec,"name");
-   if ($name eq "" ||
-       haveSpecialChar($name)){
+   if ($name eq "" || haveSpecialChar($name)){
       $self->LastMsg(ERROR,"invalid service name");
       return(0);
+   }
+
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"cistatusid")){
+      if ($newrec->{cistatusid}==4){
+         if ($oldrec->{itcloudcistatusid}!=4){
+            $self->LastMsg(ERROR,"cloud is not active");
+            return(0);
+         }
+         if (!$self->isWriteOnApplValid($applid,"default")){
+            $self->LastMsg(ERROR,"activation of cloudarea only allowed ".
+                                 "for application writeables");
+            return(0);
+         }
+      }
+   }
+   if (effChanged($oldrec,$newrec,"cistatusid")){
+      if ($newrec->{cistatusid}==6){
+         if (!$self->isWriteOnITCloudValid($itcloudid,"default")){
+            $self->LastMsg(ERROR,"mark as wasted only allowed ".
+                                 "for cloud writeables");
+            return(0);
+         }
+      }
+      if ($newrec->{cistatusid}<3){
+         if (!$self->isWriteOnITCloudValid($itcloudid,"default")){
+            $self->LastMsg(ERROR,"CI-Status not allowed to set");
+            return(0);
+         }
+      }
    }
 
    
@@ -295,11 +405,15 @@ sub isWriteValid
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $itcloudid=effVal($oldrec,$newrec,"cloudid");
 
-   return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default","applications","ipaddresses","software") if ($self->IsMemberOf("admin"));
-   return("default","applications","ipaddresses","software") if ($self->isWriteOnClusterValid($itcloudid));
+   return("default") if (!defined($oldrec));
+
+   my $itcloudid=$oldrec->{"cloudid"};
+   my $applid=$oldrec->{"applid"};
+   if ($self->isWriteOnITCloudValid($itcloudid,"default") ||
+       $self->isWriteOnApplValid($applid,"default")){
+      return("default");
+   }
    return(undef);
 }
 
@@ -307,9 +421,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default applications 
-             ipaddresses systems
-             misc cloudinfo software swinstances source));
+   return(qw(header default appl inm 
+             misc control source));
 }
 
 sub ValidateDelete

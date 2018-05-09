@@ -395,6 +395,7 @@ sub new
       new kernel::Field::SubList(
                 name          =>'swinstances',
                 label         =>'Software instances',
+                htmldetail    =>'NotEmpty',
                 group         =>'swinstances',
                 vjointo       =>'itil::swinstance',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
@@ -437,14 +438,26 @@ sub new
                 name          =>'services',
                 label         =>'Cluster services',
                 group         =>'services',
+                htmldetail    =>'NotEmpty',
                 vjointo       =>'itil::lnkitclustsvcappl',
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['itclustsvc']),
 
       new kernel::Field::SubList(
+                name          =>'itcloudareas',
+                label         =>'Cloud Areas',
+                group         =>'itcloudareas',
+                htmldetail    =>'NotEmpty',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjointo       =>'itil::itcloudarea',
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['fullname','cistatus']),
+
+      new kernel::Field::SubList(
                 name          =>'businessservices',
                 label         =>'provided Businessservices',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 vjoinbase     =>{cistatusid=>"<=5"},
                 group         =>'businessservices',
                 vjointo       =>'itil::businessservice',
@@ -2323,7 +2336,7 @@ sub isViewValid
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(accountnumbers history default applapplgroup applgroup
               attachments contacts control supcontracts custcontracts 
-              customer delmgmt
+              customer delmgmt itcloudareas
               finance interfaces licenses monisla sodrgroup qc external itsem
               mutimes  
               misc opmgmt phonenumbers services businessservices 
@@ -2492,7 +2505,8 @@ sub getDetailBlockPriority
           qw(header default functional itsem finance technical opmgmt delmgmt 
              customer custcontracts supcontracts
              contacts phonenumbers 
-             interfaces systems swinstances services businessservices applurl
+             interfaces systems itcloudareas 
+             swinstances services businessservices applurl
              monisla 
              mutimes misc attachments control 
              sodrgroup soclustgroup socomments accountnumbers licenses 

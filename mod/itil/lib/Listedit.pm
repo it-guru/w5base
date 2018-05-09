@@ -255,6 +255,23 @@ sub isWriteOnApplgrpValid
 }
 
 
+sub isWriteOnITCloudValid
+{
+   my $self=shift;
+   my $itcloudid=shift;
+   my $group=shift;
+
+   my $itcloud=$self->getPersistentModuleObject("itil::itcloud");
+   $itcloud->SetFilter({id=>\$itcloudid});
+   my ($arec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
+   my @g=$itcloud->isWriteValid($arec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
+
 sub isWriteOnSoftwaresetValid
 {
    my $self=shift;

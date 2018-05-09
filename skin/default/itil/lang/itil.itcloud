@@ -2,3 +2,5 @@
 'fieldgroup.areas'=>{de=>'Cloud Areas',en=>'Cloud Areas'},
 'Full Cloud Name'=>{de=>'vollständiger Cloud-Name'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'delete only posible, if there are no cloud areas'=>{de=>'löschen nur ohne Cloud Areas zulässig'},
+'there are existing cloud areas'=>{de=>'es existieren Cloud Areas'},

@@ -120,6 +120,7 @@ sub new
                 group         =>'areas',
                 forwardSearch =>1,
                 allowcleanup  =>1,
+                vjoinbase     =>[{cistatusid=>"<=5"}],
                 subeditmsk    =>'subedit.cloudareas',
                 vjointo       =>'itil::itcloudarea',
                 vjoinon       =>['id'=>'cloudid'],
@@ -427,6 +428,16 @@ sub Validate
    }
    ########################################################################
 
+
+   if (effChanged($oldrec,$newrec,"cistatusid")){
+      if ($newrec->{cistatusid}>=4){
+         if ($#{$oldrec->{cloudareas}}!=-1){
+            $self->LastMsg(ERROR,"there are existing cloud areas");
+            return(0);
+         }
+      }
+   }
+
 #   if ($self->isDataInputFromUserFrontend()){
 #      if (!$self->isWriteOnApplValid($applid,"systems")){
 #         $self->LastMsg(ERROR,"no access");
@@ -440,6 +451,27 @@ sub Validate
 }
 
 
+
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ( $#{$rec->{cloudareas}}!=-1){
+      $self->LastMsg(ERROR,
+          "delete only posible, if there are no ".
+          "cloud areas");
+      return(0);
+   }
+
+   return(1);
+}
+
+
+
+
+
+
 sub FinishWrite
 {
    my $self=shift;
@@ -450,12 +482,12 @@ sub FinishWrite
    return($bak);
 }
 
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/itcloud.jpg?".$cgi->query_string());
-#}
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/itcloud.jpg?".$cgi->query_string());
+}
 
 
 
@@ -520,25 +552,6 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("itil::itcloud");
 }
-
-
-sub ValidateDelete
-{
-   my $self=shift;
-   my $rec=shift;
-   my $lock=0;
-
-   if ($lock>0 ||
-       $#{$rec->{areas}}!=-1){
-      $self->LastMsg(ERROR,
-          "delete only posible, if there are no areas ".
-          "or software instance relations");
-      return(0);
-   }
-
-   return(1);
-}
-
 
 
 sub HtmlPublicDetail   # for display record in QuickFinder or with no access

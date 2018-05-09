@@ -31,6 +31,7 @@ create table itcloudarea   (
   itcloud      bigint(20) NOT NULL,
   cistatus     int(2)      NOT NULL,
   appl         bigint(20) NOT NULL,
+  description longtext     default NULL,
   comments     longtext    default NULL,
   additional   longtext    default NULL,
   createdate   datetime NOT NULL default '0000-00-00 00:00:00',
@@ -44,8 +45,10 @@ create table itcloudarea   (
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
   UNIQUE applcl(itcloud,name),
-  KEY clust(itcloud),key a(appl),
+  KEY clust(itcloud),
   UNIQUE KEY `srcsys` (srcsys,srcid),
   FOREIGN KEY fk_itcloud (itcloud)
-          REFERENCES itcloud (id) ON DELETE CASCADE
+          REFERENCES itcloud (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_appl (appl)
+          REFERENCES appl (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

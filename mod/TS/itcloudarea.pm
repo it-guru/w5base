@@ -29,6 +29,24 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'acinmassignmentgroupid',
+                readonly      =>1,
+                label         =>'Incident Assignmentgroup ID',
+                dataobjattr   =>'appl.acinmassignmentgroupid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'acinmassingmentgroup',
+                label         =>'Incident Assignmentgroup',
+                group         =>'inm',
+                readonly      =>1,
+                vjointo       =>'tsgrpmgmt::grp',
+                vjoinon       =>['acinmassignmentgroupid'=>'id'],
+                vjoindisp     =>'fullname')
+   );
+
+
    return($self);
 }
 
