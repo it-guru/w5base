@@ -202,7 +202,17 @@ sub  calcViewMatrix
          if (defined($rec)){
             my $v=$fieldlist->[$c]->RawValue($rec);
             if ($v ne ""){
-               $vMatrix->{htmldetailof}->[$c]=1;
+               if (ref($v) eq "ARRAY"){
+                  if ($#{$v}==-1){
+                     $vMatrix->{htmldetailof}->[$c]=0;
+                  }
+                  else{
+                     $vMatrix->{htmldetailof}->[$c]=1;
+                  }
+               }
+               else{
+                  $vMatrix->{htmldetailof}->[$c]=1;
+               }
             }
             else{
                $vMatrix->{htmldetailof}->[$c]=0;
