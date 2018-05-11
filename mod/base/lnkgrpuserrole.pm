@@ -118,6 +118,8 @@ sub new
                                  'RLIManager',                 # ITIL role
                                  'RLIManager2',                # ITIL role
                                  'RLIOperator',                # ITIL role
+                                 'RSKManager',                 # ITIL role
+                                 'RSKCoord',                   # ITIL role
                                  'RITDemandMgr',               # IT role
                                  'RAdmin',                     # W5Base role
                                  'RDataAdmin',                 # W5Base role

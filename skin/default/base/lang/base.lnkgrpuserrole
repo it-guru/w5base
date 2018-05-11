@@ -44,6 +44,8 @@
 'RTimeManager'=>{ de=>'Zeit-Manager', en=>'Time-Manager'},
 'RITDemandMgr'=>{ de=>'IT Tool Demand Manager', 
                   en=>'IT Tool Demand Manager'},
+'RSKManager'=>{de=>'Risiko-Manager',en=>'Risk-Manager'},
+'RSKCoord'=>{de=>'Risiko-Koordinator',en=>'Risk-Coordinator'},
 'base::lnkgrpuserrole'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
 'fieldgroup.default'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
 'native role'=>{de=>'interne Rollen Bez.'},
