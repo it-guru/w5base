@@ -2584,33 +2584,81 @@ sub jsExploreObjectMethods
    my $methods=shift;
 
    my $label=$self->T("add application interfaces");
-
-   $methods->{addApplicationInterfaces}="
-             label:\"$label\",
-             cssicon:\"basket_add\",
-             exec:function(){
-                 console.log(\"call addApplicationInterfaces on \",this);
-                 var dataobjid=this.dataobjid;
-                 var dataobj=this.dataobj;
-                 var app=this.app;
-                 app.Config().then(function(cfg){
-                    var w5obj=getModuleObject(cfg,'itil::appl');
-                    w5obj.SetFilter({
-                       id:dataobjid
-                    });
-                    w5obj.findRecord(\"id,interfaces\",function(data){
-                       for(recno=0;recno<data.length;recno++){
-                          for(ifno=0;ifno<data[recno].interfaces.length;ifno++){
-                             var ifrec=data[recno].interfaces[ifno];
-                             app.addNode(dataobj,ifrec.toapplid,ifrec.toappl);
-                             app.addEdge(app.toObjKey(dataobj,dataobjid),
-                                         app.toObjKey(dataobj,ifrec.toapplid));
-                          }
-                       }
-                    });
-                 });
-            }
+   $methods->{'m500addApplicationInterfaces'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call addApplicationInterfaces on \",this);
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          var app=this.app;
+          app.Config().then(function(cfg){
+             var w5obj=getModuleObject(cfg,'itil::appl');
+             w5obj.SetFilter({
+                id:dataobjid
+             });
+             w5obj.findRecord(\"id,interfaces\",function(data){
+                for(recno=0;recno<data.length;recno++){
+                   for(ifno=0;ifno<data[recno].interfaces.length;ifno++){
+                      var ifrec=data[recno].interfaces[ifno];
+                      app.addNode(dataobj,ifrec.toapplid,ifrec.toappl);
+                      app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                  app.toObjKey(dataobj,ifrec.toapplid));
+                   }
+                }
+             });
+          });
+       }
    ";
+
+   my $label=$self->T("add systems");
+   $methods->{'m501addApplicationSystems'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call m501addApplicationSystems on \",this);
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          var app=this.app;
+          app.Config().then(function(cfg){
+             var w5obj=getModuleObject(cfg,'itil::appl');
+             w5obj.SetFilter({
+                id:dataobjid
+             });
+             w5obj.findRecord(\"id,systems\",function(data){
+                for(recno=0;recno<data.length;recno++){
+                   for(subno=0;subno<data[recno].systems.length;subno++){
+                      var subrec=data[recno].systems[subno];
+                      app.addNode('itil::system',subrec.systemid,subrec.system);
+                      app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                  app.toObjKey('itil::system',subrec.systemid));
+                   }
+                }
+             });
+          });
+       }
+   ";
+
+   my $label=$self->T("set item visual focus");
+   $methods->{'m000setApplVisualFocus'}="
+       label:\"$label\",
+       cssicon:\"arrow_in\",
+       isPosible:function(nodeobj,activeApplet,selectedNodes){
+          if (selectedNodes.length!=1){
+             return(false);
+          }
+          return(true);
+       },
+       exec:function(){
+          console.log(\"call setApplVisualFocus on \",this);
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          var runpath=[dataobj,dataobjid];
+          \$('.spinner').show();
+          this.app.runApplet('itil::Explore::appl',runpath);
+       }
+   ";
+
 }
 
 

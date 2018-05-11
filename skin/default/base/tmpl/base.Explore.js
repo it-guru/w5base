@@ -654,6 +654,7 @@ console.log("start applet with param stack=",appletname,paramstack);
 
    this.runApplet=function(applet,paramstack){
       var app=this;
+      app.activeApplet=applet;
       if (app.runingApplet[applet]){
          if (paramstack){
             app.runingApplet[applet].run(paramstack);
@@ -829,22 +830,36 @@ console.log("start applet with param stack=",appletname,paramstack);
                 console.log("select "+n+"=",nodeobj);
                 out+=nodeobj.label+"<br>";
                 for (var m in nodeobj.nodeMethods){
-                   if (methods[m]){
-                      methods[m].cnt++;
+                   var isPosible=true;
+                   if (nodeobj.nodeMethods[m].isPosible){
+                      isPosible=nodeobj.nodeMethods[m].isPosible(
+                         nodeobj,app.activeApplet,selectedNodes
+                      );
                    }
-                   else{
-                      methods[m]={
-                         cnt:1,
-                         label:nodeobj.nodeMethods[m].label,
-                         cssicon:nodeobj.nodeMethods[m].cssicon
-                      };
+                   if (isPosible){
+                      if (methods[m]){
+                         methods[m].cnt++;
+                      }
+                      else{
+                         methods[m]={
+                            cnt:1,
+                            label:nodeobj.nodeMethods[m].label,
+                            cssicon:nodeobj.nodeMethods[m].cssicon
+                         };
+                      }
                    }
                 }
              }
              out+="</p><hr>";
              var mdiv=document.createElement('ul');
              $(mdiv).addClass("nodeMethods");
+             var posibleMethodsList=new Array();
              for (var m in methods){
+                 posibleMethodsList.push(m);
+             }
+             posibleMethodsList=posibleMethodsList.sort();
+             for(var mpos=0;mpos<posibleMethodsList.length;mpos++){
+                var m=posibleMethodsList[mpos];
                 if (methods[m].cnt==selectedNodes.length){
                    $(mdiv).append("<li><span class=nodeMethodCall data-id='"+m+
                                   "'><div class='cssicon "+methods[m].cssicon+

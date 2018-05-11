@@ -344,7 +344,7 @@ sub jsExplore
 
    my $hideItem=$self->T("hide item");
    my %objectMethods=(
-      hideItem=>"
+      'm900hideItem'=>"
              label:\"$hideItem\",
              cssicon:\"basket_delete\",
              exec:function(){
