@@ -39,3 +39,4 @@
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'You have not the necessary rights to view this record'=>{de=>'Sie haben nicht die erforderlichen Rechte, um diesen Datensatz zu sehen'},
 'Query parameter missing'=>{de=>'Keine Aufrufparameter übergeben'},
+'hide item'=>{de=>'Element verstecken'},

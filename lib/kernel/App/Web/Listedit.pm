@@ -342,9 +342,37 @@ sub jsExplore
    my $fieldnameid=$self->IdField->Name();
 
 
-   print $self->HttpHeader("text/javascript");
+   my $hideItem=$self->T("hide item");
+   my %objectMethods=(
+      hideItem=>"
+             label:\"$hideItem\",
+             cssicon:\"basket_delete\",
+             exec:function(){
+                 console.log(\"call hideNode on \",this);
+                 var curobj=this.app.node.get(this.id);
+                 if (curobj){
+                    this.app.node.remove(curobj);
+                 }
+                 this.app.resetItemSelection();
+             }
+      "
+   );
+   $self->jsExploreObjectMethods(\%objectMethods);
 
-   print(<<EOF);
+   my $objectMethods="this.nodeMethods={\n";
+   my $c=0;
+   foreach my $k (keys(%objectMethods)){
+      if ($c>0){
+         $objectMethods.="\n,";
+      }
+      $objectMethods.=$k.":{".$objectMethods{$k}."}";
+      $c++;
+   }
+   $objectMethods.="};";
+
+   print $self->HttpHeader("text/javascript",charset=>'ISO-8895-1');
+
+   my $out=(<<EOF);
 (function(window, document, undefined) {
 
    ClassDataObjLib['${dataobj}']=new Object();
@@ -369,18 +397,7 @@ sub jsExplore
        this.fieldnamelabel='${fieldnamelabel}';
        this.fieldnameid='${fieldnameid}';
        this.id=this.app.toObjKey(this.dataobj,this.dataobjid);
-       this.nodeMethods={
-          hideNode:{
-             label:"hide Element",
-             exec:function(){
-                 console.log("call hideNode on ",this);
-                 var curobj=this.app.node.get(this.id);
-                 if (curobj){
-                    this.app.node.remove(curobj);
-                 }
-             }
-          }
-       };
+       ${objectMethods}
    };
    ClassDataObjLib['${dataobj}'].prototype.refreshLabel=function(){
        var that=this;
@@ -426,8 +443,16 @@ sub jsExplore
 })(this,document);
 
 EOF
-
+   #print utf8::encode($out);
+   print $out;
 }
+
+sub jsExploreObjectMethods
+{
+   my $self=shift;
+   my $methods=shift;
+}
+
 
 sub ById
 {

@@ -196,3 +196,4 @@
 'CLUSTTESTPERYEAR.1'=>{de=>'1 Test/Jahr',en=>'1 test/year'},
 'CLUSTTESTPERYEAR.2'=>{de=>'2 Tests/Jahr',en=>'2 tests/year'},
 'CLUSTTESTPERYEAR.4'=>{de=>'4 Tests/Jahr',en=>'4 tests/year'},
+'add application interfaces'=>{de=>'Anwendungsschnittstellen hinzufügen'},

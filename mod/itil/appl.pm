@@ -2578,6 +2578,45 @@ sub getValidWebFunctions
 }
 
 
+sub jsExploreObjectMethods
+{
+   my $self=shift;
+   my $methods=shift;
+
+   my $label=$self->T("add application interfaces");
+
+   $methods->{addApplicationInterfaces}="
+             label:\"$label\",
+             cssicon:\"basket_add\",
+             exec:function(){
+                 console.log(\"call addApplicationInterfaces on \",this);
+                 var dataobjid=this.dataobjid;
+                 var dataobj=this.dataobj;
+                 var app=this.app;
+                 app.Config().then(function(cfg){
+                    var w5obj=getModuleObject(cfg,'itil::appl');
+                    w5obj.SetFilter({
+                       id:dataobjid
+                    });
+                    w5obj.findRecord(\"id,interfaces\",function(data){
+                       for(recno=0;recno<data.length;recno++){
+                          for(ifno=0;ifno<data[recno].interfaces.length;ifno++){
+                             var ifrec=data[recno].interfaces[ifno];
+                             app.addNode(dataobj,ifrec.toapplid,ifrec.toappl);
+                             app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                         app.toObjKey(dataobj,ifrec.toapplid));
+                          }
+                       }
+                    });
+                 });
+            }
+   ";
+}
+
+
+
+
+
 
 sub SceneHeader
 {

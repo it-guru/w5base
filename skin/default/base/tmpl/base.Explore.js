@@ -5,6 +5,7 @@
 <base href="%BASE%">
 <link rel="stylesheet" href="../../../public/base/load/default.css">
 <link rel="stylesheet" href="../../../public/base/load/work.css">
+<link rel="stylesheet" href="../../../public/base/load/cssicon.css">
 <link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css">
 <link rel="stylesheet" href="../../../public/base/load/jquery.dataTables.css">
 <link rel="stylesheet" href="../../../public/base/load/vis.min.css">
@@ -54,6 +55,7 @@ body{
  padding:0px;
  overflow:auto;
  background-color:#ffffff;
+ overflow:hidden;  /* sollte das Wrap Problem lösen */
 }
 
 #netmap{
@@ -72,7 +74,7 @@ body{
  border-width:1px;
  margin:0px;
  padding:0px;
- width:200px;
+ width:220px;
  float:left;
  overflow:auto;
 }
@@ -314,6 +316,15 @@ div#SearchResult{
 .nodeMethodCall{
   cursor:pointer;
 }
+.nodeMethods{
+  list-style: none;
+   margin:0px;
+}
+.nodeMethods li {
+}
+.nodeMethods li span div{
+   margin-right:4px;
+}
 </style>
 
 
@@ -519,7 +530,7 @@ var W5ExploreClass=function(){
       this.dbrec = document.createElement('div');
       this.dbrec.id = 'dbrec';
       this.workspace.appendChild(this.dbrec);
-      this.dbrec.innerHTML = 'dbrec';
+      this.showDefaultDBRec();
 
       this.console.div = document.createElement('div');
       this.console.div.id = 'cons';
@@ -752,6 +763,16 @@ console.log("start applet with param stack=",appletname,paramstack);
       )
    };
 
+   this.showDefaultDBRec=function(){
+      var out="hier könnte z.B. eine Suchmaske für das hinzufügen "+
+              "von beliebigen Items stehen";
+      $(dbrec).html(out); 
+   };
+
+   this.resetItemSelection=function(){
+      this.network.unselectAll();
+      this.showDefaultDBRec();
+   };
 
    this.ShowNetworkMap=function(MapParamTempl){
       var app=this;
@@ -771,6 +792,9 @@ console.log("start applet with param stack=",appletname,paramstack);
           multiselect: true
         },
         nodes: {
+          color:{
+             background:'#ffff00'
+          }
         }
       };
       var usephysicsonce=false;
@@ -780,11 +804,6 @@ console.log("start applet with param stack=",appletname,paramstack);
       }
       $.extend(options,MapParamTempl);
       this.network = new vis.Network(this.netmap, data, options);
-//  network.once("beforeDrawing", function() {
-//      network.focus(2, {
-//        scale: 12
-//      });
-//    });
       this.network.on("stabilized", function () {
          if ($(".spinner").is(":visible")){
             $(".spinner").hide();
@@ -802,7 +821,7 @@ console.log("start applet with param stack=",appletname,paramstack);
           params.event = "[original event]";
           if (params.nodes[0]){
              var n;
-             var out="<p>Element:<br>";
+             var out="<p>Item:<br>";
              var methods=Object();
              var selectedNodes=params.nodes;
              for(n=0;n<selectedNodes.length;n++){
@@ -810,15 +829,28 @@ console.log("start applet with param stack=",appletname,paramstack);
                 console.log("select "+n+"=",nodeobj);
                 out+=nodeobj.label+"<br>";
                 for (var m in nodeobj.nodeMethods){
-                   methods[m]++;
+                   if (methods[m]){
+                      methods[m].cnt++;
+                   }
+                   else{
+                      methods[m]={
+                         cnt:1,
+                         label:nodeobj.nodeMethods[m].label,
+                         cssicon:nodeobj.nodeMethods[m].cssicon
+                      };
+                   }
                 }
              }
-             out+="<br>Mehtods:<br></p>";
+             out+="</p><hr>";
              var mdiv=document.createElement('ul');
              $(mdiv).addClass("nodeMethods");
              for (var m in methods){
-                $(mdiv).append("<li><span class=nodeMethodCall data-id='"+m+
-                               "'>"+m+"</span></li>");
+                if (methods[m].cnt==selectedNodes.length){
+                   $(mdiv).append("<li><span class=nodeMethodCall data-id='"+m+
+                                  "'><div class='cssicon "+methods[m].cssicon+
+                                  "'></div>"+
+                                  methods[m].label+"</span></li>");
+                }
              }
              $(mdiv).find(".nodeMethodCall").click(function(e){
                 var methodName=$(this).attr("data-id");
@@ -831,7 +863,7 @@ console.log("start applet with param stack=",appletname,paramstack);
              $(dbrec).append(mdiv); 
           }
           else{
-             dbrec.innerHTML='';
+             app.showDefaultDBRec();
           }
       });
    };
