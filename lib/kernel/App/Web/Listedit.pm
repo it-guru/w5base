@@ -370,6 +370,8 @@ sub jsExplore
    }
    $objectMethods.="};";
 
+   my $formatLabelFunction=$self->jsExploreFormatLabelMethod();
+
    print $self->HttpHeader("text/javascript",charset=>'ISO-8895-1');
 
    my $out=(<<EOF);
@@ -399,6 +401,10 @@ sub jsExplore
        this.id=this.app.toObjKey(this.dataobj,this.dataobjid);
        ${objectMethods}
    };
+   ClassDataObjLib['${dataobj}'].prototype.formatLabel=function(newlabel){
+      ${formatLabelFunction}
+      return(newlabel);
+   };
    ClassDataObjLib['${dataobj}'].prototype.refreshLabel=function(){
        var that=this;
        setTimeout(function(){
@@ -410,7 +416,7 @@ sub jsExplore
                 w5obj.SetFilter(flt);
                 w5obj.findRecord(that.fieldnamelabel,function(data){
                    var newlabel=data[0][that.fieldnamelabel];
-                   newlabel=newlabel.replace(/ /," \\n");
+                   newlabel=that.formatLabel(newlabel);
                    if (data[0]){
                       that.update({label:newlabel});
                       ok(1);
@@ -451,6 +457,12 @@ sub jsExploreObjectMethods
 {
    my $self=shift;
    my $methods=shift;
+}
+
+sub jsExploreFormatLabelMethod
+{
+   my $self=shift;
+   return("");
 }
 
 

@@ -777,6 +777,7 @@ console.log("start applet with param stack=",appletname,paramstack);
 
    this.ShowNetworkMap=function(MapParamTempl){
       var app=this;
+      app.networkFitRequest=true;
       this.LayoutNetworkMap();
       var data = {
         nodes: this.node,
@@ -795,7 +796,8 @@ console.log("start applet with param stack=",appletname,paramstack);
         nodes: {
           color:{
              background:'#ffff00'
-          }
+          },
+          level:1
         }
       };
       var usephysicsonce=false;
@@ -808,11 +810,13 @@ console.log("start applet with param stack=",appletname,paramstack);
       this.network.on("stabilized", function () {
          if ($(".spinner").is(":visible")){
             $(".spinner").hide();
-            app.console.log("INFO","autolayout done");
-            app.console.log("INFO","fit map");
+         }
+         if (app.networkFitRequest){
             app.network.fit({
                animation: true
             });
+            app.networkFitRequest=false;
+            app.console.log("INFO","autolayout done");
          }
          if (usephysicsonce){
             this.setOptions( { physics: false } );
@@ -1046,7 +1050,7 @@ $(window).resize(function() {
 var runurl=document.location.href;
 runurl=runurl.replace(/^.*\/Explore\/Main[\/]{0,1}/,"");
 runurl=runurl.replace(/\?.*$/,""); // remove query parameters
-var runpath=runurl.split("/").filter(function(e){console.log("e=",e);if (e==""){return(false)}else{return(true)}});
+var runpath=runurl.split("/").filter(function(e){if (e==""){return(false)}else{return(true)}});
 //console.log("runurl=",runurl,"runpath=",runpath,"n=",runpath.length);
 
 W5Explore.MainMenu(runpath);

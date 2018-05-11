@@ -312,7 +312,7 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'grp.realeditor'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'parentid',
                 label         =>'ParentID',
                 dataobjattr   =>'grp.parentid'),
@@ -1353,6 +1353,21 @@ sub ImportOrgarea
                                             imported=>$names}});
    print $self->HtmlBottom(body=>1,form=>1);
 }
+
+
+sub jsExploreFormatLabelMethod
+{
+   my $self=shift;
+   return(<<EOF);
+
+newlabel=newlabel.replace(/^.*\\./,'');
+
+
+EOF
+}
+
+
+
 
 
 
