@@ -484,6 +484,17 @@ sub new
                 default       =>'standard',
                 htmleditwidth =>'40%',
                 selectfix     =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   if (defined($rec)){
+                      my $systemtype=$rec->{"systemtype"};
+                      if ($systemtype eq "abstract"){
+                         return(1);
+                      }
+                   }
+                   return(0);
+                },
                 label         =>'logical system type',
                 value         =>['standard',
                                  'vmware',

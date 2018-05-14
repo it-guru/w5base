@@ -60,7 +60,7 @@ create table lnkapplcustcontract (
 create table system (
   id         bigint(20) NOT NULL,
   name       varchar(40) NOT NULL,
-    adm            bigint(20)  default NULL,
+    adm            bigint(20)  default NULL,itcloudarea bigint(20) default NULL,
     adm2           bigint(20)  default NULL,
     admteam        bigint(20)  default NULL,
     systemid       varchar(20)  default NULL,
