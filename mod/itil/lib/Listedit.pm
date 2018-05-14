@@ -1257,6 +1257,10 @@ sub handleCertExpiration
             $lang=$contacts[0]->{lastlang};
             $timezone=$contacts[0]->{tz};
          }
+         if ($lang eq ""){
+            $lang="en";
+         }
+         $ENV{HTTP_FORCE_LANGUAGE}=$lang;
 
          @emailcc=grep($_!=$emailto,@emailcc);
 
