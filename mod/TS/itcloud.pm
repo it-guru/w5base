@@ -29,24 +29,26 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-#   $self->AddFields(
-#      new kernel::Field::Link(
-#                name          =>'acinmassignmentgroupid',
-#                group         =>'control',
-#                label         =>'Incident Assignmentgroup ID',
-#                dataobjattr   =>'itcloud.acinmassignmentgroupid'),
-#
-#      new kernel::Field::TextDrop(
-#                name          =>'acinmassingmentgroup',
-#                label         =>'Incident Assignmentgroup',
-#                vjoineditbase =>{isinmassign=>\'1',cistatusid=>'<6'},
-#                group         =>'inm',
-#                AllowEmpty    =>1,
-#                vjointo       =>'tsgrpmgmt::grp',
-#                vjoinon       =>['acinmassignmentgroupid'=>'id'],
-#                vjoindisp     =>'fullname'),
-#
-#   );
+
+
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'acinmassignmentgroupid',
+                group         =>'control',
+                label         =>'Incident Assignmentgroup ID',
+                dataobjattr   =>'itcloud.acinmassignmentgroupid'),
+
+      new kernel::Field::TextDrop(
+                name          =>'acinmassingmentgroup',
+                label         =>'Incident Assignmentgroup',
+                vjoineditbase =>{isinmassign=>\'1',cistatusid=>'<6'},
+                group         =>'inm',
+                AllowEmpty    =>1,
+                vjointo       =>'tsgrpmgmt::grp',
+                vjoinon       =>['acinmassignmentgroupid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+   );
    return($self);
 }
 

@@ -75,12 +75,6 @@ sub new
                 label         =>'Cloud Name',
                 dataobjattr   =>'itcloud.name'),
 
-#      new kernel::Field::Text(
-#                name          =>'clouderid',
-#                htmleditwidth =>'100px',
-#                label         =>'ClusterID',
-#                dataobjattr   =>'itcloud.itcloudid'),
-
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
@@ -147,6 +141,13 @@ sub new
                 group         =>'misc',
                 label         =>'Comments',
                 dataobjattr   =>'itcloud.comments'),
+
+      new kernel::Field::PhoneLnk(
+                name          =>'phonenumbers',
+                label         =>'Phonenumbers',
+                group         =>'phonenumbers',
+                vjoinbase     =>[{'parentobj'=>\'itil::itcloud'}],
+                subeditmsk    =>'subedit'),
 
       new kernel::Field::FileList(
                 name          =>'attachments',
@@ -283,7 +284,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default areas systems software contacts misc control
+   return(qw(header default areas systems contacts phonenumbers misc inm control
              attachments source));
 }
 
@@ -378,7 +379,7 @@ sub Validate
    }
    $name=~s/[§\.]/_/g;
    if ($name eq "" || ($name=~m/[^-a-z0-9_]/i)){
-      $self->LastMsg(ERROR,sprintf($self->T("invalid clouder name '%s'"),$name));
+      $self->LastMsg(ERROR,sprintf($self->T("invalid cloud name '%s'"),$name));
       return(0);
    }
 
@@ -430,7 +431,7 @@ sub Validate
 
 
    if (effChanged($oldrec,$newrec,"cistatusid")){
-      if ($newrec->{cistatusid}>=4){
+      if ($newrec->{cistatusid}>=5){
          if ($#{$oldrec->{cloudareas}}!=-1){
             $self->LastMsg(ERROR,"there are existing cloud areas");
             return(0);
@@ -497,7 +498,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    return(qw(header default history source areas contacts 
-             attachments control systems misc));
+             attachments control phonenumbers inm misc));
 }
 
 sub isWriteValid
@@ -506,7 +507,8 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default areas contacts attachments control);
+   my @databossedit=qw(default areas contacts attachments phonenumbers 
+                       inm misc control);
    if (!defined($rec)){
       return(@databossedit);
    }

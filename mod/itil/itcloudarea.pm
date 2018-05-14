@@ -144,6 +144,7 @@ sub new
                 htmleditwidth =>'150px',
                 htmlwidth     =>'100px',
                 group         =>'appl',
+                readonly     =>1,
                 label         =>'Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['conumber'=>'name'],
@@ -349,13 +350,20 @@ sub Validate
    }
    my $name=effVal($oldrec,$newrec,"name");
    if ($name eq "" || haveSpecialChar($name)){
-      $self->LastMsg(ERROR,"invalid service name");
+      $self->LastMsg(ERROR,"invalid cloud area name");
       return(0);
    }
 
    if (!defined($oldrec) || effChanged($oldrec,$newrec,"cistatusid")){
       if ($newrec->{cistatusid}==4){
-         if ($oldrec->{itcloudcistatusid}!=4){
+         my $c=getModuleObject($self->Config,"itil::itcloud");
+         $c->SetFilter({id=>$itcloudid});
+         my ($crec,$msg)=$c->getOnlyFirst(qw(cistatusid));
+         my $itcloudcistatusid;
+         if (defined($crec)){
+            $itcloudcistatusid=$crec->{cistatusid};
+         }
+         if ($itcloudcistatusid!=4){
             $self->LastMsg(ERROR,"cloud is not active");
             return(0);
          }
