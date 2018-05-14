@@ -56,6 +56,7 @@ my %commitdt;
 my @commitlst=$repo->command("log","--cherry-pick",
                              "--format=format:%H",
                              "--right-only",
+                             "--no-merges",
                              "--reverse",
                              $branch."...".$masterbranch);
 
@@ -70,7 +71,7 @@ if ($#commitlst==-1){
 }
 
 if ($#picklst==-1){
-   system("git log --cherry-pick --reverse --date-order --oneline --right-only ${branch}...master");
+   system("git log --cherry-pick --reverse --no-merges --date-order --oneline --right-only ${branch}...master");
    exit(0);
 }
 
