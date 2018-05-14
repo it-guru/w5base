@@ -539,7 +539,6 @@ sub NotifyForward
            $workflowname);
       }
    }
-   my $baseurl;
    
    my $url=$self->getAbsolutByIdUrl($wfheadid,{dataobj=>'base::workflow'});
 
@@ -580,6 +579,16 @@ sub NotifyForward
    }
 
    my $emailpostfix="";
+   my $baseurl;
+   if ($ENV{SCRIPT_URI} ne ""){
+      $baseurl=$ENV{SCRIPT_URI};
+      $baseurl=~s/\/auth\/.*$//;
+   }
+   else{
+      my $baseurl=$self->Config->Param("EventJobBaseUrl");
+      $baseurl.="/" if (!($baseurl=~m/\/$/));
+   }
+
    if ($baseurl ne ""){
       my $lang=$self->Lang();
       $lang="?HTTP_ACCEPT_LANGUAGE=$lang";
