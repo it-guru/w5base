@@ -412,6 +412,7 @@ var ClassAppletLib=new Object();
 var W5ExploreClass=function(){
    this.console=new Object();
    this.runingApplet=new Object();
+   this._opStack=new Array();
 
    this.spinnerOpts={
         lines: 13 // The number of lines to draw
@@ -594,20 +595,20 @@ console.log("start applet with param stack=",appletname,paramstack);
    this.loadDataObjClass=function(dataobj){
       var dataobjpath=dataobj.replace('::','/');
       if (ClassDataObjLib[dataobj]){
-         //console.log("load "+dataobj+" from cache");
          return(Promise.resolve(ClassDataObjLib[dataobj]));
       }
-      return(
-          new Promise(function(res,rej){
-                $.getScript("../../"+dataobjpath+"/jsExplore", 
-                function( data, textStatus, jqxhr ) {
-                   console.log(dataobj+" is initial loaded",ClassDataObjLib);
-                   res(ClassDataObjLib[dataobj]);
-                }).fail(function(e,parseerror){
-                   rej("ERROR: can not resolv dataobj "+dataobj);
-                });
-          })
-       );
+      else{
+          ClassDataObjLib[dataobj]=new Promise(function(res,rej){
+                   $.getScript("../../"+dataobjpath+"/jsExplore", 
+                   function( data, textStatus, jqxhr ) {
+                      console.log(dataobj+" is initial loaded",ClassDataObjLib);
+                      res(ClassDataObjLib[dataobj]);
+                   }).fail(function(e,parseerror){
+                      rej("ERROR: can not resolv dataobj "+dataobj);
+                   });
+             })
+         return(ClassDataObjLib[dataobj]);
+      }
    };
 
    this.loadApplets=function(){
@@ -706,6 +707,15 @@ console.log("start applet with param stack=",appletname,paramstack);
           })
       )
    };
+
+   this.pushOpStack=function(p){
+
+
+   }
+
+   this.processOpStack=function(){
+
+   }
 
 
    this.addEdge=function(fromid,toid,edgeTempl){
