@@ -184,6 +184,11 @@ sub FormatedDetail
    my $current=shift;
    my $mode=shift;
    my $idfield=$self->getParent->IdField();
+
+   if (!$self->getParent->isQualityCheckValid($current)){
+      return("");
+   }
+
    if ($mode eq "HtmlDetail" || $mode eq "HtmlV01"){
       if (defined($idfield)){
          my $id=$idfield->RawValue($current,$mode);
