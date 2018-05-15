@@ -133,6 +133,7 @@
 'itil.proc.mgmtitemgroup.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.proc.mgmtitemgroup.lnkmgmtitemgroup'=>{de=>'Zuordnungen',en=>'Relations'},
 'itil.proc.mgmtitemgroup.lnkcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
+'itil.proc.riskmgmt'=>{de=>'Risikomanagement',en=>'Riskmanagement'},
 'itu'=>{de=>'IT-Universum',en=>'IT-Universe'},
 'bsm'=>{de=>'Business Services',en=>'Business Services'},
 'bsm.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},

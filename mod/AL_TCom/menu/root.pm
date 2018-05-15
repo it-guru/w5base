@@ -686,6 +686,10 @@ sub Init
                       "itil::lnkmgmtitemgroupcontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.proc.riskmgmt",
+                      "itil::riskmgmtbase",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itservices",
                       "AL_TCom::itschain",
                       defaultacl=>['valid_user']);  # muß noch admin  werden!

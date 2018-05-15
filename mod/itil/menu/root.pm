@@ -622,6 +622,10 @@ sub Init
                       "itil::lnkmgmtitemgroupcontact",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itil.proc.riskmgmt",
+                      "itil::riskmgmtbase",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itil.network",
                       "itil::network",
                       defaultacl=>['valid_user']);
