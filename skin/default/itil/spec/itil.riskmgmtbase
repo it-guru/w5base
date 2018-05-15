@@ -1,0 +1,39 @@
+'ibipoints'=>{
+de=>'
+Prozesskettenorientierter KPI der TDG für die Ende-zu-Ende Bewertung der IT-Stabilität
+',
+en=>'
+TDG process chain oriented KPI for end-to-end IT stability assessment
+'},
+
+'ibiprice'=>{
+de=>'
+Multiplikation der IBI Punkte x Schadensbasissatz
+',
+en=>'
+Multiplication of IBI points x base damage rate
+'},
+
+'solutionopt'=>{
+de=>'
+Gremium von IT und Technik für das Management des IT-Betriebes.
+',
+en=>'
+Panel of IT and technology for the management of IT operations.
+'},
+
+'itrmcriticality'=>{
+de=>'
+Die ITRM Kritikalität spiegelt die geschäftliche Bedeutung und Risikoanfälligkeit der Applikation wider. <br>
+Es gibt 2 Fallgruppen der Berechnung:<br>
+1) App mit IBI.Punkten:  Die Kritikalitätsbewertung wird aus der IBI Systematik übernommen<br>
+2) App ohne IBI.Punkte: Fragenset pro Applikation in den Dimensionen Geschäftliche Bedeutung und Risikoanfälligkeit<br>
+',
+en=>'
+ITRM criticality reflects the business relevance and riskiness of the application.<br>
+There are 2 case of the calculation:<br>
+1) App with IBI points: The criticality rating is taken from the IBI classification<br>
+2) App without IBI points: Question set per application in the dimensions Business relevance and risk susceptibility<br>
+'},
+
+

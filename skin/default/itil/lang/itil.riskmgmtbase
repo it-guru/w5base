@@ -1,0 +1,4 @@
+'itil::riskmgmtbase'=>{de=>'Risikomanagement - Prozesssteuerung', en=>'Riskmanagement - process control'},
+'fieldgroup.riskdata'=>{de=>'Riskmanagement Daten',en=>'Riskmanagement data'},
+'IBI Points'=>{de=>'IBI Punkte'},
+'ITRM criticality'=>{de=>'ITRM Kritikalität'},
