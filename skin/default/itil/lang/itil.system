@@ -103,3 +103,4 @@
 "invalid directory identifier '%s' specified"=>{de=>"ungültiger Directory Identifier '%s' angegeben"},
 'NOR Model to use'=>{de=>'zu verwendendes NOR Lösungsmodel',
                      en=>'NOR Model to use'},
+'add applications'=>{de=>'Anwendungen hinzufügen'},

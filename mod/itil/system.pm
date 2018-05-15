@@ -1637,6 +1637,47 @@ sub prepareToWasted
 }
 
 
+sub jsExploreObjectMethods
+{
+   my $self=shift;
+   my $methods=shift;
+
+   my $label=$self->T("add applications");
+   $methods->{'m500addSystemApplications'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call m500addSystemApplications on \",this);
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          var app=this.app;
+          app.Config().then(function(cfg){
+             var w5obj=getModuleObject(cfg,dataobj);
+             w5obj.SetFilter({
+                id:dataobjid
+             });
+             w5obj.findRecord(\"id,applications\",function(data){
+                for(recno=0;recno<data.length;recno++){
+                   for(ifno=0;ifno<data[recno].applications.length;ifno++){
+                      var ifrec=data[recno].applications[ifno];
+                      app.addNode('itil::appl',ifrec.applid,ifrec.appl);
+                      app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                  app.toObjKey('itil::appl',ifrec.applid),
+                                  {noAcross:true});
+                   }
+                }
+                app.processOpStack(function(arrayOfResults){
+                   console.log(\"OK, all interfaces loaded arrayOfResults=\",arrayOfResults);
+                });
+
+             });
+          });
+       }
+   ";
+
+}
+
+
 
 sub Validate
 {

@@ -19,61 +19,25 @@
                 w5obj.findRecord("id,name,systems", function(data){
                    // detect all objects need to be preloaded
                    var cnt=data.length;
-                   app.console.log("INFO","found "+data.length+
-                                          " interface records");
-                   console.log("fifi data=",data);
-                   var promlst=new Array();
-                   var edges=new Array();
                    for(c=0;c<cnt;c++){
-                      promlst.push(
-                         app.addNode("itil::appl",data[c].id,
-                                                  data[c].name));
+                      app.addNode("itil::appl",data[c].id,data[c].name);
                       for(s=0;s<data[c].systems.length;s++){
-                         promlst.push(
-                            app.addNode("itil::system",
-                                        data[c].systems[s].systemid,
-                                        data[c].systems[s].system)
+                         app.addNode("itil::system",
+                                     data[c].systems[s].systemid,
+                                     data[c].systems[s].system)
+                         app.addEdge(
+                            app.toObjKey(dataobj,dataobjid),
+                            app.toObjKey('itil::system',
+                                         data[c].systems[s].systemid)
                          );
-                         edges.push({
-                            fromid:app.toObjKey(dataobj,dataobjid),
-                            toid:app.toObjKey('itil::system',
-                                              data[c].systems[s].systemid)
-                         });
                       }
                    } 
                    app.console.log("INFO","start resolving promise objects");
-
-promlst.reduce((promiseChain, currentTask) => {
-    return(promiseChain.then(function(chainResults){
-        return(currentTask.then(function(currentResult){
-            return([ ...chainResults, currentResult ]);
-        }))
-    }));
-}, Promise.resolve([])).then(function(arrayOfResults) {
-console.log("all results=",arrayOfResults);
-
-                      for(c=0;c<edges.length;c++){
-                         app.addEdge(edges[c].fromid,edges[c].toid,{});
-                      }
-                      console.log("OK, all loaded");
-
-}).catch(function(e){
-                      console.log("not good - in ",e);
+                   app.processOpStack(function(arrayOfResults){
+                      console.log("OK, all loaded arrayOfResults=",arrayOfResults);
+                      ok(arrayOfResults);
                    });
 
-
-
-
-
-                  // Promise.all(promlst).then(function(){
-                  //    for(c=0;c<edges.length;c++){
-                  //       app.addEdge(edges[c].fromid,edges[c].toid,{});
-                  //    }
-                  //    console.log("OK, all loaded");
-                   ok(data[0]);
-                },function(exception){
-                   app.console.log("got error from call");
-                   reject(exception);
                 });
              }).catch(function(e){
                 console.log("get config failed",e);
@@ -90,10 +54,6 @@ console.log("all results=",arrayOfResults);
    ClassAppletLib[applet].class.prototype.setSearchResult=function(dialog,res){
       var appletobj=this;
       $(dialog).find("#SearchResult").html(res);
-      $(dialog).find("#SearchResult").height(   // fix result height
-         $(dialog).find("#SearchResult").height()+180
-      );
-
       $(dialog).find(".appstart").click(function(e){
          console.log("click eon ",$(this).attr("data-id"));
          console.log("click eon ",$(this).attr("data-dataobj"));
@@ -160,11 +120,12 @@ console.log("all results=",arrayOfResults);
                    mtag:'%SELFNAME%'
                 },
                 {
-                   label:d.name,
-                   mtag:dataobj+"/"+d.id
+                   label:d[0].label,
+                   mtag:dataobj+"/"+d[0].dataobjid
                 }
              );
          }).catch(function(e){
+             console.log("fail to load scenario",e);
              $(".spinner").hide();
          });
       }

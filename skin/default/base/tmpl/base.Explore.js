@@ -243,7 +243,7 @@ div#SearchContainer{
   border-top:1px solid black
 }
 div#SearchResult{
-  height:100%;
+  height:inherit;
   overflow-x:hidden;
   overflow-y:scroll;
 }
@@ -684,9 +684,30 @@ console.log("start applet with param stack=",appletname,paramstack);
 
    };
 
+   this.pushOpStack=function(promiseObject){
+      this._opStack.push(promiseObject);
+   }
+
+   this.processOpStack=function(finish){
+      var app=this;
+      console.log("start processOpStack=",app._opStack);
+      this._opStack.reduce((promiseChain, currentTask) => {
+          return(promiseChain.then(function(chainResults){
+              return(currentTask.then(function(currentResult){
+                  return([ ...chainResults, currentResult ]);
+              }))
+          }));
+      }, Promise.resolve([])).then(function(data){
+         app.networkFitRequest=true;
+         app._opStack=[];
+         console.log("finish = ",app._opStack);
+         finish(data)
+      });
+   }
+
 
    this.addNode=function(dataobj,id,initialLabel,nodeTempl){
-      return(
+      this.pushOpStack(
           new Promise(function(res,rej){
               W5Explore.loadDataObjClass(dataobj).then(
                  function(DataObjClassPrototype){
@@ -708,23 +729,29 @@ console.log("start applet with param stack=",appletname,paramstack);
       )
    };
 
-   this.pushOpStack=function(p){
-
-
-   }
-
-   this.processOpStack=function(){
-
-   }
-
 
    this.addEdge=function(fromid,toid,edgeTempl){
-      var edgeid=fromid+"::"+toid;
-      if (!W5Explore.edge.get(edgeid)){
-         var e={id:edgeid,from:fromid,to:toid};
-         $.extend(e,edgeTempl);
-         W5Explore.edge.add(e);
-      }
+      this.pushOpStack(
+          new Promise(function(res,rej){
+             var edgeid=fromid+"::"+toid;
+             var cur=W5Explore.edge.get(edgeid);
+             if (edgeTempl && edgeTempl.noAcross){
+                if (!cur){
+                   var edgeid=toid+"::"+fromid;
+                   cur=W5Explore.edge.get(edgeid);
+                }
+                delete edgeTempl['noAcross'];
+             }
+
+             if (!cur){
+                var e={id:edgeid,from:fromid,to:toid};
+                $.extend(e,edgeTempl);
+                W5Explore.edge.add(e);
+                res(e);
+             }
+             res(cur);
+         })
+      );
    };
 
 
