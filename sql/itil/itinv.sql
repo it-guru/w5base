@@ -1695,3 +1695,15 @@ create table netintercon (
 alter table wallet add issuerdn varchar(256);
 alter table swinstance add ssl_certissuerdn varchar(256);
 alter table software add instanceidentify varchar(256);
+create table riskmgmtbase (
+  id              bigint(20) NOT NULL,
+  itrmcriticality int(4) default NULL,
+  solutionopt     varchar(30) default NULL,
+  ibipoints       int(4) default NULL,
+  ibiprice        int(10) default NULL,
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  FOREIGN KEY fk_applid (id) REFERENCES appl (id) ON DELETE CASCADE
+) ENGINE=INNODB;
