@@ -2072,7 +2072,7 @@ sub getSqlFrom
    my $self=shift;
    my $mode=shift;
    my @flt=@_;
-   my ($worktable,$workdb)=$self->getWorktable();
+   my $worktable="appl";
    my $selfasparent=$self->SelfAsParentObject();
    my $from="$worktable left outer join lnkcontact ".
             "on lnkcontact.parentobj='$selfasparent' ".
