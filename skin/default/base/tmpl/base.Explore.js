@@ -595,6 +595,7 @@ console.log("start applet with param stack=",appletname,paramstack);
    this.loadDataObjClass=function(dataobj){
       var dataobjpath=dataobj.replace('::','/');
       if (ClassDataObjLib[dataobj]){
+         console.log("o=",ClassDataObjLib[dataobj]);
          return(Promise.resolve(ClassDataObjLib[dataobj]));
       }
       else{
@@ -686,24 +687,35 @@ console.log("start applet with param stack=",appletname,paramstack);
 
    this.pushOpStack=function(promiseObject){
       this._opStack.push(promiseObject);
-   }
+   };
 
    this.processOpStack=function(finish){
       var app=this;
-      console.log("start processOpStack=",app._opStack);
-      this._opStack.reduce((promiseChain, currentTask) => {
-          return(promiseChain.then(function(chainResults){
-              return(currentTask.then(function(currentResult){
-                  return([ ...chainResults, currentResult ]);
-              }))
-          }));
-      }, Promise.resolve([])).then(function(data){
+      console.log("start Problem with IE processOpStack=",app._opStack);
+//      this._opStack.reduce(function(promiseChain, currentTask){
+//console.log("with ",promiseChain," resolv=",currentTask);
+//          return(promiseChain.then(function(chainResults){
+//console.log("resolved =",promiseChain);
+//              return(currentTask.then(function(currentResult){
+//console.log("currentTask.then =",currentTask,currentResult);
+//                  var l=chainResults;
+//                  l.push(currentResult);
+//                  return(l);
+//              }))
+//          }));
+//      }, Promise.resolve([])).then(function(data){
+//         app.networkFitRequest=true;
+//         app._opStack=[];
+//         console.log("finish = ",app._opStack);
+//         finish(data)
+
+      Promise.all([app._opStack]).then(function(data){
          app.networkFitRequest=true;
          app._opStack=[];
          console.log("finish = ",app._opStack);
          finish(data)
-      });
-   }
+         });
+   };
 
 
    this.addNode=function(dataobj,id,initialLabel,nodeTempl){
