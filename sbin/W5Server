@@ -1021,10 +1021,10 @@ sub StartW5ServerProcess
              \$SIG{\$sig}='IGNORE';
              next;
           }
-          if (\$sig eq "PIPE"){
+          if (\$sig eq "PIPE" | \$sig eq "SEGV"){
              \$SIG{\$sig}=sub{
                  \$self->NotifyAdmin(
-                    "\$server PIPE erhalten pid=\$orgpid:\$\$ \$0","PIPE");
+                    "\$server \$sig erhalten pid=\$orgpid:\$\$ \$0",\$sig);
                  exit(1);  # any Pipe is broken
              };
              next;
