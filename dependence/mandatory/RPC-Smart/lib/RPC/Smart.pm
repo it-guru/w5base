@@ -22,9 +22,7 @@ use 5.006_001;
 use strict;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
 use Net::Server::Multiplex;
-use IPC::Smart;
 use XML::Smart;
-use Data::Dumper;
 
 @ISA=qw();
 

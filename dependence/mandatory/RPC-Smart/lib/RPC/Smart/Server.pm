@@ -1,3 +1,44 @@
+package RPC::IPC;
+use IPC::SharedMem;
+use Data::Dumper;
+
+sub new
+{
+   my ($class,$size)=@_;
+   my $self={size=>$size};
+   #$self->{mem}=new IPC::SharedMem(0,$size,IPC_CREAT|IPC_PRIVATE);
+   $self->{mem}=new IPC::SharedMem(IPC_PRIVATE,$self->{size},IPC_CREAT|IPC_EXCL|0600);
+   $self->{mem}->attach();
+   $self->{mem}->remove();
+   return(bless($self,$class));
+}
+
+
+sub store
+{
+   my $self=shift;
+   my $string=shift;
+
+   $self->{mem}->write($string,0,$self->{size});
+}
+
+sub fetch
+{
+   my $self=shift;
+   my $string=shift;
+
+   my $s=$self->{mem}->read(0,$self->{size});
+   return($s);
+}
+
+
+sub DESTROY
+{
+   my $bk=$self->{mem}->remove();
+   return(0);
+}
+
+
 package RPC::Smart::Server;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
@@ -23,7 +64,6 @@ use strict;
 use vars qw(@ISA %tasks @EXPORT @EXPORT_OK);
 use Exporter;
 use Net::Server::Multiplex;
-use IPC::Smart;
 use XML::Smart;
 use Data::Dumper;
 use RPC::Smart;
@@ -189,8 +229,11 @@ sub async
        keys(%{$tasks})>$self->{max_async}){
       return({result=>'no task space left',exitcode=>1});
    }
-   my $taskenv={start=>time(),timeout=>$param{timeout},
-                ipc=>new IPC::Smart(-nolocking=>1,-size=>8192)};
+   my $taskenv={
+      start=>time(),
+      timeout=>$param{timeout},
+      ipc=>new RPC::IPC(8192)
+   };
    foreach my $k (keys(%param)){
       next if (exists($taskenv->{$k}));
       $taskenv->{$k}=$param{$k};
