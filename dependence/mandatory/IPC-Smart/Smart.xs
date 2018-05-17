@@ -11,6 +11,7 @@ extern "C" {
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <sys/ipc.h> 
+#include <string.h>
 #include "smart.h"
 
 /*

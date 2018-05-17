@@ -8,9 +8,9 @@
 
 # Package name      : IPC-ShareLite
 # Source directory  : .
-# Configuration time: Tue May 10 12:06:32 CEST 2011
+# Configuration time: Thu 17 May 08:42:42 CEST 2018
 # Configured by     : hvogler
-# Target system     : linux ak1ld168 2.6.18-194.17.4.el5 #1 smp wed oct 20 13:03:08 edt 2010 x86_64 x86_64 x86_64 gnulinux 
+# Target system     : linux devnull64 4.9.0-6-amd64 #1 smp debian 4.9.88-1+deb9u1 (2018-05-07) x86_64 gnulinux 
 
 Author=''
 Date=''
@@ -25,14 +25,14 @@ Source=''
 State=''
 ar=''
 archobjs=''
-awk='/bin/awk'
+awk='/usr/bin/awk'
 bash=''
 bison=''
 byacc=''
 c=''
 cat='/bin/cat'
 cf_by='hvogler'
-cf_time='Tue May 10 12:06:32 CEST 2011'
+cf_time='Thu 17 May 08:42:42 CEST 2018'
 chgrp=''
 chmod=''
 chown=''
@@ -97,7 +97,7 @@ mips_type=''
 mkdir=''
 more=''
 mv=''
-myuname='linux ak1ld168 2.6.18-194.17.4.el5 #1 smp wed oct 20 13:03:08 edt 2010 x86_64 x86_64 x86_64 gnulinux '
+myuname='linux devnull64 4.9.0-6-amd64 #1 smp debian 4.9.88-1+deb9u1 (2018-05-07) x86_64 gnulinux '
 n=''
 nm_opt=''
 nm_so_opt='--dynamic'
@@ -132,7 +132,7 @@ tail=''
 tar=''
 tbl=''
 test='test'
-touch='/bin/touch'
+touch='/usr/bin/touch'
 tr='/usr/bin/tr'
 troff=''
 uname='/bin/uname'

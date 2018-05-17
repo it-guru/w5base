@@ -5,6 +5,7 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <errno.h>
+#include <string.h>
 #include "config.h"
 #include "smart.h"
 
