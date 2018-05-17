@@ -1013,7 +1013,7 @@ sub StartW5ServerProcess
              \$SIG{INT}=\\&shutdown;
              next;
           }
-          if (\$sig eq "USR2"){
+          if (\$sig eq "USR2" || \$sig eq "WINCH"){
              \$SIG{\$sig}='IGNORE';
              next;
           }
