@@ -427,3 +427,19 @@ CREATE TABLE lnkuserw5plug (
   FOREIGN KEY fk_user (userid) REFERENCES contact (userid) ON DELETE CASCADE,
   FOREIGN KEY fk_user (plugid) REFERENCES w5plug (id) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table grpindivfld (
+  id         bigint(20) NOT NULL,
+  name       varchar(80) NOT NULL,
+  dataobject varchar(128) NOT NULL,
+  grpview    bigint(20) NOT NULL,
+  grpwrite   bigint(20) NOT NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY name (dataobject,grpview),unique(grpview,name),
+  FOREIGN KEY (grpview) REFERENCES grp (grpid) ON DELETE CASCADE
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1;

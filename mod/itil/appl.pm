@@ -1489,6 +1489,17 @@ sub new
                 parentobj     =>'itil::appl',
                 group         =>'attachments'),
 
+      new kernel::Field::SubList(
+                name          =>'individualAttr',
+                label         =>'individual attributes',
+                group         =>'individualAttr',
+                allowcleanup  =>1,
+                forwardSearch =>1,
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'itil::grpindivappl',
+                vjoinon       =>['id'=>'srcdataobjid'],
+                vjoindisp     =>['fieldname','indivfieldvalue']),
+
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
@@ -1700,6 +1711,10 @@ sub new
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->setDefaultView(qw(name mandator cistatus mdate));
    $self->setWorktable("appl");
+   $self->{individualAttr}={
+      dataobj=>'itil::grpindivappl'
+   };
+
    return($self);
 }
 
@@ -2338,7 +2353,7 @@ sub isViewValid
               attachments contacts control supcontracts custcontracts 
               customer delmgmt itcloudareas
               finance interfaces licenses monisla sodrgroup qc external itsem
-              mutimes  
+              mutimes   individualAttr
               misc opmgmt phonenumbers services businessservices 
               soclustgroup socomments source swinstances systems applurl
               technical workflowbasedata header inmchm interview efforts
@@ -2508,7 +2523,7 @@ sub getDetailBlockPriority
              interfaces systems itcloudareas 
              swinstances services businessservices applurl
              monisla 
-             mutimes misc attachments control 
+             mutimes misc attachments individualAttr control 
              sodrgroup soclustgroup socomments accountnumbers licenses 
              external source));
 }

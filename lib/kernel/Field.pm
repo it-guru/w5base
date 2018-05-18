@@ -88,6 +88,7 @@ use kernel::Field::DatacareAssistant;
 use kernel::Field::CryptText;
 use kernel::Field::TRange;
 use kernel::Field::RecordRights;
+use kernel::Field::IndividualAttr;
 use kernel::Universal;
 use Text::ParseWhere;
 @ISA    = qw(kernel::Universal);

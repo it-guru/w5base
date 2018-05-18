@@ -199,3 +199,5 @@
 'add application interfaces'=>{de=>'Anwendungsschnittstellen hinzufügen'},
 'set item visual focus'=>{de=>'Darstellung auf Element fokusieren'},
 'add systems'=>{de=>'logische Systeme hinzufügen'},
+'individual attributes'=>{de=>'individuelle Attribute'},
+'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'indivial attributes'},

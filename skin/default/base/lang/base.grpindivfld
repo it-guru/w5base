@@ -1,0 +1,6 @@
+'base::grpindivfld'=>{de=>'Team/Gruppe individual Feld',en=>'Team/Group inividiual field'},
+'Groupname'=>{de=>'Gruppe'},
+'link field to Data-Object'=>{de=>'Feld binden an Datenobjekt'},
+'Field label'=>{de=>'Feldbezeichnung'},
+'you have no right, to edit individual fields in selected group'=>{de=>'Sie haben kein Recht, individual Felder für die angebene Gruppe zu bearbeiten'},
+'delete of field also deletes all existing field values irrevocably'=>{de=>'das Löschen des Feldes löscht alle eventuell vorhandenen Inhalte unwiederruflich'},

@@ -22,6 +22,7 @@ use Class::ISA;
 use kernel;
 use kernel::App;
 use kernel::WSDLbase;
+use kernel::Field::IndividualAttr;
 use Text::ParseWords;
 
 @ISA    = qw(kernel::App kernel::WSDLbase);
@@ -986,6 +987,10 @@ sub SecureValidate
              @fieldgrouplist=("default");
           }
           my $writeok=0;
+          if ($fo->Type() eq "IndividualAttr" &&
+              keys(%{$newrec})==1){   # Individuell Attributes can only be write
+             $writeok=1;              # sperated !
+          }
           if ($fo->Name() eq "srcid" && !defined($oldrec)){
              if (defined($newrec->{srcid}) &&
                  $newrec->{srcid} ne ""){
@@ -1891,8 +1896,19 @@ sub SecureValidatedUpdateRecord
    my @filter=@_;
 
    $self->isDataInputFromUserFrontend(1);
+
+   my $wrok=0;
+   if (defined($self->{individualAttr})){
+      my @fieldnames=keys(%$newrec);
+      if ($#fieldnames==0){
+         my $fld=$self->getField($fieldnames[0]);
+         if (defined($fld) && $fld->Type() eq "IndividualAttr"){
+            $wrok=1;
+         }
+      }
+   }
    my @groups=$self->isWriteValid($oldrec);
-   if ($#groups>-1 && defined($groups[0])){
+   if (($#groups>-1 && defined($groups[0])) || $wrok){
       if ($self->SecureValidate($oldrec,$newrec,\@groups)){
          return($self->ValidatedUpdateRecord($oldrec,$newrec,@filter));
       }
@@ -2354,6 +2370,34 @@ sub ValidatedUpdateRecordTransactionless
    }
    else{
       $self->NormalizeByIOMap("preWrite",$newrec);
+
+      #######################################################################
+      # Individual Attribute Handling
+printf STDERRR ("fifi Update in ValidatedUpdateRecordTransactionless\n");
+      if (defined($self->{individualAttr})){
+         my @fieldnames=keys(%$newrec);
+         if ($#fieldnames==0){
+            my $fld=$self->getField($fieldnames[0]);
+            if (defined($fld) && $fld->Type() eq "IndividualAttr"){
+               # Write data to "IndividualAttr"
+               my $idfld=$self->IdField();
+               my $id=effVal($oldrec,$newrec,$idfld->Name());
+               my $dataobj=$self->SelfAsParentObject();
+               my $ifieldid=$fld->{grpindivfldid};
+               my $o=getModuleObject($self->Config,
+                                     $self->{individualAttr}->{dataobj});
+               $o->SetFilter({indivfieldid=>\$ifieldid,srcdataobjid=>\$id});
+               my ($irec,$msg)=$o->getOnlyFirst(qw(ALL));
+               if (defined($irec)){
+                  $o->SecureValidatedUpdateRecord($irec,{
+                     indivfieldvalue=>$newrec->{$fieldnames[0]}
+                  },{id=>[$irec->{id}]});
+               }
+               return(1); 
+            }
+         }
+      }
+      #######################################################################
       if (my $validatednewrec=$self->validateFields($oldrec,$newrec,\%comprec)){
          if ($self->Validate($oldrec,$validatednewrec,\%comprec)){
             $self->finishWriteRequestHash($oldrec,$validatednewrec);
@@ -3139,6 +3183,64 @@ sub getGroup
 
 
 
+sub generateIndiviualAttributes
+{
+   my $self=shift;
+
+   if (defined($self->{individualAttr})){
+      my $context=$self->Context;
+      if (!defined($self->{individualAttr}->{Worktable})){
+         my $o=getModuleObject($self->Config,$self->{individualAttr}->{dataobj});
+         my ($worktable,$workdb)=$o->getWorktable();
+         $self->{individualAttr}->{Worktable}=$worktable; 
+      }
+      if (!exists($context->{individualAttrCache})){
+         $context->{individualAttrCache}={};
+         if ($W5V2::OperationContext ne "QualityCheck"){
+            #msg(INFO,"genereat Indiv Attr");
+            my $o=getModuleObject($self->Config,"base::grpindivfld");
+            my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
+            my @ids=keys(%groups);
+            @ids=(-99) if ($#ids==-1);
+            my $dataobj=$self->SelfAsParentObject();
+            $o->SetFilter({
+               grpidview=>\@ids,
+               dataobj=>\$dataobj
+            });
+            my $worktable=$self->{individualAttr}->{Worktable};
+            my $idfield=$self->IdField();
+            my $idattr=$idfield->{dataobjattr};
+            foreach my $ifld ($o->getHashList(qw(id name))){
+               my $indicolid=$ifld->{id};
+               my $ifldname=$ifld->{name};
+               $ifld=ObjectRecordCodeResolver($ifld);
+               my $f=new kernel::Field::IndividualAttr(
+                  name          =>"individualattribute_$indicolid",
+                  label         =>$ifldname,
+                  grpindivfldid =>$indicolid,
+                  group         =>'individualAttr',
+                  dataobjattr   =>"(select ${worktable}.fldval ".
+                                  "from ${worktable} where ".
+                                  "${worktable}.grpindivfld='$indicolid' ".
+                                  " and ".
+                                  "${idattr}=${worktable}.dataobjid)"
+               );
+               $self->InitFields($f);
+               $context->{individualAttrCache}->{$f->Name()}=$f;
+            }
+         }
+         else{
+         }
+      }
+      return($context->{individualAttrCache});
+   }
+   else{
+      return;
+   }
+}
+
+
+
 
 
 sub getFieldList
@@ -3159,6 +3261,8 @@ sub getFieldList
          }
       }
    }
+   my $indivAttr=$self->generateIndiviualAttributes();
+   push(@fl,sort(keys(%$indivAttr)));
    return(@fl);
 }
 
@@ -3173,7 +3277,7 @@ sub getFieldObjsByView
 
    my $onlysync=0;
    if ($view->[0] eq "ALL" && $#{$view}==0){
-      @view=@{$self->{'FieldOrder'}} if (defined($self->{'FieldOrder'}));
+      @view=$self->getFieldList();
       @view=grep(!/^(qctext|qcstate|qcok|interview|interviewst|itemsummary)$/,@view); # remove qc data
    }
    #elsif ($view->[0] eq "MAINSET" && $#{$view}==0){  # u.U. for further aliases
@@ -3293,6 +3397,12 @@ sub getField
    my ($container,$name)=(undef,$fullfieldname);
    if ($fullfieldname=~m/\./){
       ($container,$name)=$fullfieldname=~m/^([^.]+)\.(\S+)/;
+   }
+   if (my ($indicolid)=$fullfieldname=~m/^individualattribute_([0-9]{5,15})$/){
+      my $indivAttr=$self->generateIndiviualAttributes();
+      if (exists($indivAttr->{$fullfieldname})){
+         return($indivAttr->{$fullfieldname});
+      }
    }
    if (defined($container)){
       if (!defined($deprec)){

@@ -124,6 +124,11 @@ sub Init
                       func=>'ImportOrgarea',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.grp.grpindivfld",
+                      "base::grpindivfld",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("sysadm.user.lnkcontact",
                       "base::lnkcontact",
                       defaultacl=>['admin']);

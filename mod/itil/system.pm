@@ -786,6 +786,17 @@ sub new
                 parentobj     =>'itil::system',
                 group         =>'attachments'),
 
+      new kernel::Field::SubList(
+                name          =>'individualAttr',
+                label         =>'individual attributes',
+                group         =>'individualAttr',
+                allowcleanup  =>1,
+                forwardSearch =>1,
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'itil::grpindivsystem',
+                vjoinon       =>['id'=>'srcdataobjid'],
+                vjoindisp     =>['fieldname','indivfieldvalue']),
+
       new kernel::Field::Interface(
                 name          =>'assetid',
                 dataobjattr   =>"$vmifexp,vsystem.asset,system.asset)", 
@@ -1349,78 +1360,13 @@ sub new
    $self->AddGroup("external",translation=>'itil::system');
    $self->setDefaultView(qw(name location cistatus mdate));
    $self->setWorktable("system");
+   $self->{individualAttr}={
+      dataobj=>'itil::grpindivsystem'
+   };
    return($self);
 }
 
 
-
-sub genIndivAttr
-{
-   my $self=shift;
-
-   my $context=$self->Context;
-   if (!exists($context->{indivAttr})){
-      $context->{indivAttr}={};
-      if ($W5V2::OperationContext ne "QualityCheck"){
-         msg(INFO,"genereat Indiv Attr");
-         sleep(1);
-         foreach my $indicolid (qw(23124564 
-                                   23451 23141234 2134123421 234123 1423214 4523
-                                   24123 21341236 76542 1242341 6426543
-                                   424123 421341236 476542 41242341 46426543
-                                   2341234)){
-            my $f=new kernel::Field::Text(
-                         name          =>"indicol_$indicolid",
-                         label         =>'IP-Count'.$indicolid,
-                         group         =>'ipaddresses',
-                         htmldetail    =>0,
-                         dataobjattr   =>"(select count(*)+$indicolid from ".
-                                         "ipaddress where ".
-                                         "system.id=ipaddress.system)");
-            $self->InitFields($f);
-            $context->{indivAttr}->{$f->Name()}=$f;
-         }
-      }
-      else{
-      }
-   }
-   return($context->{indivAttr});
-}
-
-
-sub getFieldList
-{
-   my $self=shift;
-   my $context=shift;
-
-   my @fobjs=$self->SUPER::getFieldList();
-   if ($context ne "SearchTemplate"){  
-      if ($self->IsMemberOf("admin")){
-         my $indivAttr=$self->genIndivAttr();
-         push(@fobjs,sort(keys(%$indivAttr)));
-      }
-   }
-
-   return(@fobjs);
-}
-
-
-sub getField
-{
-   my $self=shift;
-   my $fullfieldname=shift;
-   my $deprec=shift;
- 
-   if (my ($indicolid)=$fullfieldname=~m/^indicol_([0-9]{5,10})$/){
-      if ($self->IsMemberOf("admin")){
-         my $indivAttr=$self->genIndivAttr();
-         if (exists($indivAttr->{$fullfieldname})){
-            return($indivAttr->{$fullfieldname});
-         }
-      }
-   }
-   return($self->SUPER::getField($fullfieldname,$deprec));
-}
 
 
 sub getTeamBossID
@@ -1908,7 +1854,7 @@ sub isViewValid
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses phonenumbers sec applications
               location source customer history upd
-              attachments control systemclass interview qc);
+              attachments individualAttr control systemclass interview qc);
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       push(@all,"vhost");
    }
@@ -1942,7 +1888,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default software admin logsys contacts 
-                       monisla misc opmode upd
+                       monisla misc opmode upd  
                        physys ipaddresses phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
    if (defined($rec) && $rec->{'systemtype'} eq "abstract"){
@@ -2111,7 +2057,7 @@ sub getDetailBlockPriority
              opmode sec applications customer software 
              swinstances ipaddresses
              contacts monisla misc upd 
-             attachments control source));
+             attachments individualAttr control source));
 }
 
 

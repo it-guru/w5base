@@ -104,3 +104,5 @@
 'NOR Model to use'=>{de=>'zu verwendendes NOR Lösungsmodel',
                      en=>'NOR Model to use'},
 'add applications'=>{de=>'Anwendungen hinzufügen'},
+'individual attributes'=>{de=>'individuelle Attribute'},
+'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'indivial attributes'},
