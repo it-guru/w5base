@@ -26,7 +26,7 @@ sub process
 
    my $opmode=$self->getParent->Config->Param("W5BaseOperationMode");
    my $ro=0;
-   if ($opmode eq "readonly"){
+   if ($opmode eq "readonly" || $opmode eq "dev"){
       $ro=1;
    }
    sleep(600);
