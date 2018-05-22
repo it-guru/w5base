@@ -706,22 +706,24 @@ sub preProcessFilter
              "expression '$hflt->{$field}' for field $self->{name}");
       }
 
+printf STDERR ("fifi subflt=%s name=%s\n",Dumper($subflt),$self->Name());
+
       if (exists($fobj->{vjoinreverse})){
          my $localFld=$fobj->{vjoinreverse}->[0];
          my $remoteFld=$fobj->{vjoinreverse}->[1];
          $fobj->vjoinobj->ResetFilter();
          if ($fobj->vjoinobj->SetFilter($subflt)){
             $fobj->vjoinobj->SetCurrentView($remoteFld);
-            delete($hflt->{$field});
             my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
             @keylist=keys(%{$d->{$remoteFld}});
-            if (($hflt->{$field}=~m/\[LEER\]/) || 
-                ($hflt->{$field}=~m/\[EMPTY\]/)){
+            if (($hflt->{$field}=~m/^\[LEER\]$/) || 
+                ($hflt->{$field}=~m/^\[EMPTY\]$/)){
                push(@keylist,undef,"");
             }
             if ($#keylist==-1){
                @keylist=(-99);
             }
+            delete($hflt->{$field});
          }
          else{
             delete($hflt->{$field});
@@ -736,29 +738,44 @@ sub preProcessFilter
       else{
          my $localFld=$fobj->{vjoinon}->[0];
          my $remoteFld=$fobj->{vjoinon}->[1];
-         if ($fobj->vjoinobj->SetFilter($subflt)){
-            if (defined($hflt->{$localFld}) &&
-                !defined($self->{dataobjattr})){
-               $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
-                      {$fobj->{vjoinon}->[1]=>$hflt->{$localFld}});
-            }
-            $fobj->vjoinobj->SetCurrentView($remoteFld);
+         @keylist=(-99);
+
+         if (($hflt->{$field}=~m/^\[LEER\]$/) || 
+             ($hflt->{$field}=~m/^\[EMPTY\]$/)){
+            push(@keylist,undef,"");
             delete($hflt->{$field});
-            my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
-            @keylist=keys(%{$d->{$remoteFld}});
-            if (($hflt->{$field}=~m/\[LEER\]/) || 
-                ($hflt->{$field}=~m/\[EMPTY\]/)){
-               push(@keylist,undef,"");
-            }
-            if ($#keylist==-1){
-               @keylist=(-99);
-            }
-         }
-         else{
-            delete($hflt->{$field});
-            @keylist=(-99);
             $changed=1;
          }
+         elsif (($hflt->{$field}=~m/^!\[LEER\]$/) || 
+             ($hflt->{$field}=~m/^!\[EMPTY\]$/)){
+            delete($hflt->{$field});
+            $changed=1;
+            $self->getParent->LastMsg(ERROR,
+                 $self->getParent->T("search filter not supported"));
+         }
+         else{
+            if ($fobj->vjoinobj->SetFilter($subflt)){
+               if (defined($hflt->{$localFld}) &&
+                   !defined($self->{dataobjattr})){
+                  $fobj->vjoinobj->SetNamedFilter("vjoinadd".$field,
+                         {$fobj->{vjoinon}->[1]=>$hflt->{$localFld}});
+               }
+               $fobj->vjoinobj->SetCurrentView($remoteFld);
+               my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
+               @keylist=keys(%{$d->{$remoteFld}});
+               if ($#keylist==-1){
+                  @keylist=(-99);
+                  $changed=1;
+               }
+            }
+            else{
+               delete($hflt->{$field});
+               @keylist=(-99);
+               $changed=1;
+            }
+            delete($hflt->{$field});
+         }
+
          $hflt->{$localFld}=\@keylist;
          if ($localFld ne $self->Name()){
             $changed=1;
