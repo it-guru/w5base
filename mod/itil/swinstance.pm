@@ -272,6 +272,13 @@ sub new
                 vjoinon       =>['lnksoftwaresystemid'=>'id'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Boolean(
+                name          =>'lnksoftwaresystemvalid',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'softwareinst',
+                label         =>'is Software-Installation valid',
+                dataobjattr   =>'if(lnksoftwaresystem.id is not null,1,0)'),
 
       new kernel::Field::Text(
                 name          =>'optionlist',

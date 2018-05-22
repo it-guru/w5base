@@ -76,3 +76,4 @@
 'detected SSL Issuer DN'=>{de=>'erkannte SSL Zertifikat Aussteller DN'},
 'CI-Status level needs a valid application specification'=>{de=>'Dieser CI-Status benötigt die Angabe einer gültigen Anwendung'},
 'automatic swnature changed'=>{de=>'automatische Instanz Typ Änderung vorgenommen'},
+'is Software-Installation valid'=>{de=>'Software-Installation ist gültig'},
