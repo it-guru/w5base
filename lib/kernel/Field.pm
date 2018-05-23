@@ -706,8 +706,6 @@ sub preProcessFilter
              "expression '$hflt->{$field}' for field $self->{name}");
       }
 
-printf STDERR ("fifi subflt=%s name=%s\n",Dumper($subflt),$self->Name());
-
       if (exists($fobj->{vjoinreverse})){
          my $localFld=$fobj->{vjoinreverse}->[0];
          my $remoteFld=$fobj->{vjoinreverse}->[1];
