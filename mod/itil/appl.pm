@@ -1932,8 +1932,7 @@ sub calculateInterfacesCount
    foreach my $irec (@$s){
       if (lc($irec->{conproto}) ne "unknown" &&
           ($irec->{cistatusid}>2 && $irec->{cistatusid}<6) &&
-          ($irec->{ifagreementneeded} eq "1") &&
-          ($irec->{ifagreementdocsz} ne "" && $irec->{ifagreementdocsz}>10000)){
+          ($irec->{ifagreementneeded} eq "1")){
          $c++;
       }
    }
