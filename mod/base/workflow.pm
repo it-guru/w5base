@@ -877,6 +877,18 @@ sub ById
 }
 
 
+
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    my $method=shift;
+    return(1) if ($method eq "ShowState");
+    return(0);
+}
+
+
+
+
 sub getSqlFrom
 {
    my $self=shift;
