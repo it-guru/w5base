@@ -155,6 +155,9 @@ sub extendHtmlDetailPageContent
    my $idval=$rec->{$idname};
 
    return("") if (!defined($rec));
+   if ($ENV{REMOTE_USER} eq "anonymous" || $ENV{REMOTE_USER} eq ""){
+      return("");
+   }
 
    $offset+=20;
 

@@ -372,6 +372,16 @@ sub getSqlGroup
 
 
 
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    return(1);
+}
+
+
+
+
+
 sub Validate
 {
    my $self=shift;

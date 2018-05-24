@@ -205,6 +205,17 @@ sub new
    return($self);
 }
 
+
+
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    return(1);
+}
+
+
+
+
 sub getValidWebFunctions
 {
    my ($self)=@_;

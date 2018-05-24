@@ -1816,6 +1816,44 @@ sub FinishTransaction
 }
 
 
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    my $method=shift;
+    return(0);
+}
+
+sub rejectAnonymousAccess
+{
+   my $self=shift;
+   my $method=shift;
+
+   printf("Status: 403 Forbidden - no anonymous access allowed\n");
+   printf("Content-type: text/xml\n\n".
+          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>".
+          "<root>".
+          "<error>403 Forbidden - no anonymous access allowed</error>".
+          "</root>\n");
+}
+
+
+
+sub validateAnonymousAccess
+{
+   my $self=shift;
+   my $method=shift;
+
+   if (lc($ENV{REMOTE_USER}) eq "anonymous" ||
+       $ENV{REMOTE_USER} eq ""){
+      if (!$self->isAnonymousAccessValid($method)){
+         $self->rejectAnonymousAccess($method);
+         return(undef);
+      }
+   }
+   return(1);
+}
+
+
 sub ValidatedInsertRecord
 {
    my $self=shift;

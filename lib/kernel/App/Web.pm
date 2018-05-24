@@ -190,6 +190,9 @@ sub Run
    my ($func,$p)=$self->extractFunctionPath();
 
    if ($self->isFunctionValid($func)){
+      if ($self->can("validateAnonymousAccess")){
+         return(0) if (!$self->validateAnonymousAccess($func));
+      }
       if ($self->can($func)){
          return($self->$func());
       }

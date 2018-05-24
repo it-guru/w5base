@@ -375,6 +375,15 @@ sub TableVersionLoadSqlFileData
    return(%c);
 }
 
+
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    return(1);
+}
+
+
+
 sub TableVersionModifications
 {
    my $self=shift;

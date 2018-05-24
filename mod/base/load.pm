@@ -193,6 +193,15 @@ sub Run
 }
 
 
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    return(1);
+}
+
+
+
+
 
 
 1;

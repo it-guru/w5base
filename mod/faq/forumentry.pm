@@ -147,6 +147,17 @@ sub Validate
 
 
 
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    return(1);
+}
+
+
+
+
+
+
 
 
 
