@@ -393,7 +393,6 @@ sub SOAP
    $self->{SOAP}=SOAP::Transport::HTTP::CGI   
     -> dispatch_with($self->{NS})
     -> dispatch_to('interface::SOAP');
-   printf STDERR ("fifi 01 %s\n",$self->{SOAP}->deserializer);
    $self->{SOAP} -> handle;
    my $t=tv_interval($t0,[gettimeofday()]);
    my $s=sprintf("%0.4fsec",$t);
