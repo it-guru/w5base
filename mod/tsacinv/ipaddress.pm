@@ -30,6 +30,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
@@ -104,6 +105,13 @@ sub new
                 label         =>'Status',
                 dataobjattr   =>'"status"'),
 
+      new kernel::Field::Boolean(
+                name          =>'deleted',
+                readonly      =>1,
+                label         =>'marked as delete',
+                dataobjattr   =>'"bdelete"'),
+
+
       new kernel::Field::Text(
                 name          =>'code',
                 label         =>'Code',
@@ -138,13 +146,6 @@ sub new
                 label         =>'Type',
                 ignorecase    =>1,
                 dataobjattr   =>'"type"'),
-
-      new kernel::Field::Boolean(
-                name          =>'deleted',
-                readonly      =>1,
-                label         =>'marked as delete',
-                dataobjattr   =>'"bdelete"'),
-
 
       new kernel::Field::Text(
                 name          =>'description',
@@ -189,6 +190,20 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_status"))){
+     Query->Param("search_status"=>"\"!unconfigured\"");
+   }
+   if (!defined(Query->Param("search_deleted"))){
+      Query->Param("search_deleted"=>$self->T("no"));
+   }
+
+}
+
+
 
 sub getRecordImageUrl
 {

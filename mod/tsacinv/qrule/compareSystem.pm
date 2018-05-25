@@ -489,7 +489,13 @@ sub qcheckRecord
                   my %cleanAmIPlist;
                   foreach my $amiprec (@{$parrec->{ipaddresses}}){
                      my $mappedCIStatus=5;
-                     if (lc($amiprec->{status}) eq "configured"){
+                     if (lc($amiprec->{status}) eq "unconfigured"){
+                        $mappedCIStatus=6;
+                     }
+                     if (lc($amiprec->{status}) eq "out of operation"){
+                        $mappedCIStatus=6;
+                     }
+                     elsif (lc($amiprec->{status}) eq "configured"){
                         $mappedCIStatus=4;
                      }
                      if ($amiprec->{ipv4address} ne ""){
@@ -540,6 +546,9 @@ sub qcheckRecord
                              sub{  # oprec generator
                                 my ($mode,$oldrec,$newrec,%p)=@_;
                                 if ($mode eq "insert" || $mode eq "update"){
+                                   if ($mode eq "insert" && $newrec->{cistatusid} eq "6"){
+                                      return(); # do not insert already unconfigured ip's
+                                   }
                                    my $networkid=$p{netarea}->{name}->
                                                  {'Insel-Netz/Kunden-LAN'}->{id};
                                    my $identifyby=undef;
@@ -549,6 +558,16 @@ sub qcheckRecord
                                    if ($newrec->{ipaddress}=~m/^\s*$/){
                                       $mode="nop";
                                    }
+                                   my $type="1";   # secondary
+                                   # Customer Interface can not be marked
+                                   # as primary interface, because in some
+                                   # cases multiple customer interfaces
+                                   # exists in AssetManager Rotz.
+                                   #
+                                   #if (lc(trim($newrec->{description})) eq
+                                   #    "customer"){
+                                   #   $type="0"; # Customer Interface is prim
+                                   #}
                                    return({OP=>$mode,
                                            MSG=>"$mode ip $newrec->{ipaddress} ".
                                                 "in W5Base",
@@ -558,7 +577,7 @@ sub qcheckRecord
                                               name      =>$newrec->{ipaddress},
                                               cistatusid=>$newrec->{cistatusid},
                                               srcsys    =>'AMCDS',
-                                              type      =>'1', # use sek. entry
+                                              type      =>$type,
                                               networkid =>$networkid,
                                               comments  =>$newrec->{description},
                                               systemid  =>$p{refid}
