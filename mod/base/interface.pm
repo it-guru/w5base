@@ -242,7 +242,16 @@ EOF
                                                 'installed or unuseable')});
          }
          else{
-            $p->setHandlers(Start=>\&XMLstart,End=>\&XMLend,Char=>\&XMLchar);
+            $p->setHandlers(
+               Start=>\&XMLstart,
+               End=>\&XMLend,
+               Char=>\&XMLchar,
+               ExternEnt =>sub{    # Security fix to prevent 
+                                   # XML Entity Injection
+                  shift; 
+                  return("-INVALID EXTERNAL XMLREF-");
+               }
+            );
             eval('$p->parsefile($filename);');
             if ($@ ne ""){
                $exitcode+=4;
@@ -384,6 +393,7 @@ sub SOAP
    $self->{SOAP}=SOAP::Transport::HTTP::CGI   
     -> dispatch_with($self->{NS})
     -> dispatch_to('interface::SOAP');
+   printf STDERR ("fifi 01 %s\n",$self->{SOAP}->deserializer);
    $self->{SOAP} -> handle;
    my $t=tv_interval($t0,[gettimeofday()]);
    my $s=sprintf("%0.4fsec",$t);
