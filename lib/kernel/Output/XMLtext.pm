@@ -55,4 +55,28 @@ sub MimeType
 
 
 
+sub ProcessHead
+{
+   my ($self,$fh,$rec,$msg)=@_;
+   my $d;
+   my $app=$self->getParent->getParent();  # IE/Excel not works correct on UTF8
+   $d="<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>\n<root>\n";
+   return($d);
+}
+
+
+sub ProcessLine
+{
+   my ($self,$fh,$viewgroups,$rec,$msg)=@_;
+   my $d=$self->SUPER::ProcessLine($fh,$viewgroups,$rec,$msg);
+
+   $d=UTF8toLatin1($d);
+
+   return($d);
+}
+
+
+
+
+
 1;
