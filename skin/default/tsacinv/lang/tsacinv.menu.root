@@ -9,6 +9,7 @@
 'itu.ac.appl.lnkapplappl'=>{de=>'Schnittstelle',en=>'Interface'},
 'itu.ac.appl.lnkapplsystem'=>{de=>'System zuord.',en=>'System rel.'},
 'itu.ac.system'=>{de=>'System',en=>'System'},
+'itu.ac.system.noappsystem'=>{de=>'ohne Appl.',en=>'without appl.'},
 'itu.ac.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
 'itu.ac.system.swinstall'=>{de=>'Software-Inst.',en=>'Software-Inst.'},
 'itu.ac.system.lnksharednet'=>{de=>'Verkn. SharedNet',en=>'SharedNet rel.'},

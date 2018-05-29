@@ -67,8 +67,12 @@ sub Init
                       "tsacinv::lnksharednet",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itu.ac.system.lnksharedstorage",
-                      "tsacinv::lnksharedstorage",
+   $self->RegisterObj("itu.ac.system.lnksharednet",
+                      "tsacinv::lnksharednet",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.ac.system.noappsystem",
+                      "tsacinv::noappsystem",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("itu.ac.itclust",

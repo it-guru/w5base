@@ -61,7 +61,7 @@ sub new
                 searchable    =>1,
                 uppersearch   =>1,
                 align         =>'left',
-                dataobjattr   =>'"systemid"'),
+                dataobjattr   =>'system."systemid"'),
 
       new kernel::Field::Text(
                 name          =>'status',
@@ -262,7 +262,7 @@ sub new
                 label         =>'System CPU count',
                 unit          =>'CPU',
                 precision     =>0,
-                dataobjattr   =>'"systemcpucount"'),
+                dataobjattr   =>'system."systemcpucount"'),
 
       new kernel::Field::Float(  # temp. da es keine phys. cpu anzahl beim
                 name          =>'systeminvoicecpucount',  # logischen system
@@ -270,33 +270,33 @@ sub new
                 unit          =>'CPU',                   # grund: TMO 
                 htmldetail    =>0,                       # abrechnungsprozess
                 precision     =>1,
-                dataobjattr   =>'"systeminvoicecpucount"'),
+                dataobjattr   =>'system."systeminvoicecpucount"'),
 
       new kernel::Field::Float(
                 name          =>'systemcpuspeed',
                 label         =>'System CPU speed',
                 unit          =>'MHz',
                 precision     =>0,
-                dataobjattr   =>'"systemcpuspeed"'),
+                dataobjattr   =>'system."systemcpuspeed"'),
 
       new kernel::Field::Text(
                 name          =>'systemcputype',
                 label         =>'System CPU type',
                 unit          =>'MHz',
-                dataobjattr   =>'"systemcputype"'),
+                dataobjattr   =>'system."systemcputype"'),
 
       new kernel::Field::Text(
                 name          =>'systemtpmc',
                 label         =>'System tpmC',
                 unit          =>'tpmC',
-                dataobjattr   =>'"systemtpmc"'),
+                dataobjattr   =>'system."systemtpmc"'),
 
       new kernel::Field::Float(
                 name          =>'systemmemory',
                 label         =>'System Memory',
                 unit          =>'MB',
                 precision     =>0,
-                dataobjattr   =>'"systemmemory"'),
+                dataobjattr   =>'system."systemmemory"'),
 
       new kernel::Field::Text(
                 name          =>'virtualization',
@@ -333,7 +333,7 @@ sub new
                 label      =>'System Part of Asset (native from AssetManager)',
                 htmldetail    =>0,
                 unit          =>'%',
-                dataobjattr   =>'"nativepartofasset"'),
+                dataobjattr   =>'system."nativepartofasset"'),
 
 #      new kernel::Field::Text(
 #                name          =>'costallocactive',
@@ -356,12 +356,12 @@ sub new
                 name          =>'rawsystemolaclass',
                 htmldetail    =>0,
                 label         =>'raw System OLA Service Class',
-                dataobjattr   =>'"rawsystemolaclass"'),
+                dataobjattr   =>'system."rawsystemolaclass"'),
 
       new kernel::Field::Text(
                 name          =>'operationcategory',
                 label         =>'Operation Category',
-                dataobjattr   =>'"opcategory"'),
+                dataobjattr   =>'system."opcategory"'),
 
       new kernel::Field::Text(
                 name          =>'priority',
@@ -457,7 +457,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'altbc',
                 label         =>'Alternate BC',
-                dataobjattr   =>'"altbc"'),
+                dataobjattr   =>'system."altbc"'),
 
       new kernel::Field::SubList(
                 name          =>'orderedservices',
@@ -675,7 +675,7 @@ sub new
                 #dataobjattr   =>"unistr(amcomment.memcomment)"),
                 # unistr could not be used becouse invalid backslash sequenses
                 # in assetmanager
-                dataobjattr   =>'"tcomments"'),
+                dataobjattr   =>'system."tcomments"'),
 
       new kernel::Field::Text(
                 name          =>'autodiscent',
@@ -685,7 +685,7 @@ sub new
                 weblinkto     =>'tsacinv::autodiscsystem',
                 weblinkon     =>['systemid'=>'systemid'],
                 label         =>'AutoDiscovery Entry',
-                dataobjattr   =>'"autodiscent"'),
+                dataobjattr   =>'system."autodiscent"'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
