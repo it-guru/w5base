@@ -226,6 +226,12 @@ sub new
                 group         =>'form',
                 dataobjattr   =>'"soxrelevant"'),
 
+      new kernel::Field::Boolean(
+                name          =>'sas70relevant',
+                label         =>'SAS70 relevant',
+                group         =>'form',
+                dataobjattr   =>"decode(\"sas70relevant\",'YES',1,0)"),
+
       new kernel::Field::Text(
                 name          =>'securitymodel',
                 label         =>'security flag',
