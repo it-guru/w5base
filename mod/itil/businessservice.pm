@@ -128,7 +128,6 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'Nature',
                 htmleditwidth =>'60%',
-                default       =>'SVC',
                 selectfix     =>'1',
                 transprefix   =>'nat.',
                 readonly      =>sub{
