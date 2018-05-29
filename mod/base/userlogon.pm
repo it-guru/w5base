@@ -81,6 +81,34 @@ sub Validate
 }
 
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_account"))){
+      my $account=$ENV{REMOTE_USER};
+     Query->Param("search_account"=>
+                  "\"$account\"");
+   }
+}
+
+
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->IsMemberOf("admin")){
+      my $account=$ENV{REMOTE_USER};
+      my @addflt=({account=>\$account});
+      push(@flt,\@addflt);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+
+
 sub isViewValid
 {
    my ($self,$rec)=@_;
