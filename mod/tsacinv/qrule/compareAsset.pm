@@ -245,7 +245,19 @@ sub qcheckRecord
                              $parrec,"modelname",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlinkbaselogged');
+                             onCreate=>sub{
+                                my $self=shift;
+                                my $rec=shift;
+                                my $parrec=shift;
+                                my $newval=shift;
+                                if (length($newval)<3 ||
+                                    length($newval)>40 ||
+                                    ($newval=~m/^(.)\1{3}/)){
+                                   return(undef);
+                                }
+                                return({name=>$newval,cistatusid=>4});
+                             },
+                             mode=>'leftouterlinkcreate');
 
                if ($parrec->{acqumode} eq "1"){
                   $parrec->{acqumode}="RENTAL";

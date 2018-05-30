@@ -271,10 +271,17 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                         $newrec->{$k}=$param{onCreate}->{$k};
                      }
                   }
-                  #printf STDERR ("MSG: auto create element in '%s'\n%s\n",
-                  #               $chkobj->Self(),Dumper($newrec));
-                  $chkobj->ValidatedInsertRecord($newrec);
-                  $takeremote++;
+                  elsif (ref($param{onCreate}) eq "CODE"){
+                     $newrec=&{$param{onCreate}}($self,
+                                                 $origrec,$comprec,
+                                                 $comprec->{$compfieldname});
+                  }
+                  if (ref($newrec) eq "HASH" && keys(%$newrec)){
+                     #printf STDERR ("MSG: auto create element in '%s'\n%s\n",
+                     #               $chkobj->Self(),Dumper($newrec));
+                     $chkobj->ValidatedInsertRecord($newrec);
+                     $takeremote++;
+                  }
                }
                elsif ($param{mode} eq "leftouterlinkbaselogged"){
                    $obj->Log(ERROR,"basedata",
