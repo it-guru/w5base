@@ -92,7 +92,7 @@ sub qcheckRecord
    my $sslend;
    my $sslstate="ERROR: unspecific check failure";
 
-   return(0,undef) if ($rec->{'cistatusid'}!=4 && 
+   return(undef,undef) if ($rec->{'cistatusid'}!=4 && 
                        $rec->{'cistatusid'}!=3);
    if ($rec->{'sslurl'} ne "" &&  # Eckige Klammern verhindern den autoscan
        !($rec->{'sslurl'}=~m/^\[.+\]$/)){
@@ -151,7 +151,6 @@ sub qcheckRecord
          }
          elsif ($res->{exitcode} eq "101"){
             $sslstate="DNS query error";
-            return(undef,{qmsg=>"temporary ERROR: ".$res->{exitmsg}});
          }
          elsif ($res->{exitcode} eq "102"){
             $sslstate="invalid DNS name or unkonwn host";
