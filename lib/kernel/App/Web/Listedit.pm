@@ -363,16 +363,16 @@ sub jsExplore
    my $c=0;
    foreach my $k (keys(%objectMethods)){
       if ($c>0){
-         $objectMethods.="\n,";
+         $objectMethods.=",\n";
       }
-      $objectMethods.=$k.":{".$objectMethods{$k}."}";
+      $objectMethods.="   ".$k.":{".$objectMethods{$k}."}";
       $c++;
    }
    $objectMethods.="};";
 
    my $formatLabelFunction=$self->jsExploreFormatLabelMethod();
 
-   print $self->HttpHeader("text/javascript",charset=>'ISO-8895-1');
+   print $self->HttpHeader("text/javascript",charset=>'UTF-8');
 
    my $out=(<<EOF);
 (function(window, document, undefined) {
@@ -449,7 +449,7 @@ sub jsExplore
 })(this,document);
 
 EOF
-   #print utf8::encode($out);
+   utf8::encode($out);
    print $out;
 }
 

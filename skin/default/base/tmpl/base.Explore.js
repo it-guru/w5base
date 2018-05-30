@@ -334,7 +334,7 @@ div#SearchResult{
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <title>W5Explore - preBETA!</title>
 </head><body><div id='main'></div>
-<script language="JavaScript" src="../../../public/base/load/promise.js">
+<script language="JavaScript" src="../../../public/base/load/promise.js?5">
 </script>
 <script language="JavaScript" src="../../../auth/base/load/J5Base.js">
 </script>
@@ -595,7 +595,6 @@ console.log("start applet with param stack=",appletname,paramstack);
    this.loadDataObjClass=function(dataobj){
       var dataobjpath=dataobj.replace('::','/');
       if (ClassDataObjLib[dataobj]){
-         console.log("o=",ClassDataObjLib[dataobj]);
          return(Promise.resolve(ClassDataObjLib[dataobj]));
       }
       else{
@@ -605,6 +604,7 @@ console.log("start applet with param stack=",appletname,paramstack);
                       console.log(dataobj+" is initial loaded",ClassDataObjLib);
                       res(ClassDataObjLib[dataobj]);
                    }).fail(function(e,parseerror){
+                      console.log("e=",e,"parseerror=",parseerror);
                       rej("ERROR: can not resolv dataobj "+dataobj);
                    });
              })
@@ -691,30 +691,19 @@ console.log("start applet with param stack=",appletname,paramstack);
 
    this.processOpStack=function(finish){
       var app=this;
-      console.log("start Problem with IE processOpStack=",app._opStack);
-//      this._opStack.reduce(function(promiseChain, currentTask){
-//console.log("with ",promiseChain," resolv=",currentTask);
-//          return(promiseChain.then(function(chainResults){
-//console.log("resolved =",promiseChain);
-//              return(currentTask.then(function(currentResult){
-//console.log("currentTask.then =",currentTask,currentResult);
-//                  var l=chainResults;
-//                  l.push(currentResult);
-//                  return(l);
-//              }))
-//          }));
-//      }, Promise.resolve([])).then(function(data){
-//         app.networkFitRequest=true;
-//         app._opStack=[];
-//         console.log("finish = ",app._opStack);
-//         finish(data)
-
-      Promise.all([app._opStack]).then(function(data){
+      this._opStack.reduce(function(promiseChain, currentTask){
+          return(promiseChain.then(function(chainResults){
+              return(currentTask.then(function(currentResult){
+                  var l=chainResults;
+                  l.push(currentResult);
+                  return(l);
+              }))
+          }));
+      }, Promise.resolve([])).then(function(data){
          app.networkFitRequest=true;
          app._opStack=[];
-         console.log("finish = ",app._opStack);
          finish(data)
-         });
+       });
    };
 
 

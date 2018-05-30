@@ -1,4 +1,3 @@
-(function(window, document, undefined) {
    var applet='%SELFNAME%';
    ClassAppletLib[applet].class=function(app){
       ClassApplet.call(this,app);
@@ -32,9 +31,7 @@
                          );
                       }
                    } 
-                   app.console.log("INFO","start resolving promise objects");
                    app.processOpStack(function(arrayOfResults){
-                      console.log("OK, all loaded arrayOfResults=",arrayOfResults);
                       ok(arrayOfResults);
                    });
 
@@ -168,6 +165,3 @@
          });
       }
    };
-
-
-})(this,document);
