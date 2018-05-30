@@ -86,3 +86,4 @@
 'FREE'=>{de=>'kostenfrei',en=>'Free of charge'},
 'Acquisition Start'=>{de=>'Aufnahmedatum'},
 'Acquisition Mode'=>{de=>'Beschaffungsart'},
+'Slot number'=>{de=>'Steckplatznummer'},

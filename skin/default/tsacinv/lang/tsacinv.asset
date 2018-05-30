@@ -45,4 +45,5 @@
 'Acquisition Mode'=>{de=>'Beschaffungsart'},
 'full CI-Name'=>{de=>'vollständiger CI-Name'},
 'marked as delete'=>{de=>'gelöscht markiert'},
+'Slot number'=>{de=>'Steckplatznummer'},
 

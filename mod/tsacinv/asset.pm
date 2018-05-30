@@ -148,6 +148,12 @@ sub new
                 group         =>"location",
                 dataobjattr   =>'"place"'),
 
+      new kernel::Field::Text(
+                name          =>'slotno',
+                label         =>'Slot number',
+                group         =>"location",
+                dataobjattr   =>'"slotno"'),
+
       new kernel::Field::Import( $self,
                 weblinkto     =>'tsacinv::model',
                 vjointo       =>'tsacinv::model',

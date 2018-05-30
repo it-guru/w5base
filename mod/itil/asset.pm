@@ -364,6 +364,12 @@ sub new
                 label         =>'Rack identifier',
                 dataobjattr   =>'asset.rack'),
 
+      new kernel::Field::Text(
+                name          =>'slotno',
+                label         =>'Slot number',
+                group         =>"location",
+                dataobjattr   =>'asset.slotno'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',

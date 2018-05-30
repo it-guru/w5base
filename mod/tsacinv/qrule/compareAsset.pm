@@ -221,6 +221,13 @@ sub qcheckRecord
                               mode=>'string');
 
                 $self->IfComp($dataobj,
+                              $rec,"slotno",
+                              $parrec,"slotno",
+                              $autocorrect,$forcedupd,$wfrequest,
+                              \@qmsg,\@dataissue,\$errorlevel,
+                              mode=>'string');
+
+                $self->IfComp($dataobj,
                               $rec,"serialno",
                               {serialno=>$acserialno},"serialno",
                               $autocorrect,$forcedupd,$wfrequest,
