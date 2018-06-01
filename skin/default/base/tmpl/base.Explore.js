@@ -802,10 +802,23 @@ console.log("start applet with param stack=",appletname,paramstack);
       )
    };
 
+   this.globalFunctions=function(){
+       var gdiv=document.createElement('div');
+       var finder=$("<table border=0 width=100%><tr><td valign=middle><input id=findItem style='width:100%' type=text></td><td width=1%><div style='margin:3px;cursor:pointer' id=findItemButton class='cssicon find'></td></tr></table>");
+       $(finder).find("#findItemButton").click(function(e){
+          alert("i do my best to find "+$("#findItem").val());
+       });
+       $(gdiv).append($("<p>Global Functions:</p>"));
+       $(gdiv).append(finder);
+       $(gdiv).append($("<hr<br>"));
+       return(gdiv) 
+   }
    this.showDefaultDBRec=function(){
-      var out="hier könnte z.B. eine Suchmaske für das hinzufügen "+
-              "von beliebigen Items stehen";
-      $(dbrec).html(out); 
+      var out="<p>Add Object:<br><select><option>A</option><option>B</option></select><input type=text><br>xxxxhier könnte z.B. eine Suchmaske für das hinzufügen "+
+              "von beliebigen Items stehen</p>";
+      $(dbrec).html(""); 
+      $(dbrec).append($(this.globalFunctions())); 
+      $(dbrec).append($(out)); 
    };
 
    this.resetItemSelection=function(){
@@ -864,13 +877,20 @@ console.log("start applet with param stack=",appletname,paramstack);
           params.event = "[original event]";
           if (params.nodes[0]){
              var n;
-             var out="<p>Item:<br>";
+             var out=document.createElement('div');
              var methods=Object();
              var selectedNodes=params.nodes;
              for(n=0;n<selectedNodes.length;n++){
                 var nodeobj=app.node.get(selectedNodes[n]);
-                console.log("select "+n+"=",nodeobj);
-                out+=nodeobj.label+"<br>";
+                var dataid=app.toObjKey(nodeobj.dataobj,nodeobj.dataobjid);
+                console.log("select "+n+"=",nodeobj,dataid);
+
+                $(out).append($("<div style='margin:2px;padding:2px;"+
+                                "background-color:#ededed;"+
+                                "border-color:gray;border-style:solid;"+
+                                "border-width:1px;cursor:pointer' "+
+                                "data-id='"+dataid+"' class=centerItem>"+
+                                nodeobj.label+"<div>"));
                 for (var m in nodeobj.nodeMethods){
                    var isPosible=true;
                    if (nodeobj.nodeMethods[m].isPosible){
@@ -892,7 +912,19 @@ console.log("start applet with param stack=",appletname,paramstack);
                    }
                 }
              }
-             out+="</p><hr>";
+             $(out).find(".centerItem").click(function(e){
+                var id=$(this).attr("data-id");
+                var nodeobj=app.node.get(id);
+                app.network.focus(id,{
+                   animation: {
+                          duration: 1000,
+                          easingFunction: 'linear'
+                   }
+                });
+                console.log("click on nodeobj",nodeobj);
+             });
+             $(out).append($("<hr>"));
+
              var mdiv=document.createElement('ul');
              $(mdiv).addClass("nodeMethods");
              var posibleMethodsList=new Array();
@@ -903,9 +935,15 @@ console.log("start applet with param stack=",appletname,paramstack);
              for(var mpos=0;mpos<posibleMethodsList.length;mpos++){
                 var m=posibleMethodsList[mpos];
                 if (methods[m].cnt==selectedNodes.length){
-                   $(mdiv).append("<li><span class=nodeMethodCall data-id='"+m+
-                                  "'><div class='cssicon "+methods[m].cssicon+
-                                  "'></div>"+
+                   $(mdiv).append("<li "+
+                                  "style='padding-bottom:5px;"+
+                                  "padding-left:20px'>"+
+                                  "<span class=nodeMethodCall data-id='"+m+"'>"+
+                                  "<div style='position:relative'>"+
+                                  "<div style='position:absolute;left:-20px' "+
+                                  "class='cssicon "+methods[m].cssicon+"'>"+
+                                  "</div>"+
+                                  "</div>"+
                                   methods[m].label+"</span></li>");
                 }
              }
@@ -916,7 +954,9 @@ console.log("start applet with param stack=",appletname,paramstack);
                    nodeobj.nodeMethods[methodName].exec.call(nodeobj);
                 }
              });
-             $(dbrec).html(out); 
+             $(dbrec).html(""); 
+             $(dbrec).append($(app.globalFunctions())); 
+             $(dbrec).append($(out)); 
              $(dbrec).append(mdiv); 
           }
           else{
