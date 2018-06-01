@@ -244,11 +244,34 @@ sub qcheckRecord
                #################################################################### 
                # assetid compare 
                if (!in_array($dataobj->needVMHost(),$rec->{systemtype})){
-                  if ($parrec->{assetassetid} ne ""){
+                  my $assetid=$parrec->{assetassetid};
+                  # special handling to detect the correct AssetID for a
+                  # system. Because posible wrong informations for ESX vm's,
+                  # it is needed to query eCMDB (ADOP-T)
+                  if ($parrec->{systemid} ne ""){
+                     my $vsys=$dataobj->getPersistentModuleObject(
+                               'tsadopt::vsys');
+                     $vsys->SetFilter({
+                        systemid=>$parrec->{systemid}
+                     });
+                     my ($vsysrec,$msg)=$vsys->getOnlyFirst(qw(id name 
+                                                               assetid));
+                     if (!$vsys->Ping()){
+                        return(undef,{qmsg=>"ADOP-T not available - ".
+                                     "assetid is not detectable"});
+                     }
+                     if ($vsysrec->{assetid} ne ""){
+                        push(@qmsg,"substituted assetid for $parrec->{systemid} ".
+                                   "from $assetid to $vsysrec->{assetid} ".
+                                   "based on ADOP-T");
+                        $assetid=$vsysrec->{assetid};
+                     }
+                  }
+                  if ($assetid ne ""){
                      my $assetobj=getModuleObject($self->getParent->Config,
                                                   'itil::asset');
                      $assetobj->SetFilter({srcsys=>'AssetManager',
-                                           srcid=>$parrec->{assetassetid}});
+                                           srcid=>$assetid});
                      my @w5asset=$assetobj->getHashList(qw(ALL));
                      my $foundactive;
                      foreach my $a (@w5asset) {
@@ -270,7 +293,7 @@ sub qcheckRecord
 
                      $self->IfComp($dataobj,
                                    $rec,"asset",
-                                   $parrec,"assetassetid",
+                                   {assetassetid=>$assetid},"assetassetid",
                                    $autocorrect,$forcedupd,$wfrequest,
                                    \@qmsg,\@dataissue,\$errorlevel,
                                    mode=>'leftouterlinkcreate',
@@ -281,9 +304,9 @@ sub qcheckRecord
                                       allowifupdate=>1,
                                       databossid=>$rec->{databossid},
                                       mandatorid=>$rec->{mandatorid},
-                                      name=>$parrec->{assetassetid},
+                                      name=>$assetid,
                                       srcsys=>'AssetManager',
-                                      srcid=>$parrec->{assetassetid}});
+                                      srcid=>$assetid});
                   }
                }
                else{  # special VM Host-system handling - vhostsystem needs to sync
