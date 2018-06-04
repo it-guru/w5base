@@ -106,9 +106,9 @@ sub qcheckRecord
        # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14072395420001
          return(0,undef);
       }
-      if (defined($parrec) && !$parrec->{soxrelevant}){ # only if no SOX is
+      if (defined($parrec) && !$parrec->{sas70relevant}){ # only if no SAS70 is
          my $issox=$dataobj->getField("issox")->RawValue($rec); # set in AM
-         if ($issox!=$parrec->{soxrelevant}){
+         if ($issox!=$parrec->{sas70relevant}){
             my %appls;
             my $isallsap=0;
             # SAP erzeugt keine DataIssues based on 
