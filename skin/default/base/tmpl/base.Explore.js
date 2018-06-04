@@ -538,6 +538,12 @@ var W5ExploreClass=function(){
       this.console.div.innerHTML = '';
       this.main.appendChild(this.console.div);
       this.ResizeLayout();
+      $.fn.disableSelection = function() {
+          return this
+                   .attr('unselectable', 'on')
+                   .css('user-select', 'none')
+                   .on('selectstart', false);
+      };
    };
 
    this.setMPath=function(){
@@ -802,23 +808,101 @@ console.log("start applet with param stack=",appletname,paramstack);
       )
    };
 
+   this.createItemSelectors=function(out,selectedNodes){
+      var app=this;
+      for(n=0;n<selectedNodes.length;n++){
+         var nodeobj=app.node.get(selectedNodes[n]);
+         var dataid=app.toObjKey(nodeobj.dataobj,nodeobj.dataobjid);
+         console.log("select "+n+"=",nodeobj,dataid);
+
+         $(out).append($("<div style='margin:2px;padding:2px;"+
+                         "background-color:#ededed;"+
+                         "border-color:gray;border-style:solid;"+
+                         "border-width:1px;cursor:pointer' "+
+                         "data-id='"+dataid+"' class=centerItem>"+
+                         nodeobj.label+"<div>"));
+      }
+      $(out).find(".centerItem").click(function(e){
+         var id=$(this).attr("data-id");
+         var nodeobj=app.node.get(id);
+         var oldScale=app.network.getScale();
+         if (oldScale<=0.9){
+            var scaleOption = { scale : 0.9 };
+            app.network.moveTo(scaleOption);
+         }
+         app.network.focus(id,{
+            animation: {
+                   duration: 200,
+                   easingFunction: 'linear'
+            }
+         });
+         console.log("click on nodeobj",nodeobj);
+      });
+   };
+   this.findItem=function(v){
+       var app=this;
+       var showit=0;
+       var matchedNodes=new Array();
+
+       if (v.length>1){
+          app.node.forEach(function(e){
+             if (e.label.toLowerCase().indexOf(v.toLowerCase())>=0){
+                matchedNodes.push(e.id);
+             }
+          });
+          if (matchedNodes.length>0 && matchedNodes.length<20){
+             showit=1;
+          }
+       }
+       if (showit){
+          $("#foundItems").show();
+          $("#foundItems").html("");
+          var out=$("#foundItems")[0];
+         
+          app.createItemSelectors(out,matchedNodes);
+       }
+       else{
+          $("#foundItems").hide();
+       }
+   };
+
    this.globalFunctions=function(){
+       var app=this;
        var gdiv=document.createElement('div');
-       var finder=$("<table border=0 width=100%><tr><td valign=middle><input id=findItem style='width:100%' type=text></td><td width=1%><div style='margin:3px;cursor:pointer' id=findItemButton class='cssicon find'></td></tr></table>");
+       var finder=$("<table border=0 width=100%>"+
+                    "<tr><td valign=middle>"+
+                    "<input id=findItem style='width:100%' type=text></td>"+
+                    "<td width=1%>"+
+                    "<div style='margin:3px;cursor:pointer' "+
+                    "title='find item in current szenario' "+
+                    "id=findItemButton class='cssicon find'>"+
+                    "</td></tr></table>");
        $(finder).find("#findItemButton").click(function(e){
           alert("i do my best to find "+$("#findItem").val());
        });
-       $(gdiv).append($("<p>Global Functions:</p>"));
+
+       $(finder).find("#findItem").on("keyup",function(){
+          var v=$("#findItem").val();
+          if (v!=""){
+             app.findItem(v);
+          }
+       });
+       $(finder).find("#findItem").change(function(){
+          var v=$(this).val();
+          app.findItem(v);
+       });
+
        $(gdiv).append(finder);
+       $(gdiv).append("<div style='position:relative;width:98%;margin:2px'><div id=foundItems style='z-index:1000;height:200px;top:0px;overflow:auto;position:absolute;background-color:#fefefe;border-color:black;border-style:solid;border-width:1px;width:inherit;display:none'></div></div>");
        $(gdiv).append($("<hr<br>"));
        return(gdiv) 
    }
    this.showDefaultDBRec=function(){
-      var out="<p>Add Object:<br><select><option>A</option><option>B</option></select><input type=text><br>xxxxhier könnte z.B. eine Suchmaske für das hinzufügen "+
-              "von beliebigen Items stehen</p>";
+      //var out="<p>Add Object:<br><select><option>A</option><option>B</option></select><input type=text><br>xxxxhier könnte z.B. eine Suchmaske für das hinzufügen "+
+      //        "von beliebigen Items stehen</p>";
       $(dbrec).html(""); 
       $(dbrec).append($(this.globalFunctions())); 
-      $(dbrec).append($(out)); 
+      //$(dbrec).append($(out)); 
    };
 
    this.resetItemSelection=function(){
@@ -880,17 +964,10 @@ console.log("start applet with param stack=",appletname,paramstack);
              var out=document.createElement('div');
              var methods=Object();
              var selectedNodes=params.nodes;
+             app.createItemSelectors(out,selectedNodes);
              for(n=0;n<selectedNodes.length;n++){
                 var nodeobj=app.node.get(selectedNodes[n]);
                 var dataid=app.toObjKey(nodeobj.dataobj,nodeobj.dataobjid);
-                console.log("select "+n+"=",nodeobj,dataid);
-
-                $(out).append($("<div style='margin:2px;padding:2px;"+
-                                "background-color:#ededed;"+
-                                "border-color:gray;border-style:solid;"+
-                                "border-width:1px;cursor:pointer' "+
-                                "data-id='"+dataid+"' class=centerItem>"+
-                                nodeobj.label+"<div>"));
                 for (var m in nodeobj.nodeMethods){
                    var isPosible=true;
                    if (nodeobj.nodeMethods[m].isPosible){
@@ -912,17 +989,6 @@ console.log("start applet with param stack=",appletname,paramstack);
                    }
                 }
              }
-             $(out).find(".centerItem").click(function(e){
-                var id=$(this).attr("data-id");
-                var nodeobj=app.node.get(id);
-                app.network.focus(id,{
-                   animation: {
-                          duration: 1000,
-                          easingFunction: 'linear'
-                   }
-                });
-                console.log("click on nodeobj",nodeobj);
-             });
              $(out).append($("<hr>"));
 
              var mdiv=document.createElement('ul');
