@@ -503,8 +503,9 @@ sub Validate
          if ($newrec->{answer} ne ""){
             my @selectlist=$i->getPosibleSelectValues($irec->{addquestdata});
             $answervalid=0;
-            while(my $k=shift(@selectlist)){
-               if (my $v=shift(@selectlist)){
+            my ($k,$v);
+            while(defined($k=shift(@selectlist))){
+               if (defined($v=shift(@selectlist))){
                   if ($k eq $newrec->{answer}){
                      $answervalid=1;
                   }
