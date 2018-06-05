@@ -87,6 +87,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
+                explore       =>100,
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0 AND <7"},
                 vjointo       =>'base::cistatus',
@@ -100,6 +101,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'systemid',
+                explore       =>200,
                 label         =>'SystemID',
                 readonly     =>sub{
                    my $self=shift;
@@ -317,6 +319,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'asset',
                 group         =>'physys',
+                explore       =>500,
                 label         =>'Asset-Name',
                 AllowEmpty    =>1,
                 htmldetail    =>0,

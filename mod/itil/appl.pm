@@ -71,6 +71,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
+                explore       =>200,
                 htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0 AND <7"},
@@ -102,6 +103,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'conumber',
+                explore       =>500,
                 htmleditwidth =>'150px',
                 htmlwidth     =>'100px',
                 label         =>'Costcenter',
@@ -153,6 +155,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'applid',
+                explore       =>150,
                 htmlwidth     =>'100px',
                 htmleditwidth =>'150px',
                 readonly     =>sub{

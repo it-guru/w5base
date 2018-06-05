@@ -19,7 +19,7 @@
                    // detect all objects need to be preloaded
                    var cnt=data.length;
                    for(c=0;c<cnt;c++){
-                      app.addNode("itil::appl",data[c].id,data[c].name);
+                      app.addNode(dataobj,data[c].id,data[c].name);
                       for(s=0;s<data[c].systems.length;s++){
                          app.addNode("itil::system",
                                      data[c].systems[s].systemid,

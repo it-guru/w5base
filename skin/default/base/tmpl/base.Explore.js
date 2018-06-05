@@ -327,6 +327,30 @@ div#SearchResult{
 }
 </style>
 
+<style>
+#HtmlExploreDetail{
+   margin:2px;
+   font-family: "Segoe UI",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
+   border-style:solid;
+   border-width:1px;
+   border-color:black;
+   margin-top:0px;
+   border-top-width:0px;
+   padding-top-width:0px;
+}
+.ExploreOutput .Record {
+   margin:2px;
+   margin-top:0px;
+}
+.ExploreOutput .Record .FieldLabel{
+   background-color:#efefef;
+   font-weight:700;
+}
+.ExploreOutput .Record .FieldValue{
+   background-color:#cfcfcf;
+}
+
+</style>
 
 
 
@@ -815,7 +839,7 @@ console.log("start applet with param stack=",appletname,paramstack);
          var dataid=app.toObjKey(nodeobj.dataobj,nodeobj.dataobjid);
          console.log("select "+n+"=",nodeobj,dataid);
 
-         $(out).append($("<div style='margin:2px;padding:2px;"+
+         $(out).append($("<div style='margin:2px;padding:2px;margin-bottom:0;padding-bottom:0px;"+
                          "background-color:#ededed;"+
                          "border-color:gray;border-style:solid;"+
                          "border-width:1px;cursor:pointer' "+
@@ -989,6 +1013,18 @@ console.log("start applet with param stack=",appletname,paramstack);
                    }
                 }
              }
+             var path="";
+             if (selectedNodes.length==1){
+                var nodeobj=app.node.get(selectedNodes[0]);
+                var dataobj=nodeobj.dataobj;
+                var dataobjid=nodeobj.dataobjid;
+                var dataobjpath=dataobj.replace('::','/');
+                path="../../"+dataobjpath+"/Result?";
+                path=path+"FormatAs=HtmlExplore&";
+                path=path+"search_"+nodeobj.fieldnameid+"="+dataobjid;
+                
+                $(out).append($("<div id=HtmlExploreDetail style='display:none'></div>"));
+             }
              $(out).append($("<hr>"));
 
              var mdiv=document.createElement('ul');
@@ -1024,6 +1060,17 @@ console.log("start applet with param stack=",appletname,paramstack);
              $(dbrec).append($(app.globalFunctions())); 
              $(dbrec).append($(out)); 
              $(dbrec).append(mdiv); 
+             if (selectedNodes.length==1){
+                $.ajax({
+                   type:'GET',
+                   url:path,
+                   beforeSend:function(){
+                   },
+                   success:function(data){
+                      $("#HtmlExploreDetail").hide().html(data).fadeIn('slow');
+                   }
+                });
+             }
           }
           else{
              app.showDefaultDBRec();
