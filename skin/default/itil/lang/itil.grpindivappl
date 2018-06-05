@@ -1,2 +1,3 @@
-'itil::grpindivappl'=>{de=>'individual Feldinhalt - Anwendung',en=>'individual field value - application'},
+'itil::grpindivappl'=>{de=>'individual Attribut-Inhalt - Anwendung',en=>'individual attribute value - application'},
+'Application'=>{de=>'Anwendung'},
 

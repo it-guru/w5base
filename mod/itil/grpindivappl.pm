@@ -32,9 +32,11 @@ sub new
    $self->{grpindivLinkSQLIdField}='appl.id';
    $self->AddStandardFields();
    $self->AddFields(
-      new kernel::Field::Text(
+      new kernel::Field::TextDrop(
                 name          =>'dataobjname',
                 label         =>'Application',
+                weblinkto     =>'itil::appl',
+                weblinkon     =>['dataobjid'=>'id'],
                 readonly      =>1,
                 dataobjattr   =>'appl.name'),
    );

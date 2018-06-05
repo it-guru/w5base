@@ -1,3 +1,3 @@
-'Fieldname'=>{de=>'Feldbezeichnung'},
-'Fieldvalue'=>{de=>'Feldinhalt'},
-'individual Field value - W5BaseID'=>{de=>'individual Feld Inhalt W5BaseID'},
+'attribute'=>{de=>'Attribut'},
+'value'=>{de=>'Inhalt'},
+'individual attribut value - W5BaseID'=>{de=>'individual Attribut Inhalt W5BaseID'},

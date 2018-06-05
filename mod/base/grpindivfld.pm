@@ -39,7 +39,7 @@ sub new
                                   
       new kernel::Field::Select(
                 name          =>'dataobj',
-                label         =>'link field to Data-Object',
+                label         =>'link attribut to Data-Object',
                 size          =>'20',
                 readonly      =>sub{
                    my $self=shift;
@@ -60,7 +60,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Field label',
+                label         =>'Attribut label',
                 dataobjattr   =>'grpindivfld.name'),
 
       new kernel::Field::Group(

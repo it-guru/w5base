@@ -43,7 +43,7 @@ sub AddStandardFields
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'indiv Field value - W5BaseID',
+                label         =>'indiv attribute value - W5BaseID',
                 size          =>'10',
                 group         =>'source',
                 wrdataobjattr =>"id",
@@ -66,7 +66,7 @@ sub AddStandardFields
                                   
       new kernel::Field::Link(
                 name          =>'fieldidatvaluerec',
-                label         =>'indiv Field - value id',
+                label         =>'indiv attribute - value id',
                 readonly      =>1,
                 size          =>'10',
                 dataobjattr   =>$worktable.'.grpindivfld'),
@@ -77,9 +77,11 @@ sub AddStandardFields
                 size          =>'10',
                 dataobjattr   =>'grpindivfld.id'),
                                   
-      new kernel::Field::Text(
+      new kernel::Field::TextDrop(
                 name          =>'fieldname',
-                label         =>'Fieldname',
+                label         =>'attribute',
+                weblinkto     =>'base::grpindivfld',
+                weblinkon     =>['indivfieldid'=>'id'],
                 readonly      =>1,
                 size          =>'10',
                 dataobjattr   =>'grpindivfld.name'),
@@ -94,7 +96,7 @@ sub AddStandardFields
 
       new kernel::Field::Link(
                 name          =>'srcdataobjid',
-                label         =>'Fieldvalue DataObjID',
+                label         =>'attribute value DataObjID',
                 readonly      =>1,
                 size          =>'10',
                 dataobjattr   =>$self->{grpindivLinkSQLIdField}),
@@ -108,7 +110,7 @@ sub AddStandardFields
                                   
       new kernel::Field::Text(
                 name          =>'indivfieldvalue',
-                label         =>'Fieldvalue',
+                label         =>'value',
                 size          =>'20',
                 dataobjattr   =>$worktable.'.fldval'),
 
@@ -211,11 +213,9 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-print STDERR Dumper($rec);
    return("default") if (!defined($rec));
 
    my $grpid=$rec->{grpidview};
-   printf STDERR ("fifi check grpid=$grpid\n");
    if ($self->IsMemberOf($grpid,["RMember","RBoss","RBoss2"],"up")){
       return("default");
    }
