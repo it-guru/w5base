@@ -949,6 +949,11 @@ console.log("start applet with param stack=",appletname,paramstack);
           },
           smooth: true
         },
+        physics:{
+           barnesHut: {
+             avoidOverlap: 1
+           }
+        },
         interaction: { 
           multiselect: true
         },

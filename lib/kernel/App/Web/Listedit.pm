@@ -414,7 +414,9 @@ sub jsExplore
                 var flt=new Object();
                 flt[that.fieldnameid]=that.dataobjid;
                 w5obj.SetFilter(flt);
+console.log("Refresh:=",flt,that.dataobj,that.fieldnamelabel);
                 w5obj.findRecord(that.fieldnamelabel,function(data){
+console.log("Refresh:=found",data);
                    var newlabel=data[0][that.fieldnamelabel];
                    newlabel=that.formatLabel(newlabel);
                    if (data[0]){

@@ -45,10 +45,9 @@ sub new
                 label         =>'W5BaseID',
                 dataobjattr   =>'ipaddress.id'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'fullname',
                 depend        =>['name'],
-                uivisible     =>0,
                 label         =>'IP-Address',
                 searchable    =>0,
                 onRawValue    =>sub{   # compress IPV6 Adresses
@@ -75,6 +74,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'60%',
+                explore       =>100,
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0 AND <7"},
                 vjointo       =>'base::cistatus',
@@ -84,6 +84,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'system',
                 htmlwidth     =>'150px',
+                explore       =>500,
                 group         =>'relatedto',
                 label         =>'assigned to System',
                 uivisible     =>sub{
@@ -132,6 +133,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'itclustsvc',
                 htmlwidth     =>'150px',
+                explore       =>600,
                 group         =>'relatedto',
                 label         =>'assigned to Cluster Service',
                 uivisible     =>sub{

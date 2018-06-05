@@ -100,9 +100,11 @@ sub ProcessLine
       my $label=$fld->Label();
       my $val=$fld->FormatedDetail($rec,"HtmlExplore");
       my $raw=$fld->RawValue($rec);
-      $d.="<div class=FieldLabel>".$label."</div>\n";
-      $d.="<div class=FieldValue data-id='$fldname' data-raw='$raw'>".
-           $val."</div>\n";
+      if ($val ne "" || $raw ne ""){
+         $d.="<div class=FieldLabel>".$label."</div>\n";
+         $d.="<div class=FieldValue data-id='$fldname' data-raw='$raw'>".
+              $val."</div>\n";
+      }
    }
    $d.="</div>\n\n";
 

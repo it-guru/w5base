@@ -1623,6 +1623,38 @@ sub jsExploreObjectMethods
           });
        }
    ";
+   my $label=$self->T("add IP-Addresses");
+   $methods->{'m500addSystemIPAddr'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call m500addSystemIPAddr on \",this);
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          var app=this.app;
+          app.Config().then(function(cfg){
+             var w5obj=getModuleObject(cfg,dataobj);
+             w5obj.SetFilter({
+                id:dataobjid
+             });
+             w5obj.findRecord(\"id,ipaddresses\",function(data){
+                for(recno=0;recno<data.length;recno++){
+                   for(ifno=0;ifno<data[recno].ipaddresses.length;ifno++){
+                      var iprec=data[recno].ipaddresses[ifno];
+                      app.addNode('itil::ipaddress',iprec.id,iprec.name);
+                      app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                  app.toObjKey('itil::ipaddress',iprec.id),
+                                  {noAcross:true});
+                   }
+                }
+                app.processOpStack(function(arrayOfResults){
+                   console.log(\"OK, all IPs loaded arrayOfResults=\",arrayOfResults);
+                });
+
+             });
+          });
+       }
+   ";
 
 }
 
