@@ -24,9 +24,9 @@ sub amInitializeOraSession
    my $self=shift;
 
    if (defined($self->{DB})){
+      $self->{DB}->do("alter session set optimizer_features_enable='11.2.0.1'");
       $self->{DB}->do("alter session set optimizer_max_permutations=100");
       $self->{DB}->do("alter session set cursor_sharing=force");
-      $self->{DB}->do("alter session set optimizer_features_enable='11.2.0.1'");
    }
 }
 
