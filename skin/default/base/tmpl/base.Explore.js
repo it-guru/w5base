@@ -25,6 +25,28 @@ body{
  border-width:2px;
 }
 
+.cssswitches{
+   padding:2px;
+   padding-bottom:0;
+}
+
+.cssswitch{
+   margin:2px;
+   cursor:pointer;
+   border: 1px solid white;
+   border-bottom: 3px solid white;
+}
+
+.on{
+   border-bottom: 3px solid blue;
+}
+
+.cssswitch:hover{
+   border-left: 1px solid gray;
+   border-right: 1px solid gray;
+   border-top: 1px solid gray;
+}
+
 #mpath{
  border-width:0px;
  margin:0px;
@@ -85,7 +107,7 @@ body{
  border-width:0px;
  margin:0px;
  padding:0px;
- height:55px;
+ height:0px;
  overflow:hidden;
  overflow-y:auto;
  font-family: monospace;
@@ -282,7 +304,8 @@ div#SearchResult{
    margin-top:0px;
    border-top-width:0px;
    padding-top-width:0px;
-   overflow:auto;
+   overflow-x:hidden;
+   overflow-y:scroll;
 }
 .ExploreOutput .Record {
    margin:2px;
@@ -313,6 +336,8 @@ div#SearchResult{
 <script language="JavaScript" src="../../../public/base/load/datadumper.js">
 </script>
 <script language="JavaScript" src="../../../public/base/load/vis.min.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/jquery.ellipsis.js">
 </script>
 
 <script langauge="JavaScript">
@@ -733,15 +758,28 @@ console.log("start applet with param stack=",appletname,paramstack);
       );
    };
 
+   function displayTime() {
+       var str = "";
+
+       var currentTime = new Date()
+       var hours = currentTime.getHours()
+       var minutes = currentTime.getMinutes()
+       var seconds = currentTime.getSeconds()
+
+       if (minutes < 10) {
+           minutes = "0" + minutes
+       }
+       if (seconds < 10) {
+           seconds = "0" + seconds
+       }
+       str += hours + ":" + minutes + ":" + seconds + " ";
+       return str;
+   }
+
 
    this.console.log=function(level,text){
       var currentdate = new Date(); 
-      var datetime =  currentdate.getDate() + "/"
-                      + (currentdate.getMonth()+1)  + "." 
-                      + currentdate.getFullYear() + " "  
-                      + currentdate.getHours() + ":"  
-                      + currentdate.getMinutes() + ":" 
-                      + currentdate.getSeconds();
+      var datetime =  displayTime();
       if (this.div){
          var curConsVal=this.div.innerHTML.split("\n");
          var maxcons=10;
@@ -785,10 +823,23 @@ console.log("start applet with param stack=",appletname,paramstack);
       for(n=0;n<selectedNodes.length;n++){
          var nodeobj=app.node.get(selectedNodes[n]);
          var dataid=app.toObjKey(nodeobj.dataobj,nodeobj.dataobjid);
-         $(out).append($("<div data-id='"+dataid+"' id='sel_"+dataid+"' "+
-                         "class='SelectedItem centerItem'>"+
-                         nodeobj.label+"<div>"));
+         var lnk="";
+         if (nodeobj.urlofcurrentrec){
+            lnk="<div data-id='"+nodeobj.urlofcurrentrec+"' style='float:right;cursor:pointer' "+
+                "class='cssicon arrow_right openItem'></div>";
+         }
+
+
+
+
+         $(out).append($("<div id='sel_"+dataid+"' "+
+                         "class='SelectedItem'>"+lnk+
+                         "<span data-id='"+dataid+"' style='cursor:pointer' class='centerItem'>"+nodeobj.label+"</span></div><div style='clear:both'></div>"));
       }
+      $(out).find(".openItem").click(function(e){
+         var url=$(this).attr("data-id");
+         custopenwin(url,"f800");
+      });
       $(out).find(".centerItem").click(function(e){
          var id=$(this).attr("data-id");
          var nodeobj=app.node.get(id);
@@ -835,16 +886,43 @@ console.log("start applet with param stack=",appletname,paramstack);
        }
    };
 
+
    this.globalFunctions=function(){
        var app=this;
        var gdiv=document.createElement('div');
+
+       var switches=$("<div class='cssswitches'></div>");
+
+       $(switches).append("<div class='cssicon cssswitch application_key' "+
+                          "id='ControlSwitchDebugConsole' "+
+                          "title='Switch debug console'></div>");
+
+       $(switches).find(".cssswitch").click(function(){
+          console.log("click on ",this);
+          var id=$(this).attr("id");
+          if (id=="ControlSwitchDebugConsole"){
+             if (app.console.div){
+                if ($(this).hasClass("on")){
+                   $(app.console.div).height(0);
+                }
+                else{
+                   $(app.console.div).height(60);
+                }
+                app.ResizeLayout();
+             }
+          }
+          $(this).toggleClass('on');
+       });
+
+
+
        var finder=$("<table border=0 width=100%>"+
                     "<tr><td valign=middle>"+
                     "<input id=findItem style='width:100%' type=text></td>"+
                     "<td width=1%>"+
                     "<div style='margin:3px;cursor:pointer' "+
                     "title='find item in current szenario' "+
-                    "id=findItemButton class='cssicon find'>"+
+                    "id=findItemButton class='cssicon find'></div>"+
                     "</td></tr></table>");
        $(finder).find("#findItemButton").click(function(e){
           alert("i do my best to find "+$("#findItem").val());
@@ -861,6 +939,7 @@ console.log("start applet with param stack=",appletname,paramstack);
        //   app.findItem(v);
        //});
 
+       $(gdiv).append(switches);
        $(gdiv).append(finder);
        $(gdiv).append("<div style='position:relative;width:98%;margin:2px'><div id=foundItems style='z-index:1000;height:200px;top:0px;overflow:auto;position:absolute;background-color:#fefefe;border-color:black;border-style:solid;border-width:1px;width:inherit;display:none'></div></div>");
        $(gdiv).append($("<hr<br>"));
@@ -968,6 +1047,8 @@ console.log("start applet with param stack=",appletname,paramstack);
                 var nodeobj=app.node.get(selectedNodes[0]);
                 var dataobj=nodeobj.dataobj;
                 var dataobjid=nodeobj.dataobjid;
+                app.console.log("INFO","load HtmlExplore for "+dataobj+
+                                " id="+dataobjid);
                 var dataobjpath=dataobj.replace('::','/');
                 path="../../"+dataobjpath+"/Result?";
                 path=path+"FormatAs=HtmlExplore&";
@@ -1017,7 +1098,9 @@ console.log("start applet with param stack=",appletname,paramstack);
                    beforeSend:function(){
                    },
                    success:function(data){
+                     var maxw=$(app.dbrec).width();
                      $('#HtmlExploreDetail').height("auto").html(data);
+                     //$('#HtmlExploreDetail').find(".FieldValue").ellipsis();
                      var h=$('#HtmlExploreDetail').height();
                      var maxh=$(app.dbrec).height();
                      if (h>maxh/2){
@@ -1027,6 +1110,7 @@ console.log("start applet with param stack=",appletname,paramstack);
                      $('#HtmlExploreDetail').show();
                      $('#HtmlExploreDetail').animate({height: h}, 400);
                      //$("#HtmlExploreDetail").hide().html(data).fadeIn('slow');
+                     app.console.log("INFO","got HtmlExplore");
                    }
                 });
              }

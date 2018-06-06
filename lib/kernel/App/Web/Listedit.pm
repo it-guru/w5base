@@ -414,12 +414,16 @@ sub jsExplore
                 var flt=new Object();
                 flt[that.fieldnameid]=that.dataobjid;
                 w5obj.SetFilter(flt);
-console.log("Refresh:=",flt,that.dataobj,that.fieldnamelabel);
-                w5obj.findRecord(that.fieldnamelabel,function(data){
-console.log("Refresh:=found",data);
+                w5obj.findRecord(that.fieldnamelabel+
+                                 ",urlofcurrentrec",function(data){
                    var newlabel=data[0][that.fieldnamelabel];
                    newlabel=that.formatLabel(newlabel);
                    if (data[0]){
+                      if (data[0]["urlofcurrentrec"]){
+                         that.update({
+                            urlofcurrentrec:data[0]["urlofcurrentrec"]
+                         });
+                      }
                       that.update({label:newlabel});
                       ok(1);
                    }
