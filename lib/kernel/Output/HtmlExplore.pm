@@ -111,6 +111,7 @@ sub ProcessLine
 
 
    $self->Context->{LINE}+=1;
+   utf8::encode($d);
    return($d);
 }
 

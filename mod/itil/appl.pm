@@ -330,6 +330,7 @@ sub new
 
       new kernel::Field::Group(
                 name          =>'businessteam',
+                explore       =>'200',
                 group         =>'technical',
                 label         =>'Business Team',
                 vjoinon       =>'businessteamid'),
@@ -372,6 +373,7 @@ sub new
                 name          =>'tsm',
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
+                explore       =>'200',
                 group         =>'technical',
                 label         =>'Technical Solution Manager',
                 vjoinon       =>'tsmid'),
@@ -381,6 +383,7 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 group         =>'opmgmt',
+                explore       =>'200',
                 AllowEmpty    =>1,
                 label         =>'Operation Manager',
                 vjoinon       =>'opmid'),
