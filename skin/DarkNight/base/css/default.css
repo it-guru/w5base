@@ -3,9 +3,29 @@ body{
     background: black;
     color:white;
 }
-#TitleBar{
+.TitleBar{
    background-color:gray;
+   color: black;
 }
+
+a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
+   color: black;
+}
+
+
+
+.TitleBar-arrows li:before {
+  border-color: transparent transparent transparent gray;
+}
+
+.TitleBar-arrows a {
+  color: black;
+}
+.TitleBar-arrows a:hover {
+  color: silver;
+}
+
+
 
 a:link, a:visited, a:active, div.sublink,span.sublink  {
             color:#ededed;

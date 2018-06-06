@@ -192,7 +192,7 @@ iframe.popupFrame {
 }
 
 .TitleBar {
-	background-color: transparent;
+   background-color:#30579f;
 	color: #ffffff;
 	font-weight: bold;
 	height: 19px;
@@ -210,7 +210,6 @@ iframe.popupFrame {
 	border-top: 1px solid #30579f;
 	border-left: 1px solid #30579f;
 	border-right: 1px solid #30579f;
-   background-color:#30579f;
 }
 a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
 	background-color: transparent;
@@ -233,6 +232,7 @@ a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
 	cursor: pointer;
 	cursor: hand;
 }
+
 
 a:link.sublink, a:visited.sublink, a:active.sublink,
 div.sublink,span.sublink  {
@@ -304,3 +304,66 @@ word-wrap: break-word; /* Internet Explorer 5.5+ */
 div.TabSelectorModeSelect{
    overflow:hidden; /* Für IE notwendig */
 }
+
+.TitleBar-arrows li {
+  display: inline-block;
+  line-height: 22px;
+  position: relative;
+  margin:0;
+  padding:0;
+  padding-left:10px;
+  font-size:15px;
+}
+.TitleBar-arrows li:before {
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  left: -1px;
+  border-style: solid;
+  border-width: 11px 0 11px 8px;
+  border-color: transparent transparent transparent #30579f;
+  z-index: 100;
+}
+.TitleBar-arrows a:after {
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  left: 0px;
+  border-style: solid;
+  border-width: 11px 0 11px 8px;
+  border-color: transparent transparent transparent white;
+  z-index: 10;
+}
+.TitleBar-arrows .active a {
+  font-weight: bold;
+}
+.TitleBar-arrows a {
+  display: block;
+  xbackground: #ccc;
+  padding: 0 10px;
+  cursor:pointer;
+  text-decoration: none;
+  color: white;
+}
+.TitleBar-arrows a:hover {
+  xfont-weight: bold;
+  color: silver;
+}
+
+.SelectedItem {
+   margin:2px;
+   padding:2px;
+   margin-bottom:0;
+   padding-bottom:0px;
+   background-color:#415d91;
+   color:#ffffff;
+   border-color:gray;border-style:solid;
+   border-width:1px;
+   cursor:pointer;
+   user-select:none;
+}
+
+
+

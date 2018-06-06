@@ -26,18 +26,16 @@ body{
 }
 
 #mpath{
- border-style:solid;
- xborder-color:blue;
- border-width:1px;
+ border-width:0px;
  margin:0px;
  padding:0px;
  vertical-align:middle;
- height:26px;
+ height:22px;
 }
 
 #mpathfirst{
  width:20px;
- line-height:25px;
+ line-height:22px;
  xbackground-color:gray;
  text-align:center;
  float:left;
@@ -48,9 +46,9 @@ body{
 }
 
 #workspace{
- border-style:solid;
- border-color:green;
- border-width:1px;
+ xborder-style:solid;
+ xborder-color:green;
+ xborder-width:1px;
  margin:0px;
  padding:0px;
  overflow:auto;
@@ -59,9 +57,9 @@ body{
 }
 
 #netmap{
- border-style:solid;
- border-color:black;
- border-width:1px;
+ xborder-style:solid;
+ xborder-color:black;
+ xborder-width:1px;
  margin:0px;
  padding:0px;
  float:left;
@@ -69,9 +67,13 @@ body{
 }
 
 #dbrec{
- border-style:solid;
- border-color:red;
- border-width:1px;
+ xborder-style:solid;
+ xborder-color:red;
+ xborder-width:1px;
+ border-left-style:solid;
+ border-left-color:black;
+ border-left-width:2px;
+
  margin:0px;
  padding:0px;
  width:220px;
@@ -254,63 +256,6 @@ div#SearchResult{
 
 
 
-<!-- Top Application Path  Handling -->
-<style>
-.breadcrumb-arrows li {
-  display: inline-block;
-  line-height: 26px;
-  position: relative;
-  margin:0;
-  padding:0;
-  padding-left:10px;
-  font-size:15px;
-}
-.breadcrumb-arrows li:before {
-  content: " ";
-  height: 0;
-  width: 0;
-  position: absolute;
-  left: -1px;
-  border-style: solid;
-  border-width: 13px 0 13px 8px;
-  border-color: transparent transparent transparent #F3F3F3;
-  z-index: 100;
-}
-//.breadcrumb-arrows li:last-child:before {
-//  border-color: transparent;
-//}
-.breadcrumb-arrows a:after {
-  content: " ";
-  height: 0;
-  width: 0;
-  position: absolute;
-  left: 0px;
-  border-style: solid;
-  border-width: 13px 0 13px 8px;
-  xborder-color: transparent transparent transparent #cfc;
-  border-color: transparent transparent transparent black;
-  z-index: 10;
-}
-.breadcrumb-arrows .active a {
-  font-weight: bold;
-}
-.breadcrumb-arrows a {
-  display: block;
-  xbackground: #ccc;
-  padding: 0 10px;
-  cursor:pointer;
-  text-decoration: none;
-  color: black;
-}
-.breadcrumb-arrows a:hover {
-  xfont-weight: bold;
-  color: darkblue;
-}
-
-
-
-</style>
-
 
 <style>
 .nodeMethodCall{
@@ -337,6 +282,7 @@ div#SearchResult{
    margin-top:0px;
    border-top-width:0px;
    padding-top-width:0px;
+   overflow:auto;
 }
 .ExploreOutput .Record {
    margin:2px;
@@ -515,6 +461,7 @@ var W5ExploreClass=function(){
 
       this.mpathline = document.createElement('div');
       this.mpathline.id = 'mpath';
+      $(this.mpathline).addClass("TitleBar");
 
       var mfirst = document.createElement('div');
       mfirst.id='mpathfirst';
@@ -531,7 +478,7 @@ var W5ExploreClass=function(){
       this.mpathline.appendChild(mfirst);
 
       this.mpath = document.createElement('ul');
-      $(this.mpath).addClass("breadcrumb-arrows");
+      $(this.mpath).addClass("TitleBar-arrows");
       this.mpathline.appendChild(this.mpath);
       this.main.appendChild(this.mpathline);
 
@@ -577,7 +524,7 @@ var W5ExploreClass=function(){
 
       this.mpath.innerHTML = '';
       var m = document.createElement('li');
-      m.innerHTML="<a href='"+url+"'>Explore</a>";
+      m.innerHTML="<a href='"+url+"' class=TitleBarLink>Explore</a>";
       $(m).find("a").click(function(e){
          app.MainMenu(); 
          e.preventDefault();
@@ -591,7 +538,8 @@ var W5ExploreClass=function(){
             url+="/";
             url+=arguments[mi].mtag;
             var m = document.createElement('li');
-            m.innerHTML="<a href='"+url+"'>"+arguments[mi].label+"</a>";
+            m.innerHTML="<a href='"+url+"' class=TitleBarLink>"+
+                        arguments[mi].label+"</a>";
             if (mi==0){
                appletname=arguments[mi].mtag;
                $(m).find("a").click(function(e){
@@ -837,13 +785,8 @@ console.log("start applet with param stack=",appletname,paramstack);
       for(n=0;n<selectedNodes.length;n++){
          var nodeobj=app.node.get(selectedNodes[n]);
          var dataid=app.toObjKey(nodeobj.dataobj,nodeobj.dataobjid);
-         console.log("select "+n+"=",nodeobj,dataid);
-
-         $(out).append($("<div style='margin:2px;padding:2px;margin-bottom:0;padding-bottom:0px;"+
-                         "background-color:#ededed;"+
-                         "border-color:gray;border-style:solid;"+
-                         "border-width:1px;cursor:pointer' "+
-                         "data-id='"+dataid+"' class=centerItem>"+
+         $(out).append($("<div data-id='"+dataid+"' id='sel_"+dataid+"' "+
+                         "class='SelectedItem centerItem'>"+
                          nodeobj.label+"<div>"));
       }
       $(out).find(".centerItem").click(function(e){
@@ -860,6 +803,8 @@ console.log("start applet with param stack=",appletname,paramstack);
                    easingFunction: 'linear'
             }
          });
+         $("#foundItems").hide();
+         $("#findItem").val("");
          console.log("click on nodeobj",nodeobj);
       });
    };
@@ -911,10 +856,10 @@ console.log("start applet with param stack=",appletname,paramstack);
              app.findItem(v);
           }
        });
-       $(finder).find("#findItem").change(function(){
-          var v=$(this).val();
-          app.findItem(v);
-       });
+       //$(finder).find("#findItem").change(function(){
+       //   var v=$(this).val();
+       //   app.findItem(v);
+       //});
 
        $(gdiv).append(finder);
        $(gdiv).append("<div style='position:relative;width:98%;margin:2px'><div id=foundItems style='z-index:1000;height:200px;top:0px;overflow:auto;position:absolute;background-color:#fefefe;border-color:black;border-style:solid;border-width:1px;width:inherit;display:none'></div></div>");
@@ -1072,7 +1017,16 @@ console.log("start applet with param stack=",appletname,paramstack);
                    beforeSend:function(){
                    },
                    success:function(data){
-                      $("#HtmlExploreDetail").hide().html(data).fadeIn('slow');
+                     $('#HtmlExploreDetail').height("auto").html(data);
+                     var h=$('#HtmlExploreDetail').height();
+                     var maxh=$(app.dbrec).height();
+                     if (h>maxh/2){
+                        h=maxh/2;
+                     }
+                     $('#HtmlExploreDetail').height(0);
+                     $('#HtmlExploreDetail').show();
+                     $('#HtmlExploreDetail').animate({height: h}, 400);
+                     //$("#HtmlExploreDetail").hide().html(data).fadeIn('slow');
                    }
                 });
              }
