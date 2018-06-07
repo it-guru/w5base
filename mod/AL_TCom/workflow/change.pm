@@ -362,7 +362,7 @@ sub Process
          Query->Param("WorkflowStep"=>\@WorkflowStep);
       }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }  
    
 

@@ -73,6 +73,17 @@ sub getPosibleActions
    return();
 }
 
+
+sub getWorkflowMailName
+{
+   my $self=shift;
+
+   my $workflowname=$self->getParent->T($self->Self(),$self->Self());
+   return($workflowname);
+}
+
+
+
 sub handleDependenceChange
 {
    my $self=shift;

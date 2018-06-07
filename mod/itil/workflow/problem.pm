@@ -161,7 +161,7 @@ sub Process
    my $WfRec=shift;
    my $actions=shift;
 
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 

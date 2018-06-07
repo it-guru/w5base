@@ -2060,7 +2060,7 @@ sub Process
      #    return(0);
      # }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -2148,7 +2148,7 @@ sub Process
  #        return(0);
  #     }
  #  }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -2247,7 +2247,7 @@ sub Process
       }
 
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -2323,7 +2323,7 @@ sub Process
          return(0);
       }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -2404,7 +2404,7 @@ sub Process
          return(0);
       }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -2488,7 +2488,7 @@ sub Process
          return(0);
       }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -2570,7 +2570,7 @@ sub Process
          Query->Param("Formated_affectedlocationcomp"=>'EVloccomp.other');
       }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -3024,7 +3024,7 @@ sub Process
       }
       return(0);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -3101,7 +3101,7 @@ sub Process
       return($self->nativProcess($action,$h,$self->getNextStep(),
                                  $WfRec,$actions));
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -3263,7 +3263,7 @@ sub Process
       Query->Param("WorkflowStep"=>\@WorkflowStep);
       return(0);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -3489,7 +3489,7 @@ sub Process
       }
       return(undef);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 sub getWorkHeight
@@ -3821,7 +3821,7 @@ sub Process
       }
       return(1);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 sub getWorkHeight
@@ -3934,7 +3934,7 @@ sub Process
          return(0);
       }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -4018,7 +4018,7 @@ sub Process
          return(0);
       }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 

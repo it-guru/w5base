@@ -284,7 +284,7 @@ sub Process
       my $h=$self->getWriteRequestHash("web");
       return($self->nativProcess($action,$h,$WfRec,$actions)); 
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -478,7 +478,7 @@ sub Process
       Query->Param("WorkflowStep"=>\@WorkflowStep);
       return(0);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -591,7 +591,7 @@ sub Process
       }
       return(0);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -699,7 +699,7 @@ sub Process
       return($bk);
 
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 

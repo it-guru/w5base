@@ -476,7 +476,7 @@ sub Process
       }
       
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 sub addInitialParameters

@@ -512,7 +512,7 @@ sub Process
       }
       return(1);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -562,6 +562,7 @@ sub Process
    my $self=shift;
    my $action=shift;
    my $WfRec=shift;
+   my $actions=shift;
 
    if ($action eq "NextStep"){
       if (defined(Query->Param("go"))){
@@ -584,7 +585,7 @@ sub Process
       }
       return(1);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 

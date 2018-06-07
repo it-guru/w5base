@@ -363,13 +363,13 @@ sub Init
 }
 
 
-sub getWorkflowMailName
-{
-   my $self=shift;
-
-   my $workflowname=$self->getParent->T($self->Self(),$self->Self());
-   return($workflowname);
-}
+#sub getWorkflowMailName   # moved to WfClass
+#{
+#   my $self=shift;
+#
+#   my $workflowname=$self->getParent->T($self->Self(),$self->Self());
+#   return($workflowname);
+#}
 
 
 sub getPosibleActions
@@ -1813,7 +1813,7 @@ sub Process
          return(1);
       }
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 

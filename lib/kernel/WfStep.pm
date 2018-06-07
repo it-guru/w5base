@@ -161,6 +161,7 @@ sub PostProcess
    my $actions=shift;
    my %param=@_;
    my $aobj=$self->getParent->getParent->Action();
+   my $workflowname=$self->getParent->getWorkflowMailName();
 
    if ($action eq "SaveStep.wfw5event"){
       my %newparam=(mode=>'EVENT:',
@@ -191,6 +192,16 @@ sub PostProcess
       else{
          #printf STDERR ("fifi no SaveStep.wffollowup message - user is sender\n");
       }
+   }
+   if ($action eq "SaveStep.wfforward" ||
+       $action eq "SaveStep.wfreprocess"){
+      $aobj->NotifyForward($WfRec->{id},
+                           $param{fwdtarget},
+                           $param{fwdtargetid},
+                           $param{fwdtargetname},
+                           $param{note},
+                           workflowname=>$workflowname,
+                           sendercc=>1);
    }
    if ($action eq "SaveStep.wfinquiry"){
       $aobj->NotifyForward($WfRec->{id},

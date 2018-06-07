@@ -805,7 +805,7 @@ sub Process
       }
       return(0);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 

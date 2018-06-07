@@ -1114,7 +1114,7 @@ sub Process
       
       return(0) if (!$self->notesValid());
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
@@ -1309,7 +1309,7 @@ sub Process
       }
       return(1);
    }
-   return($self->SUPER::Process($action,$WfRec));
+   return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
 
