@@ -221,36 +221,29 @@ sub filterMatch
   my $flt=shift;
   my $match=0;
 
-  if (exists($arg->{id})){   # is record-filter request
-     die('is no nich brogramierd');
-     exit(1);
-     
-  }
-  else{                      # is object filtering
-     foreach my $frec (@$flt){
-        my $neg=0;
-        my $o=$frec->{obj};
-        if ($o=~m/^\!/){
-           $o=~s/^\!//;
-           $neg=1;
-        }
-        my $qo=quotemeta($o);
-        $qo=~s/\\\*/.*/g;
-        if ($arg->{'obj'}=~m/^$qo$/){
-           if (!$neg){
-              $match=1;
-           }
-           else{
-              return(0);
-           }
+  foreach my $frec (@$flt){
+     my $neg=0;
+     my $o=$frec->{obj};
+     if ($o=~m/^\!/){
+        $o=~s/^\!//;
+        $neg=1;
+     }
+     my $qo=quotemeta($o);
+     $qo=~s/\\\*/.*/g;
+     if ($arg->{'obj'}=~m/^$qo$/){
+        if (!$neg){
+           $match=$frec;
         }
         else{
-           if ($neg){
-              $match=1;
-           }
-           else{
-              return(0);
-           }
+           return(0);
+        }
+     }
+     else{
+        if ($neg){
+           $match=1;
+        }
+        else{
+           return(0);
         }
      }
   }
@@ -464,6 +457,7 @@ sub getReplicatePartnerRec
 sub getRequestedReplicationObjects
 {
    my $Config=shift;
+   my $requested_phase=shift;
    my @replicationOjects;
    my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
 
@@ -608,9 +602,16 @@ sub getRequestedReplicationObjects
              =~m/^(!{0,1}[a-z0-9*_]+::[a-z0-9*_]+)(\[.*\]){0,1}$/i){
             my %f=(obj=>$obj);
             if (defined($id)){
-               my $idname='id';
-               $f{$idname}=\$id;
-               die('is noch nich brogramierd');
+               if ($#{$requested_phase}!=0 ||
+                   $requested_phase->[0] ne "1"){
+                  msg(ERROR,"object key selection only posible, ".
+                            "if only phase1 is forced");
+                  exit(255);
+               }
+               $id=~s/^\[//;
+               $id=~s/\]$//;
+               $f{idvalue}=\$id;
+               msg(INFO,"force phase 1 replication for key $id in $obj");
             }
             push(@objflt,\%f);
          }
@@ -623,9 +624,14 @@ sub getRequestedReplicationObjects
       @ObjectFilter=@objflt;
       foreach my $ctrl (@replicationOjects){ 
          $ctrl->{'requested'}=0;
-         if (filterMatch({obj=>$ctrl->{'name'}},\@ObjectFilter)){
+         if (my $flt=filterMatch({obj=>$ctrl->{'name'}},\@ObjectFilter)){
             $ctrl->{'requested'}=1;
             msg(INFO,"object '$ctrl->{name}' requested by filter");
+            if (ref($flt)){
+               if (exists($flt->{idvalue})){
+                  $ctrl->{'idvalue'}=$flt->{idvalue};
+               }
+            }
          }
          else{
             msg(INFO,"object '$ctrl->{name}' NOT requested");
@@ -714,7 +720,11 @@ sub objectReplicationPhase1
       }
       $obj->ResetFilter();
       $obj->Limit($p1smallpack,0,0);
-      if (defined($syncstart)){ # restart sync process at 
+      if (exists($ctrl->{idvalue})){  # replicate only one KEY !
+         $obj->SetFilter({$ctrl->{idname}=>$ctrl->{idvalue}});
+         $obj->Limit(1,0,0);
+      }
+      elsif (defined($syncstart)){ # restart sync process at 
                                 # last known position
          my $cmd="select w5replkeypri p,w5replkeysec s ".
                  "from \"_$ctrl->{name}\" ".
@@ -781,13 +791,21 @@ sub objectReplicationPhase1
          do{
             last SPLOOP if ( $start+$phaselimit<time()); 
             $oldreplkey=$srcrec->{'replkeypri'};
-            if ((defined($replkey) && $srcrec->{'replkeypri'} gt $replkey) || 
-                (defined($replkeysec) && 
-                 $srcrec->{'replkeysec'} ge $replkeysec &&
-                 $srcrec->{$ctrl->{'idname'}} ne "")){
-               $candidates++;
+            if (exists($ctrl->{idvalue})){  # if idvalue is set, no seek in
+               $candidates++;               # stream is needed
                $replkeysec=undef;
                $replkey=undef;
+            }
+            else{
+               if ((defined($replkey) && 
+                    $srcrec->{'replkeypri'} gt $replkey) || 
+                   (defined($replkeysec) && 
+                    $srcrec->{'replkeysec'} ge $replkeysec &&
+                    $srcrec->{$ctrl->{'idname'}} ne "")){
+                  $candidates++;
+                  $replkeysec=undef;
+                  $replkey=undef;
+               }
             }
             if (!defined($replkeysec)){   # seek to synkey1 position in stream
                if (!$dbi->InsertOrUpdate($obj,$ctrl,$srcrec)){
@@ -1125,7 +1143,8 @@ sub createSlot
 #                       MAIN         
 
 doShutdown() if ($startProcessPPID ne getppid());
-my @ReplicationObjects=getRequestedReplicationObjects($config);
+my @ReplicationObjects=getRequestedReplicationObjects($config,
+                                                      \@requested_phase);
 doShutdown() if ($startProcessPPID ne getppid());
 
 
@@ -1341,11 +1360,11 @@ sub Help
    printf("\n");
    printf("OBJECTS:\n");
    printf("None, one or more object names (in W5Base interal notation), ".
-          "witch\nare should be replicated. If the Notation object(id) is ".
+          "witch\nare should be replicated. If the Notation object[id] is ".
           "used,\nonly the specified record id will be replicated.\n".
           "f.e.:\n".
           "base::user base::grp itil::system !base::workflow ...\n".
-          "base::location(12711643270034)\n\n");
+          "base::location[12711643270034]\n\n");
 }
 #==================================================================
 
