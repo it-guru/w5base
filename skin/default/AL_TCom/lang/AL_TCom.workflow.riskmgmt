@@ -1,0 +1,8 @@
+'AL_TCom::workflow::riskmgmt'=>{de=>'Telekom IT: Risikobehandlung',en=>'TelekomIT: Riskmgmt'},
+'AL_TCom::workflow::riskmgmt::tip'=>{
+              de=>'Hier sollte ein Text in de/en drin stehen, der '.
+                  'beschreibt, wofür der WF ist und u.U. auf FAQ Artikel dazu hinweist ',
+              en=>'Hier sollte ein Text in de/en drin stehen, der '.
+                  'beschreibt, wofür der WF ist und u.U. auf FAQ Artikel dazu hinweist '
+                  },
+
