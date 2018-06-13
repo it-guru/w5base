@@ -883,6 +883,7 @@ EOF
              ($fieldgroup eq "default" && $latelastmsg)){
             @msglist=$self->getParent->getParent->LastMsg();
          }
+         @msglist=map({quoteHtml($_)} @msglist);
          $d.="<div class=lastmsg>".join("<br>\n",map({
            if ($_=~m/^ERROR/){
               $_="<font style=\"color:red;\">".$_."</font>";
