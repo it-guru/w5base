@@ -415,12 +415,14 @@ sub FormatedStoredWorkspace
    $d="<!-- FormatedStoredWorkspace from textdrop -->";
    foreach my $var (@curval){
       $disp.=$var;
+      $var=quoteHtml($var);
       $d.="<input type=hidden name=Formated_$name value=\"$var\">";
    }
    $d=$disp.$d;
    my $dstkey=$self->{vjoinon}->[0];
    my @curval=Query->Param("Formated_".$dstkey);
    foreach my $var (@curval){
+      $var=quoteHtml($var);
       $d.="<input type=hidden name=Formated_$dstkey value=\"$var\">";
    }
 

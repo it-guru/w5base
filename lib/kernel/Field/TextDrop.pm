@@ -224,6 +224,7 @@ sub FormatedDetail
       if ($self->FieldCache->{LastDrop}){
          return($self->FieldCache->{LastDrop});
       }
+      $d=quoteHtml($d);
       return("<input class=finput type=text name=Formated_$name value=\"$d\">");
    }
    if (ref($d) eq "ARRAY"){

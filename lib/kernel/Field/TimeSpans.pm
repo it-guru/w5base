@@ -310,6 +310,7 @@ sub FormatedDetail
             if ($mode eq "edit" && defined($fromquery[$dayno])){
                $val=$fromquery[$dayno];
             }
+            $val=quoteHtml($val);
             $tab.="</td>".
                   "<td><input name=$name $dis type=text value=\"$val\" ".
                   "style=\"width:100%\"></td></tr>";

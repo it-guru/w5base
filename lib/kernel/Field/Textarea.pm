@@ -239,7 +239,7 @@ sub FormatedStoredWorkspace
    my $disp="";
    foreach my $var (@curval){
       $disp.=$self->FormatedDetail({$name=>$var},"HtmlDetail");
-      $var=~s/"/&quot;/g;
+      $var=quoteHtml($var);
       $d.="<input type=hidden name=Formated_$name value=\"$var\">";
    }
    $d=$disp.$d;

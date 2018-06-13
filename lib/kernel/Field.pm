@@ -265,7 +265,7 @@ sub getSimpleInputField
    my $value=shift;
    my $readonly=shift;
    my $name=$self->Name();
-   $value=~s/"/&quot;/g;
+   $value=quoteHtml($value);
    my $d;
 
    my $unit=$self->unit;
