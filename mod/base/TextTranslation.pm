@@ -329,6 +329,7 @@ sub Text2Acronym
     <td></td>
 </tr>
 EOF
+      $cursrc=~s/<.*?script>//g;
       my $letters=scanWord($cursrc);
       my (%acros);
       for (my $l=4;$l<7;$l++){
@@ -374,6 +375,7 @@ EOF
       $acywords.="<script language=JavaScript>".
                  "loading('please insert your Keywords ...')</script>";
    }
+   $acywords=~s/<.*?script>//g;
    my $aout=$self->getParsedTemplate("tmpl/base.Text2Acronym",
                                              {static=>{acywords=>$acywords}});
    print $aout;
