@@ -113,7 +113,9 @@ sub qcheckRecord
    return(undef) if ($rec->{applid} eq "");
    my $acapplappl=getModuleObject($self->getParent->Config,
                                   "tsacinv::lnkapplappl");
-   $acapplappl->SetFilter({parent_applid=>$rec->{applid},type=>\'SAP'});
+   $acapplappl->SetFilter({parent_applid=>$rec->{applid},
+                           type=>\'SAP',
+                           deleted=>\'0'});
    my @sapappls=$acapplappl->getHashList(qw(lchildid));
 
    return(0,undef) if ($#sapappls==-1);
