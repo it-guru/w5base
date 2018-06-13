@@ -4136,6 +4136,8 @@ sub DataObj_findtemplvar
             $self->{JSON}->property(utf8=>1);
          }
          my $d=$self->{JSON}->encode([$current->{$var}]);
+         $d=~s/</&lt;/g;  # prevent html sequences in JSON Data. This
+         $d=~s/>/&gt;/g;  # could be used for X-SiteScripting
          return($d);
       }
       if ($param[0] eq "storedworkspace"){
