@@ -298,6 +298,7 @@ sub ById
       printf("</head>");
       printf("<body>");
       printf("Please wait while connecting to '$name'<br>");
+      $val=quoteHtml($val);
       printf("Redirecting to bookmark $val ...<br>\n");
       printf("\n<script language=\"JavaScript\">\n");
       my $l=length($srclink);
@@ -316,6 +317,7 @@ EOF
    }
    else{
       print $self->HttpHeader("text/html");
+      $val=quoteHtml($val);
       printf("ERROR: bookmark id '$val' doesn't exists<br>");
    }
    return();
