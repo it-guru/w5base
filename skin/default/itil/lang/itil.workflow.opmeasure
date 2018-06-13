@@ -1,4 +1,5 @@
 'itil::workflow::opmeasure'=>{de=>'ITIL Betriebs-Maßnahme',en=>'ITIL Operations measure'},
+'fieldgroup.extopmeadesc'=>{de=>'erweitere Maßnahmeninformationen',en=>'extended measure information'},
 'Initiate request to businessteam'=>{de=>'Auftrag an den Anwendungsbetrieb initieren'},
 'Initiate developer request'=>{de=>'Auftrag an die Entwicklung initieren'},
 'Initiate operation measure'=>{de=>'Betriebs-Maßnahme ableiten'},
@@ -9,3 +10,6 @@ en=>'With this workflow you can assign and supervise tasks and measures within a
 'REV.derivation'=>{de=>'Abgeleitet von'},
 'info'=>{de=>'Informativer Verweis auf "%s"',en=>'informational link to "%s"'},
 'REV.info'=>{de=>'Informativ verwiesen von "%s"',en=>'informational linked from "%s"'},
+'invalid detail description for measure'=>{de=>'ungültige Detailbeschreibung der Maßname'},
+'planned start'=>{de=>'geplannter Beginn'},
+'planned end'=>{de=>'geplanntes Ende'},

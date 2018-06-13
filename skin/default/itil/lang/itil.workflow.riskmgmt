@@ -1,0 +1,6 @@
+'itil::workflow::riskmgmt'=>{de=>'Risikobehandlung',en=>'Riskhandling'},
+'fieldgroup.riskdesc'=>{de=>'Risikoparameter',en=>'risk parameters'},
+'fieldgroup.riskrating'=>{de=>'Risikoauswertung',en=>'risk rating'},
+'wfaddopmeasure'=>{de=>'Maßnahme erstellen',en=>'create measure'},
+'assign to'=>{de=>'Zuweisen an'},
+'When can the risk arise?'=>{de=>'Ab wann kann das Risiko eintreten?'},

@@ -35,7 +35,7 @@ sub Init
 {
    my $self=shift;
    $self->AddGroup("customerdata",translation=>'itil::workflow::opmeasure');
-   $self->AddGroup("extdesc",translation=>'itil::workflow::opmeasure');
+   $self->AddGroup("extopmeadesc",translation=>'itil::workflow::opmeasure');
    $self->itil::workflow::base::Init();
    my $bk=$self->SUPER::Init(@_);
    return($bk);
@@ -48,11 +48,14 @@ sub getDynamicFields
    my $class;
 
    my @bk=($self->InitFields(
-   #   new kernel::Field::Text(    name          =>'reqdesdate',
-   #                               label         =>'desired date',
-   #                               group         =>'default',
-   #                               container     =>'headref'),
-
+      new kernel::Field::Date(    name          =>'plannedstart',
+                                  label         =>'planned start',
+                                  group         =>'extopmeadesc',
+                                  container     =>'headref'),
+      new kernel::Field::Date(    name          =>'plannedend',
+                                  label         =>'planned end',
+                                  group         =>'extopmeadesc',
+                                  container     =>'headref'),
     ),$self->SUPER::getDynamicFields(%param));
 
    $self->getField("implementedto")->{uivisible}=0;
@@ -64,6 +67,27 @@ sub getDynamicFields
    return(@bk);
 
 }
+
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+   if (!defined($oldrec)){
+      if (length($newrec->{detaildescription})<10){
+         $self->LastMsg(ERROR,"invalid detail description for measure");
+         return(0);
+      }
+   }
+
+   return(1);
+}
+
+
 
 sub getPosibleWorkflowDerivations
 {
@@ -298,7 +322,7 @@ sub isViewValid
 {
    my $self=shift;
    return($self->SUPER::isViewValid(@_),
-          "affected","customerdata","extdesc");
+          "affected","customerdata","extopmeadesc");
 }
 
 sub isWriteValid
@@ -307,10 +331,10 @@ sub isWriteValid
    my @l=$self->SUPER::isWriteValid(@_);
    my $WfRec=shift;
 
-   push(@l,"extdesc") if (!defined($_[0]));
+   push(@l,"extopmeadesc") if (!defined($_[0]));
    if (grep(/^default$/,@l)){
       push(@l,"customerdata");
-      push(@l,"extdesc");
+      push(@l,"extopmeadesc");
    }
    my $userid=$self->getParent->getCurrentUserId();
    if ($WfRec->{fwdtarget} eq 'base::user' &&
@@ -325,7 +349,7 @@ sub isWriteValid
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("header","default","extdesc","affected","customerdata","init","flow");
+   return("header","default","extopmeadesc","affected","customerdata","init","flow");
 }
 
 sub getRecordImageUrl
