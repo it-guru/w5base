@@ -2333,7 +2333,10 @@ sub DerivateFrom # Workflow ableiten
       }
    }
    print $self->HttpHeader("text/html");
-   print("Invalid derivation request to Workflow id=$id (mode=$doDerivateWorkflow)");
+   $id=quoteHtml($id);
+   $doDerivateWorkflow=quoteHtml($doDerivateWorkflow);
+   print("Invalid derivation request to Workflow id=$id ".
+         "(mode=$doDerivateWorkflow)");
 }
 
 
