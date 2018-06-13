@@ -49,7 +49,7 @@ sub Main
    if ($tte eq ""){
       msg(ERROR,"request to base::TextTranslation with no TextTranslationEngine rejected");
       our $cgi = CGI->new();
-      $cgi->header(
+      print $cgi->header(
          -type=>'text/plain',
          -status=> '503 Service Unavailable'
       );
