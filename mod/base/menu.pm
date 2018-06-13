@@ -589,6 +589,7 @@ sub root
    $fp=~s/^\///;
    my @fp=split(/[\/]/,$fp);
    my $rootpath=Query->Param("RootPath");
+   $rootpath=quoteHtml($rootpath);
    $fp=~s/\//./g;
    $fp=~s/"/./g;
    if ($fp ne ""){
@@ -866,6 +867,8 @@ sub menuframe
    $fp=~s/\//./g;
    $fp=~s/"/./g;
    my $rootpath=Query->Param("RootPath");
+   $rootpath=~s/</&lt;/g;
+   $rootpath=~s/>/&gt;/g;
 
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(target=>'msel',
@@ -966,6 +969,8 @@ sub msel
    $fp=~s/^\///;
    my @fp=split(/[\/\.]/,$fp);
    my $rootpath=Query->Param("RootPath");
+   $rootpath=~s/</&lt;/g;
+   $rootpath=~s/>/&gt;/g;
    $fp=~s/\//./g;
    $fp=~s/"/./g;
 
@@ -1188,6 +1193,8 @@ sub processSubs
    my $active=shift;
    my $mode=shift;
    my $rootpath=Query->Param("RootPath");
+   $rootpath=~s/</&lt;/g;
+   $rootpath=~s/>/&gt;/g;
 
 
    my @subs=();
