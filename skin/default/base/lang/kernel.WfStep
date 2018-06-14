@@ -1,4 +1,5 @@
 'break Workflow'=>{de=>'Workflow abbrechen'},
+'Save'=>{de=>'Aktion speichern/ausführen'},
 'next Step'=>{de=>'nächster Schritt'},
 'previous Step'=>{de=>'Schritt zurück'},
 'one week'=>{de=>'eine Woche'},

@@ -1,6 +1,81 @@
 'itil::workflow::riskmgmt'=>{de=>'Risikobehandlung',en=>'Riskhandling'},
 'fieldgroup.riskdesc'=>{de=>'Risikoparameter',en=>'risk parameters'},
 'fieldgroup.riskrating'=>{de=>'Risikoauswertung',en=>'risk rating'},
+'fieldgroup.riskbase'=>{de=>'Risiko Basisdaten',en=>'risk basedata'},
 'wfaddopmeasure'=>{de=>'Maßnahme erstellen',en=>'create measure'},
+'wffine'=>{de=>'Risko beenden',en=>'finish risk'},
 'assign to'=>{de=>'Zuweisen an'},
+'abbort request'=>{de=>'Workflow abbrechen',en=>'abbort workflow'},
 'When can the risk arise?'=>{de=>'Ab wann kann das Risiko eintreten?'},
+'RISKPCT.0' =>{de=>    '0 %',en=>    '0 %'},
+'RISKPCT.1' =>{de=>  '1-9 %',en=>  '1-9 %'},
+'RISKPCT.2' =>{de=>'10-19 %',en=>'10-19 %'},
+'RISKPCT.3' =>{de=>'20-29 %',en=>'20-29 %'},
+'RISKPCT.4' =>{de=>'30-39 %',en=>'30-39 %'},
+'RISKPCT.5' =>{de=>'40-49 %',en=>'40-49 %'},
+'RISKPCT.6' =>{de=>'50-59 %',en=>'50-59 %'},
+'RISKPCT.7' =>{de=>'60-69 %',en=>'60-69 %'},
+'RISKPCT.8' =>{de=>'70-79 %',en=>'70-79 %'},
+'RISKPCT.9' =>{de=>'80-89 %',en=>'80-89 %'},
+'RISKPCT.10'=>{de=>'90-99 %',en=>'90-99 %'},
+'RISKPCT.11'=>{de=>  '100 %',en=>  '100 %'},
+'Riskpoints'=>{de=>'Risiko Punkte'},
+'Risk state'=>{de=>'Risiko Status'},
+'Risk base type'=>{de=>'Risko Basis-Typ'},
+'What kind of risk do you have?'=>{
+   de=>'Welche Art von Riskio haben Sie?'
+},
+'Description of the impact on the occurrence of the risk'=>{
+  de=>'Beschreibung der Auswirkungen beim Eintritt des Risikos (Schadensszenario)'
+},
+'Estimate downtime (in days) in case the risk occurs'=>{
+  de=>'Geschätzte Ausfallzeit (in Tagen) bei Risikoeintritt'
+},
+'Probability of occurrence Risk within the next 12 months'=>{
+  de=>'Eintrittswahrscheinlichkeit des Risikos innerhalb der nächsten 12 Monate'
+},
+'RISKBASE.personal'=>{
+ de=>'Personalressourcen- / Skillrisiko',
+ en=>'personnel resource / skill risk'
+},
+'RISKBASE.response'=>{
+ de=>'Risiko durch ungeregelte Zuständigkeiten',
+ en=>'risk due to unregulated responsibilities'
+},
+'RISKBASE.software'=>{
+ de=>'Softwarerisiko',
+ en=>'software risk'
+},
+'RISKBASE.hardware'=>{
+ de=>'Hardwarerisiko',
+ en=>'hardware risk'
+},
+'RISKBASE.infrastructure'=>{
+ de=>'Infrastrukturrisiko',
+ en=>'infrastructure risk'
+},
+'RISKBASE.drbackup'=>{
+ de=>'Risiko mit dem DR-Level oder der Backuplösung (nonDR) / Wiederherstellung',
+ en=>'risk with DR level or backup (nonDR) / recovery'
+},
+'RISKBASE.performance'=>{
+ de=>'Performancerisiko',
+ en=>'performance risk'
+},
+'RISKBASE.budget'=>{
+ de=>'Budgetrisiko',
+ en=>'budget risk'
+},
+'RISKBASE.thiredparty'=>{
+ de=>'Risiko mit einem Lieferanten oder Drittanbieter',
+ en=>'risk with a supplier or third party'
+},
+'RISKBASE.privacy'=>{
+ de=>'Datenschutzrisiko',
+ en=>'privacy risk'
+},
+'RISKBASE.OTHER'=>{
+ de=>'Sonstiges Risiko',
+ en=>'other risk'
+},
+

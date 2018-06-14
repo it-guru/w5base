@@ -37,6 +37,7 @@ sub Init
    my $self=shift;
    $self->AddGroup("riskdesc",translation=>'itil::workflow::riskmgmt');
    $self->AddGroup("riskrating",translation=>'itil::workflow::riskmgmt');
+   $self->AddGroup("riskbase",translation=>'itil::workflow::riskmgmt');
    $self->itil::workflow::base::Init();
    return($self->SUPER::Init(@_));
 }
@@ -76,23 +77,109 @@ sub getDynamicFields
    my @l=($self->InitFields(
       new kernel::Field::Select(  name          =>'riskbasetype',
                                   label         =>'Risk base type',
+                                  value         =>['personal',
+                                                   'response',
+                                                   'software',
+                                                   'hardware',
+                                                   'infrastructure',
+                                                   'drbackup',
+                                                   'performance',
+                                                   'budget',
+                                                   'thiredparty',
+                                                   'privacy',
+                                                   'OTHER'],
+                                  transprefix   =>'RISKBASE.',
                                   group         =>'default',
-                                  getPostibleValues =>sub {
-                                     my $self=shift;
-                                     my $param=shift;
-                                     return($self->getParent->getRiskBaseTypeList($self,$param));
-                                  },
                                   container     =>'headref'),
+
+      new kernel::Field::Textarea(name          =>'extdescriskimpact',
+                                  label         =>'Description of the impact on the occurrence of the risk',
+                                  group         =>'riskdesc',
+                                  container     =>'headref'),
+
+      new kernel::Field::Number(  name          =>'extdescriskdowntimedays',
+                                  label         =>'Estimate downtime (in days) in case the risk occurs',
+                                  editrange     =>['0'=>'180'], 
+                                  group         =>'riskdesc',
+                                  container     =>'headref'),
+
+      new kernel::Field::Select(  name          =>'extdescriskoccurrency',
+                                  label         =>'Probability of occurrence Risk within the next 12 months',
+                                  value         =>['0','1','2','3','4','5','6','7','8','9','10','11'],
+                                  default       =>'0',
+                                  transprefix   =>'RISKPCT.',
+                                  group         =>'riskdesc',
+                                  container     =>'headref'),
+
 
       new kernel::Field::Date(    name          =>'extdescarisedate',
                                   label         =>'When can the risk arise?',
                                   group         =>'riskdesc',
                                   container     =>'headref'),
 
+
+
+      new kernel::Field::Text(    name          =>'riskmgmtcolor',
+                                  label         =>'Riskpoints color',
+                                  htmldetail    =>0,
+                                  group         =>'riskrating',
+                                  onRawValue    =>\&getCalculatedRiskState),
+
+      new kernel::Field::Text(    name          =>'riskmgmtpoints',
+                                  background    =>sub{
+                                     my $self=shift;
+                                     my $mode=shift;
+                                     my $current=shift;
+                                     my $fld=$self->getParent->getField("riskmgmtcolor",$current);
+                                     my $color=$fld->RawValue($current);
+                                     return($color);
+                                  },
+                                  label         =>'Riskpoints',
+                                  group         =>'riskrating',
+                                  onRawValue    =>\&getCalculatedRiskState),
+
+      new kernel::Field::Textarea(name          =>'riskmgmtstate',
+                                  label         =>'Risiko state',
+                                  vjoinconcat   =>"\n",
+                                  htmldetail    =>'NotEmpty',
+                                  group         =>'riskrating',
+                                  onRawValue    =>\&getCalculatedRiskState),
+
+
+      new kernel::Field::TextDrop(name          =>'solutionopt',
+                                  label         =>'Solution OPT',
+                                  translation   =>'itil::riskmgmtbase',
+                                  group         =>'riskbase',
+                                  weblinkto     =>'none',
+                                  vjointo       =>'itil::riskmgmtbase',
+                                  vjoindisp     =>'solutionopt',
+                                  vjoinon       =>['affectedapplicationid'=>'id'],
+                                  prepRawValue  =>\&storedParamHandler),
+
+      new kernel::Field::Link(    name          =>'stored_solutionopt',
+                                  label         =>'stored solutionopt',
+                                  group         =>'riskbase',
+                                  container     =>'headref'),
+
+      new kernel::Field::TextDrop(name          =>'itrmcriticality',
+                                  label         =>'ITRM criticality',
+                                  translation   =>'itil::riskmgmtbase',
+                                  group         =>'riskbase',
+                                  weblinkto     =>'none',
+                                  vjointo       =>'itil::riskmgmtbase',
+                                  vjoindisp     =>'itrmcriticality',
+                                  vjoinon       =>['affectedapplicationid'=>'id'],
+                                  prepRawValue  =>\&storedParamHandler),
+
+      new kernel::Field::Link(    name          =>'stored_itrmcriticality',
+                                  label         =>'stored itrmcriticality',
+                                  group         =>'riskbase',
+                                  container     =>'headref'),
+
       new kernel::Field::TextDrop(name          =>'ibipoints',
                                   label         =>'IBI Points',
                                   translation   =>'itil::riskmgmtbase',
-                                  group         =>'riskrating',
+                                  group         =>'riskbase',
                                   weblinkto     =>'none',
                                   vjointo       =>'itil::riskmgmtbase',
                                   vjoindisp     =>'ibipoints',
@@ -101,13 +188,13 @@ sub getDynamicFields
 
       new kernel::Field::Link(    name          =>'stored_ibipoints',
                                   label         =>'stored ibipoints',
-                                  group         =>'riskrating',
+                                  group         =>'riskbase',
                                   container     =>'headref'),
 
       new kernel::Field::TextDrop(name          =>'ibiprice',
                                   label         =>'IBI EURO',
                                   translation   =>'itil::riskmgmtbase',
-                                  group         =>'riskrating',
+                                  group         =>'riskbase',
                                   weblinkto     =>'none',
                                   vjointo       =>'itil::riskmgmtbase',
                                   vjoindisp     =>'ibiprice',
@@ -116,7 +203,7 @@ sub getDynamicFields
 
       new kernel::Field::Link(    name          =>'stored_ibiprice',
                                   label         =>'stored ibiprice',
-                                  group         =>'riskrating',
+                                  group         =>'riskbase',
                                   container     =>'headref'),
 
     ),$self->SUPER::getDynamicFields(%param));
@@ -126,6 +213,47 @@ sub getDynamicFields
 
     return(@l);
 }
+
+
+sub calculateRiskState
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $st=shift;
+
+
+
+#    push(@{$st->{raw}->{riskmgmtstate}},"v1");
+#    push(@{$st->{raw}->{riskmgmtstate}},"this is a message");
+
+}
+
+
+sub getCalculatedRiskState
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $name=$self->Name();
+
+   my $id=$current->{id};
+
+   if (!defined($self->getParent->Context->{CalculatedRiskState}->{$id})){
+      my $st={
+         raw=>{
+            riskmgmtpoints=>'',
+            riskmgmtstate=>[],
+            riskmgmtcolor=>''
+         }
+      };
+      $self->getParent->calculateRiskState($current,$mode,$st);
+      $self->getParent->Context->{CalculatedRiskState}->{$id}=$st;
+   }
+   return($self->getParent->Context->{CalculatedRiskState}->{$id}->{raw}->{$name});
+   return("");
+}
+
 
 sub getPosibleWorkflowDerivations
 {
@@ -299,7 +427,7 @@ sub isOptionalFieldVisible
 
    if ($mode eq "HtmlDetail"){
       if ($name eq "detaildescription"){
-         if ($riskbasetype ne "Other"){
+         if ($riskbasetype ne "OTHER"){
             return(0);
          }
          else{
@@ -412,7 +540,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","state","flow","affected","header","riskdesc","riskrating","relations","init","history");
+   return("default","state","flow","affected","header","riskdesc","riskrating","riskbase","relations","init","history");
 }
 
 sub isWriteValid
@@ -430,7 +558,7 @@ sub isWriteValid
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("header","default","riskdesc","riskrating","affected","customerdata","init","flow");
+   return("header","default","riskdesc","riskrating","riskbase","affected","customerdata","init","flow");
 }
 
 sub getRecordImageUrl
@@ -522,15 +650,16 @@ sub generateWorkspace
 
    my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
    my $secial=$self->getParent->getSpecificDataloadForm();
+   my $t1=$self->getParent->T("What kind of risk do you have?","itil::workflow::riskmgmt");
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
-<td class=fname width=20%>%name(label)%:</td>
-<td colspan=3 class=finput>%name(detail)%</td>
+<td class=fname>$t1</td>
+<td colspan=3 class=finput>%riskbasetype(detail)%</td>
 </tr>
 <tr>
-<td class=fname>%riskbasetype(label)%:</td>
-<td colspan=3 class=finput>%riskbasetype(detail)%</td>
+<td class=fname width=20%>%name(label)%:</td>
+<td colspan=3 class=finput>%name(detail)%</td>
 </tr>
 <tr>
 <td class=fname valign=top width=20%>%detaildescription(label)%:</td>
@@ -553,7 +682,7 @@ setFocus("Formated_name");
 setEnterSubmit(document.forms[0],"NextStep");
 function setInitFormLayout(reqnature){
   var desc=document.getElementById("detaildescription");
-  if (reqnature.match(/^Other.*/)){
+  if (reqnature.match(/^OTHER.*/)){
      desc.style.visibility='visible';
      desc.style.display='block';
   }
@@ -899,11 +1028,11 @@ sub getPosibleButtons
    my %b=();
    my @saveables=grep(!/^wfbreak$/,@$actions);
    if ($#saveables!=-1){
-      %b=(SaveStep=>$self->T('Save')) if ($#{$actions}!=-1);
+      %b=(SaveStep=>$self->T('Save','kernel::WfStep')) if ($#{$actions}!=-1);
    }
    if (defined($WfRec->{id})){
       if (grep(/^wfbreak$/,@$actions)){
-         $b{BreakWorkflow}=$self->T('abbort request');
+         $b{BreakWorkflow}=$self->T('abbort request','kernel::WfStep');
       }
    }
 print STDERR "Buttons:".Dumper(\%b);
@@ -994,14 +1123,16 @@ sub nativProcess
                     closedate=>NowStamp("en"),
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
-         foreach my $v (qw(ibiprice ibipoints)){  # store base parameters
+         foreach my $v (qw(ibiprice 
+                           ibipoints 
+                           solutionopt 
+                           itrmcriticality)){  # store base parameters
             my $curval=$WfRec->{$v};
             $store->{"stored_".$v}=$curval;
          }
          if ($WfRec->{eventend} eq ""){
             $store->{eventend}=NowStamp("en");
          }
-print STDERR "Store:".Dumper($store);
          $self->StoreRecord($WfRec,$store);
          $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
          $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
