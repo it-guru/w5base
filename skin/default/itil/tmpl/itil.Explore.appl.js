@@ -31,9 +31,10 @@
                          );
                       }
                    } 
-                   app.processOpStack(function(arrayOfResults){
-                      ok(arrayOfResults);
-                   });
+                   ok(1);
+                 //  app.processOpStack(function(arrayOfResults){
+                 //     ok(arrayOfResults);
+                 //  });
 
                 });
              }).catch(function(e){
@@ -95,6 +96,7 @@
 
    ClassAppletLib[applet].class.prototype.run=function(){
       var appletobj=this;
+      var app=this.app;
       this.app.node.clear();
       this.app.edge.clear();
       if (arguments.length){
@@ -110,17 +112,30 @@
          });
          this.app.console.log("INFO","loading scenario ...");
          console.log(" run in "+dataobj+" and id="+dataobjid);
+
+         appletobj.app.setMPath({
+               label:ClassAppletLib['%SELFNAME%'].desc.label,
+               mtag:'%SELFNAME%'
+            },
+            {
+               label:"loading ...",
+               mtag:dataobj+"/"+dataobjid
+            }
+         );
+
          this.loadItems(arguments[0]).then(function(d){
-             appletobj.app.console.log("INFO","scenario is loaded");
-             appletobj.app.setMPath({
-                   label:ClassAppletLib['%SELFNAME%'].desc.label,
-                   mtag:'%SELFNAME%'
-                },
-                {
-                   label:d[0].label,
-                   mtag:dataobj+"/"+d[0].dataobjid
-                }
-             );
+             app.processOpStack(function(d){
+                app.console.log("INFO","scenario is loaded");
+                app.setMPath({
+                      label:ClassAppletLib['%SELFNAME%'].desc.label,
+                      mtag:'%SELFNAME%'
+                   },
+                   {
+                      label:d[0].label,
+                      mtag:dataobj+"/"+d[0].dataobjid
+                   }
+                );
+             });
          }).catch(function(e){
              console.log("fail to load scenario",e);
              $(".spinner").hide();

@@ -56,6 +56,8 @@ sub new
                 },
                 label         =>'W5BaseID',
                 dataobjattr   =>"$worktable.id"),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -78,6 +80,7 @@ sub new
                 sqlorder      =>'desc',
                 searchable    =>0,
                 label         =>'Name',
+                explore       =>200,
                 dataobjattr   =>"$worktable.name"),
 
       new kernel::Field::Text(
@@ -85,6 +88,7 @@ sub new
                 sqlorder      =>'desc',
                 searchable    =>0,
                 htmleditwidth =>'50px',
+                explore       =>300,
                 label         =>'Short name',
                 dataobjattr   =>"$worktable.shortname"),
 
@@ -112,6 +116,7 @@ sub new
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0 AND <7"},
                 default       =>4,
+                explore       =>400,
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
@@ -129,6 +134,7 @@ sub new
                 label         =>'Nature',
                 htmleditwidth =>'60%',
                 selectfix     =>'1',
+                explore       =>500,
                 transprefix   =>'nat.',
                 readonly      =>sub{
                    my $self=shift;
@@ -163,6 +169,7 @@ sub new
                    }
                    return(1);
                 },
+                explore       =>600,
                 readonly      =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -198,6 +205,7 @@ sub new
                    return(0);
                 },
                 uploadable    =>0,
+                explore       =>700,
                 label         =>'primarily provided by application',
                 weblinkto     =>'itil::appl',
                 weblinkon     =>['parentid'=>'id'],
@@ -229,6 +237,7 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'funcmgr',
+                explore       =>450,
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 label         =>'functional manager',
@@ -1390,6 +1399,13 @@ if (s && dboss && appl ){
 EOF
    return($d);
 }
+
+sub jsExploreFormatLabelMethod
+{
+   my $self=shift;
+   return("newlabel=newlabel.replace(':',':\\n');");
+}
+
 
 
 sub calcBackgroundFlagColor

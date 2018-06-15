@@ -1,3 +1,4 @@
-'itil::Explore::appl'=>{de=>'Anwendungsvisualisierer',en=>'Application visualisation'},
+'itil::Explore::appl'=>{de=>'Anwendungsvisualisierung',en=>'Application visualisation'},
+'description'=>{de=>'Darstellung einer Business-Applikation mit allen wichtigen Kern-CIs' ,en=>'Display an application with all direct related CIs'},
 'sublabel'=>{de=>'IT-Inventar',en=>'IT-Inventory'},
 

@@ -152,6 +152,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
+                explore       =>100,
                 group         =>['name','default','admcomments'],
                 readonly      =>sub{
                    my $self=shift;
@@ -206,12 +207,14 @@ sub new
                                    return(1);
                                 },
                 group         =>'name',
+                explore       =>200,
                 label         =>'Givenname',
                 dataobjattr   =>'contact.givenname'),
                                   
       new kernel::Field::Text(
                 name          =>'surname',
                 group         =>'name',
+                explore       =>300,
                 depend        =>['usertyp'],
                 readonly      =>sub{
                                    my $self=shift;
@@ -972,6 +975,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'allphones',
+                explore       =>400,
                 label         =>'all native phone numbers',
                 searchable    =>sub{
                    my $self=shift;
@@ -2185,9 +2189,19 @@ sub jsExploreObjectMethods
                        app.addNode('base::grp',data[0].grpid,data[0].name,{
                           level:nodelevel
                        });
+                       console.log(\"after addNode\",app._opStack);
                        app.addEdge(curkey,nexkey);
-                       if (data[0].parentid!=''){
-                          orgFinder(nexkey,data[0].parentid,nlevel+1)
+                       if (!!data[0].parentid){
+                          console.log(\"find next level for\",data[0]);
+                          app.pushOpStack(
+                             new Promise(function(res,rej){
+                                orgFinder(nexkey,data[0].parentid,nlevel+1);
+                                res(1);
+                             })
+                          );
+                       }
+                       else{
+                          console.log(\"end of orgFinder\",app._opStack);
                        }
                     }
                  });
@@ -2207,7 +2221,7 @@ sub jsExploreObjectMethods
                              level:level
                          });
                          app.addEdge(curkey,nexkey);
-                         if (data[0].parentid!=''){
+                         if (!!data[0].parentid){
                             orgFinder(nexkey,data[0].parentid,level+1);
                          }
                       });
@@ -2216,6 +2230,23 @@ sub jsExploreObjectMethods
                 app.networkFitRequest=true;
              });
           });
+       }
+   ";
+
+   my $label=$self->T("run promise test");
+   $methods->{'m990promisetest'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          var app=this.app;
+          console.log(\"call m990promisetest on \",this);
+          app.pushOpStack(
+             function(res,rej){
+                console.log(\"call in promise\",this);
+                res(1);
+             }
+          );
+          
        }
    ";
 

@@ -484,27 +484,29 @@ var W5ExploreClass=function(){
       this.main = document.getElementById('main');
       this.main.innerHTML = '';
 
-      this.mpathline = document.createElement('div');
-      this.mpathline.id = 'mpath';
-      $(this.mpathline).addClass("TitleBar");
+      if (!this.mpathline){   // ensure existing mpathline to be not destroyed
+         this.mpathline = document.createElement('div');
+         this.mpathline.id = 'mpath';
+         $(this.mpathline).addClass("TitleBar");
 
-      var mfirst = document.createElement('div');
-      mfirst.id='mpathfirst';
-      if (window.name=='msel'){  //in this case, i in fullwindow with title mode
-         mfirst.innerHTML="\u2756";
-         $(mfirst).css("cursor","pointer");
-         $(mfirst).click(function(){
-            window.location="../menu/msel";
-         });
-      }
-      else{
-         mfirst.innerHTML="\u2756";
-      }
-      this.mpathline.appendChild(mfirst);
+         var mfirst = document.createElement('div');
+         mfirst.id='mpathfirst';
+         if (window.name=='msel'){      //in this case, 
+            mfirst.innerHTML="\u2756";  // i in fullwindow with title mode
+            $(mfirst).css("cursor","pointer");
+            $(mfirst).click(function(){
+               window.location="../menu/msel";
+            });
+         }
+         else{
+            mfirst.innerHTML="\u2756";
+         }
+         this.mpathline.appendChild(mfirst);
 
-      this.mpath = document.createElement('ul');
-      $(this.mpath).addClass("TitleBar-arrows");
-      this.mpathline.appendChild(this.mpath);
+         this.mpath = document.createElement('ul');
+         $(this.mpath).addClass("TitleBar-arrows");
+         this.mpathline.appendChild(this.mpath);
+      }
       this.main.appendChild(this.mpathline);
 
       this.workspace = document.createElement('div');
@@ -557,6 +559,7 @@ var W5ExploreClass=function(){
       $(this.mpath).append(m);
       var paramstack=new Array();
       var appletname;
+      console.log("this.setMPath setMPath()",arguments);
       if (arguments){
          for(mi=0;mi<arguments.length;mi++){
 
@@ -696,6 +699,9 @@ console.log("start applet with param stack=",appletname,paramstack);
       var app=this;
       this._opStack.reduce(function(promiseChain, currentTask){
           return(promiseChain.then(function(chainResults){
+              if (!currentTask.then){
+                 currentTask=new Promise(currentTask);
+              }
               return(currentTask.then(function(currentResult){
                   var l=chainResults;
                   l.push(currentResult);
@@ -712,7 +718,7 @@ console.log("start applet with param stack=",appletname,paramstack);
 
    this.addNode=function(dataobj,id,initialLabel,nodeTempl){
       this.pushOpStack(
-          new Promise(function(res,rej){
+          function(res,rej){
               W5Explore.loadDataObjClass(dataobj).then(
                  function(DataObjClassPrototype){
                     var o=new DataObjClassPrototype(id,initialLabel,nodeTempl);
@@ -728,8 +734,9 @@ console.log("start applet with param stack=",appletname,paramstack);
                        res(curobj);
                     }
                     res(o);
-                 });
-          })
+                 }
+              );
+          }
       )
    };
 
@@ -1086,6 +1093,10 @@ console.log("start applet with param stack=",appletname,paramstack);
                    var nodeobj=app.node.get(selectedNodes[n]);
                    nodeobj.nodeMethods[methodName].exec.call(nodeobj);
                 }
+                console.log("INFO","pre processOpStack after call");
+                app.processOpStack(function(d){
+                   console.log("INFO","processOpStack finisch after call",d);
+                });
              });
              $(dbrec).html(""); 
              $(dbrec).append($(app.globalFunctions())); 
@@ -1242,6 +1253,7 @@ console.log("start applet with param stack=",appletname,paramstack);
       this.loadApplets().then(function(){
          if (runpath==undefined || runpath.length==0){
             app.showAppletList();
+            console.log("reset setMPath()");
             app.setMPath();
             $(".spinner").hide();
          }

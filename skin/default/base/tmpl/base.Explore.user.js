@@ -11,25 +11,20 @@
      var app=this.app;
      return(
         new Promise(function(ok,reject){
-console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
            app.Config().then(function(cfg){
               var w5obj=getModuleObject(cfg,dataobj);
                 w5obj.SetFilter({ userid:dataobjid });
                 w5obj.findRecord("userid,fullname,surname", function(data){
                    // detect all objects need to be preloaded
                    var cnt=data.length;
-                   var preLoad=[W5Explore.loadDataObjClass("base::user"),
-                                W5Explore.loadDataObjClass("base::grp")];
                    app.console.log("INFO","found "+data.length+
                                           " interface records");
                    console.log("fifi data=",data);
-                   Promise.all(preLoad).then(function(preload){
                       var promlst=new Array();
                       var edges=new Array();
                       for(c=0;c<cnt;c++){
-                         promlst.push(
                             app.addNode("base::user",data[c].userid,
-                                                     data[c].surname));
+                                                     data[c].fullname);
                       //   for(s=0;s<data[c].systems.length;s++){
                       //      promlst.push(
                       //         app.addNode("itil::system",
@@ -43,19 +38,7 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
                       //      });
                       //   }
                       } 
-                      app.console.log("INFO","start resolving promise objects");
-                      Promise.all(promlst).then(function(){
-                         for(c=0;c<edges.length;c++){
-                            app.addEdge(edges[c].fromid,edges[c].toid,{});
-                         }
-                         console.log("OK, all loaded");
-                      }).catch(function(e){
-                         console.log("not good - in ",e);
-                      });
-                   }).catch(function(e){
-                      console.log("not good2 - in ",e);
-                   });
-                   ok(data[0]);
+                      ok(1);
                 },function(exception){
                    app.console.log("got error from call");
                    reject(exception);
@@ -116,6 +99,7 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
 
    ClassAppletLib[applet].class.prototype.run=function(){
       var appletobj=this;
+      var app=this.app;
       this.app.node.clear();
       this.app.edge.clear();
       if (arguments.length){
@@ -131,17 +115,29 @@ console.log("app=",app,"dataobj=",dataobj,"dataobjid=",dataobjid);
          });
          this.app.console.log("INFO","loading scenario ...");
          console.log(" run in "+dataobj+" and id="+dataobjid);
+         appletobj.app.setMPath({
+               label:ClassAppletLib['%SELFNAME%'].desc.label,
+               mtag:'%SELFNAME%'
+            },
+            {
+               label:"loading ...",
+               mtag:dataobj+"/"+dataobjid
+            }
+         );
          this.loadItems(arguments[0]).then(function(d){
-             appletobj.app.console.log("INFO","scenario is loaded");
-             appletobj.app.setMPath({
-                   label:ClassAppletLib['%SELFNAME%'].desc.label,
-                   mtag:'%SELFNAME%'
-                },
-                {
-                   label:d.fullname,
-                   mtag:dataobj+"/"+d.userid
-                }
-             );
+             app.processOpStack(function(d){
+                app.console.log("INFO","scenario is loaded");
+                console.log("INFO","scenario is loaded d=",d);
+                app.setMPath({
+                      label:ClassAppletLib['%SELFNAME%'].desc.label,
+                      mtag:'%SELFNAME%'
+                   },
+                   {
+                      label:d[0].label,
+                      mtag:dataobj+"/"+d[0].dataobjid
+                   }
+                );
+             });
          }).catch(function(e){
              $(".spinner").hide();
          });

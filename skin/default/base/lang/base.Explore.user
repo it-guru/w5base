@@ -1,3 +1,4 @@
 'base::Explore::user'=>{de=>'Kontakt',en=>'Contact'},
 'sublabel'=>{de=>'BaseData',en=>'BaseData'},
+'description'=>{de=>'Kontakdarstellung inner halb seiner Organisationsstruktur' ,en=>'Display an contact with all direct related CIs'},
 
