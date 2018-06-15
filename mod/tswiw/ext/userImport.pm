@@ -93,7 +93,7 @@ sub processImport
    my $imprec=$l[0];
 
    my $user=getModuleObject($self->getParent->Config,"base::user");
-   $user->SetFilter([{'email'=>$imprec->{email}},{dsid=>$imprec->{uid}}]);
+   $user->SetFilter([{'email'=>$imprec->{email}},{posix=>$imprec->{uid}}]);
    my ($userrec,$msg)=$user->getOnlyFirst(qw(ALL));
    my $identifyby=undef;
    if (defined($userrec)){
@@ -110,7 +110,7 @@ sub processImport
          allowifupdate=>1,
          surname=>$imprec->{surname},
          givenname=>$imprec->{givenname},
-         dsid=>$imprec->{uid},
+         posix=>$imprec->{uid},
          email=>$imprec->{email}
       });
       return($identifyby);
