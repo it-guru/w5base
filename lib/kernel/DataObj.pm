@@ -2411,7 +2411,6 @@ sub ValidatedUpdateRecordTransactionless
 
       #######################################################################
       # Individual Attribute Handling
-printf STDERRR ("fifi Update in ValidatedUpdateRecordTransactionless\n");
       if (defined($self->{individualAttr})){
          my @fieldnames=keys(%$newrec);
          if ($#fieldnames==0){
