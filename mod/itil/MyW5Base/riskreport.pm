@@ -49,7 +49,7 @@ sub Init
                 label         =>'To');
    $self->{Field}->{to}->setParent($self);
 
-   $self->{Val}->{wfclass}=["",qw(problem change incident eventnotify)];
+   $self->{Val}->{wfclass}=[qw(riskmgmt opmeasure)]; # both geht noch nicht
 
    $self->{Val}->{refto}=[qw(eventend eventstart createdate mdate closedate)];
 
@@ -70,31 +70,21 @@ sub isSelectable
    my $self=shift;
    my %param=@_;
 
-   return(1);
- 
    my $u=$param{user};
    if (ref($u->{groups}) eq "ARRAY"){  
       foreach my $grprec (@{$u->{groups}}){ 
          if (ref($grprec->{roles}) eq "ARRAY"){
             return(1) if (in_array($grprec->{roles}, 
                           [qw(
-                              RINManager 
-                              RINManager2 
-                              RINOperator
-                              RCHManager 
-                              RCHManager2 
-                              RCHOperator
-                              RPRManager 
-                              RPRManager2 
-                              RPROperator
-                              RAuditor 
-                              RMonitor)],
+                              RSKManager 
+                              RSKCoord 
+                              )],
                           @{$grprec->{roles}}));
          }
       }
    }
    my $dataobj=$self->getDataObj();
-   return(1) if ($dataobj->IsMemberOf("admin"));
+#   return(1) if ($dataobj->IsMemberOf("admin"));
    return(0);
 }
 
@@ -106,6 +96,18 @@ sub getQueryTemplate
    my $dataobj=$self->getDataObj();
 
    #######################################################################
+   my @wfclass=@{$self->{Val}->{wfclass}};
+
+   my $reptyp="<select name=search_wfclass style=\"width:100%\">";
+   my $oldval=Query->Param("search_wfclass");
+   foreach my $wfclass (@wfclass){
+      $reptyp.="<option value=\"$wfclass\"";
+      $reptyp.=" selected" if ($wfclass eq $oldval);
+      $reptyp.=">".$self->T($wfclass)."</option>";
+   }
+   $reptyp.="</select>";
+   my $reptypl=$self->T("workflow class");
+
 
    #######################################################################
    my @refto=@{$self->{Val}->{refto}};
@@ -137,8 +139,8 @@ sub getQueryTemplate
 <div class=searchframe>
 <table class=searchframe>
 <tr>
-<td class=fname width=10%></td>
-<td class=finput width=40%></td>
+<td class=fname width=10%>$reptypl</td>
+<td class=finput width=40%>$reptyp</td>
 <td class=fname width=10%>$refsell:</td>
 <td class=finput width=40%>$refsel</td>
 </tr>
@@ -198,14 +200,16 @@ sub SetFilter
    #
    # verify allowed data for current MyW5Base module
    #
-   $flt->{duration}=CalcDateDuration($flt->{from},$flt->{to},"GMT");
-   if ($flt->{duration}->{totalseconds}<0){
-      $self->LastMsg(ERROR,"from is later then to");
-      return(undef);
-   }
-   if ($flt->{duration}->{totalseconds}>31622400){
-      $self->LastMsg(ERROR,"range is larger then the allowed limit of 366d");
-      return(undef);
+   if ($flt->{from} ne "" && $flt->{to} ne ""){
+      $flt->{duration}=CalcDateDuration($flt->{from},$flt->{to},"GMT");
+      if ($flt->{duration}->{totalseconds}<0){
+         $self->LastMsg(ERROR,"from is later then to");
+         return(undef);
+      }
+      if ($flt->{duration}->{totalseconds}>31622400){
+         $self->LastMsg(ERROR,"range is larger then the allowed limit of 366d");
+         return(undef);
+      }
    }
    if (defined($flt->{affectedapplication}) &&
        $flt->{affectedapplication} eq "*"){
@@ -227,22 +231,43 @@ sub SetFilter
       $self->LastMsg(ERROR,"invalid request for this module");
       return(undef);
    }
-   delete($flt->{refto});
-  # if ($flt->{to} eq "" || $flt->{from} eq ""){
-  #    $self->LastMsg(ERROR,"missing query param to prozess this request");
-  #    return(undef);
-  # }
    #######################################################################
-   #
    # make filter related to dataobj
    #
    my $dataobj=$self->getDataObj();
-   $flt->{class}=[grep(/^.*::riskmgmt$/,
-                       keys(%{$dataobj->{SubDataObj}}))];
+   if ($flt->{wfclass} eq "riskmgmt"){
+      $flt->{class}=[grep(/^.*::riskmgmt$/,
+                          keys(%{$dataobj->{SubDataObj}}))];
+   }
+   if ($flt->{wfclass} eq "opmeasure"){
+      $flt->{class}=[grep(/^.*::opmeasure$/,
+                          keys(%{$dataobj->{SubDataObj}}))];
+   }
    delete($flt->{wfclass});
 
-  # $flt->{$flt->{refto}}=">\"$flt->{from} GMT\" AND <\"$flt->{to} GMT\"";
-  # delete ($flt->{refto});
+
+
+
+   #######################################################################
+   my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
+             [qw(RSKManager RSKCoord)], "down");
+   my @grpids=keys(%grp);
+   @grpids=(qw(-1)) if ($#grpids==-1);
+   $flt->{mandatorid}=\@grpids;
+   #######################################################################
+
+   
+
+   if ($flt->{from} ne "" && $flt->{to} ne ""){
+      $flt->{$flt->{refto}}=">\"$flt->{from} GMT\" AND <\"$flt->{to} GMT\"";
+   }
+   if ($flt->{from} eq "" && $flt->{to} ne ""){
+      $flt->{$flt->{refto}}="<\"$flt->{to} GMT\"";
+   }
+   if ($flt->{from} ne "" && $flt->{to} eq ""){
+      $flt->{$flt->{refto}}=">\"$flt->{from} GMT\"";
+   }
+   delete ($flt->{refto});
    
    delete ($flt->{duration});
    delete ($flt->{to});
@@ -265,7 +290,10 @@ sub Result
    my $self=shift;
    my %q=$self->getDataObj()->getSearchHash();
 
-   $self->getDataObj()->setDefaultView(qw(eventstart eventend class name nature affectedapplication wffields.riskbasetype));
+   $self->getDataObj()->setDefaultView(qw(eventstart 
+            eventend state name nature affectedapplication 
+            wffields.riskbasetype
+            wffields.riskmgmtpoints));
 
    return(undef) if (!(my $f=$self->{Field}->{from}->Unformat($q{from})));
    $q{from}=$f->{from};

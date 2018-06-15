@@ -18,9 +18,9 @@
 'TELITMONIMP.3'=>{de=>'10T bis 50T EUR',  en=>'10T till 50T EUR'},
 'TELITMONIMP.4'=>{de=>'>50T EUR',  en=>'>50T EUR'},
 'Estimated financial impact within DTAG over the entire duration of the damage'=>{
-  de=>'Geschätzter finanzieller Impact innerhalb der DTAG über die gesamte Laufzeit des Schadens'
+  de=>'Geschätzter finanzieller Impact innerhalb der DTAG'
 },
 'Loss of IT - Immediate monetary impact within the Telekom IT'=>{
-  de=>'Schadensausmaß der IT - unmittelbare monetäre Auswirkung innerhalb der Telekom IT'
+  de=>'Schadensausmaß der IT - unmittelbare Auswirkung innerhalb der TelekomIT'
 },
 

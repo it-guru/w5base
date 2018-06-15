@@ -3,6 +3,8 @@
 'fieldgroup.riskrating'=>{de=>'Risikoauswertung',en=>'risk rating'},
 'fieldgroup.riskbase'=>{de=>'Risiko Basisdaten',en=>'risk basedata'},
 'wfaddopmeasure'=>{de=>'Maßnahme erstellen',en=>'create measure'},
+'wfclose'=>{de=>'Risko schließen',en=>'close risk'},
+'wfclosed'=>{de=>'Risko geschlossen',en=>'risk closed'},
 'wffine'=>{de=>'Risko beenden',en=>'finish risk'},
 'assign to'=>{de=>'Zuweisen an'},
 'abbort request'=>{de=>'Workflow abbrechen',en=>'abbort workflow'},
@@ -78,4 +80,6 @@
  de=>'Sonstiges Risiko',
  en=>'other risk'
 },
+'subwf'=>{de=>'zugeordnete Maßnamen',en=>'related measure'},
+'REV.subwf'=>{de=>'Riskio',en=>'risk'},
 

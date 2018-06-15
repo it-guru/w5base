@@ -60,13 +60,37 @@ sub storedParamHandler
    }
 }
 
-sub getRiskBaseTypeList
+
+sub isRiskWfAuthorized
 {
    my $self=shift;
-   my $param=shift;
+   my $rec=shift;
+   my $cachedArec=shift;
 
-   return("x","y");
+   if (!defined($cachedArec)){
+      my $applid=$rec->{affectedapplicationid};
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>$applid});
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(applmgrid));
+      if (defined($arec)){
+         $cachedArec=$arec;
+      }
+   }
+   my $userid=$self->getParent->getCurrentUserId();
+   if (!defined($cachedArec)){
+      return(0);
+   }
+   if ($userid eq $cachedArec->{applmgrid}){
+      return(1);
+   }
+   my @mandatorid=(@{$rec->{mandatorid}},$cachedArec->{mandatorid});
+
+   if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager)],"up")){
+      return(1);
+   }
+   return(0);
 }
+
 
 sub getDynamicFields
 {
@@ -262,7 +286,7 @@ sub getPosibleWorkflowDerivations
    my $actions=shift;
    my @l;
 
-   if ($WfRec->{stateid}<16){
+   if ($WfRec->{stateid}<17){
       push(@l,
          {label=>$self->T('Initiate developer request'),
           actor=>sub{
@@ -499,16 +523,24 @@ sub getPosibleActions
    my @l=$self->SUPER::getPosibleActions($WfRec);
 
    if (!$self->getParent->isDataInputFromUserFrontend()){
-      if ($WfRec->{stateid}>=16){
+      if ($WfRec->{stateid}>=17){
          push(@l,"wfforcerevise");
       }
    }
-
-   push(@l,"wfaddopmeasure");
+   if ($WfRec->{stateid}<17){
+      push(@l,"wfaddopmeasure");
+   }
    push(@l,"wfmailsend");
    push(@l,"wfforward");
-   push(@l,"wffine");
-   push(@l,"wfbreak");
+   if ($WfRec->{stateid} eq "17"){
+      push(@l,"wffine");
+   }
+   if ($WfRec->{stateid} > 1 && $WfRec->{stateid} ne "17"){
+      push(@l,"wfclose");
+   }
+   if ($WfRec->{stateid} eq "1"){
+      push(@l,"wfbreak");
+   }
    push(@l,"wfaddnote");
   # if (($stateid==2 || $stateid==3 || $stateid==4 || $stateid==10) && 
   #     ($iscurrent || ($isadmin && !$lastworker==$userid))){
@@ -546,13 +578,16 @@ sub isViewValid
 sub isWriteValid
 {
    my $self=shift;
+   my $rec=shift;
    my @l=$self->SUPER::isWriteValid(@_);
    push(@l,"extdesc") if (!defined($_[0]));
-   if (grep(/^default$/,@l)){
-      push(@l,"customerdata");
+
+   if ($rec->{stateid} <16){
+      if (grep(/^default$/,@l)){
+         push(@l,"riskdesc");
+      }
       push(@l,"riskdesc");
    }
-      push(@l,"riskdesc");
    return(@l);
 }
 
@@ -609,6 +644,41 @@ sub WSDLaddNativFieldList
 
    return($self->SUPER::WSDLaddNativFieldList($uri,$ns,$fp,$class,$mode,
                               $XMLbinding,$XMLportType,$XMLmessage,$XMLtypes));
+}
+
+
+sub isRiskParameterComplete
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (effVal($oldrec,$newrec,"extdescarisedate") eq ""){
+      return(0);
+   }
+   return(1);
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $allok=$self->isRiskParameterComplete($oldrec,$newrec);
+
+   if ($allok){
+      if (effVal($oldrec,$newrec,"stateid")<4){
+         $newrec->{stateid}=4;
+      }
+   }  
+   else{
+      if (effVal($oldrec,$newrec,"stateid") eq "4"){
+         $newrec->{stateid}=1;
+      }
+   }
+   return(1);
 }
 
 
@@ -740,14 +810,28 @@ printf STDERR ("nativProcess $self action=$action h=%s\n",Dumper($h));
          my $appl=getModuleObject($self->getParent->Config,"itil::appl");
          $appl->SetFilter($flt);
          my ($arec)=$appl->getOnlyFirst(qw(mandator mandatorid conumber
-                                           custcontracts
+                                           custcontracts applmgr applmgrid
                                            customer customerid));
          if (defined($arec)){
-print STDERR ("d=%s\n",Dumper($arec));
+            if ($arec->{applmgrid} eq "" || $arec->{applmgr} eq ""){
+               $self->LastMsg(ERROR,"no responsible applicationmanager");
+               return(0);
+            }
+            if ($arec->{mandator} eq "" || $arec->{mandatorid} eq ""){
+               $self->LastMsg(ERROR,"can not find mandator");
+               return(0);
+            }
+            $h->{fwdtarget}='base::user';
+            $h->{fwdtargetid}=$arec->{applmgrid};
+
             $h->{mandatorid}=[$arec->{mandatorid}];
             $h->{mandator}=[$arec->{mandator}];
             $h->{involvedcustomer}=[$arec->{customer}];
             $h->{involvedcostcenter}=[$arec->{conumber}];
+            if (!$self->getParent->isRiskWfAuthorized($h,$arec)){
+               $self->LastMsg(ERROR,"no authorisation to create risk workflow");
+               return(0);
+            }
             if (ref($arec->{custcontracts}) eq "ARRAY"){
                my %custcontractid;
                my %custcontract;
@@ -1014,6 +1098,14 @@ sub Process
          my $h=$self->getWriteRequestHash("web");
          return($self->nativProcess("wffine",$h,$WfRec,$actions));
       }
+      elsif ($op eq "wfclose"){
+         my $note=Query->Param("note");
+         my $effort=Query->Param("Formated_effort");
+         my $h={};
+         $h->{note}=$note                     if ($note ne "");
+         $h->{effort}=$effort                 if ($effort ne "");
+         return($self->nativProcess($op,$h,$WfRec,$actions));
+      }
 
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
@@ -1087,6 +1179,8 @@ sub nativProcess
       my $newrec={
          affectedapplicationid=>$WfRec->{affectedapplicationid},
          affectedapplication=>$WfRec->{affectedapplication},
+         mandator=>$WfRec->{mandator},
+         mandatorid=>$WfRec->{mandatorid},
          name=>$h->{name},
          stateid=>'2',
          plannedstart=>'now',
@@ -1099,9 +1193,10 @@ sub nativProcess
       my $id=$self->getParent->getParent->Store(undef,$newrec);
       my $myid=$WfRec->{id};
       if (defined($id)){
-         my $wr=getModuleObject($self->getParent->getParent->Config,"base::workflowrelation");
+         my $wr=getModuleObject($self->getParent->getParent->Config,
+                                "base::workflowrelation");
          $wr->ValidatedInsertRecord({
-            name=>"derivation",
+            name=>"subwf",
             translation=>"itil::workflow::riskmgmt",
             srcwfid=>$myid,
             dstwfid=>$id,
@@ -1111,7 +1206,40 @@ sub nativProcess
       }
       return(0);
    }
-   elsif($op eq "wffine"){
+   elsif($op eq "wfclose"){
+      # hier muss noch der Risko-Coordinator berechnet werden!
+      my @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
+                                             ['RSKCoord'],'firstup');
+      if ($#mem==-1){
+         @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
+                                             ['RSKManager'],'firstup');
+      }
+      if ($#mem==-1){
+         $self->LastMsg(ERROR,"missing RSKCoord or RSKManager");
+         return(0);
+      }
+      my $riskchef=$mem[0];
+
+
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfclosed",
+          {translation=>'itil::workflow::riskmgmt'},$h->{note},$h->{effort})){
+         my $store={stateid=>17,
+                    fwdtargetid=>$riskchef,
+                    fwdtarget=>'base::user',
+                    eventend=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if ($WfRec->{eventend} eq ""){
+            $store->{eventend}=NowStamp("en");
+         }
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         return(1);
+      }
+   }
+   elsif($op eq "wffinish"){
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wffine",
           {translation=>'base::workflow::request'},"",undef)){
@@ -1173,6 +1301,14 @@ sub generateWorkspacePages
           "</td>";
       $d.="</tr></table>";
       $$divset.="<div id=OPwfaddopmeasure class=\"$class\">$d</div>";
+   }
+   if (grep(/^wfclose$/,@$actions)){
+      $$selopt.="<option value=\"wfclose\">".
+                $self->getParent->T("wfclose",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfclose class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions).
+                "</div>";
    }
    if (grep(/^wffine$/,@$actions)){
       $$selopt.="<option value=\"wffine\">".

@@ -63,6 +63,24 @@ sub getDynamicFields
 }
 
 
+sub isRiskParameterComplete
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   return(0) if (!$self->SUPER::isRiskParameterComplete($oldrec,$newrec));
+
+   if (effVal($oldrec,$newrec,"extdescdtagmonetaryimpact") eq ""){
+      return(0);
+   }
+   return(1);
+
+
+}
+
+
+
 sub calculateRiskState
 {
    my $self=shift;
