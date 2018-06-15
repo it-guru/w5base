@@ -484,7 +484,7 @@ var W5ExploreClass=function(){
       this.main = document.getElementById('main');
       this.main.innerHTML = '';
 
-      if (!this.mpathline){   // ensure existing mpathline to be not destroyed
+      //if (!this.mpathline){   // ensure existing mpathline to be not destroyed
          this.mpathline = document.createElement('div');
          this.mpathline.id = 'mpath';
          $(this.mpathline).addClass("TitleBar");
@@ -506,7 +506,7 @@ var W5ExploreClass=function(){
          this.mpath = document.createElement('ul');
          $(this.mpath).addClass("TitleBar-arrows");
          this.mpathline.appendChild(this.mpath);
-      }
+      //}
       this.main.appendChild(this.mpathline);
 
       this.workspace = document.createElement('div');
@@ -718,7 +718,7 @@ console.log("start applet with param stack=",appletname,paramstack);
 
    this.addNode=function(dataobj,id,initialLabel,nodeTempl){
       this.pushOpStack(
-          function(res,rej){
+          new Promise(function(res,rej){
               W5Explore.loadDataObjClass(dataobj).then(
                  function(DataObjClassPrototype){
                     var o=new DataObjClassPrototype(id,initialLabel,nodeTempl);
@@ -736,7 +736,7 @@ console.log("start applet with param stack=",appletname,paramstack);
                     res(o);
                  }
               );
-          }
+          })
       )
    };
 

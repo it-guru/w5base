@@ -75,7 +75,7 @@
       var appletobj=this;
       this.app.node.clear();
       this.app.edge.clear();
-      this.app.ShowNetworkMap({
+      this.app.ShowNetworkMap({  // not good - MPath will be reseted
          physics: {
             barnesHut:{
                gravitationalConstant:-4100
@@ -83,6 +83,11 @@
             enabled: true
          }
       });
+      appletobj.app.setMPath({
+            label:ClassAppletLib['%SELFNAME%'].desc.label,
+            mtag:'%SELFNAME%'
+         },
+      );
       this.app.console.log("INFO","loading scenario ...");
       this.loadItemList().then(function(d){
           appletobj.app.console.log("INFO","scenario is loaded");
