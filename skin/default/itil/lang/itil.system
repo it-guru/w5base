@@ -106,4 +106,4 @@
 'add applications'=>{de=>'Anwendungen hinzufügen'},
 'add IP-Addresses'=>{de=>'IP-Adressen hinzufügen'},
 'individual attributes'=>{de=>'individuelle Attribute'},
-'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'indivial attributes'},
+'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},

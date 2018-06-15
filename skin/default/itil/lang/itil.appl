@@ -200,4 +200,4 @@
 'set item visual focus'=>{de=>'Darstellung auf Element fokusieren'},
 'add systems'=>{de=>'logische Systeme hinzufügen'},
 'individual attributes'=>{de=>'individuelle Attribute'},
-'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'indivial attributes'},
+'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},
