@@ -1,0 +1,4 @@
+'itil::Explore::servicetree'=>{de=>'BusinessService Tree',en=>'BusinessService Tree'},
+'description'=>{de=>'Darstellung eines BusinessServices innerhalb des Service-Trees' ,en=>'Display an BusinessService with all direct related CIs'},
+'sublabel'=>{de=>'IT-Inventar',en=>'IT-Inventory'},
+
