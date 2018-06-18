@@ -28,13 +28,13 @@
    de=>'Welche Art von Riskio haben Sie?'
 },
 'Description of the impact on the occurrence of the risk'=>{
-  de=>'Beschreibung der Auswirkungen beim Eintritt des Risikos (Schadensszenario)'
+  de=>'Beschreibung der Auswirkungen beim Eintrittenario)'
 },
 'Estimate downtime (in days) in case the risk occurs'=>{
   de=>'Geschätzte Ausfallzeit (in Tagen) bei Risikoeintritt'
 },
 'Probability of occurrence Risk within the next 12 months'=>{
-  de=>'Eintrittswahrscheinlichkeit des Risikos innerhalb der nächsten 12 Monate'
+  de=>'Eintrittswahrscheinlichkeit des Risikos  nächsten 12 Monate'
 },
 'RISKBASE.personal'=>{
  de=>'Personalressourcen- / Skillrisiko',
@@ -80,6 +80,10 @@
  de=>'Sonstiges Risiko',
  en=>'other risk'
 },
-'subwf'=>{de=>'zugeordnete Maßnamen',en=>'related measure'},
-'REV.subwf'=>{de=>'Riskio',en=>'risk'},
-
+'riskmesure'=>{de=>'zugeordnete Maßnamen',en=>'related measure'},
+'REV.riskmesure'=>{de=>'Riskio',en=>'risk'},
+'risk base data application'=>{de=>'Risiko Basisdaten Anwendung'},
+'cancel risk workflow'=>{de=>'Risikobehandlung abbrechen'},
+'risk base data application'=>{de=>'Riskio Basisdaten-Anwendung'},
+'Risiko processual estimation'=>{de=>'Riskio prozessuale Beurteilung'},
+'Risiko calculation log'=>{de=>'Riskio Berechnungsprotokoll'},

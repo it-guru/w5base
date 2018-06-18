@@ -3889,6 +3889,7 @@ sub RawValue
 
    foreach my $rec ($fo->getHashList(qw(mdate id dstwfid srcwfid
                                         dstwfclass srcwfclass
+                                        dststate
                                         dstwfname srcwfname name comments))){
       my %drec=(%$rec);
       push(@lst,\%drec);

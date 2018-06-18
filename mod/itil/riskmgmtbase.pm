@@ -69,6 +69,7 @@ sub new
                 group         =>'riskdata',
                 label         =>'ITRM criticality',
                 allowempty    =>1,
+                htmleditwidth =>'30px',
                 value         =>[qw(1 2 3 4 5)],
                 dataobjattr   =>'riskmgmtbase.itrmcriticality'),
 

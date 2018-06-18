@@ -1,1 +1,13 @@
 'itil::MyW5Base::riskreport'=>{de=>'IT-Workflow: meine Risikobehandlungs Workflows',en=>'IT-Workflow: my riskmgmt workflows'},
+'reference to'=>{de=>'Bezugszeitpunkt'},
+'eventend'=>{de=>'Ereignisende'},
+'eventstart'=>{de=>'Ereignisbeginn'},
+'mdate'=>{de=>'Bearbeitungszeitpunkt'},
+'closedate'=>{de=>'Abschlusszeitpunkt'},
+'createdate'=>{de=>'Erstellungszeitpunkt'},
+'workflow class'=>{de=>'Workflow Klasse'},
+'riskmgmt'=>{de=>'Riskiobehandlung'},
+'opmeasure'=>{de=>'Risikomaßnahme'},
+'From'=>{de=>'von'},
+'To'=>{de=>'bis'},
+

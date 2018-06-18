@@ -28,6 +28,7 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
    $self->{history}=[qw(insert modify delete)];
    return($self);
 }
@@ -83,7 +84,10 @@ sub isRiskWfAuthorized
    if ($userid eq $cachedArec->{applmgrid}){
       return(1);
    }
-   my @mandatorid=(@{$rec->{mandatorid}},$cachedArec->{mandatorid});
+   my @mandatorid=($cachedArec->{mandatorid});
+   if (defined($rec) && ref($rec->{mandatorid}) eq "ARRAY"){
+      push(@mandatorid,@{$rec->{mandatorid}});
+   }
 
    if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager)],"up")){
       return(1);
@@ -129,7 +133,8 @@ sub getDynamicFields
 
       new kernel::Field::Select(  name          =>'extdescriskoccurrency',
                                   label         =>'Probability of occurrence Risk within the next 12 months',
-                                  value         =>['0','1','2','3','4','5','6','7','8','9','10','11'],
+                                  value         =>['0','1','2','3','4','5',
+                                                   '6','7','8','9','10','11'],
                                   default       =>'0',
                                   transprefix   =>'RISKPCT.',
                                   group         =>'riskdesc',
@@ -162,13 +167,29 @@ sub getDynamicFields
                                   group         =>'riskrating',
                                   onRawValue    =>\&getCalculatedRiskState),
 
-      new kernel::Field::Textarea(name          =>'riskmgmtstate',
-                                  label         =>'Risiko state',
+      new kernel::Field::Textarea(name          =>'riskmgmtcalclog',
+                                  label         =>'Risiko calculation log',
+                                  htmlwidth     =>'500',
                                   vjoinconcat   =>"\n",
                                   htmldetail    =>'NotEmpty',
                                   group         =>'riskrating',
                                   onRawValue    =>\&getCalculatedRiskState),
 
+      new kernel::Field::Textarea(name          =>'riskmgmtestimation',
+                                  label         =>'Risiko processual estimation',
+                                  htmlwidth     =>'500',
+                                  vjoinconcat   =>"\n",
+                                  htmldetail    =>'NotEmpty',
+                                  group         =>'riskrating',
+                                  onRawValue    =>\&getCalculatedRiskState),
+
+      new kernel::Field::TextDrop(name          =>'applicationbase',
+                                  label         =>'risk base data application',
+                                  group         =>'riskbase',
+                                  vjointo       =>'itil::riskmgmtbase',
+                                  vjoindisp     =>'name',
+                                  vjoinon       =>['affectedapplicationid'=>
+                                                   'id']),
 
       new kernel::Field::TextDrop(name          =>'solutionopt',
                                   label         =>'Solution OPT',
@@ -248,8 +269,8 @@ sub calculateRiskState
 
 
 
-#    push(@{$st->{raw}->{riskmgmtstate}},"v1");
-#    push(@{$st->{raw}->{riskmgmtstate}},"this is a message");
+#    push(@{$st->{raw}->{riskmgmtcalclog}},"v1");
+#    push(@{$st->{raw}->{riskmgmtcalclog}},"this is a message");
 
 }
 
@@ -267,7 +288,8 @@ sub getCalculatedRiskState
       my $st={
          raw=>{
             riskmgmtpoints=>'',
-            riskmgmtstate=>[],
+            riskmgmtcalclog=>[],
+            riskmgmtestimation=>[],
             riskmgmtcolor=>''
          }
       };
@@ -520,6 +542,28 @@ sub getPosibleActions
 {
    my $self=shift;
    my $WfRec=shift;
+   my $userid=$self->getParent->getCurrentUserId();
+   my $isadmin=$self->getParent->IsMemberOf("admin");
+   my $iscurrent=$self->isCurrentForward($WfRec);
+   my $lastworker=$WfRec->{owner};
+   my $creator=$WfRec->{openuser};
+   my $initiatorid=$WfRec->{initiatorid};
+   my $isRiskWfAuthorized=$self->isRiskWfAuthorized($WfRec);
+
+   my $openSubWf=0;
+
+   foreach my $relrec (@{$WfRec->{relations}}){
+      if ($relrec->{dststate}<20){
+         $openSubWf=1;
+      }
+   }
+
+
+   my $isworkspace=0;
+   if (!$iscurrent){  # check Workspace only if not current
+      $isworkspace=$self->isCurrentWorkspace($WfRec);
+   }
+
    my @l=$self->SUPER::getPosibleActions($WfRec);
 
    if (!$self->getParent->isDataInputFromUserFrontend()){
@@ -527,43 +571,45 @@ sub getPosibleActions
          push(@l,"wfforcerevise");
       }
    }
-   if ($WfRec->{stateid}<17){
-      push(@l,"wfaddopmeasure");
+   if ($WfRec->{stateid}<16 && $WfRec->{stateid}>=4){
+      if ($iscurrent){
+         push(@l,"wfaddopmeasure");
+      }
    }
-   push(@l,"wfmailsend");
-   push(@l,"wfforward");
+   if ($WfRec->{stateid}<17){  # noch nicht geschlossen
+      if ($iscurrent){
+         push(@l,"wfmailsend");
+         push(@l,"wfforward");
+      }
+   }
+   if ($WfRec->{stateid}<20){  # noch nicht beendet
+      if ($isRiskWfAuthorized){
+         push(@l,"wfforward");
+      }
+   }
    if ($WfRec->{stateid} eq "17"){
-      push(@l,"wffine");
+      if ($iscurrent && $isRiskWfAuthorized){
+         push(@l,"wffine");
+      }
    }
    if ($WfRec->{stateid} > 1 && $WfRec->{stateid} ne "17"){
-      push(@l,"wfclose");
+      if (($iscurrent || $isadmin) && !$openSubWf){
+         push(@l,"wfclose");
+      }
    }
-   if ($WfRec->{stateid} eq "1"){
-      push(@l,"wfbreak");
+   if ($WfRec->{stateid} eq "1"){  
+      if ($iscurrent || $userid==$creator || $isadmin){
+         push(@l,"wfbreak");
+      }
    }
-   push(@l,"wfaddnote");
-  # if (($stateid==2 || $stateid==3 || $stateid==4 || $stateid==10) && 
-  #     ($iscurrent || ($isadmin && !$lastworker==$userid))){
-  #    if ($userid!=$creator){
-  #       push(@l,"wfforward"); # workflow beliebig weiterleiten 
-  #    }
-  #    else{
-  #       my $foundothers=0;
-  #       foreach my $action (@{$WfRec->{shortactionlog}}){
-  #          if ($action->{creator}!=$creator){
-  #             $foundothers=1;
-  #          }
-  #       }
-  #       if (!$foundothers){
-  #          push(@l,"wfforward"); # workflow beliebig weiterleiten 
-  #       }
-  #    }
-  # }
-   if ($WfRec->{stateid}>=20){
+   if ($iscurrent){
+      push(@l,"wfaddnote");
+   }
+   if ($WfRec->{stateid}>=20){  # ab beendet ist nichts mehr machbar
       @l=();
    }
    
-printf STDERR ("fifi posible Actions=%s\n",join(",",@l));
+   msg(INFO,"posible Actions in riskmgmt workflow=".join(",",@l));
    return(@l);
 }
 
@@ -861,7 +907,6 @@ printf STDERR ("nativProcess $self action=$action h=%s\n",Dumper($h));
          $self->LastMsg(ERROR,"no applicationid findable");
          return(0);
       }
-printf STDERR ("fifi 03\n");
       if (my $id=$self->StoreRecord($WfRec,$h)){
          $h->{id}=$id;
       #   if ($#wsref!=-1){
@@ -937,7 +982,6 @@ sub Validate
    my $newrec=$_[1];
    my $found=0;
 
-printf STDERR ("fifi in $self Validate %s\n",Dumper($newrec));
 
    my $aid=effVal($oldrec,$newrec,"affectedapplicationid");
    if ($aid ne ""){
@@ -945,7 +989,6 @@ printf STDERR ("fifi in $self Validate %s\n",Dumper($newrec));
       my $co=getModuleObject($self->getParent->Config,"itil::costcenter");
       my $app=getModuleObject($self->getParent->Config,"itil::appl");
 
-printf STDERR ("fifi2 in Validate\n");
       $app->SetFilter({id=>$aid});
       my @l=$app->getHashList(qw(custcontracts mandator 
                                  conumber mandatorid));
@@ -1000,7 +1043,6 @@ printf STDERR ("fifi2 in Validate\n");
          $found++;
          $newrec->{involvedcostcenter}=[keys(%conumber)];
       }
-printf STDERR ("fifi3 in Validate %s\n",Dumper($newrec));
    }
    if ($found!=1){
       $self->LastMsg(ERROR,"no valid application found in request");
@@ -1018,6 +1060,7 @@ sub getWorkHeight
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
 
    return("340");
 }
@@ -1038,7 +1081,6 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-printf STDERR ("fifi oldrec=%s newrec=%s\n",$oldrec,$newrec);
 
    return(1);
 }
@@ -1051,52 +1093,41 @@ sub Process
    my $WfRec=shift;
    my $actions=shift;
 
-   #if ($self->getParent->getParent->IsMemberOf("admin")){
-   #   if ($action eq "NextStep"){
-   #      my $h=$self->getWriteRequestHash("web");
-   #      my $fobj=$self->getParent->getField("fwdtargetname");
-   #      my $h=$self->getWriteRequestHash("web");
-   #      if ($h=$fobj->Validate($WfRec,$h)){
-   #         if (!defined($h->{fwdtarget}) ||
-   #             !defined($h->{fwdtargetid} ||
-   #             $h->{fwdtargetid}==0)){
-   #            if ($self->LastMsg()==0){
-   #               $self->LastMsg(ERROR,"invalid or no forwarding target");
-   #            }
-   #            return(0);
-   #         }
-   #      }
-   #      else{
-   #         return(0);
-   #      }
-   #      $h->{stateid}=2;
-   #      $h->{eventend}=undef;
-   #      $h->{closedate}=undef;
-   #      $h->{step}=$self->getParent->getStepByShortname("main");
-   #      if (!$self->StoreRecord($WfRec,$h)){
-   #         return(0);
-   #      }
-   #      my $fwdtargetname=Query->Param("Formated_fwdtargetname");
-   #      $self->getParent->getParent->Action->StoreRecord(
-   #          $WfRec->{id},"wfreactiv",
-   #          {translation=>'base::workflow::request'},$fwdtargetname,undef);
-   #      Query->Delete("WorkflowStep");
-   #      return(1);
-   #   }
-   #}
+   my $op=Query->Param("OP");
+
+
+   if ($action eq "BreakWorkflow"){
+      my $h=$self->getWriteRequestHash("web");
+      return($self->nativProcess("wfbreak",$h,$WfRec,$actions));
+   }
+
+
    if ($action eq "SaveStep"){
-      my $op=Query->Param("OP");
       if ($action ne "" && !grep(/^$op$/,@{$actions})){
          $self->LastMsg(ERROR,"invalid disalloed action requested");
          return(0);
       }
       elsif ($op eq "wfaddopmeasure"){
          my $h=$self->getWriteRequestHash("web");
-         return($self->nativProcess($op,$h,$WfRec,$actions));
+         $h->{plannedstart}=Query->Param("Formated_plannedstart");
+         $h->{plannedend}=Query->Param("Formated_plannedend");
+         my $bk=$self->nativProcess($op,$h,$WfRec,$actions);
+         if ($bk){
+            Query->Delete("Formated_plannedstart");
+            Query->Delete("Formated_plannedend");
+            Query->Delete("Formated_detaildescription");
+            Query->Delete("Formated_name");
+            return($bk);
+         }
+         return(!$bk);
       }
       elsif ($op eq "wffine"){
          my $h=$self->getWriteRequestHash("web");
          return($self->nativProcess("wffine",$h,$WfRec,$actions));
+      }
+      elsif ($op eq "wfbreak"){
+         my $h=$self->getWriteRequestHash("web");
+         return($self->nativProcess("wfbreak",$h,$WfRec,$actions));
       }
       elsif ($op eq "wfclose"){
          my $note=Query->Param("note");
@@ -1124,10 +1155,11 @@ sub getPosibleButtons
    }
    if (defined($WfRec->{id})){
       if (grep(/^wfbreak$/,@$actions)){
-         $b{BreakWorkflow}=$self->T('abbort request','kernel::WfStep');
+         $b{BreakWorkflow}=$self->T('cancel risk workflow',
+                                    'itil::workflow::riskmgmt');
       }
    }
-print STDERR "Buttons:".Dumper(\%b);
+   #print STDERR "Buttons:".Dumper(\%b);
    return(%b);
 }
 
@@ -1147,6 +1179,7 @@ sub nativProcess
       msg(ERROR,"invalid requested operation was '$op'");
       return(0);
    }
+
 
    if ($op eq "wfbreak"){
       if ($self->getParent->getParent->Action->StoreRecord(
@@ -1183,20 +1216,37 @@ sub nativProcess
          mandatorid=>$WfRec->{mandatorid},
          name=>$h->{name},
          stateid=>'2',
-         plannedstart=>'now',
-         plannedend=>'now+14d',
          fwdtargetname=>$h->{fwdtargetname},
          detaildescription=>$h->{detaildescription},
          class=>'itil::workflow::opmeasure',
          step =>'base::workflow::request::main'
       };
+      if ($h->{plannedstart} eq ""){
+         $h->{plannedstart}="now";
+      }
+      if ($h->{plannedend} eq ""){
+         $h->{plannedend}="now+30d";
+      }
+      my $tstamp=$self->ExpandTimeExpression($h->{plannedstart},"en",
+                               $self->UserTimezone(),"GMT");
+      return(0) if (!defined($tstamp));
+      $newrec->{plannedstart}=$tstamp;
+
+      my $tstamp=$self->ExpandTimeExpression($h->{plannedend},"en",
+                               $self->UserTimezone(),"GMT");
+      return(0) if (!defined($tstamp));
+      $newrec->{plannedend}=$tstamp;
+      print STDERR Dumper($newrec);
+
+
+
       my $id=$self->getParent->getParent->Store(undef,$newrec);
       my $myid=$WfRec->{id};
       if (defined($id)){
          my $wr=getModuleObject($self->getParent->getParent->Config,
                                 "base::workflowrelation");
          $wr->ValidatedInsertRecord({
-            name=>"subwf",
+            name=>"riskmesure",
             translation=>"itil::workflow::riskmgmt",
             srcwfid=>$myid,
             dstwfid=>$id,
@@ -1289,17 +1339,34 @@ sub generateWorkspacePages
                 "</option>\n";
       my $desc=Query->Param("Formated_name");
       my $note=Query->Param("Formated_detaildescription");
+      my $pstart=Query->Param("Formated_plannedstart");
+      my $pend=Query->Param("Formated_plannedend");
 
       my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td nowrap width=1%>Maﬂname Kurzbezeichnung:</td><td><input type=text name=Formated_name value='".quoteHtml($desc)."' style=\"width:100%\"></td></tr></table><table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=Formated_detaildescription style=\"width:100%;height:100px\">".
-         quoteHtml($note)."</textarea></td></tr>";
+          "<td nowrap width=1%>Maﬂname Kurzbezeichnung:</td>".
+          "<td><input type=text name=Formated_name value='".quoteHtml($desc).
+          "' style=\"width:100%\"></td></tr></table>";
+      $d.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
+          "<td nowrap width=1%>geplannt von:</td>".
+          "<td width=20%><input type=text name=Formated_plannedstart ".
+          "value='".quoteHtml($pstart).
+          "' style=\"width:100%\"></td>".
+          "<td nowrap width=1%>bis:</td>".
+          "<td width=20%><input type=text name=Formated_plannedend ".
+          "value='".quoteHtml($pend).
+          "' style=\"width:100%\"></td>".
+          "</tr></table>";
+      $d.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
+          "<td colspan=2>".
+          "<textarea name=Formated_detaildescription ".
+          "style=\"width:100%;height:90px\">".
+          quoteHtml($note)."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>".
           $self->getParent->T("assign to","itil::workflow::riskmgmt").
           ":&nbsp;</td>".
           "<td>\%fwdtargetname(detail)\%".
-          "</td>";
-      $d.="</tr></table>";
+          "</td></tr>";
+      $d.="</table>";
       $$divset.="<div id=OPwfaddopmeasure class=\"$class\">$d</div>";
    }
    if (grep(/^wfclose$/,@$actions)){
@@ -1322,6 +1389,7 @@ sub generateWorkspacePages
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
    return("wfaddnote");
 }
+
 
 
 #######################################################################
@@ -1364,6 +1432,11 @@ sub getWorkHeight
 }
 
 
+#######################################################################
+package itil::workflow::riskmgmt::break;
+use vars qw(@ISA);
+use kernel;
+@ISA=qw(base::workflow::request::finish);
 
 
 

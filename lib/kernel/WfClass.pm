@@ -1060,6 +1060,9 @@ sub getWorkHeight
 {
    my $self=shift;
    my $WfRec=shift;
+   my $actions=shift;
+
+   return(0) if (ref($actions) eq "ARRAY" && $#{$actions}==-1);
 
    return(200);
 }

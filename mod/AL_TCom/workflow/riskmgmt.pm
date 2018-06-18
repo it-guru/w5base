@@ -100,15 +100,15 @@ sub calculateRiskState
    }
 
    if ($v->{extdescarisedate} eq ""){
-      push(@{$st->{raw}->{riskmgmtstate}},"ERROR: missing date of rise");
+      push(@{$st->{raw}->{riskmgmtcalclog}},"ERROR: missing date of rise");
    }
    if ($v->{extdescriskoccurrency} eq ""){
-      push(@{$st->{raw}->{riskmgmtstate}},"ERROR: missing pct occurrency");
+      push(@{$st->{raw}->{riskmgmtcalclog}},"ERROR: missing pct occurrency");
    }
    if ($v->{extdescdtagmonetaryimpact} eq ""){
-      push(@{$st->{raw}->{riskmgmtstate}},"ERROR: missing DTAG mony impact");
+      push(@{$st->{raw}->{riskmgmtcalclog}},"ERROR: missing DTAG mony impact");
    }
-   if ($#{$st->{raw}->{riskmgmtstate}}!=-1){
+   if ($#{$st->{raw}->{riskmgmtcalclog}}!=-1){
       $st->{raw}->{riskmgmtcolor}="hotpink";
       $st->{raw}->{riskmgmtpoints}="???";
    }
@@ -116,7 +116,7 @@ sub calculateRiskState
       my $d=CalcDateDuration(NowStamp("en"),$v->{extdescarisedate});
       $v->{extdescarisedatedays}=$d->{days};
 
-      push(@{$st->{raw}->{riskmgmtstate}},
+      push(@{$st->{raw}->{riskmgmtcalclog}},
            "INFO: days to rise:  $v->{extdescarisedatedays}");
 
       if ($v->{extdescarisedatedays}<30){
@@ -132,33 +132,38 @@ sub calculateRiskState
          $v->{extdescarisedatedayspoint}=0;
       }
 
-      push(@{$st->{raw}->{riskmgmtstate}},
-           "INFO: days points :  $v->{extdescarisedatedayspoint}");
+      push(@{$st->{raw}->{riskmgmtcalclog}},
+           "INFO: days to rise in points :  ".
+           "$v->{extdescarisedatedayspoint}");
 
 
 
-      push(@{$st->{raw}->{riskmgmtstate}},
-           "INFO: DTAG money $v->{extdescdtagmonetaryimpact}");
-      push(@{$st->{raw}->{riskmgmtstate}},
-           "INFO: risk $v->{extdescriskoccurrency}");
-      $v->{extdescriskoccurrencylevel}=0 if ($v->{extdescriskoccurrency} eq "0" ||
-                                             $v->{extdescriskoccurrency} eq "1" ||
-                                             $v->{extdescriskoccurrency} eq "2");
-      
-      $v->{extdescriskoccurrencylevel}=1 if ($v->{extdescriskoccurrency} eq "3" ||
-                                             $v->{extdescriskoccurrency} eq "4" ||
-                                             $v->{extdescriskoccurrency} eq "5");
+      push(@{$st->{raw}->{riskmgmtcalclog}},
+           "INFO: DTAG monetary impact row number ".
+           "(wffields.extdescdtagmonetaryimpact): ".
+           "$v->{extdescdtagmonetaryimpact}");
+      push(@{$st->{raw}->{riskmgmtcalclog}},
+           "INFO: risk of occurrency (wffields.extdescriskoccurrency):".
+           " $v->{extdescriskoccurrency}");
+      if (in_array([0,1,2],$v->{extdescriskoccurrency})){
+         $v->{extdescriskoccurrencylevel}=0;
+      }
+      elsif (in_array([3,4],$v->{extdescriskoccurrency})){
+         $v->{extdescriskoccurrencylevel}=1;
+      }
+      elsif (in_array([5,6],$v->{extdescriskoccurrency})){
+         $v->{extdescriskoccurrencylevel}=2;
+      }
+      elsif (in_array([7,8],$v->{extdescriskoccurrency})){
+         $v->{extdescriskoccurrencylevel}=3;
+      }
+      else{
+         $v->{extdescriskoccurrencylevel}=4;
+      }
 
-      $v->{extdescriskoccurrencylevel}=2 if ($v->{extdescriskoccurrency} eq "6" ||
-                                             $v->{extdescriskoccurrency} eq "7" ||
-                                             $v->{extdescriskoccurrency} eq "8");
-      
-      $v->{extdescriskoccurrencylevel}=3 if ($v->{extdescriskoccurrency} eq "8" ||
-                                             $v->{extdescriskoccurrency} eq "9" ||
-                                             $v->{extdescriskoccurrency} eq "10"||
-                                             $v->{extdescriskoccurrency} eq "11");
-      push(@{$st->{raw}->{riskmgmtstate}},
-           "INFO: risk level block $v->{extdescriskoccurrencylevel}");
+      push(@{$st->{raw}->{riskmgmtcalclog}},
+           "INFO: risk level ".
+           "column number $v->{extdescriskoccurrencylevel}");
 
 
       my $mtrx=[
@@ -168,11 +173,14 @@ sub calculateRiskState
              [ qw  (    3    5    7    9   10 ) ]
       ];
       $v->{magicriskkey}=
-         $mtrx->[$v->{extdescdtagmonetaryimpact}]->[$v->{extdescriskoccurrencylevel}];
-      push(@{$st->{raw}->{riskmgmtstate}},
+         $mtrx->[$v->{extdescdtagmonetaryimpact}]->
+                [$v->{extdescriskoccurrencylevel}];
+      push(@{$st->{raw}->{riskmgmtcalclog}},
            "INFO: magic risk key $v->{magicriskkey}");
 
-      $st->{raw}->{riskmgmtpoints}=$v->{magicriskkey}+$v->{extdescarisedatedayspoint}+$v->{itrmcriticality};
+      $st->{raw}->{riskmgmtpoints}=$v->{magicriskkey}+
+                                   $v->{extdescarisedatedayspoint}+
+                                   $v->{itrmcriticality};
 
       if ($st->{raw}->{riskmgmtpoints}<=7){
          $st->{raw}->{riskmgmtcolor}="green";
@@ -189,12 +197,15 @@ sub calculateRiskState
 
    }
 
-
-
-
-
-
-   
+   if ($current->{stateid}>1){
+      if ($#{$current->{relations}}==-1){
+         push(@{$st->{raw}->{riskmgmtestimation}},
+              $self->T("no measure workflows"));
+      }
+   }
+   if ($#{$st->{raw}->{riskmgmtestimation}}==-1){
+      push(@{$st->{raw}->{riskmgmtestimation}},"OK");
+   }
 }
 
 

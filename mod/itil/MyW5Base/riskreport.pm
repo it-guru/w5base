@@ -109,6 +109,11 @@ sub getQueryTemplate
    my $reptypl=$self->T("workflow class");
 
 
+   if (!defined(Query->Param("search_state"))){
+      Query->Param("search_state"=>"1 2 4 17");
+   }
+
+
    #######################################################################
    my @refto=@{$self->{Val}->{refto}};
 
@@ -151,16 +156,12 @@ sub getQueryTemplate
 <td class=finput width=40%>$tos</td>
 </tr>
 <tr>
-<td class=fname width=10%>\%affectedapplication(label)\%:</td>
-<td class=finput width=40%>\%affectedapplication(search)\%</td>
-<td class=fname width=10%>\%involvedbusinessteam(label)\%:</td>
-<td class=finput width=40%>\%involvedbusinessteam(search)\%</td>
-</tr>
-<tr>
 <td class=fname width=10%>\%mandator(label)\%:</td>
 <td class=finput width=40%>\%mandator(search)\%</td>
-<td class=fname width=10%>\%involvedcustomer(label)\%:</td>
-<td class=finput width=40%>\%involvedcustomer(search)\%</td>
+<td class=fname width=10%>\%affectedapplication(label)\%:</td>
+<td class=finput width=40%>\%affectedapplication(search)\%</td>
+</tr>
+<tr>
 </tr>
 <tr>
 <td class=fname width=10%>\%state(label)\%:</td>
@@ -171,8 +172,8 @@ sub getQueryTemplate
 <tr>
 <td class=fname width=10%>\%name(label)\%:</td>
 <td class=finput width=40%>\%name(search)\%</td>
-<td class=fname width=10%>\%srcid(label)\%:</td>
-<td class=finput width=40%>\%srcid(search)\%</td>
+<td class=fname width=10%>\%detaildescription(label)\%:</td>
+<td class=finput width=40%>\%detaildescription(search)\%</td>
 </tr>
 </table>
 </div>
@@ -234,16 +235,6 @@ sub SetFilter
    #######################################################################
    # make filter related to dataobj
    #
-   my $dataobj=$self->getDataObj();
-   if ($flt->{wfclass} eq "riskmgmt"){
-      $flt->{class}=[grep(/^.*::riskmgmt$/,
-                          keys(%{$dataobj->{SubDataObj}}))];
-   }
-   if ($flt->{wfclass} eq "opmeasure"){
-      $flt->{class}=[grep(/^.*::opmeasure$/,
-                          keys(%{$dataobj->{SubDataObj}}))];
-   }
-   delete($flt->{wfclass});
 
 
 
@@ -273,7 +264,43 @@ sub SetFilter
    delete ($flt->{to});
    delete ($flt->{from});
 
-   msg(INFO,"MyW5Base Dataobj Filter=%s",Dumper($flt));
+
+   my $dataobj=$self->getDataObj();
+   if ($flt->{wfclass} eq "riskmgmt"){
+      $flt->{class}=[grep(/^.*::riskmgmt$/,
+                          keys(%{$dataobj->{SubDataObj}}))];
+   }
+   elsif ($flt->{wfclass} eq "opmeasure"){
+      delete($flt->{wfclass});
+      $flt->{class}=[grep(/^.*::riskmgmt$/,
+                          keys(%{$dataobj->{SubDataObj}}))];
+      my %subflt=%{$flt};
+      my $o=$dataobj->Clone();
+      $o->SetFilter(\%subflt);
+      my @l=$o->getHashList(qw(id relations));
+      print STDERR Dumper(\@l);
+      my %wfheadid=();
+      foreach my $wfrec (@l){
+         foreach my $relrec (@{$wfrec->{relations}}){
+            if ($relrec->{name} eq "riskmesure"){
+               $wfheadid{$relrec->{dstwfid}}++;
+            }
+         }
+      }
+      $flt->{id}=[keys(%wfheadid)];
+      $flt->{class}=[grep(/^.*::opmeasure$/,
+                          keys(%{$dataobj->{SubDataObj}}))];
+   }
+   else{
+      $flt->{class}="undefined";
+   }
+   delete($flt->{wfclass});
+
+
+   $flt->{isdeleted}=\'0';
+
+
+   #msg(INFO,"MyW5Base Dataobj Filter=%s",Dumper($flt));
    $dataobj->ResetFilter();
    $dataobj->SetFilter($flt);
    #######################################################################
@@ -292,7 +319,10 @@ sub Result
 
    $self->getDataObj()->setDefaultView(qw(eventstart 
             eventend state name nature affectedapplication 
+            wffields.riskmgmtestimation
+            wffields.solutionopt
             wffields.riskbasetype
+            wffields.riskmgmtcalclog
             wffields.riskmgmtpoints));
 
    return(undef) if (!(my $f=$self->{Field}->{from}->Unformat($q{from})));
