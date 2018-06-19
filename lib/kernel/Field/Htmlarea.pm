@@ -36,7 +36,7 @@ sub FormatedDetail
    my $current=shift;
    my $FormatAs=shift;
    my $name=$self->Name();
-   my $d=$self->RawValue($current);
+   my $d=$self->RawValue($current,$FormatAs);
    $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
    $d=ExpandW5BaseDataLinks($self->getParent,$FormatAs,$d);
    my $lang=$self->getParent->Lang();
@@ -151,7 +151,7 @@ sub FormatedResult
    my $current=shift;
    my $FormatAs=shift;
 
-   my $d=$self->RawValue($current);
+   my $d=$self->RawValue($current,$FormatAs);
    $d=$self->FormatedDetailDereferncer($current,$FormatAs,$d);
    if (!($FormatAs=~m/Html/) && $self->{readonly} eq "1" &&
         ref($self->{onRawValue}) eq "CODE"){ # rein berechnete HTML  Felder
