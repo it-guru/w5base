@@ -695,9 +695,15 @@ console.log("start applet with param stack=",appletname,paramstack);
       this._opStack.push(promiseObject);
    };
 
-   this.processOpStack=function(finish){
+   this.processOpStack=function(finish,preloadResult){
       var app=this;
-      this._opStack.reduce(function(promiseChain, currentTask){
+      var result=new Array();
+      if (preloadResult){
+         result=result.concat(preloadResult);
+      }
+
+      this._opStack.reduce(function(promiseChain, currentTask,i){
+          app._opStack.splice(i,1);
           return(promiseChain.then(function(chainResults){
               if (!currentTask.then){
                  currentTask=new Promise(currentTask);
@@ -709,9 +715,14 @@ console.log("start applet with param stack=",appletname,paramstack);
               }))
           }));
       }, Promise.resolve([])).then(function(data){
+         result=result.concat(data);
          app.networkFitRequest=true;
-         app._opStack=[];
-         finish(data)
+         if (app._opStack.length){
+            app.processOpStack(finish,result);
+         }
+         else{
+            finish(result)
+         }
        });
    };
 
@@ -1093,9 +1104,9 @@ console.log("start applet with param stack=",appletname,paramstack);
                    var nodeobj=app.node.get(selectedNodes[n]);
                    nodeobj.nodeMethods[methodName].exec.call(nodeobj);
                 }
-                console.log("INFO","pre processOpStack after call");
                 app.processOpStack(function(d){
-                   console.log("INFO","processOpStack finisch after call",d);
+                   console.log("INFO","processOpStack:finisch after call of "+
+                                      methodName+" result=",d);
                 });
              });
              $(dbrec).html(""); 

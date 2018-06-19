@@ -2164,72 +2164,82 @@ sub jsExploreObjectMethods
           var dataobjid=this.dataobjid;
           var dataobj=this.dataobj;
           var app=this.app;
-          app.network.setOptions({ 
-             layout: {
-                hierarchical: {
-                  direction: 'DU',
-                  sortMethod: 'hubsize'
-                }
-              }
-          } );
-          app.Config().then(function(cfg){
-             var w5obj=getModuleObject(cfg,'base::user');
-             var w5grp=getModuleObject(cfg,'base::grp');
-             w5obj.SetFilter({
-                userid:dataobjid
-             });
-             var orgFinder=function(curkey,parentid,nlevel){
-                 w5grp.SetFilter({
-                    grpid:parentid
-                 });
-                 w5grp.findRecord(\"grpid,parentid,name\",function(data){
-                    if (data[0]){
-                       var nodelevel=nlevel;
-                       var nexkey=app.toObjKey('base::grp',data[0].grpid);
-                       app.addNode('base::grp',data[0].grpid,data[0].name,{
-                          level:nodelevel
-                       });
-                       console.log(\"after addNode\",app._opStack);
-                       app.addEdge(curkey,nexkey);
-                       if (!!data[0].parentid){
-                          console.log(\"find next level for\",data[0]);
-                          app.pushOpStack(
-                             new Promise(function(res,rej){
-                                orgFinder(nexkey,data[0].parentid,nlevel+1);
-                                res(1);
-                             })
-                          );
-                       }
-                       else{
-                          console.log(\"end of orgFinder\",app._opStack);
-                       }
-                    }
-                 });
-             };
-             w5obj.findRecord(\"userid,orgunits\",function(data){
-                console.log(\"found:\",data);
-                for(recno=0;recno<data.length;recno++){
-                   for(subno=0;subno<data[recno].orgunits.length;subno++){
-                      w5grp.SetFilter({
-                         fullname:data[recno].orgunits[subno]
-                      });
-                      w5grp.findRecord(\"grpid,parentid,name\",function(data){
-                         var level=2;
-                         var curkey=app.toObjKey(dataobj,dataobjid);
-                         var nexkey=app.toObjKey('base::grp',data[0].grpid);
-                         app.addNode('base::grp',data[0].grpid,data[0].name,{
-                             level:level
-                         });
-                         app.addEdge(curkey,nexkey);
-                         if (!!data[0].parentid){
-                            orgFinder(nexkey,data[0].parentid,level+1);
-                         }
-                      });
+          app.pushOpStack(new Promise(function(methodDone){
+             app.network.setOptions({ 
+                layout: {
+                   hierarchical: {
+                     direction: 'DU',
+                     sortMethod: 'hubsize'
                    }
-                }
-                app.networkFitRequest=true;
+                 }
+             } );
+             app.Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'base::user');
+                var w5grp=getModuleObject(cfg,'base::grp');
+
+                var orgFinder=function(curkey,parentid,nlevel){
+                    w5grp.SetFilter({
+                       grpid:parentid
+                    });
+
+                    w5grp.findRecord(\"grpid,parentid,name\",function(data){
+                       if (data[0]){
+                          var nodelevel=nlevel;
+                          var nexkey=app.toObjKey('base::grp',data[0].grpid);
+                          app.addNode('base::grp',data[0].grpid,data[0].name,{
+                             level:nodelevel
+                          });
+                          console.log(\"after addNode\",app._opStack);
+                          app.addEdge(curkey,nexkey);
+                          if (!!data[0].parentid){
+                             console.log(\"find next level for\",data[0]);
+                             app.pushOpStack(
+                                new Promise(function(res,rej){
+                                   orgFinder(nexkey,data[0].parentid,nlevel+1);
+                                   res(1);
+                                })
+                             );
+                          }
+                          else{
+                             console.log(\"end of orgFinder\",app._opStack);
+                          }
+                       }
+
+                    });
+                };
+
+
+                w5obj.SetFilter({
+                   userid:dataobjid
+                });
+                w5obj.findRecord(\"userid,orgunits\",function(data){
+                   console.log(\"found:\",data);
+                   for(recno=0;recno<data.length;recno++){
+                      for(subno=0;subno<data[recno].orgunits.length;subno++){
+                         w5grp.SetFilter({
+                            fullname:data[recno].orgunits[subno]
+                         });
+                         w5grp.findRecord(\"grpid,parentid,name\",function(data){
+                            var level=2;
+                            var curkey=app.toObjKey(dataobj,dataobjid);
+                            var nexkey=app.toObjKey('base::grp',data[0].grpid);
+                            app.addNode('base::grp',data[0].grpid,data[0].name,{
+                                level:level
+                            });
+                            app.addEdge(curkey,nexkey);
+                            if (!!data[0].parentid){
+                               orgFinder(nexkey,data[0].parentid,level+1);
+                            }
+                         });
+                      }
+                   }
+                   app.networkFitRequest=true;
+                });
+                \$(document).ajaxStop(function () {
+                   methodDone(1);
+                });
              });
-          });
+          }));
        }
    ";
 
