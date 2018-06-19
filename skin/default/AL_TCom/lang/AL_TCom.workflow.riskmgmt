@@ -24,3 +24,5 @@
   de=>'Schadensausmaß der IT - unmittelbare nhalb der TelekomIT'
 },
 'no measure workflows'=>{de=>'keine Maßnahmen'},
+'incomplete risk data'=>{de=>'unvollständige Riskiodaten'},
+'measure out of time'=>{de=>'Maßnahmenzeitüberschreitung'},

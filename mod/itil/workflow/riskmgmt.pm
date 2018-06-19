@@ -169,7 +169,18 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(name          =>'riskmgmtcalclog',
                                   label         =>'Risiko calculation log',
-                                  htmlwidth     =>'500',
+                                  htmlwidth     =>'300',
+                                  nowrap        =>1,
+                                  htmldetail    =>sub{
+                                     my $self=shift;
+                                     my $mode=shift;
+                                     my %param=@_;
+                                     my $current=$param{current};
+                                     if ($self->getParent->IsMemberOf("admin")){
+                                        return(1);
+                                     }
+                                     return(0);
+                                  },
                                   vjoinconcat   =>"\n",
                                   htmldetail    =>'NotEmpty',
                                   group         =>'riskrating',
@@ -177,11 +188,23 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(name          =>'riskmgmtestimation',
                                   label         =>'Risiko processual estimation',
-                                  htmlwidth     =>'500',
+                                  htmlwidth     =>'300',
+                                  nowrap        =>1,
+                                  htmldetail    =>0,
                                   vjoinconcat   =>"\n",
                                   htmldetail    =>'NotEmpty',
                                   group         =>'riskrating',
-                                  onRawValue    =>\&getCalculatedRiskState),
+                                  onRawValue    =>\&getRiskEstimation),
+
+      new kernel::Field::Htmlarea(name          =>'riskmgmtcondition',
+                                  label         =>'Risiko machining condition',
+                                  htmlwidth     =>'300',
+                                  nowrap        =>1,
+                                  htmldetail    =>0,
+                                  vjoinconcat   =>"\n",
+                                  htmldetail    =>'NotEmpty',
+                                  group         =>'riskrating',
+                                  onRawValue    =>\&getRiskEstimation),
 
       new kernel::Field::TextDrop(name          =>'applicationbase',
                                   label         =>'risk base data application',
@@ -267,11 +290,6 @@ sub calculateRiskState
    my $mode=shift;
    my $st=shift;
 
-
-
-#    push(@{$st->{raw}->{riskmgmtcalclog}},"v1");
-#    push(@{$st->{raw}->{riskmgmtcalclog}},"this is a message");
-
 }
 
 
@@ -284,21 +302,65 @@ sub getCalculatedRiskState
 
    my $id=$current->{id};
 
-   if (!defined($self->getParent->Context->{CalculatedRiskState}->{$id})){
+   if (!defined($self->getParent->Context->{CalcRiskState}->{$id})){
       my $st={
          raw=>{
             riskmgmtpoints=>'',
             riskmgmtcalclog=>[],
-            riskmgmtestimation=>[],
             riskmgmtcolor=>''
          }
       };
       $self->getParent->calculateRiskState($current,$mode,$st);
-      $self->getParent->Context->{CalculatedRiskState}->{$id}=$st;
+      $self->getParent->Context->{CalcRiskState}->{$id}=$st;
    }
-   return($self->getParent->Context->{CalculatedRiskState}->{$id}->{raw}->{$name});
-   return("");
+   return($self->getParent->Context->{CalcRiskState}->{$id}->{raw}->{$name});
 }
+
+
+sub RiskEstimation
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $st=shift;
+
+
+
+}
+
+
+sub getRiskEstimation
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $name=$self->Name();
+
+   my $id=$current->{id};
+
+   if (!defined($self->getParent->Context->{RiskEstimation}->{$id})){
+      my $st={
+         raw=>{
+            riskmgmtestimation=>[],
+            riskmgmtcondition=>[]
+         }
+      };
+      $self->getParent->RiskEstimation($current,$mode,$st);
+      $self->getParent->Context->{RiskEstimation}->{$id}=$st;
+   }
+   return($self->getParent->Context->{RiskEstimation}->{$id}->{raw}->{$name});
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 sub getPosibleWorkflowDerivations

@@ -318,8 +318,11 @@ sub Result
    my %q=$self->getDataObj()->getSearchHash();
 
    $self->getDataObj()->setDefaultView(qw(eventstart 
-            eventend state name nature affectedapplication 
+            state name 
+            affectedapplication 
+            nature 
             wffields.riskmgmtestimation
+            wffields.riskmgmtcondition
             wffields.solutionopt
             wffields.riskbasetype
             wffields.riskmgmtcalclog

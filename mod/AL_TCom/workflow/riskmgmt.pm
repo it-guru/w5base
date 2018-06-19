@@ -80,6 +80,100 @@ sub isRiskParameterComplete
 }
 
 
+sub RiskEstimation
+{
+   my $self=shift;
+   my $current=shift;
+   my $mode=shift;
+   my $st=shift;
+
+   $self->SUPER::RiskEstimation($current,$mode,$st);
+
+   my $id=$current->{id};
+   my $cdate=CalcDateDuration($current->{createdate},NowStamp("en"));
+
+   my $relations=$self->getParent->getFieldRawValue("relations",$current);
+
+   my @childid=map({
+      $_->{dstwfid}
+   } grep({
+      $_->{dststate}<20 && $_->{name} eq "riskmesure"
+   } @{$relations}));
+
+
+
+   my $wf=$self->getParent->Clone();
+
+   $wf->SetFilter({id=>\@childid});
+   my $outoftime=0;
+   foreach my $mrec ($wf->getHashList(qw(name 
+                                         wffields.plannedstart 
+                                         wffields.plannedend 
+                                         shortactionlog))){
+      if ($#{$st->{raw}->{riskmgmtcondition}}!=-1){
+         push(@{$st->{raw}->{riskmgmtcondition}},"<hr>");
+      }
+      if ($mrec->{plannedend} ne ""){
+         my $t=CalcDateDuration($mrec->{plannedend},NowStamp("en"));
+         if ($t->{totalminutes}>5){
+            $outoftime++;
+         }
+      }
+      
+      push(@{$st->{raw}->{riskmgmtcondition}},"<b>".$mrec->{name}."</b>");
+      push(@{$st->{raw}->{riskmgmtcondition}},
+           $mrec->{plannedstart}."-".$mrec->{plannedend});
+      my $state;
+      foreach my $arec (@{$mrec->{shortactionlog}}){
+         if ($arec->{name} eq "wfaddnote"){
+            $state=$arec->{comments};
+         }
+      }
+      if (defined($state)){
+         push(@{$st->{raw}->{riskmgmtcondition}},$state);
+      }
+   }
+
+   if ($outoftime){
+      push(@{$st->{raw}->{riskmgmtestimation}},
+           $self->T("measure out of time"));
+
+   }
+
+   if ($current->{stateid}>1){
+      if ($#{$relations}==-1){
+         push(@{$st->{raw}->{riskmgmtestimation}},
+              $self->T("no measure workflows"));
+      }
+   }
+
+   my $incompl=0;
+   foreach my $vname (qw(extdescriskoccurrency 
+                         extdescdtagmonetaryimpact
+                         itrmcriticality 
+                         extdescarisedate)){
+      if ($self->getParent->getFieldRawValue("wffields.".$vname,
+                                                      $current) eq ""){
+         $incompl++;
+      }
+   }
+
+
+
+   if ($cdate->{days}>2){
+      if ($incompl){
+         push(@{$st->{raw}->{riskmgmtestimation}},
+              $self->T("incomplete risk data"));
+      }
+   }
+   if ($#{$st->{raw}->{riskmgmtestimation}}==-1){
+      push(@{$st->{raw}->{riskmgmtestimation}},"OK");
+   }
+
+}
+
+
+
 
 sub calculateRiskState
 {
@@ -90,13 +184,14 @@ sub calculateRiskState
 
    $self->SUPER::calculateRiskState($current,$mode,$st);
 
+
    my $v={};
    foreach my $vname (qw(extdescriskoccurrency 
                          extdescdtagmonetaryimpact
                          itrmcriticality 
                          extdescarisedate)){
-      my $fld=$self->getParent->getField("wffields.".$vname,$current);
-      $v->{$vname}=$fld->RawValue($current);
+      $v->{$vname}=$self->getParent->getFieldRawValue("wffields.".$vname,
+                                                      $current);
    }
 
    if ($v->{extdescarisedate} eq ""){
@@ -191,21 +286,9 @@ sub calculateRiskState
       else{
          $st->{raw}->{riskmgmtcolor}="red";
       }
-
-      
-
-
    }
 
-   if ($current->{stateid}>1){
-      if ($#{$current->{relations}}==-1){
-         push(@{$st->{raw}->{riskmgmtestimation}},
-              $self->T("no measure workflows"));
-      }
-   }
-   if ($#{$st->{raw}->{riskmgmtestimation}}==-1){
-      push(@{$st->{raw}->{riskmgmtestimation}},"OK");
-   }
+
 }
 
 
