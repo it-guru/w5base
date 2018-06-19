@@ -2236,10 +2236,13 @@ sub jsExploreObjectMethods
                    app.networkFitRequest=true;
                 });
                 \$(document).ajaxStop(function () {
-                   methodDone(1);
+                   methodDone(\"load of orgArea done\");
                 });
              });
           }));
+       },
+       postExec:function(resultOfOpStack){
+          console.log(\"Start Layout of scenario\",resultOfOpStack);
        }
    ";
 

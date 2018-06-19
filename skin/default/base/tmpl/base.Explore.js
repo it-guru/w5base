@@ -1104,9 +1104,15 @@ console.log("start applet with param stack=",appletname,paramstack);
                    var nodeobj=app.node.get(selectedNodes[n]);
                    nodeobj.nodeMethods[methodName].exec.call(nodeobj);
                 }
-                app.processOpStack(function(d){
-                   console.log("INFO","processOpStack:finisch after call of "+
-                                      methodName+" result=",d);
+                app.processOpStack(function(resultOfOpStack){
+                   if (nodeobj.nodeMethods[methodName].postExec){
+                      nodeobj.nodeMethods[methodName].postExec(resultOfOpStack);
+                   }
+                   else{
+                      console.log("INFO","processOpStack:"+
+                                  "finisch after call of "+
+                                   methodName+" result=",resultOfOpStack);
+                   }
                 });
              });
              $(dbrec).html(""); 
