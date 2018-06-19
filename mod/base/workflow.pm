@@ -547,6 +547,7 @@ sub new
 
       new kernel::Field::MDate(
                 name          =>'mdate',
+                selectfix     =>1,
                 group         =>'state',
                 label         =>'Modification-Date',
                 dataobjattr   =>'wfhead.modifydate'),
@@ -639,6 +640,7 @@ sub new
       new kernel::Field::CDate(
                 name          =>'createdate',
                 htmlwidth     =>'170px',
+                selectfix     =>1,
                 group         =>'state',
                 label         =>'Creation-Date',
                 dataobjattr   =>'wfhead.opendate'),
