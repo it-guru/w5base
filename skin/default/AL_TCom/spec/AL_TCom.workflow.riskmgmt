@@ -1,10 +1,28 @@
-'extdescriskdowntimedays'=>{de=>"Hallow Welt, dies ist ein test 
-Zeile1 <br>
-Zeile1 <br>
-Zeile1 <br>
-Zeile1 <br>
-1518764327851 6387264812793sdf asdf64872 sd1364 sad89123649812364Zeile1 <br>
+'extdescriskimpact'=>{en=>'
+Describe what is happening on the occurrence of the risk, or what consequences occur on the customer side.<br>
+For example: Which business processes are impaired? How long can a failure be expected? What extra effort is required? Who is affected by the impairment etc.<br>
+From the description, it is also important to identify the assumptions underlying your estimate of the damage (for example: downtime for x days / weeks, increased support over x person days over x days / weeks)
+',de=>'
+Beschreiben Sie, was bei Eintritt des Risikos konkret passiert bzw. welche Folgewirkungen auf Kundenseite auftreten. <br>
+Z.B. Welche Geschäftsprozesse sind beeinträchtigt? Wie lange ist mit einem Ausfall zu rechnen? Welcher zusätzliche Aufwand ist notwendig? Wer ist von der Beeinträchtigung betroffen usw.<br>
+Aus der Beschreibung soll auch deutlich werden, welche Annahmen Ihrer Schätzung des Schadens zugrunde liegen (z.B. Ausfallzeit für x Tage/Wochen; erhöhter Support über x Personentage über x Tage/Wochen)
+'},
+
+'extdescriskdowntimedays'=>{en=>'
+Please estimate the amount of days the application will be down in case the described risk occurs.<br>
+A downtime of more than 30 minutes is considered as 1 day.<br>
+<br>
+The support category is not to be taken into consideration because in general the weekday (e.g. weekend or public holidays) of the occurrence of risks cannot be estimated.
+',de=>'
+Bitte schätzen Sie die Anzahl der Tage der Ausfallzeit, wenn dieses Risiko eintritt. <br>
+Ein Ausfall > 30 min. ist mit mind. 1 Tag anzugeben. <br>
+Die Unschärfe hinsichtlich Supportkategorie ist zu vernachlässigen, da der Wochentag (z.B. Werktag, Wochenende oder Feiertag) des Risikoeintritts nicht vorhergesehen werden kann. 
+'},
+
+'xx'=>{en=>'
 
 
+',de=>'
 
-Im Feld<br>Beschreibung <b>sollte</b> dokumentiert werden, was passiert ist."},
+
+'},
