@@ -751,6 +751,34 @@ console.log("start applet with param stack=",appletname,paramstack);
       )
    };
 
+   this.genenericLoadNode=function(dataobj,idfield,labelfield,filter,
+                                   okcallback){
+      var app=this;
+      this.pushOpStack(
+        new Promise(function(ok,reject){
+           app.Config().then(function(cfg){
+              var w5obj=getModuleObject(cfg,dataobj);
+                w5obj.SetFilter(filter);
+                w5obj.findRecord(idfield+","+labelfield, function(data){
+                   // detect all objects need to be preloaded
+                   var cnt=data.length;
+                   for(c=0;c<cnt;c++){
+                      app.addNode(dataobj,data[c][idfield],
+                                          data[c][labelfield]);
+                   }
+                   ok("genenericLoadNode");
+                });
+             }).catch(function(e){
+                console.log("get config failed",e);
+                app.console.log("can not get config");
+                reject(e);
+             });
+          })
+       );
+       this.processOpStack(okcallback);
+   };
+
+
 
    this.addEdge=function(fromid,toid,edgeTempl){
       this.pushOpStack(

@@ -2189,10 +2189,8 @@ sub jsExploreObjectMethods
                           app.addNode('base::grp',data[0].grpid,data[0].name,{
                              level:nodelevel
                           });
-                          console.log(\"after addNode\",app._opStack);
                           app.addEdge(curkey,nexkey);
                           if (!!data[0].parentid){
-                             console.log(\"find next level for\",data[0]);
                              app.pushOpStack(
                                 new Promise(function(res,rej){
                                    orgFinder(nexkey,data[0].parentid,nlevel+1);
@@ -2201,7 +2199,7 @@ sub jsExploreObjectMethods
                              );
                           }
                           else{
-                             console.log(\"end of orgFinder\",app._opStack);
+                             //console.log(\"end of orgFinder\",app._opStack);
                           }
                        }
 

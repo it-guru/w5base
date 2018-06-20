@@ -5,55 +5,6 @@
    };
    $.extend(ClassAppletLib[applet].class.prototype,ClassApplet.prototype);
 
-   ClassAppletLib[applet].class.prototype.loadItems=function(param){
-     var dataobj=param[0];
-     var dataobjid=param[1];
-     var app=this.app;
-     return(
-        new Promise(function(ok,reject){
-           app.Config().then(function(cfg){
-              var w5obj=getModuleObject(cfg,dataobj);
-                w5obj.SetFilter({ userid:dataobjid });
-                w5obj.findRecord("userid,fullname,surname", function(data){
-                   // detect all objects need to be preloaded
-                   var cnt=data.length;
-                   app.console.log("INFO","found "+data.length+
-                                          " interface records");
-                   console.log("fifi data=",data);
-                      var promlst=new Array();
-                      var edges=new Array();
-                      for(c=0;c<cnt;c++){
-                            app.addNode("base::user",data[c].userid,
-                                                     data[c].fullname);
-                      //   for(s=0;s<data[c].systems.length;s++){
-                      //      promlst.push(
-                      //         app.addNode("itil::system",
-                      //                     data[c].systems[s].systemid,
-                      //                     data[c].systems[s].system)
-                      //      );
-                      //      edges.push({
-                      //         fromid:app.toObjKey(dataobj,dataobjid),
-                      //         toid:app.toObjKey('itil::system',
-                      //                           data[c].systems[s].systemid)
-                      //      });
-                      //   }
-                      } 
-                      ok(1);
-                },function(exception){
-                   app.console.log("got error from call");
-                   reject(exception);
-                });
-             }).catch(function(e){
-                console.log("get config failed",e);
-                app.console.log("can not get config");
-                reject(e); 
-             });
-          })
-       );
-   };
-
-
-
 
    ClassAppletLib[applet].class.prototype.searchItems=function(dialog,flt){
       var appletobj=this;
@@ -124,23 +75,30 @@
                mtag:dataobj+"/"+dataobjid
             }
          );
-         this.loadItems(arguments[0]).then(function(d){
-             app.processOpStack(function(d){
-                app.console.log("INFO","scenario is loaded");
-                console.log("INFO","scenario is loaded d=",d);
-                app.setMPath({
-                      label:ClassAppletLib['%SELFNAME%'].desc.label,
-                      mtag:'%SELFNAME%'
-                   },
-                   {
-                      label:d[0].label,
-                      mtag:dataobj+"/"+d[0].dataobjid
-                   }
-                );
-             });
-         }).catch(function(e){
-             $(".spinner").hide();
-         });
+
+
+        app.genenericLoadNode(dataobj,"userid","fullname",{userid:dataobjid},
+                              function(d){
+            var MasterItem=d[1];
+            MasterItem['MasterItem']=true;
+            console.log("MasterItem loaded:",MasterItem);
+            app.setMPath({
+                  label:ClassAppletLib['%SELFNAME%'].desc.label,
+                  mtag:'%SELFNAME%'
+               },
+               { label:MasterItem.label, mtag:dataobj+"/"+MasterItem.dataobjid}
+            );
+            console.log("add master item ",MasterItem);
+            MasterItem.nodeMethods['m100addUserOrgParentTree'].exec.call(
+               MasterItem
+            );
+            app.processOpStack(function(opResults){
+               console.log("scenario loaded",opResults);
+               app.network.fit({
+                  animation: true
+               });
+            });
+        });
       }
       else{
          this.app.showDialog(function(){
