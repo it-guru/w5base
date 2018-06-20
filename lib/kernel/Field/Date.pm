@@ -83,6 +83,7 @@ sub FormatedDetail
       }
       if ($mode eq "HtmlDetail" && (!$self->{dayonly} || $self->{dayonly}==2)){
          if (defined($delta) && $delta!=0){
+
             my $lang=$self->getParent->Lang();
             my $absdelta=abs($delta);
             my $baseabsdelta=abs($delta);
@@ -273,8 +274,12 @@ sub FormatedDetail
                }
             }
             my $deltastr=join(" ",@blks);
+            if ($self->{dayonly}){
+               $d=~s/\s*\d+:\d+:\d+.*$//;
+            }
             $d.=" &nbsp; ".
                 "<span style=\"white-space:nowrap;\">( $deltastr )</span>";
+            return($d);
          }
       }
       if ($mode=~m/^XlsV\d+$/){
@@ -460,7 +465,9 @@ sub Unformat
          $dateparam{defhour}=12;  # prevent day switch for day only fields
          $formated=~s/\s.*$//;    # if f.e. date is specified with 00:00:00 
       }
-      if ($self->{dayonly}){      # prevent day switch for day only fields
+      if ($self->{dayonly} &&
+          ($formated=~m/ \d+:\d+:\d+$/)){
+                 # prevent day switch for day only fields
          $formated=~s/\s.*$//;    # if f.e. date is specified with 00:00:00 
          $formated.=" 12:00:00";  # time (which is not needed)
       }
