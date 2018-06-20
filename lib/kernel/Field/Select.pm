@@ -485,8 +485,12 @@ sub FormatedResult
    }
    else{
        $res=join($self->vjoinconcat,map({
-           $self->getParent->T($self->{transprefix}.$_,$self->{translation})
-                           } @{$d}));
+           my $tval=$self->getParent->T(
+                            $self->{transprefix}.$_,$self->{translation});
+           if ($tval eq $self->{transprefix}.$_){
+              $tval=$_;
+           }
+           $tval; } @{$d}));
    }
 
 
