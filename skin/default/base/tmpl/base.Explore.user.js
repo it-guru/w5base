@@ -80,6 +80,7 @@
         app.genenericLoadNode(dataobj,"userid","fullname",{userid:dataobjid},
                               function(d){
             var MasterItem=d[1];
+            app.node.update({id:MasterItem.id,level:30});
             MasterItem['MasterItem']=true;
             console.log("MasterItem loaded:",MasterItem);
             app.setMPath({
@@ -93,6 +94,9 @@
                MasterItem
             );
             app.processOpStack(function(opResults){
+               MasterItem.nodeMethods['m100addUserOrgParentTree'].postExec.call(
+                  MasterItem,opResults
+               );
                console.log("scenario loaded",opResults);
                app.network.fit({
                   animation: true

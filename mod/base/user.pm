@@ -2168,8 +2168,10 @@ sub jsExploreObjectMethods
              app.network.setOptions({ 
                 layout: {
                    hierarchical: {
-                     direction: 'DU',
-                     sortMethod: 'hubsize'
+                     direction: 'UD',
+                     sortMethod: 'hubsize',
+                     treeSpacing: 500,
+                     edgeMinimization:true
                    }
                  }
              } );
@@ -2182,12 +2184,13 @@ sub jsExploreObjectMethods
                        grpid:parentid
                     });
 
-                    w5grp.findRecord(\"grpid,parentid,name\",function(data){
+                    w5grp.findRecord(\"grpid,parentid,fullname,name\",
+                                function(data){
                        if (data[0]){
-                          var nodelevel=nlevel;
+                          var nodelevel=(data[0].fullname.split(\".\").length)
                           var nexkey=app.toObjKey('base::grp',data[0].grpid);
                           app.addNode('base::grp',data[0].grpid,data[0].name,{
-                             level:nodelevel
+                             level:nodelevel*2
                           });
                           app.addEdge(curkey,nexkey);
                           if (!!data[0].parentid){
@@ -2217,12 +2220,14 @@ sub jsExploreObjectMethods
                          w5grp.SetFilter({
                             fullname:data[recno].orgunits[subno]
                          });
-                         w5grp.findRecord(\"grpid,parentid,name\",function(data){
+                         w5grp.findRecord(\"grpid,parentid,name,fullname\",
+                            function(data){
                             var level=2;
+                            var nodelevel=(data[0].fullname.split(\".\").length)
                             var curkey=app.toObjKey(dataobj,dataobjid);
                             var nexkey=app.toObjKey('base::grp',data[0].grpid);
                             app.addNode('base::grp',data[0].grpid,data[0].name,{
-                                level:level
+                                level:nodelevel*2
                             });
                             app.addEdge(curkey,nexkey);
                             if (!!data[0].parentid){
@@ -2240,24 +2245,24 @@ sub jsExploreObjectMethods
           }));
        },
        postExec:function(resultOfOpStack){
-          console.log(\"Start Layout of scenario\",resultOfOpStack);
-       }
-   ";
-
-   my $label=$self->T("run promise test");
-   $methods->{'m990promisetest'}="
-       label:\"$label\",
-       cssicon:\"basket_add\",
-       exec:function(){
           var app=this.app;
-          console.log(\"call m990promisetest on \",this);
-          app.pushOpStack(
-             function(res,rej){
-                console.log(\"call in promise\",this);
-                res(1);
+          var maxLevel=0;
+          app.node.forEach(function(e){
+             if (e.dataobj=='base::grp'){
+console.log(\"check level=\"+maxLevel);
+                if (maxLevel<e.level){
+                   maxLevel=e.level;
+                }
              }
-          );
-          
+          });
+console.log(\"maxLevel=\"+maxLevel);
+          app.node.forEach(function(e){
+             if (e.dataobj=='base::user'){
+console.log(\"set level on=\",e);
+                app.node.update({id:e.id,level:maxLevel+1});
+             }
+          });
+          console.log(\"Start Layout of scenario\",resultOfOpStack);
        }
    ";
 

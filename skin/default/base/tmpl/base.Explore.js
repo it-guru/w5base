@@ -1134,7 +1134,7 @@ console.log("start applet with param stack=",appletname,paramstack);
                 }
                 app.processOpStack(function(resultOfOpStack){
                    if (nodeobj.nodeMethods[methodName].postExec){
-                      nodeobj.nodeMethods[methodName].postExec(resultOfOpStack);
+                      nodeobj.nodeMethods[methodName].postExec.call(nodeobj,resultOfOpStack);
                    }
                    else{
                       console.log("INFO","processOpStack:"+

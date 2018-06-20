@@ -38,3 +38,4 @@
           de=>'%d Organisationseinheiten erfolgreich importiert'},
 '%d from %d orgareas successful imported'=>{
           de=>'%d von %d Organisationseinheiten erfolgreich importiert'},
+'add members'=>{de=>'Mitglieder hinzufügen'},

@@ -6,43 +6,6 @@
 
    ClassAppletLib[applet].class.prototype.searchFilter='';
    ClassAppletLib[applet].class.prototype.searchResult='';
-   ClassAppletLib[applet].class.prototype.loadItems=function(param){
-     var dataobj=param[0];
-     var dataobjid=param[1];
-     var app=this.app;
-     return(
-        new Promise(function(ok,reject){
-           app.Config().then(function(cfg){
-              var w5obj=getModuleObject(cfg,dataobj);
-                w5obj.SetFilter({ id:dataobjid });
-                w5obj.findRecord("id,fullname", function(data){
-                   var cnt=data.length;
-                   for(c=0;c<cnt;c++){
-                      app.addNode(dataobj,data[c].id,data[c].fullname);
-                  //    for(s=0;s<data[c].systems.length;s++){
-                  //       app.addNode("itil::system",
-                  //                   data[c].systems[s].systemid,
-                  //                   data[c].systems[s].system)
-                  //       app.addEdge(
-                  //          app.toObjKey(dataobj,dataobjid),
-                  //          app.toObjKey('itil::system',
-                  //                       data[c].systems[s].systemid)
-                  //       );
-                  //    }
-                   } 
-                   ok(1);
-                });
-             }).catch(function(e){
-                console.log("get config failed",e);
-                app.console.log("can not get config");
-                reject(e); 
-             });
-          })
-       );
-   };
-
-
-
 
    ClassAppletLib[applet].class.prototype.setSearchResult=function(dialog,res){
       var appletobj=this;
@@ -116,23 +79,25 @@
                mtag:dataobj+"/"+dataobjid
             }
          );
-         this.loadItems(arguments[0]).then(function(d){
-             app.processOpStack(function(d){
-                app.console.log("INFO","scenario is loaded");
-                app.setMPath({
-                      label:ClassAppletLib['%SELFNAME%'].desc.label,
-                      mtag:'%SELFNAME%'
-                   },
-                   {
-                      label:d[0].label,
-                      mtag:dataobj+"/"+d[0].dataobjid
-                   }
-                );
-             });
-         }).catch(function(e){
-             console.log("fail to load scenario",e);
-             $(".spinner").hide();
-         });
+
+        app.genenericLoadNode(dataobj,"id","fullname",{id:dataobjid},
+                              function(d){
+            var MasterItem=d[1];
+            MasterItem['MasterItem']=true;
+            console.log("MasterItem loaded:",MasterItem);
+            app.setMPath({
+                  label:ClassAppletLib['%SELFNAME%'].desc.label,
+                  mtag:'%SELFNAME%'
+               },
+               { label:MasterItem.label, mtag:dataobj+"/"+MasterItem.dataobjid}
+            );
+            app.processOpStack(function(opResults){
+               console.log("scenario loaded",opResults);
+               app.network.fit({
+                  animation: true
+               });
+            });
+        });
       }
       else{
          this.app.showDialog(function(){

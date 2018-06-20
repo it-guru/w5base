@@ -55,6 +55,7 @@ sub new
                 name          =>'fullname',
                 label         =>'Fullname',
                 readonly      =>1,
+                explore       =>100,
                 htmlwidth     =>'300px',
                 size          =>'40',
                 dataobjattr   =>'grp.fullname'),
@@ -112,6 +113,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'bossusers',
                 readonly      =>1,
+                explore       =>200,
                 label         =>'boss',
                 group         =>'users',
                 htmldetail    =>0,
@@ -1364,6 +1366,56 @@ newlabel=newlabel.replace(/^.*\\./,'');
 
 
 EOF
+}
+
+
+sub jsExploreObjectMethods
+{
+   my $self=shift;
+   my $methods=shift;
+
+   my $label=$self->T("add members");
+   $methods->{'m100addGrpMembers'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call m100addGrpMembers on \",this);
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          var app=this.app;
+          var MasterItem=this;
+          app.pushOpStack(new Promise(function(methodDone){
+             app.Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'base::grp');
+                w5obj.SetFilter({
+                   grpid:dataobjid
+                });
+                w5obj.findRecord(\"grpid,users\",function(data){
+                   console.log(\"found:\",data);
+                   for(recno=0;recno<data.length;recno++){
+                      for(subno=0;subno<data[recno].users.length;subno++){
+                         var curkey=MasterItem.id;
+                         var nodelevel=MasterItem.level;
+                         var nexkey=app.toObjKey('base::user',
+                                           data[recno].users[subno].userid);
+                         app.addNode('base::user',
+                                     data[recno].users[subno].userid,
+                                     data[recno].users[subno].user,{
+                                level:nodelevel+1
+                         });
+                         app.addEdge(curkey,nexkey);
+                      }
+                   }
+                   app.networkFitRequest=true;
+                });
+                \$(document).ajaxStop(function () {
+                   methodDone(\"load of Members done\");
+                });
+             });
+          }));
+       }
+   ";
+
 }
 
 
