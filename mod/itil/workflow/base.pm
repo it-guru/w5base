@@ -98,6 +98,7 @@ sub Init
                 readonly   =>1,
                 vjointo    =>'itil::appl',
                 vjoinon    =>['affectedapplicationid'=>'id'],
+                vjoineditbase=>{cistatusid=>'<6'},
                 vjoindisp  =>'name',
                 container  =>'headref',
                 group      =>'affected',

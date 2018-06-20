@@ -969,7 +969,8 @@ sub generateWorkspacePages
       my $note=Query->Param("note");
 
       my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
-         "<td colspan=2><textarea name=note style=\"width:100%;height:100px\">".
+         "<td colspan=2><textarea name=note ".
+         "style=\"width:100%;resize:none;height:100px\">".
          quoteHtml($note)."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>".
           $self->getParent->T("forward to","base::workflow::request").

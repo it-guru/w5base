@@ -215,6 +215,10 @@ sub Validate
                $filter={$self->{vjoindisp}=>$newval};
             }
             $self->vjoinobj->ResetFilter();
+            if (defined($self->{vjoineditbase})){
+               $self->vjoinobj->SetNamedFilter("EDITBASE",
+                                               $self->{vjoineditbase});
+            }
             $self->vjoinobj->SetFilter($filter);
             ($dropbox,$keylist,$vallist)=$self->vjoinobj->getHtmlSelect(
                                                      "Formated_$name",
