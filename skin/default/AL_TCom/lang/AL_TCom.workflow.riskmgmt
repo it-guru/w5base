@@ -1,7 +1,13 @@
-'AL_TCom::workflow::riskmgmt'=>{de=>'Telekom IT: Risikobehandlung',en=>'TelekomIT: Riskmgmt'},
+'AL_TCom::workflow::riskmgmt'=>{de=>'Telekom IT: Risikomanagement',en=>'TelekomIT: Riskmgmt'},
 'AL_TCom::workflow::riskmgmt::tip'=>{
-              de=>'Hier sollte ein Text in de/en drin stehen, der '.
-                  'beschreibt, wof¸r der WF ist und u.U. auf FAQ Artikel dazu hinweist ',
+              de=>'
+<br>
+Hier werden alle IT Betriebsrisiken und Maﬂnahmen der DT IT erfasst.<br>
+IT Security Risiken bitte in CAPE erfassen!<br>
+Weiter Infos hier: <br>
+<a href="https://yam.telekom.de/groups/risk-management-dt-it" target=_blank>Risikomanagement der DT IT</a>
+
+',
               en=>'Hier sollte ein Text in de/en drin stehen, der '.
                   'beschreibt, wof¸r der WF ist und u.U. auf FAQ Artikel dazu hinweist '
                   },
@@ -17,11 +23,11 @@
 'TELITMONIMP.2'=>{de=>'5T bis 10T EUR',  en=>'5T till 10T EUR'},
 'TELITMONIMP.3'=>{de=>'10T bis 50T EUR',  en=>'10T till 50T EUR'},
 'TELITMONIMP.4'=>{de=>'>50T EUR',  en=>'>50T EUR'},
-'Estimated financial impact within DTAG over the entire duration of the damage'=>{
-  de=>'Gesch‰tzter finanzieller Impact innerhalb der DTAG'
+'Total damage within DTAG (form an estimate)'=>{
+  de=>'Schadensausmaﬂ DTAG (Sch‰tzung)'
 },
-'Loss of IT - Immediate monetary impact within the Telekom IT'=>{
-  de=>'Schadensausmaﬂ der IT - unmittelbare nhalb der TelekomIT'
+'Total damage within IT (form an estimate)'=>{
+  de=>'Schadensausmaﬂ in der IT (Sch‰tzung)'
 },
 'no measure workflows'=>{de=>'keine Maﬂnahmen'},
 'incomplete risk data'=>{de=>'unvollst‰ndige Riskiodaten'},

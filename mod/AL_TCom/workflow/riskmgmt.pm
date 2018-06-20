@@ -42,7 +42,8 @@ sub getDynamicFields
    return($self->InitFields(
       $self->SUPER::getDynamicFields(@_),
       new kernel::Field::Select(  name          =>'extdescdtagmonetaryimpact',
-                                  label         =>'Estimated financial impact within DTAG over the entire duration of the damage',
+                                  label         =>'Total damage within DTAG '.
+                                                  '(form an estimate)',
                                   value         =>['','0','1','2','3'],
                                   default       =>'',
                                   transprefix   =>'DTAGMONIMP.',
@@ -50,7 +51,8 @@ sub getDynamicFields
                                   container     =>'headref'),
 
       new kernel::Field::Select(  name          =>'extdesctelitmonetaryimpact',
-                                  label         =>'Loss of IT - Immediate monetary impact within the Telekom IT',
+                                  label         =>'Total damage within IT '.
+                                                  '(form an estimate)',
                                   value         =>['','0','1','2','3','4'],
                                   default       =>'',
                                   transprefix   =>'TELITMONIMP.',

@@ -121,18 +121,26 @@ sub getDynamicFields
                                   container     =>'headref'),
 
       new kernel::Field::Textarea(name          =>'extdescriskimpact',
-                                  label         =>'Description of the impact on the occurrence of the risk',
+                                  label         =>'Description of the impact '.
+                                                  'on the occurrence of the '.
+                                                  'risk',
                                   group         =>'riskdesc',
                                   container     =>'headref'),
 
-      new kernel::Field::Number(  name          =>'extdescriskdowntimedays',
-                                  label         =>'Estimate downtime (in days) in case the risk occurs',
-                                  editrange     =>['0'=>'180'], 
+      new kernel::Field::Select(  name          =>'extdescriskdowntimedays',
+                                  label         =>'Estimate downtime '.
+                                                  '(in days) in case the risk '.
+                                                  'occurs',
+                                  htmleditwidth =>'120',
+                                  value         =>[ 0..30 ],
+                                  transprefix   =>'RISKDAYS.',
                                   group         =>'riskdesc',
                                   container     =>'headref'),
 
       new kernel::Field::Select(  name          =>'extdescriskoccurrency',
-                                  label         =>'Probability of occurrence Risk within the next 12 months',
+                                  label         =>'Probability of occurrence '.
+                                                  'Risk',
+                                  htmleditwidth =>'120',
                                   value         =>['0','1','2','3','4','5',
                                                    '6','7','8','9','10','11'],
                                   default       =>'0',
@@ -143,6 +151,7 @@ sub getDynamicFields
 
       new kernel::Field::Date(    name          =>'extdescarisedate',
                                   label         =>'When can the risk arise?',
+                                  dayonly       =>2,
                                   group         =>'riskdesc',
                                   container     =>'headref'),
 
@@ -159,7 +168,8 @@ sub getDynamicFields
                                      my $self=shift;
                                      my $mode=shift;
                                      my $current=shift;
-                                     my $fld=$self->getParent->getField("riskmgmtcolor",$current);
+                                     my $fld=$self->getParent->getField(
+                                             "riskmgmtcolor",$current);
                                      my $color=$fld->RawValue($current);
                                      return($color);
                                   },
@@ -176,13 +186,15 @@ sub getDynamicFields
                                      my $mode=shift;
                                      my %param=@_;
                                      my $current=$param{current};
-                                     if ($self->getParent->IsMemberOf("admin")){
+                                     my @mandatorid=@{$current->{mandatorid}}; 
+                                     if ($self->getParent->IsMemberOf(
+                                         \@mandatorid,
+                                         [qw(RSKCoord RSKManager)],"up")){
                                         return(1);
                                      }
                                      return(0);
                                   },
                                   vjoinconcat   =>"\n",
-                                  htmldetail    =>'NotEmpty',
                                   group         =>'riskrating',
                                   onRawValue    =>\&getCalculatedRiskState),
 
@@ -192,7 +204,19 @@ sub getDynamicFields
                                   nowrap        =>1,
                                   htmldetail    =>0,
                                   vjoinconcat   =>"\n",
-                                  htmldetail    =>'NotEmpty',
+                                  htmldetail    =>sub{
+                                     my $self=shift;
+                                     my $mode=shift;
+                                     my %param=@_;
+                                     my $current=$param{current};
+                                     my @mandatorid=@{$current->{mandatorid}}; 
+                                     if ($self->getParent->IsMemberOf(
+                                         \@mandatorid,
+                                         [qw(RSKCoord RSKManager)],"up")){
+                                        return(1);
+                                     }
+                                     return(0);
+                                  },
                                   group         =>'riskrating',
                                   onRawValue    =>\&getRiskEstimation),
 
@@ -202,7 +226,6 @@ sub getDynamicFields
                                   nowrap        =>1,
                                   htmldetail    =>0,
                                   vjoinconcat   =>"\n",
-                                  htmldetail    =>'NotEmpty',
                                   group         =>'riskrating',
                                   onRawValue    =>\&getRiskEstimation),
 
@@ -680,7 +703,16 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","state","flow","affected","header","riskdesc","riskrating","riskbase","relations","init","history");
+
+   my @l=("default","state","flow","affected","header",
+          "riskdesc","riskrating","relations","init","history");
+
+   my @mandatorid=@{$rec->{mandatorid}};
+   if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager)],"up")){
+      push(@l,"riskbase");
+   }
+
+   return(@l);
 }
 
 sub isWriteValid
@@ -1404,16 +1436,19 @@ sub generateWorkspacePages
       my $pstart=Query->Param("Formated_plannedstart");
       my $pend=Query->Param("Formated_plannedend");
 
+      my $plannedstart=$self->T("planned start");
+      my $plannedend=$self->T("planned end");
+
       my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
           "<td nowrap width=1%>Maßname Kurzbezeichnung:</td>".
           "<td><input type=text name=Formated_name value='".quoteHtml($desc).
           "' style=\"width:100%\"></td></tr></table>";
       $d.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
-          "<td nowrap width=1%>geplannt von:</td>".
+          "<td nowrap width=1%>${plannedstart}: </td>".
           "<td width=20%><input type=text name=Formated_plannedstart ".
           "value='".quoteHtml($pstart).
           "' style=\"width:100%\"></td>".
-          "<td nowrap width=1%>bis:</td>".
+          "<td nowrap width=1%> &nbsp; ${plannedend}: </td>".
           "<td width=20%><input type=text name=Formated_plannedend ".
           "value='".quoteHtml($pend).
           "' style=\"width:100%\"></td>".
