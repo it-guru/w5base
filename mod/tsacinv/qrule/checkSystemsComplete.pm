@@ -7,7 +7,7 @@ package tsacinv::qrule::checkSystemsComplete;
 =head3 PURPOSE
 
 Checks if all systems on a specifice costobject are documented in
-it-invtory.
+it-inventory.
 
 All systems in AM are defined as ...
 
@@ -157,7 +157,7 @@ sub qcheckRecord
       if ($#miss!=-1){
          $errorlevel=3;
          foreach my $s (@miss){
-            my $msg="missing logical system in it-invtory: ".$s;
+            my $msg="missing logical system in it-inventory: ".$s;
             push(@qmsg,$msg);
             push(@dataissue,$msg);
          }
