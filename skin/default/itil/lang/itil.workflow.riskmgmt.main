@@ -1,2 +1,3 @@
 'planned start'=>{de=>'Geplanter Begin'},
 'planned end'=>{de=>'Geplantes Ende'},
+'planned start or end missing'=>{de=>'Geplannter Begin oder Ende nicht angegeben'},

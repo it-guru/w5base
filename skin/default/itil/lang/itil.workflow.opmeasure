@@ -1,4 +1,4 @@
-'itil::workflow::opmeasure'=>{de=>'ITIL Betriebs-Maßnahme',en=>'ITIL Operations measure'},
+'itil::workflow::opmeasure'=>{de=>'Betriebs-Maßnahme',en=>'Operations measure'},
 'fieldgroup.extopmeadesc'=>{de=>'Erweiterte Maßnahmeninformationen',en=>'extended measure information'},
 'Initiate request to businessteam'=>{de=>'Auftrag an den Anwendungsbetrieb initieren'},
 'Initiate developer request'=>{de=>'Auftrag an die Entwicklung initieren'},
@@ -13,3 +13,5 @@ en=>'With this workflow you can assign and supervise tasks and measures within a
 'invalid detail description for measure'=>{de=>'ungültige Detailbeschreibung der Maßname'},
 'planned start'=>{de=>'Geplanter Beginn'},
 'planned end'=>{de=>'Geplantes Ende'},
+'planned end must be behind planned start'=>{de=>'Geplantes Ende muss nach dem geplanten Begin liegen'},
+'it is not allowed to delete this entry'=>{de=>'Es ist nicht erlaubt, diesen Eintrag zu löschen'},

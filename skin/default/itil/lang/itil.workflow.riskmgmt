@@ -29,7 +29,7 @@
    de=>'Welche Art von Riskio haben Sie?'
 },
 'Description of the impact on the occurrence of the risk'=>{
-  de=>'Beschreibung der Auswirkungen beim Eintrittsszenario)'
+  de=>'Beschreibung der Auswirkungen beim Eintrittsszenario'
 },
 'Estimate downtime (in days) in case the risk occurs'=>{
   de=>'Geschätzte Ausfallzeit (in Tagen) bei Risikoeintritt'

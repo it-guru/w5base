@@ -84,6 +84,27 @@ sub Validate
       }
    }
 
+   if (exists($newrec->{plannedstart}) || exists($newrec->{plannedend})){
+      my $plannedstart=effVal($oldrec,$newrec,"plannedstart"); 
+      my $plannedend=effVal($oldrec,$newrec,"plannedend"); 
+      if ($plannedstart ne "" && $plannedend ne ""){
+         my $d=CalcDateDuration($plannedstart,$plannedend);
+         if (!defined($d) || $d->{totalminutes}<=0){
+            $self->LastMsg(ERROR,"planned end must be behind planned start");
+            return(0);
+         }
+      }
+   }
+   foreach my $fld (qw(plannedstart plannedend)){
+      if (defined($oldrec) &&
+          $oldrec->{$fld} ne ""){
+         if (exists($newrec->{$fld}) && $newrec->{$fld} eq ""){
+            $self->LastMsg(ERROR,"it is not allowed to delete this entry");
+            return(0);
+         }
+      }
+   }
+
    return(1);
 }
 
@@ -349,14 +370,16 @@ sub isWriteValid
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("header","default","extopmeadesc","affected","customerdata","init","flow");
+   return("header","default","extopmeadesc","affected","customerdata",
+          "init","flow");
 }
 
 sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/workflow_appl.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/workflow_opmeasure.jpg?".
+          $cgi->query_string());
 }
 
 sub getPosibleRelations

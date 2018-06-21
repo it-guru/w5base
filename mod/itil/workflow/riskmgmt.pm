@@ -636,8 +636,10 @@ sub getPosibleActions
    my $isRiskWfAuthorized=$self->isRiskWfAuthorized($WfRec);
 
    my $openSubWf=0;
+   my $haveSubWf=0;
 
    foreach my $relrec (@{$WfRec->{relations}}){
+      $haveSubWf++;
       if ($relrec->{dststate}<20){
          $openSubWf=1;
       }
@@ -678,8 +680,10 @@ sub getPosibleActions
       }
    }
    if ($WfRec->{stateid} > 1 && $WfRec->{stateid} ne "17"){
-      if (($iscurrent || $isadmin) && !$openSubWf){
-         push(@l,"wfclose");
+      if ($haveSubWf){   # schliesen nur dann, wenn min. eine Maßnahme
+         if (($iscurrent || $isadmin) && !$openSubWf){
+            push(@l,"wfclose");
+         }
       }
    }
    if ($WfRec->{stateid} eq "1"){  
@@ -733,14 +737,16 @@ sub isWriteValid
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("header","default","riskdesc","riskrating","riskbase","affected","customerdata","init","flow");
+   return("header","default","riskdesc","riskrating",
+          "riskbase","affected","customerdata","init","flow");
 }
 
 sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/workflow_appl.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/workflow_riskmgmt.jpg?".
+          $cgi->query_string());
 }
 
 sub getPosibleRelations
@@ -1069,6 +1075,7 @@ sub Process
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
 
+
 sub Validate
 {
    my $self=shift;
@@ -1315,11 +1322,9 @@ sub nativProcess
          class=>'itil::workflow::opmeasure',
          step =>'base::workflow::request::main'
       };
-      if ($h->{plannedstart} eq ""){
-         $h->{plannedstart}="now";
-      }
-      if ($h->{plannedend} eq ""){
-         $h->{plannedend}="now+30d";
+      if ($h->{plannedstart} eq "" || $h->{plannedend} eq ""){
+         $self->LastMsg(ERROR,"planned start or end missing");
+         return(0);
       }
       my $tstamp=$self->ExpandTimeExpression($h->{plannedstart},"en",
                                $self->UserTimezone(),"GMT");
@@ -1379,11 +1384,15 @@ sub nativProcess
          }
          $self->StoreRecord($WfRec,$store);
          $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-         $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
+                            note=>$h->{note},
+                            fwdtarget=>$store->{fwdtarget},
+                            fwdtargetid=>$store->{fwdtargetid},
+                            fwdtargetname=>'RiskCoordinator');
          return(1);
       }
    }
-   elsif($op eq "wffinish"){
+   elsif($op eq "wffine"){
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wffine",
           {translation=>'base::workflow::request'},"",undef)){
@@ -1415,6 +1424,35 @@ sub nativProcess
 }
 
 
+sub PostProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my %param=@_;
+   my $aobj=$self->getParent->getParent->Action();
+   my $workflowname=$self->getParent->getWorkflowMailName();
+
+
+   if ($action eq "SaveStep.wfclose"){
+      if ($param{fwdtargetid} ne ""){
+         $aobj->NotifyForward($WfRec->{id},
+                              $param{fwdtarget},
+                              $param{fwdtargetid},
+                              $param{fwdtargetname},
+                              $param{note},
+                              workflowname=>$workflowname);
+      }
+   }
+
+   return($self->SUPER::PostProcess($action,$WfRec,$actions,%param));
+}
+
+
+
+
+
 
 sub generateWorkspacePages
 {
@@ -1435,6 +1473,12 @@ sub generateWorkspacePages
       my $note=Query->Param("Formated_detaildescription");
       my $pstart=Query->Param("Formated_plannedstart");
       my $pend=Query->Param("Formated_plannedend");
+      if (!defined($pstart)){
+         $pstart=$self->getParent->T("today");
+      }
+      if (!defined($pend)){
+         $pend=$self->getParent->T("today")."+30d";
+      }
 
       my $plannedstart=$self->T("planned start");
       my $plannedend=$self->T("planned end");

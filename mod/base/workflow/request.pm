@@ -1387,16 +1387,39 @@ sub Process
                 $WfRec->{id},"wfaddnote",
                 {translation=>'base::workflow::request'},$note,$effort)){
                my $openuserid=$WfRec->{openuser};
-               $self->StoreRecord($WfRec,{stateid=>16,fwdtargetid=>$openuserid,
-                                                      fwdtarget=>'base::user',
-                                                      eventend=>NowStamp("en"),
-                                                      fwddebtarget=>undef,
-                                                      fwddebtargetid=>undef});
+               my $store={stateid=>16,fwdtargetid=>$openuserid,
+                          fwdtarget=>'base::user',
+                          eventend=>NowStamp("en"),
+                          fwddebtarget=>undef,
+                          fwddebtargetid=>undef};
+               if ($self->getParent->getParent->getCurrentUserId() eq 
+                   $openuserid){   # if current user is opener, skip wfclose
+                  my $nextstep=$self->getParent->getStepByShortname("finish");
+                  if ($nextstep ne ""){
+                      $store={stateid=>21,
+                              step=>$nextstep,
+                              fwdtargetid=>undef,
+                              fwdtarget=>undef,
+                              closedate=>NowStamp("en"),
+                              fwddebtarget=>undef,
+                              fwddebtargetid=>undef
+                      };
+                      if ($WfRec->{eventend} eq ""){
+                         $store->{eventend}=NowStamp("en");
+                      }
+                  }
+               }
+               
+
+
+
+
+               $self->StoreRecord($WfRec,$store);
                $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
                $self->PostProcess($action.".".$op,$WfRec,$actions,
                                   note=>$note,
                                   fwdtarget=>'base::user',
-                                  fwdtargetid=>$openuserid,
+                                  fwdtargetid=>$store->{fwdtargetid},
                                   fwdtargetname=>'Requestor');
                return(1);
             }
@@ -1641,12 +1664,14 @@ sub PostProcess
        $action eq "SaveStep.wffineproc" ||
        $action eq "SaveStep.wfacceptp" ||
        $action eq "BreakWorkflow" ){
-      $aobj->NotifyForward($WfRec->{id},
-                           $param{fwdtarget},
-                           $param{fwdtargetid},
-                           $param{fwdtargetname},
-                           $param{note},
-                           workflowname=>$workflowname);
+      if ($param{fwdtargetid} ne ""){
+         $aobj->NotifyForward($WfRec->{id},
+                              $param{fwdtarget},
+                              $param{fwdtargetid},
+                              $param{fwdtargetname},
+                              $param{note},
+                              workflowname=>$workflowname);
+      }
    }
 
    if ($action eq "SaveStep.wfacceptp" ||
