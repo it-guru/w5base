@@ -258,6 +258,7 @@ sub new
                                             itil::workflow::devrequest
                                             itil::workflow::opmeasure
                                             AL_TCom::workflow::businesreq
+                                            AL_TCom::workflow::riskmgmt
                                             THOMEZMD::workflow::businesreq
                                             base::workflow::DataIssue
                                             base::workflow::mailsend
