@@ -21,6 +21,36 @@
 'RISKPCT.9' =>{de=>'80-89 %',en=>'80-89 %'},
 'RISKPCT.10'=>{de=>'90-99 %',en=>'90-99 %'},
 'RISKPCT.11'=>{de=>  '100 %',en=>  '100 %'},
+'RISKDAYS.0'=>{de=>'0 Tage',en=>'0 days'},
+'RISKDAYS.1'=>{de=>'1 Tag', en=>'1 day'},
+'RISKDAYS.2'=>{de=>'2 Tage',en=>'2 days'},
+'RISKDAYS.3'=>{de=>'3 Tage',en=>'3 days'},
+'RISKDAYS.4'=>{de=>'4 Tage',en=>'4 days'},
+'RISKDAYS.5'=>{de=>'5 Tage',en=>'5 days'},
+'RISKDAYS.6'=>{de=>'6 Tage',en=>'6 days'},
+'RISKDAYS.7'=>{de=>'7 Tage',en=>'7 days'},
+'RISKDAYS.8'=>{de=>'8 Tage',en=>'8 days'},
+'RISKDAYS.9'=>{de=>'9 Tage',en=>'9 days'},
+'RISKDAYS.10'=>{de=>'10 Tage',en=>'10 days'},
+'RISKDAYS.11'=>{de=>'11 Tage',en=>'11 days'},
+'RISKDAYS.12'=>{de=>'12 Tage',en=>'12 days'},
+'RISKDAYS.13'=>{de=>'13 Tage',en=>'13 days'},
+'RISKDAYS.14'=>{de=>'14 Tage',en=>'14 days'},
+'RISKDAYS.15'=>{de=>'15 Tage',en=>'15 days'},
+'RISKDAYS.16'=>{de=>'16 Tage',en=>'16 days'},
+'RISKDAYS.17'=>{de=>'17 Tage',en=>'17 days'},
+'RISKDAYS.18'=>{de=>'18 Tage',en=>'18 days'},
+'RISKDAYS.19'=>{de=>'19 Tage',en=>'19 days'},
+'RISKDAYS.20'=>{de=>'20 Tage',en=>'20 days'},
+'RISKDAYS.21'=>{de=>'21 Tage',en=>'21 days'},
+'RISKDAYS.22'=>{de=>'22 Tage',en=>'22 days'},
+'RISKDAYS.23'=>{de=>'23 Tage',en=>'23 days'},
+'RISKDAYS.24'=>{de=>'24 Tage',en=>'24 days'},
+'RISKDAYS.25'=>{de=>'25 Tage',en=>'25 days'},
+'RISKDAYS.26'=>{de=>'26 Tage',en=>'26 days'},
+'RISKDAYS.27'=>{de=>'27 Tage',en=>'27 days'},
+'RISKDAYS.28'=>{de=>'28 Tage',en=>'28 days'},
+'RISKDAYS.29'=>{de=>'29 Tage',en=>'29 days'},
 'RISKDAYS.30'=>{de=>'30 und länger',en=>'30 and longer'},
 'Riskpoints'=>{de=>'Risiko Punkte'},
 'Risk state'=>{de=>'Risiko Status'},
@@ -29,10 +59,10 @@
    de=>'Welche Art von Riskio haben Sie?'
 },
 'Description of the impact on the occurrence of the risk'=>{
-  de=>'Beschreibung der Auswirkungen beim Eintrittsszenario'
+  de=>'Beschreibung der Auswirkungen bei Risikoeintritt'
 },
-'Estimate downtime (in days) in case the risk occurs'=>{
-  de=>'Geschätzte Ausfallzeit (in Tagen) bei Risikoeintritt'
+'Estimate downtime in case the risk occurs'=>{
+  de=>'Geschätzte Ausfallzeit bei Risikoeintritt'
 },
 'Probability of occurrence Risk'=>{
   de=>'Eintrittswahrscheinlichkeit des Risikos'

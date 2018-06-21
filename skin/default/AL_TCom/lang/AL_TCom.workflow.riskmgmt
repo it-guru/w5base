@@ -26,8 +26,8 @@ Weiter Infos hier: <br>
 'Total damage within DTAG (form an estimate)'=>{
   de=>'Schadensausmaß DTAG (Schätzung)'
 },
-'Total damage within IT (form an estimate)'=>{
-  de=>'Schadensausmaß in der IT (Schätzung)'
+'Total damage within TelIT (form an estimate)'=>{
+  de=>'Schadensausmaß in der TelIT (Schätzung)'
 },
 'no measure workflows'=>{de=>'keine Maßnahmen'},
 'incomplete risk data'=>{de=>'unvollständige Riskiodaten'},

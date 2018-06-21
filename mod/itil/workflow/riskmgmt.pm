@@ -84,6 +84,9 @@ sub isRiskWfAuthorized
    if ($userid eq $cachedArec->{applmgrid}){
       return(1);
    }
+   if ($userid eq $cachedArec->{databossid}){
+      return(1);
+   }
    my @mandatorid=($cachedArec->{mandatorid});
    if (defined($rec) && ref($rec->{mandatorid}) eq "ARRAY"){
       push(@mandatorid,@{$rec->{mandatorid}});
@@ -129,7 +132,7 @@ sub getDynamicFields
 
       new kernel::Field::Select(  name          =>'extdescriskdowntimedays',
                                   label         =>'Estimate downtime '.
-                                                  '(in days) in case the risk '.
+                                                  'in case the risk '.
                                                   'occurs',
                                   htmleditwidth =>'120',
                                   value         =>[ 0..30 ],
@@ -316,6 +319,14 @@ sub calculateRiskState
 }
 
 
+sub getMandatoryParamFields
+{
+   my $self=shift;
+
+   return(qw(extdescriskdowntimedays extdescriskoccurrency extdescarisedate));
+}
+
+
 sub getCalculatedRiskState
 {
    my $self=shift;
@@ -373,13 +384,6 @@ sub getRiskEstimation
    }
    return($self->getParent->Context->{RiskEstimation}->{$id}->{raw}->{$name});
 }
-
-
-
-
-
-
-
 
 
 
@@ -476,75 +480,15 @@ sub getNextStep
       return($self->getStepByShortname("dataload",$WfRec));
    }
    if($currentstep=~m/::dataload$/){
+      return($self->getStepByShortname("paramload",$WfRec));
+   }
+   if($currentstep=~m/::paramload$/){
       return($self->getStepByShortname("main",$WfRec));
    }
    return(undef);
 }
 
 
-sub validateExtDesc
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $h=shift;
-
-#   foreach my $k (keys(%$h)){
-#      if ($k=~m/^extdesc/){
-#         my $fo=$self->getField("$k");
-#         if (!defined($fo)){
-#            $self->LastMsg(ERROR,"invalid write in validateExtDesc field $k");
-#            return(0);
-#         }
-#         my $unh=$fo->Unformat([$h->{$k}],$h);
-#         if (!defined($unh)){
-#            $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
-#            return(0);
-#         }
-#         else{
-#            foreach my $k (keys(%$unh)){
-#               $h->{$k}=$unh->{$k};
-#            } 
-#         } 
-#         if (!$fo->Validate($h,{$k=>$h->{$k}})){
-#            $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
-#            return(0);
-#         }
-#      }
-#   }
-#   if (exists($h->{extdescdesend})){
-#      my $d=CalcDateDuration($WfRec->{extdescdesend},$h->{extdescdesend});
-#      if ($d->{totalminutes} != 0){
-#         my $d=CalcDateDuration(NowStamp("en"),$h->{extdescdesend});
-#         if ($d->{totalminutes}<60){
-#            $self->LastMsg(ERROR,"invalid precarriage time in desired end");
-#            return(0);
-#         }
-#      }
-#   }
-#   if (exists($h->{extdescdesstart})){
-#      my $d=CalcDateDuration($WfRec->{extdescdesstart},$h->{extdescdesstart});
-#      if ($d->{totalminutes} != 0){
-#         my $d=CalcDateDuration(NowStamp("en"),$h->{extdescdesstart});
-#         if ($d->{totalminutes}<60){
-#            $self->LastMsg(ERROR,"invalid precarriage time in desired start");
-#            return(0);
-#         }
-#      }
-#   }
-#   if (exists($h->{extdescdesstart}) &&
-#       exists($h->{extdescdesend})){
-#      my $d=CalcDateDuration($h->{extdescdesstart},$h->{extdescdesend});
-#      if ($d->{totalminutes}<60){
-#         $self->LastMsg(ERROR,"start and end window not large enough");
-#         return(0);
-#      }
-#      $h->{reqdesdate}="";
-#   }
-
-
-
-   return(1);
-}
 
 sub isOptionalFieldVisible
 {
@@ -889,9 +833,6 @@ sub generateWorkspace
 setFocus("Formated_name");
 setEnterSubmit(document.forms[0],"NextStep");
 </script>
-<tr>
-<td colspan=4 align=center><br>$nextstart</td>
-</tr>
 </table>
 <script language="JavaScript">
 setFocus("Formated_name");
@@ -924,6 +865,113 @@ EOF
    return($templ);
 }
 
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "NextStep"){
+      my $fo=$self->getField("affectedapplication");
+      my $foval=Query->Param("Formated_".$fo->Name());
+      if ($foval=~m/^\s*$/){
+         $self->LastMsg(ERROR,"no application specified");
+         return(0);
+      }
+      if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
+         $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+         return(0);
+      }
+   }
+   return($self->SUPER::Process($action,$WfRec,$actions));
+}
+
+
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   return("340");
+}
+
+
+#######################################################################
+package itil::workflow::riskmgmt::paramload;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+@ISA=qw(kernel::WfStep);
+
+
+sub generateStoredWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my @steplist=@_;
+   my $d=<<EOF;
+<tr>
+<td class=fname width=30%>%affectedapplication(label)%:</td>
+<td class=finput>%affectedapplication(storedworkspace)%</td>
+</tr>
+EOF
+
+   return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
+}
+
+
+sub generateWorkspace
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   my @steplist=Query->Param("WorkflowStep");
+   pop(@steplist);
+   my $StoredWorkspace=$self->generateStoredWorkspace($WfRec,@steplist);
+
+
+   my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
+   my $secial=$self->getParent->getSpecificDataloadForm();
+   my $templ=<<EOF;
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+$StoredWorkspace
+<tr>
+<td class=fname colspan=4>%extdescriskimpact(label)%:</td>
+</tr><tr>
+<td colspan=4 class=finput>%extdescriskimpact(detail)%</td>
+</tr>
+EOF
+   foreach my $fldname ($self->getParent->getMandatoryParamFields()){
+      $templ.="<tr><td class=fname valign=top width=20%>";
+      $templ.="%${fldname}(label)%:</td>";
+      $templ.="<td colspan=3 class=finput>%${fldname}(detail)%</td>";
+      $templ.="</tr>\n";
+   }
+   $templ.=<<EOF;
+<script language="JavaScript">
+//setFocus("Formated_name");
+setEnterSubmit(document.forms[0],"NextStep");
+</script>
+<tr>
+<td colspan=4 align=center><br>$nextstart</td>
+</tr>
+</table>
+EOF
+   $templ.=$self->getParent->getParent->HtmlPersistentVariables(qw( 
+      Formated_affectedapplication
+      Formated_detaildescription
+      Formated_name
+      Formated_riskbasetype
+   ));
+
+   return($templ);
+}
+
 sub nativProcess
 {
    my $self=shift;
@@ -932,12 +980,9 @@ sub nativProcess
    my $WfRec=shift;
    my $actions=shift;
 
-printf STDERR ("nativProcess $self action=$action h=%s\n",Dumper($h));
 
    if ($action eq "NextStep"){
-      if ($h->{reqdesdate} eq ""){
-         $h->{reqdesdate}="as soon as posible / baldmˆglichst";
-      }
+      my @rskmgr;
       my $flt;
       if ($h->{affectedapplication} ne ""){
          $flt={name=>\$h->{affectedapplication}}; 
@@ -948,15 +993,23 @@ printf STDERR ("nativProcess $self action=$action h=%s\n",Dumper($h));
       if (!defined($h->{stateid}) || $h->{stateid}==0){
          $h->{stateid}=1; # erfassen
       }
-      $h->{step}=$self->getNextStep();
-      if (!$self->getParent->validateExtDesc($WfRec,$h)){
-         return(0);
+      foreach my $fld ($self->getParent->getMandatoryParamFields(),
+                       "extdescriskimpact"){
+         if ($h->{$fld} eq ""){
+            my $t=$self->getParent->T("missing value for");
+            $self->LastMsg(ERROR,$t.": ".
+                    $self->getParent->getField($fld)->Label());
+            return(0);
+         }
       }
+      $h->{step}=$self->getNextStep();
       if (defined($flt)){
          my $appl=getModuleObject($self->getParent->Config,"itil::appl");
          $appl->SetFilter($flt);
          my ($arec)=$appl->getOnlyFirst(qw(mandator mandatorid conumber
-                                           custcontracts applmgr applmgrid
+                                           custcontracts 
+                                           databoss databossid
+                                           applmgr applmgrid
                                            customer customerid));
          if (defined($arec)){
             if ($arec->{applmgrid} eq "" || $arec->{applmgr} eq ""){
@@ -965,6 +1018,16 @@ printf STDERR ("nativProcess $self action=$action h=%s\n",Dumper($h));
             }
             if ($arec->{mandator} eq "" || $arec->{mandatorid} eq ""){
                $self->LastMsg(ERROR,"can not find mandator");
+               return(0);
+            }
+            @rskmgr=$self->getParent->getMembersOf($arec->{mandatorid},
+                                                   ['RSKCoord'],'firstup');
+            if ($#rskmgr==-1){
+               @rskmgr=$self->getParent->getMembersOf($arec->{mandatorid},
+                                                   ['RSKManager'],'firstup');
+            }
+            if ($#rskmgr==-1){
+               $self->LastMsg(ERROR,"missing RSKCoord or RSKManager");
                return(0);
             }
             $h->{fwdtarget}='base::user';
@@ -1008,27 +1071,14 @@ printf STDERR ("nativProcess $self action=$action h=%s\n",Dumper($h));
          return(0);
       }
       if (my $id=$self->StoreRecord($WfRec,$h)){
-         $h->{id}=$id;
-      #   if ($#wsref!=-1){
-      #      while(my $target=shift(@wsref)){
-      #         my $targetid=shift(@wsref);
-      #         last if ($targetid eq "" || $target eq "");
-      #         $self->getParent->getParent->AddToWorkspace($id,
-      #                                                     $target,$targetid);
-      #      }
-      #   }
-      #   my $isDerivateFrom=Query->Param("isDerivateFrom");
-      #   if ($isDerivateFrom ne ""){
-      #      if (my ($srctype,$srcid)=$isDerivateFrom=~m/^(.*)::(\d+)$/){
-      #         my $wr=getModuleObject($self->Config,"base::workflowrelation"); 
-      #         $wr->ValidatedInsertRecord({
-      #            name=>"derivation",
-      #            translation=>$srctype,
-      #            srcwfid=>$srcid,
-      #            dstwfid=>$id,
-      #         });
-      #      }
-      #   }
+         my $aobj=$self->getParent->getParent->Action();
+         $aobj->NotifyForward($id,
+                              "base::user",
+                              $rskmgr[0],
+                              "RiskCoordinator",
+                              "",
+                              mode=>'newRisk:',
+                              workflowname=>$WfRec->{name});
          $self->PostProcess($action,$h,$actions);
       }
       else{
@@ -1442,6 +1492,7 @@ sub PostProcess
                               $param{fwdtargetid},
                               $param{fwdtargetname},
                               $param{note},
+                              mode=>'closeRisk:',
                               workflowname=>$workflowname);
       }
    }
@@ -1483,8 +1534,13 @@ sub generateWorkspacePages
       my $plannedstart=$self->T("planned start");
       my $plannedend=$self->T("planned end");
 
-      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
-          "<td nowrap width=1%>Maﬂname Kurzbezeichnung:</td>".
+      my $t1=$self->getParent->T("Please describe here the measure ".
+         "leading to the elimination/reduction of the risk");
+      my $t2=$self->getParent->T("short description measure");
+
+      my $d="<table width=\"100%\" border=0 style='margin-top:6px' ".
+          "cellspacing=0 cellpadding=0><tr>".
+          "<td nowrap width=1%>${t2}:</td>".
           "<td><input type=text name=Formated_name value='".quoteHtml($desc).
           "' style=\"width:100%\"></td></tr></table>";
       $d.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
@@ -1497,10 +1553,11 @@ sub generateWorkspacePages
           "value='".quoteHtml($pend).
           "' style=\"width:100%\"></td>".
           "</tr></table>";
-      $d.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
-          "<td colspan=2>".
+      $d.="<table width=\"100%\" border=0 style='margin-top:8px' ".
+          "cellspacing=0 cellpadding=0><tr>".
+          "<td colspan=2>${t1}:<br>".
           "<textarea name=Formated_detaildescription ".
-          "style=\"width:100%;height:90px\">".
+          "style=\"width:100%;resize:none;height:90px\">".
           quoteHtml($note)."</textarea></td></tr>";
       $d.="<tr><td width=1% nowrap>".
           $self->getParent->T("assign to","itil::workflow::riskmgmt").
@@ -1528,8 +1585,26 @@ sub generateWorkspacePages
                 "desire processed")."</div>";
    }
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
+   if (grep(/^wfaddopmeasure$/,@$actions)){
+      return("wfaddopmeasure");
+   }
    return("wfaddnote");
 }
+
+
+sub getWorkHeight
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   return(0) if (ref($actions) eq "ARRAY" && $#{$actions}==-1);
+
+   return(250);
+}
+
+
+
 
 
 

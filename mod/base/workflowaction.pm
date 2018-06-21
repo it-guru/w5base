@@ -597,6 +597,14 @@ sub NotifyForward
              "src=\"$baseurl/public/base/workflow/ShowState/$wfheadid$lang\">";
    }
 
+   my $labelhead=$self->T("LABEL:".$param{mode});
+   if ($labelhead eq "LABEL:".$param{mode}){
+      $labelhead=$param{mode};
+   }
+   if (!($labelhead=~m/:$/)){
+      $labelhead.=":";
+   }
+
    if (my $id=$wf->Store(undef,{
            class    =>'base::workflow::mailsend',
            step     =>'base::workflow::mailsend::dataload',
@@ -604,7 +612,7 @@ sub NotifyForward
            directlnkid   =>$wfheadid,
            directlnkmode =>"mail.".$param{mode},
            name     =>$subject,%adr,
-           emailhead=>$self->T("LABEL:".$param{mode}).":",
+           emailhead=>$labelhead,
            emailpostfix=>$emailpostfix,
            emailtext=>$comments,
           })){

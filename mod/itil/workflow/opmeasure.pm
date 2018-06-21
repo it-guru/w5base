@@ -50,10 +50,12 @@ sub getDynamicFields
    my @bk=($self->InitFields(
       new kernel::Field::Date(    name          =>'plannedstart',
                                   label         =>'planned start',
+                                  dayonly       =>2,
                                   group         =>'extopmeadesc',
                                   container     =>'headref'),
       new kernel::Field::Date(    name          =>'plannedend',
                                   label         =>'planned end',
+                                  dayonly       =>2,
                                   group         =>'extopmeadesc',
                                   container     =>'headref'),
     ),$self->SUPER::getDynamicFields(%param));

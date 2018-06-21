@@ -46,15 +46,17 @@ sub getDynamicFields
                                                   '(form an estimate)',
                                   value         =>['','0','1','2','3'],
                                   default       =>'',
+                                  htmleditwidth =>'200',
                                   transprefix   =>'DTAGMONIMP.',
                                   group         =>'riskdesc',
                                   container     =>'headref'),
 
       new kernel::Field::Select(  name          =>'extdesctelitmonetaryimpact',
-                                  label         =>'Total damage within IT '.
+                                  label         =>'Total damage within TelIT '.
                                                   '(form an estimate)',
                                   value         =>['','0','1','2','3','4'],
                                   default       =>'',
+                                  htmleditwidth =>'200',
                                   transprefix   =>'TELITMONIMP.',
                                   group         =>'riskdesc',
                                   container     =>'headref'),
@@ -63,6 +65,18 @@ sub getDynamicFields
       ));
 
 }
+
+
+sub getMandatoryParamFields
+{
+   my $self=shift;
+
+   return(qw(extdescriskdowntimedays extdescriskoccurrency 
+             extdescarisedate extdescdtagmonetaryimpact 
+             extdesctelitmonetaryimpact));
+}
+
+
 
 
 sub isRiskParameterComplete
