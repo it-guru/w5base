@@ -113,9 +113,9 @@ sub new
                 dataobjattr   =>"'T03TC_UC128.UC128_1_MW_REPORT\@XAUTOM'"),
 
       new kernel::Field::Date(
-                name          =>'srcload',
-                history       =>0,
-                group         =>'source',
+                name          =>'xsrcload',  # on Oracle alias and field
+                history       =>0,           # needs to have different names
+                group         =>'source',    # for date fields
                 label         =>'Source-Load',
                 dataobjattr   =>'srcload'),
 
