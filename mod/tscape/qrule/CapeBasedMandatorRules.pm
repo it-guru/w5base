@@ -29,8 +29,8 @@ Mandator of applications with other primary operation mode
 (test, developmnet, etc.) should correspond with the org. unit of the 
 application manager.
 
-(Example : If the AM is in solution E-COO then the application should 
-have the mandator E-COO)
+(Example : If the AM is in solution E-DTO then the application should 
+have the mandator E-DTO)
  
 If the mandator of logical systems, software instances and assets is the same 
 as the one on the superordinate CI, this mandator is used. 
@@ -53,8 +53,8 @@ Der Mandant einer Anwendung mit anderer vorwiegender Betriebsart
 (Test, Entwicklung, usw.) soll der org. Einheit des Application Managers 
 entsprechen.
 
-(Beispiel: Ist der AM in der Solution E-COO soll die Anwendung 
-den Mandanten E-COO haben)
+(Beispiel: Ist der AM in der Solution E-DTO soll die Anwendung 
+den Mandanten E-DTO haben)
 
 Bei logischen Systemen, Software-Instanzen und Assets wird der Mandant
 aus dem übergeordneten CI übernommen, wenn dieser immer auf den
