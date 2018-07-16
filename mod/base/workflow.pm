@@ -2404,6 +2404,8 @@ sub New                   # Workflow starten
             "target=_blank title=\\\"$atitle\\\">".
             "<img src=\\\"../../base/load/anker.gif\\\" ".
             "height=10 border=0></a>";
+      $tip=~s/\n/\\n/g;
+      $tip=~s/"/\\"/g;
       $tip.=sprintf($self->T("You can add a shortcut of this anker %s to ".
                     "your bookmarks, to access faster to this workflow."),$a);
       $tips.="tips['$wfclass']=\"$tip\";\n";
