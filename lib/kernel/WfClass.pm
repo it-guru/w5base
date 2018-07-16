@@ -539,6 +539,9 @@ EOF
    if (defined($WfRec)){
       my $workheight=$StepObj->getWorkHeight($WfRec,\@actions);
       my $workareah=$workheight-30;
+      if ($WfRec->{isdeleted}){
+         $workheight=0;
+      }
       my $dst="HtmlDetail?id=$id";
       if ($p eq "WorkflowSpecView"){
          $template=$self->WorkflowSpecView($WfRec);

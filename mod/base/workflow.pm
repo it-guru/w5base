@@ -1123,12 +1123,17 @@ sub getRecordHtmlDetailHeader
    if (my $fld=$self->getField("dataissuestate")){
       $statedisplay=$fld->FormatedDetail($current,"HtmlDetail");
    }
+   my $delstate="";
+   if ($current->{isdeleted}){
+      $delstate="<p><font size=+1><blink><b>".$self->T("deleted").
+                ":</b></blink></font></p>";
+   }
    $H.=<<EOF;
 <table width="100%" height="100%" border=0>
 <tr><td align="left">
 <h1 class=detailtoplineobj>$wfname:</h1>
 </td>
-<td align=right width="1%"><p class=detailtoplinename>$current->{id}</p>
+<td align=right width="1%">$delstate<p class=detailtoplinename>$current->{id}</p>
 </td></tr>
 <tr><td align="left" valign="top">
 <h2 class=detailtoplinename>$name</h2>
