@@ -1,0 +1,3 @@
+'wfmodaffectedsystem'=>{de=>'Liste betroffener Systeme anpassen',en=>'modify list of affected systems'},
+'empty system list not allowed to store'=>{de=>'leere Systemliste kann nicht gespeichert werden'},
+
