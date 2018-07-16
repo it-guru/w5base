@@ -103,13 +103,20 @@ sub getSqlFrom
       where lnkitclustsvcappl.itclustsvc=ipaddress.lnkitclustsvc
    union
    select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
-      from lnkitclustsvcappl,lnkitclustsvc,itclust,system,ipaddress 
-      where lnkitclustsvcappl.itclustsvc=lnkitclustsvc.id and
-            lnkitclustsvc.itclust=itclust.id and 
-            system.clusterid=itclust.id and
-            ipaddress.system=system.id and
-            system.cistatus<=4 and
-            itclust.cistatus<=4 
+      from lnkitclustsvcappl
+           join lnkitclustsvc on lnkitclustsvcappl.itclustsvc=lnkitclustsvc.id
+           join itclust on lnkitclustsvc.itclust=itclust.id 
+           join system on system.clusterid=itclust.id 
+           join ipaddress on ipaddress.system=system.id
+           left outer join lnkitclustsvcsyspolicy 
+              on lnkitclustsvc.id=lnkitclustsvcsyspolicy.itclustsvc 
+                 and lnkitclustsvcsyspolicy.system=system.id 
+      where system.cistatus<=4 and itclust.cistatus<=4 
+            and ( (lnkitclustsvcsyspolicy.runpolicy is null and 
+                   itclust.defrunpolicy<>'deny') or 
+                  (lnkitclustsvcsyspolicy.runpolicy is not null and 
+                   lnkitclustsvcsyspolicy.runpolicy<>'deny'))
+
 ) as ai,appl,ipaddress 
 
 EOF
