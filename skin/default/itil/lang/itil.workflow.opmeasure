@@ -3,7 +3,7 @@
 'Initiate request to businessteam'=>{de=>'Auftrag an den Anwendungsbetrieb initieren'},
 'Initiate developer request'=>{de=>'Auftrag an die Entwicklung initieren'},
 'Initiate operation measure'=>{de=>'Betriebs-Maßnahme ableiten'},
-'itil::workflow::opmeasure::tip'=>{de=>'Mit diesem Workflow können innerhalb einer Applikation Aufgaben und Maßnahmen zugewiesen und überwacht werden. Das Erstellen der Maßnahme kann nur durch steuernde Rollen (AM, TSM, OPM und dessen Vertreter)  der jeweiligen Anwendung durchgeführt werden.',
+'itil::workflow::opmeasure::tip'=>{de=>'Mit diesem Workflow können innerhalb einer Applikation Aufgaben und Maßnahmen zugewiesen und überwacht werden. Das Erstellen der Maßnahme kann nur durch steuernde Rollen (AM, TSM, OPM und dessen Vertreter)  der jeweiligen Anwendung durchgeführt werden.<br>Dieser Workflow kann als alternative zur Dokumentation eines Changes verwendet werden, wenn keinerlei Abstimmungsaufwand zur Durchführung dieser Maßnahme notwendig ist.',
 en=>'With this workflow you can assign and supervise tasks and measures within an application. A measure can only be created by a steering role of a particular application (AM, TSM, OPM and their deputies).'},
 'assign measure to'=>{de=>'Maßnahme zuweisen an'},
 'derivation'=>{de=>'Ableitung'},

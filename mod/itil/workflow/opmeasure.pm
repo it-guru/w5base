@@ -50,12 +50,10 @@ sub getDynamicFields
    my @bk=($self->InitFields(
       new kernel::Field::Date(    name          =>'plannedstart',
                                   label         =>'planned start',
-                                  dayonly       =>2,
                                   group         =>'extopmeadesc',
                                   container     =>'headref'),
       new kernel::Field::Date(    name          =>'plannedend',
                                   label         =>'planned end',
-                                  dayonly       =>2,
                                   group         =>'extopmeadesc',
                                   container     =>'headref'),
     ),$self->SUPER::getDynamicFields(%param));
@@ -64,7 +62,7 @@ sub getDynamicFields
    $self->getField("implementationeffort")->{uivisible}=0;
    $self->getField("initiatorcomments")->{uivisible}=0;
    $self->getField("affectedcontract")->{htmldetail}=0;
-   $self->getField("affectedsystem")->{htmldetail}=0;
+   $self->getField("affectedsystem")->{htmldetail}="NotEmpty";
    $self->getField("affectedproject")->{htmldetail}=0;
    return(@bk);
 
@@ -314,11 +312,29 @@ sub getPosibleActions
 {
    my $self=shift;
    my $WfRec=shift;
+   my $iscurrent=$self->isCurrentForward($WfRec);
+ 
    my @l=$self->SUPER::getPosibleActions($WfRec);
 
    if (!$self->getParent->isDataInputFromUserFrontend()){
       if ($WfRec->{stateid}>=16){
          push(@l,"wfforcerevise");
+      }
+   }
+   if ($iscurrent && 
+       in_array([3,4],$WfRec->{stateid})){
+      my $allow=1;
+      if (ref($WfRec->{shortactionlog}) eq "ARRAY"){
+         foreach my $arec (@{$WfRec->{shortactionlog}}){
+            if ($arec->{name} eq "wfaddnote"){
+               $allow=0;
+            }
+         }
+      }
+      # wenn schon was gemacht, dann darf die Liste der Systeme
+      # nicht mehr verändert werden
+      if ($allow){
+         push(@l,"wfmodaffectedsystem");
       }
    }
 
@@ -336,6 +352,9 @@ sub getStepByShortname
    my $WfRec=shift;
 
    if ($shortname eq "dataload"){
+      return("itil::workflow::opmeasure::".$shortname);
+   }
+   if ($shortname eq "main"){
       return("itil::workflow::opmeasure::".$shortname);
    }
    return($self->SUPER::getStepByShortname($shortname,$WfRec));
@@ -489,6 +508,10 @@ sub generateWorkspace
    }
    $d.="</select>";
 
+   if (!Query->Param("Formated_plannedstart")){
+      Query->Param("Formated_plannedstart"=>$self->T("now"));
+   }
+
 
    my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
    my $assignlabel=$self->getParent->getParent->T("assign measure to",
@@ -514,7 +537,15 @@ setEnterSubmit(document.forms[0],"NextStep");
 </script>
 <tr>
 <td class=fname width=20%>%prio(label)%:</td>
-<td width=80 class=finput>$d</td>
+<td>
+<table border=0 cellspacing=0 cellpadding=0>
+<tr>
+<td class=finput>$d</td>
+<td class=fname>%plannedstart(label)%:</td>
+<td colspan=3 class=finput>%plannedstart(detail)%</td>
+</tr>
+</table>
+</td>
 </tr>
 $secial
 <tr>
@@ -565,6 +596,7 @@ sub nativProcess
                                            tsmid tsm2id
                                            opmid opm2id
                                            applmgrid
+                                           systems
                                            itsemteamid 
                                            responseteamid 
                                            businessteamid
@@ -590,6 +622,24 @@ sub nativProcess
                }
                if (keys(%custcontract)){
                   $h->{affectedcontract}=[keys(%custcontract)];
+               }
+            }
+            if (ref($arec->{systems}) eq "ARRAY"){
+               my %systemid;
+               my %system;
+               foreach my $rec (@{$arec->{systems}}){
+                  if (defined($rec->{systemid})){
+                     $systemid{$rec->{systemid}}=1;
+                  }
+                  if (defined($rec->{system})){
+                     $system{$rec->{system}}=1;
+                  }
+               }
+               if (keys(%systemid)){
+                  $h->{affectedsystemid}=[keys(%systemid)];
+               }
+               if (keys(%system)){
+                  $h->{affectedsystem}=[keys(%system)];
                }
             }
             #
@@ -755,15 +805,205 @@ sub Validate
 
 
 
-
-
-
 sub getWorkHeight
 {
    my $self=shift;
    my $WfRec=shift;
 
    return("250");
+}
+
+#######################################################################
+package itil::workflow::opmeasure::main;
+use vars qw(@ISA);
+use kernel;
+@ISA=qw(base::workflow::request::main);
+
+
+sub getSystemBase
+{
+   my $self=shift;
+   my $curapplid=shift;
+   my $max=shift;
+
+   my $appl=getModuleObject($self->Config,"itil::appl");
+   $appl->SetFilter({id=>$curapplid});
+   my @l=$appl->getHashList(qw(id systems));
+   my %s; 
+   $max->{system}=5;
+   $max->{systemsystemid}=5;
+   $max->{shortdesc}=5;
+   foreach my $arec (@l){
+      if (ref($arec->{systems}) eq "ARRAY"){
+         foreach my $srec (@{$arec->{systems}}){
+            if (!exists($s{$srec->{systemid}})){
+               $s{$srec->{systemid}}={
+                 shortdesc=>$srec->{shortdesc},
+                 system=>$srec->{system},
+                 systemsystemid=>$srec->{systemsystemid}
+               };
+               if (length($srec->{shortdesc})>$max->{shortdesc}){
+                  $max->{shortdesc}=length($srec->{shortdesc});
+               }
+               if (length($srec->{system})>$max->{system}){
+                  $max->{system}=length($srec->{system});
+               }
+               if (length($srec->{systemsystemid})>$max->{systemsystemid}){
+                  $max->{systemsystemid}=length($srec->{systemsystemid});
+               }
+            }
+         }
+      }
+   }
+   $max->{system}++;
+   $max->{systemsystemid}++;
+   return(\%s);
+}
+
+
+sub generateWorkspacePages
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $divset=shift;
+   my $selopt=shift;
+   my $tr="itil::workflow::opmeasure::main";
+   my $class="display:none;visibility:hidden";
+
+   my $defop;
+   if (grep(/^wfmodaffectedsystem$/,@$actions)){
+      $$selopt.="<option value=\"wfmodaffectedsystem\">".
+                $self->getParent->T("wfmodaffectedsystem",$tr).
+                "</option>\n";
+      my $sel="<select size=9 style=\"width:100%\" ".
+              "name=affectedsystemid multiple>";
+      my $cursystemid=$WfRec->{affectedsystemid};
+      if (ref($cursystemid) ne "ARRAY"){
+         $cursystemid=[$cursystemid];
+      }
+      if (Query->Param("OP") eq "wfmodaffectedsystem"){
+         my @affectedsystemid=Query->Param("affectedsystemid");
+         $cursystemid=\@affectedsystemid;
+      }
+      my $curapplid=$WfRec->{affectedapplicationid};
+      if (ref($curapplid) ne "ARRAY"){
+         $curapplid=[$curapplid];
+      }
+      my %max=();
+      my $s=$self->getSystemBase($curapplid,\%max);
+
+      foreach my $systemid (sort({
+                              my $asel=in_array($cursystemid,$a) ? "0" : "1";
+                              my $bsel=in_array($cursystemid,$b) ? "0" : "1";
+                              my $ak=$asel.$s->{$a}->{system};
+                              my $bk=$bsel.$s->{$b}->{system};
+                              $ak cmp $bk;
+                            } keys(%$s))){
+         my $srec=$s->{$systemid};
+         my $form="%-$max{system}s ".
+                  "%-$max{systemsystemid}s ".
+                  "%-$max{shortdesc}s";
+         my $label=sprintf($form,
+                           $srec->{system},
+                           $srec->{systemsystemid},
+                           $srec->{shortdesc});
+         my $selected="";
+         if (in_array($cursystemid,$systemid)){
+            $selected=" selected";
+         }
+         $label=~s/ /&nbsp;/g;
+         $sel.="<option${selected} value=\"$systemid\">".$label."</option>\n";
+      }
+      $sel.="</select>";
+      $$divset.="<div id=OPwfmodaffectedsystem class=\"$class\">".
+                $sel."</div>";
+   }
+   return(
+      $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt)
+   );
+}
+
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
+
+   if ($action eq "BreakWorkflow"){
+      my $h=$self->getWriteRequestHash("web");
+      return($self->nativProcess("wfbreak",$h,$WfRec,$actions));
+   }
+
+   if ($action eq "SaveStep"){
+      my $op=Query->Param("OP");
+      if ($action ne "" && !grep(/^$op$/,@{$actions})){
+         $self->LastMsg(ERROR,"invalid disalloed action requested");
+         return(0);
+      }
+      if ($op eq "wfmodaffectedsystem"){
+         my @affectedsystemid=Query->Param("affectedsystemid");
+         my $h={"affectedsystemid"=>\@affectedsystemid}; 
+         return($self->nativProcess("wfmodaffectedsystem",$h,$WfRec,$actions));
+      }
+   }
+   return($self->SUPER::Process($action,$WfRec,$actions));
+}
+
+sub nativProcess
+{
+   my $self=shift;
+   my $op=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
+   if ($op ne "" && !grep(/^$op$/,@{$actions})){
+      $self->LastMsg(ERROR,"invalid disalloed action requested");
+      msg(ERROR,"invalid requested operation was '$op'");
+      return(0);
+   }
+
+   if ($op eq "wfmodaffectedsystem"){
+      if (ref($h->{affectedsystemid}) eq "ARRAY"){
+         my $curapplid=$WfRec->{affectedapplicationid};
+         if (ref($curapplid) ne "ARRAY"){
+            $curapplid=[$curapplid];
+         }
+         my %max=();
+         my $s=$self->getSystemBase($curapplid,\%max);
+         my $fh={
+            affectedsystemid=>[],
+            affectedsystem=>[]
+         };
+         if ($#{$h->{affectedsystemid}}==-1){
+            $self->LastMsg(ERROR,"empty system list not allowed to store");
+            return(0);
+         }
+         foreach my $sid (@{$h->{affectedsystemid}}){
+            if (in_array([keys(%$s)],$sid)){
+               push(@{$fh->{affectedsystemid}},$sid);
+               push(@{$fh->{affectedsystem}},$s->{$sid}->{system});
+            }
+         }
+         if ($#{$fh->{affectedsystemid}}==-1){
+            $self->LastMsg(ERROR,"empty system list not allowed to store");
+            return(0);
+         }
+         if ($self->StoreRecord($WfRec,$fh)){
+            Query->Delete("OP");
+            return(1);
+         }
+      }
+      #print STDERR ("fifi h=%s\n",Dumper($h));
+      return(1);
+   }
+   return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
 }
 
 1;
