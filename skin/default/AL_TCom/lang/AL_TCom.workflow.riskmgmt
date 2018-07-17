@@ -1,15 +1,23 @@
-'AL_TCom::workflow::riskmgmt'=>{de=>'Telekom IT: Risikomanagement',en=>'TelekomIT: Riskmgmt'},
+'AL_TCom::workflow::riskmgmt'=>{de=>'Telekom IT: Risikomanagement',en=>'Telekom IT: Riskmgmt'},
 'AL_TCom::workflow::riskmgmt::tip'=>{
-              de=>'
-<br>
+              de=>'<br>
 Hier werden alle IT Betriebsrisiken und Maﬂnahmen der DT IT erfasst.<br>
 IT Security Risiken bitte in CAPE erfassen!<br>
+<br>
+Risikomanagement leistet einen wesentlichen Beitrag um das Unternehmensziel nachhaltig zu sichern.<br>
+<br>
 Weiter Infos hier: <br>
 <a href="https://yam.telekom.de/groups/risk-management-dt-it" target=_blank>Risikomanagement der DT IT</a>
-
 ',
-              en=>'Hier sollte ein Text in de/en drin stehen, der '.
-                  'beschreibt, wof¸r der WF ist und u.U. auf FAQ Artikel dazu hinweist '
+              en=>'<br>
+All IT operational risks and measures of DT IT are recorded here.<br>
+Please record IT security risks in CAPE!<br>
+<br>
+Risk management makes a significant contribution to sustainably securing the corporate goal.<br>
+<br>
+More information here:<br>
+<a href="https://yam.telekom.de/groups/risk-management-dt-it" target=_blank>Risikomanagement der DT IT</a>
+'
                   },
 
 'DTAGMONIMP.'=>{de=>'',en=>''},
