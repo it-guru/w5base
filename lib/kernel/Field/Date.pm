@@ -360,9 +360,6 @@ sub getFrontendTimeString
             eval('$time1=Mktime($usertimezone,$Y1,$M1,$D1,$h1,$m1,$s1);');
             eval('$time2=Mktime($usertimezone,$Y2,$M2,$D2,$h2,$m2,$s2);');
             my $floatdoffset=($time2-$time1)/86400;
-printf STDERR ("fifi0 $self->{name} $Y1,$M1,$D1\n");
-printf STDERR ("fifi1 $self->{name} $Y2,$M2,$D2\n");
-printf STDERR ("fifi $self->{name} $floatdoffset\n");
             if ("$Y1,$M1,$D1" eq "$Y2,$M2,$D2"){
                $dayoffset=0;
             }
