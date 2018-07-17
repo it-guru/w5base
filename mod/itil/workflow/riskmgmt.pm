@@ -82,6 +82,7 @@ sub IsModuleSelectable
 sub isRiskWfAuthorized
 {
    my $self=shift;
+   my $mode=shift;
    my $rec=shift;
    my $cachedArec=shift;
 
@@ -98,11 +99,20 @@ sub isRiskWfAuthorized
    if (!defined($cachedArec)){
       return(0);
    }
-   if ($userid eq $cachedArec->{applmgrid}){
-      return(1);
+   if ($mode eq "create" || $mode eq "view"){
+      if ($userid eq $cachedArec->{applmgrid}){
+         return(1);
+      }
+      if ($userid eq $cachedArec->{databossid}){
+         return(1);
+      }
    }
-   if ($userid eq $cachedArec->{databossid}){
-      return(1);
+   if ($mode eq "modify" || $mode eq "view"){
+      my $userid=$self->getParent->getCurrentUserId();
+      if ($rec->{fwdtarget} eq "base::user" &&
+          $rec->{fwdtargetid} eq $userid){
+         return(1);
+      }
    }
    my @mandatorid=($cachedArec->{mandatorid});
    if (defined($rec) && ref($rec->{mandatorid}) eq "ARRAY"){
@@ -122,7 +132,7 @@ sub checkAllowCreateWorkflow
    my $h=shift;
    my $arec=shift;
 
-   if (!$self->isRiskWfAuthorized($h,$arec)){
+   if (!$self->isRiskWfAuthorized("create",$h,$arec)){
       $self->LastMsg(ERROR,
          "no authorisation to create risk workflow for selected application");
       return(0);
@@ -641,7 +651,7 @@ sub getPosibleActions
    my $lastworker=$WfRec->{owner};
    my $creator=$WfRec->{openuser};
    my $initiatorid=$WfRec->{initiatorid};
-   my $isRiskWfAuthorized=$self->isRiskWfAuthorized($WfRec);
+   my $isRiskWfAuthorized=$self->isRiskWfAuthorized("modify",$WfRec);
 
    my $openSubWf=0;
    my $haveSubWf=0;
@@ -716,12 +726,11 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
 
-   my @l=("default","state","flow","affected","header",
-          "riskdesc","riskrating","relations","init","history");
+   my @l=("default","header");
 
-   my @mandatorid=@{$rec->{mandatorid}};
-   if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager)],"up")){
-      push(@l,"riskbase");
+   if ($self->isRiskWfAuthorized("view",$rec)){
+      push(@l,"riskdesc","riskrating","relations","state",
+              "history","flow","affected","riskbase");
    }
 
    return(@l);
@@ -735,10 +744,9 @@ sub isWriteValid
    push(@l,"extdesc") if (!defined($_[0]));
 
    if ($rec->{stateid} <16){
-      if (grep(/^default$/,@l)){
+      if ($self->isRiskWfAuthorized("modify",$rec)){
          push(@l,"riskdesc");
       }
-      push(@l,"riskdesc");
    }
    return(@l);
 }
