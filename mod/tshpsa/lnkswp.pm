@@ -139,9 +139,9 @@ sub new
                           $current->{class} eq "Oracle_Database"){
                          $id="9";
                       }
-                      elsif ($current->{class} eq "Java"){
-                         $id="12687513960002";
-                      }
+                      #elsif ($current->{class} eq "Java"){
+                      #   $id="12687513960002";
+                      #}
                       else{
                          my ($iid)=$current->{class}=~m/\[(\d+)\]$/;
                          $id=$iid;
