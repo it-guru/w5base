@@ -941,6 +941,10 @@ sub Process
       if (!$self->getParent->checkAllowCreateWorkflow($apphash)){
          return(0);
       }
+      if (Query->Param("Formated_name") eq ""){
+         $self->LastMsg(ERROR,"no short description specified");
+         return(0);
+      }
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
