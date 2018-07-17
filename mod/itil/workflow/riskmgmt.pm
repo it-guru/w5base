@@ -89,7 +89,7 @@ sub isRiskWfAuthorized
       my $applid=$rec->{affectedapplicationid};
       my $appl=getModuleObject($self->Config,"itil::appl");
       $appl->SetFilter({id=>$applid});
-      my ($arec,$msg)=$appl->getOnlyFirst(qw(applmgrid));
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(applmgrid databossid mandatorid));
       if (defined($arec)){
          $cachedArec=$arec;
       }
@@ -109,11 +109,45 @@ sub isRiskWfAuthorized
       push(@mandatorid,@{$rec->{mandatorid}});
    }
 
-   if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager)],"up")){
+   if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager)],"down")){
       return(1);
    }
    return(0);
 }
+
+
+sub checkAllowCreateWorkflow
+{
+   my $self=shift;
+   my $h=shift;
+   my $arec=shift;
+
+   if (!$self->isRiskWfAuthorized($h,$arec)){
+      $self->LastMsg(ERROR,
+         "no authorisation to create risk workflow for selected application");
+      return(0);
+   }
+   return(1);
+}
+
+
+sub getResponsibleRiskRole
+{
+   my $self=shift;
+   my $arec=shift;
+
+   my @rskmgr;
+
+   @rskmgr=$self->getParent->getMembersOf($arec->{mandatorid},
+                                          ['RSKCoord'],'firstup');
+   if ($#rskmgr==-1){
+      @rskmgr=$self->getParent->getMembersOf($arec->{mandatorid},
+                                          ['RSKManager'],'firstup');
+   }
+   return(@rskmgr);
+}
+
+
 
 
 sub getDynamicFields
@@ -899,8 +933,12 @@ sub Process
          $self->LastMsg(ERROR,"no application specified");
          return(0);
       }
-      if (!$fo->Validate($WfRec,{$fo->Name=>$foval})){
+      my $apphash;
+      if (!($apphash=$fo->Validate($WfRec,{$fo->Name=>$foval}))){
          $self->LastMsg(ERROR,"unknown error") if (!$self->LastMsg());
+         return(0);
+      }
+      if (!$self->getParent->checkAllowCreateWorkflow($apphash)){
          return(0);
       }
    }
@@ -1039,12 +1077,7 @@ sub nativProcess
                $self->LastMsg(ERROR,"can not find mandator");
                return(0);
             }
-            @rskmgr=$self->getParent->getMembersOf($arec->{mandatorid},
-                                                   ['RSKCoord'],'firstup');
-            if ($#rskmgr==-1){
-               @rskmgr=$self->getParent->getMembersOf($arec->{mandatorid},
-                                                   ['RSKManager'],'firstup');
-            }
+            @rskmgr=$self->getParent->getResponsibleRiskRole($arec);
             if ($#rskmgr==-1){
                $self->LastMsg(ERROR,"missing RSKCoord or RSKManager");
                return(0);
@@ -1056,8 +1089,7 @@ sub nativProcess
             $h->{mandator}=[$arec->{mandator}];
             $h->{involvedcustomer}=[$arec->{customer}];
             $h->{involvedcostcenter}=[$arec->{conumber}];
-            if (!$self->getParent->isRiskWfAuthorized($h,$arec)){
-               $self->LastMsg(ERROR,"no authorisation to create risk workflow");
+            if (!$self->getParent->checkAllowCreateWorkflow($h,$arec)){
                return(0);
             }
             if (ref($arec->{custcontracts}) eq "ARRAY"){

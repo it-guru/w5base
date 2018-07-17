@@ -121,3 +121,4 @@
 'Risiko machining condition'=>{de=>'Risiko Bearbeitungsstand'},
 'Please describe the risk'=>{de=>'Bitte beschreiben Sie das Risiko'},
 '(only needed in risk of type "other")'=>{de=>'(nur notwendig in Risiken vom Typ "Sonstige")'},
+'no authorisation to create risk workflow for selected application'=>{de=>'Sie sind nicht berechtigt, für die ausgewählte Anwendung Risiko-Workflows zu starten'},
