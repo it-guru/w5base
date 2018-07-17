@@ -253,6 +253,11 @@ sub calculateRiskState
            "INFO: DTAG monetary impact row number ".
            "(wffields.extdescdtagmonetaryimpact): ".
            "$v->{extdescdtagmonetaryimpact}");
+
+      push(@{$st->{raw}->{riskmgmtcalclog}},
+           "INFO: ITRM criticality: ".
+           "$v->{itrmcriticality}");
+
       push(@{$st->{raw}->{riskmgmtcalclog}},
            "INFO: risk of occurrency (wffields.extdescriskoccurrency):".
            " $v->{extdescriskoccurrency}");
