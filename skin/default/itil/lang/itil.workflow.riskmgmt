@@ -119,3 +119,5 @@
 'Risiko processual estimation'=>{de=>'Riskio prozessuale Beurteilung'},
 'Risiko calculation log'=>{de=>'Riskio Berechnungsprotokoll'},
 'Risiko machining condition'=>{de=>'Risiko Bearbeitungsstand'},
+'Please describe the risk'=>{de=>'Bitte beschreiben Sie das Risiko'},
+'(only needed in risk of type "other")'=>{de=>'(nur notwendig in Risiken vom Typ "Sonstige")'},

@@ -811,6 +811,8 @@ sub generateWorkspace
    my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
    my $secial=$self->getParent->getSpecificDataloadForm();
    my $t1=$self->getParent->T("What kind of risk do you have?","itil::workflow::riskmgmt");
+   my $t2=$self->getParent->T("Please describe the risk","itil::workflow::riskmgmt");
+   my $t3=$self->getParent->T("(only needed in risk of type \"other\")","itil::workflow::riskmgmt");
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
@@ -822,7 +824,7 @@ sub generateWorkspace
 <td colspan=3 class=finput>%name(detail)%</td>
 </tr>
 <tr>
-<td class=fname valign=top width=20%>%detaildescription(label)%:</td>
+<td class=fname valign=top width=20%>$t2:<br><font color=gray>$t3</font></td>
 <td colspan=3 class=finput>%detaildescription(detail)%</td>
 </tr>
 <tr>
