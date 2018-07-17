@@ -70,6 +70,15 @@ sub isSelectable
    my $self=shift;
    my %param=@_;
 
+   #my $acl=$self->getParent->getMenuAcl($ENV{REMOTE_USER},
+   #                                     'itil::MyW5Base::riskreport$');
+   #if (defined($acl)){
+   #   return(0) if (!grep(/^read$/,@$acl));
+   #}
+   #else{
+   #   return(0);
+   #}
+
    my $u=$param{user};
    if (ref($u->{groups}) eq "ARRAY"){  
       foreach my $grprec (@{$u->{groups}}){ 

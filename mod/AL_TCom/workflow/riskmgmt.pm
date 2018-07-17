@@ -77,6 +77,24 @@ sub getMandatoryParamFields
 }
 
 
+sub IsModuleSelectable
+{
+   my $self=shift;
+   my $acl;
+
+   $acl=$self->getParent->getMenuAcl($ENV{REMOTE_USER},
+                          "base::workflow",
+                          func=>'New',
+                          param=>'WorkflowClass=AL_TCom::workflow::riskmgmt');
+   if (defined($acl)){
+      return(1) if (grep(/^read$/,@$acl));
+   }
+   return(0);
+}
+
+
+
+
 
 
 sub isRiskParameterComplete

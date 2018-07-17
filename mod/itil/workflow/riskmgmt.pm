@@ -62,6 +62,23 @@ sub storedParamHandler
 }
 
 
+sub IsModuleSelectable
+{
+   my $self=shift;
+   my $acl;
+
+   $acl=$self->getParent->getMenuAcl($ENV{REMOTE_USER},
+                          "base::workflow",
+                          func=>'New',
+                          param=>'WorkflowClass=itil::workflow::riskmgmt');
+   if (defined($acl)){
+      return(1) if (grep(/^read$/,@$acl));
+   }
+   return(0);
+}
+
+
+
 sub isRiskWfAuthorized
 {
    my $self=shift;

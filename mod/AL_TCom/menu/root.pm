@@ -46,6 +46,12 @@ sub Init
                       param=>'WorkflowClass=AL_TCom::workflow::fastdiary',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj('AL_TCom::workflow::riskmgmt$',
+                      "base::workflow",
+                      func=>'New',
+                      param=>'WorkflowClass=AL_TCom::workflow::riskmgmt',
+                      defaultacl=>['DTAG']);
+
    $self->RegisterObj('base::MyW5Base::myP800$',  # virtureller Eintrag für
                       'base::MyW5Base::myP800$',  # MyW5Base
                       func=>'Main',

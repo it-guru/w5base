@@ -1,4 +1,4 @@
-'itil::workflow::riskmgmt'=>{de=>'Risikomanagement',en=>'Riskmanagement'},
+'itil::workflow::riskmgmt'=>{de=>'ITIL Risikomanagement',en=>'ITIL Riskmanagement'},
 'fieldgroup.riskdesc'=>{de=>'Risikoparameter',en=>'risk parameters'},
 'fieldgroup.riskrating'=>{de=>'Risikoauswertung',en=>'risk rating'},
 'fieldgroup.riskbase'=>{de=>'Risiko Basisdaten',en=>'risk basedata'},
