@@ -1421,6 +1421,7 @@ sub nativProcess
             dstwfid=>$id,
          });
          Query->Delete("OP");
+         Query->Delete("Formated_fwdtargetname");
          return(1);
       }
       return(0);
@@ -1606,7 +1607,9 @@ sub generateWorkspacePages
    }
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
    if (grep(/^wfaddopmeasure$/,@$actions)){
-      return("wfaddopmeasure");
+      if (!defined($WfRec->{relations}) || $#{$WfRec->{relations}}==-1){
+         return("wfaddopmeasure");
+      }
    }
    return("wfaddnote");
 }
