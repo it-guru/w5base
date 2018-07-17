@@ -1,3 +1,4 @@
 'no application specified'=>{de=>'keine Anwendung angegeben'},
 'no authorisation to create risk workflow'=>{de=>'Sie sind nicht berechtigt, Risikobehandlungs-Workflows zu starten'},
 'no short description specified'=>{de=>'keine Kurzbeschreibung angegeben'},
+'no riskcoordinator for application'=>{de=>'kein Risikokoordator ermittelbar'},

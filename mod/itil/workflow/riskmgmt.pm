@@ -134,14 +134,27 @@ sub checkAllowCreateWorkflow
 sub getResponsibleRiskRole
 {
    my $self=shift;
-   my $arec=shift;
+   my $rec=shift;
+   my $cachedArec=shift;
 
+   if (!defined($cachedArec)){
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      my $flt={id=>$rec->{affectedapplicationid}};
+      $appl->SetFilter($flt);
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(mandatorid));
+      if (defined($arec)){
+         $cachedArec=$arec;
+      }
+   }
+   if (!defined($cachedArec)){
+      return;
+   }
    my @rskmgr;
 
-   @rskmgr=$self->getParent->getMembersOf($arec->{mandatorid},
+   @rskmgr=$self->getParent->getMembersOf($cachedArec->{mandatorid},
                                           ['RSKCoord'],'firstup');
    if ($#rskmgr==-1){
-      @rskmgr=$self->getParent->getMembersOf($arec->{mandatorid},
+      @rskmgr=$self->getParent->getMembersOf($cachedArec->{mandatorid},
                                           ['RSKManager'],'firstup');
    }
    return(@rskmgr);
@@ -693,7 +706,7 @@ sub getPosibleActions
       @l=();
    }
    
-   msg(INFO,"posible Actions in riskmgmt workflow=".join(",",@l));
+   #msg(INFO,"posible Actions in riskmgmt workflow=".join(",",@l));
    return(@l);
 }
 
@@ -864,6 +877,10 @@ sub generateWorkspace
    my $t1=$self->getParent->T("What kind of risk do you have?","itil::workflow::riskmgmt");
    my $t2=$self->getParent->T("Please describe the risk","itil::workflow::riskmgmt");
    my $t3=$self->getParent->T("(only needed in risk of type \"other\")","itil::workflow::riskmgmt");
+
+
+
+
    my $templ=<<EOF;
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
@@ -941,6 +958,14 @@ sub Process
       if (!$self->getParent->checkAllowCreateWorkflow($apphash)){
          return(0);
       }
+
+      my @rskmgr=$self->getParent->getResponsibleRiskRole($apphash);
+      if ($#rskmgr==-1){
+         $self->LastMsg(ERROR,
+             "no riskcoordinator for application");
+         return(0);
+      }
+
       if (Query->Param("Formated_name") eq ""){
          $self->LastMsg(ERROR,"no short description specified");
          return(0);
@@ -974,12 +999,34 @@ sub generateStoredWorkspace
    my $self=shift;
    my $WfRec=shift;
    my @steplist=@_;
+
    my $d=<<EOF;
 <tr>
 <td class=fname width=30%>%affectedapplication(label)%:</td>
 <td class=finput>%affectedapplication(storedworkspace)%</td>
 </tr>
 EOF
+   my $appid=Query->Param("Formated_affectedapplicationid");
+   if ($appid ne ""){
+      my $t1=$self->T("current Riskcoordinator");
+      my @rskmgr=$self->getParent->getResponsibleRiskRole({
+         affectedapplicationid=>\$appid
+      });
+      if ($#rskmgr!=-1){
+         my $user=getModuleObject($self->getParent->Config,"base::user");
+         $user->SetFilter({userid=>\$rskmgr[0]});
+         my ($urec)=$user->getOnlyFirst(qw(fullname));
+         if (defined($urec)){
+            $d.=<<EOF;
+<tr>
+<td class=fname width=30%>$t1:</td>
+<td class=finput>$urec->{fullname}</td>
+</tr>
+EOF
+         }
+      }
+   }
+ 
 
    return($self->SUPER::generateStoredWorkspace($WfRec,@steplist).$d);
 }
@@ -1081,9 +1128,12 @@ sub nativProcess
                $self->LastMsg(ERROR,"can not find mandator");
                return(0);
             }
-            @rskmgr=$self->getParent->getResponsibleRiskRole($arec);
+            @rskmgr=$self->getParent->getResponsibleRiskRole(
+               {affectedapplicationid=>$arec->{id}},
+               $arec
+            );
             if ($#rskmgr==-1){
-               $self->LastMsg(ERROR,"missing RSKCoord or RSKManager");
+               $self->LastMsg(ERROR,"no riskcoordinator for application");
                return(0);
             }
             $h->{fwdtarget}='base::user';
