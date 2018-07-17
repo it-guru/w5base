@@ -17,14 +17,28 @@ NONE
 
 [en:]
 
-New AutoDiscovery Data needs to be processed within 12 weeks. If there
-are only GDU SAP applications on the system, no check is done.
+This Q-Rule checks the processing based on the date of the scan 
+plus 12 weeks. If the data was not processed during this 
+time-period, a breach of quality will be displayed for the 
+corresponding System, and a DataIssue will be addressed to the 
+Databoss of the System.
+
+If there are only GDU SAP applications on the system, no check is done.
+
+Link FAQ: https://darwin.telekom.de/darwin/public/faq/article/ById/14845704850021
+
 
 [de:]
 
-Neue AutoDiscovery Daten müssen innerhalb von 12 Wochen 
-behandelt werden. Wenn auf dem logischen System NUR GDU SAP Anwendungen 
-bereitgestellt werden, entfällt die Prüfung.
+Diese Qualitätsregel prüft die Bearbeitung anhand des Scan-Datums 
+plus 12 Wochen. Wurde in dieser Zeitspanne keine Bearbeitung 
+durchgeführt, so wird für das entsprechende System eine Qualitätsverletzung 
+angezeigt, welches in einem DataIssue an den betreffenden 
+Datenverantwortlichen adressiert wird.
+
+Wenn auf dem logischen System NUR GDU SAP Anwendungen bereitgestellt werden, entfällt die Prüfung.
+
+Link FAQ : https://darwin.telekom.de/darwin/public/faq/article/ById/14845704850021
 
 
 =cut
