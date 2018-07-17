@@ -352,17 +352,34 @@ sub getFrontendTimeString
          }
          my ($doy, $dow, $dst);
          ($Y,$M,$D,$h,$m,$s, $doy, $dow, $dst)=Localtime($usertimezone,$time);
-         if ($dst){
-            $usertimezone=~s/^CET$/CEST/;
-         }
          {
             # calc dayoffset
-            my ($Y1,$M1,$D1)=Localtime($usertimezone,$time);
-            my ($Y2,$M2,$D2)=Localtime($usertimezone,time());
+            my ($Y1,$M1,$D1,$h1,$m1,$s1)=Localtime($usertimezone,$time);
+            my ($Y2,$M2,$D2,$h2,$m2,$s2)=Localtime($usertimezone,time());
             my ($time1,$time2);
-            eval('$time1=Mktime($usertimezone,$Y1,$M1,$D1,0,0,0);');
-            eval('$time2=Mktime($usertimezone,$Y2,$M2,$D2,0,0,0);');
-            $dayoffset=int(($time2-$time1)/86400);
+            eval('$time1=Mktime($usertimezone,$Y1,$M1,$D1,$h1,$m1,$s1);');
+            eval('$time2=Mktime($usertimezone,$Y2,$M2,$D2,$h2,$m2,$s2);');
+            my $floatdoffset=($time2-$time1)/86400;
+printf STDERR ("fifi0 $self->{name} $Y1,$M1,$D1\n");
+printf STDERR ("fifi1 $self->{name} $Y2,$M2,$D2\n");
+printf STDERR ("fifi $self->{name} $floatdoffset\n");
+            if ("$Y1,$M1,$D1" eq "$Y2,$M2,$D2"){
+               $dayoffset=0;
+            }
+            elsif ("$Y1,$M1,$D1" ne "$Y2,$M2,$D2" &&
+                   $floatdoffset>0.0 && $floatdoffset<1.0){
+               $dayoffset=1;
+            }
+            elsif ("$Y1,$M1,$D1" ne "$Y2,$M2,$D2" &&
+                   $floatdoffset<0.0 && $floatdoffset>-1.0){
+               $dayoffset=-1;
+            }
+            else{
+               $dayoffset=int(($time2-$time1)/86400);
+            }
+         }
+         if ($dst){
+            $usertimezone=~s/^CET$/CEST/;
          }
          my $lang=$self->getParent->Lang();
          $d=Date_to_String($lang,$Y,$M,$D,$h,$m,$s);
