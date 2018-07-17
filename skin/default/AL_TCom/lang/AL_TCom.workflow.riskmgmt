@@ -38,5 +38,5 @@ More information here:<br>
   de=>'Schadensausmaß in der TelIT (Schätzung)'
 },
 'no measure workflows'=>{de=>'keine Maßnahmen'},
-'incomplete risk data'=>{de=>'unvollständige Riskiodaten'},
+'incomplete risk data'=>{de=>'unvollständige Risikodaten'},
 'measure out of time'=>{de=>'Maßnahmenzeitüberschreitung'},

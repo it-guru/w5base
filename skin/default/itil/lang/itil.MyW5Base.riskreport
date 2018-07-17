@@ -6,7 +6,7 @@
 'closedate'=>{de=>'Abschlusszeitpunkt'},
 'createdate'=>{de=>'Erstellungszeitpunkt'},
 'workflow class'=>{de=>'Workflow Klasse'},
-'riskmgmt'=>{de=>'Riskiomanagement'},
+'riskmgmt'=>{de=>'Risikomanagement'},
 'opmeasure'=>{de=>'Risikomaßnahme'},
 'From'=>{de=>'von'},
 'To'=>{de=>'bis'},

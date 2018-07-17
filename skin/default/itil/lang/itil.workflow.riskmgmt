@@ -56,7 +56,7 @@
 'Risk state'=>{de=>'Risiko Status'},
 'Risk base type'=>{de=>'Risiko Basis-Typ'},
 'What kind of risk do you have?'=>{
-   de=>'Welche Art von Riskio haben Sie?'
+   de=>'Welche Art von Risiko haben Sie?'
 },
 'Description of the impact on the occurrence of the risk'=>{
   de=>'Beschreibung der Auswirkungen bei Risikoeintritt'
@@ -112,12 +112,12 @@
  en=>'other risk'
 },
 'riskmesure'=>{de=>'zugeordnete Maßnahmen',en=>'related measure'},
-'REV.riskmesure'=>{de=>'Riskio',en=>'risk'},
+'REV.riskmesure'=>{de=>'Risiko',en=>'risk'},
 'risk base data application'=>{de=>'Risiko Basisdaten Anwendung'},
 'cancel risk workflow'=>{de=>'Risikomanagement abbrechen'},
-'risk base data application'=>{de=>'Riskio Basisdaten-Anwendung'},
-'Risiko processual estimation'=>{de=>'Riskio prozessuale Beurteilung'},
-'Risiko calculation log'=>{de=>'Riskio Berechnungsprotokoll'},
+'risk base data application'=>{de=>'Risiko Basisdaten-Anwendung'},
+'Risiko processual estimation'=>{de=>'Risiko prozessuale Beurteilung'},
+'Risiko calculation log'=>{de=>'Risiko Berechnungsprotokoll'},
 'Risiko machining condition'=>{de=>'Risiko Bearbeitungsstand'},
 'Please describe the risk'=>{de=>'Bitte beschreiben Sie das Risiko'},
 '(only needed in risk of type "other")'=>{de=>'(nur notwendig in Risiken vom Typ "Sonstige")'},
