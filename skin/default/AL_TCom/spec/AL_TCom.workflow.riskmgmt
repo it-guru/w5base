@@ -64,5 +64,35 @@ IT-Ausmaß<br>
 Als Teil des Schadensausmaßes wird hier der interne IT-Schaden konkret beziffert bzw. geschätzt. Dies dient als interne Zusatzinformation, um die unmittelbare monetäre Auswirkung innerhalb von Telekom IT zu erfassen.<br>
 z.B. Reparaturen / Ausweichlösungen, Ersatzbeschaffungen, zusätzliche Personalkosten, eventuelle Strafzahlungen<br>
 '},
+'riskmgmtpoints'=>{de=>'
+Der nummerische Risikowert wird aus:<br>
+<br>
+1. ITRM Kritikalität (Strategische Relevanz & Risikoanfälligkeit, 0-5 Punkte) + <br>
+2. Risiko (Schadensausmaß & Eintrittswahrscheinlichkeit, 0-10 Punkte) + <br>
+3. Mitigationszeit (Der Verfügbaren Zeit zur Mitigation des Risikos, 0-3 Punkte)<br><br>
+addiert<br>
+<br>
+Die Ampelfarbe bedeutet und hat folgende Schwellwerte:<br>
+<br>
+Grün, 0-7 Punkte, Das Risiko hält sich in überschaubarem Rahmen. Das weitere Handling erfolgt ausschließlich im Applikationsmanagement.<br>
+<br>
+Gelb, 8-12 Punkte, Das Risiko ist erheblicher Natur. Das Handling erfolgt weiterhin im Applikationsmanagement, aber es gibt ein besonderes Monitoring durch das IT Risk Management ggf. auch mit zusätzlichen Eskalations- und Steuerungsaktivitäten.<br>
+<br>
+Rot, 13-18 Punkte, Das Risiko ist alarmierend und mit gravierenden Auswirkungen.  Es ist unmittelbare Managementattention erforderlich mit ggf. direktem Eingreifen. <br>
+',en=>'
+The numerical risk value is taken from:<br>
+1. ITRM criticality (strategic relevance & vulnerability, 0-5 points) + <br>
+2. risk (extent of damage & probability of occurrence, 0-10 points) + <br>
+3. mitigation time (The time available to mitigate the risk, 0-3 points)<br><br>
+Summed<br>
+<br>
+The traffic light color means and has the following threshold values:<br>
+<br>
+Green, 0-7 points, the risk is manageable. Further handling takes place exclusively in Application Management.<br>
+<br>
+Yellow, 8-12 points, the risk is considerable. Handling continues to take place in Application Management, but there is special monitoring by IT Risk Management, possibly with additional escalation and control activities.<br>
+<br>
+Red, 13-18 points, The risk is alarming and with serious consequences.  Immediate management attention is required with direct intervention if necessary.<br>
+'},
 
 
