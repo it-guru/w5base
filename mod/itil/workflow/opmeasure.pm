@@ -381,7 +381,7 @@ sub isWriteValid
    my $userid=$self->getParent->getCurrentUserId();
    if ($WfRec->{fwdtarget} eq 'base::user' &&
        $userid==$WfRec->{fwdtargetid} &&
-       $WfRec->{stateid}==4){
+       ($WfRec->{stateid}==4 || $WfRec->{stateid}==3)){
       push(@l,"relations");
    }
 
