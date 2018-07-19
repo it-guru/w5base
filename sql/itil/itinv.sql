@@ -1708,3 +1708,4 @@ create table riskmgmtbase (
   FOREIGN KEY fk_applid (id) REFERENCES appl (id) ON DELETE CASCADE
 ) ENGINE=INNODB;
 alter table asset add slotno varchar(20) default '';
+alter table system add productline varchar(40) default NULL;

@@ -195,6 +195,57 @@ sub qcheckRecord
    #}
    if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
        $rec->{cistatusid}==5){
+      #printf STDERR ("fifi systemolaclass=$parrec->{systemolaclass} ".
+      #               "ifarm=$rec->{itfarm} ".
+      #               "productline=$rec->{productline}\n");
+      # productline calculation
+      if ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+          ($rec->{itfarm} eq "")){
+         if ($rec->{productline} ne "CLASSIC"){
+            $forcedupd->{productline}="CLASSIC"; 
+         }
+      }
+      elsif ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+          ($rec->{itfarm}=~m/^IT-Serverfarm_AIX/i)){
+         if ($rec->{productline} ne "ITSF-AIX"){
+            $forcedupd->{productline}="ITSF-AIX"; 
+         }
+      }
+      elsif ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+          ($rec->{itfarm}=~m/^IT-Serverfarm_Solaris/i)){
+         if ($rec->{productline} ne "ITSF-SOLARIS"){
+            $forcedupd->{productline}="ITSF-SOLARIS"; 
+         }
+      }
+      elsif ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+          ($rec->{itfarm}=~m/^IT-Serverfarm_SAP_HANA/i)){
+         if ($rec->{productline} ne "SAP-HANA"){
+            $forcedupd->{productline}="SAP-HANA"; 
+         }
+      }
+      elsif ($parrec->{systemolaclass} eq "38" &&  # DCS
+          ($rec->{itfarm}=~m/^IT-Serverfarm_X86/i)){
+         if ($rec->{productline} ne "ITSF-X86"){
+            $forcedupd->{productline}="ITSF-X86"; 
+         }
+      }
+      elsif ($parrec->{systemolaclass} eq "0" &&  # UNDEFINED
+          ($rec->{itfarm}=~m/^IT-Serverfarm_DBaaS/i)){
+         if ($rec->{productline} ne "DBaaS"){
+            $forcedupd->{productline}="DBaaS"; 
+         }
+      }
+      elsif ($parrec->{systemolaclass} eq "30"   # APPCOM
+             ){
+         if ($rec->{productline} ne "APPCOM"){
+            $forcedupd->{productline}="APPCOM"; 
+         }
+      }
+      else{
+         if ($rec->{productline} ne ""){
+            $forcedupd->{productline}=undef; 
+         }
+      }
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "AssetManager"){
          if (!defined($parrec)){
             push(@qmsg,'given systemid not found as active in AssetManager');

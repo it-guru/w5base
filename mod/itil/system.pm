@@ -312,6 +312,8 @@ sub new
                 vjoinon       =>['vhostsystemid'=>'id'],
                 vjoindisp     =>'name'),
 
+
+
       new kernel::Field::Link(
                 name          =>'vhostsystemid',
                 dataobjattr   =>'system.vhostsystem'),
@@ -513,6 +515,13 @@ sub new
                                  'abstract'
                                  ],
                 dataobjattr   =>'system.systemtype'),
+
+      new kernel::Field::Text(
+                name          =>'productline',
+                label         =>'Productline',
+                htmldetail    =>'1',
+                readonly      =>1,
+                dataobjattr   =>'system.productline'),
 
       new kernel::Field::Number(
                 name          =>'cpucount',
@@ -947,18 +956,18 @@ sub new
                 dataobjattr   =>'system.is_applserver'),
 
       new kernel::Field::Boolean(
+                name          =>'isworkstation',
+                group         =>['systemclass'],
+                htmlhalfwidth =>1,
+                label         =>'Workstation',
+                dataobjattr   =>'system.is_workstation'),
+
+      new kernel::Field::Boolean(
                 name          =>'isinfrastruct',
                 group         =>'systemclass',
                 htmlhalfwidth =>1,
                 label         =>'Infrastructursystem',
                 dataobjattr   =>'system.is_infrastruct'),
-
-      new kernel::Field::Boolean(
-                name          =>'isworkstation',
-                group         =>'systemclass',
-                htmlhalfwidth =>1,
-                label         =>'Workstation',
-                dataobjattr   =>'system.is_workstation'),
 
       new kernel::Field::Boolean(
                 name          =>'isprinter',
@@ -1884,7 +1893,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
+   return("header","default","systemclass") if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(header default swinstances 
               software admin logsys contacts monisla misc opmode 

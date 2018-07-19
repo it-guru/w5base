@@ -107,3 +107,4 @@
 'add IP-Addresses'=>{de=>'IP-Adressen hinzufügen'},
 'individual attributes'=>{de=>'individuelle Attribute'},
 'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},
+'Productline'=>{de=>'Produktline'},
