@@ -498,7 +498,8 @@ sub ValidateCaches
    if ($ENV{REMOTE_USER} ne "anonymous" && #locked account check
        defined($UserCache->{$ENV{REMOTE_USER}}) &&
        defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid})){ 
-      if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}!=4){
+      if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}!=4 ||
+          $UserCache->{$ENV{REMOTE_USER}}->{rec}->{gtcack} eq ""){
          if (Query->Param("MOD") eq "base::interface"){
             printf("Status: 403 Forbidden - ".
                    "account needs to be activated with web browser\n");
@@ -507,7 +508,8 @@ sub ValidateCaches
             return(0);
          }
          else{
-            if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}==3){
+            if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}==3 ||
+                $UserCache->{$ENV{REMOTE_USER}}->{rec}->{gtcack} eq ""){
                if (!$self->GTCverification()){
                   return(0);
                }
@@ -560,7 +562,8 @@ sub GTCverification
       if (trim($txt) eq trim($gtc)){
          my $userid=$self->getCurrentUserId();
          my $user=getModuleObject($self->Config(),"base::user");
-         $user->SetFilter({userid=>\$userid,cistatusid=>\'3'});
+         $user->SetFilter([{userid=>\$userid,cistatusid=>\'3'},
+                           {userid=>\$userid,gtcack=>undef}]);
          my ($urec)=$user->getOnlyFirst(qw(ALL));
          if (defined($urec)){
             my $gtcdate=NowStamp("en");

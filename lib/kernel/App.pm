@@ -447,7 +447,7 @@ sub _LoadUserInUserCache
             $o->SetFilter({'accounts'=>[$AccountOrUserID]});
          }
          my ($rec,$msg)=$o->getOnlyFirst(qw(surname 
-                               fullname country
+                               fullname country gtcack
                                userid givenname posix groups tz lang
                                cistatusid secstate ipacl pagelimit
                                dialermode dialerurl dialeripref
