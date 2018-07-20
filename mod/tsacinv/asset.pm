@@ -67,7 +67,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'systemname',
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['lassetid'=>'lassetid'],
                 vjoinbase     =>[{status=>"\"!out of operation\"",
                                   deleted=>\'0'}],
@@ -77,7 +77,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'systemid',
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['lassetid'=>'lassetid'],
                 vjoinbase     =>[{status=>"\"!out of operation\"",
                                   deleted=>\'0'}],
@@ -95,7 +95,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
                 label         =>'Assignment Group',
-                vjointo       =>'tsacinv::group',
+                vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'name'),
 
@@ -119,7 +119,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'sysconumber',
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['lassetid'=>'lassetid'],
                 vjoinbase     =>[{status=>"\"!out of operation\"",
                                   deleted=>\'0'}],
@@ -129,9 +129,9 @@ sub new
 
 
       new kernel::Field::Import( $self,
-                weblinkto     =>'tsacinv::location',
+                weblinkto     =>\'tsacinv::location',
                 weblinkon     =>['locationid'=>'locationid'],
-                vjointo       =>'tsacinv::location',
+                vjointo       =>\'tsacinv::location',
                 vjoinon       =>['locationid'=>'locationid'],
                 group         =>'location',
                 fields        =>['fullname','location']),
@@ -155,8 +155,8 @@ sub new
                 dataobjattr   =>'"slotno"'),
 
       new kernel::Field::Import( $self,
-                weblinkto     =>'tsacinv::model',
-                vjointo       =>'tsacinv::model',
+                weblinkto     =>\'tsacinv::model',
+                vjointo       =>\'tsacinv::model',
                 vjoinon       =>['lmodelid'=>'lmodelid'],
                 weblinkon     =>['lmodelid'=>'lmodelid'],
                 prefix        =>'model',
@@ -224,7 +224,7 @@ sub new
                 name          =>'maintlevel',
                 label         =>'Maintenance Level',
                 group         =>'maint',
-                vjointo       =>'tsacinv::contract',
+                vjointo       =>\'tsacinv::contract',
                 vjoinon       =>['maintlevelid'=>'contractid'],
                 vjoindisp     =>'name'),
 

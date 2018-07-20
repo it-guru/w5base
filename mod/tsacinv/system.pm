@@ -83,7 +83,7 @@ sub new
                 dataobjattr   =>'system."conumber"'),
 
       new kernel::Field::Import($self,
-                vjointo       =>'tsacinv::location',
+                vjointo       =>\'tsacinv::location',
                 vjoinon       =>['locationid'=>'locationid'],
                 group         =>"location",
                 fields        =>[qw(fullname location)]),
@@ -133,7 +133,7 @@ sub new
                 name          =>'supervisor',
                 label         =>'Supervisor',
                 searchable    =>0,
-                vjointo       =>'tsacinv::user',
+                vjointo       =>\'tsacinv::user',
                 vjoinon       =>['supervid'=>'lempldeptid'],
                 vjoindisp     =>'fullname'),
 
@@ -145,7 +145,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
                 label         =>'Assignment Group',
-                vjointo       =>'tsacinv::group',
+                vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'name'),
 
@@ -153,7 +153,7 @@ sub new
                 name          =>'assignmentgroupsupervisor',
                 label         =>'Assignment Group Supervisor',
                 htmldetail    =>0,
-                vjointo       =>'tsacinv::group',
+                vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'supervisor'),
 
@@ -161,14 +161,14 @@ sub new
                 name          =>'assignmentgroupsupervisoremail',
                 label         =>'Assignment Group Supervisor E-Mail',
                 htmldetail    =>0,
-                vjointo       =>'tsacinv::group',
+                vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'supervisoremail'),
 
       new kernel::Field::TextDrop(
                 name          =>'iassignmentgroup',
                 label         =>'Incident Assignment Group',
-                vjointo       =>'tsacinv::group',
+                vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lincidentagid'=>'lgroupid'],
                 vjoindisp     =>'name'),
 

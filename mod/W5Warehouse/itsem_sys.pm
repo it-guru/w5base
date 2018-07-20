@@ -29,8 +29,10 @@ sub AddAllFieldsFromWorktable
 
    my @back=$self->SUPER::AddAllFieldsFromWorktable(@_);
 
-   $self->getField("itsemteamid")->{uivisible}=0;
-   $self->getField("itsemteamid")->{noselect}=1;
+   if ($self->getField("itsemteamid")){ 
+      $self->getField("itsemteamid")->{uivisible}=0;
+      $self->getField("itsemteamid")->{noselect}=1;
+   }
    return(@back);
 }
 

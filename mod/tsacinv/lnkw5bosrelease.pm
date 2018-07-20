@@ -57,7 +57,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'w5bosrelease',
                 label         =>'W5Base OS',
-                vjointo       =>'itil::osrelease',
+                vjointo       =>\'itil::osrelease',
                 vjoinon       =>['w5bosreleaseid'=>'id'],
                 vjoindisp     =>'name'),
                                                    

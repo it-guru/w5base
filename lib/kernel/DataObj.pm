@@ -2646,10 +2646,12 @@ sub findNearestTargetDataObj
             return($nto);
          }
          else{
-            msg(ERROR,"invalid findNearestTargetDataObj in '$s' ".
-                      "from '$to' to '$nto' ".
-                      "requested for ".$requestedfor." needs SCALAR ref ".
-                      "because not unique dataobject names");
+            if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+               msg(WARN,"unable findNearestTargetDataObj in '$s' ".
+                        "from '$to' to '$nto' ".
+                        "requested for ".$requestedfor." needs SCALAR ref ".
+                        "because not unique dataobject names");
+            }
          }
       }
    }

@@ -39,13 +39,18 @@ sub new
   #    msg(ERROR,"can't Import field without vjoinon");
   #    return()
   # }
+   my $vjointo=$param{vjointo};
+   $vjointo=$$vjointo if (ref($vjointo) eq "SCALAR");
+
    if (!defined($param{prefix})){
-      $param{prefix}=$param{vjointo};
+      $param{prefix}=$vjointo;
       $param{prefix}=~s/::/_/g;
    }
-   my $obj=getModuleObject($parent->Config,$param{vjointo});
+
+   
+   my $obj=getModuleObject($parent->Config,$vjointo);
    if (!defined($obj)){
-      msg(ERROR,"can't create vjoinobj '$param{vjointo}'");
+      msg(ERROR,"can't create vjoinobj '$vjointo'");
       return()
    }
    my @res;
