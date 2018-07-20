@@ -218,7 +218,7 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 searchable    =>0,
-                vjointo       =>'tsacinv::costcenter',
+                vjointo       =>\'tsacinv::costcenter',
                 vjoinon       =>['conumber'=>'name'],
                 vjoindisp     =>'productionplanningoss')
    );

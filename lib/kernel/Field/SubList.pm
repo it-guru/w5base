@@ -63,20 +63,7 @@ sub EditProcessor
    my $dfield=$app->getField($field);
 
 
-   my $target=$dfield->{vjointo};
-   if (ref($target) ne "SCALAR"){
-      if ($self->getParent->can("findNearestTargetDataObj")){
-         $target=$self->getParent->findNearestTargetDataObj($target,
-                    "field:".$self->Name);
-      }
-      if (!ref($self->{target})){ # if no reference, store it cached
-         $dfield->{vjointo}=$target;
-      }
-   }
-
-
-
-
+   my $target=$self->getNearestVjoinTarget();
 
    $dfield->vjoinobjInit();
    my %forceparam=$app->getForceParamForSubedit($id,$dfield);
@@ -142,7 +129,7 @@ EOF
       my $d=$self->getSubListData($current,"HtmlDetail",%param);
       if ($d ne ""){
          if ($self->forwardSearch){
-            my $target=$self->{vjointo};
+            my $target=$self->getNearestVjoinTarget();
             $target=$$target if (ref($target) eq "SCALAR");
 
             my $dstflt=$self->{vjoinon}->[1];
@@ -206,16 +193,7 @@ sub getLineSubListData
    my $mode=shift;
    my $app=$self->getParent;
 
-   my $target=$self->{vjointo};
-   if (ref($target) ne "SCALAR"){
-      if ($self->getParent->can("findNearestTargetDataObj")){
-         $target=$self->getParent->findNearestTargetDataObj($target,
-                    "field:".$self->Name);
-      }
-      if (!ref($self->{target})){ # if no reference, store it cached
-         $self->{vjointo}=$target;
-      }
-   }
+   my $target=$self->getNearestVjoinTarget();
    if (defined($self->{vjointo})){
       my $srcfield=$app->getField($self->{vjoinon}->[0]);
       if (!defined($srcfield)){
@@ -273,16 +251,7 @@ sub getSubListData
    my %param=@_;
    my $app=$self->getParent;
 
-   my $target=$self->{vjointo};
-   if (ref($target) ne "SCALAR"){
-      if ($self->getParent->can("findNearestTargetDataObj")){
-         $target=$self->getParent->findNearestTargetDataObj($target,
-                    "field:".$self->Name);
-      }
-      if (!ref($self->{target})){ # if no reference, store it cached
-         $self->{vjointo}=$target;
-      }
-   }
+   my $target=$self->getNearestVjoinTarget();
 
    if (defined($self->{vjointo})){
       my $srcfield=$app->getField($self->{vjoinon}->[0]);

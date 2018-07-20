@@ -4,15 +4,62 @@ body{
 
 div.fieldlist{
    margin-top:3px;
-   height:240px;
+   height:60vh;
    overflow:auto;
 }
+
+table.ObjectDefinition {
+   color:black;
+   border-collapse: collapse;
+   table-layout:fixed;
+   width:98%;
+}
+table.ObjectDefinition tr td {
+   border: 1px solid black;
+   margin:0;
+   text-overflow: ellipsis;
+}
+table.ObjectDefinition tr th {
+   border-left: 1px solid black;
+   border-right: 1px solid black;
+   border-bottom: 2px solid black;
+   margin:0;
+}
+table.ObjectDefinition tr .foname {
+   white-space: nowrap;
+   width:21%;
+   overflow:hidden;
+}
+table.ObjectDefinition tr .fotype {
+   white-space: nowrap;
+   width:15%;
+   overflow:hidden;
+}
+table.ObjectDefinition tr .foref {
+   white-space: nowrap;
+   width:18%;
+   overflow:hidden;
+}
+table.ObjectDefinition tr td.foref {
+   font-size:9px;
+}
+table.ObjectDefinition tr .fosearch {
+   white-space: nowrap;
+   width:50px;
+   overflow:hidden;
+}
+
+
 
 @media print{
    div.fieldlist{
       height:auto;
    }
    div.sublink{
+      display:none;
+      visblitity:hidden;
+   }
+   div.OracleReplication{
       display:none;
       visblitity:hidden;
    }

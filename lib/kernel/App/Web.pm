@@ -436,7 +436,7 @@ function UserMask()
 }
 function ModuleObjectInfo()
 {
-   showPopWin('${prefix}ModuleObjectInfo',580,400);
+   showPopWin('${prefix}ModuleObjectInfo',610,400);
 }
 </script>
 EOF

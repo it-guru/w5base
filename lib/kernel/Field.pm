@@ -168,22 +168,25 @@ sub new
    return($self);
 }
 
-sub addWebLinkToFacility
+
+sub getNearestWebLinkTarget
 {
    my $self=shift;
    my $d=shift;
    my $current=shift;
-   my %param=@_;
 
    my $weblinkon=$self->{weblinkon};
    my $weblinkto=$self->{weblinkto};
    if (ref($weblinkto) eq "CODE"){
       ($weblinkto,$weblinkon)=&{$weblinkto}($self,$d,$current);
    }
-
-   if (defined($weblinkto) && defined($weblinkon) && lc($weblinkto) ne "none"){
-      # dynamic Target DataObject detection
+   if (lc($weblinkto) eq "none"){
+      return(undef,undef);
+   }
+   my $oldweblinkto=$weblinkto;
+   if (defined($weblinkto) && defined($weblinkon)){
       if (ref($weblinkto) ne "SCALAR"){
+         # dynamic Target DataObject detection
          if ($self->getParent->can("findNearestTargetDataObj")){
             $weblinkto=$self->getParent->findNearestTargetDataObj($weblinkto,
                        "field:".$self->Name);
@@ -192,6 +195,51 @@ sub addWebLinkToFacility
             $self->{weblinkto}=$weblinkto;
          }
       }
+   }
+   my $newweblinkto=$weblinkto;
+   if ($newweblinkto ne $oldweblinkto){
+      printf STDERR ("change target for $self->{name} ".
+                     "from $oldweblinkto to $newweblinkto\n");
+   }
+   return($weblinkto,$weblinkon);
+}
+
+
+
+sub getNearestVjoinTarget
+{
+   my $self=shift;
+
+   my $vjointo=$self->{vjointo};
+   if (defined($vjointo)){
+      if (ref($vjointo) ne "SCALAR"){
+         # dynamic Target DataObject detection
+         if ($self->getParent->can("findNearestTargetDataObj")){
+            $vjointo=$self->getParent->findNearestTargetDataObj($vjointo,
+                       "field:".$self->Name);
+         }
+         if (!ref($self->{vjointo})){ # if no reference, store it cached
+            $self->{vjointo}=$vjointo;
+         }
+      }
+   }
+   return($vjointo);
+}
+
+
+
+
+
+sub addWebLinkToFacility
+{
+   my $self=shift;
+   my $d=shift;
+   my $current=shift;
+   my %param=@_;
+
+   my ($weblinkto,$weblinkon)=$self->getNearestWebLinkTarget($d,$current);
+
+   if (defined($weblinkto) && defined($weblinkon)){
       if (ref($weblinkto) eq "SCALAR"){
          $weblinkto=$$weblinkto; # dereferenzieren von weblinkto
       }
@@ -407,7 +455,7 @@ sub vjoinobj
 {
    my $self=shift;
    return(undef) if (!exists($self->{vjointo}));
-   my $jointo=$self->{vjointo};
+   my $jointo=$self->getNearestVjoinTarget();
    if (ref($jointo) eq "SCALAR"){
       $jointo=$$jointo;
    }

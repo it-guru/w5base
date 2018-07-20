@@ -32,7 +32,7 @@ sub new
    $self->AddFields(
       new kernel::Field::Link(
                 name          =>'acrelassignmentgroupid',
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'lassignmentid'),
 
@@ -46,13 +46,13 @@ sub new
                 readonly      =>1,
                 async         =>'1',
                 depend        =>['acrelassignmentgroupid'],
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'assignmentgroup'),
 
       new kernel::Field::Link(
                 name          =>'acreliassignmentgroupid',
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'lincidentagid'),
 
@@ -66,7 +66,7 @@ sub new
                 readonly      =>1,
                 async         =>'1',
                 depend        =>['acreliassignmentgroupid'],
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'iassignmentgroup'),
 
@@ -82,7 +82,7 @@ sub new
                 vjoineditbase =>{isinmassign=>\'1'},
                 group         =>'inmchm',
                 AllowEmpty    =>1,
-                vjointo       =>'tsgrpmgmt::grp',
+                vjointo       =>\'tsgrpmgmt::grp',
                 vjoinon       =>['acinmassignmentgroupid'=>'id'],
                 vjoindisp     =>'fullname'),
 
@@ -98,7 +98,7 @@ sub new
                 vjoineditbase =>{ischmapprov=>\'1'},
                 group         =>'inmchm',
                 AllowEmpty    =>1,
-                vjointo       =>'tsgrpmgmt::grp',
+                vjointo       =>\'tsgrpmgmt::grp',
                 vjoinon       =>['scapprgroupid'=>'id'],
                 vjoindisp     =>'fullname'),
 
@@ -106,7 +106,7 @@ sub new
                 name          =>'accontrolcenter',
                 label         =>'AM System ControlCenter',
                 group         =>'amrel',
-                weblinkto     =>'tsacinv::group',
+                weblinkto     =>\'tsacinv::group',
                 weblinkon     =>['accontrolcenter'=>'name'],
                 async         =>'1',
                 searchable    =>0,
@@ -124,7 +124,7 @@ sub new
                 async         =>'1',
                 searchable    =>0,
                 readonly      =>1,
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'controlcenter2'),
 
@@ -147,7 +147,7 @@ sub new
                 weblinkto     =>'NONE',
                 async         =>'1',
                 readonly      =>1,
-                vjointo       =>'tsacinv::system',
+                vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'soxrelevant'),
 

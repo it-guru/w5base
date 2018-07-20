@@ -51,13 +51,18 @@ sub ModuleObjectInfo
                            form=>1);
    $self->doInitialize();
    print("<table width=98%>");
-   printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Frontend name"));
+   printf("<tr><td valign=top nowrap><b>%s:</b></td>",
+          $self->T("Frontend name"));
    printf("<td>%s</td></tr>",$self->T($self->Self,$self->Self));
-   printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Internal object name"));
-   printf("<td>%s</td></tr>",$self->Self);
-   printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Self as parent object"));
+   printf("<tr><td valign=top nowrap><b>%s:</b></td>",
+          $self->T("Internal object name"));
+   printf("<td><a href=\"ModuleObjectInfo\">%s</a>".
+          "</td></tr>",$self->Self);
+   printf("<tr><td valign=top nowrap><b>%s:</b></td>",
+          $self->T("Self as parent object"));
    printf("<td>%s</td></tr>",$self->SelfAsParentObject);
-   printf("<tr><td valign=top nowrap><b>%s:</b></td>",$self->T("Parent classes"));
+   printf("<tr><td valign=top nowrap><b>%s:</b></td>",
+          $self->T("Parent classes"));
    printf("<td>%s</td></tr>",join(", ",@ISA));
    printf("<tr><td valign=bottom><b>%s:</b></td>",$self->T("Datafields"));
    printf("<td align=right><span class=sublink>".
@@ -65,13 +70,15 @@ sub ModuleObjectInfo
           "src=\"../../../public/base/load/miniprint.gif\"></span>".
           "</td></tr>");
    printf("<tr><td colspan=2>");
-   printf("<div class=fieldlist><center><table border=1 width=520>");
-      print("<tr>");
-      printf("<td><b>%s</b></td>",$self->T("Frontend field"));
-      printf("<td width=1%% nowrap><b>%s</b></td>",$self->T("Internal field"));
-      printf("<td width=1%% nowrap><b>%s</b></td>",$self->T("Field type"));
-      printf("<td width=1%% nowrap><b>%s</b></td>",$self->T("Searchable"));
-      print("</tr>");
+   printf("<div class=fieldlist><center>".
+          "<table class=ObjectDefinition>");
+   print("<tr>");
+   printf("<th><b>%s</b></th>",$self->T("Frontend field"));
+   printf("<th class=foname><b>%s</b></th>",$self->T("Internal field"));
+   printf("<th class=fotype nowrap><b>%s</b></th>",$self->T("Field type"));
+   printf("<th class=foref nowrap><b>%s</b></th>",$self->T("Reference"));
+   printf("<th class=fosearch nowrap><b>%s</b></th>",$self->T("Searchable"));
+   print("</tr>");
    foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
       print("<tr>");
       my $label=$fo->Label();
@@ -79,16 +86,35 @@ sub ModuleObjectInfo
       $label=~s/-/ - /g;
       $label="&nbsp; &nbsp;" if ($label=~m/^\s*$/);
       printf("<td valign=top>%s</td>",$label);
-      printf("<td valign=top>%s</td>",$fo->Name());
-      printf("<td valign=top>%s</td>",$fo->Type());
-      printf("<td align=center>%s</td>",
+      printf("<td valign=top class=foname>%s</td>",$fo->Name());
+      printf("<td valign=top class=fotype>%s</td>",$fo->Type());
+      my $vjointo=$fo->getNearestVjoinTarget();
+      $vjointo=$$vjointo if (ref($vjointo) eq "SCALAR");
+      if ($vjointo ne ""){
+         my $l=$vjointo;
+         $l=~s/::/\//g;
+         $l="../../$l/ModuleObjectInfo";
+         $vjointo="<a href=\"$l\">$vjointo</a>";
+         if (exists($fo->{vjoinon})){
+            if (ref($fo->{vjoinon}) eq "ARRAY"){
+               $vjointo.="<br>".$fo->{vjoinon}->[0]."-&gt;".$fo->{vjoinon}->[1];
+            }
+            else{
+               $vjointo.="<br>COMPLEX-LINK";
+            }
+         }
+      }
+      
+      printf("<td valign=top class=foref>%s</td>",$vjointo);
+      printf("<td valign=top align=center class=fosearch>%s</td>",
              $fo->searchable ? $self->T("yes") : $self->T("no"));
       print("</tr>");
    }
    printf("</table>");
    printf("<br><br><hr>");
    if ($self->IsMemberOf(["admin","support"])){
-      printf("</center><b>Oracle-Replication-Schema:</b><br>");
+      printf("</center><div class=OracleReplication>".
+             "<b>Oracle-Replication-Schema:</b><br>");
 
       printf("<pre>");
       printf("create table \"%s\" (\n",$self->Self);
@@ -164,6 +190,7 @@ sub ModuleObjectInfo
                 $self->Self,$self->Self);
       }
       printf("</pre>");
+      printf("</div>");
    }
 
 
