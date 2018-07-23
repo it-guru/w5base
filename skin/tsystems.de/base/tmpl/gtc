@@ -7,8 +7,8 @@
       Die W5Base/Darwin Administration ist berechtigt, bei fahrlässigem 
       Fehlverhalten eines Users oder dem Verstoß gegen die AGB's, die 
       Kennung(en) zu sperren. Darunter sind im speziellen Versuche zu 
-      verstehen, die Stabilität des Systems negativ zu beeinflussen oder die 
-      Datenbanken mit sinnlosen Informationen zu überfluten.
+      verstehen, die Stabilität des Systems negativ zu beeinflussen 
+      oder die Datenbanken mit sinnlosen Informationen zu überfluten.
 
      
   §2  Umgang mit dem System
@@ -16,17 +16,19 @@
       Das W5Base/Darwin Datenbanksystem darf von den Usern nur in der 
       vorgesehenen Art verwendet werden. Der User ist verpflichtet, seine 
       Zugangsdaten nur für seine persönliche Nutzung zugänglich zu machen.
-      Service-Kennungen sind nur für die vorgesehene Schnittstellen-Anwendung 
-      zu verwenden. Eine Nutzung von Service-Kennung für normale, nicht
+      Service-Kennungen sind nur für die vorgesehene 
+      Schnittstellen-Anwendung zu verwenden. 
+      Eine Nutzung von Service-Kennung für normale, nicht
       Schnittstellen-Funktionalitäten ist NICHT zulässig.
 
      
   §3  Verantwortung für Datenelemente
       -------------------------------
-      Erzeugt ein User im W5Base/Darwin Datenbanksystem Datensätze, die der
-      Zuordnung zu einem Datenverantwortlichen unterliegen, so ist der
-      User für diese Daten zeitlich unbegrenzt verantwortlich. Die Übergabe
-      der Daten an andere User (Nachfolger) liegt allein in der Zuständigkeit
+      Erzeugt ein User im W5Base/Darwin Datenbanksystem Datensätze, 
+      die der Zuordnung zu einem Datenverantwortlichen unterliegen, 
+      so ist der User für diese Daten zeitlich unbegrenzt 
+      verantwortlich. Die Übergabe der Daten an andere 
+      User (Nachfolger) liegt allein in der Zuständigkeit
       des Datenverantwortlichen.
 
      
@@ -34,23 +36,26 @@
       ------------
       Jeder User trägt selbst die volle Verantwortung für die von ihm 
       erzeugten/veränderten Daten. Die Ablage von rechtswidrigen, 
-      pornografischen oder rechtsradikalen  Inhalten ist strengstens untersagt!
+      pornografischen oder rechtsradikalen  Inhalten ist strengstens 
+      untersagt!
 
 
   §5  Export/Extraktion von Daten
       ---------------------------
-      Im W5Base/Darwin Datenbanksystem bestehen für den User div. Möglichkeiten
-      für den Export von Daten. Die Nutzung dieser Funktionen ist auf
+      Im W5Base/Darwin Datenbanksystem bestehen für den User 
+      div. Möglichkeiten für den Export von Daten. 
+      Die Nutzung dieser Funktionen ist auf
       das dienstlich notwendige Minimum zu begrenzen.
       Eine Weitergabe von extrahierten Daten ohne Freigabe 
-      der W5Base/Darwin Administration ist strengstens untersagt. Eine Freigabe
-      wird nur über einen "Admin-Request" erteilt.
+      der W5Base/Darwin Administration ist strengstens untersagt. 
+      Eine Freigabe wird nur über einen "Admin-Request" erteilt.
 
      
   §6  Anpassung von Rechten
       ---------------------
-      Rechteanpassungen, Gruppenveränderungen, die Zuordnung von Kontakten
-      zu bestimmten Gruppen, Anforderung von Datenbereinigungen oder allgemeine
+      Rechteanpassungen, Gruppenveränderungen, die Zuordnung von 
+      Kontakten zu bestimmten Gruppen, Anforderung von 
+      Datenbereinigungen oder allgemeine
       Fragen zu W5Base/Darwin sind generell als "Admin-Request" 
       einzustellen.  Dieser ist unter 
       MyW5Base/Darwin->"neuen Workflow starten" erreichbar.
@@ -71,5 +76,97 @@
       den Workflow "ITIL Anfrage/Anforderung an die Anwendungsentwicklung"
       einzustellen (Anwendung: W5Base/Darwin).
       Im Sinne eines kontinuierlichen Verbesserungsprozesses ist JEDER
-      User angehalten, erkannte Fehler in der Web-Oberfläche über den genannten
-      Workflow zu melden.
+      User angehalten, erkannte Fehler in der Web-Oberfläche über den 
+      genannten Workflow zu melden.
+
+
+  §9  Datenschutz für konzerninterne IT-Services der DT IT
+      ----------------------------------------------------
+      Datenschutzhinweise:
+      Der Schutz Ihrer persönlichen Daten hat für die 
+      Deutsche Telekom IT GmbH als interner IT Service-Dienstleister 
+      der Deutschen Telekom einen hohen Stellenwert. 
+      Es ist uns wichtig, Sie darüber zu informieren, nach 
+      welchen Regeln ihre persönlichen Daten verwendet werden. 
+    
+      Wo finde ich die Information zum Datenschutz in 
+      der Deutschen Telekom:
+
+      Durch Group Privacy (GPR) wird im Konzern über 
+         https://datenschutz.telekom.de 
+      und 
+         https://yam.telekom.de/groups/group-privacy 
+      informiert. 
+      Information zum Umgang mit Kundendaten im Konzern finden Sie 
+      unter http://www.telekom.de/datenschutzhinweise. 
+    
+      Wer ist verantwortlich für die Datenverarbeitung: 
+      Datenverantwortlich für ihre Beschäftigtendaten ist Ihr 
+      Arbeitgeber, also die Gesellschaft mit der Sie den Arbeitsvertrag 
+      abgeschlossen haben.
+      Als so genannter "Externer Beschäftigter" ist es die Gesellschaft 
+      von der Sie beauftragt wurden. 
+    
+      Welche Daten werden erfasst, wie werden sie verwendet und wie lange 
+      werden sie gespeichert:
+
+      Die persönlichen Daten werden entsprechend der 
+      Konzernbetriebsvereinbarung IT-Systeme und weiterer 
+      Betriebsvereinbarungen erfasst und verwendet. 
+      Die Vereinbarungen regeln welche Daten verarbeitet werden und wofür 
+      diese verwendet werden.
+      Personal-Portal, Rechtliche Grundlagen: 
+         https://personal.telekom.de/rg
+      Für diesen IT-Service gilt insbesondere die folgende 
+      Betriebsvereinbarung: "Rahmen GBV IT Systeme"
+    
+      Benutzerkennungen und Protokollierung (Log- und Accountdaten):
+
+      Für IT-Services im Telekom Konzern werden persönlich 
+      zugeordnete Kennungen und Passworte verwendet. 
+      Die Speicherung dieser Daten richtet sich nach 
+      den gesetzlichen Anforderungen und den Sicherheitsstandards 
+      im Konzern. 
+    
+      An wen werden meine Daten weitergegeben:
+
+      a) An Auftragsverarbeiter, das sind Unternehmen innerhalb und 
+         außerhalb des Konzerns, die wir im gesetzlich vorgesehenen 
+         Rahmen mit der Verarbeitung von Daten beauftragen, 
+         Art. 28 DSGVO (Dienstleister, Erfüllungsgehilfen). 
+         Ihr Arbeitgeber bleibt auch in dem Fall weiterhin für den 
+         Schutz Ihrer Daten verantwortlich.
+
+      b) Aufgrund gesetzlicher Verpflichtung: In bestimmten Fällen 
+         sind wir gesetzlich verpflichtet, bestimmte Daten an die 
+         anfragende staatliche Stelle zu übermitteln. 
+    
+      Welche Rechte habe ich:
+
+      Sie haben das Recht, 
+
+      a) Auskunft zu verlangen zu Kategorien der verarbeiteten Daten, 
+         Verarbeitungszwecken, etwaigen Empfängern der Daten, der 
+         geplanten Speicherdauer (Art. 15 DSGVO)
+
+      b) die Berichtigung unrichtiger oder unvollständiger Daten 
+         zu verlangen (Art. 16 DSGVO);
+
+      c) in bestimmten Fällen im Rahmen des Art. 17 DSGVO die Löschung 
+         von Daten zu verlangen - insbesondere soweit die Daten für den 
+         vorgesehenen Zweck nicht mehr erforderlich sind. 
+         Beispielsweise nach Beendigung des Beschäftigungsverhältnisses, 
+         sofern keine gesetzlichen Aufbewahrungspflichten bestehen.
+    
+      Wer ist mein Ansprechpartner, wenn ich Fragen zum Datenschutz habe:
+
+      a) Zu diesem IT-Service können Sie sich an 
+         w5base.darwin@t-systems.com  wenden.
+
+      b) Bei Fragen zum Beschäftigtendatenschutz im Konzern können 
+         Sie sich an datenschutz@telekom.de wenden.
+
+      c) Datenschutzbeauftragter der Deutsche Telekom IT GmbH ist 
+         Dr. Claus Dieter Ulmer, Friedrich-Ebert-Allee 140, 53113 Bonn. 
+
+

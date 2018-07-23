@@ -1,21 +1,22 @@
-     Common policy (GTCs) for the usage of the W5Base/Darwin database system
-===============================================================================
+     Common policy (GTCs) for the usage of the W5Base/Darwin  system
+===========================================================================
  
   
   §1  blocking of identifications/ contacts
       -------------------------------------
-      The administration of W5Base/Darwin is authorized, in cases of careless 
-      behaviour of users or by violation against the common policy to ban the 
-      identifications. That means especially the efforts to affect the 
-      stability system in a negative way or flooding the database with 
-      senseless information.
+      The administration of W5Base/Darwin is authorized, in cases 
+      of careless behaviour of users or by violation against the 
+      common policy to ban the identifications. That means 
+      especially the efforts to affect the 
+      stability system in a negative way or flooding the database 
+      with senseless information.
 
      
   §2  handling with the system
       ------------------------
-      The W5Base/Darwin database system has to be used by the users only in 
-      the designated way. The user is committed to take care of its access 
-      data, they have to be reachable only for his personal usage. 
+      The W5Base/Darwin database system has to be used by the users only
+      in the designated way. The user is committed to take care of its 
+      access data, they have to be reachable only for his personal usage. 
       Service identifications are only allowed to be used for designated 
       application interfaces. The usage of service identifier for regular, 
       none interface functionality is NOT allowed.
@@ -41,17 +42,25 @@
       --------------------------
       In the W5Base/Darwin Data bank system there are fort he user several 
       methods to export data. The usage of this function should be limited 
-      to the minimum for the official business. Forwarding of extracted data 
-      without the permission of W5Base/Darwin administrators is strictly 
-      prohibited. Permission is only granted by using an "Admin-Request".     
+      to the minimum for the official business. Forwarding of 
+      extracted data without the permission of W5Base/Darwin administrators
+      is strictly prohibited. 
+      Permission is only granted by using an "Admin-Request".     
  
 
   §6  adjustment of rights
       --------------------
-      Adjustment of rights, changes to groups, the assignment of contacts to 
-      certain groups, requests for data rectifications or general questions 
-      to W5Base/Darwin/ Darwin have to be formulated generally as 
-      "Admin-Requests". This can be found at "MyW5Base" - "start new Workflow".  
+      Adjustment of rights, changes to groups, the assignment of 
+      contacts to certain groups, requests for data rectifications or 
+      general questions to W5Base/Darwin/ Darwin have to be 
+      formulated generally as 
+
+         "Admin-Requests" 
+
+      This can be found at:
+
+         "MyW5Base" - "start new Workflow".  
+
      
   §7  adjustment of central data elements
       -----------------------------------
@@ -60,12 +69,85 @@
       clearly. Demands for this will be processed only as "Admin-Request".
 
      
-  §8  program adjustments and failure corrections in the W5Base/Darwin system
-      -----------------------------------------------------------------------
+  §8  program adjustments and failure corrections in the W5Base/Darwin
+      ----------------------------------------------------------------
       Program technical adjustments, error messages, expansion requests or 
       ideas for new functions can be submitted with the workflow 
       "ITIL request to the application development". 
-      (application: W5Base/Darwin). For a continuous improvement process EVERY 
-      user should report recognised bugs in the Web-Surface over the 
-      mentioned workflow.
+      (application: W5Base/Darwin). For a continuous improvement 
+      process EVERY user should report recognised bugs in the Web-Surface 
+      over the mentioned workflow.
  
+  §9  data protection for internal IT services of the DT IT
+      -----------------------------------------------------
+      Data protection information:
+      The protection of your personal data is very important to 
+      Deutsche Telekom IT GmbH as an internal IT service provider 
+      of Deutsche Telekom. 
+      It is important to us to inform you about the rules according to 
+      which your personal data is used.
+
+      Where can I find information on data protection at Deutsche Telekom:
+      Group Privacy (GPR) informs the company 
+      via https://datenschutz.telekom.de 
+      and https://yam.telekom.de/groups/group-privacy
+      Information on the handling of customer data within the company 
+      can be found under http://www.telekom.de/datenschutzhinweise
+
+      Who is responsible for data processing:
+      Your employer, i.e. the company with whom you have concluded the 
+      employment contract, is responsible for your employee data. As a 
+      so-called "external employee", it is the company from which you 
+      were commissioned.
+
+      What data is collected, how is it used and for how long is 
+      it stored:
+      Personal data is collected and used in accordance with the 
+      Group works agreement IT systems and additional works agreements. 
+      The agreements regulate which data are processed and for which 
+      purpose they are used.
+      Personnel portal, legal basis: https://personal.telekom.de/rg
+      For this IT service the following works agreement applies 
+      in particular: "Rahmen GBV IT Systeme"
+
+      User IDs and logging (log and account data):
+      Personally assigned identifiers and passwords are used for 
+      IT services within the Deutsche Telekom Group. This data is stored 
+      in accordance with legal requirements and the Group's security 
+      standards.
+    
+      Who will my data be given to:
+
+      a) To contractors, these are companies within and outside the company 
+         which are commissioned by us to process data within the statutory 
+         limits, Art. 28 DSGVO (service providers, subcontractors). 
+         Your employer remains in this case responsible for the 
+         protection of your data.
+
+      b) Due to legal obligation: In certain cases, we are legally obliged 
+         to transmit certain data to the requesting state authorities.
+    
+      What rights do I have:
+      You have the right to:
+
+      a) request information on categories of processed data, processing 
+         purposes, possible recipients of the data, the planned storage 
+         period (Art. 15 DSGVO)
+
+      b) request the correction of incorrect or incomplete 
+         data (Art. 16 DSGVO);
+
+      c) to request the deletion of data in certain cases within the 
+         framework of Art. 17 DSGVO - especially if the data is no longer 
+         required for the intended purpose. For example, after termination 
+         of employment, as long as no legal retention obligations exist.
+    
+      Who do I contact if I have questions about data protection:
+
+      a) You can contact w5base.darwin@t-systems.com about this IT service.
+
+      b) If you have any questions about employee data protection in the 
+         company, please contact datenschutz@telekom.de 
+
+      c) Data protection officer of Deutsche Telekom IT GmbH 
+         is Dr. Claus Dieter Ulmer, Friedrich-Ebert-Allee 140, 53113 Bonn.
