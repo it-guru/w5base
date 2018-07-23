@@ -9,4 +9,5 @@
 'fieldgroup.default'=>{de=>'Menu Informationen',en=>'Menu informations'},
 'data area'=>{de=>'Datenbereich'},
 'navigation area'=>{de=>'Navigationsbereich'},
-'select a skin'=>{de=>'Wählen Sie einen Skin'}
+'select a skin'=>{de=>'Wählen Sie einen Skin'},
+'KeyNode in Datamodel'=>{de=>'Schlüsselknoten in Datenmodel'}

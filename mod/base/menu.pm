@@ -81,6 +81,11 @@ sub new
                 label         =>'Config',
                 dataobjattr   =>'menu.config'),
 
+      new kernel::Field::Text(
+                name          =>'datamodel',
+                label         =>'KeyNode in Datamodel',
+                dataobjattr   =>'menu.datamodel'),
+
       new kernel::Field::Select(
                 name          =>'useobjacl',
                 label         =>'use Object ACL',

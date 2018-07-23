@@ -33,3 +33,4 @@ CREATE TABLE menuacl (
 alter table menuacl add comments longtext;
 alter table menuacl add expiration datetime;
 alter table menuacl add alertstate varchar(10);
+alter table menu add datamodel varchar(20);
