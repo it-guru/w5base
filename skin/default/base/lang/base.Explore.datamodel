@@ -1,0 +1,4 @@
+'base::Explore::datamodel'=>{de=>'Datenmodel Browser',en=>'Datamodel Browser'},
+'sublabel'=>{de=>'BaseData',en=>'BaseData'},
+'description'=>{de=>'Darstellung der Teilmodule des Datenmodels der W5Base' ,en=>'Visualisation of parts in datamodel of W5Base'},
+

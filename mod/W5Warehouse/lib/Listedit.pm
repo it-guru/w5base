@@ -43,7 +43,7 @@ sub AddAllFieldsFromWorktable
         $self->{FieldGenerationTime}+600<time()){   # field cache for 10min
       $self->{FieldGenerationTime}=time();
       $self->ResetFields();
-      msg(INFO,"new generation of field list in ".$self->Self);
+      #msg(INFO,"new generation of field list in ".$self->Self);
       my ($worktable,$workdb)=$self->getWorktable();
       my @l;
       push(@l,new kernel::Field::Linenumber(

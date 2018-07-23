@@ -67,7 +67,27 @@ sub new
       new kernel::Field::Text(
                 name          =>'referral',
                 htmlwidth     =>'300px',
+                htmldetail    =>'NotEmpty',
                 label         =>'referral'),
+
+      new kernel::Field::Text(
+                name          =>'vjointo',
+                htmlwidth     =>'300px',
+                htmldetail    =>'0',
+                label         =>'vjointo'),
+
+      new kernel::Field::Text(
+                name          =>'vjoinonfrom',
+                htmlwidth     =>'300px',
+                htmldetail    =>'0',
+                label         =>'vjoinonfrom'),
+
+      new kernel::Field::Text(
+                name          =>'vjoinonto',
+                htmlwidth     =>'300px',
+                htmldetail    =>'0',
+                label         =>'vjoinonto'),
+
 
       new kernel::Field::Htmlarea(
                 name          =>'spec',
@@ -88,50 +108,91 @@ sub getData
    my $c=$self->Context;
    if (!defined($c->{data})){
       my $instdir=$self->Config->Param("INSTDIR");
-      msg(INFO,"recreate data on dir '%s'",$instdir);
+      my $cachedir=$self->Config->Param("DataObjCacheStore");
+      $cachedir.="/" if (!($cachedir=~m/\/$/));
+      my $DataObjCacheFile=$cachedir.$self->Self.".cache.db.tmp";
       my $pat="$instdir/mod/*/*.pm";
       my @sublist=glob($pat);
+      my $maxmtime=0;
       @sublist=map({my $qi=quotemeta($instdir);
+                    my $mtime = (stat($_))[9];
+                    $maxmtime=$mtime if ($maxmtime<$mtime);
                     $_=~s/^$instdir//;
                     $_=~s/\/mod\///; $_=~s/\.pm$//;
                     $_=~s/\//::/g;
                     $_;
                    } @sublist);
       my @data=();
-      foreach my $modname (@sublist){
-         my $o=getModuleObject($self->Config,$modname);
-         if (defined($o)){
-            if ($o->can("getFieldObjsByView")){
-               my $spec={};
-               if ($o->can("LoadSpec")){
-                  $spec=$o->LoadSpec(undef);
-               }
-               foreach my $fo ($o->getFieldObjsByView([qw(ALL)])){
-                  my %rec=();
-                  $rec{fullname}=$modname."::".$fo->Name;
-                  $rec{internalname}=$fo->Name;
-                  $rec{label}=$fo->Label;
-                  $rec{type}=$fo->Self;
-                  $rec{modname}=$modname;
-                  $rec{dataobjattr}=$fo->{dataobjattr};
-                  $rec{spec}=$spec->{$fo->Name};
-                  $rec{modnamelabel}=$o->T($modname,$modname);
-                  $rec{referral}="";
-                  if (exists($fo->{vjointo})){
-                     $rec{referral}=$modname."::".$fo->{vjoinon}->[0].
-                                    " -> ".
-                                    $fo->{vjointo}."::".$fo->{vjoinon}->[1];
+      if ((stat($DataObjCacheFile))[9]>$maxmtime){
+         if (open(F,"<",$DataObjCacheFile)){
+            my $VAR1;
+            eval(join("",<F>));
+            if (defined($VAR1)){
+               $c->{data}=$VAR1;
+            }
+            else{
+               msg(ERROR,"read from cache $DataObjCacheFile failed: $@");
+            }
+            close(F);
+         }
+      }
+      if (!defined($c->{data})){
+         msg(INFO,"recreate data on dir '%s'",$instdir);
+         foreach my $modname (@sublist){
+            my $o=getModuleObject($self->Config,$modname);
+            if (defined($o)){
+               if ($o->can("getFieldObjsByView")){
+                  my $spec={};
+                  if ($o->can("LoadSpec")){
+                     $spec=$o->LoadSpec(undef);
                   }
-                  push(@data,\%rec);
+                  foreach my $fo ($o->getFieldObjsByView([qw(ALL)])){
+                     my %rec=();
+                     $rec{fullname}=$modname."::".$fo->Name;
+                     $rec{internalname}=$fo->Name;
+                     $rec{label}=$fo->Label;
+                     $rec{type}=$fo->Self;
+                     $rec{modname}=$modname;
+                     $rec{dataobjattr}=$fo->{dataobjattr};
+                     $rec{spec}=$spec->{$fo->Name};
+                     $rec{modnamelabel}=$o->T($modname,$modname);
+                     $rec{vjointo}=$fo->getNearestVjoinTarget();
+                     if (ref($rec{vjointo}) eq "SCALAR"){
+                        $rec{vjointo}=${$rec{vjointo}};
+                     }
+                     $rec{vjoinonfrom}="";
+                     $rec{vjoinonto}="";
+                     $rec{referral}="";
+                     if ($rec{vjointo} ne ""){
+                        if (ref($fo->{vjoinon}) eq "ARRAY"){
+                           $rec{vjoinonfrom}=$fo->{vjoinon}->[0];
+                           $rec{vjoinonto}=$fo->{vjoinon}->[1];
+                        }
+                        else{
+                           $rec{vjoinonfrom}="COMPLEX";
+                           $rec{vjoinonto}="COMPLEX";
+                        }
+                        $rec{referral}=$modname."::".$rec{vjoinonfrom}.
+                                       " -> ".
+                                       $rec{vjointo}."::".$rec{vjoinonto};
+                     }
+                     push(@data,\%rec);
+                  }
                }
             }
          }
+         if (open(F,">",$DataObjCacheFile)){
+            print F (Dumper(\@data));
+            close(F);
+         }
+         else{
+            msg(ERROR,"fail to write cache file $DataObjCacheFile");
+         }
+         $c->{data}=\@data;
       }
-      $c->{data}=\@data;
    }
    return($c->{data});
 }
-
 
 
 
@@ -141,12 +202,14 @@ sub getValidWebFunctions
    return(qw(show),$self->SUPER::getValidWebFunctions());
 }
 
+
 sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
    return("ALL");
 }
+
 
 sub isWriteValid
 {

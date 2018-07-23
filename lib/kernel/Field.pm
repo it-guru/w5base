@@ -198,8 +198,8 @@ sub getNearestWebLinkTarget
    }
    my $newweblinkto=$weblinkto;
    if ($newweblinkto ne $oldweblinkto){
-      printf STDERR ("change target for $self->{name} ".
-                     "from $oldweblinkto to $newweblinkto\n");
+      #printf STDERR ("change target for $self->{name} ".
+      #               "from $oldweblinkto to $newweblinkto\n");
    }
    return($weblinkto,$weblinkon);
 }
@@ -211,16 +211,14 @@ sub getNearestVjoinTarget
    my $self=shift;
 
    my $vjointo=$self->{vjointo};
-   if (defined($vjointo)){
-      if (ref($vjointo) ne "SCALAR"){
-         # dynamic Target DataObject detection
-         if ($self->getParent->can("findNearestTargetDataObj")){
-            $vjointo=$self->getParent->findNearestTargetDataObj($vjointo,
-                       "field:".$self->Name);
-         }
-         if (!ref($self->{vjointo})){ # if no reference, store it cached
-            $self->{vjointo}=$vjointo;
-         }
+   if (defined($vjointo) && ref($vjointo) ne "SCALAR" && $vjointo ne ""){
+      # dynamic Target DataObject detection
+      if ($self->getParent->can("findNearestTargetDataObj")){
+         $vjointo=$self->getParent->findNearestTargetDataObj($vjointo,
+                    "field:".$self->Name);
+      }
+      if (!ref($self->{vjointo})){ # if no reference, store it cached
+         $self->{vjointo}=$vjointo;
       }
    }
    return($vjointo);

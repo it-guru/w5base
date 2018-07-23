@@ -9,3 +9,4 @@
 'Description'=>{de=>'Beschreibung'},
 'IO-Object Defintion'=>{de=>'IO-Objektdefinition'},
 'top object name'=>{de=>'top Objektname'},
+'extend depth by one'=>{de=>'erweitern um eine Ebene'},

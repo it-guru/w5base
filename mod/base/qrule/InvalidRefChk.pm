@@ -287,14 +287,17 @@ sub qcheckRecord
          type=>$fobj->Type()
       };
       if ($fobj->Type() ne "ContactLnk"){
+         $rrec->{vjointo}=$fobj->getNearestVjoinTarget();
+         if (ref($rrec->{vjointo}) eq "SCALAR"){
+            $rrec->{vjointo}=${$rrec->{vjointo}};
+         }
          my $idfobj=$dataobj->getField($fobj->{vjoinon}->[0]);
          $rrec->{rawfield}=$fobj->{vjoinon}->[0];
          $rrec->{rawvalue}=$rec->{$fobj->{vjoinon}->[0]};
-         $rrec->{vjointo}=$fobj->{vjointo};
          if (defined($idfobj)){
             my $id=$idfobj->RawValue($rec);
             if ($id ne ""){
-               my $k=$fobj->{vjointo}."::".$id;
+               my $k=$rrec->{vjointo}."::".$id;
                if (!exists($chklst{$k})){
                   $chklst{$k}={
                      target=>$fobj->{vjointo},

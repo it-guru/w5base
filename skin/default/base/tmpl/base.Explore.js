@@ -716,7 +716,6 @@ console.log("start applet with param stack=",appletname,paramstack);
           }));
       }, Promise.resolve([])).then(function(data){
          result=result.concat(data);
-         app.networkFitRequest=true;
          if (app._opStack.length){
             app.processOpStack(finish,result);
          }
@@ -1006,7 +1005,6 @@ console.log("start applet with param stack=",appletname,paramstack);
 
    this.ShowNetworkMap=function(MapParamTempl){
       var app=this;
-      app.networkFitRequest=true;
       this.LayoutNetworkMap();
       var data = {
         nodes: this.node,
@@ -1042,9 +1040,6 @@ console.log("start applet with param stack=",appletname,paramstack);
       $.extend(options,MapParamTempl);
       this.network = new vis.Network(this.netmap, data, options);
       this.network.on("stabilized", function () {
-         if ($(".spinner").is(":visible")){
-            $(".spinner").hide();
-         }
          if (app.networkFitRequest){
             app.network.fit({
                animation: true
@@ -1127,12 +1122,14 @@ console.log("start applet with param stack=",appletname,paramstack);
                 }
              }
              $(mdiv).find(".nodeMethodCall").click(function(e){
+                $(".spinner").show();
                 var methodName=$(this).attr("data-id");
                 for(n=0;n<selectedNodes.length;n++){
                    var nodeobj=app.node.get(selectedNodes[n]);
                    nodeobj.nodeMethods[methodName].exec.call(nodeobj);
                 }
                 app.processOpStack(function(resultOfOpStack){
+                   $(".spinner").hide();
                    if (nodeobj.nodeMethods[methodName].postExec){
                       nodeobj.nodeMethods[methodName].postExec.call(nodeobj,resultOfOpStack);
                    }
@@ -1243,6 +1240,7 @@ console.log("start applet with param stack=",appletname,paramstack);
          $(modal).remove();
          exitCode();
       }); 
+      $(".spinner").hide();
       $(modal).show();
       $(modalframe).find("input:text:visible:first").focus();
    }
