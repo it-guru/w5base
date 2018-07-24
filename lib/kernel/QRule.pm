@@ -257,8 +257,7 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
           (!defined($origrec->{$origfieldname}) ||
            $comprec->{$compfieldname} ne $origrec->{$origfieldname})){
          my $lnkfield=$obj->getField($origfieldname);
-         my $lnkobj=$lnkfield->{vjointo};
-         my $chkobj=getModuleObject($self->getParent->Config,$lnkobj);
+         my $chkobj=$lnkfield->vjoinobj();
          if (defined($chkobj)){
             $chkobj->SetFilter($lnkfield->{vjoindisp}=>
                                "\"".$comprec->{$compfieldname}."\"");
