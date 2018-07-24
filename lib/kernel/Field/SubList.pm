@@ -111,6 +111,10 @@ sub FormatedDetail
 EOF
 
    }
+   if ($mode eq "HtmlExplore"){
+      my $d=$self->getSubListData($current,"HtmlExplore",%param);
+      return($d);
+   }
    if ($mode eq "HtmlDetail" || ($mode eq "edit" && $readonly)){
       $param{nodetaillink}=1 if ($self->{nodetaillink});
       $param{ignViewValid}=1 if ($self->{ignViewValid});

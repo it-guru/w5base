@@ -2,6 +2,8 @@
                            en=>'W5Base-Reflexion DataObjs'},
 'fieldgroup.default'=>{de=>'Feldbeschreibung',en=>'Field description'},
 'fieldgroup.sql'=>{de=>'SQL Backend',en=>'SQL Backend'},
+'fieldgroup.fields'=>{de=>'Datenfelder',en=>'Datafields'},
+'fields'=>{de=>'Datenfelder',en=>'Datafields'},
 'fullqualified object'=>{de=>'vollqualifizierter Objektname'},
 'Dataobject'=>{de=>'Datenobjekt'},
 'Dataobject Label'=>{de=>'Datenobjekt Bezeichnung'},

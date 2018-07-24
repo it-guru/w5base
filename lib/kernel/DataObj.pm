@@ -3597,7 +3597,12 @@ sub getSubList
    }
    $opt{SubListEdit}=1 if ($mode eq "HtmlSubListEdit");
    return("...")       if ($mode=~m/^Multi.*/);   # on FormaterMultiOperation s
-   $mode="HtmlSubList" if ($mode=~m/^.{0,1}Html.*$/);
+   if ($mode ne "HtmlExplore" && ($mode=~m/^.{0,1}Html.*$/)){
+      $mode="HtmlSubList";
+   }
+   if ($mode eq "HtmlExplore"){
+      $mode="HtmlSubListExplore";
+   }
    $mode="SubXMLV01"   if ($mode=~m/XML/);
    if ($mode=~m/^OneLine$/){
       my @view=$self->GetCurrentView();

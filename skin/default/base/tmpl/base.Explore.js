@@ -98,7 +98,7 @@ body{
 
  margin:0px;
  padding:0px;
- width:220px;
+ width:280px;
  float:left;
  overflow:auto;
 }
@@ -295,6 +295,10 @@ div#SearchResult{
 </style>
 
 <style>
+#HtmlExploreSpinner{
+   text-align:center;
+   margin:2px;
+}
 #HtmlExploreDetail{
    margin:2px;
    font-family: "Segoe UI",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -317,6 +321,15 @@ div#SearchResult{
 }
 .ExploreOutput .Record .FieldValue{
    background-color:#cfcfcf;
+}
+
+.SubListExplore td {
+   background-color:silver;
+}
+.SubListExploreClick{
+   width:15px;
+   height:15px;
+   transform: scale(0.6);
 }
 
 </style>
@@ -1094,8 +1107,11 @@ console.log("start applet with param stack=",appletname,paramstack);
                 path="../../"+dataobjpath+"/Result?";
                 path=path+"FormatAs=HtmlExplore&";
                 path=path+"search_"+nodeobj.fieldnameid+"="+dataobjid;
-                
-                $(out).append($("<div id=HtmlExploreDetail style='display:none'></div>"));
+                var DetailFrame=$("<div id=HtmlExploreDetail "+
+                                  "style='display:none'></div>");
+                $(out).append(DetailFrame);
+                var HtmlExploreSpinner=$("<div id=HtmlExploreSpinner><img src=\"../../base/load/ajaxloader.gif\"></div>");
+                $(out).append(HtmlExploreSpinner);
              }
              $(out).append($("<hr>"));
 
@@ -1151,6 +1167,7 @@ console.log("start applet with param stack=",appletname,paramstack);
                    beforeSend:function(){
                    },
                    success:function(data){
+                     $('#HtmlExploreSpinner').remove();
                      var maxw=$(app.dbrec).width();
                      $('#HtmlExploreDetail').height("auto").html(data);
                      //$('#HtmlExploreDetail').find(".FieldValue").ellipsis();

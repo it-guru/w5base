@@ -58,6 +58,8 @@ sub new
                 align         =>'left',
                 label         =>'ID'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'fullname',
                 htmldetail    =>0,
@@ -77,6 +79,17 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description'),
+
+      new kernel::Field::SubList(
+                name          =>'fields',
+                label         =>'fields',
+                readonly      =>1,
+                htmldetail    =>0,
+                explore       =>200,
+                group         =>'fields',
+                vjointo       =>'base::reflexion_fields',
+                vjoinon       =>['id'=>'modname'],  
+                vjoindisp     =>['internalname','type']),
 
       new kernel::Field::Text(
                 name          =>'selfasparent',
@@ -273,13 +286,24 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   my @l=qw(default header history);
+   my @l=qw(default header history fields);
    
    if (in_array([split(/,\s*/,$rec->{pclasses})],"kernel::DataObj::DB")){
       push(@l,"sql");
    }
    return(@l);
 }
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","fields","sql" ,"source");
+}
+
+
 
 sub isWriteValid
 {
