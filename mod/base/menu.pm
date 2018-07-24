@@ -155,6 +155,9 @@ sub Validate
       return(0);
    }
    $newrec->{fullname}=$name;
+   if (exists($newrec->{datamodel})){
+      $newrec->{datamodel}=~s/[^a-zA-Z_0-9-]/_/g;
+   }
    return(1);
 }
 
