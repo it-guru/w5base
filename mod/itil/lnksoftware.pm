@@ -59,8 +59,9 @@ sub new
                    "concat('-',lnksoftwaresystem.version),''),".
                    "if (lnksoftwaresystem.parent is null,".
                    "if (lnksoftwaresystem.system is not null,".
-                   "concat(' (system installed\@',system.name,')'),".
- 
+                   "concat(' (system installed\@',system.name,".
+                   "if (lnksoftwaresystem.instpath<>'',".
+                   "concat(':',lnksoftwaresystem.instpath),''),')'),".
                    "' (cluster service installed)'),' (Option)'))"),
                                                  
       new kernel::Field::TextDrop(
