@@ -128,6 +128,12 @@ sub ProcessHead
    my $query=kernel::cgi::Hash2QueryString($q); 
    $bmlink.="?".$query if ($query ne "");
    $url.="?".$query if ($query ne "");
+
+   if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+      $url=~s/^http:/https:/i;
+   }
+
+
    my $bmname=Query->Param("bmname");
   
    $d=<<EOF;
