@@ -312,6 +312,9 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'systemos',
+                vjointo       =>\'tsacinv::osrelease',
+                vjoinon       =>['systemos'=>'name'],
+                weblinkto     =>'none',
                 label         =>'System OS',
                 dataobjattr   =>'"systemos"'),
 

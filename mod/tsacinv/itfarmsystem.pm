@@ -49,8 +49,9 @@ sub new
                 label         =>'Systemname',
                 ignorecase    =>1,
                 htmlwidth     =>'250',
-                weblinkto     =>'tsacinv::system',
-                weblinkon     =>['systemid'=>'systemid'],
+                vjointo       =>\'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'systemname',
                 dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
