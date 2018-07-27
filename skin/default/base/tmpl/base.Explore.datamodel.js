@@ -64,7 +64,6 @@
                enabled: true
             }
          });
-         $(".spinner").show();
          this.app.console.log("INFO","loading scenario ...");
          appletobj.app.setMPath({
                label:ClassAppletLib['%SELFNAME%'].desc.label,

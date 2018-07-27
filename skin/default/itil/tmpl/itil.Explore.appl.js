@@ -95,7 +95,8 @@
                MasterItem
             );
             app.processOpStack(function(opResults){
-               console.log("scenario loaded",opResults);
+               console.log("opResults load of appl",opResults);
+               $(".spinner").hide();
                app.network.fit({
                   animation: true
                });

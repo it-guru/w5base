@@ -529,32 +529,39 @@ var W5ExploreClass=function(){
    };
 
    this.LayoutMenuLayer=function(){
-      this.LayoutBase();
-      this.ResizeLayout();
+      if (!this.main ||  $(this.main).attr("data-layout")!="MenuLayer"){
+         this.LayoutBase();
+         this.ResizeLayout();
+         $(this.main).attr("data-layout","MenuLayer");
+      }
    };
+
    this.LayoutNetworkMap=function(){
-      this.LayoutBase();
-      this.netmap = document.createElement('div');
-      this.netmap.id = 'netmap';
-      this.workspace.appendChild(this.netmap);
-      this.netmap.innerHTML = 'netmap';
-
-      this.dbrec = document.createElement('div');
-      this.dbrec.id = 'dbrec';
-      this.workspace.appendChild(this.dbrec);
-      this.showDefaultDBRec();
-
-      this.console.div = document.createElement('div');
-      this.console.div.id = 'cons';
-      this.console.div.innerHTML = '';
-      this.main.appendChild(this.console.div);
-      this.ResizeLayout();
-      $.fn.disableSelection = function() {
-          return this
-                   .attr('unselectable', 'on')
-                   .css('user-select', 'none')
-                   .on('selectstart', false);
-      };
+      if (!this.main ||  $(this.main).attr("data-layout")!="NetworkMap"){
+         this.LayoutBase();
+         this.netmap = document.createElement('div');
+         this.netmap.id = 'netmap';
+         this.workspace.appendChild(this.netmap);
+         this.netmap.innerHTML = 'netmap';
+        
+         this.dbrec = document.createElement('div');
+         this.dbrec.id = 'dbrec';
+         this.workspace.appendChild(this.dbrec);
+         this.showDefaultDBRec();
+        
+         this.console.div = document.createElement('div');
+         this.console.div.id = 'cons';
+         this.console.div.innerHTML = '';
+         this.main.appendChild(this.console.div);
+         this.ResizeLayout();
+         $.fn.disableSelection = function() {
+             return this
+                      .attr('unselectable', 'on')
+                      .css('user-select', 'none')
+                      .on('selectstart', false);
+         };
+         $(this.main).attr("data-layout","NetworkMap");
+      }
    };
 
    this.setMPath=function(){
@@ -1019,6 +1026,7 @@ console.log("start applet with param stack=",appletname,paramstack);
    this.ShowNetworkMap=function(MapParamTempl){
       var app=this;
       this.LayoutNetworkMap();
+      $(".spinner").show();
       var data = {
         nodes: this.node,
         edges: this.edge

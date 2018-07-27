@@ -2609,29 +2609,29 @@ sub jsExploreObjectMethods
        cssicon:\"basket_add\",
        exec:function(){
           console.log(\"call addApplicationInterfaces on \",this);
+          \$(\".spinner\").show();
+          var app=this.app;
           var dataobjid=this.dataobjid;
           var dataobj=this.dataobj;
-          var app=this.app;
-          app.Config().then(function(cfg){
-             var w5obj=getModuleObject(cfg,'itil::appl');
-             w5obj.SetFilter({
-                id:dataobjid
-             });
-             w5obj.findRecord(\"id,interfaces\",function(data){
-                for(recno=0;recno<data.length;recno++){
-                   for(ifno=0;ifno<data[recno].interfaces.length;ifno++){
-                      var ifrec=data[recno].interfaces[ifno];
-                      app.addNode(dataobj,ifrec.toapplid,ifrec.toappl);
-                      app.addEdge(app.toObjKey(dataobj,dataobjid),
-                                  app.toObjKey(dataobj,ifrec.toapplid));
-                   }
-                }
-                app.processOpStack(function(arrayOfResults){
-                   console.log(\"OK, all interfaces loaded arrayOfResults=\",arrayOfResults);
+          app.pushOpStack(new Promise(function(methodDone){
+             app.Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'itil::appl');
+                w5obj.SetFilter({
+                   id:dataobjid
                 });
-
+                w5obj.findRecord(\"id,interfaces\",function(data){
+                   for(recno=0;recno<data.length;recno++){
+                      for(ifno=0;ifno<data[recno].interfaces.length;ifno++){
+                         var ifrec=data[recno].interfaces[ifno];
+                         app.addNode(dataobj,ifrec.toapplid,ifrec.toappl);
+                         app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                     app.toObjKey(dataobj,ifrec.toapplid));
+                      }
+                   }
+                   methodDone(\"end of addApplicationInterfaces\");
+                });
              });
-          });
+          }));
        }
    ";
 
@@ -2641,29 +2641,32 @@ sub jsExploreObjectMethods
        cssicon:\"basket_add\",
        exec:function(){
           console.log(\"call m501addApplicationSystems on \",this);
+          \$(\".spinner\").show();
+          var app=this.app;
           var dataobjid=this.dataobjid;
           var dataobj=this.dataobj;
-          var app=this.app;
-          app.Config().then(function(cfg){
-             var w5obj=getModuleObject(cfg,'itil::appl');
-             w5obj.SetFilter({
-                id:dataobjid
-             });
-             w5obj.findRecord(\"id,systems\",function(data){
-                for(recno=0;recno<data.length;recno++){
-                   for(subno=0;subno<data[recno].systems.length;subno++){
-                      var subrec=data[recno].systems[subno];
-                      app.addNode('itil::system',subrec.systemid,subrec.system);
-                      app.addEdge(app.toObjKey(dataobj,dataobjid),
-                                  app.toObjKey('itil::system',subrec.systemid),
-                                  {noAcross:true});
+          app.pushOpStack(new Promise(function(methodDone){
+             app.Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'itil::appl');
+                w5obj.SetFilter({
+                   id:dataobjid
+                });
+                w5obj.findRecord(\"id,systems\",function(data){
+                   for(recno=0;recno<data.length;recno++){
+                      for(subno=0;subno<data[recno].systems.length;subno++){
+                         var subrec=data[recno].systems[subno];
+                         app.addNode('itil::system',subrec.systemid,
+                                     subrec.system);
+                         app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                     app.toObjKey('itil::system',
+                                     subrec.systemid),
+                                     {noAcross:true});
+                      }
                    }
-                }
-                app.processOpStack(function(arrayOfResults){
-                   console.log(\"OK, all systems loaded arrayOfResults=\",arrayOfResults);
+                   methodDone(\"end of m501addApplicationSystems\");
                 });
              });
-          });
+          }));
        }
    ";
 
@@ -2679,10 +2682,10 @@ sub jsExploreObjectMethods
        },
        exec:function(){
           console.log(\"call setApplVisualFocus on \",this);
+          \$(\".spinner\").show();
           var dataobjid=this.dataobjid;
           var dataobj=this.dataobj;
           var runpath=[dataobj,dataobjid];
-          \$('.spinner').show();
           this.app.runApplet('itil::Explore::appl',runpath);
        }
    ";
