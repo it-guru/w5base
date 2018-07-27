@@ -82,6 +82,10 @@ sub objgen
         msg(ERROR,"targetfile $targetfile already exists")
       });
    }
+   my $skindir="$instdir/skin/default/$modbase";
+   my $langdir="$instdir/skin/default/$modbase/lang";
+   my $langfile="$instdir/skin/default/$modbase/lang/${modbase}.$objname";
+
    my $TARGET;
    if (!open($TARGET,">",$targetfile)){
       return({exitcode=>1,msg=>
@@ -108,7 +112,7 @@ sub objgen
    my $dbname=$dbd->{DB}->{dbname};
    my $year=(localtime(time()))[5];
 
-   print $TARGET (<<EOF);
+   print $TARGET <<EOF;
 package ${modbase}::${objname};
 #  W5Base Framework
 #  Copyright (C) ${year}  Hartmut Vogler (it\@guru.de)
@@ -222,6 +226,26 @@ sub Initialize
 
 
 
+sub getRecordImageUrl
+{
+   my \$self=shift;
+   my \$cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>\$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/system.jpg?".\$cgi->query_string());
+}
+
+
+
+sub initSearchQuery
+{
+   my \$self=shift;
+#   if (!defined(Query->Param("search_cistatus"))){
+#     Query->Param("search_cistatus"=>
+#                  "\"!".\$self->T("CI-Status(6)","base::cistatus")."\"");
+#   }
+}
+
+
+
 sub isViewValid
 {
    my \$self=shift;
@@ -232,9 +256,28 @@ sub isViewValid
 
 
 1;
+
 EOF
 
    close($TARGET);
+
+   if (! -f $langfile){
+      if (! -d $skindir ){
+         mkdir($skindir);
+      }
+      if (! -d $langdir ){
+         mkdir($langdir);
+      }
+      if (open($TARGET,">",$langfile)){
+         print $TARGET ("'${modbase}::${objname}'=>{\n");
+         print $TARGET ("  en=>'${modbase}__${objname}',\n");
+         print $TARGET ("  de=>'${modbase}__${objname}'\n");
+         print $TARGET ("},\n");
+         close($TARGET);
+      } 
+
+
+   }
    return({exitcode=>0,msg=>'ok'});
 }
 
