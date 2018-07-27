@@ -68,6 +68,7 @@
                enabled: true   // || "once"
             }
          });
+         this.app.network.moveTo({scale:0.5,animation:false});
          this.app.console.log("INFO","loading scenario ...");
          console.log(" run in "+dataobj+" and id="+dataobjid);
 
@@ -96,10 +97,7 @@
             );
             app.processOpStack(function(opResults){
                console.log("opResults load of appl",opResults);
-               $(".spinner").hide();
-               app.network.fit({
-                  animation: true
-               });
+               app.networkFitRequest=true;
             });
         });
       }

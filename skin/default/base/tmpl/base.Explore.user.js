@@ -64,6 +64,7 @@
                enabled: true
             }
          });
+         this.app.network.moveTo({scale:0.5,animation:false});
          this.app.console.log("INFO","loading scenario ...");
          console.log(" run in "+dataobj+" and id="+dataobjid);
          appletobj.app.setMPath({
@@ -97,10 +98,8 @@
                MasterItem.nodeMethods['m100addUserOrgParentTree'].postExec.call(
                   MasterItem,opResults
                );
+               app.networkFitRequest=true;
                console.log("scenario loaded",opResults);
-               app.network.fit({
-                  animation: true
-               });
             });
         });
       }

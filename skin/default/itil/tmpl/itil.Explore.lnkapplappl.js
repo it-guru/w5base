@@ -49,6 +49,7 @@
                             app.addEdge(edges[c].fromid,edges[c].toid,{});
                          }
                          console.log("OK, all loaded");
+                         app.networkFitRequest=true;
                       }).catch(function(e){
                          console.log("not good - in ",e);
                       });

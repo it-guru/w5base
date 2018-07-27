@@ -64,6 +64,7 @@
                enabled: true
             }
          });
+         this.app.network.moveTo({scale:0.5,animation:false});
          this.app.console.log("INFO","loading scenario ...");
          appletobj.app.setMPath({
                label:ClassAppletLib['%SELFNAME%'].desc.label,
@@ -94,9 +95,6 @@
            
                app.genenericLoadNode(dataobj,"id","fullname",{id:fulltarget},
                                     function(d){
-                  app.network.fit({
-                     animation: true
-                  });
                   app.setMPath({
                         label:ClassAppletLib['%SELFNAME%'].desc.label,
                         mtag:'%SELFNAME%'
@@ -111,10 +109,7 @@
                   }
                   app.processOpStack(function(opResults){
                      console.log("scenario loaded",opResults);
-                     $(".spinner").hide();
-                     app.network.fit({
-                        animation: true
-                     });
+                     app.networkFitRequest=true;
                   });
               });
            

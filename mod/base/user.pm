@@ -2249,16 +2249,13 @@ sub jsExploreObjectMethods
           var maxLevel=0;
           app.node.forEach(function(e){
              if (e.dataobj=='base::grp'){
-console.log(\"check level=\"+maxLevel);
                 if (maxLevel<e.level){
                    maxLevel=e.level;
                 }
              }
           });
-console.log(\"maxLevel=\"+maxLevel);
           app.node.forEach(function(e){
              if (e.dataobj=='base::user'){
-console.log(\"set level on=\",e);
                 app.node.update({id:e.id,level:maxLevel+1});
              }
           });

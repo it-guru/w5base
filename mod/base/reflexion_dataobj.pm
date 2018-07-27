@@ -354,7 +354,6 @@ sub jsExploreObjectMethods
                          app.addEdge(curkey,nexkey);
                       }
                   }
-                  app.networkFitRequest=true;
                });
                \$(document).ajaxStop(function () {
                    methodDone(\"load of Members done\");

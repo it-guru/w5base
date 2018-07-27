@@ -92,6 +92,14 @@ body{
  xborder-style:solid;
  xborder-color:red;
  xborder-width:1px;
+ margin:0px;
+ width:inherit;
+ padding:0px;
+ float:left;
+ overflow:auto;
+}
+
+#ctrl{
  border-left-style:solid;
  border-left-color:black;
  border-left-width:2px;
@@ -461,6 +469,7 @@ var W5ExploreClass=function(){
          this.netmap && $(this.netmap).height(1);
          this.netmap && $(this.netmap).width(1);
          this.dbrec && $(this.dbrec).height(1);
+         this.ctrl && $(this.ctrl).height(1);
         // setTimeout(function(){app.ResizeLayout(1);}, 1);
       }
       if (!level2){
@@ -481,14 +490,19 @@ var W5ExploreClass=function(){
             $(this.netmap).outerHeight(
                 $(this.workspace).innerHeight());
          }
+         if (this.ctrl){
+            $(this.ctrl).outerHeight(
+                $(this.workspace).innerHeight());
+         }
          if (this.dbrec){
             $(this.dbrec).outerHeight(
-                $(this.workspace).innerHeight());
+                $(this.ctrl).innerHeight()-
+                $(this.ctrlbar).outerHeight()-5);
          }
          if (this.netmap){
             $(this.netmap).outerWidth(
                 $(this.workspace).innerWidth()-
-                $(this.dbrec).outerWidth()-5);
+                $(this.ctrl).outerWidth()-5);
          }
       }
    };
@@ -544,15 +558,26 @@ var W5ExploreClass=function(){
          this.workspace.appendChild(this.netmap);
          this.netmap.innerHTML = 'netmap';
         
+         this.ctrl = document.createElement('div');
+         this.ctrl.id = 'ctrl';
+         this.workspace.appendChild(this.ctrl);
+
+         this.ctrlbar = document.createElement('div');
+         this.ctrlbar.id = 'ctrlbar';
+         this.ctrl.appendChild(this.ctrlbar);
+
          this.dbrec = document.createElement('div');
          this.dbrec.id = 'dbrec';
-         this.workspace.appendChild(this.dbrec);
+         this.ctrl.appendChild(this.dbrec);
+
          this.showDefaultDBRec();
         
          this.console.div = document.createElement('div');
          this.console.div.id = 'cons';
          this.console.div.innerHTML = '';
          this.main.appendChild(this.console.div);
+         $(this.ctrlbar).html(""); 
+         $(this.ctrlbar).append($(this.globalFunctions())); 
          this.ResizeLayout();
          $.fn.disableSelection = function() {
              return this
@@ -602,7 +627,6 @@ var W5ExploreClass=function(){
 
 
                $(m).find("a").click(function(e){
-console.log("start applet with param stack=",appletname,paramstack);
                   app.runApplet(appletname,paramstack);
                   e.preventDefault();
                });
@@ -755,6 +779,18 @@ console.log("start applet with param stack=",appletname,paramstack);
                     //var curobj=W5Explore.node._data[o.id];
                     var curobj=W5Explore.node.get(o.id);
                     if (!curobj){
+                       if (!o.app.nextAngle || o.app.nextAngle>300){
+                          o.app.nextAngle=1;
+                       }
+                       o.app.nextAngle=o.app.nextAngle+30;
+                       var radius = 300;
+         
+                       o.x=radius*Math.sin(Math.PI*2*o.app.nextAngle/360);
+                       o.y=radius*Math.cos(Math.PI*2*o.app.nextAngle/360);
+                       //console.log("x="+o.x,"y="+o.y);
+                       o.allowedToMoveX=true;
+                       o.allowedToMoveY=true;
+ 
                        W5Explore.node.add(o);
                        o.parentNodeDataSet=W5Explore.node;
                        o.app=W5Explore;
@@ -1013,8 +1049,7 @@ console.log("start applet with param stack=",appletname,paramstack);
    this.showDefaultDBRec=function(){
       //var out="<p>Add Object:<br><select><option>A</option><option>B</option></select><input type=text><br>xxxxhier könnte z.B. eine Suchmaske für das hinzufügen "+
       //        "von beliebigen Items stehen</p>";
-      $(dbrec).html(""); 
-      $(dbrec).append($(this.globalFunctions())); 
+      $(this.dbrec).html(""); 
       //$(dbrec).append($(out)); 
    };
 
@@ -1062,15 +1097,22 @@ console.log("start applet with param stack=",appletname,paramstack);
       this.network = new vis.Network(this.netmap, data, options);
       this.network.on("stabilized", function () {
          if (app.networkFitRequest){
-            app.network.fit({
-               animation: true
-            });
+            if (!app.networkFitRequestCanceledByUser){
+               app.network.fit({
+                  animation: true
+               });
+            }
+            $(".spinner").hide();
             app.networkFitRequest=false;
+            app.networkFitRequestCanceledByUser=false;
             app.console.log("INFO","autolayout done");
          }
          if (usephysicsonce){
             this.setOptions( { physics: false } );
          }
+      });
+      this.network.on("zoom", function (params) {
+         app.networkFitRequestCanceledByUser=true;
       });
       this.network.on("click", function (params) {
           params.event = "[original event]";
@@ -1165,7 +1207,6 @@ console.log("start applet with param stack=",appletname,paramstack);
                 });
              });
              $(dbrec).html(""); 
-             $(dbrec).append($(app.globalFunctions())); 
              $(dbrec).append($(out)); 
              $(dbrec).append(mdiv); 
              if (selectedNodes.length==1){
