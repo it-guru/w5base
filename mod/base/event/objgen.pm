@@ -161,7 +161,7 @@ EOF
       }
    }
    if (!defined($idname)){
-      for(my $c=0;$c<$#l;$c++){
+      for(my $c=0;$c<=$#l;$c++){
          if ($l[$c]->{fieldname}=~m/id$/i){
             $idname=$l[$c]->{fieldname};
             last;
@@ -169,7 +169,7 @@ EOF
       }
    }
    my @devview=qw(linenumber);
-   for(my $c=0;$c<$#l;$c++){
+   for(my $c=0;$c<=$#l;$c++){
       if (!$l[$c]->{done}){
          my ($w5name,$fldname,$tablename,$fieldlabel)=genFieldname($l[$c]);
          my $w5type="kernel::Field::Text";
@@ -221,6 +221,16 @@ sub Initialize
    my \@result=\$self->AddDatabase(DB=>new kernel::database(\$self,"${dbname}"));
    return(\@result) if (defined(\$result[0]) eq "InitERROR");
    return(1) if (defined(\$self->{DB}));
+   return(0);
+}
+
+
+
+
+sub isQualityCheckValid
+{
+   my \$self=shift;
+   my \$rec=shift;
    return(0);
 }
 

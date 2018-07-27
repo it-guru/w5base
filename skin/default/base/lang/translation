@@ -1,6 +1,7 @@
 'Linenumber'             =>{de=>'Zeile',en=>'Line'                          },
 'Data maintenences contacts' =>{de=>'Datenpflegeberechtigte'               },
 'Modification-Date'      =>{de=>'Bearbeitungszeitpunkt'                     },
+'Deletion-Date'          =>{de=>'Löschzeitpunkt'                            },
 'Modification-Date reverse'=>{de=>'Bearbeitungszeitpunkt absteigend sortiert'},
 'Creation-Date'          =>{de=>'Erstellungszeitpunkt'                      },
 'Fulltext'               =>{de=>'Volltext suche',en=>'Fulltext search'      },
