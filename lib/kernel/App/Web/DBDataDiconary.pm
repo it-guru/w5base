@@ -28,7 +28,11 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   if (!defined($param{MainSearchFieldLines})){
+      $param{MainSearchFieldLines}=4;
+   }
    my $self=bless($type->SUPER::new(%param),$type);
+
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -80,6 +84,11 @@ sub new
                 dataobjattr   =>"f.isindexed"),
 
       new kernel::Field::Text(
+                name          =>'colid',
+                label         =>'ColID',
+                dataobjattr   =>"f.colid"),
+
+      new kernel::Field::Text(
                 name          =>'schemaname',
                 align         =>'left',
                 uppersearch   =>'1',
@@ -107,6 +116,7 @@ sub getSqlFrom
        t.data_type,
        t.table_name tablename,
        t.column_name fieldname,
+       t.column_id colid,
        t.owner,
        t.data_length,
        decode(i.index_name,null,0,1) isindexed,
@@ -121,6 +131,7 @@ EOF
    if ($self->{DictionaryMode} eq "DB2"){
       $from=<<EOF;
 (select trim(tabschema)||'.'||trim(tabname)||'.'||colname fullfieldname,
+        trim(tabschema)||'.'||trim(tabname)||'.'||colname colid,
         typename data_type,
         trim(tabname) tablename,
         colname fieldname,
@@ -145,7 +156,8 @@ EOF
    table_catalog                                                  owner, 
    data_type                                                      data_type,
    NULL                                                           isindexed,
-   character_maximum_length                                       data_length
+   character_maximum_length                                       data_length,
+   lower( table_catalog+'.'+table_name+'.'+column_name)           fieldid
 from information_schema.columns) f
 EOF
    }
@@ -153,6 +165,18 @@ EOF
 
 
    return($from);
+}
+
+sub initSearchQuery
+{
+   my $self=shift;
+
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   if ($self->{DB}->{dbschema} ne ""){
+      if (!defined(Query->Param("search_schemaname"))){
+         Query->Param("search_schemaname"=>$self->{DB}->{dbschema});
+      }
+   }
 }
 
 
