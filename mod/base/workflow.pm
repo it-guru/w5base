@@ -1758,12 +1758,33 @@ sub Validate
    }
    ######################################################################
  
-   if ($stateid>1){
+   if (defined($oldrec) && $stateid>1){
       if ($oldrec->{autocopymode} ne ""){
          $newrec->{autocopymode}=undef;
       }
       if ($oldrec->{autocopydate} ne ""){
          $newrec->{autocopydate}=undef;
+      }
+   }
+   if (defined($oldrec) && $stateid>20){
+      my $eventstart=effVal($oldrec,$newrec,"eventstart");
+      my $eventend=effVal($oldrec,$newrec,"eventend");
+      if ($eventend eq ""){   # need to create a dynamic eventend!!!
+         my $closedate=effVal($oldrec,$newrec,"closedate");
+         printf STDERR ("DEBUG: eventend fixup on '%s' done\n",$oldrec->{id});
+         if ($closedate ne ""){
+            $newrec->{eventend}=$closedate;
+         }
+         else{
+            $newrec->{eventend}=NowStamp("en");
+         }
+      }
+      if ($eventstart eq ""){   # need to create a dynamic eventstart!!!
+         printf STDERR ("DEBUG: eventstart fixup on '%s' done\n",$oldrec->{id});
+         my $createdate=effVal($oldrec,$newrec,"createdate");
+         if ($createdate ne ""){
+            $newrec->{eventstart}=$createdate;
+         }
       }
    }
 
