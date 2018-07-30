@@ -10,3 +10,5 @@
 'Contracts'=>{de=>'Verträge'},
 'Deputy Manager'=>{de=>'Manager Vetreter'},
 'Systems'=>{de=>'Systeme'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+

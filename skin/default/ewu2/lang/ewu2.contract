@@ -6,3 +6,5 @@
 'Fullname'=>{de=>'Vertragsbezeichnung'},
 'Deputy Owner'=>{de=>'Eigentümer Vertreter'},
 'Owner'=>{de=>'Eigentümer'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+

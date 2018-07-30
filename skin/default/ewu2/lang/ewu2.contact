@@ -6,5 +6,5 @@
 'Givenname'=>{ de=>'Vorname'},
 'Phonenumber'=>{ de=>'Telefonnummer'},
 'Phonenumber 2'=>{ de=>'Telefonnummer 2'},
-'Deleted'=>{ de=>'gelöscht markiert'},
+'marked as delete'=>{de=>'gelöscht markiert'},
 

@@ -73,7 +73,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'deleted',
                 htmldetail    =>0,
-                label         =>"Deleted",
+                label         =>"marked as delete",
                 dataobjattr   =>"decode(\"CONTACTS\".\"DELETED_AT\",NULL,0,1)"),
 
       new kernel::Field::Email(

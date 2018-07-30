@@ -4,4 +4,5 @@
 },
 'Contract name'=>{de=>'Vertragsbezeichnung'},
 'Project name'=>{de=>'Projektbezeichnung'},
+'System status'=>{de=>'Systemstatus'},
 

@@ -60,6 +60,21 @@ sub new
                 vjoindisp     =>'name',
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".".
                                 "\"UNAME\""),
+
+      new kernel::Field::Text(
+                name          =>'systemstatus',
+                label         =>"System status",
+                dataobjattr   =>"\"COMPUTER_SYSTEMS\".".
+                                "\"STATUS\""),
+
+      new kernel::Field::Boolean(
+                name          =>'systemdeleted',
+                label         =>"system marked as delete",
+                htmldetail    =>0,
+                dataobjattr   =>"decode(\"COMPUTER_SYSTEMS\".".
+                                "\"DELETED_AT\",NULL,0,1)"),
+
+
       new kernel::Field::TextDrop(
                 name          =>'contractname',
                 label         =>"Contract name",

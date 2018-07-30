@@ -108,7 +108,8 @@ sub new
                 group         =>'systems',
                 vjointo       =>'ewu2::lnksystemcontract',
                 vjoinon       =>['id'=>'devlabprojectid'],
-                vjoindisp     =>[qw(systemname contractname)]),
+                vjoinbase     =>{systemdeleted=>\'0'},
+                vjoindisp     =>[qw(systemname systemstatus contractname)]),
 
       new kernel::Field::CDate(
                 name          =>'cdate',

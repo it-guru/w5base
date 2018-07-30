@@ -54,6 +54,10 @@ sub Init
                       "ewu2::ipaddress",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.EWU2.asset",
+                      "ewu2::asset",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.EWU2.kernel",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);

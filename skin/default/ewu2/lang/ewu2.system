@@ -4,6 +4,8 @@
 },
 'fieldgroup.backup'=>{de=>'Backup Informationen',en=>'Backup informations'},
 'fieldgroup.sysdata'=>{de=>'Systemdaten',en=>'Sysdata'},
+'fieldgroup.asset'=>{de=>'Asset',en=>'Asset'},
+'fieldgroup.virtualisation'=>{de=>'Virtualisierung',en=>'Virtualisation'},
 'fieldgroup.contracts'=>{de=>'Verträge',en=>'Contracts'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'IP-Adresses'=>{de=>'IP-Adressen'},
@@ -13,5 +15,7 @@
 'system type'=>{de=>'Systemtyp'},
 'Description'=>{de=>'Beschreibung'},
 'Notes'=>{de=>'Notizen'},
-'full unique systemname'=>{de=>'vollständiger Systemname'},
+'full systemname'=>{de=>'vollständiger Systemname'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+'virtualisation Host'=>{de=>'Virtualisierungs Host'},
 

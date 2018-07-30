@@ -45,12 +45,21 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                label         =>"full unique systemname",
+                label         =>"full systemname",
                 ignorecase    =>1,
                 htmldetail    =>0,
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"UNAME\" || ' (' || ".
                                 "\"COMPUTER_SYSTEMS\".\"COMPUTER_SYSTEM_ID\" ".
                                 "||')'"),
+
+      new kernel::Field::Text(
+                name          =>'typedfullname',
+                label         =>"full systemname",
+                nowrap        =>1,
+                uivisible     =>0,
+                dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"UNAME\" || ' (' || ".
+                                "\"COMPUTER_SYSTEMS\".\"COMPUTER_SYSTEM_ID\" ".
+                                "||') ' || \"COMPUTER_SYSTEMS\".\"TYPE\""),
 
       new kernel::Field::Text(
                 name          =>'systemname',
@@ -68,6 +77,13 @@ sub new
                 name          =>'type',
                 label         =>"system type",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"TYPE\""),
+
+      new kernel::Field::Boolean(
+                name          =>'deleted',
+                label         =>"marked as delete",
+                htmldetail    =>0,
+                dataobjattr   =>"decode(\"COMPUTER_SYSTEMS\".".
+                                "\"DELETED_AT\",NULL,0,1)"),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
@@ -115,6 +131,15 @@ sub new
                 label         =>"Cluster Cs Id",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"CLUSTER_CS_ID\""),
 
+      new kernel::Field::TextDrop(
+                name          =>'vhostname',
+                label         =>"virtualisation Host",
+                group         =>'virtualisation',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'ewu2::system',
+                vjoinon       =>['hostingcsid'=>'id'],
+                vjoindisp     =>'typedfullname'),
+
       new kernel::Field::Link(
                 name          =>'hostingcsid',
                 label         =>"Hosting Cs Id",
@@ -124,7 +149,17 @@ sub new
                 name          =>'vmvirtualisationtype',
                 label         =>"Virtualisation Type",
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"VM_VIRTUALISATION_TYPE\""),
+                dataobjattr   =>"\"COMPUTER_SYSTEMS\".".
+                                "\"VM_VIRTUALISATION_TYPE\""),
+
+      new kernel::Field::SubList(
+                name          =>'vsystems',
+                label         =>'virtual systems',
+                group         =>'virtualisation',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'ewu2::system',
+                vjoinon       =>['id'=>'hostingcsid'],
+                vjoindisp     =>[qw(typedfullname status osrelease)]),
 
       new kernel::Field::Text(
                 name          =>'osrelease',
@@ -177,6 +212,15 @@ sub new
                 group         =>'sysdata',
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"HOSTID\""),
+
+      new kernel::Field::TextDrop(
+                name          =>'asset',
+                label         =>"Asset",
+                group         =>'asset',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'ewu2::asset',
+                vjoinon       =>['physicalelementid'=>'id'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Text(
                 name          =>'operatedby',
@@ -263,7 +307,8 @@ sub new
 
    );
    $self->{use_distinct}=0;
-   $self->setDefaultView(qw(systemname type status osrelease platform domain));
+   $self->setDefaultView(qw(systemname type status osrelease 
+                            vhostname asset));
    $self->setWorktable("\"COMPUTER_SYSTEMS\"");
    return($self);
 }
@@ -296,7 +341,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","sysdata","ipaddresses","contacts",
+   return("header","default","sysdata","virtualisation",
+          "asset","ipaddresses","contacts",
           "backup","contracts","source");
 }
 
@@ -315,9 +361,10 @@ sub isQualityCheckValid
 sub initSearchQuery
 {
    my $self=shift;
-   if (!defined(Query->Param("search_status"))){
-     Query->Param("search_status"=>'up');
+   if (!defined(Query->Param("search_deleted"))){
+     Query->Param("search_deleted"=>$self->T("no"));
    }
+
 }
 
 

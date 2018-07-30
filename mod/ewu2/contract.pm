@@ -100,7 +100,8 @@ sub new
                 group         =>'systems',
                 vjointo       =>'ewu2::lnksystemcontract',
                 vjoinon       =>['id'=>'devlabcontractid'],
-                vjoindisp     =>[qw(systemname)]),
+                vjoinbase     =>{systemdeleted=>\'0'},
+                vjoindisp     =>[qw(systemname systemstatus )]),
 
       new kernel::Field::Text(
                 name          =>'servicelevel',
