@@ -33,6 +33,10 @@ sub new
       $self->{WSDLfieldType}="SubListRecordArray";
    }
    $self->{Sequence}=0;
+   $self->{vjoinedit}=$self->{vjointo};
+   if (ref($self->{vjoinedit}) eq "SCALAR"){
+      $self->{vjoinedit}=${$self->{vjoinedit}};
+   }
    return($self);
 }
 
@@ -70,7 +74,21 @@ sub EditProcessor
    foreach my $v (keys(%forceparam)){
       Query->Param($v=>$forceparam{$v});
    }
-   $dfield->vjoinobj->HandleSubListEdit(subeditmsk=>$dfield->{subeditmsk});
+
+   #
+   # this makes problems with findNearest if template is not in derivations
+   #
+   # $dfield->vjoinobj->HandleSubListEdit(
+   #    subeditmsk=>$dfield->{subeditmsk}
+   # );
+   my $dataobjname;
+   if (exists($self->{vjoinedit}) && $self->{vjoinedit} ne ""){
+      $dataobjname=$self->{vjoinedit};
+   }
+   my $do=$self->getParent->getPersistentModuleObject($dataobjname);
+   $do->HandleSubListEdit(subeditmsk=>$dfield->{subeditmsk});
+
+
 
    $app->SetFilter({$app->IdField->Name()=>$id});
    $app->SetCurrentView($field);
