@@ -100,7 +100,8 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   my $newCIDataboss='12808977330001'; # Marek M.
+   #my $newCIDataboss='12808977330001'; # Marek M.
+   my $newCIDataboss='15301885190001'; # (fmb_tel-it_sacm_sap@t-systems.com)
    my $sapAdminGroup='14462097390001';
 
    my @sapAdmins=$dataobj->getMembersOf($sapAdminGroup);
