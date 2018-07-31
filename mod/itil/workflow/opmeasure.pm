@@ -50,9 +50,11 @@ sub getDynamicFields
    my @bk=($self->InitFields(
       new kernel::Field::Date(    name          =>'plannedstart',
                                   label         =>'planned start',
+                                  htmleditwidth =>'100%',
                                   group         =>'extopmeadesc',
                                   container     =>'headref'),
       new kernel::Field::Date(    name          =>'plannedend',
+                                  htmleditwidth =>'100%',
                                   label         =>'planned end',
                                   group         =>'extopmeadesc',
                                   container     =>'headref'),
@@ -533,10 +535,15 @@ sub generateWorkspace
 
 
    my $nextstart=$self->getParent->getParent->T("NEXTSTART","base::workflow");
+   my $t1=$self->getParent->getParent->T("planned timerange",
+                $self->getParent->Self);
    my $assignlabel=$self->getParent->getParent->T("assign measure to",
                    $self->getParent->Self);
    my $secial=$self->getParent->getSpecificDataloadForm();
    my $templ=<<EOF;
+<style>
+
+</style>
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
 <tr>
 <td class=fname width=20%>%name(label)%:</td>
@@ -560,7 +567,7 @@ setEnterSubmit(document.forms[0],"NextStep");
 <table border=0 cellspacing=0 cellpadding=0>
 <tr>
 <td class=finput>$d</td>
-<td class=fname>%plannedstart(label)%:</td>
+<td class=fname>${t1}:</td>
 <td class=finput>%plannedstart(detail)%</td>
 <td>-</td>
 <td class=finput>%plannedend(detail)%</td>

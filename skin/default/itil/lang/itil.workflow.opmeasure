@@ -3,8 +3,40 @@
 'Initiate request to businessteam'=>{de=>'Auftrag an den Anwendungsbetrieb initieren'},
 'Initiate developer request'=>{de=>'Auftrag an die Entwicklung initieren'},
 'Initiate operation measure'=>{de=>'Betriebs-Maßnahme ableiten'},
-'itil::workflow::opmeasure::tip'=>{de=>'Mit diesem Workflow können innerhalb einer Applikation Aufgaben und Maßnahmen zugewiesen und überwacht werden. Das Erstellen der Maßnahme kann nur durch steuernde Rollen (AM, TSM, OPM und dessen Vertreter)  der jeweiligen Anwendung durchgeführt werden.<br>Dieser Workflow kann als alternative zur Dokumentation eines Changes verwendet werden, wenn keinerlei Abstimmungsaufwand zur Durchführung dieser Maßnahme notwendig ist.',
-en=>'With this workflow you can assign and supervise tasks and measures within an application. A measure can only be created by a steering role of a particular application (AM, TSM, OPM and their deputies).'},
+'itil::workflow::opmeasure::tip'=>{de=>'<br>
+Ein Betriebsmaßnahmen-Workflow dient zur Dokumentation von Änderungen und Anpassungen im Anwendungsumfeld.<br>Das Erstellen der Maßnahme kann nur durch steuernde Rollen (AM, TSM, OPM und dessen Vertreter) der jeweiligen Anwendung durchgeführt werden.<br>
+<br><br>
+Ein Betriebsmaßnahmen-Workflow darf als alternative für einen "Change" verwendet werden, wenn alle die folgenden Punkte erfüllt sind:<br><br>
+<ul>
+<li>  Es ist primär nur EINE Anwendung von der Maßnahme betroffen.
+<li>  Es sind keine tooltechnischen (Maßnahmen-Workflow) Abstimmungen mit u.U. weiteren betroffenen Personenkreisen notwendig.
+<li>  Wenn mehrere Maßnahmen aufeinander Auswirkungen haben können, so sind diese im Workflow miteinander zu verknüpfen (Workflow-Relationen).
+<li>  Die Maßnahme ist VOR Beginn im Tool zu dokumentieren.
+<li>  Kollisionsprüfung zu anderen Changes, Change-Freezes oder Maßnahmen wurde eigenverantwortlich im Vorfeld durchgeführt.
+</ul><br>
+<br>
+Generell ist es so, dass Maßnahmen initial nur an Personen im direkten Umfeld der betroffenen Anwendung zugewiesen werden können (dies ist bereits vom Workflow so vorgegeben).<br>
+<br>
+Die Dokumentation von Maßnahmen stellt keine Absicherung gegen mögliche Incidents dar. In einer Maßnahmen muss beschrieben sein/werden, das alle notwendigen Schritte für einen sicheren und bestmöglichen Betriebsablauf durchgeführt wurden.
+<br>
+',
+en=>'<br>
+An operational measures workflow is used to document changes and adjustments in the application environment.<br>The task can only be created by controlling roles (AM, TSM, OPM and their deputies) of the respective application.<br>
+<br><br>
+An operational action workflow can be used as an alternative for a "Change" if all of the following points are fulfilled:<br><br>
+<ul>
+<li>  Only ONE application is primarily affected by the measure.
+<li>  There are no tool-technical (measure workflow) reconciliations with other affected persons may be necessary.
+<li>  If several tasks can affect each other, they must be linked in the workflow (workflow relations).
+<li>  The measure must be documented in the tool BEFORE commencement.
+<li>  Collision check for other changes, change frequencies or measures was carried out independently in advance.
+</ul><br>
+<br>
+Generell ist es so, dass Maßnahmen initial nur an Personen im direkten Umfeld der betroffenen Anwendung zugewiesen werden können (dies ist bereits vom Workflow so vorgegeben).<br>
+<br>
+Die Dokumentation von Maßnahmen stellt keine Absicherung gegen mögliche Incidents dar. In einer Maßnahmen muss beschrieben sein/werden, das alle notwendigen Schritte für einen sicheren und bestmöglichen Betriebsablauf durchgeführt wurden.
+<br>
+'},
 'assign measure to'=>{de=>'Maßnahme zuweisen an'},
 'derivation'=>{de=>'Ableitung'},
 'REV.derivation'=>{de=>'Abgeleitet von'},
@@ -16,3 +48,4 @@ en=>'With this workflow you can assign and supervise tasks and measures within a
 'planned end must be behind planned start'=>{de=>'Geplantes Ende muss nach dem geplanten Begin liegen'},
 'it is not allowed to delete this entry'=>{de=>'Es ist nicht erlaubt, diesen Eintrag zu löschen'},
 'planned start must can not be befor workflow start'=>{de=>'Geplanter Beginn kann nicht vor Workflow-Start liegen'},
+'planned timerange'=>{de=>'geplannter Zeitraum'},
