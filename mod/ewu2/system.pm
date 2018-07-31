@@ -199,8 +199,9 @@ sub new
                 label         =>"CPU Cores Total",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"CPU_CORES_TOTAL\""),
 
-      new kernel::Field::Text(
-                name          =>'memory',
+      new kernel::Field::Text(   # Feld ist nicht verwendbar, da der Inhalt
+                name          =>'memory',  # manchmal MB und manchmal GB sind
+                uivisible     =>0,  
                 group         =>'sysdata',
                 label         =>"Memory",
                 unit          =>'MB',
@@ -283,24 +284,28 @@ sub new
                 name          =>'dlicensedate',
                 label         =>"License Date",
                 uivisible     =>0,
+                timezone      =>'CET',
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"LICENSE_DATE\""),
 
       new kernel::Field::Date(
                 name          =>'cdate',
                 group         =>'source',
+                timezone      =>'CET',
                 label         =>"Creation-Date",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"CREATED_AT\""),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
+                timezone      =>'CET',
                 label         =>"Modification-Date",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"UPDATED_AT\""),
 
       new kernel::Field::Date(
                 name          =>'ddate',
                 group         =>'source',
+                timezone      =>'CET',
                 uivisible     =>0,
                 label         =>"Deletion-Date",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"DELETED_AT\""),

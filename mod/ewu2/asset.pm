@@ -149,6 +149,7 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'dcommissionedat',
+                timezone      =>'CET',
                 uivisible     =>0,
                 label         =>"Commissioned At",
                 dataobjattr   =>"\"PHYSICAL_ELEMENTS\".\"COMMISSIONED_AT\""),
@@ -162,18 +163,21 @@ sub new
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
+                timezone      =>'CET',
                 label         =>"Creation-Date",
                 dataobjattr   =>"\"PHYSICAL_ELEMENTS\".\"CREATED_AT\""),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
+                timezone      =>'CET',
                 label         =>"Modification-Date",
                 dataobjattr   =>"\"PHYSICAL_ELEMENTS\".\"UPDATED_AT\""),
 
       new kernel::Field::Date(
                 name          =>'ddate',
                 group         =>'source',
+                timezone      =>'CET',
                 htmldetail    =>'NotEmpty',
                 label         =>"Deletion-Date",
                 dataobjattr   =>"\"PHYSICAL_ELEMENTS\".\"DELETED_AT\""),

@@ -114,18 +114,21 @@ sub new
       new kernel::Field::CDate(
                 name          =>'cdate',
                 label         =>"Creation-Date",
+                timezone      =>'CET',
                 group         =>'source',
                 dataobjattr   =>"\"PROJECTS\".\"CREATED_AT\""),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 label         =>"Modification-Date",
+                timezone      =>'CET',
                 group         =>'source',
                 dataobjattr   =>"\"PROJECTS\".\"UPDATED_AT\""),
 
       new kernel::Field::Date(
                 name          =>'ddate',
                 label         =>"Deletion-Date",
+                timezone      =>'CET',
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"\"PROJECTS\".\"DELETED_AT\""),
 

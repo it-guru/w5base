@@ -133,18 +133,21 @@ sub new
       new kernel::Field::CDate(
                 name          =>'cdate',
                 label         =>"Creation-Date",
+                timezone      =>'CET',
                 group         =>'source',
                 dataobjattr   =>"\"CONTACTS\".\"CREATED_AT\""),
 
       new kernel::Field::CDate(
                 name          =>'mdate',
                 label         =>"Modification-Date",
+                timezone      =>'CET',
                 group         =>'source',
                 dataobjattr   =>"\"CONTACTS\".\"UPDATED_AT\""),
 
       new kernel::Field::Date(
                 name          =>'ddeletedat',
                 group         =>'source',
+                timezone      =>'CET',
                 label         =>"Deletion-Date",
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"\"CONTACTS\".\"DELETED_AT\""),
