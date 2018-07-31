@@ -94,7 +94,26 @@ sub Validate
             return(0);
          }
       }
+      my $eventstart=effVal($oldrec,$newrec,"eventstart"); 
+      my $eventend=effVal($oldrec,$newrec,"eventend"); 
+      if ($plannedstart ne "" && $eventstart ne $plannedstart){
+         $newrec->{eventstart}=$plannedstart;
+      }
+      if ($plannedend ne "" && $eventend ne $plannedend){
+         $newrec->{eventend}=$plannedend;
+      }
    }
+   if (exists($newrec->{plannedstart}) && $newrec->{plannedstart} ne ""){
+      my $plannedstart=effVal($oldrec,$newrec,"plannedstart"); 
+      my $createdate=effVal($oldrec,$newrec,"createdate"); 
+      my $d=CalcDateDuration($plannedstart,$createdate);
+      if (!defined($d) || $d->{totalminutes}>1.0){
+         $self->LastMsg(ERROR,
+            "planned start must can not be befor workflow start");
+         return(0);
+      }
+   }
+   
    foreach my $fld (qw(plannedstart plannedend)){
       if (defined($oldrec) &&
           $oldrec->{$fld} ne ""){
@@ -542,7 +561,9 @@ setEnterSubmit(document.forms[0],"NextStep");
 <tr>
 <td class=finput>$d</td>
 <td class=fname>%plannedstart(label)%:</td>
-<td colspan=3 class=finput>%plannedstart(detail)%</td>
+<td class=finput>%plannedstart(detail)%</td>
+<td>-</td>
+<td class=finput>%plannedend(detail)%</td>
 </tr>
 </table>
 </td>
