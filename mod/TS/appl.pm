@@ -138,6 +138,12 @@ sub new
                 label         =>'ICTO internal ID',
                 dataobjattr   =>'appl.ictoid'),
 
+      new kernel::Field::Text(
+                name          =>'ciamapplid',
+                group         =>'misc',
+                label         =>'CIAM ApplicationID',
+                dataobjattr   =>'appl.ciamapplid'),
+
       new kernel::Field::Select(
                 name          =>'controlcenter',
                 group         =>'monisla',

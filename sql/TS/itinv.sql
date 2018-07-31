@@ -7,3 +7,4 @@ alter table system add acinmassignmentgroupid bigint(20), add scapprgroupid bigi
 alter table asset add acinmassignmentgroupid bigint(20), add scapprgroupid bigint(20);
 alter table campus add acinmassignmentgroupid bigint(20);
 alter table itclust add acinmassignmentgroupid bigint(20);
+alter table appl add ciamapplid varchar(40);
