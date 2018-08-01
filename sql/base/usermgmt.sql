@@ -443,3 +443,4 @@ create table grpindivfld (
   KEY name (dataobject,grpview),unique(grpview,name),
   FOREIGN KEY (grpview) REFERENCES grp (grpid) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table grpindivfld add directonly int(1) default '0';

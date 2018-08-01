@@ -1,4 +1,4 @@
-package itil::grpindivappl;
+package base::grpindivworkflow;
 #  W5Base Framework
 #  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
@@ -28,17 +28,17 @@ sub new
    my %param=@_;
 
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->setWorktable("grpindivappl");
-   $self->{grpindivLinkSQLIdField}='appl.id';
+   $self->setWorktable("grpindivwfhead");
+   $self->{grpindivLinkSQLIdField}='wfhead.wfheadid';
    $self->AddStandardFields();
    $self->AddFields(
       new kernel::Field::TextDrop(
                 name          =>'dataobjname',
-                label         =>'Application',
-                weblinkto     =>'itil::appl',
+                label         =>'Workflow',
+                weblinkto     =>'base::workflow',
                 weblinkon     =>['dataobjid'=>'id'],
                 readonly      =>1,
-                dataobjattr   =>'appl.name'),
+                dataobjattr   =>'wfhead.shortdescription'),
    );
 
    $self->setDefaultView(qw(fieldname dataobjname indivfieldvalue mdate));
@@ -50,6 +50,8 @@ sub getSqlFrom
 {
    my $self=shift;
    my $mode=shift;
+   my @filter=@_;
+
 
    my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
 
@@ -57,23 +59,65 @@ sub getSqlFrom
    my $dids=join(",",map({$_->{grpid}} 
                      grep({$_->{distance} eq "0"} 
                      values(%groups))));
-   if ($dids eq ""){
-      $dids="-99";
-   }
+
    if ($ids eq ""){
       $ids="-99";
    }
-   my $from.="appl ".
+   if ($dids eq ""){
+      $dids="-99";
+   }
+
+   my $from.="wfhead ".
           "join grpindivfld ".
-          "on grpindivfld.dataobject='itil::appl' and ".
+          "on grpindivfld.dataobject='base::workflow' and ".
           "((grpindivfld.grpview in ($ids) and grpindivfld.directonly='0') or ".
           "(grpindivfld.grpview in ($dids) and grpindivfld.directonly='1')) ".
-          "left outer join grpindivappl ".
-          "on (appl.id=grpindivappl.dataobjid ".
-          " and grpindivappl.grpindivfld=grpindivfld.id)";
+          "left outer join grpindivwfhead ".
+          "on (wfhead.wfheadid=grpindivwfhead.dataobjid ".
+          " and grpindivwfhead.grpindivfld=grpindivfld.id)";
 
    return($from);
 }
 
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+   my $where="";
+
+   # due preformance problems with join of wfhead table, it is
+   # need to add a where on wfhead.wfheadid on direct record access
+
+   if ($mode eq "select"){
+      foreach my $subf (@filter){
+         my @fl=($subf);
+         if (ref($subf) eq "ARRAY"){
+            @fl=@$subf;
+         }
+         foreach my $f (@fl){
+            if (ref($f) eq "HASH"){
+               if (exists($f->{id}) && $f->{id}=~m/^\d+_\d+$$/){
+                  $f->{id}=[$f->{id}];
+               }
+               if (exists($f->{id}) && ref($f->{id}) eq "SCALAR"){
+                  $f->{id}=[${$f->{id}}];
+               }
+               if (exists($f->{id}) && ref($f->{id}) eq "ARRAY"){
+                  my @wfheadid=map({
+                     my ($wfheadid)=$_=~m/^(\d+)_/;
+                     $wfheadid;
+                  } @{$f->{id}});
+                  if ($where ne ""){
+                     $where.=" or ";
+                  }
+                  $where.="wfhead.wfheadid in (".join(",",@wfheadid).")";
+               }
+            }
+         }
+      }
+   }
+   return($where);
+}
 
 1;

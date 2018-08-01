@@ -52,8 +52,12 @@ sub new
                    my $app=$self->getParent;
                    my @l;
                    push(@l,"","");
-                   push(@l,"itil::appl",$app->T("itil::appl","itil::appl"));
-                   push(@l,"itil::system",$app->T("itil::system","itil::system"));
+                   push(@l,"itil::appl",
+                           $app->T("itil::appl","itil::appl"));
+                   push(@l,"itil::system",
+                           $app->T("itil::system","itil::system"));
+                   push(@l,"base::workflow",
+                           $app->T("base::workflow","base::workflow"));
                    return(@l);
                 }, 
                 dataobjattr   =>'grpindivfld.dataobject'),
@@ -68,6 +72,11 @@ sub new
                 label         =>'Groupname',
                 vjoinon       =>['grpidview'=>'grpid'],
                 vjoindisp     =>'fullname'),
+
+      new kernel::Field::Boolean(
+                name          =>'directonly',
+                label         =>'only direct members',
+                dataobjattr   =>'grpindivfld.directonly'),
 
       new kernel::Field::Interface(
                 name          =>'grpidview',

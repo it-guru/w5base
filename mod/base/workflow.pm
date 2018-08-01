@@ -812,6 +812,17 @@ sub new
                 group         =>'state',
                 label         =>'auto copy mode',
                 dataobjattr   =>'wfhead.acopymode'),
+
+      new kernel::Field::SubList(
+                name          =>'individualAttr',
+                label         =>'individual attributes',
+                group         =>'individualAttr',
+                allowcleanup  =>1,
+                forwardSearch =>1,
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'base::grpindivworkflow',
+                vjoinon       =>['id'=>'srcdataobjid'],
+                vjoindisp     =>['fieldname','indivfieldvalue']),
                                   
       new kernel::Field::Date(
                 name          =>'autocopydate',
@@ -859,6 +870,9 @@ sub new
       update=>[
          'local'
       ]
+   };
+   $self->{individualAttr}={
+      dataobj=>'base::grpindivworkflow'
    };
    return($self);
 }
@@ -1439,7 +1453,7 @@ sub isViewValid
    my @grplist=(@addgroups,
                 $self->{SubDataObj}->{$rec->{class}}->isViewValid($rec));
    push(@grplist,"qc");
-   return(@grplist);
+   return(@grplist,"individualAttr");
 }
 
 sub InitCopy
@@ -1970,7 +1984,8 @@ sub getDetailBlockPriority
       @preblk=grep(!/^$blk$/,@preblk);
       @postblk=grep(!/^$blk$/,@postblk);
    }
-   return(@preblk,@sub,@postblk);
+   
+   return(@preblk,@sub,@postblk,"individualAttr");
 }
 
 

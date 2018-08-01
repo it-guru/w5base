@@ -93,3 +93,5 @@
 'auto copy mode'=>{de=>'Automatisches Scheduling',en=>'auto scheduling'},
 'last workflow copy at'=>{de=>'letzter Scheduling Zeitpunkt'},
 'no action log entry'=>{de=>'--- noch kein Eintrag ---'},
+'individual attributes'=>{de=>'individuelle Attribute'},
+'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},

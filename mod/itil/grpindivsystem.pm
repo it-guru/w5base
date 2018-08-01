@@ -52,14 +52,21 @@ sub getSqlFrom
    my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
 
    my $ids=join(",",keys(%groups));
+   my $dids=join(",",map({$_->{grpid}} 
+                     grep({$_->{distance} eq "0"} 
+                     values(%groups))));
 
    if ($ids eq ""){
       $ids="-99";
    }
+   if ($dids eq ""){
+      $dids="-99";
+   }
    my $from.="system ".
           "join grpindivfld ".
           "on grpindivfld.dataobject='itil::system' and ".
-          "grpindivfld.grpview in ($ids)  ".
+          "((grpindivfld.grpview in ($ids) and grpindivfld.directonly='0') or ".
+          "(grpindivfld.grpview in ($dids) and grpindivfld.directonly='1')) ".
           "left outer join grpindivsystem ".
           "on (system.id=grpindivsystem.dataobjid ".
           " and grpindivsystem.grpindivfld=grpindivfld.id)";

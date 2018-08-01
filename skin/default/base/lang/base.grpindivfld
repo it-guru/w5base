@@ -1,5 +1,6 @@
 'base::grpindivfld'=>{de=>'Team/Gruppe individual Attribut',en=>'Team/Group inividiual attribute'},
 'Groupname'=>{de=>'Gruppe'},
+'only direct members'=>{de=>'sichtbar nur für direkte Mitglieder'},
 'link attribut to Data-Object'=>{de=>'Attribut binden an Datenobjekt'},
 'Attribut label'=>{de=>'Attribut-Bezeichnung'},
 'you have no right, to edit individual fields in selected group'=>{de=>'Sie haben kein Recht, individual Felder für die angebene Gruppe zu bearbeiten'},
