@@ -1463,7 +1463,12 @@ sub CreateSubTip
    delete($qhash->{NextStep});
    delete($qhash->{SaveStep});
    my $qhash=new kernel::cgi($qhash);
-   my $openquery={OpenURL=>"$ENV{SCRIPT_URI}?".$qhash->QueryString()};
+   my $OpenURL="$ENV{SCRIPT_URI}?".$qhash->QueryString();
+   if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+      $OpenURL=~s/^http:/https:/i;
+      $url=~s/^http:/https:/i;
+   }
+   my $openquery={OpenURL=>$OpenURL};
    my $queryobj=new kernel::cgi($openquery);
    $url.="?".$queryobj->QueryString();
    $url=~s/\%/\\\%/g;
