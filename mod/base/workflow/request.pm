@@ -1650,16 +1650,6 @@ sub PostProcess
                            workflowname=>$workflowname,
                            sendercc=>1);
    }
-   if ($action eq "SaveStep.wfforward" ||
-       $action eq "SaveStep.wfreprocess"){
-      $aobj->NotifyForward($WfRec->{id},
-                           $param{fwdtarget},
-                           $param{fwdtargetid},
-                           $param{fwdtargetname},
-                           $param{note},
-                           workflowname=>$workflowname,
-                           sendercc=>1);
-   }
    if ($action eq "SaveStep.wfreject" ||
        $action eq "SaveStep.wffineproc" ||
        $action eq "SaveStep.wfacceptp" ||
