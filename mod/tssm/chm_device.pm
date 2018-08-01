@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tssm::lib::io;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -31,24 +32,88 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name       =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
 
-      new kernel::Field::Id(        name       =>'changenumber',
-                                    label      =>'Change No.',
-                                    align      =>'left',
-                                    dataobjattr=>'cm3ra25.numberprgn'),
+      new kernel::Field::Id(        
+                name          =>'lnkid',
+                label         =>'LnkID',
+                htmldetail    =>0,
+                dataobjattr   =>SELpref."cm3ra10.dh_number || '-' || ".
+                                SELpref."cm3ra10.record_number"),
 
-      new kernel::Field::Text(      name       =>'name',
-                                    label      =>'Device/System',
-                                    dataobjattr=>'cm3ra25.affected_device'),
+      new kernel::Field::Text(        
+                name          =>'changenumber',
+                label         =>'Change No.',
+                align         =>'left',
+                dataobjattr   =>SELpref.'cm3ra10.dh_number'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Device/System',
+                uppersearch   =>1,
+                dataobjattr   =>SELpref.'cm3ra10.tsi_ci_name'),
+
+      new kernel::Field::Boolean(
+                name          =>'civalid',
+                group         =>'dst',
+                label         =>'Valid',
+                translation   =>'tssm::lnk',
+                nowrap        =>1,
+                dataobjattr   =>
+                  "decode(".SELpref."device2m1.ci_name,NULL,0,1)"
+                ),
+
+     new kernel::Field::Text(
+                name          =>'dstsmid',
+                group         =>'dst',
+                label         =>'Destination-SMID',
+                dataobjattr   =>SELpref."device2m1.logical_name"),
+
+     new kernel::Field::Text(
+                name          =>'dstmodel',
+                group         =>'dst',
+                label         =>'Destination-Model',
+                dataobjattr   =>SELpref."device2m1.type"),
+
+      new kernel::Field::Text(
+                name          =>'dstobj',
+                group         =>'amdst',
+                label         =>'Destination-AMObj',
+                dataobjattr   =>getAMObjDecode( SELpref."device2m1.type")),
+
+      new kernel::Field::MDate(
+                name         =>'mdate',
+                label        =>'Modification-Date',
+                uppersearch  =>1,
+                dataobjattr  =>SELpref.'cm3ra10.sysmodtime'),
    );
-   $self->{use_distinct}=1;
+   $self->{use_distinct}=0;
 
 
-   $self->setDefaultView(qw(linenumber changenumber name));
+   $self->setDefaultView(qw(linenumber changenumber name civalid dstmodel dstobj mdate));
    return($self);
 }
+
+
+
+
+sub getAMObjDecode
+{
+   my $depend=shift;
+
+   return(
+          "decode($depend,".
+               "'application','tsacinv::appl',".
+               "'computer','tsacinv::system',".
+               "'generic','tsacinv::asset',".
+               "'runningsoftware','tsacinv::swinstance',".
+               "NULL)"
+       );
+}
+
+
 
 sub Initialize
 {
@@ -64,14 +129,17 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="cm3ra25";
+   my $from=TABpref."cm3ra10 ".SELpref."cm3ra10 ".
+         "left outer join ".TABpref."device2m1 ".SELpref."device2m1 ".
+         "on ".SELpref."cm3ra10.tsi_ci_name=".SELpref."device2m1.ci_name";
    return($from);
 }
+
 
 sub initSqlWhere
 {
    my $self=shift;
-   my $where="not cm3ra25.affected_device is null";
+   my $where="not ".SELpref."cm3ra10.tsi_ci_name is null";
    return($where);
 }
 
