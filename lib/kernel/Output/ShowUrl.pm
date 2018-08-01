@@ -129,8 +129,10 @@ sub ProcessHead
    $bmlink.="?".$query if ($query ne "");
    $url.="?".$query if ($query ne "");
 
+   my $uri=$ENV{SCRIPT_URI};
    if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
       $url=~s/^http:/https:/i;
+      $uri=~s/^http:/https:/i;
    }
 
 
@@ -175,7 +177,7 @@ data structures in W5Base.<br>
 </div>
 <div class=winframe style="width:100%;overflow:auto;margin:5px;padding:2px">
 <b>URI:</b>
-<XMP style='margin:0;padding:0'>$ENV{SCRIPT_URI}</xmp>
+<XMP style='margin:0;padding:0'>$uri</xmp>
 <xmp>$p</xmp></div>
 </div>
 </div>

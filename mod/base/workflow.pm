@@ -2418,7 +2418,12 @@ sub New                   # Workflow starten
       my $url=$ENV{SCRIPT_URI};
       $url=~s/\/auth\/.*$//;
       $url.="/auth/base/menu/msel/MyW5Base";
-      my $openquery={OpenURL=>"$ENV{SCRIPT_URI}?WorkflowClass=$wfclass"};
+      my $OpenURL="$ENV{SCRIPT_URI}?WorkflowClass=$wfclass";
+      if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+         $OpenURL=~s/^http:/https:/i;
+         $url=~s/^http:/https:/i;
+      }
+      my $openquery={OpenURL=>$OpenURL};
       my $queryobj=new kernel::cgi($openquery);
       $url.="?".$queryobj->QueryString(); 
       my $a="<a href=\\\"$url\\\" ".
