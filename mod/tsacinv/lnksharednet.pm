@@ -87,6 +87,8 @@ sub new
                 label         =>'Network-Component SystemID',
                 size          =>'20',
                 uppersearch   =>1,
+                vjointo       =>'tsacinv::system',
+                vjoinon       =>['netsystemid'=>'systemid'],
                 dataobjattr   =>'"netsystemid"'),
 
       new kernel::Field::Text(

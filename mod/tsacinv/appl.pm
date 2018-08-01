@@ -50,6 +50,7 @@ sub new
                 name          =>'fullname',
                 label         =>'full CI-Name',
                 group         =>'appgen',
+                explore       =>100,
                 searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>'generic_appl."fullname"'),
@@ -71,6 +72,7 @@ sub new
                 name          =>'assignmentgroup',
                 label         =>'CFM Assignment Group',
                 group         =>'appgen',
+                explore       =>200,
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
                 vjoindisp     =>'name'),
@@ -78,6 +80,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
+                explore       =>300,
                 group         =>'appgen',
                 dataobjattr   =>'generic_appl."status"'),
                                     
@@ -91,6 +94,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'usage',
                 label         =>'Usage',
+                explore       =>400,
                 group         =>'default',
                 dataobjattr   =>'"usage"'),
                                     
@@ -134,6 +138,7 @@ sub new
                 name          =>'iassignmentgroup',
                 label         =>'INM Assignment Group',
                 group         =>'default',
+                explore       =>250,
                 vjointo       =>'tsacinv::group',
                 vjoinon       =>['lincidentagid'=>'lgroupid'],
                 vjoindisp     =>'name'),
@@ -433,6 +438,16 @@ sub new
                 weblinkto     =>'NONE',
                 vjoinon       =>['applid'=>'applid'],
                 vjoindisp     =>'netname'),
+
+      new kernel::Field::SubList(
+                name          =>'usedsharednetcompids',
+                group         =>'usedsharedcomp',
+                label         =>'direct connected Shared-Network SystemIDs',
+                vjointo       =>'tsacinv::lnksharednet',
+                htmldetail    =>0,
+                weblinkto     =>'NONE',
+                vjoinon       =>['applid'=>'applid'],
+                vjoindisp     =>['netsystemid','netname']),
 
       new kernel::Field::Boolean(
                 name          =>'isgeneric',
@@ -785,6 +800,87 @@ sub getDetailBlockPriority
    return(qw(header appgen default interfaces systems usedsharedcomp
              control
              w5basedata source));
+}
+
+
+
+sub jsExploreObjectMethods
+{
+   my $self=shift;
+   my $methods=shift;
+
+   my $label=$self->T("add shared network systems");
+   $methods->{'m500addApplicationNetworksystems'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call m500addApplicationNetworksystems on \",this);
+          \$(\".spinner\").show();
+          var app=this.app;
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          app.pushOpStack(new Promise(function(methodDone){
+             app.Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'tsacinv::appl');
+                w5obj.SetFilter({
+                   applid:dataobjid
+                });
+                w5obj.findRecord(\"applid,usedsharednetcompids\",function(data){
+                   for(recno=0;recno<data.length;recno++){
+                      for(netsno=0;
+                          netsno<data[recno].usedsharednetcompids.length;
+                          netsno++){
+                         var netsrec=data[recno].usedsharednetcompids[netsno];
+                         app.addNode(\"tsacinv::system\",
+                                     netsrec.netsystemid,netsrec.netsystemid);
+                         app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                     app.toObjKey(\"tsacinv::system\",
+                                     netsrec.netsystemid));
+                      }
+                   }
+                   methodDone(\"end of addApplicationInterfaces\");
+                });
+             });
+          }));
+       }
+   ";
+
+   my $label=$self->T("add systems");
+   $methods->{'m501addApplicationSystems'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call m501addApplicationSystems on \",this);
+          \$(\".spinner\").show();
+          var app=this.app;
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          app.pushOpStack(new Promise(function(methodDone){
+             app.Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'tsacinv::appl');
+                w5obj.SetFilter({
+                   applid:dataobjid
+                });
+                w5obj.findRecord(\"applid,systems\",function(data){
+                   for(recno=0;recno<data.length;recno++){
+                      for(subno=0;subno<data[recno].systems.length;subno++){
+                         var subrec=data[recno].systems[subno];
+                         app.addNode('tsacinv::system',subrec.systemid,
+                                     subrec.systemid);
+                         app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                     app.toObjKey('tsacinv::system',
+                                     subrec.systemid),
+                                     {noAcross:true});
+                      }
+                   }
+                   methodDone(\"end of m501addApplicationSystems\");
+                });
+             });
+          }));
+       }
+   ";
+
+
 }
 
 

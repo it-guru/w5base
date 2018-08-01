@@ -271,7 +271,7 @@ div.SearchLabel{
   background-color: #f0f0f0;
 }
 div#SearchContainer{
-  height:100%;
+  height:200px;
   border-top:1px solid black
 }
 div#SearchResult{

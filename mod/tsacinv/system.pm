@@ -58,6 +58,7 @@ sub new
                 name          =>'systemid',
                 label         =>'SystemId',
                 size          =>'13',
+                explore       =>100,
                 searchable    =>1,
                 uppersearch   =>1,
                 align         =>'left',
@@ -65,6 +66,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'status',
+                explore       =>200,
                 label         =>'Status',
                 dataobjattr   =>'system."status"'),
 
@@ -144,6 +146,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
+                explore       =>300,
                 label         =>'Assignment Group',
                 vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
