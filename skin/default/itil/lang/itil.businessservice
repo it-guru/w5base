@@ -99,3 +99,4 @@ Anwendung zur Verfügung stellen kann.',en=>'Welcome'},
 'reaction time degree of attainment'=>{de=>'Reaktionszeit Erfüllungsgrad'},
 'application only allowed on gerneric Business Service'=>{de=>'Anwendung nur bei Generischen BusinessService zulässig'},
 'gerneric Business Service need an application'=>{de=>'Generischer BusinessService benötigt eine Anwendung'},
+'add tangential elementes'=>{de=>'tangierende Elemente hinzufügen'}

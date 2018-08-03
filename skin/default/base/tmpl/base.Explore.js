@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="../../../public/base/load/kernel.App.Web.css">
 <link rel="stylesheet" href="../../../public/base/load/jquery.dataTables.css">
 <link rel="stylesheet" href="../../../public/base/load/vis.min.css">
+<link rel="stylesheet" href="../../../public/base/load/vis-network.min.css">
 
 
 <!-- Main Layout  Handling -->
@@ -34,11 +35,11 @@ body{
    margin:2px;
    cursor:pointer;
    border: 1px solid white;
-   border-bottom: 3px solid white;
+   border-bottom: 4px solid white;
 }
 
 .on{
-   border-bottom: 3px solid blue;
+   border-bottom: 4px solid #35ad53;
 }
 
 .cssswitch:hover{
@@ -998,6 +999,10 @@ var W5ExploreClass=function(){
                           "id='ControlSwitchDebugConsole' "+
                           "title='Switch debug console'></div>");
 
+       $(switches).append("<div class='cssicon cssswitch application_delete' "+
+                          "id='ControlSwitchNavigation' "+
+                          "title='Switch Navigation Controls'></div>");
+
        $(switches).find(".cssswitch").click(function(){
           console.log("click on ",this);
           var id=$(this).attr("id");
@@ -1010,6 +1015,22 @@ var W5ExploreClass=function(){
                    $(app.console.div).height(60);
                 }
                 app.ResizeLayout();
+             }
+          }
+          if (id=="ControlSwitchNavigation"){
+             if ($(this).hasClass("on")){
+                app.network.setOptions({
+                   interaction: { 
+                     navigationButtons: false,
+                   }
+                });
+             }
+             else{
+                app.network.setOptions({
+                   interaction: { 
+                     navigationButtons: true,
+                   }
+                });
              }
           }
           $(this).toggleClass('on');
@@ -1079,21 +1100,29 @@ var W5ExploreClass=function(){
            }
         },
         interaction: { 
-          multiselect: true
+          multiselect: true,
+          navigationButtons: false,
+          keyboard: true
         },
         nodes: {
           color:{
              background:'#ffff00'
           },
           level:1
-        }
+        },
       };
       var usephysicsonce=false;
       if (MapParamTempl.physics && MapParamTempl.physics.enabled=="once"){
          usephysicsonce=true;
          MapParamTempl.physics.enabled=true; 
       }
+      
+
+
+
+
       $.extend(options,MapParamTempl);
+console.log("use options",options);
       this.network = new vis.Network(this.netmap, data, options);
       this.network.on("stabilized", function () {
          if (app.networkFitRequest){
