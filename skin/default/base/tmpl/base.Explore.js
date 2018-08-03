@@ -995,13 +995,19 @@ var W5ExploreClass=function(){
 
        var switches=$("<div class='cssswitches'></div>");
 
+       $(switches).append("<div class='cssicon cssswitch "+
+                          "application_delete' "+
+                          "id='ControlSwitchNavigation' "+
+                          "title='Switch Navigation Controls'></div>");
+
+       $(switches).append("<div class='cssicon cssswitch "+
+                          "application_lightning on' "+
+                          "id='ControlSwitchPhysics' "+
+                          "title='Switch Autolayout'></div>");
+
        $(switches).append("<div class='cssicon cssswitch application_key' "+
                           "id='ControlSwitchDebugConsole' "+
                           "title='Switch debug console'></div>");
-
-       $(switches).append("<div class='cssicon cssswitch application_delete' "+
-                          "id='ControlSwitchNavigation' "+
-                          "title='Switch Navigation Controls'></div>");
 
        $(switches).find(".cssswitch").click(function(){
           console.log("click on ",this);
@@ -1017,18 +1023,18 @@ var W5ExploreClass=function(){
                 app.ResizeLayout();
              }
           }
-          if (id=="ControlSwitchNavigation"){
+          if (id=="ControlSwitchPhysics"){
              if ($(this).hasClass("on")){
                 app.network.setOptions({
-                   interaction: { 
-                     navigationButtons: false,
+                   physics: { 
+                     enabled: false,
                    }
                 });
              }
              else{
                 app.network.setOptions({
-                   interaction: { 
-                     navigationButtons: true,
+                   physics: { 
+                     enabled: true,
                    }
                 });
              }
