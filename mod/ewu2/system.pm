@@ -138,7 +138,9 @@ sub new
       new kernel::Field::Link(
                 name          =>'physicalelementid',
                 label         =>"Physical Element Id",
-                dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"PHYSICAL_ELEMENT_ID\""),
+                dataobjattr   =>"decode(\"COMPUTER_SYSTEMS\".\"TYPE\",".
+                             "'VirtualMachine',VHOST.PHYSICAL_ELEMENT_ID,".
+                             "\"COMPUTER_SYSTEMS\".\"PHYSICAL_ELEMENT_ID\")"),
 
       new kernel::Field::Link(
                 name          =>'clustercsid',
@@ -331,6 +333,19 @@ sub new
    $self->setWorktable("\"COMPUTER_SYSTEMS\"");
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable left outer join $worktable \"VHOST\" ".
+            "on $worktable.\"HOSTING_CS_ID\"=\"VHOST\".\"COMPUTER_SYSTEM_ID\"";
+
+   return($from);
+}
+
+
 
 
 
