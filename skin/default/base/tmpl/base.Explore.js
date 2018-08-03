@@ -121,6 +121,46 @@ body{
  overflow-y:auto;
  font-family: monospace;
 }
+
+@media print {
+   body{
+      border:none;
+      overflow:visible;
+      width:1754px;
+      height:1240px;
+   }
+   #main{
+      border:none;
+      overflow:visible;
+      width:1754px;
+      height:1240px;
+   }
+   #workspace{
+      border:none;
+      overflow:visible;
+      width:1754px;
+      height:1240px;
+   }
+   #netmap{
+      border:none;
+      overflow:visible;
+      width:1754px;
+      height:1240px;
+   }
+   #ctrl{
+      display:none;
+   }
+   #cons{
+      display:none;
+   }
+   #dbrec{
+      display:none;
+   }
+   #mpath{
+      display:none;
+   }
+}
+
 </style>
 
 
@@ -1009,9 +1049,17 @@ var W5ExploreClass=function(){
                           "id='ControlSwitchDebugConsole' "+
                           "title='Switch debug console'></div>");
 
+       $(switches).append("<div class='cssicon cssswitch printer' "+
+                          "id='ControlSwitchPrint' "+
+                          "title='Print Network'></div>");
+
        $(switches).find(".cssswitch").click(function(){
           console.log("click on ",this);
           var id=$(this).attr("id");
+          if (id=="ControlSwitchPrint"){
+             $(app.network).focus();
+             window.print();
+          }
           if (id=="ControlSwitchDebugConsole"){
              if (app.console.div){
                 if ($(this).hasClass("on")){
@@ -1022,6 +1070,7 @@ var W5ExploreClass=function(){
                 }
                 app.ResizeLayout();
              }
+             $(this).toggleClass('on');
           }
           if (id=="ControlSwitchPhysics"){
              if ($(this).hasClass("on")){
@@ -1038,8 +1087,25 @@ var W5ExploreClass=function(){
                    }
                 });
              }
+             $(this).toggleClass('on');
           }
-          $(this).toggleClass('on');
+          if (id=="ControlSwitchNavigation"){
+             if ($(this).hasClass("on")){
+                app.network.setOptions({
+                   interaction: {
+                     navigationButtons: false,
+                   }
+                });
+             }
+             else{
+                app.network.setOptions({
+                   interaction: {
+                     navigationButtons: true,
+                   }
+                });
+             }
+             $(this).toggleClass('on');
+          }
        });
 
 
@@ -1088,6 +1154,29 @@ var W5ExploreClass=function(){
    this.ShowNetworkMap=function(MapParamTempl){
       var app=this;
       this.LayoutNetworkMap();
+
+      var preNetworkPrint=function(){
+        app.network.setOptions({
+           width:'1754px',
+           height:'1240px'
+        });
+        app.network.moveTo({
+
+        });
+      };
+      var postNetworkPrint=function(){
+        app.network.setOptions({
+           width:'100%',
+           height:'100%'
+        });
+     
+      };
+
+
+
+
+      $( window ).bind( "beforeprint",preNetworkPrint);
+      $( window ).bind( "afterprint",postNetworkPrint);
       $(".spinner").show();
       var data = {
         nodes: this.node,
@@ -1128,7 +1217,6 @@ var W5ExploreClass=function(){
 
 
       $.extend(options,MapParamTempl);
-console.log("use options",options);
       this.network = new vis.Network(this.netmap, data, options);
       this.network.on("stabilized", function () {
          if (app.networkFitRequest){
