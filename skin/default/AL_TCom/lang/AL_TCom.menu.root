@@ -157,3 +157,4 @@
 'AL_TCom.cloud.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.cloud.area'=>{de=>'Area',en=>'Area'},
 'AL_TCom.cloud.area.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.system.import'=>{de=>'Import',en=>'Import'}

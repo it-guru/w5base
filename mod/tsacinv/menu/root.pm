@@ -180,7 +180,7 @@ sub Init
                       "tsacinv::DBDataDiconary",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("AL_TCom.system.acimport",
+   $self->RegisterObj("AL_TCom.system.import.ac",
                       "tsacinv::system",
                       func=>'ImportSystem',
                       prio=>20000,

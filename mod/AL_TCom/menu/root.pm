@@ -333,6 +333,12 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.import",
+                      "tmpl/welcome",
+                      func=>'Import',
+                      prio=>20000,
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.asset",
                       "AL_TCom::asset",
                       defaultacl=>['valid_user']);

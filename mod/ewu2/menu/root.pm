@@ -66,6 +66,12 @@ sub Init
                       "ewu2::contact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.import.EWU2",
+                      "ewu2::system",
+                      func=>'ImportSystem',
+                      prio=>20000,
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

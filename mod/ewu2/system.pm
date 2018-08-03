@@ -116,6 +116,20 @@ sub new
                 label         =>"Description",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"DESCRIPTION\""),
 
+      new kernel::Field::TextDrop(
+                name          =>'location',
+                label         =>'Location',
+                translation   =>'itil::asset',
+                vjointo       =>'base::location',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['locationid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'locationid',
+                label         =>"LocationID",
+                dataobjattr   =>"'11927275230009'"),
+
       new kernel::Field::Textarea(
                 name          =>'notes',
                 label         =>"Notes",
@@ -313,7 +327,7 @@ sub new
    );
    $self->{use_distinct}=0;
    $self->setDefaultView(qw(systemname type status osrelease 
-                            vhostname asset));
+                            vhostname asset id));
    $self->setWorktable("\"COMPUTER_SYSTEMS\"");
    return($self);
 }
@@ -382,6 +396,182 @@ sub isViewValid
    return("ALL");
 }
 
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),
+          qw(ImportSystem));
+}  
+
+sub ImportSystem
+{
+   my $self=shift;
+
+   my $importname=trim(Query->Param("importname"));
+   if (Query->Param("DOIT")){
+      if ($self->Import({importname=>$importname})){
+         Query->Delete("importname");
+         $self->LastMsg(OK,"system has been successfuly imported");
+      }
+      Query->Delete("DOIT");
+   }
+
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importname},
+                           body=>1,form=>1,
+                           title=>"EWU2 System Import");
+   print $self->getParsedTemplate("tmpl/minitool.system.import",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+   
+
+sub Import
+{
+   my $self=shift;
+   my $param=shift;
+
+   my $flt;
+   my $w5flt;
+   if ($param->{importname} ne ""){
+      if ($param->{importname}=~m/^\d+$/){
+         $flt={id=>[$param->{importname}],deleted=>\'0'};
+      }
+      else{
+         $flt={systemname=>[$param->{importname}],deleted=>\'0'};
+      }
+      $w5flt={srcid=>[$param->{importname}],srcsys=>\'EWU2'};
+   }
+   else{
+      return(undef);
+   }
+   $self->ResetFilter();
+   $self->SetFilter($flt);
+   my @l=$self->getHashList(qw(id systemname status assetid));
+   if ($#l==-1){
+      $self->LastMsg(ERROR,"DevLabSystemID not found in EWU2");
+      return(undef);
+   }
+   if ($#l>0){
+      $self->LastMsg(ERROR,"DevLabSystemID not unique in EWU2");
+      return(undef);
+   }
+   my $sysrec=$l[0];
+
+
+   if ($sysrec->{status} ne "up"){
+      $self->LastMsg(ERROR,"DevLabSystemID is not up");
+      return(undef);
+   }
+
+
+
+
+
+   my $sys=getModuleObject($self->Config,"itil::system");
+   $sys->SetFilter($w5flt);
+   my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   my $identifyby;
+   if (defined($w5sysrec)){
+      if ($w5sysrec->{cistatusid}==4){
+         $self->LastMsg(ERROR,"DevLabSystemID already exists in W5Base");
+         return(undef);
+      }
+
+      my %newrec=(cistatusid=>4);
+      my $userid;
+
+      if ($self->isDataInputFromUserFrontend() &&
+          !$self->IsMemberOf("admin")) {
+         $userid=$self->getCurrentUserId();
+         $newrec{databossid}=$userid;
+      }
+
+      if ($sys->ValidatedUpdateRecord($w5sysrec,\%newrec,
+                                      {id=>\$w5sysrec->{id}})) {
+         $identifyby=$w5sysrec->{id};
+      }
+   }
+   else{
+      # check 1: Assigmenen Group registered
+#      if ($sysrec->{lassignmentid} eq ""){
+#         $self->LastMsg(ERROR,"SystemID has no Assignment Group");
+#         return(undef);
+#      }
+#      # check 2: Assingment Group active
+#      my $acgroup=getModuleObject($self->Config,"tsacinv::group");
+#      $acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
+#      my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisoremail));
+#      if (!defined($acgrouprec)){
+#         $self->LastMsg(ERROR,"Can't find Assignment Group of system");
+#         return(undef);
+#      }
+#      # check 3: Supervisor registered
+#      #if ($acgrouprec->{supervisoremail} eq ""){
+#      #   $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
+#      #   return(undef);
+#      #}
+      my $importname;
+      # check 4: load Supervisor ID in W5Base
+      my $user=getModuleObject($self->Config,"base::user");
+      my $admid;
+      if ($importname ne ""){
+         $admid=$user->GetW5BaseUserID($importname,"email");
+      }
+      #if (!defined($admid)){
+      #   $self->LastMsg(WARN,"Can't import Supervisor as Admin");
+      #}
+      # check 5: find id of mandator "extern"
+      my $mand=getModuleObject($self->Config,"base::mandator");
+      $mand->SetFilter({name=>"extern"});
+      my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
+      if (!defined($mandrec)){
+         $self->LastMsg(ERROR,"Can't find mandator extern");
+         return(undef);
+      }
+      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write","direct");
+      my $mandatorid=$mandrec->{grpid};
+      if (in_array(\@mandators,200)){
+         $mandatorid=200;
+      }
+      else{
+         $mandatorid=$mandators[0];
+      }
+      if ($mandatorid eq ""){
+         $self->LastMsg(ERROR,"Can't find any mandator");
+         return(undef);
+      }
+
+      # final: do the insert operation
+      my $newrec={name=>$sysrec->{systemname},
+                  srcid=>$sysrec->{id},
+                  srcsys=>'EWU2',
+                  allowifupdate=>1,
+                  mandatorid=>$mandatorid,
+                  cistatusid=>4};
+      if (defined($admid)){
+         $newrec->{admid}=$admid;
+      }
+
+      $identifyby=$sys->ValidatedInsertRecord($newrec);
+   }
+   if (defined($identifyby) && $identifyby!=0){
+      $sys->ResetFilter();
+      $sys->SetFilter({'id'=>\$identifyby});
+      my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
+         my $qc=getModuleObject($self->Config,"base::qrule");
+         $qc->setParent($sys);
+         $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
+      }
+   }
+   return($identifyby);
+}
 
 1;
 

@@ -64,6 +64,20 @@ sub new
                 label         =>"Model",
                 dataobjattr   =>"\"PHYSICAL_ELEMENTS\".\"MODEL\""),
 
+      new kernel::Field::TextDrop(
+                name          =>'location',
+                label         =>'Location',
+                translation   =>'itil::asset',
+                vjointo       =>'base::location',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['locationid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'locationid',
+                label         =>"LocationID",
+                dataobjattr   =>"'11927275230009'"),
+
       new kernel::Field::Boolean(
                 name          =>'deleted',
                 label         =>"marked as delete",
