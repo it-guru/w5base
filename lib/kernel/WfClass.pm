@@ -131,13 +131,17 @@ sub  recalcResponsiblegrp
    if ($fwdtarget eq "base::user"){
       my $user=getModuleObject($self->getParent->Config,"base::user");
       $user->SetFilter({userid=>\$fwdtargetid});
-      my ($usrrec)=$user->getOnlyFirst(qw(groups));
+      my ($usrrec)=$user->getOnlyFirst(qw(groups usertyp));
       if (defined($usrrec) && ref($usrrec->{groups}) eq "ARRAY"){
          my %grp;
          my %grpid;
+         my @chkroles=orgRoles();
+         if ($usrrec->{usertyp} eq "service"){
+            push(@chkroles,"RMember"); # for Service-Users stats goes to RMember
+         }
          foreach my $grec (@{$usrrec->{groups}}){
             if (ref($grec->{roles}) eq "ARRAY"){
-               if (in_array($grec->{roles},[orgRoles])){
+               if (in_array($grec->{roles},\@chkroles)){
                   $grp{$grec->{group}}++;
                   $grpid{$grec->{grpid}}++;
                }
