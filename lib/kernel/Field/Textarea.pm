@@ -204,7 +204,8 @@ sub FormatedResult
       else{
          $d=quoteHtml($d);
       }
-      if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlSubList"){
+      if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlExplore" || 
+          $FormatAs eq "HtmlSubList"){
          # target ist kein pre-Formated HTML Element
          $d=~s/\n/<br>\n/gs;
       }

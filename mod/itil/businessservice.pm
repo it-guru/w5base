@@ -147,7 +147,7 @@ sub new
                 value         =>[undef,'SVC','IT-S','ES','TR'],
                 dataobjattr   =>"$worktable.nature"),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'parentid',
                 selectfix     =>1,
                 label         =>'ParentID',
@@ -482,6 +482,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'description',
+                explore       =>10000,
                 group         =>'desc',
                 label         =>'Business Service Description',
                 dataobjattr   =>"$worktable.description"),
@@ -2460,6 +2461,96 @@ sub TreeView
 }
 
 
+
+
+sub jsExploreObjectMethods
+{
+   my $self=shift;
+   my $methods=shift;
+
+   my $label=$self->T("add tangential elementes");
+   $methods->{'m500addTangCIs'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call m500addTangCIs on \",this);
+          \$(\".spinner\").show();
+          var app=this.app;
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          app.pushOpStack(new Promise(function(methodDone){
+             app.Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'itil::businessservice');
+                w5obj.SetFilter({
+                   id:dataobjid
+                });
+                w5obj.findRecord(\"id,upperservice,servicecomp,parentid\",
+                     function(data){
+                   console.log(\"found\",data);
+                   for(recno=0;recno<data.length;recno++){
+                      for(i=0;i<data[recno].upperservice.length;i++){
+                         var r=data[recno].upperservice[i];
+                         app.addNode(dataobj,r.businessserviceid,
+                                     r.businessserviceid);
+                         app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                     app.toObjKey(dataobj,r.businessserviceid),{
+                                        noAcross:true,
+                                        color:{
+                                           color:'blue'
+                                        },
+                                        arrows:{
+                                           from:{
+                                              enabled:true,
+                                              type:'arrow'
+                                           }
+                                        }
+                                     });
+                      }
+                      for(i=0;i<data[recno].servicecomp.length;i++){
+                         var r=data[recno].servicecomp[i];
+                         app.addNode(r.objtype,r.obj1id,r.obj1id);
+                         app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                     app.toObjKey(r.objtype,r.obj1id),{
+                                        noAcross:true,
+                                        color:{
+                                           color:'blue'
+                                        },
+                                        arrows:{
+                                           to:{
+                                              enabled:true,
+                                              type:'arrow'
+                                           }
+                                        }
+                                     });
+                      }
+                      if (data[recno].parentid!=\"\"){
+                         app.addNode(\"itil::appl\",data[recno].parentid,
+                                     data[recno].parentid);
+                         app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                     app.toObjKey(\"itil::appl\",
+                                     data[recno].parentid),{
+                                        color:{
+                                           color:'silver'
+                                        },
+                                        title:'App',
+                                        arrows:{
+                                           to:{
+                                              enabled:true,
+                                              type:'bar'
+                                           }
+                                        }
+                                     });
+                      }
+                      
+                   }
+                   methodDone(\"end of am500addTangCIs\");
+                });
+             });
+          }));
+       }
+   ";
+
+}
 
 
 

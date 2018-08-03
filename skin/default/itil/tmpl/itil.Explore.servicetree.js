@@ -93,9 +93,7 @@
             );
             app.processOpStack(function(opResults){
                console.log("scenario loaded",opResults);
-               app.network.fit({
-                  animation: true
-               });
+               app.networkFitRequest=true;
             });
         });
       }

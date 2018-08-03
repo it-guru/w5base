@@ -53,12 +53,13 @@ sub prepareParent
 
    my %f=(); 
 
-   foreach my $fobj ($app->getFieldObjsByView(["ALL"])){
+   my @fl=$app->getFieldObjsByView(["ALL"]);
+   foreach my $fobj (@fl){
       if (exists($fobj->{explore})){
          $f{$fobj->Name()}=$fobj->{explore};
       }
    }
-   my @view=sort({$f{$a} cmp $f{$b}} keys(%f));
+   my @view=sort({$f{$a} <=> $f{$b}} keys(%f));
 
 
 
@@ -95,6 +96,11 @@ sub ProcessLine
    my $editgroups=[$app->isWriteValid($rec)];
 
    my $d="<div class=Record data-id='$rec->{id}'>\n";
+
+
+
+
+
    foreach my $fldname (@view){
       my $fld=$app->getField($fldname,$rec);
       my $label=$fld->Label();
