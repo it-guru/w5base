@@ -47,6 +47,12 @@ body{
    border-bottom: 4px solid white;
 }
 
+.cssswitchdisabled{
+   cursor:not-allowed;
+   opacity: 0.4;
+   filter: alpha(opacity=40); /* msie */
+}
+
 .on{
    border-bottom: 4px solid #35ad53;
 }
@@ -55,6 +61,11 @@ body{
    border-left: 1px solid gray;
    border-right: 1px solid gray;
    border-top: 1px solid gray;
+}
+
+.cssswitchdisabled:hover{
+   border: 1px solid white;
+   border-bottom: 4px solid white;
 }
 
 #mpath{
@@ -1066,8 +1077,12 @@ var W5ExploreClass=function(){
                           "id='ControlSwitchDebugConsole' "+
                           "title='Switch debug console'></div></div>");
 
+
        $(swrow).append("<div class='cssswitchcell'>"+
-                        "&nbsp;</div>");
+                        "<div class='cssicon cssswitch "+
+                          "application_view_columns cssswitchdisabled' "+
+                          "id='SwitchNothing' "+
+                          "title='Show data as table'></div></div>");
 
        $(swrow).append("<div class='cssswitchcell'>"+
                         "&nbsp;</div>");
@@ -1086,7 +1101,7 @@ var W5ExploreClass=function(){
                           "id='ControlSwitchPrint' "+
                           "title='Print Network'></div></div>");
 
-       $(switches).find(".cssswitch").click(function(){
+       $(switches).find(".cssswitch").not(".cssswitchdisabled").click(function(){
           console.log("click on ",this);
           var id=$(this).attr("id");
           if (id=="ControlSwitchPrint"){
