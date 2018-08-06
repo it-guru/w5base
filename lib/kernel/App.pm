@@ -1246,8 +1246,10 @@ sub ExpandTRangeExpression
 
    my $res=undef;
 
-   #printf STDERR ("fifi val='$val'\n");
-
+   if ($val=~m/^".*"$/){
+      $val=~s/^"//;
+      $val=~s/"$//;
+   }
    if ($val=~m/^currentmonth$/gi){
       my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($srctimezone); 
       my $max=Days_in_Month($Y,$M);
@@ -1288,10 +1290,15 @@ sub ExpandTRangeExpression
                    (\d{4})-(\d{1,2})-(\d{1,2})\s
                    (\d{1,2}):(\d{1,2}):(\d{1,2})$/xgi){
       my ($time1,$time2);
+      my $fromalign=0;
+      my $toalign=0;
       if ($opt->{align} eq "day"){
          if (!($h1==0  && $m1==0  && $s1==0 &&
                $h2==23 && $m2==59 && $s2==59)){
-            return(undef);
+            $h1=0;$m1=0;$s1=0;     # auto align
+            $h2=23;$m2=59;$s2=59;
+            $fromalign=(24*60*60)*-1;
+            $toalign=(24*60*60);
          } 
       }
       eval('$time1=Mktime($srctimezone,$Y1,$M1,$D1,$h1,$m1,$s1);');
@@ -1299,6 +1306,8 @@ sub ExpandTRangeExpression
       if ($time1>$time2){
          return(undef);
       }
+      $time1+=$fromalign;
+      $time2+=$toalign;
       ($Y1,$M1,$D1,$h1,$m1,$s1)=Localtime($dsttimezone,$time1);
       ($Y2,$M2,$D2,$h2,$m2,$s2)=Localtime($dsttimezone,$time2);
       $res=[sprintf("%04d-%02d-%02dT%02d:%02d:%02d",

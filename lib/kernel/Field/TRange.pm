@@ -64,8 +64,7 @@ sub SetFilter
               }
               else{
                  if ($trange ne ""){
-                    my @words=parse_line('[,;]{0,1}\s+',0,$trange);
-                    $args=\@words;
+                    $args=[$trange];
                  }
               }
               if ($#{$args}!=0){
@@ -79,16 +78,22 @@ sub SetFilter
                  }
               );
               if (!defined($res)){
-                 $self->getParent->LastMsg(ERROR,"can not parse time range");
+                 printf STDERR ("fifi $args->[0]\n");
+                 $self->getParent->LastMsg(ERROR,"can not parse time range ");
                  return(undef);
               }
               my $s=$res->[0];
               my $e=$res->[1];
              
+         #     my @addflt=(
+         #                {$self->{depend}->[0]=>">=\"$s\" AND <=\"$e\""},
+         #                {$self->{depend}->[1]=>"<=\"$e\" AND >=\"$s\""},
+         #                {$self->{depend}->[2]=>"<=\"$e\" AND >=\"$s\""}
+         #               );
               my @addflt=(
-                         {$self->{depend}->[0]=>">=\"$s\" AND <=\"$e\""},
+                         {$self->{depend}->[0]=>"<=\"$e\""},
                          {$self->{depend}->[1]=>"<=\"$e\" AND >=\"$s\""},
-                         {$self->{depend}->[2]=>"<=\"$e\" AND >=\"$s\""}
+                         {$self->{depend}->[2]=>">=\"$s\""}
                         );
               push(@$flt,\@addflt);
            }
