@@ -16,6 +16,10 @@ BEGIN
    IF (e is not null AND s is not null) THEN
       select cast((UNIX_TIMESTAMP(e)-UNIX_TIMESTAMP(s))/60/60/24 as decimal) 
       into ndays; 
+      if (ndays=0) THEN
+         select concat_ws(' ',date(s), '12:00:00') into padDate;
+         insert into wfrange (wfheadid,m,wfclass) values(id,padDate,c);
+      END IF;
       if (ndays>0 AND ndays<1000) THEN
          insert into wfrange (wfheadid,m,wfclass) values(id,s,c);
          select concat_ws(' ',date(s), '12:00:00') into padDate;
