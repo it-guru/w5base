@@ -27,10 +27,19 @@ body{
 }
 
 .cssswitches{
-   padding:2px;
-   padding-bottom:0;
+   padding:0;
+   display:table;
+   width:100%;
+   border-bottom:1px solid silver;
 }
 
+.cssswitchrow{
+   display:table-row;
+}
+.cssswitchcell{
+   display:table-cell;
+   width:10%;
+}
 .cssswitch{
    margin:2px;
    cursor:pointer;
@@ -127,25 +136,25 @@ body{
       border:none;
       overflow:visible;
       width:1754px;
-      height:1240px;
+      height:1150px;
    }
    #main{
       border:none;
       overflow:visible;
       width:1754px;
-      height:1240px;
+      height:1150px;
    }
    #workspace{
       border:none;
       overflow:visible;
       width:1754px;
-      height:1240px;
+      height:1150px;
    }
    #netmap{
       border:none;
       overflow:visible;
       width:1754px;
-      height:1240px;
+      height:1150px;
    }
    #ctrl{
       display:none;
@@ -1034,30 +1043,58 @@ var W5ExploreClass=function(){
        var gdiv=document.createElement('div');
 
        var switches=$("<div class='cssswitches'></div>");
+       var swrow=$("<div class='cssswitchrow'></div>");
+       $(switches).append(swrow);
 
-       $(switches).append("<div class='cssicon cssswitch "+
-                          "application_delete' "+
-                          "id='ControlSwitchNavigation' "+
-                          "title='Switch Navigation Controls'></div>");
+       $(swrow).append( "<div class='cssswitchcell'>"+
+                        "<div class='cssicon cssswitch "+
+                        "application_delete' "+
+                        "id='ControlSwitchNavigation' "+
+                        "title='Switch Navigation Controls'></div></div>");
 
-       $(switches).append("<div class='cssicon cssswitch "+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "&nbsp;</div>");
+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "<div class='cssicon cssswitch "+
                           "application_lightning on' "+
                           "id='ControlSwitchPhysics' "+
-                          "title='Switch Autolayout'></div>");
+                          "title='Switch Autolayout'></div></div>");
 
-       $(switches).append("<div class='cssicon cssswitch application_key' "+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "<div class='cssicon cssswitch application_key' "+
                           "id='ControlSwitchDebugConsole' "+
-                          "title='Switch debug console'></div>");
+                          "title='Switch debug console'></div></div>");
 
-       $(switches).append("<div class='cssicon cssswitch printer' "+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "&nbsp;</div>");
+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "&nbsp;</div>");
+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "&nbsp;</div>");
+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "&nbsp;</div>");
+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "&nbsp;</div>");
+
+       $(swrow).append("<div class='cssswitchcell'>"+
+                        "<div class='cssicon cssswitch printer' "+
                           "id='ControlSwitchPrint' "+
-                          "title='Print Network'></div>");
+                          "title='Print Network'></div></div>");
 
        $(switches).find(".cssswitch").click(function(){
           console.log("click on ",this);
           var id=$(this).attr("id");
           if (id=="ControlSwitchPrint"){
-             $(app.network).focus();
+             var work=document.getElementById("workspace");
+             if (work){
+                console.log("set focus to work");
+                work.focus();
+             }
              window.print();
           }
           if (id=="ControlSwitchDebugConsole"){
@@ -1158,7 +1195,7 @@ var W5ExploreClass=function(){
       var preNetworkPrint=function(){
         app.network.setOptions({
            width:'1754px',
-           height:'1240px'
+           height:'1150px'
         });
         app.network.moveTo({
 
