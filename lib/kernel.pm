@@ -470,7 +470,7 @@ sub quoteQueryString {
 
 sub orgRoles
 {
-   return(qw(REmployee RApprentice RFreelancer RBoss));
+   return(qw(REmployee RApprentice RFreelancer RBoss RBoss2));
 }
 
 

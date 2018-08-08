@@ -525,7 +525,7 @@ sub getInitiatorGroupsOf
    my $AccountOrUserID=shift;
 
    my %groups=$self->getGroupsOf($AccountOrUserID,
-                  [qw(REmployee RBoss RBackoffice RBoss2)],'direct');
+                  [orgRoles(),"RBackoffice"],'direct');
    my $now=NowStamp("en");
    my %age;
    foreach my $grpid (keys(%groups)){

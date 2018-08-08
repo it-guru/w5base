@@ -38,30 +38,24 @@ sub new
                 group         =>'init',
                 getPostibleValues=>sub{
                    my $self=shift;
-                   my %groups=$self->getParent->getPosibleInitiatorGroups();
-                   my @l;
-                   foreach my $grp (sort({$a->{fullname} cmp $b->{fullname}} 
-                                    values(%groups))){
-                      push(@l,$grp->{grpid},$grp->{fullname});
-                   }
-               
-                   return(@l); 
+                   my @groups=$self->getParent->getPosibleInitiatorGroups();
+                   return(@groups);
                 }),
-
 
     );
    return($self);
 }
+
 
 sub getPosibleInitiatorGroups
 {
    my $self=shift;
    my $userid=$self->getParent->getCurrentUserId();
 
-   my %groups=$self->getGroupsOf($userid,
-                  [qw(REmployee RBoss RBackoffice RBoss2)],'direct');
-   return(%groups);
+   my @groups=$self->getParent->getInitiatorGroupsOf($userid);
+   return(@groups);
 }
+
 
 sub getDynamicFields
 {
@@ -695,12 +689,12 @@ sub nativProcess
                 exists($groups{$h->{forceinitiatorgroupid}})){
                $h->{initiatorgroupid}=$h->{forceinitiatorgroupid};
                $h->{initiatorgroup}=
-                   $groups{$h->{forceinitiatorgroupid}}->{fullname};
+                   $groups{$h->{forceinitiatorgroupid}};
             }
             else{
                my @k=keys(%groups);
                $h->{initiatorgroupid}=$k[0];
-               $h->{initiatorgroup}=$groups{$k[0]}->{fullname};
+               $h->{initiatorgroup}=$groups{$k[0]};
             }
          }
       }

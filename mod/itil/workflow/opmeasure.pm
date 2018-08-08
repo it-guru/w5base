@@ -676,11 +676,12 @@ sub nativProcess
             #
             my $userid=$self->getParent->getParent->getCurrentUserId();
             if ($userid eq "" ||
-                !in_array([$userid],[
+                (!in_array([$userid],[
                    $arec->{tsmid},$arec->{tsm2id},
                    $arec->{opmid},$arec->{opm2id},
                    $arec->{applmgrid}
-                 ])){
+                 ]) &&
+                (!$self->getParent->IsMemberOf("admin")))){
                $self->LastMsg(ERROR,"you are no authorised to create ".
                                     "measure for the desired application");
                return(0);
