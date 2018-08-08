@@ -144,12 +144,26 @@ sub ProcessHead
       $d.="SortTableResultTable.onsort=function (){\n";
       $d.=" var rows = SortTableResultTable.tBody.rows\n";
       $d.=" var l = rows.length;\n";
-    #  $d.=" console.log(rows);\n";
+      $d.=" console.log(rows);\n";
       $d.=" for (var i = 0; i < l; i++) { \n".
           "   SortableTableremoveClassName(rows[i]); \n".
           "   SortableTableaddClassName(rows[i], \n".
           "        i % 2 ? \"subline2\":\"subline1\"); } };\n"; 
-    #  $d.="SortTableResultTable.sort(1,false);\n";
+      if ($self->getParent->getParent->{AutoSortTableHtmlV01}){
+         my $sortdata=$self->getParent->getParent->{AutoSortTableHtmlV01};
+         AUTOSORT: foreach my $fld (keys(%$sortdata)){
+            for(my $c=0;$c<$#view;$c++){
+               if ($view[$c]->Name() eq $fld){
+                  my $col=$c+1;
+                  my $mode="false";
+                  $mode="true" if ($sortdata->{$fld});
+                  $d.="SortTableResultTable.sort($col,$mode);\n";
+                  last AUTOSORT; 
+               }
+            }
+         }
+      }
+      $d.="SortTableResultTable.initHeader();\n";
       $d.="}\n";
       $d.="</script>\n";
    }
