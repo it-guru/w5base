@@ -398,10 +398,10 @@ sub SetFilter
          else{
             $maxlevel=20 if ($fnd<$n);
             if ($fnd==$n){
-               $maxlevel=60;
+               $maxlevel=75;
             }
             if ($fnd>$n){
-               $maxlevel=66+$fnd;
+               $maxlevel=80+($fnd*3);
             }
          }
       }
