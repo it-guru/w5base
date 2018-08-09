@@ -362,6 +362,20 @@ sub Result
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
+sub Welcome
+{
+   my $self=shift;
+
+   my $oldval=Query->Param("MyW5BaseSUBMOD");
+   if (defined($oldval) && exists($self->{SubDataObj}->{$oldval}) &&
+       $self->{SubDataObj}->{$oldval}->can("Welcome")){
+      my $curquery=$self->{SubDataObj}->{$oldval};
+      my $res=$curquery->Welcome();
+      return($res) if (defined($res));
+   }
+   return($self->SUPER::Welcome());
+}
+
 sub ViewEditor
 {
    my $self=shift;
