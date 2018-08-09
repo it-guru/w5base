@@ -58,7 +58,7 @@ sub Init
                 label         =>'To');
    $self->{Field}->{to}->setParent($self);
 
-   $self->{Val}->{ifcheck}=["none","moderat","full"];
+   $self->{Val}->{ifcheck}=["none","moderat","full","excessive"];
 
 
    $self->{DataObj}->AddFields(
@@ -73,8 +73,7 @@ sub Init
                    my $fieldself=shift;
                    my $current=shift;
                    my $id=$current->{id};
-                   return(sprintf("%03d",
-                          $MyW5BaseContext->{CheckOfChanges}->{curLevel}));
+                   return($MyW5BaseContext->{CheckOfChanges}->{curLevel});
                 })
    );
 
@@ -95,32 +94,7 @@ sub isSelectable
 {
    my $self=shift;
    my %param=@_;
-# 
-#   my $u=$param{user};
-#   if (ref($u->{groups}) eq "ARRAY"){  
-#      foreach my $grprec (@{$u->{groups}}){ 
-#         if (ref($grprec->{roles}) eq "ARRAY"){
-#            return(1) if (in_array($grprec->{roles}, 
-#                          [qw(
-#                              RINManager 
-#                              RINManager2 
-#                              RINOperator
-#                              RCHManager 
-#                              RCHManager2 
-#                              RCHOperator
-#                              RPRManager 
-#                              RPRManager2 
-#                              RPROperator
-#                              RAuditor 
-#                              RMonitor)],
-#                          @{$grprec->{roles}}));
-#         }
-#      }
-#   }
    return(1);
-   my $dataobj=$self->getDataObj();
-   return(1) if ($dataobj->IsMemberOf("admin"));
-   return(0);
 }
 
 
@@ -135,7 +109,7 @@ sub getQueryTemplate
       Query->Param("search_from"=>$self->T("now")."-24h");
    }
    if (!defined(Query->Param("search_to"))){
-      Query->Param("search_to"=>$self->T("now")."-5m");
+      Query->Param("search_to"=>"start+1d");
    }
 
 
@@ -151,6 +125,8 @@ sub getQueryTemplate
    }
    $reptyp.="</select>";
    my $reptypl=$self->T("interface consideration");
+   my $kwtext=$self->T("keyword containment");
+
    #######################################################################
 
    my $showallsel;
@@ -180,7 +156,7 @@ sub getQueryTemplate
 <td class=finput width=40%>$reptyp</td>
 </tr>
 <tr>
-<td class=fname width=10%>Stichwort-Eingrenzung:</td>
+<td class=fname width=10%>$kwtext:</td>
 <td class=finput colspan=3>\%name(search)\%</td>
 </tr>
 </table>
@@ -226,6 +202,7 @@ sub SetFilter
    }
 
    my @apps;
+   my $ifcheck=$flt->{ifcheck};
 
    if ( $flt->{affectedapplication} ne "" && 
          $flt->{affectedapplication} ne "*"){
@@ -235,7 +212,7 @@ sub SetFilter
    }
    msg(INFO,"CoC with app cnt=".($#apps+1)." and trange=$t->{totaldays}");
 
-   if ($#apps==-1 || $#apps>99){
+   if ($#apps==-1 || $#apps>99 || $ifcheck eq "excessive"){
       if ($t->{totalminutes}>(24*60*2)){
          $self->LastMsg(ERROR,
             "unspecific application search is limit to a timerange of 48h");
@@ -252,7 +229,7 @@ sub SetFilter
    if ($#apps>0){
       if ($t->{totalminutes}>(24*60*34)){
          $self->LastMsg(ERROR,
-            "more than 1 application search is limit to a timerange of 28d");
+            "more than 1 application search is limit to a timerange of one month");
          return(undef);
       }
    }
@@ -264,9 +241,39 @@ sub SetFilter
       }
    }
 
+   my $MyW5BaseContext=$self->{Context};
    msg(INFO,"CoC with ifcheck $flt->{ifcheck}");
    if ($flt->{ifcheck} eq "none"){
       delete($flt->{ifcheck});
+   }
+   elsif ($flt->{ifcheck} eq "excessive"){
+      delete($flt->{ifcheck});
+      if ($#apps!=-1){
+         my $lnkappl=getModuleObject($self->Config,"itil::lnkapplappl");
+         $lnkappl->SetFilter([
+            {
+               fromapplid=>[map({$_->{id}} @apps)],
+               toapplcistatus=>[3,4,5],
+               contype=>[0,1,2,3,4,5],
+               cistatusid=>[3,4,5]
+            },
+            {
+               toapplid=>[map({$_->{id}} @apps)],
+               fromapplcistatus=>[3,4,5],
+               contype=>[0,1,2,3,4,5],
+               cistatusid=>[3,4,5]
+            }
+         ]);
+         my @l=$lnkappl->getHashList(qw(fromapplid toapplid));
+         Dumper(\@l);
+         my %uids;
+         map({
+            $uids{$_->{toapplid}}++;
+            $uids{$_->{fromapplid}}++;
+         } @l);
+         $MyW5BaseContext->{CheckOfChanges}->{ifappids}=[keys(%uids)];
+      }
+      delete($flt->{affectedapplication});
    }
    elsif ($flt->{ifcheck} eq "moderat"){
       delete($flt->{ifcheck});
@@ -321,15 +328,12 @@ sub SetFilter
          $flt->{affectedapplication}.=" ".join(" ",keys(%unames));
       }
    }
-   #print STDERR Dumper($t);
-
 
    $flt->{eventstart}="<\"$to\" OR [EMPTY]";
    $flt->{eventend}=">\"$from\" OR [EMPTY]";
    $flt->{isdeleted}=\'0';
 
 
-   my $MyW5BaseContext=$self->{Context};
    if ($keywords ne ""){
       my @words=parse_line('[,;]{0,1}\s+',0,$keywords);
       $MyW5BaseContext->{CheckOfChanges}->{keywords}=\@words;
@@ -346,10 +350,14 @@ sub SetFilter
       $MyW5BaseContext->{CheckOfChanges}->{appids}=[map({$_->{id}} @apps)];
    }
    $MyW5BaseContext->{CheckOfChanges}->{from}=$from;
+   $MyW5BaseContext->{CheckOfChanges}->{ifcheck}=$ifcheck;
 
    $self->{DataObj}->{AutoSortTableHtmlV01}={
       'targetmatchlevel'=>1
    };
+
+
+   #msg(INFO,"CheckOfChanges:".Dumper($MyW5BaseContext->{CheckOfChanges}));
    
 
    $self->{DataObj}->{SoftFilter}=sub{
@@ -384,7 +392,18 @@ sub SetFilter
                $wordfnd+=($nname+$ntxt);
             }
          }
-         return(0) if ($fnd<$n);
+         if ($MyW5BaseContext->{CheckOfChanges}->{ifcheck} ne "excessive"){
+            return(0) if ($fnd<$n);
+         }
+         else{
+            $maxlevel=20 if ($fnd<$n);
+            if ($fnd==$n){
+               $maxlevel=60;
+            }
+            if ($fnd>$n){
+               $maxlevel=66+$fnd;
+            }
+         }
       }
 
       my $level=$maxlevel;
@@ -399,39 +418,44 @@ sub SetFilter
          my $t=CalcDateDuration($MyW5BaseContext->{CheckOfChanges}->{from},
                                 $evstart,"GMT");
          my $off=abs($t->{totalminutes});
-         my $oindex=$off*25.0/$tq;
-         $oindex=25.0 if ($oindex>25);
+         my $oindex=$off*35.0/$tq;
+         $oindex=35.0 if ($oindex>35);
          $level-=$oindex; 
       }
       if (exists($MyW5BaseContext->{CheckOfChanges}->{appids})){
          if (!in_array($MyW5BaseContext->{CheckOfChanges}->{appids},
                        $rec->{affectedapplicationid})){
-            $level-=20;
+            $level*=0.45;
+         }
+         else{
+            $level*=1.48;
          }
       }
-
-
-      
-      
-
-
-
-
-      $level="10" if ($level<10);
-
-
-
+      if (exists($MyW5BaseContext->{CheckOfChanges}->{ifappids})){
+         my $fndiapps=0;
+         foreach my $ifid (@{$MyW5BaseContext->{CheckOfChanges}->{ifappids}}){
+            if (in_array($ifid,$rec->{affectedapplicationid})){
+               $fndiapps++;
+            }
+         }
+         if ($fndiapps>5){
+            $level*=1.39;
+         }
+         elsif ($fndiapps>1){
+            $level*=1.34;
+         }
+         elsif ($fndiapps>0){
+            $level*=1.24;
+         }
+         else{
+            $level*=0.36;
+         }
+      }
+      $level=10 if ($level<10);
+      $level=99.9 if ($level>99.9);
       $MyW5BaseContext->{CheckOfChanges}->{curLevel}=$level;
-
-      #printf STDERR ("$MyW5BaseContext name:%s\nDetail:%s\n\n",$rec->{name},length($txt));
       return(1);
    };
-
-
-
-
-
-
    my $dataobj=$self->getDataObj();
    #msg(INFO,"MyW5Base Dataobj Filter=%s",Dumper($flt));
    $dataobj->ResetFilter();
@@ -450,6 +474,13 @@ sub Result
 {
    my $self=shift;
    my %q=$self->getDataObj()->getSearchHash();
+
+   if ($q{from}=~m/[^a-z]end[^a-z]/i){
+      $q{from}=~s/[^a-z]end[^a-z]/$q{to}/gi;
+   }
+   if ($q{to}=~m/(^|[^a-z])start([^a-z]|$)/i){
+      $q{to}=~s/(^|[^a-z])start([^a-z]|$)/$1$q{from}$2/gi;
+   }
 
    my ($from,$to);
 
@@ -488,6 +519,25 @@ sub Result
    );
    return($self->{DataObj}->Result(%param));
 }
+
+
+sub Welcome
+{
+   my $self=shift;
+   print $self->getParent->HttpHeader("text/html");
+   print $self->getParent->HtmlHeader(style=>['default.css','mainwork.css'],
+                           body=>1,form=>1);
+   my $module=$self->Module();
+   my $appname=$self->App();
+   my $tmpl="tmpl/$appname.welcome";
+
+
+   print $self->getParent->getParsedTemplate($tmpl,{skinbase=>$module});
+   print $self->getParent->HtmlBottom(body=>1,form=>1);
+   return(0);
+}
+
+
 
 
 

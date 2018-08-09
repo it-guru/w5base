@@ -1,0 +1,25 @@
+<Style>
+p {margin-bottom: 6px}
+ul {margin-bottom: 6px}
+h2 {margin-bottom: 6px}
+body {margin: 20px}
+</ Style>
+<h2> Hints for using the CheckOfChanges: </ h2>
+<p> Changes and operational measures are analyzed during the query. Depending on how exactly the "affected application" is specified, the longer may be the "time window" that is queried. It does not matter if the queried timeframe is in the past or future - with time windows in the future, of course, only scheduled actions can be determined. </ P>
+
+<p> If <b> "Interface Consideration" = "none" </ b> is selected and if "Application concerned" specifies one or more applications, only changes / measures are listed in which the selected applications occur. </ p>
+
+<p> If <b> "Interface Consideration" = "moderate" </ b> is selected and if "affected application" specifies one or more applications, only changes / measures are listed in which the selected applications or a critical "marked interface of these applications occurs. </ p>
+
+<p> If <b> "Interface Consideration" = "complete" </ b> is selected and if "affected application" specifies one or more applications, only changes / measures are listed in which the selected applications or any interfaces Application of these applications occurs. </ P>
+
+<p> If <b> "Interface Consideration" = "excessive" </ b> is selected and if "affected application" specifies one or more applications, all changes / measures affecting the time window are listed and only one corresponding evaluation is performed in the "agreement". For such queries, the time window must not be longer than 24 hours. </ P>
+
+<p> In the result list, a "match" in percent is calculated. Here, an assignment is calculated to what extent the changes / measures correspond to the query criteria. Where: </ p>
+<Ul>
+<li> ... it will be upgraded if the found workflow starts at the same time as possible with the requested time window. </ li>
+<li> ... If keywords have been specified, they will be upgraded if they occur multiple times in a workflow. </ li>
+<li> ... If only interfaces of a given application were found in the workflow, then a depreciation </ li> occurs
+</ Ul>
+<p> When limiting by keywords, no wildcards (*?) can be used. If several keywords are used, then all visual words must be omitted in the brief description or in the long description of the change or action, so that the workflow is listed (or upgraded, for "exzensively" evaluations).
+</ P>
