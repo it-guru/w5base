@@ -475,8 +475,8 @@ sub Result
    my $self=shift;
    my %q=$self->getDataObj()->getSearchHash();
 
-   if ($q{from}=~m/[^a-z]end[^a-z]/i){
-      $q{from}=~s/[^a-z]end[^a-z]/$q{to}/gi;
+   if ($q{from}=~m/(^|[^a-z])end([^a-z]|$)/i){
+      $q{from}=~s/(^|[^a-z])end([^a-z]|$)/$1$q{to}$2/gi;
    }
    if ($q{to}=~m/(^|[^a-z])start([^a-z]|$)/i){
       $q{to}=~s/(^|[^a-z])start([^a-z]|$)/$1$q{from}$2/gi;
