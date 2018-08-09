@@ -78,8 +78,8 @@ sub SetFilter
                  }
               );
               if (!defined($res)){
-                 printf STDERR ("fifi $args->[0]\n");
-                 $self->getParent->LastMsg(ERROR,"can not parse time range ");
+                 $self->getParent->LastMsg(ERROR,"can not parse time range");
+                 msg(ERROR,"TRange acces to $args->[0]");
                  return(undef);
               }
               my $s=$res->[0];

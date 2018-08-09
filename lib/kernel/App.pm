@@ -1719,6 +1719,23 @@ sub ExpandTimeExpression
       $found=1;
       $fail=0;
    }
+   elsif (($D,$M)=$val=~m/^(\d+)\.(\d+)\./){
+      $val=~s/^(\d+)\.(\d+)\.//;
+      $h=$param{defhour};
+      $m=$param{defmin};
+      $s=$param{defsec};
+      ($Y)=Today_and_Now($dsttimezone); 
+      eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');
+      if ($@ ne ""){
+         msg(ERROR,$@);
+         $self->LastMsg(ERROR,"ilegal time expression '%s' $Y-$M-$D $h:$m:$s",
+                                         $orgval);
+         return(undef);
+      }
+      ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
+      $found=1;
+      $fail=0;
+   }
    elsif (($Y,$M,$D)=$val=~m/^(\d+)-(\d+)-(\d+)/){
       $val=~s/^(\d+)-(\d+)-(\d+)//;
       $h=$param{defhour};
