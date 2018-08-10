@@ -3592,6 +3592,7 @@ sub getSubList
    my %opt=();
 
    my $pmode=$mode;
+   $param{parentcurrent}=$current;
    if (defined($param{ParentMode})){
       $pmode=$param{ParentMode};
    }
@@ -3606,10 +3607,8 @@ sub getSubList
    $mode="SubXMLV01"   if ($mode=~m/XML/);
    if ($mode=~m/^OneLine$/){
       my @view=$self->GetCurrentView();
-      $self->SetCurrentView($view[0]);
-      $mode="CsvV01";
+      return([$self->getVal($view[0])]);
    }
-   $param{parentcurrent}=$current;
    if ($mode eq "RAW" || $mode eq "JSON"){
       my @view=$self->GetCurrentView();
       return($self->getHashList(@view));

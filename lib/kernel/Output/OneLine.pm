@@ -187,7 +187,10 @@ sub ProcessHead
       $d.="</td></tr></table>";
       $d.="</td>";
       $d.="</tr>";
-      $d.="</table><br><br><hr>";
+      $d.="</table><div ".
+          "style=\"font-family:monospace;margin:5px;".
+          "padding:5px;height:100px;overflow:auto;".
+          "border-top:1px solid black\">";
    }
    return($d);
 }
@@ -258,6 +261,7 @@ sub ProcessBottom
             my $fieldobj=$self->{fieldobjects}->[$fieldno];
             if (in_array(\@useField,$fieldobj->Name())){
                my $dval=$self->{recordlist}->[$recno]->[$fieldno];
+print STDERR Dumper(\$dval);
                if (ref($dval) eq "ARRAY"){
                   map({$l{$_}=$_} @$dval);
                }
@@ -285,7 +289,7 @@ sub ProcessBottom
    elsif (!grep(/\t/,@l)){
       $d.=join("\t",@l);
    }
-   $d.="\r\n<br><br>";
+   $d.="</div>";
    $d.=$app->HtmlBottom(form=>1,body=>1);
    return($d);
 }
