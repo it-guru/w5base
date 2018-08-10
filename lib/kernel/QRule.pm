@@ -255,7 +255,7 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&
           (!defined($origrec->{$origfieldname}) ||
-           $comprec->{$compfieldname} ne $origrec->{$origfieldname})){
+           lc($comprec->{$compfieldname}) ne lc($origrec->{$origfieldname}))){
          my $lnkfield=$obj->getField($origfieldname);
          my $chkobj=$lnkfield->vjoinobj();
          if (defined($chkobj)){
