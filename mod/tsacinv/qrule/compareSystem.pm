@@ -195,9 +195,6 @@ sub qcheckRecord
    #}
    if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
        $rec->{cistatusid}==5){
-      #printf STDERR ("fifi systemolaclass=$parrec->{systemolaclass} ".
-      #               "ifarm=$rec->{itfarm} ".
-      #               "productline=$rec->{productline}\n");
       # productline calculation
       if ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
           ($rec->{itfarm} eq "")){
@@ -225,8 +222,8 @@ sub qcheckRecord
       }
       elsif ($parrec->{systemolaclass} eq "38" &&  # DCS
           ($rec->{itfarm}=~m/^IT-Serverfarm_X86/i)){
-         if ($rec->{productline} ne "ITSF-X86"){
-            $forcedupd->{productline}="ITSF-X86"; 
+         if ($rec->{productline} ne "ITSF-x86"){
+            $forcedupd->{productline}="ITSF-x86"; 
          }
       }
       elsif ($parrec->{systemolaclass} eq "0" &&  # UNDEFINED
