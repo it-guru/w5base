@@ -2260,7 +2260,10 @@ sub NotifiedValidatedUpdateRecord
 
    return(undef) if (ref($notifycontrol) ne "HASH");
 
-   my %oldval=%{$oldrec};
+   my %oldval;  # Backup field values, which are going to be changed
+   foreach my $k (keys(%$newrec)){
+      $oldval{$k}=$oldrec->{$k};
+   }
 
    my $bk;
    if ($self->StartTransaction("update",$oldrec,$newrec)){
