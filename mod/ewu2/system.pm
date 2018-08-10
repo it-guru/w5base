@@ -467,7 +467,7 @@ sub Import
    }
    $self->ResetFilter();
    $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(id systemname status assetid));
+   my @l=$self->getHashList(qw(ALL));
    if ($#l==-1){
       $self->LastMsg(ERROR,"DevLabSystemID not found in EWU2");
       return(undef);
@@ -562,16 +562,108 @@ sub Import
          return(undef);
       }
 
-      # final: do the insert operation
+      my $systype="standard";
       my $newrec={name=>$sysrec->{systemname},
                   srcid=>$sysrec->{id},
                   srcsys=>'EWU2',
                   allowifupdate=>1,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
+      if ($sysrec->{type} eq "VirtualMachine"){
+         $systype="virtualizedSystem";
+         if ($sysrec->{vhostname} eq "" || $sysrec->{hostingcsid} eq ""){
+            $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                           "no vhost information for virtualizedSystem");
+            return(undef);
+         }
+         my $sys=getModuleObject($self->Config,"itil::system");
+         $sys->SetFilter({
+            cistatusid=>'4',
+            srcsys=>'EWU2',
+            srcid=>$sysrec->{hostingcsid}
+         });
+         my ($vmrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+         if (!defined($vmrec)){
+            $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                           "vmhost ".$sysrec->{vhostname}.
+                           " needs to be imported at first");
+            return(undef);
+         }
+         else{
+            $newrec->{vhostsystemid}=$vmrec->{id};
+         }
+      }
+      elsif ($sysrec->{type} eq "PhysicalMachine"){
+         if ($sysrec->{physicalelementid} eq ""){
+            $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                           "missing PhysicalElement reference");
+            return(undef);
+         }
+         my $ass=getModuleObject($self->Config,"itil::asset");
+         $ass->SetFilter({
+            srcsys=>'EWU2',
+            srcid=>$sysrec->{physicalelementid}
+         });
+         my ($hwrec,$msg)=$ass->getOnlyFirst(qw(ALL));
+         if (!defined($hwrec)){
+            my $dlass=getModuleObject($self->Config,"ewu2::asset");
+            $dlass->SetFilter({
+               id=>\$sysrec->{physicalelementid}
+            });
+            my ($arec,$msg)=$dlass->getOnlyFirst(qw(ALL));
+            if ($arec->{commonname} eq "" ||
+                $arec->{locationid} eq "" ||
+                $arec->{deleted} eq "1"   ||
+                $arec->{serialno} eq ""){
+               $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                              "missing asset attributes for autoimport");
+               return(undef);
+            }
+            my $newarec={
+               name=>$arec->{commonname},
+               serialno=>$arec->{serialno},
+               cistatusid=>4,
+               mandatorid=>$mandatorid,
+               locationid=>$arec->{locationid},
+               srcsys=>'EWU2',
+               srcid=>$sysrec->{physicalelementid}
+            };
+            my $identifyby=$ass->ValidatedInsertRecord($newarec);
+            if ($identifyby eq ""){
+               $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                              "asset autoimport incomplete");
+               return(undef);
+            }
+            $ass->ResetFilter();
+            $ass->SetFilter({
+               srcsys=>'EWU2',
+               srcid=>$sysrec->{physicalelementid}
+            });
+            ($hwrec,$msg)=$ass->getOnlyFirst(qw(ALL));
+         }
+
+
+         if (!defined($hwrec)){
+            $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                           "asset ".$sysrec->{asset}.
+                           " needs to be imported at first");
+            return(undef);
+         }
+         else{
+            $newrec->{assetid}=$hwrec->{id};
+         }
+      }
+      else{
+         $self->LastMsg(ERROR,"not suppored systemtyp ".
+                              $sysrec->{type});
+         return(undef);
+      }
+
+      # final: do the insert operation
       if (defined($admid)){
          $newrec->{admid}=$admid;
       }
+      $newrec->{systemtype}=$systype;
 
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }

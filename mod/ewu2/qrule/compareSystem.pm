@@ -122,47 +122,8 @@ sub qcheckRecord
          }
          else{
             if ($rec->{srcsys} eq "EWU2"){
-               #
-               # osrelease mapping
-               #
-#               if (!($parrec->{systemos}=~/^\s*$/)){
-#                  my $mapos=$dataobj->ModuleObject("ewu2::lnkw5bosrelease");
-#                  $mapos->SetFilter({extosrelease=>\$parrec->{systemos}});
-#                  my ($maposrec,$msg)=$mapos->getOnlyFirst(qw(ALL));
-#                  if (defined($maposrec)){
-#                     if ($maposrec->{w5bosrelease} ne ""){
-#                        $parrec->{systemos}=$maposrec->{w5bosrelease};
-#                     }
-#                     else{  # try automatic map update
-#                        my $os=$dataobj->ModuleObject("itil::osrelease");
-#                        my $osname=$parrec->{systemos};
-#                        $osname=~s/"//g;
-#                        $osname='"'.$osname.'"';
-#                        $os->SetFilter({name=>$osname,cistatusid=>4});
-#                        my ($osrec,$msg)=$os->getOnlyFirst(qw(ALL));
-#                        if (defined($osrec)){
-#                           msg(INFO,"auto update ewu2::lnkw5bosrelease");
-#                           $mapos->ValidatedUpdateRecord($maposrec,
-#                                   {w5bosrelease=>$osrec->{name}},
-#                                   {id=>\$maposrec->{id}});
-#                        }
-#                     }
-#                  }
-#                  else{
-#                     my %new=(extosrelease=>$parrec->{systemos},direction=>1);
-#                     # try to find an already existing name in W5Base
-#                     my $os=$dataobj->ModuleObject("itil::osrelease");
-#                     $os->SetFilter({name=>'"'.$parrec->{systemos}.'"'});
-#                     my ($w5osrec,$msg)=$mapos->getOnlyFirst(qw(name));
-#                     if (defined($w5osrec)){
-#                        $new{w5bosrelease}=$w5osrec->{name};
-#                     }
-#                     $mapos->ValidatedInsertRecord(\%new);
-#                  }
-#               }
-               ############################################################## 
                # assetid compare 
-#               if (!in_array($dataobj->needVMHost(),$rec->{systemtype})){
+               if (!in_array($dataobj->needVMHost(),$rec->{systemtype})){
 #                  my $assetid=$parrec->{assetassetid};
 #                  # special handling to detect the correct AssetID for a
 #                  # system. Because posible wrong informations for ESX vm's,
@@ -227,8 +188,8 @@ sub qcheckRecord
 #                                      srcsys=>'ewu2',
 #                                      srcid=>$assetid});
 #                  }
-#               }
-#               else{  # special VM Host-system handling - vhostsystem needs to sync
+               }
+               else{ 
 #                  my $assetid=$parrec->{assetassetid};
 #                  if ($assetid ne ""){
 #                     my $sys=$dataobj->ModuleObject("ewu2::system");
@@ -279,7 +240,7 @@ sub qcheckRecord
 #                                $autocorrect,$forcedupd,$wfrequest,
 #                                \@qmsg,\@dataissue,\$errorlevel,
 #                                mode=>'string');
-#               }
+               }
                ############################################################### 
 
                if (defined($parrec->{systemname})){
@@ -358,7 +319,7 @@ sub qcheckRecord
                              $parrec,"osrelease",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlinkbaselogged');
+                             mode=>'leftouterlink');
                if ($rec->{allowifupdate}){
                   my $net=getModuleObject($self->getParent->Config(),
                           "itil::network");
