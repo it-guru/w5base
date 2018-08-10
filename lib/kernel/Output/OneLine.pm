@@ -261,7 +261,6 @@ sub ProcessBottom
             my $fieldobj=$self->{fieldobjects}->[$fieldno];
             if (in_array(\@useField,$fieldobj->Name())){
                my $dval=$self->{recordlist}->[$recno]->[$fieldno];
-print STDERR Dumper(\$dval);
                if (ref($dval) eq "ARRAY"){
                   map({$l{$_}=$_} @$dval);
                }
