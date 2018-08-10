@@ -1,0 +1,8 @@
+'itil::qrule::SystemDBsw'=>
+   {de=>'Prüfung Systemklassifizierung Datenbankserver SoftwareInst',
+    en=>'check systemclass databaseserver SoftwareInst'},
+'system classification db server is set without db software installations'=>{de=>'Systemklassifzierung als DB Server aber keine DB-Software-Installationen gefunden'},
+'system classification db server is not set, but db software installations found'=>{de=>'System ist nicht als DB Server klassifiziert, es wurden aber DB-Software-Installationen gefunden'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+
+

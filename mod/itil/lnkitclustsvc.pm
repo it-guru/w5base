@@ -296,7 +296,7 @@ sub new
                 vjoinon       =>['id'=>'itclustsvcid'],
                 vjoindisp     =>['software','version','quantity','comments'],
                 vjoininhash   =>['softwarecistatusid','liccontractcistatusid',
-                                 'liccontractid',
+                                 'liccontractid','id',
                                  'software','version','quantity']),
                                                    
       new kernel::Field::SubList(
