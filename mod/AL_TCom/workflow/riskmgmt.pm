@@ -246,7 +246,8 @@ sub calculateRiskState
       $v->{extdescarisedatedays}=$d->{days};
 
       push(@{$st->{raw}->{riskmgmtcalclog}},
-           "INFO: days to rise:  $v->{extdescarisedatedays}");
+           "INFO: ".$self->T("days to rise").
+           ": ".$v->{extdescarisedatedays});
 
       if ($v->{extdescarisedatedays}<30){
          $v->{extdescarisedatedayspoint}=3;
@@ -262,23 +263,17 @@ sub calculateRiskState
       }
 
       push(@{$st->{raw}->{riskmgmtcalclog}},
-           "INFO: days to rise in points :  ".
-           "$v->{extdescarisedatedayspoint}");
-
+           "INFO: ".$self->T("mitigation time").": ".
+           $v->{extdescarisedatedayspoint});
 
 
       push(@{$st->{raw}->{riskmgmtcalclog}},
-           "INFO: DTAG monetary impact row number ".
-           "(wffields.extdescdtagmonetaryimpact): ".
-           "$v->{extdescdtagmonetaryimpact}");
+           "INFO: ".$self->T("ITRM criticality").": ".
+           $v->{itrmcriticality});
 
       push(@{$st->{raw}->{riskmgmtcalclog}},
-           "INFO: ITRM criticality: ".
-           "$v->{itrmcriticality}");
-
-      push(@{$st->{raw}->{riskmgmtcalclog}},
-           "INFO: risk of occurrency (wffields.extdescriskoccurrency):".
-           " $v->{extdescriskoccurrency}");
+           "INFO: ".$self->T("risk of occurrency").": ".
+           $v->{extdescriskoccurrency});
       if (in_array([0,1,2],$v->{extdescriskoccurrency})){
          $v->{extdescriskoccurrencylevel}=0;
       }
@@ -296,8 +291,12 @@ sub calculateRiskState
       }
 
       push(@{$st->{raw}->{riskmgmtcalclog}},
-           "INFO: risk level ".
-           "column number $v->{extdescriskoccurrencylevel}");
+           "INFO: ".$self->T("risk level column number").
+           ": ".$v->{extdescriskoccurrencylevel});
+
+      push(@{$st->{raw}->{riskmgmtcalclog}},
+           "INFO: ".$self->T("risk level row number").
+           ": ".$v->{extdescdtagmonetaryimpact});
 
 
       my $mtrx=[
@@ -310,11 +309,14 @@ sub calculateRiskState
          $mtrx->[$v->{extdescdtagmonetaryimpact}]->
                 [$v->{extdescriskoccurrencylevel}];
       push(@{$st->{raw}->{riskmgmtcalclog}},
-           "INFO: magic risk key $v->{magicriskkey}");
+           "INFO: ".$self->T("magic risk key").": ".
+           $v->{magicriskkey});
 
       $st->{raw}->{riskmgmtpoints}=$v->{magicriskkey}+
                                    $v->{extdescarisedatedayspoint}+
                                    $v->{itrmcriticality};
+
+
 
       if ($st->{raw}->{riskmgmtpoints}<=7){
          $st->{raw}->{riskmgmtcolor}="green";

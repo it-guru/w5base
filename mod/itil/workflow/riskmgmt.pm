@@ -122,6 +122,9 @@ sub isRiskWfAuthorized
    if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager)],"down")){
       return(1);
    }
+   if ($mode eq "view"){
+      return(1) if ($self->IsMemberOf("admin"));
+   }
    return(0);
 }
 
@@ -194,7 +197,7 @@ sub getDynamicFields
                                                    'privacy',
                                                    'OTHER'],
                                   transprefix   =>'RISKBASE.',
-                                  group         =>'default',
+                                  group         =>'riskbase',
                                   container     =>'headref'),
 
       new kernel::Field::Textarea(name          =>'extdescriskimpact',
@@ -235,7 +238,7 @@ sub getDynamicFields
 
 
       new kernel::Field::Text(    name          =>'riskmgmtcolor',
-                                  label         =>'Riskpoints color',
+                                  label         =>'Risk value color',
                                   htmldetail    =>0,
                                   group         =>'riskrating',
                                   onRawValue    =>\&getCalculatedRiskState),
@@ -250,7 +253,7 @@ sub getDynamicFields
                                      my $color=$fld->RawValue($current);
                                      return($color);
                                   },
-                                  label         =>'Riskpoints',
+                                  label         =>'Risk value',
                                   group         =>'riskrating',
                                   onRawValue    =>\&getCalculatedRiskState),
 
@@ -563,6 +566,25 @@ sub getNextStep
 }
 
 
+sub camuflageOptionalField
+{
+   my $self=shift;
+   my $fld=shift;
+   my $d=shift;
+   my $current=shift;
+   if ($fld->Name() eq "name"){
+      if (!$self->isRiskWfAuthorized("view",$current)){
+         if (length($d)>3){
+            $d=substr($d,0,3)."...";
+         }
+      }
+   }
+
+   return($d);
+}
+
+
+
 
 sub isOptionalFieldVisible
 {
@@ -727,6 +749,7 @@ sub isViewValid
    my $rec=shift;
 
    my @l=("default","header");
+
 
    if ($self->isRiskWfAuthorized("view",$rec)){
       push(@l,"riskdesc","riskrating","relations","state",
@@ -1477,6 +1500,7 @@ sub nativProcess
       my $newrec={
          affectedapplicationid=>$WfRec->{affectedapplicationid},
          affectedapplication=>$WfRec->{affectedapplication},
+         subtyp=>'riskmeasure',
          mandator=>$WfRec->{mandator},
          mandatorid=>$WfRec->{mandatorid},
          name=>$h->{name},

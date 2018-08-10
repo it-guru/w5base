@@ -52,7 +52,7 @@
 'RISKDAYS.28'=>{de=>'28 Tage',en=>'28 days'},
 'RISKDAYS.29'=>{de=>'29 Tage',en=>'29 days'},
 'RISKDAYS.30'=>{de=>'30 und länger',en=>'30 and longer'},
-'Riskpoints'=>{de=>'Risiko Punkte'},
+'Risk value'=>{de=>'Risikowert'},
 'Risk state'=>{de=>'Risiko Status'},
 'Risk base type'=>{de=>'Risiko Basis-Typ'},
 'What kind of risk do you have?'=>{

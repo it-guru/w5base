@@ -47,5 +47,6 @@ Die Dokumentation von Maßnahmen stellt keine Absicherung gegen mögliche Incident
 'planned end'=>{de=>'Geplantes Ende'},
 'planned end must be behind planned start'=>{de=>'Geplantes Ende muss nach dem geplanten Begin liegen'},
 'it is not allowed to delete this entry'=>{de=>'Es ist nicht erlaubt, diesen Eintrag zu löschen'},
-'planned start must can not be befor workflow start'=>{de=>'Geplanter Beginn kann nicht vor Workflow-Start liegen'},
+'planned start to far in the past'=>{de=>'Geplanter Beginn zu weit in der Vergangenheit'},
+'planned end to far in the future'=>{de=>'Geplantes Ende zu weit in der Zukunft'},
 'planned timerange'=>{de=>'geplannter Zeitraum'},

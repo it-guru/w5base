@@ -48,6 +48,9 @@ sub getDynamicFields
    my $class;
 
    my @bk=($self->InitFields(
+      new kernel::Field::Link(    name          =>'subtyp',
+                                  label         =>'subtyp',
+                                  container     =>'headref'),
       new kernel::Field::Date(    name          =>'plannedstart',
                                   label         =>'planned start',
                                   htmleditwidth =>'100%',
@@ -109,12 +112,37 @@ sub Validate
       my $plannedstart=effVal($oldrec,$newrec,"plannedstart"); 
       my $createdate=effVal($oldrec,$newrec,"createdate"); 
       my $d=CalcDateDuration($plannedstart,$createdate);
-      if (!defined($d) || $d->{totalminutes}>1.0){
-         $self->LastMsg(ERROR,
-            "planned start must can not be befor workflow start");
+      my $subtyp=effVal($oldrec,$newrec,"subtyp");
+      my $maxoffset=10.0;
+      if ($subtyp eq "riskmeasure"){
+         $maxoffset=365*24*60*2;
+      }
+      if (!defined($d) || $d->{totalminutes}>$maxoffset){
+         $self->LastMsg(ERROR,"planned start to far in the past");
          return(0);
       }
    }
+   if (exists($newrec->{plannedend}) && $newrec->{plannedend} ne ""){
+      my $plannedend=effVal($oldrec,$newrec,"plannedend"); 
+      my $d=CalcDateDuration(NowStamp("en"),$plannedend);
+      my $subtyp=effVal($oldrec,$newrec,"subtyp");
+      my $maxoffset=365*24*60;
+      if ($subtyp eq "riskmeasure"){
+         $maxoffset=365*24*60*5;
+      }
+      if (!defined($d) || $d->{totalminutes}>$maxoffset){
+         $self->LastMsg(ERROR,"planned end to far in the future");
+         return(0);
+      }
+   }
+   if (effChanged($oldrec,$newrec,"stateid")){
+      if (defined($oldrec) && $oldrec->{stateid}<21 && $newrec->{stateid}>20){
+         $newrec->{eventend}=NowStamp("en");
+      }
+   }
+
+
+
    
    foreach my $fld (qw(plannedstart plannedend)){
       if (defined($oldrec) &&

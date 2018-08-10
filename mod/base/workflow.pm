@@ -65,6 +65,7 @@ sub new
                 label         =>'Short Description',
                 htmlwidth     =>'350px',
                 size          =>'20',
+                prepRawValue  =>\&camuflageOptionalField,
                 selectfix     =>1,
                 dataobjattr   =>'wfhead.shortdescription'),
                                    
@@ -1059,6 +1060,21 @@ sub getEventDay
    return($dd);
 }
 
+
+sub camuflageOptionalField
+{
+   my $self=shift;
+   my $d=shift;
+   my $current=shift;
+   my $ap=$self->getParent();
+   return($d) if (!defined($current));
+   my $class=$current->{class};
+   return($d) if (!defined($ap->{SubDataObj}->{$class}));
+   return($d) if (!$ap->{SubDataObj}->{$class}->can("camuflageOptionalField")); 
+   return(
+      $ap->{SubDataObj}->{$class}->camuflageOptionalField($self,$d,$current)
+   );
+}
 
 sub isOptionalFieldVisible
 {
