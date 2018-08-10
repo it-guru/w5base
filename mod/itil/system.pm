@@ -512,6 +512,7 @@ sub new
                                  'LDomain',              # sun logische Domain
                                  'HDomain',              # sun hardware Domain
                                  'lpar',                 # z/os
+                                 'virtualizedSystem',      # universal VM
                                  'abstract'
                                  ],
                 dataobjattr   =>'system.systemtype'),
@@ -1883,7 +1884,7 @@ sub needVMHost
 {
    my $self=shift;
 
-   return([]);
+   return(['virtualizedSystem']);
    return(['vmware','vPartition']);
 }
 
