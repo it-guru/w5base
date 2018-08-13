@@ -329,6 +329,9 @@ sub getSubListData
          }
          @view=@{$self->{'vjoindisp'.$mode}};
       }
+      if ($self->{vjoindistinct}){
+         unshift(@view,"VDISTINCT");
+      }
 
       $self->vjoinobj->SetCurrentView(@view);
       $param{parentfield}=$self->Name();

@@ -64,10 +64,6 @@ sub new
                 dataobjattr   =>'lnkitclustsvcappl.appl'),
 
       new kernel::Field::Link(
-                name          =>'itclustid',
-                dataobjattr   =>'lnkitclustsvcappl.itclust'),
-
-      new kernel::Field::Link(
                 name          =>'itclustsvcid',
                 dataobjattr   =>'lnkitclustsvcappl.itclustsvc'),
 
@@ -83,6 +79,15 @@ sub new
                 group         =>'applinfo',
                 label         =>'ApplicationID',
                 dataobjattr   =>'appl.applid'),
+
+      new kernel::Field::Import( $self,
+                vjointo       =>'itil::appl',
+                dontrename    =>1,
+                readonly      =>1,
+                group         =>'applinfo',
+                uploadable    =>0,
+                fields        =>[qw(tsm tsmid tsm2 tsm2id applmgr applmgrid)]),
+
 
       new kernel::Field::Link(
                 name          =>'itclustid',

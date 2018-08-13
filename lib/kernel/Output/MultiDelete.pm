@@ -32,6 +32,8 @@ sub new
 
 sub IsModuleSelectable
 {
+   my $self=shift;
+
    return(1);
 }
 

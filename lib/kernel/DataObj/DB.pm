@@ -133,7 +133,7 @@ sub getSqlFields
    my @flist=();
    my $drivername=defined($self->{DB}) ? $self->{DB}->DriverName():undef;
    my $distinct;
-   if ($view[0] eq "DISTINCT"){
+   if ($view[0] eq "VDISTINCT"){
       $distinct="distinct";
       shift(@view);
    }

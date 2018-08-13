@@ -105,6 +105,9 @@ sub ProcessHead
    }
    $tableidstr="id=\"$tableid\""; 
    my @sortnames;
+   if ($view[0] eq "VDISTINCT"){
+      shift(@view);
+   }
    foreach my $fieldname (@view){
       my $field=$app->getField($fieldname);
       if (defined($field)) {
@@ -191,14 +194,29 @@ sub ProcessLine
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
+
+   my $vjoindistinct=0;
+   if ($view[0] eq "VDISTINCT"){
+      shift(@view);
+      $vjoindistinct=1;
+   }
+
+
+
    $self->{lineclass}=1 if (!exists($self->{lineclass}));
    my $d="";
    my $lineclass="subline".$self->{lineclass};
    my $lineonclick;
-   my $idfield=$app->IdField();
-   my $idfieldname=ref($idfield) ? $idfield->Name():undef;
-   my $id=ref($idfield) ? $idfield->RawValue($rec):undef;
-   $id=$id->[0] if (ref($id) eq "ARRAY");
+
+   my $idfield;
+   my $idfieldname;
+   my $id;
+   if (!$vjoindistinct){
+      $idfield=$app->IdField();
+      $idfieldname=ref($idfield) ? $idfield->Name():undef;
+      $id=ref($idfield) ? $idfield->RawValue($rec):undef;
+      $id=$id->[0] if (ref($id) eq "ARRAY");
+   }
 
 
    #######################################################################

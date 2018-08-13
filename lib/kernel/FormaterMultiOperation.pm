@@ -178,18 +178,23 @@ sub ProcessLine
 {
    my ($self,$fh,$viewgroups,$rec,$msg)=@_;
    my $app=$self->getParent->getParent();
-   my @view=$app->getFieldObjsByView([$app->getCurrentView()],
-                                     current=>$rec);
+   my @viewnames=$app->getCurrentView();
+   my @view=$app->getFieldObjsByView(\@viewnames,current=>$rec);
    my $d="";
    my $idfield=$app->IdField();
 
    $d.="<tr>";
-   my $idtag="ACT:".$idfield->RawValue($rec);
+   my $idtag="ACT:-NONE-";
    my $class="line";
-   my $marker="<input class=ACT type=checkbox name=$idtag>";
-   my $tag=Query->Param($idtag);
+   my $marker="&nbsp;";
+   my $tag;
    my $fail=0;
    my $lastmsg;
+   if (defined($idfield) && $viewnames[0] ne "VDISTINCT"){
+      $idtag="ACT:".$idfield->RawValue($rec);
+      $marker="<input class=ACT type=checkbox name=$idtag>";
+      $tag=Query->Param($idtag);
+   }
    if ($tag ne ""){
       $fail=1;
       my ($id)=$idtag=~m/^ACT:(.+)$/;

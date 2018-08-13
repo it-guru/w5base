@@ -134,6 +134,56 @@ sub new
                 vjoininhash   =>['fullname','itservid',
                                  'applicationnames','name']),
 
+      new kernel::Field::Text(
+                name          =>'applications',
+                label         =>'Applications',
+                group         =>'applications',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkitclustsvcappl',
+                vjoinon       =>['id'=>'itclustid'],
+                vjoinbase     =>{applcistatusid=>"<6"},
+                vjoindistinct =>1,
+                vjoindisp     =>['appl'],
+                vjoininhash   =>['appl','applid']),
+
+      new kernel::Field::SubList(
+                name          =>'appltsm',
+                label         =>'Application TSMs',
+                group         =>'applications',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkitclustsvcappl',
+                vjoinon       =>['id'=>'itclustid'],
+                vjoinbase     =>{applcistatusid=>"<6"},
+                vjoindistinct =>1,
+                vjoindisp     =>['tsm']),
+
+      new kernel::Field::SubList(
+                name          =>'appltsm2',
+                label         =>'Application deputy TSMs',
+                group         =>'applications',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkitclustsvcappl',
+                vjoinon       =>['id'=>'itclustid'],
+                vjoinbase     =>{applcistatusid=>"<6"},
+                vjoindistinct =>1,
+                vjoindisp     =>['tsm2']),
+
+      new kernel::Field::SubList(
+                name          =>'applapplmgr',
+                label         =>'Application ApplicationManagers',
+                group         =>'applications',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::lnkitclustsvcappl',
+                vjoinon       =>['id'=>'itclustid'],
+                vjoinbase     =>{applcistatusid=>"<6"},
+                vjoindistinct =>1,
+                vjoindisp     =>['applmgr']),
+
+
       new kernel::Field::SubList(
                 name          =>'systems',
                 label         =>'Systems',
@@ -321,7 +371,8 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default services systems software contacts misc control
+   return(qw(header default services systems applications
+             software contacts misc control
              attachments source));
 }
 
@@ -503,7 +554,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return(qw(header default history source services contacts 
+   return(qw(header default history source services contacts applications
              attachments control systems misc));
 }
 

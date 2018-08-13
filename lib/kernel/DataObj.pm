@@ -3610,6 +3610,9 @@ sub getSubList
    $mode="SubXMLV01"   if ($mode=~m/XML/);
    if ($mode=~m/^OneLine$/){
       my @view=$self->GetCurrentView();
+      if ($view[0] eq "VDISTINCT"){ # for VDISTINCT Querys use second field
+         return([$self->getVal($view[1])]);
+      }
       return([$self->getVal($view[0])]);
    }
    if ($mode eq "RAW" || $mode eq "JSON"){

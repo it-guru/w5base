@@ -911,7 +911,7 @@ sub calcRooms
    my $locationid=Query->Param("Formated_affectedlocationid");
    my $asset=getModuleObject($self->getParent->Config,"itil::asset");
    $asset->SetFilter({locationid=>\$locationid});
-   my @roomrec=$asset->getHashList(qw(DISTINCT room));
+   my @roomrec=$asset->getHashList(qw(VDISTINCT room));
    foreach my $roomrec (@roomrec){
       $room{$roomrec->{room}}=1 if ($roomrec->{room} ne "");
    }
