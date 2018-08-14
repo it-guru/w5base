@@ -2817,10 +2817,15 @@ EOF
    my $attmsg=$self->T("Attachment","base::workflow::mailsend");
    my $refmsg=$self->T("add refernce","base::workflow::mailsend");
    my $lastmsg=$self->findtemplvar({},"LASTMSG");
+   my $refdialog="&nbsp;";
+   if ($parent ne "" && $id ne ""){
+      $refdialog="<label for=\"addref\">$refmsg:</label>";
+      $refdialog.="<input id=\"addref\" name=addref $addref type=checkbox>";
+   }
    $s=~s/"//g;
    $t=~s/"//g;
    $c=~s/"//g;
-   print('<table style="margin:5px;padding-right:10px" border=0 '.
+   print('<table style="margin:0px;padding:0px" border=0 '.
          'cellspacing=0 cellpadding=0 width="100%" height="100%">');
    #printf("<tr><td height=1%%>Mail related to</td></tr>");
    print <<EOF;
@@ -2835,7 +2840,7 @@ EOF
       $to:</span></td>
   </tr></table>
   </td>
-  <td><textarea id=to name=to style="width:100%;height:40px">$t</textarea></td>
+  <td><textarea id=to name=to style="width:100%;height:40px;resize:vertical;max-height:130px;min-height:30px;">$t</textarea></td>
   </tr></table>
  </td></tr>
  <tr height=1%><td height=1%>
@@ -2849,7 +2854,7 @@ EOF
       CC:</span></td>
   </tr></table>
   </td>
-  <td><textarea id=cc name=cc style="width:100%;height:30px">$c</textarea></td>
+  <td><textarea id=cc name=cc style="width:100%;height:30px;resize:vertical;max-height:130px;min-height:30px;">$c</textarea></td>
   </tr></table>
  </td></tr>
  <tr height=1%><td height=1%>
@@ -2862,12 +2867,13 @@ EOF
   <table width=\"100%\"><tr>
   <td width=50>$attmsg:</td>
   <td><input name=file size=32 type=file></td>
-  <td width=140 nowrap align=right><div style="vertical-align:middle"><label for="addref">$refmsg:</label>
-  <input id="addref" name=addref $addref type=checkbox></div></td>
+  <td width=140 nowrap align=right><div style="vertical-align:middle">
+  $refdialog
+  </div></td>
   </tr></table>
  </td></tr>
  <tr><td>
-  <textarea onkeydown="textareaKeyHandler(this,event);" name=msg style="width:100%;height:100%">$m</textarea>
+  <textarea onkeydown="textareaKeyHandler(this,event);" name=msg style="width:100%;height:100%;resize:none">$m</textarea>
  </td></tr>
  <tr height=1%><td height=1% align=left>
 <iframe style="height:15px;width:100%;margin:0px;padding:0px;border-style:none; border-width:0pt;" src="Empty" name=action></iframe>

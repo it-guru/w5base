@@ -19,7 +19,6 @@ package kernel::FormaterMultiOperation;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Formater);
 
 
@@ -86,7 +85,7 @@ sub ProcessHead
    }
 
    my $d="";
-   $d.=$app->HtmlHeader(form=>1,body=>1,
+   $d.=$app->HtmlHeader(form=>1,body=>1,js=>['toolbox.js'],
                         style=>[qw(default.css MultiAct.css)]);
    if ($self->{FAIL}){
       $self->getParent->getParent->LastMsg(ERROR,

@@ -3615,7 +3615,7 @@ sub getSubList
       }
       return([$self->getVal($view[0])]);
    }
-   if ($mode eq "RAW" || $mode eq "JSON"){
+   if ($mode eq "RAW" || $mode eq "JSON" || $mode eq "ContactMail"){
       my @view=$self->GetCurrentView();
       return($self->getHashList(@view));
    }

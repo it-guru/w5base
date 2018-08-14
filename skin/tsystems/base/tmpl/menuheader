@@ -41,9 +41,10 @@ TSI-HELP: <a  style="color:white" href="callto:+498008744357">+49 800 8744357</a
 
 <div class="navItem"><a target=_top href="../menu/root" title="W5Base/Darwin Start-Page">Start-Page</a></div>
 
+<!--
 <div class="navItem" style='width:150px'>
 <a href="../../base/Explore/Main" target=msel><img width=11 height=11 src="../../base/load/exploreico.gif">&nbsp;&nbsp;W5Data-Explorer</a></div>
-
+-->
 
 <div class="navItem"><a target=_blank href="https://yam.telekom.de" title="YAM">YAM</a></div>
 
