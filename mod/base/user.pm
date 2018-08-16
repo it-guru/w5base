@@ -685,6 +685,12 @@ sub new
                 label         =>'W5Base Mail Signatur',
                 dataobjattr   =>'contact.w5mailsig'),
 
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                vjoinon       =>['userid'=>'refid'],
+                label         =>'Contacts',
+                group         =>'contacts'),
+
       new kernel::Field::Select(
                 name          =>'sms',
                 label         =>'SMS Notification',
@@ -1305,6 +1311,14 @@ sub Validate
          }
       }
    }
+   if (effChangedVal($oldrec,$newrec,"usertyp") &&
+       $oldrec->{usertyp} eq "function"){
+      if ($#{$oldrec->{contacts}}!=-1){
+         $self->LastMsg(ERROR,
+                        "usertyp change not allowed with existing contacts");
+         return(0);
+      }
+   }
 
 
 
@@ -1573,7 +1587,7 @@ sub isViewValid
    }  
    elsif ($rec->{usertyp} eq "function"){
       if ($self->IsMemberOf(["admin","support"])){
-         @gl=qw(header name default nativcontact comments 
+         @gl=qw(header name default nativcontact comments contacts
                    control userid userro qc history);
       }
       else{
@@ -1736,11 +1750,15 @@ sub isWriteValid
    return("default","name","office","comments") if (!defined($rec));
    return(undef) if (!defined($rec));
    if ($self->IsMemberOf("admin")){
-      return(qw(default name office private userparam 
+      my @l=(qw(default name office private userparam 
                 groups usersubst control admcomments
                 comments header picture nativcontact userro 
                 personrelated introdution
                 interview officeacc userid));
+      if ($rec->{usertyp} eq "function"){
+         push(@l,"contacts");
+      }
+      return(@l);
    }
    my $userid=$self->getCurrentUserId();
    if ($userid eq $rec->{userid} ||
@@ -1748,6 +1766,9 @@ sub isWriteValid
       my @l=("name","userparam","office","officeacc","private","nativcontact",
              "usersubst","control","officeacc","personrelated","introdution",
              "officeacc","interview","comments");
+      if ($rec->{usertyp} eq "function"){
+         push(@l,"contacts");
+      }
       return($self->expandByDataACL(undef,@l));
    }
    # check if the user has a direct boss
@@ -1916,7 +1937,7 @@ sub getDetailBlockPriority
    my %param=@_;
    return(qw(header name picture default admcomments 
              comments nativcontact office 
-             officeacc private personrelated introdution
+             officeacc private personrelated introdution contacts
              userparam control groups usersubst userid userro ));
 }
 

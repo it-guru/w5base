@@ -96,8 +96,7 @@ sub new
                    return(1);
                 },
                 label         =>'Type',
-                dataobjattr   =>"if (contact.usertyp='altemail',".
-                                "'alternate','primary')"),
+                dataobjattr   =>"contact.usertyp"),
                                   
       new kernel::Field::Text(
                 name          =>'surname',
@@ -208,6 +207,8 @@ sub getSqlFrom
 
    my $precision0="";
    my $precision1="";
+   my $precision2="";
+   my $precision3="";
    if ($mode eq "select"){
       my ($worktable,$workdb)=$self->getWorktable();
       $workdb=$self->{DB} if (!defined($workdb));
@@ -216,21 +217,26 @@ sub getSqlFrom
             if (!ref($filter->{userid})){
                $precision0.="and pcontact='$filter->{userid}' ";
                $precision1.="and userid='$filter->{userid}' ";
+               $precision2.="and lnkcontact.targetid='$filter->{userid}' ";
+               $precision3.="and baseuser.userid='$filter->{userid}' ";
             }
          }
          if (ref($filter) eq "HASH" && defined($filter->{email})){
-     
             if (!ref($filter->{email}) &&
                 !($filter->{email}=~m/[\*\?\s]/)){
-               my $e="email=".$workdb->quotemeta(lc($filter->{email}))." ";
-               $precision0.="and $e ";
-               $precision1.="and $e ";
+               my $e="a.email=".$workdb->quotemeta(lc($filter->{email}))." ";
+               $precision0.="and a.$e ";
+               $precision1.="and b.$e ";
+               $precision2.="and c.$e ";
+               $precision3.="and d.$e ";
             }
             if (ref($filter->{email}) eq "ARRAY"){
                if ($#{$filter->{email}}==0){
                   my $e="email=".$workdb->quotemeta(lc($filter->{email}))." ";
-                  $precision0.="and $e ";
-                  $precision1.="and $e ";
+                  $precision1.="and a.$e ";
+                  $precision1.="and b.$e ";
+                  $precision2.="and c.$e ";
+                  $precision3.="and d.$e ";
                }
             }
          }
@@ -238,15 +244,54 @@ sub getSqlFrom
    }
 
    my $from="(".
-            "select  email, cistatus, userid,pcontact, usertyp,".
-            "        fullname, createdate, modifydate, createuser, modifyuser,".
-            "        editor, realeditor,srcsys,srcload,srcid ".
+            "select  a.email, a.cistatus, a.userid,a.pcontact, ".
+                    "'primary' usertyp,".
+                    "a.fullname, a.createdate, a.modifydate,".
+                    "a.createuser, a.modifyuser,".
+                    "a.editor, a.realeditor,a.srcsys,a.srcload,a.srcid ".
             "from contact as a where usertyp='altemail' ".$precision0.
             " union ".
-            "select  email, cistatus, userid,userid pcontact, usertyp,".
-            "        fullname, createdate, modifydate, createuser, modifyuser,".
-            "        editor, realeditor,srcsys,srcload,srcid ".
+            "select  b.email, b.cistatus, b.userid,b.userid pcontact, ".
+                    "'alternate' usertyp,".
+                    "b.fullname, b.createdate, b.modifydate,".
+                    "b.createuser, b.modifyuser,".
+                    "b.editor, b.realeditor,b.srcsys,b.srcload,b.srcid ".
             "from contact as b where usertyp<>'altemail' ".$precision1.
+            " union ".
+            "select  c.email, c.cistatus, c.userid,".
+                    "lnkcontact.targetid pcontact,".
+                    "'alternatefrom' usertyp,".
+                    "c.fullname, c.createdate, c.modifydate, c.createuser,".
+                    "c.modifyuser,".
+                    "c.editor, c.realeditor,c.srcsys,c.srcload,c.srcid ".
+            "from contact as c join lnkcontact ".
+                 "on c.userid=lnkcontact.refid and ".
+                 "lnkcontact.parentobj='base::user' and ".
+                 "(lnkcontact.expiration is null or ".
+                  "lnkcontact.expiration<now()) and ".
+                 "lnkcontact.croles like \"\%roles='useasfrom'=roles\%\" ".
+            " where c.cistatus in ('4') ".$precision2.
+            " union ".
+            "select  d.email, d.cistatus, d.userid,".
+                    "baseuser.userid pcontact,".
+                    "'alternatefrom' usertyp,".
+                    "d.fullname, d.createdate, d.modifydate, d.createuser,".
+                    "d.modifyuser,".
+                    "d.editor, d.realeditor,d.srcsys,d.srcload,d.srcid ".
+            "from contact baseuser ".
+            " join lnkgrpuser on baseuser.userid=lnkgrpuser.userid ".
+                                " and (lnkgrpuser.expiration is null ".
+                                "   or lnkgrpuser.expiration<now()) ".
+            " join grp on grp.grpid=lnkgrpuser.grpid ".
+            " join lnkcontact on grp.grpid=lnkcontact.targetid ".
+                 " and lnkcontact.parentobj='base::user' ".
+                 " and lnkcontact.target='base::grp' ".
+                 " and (lnkcontact.expiration is null or ".
+                       "lnkcontact.expiration<now()) ".
+                 " and lnkcontact.croles like \"\%roles='useasfrom'=roles\%\" ".
+            " join contact as d  ".
+                 "on d.userid=lnkcontact.refid  ".
+            " where d.cistatus in ('4') ".$precision3.
             ") as contact";
 
    return($from);
@@ -295,6 +340,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    return(undef) if ($rec->{emailtyp} eq "primary");
+   return(undef) if ($rec->{emailtyp} eq "alternatefrom");
    return("default") if ($self->IsMemberOf("admin"));
    return(undef);
 }

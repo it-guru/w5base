@@ -10,3 +10,4 @@
 'Information contact'=>{de=>'Informationspartner'},
 'Event information contact'=>{de=>'Ereignis-Informationspartner'},
 'facility manager'=>{de=>'Hausmeister'},
+'UseAsFrom'=>{de=>'VerwendungAlsVon'},

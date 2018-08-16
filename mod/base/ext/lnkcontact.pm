@@ -47,6 +47,13 @@ sub getPosibleRoles
              "write"           =>$self->getParent->T("write",$self->Self)
              );
    }
+   if ($parentobj eq "base::user" ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self() eq "base::user")){
+      return("useasfrom"        =>$self->getParent->T("UseAsFrom",$self->Self),
+             );
+   }
    if ($parentobj=~m/^.+::projectroom$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&

@@ -159,3 +159,4 @@
 '%d from %d user successful imported'=>{
          de=>'%d von %d Kontakten erfolgreich importiert'},
 'add organisational tree'=>{de=>'Organisationsbaum hinzufügen'},
+'usertyp change not allowed with existing contacts'=>{de=>'Änderung des Usertyps nicht erlaubt bei vorhandenen Kontakten'},
