@@ -19,4 +19,5 @@
 'BCC to sender'=>{de=>'BCC an Versender'},
 'Attachment'=>{de=>'Anlage'},
 'add refernce'=>{de=>'Referenz hinzufügen'},
+'from'=>{de=>'Von'},
 

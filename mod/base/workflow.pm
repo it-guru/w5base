@@ -2636,6 +2636,7 @@ sub externalMailHandler
    }
 
 
+   my $from=Query->Param("from");
    my $s=Query->Param("subject");
    my $m=Query->Param("msg");
    my @t=split(/\s*[,;]\s*/,Query->Param("to"));
@@ -2649,6 +2650,27 @@ sub externalMailHandler
 
    if ($addref ne ""){
       $addref="checked";
+   }
+
+
+   # calculate valid fromlist
+   my $user=getModuleObject($self->Config,"base::user");
+   my $userid=$self->getCurrentUserId();
+   my @fromlist;
+   if ($userid ne ""){
+      $user->SetFilter({userid=>\$userid});
+      my ($urec)=$user->getOnlyFirst(qw(userid emails));
+      if (defined($urec) && ref($urec->{emails}) eq "ARRAY" &&
+          $#{$urec->{emails}}>0){
+         foreach my $emailrec (@{$urec->{emails}}){
+            if ($emailrec->{emailtype} eq "primary"){
+               unshift(@fromlist,$emailrec->{email});
+            }
+            else{
+               push(@fromlist,$emailrec->{email});
+            }
+         }
+      }
    }
 
    if (Query->Param("ACTION") eq "send"){
@@ -2676,6 +2698,9 @@ sub externalMailHandler
             $notiy{emailtext}.=$url;
             $notiy{emailtext}.="\n\n";
          }
+      }
+      if ($from ne "" && $#fromlist>0 && in_array(\@fromlist,$from)){
+         $notiy{emailfrom}=$from;
       }
       $notiy{emailto}=\@t;
       $notiy{emailcc}=\@c;
@@ -2802,7 +2827,6 @@ EOF
       }
    }
 
-
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','work.css'],
                            body=>1,form=>1,target=>'action',multipart=>1,
@@ -2810,6 +2834,26 @@ EOF
                                 'jquery.js','toolbox.js','subModal.js'],
                            title=>'W5Base Mail Client');
    print $self->HtmlSubModalDiv();
+
+   my $user=getModuleObject($self->Config,"base::user");
+   my $userid=$self->getCurrentUserId();
+   my $fromline="";
+   if ($#fromlist>0){
+      $fromline="<tr height=1%><td align=left>";
+      $fromline.=$self->T("from","base::workflow::mailsend").":";
+      $fromline.="</td>";
+      $fromline.="<td>";
+      $fromline.="<select name=from style=\"width:100%\">";
+      foreach my $fromemail (@fromlist){
+         $fromline.="<option value=\"$fromemail\"";
+         $fromline.=" selected" if ($from eq $fromemail);
+         $fromline.=">$fromemail</option>";
+      }
+      $fromline.="</select>";
+      $fromline.="</td>";
+      $fromline.="</tr>";
+   }
+
    my $to=$self->T("To","base::workflow::mailsend");
    my $subject=$self->T("Subject","base::workflow::mailsend");
    my $send=$self->T("Send message","base::workflow::mailsend");
@@ -2829,8 +2873,8 @@ EOF
          'cellspacing=0 cellpadding=0 width="100%" height="100%">');
    #printf("<tr><td height=1%%>Mail related to</td></tr>");
    print <<EOF;
- <tr height=1%><td height=1%>
-  <table width=\"100%\"><tr>
+<tr height=1%><td height=1%>
+  <table width=\"100%\">${fromline}<tr>
   <td width=50 valign=top>
   <table border=0 cellspacing=0 cellpadding=0><tr>
   <td><span class=sublink onclick=\"openAdressbook('to','$to');\">
