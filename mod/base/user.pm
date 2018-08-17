@@ -1620,10 +1620,13 @@ sub isViewValid
          @gl=grep(/^(name|header)$/,@gl);
       }
       elsif ($secstate<3){
-         @gl=grep(/^(name|header|office|default|groups|comments|nativcontact|userid|qc)$/,@gl);
+         @gl=grep(/^(name|header|office|default|groups|contacts|
+                     comments|nativcontact|userid|qc)$/x,@gl);
       }
       elsif ($secstate<4){
-         @gl=grep(/^(name|header|office|officeacc|private|default|groups|comments|nativcontact|userid|control|qc|userro|history)$/,@gl);
+         @gl=grep(/^(name|header|office|officeacc|private|contacts|
+                     default|groups|comments|nativcontact|userid|
+                     control|qc|userro|history)$/x,@gl);
       }
    }
    if ($userid==$rec->{userid}){
