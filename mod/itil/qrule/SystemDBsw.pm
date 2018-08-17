@@ -104,7 +104,9 @@ sub qcheckRecord
       $csobj->SetFilter({clustid=>$rec->{itclustid},
                          itclustcistatusid=>[qw(3 4 5)]});
       foreach my $swinst ($csobj->getHashList('software')) {
-          push(@cinst,$swinst->{id});
+          foreach my $swi (@{$swinst->{software}}){
+             push(@cinst,$swi->{id});
+          }
       }
    }
 
