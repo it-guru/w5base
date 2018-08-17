@@ -17,7 +17,7 @@ package kernel::cgi;
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 use strict;
-use kernel::cgi;
+use kernel;
 use Data::Dumper;
 use CGI(qw(-oldstyle_urls));
 
@@ -74,6 +74,11 @@ sub UploadInfo
 sub Param
 {
    my $self=shift;
+
+   my $queryIsUtf8=0;
+   if ($self->{'cgi'}->content_type()=~m/charset=UTF-8/i){
+      $queryIsUtf8=1;
+   }
    if (defined($_[1])){
       return($self->{'cgi'}->param(-name=>$_[0],-value=>$_[1]));
    }
@@ -82,7 +87,10 @@ sub Param
              $self->{'cgi'}->multi_param($_[0]):
              $self->{'cgi'}->param($_[0]));
    }
-   return($self->{'cgi'}->param(@_));
+   my $val=$self->{'cgi'}->param(@_);
+   $val=UTF8toLatin1($val) if ($queryIsUtf8);
+
+   return($val);
 }
 
 
@@ -122,6 +130,7 @@ sub Reset
 }
 
 
+
 sub UrlParam
 {
    my $self=shift;
@@ -134,6 +143,10 @@ sub MultiVars
    my $self=shift;
    my %h=();
 
+   my $queryIsUtf8=0;
+   if ($self->{'cgi'}->content_type()=~m/charset=UTF-8/i){
+      $queryIsUtf8=1;
+   }
    foreach my $v ($self->{'cgi'}->param()){
       my @val=$self->{'cgi'}->can('multi_param') ?
               $self->{'cgi'}->multi_param($v):
@@ -141,9 +154,14 @@ sub MultiVars
       if ($#val==0){
          $h{$v}=$val[0];
          $h{$v}=~s/&quote;/"/g;
+         $h{$v}=UTF8toLatin1($h{$v}) if ($queryIsUtf8);
       }
       else{
-         map({$_=~s/&quote;/"/g;} @val);
+         map({
+            $_=~s/&quote;/"/g;
+            $_=UTF8toLatin1($_) if ($queryIsUtf8);
+            $_;
+         } @val);
          $h{$v}=\@val;
       }
    }
