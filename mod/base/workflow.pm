@@ -2202,13 +2202,16 @@ function displayResult(res)
    if ("$field"!=""){
        curStr=parent.\$("#$field").val();
    }
-   var curl=curStr.split(sepExp); 
+   var curl=new Array();
+   if (curStr){
+      curl=curStr.split(sepExp); 
+   }
 
    for(var c=0;c<res.length && c<50;c++){
       d+="<tr>";
       if ("$field"!=""){
          d+="<td valign=top><input type=checkbox";
-         if (!jQuery.inArray(res[c].email,curl)){
+         if (jQuery.inArray(res[c].email,curl)>-1){
             d+=" checked";
          }
          d+=" onclick=\\"changeValue(this,"+c+");\\"></td>";
@@ -2869,7 +2872,7 @@ EOF
    $s=~s/"//g;
    $t=~s/"//g;
    $c=~s/"//g;
-   print('<table style="margin:0px;padding:0px" border=0 '.
+   print('<table class=noselect style="margin:0px;padding:0px" border=0 '.
          'cellspacing=0 cellpadding=0 width="100%" height="100%">');
    #printf("<tr><td height=1%%>Mail related to</td></tr>");
    print <<EOF;
