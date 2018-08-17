@@ -1591,7 +1591,8 @@ sub isViewValid
                    control userid userro qc history);
       }
       else{
-         @gl=qw(header name default nativcontact comments userid userro qc);
+         @gl=qw(header name default nativcontact comments 
+                contacts userid userro qc);
       }
    }  
    elsif ($rec->{usertyp} eq "service"){
