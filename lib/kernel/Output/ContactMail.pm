@@ -135,7 +135,7 @@ sub fieldSelectBox
 
    
 
-   my $d="<select name=\"$name\" multiple size=10 style=\"width:100%\" >";
+   my $d="<select name=\"$name\" multiple size=7 style=\"width:100%\" >";
    foreach my $fld (@$fields){
       my @fldname;
       my @fldlabel;
@@ -239,13 +239,15 @@ sub ProcessHead
    if ($#fieldlist!=0){
       $d.="<table class=freeform width=98% border=0>";
       $d.="<tr>";
-      $d.="<td nowrap style=\"padding:15px\">";
-      $d.="To:<br>";
+      $d.="<td nowrap style=\"padding:15px;padding-top:0px;".
+          "padding-bottom:0px\">";
+      $d.=$app->T("To:",$self->Self)."<br>";
       $d.=$self->fieldSelectBox($app,$rec,"useTO",\@fieldlist,\@useTO);
 
       $d.="</td>";
-      $d.="<td nowrap style=\"padding:15px\">";
-      $d.="CC:<br>";
+      $d.="<td nowrap style=\"padding:15px;padding-top:0px;".
+          "padding-bottom:0px\">";
+      $d.=$app->T("CC:",$self->Self)."<br>";
       $d.=$self->fieldSelectBox($app,$rec,"useCC",\@fieldlist,\@useCC);
       $d.="</td>";
       $d.="</tr><tr>";
