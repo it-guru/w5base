@@ -245,14 +245,14 @@ sub getSqlFrom
 
    my $from="(".
             "select  a.email, a.cistatus, a.userid,a.pcontact, ".
-                    "'primary' usertyp,".
+                    "'alternate' usertyp,".
                     "a.fullname, a.createdate, a.modifydate,".
                     "a.createuser, a.modifyuser,".
                     "a.editor, a.realeditor,a.srcsys,a.srcload,a.srcid ".
             "from contact as a where usertyp='altemail' ".$precision0.
             " union ".
             "select  b.email, b.cistatus, b.userid,b.userid pcontact, ".
-                    "'alternate' usertyp,".
+                    "'primary' usertyp,".
                     "b.fullname, b.createdate, b.modifydate,".
                     "b.createuser, b.modifyuser,".
                     "b.editor, b.realeditor,b.srcsys,b.srcload,b.srcid ".
