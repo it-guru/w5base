@@ -817,20 +817,24 @@ sub InsertRecord
    else{
       $self->Log(INFO,"sqlwrite","(long insert >64k)");
    }
-   if ($workdb->do($cmd)){
+
+   my $bk=$workdb->do($cmd);
+   if (!$bk){
       my $retrycnt=0;
       while(($workdb->getErrorMsg())
             =~/^Deadlock found when trying to get lock/){
         $retrycnt++;
         msg(ERROR,"found Deadlock - retry $retrycnt");
         sleep(1);
-        $workdb->do($cmd);
+        $bk=$workdb->do($cmd);
+        last if ($bk);
         if ($retrycnt>3){
            msg(ERROR,"Deadlock problem - giving up");
            last;
         }
       }
-
+   }
+   if ($bk){
       $workdb->finish();
       if (!defined($id)){
          # id was not created by w5base, soo we need to read it from the
