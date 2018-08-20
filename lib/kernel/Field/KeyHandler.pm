@@ -118,6 +118,7 @@ sub FinishWrite
    if (defined($self->{extselect})){
       foreach my $k (keys(%{$self->{extselect}})){
          my $val;
+         next if ($k eq "trange");
          if (exists($newrec->{$k})){
             $val=$newrec->{$k};
             $updneed=1 if (!defined($oldrec->{$k}) ||
