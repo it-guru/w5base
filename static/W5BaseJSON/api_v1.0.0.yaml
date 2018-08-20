@@ -1,0 +1,144 @@
+openapi: "3.0.0"
+info:
+  title: W5Base JSON API Interface
+  version: 1.0.0
+servers:
+  - url: https://darwin.telekom.de/
+paths:
+   /{config}/auth/{dataobj}/Result:
+      post:
+         description: |
+          Query "dataobj"
+         tags:
+           - Query Data
+         security:
+           - BasicAuth: []
+         parameters:
+            - name: config
+              in: path
+              description: 'Configuration name, you want to access'
+              required: true
+              schema:
+                type: string
+
+            - name: dataobj
+              in: path
+              description: 'Name of Dataobject with :: replaced by /'
+              required: true
+              schema:
+                type: string
+            - name: FormatAs
+              in: query
+              description: 'Format response in specified Format'
+              required: true
+              schema: 
+                 type: string
+                 enum: [nativeJSON]
+            - name: UseLimit
+              in: query
+              description: 'Number of records, that should be returned at max'
+              required: false
+              schema: 
+                 type: number
+            - name: UseLimitStart
+              in: query
+              description: 'Start sending Records with given record number'
+              required: false
+              schema: 
+                 type: number
+            - name: CurrentView
+              in: query
+              description: |
+                Specifies which fields you want to have in output. If
+                it is a bareword, it will be interprated as a viewname. If
+                it is a list of words sperated with "," and in brackets "()",
+                the specified internal fieldnames will returned.
+              required: false
+              schema: 
+                 type: string
+            - name: search_
+              in: query
+              description: |
+                You can query any "searchable" interal fieldname 
+                by spezifing all filters as "internalfieldname_search" f.e.
+                if you want to query by surname = Vogler, you have to add
+                parameter "search_surname=Vogler"
+              required: false
+              schema:
+                type: object
+              style: form
+              explode: true
+         responses:
+            200:
+              description: successful operation
+      get:
+         description: |
+          Query "dataobj"
+         tags:
+           - Query Data
+         security:
+           - BasicAuth: []
+         parameters:
+            - name: config
+              in: path
+              description: 'Configuration name, you want to access'
+              required: true
+              schema:
+                type: string
+
+            - name: dataobj
+              in: path
+              description: 'Name of Dataobject with :: replaced by /'
+              required: true
+              schema:
+                type: string
+            - name: FormatAs
+              in: query
+              description: 'Format response in specified Format'
+              required: true
+              schema: 
+                 type: string
+                 enum: [nativeJSON]
+            - name: UseLimit
+              in: query
+              description: 'Number of records, that should be returned at max'
+              required: false
+              schema: 
+                 type: number
+            - name: UseLimitStart
+              in: query
+              description: 'Start sending Records with given record number'
+              required: false
+              schema: 
+                 type: number
+            - name: CurrentView
+              in: query
+              description: |
+                Specifies which fields you want to have in output. If
+                it is a bareword, it will be interprated as a viewname. If
+                it is a list of words sperated with "," and in brackets "()",
+                the specified internal fieldnames will returned.
+              required: false
+              schema: 
+                 type: string
+            - name: search_
+              in: query
+              description: |
+                You can query any "searchable" interal fieldname 
+                by spezifing all filters as "internalfieldname_search" f.e.
+                if you want to query by surname = Vogler, you have to add
+                parameter "search_surname=Vogler"
+              required: false
+              schema:
+                type: object
+              style: form
+              explode: true
+         responses:
+            200:
+              description: successful operation
+
+components:
+   securitySchemes:
+     BasicAuth:
+       type: http
+       scheme: basic
