@@ -611,6 +611,11 @@ sub Import
                id=>\$sysrec->{physicalelementid}
             });
             my ($arec,$msg)=$dlass->getOnlyFirst(qw(ALL));
+            if ($arec->{serialno} eq ""){
+               $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                              "missing asset attribut serialno for autoimport");
+               return(undef);
+            }
             if ($arec->{commonname} eq "" ||
                 $arec->{locationid} eq "" ||
                 $arec->{deleted} eq "1"   ||

@@ -39,7 +39,7 @@
 'itu.ac.quality.appl'=>{de=>'Anwendung',en=>'Application'},
 'itts.system.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
 'itts.appl.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
-'AL_TCom.system.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
+'AL_TCom.system.import.ac'=>{de=>'AssetManager',en=>'AssetManager'},
 'TSSlovakia.system.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
 'AL_TCom.itclust.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
 'TSSlovakia.itclust.acimport'=>{de=>'AssetManager Import',en=>'AssetManager Import'},
