@@ -87,14 +87,16 @@ sub Param
              $self->{'cgi'}->multi_param($_[0]):
              $self->{'cgi'}->param($_[0]));
    }
-   return($self->{'cgi'}->param(@_));
-
-   # offenens ToDo im UTF8 Query Handling:
-
-#   my $val=$self->{'cgi'}->param(@_);
-#   $val=UTF8toLatin1($val) if ($queryIsUtf8);
-#
-#   return($val);
+   if (wantarray()){
+      my @v=$self->{'cgi'}->param(@_);
+      if ($queryIsUtf8){
+         @v=map({UTF8toLatin1($_)} @v);
+      }
+      return(@v);
+   }
+   my $val=$self->{'cgi'}->param(@_);
+   $val=UTF8toLatin1($val) if ($queryIsUtf8);
+   return($val);
 }
 
 
