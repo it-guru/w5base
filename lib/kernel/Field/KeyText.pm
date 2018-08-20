@@ -73,23 +73,48 @@ sub preProcessFilter
                my $sqltype="STRING";
                $sqltype="DATE" if ($type=~m/Date$/); 
                if (exists($hflt->{$sfld})){
-                  if ($sfld eq "eventend" && 
-                      ref($hflt->{$self->{name}}) ne "ARRAY" &&
-                      ref($hflt->{$self->{name}}) ne "SCALAR"){
-                  #   push(@useindex,"eventend");
-                  }
-                  my %sqlparam=(sqldbh=>$db,datatype=>$sqltype);
-                  my $searchfield;
-                  if ($sfld eq $idfield){
-                     $searchfield="id";
+                  if ($sfld eq "trange"){
+                     my $trangetab=$keyfield->{extselect}->{$sfld};
+                     my $range=$hflt->{$sfld};
+
+                     my $res=$self->getParent->ExpandTRangeExpression($range,
+                        undef,undef,undef,
+                        {
+                           align=>'day'
+                        }
+                     );
+                     my $s=$self->getParent->ExpandTimeExpression(
+                           $res->[0],"en"
+                     );
+                     my $e=$self->getParent->ExpandTimeExpression(
+                           $res->[1],"en"
+                     );
+                     $where="($where) and (" if ($where ne "");
+                     $where.="$trangetab.s<='$e'";
+                     $where.=" or ";
+                     $where.=" ($trangetab.m<='$e' and $trangetab.m>='$s') ";
+                     $where.=" or ";
+                     $where.="$trangetab.e>='$s'";
+                     $where.=")";
+                     $cmd="select $keytab.name,$keytab.id ".
+                          "from $trangetab join $keytab on ".
+                          "$keytab.id=$trangetab.wfheadid";
                   }
                   else{
-                     $searchfield=$keyfield->{extselect}->{$sfld};
+                     my %sqlparam=(sqldbh=>$db,datatype=>$sqltype);
+                     my $searchfield;
+                     if ($sfld eq $idfield){
+                        $searchfield=$keytab.".id";
+                     }
+                     else{
+                        $searchfield=$keytab.".".
+                                     $keyfield->{extselect}->{$sfld};
+                     }
+                     my $bk=$self->getParent->Data2SQLwhere(\$where,
+                                        $searchfield,
+                                        $hflt->{$sfld},%sqlparam);
+                     return(undef) if (!$bk);
                   }
-                  my $bk=$self->getParent->Data2SQLwhere(\$where,
-                                     $searchfield,
-                                     $hflt->{$sfld},%sqlparam);
-                  return(undef) if (!$bk);
                }
             }
          }

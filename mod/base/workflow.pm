@@ -845,6 +845,7 @@ sub new
                 label         =>'Key Handler',
                 dataobjname   =>'w5base',
                 extselect     =>{
+                                   trange=>'wfrange',
                                    createdate=>'opendate',
                                    closedate =>'closedate',
                                    eventstart=>'eventstart',

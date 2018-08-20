@@ -329,8 +329,8 @@ sub SetFilter
       }
    }
 
-   $flt->{eventstart}="<\"$to\" OR [EMPTY]";
-   $flt->{eventend}=">\"$from\" OR [EMPTY]";
+ #  $flt->{eventstart}="<\"$to\" OR [EMPTY]";
+ #  $flt->{eventend}=">\"$from\" OR [EMPTY]";
    $flt->{isdeleted}=\'0';
 
 
@@ -457,9 +457,17 @@ sub SetFilter
       return(1);
    };
    my $dataobj=$self->getDataObj();
-   #msg(INFO,"MyW5Base Dataobj Filter=%s",Dumper($flt));
+   msg(INFO,"MyW5Base Dataobj Filter=%s",Dumper($flt));
    $dataobj->ResetFilter();
-   return($dataobj->SetFilter($flt));
+
+   my %f1=%{$flt};
+   my %f2=%{$flt};
+
+   $f1{eventstart}="<\"$to\" OR [EMPTY]";
+   $f2{eventend}=">\"$from\" OR [EMPTY]";
+
+   return($dataobj->SetFilter([\%f1,\%f2]));
+   #return($dataobj->SetFilter($flt));
    #return($dataobj->SetFilter($flt,\%flt2));
    #######################################################################
 

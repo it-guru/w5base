@@ -47,6 +47,51 @@ sub new
 }
 
 
+sub addTRangeFilter
+{
+   my $self=shift;
+   my $baseflt=shift;
+   my $flt=shift;
+
+   my $args=[];
+   my $trange=$flt->{$self->Name()};
+   $trange=${$trange} if (ref($trange) eq "SCALAR");
+   if (ref($trange) eq "ARRAY"){
+      $args=$trange;
+   }
+   else{
+      if ($trange ne ""){
+         $args=[$trange];
+      }
+   }
+   if ($#{$args}!=0){
+      $self->getParent->LastMsg(ERROR,"can not identify time range");
+      return(undef);
+   }
+   my $res=$self->getParent->ExpandTRangeExpression($args->[0],
+      undef,undef,undef,
+      {
+         align=>'day'
+      }
+   );
+   if (!defined($res)){
+      $self->getParent->LastMsg(ERROR,"can not parse time range");
+      msg(ERROR,"TRange acces to $args->[0]");
+      return(undef);
+   }
+   my $s=$res->[0];
+   my $e=$res->[1];
+   
+   my @addflt=(
+              {$self->{depend}->[0]=>"<=\"$e\""},
+              {$self->{depend}->[1]=>"<=\"$e\" AND >=\"$s\""},
+              {$self->{depend}->[2]=>">=\"$s\""}
+             );
+   push(@$baseflt,\@addflt);
+   return(1);
+}
+
+
 sub SetFilter
 {
    my $self=shift;
@@ -56,56 +101,22 @@ sub SetFilter
      if (ref($flt) eq "ARRAY"){
         if (ref($flt->[0]) eq "HASH"){
            if (exists($flt->[0]->{$self->Name()})){
-              my $args=[];
-              my $trange=$flt->[0]->{$self->Name()};
-              $trange=${$trange} if (ref($trange) eq "SCALAR");
-              if (ref($trange) eq "ARRAY"){
-                 $args=$trange;
-              }
-              else{
-                 if ($trange ne ""){
-                    $args=[$trange];
-                 }
-              }
-              if ($#{$args}!=0){
-                 $self->getParent->LastMsg(ERROR,"can not identify time range");
+              if (!$self->addTRangeFilter($flt,$flt->[0])){
                  return(undef);
               }
-              my $res=$self->getParent->ExpandTRangeExpression($args->[0],
-                 undef,undef,undef,
-                 {
-                    align=>'day'
-                 }
-              );
-              if (!defined($res)){
-                 $self->getParent->LastMsg(ERROR,"can not parse time range");
-                 msg(ERROR,"TRange acces to $args->[0]");
-                 return(undef);
-              }
-              my $s=$res->[0];
-              my $e=$res->[1];
-             
-         #     my @addflt=(
-         #                {$self->{depend}->[0]=>">=\"$s\" AND <=\"$e\""},
-         #                {$self->{depend}->[1]=>"<=\"$e\" AND >=\"$s\""},
-         #                {$self->{depend}->[2]=>"<=\"$e\" AND >=\"$s\""}
-         #               );
-              my @addflt=(
-                         {$self->{depend}->[0]=>"<=\"$e\""},
-                         {$self->{depend}->[1]=>"<=\"$e\" AND >=\"$s\""},
-                         {$self->{depend}->[2]=>">=\"$s\""}
-                        );
-              push(@$flt,\@addflt);
            }
         }
-
+        if (ref($flt->[0]) eq "ARRAY"){
+           foreach my $subflt (@{$flt->[0]}){
+              if (exists($subflt->{$self->Name()})){
+                 if (!$self->addTRangeFilter($flt,$subflt)){
+                    return(undef);
+                 }
+              }
+           }
+        }
      }
-
-
-
-
-
-      return(1);
+     return(1);
    }
    $self->getParent->LastMsg(ERROR,"invalid timerange filter");
    return(undef);
