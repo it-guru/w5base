@@ -12,4 +12,4 @@
 'incomplete timerange specification'=>{de=>'unvollständige Zeitbereichsangabe'},
 'unspecific application search is limit to a timerange of 48h'=>{de=>'unspezifische Anwendungssuche ist begrenzt auf ein Zeitfenster von 48 Stunden'},
 'more than 1 application search is limit to a timerange of one month'=>{de=>'Suche mit mehr als einer Anwendung ist limitiert auf ein Zeitfenster von einem Monat'},
-
+'incident consideration'=>{de=>'Incidents einschließen'},

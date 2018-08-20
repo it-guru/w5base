@@ -62,6 +62,9 @@ sub Init
 
 
    $self->{DataObj}->AddFields(
+      new kernel::Field::Text(
+                   Parent        =>$self, 
+                   name          =>'inmsel'),
       new kernel::Field::Percent(
                 name          =>'targetmatchlevel',
                 label         =>'target match level',
@@ -124,7 +127,18 @@ sub getQueryTemplate
       $reptyp.=">".$self->T($ifcheck)."</option>";
    }
    $reptyp.="</select>";
+
+   my $isel="<select name=search_inmsel style=\"width:100%\">";
+   my $oldval=Query->Param("search_inmsel");
+   foreach my $inmopt ("no","yes"){
+      $isel.="<option value=\"$inmopt\"";
+      $isel.=" selected" if ($inmopt eq $oldval);
+      $isel.=">".$self->T($inmopt)."</option>";
+   }
+   $isel.="</select>";
+
    my $reptypl=$self->T("interface consideration");
+   my $ichk=$self->T("incident consideration");
    my $kwtext=$self->T("keyword containment");
 
    #######################################################################
@@ -154,6 +168,12 @@ sub getQueryTemplate
 <td class=finput width=40%>\%affectedapplication(search)\%</td>
 <td class=fname width=10%>$reptypl:</td>
 <td class=finput width=40%>$reptyp</td>
+</tr>
+<tr>
+<td class=fname width=10%>&nbsp;</td>
+<td class=finput width=40%>&nbsp;</td>
+<td class=fname width=10%>$ichk:</td>
+<td class=finput width=40%>$isel</td>
 </tr>
 <tr>
 <td class=fname width=10%>$kwtext:</td>
@@ -457,7 +477,7 @@ sub SetFilter
       return(1);
    };
    my $dataobj=$self->getDataObj();
-   msg(INFO,"MyW5Base Dataobj Filter=%s",Dumper($flt));
+   msg(INFO,"MyW5Base CheckOfAdjustments Filter=%s",Dumper($flt));
    $dataobj->ResetFilter();
 
    my %f1=%{$flt};
@@ -510,6 +530,11 @@ sub Result
    $q{class}=[grep(/^.*::(change|opmeasure)$/,
                keys(%{$self->{DataObj}->{SubDataObj}}))];
 
+    if ($q{inmsel} eq "yes"){
+       $q{class}=[grep(/^.*::(change|opmeasure|incident)$/,
+                   keys(%{$self->{DataObj}->{SubDataObj}}))];
+    }
+    delete($q{inmsel});
 
 
    if (!$self->SetFilter(\%q)){

@@ -13,7 +13,7 @@ body{margin:20px}
 
 <p>Wird bei <b>"Schnittstellenbetrachtung"="vollständig"</b> gewählt und ist bei "betroffene Anwendung" eine oder mehrere Anwendungen angeben, so werden nur Changes/Maßnahmen aufgelistet, in denen die ausgewählten Anwendungen oder eine beliebige Schnittstellen-Anwendung dieser Anwendungen vorkommt.</p>
 
-<p>Wird bei <b>"Schnittstellenbetrachtung"="exzessiv"</b> gewählt und ist bei "betroffene Anwendung" eine oder mehrere Anwendungen angeben, so werden alle das Zeitfenster tangierenden Changes/Maßnahmen aufgelistet und es erfolgt nur eine ensprechede Bewertung in der "Übereinstimmg". Bei derartigen Abfragen darf das Zeitfenster nicht länger als 24h sein.</p>
+<p>Wird bei <b>"Schnittstellenbetrachtung"="exzessiv"</b> gewählt und ist bei "betroffene Anwendung" eine oder mehrere Anwendungen angeben, so werden <u>alle</u> das Zeitfenster tangierenden Changes/Maßnahmen aufgelistet und es erfolgt nur eine ensprechede Bewertung in der "Übereinstimmg". In diesem Modus wird quasi JEDE Anwendung als Schnittstelle angesehen. Bei derartigen Abfragen darf das Zeitfenster nicht länger als 24h sein.</p>
 
 <p>In der Ergebnisliste wird eine "Übereinstimmung" in Prozent errechnet. Hier wird eine Zuorndung errechnet, inwieweit die Changes/Maßnahmen den Abfragekriterien entsprechen. Dabei gilt:</p>
 <ul>
