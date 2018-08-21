@@ -5,6 +5,79 @@ info:
 servers:
   - url: https://darwin.telekom.de/
 paths:
+   /{config}/auth/{dataobj}/ModuleObjectInfo:
+      get:
+         description: |
+          Show structure informations of "dataobj"
+         tags:
+           - Access Data-Dictionary
+         security:
+           - BasicAuth: []
+         parameters:
+            - name: config
+              in: path
+              description: 'Configuration name, you want to access'
+              required: true
+              schema:
+                type: string
+
+            - name: dataobj
+              in: path
+              description: 'Name of Dataobject with :: replaced by /'
+              required: true
+              schema:
+                type: string
+            - name: FormatAs
+              in: query
+              description: 'Format response in specified Format'
+              required: true
+              schema: 
+                 type: string
+                 enum: [nativeJSON]
+         responses:
+            200:
+              description: successful operation
+            404:
+              description: JSON Output not available - contact admin
+   /{config}/auth/base/reflexion_dataobj/Result:
+      get:
+         description: |
+          List/Filter all available "dataobj" records
+         tags:
+           - Access Data-Dictionary
+         security:
+           - BasicAuth: []
+         parameters:
+            - name: config
+              in: path
+              description: 'Configuration name, you want to access'
+              required: true
+              schema:
+                type: string
+
+            - name: dataobj
+              in: path
+              description: 'Name of Dataobject with :: replaced by /'
+              required: true
+              schema:
+                type: string
+            - name: FormatAs
+              in: query
+              description: 'Format response in specified Format'
+              required: true
+              schema: 
+                 type: string
+                 enum: [nativeJSON]
+            - name: CurrentView
+              in: query
+              description: 'Show id=dataobj in listing'
+              required: true
+              schema: 
+                 type: string
+                 enum: ["(id,modnamelabel)"]
+         responses:
+            200:
+              description: successful operation
    /{config}/auth/{dataobj}/Result:
       post:
          description: |

@@ -1348,6 +1348,9 @@ sub HttpHeader
    $charset=";charset=ISO-8895-1" if ($content eq "text/html" || 
                                       $content eq "text/plain");
    $charset=";charset=$param{charset}" if (defined($param{charset}));
+   if (exists($param{code})){
+      $d.="Status-Code: ".$param{code}."\n";
+   }
    $d.=sprintf("Content-type: %s$charset\n\n",$content);
    #if ($param{'cache'}){
    #   msg(INFO,$d);

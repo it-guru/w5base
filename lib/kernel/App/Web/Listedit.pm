@@ -42,165 +42,214 @@ sub new
 sub ModuleObjectInfo
 {
    my $self=shift;
+   my $format=Query->Param("FormatAs");
+   my $jsonok=0;
+   my $json={};
+   my $JSON;
 
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css',
-                                   'kernel.App.Web.ModuleObjectInfo.css'],
-                           js=>['toolbox.js'],
-                           title=>$self->T('Module Object Information'),
-                           form=>1);
+   eval("use JSON;\$JSON=new JSON;");
+   if ($@ eq ""){
+      $jsonok=1;
+      $JSON->utf8(1);
+   }
+
+   $format="HtmlV01" if ($format eq "");
+
+
+   if ($format ne "HtmlV01" && 
+       (!$jsonok || ($format ne "nativeJSON" && $format ne "JSONP"))){
+      print $self->HttpHeader("text/html",'code'=>'404');
+      print("<html><h1>404 Not Found</h1></html>");
+      return(undef);
+   }
+
+   
+   if ($format eq "HtmlV01"){ 
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(style=>['default.css',
+                                      'kernel.App.Web.ModuleObjectInfo.css'],
+                              js=>['toolbox.js'],
+                              title=>$self->T('Module Object Information'),
+                              form=>1);
+   }
+   else{
+      print $self->HttpHeader("application/javascript");
+
+   }
    $self->doInitialize();
-   print("<table width=98%>");
-   printf("<tr><td valign=top nowrap><b>%s:</b></td>",
-          $self->T("Frontend name"));
-   printf("<td>%s</td></tr>",$self->T($self->Self,$self->Self));
-   printf("<tr><td valign=top nowrap><b>%s:</b></td>",
-          $self->T("Internal object name"));
-   printf("<td><a href=\"ModuleObjectInfo\">%s</a>".
-          "</td></tr>",$self->Self);
-   printf("<tr><td valign=top nowrap><b>%s:</b></td>",
-          $self->T("Self as parent object"));
-   printf("<td>%s</td></tr>",$self->SelfAsParentObject);
-   printf("<tr><td valign=top nowrap><b>%s:</b></td>",
-          $self->T("Parent classes"));
-   printf("<td>%s</td></tr>",join(", ",@ISA));
-   printf("<tr><td valign=bottom><b>%s:</b></td>",$self->T("Datafields"));
-   printf("<td align=right><span class=sublink>".
-          "<img border=0 style=\"margin-bottom:2px\" onclick=doPrint() ".
-          "src=\"../../../public/base/load/miniprint.gif\"></span>".
-          "</td></tr>");
-   printf("<tr><td colspan=2>");
-   printf("<div class=fieldlist><center>".
-          "<table class=ObjectDefinition>");
-   print("<tr>");
-   printf("<th><b>%s</b></th>",$self->T("Frontend field"));
-   printf("<th class=foname><b>%s</b></th>",$self->T("Internal field"));
-   printf("<th class=fotype nowrap><b>%s</b></th>",$self->T("Field type"));
-   printf("<th class=foref nowrap><b>%s</b></th>",$self->T("Reference"));
-   printf("<th class=fosearch nowrap><b>%s</b></th>",$self->T("Searchable"));
-   print("</tr>");
-   foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
+   $json->{dataobj}=$self->Self;
+   $json->{dataobjtopclass}=$self->SelfAsParentObject;
+   $json->{field}=[];
+   if ($format eq "HtmlV01"){
+      print("<table width=98%>");
+      printf("<tr><td valign=top nowrap><b>%s:</b></td>",
+             $self->T("Frontend name"));
+      printf("<td>%s</td></tr>",$self->T($self->Self,$self->Self));
+      printf("<tr><td valign=top nowrap><b>%s:</b></td>",
+             $self->T("Internal object name"));
+      printf("<td><a href=\"ModuleObjectInfo\">%s</a>".
+             "</td></tr>",$self->Self);
+      printf("<tr><td valign=top nowrap><b>%s:</b></td>",
+             $self->T("Self as parent object"));
+      printf("<td>%s</td></tr>",$self->SelfAsParentObject);
+      printf("<tr><td valign=top nowrap><b>%s:</b></td>",
+             $self->T("Parent classes"));
+      printf("<td>%s</td></tr>",join(", ",@ISA));
+      printf("<tr><td valign=bottom><b>%s:</b></td>",$self->T("Datafields"));
+      printf("<td align=right><span class=sublink>".
+             "<img border=0 style=\"margin-bottom:2px\" onclick=doPrint() ".
+             "src=\"../../../public/base/load/miniprint.gif\"></span>".
+             "</td></tr>");
+      printf("<tr><td colspan=2>");
+      printf("<div class=fieldlist><center>".
+             "<table class=ObjectDefinition>");
       print("<tr>");
+      printf("<th><b>%s</b></th>",$self->T("Frontend field"));
+      printf("<th class=foname><b>%s</b></th>",$self->T("Internal field"));
+      printf("<th class=fotype nowrap><b>%s</b></th>",$self->T("Field type"));
+      printf("<th class=foref nowrap><b>%s</b></th>",$self->T("Reference"));
+      printf("<th class=fosearch nowrap><b>%s</b></th>",$self->T("Searchable"));
+      print("</tr>");
+   }
+   foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
+      my $jfld={};
+      print("<tr>") if ($format eq "HtmlV01");
       my $label=$fo->Label();
+      $jfld->{label}=$label;
+      $jfld->{name}=$fo->Name();
+      $jfld->{type}=$fo->Type();
       $label=~s/\// \/ /g;
       $label=~s/-/ - /g;
       $label="&nbsp; &nbsp;" if ($label=~m/^\s*$/);
-      printf("<td valign=top>%s</td>",$label);
-      printf("<td valign=top class=foname>%s</td>",$fo->Name());
-      printf("<td valign=top class=fotype>%s</td>",$fo->Type());
+      if ($format eq "HtmlV01"){
+         printf("<td valign=top>%s</td>",$label);
+         printf("<td valign=top class=foname>%s</td>",$fo->Name());
+         printf("<td valign=top class=fotype>%s</td>",$fo->Type());
+      }
       my $vjointo=$fo->getNearestVjoinTarget();
       $vjointo=$$vjointo if (ref($vjointo) eq "SCALAR");
       if ($vjointo ne ""){
          my $l=$vjointo;
          $l=~s/::/\//g;
          $l="../../$l/ModuleObjectInfo";
+         $jfld->{vjointo}=$vjointo;
          $vjointo="<a href=\"$l\">$vjointo</a>";
          if (exists($fo->{vjoinon})){
             if (ref($fo->{vjoinon}) eq "ARRAY"){
                $vjointo.="<br>".$fo->{vjoinon}->[0]."-&gt;".$fo->{vjoinon}->[1];
+               $jfld->{vjoinon}=$fo->{vjoinon};
             }
             else{
                $vjointo.="<br>COMPLEX-LINK";
+               $jfld->{vjoinon}="COMPLEX-LINK";
             }
          }
       }
       
-      printf("<td valign=top class=foref>%s</td>",$vjointo);
-      printf("<td valign=top align=center class=fosearch>%s</td>",
-             $fo->searchable ? $self->T("yes") : $self->T("no"));
-      print("</tr>");
+      if ($format eq "HtmlV01"){
+         printf("<td valign=top class=foref>%s</td>",$vjointo);
+         printf("<td valign=top align=center class=fosearch>%s</td>",
+                $fo->searchable ? $self->T("yes") : $self->T("no"));
+         print("</tr>");
+      }
+      eval('$jfld->{searchable}=JSON::false;');
+      if ($fo->searchable){
+         eval('$jfld->{searchable}=JSON::true;');
+      }
+      push(@{$json->{field}},$jfld);
    }
-   printf("</table>");
-   printf("<br><br><hr>");
-   if ($self->IsMemberOf(["admin","support"])){
-      printf("</center><div class=OracleReplication>".
-             "<b>Oracle-Replication-Schema:</b><br>");
-
-      printf("<pre>");
-      printf("create table \"%s\" (\n",$self->Self);
-      my $form=" %-20s %s,\n";
-      foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
-         my $typ=$fo->Type();
-         my $name=$fo->Name();
-         next if (in_array([qw(lastqcheck secroles sectargetid sectarget
-                               lastqcheck dataissuestate qcresonsearea
-                               attachments additional contacts)],$name));
-         if ($typ ne "SubList" && $typ ne "Linenumber" &&
-             $name ne "replkeypri" && $name ne "replkeysec"){
-            if ($name eq "id"){
-               printf($form,$fo->Name,"Number(*,0) not null");
-            }
-            elsif ($name eq "cistatusid"){
-               printf($form,$fo->Name,"Number(2,0)");
-            }
-            elsif (in_array([qw(mandatorid databossid)],$name)){
-               printf($form,$fo->Name,"Number(*,0)");
-            }
-            elsif ($typ eq "Date" || $typ eq "CDate" || $typ eq "MDate"){
-               printf($form,$fo->Name,"DATE");
-            }
-            elsif ($typ eq "Boolean"){
-               printf($form,$fo->Name,"Number(1,0)");
-            }
-            elsif ($typ eq "TextDrop" || $typ eq "Contact" || 
-                   $typ eq "Databoss"){
-               printf($form,$fo->Name,"VARCHAR2(128)");
-            }
-            elsif ($typ eq "Group"){
-               printf($form,$fo->Name,"VARCHAR2(256)");
-            }
-            else{
-               my $len=40;
-               $len=80   if ($name eq "srcsys");
-               $len=80   if ($name eq "name");
-               $len=20   if ($name eq "cistatus");
-               $len=128  if ($name eq "fullname");
-               $len=4000 if ($name eq "comments");
-               printf($form,$fo->Name,"VARCHAR2($len)");
+   if ($format eq "HtmlV01"){
+      printf("</table>");
+      printf("<br><br><hr>");
+      if ($self->IsMemberOf(["admin","support"])){
+         printf("</center><div class=OracleReplication>".
+                "<b>Oracle-Replication-Schema:</b><br>");
+     
+         printf("<pre>");
+         printf("create table \"%s\" (\n",$self->Self);
+         my $form=" %-20s %s,\n";
+         foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
+            my $typ=$fo->Type();
+            my $name=$fo->Name();
+            next if (in_array([qw(lastqcheck secroles sectargetid sectarget
+                                  lastqcheck dataissuestate qcresonsearea
+                                  attachments additional contacts)],$name));
+            if ($typ ne "SubList" && $typ ne "Linenumber" &&
+                $name ne "replkeypri" && $name ne "replkeysec"){
+               if ($name eq "id"){
+                  printf($form,$fo->Name,"Number(*,0) not null");
+               }
+               elsif ($name eq "cistatusid"){
+                  printf($form,$fo->Name,"Number(2,0)");
+               }
+               elsif (in_array([qw(mandatorid databossid)],$name)){
+                  printf($form,$fo->Name,"Number(*,0)");
+               }
+               elsif ($typ eq "Date" || $typ eq "CDate" || $typ eq "MDate"){
+                  printf($form,$fo->Name,"DATE");
+               }
+               elsif ($typ eq "Boolean"){
+                  printf($form,$fo->Name,"Number(1,0)");
+               }
+               elsif ($typ eq "TextDrop" || $typ eq "Contact" || 
+                      $typ eq "Databoss"){
+                  printf($form,$fo->Name,"VARCHAR2(128)");
+               }
+               elsif ($typ eq "Group"){
+                  printf($form,$fo->Name,"VARCHAR2(256)");
+               }
+               else{
+                  my $len=40;
+                  $len=80   if ($name eq "srcsys");
+                  $len=80   if ($name eq "name");
+                  $len=20   if ($name eq "cistatus");
+                  $len=128  if ($name eq "fullname");
+                  $len=4000 if ($name eq "comments");
+                  printf($form,$fo->Name,"VARCHAR2($len)");
+               }
             }
          }
+      #   # this is not longer nessesary, because this state tables are
+      #   # automaticly create by W5Replication tool
+      #   my @w5repladd=('W5REPLKEY'     =>'CHAR(70) not null',
+      #                  'W5REPLKEYPRI'  =>'CHAR(35) not null',
+      #                  'W5REPLKEYSEC'  =>'CHAR(35) not null',
+      #                  'W5REPLLASTSUCC'=>'DATE not null',
+      #                  'W5REPLLASTTRY' =>'DATE not null',
+      #                  'W5REPLMDATE'   =>'DATE not null',
+      #                  'W5REPLCDATE'   =>'DATE not null',
+      #                  'W5REPLFAILCNT' =>'NUMBER(22,0) default 0 not null');
+      #   while(my $k=shift(@w5repladd)){
+      #       my $v=shift(@w5repladd);
+      #       printf($form,$k,$v);
+      #   }
+         my $idname="?";
+         if (my $idobj=$self->IdField()){
+            $idname=$idobj->Name();
+         }
+         printf(" constraint \"%s_pk\" primary key (%s)\n",$self->Self,$idname);
+     
+         printf(");\n");
+         if ($self->getField("name")){          
+            printf("CREATE INDEX \"%s_di1\"\n       ON \"%s\"(NAME);\n",
+                   $self->Self,$self->Self);    
+         }                                      
+         if ($self->getField("fullname")){      
+            printf("CREATE INDEX \"%s_di2\"\n       ON \"%s\"(FULLNAME);\n",
+                   $self->Self,$self->Self);
+         }
+         printf("</pre>");
+         printf("</div>");
       }
-   #   # this is not longer nessesary, because this state tables are
-   #   # automaticly create by W5Replication tool
-   #   my @w5repladd=('W5REPLKEY'     =>'CHAR(70) not null',
-   #                  'W5REPLKEYPRI'  =>'CHAR(35) not null',
-   #                  'W5REPLKEYSEC'  =>'CHAR(35) not null',
-   #                  'W5REPLLASTSUCC'=>'DATE not null',
-   #                  'W5REPLLASTTRY' =>'DATE not null',
-   #                  'W5REPLMDATE'   =>'DATE not null',
-   #                  'W5REPLCDATE'   =>'DATE not null',
-   #                  'W5REPLFAILCNT' =>'NUMBER(22,0) default 0 not null');
-   #   while(my $k=shift(@w5repladd)){
-   #       my $v=shift(@w5repladd);
-   #       printf($form,$k,$v);
-   #   }
-      my $idname="?";
-      if (my $idobj=$self->IdField()){
-         $idname=$idobj->Name();
-      }
-      printf(" constraint \"%s_pk\" primary key (%s)\n",$self->Self,$idname);
 
-      printf(");\n");
-      if ($self->getField("name")){          
-         printf("CREATE INDEX \"%s_di1\"\n       ON \"%s\"(NAME);\n",
-                $self->Self,$self->Self);    
-      }                                      
-      if ($self->getField("fullname")){      
-         printf("CREATE INDEX \"%s_di2\"\n       ON \"%s\"(FULLNAME);\n",
-                $self->Self,$self->Self);
-      }
-      printf("</pre>");
+
+
+
       printf("</div>");
-   }
-
-
-
-
-   printf("</div>");
-   
-   printf("</td></tr>");
-   print("</table>");
-   print(<<EOF);
+      
+      printf("</td></tr>");
+      print("</table>");
+      print(<<EOF);
 <script language="JavaScript">
 function doPrint()
 {
@@ -210,7 +259,11 @@ function doPrint()
 EOF
 
 
-   print $self->HtmlBottom(form=>1);
+      print $self->HtmlBottom(form=>1);
+   }
+   else{
+      print $JSON->pretty->encode($json);
+   }
 }
 
 sub addAttach
