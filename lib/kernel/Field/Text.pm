@@ -122,7 +122,11 @@ sub FormatedDetail
       $d=~s/\n/<br>\n/g;
       if ($self->{htmlnowrap}){
          $d=~s/[ \t]/&nbsp;/g;
-         $d=~s/-/&minus;/g;
+         ##############################
+         #$d=~s/-/&minus;/g;
+         # see hypher explaination in 
+         # lib/kernel/Output/HtmlV01.pm
+         $d="<nobr>".$d."</nobr>";
       }
    }
    $d.=" ".$self->{unit} if ($d ne "" && $FormatAs eq "HtmlDetail");

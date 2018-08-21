@@ -346,7 +346,16 @@ sub ProcessLine
          $nowrap=" nowrap";
       }
       if (!($data=~m/javascript/i)){
-         $data=~s/-/&#x2011;/g;   # nicht zulässig, wenn JavaScript vorkommt
+         # if data ist javascript, no prevent of hyphen break can be done.
+         # replace of hyphen by &#x2011; is a bad solution, because it is
+         # no working if data is copied to clipboard.
+         #$data=~s/-/&#x2011;/g;   
+         # replace to &minus; creates the same clipboard Problem.
+         #$data=~s/-/&minus;/g;   
+         # best solution seems to be the "not W5C conform" nobr tag. It works
+         # also in IE compat mode, soo we use the "Minus-V5" solution in
+         # static/MinusProblem/index.html sample doc.
+         $data=~s/(\S+)-(\S+)/<nobr>$1-$2<\/nobr>/g;  
       }
       $l[$self->{fieldkeys}->{$fieldname}]={data=>$data,
                                             fclick=>$fclick,
