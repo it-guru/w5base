@@ -105,7 +105,7 @@
          this.app.showDialog(function(){
             var dialog = document.createElement('div');
             $(dialog).css("height","100%");
-            $(dialog).append("<table id=SearchTab width=97% height=90% "+
+            $(dialog).append("<div id=SearchTab><table width=97% xheight=90% "+
                               "border=0>"+  
                               "<tr height=1%><td >"+
            "<h1>"+ClassAppletLib['%SELFNAME%'].desc.label+"</h1>"+
@@ -121,7 +121,7 @@
                               "<div id=SearchResult></div>"+
                               "</div>"+
                               "</td></tr>"+
-                              "</table>");
+                              "</table></div>");
             $(dialog).find("#SearchInp").val(appletobj.searchFilter);
             $(dialog).find("#SearchInp").focus();
             appletobj.setSearchResult(dialog,appletobj.searchResult);
@@ -134,6 +134,8 @@
                }
             });
             $(".spinner").hide();
+            console.log("dialog height=",$(dialog).height());
+            console.log("search height=",$(dialog).find("#SearchTab").outerHeight());
             return(dialog);
          },function(){
             appletobj.exit();

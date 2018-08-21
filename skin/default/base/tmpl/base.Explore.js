@@ -183,6 +183,26 @@ body{
 
 </style>
 
+<!-- Startup box -->
+<style>
+
+#W5ExploreLogo{
+   display:none;
+   position:absolute;
+   height:250px;
+   width:408px;
+   background:#f9f9f9;
+   border:10px outset #cecece;
+   z-index:2;
+   padding:12px;
+   font-size:13px;
+   left: 50%;
+   top: 50%;
+   transform: translate(-50%,-50%);
+   box-shadow: inset 0px 0px 0px 1px black;
+}
+</style>
+
 
 <!-- Modal Dialog  Handling -->
 <style>
@@ -332,7 +352,7 @@ div.SearchLabel{
   background-color: #f0f0f0;
 }
 div#SearchContainer{
-  height:200px;
+  height:150px;
   border-top:1px solid black
 }
 div#SearchResult{
@@ -786,6 +806,7 @@ var W5ExploreClass=function(){
             else{
                app.runingApplet[applet].run();
             }
+            setTimeout(function(){$("#W5ExploreLogo").fadeOut(1500);},2000);
            // $(".spinner").hide(); # hide needs to be done from applet
          }).catch(function(e){
             $(".spinner").hide();
@@ -1488,9 +1509,26 @@ var W5ExploreClass=function(){
 
 
 
-   this.showW5ExploreLogo=function(){
+   this.showW5ExploreLogo=function(applet){
       var app=this;
-      $("#workspace").html("<br><br><center><h1>W5Explore</h1></center>");
+      var box=document.createElement('div');
+      box.id="W5ExploreLogo";
+      $(box).append($("<center><h1>W5Explore</h1></center>"));
+      if (applet!=""){
+         $(box).append($("<center><h2>Starting applet "+applet+"</h2></center>"));
+      }
+      else{
+         $(box).append($("<center><h2>Data Explorer Main</h2></center>"));
+      }
+      $(box).append($("<div style='margin-top:150px'>... you are "+
+                      "booting the hidden feature code "+
+                      "W5Explore. Not warenty and no support! "+
+                      "Use at your own risk.</div>"));
+      $("body").append(box);
+      $("body").find("#W5ExploreLogo").fadeIn();
+
+
+      //$("#workspace").html("<br><br><center><h1>W5Explore</h1></center>");
    }
 
    this.showAppletList=function(){
@@ -1534,17 +1572,19 @@ var W5ExploreClass=function(){
    this.MainMenu=function(runpath){
       var app=this;
       this.LayoutMenuLayer();
+      app.showW5ExploreLogo("");
       this.loadApplets().then(function(){
          if (runpath==undefined || runpath.length==0){
             app.showAppletList();
             console.log("reset setMPath()");
             app.setMPath();
             $(".spinner").hide();
+            setTimeout(function(){$("#W5ExploreLogo").fadeOut(1500);},2000);
          }
          else{
-            app.showW5ExploreLogo();
-            $(".spinner").show();
             var applet=runpath.shift();
+            app.showW5ExploreLogo(applet);
+            $(".spinner").show();
             app.loadAppletClass(applet).then(function(AppletClassPrototype){
                if (runpath.length==0){
                   app.runApplet(applet);
