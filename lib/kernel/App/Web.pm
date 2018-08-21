@@ -1450,7 +1450,9 @@ sub HtmlHeader
 EOF
   if (($ENV{HTTP_USER_AGENT}=~m#.*win.*rv:11\..*#) ||
       ($ENV{HTTP_USER_AGENT}=~m#.* MSIE 7\.0;.* Trident/7\.0;.*#)){
-     $d.="<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\">";
+     # try to deactivate Compat Mode
+     $d.="<meta http-equiv=\"X-UA-Compatible\" ".
+         "content=\"EmulateIE10;IE=edge\">";
   }
   $d.=<<EOF;
 <script type="text/javascript" language="JavaScript">

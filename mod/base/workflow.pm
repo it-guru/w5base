@@ -2844,10 +2844,11 @@ EOF
    my $fromline="";
    if ($#fromlist>0){
       $fromline="<tr height=1%><td align=left>";
+      $fromline.="<table border=0 width=\"100%\">";
+      $fromline.="<tr><td width=50>";
       $fromline.=$self->T("from","base::workflow::mailsend").":";
-      $fromline.="</td>";
-      $fromline.="<td>";
-      $fromline.="<select name=from style=\"width:100%\">";
+      $fromline.="</td><td>";
+      $fromline.="<select name=from style=\"width:80%\">";
       foreach my $fromemail (@fromlist){
          $fromline.="<option value=\"$fromemail\"";
          $fromline.=" selected" if ($from eq $fromemail);
@@ -2856,6 +2857,7 @@ EOF
       $fromline.="</select>";
       $fromline.="</td>";
       $fromline.="</tr>";
+      $fromline.="</table></td></tr>";
    }
 
    my $to=$self->T("To","base::workflow::mailsend");
@@ -2877,16 +2879,20 @@ EOF
          'cellspacing=0 cellpadding=0 width="100%" height="100%">');
    #printf("<tr><td height=1%%>Mail related to</td></tr>");
    print <<EOF;
+${fromline}
 <tr height=1%><td height=1%>
-  <table width=\"100%\">${fromline}<tr>
+  <table width=\"100%\">
+  <tr>
   <td width=50 valign=top>
-  <table border=0 cellspacing=0 cellpadding=0><tr>
-  <td><span class=sublink onclick=\"openAdressbook('to','$to');\">
-      <img id=\"addrto\" src=\"../../base/load/addrbook.gif\"></span></td>
-  <td>&nbsp;</td>
-  <td><span class=sublink onclick=\"openAdressbook('to','$to');\">
-      $to:</span></td>
-  </tr></table>
+     <table border=0 cellspacing=0 cellpadding=0>
+     <tr>
+     <td><span class=sublink onclick=\"openAdressbook('to','$to');\">
+         <img id=\"addrto\" src=\"../../base/load/addrbook.gif\"></span></td>
+     <td>&nbsp;</td>
+     <td><span class=sublink onclick=\"openAdressbook('to','$to');\">
+         $to:</span></td>
+     </tr>
+     </table>
   </td>
   <td><textarea id=to name=to style="width:100%;height:40px;resize:vertical;max-height:130px;min-height:30px;">$t</textarea></td>
   </tr></table>
