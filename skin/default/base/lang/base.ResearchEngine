@@ -1,9 +1,0 @@
-'base::ResearchEngine'=>{
-   de=>'W5Base Research and Analyse Engine - preBETA!',
-   en=>'W5Base Research and Analyse Engine - preBETA!'
-},
-'Fullname'=>{de=>'vollständiger Name'},
-'Name'=>{de=>'Name'},
-'ObjectType'=>{de=>'Objekt-Typ'},
-
-

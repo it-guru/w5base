@@ -2288,13 +2288,6 @@ function DetailHandleQualityCheck()
            "height=240,width=$detailx,toolbar=no,status=no,"+
            "resizable=yes,scrollbars=auto");
 }
-function DetailResearchEngine()
-{
-   openwin('../../base/ResearchEngine/StartWith/$sname/$id',
-           "ResearchEngine$id",
-           "height=800,width=1024,toolbar=no,status=yes,"+
-           "resizable=yes,scrollbars=auto");
-}
 function FinishHandleInfoAboSubscribe(returnVal,isbreak)
 {
    if (!isbreak){
@@ -2358,18 +2351,6 @@ sub getDetailFunctions
        $self->isQualityCheckValid($rec)){
       if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
          unshift(@f,$self->T("QualityCheck")=>"DetailHandleQualityCheck");
-      }
-   }
-   if (defined($rec)){
-      my $instdir=$W5V2::INSTDIR;
-      my $s=$self->Self();
-      $s=~s/::/::Research::/;
-      $s=~s/::/\//g;
-      my $rmod=$instdir."/mod/".$s.".pm";
-      if (-f $rmod){
-         if ($self->IsMemberOf("admin")){
-            unshift(@f,$self->T("Research")=>"DetailResearchEngine");
-         }
       }
    }
    return(@f);
