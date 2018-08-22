@@ -171,6 +171,15 @@ sub new
                 vjoinon       =>['systemepaadm2id'=>'userid']),
 
       new kernel::Field::Text(
+                name          =>'systemepaincidentgroup',
+                label         =>'System A - Incident Target Group',
+                htmldetail    =>'NotEmptyOrEdit',
+                group         =>'epa',
+                wrdataobjattr =>'netintercon.epa__incidentgroup',
+                dataobjattr   =>"if (netintercon.epa_typ=1,NULL,".
+                                'netintercon.epa__incidentgroup)'),
+
+      new kernel::Field::Text(
                 name          =>'systemepalocation',
                 label         =>'System A - Location',
                 htmldetail    =>'NotEmptyOrEdit',
@@ -271,6 +280,15 @@ sub new
                 vjoinon       =>['systemepbadm2id'=>'userid']),
 
       new kernel::Field::Text(
+                name          =>'systemepbincidentgroup',
+                label         =>'System B - Incident Target Group',
+                htmldetail    =>'NotEmptyOrEdit',
+                group         =>'epb',
+                wrdataobjattr =>'netintercon.epb__incidentgroup',
+                dataobjattr   =>"if (netintercon.epb_typ=1,'???',".
+                                'netintercon.epb__incidentgroup)'),
+
+      new kernel::Field::Text(
                 name          =>'systemepblocation',
                 label         =>'System B - Location',
                 htmldetail    =>'NotEmptyOrEdit',
@@ -308,7 +326,13 @@ sub new
                 label         =>'Contacts',
                 group         =>'contacts'),
 
-                                                   
+
+      new kernel::Field::FileList(
+                name          =>'attachments',
+                label         =>'Attachments',
+                parentobj     =>'itil::appl',
+                group         =>'attachments'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -401,6 +425,7 @@ var system=document.forms[0].elements['Formated_system${grp}'];
 var systemname=document.forms[0].elements['Formated_system${grp}name'];
 var systemadm=document.forms[0].elements['Formated_system${grp}adm'];
 var systemadm2=document.forms[0].elements['Formated_system${grp}adm2'];
+var systemincidentgroup=document.forms[0].elements['Formated_system${grp}incidentgroup'];
 var systemlocation=document.forms[0].elements['Formated_system${grp}location'];
 var systemroom=document.forms[0].elements['Formated_system${grp}room'];
 var systemplace=document.forms[0].elements['Formated_system${grp}place'];
@@ -412,6 +437,7 @@ if (s){
       systemname.disabled=true;
       systemadm.disabled=true;
       systemadm2.disabled=true;
+      systemincidentgroup.disabled=true;
       systemlocation.disabled=true;
       systemroom.disabled=true;
       systemplace.disabled=true;
@@ -421,6 +447,7 @@ if (s){
       systemname.disabled=false;
       systemadm.disabled=false;
       systemadm2.disabled=false;
+      systemincidentgroup.disabled=false;
       systemlocation.disabled=false;
       systemroom.disabled=false;
       systemplace.disabled=false;
@@ -430,6 +457,7 @@ if (s){
       systemname.disabled=true;
       systemadm.disabled=true;
       systemadm2.disabled=true;
+      systemincidentgroup.disabled=true;
       systemlocation.disabled=true;
       systemroom.disabled=true;
       systemplace.disabled=true;
@@ -492,7 +520,7 @@ sub getRecordImageUrl
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default epa epb contacts  source));
+   return( qw(header default epa epb contacts attachments source));
 }
 
 sub SelfAsParentObject    # this method is needed because existing derevations
@@ -529,6 +557,13 @@ sub Validate
          $newrec->{"epbsystemid"}=undef;
       } 
    }
+   my $netinterconid=effVal($oldrec,$newrec,"netinterconid");
+
+   if (length($netinterconid)<3 || haveSpecialChar($netinterconid)){ 
+      $self->LastMsg(ERROR,
+           sprintf($self->T("invalid LSZ '%s' specified"),$netinterconid));
+      return(0);
+   }
 
 
    ########################################################################
@@ -564,7 +599,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default epa epb contacts);
+   my @databossedit=qw(default epa epb contacts attachments);
 
 
    if (!defined($rec)){

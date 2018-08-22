@@ -618,11 +618,11 @@ sub Init
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("AL_TCom.network.intercon",
-                      "itil::netintercon",
+                      "AL_TCom::netintercon",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("AL_TCom.network.intercon.new",
-                      "itil::netintercon",
+                      "AL_TCom::netintercon",
                       func=>'New',
                       defaultacl=>['valid_user']);
    

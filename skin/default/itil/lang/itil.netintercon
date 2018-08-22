@@ -26,3 +26,4 @@
 'System B - Place'=>{de=>'System B - Platz'},
 'System B - Deputy Admin'=>{de=>'System B - Admin Vertreter'},
 'invalid systemname'=>{de=>'ungültiger Systemname'},
+"invalid LSZ '%s' specified"=>{de=>"ungültige LSZ '%s' angegeben"},

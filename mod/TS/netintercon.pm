@@ -1,6 +1,6 @@
-package AL_TCom::netintercon;
+package TS::netintercon;
 #  W5Base Framework
-#  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use TS::netintercon;
-@ISA=qw(TS::netintercon);
+use itil::netintercon;
+@ISA=qw(itil::netintercon);
 
 sub new
 {
