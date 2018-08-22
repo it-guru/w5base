@@ -3,6 +3,16 @@ body{
    margin:0px;
    overflow:hidden;
 }
+.further{
+   padding:5px;
+   margin:5px;
+   margin-top:30px;
+   background-color:lightgray;
+   width:93%;
+   overflow:auto;
+   margin-top:30px;
+}
+
 select.newworkflow{
    width:99%;
    height:99%;

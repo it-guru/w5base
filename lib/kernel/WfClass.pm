@@ -631,6 +631,16 @@ EOF
               $self->getParent->T($self->Self,$self->Self).
               "</b></div>";
       }
+
+      my $faq=getModuleObject($self->getParent->Config(),"faq::article");
+
+      if (defined($faq)){
+         my $further=$faq->getFurtherArticles("workflow ".$self->Self);
+         if ($further ne ""){
+            $tip.=$further;
+         }
+      }
+
       my $imgurl=$self->getRecordImageUrl();
       my $subtip=$StepObj->CreateSubTip();
       $subtip="&nbsp;" if ($subtip eq "");

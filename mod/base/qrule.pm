@@ -1161,7 +1161,7 @@ sub FullView
    if (defined($rec)){
       my $faq=getModuleObject($self->Config(),"faq::article");
       if (defined($faq)){
-         my $further=$faq->getFurtherArticles("QualtiyRule ".$rec->{id},1);
+         my $further=$faq->getFurtherArticles("QualtiyRule ".$rec->{id});
          if ($further ne ""){
             print($further);
          }

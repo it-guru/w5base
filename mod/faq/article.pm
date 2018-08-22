@@ -948,7 +948,10 @@ sub getFurtherArticles
       }
       else{
          my @kw=grep(/^\S{3,100}$/,split(/[\s\/,]/,$words));
-         if ($#kw>0){
+         if ($#kw==-1 && $words ne ""){
+            @kw=($words);
+         }
+         if ($#kw>-1){
             my @ll;
             my @not=qw(mit einer einen eines der die das ich du er sie es wir
                        durch andere anderes infos info aus wie wird
@@ -998,7 +1001,11 @@ sub getFurtherArticles
                 $label."</span></li></ul></td></tr>";
    }
    if ($further ne ""){
-      $further="<div class=further>".$self->T("further FAQ-articles").":".
+      my $label=$self->T("further FAQ-articles");
+      if ((caller())[0] ne "faq::article"){
+         $label=$self->T("related FAQ-articles");
+      }
+      $further="<div class=further>${label}:".
                "<table width=\"100%\">".$further."</table></div>";
 
    }

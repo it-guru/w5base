@@ -2433,6 +2433,8 @@ sub New                   # Workflow starten
    if ($self->Config->Param("W5BaseOperationMode") eq "readonly"){
       @selectable=();
    }
+   my $faq=getModuleObject($self->Config(),"faq::article");
+
    foreach my $wfclass (@selectable){
       my $name=$self->{SubDataObj}->{$wfclass}->Label();
       $disp{$name}=$wfclass;
@@ -2465,6 +2467,12 @@ sub New                   # Workflow starten
             "target=_blank title=\\\"$atitle\\\">".
             "<img src=\\\"../../base/load/anker.gif\\\" ".
             "height=10 border=0></a>";
+      if (defined($faq)){
+         my $further=$faq->getFurtherArticles("workflow ".$wfclass);
+         if ($further ne ""){
+            $tip.=$further;
+         }
+      }
       $tip=~s/\n/\\n/g;
       $tip=~s/"/\\"/g;
       $tip.=sprintf($self->T("You can add a shortcut of this anker %s to ".
