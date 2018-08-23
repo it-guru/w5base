@@ -163,6 +163,7 @@ sub _preProcessFilter
    my $self=shift;
    my $hflt=shift;
 
+
    my $changed=0;
    do{ 
       $changed=0;
@@ -207,19 +208,27 @@ sub _SetFilter
    my @list=@_;
    $self->{FilterSet}->{$filtername}=[];
 
+
+
    @list={@list} if (!ref($list[0]));
    my $fail=0;
    do{
       if (ref($list[0]) eq "ARRAY"){
          my @l=@{$list[0]};
+         my @finelist;
          for(my $c=0;$c<=$#l;$c++){
-            $l[$c]=$self->_preProcessFilter($l[$c]);
-            $fail++ if (!defined($l[$c]));
+            my %f=%{$l[$c]};  # copy filter-hash to prevent SCALAR convert
+            my $flt=\%f;      # to ARRAY lists (in SubList vjoins)
+            $flt=$self->_preProcessFilter($flt);
+            $fail++ if (!defined($flt));
+            push(@finelist,$flt);
          }
-         push(@{$self->{FilterSet}->{$filtername}},\@l);
+         push(@{$self->{FilterSet}->{$filtername}},\@finelist);
       }
       elsif (ref($list[0]) eq "HASH"){
-         my $h=$self->_preProcessFilter($list[0]);
+         my %f=%{$list[0]};
+         my $flt=\%f;
+         my $h=$self->_preProcessFilter($flt);
          $fail++ if (!defined($h));
          push(@{$self->{FilterSet}->{$filtername}},$h);
       }

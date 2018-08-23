@@ -735,6 +735,7 @@ sub getForceParamForSubedit
    my $lnk=$joinf->RawValue($rec);
 
    $forceparam{$dfield->{vjoinon}->[1]}=$lnk;
+printf STDERR ("fifi base=%s\n",Dumper($dfield->{vjoinbase}));
    if (defined($dfield->{vjoinbase})){
       my @filter=($dfield->{vjoinbase});
       if (ref($dfield->{vjoinbase}) eq "ARRAY"){
@@ -744,6 +745,7 @@ sub getForceParamForSubedit
          foreach my $var (keys(%$filter)){
             if (ref($filter->{$var}) eq "SCALAR"){
                $forceparam{$var}=${$filter->{$var}};
+               $forceparam{"Formated_".$var}=${$filter->{$var}};
             }
          }
       }
