@@ -302,13 +302,8 @@ sub new
 
       new kernel::Field::Mandator(
                 group         =>'applinfo',
+                label         =>'Application Mandator',
                 readonly      =>1),
-
-      new kernel::Field::Link(
-                name          =>'mandatorid',
-                label         =>'ApplMandatorID',
-                group         =>'applinfo',
-                dataobjattr   =>'appl.mandator'),
 
       new kernel::Field::Select(
                 name          =>'applcistatus',
@@ -612,7 +607,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
-                label         =>'MandatorID',
+                label         =>'Application MandatorID',
                 dataobjattr   =>'appl.mandator'),
 
       new kernel::Field::Link(

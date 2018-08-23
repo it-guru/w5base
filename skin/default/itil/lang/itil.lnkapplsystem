@@ -39,3 +39,6 @@ then these applications-system links are not listed.
 'log. CPU count'=>{de=>'log. CPU Anzahl'},
 'log. Memory'=>{de=>'log. Arbeitsspeicher'},
 'relative phys. CPU count'=>{de=>'relative phys. CPU Anzahl'},
+'Application Mandator'=>{de=>'Anwendungs Mandant'},
+'ApplicationID'=>{de=>'Anwendungs-ID'},
+'deputy Technical Solution Manager E-Mail'=>{de=>'TSM Vertreter E-Mail'},
