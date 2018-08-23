@@ -1,0 +1,9 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=fname width=10%>%ipnetname(label)%:</td>
+         <td class=finput colspan=3>%ipnetname(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subadd,subdelete,subsave,subcancel)%

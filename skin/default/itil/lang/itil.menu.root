@@ -91,6 +91,8 @@
 'itil.network.ipnet.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.network.intercon'=>{de=>'Netzkopplung',en=>'Interconnect'},
 'itil.network.intercon.new'=>{de=>'Neueingabe',en=>'New'},
+'itil.network.intercon.lnkipnet'=>{de=>'Verkn. IP-Netz',en=>'Link IP-Net'},
+'itil.network.intercon.lnkipnet.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.osrelease'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'itil.kern.osrelease.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.software'=>{de=>'Software',en=>'Software'},

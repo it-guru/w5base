@@ -211,6 +211,17 @@ sub new
                 selectfix     =>1,
                 dataobjattr   =>'netintercon.epa_systemid'),
 
+      new kernel::Field::SubList(
+                name          =>'epanets',
+                label         =>'Endpoint A - Networks',
+                group         =>'epanets',
+                htmllimit     =>'20',
+                vjointo       =>'itil::lnknetinterconipnet',
+                vjoinbase     =>[{'endpoint'=>\'A'}],
+                vjoinon       =>['id'=>'netinterconid'],
+                vjoindisp     =>['ipnetname']),
+
+
       new kernel::Field::Select(
                 name          =>'epbtype',
                 label         =>'Endpoint B - reference type',
@@ -314,6 +325,17 @@ sub new
                 wrdataobjattr =>'netintercon.epb__place',
                 dataobjattr   =>'if (netintercon.epb_typ=1,assb.place,'.
                                 'netintercon.epb__place)'),
+
+      new kernel::Field::SubList(
+                name          =>'epbnets',
+                label         =>'Endpoint B - Networks',
+                group         =>'epbnets',
+                htmllimit     =>'20',
+                vjointo       =>'itil::lnknetinterconipnet',
+                vjoinbase     =>[{'endpoint'=>\'B'}],
+                vjoinon       =>['id'=>'netinterconid'],
+                vjoindisp     =>['ipnetname']),
+
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -520,7 +542,8 @@ sub getRecordImageUrl
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default epa epb contacts attachments source));
+   return( qw(header default epa epanets epb epbnets contacts 
+              attachments source));
 }
 
 sub SelfAsParentObject    # this method is needed because existing derevations
@@ -599,7 +622,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default epa epb contacts attachments);
+   my @databossedit=qw(default epa epb epanets epbnets contacts);
 
 
    if (!defined($rec)){

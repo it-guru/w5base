@@ -82,6 +82,8 @@
 'AL_TCom.network.ipnet.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.network.intercon'=>{de=>'Netzkopplung',en=>'Interconnect'},
 'AL_TCom.network.intercon.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.network.intercon.lnkipnet'=>{de=>'Verkn. IP-Netz',en=>'Link IP-Net'},
+'AL_TCom.network.intercon.lnkipnet.new'=>{de=>'Neueingabe',en=>'New'},
 'AL_TCom.kern'=>{de=>'Stammdaten',en=>'Basedata'},
 'AL_TCom.kern.network'=>{de=>'Netzbereich',en=>'Networkarea'},
 'AL_TCom.kern.network.new'=>{de=>'Neueingabe',en=>'New'},

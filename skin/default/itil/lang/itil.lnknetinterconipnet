@@ -1,0 +1,6 @@
+'itil::lnknetinterconipnet'=>{de=>'Verknüpfung Netzkopplung-IP-Netz',en=>'Relation Interconect-IP-Net'},
+'endpoint'=>{de=>'Endpunkt'},
+'Network Name'=>{de=>'IP-Netz Name'},
+'Interconnect'=>{de=>'Netzkopplungsname'},
+'invalid ip-net specified'=>{de=>'ungültiges IP-Netz angegeben'},
+'invalid interconnect specified'=>{de=>'ungültige Netzkopplung angegeben'},

@@ -638,6 +638,20 @@ sub Init
                       "itil::netintercon",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.network.intercon.new",
+                      "itil::netintercon",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.network.intercon.lnkipnet",
+                      "itil::lnknetinterconipnet",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.network.intercon.lnkipnet.new",
+                      "itil::lnknetinterconipnet",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj('itil::workflow::opmeasure$',
                       "base::workflow",
                       func=>'New',

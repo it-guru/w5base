@@ -625,6 +625,16 @@ sub Init
                       "AL_TCom::netintercon",
                       func=>'New',
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.network.intercon.lnkipnet",
+                      "itil::lnknetinterconipnet",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.network.intercon.lnkipnet.new",
+                      "itil::lnknetinterconipnet",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    
    $self->RegisterObj("AL_TCom.proc.ChangeManagement",
                       "TS::chmmgmt",

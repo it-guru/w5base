@@ -1709,3 +1709,25 @@ create table riskmgmtbase (
 ) ENGINE=INNODB;
 alter table asset add slotno varchar(20) default '';
 alter table system add productline varchar(40) default NULL;
+create table lnknetinterconipnet (
+  id         bigint(20) NOT NULL,
+  ipnet       bigint(20) NOT NULL,
+  netintercon bigint(20) NOT NULL,
+  endpoint    char(1) default 'A',
+  additional longtext   default NULL,
+  comments   longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY lnkkey (ipnet,netintercon),
+  FOREIGN KEY fk_ipnet  (ipnet) REFERENCES ipnet (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_netintercon (netintercon) REFERENCES netintercon (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=INNODB;
