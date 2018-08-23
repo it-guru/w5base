@@ -1118,7 +1118,8 @@ var W5ExploreClass=function(){
                         "&nbsp;</div>");
 
        $(swrow).append("<div class='cssswitchcell'>"+
-                        "<div class='cssicon cssswitch printer' "+
+                        "<div class='cssicon cssswitch printer "+
+                          "cssswitchdisabled' "+
                           "id='ControlSwitchPrint' "+
                           "title='Print Network'></div></div>");
 

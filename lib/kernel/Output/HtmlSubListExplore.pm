@@ -239,6 +239,9 @@ sub ProcessLine
       $d.="<div class=subdatafield valign=top $align";
       $data="&nbsp;" if ($data=~m/^\s*$/);
       $d.=" style=\"$style\"";
+      if ($data=~m/\S{38}/){
+         $data=~s/(\S{37})(\S+)/$1 $2/g;
+      }
       $d.="$nowrap>".$data."</div>\n";
    }
    $d.="</td></tr>\n";

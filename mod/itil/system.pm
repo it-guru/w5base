@@ -149,6 +149,20 @@ sub new
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['appl']),
 
+      new kernel::Field::SubList(
+                name          =>'tsms',
+                label         =>'Technical Solution Managers',
+                group         =>'applications',
+                htmldetail    =>0,
+                readonly      =>1,
+                searchable    =>0,
+                explore       =>500,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['tsm']),
+
+
       new kernel::Field::Text(
                 name          =>'tsmemails',
                 label         =>'Technical Solution Manager E-Mails',
@@ -1094,6 +1108,7 @@ sub new
                 name          =>'ipaddresseslist',
                 label         =>'IP-Adresses list',
                 group         =>'ipaddresses',
+                explore       =>800,
                 htmldetail    =>0,
                 subeditmsk    =>'subedit.system',
                 vjoinbase     =>[{cistatusid=>\"4"}],
