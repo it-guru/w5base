@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta http-equiv="X-UA-Compatible" content="EmulateIE10;IE=edge"/>
 <base href="%BASE%">
 <link rel="stylesheet" href="../../../public/base/load/goldenlayout-base.css">
 <link rel="stylesheet" href="../../../public/base/load/goldenlayout-light-theme.css">
+<link rel="stylesheet" href="../../../public/base/load/OpenW5Desktop.css">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <title>OpenW5Desktop - preBETA!</title>
@@ -57,13 +58,14 @@ html, body{
   border-top: 1px solid #333;
   cursor: pointer;
   padding: 10px 5px;
-  color: #BBB;
+  color: gray;
   background:#f4f4f4;
   font: 12px Arial, sans-serif;
 }
 
 #menuContainer li:hover{
   color: black;
+  background:#f3f3f3;
 }
 
 #layoutContainer{
@@ -104,6 +106,15 @@ $(document).ready(function(){
            ]
        }]
    };
+   var myLayout,savedState=localStorage.getItem( 'savedState' );
+   if (savedState!==null){
+      config=JSON.parse(savedState);
+   }
+   // posible place for forcing config parameters
+   delete(config.maxmisedItemId);
+
+
+   // ///////////////////////////////////////////////////////////////////
 
    var myLayout = new window.GoldenLayout( config, $('#layoutContainer') );
 
@@ -112,12 +123,18 @@ $(document).ready(function(){
        var dataobj=container._config.dataobj;
        console.log("w5 ",dataobj);
        var dataobjpath=dataobj.replace("::","/");
-       var url="../../"+dataobjpath+"/Main";
+       var url="../../"+dataobjpath+"/NativMain";
        var html="<iframe style='width:100%;height:100%' "+
                 "src='"+url+"'></iframe>";
        container.getElement().html(html);
      }
    );
+
+   myLayout.on( 'stateChanged', function(){
+       var state = JSON.stringify( myLayout.toConfig() );
+       console.log("state=",state);
+       localStorage.setItem( 'savedState', state );
+   });
 
    myLayout.init();
 
