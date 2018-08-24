@@ -982,6 +982,14 @@ sub msel
    $fp=~s/\//./g;
    $fp=~s/"/./g;
 
+   if ($fp eq ""){
+      my $autoloadpath=$self->Config->Param("AutoLoadMenuPath");
+      if ($autoloadpath ne ""){
+         if (exists($mt->{fullname}->{$autoloadpath})){
+            $fp=$autoloadpath;
+         }
+      }
+   }
    my $wintitle="";
    if (defined($mt->{fullname}->{$fp})){
       my $m=$mt->{fullname}->{$fp};

@@ -94,6 +94,10 @@ Bei Serverkomandos (z.B. W5Event, W5Server, W5Replicate ...) wird die Konfigurat
 * SKIN
   Oberflächen Skin name
 
+* AutoLoadMenuPath
+  Allows to define a MenuPath, which should be loaded if no MenuPath is
+  selected (f.e. in case of start w5base application in webfrontend)
+
 * WEBSERVICEPROXY
   Bei Webservice Verbindungen wird in dieser Variabel die PROXY (nicht Web-Proxy!) URL abgespeichert.
 
