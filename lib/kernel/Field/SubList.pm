@@ -44,10 +44,8 @@ sub vjoinobjInit
 {
    my $self=shift;
    $self->vjoinobj->ResetFilter();
-printf STDERR ("fifi 2.2  vjoinbase=%s\n",Dumper($self->{vjoinbase}));
    if (defined($self->{vjoinbase})){
       $self->vjoinobj->SetNamedFilter("VJOINBASE",$self->{vjoinbase});
-printf STDERR ("fifi 2.3  vjoinbase=%s\n",Dumper($self->{vjoinbase}));
    }
 }
 
@@ -119,7 +117,6 @@ sub FormatedDetail
    my $idfield=$app->IdField();
    my $id=$idfield->RawValue($current);
    my $name=$self->Name();
-printf STDERR ("fifi name=$name vjoinbase=%s\n",Dumper($self->{vjoinbase}));
    $self->{Sequence}++;
    my $readonly=$self->readonly($current);
    if ($mode eq "edit" && !$readonly){
