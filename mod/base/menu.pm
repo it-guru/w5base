@@ -983,10 +983,12 @@ sub msel
    $fp=~s/"/./g;
 
    if ($fp eq ""){
-      my $autoloadpath=$self->Config->Param("AutoLoadMenuPath");
-      if ($autoloadpath ne ""){
-         if (exists($mt->{fullname}->{$autoloadpath})){
-            $fp=$autoloadpath;
+      if ($ENV{REMOTE_USER} ne "anonymous" && $ENV{REMOTE_USER} ne ""){
+         my $autoloadpath=$self->Config->Param("AutoLoadMenuPath");
+         if ($autoloadpath ne ""){
+            if (exists($mt->{fullname}->{$autoloadpath})){
+               $fp=$autoloadpath;
+            }
          }
       }
    }
