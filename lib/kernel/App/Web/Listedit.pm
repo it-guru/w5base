@@ -1008,14 +1008,14 @@ sub arrangeSearchData
    my $newbutton="";
    $newbutton="new," if ($param{allowNewButton});
    my $d=<<EOF;
-<img width=450 border=0 height=1 src="../../../public/base/load/empty.gif"><div class=searchframe><table class=searchframe>$searchframe</table></div>
+<img width=450 border=0 height=1 src="../../../public/base/load/empty.gif"><div class=searchframe><table id=SearchParamTable class=searchframe>$searchframe</table></div>
 %StdButtonBar(search,analytic,$newbutton,defaults,reset,bookmark,print,extended,upload)%
 <div style="width:100%;
             border-width:0px;
             margin:0px;
             padding:0px;
             display:none;visibility:hidden" id=ext>
-<div class=extsearchframe><table class=extsearchframe>$extframe</table></div>
+<div class=extsearchframe><table id=ExtSearchParamTable class=extsearchframe>$extframe</table></div>
 </div>
 <script language="JavaScript">
 setFocus("$defaultsearch");
@@ -1421,8 +1421,10 @@ sub Main
 </script>
 EOF
    }
+   
    print("<div id=MainStartup style='display:none'>".
-         "<table style=\"border-collapse:collapse;width:100%;height:100%\" ".
+         "<table id=MainTable ".
+         "style=\"border-collapse:collapse;width:100%;height:100%\" ".
          "border=0 cellspacing=0 cellpadding=0>");
    if (!$param{nohead}){
       printf("<tr><td height=1%% style=\"padding:1px\" ".
@@ -1430,6 +1432,12 @@ EOF
    }
    printf("<tr><td height=1%% style=\"padding:1px\">%s</td></tr>",
           $self->getParsedSearchTemplate(%param));
+   print <<EOF;
+<script>
+addEvent(window, "resize", genericResponsiveMainHandler);
+addEvent(window, "load", genericResponsiveMainHandler);
+</script>
+EOF
    my $welcomeurl="Welcome";
    if (!$self->can("Welcome")){
       my $mod=$self->Module();

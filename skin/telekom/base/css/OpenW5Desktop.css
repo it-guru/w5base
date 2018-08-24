@@ -1,0 +1,22 @@
+.lm_maximised .lm_header{
+  background-color:#b90b64
+}
+
+.lm_header .lm_tab{
+  background-color:#bc0060;
+  color:silver;
+}
+
+
+.lm_header{
+  background-color:#b90b64
+}
+
+
+.lm_tabs .lm_active{
+  background-color:#e20074;
+  color:white;
+}
+
+
+

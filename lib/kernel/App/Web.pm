@@ -1701,10 +1701,15 @@ sub findtemplvar
       my $href=shift;
       my $text=shift;
       my $class=shift;
-       
+
+      my $id=$href;
+      $id=~s/(^[a-zA-Z0-9_]+).*/$1/;
+      if ($id ne ""){
+         $id="id='Button_$id' ";
+      }
       $class="button" if (!defined($class));
-      $$d.="<input class=$class type=button value=\"".$s->T($text)."\"".
-           "onclick=\"$href;\">";
+      $$d.="\n<input ${id}class=$class type=button value=\"".$s->T($text)."\" ".
+           "onclick=\"$href;\">\n";
    }
    if ($var eq "LASTMSG"){
       my $d="";
