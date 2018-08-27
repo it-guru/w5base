@@ -605,6 +605,9 @@ sub NotifyAddOrRemoveObject
       my $baseurl=$self->Config->Param("EventJobBaseUrl");
       $url=$baseurl;
    }
+   if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+      $url=~s/^http:/https:/i;
+   }
    my $spath=$self->Self();
    $spath=~s/::/\//g;
    my $publicurl=$url."/public/".$spath."/";

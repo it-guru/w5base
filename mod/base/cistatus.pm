@@ -103,6 +103,15 @@ sub show                 # is used, to make the cistatus visible for emails
 }
 
 
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    my $method=shift;
+    return(1) if ($method eq "show");
+    return(0);
+}
+
+
 
 sub RawValue
 {
