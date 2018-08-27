@@ -1,4 +1,4 @@
-package AL_TCom::netintercon;
+package AL_TCom::lnkapplsystem;
 #  W5Base Framework
 #  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
@@ -20,8 +20,8 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use TS::netintercon;
-@ISA=qw(TS::netintercon);
+use TS::lnkapplsystem;
+@ISA=qw(TS::lnkapplsystem);
 
 sub new
 {

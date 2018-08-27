@@ -190,8 +190,8 @@ sub Init
                       defaultacl=>['admin']);
 
    $self->RegisterObj("AL_TCom.appl.lnksystem",
-                      "itil::lnkapplsystem",
-                      defaultacl=>['admin']);
+                      "AL_TCom::lnkapplsystem",
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.appl.aegmgmt",
                       "AL_TCom::aegmgmt",
