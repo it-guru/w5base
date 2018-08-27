@@ -1216,6 +1216,7 @@ sub nativProcess
                               mode=>'newRisk:',
                               workflowname=>$WfRec->{name});
          Query->Delete("Formated_detaildescription");
+         Query->Delete("Formated_name");
          $self->PostProcess($action,$h,$actions);
       }
       else{
