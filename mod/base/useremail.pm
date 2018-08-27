@@ -224,7 +224,7 @@ sub getSqlFrom
          if (ref($filter) eq "HASH" && defined($filter->{email})){
             if (!ref($filter->{email}) &&
                 !($filter->{email}=~m/[\*\?\s]/)){
-               my $e="a.email=".$workdb->quotemeta(lc($filter->{email}))." ";
+               my $e="email=".$workdb->quotemeta(lc($filter->{email}))." ";
                $precision0.="and a.$e ";
                $precision1.="and b.$e ";
                $precision2.="and c.$e ";
