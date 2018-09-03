@@ -345,7 +345,9 @@ sub ProcessLine
          $style.="white-space:nowrap;";
          $nowrap=" nowrap";
       }
-      if (!($data=~m/javascript/i)){
+      if (!($data=~m/javascript/i) && 
+          !($data=~m/<.*>/i) && # html code in output of field
+          !($field->can("getSubListData"))){
          # if data ist javascript, no prevent of hyphen break can be done.
          # replace of hyphen by &#x2011; is a bad solution, because it is
          # no working if data is copied to clipboard.
