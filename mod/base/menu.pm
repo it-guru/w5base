@@ -1065,6 +1065,7 @@ EOF
           ($openurl=~m/^\.\.\//)){
          Query->Delete("OpenURL");
          $currenturl=$openurl;
+         $currenturl=~s/^http[s]{0,1}://i;  # prevent mixed content problem
       }
       else{
          if (defined($mt->{fullname}->{$fp})){
