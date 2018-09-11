@@ -453,9 +453,9 @@ sub qcheckRecord
            $rec->{cistatusid} ne "6"){
             $dataobj->Log(ERROR,"basedata",
                    "Dummy entry detected. The Contact '%s'\n".
-                   "(userid=%s) will be marked as delete\n-".
+                   "(userid=%s;dsid=%s;posix=%s) will be marked as delete\n-".
                    "\n-",
-                   $rec->{fullname},$rec->{userid});
+                   $rec->{fullname},$rec->{userid},$rec->{dsid},$rec->{posix});
             my $user=getModuleObject($self->getParent->Config(),
                                       "base::user");
             $user->ValidatedUpdateRecord($rec,
