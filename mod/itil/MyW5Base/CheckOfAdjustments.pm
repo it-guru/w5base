@@ -483,8 +483,9 @@ sub SetFilter
    my %f1=%{$flt};
    my %f2=%{$flt};
 
-   $f1{eventstart}="<=\"$to\" OR [EMPTY]";
-   $f1{eventend}=">=\"$from\" OR [EMPTY]";
+
+   $f1{eventstart}="<=\"$to GMT\" OR [EMPTY]";
+   $f1{eventend}=">=\"$from GMT\" OR [EMPTY]";
 
    #return($dataobj->SetFilter([\%f1,\%f2]));
    return($dataobj->SetFilter(\%f1));
