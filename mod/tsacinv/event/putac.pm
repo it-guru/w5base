@@ -1155,7 +1155,7 @@ sub SendXmlToAM_appl
                }
                my $acstatus="IN OPERATION";
                if ($rec->{cistatusid}==3){
-                  $acstatus="PROJECT";
+                  $acstatus="IN BUILD";
                }
                if ($rec->{cistatusid}==5){
                   $acstatus="OUT OF OPERATION";
