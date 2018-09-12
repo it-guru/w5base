@@ -144,7 +144,7 @@ sub ProcessHead
       $d.="SortTableResultTable.onsort=function (){\n";
       $d.=" var rows = SortTableResultTable.tBody.rows\n";
       $d.=" var l = rows.length;\n";
-      $d.=" console.log(rows);\n";
+      #$d.=" console.log(rows);\n";
       $d.=" for (var i = 0; i < l; i++) { \n".
           "   SortableTableremoveClassName(rows[i]); \n".
           "   SortableTableaddClassName(rows[i], \n".
@@ -162,8 +162,8 @@ sub ProcessHead
                }
             }
          }
+         #$d.="SortTableResultTable.initHeader([$sortline]);\n";
       }
-      $d.="SortTableResultTable.initHeader();\n";
       $d.="}\n";
       $d.="</script>\n";
    }
