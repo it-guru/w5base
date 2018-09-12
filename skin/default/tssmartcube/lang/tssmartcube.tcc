@@ -19,4 +19,5 @@
 'it is posible to update/upgrade OS'=>{de=>'Update/Upgrade des OS möglich'},
 'Upgrade/Refresh reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
 'Update/Upgrade reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
+'Operating System'=>{de=>'Betriebssystem'},
 
