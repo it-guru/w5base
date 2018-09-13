@@ -387,6 +387,17 @@ sub SecureSetFilter
 }
 
 
+sub SetFilter {
+   my $self=shift;
+
+   if (defined($self->{DB})){
+      $self->{DB}->{db}->{LongReadLen}=1024*1024*15;    #15MB
+   }
+   $self->SUPER::SetFilter(@_);
+}
+
+
+
 
 
 
