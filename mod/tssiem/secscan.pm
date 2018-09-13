@@ -144,7 +144,7 @@ sub new
                 name          =>'pdfstdfull_name',
                 label         =>'PDF Standard Full name',
                 group         =>'results',
-                dataobjattr   =>"('Qualys_ICTO-'||lpad(ictoid,5,'0')||".
+                dataobjattr   =>"('Qualys_'||ictoid||".
                                 "'_'||".
                                 "to_char(launch_datetime,'YYYYMMDDHH24MISS')||".
                                 "'_standard_full'||'.pdf')"),
@@ -189,7 +189,7 @@ sub new
                 name          =>'pdfstddelta_name',
                 label         =>'PDF Standard Delta name',
                 group         =>'results',
-                dataobjattr   =>"('Qualys_ICTO-'||lpad(ictoid,5,'0')||".
+                dataobjattr   =>"('Qualys_'||ictoid||".
                                 "'_'||".
                                 "to_char(launch_datetime,'YYYYMMDDHH24MISS')||".
                                 "'_standard_delta'||'.pdf')"),
@@ -234,7 +234,7 @@ sub new
                 name          =>'pdfvfwifull_name',
                 label         =>'PDF SmiplifiedFW Full name',
                 group         =>'results',
-                dataobjattr   =>"('Qualys_ICTO-'||lpad(ictoid,5,'0')||".
+                dataobjattr   =>"('Qualys_'||ictoid||".
                                 "'_'||".
                                 "to_char(launch_datetime,'YYYYMMDDHH24MISS')||".
                                 "'_SmiplifiedFW_full'||'.pdf')"),
@@ -279,7 +279,7 @@ sub new
                 name          =>'pdfvfwidelta_name',
                 label         =>'PDF SmiplifiedFW Delta name',
                 group         =>'results',
-                dataobjattr   =>"('Qualys_ICTO-'||lpad(ictoid,5,'0')||".
+                dataobjattr   =>"('Qualys_'||ictoid||".
                                 "'_'||".
                                 "to_char(launch_datetime,'YYYYMMDDHH24MISS')||".
                                 "'_SmiplifiedFW_delta'||'.pdf')"),
