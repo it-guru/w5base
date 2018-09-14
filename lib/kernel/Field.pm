@@ -751,13 +751,19 @@ sub preProcessFilter
              "error while compilining ".
              "expression '$hflt->{$field}' for field $self->{name}");
       }
-
+      my $vjoinslimit;
+      if (exists($self->{vjoinslimit})){
+         $vjoinslimit=$self->{vjoinslimit};
+      }
       if (exists($fobj->{vjoinreverse})){
          my $localFld=$fobj->{vjoinreverse}->[0];
          my $remoteFld=$fobj->{vjoinreverse}->[1];
          $fobj->vjoinobj->ResetFilter();
          if ($fobj->vjoinobj->SetFilter($subflt)){
             $fobj->vjoinobj->SetCurrentView($remoteFld);
+            #if (defined($vjoinslimit)){ # not working, because key can
+            #   $fobj->vjoinobj->Limit($vjoinslimit+1); # not be unique
+            #}
             my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
             @keylist=keys(%{$d->{$remoteFld}});
             if (($hflt->{$field}=~m/^\[LEER\]$/) || 
@@ -805,6 +811,9 @@ sub preProcessFilter
                          {$fobj->{vjoinon}->[1]=>$hflt->{$localFld}});
                }
                $fobj->vjoinobj->SetCurrentView($remoteFld);
+               #if (defined($vjoinslimit)){ # not working, because key can
+               #   $fobj->vjoinobj->Limit($vjoinslimit+1); # not be unique
+               #}
                my $d=$fobj->vjoinobj->getHashIndexed($remoteFld);
                @keylist=keys(%{$d->{$remoteFld}});
                if ($#keylist==-1){
@@ -819,6 +828,11 @@ sub preProcessFilter
             }
             delete($hflt->{$field});
          }
+         if (defined($vjoinslimit) && $#keylist>=($vjoinslimit)){
+            my $msg=$self->getParent->T('filter on "%s" not selective enough',
+                    'kernel::Field');
+            $err=sprintf($msg,$self->Label());
+         }
 
          $hflt->{$localFld}=\@keylist;
          if ($localFld ne $self->Name()){
@@ -829,10 +843,9 @@ sub preProcessFilter
    }
    else{
       if ($hflt->{$field} eq "[NONE]"){   # das wäre eine Idee, wie man mit
-         $self->getParent->LastMsg(ERROR, # der Suche nach leeren SubLists
+         $err="ERROR: ".
               $self->getParent->T("search for NONE only posible on sublists",
-                 $self->Self));           # umgehen könnte .... ist aber noch
-         $err=1;                          # nicht fertig.
+                 $self->Self);           # umgehen könnte .... ist aber noch
       }
    }
    return($changed,$err);
