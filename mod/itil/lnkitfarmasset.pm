@@ -109,6 +109,8 @@ sub new
                 label         =>'Systems',
                 group         =>'systems',
                 readonly      =>1,
+                htmllimit     =>'20',
+                forwardSearch =>1,
                 vjointo       =>'itil::system',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['assetid'=>'assetid'],

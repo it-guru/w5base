@@ -124,6 +124,16 @@ sub new
                 vjoinon       =>['assetlocationid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::TextDrop(
+                name          =>'itfarm',
+                group         =>'assetinfo',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'Serverfarm',
+                vjointo       =>'itil::lnkitfarmasset',
+                vjoinon       =>['assetid'=>'assetid'],
+                vjoindisp     =>'itfarm'),
+
       new kernel::Field::Select(
                 name          =>'osrelease',
                 group         =>'systeminfo',
