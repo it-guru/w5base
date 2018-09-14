@@ -211,7 +211,8 @@ a.button:active  {
 div.lastmsg{
    margin:0px;
    padding:0px;
-   height:15px;
+   min-height:15px;
+   height:auto;
    width:99%;
    border-style:none;
    font-weight:normal;
