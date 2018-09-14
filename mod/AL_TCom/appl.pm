@@ -196,6 +196,7 @@ sub ItemSummary
       my @systems=$o->getHashList(qw(name denyupd denyupdcomments 
                                      dataissuestate
                                      osanalysestate
+                                     itfarm
                                      urlofcurrentrec
                                      servicesupport));
       return(0) if (!$o->Ping());
