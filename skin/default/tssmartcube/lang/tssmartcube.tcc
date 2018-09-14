@@ -4,6 +4,7 @@
 'fieldgroup.upd'=>{de=>'OS Update/Refresh Möglichkeiten',en=>'OS Update/Refresh posibilities'},
 'fieldgroup.w5basedata'=>{de=>'W5Base Verbindung',en=>'W5Base conjunction'},
 'relevant logical System Config-Item'=>{de=>'relevantes System Config-Item'},
+'relevant application Config-Items'=>{de=>'relevante Anwendungs Config-Items'},
 'fieldgroup.ha'=>{de=>'Cluster Software',en=>'Cluster Software'},
 'fieldgroup.os'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'fieldgroup.hw'=>{de=>'Hardware',en=>'Hardware'},

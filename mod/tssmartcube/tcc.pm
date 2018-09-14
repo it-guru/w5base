@@ -674,9 +674,19 @@ sub new
                 label         =>'relevant logical System Config-Item',
                 group         =>'w5basedata',
                 searchable    =>0,
-                vjointo       =>'AL_TCom::system',
+                vjointo       =>\'AL_TCom::system',
                 vjoinon       =>['w5systemid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::Text(
+                name          =>'w5applications',
+                label         =>'relevant application Config-Items',
+                group         =>'w5basedata',
+                vjointo       =>\'itil::lnkapplsystem',
+                vjoinslimit   =>'1000',
+                vjoinon       =>['w5systemid'=>'systemid'],
+                weblinkto     =>'none',
+                vjoindisp     =>'appl'),
 
       new kernel::Field::DataMaintContacts(
                 vjointo       =>'itil::system',
