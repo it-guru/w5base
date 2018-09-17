@@ -3238,8 +3238,7 @@ sub generateIndiviualAttributes
 {
    my $self=shift;
 
-   if ($self->{isInitalized} && # only if initializied because of W5Server calls
-       defined($self->{individualAttr})){
+   if ( defined($self->{individualAttr})){
       my $context=$self->Context;
       if (!defined($self->{individualAttr}->{Worktable})){
          my $o=getModuleObject($self->Config,$self->{individualAttr}->{dataobj});
@@ -3313,9 +3312,10 @@ sub getFieldList
          }
       }
    }
-
-   my $indivAttr=$self->generateIndiviualAttributes();
-   push(@fl,sort(keys(%$indivAttr)));
+   if ($context ne "collectively"){
+      my $indivAttr=$self->generateIndiviualAttributes();
+      push(@fl,sort(keys(%$indivAttr)));
+   }
 
    return(@fl);
 }

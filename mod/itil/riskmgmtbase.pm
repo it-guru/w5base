@@ -52,11 +52,14 @@ sub new
 
    $self->DelFields(@fielddrop);
 
-   foreach my $fldobj ($self->getFieldObjsByView([qw(ALL)])){
-      $fldobj->{readonly}=1;
-      next if (in_array(\@fullinherit,$fldobj->Name()));
-      $fldobj->{searchable}=0;
-      $fldobj->{htmldetail}=0;
+   foreach my $fldname ($self->getFieldList("collectively")){
+      my $fldobj=$self->getField($fldname);
+      if (defined($fldobj)){
+         $fldobj->{readonly}=1;
+         next if (in_array(\@fullinherit,$fldobj->Name()));
+         $fldobj->{searchable}=0;
+         $fldobj->{htmldetail}=0;
+      }
    }
 
    delete($self->{workflowlink});

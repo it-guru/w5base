@@ -50,17 +50,20 @@ sub new
 
       insertafter=>'location'
    );
-   foreach my $fo ($self->getFieldObjsByView([qw(ALL)])){
-      next if ($fo->Name eq "name");
-      next if ($fo->Name eq "cistatus");
-      next if ($fo->Name eq "systemid");
-      next if ($fo->Name eq "location");
-      next if ($fo->Name eq "asset");
-      next if ($fo->Name eq "conumber");
-      next if ($fo->Name eq "applications");
-      next if ($fo->Name eq "adminteam");
-      next if ($fo->Name eq "swinstproducer");
-      $fo->{searchable}=0;
+   foreach my $fldname ($self->getFieldList("collectively")){
+      my $fldobj=$self->getField($fldname);
+      if (defined($fldobj)){
+         next if ($fldobj->Name eq "name");
+         next if ($fldobj->Name eq "cistatus");
+         next if ($fldobj->Name eq "systemid");
+         next if ($fldobj->Name eq "location");
+         next if ($fldobj->Name eq "asset");
+         next if ($fldobj->Name eq "conumber");
+         next if ($fldobj->Name eq "applications");
+         next if ($fldobj->Name eq "adminteam");
+         next if ($fldobj->Name eq "swinstproducer");
+         $fldobj->{searchable}=0;
+      }
    }
 
    $self->setDefaultView(qw(name systemid swinstmatrix));
