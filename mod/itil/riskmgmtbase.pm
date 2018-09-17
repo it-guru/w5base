@@ -225,6 +225,29 @@ sub isQualityCheckValid
 }
 
 
+sub prepUploadFilterRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   if ((!defined($newrec->{id}) || $newrec->{id} eq "")
+       && $newrec->{name} ne ""){
+      my $o=$self->Clone();
+      $o->SetFilter({name=>\$newrec->{name}});
+      my @l=$o->getHashList(qw(id));
+      if ($#l==0){
+         my $crec=$l[0];
+         $newrec->{id}=$crec->{id};
+         delete($newrec->{name});
+      }
+      elsif($#l>0){
+         $self->LastMsg(ERROR,"not unique name");
+      }
+   }
+   $self->SUPER::prepUploadFilterRecord($newrec);
+}
+
+
 
 
 sub isWriteValid
