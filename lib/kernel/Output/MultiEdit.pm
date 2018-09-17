@@ -50,7 +50,11 @@ sub Init
    my $self=shift;
    my $app=$self->getParent->getParent();
 
-   $self->Context->{opobj}=getModuleObject($app->Config,$app->Self());
+   my $opobj=getModuleObject($app->Config,$app->Self());
+   $opobj->doInitialize();  # ensure, all grpIndiv Fields are loaded
+   $self->Context->{opobj}=$opobj;
+
+
    $self->SUPER::Init();
    return(undef);
 }
@@ -110,7 +114,7 @@ sub MultiOperationHeader
    my @fieldlist=$app->getFieldObjsByView([qw(ALL)],
                                            opmode=>'MultiEdit');
    my @oktypes=qw(TextDrop Databoss Mandator Contact Group Number 
-                  Textarea MultiDst IndividualAttr
+                  Textarea MultiDst IndividualAttr Currency
                   Text Select Boolean Date);
    foreach my $fo (@fieldlist){
       my $t=$fo->Type();
