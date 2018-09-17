@@ -42,12 +42,10 @@ sub RunWebApp
    binmode(STDOUT,':raw');
    binmode(STDERR,':raw');
 
-   #printf STDERR ("WebDav=%s\n",Dumper(\%ENV));
    my $cgi=new kernel::cgi();
    #msg(INFO,"query=%s",Dumper(scalar($cgi->MultiVars())));
    my $MOD=$cgi->UrlParam("MOD");
    my $objectkey=$ENV{'SCRIPT_NAME'}.":".$MOD;
-
    if (!exists($W5V2::ObjCache{$objectkey})){
       my $o=getModuleObject($instdir,$configname,$MOD);
       if (!defined($o)){

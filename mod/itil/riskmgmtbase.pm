@@ -19,6 +19,10 @@ package itil::riskmgmtbase;
 use strict;
 use vars qw(@ISA $VERSION $DESCRIPTION);
 use kernel;
+use kernel::App::Web;
+use kernel::App::Web::InterviewLink;
+use kernel::DataObj::DB;
+use kernel::Field;
 use itil::appl;
 @ISA=qw(itil::appl);
 
@@ -70,7 +74,8 @@ sub new
                 label         =>'ITRM criticality',
                 allowempty    =>1,
                 htmleditwidth =>'30px',
-                value         =>[qw(1 2 3 4 5)],
+                useNullEmpty  =>1,
+                value         =>[qw(0 1 2 3 4 5)],
                 dataobjattr   =>'riskmgmtbase.itrmcriticality'),
 
       new kernel::Field::Select(
