@@ -104,6 +104,12 @@ EOF
                     "resizable=yes,scrollbars=no\")";
             $link="<a class=bookmark href=javascript:$onclick>";
          }
+         if ($b->{target} eq "fullscreen"){
+            my $onclick="openwin(\"$b->{srclink}\",\"fullscreen\",".
+                    "\"height=480,width=640,toolbar=no,status=no,".
+                    "resizable=yes,scrollbars=no\")";
+            $link="<a class=bookmark href=javascript:$onclick>";
+         }
          if ($b->{srclink}=~m/^javascript:/i){
             $link="<a class=bookmark target=_self href=$b->{srclink}>";
          }
