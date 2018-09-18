@@ -1114,9 +1114,6 @@ sub SendXmlToAM_appl
                }
 
                my $chmapprgrp="[NULL]";
-               if ($rec->{scapprgroup} ne "") {
-                  $chmapprgrp=$rec->{scapprgroup};
-               }
 
                my $criticality=$rec->{criticality};
                $criticality=~s/^CR//;

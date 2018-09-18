@@ -148,20 +148,6 @@ sub new
                 label         =>'AM-Incident-AssignmentID',
                 dataobjattr   =>'"lincidentagid"'),
 
-
-      new kernel::Field::TextDrop(
-                name          =>'capprovergroup',
-                label         =>'CHM Approver Group',
-                group         =>'default',
-                vjointo       =>'tsacinv::group',
-                vjoinon       =>['lchhangeapprid'=>'lgroupid'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'lchhangeapprid',
-                label         =>'AM-Change-ApproverID',
-                dataobjattr   =>'"lchhangeapprid"'),
-
       new kernel::Field::TextDrop(
                 name          =>'cimplementorgroup',
                 label         =>'CHM Implementor Group',
