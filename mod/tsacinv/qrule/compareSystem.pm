@@ -196,7 +196,12 @@ sub qcheckRecord
    if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
        $rec->{cistatusid}==5){
       # productline calculation
-      if ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+      if (($rec->{itfarm}=~m/^NGSSM-Farm_x86/i)){
+         if ($rec->{productline} ne "NGSSM-Farm_x86"){
+            $forcedupd->{productline}="NGSSM-Farm_x86"; 
+         }
+      }
+      elsif ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
           ($rec->{itfarm} eq "")){
          if ($rec->{productline} ne "CLASSIC"){
             $forcedupd->{productline}="CLASSIC"; 
