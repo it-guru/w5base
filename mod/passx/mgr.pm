@@ -1132,7 +1132,6 @@ function inputkeyhandler()        //IE Variante
 {
    if (window.event && window.event.keyCode==13){
      // window.returnpressed=true;
-      alert("enter in inputkeyhandler");
       return(false);
    }
    return(true);
