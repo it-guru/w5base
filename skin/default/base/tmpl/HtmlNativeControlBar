@@ -1,0 +1,27 @@
+<script langauge="JavaScript">
+function  HtmlNativeControlBarReload(){
+   document.location.href=document.location.href;
+}
+function  HtmlNativeControlBarPrint(){
+   window.print();
+}
+</script>
+<style>
+.HtmlNativeControlBarIcon{
+cursor:pointer;
+padding:2px;
+border:1px solid gray;
+border-radius : 2px;
+width:18px;
+height:18px;
+ background-color: #fefefe;
+}
+.HtmlNativeControlBarIcon:hover{
+  background-color: #f0f0f0;
+  -webkit-transition: background-color 300ms linear;
+  -ms-transition: background-color 300ms linear;
+  transition: background-color 300ms linear;
+}
+</style>
+<img onclick=HtmlNativeControlBarReload() class=HtmlNativeControlBarIcon border=0 src="../../base/load/reload.gif" title="Reload Query">
+<img onclick=HtmlNativeControlBarPrint() class=HtmlNativeControlBarIcon border=0 style="margin-right:5px" src="../../base/load/miniprint.gif" title="Print Result">

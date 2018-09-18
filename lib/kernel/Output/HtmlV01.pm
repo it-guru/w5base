@@ -102,6 +102,13 @@ sub ProcessHead
          "src=\"../../../public/base/load/OutputHtml.js\"></script>\n";
        "</script>\n";
    $d.=$self->{fieldsPageHeader};
+
+
+   $d.="<div id=HtmlNativeControlBar style='display:none'>";
+   $d.=$app->getTemplate("tmpl/HtmlNativeControlBar","base");
+   $d.="</div>\n";
+
+
    $d.="<table class=maintable>\n";
    if (!Query->Param('$NOVIEWSELECT$')){
       $d.=$self->getHtmlViewLine($fh,$dest);
@@ -137,7 +144,15 @@ sub ProcessHead
           "</script>";
       $d.="<script language=JavaScript>\n";
       $d.="var SortTableResultTable;\n";
+      $d.="addEvent(window,\"load\",checkHtmlNativeControlBar);\n";
       $d.="addEvent(window,\"load\",InitTabResultTable);\n";
+      $d.="function checkHtmlNativeControlBar(){\n";
+      $d.=" var e=document.getElementById(\"HtmlNativeControlBar\")\n";
+      $d.=" if (window.top == window.self){\n";
+      $d.=" e.style.visibility='visible';\n";
+      $d.=" e.style.display='block';\n";
+      $d.=" }\n";
+      $d.="}\n";
       $d.="function InitTabResultTable(){\n";
       $d.="SortTableResultTable=new SortableTable(".
           "document.getElementById(\"ResultTable\"), [$sortline]);\n";

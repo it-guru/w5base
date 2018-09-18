@@ -965,7 +965,7 @@ sub createWorkflowQuery
    my $id=shift;
 
    $self->ResetFilter();
-   $self->SetFilter({id=>\$id});
+   $self->SetFilter({id=>$id});
    my ($rec,$msg)=$self->getOnlyFirst(qw(systems));
    my %sid=();
    if (defined($rec->{systems}) && ref($rec->{systems}) eq "ARRAY"){

@@ -654,6 +654,16 @@ sub getRelatedWorkflows
 
    my $idobj=$self->IdField();
 
+   my $dataobjectidflt=$dataobjectid;
+   if (!ref($dataobjectidflt)){   # ensure id is a scalar or array ref
+      $dataobjectidflt=\$dataobjectid;
+   }
+   if (ref($dataobjectidflt) eq "ARRAY" && $#{$dataobjectidflt}>=50){
+      $self->LastMsg(ERROR,
+             $self->T("direct id filter is limited to 50 entries"));
+      return(undef);
+   }
+
    my $idname;
    if (defined($idobj)){
       $idname=$idobj->Name();
@@ -699,12 +709,12 @@ sub getRelatedWorkflows
    if (ref($self->{workflowlink})){
       if (ref($self->{workflowlink}->{workflowkey}) eq "ARRAY" &&
           $self->{workflowlink}->{workflowkey}->[0] eq $idname){
-         $q->{$self->{workflowlink}->{workflowkey}->[1]}=\$dataobjectid;
+         $q->{$self->{workflowlink}->{workflowkey}->[1]}=$dataobjectidflt;
        #  $q{affectedapplication}="ASS_ADSL-NI(P)";
       }
       else{
          if (ref($self->{workflowlink}->{workflowkey}) eq "CODE"){
-            &{$self->{workflowlink}->{workflowkey}}($self,$q,$dataobjectid);
+            &{$self->{workflowlink}->{workflowkey}}($self,$q,$dataobjectidflt);
          }
          else{
             $q->{id}="none";
@@ -753,7 +763,7 @@ sub getRelatedWorkflows
          my %qadd=%qorg; # now add the DataIssue Workflows to 
                          # DataSelection idl
          $qadd{directlnktype}=[$self->Self,$self->SelfAsParentObject()];
-         $qadd{directlnkid}=\$dataobjectid;
+         $qadd{directlnkid}=$dataobjectidflt;
          $qadd{directlnkmode}=$mode;
          $qadd{isdeleted}=\'0';
          $h->ResetFilter();

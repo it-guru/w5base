@@ -183,6 +183,10 @@ sub WorkflowLinkResult
    my $class=Query->Param("class");    
    my $currentid=Query->Param("CurrentId");
    my $fulltext=Query->Param("fulltext");
+
+   if ($currentid=~m/,/){
+      $currentid=[split(/,/,$currentid)];
+   }
    
    my $ids=$self->getRelatedWorkflows($currentid,
              {timerange=>$tt,class=>$class,fulltext=>$fulltext});

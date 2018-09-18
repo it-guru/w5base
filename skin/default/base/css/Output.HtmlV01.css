@@ -1,3 +1,11 @@
+#HtmlNativeControlBar{
+   display:none;
+   visibility:hidden;
+   position: fixed;
+   z-index: 5;
+   bottom:0px;
+   right:0px;
+}
 table.maintable{
    border-collapse:collapse;
    width:100%;
@@ -195,6 +203,10 @@ a:focus.lineselect {
       visibility:hidden;
    }
    table.viewlist{
+      display:none;
+      visibility:hidden;
+   }
+   #HtmlNativeControlBar{
       display:none;
       visibility:hidden;
    }
