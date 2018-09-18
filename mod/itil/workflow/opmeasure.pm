@@ -500,6 +500,14 @@ sub isContactInRelationToApp
                    $arec->{applmgrid}])){
             return(1);
          }
+         my %g=$self->getGroupsOf($fwd->{fwdtargetid},["RMember"],"direct");
+         if (($arec->{itsemteamid} ne "" && exists($g{$arec->{itsemteamid}}))||
+             ($arec->{responseteamid} ne "" && 
+              exists($g{$arec->{responseteamid}}))||
+             ($arec->{businessteamid} ne "" && 
+              exists($g{$arec->{businessteamid}}))){
+            return(1);
+         }
       }
       if ($fwd->{fwdtarget} eq "base::grp"){
          if (in_array([$fwd->{fwdtargetid}],[
@@ -709,7 +717,9 @@ sub nativProcess
                    $arec->{opmid},$arec->{opm2id},
                    $arec->{applmgrid}
                  ]) &&
-                (!$self->getParent->IsMemberOf("admin")))){
+                (!$self->getParent->IsMemberOf("admin")) &&
+                ($arec->{businessteamid} ne "" && 
+                 !$self->getParent->IsMemberOf($arec->{businessteamid})))){
                $self->LastMsg(ERROR,"you are no authorised to create ".
                                     "measure for the desired application");
                return(0);

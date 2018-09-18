@@ -758,6 +758,12 @@ sub nativProcess
             $h->{fwddebtarget}=$fwddebtarget;
             $h->{fwddebtargetid}=$fwddebtargetid;
          }
+         if ($h->{fwdtarget} eq "base::user"){
+            my $userid=$self->getParent->getParent->getCurrentUserId();
+            if ($userid ne "" && $h->{fwdtargetid} eq $userid){
+               $h->{stateid}=3; # If User = [ICH] then direct accept workflow
+            }
+         }
          $h->{isdefaultforward}=1;
       }
       $h->{eventend}=undef;
