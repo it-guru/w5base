@@ -116,6 +116,7 @@ sub Validate
       my $maxoffset=10.0;
       if ($subtyp eq "riskmeasure"){
          $maxoffset=365*24*60*2;
+         $maxoffset=365*24*60*100;  # temporär for migration dataload
       }
       if (!defined($d) || $d->{totalminutes}>$maxoffset){
          $self->LastMsg(ERROR,"planned start to far in the past");
