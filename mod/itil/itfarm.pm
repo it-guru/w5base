@@ -225,6 +225,18 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'itfarm.realeditor'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"itfarm.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(itfarm.id,35,'0')"),
+
       new kernel::Field::Link(
                 name          =>'sectarget',
                 noselect      =>'1',
