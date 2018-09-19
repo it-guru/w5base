@@ -469,7 +469,10 @@ sub Validate
 
    {  # check from as ip
       $ip->ResetFilter();
-      $ip->SetFilter({name=>\$srchost,cistatusid=>"<6"});
+      $ip->SetFilter([
+         {name=>\$srchost,cistatusid=>"<6"},
+         {dnsname=>\$srchost,cistatusid=>"<6"}
+      ]);
       foreach my $iprec ($ip->getHashList(qw(name networkid applications))){
          my $al=$iprec->{applications};
          $al=[$al] if (ref($al) ne "ARRAY");
@@ -492,7 +495,10 @@ sub Validate
 
    {  # check to as ip
       $ip->ResetFilter();
-      $ip->SetFilter({name=>\$dsthost,cistatusid=>"<6"});
+      $ip->SetFilter([
+          {name=>\$dsthost,cistatusid=>"<6"},
+          {dnsname=>\$dsthost,cistatusid=>"<6"}
+      ]);
       foreach my $iprec ($ip->getHashList(qw(name networkid applications))){
          my $al=$iprec->{applications};
          $al=[$al] if (ref($al) ne "ARRAY");
