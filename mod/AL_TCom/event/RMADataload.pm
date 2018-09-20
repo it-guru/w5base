@@ -122,6 +122,14 @@ sub CreateWorkflows
                srcwfid=>$self->{d}->{risk}->{$rec->{riskid}}->{wfheadid},
                dstwfid=>$id,
             });
+            if (exists($rec->{addnote})){
+               if (!($self->{wf}->Action->StoreRecord($id,"wfaddnote",
+                   {translation=>'base::workflow::request'},$rec->{addnote}))){
+                  msg(ERROR,"fail to add note to Workflow ".
+                            "1st ref at $rec->{ref}->[0]");
+               
+               }
+            }
          }
          else{
             msg(ERROR,"fail to create Workflow ".Dumper($rec));
@@ -313,7 +321,7 @@ sub ProcessLineData
          $self->{d}->{risk}->{$riskid}->{fwdtarget}="base::user";
          $self->{d}->{risk}->{$riskid}->{fwdtargetid}=$arec->{applmgrid};
          $self->{d}->{risk}->{$riskid}->{owner}=$arec->{applmgrid};
-         $self->{d}->{risk}->{$riskid}->{creator}=$arec->{applmgrid};
+         $self->{d}->{risk}->{$riskid}->{openuser}=$arec->{applmgrid};
          $self->{d}->{risk}->{$riskid}->{step}="itil::workflow::riskmgmt::main";
          $self->{d}->{risk}->{$riskid}->{stateid}="4";
          push(@{$self->{d}->{risk}->{$riskid}->{ref}},
@@ -340,6 +348,8 @@ sub ProcessLineData
              $d=$self->{appl}->ExpandTimeExpression($d,"CET");
              $invalid=1 if ($d eq "");
              $self->{d}->{measure}->{$mid}->{plannedstart}=$d;
+             $self->{d}->{measure}->{$mid}->{plannedstart}
+                =~s/00:00:00/12:00:00/;
          }
          elsif ($data->[3] eq 
                 "Geplantes Ende"){
@@ -348,6 +358,8 @@ sub ProcessLineData
              $d=$self->{appl}->ExpandTimeExpression($d,"CET");
              $invalid=1 if ($d eq "");
              $self->{d}->{measure}->{$mid}->{plannedend}=$d;
+             $self->{d}->{measure}->{$mid}->{plannedend}
+                =~s/00:00:00/12:00:00/;
          }
          elsif ($data->[3] eq 
                 "Bitte hier die Maßnahme schildern, die zur ".
@@ -358,6 +370,15 @@ sub ProcessLineData
          }
          elsif ($data->[3] eq 
                 "Notiz die an der Maßnahme haftet"){
+            my $d=trim($data->[4]);
+            if (length($d)>10){
+               $self->{d}->{measure}->{$mid}->{addnote}=$d
+            }
+            else{
+               if (length($data->[4])>1){
+                  $invalid=1;
+               }
+            }
          }
          else{
             printf STDERR ("WARN:  ignore mesure data line ".
@@ -386,7 +407,7 @@ sub ProcessLineData
          $self->{d}->{measure}->{$mid}->{fwdtarget}="base::user";
          $self->{d}->{measure}->{$mid}->{fwdtargetid}=$arec->{applmgrid};
          $self->{d}->{measure}->{$mid}->{owner}=$arec->{applmgrid};
-         $self->{d}->{measure}->{$mid}->{creator}=$arec->{applmgrid};
+         $self->{d}->{measure}->{$mid}->{openuser}=$arec->{applmgrid};
          $self->{d}->{measure}->{$mid}->{step}="itil::workflow::opmeasure::main";
          $self->{d}->{measure}->{$mid}->{stateid}="4";
          $self->{d}->{measure}->{$mid}->{riskid}=$riskid;
@@ -404,9 +425,11 @@ sub ProcessLineData
    $newrec->{class}="THOMEZMD::workflow::businesreq";
    $newrec->{step}="base::workflow::request::main";
    my ($m,$d,$y)=$data->[1]=~m/^(\d+)-(\d+)-(\d+)$/;
-   $newrec->{eventstart}=$self->getParent->ExpandTimeExpression("$d.$m.".(2000+$y),"GMT");
+   $newrec->{eventstart}=$self->getParent->ExpandTimeExpression(
+                               "$d.$m.".(2000+$y),"GMT");
    my ($m,$d,$y)=$data->[2]=~m/^(\d+)-(\d+)-(\d+)$/;
-   $newrec->{eventend}=$self->getParent->ExpandTimeExpression("$d.$m.".(2000+$y),"GMT");
+   $newrec->{eventend}=$self->getParent->ExpandTimeExpression(
+                               "$d.$m.".(2000+$y),"GMT");
    $newrec->{mdate}=$self->getParent->ExpandTimeExpression("now","GMT");
    $newrec->{opendate}=$self->getParent->ExpandTimeExpression("now","GMT");
    $newrec->{closedate}=$self->getParent->ExpandTimeExpression("now","GMT");
