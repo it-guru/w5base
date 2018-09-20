@@ -586,8 +586,8 @@ function CheckPasswordState()
 {
    var work=document.getElementById("TabSelectorModeSelect");
    var info=document.getElementById("RunInfo");
-   console.log("fifi re=",parent.returnpressed);
-   console.log("fifi pass=",parent.document.forms[0].rsaphrase.value);
+   //console.log("fifi re=",parent.returnpressed);
+   //console.log("fifi pass=",parent.document.forms[0].rsaphrase.value);
    if (parent.document.forms[0].rsaphrase.value.length<5 ||
        parent.returnpressed==false){
       work.style.visibility="hidden";
@@ -596,6 +596,10 @@ function CheckPasswordState()
    else{
       work.style.visibility="visible";
       info.style.visibility="hidden";
+      var e=parent.document.getElementById("manEnterBtn");
+      if (e){
+         e.style.display="none";
+      }
       if ("$directopenid"!=""){
          var newurl="CryptoOut?id=$directopenid";
          var oldurl=window.frames['CryptoOut'].document.location.href;
@@ -1131,10 +1135,19 @@ document.onkeypress=keyhandler;   //mozilla Variante
 function inputkeyhandler()        //IE Variante
 {
    if (window.event && window.event.keyCode==13){
-     // window.returnpressed=true;
+      window.returnpressed=true;
       return(false);
    }
    return(true);
+}
+
+function manEnter()
+{
+   var e=document.getElementById("manEnterBtn");
+   if (e){
+      e.style.display="none";
+   }
+   window.returnpressed=true;
 }
 
 function RestartWorkspace()
@@ -1153,7 +1166,7 @@ window.onload=function(){
 </script>
 <table width="100%" height="100%" border=0>
 <tr height="1%"><td width="10%" nowrap>$PersonalPassword</td><td>
-<input name=rsaphrase autocomplete="off" autofill="off" onkeydown="testForEnter();" onkeypress="inputkeyhandler();" type=password>
+<input name=rsaphrase autocomplete="off" autofill="off" onkeydown="testForEnter();" onkeypress="inputkeyhandler();" type=password><input id=manEnterBtn type=button value="&rarr;" onclick="manEnter();">
 <input id=activity disabled name=activity type=hidden value="">
 </td><td align=right>
 <input type=button name=restart value=" $RestartApplication " onClick="RestartWorkspace()"></td></tr>
