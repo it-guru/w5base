@@ -411,7 +411,6 @@ sub isViewValid
    if ($rec->{devreqdetailstat}){
       push(@l,"devreqstat");
    }
-   push(@l,"affected");
    return(@l);
 }
 

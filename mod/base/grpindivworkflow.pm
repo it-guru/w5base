@@ -54,11 +54,12 @@ sub getSqlFrom
 
 
    my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
+   my %dgroups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','direct');
 
    my $ids=join(",",keys(%groups));
    my $dids=join(",",map({$_->{grpid}} 
                      grep({$_->{distance} eq "0"} 
-                     values(%groups))));
+                     values(%dgroups))));
 
    if ($ids eq ""){
       $ids="-99";
