@@ -65,6 +65,14 @@ sub new
                 dataobjattr   =>'system."systemid"'),
 
       new kernel::Field::Text(
+                name          =>'itfarm',
+                vjointo       =>\'tsacinv::itfarm',
+                vjoinon       =>['assetassetid'=>'farmassets'],
+                vjoindisp     =>'name',
+                uivisible     =>0,
+                label         =>'IT-Farm'),
+
+      new kernel::Field::Text(
                 name          =>'status',
                 explore       =>200,
                 label         =>'Status',

@@ -46,6 +46,15 @@ sub new
                 align         =>'left',
                 dataobjattr   =>'"assetid"'),
 
+
+      new kernel::Field::Text(
+                name          =>'itfarm',
+                vjointo       =>\'tsacinv::itfarm',
+                vjoinon       =>['assetid'=>'farmassets'],
+                vjoindisp     =>'name',
+                uivisible     =>0,
+                label         =>'IT-Farm'),
+
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
