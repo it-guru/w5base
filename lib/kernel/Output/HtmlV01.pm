@@ -147,8 +147,11 @@ sub ProcessHead
       $d.="addEvent(window,\"load\",checkHtmlNativeControlBar);\n";
       $d.="addEvent(window,\"load\",InitTabResultTable);\n";
       $d.="function checkHtmlNativeControlBar(){\n";
-      $d.=" var e=document.getElementById(\"HtmlNativeControlBar\")\n";
+      $d.=" var e=document.getElementById(\"HtmlNativeControlBar\");\n";
       $d.=" if (window.top == window.self){\n";
+      $d.=" e.style.visibility='visible';\n";
+      $d.=" e.style.display='block';\n";
+      $d.=" e=document.getElementById(\"HtmlNativeControlBottom\");";
       $d.=" e.style.visibility='visible';\n";
       $d.=" e.style.display='block';\n";
       $d.=" }\n";
@@ -418,6 +421,8 @@ sub ProcessBottom
 
    $d.="</td></tr>\n\n\n";
    $d.="<tbody></table>\n";
+   $d.="<div id=HtmlNativeControlBottom style='display:none;height:40px'>";
+   $d.="</div>\n";
    if ($self->{SubListEdit}==1){
       $d.=<<EOF;
 <script language=JavaScript>

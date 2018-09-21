@@ -5,6 +5,68 @@ function  HtmlNativeControlBarReload(){
 function  HtmlNativeControlBarPrint(){
    window.print();
 }
+function  HtmlNativeControlBarFilter(){
+   var input, filter, table, tr, td, i;
+   input = document.getElementById("HtmlNativeControlBarFilterText");
+   filter = input.value.toUpperCase();
+   table = document.getElementById("ResultTable");
+   tr = table.getElementsByTagName("tr");
+   var markup=0;
+   if (document.getElementsByClassName){
+      markup=1;
+   }
+   markup=0; // this works not correct;
+
+   if (markup){
+      var l=document.getElementsByClassName("HtmlNativeControlBarFilterText");
+      for(c=0;c<l.length;c++){
+         l[c].classList.remove("HtmlNativeControlBarFilterText");
+      }
+   }
+  
+   for (i = 1; i < tr.length; i++) {
+      var td=tr[i].getElementsByTagName("td");
+      var found=0;
+      td = tr[i].getElementsByTagName("td");
+      if (td) {
+         for(c=0;c<td.length;c++){
+            var innerHTML=td[c].innerHTML;
+            var index=innerHTML.toUpperCase().indexOf(filter);
+            if (index>-1){
+               if (markup){
+                  innerHTML=innerHTML.substring(0,index)+ 
+                            "<span class='HtmlNativeHighlight'>"+ 
+                            innerHTML.substring(index,index+filter.length)+ 
+                            "</span>"+
+                            innerHTML.substring(index + filter.length);
+                  td[c].innerHTML=innerHTML;
+               }
+               found++;
+            }
+         }
+      } 
+      if (found){
+        tr[i].style.display = "";
+      } 
+      else{
+        tr[i].style.display = "none";
+      }
+   }
+   input.focus();
+}
+function handleKeyPress(){
+   window.setTimeout(function(){
+      HtmlNativeControlBarFilter();
+   },100);
+}
+document.forms[0].action=document.location.href;
+document.forms[0].method='get';
+document.forms[0].onsubmit=function(evt){
+   evt.preventDefault();
+   HtmlNativeControlBarFilter();
+   return(false);
+};
+document.body.style.overflowY="scroll";
 </script>
 <style>
 .HtmlNativeControlBarIcon{
@@ -23,5 +85,9 @@ height:18px;
   transition: background-color 300ms linear;
 }
 </style>
-<img onclick=HtmlNativeControlBarReload() class=HtmlNativeControlBarIcon border=0 src="../../base/load/reload.gif" title="Reload Query">
-<img onclick=HtmlNativeControlBarPrint() class=HtmlNativeControlBarIcon border=0 style="margin-right:5px" src="../../base/load/miniprint.gif" title="Print Result">
+<form>
+<input type=text class=HtmlNativeControlBarIcon style="width:100px;bottom:9px;height:22px;position:relative;margin-left:20px" value="" name=HtmlNativeControlBarFilterText id=HtmlNativeControlBarFilterText onkeyup="handleKeyPress();" >
+<img onclick=HtmlNativeControlBarFilter() class=HtmlNativeControlBarIcon border=0 style="margin-right:0px" src="../../base/load/find.gif" title="Print Result">
+</form>
+<img onclick=HtmlNativeControlBarPrint() class=HtmlNativeControlBarIcon border=0 src="../../base/load/miniprint.gif" title="Print Result">
+<img onclick=HtmlNativeControlBarReload() class=HtmlNativeControlBarIcon border=0 style="margin-right:5px" src="../../base/load/reload.gif" title="Reload Query">
