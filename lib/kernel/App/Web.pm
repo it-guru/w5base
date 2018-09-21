@@ -1450,7 +1450,7 @@ EOF
       ($ENV{HTTP_USER_AGENT}=~m#.* MSIE 7\.0;.* Trident/7\.0;.*#)){
      # try to deactivate Compat Mode
      $d.="<meta http-equiv=\"X-UA-Compatible\" ".
-         "content=\"EmulateIE10;IE=edge\">";
+         "content=\"IE=EmulateIE10;IE=edge\">";
   }
   $d.=<<EOF;
 <script type="text/javascript" language="JavaScript">
