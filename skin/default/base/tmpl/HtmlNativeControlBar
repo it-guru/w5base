@@ -86,7 +86,7 @@ height:18px;
 }
 </style>
 <form>
-<input type=text class=HtmlNativeControlBarIcon style="width:100px;bottom:9px;height:22px;position:relative;margin-left:20px" value="" name=HtmlNativeControlBarFilterText id=HtmlNativeControlBarFilterText onkeyup="handleKeyPress();" >
+<input type=text class=HtmlNativeControlBarIcon style="width:100px;bottom:9px;height:22px;position:relative;margin-left:20px" autocomplete="off" value="" name=HtmlNativeControlBarFilterText id=HtmlNativeControlBarFilterText onkeyup="handleKeyPress();" >
 <img onclick=HtmlNativeControlBarFilter() class=HtmlNativeControlBarIcon border=0 style="margin-right:0px" src="../../base/load/find.gif" title="Print Result">
 </form>
 <img onclick=HtmlNativeControlBarPrint() class=HtmlNativeControlBarIcon border=0 src="../../base/load/miniprint.gif" title="Print Result">
