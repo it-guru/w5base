@@ -1,3 +1,4 @@
 'attribute'=>{de=>'Attribut'},
 'value'=>{de=>'Inhalt'},
 'individual attribut value - W5BaseID'=>{de=>'individual Attribut Inhalt W5BaseID'},
+'Internal field name'=>{de=>'interner Feldname'},

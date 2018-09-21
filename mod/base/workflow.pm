@@ -262,7 +262,7 @@ sub new
       new kernel::Field::MultiDst (
                 name          =>'fwdtargetname',
                 group         =>'state',
-                htmlwidth     =>'450',
+                htmlwidth     =>'280',
                 htmleditwidth =>'400',
                 label         =>'Forward to',
                 dst           =>['base::grp' =>'fullname',
@@ -738,6 +738,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'openusername',
                 weblinkto     =>'base::user',
+                htmlwidth     =>'280',
                 weblinkon     =>['openuser'=>'userid'],
                 group         =>'state',
                 label         =>'Creator Name',

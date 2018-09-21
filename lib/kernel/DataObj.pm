@@ -852,6 +852,7 @@ sub getWriteRequestHash
    }
    elsif ($mode eq "ajaxcall"){
       my %rec=Query->MultiVars(); 
+      my @fieldlist=$self->getFieldObjsByView(["ALL"]);
       foreach my $k (keys(%rec)){
          delete($rec{$k}) if ($k eq "");
          if (my ($v)=$k=~m/^Formated_(.*)$/){ 
@@ -863,8 +864,7 @@ sub getWriteRequestHash
       return(\%rec);
    }
    else{
-      $self->SetCurrentView(qw(ALL));
-      my @fieldlist=$self->getFieldObjsByView([$self->getCurrentView()],
+      my @fieldlist=$self->getFieldObjsByView(["ALL"],
                                               oldrec=>$oldrec,
                                               opmode=>'getWriteRequestHash');
       foreach my $fobj (@fieldlist){
@@ -2435,6 +2435,9 @@ sub ValidatedUpdateRecordTransactionless
       # Individual Attribute Handling
       if (defined($self->{individualAttr})){
          my @fieldnames=keys(%$newrec);
+         if ($self->Self eq "base::workflow"){       # in Workflow-Engine class 
+            @fieldnames=grep(!/^class$/,@fieldnames);# is always set, but can
+         }                                           # be ignored
          if ($#fieldnames==0){
             my $fld=$self->getField($fieldnames[0]);
             if (defined($fld) && $fld->Type() eq "IndividualAttr"){
@@ -3279,6 +3282,9 @@ sub generateIndiviualAttributes
                   name          =>"individualattribute_$indicolid",
                   label         =>$ifldname,
                   grpindivfldid =>$indicolid,
+                  htmlwidth     =>'200',
+                  htmlfixedfont =>1,
+                  onClick       =>'inlineEdit(event,this);',
                   group         =>'individualAttr',
                   dataobjattr   =>"(select ${worktable}.fldval ".
                                   "from ${worktable} where ".

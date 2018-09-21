@@ -142,7 +142,7 @@ td.datafield{
 }
 th.headfield{
    padding-left:5px;
-   padding-right:5px;
+   -padding-right:5px;
    background:#dadada;
    background:#CfCfCf;
    text-align:left;
@@ -172,6 +172,10 @@ table.subtable td.hl {
    background-color: #F4F4F4; 
    padding: 0px; 
    font-weight: bold;
+}
+
+.htmlfixedfont{
+   font-family:monospace;
 }
 
 

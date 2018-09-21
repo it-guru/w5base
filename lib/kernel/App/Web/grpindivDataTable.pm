@@ -108,11 +108,19 @@ sub AddStandardFields
                 size          =>'10',
                 dataobjattr   =>$worktable.'.dataobjid'),
                                   
-      new kernel::Field::Text(
+      new kernel::Field::Textarea(
                 name          =>'indivfieldvalue',
                 label         =>'value',
                 size          =>'20',
                 dataobjattr   =>$worktable.'.fldval'),
+
+      new kernel::Field::Text(
+                name          =>'internalname',
+                group         =>'source',
+                label         =>'Internal field name',
+                readonly      =>1,
+                dataobjattr   =>
+                           "concat('individualattribute_',grpindivfld.id)"),
 
       new kernel::Field::MDate(
                 name          =>'mdate',

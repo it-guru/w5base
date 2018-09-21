@@ -385,7 +385,7 @@ sub getValidWebFunctions
             NativResult Result Upload UploadWelcome UploadFrame
             Welcome Empty Detail Visual HtmlDetail HandleInfoAboSubscribe
             New ModalNew ModalEdit Copy FormatSelect Bookmark startWorkflow
-            DeleteRec InitWorkflow AsyncSubListView 
+            DeleteRec InitWorkflow AsyncSubListView Modify
             EditProcessor ViewProcessor HandleQualityCheck
             jsExplore
             ViewEditor ById ModuleObjectInfo);
@@ -1663,12 +1663,13 @@ sub finishCopy
 sub HandleSave
 {
    my $self=shift;
+   my $mode=shift;
    my $oldrec=undef;
    my $id=Query->Param("CurrentIdToEdit");
    my $idobj=$self->IdField();
    my $idname=$idobj->Name();
    my $flt=undef;
-   #msg(INFO,"id=$id");
+   msg(INFO,"id=$id");
    if (defined($id) && $id ne ""){
       $id=~s/&quote;/"/g;
       $flt={$idname=>\$id};
@@ -1684,7 +1685,8 @@ sub HandleSave
       $W5V2::HistoryComments=$HistoryComments;
       Query->Delete("HistoryComments");
    }
-   my $newrec=$self->getWriteRequestHash("web",$oldrec);
+   #my $newrec=$self->getWriteRequestHash("web",$oldrec);
+   my $newrec=$self->getWriteRequestHash($mode,$oldrec);
    if ($self->LastMsg()!=0){
       return(undef);
    }
@@ -1753,6 +1755,7 @@ sub HandleSave
 sub HandleDelete
 {
    my $self=shift;
+   my $mode=shift;
 
    my $id=Query->Param("CurrentIdToEdit");
    my $flt=undef;
@@ -1785,6 +1788,8 @@ sub HandleDelete
 sub ProcessDataModificationOP
 {
    my $self=shift;
+   my $mode=shift;
+   $mode="web" if ($mode eq "");
 
    my $op=Query->Param("OP");
    if (Query->Param("NewRecSelected")==1){
@@ -1796,11 +1801,11 @@ sub ProcessDataModificationOP
    }
    if ($op eq "save"){
       Query->Delete("OP");
-      $self->HandleSave();
+      $self->HandleSave($mode);
    }
    if ($op eq "delete"){
       Query->Delete("OP");
-      $self->HandleDelete();
+      $self->HandleDelete($mode);
    }
    return($op);
 }
@@ -1887,6 +1892,17 @@ sub HtmlDetail
 
 }
 
+
+sub Modify
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $op=$self->ProcessDataModificationOP();
+
+   $self->Result(); # reflect modified record in requests format
+   return(0);
+}
 
 sub ModalEdit
 {

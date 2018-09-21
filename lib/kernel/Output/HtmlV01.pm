@@ -207,7 +207,7 @@ sub ProcessHead
          }
          my $style="";
          if (defined($field->{htmlwidth})){
-            $style="width:$field->{htmlwidth};";
+            $style="min-width:$field->{htmlwidth}";
          }
          $d.="<th class=headfield valign=top style=\"$style\">".
              $displayname.$self->{fieldHeaders}->{$name}."</th>";
@@ -291,7 +291,15 @@ sub ProcessLine
    }
    $d.="<tr class=$lineclass ".
        "onMouseOver=\"this.className='linehighlight'\" ".
-       "onMouseOut=\"this.className='$lineclass'\">\n";
+       "onMouseOut=\"this.className='$lineclass'\"";
+   if ($id ne "" && $idfieldname ne ""){
+      my $dataid=$id;
+      $dataid=~s/[^0-9a-z_-]/_/gi;
+      $d.=" data-id=\"$dataid\"";
+      $d.=" data-idname=\"$idfieldname\"";
+      $d.=" data-obj=\"".$self->getParent->getParent->Self."\"";
+   }
+   $d.=">\n";
    if ($#view!=-1){
       $d.="<td width=1><a class=lineselect href=\"$dest\" ".
           "target=_blank onfocus='window.status=\"open record\";' ".
@@ -320,6 +328,9 @@ sub ProcessLine
             #   $data=utf8($data);
             #   $data=$data->latin1();
             #}
+            if (exists($field->{onClick}) && !ref($field->{onClick})){
+               $fclick=$field->{onClick};
+            }
             if (ref($field->{onClick}) eq "CODE"){
                my $fc=&{$field->{onClick}}($field,$self,$app,$rec);
                $fclick=$fc if ($fc ne "");
@@ -354,7 +365,7 @@ sub ProcessLine
          $align=" align=$field->{align}";
       }
       if (defined($field->{htmlwidth}) && $c!=$#view){ # at last field, width
-         $style.="width:$field->{htmlwidth};";         # should be calc by 
+         $style.="min-width:$field->{htmlwidth};";
       }                                                # browser
       else{
          $style.="width:auto;";
@@ -377,9 +388,16 @@ sub ProcessLine
          # static/MinusProblem/index.html sample doc.
          $data=~s/(\S+)-(\S+)/<nobr>$1-$2<\/nobr>/g;  
       }
+      my $htmlfixedfont=0;
+      if ($field->{htmlfixedfont}){
+         $htmlfixedfont=1;
+      }
+      
       $l[$self->{fieldkeys}->{$fieldname}]={data=>$data,
                                             fclick=>$fclick,
+                                            htmlfixedfont=>$htmlfixedfont,
                                             align=>$align,
+                                            fieldname=>$fieldname,
                                             nowrap=>$nowrap,
                                             style=>$style};
    }
@@ -388,7 +406,11 @@ sub ProcessLine
          $d.="<td></td>";
       }
       else{
-         $d.="<td class=datafield$rec->{align}";
+         my $class="datafield$rec->{align}";
+         if ($rec->{htmlfixedfont}){
+            $class.=" htmlfixedfont";
+         }
+         $d.="<td class=\"$class\" data-name=\"$rec->{fieldname}\" ";
          $d.=" onClick=$rec->{fclick}" if ($rec->{fclick} ne "");
          $d.=" style=\"$rec->{style}\"$rec->{nowrap}>".$rec->{data}."</td>\n";
       }

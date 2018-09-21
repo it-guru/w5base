@@ -19,8 +19,8 @@ package kernel::Field::IndividualAttr;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Field::Text;
-@ISA    = qw(kernel::Field::Text);
+use kernel::Field::Textarea;
+@ISA    = qw(kernel::Field::Textarea);
 
 
 sub new
