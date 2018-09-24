@@ -83,9 +83,13 @@ sub Param
       return($self->{'cgi'}->param(-name=>$_[0],-value=>$_[1]));
    }
    if ($#_==0 && wantarray()){
-      return($self->{'cgi'}->can('multi_param') ?
+      my @v=$self->{'cgi'}->can('multi_param') ?
              $self->{'cgi'}->multi_param($_[0]):
-             $self->{'cgi'}->param($_[0]));
+             $self->{'cgi'}->param($_[0]);
+      if ($queryIsUtf8){
+         @v=map({UTF8toLatin1($_)} @v);
+      }
+      return(@v);
    }
    if (wantarray()){
       my @v=$self->{'cgi'}->param(@_);
