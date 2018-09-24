@@ -84,6 +84,76 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'PRODUCTLINE'),
 
+      new kernel::Field::Text(
+                name          =>'operationcategory',
+                label         =>'Operation Category',
+                searchable    =>0,
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'OPERATIONCATEGORY'),
+
+      new kernel::Field::Text(
+                name          =>'assignment_group',
+                label         =>'Assignment Group',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'ASSIGNMENT_GROUP'),
+
+      new kernel::Field::Text(
+                name          =>'customerlink_identifier',
+                label         =>'Kunde',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'CUSTOMERLINK_IDENTIFIER'),
+
+      new kernel::Field::Text(
+                name          =>'criticality',
+                label         =>'Criticality',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'CRITICALITY'),
+
+      new kernel::Field::Text(
+                name          =>'autodiscoverystatus',
+                label         =>'Autodiscovery Status',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'AUTODISCOVERYSTATUS'),
+
+      new kernel::Field::Text(
+                name          =>'appcom_techbase',
+                label         =>'AppCom Location',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'APPCOM_TECHBASE'),
+
+      new kernel::Field::Text(
+                name          =>'virtualization',
+                label         =>'Virtualization',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'VIRTUALIZATION'),
+
+      new kernel::Field::Text(
+                name          =>'days_not_patched',
+                label         =>'Days not patched',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'DAYS_NOT_PATCHED'),
+
+      new kernel::Field::Text(
+                name          =>'red_alert',
+                label         =>'Red Alert',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'RED_ALERT'),
+
+      new kernel::Field::Date(
+                name          =>'opcatchangedate',
+                label         =>'Operation Category Change Date',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                dataobjattr   =>'OPCAT_CHANGE_DATE'),
+
       new kernel::Field::Number(
                 name          =>'check_status',
                 label         =>'TCC total state: CheckID',

@@ -21,4 +21,12 @@
 'Upgrade/Refresh reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
 'Update/Upgrade reject valid to'=>{de=>'Ausschlußbegründung gültig bis'},
 'Operating System'=>{de=>'Betriebssystem'},
+'Operation Category'=>{de=>'Betriebs-Kategorie'},
+'Customer'=>{de=>'Kunde'},
+'Criticality'=>{de=>'Kritikalität'},
+'Autodiscovery Status'=>{de=>'Autodiscovery-Status'},
+'AppCom Location'=>{de=>'AppCom-Standort'},
+'Virtualization'=>{de=>'Virtualisierung'},
+'Days not patched'=>{de=>'Anzahl Tage nicht gepatcht'},
+'Operation Category Change Date'=>{de=>'Aktualisierungsdatum Betriebs-Kategorie'},
 
