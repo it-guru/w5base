@@ -403,12 +403,15 @@ sub LoadGroups
           ($allgrp->{$grp}->{direction} eq "up" || # if a group has been loaded
            $direction eq "both")){ # in up mode and a additional "both" mode
          my $fullname=$GroupCache->{grpid}->{$grp}->{fullname};
-         $allgrp->{$grp}={         # is requested - a force load is needed!
-               fullname=>$fullname,
-               grpid=>$grp,
-               distance=>$distance,
-               direction=>$direction
-         };
+         if (!exists($allgrp->{$grp}) ||      # distance 0 records have 
+             $allgrp->{$grp}->{distance}!=0){ # priority !
+            $allgrp->{$grp}={         # is requested - a force load is needed!
+                  fullname=>$fullname,
+                  grpid=>$grp,
+                  distance=>$distance,
+                  direction=>$direction
+            };
+         }
          if ($direction eq "down" || $direction eq "both"){
             if (ref($GroupCache->{grpid}->{$grp}->{subid}) eq "ARRAY"){
                push(@down,@{$GroupCache->{grpid}->{$grp}->{subid}});
