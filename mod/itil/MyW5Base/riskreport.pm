@@ -49,7 +49,7 @@ sub Init
                 label         =>'To');
    $self->{Field}->{to}->setParent($self);
 
-   $self->{Val}->{wfclass}=[qw(riskmgmt opmeasure)]; # both geht noch nicht
+   $self->{Val}->{wfclass}=[qw(riskmgmt opmeasure both)]; 
 
    $self->{Val}->{refto}=[qw(eventend eventstart createdate mdate closedate)];
 
@@ -287,7 +287,6 @@ sub SetFilter
       my $o=$dataobj->Clone();
       $o->SetFilter(\%subflt);
       my @l=$o->getHashList(qw(id relations));
-      print STDERR Dumper(\@l);
       my %wfheadid=();
       foreach my $wfrec (@l){
          foreach my $relrec (@{$wfrec->{relations}}){
@@ -296,8 +295,33 @@ sub SetFilter
             }
          }
       }
-      $flt->{id}=[keys(%wfheadid)];
+      my @wfheadid=keys(%wfheadid);
+      push(@wfheadid,"-99") if ($#wfheadid==-1);
+      $flt->{id}=\@wfheadid;
       $flt->{class}=[grep(/^.*::opmeasure$/,
+                          keys(%{$dataobj->{SubDataObj}}))];
+   }
+   elsif ($flt->{wfclass} eq "both"){
+      delete($flt->{wfclass});
+      $flt->{class}=[grep(/^.*::riskmgmt$/,
+                          keys(%{$dataobj->{SubDataObj}}))];
+      my %subflt=%{$flt};
+      my $o=$dataobj->Clone();
+      $o->SetFilter(\%subflt);
+      my @l=$o->getHashList(qw(id relations));
+      my %wfheadid=();
+      foreach my $wfrec (@l){
+         $wfheadid{$wfrec->{id}}++;
+         foreach my $relrec (@{$wfrec->{relations}}){
+            if ($relrec->{name} eq "riskmesure"){
+               $wfheadid{$relrec->{dstwfid}}++;
+            }
+         }
+      }
+      my @wfheadid=keys(%wfheadid);
+      push(@wfheadid,"-99") if ($#wfheadid==-1);
+      $flt->{id}=\@wfheadid;
+      $flt->{class}=[grep(/^.*::(opmeasure|riskmgmt)$/,
                           keys(%{$dataobj->{SubDataObj}}))];
    }
    else{
