@@ -902,6 +902,7 @@ sub getWriteRequestHash
             }
          }
       }
+      use Data::HexDump;
       return($newrec) if ($mode eq "upload");
    }
    return($rec);
@@ -2451,11 +2452,20 @@ sub ValidatedUpdateRecordTransactionless
                $o->SetFilter({indivfieldid=>\$ifieldid,srcdataobjid=>\$id});
                my ($irec,$msg)=$o->getOnlyFirst(qw(ALL));
                if (defined($irec)){
-                  $o->SecureValidatedUpdateRecord($irec,{
-                     indivfieldvalue=>$newrec->{$fieldnames[0]}
-                  },{id=>[$irec->{id}]});
+                  if (!$o->SecureValidatedUpdateRecord($irec,{
+                        indivfieldvalue=>$newrec->{$fieldnames[0]}
+                      },{id=>[$irec->{id}]})){
+                  }
+               }
+               else{
+                  $self->LastMsg(ERROR,"invalid individual Attribut");
+                  return(0);
                }
                return(1); 
+            }
+            else{
+               $self->LastMsg(ERROR,"invalid individual Attribut");
+               return(0);
             }
          }
       }
@@ -3266,11 +3276,23 @@ sub generateIndiviualAttributes
             my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
             my @ids=keys(%groups);
             @ids=(-99) if ($#ids==-1);
+            my @dids=map({$_->{grpid}}
+                              grep({$_->{distance} eq "0"}
+                              values(%groups)));
+            @dids=(-99) if ($#dids==-1);
+
             my $dataobj=$self->SelfAsParentObject();
-            $o->SetFilter({
-               grpidview=>\@ids,
-               dataobj=>\$dataobj
-            });
+            $o->SetFilter([{
+                              directonly=>\'0',
+                              grpidview=>\@ids,
+                              dataobj=>\$dataobj
+                           },
+                           {
+                              directonly=>\'1',
+                              grpidview=>\@dids,
+                              dataobj=>\$dataobj
+                           },
+            ]);
             my $worktable=$self->{individualAttr}->{Worktable};
             my $idfield=$self->IdField();
             my $idattr=$idfield->{dataobjattr};
