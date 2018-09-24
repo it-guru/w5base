@@ -129,6 +129,31 @@ sub getNext
 }
 
 
+
+
+sub WriteToStdoutNoAccess
+{
+   my $self=shift;
+   my %param=@_;
+   my $app=$self->getParent();
+   $self->Format->prepareParent($app,\%param);
+   my $d=$self->Format->Init();
+   $d.=$self->Format->getNoAccess(%param);
+   print STDOUT $d;
+}
+
+sub WriteToStdoutErrorDocument
+{
+   my $self=shift;
+   my %param=@_;
+   my $app=$self->getParent();
+   $self->Format->prepareParent($app,\%param);
+   my $d=$self->Format->Init();
+   $d.=$self->Format->getErrorDocument(%param);
+   print STDOUT $d;
+}
+
+
 sub WriteToStdout
 {
    my $self=shift;

@@ -99,6 +99,9 @@ sub ProcessHead
    $d.="<script language=JavaScript type=\"text/javascript\" ".
          "src=\"../../../public/base/load/toolbox.js\"></script>\n";
    $d.="<script language=JavaScript type=\"text/javascript\" ".
+         "src=\"../../../public/base/load/url.js\"></script>\n";
+       "</script>\n";
+   $d.="<script language=JavaScript type=\"text/javascript\" ".
          "src=\"../../../public/base/load/OutputHtml.js\"></script>\n";
        "</script>\n";
    $d.=$self->{fieldsPageHeader};

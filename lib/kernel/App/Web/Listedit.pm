@@ -1669,7 +1669,7 @@ sub HandleSave
    my $idobj=$self->IdField();
    my $idname=$idobj->Name();
    my $flt=undef;
-   msg(INFO,"id=$id");
+   msg(INFO,"HandleSave for id=$id");
    if (defined($id) && $id ne ""){
       $id=~s/&quote;/"/g;
       $flt={$idname=>\$id};
@@ -1900,7 +1900,28 @@ sub Modify
 
    my $op=$self->ProcessDataModificationOP();
 
-   $self->Result(); # reflect modified record in requests format
+   if ($self->LastMsg()>0){   # first try to handle dynamic Foramted Error docs
+      my $output=new kernel::Output($self);
+      my $format=Query->Param("FormatAs");
+      if (defined($param{FormatAs})){
+         Query->Param("FormatAs"=>$param{FormatAs});
+         $format=$param{FormatAs};
+      }
+      if ((!defined($format) || $format eq "")){
+         Query->Param("FormatAs"=>"nativeJSON");
+         $self->Limit(1);
+      }
+      my $format=Query->Param("FormatAs");
+      $param{WindowMode}="Modify";
+      if (!($output->setFormat($format,%param))){
+         return();
+      }
+printf STDERR ("write error in Format $format\n");
+      $output->WriteToStdoutErrorDocument(HttpHeader=>1);
+   }
+   else{
+      $self->Result(); # reflect modified record in requests format
+   }
    return(0);
 }
 

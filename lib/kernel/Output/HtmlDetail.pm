@@ -301,6 +301,8 @@ sub ProcessLine
    if (!exists($self->{fieldsPageHeader})){
       $self->{fieldsPageHeader}=
            "<script language=\"JavaScript\" ".
+           "src=\"../../base/load/OutputHtml.js\"></script>\n".
+           "<script language=\"JavaScript\" ".
            "src=\"../../base/load/HtmlDetail.js\"></script>\n".
            "<script language=\"JavaScript\" ".
            "src=\"../../base/load/toolbox.js\"></script>\n".

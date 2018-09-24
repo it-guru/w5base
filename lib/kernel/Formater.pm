@@ -198,6 +198,33 @@ sub Finish
    return();
 }
 
+sub getNoAccess
+{
+   my $self=shift;
+   my (%param)=@_;
+   my $d="";
+
+   if ($param{HttpHeader}){
+      $d.=$self->getHttpHeader();
+   }
+   $d.="no Access";
+   return($d);
+}
+
+sub getErrorDocument
+{
+   my $self=shift;
+   my (%param)=@_;
+   my $d="";
+
+   if ($param{HttpHeader}){
+      $d.=$self->getHttpHeader();
+   }
+   $d.=join("\n",$self->getParent->getParent->LastMsg());
+   return($d);
+}
+
+
 sub getEmpty
 {
    my $self=shift;

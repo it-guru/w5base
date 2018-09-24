@@ -46,3 +46,4 @@ EOF
 'new value'=>{de=>'neuer Inhalt'},
 'the datasource'=>{de=>'die Datenquelle'},
 'For Details of underlying ruleset, check QualityRule'=>{de=>'Nähere Informationen zum zugrundeligenden Regelwerk, finden Sie in der QualityRule'},
+'invalid individual Attribut'=>{de=>'ungültiges Individual Attribut'},
