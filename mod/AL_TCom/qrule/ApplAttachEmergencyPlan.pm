@@ -102,9 +102,11 @@ sub qcheckRecord
       if (!($found)){
          $exitcode=3 if ($exitcode<3);
          push(@{$desc->{qmsg}},
-              $self->T('there is no Emergency Plan attachment found'));
+              $self->T('no Emergency Plan attachment found / '.
+                       'no valid naming for Emergency Plan attachment'));
          push(@{$desc->{dataissue}},
-              $self->T('there is no Emergency Plan attachment found'));
+              $self->T('no Emergency Plan attachment found / '.
+                       'no valid naming for Emergency Plan attachment'));
       }
    }
    else{

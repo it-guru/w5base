@@ -115,11 +115,13 @@ sub qcheckRecord
          if (!($found)){
             $exitcode=3 if ($exitcode<3);
             push(@{$desc->{qmsg}},
-                 $self->T('there is no SystemOverview attachment found'));
+                 $self->T('no SystemOverview attachment found / '.
+                          'no valid naming for SystemOverview attachment'));
             push(@{$desc->{qmsg}},
                  $self->T('requested SystemOverview name').": ".$nameexpr);
             push(@{$desc->{dataissue}},
-                 $self->T('there is no SystemOverview attachment found'));
+                 $self->T('no SystemOverview attachment found / '.
+                          'no valid naming for SystemOverview attachment'));
          }
          if ($foundasprivate){
             $exitcode=3 if ($exitcode<3);
