@@ -107,7 +107,8 @@ sub InterviewSubForm
                    "src=\"../../../public/base/load/empty.gif\"></td>".
                    "</tr></table></div>";
             }
-            $d.="\n<div class=InterviewQuest><form name=\"F$qrec->{id}\">".
+            $d.="\n<div class=InterviewQuest>".
+                "<form onsubmit=\"return(false);\" name=\"F$qrec->{id}\">".
                 "<table border=0 class=InterviewQuest width=95% 
                   border=0 >".
                 "<tr><td><div onclick=switchExt($qrec->{id})>".
