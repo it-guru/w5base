@@ -158,6 +158,15 @@ sub AddStandardFields
                 label         =>'real Editor Account',
                 dataobjattr   =>$worktable.'.realeditor'),
    );
+
+   $self->{history}={
+      delete=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ]
+   };
 }
 
 
@@ -170,15 +179,15 @@ sub ValidatedUpdateRecord
    my @filter=@_;
 
    $filter[0]={id=>\$oldrec->{id}};
-   $newrec->{fieldidatvaluerec}=$oldrec->{indivfieldid}; 
-   $newrec->{dataobjid}=$oldrec->{id};  
-   $newrec->{id}=$oldrec->{srcdataobjid}."_".$oldrec->{indivfieldid};  # ID gen
    if (!defined($oldrec->{ofid})){     
-      return($self->SUPER::ValidatedInsertRecord($newrec));
+      my %newrec=%{$newrec};
+      $newrec{fieldidatvaluerec}=$oldrec->{indivfieldid}; 
+      $newrec{dataobjid}=$oldrec->{id};  
+      $newrec{id}=$oldrec->{srcdataobjid}."_".$oldrec->{indivfieldid}; # ID gen
+      return($self->SUPER::ValidatedInsertRecord(\%newrec));
    }
    return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
 }
-
 
 
 sub isQualityCheckValid
@@ -204,6 +213,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
  
+
    return(1);
 }
 
