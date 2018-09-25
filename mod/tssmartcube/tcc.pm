@@ -803,6 +803,62 @@ sub getSqlFrom
 }
 
 
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="";
+
+   my $userid=$self->getCurrentUserId();
+   $userid=-1 if (!defined($userid) || $userid==0);
+
+   if ($self->isDataInputFromUserFrontend()){
+      if (!$self->IsMemberOf([qw(admin w5base.tsssmartcube.tcc.read)],"RMember")){
+         my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
+         my @grpid=grep(/^[0-9]+/,keys(%grp));
+         @grpid=qw(-99) if ($#grpid==-1);
+        
+         my $appl=$self->getPersistentModuleObject("w5appl","itil::appl");
+         my $lappsys=$self->getPersistentModuleObject("w5lappsys","itil::lnkapplsystem");
+        
+         my @flt;
+         push(@flt,{databossid=>\$userid});
+         push(@flt,{applmgrid=>\$userid});
+         push(@flt,{semid=>\$userid});
+         push(@flt,{sem2id=>\$userid});
+         push(@flt,{tsmid=>\$userid});
+         push(@flt,{tsm2id=>\$userid});
+         push(@flt,{opmid=>\$userid});
+         push(@flt,{opm2id=>\$userid});
+         push(@flt,{businessteamid=>\@grpid});
+         push(@flt,{itsemteamid=>\@grpid});
+         push(@flt,{responseteam=>\@grpid});
+        
+         $appl->SetFilter(\@flt);
+         $appl->SetCurrentView(qw(id));
+         my $i=$appl->getHashIndexed("id");
+        
+         my @appid=keys(%{$i->{id}});
+         @appid=qw(-1) if ($#appid==-1);
+        
+         $lappsys->SetFilter({applid=>\@appid});
+         $lappsys->SetCurrentView(qw(systemsystemid));
+         my $s=$lappsys->getHashIndexed("systemsystemid");
+        
+         my @systemid=grep(/^S[0-9]+$/,keys(%{$s->{systemsystemid}}));
+        
+         my @secsystemid;
+         while (my @sid=splice(@systemid,0,500)){   # needed to fix oracle "in" limits
+            push(@secsystemid,"SYSTEM_ID in (".join(",",map({"'".$_."'"} @sid)).")");
+         }
+         $where="(".join(" OR ",@secsystemid).")";
+      }
+   }
+
+   return($where);
+}
+
+
+
 #SYSTEM_ID               = SystemID des logischen Systems (aus AssetManager)
 
 #OS_ROADMAP              = aktuelle Betriebssystemversion
