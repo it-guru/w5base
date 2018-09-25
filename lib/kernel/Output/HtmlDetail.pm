@@ -617,6 +617,7 @@ EOF
                $subblock.="<tr class=fline>" if ($col==0);
                if ($fieldlist[$c]->Type() eq "Textarea" ||
                    $fieldlist[$c]->Type() eq "Container" ||
+                   $fieldlist[$c]->Type() eq "IndividualAttr" ||
                    $fieldlist[$c]->Type() eq "TimeSpans" ||
                    $fieldlist[$c]->Type() eq "Htmlarea"){
                   my $datacolspan=2;

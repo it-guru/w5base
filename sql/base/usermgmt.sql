@@ -444,3 +444,4 @@ create table grpindivfld (
   FOREIGN KEY (grpview) REFERENCES grp (grpid) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table grpindivfld add directonly int(1) default '0';
+alter table grpindivfld add rdonly int(1) default '0',add fldbehavior varchar(20) default 'singleline',add fldextra longtext;

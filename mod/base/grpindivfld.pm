@@ -78,6 +78,25 @@ sub new
                 label         =>'only direct members',
                 dataobjattr   =>'grpindivfld.directonly'),
 
+      new kernel::Field::Boolean(
+                name          =>'readonly',
+                label         =>'existing values readonly (archived)',
+                dataobjattr   =>'grpindivfld.rdonly'),
+
+      new kernel::Field::Select(
+                name          =>'behavior',
+                label         =>'attribut fldbehavior',
+                value         =>['singleline',
+                                 'smallmulti',
+                                 'hugemulti'],
+                dataobjattr   =>'grpindivfld.fldbehavior'),
+
+      new kernel::Field::Textarea(
+                name          =>'extra',
+                readonly      =>1, # für die Zukunft!
+                label         =>'attribut fldbehavior extra data',
+                dataobjattr   =>'grpindivfld.fldextra'),
+
       new kernel::Field::Interface(
                 name          =>'grpidview',
                 dataobjattr   =>'grpindivfld.grpview'),

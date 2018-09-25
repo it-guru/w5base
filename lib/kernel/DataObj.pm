@@ -3267,7 +3267,8 @@ sub generateIndiviualAttributes
 {
    my $self=shift;
 
-   if ( defined($self->{individualAttr})){
+   if ( defined($self->{individualAttr}) && 
+        $W5V2::OperationContext eq "WebFrontend"){
       my $context=$self->Context;
       if (!defined($self->{individualAttr}->{Worktable})){
          my $o=getModuleObject($self->Config,$self->{individualAttr}->{dataobj});
@@ -3302,17 +3303,16 @@ sub generateIndiviualAttributes
             my $worktable=$self->{individualAttr}->{Worktable};
             my $idfield=$self->IdField();
             my $idattr=$idfield->{dataobjattr};
-            foreach my $ifld ($o->getHashList(qw(id name))){
+            foreach my $ifld ($o->getHashList(qw(id name readonly behavior extra))){
                my $indicolid=$ifld->{id};
                my $ifldname=$ifld->{name};
                $ifld=ObjectRecordCodeResolver($ifld);
-               my $f=new kernel::Field::IndividualAttr(
+               my %fldparam=(
                   name          =>"individualattribute_$indicolid",
                   label         =>$ifldname,
                   grpindivfldid =>$indicolid,
                   htmlwidth     =>'200',
                   htmlfixedfont =>1,
-                  onClick       =>'inlineEdit(event,this);',
                   group         =>'individualAttr',
                   dataobjattr   =>"(select ${worktable}.fldval ".
                                   "from ${worktable} where ".
@@ -3320,6 +3320,19 @@ sub generateIndiviualAttributes
                                   " and ".
                                   "${idattr}=${worktable}.dataobjid)"
                );
+               if (!$ifld->{readonly}){
+                  $fldparam{onClick}="inlineEdit(event,this,'$ifld->{behavior}');";
+               }
+               else{
+                  $fldparam{onClick}='return(false);';
+                  $fldparam{readonly}='1';
+               }
+               if ($ifld->{behavior} eq "hugemulti"){
+                  $fldparam{htmlwidth}="300";
+               }
+               $fldparam{behavior}=$ifld->{behavior};
+               $fldparam{extra}=$ifld->{extra};
+               my $f=new kernel::Field::IndividualAttr(%fldparam);
                $self->InitFields($f);
                $context->{individualAttrCache}->{$f->Name()}=$f;
             }

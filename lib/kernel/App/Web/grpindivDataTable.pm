@@ -65,6 +65,30 @@ sub AddStandardFields
                                  $worktable.".fldval)"),
                                   
       new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'Fullname',
+                readonly      =>1,
+                dataobjattr   =>"concat(grpindivfld.name,': ',".
+                                 $worktable.".fldval)"),
+
+      # control field behavior
+      new kernel::Field::Link(             
+                name          =>'readonly',
+                selectfix     =>1,
+                dataobjattr   =>'grpindivfld.rdonly'),
+
+      new kernel::Field::Link(
+                name          =>'behavior',
+                selectfix     =>1,
+                dataobjattr   =>'grpindivfld.fldbehavior'),
+
+      new kernel::Field::Link(
+                name          =>'extra',
+                selectfix     =>1,
+                dataobjattr   =>'grpindivfld.fldextra'),
+      ###################################################
+                                  
+      new kernel::Field::Link(
                 name          =>'fieldidatvaluerec',
                 label         =>'indiv attribute - value id',
                 readonly      =>1,
@@ -108,10 +132,15 @@ sub AddStandardFields
                 size          =>'10',
                 dataobjattr   =>$worktable.'.dataobjid'),
                                   
-      new kernel::Field::Textarea(
+      new kernel::Field::IndividualAttr(
                 name          =>'indivfieldvalue',
                 label         =>'value',
-                size          =>'20',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if ($rec->{readonly});
+                   return(0);
+                },
                 dataobjattr   =>$worktable.'.fldval'),
 
       new kernel::Field::Text(
@@ -212,7 +241,16 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
- 
+
+   if (defined($oldrec) && $oldrec->{readonly}){
+      $self->LastMsg("ERROR","attribute is marked as archived");
+      return(undef);
+   }
+   if (defined($oldrec) && $oldrec->{behavior} eq "singleline"){
+      if (exists($newrec->{indivfieldvalue})){
+         $newrec->{indivfieldvalue}=~s/[\r\n].*$//gs;
+      }
+   }
 
    return(1);
 }
