@@ -2439,22 +2439,24 @@ sub ValidatedUpdateRecordTransactionless
          if ($self->Self eq "base::workflow"){       # in Workflow-Engine class 
             @fieldnames=grep(!/^class$/,@fieldnames);# is always set, but can
          }                                           # be ignored
-         if ($#fieldnames==0){
+         if ($#fieldnames==0 && ($fieldnames[0]=~m/^individualattribute_/)){
             my $fld=$self->getField($fieldnames[0]);
-            if (defined($fld) && $fld->Type() eq "IndividualAttr"){
-               # Write data to "IndividualAttr"
-               my $idfld=$self->IdField();
-               my $id=effVal($oldrec,$newrec,$idfld->Name());
-               my $dataobj=$self->SelfAsParentObject();
-               my $ifieldid=$fld->{grpindivfldid};
-               my $o=getModuleObject($self->Config,
-                                     $self->{individualAttr}->{dataobj});
-               $o->SetFilter({indivfieldid=>\$ifieldid,srcdataobjid=>\$id});
-               my ($irec,$msg)=$o->getOnlyFirst(qw(ALL));
-               if (defined($irec)){
-                  if (!$o->SecureValidatedUpdateRecord($irec,{
-                        indivfieldvalue=>$newrec->{$fieldnames[0]}
-                      },{id=>[$irec->{id}]})){
+            if (defined($fld)){
+               if ($fld->Type() eq "IndividualAttr"){
+                  # Write data to "IndividualAttr"
+                  my $idfld=$self->IdField();
+                  my $id=effVal($oldrec,$newrec,$idfld->Name());
+                  my $dataobj=$self->SelfAsParentObject();
+                  my $ifieldid=$fld->{grpindivfldid};
+                  my $o=getModuleObject($self->Config,
+                                        $self->{individualAttr}->{dataobj});
+                  $o->SetFilter({indivfieldid=>\$ifieldid,srcdataobjid=>\$id});
+                  my ($irec,$msg)=$o->getOnlyFirst(qw(ALL));
+                  if (defined($irec)){
+                     if (!$o->SecureValidatedUpdateRecord($irec,{
+                           indivfieldvalue=>$newrec->{$fieldnames[0]}
+                         },{id=>[$irec->{id}]})){
+                     }
                   }
                }
                else{
