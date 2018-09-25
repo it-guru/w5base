@@ -2458,12 +2458,18 @@ sub ValidatedUpdateRecordTransactionless
                   }
                }
                else{
+                  msg(ERROR,"try to access IndividualAttr $fieldnames[0] ".
+                            "in OperationContext $W5V2::OperationContext ".
+                            "by $ENV{REMOTE_USER}"){
                   $self->LastMsg(ERROR,"invalid individual Attribut");
                   return(0);
                }
                return(1); 
             }
             else{
+               msg(ERROR,"try to access invalid IndividualAttr $fieldnames[0] ".
+                         "in OperationContext $W5V2::OperationContext ".
+                         "by $ENV{REMOTE_USER}"){
                $self->LastMsg(ERROR,"invalid individual Attribut");
                return(0);
             }
@@ -3270,7 +3276,7 @@ sub generateIndiviualAttributes
       }
       if (!exists($context->{individualAttrCache})){
          $context->{individualAttrCache}={};
-         if ($W5V2::OperationContext ne "QualityCheck"){
+         if ($W5V2::OperationContext eq "WebFrontend"){
             #msg(INFO,"genereat Indiv Attr");
             my $o=getModuleObject($self->Config,"base::grpindivfld");
             my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
