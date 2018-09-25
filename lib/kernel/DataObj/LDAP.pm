@@ -454,7 +454,9 @@ sub getOnlyFirst
    $self->SetCurrentView(@view);
    $self->Limit(1,1);
    my @res=$self->getFirst();
-   $self->{LDAP}->finish();
+   if (defined($self->{LDAP})){
+      $self->{LDAP}->finish();
+   }
    return(@res);
 }
 
