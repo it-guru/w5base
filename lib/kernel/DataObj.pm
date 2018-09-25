@@ -2460,7 +2460,7 @@ sub ValidatedUpdateRecordTransactionless
                else{
                   msg(ERROR,"try to access IndividualAttr $fieldnames[0] ".
                             "in OperationContext $W5V2::OperationContext ".
-                            "by $ENV{REMOTE_USER}"){
+                            "by $ENV{REMOTE_USER}");
                   $self->LastMsg(ERROR,"invalid individual Attribut");
                   return(0);
                }
@@ -2469,7 +2469,7 @@ sub ValidatedUpdateRecordTransactionless
             else{
                msg(ERROR,"try to access invalid IndividualAttr $fieldnames[0] ".
                          "in OperationContext $W5V2::OperationContext ".
-                         "by $ENV{REMOTE_USER}"){
+                         "by $ENV{REMOTE_USER}");
                $self->LastMsg(ERROR,"invalid individual Attribut");
                return(0);
             }
