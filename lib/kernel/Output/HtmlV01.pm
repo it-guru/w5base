@@ -126,8 +126,12 @@ sub ProcessHead
       foreach my $field (@view){
          my $fieldname=$field->Name();
          if (defined($field)){
-            if ($field->Type() eq "Number" ||
-                $field->Type() eq "Linenumber"){
+            if (exists($field->{htmltablesort})){
+               push(@sortnames,$field->{htmltablesort});
+            }
+            elsif ($field->Type() eq "Number" ||
+                $field->Type() eq "Linenumber" ||
+                $field->Type() eq "Percent"){
                push(@sortnames,"Number");
             }
             elsif (grep(/kernel::Field::Date/,

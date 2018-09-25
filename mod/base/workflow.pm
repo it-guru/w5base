@@ -118,6 +118,7 @@ sub new
       new base::workflow::Field::state(
                 name          =>'state',
                 htmldetail    =>0,
+                htmltablesort =>'Number',
                 selectfix     =>1,
                 htmlwidth     =>'100px',
                 label         =>'Workflow-State',
