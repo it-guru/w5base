@@ -142,7 +142,7 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'grpindivfld.realeditor'),
    );
-   $self->setDefaultView(qw(name dataobj owner mdat));
+   $self->setDefaultView(qw(name dataobj groupname directonly readonly behavior));
    $self->setWorktable("grpindivfld");
    return($self);
 }
