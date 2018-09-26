@@ -812,26 +812,29 @@ sub initSqlWhere
    $userid=-1 if (!defined($userid) || $userid==0);
 
    if ($self->isDataInputFromUserFrontend()){
-      if (!$self->IsMemberOf([qw(admin w5base.tsssmartcube.tcc.read)],"RMember")){
+      if (!$self->IsMemberOf([qw(admin w5base.tssmartcube.tcc.read)],
+          "RMember")){
          my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
          my @grpid=grep(/^[0-9]+/,keys(%grp));
          @grpid=qw(-99) if ($#grpid==-1);
         
          my $appl=$self->getPersistentModuleObject("w5appl","itil::appl");
-         my $lappsys=$self->getPersistentModuleObject("w5lappsys","itil::lnkapplsystem");
+         my $sys=$self->getPersistentModuleObject("w5sys","itil::system");
+         my $lappsys=$self->getPersistentModuleObject("w5lappsys",
+            "itil::lnkapplsystem");
         
-         my @flt;
-         push(@flt,{databossid=>\$userid});
-         push(@flt,{applmgrid=>\$userid});
-         push(@flt,{semid=>\$userid});
-         push(@flt,{sem2id=>\$userid});
-         push(@flt,{tsmid=>\$userid});
-         push(@flt,{tsm2id=>\$userid});
-         push(@flt,{opmid=>\$userid});
-         push(@flt,{opm2id=>\$userid});
-         push(@flt,{businessteamid=>\@grpid});
-         push(@flt,{itsemteamid=>\@grpid});
-         push(@flt,{responseteam=>\@grpid});
+         my @flt=();
+         push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],applmgrid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],semid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],sem2id=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],tsmid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],tsm2id=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],opmid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],opm2id=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],businessteamid=>\@grpid});
+         push(@flt,{cistatusid=>[3,4,5],itsemteamid=>\@grpid});
+         push(@flt,{cistatusid=>[3,4,5],responseteam=>\@grpid});
         
          $appl->SetFilter(\@flt);
          $appl->SetCurrentView(qw(id));
@@ -843,12 +846,27 @@ sub initSqlWhere
          $lappsys->SetFilter({applid=>\@appid});
          $lappsys->SetCurrentView(qw(systemsystemid));
          my $s=$lappsys->getHashIndexed("systemsystemid");
+
+         my @flt=();
+         push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],admid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],adm2id=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],adminteamid=>\@grpid});
+         $sys->SetFilter(\@flt);
+         $sys->SetCurrentView(qw(systemid));
+         my $ss=$sys->getHashIndexed("systemid");
+         foreach my $k (keys(%{$ss->{systemid}})){
+            $s->{systemsystemid}->{$k}="1";
+         }
+
+
         
          my @systemid=grep(/^S[0-9]+$/,keys(%{$s->{systemsystemid}}));
         
          my @secsystemid;
-         while (my @sid=splice(@systemid,0,500)){   # needed to fix oracle "in" limits
-            push(@secsystemid,"SYSTEM_ID in (".join(",",map({"'".$_."'"} @sid)).")");
+         while (my @sid=splice(@systemid,0,500)){ #needed to fix ora "in" limits
+            push(@secsystemid,"SYSTEM_ID in (".
+                              join(",",map({"'".$_."'"} @sid)).")");
          }
          $where="(".join(" OR ",@secsystemid).")";
       }
