@@ -37,7 +37,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                uivisible     =>0,
+                htmldetail    =>0,
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'postitnote.id'),
@@ -83,6 +83,26 @@ sub new
                 group         =>'rel',
                 label         =>'direct display',
                 dataobjattr   =>'publicstate'),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                selectfix     =>1,
+                label         =>'Source-System',
+                dataobjattr   =>'postitnote.srcsys'),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'postitnote.srcid'),
+
+      new kernel::Field::Date(
+                name          =>'srcload',
+                history       =>0,
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'postitnote.srcload'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',

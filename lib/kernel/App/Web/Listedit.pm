@@ -1669,7 +1669,10 @@ sub HandleSave
    my $idobj=$self->IdField();
    my $idname=$idobj->Name();
    my $flt=undef;
-   msg(INFO,"HandleSave for id=$id");
+
+   if ($mode eq "Modify"){  # Ajax Operaton
+      $id=Query->Param($idname);
+   }
    if (defined($id) && $id ne ""){
       $id=~s/&quote;/"/g;
       $flt={$idname=>\$id};
@@ -1685,8 +1688,20 @@ sub HandleSave
       $W5V2::HistoryComments=$HistoryComments;
       Query->Delete("HistoryComments");
    }
-   #my $newrec=$self->getWriteRequestHash("web",$oldrec);
    my $newrec=$self->getWriteRequestHash($mode,$oldrec);
+   if (!defined($oldrec) && defined($newrec->{$idname})){
+      # after prepUploadRecord an old record id could be found
+      Query->Param($idname=>$newrec->{$idname});
+      $flt={$idname=>\$newrec->{$idname}};
+      $self->ResetFilter();
+      $self->SecureSetFilter($flt);
+      $self->SetCurrentView(qw(ALL));
+      my $msg;
+      $self->SetCurrentOrder("NONE");
+      ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
+   }
+
+
    if ($self->LastMsg()!=0){
       return(undef);
    }
@@ -1898,7 +1913,41 @@ sub Modify
    my $self=shift;
    my %param=@_;
 
-   my $op=$self->ProcessDataModificationOP();
+   my $idfield=$self->IdField();
+   my $id;
+   my $op=Query->Param("OP");
+   if (!defined($idfield)){
+      $self->LastMsg(ERROR,"Modify operations only allowed on ".
+                           "dataobjects with IdField");
+   }
+   elsif($op ne "save" && $op ne "delete"){
+      $self->LastMsg(ERROR,"no valid OP specified in Modify-call");
+   }
+   else{
+      $id=Query->Param($idfield->Name());
+      if ($id eq "" && $op eq "delete"){
+         $self->LastMsg(ERROR,"delete OP only allowed with specific id");
+      }
+      else{
+         $op=$self->ProcessDataModificationOP("Modify");
+         $id=Query->Param($idfield->Name());
+         if ($id eq ""){
+            if ($self->LastMsg()==0){
+               $self->LastMsg(ERROR,"unexpected id after $op operation");
+            }
+         }
+      }
+   }
+
+
+   my $format=Query->Param("FormatAs");
+   if (!defined($format)){
+      Query->Param("FormatAs"=>"nativeJSON");
+   }
+   my $CurrentView=Query->Param("CurrentView");
+   if ($CurrentView eq ""){
+      Query->Param("CurrentView"=>"(".$idfield->Name().")");
+   }
 
    if ($self->LastMsg()>0){   # first try to handle dynamic Foramted Error docs
       my $output=new kernel::Output($self);
@@ -1916,11 +1965,12 @@ sub Modify
       if (!($output->setFormat($format,%param))){
          return();
       }
-printf STDERR ("write error in Format $format\n");
       $output->WriteToStdoutErrorDocument(HttpHeader=>1);
    }
    else{
-      $self->Result(); # reflect modified record in requests format
+      $self->ResetFilter();
+      $self->SetFilter($idfield->Name=>\$id);
+      $self->Result(ExternalFilter=>1); 
    }
    return(0);
 }

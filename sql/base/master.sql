@@ -843,3 +843,4 @@ CREATE TABLE objblacklist (
   UNIQUE KEY (objtype,field)
 ) ENGINE=INNODB;
 alter table interview add themaresp bigint(20),add themaresp2 bigint(20);
+alter table postitnote add srcsys varchar(100) default 'w5base', add srcid varchar(100) default NULL,add srcload datetime default NULL, add UNIQUE KEY `srcsys` (srcsys,srcid);

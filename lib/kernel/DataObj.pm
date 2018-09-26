@@ -869,7 +869,7 @@ sub getWriteRequestHash
                                               opmode=>'getWriteRequestHash');
       foreach my $fobj (@fieldlist){
          my $field=$fobj->Name();
-         if ($mode eq "web"){
+         if ($mode eq "web" || $mode eq "Modify"){
             my @val=Query->Param($field);
             if ($#val==-1){
                @val=Query->Param("Formated_".$field);
@@ -900,6 +900,11 @@ sub getWriteRequestHash
             if (!($fobj->prepUploadRecord($newrec,$oldrec))){
                return(undef);
             }
+         }
+      }
+      if ($mode eq "Modify"){
+         if (!($self->prepUploadRecord($rec))){
+            return(undef);
          }
       }
       use Data::HexDump;
