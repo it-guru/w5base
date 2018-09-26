@@ -247,14 +247,13 @@ sub getSqlFrom
 }
 
 
-
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_operational"))){
-#     Query->Param("search_operational"=>"\"".$self->T("yes")."\"");
-#   }
-#}
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_sdate"))){
+     Query->Param("search_sdate"=>">now-3M");
+   }
+}
 
 
 
