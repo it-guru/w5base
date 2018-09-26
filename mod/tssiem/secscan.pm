@@ -374,6 +374,7 @@ sub addICTOSecureFilter
          push(@flt,{cistatusid=>[3,4,5],businessteamid=>\@grpid});
          push(@flt,{cistatusid=>[3,4,5],itsemteamid=>\@grpid});
          push(@flt,{cistatusid=>[3,4,5],responseteam=>\@grpid});
+         push(@flt,{cistatusid=>[3,4,5],manadatorid=>\@grpid});
 
          $appl->SetFilter(\@flt);
          $appl->SetCurrentView(qw(ictono));
