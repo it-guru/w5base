@@ -8,7 +8,7 @@
 'workflow class'=>{de=>'Workflow Klasse'},
 'riskmgmt'=>{de=>'Risikomanagement'},
 'opmeasure'=>{de=>'Risikomaßnahme'},
-'both'=>{de=>'Risiko- und Maßnahmen-Workflows'},
+'both'=>{de=>'Risiko- und Maßnahmen-Workflows',en=>'riskmgmt and opmeasure workflows'},
 'From'=>{de=>'von'},
 'To'=>{de=>'bis'},
 
