@@ -23,6 +23,8 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use tssiem::secscan;
+use Date::Parse;
+use kernel::date;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -123,6 +125,38 @@ sub new
                 name          =>'lastdetect',
                 label         =>'Last Detect',
                 dataobjattr   =>'W5SIEM_secent.last_detect'),
+
+#      new kernel::Field::Boolean(
+#                name          =>'isold',
+#                label         =>'is old entry',
+#                dataobjattr   =>"
+#case
+#   when W5SIEM_secent.last_detect<W5SIEM_secscan.launch_datetime then '1'
+#   else '0'
+#end
+#
+#
+#
+#"),
+
+      new kernel::Field::Text(
+                name          =>'sslparsedserial',
+                label         =>'SSL parsed Serial',
+                depend        =>'results',
+                onRawValue    =>\&parseSSL),
+
+      new kernel::Field::Text(
+                name          =>'sslparsedissuer',
+                label         =>'SSL parsed Issuer',
+                depend        =>'results',
+                onRawValue    =>\&parseSSL),
+
+      new kernel::Field::Date(
+                name          =>'sslparsedvalidtill',
+                label         =>'SSL parsed Valid Till',
+                depend        =>'results',
+                onRawValue    =>\&parseSSL),
+
 
       new kernel::Field::Textarea(
                 name          =>'vendor_reference',
@@ -227,12 +261,110 @@ sub new
 }
 
 
+sub parseSSL
+{
+   my $self=shift;
+   my $current=shift;
+   my $results=$current->{results};
+   my $id=$current->{srcid};
+   my $app=$self->getParent();
+   my $c=$self->getParent->Context();
+   return(undef) if (!defined($results) || $results eq "");
+   my $cacheKey="parsedSSL";
+
+   if (!defined($c->{$cacheKey}->{$id})){
+      my %l;
+      my $lineno=0;
+      my $certno;
+      my $inissuer=0;
+      my %issuer;
+      $results=~s/\r\n/\n/g;
+      my @results=split("\n",$results);
+      while(my $line=shift(@results)){
+         if (my ($n)=$line=~m/^\(([0-9]{1,2})\)/){
+            $certno=$n;
+            $inissuer=0;
+         }
+         if ($certno eq "0"){
+            if ($inissuer){
+               if (my ($s)=$line=~m/^\s*countryName\s*(.*)\s*$/){
+                  $issuer{C}=$s;
+               }
+               if (my ($s)=$line=~m/^\s*organizationName\s*(.*)\s*$/){
+                  $issuer{O}=$s;
+               }
+               if (my ($s)=$line=~m/^\s*stateOrProvinceName\s*(.*)\s*$/){
+                  $issuer{ST}=$s;
+               }
+               if (my ($s)=$line=~m/^\s*postalCode\s*(.*)\s*$/){
+                  $issuer{postalCode}=$s;
+               }
+               if (my ($s)=$line=~m/^\s*localityName\s*(.*)\s*$/){
+                  $issuer{L}=$s;
+               }
+               if (my ($s)=$line=~m/^\s*streetAddress\s*(.*)\s*$/){
+                  $issuer{street}=$s;
+               }
+               if (my ($s)=$line=~m/^\s*commonName\s*(.*)\s*$/){
+                  $issuer{CN}=$s;
+               }
+               if (my ($s)=$line=~m/^\s*organizationalUnitName\s*(.*)\s*$/){
+                  $issuer{OU}=$s;
+               }
+            }
+            if (my ($s)=$line=~m/^\(0\)Serial Number\s+(.*)\s*$/){
+               $s=~s/\s*\(Negative\)\s*//i;
+               $s=~s/^\s*//;
+               $s=~s/\s*$//;
+               if ($s=~m/^[0-9a-fA-F:]+$/i){
+                  $s=~s/://g;
+               }
+               $l{sslparsedserial}=uc($s);
+            }
+            if (my ($s)=$line=~m/^\(0\)Valid Till\s*(.*)\s*$/){
+               $l{sslparsedvalidtill}=Localtime("GMT",str2time($s));
+            }
+            if (my ($s)=$line=~m/^\(0\)ISSUER NAME\s*$/){
+               $inissuer=1;
+            }
+         }
+         $lineno++;
+      }
+      if (keys(%issuer)){
+         my $i="";
+         foreach my $k (qw(C O OU ST postalCode L street CN)){
+            if (exists($issuer{$k})){
+               $i.=", " if ($i ne "");
+               $i.="$k=".$issuer{$k};
+            }
+         }
+         $l{sslparsedissuer}=$i;
+      } 
+      print STDERR Dumper(\%issuer);
+
+#         $l{w5base_appl}=[sort(values(%appl))];
+#         $l{w5base_sem}=[sort(values(%sem))];
+#         $l{w5base_tsm}=[sort(values(%tsm))];
+#         $l{w5base_applmgr}=[sort(values(%applmgr))];
+#         $l{w5base_applcustomerprio}=[sort(values(%customerprio))];
+#         $l{w5base_businessteam}=[sort(values(%businessteam))];
+#      }
+      $c->{$cacheKey}->{$id}=\%l;
+   }
+   return($c->{$cacheKey}->{$id}->{$self->Name});
+}
+
+
 sub Initialize
 {
    my $self=shift;
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   if (defined($self->{DB})){
+      $self->{DB}->do("alter session set cursor_sharing=force");
+   }
+
    return(1) if (defined($self->{DB}));
    return(0);
 }

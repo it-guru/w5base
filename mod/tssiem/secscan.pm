@@ -327,6 +327,10 @@ sub Initialize
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   if (defined($self->{DB})){
+      $self->{DB}->do("alter session set cursor_sharing=force");
+   }
+
    return(1) if (defined($self->{DB}));
    return(0);
 }
