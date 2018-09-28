@@ -303,7 +303,7 @@ sub getDynamicFields
       new kernel::Field::Htmlarea(name          =>'riskmgmtcondition',
                                   label         =>'Risiko machining condition',
                                   htmlwidth     =>'300',
-                                  nowrap        =>1,
+                                  xnowrap        =>1,
                                   htmldetail    =>0,
                                   vjoinconcat   =>"\n",
                                   group         =>'riskrating',
