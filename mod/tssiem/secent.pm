@@ -267,7 +267,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
 
-   my @l=qw(default source header scan");
+   my @l=qw(default source header scan);
 
    if ($rec->{qid} eq "86002"){
       push(@l,"sslcert");
