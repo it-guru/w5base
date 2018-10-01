@@ -90,6 +90,9 @@ CREATE INDEX "W5SIEM_secent_i3"
 CREATE INDEX "W5SIEM_secent_i4"
    ON "W5SIEM_secent" (qid) online;
 
+CREATE INDEX "W5SIEM_secent_i5"
+   ON "W5SIEM_secent" (last_detect) online;
+
 
 CREATE SEQUENCE "W5SIEM_secent_seq"
    MINVALUE 1
