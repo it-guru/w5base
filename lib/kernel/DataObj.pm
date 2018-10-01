@@ -4605,10 +4605,10 @@ sub FilterPart2SQLexp
             $conjunction="OR";
             next;
          }
+         my $sqldriver=$sqlparam{sqldbh}->DriverName();
          if (($val eq "[LEER]" || $val eq "[EMPTY]") && 
               ($sqlparam{wildcards} || $sqlparam{datatype} eq "DATE")){
             $exp.=" ".$conjunction." " if ($exp ne "");
-            my $sqldriver=$sqlparam{sqldbh}->DriverName();
             if (defined($sqlparam{sqldbh}) &&
                 ($sqldriver eq "oracle" || $sqldriver eq "db2")){
                $exp.="($sqlfieldname is NULL)"; # in oracle is ''=NULL and
@@ -4619,6 +4619,9 @@ sub FilterPart2SQLexp
             next;
          }
          my $compop=" like ";
+         if ($sqldriver eq "pg"){
+            $compop=" ilike ";
+         }
          $compop="=" if (!$sqlparam{wildcards}); 
          $compop=" is " if (!defined($val));
          if ($sqlparam{datatype} eq "DATE" && defined($val) &&

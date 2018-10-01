@@ -158,18 +158,36 @@ sub Connect
    if (uc($self->DriverName()) eq "ORACLE"){   # needed for primaryreplkey tech.
       $self->do("alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");
    }
+
+
    if (exists($self->{dbschema})){
-      $self->do("alter session set sort_area_size=524288000");
-      my $schemacmd="alter session set current_schema=$self->{dbschema}";
-      if (!($self->do($schemacmd))){
-         return(undef,
-                msg(ERROR,"Connect(%s): can't set current_schema to '%s'",
-                    $dbname,$self->{dbschema}));
-         return(undef);
+      if (($self->{dbconnect}=~m/^dbi:pg:/i)){
+         my $schemacmd="set schema '$self->{dbschema}'";
+         if (!($self->do($schemacmd))){
+            return(undef,
+                   msg(ERROR,"Connect(%s): can't set current_schema to '%s'",
+                       $dbname,$self->{dbschema}));
+            return(undef);
+         }
+         else{
+            my $parent=$self->getParent->Self();
+            #msg(INFO,"schema on $dbname set: $schemacmd; for $parent");
+         }
+
       }
       else{
-         my $parent=$self->getParent->Self();
-         #msg(INFO,"schema on $dbname set: $schemacmd; for $parent");
+         $self->do("alter session set sort_area_size=524288000");
+         my $schemacmd="alter session set current_schema=$self->{dbschema}";
+         if (!($self->do($schemacmd))){
+            return(undef,
+                   msg(ERROR,"Connect(%s): can't set current_schema to '%s'",
+                       $dbname,$self->{dbschema}));
+            return(undef);
+         }
+         else{
+            my $parent=$self->getParent->Self();
+            #msg(INFO,"schema on $dbname set: $schemacmd; for $parent");
+         }
       }
    }
    return(undef) if (!defined($self->{'db'}));
