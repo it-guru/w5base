@@ -11,3 +11,5 @@
 'singleline'=>{de=>'einzeiliges Textfeld',en=>'single line textfield'},
 'smallmulti'=>{de=>'kleines mehrzeiliges Textfeld',en=>'small multiline textfield'},
 'hugemulti'=>{de=>'grosses mehrzeiliges Textfeld',en=>'huge multiline textfield'},
+'select'=>{de=>'Auswahlliste',en=>'Select-Box'},
+'invalid field name specified'=>{de=>'ungültige Bezeichnung im Feld Attribut-Bezeichnung'},

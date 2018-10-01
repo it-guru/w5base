@@ -1,0 +1,11 @@
+'extra'=>{
+   de=>'
+Auswahl Optionen bei Auswahllisten
+grennt durch | (senkrechter Strich).
+',
+   en=>'
+Select options for select boxes
+sperated by | (vertical line)
+'
+
+},

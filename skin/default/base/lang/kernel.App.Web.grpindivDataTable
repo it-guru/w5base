@@ -3,3 +3,4 @@
 'individual attribut value - W5BaseID'=>{de=>'individual Attribut Inhalt W5BaseID'},
 'Internal field name'=>{de=>'interner Feldname'},
 'attribute is marked as archived'=>{de=>'Attribut ist "archiviert" markiert'},
+'invalid value in select field'=>{de=>'unzulässiger Inhalt für Auswahlliste'},

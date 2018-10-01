@@ -418,7 +418,9 @@ sub ProcessLine
             $class.=" htmlfixedfont";
          }
          $d.="<td class=\"$class\" data-name=\"$rec->{fieldname}\" ";
-         $d.=" onClick=$rec->{fclick}" if ($rec->{fclick} ne "");
+         my $cl=$rec->{fclick};
+         $cl=~s/"/&quot;/g;
+         $d.=" onClick=\"$cl\"" if ($rec->{fclick} ne "");
          $d.=" style=\"$rec->{style}\"$rec->{nowrap}>".$rec->{data}."</td>\n";
       }
    }

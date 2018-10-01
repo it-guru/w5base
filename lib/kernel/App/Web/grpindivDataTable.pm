@@ -251,6 +251,21 @@ sub Validate
          $newrec->{indivfieldvalue}=~s/[\r\n].*$//gs;
       }
    }
+printf STDERR ("fifi:",Dumper($newrec));
+   if (defined($oldrec) && $oldrec->{behavior} eq "select"){
+      my @valids=map({trim($_)} split(/\|/,$oldrec->{extra}));
+      if (exists($newrec->{indivfieldvalue})){
+         my $newval=trim($newrec->{indivfieldvalue});
+         if ($newval ne $newrec->{indivfieldvalue}){
+            $newrec->{indivfieldvalue}=$newval;
+         }
+         if (!in_array(\@valids,$newval)){
+            $self->LastMsg("ERROR","invalid value in select field",
+                           'kernel::App::Web::grpindivDataTable');
+            return(undef);
+         }
+      }
+   }
 
    return(1);
 }

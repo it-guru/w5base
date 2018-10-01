@@ -3310,7 +3310,8 @@ sub generateIndiviualAttributes
             my $worktable=$self->{individualAttr}->{Worktable};
             my $idfield=$self->IdField();
             my $idattr=$idfield->{dataobjattr};
-            foreach my $ifld ($o->getHashList(qw(id name readonly behavior extra))){
+            foreach my $ifld ($o->getHashList(qw(id name readonly behavior 
+                                                 extra))){
                my $indicolid=$ifld->{id};
                my $ifldname=$ifld->{name};
                $ifld=ObjectRecordCodeResolver($ifld);
@@ -3328,7 +3329,10 @@ sub generateIndiviualAttributes
                                   "${idattr}=${worktable}.dataobjid)"
                );
                if (!$ifld->{readonly}){
-                  $fldparam{onClick}="inlineEdit(event,this,'$ifld->{behavior}');";
+                  my $extra=$ifld->{extra};
+                  $extra=~s/'//g;
+                  $fldparam{onClick}="inlineEdit(event,this,".
+                                     "'$ifld->{behavior}','$extra');";
                }
                else{
                   $fldparam{onClick}='return(false);';

@@ -86,14 +86,16 @@ sub new
       new kernel::Field::Select(
                 name          =>'behavior',
                 label         =>'attribut fldbehavior',
+                jsonchanged   =>\&getOnChangedTypeScript,
+                jsoninit      =>\&getOnChangedTypeScript,
                 value         =>['singleline',
                                  'smallmulti',
-                                 'hugemulti'],
+                                 'hugemulti',
+                                 'select'],
                 dataobjattr   =>'grpindivfld.fldbehavior'),
 
       new kernel::Field::Textarea(
                 name          =>'extra',
-                readonly      =>1, # für die Zukunft!
                 label         =>'attribut fldbehavior extra data',
                 dataobjattr   =>'grpindivfld.fldextra'),
 
@@ -146,6 +148,33 @@ sub new
    $self->setWorktable("grpindivfld");
    return($self);
 }
+
+
+sub getOnChangedTypeScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var b=document.forms[0].elements['Formated_behavior'];
+var e=document.forms[0].elements['Formated_extra'];
+
+if (b && e){
+   var v=b.options[b.selectedIndex].value;
+   if (v=="select"){
+      e.disabled=false;
+   }
+   else{
+      e.value="";
+      e.disabled=true;
+   }
+}
+
+EOF
+   return($d);
+}
+
 
 
 sub ValidateDelete
@@ -243,6 +272,13 @@ sub Validate
        !($newrec->{name}=~m/^[a-zA-Z 0-9_\.-]+$/)){
       $self->LastMsg(ERROR,"invalid field name specified");
       return(undef);
+   }
+
+   my $extra=effVal($oldrec,$newrec,"extra");
+   $extra=trim($extra);
+   $extra=~s/["']//g;
+   if ($extra ne effVal($oldrec,$newrec,"extra")){
+      $newrec->{extra}=$extra;
    }
 
 
