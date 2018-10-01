@@ -1,3 +1,4 @@
 'tssiem::secent'=>{de=>'Qualys: SecEntry',en=>'Qualys: SecEntry'},
 'fieldgroup.scan'=>{de=>'Scan',en=>'Scan'},
+'fieldgroup.sslcert'=>{de=>'SSL Cert',en=>'SSL Cert'},
 'first detect'=>{de=>'erstmalig erkannt'},

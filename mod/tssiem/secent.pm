@@ -80,6 +80,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'qid',
                 htmltablesort =>'Number',
+                selectfix     =>1,
                 label         =>'QID',
                 dataobjattr   =>"W5SIEM_secent.qid"),
 
@@ -128,36 +129,33 @@ sub new
                 label         =>'Last Detect',
                 dataobjattr   =>'W5SIEM_secent.last_detect'),
 
-#      new kernel::Field::Boolean(
-#                name          =>'isold',
-#                label         =>'is old entry',
-#                dataobjattr   =>"
-#case
-#   when W5SIEM_secent.last_detect<W5SIEM_secscan.launch_datetime then '1'
-#   else '0'
-#end
-#
-#
-#
-#"),
-
       new kernel::Field::Text(
                 name          =>'sslparsedserial',
                 label         =>'SSL parsed Serial',
+                group         =>'sslcert',
                 depend        =>'results',
                 onRawValue    =>\&parseSSL),
 
       new kernel::Field::Text(
                 name          =>'sslparsedissuer',
                 label         =>'SSL parsed Issuer',
+                group         =>'sslcert',
                 depend        =>'results',
                 onRawValue    =>\&parseSSL),
 
       new kernel::Field::Date(
                 name          =>'sslparsedvalidtill',
                 label         =>'SSL parsed Valid Till',
+                group         =>'sslcert',
                 depend        =>'results',
                 onRawValue    =>\&parseSSL),
+
+      new kernel::Field::TextURL(
+                name          =>'sslparsedw5baseref',
+                label         =>'SSL Cert W5Ref',
+                group         =>'sslcert',
+                depend        =>['results',"sslparsedissuer","sslparsedserial"],
+                onRawValue    =>\&sslparsew5baseref),
 
 
       new kernel::Field::Textarea(
@@ -263,6 +261,62 @@ sub new
 }
 
 
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @l=qw(default source header scan");
+
+   if ($rec->{qid} eq "86002"){
+      push(@l,"sslcert");
+   }
+   
+   return(@l);
+}
+
+
+
+
+sub sslparsew5baseref
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $issuer=$self->getParent->getField("sslparsedissuer")->RawValue($current);
+   my $serial=$self->getParent->getField("sslparsedserial")->RawValue($current);
+
+   my $swi=$self->getParent->getPersistentModuleObject("w5swi",
+                                                       "itil::swinstance");
+
+   my $wal=$self->getParent->getPersistentModuleObject("w5wal",
+                                                       "itil::applwallet");
+
+
+   $swi->SetFilter({
+      ssl_cert_issuerdn=>'"'.$issuer.'"',
+      ssl_cert_serialno=>'"'.$serial.'"',
+      cistatusid=>"<6"
+   });
+   my ($swirec,$msg)=$swi->getOnlyFirst(qw(urlofcurrentrec));
+   if (defined($swirec)){
+      return($swirec->{urlofcurrentrec});
+   }
+
+
+   $wal->SetFilter({
+      issuerdn=>'"'.$issuer.'"',
+      serialno=>'"'.$serial.'"'
+   });
+   my ($walrec,$msg)=$wal->getOnlyFirst(qw(urlofcurrentrec));
+   if (defined($walrec)){
+      return($walrec->{urlofcurrentrec});
+   }
+   return(undef);
+}
+
+
 sub parseSSL
 {
    my $self=shift;
@@ -321,6 +375,11 @@ sub parseSSL
                if ($s=~m/^[0-9a-fA-F:]+$/i){
                   $s=~s/://g;
                }
+               $s=trim($s);
+               if (my ($hex)=$s=~m/^[0-9]+\s*\((0x[0-9a-f]+)\)$/i){
+                  $hex=~s/^0x//i;
+                  $s=$hex;
+               }
                $l{sslparsedserial}=uc($s);
             }
             if (my ($s)=$line=~m/^\(0\)Valid Till\s*(.*)\s*$/){
@@ -342,15 +401,6 @@ sub parseSSL
          }
          $l{sslparsedissuer}=$i;
       } 
-      print STDERR Dumper(\%issuer);
-
-#         $l{w5base_appl}=[sort(values(%appl))];
-#         $l{w5base_sem}=[sort(values(%sem))];
-#         $l{w5base_tsm}=[sort(values(%tsm))];
-#         $l{w5base_applmgr}=[sort(values(%applmgr))];
-#         $l{w5base_applcustomerprio}=[sort(values(%customerprio))];
-#         $l{w5base_businessteam}=[sort(values(%businessteam))];
-#      }
       $c->{$cacheKey}->{$id}=\%l;
    }
    return($c->{$cacheKey}->{$id}->{$self->Name});
@@ -416,7 +466,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","scan","source");
+   return("header","default","scan","sslcert","source");
 }
 
 
