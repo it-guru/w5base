@@ -741,7 +741,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'w5systemname',
-                label         =>'relevant logical System Config-Item',
+                label         =>'W5Base/logical System',
                 group         =>'w5basedata',
                 searchable    =>0,
                 vjointo       =>\'AL_TCom::system',
@@ -750,7 +750,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'w5applications',
-                label         =>'relevant application Config-Items',
+                label         =>'W5Base/Application',
                 group         =>'w5basedata',
                 vjointo       =>\'itil::lnkapplsystem',
                 vjoinslimit   =>'1000',

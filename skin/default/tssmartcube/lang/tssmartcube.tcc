@@ -29,4 +29,6 @@
 'Virtualization'=>{de=>'Virtualisierung'},
 'Days not patched'=>{de=>'Anzahl Tage nicht gepatcht'},
 'Operation Category Change Date'=>{de=>'Aktualisierungsdatum Betriebs-Kategorie'},
+'W5Base/logical System'=>{de=>'W5Base/logisches System'},
+'W5Base/Application'=>{de=>'W5Base/Anwendung'},
 
