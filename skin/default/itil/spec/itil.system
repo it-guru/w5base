@@ -75,6 +75,14 @@ Cryptoboxes, SetTop-Boxes, control systems etc.
 'New.fieldgroup.default'=>{
 de=>'<b>Achtung:</b> Bitte verwenden Sie die Funktion "Neueingabe" nur dann, wenn Sie wirklich ein <u>neues</u> Config-Item erfassen möchten. Sollte das Config-Item bereits in einem anderen Config-Management-System erfasst sein, verwenden Sie bitte die "Import" Funktion.',
 en=>'<b>Attention:</b> Please use the "New" function only in case you really want to create a <u>new</u> Config-Item. If the Config-Item already exists in another Config-Management-System, please use the "Import" function.'
-}
+},
+'issox'=>{
+de=>'Wenn die Applikation in den ICS/SOX Focus gelangt wird dies bei der Applikation dokumentiert. Per Default wird die Applikationsvorgabe automatisch in dieses Feld übernommen.',
+en=>'When the application reaches the ICS/SOX Focus, this is documented in the application. By default, the application default is automatically transferred to this field.'
+},
+'nosoxinherit'=>{
+de=>'Soll die Applikationsvorgabe für einzelne Server nicht übernommen werden, so ist hier ein Nein einzutragen.',
+en=>'If the application default for individual servers is not to be accepted, a No must be entered here.'
+},
 
 

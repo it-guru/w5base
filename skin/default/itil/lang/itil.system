@@ -69,8 +69,9 @@
 'there are still linked active ipaddresses on this system'=>{de=>'diesem System sind noch aktive IP-Adressen zugeordnet'},
 'fieldgroup.customer'=>{de=>'verwendet durch Kunde',en=>'used by customer'},
 'Customer Contract'=>{de=>'Kundenvertrag'},
-'mangaged by rules of SOX'=>{de=>'Betreuung nach SOX (USA) Regeln'},
-'SOX state'=>{de=>'SOX (USA) Status'},
+'Default for ICS / SOX compliance (calculated)'=>{
+ de=>'Vorgabe für ICS / SOX konformen Betrieb (berechnet)'
+},
 "invalid systemid '%s' specified"=>{de=>"ungültige SystemID '%s'"},
 "invalid system name '%s' specified"=>{de=>"ungültiger Systemname '%s'"},
 'monitoring resonsible Team'=>{de=>'Monitoring verantw. Team'},

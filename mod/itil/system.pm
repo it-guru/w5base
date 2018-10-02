@@ -645,7 +645,7 @@ sub new
 
       new kernel::Field::JoinUniqMerge(
                 name          =>'issox',
-                label         =>'mangaged by rules of SOX',
+                label         =>'Default for ICS / SOX compliance (calculated)',
                 group         =>'sec',
                 searchable    =>1,
                 vjointo       =>'itil::lnkapplsystem',
@@ -656,7 +656,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'nosoxinherit',
                 group         =>'sec',
-                label         =>'SOX state',
+                label         =>'ICS / SOX compliance necessary',
                 searchable    =>0,
                 transprefix   =>'ApplInherit.',
                 htmleditwidth =>'180px',

@@ -143,6 +143,7 @@ sub new
                 name          =>'acsoxrelevant',
                 label         =>'AM SOX relevant',
                 group         =>'amrel',
+                htmldetail    =>0,
                 searchable    =>0,
                 weblinkto     =>'NONE',
                 async         =>'1',
@@ -150,6 +151,20 @@ sub new
                 vjointo       =>\'tsacinv::system',
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>'soxrelevant'),
+
+
+      new kernel::Field::Boolean(
+                name          =>'acsas70relevant',
+                label         =>'AM SAS70 relevant',
+                group         =>'amrel',
+                searchable    =>0,
+                weblinkto     =>'NONE',
+                async         =>'1',
+                readonly      =>1,
+                vjointo       =>\'tsacinv::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'sas70relevant'),
+
 
       new kernel::Field::Textarea(
                 name          =>'ipanalyse',
