@@ -312,11 +312,23 @@ body{
   border-width:1px;
   padding:10px;
   cursor:pointer;
+  -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+     -khtml-user-select: none;
+       -moz-user-select: none; 
+        -ms-user-select: none; 
+            user-select: none; 
 }
 
 .mtiletxt span{
   font-size:18px;
   font-weight:400;
+  -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+     -khtml-user-select: none;
+       -moz-user-select: none; 
+        -ms-user-select: none; 
+            user-select: none; 
 }
 
 .mtiletxt small{
@@ -326,11 +338,22 @@ body{
   right:15px;
   bottom:10px;
   color:#bdbdbd;
+  -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+     -khtml-user-select: none;
+       -moz-user-select: none; 
+        -ms-user-select: none; 
+            user-select: none; 
 }
 
 .mtiletxt:hover{
   background-color: #ffffff;
   transition: background-color 0.4s;
+}
+
+.mtileChose {
+  color: #fff;
+  background-color: gray;
 }
 
 </style>
@@ -432,6 +455,8 @@ div#SearchResult{
 <script language="JavaScript" src="../../../public/base/load/promise.js?5">
 </script>
 <script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+<script language="JavaScript" src="../../../public/base/load/Sortable.js">
 </script>
 <script language="JavaScript" src="../../../public/base/load/spin.js">
 </script>
@@ -757,7 +782,7 @@ var W5ExploreClass=function(){
                    else{
                       alert("script parse error "+parseerror);
                    }
-                   console.log("fail",e);
+                   console.log("fail",e,parseerror);
                    rej(e);
                 });
           })
@@ -1566,6 +1591,34 @@ var W5ExploreClass=function(){
          $(e).addClass("dummyItem");
          p.appendChild(e);
       }
+
+      app.MainSortable = new Sortable(p, {
+         delay: 0, 
+         store: null,  // @see Store
+         animation: 850,  // ms, animation speed moving items
+         handle: ".parent",  // Drag handle selector within list items
+         draggable: ".item", 
+         chosenClass: "mtileChose",
+         filter: ".dummyItem",
+         dataIdAttr: 'data-id',
+         touchStartThreshold: 3,
+         forceFallback: true,      // needed for ieEdge mode
+         store: {
+            get: function (sortable) {
+               var order = localStorage.getItem(sortable.options.group.name);
+               var a=order ? order.split('|') : [];
+               //console.log("get:",a);
+               return(a);
+            },
+            set: function (s) {
+               var order = s.toArray();
+               var a=order.join('|');
+               //console.log("set:",a);
+              localStorage.setItem(s.options.group.name,a);
+            }
+       }
+      });
+
    }
 
 
@@ -1573,7 +1626,9 @@ var W5ExploreClass=function(){
    this.MainMenu=function(runpath){
       var app=this;
       this.LayoutMenuLayer();
-      app.showW5ExploreLogo("");
+      if (runpath!=undefined){
+         app.showW5ExploreLogo("");
+      }
       this.loadApplets().then(function(){
          if (runpath==undefined || runpath.length==0){
             app.showAppletList();
