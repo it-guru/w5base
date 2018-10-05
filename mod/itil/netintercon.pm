@@ -622,7 +622,7 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default epa epb epanets epbnets contacts);
+   my @databossedit=qw(default epa epb epanets epbnets contacts attachments);
 
 
    if (!defined($rec)){

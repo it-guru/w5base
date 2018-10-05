@@ -10,7 +10,7 @@
 'EPT.2'=>{de=>'externe Gerätereferenz',en=>'external device reference'},
 'Endpoint A - reference type'=>{de=>'Endpunkt A - Referenztyp'},
 'Endpoint B - reference type'=>{de=>'Endpunkt B - Referenztyp'},
-'Line Key number (LSZ)'=>{de=>'Leitunsschlüsselzahl (LSZ)'},
+'Line Key number (LSZ)'=>{de=>'Leitungsschlüsselzahl (LSZ)'},
 'Interconnect Network Name'=>{de=>'Kopplungs-IP-Netzwerk'},
 'Interconnect name'=>{de=>'Kopplungsname'},
 'Interconnect bandwidth'=>{de=>'Kopplungs-Bandbreite'},
