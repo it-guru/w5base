@@ -77,8 +77,8 @@ sub hunk {
              $c2="<font color=darkgreen>";
           }
 
-          $d.="<td>$c1".$e->[1]."</font></td>";
-          $d.="<td>$c2".$e->[3]."</font></td>";
+          $d.="<td>$c1".quoteHtml($e->[1])."</font></td>";
+          $d.="<td>$c2".quoteHtml($e->[3])."</font></td>";
           $d.="</tr>";
     }
     return($d);
