@@ -1,4 +1,4 @@
-'tssm::chm_device'=>{de=>'betroffene Gerät',en=>'affected Device'},
+'tssm::chm_device'=>{de=>'Change: betroffenes Gerät',en=>'Change: affected Device'},
 'relation name'=>{de=>'Verknüpfungsname'},
 'Change No.'=>{de=>'Changenummer'},
 'fieldgroup.status'=>{de=>'Status',en=>'State'},

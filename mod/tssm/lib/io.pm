@@ -147,7 +147,8 @@ sub ProcessServiceManagerRecord
          msg(DEBUG,"PROCESS: try to create new workflow entry");
          if (my $id=$wf->Store(undef,$wfstorerec)){
             msg(DEBUG,"workflow id=%s created",$id);
-            $self->CreateOrUpdateRelations($id,$relations);
+            #$self->CreateOrUpdateRelations($id,$relations); # not working
+            # since 06/2015
          }
          else{
             msg(ERROR,"failed to create workflow :".$wfstorerec->{srcid});
@@ -161,97 +162,13 @@ sub ProcessServiceManagerRecord
             msg(DEBUG,"PROCESS: du update to '$updateto'");
             my $oldrec=$_;
             $wf->ValidatedUpdateRecord($oldrec,$wfstorerec,{id=>\$updateto});
-            $self->CreateOrUpdateRelations($updateto,$relations);
+            #$self->CreateOrUpdateRelations($updateto,$relations); # not
+            # workin since 06/2015
          });
       }
    }
    else{
       msg(DEBUG,"no wfstorerec created");
-   }
-}
-
-sub CreateOrUpdateRelations
-{
-   my $self=shift;
-   my $srcid=shift;
-   my $relations=shift;
-
-
-   if (ref($relations) eq "ARRAY" && $#{$relations}>-1){
-      my %types;
-      foreach my $relrec (@$relations){
-         $types{$relrec->{name}}++;
-      }
-      my @types=keys(%types);
-
-      my $wr=$self->getParent->getPersistentModuleObject(
-                                "base::workflowrelation");
-      $wr->SetFilter({srcwfid=>\$srcid,name=>\@types});
-      my @currelations=$wr->getHashList(qw(ALL));
-
-      my @add;
-      my @del;
-      my @compfields=qw(name dstwfid);
-      my $compfunc=sub{
-         my $ok=1;
-         foreach my $fld (@compfields){
-            $ok=0 if ($_[0]->{$fld} ne $_[1]->{$fld}); 
-         }
-         return(1) if ($ok);
-         return(0);
-      };
-
-      foreach my $rec (@currelations){
-         my $found=0;
-         CHK1: foreach my $chkrec (@$relations){
-            if (&{$compfunc}($rec,$chkrec)){
-               $found++;
-               last CHK1;
-            }
-         }
-         if (!$found){
-            push(@del,$rec);
-         }
-      }
-      foreach my $chkrec (@$relations){
-         my $found=0;
-         CHK2: foreach my $rec (@currelations){
-            if (&{$compfunc}($rec,$chkrec)){
-               $found++;
-               last CHK2;
-            }
-         }
-         if (!$found){
-            push(@add,$chkrec);
-         }
-      }
-      #msg(DEBUG,"currelations=%s",Dumper(\@currelations));
-      #msg(DEBUG,"relations=%s",Dumper($relations));
-      #msg(DEBUG,"compfields=%s",Dumper(\@compfields));
-      #msg(DEBUG,"add=%s",Dumper(\@add));
-      #msg(DEBUG,"del=%s",Dumper(\@del));
-      foreach my $rec (@add){
-         my $chkwfid=$rec->{dstwfid};
-         my $wf=$self->getParent->getPersistentModuleObject(
-                                   "base::workflow");
-         $wf->SetFilter({id=>\$chkwfid});
-         my ($WfRec,$msg)=$wf->getOnlyFirst(qw(id));
-         if (defined($WfRec)){
-            $wr->ValidatedInsertRecord({comments=>'link by SC Change',
-                                        srcwfid=>$srcid,%$rec});
-         }
-         else{
-            my $opmode=$self->Config->Param("W5BaseOperationMode");
-            if ($opmode ne "dev" &&
-                $opmode ne "test"){
-               msg(ERROR,"invalid relation request ".
-                         "'$srcid' to '$rec->{dstwfid}'");
-            }
-         }
-      }
-      foreach my $rec (@del){
-         $wr->ValidatedDeleteRecord($rec);
-      }
    }
 }
 

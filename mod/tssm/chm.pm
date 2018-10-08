@@ -73,17 +73,6 @@ sub new
                 label         =>'Planed Duration',
                 depend        =>[qw(plannedstart plannedend)]),
 
-#      new kernel::Field::Text(
-#                name          =>'location',
-#                label         =>'Location',
-#                ignorecase    =>1,
-#                dataobjattr   =>'cm3rm1.change_shortname'), 
-#
-#      new kernel::Field::Link(
-#                name          =>'rawlocation',
-#                label         =>'raw Location',
-#                dataobjattr   =>'cm3rm1.change_shortname'), 
-
       new kernel::Field::Text(
                 name          =>'exsrcid',
                 htmldetail    =>0,
@@ -93,59 +82,6 @@ sub new
                                         'null',NULL,".
                                          SELpref."cm3rm1.tsi_external_id)"),
 
-#      new kernel::Field::Text(
-#                name          =>'srcid1', #?
-#                htmldetail    =>1,
-#                label         =>'Extern Change ID',
-#                dataobjattr   =>"decode(cm3rm1.tsi_external_main_id,'null',NULL,".
-#                                       "cm3rm1.tsi_external_main_id)"),
-#
-#      new kernel::Field::Text(
-#                name          =>'srcid2', #?
-#                htmldetail    =>1,
-#                label         =>'Extern Change',
-#                dataobjattr   =>"decode(cm3rm1.tsi_extern,'null',NULL,".
-#                                       "cm3rm1.tsi_extern)"),
-#
-#      new kernel::Field::Text(
-#                name          =>'srcid3', #?
-#                htmldetail    =>1,
-#                label         =>'Extern Change ID',
-#                dataobjattr   =>"decode(cm3rm1.tsi_external_number,'null',NULL,".
-#                                       "cm3rm1.tsi_external_number)"),
-#
-#      new kernel::Field::Text(
-#                name          =>'srcid4', #?
-#                htmldetail    =>1,
-#                sqlorder      =>"none",
-#                label         =>'Extern Change ID',
-#                dataobjattr   =>"cm3rm1.tsi_ext_interface_keys"),
-#
-#      new kernel::Field::Text(
-#                name          =>'srcid5', #?
-#                htmldetail    =>1,
-#                sqlorder      =>"none",
-#                label         =>'Extern Change ID',
-#                dataobjattr   =>"cm3rm1.tsi_ext_interface_names"),
-
-##      new kernel::Field::Text(
-##                name          =>'project',
-##                label         =>'Project',
-##                htmlwidth     =>'100px',
-##                ignorecase    =>1,
-##                dataobjattr   =>'cm3rm1.project'),
-
-#      new kernel::Field::SubList(
-#                name          =>'device',
-#                label         =>'Device (deprecated)',
-#                group         =>'device',
-#                htmlwidth     =>'300px',
-#                nodetaillink  =>1,
-#                htmldetail    =>0,
-#                searchable    =>0,
-#                vjointo       =>'tssm::chm_device',
-#                vjoinon       =>['changenumber'=>'changenumber'],
-#                vjoindisp     =>[qw(name)]),
 
       new kernel::Field::Text(
                 name          =>'modelid',
@@ -261,12 +197,6 @@ sub new
                 label         =>'Fallback',
                 searchable    =>0,
                 dataobjattr   =>SELpref.'cm3rm1.backout_method'),
-
-##      new kernel::Field::Textarea(
-##                name          =>'cause',
-##                label         =>'Cause',
-##                searchable    =>0,
-##                dataobjattr   =>'cm3rm1.cause'),
 
       new kernel::Field::Textarea(
                 name          =>'chmtarget',
@@ -394,46 +324,11 @@ sub new
                 label         =>'Change Type (CBI)',
                 dataobjattr   =>SELpref.'cm3rm1.initial_impact'),
 
-##      new kernel::Field::Text(
-##                name          =>'typecalc',
-##                group         =>'status',
-##                label         =>'Type calculated',
-##                htmldetail    =>0,
-##                dataobjattr   =>'cm3rm1.dsc_change_type_calculated'),
-
-##      new kernel::Field::Text(
-##                name          =>'types',
-##                group         =>'status',
-##                label         =>'Change types',
-##                searchable    =>0,
-##                depend        =>[qw(type typecalc)],
-##                onRawValue    =>sub{
-##                   my $self=shift;
-##                   my $current=shift;
-##                   return "$current->{type} (calc. $current->{typecalc})";
-##                }),
-
       new kernel::Field::Text(
                 name          =>'criticality',
                 group         =>'status',
                 label         =>'Criticality',
                 dataobjattr   =>SELpref.'cm3rm1.severity'),
-
-##      new kernel::Field::Text(
-##                name          =>'criticalities',
-##                group         =>'status',
-##                label         =>'Criticalities',
-##                searchable    =>0,
-##                depend        =>[qw(criticality criticalitycalc)],
-##                onRawValue    =>sub{
-##                   my $self=shift;
-##                   my $current=shift;
-##                   my $txt=$current->{criticality};
-##                   if ($current->{criticalitycalc}=~m/\S*/){
-##                      $txt.=" (calc. $current->{criticalitycalc})";
-##                   }
-##                   return $txt;
-##                }),
 
       new kernel::Field::Text(
                 name          =>'complexity',
@@ -558,9 +453,9 @@ sub new
                 uivisible     =>0,
                 searchable    =>0,
                 group         =>'relations',
-                vjointo       =>'tssm::lnk',
+                vjointo       =>'tssm::chm_device',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoininhash   =>[qw(dstsmobj dstsmid dstid dstobj dstname)],
+                vjoininhash   =>[qw(dstid dstobj dstname)],
                 vjoindisp     =>[qw(dstname)]),
 
       new kernel::Field::SubList(
@@ -568,7 +463,7 @@ sub new
                 label         =>'Configuration Items',
                 group         =>'configitems',
                 forwardSearch =>1,
-                vjointo       =>'tssm::lnkci',
+                vjointo       =>'tssm::chm_device',
                 vjoinon       =>['changenumber'=>'src'],
                 vjoindisp     =>[qw(descname dstmodel dstcriticality
                                     civalid dststatus)]),
