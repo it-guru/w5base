@@ -159,24 +159,50 @@ sub new
                                 append_open => "<font color=darkgreen><b>",
                                 append_close => "</b></font>");
 
-                   eval(' 
-                      use String::Diff;
-                      $diff=String::Diff::diff($oldstate,$newstate,%diffopt);
-                   ');
-                   my $a=$diff->[0];
-                   my $b=$diff->[1];
-                   $a=~s/\n/<br>/g;
-                   $b=~s/\n/<br>/g;
-
-
-                  
-                   return("<table width=\"100%\">".
-                          "<tr><th align=left width=\"50%\">old:</th>".
-                          "<th align=left width=\"50%\">new:</th></tr>".
-                          "<tr><td  style=\"color:gray\">$a</td>".
-                          "<td  style=\"color:gray\">$b</td></tr>".
-                          "</table>");
-
+                   if (($oldstate
+                        =~m/(([^,; <>]{2,128})[,;] ){10,}([^,; <>]{2,128})/i) ||
+                       ($newstate
+                        =~m/(([^,; <>]{2,128})[,;] ){10,}([^,; <>]{2,128})/i)){
+                      $diffopt{linebreak}=1;
+                      $oldstate=~s/([,;]) /\n/g;
+                      $newstate=~s/([,;]) /\n/g;
+                   }
+                   my $oldlines=()=$oldstate=~/\n/g;
+                   my $newlines=()=$newstate=~/\n/g;
+                   if (($oldlines>3 || $newlines>3) &&
+                       !($oldstate=~m/<.*>/) &&
+                       !($newstate=~m/<.*>/) ){   # nicht bei HTML!
+                      $diffopt{linebreak}=1;
+                   }
+                   if ($diffopt{linebreak}){ 
+                      eval('use Text::Diff;
+                            use Text::Diff::myHtml;
+                            $diff=Text::Diff::diff(
+                                  [split(/\n/,$oldstate)],
+                                  [split(/\n/,$newstate)],
+                                  {STYLE=>"Text::Diff::myHtml"})');
+                      return($diff);
+                   }
+                   else{
+                      eval(' 
+                         use String::Diff;
+                         $diff=String::Diff::diff($oldstate,$newstate,%diffopt);
+                      ');
+                      my $a="???";
+                      my $b="???";
+                      if (ref($diff) eq "ARRAY"){
+                         $a=$diff->[0];
+                         $b=$diff->[1];
+                      }
+                      $a=~s/\n/<br>/g;
+                      $b=~s/\n/<br>/g;
+                      return("<table width=\"100%\">".
+                             "<tr><th align=left width=\"50%\">old:</th>".
+                             "<th align=left width=\"50%\">new:</th></tr>".
+                             "<tr><td  style=\"color:gray\">$a</td>".
+                             "<td  style=\"color:gray\">$b</td></tr>".
+                             "</table>");
+                   }
                 }),
 
       new kernel::Field::Textarea(

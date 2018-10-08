@@ -132,6 +132,10 @@ sub HistoryResult
                $h->ResetFilter();
                my %q=$h->getSearchHash();
                my $dataobject=[$self->Self,$self->SelfAsParentObject()];
+               if ($dataobject->[0] eq $dataobject->[1]){
+                  my $s=$self->Self;
+                  $dataobject=\$s;
+               }
                $q{dataobject}=$dataobject;
                $q{dataobjectid}=\$dataobjectid;
                if (!$self->IsMemberOf("admin")){
