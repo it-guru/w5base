@@ -26,25 +26,30 @@ use kernel::config;
 use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
-use List::Util 'shuffle';
 use File::Temp qw(tempdir);
 use Time::HiRes qw(usleep sleep);
 use DBI;
 use POSIX;
-use vars qw($opt_v $opt_h $opt_c $opt_t $opt_k $opt_f $opt_a
-            $opt_q $opt_l $configname);
+use vars qw($opt_v $opt_h $opt_c  
+            $opt_k 
+            $opt_archivemode
+            $opt_q 
+            $opt_p 
+            $opt_tsize 
+            $opt_l 
+            $configname);
 $|=1;
 my $startProcessPPID=getppid(); # there is need to check ppid at at start 
                                 # against current, because IO::Multiplex and
                                 # DBD::Oracle modifies SIGPIPE Handler!
 
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
-                        'tasks=i'=>\$opt_t,
                         'keycol=i'=>\$opt_k,
                         'quietmode'=>\$opt_q,
-                        'force'=>\$opt_f,          # process if other sessions
-                        'archive'=>\$opt_a,        # archive old records
+                        'archive'=>\$opt_archivemode,    # archive old records
                         'limittime=i'=>\$opt_l,
+                        'post=s'=>\$opt_p,
+                        'transactsz=i'=>\$opt_tsize,
                         'debug'=>\$opt_v,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
@@ -56,24 +61,46 @@ if ($opt_q){
 if (!defined($opt_k)){
    $opt_k=0;                       # no key column handling
 }
-if (!defined($opt_a)){
-   $opt_a=0;
+if (!defined($opt_tsize)){
+   $opt_tsize=50;                  # per Default 50 lines in one transaction
+}
+if (!defined($opt_archivemode)){
+   $opt_archivemode=0;
 }
 else{
-   $opt_a=1;
+   $opt_archivemode=1;
 }
 if ($opt_k<0 || $opt_k>100){
    msg(ERROR,"invalid key column '$opt_k'");
    exit(1);
 }
 
-if ($opt_k==0 &&  $opt_a==1){
+if ($opt_k==0 &&  $opt_archivemode==1){
    msg(ERROR,"record archiving only works in combination with key column");
    exit(1);
 }
 
 
-my $ReplicationStart=time();
+my $CSVImportStart=time();
+
+
+my $MaximumCSVImportTime=600;
+if ($opt_l ne ""){
+   if ($opt_l=~m/^\d+$/){
+      $MaximumCSVImportTime=$opt_l;
+   }
+   else{
+      Help();exit(255);
+   }
+}
+if ($opt_p ne "" && $opt_p ne "none" && 
+    $opt_p ne "rename" && $opt_p ne "delete"){
+   Help();exit(255);
+}
+if ($MaximumCSVImportTime<10){
+   $MaximumCSVImportTime=10;
+}
+
 if ($opt_h){
    Help();exit(255);
 }
@@ -84,6 +111,7 @@ else{
    $W5V2::Debug=0;
 }
 
+$W5V2::OperationContext="W5Replicate";  # to handle msg(xxx) correct
 
 
 if ($ENV{REMOTE_USER} eq ""){
@@ -95,7 +123,16 @@ if ($ENV{REMOTE_USER} eq ""){
    }
    $ENV{REAL_REMOTE_USER}="system/W5Replicate";
 }
-$W5V2::OperationContext="W5Replicate";
+
+
+$SIG{ALRM}=sub{
+   printf STDERR ("ERROR: hard termination start at ".time().
+                  " while W5csv2db ".
+                  "timelimit $MaximumCSVImportTime sec reached\n");
+   exit(128);
+};
+alarm($MaximumCSVImportTime);
+
 
 
 #
@@ -233,7 +270,16 @@ my $SRCCSV;  # source temp file
 my $CURCSV;  # current CSV 
 my @FIELDS;  # fieldlist in CSV 1st Line
 my $FIELDS;  # 1st Line of CSV
-my %stat=(start=>time(),clr=>0,upd=>0,ins=>0,del=>0,ilines=>undef,clines=>undef);
+my %stat=(
+   start=>time(),
+   clr=>0,
+   upd=>0,
+   ins=>0,
+   del=>0,
+   ilines=>undef,
+   table=>$DSTTAB,
+   clines=>undef
+);
 
 
 
@@ -245,12 +291,15 @@ foreach my $SOURCE (@SOURCELIST){
    if ($ARGV[0]=~m/^sftp:/){
       #  sftp://w5sftp/home/w5sapp01/incoming/P01DE_order_hier_DRW_*.csv
       my $url=$ARGV[0];
-      my ($schema,$host,$dir,$filespec)=$url=~m#^(sftp)://([^/]+)(/.*)/([^/]+)$#;
+      my ($schema,$host,$dir,$filespec)=
+         $url=~m#^(sftp)://([^/]+)(/.*)/([^/]+)$#;
+      my $ftptemp=tempdir(CLEANUP=>1);
 
       msg (INFO,"schema=$schema");
       msg (INFO,"host=$host");
       msg (INFO,"dir=$dir");
       msg (INFO,"filespec=$filespec");
+      msg (DEBUG,"tempdir=$ftptemp");
 
       my $res=`echo 'version' | $SYSCMD{sftp} -b - \"$host\" 2>&1`;
       if ($?!=0){
@@ -258,50 +307,59 @@ foreach my $SOURCE (@SOURCELIST){
          msg(ERROR,"connect check to $host failed");
          exit(1);
       }
-      my $ftptemp=tempdir(CLEANUP=>1);
+      my $cmd="echo 'cd $dir\n".
+              "\n".    # WICHTIG!
+              "ls $filespec'| ".
+              "$SYSCMD{sftp}  -p -b - \"$host\" 2>&1";
+      my $res=`$cmd`;
+      $res=~s/^.*sftp\s*>\s*\nsftp\s*>\s*ls .*?\n//s;
 
-      
-      my $res=`echo 'cd $dir\nls $filespec'| $SYSCMD{sftp}  -b - \"$host\" 2>&1`;
       if ($?!=0){
+         if (($filespec=~m/\*/)){
+            if (($res=~m/not found\s*$/)){
+               msg(INFO,"$res");
+               exit(2);
+            }
+         } 
          msg(ERROR,"$res");
-         msg(ERROR,"fail to load filelist from $host with filespec $filespec");
+         msg(ERROR,"load filelist from $host with filespec $filespec");
          exit(1);
       }
-      foreach my $remotefile (split(/\n/,$res)){
-          printf("Prozessing=%s\n",$remotefile);
 
 
+      foreach my $remotefile (split(/[\r\n]+/,$res)){
+          $remotefile=~s/\s*$//s;
+          msg(INFO,"processing file '$remotefile'");
+          my $cmd="echo 'lcd \"$ftptemp\"\ncd $dir\nget \"$remotefile\"' | ".
+                  " sftp -b - \"$host\" 2>&1";
+          my $res=`$cmd`;
+          my $loaderror;
+          if ($?!=0){
+             $loaderror=$res;
+          }
+          prepairTempfile($ftptemp."/".$remotefile);
+          ProcessTempfile();
+          if ($opt_p eq "rename"){
+             my $cmd="echo 'cd $dir\n".
+                     "rename \"$remotefile\" \"$remotefile.done\"' | ".
+                     " sftp -b - \"$host\" 2>&1";
+             my $res=`$cmd`;
+             if ($?!=0){
+                $res=~s/[\r\n]+/\n/gs;
+                msg(ERROR,$res);
+             }
+          }
+          if ($opt_p eq "delete"){
+             my $cmd="echo 'cd $dir\n".
+                     "rm \"$remotefile\"' | ".
+                     " sftp -b - \"$host\" 2>&1";
+             my $res=`$cmd`;
+             if ($?!=0){
+                $res=~s/[\r\n]+/\n/gs;
+                msg(ERROR,$res);
+             }
+          }
       }
-
-
-
-      
-
-#      my $res=`echo 'lcd \"$ftptemp\"\ncd get *.csv' |
-#                sftp -b - \"$sftpsource\" 2>&1`;
-#      if ($?!=0){
-#         $loaderror=$res;
-#      }
-
-
-
-
-#   if (!defined($loaderror)){
-#      my $dh;
-#      if (opendir($dh,$tempdir)){
-#         @loadfiles=grep({ -f "$tempdir/$_" &&
-#                           !($_=~m/^\./) } readdir($dh));
-#         if ($#loadfiles==-1){
-#            $loaderror="error - no files transfered from '$sftpsource'";
-#         }
-#      }
-#      else{
-#         $loaderror="fail to open dir '$tempdir': $?";
-#      }
-#   }
-
-
-
 
 
       exit(1);
@@ -311,64 +369,73 @@ foreach my $SOURCE (@SOURCELIST){
 
    }
    else{
-      if (-f $ARGV[0] && -r $ARGV[0]){
-         msg(ERROR,"transfer source file to temp space");
-         if (open(FI,"<$ARGV[0]")){
-            $FIELDS=<FI>;         
-            $stat{ifile}=$ARGV[0];
-            $stat{ifile}=~s/^.*[\\\/]//;
-            if (open(FO,">$TMP/base.csv")){
-               $stat{ilines}=0;
-               while(my $l=<FI>){
-                  $stat{ilines}++;
-                  if (length($l)>3200){
-                     msg(ERROR,"csv records with more then 3200 char are not supported");
-                     msg(ERROR,"input file $ARGV[0] line $stat{ilines}");
-                     exit(1);
-                  }
-                  print FO $l;
+      prepairTempfile($ARGV[0]);
+      ProcessTempfile();
+   }
+}
+
+
+sub prepairTempfile
+{
+   my $sourcefile=shift;
+
+   if (-f $sourcefile && -r $sourcefile){
+      msg(INFO,"transfer source file to temp space '$TMP'");
+      if (open(FI,"<$sourcefile")){
+         $FIELDS=<FI>;         
+         $stat{ifile}=$sourcefile;
+         $stat{ifile}=~s/^.*[\\\/]//;
+         if (open(FO,">$TMP/base.csv")){
+            $stat{ilines}=0;
+            while(my $l=<FI>){
+               $stat{ilines}++;
+               if (length($l)>3200){
+                  msg(ERROR,"csv records with more then ".
+                            "3200 char are not supported");
+                  msg(ERROR,"input file $sourcefile line $stat{ilines}");
+                  exit(1);
                }
-               close(FO);
+               print FO $l;
             }
-            else{
-               MSG(ERROR,"fail to open temp csv");
-               exit(1);
-            }
-            close(FI);
+            close(FO);
          }
          else{
-            MSG(ERROR,"fail to open source csv '$ARGV[0]'");
+            MSG(ERROR,"fail to open temp csv");
             exit(1);
          }
-         my $cmd="$SYSCMD{cat} '$TMP/base.csv'|".
-                 "$SYSCMD{sort}|".
-                 "$SYSCMD{uniq}".
-                 ">'$TMP/source.csv'";
-         printf STDERR ("fifi cmd=$cmd\n");
-         system($cmd);
-         unlink("$TMP/base.csv");
-         if ($? == -1) {
-             msg(ERROR,"failed to execute: $!\n");
-             exit(1);
-         }
-         elsif ($? & 127) {
-             msg(ERROR,"child died with signal %d, %s coredump\n",
-                 ($? & 127),  ($? & 128) ? 'with' : 'without');
-             exit(1);
-         }
-         elsif (( $? >> 8)!=0) {
-             msg(ERROR,"child exited with value %d\n",$?>>8);
-             exit(1);
-         }
-         $SRCCSV=$TMP."/source.csv";
+         close(FI);
       }
       else{
-         msg(ERROR,"source file %s",$ARGV[0]);
-         msg(ERROR,"can not open source file");
+         MSG(ERROR,"fail to open source csv '$sourcefile'");
          exit(1);
       }
+      my $cmd="$SYSCMD{cat} '$TMP/base.csv'|".
+              "$SYSCMD{sort}|".
+              "$SYSCMD{uniq}".
+              ">'$TMP/source.csv'";
+      msg(DEBUG,"source create cmd: $cmd");
+      system($cmd);
+      unlink("$TMP/base.csv");
+      if ($? == -1) {
+          msg(ERROR,"failed to execute: $!\n");
+          exit(1);
+      }
+      elsif ($? & 127) {
+          msg(ERROR,"child died with signal %d, %s coredump\n",
+              ($? & 127),  ($? & 128) ? 'with' : 'without');
+          exit(1);
+      }
+      elsif (( $? >> 8)!=0) {
+          msg(ERROR,"child exited with value %d\n",$?>>8);
+          exit(1);
+      }
+      $SRCCSV=$TMP."/source.csv";
    }
-   ProcessTempfile();
+   else{
+      msg(ERROR,"source file %s",$sourcefile);
+      msg(ERROR,"can not open source file");
+      exit(1);
+   }
 }
 
 
@@ -463,9 +530,9 @@ sub ProcessTempfile
 
    my $del_sth;
 
-   if ($opt_a){
+   if ($opt_archivemode){
       $del_sth=$dbi->prepare(
-         "update \"$DSTTAB\" set \"W5_isdel\"='1' ".
+         "update \"$DSTTAB\" set \"W5_isdel\"='1',\"W5_mdate\"=current_date ".
          "where \"W5_rawline\"=? and \"W5_isdel\"='0'"
       );
    }
@@ -486,6 +553,9 @@ sub ProcessTempfile
 
    if (open(F,">$TMP/sqlcurrent.csv")){
       my $cmd="select \"W5_rawline\" from \"$DSTTAB\" where \"W5_isdel\"='0'";
+      if ($opt_archivemode){  # only lines with W5_key are usesable
+         $cmd.=" and \"W5_key\" is not null";
+      }
       my $sth=$dbi->prepare($cmd);
       if ($sth->execute()){
          $stat{clines}=0;
@@ -516,14 +586,14 @@ sub ProcessTempfile
 
    my $diffstream;
    my $cx;
+   my @compcmd=($SYSCMD{comm},"-3","$TMP/current.csv","$TMP/source.csv");
 
-   my $compcmd="$SYSCMD{comm} -3 \"$TMP/current.csv\" \"$TMP/source.csv\"";
-
-   msg(INFO,"compare cmd = $compcmd");
+   msg(DEBUG,"compare cmd = @compcmd");
 
    #exit(1);
 
-   if (!open($diffstream,"$compcmd|")){
+   my $diffpid=open($diffstream,"-|",@compcmd);
+   if (!$diffpid){
        msg(ERROR,"fail to open diff stream $!");
        exit(1);
    }
@@ -626,22 +696,24 @@ sub ProcessTempfile
       $c++;
       if ($op->{op} eq "insert"){
          if ($#{$op->{cols}}!=$#FIELDS){
-            printf STDERR ("colcount missmatch\n");
-            printf STDERR ("l='%s'\n",$op->{rawline});
-            printf STDERR ("c='%s'\n",join(";",@{$op->{cols}}));
-            printf STDERR ("f='%s'\n",join(";",@FIELDS));
+            msg(ERROR,"colcount missmatch in csv data");
+            msg(ERROR,"line=$op->{rawline}");
+            msg(DEBUG,"c='".join(";",@{$op->{cols}})."'");
+            msg(DEBUG,"f='".join(";",@FIELDS)."'");
             $stat{colcnterr}++;
          }
             if (!($sqlbk=$ins_sth->execute($op->{rawline},$op->{key},
                                         @{$op->{cols}}))){
-            msg(ERROR,"fail");
+            msg(ERROR,"insert fail");
+            msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
             exit(1);
          }
          $stat{ins}++;
       }
       elsif($op->{op} eq "delete"){
          if (!($sqlbk=$del_sth->execute(($op->{rawline})))){
-            msg(ERROR,"fail");
+            msg(ERROR,"delete fail");
+            msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
             exit(1);
          }
          if ($sqlbk eq "0E0"){
@@ -653,10 +725,12 @@ sub ProcessTempfile
          if (!($sqlbk=$upd_sth->execute($op->{rawline},
                                         @{$op->{cols}},$op->{key}))){
             msg(ERROR,"update fail");
+            msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
             exit(1);
          }
          if ($sqlbk eq "0E0"){
-            msg(ERROR,"update fail on %s",Dumper($op));
+            msg(ERROR,"update failed on key '$op->{key}'");
+            msg(DEBUG,"update operation: %s",Dumper($op));
             exit(1);
          }
 
@@ -666,12 +740,14 @@ sub ProcessTempfile
          msg(ERROR,"operation '$op->{op}' not supported");
          exit(1);
       }
-      if ($c % 49 == 0){
-         $dbi->commit();
-         $stat{commit}++;
+      if ($opt_tsize>0){
+         if ($c % $opt_tsize == 0){
+            $dbi->commit();
+            $stat{commit}++;
+         }
       }
       if ($c % 1000 == 0){
-         printf STDERR ("block:$c\n");
+         msg(INFO,"processed $c lines");
       }
      # printf("%d= size=%d op=%s\n",$c,length($op->{line}),$op->{op});
    }
@@ -680,9 +756,12 @@ sub ProcessTempfile
 
 
    if (!close($diffstream)){
-      msg(ERROR,"fail to process full diff stream $!");
+      msg(ERROR,"fail to process full diff stream $! $@ $?");
       exit(1);
    }
+   $main::streameof=0;
+   unlink("$TMP/current.csv");
+   unlink("$TMP/source.csv");
 
    if (!($sqlbk=$clr_sth->execute())){
       msg(ERROR,"cleanup fail");
@@ -692,22 +771,44 @@ sub ProcessTempfile
       $stat{clr}=$sqlbk;
    }
 
+
+
+
+
+   msg(INFO,"start final commit");
+   $dbi->commit();
+   $stat{commit}++;
+   $dbi->disconnect();
+   msg(INFO,"final commit done");
+
+
    $stat{end}=time();
    $stat{opcnt}=$stat{upd}+$stat{ins}+$stat{del};
    $stat{duration}=$stat{end}-$stat{start};
 
-   print Dumper(\%stat);
-
-
-
-
-
-      $dbi->commit();
-      $dbi->disconnect();
-
-   #printf STDERR ("replication duration=%d max=%d\n",time()-$ReplicationStart,
-   #               $MaximumReplicationTime);
-
+   my $metric=INFO;
+   if ($stat{duration}<3){
+      $metric=WARN;
+   }
+   if ($stat{opcnt}<1){
+      $metric=WARN;
+   }
+   if ($opt_v){
+      $metric=DEBUG;
+   }
+   msg($metric,"Transfer statistics:");
+   msg($metric,"  file:         '".$stat{ifile}."'");
+   msg($metric,"  output table: '".$stat{table}."'");
+   msg($metric,"  duration:     ".$stat{duration}." sec");
+   msg($metric,"  csv lines:    ".$stat{clines});
+   msg($metric,"  operations:   ".$stat{opcnt});
+   if ($opt_v){
+      msg($metric,"  commit cnt:   ".$stat{commit});
+      msg($metric,"  ins op count: ".$stat{ins});
+      msg($metric,"  upd op count: ".$stat{upd});
+      msg($metric,"  del op count: ".$stat{del});
+   }
+   #print Dumper(\%stat);
 }
                
 exit(0);
@@ -715,7 +816,7 @@ exit(0);
 #==================================================================
 sub Help
 {
-   printf("Usage: W5Replicate [OPTIONS] [OBJECTS]\n");
+   printf("Usage: W5csv2db [OPTIONS] SRCURI DSTTAB\n");
    printf("\n");
    my $form=" %-60s %17s\n";
    printf("OPTIONS:\n");
@@ -725,20 +826,35 @@ sub Help
           "[false]");
    printf($form,"--quietmode  disable all INFO messages to STDOUT",
           "[false]");
+   printf($form,"--archive    process in archive mode",
+          "[0]");
+   printf($form,"             In archive mode, all records will be stay ","");
+   printf($form,"             in db and only be marked as delete.","");
+   printf($form,"             After a period of 90 days, the recoreds","");
+   printf($form,"             will be hard deleted.","");
+   printf($form,"             It is not a good idea, to cyclically switch","");
+   printf($form,"             archive and non archive mode, on the same","");
+   printf($form,"             target table.","");
+   printf($form,"--transactsz Specify, how many rows get a db transcaction.",
+          "[50]");
+   printf($form,"             If you specify 0, ALL records get ONE\n","");
+   printf($form,"             transaction. (all will be wrote with on commit)\n","");
+   printf($form,"--post       rename or delete source, after success",
+          "[none]");
    printf($form,"--limittime  limit t for replication process in sec",
-          "[60]");
-   printf($form,"--phase      process the specified phases",
-          "[1,2,3]");
-   printf($form,"--tasks      limit the count of parallel processes",
-          "[3]");
+          "[600]");
    printf("\n");
-   printf("OBJECTS:\n");
-   printf("None, one or more object names (in W5Base interal notation), ".
-          "witch\nare should be replicated. If the Notation object(id) is ".
-          "used,\nonly the specified record id will be replicated.\n".
-          "f.e.:\n".
-          "base::user base::grp itil::system !base::workflow ...\n".
-          "base::location(12711643270034)\n\n");
+   printf("SRCURI:\n");
+   printf("This can be a local file or a sftp://... URI. If a sftp URI\n".
+          "is specified, the system command \"sftp\" is used in batchmode\n".
+          "to get remote file and do posible rename/delete operations.\n".
+          "For sftp URIs can wildcards be used:\n".
+          "sftp://w5sftp.w5base.net/indir/newcsvfile.*.csv newdbtab\n".
+          "\n");
+   printf("DSTTAB:\n");
+   printf("Specifiy the destination table, to which the data should\n".
+          "be transfered. The case of the name will be obtained (regard\n".
+          "Oracle Table naming convention on lower case char!)\n");
 }
 #==================================================================
 
