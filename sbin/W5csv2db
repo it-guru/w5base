@@ -225,16 +225,6 @@ sub getOracleDBIConnectionHandle
    return($dst,uc($dbuser),lc($dbuser).'@'.lc($dbconnect));
 }
 
-#create table tcsv (
-#   W5RAWLINE varchar2(4000),
-#   W5KEY     varchar2(20),
-#   W5MDATE   DATE not null,
-#   W5ISDEL   char(1) default '0'
-#);
-#create index tcsvi1 on tcsv (W5RAWLINE);
-#create index tcsvi2 on tcsv (W5MDATE);
-#create index tcsvi3 on tcsv (W5ISDEL);
-
 
 #
 # find system commandos sort, comm and diff
@@ -555,14 +545,9 @@ sub ProcessTempfile
       );
    }
 
-
-
-
    #
    # bereits geladenen CSV Stand erzeugen
    #
-
-
    if (open(F,">$TMP/sqlcurrent.csv")){
       my $cmd="select \"W5_rawline\" from \"$DSTTAB\" where \"W5_isdel\"='0'";
       if ($opt_archivemode){  # only lines with W5_key are usesable
@@ -694,18 +679,8 @@ sub ProcessTempfile
             }
          }
       }
-
-
-
-
-
-      
       return($op); 
    }
-
-
-
-
 
    my $c=0;
    my $sqlbk;
@@ -783,9 +758,6 @@ sub ProcessTempfile
      # printf("%d= size=%d op=%s\n",$c,length($op->{line}),$op->{op});
    }
 
-
-
-
    if (!close($diffstream)){
       msg(ERROR,"fail to process full diff stream $! $@ $?");
       exit(1);
@@ -801,10 +773,6 @@ sub ProcessTempfile
    if ($sqlbk ne "0E0"){
       $stat{clr}=$sqlbk;
    }
-
-
-
-
 
    msg(INFO,"start final commit");
    $dbi->commit();
@@ -965,265 +933,6 @@ sub getHash
    return(undef);
 }
 
-sub preprocessRecord
-{
-   my $self=shift;
-   my ($obj,$ctrl,$reqrec,$col)=@_;
-   my %rec=(%$reqrec);
-
-   if (exists($rec{'replkeypri'}) && exists($rec{'replkeysec'})){
-      # in Phase2 no replkeypri and replkeysec will be updated! This is
-      # neassesary to ensure process in Phase1
-      $rec{'w5replkey'}=sprintf("%35s%35s",$rec{'replkeypri'},
-                                           $rec{'replkeysec'});
-      $rec{'w5replkey'}=~s/ /0/g;
-      $rec{'w5replkeypri'}=$rec{'replkeypri'};
-      $rec{'w5replkeysec'}=$rec{'replkeysec'};
-   }
-   foreach my $k (@{$ctrl->{'replkeyfields'}}){
-      delete($rec{$k});
-   }
-   foreach my $fieldname (keys(%rec)){
-      my $fobj=$obj->getField($fieldname);
-      my $forceHashHandling=0;
-      if (defined($fobj)){
-         if ($fobj->Type() eq "XMLInterface"){
-            if (exists($rec{name}) && $rec{name} eq "W5Base/Darwin"){
-               $forceHashHandling=1;
-            }
-         }
-      }
-      if (scalar($rec{$fieldname}) =~ m/^Container=HASH/) {
-         $rec{$fieldname}=$self->Hash2DataField($forceHashHandling,
-                                                $rec{$fieldname});
-      }
-      if (ref($rec{$fieldname}) eq "ARRAY"){
-         if ($#{$rec{$fieldname}}>=0){
-            if (ref($rec{$fieldname}->[0]) ne "HASH"){
-               $rec{$fieldname}=join("; ",@{$rec{$fieldname}});
-            }
-            else{
-               $rec{$fieldname}=$self->Hash2DataField($forceHashHandling,
-                                                      $rec{$fieldname});
-            }
-         }
-         else{
-            $rec{$fieldname}=undef;
-         }
-      }
-      if (ref($rec{$fieldname}) eq "HASH"){
-         $rec{$fieldname}=$self->Hash2DataField($forceHashHandling,
-                                                $rec{$fieldname});
-      }
-      # strip all field values to the max. length in the replication
-      # schema. This prevent oracle SQL Errors
-      if (exists($col->{$fieldname})){
-         if ($col->{$fieldname}->{'type'} =~ m/^[char|varchar]/i) {
-            if (length($rec{$fieldname})>$col->{$fieldname}->{'size'}){
-               $rec{$fieldname}=substr($rec{$fieldname},0,
-                                       $col->{$fieldname}->{'size'});
-            }
-         }
-      }
-   }
-   return(\%rec);
-}
-
-
-sub isChanged
-{
-   my $self=shift;
-   my $ctrl=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   my $changecount=0;
-   foreach my $k (keys(%$newrec)){
-      if (!($k=~m/^w5repl.*$/i)){
-
-        my $new=$newrec->{$k};
-         my $old=$oldrec->{$k};
-         if (trim($new) ne trim($old)){
-            $changecount++;
-            msg(INFO,sprintf("%s: old='%s' new='%s'",$k,$oldrec->{$k},
-                                                        $newrec->{$k}));
-         }
-      }
-   }
-   return($changecount);
-}
-
-
-
-
-sub InsertOrUpdate
-{
-   my $self=shift;
-   my $obj=shift;
-   my $ctrl=shift;
-   my $reqrec=shift;
-   my $dbtable=$ctrl->{'name'};
-   my $idname=$ctrl->{'idname'};
-   my $col=$ctrl->{'col'};
-   my ($bk,@w5v,@w5p,@w5b);
-
-   my $rec=$self->preprocessRecord($obj,$ctrl,$reqrec,$col);
-
-   my $cmd="select * from \"$dbtable\" where $idname=?";
-   my $idval=$rec->{$idname};
-   msg(INFO,"query ($idval): $cmd");
-   my @curlist=$self->getHashList($cmd,$idval);
-
-   # hier muß die view noch sortiert werden, da wenn die LOB Felder nicht
-   # am Ende des Statements stehen, ein ORA-24816 auftaucht.
-   my @view=sort({
-      my $pa="100";
-      my $pb="100";
-      my @lobs=qw(CLOB LOB BLOB);
-      $pa=900 if (in_array(\@lobs,$col->{$a}->{type}));
-      $pb=900 if (in_array(\@lobs,$col->{$b}->{type}));
-      $pa.$a cmp $pb.$b;
-   } keys(%$rec));
-
-   if ($#curlist==0){     # do an update
-      my $isChanged=$self->isChanged($ctrl,$curlist[0],$rec);
-      my (@v,@values);
-      foreach my $fieldname (@view){
-         if ($fieldname=~m/^w5repl.*/i){
-            push(@w5v,$fieldname);
-            push(@w5p,"?");
-            push(@w5b,$rec->{$fieldname});
-            delete($rec->{$fieldname});
-         }
-         else{
-            push(@values,$rec->{$fieldname});
-            if ($col->{$fieldname}->{type} =~ m/^(timestamp|date)/i) {
-               push(@v,"$fieldname=to_date(?,'YYYY-MM-DD HH24:MI:SS')");
-            }
-            else {
-               push(@v,"$fieldname=?");
-            }
-         }
-      }
-      if ($isChanged){
-         push(@w5v,"w5replmdate");
-         push(@w5p,"current_date");
-      }
-      my $v=join(",",@v);
-      my $updcmd="update \"$dbtable\" set $v where $idname=?";
-      msg(INFO,"upd ($idval): $updcmd (".
-               join(",",map({"'".$_."'"} @values,$idval)).")");
-      $bk=$self->doCmd($updcmd,@values,$idval);
-   }
-   elsif ($#curlist==-1){ # do an insert
-      my @values;
-      my @place;
-      my @insview;
-      foreach my $fieldname (@view) {
-         if ($fieldname=~m/^w5repl.*/i){
-            push(@w5v,$fieldname);
-            push(@w5p,"?");
-            push(@w5b,$rec->{$fieldname});
-            delete($rec->{$fieldname});
-         }
-         else{
-            push(@insview,$fieldname);
-            push(@values,$rec->{$fieldname});
-            if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
-               push(@place,"to_date(?,'YYYY-MM-DD HH24:MI:SS')");
-            }
-            else {
-               push(@place,"?");
-            }
-         }
-      }
-      #my @values=map({$rec->{$_}} @view);
-      #my @place=map({'?'} @view);
-     # if (exists($ctrl->{'col'}->{'w5replmdate'})){
-     #    push(@w5v,'w5replmdate');
-     #    push(@w5p,'current_date');
-     # }
-     # if (exists($ctrl->{'col'}->{'w5replcdate'})){
-     #    push(@w5v,'w5replcdate');
-     #    push(@w5p,'current_date');
-     # }
-      
-      my $inscmd="insert into \"$dbtable\" ".
-        "(".join(",",@insview).") values(".join(",",@place).")";
-      msg(INFO,"ins ($idval): $inscmd");
-      $bk=$self->doCmd($inscmd,@values);
-   }
-   else{
-      msg(ERROR,"ganz scheisse!");
-      exit(-12356);
-   }
-   if ($bk){  # now store the current state of object in state table _
-      push(@w5v,'w5repllastsucc');
-      push(@w5p,'current_date');
-      push(@w5v,'w5repllasttry');
-      push(@w5p,'current_date');
-      push(@w5v,"w5replfailcnt");
-      push(@w5p,"0");
-      my $cmd="select refid from \"_$dbtable\" where refid=?";
-      my @curlist=$self->getHashList($cmd,$idval);
-      if ($#curlist==0){     # do an update
-         my @v;
-         for(my $c=0;$c<=$#w5v;$c++){
-            push(@v,$w5v[$c]."=".$w5p[$c]);
-         }
-         my $updcmd="update \"_$dbtable\" set ".
-                    join(",",@v)." where refid=?";
-         $bk=$self->doCmd($updcmd,@w5b,$idval);
-      }
-      else{
-         if (!in_array(\@w5v,"w5replmdate")){
-            push(@w5v,'w5replmdate');
-            push(@w5p,'current_date');
-         }
-         push(@w5v,'w5replcdate');
-         push(@w5p,'current_date');
-         push(@w5v,'refid');
-         push(@w5p,'?');
-         push(@w5b,$idval);
-         my $inscmd="insert into \"_$dbtable\" ".
-           "(".join(",",@w5v).") ".
-           "values(".join(",",@w5p).")";
-         msg(INFO,"w5ins: $inscmd :",join(",",@w5b));
-         $bk=$self->doCmd($inscmd,@w5b);
-      }
-   }
-   return($bk);
-}
-
-
-
-sub Hash2DataField
-{
-   my $self=shift;
-   my $forceHashHandling=shift;
-   my $container=shift;
-   my $element;
-
-   if ($forceHashHandling){
-     return(utf8(hash2xml($container))->latin1());
-   }
-   elsif (ref($container) eq "ARRAY"){
-     return(utf8(hash2xml({'struct'=>{'entry'=>$container}}))->latin1());
-   }
-   elsif (exists($container->{'item'}) && 
-       scalar($container->{'item'}) =~ m/^ARRAY/) {
-      foreach my $item (@{$container->{'item'}}) {
-         $element.=$item->{'name'}.
-                   "='".$item->{'value'}."'=".
-                   $item->{'name'}."\n";
-      }
-   }
-   else{
-     return("<struct><entry>".
-            utf8(hash2xml($container))->latin1()."</entry></struct>");
-   }
-   return($element);
-}
 
 sub effectedRows
 {
