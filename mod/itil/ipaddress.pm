@@ -642,6 +642,7 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $orignew=shift;
    
    return(1) if (effChangedVal($oldrec,$newrec,"cistatusid")==7);
 
@@ -676,8 +677,13 @@ sub Validate
    }
    my $is_monitoring=effVal($oldrec,$newrec,"is_monitoring");
    if ($is_monitoring ne "1" && $is_monitoring ne "" &&
-       defined($oldrec) && $oldrec->{is_monitoring} ne "0"){
+       defined($oldrec) && ($oldrec->{is_monitoring} ne "0" && 
+                            $oldrec->{is_monitoring} ne "")){
       $newrec->{is_monitoring}=undef;
+   }
+   if ($newrec->{is_monitoring} eq "0"){
+      $newrec->{is_monitoring}=undef;
+      $orignew->{is_monitoring}=undef;
    }
    ##################################################################
 
@@ -711,7 +717,12 @@ sub Validate
               unpack("H2",pack('C',$o4));
    }
    elsif ($type eq "IPv6"){
-       $ip6str=$chkname;
+      my @unformat;
+      foreach my $okt (split(/:/,$chkname)){
+         push(@unformat,sprintf("%04x",hex($okt)));
+      }
+      $name=lc(join(":",@unformat));
+      $ip6str=$name;
    }
    else{
       $self->LastMsg(ERROR,$self->T($errmsg,"itil::lib::Listedit"));
