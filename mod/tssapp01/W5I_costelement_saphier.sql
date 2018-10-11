@@ -30,5 +30,36 @@ select "ID","SAPNAME","NAME","SHORTNAME",
           NULL RAWOFIENTITY,
           NULL OFIENTITY
    from "tssapp01::costcenter"
-) costelement
+) costelement;
+
+
+create or replace view "W5I_tssapp01::costcenter" as
+  select 
+    rowid                            w5id,
+    "W5_key"                         w5name,
+    "C04_company_code"               w5accarea,
+    "C03_description"                w5description,
+    ''                               w5etype,
+    "C10_supervisor_wiw"             w5responsiblewiw,
+    "C19_hierarchy_TSI_ID"           saphier1,
+    "C21_hierarchy_ESS_BSS_ID"       saphier2,
+    "C23_hierarchy_ITO_SSM_ID"       saphier3,
+    "C25_hierarchy_BB_1_ID"          saphier4,
+    "C27_business_center_ID"         saphier5,
+    "C29_customer_center_ID"         saphier6,
+    "C31_customer_team_ID"           saphier7,
+    "C33_customer_office_ID"         saphier8,
+    "C35_hierarchy_9_ID"             saphier9,
+    "C37_hierarchy_10_ID"            saphier10,
+    "W5_cdate"                       w5createdate,
+    "W5_mdate"                       w5modifydate,
+    'P01DE'                          w5srcsys,
+    "W5_key"                         w5srcid
+  from w5ftpgw1."w5sapp01_P01DE_order_hier";
+
+grant select on "W5I_tssapp01::costcenter" to W5I;
+create or replace synonym W5I."tssapp01::costcenter" for "W5I_tssapp01::costcenter";
+
+
+
 
