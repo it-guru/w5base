@@ -34,6 +34,7 @@ use vars qw($opt_v $opt_h $opt_c
             $opt_k 
             $opt_archivemode
             $opt_q 
+            $opt_w 
             $opt_p 
             $opt_tsize 
             $opt_l 
@@ -48,6 +49,7 @@ exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'quietmode'=>\$opt_q,
                         'archive'=>\$opt_archivemode,    # archive old records
                         'limittime=i'=>\$opt_l,
+                        'warnlevel=i'=>\$opt_w,
                         'post=s'=>\$opt_p,
                         'transactsz=i'=>\$opt_tsize,
                         'debug'=>\$opt_v,
@@ -60,6 +62,9 @@ if ($opt_q){
 }
 if (!defined($opt_k)){
    $opt_k=0;                       # no key column handling
+}
+if (!defined($opt_w)){
+   $opt_w=1;                       # default warn level
 }
 if (!defined($opt_tsize)){
    $opt_tsize=50;                  # per Default 50 lines in one transaction
@@ -278,7 +283,8 @@ my %stat=(
    del=>0,
    ilines=>undef,
    table=>$DSTTAB,
-   clines=>undef
+   clines=>undef,
+   opfailcnt=>0
 );
 
 
@@ -315,9 +321,9 @@ foreach my $SOURCE (@SOURCELIST){
       $res=~s/^.*sftp\s*>\s*\nsftp\s*>\s*ls .*?\n//s;
 
       if ($?!=0){
-         if (($filespec=~m/\*/)){
+         if (($opt_w & 1)){
             if (($res=~m/not found\s*$/)){
-               msg(INFO,"$res");
+               msg(WARN,"$res");
                exit(2);
             }
          } 
@@ -702,19 +708,26 @@ sub ProcessTempfile
             msg(DEBUG,"f='".join(";",@FIELDS)."'");
             $stat{colcnterr}++;
          }
-            if (!($sqlbk=$ins_sth->execute($op->{rawline},$op->{key},
-                                        @{$op->{cols}}))){
-            msg(ERROR,"insert fail");
-            msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
-            exit(1);
+         if (!($sqlbk=$ins_sth->execute($op->{rawline},$op->{key},
+                                     @{$op->{cols}}))){
+            msg(WARN,"insert fail for rawline='$op->{rawline}'");
+            msg(DEBUG,"insert operation: %s",Dumper($op));
+            if ($DBI::errstr ne ""){
+               msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
+            }
+            $stat{opfailcnt}++;
          }
+         
          $stat{ins}++;
       }
       elsif($op->{op} eq "delete"){
          if (!($sqlbk=$del_sth->execute(($op->{rawline})))){
-            msg(ERROR,"delete fail");
-            msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
-            exit(1);
+            msg(WARN,"delete fail for rawline='$op->{rawline}'");
+            msg(DEBUG,"delete operation: %s",Dumper($op));
+            if ($DBI::errstr ne ""){
+               msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
+            }
+            $stat{opfailcnt}++;
          }
          if ($sqlbk eq "0E0"){
             printf STDERR ("fifi sqlbk=$sqlbk line=$op->{rawline}\n");
@@ -724,14 +737,17 @@ sub ProcessTempfile
       elsif($op->{op} eq "update"){
          if (!($sqlbk=$upd_sth->execute($op->{rawline},
                                         @{$op->{cols}},$op->{key}))){
-            msg(ERROR,"update fail");
-            msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
-            exit(1);
+            msg(WARN,"update fail for rawline='$op->{rawline}'");
+            msg(DEBUG,"update operation: %s",Dumper($op));
+            if ($DBI::errstr ne ""){
+               msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
+            }
+            $stat{opfailcnt}++;
          }
          if ($sqlbk eq "0E0"){
-            msg(ERROR,"update failed on key '$op->{key}'");
+            msg(WARN,"update failed on key '$op->{key}' - key not found");
             msg(DEBUG,"update operation: %s",Dumper($op));
-            exit(1);
+            $stat{opfailcnt}++;
          }
 
          $stat{upd}++;
@@ -748,6 +764,10 @@ sub ProcessTempfile
       }
       if ($c % 1000 == 0){
          msg(INFO,"processed $c lines");
+      }
+      if ($stat{opfailcnt}>10){
+         msg(ERROR,"to many failed operations - given up");
+         exit(1);
       }
      # printf("%d= size=%d op=%s\n",$c,length($op->{line}),$op->{op});
    }
@@ -787,10 +807,13 @@ sub ProcessTempfile
    $stat{duration}=$stat{end}-$stat{start};
 
    my $metric=INFO;
-   if ($stat{duration}<3){
+   if (($opt_w & 2) && ($stat{duration}<3)){
       $metric=WARN;
    }
-   if ($stat{opcnt}<1){
+   if (($opt_w & 8) && ($stat{opcnt}<1)){
+      $metric=WARN;
+   }
+   if (($opt_w & 4) && ($stat{clines}<10)){
       $metric=WARN;
    }
    if ($opt_v){
@@ -821,13 +844,15 @@ sub Help
    my $form=" %-60s %17s\n";
    printf("OPTIONS:\n");
    printf($form,"--config     configuration file",
-          "[replicate.conf]");
+          "[w5csv2db.conf]");
    printf($form,"--debug      enable debug messages",
           "[false]");
    printf($form,"--quietmode  disable all INFO messages to STDOUT",
           "[false]");
-   printf($form,"--archive    process in archive mode",
-          "[0]");
+   printf($form,"--keycol     specifies the key column in csv line", "[0]");
+   printf($form,"             0 means no keycolumn handling is done.","");
+   printf($form,"             The first column is need to specify as 1","");
+   printf($form,"--archive    process in archive mode", "[0]");
    printf($form,"             In archive mode, all records will be stay ","");
    printf($form,"             in db and only be marked as delete.","");
    printf($form,"             After a period of 90 days, the recoreds","");
@@ -835,10 +860,20 @@ sub Help
    printf($form,"             It is not a good idea, to cyclically switch","");
    printf($form,"             archive and non archive mode, on the same","");
    printf($form,"             target table.","");
+   printf($form,"","");
    printf($form,"--transactsz Specify, how many rows get a db transcaction.",
           "[50]");
-   printf($form,"             If you specify 0, ALL records get ONE\n","");
+   printf($form,"             If you specify 0, ALL records get ONE","");
    printf($form,"             transaction. (all will be wrote with on commit)\n","");
+   printf($form,"","");
+   printf($form,"--warnlevel  Specify the level, in which cases WARN","[1]");
+   printf($form,"             messages are printed.","");
+   printf($form,"             0 = no warings","");
+   printf($form,"             1 = warn if requested files are not found","");
+   printf($form,"             2 = warn if process takes less then 3 sec","");
+   printf($form,"             4 = warn if file has less then 10 csv lines","");
+   printf($form,"             8 = warn if less then 1 upd/ins/del op is done","");
+   printf($form,"","");
    printf($form,"--post       rename or delete source, after success",
           "[none]");
    printf($form,"--limittime  limit t for replication process in sec",
@@ -855,6 +890,7 @@ sub Help
    printf("Specifiy the destination table, to which the data should\n".
           "be transfered. The case of the name will be obtained (regard\n".
           "Oracle Table naming convention on lower case char!)\n");
+   printf($form,"","");
 }
 #==================================================================
 
