@@ -89,10 +89,19 @@ sub new
                                     align      =>'right',
                                     dataobjattr=>'"ammount"'),
 
+      new kernel::Field::Text(      name       =>'costcenter',
+                                    label      =>'CostCenter',
+                                    dataobjattr=>'"costcenter"'),
+
+      new kernel::Field::Text(      name       =>'sendcostcenter',
+                                    label      =>'sender CostCenter',
+                                    dataobjattr=>'"sendcostcenter"'),
+
    );
    $self->setWorktable("service"); 
    $self->setDefaultView(qw(linenumber serviceid systemid name 
-                            type ammount unit description));
+                            type ammount unit 
+                            costcenter sendcostcenter description));
    return($self);
 }
 

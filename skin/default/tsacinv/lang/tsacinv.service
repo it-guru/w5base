@@ -7,3 +7,5 @@
 'Service Type'=>{de=>'Leistungsart'},
 'Service Description'=>{de=>'Leistungsbeschreibung'},
 'Unit'=>{de=>'Einheit'},
+'CostCenter'=>{de=>'Kontierungsobjekt'},
+'sender CostCenter'=>{de=>'Sender Kontierungsobjekt'},
