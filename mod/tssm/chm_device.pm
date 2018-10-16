@@ -52,6 +52,8 @@ sub new
       new kernel::Field::Text(        
                 name          =>'changenumber',
                 label         =>'Change No.',
+                weblinkto     =>'tssm::chm',
+                weblinkon     =>['changenumber'=>'changenumber'],
                 align         =>'left',
                 dataobjattr   =>SELpref.'cm3ra10.dh_number'),
 
@@ -107,16 +109,36 @@ sub new
                 label         =>'Destination-Model',
                 dataobjattr   =>SELpref."device2m1.type"),
 
-      new kernel::Field::Text(
+     new kernel::Field::Text(
+                name          =>'dstname',
+                group         =>'amdst',
+                label         =>'Destination Name',
+                dataobjattr   =>SELpref."device2m1.title"),
+
+     new kernel::Field::Text(
                 name          =>'dstobj',
                 group         =>'amdst',
                 label         =>'Destination-AMObj',
                 dataobjattr   =>getAMObjDecode( SELpref."device2m1.type")),
 
-     new kernel::Field::Text(
-                name          =>'dstname',
+     new kernel::Field::MultiDst (
+                name          =>'dstamname',
                 group         =>'amdst',
                 label         =>'Destination-AMName',
+                altnamestore  =>'dstraw',
+                htmlwidth     =>'200',
+                dst           =>[
+                                 'tsacinv::system'=>'fullname',
+                                 'tsacinv::appl'=>'fullname',
+                                 'tsacinv::asset'=>'fullname',
+                                ],
+                dsttypfield   =>'dstobj',
+                dstidfield    =>'dstid'),
+
+     new kernel::Field::Link(
+                name          =>'dstraw',
+                group         =>'amdst',
+                label         =>'Destination-AM Name',
                 dataobjattr   =>SELpref."device2m1.title"),
 
      new kernel::Field::Text(
@@ -162,6 +184,7 @@ sub getAMObjDecode
           "decode($depend,".
                "'application','tsacinv::appl',".
                "'computer','tsacinv::system',".
+               "'networkcomponents','tsacinv::system',".
                "'generic','tsacinv::asset',".
                "'runningsoftware','tsacinv::swinstance',".
                "NULL)"
