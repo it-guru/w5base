@@ -1,0 +1,52 @@
+Perl V5.x - GPLv1
+https://perldoc.perl.org/perlgpl.html
+
+Apache Web-Server  - Apache LicenseV2
+https://httpd.apache.org/docs/2.4/license.html
+
+MySQL/MariaDB  - GPLv3 bzw. GPLv2
+https://mariadb.com/kb/en/library/legal-documents-mariadb-license/
+
+W5Base portable Perl Libraries 
+==============================
+RPC Smart - GPLv2
+mandatory/RPC-Smart
+
+IPC Smart - GPLv2
+mandatory/IPC-Smart
+
+
+Mandatory CPAN Libraries
+========================
+Date::Calc - "Artistic License" or "GNU General Public License"
+https://metacpan.org/pod/distribution/Date-Calc/lib/Date/Calc.pod
+
+DBD::mysql - GPLv1
+https://metacpan.org/pod/DBD::mysql
+
+SOAP::lite - GPLv1
+https://metacpan.org/pod/SOAP::Lite
+
+Spreadsheet::WriteExcel - "Artistic License" or "GNU General Public License"
+https://metacpan.org/pod/Spreadsheet::WriteExcel
+
+Net::Server - "Artistic License" or "GNU General Public License"
+https://metacpan.org/pod/Net::Server
+
+
+Other Libraries
+===============
+PDF Lib Lite - as Free License version in non-commercial projects
+optional/PDFlib-Lite-7.0.4.tar.gz
+
+mod_perl2 - Apache Software License
+https://perl.apache.org/docs/2.0/index.html
+
+FreeTDS - MSSQL Database driver - LGPL
+http://www.freetds.org/userguide/
+
+TinyMCE  - GPL
+https://www.tiny.cloud/docs-3x/extras/TinyMCE3x@License/
+
+jQuery - MIT License
+https://jquery.org/license/
