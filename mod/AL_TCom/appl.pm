@@ -296,13 +296,14 @@ sub ItemSummary
    foreach my $sys (@{$summary->{systems}}){
       $systemids{$sys->{systemsystemid}}=$sys if ($sys->{systemsystemid} ne "");
    }
-   if (keys(%systemids)){
+   if (keys(%systemids)>0){
       my $o=getModuleObject($self->Config,"tssmartcube::tcc");
       $o->SetFilter({systemid=>[keys(%systemids)]});
       my @osroadmap=$o->getHashList(qw(systemid systemname 
                                        roadmap osroadmapstate 
                                        urlofcurrentrec os_base_setup
                                        os_base_setup_color
+                                       operationcategory
                                        denyupd denyupdcomments));
       return(0) if (!$o->Ping());
       $summary->{osroadmap}={record=>ObjectRecordCodeResolver(\@osroadmap)};
@@ -321,12 +322,13 @@ sub ItemSummary
             $systemids{$sys->{systemsystemid}}=$sys;
          }
       }
-      if (keys(%systemids)){
+      if (keys(%systemids)>0 && keys(%systemids)<=250){
          my $l1=getModuleObject($self->Config,"tshpsa::lnkswp");
          my @swview=qw(fullname denyupd denyupdcomments 
                        softwarerelstate is_mw is_dbs
                        systemname systemsystemid 
                        version path uname softwarename
+                       operationcategory
                        urlofcurrentrec);
          $l1->ResetFilter();
          $l1->SetFilter({systemsystemid        =>[keys(%systemids)],

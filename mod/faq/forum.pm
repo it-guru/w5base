@@ -134,7 +134,7 @@ sub ShowNewTopic
      my $to=$self->getPersistentModuleObject("faq::forumtopic");
      $to->Context->{DataInputFromUserFrontend}=1;
      if (my $id=$to->ValidatedInsertRecord(\%rec)){
-        print("<tr><td>Theam erfolgreich gespeichert.</td></tr></table>");
+        print("<tr><td>Thema erfolgreich gespeichert.</td></tr></table>");
         my $ref=Query->Param("HTTP_REFERER"); 
         print("<script language=\"JavaScript\">".
               "window.setTimeout('document.location.href=\"$ref\";', 500);".
