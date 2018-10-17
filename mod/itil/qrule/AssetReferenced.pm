@@ -11,6 +11,8 @@ has at least one logical system assigned that is not in the CI-State
 "dipsosed of waste". If the CI-State of the asset in AssetMananger 
 is not "marked as delete" it must be referenced by at least 
 one logical system in any state.
+If asset has a relation to a server farm, the relation to logical
+systems is optional.
 
 =head3 IMPORTS
 
@@ -91,11 +93,28 @@ sub qcheckRecord
    if ($rec->{cistatusid}!=4){
       delete($sysflt->{cistatusid});
    }
-   my $sys=getModuleObject($self->getParent->Config,"itil::system");
-   $sys->SetFilter($sysflt);
-   my @l=$sys->getHashList(qw(id));
-   if ($#l==-1){
-      push(@msg,"no logical systems referenced to this asset");
+   my $itfarmvalid=0;
+
+   if ($rec->{itfarm} ne ""){
+      my $assetid=$rec->{id};
+      my $lnk=getModuleObject($self->getParent->Config,"itil::lnkitfarmasset");
+
+      $lnk->SetFilter({assetid=>\$assetid});
+      my ($lrec,$msg)=$lnk->getOnlyFirst(qw(itfarmid itfarmcistatuid));
+      if ($lrec->{itfarmid} ne "" &&
+          ($lrec->{itfarmcistatuid} ne "" &&
+           $lrec->{itfarmcistatuid}<6)){
+         $itfarmvalid=1;
+      }
+   }
+
+   if (!$itfarmvalid){
+      my $sys=getModuleObject($self->getParent->Config,"itil::system");
+      $sys->SetFilter($sysflt);
+      my @l=$sys->getHashList(qw(id));
+      if ($#l==-1){
+         push(@msg,"no logical systems referenced to this asset");
+      }
    }
 
    if ($#msg>=0){

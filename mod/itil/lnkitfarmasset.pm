@@ -56,6 +56,11 @@ sub new
                 dataobjattr   =>'lnkitfarmasset.itfarm'),
 
       new kernel::Field::Link(
+                name          =>'itfarmcistatuid',
+                label         =>'Serverfarm CIstatusID',
+                dataobjattr   =>'itfarm.cistatus'),
+
+      new kernel::Field::Link(
                 name          =>'fullname',
                 label         =>'Fullname',
                 dataobjattr   =>"concat(itfarm.fullname,'-',asset.name)"),
