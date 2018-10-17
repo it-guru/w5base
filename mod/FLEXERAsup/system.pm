@@ -65,6 +65,7 @@ select "W5I_system_universum".id,
        "W5I_system_universum".systemid,
        "W5I_system_universum".saphier,
        "W5I_system_universum".amcostelement costelement,
+       "W5I_system_universum".w5costelement w5costelement,
        decode("mview_FLEXERA_system".FLEXERASYSTEMID,NULL,0,1) flexerafnd,
        "mview_FLEXERA_system".SYSTEMINVHOSTTYPE                systeminvhosttype,
        "mview_FLEXERA_system".ISVM                             isvm,
@@ -236,7 +237,14 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'costelement',
-                label         =>'costelement',
+                label         =>'AM costelement',
+                ignorecase    =>1,
+                readonly      =>1,
+                dataobjattr   =>'costelement'),
+
+      new kernel::Field::Text(
+                name          =>'w5costelement',
+                label         =>'W5Base costelement',
                 ignorecase    =>1,
                 readonly      =>1,
                 dataobjattr   =>'costelement'),
