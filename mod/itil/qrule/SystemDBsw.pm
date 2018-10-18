@@ -88,6 +88,10 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3); 
 
+   # no autocorrection is allowed - see request 
+   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/15192854880001
+   $autocorrect=0;
+
    my @inst;
    my @cinst;
 
@@ -126,7 +130,6 @@ sub qcheckRecord
    $sw->SetFilter({id=>[keys(%allsw)]});
    $sw->SetCurrentView(qw(id is_dbs));
    my $swprod=$sw->getHashIndexed("id");
-
 
    # now we have all we need
    my $founddbinst=0;
