@@ -1,0 +1,4 @@
+'itil::qrule::SystemIpAddresses'=>{de=>'Prüfung ob IP-Adressen erfasst wurden',
+                             en=>'check if ip-addresses are documented'},
+'missing ip addresses'=>{de=>'keine IP-Adressen dokumentiert'},
+
