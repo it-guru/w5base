@@ -242,18 +242,27 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if (defined($oldrec) && $oldrec->{readonly}){
+   my $fieldidatvaluerec=effVal($oldrec,$newrec,"fieldidatvaluerec");
+   my $g=$self->getPersistentModuleObject("indivGrp","base::grpindivfld");
+   $g->SetFilter({id=>\$fieldidatvaluerec});
+   my ($giFld,$msg)=$g->getOnlyFirst(qw(id readonly behavior extra));
+
+   if (!defined($giFld)){
+      $self->LastMsg("ERROR","invalid field id write request");
+      return(undef);
+   }
+
+   if ($giFld->{readonly}){
       $self->LastMsg("ERROR","attribute is marked as archived");
       return(undef);
    }
-   if (defined($oldrec) && $oldrec->{behavior} eq "singleline"){
+   if ($giFld->{behavior} eq "singleline"){
       if (exists($newrec->{indivfieldvalue})){
          $newrec->{indivfieldvalue}=~s/[\r\n].*$//gs;
       }
    }
-printf STDERR ("fifi:",Dumper($newrec));
-   if (defined($oldrec) && $oldrec->{behavior} eq "select"){
-      my @valids=map({trim($_)} split(/\|/,$oldrec->{extra}));
+   if ($giFld->{behavior} eq "select"){
+      my @valids=map({trim($_)} split(/\|/,$giFld->{extra}));
       if (exists($newrec->{indivfieldvalue})){
          my $newval=trim($newrec->{indivfieldvalue});
          if ($newval ne $newrec->{indivfieldvalue}){

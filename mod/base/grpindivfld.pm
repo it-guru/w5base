@@ -248,7 +248,8 @@ sub isWriteOnGroupValid
    return(1) if ($self->IsMemberOf("admin"));
    my $userid=$self->getCurrentUserId();
    my %a=$self->getGroupsOf($userid, [qw(RBoss RBoss2)], 'down');
-   if (in_array([keys(%a)],$grpid)){
+   my %b=$self->getGroupsOf($userid, [qw(RAdmin)], 'direct');
+   if (in_array([keys(%a),keys(%b)],$grpid)){
       return(1);
    }
 
