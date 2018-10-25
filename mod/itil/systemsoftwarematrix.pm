@@ -62,6 +62,7 @@ sub new
          next if ($fldobj->Name eq "applications");
          next if ($fldobj->Name eq "adminteam");
          next if ($fldobj->Name eq "swinstproducer");
+         next if ($fldobj->Name eq "swinstmatrix");
          $fldobj->{searchable}=0;
       }
    }
