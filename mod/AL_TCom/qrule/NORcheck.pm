@@ -144,7 +144,7 @@ sub qcheckRecord
             $self->sendNotification($dataobj,$rec,
                                     $adv,"refreshinfo1",$advrec[0]);
             # Mail ADV erstellen
-            printf STDERR ("adv erstellen\n");
+            #printf STDERR ("adv erstellen\n");
          }
       }
       else{
@@ -210,7 +210,6 @@ sub sendNotification
       push(@to,$rec->{delmgrid})  if ($rec->{delmgrid}  ne "");
       push(@cc,$rec->{delmgr2id}) if ($rec->{delmgr2id} ne "");
       $notifycontrol->{useTemplate}.=".applnor";
-      $subject="Empfehlung zur Erstellung eines NOR-Nachweises";
    }
    if ($#to==-1){
       push(@to,$rec->{applmgrid}) if ($rec->{applmgrid} ne "");
@@ -234,7 +233,7 @@ sub sendNotification
 
       my $outdate="";
       if ($docobj->Self() eq "itil::appladv"){
-         $subject=$dataobj->T("Empfehlung zur Erstellung einer NOR-Vorgabe");
+         $subject=$dataobj->T("Necessity to creation of NOR-Target");
          if ($field eq "refreshinfo2"){
             $outdate=sprintf($dataobj->T(
                              "The current NOR-Target %s is out of date."),
@@ -242,7 +241,7 @@ sub sendNotification
          }
       }
       if ($docobj->Self() eq "itil::applnor"){
-         $subject=$dataobj->T("Recommendation to creation of NOR-Verification");
+         $subject=$dataobj->T("Necessity to creation of NOR-Verification");
          if ($field eq "refreshinfo2"){
             $outdate=sprintf($dataobj->T(
                              "The current NOR-Verification %s is out of date."),
