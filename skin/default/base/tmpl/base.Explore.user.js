@@ -107,32 +107,55 @@
          this.app.showDialog(function(){
             var dialog = document.createElement('div');
             $(dialog).css("height","100%");
-            $(dialog).append("<table id=SearchTab width=97% height=90% "+
-                              "border=0>"+  
-                              "<tr height=1%><td >"+
-           "<h1>"+ClassAppletLib['%SELFNAME%'].desc.label+"</h1>"+
+            $(dialog).append("<div id=SearchTab><table width=100% "+
+                              "cellspacing=0 cellpadding=0 border=0>"+
+                              "<tr height=1%><td>"+
+            "<h1>"+ClassAppletLib['%SELFNAME%'].desc.label+"</h1>"+
                               "</td></tr>"+
-                              "<tr height=1%><td width=10%>"+
-                              "<form id=SearchFrm><div class='SearchLabel'>"+
+                              "<tr height=1%><td>"+
+                              "<form id=SearchFrm>"+
+                              "<table width=100% "+
+                              "cellspacing=0 cellpadding=0 border=0>"+
+                              "<tr><td width=1%>"+
+                              "<div class='SearchLabel'>"+
                               "Suchen:</div></td><td>"+
                               "<div class='SearchLabel'>"+
                               "<input type=text name=SearchInp id=SearchInp>"+
-                              "</div></form></td></tr>"+
-                              "<tr><td colspan=2 valign=top>"+
+                              "</div></form></td></tr></table>"+
+                              "</td></tr>"+
+                              "<tr><td valign=top>"+
                               "<div id=SearchContainer>"+
                               "<div id=SearchResult></div>"+
                               "</div>"+
                               "</td></tr>"+
-                              "</table>");
+                              "</table></form></div>");
+
+           // $(dialog).find("#SearchInp").val(appletobj.searchFilter);
             $(dialog).find("#SearchInp").focus();
+         //   appletobj.setSearchResult(dialog,appletobj.searchResult);
             $(dialog).find("#SearchInp").on('keypress', function (e) {
                if(e.which === 13){
                   $(this).attr("disabled", "disabled");
                   appletobj.searchItems(dialog,$(this).val());
                   $(this).removeAttr("disabled");
                   $(dialog).find("#SearchInp").focus();
+                  return(false);
                }
             });
+            function resizeModalHandler(e){
+               $(this).find('#SearchContainer').height(10);
+               var h=$(this).parent().height();
+               var w=$(this).parent().width();
+               var hSearchFrm=$(this).find('#SearchFrm').first().height();
+               $(this).find('#SearchTab').width(w*0.95);
+               $(this).find('#SearchContainer').height((0.9*h)-hSearchFrm-10);
+               $(this).find('#SearchResult').height((0.9*h)-hSearchFrm-10);
+               console.log("got reszie in dialog "+
+                           "h="+h+" w="+w+" SearchFrm="+hSearchFrm);
+               e.stopPropagation();
+            }
+            $(dialog).on('resize',resizeModalHandler);
+            $(".spinner").hide();
             return(dialog);
          },function(){
             appletobj.exit();

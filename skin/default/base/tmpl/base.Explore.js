@@ -189,8 +189,10 @@ body{
 #W5ExploreLogo{
    display:none;
    position:absolute;
-   height:250px;
-   width:408px;
+   height:40%;
+   max-height:250px;
+   width:40%;
+   max-width:408px;
    background:#f9f9f9;
    border:10px outset #cecece;
    z-index:2;
@@ -226,7 +228,7 @@ body{
     padding-top: 5px;
     border: 1px solid #888;
     width: 80%; 
-    height: 40%;
+    height: 50%;
 }
 
 .closebtn {
@@ -367,7 +369,7 @@ div.SearchInp{
   line-height:25px;
 }
 input#SearchInp{
-  width:90%
+  width:95%
 }
 div.SearchLabel{
   padding:5px;
@@ -375,11 +377,11 @@ div.SearchLabel{
   background-color: #f0f0f0;
 }
 div#SearchContainer{
-  height:150px;
+  margin-top:2px;
+  padding-top:2px;
   border-top:1px solid black
 }
 div#SearchResult{
-  height:inherit;
   overflow-x:hidden;
   overflow-y:scroll;
 }
@@ -610,6 +612,7 @@ var W5ExploreClass=function(){
                 $(this.workspace).innerWidth()-
                 $(this.ctrl).outerWidth()-5);
          }
+         $('.modal-content  div').first().trigger('resize');
       }
    };
 
@@ -1517,6 +1520,7 @@ var W5ExploreClass=function(){
    this.showDialog=function(genContent,exitCode){
       var modal=document.createElement('div');
       $(modal).id='myModal';
+      $(modal).addClass('modal-dialog');
       $(modal).addClass('modal-background');
       var modalframe=document.createElement('div');
       $(modalframe).addClass('modal-content');
@@ -1530,6 +1534,10 @@ var W5ExploreClass=function(){
       }); 
       $(".spinner").hide();
       $(modal).show();
+      $(modal).on('resize',function(e){
+         e.stopPropagation();
+      });
+      $('.modal-content  div').first().trigger('resize');
       $(modalframe).find("input:text:visible:first").focus();
    }
 
@@ -1546,7 +1554,7 @@ var W5ExploreClass=function(){
       else{
          $(box).append($("<center><h2>Data Explorer Main</h2></center>"));
       }
-      $(box).append($("<div style='margin-top:150px'>... you are "+
+      $(box).append($("<div style='margin-top:140px'>... you are "+
                       "booting the hidden feature code "+
                       "W5Explore. Not warenty and no support! "+
                       "Use at your own risk.</div>"));
