@@ -21,7 +21,7 @@ NONE
 
 [en:]
 
-An application usually runs on at least one logical system. 
+An application usually runs on at least one logical system or cloud area. 
 
 Step 1: Please make sure that the logical systems are already created in W5Base/Darwin.
 
@@ -36,13 +36,17 @@ the field to 'yes' if the application doesn't have any systems!
 The technical responsible of the application (TSM) usually knows which 
 systems were comissioned.
 
+A cloud area will be only tread as "system", if it is marked 
+as "installed/active".
+
 In case of questions regarding handling W5Base/Darwin you can turn 
 to the Support of Darwin:
 https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 [de:]
 
-Eine Anwendung läuft im Regelfall auf mindestens einem logischen System.
+Eine Anwendung läuft im Regelfall auf mindestens einem logischen System 
+oder einer Cloud-Area.
 
 Schritt 1: Überprüfen Sie bitte, ob die Systeme in W5Base/Darwin bereits angelegt sind.
 
@@ -56,6 +60,9 @@ bitte unter 'Steuerungs-/Automationsdaten'
 Das Feld darf nur auf 'ja' gesetzt werden, wenn die Anwendung keine Systeme 
 hinterlegt hat! Der technische Verantwortliche der Anwendung (TSM) 
 weiß in der Regel welche Systeme beauftragt wurden.
+
+Eine Cloud-Area wird nur als "System" angesehen, wenn diese als 
+"installiert/aktiv" markiert ist.
 
 Bei Fragen zum Umgang mit dem Tool können Sie sich 
 an den Darwin-Support wenden:
@@ -109,16 +116,30 @@ sub qcheckRecord
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+
+   my $systemcnt=0;
+   my $cloudacnt=0;
+   if (ref($rec->{systems}) eq "ARRAY" && $#{$rec->{systems}}!=-1){
+      $systemcnt=$#{$rec->{systems}}+1;
+   }
+   if (ref($rec->{itcloudareas}) eq "ARRAY" && $#{$rec->{itcloudareas}}!=-1){
+      foreach my $cloudarea (@{$rec->{itcloudareas}}){
+         if ($cloudarea->{cistatusid}==4){
+            $cloudacnt++;
+         }
+      }
+   }
+
    if (!$rec->{isnosysappl}){
-      if (ref($rec->{systems}) ne "ARRAY" || $#{$rec->{systems}}==-1){
-         return(3,{qmsg=>['no system relations'],
-                   dataissue=>['no system relations']});
+      if ($systemcnt==0 && $cloudacnt==0){
+         return(3,{qmsg=>['no system or cloud relations'],
+                   dataissue=>['no system or cloud relations']});
       }
    }
    else{
-      if (ref($rec->{systems}) eq "ARRAY" && $#{$rec->{systems}}!=-1){
-         return(3,{qmsg=>['superfluous system relations'],
-                   dataissue=>['superfluous system relations']});
+      if ($systemcnt!=0 || $cloudacnt!=0){
+         return(3,{qmsg=>['superfluous system or cloud relations'],
+                   dataissue=>['superfluous system or cloud relations']});
       }
    }
    return(0,undef);
