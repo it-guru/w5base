@@ -408,7 +408,8 @@ sub new
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['fullname','swnature','is_dbs','is_mw'],
                 vjoininhash   =>['fullname','swnature','is_dbs',
-                                 'is_mw','cistatusid']),
+                                 'is_mw','cistatusid','id',
+                                 'systemid','itclustsid']),
 
       new kernel::Field::Number(
                 name          =>'swinstancecount',
@@ -2666,6 +2667,48 @@ sub jsExploreObjectMethods
                       }
                    }
                    methodDone(\"end of m501addApplicationSystems\");
+                });
+             });
+          }));
+       }
+   ";
+
+   my $label=$self->T("add software instances");
+   $methods->{'m501addApplicationInstances'}="
+       label:\"$label\",
+       cssicon:\"basket_add\",
+       exec:function(){
+          console.log(\"call m501addApplicationInstances on \",this);
+          \$(\".spinner\").show();
+          var app=this.app;
+          var dataobjid=this.dataobjid;
+          var dataobj=this.dataobj;
+          app.pushOpStack(new Promise(function(methodDone){
+             app.Config().then(function(cfg){
+                var w5obj=getModuleObject(cfg,'itil::appl');
+                w5obj.SetFilter({
+                   id:dataobjid
+                });
+                w5obj.findRecord(\"id,swinstances\",function(data){
+                   for(recno=0;recno<data.length;recno++){
+                      for(subno=0;subno<data[recno].swinstances.length;subno++){
+                         var subrec=data[recno].swinstances[subno];
+                         app.addNode('itil::swinstance',subrec.id,
+                                     subrec.fullname);
+                         app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                     app.toObjKey('itil::swinstance',
+                                     subrec.id),
+                                     {noAcross:true});
+                         if (subrec.systemid){
+                            app.addEdge(app.toObjKey('itil::swinstance',
+                                        subrec.id),
+                                        app.toObjKey('itil::system',
+                                        subrec.systemid),
+                                        {noAcross:true});
+                         }
+                      }
+                   }
+                   methodDone(\"end of m501addApplicationInstances\");
                 });
              });
           }));

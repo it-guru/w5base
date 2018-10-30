@@ -75,6 +75,7 @@ sub new
                 htmleditwidth =>'40%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0 AND <7"},
+                explore       =>100,
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
@@ -104,6 +105,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'rawswnature',
                 group         =>'env',
+                explore       =>200,
                 label         =>'raw Instance type',
                 dataobjattr   =>'swinstance.swnature'),
 
@@ -169,6 +171,7 @@ sub new
                 name          =>'swteam',
                 label         =>'Instance guardian team',
                 vjointo       =>'base::grp',
+                explore       =>300,
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['swteamid'=>'grpid'],
                 vjoindisp     =>'fullname'),
@@ -176,6 +179,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'swinstanceid',
                 htmlwidth     =>'100px',
+                explore       =>150,
                 label         =>'Instance ID',
                 dataobjattr   =>'swinstance.swinstanceid'),
 
@@ -220,6 +224,7 @@ sub new
                 name          =>'system',
                 label         =>'System',
                 group         =>'systems',
+                explore       =>500,
                 vjointo       =>'itil::system',
                 vjoineditbase =>{'cistatusid'=>[2,3,4],isembedded=>\'0'},
                 vjoinon       =>['systemid'=>'id'],
@@ -518,6 +523,7 @@ sub new
                 name          =>'itclusts',
                 group         =>'cluster',
                 label         =>'Cluster Service',
+                explore       =>500,
                 vjointo       =>'itil::lnkitclustsvc',
                 vjoineditbase =>{'itclustcistatusid'=>[2,3,4]},
                 vjoinon       =>['itclustsid'=>'id'],
