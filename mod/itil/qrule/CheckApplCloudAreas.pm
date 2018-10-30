@@ -105,7 +105,7 @@ sub qcheckRecord
    my $now=NowStamp("en");
    if (ref($rec->{itcloudareas}) eq "ARRAY"){
       foreach my $crec (@{$rec->{itcloudareas}}){
-         if ($crec->{cistatusid}<5){
+         if ($crec->{cistatusid}!=4 && $crec->{cistatusid}<5){
             my $t=CalcDateDuration($crec->{mdate},$now,"GMT");
             if (!defined($t) || $t->{totaldays}>(6*7)){ # 6 weeks
                push(@needToAct,$crec->{fullname});
