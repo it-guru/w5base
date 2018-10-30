@@ -17,8 +17,8 @@ NONE
 
 [en:]
 
-Document all direct on system configured IP-Addresses. 
-The loopback address (127.0.0.1) is not need to be documented.
+Please document all direct Ip-Adresses on the system. 
+The loopback adress (127.0.0.1) doesn't have to be documented.
 
 [de:]
 
