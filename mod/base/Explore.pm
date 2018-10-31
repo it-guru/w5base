@@ -35,7 +35,7 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main jsApplets));
+   return(qw(Main jsApplets jsLib));
 }
 
 
@@ -64,6 +64,33 @@ sub Main
    print($prog);
 }
 
+sub jsLib  #  base/ kernel.Explore.network
+{
+   my $self=shift;
+   my $lang=$self->Lang();
+
+   print $self->HttpHeader("text/javascript");
+
+   my $appletcall;
+   if (defined(Query->Param("FunctionPath"))){
+      $appletcall=Query->Param("FunctionPath");
+   }
+   my @p=split(/\//,$appletcall);
+
+   printf("(function(window, document, undefined){\n");
+   if ($p[1] eq "base"){
+      my $opt={
+         static=>{
+            BASE=>$p[1]
+         }
+      };
+      my $prog=$self->getParsedTemplate("tmpl/$p[2]",$opt);
+      utf8::encode($prog);
+      print($prog);
+   }
+   printf("})(this,document);\n\n");
+}
+
 sub jsApplets
 {
    my $self=shift;
@@ -77,11 +104,11 @@ sub jsApplets
    }
    $appletcall=~s/^\///;
    $appletcall=~s/\//::/g;
+   $appletcall=~s/\..*$//;
 
    printf("(function(window, document, undefined){\n");
    if ($appletcall ne ""){
       if (exists($self->{Explore}->{$appletcall})){
-         sleep(2);
          print($self->{Explore}->{$appletcall}->getJSObjectClass($self,$lang));
       }
    }
@@ -95,6 +122,7 @@ sub jsApplets
          if (defined($d)){
             my $selfname=$sobj->Self();
             my $jsdata=$jsengine->encode($d);
+            utf8::encode($jsdata);
             printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
          }
       }

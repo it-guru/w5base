@@ -1,58 +1,16 @@
-(function(window, document, undefined) {
-   var applet='%SELFNAME%';
+var applet='%SELFNAME%';
+define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
    ClassAppletLib[applet].class=function(app){
       ClassApplet.call(this,app);
    };
    $.extend(ClassAppletLib[applet].class.prototype,ClassApplet.prototype);
 
-
-//   ClassAppletLib[applet].class.prototype.searchItems=function(dialog,flt){
-//      var appletobj=this;
-//      this.app.Config().then(function(cfg){
-//         var w5obj=getModuleObject(cfg,'base::user');
-//         if (flt.indexOf("*")==-1 && flt.indexOf(" ")==-1){
-//            flt="*"+flt+"*";
-//         }
-//         w5obj.SetFilter({
-//            cistatusid:"4",
-//            fullname:flt
-//         });
-//         w5obj.findRecord("userid,fullname",function(data){
-//            var cnt=data.length;
-//            var res="";
-//            for(c=0;c<cnt;c++){
-//               res+="<div class='purebtn appstart' "+
-//                    "data-id='"+data[c].userid+"'"+
-//                    "data-dataobj='base::user'"+
-//                    ">"+
-//                    data[c].fullname+"</div>";
-//            }
-//            $(dialog).find("#SearchResult").height(   // fix result height
-//               $(dialog).find("#SearchResult").height()
-//            );
-//            $(dialog).find("#SearchResult").html(res);
-//
-//            $(dialog).find(".appstart").click(function(e){
-//               console.log("click eon ",$(this).attr("data-id"));
-//               console.log("click eon ",$(this).attr("data-dataobj"));
-//
-//               var id=$(this).attr("data-id");
-//               var dataobj=$(this).attr("data-dataobj");
-//               appletobj.run([dataobj,id]);
-//            });
-//         },function(e){
-//            $(dialog).find("#SearchResult").html("Fail");
-//         });
-//      }).catch(function(e){
-//         $(dialog).find("#SearchResult").html("Fail2");
-//      });
-//   }
-
    ClassAppletLib[applet].class.prototype.run=function(){
       var appletobj=this;
       var app=this.app;
-      this.app.node.clear();
-      this.app.edge.clear();
+
+      app.InitObjectStore();
+
       if (arguments.length){
          var datamodel=arguments[0][0];
          var depth=arguments[0][1];
@@ -179,6 +137,5 @@
          });
       }
    };
-
-
-})(this,document);
+   return(ClassAppletLib[applet].class);
+});

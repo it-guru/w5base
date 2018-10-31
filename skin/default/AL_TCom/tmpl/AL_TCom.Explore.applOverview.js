@@ -1,6 +1,6 @@
 var applet='%SELFNAME%';
 
-define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
+define(["datadumper"],function (Dumper){
    ClassAppletLib[applet].class=function(app){
       ClassApplet.call(this,app);
    };
@@ -58,22 +58,11 @@ define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
       var appletobj=this;
       var app=this.app;
 
-      app.InitObjectStore();
-
       if (arguments.length){
          var dataobj=arguments[0][0];
          var dataobjid=arguments[0][1];
-         this.app.ShowNetworkMap({
-            physics: {
-               barnesHut:{
-                  gravitationalConstant:-50000
-               },
-               enabled: true   // || "once"
-            }
-         });
-         this.app.network.moveTo({scale:0.5,animation:false});
+         this.app.LayoutSimple();
          this.app.console.log("INFO","loading scenario ...");
-         console.log(" run in "+dataobj+" and id="+dataobjid);
 
          appletobj.app.setMPath({
                label:ClassAppletLib['%SELFNAME%'].desc.label,
@@ -81,29 +70,40 @@ define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
             },
             { label:"loading ...", mtag:dataobj+"/"+dataobjid }
          );
-        app.genenericLoadNode(dataobj,"id","name",{id:dataobjid},function(d){
-            var MasterItem=d[1];
-            MasterItem['MasterItem']=true;
-            console.log("MasterItem loaded:",MasterItem);
+         this.MasterItem=undefined;
+         app.genenericLoadRecord(dataobj,"name,tsm,opm,id",{id:dataobjid},function(rec){
+            console.log("ok rec=",rec);
+            appletobj.MasterItem=rec[0]; 
             app.setMPath({
                   label:ClassAppletLib['%SELFNAME%'].desc.label,
                   mtag:'%SELFNAME%'
                },
-               { label:MasterItem.label, mtag:dataobj+"/"+MasterItem.dataobjid}
+               { label:appletobj.MasterItem.name, mtag:dataobj+"/"+appletobj.MasterItem.id}
             );
-            console.log("add master item ",MasterItem);
-            MasterItem.nodeMethods['m501addApplicationSystems'].exec.call(
-               MasterItem
-            );
-            MasterItem.nodeMethods['m500addApplicationInterfaces'].exec.call(
-               MasterItem
-            );
-            app.processOpStack(function(opResults){
-               //console.log("opResults load of appl",opResults);
-               $(".spinner").hide();
-               app.networkFitRequest=true;
-            });
-        });
+            var div=document.createElement('div');
+            div.id = 'applOverview';
+            this.workspace.appendChild(div);
+            div.innerHTML="<div class=applOverviewHeader>Application: "+appletobj.MasterItem.name+"</div>";
+         },function(){
+            if (appletobj.MasterItem){
+               app.genenericLoadRecord("AL_TCom::appl","name,itemsummary",{id:dataobjid},function(rec){
+                  var r=rec[0];
+                  var div=document.createElement('div');
+                  div.id = 'applOverview';
+                  this.workspace.appendChild(div);
+                  div.innerHTML="<div style='height:200px;overflow:auto'><xmp>"+Dumper(r)+"</xmp></div>";
+               },function(){
+                  app.processOpStack(function(opResults){
+                     $(".spinner").hide();
+                  });
+               });
+            }
+            else{
+               app.processOpStack(function(opResults){
+                  $(".spinner").hide();
+               });
+            }
+         });
       }
       else{
          this.app.showDialog(function(){
@@ -162,7 +162,6 @@ define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
             appletobj.exit();
          });
       }
-      console.log("ok, class added");
    }
    return(ClassAppletLib[applet].class);
 });

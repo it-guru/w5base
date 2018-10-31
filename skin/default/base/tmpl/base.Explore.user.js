@@ -1,10 +1,9 @@
-(function(window, document, undefined) {
-   var applet='%SELFNAME%';
+var applet='%SELFNAME%';
+define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
    ClassAppletLib[applet].class=function(app){
       ClassApplet.call(this,app);
    };
    $.extend(ClassAppletLib[applet].class.prototype,ClassApplet.prototype);
-
 
    ClassAppletLib[applet].class.prototype.searchItems=function(dialog,flt){
       var appletobj=this;
@@ -51,8 +50,8 @@
    ClassAppletLib[applet].class.prototype.run=function(){
       var appletobj=this;
       var app=this.app;
-      this.app.node.clear();
-      this.app.edge.clear();
+
+      app.InitObjectStore();
       if (arguments.length){
          var dataobj=arguments[0][0];
          var dataobjid=arguments[0][1];
@@ -162,6 +161,5 @@
          });
       }
    };
-
-
-})(this,document);
+   return(ClassAppletLib[applet].class); 
+});
