@@ -187,6 +187,8 @@ sub Run
    my ($shortself)=$self=~m/^(.+)=/;
    my ($func,$p)=$self->extractFunctionPath();
 
+   $func=~s/\..*$//;  # prevent try to call methods with dot in Name (like .js calls from requirejs)
+
    if ($self->isFunctionValid($func)){
       if ($self->can("validateAnonymousAccess")){
          return(0) if (!$self->validateAnonymousAccess($func));
