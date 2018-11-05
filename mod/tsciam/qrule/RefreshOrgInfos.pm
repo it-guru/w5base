@@ -128,13 +128,18 @@ sub qcheckRecord
          }
          $curtousd=tsciam::ext::orgareaImport::preFixShortname(
                                                   $ciamrec->{shortname});
+         my $curfinename=$curtousd;
+         if ($curtousd eq ""){
+            $curfinename="tOuID_".$ciamrec->{toucid};
+         }
+
          if ($oldtousd ne "" && $oldtousd eq $rec->{name}){
-            if ($oldtousd ne $curtousd){
+            if ($oldtousd ne $curfinename){
                my $oldname=$rec->{fullname};
                my $basemsg="Try rename of Org '$oldname' needed - ".
-                           "based on CIAM new tOuSD '$curtousd'";
+                           "based on CIAM new tOuSD '$curfinename'";
                $dataobj->Log(WARN,"basedata",$basemsg);
-               if ($dataobj->ValidatedUpdateRecord($rec,{name=>$curtousd},
+               if ($dataobj->ValidatedUpdateRecord($rec,{name=>$curfinename},
                                                    {grpid=>\$rec->{grpid}})){
                   push(@qmsg,"all desired fields has been updated: name");
                   my $basemsg="Rename of Org '$oldname' done";
@@ -153,7 +158,7 @@ sub qcheckRecord
          my @i;
          #######################################################
          push(@i,["CIAM tOuCID:",$ciamrec->{toucid}]);
-         push(@i,["CIAM tOuSD: ",$ciamrec->{shortname}]);
+         push(@i,["CIAM tOuSD:",trim($ciamrec->{shortname})]);
          push(@i,["CIAM : ",$ciamrec->{urlofcurrentrec}]);
          #######################################################
          my $c=$rec->{comments};
@@ -190,12 +195,14 @@ sub qcheckRecord
               $newadditional{tOuSD}->[0] ne $ciamrec->{shortname}){
             $changed++;
             $newadditional{tOuSD}=$ciamrec->{shortname};
+            if (!defined($newadditional{tOuSD})){
+               $newadditional{tOuSD}="";
+            }
          }
          if ($changed){
             $forcedupd->{additional}=\%newadditional;
          }
       }
-
 
       #printf STDERR ("store last known tOuSD\n");
       #printf STDERR ("d=%s\n",Dumper($rec));
