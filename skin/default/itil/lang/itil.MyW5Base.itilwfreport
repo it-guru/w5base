@@ -7,6 +7,7 @@
 'createdate'=>{de=>'Erstellungszeitpunkt'},
 'workflow class'=>{de=>'Workflow Klasse'},
 'problem'=>{de=>'Problemmanagement'},
+'opmeasure'=>{de=>'Betriebsmaßnahme',en=>'Operations measure'},
 'change'=>{de=>'Changemanagement'},
 'incident'=>{de=>'Incidentmanagement'},
 'eventnotify'=>{de=>'Ereignismeldungen'},

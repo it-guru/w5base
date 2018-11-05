@@ -49,7 +49,8 @@ sub Init
                 label         =>'To');
    $self->{Field}->{to}->setParent($self);
 
-   $self->{Val}->{wfclass}=["",qw(problem change incident eventnotify)];
+   $self->{Val}->{wfclass}=["",qw(problem change incident eventnotify 
+                                  opmeasure)];
 
    $self->{Val}->{refto}=[qw(eventend eventstart createdate mdate closedate)];
 
