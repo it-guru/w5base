@@ -47,10 +47,6 @@ sub Init
                       "../../../public/base/load/tmpl/welcome.j5base.html",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("Tools.dev.selfhtml",
-                      "http://de.selfhtml.org/",
-                      defaultacl=>['valid_user']);
-   
    $self->RegisterObj("Tools.dev.cssforyou",
                       "http://www.css4you.de/",
                       defaultacl=>['valid_user']);
