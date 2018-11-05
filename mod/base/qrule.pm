@@ -717,14 +717,11 @@ sub translate_qmsg
    $res->{qmsg}=$control->{qmsg};
    if (ref($res->{qmsg}) eq "ARRAY"){
       for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
-printf STDERR ("fifi '$res->{qmsg}->[$c]'\n");
          if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s*(.*)$/){
-printf STDERR ("fifi 1 pr='$pr' po='$po'\n");
             $res->{qmsg}->[$c]=$self->T($pr,
                                          $qrulename).": ".$po;
          }
          else{
-printf STDERR ("fifi 2 \n");
             $res->{qmsg}->[$c]=$self->T($res->{qmsg}->[$c],
                                          $qrulename);
          }
