@@ -57,7 +57,7 @@ sub Init
 
    $self->RegisterObj("Tools.dev.texttranslation",
                       "base::TextTranslation",
-                      defaultacl=>['valid_user']);
+                      defaultacl=>['admin']);
    
    return($self);
 }
