@@ -18,7 +18,6 @@ package dev::menu::root;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -43,10 +42,6 @@ sub Init
                       "base::interface",
                       func=>'io',
                       defaultacl=>['admin']);
-   
-   $self->RegisterObj("Tools.dev.color",
-                      "tmpl/ColorTool",
-                      defaultacl=>['valid_user']);
    
    $self->RegisterObj("Tools.dev.yui",
                       "../../../static/yui/index.html",
