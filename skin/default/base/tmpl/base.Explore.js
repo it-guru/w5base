@@ -480,11 +480,21 @@ requirejs.config({
    baseUrl:"../../",
    paths: {
         app: '../app',
-        J5Base: '../auth/base/load/J5Base.js',
-        ellipsis: '../public/base/load/jquery.ellipsis.js',
+        J5Base: '../auth/base/load/J5Base',
+        'jquery.flot': '../auth/base/load/jquery.flot',
+        'jquery.flot.pie': '../auth/base/load/jquery.flot.pie',
+        ellipsis: '../public/base/load/jquery.ellipsis',
         datadumper: '../public/base/load/datadumper',
         visjs: '../public/base/load/vis.min'
-   }
+   },
+   shim: {
+        'jquery.flot': {
+               exports: '$.plot'
+        },
+        'jquery.flot.pie': {
+               deps: ['jquery.flot']
+        }
+   },
 });
 
 
@@ -588,6 +598,13 @@ var W5ExploreClass=function(){
    this.toObjKey=function(dataobj,id){
       return(dataobj+'::'+id);
    };
+   this.loadCss=function (url) {
+      var link = document.createElement("link");
+      link.type = "text/css";
+      link.rel = "stylesheet";
+      link.href = "../../../"+url;
+      document.getElementsByTagName("head")[0].appendChild(link);
+   }
    this.ResizeLayout=function(level2){
       if (!level2){
          var app=this;

@@ -1744,7 +1744,7 @@ sub ItemSummary
    return(0) if (!$o->Ping());
 
    my $ids=$self->getRelatedWorkflows($current->{id},
-             {timerange=>">01.10.2013"});
+             {timerange=>">now-56d"});  # 8 Wochen
    $summary->{workflow}=[values(%$ids)];
    return(0) if (!$self->Ping());
 

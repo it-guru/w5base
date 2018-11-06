@@ -1,6 +1,6 @@
 var applet='%SELFNAME%';
 
-define(["datadumper"],function (Dumper){
+define(["datadumper","jquery.flot","jquery.flot.pie"],function (Dumper){
    ClassAppletLib[applet].class=function(app){
       ClassApplet.call(this,app);
    };
@@ -8,6 +8,142 @@ define(["datadumper"],function (Dumper){
 
    ClassAppletLib[applet].class.prototype.searchFilter='';
    ClassAppletLib[applet].class.prototype.searchResult='';
+
+   ClassAppletLib[applet].class.prototype.showSummary=function(out,id,isum){
+      var d={};
+      //data generation for dataquality
+      var dataquality={
+         ok:0,
+         fail:0,
+         total:0
+      };
+      for(c=0;c<isum.dataquality.record.length;c++){
+         dataquality.total+=1;
+         if (isum.dataquality.record[c].dataissuestate=="OK"){
+            dataquality.ok++;
+         }
+         else{
+            dataquality.fail++;
+         }
+      }
+      d.dataquality=[
+         {
+            label:"Issue free = "+dataquality.ok,
+            data:dataquality.ok,
+            color:"green"
+         },
+         {
+            label:"DataIssue fail = "+dataquality.fail,
+            data:dataquality.fail,
+            color:"red"
+         }
+      ];
+
+      var hardware={
+         ok:0,
+         fail:0,
+         total:0
+      };
+      for(c=0;c<isum.hardware.record.length;c++){
+         console.log(isum.hardware.record[c]);
+         hardware.total+=1;
+         if (isum.hardware.record[c].assetrefreshstate=="OK"){
+            hardware.ok++;
+         }
+         else{
+            hardware.fail++;
+         }
+      }
+      d.hardware=[
+         {
+            label:"Hardware OK = "+hardware.ok,
+            data:hardware.ok,
+            color:"green"
+         },
+         {
+            label:"HardwareRefresh fail = "+hardware.fail,
+            data:hardware.fail,
+            color:"red"
+         }
+      ];
+
+
+      var system={
+         ok:0,
+         fail:0,
+         total:0
+      };
+      for(c=0;c<isum.system.record.length;c++){
+         console.log(isum.system.record[c]);
+         system.total+=1;
+         if (isum.system.record[c].osanalysestate=="OK"){
+            system.ok++;
+         }
+         else{
+            system.fail++;
+         }
+      }
+      d.system=[
+         {
+            label:"OperationSystem OK = "+system.ok,
+            data:system.ok,
+            color:"green"
+         },
+         {
+            label:"OperationSystem fail = "+system.fail,
+            data:system.fail,
+            color:"red"
+         }
+      ];
+
+
+      var software={
+         ok:0,
+         fail:0,
+         total:0
+      };
+      for(c=0;c<isum.software.record[0].i.length;c++){
+         software.total+=1;
+         if (isum.software.record[0].i[c].osanalysestate=="OK"){
+            software.ok++;
+         }
+         else{
+            software.fail++;
+         }
+      }
+      d.software=[
+         {
+            label:"Software OK = "+software.ok,
+            data:software.ok,
+            color:"green"
+         },
+         {
+            label:"Software fail = "+software.fail,
+            data:software.fail,
+            color:"red"
+         }
+      ];
+
+
+
+      //visualisation
+      $(out).html("");
+      for (var chartname in d){
+         $(out).append("<div id='"+chartname+"_' "+
+                           "style='border-style:solid;border-color:gray;width:300px;height:130px;margin:2px;float:left;' />");
+         $("#"+chartname+"_").append("<div align=center><p>"+chartname+"</p></div>");
+         $("#"+chartname+"_").append("<div id='"+chartname+"' style=\"margin-bottom:2px;height:80px\" />");
+         var placeholder=$("#"+chartname);
+         $.plot(placeholder,d[chartname],{
+            series:{
+               pie:{
+                  radius:0.8,
+                  show:true
+               }
+            }
+         });
+      }
+   };
 
    ClassAppletLib[applet].class.prototype.setSearchResult=function(dialog,res){
       var appletobj=this;
@@ -71,6 +207,7 @@ define(["datadumper"],function (Dumper){
             { label:"loading ...", mtag:dataobj+"/"+dataobjid }
          );
          this.MasterItem=undefined;
+         this.app.workspace.innerHTML="";
          app.genenericLoadRecord(dataobj,"name,tsm,opm,id",{id:dataobjid},function(rec){
             console.log("ok rec=",rec);
             appletobj.MasterItem=rec[0]; 
@@ -83,15 +220,26 @@ define(["datadumper"],function (Dumper){
             var div=document.createElement('div');
             div.id = 'applOverview';
             this.workspace.appendChild(div);
-            div.innerHTML="<div class=applOverviewHeader>Application: "+appletobj.MasterItem.name+"</div>";
+            app.loadCss("public/AL_TCom/load/AL_TCom.Explore.applOverview.css");
+            div.innerHTML="<div class=applOverviewHeader>Application: "+
+                           appletobj.MasterItem.name+
+                           "</div>"+
+                          "<div id=analysedData data-id='"+appletobj.MasterItem.id+"'>"+
+                          "<div class=analyseLoader>"+
+                          'Analysing itemsummary...<br><img src="../../base/load/ajaxloader.gif">'+
+                          "</div>"+
+                          "</div>";
          },function(){
+            $(".spinner").hide();
             if (appletobj.MasterItem){
-               app.genenericLoadRecord("AL_TCom::appl","name,itemsummary",{id:dataobjid},function(rec){
+               app.genenericLoadRecord("AL_TCom::appl","name,id,itemsummary",{id:dataobjid},function(rec){
                   var r=rec[0];
-                  var div=document.createElement('div');
-                  div.id = 'applOverview';
-                  this.workspace.appendChild(div);
-                  div.innerHTML="<div style='height:200px;overflow:auto'><xmp>"+Dumper(r)+"</xmp></div>";
+                  var out=$(this.workspace).find("[data-id=\""+r.id+"\"]").first();
+                  $(out).css("height","100");
+                  $(out).html(
+                     "<div style='height:200px;overflow:auto'><xmp>"+Dumper(r)+"</xmp></div>"
+                  );
+                  appletobj.showSummary(out,r.id,r.itemsummary.xmlroot);
                },function(){
                   app.processOpStack(function(opResults){
                      $(".spinner").hide();

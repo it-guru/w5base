@@ -1,0 +1,11 @@
+div#applOverview{
+   margin:10px;
+}
+div.applOverviewHeader{
+   color: black;
+   font-weight: bold;
+   font-size: 20px;
+}
+div.analyseLoader{
+   text-align:center;
+}
