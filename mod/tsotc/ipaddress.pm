@@ -1,4 +1,4 @@
-package tsotc::domain;
+package tsotc::ipaddress;
 #  W5Base Framework
 #  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
@@ -33,27 +33,26 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
-                sqlorder      =>'desc',
-                label         =>'OTC-DomainID',
-                dataobjattr   =>"domain_uuid"),
+                label         =>'OTC-IPAddressID',
+                sqlorder      =>'none',
+                dataobjattr   =>"'0'"),
+
+      new kernel::Field::Link(
+                name          =>'systemid',
+                label         =>'OTC-SystemID',
+                sqlorder      =>'none',
+                dataobjattr   =>"'1'"),
 
       new kernel::Field::Text(
                 name          =>'name',
-                sqlorder      =>'desc',
-                label         =>'Name',
-                dataobjattr   =>"tenant"),
-
-      new kernel::Field::SubList(
-                name          =>'projects',
-                label         =>'Projects',
-                group         =>'projects',
-                vjointo       =>\'tsotc::project',
-                vjoinon       =>['id'=>'domainid'],
-                vjoindisp     =>['name']),
+                label         =>'IP-Address',
+                sqlorder      =>'none',
+                dataobjattr   =>"'no IP informations'"),
 
    );
    $self->setDefaultView(qw(name id ));
-   $self->setWorktable("otc4darwin_projects_vw");
+   $self->setWorktable("otc4darwin_server_ips_vw");
+   $self->setWorktable("");
    return($self);
 }
 

@@ -1,0 +1,6 @@
+'tsotc::lnkprojectsystem'=>{
+ de=>'OTC Integrated: Verknüpfung Projekt-System',
+ en=>'OTC Integrated: Relation Project-System'
+},
+'Projectname'=>{de=>'Projekt-Name'},
+'Description'=>{de=>'Beschreibung'},

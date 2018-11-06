@@ -1,0 +1,11 @@
+'tsotc::system'=>{
+ de=>'OTC Integrated: System',
+ en=>'OTC Integrated: System'
+},
+'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'fieldgroup.iaascontacts'=>{de=>'IaaS Kontakte',en=>'IaaS Contacts'},
+'fieldgroup.iaccontacts'=>{de=>'IaC Kontakte',en=>'IaC Contacts'},
+'CPU-Count'=>{de=>'CPU-Anzahl'},
+'Memory'=>{de=>'Arbeitsspeicher'},
+'Project'=>{de=>'Project'},
+'Description'=>{de=>'Beschreibung'},

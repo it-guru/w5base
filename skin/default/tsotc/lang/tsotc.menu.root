@@ -1,3 +1,9 @@
 'itu.tsotc'=>{de=>'OTC Integrated',en=>'OTC Integrated'},
 'itu.tsotc.domain'=>{de=>'Domain',en=>'Domain'},
+'itu.tsotc.project'=>{de=>'Projekt',en=>'Project'},
+'itu.tsotc.project.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},
+'itu.tsotc.system'=>{de=>'System',en=>'System'},
+'itu.tsotc.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
+'itu.tsotc.system.lnkiaascontact'=>{de=>'Verkn. IaaS Kontakt',en=>'Link IaaS Contact'},
+'itu.tsotc.system.lnkiaccontact'=>{de=>'Verkn. IaC Kontakt',en=>'Link IaC Contact'},
 

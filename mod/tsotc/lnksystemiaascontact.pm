@@ -1,4 +1,4 @@
-package tsotc::domain;
+package tsotc::lnksystemiaascontact;
 #  W5Base Framework
 #  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
@@ -33,27 +33,30 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
-                sqlorder      =>'desc',
-                label         =>'OTC-DomainID',
-                dataobjattr   =>"domain_uuid"),
+                label         =>'LinkID',
+                dataobjattr   =>"concat(server_uuid,asp)"),
 
       new kernel::Field::Text(
-                name          =>'name',
-                sqlorder      =>'desc',
-                label         =>'Name',
-                dataobjattr   =>"tenant"),
+                name          =>'systemid',
+                label         =>'OTC-SystemID',
+                dataobjattr   =>"server_uuid"),
 
-      new kernel::Field::SubList(
-                name          =>'projects',
-                label         =>'Projects',
-                group         =>'projects',
-                vjointo       =>\'tsotc::project',
-                vjoinon       =>['id'=>'domainid'],
-                vjoindisp     =>['name']),
+      new kernel::Field::Email(
+                name          =>'contact',
+                label         =>'Contact E-Mail',
+                htmlwidth     =>'220px',
+                dataobjattr   =>"lower(asp)"),
+
+      new kernel::Field::TextDrop(
+                name          =>'w5contact',
+                label         =>'W5Base Contact',
+                vjointo       =>\'base::user',
+                vjoinon       =>['contact'=>'emails'],
+                vjoindisp     =>'fullname'),
 
    );
-   $self->setDefaultView(qw(name id ));
-   $self->setWorktable("otc4darwin_projects_vw");
+   $self->setDefaultView(qw(systemid contact));
+   $self->setWorktable("otc4darwin_ias_srv_metadata_vw");
    return($self);
 }
 

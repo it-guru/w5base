@@ -41,6 +41,35 @@ sub Init
    $self->RegisterObj("itu.tsotc.domain",
                       "tsotc::domain",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsotc.project",
+                      "tsotc::project",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsotc.project.lnksystem",
+                      "tsotc::lnkprojectsystem",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsotc.system",
+                      "tsotc::system",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsotc.system.ipaddress",
+                      "tsotc::ipaddress",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsotc.system.ipaddress",
+                      "tsotc::ipaddress",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsotc.system.lnkiaascontact",
+                      "tsotc::lnksystemiaascontact",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsotc.system.lnkiaccontact",
+                      "tsotc::lnksystemiaccontact",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

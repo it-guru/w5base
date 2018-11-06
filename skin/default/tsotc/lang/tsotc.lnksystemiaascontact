@@ -1,0 +1,12 @@
+'tsotc::lnksystemiaascontact'=>{
+ de=>'OTC Integrated: Verknüpfung IaaS Kontakt',
+ en=>'OTC Integrated: Relation IaaS Contact'
+},
+'Contact E-Mail'=>{de=>'Kontakt-EMail'},
+'W5Base Contact'=>{de=>'W5Base Kontakt'},
+'Description'=>{de=>'Beschreibung'},
+'WELCOME'=>{de=>'
+Infrastructure-as-a-Service (IaaS) ist ein Service des Cloud-Computing für die bedarfsabhängige Bereitstellung virtueller Infrastruktur-Komponenten durch einen IT-Dienstleister, einem Cloud-Provider.
+',en=>'
+Infrastructure-as-a-Service (IaaS) is a cloud computing service for the on-demand provision of virtual infrastructure components by an IT service provider, a cloud provider.
+'},

@@ -1,4 +1,4 @@
-package tsotc::domain;
+package tsotc::project;
 #  W5Base Framework
 #  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
@@ -34,22 +34,50 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
-                label         =>'OTC-DomainID',
+                group         =>'source',
+                label         =>'OTC-ProjectID',
+                dataobjattr   =>"project_uuid"),
+
+      new kernel::Field::Link(
+                name          =>'domainid',
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'DomainID',
                 dataobjattr   =>"domain_uuid"),
 
       new kernel::Field::Text(
                 name          =>'name',
                 sqlorder      =>'desc',
                 label         =>'Name',
+                dataobjattr   =>"project_name"),
+
+      new kernel::Field::Text(
+                name          =>'domain',
+                sqlorder      =>'desc',
+                label         =>'Domain',
+                weblinkto     =>\'tsotc::domain',
+                weblinkon     =>['domainid'=>'id'],
                 dataobjattr   =>"tenant"),
 
       new kernel::Field::SubList(
-                name          =>'projects',
-                label         =>'Projects',
-                group         =>'projects',
-                vjointo       =>\'tsotc::project',
-                vjoinon       =>['id'=>'domainid'],
-                vjoindisp     =>['name']),
+                name          =>'systems',
+                label         =>'Systems',
+                group         =>'systems',
+                vjointo       =>\'tsotc::lnkprojectsystem',
+                vjoinon       =>['id'=>'projectid'],
+                vjoindisp     =>['systemname','state']),
+
+      new kernel::Field::Date(
+                name          =>'lastmondate',
+                group         =>'source',
+                timezone      =>'CET',
+                label         =>'last monitoring date',
+                dataobjattr   =>"last_monitoring_date"),
+
+#      new kernel::Field::Text(
+#                name          =>'description',
+#                label         =>'Description',
+#                dataobjattr   =>"tenant_description"),
 
    );
    $self->setDefaultView(qw(name id ));
@@ -72,15 +100,15 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","source");
+   return("header","default","systems","source");
 }
 
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/base/load/location.jpg?".$cgi->query_string());
-#}
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
+}
 
 #sub initSearchQuery
 #{

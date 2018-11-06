@@ -1,4 +1,4 @@
-package tsotc::domain;
+package tsotc::lnkprojectsystem;
 #  W5Base Framework
 #  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
@@ -34,28 +34,64 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
-                label         =>'OTC-DomainID',
-                dataobjattr   =>"domain_uuid"),
+                label         =>'LinkID',
+                dataobjattr   =>"server_uuid"),
 
       new kernel::Field::Text(
-                name          =>'name',
+                name          =>'systemid',
                 sqlorder      =>'desc',
-                label         =>'Name',
-                dataobjattr   =>"tenant"),
+                label         =>'OTC-SystemID',
+                dataobjattr   =>"server_uuid"),
 
-      new kernel::Field::SubList(
-                name          =>'projects',
-                label         =>'Projects',
-                group         =>'projects',
-                vjointo       =>\'tsotc::project',
-                vjoinon       =>['id'=>'domainid'],
-                vjoindisp     =>['name']),
+      new kernel::Field::Text(
+                name          =>'systemname',
+                sqlorder      =>'desc',
+                label         =>'Systemname',
+                htmlwidth     =>'220px',
+                weblinkto     =>\'tsotc::system',
+                weblinkon     =>['systemid'=>'id'],
+                dataobjattr   =>"server_name"),
+
+      new kernel::Field::Text(
+                name          =>'state',
+                sqlorder      =>'desc',
+                label         =>'System State',
+                dataobjattr   =>"vm_state"),
+
+      new kernel::Field::Text(
+                name          =>'projectid',
+                sqlorder      =>'desc',
+                label         =>'OTC-ProjectID',
+                dataobjattr   =>"otc4darwin_server_vw.project_uuid"),
+
+      new kernel::Field::Text(
+                name          =>'projectname',
+                sqlorder      =>'desc',
+                label         =>'Projectname',
+                weblinkto     =>\'tsotc::project',
+                weblinkon     =>['projectid'=>'id'],
+                dataobjattr   =>"project_name"),
 
    );
-   $self->setDefaultView(qw(name id ));
-   $self->setWorktable("otc4darwin_projects_vw");
+   $self->setDefaultView(qw(id systemid systemname projectid projectname));
+   $self->setWorktable("otc4darwin_server_vw");
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable join otc4darwin_projects_vw ".
+            "on $worktable.project_uuid=otc4darwin_projects_vw.project_uuid";
+
+   return($from);
+}
+
 
 sub Initialize
 {
