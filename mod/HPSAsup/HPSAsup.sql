@@ -13,6 +13,7 @@ select distinct "itil::system".id                 id,
                 "itil::system".name               systemname, 
                 "itil::system".systemid           systemid,
                 "itil::system".osclass            osclass,
+                "itil::appl".customerprio         applcustomerprio,
                 decode("W5I_HPSAsup__system_of".dscope,null,'IN',
                        "W5I_HPSAsup__system_of".dscope)  dscope,
                 decode("W5I_HPSA_system".systemid,null,0,1)  hpsafnd,
@@ -100,6 +101,7 @@ select distinct "itil::system".id                 id,
                 "itil::system".name               systemname, 
                 "itil::system".systemid           systemid,
                 "itil::system".osclass            osclass,
+                "itil::appl".customerprio         applcustomerprio,
                 decode("W5I_HPSAsup__system_of".dscope,null,'IN',
                        "W5I_HPSAsup__system_of".dscope)  dscope,
                 decode("W5I_HPSA_system".systemid,null,0,1)  hpsafnd,
@@ -168,7 +170,98 @@ where
     and ("tsacinv::system".status not like 'hibernate' or 
          "tsacinv::system".status is null)
        -- Ausschluss von Mainframe
-    and "itil::system".osclass not like 'MAINFRAME';
+    and "itil::system".osclass not like 'MAINFRAME'
+
+union all
+            
+select distinct "itil::system".id                 id,
+                "itil::system".name               systemname, 
+                "itil::system".systemid           systemid,
+                "itil::system".osclass            osclass,
+                min("itil::appl".customerprio)    applcustomerprio,
+                decode("W5I_HPSAsup__system_of".dscope,null,'IN',
+                       "W5I_HPSAsup__system_of".dscope)  dscope,
+                decode("W5I_HPSA_system".systemid,null,0,1)  hpsafnd,
+                decode("W5I_HPSA_lnkswp".server_id,null,0,1) scannerfnd,
+                "W5I_HPSAsup__system_of".systemid of_id,
+                "W5I_HPSAsup__system_of".comments,
+                "W5I_HPSAsup__system_of".chm,
+                '11/2018-'                  scopemode,
+                "W5I_HPSAsup__system_of".modifyuser,
+                "W5I_HPSAsup__system_of".modifydate
+       
+from "itil::appl"
+ left outer join "base::grp" bteam   
+   on "itil::appl".businessteamid=bteam.grpid
+ join "W5I_ALL_itil::lnkapplsystem"  
+   on "itil::appl".id="W5I_ALL_itil::lnkapplsystem".appl
+ join "itil::system"                 
+   on "W5I_ALL_itil::lnkapplsystem".system="itil::system".id
+ left outer join "tsacinv::system"              
+   on "itil::system".systemid="tsacinv::system".systemid
+ left outer join "W5I_HPSAsup__system_of"
+    on "itil::system".systemid="W5I_HPSAsup__system_of".systemid
+ left outer join "W5I_HPSA_system" 
+    on "itil::system".systemid="W5I_HPSA_system".systemid
+ left outer join "W5I_HPSA_lnkswp" 
+    on "W5I_HPSA_system".server_id="W5I_HPSA_lnkswp".server_id 
+       and ("W5I_HPSA_lnkswp".swclass='HPSA_MW_Scanner_WIN [14356670830001]'
+         or "W5I_HPSA_lnkswp".swclass='HPSA_MW_Scanner [14224372530001]')
+where 
+        -- nur installiert/aktive Anwendungen
+       "itil::appl".cistatusid=4 
+       -- nur installiert/aktive Systeme
+    and "itil::system".cistatusid in (3,4)
+       -- nur Anwendungen der TelekomIT Mandaten
+    and "itil::appl".mandator like 'TelekomIT%'
+       -- nur Anwendungen mit der Prio 1
+    and "itil::appl".customerprio in (1,2)
+       -- nicht Anwendungen im Mandaten "Extern"
+    and "itil::appl".mandator     not like 'Extern'    
+       -- nicht Anwendungen mit Betriebsteam "Extern"
+    and bteam.fullname     not like 'Extern'               
+       -- keine Systeme am Standort Kiel
+    and (   "itil::system".location not like 'DE.Kiel.Kronshagener_Weg_107.%' 
+         or "itil::system".location not like 'DE.Kiel.Kronshagener_Weg_107'
+         or "itil::system".location is null )
+       -- nur Systeme mit Betriebsart=Prod
+    and "itil::system".isprod=1                   
+       -- keine Systeme mit Systemklassifizierung=Infrastrutkur
+    and "itil::system".isinfrastruct=0
+       -- keine Systeme mit Systemklassifizierung=Backupserver
+    and "itil::system".isbackupsrv=0
+       -- keine Systeme mit Systemklassifizierung=Printer/Printserver
+    and "itil::system".isprinter=0
+       -- keine Systeme mit Systemklassifizierung=Switch / Networkswitch
+    and "itil::system".isnetswitch=0
+       -- keine Systeme mit Systemklassifizierung=Router
+    and "itil::system".isrouter=0
+       -- Embedded Systeme ausklammern (da Scanner nicht möglich)
+    and "itil::system".isembedded=0
+       -- Loadbalancer Systeme ausklammern (da Scanner nicht möglich)
+    and "itil::system".isloadbalacer=0
+       -- Systeme die in AssetManager als ESXI Markiert sind ausklammern
+    and ("tsacinv::system".systemos not like 'VMWARE ESXI%' or
+         "tsacinv::system".systemos is null)
+       -- MU Status "hibernate" ausklammern
+    and ("tsacinv::system".status not like 'hibernate' or 
+         "tsacinv::system".status is null)
+       -- Ausschluss von Mainframe
+    and "itil::system".osclass not like 'MAINFRAME'
+group by "itil::system".id,
+         "itil::system".name,
+         "itil::system".systemid,
+         "itil::system".osclass,
+          decode("W5I_HPSAsup__system_of".dscope,null,'IN',
+                 "W5I_HPSAsup__system_of".dscope),
+          decode("W5I_HPSA_system".systemid,null,0,1),
+          decode("W5I_HPSA_lnkswp".server_id,null,0,1),
+          "W5I_HPSAsup__system_of".systemid,
+          "W5I_HPSAsup__system_of".comments,
+          "W5I_HPSAsup__system_of".chm,
+          '11/2018-',
+          "W5I_HPSAsup__system_of".modifyuser,
+          "W5I_HPSAsup__system_of".modifydate;      
 
 grant select on "W5I_HPSAsup__system" to W5I;
 grant select,update,insert on "W5I_HPSAsup__system_of" to W5I;

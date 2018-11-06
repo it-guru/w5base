@@ -121,12 +121,19 @@ sub new
                 group         =>'source',
                 selectsearch  =>sub{
                    my $self=shift;
-                   my @l=("2017-","-2016");
+                   my @l=("11/2018-","2017-","-2016");
                    return(@l);
                 },
 
                 label         =>'Scope-Mode',
                 dataobjattr   =>'scopemode'),
+
+     new kernel::Field::Text(
+                name          =>'applcustomerprio',
+                searchable    =>1,
+                htmldetail    =>0,
+                label         =>'lowest application customerprio',
+                dataobjattr   =>'applcustomerprio'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
@@ -237,6 +244,9 @@ sub initSearchQuery
    if (!defined(Query->Param("search_dscope"))){
      Query->Param("search_dscope"=>"IN");
    }
+   if (!defined(Query->Param("search_applcustomerprio"))){
+     Query->Param("search_applcustomerprio"=>"1");
+   }
 }
 
 
@@ -247,7 +257,7 @@ sub SetFilter
 
    if ($self->isDirectFilter(@flt)){
       if (!exists($flt[0]->{scopemode})){
-         $flt[0]->{scopemode}=\"2017-";
+         $flt[0]->{scopemode}=\"11/2018-";
       }
    }
    return($self->SUPER::SetFilter(@flt));
