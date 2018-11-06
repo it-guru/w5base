@@ -413,6 +413,9 @@ sub getBackendName
          /^db2$/i and do {
             return("$self->{dataobjattr}");
          };
+         /^pg$/i and do {
+            return("$self->{dataobjattr}");
+         };
          do {
             msg(ERROR,"conversion for date on driver '$_' not defined ToDo!");
             return(undef);
