@@ -451,13 +451,21 @@ sub getSqlSelect
    my $limitnum=$self->{_Limit};
    my $drivername=defined($self->{DB}) ? $self->{DB}->DriverName():undef;
    my @cmd;
-   return(undef) if ($#from==-1 || $from[0] eq "");
+   #return(undef) if ($#from==-1 || $from[0] eq "");
    foreach my $from (@from){
       my $cmd="select "; 
       #if ($limitnum>0){  # not good - it reduces performance in some cases!
       #   $cmd.=" /*+ FIRST_ROWS(".($limitnum).") */ ";
       #}
-      $cmd.=$distinct.join(",",@fields)." from $from";
+      $cmd.=$distinct.join(",",@fields);
+      if ($from ne ""){
+         $cmd.=" from $from";
+      }
+      else{
+         if ($drivername eq "oracle"){
+            $cmd.=" from dual";
+         }
+      }
       $cmd.=" where ".$where if ($where ne "");
       $cmd.=" group by ".$group if ($group ne "");
       $cmd.=" order by ".$order if ($order ne "");
