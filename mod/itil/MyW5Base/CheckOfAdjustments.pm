@@ -46,17 +46,17 @@ sub Init
    $self->{DataObj}=getModuleObject($self->getParent->Config,"base::workflow");
    $self->{appl}=getModuleObject($self->getParent->Config,"itil::appl");
 
-   $self->{Field}->{from}=new kernel::Field::Date(
+   $self->{Field}->{trangefrom}=new kernel::Field::Date(
                 Parent        =>$self,
-                name          =>'from',
+                name          =>'trangefrom',
                 label         =>'From');
-   $self->{Field}->{from}->setParent($self);
+   $self->{Field}->{trangefrom}->setParent($self);
 
-   $self->{Field}->{to}=new kernel::Field::Date(
+   $self->{Field}->{trangeto}=new kernel::Field::Date(
                 Parent        =>$self, 
-                name          =>'to',
+                name          =>'trangeto',
                 label         =>'To');
-   $self->{Field}->{to}->setParent($self);
+   $self->{Field}->{trangeto}->setParent($self);
 
    $self->{Val}->{ifcheck}=["none","moderat","full","excessive"];
 
@@ -108,11 +108,11 @@ sub getQueryTemplate
    my $dataobj=$self->getDataObj();
 
 
-   if (!defined(Query->Param("search_from"))){
-      Query->Param("search_from"=>$self->T("now")."-24h");
+   if (!defined(Query->Param("search_trangefrom"))){
+      Query->Param("search_trangefrom"=>$self->T("now")."-24h");
    }
-   if (!defined(Query->Param("search_to"))){
-      Query->Param("search_to"=>"start+1d");
+   if (!defined(Query->Param("search_trangeto"))){
+      Query->Param("search_trangeto"=>"start+1d");
    }
 
 
@@ -147,11 +147,11 @@ sub getQueryTemplate
    $showallsel="checked" if (Query->Param("SHOWALL"));
 
    
-   my $froml=$self->{Field}->{from}->Label;
-   my $froms=$self->{Field}->{from}->FormatedSearch();
+   my $froml=$self->{Field}->{trangefrom}->Label;
+   my $froms=$self->{Field}->{trangefrom}->FormatedSearch();
 
-   my $tol=$self->{Field}->{to}->Label;
-   my $tos=$self->{Field}->{to}->FormatedSearch();
+   my $tol=$self->{Field}->{trangeto}->Label;
+   my $tos=$self->{Field}->{trangeto}->FormatedSearch();
 
 
    my $d=<<EOF;
@@ -202,14 +202,14 @@ sub SetFilter
    my $flt=shift;
 
 
-   my $from=$flt->{from}; 
-   my $to=$flt->{to}; 
+   my $from=$flt->{trangefrom}; 
+   my $to=$flt->{trangeto}; 
 
    my $keywords=$flt->{name};
 
    delete ($flt->{duration});
-   delete ($flt->{to});
-   delete ($flt->{from});
+   delete ($flt->{trangeto});
+   delete ($flt->{trangefrom});
    delete ($flt->{name});
 
    my $t;
@@ -504,23 +504,27 @@ sub Result
    my $self=shift;
    my %q=$self->getDataObj()->getSearchHash();
 
-   if ($q{from}=~m/(^|[^a-z])end([^a-z]|$)/i){
-      $q{from}=~s/(^|[^a-z])end([^a-z]|$)/$1$q{to}$2/gi;
+   if ($q{trangefrom}=~m/(^|[^a-z])end([^a-z]|$)/i){
+      $q{trangefrom}=~s/(^|[^a-z])end([^a-z]|$)/$1$q{trangeto}$2/gi;
    }
-   if ($q{to}=~m/(^|[^a-z])start([^a-z]|$)/i){
-      $q{to}=~s/(^|[^a-z])start([^a-z]|$)/$1$q{from}$2/gi;
+   if ($q{trangeto}=~m/(^|[^a-z])start([^a-z]|$)/i){
+      $q{trangeto}=~s/(^|[^a-z])start([^a-z]|$)/$1$q{trangefrom}$2/gi;
    }
 
    my ($from,$to);
 
-   return(undef) if (!(my $f=$self->{Field}->{from}->Unformat($q{from})));
-   $from=$f->{from};
+   if (!(my $f=$self->{Field}->{trangefrom}->Unformat($q{trangefrom}))){
+      return(undef);
+   }
+   $from=$f->{trangefrom};
 
-   return(undef) if (!(my $f=$self->{Field}->{to}->Unformat($q{to})));
-   $to=$f->{to};
+   if (!(my $f=$self->{Field}->{trangeto}->Unformat($q{trangeto}))){
+      return(undef);
+   }
+   $to=$f->{trangeto};
 
-   $q{to}=$to;
-   $q{from}=$from;
+   $q{trangeto}=$to;
+   $q{trangefrom}=$from;
    my ($fromday)=$from=~m/^(\S+)/;
    my ($today)=$to=~m/^(\S+)/;
 
