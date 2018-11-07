@@ -98,7 +98,10 @@ sub new
                 getPostibleValues=>sub{
                    my $self=shift;
                    my $current=shift;
-                   return($self->getParent->getPosibleInstanceTypes($current->{posibleinstanceidentify}));
+                   return($self->getParent->getPosibleInstanceTypes(
+                             $current->{posibleinstanceidentify}
+                          )
+                   );
                 },
                 dataobjattr   =>'swinstance.swnature'),
      
@@ -114,6 +117,7 @@ sub new
                 htmlwidth  =>'150px',
                 label      =>'Application',
                 vjointo    =>'itil::appl',
+                vjoineditbase =>{cistatusid=>">1 AND <6"},
                 vjoinon    =>['applid'=>'id'],
                 vjoindisp  =>'name'),
 
@@ -226,7 +230,7 @@ sub new
                 group         =>'systems',
                 explore       =>500,
                 vjointo       =>'itil::system',
-                vjoineditbase =>{'cistatusid'=>[2,3,4],isembedded=>\'0'},
+                vjoineditbase =>{'cistatusid'=>[2,3,4]},
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 
@@ -486,6 +490,14 @@ sub new
                 label         =>'run on Cluster Service',
                 group         =>'env',
                 dataobjattr   =>'swinstance.runonclusts'),
+
+      new kernel::Field::Boolean(
+                name          =>'isembedded',
+                selectfix     =>1,
+                htmldetail    =>0,
+                label         =>'is embedded instance',
+                group         =>'env',
+                dataobjattr   =>'system.is_embedded'),
 
       new kernel::Field::Text(
                 name          =>'autoname',
@@ -920,6 +932,8 @@ sub getSqlFrom
           "left outer join appl on $worktable.appl=appl.id ".
           "left outer join lnksoftwaresystem ".
           "on swinstance.lnksoftwaresystem=lnksoftwaresystem.id ".
+          "left outer join system ".
+          "on swinstance.system=system.id ".
           "left outer join software ".
           "on lnksoftwaresystem.software=software.id ".
           "left outer join producer ".
@@ -1209,7 +1223,8 @@ sub Validate
       $newrec->{ssl_cert_issuerdn}=undef;
       $newrec->{sslcheck}=undef;
    }
-   if (effChanged($oldrec,$newrec,"systemid") &&  # reset software inst
+   if ((effChanged($oldrec,$newrec,"systemid") ||
+        effChanged($oldrec,$newrec,"itclustsid")) &&  # reset software inst
        !exists($newrec->{lnksoftwaresystemid})){
       $newrec->{lnksoftwaresystemid}=undef;
    }
@@ -1264,6 +1279,9 @@ sub isViewValid
    }
    else{
       push(@all,"systems");
+   }
+   if ($rec->{isembedded}){
+      @all=grep(!/^softwareinst$/,@all);
    }
    #if ($self->IsMemberOf("admin")){
    #   push(@all,"qc");

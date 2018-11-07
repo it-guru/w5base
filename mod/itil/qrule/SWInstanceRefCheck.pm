@@ -77,9 +77,9 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(0,undef) if ($rec->{'cistatusid'}!=4 && 
-                       $rec->{'cistatusid'}!=5 &&
-                       $rec->{'cistatusid'}!=3);
+   return(undef,undef) if ($rec->{'cistatusid'}!=4 && 
+                           $rec->{'cistatusid'}!=5 &&
+                           $rec->{'cistatusid'}!=3);
    if ($rec->{applid} ne ""){
       my @msg;
       my $appl=getModuleObject($self->getParent->Config,"itil::appl");
@@ -138,28 +138,31 @@ sub qcheckRecord
                }
             }
          }
-         if ($swinstvalid){ # detail check of software-Installation
-            my $swi=getModuleObject($self->getParent->Config,
-                                    "itil::lnksoftware");
-            $swi->SetFilter({id=>\$rec->{lnksoftwaresystemid}});
-            my ($swirec,$msg)=$swi->getOnlyFirst(qw(id systemid itclustsvcid));
-            if (!defined($swirec)){
-               $swinstvalid=0
-            }
-            else{
-               # detail check of found software installation
-               # printf STDERR ("swirec=%s\n",Dumper($swirec));
-               if (defined($rec->{systemid}) &&
-                   $swirec->{systemid} ne $rec->{systemid}){
-                  push(@msg,
+         if (!$rec->{isembedded}){
+            if ($swinstvalid){ # detail check of software-Installation
+               my $swi=getModuleObject($self->getParent->Config,
+                                       "itil::lnksoftware");
+               $swi->SetFilter({id=>\$rec->{lnksoftwaresystemid}});
+               my ($swirec,$msg)=$swi->getOnlyFirst(qw(id systemid 
+                                                       itclustsvcid));
+               if (!defined($swirec)){
+                  $swinstvalid=0
+               }
+               else{
+                  # detail check of found software installation
+                  # printf STDERR ("swirec=%s\n",Dumper($swirec));
+                  if (defined($rec->{systemid}) &&
+                      $swirec->{systemid} ne $rec->{systemid}){
+                     push(@msg,
                        "software installation no longer belongs to the system");
+                  }
                }
             }
-         }
-         if (!$swinstvalid){
-            if ($self->isValidSoftwareInstallationMandatory($rec)){
-               push(@msg,
+            if (!$swinstvalid){
+               if ($self->isValidSoftwareInstallationMandatory($rec)){
+                  push(@msg,
                     "invalid or not existing software installation specified");
+               }
             }
          }
       }
