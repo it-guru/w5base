@@ -280,8 +280,6 @@ body{
   justify-content:center;
   -webkit-flex-wrap:wrap;
   flex-wrap:wrap;
-  
-  xbackground: #FFD54F;
   margin: 0 auto;
   width: 96%;
   margin-top:20px;
@@ -599,11 +597,24 @@ var W5ExploreClass=function(){
       return(dataobj+'::'+id);
    };
    this.loadCss=function (url) {
-      var link = document.createElement("link");
-      link.type = "text/css";
-      link.rel = "stylesheet";
-      link.href = "../../../"+url;
-      document.getElementsByTagName("head")[0].appendChild(link);
+      var loadurl="../../../"+url;
+      var found=0;
+      $('link').each(function () {
+         if ($(this).attr("href")==loadurl){
+            found=1;
+         }
+      });
+      if (!found){
+         var link = document.createElement("link");
+         link.type = "text/css";
+         link.rel = "stylesheet";
+         link.href = loadurl;
+         document.getElementsByTagName("head")[0].appendChild(link);
+         console.log("loadCss loaded ",loadurl);
+      }
+      else{
+         console.log("loadCss already loaded ",loadurl);
+      }
    }
    this.ResizeLayout=function(level2){
       if (!level2){
