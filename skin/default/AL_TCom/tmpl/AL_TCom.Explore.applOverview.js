@@ -104,7 +104,7 @@ define(["datadumper","jquery.flot","jquery.flot.pie"],function (Dumper){
       };
       for(c=0;c<isum.software.record[0].i.length;c++){
          software.total+=1;
-         if (isum.software.record[0].i[c].osanalysestate=="OK"){
+         if (isum.software.record[0].i[c].softwareinstrelstate=="OK"){
             software.ok++;
          }
          else{
