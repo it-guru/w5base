@@ -64,6 +64,8 @@ sub new
                 name          =>'name',
                 label         =>'Name',
                 size          =>'20',
+                htmlwith      =>'200px',
+                nowrap        =>1,
                 dataobjattr   =>'grp.name'),
 
       new kernel::Field::Select(

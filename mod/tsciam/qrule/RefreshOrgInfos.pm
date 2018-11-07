@@ -119,38 +119,48 @@ sub qcheckRecord
          $forcedupd->{ext_refid1}=$ext_refid1;
       }
       if (defined($ciamrec)){  # rename check
+         my $rawoldtousd;
          my $oldtousd;
          my $curtousd;
          if (exists($rec->{additional}->{tOuSD}) &&
              ref($rec->{additional}->{tOuSD}) eq "ARRAY"){
-            $oldtousd=$rec->{additional}->{tOuSD}->[0];
-            $oldtousd=tsciam::ext::orgareaImport::preFixShortname($oldtousd);
+            $rawoldtousd=$rec->{additional}->{tOuSD}->[0];
+            $oldtousd=tsciam::ext::orgareaImport::preFixShortname(
+                         $ciamrec->{toucid},$rawoldtousd);
          }
          $curtousd=tsciam::ext::orgareaImport::preFixShortname(
-                                                  $ciamrec->{shortname});
+            $ciamrec->{toucid},
+            $ciamrec->{shortname}
+         );
          my $curfinename=$curtousd;
-         if ($curtousd eq ""){
-            $curfinename="tOuID_".$ciamrec->{toucid};
+         my $localrenamed=0;
+         if (defined($oldtousd) && 
+             $rec->{name} ne $oldtousd &&
+             $rec->{name} ne "tOuSD" &&   # invalid local name
+             $rec->{name} ne ""){         # invalid local name
+            $localrenamed=1;
          }
+         #printf STDERR ("DEBUG: localname=$rec->{name}\n");
+         #printf STDERR ("DEBUG: localrenamed=$localrenamed\n");
+         #printf STDERR ("DEBUG: curtousd=$curtousd\n");
+         #printf STDERR ("DEBUG: oldtousd=$oldtousd\n");
 
-         if ($oldtousd ne "" && $oldtousd eq $rec->{name}){
-            if ($oldtousd ne $curfinename){
-               my $oldname=$rec->{fullname};
-               my $basemsg="Try rename of Org '$oldname' needed - ".
-                           "based on CIAM new tOuSD '$curfinename'";
+         if (!$localrenamed && $curtousd ne $rec->{name}){
+            my $oldname=$rec->{fullname};
+            my $basemsg="Try rename of Org '$oldname' needed - ".
+                        "based on CIAM new tOuSD '$curtousd'";
+            $dataobj->Log(WARN,"basedata",$basemsg);
+            if ($dataobj->ValidatedUpdateRecord($rec,{name=>$curtousd},
+                                                {grpid=>\$rec->{grpid}})){
+               push(@qmsg,"all desired fields has been updated: name");
+               my $basemsg="Rename of Org '$oldname' done";
                $dataobj->Log(WARN,"basedata",$basemsg);
-               if ($dataobj->ValidatedUpdateRecord($rec,{name=>$curfinename},
-                                                   {grpid=>\$rec->{grpid}})){
-                  push(@qmsg,"all desired fields has been updated: name");
-                  my $basemsg="Rename of Org '$oldname' done";
-                  $dataobj->Log(WARN,"basedata",$basemsg);
-               }
-               else{
-                  push(@qmsg,$basemsg);
-                  push(@qmsg,$self->getParent->LastMsg());
-                  $errorlevel=3 if ($errorlevel<3);
-                  return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@qmsg});
-               }
+            }
+            else{
+               push(@qmsg,$basemsg);
+               push(@qmsg,$self->getParent->LastMsg());
+               $errorlevel=3 if ($errorlevel<3);
+               return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@qmsg});
             }
          }
       }
@@ -163,6 +173,7 @@ sub qcheckRecord
          #######################################################
          my $c=$rec->{comments};
          $c=~s/(^|\n).*?WhoIsWho.*?(\n|$)//gs;  # remove posible WhoIsWho Infos
+         $c=~s/^(.+)CIAM tOuSD:.*$/$1/gm;
 
          foreach my $irec (@i){ 
             my $infopref=$irec->[0];

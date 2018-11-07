@@ -182,6 +182,7 @@ sub processImport
 
 sub preFixShortname
 {
+   my $tOuID=shift;
    my $newname=shift;
 
    $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
@@ -197,6 +198,9 @@ sub preFixShortname
    if (length($newname)>15){
       $newname=substr($newname,0,15);
    }
+   if ($newname eq ""){
+      $newname="tOuID_$tOuID";
+   }
    return($newname);
 }
 
@@ -209,10 +213,7 @@ sub findNewValidShortname
    my $ciamrec=shift;
 
    my $newname=$ciamrec->{shortname};
-   if ($newname eq ""){
-      $newname="tOuSD";
-   }
-   $newname=preFixShortname($newname);
+   $newname=preFixShortname($ciamrec->{toucid},$newname);
    my $suffix="";
    my $grprec;
    my $loop=1;
