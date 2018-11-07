@@ -513,12 +513,13 @@ sub Result
 
    my ($from,$to);
 
-   if (!(my $f=$self->{Field}->{trangefrom}->Unformat($q{trangefrom}))){
+   my $f;
+   if (!($f=$self->{Field}->{trangefrom}->Unformat($q{trangefrom}))){
       return(undef);
    }
    $from=$f->{trangefrom};
 
-   if (!(my $f=$self->{Field}->{trangeto}->Unformat($q{trangeto}))){
+   if (!($f=$self->{Field}->{trangeto}->Unformat($q{trangeto}))){
       return(undef);
    }
    $to=$f->{trangeto};
