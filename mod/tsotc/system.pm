@@ -36,7 +36,7 @@ sub new
                 sqlorder      =>'desc',
                 group         =>'source',
                 label         =>'OTC-SystemID',
-                dataobjattr   =>"server_uuid"),
+                dataobjattr   =>"otc4darwin_server_vw.server_uuid"),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -44,12 +44,22 @@ sub new
                 label         =>'Systemname',
                 dataobjattr   =>"server_name"),
 
+      new kernel::Field::Email(
+                name          =>'contactemail',
+                label         =>'Contact email',
+                dataobjattr   =>"lower(".
+                                "case when ".
+                                "otc4darwin_ias_srv_metadata_vw.asp is null ".
+                                "then otc4darwin_iac_srv_metadata_vw.asp ".
+                                "else otc4darwin_ias_srv_metadata_vw.asp ".
+                                "end)"),
+
       new kernel::Field::Text(
                 name          =>'projectname',
                 label         =>'Project',
                 weblinkto     =>\'tsotc::project',
                 weblinkon     =>['projectid'=>'id'],
-                dataobjattr   =>"project_name"),
+                dataobjattr   =>"otc4darwin_projects_vw.project_name"),
 
       new kernel::Field::Text(
                 name          =>'availability_zone',
@@ -82,11 +92,6 @@ sub new
                 label         =>'OTC-ProjectID',
                 dataobjattr   =>'otc4darwin_server_vw.project_uuid'),
 
-      new kernel::Field::Link(
-                name          =>'vsystemid',
-                label         =>'V-SystemID1',
-                dataobjattr   =>"'1'"),
-
       new kernel::Field::SubList(
                 name          =>'iaascontacts',
                 label         =>'IaaS Contacts',
@@ -108,8 +113,8 @@ sub new
                 label         =>'IP-Addresses',
                 group         =>'ipaddresses',
                 vjointo       =>\'tsotc::ipaddress',
-                vjoinon       =>['vsystemid'=>'systemid'],
-                vjoindisp     =>['name']),
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['name',"hwaddr"]),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -130,7 +135,7 @@ sub new
                 group         =>'source',
                 label         =>'Source-Load',
                 timezone      =>'CET',
-                dataobjattr   =>"db_timestamp"),
+                dataobjattr   =>"otc4darwin_server_vw.db_timestamp"),
 
    );
    $self->setDefaultView(qw(name projectname id availability_zone ));
@@ -146,8 +151,13 @@ sub getSqlFrom
    my @flt=@_;
    my ($worktable,$workdb)=$self->getWorktable();
    my $selfasparent=$self->SelfAsParentObject();
-   my $from="$worktable join otc4darwin_projects_vw ".
-            "on $worktable.project_uuid=otc4darwin_projects_vw.project_uuid";
+   my $from="$worktable ".
+       "join otc4darwin_projects_vw ".
+       "on $worktable.project_uuid=otc4darwin_projects_vw.project_uuid ".
+       "left outer join otc4darwin_ias_srv_metadata_vw ".
+       "on $worktable.server_uuid=otc4darwin_ias_srv_metadata_vw.server_uuid ".
+       "left outer join otc4darwin_iac_srv_metadata_vw ".
+       "on $worktable.server_uuid=otc4darwin_iac_srv_metadata_vw.server_uuid";
 
    return($from);
 }

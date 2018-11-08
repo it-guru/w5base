@@ -31,28 +31,29 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Id(
-                name          =>'id',
-                label         =>'OTC-IPAddressID',
-                sqlorder      =>'none',
-                dataobjattr   =>"'0'"),
-
-      new kernel::Field::Link(
-                name          =>'systemid',
-                label         =>'OTC-SystemID',
-                sqlorder      =>'none',
-                dataobjattr   =>"'1'"),
-
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'IP-Address',
-                sqlorder      =>'none',
-                dataobjattr   =>"'no IP informations'"),
+                dataobjattr   =>"ip_address"),
+
+      new kernel::Field::Text(
+                name          =>'systemname',
+                label         =>'Systemname',
+                dataobjattr   =>"otc4darwin_server_vw.server_name"),
+
+      new kernel::Field::Text(
+                name          =>'hwaddr',
+                label         =>'MAC address',
+                dataobjattr   =>"mac_address"),
+
+      new kernel::Field::Text(
+                name          =>'systemid',
+                label         =>'OTC-SystemID',
+                dataobjattr   =>"otc4darwin_server_ips_vw.server_uuid"),
 
    );
-   $self->setDefaultView(qw(name id ));
+   $self->setDefaultView(qw(systemname name hwaddr systemid));
    $self->setWorktable("otc4darwin_server_ips_vw");
-   $self->setWorktable("");
    return($self);
 }
 
@@ -65,6 +66,22 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable ".
+       "join otc4darwin_server_vw ".
+       "on $worktable.server_uuid=otc4darwin_server_vw.server_uuid";
+
+   return($from);
+}
+
 
 sub getDetailBlockPriority
 {
