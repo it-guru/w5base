@@ -37,6 +37,34 @@ create or replace view "W5I_tssapp01::costcenter" as
   select 
     rowid                            w5id,
     "W5_key"                         w5name,
+    "C03_company_code"               w5accarea,
+    "C02_description"                w5description,
+    'C04_cost_center_type'           w5etype,
+    "C05_supervisor"                 w5responsiblewiw,
+    "C09_hierarchy_TSI_ID"           saphier1,
+    "C11_hierarchy_ESS_BSS_ID"       saphier2,
+    "C13_hierarchy_ITO_SSM_ID"       saphier3,
+    "C15_hierarchy_SL_IL_ID"         saphier4,
+    "C17_business_center_ID"         saphier5,
+    "C19_customer_center_ID"         saphier6,
+    "C21_customer_team_ID"           saphier7,
+    "C23_customer_office_ID"         saphier8,
+    "C25_hierarchy_9_ID"             saphier9,
+    "C27_hierarchy_10_ID"            saphier10,
+    "W5_cdate"                       w5createdate,
+    "W5_mdate"                       w5modifydate,
+    'P01DE'                          w5srcsys,
+    "W5_key"                         w5srcid
+  from w5ftpgw1."w5sapp01_P01DE_kostl_h";
+
+grant select on "W5I_tssapp01::costcenter" to W5I;
+create or replace synonym W5I."tssapp01::costcenter" for "W5I_tssapp01::costcenter";
+
+
+create or replace view "W5I_tssapp01::psp" as
+  select 
+    rowid                            w5id,
+    "W5_key"                         w5name,
     "C04_company_code"               w5accarea,
     "C03_description"                w5description,
     ''                               w5etype,
@@ -57,8 +85,8 @@ create or replace view "W5I_tssapp01::costcenter" as
     "W5_key"                         w5srcid
   from w5ftpgw1."w5sapp01_P01DE_order_hier";
 
-grant select on "W5I_tssapp01::costcenter" to W5I;
-create or replace synonym W5I."tssapp01::costcenter" for "W5I_tssapp01::costcenter";
+grant select on "W5I_tssapp01::psp" to W5I;
+create or replace synonym W5I."tssapp01::psp" for "W5I_tssapp01::psp";
 
 
 
