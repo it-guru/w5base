@@ -330,6 +330,9 @@ sub Initialize
    if (defined($self->{DB})){
       $self->{DB}->do("alter session set cursor_sharing=force");
    }
+   if (defined($self->{DB})){
+      $self->{DB}->{db}->{LongReadLen}=1024*1024*15;    #15MB
+   }
 
    return(1) if (defined($self->{DB}));
    return(0);
@@ -419,15 +422,6 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
-
-sub SetFilter {
-   my $self=shift;
-
-   if (defined($self->{DB})){
-      $self->{DB}->{db}->{LongReadLen}=1024*1024*15;    #15MB
-   }
-   $self->SUPER::SetFilter(@_);
-}
 
 
 
