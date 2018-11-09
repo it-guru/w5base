@@ -98,3 +98,7 @@ BEGIN
    
 END;
 
+grant select on "W5I_applarchive" to W5I;
+create or replace synonym W5I.applarchive for "W5I_applarchive";
+
+
