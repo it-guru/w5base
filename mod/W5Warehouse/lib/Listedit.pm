@@ -68,10 +68,9 @@ sub AddAllFieldsFromWorktable
                           dataobjattr   =>"\"$fld->{fieldname}\""));
          }
          elsif ($fld->{fieldtype} eq "CLOB"){
-            push(@l,new kernel::Field::Text(
+            push(@l,new kernel::Field::Textarea(
                           name          =>$name,
                           searchable    =>1,
-                          ignorecase    =>1,
                           sqlorder      =>'none',
                           label         =>$label,
                           dataobjattr   =>"\"$fld->{fieldname}\""));
@@ -189,6 +188,9 @@ sub Initialize
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
    return(@result) if (defined($result[0]) eq "InitERROR");
+   if (defined($self->{DB})){
+      $self->{DB}->{db}->{LongReadLen}=1024*1024*15;    #15MB
+   }
    return(1) if (defined($self->{DB}));
    return(0);
 }
