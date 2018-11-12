@@ -193,6 +193,26 @@ sub new
                    "'ClusterService')"),
 
       new kernel::Field::TextDrop(
+                name          =>'pfullname',
+                label         =>'main installation',
+                vjointo       =>\'itil::lnksoftware',
+                vjoinon       =>['parentsoftwareid'=>'id'],
+                translation   =>'itil::lnksoftware',
+                vjoindisp     =>'fullname',
+                weblinkto     =>'NONE',
+                searchable    =>0,
+                readonly      =>1,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $current=$param{current};
+                   return(0) if (!defined($current) ||
+                                 $current->{softwareinstpclass} ne "OPTION");
+                   return(1);
+                }),
+                                                 
+      new kernel::Field::TextDrop(
                 name          =>'liccontract',
                 htmlwidth     =>'100px',
                 group         =>'lic',
@@ -364,6 +384,7 @@ sub new
                 label         =>'Software installation class',
                 htmldetail    =>0,
                 readonly      =>1,
+                selectfix     =>1,
                 group         =>'softwaredetails',
                 dataobjattr   =>'software.productclass'),
 
@@ -459,6 +480,11 @@ sub new
                 name          =>'softwareid',
                 label         =>'SoftwareID',
                 dataobjattr   =>'lnksoftwaresystem.software'),
+                                                   
+      new kernel::Field::Link(
+                name          =>'parentsoftwareid',
+                label         =>'ParentSoftwareID',
+                dataobjattr   =>'lnksoftwaresystem.parent'),
                                                    
       new kernel::Field::Link(
                 name          =>'liccontractid',
@@ -1087,6 +1113,10 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("default","header","instdetail") if (!defined($rec));
+   if ($rec->{softwareinstpclass} eq "OPTION"){
+      return(qw(default history source instdetail lic upd misc source));
+
+   }
    return("ALL");
 }
 
@@ -1099,10 +1129,13 @@ sub isDeleteValid
               $self->isWriteValid($rec))));
    return if ($#l==-1);
    return(1) if (in_array(\@l,["ALL","default"]));
-   # Löschen geht noch nicht! - Das muß erst noch implementiert werden, das
-   # dann nach dem Löschen auch noch einem Mail an den Datenverantwortlichen
-   # erzeugt wird.
-   #return(1) if (in_array(\@l,["instdetail"]));
+
+   if ($rec->{softwareinstpclass} eq "OPTION"){
+      # for options the group "misc" is the flag for delete allowing 
+      # (instdetail is not ok, because this can be writeable on instance
+      #  contacts)
+      return(1) if (in_array(\@l,["misc"]));
+   }
    return;
 }
 
@@ -1245,6 +1278,18 @@ sub checkAlternateInstCreateRights
 
    return(1);
 }
+
+#sub FinishDelete
+#{
+#   my $self=shift;
+#   my $oldrec=shift;
+#   my $bk=$self->SUPER::FinishDelete($oldrec);
+#
+#   print STDERR "FinishDelete:".Dumper($oldrec);
+#}
+
+
+
 
 sub FinishWrite
 {

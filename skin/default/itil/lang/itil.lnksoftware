@@ -63,4 +63,5 @@
 'system is not writeable for you'=>{de=>'kein Schreibzugriff auf das angegebene System'},
 'AutoDiscovery Relation'=>{de=>'AutoDiscovery Zuordnung'},
 'installation with selected software already exists at specified installpath'=>{de=>'Installation mit der ausgewählten Software existiert bereits im angegebenen Installationsverzeichnis'},
+'main installation'=>{de=>'Haupt-Softwareinstallation'},
 
