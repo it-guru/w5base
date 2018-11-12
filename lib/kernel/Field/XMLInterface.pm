@@ -34,6 +34,7 @@ sub new
    my $self={@_};
    $self->{searchable}=0 if (!defined($self->{searchable}));
    $self->{htmldetail}=0 if (!defined($self->{htmldetail}));
+   $self->{sqlorder}="NONE" if (!defined($self->{sqlorder}));
    $self->{uivisible}=sub {
       my $self=shift;
       my $mode=shift;

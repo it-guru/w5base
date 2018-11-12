@@ -553,6 +553,7 @@ sub xml2hash {
 
    eval("\$p->parse(\$d);");
    if ($@ ne ""){
+      msg(WARN,"XML parse: $@");
       return(undef);
    }
    return($h);
