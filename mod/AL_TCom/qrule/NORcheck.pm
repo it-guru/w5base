@@ -223,7 +223,7 @@ sub sendNotification
       }
    }
    push(@bcc,"11634953080001"); # ich
-   push(@bcc,"11634962230006"); # Sandra
+   #push(@bcc,"11634962230006"); # Sandra
 
    if ($#to!=-1){
       my $touserid=$to[0];
