@@ -340,6 +340,7 @@ sub qcheckRecord
 
    foreach my $k (keys(%chklst)){
       my $target=$chklst{$k}->{target};
+      $target=$$target if (ref($target));
       my $targetid=$chklst{$k}->{targetid};
       if ($target eq "base::grp"){
          $grp->ResetFilter();
