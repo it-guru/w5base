@@ -499,12 +499,12 @@ sub qcheckRecord
       }
 
       my $typeclass=undef;
-      if ($ciamrec->{office_state} eq "Employee" ||
-          $ciamrec->{office_state} eq "Manager" ||
-          $ciamrec->{office_state} eq "Employee-1st-Day" ||  # vor Eintrittsdat.
-          $ciamrec->{office_state} eq "Freelancer" ||
-          $ciamrec->{office_state} eq "Rumpfdatensatz" ||
-          $ciamrec->{office_state} eq "DTAG User"){
+      if (lc($ciamrec->{office_state}) eq lc("Employee") ||
+          lc($ciamrec->{office_state}) eq lc("Manager") ||
+          lc($ciamrec->{office_state}) eq lc("Employee-1st-Day")||#vorEintr.dat.
+          lc($ciamrec->{office_state}) eq lc("Freelancer") ||
+          lc($ciamrec->{office_state}) eq lc("Rumpfdatensatz") ||
+          lc($ciamrec->{office_state}) eq lc("DTAG User")){
          $typeclass="user";
       }
       else{

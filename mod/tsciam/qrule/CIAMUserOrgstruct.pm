@@ -310,7 +310,7 @@ sub qcheckRecord
                 next;
              }
              my $ciamstate=$wr->{office_state};
-             if ($ciamstate eq "Employee"){
+             if (lc($ciamstate) eq lc("Employee")){
                 $ciamstate="RFreelancer"; # Sekundäre Arbeitsverhältnisse
                                           # werden immer als Extern angesehen.
              }
@@ -345,12 +345,12 @@ sub addWorkrelationShip
    my $ciamorg=getModuleObject($self->getParent->Config,"tsciam::orgarea");
 
    my $level1role="RFreelancer";
-   if ($ciamstate eq "Intern" ||
-       $ciamstate eq "Manager" ||
-       $ciamstate eq "Employee"){
+   if (lc($ciamstate) eq lc("Intern") ||
+       lc($ciamstate) eq lc("Manager") ||
+       lc($ciamstate) eq lc("Employee")){
       $level1role="REmployee";
    }
-   if ($ciamstate eq "Apprentice"){
+   if (lc($ciamstate) eq lc("Apprentice")){
       $level1role="RApprentice";
    }
    msg(INFO,"organizationalstatus=$ciamstate --- w5base role=$level1role");
