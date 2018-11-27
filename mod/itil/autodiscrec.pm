@@ -360,7 +360,6 @@ sub Validate
    my $newrec=shift;
 
 
-   #printf("fifi 01 in $self\n");
    if (effChanged($oldrec,$newrec,"state")){   # statuswechsel auf
       my $s=$newrec->{state}; 
       if ($s eq "10" || $s eq "20"){   # einmalig oder auto

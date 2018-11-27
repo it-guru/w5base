@@ -118,7 +118,6 @@ sub setReferencesToNull
 
    my $idfield=$dataobj->IdField();
 
-printf STDERR ("fifi 01 ci=$contactrec->{cistatusid}\n");
    if ((!defined($contactrec) || $contactrec->{cistatusid}==7) ||
        (defined($contactrec) && $contactrec->{cistatusid}==6)){
       my $contact_old_enought=1;
@@ -133,7 +132,6 @@ printf STDERR ("fifi 01 ci=$contactrec->{cistatusid}\n");
             #msg(INFO,"contact is bad but not old enouth");
          }
       }
-printf STDERR ("fifi contact_old_enought $contact_old_enought\n");
 
       if ($contact_old_enought){
          if (defined($idfield)){
