@@ -1,0 +1,9 @@
+'name'=>{ de=>'
+Der interne System-Alias dient
+rein zur Indentifzierung des Systems
+innerhalb einer Anwendung. Er muss
+nicht eindeutig sein und hat nichts
+mit dem Systemnamen zu tun.
+'
+
+},

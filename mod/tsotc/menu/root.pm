@@ -54,6 +54,15 @@ sub Init
                       "tsotc::system",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.tsotc.system.request",
+                      "tsotc::sysreq",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.tsotc.system.request.new",
+                      "tsotc::sysreq",
+                      func=>'New',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itu.tsotc.system.ipaddress",
                       "tsotc::ipaddress",
                       defaultacl=>['valid_user']);
