@@ -1681,6 +1681,10 @@ sub HandleSave
       my $msg;
       $self->SetCurrentOrder("NONE");
       ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
+      if (!defined($oldrec)){
+         $self->LastMsg(ERROR,
+                        "save request to invalid or not existing record id");
+      }
       #$self->SetCurrentView();
    }
    my $HistoryComments=Query->Param("HistoryComments");
@@ -1689,16 +1693,18 @@ sub HandleSave
       Query->Delete("HistoryComments");
    }
    my $newrec=$self->getWriteRequestHash($mode,$oldrec);
-   if (!defined($oldrec) && defined($newrec->{$idname})){
-      # after prepUploadRecord an old record id could be found
-      Query->Param($idname=>$newrec->{$idname});
-      $flt={$idname=>\$newrec->{$idname}};
-      $self->ResetFilter();
-      $self->SecureSetFilter($flt);
-      $self->SetCurrentView(qw(ALL));
-      my $msg;
-      $self->SetCurrentOrder("NONE");
-      ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
+   if ($self->LastMsg()==0){
+      if (!defined($oldrec) && defined($newrec->{$idname})){
+         # after prepUploadRecord an old record id could be found
+         Query->Param($idname=>$newrec->{$idname});
+         $flt={$idname=>\$newrec->{$idname}};
+         $self->ResetFilter();
+         $self->SecureSetFilter($flt);
+         $self->SetCurrentView(qw(ALL));
+         my $msg;
+         $self->SetCurrentOrder("NONE");
+         ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
+      }
    }
 
 
