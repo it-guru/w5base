@@ -150,6 +150,23 @@ sub new
                 editrange     =>[1,940*1024],
                 dataobjattr   =>'memory'),
 
+      new kernel::Field::SubList(
+                name          =>'storage',
+                label         =>'Storage',
+                group         =>'storage',
+                vjointo       =>\'tsotc::sysreqfs',
+                vjoinon       =>['id'=>'sysreqid'],
+                vjoindisp     =>['fsentry','fssize']),
+
+      new kernel::Field::Text(
+                name          =>'osclass',
+                label         =>'OS-Class',
+                vjointo       =>'itil::osrelease',
+                readonly      =>1,
+                group         =>'source',
+                vjoinon       =>['osreleaseid'=>'id'],
+                vjoindisp     =>'osclass'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 selectfix     =>1,
@@ -317,6 +334,27 @@ sub isController
 }
 
 
+sub isRequestor
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $userid=$self->getCurrentUserId();
+
+   return(1) if ($rec->{creator} eq $userid);
+
+   #print STDERR Dumper($rec);
+
+
+
+   #if ($self->IsMemberOf([qw(dmin w5base.tsotc.controller)])){
+   #   return(1);
+   #}
+   return(0);
+
+}
+
+
 sub Validate
 {
    my $self=shift;
@@ -337,6 +375,25 @@ sub Validate
       return(0);
    }
 
+   if (effChanged($oldrec,$newrec,"osreleaseid")){
+      if (defined($oldrec) && $#{$oldrec->{storage}}!=-1){
+         my $oldreleaseid=$oldrec->{osreleaseid};
+         my $newreleaseid=$newrec->{osreleaseid};
+         if ($oldreleaseid ne ""){
+            my $o=getModuleObject($self->Config,"itil::osrelease");
+            $o->SetFilter({id=>[$oldreleaseid,$newreleaseid]});
+            $o->SetCurrentView(qw(id osclass));
+            my $i=$o->getHashIndexed("id");
+            if ($i->{id}->{$oldreleaseid}->{osclass} ne 
+                $i->{id}->{$newreleaseid}->{osclass}){
+               $self->LastMsg(ERROR,"os change not supported, ".
+                                    "with existing storeage");
+               return(0);
+            }
+         }
+      }
+   }
+
    if ($reqstatus eq "1" && $newrec->{reqstatus} eq "2"){
       # initiate deployment request
       if (effVal($oldrec,$newrec,"cpucount") eq ""){
@@ -353,6 +410,27 @@ sub Validate
       }
       if (effVal($oldrec,$newrec,"systemclass") eq ""){
          $self->LastMsg(ERROR,"missing definition for system classification");
+         return(0);
+      }
+      my $foundroot=0;
+      if (effVal($oldrec,$newrec,"osclass") eq "WIN"){
+         foreach my $fsrec (@{$oldrec->{storage}}){
+            if ($fsrec->{fsentry} eq "C:"){
+               $foundroot++;
+               last;
+            }
+         }
+      }
+      else{
+         foreach my $fsrec (@{$oldrec->{storage}}){
+            if ($fsrec->{fsentry} eq "/"){
+               $foundroot++;
+               last;
+            }
+         }
+      }
+      if (!$foundroot){
+         $self->LastMsg(ERROR,"missing root filesystem");
          return(0);
       }
    }
@@ -405,6 +483,12 @@ sub isWriteValid
    my $rec=shift;
    return("default") if (!defined($rec));
 
+   if ($self->isRequestor($rec)){
+      if ($rec->{reqstatus} eq "1"){
+         return("default","storage");
+      }
+      return("default");
+   }
    if ($self->isController($rec)){
       return("default");
    }

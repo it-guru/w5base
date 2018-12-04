@@ -1,4 +1,5 @@
 'tsotc::sysreq'=>{de=>'OTC: Systemanforderung',en=>'OTC: System request'},
+'fieldgroup.storage'=>{de=>'Storage',en=>'Storage'},
 'Application'=>{de=>'Anwendung'},
 'internal system alias'=>{de=>'interner System-Alias'},
 'request status'=>{de=>'Request-Status'},
@@ -24,4 +25,6 @@
 '(11) rundown in process'  =>{de=>'(11) RunDown in Bearbeitung'},
 '(90) disposed of waste'   =>{de=>'(90) veraltet/gelöscht'},
 '(99) deployment rejected' =>{de=>'(99) Bereitstellung abgelehnt'},
+'os change not supported, with existing storeage'=>{de=>'Betriebssystem-Wechsel nicht möglich, mit vorhandenen Storage'},
+
 

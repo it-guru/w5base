@@ -40,7 +40,7 @@ create table tsotc_sysreq_fs (
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(20)  default NULL,
   srcload    datetime     default NULL,
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id),UNIQUE KEY fs(sysreq,fsentry),
   FOREIGN KEY fk_tsotc_sysreq_fs1 (sysreq) 
   REFERENCES tsotc_sysreq (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
