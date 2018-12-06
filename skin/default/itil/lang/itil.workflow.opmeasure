@@ -13,6 +13,7 @@ Ein Betriebsmaßnahmen-Workflow darf als alternative für einen "Change" verwendet
 <li>  Wenn mehrere Maßnahmen aufeinander Auswirkungen haben können, so sind diese im Workflow miteinander zu verknüpfen (Workflow-Relationen).
 <li>  Die Maßnahme ist VOR Beginn im Tool zu dokumentieren.
 <li>  Kollisionsprüfung zu anderen Changes, Change-Freezes oder Maßnahmen wurde eigenverantwortlich im Vorfeld durchgeführt.
+<li>  Die Maßnahme wird ohne PSO (Downtime der Applikation) durchgeführt.
 </ul><br>
 <br>
 Generell ist es so, dass Maßnahmen initial nur an Personen im direkten Umfeld der betroffenen Anwendung zugewiesen werden können (dies ist bereits vom Workflow so vorgegeben).<br>
@@ -30,11 +31,12 @@ An operational action workflow can be used as an alternative for a "Change" if a
 <li>  If several tasks can affect each other, they must be linked in the workflow (workflow relations).
 <li>  The measure must be documented in the tool BEFORE commencement.
 <li>  Collision check for other changes, change frequencies or measures was carried out independently in advance.
+<li>  The measure is performed without PSO (downtime of the application).
 </ul><br>
 <br>
-Generell ist es so, dass Maßnahmen initial nur an Personen im direkten Umfeld der betroffenen Anwendung zugewiesen werden können (dies ist bereits vom Workflow so vorgegeben).<br>
+In general, the initial assignment of the tasks can only be done to persons in the direct environment of the affected application (this is already predefined by the workflow).<br>
 <br>
-Die Dokumentation von Maßnahmen stellt keine Absicherung gegen mögliche Incidents dar. In einer Maßnahmen muss beschrieben sein/werden, das alle notwendigen Schritte für einen sicheren und bestmöglichen Betriebsablauf durchgeführt wurden.
+The documentation of a measure does not protect against possible incidents. A measure must describe that all necessary steps have been taken to ensure safe and optimum operation.<br>
 <br>
 '},
 'assign measure to'=>{de=>'Maßnahme zuweisen an'},
