@@ -35,6 +35,7 @@ sub process
          $self->EnrichmentCollector();
       }
       sleep(600);
+      die('lost my parent W5Server process - not good') if (getppid()==1);
    }
 }
 
