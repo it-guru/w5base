@@ -26,5 +26,6 @@
 '(90) disposed of waste'   =>{de=>'(90) veraltet/gelöscht'},
 '(99) deployment rejected' =>{de=>'(99) Bereitstellung abgelehnt'},
 'os change not supported, with existing storeage'=>{de=>'Betriebssystem-Wechsel nicht möglich, mit vorhandenen Storage'},
+'no permission to request systems for specified application'=>{de=>'keine Erlaubnis zum Anfordern von Systemen für die gegebene Anwendung'},
 
 

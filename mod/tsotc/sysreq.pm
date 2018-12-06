@@ -286,26 +286,28 @@ sub calcPostibleReqStatus
          if ($app->isController($current)){
             push(@l,"4",$app->T("(4) installed/active"));
             push(@l,"3",$app->T("(3) deployment in process"));
-            push(@l,"10",$app->T("(10) deployment rejected"));
+            push(@l,"99",$app->T("(99) deployment rejected"));
          }
-         if ($app->IsMemberOf("admin")){  # eingriffs möglichkeit für Admins
-            push(@l,"1",$app->T("(1) reserved"));
-         }
+         #if ($app->IsMemberOf("admin")){  # eingriffs möglichkeit für Admins
+         #   push(@l,"1",$app->T("(1) reserved"));
+         #}
       }
       if ($current->{reqstatus} eq "3"){
          push(@l,"3",$app->T("(3) deployment in process"));
          if ($app->isController($current)){
             push(@l,"4",$app->T("(4) installed/active"));
-            push(@l,"10",$app->T("(10) deployment rejected"));
+            push(@l,"99",$app->T("(99) deployment rejected"));
          }
-         if ($app->IsMemberOf("admin")){  # eingriffs möglichkeit für Admins
-            push(@l,"1",$app->T("(1) reserved"));
-         }
+         #if ($app->IsMemberOf("admin")){  # eingriffs möglichkeit für Admins
+         #   push(@l,"1",$app->T("(1) reserved"));
+         #}
       }
       if ($current->{reqstatus} eq "4"){
          push(@l,"4",$app->T("(4) installed/active"));
-         push(@l,"11",$app->T("(11) updateing"));
-         push(@l,"5",$app->T("(5) run down on order"));
+         if ($app->isRequestor($current)){
+            push(@l,"5",$app->T("(5) prepair update"));
+            push(@l,"10",$app->T("(10) rundown on order"));
+         }
       }
       if ($current->{reqstatus} eq "5"){
          if ($app->isController($current)){
@@ -314,6 +316,24 @@ sub calcPostibleReqStatus
       }
       if ($current->{reqstatus} eq "6"){
          push(@l,"8",$app->T("(8) update on order"));
+      }
+      if ($current->{reqstatus} eq "10"){
+         push(@l,"10",$app->T("(10) rundown on order"));
+         if ($app->isRequestor($current)){
+            push(@l,"4",$app->T("(4) installed/active"));
+         }
+      }
+      if ($current->{reqstatus} eq "11"){
+         push(@l,"11",$app->T("(11) rundown in process"));
+         if ($app->isController($current)){
+            push(@l,"90",$app->T("(90) disposed of waste"));
+         }
+      }
+      if ($current->{reqstatus} eq "90"){
+         push(@l,"90",$app->T("(90) disposed of waste"));
+      }
+      if ($current->{reqstatus} eq "99"){
+         push(@l,"99",$app->T("(99) deployment rejected"));
       }
    }
 
@@ -326,7 +346,7 @@ sub isController
    my $self=shift;
    my $rec=shift;
 
-   if ($self->IsMemberOf([qw(dmin w5base.tsotc.controller)])){
+   if ($self->IsMemberOf([qw(w5base.tsotc.controller)])){
       return(1);
    }
    return(0);
@@ -341,15 +361,24 @@ sub isRequestor
 
    my $userid=$self->getCurrentUserId();
 
-   return(1) if ($rec->{creator} eq $userid);
+   return(1) if (defined($rec) && $rec->{creator} eq $userid);
 
-   #print STDERR Dumper($rec);
+   my $appid=$rec->{applid};
 
+   if ($appid ne ""){
+      my @v=qw(tsmid tsm2id applmgrid opmid opm2id);
+      my $p=$self->getPersistentModuleObject($self->Config,"itil::appl");
 
-
-   #if ($self->IsMemberOf([qw(dmin w5base.tsotc.controller)])){
-   #   return(1);
-   #}
+      $p->SetFilter({id=>\$appid});
+      my ($apprec)=$p->getOnlyFirst(@v);
+      if (defined($apprec)){
+         foreach my $fld (@v){
+            if ($apprec->{$fld} eq $userid){
+               return(1);
+            }
+         }
+      }
+   }
    return(0);
 
 }
@@ -361,6 +390,13 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $orgrec=shift;
+
+   if (!defined($oldrec)){
+      if (!$self->isRequestor({applid=>$newrec->{applid}})){
+         $self->LastMsg(ERROR,"no permission to request systems for specified application");
+         return(0);
+      }
+   }
 
    my $reqstatus;
    if (defined($oldrec)){
@@ -483,6 +519,9 @@ sub isWriteValid
    my $rec=shift;
    return("default") if (!defined($rec));
 
+   if ($rec->{reqstatus} eq "90" || $rec->{reqstatus} eq "99"){
+      return(undef);
+   }
    if ($self->isRequestor($rec)){
       if ($rec->{reqstatus} eq "1"){
          return("default","storage");
