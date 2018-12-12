@@ -8,7 +8,10 @@ PIDFile=/var/run/extSimpleHandler/extSimpleHandler.pid
 EnvironmentFile=/etc/default/extSimpleHandler
 ExecStart=/opt/w5base/contrib/ActionHandler/extSimpleHandler.pl
 ExecStopPost=/bin/rm /var/run/extSimpleHandler/extSimpleHandler.pid
-Restart=on-abort
+Restart=always
+RestartSec=5
+StartLimitInterval=43200
+StartLimitBurst=2000
 
 [Install]
 WantedBy=multi-user.target

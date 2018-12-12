@@ -1579,7 +1579,6 @@ sub NormalizeByIOMap
                }
             }
          }
-       #  printf STDERR ("fifi end rules\n");
          if ($match==$check && $check>0){     # do modifications
             $$debug.=" -> matched:" if ($debug);
             for(my $fnum=1;$fnum<=5;$fnum++){
@@ -1589,7 +1588,6 @@ sub NormalizeByIOMap
                   if ($mexp ne ""){
                      my $n;
                      my $cmd="\$n=\$flt->{\$fname}=~$mexp;";
-               #      printf STDERR ("fifi cmd=$cmd\n");
                      eval($cmd);
                      if ($@ ne ""){
                         $$debug.=" $fname(ERROR)" if ($debug);
@@ -2714,6 +2712,7 @@ sub SendRemoteEvent
    my $newrec=shift;
    my $insertid=shift;
 
+
    $self->LoadSubObjs("ObjectEventHandler","ObjectEventHandler");
    foreach my $eh (values(%{$self->{ObjectEventHandler}})){
       $eh->HandleEvent($mode,$self->Self,$oldrec,$newrec);
@@ -2724,7 +2723,7 @@ sub SendRemoteEvent
       @updkeys=grep(!/^(lastqenrich|lastqcheck|mdate)$/,@updkeys);
    }
    
-   if ($#updkeys!=-1 && !$self->{dontSendRemoteEvent}){
+   if (($#updkeys!=-1 || $mode eq "del") && !$self->{dontSendRemoteEvent}){
       my $idobj=$self->IdField();
       my $userid=$self->getCurrentUserId();
       my ($id,$sub);
