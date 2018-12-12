@@ -1,0 +1,14 @@
+[Unit]
+Description=extSimpleHandler
+
+[Service]
+User=hvogler
+Type=simple
+PIDFile=/var/run/extSimpleHandler/extSimpleHandler.pid
+EnvironmentFile=/etc/default/extSimpleHandler
+ExecStart=/opt/w5base/contrib/ActionHandler/extSimpleHandler.pl
+ExecStopPost=/bin/rm /var/run/extSimpleHandler/extSimpleHandler.pid
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
