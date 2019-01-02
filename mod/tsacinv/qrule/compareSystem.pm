@@ -201,43 +201,50 @@ sub qcheckRecord
             $forcedupd->{productline}="NGSSM-Farm_x86"; 
          }
       }
-      elsif ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+      elsif (defined($parrec) &&
+             $parrec->{systemolaclass} eq "10" &&  # CLASSIC
           ($rec->{itfarm} eq "")){
          if ($rec->{productline} ne "CLASSIC"){
             $forcedupd->{productline}="CLASSIC"; 
          }
       }
-      elsif ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+      elsif (defined($parrec) &&
+             $parrec->{systemolaclass} eq "10" &&  # CLASSIC
           ($rec->{itfarm}=~m/^IT-Serverfarm_AIX/i)){
          if ($rec->{productline} ne "ITSF-AIX"){
             $forcedupd->{productline}="ITSF-AIX"; 
          }
       }
-      elsif ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+      elsif (defined($parrec) &&
+             $parrec->{systemolaclass} eq "10" &&  # CLASSIC
           ($rec->{itfarm}=~m/^IT-Serverfarm_Solaris/i)){
          if ($rec->{productline} ne "ITSF-SOLARIS"){
             $forcedupd->{productline}="ITSF-SOLARIS"; 
          }
       }
-      elsif ($parrec->{systemolaclass} eq "10" &&  # CLASSIC
+      elsif (defined($parrec) &&
+             $parrec->{systemolaclass} eq "10" &&  # CLASSIC
           ($rec->{itfarm}=~m/^IT-Serverfarm_SAP_HANA/i)){
          if ($rec->{productline} ne "SAP-HANA"){
             $forcedupd->{productline}="SAP-HANA"; 
          }
       }
-      elsif ($parrec->{systemolaclass} eq "38" &&  # DCS
+      elsif (defined($parrec) &&
+             $parrec->{systemolaclass} eq "38" &&  # DCS
           ($rec->{itfarm}=~m/^IT-Serverfarm_X86/i)){
          if ($rec->{productline} ne "ITSF-x86"){
             $forcedupd->{productline}="ITSF-x86"; 
          }
       }
-      elsif ($parrec->{systemolaclass} eq "0" &&  # UNDEFINED
+      elsif (defined($parrec) &&
+             $parrec->{systemolaclass} eq "0" &&  # UNDEFINED
           ($rec->{itfarm}=~m/^IT-Serverfarm_DBaaS/i)){
          if ($rec->{productline} ne "DBaaS"){
             $forcedupd->{productline}="DBaaS"; 
          }
       }
-      elsif ($parrec->{systemolaclass} eq "30"   # APPCOM
+      elsif (defined($parrec) &&
+             $parrec->{systemolaclass} eq "30"   # APPCOM
              ){
          if ($rec->{productline} ne "APPCOM"){
             $forcedupd->{productline}="APPCOM"; 
