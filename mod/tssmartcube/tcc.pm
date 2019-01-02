@@ -812,7 +812,10 @@ sub initSqlWhere
    $userid=-1 if (!defined($userid) || $userid==0);
 
    if ($self->isDataInputFromUserFrontend()){
-      if (!$self->IsMemberOf([qw(admin w5base.tssmartcube.tcc.read)],
+      if (!$self->IsMemberOf([qw(admin 
+                                 w5base.tssmartcube.tcc.read
+                                 w5base.tssmartcube.tcc.read.itsem
+                              )],
           "RMember")){
          my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
          my @grpid=grep(/^[0-9]+/,keys(%grp));
