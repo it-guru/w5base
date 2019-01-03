@@ -149,6 +149,7 @@ sub NotifyChange
          my @eventlist=($scstate);
 
          foreach my $curscstate (@eventlist){
+            next if ($curscstate eq "");
             my @emailtext;
             my @emailsubheader;
             my @emailprefix;
@@ -171,7 +172,7 @@ sub NotifyChange
                   push(@emailprefix,
                        "<a title=\"click to get current ".
                                   "informations of change\" ".
-                       "href=\"$url/auth/tssc/chm/ById/$srcid\">".
+                       "href=\"$url/auth/tssm/chm/ById/$srcid\">".
                        "$srcid</a>");
                }
                else{

@@ -414,7 +414,7 @@ sub mkChangeStoreRec
       $wfrec{additional}->{ServiceManagerResolvedBy}=$rec->{resolvedby};
    }
 
-   $wfrec{owner}=0;
+   $wfrec{owner}=undef;
    if (!($rec->{implementor}=~m/^\s*$/)){
       $wfrec{additional}->{ServiceManagerImplementor}=$rec->{implementor};
       my $implementor=lc($rec->{implementor});
@@ -449,12 +449,18 @@ sub mkChangeStoreRec
    }
    $wfrec{eventstart}=$rec->{plannedstart};
    $wfrec{eventend}=$rec->{plannedend};
-   if ($rec->{workstart} ne ""){
-      $wfrec{eventstart}=$rec->{workstart};
+
+   my @viewgroups=$obj->isViewValid($rec);
+   if (in_array(\@viewgroups,"close") ||
+       $rec->{taskstatus} eq "all tasks closed"){
+      if ($rec->{workstart} ne ""){
+         $wfrec{eventstart}=$rec->{workstart};
+      }
+      if ($rec->{workend} ne ""){
+         $wfrec{eventend}=$rec->{workend};
+      }
    }
-   if ($rec->{workend} ne ""){
-      $wfrec{eventend}=$rec->{workend};
-   }
+
    $wfrec{mdate}=$rec->{sysmodtime};
    $wfrec{createdate}=$rec->{createtime};
    $wfrec{closedate}=$rec->{closetime};

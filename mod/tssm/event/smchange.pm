@@ -60,7 +60,7 @@ sub smchange
                            plannedend plannedstart priority project
                            reason relations requestedby resolvedby
                            resolvetime resources risk srcid srcsys
-                           status sysmodtime tasks type validation
+                           status taskstatus sysmodtime tasks type validation
                            urgency workduration workend workstart
                            approvalsreq));
 

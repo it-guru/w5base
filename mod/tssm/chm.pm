@@ -267,6 +267,13 @@ sub new
                 dataobjattr   =>SELpref.'cm3rm1.tsi_status'),
 
       new kernel::Field::Text(
+                name          =>'taskstatus',
+                group         =>'status',
+                selectfix     =>1,
+                label         =>'Task Status',
+                dataobjattr   =>SELpref.'cm3rm1.tsi_tasks_status'),
+
+      new kernel::Field::Text(
                 name          =>'phase',
                 selectfix     =>1,
                 group         =>'status',
@@ -741,9 +748,9 @@ sub isViewValid
        lc($rec->{status}) ne "resolved" &&
        !($rec->{phase}=~m/^60 /) &&
        !($rec->{phase}=~m/^70 /)){
-      @l=grep(!/^close$/,@l);
-   }
-   if ($rec->{srcsys} ne ""){
+      @l=grep(!/^close$/,@l);   # "close" would be also used as flag, to
+   }                            # handle workstart/end als eventstart/end
+   if ($rec->{srcsys} ne ""){   # in w5base workflow engine !
       push(@l,"source");
    }
    return(@l);
