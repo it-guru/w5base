@@ -309,7 +309,7 @@ sub qcheckRecord
 #                                name=>$parrec->{systemola}});
                $self->IfComp($dataobj,
                              $rec,"cpucount",
-                             $parrec,"cpucount",
+                             $parrec,"cpucorestotal",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');
