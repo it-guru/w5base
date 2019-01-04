@@ -215,9 +215,8 @@ sub new
                 label         =>"CPU Cores Total",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"CPU_CORES_TOTAL\""),
 
-      new kernel::Field::Text(   # Feld ist nicht verwendbar, da der Inhalt
-                name          =>'memory',  # manchmal MB und manchmal GB sind
-                uivisible     =>0,  
+      new kernel::Field::Text(   
+                name          =>'memory',  
                 group         =>'sysdata',
                 label         =>"Memory",
                 unit          =>'MB',
