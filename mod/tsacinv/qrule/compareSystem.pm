@@ -106,8 +106,16 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
+
+   return(undef,undef) if ($rec->{srcsys} ne ""  &&           # exclude f.e.
+                           $rec->{srcsys} ne "W5Base" &&      # EWU2 elements
+                           $rec->{srcsys} ne "AssetManager");
+
+
+
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
+
 
    #
    # Level 0

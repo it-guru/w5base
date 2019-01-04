@@ -95,7 +95,10 @@ sub qcheckRecord
    my $errorlevel=0;
 
 
-
+   return(undef,undef) if ($rec->{srcsys} ne ""  &&           # exclude f.e.
+                           $rec->{srcsys} ne "W5Base" &&      # EWU2 elements
+                           $rec->{srcsys} ne "AssetManager"); 
+   
 
    #return(0,undef) if ($rec->{cistatusid}!=4);
 
