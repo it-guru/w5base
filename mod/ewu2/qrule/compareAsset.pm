@@ -167,7 +167,8 @@ sub qcheckRecord
                              $parrec,"model",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlink');
+                             mode=>'leftouterlinkbaselogged',
+                             iomapped=>$par);
 
                $self->IfComp($dataobj,
                              $rec,"locationid",

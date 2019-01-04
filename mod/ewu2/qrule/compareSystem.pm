@@ -315,11 +315,19 @@ sub qcheckRecord
                              mode=>'integer');
 
                $self->IfComp($dataobj,
+                             $rec,"memory",
+                             $parrec,"memory",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'integer');
+
+               $self->IfComp($dataobj,
                              $rec,"osrelease",
                              $parrec,"osrelease",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlink');
+                             mode=>'leftouterlinkbaselogged',
+                             iomapped=>$par);
                if ($rec->{allowifupdate}){
                   my $net=getModuleObject($self->getParent->Config(),
                           "itil::network");
