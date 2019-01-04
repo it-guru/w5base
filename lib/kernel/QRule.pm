@@ -167,6 +167,7 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
    my $errorlevel=shift;
    my %param=@_;
 
+   my ($callerpackage)=caller();
    $param{mode}="native" if (!defined($param{mode}));
    $param{AllowEmpty}=1 if (!defined($param{AllowEmpty}));
 
@@ -184,6 +185,18 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
    }
 
    my $takeremote=0;
+   my $remotecompval;
+   if (exists($comprec->{$compfieldname})){
+      $remotecompval=$comprec->{$compfieldname};
+      if ($param{mode} eq "boolean"){ 
+         if ($remotecompval){ # some data cleanup in boolean mode 
+            $remotecompval=1;
+         }
+         else{
+            $remotecompval=0;
+         }
+      }
+   }
 
    if ($param{mode} eq "native" ||
        $param{mode} eq "string"){           # like native string compares
@@ -259,9 +272,44 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
          my $lnkfield=$obj->getField($origfieldname);
          my $chkobj=$lnkfield->vjoinobj();
          if (defined($chkobj)){
-            $chkobj->SetFilter($lnkfield->{vjoindisp}=>
-                               "\"".$comprec->{$compfieldname}."\"");
-            my ($chkrec,$msg)=$chkobj->getOnlyFirst($lnkfield->{vjoinon}->[1]);
+            my %joinfilter=(
+               $lnkfield->{vjoindisp}=>"\"".$comprec->{$compfieldname}."\""
+            );
+            if (defined($param{iomapped}) && ref($param{iomapped})){
+               my $d;
+               my $iorec={
+                     $lnkfield->{vjoindisp}=>$comprec->{$compfieldname}
+               };
+               my @targetid=$chkobj->getIdByHashIOMapped(
+                  $param{iomapped}->Self(),
+                  $iorec,
+                  DEBUG=>\$d,
+                  ForceLikeSearch=>1
+               );
+               if ($iorec->{$lnkfield->{vjoindisp}} ne 
+                   $comprec->{$compfieldname}){
+                  if ($#targetid==-1){
+                     if ($obj->IsMemberOf("admin")){  # only for admins as info!
+                        push(@$qmsg,"IOMapped ($compfieldname): '".
+                                    $comprec->{$compfieldname}."' -> ".
+                                    "'".$iorec->{$lnkfield->{vjoindisp}}."' ".
+                                    "but not storedable");
+                     }
+                  }
+               }
+               #printf STDERR ("debug=%s\n",$d);
+               if ($#targetid!=-1){
+                  my $idfield=$chkobj->IdField();
+                  if (defined($idfield)){
+                     %joinfilter=($idfield->Name()=>\$targetid[0]);
+                  }   
+               }
+            }
+
+            $chkobj->SetFilter(%joinfilter);
+            my ($chkrec,$msg)=$chkobj->getOnlyFirst(
+               $lnkfield->{vjoinon}->[1],$lnkfield->{vjoindisp}
+            );
             if (!defined($chkrec)){
                if ($param{mode} eq "leftouterlinkcreate"){
                   my $newrec={};
@@ -283,10 +331,15 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                   }
                }
                elsif ($param{mode} eq "leftouterlinkbaselogged"){
+                   my $ref=$obj->Self;
+                   my $idfield=$obj->IdField();
+                   if (defined($idfield) && $origrec->{$idfield->Name()} ne ""){
+                      $ref.="(".$origrec->{$idfield->Name()}.")";
+                   }
                    $obj->Log(ERROR,"basedata",
                         "Missing key '$comprec->{$compfieldname}' while ".
                         "try to import '$compfieldname' in '".
-                        $obj->Self."'".
+                        $ref."' with module '$callerpackage'".
                         "\n-");
                }
                else{
@@ -296,7 +349,22 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                }
             }
             else{
-               $takeremote++;
+               if (defined($param{iomapped}) && ref($param{iomapped})){
+                  # remoteval maybee changed! (if iomapped)
+                  if (!defined($origrec->{$origfieldname}) ||
+                      lc($chkrec->{$lnkfield->{vjoindisp}}) ne 
+                      lc($origrec->{$origfieldname})){
+                     $remotecompval=$chkrec->{$lnkfield->{vjoindisp}};
+                     $takeremote++;
+                  }
+                  else{
+                     # takeremote not needed, because value is equal after
+                     # iomapping
+                  }
+               }
+               else{
+                  $takeremote++;
+               }
             }
          }
       }
@@ -355,18 +423,6 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
       }
    }
    if ($takeremote){
-      my $compval;
-      if (exists($comprec->{$compfieldname})){
-         $compval=$comprec->{$compfieldname};
-         if ($param{mode} eq "boolean"){ 
-            if ($compval){ # some data cleanup in boolean mode 
-               $compval=1;
-            }
-            else{
-               $compval=0;
-            }
-         }
-      }
 
       if ($tmpExcluded) {
          push(@$qmsg,"different data, ".
@@ -380,11 +436,11 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
              !defined($origrec->{$origfieldname}) ||
              $origrec->{$origfieldname}=~m/^\s*$/){
             if ($param{AllowEmpty} || $comprec->{$compfieldname} ne ""){
-               $forcedupd->{$origfieldname}=$compval;
+               $forcedupd->{$origfieldname}=$remotecompval;
             }
          }
          else{
-            $wfrequest->{$origfieldname}=$compval;
+            $wfrequest->{$origfieldname}=$remotecompval;
          }
       }
    }
