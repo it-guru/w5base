@@ -1,6 +1,6 @@
 package TS::event::COMigrationToolTRAFO;
 #  W5Base Framework
-#  Copyright (C) 2012  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -36,15 +36,8 @@ sub new
    return($self);
 }
 
-sub Init
-{
-   my $self=shift;
 
-   $self->RegisterEvent("COMigrationTool","COMigrationTool");
-   return(1);
-}
-
-sub COMigrationTool
+sub COMigrationToolTRAFO
 {
    my $self=shift;
    my $filename=shift;
