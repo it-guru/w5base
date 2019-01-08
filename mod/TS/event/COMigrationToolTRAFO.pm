@@ -59,7 +59,7 @@ sub ProcessLineData
    my $row=shift;
    my $data=shift;
    return() if ($row==0);
-   return() if (trim($data->[0]) eq trim($data->[1]))
+   return() if (trim($data->[0]) eq trim($data->[1]));
    return() if (trim($data->[0]) eq "");
    return() if (trim($data->[1]) eq "");
 
