@@ -6,9 +6,8 @@ package tscape::qrule::compareApplMgr2;
 
 =head3 PURPOSE
 
-This quality rule compares the Maintenance responsible specified in 
-the ICTO Object on CAPE to the ApplicationManager deputy entry in
-a BusinessApplication.
+This quality rule compares the "Application Manager Deputy" specified in 
+the ICTO Object on CAPE with contacts in BusinessApplication.
 
 =head3 IMPORTS
 
@@ -16,7 +15,7 @@ a BusinessApplication.
 
 =head3 HINTS
 
-The Maintenance responsible  of an IT application is leading entered in CAPE via the ICT-Object and is only compared for the production environments in Darwin (valid for CI-States: "available/in project" and "installed/active")
+The "Application Manager Deputy" of an IT application is leading entered in CAPE via the ICT-Object and is only compared for the production environments in Darwin (valid for CI-States: "available/in project" and "installed/active")
 
 Please contact the Support of CAPE ...
 
@@ -24,7 +23,7 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/14549226710001
 
 [de:]
 
-Der ApplicationManager Vertreter ist federführend in CAPE über das ICTO Objekt als Maintenance responsible gepflegt und wird nur für die Produktionsumgebungen in Darwin abgeglichen (gilt für CI-Status: "verfügbar/in Projektierung" und "installiert/aktiv")
+Der ApplicationManager Vertreter ist federführend in CAPE über das ICTO Objekt als "Application Manager Deputy" gepflegt und wird nur für die Produktionsumgebungen in Darwin abgeglichen (gilt für CI-Status: "verfügbar/in Projektierung" und "installiert/aktiv")
 
 Bitte kontaktieren Sie den Support von CAPE ...
 
@@ -107,7 +106,7 @@ sub qcheckRecord
          if (defined($parrec)){
             my $user=getModuleObject($self->getParent->Config,"base::user");
             foreach my $r (@{$parrec->{roles}}){
-               if (($r->{role} eq "Maintenance Responsible") &&
+               if (($r->{role} eq "Application Manager Deputy") &&
                    $r->{email} ne ""){
                   my $amid=$user->GetW5BaseUserID($r->{email},"email",
                                                   {quiet=>1});
