@@ -14,6 +14,7 @@
 'itu.ac.system.swinstall'=>{de=>'Software-Inst.',en=>'Software-Inst.'},
 'itu.ac.system.lnksharednet'=>{de=>'Verkn. SharedNet',en=>'SharedNet rel.'},
 'itu.ac.system.lnksharedstorage'=>{de=>'Verkn. SharedStor',en=>'SharedStor rel.'},
+'itu.ac.system.service'=>{de=>'Service/Leistung',en=>'Service'},
 'itu.ac.license'=>{de=>'Lizenz',en=>'License'},
 'itu.ac.shstorage'=>{de=>'shared Storage',en=>'shared Storage'},
 'itu.ac.krn'=>{de=>'Stammdaten',en=>'Kerneldata'},

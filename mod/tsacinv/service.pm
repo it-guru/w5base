@@ -33,69 +33,89 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    $self->AddFields(
-      new kernel::Field::Linenumber(name       =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
 
-      new kernel::Field::Id(        name       =>'serviceid',
-                                    label      =>'ServiceID',
-                                    align      =>'left',
-                                    dataobjattr=>'"serviceid"'),
+      new kernel::Field::Id(
+                name          =>'serviceid',
+                label         =>'ServiceID',
+                align         =>'left',
+                dataobjattr   =>'"serviceid"'),
 
-      new kernel::Field::Text(      name       =>'systemid',
-                                    label      =>'SystemId',
-                                    size       =>'13',
-                                    htmlwidth  =>50,
-                                    uppersearch=>1,
-                                    align      =>'left',
-                                    dataobjattr=>'"systemid"'),
+      new kernel::Field::Text(
+                name          =>'systemid',
+                label         =>'SystemId',
+                size          =>'13',
+                htmlwidth     =>50,
+                uppersearch   =>1,
+                align         =>'left',
+                dataobjattr   =>'"systemid"'),
+
+      new kernel::Field::Text(
+               name           =>'systemname',
+               label          =>'Systemname',
+               vjoinslimit    =>100,
+               vjointo        =>\'tsacinv::system',
+               vjoinon        =>['systemid'=>'systemid'],
+               vjoindisp      =>'systemname'),
 
       new kernel::Field::Interface(
                 name          =>'lcomputerid',
                 label         =>'AC-ComputerID',
                 dataobjattr   =>'"lcomputerid"'),
 
-      new kernel::Field::Text(      name       =>'name',
-                                    label      =>'Service Name',
-                                    htmlwidth  =>50,
-                                    ignorecase =>1,
-                                    dataobjattr=>'"name"'),
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Service Name',
+                htmlwidth     =>50,
+                ignorecase    =>1,
+                dataobjattr   =>'"name"'),
 
-      new kernel::Field::Text(      name       =>'type',
-                                    label      =>'Service Type',
-                                    htmlwidth  =>200,
-                                    ignorecase =>1,
-                                    dataobjattr=>'"type"'),
+      new kernel::Field::Text(
+                name          =>'type',
+                label         =>'Service Type',
+                htmlwidth     =>200,
+                ignorecase    =>1,
+                dataobjattr   =>'"type"'),
 
-      new kernel::Field::Text(      name       =>'unit',
-                                    label      =>'Unit',
-                                    htmlwidth  =>50,
-                                    dataobjattr=>'"unit"'),
+      new kernel::Field::Text(
+                name          =>'unit',
+                label         =>'Unit',
+                htmlwidth     =>50,
+                dataobjattr   =>'"unit"'),
+                              
+      new kernel::Field::Text(
+                name          =>'description',
+                label         =>'Service Description',
+                dataobjattr   =>'"description"'),
 
-      new kernel::Field::Text(      name       =>'description',
-                                    label      =>'Service Description',
-                                    dataobjattr=>'"description"'),
+      new kernel::Field::Boolean(
+                name          =>'isordered',
+                label         =>'is ordered',
+                dataobjattr   =>'"isordered"'),
 
-      new kernel::Field::Boolean(   name       =>'isordered',
-                                    label      =>'is ordered',
-                                    dataobjattr=>'"isordered"'),
+      new kernel::Field::Boolean(
+                name          =>'isdelivered',
+                label         =>'is delivered',
+                dataobjattr   =>'"isdelivered"'),
 
-      new kernel::Field::Boolean(   name       =>'isdelivered',
-                                    label      =>'is delivered',
-                                    dataobjattr=>'"isdelivered"'),
+      new kernel::Field::Float(
+                name          =>'ammount',
+                label         =>'Ammount',
+                htmlwidth     =>50,
+                align         =>'right',
+                dataobjattr   =>'"ammount"'),
 
-      new kernel::Field::Float(     name       =>'ammount',
-                                    label      =>'Ammount',
-                                    htmlwidth  =>50,
-                                    align      =>'right',
-                                    dataobjattr=>'"ammount"'),
+      new kernel::Field::Text(
+                name          =>'costcenter',
+                label         =>'CostCenter',
+                dataobjattr   =>'"costcenter"'),
 
-      new kernel::Field::Text(      name       =>'costcenter',
-                                    label      =>'CostCenter',
-                                    dataobjattr=>'"costcenter"'),
-
-      new kernel::Field::Text(      name       =>'sendcostcenter',
-                                    label      =>'sender CostCenter',
-                                    dataobjattr=>'"sendcostcenter"'),
+      new kernel::Field::Text(
+                name          =>'sendcostcenter',
+                label         =>'sender CostCenter',
+                dataobjattr   =>'"sendcostcenter"'),
 
    );
    $self->setWorktable("service"); 

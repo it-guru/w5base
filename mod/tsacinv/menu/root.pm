@@ -75,6 +75,10 @@ sub Init
                       "tsacinv::noappsystem",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.ac.system.service",
+                      "tsacinv::service",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itu.ac.itclust",
                       "tsacinv::itclust",
                       defaultacl=>['admin']);
