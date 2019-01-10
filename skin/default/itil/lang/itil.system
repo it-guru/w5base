@@ -43,6 +43,7 @@
 'Productionsystem'=>{de=>'Produktionssystem'},
 'Developmentsystem'=>{de=>'Entwicklungssystem'},
 'Educationsystem'=>{de=>'Schulungssystem'},
+'Disaster Recovery'=>{de=>'Katastrophenfall'},
 'Approval/Integration System'=>{de=>'Abnahme-/Integrationssystem'},
 'Referencesystem'=>{de=>'Referenzsystem'},
 'Infrastructursystem'=>{de=>'Infrastruktursystem'},

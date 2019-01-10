@@ -1731,3 +1731,4 @@ create table lnknetinterconipnet (
   FOREIGN KEY fk_netintercon (netintercon) REFERENCES netintercon (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
+alter table system add is_cbreakdown bool default '0';

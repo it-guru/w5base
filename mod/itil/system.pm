@@ -964,6 +964,13 @@ sub new
                 dataobjattr   =>'system.is_reference'),
 
       new kernel::Field::Boolean(
+                name          =>'iscbreakdown',
+                group         =>'opmode',
+                htmlhalfwidth =>1,
+                label         =>'Disaster Recovery',
+                dataobjattr   =>'system.is_cbreakdown'),
+
+      new kernel::Field::Boolean(
                 name          =>'isapplserver',
                 group         =>'systemclass',
                 htmlhalfwidth =>1,
