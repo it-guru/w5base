@@ -63,6 +63,11 @@ create table "W5SIEM_secent" (
    associated_malware   VARCHAR2(4000),
    pci_vuln             VARCHAR2(10),
    category             VARCHAR2(2000),
+   protocol             varchar2(40),
+   cve_id               varchar2(256),
+   bugtraq_id           varchar2(256),
+   thread               clob,
+   solution             clob,
    constraint W5SIEM_secent_pk foreign key (ref)
    REFERENCES "W5SIEM_secscan" (ref),
    constraint W5SIEM_secent_pk1 PRIMARY KEY (id)
