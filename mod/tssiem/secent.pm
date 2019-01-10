@@ -115,6 +115,11 @@ sub new
                 dataobjattr   =>"W5SIEM_secent.port"),
 
       new kernel::Field::Text(
+                name          =>'protocol',
+                label         =>'Protocol',
+                dataobjattr   =>"W5SIEM_secent.protocol"),
+
+      new kernel::Field::Text(
                 name          =>'ssl',
                 label         =>'SSL',
                 dataobjattr   =>"W5SIEM_secent.ssl"),
@@ -128,6 +133,16 @@ sub new
                 name          =>'lastdetect',
                 label         =>'Last Detect',
                 dataobjattr   =>'W5SIEM_secent.last_detect'),
+
+      new kernel::Field::Text(
+                name          =>'cveid',
+                label         =>'CVE ID',
+                dataobjattr   =>"W5SIEM_secent.cve_id"),
+
+      new kernel::Field::Text(
+                name          =>'bugtraqid',
+                label         =>'Bugtraq ID',
+                dataobjattr   =>"W5SIEM_secent.bugtraq_id"),
 
       new kernel::Field::Text(
                 name          =>'sslparsedserial',
@@ -223,6 +238,20 @@ sub new
                 htmldetail    =>'NotEmpty',
                 sqlorder      =>'NONE',
                 dataobjattr   =>'W5SIEM_secent.results'),
+
+      new kernel::Field::Textarea(
+                name          =>'thread',
+                label         =>'Thread',
+                htmldetail    =>'NotEmpty',
+                sqlorder      =>'NONE',
+                dataobjattr   =>'W5SIEM_secent.thread'),
+
+      new kernel::Field::Textarea(
+                name          =>'solution',
+                label         =>'Solution',
+                htmldetail    =>'NotEmpty',
+                sqlorder      =>'NONE',
+                dataobjattr   =>'W5SIEM_secent.solution'),
 
 
       new kernel::Field::Text(
