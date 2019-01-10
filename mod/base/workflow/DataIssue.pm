@@ -838,6 +838,13 @@ sub PostProcess
                            workflowname=>$workflowname,
                            sendercc=>1);
    }
+   if ($action eq "addWfAction.wfmailsend"){
+      if (defined($WfRec) && ($WfRec->{id}=~m/^\d{3,20}$/)){
+         $self->getParent->getParent->ValidatedUpdateRecord($WfRec,{
+            mdate=>NowStamp("en")
+         },{id=>\$WfRec->{id}});
+      }
+   }
    if ($action=~m/^SaveStep\..*$/){
       Query->Delete("WorkflowStep");
       Query->Delete("note");

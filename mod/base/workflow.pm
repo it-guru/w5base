@@ -2696,6 +2696,12 @@ sub externalMailHandler
          $chkfail=1;
          $self->LastMsg(ERROR,"no target email adress specified");
       }
+      if (length(trim($s))<3){
+         $self->LastMsg(ERROR,"missing subject");
+      }
+      if (length(trim($m))<3){
+         $self->LastMsg(ERROR,"missing mail text");
+      }
       my %notiy;
       $notiy{name}=$s;
       $notiy{emailtext}=$m;
@@ -2987,9 +2993,11 @@ function doSend()
 {
    if (document.forms[0].elements['subject'].value==""){
       alert("no subject");
+      return(0);
    }
    if (document.forms[0].elements['to'].value==""){
       alert("no to");
+      return(0);
    }
    document.forms[0].submit();
 

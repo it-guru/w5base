@@ -95,3 +95,5 @@
 'no action log entry'=>{de=>'--- noch kein Eintrag ---'},
 'individual attributes'=>{de=>'individuelle Attribute'},
 'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},
+'missing subject'=>{de=>'kein Betreff'},
+'missing mail text'=>{de=>'kein Nachrichtentext'},

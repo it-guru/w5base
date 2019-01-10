@@ -401,7 +401,45 @@ sub StoreRecord
    $rec{name}=$name;
    $rec{comments}=$comments;
    $rec{effort}=$effort if (defined($effort) && $effort!=0);
-   return($self->ValidatedInsertRecord(\%rec));
+
+   if (!($rec{wfheadid}=~/^\d{3,20}$/)){
+      $self->LastMsg(ERROR,"invalid wfheadid StoreRecord in StoreRecord");
+      Stacktrace(); 
+      return(0);
+   }
+   my $parent=$self->getParent();
+
+   my $wf=$self->getPersistentModuleObject("wf","base::workflow");
+   my ($WfRec,$class,$step)=$wf->getWfRec($wfheadid);
+
+   if (!defined($WfRec)){
+      $self->LastMsg(ERROR,"invalid wfheadid '$rec{wfheadid}' for ".
+                           "StoreRecord in StoreRecord");
+      Stacktrace(); 
+      return(0);
+   }
+   my $bk=$self->ValidatedInsertRecord(\%rec);
+
+   #######################################################################
+   # Hack to call PostProcess in related Workflow (f.e. for 
+   # postMail Handling)
+   if ($bk){
+      if (defined($wf->{SubDataObj}->{$class})){
+         my $stepobj=$wf->{SubDataObj}->{$class}->getStepObject($self->Config,
+                                                                $step);
+         if (defined($stepobj)){
+            my $bk=$stepobj->PostProcess("addWfAction.".$name,
+                                         $WfRec,undef,%rec);
+         }
+      }
+      else{
+        Stacktrace();
+      }
+   }
+   #######################################################################
+
+
+   return($bk);
 }
 
 sub NotifyForward
