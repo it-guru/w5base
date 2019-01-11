@@ -423,6 +423,8 @@ sub getBackendName
       }
    }
    if ($mode eq "order"){
+      my $ordername=shift;
+
       return(undef) if (lc($self->{sqlorder}) eq "none");
       $_=$db->DriverName();
       case: {   # did not works on tsinet Oracle database
@@ -437,6 +439,13 @@ sub getBackendName
             else{
                $sqlorder="desc";
             }
+            if ($sqlorder ne "none" && ($ordername=~m/^-/)){  # absteigend
+               $sqlorder="desc";
+            }
+            if ($sqlorder ne "none" && ($ordername=~m/^\+/)){  # aufsteigend
+               $sqlorder="asc";
+            }
+
             if ($self->getParent->{use_distinct}){
                return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS') ".
                       "NULLS FIRST"); # needed for QualityChecks
@@ -450,6 +459,7 @@ sub getBackendName
 
          };
       }
+      return($self->SUPER::getBackendName($mode,$db,$ordername));
    }
    return($self->SUPER::getBackendName($mode,$db));
 }  
