@@ -3411,6 +3411,7 @@ sub getFieldObjsByView
    }
    foreach my $fullfieldname (@view){
       $fullfieldname=trim($fullfieldname);
+      $fullfieldname=~s/^[+-]//;  # remove posible order
       my ($container,$fieldname)=(undef,$fullfieldname);
       if ($fullfieldname=~m/\./){
          ($container,$fieldname)=$fullfieldname=~m/^(\S+?)\.(\S+)/;
@@ -3734,6 +3735,7 @@ sub getCurrentViewName
 sub getCurrentView
 {
    my $self=shift;
+   my $raw=shift;    # if raw=1 no +- is striped
    if (!defined($self->Context->{'CurrentView'})){
       if (ref($self->{DefaultView}) eq "ARRAY"){
          return(@{$self->{DefaultView}});
@@ -3742,12 +3744,23 @@ sub getCurrentView
          return();
       }
    }
-   return(@{$self->Context->{'CurrentView'}});
+   my @view=@{$self->Context->{'CurrentView'}};
+   if (!$raw){
+      map({$_=~s/^[+-]//;$_} @view);
+   }
+
+   return(@view);
 }
 
 sub SetCurrentOrder
 {
    my $self=shift;
+
+   #  prefix + on field creates "ascending" (asc) order
+   #  prefix - on field creates "descending" (desc) order
+   #  (but only if sqlorder is not set to "none")
+   #
+
    if ($#_==-1){
       delete($self->Context->{'CurrentOrder'});
    }

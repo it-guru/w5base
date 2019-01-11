@@ -264,37 +264,16 @@ sub getSqlOrder
    my $self=shift;
    my ($worktable,$workdb)=$self->getWorktable();
    my @order=$self->initSqlOrder;
+
+   my @rawview=$self->getCurrentView(1);
    my @view=$self->getFieldObjsByView([$self->getCurrentView()]);
-
-
    my @o=$self->GetCurrentOrder();
+
    if (!($#o==0 && uc($o[0]) eq "NONE")){
       if ($#o==-1 || ($#o==0 && $o[0] eq "")){
-         foreach my $field (@view){
-            my $orderstring=$field->getBackendName("order",$self->{DB});
-            if (!defined($orderstring)){
-               if (defined($field->{vjoinon}) && 
-                   ref($field->{vjoinon}) eq "ARRAY"){
-                  my $jfld=$self->getField($field->{vjoinon}->[0]);
-                  if (defined($jfld)){
-                     my $orderstring=$jfld->getBackendName("order",
-                                      $self->{DB});
-                     if (defined($orderstring) &&
-                         !in_array(\@order,$orderstring)){
-                        push(@order,$orderstring);
-                     }
-                  }
-               }
-            }
-            else{
-               if (!in_array(\@order,$orderstring)){
-                  push(@order,$orderstring);
-               }
-            }
-         }
-         return(join(", ",@order));
+         @o=@rawview;
       }
-      else{
+      {
          foreach my $ofield (@o){
             my $fieldname=$ofield;
             $fieldname=~s/^[+-]//;

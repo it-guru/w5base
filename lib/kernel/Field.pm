@@ -972,15 +972,14 @@ sub getBackendName     # returns the name/function to place in select
          if (defined($self->{sqlorder})){
             $sqlorder=$self->{sqlorder};
          }
-         if ($ordername=~m/^-/){
-            if ($sqlorder eq "desc"){
-               $sqlorder="";
-            }
-            else{
-               $sqlorder="desc";
-            }
+         if ($sqlorder ne "none" && ($ordername=~m/^-/)){  # absteigend
+            $sqlorder="desc";
+         }
+         if ($sqlorder ne "none" && ($ordername=~m/^\+/)){  # aufsteigend
+            $sqlorder="asc";
          }
          $orderstring.=" ".$sqlorder;
+
          return(undef) if (lc($self->{sqlorder}) eq "none");
          return($orderstring);
       }
