@@ -969,6 +969,20 @@ sub generateToken
    return(substr($token,0,$len));
 }
 
+sub defaultModuleObject_newMethod
+{
+   my $type=shift;
+   my %param=@_;
+   my $self;
+
+   { # SUPER is not working - so we need to calc parrent:new
+      no strict qw/refs/;
+      my @isa=eval("\@${type}::ISA");
+      my $new="$isa[0]::new";
+      $self=bless(&{$new}(%param),$type);
+   }
+   return($self);
+}
 
 sub getModuleObject
 {
@@ -1028,7 +1042,17 @@ sub getModuleObject
       $compartment->reval("use $package;\$o=new $package(\%modparam);");
    }
    else{
-      eval("use $package;(\$o,\$msg)=new $package(\%modparam);");
+      eval("use $package;");
+      if ($@ eq ""){
+         {  # dynamic define new method (Hack) in package, if it not exists
+            no strict qw/refs/;
+            my $func=$package."::new";
+            if (!(*{$func}{CODE})){
+               *{$func}=\&defaultModuleObject_newMethod;
+            }
+         }
+         eval("(\$o,\$msg)=new $package(\%modparam);");
+      }
    }
    if ($@ ne "" || !defined($o) || $o eq "InitERROR"){
       $msg=$@;
