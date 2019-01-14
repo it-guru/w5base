@@ -1,0 +1,9 @@
+Ladies and Gentlemen,
+
+on the ICTO-ID '%ICTONO%' the following Qualys SecurityScans are available:
+
+%SCANLIST%
+
+Please fix the issues descripted in the Reports.
+%DEBUG%
+
