@@ -266,6 +266,8 @@ sub new
                 label         =>'Source-Id',
                 dataobjattr   =>'W5SIEM_secent.id'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Date(
                 name          =>'srcload',
                 history       =>0,

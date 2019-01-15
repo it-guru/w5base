@@ -40,6 +40,8 @@ sub new
                 group         =>'source',
                 dataobjattr   =>"ref"),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Link(
                 name          =>'qref',
                 label         =>'Qualys Ref',

@@ -214,10 +214,6 @@ sub doNotify
       #}
    }
 
-#   %uid=();
-
-   $uid{to}->{12663941300002}++; # Roland bekommt die erstmal aufs Auge
-
 
    my @targetuids=grep(!/^$/,keys(%{$uid{to}}),keys(%{$uid{cc}}));
 
@@ -269,7 +265,7 @@ sub doNotify
       $wfa->Notify("INFO",$subject,$tmpl, 
          emailto=>\@emailto, 
          emailcc=>\@emailcc, 
-         emailbcc=>[11634953080001]
+         emailbcc=>[11634953080001,12663941300002]
       );
    }
    if ($lastlang ne ""){
