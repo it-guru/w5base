@@ -15,7 +15,8 @@ the ICTO Object on CAPE with contacts in BusinessApplication.
 
 =head3 HINTS
 
-The "Application Manager Deputy" of an IT application is leading entered in CAPE via the ICT-Object and is only compared for the production environments in Darwin (valid for CI-States: "available/in project" and "installed/active")
+The "ApplicationManager deputy" is maintained in CAPE via the ICTO object as "Application Manager Deputy" and is only adjusted for the production environments in Darwin (valid for CI states: "available/project" and "installed/active").
+
 
 Please contact the Support of CAPE ...
 

@@ -1,4 +1,4 @@
-'tscape::qrule::compareApplMgr2'=>{de=>'Überprüfung ob der ApplicationManager Vertreter Kontakt mit CAPE übereinstimmt',en=>'validate the ApplicationManager deputy against CAPE'},
+'tscape::qrule::compareApplMgr2'=>{de=>'Überprüfung ob der ApplicationManager Vertreter Kontakt mit CAPE übereinstimmt',en=>'Check if the ApplicationManager deputy contact matches CAPE'},
 'removing applmgr2 role from contact %s'=>{de=>'Entferung der Rolle ApplicationManager Vertreter vom Kontakt %s'},
 'removing applmgr2 contact %s'=>{de=>'Entferung des ApplicationManager Vertreter Kontaktes %s'},
 'update roles of contact %s with applmgr2'=>{de=>'Aktualisierung des Kontaktes %s um Rolle ApplicationManager Vertreter'},
