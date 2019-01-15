@@ -52,63 +52,51 @@ sub new
                 label         =>'Accounting Area',
                 dataobjattr   =>'"tssapp01::psp".w5accarea'),
 
-#      new kernel::Field::Text(
-#                name          =>'rawofientity',
-#                label         =>'raw OFI Entity',
-#                htmldetail    =>0,
-#                searchable    =>0,
-#                dataobjattr   =>'interface_tssapp01_01.rawofientity'),
-
-#      new kernel::Field::Text(
-#                name          =>'ofientity',
-#                label         =>'OFI Entity',
-#                dataobjattr   =>'interface_tssapp01_01.ofientity'),
-
-#      new kernel::Field::Text(
-#                name          =>'status',
-#                label         =>'Status',
-#                dataobjattr   =>'interface_tssapp01_01.status'),
+      new kernel::Field::Text(
+                name          =>'status',
+                label         =>'Status',
+                dataobjattr   =>'"tssapp01::psp".status'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
                 dataobjattr   =>'"tssapp01::psp".w5description'),
 
-#      new kernel::Field::Text(
-#                name          =>'sapcustomer',
-#                label         =>'SAP Customer',
-#                dataobjattr   =>'interface_tssapp01_01.sapcustomer'),
+      new kernel::Field::Text(
+                name          =>'sapcustomer',
+                label         =>'SAP Customer',
+                dataobjattr   =>'"tssapp01::psp".sapcustomer'),
 
       new kernel::Field::Link(
                 name          =>'etype',
                 label         =>'Type',
                 dataobjattr   =>'"tssapp01::psp".w5etype'),
 
-#      new kernel::Field::Text(
-#                name          =>'bpmark',
-#                label         =>'Bussinessprocess mark',
-#                weblinkto     =>'tssapp01::gpk',
-#                weblinkon     =>['bpmark'=>'name'],
-#                dataobjattr   =>'interface_tssapp01_01.bpmark'),
+      new kernel::Field::Text(
+                name          =>'bpmark',
+                label         =>'Bussinessprocess mark',
+                weblinkto     =>'tssapp01::gpk',
+                weblinkon     =>['bpmark'=>'name'],
+                dataobjattr   =>'"tssapp01::psp".bpmark'),
 
-#      new kernel::Field::Text(
-#                name          =>'ictono',
-#                label         =>'ICTO-ID',
-#                dataobjattr   =>'interface_tssapp01_01.ictono'),
+      new kernel::Field::Text(
+                name          =>'ictono',
+                label         =>'ICTO-ID',
+                dataobjattr   =>'"tssapp01::psp".ictono'),
 
-#      new kernel::Field::TextDrop(
-#                name          =>'databoss',
-#                group         =>'contacts',
-#                label         =>'Projectmanager EMail',
-#                vjointo       =>'tswiw::user',
-#                vjoinon       =>['databosswiw'=>'uid'],
-#                vjoindisp     =>'email'),
+      new kernel::Field::TextDrop(
+                name          =>'databoss',
+                group         =>'contacts',
+                label         =>'Projectmanager EMail',
+                vjointo       =>'tswiw::user',
+                vjoinon       =>['databosswiw'=>'uid'],
+                vjoindisp     =>'email'),
 
-#      new kernel::Field::Text(
-#                name          =>'databosswiw',
-#                group         =>'contacts',
-#                label         =>'Projectmanager WIW ID',
-#                dataobjattr   =>'interface_tssapp01_01.databosswiw'),
+      new kernel::Field::Text(
+                name          =>'databosswiw',
+                group         =>'contacts',
+                label         =>'Projectmanager WIW ID',
+                dataobjattr   =>'"tssapp01::psp".w5responsiblewiw'),
 
 #      new kernel::Field::TextDrop(
 #                name          =>'sm',
@@ -143,7 +131,7 @@ sub new
                 label         =>'SAP hierarchy',
                 group         =>'saphier',
                 ignorecase    =>1,
-                dataobjattr   =>getSAPhierSQL()),
+                dataobjattr   =>'"tssapp01::psp".saphier'),
 
       new kernel::Field::Text(
                 name          =>'saphier1',
@@ -239,11 +227,11 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'"tssapp01::psp".w5modifydate'),
 
-#      new kernel::Field::Boolean(
-#                name          =>'isdeleted',
-#                uivisible     =>0,
-#                label         =>'is deleted',
-#                dataobjattr   =>'interface_tssapp01_01.isdeleted'),
+      new kernel::Field::Boolean(
+                name          =>'isdeleted',
+                uivisible     =>0,
+                label         =>'is deleted',
+                dataobjattr   =>'"tssapp01::psp".isdeleted'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
@@ -268,12 +256,6 @@ sub new
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'"tssapp01::psp".w5srcid'),
-
-      new kernel::Field::Date(
-                name          =>'srcload',
-                group         =>'source',
-                label         =>'Source-Load',
-                dataobjattr   =>'interface_tssapp01_01.srcload'),
 
    );
    $self->setDefaultView(qw(name description cdate mdate));
