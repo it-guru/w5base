@@ -546,6 +546,17 @@ sub new
                 selectfix     =>1,
                 dataobjattr   =>'swinstance.itclusts'),
 
+      new kernel::Field::SubList(
+                name          =>'swinstancerunnodes',
+                label         =>'posible instance run nodes/systems',
+                group         =>'swinstancerunnodes',
+                vjointo       =>'itil::lnkswinstancesystem',
+                vjoinbase     =>{'systemcistatusid'=>"<=5"},
+                vjoinon       =>['id'=>'swinstanceid'],
+                vjoininhash   =>['system','systemid','systemsystemid',
+                                 'systemcistatusid'],
+                vjoindisp     =>['system','systemsystemid','systemcistatus']),
+
       new kernel::Field::Text(
                 name          =>'sslurl',
                 group         =>'ssl',
@@ -1272,7 +1283,7 @@ sub isViewValid
 
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc monisla env history control
-              relations swinstancerules
+              relations swinstancerules swinstancerunnodes
               softwareinst contacts attachments source swinstanceparam qc);
    if (defined($rec) && $rec->{'runonclusts'}){
       push(@all,"cluster");
@@ -1347,7 +1358,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default adm sec env monisla misc cluster 
-             systems softwareinst contacts swinstanceparam ssl 
+             systems swinstancerunnodes softwareinst contacts swinstanceparam ssl 
              control swinstancerules attachments relations source));
 }
 

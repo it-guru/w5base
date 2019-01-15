@@ -36,12 +36,6 @@ sub new
                 name          =>'linenumber',
                 label         =>'No.'),
 
-      new kernel::Field::Id(
-                name          =>'id',
-                label         =>'LinkID',
-                searchable    =>0,
-                dataobjattr   =>'lnkswinstancesystem.id'),
-                                                 
       new kernel::Field::TextDrop(
                 name          =>'swinstance',
                 htmlwidth     =>'250px',
@@ -51,22 +45,15 @@ sub new
                 vjoindisp     =>'fullname',
                 dataobjattr   =>'swinstance.fullname'),
 
-      new kernel::Field::TextDrop(
-                name          =>'swteam',
-                label         =>'Instance guardian team',
-                translation   =>'itil::swinstance',
+      new kernel::Field::Select(
+                name          =>'swinstancecistatus',
+                group         =>'swinstanceinfo',
                 readonly      =>1,
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['swteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+                label         =>'Instance CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['swinstancecistatusid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
-                name          =>'swteamid',
-                dataobjattr   =>'swinstance.swteam'),
-
-
-                                                   
       new kernel::Field::TextDrop(
                 name          =>'system',
                 htmlwidth     =>'100px',
@@ -92,6 +79,20 @@ sub new
                 group         =>'systeminfo',
                 dataobjattr   =>'system.systemid'),
 
+      new kernel::Field::TextDrop(
+                name          =>'swteam',
+                label         =>'Instance guardian team',
+                translation   =>'itil::swinstance',
+                readonly      =>1,
+                vjointo       =>'base::grp',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['swteamid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'swteamid',
+                dataobjattr   =>'swinstance.swteam'),
+                                                   
       new kernel::Field::Text(
                 name          =>'shortdesc',
                 readonly      =>1,
@@ -136,66 +137,6 @@ sub new
                 value         =>[0,1],
                 dataobjattr   =>'system.is_test'),
 
-      new kernel::Field::Textarea(
-                name          =>'comments',
-                searchable    =>0,
-                label         =>'Comments',
-                dataobjattr   =>'lnkswinstancesystem.comments'),
-
-      new kernel::Field::Creator(
-                name          =>'creator',
-                group         =>'source',
-                label         =>'Creator',
-                dataobjattr   =>'lnkswinstancesystem.createuser'),
-                                   
-      new kernel::Field::Owner(
-                name          =>'owner',
-                group         =>'source',
-                label         =>'last Editor',
-                dataobjattr   =>'lnkswinstancesystem.modifyuser'),
-                                   
-      new kernel::Field::Text(
-                name          =>'srcsys',
-                group         =>'source',
-                label         =>'Source-System',
-                dataobjattr   =>'lnkswinstancesystem.srcsys'),
-                                                   
-      new kernel::Field::Text(
-                name          =>'srcid',
-                group         =>'source',
-                label         =>'Source-Id',
-                dataobjattr   =>'lnkswinstancesystem.srcid'),
-                                                   
-      new kernel::Field::Date(
-                name          =>'srcload',
-                group         =>'source',
-                label         =>'Last-Load',
-                dataobjattr   =>'lnkswinstancesystem.srcload'),
-                                                   
-      new kernel::Field::CDate(
-                name          =>'cdate',
-                group         =>'source',
-                label         =>'Creation-Date',
-                dataobjattr   =>'lnkswinstancesystem.createdate'),
-                                                
-      new kernel::Field::MDate(
-                name          =>'mdate',
-                group         =>'source',
-                label         =>'Modification-Date',
-                dataobjattr   =>'lnkswinstancesystem.modifydate'),
-                                                   
-      new kernel::Field::Editor(
-                name          =>'editor',
-                group         =>'source',
-                label         =>'Editor Account',
-                dataobjattr   =>'lnkswinstancesystem.editor'),
-                                                  
-      new kernel::Field::RealEditor(
-                name          =>'realeditor',
-                group         =>'source',
-                label         =>'real Editor Account',
-                dataobjattr   =>'lnkswinstancesystem.realeditor'),
-
       new kernel::Field::Mandator(
                 group         =>'swinstanceinfo',
                 readonly      =>1),
@@ -205,15 +146,6 @@ sub new
                 label         =>'ApplMandatorID',
                 group         =>'swinstanceinfo',
                 dataobjattr   =>'swinstance.mandator'),
-
-      new kernel::Field::Select(
-                name          =>'swinstancecistatus',
-                group         =>'swinstanceinfo',
-                readonly      =>1,
-                label         =>'Instance CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['swinstancecistatusid'=>'id'],
-                vjoindisp     =>'name'),
 
       new kernel::Field::Select(
                 name          =>'swnature',
@@ -294,13 +226,12 @@ sub new
                                                    
       new kernel::Field::Link(
                 name          =>'swinstanceid',
-                label         =>'ApplID',
-                dataobjattr   =>'lnkswinstancesystem.swinstance'),
+                dataobjattr   =>'swinstance.id'),
                                                    
       new kernel::Field::Link(
                 name          =>'systemid',
                 label         =>'SystemId',
-                dataobjattr   =>'lnkswinstancesystem.system'),
+                dataobjattr   =>'system.id'),
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
@@ -308,7 +239,6 @@ sub new
                 dataobjattr   =>'swinstance.mandator'),
    );
    $self->setDefaultView(qw(swnature swinstance swtype system systemsystemid cdate));
-   $self->setWorktable("lnkswinstancesystem");
    return($self);
 }
 
@@ -324,12 +254,38 @@ sub getRecordImageUrl
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="lnkswinstancesystem left outer join swinstance ".
-            "on lnkswinstancesystem.swinstance=swinstance.id ".
-            "left outer join system ".
-            "on lnkswinstancesystem.system=system.id";
+   my $from="swinstance
+      left outer join lnkitclustsvc
+         on swinstance.itclusts=lnkitclustsvc.id
+      left outer join itclust
+         on lnkitclustsvc.itclust=itclust.id
+      left outer join system as clnode
+         on clnode.clusterid=itclust.id
+      left outer join lnkitclustsvcsyspolicy
+         on (lnkitclustsvc.id=lnkitclustsvcsyspolicy.itclustsvc and
+            clnode.id=lnkitclustsvcsyspolicy.system)
+      left outer join system
+         on (swinstance.system=system.id or clnode.id=system.id)";
+ 
    return($from);
 }
+
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   my $where="((swinstance.runonclusts=0) or (
+      ((lnkitclustsvc.id is not null and
+        lnkitclustsvcsyspolicy.runpolicy is null and
+        itclust.defrunpolicy<>'deny') or
+       (lnkitclustsvc.id is not null and
+        lnkitclustsvcsyspolicy.runpolicy is not null and
+        lnkitclustsvcsyspolicy.runpolicy<>'deny'))
+      ))";
+   return($where);
+}
+
 
 sub SecureSetFilter
 {
@@ -353,35 +309,6 @@ sub SecureSetFilter
 
 
 
-sub Validate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $origrec=shift;
-
-   if ((!defined($oldrec) && !defined($newrec->{swinstanceid})) ||
-       (defined($newrec->{swinstanceid}) && $newrec->{swinstanceid}==0)){
-      $self->LastMsg(ERROR,"invalid swinstanceication specified");
-      return(undef);
-   }
-   if ((!defined($oldrec) && !defined($newrec->{systemid})) ||
-       (defined($newrec->{systemid}) && $newrec->{systemid}==0)){
-      $self->LastMsg(ERROR,"invalid contract specified");
-      return(undef);
-   }
-   my $swinstanceid=effVal($oldrec,$newrec,"swinstanceid");
-
-   if ($self->isDataInputFromUserFrontend()){
-      if (!$self->isWriteOnSwinstanceValid($swinstanceid,"systems")){
-         $self->LastMsg(ERROR,"no access");
-         return(undef);
-      }
-   }
-   return(1);
-}
-
-
 sub isViewValid
 {
    my $self=shift;
@@ -396,19 +323,34 @@ sub SecureValidate
 }
 
 
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_swinstancecistatus"))){
+     Query->Param("search_swinstancecistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+   if (!defined(Query->Param("search_systemcistatus"))){
+     Query->Param("search_systemcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
+
 sub isWriteValid
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
 
-   my $swinstanceid=effVal($oldrec,$newrec,"swinstanceid");
-
-   return("default") if (!defined($oldrec) && !defined($newrec));
-   return("default") if ($self->IsMemberOf("admin"));
-   return("default") if ($self->isWriteOnSwinstanceValid($swinstanceid,"systems"));
-   return("default") if (!$self->isDataInputFromUserFrontend() && 
-                         !defined($oldrec));
+#   my $swinstanceid=effVal($oldrec,$newrec,"swinstanceid");
+#
+#   return("default") if (!defined($oldrec) && !defined($newrec));
+#   return("default") if ($self->IsMemberOf("admin"));
+#   return("default") if ($self->isWriteOnSwinstanceValid($swinstanceid,"systems"));
+#   return("default") if (!$self->isDataInputFromUserFrontend() && 
+#                         !defined($oldrec));
 
    return(undef);
 }

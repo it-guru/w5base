@@ -13,6 +13,8 @@
 'fieldgroup.relations'=>{de=>'Instanz Relationen',en=>'Instance relations'},
 'fieldgroup.ssl'=>{de=>'SSL Prüfsystem',en=>'SSL Verification'},
 'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
+'fieldgroup.swinstancerunnodes'=>{en=>'posible instance run nodes/systems',de=>'möglich Instanz Ausführungs-Nodes/Systeme'},
+'posible instance run nodes/systems'=>{de=>'möglich Instanz Ausführungs-Nodes/Systeme'},
 'fieldgroup.env'=>{en=>'enviroment documentation',de=>'Umgebungsbeschreibung'},
 'fieldgroup.swinstancerules'=>{en=>'Config rules',de=>'Konfigurationsregeln'},
 'fieldgroup.swinstanceparam'=>{en=>'Life Parameters',de=>'Life Parameter'},
