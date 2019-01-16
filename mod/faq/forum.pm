@@ -105,10 +105,11 @@ sub NewTopic
       my $bo=$self->getPersistentModuleObject("faq::forumboard");
       $bo->SetFilter({id=>\$board});
       my ($borec,$msg)=$bo->getOnlyFirst(qw(name));
+      my $t=$self->T("new topic");
       print $self->getAppTitleBar(title=>'Forum: '.
                     "<a href=\"Main\" class=toplink>Boards</a> &bull; ".
                     "<a href=\"Main/$board\" class=toplink>$borec->{name}</a>".
-                    ' &bull; neues Thema');
+                    ' &bull; '.$t);
       $self->ShowNewTopic();
    }
    print $self->HtmlBottom(body=>1,form=>1);
@@ -134,8 +135,12 @@ sub ShowNewTopic
      my $to=$self->getPersistentModuleObject("faq::forumtopic");
      $to->Context->{DataInputFromUserFrontend}=1;
      if (my $id=$to->ValidatedInsertRecord(\%rec)){
-        print("<tr><td>Thema erfolgreich gespeichert.</td></tr></table>");
+        my $t=$self->T("Topic successfull saved");
+        print("<tr><td>${t}.</td></tr></table>");
         my $ref=Query->Param("HTTP_REFERER"); 
+        if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+           $ref=~s/^http:/https/gi;
+        }
         print("<script language=\"JavaScript\">".
               "window.setTimeout('document.location.href=\"$ref\";', 500);".
               "</script>");
@@ -919,10 +924,11 @@ sub ShowBoards
    print("<center><table $self->{maintabparam}>");
 
    print("<tr><td colspan=5 align=right>&nbsp;</td></tr>");
+   my $t=$self->T("moderator");
    print("<tr><th $class>Board</th><th $class style=\"text-align:center\">".
          $self->T("topics")."</th><th $class style=\"text-align:center\">".
          $self->T("entrys")."</th><th $class>".
-         $self->T("last posting by")."</th><th $class>Moderator</th></tr>");
+         $self->T("last posting by")."</th><th $class>${t}</th></tr>");
    my $l=1;
    $bo->SecureSetFilter();
    foreach my $rec ($bo->getHashList(qw(boardgroup name id 

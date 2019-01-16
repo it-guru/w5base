@@ -17,3 +17,6 @@
 'The Board manager has add you to board "%s".'=>{de=>'Der Forum Moderator hat Sie dem Board "%s" hinzugefügt.'},
 'The Board manager has removed you from board "%s".'=>{de=>'Der Forum Moderator hat Sie aus dem Board "%s" entfernt.'},
 'moderator info'=>{de=>'Moderator-Information'},
+'Topic successfull saved'=>{de=>'Thema erfolgreich gespeichert'},
+'new topic'=>{de=>'neues Thema'},
+'moderator'=>{de=>'Moderator'},
