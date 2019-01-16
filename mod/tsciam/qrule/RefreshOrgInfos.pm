@@ -150,10 +150,53 @@ sub qcheckRecord
             my $basemsg="Try rename of Org '$oldname' needed - ".
                         "based on CIAM new tOuSD '$curtousd'";
             $dataobj->Log(WARN,"basedata",$basemsg);
+
+            ##################################################################
+            # the new name for current group can be already be in use on 
+            # the same org-level, so we need to rename the already existing
+            # in an oldxx to get free space for the new name.
+            $dataobj->ResetFilter();
+            $dataobj->SetFilter({
+               parentid=>\$rec->{parentid},
+               name=>\$curtousd,
+               grpid=>"!".$rec->{grpid}
+            });
+            my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
+            if (defined($chkrec)){ # rename will not work, because new exists
+               my $basemsg="New name='$curtousd' already in use by ".
+                           "$chkrec->{fullname} (grpid:$chkrec->{grpid})";
+               $dataobj->Log(WARN,"basedata",$basemsg);
+               FINDFREE: for(my $c=1;$c<99;$c++){  # try find free oldname
+                  my $oldname=$chkrec->{name};
+                  if (length($oldname)>16){
+                     $oldname=substr($oldname,0,15);
+                  }
+                  $oldname.=sprintf("-old%02d",$c);
+                  $dataobj->ResetFilter();
+                  $dataobj->SetFilter({
+                     parentid=>\$rec->{parentid},
+                     name=>\$oldname
+                  });
+                  my ($chk2rec,$msg)=$dataobj->getOnlyFirst(qw(grpid));
+                  if (!defined($chk2rec)){ # OK Name ist frei
+                     if ($dataobj->ValidatedUpdateRecord($chkrec,{
+                           name=>$oldname},{grpid=>\$chkrec->{grpid}})){
+                        my $basemsg="Rename '$chkrec->{fullname}' to ".
+                                    "name='$oldname' done - now ".
+                                    "new $curtousd is useable";
+                        $dataobj->Log(WARN,"basedata",$basemsg);
+                        last FINDFREE;
+                     }
+                  }
+               }
+            }
+            ##################################################################
+
             if ($dataobj->ValidatedUpdateRecord($rec,{name=>$curtousd},
                                                 {grpid=>\$rec->{grpid}})){
                push(@qmsg,"all desired fields has been updated: name");
-               my $basemsg="Rename of Org '$oldname' done";
+               my $basemsg="Rename of Org '$oldname' to name='$curtousd' ".
+                           "done\n--";
                $dataobj->Log(WARN,"basedata",$basemsg);
             }
             else{
