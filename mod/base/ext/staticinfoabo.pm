@@ -38,14 +38,18 @@ sub getControlData
    my $app=$self->getParent();
 
    return([
-           'base::user' =>   {id  =>'110000001',
-                                              name=>'STEVuserchanged'},
-           'base::grp' =>    {id  =>'110000002',
-                                              name=>'STEVqreportbyorg'},
-           'base::workflow'=>{id  =>'110000003',
-                                              name=>'STEVwfstatsendWeek'},
-           'base::user' =>   {id  =>'110000004',
-                                              name=>'STEVborderchange'},
+           'base::user' =>   {            id  =>'110000001',
+               name=>'STEVuserchanged'},
+
+           'base::grp' =>    {            id  =>'110000002',
+               name=>'STEVqreportbyorg'},
+
+           'base::workflow'=>{            id  =>'110000003',
+               force=>1,   # not editable for users set to 1
+               name=>'STEVwfstatsendWeek'},
+
+           'base::user' =>   {            id  =>'110000004',
+               name=>'STEVborderchange'},
           ]);
 
 }

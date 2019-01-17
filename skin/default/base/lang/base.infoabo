@@ -16,6 +16,7 @@
 'Info Mode'=>{de=>'Informationsmodus'},
 'Contact E-Mail'=>{de=>'Kontakt E-Mail'},
 'Subscribe managment'=>{de=>'InfoAbo: Bestellen und Abbestellen von Informationsquellen'},
+'forced'=>{de=>'erzwungen'},
 'subscribe'=>{de=>'abonnieren'},
 'unsubscribe'=>{de=>'abbestellen'},
 'not subscribed'=>{de=>'nicht bestellt'},

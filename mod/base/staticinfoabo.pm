@@ -46,6 +46,8 @@ sub new
                                     $current->{name},$current->{translation}));
                                   },
                                   label    =>'Info Fullname'),
+      new kernel::Field::Boolean( name     =>'force',
+                                  label    =>'Force Abo Handling'),
       new kernel::Field::Text(    name     =>'translation',
                                   label    =>'Info Translation')
    );
@@ -57,7 +59,8 @@ sub new
          my $rec=shift(@$ctrl);
          my $r={id         =>$rec->{id},
                 translation=>$trans,
-                name       =>$rec->{name}};
+                name       =>$rec->{name},
+                force      =>$rec->{force}};
          push(@{$self->{'data'}},$r);
       }
    }

@@ -426,6 +426,54 @@ EOF
    return($d);
 }
 
+sub getAboTemplateRecordsFor
+{
+   my $self=shift;
+   my $parentobj=shift;
+   my $parentobj2=shift;
+
+
+   my @res=();
+   my %mode=();
+   if ($parentobj eq "base::staticinfoabo" || $parentobj eq ""){
+      my $st=getModuleObject($self->Config,"base::staticinfoabo");
+      foreach my $rec ($st->getHashList(qw(id name fullname force))){
+         $mode{$rec->{name}}={
+             name=>$rec->{name},
+             id=>$rec->{id},
+             type=>'staticinfoabo',
+             fullname=>$rec->{fullname},
+             force=>$rec->{force},
+             parentobj=>'base::staticinfoabo'
+         };
+         push(@res,$mode{$rec->{name}});
+      }
+   }
+   if ($parentobj ne "base::staticinfoabo"){
+      foreach my $obj (values(%{$self->{infoabo}})){
+         my ($ctrl)=$obj->getControlData($self);
+         foreach my $obj (keys(%$ctrl)){
+            if ($parentobj eq $obj ||
+                $parentobj2 eq $obj || $parentobj eq ""){
+               my @l=@{$ctrl->{$obj}->{mode}};
+               while(my $m=shift(@l)){
+                  my $t=shift(@l);
+                  $mode{$m}={
+                      name=>$m,
+                      type=>'infoabo',
+                      fullname=>$self->T($m,$t),
+                      force=>'',
+                      parentobj=>$parentobj
+                  };
+                  push(@res,$mode{$m});
+               }
+            }
+         }
+      }
+   }
+   return({mode=>\%mode,modes=>\@res});
+}
+
 sub getModesFor
 {
    my $self=shift;
@@ -884,6 +932,7 @@ sub LoadTargets
    my $load=$param{load};   # load userid or email address
    $load="email" if ($load eq "" || !($load ne "email" || $load eq "userid"));
 
+   my $ml=$self->getAboTemplateRecordsFor($parent); 
    my $c=0;
    if (!defined($userlist)){
       $self->ResetFilter();
@@ -912,6 +961,7 @@ sub LoadTargets
       $mode=\$mode if (!ref($mode));
       $userlist=[$userlist] if (!ref($userlist) eq "ARRAY");
       $param{default}=0 if (!exists($param{default}));
+
       $self->ResetFilter();
       $self->SetFilter({refid=>$refid,mode=>$mode,
                         parent=>$parent,userid=>$userlist});
@@ -923,7 +973,13 @@ sub LoadTargets
                                         # contact entry has NOT been deleted
          @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
          if ($rec->{email} ne ""){
-            if ($rec->{active} && $rec->{usercistatusid}<=5){
+            my $requested=$rec->{active};
+            if (defined($ml) && exists($ml->{mode}->{$$mode}) &&
+                $ml->{mode}->{$$mode}->{parentobj} eq "base::staticinfoabo" &&
+                $ml->{mode}->{$$mode}->{force} ne ""){
+               $requested=$ml->{mode}->{$$mode}->{force};
+            }
+            if ($requested && $rec->{usercistatusid}<=5){
                if (!defined($desthash->{lc($rec->{$load})})){
                   $desthash->{lc($rec->{$load})}=[];
                }
@@ -932,37 +988,54 @@ sub LoadTargets
             }
          }
       }
-      my %u=();
+      my %u=();   # store default mode, if not forced
       map({$u{$_}=1;} @$userlist);
       @$userlist=keys(%u);
-      if ($#{$userlist}!=-1){
-         #if (!$parent=~m/^\*/){
-            foreach my $userid (@$userlist){
-               # insert operation
-               my $sparent=$parent;
-               my $srefid=$refid;
-               my $smode=$mode;
-               $sparent=$$parent if (ref($parent) eq "SCALAR");
-               $srefid=$$refid if (ref($refid) eq "SCALAR");
-               $smode=$$mode if (ref($mode) eq "SCALAR");
-               if ($userid>0){
-                  my $rec={userid=>$userid,active=>$param{default},
-                           parent=>$sparent,mode=>$smode,refid=>$srefid};
-                  $self->InsertRecord($rec);
+      if (defined($ml) && exists($ml->{mode}->{$$mode}) &&
+          (($ml->{mode}->{$$mode}->{parentobj} eq "base::staticinfoabo" &&
+            $ml->{mode}->{$$mode}->{force} eq "1"))){ 
+          my $usr=getModuleObject($self->Config,"base::user");
+          $usr->SetFilter({userid=>$userlist,cistatusid=>4});
+          foreach my $urec ($usr->getHashList(qw(userid email))){
+             if (!defined($desthash->{lc($urec->{$load})})){
+                $desthash->{lc($urec->{$load})}=[];
+             }
+             push(@{$desthash->{lc($urec->{$load})}},$urec->{userid});
+          }
+      }
+      if (defined($ml) && exists($ml->{mode}->{$$mode}) &&
+          (($ml->{mode}->{$$mode}->{parentobj} eq "base::staticinfoabo" &&
+            $ml->{mode}->{$$mode}->{force} eq "") ||
+           $ml->{mode}->{$$mode}->{parentobj} ne "base::staticinfoabo")){
+         if ($#{$userlist}!=-1){
+            #if (!$parent=~m/^\*/){
+               foreach my $userid (@$userlist){
+                  # insert operation
+                  my $sparent=$parent;
+                  my $srefid=$refid;
+                  my $smode=$mode;
+                  $sparent=$$parent if (ref($parent) eq "SCALAR");
+                  $srefid=$$refid if (ref($refid) eq "SCALAR");
+                  $smode=$$mode if (ref($mode) eq "SCALAR");
+                  if ($userid>0){
+                     my $rec={userid=>$userid,active=>$param{default},
+                              parent=>$sparent,mode=>$smode,refid=>$srefid};
+                     $self->InsertRecord($rec);
+                  }
+                  else{
+                     msg(ERROR,"try to insert infoabo for invalid '$userid'");
+                  }
                }
-               else{
-                  msg(ERROR,"try to insert infoabo for invalid '$userid'");
+            #}
+            $self->ResetFilter();
+            $self->SetFilter({refid=>$refid,mode=>$mode,active=>\'1',
+                              parent=>$parent,userid=>$userlist});
+            foreach my $rec ($self->getHashList(qw(userid email))){
+               if (!defined($desthash->{lc($rec->{$load})})){
+                  $desthash->{lc($rec->{$load})}=[];
                }
+               push(@{$desthash->{lc($rec->{$load})}},$rec->{id});
             }
-         #}
-         $self->ResetFilter();
-         $self->SetFilter({refid=>$refid,mode=>$mode,active=>\'1',
-                           parent=>$parent,userid=>$userlist});
-         foreach my $rec ($self->getHashList(qw(userid email))){
-            if (!defined($desthash->{lc($rec->{$load})})){
-               $desthash->{lc($rec->{$load})}=[];
-            }
-            push(@{$desthash->{lc($rec->{$load})}},$rec->{id});
          }
       }
    }
@@ -1003,27 +1076,39 @@ sub WinHandleInfoAboSubscribe
    $d.=$self->HtmlHeader(style=>'default.css',
                          form=>1,body=>1,
                          title=>$self->T("Subscribe managment"));
+
    my $oldval=Query->Param("infoabo");
    my ($curobj,$curmode,$curid)=split(/;/,$oldval);
+   my $ml;
    if (defined($curobj) && defined($curmode) && defined($curid) &&
        $curobj ne "" && $curmode ne "" && $curid ne ""){
-      $self->ResetFilter();
-      $self->SetFilter({refid=>\$curid,parentobj=>\$curobj,
-                        mode=>\$curmode,userid=>\$userid});
-      my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
-      if (Query->Param("ADD")){
-         if (defined($rec)){
-            $self->ValidatedUpdateRecord($rec,{active=>1},{id=>\$rec->{id}});
+      $ml=$self->getAboTemplateRecordsFor($curobj); 
+      if (exists($ml->{mode}->{$curmode})){ # check if change is valid
+         my $desiredOP;
+         $desiredOP="ADD" if (Query->Param("ADD"));
+         $desiredOP="DEL" if (Query->Param("DEL"));
+         if ($ml->{mode}->{$curmode}->{force} eq "1" &&
+             defined($desiredOP)){
+            $desiredOP="ADD";
          }
-         else{
-            $self->ValidatedInsertRecord({refid=>$curid,parentobj=>$curobj,
-                                          active=>1,
-                                          mode=>$curmode,userid=>$userid});
+         $self->ResetFilter();
+         $self->SetFilter({refid=>\$curid,parentobj=>\$curobj,
+                           mode=>\$curmode,userid=>\$userid});
+         my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+         if ($desiredOP eq "ADD"){
+            if (defined($rec)){
+               $self->ValidatedUpdateRecord($rec,{active=>1},{id=>\$rec->{id}});
+            }
+            else{
+               $self->ValidatedInsertRecord({refid=>$curid,parentobj=>$curobj,
+                                             active=>1,
+                                             mode=>$curmode,userid=>$userid});
+            }
          }
-      }
-      if (Query->Param("DEL")){
-         if (defined($rec)){
-            $self->ValidatedUpdateRecord($rec,{active=>0},{id=>\$rec->{id}});
+         elsif ($desiredOP eq "DEL"){
+            if (defined($rec)){
+               $self->ValidatedUpdateRecord($rec,{active=>0},{id=>\$rec->{id}});
+            }
          }
       }
    }
@@ -1050,6 +1135,7 @@ sub WinHandleInfoAboSubscribe
       $statusmsg="<b>".$self->T("Current State").":</b> ";
       my $st=isAboActiv(\@cur,$curobj,$curmode,$curid);
       if ((!defined($st)) && $curobj eq "base::staticinfoabo"){
+
          $statusmsg.=$self->T("default handling");
          $statusbtn="<input style=\"width:100px;margin-right:210px\" ".
                     "type=submit name=ADD value=\" ".
@@ -1066,32 +1152,50 @@ sub WinHandleInfoAboSubscribe
                     "type=submit name=ADD value=\" ".
                     $self->T("subscribe")." \">";
       }
+      if ($curobj eq "base::staticinfoabo" && defined($ml) &&
+          exists($ml->{mode}->{$curmode}) &&
+          $ml->{mode}->{$curmode}->{force} ne ""){
+         $statusbtn="";
+         $statusmsg="<b>".$self->T("Current State").":</b> ";
+         if ($ml->{mode}->{$curmode}->{force} eq "1"){
+            $statusmsg.=$self->T("forced")." ".$self->T("subscribed");
+         }
+         if ($ml->{mode}->{$curmode}->{force} eq "0"){
+            $statusmsg.=$self->T("forced")." ".$self->T("unsubscribe");
+         }
+      }
    }
    my $optionlist="";
    while(defined(my $obj=shift(@oplist))){
       my $id=shift(@oplist);
       my $label=shift(@oplist);
       my @ml;
-      if ($obj eq "base::staticinfoabo"){
-         my $st=getModuleObject($self->Config,"base::staticinfoabo");
-         foreach my $rec ($st->getHashList(qw(id name fullname))){
-            push(@ml,$rec->{name}.";".$rec->{id});
-            push(@ml,$rec->{fullname});
-         }
-      }
-      else{
-         @ml=$self->getModesFor($obj);
-      }
+      my $ml=$self->getAboTemplateRecordsFor($obj); 
+
       my $objlabel=$self->T($obj,$obj);
       $objlabel.=": ".$label if ($label ne "");
       
       $optionlist.="<optgroup label=\"$objlabel\">";
-      while(defined(my $mode=shift(@ml))){
-         my $modelabel=shift(@ml);
-         my $key="$obj;$mode";
-         $key.=";$id" if (defined($id) && $id ne "");
+      foreach my $mrec (@{$ml->{modes}}){
+         next if ($mrec->{parentobj} ne $obj);
+         my $mode=$mrec->{name};
+         my $modelabel=$mrec->{fullname};
+         my $opobj=$mrec->{parentobj};
+
+         my $key="$opobj;$mode";
+         if ($opobj eq "base::staticinfoabo"){
+            $key.=";".$mrec->{id};
+         }
+         else{
+            $key.=";$id" if (defined($id) && $id ne "");
+         }
          my ($akobj,$akmode,$akid)=split(/;/,$key);
          my $st=isAboActiv(\@cur,$akobj,$akmode,$akid);
+         if ($akobj eq "base::staticinfoabo" &&
+             exists($ml->{mode}->{$mode}) && 
+             $ml->{mode}->{$mode}->{force} ne ""){
+            $st=$ml->{mode}->{$mode}->{force};
+         }
          $st="?"      if ((!defined($st)) && $akobj eq "base::staticinfoabo");
          $st="-"      if (!defined($st));
          $st="*"      if ($st eq "1");
