@@ -145,6 +145,7 @@ foreach my $apid (@apid){
       }
       else{
          printf STDERR ("ERROR: inconsistend pid file at '$statefile'\n");
+         printf STDERR ("ERROR: pid line='%s'\n",$l);
       }
       close(F);
    }
