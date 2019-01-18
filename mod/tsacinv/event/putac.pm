@@ -157,6 +157,40 @@ sub getAcGroupByW5BaseGroup
    return(undef);
 }
 
+sub mkAcFtpRecIP
+{
+   my $self=shift;
+   my $arec=shift;
+   my $rec=shift;
+
+   if (ref($rec->{ipaddresses}) eq "ARRAY"){
+      my @ip;
+      foreach my $iprec (@{$rec->{ipaddresses}}){
+          push(@ip,{
+             EventID=>"IP:".$rec->{systemid}.":".$iprec->{id},
+             Description=>$iprec->{comments},
+             Comp_ExternalID=>$iprec->{id},
+             Comp_ExternalSystem=>"W5Base",
+             Computer=>$rec->{systemid},
+             Application=>"[NULL]",
+             Remarks=>"admin",
+             Status=>"configured",
+             bDeleted=>"0",
+             IPMS=>"",
+             ExternalID=>$rec->{id},
+             ExternalSystem=>"W5Base",
+             TcpIpAddress=>$iprec->{name}
+          });
+      }
+      my @l;
+      push(@l,{Interfaces=>\@ip});
+      #die("hard");
+      return(\@l);
+   }
+   return();
+}
+
+
 sub mkAcFtpRecSystem
 {
    my $self=shift;
@@ -276,11 +310,12 @@ sub SendXmlToAM_system
          $filter{name}=\@systemname;
       }
    }
-   $self->{DebugMode}=0;   # force non debug mode
+   #$self->{DebugMode}=0;   # force non debug mode
    my (%fh,%filename);
 
    $self->{jobstart}=NowStamp();
    ($fh{system},       $filename{system}               )=$self->InitTransfer();
+   ($fh{interface},    $filename{interface}            )=$self->InitTransfer();
 
    $system->SetFilter(\%filter);
    $system->SetCurrentView(qw(ALL));
@@ -302,6 +337,12 @@ sub SendXmlToAM_system
                   $acnew++;
                }
             }
+            if (my $iplst=$self->mkAcFtpRecIP($acassetrec,$rec)){
+               my $fh=$fh{interface};
+               foreach my $iprec (@$iplst){
+                  print $fh hash2xml($iprec,{header=>0});
+               }
+            }
          }
          
          ($rec,$msg)=$system->getNext();
@@ -309,6 +350,7 @@ sub SendXmlToAM_system
    }
    msg(INFO,"count status: acnew=$acnew acnewback=$acnewback");
    $self->TransferFile($fh{system},$filename{system},"logsys");
+   $self->TransferFile($fh{interface},$filename{interface},"interface");
 }
 
 
@@ -1421,14 +1463,14 @@ sub TransferFile
       close(FI);
    }
    if ($ftp->Connect()){
-      msg(INFO,"Connect to FTP Server OK '$ftp'");
+      msg(INFO,"Connect to FTP Server OK '$ftp' - debug=$self->{DebugMode}");
       my $jobname="w5base.".$self->{jobstart}.".".sprintf("%08d",$$).".xml";
       my $jobfile="$object/$jobname";
       msg(INFO,"Processing  job : '%s'",$jobfile);
       msg(INFO,"Processing  file: '%s'",$filename);
       if (!$self->{DebugMode}){
          my $transferOK=0;
-         if ($self->Config->Param("W5BaseOperationMode") ne "devx"){
+         if ($self->Config->Param("W5BaseOperationMode") ne "xdev"){
             if (!defined($ftp->Put($filename,$jobfile))){
                msg(ERROR,"File $filename to $jobfile could not be transfered:".
                          " $?, $!");
