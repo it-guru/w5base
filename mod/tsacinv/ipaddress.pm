@@ -162,6 +162,18 @@ sub new
                 label         =>'AccountNoID',
                 dataobjattr   =>'"laccountnoid"'),
 
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                label         =>'Source-System',
+                dataobjattr   =>'"srcsys"'),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'"srcid"'),
+
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
