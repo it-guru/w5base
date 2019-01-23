@@ -882,8 +882,6 @@ sub SendXmlToAM_logicalgroups
                       bDelete=>'0'
                    }
             };
-            $acftprec->{Appl}->{ExternalID}="AssetW5BaseID:".$rec->{id};
-            $acftprec->{Appl}->{ExternalSystem}="W5Base";
 
             my $fh=$fh{lg};
             print $fh hash2xml($acftprec,{header=>0});
