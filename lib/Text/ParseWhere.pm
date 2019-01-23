@@ -139,6 +139,13 @@ sub _checkSyn
    }
 
 
+# Operator Präzedenz für W5Base Filter Hashes
+# A || B && C          bedeutet A || (B && C)
+# A && B || C && D     bedeutet (A && B) || (C && D)
+# A && B && C || D     bedeutet (A && B && C) || D
+# !A && B || C         bedeutet ((!A) && B) || C
+# A && (B || C ) && D  nicht zulässig 
+
 
 sub fltHashFromExpression
 {
