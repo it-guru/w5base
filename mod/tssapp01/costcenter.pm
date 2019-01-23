@@ -39,28 +39,28 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
-                dataobjattr   =>'interface_tssapp01_02.id'),
+                dataobjattr   =>'"tssapp01::costcenter".w5id'),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
                 nowrap        =>1,
                 label         =>'CostCenter',
-                dataobjattr   =>'interface_tssapp01_02.name'),
+                dataobjattr   =>'"tssapp01::costcenter".w5name'),
 
       new kernel::Field::Text(
                 name          =>'accarea',
                 label         =>'Accounting Area',
-                dataobjattr   =>'interface_tssapp01_02.accarea'),
+                dataobjattr   =>'"tssapp01::costcenter".w5accarea'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
-                dataobjattr   =>'interface_tssapp01_02.description'),
+                dataobjattr   =>'"tssapp01::costcenter".w5description'),
 
       new kernel::Field::Link(
                 name          =>'etype',
                 label         =>'Type',
-                dataobjattr   =>'interface_tssapp01_02.etype'),
+                dataobjattr   =>'"tssapp01::costcenter".w5etype'),
 
       new kernel::Field::TextDrop(
                 name          =>'responsible',
@@ -74,14 +74,14 @@ sub new
                 name          =>'responsiblewiw',
                 group         =>'contacts',
                 label         =>'costcenter responsible WIW ID',
-                dataobjattr   =>'interface_tssapp01_02.responsiblewiw'),
+                dataobjattr   =>'"tssapp01::costcenter".w5responsiblewiw'),
 
       new kernel::Field::Text(
                 name          =>'saphier',
                 label         =>'SAP hierarchy',
                 group         =>'saphier',
                 ignorecase    =>1,
-                dataobjattr   =>tssapp01::costcenter::getSAPhierSQL()),
+                dataobjattr   =>'saphier'),
 
       new kernel::Field::Text(
                 name          =>'saphier1',
@@ -89,7 +89,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier1'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier1'),
 
       new kernel::Field::Text(
                 name          =>'saphier2',
@@ -97,7 +97,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier2'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier2'),
 
       new kernel::Field::Text(
                 name          =>'saphier3',
@@ -105,7 +105,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier3'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier3'),
 
       new kernel::Field::Text(
                 name          =>'saphier1',
@@ -113,7 +113,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier4'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier4'),
 
       new kernel::Field::Text(
                 name          =>'saphier5',
@@ -121,7 +121,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier5'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier5'),
 
       new kernel::Field::Text(
                 name          =>'saphier6',
@@ -129,7 +129,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier6'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier6'),
 
       new kernel::Field::Text(
                 name          =>'saphier7',
@@ -137,7 +137,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier7'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier7'),
 
       new kernel::Field::Text(
                 name          =>'saphier8',
@@ -145,7 +145,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier8'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier8'),
 
       new kernel::Field::Text(
                 name          =>'saphier9',
@@ -153,7 +153,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier9'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier9'),
 
       new kernel::Field::Text(
                 name          =>'saphier10',
@@ -161,55 +161,49 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_02.saphier10'),
+                dataobjattr   =>'"tssapp01::costcenter".saphier10'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Creation-Date',
-                dataobjattr   =>'interface_tssapp01_02.createdate'),
+                dataobjattr   =>'"tssapp01::costcenter".w5createdate'),
                                                   
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
-                dataobjattr   =>'interface_tssapp01_02.modifydate'),
+                dataobjattr   =>'"tssapp01::costcenter".w5modifydate'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>"interface_tssapp01_02.modifydate"),
+                dataobjattr   =>"\"tssapp01::costcenter\".w5modifydate"),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(interface_tssapp01_02.id,35,'0')"),
+                dataobjattr   =>"lpad(\"tssapp01::costcenter\".w5id,35,'0')"),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'interface_tssapp01_02.srcsys'),
+                dataobjattr   =>'"tssapp01::costcenter".w5srcsys'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'interface_tssapp01_02.srcid'),
-
-      new kernel::Field::Date(
-                name          =>'srcload',
-                group         =>'source',
-                label         =>'Source-Load',
-                dataobjattr   =>'interface_tssapp01_02.srcload'),
+                dataobjattr   =>'"tssapp01::costcenter".w5srcid'),
 
    );
    $self->setDefaultView(qw(name description cdate mdate));
-   $self->setWorktable("interface_tssapp01_02");
+   $self->setWorktable("\"tssapp01::costcenter\"");
    $self->{history}={
       update=>[
          'local'
@@ -221,13 +215,13 @@ sub new
 sub getSAPhierSQL
 {
    my $tab=shift;
-   $tab="interface_tssapp01_02" if ($tab eq "");
+   $tab="\"tssapp01::costcenter\"" if ($tab eq "");
    my $saphierfield;
    for(my $c=1;$c<=10;$c++){
-      $saphierfield.=",'.'," if ($saphierfield ne "");
-      $saphierfield.="if (${tab}.saphier${c} is null OR ${tab}.saphier${c}='','-',${tab}.saphier${c})";
+      $saphierfield.="||'.'||" if ($saphierfield ne "");
+      $saphierfield.="decode(${tab}.saphier${c},NULL,'-',${tab}.saphier${c})";
    }
-   $saphierfield="concat($saphierfield)";
+   $saphierfield="($saphierfield)";
    return($saphierfield);
 }
 
@@ -299,6 +293,18 @@ sub ImportCostCenter
    print $self->getParsedTemplate("tmpl/minitool.costcenter.import",{});
    print $self->HtmlBottom(body=>1,form=>1);
 }
+
+
+sub Initialize
+{
+   my $self=shift;
+
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
+   return(@result) if (defined($result[0]) eq "InitERROR");
+   return(1) if (defined($self->{DB}));
+   return(0);
+}
+
 
 sub Import
 {

@@ -1,6 +1,6 @@
 package tssapp01::psp;
 #  W5Base Framework
-#  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2018  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -39,62 +39,50 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
-                dataobjattr   =>'interface_tssapp01_01.id'),
+                dataobjattr   =>'"tssapp01::psp".w5id'),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
                 nowrap        =>1,
                 label         =>'PSP Name',
-                dataobjattr   =>'interface_tssapp01_01.name'),
+                dataobjattr   =>'"tssapp01::psp".w5name'),
 
       new kernel::Field::Text(
                 name          =>'accarea',
                 label         =>'Accounting Area',
-                dataobjattr   =>'interface_tssapp01_01.accarea'),
-
-      new kernel::Field::Text(
-                name          =>'rawofientity',
-                label         =>'raw OFI Entity',
-                htmldetail    =>0,
-                searchable    =>0,
-                dataobjattr   =>'interface_tssapp01_01.rawofientity'),
-
-      new kernel::Field::Text(
-                name          =>'ofientity',
-                label         =>'OFI Entity',
-                dataobjattr   =>'interface_tssapp01_01.ofientity'),
+                dataobjattr   =>'"tssapp01::psp".w5accarea'),
 
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
-                dataobjattr   =>'interface_tssapp01_01.status'),
+                dataobjattr   =>'"tssapp01::psp".status'),
 
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Description',
-                dataobjattr   =>'interface_tssapp01_01.description'),
+                dataobjattr   =>'"tssapp01::psp".w5description'),
 
       new kernel::Field::Text(
                 name          =>'sapcustomer',
                 label         =>'SAP Customer',
-                dataobjattr   =>'interface_tssapp01_01.sapcustomer'),
+                dataobjattr   =>'"tssapp01::psp".sapcustomer'),
 
       new kernel::Field::Link(
                 name          =>'etype',
                 label         =>'Type',
-                dataobjattr   =>'interface_tssapp01_01.etype'),
+                dataobjattr   =>'"tssapp01::psp".w5etype'),
 
       new kernel::Field::Text(
                 name          =>'bpmark',
                 label         =>'Bussinessprocess mark',
                 weblinkto     =>'tssapp01::gpk',
                 weblinkon     =>['bpmark'=>'name'],
-                dataobjattr   =>'interface_tssapp01_01.bpmark'),
+                dataobjattr   =>'"tssapp01::psp".bpmark'),
 
       new kernel::Field::Text(
                 name          =>'ictono',
                 label         =>'ICTO-ID',
-                dataobjattr   =>'interface_tssapp01_01.ictono'),
+                dataobjattr   =>'"tssapp01::psp".ictono'),
 
       new kernel::Field::TextDrop(
                 name          =>'databoss',
@@ -108,42 +96,42 @@ sub new
                 name          =>'databosswiw',
                 group         =>'contacts',
                 label         =>'Projectmanager WIW ID',
-                dataobjattr   =>'interface_tssapp01_01.databosswiw'),
+                dataobjattr   =>'"tssapp01::psp".w5responsiblewiw'),
 
-      new kernel::Field::TextDrop(
-                name          =>'sm',
-                group         =>'contacts',
-                vjointo       =>'tswiw::user',
-                label         =>'CBM EMail',
-                vjoinon       =>['smwiw'=>'uid'],
-                vjoindisp     =>'email'),
+#      new kernel::Field::TextDrop(
+#                name          =>'sm',
+#                group         =>'contacts',
+#                vjointo       =>'tswiw::user',
+#                label         =>'CBM EMail',
+#                vjoinon       =>['smwiw'=>'uid'],
+#                vjoindisp     =>'email'),
 
-      new kernel::Field::Text(
-                name          =>'smwiw',
-                group         =>'contacts',
-                label         =>'CBM WIW ID',
-                dataobjattr   =>'interface_tssapp01_01.smwiw'),
+#      new kernel::Field::Text(
+#                name          =>'smwiw',
+#                group         =>'contacts',
+#                label         =>'CBM WIW ID',
+#                dataobjattr   =>'interface_tssapp01_01.smwiw'),
 
-      new kernel::Field::TextDrop(
-                name          =>'dm',
-                group         =>'contacts',
-                label         =>'Deliverymanager EMail',
-                vjointo       =>'tswiw::user',
-                vjoinon       =>['dmwiw'=>'uid'],
-                vjoindisp     =>'email'),
+#      new kernel::Field::TextDrop(
+#                name          =>'dm',
+#                group         =>'contacts',
+#                label         =>'Deliverymanager EMail',
+#                vjointo       =>'tswiw::user',
+#                vjoinon       =>['dmwiw'=>'uid'],
+#                vjoindisp     =>'email'),
 
-      new kernel::Field::Text(
-                name          =>'dmwiw',
-                group         =>'contacts',
-                label         =>'Deliverymanager WIW ID',
-                dataobjattr   =>'interface_tssapp01_01.dmwiw'),
+#      new kernel::Field::Text(
+#                name          =>'dmwiw',
+#                group         =>'contacts',
+#                label         =>'Deliverymanager WIW ID',
+#                dataobjattr   =>'interface_tssapp01_01.dmwiw'),
 
       new kernel::Field::Text(
                 name          =>'saphier',
                 label         =>'SAP hierarchy',
                 group         =>'saphier',
                 ignorecase    =>1,
-                dataobjattr   =>tssapp01::psp::getSAPhierSQL()),
+                dataobjattr   =>'"tssapp01::psp".saphier'),
 
       new kernel::Field::Text(
                 name          =>'saphier1',
@@ -151,7 +139,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier1'),
+                dataobjattr   =>'"tssapp01::psp".saphier1'),
 
       new kernel::Field::Text(
                 name          =>'saphier2',
@@ -159,7 +147,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier2'),
+                dataobjattr   =>'"tssapp01::psp".saphier2'),
 
       new kernel::Field::Text(
                 name          =>'saphier3',
@@ -167,7 +155,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier3'),
+                dataobjattr   =>'"tssapp01::psp".saphier3'),
 
       new kernel::Field::Text(
                 name          =>'saphier4',
@@ -175,7 +163,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier4'),
+                dataobjattr   =>'"tssapp01::psp".saphier4'),
 
       new kernel::Field::Text(
                 name          =>'saphier5',
@@ -183,7 +171,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier5'),
+                dataobjattr   =>'"tssapp01::psp".saphier5'),
 
       new kernel::Field::Text(
                 name          =>'saphier6',
@@ -191,7 +179,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier6'),
+                dataobjattr   =>'"tssapp01::psp".saphier6'),
 
       new kernel::Field::Text(
                 name          =>'saphier7',
@@ -199,7 +187,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier7'),
+                dataobjattr   =>'"tssapp01::psp".saphier7'),
 
       new kernel::Field::Text(
                 name          =>'saphier8',
@@ -207,7 +195,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier8'),
+                dataobjattr   =>'"tssapp01::psp".saphier8'),
 
       new kernel::Field::Text(
                 name          =>'saphier9',
@@ -215,7 +203,7 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier9'),
+                dataobjattr   =>'"tssapp01::psp".saphier9'),
 
       new kernel::Field::Text(
                 name          =>'saphier10',
@@ -223,82 +211,76 @@ sub new
                 group         =>'saphier',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>'interface_tssapp01_01.saphier10'),
+                dataobjattr   =>'"tssapp01::psp".saphier10'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Creation-Date',
-                dataobjattr   =>'interface_tssapp01_01.createdate'),
+                dataobjattr   =>'"tssapp01::psp".w5createdate'),
                                                   
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
-                dataobjattr   =>'interface_tssapp01_01.modifydate'),
+                dataobjattr   =>'"tssapp01::psp".w5modifydate'),
 
       new kernel::Field::Boolean(
                 name          =>'isdeleted',
                 uivisible     =>0,
                 label         =>'is deleted',
-                dataobjattr   =>'interface_tssapp01_01.isdeleted'),
+                dataobjattr   =>'"tssapp01::psp".isdeleted'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>"interface_tssapp01_01.modifydate"),
+                dataobjattr   =>"\"tssapp01::psp\".w5modifydate"),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(interface_tssapp01_01.id,35,'0')"),
+                dataobjattr   =>"lpad(\"tssapp01::psp\".w5id,35,'0')"),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'interface_tssapp01_01.srcsys'),
+                dataobjattr   =>'"tssapp01::psp".w5srcsys'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'interface_tssapp01_01.srcid'),
-
-      new kernel::Field::Date(
-                name          =>'srcload',
-                group         =>'source',
-                label         =>'Source-Load',
-                dataobjattr   =>'interface_tssapp01_01.srcload'),
+                dataobjattr   =>'"tssapp01::psp".w5srcid'),
 
    );
    $self->setDefaultView(qw(name description cdate mdate));
-   $self->setWorktable("interface_tssapp01_01");
-   $self->{history}={
-      update=>[
-         'local'
-      ]
-   };
+   $self->setWorktable("\"tssapp01::psp\"");
+
+   #$self->{history}={
+   #   update=>[
+   #      'local'
+   #   ]
+   #};
    return($self);
 }
 
 sub getSAPhierSQL
 {
    my $tab=shift;
-   $tab="interface_tssapp01_01" if ($tab eq "");
+   $tab="\"tssapp01::psp\"" if ($tab eq "");
    my $saphierfield;
    for(my $c=1;$c<=10;$c++){
-      $saphierfield.=",'.'," if ($saphierfield ne "");
-      $saphierfield.="if (${tab}.saphier${c} is null OR ${tab}.saphier${c}='','-',${tab}.saphier${c})";
+      $saphierfield.="||'.'||" if ($saphierfield ne "");
+      $saphierfield.="decode(${tab}.saphier${c},NULL,'-',${tab}.saphier${c})";
    }
-   $saphierfield="concat($saphierfield)";
+   $saphierfield="($saphierfield)";
    return($saphierfield);
 }
-
 
 
 sub Validate
@@ -320,6 +302,17 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default contacts saphier source));
+}
+
+
+sub Initialize
+{
+   my $self=shift;
+
+   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
+   return(@result) if (defined($result[0]) eq "InitERROR");
+   return(1) if (defined($self->{DB}));
+   return(0);
 }
 
 
