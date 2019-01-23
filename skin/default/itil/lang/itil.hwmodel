@@ -1,3 +1,5 @@
 'itil::hwmodel'=>{de=>'Hardware Model',en=>'Hardware Model'},
 'fieldgroup.default'=>{de=>'Hardware Model Daten',en=>'Hardware Model Data'},
+'fieldgroup.statusinfo'=>{de=>'Status Informationen',en=>'Status Infos'},
+'Asset use count'=>{de=>'Anzahl Verwendungen in Hardware/Assets'},
 'Producer'=>{de=>'Hersteller'},

@@ -91,6 +91,13 @@ sub new
                 },
                 dataobjattr   =>'hwmodel.additional'),
 
+      new kernel::Field::Number(
+                name          =>'assetusecount',
+                group         =>'statusinfo',
+                label         =>'Asset use count',
+                dataobjattr   =>"(select count(*) from asset ".
+                                "where asset.hwmodel=hwmodel.id and asset.cistatus<6)"),
+                                                   
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -180,6 +187,13 @@ sub SecureValidate
 
 
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default statusinfo source));
+}
+
+
 
 sub Validate
 {
@@ -209,6 +223,25 @@ sub FinishWrite
    }
    return(1);
 }
+
+
+sub isCopyValid
+{
+   my $self=shift;
+
+   return(1) if ($self->IsMemberOf("admin"));
+   return(0);
+}
+
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
 
 
 
