@@ -64,6 +64,7 @@ sub Init
    $self->RegisterEvent("SendXmlToAM_system","SendXmlToAM_system",timeout=>40000);
    $self->RegisterEvent("SendXmlToAM_asset","SendXmlToAM_asset",timeout=>40000);
    $self->RegisterEvent("SendXmlToAM_campus","SendXmlToAM_campus");
+   $self->RegisterEvent("SendXmlToAM_logicalgroups","SendXmlToAM_logicalgroups");
    $self->RegisterEvent("SendXmlToAM_itclust","SendXmlToAM_itclust");
 
 
@@ -826,6 +827,93 @@ sub SendXmlToAM_itclust
    }
 
    my $back=$self->TransferFile($fh{itclust},$filename{itclust},"cluster");
+
+   return($back);
+}
+
+
+sub SendXmlToAM_logicalgroups
+{
+   my $self=shift;
+   my @w5id=@_;
+
+   my $elements=0;
+   my $sys=getModuleObject($self->Config,"itil::system");
+   my $ass=getModuleObject($self->Config,"itil::asset");
+
+   my %filter=(cistatusid=>['3','4','5'],itfarm=>'!""');
+   $self->{DebugMode}=1;
+   if ($#w5id!=-1){
+      if (in_array(\@w5id,"debug")){
+         @w5id=grep(!/^debug$/i,@w5id);
+         $self->{DebugMode}=1;
+         msg(ERROR,"processing DebugMode - loading assets '%s'",join(",",@w5id));
+      }
+      $filter{name}=\@w5id;
+   }
+
+   $ass->SetFilter(\%filter);
+   $ass->SetCurrentView(qw(ALL));
+
+   my (%fh,%filename);
+   ($fh{lg},      $filename{lg}               )=$self->InitTransfer();
+
+
+   my ($rec,$msg)=$ass->getFirst();
+   $self->{jobstart}=NowStamp();
+   if (defined($rec)){
+      do{
+         if ($rec->{name}=~m/^A\d+$/){ 
+            my $jobname="W5Base.$self->{jobstart}.".NowStamp().
+                        '.Asset_'.$rec->{id};
+            msg(INFO,"process asset =$rec->{name} ($rec->{itfarm}) ".
+                     "jobname=$jobname");
+            my $CurrentEventId="Add Asset $rec->{name} to farm $rec->{itfarm}";
+            my $groupname="W5Base_".$rec->{itfarm};
+            my $groupdesc="TelIT ".$rec->{itfarm};
+            my $acftprec={
+                   CI_LogGroup_Rel=>{
+                      Description=>$groupdesc,
+                      Portfolio=>$rec->{name},
+                      EventID=>$CurrentEventId,
+                      ExternalSystem=>"W5Base",
+                      ExternalID=>"Asset-W5BaseID:".$rec->{id},
+                      LogGroup_Description=>$groupname,
+                      LogGroup_bDelete=>0,
+                      bDelete=>'0'
+                   }
+            };
+            $acftprec->{Appl}->{ExternalID}="AssetW5BaseID:".$rec->{id};
+            $acftprec->{Appl}->{ExternalSystem}="W5Base";
+
+            my $fh=$fh{lg};
+            print $fh hash2xml($acftprec,{header=>0});
+            if (ref($rec->{systems}) eq "ARRAY"){
+               foreach my $sysrec (@{$rec->{systems}}){
+                  if ($sysrec->{systemid}=~m/^S\d+$/){
+                     $CurrentEventId="Add System $sysrec->{name} to farm $rec->{itfarm}";
+                     my $acftprec={
+                            CI_LogGroup_Rel=>{
+                               Description=>$groupdesc,
+                               Portfolio=>$sysrec->{systemid},
+                               EventID=>$CurrentEventId,
+                               ExternalSystem=>"W5Base",
+                               ExternalID=>"System-W5BaseID:".$sysrec->{id},
+                               LogGroup_Description=>$groupname,
+                               LogGroup_bDelete=>0,
+                               bDelete=>'0'
+                            }
+                     };
+                     print $fh hash2xml($acftprec,{header=>0});
+                  }
+               }
+            }
+         }
+         ($rec,$msg)=$ass->getNext();
+      } until(!defined($rec));
+   }
+
+   my $back=$self->TransferFile($fh{lg},$filename{lg},"loggroup_ci_rel");
 
    return($back);
 }
