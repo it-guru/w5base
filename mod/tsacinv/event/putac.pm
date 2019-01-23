@@ -842,7 +842,6 @@ sub SendXmlToAM_logicalgroups
    my $ass=getModuleObject($self->Config,"itil::asset");
 
    my %filter=(cistatusid=>['3','4','5'],itfarm=>'!""');
-   $self->{DebugMode}=1;
    if ($#w5id!=-1){
       if (in_array(\@w5id,"debug")){
          @w5id=grep(!/^debug$/i,@w5id);
