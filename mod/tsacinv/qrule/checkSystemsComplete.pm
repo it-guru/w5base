@@ -29,9 +29,6 @@ NONE
 
 =head3 HINTS
 
-Überprüfung der vollständigen Erfassung aller logischen Systeme aus AM
-Hinweise zur Problembeseitigung:
-
 Es müssen alle Systeme die im AssetManager dem aktuellen Kontierungsobjekt 
 zugeordnet sind, auch in W5Base/Darwin unter IT-Inventar->System erfasst sein! 
 
@@ -50,19 +47,19 @@ betreffenden logischen Systeme selbst erfassen (somit die Datenverantwortung
 
 [en:] 
 
-All Systems assigned to an up to date cost center in Asset Manager, have to 
-be created in W5Base/Darwin under IT-Inventory > System as well. 
+All Systems assigned to an up to date cost center in Asset Manager have to be 
+created in W5Base/Darwin under IT-Inventory > System. 
 
 Attention: In case of an infrastructure system, the system has to be marked 
 as infrastructure system in Darwin as well (Systemclass). 
-
 Creation of logical systems in Darwin is generally done by TSM of the 
 specific application. It is in the responsibility of the databoss of the 
-cost center to inform a TSM, which then will create the logical systems. 
-If this does not happen, it can be escalated through the SACM process.
+cost center to inform the TSM, which then will create the logical systems. 
 
-Alternatively the databoss of a cost center has to create logical systems 
-on his own and also maintain them in Darwin.
+If this does not happen, it can be escalated through the SACM process. 
+Alternatively the databoss of a corresponding cost center has to create 
+logical systems on his own and also maintain them in Darwin.
+
 
 =cut
 #######################################################################
