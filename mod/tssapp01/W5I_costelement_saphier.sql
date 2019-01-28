@@ -1,6 +1,6 @@
 create or replace view "W5I_tssapp01::costcenter" as
   select 
-    rowid                            w5id,
+    "W5_id"                          w5id,
     "W5_key"                         w5name,
     "C03_company_code"               w5accarea,
     "C02_description"                w5description,
@@ -29,7 +29,7 @@ create or replace synonym W5I."tssapp01::costcenter" for "W5I_tssapp01::costcent
 
 create or replace view "W5I_tssapp01::psp" as
   select 
-    rowid                            w5id,
+    "W5_id"                          w5id,
     "W5_key"                         w5name,
     "C04_company_code"               w5accarea,
     "C03_description"                w5description,
