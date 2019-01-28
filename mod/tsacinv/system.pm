@@ -150,7 +150,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'supervid',
                 label         =>'Supervisor ID',
-                dataobjattr   =>'"supervid"'),
+                dataobjattr   =>'system."supervid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
@@ -158,7 +158,8 @@ sub new
                 label         =>'Assignment Group',
                 vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>'cassigrp."name"'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroupsupervisor',
@@ -181,7 +182,8 @@ sub new
                 label         =>'Incident Assignment Group',
                 vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lincidentagid'=>'lgroupid'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>'iassigrp."name"'),
 
       new kernel::Field::Link(
                 name          =>'lassignmentid',
@@ -211,7 +213,20 @@ sub new
                 name          =>'usage',
                 group         =>'form',
                 label         =>'Usage',
-                dataobjattr   =>'system."usage"'),
+                dataobjattr   =>
+                     "case ".
+                     " when ((system.\"usage\"='OSY-I: HOUSING' ".
+                     "        or system.\"usage\"='HOUSING') ".
+                     "      and (regexp_like(iassigrp.\"name\",'^TIT\\.') ".
+                     "        or iassigrp.\"name\"='TIT') ".
+                     "      and ((regexp_like(cassigrp.\"name\",'^C\\.') ".
+                     "        or cassigrp.\"name\"='C') ".
+                     "       or  (regexp_like(cassigrp.\"name\",'^MIS\\.') ".
+                     "         or cassigrp.\"name\"='MIS')) ".
+                     "      and system.\"systemola\"='DCI-ONLY') ".
+                     " then cast('InvoiceOnly' as nvarchar2(40)) ".
+                     " else cast(system.\"usage\" as nvarchar2(40)) ".
+                     "end "),
 
       new kernel::Field::Text(
                 name          =>'type',
@@ -789,17 +804,19 @@ sub new
 }
 
 
-#sub getSqlFrom
-#{
-#   my $self=shift;
-#
-#   # Performance Hack
-#   my $from='system join asset on system."lassetid"=asset."lassetid" '.
-#            'left outer join location '.
-#            'on asset."locationid"=location."locationid"';
-#
-#   return($from);
-#}
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from=$self->SUPER::getSqlFrom(@_);
+
+   $from.=" left outer join grp cassigrp ".
+            "on system.\"lassignmentid\"=cassigrp.\"lgroupid\" ";
+
+   $from.=" left outer join grp iassigrp ".
+            "on system.\"lincidentagid\"=iassigrp.\"lgroupid\" ";
+
+   return($from);
+}
 
 
 
