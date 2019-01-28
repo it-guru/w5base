@@ -60,8 +60,8 @@ sub new
                    }
                    return($flt);
                 },
-                vjoindisp     =>['name','ofientity','status','description'],
-                vjoininhash   =>['name','ofientity','status','description','saphier']),
+                vjoindisp     =>['name','status','description'],
+                vjoininhash   =>['name','status','description','saphier']),
       insertafter=>'itsemid'
    );
    $self->AddFields(
@@ -89,39 +89,6 @@ sub new
                 },
                 vjoininhash     =>['name','description','saphier'],
                 vjoindisp     =>['name','description']),
-      insertafter=>'itsemid'
-   );
-   $self->AddFields(
-      new kernel::Field::Text(
-                name          =>'sapofientity',
-                group         =>'saprelation',
-                readonly      =>1,
-                label         =>'OFI Element',
-                vjointo       =>\'tssapp01::psp',
-                vjoinon       =>['name'=>'name'],
-                vjoinonfinish =>sub{
-                   my $self=shift;
-                   my $flt=shift;
-                   my $current=shift;
-                   my $f=$flt->{name};
-                   if (ref($f) eq "SCALAR"){
-                      $f=$$f;
-                   }
-                   $f=~s/\[.*\]$//;
-                   if ($f=~m/\S-[a-z0-9]+/){
-                      $flt->{name}=join(" ",map({'"'.$_.'"'}
-                                  $f,
-                                  $f."-*"));
-                   }
-                   elsif ($f=~m/[a-z0-9]+/){
-                      $flt->{name}=join(" ",map({'"'.$_.'"'}
-                                  "?-".$f,
-                                  "?-".$f."-*",
-                                  $f));
-                   }
-                   return($flt);
-                },
-                vjoindisp     =>'ofientity'),
       insertafter=>'itsemid'
    );
    $self->AddGroup("saprelation",translation=>'TS::costcenter');
