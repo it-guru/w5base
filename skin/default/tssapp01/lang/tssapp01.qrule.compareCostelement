@@ -1,0 +1,5 @@
+'tssapp01::qrule::compareCostelement'=>{de=>'Prüfung des Kontierungsobjektes gegen SAP P01',en=>'Check costelement against SAP P01'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'costelement does not exists in SAP P01'=>{de=>'Kontierungsobjet existiert nicht in SAP P01'},
+'different values stored in SAP'=>{de=>'unterschiedliche Inhalte in SAP P01'},
+
