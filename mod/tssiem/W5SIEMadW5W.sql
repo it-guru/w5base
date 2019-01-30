@@ -66,6 +66,7 @@ create table "W5SIEM_secent" (
    protocol             varchar2(40),
    cve_id               varchar2(256),
    bugtraq_id           varchar2(256),
+   times_detected       NUMBER(20,0),
    solution             clob,
    constraint W5SIEM_secent_pk foreign key (ref)
    REFERENCES "W5SIEM_secscan" (ref),

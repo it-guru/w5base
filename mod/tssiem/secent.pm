@@ -254,6 +254,12 @@ sub new
                 dataobjattr   =>'W5SIEM_secent.solution'),
 
 
+      new kernel::Field::Number(
+                name          =>'ntimes',
+                group         =>'source',
+                label         =>'Times detected',
+                dataobjattr   =>"W5SIEM_secent.times_detected"),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
