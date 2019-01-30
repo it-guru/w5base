@@ -240,11 +240,11 @@ sub new
                 dataobjattr   =>'W5SIEM_secent.results'),
 
       new kernel::Field::Textarea(
-                name          =>'thread',
-                label         =>'Thread',
+                name          =>'threat',
+                label         =>'Threat',
                 htmldetail    =>'NotEmpty',
                 sqlorder      =>'NONE',
-                dataobjattr   =>'W5SIEM_secent.thread'),
+                dataobjattr   =>'W5SIEM_secent.threat'),
 
       new kernel::Field::Textarea(
                 name          =>'solution',
