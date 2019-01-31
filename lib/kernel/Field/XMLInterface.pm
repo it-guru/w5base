@@ -35,6 +35,7 @@ sub new
    $self->{searchable}=0 if (!defined($self->{searchable}));
    $self->{htmldetail}=0 if (!defined($self->{htmldetail}));
    $self->{sqlorder}="NONE" if (!defined($self->{sqlorder}));
+   $self->{rawxml}=0        if (!defined($self->{rawxml}));
    $self->{uivisible}=sub {
       my $self=shift;
       my $mode=shift;

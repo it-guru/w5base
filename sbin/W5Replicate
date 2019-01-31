@@ -1600,17 +1600,6 @@ sub InsertOrUpdate
             }
          }
       }
-      #my @values=map({$rec->{$_}} @view);
-      #my @place=map({'?'} @view);
-     # if (exists($ctrl->{'col'}->{'w5replmdate'})){
-     #    push(@w5v,'w5replmdate');
-     #    push(@w5p,'current_date');
-     # }
-     # if (exists($ctrl->{'col'}->{'w5replcdate'})){
-     #    push(@w5v,'w5replcdate');
-     #    push(@w5p,'current_date');
-     # }
-      
       my $inscmd="insert into \"$dbtable\" ".
         "(".join(",",@insview).") values(".join(",",@place).")";
       msg(INFO,"ins ($idval): $inscmd");
