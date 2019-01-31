@@ -51,3 +51,7 @@
 'expires at'=>{de=>'verfällt am'},
 'expiration to long in the past'=>{de=>'Verfallsdatum liegt zu weit in der Vergangenheit'},
 'relation invalid since'=>{de=>'Zuordnung ungültig seit'},
+'Modifiable'=>{de=>'Veränderbarkeit'},
+'USERMODIFIABLE'=>{de=>'benutzeranpassbar',en=>'user modifiable'},
+'FORECEDON'=>{de=>'erzwungen abonniert',en=>'forced active'},
+'FORECEDOFF'=>{de=>'erzwungen abbestellt',en=>'forced not active'},

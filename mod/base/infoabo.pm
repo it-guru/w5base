@@ -28,7 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    
 
@@ -40,6 +40,7 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'LinkID',
+                group         =>'source',
                 searchable    =>0,
                 dataobjattr   =>'infoabo.id'),
 
@@ -63,6 +64,7 @@ sub new
                 label         =>'Info Source',
                 group         =>['default','newin'],
                 uploadable    =>0,
+                selectfix     =>1,
                 htmleditwidth =>'100%',
                 readonly      =>sub{
                       my $self=shift;
@@ -82,6 +84,16 @@ sub new
                 label         =>'Target-Name',
                 uploadable    =>0,
                 dst           =>[],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (exists($param{current}) &&
+                       $param{current}->{parentobj} eq "base::staticinfoabo"){
+                      return(0);
+                   }
+                   return(1);
+                },
                 readonly      =>sub{
                       my $self=shift;
                       my $rec=shift;
@@ -96,10 +108,46 @@ sub new
                 uploadable    =>0,
                 searchable    =>0,
                 label         =>'Info Mode',
+                selectfix     =>1,
                 readonly      =>1,
                 htmleditwidth =>'100%',
                 getPostibleValues=>\&getPostibleModes,
                 dataobjattr   =>'infoabo.mode'),
+
+      new kernel::Field::Select(
+                name          =>'modifiable',
+                uploadable    =>0,
+                searchable    =>0,
+                label         =>'Modifiable',
+                readonly      =>1,
+                onRawValue    =>sub{
+                    my $self=shift;
+                    my $current=shift;
+                    my $app=$self->getParent;
+                    my $d="USERMODIFIABLE";
+                    if (defined($current)){
+                       if ($current->{parentobj} eq "base::staticinfoabo"){
+                          foreach my $obj (values(%{$app->{staticinfoabo}})){
+                             my ($ctrl)=$obj->getControlData($self);
+                             while(my $trans=shift(@$ctrl)){
+                                my $crec=shift(@$ctrl);
+                                if ($crec->{name} eq $current->{mode}){
+                                   if (exists($crec->{force})){
+                                      if ($crec->{force} eq "1"){
+                                         $d="FORECEDON";
+                                      }
+                                      if ($crec->{force} eq "0"){
+                                         $d="FORECEDOFF";
+                                      }
+                                   }
+                                }
+                             }
+                          }
+                       }
+                    }
+                    return($d);
+                 }),
+
 
       new kernel::Field::Date(
                 name          =>'invalidsince',
@@ -148,6 +196,15 @@ sub new
                 label         =>'Active',
                 transprefix   =>'boolean.',
                 value         =>[1,0],
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $app=$self->getParent;
+                   my %param=@_;
+
+                   return(0) if ($app->isForced($param{current}));
+                   return(1);
+                },
                 htmleditwidth =>'80px',
                 dataobjattr   =>'infoabo.active'),
 
@@ -269,6 +326,15 @@ sub new
       new kernel::Field::Date(
                 name          =>'expiration',
                 label         =>'Expiration-Date',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $app=$self->getParent;
+                   my %param=@_;
+
+                   return(0) if ($app->isForced($param{current}));
+                   return(1);
+                },
                 dataobjattr   =>'infoabo.expiration'),
                                                  
       new kernel::Field::Editor(
@@ -339,6 +405,24 @@ sub getDetailBlockPriority
 }
 
 
+sub isForced
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0) if (!defined($rec));
+   if ($rec->{parentobj} eq "base::staticinfoabo"){
+      foreach my $obj (values(%{$self->{staticinfoabo}})){
+         my ($ctrl)=$obj->getControlData($self);
+         while(my $trans=shift(@$ctrl)){
+            my $crec=shift(@$ctrl);
+            if ($crec->{name} eq $rec->{mode}){
+               return(1) if (exists($crec->{force}));
+            }
+         }
+      }
+   }
+   return(0);
+}
 
 
 sub getSqlFrom
@@ -891,6 +975,7 @@ sub isWriteValid
    if (!defined($rec)){
       return("default","relation","newin");
    }
+   return(undef) if ($self->isForced($rec));
    my $userid=$rec->{userid};
    return("default","newin") if (ref($rec) eq "HASH" &&
                                  $self->getCurrentUserId() eq $userid);
