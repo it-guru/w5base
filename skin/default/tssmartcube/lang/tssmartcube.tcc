@@ -26,7 +26,7 @@
 'Autodiscovery Status'=>{de=>'Autodiscovery-Status'},
 'AppCom Location'=>{de=>'AppCom-Standort'},
 'Virtualization'=>{de=>'Virtualisierung'},
-'Days not patched'=>{de=>'Anzahl Tage nicht gepatcht'},
+'Missing Patch released x days ago'=>{de=>'Fehlender Patch, freigegeben vor x Tagen'},
 'Operation Category Change Date'=>{de=>'Aktualisierungsdatum Operation Category'},
 'W5Base/logical System'=>{de=>'W5Base/logisches System'},
 'W5Base/Application'=>{de=>'W5Base/Anwendung'},

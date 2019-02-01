@@ -135,7 +135,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'days_not_patched',
-                label         =>'Days not patched',
+                label         =>'Missing Patch released x days ago',
                 htmldetail    =>'NotEmpty',
                 searchable    =>0,
                 dataobjattr   =>'DAYS_NOT_PATCHED'),
