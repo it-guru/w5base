@@ -46,6 +46,7 @@ sub RManW5Wexp
    my @q;
    $baseq{class}=[grep(/^.*::(riskmgmt)$/,keys(%{$wf->{SubDataObj}}))];
    $baseq{isdeleted}=\'0';
+   #$baseq{id}='15377719300021';
 
    {
       my %q=%baseq;
@@ -93,7 +94,19 @@ sub RManW5Wexp
 
    $wf->SetCurrentOrder(qw(mdate));
 
-   my @fancy=qw(state wffields.extdesctelitmonetaryimpact);
+   my @fancy=qw(state 
+      wffields.riskmgmtpoints
+      wffields.riskbasetype
+      wffields.extdescriskoccurrency
+      wffields.extdescarisedate
+      wffields.extdescdtagmonetaryimpact
+      wffields.extdesctelitmonetaryimpact
+      wffields.extdescriskdowntimedays
+      wffields.ibipoints
+      wffields.ibiprice
+      wffields.riskmgmtcondition
+      wffields.solutionopt
+   );
 
 
    my ($rec,$msg)=$wf->getFirst();
@@ -111,6 +124,7 @@ sub RManW5Wexp
              $xrec->{xmlroot}->{fancy}->{en}->{$xname}=
                 $fld->FormatedDetail($rec,"XmlV01");
           }
+          $xrec->{xmlroot}->{xmlstate}="OK";
           
           my $d=hash2xml($xrec);
           $os->SnapRecord($rec->{id},$rec->{name},"base::workflow",$d);

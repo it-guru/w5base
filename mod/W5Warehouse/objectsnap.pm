@@ -134,9 +134,14 @@ sub SnapRecord
    my $xmlrec=shift;
    my ($worktable,$workdb)=$self->getWorktable();
 
+   my $xmltext=$xmlrec;
+
+#   if (utf8::is_utf8($xmltext)){   # xml in W5W is always stored in Latin1
+      $xmltext=UTF8toLatin1($xmltext);
+#   }
 
    my $bk=$self->{insertcmdsth}->execute(
-       $id,$name,$dataobj,$xmlrec,
+       $id,$name,$dataobj,$xmltext,
        $self->{snapdate},
        $self->{snapclass});
    if (!$bk){
