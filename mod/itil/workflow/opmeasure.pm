@@ -492,6 +492,7 @@ sub isContactInRelationToApp
    my $arec=shift;
 
    my $c=$arec->{contacts};
+   my %g;
 
    if (ref($c) eq "ARRAY"){
       if ($fwd->{fwdtarget} eq "base::user"){
@@ -501,7 +502,7 @@ sub isContactInRelationToApp
                    $arec->{applmgrid}])){
             return(1);
          }
-         my %g=$self->getGroupsOf($fwd->{fwdtargetid},["RMember"],"direct");
+         %g=$self->getGroupsOf($fwd->{fwdtargetid},["RMember"],"direct");
          if (($arec->{itsemteamid} ne "" && exists($g{$arec->{itsemteamid}}))||
              ($arec->{responseteamid} ne "" && 
               exists($g{$arec->{responseteamid}}))||
@@ -518,17 +519,43 @@ sub isContactInRelationToApp
             return(1);
          }
       }
-      foreach my $con (@$c){
-         my $roles=$con->{roles};
-         $roles=[$roles] if (ref($roles) ne "ARRAY");
-         #if (grep(/^orderin1$/,@$roles)){
-         if ($#{$roles}!=-1){
-            if ($con->{target} eq $fwd->{fwdtarget} &&
-                $con->{targetid} eq $fwd->{fwdtargetid}){
-               return(1);
-            }
-         } 
+      foreach my $con (@$c){  # if target is registered in contacts, it's ok
+         if ($con->{target} eq $fwd->{fwdtarget} &&
+             $con->{targetid} eq $fwd->{fwdtargetid}){
+            return(1);
+         }
       }
+      if (ref($arec->{swinstances}) eq "ARRAY"){
+         my @swiid;
+         foreach my $swirec (@{$arec->{swinstances}}){
+            push(@swiid,$swirec->{id}) if ($swirec->{id} ne "");
+         }
+         if ($#swiid!=-1){
+            my $swi=getModuleObject($self->Config,"itil::swinstance");
+            $swi->SetFilter({id=>\@swiid});
+            foreach my $swirec ($swi->getHashList(qw(fullname
+                                                 admid adm2id swteamid))){
+                if ($fwd->{fwdtarget} eq "base::user"){
+                   if (in_array([$fwd->{fwdtargetid}],[
+                             $swirec->{admid},
+                             $swirec->{adm2id}])){
+                      return(1);
+                   }
+                   if (($swirec->{swteamid} ne "" && 
+                       exists($g{$swirec->{swteamid}}))){
+                      return(1);
+                   }
+                }
+                if ($fwd->{fwdtarget} eq "base::grp"){
+                   if (in_array([$fwd->{fwdtargetid}],[
+                             $swirec->{swteamid}])){
+                      return(1);
+                   }
+                }
+            }
+         }
+      }
+
    }
    return(0);
 
@@ -665,6 +692,7 @@ sub nativProcess
                                            itsemteamid 
                                            responseteamid 
                                            businessteamid
+                                           swinstances 
                                         ));
          if (defined($arec)){
             $h->{mandatorid}=[$arec->{mandatorid}];
