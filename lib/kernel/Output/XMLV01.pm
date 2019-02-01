@@ -66,7 +66,12 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
-   $d.="Content-type:".$self->MimeType()."\n\n";
+   if ($self->{charset} eq "utf-8"){
+      $d.="Content-type:".$self->MimeType().";charset=UTF8\n\n";
+   }
+   else{
+      $d.="Content-type:".$self->MimeType()."\n\n";
+   }
    return($d);
 }
 
@@ -74,6 +79,14 @@ sub Init
 {
    my ($self,$fh)=@_;
    my $app=$self->getParent->getParent();
+   $self->{charset}="utf-8";  # default charset
+   #
+   #  ToDo:
+   #
+   #  Check if Accept-Charset in header is utf-8 - if only Latin1 is
+   #  accepted, change $self->{charset}
+   #
+   #
    return();
 }
 

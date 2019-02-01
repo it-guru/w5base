@@ -35,7 +35,7 @@ sub new
    $self->{searchable}=0 if (!defined($self->{searchable}));
    $self->{htmldetail}=0 if (!defined($self->{htmldetail}));
    $self->{sqlorder}="NONE" if (!defined($self->{sqlorder}));
-   $self->{rawxml}=0        if (!defined($self->{rawxml}));
+   #$self->{rawxml}=0        if (!defined($self->{rawxml}));
    $self->{uivisible}=sub {
       my $self=shift;
       my $mode=shift;
@@ -153,6 +153,9 @@ sub RawValue
    if (defined($d) && ref($d) ne "HASH"){
       if (!($d=~m/^<xmlroot>/)){
          $d="<xmlroot>".$d."</xmlroot>";
+      }
+      if (!utf8::is_utf8($d)){  # handle if Backend has XML textData not in UTF8
+         $d=latin1($d)->utf8();
       }
       $d=xml2hash($d);
    }
