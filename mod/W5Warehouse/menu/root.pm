@@ -91,6 +91,10 @@ sub Init
                       "W5Warehouse::ufield",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itu.W5Warehouse.krn.objectsnap",
+                      "W5Warehouse::objectsnap",
+                      defaultacl=>['admin']);
+   
    return($self);
 }
 

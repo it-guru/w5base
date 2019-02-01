@@ -77,6 +77,19 @@ sub new
 }
 
 
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   if ($self->IsMemberOf("admin")){
+      return("ALL");
+   }
+   return();
+}
+
+
+
 sub Initialize
 {
    my $self=shift;
