@@ -101,8 +101,12 @@ sub isViewValid
 {
    my $self=shift;
    my @l=$self->SUPER::isViewValid(@_);
-   if (grep(/^(default|ALL)$/,@l)){
-      push(@l,"saprelation");
+   my $rec=shift;
+
+   if (defined($rec) && $rec->{cistatusid}>2 && $rec->{cistatusid}<6){
+      if (grep(/^(default|ALL)$/,@l)){
+         push(@l,"saprelation");
+      }
    }
    return(@l);
 }

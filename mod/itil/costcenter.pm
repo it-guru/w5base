@@ -58,7 +58,12 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return($self->SUPER::isViewValid($rec),"applications");
+
+   my @l=$self->SUPER::isViewValid($rec);
+   if (defined($rec) && $rec->{cistatusid}>2 && $rec->{cistatusid}<6){
+      push(@l,"applications");
+   }
+   return(@l);
 }
 
 sub FinishWrite

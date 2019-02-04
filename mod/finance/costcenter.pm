@@ -396,25 +396,6 @@ sub ValidateCONumber
 
    }
    return(0);
-
-
-
-#   if (!defined($oldrec) || exists($newrec->{$fieldname})){
-#      my $conummer=uc(effVal($oldrec,$newrec,$fieldname));
-#      if ($conummer=~m/^\s*$/ || 
-#          (!($conummer=~m/^[0-9]+$/) &&
-#           !($conummer=~m/^\S+\[\d+\]$/) &&   # for deleted entries
-#           !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
-#           !($conummer=~m/^[A-Z]-[A-Z,0-9]{10}$/) &&
-#           !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
-#         return(0);
-#      }
-#      $conummer=~s/^0+//g;
-#      if (defined($newrec)){
-#         $newrec->{$fieldname}=$conummer;
-#      }
-#   }
-   return(1);
 }
 
 
@@ -446,6 +427,11 @@ sub Validate
    if ($itsem>0 && $delmgr){
       $self->LastMsg(ERROR,"IT Servicemanagement an delivery management ".
                            "can not exist concurrently");
+      return(0);
+   }
+   my $name=effVal($oldrec,$newrec,"name");
+   if (length(trim($name))<3){
+      $self->LastMsg(ERROR,"invalid cost element specified");
       return(0);
    }
 
