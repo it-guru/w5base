@@ -47,7 +47,9 @@ sub ValidateCONumber    # this method needs to be renamed in validateCostcenter
    my $oldrec=shift;
    my $newrec=shift;
 
-   if (!defined($oldrec) || exists($newrec->{$fieldname})){
+
+   if (!defined($oldrec) || 
+       (defined($newrec) && exists($newrec->{$fieldname}))){
       my $conummer=uc(effVal($oldrec,$newrec,$fieldname));
       if ($dataobj eq "finance::costcenter"){
          return(1) if ($conummer=~m/^\S+\[\d+\]/);
@@ -60,6 +62,7 @@ sub ValidateCONumber    # this method needs to be renamed in validateCostcenter
    !($conummer=~m/^[0-9]{5,10}$/) &&  # für CO und Kostenstellen 
    !($conummer=~m/^[A-Z,0-9][0-9]{8}[A-Z,0-9]$/) &&
    !($conummer=~m/^[A-Z]-[A-Z,0-9]{10}$/) &&
+   !($conummer=~m/^[0-9]{4}$/) &&  # SAP USA
    !($conummer=~m/^[A-Z0-9]{4}[0-9]{6}$/) &&  # OFI Kostenstelle
    !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}$/) &&  # OFI PSP Top
    !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}-[0-9]{2}$/) &&  #OFI E2

@@ -1,0 +1,2 @@
+'finance::qrule::validateCostcenterNaming'=>{de=>'Prüfung der Namenskonvention eines Kontierungsobjektes',en=>'check naming convention of cost element'},
+'invalid or unknown number format for cost element'=>{de=>'ungültiges oder unbekanntes Kontierungsnummern Format'},

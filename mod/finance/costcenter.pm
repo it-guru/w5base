@@ -430,7 +430,7 @@ sub Validate
       return(0);
    }
    my $name=effVal($oldrec,$newrec,"name");
-   if (length(trim($name))<3){
+   if (length(trim($name))<2){
       $self->LastMsg(ERROR,"invalid cost element specified");
       return(0);
    }
