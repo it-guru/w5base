@@ -1732,3 +1732,4 @@ create table lnknetinterconipnet (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
 alter table system add is_cbreakdown bool default '0';
+alter table ipaddress add lastqcheck datetime default NULL,add key(lastqcheck);

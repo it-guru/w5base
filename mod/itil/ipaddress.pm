@@ -565,6 +565,13 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'ipaddress.realeditor'),
 
+      new kernel::Field::QualityText(),
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'ipaddress.lastqcheck'),
+
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
@@ -916,7 +923,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   my @def=("header","default");
+   my @def=("header","default","qc");
    return(@def) if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    push(@def,"source");
