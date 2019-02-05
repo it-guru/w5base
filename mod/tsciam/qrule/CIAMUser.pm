@@ -136,6 +136,35 @@ sub qcheckRecord
       my @posix=grep(!/^[A-Z]{1,3}\d+$/,@{$uidlist});
       $posix=$posix[0];
 
+      if (defined($ciamrec) && $posix eq "" && $rec->{usertyp} eq "user"){  
+         # user has a valid CIAM Record, but no WIW Account
+         # (this can be happend, if user uses a wiw-account over a 
+         #  PM-DUP concept)
+         # now we try to find a wiw account from user used useraccounts:
+         if (ref($rec->{accounts}) eq "ARRAY"){
+            my @wiwaccounts=sort(
+               grep(/^wiw\//,
+                  map({$_->{account}} @{$rec->{accounts}})));
+            if ($#wiwaccounts==0){
+               my $wiwaccount=$wiwaccounts[0];
+               $wiwaccount=~s/^wiw\///;
+               if ($wiwaccount=~m/^[a-z0-9_]{4,8}$/){
+                  $posix=$wiwaccount;
+               }
+            }
+         }
+         if ($posix ne ""){
+            # check, if posix is not used by an other contact
+            my $chkcontact=$dataobj->Clone();
+            $chkcontact->SetFilter({posix=>\$posix,cistatusid=>"<6"});
+            my ($chkrec,$msg)=$chkcontact->getOnlyFirst(qw(ALL));
+            if (defined($chkrec) && $chkrec->{userid} ne $rec->{userid}){
+               msg(INFO,"remove posix detected by w5-useraccounts");
+               $posix=undef;
+            }
+         }
+      }
+
 
       if (!defined($ciamrec)){
          #####################################################################
@@ -448,6 +477,8 @@ sub qcheckRecord
           ((($ciamrec->{surname}=~m/^mustermann$/i) && 
            ($ciamrec->{givenname}=~m/^max$/i) ) ||
            # robotics Accounts beginnen mit pn- im Vor oder Nachnamen
+           ($ciamrec->{surname}=~m/^PN-DUP/) ||
+           ($ciamrec->{givenname}=~m/^PN-DUP/) ||
            ($ciamrec->{email}=~m/^.*\.pn-.*\@external.*$/i) ||
            ($ciamrec->{email}=~m/^pn-.*\@external.*$/i)) &&
            $rec->{cistatusid} ne "6"){
