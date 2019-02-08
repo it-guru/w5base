@@ -17,7 +17,7 @@ CREATE TABLE grp (
   modifyuser bigint(20) NOT NULL default '0',
   editor varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
-  PRIMARY KEY  (grpid),
+  PRIMARY KEY  (grpid),unique(srcsys,srcid),
   UNIQUE KEY fullname (fullname),
   KEY parentid (parentid),
   KEY name (name,cistatus),key(cistatus)
