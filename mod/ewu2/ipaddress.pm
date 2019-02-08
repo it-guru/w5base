@@ -39,23 +39,23 @@ sub new
       new kernel::Field::Id(
                 name          =>'ipaddressid',
                 label         =>"Ip Address Id",
-                dataobjattr   =>"\"IP_ADDRESSES\".\"IP_ADDRESS_ID\""),
+                dataobjattr   =>"\"IPA\".\"IP_ADDRESS_ID\""),
 
       new kernel::Field::Text(
                 name          =>'name',
                 nowrap        =>1,
                 label         =>"IP-Address",
-                dataobjattr   =>"\"IP_ADDRESSES\".\"ADDRESS\""),
+                dataobjattr   =>"\"IPA\".\"ADDRESS\""),
 
       new kernel::Field::Text(
                 name          =>'dnsname',
                 label         =>"DNS Name",
-                dataobjattr   =>"\"IP_ADDRESSES\".\"DNS_NAME\""),
+                dataobjattr   =>"\"IPA\".\"DNS_NAME\""),
 
       new kernel::Field::Text(
                 name          =>'dnsdomain',
                 label         =>"DNS Domain",
-                dataobjattr   =>"\"IP_ADDRESSES\".\"DNS_DOMAIN\""),
+                dataobjattr   =>"\"IPA\".\"DNS_DOMAIN\""),
 
       new kernel::Field::Text(
                 name          =>'system',
@@ -67,18 +67,23 @@ sub new
       new kernel::Field::Text(
                 name          =>'dnscname',
                 label         =>"DNS Cname",
-                dataobjattr   =>"\"IP_ADDRESSES\".\"DNS_CNAME\""),
+                dataobjattr   =>"\"IPA\".\"DNS_CNAME\""),
+
+      new kernel::Field::Text(
+                name          =>'comments',
+                label         =>"Comment",
+                dataobjattr   =>"\"IPA\".\"CMT\""),
 
       new kernel::Field::Link(
                 name          =>'ptrnameid',
                 label         =>"PTR Name Id",
-                dataobjattr   =>"\"IP_ADDRESSES\".\"PTR_NAME_ID\""),
+                dataobjattr   =>"\"IPA\".\"PTR_NAME_ID\""),
 
       new kernel::Field::Text(
                 name          =>'devlabsystemid',
                 htmldetail    =>0,
                 label         =>"DevLabSystemId",
-                dataobjattr   =>"\"IP_ADDRESSES\".\"COMPUTER_SYSTEM_ID\""),
+                dataobjattr   =>"\"IPA\".\"COMPUTER_SYSTEM_ID\""),
 
    );
    $self->{use_distinct}=1;
@@ -98,6 +103,47 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="
+      (
+        select to_char(IP_ADDRESS_ID) IP_ADDRESS_ID,
+             ADDRESS,
+             DNS_NAME,
+             DNS_DOMAIN,
+             DNS_CNAME,
+             'IP' CMT,
+             PTR_NAME_ID,
+             COMPUTER_SYSTEM_ID
+       from $worktable 
+       union
+       select to_char(COMPUTER_SYSTEMS.COMPUTER_SYSTEM_ID) || '-' 
+              || to_char($worktable.IP_ADDRESS_ID) IP_ADDRESS_ID,
+             $worktable.ADDRESS,
+             $worktable.DNS_NAME,
+             $worktable.DNS_DOMAIN,
+             $worktable.DNS_CNAME,
+             'Service:' || COMPUTER_SYSTEMS.UNAME,
+             $worktable.PTR_NAME_ID,
+             COMPUTER_SYSTEMS.HOSTING_CS_ID COMPUTER_SYSTEM_ID
+       from COMPUTER_SYSTEMS 
+            join $worktable 
+               on COMPUTER_SYSTEMS.COMPUTER_SYSTEM_ID=
+                  $worktable.COMPUTER_SYSTEM_ID
+       where COMPUTER_SYSTEMS.type='Service'
+      ) IPA";
+ 
+
+   return($from);
+}
+
+
+
 
 
 

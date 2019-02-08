@@ -347,7 +347,8 @@ sub qcheckRecord
                             m/^\d{1,3}(\.\d{1,3}){3,3}$/){
                            $cleanAmIPlist{$ewuiprec->{name}}={
                               cistatusid=>$mappedCIStatus,
-                              ipaddress=>$ewuiprec->{name}
+                              ipaddress=>$ewuiprec->{name},
+                              comments=>trim($ewuiprec->{comments})
                            };
                         }
                         else{
@@ -367,7 +368,9 @@ sub qcheckRecord
                                    $eq=0;
                                    $eq=1 if ($a->{srcsys} eq "EWU2" &&
                                              $a->{cistatusid} eq 
-                                             $b->{cistatusid});
+                                             $b->{cistatusid}       &&
+                                             $a->{comments} eq 
+                                             $b->{comments});
                                 }
                                 return($eq);
                              },
@@ -409,6 +412,7 @@ sub qcheckRecord
                                               srcsys    =>'EWU2',
                                               type      =>$type,
                                               networkid =>$networkid,
+                                              comments  =>$newrec->{comments},
                                               systemid  =>$p{refid}
                                               }
                                            });

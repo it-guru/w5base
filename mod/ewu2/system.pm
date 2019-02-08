@@ -91,7 +91,7 @@ sub new
                 group         =>'ipaddresses',
                 vjointo       =>'ewu2::ipaddress',
                 vjoinon       =>['id'=>'devlabsystemid'],
-                vjoindisp     =>[qw(name dnsname dnsdomain)]),
+                vjoindisp     =>[qw(name dnsname dnsdomain comments)]),
 
       new kernel::Field::SubList(
                 name          =>'contacts',
@@ -155,6 +155,15 @@ sub new
                 vjointo       =>'ewu2::system',
                 vjoinon       =>['hostingcsid'=>'id'],
                 vjoindisp     =>'typedfullname'),
+
+      new kernel::Field::TextDrop(
+                name          =>'vhostsystemname',
+                label         =>"virtualisation Systemname",
+                group         =>'virtualisation',
+                htmldetail    =>0,
+                vjointo       =>'ewu2::system',
+                vjoinon       =>['hostingcsid'=>'id'],
+                vjoindisp     =>'systemname'),
 
       new kernel::Field::Link(
                 name          =>'hostingcsid',
@@ -583,10 +592,19 @@ sub Import
          });
          my ($vmrec,$msg)=$sys->getOnlyFirst(qw(ALL));
          if (!defined($vmrec)){
-            $self->LastMsg(ERROR,"EWU2 incomplete: ".
-                           "vmhost ".$sysrec->{vhostname}.
-                           " needs to be imported at first");
-            return(undef);
+            $self->LastMsg(WARN,"missing vmhost $sysrec->{vhostsystemname} ".
+                                " - try to import it");
+            my $pid=$self->Import({importname=>$sysrec->{vhostsystemname}});
+            if (defined($pid)){
+               $self->LastMsg(INFO,"Systemname $sysrec->{vhostsystemname} ".
+                                   "imported");
+            }
+            else{
+               $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                              "vmhost ".$sysrec->{vhostname}.
+                              " needs to be imported at first");
+               return(undef);
+            }
          }
          else{
             $newrec->{vhostsystemid}=$vmrec->{id};
@@ -655,6 +673,20 @@ sub Import
          }
          else{
             $newrec->{assetid}=$hwrec->{id};
+         }
+      }
+      elsif ($sysrec->{type} eq "Service"){
+         $self->LastMsg(WARN,"Systemname is a Service ".
+                             "on $sysrec->{vhostsystemname} - try to import ".
+                             $sysrec->{vhostsystemname});
+         my $pid=$self->Import({importname=>$sysrec->{vhostsystemname}});
+         if (defined($pid)){
+            $self->LastMsg(INFO,"Systemname $sysrec->{vhostsystemname} ".
+                                "imported");
+            return($pid);
+         }
+         else{
+            return(undef);
          }
       }
       else{
