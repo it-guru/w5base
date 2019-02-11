@@ -1,3 +1,3 @@
-'you are no authorised to create measure for the desired application'=>{de=>'Sie sind für das Erstellen von Aufgaben für die angegebene Anwendungen zugelassen'},
+'You are not authorised to create measures for the desired application'=>{de=>'Sie sind für das Erstellen von Aufgaben für die angegebene Anwendungen nicht zugelassen'},
 'selected target forward is not in relation to desired application'=>{de=>'Das Weiterleitungsziel steht nicht in Verbindung zur gewählten Anwendung'},
 

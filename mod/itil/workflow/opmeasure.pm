@@ -749,8 +749,8 @@ sub nativProcess
                 (!$self->getParent->IsMemberOf("admin")) &&
                 ($arec->{businessteamid} ne "" && 
                  !$self->getParent->IsMemberOf($arec->{businessteamid})))){
-               $self->LastMsg(ERROR,"you are no authorised to create ".
-                                    "measure for the desired application");
+               $self->LastMsg(ERROR,"You are not authorised to create ".
+                                    "measures for the desired application");
                return(0);
             }
             my $fo=$self->getField("fwdtargetname");
