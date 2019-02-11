@@ -51,6 +51,18 @@ sub new
                 label         =>'IP',
                 dataobjattr   =>"W5SIEM_secent.ipaddress"),
 
+      new kernel::Field::Text(
+                name          =>'dnsname',
+                label         =>'DNS',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"W5SIEM_secent.dns"),
+
+      new kernel::Field::Text(
+                name          =>'netbios',
+                label         =>'NetBIOS',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"W5SIEM_secent.netbios"),
+
       new kernel::Field::SubList(
                 name          =>'systems',
                 label         =>'possible W5Base System',
@@ -256,7 +268,6 @@ sub new
 
       new kernel::Field::Number(
                 name          =>'ntimes',
-                group         =>'source',
                 label         =>'Times detected',
                 dataobjattr   =>"W5SIEM_secent.times_detected"),
 
