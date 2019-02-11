@@ -656,10 +656,10 @@ sub initSqlWhere
    my $SELpref=SELpref;
 
    if ($ENV{REMOTE_USER} ne "dummy/admin"){
-      #$where=SELpref."cm3rm1.tsi_mandant in (".
-      #   join(",",map({"'".$_."'"} MandantenRestriction())).")";
+      my $mlist=join(",",map({"'".$_."'"} MandantenRestriction()));
 
 $where=<<EOF;
+         (${SELpref}CM3RM1.TSI_MANDANT in ($mlist) or
          ${SELpref}CM3RM1.dh_number in (
             SELECT B."DH_NUMBER"
             FROM SMREP1.DH_CM3RM1 B
@@ -682,7 +682,7 @@ $where=<<EOF;
             SELECT CP."DH_NUMBER"
             FROM SMREP1.DH_CM3RA7 CP
             WHERE CP.TSI_APPROVALS_MANUAL like 'TIT.%'
-         )
+         ))
 EOF
    }
 
