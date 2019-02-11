@@ -117,6 +117,7 @@ sub new
                 htmlwidth  =>'150px',
                 label      =>'Application',
                 vjointo    =>'itil::appl',
+                SoftValidate  =>1,          # check only - if changed
                 vjoineditbase =>{cistatusid=>">1 AND <6"},
                 vjoinon    =>['applid'=>'id'],
                 vjoindisp  =>'name'),
