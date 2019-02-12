@@ -434,7 +434,8 @@ sub Validate
       if ($cistatus==6 || (defined($oldrec) && $oldrec->{cistatusid}==6)){
          $chkname=~s/\[.*?\]$//g;
       }
-      if ($chkname eq "" || !($chkname=~m/^[\(\)a-zA-Z0-9_-]+$/)){
+      if ($chkname eq "" || !($chkname=~m/^[\(\)a-zA-Z0-9_-]+$/) ||
+          length($chkname)>20){
          $self->LastMsg(ERROR,"invalid groupname '\%s' specified",
                         $newrec->{name});
          return(undef);

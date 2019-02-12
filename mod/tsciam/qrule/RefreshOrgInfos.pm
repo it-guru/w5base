@@ -168,8 +168,8 @@ sub qcheckRecord
                $dataobj->Log(WARN,"basedata",$basemsg);
                FINDFREE: for(my $c=1;$c<99;$c++){  # try find free oldname
                   my $oldname=$chkrec->{name};
-                  if (length($oldname)>16){
-                     $oldname=substr($oldname,0,15);
+                  if (length($oldname)>14){
+                     $oldname=substr($oldname,0,14);
                   }
                   $oldname.=sprintf("-old%02d",$c);
                   $dataobj->ResetFilter();
@@ -191,7 +191,6 @@ sub qcheckRecord
                }
             }
             ##################################################################
-
             if ($dataobj->ValidatedUpdateRecord($rec,{name=>$curtousd},
                                                 {grpid=>\$rec->{grpid}})){
                push(@qmsg,"all desired fields has been updated: name");
