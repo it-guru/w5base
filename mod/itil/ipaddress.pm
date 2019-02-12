@@ -860,7 +860,10 @@ sub isParentOPvalid
       }
       my @l=$p->getHashList(qw(ALL));
       if ($#l!=0){
-         $self->LastMsg(ERROR,"invalid system reference") if ($mode eq "write");
+         if ($mode eq "write"){
+            $self->LastMsg(ERROR,"invalid system reference to systemid=".
+                                 $systemid);
+         }
          return(0);
       }
       my @blkl;
@@ -885,7 +888,10 @@ sub isParentOPvalid
       $p->SecureSetFilter(\%flt,\%flt);
       my @l=$p->getHashList(qw(ALL));
       if ($#l!=0){
-         $self->LastMsg(ERROR,"invalid itclust reference") if ($mode eq "write");
+         if ($mode eq "write"){
+            $self->LastMsg(ERROR,"invalid itclust reference to itclustsvc=".
+                                 $itclustsvcid);
+         }
          return(0);
       }
       my @blkl;
