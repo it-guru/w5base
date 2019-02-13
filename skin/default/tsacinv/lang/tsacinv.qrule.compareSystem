@@ -18,3 +18,5 @@
 'different data, but automatic update temporary deactivated'=>{
    de=>'unterschiedliche Daten, aber automatisches Update vorübergehend deaktiviviert'
 },
+'can not automatic delete ip %s because network area has been changed'=>{de=>'Automatisches Löschen der IP %s nicht möglich, da Netzbereich geändert wurde'},
+'substituted assetid for %s from %s to %s based on ADOP-T'=>{de=>'Ersetze AssetID für %s von %s auf %s aufgrund von ADOP-T Mapping'},

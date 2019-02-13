@@ -329,9 +329,11 @@ sub qcheckRecord
                                      "assetid is not detectable"});
                      }
                      if ($vsysrec->{assetid} ne ""){
-                        push(@qmsg,"substituted assetid for $parrec->{systemid} ".
-                                   "from $assetid to $vsysrec->{assetid} ".
-                                   "based on ADOP-T");
+                        my $msg=$self->T('substituted assetid for %s '.
+                                       'from %s to %s based on ADOP-T');
+                        $msg=sprintf($msg,$parrec->{systemid},
+                                          $assetid,$vsysrec->{assetid});
+                        push(@qmsg,$msg);
                         $assetid=$vsysrec->{assetid};
                      }
                   }
@@ -678,7 +680,14 @@ sub qcheckRecord
                                 elsif ($mode eq "delete"){
                                    my $networkid=$oldrec->{networkid};
                                    if ($networkid ne $p{netarea}->{name}->
-                                                     {'Insel-Netz/Kunden-LAN'}->{id}){
+                                             {'Insel-Netz/Kunden-LAN'}->{id}){
+                                      my $msg=$self->T('can not automatic '.
+                                                       'delete ip %s '.
+                                                       'because network area '.
+                                                       'has been changed');
+                                      $msg=sprintf($msg,$oldrec->{name});
+   
+                                      push(@qmsg,$msg);
                                       return();
                                    }
                                    return({OP=>$mode,
