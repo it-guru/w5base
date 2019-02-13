@@ -605,6 +605,15 @@ sub new
 }
 
 
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/ipaddress.jpg?".$cgi->query_string());
+}
+
+
+
 sub initSearchQuery
 {
    my $self=shift;
@@ -852,13 +861,14 @@ sub isParentOPvalid
       my $idname=$p->IdField->Name();
       my %flt=($idname=>\$systemid);
       $p->ResetFilter();
-      if (isDataInputFromUserFrontend()){
-         $p->SecureSetFilter(\%flt,\%flt);  # verhindert isDirectFilter true
+      if ($mode eq "write"){ 
+         $p->SetFilter(\%flt);
       }
       else{
-         $p->SetFilter(\%flt,\%flt);        # verhindert isDirectFilter true
+         $p->SecureSetFilter(\%flt,\%flt);  # do not use isDirectHandling
       }
       my @l=$p->getHashList(qw(ALL));
+
       if ($#l!=0){
          if ($mode eq "write"){
             $self->LastMsg(ERROR,"invalid system reference to systemid=".
@@ -875,7 +885,6 @@ sub isParentOPvalid
       }
       if (isDataInputFromUserFrontend()){
          if (!grep(/^ALL$/,@blkl) && !grep(/^ipaddresses$/,@blkl)){
-            $self->LastMsg(ERROR,"no access") if ($mode eq "write");
             return(0);
          }
       }
@@ -885,7 +894,12 @@ sub isParentOPvalid
       my $idname=$p->IdField->Name();
       my %flt=($idname=>\$itclustsvcid);
       $p->ResetFilter();
-      $p->SecureSetFilter(\%flt,\%flt);
+      if ($mode eq "write"){ 
+         $p->SetFilter(\%flt);
+      }
+      else{
+         $p->SecureSetFilter(\%flt,\%flt);  # do not use isDirectHandling
+      }
       my @l=$p->getHashList(qw(ALL));
       if ($#l!=0){
          if ($mode eq "write"){
