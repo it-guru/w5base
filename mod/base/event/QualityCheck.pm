@@ -50,6 +50,7 @@ sub QualityCheck
 {
    my $self=shift;
    my $dataobj=shift;
+   my $dataobjid=shift;     # for debugging, it is posible to specify a id
    msg(DEBUG,"starting QualityCheck");
    my $lnkq=getModuleObject($self->Config,"base::lnkqrulemandator");
 
@@ -100,11 +101,25 @@ sub QualityCheck
          if ($obj->getField("mandatorid")){
             my @mandators=keys(%{$dataobjtocheck{$dataobj}});
             @mandators=grep({$_ ne "0"} @mandators);
-            if ($#mandators!=-1  # use mandator filter if not only "ANY" rules exists
-                && $dataobj ne "base::workflow"){
+            if ($#mandators!=-1              # use mandator filter if not only 
+                && $dataobj ne "base::workflow"){  # "ANY" rules exists
                msg(INFO,"set (basefilter) mandatorid filter='%s'",
                         join(",",@mandators));
                $basefilter={mandatorid=>\@mandators};
+            }
+         }
+         if ($dataobjid ne ""){
+            my $idfield=$obj->IdField();
+            if (defined($idfield)){
+               my $idname=$idfield->Name();
+               if ($idname ne ""){
+                  if (ref($basefilter) eq "HASH"){
+                     $basefilter->{$idname}=\$dataobjid;
+                  }
+                  else{
+                     $basefilter={$idname=>\$dataobjid};
+                  }
+               }
             }
          }
          return($self->doQualityCheck($basefilter,$obj));
