@@ -537,7 +537,11 @@ sub qcheckRecord
                         if (!($co->ValidateCONumber(
                               $dataobj->SelfAsParentObject,"conumber", $parrec,
                               {conumber=>$parrec->{conumber}}))){ # simulierter newrec
-                           $parrec->{conumber}=undef;
+                           if ($parrec->{conumber} ne ""){
+                              push(@qmsg,"not acceptable CO-Number format: ".
+                                         $parrec->{conumber});
+                              $parrec->{conumber}=undef;
+                           }
                         }
                      }
                      else{
