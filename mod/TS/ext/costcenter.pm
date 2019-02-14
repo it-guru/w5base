@@ -67,6 +67,7 @@ sub ValidateCONumber    # this method needs to be renamed in validateCostcenter
    !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}$/) &&  # OFI PSP Top
    !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}-[0-9]{2}$/) &&  #OFI E2
    !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}-[0-9]{2}-[0-9]{2,4}$/) &&  # E3
+   !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}-[0-9]{2}-[0-9]{2,4}-[0-9]{2,4}$/) &&  # E3
    !($conummer=~m/^[A-Z]-[0-9]{6,12}-[A-Z,0-9]{3,6}$/) )){
          return(0);
       }
