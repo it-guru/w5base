@@ -96,26 +96,13 @@ sub AnalyseAndProcessRec
    my $logcol=2;
 
    my $total=0;
-   my %to=();
-   my %cc=(11634953080001=>1,   #hv
-           11634955570001=>1,   #cj
-           11634955470001=>1,   #pm
-           12762475160001=>1,   #ag
-   );
-
-
    my $msg="";
-   my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
-
 
    my $covalid=1;
-
    if (($rec->{name}=~m/^\s*$/) ||
        ($rec->{name}=~m/\*/)){
       $covalid=0;
    }
-
-
 
    if ($covalid){
       foreach my $o (qw(appl custcontract system asset)){ 
@@ -136,71 +123,20 @@ sub AnalyseAndProcessRec
    }
    else{
       if ($rec->{cistatusid}!=4){
-         print STDERR ("found references for $co but cistatus is $rec->{cistatusid}\n");
+         print STDERR ("found references for $co but cistatus ".
+                       "is $rec->{cistatusid}\n");
          if ($opobj->ValidatedUpdateRecord($rec,{cistatusid=>4},
                                                 {id=>\$rec->{id}})){
             print STDERR ("$co set to active\n");
          }
       }
+      if ($rec->{allowifupdate} ne "1"){
+         if ($opobj->ValidatedUpdateRecord($rec,{allowifupdate=>1},
+                                                {id=>\$rec->{id}})){
+            print STDERR ("$co setting up allowifupdate to 1\n");
+         }
+      }
    }
-
-
-#   if ($total>0){
-#      my $wfa=getModuleObject($self->Config,"base::workflowaction");
-#      my $contact=
-#           "\nFMB One ERP Rollout TSI ".
-#           "One.ERP_Rollout_TSI\@telekom.de".
-#           "\n\n";
-#
-#      if (keys(%to)!=0){
-#         $wfa->Notify("INFO",
-#           "SAPP01 to OFI (One Finace) Migration - ".
-##           $data->[0]." -> ".$data->[1],
-#           "Sehr geehrte Damen und Herren,\n\n".
-#           "aufgrund einer notwendigen Umstellung vom SAP P01 ".
-#           "auf das konzerneinheitliche SAP OFI System ".
-#           ", wurden in W5Base/Darwin ".
-#           "Korrekturen an Config-Items durchgeführt, in denen Sie als ".
-#           "Datenverantwortlicher geführt werden.\n\n".
-#           "Im konkreten Fall wurde der Kostenknoten ...\n".
-##           "'<b>".$data->[0]."</b>' auf '<b>".$data->[1]."</b>'\n ".
-#           "... umgestellt.\n\n".
-#           "Diese Korrektur hat Auswirkungen auf die folgenden ".
-#           "Config-Items:\n".$msg.
-#           "\n\nBitte prüfen Sie im Bedarfsfall, ob diese ".
-#           "Umstellungen auch aus Ihrer Sicht korrekt sind. Bei ".
-#           "Rückfragen zu dieser Migration wenden Sie sich bitte ".
-#           "an das Funktionspostfach ...\n".
-#           $contact.
-#           "... welches für Fragen im Zusammenhang mit der OFI Migration ".
-#           "eingerichtet wurde.\n".
-#           "\n".
-#           "\n".
-#           "               ---------------------------------------\n".
-#           "\n".
-#           "\n".
-#           "Dear Ladies and Gentleman,\n\n".
-#           "Because of the necessary migration from SAP P01 to the ".
-#           "group-wide SAP OFI System corrections in W5Base/Darwin were ".
-#           "made on the config-items where you are listed as the ".
-#           "Databoss.\n\n".
-#           "In this particular case the cost node ...\n ".
-###           "'<b>".$data->[0]."</b>' was changed to '<b>".$data->[1]."</b>'\n ".
-#           "\n".
-#           "This correction affects the following config-items:\n".
-#           $msg.
-#           "\n\nPlease check if this change is correct from your point of ".
-#           "view. In case of further questions please contact the ".
-#           "functional mailbox ...\n".
-#           $contact.
-#           "... which was set up for enquiries regarding the ".
-#           "OFI Migration.\n"
-#           ,
-#           emailto=>[keys(%to)],
-#           emailcc=>[keys(%cc)]);
-#      }
-#   }
-   
 }
 
 
