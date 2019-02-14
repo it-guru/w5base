@@ -327,9 +327,9 @@ sub Import
 
    my $allok=1;
    foreach my $chk (@import){
-      $chk=limitlen($chk,15,1);
       if (!$co->ValidateCONumber($self->Self,
            "conumber",undef,{conumber=>$chk})){
+         $chk=limitlen($chk,15,1);
          $self->LastMsg(ERROR,
             "the element '%s' seems not to be acceptable for this database",
             $chk);
