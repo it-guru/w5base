@@ -3,7 +3,7 @@ Ladies and Gentlemen,
 on the ICTO-ID '%ICTONO%' the following IP addresses have
 SSL certificates found that will soon become invalid:
 
-%CERTLIST%%
+%CERTLIST%
 
 Please make sure that these certificates are 
 be renewed/extended in time. This is the first and only
