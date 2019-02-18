@@ -98,7 +98,7 @@ sub SSLcertMon
                                  sslparsedw5baseref sslparsedvalidtill
                                  sdate srcid));
       $datastream->SetCurrentOrder("+sdate","+srcid");
-      $datastream->Limit(1000);
+      $datastream->Limit(5000);
       my ($rec,$msg)=$datastream->getFirst();
 
       if (defined($rec)){
