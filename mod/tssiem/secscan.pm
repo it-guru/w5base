@@ -319,6 +319,9 @@ sub new
    $self->{use_distinct}=0;
    $self->setDefaultView(qw(sdate ictono name sduration secentcnt));
    $self->setWorktable("W5SIEM_secscan");
+   $self->BackendSessionName("W5SIEM_secscan_LongRead");  # try to force dedicated Session
+                                                          # because lonReadLen and 
+                                                          # cursor_sharing=force
    return($self);
 }
 
