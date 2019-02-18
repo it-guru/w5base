@@ -81,6 +81,7 @@ sub SecScanMon
          my $lastmsg=$firstrec->{exitmsg};
          if (($laststamp,$lastid)=
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
+            $exitmsg=$lastmsg;
             %flt=( 
                sdate=>">=\"$laststamp GMT\""
             );

@@ -82,6 +82,7 @@ sub SSLcertMon
          my $lastmsg=$firstrec->{exitmsg};
          if (($laststamp,$lastid)=
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\d+)$/){
+            $exitmsg=$lastmsg;
             %flt=( 
                sdate=>">=\"$laststamp GMT\"",
                qid=>\"86002"
