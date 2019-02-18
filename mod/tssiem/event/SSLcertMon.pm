@@ -145,7 +145,7 @@ sub SSLcertMon
                msg(ERROR,"db record problem: %s",$msg);
                return({exitcode=>1,msg=>$msg});
             }
-         }until(!defined($rec) || $recno>100);
+         }until(!defined($rec) || $recno>2000);
       }
    }
 
