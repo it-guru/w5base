@@ -135,7 +135,7 @@ sub getSqlFrom
             join $worktable 
                on COMPUTER_SYSTEMS.COMPUTER_SYSTEM_ID=
                   $worktable.COMPUTER_SYSTEM_ID
-       where COMPUTER_SYSTEMS.type='Service'
+       where COMPUTER_SYSTEMS.type='Service' and COMPUTER_SYSTEMS.STATUS='up'
       ) IPA";
  
 
