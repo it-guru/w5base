@@ -80,6 +80,8 @@ sub qcheckRecord
    my $par;
    my $parrec;
 
+   return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+
    if ($rec->{srcsys} eq "" || lc($rec->{srcsys}) eq "w5base"){
       $par=getModuleObject($self->getParent->Config(),"tssapp01::psp");
       $par->SetFilter({name=>\$rec->{name}});
@@ -125,14 +127,14 @@ sub qcheckRecord
                           mode=>'string');
       }
       if ($rec->{cistatusid} < 6){
-         if ($rec->{description} eq ""){
-            $self->IfComp($dataobj,
-                          $rec,"shortdesc",
-                          $parrec,"description",
-                          $autocorrect,$forcedupd,$wfrequest,
-                          \@qmsg,\@dataissue,\$errorlevel,
-                          mode=>'string');
-         }
+         my @nomsg;
+         my $noerrorlevel;
+         $self->IfComp($dataobj,
+                       $rec,"shortdesc",
+                       $parrec,"description",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       \@nomsg,\@nomsg,\$noerrorlevel,
+                       mode=>'string');
       }
       if ($par->Self() eq "tssapp01::costcenter"){
          if ($rec->{costcentertype} ne "costcenter"){
@@ -144,9 +146,9 @@ sub qcheckRecord
             $forcedupd->{costcentertype}="pspelement";
          }
       }
-      #if ($rec->{srcid} ne $parrec->{id}){   # srcid not wide enouth
-      #   $forcedupd->{srcid}=$parrec->{id};
-      #}
+      if ($rec->{srcid} ne $parrec->{id}){  
+         $forcedupd->{srcid}=$parrec->{id};
+      }
    }
 
    if (keys(%$forcedupd)){
