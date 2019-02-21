@@ -35,6 +35,7 @@ sub new
 sub RManW5Wexp
 {
    my $self=shift;
+   my $debugwfid=shift;
    my $exitcode=0;
 
    my $wf=getModuleObject($self->Config,"base::workflow");
@@ -59,8 +60,13 @@ sub RManW5Wexp
       push(@q,\%q);
    }
 
-
-   $wf->SetFilter(\@q);
+   if ($debugwfid eq ""){
+      $wf->SetFilter(\@q);
+   }
+   else{
+      $wf->SetFilter({id=>\$debugwfid});
+   }
+   
 
    
 
@@ -80,6 +86,7 @@ sub RManW5Wexp
       wffields.ibiprice
       wffields.riskmgmtcondition
       wffields.solutionopt
+      wffields.itrmcriticality
       mdate
       cdate
       mandator
